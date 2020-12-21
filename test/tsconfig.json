@@ -1,0 +1,18 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+		"target": "es2019",
+		"module": "amd",
+		"removeComments": true,
+		"strictNullChecks": true,
+		"noImplicitReturns": true,
+		"noImplicitAny": true,
+		"preserveConstEnums": true,
+		"outFile": "test.js",
+		"experimentalDecorators": true
+	},
+	"include": [
+		"./src/**/*.ts",
+		"../src/core/global/shrewd.d.ts",
+	]
+}

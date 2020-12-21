@@ -1,0 +1,172 @@
+{
+	"name": "正體中文",
+	"flag": "taiwan",
+	"welcome": {
+		"title": "歡迎使用 Box Pleating Studio！",
+		"intro": [
+			"本應用程式是做來幫助摺紙設計者利用箱形褶（box pleating，日文作「蛇腹折り」）系統和 GOPS 來設計超複雜超狂的作品。",
+			"您可以從左上角的選單建立新的空白專案，或是至 {0} 閱讀簡短的使用手冊。"
+		],
+		"install": {
+			"hint": "您也可以將 BP Studio 以獨立應用程式的形式安裝至您的裝置上，並離線使用！",
+			"ios": "iOS 安裝方法：在 Safari 中開啟本網址，按下螢幕中間下方的分享按鈕，並且點選「加入至首頁」。",
+			"bt": "安裝 Box Pleating Studio App",
+			"ing": "安裝 App 中，請稍待……",
+			"ed": "BP Studio 已經安裝到您的裝置上了。",
+			"open": "開啟 Box Pleating Studio App"
+		},
+		"copyright": "Copyright © 2020 蔡牧村"
+	},
+	"toolbar": {
+		"file": {
+			"title": "檔案",
+			"new": "開新專案",
+			"open": "開啟專案 / 工作區",
+			"saveBPS": "下載目前的專案",
+			"saveBPZ": "下載工作區",
+			"saveSVG": "以 SVG 格式下載目前的視圖",
+			"savePNG": "以 PNG 格式下載目前的視圖",
+			"copyPNG": "以 PNG 格式複製目前的視圖",
+			"print": "列印目前的視圖",
+			"share": "分享目前的專案"
+		},
+		"setting": {
+			"title": "設定",
+			"fullscreen": "全螢幕模式",
+			"fullscreenExit": "退出全螢幕模式",
+			"grid": "顯示格線",
+			"hinge": "顯示樞紐摺痕",
+			"ridge": "顯示脊摺痕",
+			"axial": "顯示裝置中的軸平行摺痕",
+			"label": "顯示標籤",
+			"tip": "顯示角片頂點",
+			"preference": "喜好設定"
+		},
+		"project": {
+			"title": "開啟的專案",
+			"empty": "目前沒有開啟的專案",
+			"noTitle": "(無標題)",
+			"clone": "複製目前的專案",
+			"close": "關閉目前的專案",
+			"closeAll": "關閉所有專案"
+		},
+		"help": {
+			"title": "說明",
+			"about": "關於",
+			"donation": "捐款"
+		},
+		"view": {
+			"tree": "樹狀結構",
+			"layout": "配置"
+		},
+		"panel": "選項面板",
+		"tab": {
+			"clone": "複製",
+			"close": "關閉",
+			"closeAll": "全部關閉",
+			"closeOther": "關閉其它",
+			"closeRight": "關閉右側"
+		}
+	},
+	"preference": {
+		"language": "語言",
+		"autoSave": "自動儲存工作區",
+		"includeHidden": "在 SVG 輸出中包含隱藏元件"
+	},
+	"panel": {
+		"design": {
+			"type": "Box Pleating Studio 專案",
+			"title": "標題",
+			"titlePH": "(專案標題)",
+			"descriptionPH": "(專案描述)",
+			"tree": "樹狀結構檢視",
+			"layout": "配置檢視",
+			"width": "寬度",
+			"height": "高度",
+			"autoScale": "自動縮放",
+			"scale": "尺度"
+		},
+		"flap": {
+			"type": "角片",
+			"name": "名稱",
+			"radius": "半徑",
+			"width": "寬度",
+			"height": "高度",
+			"goto": "前往頂點"
+		},
+		"flaps": {
+			"type": "角片",
+			"goto": "前往頂點"
+		},
+		"river": {
+			"type": "河",
+			"width": "寬度",
+			"goto": "前往邊"
+		},
+		"vertex": {
+			"type": "頂點",
+			"name": "名稱",
+			"addLeaf": "新增葉邊",
+			"ofLength": "長度為",
+			"delJoin": "刪除並合併端點",
+			"goto": "前往角片"
+		},
+		"vertices": {
+			"type": "頂點",
+			"goto": "前往角片"
+		},
+		"edge": {
+			"type": "邊",
+			"length": "長度",
+			"split": "分割",
+			"merge": "融合端點",
+			"goto": "前往河"
+		},
+		"repo": {
+			"type": "伸展結構",
+			"config": "組態",
+			"pattern": "摺痕模式",
+			"onlyOne": "只找到了一種摺痕模式"
+		}
+	},
+	"share": {
+		"copy": "複製",
+		"message": "快來看我用 Box Pleating Studio 設計的專案「{0}」！",
+		"share": "分享",
+		"title": "分享專案"
+	},
+	"about": {
+		"title": "關於 Box Pleating Studio",
+		"license": "依 MIT 授權條款發行",
+		"visit": "欲參閱使用手冊或提供意見回饋，請前往本 App 在 GitHub 上的 {0}。",
+		"homepage": "首頁",
+		"donation": "BP Studio 的使用是完全免費的。若您覺得本 App 對您的摺紙設計有幫助並有興趣提供支持，歡迎您透過 {0} 任意捐款。"
+	},
+	"donate": {
+		"title": "贊助 Box Pleating Studio",
+		"intro": "感謝您考慮贊助 Box Pleating Studio！請輸入任何您想捐款的數字。您可以捐美金 $1 請我喝杯咖啡，或 $10 請我吃頓飯之類的。😄 (PayPal 手續費會在結帳時加上去)",
+		"error": "請輸入一個數字",
+		"then": "然後按下底下的按鈕並依指示完成捐款。",
+		"wait": "請等待 PayPal 完成您的交易……",
+		"nextTime": "下次再說",
+		"thank": "{0}，感謝您的熱情捐款！"
+	},
+	"message": {
+		"invalidFormat": "檔案「{0}」的格式無效。",
+		"downloadHint": "按右鍵並點選「另存連結」可指定存檔位置",
+		"min3vertex": "樹狀結構至少需要有三個頂點",
+		"oldVersion": "專案「{0}」是使用較舊版本的 BP Studio 產生的，部份伸展結構可能會需要重新選取。專案會在下次存檔時更新為最新格式。",
+		"patternNotFound": "在當前的設計中，存在一些角片重疊是雖然有效、但目前的 BP Studio 卻無法找到可行的伸展摺痕模式的。本應用程式的作者將會持續實作更多演算法以涵蓋更多情況。",
+		"unsaved": "專案「{0}」有尚未儲存的變更，確定要捨棄？"
+	},
+	"keyword": {
+		"yes": "是",
+		"no": "否",
+		"ok": "確定",
+		"delete": "刪除",
+		"version": "版本",
+		"untitled": "未命名",
+		"workspace": "工作區",
+		"close": "關閉"
+	}
+}

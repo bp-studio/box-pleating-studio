@@ -1,0 +1,27 @@
+{
+	// 使用 IntelliSense 以得知可用的屬性。
+	// 暫留以檢視現有屬性的描述。
+	// 如需詳細資訊，請瀏覽: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "pwa-chrome",
+			"request": "launch",
+			"name": "Launch in Chrome",
+			"preLaunchTask": "Gulp build",
+			"internalConsoleOptions": "neverOpen",
+			"file": "${workspaceFolder}/dist/index.htm",
+			"sourceMaps": true
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch Test",
+			"preLaunchTask": "Gulp buildTest",
+			"console": "internalConsole",
+			"internalConsoleOptions": "openOnSessionStart",
+			"program": "${workspaceFolder}/test/test.js",
+			"protocol": "inspector"
+		}
+	]
+}

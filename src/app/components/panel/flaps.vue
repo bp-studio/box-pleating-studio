@@ -1,0 +1,20 @@
+<template >
+	<div>
+		<h5 v-t="'panel.flaps.type'"></h5>
+		<div class="mt-3">
+			<button class="btn btn-primary" v-if="design.tree.node.size>3" @click="design.deleteFlaps(selections)" v-t="'keyword.delete'"></button>
+		</div>
+		<div class="mt-3">
+			<button class="btn btn-primary" @click="design.flapToVertex(selections)" v-t="'panel.flaps.goto'"></button>
+		</div>
+	</div>
+</template>
+
+
+<script lang="ts">
+	import { Component } from 'vue-property-decorator';
+	import BaseComponent from '../mixins/baseComponent';
+
+	@Component
+	export default class Flaps extends BaseComponent { }
+</script>

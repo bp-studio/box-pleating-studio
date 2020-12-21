@@ -1,0 +1,34 @@
+{
+	"latex-workshop.latex.recipe.default": "xelatex",
+	"latex-workshop.latex.recipes": [
+		{
+			"name": "xelatex",
+			"tools": [
+				"xelatex",
+			]
+		}
+	],
+	"files.exclude": {
+		"node_modules": true,
+		"**/*.map": true,
+		"**/debug.log": true,
+		"docs/**/*.log": true,
+		"**/*.aux": true,
+		"**/*.nav": true,
+		"**/*.out": true,
+		"**/*.snm": true,
+		"**/*.synctex.gz": true,
+		"**/*.toc": true,
+	},
+	"i18n-ally.enabledFrameworks": [
+		"vue"
+	],
+	"i18n-ally.localesPaths": "src/locale",
+	"i18n-ally.enabledParsers": [
+		"json"
+	],
+	"i18n-ally.sourceLanguage": "en",
+	"i18n-ally.keystyle": "nested",
+	"i18n-ally.indent": 4,
+	"i18n-ally.tabStyle": "tab"
+}

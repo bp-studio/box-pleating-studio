@@ -1,0 +1,54 @@
+{
+	// 如需 tasks.json 格式的文件， 
+	// 請參與 https://go.microsoft.com/fwlink/?LinkId=733558
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Gulp build",
+			"type": "gulp",
+			"task": "default",
+			"isBackground": true,
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"revealProblems": "onProblem",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true
+			},
+			"problemMatcher": {
+				"fileLocation": "relative",
+				"pattern": {
+					"regexp": "^([^\\s].*)\\((\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+					"file": 1,
+					"location": 2,
+					"severity": 3,
+					"code": 4,
+					"message": 5
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "^\\[.{8}\\]\\sStarting\\s\\'build",
+					"endsPattern": "^\\[.{8}\\]\\sFinished"
+				}
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Gulp buildTest",
+			"type": "gulp",
+			"task": "buildTest",
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"revealProblems": "onProblem",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true
+			}
+		}
+	]
+}

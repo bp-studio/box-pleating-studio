@@ -1,0 +1,7 @@
+RewriteEngine On
+
+RewriteCond %{HTTP_HOST} !bpstudio.abstreamace.com$ [NC]
+RewriteRule ^(.*)$ - [R=404,L]
+
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

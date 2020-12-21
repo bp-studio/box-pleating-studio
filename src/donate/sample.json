@@ -1,0 +1,97 @@
+// This is a sample json data returned after transaction is completed.
+// It is included in the repo only for future reference purpose.
+// This is genereated from a PayPal sandbox account, so you won't find any sensitive info here.
+{
+	"create_time": "2020-12-01T03:31:26Z",
+	"update_time": "2020-12-01T03:32:46Z",
+	"id": "27794128LV425630W",
+	"intent": "CAPTURE",
+	"status": "COMPLETED",
+	"payer": {
+		"email_address": "sb-uaxcf3361715@personal.example.com",
+		"payer_id": "42WMBC8NYJ5QU",
+		"address": {
+			"country_code": "US"
+		},
+		"name": {
+			"given_name": "John",
+			"surname": "Doe"
+		}
+	},
+	"purchase_units": [
+		{
+			"description": "Supporting Box Pleating Studio",
+			"reference_id": "default",
+			"amount": {
+				"value": "10.77",
+				"currency_code": "USD"
+			},
+			"payee": {
+				"email_address": "sb-mctmq3360699@business.example.com",
+				"merchant_id": "CT3D2P8FLV39A"
+			},
+			"shipping": {
+				"name": {
+					"full_name": "John Doe"
+				},
+				"address": {
+					"address_line_1": "1 Main St",
+					"admin_area_2": "San Jose",
+					"admin_area_1": "CA",
+					"postal_code": "95131",
+					"country_code": "US"
+				}
+			},
+			"payments": {
+				"captures": [
+					{
+						"status": "COMPLETED",
+						"id": "7UX4031727385264D",
+						"final_capture": true,
+						"create_time": "2020-12-01T03:32:46Z",
+						"update_time": "2020-12-01T03:32:46Z",
+						"amount": {
+							"value": "10.77",
+							"currency_code": "USD"
+						},
+						"seller_protection": {
+							"status": "ELIGIBLE",
+							"dispute_categories": [
+								"ITEM_NOT_RECEIVED",
+								"UNAUTHORIZED_TRANSACTION"
+							]
+						},
+						"links": [
+							{
+								"href": "https://api.sandbox.paypal.com/v2/payments/captures/7UX4031727385264D",
+								"rel": "self",
+								"method": "GET",
+								"title": "GET"
+							},
+							{
+								"href": "https://api.sandbox.paypal.com/v2/payments/captures/7UX4031727385264D/refund",
+								"rel": "refund",
+								"method": "POST",
+								"title": "POST"
+							},
+							{
+								"href": "https://api.sandbox.paypal.com/v2/checkout/orders/27794128LV425630W",
+								"rel": "up",
+								"method": "GET",
+								"title": "GET"
+							}
+						]
+					}
+				]
+			}
+		}
+	],
+	"links": [
+		{
+			"href": "https://api.sandbox.paypal.com/v2/checkout/orders/27794128LV425630W",
+			"rel": "self",
+			"method": "GET",
+			"title": "GET"
+		}
+	]
+}

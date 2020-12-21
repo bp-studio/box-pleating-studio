@@ -1,0 +1,34 @@
+{
+	"name": "box-pleating-studio",
+	"version": "1.0.0",
+	"description": "Super-complex origami design made easy!",
+	"main": "./dist/bpstudio.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Mu-Tsun Tsai",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/bootstrap": "^4.5.1",
+		"@types/jquery": "^3.5.4",
+		"crc": "^3.8.0",
+		"fancy-log": "^1.3.3",
+		"gulp": "^4.0.2",
+		"gulp-concat": "^2.6.1",
+		"gulp-if-any-newer": "^2.0.0",
+		"gulp-sourcemaps": "^2.6.5",
+		"gulp-terser": "^1.4.1",
+		"gulp-typescript": "^5.0.1",
+		"gulp-wrap-js": "^0.4.1",
+		"jszip": "^3.5.0",
+		"popper.js": "^1.16.1",
+		"typescript": "^4.0.5",
+		"vinyl-ftp": "^0.6.1",
+		"vue": "^2.6.12",
+		"vue-property-decorator": "^9.0.2",
+		"vue-property-decorator-transpiler": "^2.0.5",
+		"vue-template-compiler": "^2.6.12",
+		"workbox-build": "^5.1.4"
+	},
+	"dependencies": {}
+}

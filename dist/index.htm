@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html translate="no">
+
+<head>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-799WYS2TDC"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+		gtag('config', 'G-799WYS2TDC');
+	</script>
+
+	<meta charset="UTF-8">
+	<title>Box Pleating Studio</title>
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
+	<meta name="description" content="Super-complex origami design made easy!">
+	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio" />
+	<meta name="google" content="notranslate">
+	<meta name="build" content="420">
+
+	<meta property="og:url" content="https://bpstudio.abstreamace.com" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Box Pleating Studio" />
+	<meta property="og:image" content="https://bpstudio.abstreamace.com/assets/mockup.jpg" />
+	<meta property="og:description" content="Super-complex origami design made easy!" />
+
+	<link rel="icon" type="image/png" sizes="512x512" href="assets/icon/icon-512.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="assets/icon/icon-192.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="assets/icon/icon-96.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="assets/icon/icon-32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="assets/icon/icon-16.png">
+	<link rel='apple-touch-icon' sizes='192x192' href="assets/icon/icon-192.png" />
+
+	<script>
+		if(location.protocol == 'https:') {
+			document.write(`<link rel="manifest" href="manifest.json">`);
+			if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+		}
+
+		(function() {
+			let display = (id, v) => document.getElementById(id).style.display = v;
+			let err = false, onErr = () => err = true;
+			let errorOB = new MutationObserver(function(mutations) {
+				mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
+					(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
+				));
+			});
+			errorOB.observe(document, { childList: true, subtree: true });
+			window.addEventListener('DOMContentLoaded', () => {
+				errorOB.disconnect();
+				if(err) {
+					display('resource', 'block');
+					display('divWorkspace', 'none');
+					display('app', 'none');
+				} else if(typeof BPStudio == 'undefined') {
+					display('requirement', 'block');
+				}
+			});
+		})();
+	</script>
+
+	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="lib/font-awesome/css/all.min.css">
+
+	<script src="lib/jquery.min.js"></script>
+	<script src="lib/bootstrap/js/popper.min.js"></script>
+	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="lib/paper-core.min.js"></script>
+	<script src="lib/vue.runtime.min.js"></script>
+	<script src="lib/vue-clipboard.min.js"></script>
+	<script src="lib/lzma_worker-min.js"></script>
+	<script src="lib/clickout-event.js"></script>
+	<script src="lib/sortable.min.js"></script>
+	<script src="lib/vuedraggable.umd.min.js"></script>
+	<script src="lib/jszip.min.js"></script>
+	<script src="lib/vue-i18n.js"></script>
+
+	<link rel="stylesheet" href="assets/bps/style.css">
+	<link rel="stylesheet" href="main.css?47770bd5">
+	<link rel="stylesheet" href="bpstudio.css?64faaaae">
+
+	<script src="shrewd.min.js?97d129ed"></script>
+	<script src="bpstudio.js?7d170c1a"></script>
+	<script src="locale.js?36e183d9"></script>
+</head>
+
+<body>
+	<div id="divWorkspace"></div>
+	<div id="core"></div>
+	<div id="app"></div>
+
+	<div id="requirement" class="p-3" style="display:none;">
+		<h3>
+			It appears that your browser is too old to support Box Pleating Studio.
+			Please upgrade your browser or use the latest version of Chrome, which is the recommended browser.
+			The author apologize for the inconvenience.
+		</h3>
+	</div>
+	<div id="resource" class="p-3" style="display:none;">
+		<h3>
+			Some of the required resources cannot be loaded successfully, and thus Box Pleating Studio cannot be started.
+			This is probably due to internet connection problem and/or missing cached resources.
+			Please check you network and try again.
+		</h3>
+	</div>
+</body>
+
+<script src="main.js?96921740"></script>
+
+</html>

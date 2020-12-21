@@ -1,0 +1,21 @@
+<template >
+	<div>
+		<h5 v-t="'panel.river.type'"></h5>
+		<field :label="$t('panel.river.width')" type="number" v-model.number="selection.length"></field>
+		<div class="mt-3">
+			<button class="btn btn-primary" @click="selection.delete()" v-t="'keyword.delete'"></button>
+		</div>
+		<div class="mt-3">
+			<button class="btn btn-primary" @click="design.riverToEdge(selection)" v-t="'panel.river.goto'"></button>
+		</div>
+	</div>
+</template>
+
+
+<script lang="ts">
+	import { Component } from 'vue-property-decorator';
+	import BaseComponent from '../mixins/baseComponent';
+
+	@Component
+	export default class River extends BaseComponent { }
+</script>

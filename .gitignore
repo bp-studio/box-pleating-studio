@@ -1,0 +1,18 @@
+# You don't really think I'll leave sensitive info in the repo, do you?
+.vscode/*ftp*
+
+# Non-essential files
+node_modules
+debug.log
+
+# LaTeX aux files
+docs/*.aux
+docs/*.log
+docs/*.synctex.gz
+docs/*.nav
+docs/*.out
+docs/*.toc
+docs/*.snm
+
+# My own notes
+NOTE.md

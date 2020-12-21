@@ -1,0 +1,172 @@
+{
+	"name": "English",
+	"flag": "usa",
+	"welcome": {
+		"title": "Welcome to Box Pleating Studio!",
+		"intro": [
+			"This app is made to help origami designers to make complex, crazy designs using box pleating and GOPS gadgets.",
+			"To begin, click on the upper-left menu button to create an empty new project, our read our brief user manual on {0}."
+		],
+		"install": {
+			"hint": "You can also install BP Studio as a standalone app to your device, and use it offline!",
+			"ios": "How to install on iOS: Open this website in Safari, tap the \"Share\" icon at the bottom of\tyour screen, and then tap \"Add to home screen\".",
+			"bt": "Install Box Pleating Studio App",
+			"ing": "Installing app, please wait...",
+			"ed": "BP Studio is already installed on your device.",
+			"open": "Open Box Pleating Studio App"
+		},
+		"copyright": "Copyright © 2020 by Mu-Tsun Tsai"
+	},
+	"toolbar": {
+		"file": {
+			"title": "Files",
+			"new": "New project",
+			"open": "Open projects / workspaces",
+			"saveBPS": "Download current project",
+			"saveBPZ": "Download workspace",
+			"saveSVG": "Download current view as SVG",
+			"savePNG": "Download current view as PNG",
+			"copyPNG": "Copy current view as PNG",
+			"print": "Print current view",
+			"share": "Share current project"
+		},
+		"setting": {
+			"title": "Settings",
+			"fullscreen": "Fullscreen",
+			"fullscreenExit": "Exit fullscreen",
+			"grid": "Show grid lines",
+			"hinge": "Show hinge creases",
+			"ridge": "Show ridge creases",
+			"axial": "Show axial-parallel creases in gadgets",
+			"label": "Show labels",
+			"tip": "Show flap tips",
+			"preference": "Preferences"
+		},
+		"project": {
+			"title": "Open projects",
+			"empty": "No open projects",
+			"noTitle": "(no title)",
+			"clone": "Clone current project",
+			"close": "Close current project",
+			"closeAll": "Close all projects"
+		},
+		"help": {
+			"title": "Help",
+			"about": "About",
+			"donation": "Donation"
+		},
+		"view": {
+			"tree": "Tree structure",
+			"layout": "Layout"
+		},
+		"tab": {
+			"clone": "Clone",
+			"close": "Close",
+			"closeAll": "Close all",
+			"closeOther": "Close others",
+			"closeRight": "Close all to the right"
+		},
+		"panel": "Option panel"
+	},
+	"preference": {
+		"language": "Language",
+		"autoSave": "Save workspace automatically",
+		"includeHidden": "Include hidden elements in SVG exports"
+	},
+	"panel": {
+		"design": {
+			"type": "Box Pleating Studio Project",
+			"title": "Title",
+			"titlePH": "(Project title)",
+			"descriptionPH": "(Project description)",
+			"tree": "Tree structure view",
+			"layout": "Layout view",
+			"width": "Width",
+			"height": "Height",
+			"autoScale": "Auto-scale",
+			"scale": "Scale"
+		},
+		"flap": {
+			"type": "Flap",
+			"name": "Name",
+			"radius": "Radius",
+			"width": "Width",
+			"height": "Height",
+			"goto": "Go to vertex"
+		},
+		"flaps": {
+			"type": "Flaps",
+			"goto": "Go to vertices"
+		},
+		"river": {
+			"type": "River",
+			"width": "Width",
+			"goto": "Go to edge"
+		},
+		"vertex": {
+			"type": "Vertex",
+			"name": "Name",
+			"addLeaf": "Add leaf",
+			"ofLength": "of length",
+			"delJoin": "Delete and join",
+			"goto": "Go to flap"
+		},
+		"vertices": {
+			"type": "Vertices",
+			"goto": "Go to flaps"
+		},
+		"edge": {
+			"type": "Edge",
+			"length": "Length",
+			"split": "Split",
+			"merge": "Merge ends",
+			"goto": "Go to river"
+		},
+		"repo": {
+			"type": "Stretch",
+			"config": "Configuration",
+			"pattern": "Pattern",
+			"onlyOne": "Only one pattern is found."
+		}
+	},
+	"share": {
+		"title": "Share project",
+		"copy": "Copy",
+		"share": "Share",
+		"message":  "Check out my project \"{0}\" designed with Box Pleating Studio!"
+	},
+	"about": {
+		"title": "About Box Pleating Studio",
+		"license": "Released under the MIT license.",
+		"visit": "For user manual and feedback, visit the app's {0} on Github.",
+		"homepage": "homepage",
+		"donation": "BP Studio is completely free to use. If you find this app helpful to your designing and are interested in supporting this app, you can donate any amount with {0}."
+	},
+	"donate": {
+		"title": "Supporting Box Pleating Studio",
+		"intro": "Thank you for considering supporting Box Pleating Studio! Please enter any amount you would like to donate. You can buy me a coffee with $1, or a dinner with $10, etc. 😄 (PayPal handling fee will be added during checkout)",
+		"error": "Please enter a number",
+		"then": "Then click the button below and follow the instructions to complete.",
+		"wait": "Please wait until PayPal complete your transaction...",
+		"nextTime": "Maybe next time",
+		"thank": "Thank you very much, {0}, for your kind donation!"
+	},
+	"message": {
+		"invalidFormat": "File \"{0}\" is of invalid format.",
+		"downloadHint": "Right-click and use \"Save As\" to choose file location.",
+		"min3vertex": "The tree needs to have at least 3 vertices.",
+		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and some stretch patterns may need to be re-selected. It will be updated to the latest format on the next saving.",
+		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
+		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?"
+	},
+	"keyword": {
+		"yes": "Yes",
+		"no": "No",
+		"ok": "OK",
+		"close": "Close",
+		"delete": "Delete",
+		"version": "Version",
+		"untitled": "Untitled",
+		"workspace": "workspace"
+	}
+}
