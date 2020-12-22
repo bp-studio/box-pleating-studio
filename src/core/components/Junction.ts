@@ -110,12 +110,6 @@ interface JJunction extends JRectangle {
 		return a1.concat(a2);
 	}
 
-	/** 等同於呼叫 `.q1.point`，但是假定了正常重疊的前提 */
-	public get p1() { return this.q1!.point; }
-
-	/** 等同於呼叫 `.q2.point`，但是假定了正常重疊的前提 */
-	public get p2() { return this.q2!.point; }
-
 	@shrewd public get q1() {
 		return isQuadrant(this.direction) ? this.f1.quadrants[this.direction] : null;
 	}
@@ -198,13 +192,6 @@ interface JJunction extends JRectangle {
 		if(vx) return Math.abs(x);
 		if(vy) return Math.abs(y);
 		return 0;
-	}
-
-	public createSideRidge(pt: Point): Line | null {
-		if(!this.q1 || !this.q2) return null;
-		let l = this.q1.createSideRidge(pt);
-		if(l == null) l = this.q2.createSideRidge(pt);
-		return l;
 	}
 
 	@shrewd public get isValid(): boolean {

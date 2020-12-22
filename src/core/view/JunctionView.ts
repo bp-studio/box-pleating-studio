@@ -27,6 +27,7 @@
 		}
 	}
 
+	/** 當相交面積太小的時候加粗框線以免重疊不明顯 */
 	private static widthForArea(a:number):number {
 		return a < 0.25 ? 4 : a < 0.5 ? 3 : a < 1 ? 2 : 1;
 	}

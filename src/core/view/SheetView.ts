@@ -30,20 +30,15 @@
 		let width = this._sheet.width;
 		let height = this._sheet.height;
 
-		this._border.segments[0].point.set(0, height);
-		this._border.segments[2].point.set(width, 0);
-		this._border.segments[3].point.set(width, height);
+		PaperUtil.setRectangleSize(this._border, width, height);
 
 		this._grid.visible = this.$studio?.$display.settings.showGrid;
 		this._grid.removeChildren();
-
 		for(let i = 1; i < height; i++) {
-			this._grid.moveTo(new paper.Point(0, i));
-			this._grid.lineTo(new paper.Point(width, i));
+			PaperUtil.addLine(this._grid, new paper.Point(0, i), new paper.Point(width, i));
 		}
 		for(let i = 1; i < width; i++) {
-			this._grid.moveTo(new paper.Point(i, 0));
-			this._grid.lineTo(new paper.Point(i, height));
+			PaperUtil.addLine(this._grid, new paper.Point(i, 0), new paper.Point(i, height));
 		}
 	}
 }

@@ -7,7 +7,7 @@
 
 namespace Migration {
 
-	export const current: string = "rc1";
+	export const current: string = "0";
 
 	export function process(design: any, onDeprecated?: (title: string) => void): JDesign {
 		let deprecate = false;
@@ -72,8 +72,10 @@ namespace Migration {
 			}
 		}
 
-		if(deprecate && onDeprecated) onDeprecated(design.title);
+		// 版本 0 與 rc1 完全相同，純粹為了紀念發行而改變號碼
+		if(design.version == "rc1") design.version = "0";
 
+		if(deprecate && onDeprecated) onDeprecated(design.title);
 		return design;
 	}
 

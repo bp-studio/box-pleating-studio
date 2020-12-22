@@ -3,15 +3,10 @@
 // Enums
 //////////////////////////////////////////////////////////////////
 
-class Enum {
-	static values(e: any) {
+namespace Enum {
+	export function values(e: any) {
 		return Object.values<number>(e).filter(a => !isNaN(Number(a)));
 	}
-
-	static isFWD(dir: Direction) { return dir == Direction.UR || dir == Direction.LL; }
-	static isBWD(dir: Direction) { return dir == Direction.UL || dir == Direction.LR; }
-	static onRight(dir: Direction) { return dir == Direction.UR || dir == Direction.LR; }
-	static onLeft(dir: Direction) { return dir == Direction.UL || dir == Direction.LL; }
 }
 
 enum JunctionStatus { tooClose, overlap, tooFar }

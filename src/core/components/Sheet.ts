@@ -102,7 +102,15 @@ interface JSheet {
 		return this.controls.filter((c: Control): c is IndependentDraggable => c instanceof IndependentDraggable);
 	}
 
+	/**
+	 * 所有的 `IndependentDraggable` 所佔據空間的矩形。
+	 *
+	 * 這個資料故意不採用計算屬性而是採用一個反應方法來持續更新它，
+	 * 為的是避免導致循環參照。
+	 */
 	private indepRect: Rectangle = new Rectangle(Point.ZERO, Point.ZERO);
+
+	/** 更新 `indepRect` 的反應方法 */
 	@shrewd private getIndepRect() {
 		let x1 = Number.POSITIVE_INFINITY, y1 = Number.POSITIVE_INFINITY;
 		let x2 = Number.NEGATIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;

@@ -97,7 +97,7 @@
 			if(start && this.outside(trace[0], r, this.q % 2 != 1)) {
 				trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
 			}
-			if(end &&this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
+			if(end && this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
 				trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
 			}
 		}
@@ -216,9 +216,9 @@
 		return stretch ? stretch.pattern : null;
 	}
 
-	@shrewd public get corner(): paper.Point {
+	@shrewd public get corner(): Point {
 		let r = this.flap.radius;
-		return this.point.add(this.qv.scale(r)).toPaper();
+		return this.point.add(this.qv.scale(r));
 	}
 
 	@shrewd private get junctions(): readonly Junction[] {
@@ -247,15 +247,6 @@
 	@shrewd public get activeJunctions(): readonly Junction[] {
 		let result = this.design.activeJunctionsByQuadrant.get(this);
 		return result ? result : [];
-	}
-
-	public createSideRidge(pt: Point): Line | null {
-		let r = this.flap.radius;
-		let { x, y } = pt.sub(this.point).scale(this.qv);
-		if(!(0 < x && x < r && 0 < y && y < r)) return null;
-		let d = Math.min(r - x, r - y);
-		let v = this.qv.scale(d);
-		return new Line(pt, pt.add(v));
 	}
 
 	/** 把一個象限方向作相位變換處理 */

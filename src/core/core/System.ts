@@ -21,7 +21,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	@shrewd private get _controls(): Control[] {
 		let c = this._studio.design ? this._studio.design.sheet.activeControls.concat() : [];
 		c.sort((a, b) => System.controlPriority(a) - System.controlPriority(b));
-		this._dragSelectables = c.filter(isDragSelectableControl);
+		this._dragSelectables = c.filter(Control.isDragSelectable);
 		if(!c.length) this._ctrl = [null, null]; // GC
 		return c;
 	}

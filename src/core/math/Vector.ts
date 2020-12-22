@@ -95,11 +95,12 @@ class Vector extends Couple {
 		return new Vector(fx * x, fx * y);
 	}
 
-	/** 原地對調 x, y 值 */
-	public flip(): Vector {
-		[this._x, this._y] = [this._y, this._x];
-		return this;
-	}
+	// 這個似乎用不到了
+	// /** 原地對調 x, y 值 */
+	// public flip(): Vector {
+	// 	[this._x, this._y] = [this._y, this._x];
+	// 	return this;
+	// }
 
 	/** 檢查自身跟傳入的向量是否平行 */
 	public parallel(v: Vector): boolean {

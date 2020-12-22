@@ -22,27 +22,16 @@
 	}
 
 	protected render() {
-		this._shade.removeChildren();
-
 		let path: paper.PathItem | null = null;
 		for(let r of this.control.regions) {
 			let cPath = this.contourToPath(r.shape.contour);
 			if(!path) path = cPath;
 			else path = path.unite(cPath, { insert: false });
 		}
-		if(path!.children) this._shade.copyContent(path!);
-		else this._shade.addChild(path!)
+		PaperUtil.replaceContent(this._shade, path!, false);
 
-		this.setLines(this._ridges, this.control.ridges, this.control.outerRidges);
-		this.setLines(this._axisParallels, this.control.axisParallels);
-	}
-
-	private setLines(path: paper.CompoundPath, ...lines: (readonly Line[])[]) {
-		path.removeChildren();
-		for(let set of lines) for(let l of set) {
-			path.moveTo(l.p1.toPaper());
-			path.lineTo(l.p2.toPaper());
-		}
+		PaperUtil.setLines(this._ridges, this.control.ridges, this.control.outerRidges);
+		PaperUtil.setLines(this._axisParallels, this.control.axisParallels);
 	}
 
 	private contourToPath(contour: ReadonlyPath): paper.Path {

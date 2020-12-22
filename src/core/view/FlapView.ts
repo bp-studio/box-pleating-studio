@@ -92,10 +92,7 @@
 		// outer ridges
 		this._outerRidges.removeChildren();
 		this.control.quadrants.forEach((q, i) => {
-			if(q.pattern == null) {
-				this._outerRidges.moveTo(p[i]);
-				this._outerRidges.lineTo(q.corner);
-			}
+			if(q.pattern == null) PaperUtil.addLine(this._outerRidges, p[i], q.corner);
 		});
 
 		this._label.content = this.control.node.name;

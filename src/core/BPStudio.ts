@@ -60,7 +60,7 @@
 
 @shrewd class BPStudio {
 
-	public readonly version: string = "0.0.0 rc1";
+	public readonly version: string = "0.0.0";
 
 	public readonly $el: HTMLElement;
 	public readonly $display: Display;

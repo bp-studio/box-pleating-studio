@@ -67,21 +67,16 @@ abstract class Draggable extends ViewedControl {
 //////////////////////////////////////////////////////////////////
 /**
  * `IndependentDraggable` 是一個拖曳行為與其它物件無關的 `Draggable`。
+ *
+ * 這樣的物件會限定住 `Sheet` 所能縮小的程度。
  */
 //////////////////////////////////////////////////////////////////
 
 abstract class IndependentDraggable extends Draggable {
-	// @shrewd({
-	// 	// 在 `Sheet` 大小縮小時，如果位置超出範圍，會自我修正回到 `Sheet` 的範圍之中。
-	// 	renderer(this: IndependentDraggable, value: IPoint) {
-	// 		let v = this.constraint(Vector.ZERO, value);
-	// 		value.x += v.x;
-	// 		value.y += v.y;
-	// 		return value;
-	// 	}
-	// })
-	// public location: IPoint = { x: 0, y: 0 };
 
+	/** 物件在 Sheet 上佔據的高度 */
 	public abstract readonly height: number;
+
+	/** 物件在 Sheet 上佔據的寬度 */
 	public abstract readonly width: number;
 }

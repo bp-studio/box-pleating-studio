@@ -31,6 +31,7 @@ namespace MathUtil {
 		return [a / gcd, b / gcd];
 	}
 
+	/** 把數值 x 朝著 f 指定的方向取下一個整數 */
 	export function int(x: number, f: number) {
 		return f > 0 ? Math.ceil(x) : Math.floor(x);
 	}

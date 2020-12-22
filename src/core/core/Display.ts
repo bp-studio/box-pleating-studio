@@ -23,8 +23,8 @@
 	/** 暫時鎖定 Viewport 大小 */
 	private lockViewport: boolean = false;
 
-	private _frameRateCount: number = 0;
-	private _frameRateTotal: number = 0;
+	// private _frameRateCount: number = 0;
+	// private _frameRateTotal: number = 0;
 
 	private spaceHolder: HTMLDivElement;
 

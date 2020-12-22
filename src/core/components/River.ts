@@ -25,6 +25,7 @@
 	}
 
 	public delete(): void {
+		// 裡面有 action，因此這邊不用加上
 		this.design.edges.get(this.edge)!.deleteAndMerge();
 	}
 
