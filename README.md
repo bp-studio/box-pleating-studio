@@ -22,8 +22,8 @@ If you visit the website by Chrome (or by Safari on an iPhone), it will also inf
 Start from the upperleft, each button in the toolbar is explained as follows.
 
 - File menu: Create new project, download or share projects, etc.
-- Setting menu: Display options and app preferences.
-- Project menu: Switch among different projects.
+- Setting menu: Display options and app preferences (including language setting).
+- Project menu: Manage all opened projects.
 - Help menu: About the app, and how to support it.
 - Tree structure: Edit the tree structure of your project.
 - Layout: Edit the Flap and Gadget layout of your project.
@@ -59,3 +59,33 @@ The author would like to specially thank the following people, in no particular 
 ## About the author
 
 Mu-Tsun Tsai began his studying of origami design theory by reading Robert J. Lang's book. They soon became good friends and together they generalized the notion of Pythagorean Stretch into GOPS, and it was published in 7OSME. Tsai lives in Taiwan and makes a living by doing full-stack developing. He particularly specializes in C# and TypeScript. Tsai is also the author of the reactive framework Shrewd, which is the core powering Box Pleating Studio.
+
+<hr>
+
+## For developers
+
+### Environment and build instructions
+
+BP Studio is developed using [VS Code](https://code.visualstudio.com/), and the project folder is already configured for it. To build BP Studio, first you need the following:
+
+1. Install [Node.js](https://nodejs.org/), and use the command `npm install` under the project root folder to install all dependencies.
+2. Install [TypeScript](https://www.typescriptlang.org/) globally by the command `npm install --global typescript`.
+2. Install [Gulp](https://www.npmjs.com/package/gulp) globally by the command `npm install --global gulp-cli`.
+
+And then you can simply press `F5` in VS Code to build and launch the app automatically. Alternatively, run `gulp buildCore` to build the core part (`dist/bpstudio.js`, of which source code is under `src/core`) manually, and use any browser to open `dist/index.htm` to run it.
+
+Other important gulp scripts include:
+
+- `buildCorePub`: build the release version of `bpstudio.js`, which will be minified.
+- `buildApp`: build the UI part (`main.js`, source code under `src/app`) of the app, which is written in [Vue.js](https://vuejs.org/) version 2.
+- `buildLocale`: build `locale.js` (source code under `src/locale`).
+
+If you would like to contribute a new language, start with `src/locale/en.json` and translate it. You will find the VS Code extension [i18n Ally](https://marketplace.visualstudio.com/items?itemName=antfu.i18n-ally) very helpful.
+
+### About BP Studio Core
+
+BP Studio heavily depends on [Shrewd](https://github.com/MuTsunTsai/shrewd), a reactive JavaScript framework developed by the author, for managing the dependencies of thousands of variables. Shrewd makes sure that when some of the variables have changed by user interactions, only the necessary recalculation is performed, and in the correct order. It is recommended that you read about Shrewd in order to fully understand the source code of BP Studio.
+
+All paths below are relative to `src/core`. Roughly speaking, a BP Studio project begins with a `Design` object (`core/Design.ts`), which contains a `Tree` object (`model/Tree.ts`) that describes the tree structure of our design. Then `Flap` objects (`components/Flap.ts`) are generated in correspondence to the leaf nodes in the tree, and `Junction` objects (`components/Junction.ts`), which monitors the overlapping status between two flaps, are generated for each pair of flaps. Junctions are then grouped into `Stretch` objects (`pattern/Stretch.ts`), and it will create a `Repository` object (`pattern/Repository.ts`) which is the starting point of searching for `Pattern` objects (`pattern/Pattern.ts`). After patterns are found, everything will then be rendered by the various `View` objects in the `view` folder, onto a canvas prepared by `core/Display.ts` using paper.js. User interactions are handled in `core/System.ts`.
+
+Almost all comments in the source code are written in Chinese, which is slightly more intuitive for the author's train of thoughts; sorry about that 😅
