@@ -5,7 +5,7 @@
 		:href="href"
 		@click="download"
 		@mouseover="getFile"
-		@contextmenu.stop="getFile"
+		@contextmenu.stop="contextMenu"
 		:download="file.name"
 		:title="$t('message.downloadHint')"
 	>
@@ -34,16 +34,21 @@
 		@Prop(Boolean) public disabled: boolean;
 		@Prop(Boolean) public btn: boolean = false;
 
-		public async download() {
+		public download() {
 			if(this.href == "#") {
 				this.downloading = new Promise(resolve => this.downloaded = resolve);
 				event.preventDefault();
-				await this.getFile();
-				(this.$el as any).click();
-			} else if(this.downloaded) {
-				this.downloaded();
+				this.getFile().then(() => (this.$el as any).click());
+			} else {
+				if(this.downloaded) this.downloaded();
 				this.downloaded = null;
+				this.$emit('download');
 			}
+		}
+
+		public contextMenu() {
+			this.getFile();
+			this.$emit('download');
 		}
 
 		public async getFile(): Promise<void> {

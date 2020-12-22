@@ -10,11 +10,11 @@
 			<i class="far fa-folder-open"></i>
 			{{$t('toolbar.file.open')}}
 		</label>
-		<download :disabled="!design" :file="jsonFile" ref="bps">
+		<download :disabled="!design" :file="jsonFile" ref="bps" @download="notify">
 			<i class="fas fa-download"></i>
 			{{$t('toolbar.file.saveBPS')}}
 		</download>
-		<download :disabled="!design" :file="workspaceFile" ref="bpz">
+		<download :disabled="!design" :file="workspaceFile" ref="bpz" @download="notifyAll">
 			<i class="fas fa-download"></i>
 			{{$t('toolbar.file.saveBPZ')}}
 		</download>
@@ -68,6 +68,13 @@
 				e.stopPropagation();
 				if(e.dataTransfer) this.openFiles(e.dataTransfer.files);
 			})
+		}
+
+		private notify() {
+			bp.design.notifySave();
+		}
+		private notifyAll() {
+			bp.designMap.forEach(d => d.notifySave());
 		}
 
 		public get jsonFile(): FileFactory {

@@ -205,22 +205,19 @@
 				let message = this.$t("message.unsaved", [title]);
 				if(!(await (this.$refs.confirm as Confirm).show(message))) return false;
 			}
+			this.designs.splice(this.designs.indexOf(id), 1);
 			bp.close(id);
 			return true;
 		}
 		public async close(id?: number) {
 			if(id === undefined) id = bp.design.id;
-			let i = this.designs.indexOf(id);
 			if(await this.closeCore(id)) {
-				this.designs.splice(i, 1);
 				bp.select(this.designs.length ? this.designs[0] : null);
 				Shrewd.commit();
 			}
 		}
 		public async closeBy(predicate: (i: number) => boolean) {
-			for(let i of this.designs) if(predicate(i)) {
-				if(await this.closeCore(i)) this.designs.splice(this.designs.indexOf(i), 1);
-			}
+			for(let i of this.designs.concat()) if(predicate(i)) await this.closeCore(i);
 			Shrewd.commit();
 		}
 		public async closeOther(id: number) {
