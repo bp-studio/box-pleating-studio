@@ -63,6 +63,5 @@ var i18n = new VueI18n({
 var app = new Vue.options.components['app']({ i18n });
 app.$mount('#app');
 
-let settings = JSON.parse(localStorage.getItem("settings"));
-if(settings) i18n.locale = settings.locale ?? "en";
+i18n.locale = localStorage.getItem("locale") ?? "en";
 document.title = i18n.t("donate.title");
