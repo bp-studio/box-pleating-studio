@@ -39,6 +39,7 @@
 	import $ from 'jquery/index';
 
 	declare const i18n: any;
+	declare const gtag: any;
 
 	@Component
 	export default class Preference extends Vue {
@@ -48,6 +49,7 @@
 
 		public show() {
 			$(this.$el).modal();
+			gtag('event', 'screen_view', { screen_name: 'Preference' });
 		}
 	}
 </script>

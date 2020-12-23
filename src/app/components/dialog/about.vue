@@ -29,9 +29,14 @@
 	import { bp } from '../import/BPStudio';
 	import $ from 'jquery/index';
 
+	declare const gtag: any;
+
 	@Component
 	export default class About extends Vue {
-		public show() { $(this.$el).modal(); }
+		public show() {
+			$(this.$el).modal();
+			gtag('event', 'screen_view', { screen_name: 'About' });
+		}
 		public get version() {
 			let meta = document.querySelector("meta[name=build]") as HTMLMetaElement;
 			return bp.version + " build " + meta.content;

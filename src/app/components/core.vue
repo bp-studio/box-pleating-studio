@@ -37,6 +37,7 @@
 	declare const setInterval: any;
 	declare const i18n: any;
 	declare const core: Core;
+	declare const gtag: any;
 	export { core };
 
 	@Component
@@ -233,12 +234,12 @@
 			bp.select(this.designs.length ? this.designs[0] : null);
 		}
 		public clone(id?: number) {
-			console.log(id);
 			if(id === undefined) id = bp.design.id;
 			let i = this.designs.indexOf(id);
 			let c = bp.restore(this.checkTitle(bp.designMap.get(id).toJSON()));
 			this.designs.splice(i + 1, 0, (bp.design = c).id);
 			Shrewd.commit();
+			gtag('event', 'project', { action: 'clone' });
 		}
 		public addDesign(d: Design) {
 			this.designs.push(d.id);

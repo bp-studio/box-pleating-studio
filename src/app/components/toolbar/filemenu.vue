@@ -1,7 +1,7 @@
 <template>
 	<dropdown icon="fas fa-file-alt" :title="$t('toolbar.file.title')" @hide="reset">
 		<input type="file" id="iptFile" accept=".bps, .bpz, .json, .zip" multiple class="d-none" @change="upload($event)" />
-		<div class="dropdown-item" @click="core.create()">
+		<div class="dropdown-item" @click="newProject">
 			<i class="far fa-file"></i>
 			{{$t('toolbar.file.new')}}
 		</div>
@@ -19,11 +19,11 @@
 			{{$t('toolbar.file.saveBPZ')}}
 		</download>
 		<divider></divider>
-		<download :disabled="!design" :file="svgFile" ref="svg">
+		<download :disabled="!design" :file="svgFile" ref="svg" @download="svgSaved">
 			<i class="far fa-file-image"></i>
 			{{$t('toolbar.file.saveSVG')}}
 		</download>
-		<download :disabled="!design" :file="pngFile" ref="png">
+		<download :disabled="!design" :file="pngFile" ref="png" @download="pngSaved">
 			<i class="far fa-file-image"></i>
 			{{$t('toolbar.file.savePNG')}}
 		</download>
@@ -51,6 +51,8 @@
 	import JSZip from 'jszip';
 	import $ from 'jquery/index';
 
+	declare const gtag: any;
+
 	import Download from '../gadget/download.vue';
 	import BaseComponent from '../mixins/baseComponent';
 
@@ -70,11 +72,24 @@
 			})
 		}
 
+		private newProject() {
+			core.create();
+			gtag('event', 'project', { action: 'create' });
+		}
+
 		private notify() {
 			bp.design.notifySave();
+			gtag('event', 'project', { action: 'save' });
 		}
 		private notifyAll() {
 			bp.designMap.forEach(d => d.notifySave());
+			gtag('event', 'project', { action: 'save_workspace' });
+		}
+		private svgSaved() {
+			gtag('event', 'project', { action: 'save_svg' });
+		}
+		private pngSaved() {
+			gtag('event', 'project', { action: 'save_png' });
 		}
 
 		public get jsonFile(): FileFactory {
@@ -102,6 +117,7 @@
 		}
 		public copyPNG(): void {
 			bp.$display.copyPNG();
+			gtag('event', 'share', { method: 'copy', content_type: 'image' });
 		}
 
 		private reset(): void {
@@ -160,6 +176,7 @@
 		protected print() {
 			bp.$display.beforePrint();
 			setTimeout(window.print, 500);
+			gtag('event', 'print', {});
 		}
 	}
 </script>

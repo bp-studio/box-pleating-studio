@@ -11,7 +11,8 @@
 					</div>
 					<div>
 						<button class="btn btn-primary" v-clipboard:copy="url" v-clipboard:success="onCopy">
-							<i class="fas fa-copy"></i> {{$t('share.copy')}}
+							<i class="fas fa-copy"></i>
+							{{$t('share.copy')}}
 							<i
 								class="fas fa-check d-inline-block"
 								ref="success"
@@ -19,7 +20,8 @@
 							></i>
 						</button>
 						<button v-if="canShare" class="btn btn-primary" @click="share">
-							<i class="fas fa-share"></i> {{$t('share.share')}}
+							<i class="fas fa-share"></i>
+							{{$t('share.share')}}
 						</button>
 					</div>
 				</div>
@@ -37,6 +39,7 @@
 	import $ from 'jquery/index';
 
 	declare const LZ: any;
+	declare const gtag: any;
 
 	@Component
 	export default class Share extends BaseComponent {
@@ -51,12 +54,14 @@
 		public show() {
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
 			$(this.$el).modal();
+			gtag('event', 'screen_view', { screen_name: 'Share' });
 		}
 
 		private onCopy() {
 			let s = this.$refs.success as HTMLSpanElement;
 			s.style.width = "20px";
 			setTimeout(() => s.style.width = "0px", 3000);
+			gtag('event', 'share', { method: 'copy', content_type: 'link' });
 		}
 
 		private share() {
@@ -64,8 +69,8 @@
 				title: "Box Pleating Studio",
 				text: this.$t("share.message", [this.design.title]),
 				url: this.url
-			})
-				.catch(() => { }); // 捕捉取消之類的錯誤，不處理
+			}).catch(() => { }); // 捕捉取消之類的錯誤，不處理
+			gtag('event', 'share', { method: 'app', content_type: 'link' });
 		}
 	}
 </script>

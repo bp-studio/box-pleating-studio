@@ -20,10 +20,13 @@
 	import { Vue, Component } from 'vue-property-decorator';
 	import $ from 'jquery/index';
 
+	declare const gtag: any;
+
 	@Component
 	export default class Note extends Vue {
 		private note() {
 			$('#mdlNote').modal();
+			gtag('event', 'screen_view', { screen_name: 'Note' });
 		}
 	}
 </script>
