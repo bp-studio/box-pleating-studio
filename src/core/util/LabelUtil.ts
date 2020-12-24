@@ -55,7 +55,7 @@ namespace LabelUtil {
 				// 初次直接執行
 				LabelUtil.slowLabel(label, lx, ly, lh, avoid);
 			} */
-			
+
 			slowLabel(label, lx, ly, lh, avoid);
 		}
 		syncLabel(label, glow);
@@ -82,7 +82,7 @@ namespace LabelUtil {
 			offsetLabel(label, lx, ly, lh, dx, dy);
 
 			let rec = new paper.Path.Rectangle(label.bounds);
-			rec.transform(label.layer.matrix)
+			if(label.layer) rec.transform(label.layer.matrix);
 
 			let ok = clone.every(c => {
 				let i1 = rec.intersect(c, { insert: false }).isEmpty();

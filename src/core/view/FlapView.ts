@@ -1,13 +1,13 @@
 
-@shrewd class FlapView extends ControlView<Flap> {
+@shrewd class FlapView extends LabeledView<Flap> {
 
+	protected readonly _label: paper.PointText;
 	public readonly hinge: paper.Path;
 	private readonly _shade: paper.Path;
 	private readonly _dots: PerQuadrant<paper.Path.Circle>;
 	private readonly _circle: paper.Path;
 	private readonly _outerRidges: paper.CompoundPath;
 	private readonly _innerRidges: paper.CompoundPath;
-	private readonly _label: paper.PointText;
 	private readonly _glow: paper.PointText;
 
 	constructor(flap: Flap) {

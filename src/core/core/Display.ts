@@ -217,7 +217,7 @@
 	@shrewd public get scale() {
 		if(this._studio.design && this._studio.design.sheet) {
 			if(this._studio.design.fullscreen) {
-				let ws = (this.viewWidth - this.MARGIN * 2) / this._studio.design.sheet.width;
+				let ws = (this.viewWidth - this.horMargin * 2) / this._studio.design.sheet.width;
 				let wh = (this.viewHeight - this.MARGIN * 2) / this._studio.design.sheet.height;
 				return Math.min(ws, wh);
 			} else {
@@ -228,8 +228,15 @@
 		}
 	}
 
+	// 這個值如果直接做成計算屬性會導致循環參照，所以要用一個反應方法來延遲更新它
+	@shrewd private horMargin = 0;
+	@shrewd private getHorMargin() {
+		let m = Math.max((this._studio.design?.overflow ?? 0) + 10, this.MARGIN);
+		setTimeout(() => this.horMargin = m, 0);
+	}
+
 	@shrewd private get sheetWidth(): number {
-		return (this._studio.design?.sheet?.width ?? 0) * this.scale + this.MARGIN * 2;
+		return (this._studio.design?.sheet?.width ?? 0) * this.scale + this.horMargin * 2;
 	}
 
 	@shrewd private get sheetHeight(): number {
@@ -245,7 +252,7 @@
 	}
 
 	public getAutoScale(): number {
-		let ws = (this.viewWidth - this.MARGIN * 2) / (this._studio.design?.sheet?.width ?? 1);
+		let ws = (this.viewWidth - this.horMargin * 2) / (this._studio.design?.sheet?.width ?? 1);
 		let hs = (this.viewHeight - this.MARGIN * 2) / (this._studio.design?.sheet?.height ?? 1);
 		return Math.min(ws, hs);
 	}
@@ -283,7 +290,7 @@
 
 		// 依照數值配置 Paper.js 的 View 的大小和變換矩陣
 		let el = this._studio.$el;
-		let mw = (cw - this.sheetWidth) / 2 + this.MARGIN, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+		let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
 
 		if(this.lockViewport) this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
 		else this.project.view.viewSize.set(el.clientWidth, el.clientHeight);

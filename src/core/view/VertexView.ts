@@ -1,14 +1,14 @@
 
-@shrewd class VertexView extends ControlView<Vertex> {
+@shrewd class VertexView extends LabeledView<Vertex> {
 
+	protected _label: paper.PointText;
 	private _dot: paper.Path.Circle;
 	private _circle: paper.Path.Circle;
-	private _label: paper.PointText;
 	private _glow: paper.PointText;
 
 	constructor(vertex: Vertex) {
 		super(vertex);
-		
+
 		let option = Object.assign({}, Style.dot, { radius: 4 });
 		this.$addItem(Layer.dot, this._dot = new paper.Path.Circle(option));
 		this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));

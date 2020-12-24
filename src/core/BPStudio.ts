@@ -46,13 +46,15 @@
 // Level 5
 /// <reference path="class/ViewedControl.ts" />
 /// <reference path="pattern/Configuration.ts" />
-/// <reference path="view/FlapView.ts" />
+/// <reference path="view/LabeledView.ts" />
 /// <reference path="view/JunctionView.ts" />
-/// <reference path="view/VertexView.ts" />
 /// <reference path="view/RiverView.ts" />
 
 // Level 6
 /// <reference path="class/Draggable.ts" />
+/// <reference path="view/FlapView.ts" />
+/// <reference path="view/EdgeView.ts" />
+/// <reference path="view/VertexView.ts" />
 
 // Level 7
 /// <reference path="components/Flap.ts" />
@@ -85,8 +87,9 @@
 		this.system = new System(this);
 	}
 
-	public load(json: string): Design {
-		return this.tryLoad(Migration.process(JSON.parse(json), this.onDeprecate));
+	public load(json: string | object): Design {
+		if(typeof json == "string") json = JSON.parse(json);
+		return this.tryLoad(Migration.process(json, this.onDeprecate));
 	}
 
 	public create(json: any): Design {

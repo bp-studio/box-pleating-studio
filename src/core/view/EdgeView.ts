@@ -1,16 +1,17 @@
 
-@shrewd class EdgeView extends ControlView<Edge> {
+@shrewd class EdgeView extends LabeledView<Edge> {
 
 	public line: paper.Path;
 
+	protected _label: paper.PointText;
+
 	/** 加粗的直線空間，方便判定選取動作 */
 	private _lineRegion: paper.Path;
-	private _label: paper.PointText;
 	private _glow: paper.PointText;
 
 	constructor(edge: Edge) {
 		super(edge);
-		
+
 		this.$addItem(Layer.ridge, this.line = new paper.Path.Line(Style.edge));
 		this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
 		this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));

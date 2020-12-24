@@ -93,7 +93,7 @@
 					.map(a => locales.find(l => r(a).startsWith(l)))
 					.filter(l => !!l);
 				languages = Array.from(new Set(languages));
-				if(locales.length > 1) {
+				if(languages.length > 1) {
 					this.languages = languages;
 					$('#mdlLanguage').modal();
 				}
@@ -181,7 +181,11 @@
 
 		public dropdown: any = null;
 
-		public get design() { return bp.design; }
+		public get design() {
+			let t = bp.design ? bp.design.title : null;
+			document.title = "Box Pleating Studio" + (t ? " - " + t : "");
+			return bp.design;
+		}
 		public get selections(): any { return bp.system.selections; }
 
 		public create() {
