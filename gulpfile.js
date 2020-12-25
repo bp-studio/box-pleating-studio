@@ -112,8 +112,7 @@ gulp.task('buildDonate', () =>
 		.pipe(gulp.dest('dist/'))
 );
 
-
-gulp.task('uploadPub', function() {
+const ftpFactory = (folder) => function() {
 	let options = require('./.vscode/ftp-pub.json');
 	options.log = log;
 	let conn = ftp.create(options);
@@ -123,9 +122,13 @@ gulp.task('uploadPub', function() {
 		'!**/debug.log'
 	];
 	return gulp.src(globs, { base: './dist', buffer: false })
-		.pipe(conn.newer('/public_html/bp'))
-		.pipe(conn.dest('/public_html/bp/'));
-});
+		.pipe(conn.newer(`/public_html/${folder}`))
+		.pipe(conn.dest(`/public_html/${folder}`));
+};
+
+gulp.task('uploadPub', ftpFactory('bp'));
+
+gulp.task('deployDev', ftpFactory('bp-dev'));
 
 gulp.task('deployPub', gulp.series(
 	'buildCorePub',

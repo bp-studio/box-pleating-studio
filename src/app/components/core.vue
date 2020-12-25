@@ -97,7 +97,7 @@
 					this.languages = languages;
 					$('#mdlLanguage').modal();
 				}
-				l = languages[0] || navigator.languages[0];
+				l = languages[0] ?? navigator.languages[0];
 			}
 			if(!l) l = "en";
 			i18n.locale = r(l);

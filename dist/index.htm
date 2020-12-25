@@ -17,7 +17,7 @@
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio" />
 	<meta name="google" content="notranslate">
-	<meta name="build" content="443">
+	<meta name="build" content="445">
 
 	<meta property="og:url" content="https://bpstudio.abstreamace.com" />
 	<meta property="og:type" content="website" />
@@ -40,12 +40,13 @@
 
 		(function() {
 			let display = (id, v) => document.getElementById(id).style.display = v;
-			let err = false, onErr = () => err = true;
+			let err = false, werr = false, onErr = () => err = true;
 			let errorOB = new MutationObserver(function(mutations) {
 				mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
 					(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
 				));
 			});
+			window.onerror = () => werr = true;
 			errorOB.observe(document, { childList: true, subtree: true });
 			window.addEventListener('DOMContentLoaded', () => {
 				errorOB.disconnect();
@@ -53,7 +54,7 @@
 					display('resource', 'block');
 					display('divWorkspace', 'none');
 					display('app', 'none');
-				} else if(typeof BPStudio == 'undefined') {
+				} else if(typeof BPStudio == 'undefined' || werr) {
 					display('requirement', 'block');
 				}
 			});
@@ -77,7 +78,7 @@
 	<script src="lib/vue-i18n.js"></script>
 
 	<link rel="stylesheet" href="assets/bps/style.css">
-	<link rel="stylesheet" href="main.css?47770bd5">
+	<link rel="stylesheet" href="main.css?d1c36eb">
 	<link rel="stylesheet" href="bpstudio.css?64faaaae">
 
 	<script src="shrewd.min.js?97d129ed"></script>
@@ -92,8 +93,9 @@
 
 	<div id="requirement" class="p-3" style="display:none;">
 		<h3>
-			It appears that your browser is too old to support Box Pleating Studio.
+			It appears that your browser or device is too old to support Box Pleating Studio.
 			Please upgrade your browser or use the latest version of Chrome, which is the recommended browser.
+			It is also known that iPhone 6 is unable to support BP Studio.
 			The author apologize for the inconvenience.
 		</h3>
 	</div>
@@ -109,6 +111,6 @@
 	</noscript>
 </body>
 
-<script src="main.js?748a44b4"></script>
+<script src="main.js?be6f89e5"></script>
 
 </html>
