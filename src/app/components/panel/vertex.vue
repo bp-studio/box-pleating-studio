@@ -20,7 +20,7 @@
 				v-t="'panel.vertex.delJoin'"
 			></button>
 		</div>
-		<div class="mt-3">
+		<div class="mt-3" v-if="selection.degree==1">
 			<button class="btn btn-primary" @click="design.vertexToFlap(selections)" v-t="'panel.vertex.goto'"></button>
 		</div>
 	</div>
