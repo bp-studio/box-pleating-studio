@@ -244,11 +244,11 @@
 	}
 
 	@shrewd public get isXScrollable(): boolean {
-		return this.sheetWidth > this.viewWidth;
+		return this.sheetWidth > this.viewWidth + 1; // 加 1 以避免浮點數誤觸
 	}
 
 	@shrewd public get isYScrollable(): boolean {
-		return this.sheetHeight > this.viewHeight;
+		return this.sheetHeight > this.viewHeight + 1; // 加 1 以避免浮點數誤觸
 	}
 
 	public getAutoScale(): number {

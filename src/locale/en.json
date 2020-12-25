@@ -5,7 +5,7 @@
 		"title": "Welcome to Box Pleating Studio!",
 		"intro": [
 			"This app is made to help origami designers to make complex, crazy designs using box pleating and GOPS gadgets.",
-			"To begin, click on the upper-left menu button to create an empty new project, our read our brief user manual on {0}."
+			"To begin, click on the upper-left menu button to create an empty new project, or read our brief user manual on {0}."
 		],
 		"install": {
 			"hint": "You can also install BP Studio as a standalone app to your device, and use it offline!",

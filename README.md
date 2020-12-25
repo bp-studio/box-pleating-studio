@@ -13,7 +13,7 @@ Box Pleating Studio is not for origami beginners. In order to fully understand t
 
 ## How to get the app
 
-Simply visit [https://bpstudio.abstreamace.com/](https://bpstudio.abstreamace.com/) to launch the BP Studio app, no downloading required! For the best performance, it is highly recommended that you use Chrome to visit the site.
+Simply visit [https://bpstudio.abstreamace.com/](https://bpstudio.abstreamace.com/) to launch the BP Studio app, no downloading required! For the best performance, it is highly recommended that you use Chrome to visit the site. In any case, do update your browser to the latest version as BP Studio utilizes many new web features and will not work on legacy browsers.
 
 If you visit the website by Chrome (or by Safari on an iPhone), it will also inform you that you could install BP Studio to your device as a standalone app, and use it offline. Just follow the instructions to install it. This will provide the best user experience especially on mobile devices.
 
@@ -64,11 +64,17 @@ Mu-Tsun Tsai began his studying of origami design theory by reading Robert J. La
 
 <hr>
 
-## For developers
+## For contributors
+
+BP Studio is developed using [VS Code](https://code.visualstudio.com/), and the project folder is already configured for it.
+
+### Contributing new languages
+
+If you would like to contribute a new language, start with `src/locale/en.json` and translate it. You will find the VS Code extension [i18n Ally](https://marketplace.visualstudio.com/items?itemName=antfu.i18n-ally) very helpful.
 
 ### Environment and build instructions
 
-BP Studio is developed using [VS Code](https://code.visualstudio.com/), and the project folder is already configured for it. To build BP Studio, first you need the following:
+To build BP Studio, first you need the following:
 
 1. Install [Node.js](https://nodejs.org/), and use the command `npm install` under the project root folder to install all dependencies.
 2. Install [TypeScript](https://www.typescriptlang.org/) globally by the command `npm install --global typescript`.
@@ -81,8 +87,6 @@ Other important gulp scripts include:
 - `buildCorePub`: build the release version of `bpstudio.js`, which will be minified.
 - `buildApp`: build the UI part (`main.js`, source code under `src/app`) of the app, which is written in [Vue.js](https://vuejs.org/) version 2.
 - `buildLocale`: build `locale.js` (source code under `src/locale`).
-
-If you would like to contribute a new language, start with `src/locale/en.json` and translate it. You will find the VS Code extension [i18n Ally](https://marketplace.visualstudio.com/items?itemName=antfu.i18n-ally) very helpful.
 
 ### About BP Studio Core
 
