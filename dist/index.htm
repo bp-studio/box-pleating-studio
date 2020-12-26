@@ -17,7 +17,7 @@
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio" />
 	<meta name="google" content="notranslate">
-	<meta name="build" content="445">
+	<meta name="build" content="446">
 
 	<meta property="og:url" content="https://bpstudio.abstreamace.com" />
 	<meta property="og:type" content="website" />
@@ -38,26 +38,31 @@
 			if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 		}
 
-		(function() {
-			let display = (id, v) => document.getElementById(id).style.display = v;
-			let err = false, werr = false, onErr = () => err = true;
-			let errorOB = new MutationObserver(function(mutations) {
+		(function() { // Stratup error handling, written in ES3 for maximal compatibility
+			var debug = location.search.toLowerCase().indexOf("debug=startup") >= 0;
+			var display = function(id, v, c) {
+				var el = document.getElementById(id);
+				el.style.display = v;
+				if(c && debug) el.innerHTML += "<br>" + navigator.userAgent + "<br>" + c;
+			};
+			var err = undefined, werr = undefined, onErr = function(e) { err = e.target.src; }
+			var cb = function() {
+				if(err || werr) {
+					display('divWorkspace', 'none');
+					display('app', 'none');
+					display(err ? 'resource' : 'requirement', 'block', err || werr);
+				}
+				if(errorOB) errorOB.disconnect();
+			};
+			window.onerror = function(a, b, c, d) { werr = [a, b, c, d].toString(); }
+			if(!window.addEventListener) return werr = 'IE8', window.onload = cb;
+			window.addEventListener('DOMContentLoaded', cb);
+			var errorOB = new MutationObserver(function(mutations) {
 				mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
 					(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
 				));
 			});
-			window.onerror = () => werr = true;
 			errorOB.observe(document, { childList: true, subtree: true });
-			window.addEventListener('DOMContentLoaded', () => {
-				errorOB.disconnect();
-				if(err) {
-					display('resource', 'block');
-					display('divWorkspace', 'none');
-					display('app', 'none');
-				} else if(typeof BPStudio == 'undefined' || werr) {
-					display('requirement', 'block');
-				}
-			});
 		})();
 	</script>
 
@@ -82,7 +87,7 @@
 	<link rel="stylesheet" href="bpstudio.css?64faaaae">
 
 	<script src="shrewd.min.js?97d129ed"></script>
-	<script src="bpstudio.js?1f2cb5d9"></script>
+	<script src="bpstudio.js?6b2eef7b"></script>
 	<script src="locale.js?d97318fc"></script>
 </head>
 
@@ -92,19 +97,20 @@
 	<div id="app"></div>
 
 	<div id="requirement" class="p-3" style="display:none;">
-		<h3>
-			It appears that your browser or device is too old to support Box Pleating Studio.
+		<h3>It appears that your browser or device is too old to support Box Pleating Studio.</h3>
+		<h5>
 			Please upgrade your browser or use the latest version of Chrome, which is the recommended browser.
 			It is also known that iPhone 6 is unable to support BP Studio.
-			The author apologize for the inconvenience.
-		</h3>
+			The author apologize for the inconvenience.<br>
+		</h5>
 	</div>
 	<div id="resource" class="p-3" style="display:none;">
-		<h3>
-			Some of the required resources cannot be loaded successfully, and thus Box Pleating Studio cannot be started.
+		<h3>Some of the required resources cannot be loaded successfully.</h3>
+		<h5>
+			As a result, Box Pleating Studio cannot be started.
 			This is probably due to internet connection problem and/or missing cached resources.
 			Please check you network and try again.
-		</h3>
+		</h5>
 	</div>
 	<noscript>
 		<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
