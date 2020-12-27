@@ -29,8 +29,8 @@ function write(target, filename, sum) {
 	let m = html.match(reg);
 	if(m && m[0] != replace) {
 		html = html.replace(reg, replace);
-		html = html.replace(/<meta name="build" content="(\d+)">/,
-			(a, b) => `<meta name="build" content="${Number(b) + 1}">`);
+		html = html.replace(/app_version: "(\d+)"/,
+			(a, b) => `app_version: "${Number(b) + 1}"`);
 	}
 	fs.writeFileSync(target, html);
 }

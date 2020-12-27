@@ -172,13 +172,5 @@
 			let title = this.getDesign(id).title;
 			return title ? title : this.$t('toolbar.project.noTitle');
 		}
-
-		public confirm(message: string): Promise<void> {
-			let c = $('#confirm');
-			let p = new Promise<void>(resolve => c.find('.btn-primary').one('click', resolve as any));
-			c.find('.modal-body').html(message);
-			c.modal({ backdrop: 'static' });
-			return p;
-		}
 	}
 </script>

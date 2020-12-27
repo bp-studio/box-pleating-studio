@@ -35,14 +35,14 @@
 					placement: "bottom-start"
 				}
 			);
-			$(this.$el).addClass('show');
+			this.$el.classList.add('show');
 			this.shown = true;
 		}
 
 		private hide() {
 			if(this.shown) {
 				// 這邊必須設置一個延遲，否則觸控模式中會不能按
-				setTimeout(() => $(this.$el).removeClass('show'), 10);
+				setTimeout(() => this.$el.classList.remove('show'), 10);
 				this.shown = false;
 			}
 		}

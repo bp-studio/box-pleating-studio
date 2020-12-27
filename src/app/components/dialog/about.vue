@@ -30,6 +30,7 @@
 	import $ from 'jquery/index';
 
 	declare const gtag: any;
+	declare const app_config: any;
 
 	@Component
 	export default class About extends Vue {
@@ -38,8 +39,7 @@
 			gtag('event', 'screen_view', { screen_name: 'About' });
 		}
 		public get version() {
-			let meta = document.querySelector("meta[name=build]") as HTMLMetaElement;
-			return bp.version + " build " + meta.content;
+			return bp.version + " build " + app_config.app_version;
 		}
 	}
 </script>
