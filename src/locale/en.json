@@ -50,6 +50,10 @@
 			"close": "Close current project",
 			"closeAll": "Close all projects"
 		},
+		"tools": {
+			"title": "Tools",
+			"TreeMaker": "Import TreeMaker file"
+		},
 		"help": {
 			"title": "Help",
 			"about": "About",

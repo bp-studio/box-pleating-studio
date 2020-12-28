@@ -30,8 +30,6 @@
 	import { Component, Prop, Watch } from 'vue-property-decorator';
 	import InputMixin from '../mixins/inputMixin';
 
-	declare var vid: number;
-
 	@Component
 	export default class Field extends InputMixin {
 		@Watch('v') onVChange(checked: boolean) {

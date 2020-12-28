@@ -1,13 +1,11 @@
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
 
-declare var vid: number;
-
 @Component
 export default class InputMixin extends Vue {
 
 	@Prop(null) public value: any;
 
-	protected id: string = "f" + (vid++);
+	protected id: string = "field" + this._uid;
 	protected v: any = null;
 	protected focused: boolean = false;
 

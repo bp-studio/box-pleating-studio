@@ -66,6 +66,10 @@
 			"closeAll": "全部關閉",
 			"closeOther": "關閉其它",
 			"closeRight": "關閉右側"
+		},
+		"tools": {
+			"TreeMaker": "匯入 TreeMaker 檔案",
+			"title": "工具"
 		}
 	},
 	"preference": {

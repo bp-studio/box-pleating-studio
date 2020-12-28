@@ -19,9 +19,22 @@
 
 	public readonly design: Design;
 
-	constructor(design: Design) {
+	constructor(design: Design, edges?: JEdge[]) {
 		super(design);
 		this.design = design;
+
+		// 防呆載入所有的邊；傳入資料的順序無所謂
+		while(edges?.length) {
+			let remain: JEdge[] = [], ok = false;
+			for(let e of edges) {
+				if(this.addEdge(e.n1, e.n2, e.length)) ok = true;
+				else {
+					remain.push(e);
+				}
+			}
+			if(!ok) break; // 防呆
+			edges = remain;
+		}
 	}
 
 	protected onDispose(): void {
@@ -114,6 +127,7 @@
 		return this.node.get(id)!;
 	}
 
+	/** 加入一條邊並且傳回是否成功 */
 	public addEdge(n1: number, n2: number, length: number) {
 		let has1 = this.node.has(n1), has2 = this.node.has(n2);
 

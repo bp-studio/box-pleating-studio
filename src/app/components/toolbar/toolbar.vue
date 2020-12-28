@@ -3,29 +3,11 @@
 		<div class="btn-group mr-2">
 			<filemenu @share="$emit('share')"></filemenu>
 			<settingmenu @pref="$emit('pref')"></settingmenu>
-			<dropdown icon="fas fa-layer-group" :title="$t('toolbar.project.title')">
-				<template v-if="core.designs.length">
-					<div class="dropdown-item" @click="core.clone()">
-						<i class="far fa-clone"></i>
-						{{$t('toolbar.project.clone')}}
-					</div>
-					<divider></divider>
-					<div class="dropdown-item" v-for="id in core.designs" :key="id" @click="core.select(id)">
-						<i v-if="design==getDesign(id)" class="fas fa-check"></i>
-						<i v-else></i>
-						{{getTitle(id)}}
-					</div>
-					<divider></divider>
-					<div class="dropdown-item" @click="core.close()">
-						<i class="far fa-window-close"></i>
-						{{$t('toolbar.project.close')}}
-					</div>
-					<div class="dropdown-item" @click="core.closeAll()">
-						<i class="far fa-window-close"></i>
-						{{$t('toolbar.project.closeAll')}}
-					</div>
-				</template>
-				<dropdownitem v-else disabled v-t="'toolbar.project.empty'"></dropdownitem>
+			<dropdown icon="fas fa-tools" :title="$t('toolbar.tools.title')">
+				<uploader accept=".tmd5" @upload="TreeMaker($event)">
+					<i class="fas fa-file-import"></i>
+					{{$t("toolbar.tools.TreeMaker")}}
+				</uploader>
 			</dropdown>
 			<dropdown icon="far fa-question-circle" :title="$t('toolbar.help.title')">
 				<div class="dropdown-item" @click="$emit('about')">
@@ -130,6 +112,7 @@
 	import { Component } from 'vue-property-decorator';
 	import { bp, Design } from '../import/BPStudio';
 	import { core } from '../core.vue';
+	import { readFile } from '../import/types';
 	import $ from 'jquery/index';
 
 	import BaseComponent from '../mixins/baseComponent';
@@ -157,6 +140,19 @@
 			if(event.deltaX == 0) {
 				(this.$refs.tab as HTMLDivElement).scrollLeft -= event.deltaY / 5;
 			}
+		}
+
+		public async TreeMaker(event) {
+			let f = event.target;
+			if(f.files.length == 0) return;
+			let buffer = await readFile(f.files[0]);
+			let content = new TextDecoder().decode(new Uint8Array(buffer));
+			try {
+				core.open(bp.TreeMaker.parse(f.files[0].name.replace(/\.tmd5$/i, ""), content));
+			} catch(e) {
+				core.alert(e.message);
+			}
+			f.value = "";
 		}
 
 		private menuId: number;

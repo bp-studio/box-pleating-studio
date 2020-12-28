@@ -1,1 +1,6219 @@
-!function(t,e){"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?module.exports=e():t.BPStudio=e()}(this,(function(){var t=this&&this.__decorate||function(t,e,i,s){var n,r=arguments.length,o=r<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)o=Reflect.decorate(t,e,i,s);else for(var h=t.length-1;h>=0;h--)(n=t[h])&&(o=(r<3?n(o):r>3?n(e,i,o):n(e,i))||o);return r>3&&o&&Object.defineProperty(e,i,o),o};if("object"!=typeof Shrewd)throw new Error("BPStudio requires Shrewd.");if("object"!=typeof paper)throw new Error("BPStudio requires paper.js.");const{shrewd:e}=Shrewd;Shrewd.option.autoCommit=!1,setInterval(()=>Shrewd.commit(),50);let i=!1;function s(t,e){if(void 0===e)return(e,i)=>n(e,i,t);n(t,e,{})}function n(t,i,s){e({validator(t){var e,n;let o=r.get(this);o||r.set(this,o={});let h=null===(n=null===(e=s.validator)||void 0===e?void 0:e.apply(this,[t]))||void 0===n||n;if(h){if(i in o&&o[i]!=t){if(!("design"in this))debugger;this.design.fieldChange(this,i,o[i],t)}o[i]=t}return h}})(t,i)}const r=new WeakMap;function o(t,e,i){let s=i.get;return{get(){let t=h.get(this);return t||h.set(this,t={}),e in t?t[e]:t[e]=s.apply(this)},enumerable:!1,configurable:!1}}const h=new WeakMap;class l{constructor(t,e){this.configuration=t,this.overlaps=e.overlaps,this.strategy=e.strategy}static getMaxIntersectionDistance(t,e,i,s){let n=s?2:0,r=t.node.get(e.c[n].e),o=t.node.get(i.c[n].e),h=t.node.get(e.c[2-n].e);return t.distTriple(r,o,h).d3}*generate(){let{strategy:t}=this;if(1==this.overlaps.length){let e=this.overlaps[0],i=this.configuration.repository.structure[e.parent];if(t==Tt.halfIntegral)for(let t of this.halfKamiya(e,i.sx))yield{gadgets:[t]};if(t==Tt.universal)for(let t of this.universalGPS(e,i.sx))yield{gadgets:[t]};else for(let t of c.gops(e,i.sx))yield{gadgets:[{pieces:[t]}]}}if(2==this.overlaps.length){let e=this.configuration.repository.getJoiner(this.overlaps);t==Tt.baseJoin?yield*e.baseJoin():t==Tt.standardJoin?yield*e.standardJoin():yield*e.simpleJoin(t)}}*universalGPS(t,e){let i=2,s=!1;for(;!s;){let n=Lt(t);n.ox*=i,n.oy*=i;for(let t of c.gops(n,e*i)){let e=c.instantiate(t).shrink(i);if(!Number.isInteger(e.v))continue;let{ox:n,oy:r,u:o,v:h}=e,l={ox:n,oy:r,u:h,v:o},a={x:0,y:0},d={x:r+o+h,y:n+o+h};e.detours=[[a,d]],l.detours=[[d,a]];let u=e.oy+e.u+e.v,p=Math.ceil(u)-u,g=new jt({pieces:[e,l]}),f=g.reverseGPS();yield g.addSlack(2,p),yield f.addSlack(0,p),s=!0}i+=2}}*halfKamiya(t,e){if(t.ox%2==0||t.oy%2==0)return;let i=Lt(t);i.ox<<=1,i.oy<<=1;for(let t of c.gops(i,2*e)){let e=c.instantiate(t);if(e.rank>3)continue;let i=e.v%2==0;if(e.ox==e.oy&&i)continue;let{ox:s,oy:n,u:r,v:o}=e.shrink(2),h=Math.abs(s-n)/2;if(!Number.isInteger(h))debugger;let l,a=Math.min(s,n);if(i&&s>=n)e.detours=[[{x:h,y:3*h},{x:n+r+o,y:s+r+o}]],l={ox:a,oy:a,u:o,v:r-h,detours:[[{x:a+r+o-h,y:a+r+o-h},{x:0,y:0}]],shift:{x:h,y:3*h}};else{if(i||!(n>=s))continue;e.detours=[[{x:n+r+o,y:s+r+o},{x:3*h,y:h}]],l={ox:a,oy:a,u:o-h,v:r,detours:[[{x:0,y:0},{x:a+r+o-h,y:a+r+o-h}]],shift:{x:3*h,y:h}}}let d=new jt({pieces:[e,l]}),u=d.reverseGPS();yield d.addSlack(2,.5),yield u.addSlack(0,.5)}}}class a{get axisParallels(){let t=this.shape.contour.find(t=>t.isIntegral),e=this.direction,i=e.rotate90().normalize(),s=Number.POSITIVE_INFINITY,n=Number.NEGATIVE_INFINITY;for(let e of this.shape.contour){let r=e.sub(t).dot(i);r>n&&(n=r),r<s&&(s=r)}let r=[];for(let o=Math.ceil(s);o<=Math.floor(n);o++){let s=t.add(i.scale(o)),n=[];for(let t of this.shape.ridges){let i=t.intersection(s,e);if(i&&!i.eq(n[0])&&n.push(i),2==n.length)break}2==n.length&&r.push(new It(...n))}return r}}t([o],a.prototype,"axisParallels",null);let d=class{constructor(t){this._disposed=!1,this._disposeWith=t}_disposeEvent(){this.disposed&&(Shrewd.terminate(this),this.onDispose())}get shouldDispose(){return!!this._disposeWith&&this._disposeWith.disposed}dispose(){this._disposed=!0}onDispose(){}get disposed(){return this._disposed}};t([e({renderer(t){return t||this.shouldDispose}})],d.prototype,"_disposed",void 0),t([e],d.prototype,"_disposeEvent",null),t([e],d.prototype,"disposed",null),d=t([e],d);class c extends a{constructor(t){super(),$t(this,t)}get _points(){let{ox:t,oy:e,u:i,v:s}=this,n=[T.ZERO,new T(i,t+i),new T(e+i+s,t+i+s),new T(e+s,s)];return n.forEach(t=>t.addBy(this._shift)),n}get _shift(){var t,e,i,s,n,r,o,h;return new k((null!==(e=null===(t=this.shift)||void 0===t?void 0:t.x)&&void 0!==e?e:0)+(null!==(s=null===(i=this._offset)||void 0===i?void 0:i.x)&&void 0!==s?s:0),(null!==(r=null===(n=this.shift)||void 0===n?void 0:n.y)&&void 0!==r?r:0)+(null!==(h=null===(o=this._offset)||void 0===o?void 0:o.y)&&void 0!==h?h:0))}get shape(){let t=this._points.concat(),e=t.map((t,e,i)=>new It(t,i[(e+1)%i.length]));return(this.detours||[]).forEach(i=>{let s=i.map(t=>new T(t.x,t.y).addBy(this._shift)),n=s[0],r=s[s.length-1],o=[];for(let t=0;t<s.length-1;t++)o.push(new It(s[t],s[t+1]));let h=e.length;for(let i=0;i<h;i++){let l=e[i].p1.eq(n);if(l||e[i].contains(n)){for(let a=1;a<h;a++){let d=(a+i)%h;if(e[d].p1.eq(r)||e[d].contains(r)){let c=d<i?h-i:a+1,u=a+1-c,p=s.concat();return o.push(new It(r,e[d].p2)),l||(p.unshift(e[i].p1),o.unshift(new It(e[i].p1,n))),t.splice(i,c,...p),e.splice(i,c,...o),t.splice(0,u),void e.splice(0,u)}}debugger}}}),{contour:t,ridges:e}}get anchors(){let t=this._points,{contour:e}=this.shape;return[e.some(e=>e.eq(t[0]))?t[0]:null,e.includes(t[1])?t[1]:null,e.some(e=>e.eq(t[2]))?t[2]:null,e.includes(t[3])?t[3]:null]}get direction(){let{oy:t,v:e}=this;return new k(t+e,e).doubleAngle()}get sx(){return this.oy+this.u+this.v}get sy(){return this.ox+this.u+this.v}get rank(){let t=Wt.reduce(this.oy+this.v,this.oy)[0],e=Wt.reduce(this.ox+this.u,this.ox)[0];return Math.max(t,e)}revserse(t,e){let{shift:i,detours:s,sx:n,sy:r}=this;i=i||{x:0,y:0};let o={x:t-n-i.x,y:e-r-i.y};(o.x||o.y)&&(this.shift=o),null==s||s.forEach(t=>t.forEach(t=>{t.x=n-t.x,t.y=r-t.y}))}shrink(t=2){return h.delete(this),this.ox/=t,this.oy/=t,this.u/=t,this.v/=t,this}offset(t){!t||this._offset&&this._offset.x==t.x&&this._offset.y==t.y||(this._offset=t,h.delete(this))}addDetour(t){t=Lt(t);for(let e=0;e<t.length-1;e++)t[e].x==t[e+1].x&&t[e].y==t[e+1].y&&t.splice(e--,1);1!=t.length&&(this.detours=this.detours||[],this.detours.push(t),h.delete(this))}clearDetour(){var t;(null===(t=this.detours)||void 0===t?void 0:t.length)&&(this.detours=void 0,h.delete(this))}toJSON(){return Lt(this)}static*gops(t,e){let{ox:i,oy:s}=t;if([i,s].some(t=>!Number.isSafeInteger(t)))return;if(i%2&&s%2)return;void 0===e&&(e=Number.POSITIVE_INFINITY);let n=i*s/2;for(let t,r=Math.floor(Math.sqrt(n));r>0&&r+(t=n/r)+s<=e;r--)if(n%r==0&&(r==t&&(yield{ox:i,oy:s,u:r,v:t}),r!=t)){let e=new c({ox:i,oy:s,u:r,v:t}),n=new c({ox:i,oy:s,u:t,v:r});e.rank>n.rank?(yield n,yield e):(yield e,yield n)}}static instantiate(t,e=!1){return t instanceof c&&!e?t:new c(t)}}t([o],c.prototype,"_points",null),t([function(t,e,i){if(i)return i.enumerable=!1,i;Object.defineProperty(t,e,{set(t){Object.defineProperty(this,e,{value:t,writable:!0,configurable:!1})},configurable:!0})}],c.prototype,"_offset",void 0),t([o],c.prototype,"_shift",null),t([o],c.prototype,"shape",null),t([o],c.prototype,"anchors",null),t([o],c.prototype,"direction",null),t([o],c.prototype,"rank",null);class u extends a{constructor(t){super(),this.contour=t.contour,this.dir=t.dir}get shape(){let t=this.contour.map(t=>new T(t)),e=t.map((t,e,i)=>new It(t,i[(e+1)%i.length]));return{contour:t,ridges:e}}get direction(){return new k(this.dir)}static instantiate(t){return t instanceof u?t:new u(t)}}t([o],u.prototype,"shape",null),t([o],u.prototype,"direction",null);let p=class{constructor(){this._map=new Map,this._size=0}set(t,e,i){return this.has(t,e)||(this._map.has(t)||this._map.set(t,new Map),this._map.has(e)||this._map.set(e,new Map),this._size++),this._map.get(t).set(e,i),this._map.get(e).set(t,i),this}get[Symbol.toStringTag](){return"DoubleMap"}has(...t){return this._size,1==t.length?this._map.has(t[0]):this._map.has(t[0])&&this._map.get(t[0]).has(t[1])}get(...t){return this._size,1==t.length?this._map.get(t[0]):this.has(t[0],t[1])?this._map.get(t[0]).get(t[1]):void 0}get size(){return this._size}clear(){this._map.clear(),this._size=0}forEach(t,e){e||(e=this);for(let[i,s,n]of this.entries())t.apply(e,[n,i,s,this])}delete(...t){if(1==t.length){if(!this._map.has(t[0]))return!1;this._size-=this._map.get(t[0]).size,this._map.delete(t[0]);for(let e of this._map.values())e.delete(t[0]);return!0}return!!this.has(t[0],t[1])&&(this._map.get(t[0]).delete(t[1]),this._map.get(t[1]).delete(t[0]),this._size--,!0)}[Symbol.iterator](){return this.entries()}*entries(){for(let[t,e]of this.keys())yield[t,e,this.get(t,e)]}*keys(){this._size;let t=new Map;for(let e of this._map.keys()){t.set(e,new Set);for(let i of this._map.get(e).keys())t.has(i)&&t.get(i).has(e)||(t.get(e).add(i),yield[e,i])}}firstKeys(){return this._size,this._map.keys()}*values(){for(let[t,e]of this.keys())yield this.get(t,e)}};t([e],p.prototype,"_size",void 0),p=t([e],p);class g{constructor(t,e,i,s){this.source=t,this.keyGen=e,this.ctor=i,this.dtor=s,this._map=new Map}render(){for(let[t,e]of this._map)this.dtor(t,e)&&this._map.delete(t);for(let t of this.source()){let e=this.keyGen(t);this._map.has(e)||this._map.set(e,this.ctor(t))}return new Map(this._map)}get(t){return this.render().get(t)}has(t){return this.render().has(t)}forEach(t,e){return this.render().forEach(t,e)}get size(){return this.render().size}[Symbol.iterator](){return this.render()[Symbol.iterator]()}entries(){return this.render().entries()}keys(){return this.render().keys()}values(){return this.render().values()}toJSON(){return Array.from(this.values()).map(t=>t.toJSON())}}t([e],g.prototype,"render",null);let f=class{constructor(t,e){this._source=t,this._constructor=e,this._map=new p}dispose(){Shrewd.terminate(this._map),Shrewd.terminate(this)}has(...t){return this._map.has.apply(this._map,t)}get(...t){return this._map.get.apply(this._map,t)}get size(){return this._map.size}forEach(t,e){return this._map.forEach(t,e)}[Symbol.iterator](){return this._map[Symbol.iterator]()}entries(){return this._map.entries()}keys(){return this._map.keys()}firstKeys(){return this._map.firstKeys()}values(){return this._map.values()}};t([e({renderer(t){for(let e of t.firstKeys())e.disposed&&t.delete(e);let e=Array.from(this._source());e.length>1&&0==t.size&&t.set(e[0],e[1],this._constructor(e[0],e[1]));for(let i of e)if(!t.has(i)){let e=Array.from(t.firstKeys());for(let s of e)t.set(i,s,this._constructor(i,s))}return t}})],f.prototype,"_map",void 0),f=t([e],f),window.BigInt=window.BigInt||(t=>t);const y=BigInt(1);class v{constructor(t,e=1){if(t instanceof v)this._p=t._p,this._q=t._q*BigInt(e);else if("bigint"==typeof t&&"bigint"==typeof e)this._p=t,this._q=e;else if("bigint"==typeof t&&1===e)this._p=t,this._q=y;else{if("number"!=typeof t||"number"!=typeof e){debugger;throw new Error("Parameters are not valid")}if(Number.isSafeInteger(t)&&Number.isSafeInteger(e))this._p=BigInt(t),this._q=BigInt(e);else{if(!Number.isFinite(t/e)){debugger;throw new Error("Parameters are not valid")}{let i=v.toFraction(t/e);this._p=i._p,this._q=i._q}}}}static toFraction(t,e=1,i=0){let s=Math.floor(t),n=t-s,r=s*i+e;return n/r/((1-n)*r+i)<v.ERROR?new v(s):v.toFraction(1/n,i,r).i().a(s)}get $numerator(){return this._p}get $denominator(){return this._q}get value(){return Number(this._p)/Number(this._q)}toString(){return this.smp(),this._p+(this._q>1?"/"+this._q:"")}c(){return new v(this._p,this._q)}smp(){return[this._p,this._q]=Wt.reduce(this._p,this._q),this._check()}n(){return this._p=-this._p,this}i(){return[this._p,this._q]=[this._q,this._p],this}r(){return this._p=BigInt(Math.round(this.value)),this._q=y,this}a(t){return t instanceof v?(this._p=this._p*t._q+this._q*t._p,this._q*=t._q):Number.isInteger(t)?this._p+=BigInt(t)*this._q:this.a(new v(t)),this}s(t){return t instanceof v?(this._p=this._p*t._q-this._q*t._p,this._q*=t._q):Number.isInteger(t)?this._p-=BigInt(t)*this._q:this.s(new v(t)),this}m(t){return t instanceof v?(this._p*=t._p,this._q*=t._q):Number.isInteger(t)?this._p*=BigInt(t):this.m(new v(t)),this._check()}d(t){return t instanceof v?(this._p*=t._q,this._q*=t._p):Number.isInteger(t)?this._q*=BigInt(t):this.d(new v(t)),this._check()}_check(){return this._q<0&&(this._q=-this._q,this._p=-this._p),this}get neg(){return this.c().n()}get inv(){return this.c().i()}add(t){return this.c().a(t)}sub(t){return this.c().s(t)}mul(t){return this.c().m(t)}div(t){return this.c().d(t)}eq(t){return t instanceof v?this._p*t._q==this._q*t._p:this._p==this._q*BigInt(t)}ne(t){return t instanceof v?this._p*t._q!=this._q*t._p:Number.isSafeInteger(t)?this._p!=this._q*BigInt(t):this.ne(new v(t))}lt(t){return t instanceof v?this._p*t._q<this._q*t._p:Number.isSafeInteger(t)?this._p<this._q*BigInt(t):this.lt(new v(t))}gt(t){return t instanceof v?this._p*t._q>this._q*t._p:Number.isSafeInteger(t)?this._p>this._q*BigInt(t):this.gt(new v(t))}le(t){return t instanceof v?this._p*t._q<=this._q*t._p:Number.isSafeInteger(t)?this._p<=this._q*BigInt(t):this.le(new v(t))}ge(t){return t instanceof v?this._p*t._q>=this._q*t._p:Number.isSafeInteger(t)?this._p>=this._q*BigInt(t):this.ge(new v(t))}toJSON(){return this.toString()}}v.ERROR=1e-12;class _ extends l{constructor(t,e){super(t,e),this.cornerMap=[];for(let[t,i]of e.overlaps.entries())for(let[e,s]of i.c.entries())this.cornerMap.push([s,t,e])}get intersectionCorners(){return this.cornerMap.filter(t=>{let e=t[0].type;return e==mt.side||e==mt.intersection})}get outCorners(){return this.intersectionCorners.concat(this.cornerMap.filter(t=>t[0].type==mt.flap))}get constraints(){return this.cornerMap.filter(t=>{let e=t[0].type;return e==mt.socket||e==mt.internal||e==mt.flap})}getOriginalDisplacement(t){let e=this.overlaps.find(t=>t.c[0].type!=mt.coincide);return t.getConnectionTarget(e.c[0]).sub(this.configuration.repository.stretch.origin)}get _sideConnectionTarget(){let t=new Map,e=this.configuration.sheet.design.flapsById;for(let[i,s,n]of this.intersectionCorners){let r=this.overlaps[s],o=this.getParent(r),[h,l]=[o.c[0],o.c[2]],[a,d]=[e.get(h.e),e.get(l.e)],c=a.quadrants[h.q],u=0,p=d.quadrants[l.q],g=0;if(i.type==mt.intersection){let t=r.c[0].e<0,e=this.configuration.sheet.design.tree,s=e.node.get(i.e),n=e.distTriple(a.node,d.node,s);if(t?g=n.d2-d.radius:u=n.d1-a.radius,isNaN(u)||isNaN(g))debugger}r=this.getExposedOverlap(r);let f=c.getOverlapCorner(r,o,n,u),y=p.getOverlapCorner(r,o,qt(n),g);t.set(i,[f,y])}return t}getExposedOverlap(t){var e;if(1==this.overlaps.length)return t;let i=Lt(t),s=this.getParent(t);i.shift=null!==(e=i.shift)&&void 0!==e?e:{x:0,y:0};for(let e of this.overlaps)if(e!=t){let t=this.getParent(e),n=i.ox+i.shift.x,r=i.oy+i.shift.y;t.c[0].e==s.c[0].e&&(t.ox<s.ox&&(i.ox=n-(i.shift.x=Math.max(i.shift.x,t.ox))),t.oy<s.oy&&(i.oy=r-(i.shift.y=Math.max(i.shift.y,t.oy)))),t.c[2].e==s.c[2].e&&(t.ox<s.ox&&(i.ox=s.ox-Math.max(t.ox,s.ox-n)-i.shift.x),t.oy<s.oy&&(i.oy=s.oy-Math.max(t.oy,s.oy-r)-i.shift.y))}return i}getParent(t){return this.configuration.repository.structure[t.parent]}getSideConnectionTarget(t,e,i){let[s,n]=this._sideConnectionTarget.get(e);return s._x.gt(n._x)&&([s,n]=[n,s]),void 0===i?t._x.le(s._x)?s:t._x.ge(n._x)?n:null:0==i||3==i?s:n}toJSON(){let t={overlaps:this.overlaps,strategy:this.strategy},e=this.configuration.jidMap;if(e.size>0){t.overlaps=Lt(t.overlaps);for(let i of t.overlaps)for(let t of i.c)void 0!==t.e&&t.e>=0&&(t.e=e.get(t.e))}return t}}t([o],_.prototype,"intersectionCorners",null),t([o],_.prototype,"outCorners",null),t([o],_.prototype,"constraints",null),t([e],_.prototype,"_sideConnectionTarget",null);let m=class extends g{constructor(t,e){super(t,t=>t,e,(t,e)=>e.disposed)}};m=t([e],m);let x=class extends g{constructor(t,e,i){super(t,e,i,(t,e)=>e.disposed)}};x=t([e],x);class w extends d{constructor(t){super(),this._oldStudio=null,this.mountTarget=t}get shouldDispose(){return super.shouldDispose||this.mountTarget instanceof w&&this.mountTarget.disposed}get $studio(){return this.disposed||!this.isActive?null:this.mountTarget instanceof w?this.mountTarget.$studio:this.mountTarget}mountEvents(){this.$studio!==this._oldStudio&&(this.$studio&&this.onMount(this.$studio),this._oldStudio&&this.onDismount(this._oldStudio),this._oldStudio=this.$studio)}onDispose(){this._oldStudio&&this.onDismount(this._oldStudio),super.onDispose()}get isActive(){return!0}static isActive(t){return t.isActive}onMount(t){}onDismount(t){}}t([e],w.prototype,"$studio",null),t([e],w.prototype,"mountEvents",null);let b=class extends d{constructor(t){super(t),this.node=new Map,this.edge=new p,this.path=new f(()=>this.node.values(),(t,e)=>new R(t,e)),this.nextId=0,this.jidMap=new Map,this.design=t}onDispose(){Shrewd.terminate(this.edge),this.path.dispose()}get leaf(){var t=new Set;for(let e of this.node.values())1==e.degree&&t.add(e);return t}generateJID(){let t=Array.from(this.node.values()).sort((t,e)=>t.id-e.id),e=0;for(let i of t)this.jidMap.set(i.id,i.jid=e++)}dist(t,e){let i=this.path.get(t,e);return i?i.length:NaN}getOrAddNode(t){let e;return this.node.has(t)?e=this.node.get(t):(this.node.set(t,e=new P(this,t)),t>=this.nextId&&(this.nextId=t+1)),e}split(t){let e=this.getOrAddNode(this.nextId),{n1:i,n2:s}=t;return this.edge.delete(i,s),this.edge.set(e,i,new N(e,i,Math.ceil(t.length/2))),this.edge.set(e,s,new N(e,s,Math.max(Math.floor(t.length/2),1))),t.dispose(),e}deleteAndMerge(t){let e=this.getOrAddNode(this.nextId),{n1:i,n2:s,a1:n,a2:r}=t;this.edge.delete(i,s);for(let t of n){let s=t.n(i);this.edge.delete(s,i),this.edge.set(e,s,new N(e,s,t.length))}for(let t of r){let i=t.n(s);this.edge.delete(i,s),this.edge.set(e,i,new N(e,i,t.length))}return i.dispose(!0),s.dispose(!0),e}deleteAndJoin(t){let e=t.edges;if(2!=e.length)return void console.warn(`Incorrectly calling delete-and-join at [${t.id}].`);let i=e[0],s=e[1],n=i.n(t),r=s.n(t),o=new N(n,r,i.length+s.length);return this.edge.set(n,r,o),t.dispose(!0),o}addLeafAt(t,e){let i=this.nextId;return this.addEdge(t,i,e),this.node.get(i)}addEdge(t,e,i){let s=this.node.has(t),n=this.node.has(e);if(0!=this.node.size&&!s&&!n)return console.warn(`Adding edge (${t},${e}) disconnects the graph.`),!1;let r=this.getOrAddNode(t),o=this.getOrAddNode(e);if(this.edge.has(r,o))return this.edge.get(r,o).length=i,!1;if(s&&n)return console.warn(`Adding edge (${t},${e}) will cause circuit.`),!1;let h=new N(r,o,i);return this.edge.set(r,o,h),!0}distTriple(t,e,i){let s=this.dist(t,e),n=this.dist(t,i),r=this.dist(e,i),o=(s+n+r)/2;return{d1:o-r,d2:o-n,d3:o-s}}};t([e({renderer(t){for(let[e,i]of t)i.disposed&&t.delete(e);return t}})],b.prototype,"node",void 0),t([e({renderer(t){for(let e of t.firstKeys())e.disposed&&t.delete(e);return t}})],b.prototype,"edge",void 0),t([e],b.prototype,"leaf",null),b=t([e],b);class S{constructor(...t){void 0===t[1]&&(t=[t[0]._x,t[0]._y]),this._x=new v(t[0]),this._y=new v(t[1])}get x(){return this._x.value}set x(t){this._x=new v(t)}get y(){return this._y.value}set y(t){this._y=new v(t)}smp(){return this._x.smp(),this._y.smp(),this}eq(t){return!!t&&(this._x.eq(t._x)&&this._y.eq(t._y))}clone(){return new this.constructor(this._x,this._y)}toString(){return"("+this._x+", "+this._y+")"}toJSON(){return this.toString()}set(t,e=0){return t instanceof S?(this._x=new v(t._x),this._y=new v(t._y)):(this._x=new v(t),this._y=new v(e)),this}add(t){return new this.constructor(this._x.add(t._x),this._y.add(t._y)).smp()}addBy(t){return this._x.a(t._x),this._y.a(t._y),this.smp()}round(t=1){return this._x.d(t).r().m(t),this._y.d(t).r().m(t),this.smp()}range(t,e,i,s){return this._x.lt(t)&&(this._x=new v(t)),this._x.gt(e)&&(this._x=new v(e)),this._y.lt(i)&&(this._y=new v(i)),this._y.gt(s)&&(this._y=new v(s)),this}toIPoint(){return{x:this.x,y:this.y}}}class M extends w{constructor(t,e){if(super(t),this.id=M._id++,this.dragging=!1,this.edges=new m(()=>this.tree.edge.values(),t=>new ot(this.TreeSheet,this.vertices.get(t.n1),this.vertices.get(t.n2),t)),this.rivers=new m(()=>[...this.tree.edge.values()].filter(t=>t.isRiver),t=>new lt(this.LayoutSheet,t)),this.vertices=new m(()=>this.tree.node.values(),t=>new nt(this.TreeSheet,t)),this.flaps=new m(()=>this.tree.leaf,t=>new it(this.LayoutSheet,t)),this.junctions=new f(()=>this.flaps.values(),(t,e)=>new ht(this.LayoutSheet,t,e)),this.stretches=new m(()=>this.teams.keys(),t=>new J(this.LayoutSheet,t)),this.data=$t({title:"Untitled",version:dt.current,fullscreen:!0,mode:"layout",layout:{sheet:{width:16,height:16,scale:20},flaps:[],stretches:[]},tree:{sheet:{width:20,height:20,scale:16},nodes:[],edges:[]}},e),this.data.tree.nodes.length<3)throw new Error("Invalid format.");this.options=new ut(this.data)}sortJEdge(){let t=this.edges.toJSON();if(0==t.length)return[];let e=new Set,i=[];for(;t.length;){let s=t.shift();0==e.size||e.has(s.n1)||e.has(s.n2)?(i.push(s),e.add(s.n1),e.add(s.n2)):t.push(s)}return i}get isActive(){return this instanceof E&&this.mountTarget.design==this}get patternNotFound(){return[...this.stretches.values()].some(t=>t.isTotallyValid&&null==t.pattern)}onDispose(){Shrewd.terminate(this.edges),Shrewd.terminate(this.vertices),Shrewd.terminate(this.rivers),Shrewd.terminate(this.flaps),Shrewd.terminate(this.stretches),this.junctions.dispose()}get validJunctions(){return[...this.junctions.values()].filter(t=>t.isValid)}get teams(){let t,e=new Set(this.activeJunctions),i=new Map;function s(i){if(e.has(i)){t.push(i),e.delete(i);for(let t of i.neighbors)s(t)}}for(;e.size>0;)t=[],s(e.values().next().value),t.sort(ht.sort),i.set(ht.createTeamId(t,t=>t.node.id),t);return i}get devices(){let t=[];for(let e of this.stretches.values())t.push(...e.devices);return t}get activeJunctions(){return this.validJunctions.filter(t=>!t.isCovered)}get junctionsByQuadrant(){return M.ToQuadrantMap(this.junctions.values())}get activeJunctionsByQuadrant(){return M.ToQuadrantMap(this.activeJunctions)}static ToQuadrantMap(t){let e=new Map;function i(t,i){let s=e.get(t);s||e.set(t,s=[]),s.push(i)}for(let e of t)i(e.q1,e),i(e.q2,e);return e}get stretchByQuadrant(){let t=new Map;for(let e of this.stretches.values())if(e.isActive)for(let i of e.junctions)t.set(i.q1,e),t.set(i.q2,e);return t}getStretchByQuadrant(t){var e;return null!==(e=this.stretchByQuadrant.get(t))&&void 0!==e?e:null}get flapsById(){let t=new Map;for(let e of this.flaps.values())t.set(e.node.id,e);return t}get openAnchors(){let t=new Map;for(let e of this.activeStretches){let i=e.fx*e.fy;for(let s of e.pattern.devices)for(let e of s.openAnchors){let s=i+","+(e.x-i*e.y),n=t.get(s);n||t.set(s,n=[]),n.push(e)}}return t}get activeStretches(){return[...this.stretches.values()].filter(t=>t.isActive&&!!t.pattern)}get overflow(){return Math.max(...[...this.flaps.values(),...this.edges.values(),...this.vertices.values()].map(t=>t.view.overflow))}}M._id=0,t([e],M.prototype,"dragging",void 0),t([e],M.prototype,"isActive",null),t([e],M.prototype,"patternNotFound",null),t([e],M.prototype,"validJunctions",null),t([e],M.prototype,"teams",null),t([e],M.prototype,"devices",null),t([e],M.prototype,"activeJunctions",null),t([e],M.prototype,"junctionsByQuadrant",null),t([e],M.prototype,"activeJunctionsByQuadrant",null),t([e],M.prototype,"stretchByQuadrant",null),t([e],M.prototype,"flapsById",null),t([e],M.prototype,"openAnchors",null),t([e],M.prototype,"activeStretches",null),t([e],M.prototype,"overflow",null);class q extends w{constructor(t){super(t),this.sheet=t}get design(){return this.sheet.design}}let I=class extends w{constructor(t,e,...i){super(t),this._activeControlCache=[],this.indepRect=new kt(T.ZERO,T.ZERO),this.width=e.width,this.height=e.height,this.scale=e.scale,this._controlMaps=i,this.view=new V(this)}get controls(){var t=[];for(let e of this._controlMaps)t.push(...e());return t}get activeControls(){return this.design.dragging||(this._activeControlCache=this.controls.filter(t=>w.isActive(t))),this._activeControlCache}constraint(t,e){return t.range(-e.x,this.width-e.x,-e.y,this.height-e.y)}get design(){return this.mountTarget}get isActive(){return this.design.sheet==this}get displayScale(){return this.$studio?this.$studio.$display.scale:1}toJSON(){return{width:this.width,height:this.height,scale:this.scale}}get size(){return Math.max(this.width,this.height)}contains(t){return 0<=t.x&&t.x<=this.width&&0<=t.y&&t.y<=this.height}get independents(){return this.controls.filter(t=>t instanceof Y)}getIndepRect(){let t=Number.POSITIVE_INFINITY,e=Number.POSITIVE_INFINITY,i=Number.NEGATIVE_INFINITY,s=Number.NEGATIVE_INFINITY;for(let n of this.independents){let r=n.location;r.x<t&&(t=r.x),r.x>i&&(i=r.x),r.y<e&&(e=r.y),r.y>s&&(s=r.y)}this.indepRect=new kt(new T(t,e),new T(i,s))}};t([e],I.prototype,"controls",null),t([e],I.prototype,"activeControls",null),t([s({validator(t){let e=t>=8&&t>=this.indepRect.width,i=t-this.indepRect.right;if(e&&i<0)for(let t of this.independents)t.location.x+=i;return e}})],I.prototype,"width",void 0),t([s({validator(t){let e=t>=8&&t>=this.indepRect.height,i=t-this.indepRect.top;if(e&&i<0)for(let t of this.independents)t.location.y+=i;return e}})],I.prototype,"height",void 0),t([s({validator(t){var e,i;return t>=Math.min(10,Math.ceil(null!==(i=null===(e=this.$studio)||void 0===e?void 0:e.$display.getAutoScale())&&void 0!==i?i:10))}})],I.prototype,"scale",void 0),t([e],I.prototype,"isActive",null),t([e],I.prototype,"displayScale",null),t([e],I.prototype,"size",null),t([e],I.prototype,"independents",null),t([e],I.prototype,"getIndepRect",null),I=t([e],I);class C extends w{constructor(){super(...arguments),this._paths=[]}draw(){this.mountEvents(),this.$studio&&(this.$studio.$display.render(),this.render())}$addItem(t,e){this._paths.push([t,e])}onMount(t){for(let[e,i]of this._paths)t.$display.project.layers[e].addChild(i)}onDismount(t){for(let[t,e]of this._paths)e.remove()}contains(t){return!1}}t([e],C.prototype,"draw",null);let P=class extends d{constructor(t,e){super(t),this.name="",this.tree=t,this.id=e}get shouldDispose(){return super.shouldDispose||this.tree.disposed}dispose(t=!1){if(t||1==this.degree)super.dispose();else{if(2==this.degree)return this.tree.deleteAndJoin(this);1!=this.degree&&console.warn(`Node [${this.name?this.name:this.id}] is not a leaf.`)}}addLeaf(t){return this.tree.addLeafAt(this.id,t)}get design(){return this.tree.design}get edges(){let t=this.tree.edge.get(this);return t?Array.from(t.values()):[]}get degree(){return this.edges.length}get firstEdge(){return this.edges[0]}get radius(){return 1==this.degree?this.edges[0].length:NaN}};t([s],P.prototype,"name",void 0),t([e],P.prototype,"edges",null),t([e],P.prototype,"degree",null),t([e],P.prototype,"firstEdge",null),t([e],P.prototype,"radius",null),P=t([e],P);let N=class extends d{constructor(t,e,i){super(),this._n1=t,this._n2=e,this.length=i}get design(){return this.n1.design}get shouldDispose(){return super.shouldDispose||this._n1.disposed||this._n2.disposed}get isRiver(){return this.g1.length>1&&this.g2.length>1}adjacentEdges(t){return t.edges.filter(t=>t!=this)}get a1(){return this.adjacentEdges(this._n1)}get a2(){return this.adjacentEdges(this._n2)}group(t,e){let i=[t];for(let s of e)i.push(...s.g(t));return i}get g1(){return this.group(this._n1,this.a1)}get g2(){return this.group(this._n2,this.a2)}g(t){return t==this._n1?this.g2:this.g1}get l1(){return this.g1.filter(t=>1==t.degree)}get l2(){return this.g2.filter(t=>1==t.degree)}get t1(){return this.a1.map(t=>t.t(this._n1)+t.length).reduce((t,e)=>t+e,0)}get t2(){return this.a2.map(t=>t.t(this._n2)+t.length).reduce((t,e)=>t+e,0)}t(t){return t==this._n1?this.t2:this.t1}get p1(){return Math.max(...this.l1.map(t=>t.tree.dist(t,this.n1)))}get p2(){return Math.max(...this.l2.map(t=>t.tree.dist(t,this.n2)))}get wrapSide(){return this.isRiver?this.p1>this.p2?2:this.p1<this.p2?1:this.t1>this.t2?2:this.t1<this.t2||this.g1.length>this.g2.length?1:this.g1.length<this.g2.length?2:0:0}get n1(){return this._n1}get n2(){return this._n2}n(t){return t==this._n1?this._n2:this._n1}};t([s({validator:t=>t>0})],N.prototype,"length",void 0),t([e],N.prototype,"isRiver",null),t([e],N.prototype,"a1",null),t([e],N.prototype,"a2",null),t([e],N.prototype,"g1",null),t([e],N.prototype,"g2",null),t([e],N.prototype,"l1",null),t([e],N.prototype,"l2",null),t([e],N.prototype,"t1",null),t([e],N.prototype,"t2",null),t([e],N.prototype,"p1",null),t([e],N.prototype,"p2",null),t([e],N.prototype,"wrapSide",null),N=t([e],N);let R=class extends d{constructor(t,e){super(),this._n1=t,this._n2=e}get shouldDispose(){return super.shouldDispose||this._n1.disposed||this._n2.disposed}get edges(){let t=[],e=this._n1,i=!0;for(;e!=this._n2&&i;){i=!1;for(let s of e.edges)if(s.g(e).includes(this._n2)){i=!0,t.push(s),e=s.n(e);break}}return t}get length(){return this.edges.reduce((t,e)=>t+e.length,0)}};t([e],R.prototype,"edges",null),t([e],R.prototype,"length",null),R=t([e],R);class T extends S{static get ZERO(){return new T(0,0)}constructor(...t){void 0===t[1]?super(t[0].x,t[0].y):super(...t)}dist(t){return this.sub(t).length}paramDist(t){return Math.max(Math.abs(t.x-this.x),Math.abs(t.y-this.y))}sub(t){return t instanceof k?new T(this._x.sub(t._x),this._y.sub(t._y)).smp():t instanceof T?new k(this._x.sub(t._x),this._y.sub(t._y)).smp():new k(this._x.sub(t.x),this._y.sub(t.y)).smp()}subBy(t){return this._x.s(t.x),this._y.s(t.y),this}diagonalXRange(t,e,i){this._x.lt(t)&&this.setDiagonalX(t,i),this._x.gt(e)&&this.setDiagonalX(e,i)}toPaper(){return new paper.Point(this.x,this.y)}setDiagonalX(t,e){var i=this._x.sub(t);this._x.s(i),e?this._y.a(i):this._y.s(i)}eq(t){return t instanceof T||!t?super.eq(t):this.x==t.x&&this.y==t.y}get isIntegral(){return this._x.$denominator===y&&this._y.$denominator===y}transform(t,e){return new T(this._x.mul(t),this._y.mul(e))}}class k extends S{static get ZERO(){return new k(0,0)}constructor(...t){void 0===t[1]?super(t[0].x,t[0].y):super(...t)}get length(){return Math.sqrt(this.dot(this))}get slope(){return this._y.div(this._x)}rotate90(){return new k(this._y.neg,this._x)}normalize(){return this.scale(new v(this.length).inv)}scale(t,e){return t instanceof S?this.scale(t._x,t._y):(e||(e=t),new k(this._x.mul(t),this._y.mul(e)).smp())}dot(t){return this._x.mul(t._x).a(this._y.mul(t._y)).value}get neg(){return new k(this._x.neg,this._y.neg)}get angle(){return Math.atan2(this.y,this.x)}reduce(){let[t,e]=[this._x.$numerator,this._y.$numerator],[i,s]=[this._x.$denominator,this._y.$denominator],[n,r]=Wt.reduce(t*s,e*i);return new k(Number(n),Number(r))}doubleAngle(t=1){let{x:e,y:i}=this.reduce();return[e,i]=Wt.reduce(e*e-i*i,2*e*i),new k(t*e,t*i)}parallel(t){return this._x.mul(t._y).eq(this._y.mul(t._x))}static bisector(t,e){let[i,s]=Wt.reduce(t.x,t.y),[n,r]=Wt.reduce(e.x,e.y),o=Math.sqrt(i*i+s*s),h=Math.sqrt(n*n+r*r);return new k(i*h+n*o,s*h+r*o)}}let E=class extends M{constructor(t,e){super(t,e),this._modified=!1,this.LayoutSheet=new I(this,this.data.layout.sheet,()=>this.flaps.values(),()=>this.rivers.values(),()=>this.stretches.values(),()=>this.devices),this.TreeSheet=new I(this,this.data.tree.sheet,()=>this.edges.values(),()=>this.vertices.values()),this.title=this.data.title,this.fullscreen=this.data.fullscreen,this.description=this.data.description,this.mode=this.data.mode,this.tree=new b(this);for(let t of this.data.tree.edges)this.tree.addEdge(t.n1,t.n2,t.length)}get sheet(){return"layout"==this.mode?this.LayoutSheet:this.TreeSheet}get modified(){return this._modified}get design(){return this}notifySave(){this._modified=!1}takeAction(t){this._modified=!0,t()}fieldChange(t,e,i,s){this._modified=!0}toJSON(){this.tree.generateJID();let t={title:this.title,description:this.description,fullscreen:this.fullscreen,version:dt.current,mode:this.mode,layout:{sheet:this.LayoutSheet.toJSON(),flaps:this.flaps.toJSON(),stretches:this.stretches.toJSON()},tree:{sheet:this.TreeSheet.toJSON(),nodes:this.vertices.toJSON(),edges:this.sortJEdge()}};return this.tree.jidMap.clear(),t}deleteVertices(t){this.takeAction(()=>{let e=t.concat().sort((t,e)=>t.node.degree-e.node.degree);for(;this.vertices.size>3;){let t=e.find(t=>1==t.node.degree);if(!t)break;t.node.dispose(),e.splice(e.indexOf(t),1),Shrewd.commit()}})}deleteFlaps(t){this.takeAction(()=>{for(let e of t){if(3==this.vertices.size)break;e.node.dispose(),Shrewd.commit()}})}clearCPSelection(){for(let t of this.LayoutSheet.controls)t.selected=!1}clearTreeSelection(){for(let t of this.TreeSheet.controls)t.selected=!1}flapToVertex(t){this.clearTreeSelection();for(let e of t){let t=this.vertices.get(e.node);t&&(t.selected=!0)}this.mode="tree"}vertexToFlap(t){this.clearCPSelection();for(let e of t){let t=this.flaps.get(e.node);t&&(t.selected=!0)}this.mode="layout"}riverToEdge(t){this.clearTreeSelection();let e=this.edges.get(t.edge);e&&(e.selected=!0),this.mode="tree"}edgeToRiver(t){this.clearCPSelection();let e=t.edge;if(e.isRiver){let t=this.rivers.get(e);t&&(t.selected=!0)}else{let t=1==e.n1.degree?e.n1:e.n2,i=this.flaps.get(t);i&&(i.selected=!0)}this.mode="layout"}};t([e],E.prototype,"fullscreen",void 0),t([e],E.prototype,"mode",void 0),t([s],E.prototype,"description",void 0),t([s],E.prototype,"title",void 0),t([e],E.prototype,"sheet",null),E=t([e],E);class O extends q{constructor(){super(...arguments),this.selected=!1}selectableWith(t){return!1}get dragSelectAnchor(){return null}toggle(){this.selected=!this.selected}contains(t){return!1}static isDragSelectable(t){return null!=t.dragSelectAnchor}}var j;t([e],O.prototype,"selected",void 0);let D=j=class extends q{constructor(t,e,i){super(t),this.flap=e,this.q=i,this.qv=j.QV[i],this.sv=j.SV[i],this.pv=j.SV[(i+1)%4],this.fx=0==this.q||3==this.q?1:-1,this.fy=0==this.q||1==this.q?1:-1}getOverlapCorner(t,e,i,s){var n,r,o,h;let l=this.flap.radius+s,a=null!==(r=null===(n=t.shift)||void 0===n?void 0:n.x)&&void 0!==r?r:0,d=null!==(h=null===(o=t.shift)||void 0===o?void 0:o.y)&&void 0!==h?h:0;return this.flap.node.id!=e.c[0].e&&(a=e.ox-(t.ox+a),d=e.oy-(t.oy+d)),new T(this.x(l-(3==i?0:t.ox)-a),this.y(l-(1==i?0:t.oy)-d))}makeContour(t){let e,i=this.flap.radius+t,s=this.sv.scale(i),n=this.getStart(i),r=this.point.add(s.rotate90()),o=this.pattern;if(o){let t=o.linesForTracing[this.q].concat(),s=o.stretch.junctions,h=this.findNextDelta(s,!1),l=this.findLead(s,i,t),a=l?this.findNextDelta(s,!0):void 0;e=Nt.create(t,null!=l?l:n,this.pv,null!=h?h:new It(r,this.pv),a),a&&this.outside(e[0],i,this.q%2!=1)&&e.unshift(this.q%2?a.yIntersection(this.y(i)):a.xIntersection(this.x(i))),h&&this.outside(e[e.length-1],i,this.q%2==1)&&e.push(this.q%2?h.xIntersection(this.x(i)):h.yIntersection(this.y(i)))}else e=[n,this.point.add(this.qv.scale(i))];return e.map(t=>t.toPaper())}outside(t,e,i){return i?t.x*this.fx>this.x(e)*this.fx:t.y*this.fy>this.y(e)*this.fy}getStart(t){return this.point.add(this.sv.scale(t))}y(t){return this.point.y+this.fy*t}x(t){return this.point.x+this.fx*t}findNextDelta(t,e){let i=this.findJoinNextQ(t,e,!0);if(!i)return;let{joinQ:s,nextQ:n,mode:r}=i,{d1:o,d2:h}=this.design.tree.distTriple(this.flap.node,n.flap.node,s.flap.node),l=r?new T(n.x(h),this.y(o)):new T(this.x(o),n.y(h));return new It(l,this.qv)}findJoinNextQ(t,e,i){if(1==t.length)return;let s,n=!!(this.q%2)==e,r=n?"oy":"ox",o=ht.findMinMax(t.filter(t=>t.q1==this||t.q2==this),r,-1),h=o.q1==this?o.q2:o.q1;if(1!=h.activeJunctions.length){if(i){let t=h.activeJunctions.concat().sort((t,e)=>t[r]-e[r]);if(s=t[t.indexOf(o)+1],!s)return}else if(s=ht.findMinMax(h.activeJunctions,r,1),s==o)return;return{joinQ:h,nextQ:s.q1==h?s.q2:s.q1,mode:n}}}findLead(t,e,i){var s;let n=this.findJoinNextQ(t,!0,!1);if(!n)return;let{joinQ:r,nextQ:o}=n,h=this.design.junctions.get(this.flap,o.flap).status!=yt.tooClose,l=this.design.tree.distTriple(this.flap.node,o.flap.node,r.flap.node);if(e<=l.d1&&h)return;let a=e-l.d1+l.d2;if(e<=l.d1){let t=this.q%2?new T(o.x(a),this.y(e)):new T(this.x(e),o.y(a));i.push(new It(t,this.qv.neg))}return null!==(s=o.findLead(t,a,i))&&void 0!==s?s:o.getStart(a)}getOverriddenPath(t){let e=[];if(this.pattern)return e;let i=this.flap.radius+t;for(let[t,s]of this.coveredJunctions){let{ox:n,oy:r}=t,o=this.point.add(this.qv.scale(i));for(let t of s){let e=t.sub(o);n=Math.min(-e.x*this.fx,n),r=Math.min(-e.y*this.fy,r)}let h=new k(n*this.fx,r*this.fy);e.push(new paper.Path.Rectangle(o.toPaper(),o.sub(h).toPaper()))}return e}get pattern(){let t=this.design.getStretchByQuadrant(this);return t?t.pattern:null}get corner(){let t=this.flap.radius;return this.point.add(this.qv.scale(t))}get junctions(){var t;return null!==(t=this.design.junctionsByQuadrant.get(this))&&void 0!==t?t:[]}get coveredJunctions(){return this.junctions.filter(t=>t.isValid&&t.isCovered).map(t=>{let e=t.q1==this?t.q2:t.q1;return[t,t.coveredBy.map(t=>t.q1==e?t.q2.point:t.q1.point)]})}get point(){return this.flap.points[this.q]}get activeJunctions(){let t=this.design.activeJunctionsByQuadrant.get(this);return t||[]}static transform(t,e,i){return e<0&&(t+=t%2?3:1),i<0&&(t+=t%2?1:3),t%4}getBaseRectangle(t){let e=this.flap.radius;return new kt(new T(this.x(e),this.y(e)),new T(this.x(e-t.ox),this.y(e-t.oy)))}debug(t=0){i=!0,console.log(this.makeContour(t).map(t=>t.toString())),i=!1}};D.QV=[new k(1,1),new k(-1,1),new k(-1,-1),new k(1,-1)],D.SV=[new k(1,0),new k(0,1),new k(-1,0),new k(0,-1)],t([e],D.prototype,"pattern",null),t([e],D.prototype,"corner",null),t([e],D.prototype,"junctions",null),t([e],D.prototype,"coveredJunctions",null),t([e],D.prototype,"point",null),t([e],D.prototype,"activeJunctions",null),D=j=t([e],D);let J=class extends O{constructor(t,e){super(t),this._repoCache=new Map,this.signature=e}get type(){return"Stretch"}get junctions(){var t;let e=null!==(t=this.design.teams.get(this.signature))&&void 0!==t?t:[];if(this.junctionCache&&this.junctionCache.length==e.length){for(let t in e)if(e[t]!=this.junctionCache[t])return this.junctionCache=e;return this.junctionCache}return this.junctionCache=e}get flaps(){let t=new Set;for(let e of this.junctions)t.add(e.f1),t.add(e.f2);return Array.from(t)}get origin(){var t,e,i;return null!==(i=null===(e=null===(t=this.junctions[0])||void 0===t?void 0:t.q1)||void 0===e?void 0:e.point)&&void 0!==i?i:T.ZERO}get repository(){if(!this.isValid)return null;let t,e=this.structureSignature;if(this._repoCache.has(e))t=this._repoCache.get(e);else{let i=this.design.options.get("stretch",this.signature);t=new At(this,e,i)}return this.design.dragging||this._repoCache.clear(),this._repoCache.set(e,t),t}get fx(){var t,e;return null!==(e=null===(t=this.junctions[0])||void 0===t?void 0:t.fx)&&void 0!==e?e:1}get fy(){var t,e;return null!==(e=null===(t=this.junctions[0])||void 0===t?void 0:t.fy)&&void 0!==e?e:1}get shouldDispose(){return super.shouldDispose||!this.isActive&&!this.design.dragging}get isActive(){return this.design.teams.has(this.signature)}get pattern(){var t,e,i;return null!==(i=null===(e=null===(t=this.repository)||void 0===t?void 0:t.entry)||void 0===e?void 0:e.entry)&&void 0!==i?i:null}get isValid(){return this.junctions.every(t=>t.status==yt.overlap)}get isTotallyValid(){if(!this.isActive)return!1;for(let t=0;t<this.flaps.length;t++)for(let e=t+1;e<this.flaps.length;e++){if(this.design.junctions.get(this.flaps[t],this.flaps[e]).status==yt.tooClose)return!1}return!0}get structureSignature(){return this.isValid?JSON.stringify(this.junctions.map(t=>{let e=t.toJSON(),i=e.c;return t.fx!=this.fx&&(e.c=[i[2],i[3],i[0],i[1]]),e})):""}get devices(){return this.pattern?this.pattern.devices:[]}toJSON(){var t,e,i,s;return{id:ht.createTeamId(this.junctions,t=>t.node.jid),configuration:null!==(e=null===(t=this.pattern)||void 0===t?void 0:t.configuration.toJSON())&&void 0!==e?e:void 0,pattern:null!==(s=null===(i=this.pattern)||void 0===i?void 0:i.toJSON())&&void 0!==s?s:void 0}}};t([e],J.prototype,"junctions",null),t([e],J.prototype,"flaps",null),t([e],J.prototype,"repository",null),t([e],J.prototype,"isActive",null),t([e],J.prototype,"pattern",null),t([e],J.prototype,"isValid",null),t([e],J.prototype,"isTotallyValid",null),t([e],J.prototype,"structureSignature",null),J=t([e],J);let A=class extends q{constructor(t,e){super(t.sheet),this.configuration=t,this.devices=e.devices.map((e,i)=>new Ot(this,t.partitions[i],e)),this.gadgets=this.devices.reduce((t,e)=>t.concat(e.gadgets),[]),this.signature=JSON.stringify(e)}static getSignature(t){let e=t.devices;t.devices=t.devices.map(t=>((t=Lt(t)).gadgets.forEach(t=>jt.simplify(t)),t.offset=void 0,t));let i=JSON.stringify(t);return t.devices=e,i}get shouldDispose(){return super.shouldDispose||this.configuration.disposed}get isActive(){return this.configuration.isActive&&this.configuration.entry==this}get linesForTracing(){if(!this.isActive)return St(t=>[]);let t=this.configuration.repository.stretch.junctions[0].direction,{fx:e,fy:i}=this.stretch;return St(s=>{let n=[];if(t%2!=s%2)return n;for(let t of this.devices){let r=D.QV[s].scale(this.design.sheet.size);n.push(...t.ridges),n.push(...t.getConnectionRidges(!0));for(let[o,h,l]of t.partition.outCorners){let a=t.anchors[h][l];if(o.type==mt.side||o.type==mt.flap&&s!=D.transform(l,e,i)||o.type==mt.internal&&s!=D.transform(o.q,e,i))n.push(new It(a,a.add(r)));else if(o.type==mt.intersection){let e=t.partition.overlaps[h].c.find(t=>t.type==mt.flap).q,i=t.partition.getSideConnectionTarget(a,o,e);i&&n.push(new It(a,i))}else n.push(new It(a,this.getConnectionTarget(o)))}}return It.distinct(n)})}toJSON(){return{devices:this.devices.map(t=>t.toJSON())}}get selected(){return this.devices.some(t=>t.selected)}get stretch(){return this.configuration.repository.stretch}getConnectionTarget(t){if(t.e>=0)return this.design.flapsById.get(t.e).points[t.q];{let[e,i]=this.configuration.overlapMap.get(t.e);return this.devices[e].anchors[i][t.q]}}};t([e],A.prototype,"isActive",null),t([e],A.prototype,"linesForTracing",null),A=t([e],A);class $ extends q{constructor(){super(...arguments),this.index=0,this._prototypeCache=[],this._cache=[]}get _prototypes(){if(!this.generator)return this._prototypeCache;if(this.design.dragging)return this.buildFirst(),this._prototypeCache.concat();0==this._cache.length&&this.buildFirst();for(let t of this.generator)this._prototypeCache.push(t);return delete this.generator,this._prototypeCache}buildFirst(){let t=this.generator.next();if(!t.done)try{this._cache[0]=this.builder(t.value),this._prototypeCache.push(t.value)}catch(t){console.log("Incompatible old version.")}}get entry(){let t=this._prototypes,e=this.index;return 0==t.length?null:this._cache[e]=this._cache[e]||this.builder(t[e])}move(t=1){let e=this.index,i=this._prototypes.length;this.index=(this.index+t+i)%i,this.onMove(this.index,e),Shrewd.commit()}get size(){return this._prototypes.length}}t([s],$.prototype,"index",void 0),t([e],$.prototype,"_prototypes",null),t([e],$.prototype,"entry",null);class L extends C{constructor(t){super(t),this.control=t}drawSelection(){this.renderSelection(this.control.selected)}}t([e],L.prototype,"drawSelection",null);let B=class extends C{constructor(t){super(t),this.visible=!1,this.$addItem(_t.drag,this._rectangle=new paper.Path.Rectangle(wt.selection))}contains(t){return this._rectangle.contains(t)}render(){if(this._rectangle.visible=this.visible){let t=new paper.Path.Rectangle({from:this.down,to:this.now});this._rectangle.set({segments:t.segments})}}};t([e],B.prototype,"visible",void 0),t([e],B.prototype,"down",void 0),t([e],B.prototype,"now",void 0),B=t([e],B);let V=class extends C{constructor(t){super(t),this._sheet=t,this._border=new paper.Path.Rectangle({point:[0,0],size:[0,0],strokeWidth:3}),this.$addItem(_t.sheet,this._border),this._grid=new paper.CompoundPath(wt.sheet),this.$addItem(_t.sheet,this._grid)}contains(t){return this._border.contains(t)}render(){var t;if(!this.$studio)return;let e=this._sheet.width,i=this._sheet.height;Ft.setRectangleSize(this._border,e,i),this._grid.visible=null===(t=this.$studio)||void 0===t?void 0:t.$display.settings.showGrid,this._grid.removeChildren();for(let t=1;t<i;t++)Ft.addLine(this._grid,new paper.Point(0,t),new paper.Point(e,t));for(let t=1;t<e;t++)Ft.addLine(this._grid,new paper.Point(t,0),new paper.Point(t,i))}};V=t([e],V);class W extends O{contains(t){return this.view.draw(),this.view.contains(t)}}let F=class extends ${constructor(t,e,i){super(t.sheet),this.repository=t,this.seed=i,i&&(this.seedSignature=A.getSignature(i));let s=[],n=new Map,r=-1;for(let[t,i]of e.partitions.entries())for(let[e,o]of i.overlaps.entries())s.push(o),n.set(r--,[t,e]);this.overlaps=s,this.overlapMap=n,this.partitions=e.partitions.map(t=>new _(this,t)),this.generator=this.generate()}get isActive(){return this.repository.isActive&&this.repository.entry==this}builder(t){return new A(this,t)}*generate(){this.seed&&(yield this.seed);yield*Bt.filter(this.search([]),t=>!this.seedSignature||this.seedSignature!=A.getSignature(t))}*search(t,e=0){if(e==this.partitions.length){let e=this.makePattern(Lt(t));e&&(yield e)}else for(let i of this.partitions[e].generate())t.push(i),yield*this.search(t,e+1),t.pop()}makePattern(t){t.forEach(t=>t.gadgets=t.gadgets.map(t=>jt.instantiate(t)));let e=t,i=this.repository.structure;if(1==i.length){let t=i[0].sx;if(1==e.length)return e[0].offset=Math.floor((t-e[0].gadgets[0].sx)/2),{devices:e};if(2==e.length){let[i,s]=e.map(t=>t.gadgets[0]),n=this.overlaps[0].c[2],r=this.overlaps[1].c[0],o=i.sx+s.rx(n.q,2),h=s.sx+i.rx(r.q,0);return o>t||h>t?null:(e[1].offset=t-h,{devices:e})}}if(2==i.length&&1==this.partitions.length){let[t,i]=this.overlaps,[s,n]=[t,i].map(t=>this.repository.structure[t.parent]),r=s.c[0].e==n.c[0].e,o=e[0].gadgets;return o[0].sx>s.sx||o[1].sx>n.sx?null:(r||(e[0].offset=s.sx-o[0].sx),{devices:e})}if(2==i.length&&2==this.partitions.length){let[t,i]=e.map(t=>t.gadgets[0]),[s,n]=this.overlaps,r=s.c[0].e>=0&&s.c[2].e>=0;r&&([t,i]=[i,t],[s,n]=[n,s]);let[o,h]=[s,n].map(t=>this.repository.structure[t.parent]),l=s.c[0].e<0,a=l?0:2,d=s.c[a].q,c=o.sx,u=t.sx,p=t.setupConnectionSlack(i,a,d);c-=Math.ceil(i.rx(d,a))+p;let g=l?[null!=p?p:0,0]:[c-u,h.sx-i.sx];return r&&g.reverse(),u>c?null:i.contains(this.getRelativeDelta(o,h,i))?null:(e.forEach((t,e)=>t.offset=g[e]),{devices:e})}return null}getRelativeDelta(t,e,i){let s=t.c[0].e==e.c[0].e,n=l.getMaxIntersectionDistance(this.design.tree,t,e,s);e.ox>t.ox&&([t,e]=[e,t]);let r={x:n-e.ox,y:n-t.oy};return s||(r.x=i.sx-r.x,r.y=i.sy-r.y),new T(r)}onMove(){this.repository.stretch.selected=!this.entry.selected}toJSON(){return{partitions:this.partitions.map(t=>t.toJSON())}}get jidMap(){return this.design.tree.jidMap}};t([e],F.prototype,"isActive",null),F=t([e],F);class H extends L{get overflow(){if(!this.$studio)return 0;this.render();let t=0,e=this._label.bounds,i=this.$studio.$display.scale*this.control.sheet.width,s=e.x,n=e.x+e.width;return s<0&&(t=-s),n>i&&(t=Math.max(t,n-i)),Math.ceil(t)}}var z;t([e],H.prototype,"overflow",null);let G=z=class extends C{constructor(t){super(t),this._junction=t,this.$addItem(_t.junction,this._shade=new paper.CompoundPath(wt.junction))}render(){if(this._shade.visible=this._junction.status==yt.tooClose){let t=this._junction.f1,e=this._junction.f2;this._shade.removeChildren();let i=this._junction.$treeDistance-(t.radius+e.radius);if(0==i)this._shade.addChild(t.view.circle.intersect(e.view.circle)),this._shade.strokeWidth=z.widthForArea(this._shade.area);else{let s=t.view.makeRectangle(i),n=e.view.makeRectangle(i);this._shade.addChild(t.view.circle.intersect(n)),this._shade.addChild(e.view.circle.intersect(s)),this._shade.strokeWidth=z.widthForArea(this._shade.area)}}}static widthForArea(t){return t<.25?4:t<.5?3:t<1?2:1}};G=z=t([e],G);let Q=class extends L{constructor(t){super(t),this.components=new m(()=>this.info.components,([t,e])=>new K(this,t,e)),this.$addItem(_t.shade,this._shade=new paper.CompoundPath(wt.shade)),this.$addItem(_t.hinge,this._hinge=new paper.CompoundPath(wt.hinge)),this.$addItem(_t.ridge,this._ridge=new paper.CompoundPath(wt.ridge)),this.boundary=new paper.CompoundPath({})}contains(t){return this.control.sheet.view.contains(t)&&this._shade.contains(t)}get info(){if(this.disposed)return{adjacent:[],length:0,components:[]};let t,e,i=this.control.edge;return 0==i.wrapSide?(e=this.toComponents(i.l1,i.n1).concat(this.toComponents(i.l2,i.n2)),t=i.a1.concat(i.a2)):2==i.wrapSide?(e=this.toComponents(i.l2,i.n2),t=i.a2):(e=this.toComponents(i.l1,i.n1),t=i.a1),{adjacent:t,length:i.length,components:e}}toComponents(t,e){return t.map(t=>[this.design.flaps.get(t),e])}get design(){return this.control.sheet.design}onDispose(){Shrewd.terminate(this.components),super.onDispose()}get closure(){let t=new paper.PathItem;if(this.disposed)return t;for(let e of this.components.values()){let i=e.contour;t=t.isEmpty()?i:t.unite(i,{insert:!1})}return t}get actualPath(){var t;let{adjacent:e}=this.info,i=this.control.sheet.design,s=this.closure;if(this.disposed)return s;for(let n of e)if(n.isRiver){let e=i.rivers.get(n);for(let i of null!==(t=e.view.closure.children)&&void 0!==t?t:[e.view.closure])s=s.subtract(i,{insert:!1})}else{let t=i.flaps.get(1==n.n1.degree?n.n1:n.n2);t.view.renderHinge(),s=s.subtract(t.view.hinge,{insert:!1})}return s.reorient(!1,!0)}render(){Ft.replaceContent(this.boundary,this.closure,!0),Ft.replaceContent(this._shade,this.actualPath,!1),Ft.replaceContent(this._hinge,this.actualPath,!1),this.renderRidge()}get corners(){var t;if(this.disposed)return[];let e=this.actualPath,i=(null!==(t=e.children)&&void 0!==t?t:[e]).map(t=>t.segments.map(t=>new T(t.point)));if(0==i[0].length)return[];let{paths:s,map:n}=Pt.collect(i),r=[];for(let t of s){let e=t.length,i=t[e-1],s=t[0],o=s.sub(i);for(let h=0;h<e;h++){let l=t[(h+1)%e],a=l.sub(s);if(0==o.dot(a)&&o.rotate90().dot(a)>0){let t=new k(Math.sign(a.x)-Math.sign(o.x),Math.sign(a.y)-Math.sign(o.y)).scale(this.control.length),e=s.add(t);r.push([s,e,n.has(e.toString())])}i=s,s=l,o=a}}return r}renderRidge(){var t;this._ridge.removeChildren();for(let[e,i,s]of this.corners){let n=new It(e,i),r=n.slope.value,o=r+","+(e.x-r*e.y),h=(null!==(t=this.control.sheet.design.openAnchors.get(o))&&void 0!==t?t:[]).find(t=>n.contains(t,!0));h?Ft.addLine(this._ridge,e,h):s&&Ft.addLine(this._ridge,e,i)}}renderSelection(t){this._shade.visible=t}};t([e],Q.prototype,"info",null),t([e],Q.prototype,"closure",null),t([e],Q.prototype,"actualPath",null),t([e],Q.prototype,"corners",null),Q=t([e],Q);let K=class extends d{constructor(t,e,i){super(t),this.view=t,this.flap=e,this.node=i}get shouldDispose(){return super.shouldDispose||this.flap.disposed||!this.view.info.components.some(t=>t[0]==this.flap)}get distance(){if(this.disposed)return 0;let{design:t,info:e}=this.view,i=this.flap;return t.tree.dist(i.node,this.node)-i.radius+e.length}get contour(){return this.flap.view.draw(),this.flap.view.makeContour(this.distance)}};t([e],K.prototype,"distance",null),t([e],K.prototype,"contour",null),K=t([e],K);class U extends W{constructor(){super(...arguments),this.location={x:0,y:0}}dragStart(t){this._dragOffset=t.sub(this.location)}dragConstraint(t){if(t instanceof k)return this.constraint(t,this.location);{let e=new T(this.location),i=this.constraint(t.sub(this._dragOffset).sub(e),e);return e.add(i).add(this._dragOffset)}}drag(t){t instanceof T?(t=t.sub(this._dragOffset)).eq(this.location)||this.design.takeAction(()=>{this.location.x=t.x,this.location.y=t.y}):t.eq(k.ZERO)||this.design.takeAction(()=>{this.location.x+=t.x,this.location.y+=t.y})}constraint(t,e){return k.ZERO}}t([e],U.prototype,"location",void 0);class Y extends U{}let Z=class extends H{constructor(t){super(t),this.$addItem(_t.shade,this._shade=new paper.Path.Rectangle(wt.shade)),this.$addItem(_t.hinge,this.hinge=new paper.Path.Rectangle(wt.hinge)),this.$addItem(_t.shade,this._circle=new paper.Path(wt.circle)),this._dots=St(t=>{let e=new paper.Path.Circle(wt.dot);return this.$addItem(_t.dot,e),e}),this.$addItem(_t.ridge,this._innerRidges=new paper.CompoundPath(wt.ridge)),this.$addItem(_t.ridge,this._outerRidges=new paper.CompoundPath(wt.ridge)),this.$addItem(_t.label,this._glow=new paper.PointText(wt.glow)),this.$addItem(_t.label,this._label=new paper.PointText(wt.label))}contains(t){return this.control.sheet.view.contains(t)&&(this.hinge.contains(t)||null!=this.hinge.hitTest(t))}get circle(){return this.makeRectangle(0)}makeRectangle(t){let e=this.control.points,i=this.control.node.radius+t;return new paper.Path.Rectangle({from:[e[2].x-i,e[2].y-i],to:[e[0].x+i,e[0].y+i],radius:i})}makeContour(t){let e=new paper.Path({closed:!0});this.control.quadrants.forEach(i=>e.add(...i.makeContour(t)));let i=e;for(let e of this.control.quadrants)for(let s of e.getOverriddenPath(t))i=i.subtract(s,{insert:!1});return i}renderHinge(){var t,e;this._circle.visible=null!==(e=null===(t=this.$studio)||void 0===t?void 0:t.$display.settings.showHinge)&&void 0!==e&&e,this.hinge.removeSegments(),this.control.quadrants.forEach(t=>this.hinge.add(...t.makeContour(0)))}render(){let t=this.control.sheet.displayScale,e=this.control.width,i=this.control.height;this._circle.copyContent(this.circle),this.renderHinge();let s=St(e=>{let i=this.control.points[e].toPaper();return this._dots[e].position.set((e=>[e.x*t,-e.y*t])(i)),i});this._dots[2].visible=e>0||i>0,this._dots[1].visible=this._dots[3].visible=e>0&&i>0,this._innerRidges.removeChildren(),this._innerRidges.moveTo(s[3]),s.forEach(t=>this._innerRidges.lineTo(t)),this._innerRidges.visible=e>0||i>0,this._outerRidges.removeChildren(),this.control.quadrants.forEach((t,e)=>{null==t.pattern&&Ft.addLine(this._outerRidges,s[e],t.corner)}),this._label.content=this.control.node.name,Vt.setLabel(this.control.sheet,this._label,this._glow,this.control.dragSelectAnchor,this._dots[0]),this._shade.copyContent(this.hinge)}renderSelection(t){this._shade.visible=t}};t([e],Z.prototype,"circle",null),t([e],Z.prototype,"renderHinge",null),Z=t([e],Z);let X=class extends H{constructor(t){super(t),this.$addItem(_t.ridge,this.line=new paper.Path.Line(wt.edge)),this.$addItem(_t.label,this._glow=new paper.PointText(wt.glow)),this.$addItem(_t.label,this._label=new paper.PointText(wt.label)),this._lineRegion=new paper.Path.Line({strokeWidth:15})}contains(t){return!(null==this._lineRegion.hitTest(t)&&null==this._glow.hitTest(t.transform(this._glow.layer.matrix.inverted()))||this.control.v1.view.contains(t)||this.control.v2.view.contains(t))}render(){let t=this.control.v1.location,e=this.control.v2.location,i={x:(t.x+e.x)/2,y:(t.y+e.y)/2};this._lineRegion.segments[0].point.set([t.x,t.y]),this._lineRegion.segments[1].point.set([e.x,e.y]),this.line.copyContent(this._lineRegion),this._label.content=this.control.length.toString(),Vt.setLabel(this.control.sheet,this._label,this._glow,i,this.line)}renderSelection(t){let e=t?Ft.Red:Ft.Black;this._label.fillColor=this._label.strokeColor=this.line.strokeColor=e,this.line.strokeWidth=t?3:2}};X=t([e],X);let tt=class extends H{constructor(t){super(t);let e=Object.assign({},wt.dot,{radius:4});this.$addItem(_t.dot,this._dot=new paper.Path.Circle(e)),this.$addItem(_t.label,this._glow=new paper.PointText(wt.glow)),this.$addItem(_t.label,this._label=new paper.PointText(wt.label)),this._circle=new paper.Path.Circle({radius:.4})}contains(t){return this._circle.contains(t)||null!=this._glow.hitTest(t.transform(this._glow.layer.matrix.inverted()))}render(){let t=this.control.sheet.displayScale,e=this.control.location.x,i=this.control.location.y;this._circle.position.set([e,i]),this._dot.position.set([e*t,-i*t]);let s=this.control.node.edges.map(t=>{let e=this.control.sheet.design.edges.get(t).view;return e.draw(),e.line});this._label.content=this.control.node.name,Vt.setLabel(this.control.sheet,this._label,this._glow,{x:e,y:i},this._dot,...s)}renderSelection(t){this._dot.set(t?wt.dotSelected:wt.dot)}};var et;tt=t([e],tt);let it=et=class extends Y{constructor(t,e){super(t),this.width=0,this.height=0,this.node=e;let i=this.sheet.design.options.get("flap",e.id);i&&(this.location.x=i.x,this.location.y=i.y,this.width=i.width,this.height=i.height),this.quadrants=St(e=>new D(t,this,e)),this.view=new Z(this)}get type(){return"Flap"}selectableWith(t){return t instanceof et}get dragSelectAnchor(){return{x:this.location.x+this.width/2,y:this.location.y+this.height/2}}get points(){let t=this.location.x,e=this.location.y,i=this.width,s=this.height;return[new T(t+i,e+s),new T(t,e+s),new T(t,e),new T(t+i,e)]}get name(){return this.node.name}set name(t){this.node.name=t}get radius(){var t,e;return null!==(e=null===(t=this.node.firstEdge)||void 0===t?void 0:t.length)&&void 0!==e?e:0}set radius(t){this.node.firstEdge.length=t}get shouldDispose(){return super.shouldDispose||this.node.disposed||1!=this.node.degree}toJSON(){return{id:this.node.jid,width:this.width,height:this.height,x:this.location.x,y:this.location.y}}constraint(t,e){return this.sheet.constraint(t,e),this.sheet.constraint(t,{x:e.x+this.width,y:e.y+this.height}),t}debug(t=0){console.log(this.view.makeContour(t).exportJSON())}};var st;t([s({validator(t){let e=t>=0&&t<=this.sheet.width,i=this.location.x+t-this.sheet.width;return i>0&&(this.location.x-=i),e}})],it.prototype,"width",void 0),t([s({validator(t){let e=t>=0&&t<=this.sheet.height,i=this.location.y+t-this.sheet.height;return i>0&&(this.location.y-=i),e}})],it.prototype,"height",void 0),t([e],it.prototype,"dragSelectAnchor",null),t([e],it.prototype,"points",null),it=et=t([e],it);let nt=st=class extends Y{constructor(t,e){super(t),this.height=0,this.width=0,this.node=e;let i=t.design.options.get("vertex",this.node.id);i&&(null!=i.name&&(this.node.name=i.name),this.location.x=i.x,this.location.y=i.y),this.view=new tt(this)}get type(){return"Vertex"}get name(){return this.node.name}set name(t){this.node.name=t}get degree(){return this.node.degree}selectableWith(t){return t instanceof st}get dragSelectAnchor(){return this.location}addLeaf(t=1){this.design.takeAction(()=>{let e=[...this.design.vertices.values()],i=this.node.addLeaf(t),s=this.findCloestEmptyPoint(e);this.design.options.set("vertex",i.id,{id:i.id,name:i.name,x:s.x,y:s.y})})}findCloestEmptyPoint(t){let{x:e,y:i}=this.location,s=new T(e+.125,i+.0625),n=[],r=new Set;for(let e of t)r.add(e.location.x+","+e.location.y);for(let t=e-5;t<=e+5;t++)for(let e=i-5;e<=i+5;e++)if(!r.has(t+","+e)){let i=new T(t,e);n.push([i,i.dist(s)])}return n.sort((t,e)=>t[1]-e[1]),n[0][0]}deleteAndJoin(){2==this.node.degree&&this.design.takeAction(()=>{let t=this.node.dispose();Shrewd.commit(),this.design.edges.get(t).selected=!0})}get shouldDispose(){return super.shouldDispose||this.node.disposed}toJSON(){return{id:this.node.jid,name:this.name,x:this.location.x,y:this.location.y}}constraint(t,e){return this.sheet.constraint(t,e),t}};nt=st=t([e],nt);let rt=class{constructor(t){this.version="0.0.2",this.designMap=new Map,this.design=null;let e=document.querySelector(t);if(null==e||!(e instanceof HTMLElement))throw new Error("selector is not valid");this.$el=e,this.$paper=new paper.PaperScope,this.$display=new at(this),this.system=new gt(this)}load(t){return"string"==typeof t&&(t=JSON.parse(t)),this.tryLoad(dt.process(t,this.onDeprecate))}create(t){return Object.assign(t,{version:dt.current,layout:{flaps:[{id:0,width:0,height:0,x:8,y:7},{id:2,width:0,height:0,x:8,y:9}]},tree:{nodes:[{id:0,name:"",x:10,y:13},{id:1,name:"",x:10,y:10},{id:2,name:"",x:10,y:7}],edges:[{n1:0,n2:1,length:1},{n1:2,n2:1,length:1}]}}),this.restore(t)}restore(t){let e=new E(this,dt.process(t,this.onDeprecate));return this.designMap.set(e.id,e),e}select(t){if(null!=t){let e=this.designMap.get(t);e&&(this.design=e)}else this.design=null}close(t){let e=this.designMap.get(t);e&&(this.designMap.delete(t),e.dispose())}closeAll(){this.design=null;for(let t of this.designMap.values())t.dispose();this.designMap.clear()}tryLoad(t){return this.design=new E(this,t),this.designMap.set(this.design.id,this.design),Shrewd.commit(),this.design}toBPS(){if(!this.design)return"";let t=JSON.stringify(this.design),e=new Blob([t],{type:"application/octet-stream"});return URL.createObjectURL(e)}};t([e],rt.prototype,"design",void 0),rt=t([e],rt);let ot=class extends W{constructor(t,e,i,s){super(t),this.v1=e,this.v2=i,this.edge=s,this.view=new X(this)}get type(){return"Edge"}get shouldDispose(){return super.shouldDispose||this.edge.disposed}split(){this.design.takeAction(()=>this.toVertex(b.prototype.split))}deleteAndMerge(){this.design.takeAction(()=>this.toVertex(b.prototype.deleteAndMerge))}toVertex(t){let e=this.v1.location,i=this.v2.location,s=Math.round((e.x+i.x)/2),n=Math.round((e.y+i.y)/2),r=t.apply(this.design.tree,[this.edge]);this.design.options.set("vertex",r.id,{id:r.id,name:r.name,x:s,y:n}),Shrewd.commit(),this.design.vertices.get(r).selected=!0}get length(){return this.edge.length}set length(t){this.edge.length=t}toJSON(){return{n1:this.v1.node.jid,n2:this.v2.node.jid,length:this.edge.length}}};ot=t([e],ot);let ht=class extends q{constructor(t,e,i){super(t),e.node.id>i.node.id&&([e,i]=[i,e]),this.f1=e,this.f2=i,this.id=e.node.id+":"+i.node.id,new G(this)}static createTeamId(t,e){let i=new Set;return t.forEach(t=>{i.add(e(t.f1)),i.add(e(t.f2))}),Array.from(i).sort((t,e)=>t-e).join(",")}static sort(t,e){let i=t.f1.node.id-e.f1.node.id;return 0!=i?i:t.f2.node.id-e.f2.node.id}get shouldDispose(){return super.shouldDispose||this.f1.disposed||this.f2.disposed}get baseRectangle(){if(!this.isValid)return;let t=this.sx>0?this.q2:this.q1;return null==t?void 0:t.getBaseRectangle(this)}isCoveredBy(t){if(this==t||this.direction%2!=t.direction%2)return!1;let[e,i]=[t.baseRectangle,this.baseRectangle];return!!(e&&i&&e.contains(i))&&(!e.equals(i)||(Math.abs(t.sx)<Math.abs(this.sx)||Math.abs(t.sy)<Math.abs(this.sy)))}get coveredBy(){return this.isValid?this.sheet.design.validJunctions.filter(t=>this.isCoveredBy(t)):[]}get isCovered(){return this.coveredBy.some(t=>0==t.coveredBy.length)}toJSON(){return{c:[{type:mt.flap,e:this.f1.node.id,q:this.q1.q},{type:mt.side},{type:mt.flap,e:this.f2.node.id,q:this.q2.q},{type:mt.side}],ox:this.ox,oy:this.oy,sx:this.sx<0?-this.sx:this.sx}}get neighbors(){if(this.direction>3)return[];let t=this.q1.activeJunctions.concat(),e=this.q2.activeJunctions.concat();return t.splice(t.indexOf(this),1),e.splice(e.indexOf(this),1),t.concat(e)}get q1(){return Mt(this.direction)?this.f1.quadrants[this.direction]:null}get q2(){return Mt(this.direction)?this.f2.quadrants[qt(this.direction)]:null}get $treeDistance(){return this.design.tree.dist(this.f1.node,this.f2.node)}get status(){return this._flapDistance<this.$treeDistance?yt.tooClose:this.ox&&this.oy?yt.overlap:yt.tooFar}get fx(){return-Math.sign(this.sx)}get fy(){return-Math.sign(this.sy)}get ox(){let t=this.$treeDistance-Math.abs(this.sx);return t>0?t:NaN}get oy(){let t=this.$treeDistance-Math.abs(this.sy);return t>0?t:NaN}get sx(){let t=this.f1.location.x,e=this.f2.location.x,i=this.f1.width,s=t-e-this.f2.width;return s>=0?s:(s=t+i-e,s<=0?s:NaN)}get sy(){let t=this.f1.location.y,e=this.f2.location.y,i=this.f1.height,s=t-e-this.f2.height;return s>=0?s:(s=t+i-e,s<=0?s:NaN)}get direction(){let t=this.sx,e=this.sy;return t<0&&e<0?vt.UR:t>0&&e<0?vt.UL:t>0&&e>0?vt.LL:t<0&&e>0?vt.LR:t<0?vt.R:t>0?vt.L:e<0?vt.T:e>0?vt.B:vt.none}get _flapDistance(){let t=this.sx,e=this.sy,i=0!=t&&!isNaN(t),s=0!=e&&!isNaN(e);return i&&s?Math.sqrt(t*t+e*e):i?Math.abs(t):s?Math.abs(e):0}get isValid(){return this.status==yt.overlap}static findMinMax(t,e,i){let s=t[0][e],n=t[0];for(let r=1;r<t.length;r++)t[r][e]*i>s*i&&(n=t[r],s=t[r][e]);return n}};t([e],ht.prototype,"baseRectangle",null),t([e],ht.prototype,"coveredBy",null),t([e],ht.prototype,"isCovered",null),t([e],ht.prototype,"neighbors",null),t([e],ht.prototype,"q1",null),t([e],ht.prototype,"q2",null),t([e],ht.prototype,"$treeDistance",null),t([e],ht.prototype,"status",null),t([e],ht.prototype,"fx",null),t([e],ht.prototype,"fy",null),t([e],ht.prototype,"ox",null),t([e],ht.prototype,"oy",null),t([e],ht.prototype,"sx",null),t([e],ht.prototype,"sy",null),t([e],ht.prototype,"direction",null),t([e],ht.prototype,"_flapDistance",null),t([e],ht.prototype,"isValid",null),ht=t([e],ht);let lt=class extends W{constructor(t,e){super(t),this.edge=e,this.view=new Q(this)}get type(){return"River"}get shouldDispose(){return super.shouldDispose||this.edge.disposed||!this.edge.isRiver}delete(){this.design.edges.get(this.edge).deleteAndMerge()}get length(){return this.edge.length}set length(t){this.edge.length=t}};lt=t([e],lt);let at=class{constructor(t){this.MARGIN=30,this.lockViewport=!1,this.scroll={x:0,y:0},this.settings={showAxialParallel:!0,showGrid:!0,showHinge:!0,showRidge:!0,showLabel:!0,showDot:!0,includeHiddenElement:!1},this._printing=!1,this.horMargin=0,this._studio=t,t.$el.appendChild(this.spaceHolder=document.createElement("div")),t.$el.addEventListener("scroll",this.onScroll.bind(this)),this._canvas=document.createElement("canvas"),t.$el.appendChild(this._canvas),window.addEventListener("resize",this.setSize.bind(this)),this.setSize(),this.spaceHolder.appendChild(this._img=new Image),window.addEventListener("beforeprint",this.beforePrint.bind(this)),window.addEventListener("afterprint",this.afterPrint.bind(this));let e=matchMedia("(hover: none)").matches;document.addEventListener("focusin",t=>{e&&(t.target instanceof HTMLInputElement||t.target instanceof HTMLTextAreaElement)&&(this.lockViewport=!0)}),document.addEventListener("focusout",t=>this.lockViewport=!1),t.$paper.setup(this._canvas),t.$paper.settings.insertItems=!1,this.project=t.$paper.project,this.project.currentStyle.strokeColor=Ft.Black,this.project.currentStyle.strokeScaling=!1;for(let t of ft.values(_t))this.project.addLayer(new paper.Layer({name:_t[t]}));this.boundary=new paper.Path.Rectangle({from:[0,0],to:[0,0]});for(let t of ft.values(_t))xt[t].clipped&&(this.project.layers[t].addChild(this.boundary.clone()),this.project.layers[t].clipped=!0)}setSize(){this.lockViewport||(this.viewWidth=this._studio.$el.clientWidth,this.viewHeight=this._studio.$el.clientHeight)}toSVG(){let t=Math.max(this.sheetWidth,this.viewWidth),e=Math.max(this.sheetHeight,this.viewHeight),i=(t-this.sheetWidth)/2-this.scroll.x,s=(e-this.sheetHeight)/2-this.scroll.y,n=new paper.Rectangle(i,s,this.sheetWidth,this.sheetHeight),r=this._studio.$paper.project.exportSVG({bounds:n,matrix:this.project.view.matrix});this.settings.includeHiddenElement||this.removeHidden(r);let o=new Blob([r.outerHTML],{type:"image/svg+xml"});return URL.createObjectURL(o)}removeHidden(t){let e=Array.from(t.children);for(let i of e)"hidden"==i.getAttribute("visibility")?t.removeChild(i):this.removeHidden(i)}createPNG(){let t=document.createElement("canvas"),e=t.getContext("2d"),i=this._img;return new Promise(s=>{let n=()=>{i.removeEventListener("load",n),t.width=i.clientWidth,t.height=i.clientHeight,e.fillStyle="white",e.fillRect(0,0,t.width,t.height),e.drawImage(i,0,0,i.naturalWidth,i.naturalHeight,0,0,i.clientWidth,i.clientHeight),this._printing=!1,t.toBlob(t=>s(t))};i.addEventListener("load",n),this.beforePrint()})}toPNG(){return this.createPNG().then(t=>URL.createObjectURL(t))}copyPNG(){return this.createPNG().then(t=>navigator.clipboard.write([new ClipboardItem({"image/png":t})]))}beforePrint(){if(clearTimeout(this._debounce),!this._printing&&"visible"==document.visibilityState){let t=this._img.src;setTimeout(()=>URL.revokeObjectURL(t),5e3),this._img.src=this.toSVG(),this._printing=!0}}afterPrint(){this._debounce=setTimeout(()=>{this._printing=!1,this._debounce=NaN},1e3)}onScroll(){this.scroll.x=this._studio.$el.scrollLeft,this.scroll.y=this._studio.$el.scrollTop}get scale(){if(this._studio.design&&this._studio.design.sheet){if(this._studio.design.fullscreen){let t=(this.viewWidth-2*this.horMargin)/this._studio.design.sheet.width,e=(this.viewHeight-2*this.MARGIN)/this._studio.design.sheet.height;return Math.min(t,e)}return this._studio.design.sheet.scale}return 1}getHorMargin(){var t,e;let i=Math.max((null!==(e=null===(t=this._studio.design)||void 0===t?void 0:t.overflow)&&void 0!==e?e:0)+10,this.MARGIN);setTimeout(()=>this.horMargin=i,0)}get sheetWidth(){var t,e,i;return(null!==(i=null===(e=null===(t=this._studio.design)||void 0===t?void 0:t.sheet)||void 0===e?void 0:e.width)&&void 0!==i?i:0)*this.scale+2*this.horMargin}get sheetHeight(){var t,e,i;return(null!==(i=null===(e=null===(t=this._studio.design)||void 0===t?void 0:t.sheet)||void 0===e?void 0:e.height)&&void 0!==i?i:0)*this.scale+2*this.MARGIN}get isXScrollable(){return this.sheetWidth>this.viewWidth+1}get isYScrollable(){return this.sheetHeight>this.viewHeight+1}getAutoScale(){var t,e,i,s,n,r;let o=(this.viewWidth-2*this.horMargin)/(null!==(i=null===(e=null===(t=this._studio.design)||void 0===t?void 0:t.sheet)||void 0===e?void 0:e.width)&&void 0!==i?i:1),h=(this.viewHeight-2*this.MARGIN)/(null!==(r=null===(n=null===(s=this._studio.design)||void 0===s?void 0:s.sheet)||void 0===n?void 0:n.height)&&void 0!==r?r:1);return Math.min(o,h)}isScrollable(){return this._studio.$el.classList.toggle("scroll-x",this.isXScrollable),this._studio.$el.classList.toggle("scroll-y",this.isYScrollable),this.isXScrollable||this.isYScrollable}renderSetting(){var t,e;let i=null!==(e="layout"!=(null===(t=this._studio.design)||void 0===t?void 0:t.mode))&&void 0!==e&&e;this.project.layers[_t.hinge].visible=this.settings.showHinge,this.project.layers[_t.ridge].visible=this.settings.showRidge||i,this.project.layers[_t.axisParallel].visible=this.settings.showAxialParallel,this.project.layers[_t.label].visible=this.settings.showLabel,this.project.layers[_t.dot].visible=this.settings.showDot||i}render(){let t=0,e=0,i=this.scale;this._studio.design&&this._studio.design.sheet&&({width:t,height:e}=this._studio.design.sheet);let s=Math.max(this.sheetWidth,this.viewWidth),n=Math.max(this.sheetHeight,this.viewHeight);this.spaceHolder.style.width=s+"px",this.spaceHolder.style.height=n+"px",Ft.setRectangleSize(this.boundary,t,e);let r=this._studio.$el,o=(s-this.sheetWidth)/2+this.horMargin,h=(n+this.sheetHeight)/2-this.MARGIN;this.lockViewport?this.project.view.viewSize.set(this.viewWidth,this.viewHeight):this.project.view.viewSize.set(r.clientWidth,r.clientHeight),this.project.view.matrix.set(i,0,0,-i,o-this.scroll.x,h-this.scroll.y);for(let t of ft.values(_t)){let e=this.project.layers[t];xt[t].clipped&&e.children[0].set({segments:this.boundary.segments}),xt[t].scaled||(e.applyMatrix=!1,e.matrix.set(1/i,0,0,-1/i,0,0))}}};var dt,ct;t([e],at.prototype,"viewWidth",void 0),t([e],at.prototype,"viewHeight",void 0),t([e],at.prototype,"scroll",void 0),t([e],at.prototype,"settings",void 0),t([e],at.prototype,"scale",null),t([e],at.prototype,"horMargin",void 0),t([e],at.prototype,"getHorMargin",null),t([e],at.prototype,"sheetWidth",null),t([e],at.prototype,"sheetHeight",null),t([e],at.prototype,"isXScrollable",null),t([e],at.prototype,"isYScrollable",null),t([e],at.prototype,"isScrollable",null),t([e],at.prototype,"renderSetting",null),t([e],at.prototype,"render",null),at=t([e],at),function(t){function e(t,e){let i=[],s=new Map;for(let[e,n]of t.entries()){if(s.has(e))continue;let r=n.c.filter(t=>t.type==mt.coincide),o=r.find(t=>s.has(-t.e-1)),h=i.length;if(o){let t=s.get(-o.e-1);s.set(e,t),i[t].push(n)}else s.set(e,h),i.push([n]);r.forEach(n=>{e=-n.e-1,s.has(e)||(s.set(e,h),i[h].push(t[e]))})}return i.map(t=>({overlaps:t,strategy:e}))}t.current="0",t.process=function(t,i){var s;let n=!1;if("version"in t||("cp"==t.mode&&(t.mode="layout"),t.layout=t.cp,delete t.cp,t.version="beta",delete t.layout.stretches,n=!0),"beta"==t.version){t.version="rc0";let e=t.layout.stretches;if(e)for(let t of e.concat()){let i=t.configuration;!i||i.overlaps&&!i.overlaps.some(t=>t.c.some(t=>t.type==mt.intersection&&void 0===t.e))||(e.splice(e.indexOf(t),1),n=!0)}}if("rc0"==t.version){t.version="rc1";let i=t.layout.stretches;if(i)for(let t of i.concat()){if(t.configuration){t.configuration={partitions:e(t.configuration.overlaps,t.configuration.strategy)},t.pattern&&(1==t.configuration.partitions.length?t.pattern={devices:[{gadgets:t.pattern.gadgets,offset:null===(s=t.pattern.offsets)||void 0===s?void 0:s[0]}]}:t.pattern={devices:t.pattern.gadgets.map((e,i)=>{var s;return{gadgets:[e],offset:null===(s=t.pattern.offsets)||void 0===s?void 0:s[i]}})})}}}return"rc1"==t.version&&(t.version="0"),n&&i&&i(t.title),t}}(dt||(dt={}));class ut{constructor(t){this.options=new Map;for(let e of t.tree.nodes)this.set("vertex",e.id,e);for(let e of t.layout.flaps)this.set("flap",e.id,e);for(let e of t.layout.stretches)this.set("stretch",e.id,e)}get(t,e){e=t+e;let i=this.options.get(e);return this.options.delete(e),i}set(t,e,i){this.options.set(t+e,i)}}const pt="undefined"!=typeof TouchEvent;let gt=ct=class{constructor(t){this._dragging=!1,this._spaceDown=!1,this._touchScaling=[0,0],this._scrolled=!1,this._possiblyReselect=!1,this._studio=t;let e=t.$paper.view.element,i=t.$paper.tool=new paper.Tool;i.onKeyDown=this._canvasKeydown.bind(this),i.onKeyUp=this._canvasKeyup.bind(this),i.onMouseDown=this._canvasMousedown.bind(this),i.onMouseDrag=this._canvasMousedrag.bind(this),i.onMouseUp=this._canvasMouseup.bind(this),e.addEventListener("wheel",this._canvasWheel.bind(this)),e.addEventListener("touchstart",this._canvasTouch.bind(this)),document.addEventListener("mousemove",this._bodyMousemove.bind(this)),document.addEventListener("touchmove",this._bodyMousemove.bind(this)),document.addEventListener("mouseup",this._bodyMouseup.bind(this)),document.addEventListener("touchend",this._bodyMouseup.bind(this)),document.addEventListener("contextmenu",this._bodyMenu.bind(this)),this._dragSelectView=new B(t)}static controlPriority(t){return t instanceof Ot||t instanceof nt?1:t instanceof it||t instanceof ot?2:3}get _controls(){let t=this._studio.design?this._studio.design.sheet.activeControls.concat():[];return t.sort((t,e)=>ct.controlPriority(t)-ct.controlPriority(e)),this._dragSelectables=t.filter(O.isDragSelectable),t.length||(this._ctrl=[null,null]),t}get selections(){return this._controls.filter(t=>t.selected)}draggableSelections(){return this.selections.filter(t=>t instanceof U)}get _canvas(){return this._studio.$paper.view.element}_processSelection(t,e){var i=null,s=null,n=null,r=this._controls.filter(e=>e.contains(t));for(let t of r)i||(i=t),t.selected?s=t:s&&!n&&(n=t);if(n||!i||i.selected||(n=i),s){let t=ct.controlPriority(s);r.some(e=>ct.controlPriority(e)<t)&&(this._possiblyReselect=!0)}e?(s&&!n&&s.toggle(),n&&this._select(n)):(s||this._clearSelection(),!s&&n&&this._select(n)),this._ctrl=[s,n]}_processNextSelection(){var[t,e]=this._ctrl;this._studio.design&&!this._studio.design.dragging&&(t&&e&&this._clearSelection(),t&&!e&&this._clearSelection(t),e&&this._select(e))}_select(t){t.selected||0!=this.selections.length&&!this.selections[0].selectableWith(t)||(t.selected=!0)}_clearSelection(t=null){this._dragSelectView.visible=!1;for(let e of this.selections)e!=t&&(e.selected=!1)}_checkEvent(t){return!(this.isTouch(t)&&t.touches.length>1)&&!(t instanceof MouseEvent&&0!=t.button)}_canvasKeydown(t){let e=document.activeElement;if(e instanceof HTMLInputElement||e instanceof HTMLTextAreaElement)return!0;let i=this._canvas,s=new k(0,0);switch(t.key){case"space":return this._studio.$display.isScrollable()&&(i.style.cursor="grab",this._spaceDown=!0),!1;case"delete":let e=this.selections[0];return e instanceof it&&this._studio.design.deleteFlaps(this.selections),e instanceof nt&&this._studio.design.deleteVertices(this.selections),!1;case"a":let n=this._studio.design;return t.modifiers.control&&n&&(this._clearSelection(),"layout"==n.mode&&n.flaps.forEach(t=>t.selected=!0),"tree"==n.mode&&n.vertices.forEach(t=>t.selected=!0)),!1;case"up":s.set(0,1);break;case"down":s.set(0,-1);break;case"left":s.set(-1,0);break;case"right":s.set(1,0);break;default:return!0}let n=this.draggableSelections();if(0==n.length)return!0;n[0]instanceof Ot&&(s=s.scale(2));for(let t of n)s=t.dragConstraint(s);for(let t of n)t.drag(s);return!1}_canvasKeyup(){this._canvas.style.cursor="unset",this._spaceDown=!1}_canvasMousedown(t){if(t.event instanceof MouseEvent&&(this._spaceDown||2==t.event.button))return console.log(t.point.round().toString()),void this._setScroll(t.event);let e=document.activeElement;if(e instanceof HTMLElement&&e.blur(),!this._checkEvent(t.event)||this._scrollStart)return;let i=t.point;if(this._processSelection(i,t.modifiers.control),1==this.selections.length&&this.isTouch(t.event)&&(this._longPressTimeout=window.setTimeout(()=>{this.onLongPress()},750)),this.draggableSelections().length){this._lastKnownCursorLocation=new T(t.downPoint).round();for(let t of this.draggableSelections())t.dragStart(this._lastKnownCursorLocation);this._dragging=!0}}_canvasMouseup(t){this._dragSelectView.visible=!1,this._checkEvent(t.event)&&(this._scrollStart?t.event instanceof MouseEvent&&(this._scrollStart=null):t.modifiers.control||this._processNextSelection())}_reselect(t){this._clearSelection(),this._processSelection(t.point,!1),Shrewd.commit();for(let t of this.draggableSelections())t.dragStart(this._lastKnownCursorLocation);this._possiblyReselect=!1}_canvasMousedrag(t){var e;if(!this._scrollStart)if(this._possiblyReselect&&(this._reselect(t),this._dragging=!0),this._dragging){let i=new T(t.point).round();if(this._lastKnownCursorLocation.eq(i))return;window.clearTimeout(this._longPressTimeout),null===(e=this.onDrag)||void 0===e||e.apply(null),this._lastKnownCursorLocation.set(i);for(let t of this.draggableSelections())i=t.dragConstraint(i);for(let t of this.draggableSelections())t.drag(i);this._studio.design.dragging=!0}else if(this._dragSelectables.length){if(!this._dragSelectView.visible){if(this.isTouch(t.event)&&t.downPoint.getDistance(t.point)<1)return;this._clearSelection(),this._dragSelectView.visible=!0,this._dragSelectView.down=t.downPoint,Shrewd.commit()}this._dragSelectView.now=t.point,this._dragSelectView.draw();for(let t of this._dragSelectables)t.selected=this._dragSelectView.contains(new paper.Point(t.dragSelectAnchor))}}_canvasWheel(t){if(t.ctrlKey){t.preventDefault();let e=this._studio.design;e&&(e.fullscreen&&(e.sheet.scale=Math.round(this._studio.$display.scale),e.fullscreen=!1),e.sheet.scale-=Math.round(t.deltaY/100))}}_canvasTouch(t){t.touches.length>1&&(this._clearSelection(),this._setScroll(t),this._touchScaling=[this.getTouchDistance(t),this._studio.$display.scale])}getTouchDistance(t){let e=t.touches,i=e[1].screenX-e[0].screenX,s=e[1].screenY-e[0].screenY;return Math.sqrt(i*i+s*s)}_bodyMousemove(t){var e;if(this._scrollStart&&(t instanceof MouseEvent||t.touches.length>=2)){let i=this.isTouch(t)?t.touches[0]:t,s=new T(i.screenX,i.screenY).sub(this._lastKnownCursorLocation),n=this._studio.$el;if(this._studio.$display.isXScrollable&&(n.scrollLeft=this._scrollStart.x-s.x),this._studio.$display.isYScrollable&&(n.scrollTop=this._scrollStart.y-s.y),this.isTouch(t)){let i=null===(e=this._studio.design)||void 0===e?void 0:e.sheet;if(i){let e=(this.getTouchDistance(t)-this._touchScaling[0])/30,s=this._studio.$display.getAutoScale();e=Math.round(e+this._touchScaling[1]),e<=s?(i.scale=Math.ceil(s),i.design.fullscreen=!0):(i.scale=Math.ceil(e),i.design.fullscreen=!1)}}this._scrolled=!0}}_setScroll(t){let e=this._studio.$el,i=this.isTouch(t)?t.touches[0]:t;window.clearTimeout(this._longPressTimeout),this._scrollStart=new T(e.scrollLeft,e.scrollTop),this._scrolled=!1,this._lastKnownCursorLocation=new T(i.screenX,i.screenY)}_bodyMouseup(t){this._dragEnd(),window.clearTimeout(this._longPressTimeout),this.isTouch(t)&&0==t.touches.length&&(this._scrollStart=null)}_dragEnd(){this._dragging=!1,this._studio.design&&(this._studio.design.dragging=!1)}_bodyMenu(t){t.preventDefault(),this._scrollStart=null}isTouch(t){return pt&&t instanceof TouchEvent}};var ft,yt,vt,_t,mt;t([e],gt.prototype,"_controls",null),t([e],gt.prototype,"selections",null),t([e],gt.prototype,"draggableSelections",null),gt=ct=t([e],gt),function(t){t.values=function(t){return Object.values(t).filter(t=>!isNaN(Number(t)))}}(ft||(ft={})),function(t){t[t.tooClose=0]="tooClose",t[t.overlap=1]="overlap",t[t.tooFar=2]="tooFar"}(yt||(yt={})),function(t){t[t.UR=0]="UR",t[t.UL=1]="UL",t[t.LL=2]="LL",t[t.LR=3]="LR",t[t.R=4]="R",t[t.T=5]="T",t[t.L=6]="L",t[t.B=7]="B",t[t.none=8]="none"}(vt||(vt={})),function(t){t[t.sheet=0]="sheet",t[t.shade=1]="shade",t[t.hinge=2]="hinge",t[t.ridge=3]="ridge",t[t.axisParallel=4]="axisParallel",t[t.junction=5]="junction",t[t.dot=6]="dot",t[t.label=7]="label",t[t.drag=8]="drag"}(_t||(_t={})),function(t){t[t.socket=0]="socket",t[t.internal=1]="internal",t[t.side=2]="side",t[t.intersection=3]="intersection",t[t.flap=4]="flap",t[t.coincide=5]="coincide"}(mt||(mt={}));const xt={[_t.sheet]:{clipped:!1,scaled:!0},[_t.shade]:{clipped:!0,scaled:!0},[_t.hinge]:{clipped:!0,scaled:!0},[_t.ridge]:{clipped:!0,scaled:!0},[_t.axisParallel]:{clipped:!0,scaled:!0},[_t.junction]:{clipped:!0,scaled:!0},[_t.dot]:{clipped:!1,scaled:!1},[_t.label]:{clipped:!1,scaled:!1},[_t.drag]:{clipped:!1,scaled:!0}};var wt;!function(t){t.circle={strokeWidth:1,strokeColor:"#69F"},t.dot={fillColor:"#69F",strokeWidth:1,strokeColor:"#000",radius:3},t.dotSelected={strokeWidth:3,strokeColor:"red"},t.hinge={strokeColor:"#69F",strokeWidth:3},t.sheet={strokeWidth:.25,strokeColor:"#000"},t.label={point:[0,0],fillColor:"black",fontWeight:"normal",strokeWidth:.5,fontSize:14},t.glow={point:[0,0],fontWeight:"normal",strokeWidth:2.5,strokeColor:"white",fontSize:14},t.edge={},t.ridge={strokeWidth:1.25,strokeColor:"red"},t.selection={strokeColor:"#69f",fillColor:"rgba(102, 153, 255, 0.2)"},t.shade={fillColor:"#69F",opacity:.3,strokeWidth:0},t.junction={strokeColor:"red",fillColor:"red",opacity:.3},t.axisParallel={strokeWidth:1,strokeColor:"green"},t.top={}}(wt||(wt={}));const bt=[0,1,2,3];function St(t){return bt.map(t)}function Mt(t){return t<4}function qt(t){return(t+2)%4}class It{constructor(t,e){e instanceof k&&(e=t.add(e)),this.p1=t,this.p2=e}toString(){return[this.p1,this.p2].sort().toString()}get isDegenerated(){return this.p1.eq(this.p2)}eq(t){return this.p1.eq(t.p1)&&this.p2.eq(t.p2)||this.p1.eq(t.p2)&&this.p2.eq(t.p1)}contains(t,e=!1){let i=t instanceof T?t:new T(t);if(e&&(i.eq(this.p1)||i.eq(this.p2)))return!0;var s=i.sub(this.p1),n=i.sub(this.p2);return s._x.mul(n._y).eq(n._x.mul(s._y))&&s.dot(n)<0}lineContains(t){return this.vector.parallel(t.sub(this.p1))}intersection(...t){if(void 0===t[1])return this.intersection(t[0].p1,t[0].p2.sub(t[0].p1));let[e,i,s]=t;var n=this.p2.sub(this.p1),r=new Ct(n._x,i._x,n._y,i._y).inverse;if(null==r)return null;var o=r.multiply(new T(e.sub(this.p1))),h=o._x,l=o._y.neg;return h.lt(0)||h.gt(1)||s&&l.lt(0)?null:e.add(i.scale(l))}transform(t,e){return new It(this.p1.transform(t,e),this.p2.transform(t,e))}shift(t){return new It(this.p1.add(t),this.p2.add(t))}static distinct(t){let e=new Set;return t.filter(t=>{let i=t.toString(),s=!e.has(i);return s&&e.add(i),s})}static subtract(t,e){let i=[],s=new Map;for(let t of e){let e=t.slope.toString(),i=s.get(e);i||s.set(e,i=[]),i.push(t)}for(let e of t){let t=e.slope.toString();s.has(t)?i.push(...e.cancel(s.get(t))):i.push(e)}return i}cancel(t){let e=[this];for(let i of t){let t=[];for(let s of e)t.push(...s._cancel(i));e=t}return e}*_cancel(t){let e=this.contains(t.p1,!0),i=this.contains(t.p2,!0),s=t.contains(this.p1,!0),n=t.contains(this.p2,!0);if(!s||!n)if(!e&&!i||!s&&!n)yield this;else if(e&&i){let e=new It(this.p1,t.p1),i=new It(this.p1,t.p2),s=new It(this.p2,t.p1),n=new It(this.p2,t.p2);e.isDegenerated?yield n:i.isDegenerated?yield s:s.isDegenerated?yield i:n.isDegenerated?yield e:e.contains(t.p2)?(yield i,yield s):(yield e,yield n)}else{let i=e?t.p1:t.p2,s=n?this.p1:this.p2;i.eq(s)||(yield new It(i,s))}}get slope(){return this.p1._x.sub(this.p2._x).d(this.p1._y.sub(this.p2._y))}xOrient(){return this.p1._x.gt(this.p2._x)?[this.p2,this.p1]:[this.p1,this.p2]}*gridPoints(){let{p1:t,p2:e}=this,i=e.x-t.x,s=e.y-t.y;if(Math.abs(i)<Math.abs(s)){let s=Math.sign(i);for(let i=Wt.int(t.x,s);i*s<=e.x*s;i+=s){let t=this.xIntersection(i);t.isIntegral&&(yield t)}}else{let i=Math.sign(s);for(let s=Wt.int(t.y,i);s*i<=e.y*i;s+=i){let t=this.yIntersection(s);t.isIntegral&&(yield t)}}}xIntersection(t){let e=this.p2.sub(this.p1);return new T(t,this.p1._y.sub(e.slope.mul(this.p1._x.sub(t))).smp())}yIntersection(t){let e=this.p2.sub(this.p1);return new T(this.p1._x.sub(this.p1._y.sub(t).div(e.slope)).smp(),t)}reflect(t){t=t.neg;var e=new Ct(t._x,t._y.neg,t._y,t._x);return t=(t=e.inverse.multiply(this.p2.sub(this.p1))).doubleAngle(),e.multiply(t).reduce()}perpendicular(t){return 0==this.vector.dot(t)}get vector(){return this.p1.sub(this.p2)}}class Ct{constructor(t,e,i,s,n){this.a=new v(t),this.b=new v(e),this.c=new v(i),this.d=new v(s),this.det=n||this.a.mul(this.d).s(this.b.mul(this.c)).smp()}toString(){return[this.a,this.b,this.c,this.d].toString()}smp(){return this.a.smp(),this.b.smp(),this.c.smp(),this.d.smp(),this}get determinant(){return this.det.value}get inverse(){return this.det.eq(0)?null:new Ct(this.d.div(this.det),this.b.neg.d(this.det),this.c.neg.d(this.det),this.a.div(this.det),this.det.inv).smp()}multiply(t){return new t.constructor(this.a.mul(t._x).a(this.b.mul(t._y)),this.c.mul(t._x).a(this.d.mul(t._y))).smp()}static getTransformMatrix(t,e){if(t.eq(k.ZERO))throw new Error("Cannot transform zero vector.");let i=new Ct(t._x,t._y.neg,t._y,t._x),{_x:s,_y:n}=i.inverse.multiply(e);return new Ct(s,n.neg,n,s)}}var Pt,Nt,Rt,Tt;!function(t){function e(t){let e=[];for(let i=0;i<t.length;i++){let[s,n]=[t[i],t[(i+1)%t.length]];s.eq(n)||e.push(new It(s,n))}return e}function i(t,e,i=!1){if(e.length<=2)return i&&e[0].contains(t,!0);let s=0,n=new k(1,0);for(let r of e){if(r.p1.eq(t)||r.p2.eq(t))return i;let e=r.intersection(t,n,!0);if(!e)continue;if(e.eq(t))return i;let o=e.eq(r.p1),h=e.eq(r.p2);(!o&&!h||o&&r.p2._y.lt(t._y)||h&&r.p1._y.lt(t._y))&&s++}return s%2==1}function s(t,e){return t.push(...t.splice(0,e)),t}t.triangleTransform=function(t,e){let[i,s,n]=t,[r,o,h]=[e,s,n].map(t=>t.sub(i)),l=Ct.getTransformMatrix(o,r);return i.add(l.multiply(h))},t.collect=function(t){let e=[],i=new Map,n=0;for(let r of t){let t=!1;for(let[o,h]of r.entries()){let l=h.toString(),a=i.get(l);if(a){if(!e[a[0]])continue;e[a[0]].splice(a[1],0,...s(r,o));for(let[t,s]of e[a[0]].entries())i.set(s.toString(),[a[0],t]);t=!0;break}i.set(l,[n,o])}t||(e.push(r),n++)}return{paths:e,map:i}},t.join=function(t,e){t=t.concat(),e=e.concat();for(let i=0;i<t.length;i++)for(let n=0;n<e.length;n++)if(t[i].eq(e[n]))return s(e,n),t.splice(i,2,...e),t;return t},t.shift=function(t,e){return t.map(t=>t.add(e))},t.polygonIntersect=function(t,s){let n=e(t),r=e(s);return t.some(t=>i(t,r))||s.some(t=>i(t,n))},t.lineInsidePath=function(t,s){let n=e(s);return i(t.p1,n,!0)&&i(t.p2,n,!0)},t.pointInsidePath=function(t,s){return i(t,e(s))}}(Pt||(Pt={}));class kt{constructor(t,e){t._x.gt(e._x)&&([t,e]=[e,t]),t._y.gt(e._y)&&([t,e]=[new T(t._x,e._y),new T(e._x,t._y)]),[this.p1,this.p2]=[t,e]}contains(t){return this.p1._x.le(t.p1._x)&&this.p1._y.le(t.p1._y)&&this.p2._x.ge(t.p2._x)&&this.p2._y.ge(t.p2._y)}equals(t){return this.p1.eq(t.p1)&&this.p2.eq(t.p2)}get width(){return this.p2._x.sub(this.p1._x).value}get height(){return this.p2._y.sub(this.p1._y).value}get top(){return this.p2.y}get right(){return this.p2.x}}!function(t){function e(t,e,i){let s=[],n=t.length-1;do{s.push(t[n])}while(!t[n--].eq(e));if(!(s.length<=2))for(let t of i)Pt.lineInsidePath(t,s)&&i.delete(t)}function s(t,e){return null!=t&&(null==e||t.dist.lt(e.dist)||t.dist.eq(e.dist)&&t.angle<e.angle)}function n(t,e,i){var s=t.p2.sub(t.p1),n=new Ct(s._x,i._x,s._y,i._y).inverse;if(null==n)return null;var o=n.multiply(new T(e.sub(t.p1))),h=o._x,l=o._y.neg;return h.lt(0)||h.gt(1)||l.lt(0)?null:{point:e.add(i.scale(l)),dist:l,angle:r(i,s)}}function r(t,e){for(var i=t.angle-e.angle;i<0;)i+=Math.PI;for(;i>Math.PI;)i-=Math.PI;return i}function o(t,e,i,s){let n=i.rotate90(),o=t.p1.sub(e),h=t.p2.sub(e),l=o.dot(n),a=h.dot(n),d=o.dot(i),c=h.dot(i);return(l>0||a>0)&&(d>0||c>0||!!s&&r(i,t.vector)>s)}t.create=function(t,h,l,a,d){let c,u,p,g=[],f=[],y=l,v=h,_=new Set,m=new Set(t);do{c=null;for(let t of m){if(!o(t,v,y,u?r(y,u):void 0))continue;let e=n(t,v,y);i&&e&&console.log([JSON.stringify(e),t.toString()]),s(e,c)&&(c=e,p=t)}if(c){let t=c.point,s=new It(v,t);if(d){let t=s.intersection(d);t&&(f.push(t),d=void 0)}let n=s.intersection(a);if(n){f.push(n);break}let r=t.toString();_.has(r)?e(g,t,m):_.add(r),g.push(t),d||f.length&&f[f.length-1].eq(t)||f.push(t),u=p.vector,y=p.reflect(y),i&&console.log([t.toString(),p.toString(),y.toString(),u.toString()]),v=t,m.delete(p)}}while(null!=c);return f}}(Nt||(Nt={})),function(t){function e(t,e){return{c:Lt(t.c),ox:t.ox,oy:t.oy,parent:e}}t.joinOverlaps=function(t,e,i,s,n,r=!1){r&&([t,e]=[e,t],[i,s]=[s,i]);let o=n?0:2,h=((e.ox>t.ox?3:1)+o)%4;return e.c[o]={type:mt.coincide,e:i,q:o},e.c[h]={type:mt.intersection,e:t.c[qt(o)].e},t.c[qt(h)]={type:mt.coincide,e:s,q:h},e},t.cut=function(t,i,s,n,r){let o=e(t,i),h=e(t,i);return n>0?(o.c[2]={type:mt.internal,e:s-1,q:3},o.c[1]={type:mt.socket,e:s-1,q:0},o.ox=n,h.c[3]={type:mt.socket,e:s,q:2},h.c[0]={type:mt.internal,e:s,q:1},h.ox=t.ox-n,h.shift={x:n,y:0}):(o.c[2]={type:mt.internal,e:s-1,q:1},o.c[3]={type:mt.socket,e:s-1,q:0},o.oy=r,h.c[1]={type:mt.socket,e:s,q:2},h.c[0]={type:mt.internal,e:s,q:3},h.oy=t.oy-r,h.shift={x:0,y:r}),[{overlaps:[o]},{overlaps:[h]}]},t.toOverlap=e}(Rt||(Rt={})),function(t){t.halfIntegral="HALFINTEGRAL",t.universal="UNIVERSAL",t.baseJoin="BASE_JOIN",t.standardJoin="STANDARD_JOIN",t.perfect="PERFECT"}(Tt||(Tt={}));class Et{constructor(t,e){this.repo=t,this.seed=null==e?void 0:e.configuration,this.seedSignature=JSON.stringify(this.seed),this.pattern=null==e?void 0:e.pattern}*generate(t){if(this.seed&&this.pattern)try{let t=new F(this.repo,this.seed,this.pattern);if(!t.entry)throw!0;yield t}catch(t){this.seedSignature=void 0,console.log("Incompatible old version.")}yield*Bt.filter(this.search(),t=>!this.seedSignature||this.seedSignature!=JSON.stringify(t)),t()}*search(){const t=this.repo.structure,e=t=>null!=t.entry;if(1==t.length){let[i]=t;yield*Bt.first([this.searchSingleGadget(i),this.searchDoubleRelay(i,0),this.searchSingleGadget(i,Tt.halfIntegral),this.searchSingleGadget(i,Tt.universal)],e)}if(2==t.length){let i=t;yield*Bt.first([this.searchThreeFlapJoin(i,Tt.perfect),this.searchThreeFlapRelay(i),this.searchThreeFlapJoin(i),this.searchThreeFlapRelayJoin(i),this.searchThreeFlapJoin(i,Tt.baseJoin),this.searchThreeFlapRelayJoin(i,Tt.baseJoin),this.searchThreeFlapJoin(i,Tt.standardJoin),this.searchThreeFlapRelayJoin(i,Tt.standardJoin),this.searchThreeFlapRelay(i,Tt.halfIntegral)],e)}}*searchSingleGadget(t,e){yield new F(this.repo,{partitions:[{overlaps:[Rt.toOverlap(t,0)],strategy:e}]})}*searchDoubleRelay(t,e){if(!(t.ox*t.oy%2))if(t.ox<t.oy)for(let i=1;i<=t.oy/2;i++){let s=new F(this.repo,{partitions:Rt.cut(t,e,-1,0,i)});s.entry&&(yield s,yield new F(this.repo,{partitions:Rt.cut(t,e,-1,0,t.oy-i)}))}else for(let i=1;i<=t.ox/2;i++){let s=new F(this.repo,{partitions:Rt.cut(t,e,-1,i,0)});s.entry&&(yield s,yield new F(this.repo,{partitions:Rt.cut(t,e,-1,t.ox-i,0)}))}}*searchThreeFlapRelay(t,e){let[i,s]=t.map((t,e)=>Rt.toOverlap(t,e)),n=i.c[2].e==s.c[2].e;i.ox>s.ox&&([i,s]=[s,i]);let[r,o]=Lt([i,s]);o.ox-=i.ox,r.oy-=s.oy;let[h,l,a,d]=n?[0,1,2,3]:[2,3,0,1];o.c[a]={type:mt.internal,e:-1,q:d},o.c[l]={type:mt.intersection,e:i.c[h].e},i.c[d]={type:mt.socket,e:-2,q:a},r.c[a]={type:mt.internal,e:-2,q:l},r.c[d]={type:mt.intersection,e:s.c[h].e},s.c[l]={type:mt.socket,e:-1,q:a},n||(o.shift={x:i.ox,y:0},r.shift={x:0,y:s.oy}),yield new F(this.repo,{partitions:[{overlaps:[i],strategy:e},{overlaps:[o],strategy:e}]}),yield new F(this.repo,{partitions:[{overlaps:[r],strategy:e},{overlaps:[s],strategy:e}]})}*searchThreeFlapJoin(t,e){let[i,s]=t.map((t,e)=>Rt.toOverlap(t,e));Rt.joinOverlaps(i,s,-1,-2,i.c[0].e==s.c[0].e),yield new F(this.repo,{partitions:[{overlaps:[i,s],strategy:e}]})}*searchThreeFlapRelayJoin(t,e){let[i,s]=t.map((t,e)=>Rt.toOverlap(t,e)),n=i.c[0].e==s.c[0].e,r=s.ox>i.ox,o=(r?i:s).ox,h=(r?s:i).oy;for(let t=1;t<o;t++){let[o,h]=Lt([i,s]),l=Rt.joinOverlaps(o,h,-1,-2,n,!r);l.ox-=t,n&&(l.shift={x:t,y:0}),yield new F(this.repo,{partitions:[{overlaps:[o,h],strategy:e}]})}for(let t=1;t<h;t++){let[o,h]=Lt([i,s]),l=Rt.joinOverlaps(o,h,-1,-2,n,r);l.oy-=t,n&&(l.shift={x:0,y:t}),yield new F(this.repo,{partitions:[{overlaps:[o,h],strategy:e}]})}}}let Ot=class extends U{constructor(t,e,i){var s,n,r;super(t.sheet),this.pattern=t,this.partition=e;let{fx:o,fy:h}=t.stretch;this.gadgets=i.gadgets.map(t=>jt.instantiate(t)),this.addOns=null!==(n=null===(s=i.addOns)||void 0===s?void 0:s.map(t=>u.instantiate(t)))&&void 0!==n?n:[];let l=null!==(r=i.offset)&&void 0!==r?r:0;this.location={x:l*o,y:l*h},this.view=new Ht(this)}get type(){return"Device"}toJSON(){return{gadgets:this.gadgets.map(t=>t.toJSON()),offset:this.offset,addOns:this.addOns.length?this.addOns:void 0}}get _origin(){return this._originalDisplacement||(this._originalDisplacement=this.partition.getOriginalDisplacement(this.pattern)),this.pattern.stretch.origin.add(this._originalDisplacement)}get shouldDispose(){return super.shouldDispose||this.pattern.disposed}get isActive(){return this.pattern.isActive}get anchors(){let t=[],{fx:e,fy:i}=this.pattern.stretch;for(let s of this.gadgets)t.push(s.anchorMap.map(t=>{if(!t[0])debugger;return t[0].transform(e,i).add(this.delta)}));return t}get delta(){return this._origin.add(new k(this.location)).sub(T.ZERO)}get regions(){let t=[];for(let e of this.gadgets)t.push(...e.pieces);return t.push(...this.addOns),t}get regionRidges(){let t=new Map;for(let e of this.regions){let i=this.regions.filter(t=>t!=e&&t.direction.parallel(e.direction)).reduce((t,e)=>(t.push(...e.shape.ridges.filter(t=>!t.perpendicular(e.direction))),t),[]);t.set(e,It.subtract(e.shape.ridges,i))}return t}get rawRidges(){let{fx:t,fy:e}=this.pattern.stretch,i=[],s=this.regionRidges;for(let n of this.regions)i.push(...s.get(n).map(i=>i.transform(t,e).shift(this.delta)));return It.distinct(i)}get ridges(){return It.subtract(this.rawRidges,this.neighbors.reduce((t,e)=>(t.push(...e.rawRidges),t),[]))}get axisParallels(){let{fx:t,fy:e}=this.pattern.stretch,i=[];for(let s of this.regions)for(let n of s.axisParallels)i.push(n.transform(t,e).shift(this.delta));return i}get outerRidges(){if(!this.isActive)return[];let t=this.getConnectionRidges();for(let[e,i]of this.intersectionMap)i&&t.push(new It(e,i));return It.distinct(t)}get intersectionMap(){let t=[];if(!this.isActive)return t;for(let[e,i,s]of this.partition.intersectionCorners){let n=this.anchors[i][s],r=this.partition.getSideConnectionTarget(n,e);t.push([n,r])}return t}get openAnchors(){return this.intersectionMap.filter(t=>!t[1]||t[0].eq(t[1])).map(t=>t[0])}getConnectionRidges(t=!1){let e=[];for(let[i,s]of this.partition.overlaps.entries())for(let[n,r]of s.c.entries())(r.type==mt.flap&&!t||r.type==mt.internal)&&e.push(new It(this.anchors[i][n],this.pattern.getConnectionTarget(r)));return e}constraint(t,e){let{fx:i,fy:s}=this.pattern.stretch,n=i*s,r=Math.round((t.x+n*t.y)/2);for(let[t,e,i]of this.partition.constraints)r=this.fix(r,t,e,i);return new k(r,n*r)}get neighbors(){let t=new Set;for(let e of this.partition.overlaps)for(let i of e.c)if(i.type==mt.socket||i.type==mt.internal){let[e]=this.partition.configuration.overlapMap.get(i.e);t.add(this.pattern.devices[e])}return Array.from(t)}fix(t,e,i,s){let n=e.type!=mt.socket,r=this.pattern.stretch.fx*(0==(n?s:qt(e.q))?-1:1),o=this.pattern.getConnectionTarget(e),h=n?this.gadgets[i].slacks[s]:this.pattern.gadgets[-e.e-1].slacks[e.q],l=o.x-this.anchors[i][s].x-h*r;return t*r>l*r&&(t=l),t}get offset(){let t=this.partition.getOriginalDisplacement(this.pattern).x;return t-=this._originalDisplacement.x,(this.location.x-t)*this.pattern.stretch.fx}};t([e],Ot.prototype,"isActive",null),t([e],Ot.prototype,"anchors",null),t([e],Ot.prototype,"delta",null),t([o],Ot.prototype,"regions",null),t([o],Ot.prototype,"regionRidges",null),t([e],Ot.prototype,"rawRidges",null),t([e],Ot.prototype,"ridges",null),t([e],Ot.prototype,"axisParallels",null),t([e],Ot.prototype,"outerRidges",null),t([e],Ot.prototype,"intersectionMap",null),t([e],Ot.prototype,"openAnchors",null),t([e],Ot.prototype,"neighbors",null),Ot=t([e],Ot);class jt{constructor(t){this.pieces=t.pieces.map(t=>c.instantiate(t)),this.offset=t.offset,this.pieces.forEach(t=>t.offset(this.offset)),this.anchors=t.anchors}toJSON(){return Lt(this)}get anchorMap(){return St(t=>{var e,i;if(null===(i=null===(e=this.anchors)||void 0===e?void 0:e[t])||void 0===i?void 0:i.location){let e=new T(this.anchors[t].location);return this.offset&&e.addBy(new k(this.offset)),[e,null]}if(1==this.pieces.length)return[this.pieces[0].anchors[t],0];for(let[e,i]of this.pieces.entries())if(i.anchors[t])return[i.anchors[t],e];debugger;throw new Error})}_getSlack(t){var e,i,s;return null!==(s=null===(i=null===(e=this.anchors)||void 0===e?void 0:e[t])||void 0===i?void 0:i.slack)&&void 0!==s?s:0}get slacks(){return St(t=>this._getSlack(t))}get sx(){return Math.ceil(this.anchorMap[2][0].x-this.anchorMap[0][0].x)}get sy(){return Math.ceil(this.anchorMap[2][0].y-this.anchorMap[0][0].y)}reverseGPS(){let t=jt.instantiate(this.toJSON()),[e,i]=t.pieces,s=Math.ceil(Math.max(e.sx,i.sx)),n=Math.ceil(Math.max(e.sy,i.sy));return e.revserse(s,n),i.revserse(s,n),t}addSlack(t,e){var i;return this.anchors=this.anchors||[],this.anchors[t]=this.anchors[t]||{},this.anchors[t].slack=(null!==(i=this.anchors[t].slack)&&void 0!==i?i:0)+e,this}setupConnectionSlack(t,e,i){let s=this.contour,n=t.contour,r=0==e?1:-1,o=new k(r,r),h=t.anchorMap[i][0].sub(T.ZERO).addBy(o.scale(this._getSlack(e)));s=Pt.shift(s,0==e?h:h.add(T.ZERO.sub(this.anchorMap[2][0])));let l=0;for(;Pt.polygonIntersect(s,n);)s=Pt.shift(s,o),l++;return this.addSlack(e,l),l}get contour(){let t=this.pieces,e=t[0].shape.contour;for(let i=1;i<t.length;i++)e=Pt.join(e,t[i].shape.contour);return e}rx(t,e){return Math.abs(this.anchorMap[t][0].x-this.anchorMap[e][0].x)}ry(t,e){return Math.abs(this.anchorMap[t][0].y-this.anchorMap[e][0].y)}contains(t){return this.pieces.some(e=>Pt.pointInsidePath(t,e.shape.contour))}static instantiate(t){return t instanceof jt?t:new jt(t)}static simplify(t){if(t.offset&&0==t.offset.x&&0==t.offset.y&&delete t.offset,t.anchors){for(let[e,i]of t.anchors.entries())i&&(0===i.slack&&delete i.slack,0==Object.keys(i).length&&delete t.anchors[e]);t.anchors.some(t=>!!t)||delete t.anchors}return t}}t([o],jt.prototype,"anchorMap",null),t([o],jt.prototype,"slacks",null),t([o],jt.prototype,"sx",null),t([o],jt.prototype,"sy",null),t([o],jt.prototype,"contour",null);class Dt{constructor(t,e){let i=[],[s,n]=t;if(s.ox==n.ox||s.oy==n.oy)return;[this.g1,this.g2]=t.map(t=>{let s=e.structure[t.parent];return i.push(s),Array.from(c.gops(t,s.sx))});let[r,o]=i;this.oriented=r.c[0].e==o.c[0].e,this.cw=s.ox>n.ox,this.q=this.oriented?0:2,[this.q1,this.q2]=this.oriented?this.cw?[2,1]:[1,2]:this.cw?[0,3]:[3,0],this.intDist=l.getMaxIntersectionDistance(e.sheet.design.tree,r,o,this.oriented),[this.s1,this.s2]=this.oriented?[s.shift,n.shift]:[this.getReverseShift(s,r),this.getReverseShift(n,o)]}*join(t,e){let{g1:i,g2:s}=this,n=[];if(i){for(let r of i)for(let i of s){let s=c.instantiate(r,!0),o=c.instantiate(i,!0);e&&!e(s,o)||n.push(...t(new Jt(this,s,o)))}n.sort((t,e)=>t[1]-e[1]);for(let[t]of n)yield t}}*simpleJoin(t){let{s1:e,s2:i}=this;yield*this.join(t=>t.simpleJoin(),(s,n)=>{let r=s.direction.parallel(n.direction);return!(t==Tt.perfect&&!r)&&(!e&&!i||!r)})}*baseJoin(){yield*this.join(t=>t.baseJoin())}*standardJoin(){let{s1:t,s2:e}=this,i=!!t||!!e,s=0;yield*this.join(t=>t.standardJoin(),(t,e)=>i||0==s++)}getReverseShift(t,e){var i,s,n,r;let o=t.ox+(null!==(s=null===(i=t.shift)||void 0===i?void 0:i.x)&&void 0!==s?s:0),h=t.oy+(null!==(r=null===(n=t.shift)||void 0===n?void 0:n.y)&&void 0!==r?r:0);if(o!=e.ox||h!=e.oy)return{x:o-e.ox,y:h-e.oy}}getRelayJoinIntersection(t,e,i){let s=this.oriented?new k(1,1):new k(-1,-1),n=t.anchors[this.q].sub(new k(e));return t.shape.ridges[i].intersection(n,s)}}class Jt{constructor(t,e,i){let{oriented:s,s1:n,s2:r,q1:o,q2:h,q:l}=this.joiner=t,a=[],d=[],c=e.sx+i.sx,u={x:0,y:0},p={x:0,y:0};if(n){let r=t.getRelayJoinIntersection(i,n,(o+2)%4);if(!r||!r.isIntegral)return;s?(e.offset(u=r.toIPoint()),c+=u.x,a[l]={location:{x:-u.x,y:-u.y}}):(i.offset(p={x:i.sx-r.x,y:i.sy-r.y}),c+=p.x,a[l]={location:{x:e.sx+p.x,y:e.sy+p.y}})}if(r){let n=t.getRelayJoinIntersection(e,r,(h+2)%4);if(!n||!n.isIntegral)return;s?(i.offset(p=n.toIPoint()),c+=p.x,d[l]={location:{x:-p.x,y:-p.y}}):(i.offset(p={x:n.x-e.sx,y:n.y-e.sy}),c-=p.x,d[l]={location:{x:i.sx-p.x,y:i.sy-p.y}})}let g,f=k.ZERO;s||(g={x:e.sx-i.sx,y:e.sy-i.sy},f=new k(g));let y=new k(u).neg,v=new k(p).addBy(f).neg,_=n?e.anchors[l]:i.anchors[l].add(f),m=_.add(y).toIPoint(),x=_.add(v).toIPoint(),w=e.shape.ridges[o],b=i.shape.ridges[h].shift(f),S=k.bisector(e.direction,i.direction),M=s?T.ZERO:n?new T(a[l].location):e.anchors[l],q=s?1:-1;this.data={p1:e,p2:i,v1:y,v2:v,a1:a,a2:d,off1:u,off2:p,offset:g,size:c,pt:_,pt1:m,pt2:x,e1:w,e2:b,bv:S,org:M,f:q}}*simpleJoin(){if(!this.data)return;let{e1:t,e2:e,p1:i,p2:s,pt:n,bv:r}=this.data,o=t.intersection(e);o&&(i.direction.parallel(s.direction)||o.sub(n).parallel(r))&&this.setupAnchor(o)&&(this.setupDetour([o],[o]),yield this.result())}get deltaPt(){let{org:t,p1:e,p2:i,f:s}=this.data,{cw:n,intDist:r}=this.joiner;return new T(t.x+(r-(n?i:e).ox)*s,t.y+(r-(n?e:i).oy)*s)}baseJoinIntersections(){let{bv:t,e1:e,e2:i,pt:s}=this.data,n=new It(this.deltaPt,D.QV[0]),r=new It(s,t);return{D1:e.intersection(n),D2:i.intersection(n),B1:e.intersection(r),B2:i.intersection(r),delta:n}}*baseJoin(){if(!this.data)return;let{D1:t,D2:e,B1:i,B2:s}=this.baseJoinIntersections();if((null==i?void 0:i.isIntegral)&&(null==e?void 0:e.isIntegral)&&!i.eq(e)){if(!this.setupAnchor(e))return;this.setupDetour([i],[e,i]),yield this.result(!0)}if((null==s?void 0:s.isIntegral)&&(null==t?void 0:t.isIntegral)&&!s.eq(t)){if(!this.setupAnchor(t))return;this.setupDetour([t,s],[s]),yield this.result()}}substituteEnd(t,e){let[i,s]=t.xOrient();return new It(e,this.joiner.oriented?s:i)}closestGridPoint(t,e){let i,s=Number.POSITIVE_INFINITY;for(let n of t.gridPoints()){let t=n.dist(e);t<s&&(s=t,i=n)}return i}*standardJoin(){if(!this.data)return;let{D1:t,D2:e,B1:i,B2:s,delta:n}=this.baseJoinIntersections(),{f:r}=this.data;i&&e&&!i.eq(e)&&(e.x*r>i.x*r?yield*this.obtuseStandardJoin(i,e,0):yield*this.acuteStandardJoin(i,e,1,n)),s&&t&&!s.eq(t)&&(t.x*r>s.x*r?yield*this.obtuseStandardJoin(s,t,1):yield*this.acuteStandardJoin(s,t,0,n))}*obtuseStandardJoin(t,e,i){if(t.isIntegral)return;let{e1:s,e2:n,p1:r,p2:o,pt:h,f:l}=this.data,{cw:a}=this.joiner,d=[s,n][i],c=[r,o][i];if(a!=r.direction.slope.gt(o.direction.slope))return;if(!this.setupAnchor(e))return;let u=e.sub(t).slope.gt(1)?d.xIntersection(e.x):d.yIntersection(e.y),p=this.closestGridPoint(this.substituteEnd(d,t),e);if(p.eq(d.p1)||p.eq(d.p2))return;let g=Pt.triangleTransform([e,u,t],p);g.x*l<h.x*l||(this.data.addOns=[{contour:[e,p,g].map(t=>t.toIPoint()),dir:new It(p,g).reflect(c.direction).toIPoint()}],this.setupDetour([0==i?p:e,g],[0==i?e:p,g]),yield this.result(!0,g.dist(p)))}*acuteStandardJoin(t,e,i,s){if(e.isIntegral)return;let{e1:n,e2:r,p1:o,p2:h}=this.data,l=[n,r][i],a=[o,h][i],d=this.closestGridPoint(this.substituteEnd(l,e),t);if(d.eq(l.p1)||d.eq(l.p2))return;let c=e.sub(t).slope.gt(1)?s.yIntersection(d.y):s.xIntersection(d.x),u=Pt.triangleTransform([d,e,c],t);this.setupAnchor(u)&&(this.data.addOns=[{contour:[t,d,u].map(t=>t.toIPoint()),dir:new It(d,t).reflect(a.direction).toIPoint()}],this.setupDetour(0==i?[d,t]:[t],0==i?[t]:[d,t]),yield this.result(!0,t.dist(d)))}setupDetour(t,e){let{p1:i,p2:s,v1:n,v2:r,pt1:o,pt2:h}=this.data,l=t.map(t=>t.add(n).toIPoint());l.push(o);let a=e.map(t=>t.add(r).toIPoint());a.push(h),(this.joiner.cw?a:l).reverse(),i.clearDetour(),i.addDetour(l),s.clearDetour(),s.addDetour(a)}setupAnchor(t){let{a1:e,a2:i,v1:s,v2:n,f:r}=this.data,{oriented:o,cw:h}=this.joiner;if(t.x*r>this.deltaPt.x*r)return!1;let l=o==h;return e[l?3:1]={location:t.add(s).toIPoint()},i[l?1:3]={location:t.add(n).toIPoint()},!0}result(t=!1,e){let{p1:i,p2:s,a1:n,a2:r,off1:o,off2:h,offset:l,size:a,addOns:d}=this.data;return this.data.addOns=void 0,l&&(h={x:h.x+l.x,y:h.y+l.y}),[{gadgets:[{pieces:[t?i.toJSON():i],offset:this.simplifyIPoint(o),anchors:n.concat()},{pieces:[t?s.toJSON():s],offset:this.simplifyIPoint(h),anchors:r.concat()}],addOns:d},a+10*(null!=e?e:0)]}simplifyIPoint(t){return t&&0==t.x&&0==t.y?void 0:t}}t([o],Jt.prototype,"deltaPt",null);let At=class extends ${constructor(t,e,i){super(t.sheet),this.joinerCache=new Map,this.stretch=t,this.signature=e,this.structure=JSON.parse(e),this.generator=new Et(this,i).generate(()=>this.joinerCache.clear())}builder(t){return t}get isActive(){return this.stretch.isActive&&this.stretch.repository==this}onMove(){this.stretch.selected=!this.entry.entry.selected}getJoiner(t){let e=JSON.stringify(t),i=this.joinerCache.get(e);return i||this.joinerCache.set(e,i=new Dt(t,this)),i}};function $t(t,...e){for(let i of e)if(i instanceof Object){let e=Object.keys(i);for(let s of e){let e=i[s];e instanceof Object?t[s]instanceof Object&&t[s]!=e?t[s]=$t(t[s],e):t[s]=Lt(e):t[s]=e}}return t}function Lt(t){return $t(t instanceof Array?[]:{},t)}var Bt,Vt,Wt,Ft;t([e],At.prototype,"isActive",null),At=t([e],At),function(t){t.first=function*(t,e){for(let i of t){let t=!1;for(let s of i)e(s)&&(yield s,t=!0);if(t)return}},t.filter=function*(t,e){for(let i of t)e(i)&&(yield i)}}(Bt||(Bt={})),function(t){let e=new WeakMap;function i(t,e,i,s,n,r){t.justification=0==n?"center":1==n?"left":"right";let o=0==r?-s/5:-1==r?-s/2:0,h=Math.sqrt(n*n+r*r),l=0==h?0:s/2/h;t.point.set(e+n*l,i-r*l-o)}t.setLabel=function(t,s,n,r,...o){if(n.content=s.content,!s.content)return;let h=r.x,l=r.y,a=t.displayScale,d=t.width,c=t.height,u=s.bounds.height,p=h*a,g=-l*a;if(0==h||0==l||h==d||l==c){i(s,p,g,u,0==h?-1:h==d?1:0,0==l?-1:l==c?1:0)}else!function(t,s,n,r,o){let h=[[0,0],[0,-1],[-1,0],[0,1],[1,0],[-1,-1],[-1,1],[1,1],[1,-1]],l=o.map(t=>{let e=t.clone({insert:!1});return t.layer&&e.transform(t.layer.matrix),e}),a=0,d=0;for([a,d]of h){i(t,s,n,r,a,d);let e=new paper.Path.Rectangle(t.bounds);if(t.layer&&e.transform(t.layer.matrix),l.every(t=>{let i=e.intersect(t,{insert:!1}).isEmpty(),s=!e.intersects(t);return i&&s}))break}e.set(t,{dx:a,dy:d,timeout:void 0})}(s,p,g,u,o);!function(t,e){e.point.set(t.point),e.justification=t.justification}(s,n)}}(Vt||(Vt={})),function(t){t.GCD=function(t,e){if("number"==typeof t&&!Number.isSafeInteger(t))throw new Error("Not a safe integer: "+t);if("number"==typeof e&&!Number.isSafeInteger(e))throw new Error("Not a safe integer: "+e);if(0==t&&0==e)throw new Error("Input cannot be both zero");for(t<0&&(t=-t),e<0&&(e=-e);t&&e;)(t%=e)&&(e%=t);return t||e},t.reduce=function(t,e){if("number"==typeof t&&!Number.isInteger(t)||"number"==typeof e&&!Number.isInteger(e)){let i=new v(t),s=new v(e);t=Number(i.$numerator*s.$denominator),e=Number(i.$denominator*s.$numerator)}let i=this.GCD(t,e);return[t/i,e/i]},t.int=function(t,e){return e>0?Math.ceil(t):Math.floor(t)}}(Wt||(Wt={})),function(t){t.replaceContent=function(t,e,i){t.removeChildren(),e instanceof paper.CompoundPath?t.copyContent(e):(i&&(e=e.clone({insert:!1})),t.addChild(e))},t.setRectangleSize=function(t,e,i){t.segments[1].point.set(e,0),t.segments[2].point.set(e,i),t.segments[3].point.set(0,i)},t.addLine=function(t,e,i){e instanceof T&&(e=e.toPaper()),i instanceof T&&(i=i.toPaper()),t.moveTo(e),t.lineTo(i)},t.setLines=function(e,...i){e.removeChildren();for(let s of i)for(let i of s)t.addLine(e,i.p1,i.p2)},t.Black=new paper.Color("black"),t.Red=new paper.Color("red")}(Ft||(Ft={}));let Ht=class extends L{constructor(t){super(t),this.$addItem(_t.axisParallel,this._axisParallels=new paper.CompoundPath(wt.axisParallel)),this.$addItem(_t.ridge,this._ridges=new paper.CompoundPath(wt.ridge)),this.$addItem(_t.shade,this._shade=new paper.CompoundPath(wt.shade))}contains(t){return this._shade.contains(t)}render(){let t=null;for(let e of this.control.regions){let i=this.contourToPath(e.shape.contour);t=t?t.unite(i,{insert:!1}):i}Ft.replaceContent(this._shade,t,!1),Ft.setLines(this._ridges,this.control.ridges,this.control.outerRidges),Ft.setLines(this._axisParallels,this.control.axisParallels)}contourToPath(t){let e=new paper.Path({closed:!0}),{fx:i,fy:s}=this.control.pattern.stretch,n=this.control.delta;return t.forEach(t=>e.add(t.transform(i,s).add(n).toPaper())),e}renderSelection(t){this._shade.visible=t||this.control.pattern.configuration.repository.stretch.selected}};return Ht=t([e],Ht),rt}));
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+if (typeof Shrewd != "object")
+    throw new Error("BPStudio requires Shrewd.");
+if (typeof paper != "object")
+    throw new Error("BPStudio requires paper.js.");
+const { shrewd } = Shrewd;
+Shrewd.option.autoCommit = false;
+setInterval(() => Shrewd.commit(), 50);
+let debug = false;
+function nonenumerable(target, name, desc) {
+    if (desc) {
+        desc.enumerable = false;
+        return desc;
+    }
+    Object.defineProperty(target, name, {
+        set(value) {
+            Object.defineProperty(this, name, {
+                value, writable: true, configurable: false,
+            });
+        },
+        configurable: true,
+    });
+}
+;
+function action(target, name) {
+    if (name === undefined)
+        return (obj, name) => actionInner(obj, name, target);
+    else
+        actionInner(target, name, {});
+}
+function actionInner(target, name, option) {
+    shrewd({
+        validator(v) {
+            var _a, _b;
+            let record = actionMap.get(this);
+            if (!record)
+                actionMap.set(this, record = {});
+            let result = (_b = (_a = option.validator) === null || _a === void 0 ? void 0 : _a.apply(this, [v])) !== null && _b !== void 0 ? _b : true;
+            if (result) {
+                if (name in record && record[name] != v) {
+                    if (!('design' in this))
+                        debugger;
+                    this.design.fieldChange(this, name, record[name], v);
+                }
+                record[name] = v;
+            }
+            return result;
+        }
+    })(target, name);
+}
+const actionMap = new WeakMap();
+function onDemand(target, name, desc) {
+    let getter = desc.get;
+    return {
+        get() {
+            let record = onDemandMap.get(this);
+            if (!record)
+                onDemandMap.set(this, record = {});
+            if (name in record)
+                return record[name];
+            else
+                return record[name] = getter.apply(this);
+        },
+        enumerable: false,
+        configurable: false
+    };
+}
+;
+const onDemandMap = new WeakMap();
+class Partitioner {
+    constructor(config, data) {
+        this.configuration = config;
+        this.overlaps = data.overlaps;
+        this.strategy = data.strategy;
+    }
+    static getMaxIntersectionDistance(tree, r1, r2, oriented) {
+        let q = oriented ? 2 : 0;
+        let n1 = tree.node.get(r1.c[q].e);
+        let n2 = tree.node.get(r2.c[q].e);
+        let n3 = tree.node.get(r1.c[2 - q].e);
+        return tree.distTriple(n1, n2, n3).d3;
+    }
+    *generate() {
+        let { strategy } = this;
+        if (this.overlaps.length == 1) {
+            let o = this.overlaps[0];
+            let j = this.configuration.repository.structure[o.parent];
+            if (strategy == Strategy.halfIntegral) {
+                for (let g of this.halfKamiya(o, j.sx))
+                    yield { gadgets: [g] };
+            }
+            if (strategy == Strategy.universal) {
+                for (let g of this.universalGPS(o, j.sx))
+                    yield { gadgets: [g] };
+            }
+            else {
+                for (let p of Piece.gops(o, j.sx))
+                    yield { gadgets: [{ pieces: [p] }] };
+            }
+        }
+        if (this.overlaps.length == 2) {
+            let joiner = this.configuration.repository.getJoiner(this.overlaps);
+            if (strategy == Strategy.baseJoin) {
+                yield* joiner.baseJoin();
+            }
+            else if (strategy == Strategy.standardJoin) {
+                yield* joiner.standardJoin();
+            }
+            else {
+                yield* joiner.simpleJoin(strategy);
+            }
+        }
+    }
+    *universalGPS(o, sx) {
+        let d = 2, found = false;
+        while (!found) {
+            let bigO = clone(o);
+            bigO.ox *= d;
+            bigO.oy *= d;
+            for (let p of Piece.gops(bigO, sx * d)) {
+                let p1 = Piece.instantiate(p).shrink(d);
+                if (!Number.isInteger(p1.v))
+                    continue;
+                let { ox, oy, u, v } = p1;
+                let p2 = { ox, oy, u: v, v: u };
+                let pt1 = { x: 0, y: 0 }, pt2 = { x: oy + u + v, y: ox + u + v };
+                p1.detours = [[pt1, pt2]];
+                p2.detours = [[pt2, pt1]];
+                let sx = p1.oy + p1.u + p1.v, s = Math.ceil(sx) - sx;
+                let g = new Gadget({ pieces: [p1, p2] });
+                let gr = g.reverseGPS();
+                yield g.addSlack(2, s);
+                yield gr.addSlack(0, s);
+                found = true;
+            }
+            d += 2;
+        }
+    }
+    *halfKamiya(o, sx) {
+        if (o.ox % 2 == 0 || o.oy % 2 == 0)
+            return;
+        let doubleO = clone(o);
+        doubleO.ox <<= 1;
+        doubleO.oy <<= 1;
+        for (let p of Piece.gops(doubleO, sx * 2)) {
+            let p1 = Piece.instantiate(p);
+            if (p1.rank > 3)
+                continue;
+            let v_even = p1.v % 2 == 0;
+            if (p1.ox == p1.oy && v_even)
+                continue;
+            let { ox, oy, u, v } = p1.shrink(2);
+            let diff = Math.abs(ox - oy) / 2;
+            if (!Number.isInteger(diff))
+                debugger;
+            let sm = Math.min(ox, oy);
+            let p2;
+            if (v_even && ox >= oy) {
+                p1.detours = [[{ x: diff, y: 3 * diff }, { x: oy + u + v, y: ox + u + v }]];
+                p2 = {
+                    ox: sm, oy: sm, u: v, v: u - diff,
+                    detours: [[{ x: sm + u + v - diff, y: sm + u + v - diff }, { x: 0, y: 0 }]],
+                    shift: { x: diff, y: 3 * diff }
+                };
+            }
+            else if (!v_even && oy >= ox) {
+                p1.detours = [[{ x: oy + u + v, y: ox + u + v }, { x: diff * 3, y: diff }]];
+                p2 = {
+                    ox: sm, oy: sm, u: v - diff, v: u,
+                    detours: [[{ x: 0, y: 0 }, { x: sm + u + v - diff, y: sm + u + v - diff }]],
+                    shift: { x: diff * 3, y: diff }
+                };
+            }
+            else
+                continue;
+            let g = new Gadget({ pieces: [p1, p2] });
+            let gr = g.reverseGPS();
+            yield g.addSlack(2, 0.5);
+            yield gr.addSlack(0, 0.5);
+        }
+    }
+}
+class Region {
+    get axisParallels() {
+        let ref = this.shape.contour.find(p => p.isIntegral);
+        let dir = this.direction;
+        let step = dir.rotate90().normalize();
+        let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
+        for (let p of this.shape.contour) {
+            let units = p.sub(ref).dot(step);
+            if (units > max)
+                max = units;
+            if (units < min)
+                min = units;
+        }
+        let ap = [];
+        for (let i = Math.ceil(min); i <= Math.floor(max); i++) {
+            let p = ref.add(step.scale(i));
+            let intersections = [];
+            for (let r of this.shape.ridges) {
+                let j = r.intersection(p, dir);
+                if (j && !j.eq(intersections[0]))
+                    intersections.push(j);
+                if (intersections.length == 2)
+                    break;
+            }
+            if (intersections.length == 2) {
+                ap.push(new Line(...intersections));
+            }
+        }
+        return ap;
+    }
+}
+__decorate([
+    onDemand
+], Region.prototype, "axisParallels", null);
+let Disposible = class Disposible {
+    constructor(parent) {
+        this._disposed = false;
+        this._disposeWith = parent;
+    }
+    _disposeEvent() {
+        if (this.disposed) {
+            Shrewd.terminate(this);
+            this.onDispose();
+        }
+    }
+    get shouldDispose() {
+        return this._disposeWith ? this._disposeWith.disposed : false;
+    }
+    dispose() {
+        this._disposed = true;
+    }
+    onDispose() { }
+    get disposed() {
+        return this._disposed;
+    }
+};
+__decorate([
+    shrewd({
+        renderer(v) {
+            return v || this.shouldDispose;
+        }
+    })
+], Disposible.prototype, "_disposed", void 0);
+__decorate([
+    shrewd
+], Disposible.prototype, "_disposeEvent", null);
+__decorate([
+    shrewd
+], Disposible.prototype, "disposed", null);
+Disposible = __decorate([
+    shrewd
+], Disposible);
+class Piece extends Region {
+    constructor(piece) {
+        super();
+        deepCopy(this, piece);
+    }
+    get _points() {
+        let { ox, oy, u, v } = this;
+        let result = [
+            Point.ZERO,
+            new Point(u, ox + u),
+            new Point(oy + u + v, ox + u + v),
+            new Point(oy + v, v),
+        ];
+        result.forEach(p => p.addBy(this._shift));
+        return result;
+    }
+    get _shift() {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        return new Vector(((_b = (_a = this.shift) === null || _a === void 0 ? void 0 : _a.x) !== null && _b !== void 0 ? _b : 0) + ((_d = (_c = this._offset) === null || _c === void 0 ? void 0 : _c.x) !== null && _d !== void 0 ? _d : 0), ((_f = (_e = this.shift) === null || _e === void 0 ? void 0 : _e.y) !== null && _f !== void 0 ? _f : 0) + ((_h = (_g = this._offset) === null || _g === void 0 ? void 0 : _g.y) !== null && _h !== void 0 ? _h : 0));
+    }
+    get shape() {
+        let contour = this._points.concat();
+        let ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
+        (this.detours || []).forEach(d => {
+            let detour = d.map(p => new Point(p.x, p.y).addBy(this._shift));
+            let start = detour[0], end = detour[detour.length - 1];
+            let lines = [];
+            for (let i = 0; i < detour.length - 1; i++) {
+                lines.push(new Line(detour[i], detour[i + 1]));
+            }
+            let l = ridges.length;
+            for (let i = 0; i < l; i++) {
+                let eq = ridges[i].p1.eq(start);
+                if (eq || ridges[i].contains(start)) {
+                    for (let j = 1; j < l; j++) {
+                        let k = (j + i) % l;
+                        if (ridges[k].p1.eq(end) || ridges[k].contains(end)) {
+                            let tail = k < i ? l - i : j + 1, head = j + 1 - tail;
+                            let pts = detour.concat();
+                            lines.push(new Line(end, ridges[k].p2));
+                            if (!eq) {
+                                pts.unshift(ridges[i].p1);
+                                lines.unshift(new Line(ridges[i].p1, start));
+                            }
+                            contour.splice(i, tail, ...pts);
+                            ridges.splice(i, tail, ...lines);
+                            contour.splice(0, head);
+                            ridges.splice(0, head);
+                            return;
+                        }
+                    }
+                    debugger;
+                }
+            }
+        });
+        return { contour, ridges };
+    }
+    get anchors() {
+        let p = this._points;
+        let { contour } = this.shape;
+        return [
+            contour.some(c => c.eq(p[0])) ? p[0] : null,
+            contour.includes(p[1]) ? p[1] : null,
+            contour.some(c => c.eq(p[2])) ? p[2] : null,
+            contour.includes(p[3]) ? p[3] : null
+        ];
+    }
+    get direction() {
+        let { oy, v } = this;
+        return new Vector(oy + v, v).doubleAngle();
+    }
+    get sx() {
+        return this.oy + this.u + this.v;
+    }
+    get sy() {
+        return this.ox + this.u + this.v;
+    }
+    get rank() {
+        let r1 = MathUtil.reduce(this.oy + this.v, this.oy)[0];
+        let r2 = MathUtil.reduce(this.ox + this.u, this.ox)[0];
+        return Math.max(r1, r2);
+    }
+    revserse(tx, ty) {
+        let { shift, detours, sx, sy } = this;
+        shift = shift || { x: 0, y: 0 };
+        let s = { x: tx - sx - shift.x, y: ty - sy - shift.y };
+        if (s.x || s.y)
+            this.shift = s;
+        detours === null || detours === void 0 ? void 0 : detours.forEach(c => c.forEach(p => { p.x = sx - p.x; p.y = sy - p.y; }));
+    }
+    shrink(by = 2) {
+        onDemandMap.delete(this);
+        this.ox /= by;
+        this.oy /= by;
+        this.u /= by;
+        this.v /= by;
+        return this;
+    }
+    offset(o) {
+        if (!o || this._offset && this._offset.x == o.x && this._offset.y == o.y)
+            return;
+        this._offset = o;
+        onDemandMap.delete(this);
+    }
+    addDetour(detour) {
+        detour = clone(detour);
+        for (let i = 0; i < detour.length - 1; i++) {
+            if (detour[i].x == detour[i + 1].x && detour[i].y == detour[i + 1].y)
+                detour.splice(i--, 1);
+        }
+        if (detour.length == 1)
+            return;
+        this.detours = this.detours || [];
+        this.detours.push(detour);
+        onDemandMap.delete(this);
+    }
+    clearDetour() {
+        var _a;
+        if ((_a = this.detours) === null || _a === void 0 ? void 0 : _a.length) {
+            this.detours = undefined;
+            onDemandMap.delete(this);
+        }
+    }
+    toJSON() {
+        return clone(this);
+    }
+    static *gops(overlap, sx) {
+        let { ox, oy } = overlap;
+        if ([ox, oy].some(n => !Number.isSafeInteger(n)))
+            return;
+        if (ox % 2 && oy % 2)
+            return;
+        if (sx === undefined)
+            sx = Number.POSITIVE_INFINITY;
+        let ha = ox * oy / 2;
+        for (let u = Math.floor(Math.sqrt(ha)), v; u > 0 && u + (v = ha / u) + oy <= sx; u--) {
+            if (ha % u == 0) {
+                if (u == v)
+                    yield { ox, oy, u, v };
+                if (u != v) {
+                    let p1 = new Piece({ ox, oy, u, v });
+                    let p2 = new Piece({ ox, oy, u: v, v: u });
+                    let r1 = p1.rank, r2 = p2.rank;
+                    if (r1 > r2) {
+                        yield p2;
+                        yield p1;
+                    }
+                    else {
+                        yield p1;
+                        yield p2;
+                    }
+                }
+            }
+        }
+    }
+    static instantiate(p, alwaysNew = false) {
+        return p instanceof Piece && !alwaysNew ? p : new Piece(p);
+    }
+}
+__decorate([
+    onDemand
+], Piece.prototype, "_points", null);
+__decorate([
+    nonenumerable
+], Piece.prototype, "_offset", void 0);
+__decorate([
+    onDemand
+], Piece.prototype, "_shift", null);
+__decorate([
+    onDemand
+], Piece.prototype, "shape", null);
+__decorate([
+    onDemand
+], Piece.prototype, "anchors", null);
+__decorate([
+    onDemand
+], Piece.prototype, "direction", null);
+__decorate([
+    onDemand
+], Piece.prototype, "rank", null);
+class AddOn extends Region {
+    constructor(data) {
+        super();
+        this.contour = data.contour;
+        this.dir = data.dir;
+    }
+    get shape() {
+        let contour = this.contour.map(p => new Point(p));
+        let ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
+        return { contour, ridges };
+    }
+    get direction() {
+        return new Vector(this.dir);
+    }
+    static instantiate(a) {
+        return a instanceof AddOn ? a : new AddOn(a);
+    }
+}
+__decorate([
+    onDemand
+], AddOn.prototype, "shape", null);
+__decorate([
+    onDemand
+], AddOn.prototype, "direction", null);
+let DoubleMap = class DoubleMap {
+    constructor() {
+        this._map = new Map();
+        this._size = 0;
+    }
+    set(key1, key2, value) {
+        if (!this.has(key1, key2)) {
+            if (!this._map.has(key1))
+                this._map.set(key1, new Map());
+            if (!this._map.has(key2))
+                this._map.set(key2, new Map());
+            this._size++;
+        }
+        this._map.get(key1).set(key2, value);
+        this._map.get(key2).set(key1, value);
+        return this;
+    }
+    get [Symbol.toStringTag]() { return "DoubleMap"; }
+    has(...args) {
+        this._size;
+        if (args.length == 1)
+            return this._map.has(args[0]);
+        else
+            return this._map.has(args[0]) && this._map.get(args[0]).has(args[1]);
+    }
+    get(...args) {
+        this._size;
+        if (args.length == 1)
+            return this._map.get(args[0]);
+        else if (!this.has(args[0], args[1]))
+            return undefined;
+        else
+            return this._map.get(args[0]).get(args[1]);
+    }
+    get size() {
+        return this._size;
+    }
+    clear() {
+        this._map.clear();
+        this._size = 0;
+    }
+    forEach(callbackfn, thisArg) {
+        if (!thisArg)
+            thisArg = this;
+        for (let [k1, k2, v] of this.entries())
+            callbackfn.apply(thisArg, [v, k1, k2, this]);
+    }
+    delete(...args) {
+        if (args.length == 1) {
+            if (!this._map.has(args[0]))
+                return false;
+            this._size -= this._map.get(args[0]).size;
+            this._map.delete(args[0]);
+            for (let m of this._map.values())
+                m.delete(args[0]);
+            return true;
+        }
+        else {
+            if (!this.has(args[0], args[1]))
+                return false;
+            this._map.get(args[0]).delete(args[1]);
+            this._map.get(args[1]).delete(args[0]);
+            this._size--;
+            return true;
+        }
+    }
+    [Symbol.iterator]() { return this.entries(); }
+    *entries() {
+        for (let [k1, k2] of this.keys())
+            yield [k1, k2, this.get(k1, k2)];
+    }
+    *keys() {
+        this._size;
+        let temp = new Map();
+        for (let k1 of this._map.keys()) {
+            temp.set(k1, new Set());
+            for (let k2 of this._map.get(k1).keys()) {
+                if (temp.has(k2) && temp.get(k2).has(k1))
+                    continue;
+                temp.get(k1).add(k2);
+                yield [k1, k2];
+            }
+        }
+    }
+    firstKeys() {
+        this._size;
+        return this._map.keys();
+    }
+    *values() {
+        for (let [k1, k2] of this.keys())
+            yield this.get(k1, k2);
+    }
+};
+__decorate([
+    shrewd
+], DoubleMap.prototype, "_size", void 0);
+DoubleMap = __decorate([
+    shrewd
+], DoubleMap);
+class BaseMapping {
+    constructor(source, keyGen, ctor, dtor) {
+        this.source = source;
+        this.keyGen = keyGen;
+        this.ctor = ctor;
+        this.dtor = dtor;
+        this._map = new Map();
+    }
+    render() {
+        for (let [key, value] of this._map) {
+            if (this.dtor(key, value))
+                this._map.delete(key);
+        }
+        for (let group of this.source()) {
+            let key = this.keyGen(group);
+            if (!this._map.has(key))
+                this._map.set(key, this.ctor(group));
+        }
+        return new Map(this._map);
+    }
+    get(key) { return this.render().get(key); }
+    has(key) { return this.render().has(key); }
+    forEach(callbackfn, thisArg) {
+        return this.render().forEach(callbackfn, thisArg);
+    }
+    get size() { return this.render().size; }
+    [Symbol.iterator]() { return this.render()[Symbol.iterator](); }
+    entries() { return this.render().entries(); }
+    keys() { return this.render().keys(); }
+    values() { return this.render().values(); }
+    toJSON() {
+        return Array.from(this.values()).map(v => v.toJSON());
+    }
+}
+__decorate([
+    shrewd
+], BaseMapping.prototype, "render", null);
+let DoubleMapping = class DoubleMapping {
+    constructor(source, constructor) {
+        this._source = source;
+        this._constructor = constructor;
+        this._map = new DoubleMap();
+    }
+    dispose() {
+        Shrewd.terminate(this._map);
+        Shrewd.terminate(this);
+    }
+    has(...args) { return this._map.has.apply(this._map, args); }
+    get(...args) { return this._map.get.apply(this._map, args); }
+    get size() { return this._map.size; }
+    forEach(callbackfn, thisArg) {
+        return this._map.forEach(callbackfn, thisArg);
+    }
+    [Symbol.iterator]() { return this._map[Symbol.iterator](); }
+    entries() { return this._map.entries(); }
+    keys() { return this._map.keys(); }
+    firstKeys() { return this._map.firstKeys(); }
+    values() { return this._map.values(); }
+};
+__decorate([
+    shrewd({
+        renderer(map) {
+            for (let key of map.firstKeys()) {
+                if (key.disposed)
+                    map.delete(key);
+            }
+            let source = Array.from(this._source());
+            if (source.length > 1 && map.size == 0) {
+                map.set(source[0], source[1], this._constructor(source[0], source[1]));
+            }
+            for (let key of source) {
+                if (!map.has(key)) {
+                    let keys = Array.from(map.firstKeys());
+                    for (let k of keys)
+                        map.set(key, k, this._constructor(key, k));
+                }
+            }
+            return map;
+        }
+    })
+], DoubleMapping.prototype, "_map", void 0);
+DoubleMapping = __decorate([
+    shrewd
+], DoubleMapping);
+window.BigInt = window.BigInt || ((n) => n);
+const BIG1 = BigInt(1);
+class Fraction {
+    constructor(n, d = 1) {
+        if (n instanceof Fraction) {
+            this._p = n._p;
+            this._q = n._q * BigInt(d);
+        }
+        else if (typeof n == 'bigint' && typeof d == 'bigint') {
+            this._p = n;
+            this._q = d;
+        }
+        else if (typeof n == 'bigint' && d === 1) {
+            this._p = n;
+            this._q = BIG1;
+        }
+        else if (typeof n == 'number' && typeof d == 'number') {
+            if (Number.isSafeInteger(n) && Number.isSafeInteger(d)) {
+                this._p = BigInt(n);
+                this._q = BigInt(d);
+            }
+            else if (!Number.isFinite(n / d)) {
+                debugger;
+                throw new Error("Parameters are not valid");
+            }
+            else {
+                let f = Fraction.toFraction(n / d);
+                this._p = f._p;
+                this._q = f._q;
+            }
+        }
+        else {
+            debugger;
+            throw new Error("Parameters are not valid");
+        }
+    }
+    static toFraction(v, k2 = 1, k1 = 0) {
+        let n = Math.floor(v), r = v - n, k0 = n * k1 + k2;
+        if (r / k0 / ((1 - r) * k0 + k1) < Fraction.ERROR)
+            return new Fraction(n);
+        else
+            return Fraction.toFraction(1 / r, k1, k0).i().a(n);
+    }
+    get $numerator() { return this._p; }
+    get $denominator() { return this._q; }
+    get value() { return Number(this._p) / Number(this._q); }
+    toString() { this.smp(); return this._p + (this._q > 1 ? "/" + this._q : ""); }
+    c() { return new Fraction(this._p, this._q); }
+    smp() {
+        [this._p, this._q] = MathUtil.reduce(this._p, this._q);
+        return this._check();
+    }
+    n() { this._p = -this._p; return this; }
+    i() { [this._p, this._q] = [this._q, this._p]; return this; }
+    r() {
+        this._p = BigInt(Math.round(this.value));
+        this._q = BIG1;
+        return this;
+    }
+    a(v) {
+        if (v instanceof Fraction) {
+            this._p = this._p * v._q + this._q * v._p;
+            this._q *= v._q;
+        }
+        else if (Number.isInteger(v))
+            this._p += BigInt(v) * this._q;
+        else
+            this.a(new Fraction(v));
+        return this;
+    }
+    s(v) {
+        if (v instanceof Fraction) {
+            this._p = this._p * v._q - this._q * v._p;
+            this._q *= v._q;
+        }
+        else if (Number.isInteger(v))
+            this._p -= BigInt(v) * this._q;
+        else
+            this.s(new Fraction(v));
+        return this;
+    }
+    m(v) {
+        if (v instanceof Fraction) {
+            this._p *= v._p;
+            this._q *= v._q;
+        }
+        else if (Number.isInteger(v))
+            this._p *= BigInt(v);
+        else
+            this.m(new Fraction(v));
+        return this._check();
+    }
+    d(v) {
+        if (v instanceof Fraction) {
+            this._p *= v._q;
+            this._q *= v._p;
+        }
+        else if (Number.isInteger(v))
+            this._q *= BigInt(v);
+        else
+            this.d(new Fraction(v));
+        return this._check();
+    }
+    _check() {
+        if (this._q < 0) {
+            this._q = -this._q;
+            this._p = -this._p;
+        }
+        return this;
+    }
+    get neg() { return this.c().n(); }
+    get inv() { return this.c().i(); }
+    add(v) { return this.c().a(v); }
+    sub(v) { return this.c().s(v); }
+    mul(v) { return this.c().m(v); }
+    div(v) { return this.c().d(v); }
+    eq(v) {
+        if (v instanceof Fraction)
+            return this._p * v._q == this._q * v._p;
+        else
+            return this._p == this._q * BigInt(v);
+    }
+    ne(v) {
+        if (v instanceof Fraction)
+            return this._p * v._q != this._q * v._p;
+        else if (Number.isSafeInteger(v))
+            return this._p != this._q * BigInt(v);
+        else
+            return this.ne(new Fraction(v));
+    }
+    lt(v) {
+        if (v instanceof Fraction)
+            return this._p * v._q < this._q * v._p;
+        else if (Number.isSafeInteger(v))
+            return this._p < this._q * BigInt(v);
+        else
+            return this.lt(new Fraction(v));
+    }
+    gt(v) {
+        if (v instanceof Fraction)
+            return this._p * v._q > this._q * v._p;
+        else if (Number.isSafeInteger(v))
+            return this._p > this._q * BigInt(v);
+        else
+            return this.gt(new Fraction(v));
+    }
+    le(v) {
+        if (v instanceof Fraction)
+            return this._p * v._q <= this._q * v._p;
+        else if (Number.isSafeInteger(v))
+            return this._p <= this._q * BigInt(v);
+        else
+            return this.le(new Fraction(v));
+    }
+    ge(v) {
+        if (v instanceof Fraction)
+            return this._p * v._q >= this._q * v._p;
+        else if (Number.isSafeInteger(v))
+            return this._p >= this._q * BigInt(v);
+        else
+            return this.ge(new Fraction(v));
+    }
+    toJSON() {
+        return this.toString();
+    }
+}
+Fraction.ERROR = 1e-12;
+class Partition extends Partitioner {
+    constructor(config, data) {
+        super(config, data);
+        this.cornerMap = [];
+        for (let [i, o] of data.overlaps.entries()) {
+            for (let [j, c] of o.c.entries()) {
+                this.cornerMap.push([c, i, j]);
+            }
+        }
+    }
+    get intersectionCorners() {
+        return this.cornerMap.filter(m => {
+            let type = m[0].type;
+            return type == CornerType.side ||
+                type == CornerType.intersection;
+        });
+    }
+    get outCorners() {
+        return this.intersectionCorners.concat(this.cornerMap.filter(m => m[0].type == CornerType.flap));
+    }
+    get constraints() {
+        return this.cornerMap.filter(m => {
+            let type = m[0].type;
+            return type == CornerType.socket ||
+                type == CornerType.internal ||
+                type == CornerType.flap;
+        });
+    }
+    getOriginalDisplacement(pattern) {
+        let o = this.overlaps.find(o => o.c[0].type != CornerType.coincide);
+        return pattern.getConnectionTarget(o.c[0])
+            .sub(this.configuration.repository.stretch.origin);
+    }
+    get _sideConnectionTarget() {
+        let result = new Map();
+        let flaps = this.configuration.sheet.design.flapsById;
+        for (let [c, o, q1] of this.intersectionCorners) {
+            let ov = this.overlaps[o];
+            let parent = this.getParent(ov);
+            let [c1, c2] = [parent.c[0], parent.c[2]];
+            let [f1, f2] = [flaps.get(c1.e), flaps.get(c2.e)];
+            let quad1 = f1.quadrants[c1.q], d1 = 0;
+            let quad2 = f2.quadrants[c2.q], d2 = 0;
+            if (c.type == CornerType.intersection) {
+                let oriented = ov.c[0].e < 0;
+                let tree = this.configuration.sheet.design.tree;
+                let n3 = tree.node.get(c.e);
+                let t = tree.distTriple(f1.node, f2.node, n3);
+                if (oriented)
+                    d2 = t.d2 - f2.radius;
+                else
+                    d1 = t.d1 - f1.radius;
+                if (isNaN(d1) || isNaN(d2))
+                    debugger;
+            }
+            ov = this.getExposedOverlap(ov);
+            let p1 = quad1.getOverlapCorner(ov, parent, q1, d1);
+            let p2 = quad2.getOverlapCorner(ov, parent, opposite(q1), d2);
+            result.set(c, [p1, p2]);
+        }
+        return result;
+    }
+    getExposedOverlap(ov) {
+        var _a;
+        if (this.overlaps.length == 1)
+            return ov;
+        let result = clone(ov), parent = this.getParent(ov);
+        result.shift = (_a = result.shift) !== null && _a !== void 0 ? _a : { x: 0, y: 0 };
+        for (let o of this.overlaps)
+            if (o != ov) {
+                let p = this.getParent(o);
+                let w = result.ox + result.shift.x;
+                let h = result.oy + result.shift.y;
+                if (p.c[0].e == parent.c[0].e) {
+                    if (p.ox < parent.ox)
+                        result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
+                    if (p.oy < parent.oy)
+                        result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
+                }
+                if (p.c[2].e == parent.c[2].e) {
+                    if (p.ox < parent.ox)
+                        result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
+                    if (p.oy < parent.oy)
+                        result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
+                }
+            }
+        return result;
+    }
+    getParent(ov) {
+        return this.configuration.repository.structure[ov.parent];
+    }
+    getSideConnectionTarget(point, c, q) {
+        let [p1, p2] = this._sideConnectionTarget.get(c);
+        if (p1._x.gt(p2._x))
+            [p1, p2] = [p2, p1];
+        if (q === undefined) {
+            if (point._x.le(p1._x))
+                return p1;
+            if (point._x.ge(p2._x))
+                return p2;
+            return null;
+        }
+        else {
+            return q == 0 || q == 3 ? p1 : p2;
+        }
+    }
+    toJSON() {
+        let result = {
+            overlaps: this.overlaps,
+            strategy: this.strategy
+        };
+        let map = this.configuration.jidMap;
+        if (map.size > 0) {
+            result.overlaps = clone(result.overlaps);
+            for (let o of result.overlaps) {
+                for (let c of o.c)
+                    if (c.e !== undefined && c.e >= 0)
+                        c.e = map.get(c.e);
+            }
+        }
+        return result;
+    }
+}
+__decorate([
+    onDemand
+], Partition.prototype, "intersectionCorners", null);
+__decorate([
+    onDemand
+], Partition.prototype, "outCorners", null);
+__decorate([
+    onDemand
+], Partition.prototype, "constraints", null);
+__decorate([
+    shrewd
+], Partition.prototype, "_sideConnectionTarget", null);
+let Mapping = class Mapping extends BaseMapping {
+    constructor(source, constructor) {
+        super(source, k => k, constructor, (k, v) => v.disposed);
+    }
+};
+Mapping = __decorate([
+    shrewd
+], Mapping);
+let GroupMapping = class GroupMapping extends BaseMapping {
+    constructor(source, keyGen, ctor) {
+        super(source, keyGen, ctor, (k, v) => v.disposed);
+    }
+};
+GroupMapping = __decorate([
+    shrewd
+], GroupMapping);
+class Mountable extends Disposible {
+    constructor(parent) {
+        super();
+        this._oldStudio = null;
+        this.mountTarget = parent;
+    }
+    get shouldDispose() {
+        return super.shouldDispose ||
+            (this.mountTarget instanceof Mountable ? this.mountTarget.disposed : false);
+    }
+    get $studio() {
+        if (this.disposed || !this.isActive)
+            return null;
+        else if (!(this.mountTarget instanceof Mountable))
+            return this.mountTarget;
+        else
+            return this.mountTarget.$studio;
+    }
+    mountEvents() {
+        if (this.$studio !== this._oldStudio) {
+            if (this.$studio)
+                this.onMount(this.$studio);
+            if (this._oldStudio)
+                this.onDismount(this._oldStudio);
+            this._oldStudio = this.$studio;
+        }
+    }
+    onDispose() {
+        if (this._oldStudio)
+            this.onDismount(this._oldStudio);
+        super.onDispose();
+    }
+    get isActive() { return true; }
+    static isActive(m) { return m.isActive; }
+    onMount(studio) { }
+    onDismount(studio) { }
+}
+__decorate([
+    shrewd
+], Mountable.prototype, "$studio", null);
+__decorate([
+    shrewd
+], Mountable.prototype, "mountEvents", null);
+let Tree = class Tree extends Disposible {
+    constructor(design, edges) {
+        super(design);
+        this.node = new Map();
+        this.edge = new DoubleMap();
+        this.path = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePath(n1, n2));
+        this.nextId = 0;
+        this.jidMap = new Map();
+        this.design = design;
+        while (edges === null || edges === void 0 ? void 0 : edges.length) {
+            let remain = [], ok = false;
+            for (let e of edges) {
+                if (this.addEdge(e.n1, e.n2, e.length))
+                    ok = true;
+                else {
+                    remain.push(e);
+                }
+            }
+            if (!ok)
+                break;
+            edges = remain;
+        }
+    }
+    onDispose() {
+        Shrewd.terminate(this.edge);
+        this.path.dispose();
+    }
+    get leaf() {
+        var set = new Set();
+        for (let node of this.node.values())
+            if (node.degree == 1)
+                set.add(node);
+        return set;
+    }
+    generateJID() {
+        let arr = Array.from(this.node.values()).sort((a, b) => a.id - b.id), i = 0;
+        for (let n of arr)
+            this.jidMap.set(n.id, n.jid = i++);
+    }
+    dist(n1, n2) {
+        let path = this.path.get(n1, n2);
+        return path ? path.length : NaN;
+    }
+    getOrAddNode(n) {
+        let N;
+        if (this.node.has(n))
+            N = this.node.get(n);
+        else {
+            this.node.set(n, N = new TreeNode(this, n));
+            if (n >= this.nextId)
+                this.nextId = n + 1;
+        }
+        return N;
+    }
+    split(e) {
+        let N = this.getOrAddNode(this.nextId);
+        let { n1, n2 } = e;
+        this.edge.delete(n1, n2);
+        this.edge.set(N, n1, new TreeEdge(N, n1, Math.ceil(e.length / 2)));
+        this.edge.set(N, n2, new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
+        e.dispose();
+        return N;
+    }
+    deleteAndMerge(e) {
+        let N = this.getOrAddNode(this.nextId);
+        let { n1, n2, a1, a2 } = e;
+        this.edge.delete(n1, n2);
+        for (let edge of a1) {
+            let n = edge.n(n1);
+            this.edge.delete(n, n1);
+            this.edge.set(N, n, new TreeEdge(N, n, edge.length));
+        }
+        for (let edge of a2) {
+            let n = edge.n(n2);
+            this.edge.delete(n, n2);
+            this.edge.set(N, n, new TreeEdge(N, n, edge.length));
+        }
+        n1.dispose(true);
+        n2.dispose(true);
+        return N;
+    }
+    deleteAndJoin(n) {
+        let edges = n.edges;
+        if (edges.length != 2) {
+            console.warn(`Incorrectly calling delete-and-join at [${n.id}].`);
+            return;
+        }
+        let e1 = edges[0], e2 = edges[1];
+        let N1 = e1.n(n), N2 = e2.n(n);
+        let edge = new TreeEdge(N1, N2, e1.length + e2.length);
+        this.edge.set(N1, N2, edge);
+        n.dispose(true);
+        return edge;
+    }
+    addLeafAt(n, length) {
+        let id = this.nextId;
+        this.addEdge(n, id, length);
+        return this.node.get(id);
+    }
+    addEdge(n1, n2, length) {
+        let has1 = this.node.has(n1), has2 = this.node.has(n2);
+        if (this.node.size != 0 && !has1 && !has2) {
+            console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
+            return false;
+        }
+        let N1 = this.getOrAddNode(n1), N2 = this.getOrAddNode(n2);
+        if (this.edge.has(N1, N2)) {
+            this.edge.get(N1, N2).length = length;
+            return false;
+        }
+        else if (has1 && has2) {
+            console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
+            return false;
+        }
+        let edge = new TreeEdge(N1, N2, length);
+        this.edge.set(N1, N2, edge);
+        return true;
+    }
+    distTriple(n1, n2, n3) {
+        let d12 = this.dist(n1, n2);
+        let d13 = this.dist(n1, n3);
+        let d23 = this.dist(n2, n3);
+        let total = (d12 + d13 + d23) / 2;
+        return {
+            d1: total - d23,
+            d2: total - d13,
+            d3: total - d12
+        };
+    }
+};
+__decorate([
+    shrewd({
+        renderer(v) {
+            for (let [id, node] of v)
+                if (node.disposed)
+                    v.delete(id);
+            return v;
+        }
+    })
+], Tree.prototype, "node", void 0);
+__decorate([
+    shrewd({
+        renderer(v) {
+            for (let node of v.firstKeys())
+                if (node.disposed)
+                    v.delete(node);
+            return v;
+        }
+    })
+], Tree.prototype, "edge", void 0);
+__decorate([
+    shrewd
+], Tree.prototype, "leaf", null);
+Tree = __decorate([
+    shrewd
+], Tree);
+class Couple {
+    constructor(...p) {
+        if (p[1] === undefined)
+            p = [p[0]._x, p[0]._y];
+        this._x = new Fraction(p[0]);
+        this._y = new Fraction(p[1]);
+    }
+    get x() { return this._x.value; }
+    set x(v) { this._x = new Fraction(v); }
+    get y() { return this._y.value; }
+    set y(v) { this._y = new Fraction(v); }
+    smp() {
+        this._x.smp();
+        this._y.smp();
+        return this;
+    }
+    eq(c) {
+        if (!c)
+            return false;
+        return this._x.eq(c._x) && this._y.eq(c._y);
+    }
+    clone() {
+        return new this.constructor(this._x, this._y);
+    }
+    toString() { return "(" + this._x + ", " + this._y + ")"; }
+    toJSON() {
+        return this.toString();
+    }
+    set(x, y = 0) {
+        if (x instanceof Couple) {
+            this._x = new Fraction(x._x);
+            this._y = new Fraction(x._y);
+        }
+        else {
+            this._x = new Fraction(x);
+            this._y = new Fraction(y);
+        }
+        ;
+        return this;
+    }
+    add(v) {
+        return new this.constructor(this._x.add(v._x), this._y.add(v._y)).smp();
+    }
+    addBy(v) {
+        this._x.a(v._x);
+        this._y.a(v._y);
+        return this.smp();
+    }
+    round(scale = 1) {
+        this._x.d(scale).r().m(scale);
+        this._y.d(scale).r().m(scale);
+        return this.smp();
+    }
+    range(min_X, max_X, min_Y, max_Y) {
+        if (this._x.lt(min_X))
+            this._x = new Fraction(min_X);
+        if (this._x.gt(max_X))
+            this._x = new Fraction(max_X);
+        if (this._y.lt(min_Y))
+            this._y = new Fraction(min_Y);
+        if (this._y.gt(max_Y))
+            this._y = new Fraction(max_Y);
+        return this;
+    }
+    toIPoint() {
+        return { x: this.x, y: this.y };
+    }
+}
+class DesignBase extends Mountable {
+    constructor(studio, profile) {
+        super(studio);
+        this.id = DesignBase._id++;
+        this.dragging = false;
+        this.edges = new Mapping(() => this.tree.edge.values(), e => new Edge(this.TreeSheet, this.vertices.get(e.n1), this.vertices.get(e.n2), e));
+        this.rivers = new Mapping(() => [...this.tree.edge.values()].filter(e => e.isRiver), e => new River(this.LayoutSheet, e));
+        this.vertices = new Mapping(() => this.tree.node.values(), n => new Vertex(this.TreeSheet, n));
+        this.flaps = new Mapping(() => this.tree.leaf, l => new Flap(this.LayoutSheet, l));
+        this.junctions = new DoubleMapping(() => this.flaps.values(), (f1, f2) => new Junction(this.LayoutSheet, f1, f2));
+        this.stretches = new Mapping(() => this.teams.keys(), signature => new Stretch(this.LayoutSheet, signature));
+        this.data = deepCopy(Migration.getSample(), profile);
+        if (this.data.tree.nodes.length < 3)
+            throw new Error("Invalid format.");
+        this.options = new OptionManager(this.data);
+    }
+    sortJEdge() {
+        let edges = this.edges.toJSON();
+        if (edges.length == 0)
+            return [];
+        let nodes = new Set();
+        let result = [];
+        while (edges.length) {
+            let e = edges.shift();
+            if (nodes.size == 0 || nodes.has(e.n1) || nodes.has(e.n2)) {
+                result.push(e);
+                nodes.add(e.n1);
+                nodes.add(e.n2);
+            }
+            else
+                edges.push(e);
+        }
+        return result;
+    }
+    get isActive() {
+        return (this instanceof Design) && this.mountTarget.design == this;
+    }
+    get patternNotFound() {
+        return [...this.stretches.values()].some(s => s.isTotallyValid && s.pattern == null);
+    }
+    onDispose() {
+        Shrewd.terminate(this.edges);
+        Shrewd.terminate(this.vertices);
+        Shrewd.terminate(this.rivers);
+        Shrewd.terminate(this.flaps);
+        Shrewd.terminate(this.stretches);
+        this.junctions.dispose();
+    }
+    get validJunctions() {
+        return [...this.junctions.values()].filter(j => j.isValid);
+    }
+    get teams() {
+        let arr;
+        let set = new Set(this.activeJunctions);
+        let result = new Map();
+        function add(junction) {
+            if (!set.has(junction))
+                return;
+            arr.push(junction);
+            set.delete(junction);
+            for (let j of junction.neighbors)
+                add(j);
+        }
+        while (set.size > 0) {
+            arr = [];
+            add(set.values().next().value);
+            arr.sort(Junction.sort);
+            result.set(Junction.createTeamId(arr, f => f.node.id), arr);
+        }
+        return result;
+    }
+    get devices() {
+        let result = [];
+        for (let s of this.stretches.values())
+            result.push(...s.devices);
+        return result;
+    }
+    get activeJunctions() {
+        return this.validJunctions.filter(j => !j.isCovered);
+    }
+    get junctionsByQuadrant() {
+        return DesignBase.ToQuadrantMap(this.junctions.values());
+    }
+    get activeJunctionsByQuadrant() {
+        return DesignBase.ToQuadrantMap(this.activeJunctions);
+    }
+    static ToQuadrantMap(junctions) {
+        let result = new Map();
+        function add(q, j) {
+            let arr = result.get(q);
+            if (!arr)
+                result.set(q, arr = []);
+            arr.push(j);
+        }
+        for (let j of junctions) {
+            add(j.q1, j);
+            add(j.q2, j);
+        }
+        return result;
+    }
+    get stretchByQuadrant() {
+        let result = new Map();
+        for (let s of this.stretches.values())
+            if (s.isActive) {
+                for (let o of s.junctions) {
+                    result.set(o.q1, s);
+                    result.set(o.q2, s);
+                }
+            }
+        return result;
+    }
+    getStretchByQuadrant(quadrant) {
+        var _a;
+        return (_a = this.stretchByQuadrant.get(quadrant)) !== null && _a !== void 0 ? _a : null;
+    }
+    get flapsById() {
+        let result = new Map();
+        for (let f of this.flaps.values())
+            result.set(f.node.id, f);
+        return result;
+    }
+    get openAnchors() {
+        let result = new Map();
+        for (let s of this.activeStretches) {
+            let f = s.fx * s.fy;
+            for (let d of s.pattern.devices) {
+                for (let a of d.openAnchors) {
+                    let key = f + "," + (a.x - f * a.y);
+                    let arr = result.get(key);
+                    if (!arr)
+                        result.set(key, arr = []);
+                    arr.push(a);
+                }
+            }
+        }
+        return result;
+    }
+    get activeStretches() {
+        return [...this.stretches.values()].filter(s => s.isActive && !!s.pattern);
+    }
+    get overflow() {
+        return Math.max(...[
+            ...this.flaps.values(),
+            ...this.edges.values(),
+            ...this.vertices.values()
+        ].map(c => c.view.overflow));
+    }
+}
+DesignBase._id = 0;
+__decorate([
+    shrewd
+], DesignBase.prototype, "dragging", void 0);
+__decorate([
+    shrewd
+], DesignBase.prototype, "isActive", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "patternNotFound", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "validJunctions", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "teams", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "devices", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "activeJunctions", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "junctionsByQuadrant", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "activeJunctionsByQuadrant", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "stretchByQuadrant", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "flapsById", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "openAnchors", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "activeStretches", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "overflow", null);
+class SheetObject extends Mountable {
+    constructor(sheet) {
+        super(sheet);
+        this.sheet = sheet;
+    }
+    get design() {
+        return this.sheet.design;
+    }
+}
+let Sheet = class Sheet extends Mountable {
+    constructor(design, sheet, ...maps) {
+        super(design);
+        this._activeControlCache = [];
+        this.indepRect = new Rectangle(Point.ZERO, Point.ZERO);
+        this.width = sheet.width;
+        this.height = sheet.height;
+        this.scale = sheet.scale;
+        this._controlMaps = maps;
+        this.view = new SheetView(this);
+    }
+    get controls() {
+        var result = [];
+        for (let map of this._controlMaps)
+            result.push(...map());
+        return result;
+    }
+    get activeControls() {
+        if (!this.design.dragging) {
+            this._activeControlCache = this.controls.filter(c => Mountable.isActive(c));
+        }
+        return this._activeControlCache;
+    }
+    constraint(v, p) {
+        return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
+    }
+    get design() {
+        return this.mountTarget;
+    }
+    get isActive() {
+        return this.design.sheet == this;
+    }
+    get displayScale() {
+        return this.$studio ? this.$studio.$display.scale : 1;
+    }
+    toJSON() {
+        return { width: this.width, height: this.height, scale: this.scale };
+    }
+    get size() {
+        return Math.max(this.width, this.height);
+    }
+    contains(p) {
+        return 0 <= p.x && p.x <= this.width && 0 <= p.y && p.y <= this.height;
+    }
+    get independents() {
+        return this.controls.filter((c) => c instanceof IndependentDraggable);
+    }
+    getIndepRect() {
+        let x1 = Number.POSITIVE_INFINITY, y1 = Number.POSITIVE_INFINITY;
+        let x2 = Number.NEGATIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;
+        for (let i of this.independents) {
+            let l = i.location;
+            if (l.x < x1)
+                x1 = l.x;
+            if (l.x > x2)
+                x2 = l.x;
+            if (l.y < y1)
+                y1 = l.y;
+            if (l.y > y2)
+                y2 = l.y;
+        }
+        this.indepRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
+    }
+};
+__decorate([
+    shrewd
+], Sheet.prototype, "controls", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "activeControls", null);
+__decorate([
+    action({
+        validator(v) {
+            let ok = v >= 8 && v >= this.indepRect.width;
+            let d = v - this.indepRect.right;
+            if (ok && d < 0)
+                for (let i of this.independents)
+                    i.location.x += d;
+            return ok;
+        }
+    })
+], Sheet.prototype, "width", void 0);
+__decorate([
+    action({
+        validator(v) {
+            let ok = v >= 8 && v >= this.indepRect.height;
+            let d = v - this.indepRect.top;
+            if (ok && d < 0)
+                for (let i of this.independents)
+                    i.location.y += d;
+            return ok;
+        }
+    })
+], Sheet.prototype, "height", void 0);
+__decorate([
+    action({
+        validator(v) {
+            var _a, _b;
+            return v >= Math.min(10, Math.ceil((_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.getAutoScale()) !== null && _b !== void 0 ? _b : 10));
+        }
+    })
+], Sheet.prototype, "scale", void 0);
+__decorate([
+    shrewd
+], Sheet.prototype, "isActive", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "displayScale", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "size", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "independents", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "getIndepRect", null);
+Sheet = __decorate([
+    shrewd
+], Sheet);
+class View extends Mountable {
+    constructor() {
+        super(...arguments);
+        this._paths = [];
+    }
+    draw() {
+        this.mountEvents();
+        if (this.$studio) {
+            this.$studio.$display.render();
+            this.render();
+        }
+    }
+    $addItem(layer, item) {
+        this._paths.push([layer, item]);
+    }
+    onMount(studio) {
+        for (let [l, p] of this._paths)
+            studio.$display.project.layers[l].addChild(p);
+    }
+    onDismount(studio) {
+        for (let [l, p] of this._paths)
+            p.remove();
+    }
+    contains(point) {
+        return false;
+    }
+}
+__decorate([
+    shrewd
+], View.prototype, "draw", null);
+let TreeNode = class TreeNode extends Disposible {
+    constructor(tree, id) {
+        super(tree);
+        this.name = "";
+        this.tree = tree;
+        this.id = id;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.tree.disposed;
+    }
+    dispose(force = false) {
+        if (force || this.degree == 1)
+            super.dispose();
+        else if (this.degree == 2)
+            return this.tree.deleteAndJoin(this);
+        else if (this.degree != 1)
+            console.warn(`Node [${this.name ? this.name : this.id}] is not a leaf.`);
+        return undefined;
+    }
+    addLeaf(length) {
+        return this.tree.addLeafAt(this.id, length);
+    }
+    get design() { return this.tree.design; }
+    get edges() {
+        let e = this.tree.edge.get(this);
+        return e ? Array.from(e.values()) : [];
+    }
+    get degree() {
+        return this.edges.length;
+    }
+    get firstEdge() {
+        return this.edges[0];
+    }
+    get radius() {
+        return this.degree == 1 ? this.edges[0].length : NaN;
+    }
+};
+__decorate([
+    action
+], TreeNode.prototype, "name", void 0);
+__decorate([
+    shrewd
+], TreeNode.prototype, "edges", null);
+__decorate([
+    shrewd
+], TreeNode.prototype, "degree", null);
+__decorate([
+    shrewd
+], TreeNode.prototype, "firstEdge", null);
+__decorate([
+    shrewd
+], TreeNode.prototype, "radius", null);
+TreeNode = __decorate([
+    shrewd
+], TreeNode);
+let TreeEdge = class TreeEdge extends Disposible {
+    constructor(n1, n2, length) {
+        super();
+        this._n1 = n1;
+        this._n2 = n2;
+        this.length = length;
+    }
+    get design() { return this.n1.design; }
+    get shouldDispose() {
+        return super.shouldDispose || this._n1.disposed || this._n2.disposed;
+    }
+    get isRiver() {
+        return this.g1.length > 1 && this.g2.length > 1;
+    }
+    adjacentEdges(n) { return n.edges.filter(e => e != this); }
+    get a1() { return this.adjacentEdges(this._n1); }
+    get a2() { return this.adjacentEdges(this._n2); }
+    group(n, edges) {
+        let result = [n];
+        for (let edge of edges)
+            result.push(...edge.g(n));
+        return result;
+    }
+    get g1() { return this.group(this._n1, this.a1); }
+    get g2() { return this.group(this._n2, this.a2); }
+    g(n) { return n == this._n1 ? this.g2 : this.g1; }
+    get l1() {
+        return this.g1.filter(n => n.degree == 1);
+    }
+    get l2() {
+        return this.g2.filter(n => n.degree == 1);
+    }
+    get t1() {
+        return this.a1.map(e => e.t(this._n1) + e.length).reduce((n, x) => n + x, 0);
+    }
+    get t2() {
+        return this.a2.map(e => e.t(this._n2) + e.length).reduce((n, x) => n + x, 0);
+    }
+    t(n) { return n == this._n1 ? this.t2 : this.t1; }
+    get p1() {
+        return Math.max(...this.l1.map(n => n.tree.dist(n, this.n1)));
+    }
+    get p2() {
+        return Math.max(...this.l2.map(n => n.tree.dist(n, this.n2)));
+    }
+    get wrapSide() {
+        if (!this.isRiver)
+            return 0;
+        if (this.p1 > this.p2)
+            return 2;
+        if (this.p1 < this.p2)
+            return 1;
+        if (this.t1 > this.t2)
+            return 2;
+        if (this.t1 < this.t2)
+            return 1;
+        if (this.g1.length > this.g2.length)
+            return 1;
+        if (this.g1.length < this.g2.length)
+            return 2;
+        return 0;
+    }
+    get n1() { return this._n1; }
+    get n2() { return this._n2; }
+    n(n) { return n == this._n1 ? this._n2 : this._n1; }
+};
+__decorate([
+    action({ validator: (v) => v > 0 })
+], TreeEdge.prototype, "length", void 0);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "isRiver", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "a1", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "a2", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "g1", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "g2", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "l1", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "l2", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "t1", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "t2", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "p1", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "p2", null);
+__decorate([
+    shrewd
+], TreeEdge.prototype, "wrapSide", null);
+TreeEdge = __decorate([
+    shrewd
+], TreeEdge);
+let TreePath = class TreePath extends Disposible {
+    constructor(n1, n2) {
+        super();
+        this._n1 = n1;
+        this._n2 = n2;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this._n1.disposed || this._n2.disposed;
+    }
+    get edges() {
+        let result = [];
+        let now = this._n1;
+        let ok = true;
+        while (now != this._n2 && ok) {
+            ok = false;
+            for (let e of now.edges) {
+                if (e.g(now).includes(this._n2)) {
+                    ok = true;
+                    result.push(e);
+                    now = e.n(now);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    get length() {
+        return this.edges.reduce((l, e) => l + e.length, 0);
+    }
+};
+__decorate([
+    shrewd
+], TreePath.prototype, "edges", null);
+__decorate([
+    shrewd
+], TreePath.prototype, "length", null);
+TreePath = __decorate([
+    shrewd
+], TreePath);
+class Point extends Couple {
+    static get ZERO() {
+        return new Point(0, 0);
+    }
+    constructor(...p) {
+        if (p[1] === undefined)
+            super(p[0].x, p[0].y);
+        else
+            super(...p);
+    }
+    dist(p) {
+        return this.sub(p).length;
+    }
+    paramDist(p) {
+        return Math.max(Math.abs(p.x - this.x), Math.abs(p.y - this.y));
+    }
+    sub(c) {
+        if (c instanceof Vector)
+            return new Point(this._x.sub(c._x), this._y.sub(c._y)).smp();
+        else if (c instanceof Point)
+            return new Vector(this._x.sub(c._x), this._y.sub(c._y)).smp();
+        else
+            return new Vector(this._x.sub(c.x), this._y.sub(c.y)).smp();
+    }
+    subBy(v) {
+        this._x.s(v.x);
+        this._y.s(v.y);
+        return this;
+    }
+    diagonalXRange(min_X, max_X, reversed) {
+        if (this._x.lt(min_X))
+            this.setDiagonalX(min_X, reversed);
+        if (this._x.gt(max_X))
+            this.setDiagonalX(max_X, reversed);
+    }
+    toPaper() {
+        return new paper.Point(this.x, this.y);
+    }
+    setDiagonalX(x, reversed) {
+        var s = this._x.sub(x);
+        this._x.s(s);
+        if (reversed)
+            this._y.a(s);
+        else
+            this._y.s(s);
+    }
+    eq(p) {
+        if (p instanceof Point || !p)
+            return super.eq(p);
+        return this.x == p.x && this.y == p.y;
+    }
+    get isIntegral() {
+        return this._x.$denominator === BIG1 && this._y.$denominator === BIG1;
+    }
+    transform(fx, fy) {
+        return new Point(this._x.mul(fx), this._y.mul(fy));
+    }
+}
+class Vector extends Couple {
+    static get ZERO() {
+        return new Vector(0, 0);
+    }
+    constructor(...p) {
+        if (p[1] === undefined)
+            super(p[0].x, p[0].y);
+        else
+            super(...p);
+    }
+    get length() {
+        return Math.sqrt(this.dot(this));
+    }
+    get slope() {
+        return this._y.div(this._x);
+    }
+    rotate90() {
+        return new Vector(this._y.neg, this._x);
+    }
+    normalize() {
+        return this.scale(new Fraction(this.length).inv);
+    }
+    scale(x, y) {
+        if (x instanceof Couple)
+            return this.scale(x._x, x._y);
+        if (!y)
+            y = x;
+        return new Vector(this._x.mul(x), this._y.mul(y)).smp();
+    }
+    dot(v) {
+        return this._x.mul(v._x).a(this._y.mul(v._y)).value;
+    }
+    get neg() {
+        return new Vector(this._x.neg, this._y.neg);
+    }
+    get angle() {
+        return Math.atan2(this.y, this.x);
+    }
+    reduce() {
+        let [nx, ny] = [this._x.$numerator, this._y.$numerator];
+        let [dx, dy] = [this._x.$denominator, this._y.$denominator];
+        let [x, y] = MathUtil.reduce(nx * dy, ny * dx);
+        return new Vector(Number(x), Number(y));
+    }
+    doubleAngle(fx = 1) {
+        let { x, y } = this.reduce();
+        [x, y] = MathUtil.reduce(x * x - y * y, 2 * x * y);
+        return new Vector(fx * x, fx * y);
+    }
+    parallel(v) {
+        return this._x.mul(v._y).eq(this._y.mul(v._x));
+    }
+    static bisector(v1, v2) {
+        let [x1, y1] = MathUtil.reduce(v1.x, v1.y);
+        let [x2, y2] = MathUtil.reduce(v2.x, v2.y);
+        let z1 = Math.sqrt(x1 * x1 + y1 * y1);
+        let z2 = Math.sqrt(x2 * x2 + y2 * y2);
+        return new Vector(x1 * z2 + x2 * z1, y1 * z2 + y2 * z1);
+    }
+}
+let Design = class Design extends DesignBase {
+    constructor(studio, profile) {
+        super(studio, profile);
+        this._modified = false;
+        this.LayoutSheet = new Sheet(this, this.data.layout.sheet, () => this.flaps.values(), () => this.rivers.values(), () => this.stretches.values(), () => this.devices);
+        this.TreeSheet = new Sheet(this, this.data.tree.sheet, () => this.edges.values(), () => this.vertices.values());
+        this.title = this.data.title;
+        ;
+        this.fullscreen = this.data.fullscreen;
+        this.description = this.data.description;
+        this.mode = this.data.mode;
+        this.tree = new Tree(this, this.data.tree.edges);
+    }
+    get sheet() {
+        return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
+    }
+    get modified() {
+        return this._modified;
+    }
+    get design() {
+        return this;
+    }
+    notifySave() {
+        this._modified = false;
+    }
+    takeAction(action) {
+        this._modified = true;
+        action();
+    }
+    fieldChange(obj, prop, oldValue, newValue) {
+        this._modified = true;
+    }
+    toJSON() {
+        this.tree.generateJID();
+        let result = {
+            title: this.title,
+            description: this.description,
+            fullscreen: this.fullscreen,
+            version: Migration.current,
+            mode: this.mode,
+            layout: {
+                sheet: this.LayoutSheet.toJSON(),
+                flaps: this.flaps.toJSON(),
+                stretches: this.stretches.toJSON()
+            },
+            tree: {
+                sheet: this.TreeSheet.toJSON(),
+                nodes: this.vertices.toJSON(),
+                edges: this.sortJEdge()
+            }
+        };
+        this.tree.jidMap.clear();
+        return result;
+    }
+    deleteVertices(vertices) {
+        this.takeAction(() => {
+            let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
+            while (this.vertices.size > 3) {
+                let v = arr.find(v => v.node.degree == 1);
+                if (!v)
+                    break;
+                v.node.dispose();
+                arr.splice(arr.indexOf(v), 1);
+                Shrewd.commit();
+            }
+        });
+    }
+    deleteFlaps(flaps) {
+        this.takeAction(() => {
+            for (let f of flaps) {
+                if (this.vertices.size == 3)
+                    break;
+                f.node.dispose();
+                Shrewd.commit();
+            }
+        });
+    }
+    clearCPSelection() {
+        for (let c of this.LayoutSheet.controls)
+            c.selected = false;
+    }
+    clearTreeSelection() {
+        for (let c of this.TreeSheet.controls)
+            c.selected = false;
+    }
+    flapToVertex(flaps) {
+        this.clearTreeSelection();
+        for (let f of flaps) {
+            let v = this.vertices.get(f.node);
+            if (v)
+                v.selected = true;
+        }
+        this.mode = "tree";
+    }
+    vertexToFlap(vertices) {
+        this.clearCPSelection();
+        for (let v of vertices) {
+            let f = this.flaps.get(v.node);
+            if (f)
+                f.selected = true;
+        }
+        this.mode = "layout";
+    }
+    riverToEdge(river) {
+        this.clearTreeSelection();
+        let e = this.edges.get(river.edge);
+        if (e)
+            e.selected = true;
+        this.mode = "tree";
+    }
+    edgeToRiver(edge) {
+        this.clearCPSelection();
+        let te = edge.edge;
+        if (te.isRiver) {
+            let r = this.rivers.get(te);
+            if (r)
+                r.selected = true;
+        }
+        else {
+            let n = te.n1.degree == 1 ? te.n1 : te.n2;
+            let f = this.flaps.get(n);
+            if (f)
+                f.selected = true;
+        }
+        this.mode = "layout";
+    }
+};
+__decorate([
+    shrewd
+], Design.prototype, "fullscreen", void 0);
+__decorate([
+    shrewd
+], Design.prototype, "mode", void 0);
+__decorate([
+    action
+], Design.prototype, "description", void 0);
+__decorate([
+    action
+], Design.prototype, "title", void 0);
+__decorate([
+    shrewd
+], Design.prototype, "sheet", null);
+Design = __decorate([
+    shrewd
+], Design);
+class Control extends SheetObject {
+    constructor() {
+        super(...arguments);
+        this.selected = false;
+    }
+    selectableWith(c) { return false; }
+    get dragSelectAnchor() {
+        return null;
+    }
+    toggle() {
+        this.selected = !this.selected;
+    }
+    contains(point) {
+        return false;
+    }
+    static isDragSelectable(c) {
+        return c.dragSelectAnchor != null;
+    }
+}
+__decorate([
+    shrewd
+], Control.prototype, "selected", void 0);
+var Quadrant_1;
+let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
+    constructor(sheet, flap, q) {
+        super(sheet);
+        this.flap = flap;
+        this.q = q;
+        this.qv = Quadrant_1.QV[q];
+        this.sv = Quadrant_1.SV[q];
+        this.pv = Quadrant_1.SV[(q + 1) % 4];
+        this.fx = this.q == 0 || this.q == 3 ? 1 : -1;
+        this.fy = this.q == 0 || this.q == 1 ? 1 : -1;
+    }
+    getOverlapCorner(ov, parent, q, d) {
+        var _a, _b, _c, _d;
+        let r = this.flap.radius + d;
+        let sx = (_b = (_a = ov.shift) === null || _a === void 0 ? void 0 : _a.x) !== null && _b !== void 0 ? _b : 0;
+        let sy = (_d = (_c = ov.shift) === null || _c === void 0 ? void 0 : _c.y) !== null && _d !== void 0 ? _d : 0;
+        if (this.flap.node.id != parent.c[0].e) {
+            sx = parent.ox - (ov.ox + sx);
+            sy = parent.oy - (ov.oy + sy);
+        }
+        return new Point(this.x(r - (q == 3 ? 0 : ov.ox) - sx), this.y(r - (q == 1 ? 0 : ov.oy) - sy));
+    }
+    makeContour(d) {
+        let r = this.flap.radius + d;
+        let v = this.sv.scale(r);
+        let startPt = this.getStart(r);
+        let endPt = this.point.add(v.rotate90());
+        let pattern = this.pattern;
+        let trace;
+        if (!pattern) {
+            trace = [startPt, this.point.add(this.qv.scale(r))];
+        }
+        else {
+            let lines = pattern.linesForTracing[this.q].concat();
+            let junctions = pattern.stretch.junctions;
+            let end = this.findNextDelta(junctions, false);
+            let lead = this.findLead(junctions, r, lines);
+            let start = lead ? this.findNextDelta(junctions, true) : undefined;
+            trace = Trace.create(lines, lead !== null && lead !== void 0 ? lead : startPt, this.pv, end !== null && end !== void 0 ? end : new Line(endPt, this.pv), start);
+            if (start && this.outside(trace[0], r, this.q % 2 != 1)) {
+                trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
+            }
+            if (end && this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
+                trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
+            }
+        }
+        return trace.map(p => p.toPaper());
+    }
+    outside(p, r, x) {
+        return x ? p.x * this.fx > this.x(r) * this.fx : p.y * this.fy > this.y(r) * this.fy;
+    }
+    getStart(d) {
+        return this.point.add(this.sv.scale(d));
+    }
+    y(d) {
+        return this.point.y + this.fy * d;
+    }
+    x(d) {
+        return this.point.x + this.fx * d;
+    }
+    findNextDelta(junctions, cw) {
+        let find = this.findJoinNextQ(junctions, cw, true);
+        if (!find)
+            return undefined;
+        let { joinQ, nextQ, mode } = find;
+        let { d1, d2 } = this.design.tree.distTriple(this.flap.node, nextQ.flap.node, joinQ.flap.node);
+        let int = mode ? new Point(nextQ.x(d2), this.y(d1)) : new Point(this.x(d1), nextQ.y(d2));
+        return new Line(int, this.qv);
+    }
+    findJoinNextQ(junctions, cw, next) {
+        if (junctions.length == 1)
+            return undefined;
+        let mode = !!(this.q % 2) == cw;
+        let key = mode ? "oy" : "ox";
+        let minJ = Junction.findMinMax(junctions.filter(j => j.q1 == this || j.q2 == this), key, -1);
+        let joinQ = minJ.q1 == this ? minJ.q2 : minJ.q1;
+        if (joinQ.activeJunctions.length == 1)
+            return undefined;
+        let nextJ;
+        if (next) {
+            let sort = joinQ.activeJunctions.concat().sort((a, b) => a[key] - b[key]);
+            nextJ = sort[sort.indexOf(minJ) + 1];
+            if (!nextJ)
+                return undefined;
+        }
+        else {
+            nextJ = Junction.findMinMax(joinQ.activeJunctions, key, 1);
+            if (nextJ == minJ)
+                return undefined;
+        }
+        let nextQ = nextJ.q1 == joinQ ? nextJ.q2 : nextJ.q1;
+        return { joinQ, nextQ, mode };
+    }
+    findLead(junctions, d, lines) {
+        var _a;
+        let find = this.findJoinNextQ(junctions, true, false);
+        if (!find)
+            return undefined;
+        let { joinQ, nextQ } = find;
+        let ok = this.design.junctions.get(this.flap, nextQ.flap).status != JunctionStatus.tooClose;
+        let dist = this.design.tree.distTriple(this.flap.node, nextQ.flap.node, joinQ.flap.node);
+        if (d <= dist.d1 && ok)
+            return undefined;
+        let d2 = d - dist.d1 + dist.d2;
+        if (d <= dist.d1) {
+            let p1 = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
+            lines.push(new Line(p1, this.qv.neg));
+        }
+        return (_a = nextQ.findLead(junctions, d2, lines)) !== null && _a !== void 0 ? _a : nextQ.getStart(d2);
+    }
+    getOverriddenPath(d) {
+        let result = [];
+        if (this.pattern)
+            return result;
+        let r = this.flap.radius + d;
+        for (let [j, pts] of this.coveredJunctions) {
+            let { ox, oy } = j;
+            let p = this.point.add(this.qv.scale(r));
+            for (let pt of pts) {
+                let diff = pt.sub(p);
+                ox = Math.min(-diff.x * this.fx, ox);
+                oy = Math.min(-diff.y * this.fy, oy);
+            }
+            let v = new Vector(ox * this.fx, oy * this.fy);
+            result.push(new paper.Path.Rectangle(p.toPaper(), p.sub(v).toPaper()));
+        }
+        return result;
+    }
+    get pattern() {
+        let stretch = this.design.getStretchByQuadrant(this);
+        return stretch ? stretch.pattern : null;
+    }
+    get corner() {
+        let r = this.flap.radius;
+        return this.point.add(this.qv.scale(r));
+    }
+    get junctions() {
+        var _a;
+        return (_a = this.design.junctionsByQuadrant.get(this)) !== null && _a !== void 0 ? _a : [];
+    }
+    get coveredJunctions() {
+        return this.junctions
+            .filter(j => j.isValid && j.isCovered)
+            .map(j => {
+            let q3 = j.q1 == this ? j.q2 : j.q1;
+            return [j, j.coveredBy.map(c => c.q1 == q3 ? c.q2.point : c.q1.point)];
+        });
+    }
+    get point() {
+        return this.flap.points[this.q];
+    }
+    get activeJunctions() {
+        let result = this.design.activeJunctionsByQuadrant.get(this);
+        return result ? result : [];
+    }
+    static transform(dir, fx, fy) {
+        if (fx < 0)
+            dir += dir % 2 ? 3 : 1;
+        if (fy < 0)
+            dir += dir % 2 ? 1 : 3;
+        return dir % 4;
+    }
+    getBaseRectangle(j) {
+        let r = this.flap.radius;
+        return new Rectangle(new Point(this.x(r), this.y(r)), new Point(this.x(r - j.ox), this.y(r - j.oy)));
+    }
+    debug(d = 0) {
+        debug = true;
+        console.log(this.makeContour(d).map(p => p.toString()));
+        debug = false;
+    }
+};
+Quadrant.QV = [
+    new Vector(1, 1),
+    new Vector(-1, 1),
+    new Vector(-1, -1),
+    new Vector(1, -1)
+];
+Quadrant.SV = [
+    new Vector(1, 0),
+    new Vector(0, 1),
+    new Vector(-1, 0),
+    new Vector(0, -1)
+];
+__decorate([
+    shrewd
+], Quadrant.prototype, "pattern", null);
+__decorate([
+    shrewd
+], Quadrant.prototype, "corner", null);
+__decorate([
+    shrewd
+], Quadrant.prototype, "junctions", null);
+__decorate([
+    shrewd
+], Quadrant.prototype, "coveredJunctions", null);
+__decorate([
+    shrewd
+], Quadrant.prototype, "point", null);
+__decorate([
+    shrewd
+], Quadrant.prototype, "activeJunctions", null);
+Quadrant = Quadrant_1 = __decorate([
+    shrewd
+], Quadrant);
+let Stretch = class Stretch extends Control {
+    constructor(sheet, signature) {
+        super(sheet);
+        this._repoCache = new Map();
+        this.signature = signature;
+    }
+    get type() { return "Stretch"; }
+    get junctions() {
+        var _a;
+        let result = (_a = this.design.teams.get(this.signature)) !== null && _a !== void 0 ? _a : [];
+        if (this.junctionCache && this.junctionCache.length == result.length) {
+            for (let i in result)
+                if (result[i] != this.junctionCache[i]) {
+                    return this.junctionCache = result;
+                }
+            return this.junctionCache;
+        }
+        else
+            return this.junctionCache = result;
+    }
+    get flaps() {
+        let s = new Set();
+        for (let j of this.junctions) {
+            s.add(j.f1);
+            s.add(j.f2);
+        }
+        return Array.from(s);
+    }
+    get origin() {
+        var _a, _b, _c;
+        return (_c = (_b = (_a = this.junctions[0]) === null || _a === void 0 ? void 0 : _a.q1) === null || _b === void 0 ? void 0 : _b.point) !== null && _c !== void 0 ? _c : Point.ZERO;
+    }
+    get repository() {
+        if (!this.isValid)
+            return null;
+        let structure = this.structureSignature;
+        let result;
+        if (this._repoCache.has(structure))
+            result = this._repoCache.get(structure);
+        else {
+            let option = this.design.options.get("stretch", this.signature);
+            result = new Repository(this, structure, option);
+        }
+        if (!this.design.dragging)
+            this._repoCache.clear();
+        this._repoCache.set(structure, result);
+        return result;
+    }
+    get fx() { var _a, _b; return (_b = (_a = this.junctions[0]) === null || _a === void 0 ? void 0 : _a.fx) !== null && _b !== void 0 ? _b : 1; }
+    get fy() { var _a, _b; return (_b = (_a = this.junctions[0]) === null || _a === void 0 ? void 0 : _a.fy) !== null && _b !== void 0 ? _b : 1; }
+    get shouldDispose() {
+        return super.shouldDispose || !this.isActive && !this.design.dragging;
+    }
+    get isActive() {
+        return this.design.teams.has(this.signature);
+    }
+    get pattern() {
+        var _a, _b, _c;
+        return (_c = (_b = (_a = this.repository) === null || _a === void 0 ? void 0 : _a.entry) === null || _b === void 0 ? void 0 : _b.entry) !== null && _c !== void 0 ? _c : null;
+    }
+    get isValid() {
+        return this.junctions.every(j => j.status == JunctionStatus.overlap);
+    }
+    get isTotallyValid() {
+        if (!this.isActive)
+            return false;
+        for (let i = 0; i < this.flaps.length; i++) {
+            for (let j = i + 1; j < this.flaps.length; j++) {
+                let jn = this.design.junctions.get(this.flaps[i], this.flaps[j]);
+                if (jn.status == JunctionStatus.tooClose)
+                    return false;
+            }
+        }
+        return true;
+    }
+    get structureSignature() {
+        return this.isValid ? JSON.stringify(this.junctions.map(j => {
+            let result = j.toJSON(), c = result.c;
+            if (j.fx != this.fx)
+                result.c = [c[2], c[3], c[0], c[1]];
+            return result;
+        })) : "";
+    }
+    get devices() {
+        if (!this.pattern)
+            return [];
+        else
+            return this.pattern.devices;
+    }
+    toJSON() {
+        var _a, _b, _c, _d;
+        return {
+            id: Junction.createTeamId(this.junctions, f => f.node.jid),
+            configuration: (_b = (_a = this.pattern) === null || _a === void 0 ? void 0 : _a.configuration.toJSON()) !== null && _b !== void 0 ? _b : undefined,
+            pattern: (_d = (_c = this.pattern) === null || _c === void 0 ? void 0 : _c.toJSON()) !== null && _d !== void 0 ? _d : undefined
+        };
+    }
+};
+__decorate([
+    shrewd
+], Stretch.prototype, "junctions", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "flaps", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "repository", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "isActive", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "pattern", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "isValid", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "isTotallyValid", null);
+__decorate([
+    shrewd
+], Stretch.prototype, "structureSignature", null);
+Stretch = __decorate([
+    shrewd
+], Stretch);
+let Pattern = class Pattern extends SheetObject {
+    constructor(configuration, pattern) {
+        super(configuration.sheet);
+        this.configuration = configuration;
+        this.devices = pattern.devices.map((d, i) => new Device(this, configuration.partitions[i], d));
+        this.gadgets = this.devices.reduce((arr, d) => arr.concat(d.gadgets), []);
+        this.signature = JSON.stringify(pattern);
+    }
+    static getSignature(pattern) {
+        let d = pattern.devices;
+        pattern.devices = pattern.devices.map(d => {
+            d = clone(d);
+            d.gadgets.forEach(g => Gadget.simplify(g));
+            d.offset = undefined;
+            return d;
+        });
+        let result = JSON.stringify(pattern);
+        pattern.devices = d;
+        return result;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.configuration.disposed;
+    }
+    get isActive() {
+        return this.configuration.isActive && this.configuration.entry == this;
+    }
+    get linesForTracing() {
+        if (!this.isActive)
+            return MakePerQuadrant(i => []);
+        let dir = this.configuration.repository.stretch.junctions[0].direction;
+        let { fx, fy } = this.stretch;
+        return MakePerQuadrant(q => {
+            let lines = [];
+            if (dir % 2 != q % 2)
+                return lines;
+            for (let d of this.devices) {
+                let qv = Quadrant.QV[q];
+                let vector = qv.scale(this.design.sheet.size);
+                lines.push(...d.ridges);
+                lines.push(...d.getConnectionRidges(true));
+                for (let [c, o, cq] of d.partition.outCorners) {
+                    let anchor = d.anchors[o][cq];
+                    if (c.type == CornerType.side ||
+                        c.type == CornerType.flap && q != Quadrant.transform(cq, fx, fy) ||
+                        c.type == CornerType.internal && q != Quadrant.transform(c.q, fx, fy)) {
+                        lines.push(new Line(anchor, anchor.add(vector)));
+                    }
+                    else {
+                        if (c.type == CornerType.intersection) {
+                            let q = d.partition.overlaps[o].c.find(m => m.type == CornerType.flap).q;
+                            let to = d.partition.getSideConnectionTarget(anchor, c, q);
+                            if (to)
+                                lines.push(new Line(anchor, to));
+                        }
+                        else {
+                            lines.push(new Line(anchor, this.getConnectionTarget(c)));
+                        }
+                    }
+                }
+            }
+            return Line.distinct(lines);
+        });
+    }
+    toJSON() {
+        return { devices: this.devices.map(d => d.toJSON()) };
+    }
+    get selected() {
+        return this.devices.some(d => d.selected);
+    }
+    get stretch() {
+        return this.configuration.repository.stretch;
+    }
+    getConnectionTarget(c) {
+        if (c.e >= 0)
+            return this.design.flapsById.get(c.e).points[c.q];
+        else {
+            let [i, j] = this.configuration.overlapMap.get(c.e);
+            return this.devices[i].anchors[j][c.q];
+        }
+    }
+};
+__decorate([
+    shrewd
+], Pattern.prototype, "isActive", null);
+__decorate([
+    shrewd
+], Pattern.prototype, "linesForTracing", null);
+Pattern = __decorate([
+    shrewd
+], Pattern);
+class Store extends SheetObject {
+    constructor() {
+        super(...arguments);
+        this.index = 0;
+        this._prototypeCache = [];
+        this._cache = [];
+    }
+    get _prototypes() {
+        if (!this.generator)
+            return this._prototypeCache;
+        if (this.design.dragging) {
+            this.buildFirst();
+            return this._prototypeCache.concat();
+        }
+        else {
+            if (this._cache.length == 0)
+                this.buildFirst();
+            for (let entry of this.generator)
+                this._prototypeCache.push(entry);
+            delete this.generator;
+            return this._prototypeCache;
+        }
+    }
+    buildFirst() {
+        let entry = this.generator.next();
+        if (!entry.done) {
+            try {
+                this._cache[0] = this.builder(entry.value);
+                this._prototypeCache.push(entry.value);
+            }
+            catch (e) {
+                console.log("Incompatible old version.");
+            }
+        }
+    }
+    get entry() {
+        let e = this._prototypes, i = this.index;
+        if (e.length == 0)
+            return null;
+        return this._cache[i] = this._cache[i] || this.builder(e[i]);
+    }
+    move(by = 1) {
+        let from = this.index, l = this._prototypes.length;
+        this.index = (this.index + by + l) % l;
+        this.onMove(this.index, from);
+        Shrewd.commit();
+    }
+    get size() {
+        return this._prototypes.length;
+    }
+}
+__decorate([
+    action
+], Store.prototype, "index", void 0);
+__decorate([
+    shrewd
+], Store.prototype, "_prototypes", null);
+__decorate([
+    shrewd
+], Store.prototype, "entry", null);
+class ControlView extends View {
+    constructor(control) {
+        super(control);
+        this.control = control;
+    }
+    drawSelection() {
+        this.renderSelection(this.control.selected);
+    }
+}
+__decorate([
+    shrewd
+], ControlView.prototype, "drawSelection", null);
+let DragSelectView = class DragSelectView extends View {
+    constructor(studio) {
+        super(studio);
+        this.visible = false;
+        this.$addItem(Layer.drag, this._rectangle = new paper.Path.Rectangle(Style.selection));
+    }
+    contains(point) {
+        return this._rectangle.contains(point);
+    }
+    render() {
+        if (this._rectangle.visible = this.visible) {
+            let r = new paper.Path.Rectangle({
+                from: this.down,
+                to: this.now
+            });
+            this._rectangle.set({ segments: r.segments });
+        }
+    }
+};
+__decorate([
+    shrewd
+], DragSelectView.prototype, "visible", void 0);
+__decorate([
+    shrewd
+], DragSelectView.prototype, "down", void 0);
+__decorate([
+    shrewd
+], DragSelectView.prototype, "now", void 0);
+DragSelectView = __decorate([
+    shrewd
+], DragSelectView);
+let SheetView = class SheetView extends View {
+    constructor(sheet) {
+        super(sheet);
+        this._sheet = sheet;
+        this._border = new paper.Path.Rectangle({
+            point: [0, 0],
+            size: [0, 0],
+            strokeWidth: 3,
+        });
+        this.$addItem(Layer.sheet, this._border);
+        this._grid = new paper.CompoundPath(Style.sheet);
+        this.$addItem(Layer.sheet, this._grid);
+    }
+    contains(point) {
+        return this._border.contains(point);
+    }
+    render() {
+        var _a;
+        if (!this.$studio)
+            return;
+        let width = this._sheet.width;
+        let height = this._sheet.height;
+        PaperUtil.setRectangleSize(this._border, width, height);
+        this._grid.visible = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showGrid;
+        this._grid.removeChildren();
+        for (let i = 1; i < height; i++) {
+            PaperUtil.addLine(this._grid, new paper.Point(0, i), new paper.Point(width, i));
+        }
+        for (let i = 1; i < width; i++) {
+            PaperUtil.addLine(this._grid, new paper.Point(i, 0), new paper.Point(i, height));
+        }
+    }
+};
+SheetView = __decorate([
+    shrewd
+], SheetView);
+class ViewedControl extends Control {
+    contains(point) {
+        this.view.draw();
+        return this.view.contains(point);
+    }
+}
+let Configuration = class Configuration extends Store {
+    constructor(set, config, seed) {
+        super(set.sheet);
+        this.repository = set;
+        this.seed = seed;
+        if (seed)
+            this.seedSignature = Pattern.getSignature(seed);
+        let overlaps = [];
+        let overlapMap = new Map();
+        let k = -1;
+        for (let [i, p] of config.partitions.entries()) {
+            for (let [j, o] of p.overlaps.entries()) {
+                overlaps.push(o);
+                overlapMap.set(k--, [i, j]);
+            }
+        }
+        this.overlaps = overlaps;
+        this.overlapMap = overlapMap;
+        this.partitions = config.partitions.map(p => new Partition(this, p));
+        this.generator = this.generate();
+    }
+    get isActive() {
+        return this.repository.isActive && this.repository.entry == this;
+    }
+    builder(prototype) {
+        return new Pattern(this, prototype);
+    }
+    *generate() {
+        if (this.seed)
+            yield this.seed;
+        let filter = (pattern) => !this.seedSignature || this.seedSignature != Pattern.getSignature(pattern);
+        yield* GeneratorUtil.filter(this.search([]), filter);
+    }
+    *search(devices, depth = 0) {
+        if (depth == this.partitions.length) {
+            let p = this.makePattern(clone(devices));
+            if (p)
+                yield p;
+        }
+        else {
+            for (let d of this.partitions[depth].generate()) {
+                devices.push(d);
+                yield* this.search(devices, depth + 1);
+                devices.pop();
+            }
+        }
+    }
+    makePattern(prototypes) {
+        prototypes.forEach(d => d.gadgets = d.gadgets.map(g => Gadget.instantiate(g)));
+        let devices = prototypes;
+        let junctions = this.repository.structure;
+        if (junctions.length == 1) {
+            let sx = junctions[0].sx;
+            if (devices.length == 1) {
+                devices[0].offset = Math.floor((sx - devices[0].gadgets[0].sx) / 2);
+                return { devices };
+            }
+            if (devices.length == 2) {
+                let [g1, g2] = devices.map(d => d.gadgets[0]);
+                let c1 = this.overlaps[0].c[2];
+                let c2 = this.overlaps[1].c[0];
+                let tx1 = g1.sx + g2.rx(c1.q, 2);
+                let tx2 = g2.sx + g1.rx(c2.q, 0);
+                if (tx1 > sx || tx2 > sx)
+                    return null;
+                devices[1].offset = sx - tx2;
+                return { devices };
+            }
+        }
+        if (junctions.length == 2 && this.partitions.length == 1) {
+            let [o1, o2] = this.overlaps;
+            let [j1, j2] = [o1, o2].map(o => this.repository.structure[o.parent]);
+            let oriented = j1.c[0].e == j2.c[0].e;
+            let gadgets = devices[0].gadgets;
+            if (gadgets[0].sx > j1.sx || gadgets[1].sx > j2.sx)
+                return null;
+            if (!oriented)
+                devices[0].offset = j1.sx - gadgets[0].sx;
+            return { devices };
+        }
+        if (junctions.length == 2 && this.partitions.length == 2) {
+            let [g1, g2] = devices.map(d => d.gadgets[0]);
+            let [o1, o2] = this.overlaps;
+            let reversed = o1.c[0].e >= 0 && o1.c[2].e >= 0;
+            if (reversed) {
+                [g1, g2] = [g2, g1];
+                [o1, o2] = [o2, o1];
+            }
+            let [j1, j2] = [o1, o2].map(o => this.repository.structure[o.parent]);
+            let oriented = o1.c[0].e < 0;
+            let q = oriented ? 0 : 2, tq = o1.c[q].q;
+            let sx = j1.sx, tx = g1.sx;
+            let s = g1.setupConnectionSlack(g2, q, tq);
+            sx -= Math.ceil(g2.rx(tq, q)) + s;
+            let offsets = oriented ? [s !== null && s !== void 0 ? s : 0, 0] : [sx - tx, j2.sx - g2.sx];
+            if (reversed)
+                offsets.reverse();
+            if (tx > sx)
+                return null;
+            if (g2.contains(this.getRelativeDelta(j1, j2, g2)))
+                return null;
+            devices.forEach((d, i) => d.offset = offsets[i]);
+            return { devices };
+        }
+        return null;
+    }
+    getRelativeDelta(j1, j2, g) {
+        let oriented = j1.c[0].e == j2.c[0].e;
+        let r = Partitioner.getMaxIntersectionDistance(this.design.tree, j1, j2, oriented);
+        if (j2.ox > j1.ox)
+            [j1, j2] = [j2, j1];
+        let p = { x: r - j2.ox, y: r - j1.oy };
+        if (!oriented) {
+            p.x = g.sx - p.x;
+            p.y = g.sy - p.y;
+        }
+        return new Point(p);
+    }
+    onMove() {
+        this.repository.stretch.selected = !(this.entry.selected);
+    }
+    toJSON() {
+        return { partitions: this.partitions.map(p => p.toJSON()) };
+    }
+    get jidMap() {
+        return this.design.tree.jidMap;
+    }
+};
+__decorate([
+    shrewd
+], Configuration.prototype, "isActive", null);
+Configuration = __decorate([
+    shrewd
+], Configuration);
+class LabeledView extends ControlView {
+    get overflow() {
+        if (!this.$studio)
+            return 0;
+        this.render();
+        let result = 0, b = this._label.bounds;
+        let w = this.$studio.$display.scale * this.control.sheet.width;
+        let left = b.x, right = b.x + b.width;
+        if (left < 0)
+            result = -left;
+        if (right > w)
+            result = Math.max(result, right - w);
+        return Math.ceil(result);
+    }
+}
+__decorate([
+    shrewd
+], LabeledView.prototype, "overflow", null);
+var JunctionView_1;
+let JunctionView = JunctionView_1 = class JunctionView extends View {
+    constructor(junction) {
+        super(junction);
+        this._junction = junction;
+        this.$addItem(Layer.junction, this._shade = new paper.CompoundPath(Style.junction));
+    }
+    render() {
+        if (this._shade.visible = this._junction.status == JunctionStatus.tooClose) {
+            let f1 = this._junction.f1, f2 = this._junction.f2;
+            this._shade.removeChildren();
+            let d = this._junction.$treeDistance - (f1.radius + f2.radius);
+            if (d == 0) {
+                this._shade.addChild(f1.view.circle.intersect(f2.view.circle));
+                this._shade.strokeWidth = JunctionView_1.widthForArea(this._shade.area);
+            }
+            else {
+                let c1 = f1.view.makeRectangle(d), c2 = f2.view.makeRectangle(d);
+                this._shade.addChild(f1.view.circle.intersect(c2));
+                this._shade.addChild(f2.view.circle.intersect(c1));
+                this._shade.strokeWidth = JunctionView_1.widthForArea(this._shade.area);
+            }
+        }
+    }
+    static widthForArea(a) {
+        return a < 0.25 ? 4 : a < 0.5 ? 3 : a < 1 ? 2 : 1;
+    }
+};
+JunctionView = JunctionView_1 = __decorate([
+    shrewd
+], JunctionView);
+let RiverView = class RiverView extends ControlView {
+    constructor(river) {
+        super(river);
+        this.components = new Mapping(() => this.info.components, ([f, n]) => new RiverComponent(this, f, n));
+        this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
+        this.$addItem(Layer.hinge, this._hinge = new paper.CompoundPath(Style.hinge));
+        this.$addItem(Layer.ridge, this._ridge = new paper.CompoundPath(Style.ridge));
+        this.boundary = new paper.CompoundPath({});
+    }
+    contains(point) {
+        return this.control.sheet.view.contains(point) && this._shade.contains(point);
+    }
+    get info() {
+        if (this.disposed)
+            return { adjacent: [], length: 0, components: [] };
+        let edge = this.control.edge;
+        let a;
+        let c;
+        if (edge.wrapSide == 0) {
+            c = this.toComponents(edge.l1, edge.n1).concat(this.toComponents(edge.l2, edge.n2));
+            a = edge.a1.concat(edge.a2);
+        }
+        else if (edge.wrapSide == 2) {
+            c = this.toComponents(edge.l2, edge.n2);
+            a = edge.a2;
+        }
+        else {
+            c = this.toComponents(edge.l1, edge.n1);
+            a = edge.a1;
+        }
+        return { adjacent: a, length: edge.length, components: c };
+    }
+    toComponents(l, n) {
+        return l.map(l => [this.design.flaps.get(l), n]);
+    }
+    get design() {
+        return this.control.sheet.design;
+    }
+    onDispose() {
+        Shrewd.terminate(this.components);
+        super.onDispose();
+    }
+    get closure() {
+        let path = new paper.PathItem();
+        if (this.disposed)
+            return path;
+        for (let component of this.components.values()) {
+            let c = component.contour;
+            if (path.isEmpty())
+                path = c;
+            else
+                path = path.unite(c, { insert: false });
+        }
+        return path;
+    }
+    get actualPath() {
+        var _a;
+        let { adjacent } = this.info;
+        let design = this.control.sheet.design;
+        let path = this.closure;
+        if (this.disposed)
+            return path;
+        for (let e of adjacent) {
+            if (e.isRiver) {
+                let r = design.rivers.get(e);
+                for (let item of (_a = r.view.closure.children) !== null && _a !== void 0 ? _a : [r.view.closure]) {
+                    path = path.subtract(item, { insert: false });
+                }
+            }
+            else {
+                let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2);
+                f.view.renderHinge();
+                path = path.subtract(f.view.hinge, { insert: false });
+            }
+        }
+        return path.reorient(false, true);
+    }
+    render() {
+        PaperUtil.replaceContent(this.boundary, this.closure, true);
+        PaperUtil.replaceContent(this._shade, this.actualPath, false);
+        PaperUtil.replaceContent(this._hinge, this.actualPath, false);
+        this.renderRidge();
+    }
+    get corners() {
+        var _a;
+        if (this.disposed)
+            return [];
+        let path = this.actualPath;
+        let p_paths = ((_a = path.children) !== null && _a !== void 0 ? _a : [path]);
+        let r_paths = p_paths.map(path => path.segments.map(p => new Point(p.point)));
+        if (r_paths[0].length == 0)
+            return [];
+        let { paths, map } = PathUtil.collect(r_paths);
+        let result = [];
+        for (let p of paths) {
+            let l = p.length;
+            let prev = p[l - 1];
+            let now = p[0];
+            let v_in = now.sub(prev);
+            for (let i = 0; i < l; i++) {
+                let next = p[(i + 1) % l];
+                let v_out = next.sub(now);
+                if (v_in.dot(v_out) == 0 && v_in.rotate90().dot(v_out) > 0) {
+                    let v = new Vector(Math.sign(v_out.x) - Math.sign(v_in.x), Math.sign(v_out.y) - Math.sign(v_in.y)).scale(this.control.length);
+                    let target = now.add(v);
+                    result.push([now, target, map.has(target.toString())]);
+                }
+                prev = now;
+                now = next;
+                v_in = v_out;
+            }
+        }
+        return result;
+    }
+    renderRidge() {
+        var _a;
+        this._ridge.removeChildren();
+        for (let [from, to, self] of this.corners) {
+            let line = new Line(from, to);
+            let f = line.slope.value, key = f + "," + (from.x - f * from.y);
+            let arr = (_a = this.control.sheet.design.openAnchors.get(key)) !== null && _a !== void 0 ? _a : [];
+            let p = arr.find(p => line.contains(p, true));
+            if (p)
+                PaperUtil.addLine(this._ridge, from, p);
+            else if (self) {
+                PaperUtil.addLine(this._ridge, from, to);
+            }
+        }
+    }
+    renderSelection(selected) {
+        this._shade.visible = selected;
+    }
+};
+__decorate([
+    shrewd
+], RiverView.prototype, "info", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "closure", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "actualPath", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "corners", null);
+RiverView = __decorate([
+    shrewd
+], RiverView);
+let RiverComponent = class RiverComponent extends Disposible {
+    constructor(view, flap, node) {
+        super(view);
+        this.view = view;
+        this.flap = flap;
+        this.node = node;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.flap.disposed ||
+            !this.view.info.components.some(c => c[0] == this.flap);
+    }
+    get distance() {
+        if (this.disposed)
+            return 0;
+        let { design, info } = this.view, flap = this.flap;
+        let dis = design.tree.dist(flap.node, this.node);
+        return dis - flap.radius + info.length;
+    }
+    get contour() {
+        this.flap.view.draw();
+        return this.flap.view.makeContour(this.distance);
+    }
+};
+__decorate([
+    shrewd
+], RiverComponent.prototype, "distance", null);
+__decorate([
+    shrewd
+], RiverComponent.prototype, "contour", null);
+RiverComponent = __decorate([
+    shrewd
+], RiverComponent);
+class Draggable extends ViewedControl {
+    constructor() {
+        super(...arguments);
+        this.location = { x: 0, y: 0 };
+    }
+    dragStart(cursor) {
+        this._dragOffset = cursor.sub(this.location);
+    }
+    dragConstraint(by) {
+        if (by instanceof Vector) {
+            return this.constraint(by, this.location);
+        }
+        else {
+            let l = new Point(this.location);
+            let v = this.constraint(by.sub(this._dragOffset).sub(l), l);
+            return l.add(v).add(this._dragOffset);
+        }
+    }
+    drag(by) {
+        if (by instanceof Point) {
+            by = by.sub(this._dragOffset);
+            if (!by.eq(this.location))
+                this.design.takeAction(() => {
+                    this.location.x = by.x;
+                    this.location.y = by.y;
+                });
+        }
+        else {
+            if (!by.eq(Vector.ZERO))
+                this.design.takeAction(() => {
+                    this.location.x += by.x;
+                    this.location.y += by.y;
+                });
+        }
+    }
+    constraint(v, location) {
+        return Vector.ZERO;
+    }
+}
+__decorate([
+    shrewd
+], Draggable.prototype, "location", void 0);
+class IndependentDraggable extends Draggable {
+}
+let FlapView = class FlapView extends LabeledView {
+    constructor(flap) {
+        super(flap);
+        this.$addItem(Layer.shade, this._shade = new paper.Path.Rectangle(Style.shade));
+        this.$addItem(Layer.hinge, this.hinge = new paper.Path.Rectangle(Style.hinge));
+        this.$addItem(Layer.shade, this._circle = new paper.Path(Style.circle));
+        this._dots = MakePerQuadrant(i => {
+            let d = new paper.Path.Circle(Style.dot);
+            this.$addItem(Layer.dot, d);
+            return d;
+        });
+        this.$addItem(Layer.ridge, this._innerRidges = new paper.CompoundPath(Style.ridge));
+        this.$addItem(Layer.ridge, this._outerRidges = new paper.CompoundPath(Style.ridge));
+        this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
+        this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
+    }
+    contains(point) {
+        return this.control.sheet.view.contains(point) &&
+            (this.hinge.contains(point) || this.hinge.hitTest(point) != null);
+    }
+    get circle() {
+        return this.makeRectangle(0);
+    }
+    makeRectangle(d) {
+        let p = this.control.points, r = this.control.node.radius + d;
+        return new paper.Path.Rectangle({
+            from: [p[2].x - r, p[2].y - r],
+            to: [p[0].x + r, p[0].y + r],
+            radius: r
+        });
+        ;
+    }
+    makeContour(d) {
+        let path = new paper.Path({ closed: true });
+        this.control.quadrants.forEach(q => path.add(...q.makeContour(d)));
+        let item = path;
+        for (let q of this.control.quadrants) {
+            for (let p of q.getOverriddenPath(d))
+                item = item.subtract(p, { insert: false });
+        }
+        return item;
+    }
+    renderHinge() {
+        var _a, _b;
+        this._circle.visible = (_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showHinge) !== null && _b !== void 0 ? _b : false;
+        this.hinge.removeSegments();
+        this.control.quadrants.forEach(q => this.hinge.add(...q.makeContour(0)));
+    }
+    render() {
+        let ds = this.control.sheet.displayScale;
+        let w = this.control.width, h = this.control.height;
+        this._circle.copyContent(this.circle);
+        this.renderHinge();
+        let fix = (p) => [p.x * ds, -p.y * ds];
+        let p = MakePerQuadrant(i => {
+            let pt = this.control.points[i].toPaper();
+            this._dots[i].position.set(fix(pt));
+            return pt;
+        });
+        this._dots[2].visible = w > 0 || h > 0;
+        this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
+        this._innerRidges.removeChildren();
+        this._innerRidges.moveTo(p[3]);
+        p.forEach(p => this._innerRidges.lineTo(p));
+        this._innerRidges.visible = w > 0 || h > 0;
+        this._outerRidges.removeChildren();
+        this.control.quadrants.forEach((q, i) => {
+            if (q.pattern == null)
+                PaperUtil.addLine(this._outerRidges, p[i], q.corner);
+        });
+        this._label.content = this.control.node.name;
+        LabelUtil.setLabel(this.control.sheet, this._label, this._glow, this.control.dragSelectAnchor, this._dots[0]);
+        this._shade.copyContent(this.hinge);
+    }
+    renderSelection(selected) {
+        this._shade.visible = selected;
+    }
+};
+__decorate([
+    shrewd
+], FlapView.prototype, "circle", null);
+__decorate([
+    shrewd
+], FlapView.prototype, "renderHinge", null);
+FlapView = __decorate([
+    shrewd
+], FlapView);
+let EdgeView = class EdgeView extends LabeledView {
+    constructor(edge) {
+        super(edge);
+        this.$addItem(Layer.ridge, this.line = new paper.Path.Line(Style.edge));
+        this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
+        this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
+        this._lineRegion = new paper.Path.Line({ strokeWidth: 15 });
+    }
+    contains(point) {
+        return (this._lineRegion.hitTest(point) != null ||
+            this._glow.hitTest(point.transform(this._glow.layer.matrix.inverted())) != null)
+            && !this.control.v1.view.contains(point)
+            && !this.control.v2.view.contains(point);
+    }
+    render() {
+        let l1 = this.control.v1.location, l2 = this.control.v2.location;
+        let center = { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
+        this._lineRegion.segments[0].point.set([l1.x, l1.y]);
+        this._lineRegion.segments[1].point.set([l2.x, l2.y]);
+        this.line.copyContent(this._lineRegion);
+        this._label.content = this.control.length.toString();
+        LabelUtil.setLabel(this.control.sheet, this._label, this._glow, center, this.line);
+    }
+    renderSelection(selected) {
+        let color = selected ? PaperUtil.Red : PaperUtil.Black;
+        this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
+        this.line.strokeWidth = selected ? 3 : 2;
+    }
+};
+EdgeView = __decorate([
+    shrewd
+], EdgeView);
+let VertexView = class VertexView extends LabeledView {
+    constructor(vertex) {
+        super(vertex);
+        let option = Object.assign({}, Style.dot, { radius: 4 });
+        this.$addItem(Layer.dot, this._dot = new paper.Path.Circle(option));
+        this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
+        this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
+        this._circle = new paper.Path.Circle({ radius: 0.4 });
+    }
+    contains(point) {
+        return this._circle.contains(point) ||
+            this._glow.hitTest(point.transform(this._glow.layer.matrix.inverted())) != null;
+    }
+    render() {
+        let ds = this.control.sheet.displayScale;
+        let x = this.control.location.x, y = this.control.location.y;
+        this._circle.position.set([x, y]);
+        this._dot.position.set([x * ds, -y * ds]);
+        let lines = this.control.node.edges.map(e => {
+            let edgeView = this.control.sheet.design.edges.get(e).view;
+            edgeView.draw();
+            return edgeView.line;
+        });
+        this._label.content = this.control.node.name;
+        LabelUtil.setLabel(this.control.sheet, this._label, this._glow, { x, y }, this._dot, ...lines);
+    }
+    renderSelection(selected) {
+        this._dot.set(selected ? Style.dotSelected : Style.dot);
+    }
+};
+VertexView = __decorate([
+    shrewd
+], VertexView);
+var Flap_1;
+let Flap = Flap_1 = class Flap extends IndependentDraggable {
+    constructor(sheet, node) {
+        super(sheet);
+        this.width = 0;
+        this.height = 0;
+        this.node = node;
+        let option = this.sheet.design.options.get("flap", node.id);
+        if (option) {
+            this.location.x = option.x;
+            this.location.y = option.y;
+            this.width = option.width;
+            this.height = option.height;
+        }
+        this.quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
+        this.view = new FlapView(this);
+    }
+    get type() { return "Flap"; }
+    selectableWith(c) { return c instanceof Flap_1; }
+    get dragSelectAnchor() {
+        return { x: this.location.x + this.width / 2, y: this.location.y + this.height / 2 };
+    }
+    get points() {
+        let x = this.location.x, y = this.location.y;
+        let w = this.width, h = this.height;
+        return [
+            new Point(x + w, y + h),
+            new Point(x, y + h),
+            new Point(x, y),
+            new Point(x + w, y)
+        ];
+    }
+    get name() { return this.node.name; }
+    set name(n) { this.node.name = n; }
+    get radius() {
+        var _a, _b;
+        return (_b = (_a = this.node.firstEdge) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0;
+    }
+    set radius(r) { this.node.firstEdge.length = r; }
+    get shouldDispose() {
+        return super.shouldDispose || this.node.disposed || this.node.degree != 1;
+    }
+    toJSON() {
+        return {
+            id: this.node.jid,
+            width: this.width,
+            height: this.height,
+            x: this.location.x,
+            y: this.location.y
+        };
+    }
+    constraint(v, location) {
+        this.sheet.constraint(v, location);
+        this.sheet.constraint(v, {
+            x: location.x + this.width,
+            y: location.y + this.height
+        });
+        return v;
+    }
+    debug(d = 0) {
+        console.log(this.view.makeContour(d).exportJSON());
+    }
+};
+__decorate([
+    action({
+        validator(v) {
+            let ok = v >= 0 && v <= this.sheet.width;
+            let d = this.location.x + v - this.sheet.width;
+            if (d > 0)
+                this.location.x -= d;
+            return ok;
+        }
+    })
+], Flap.prototype, "width", void 0);
+__decorate([
+    action({
+        validator(v) {
+            let ok = v >= 0 && v <= this.sheet.height;
+            let d = this.location.y + v - this.sheet.height;
+            if (d > 0)
+                this.location.y -= d;
+            return ok;
+        }
+    })
+], Flap.prototype, "height", void 0);
+__decorate([
+    shrewd
+], Flap.prototype, "dragSelectAnchor", null);
+__decorate([
+    shrewd
+], Flap.prototype, "points", null);
+Flap = Flap_1 = __decorate([
+    shrewd
+], Flap);
+var Vertex_1;
+let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
+    constructor(sheet, node) {
+        super(sheet);
+        this.height = 0;
+        this.width = 0;
+        this.node = node;
+        let option = sheet.design.options.get("vertex", this.node.id);
+        if (option) {
+            if (option.name != undefined)
+                this.node.name = option.name;
+            this.location.x = option.x;
+            this.location.y = option.y;
+        }
+        this.view = new VertexView(this);
+    }
+    get type() { return "Vertex"; }
+    get name() { return this.node.name; }
+    set name(n) { this.node.name = n; }
+    get degree() { return this.node.degree; }
+    selectableWith(c) { return c instanceof Vertex_1; }
+    get dragSelectAnchor() {
+        return this.location;
+    }
+    addLeaf(length = 1) {
+        this.design.takeAction(() => {
+            let v = [...this.design.vertices.values()];
+            let node = this.node.addLeaf(length);
+            let p = this.findCloestEmptyPoint(v);
+            this.design.options.set("vertex", node.id, {
+                id: node.id,
+                name: node.name,
+                x: p.x,
+                y: p.y
+            });
+        });
+    }
+    findCloestEmptyPoint(vertices) {
+        let { x, y } = this.location;
+        let ref = new Point(x + 0.125, y + 0.0625);
+        let arr = [];
+        let occupied = new Set();
+        for (let v of vertices)
+            occupied.add(v.location.x + "," + v.location.y);
+        let r = 5;
+        for (let i = x - r; i <= x + r; i++)
+            for (let j = y - r; j <= y + r; j++) {
+                if (!occupied.has(i + "," + j)) {
+                    let p = new Point(i, j);
+                    arr.push([p, p.dist(ref)]);
+                }
+            }
+        arr.sort((a, b) => a[1] - b[1]);
+        return arr[0][0];
+    }
+    deleteAndJoin() {
+        if (this.node.degree != 2)
+            return;
+        this.design.takeAction(() => {
+            let edge = this.node.dispose();
+            Shrewd.commit();
+            this.design.edges.get(edge).selected = true;
+        });
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.node.disposed;
+    }
+    toJSON() {
+        return {
+            id: this.node.jid,
+            name: this.name,
+            x: this.location.x,
+            y: this.location.y
+        };
+    }
+    constraint(v, location) {
+        this.sheet.constraint(v, location);
+        return v;
+    }
+};
+Vertex = Vertex_1 = __decorate([
+    shrewd
+], Vertex);
+let BPStudio = class BPStudio {
+    constructor(selector) {
+        this.version = "0.0.2";
+        this.designMap = new Map();
+        this.design = null;
+        let el = document.querySelector(selector);
+        if (el == null || !(el instanceof HTMLElement)) {
+            throw new Error("selector is not valid");
+        }
+        this.$el = el;
+        this.$paper = new paper.PaperScope();
+        this.$display = new Display(this);
+        this.system = new System(this);
+    }
+    load(json) {
+        if (typeof json == "string")
+            json = JSON.parse(json);
+        return this.tryLoad(Migration.process(json, this.onDeprecate));
+    }
+    create(json) {
+        Object.assign(json, {
+            version: Migration.current,
+            layout: {
+                flaps: [
+                    { id: 0, width: 0, height: 0, x: 8, y: 7 },
+                    { id: 2, width: 0, height: 0, x: 8, y: 9 }
+                ]
+            },
+            tree: {
+                nodes: [
+                    { id: 0, name: "", x: 10, y: 13 },
+                    { id: 1, name: "", x: 10, y: 10 },
+                    { id: 2, name: "", x: 10, y: 7 }
+                ],
+                edges: [
+                    { n1: 0, n2: 1, length: 1 },
+                    { n1: 2, n2: 1, length: 1 }
+                ]
+            }
+        });
+        return this.restore(json);
+    }
+    restore(json) {
+        let design = new Design(this, Migration.process(json, this.onDeprecate));
+        this.designMap.set(design.id, design);
+        return design;
+    }
+    select(id) {
+        if (id != null) {
+            let d = this.designMap.get(id);
+            if (d)
+                this.design = d;
+        }
+        else
+            this.design = null;
+    }
+    close(id) {
+        let d = this.designMap.get(id);
+        if (d) {
+            this.designMap.delete(id);
+            d.dispose();
+        }
+    }
+    closeAll() {
+        this.design = null;
+        for (let d of this.designMap.values())
+            d.dispose();
+        this.designMap.clear();
+    }
+    tryLoad(design) {
+        this.design = new Design(this, design);
+        this.designMap.set(this.design.id, this.design);
+        Shrewd.commit();
+        return this.design;
+    }
+    toBPS() {
+        if (!this.design)
+            return "";
+        let json = JSON.stringify(this.design);
+        let blob = new Blob([json], { type: "application/octet-stream" });
+        return URL.createObjectURL(blob);
+    }
+    get TreeMaker() { return TreeMaker; }
+};
+__decorate([
+    shrewd
+], BPStudio.prototype, "design", void 0);
+BPStudio = __decorate([
+    shrewd
+], BPStudio);
+let Edge = class Edge extends ViewedControl {
+    constructor(sheet, v1, v2, edge) {
+        super(sheet);
+        this.v1 = v1;
+        this.v2 = v2;
+        this.edge = edge;
+        this.view = new EdgeView(this);
+    }
+    get type() { return "Edge"; }
+    get shouldDispose() {
+        return super.shouldDispose || this.edge.disposed;
+    }
+    split() {
+        this.design.takeAction(() => this.toVertex(Tree.prototype.split));
+    }
+    deleteAndMerge() {
+        this.design.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
+    }
+    toVertex(action) {
+        let l1 = this.v1.location, l2 = this.v2.location;
+        let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
+        let node = action.apply(this.design.tree, [this.edge]);
+        this.design.options.set("vertex", node.id, { id: node.id, name: node.name, x, y });
+        Shrewd.commit();
+        this.design.vertices.get(node).selected = true;
+    }
+    get length() { return this.edge.length; }
+    ;
+    set length(v) { this.edge.length = v; }
+    toJSON() {
+        return {
+            n1: this.v1.node.jid,
+            n2: this.v2.node.jid,
+            length: this.edge.length
+        };
+    }
+};
+Edge = __decorate([
+    shrewd
+], Edge);
+let Junction = class Junction extends SheetObject {
+    constructor(sheet, f1, f2) {
+        super(sheet);
+        if (f1.node.id > f2.node.id)
+            [f1, f2] = [f2, f1];
+        this.f1 = f1;
+        this.f2 = f2;
+        this.id = f1.node.id + ":" + f2.node.id;
+        new JunctionView(this);
+    }
+    static createTeamId(arr, idFactory) {
+        let set = new Set();
+        arr.forEach(o => {
+            set.add(idFactory(o.f1));
+            set.add(idFactory(o.f2));
+        });
+        return Array.from(set).sort((a, b) => a - b).join(",");
+    }
+    static sort(j1, j2) {
+        let d = j1.f1.node.id - j2.f1.node.id;
+        if (d != 0)
+            return d;
+        else
+            return j1.f2.node.id - j2.f2.node.id;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.f1.disposed || this.f2.disposed;
+    }
+    get baseRectangle() {
+        if (!this.isValid)
+            return undefined;
+        let q = this.sx > 0 ? this.q2 : this.q1;
+        return q === null || q === void 0 ? void 0 : q.getBaseRectangle(this);
+    }
+    isCoveredBy(o) {
+        if (this == o || this.direction % 2 != o.direction % 2)
+            return false;
+        let [r1, r2] = [o.baseRectangle, this.baseRectangle];
+        if (!r1 || !r2 || !r1.contains(r2))
+            return false;
+        if (r1.equals(r2)) {
+            return Math.abs(o.sx) < Math.abs(this.sx) || Math.abs(o.sy) < Math.abs(this.sy);
+        }
+        return true;
+    }
+    get coveredBy() {
+        if (!this.isValid)
+            return [];
+        return this.sheet.design.validJunctions.filter(j => this.isCoveredBy(j));
+    }
+    get isCovered() {
+        return this.coveredBy.some(j => j.coveredBy.length == 0);
+    }
+    toJSON() {
+        return {
+            c: [
+                { type: CornerType.flap, e: this.f1.node.id, q: this.q1.q },
+                { type: CornerType.side },
+                { type: CornerType.flap, e: this.f2.node.id, q: this.q2.q },
+                { type: CornerType.side }
+            ],
+            ox: this.ox,
+            oy: this.oy,
+            sx: this.sx < 0 ? -this.sx : this.sx
+        };
+    }
+    get neighbors() {
+        if (this.direction > 3)
+            return [];
+        let a1 = this.q1.activeJunctions.concat();
+        let a2 = this.q2.activeJunctions.concat();
+        a1.splice(a1.indexOf(this), 1);
+        a2.splice(a2.indexOf(this), 1);
+        return a1.concat(a2);
+    }
+    get q1() {
+        return isQuadrant(this.direction) ? this.f1.quadrants[this.direction] : null;
+    }
+    get q2() {
+        return isQuadrant(this.direction) ? this.f2.quadrants[opposite(this.direction)] : null;
+    }
+    get $treeDistance() {
+        return this.design.tree.dist(this.f1.node, this.f2.node);
+    }
+    get status() {
+        if (this._flapDistance < this.$treeDistance)
+            return JunctionStatus.tooClose;
+        else if (this.ox && this.oy)
+            return JunctionStatus.overlap;
+        else
+            return JunctionStatus.tooFar;
+    }
+    get fx() {
+        return -Math.sign(this.sx);
+    }
+    get fy() {
+        return -Math.sign(this.sy);
+    }
+    get ox() {
+        let x = this.$treeDistance - Math.abs(this.sx);
+        return x > 0 ? x : NaN;
+    }
+    get oy() {
+        let y = this.$treeDistance - Math.abs(this.sy);
+        return y > 0 ? y : NaN;
+    }
+    get sx() {
+        let x1 = this.f1.location.x, x2 = this.f2.location.x;
+        let w1 = this.f1.width, w2 = this.f2.width;
+        let sx = x1 - x2 - w2;
+        if (sx >= 0)
+            return sx;
+        sx = x1 + w1 - x2;
+        if (sx <= 0)
+            return sx;
+        return NaN;
+    }
+    get sy() {
+        let y1 = this.f1.location.y, y2 = this.f2.location.y;
+        let h1 = this.f1.height, h2 = this.f2.height;
+        let sy = y1 - y2 - h2;
+        if (sy >= 0)
+            return sy;
+        sy = y1 + h1 - y2;
+        if (sy <= 0)
+            return sy;
+        return NaN;
+    }
+    get direction() {
+        let x = this.sx, y = this.sy;
+        if (x < 0 && y < 0)
+            return Direction.UR;
+        if (x > 0 && y < 0)
+            return Direction.UL;
+        if (x > 0 && y > 0)
+            return Direction.LL;
+        if (x < 0 && y > 0)
+            return Direction.LR;
+        if (x < 0)
+            return Direction.R;
+        if (x > 0)
+            return Direction.L;
+        if (y < 0)
+            return Direction.T;
+        if (y > 0)
+            return Direction.B;
+        return Direction.none;
+    }
+    get _flapDistance() {
+        let x = this.sx, y = this.sy;
+        let vx = x != 0 && !isNaN(x), vy = y != 0 && !isNaN(y);
+        if (vx && vy)
+            return Math.sqrt(x * x + y * y);
+        if (vx)
+            return Math.abs(x);
+        if (vy)
+            return Math.abs(y);
+        return 0;
+    }
+    get isValid() {
+        return this.status == JunctionStatus.overlap;
+    }
+    static findMinMax(junctions, key, f) {
+        let value = junctions[0][key];
+        let result = junctions[0];
+        for (let j = 1; j < junctions.length; j++)
+            if (junctions[j][key] * f > value * f) {
+                result = junctions[j];
+                value = junctions[j][key];
+            }
+        return result;
+    }
+};
+__decorate([
+    shrewd
+], Junction.prototype, "baseRectangle", null);
+__decorate([
+    shrewd
+], Junction.prototype, "coveredBy", null);
+__decorate([
+    shrewd
+], Junction.prototype, "isCovered", null);
+__decorate([
+    shrewd
+], Junction.prototype, "neighbors", null);
+__decorate([
+    shrewd
+], Junction.prototype, "q1", null);
+__decorate([
+    shrewd
+], Junction.prototype, "q2", null);
+__decorate([
+    shrewd
+], Junction.prototype, "$treeDistance", null);
+__decorate([
+    shrewd
+], Junction.prototype, "status", null);
+__decorate([
+    shrewd
+], Junction.prototype, "fx", null);
+__decorate([
+    shrewd
+], Junction.prototype, "fy", null);
+__decorate([
+    shrewd
+], Junction.prototype, "ox", null);
+__decorate([
+    shrewd
+], Junction.prototype, "oy", null);
+__decorate([
+    shrewd
+], Junction.prototype, "sx", null);
+__decorate([
+    shrewd
+], Junction.prototype, "sy", null);
+__decorate([
+    shrewd
+], Junction.prototype, "direction", null);
+__decorate([
+    shrewd
+], Junction.prototype, "_flapDistance", null);
+__decorate([
+    shrewd
+], Junction.prototype, "isValid", null);
+Junction = __decorate([
+    shrewd
+], Junction);
+let River = class River extends ViewedControl {
+    constructor(sheet, edge) {
+        super(sheet);
+        this.edge = edge;
+        this.view = new RiverView(this);
+    }
+    get type() { return "River"; }
+    get shouldDispose() {
+        return super.shouldDispose || this.edge.disposed || !this.edge.isRiver;
+    }
+    delete() {
+        this.design.edges.get(this.edge).deleteAndMerge();
+    }
+    get length() { return this.edge.length; }
+    ;
+    set length(v) { this.edge.length = v; }
+};
+River = __decorate([
+    shrewd
+], River);
+let Display = class Display {
+    constructor(studio) {
+        this.MARGIN = 30;
+        this.lockViewport = false;
+        this.scroll = { x: 0, y: 0 };
+        this.settings = {
+            showAxialParallel: true,
+            showGrid: true,
+            showHinge: true,
+            showRidge: true,
+            showLabel: true,
+            showDot: true,
+            includeHiddenElement: false,
+        };
+        this._printing = false;
+        this.horMargin = 0;
+        this._studio = studio;
+        studio.$el.appendChild(this.spaceHolder = document.createElement("div"));
+        studio.$el.addEventListener("scroll", this.onScroll.bind(this));
+        this._canvas = document.createElement("canvas");
+        studio.$el.appendChild(this._canvas);
+        window.addEventListener("resize", this.setSize.bind(this));
+        this.setSize();
+        this.spaceHolder.appendChild(this._img = new Image());
+        window.addEventListener("beforeprint", this.beforePrint.bind(this));
+        window.addEventListener("afterprint", this.afterPrint.bind(this));
+        let mobile = matchMedia("(hover: none)").matches;
+        document.addEventListener("focusin", e => {
+            if (mobile && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+                this.lockViewport = true;
+            }
+        });
+        document.addEventListener("focusout", e => this.lockViewport = false);
+        studio.$paper.setup(this._canvas);
+        studio.$paper.settings.insertItems = false;
+        this.project = studio.$paper.project;
+        this.project.currentStyle.strokeColor = PaperUtil.Black;
+        this.project.currentStyle.strokeScaling = false;
+        for (let l of Enum.values(Layer)) {
+            this.project.addLayer(new paper.Layer({ name: Layer[l] }));
+        }
+        this.boundary = new paper.Path.Rectangle({
+            from: [0, 0],
+            to: [0, 0]
+        });
+        for (let l of Enum.values(Layer)) {
+            if (LayerOptions[l].clipped) {
+                this.project.layers[l].addChild(this.boundary.clone());
+                this.project.layers[l].clipped = true;
+            }
+        }
+    }
+    setSize() {
+        if (this.lockViewport)
+            return;
+        this.viewWidth = this._studio.$el.clientWidth;
+        this.viewHeight = this._studio.$el.clientHeight;
+    }
+    toSVG() {
+        let cw = Math.max(this.sheetWidth, this.viewWidth);
+        let ch = Math.max(this.sheetHeight, this.viewHeight);
+        let x = (cw - this.sheetWidth) / 2 - this.scroll.x;
+        let y = (ch - this.sheetHeight) / 2 - this.scroll.y;
+        let rect = new paper.Rectangle(x, y, this.sheetWidth, this.sheetHeight);
+        let svg = this._studio.$paper.project.exportSVG({
+            bounds: rect,
+            matrix: this.project.view.matrix
+        });
+        if (!this.settings.includeHiddenElement)
+            this.removeHidden(svg);
+        let blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
+        return URL.createObjectURL(blob);
+    }
+    removeHidden(node) {
+        let children = Array.from(node.children);
+        for (let c of children) {
+            if (c.getAttribute('visibility') == 'hidden')
+                node.removeChild(c);
+            else
+                this.removeHidden(c);
+        }
+    }
+    createPNG() {
+        let canvas = document.createElement("canvas");
+        let ctx = canvas.getContext("2d");
+        let img = this._img;
+        return new Promise(resolve => {
+            let callback = () => {
+                img.removeEventListener("load", callback);
+                canvas.width = img.clientWidth;
+                canvas.height = img.clientHeight;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, img.clientWidth, img.clientHeight);
+                this._printing = false;
+                canvas.toBlob(blob => resolve(blob));
+            };
+            img.addEventListener("load", callback);
+            this.beforePrint();
+        });
+    }
+    toPNG() {
+        return this.createPNG().then(blob => URL.createObjectURL(blob));
+    }
+    copyPNG() {
+        return this.createPNG().then(blob => navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+        ]));
+    }
+    beforePrint() {
+        clearTimeout(this._debounce);
+        if (!this._printing &&
+            document.visibilityState == 'visible') {
+            let old = this._img.src;
+            setTimeout(() => URL.revokeObjectURL(old), 5000);
+            this._img.src = this.toSVG();
+            this._printing = true;
+        }
+    }
+    afterPrint() {
+        this._debounce = setTimeout(() => {
+            this._printing = false;
+            this._debounce = NaN;
+        }, 1000);
+    }
+    onScroll() {
+        this.scroll.x = this._studio.$el.scrollLeft;
+        this.scroll.y = this._studio.$el.scrollTop;
+    }
+    get scale() {
+        if (this._studio.design && this._studio.design.sheet) {
+            if (this._studio.design.fullscreen) {
+                let ws = (this.viewWidth - this.horMargin * 2) / this._studio.design.sheet.width;
+                let wh = (this.viewHeight - this.MARGIN * 2) / this._studio.design.sheet.height;
+                return Math.min(ws, wh);
+            }
+            else {
+                return this._studio.design.sheet.scale;
+            }
+        }
+        else {
+            return 1;
+        }
+    }
+    getHorMargin() {
+        var _a, _b;
+        let m = Math.max(((_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.overflow) !== null && _b !== void 0 ? _b : 0) + 10, this.MARGIN);
+        setTimeout(() => this.horMargin = m, 0);
+    }
+    get sheetWidth() {
+        var _a, _b, _c;
+        return ((_c = (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.width) !== null && _c !== void 0 ? _c : 0) * this.scale + this.horMargin * 2;
+    }
+    get sheetHeight() {
+        var _a, _b, _c;
+        return ((_c = (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.height) !== null && _c !== void 0 ? _c : 0) * this.scale + this.MARGIN * 2;
+    }
+    get isXScrollable() {
+        return this.sheetWidth > this.viewWidth + 1;
+    }
+    get isYScrollable() {
+        return this.sheetHeight > this.viewHeight + 1;
+    }
+    getAutoScale() {
+        var _a, _b, _c, _d, _e, _f;
+        let ws = (this.viewWidth - this.horMargin * 2) / ((_c = (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.width) !== null && _c !== void 0 ? _c : 1);
+        let hs = (this.viewHeight - this.MARGIN * 2) / ((_f = (_e = (_d = this._studio.design) === null || _d === void 0 ? void 0 : _d.sheet) === null || _e === void 0 ? void 0 : _e.height) !== null && _f !== void 0 ? _f : 1);
+        return Math.min(ws, hs);
+    }
+    isScrollable() {
+        this._studio.$el.classList.toggle("scroll-x", this.isXScrollable);
+        this._studio.$el.classList.toggle("scroll-y", this.isYScrollable);
+        return this.isXScrollable || this.isYScrollable;
+    }
+    renderSetting() {
+        var _a, _b;
+        let notLayout = ((_b = ((_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.mode) != "layout") !== null && _b !== void 0 ? _b : false);
+        this.project.layers[Layer.hinge].visible = this.settings.showHinge;
+        this.project.layers[Layer.ridge].visible = this.settings.showRidge || notLayout;
+        this.project.layers[Layer.axisParallel].visible = this.settings.showAxialParallel;
+        this.project.layers[Layer.label].visible = this.settings.showLabel;
+        this.project.layers[Layer.dot].visible = this.settings.showDot || notLayout;
+    }
+    render() {
+        let width = 0, height = 0, s = this.scale;
+        if (this._studio.design && this._studio.design.sheet) {
+            ({ width, height } = this._studio.design.sheet);
+        }
+        let cw = Math.max(this.sheetWidth, this.viewWidth);
+        let ch = Math.max(this.sheetHeight, this.viewHeight);
+        this.spaceHolder.style.width = cw + "px";
+        this.spaceHolder.style.height = ch + "px";
+        PaperUtil.setRectangleSize(this.boundary, width, height);
+        let el = this._studio.$el;
+        let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+        if (this.lockViewport)
+            this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
+        else
+            this.project.view.viewSize.set(el.clientWidth, el.clientHeight);
+        this.project.view.matrix.set(s, 0, 0, -s, mw - this.scroll.x, mh - this.scroll.y);
+        for (let l of Enum.values(Layer)) {
+            let layer = this.project.layers[l];
+            if (LayerOptions[l].clipped) {
+                layer.children[0].set({
+                    segments: this.boundary.segments
+                });
+            }
+            if (!LayerOptions[l].scaled) {
+                layer.applyMatrix = false;
+                layer.matrix.set(1 / s, 0, 0, -1 / s, 0, 0);
+            }
+        }
+    }
+};
+__decorate([
+    shrewd
+], Display.prototype, "viewWidth", void 0);
+__decorate([
+    shrewd
+], Display.prototype, "viewHeight", void 0);
+__decorate([
+    shrewd
+], Display.prototype, "scroll", void 0);
+__decorate([
+    shrewd
+], Display.prototype, "settings", void 0);
+__decorate([
+    shrewd
+], Display.prototype, "scale", null);
+__decorate([
+    shrewd
+], Display.prototype, "horMargin", void 0);
+__decorate([
+    shrewd
+], Display.prototype, "getHorMargin", null);
+__decorate([
+    shrewd
+], Display.prototype, "sheetWidth", null);
+__decorate([
+    shrewd
+], Display.prototype, "sheetHeight", null);
+__decorate([
+    shrewd
+], Display.prototype, "isXScrollable", null);
+__decorate([
+    shrewd
+], Display.prototype, "isYScrollable", null);
+__decorate([
+    shrewd
+], Display.prototype, "isScrollable", null);
+__decorate([
+    shrewd
+], Display.prototype, "renderSetting", null);
+__decorate([
+    shrewd
+], Display.prototype, "render", null);
+Display = __decorate([
+    shrewd
+], Display);
+var Migration;
+(function (Migration) {
+    Migration.current = "0";
+    function getSample() {
+        return {
+            title: "",
+            version: Migration.current,
+            fullscreen: true,
+            mode: "layout",
+            layout: {
+                sheet: { width: 16, height: 16, scale: 20 },
+                flaps: [],
+                stretches: [],
+            },
+            tree: {
+                sheet: { width: 20, height: 20, scale: 16 },
+                nodes: [],
+                edges: []
+            }
+        };
+    }
+    Migration.getSample = getSample;
+    function process(design, onDeprecated) {
+        var _a;
+        let deprecate = false;
+        if (!('version' in design)) {
+            if (design.mode == "cp")
+                design.mode = "layout";
+            design.layout = design.cp;
+            delete design.cp;
+            design.version = "beta";
+            delete design.layout.stretches;
+            deprecate = true;
+        }
+        if (design.version == "beta") {
+            design.version = "rc0";
+            let st = design.layout.stretches;
+            if (st)
+                for (let s of st.concat()) {
+                    let cf = s.configuration;
+                    if (cf && (!cf.overlaps || cf.overlaps.some((o) => o.c.some((c) => c.type == CornerType.intersection && c.e === undefined)))) {
+                        st.splice(st.indexOf(s), 1);
+                        deprecate = true;
+                    }
+                }
+        }
+        if (design.version == "rc0") {
+            design.version = "rc1";
+            let st = design.layout.stretches;
+            if (st)
+                for (let s of st.concat()) {
+                    let cf = s.configuration;
+                    if (cf) {
+                        s.configuration = {
+                            partitions: toPartition(s.configuration.overlaps, s.configuration.strategy)
+                        };
+                        let pt = s.pattern;
+                        if (pt) {
+                            if (s.configuration.partitions.length == 1) {
+                                s.pattern = {
+                                    devices: [{
+                                            gadgets: s.pattern.gadgets,
+                                            offset: (_a = s.pattern.offsets) === null || _a === void 0 ? void 0 : _a[0]
+                                        }]
+                                };
+                            }
+                            else {
+                                s.pattern = {
+                                    devices: s.pattern.gadgets.map((g, i) => {
+                                        var _a;
+                                        return ({
+                                            gadgets: [g],
+                                            offset: (_a = s.pattern.offsets) === null || _a === void 0 ? void 0 : _a[i]
+                                        });
+                                    })
+                                };
+                            }
+                        }
+                    }
+                }
+        }
+        if (design.version == "rc1")
+            design.version = "0";
+        if (deprecate && onDeprecated)
+            onDeprecated(design.title);
+        return design;
+    }
+    Migration.process = process;
+    function toPartition(overlaps, strategy) {
+        let partitions = [];
+        let partitionMap = new Map();
+        for (let [i, o] of overlaps.entries()) {
+            if (partitionMap.has(i))
+                continue;
+            let coin = o.c.filter(c => c.type == CornerType.coincide);
+            let c = coin.find(c => partitionMap.has(-c.e - 1));
+            let j = partitions.length;
+            if (c) {
+                let j = partitionMap.get(-c.e - 1);
+                partitionMap.set(i, j);
+                partitions[j].push(o);
+            }
+            else {
+                partitionMap.set(i, j);
+                partitions.push([o]);
+            }
+            coin.forEach(c => {
+                i = -c.e - 1;
+                if (!partitionMap.has(i)) {
+                    partitionMap.set(i, j);
+                    partitions[j].push(overlaps[i]);
+                }
+            });
+        }
+        return partitions.map(p => ({ overlaps: p, strategy }));
+    }
+})(Migration || (Migration = {}));
+class OptionManager {
+    constructor(design) {
+        this.options = new Map();
+        for (let n of design.tree.nodes)
+            this.set("vertex", n.id, n);
+        for (let f of design.layout.flaps)
+            this.set("flap", f.id, f);
+        for (let s of design.layout.stretches)
+            this.set("stretch", s.id, s);
+    }
+    get(type, id) {
+        id = type + id;
+        let option = this.options.get(id);
+        this.options.delete(id);
+        return option;
+    }
+    set(type, id, option) {
+        this.options.set(type + id, option);
+    }
+}
+var System_1;
+const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
+let System = System_1 = class System {
+    constructor(studio) {
+        this._dragging = false;
+        this._spaceDown = false;
+        this._touchScaling = [0, 0];
+        this._scrolled = false;
+        this._possiblyReselect = false;
+        this._studio = studio;
+        let canvas = studio.$paper.view.element;
+        let tool = studio.$paper.tool = new paper.Tool();
+        tool.onKeyDown = this._canvasKeydown.bind(this);
+        tool.onKeyUp = this._canvasKeyup.bind(this);
+        tool.onMouseDown = this._canvasMousedown.bind(this);
+        tool.onMouseDrag = this._canvasMousedrag.bind(this);
+        tool.onMouseUp = this._canvasMouseup.bind(this);
+        canvas.addEventListener("wheel", this._canvasWheel.bind(this));
+        canvas.addEventListener("touchstart", this._canvasTouch.bind(this));
+        document.addEventListener("mousemove", this._bodyMousemove.bind(this));
+        document.addEventListener("touchmove", this._bodyMousemove.bind(this));
+        document.addEventListener("mouseup", this._bodyMouseup.bind(this));
+        document.addEventListener("touchend", this._bodyMouseup.bind(this));
+        document.addEventListener("contextmenu", this._bodyMenu.bind(this));
+        this._dragSelectView = new DragSelectView(studio);
+    }
+    static controlPriority(c) {
+        if (c instanceof Device || c instanceof Vertex)
+            return 1;
+        if (c instanceof Flap || c instanceof Edge)
+            return 2;
+        return 3;
+    }
+    get _controls() {
+        let c = this._studio.design ? this._studio.design.sheet.activeControls.concat() : [];
+        c.sort((a, b) => System_1.controlPriority(a) - System_1.controlPriority(b));
+        this._dragSelectables = c.filter(Control.isDragSelectable);
+        if (!c.length)
+            this._ctrl = [null, null];
+        return c;
+    }
+    get selections() {
+        return this._controls.filter(c => c.selected);
+    }
+    draggableSelections() {
+        return this.selections.filter((o) => o instanceof Draggable);
+    }
+    get _canvas() { return this._studio.$paper.view.element; }
+    _processSelection(point, ctrlKey) {
+        var firstCtrl = null;
+        var nowCtrl = null;
+        var nextCtrl = null;
+        var controls = this._controls.filter(o => o.contains(point));
+        for (let o of controls) {
+            if (!firstCtrl)
+                firstCtrl = o;
+            if (o.selected)
+                nowCtrl = o;
+            else if (nowCtrl && !nextCtrl)
+                nextCtrl = o;
+        }
+        if (!nextCtrl && firstCtrl && !firstCtrl.selected)
+            nextCtrl = firstCtrl;
+        if (nowCtrl) {
+            let p = System_1.controlPriority(nowCtrl);
+            if (controls.some(c => System_1.controlPriority(c) < p)) {
+                this._possiblyReselect = true;
+            }
+        }
+        if (!ctrlKey) {
+            if (!nowCtrl)
+                this._clearSelection();
+            if (!nowCtrl && nextCtrl)
+                this._select(nextCtrl);
+        }
+        else {
+            if (nowCtrl && !nextCtrl)
+                nowCtrl.toggle();
+            if (nextCtrl)
+                this._select(nextCtrl);
+        }
+        this._ctrl = [nowCtrl, nextCtrl];
+    }
+    _processNextSelection() {
+        var [nowCtrl, nextCtrl] = this._ctrl;
+        if (this._studio.design && !this._studio.design.dragging) {
+            if (nowCtrl && nextCtrl)
+                this._clearSelection();
+            if (nowCtrl && !nextCtrl)
+                this._clearSelection(nowCtrl);
+            if (nextCtrl)
+                this._select(nextCtrl);
+        }
+    }
+    _select(c) {
+        if (!c.selected && (this.selections.length == 0 || this.selections[0].selectableWith(c))) {
+            c.selected = true;
+        }
+    }
+    _clearSelection(c = null) {
+        this._dragSelectView.visible = false;
+        for (let control of this.selections)
+            if (control != c)
+                control.selected = false;
+    }
+    _checkEvent(event) {
+        if (this.isTouch(event) && event.touches.length > 1)
+            return false;
+        if (event instanceof MouseEvent && event.button != 0)
+            return false;
+        return true;
+    }
+    _canvasKeydown(event) {
+        let active = document.activeElement;
+        if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement)
+            return true;
+        let canvas = this._canvas;
+        let v = new Vector(0, 0);
+        switch (event.key) {
+            case "space":
+                if (this._studio.$display.isScrollable()) {
+                    canvas.style.cursor = "grab";
+                    this._spaceDown = true;
+                }
+                return false;
+            case "delete":
+                let s = this.selections[0];
+                if (s instanceof Flap)
+                    this._studio.design.deleteFlaps(this.selections);
+                if (s instanceof Vertex)
+                    this._studio.design.deleteVertices(this.selections);
+                return false;
+            case "a":
+                let d = this._studio.design;
+                if (event.modifiers.control && d) {
+                    this._clearSelection();
+                    if (d.mode == "layout")
+                        d.flaps.forEach(f => f.selected = true);
+                    if (d.mode == "tree")
+                        d.vertices.forEach(v => v.selected = true);
+                }
+                return false;
+            case "up":
+                v.set(0, 1);
+                break;
+            case "down":
+                v.set(0, -1);
+                break;
+            case "left":
+                v.set(-1, 0);
+                break;
+            case "right":
+                v.set(1, 0);
+                break;
+            default: return true;
+        }
+        let sel = this.draggableSelections();
+        if (sel.length == 0)
+            return true;
+        if (sel[0] instanceof Device)
+            v = v.scale(2);
+        for (let o of sel)
+            v = o.dragConstraint(v);
+        for (let o of sel)
+            o.drag(v);
+        return false;
+    }
+    _canvasKeyup() {
+        this._canvas.style.cursor = "unset";
+        this._spaceDown = false;
+    }
+    _canvasMousedown(event) {
+        if (event.event instanceof MouseEvent && (this._spaceDown || event.event.button == 2)) {
+            console.log(event.point.round().toString());
+            this._setScroll(event.event);
+            return;
+        }
+        let el = document.activeElement;
+        if (el instanceof HTMLElement)
+            el.blur();
+        if (!this._checkEvent(event.event) || this._scrollStart)
+            return;
+        let point = event.point;
+        this._processSelection(point, event.modifiers.control);
+        if (this.selections.length == 1 && this.isTouch(event.event)) {
+            this._longPressTimeout = window.setTimeout(() => {
+                this.onLongPress();
+            }, 750);
+        }
+        if (this.draggableSelections().length) {
+            this._lastKnownCursorLocation = new Point(event.downPoint).round();
+            for (let o of this.draggableSelections())
+                o.dragStart(this._lastKnownCursorLocation);
+            this._dragging = true;
+        }
+    }
+    _canvasMouseup(event) {
+        this._dragSelectView.visible = false;
+        if (!this._checkEvent(event.event))
+            return;
+        if (this._scrollStart) {
+            if (event.event instanceof MouseEvent) {
+                this._scrollStart = null;
+            }
+            return;
+        }
+        if (!event.modifiers.control)
+            this._processNextSelection();
+    }
+    _reselect(event) {
+        this._clearSelection();
+        this._processSelection(event.point, false);
+        Shrewd.commit();
+        for (let o of this.draggableSelections())
+            o.dragStart(this._lastKnownCursorLocation);
+        this._possiblyReselect = false;
+    }
+    _canvasMousedrag(event) {
+        var _a;
+        if (this._scrollStart)
+            return;
+        if (this._possiblyReselect) {
+            this._reselect(event);
+            this._dragging = true;
+        }
+        if (this._dragging) {
+            let pt = new Point(event.point).round();
+            if (this._lastKnownCursorLocation.eq(pt))
+                return;
+            window.clearTimeout(this._longPressTimeout);
+            (_a = this.onDrag) === null || _a === void 0 ? void 0 : _a.apply(null);
+            this._lastKnownCursorLocation.set(pt);
+            for (let o of this.draggableSelections())
+                pt = o.dragConstraint(pt);
+            for (let o of this.draggableSelections())
+                o.drag(pt);
+            this._studio.design.dragging = true;
+        }
+        else if (this._dragSelectables.length) {
+            if (!this._dragSelectView.visible) {
+                if (this.isTouch(event.event) && event.downPoint.getDistance(event.point) < 1)
+                    return;
+                this._clearSelection();
+                this._dragSelectView.visible = true;
+                this._dragSelectView.down = event.downPoint;
+                Shrewd.commit();
+            }
+            this._dragSelectView.now = event.point;
+            this._dragSelectView.draw();
+            for (let c of this._dragSelectables) {
+                c.selected = this._dragSelectView.contains(new paper.Point(c.dragSelectAnchor));
+            }
+        }
+    }
+    _canvasWheel(event) {
+        if (event.ctrlKey) {
+            event.preventDefault();
+            let d = this._studio.design;
+            if (d) {
+                if (d.fullscreen) {
+                    d.sheet.scale = Math.round(this._studio.$display.scale);
+                    d.fullscreen = false;
+                }
+                d.sheet.scale -= Math.round(event.deltaY / 100);
+            }
+        }
+    }
+    _canvasTouch(event) {
+        if (event.touches.length > 1) {
+            this._clearSelection();
+            this._setScroll(event);
+            this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
+        }
+    }
+    getTouchDistance(event) {
+        let t = event.touches, dx = t[1].screenX - t[0].screenX, dy = t[1].screenY - t[0].screenY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    _bodyMousemove(event) {
+        var _a;
+        if (this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
+            let e = this.isTouch(event) ? event.touches[0] : event;
+            let pt = new Point(e.screenX, e.screenY);
+            let diff = pt.sub(this._lastKnownCursorLocation);
+            let el = this._studio.$el;
+            if (this._studio.$display.isXScrollable)
+                el.scrollLeft = this._scrollStart.x - diff.x;
+            if (this._studio.$display.isYScrollable)
+                el.scrollTop = this._scrollStart.y - diff.y;
+            if (this.isTouch(event)) {
+                let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+                if (sheet) {
+                    let s = (this.getTouchDistance(event) - this._touchScaling[0]) / 30;
+                    let auto = this._studio.$display.getAutoScale();
+                    s = Math.round(s + this._touchScaling[1]);
+                    if (s <= auto) {
+                        sheet.scale = Math.ceil(auto);
+                        sheet.design.fullscreen = true;
+                    }
+                    else {
+                        sheet.scale = Math.ceil(s);
+                        sheet.design.fullscreen = false;
+                    }
+                }
+            }
+            this._scrolled = true;
+        }
+    }
+    _setScroll(event) {
+        let el = this._studio.$el;
+        let e = this.isTouch(event) ? event.touches[0] : event;
+        window.clearTimeout(this._longPressTimeout);
+        this._scrollStart = new Point(el.scrollLeft, el.scrollTop);
+        this._scrolled = false;
+        this._lastKnownCursorLocation = new Point(e.screenX, e.screenY);
+    }
+    _bodyMouseup(event) {
+        this._dragEnd();
+        window.clearTimeout(this._longPressTimeout);
+        if (this.isTouch(event) && event.touches.length == 0) {
+            this._scrollStart = null;
+        }
+    }
+    _dragEnd() {
+        this._dragging = false;
+        if (this._studio.design)
+            this._studio.design.dragging = false;
+    }
+    _bodyMenu(event) {
+        event.preventDefault();
+        this._scrollStart = null;
+    }
+    isTouch(event) {
+        return TOUCH_SUPPORT && event instanceof TouchEvent;
+    }
+};
+__decorate([
+    shrewd
+], System.prototype, "_controls", null);
+__decorate([
+    shrewd
+], System.prototype, "selections", null);
+__decorate([
+    shrewd
+], System.prototype, "draggableSelections", null);
+System = System_1 = __decorate([
+    shrewd
+], System);
+var Enum;
+(function (Enum) {
+    function values(e) {
+        return Object.values(e).filter(a => !isNaN(Number(a)));
+    }
+    Enum.values = values;
+})(Enum || (Enum = {}));
+var JunctionStatus;
+(function (JunctionStatus) {
+    JunctionStatus[JunctionStatus["tooClose"] = 0] = "tooClose";
+    JunctionStatus[JunctionStatus["overlap"] = 1] = "overlap";
+    JunctionStatus[JunctionStatus["tooFar"] = 2] = "tooFar";
+})(JunctionStatus || (JunctionStatus = {}));
+var Direction;
+(function (Direction) {
+    Direction[Direction["UR"] = 0] = "UR";
+    Direction[Direction["UL"] = 1] = "UL";
+    Direction[Direction["LL"] = 2] = "LL";
+    Direction[Direction["LR"] = 3] = "LR";
+    Direction[Direction["R"] = 4] = "R";
+    Direction[Direction["T"] = 5] = "T";
+    Direction[Direction["L"] = 6] = "L";
+    Direction[Direction["B"] = 7] = "B";
+    Direction[Direction["none"] = 8] = "none";
+})(Direction || (Direction = {}));
+var Layer;
+(function (Layer) {
+    Layer[Layer["sheet"] = 0] = "sheet";
+    Layer[Layer["shade"] = 1] = "shade";
+    Layer[Layer["hinge"] = 2] = "hinge";
+    Layer[Layer["ridge"] = 3] = "ridge";
+    Layer[Layer["axisParallel"] = 4] = "axisParallel";
+    Layer[Layer["junction"] = 5] = "junction";
+    Layer[Layer["dot"] = 6] = "dot";
+    Layer[Layer["label"] = 7] = "label";
+    Layer[Layer["drag"] = 8] = "drag";
+})(Layer || (Layer = {}));
+var CornerType;
+(function (CornerType) {
+    CornerType[CornerType["socket"] = 0] = "socket";
+    CornerType[CornerType["internal"] = 1] = "internal";
+    CornerType[CornerType["side"] = 2] = "side";
+    CornerType[CornerType["intersection"] = 3] = "intersection";
+    CornerType[CornerType["flap"] = 4] = "flap";
+    CornerType[CornerType["coincide"] = 5] = "coincide";
+})(CornerType || (CornerType = {}));
+;
+const LayerOptions = {
+    [Layer.sheet]: { clipped: false, scaled: true },
+    [Layer.shade]: { clipped: true, scaled: true },
+    [Layer.hinge]: { clipped: true, scaled: true },
+    [Layer.ridge]: { clipped: true, scaled: true },
+    [Layer.axisParallel]: { clipped: true, scaled: true },
+    [Layer.junction]: { clipped: true, scaled: true },
+    [Layer.dot]: { clipped: false, scaled: false },
+    [Layer.label]: { clipped: false, scaled: false },
+    [Layer.drag]: { clipped: false, scaled: true },
+};
+var Style;
+(function (Style) {
+    Style.circle = {
+        strokeWidth: 1,
+        strokeColor: "#69F"
+    };
+    Style.dot = {
+        fillColor: "#69F",
+        strokeWidth: 1,
+        strokeColor: "#000",
+        radius: 3
+    };
+    Style.dotSelected = {
+        strokeWidth: 3,
+        strokeColor: "red",
+    };
+    Style.hinge = {
+        strokeColor: '#69F',
+        strokeWidth: 3,
+    };
+    Style.sheet = {
+        strokeWidth: 0.25,
+        strokeColor: "#000"
+    };
+    Style.label = {
+        point: [0, 0],
+        fillColor: 'black',
+        fontWeight: 'normal',
+        strokeWidth: 0.5,
+        fontSize: 14
+    };
+    Style.glow = {
+        point: [0, 0],
+        fontWeight: 'normal',
+        strokeWidth: 2.5,
+        strokeColor: 'white',
+        fontSize: 14
+    };
+    Style.edge = {};
+    Style.ridge = {
+        strokeWidth: 1.25,
+        strokeColor: "red"
+    };
+    Style.selection = {
+        strokeColor: "#69f",
+        fillColor: "rgba(102, 153, 255, 0.2)"
+    };
+    Style.shade = {
+        fillColor: '#69F',
+        opacity: 0.3,
+        strokeWidth: 0,
+    };
+    Style.junction = {
+        strokeColor: "red",
+        fillColor: "red",
+        opacity: 0.3,
+    };
+    Style.axisParallel = {
+        strokeWidth: 1,
+        strokeColor: "green"
+    };
+    Style.top = {};
+})(Style || (Style = {}));
+const quadrants = [0, 1, 2, 3];
+function MakePerQuadrant(factory) {
+    return quadrants.map(factory);
+}
+function isQuadrant(direction) {
+    return direction < 4;
+}
+function opposite(direction) {
+    return (direction + 2) % 4;
+}
+class Line {
+    constructor(p, c) {
+        if (c instanceof Vector)
+            c = p.add(c);
+        this.p1 = p;
+        this.p2 = c;
+    }
+    toString() { return [this.p1, this.p2].sort().toString(); }
+    get isDegenerated() { return this.p1.eq(this.p2); }
+    eq(l) { return this.p1.eq(l.p1) && this.p2.eq(l.p2) || this.p1.eq(l.p2) && this.p2.eq(l.p1); }
+    contains(point, includeEndpoints = false) {
+        let p = point instanceof Point ? point : new Point(point);
+        if (includeEndpoints && (p.eq(this.p1) || p.eq(this.p2)))
+            return true;
+        var v1 = p.sub(this.p1), v2 = p.sub(this.p2);
+        return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
+    }
+    lineContains(p) {
+        return this.vector.parallel(p.sub(this.p1));
+    }
+    intersection(...t) {
+        if (t[1] === undefined)
+            return this.intersection(t[0].p1, t[0].p2.sub(t[0].p1));
+        let [p, v, isRay] = t;
+        var v1 = this.p2.sub(this.p1);
+        var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+        if (m == null)
+            return null;
+        var r = m.multiply(new Point(p.sub(this.p1)));
+        var a = r._x, b = r._y.neg;
+        if (a.lt(0) || a.gt(1))
+            return null;
+        if (isRay && b.lt(0))
+            return null;
+        return p.add(v.scale(b));
+    }
+    transform(fx, fy) {
+        return new Line(this.p1.transform(fx, fy), this.p2.transform(fx, fy));
+    }
+    shift(v) {
+        return new Line(this.p1.add(v), this.p2.add(v));
+    }
+    static distinct(lines) {
+        let signatures = new Set();
+        return lines.filter(l => {
+            let signature = l.toString(), ok = !signatures.has(signature);
+            if (ok)
+                signatures.add(signature);
+            return ok;
+        });
+    }
+    static subtract(l1, l2) {
+        let result = [];
+        let slopeMap = new Map();
+        for (let l of l2) {
+            let slope = l.slope.toString();
+            let arr = slopeMap.get(slope);
+            if (!arr)
+                slopeMap.set(slope, arr = []);
+            arr.push(l);
+        }
+        for (let l of l1) {
+            let slope = l.slope.toString();
+            if (!slopeMap.has(slope))
+                result.push(l);
+            else
+                result.push(...l.cancel(slopeMap.get(slope)));
+        }
+        return result;
+    }
+    cancel(set) {
+        let result = [this];
+        for (let l2 of set) {
+            let next = [];
+            for (let l1 of result)
+                next.push(...l1._cancel(l2));
+            result = next;
+        }
+        return result;
+    }
+    *_cancel(l) {
+        let a = this.contains(l.p1, true), b = this.contains(l.p2, true);
+        let c = l.contains(this.p1, true), d = l.contains(this.p2, true);
+        if (c && d)
+            return;
+        if (!a && !b || !c && !d)
+            yield this;
+        else if (a && b) {
+            let l11 = new Line(this.p1, l.p1), l12 = new Line(this.p1, l.p2);
+            let l21 = new Line(this.p2, l.p1), l22 = new Line(this.p2, l.p2);
+            if (l11.isDegenerated)
+                yield l22;
+            else if (l12.isDegenerated)
+                yield l21;
+            else if (l21.isDegenerated)
+                yield l12;
+            else if (l22.isDegenerated)
+                yield l11;
+            else if (l11.contains(l.p2)) {
+                yield l12;
+                yield l21;
+            }
+            else {
+                yield l11;
+                yield l22;
+            }
+        }
+        else {
+            let p1 = a ? l.p1 : l.p2;
+            let p2 = d ? this.p1 : this.p2;
+            if (!p1.eq(p2))
+                yield new Line(p1, p2);
+        }
+    }
+    get slope() {
+        return this.p1._x.sub(this.p2._x).d(this.p1._y.sub(this.p2._y));
+    }
+    xOrient() {
+        if (this.p1._x.gt(this.p2._x))
+            return [this.p2, this.p1];
+        return [this.p1, this.p2];
+    }
+    *gridPoints() {
+        let { p1, p2 } = this;
+        let dx = p2.x - p1.x, dy = p2.y - p1.y;
+        if (Math.abs(dx) < Math.abs(dy)) {
+            let f = Math.sign(dx);
+            for (let x = MathUtil.int(p1.x, f); x * f <= p2.x * f; x += f) {
+                let p = this.xIntersection(x);
+                if (p.isIntegral)
+                    yield p;
+            }
+        }
+        else {
+            let f = Math.sign(dy);
+            for (let y = MathUtil.int(p1.y, f); y * f <= p2.y * f; y += f) {
+                let p = this.yIntersection(y);
+                if (p.isIntegral)
+                    yield p;
+            }
+        }
+    }
+    xIntersection(x) {
+        let v = this.p2.sub(this.p1);
+        return new Point(x, this.p1._y.sub(v.slope.mul(this.p1._x.sub(x))).smp());
+    }
+    yIntersection(y) {
+        let v = this.p2.sub(this.p1);
+        return new Point(this.p1._x.sub(this.p1._y.sub(y).div(v.slope)).smp(), y);
+    }
+    reflect(v) {
+        v = v.neg;
+        var m = new Matrix(v._x, v._y.neg, v._y, v._x);
+        var mi = m.inverse;
+        v = mi.multiply(this.p2.sub(this.p1));
+        v = v.doubleAngle();
+        return m.multiply(v).reduce();
+    }
+    perpendicular(v) {
+        return this.vector.dot(v) == 0;
+    }
+    get vector() {
+        return this.p1.sub(this.p2);
+    }
+}
+class Matrix {
+    constructor(a, b, c, d, det) {
+        this.a = new Fraction(a);
+        this.b = new Fraction(b);
+        this.c = new Fraction(c);
+        this.d = new Fraction(d);
+        if (det)
+            this.det = det;
+        else
+            this.det = this.a.mul(this.d).s(this.b.mul(this.c)).smp();
+    }
+    toString() { return [this.a, this.b, this.c, this.d].toString(); }
+    smp() {
+        this.a.smp();
+        this.b.smp();
+        this.c.smp();
+        this.d.smp();
+        return this;
+    }
+    get determinant() { return this.det.value; }
+    get inverse() {
+        if (this.det.eq(0))
+            return null;
+        return new Matrix(this.d.div(this.det), this.b.neg.d(this.det), this.c.neg.d(this.det), this.a.div(this.det), this.det.inv).smp();
+    }
+    multiply(that) {
+        return new that.constructor(this.a.mul(that._x).a(this.b.mul(that._y)), this.c.mul(that._x).a(this.d.mul(that._y))).smp();
+    }
+    static getTransformMatrix(from, to) {
+        if (from.eq(Vector.ZERO))
+            throw new Error("Cannot transform zero vector.");
+        let M = new Matrix(from._x, from._y.neg, from._y, from._x);
+        let { _x: a, _y: b } = M.inverse.multiply(to);
+        return new Matrix(a, b.neg, b, a);
+    }
+}
+var PathUtil;
+(function (PathUtil) {
+    function triangleTransform(triangle, to) {
+        let [p1, p2, p3] = triangle;
+        let [v1, v2, v3] = [to, p2, p3].map(p => p.sub(p1));
+        let m = Matrix.getTransformMatrix(v2, v1);
+        return p1.add(m.multiply(v3));
+    }
+    PathUtil.triangleTransform = triangleTransform;
+    function collect(paths) {
+        let result = [], map = new Map(), i = 0;
+        for (let path of paths) {
+            let merged = false;
+            for (let [j, p] of path.entries()) {
+                let s = p.toString(), k = map.get(s);
+                if (k) {
+                    if (!result[k[0]])
+                        continue;
+                    result[k[0]].splice(k[1], 0, ...rotate(path, j));
+                    for (let [i, p] of result[k[0]].entries())
+                        map.set(p.toString(), [k[0], i]);
+                    merged = true;
+                    break;
+                }
+                else
+                    map.set(s, [i, j]);
+            }
+            if (!merged) {
+                result.push(path);
+                i++;
+            }
+        }
+        return { paths: result, map };
+    }
+    PathUtil.collect = collect;
+    function join(p1, p2) {
+        p1 = p1.concat();
+        p2 = p2.concat();
+        for (let i = 0; i < p1.length; i++) {
+            for (let j = 0; j < p2.length; j++) {
+                if (p1[i].eq(p2[j])) {
+                    rotate(p2, j);
+                    p1.splice(i, 2, ...p2);
+                    return p1;
+                }
+            }
+        }
+        return p1;
+    }
+    PathUtil.join = join;
+    function shift(path, v) {
+        return path.map(p => p.add(v));
+    }
+    PathUtil.shift = shift;
+    function polygonIntersect(p1, p2) {
+        let l1 = pathToLines(p1), l2 = pathToLines(p2);
+        return p1.some(p => pointInPolygon(p, l2)) || p2.some(p => pointInPolygon(p, l1));
+    }
+    PathUtil.polygonIntersect = polygonIntersect;
+    function lineInsidePath(l, path) {
+        let lines = pathToLines(path);
+        return pointInPolygon(l.p1, lines, true) && pointInPolygon(l.p2, lines, true);
+    }
+    PathUtil.lineInsidePath = lineInsidePath;
+    function pointInsidePath(p, path) {
+        return pointInPolygon(p, pathToLines(path));
+    }
+    PathUtil.pointInsidePath = pointInsidePath;
+    function pathToLines(p) {
+        let result = [];
+        for (let i = 0; i < p.length; i++) {
+            let [p1, p2] = [p[i], p[(i + 1) % p.length]];
+            if (!p1.eq(p2))
+                result.push(new Line(p1, p2));
+        }
+        return result;
+    }
+    function pointInPolygon(p, lines, boundary = false) {
+        if (lines.length <= 2)
+            return boundary && lines[0].contains(p, true);
+        let n = 0, v = new Vector(1, 0);
+        for (let l of lines) {
+            if (l.p1.eq(p) || l.p2.eq(p))
+                return boundary;
+            let int = l.intersection(p, v, true);
+            if (!int)
+                continue;
+            if (int.eq(p))
+                return boundary;
+            let e1 = int.eq(l.p1), e2 = int.eq(l.p2);
+            if (!e1 && !e2 || e1 && l.p2._y.lt(p._y) || e2 && l.p1._y.lt(p._y))
+                n++;
+        }
+        return n % 2 == 1;
+    }
+    function rotate(p, j) {
+        p.push(...p.splice(0, j));
+        return p;
+    }
+})(PathUtil || (PathUtil = {}));
+class Rectangle {
+    constructor(p1, p2) {
+        if (p1._x.gt(p2._x))
+            [p1, p2] = [p2, p1];
+        if (p1._y.gt(p2._y))
+            [p1, p2] = [new Point(p1._x, p2._y), new Point(p2._x, p1._y)];
+        [this.p1, this.p2] = [p1, p2];
+    }
+    contains(rec) {
+        return this.p1._x.le(rec.p1._x) && this.p1._y.le(rec.p1._y) &&
+            this.p2._x.ge(rec.p2._x) && this.p2._y.ge(rec.p2._y);
+    }
+    equals(rec) {
+        return this.p1.eq(rec.p1) && this.p2.eq(rec.p2);
+    }
+    get width() { return this.p2._x.sub(this.p1._x).value; }
+    get height() { return this.p2._y.sub(this.p1._y).value; }
+    get top() { return this.p2.y; }
+    get right() { return this.p2.x; }
+}
+var Trace;
+(function (Trace) {
+    function create(lines, startPt, sv, end, start) {
+        let history = [];
+        let trace = [];
+        let x;
+        let v = sv;
+        let p = startPt;
+        let shift;
+        let line;
+        let record = new Set();
+        let candidates = new Set(lines);
+        do {
+            x = null;
+            for (let l of candidates) {
+                let ang = shift ? getAngle(v, shift) : undefined;
+                if (!isLeftTouchable(l, p, v, ang))
+                    continue;
+                let r = getIntersection(l, p, v);
+                if (debug && r)
+                    console.log([JSON.stringify(r), l.toString()]);
+                if (intersectionCloser(r, x)) {
+                    x = r;
+                    line = l;
+                }
+            }
+            if (x) {
+                let pt = x.point;
+                let l = new Line(p, pt);
+                if (start) {
+                    let p = l.intersection(start);
+                    if (p) {
+                        trace.push(p);
+                        start = undefined;
+                    }
+                }
+                let goal = l.intersection(end);
+                if (goal) {
+                    trace.push(goal);
+                    break;
+                }
+                let sg = pt.toString();
+                if (record.has(sg))
+                    processLoop(history, pt, candidates);
+                else
+                    record.add(sg);
+                history.push(pt);
+                if (!start) {
+                    if (!trace.length || !trace[trace.length - 1].eq(pt))
+                        trace.push(pt);
+                }
+                shift = line.vector;
+                v = line.reflect(v);
+                if (debug)
+                    console.log([pt.toString(), line.toString(), v.toString(), shift.toString()]);
+                p = pt;
+                candidates.delete(line);
+            }
+        } while (x != null);
+        return trace;
+    }
+    Trace.create = create;
+    function processLoop(trace, pt, candidates) {
+        let path = [], i = trace.length - 1;
+        do {
+            path.push(trace[i]);
+        } while (!trace[i--].eq(pt));
+        if (path.length <= 2)
+            return;
+        for (let l of candidates)
+            if (PathUtil.lineInsidePath(l, path))
+                candidates.delete(l);
+    }
+    function intersectionCloser(r, x) {
+        return r != null && (x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle < x.angle);
+    }
+    function getIntersection(l, p, v) {
+        var v1 = l.p2.sub(l.p1);
+        var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+        if (m == null)
+            return null;
+        var r = m.multiply(new Point(p.sub(l.p1)));
+        var a = r._x, b = r._y.neg;
+        if (a.lt(0) || a.gt(1) || b.lt(0))
+            return null;
+        return {
+            point: p.add(v.scale(b)),
+            dist: b,
+            angle: getAngle(v, v1)
+        };
+    }
+    function getAngle(v1, v2) {
+        var ang = v1.angle - v2.angle;
+        while (ang < 0)
+            ang += Math.PI;
+        while (ang > Math.PI)
+            ang -= Math.PI;
+        return ang;
+    }
+    function isLeftTouchable(l, p, v, ang) {
+        let rv = v.rotate90();
+        let v1 = l.p1.sub(p), v2 = l.p2.sub(p);
+        let r1 = v1.dot(rv), r2 = v2.dot(rv);
+        let d1 = v1.dot(v), d2 = v2.dot(v);
+        return (r1 > 0 || r2 > 0) && (d1 > 0 || d2 > 0 || !!ang && getAngle(v, l.vector) > ang);
+    }
+})(Trace || (Trace = {}));
+var ConfigUtil;
+(function (ConfigUtil) {
+    function joinOverlaps(o1, o2, i1, i2, oriented, reverse = false) {
+        if (reverse) {
+            [o1, o2] = [o2, o1];
+            [i1, i2] = [i2, i1];
+        }
+        let c = oriented ? 0 : 2;
+        let q = ((o2.ox > o1.ox ? 3 : 1) + c) % 4;
+        o2.c[c] = { type: CornerType.coincide, e: i1, q: c };
+        o2.c[q] = { type: CornerType.intersection, e: o1.c[opposite(c)].e };
+        o1.c[opposite(q)] = { type: CornerType.coincide, e: i2, q: q };
+        return o2;
+    }
+    ConfigUtil.joinOverlaps = joinOverlaps;
+    function cut(j, index, id, x, y) {
+        let o1 = toOverlap(j, index), o2 = toOverlap(j, index);
+        if (x > 0) {
+            o1.c[2] = { type: CornerType.internal, e: id - 1, q: 3 };
+            o1.c[1] = { type: CornerType.socket, e: id - 1, q: 0 };
+            o1.ox = x;
+            o2.c[3] = { type: CornerType.socket, e: id, q: 2 };
+            o2.c[0] = { type: CornerType.internal, e: id, q: 1 };
+            o2.ox = j.ox - x;
+            o2.shift = { x, y: 0 };
+        }
+        else {
+            o1.c[2] = { type: CornerType.internal, e: id - 1, q: 1 };
+            o1.c[3] = { type: CornerType.socket, e: id - 1, q: 0 };
+            o1.oy = y;
+            o2.c[1] = { type: CornerType.socket, e: id, q: 2 };
+            o2.c[0] = { type: CornerType.internal, e: id, q: 3 };
+            o2.oy = j.oy - y;
+            o2.shift = { x: 0, y };
+        }
+        return [{ overlaps: [o1] }, { overlaps: [o2] }];
+    }
+    ConfigUtil.cut = cut;
+    function toOverlap(j, index) {
+        return {
+            c: clone(j.c),
+            ox: j.ox,
+            oy: j.oy,
+            parent: index
+        };
+    }
+    ConfigUtil.toOverlap = toOverlap;
+})(ConfigUtil || (ConfigUtil = {}));
+var Strategy;
+(function (Strategy) {
+    Strategy["halfIntegral"] = "HALFINTEGRAL";
+    Strategy["universal"] = "UNIVERSAL";
+    Strategy["baseJoin"] = "BASE_JOIN";
+    Strategy["standardJoin"] = "STANDARD_JOIN";
+    Strategy["perfect"] = "PERFECT";
+})(Strategy || (Strategy = {}));
+class Configurator {
+    constructor(repo, option) {
+        this.repo = repo;
+        this.seed = option === null || option === void 0 ? void 0 : option.configuration;
+        this.seedSignature = JSON.stringify(this.seed);
+        this.pattern = option === null || option === void 0 ? void 0 : option.pattern;
+    }
+    *generate(callback) {
+        if (this.seed && this.pattern) {
+            try {
+                let c = new Configuration(this.repo, this.seed, this.pattern);
+                if (!c.entry)
+                    throw true;
+                yield c;
+            }
+            catch (e) {
+                this.seedSignature = undefined;
+                console.log("Incompatible old version.");
+            }
+        }
+        let filter = (config) => !this.seedSignature || this.seedSignature != JSON.stringify(config);
+        yield* GeneratorUtil.filter(this.search(), filter);
+        callback();
+    }
+    *search() {
+        const structure = this.repo.structure;
+        const filter = (config) => config.entry != null;
+        if (structure.length == 1) {
+            let [j] = structure;
+            yield* GeneratorUtil.first([
+                this.searchSingleGadget(j),
+                this.searchDoubleRelay(j, 0),
+                this.searchSingleGadget(j, Strategy.halfIntegral),
+                this.searchSingleGadget(j, Strategy.universal),
+            ], filter);
+        }
+        if (structure.length == 2) {
+            let layout = structure;
+            yield* GeneratorUtil.first([
+                this.searchThreeFlapJoin(layout, Strategy.perfect),
+                this.searchThreeFlapRelay(layout),
+                this.searchThreeFlapJoin(layout),
+                this.searchThreeFlapRelayJoin(layout),
+                this.searchThreeFlapJoin(layout, Strategy.baseJoin),
+                this.searchThreeFlapRelayJoin(layout, Strategy.baseJoin),
+                this.searchThreeFlapJoin(layout, Strategy.standardJoin),
+                this.searchThreeFlapRelayJoin(layout, Strategy.standardJoin),
+                this.searchThreeFlapRelay(layout, Strategy.halfIntegral),
+            ], filter);
+        }
+    }
+    *searchSingleGadget(j, strategy) {
+        yield new Configuration(this.repo, {
+            partitions: [{
+                    overlaps: [ConfigUtil.toOverlap(j, 0)],
+                    strategy: strategy
+                }]
+        });
+    }
+    *searchDoubleRelay(j, index) {
+        if ((j.ox * j.oy) % 2)
+            return;
+        if (j.ox < j.oy) {
+            for (let y = 1; y <= j.oy / 2; y++) {
+                let c = new Configuration(this.repo, { partitions: ConfigUtil.cut(j, index, -1, 0, y) });
+                if (c.entry) {
+                    yield c;
+                    yield new Configuration(this.repo, { partitions: ConfigUtil.cut(j, index, -1, 0, j.oy - y) });
+                }
+            }
+        }
+        else {
+            for (let x = 1; x <= j.ox / 2; x++) {
+                let c = new Configuration(this.repo, { partitions: ConfigUtil.cut(j, index, -1, x, 0) });
+                if (c.entry) {
+                    yield c;
+                    yield new Configuration(this.repo, { partitions: ConfigUtil.cut(j, index, -1, j.ox - x, 0) });
+                }
+            }
+        }
+    }
+    *searchThreeFlapRelay(junctions, strategy) {
+        let [o1, o2] = junctions.map((j, i) => ConfigUtil.toOverlap(j, i));
+        let oriented = o1.c[2].e == o2.c[2].e;
+        if (o1.ox > o2.ox)
+            [o1, o2] = [o2, o1];
+        let [o1p, o2p] = clone([o1, o2]);
+        o2p.ox -= o1.ox;
+        o1p.oy -= o2.oy;
+        let [a, b, c, d] = oriented ? [0, 1, 2, 3] : [2, 3, 0, 1];
+        o2p.c[c] = { type: CornerType.internal, e: -1, q: d };
+        o2p.c[b] = { type: CornerType.intersection, e: o1.c[a].e };
+        o1.c[d] = { type: CornerType.socket, e: -2, q: c };
+        o1p.c[c] = { type: CornerType.internal, e: -2, q: b };
+        o1p.c[d] = { type: CornerType.intersection, e: o2.c[a].e };
+        o2.c[b] = { type: CornerType.socket, e: -1, q: c };
+        if (!oriented) {
+            o2p.shift = { x: o1.ox, y: 0 };
+            o1p.shift = { x: 0, y: o2.oy };
+        }
+        yield new Configuration(this.repo, {
+            partitions: [
+                { overlaps: [o1], strategy: strategy },
+                { overlaps: [o2p], strategy: strategy }
+            ]
+        });
+        yield new Configuration(this.repo, {
+            partitions: [
+                { overlaps: [o1p], strategy: strategy },
+                { overlaps: [o2], strategy: strategy }
+            ]
+        });
+    }
+    *searchThreeFlapJoin(junctions, strategy) {
+        let [o1, o2] = junctions.map((j, i) => ConfigUtil.toOverlap(j, i));
+        ConfigUtil.joinOverlaps(o1, o2, -1, -2, o1.c[0].e == o2.c[0].e);
+        yield new Configuration(this.repo, {
+            partitions: [{
+                    overlaps: [o1, o2],
+                    strategy: strategy
+                }]
+        });
+    }
+    *searchThreeFlapRelayJoin(junctions, strategy) {
+        let [o1, o2] = junctions.map((j, i) => ConfigUtil.toOverlap(j, i));
+        let oriented = o1.c[0].e == o2.c[0].e;
+        let o1x = o2.ox > o1.ox;
+        let x = (o1x ? o1 : o2).ox, y = (o1x ? o2 : o1).oy;
+        for (let n = 1; n < x; n++) {
+            let [o1p, o2p] = clone([o1, o2]);
+            let o = ConfigUtil.joinOverlaps(o1p, o2p, -1, -2, oriented, !o1x);
+            o.ox -= n;
+            if (oriented)
+                o.shift = { x: n, y: 0 };
+            yield new Configuration(this.repo, {
+                partitions: [{
+                        overlaps: [o1p, o2p],
+                        strategy: strategy
+                    }]
+            });
+        }
+        for (let n = 1; n < y; n++) {
+            let [o1p, o2p] = clone([o1, o2]);
+            let o = ConfigUtil.joinOverlaps(o1p, o2p, -1, -2, oriented, o1x);
+            o.oy -= n;
+            if (oriented)
+                o.shift = { x: 0, y: n };
+            yield new Configuration(this.repo, {
+                partitions: [{
+                        overlaps: [o1p, o2p],
+                        strategy: strategy
+                    }]
+            });
+        }
+    }
+}
+let Device = class Device extends Draggable {
+    constructor(pattern, partition, data) {
+        var _a, _b, _c;
+        super(pattern.sheet);
+        this.pattern = pattern;
+        this.partition = partition;
+        let { fx, fy } = pattern.stretch;
+        this.gadgets = data.gadgets.map(g => Gadget.instantiate(g));
+        this.addOns = (_b = (_a = data.addOns) === null || _a === void 0 ? void 0 : _a.map(a => AddOn.instantiate(a))) !== null && _b !== void 0 ? _b : [];
+        let offset = (_c = data.offset) !== null && _c !== void 0 ? _c : 0;
+        this.location = { x: offset * fx, y: offset * fy };
+        this.view = new DeviceView(this);
+    }
+    get type() { return "Device"; }
+    toJSON() {
+        return {
+            gadgets: this.gadgets.map(g => g.toJSON()),
+            offset: this.offset,
+            addOns: this.addOns.length ? this.addOns : undefined
+        };
+    }
+    get _origin() {
+        this._originalDisplacement || (this._originalDisplacement = this.partition.getOriginalDisplacement(this.pattern));
+        return this.pattern.stretch.origin.add(this._originalDisplacement);
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.pattern.disposed;
+    }
+    get isActive() { return this.pattern.isActive; }
+    get anchors() {
+        let result = [];
+        let { fx, fy } = this.pattern.stretch;
+        for (let g of this.gadgets) {
+            result.push(g.anchorMap.map(m => {
+                if (!m[0])
+                    debugger;
+                return m[0].transform(fx, fy).add(this.delta);
+            }));
+        }
+        return result;
+    }
+    get delta() {
+        return this._origin.add(new Vector(this.location)).sub(Point.ZERO);
+    }
+    get regions() {
+        let result = [];
+        for (let g of this.gadgets)
+            result.push(...g.pieces);
+        result.push(...this.addOns);
+        return result;
+    }
+    get regionRidges() {
+        let map = new Map();
+        for (let r of this.regions) {
+            let s = this.regions
+                .filter(q => q != r && q.direction.parallel(r.direction))
+                .reduce((arr, q) => (arr.push(...q.shape.ridges.filter(r => !r.perpendicular(q.direction))), arr), []);
+            map.set(r, Line.subtract(r.shape.ridges, s));
+        }
+        return map;
+    }
+    get rawRidges() {
+        let { fx, fy } = this.pattern.stretch;
+        let result = [];
+        let map = this.regionRidges;
+        for (let r of this.regions) {
+            result.push(...map.get(r).map(r => r.transform(fx, fy).shift(this.delta)));
+        }
+        return Line.distinct(result);
+    }
+    get ridges() {
+        return Line.subtract(this.rawRidges, this.neighbors.reduce((arr, g) => (arr.push(...g.rawRidges), arr), []));
+    }
+    get axisParallels() {
+        let { fx, fy } = this.pattern.stretch;
+        let result = [];
+        for (let r of this.regions) {
+            for (let ap of r.axisParallels) {
+                result.push(ap.transform(fx, fy).shift(this.delta));
+            }
+        }
+        return result;
+    }
+    get outerRidges() {
+        if (!this.isActive)
+            return [];
+        let result = this.getConnectionRidges();
+        for (let [from, to] of this.intersectionMap)
+            if (to)
+                result.push(new Line(from, to));
+        return Line.distinct(result);
+    }
+    get intersectionMap() {
+        let result = [];
+        if (!this.isActive)
+            return result;
+        for (let [c, o, q] of this.partition.intersectionCorners) {
+            let from = this.anchors[o][q];
+            let to = this.partition.getSideConnectionTarget(from, c);
+            result.push([from, to]);
+        }
+        return result;
+    }
+    get openAnchors() {
+        return this.intersectionMap.filter(m => !m[1] || m[0].eq(m[1])).map(m => m[0]);
+    }
+    getConnectionRidges(internalOnly = false) {
+        let result = [];
+        for (let [i, ov] of this.partition.overlaps.entries()) {
+            for (let [q, c] of ov.c.entries()) {
+                if (c.type == CornerType.flap && !internalOnly || c.type == CornerType.internal) {
+                    result.push(new Line(this.anchors[i][q], this.pattern.getConnectionTarget(c)));
+                }
+            }
+        }
+        return result;
+    }
+    constraint(v, location) {
+        let { fx, fy } = this.pattern.stretch, f = fx * fy;
+        let x = Math.round((v.x + f * v.y) / 2);
+        for (let [c, o, q] of this.partition.constraints) {
+            x = this.fix(x, c, o, q);
+        }
+        return new Vector(x, f * x);
+    }
+    get neighbors() {
+        let result = new Set();
+        for (let o of this.partition.overlaps) {
+            for (let c of o.c)
+                if (c.type == CornerType.socket || c.type == CornerType.internal) {
+                    let [i] = this.partition.configuration.overlapMap.get(c.e);
+                    result.add(this.pattern.devices[i]);
+                }
+        }
+        return Array.from(result);
+    }
+    fix(dx, c, o, q) {
+        let out = c.type != CornerType.socket;
+        let f = this.pattern.stretch.fx * ((out ? q : opposite(c.q)) == 0 ? -1 : 1);
+        let target = this.pattern.getConnectionTarget(c);
+        let slack = out ? this.gadgets[o].slacks[q] : this.pattern.gadgets[-c.e - 1].slacks[c.q];
+        let bound = target.x - this.anchors[o][q].x - slack * f;
+        if (dx * f > bound * f)
+            dx = bound;
+        return dx;
+    }
+    get offset() {
+        let dx = this.partition.getOriginalDisplacement(this.pattern).x;
+        dx -= this._originalDisplacement.x;
+        return (this.location.x - dx) * this.pattern.stretch.fx;
+    }
+};
+__decorate([
+    shrewd
+], Device.prototype, "isActive", null);
+__decorate([
+    shrewd
+], Device.prototype, "anchors", null);
+__decorate([
+    shrewd
+], Device.prototype, "delta", null);
+__decorate([
+    onDemand
+], Device.prototype, "regions", null);
+__decorate([
+    onDemand
+], Device.prototype, "regionRidges", null);
+__decorate([
+    shrewd
+], Device.prototype, "rawRidges", null);
+__decorate([
+    shrewd
+], Device.prototype, "ridges", null);
+__decorate([
+    shrewd
+], Device.prototype, "axisParallels", null);
+__decorate([
+    shrewd
+], Device.prototype, "outerRidges", null);
+__decorate([
+    shrewd
+], Device.prototype, "intersectionMap", null);
+__decorate([
+    shrewd
+], Device.prototype, "openAnchors", null);
+__decorate([
+    shrewd
+], Device.prototype, "neighbors", null);
+Device = __decorate([
+    shrewd
+], Device);
+class Gadget {
+    constructor(gadget) {
+        this.pieces = gadget.pieces.map(p => Piece.instantiate(p));
+        this.offset = gadget.offset;
+        this.pieces.forEach(p => p.offset(this.offset));
+        this.anchors = gadget.anchors;
+    }
+    toJSON() {
+        return clone(this);
+    }
+    get anchorMap() {
+        return MakePerQuadrant(q => {
+            var _a, _b;
+            if ((_b = (_a = this.anchors) === null || _a === void 0 ? void 0 : _a[q]) === null || _b === void 0 ? void 0 : _b.location) {
+                let p = new Point(this.anchors[q].location);
+                if (this.offset)
+                    p.addBy(new Vector(this.offset));
+                return [p, null];
+            }
+            else {
+                if (this.pieces.length == 1)
+                    return [this.pieces[0].anchors[q], 0];
+                for (let [i, p] of this.pieces.entries()) {
+                    if (p.anchors[q])
+                        return [p.anchors[q], i];
+                }
+                debugger;
+                throw new Error();
+            }
+        });
+    }
+    _getSlack(q) {
+        var _a, _b, _c;
+        return (_c = (_b = (_a = this.anchors) === null || _a === void 0 ? void 0 : _a[q]) === null || _b === void 0 ? void 0 : _b.slack) !== null && _c !== void 0 ? _c : 0;
+    }
+    get slacks() {
+        return MakePerQuadrant(q => this._getSlack(q));
+    }
+    get sx() {
+        return Math.ceil(this.anchorMap[2][0].x - this.anchorMap[0][0].x);
+    }
+    get sy() {
+        return Math.ceil(this.anchorMap[2][0].y - this.anchorMap[0][0].y);
+    }
+    reverseGPS() {
+        let g = Gadget.instantiate(this.toJSON());
+        let [p1, p2] = g.pieces;
+        let sx = Math.ceil(Math.max(p1.sx, p2.sx));
+        let sy = Math.ceil(Math.max(p1.sy, p2.sy));
+        p1.revserse(sx, sy);
+        p2.revserse(sx, sy);
+        return g;
+    }
+    addSlack(q, slack) {
+        var _a;
+        this.anchors = this.anchors || [];
+        this.anchors[q] = this.anchors[q] || {};
+        this.anchors[q].slack = ((_a = this.anchors[q].slack) !== null && _a !== void 0 ? _a : 0) + slack;
+        return this;
+    }
+    setupConnectionSlack(g, q1, q2) {
+        let c1 = this.contour, c2 = g.contour;
+        let f = q1 == 0 ? 1 : -1;
+        let step = new Vector(f, f);
+        let v = g.anchorMap[q2][0].sub(Point.ZERO).addBy(step.scale(this._getSlack(q1)));
+        c1 = PathUtil.shift(c1, q1 == 0 ? v : v.add(Point.ZERO.sub(this.anchorMap[2][0])));
+        let s = 0;
+        while (PathUtil.polygonIntersect(c1, c2)) {
+            c1 = PathUtil.shift(c1, step);
+            s++;
+        }
+        this.addSlack(q1, s);
+        return s;
+    }
+    get contour() {
+        let p = this.pieces, contour = p[0].shape.contour;
+        for (let i = 1; i < p.length; i++)
+            contour = PathUtil.join(contour, p[i].shape.contour);
+        return contour;
+    }
+    rx(q1, q2) {
+        return Math.abs(this.anchorMap[q1][0].x - this.anchorMap[q2][0].x);
+    }
+    ry(q1, q2) {
+        return Math.abs(this.anchorMap[q1][0].y - this.anchorMap[q2][0].y);
+    }
+    contains(p) {
+        return this.pieces.some(pc => PathUtil.pointInsidePath(p, pc.shape.contour));
+    }
+    static instantiate(g) {
+        if (g instanceof Gadget)
+            return g;
+        else
+            return new Gadget(g);
+    }
+    static simplify(g) {
+        if (g.offset && g.offset.x == 0 && g.offset.y == 0)
+            delete g.offset;
+        if (g.anchors) {
+            for (let [i, a] of g.anchors.entries()) {
+                if (!a)
+                    continue;
+                if (a.slack === 0)
+                    delete a.slack;
+                if (Object.keys(a).length == 0)
+                    delete g.anchors[i];
+            }
+            if (!g.anchors.some(a => !!a))
+                delete g.anchors;
+        }
+        return g;
+    }
+}
+__decorate([
+    onDemand
+], Gadget.prototype, "anchorMap", null);
+__decorate([
+    onDemand
+], Gadget.prototype, "slacks", null);
+__decorate([
+    onDemand
+], Gadget.prototype, "sx", null);
+__decorate([
+    onDemand
+], Gadget.prototype, "sy", null);
+__decorate([
+    onDemand
+], Gadget.prototype, "contour", null);
+class Joiner {
+    constructor(overlaps, repo) {
+        let junctions = [];
+        let [o1, o2] = overlaps;
+        if (o1.ox == o2.ox || o1.oy == o2.oy)
+            return;
+        [this.g1, this.g2] = overlaps.map(o => {
+            let j = repo.structure[o.parent];
+            junctions.push(j);
+            return Array.from(Piece.gops(o, j.sx));
+        });
+        let [j1, j2] = junctions;
+        this.oriented = j1.c[0].e == j2.c[0].e;
+        this.cw = o1.ox > o2.ox;
+        this.q = this.oriented ? 0 : 2;
+        [this.q1, this.q2] = this.oriented ? (this.cw ? [2, 1] : [1, 2]) : (this.cw ? [0, 3] : [3, 0]);
+        this.intDist = Partitioner.getMaxIntersectionDistance(repo.sheet.design.tree, j1, j2, this.oriented);
+        [this.s1, this.s2] = this.oriented ?
+            [o1.shift, o2.shift] :
+            [this.getReverseShift(o1, j1), this.getReverseShift(o2, j2)];
+    }
+    *join(generator, precondition) {
+        let { g1, g2 } = this;
+        let result = [];
+        if (!g1)
+            return;
+        for (let p1 of g1) {
+            for (let p2 of g2) {
+                let P1 = Piece.instantiate(p1, true);
+                let P2 = Piece.instantiate(p2, true);
+                if (precondition && !precondition(P1, P2))
+                    continue;
+                result.push(...generator(new JoinerCore(this, P1, P2)));
+            }
+        }
+        result.sort((a, b) => a[1] - b[1]);
+        for (let [j] of result)
+            yield j;
+    }
+    *simpleJoin(strategy) {
+        let { s1, s2 } = this;
+        yield* this.join(j => j.simpleJoin(), (P1, P2) => {
+            let parallel = P1.direction.parallel(P2.direction);
+            if (strategy == Strategy.perfect && !parallel)
+                return false;
+            if ((s1 || s2) && parallel)
+                return false;
+            return true;
+        });
+    }
+    *baseJoin() {
+        yield* this.join(j => j.baseJoin());
+    }
+    *standardJoin() {
+        let { s1, s2 } = this, shift = !!s1 || !!s2;
+        let counter = 0;
+        yield* this.join(j => j.standardJoin(), (P1, P2) => {
+            return shift || counter++ == 0;
+        });
+    }
+    getReverseShift(o, j) {
+        var _a, _b, _c, _d;
+        let x = o.ox + ((_b = (_a = o.shift) === null || _a === void 0 ? void 0 : _a.x) !== null && _b !== void 0 ? _b : 0), y = o.oy + ((_d = (_c = o.shift) === null || _c === void 0 ? void 0 : _c.y) !== null && _d !== void 0 ? _d : 0);
+        if (x == j.ox && y == j.oy)
+            return undefined;
+        return { x: x - j.ox, y: y - j.oy };
+    }
+    getRelayJoinIntersection(p, s, n) {
+        let testVector = this.oriented ? new Vector(1, 1) : new Vector(-1, -1);
+        let pt = p.anchors[this.q].sub(new Vector(s));
+        return p.shape.ridges[n].intersection(pt, testVector);
+    }
+}
+class JoinerCore {
+    constructor(joiner, p1, p2) {
+        let { oriented, s1, s2, q1, q2, q } = this.joiner = joiner;
+        let a1 = [], a2 = [];
+        let size = p1.sx + p2.sx;
+        let off1 = { x: 0, y: 0 }, off2 = { x: 0, y: 0 };
+        if (s1) {
+            let int = joiner.getRelayJoinIntersection(p2, s1, (q1 + 2) % 4);
+            if (!int || !int.isIntegral)
+                return;
+            if (oriented) {
+                p1.offset(off1 = int.toIPoint());
+                size += off1.x;
+                a1[q] = { location: { x: -off1.x, y: -off1.y } };
+            }
+            else {
+                p2.offset(off2 = { x: p2.sx - int.x, y: p2.sy - int.y });
+                size += off2.x;
+                a1[q] = { location: { x: p1.sx + off2.x, y: p1.sy + off2.y } };
+            }
+        }
+        if (s2) {
+            let int = joiner.getRelayJoinIntersection(p1, s2, (q2 + 2) % 4);
+            if (!int || !int.isIntegral)
+                return;
+            if (oriented) {
+                p2.offset(off2 = int.toIPoint());
+                size += off2.x;
+                a2[q] = { location: { x: -off2.x, y: -off2.y } };
+            }
+            else {
+                p2.offset(off2 = { x: int.x - p1.sx, y: int.y - p1.sy });
+                size -= off2.x;
+                a2[q] = { location: { x: p2.sx - off2.x, y: p2.sy - off2.y } };
+            }
+        }
+        let offset, o = Vector.ZERO;
+        if (!oriented) {
+            offset = { x: p1.sx - p2.sx, y: p1.sy - p2.sy };
+            o = new Vector(offset);
+        }
+        let v1 = new Vector(off1).neg, v2 = new Vector(off2).addBy(o).neg;
+        let pt = (s1 ? p1.anchors[q] : p2.anchors[q].add(o));
+        let pt1 = pt.add(v1).toIPoint(), pt2 = pt.add(v2).toIPoint();
+        let e1 = p1.shape.ridges[q1], e2 = p2.shape.ridges[q2].shift(o);
+        let bv = Vector.bisector(p1.direction, p2.direction);
+        let org = oriented ? Point.ZERO : s1 ? new Point(a1[q].location) : p1.anchors[q];
+        let f = oriented ? 1 : -1;
+        this.data = { p1, p2, v1, v2, a1, a2, off1, off2, offset, size, pt, pt1, pt2, e1, e2, bv, org, f };
+    }
+    *simpleJoin() {
+        if (!this.data)
+            return;
+        let { e1, e2, p1, p2, pt, bv } = this.data;
+        let int = e1.intersection(e2);
+        if (!int)
+            return;
+        if (!p1.direction.parallel(p2.direction) && !int.sub(pt).parallel(bv))
+            return;
+        if (!this.setupAnchor(int))
+            return;
+        this.setupDetour([int], [int]);
+        yield this.result();
+    }
+    get deltaPt() {
+        let { org, p1, p2, f } = this.data;
+        let { cw, intDist } = this.joiner;
+        return new Point(org.x + (intDist - (cw ? p2 : p1).ox) * f, org.y + (intDist - (cw ? p1 : p2).oy) * f);
+    }
+    baseJoinIntersections() {
+        let { bv, e1, e2, pt } = this.data;
+        let delta = new Line(this.deltaPt, Quadrant.QV[0]), beta = new Line(pt, bv);
+        let D1 = e1.intersection(delta), D2 = e2.intersection(delta);
+        let B1 = e1.intersection(beta), B2 = e2.intersection(beta);
+        return { D1, D2, B1, B2, delta };
+    }
+    *baseJoin() {
+        if (!this.data)
+            return;
+        let { D1, D2, B1, B2 } = this.baseJoinIntersections();
+        if ((B1 === null || B1 === void 0 ? void 0 : B1.isIntegral) && (D2 === null || D2 === void 0 ? void 0 : D2.isIntegral) && !B1.eq(D2)) {
+            if (!this.setupAnchor(D2))
+                return;
+            this.setupDetour([B1], [D2, B1]);
+            yield this.result(true);
+        }
+        if ((B2 === null || B2 === void 0 ? void 0 : B2.isIntegral) && (D1 === null || D1 === void 0 ? void 0 : D1.isIntegral) && !B2.eq(D1)) {
+            if (!this.setupAnchor(D1))
+                return;
+            this.setupDetour([D1, B2], [B2]);
+            yield this.result();
+        }
+    }
+    substituteEnd(e, p) {
+        let [p1, p2] = e.xOrient();
+        return new Line(p, this.joiner.oriented ? p2 : p1);
+    }
+    closestGridPoint(e, p) {
+        let r, d = Number.POSITIVE_INFINITY;
+        for (let i of e.gridPoints()) {
+            let dist = i.dist(p);
+            if (dist < d) {
+                d = dist;
+                r = i;
+            }
+        }
+        return r;
+    }
+    *standardJoin() {
+        if (!this.data)
+            return;
+        let { D1, D2, B1, B2, delta } = this.baseJoinIntersections();
+        let { f } = this.data;
+        if (B1 && D2 && !B1.eq(D2)) {
+            if (D2.x * f > B1.x * f)
+                yield* this.obtuseStandardJoin(B1, D2, 0);
+            else
+                yield* this.acuteStandardJoin(B1, D2, 1, delta);
+        }
+        if (B2 && D1 && !B2.eq(D1)) {
+            if (D1.x * f > B2.x * f)
+                yield* this.obtuseStandardJoin(B2, D1, 1);
+            else
+                yield* this.acuteStandardJoin(B2, D1, 0, delta);
+        }
+    }
+    *obtuseStandardJoin(B, D, i) {
+        if (B.isIntegral)
+            return;
+        let { e1, e2, p1, p2, pt, f } = this.data;
+        let { cw } = this.joiner;
+        let e = [e1, e2][i], p = [p1, p2][i];
+        if (cw != (p1.direction.slope.gt(p2.direction.slope)))
+            return;
+        if (!this.setupAnchor(D))
+            return;
+        let P = D.sub(B).slope.gt(1) ? e.xIntersection(D.x) : e.yIntersection(D.y);
+        let T = this.closestGridPoint(this.substituteEnd(e, B), D);
+        if (T.eq(e.p1) || T.eq(e.p2))
+            return;
+        let R = PathUtil.triangleTransform([D, P, B], T);
+        if (R.x * f < pt.x * f)
+            return;
+        this.data.addOns = [{
+                contour: [D, T, R].map(p => p.toIPoint()),
+                dir: new Line(T, R).reflect(p.direction).toIPoint()
+            }];
+        this.setupDetour([i == 0 ? T : D, R], [i == 0 ? D : T, R]);
+        yield this.result(true, R.dist(T));
+    }
+    *acuteStandardJoin(B, D, i, delta) {
+        if (D.isIntegral)
+            return;
+        let { e1, e2, p1, p2 } = this.data;
+        let e = [e1, e2][i], p = [p1, p2][i];
+        let T = this.closestGridPoint(this.substituteEnd(e, D), B);
+        if (T.eq(e.p1) || T.eq(e.p2))
+            return;
+        let P = D.sub(B).slope.gt(1) ? delta.yIntersection(T.y) : delta.xIntersection(T.x);
+        let R = PathUtil.triangleTransform([T, D, P], B);
+        if (!this.setupAnchor(R))
+            return;
+        this.data.addOns = [{
+                contour: [B, T, R].map(p => p.toIPoint()),
+                dir: new Line(T, B).reflect(p.direction).toIPoint()
+            }];
+        this.setupDetour(i == 0 ? [T, B] : [B], i == 0 ? [B] : [T, B]);
+        yield this.result(true, B.dist(T));
+    }
+    setupDetour(dt1, dt2) {
+        let { p1, p2, v1, v2, pt1, pt2 } = this.data;
+        let d1 = dt1.map(p => p.add(v1).toIPoint());
+        d1.push(pt1);
+        let d2 = dt2.map(p => p.add(v2).toIPoint());
+        d2.push(pt2);
+        (this.joiner.cw ? d2 : d1).reverse();
+        p1.clearDetour();
+        p1.addDetour(d1);
+        p2.clearDetour();
+        p2.addDetour(d2);
+    }
+    setupAnchor(a) {
+        let { a1, a2, v1, v2, f } = this.data;
+        let { oriented, cw } = this.joiner;
+        if (a.x * f > this.deltaPt.x * f)
+            return false;
+        let left = oriented == cw;
+        a1[left ? 3 : 1] = { location: a.add(v1).toIPoint() };
+        a2[left ? 1 : 3] = { location: a.add(v2).toIPoint() };
+        return true;
+    }
+    result(json = false, extraSize) {
+        let { p1, p2, a1, a2, off1, off2, offset, size, addOns } = this.data;
+        this.data.addOns = undefined;
+        if (offset)
+            off2 = { x: off2.x + offset.x, y: off2.y + offset.y };
+        return [{
+                gadgets: [
+                    { pieces: [json ? p1.toJSON() : p1], offset: this.simplifyIPoint(off1), anchors: a1.concat() },
+                    { pieces: [json ? p2.toJSON() : p2], offset: this.simplifyIPoint(off2), anchors: a2.concat() }
+                ],
+                addOns
+            }, size + (extraSize !== null && extraSize !== void 0 ? extraSize : 0) * 10];
+    }
+    simplifyIPoint(p) {
+        return p && p.x == 0 && p.y == 0 ? undefined : p;
+    }
+}
+__decorate([
+    onDemand
+], JoinerCore.prototype, "deltaPt", null);
+let Repository = class Repository extends Store {
+    constructor(stretch, signature, option) {
+        super(stretch.sheet);
+        this.joinerCache = new Map();
+        this.stretch = stretch;
+        this.signature = signature;
+        this.structure = JSON.parse(signature);
+        this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());
+    }
+    builder(prototype) {
+        return prototype;
+    }
+    get isActive() {
+        return this.stretch.isActive && this.stretch.repository == this;
+    }
+    onMove() {
+        this.stretch.selected = !(this.entry.entry.selected);
+    }
+    getJoiner(overlaps) {
+        let key = JSON.stringify(overlaps);
+        let j = this.joinerCache.get(key);
+        if (!j)
+            this.joinerCache.set(key, j = new Joiner(overlaps, this));
+        return j;
+    }
+};
+__decorate([
+    shrewd
+], Repository.prototype, "isActive", null);
+Repository = __decorate([
+    shrewd
+], Repository);
+var TreeMaker;
+(function (TreeMaker) {
+    function parse(title, data) {
+        try {
+            let v = new TreeMakerVisitor(data);
+            let { result } = new TreeMakerParser(v);
+            result.title = title;
+            return result;
+        }
+        catch (e) {
+            if (typeof e == "string")
+                throw new Error(e);
+            else
+                throw new Error("File seems corrupted and cannot be loaded successfully.");
+        }
+    }
+    TreeMaker.parse = parse;
+    class TreeMakerVisitor {
+        constructor(data) {
+            this.lines = data.split('\n').values();
+        }
+        get next() {
+            let result = this.lines.next().value;
+            console.log(result);
+            return result;
+        }
+        get int() { return parseInt(this.next); }
+        get float() { return parseFloat(this.next); }
+        get bool() { return this.next == "true"; }
+        skip(n) { for (let i = 0; i < n; i++)
+            this.lines.next(); }
+        skipArray() { this.skip(parseInt(this.next)); }
+    }
+    class TreeMakerParser {
+        constructor(v) {
+            this.result = Migration.getSample();
+            this._visitor = v;
+            if (v.next != "tree" || v.next != "5.0")
+                throw "File is not of TreeMaker 5 format.";
+            let width = v.float, height = v.float;
+            let scale = 1 / v.float;
+            let sw = Math.ceil(width * scale - 0.25);
+            let sh = Math.ceil(height * scale - 0.25);
+            this.fx = sw / width;
+            this.fy = sh / height;
+            if (sw < 8 || sh < 8)
+                throw "BP Studio requires sheet size at least 8.";
+            v.skip(4);
+            if (!v.bool) {
+            }
+            v.skip(6);
+            let numNode = v.int, numEdge = v.int;
+            v.skip(6);
+            for (let i = 0; i < numNode; i++)
+                this.parseNode();
+            for (let i = 0; i < numEdge; i++)
+                this.parseEdge();
+            let sheet = { width: sw, height: sh, scale: 20 };
+            this.result.layout.sheet = sheet;
+            this.result.tree.sheet = sheet;
+        }
+        parseNode() {
+            let v = this._visitor;
+            if (v.next != "node")
+                throw new Error();
+            let vertex = {
+                id: v.int,
+                name: v.next,
+                x: Math.round(v.float * this.fx),
+                y: Math.round(v.float * this.fy),
+            };
+            v.skip(2);
+            if (v.bool) {
+                this.result.layout.flaps.push({
+                    id: vertex.id,
+                    x: vertex.x,
+                    y: vertex.y,
+                    height: 0,
+                    width: 0
+                });
+            }
+            this.result.tree.nodes.push(vertex);
+            v.skip(6);
+            v.skipArray();
+            v.skipArray();
+            v.skipArray();
+            if (v.next == "1")
+                v.next;
+        }
+        parseEdge() {
+            let v = this._visitor;
+            if (v.next != "edge")
+                throw new Error();
+            v.skip(2);
+            this.result.tree.edges.push({
+                length: Math.round(v.float),
+                n1: (v.skip(5), v.int),
+                n2: v.int
+            });
+        }
+    }
+})(TreeMaker || (TreeMaker = {}));
+function deepCopy(target, ...sources) {
+    for (let s of sources)
+        if (s instanceof Object) {
+            let keys = Object.keys(s);
+            for (let k of keys) {
+                let v = s[k];
+                if (v instanceof Object) {
+                    if (target[k] instanceof Object &&
+                        target[k] != v) {
+                        target[k] = deepCopy(target[k], v);
+                    }
+                    else
+                        target[k] = clone(v);
+                }
+                else {
+                    target[k] = v;
+                }
+            }
+        }
+    return target;
+}
+function clone(source) {
+    let r = source instanceof Array ? [] : {};
+    return deepCopy(r, source);
+}
+var GeneratorUtil;
+(function (GeneratorUtil) {
+    function* first(generators, filter) {
+        for (let generator of generators) {
+            let found = false;
+            for (let value of generator)
+                if (filter(value)) {
+                    yield value;
+                    found = true;
+                }
+            if (found)
+                return;
+        }
+    }
+    GeneratorUtil.first = first;
+    function* filter(generator, predicate) {
+        for (let value of generator)
+            if (predicate(value))
+                yield value;
+    }
+    GeneratorUtil.filter = filter;
+})(GeneratorUtil || (GeneratorUtil = {}));
+var LabelUtil;
+(function (LabelUtil) {
+    let cache = new WeakMap();
+    function offsetLabel(label, lx, ly, lh, dx, dy) {
+        label.justification = dx == 0 ? "center" : dx == 1 ? "left" : "right";
+        let oy = dy == 0 ? -lh / 5 : dy == -1 ? -lh / 2 : 0;
+        let l = Math.sqrt(dx * dx + dy * dy);
+        let d = l == 0 ? 0 : lh / 2 / l;
+        label.point.set(lx + dx * d, ly - dy * d - oy);
+    }
+    function setLabel(sheet, label, glow, pt, ...avoid) {
+        glow.content = label.content;
+        if (!label.content)
+            return;
+        let x = pt.x, y = pt.y;
+        let ss = sheet.displayScale, sw = sheet.width, sh = sheet.height;
+        let lh = label.bounds.height;
+        let lx = x * ss, ly = -y * ss;
+        if (x == 0 || y == 0 || x == sw || y == sh) {
+            let dx = x == 0 ? -1 : x == sw ? 1 : 0;
+            let dy = y == 0 ? -1 : y == sh ? 1 : 0;
+            offsetLabel(label, lx, ly, lh, dx, dy);
+        }
+        else {
+            slowLabel(label, lx, ly, lh, avoid);
+        }
+        syncLabel(label, glow);
+    }
+    LabelUtil.setLabel = setLabel;
+    function syncLabel(label, glow) {
+        glow.point.set(label.point);
+        glow.justification = label.justification;
+    }
+    function slowLabel(label, lx, ly, lh, avoid) {
+        let arr = [[0, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [-1, -1], [-1, 1], [1, 1], [1, -1]];
+        let clone = avoid.map(a => {
+            let c = a.clone({ insert: false });
+            if (a.layer)
+                c.transform(a.layer.matrix);
+            return c;
+        });
+        let dx = 0, dy = 0;
+        for ([dx, dy] of arr) {
+            offsetLabel(label, lx, ly, lh, dx, dy);
+            let rec = new paper.Path.Rectangle(label.bounds);
+            if (label.layer)
+                rec.transform(label.layer.matrix);
+            let ok = clone.every(c => {
+                let i1 = rec.intersect(c, { insert: false }).isEmpty();
+                let i2 = !rec.intersects(c);
+                return i1 && i2;
+            });
+            if (ok)
+                break;
+        }
+        cache.set(label, {
+            dx, dy, timeout: undefined
+        });
+    }
+})(LabelUtil || (LabelUtil = {}));
+var MathUtil;
+(function (MathUtil) {
+    function GCD(a, b) {
+        if (typeof a == 'number' && !Number.isSafeInteger(a))
+            throw new Error("Not a safe integer: " + a);
+        if (typeof b == 'number' && !Number.isSafeInteger(b))
+            throw new Error("Not a safe integer: " + b);
+        if (a == 0 && b == 0)
+            throw new Error("Input cannot be both zero");
+        if (a < 0)
+            a = -a;
+        if (b < 0)
+            b = -b;
+        while (a && b) {
+            a %= b;
+            if (a)
+                b %= a;
+        }
+        return a ? a : b;
+    }
+    MathUtil.GCD = GCD;
+    function reduce(a, b) {
+        if (typeof a == 'number' && !Number.isInteger(a) || typeof b == 'number' && !Number.isInteger(b)) {
+            let af = new Fraction(a), bf = new Fraction(b);
+            a = Number(af.$numerator * bf.$denominator);
+            b = Number(af.$denominator * bf.$numerator);
+        }
+        let gcd = this.GCD(a, b);
+        return [a / gcd, b / gcd];
+    }
+    MathUtil.reduce = reduce;
+    function int(x, f) {
+        return f > 0 ? Math.ceil(x) : Math.floor(x);
+    }
+    MathUtil.int = int;
+})(MathUtil || (MathUtil = {}));
+var PaperUtil;
+(function (PaperUtil) {
+    function replaceContent(target, source, clone) {
+        target.removeChildren();
+        if (source instanceof paper.CompoundPath)
+            target.copyContent(source);
+        else {
+            if (clone)
+                source = source.clone({ insert: false });
+            target.addChild(source);
+        }
+    }
+    PaperUtil.replaceContent = replaceContent;
+    function setRectangleSize(rect, width, height) {
+        rect.segments[1].point.set(width, 0);
+        rect.segments[2].point.set(width, height);
+        rect.segments[3].point.set(0, height);
+    }
+    PaperUtil.setRectangleSize = setRectangleSize;
+    function addLine(path, p1, p2) {
+        if (p1 instanceof Point)
+            p1 = p1.toPaper();
+        if (p2 instanceof Point)
+            p2 = p2.toPaper();
+        path.moveTo(p1);
+        path.lineTo(p2);
+    }
+    PaperUtil.addLine = addLine;
+    function setLines(path, ...lines) {
+        path.removeChildren();
+        for (let set of lines)
+            for (let l of set)
+                PaperUtil.addLine(path, l.p1, l.p2);
+    }
+    PaperUtil.setLines = setLines;
+    PaperUtil.Black = new paper.Color('black');
+    PaperUtil.Red = new paper.Color('red');
+})(PaperUtil || (PaperUtil = {}));
+let DeviceView = class DeviceView extends ControlView {
+    constructor(device) {
+        super(device);
+        this.$addItem(Layer.axisParallel, this._axisParallels = new paper.CompoundPath(Style.axisParallel));
+        this.$addItem(Layer.ridge, this._ridges = new paper.CompoundPath(Style.ridge));
+        this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
+    }
+    contains(point) {
+        return this._shade.contains(point);
+    }
+    render() {
+        let path = null;
+        for (let r of this.control.regions) {
+            let cPath = this.contourToPath(r.shape.contour);
+            if (!path)
+                path = cPath;
+            else
+                path = path.unite(cPath, { insert: false });
+        }
+        PaperUtil.replaceContent(this._shade, path, false);
+        PaperUtil.setLines(this._ridges, this.control.ridges, this.control.outerRidges);
+        PaperUtil.setLines(this._axisParallels, this.control.axisParallels);
+    }
+    contourToPath(contour) {
+        let path = new paper.Path({ closed: true });
+        let { fx, fy } = this.control.pattern.stretch;
+        let delta = this.control.delta;
+        contour.forEach(c => path.add(c.transform(fx, fy).add(delta).toPaper()));
+        return path;
+    }
+    renderSelection(selected) {
+        this._shade.visible = selected || this.control.pattern.configuration.repository.stretch.selected;
+    }
+};
+DeviceView = __decorate([
+    shrewd
+], DeviceView);
+
+//# sourceMappingURL=bpstudio.js.map

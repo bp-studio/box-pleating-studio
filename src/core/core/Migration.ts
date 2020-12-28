@@ -9,6 +9,25 @@ namespace Migration {
 
 	export const current: string = "0";
 
+	export function getSample(): JDesign {
+		return {
+			title: "",
+			version: Migration.current,
+			fullscreen: true,
+			mode: "layout",
+			layout: {
+				sheet: { width: 16, height: 16, scale: 20 },
+				flaps: [],
+				stretches: [],
+			},
+			tree: {
+				sheet: { width: 20, height: 20, scale: 16 },
+				nodes: [],
+				edges: []
+			}
+		};
+	}
+
 	export function process(design: any, onDeprecated?: (title: string) => void): JDesign {
 		let deprecate = false;
 

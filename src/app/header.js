@@ -15,6 +15,15 @@ function sanitize(filename) {
 		.replace(/[\. ]+$/, "project");
 }
 
+function readFile(file) {
+	return new Promise((resolve, reject) => {
+		let reader = new FileReader();
+		reader.onload = e => resolve(e.target.result);
+		reader.onerror = e => reject(e);
+		reader.readAsArrayBuffer(file); // readAsText 可能無法完整讀取 binary 檔案
+	});
+}
+
 const LZ = {
 	compress(s) {
 		s = LZMA.compress(s, 1); // Experiments showed that 1 is good enough
@@ -29,5 +38,3 @@ const LZ = {
 		return LZMA.decompress(bytes);
 	}
 }
-
-let vid = 0;

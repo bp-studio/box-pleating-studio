@@ -47,8 +47,7 @@ interface IDesignObject {
 		this.description = this.data.description;
 		this.mode = this.data.mode;
 
-		this.tree = new Tree(this);
-		for(let e of this.data.tree.edges) this.tree.addEdge(e.n1, e.n2, e.length);
+		this.tree = new Tree(this, this.data.tree.edges);
 	}
 
 	@shrewd public get sheet(): Sheet {

@@ -156,4 +156,6 @@
 		let blob = new Blob([json], { type: "application/octet-stream" });
 		return URL.createObjectURL(blob);
 	}
+
+	public get TreeMaker() { return TreeMaker; }
 }

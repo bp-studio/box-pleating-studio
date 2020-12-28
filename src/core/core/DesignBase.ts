@@ -44,22 +44,7 @@ abstract class DesignBase extends Mountable {
 	constructor(studio: BPStudio, profile: RecursivePartial<JDesign>) {
 		super(studio);
 
-		this.data = deepCopy<JDesign>({
-			title: "Untitled",
-			version: Migration.current,
-			fullscreen: true,
-			mode: "layout",
-			layout: {
-				sheet: { width: 16, height: 16, scale: 20 },
-				flaps: [],
-				stretches: [],
-			},
-			tree: {
-				sheet: { width: 20, height: 20, scale: 16 },
-				nodes: [],
-				edges: []
-			}
-		}, profile);
+		this.data = deepCopy<JDesign>(Migration.getSample(), profile);
 
 		if(this.data.tree.nodes.length < 3) throw new Error("Invalid format.");
 
@@ -68,7 +53,9 @@ abstract class DesignBase extends Mountable {
 
 	/**
 	 * 把 `this.edges.toJSON()` 產出的 `JEdge[]` 做一個排序，
-	 * 使得從第一條邊開始逐一加入邊都能維持連通性；不這麼做的話，載入時會出錯。
+	 * 使得從第一條邊開始逐一加入邊都能維持連通性。
+	 *
+	 * 雖然現在載入資料的程式也已經做了防呆，但總之還是把這個做上去。
 	 */
 	protected sortJEdge(): JEdge[] {
 		let edges = this.edges.toJSON();

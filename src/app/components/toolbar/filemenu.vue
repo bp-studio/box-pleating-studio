@@ -1,15 +1,14 @@
 <template>
 	<dropdown icon="fas fa-file-alt" :title="$t('toolbar.file.title')" @hide="reset">
-		<input type="file" id="iptFile" accept=".bps, .bpz, .json, .zip" multiple class="d-none" @change="upload($event)" />
 		<div class="dropdown-item" @click="newProject">
 			<i class="far fa-file"></i>
 			{{$t('toolbar.file.new')}}
 		</div>
 		<divider></divider>
-		<label class="dropdown-item m-0" for="iptFile">
+		<uploader accept=".bps, .bpz, .json, .zip" multiple @upload="upload($event)">
 			<i class="far fa-folder-open"></i>
 			{{$t('toolbar.file.open')}}
-		</label>
+		</uploader>
 		<download :disabled="!design" :file="jsonFile" ref="bps" @download="notify">
 			<i class="fas fa-download"></i>
 			{{$t('toolbar.file.saveBPS')}}
@@ -45,7 +44,7 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { FileFactory, sanitize } from '../import/types';
+	import { FileFactory, sanitize, readFile } from '../import/types';
 	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import JSZip from 'jszip';
@@ -136,27 +135,20 @@
 		public async openFiles(files: FileList) {
 			if(files.length) for(let i = 0; i < files.length; i++) await this.open(files[i]);
 		}
-		public open(file: File): Promise<void> {
-			return new Promise(resolve => {
-				let reader = new FileReader();
-				reader.onload = async e => {
-					try {
-						let buffer = e.target.result as ArrayBuffer;
-						let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
-						if(test == "{") { // JSON
-							let content = new TextDecoder().decode(new Uint8Array(buffer));
-							core.addDesign(bp.load(content));
-						} else if(test == "P") { // PKZip
-							await this.openWorkspace(buffer);
-						} else throw 1;
-					} catch(e) {
-						debugger;
-						await core.alert(this.$t('message.invalidFormat', [file.name]));
-					}
-					resolve();
-				}
-				reader.readAsArrayBuffer(file); // readAsText 可能無法完整讀取 binary 檔案
-			});
+		public async open(file: File): Promise<void> {
+			try {
+				let buffer = await readFile(file);
+				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
+				if(test == "{") { // JSON
+					let content = new TextDecoder().decode(new Uint8Array(buffer));
+					core.addDesign(bp.load(content));
+				} else if(test == "P") { // PKZip
+					await this.openWorkspace(buffer);
+				} else throw 1;
+			} catch(e) {
+				debugger;
+				await core.alert(this.$t('message.invalidFormat', [file.name]));
+			}
 		}
 		private async openWorkspace(buffer: ArrayBuffer) {
 			let zip = await JSZip.loadAsync(buffer);

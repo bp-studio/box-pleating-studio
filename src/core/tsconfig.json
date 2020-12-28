@@ -2,7 +2,6 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"target": "es2018",
-		"module": "amd",
 		"types": [], // 避免使用到 Node 版的 setTimeout
 		"lib": ["DOM", "ESNext"], // 做了上一則設置之後這個是必要的
 		"removeComments": true,
