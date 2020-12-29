@@ -38,8 +38,8 @@ interface JSheet {
 
 	@action({
 		validator(this: Sheet, v: number) {
-			let ok = v >= 8 && v >= this.indepRect.width;
-			let d = v - this.indepRect.right;
+			let ok = v >= 8 && v >= this._independentRect.width;
+			let d = v - this._independentRect.right;
 			if(ok && d < 0) for(let i of this.independents) i.location.x += d;
 			return ok;
 		}
@@ -48,8 +48,8 @@ interface JSheet {
 
 	@action({
 		validator(this: Sheet, v: number) {
-			let ok = v >= 8 && v >= this.indepRect.height;
-			let d = v - this.indepRect.top;
+			let ok = v >= 8 && v >= this._independentRect.height;
+			let d = v - this._independentRect.top;
 			if(ok && d < 0) for(let i of this.independents) i.location.y += d;
 			return ok;
 		}
@@ -108,10 +108,10 @@ interface JSheet {
 	 * 這個資料故意不採用計算屬性而是採用一個反應方法來持續更新它，
 	 * 為的是避免導致循環參照。
 	 */
-	private indepRect: Rectangle = new Rectangle(Point.ZERO, Point.ZERO);
+	private _independentRect: Rectangle = new Rectangle(Point.ZERO, Point.ZERO);
 
-	/** 更新 `indepRect` 的反應方法 */
-	@shrewd private getIndepRect() {
+	/** 更新 `_independentRect` 的反應方法 */
+	@shrewd private _getIndependentRect() {
 		let x1 = Number.POSITIVE_INFINITY, y1 = Number.POSITIVE_INFINITY;
 		let x2 = Number.NEGATIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;
 		for(let i of this.independents) {
@@ -121,6 +121,6 @@ interface JSheet {
 			if(l.y < y1) y1 = l.y;
 			if(l.y > y2) y2 = l.y;
 		}
-		this.indepRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
+		this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
 	}
 }

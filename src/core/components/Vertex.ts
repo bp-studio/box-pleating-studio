@@ -43,7 +43,7 @@ interface JVertex extends IPoint {
 			let node = this.node.addLeaf(length);
 
 			// 找尋最近的空位去放
-			let p = this.findCloestEmptyPoint(v);
+			let p = this.findClosestEmptyPoint(v);
 			this.design.options.set("vertex", node.id, {
 				id: node.id,
 				name: node.name,
@@ -53,7 +53,7 @@ interface JVertex extends IPoint {
 		});
 	}
 
-	public findCloestEmptyPoint(vertices: Vertex[]): Point {
+	public findClosestEmptyPoint(vertices: Vertex[]): Point {
 		let { x, y } = this.location;
 		let ref = new Point(x + 0.125, y + 0.0625);
 		let arr: [Point, number][] = [];

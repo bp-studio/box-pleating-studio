@@ -3,7 +3,7 @@
 /// <reference path="util/Decorators.ts" />
 /// <reference path="pattern/Partitioner.ts" />
 /// <reference path="pattern/Region.ts" />
-/// <reference path="class/Disposible.ts" />
+/// <reference path="class/Disposable.ts" />
 
 // Level 1
 /// <reference path="pattern/Piece.ts" />

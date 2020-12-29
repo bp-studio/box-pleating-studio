@@ -67,7 +67,7 @@ namespace LabelUtil {
 	}
 
 	/**
-	 * 原本把這部份的程式碼拉出來是為了要做 debouncing，
+	 * 原本把這部份的程式碼拉出來是為了要做 debounce，
 	 * 不過由於程式碼效能的提昇暫時似乎不用這麼做。
 	 */
 	function slowLabel(label: paper.PointText, lx: number, ly: number, lh: number, avoid: paper.Path[]) {

@@ -23,6 +23,9 @@ function readFile(file) {
 		reader.readAsArrayBuffer(file); // readAsText 可能無法完整讀取 binary 檔案
 	});
 }
+function bufferToText(buffer) {
+	return new TextDecoder().decode(new Uint8Array(buffer));
+}
 
 const LZ = {
 	compress(s) {

@@ -1,5 +1,5 @@
 
-@shrewd class TreePath extends Disposible {
+@shrewd class TreePath extends Disposable {
 
 	private readonly _n1: TreeNode;
 	private readonly _n2: TreeNode;

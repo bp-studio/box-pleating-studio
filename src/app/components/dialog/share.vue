@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
 	import $ from 'jquery/index';
 

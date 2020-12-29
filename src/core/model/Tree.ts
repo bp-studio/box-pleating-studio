@@ -1,5 +1,5 @@
 
-@shrewd class Tree extends Disposible {
+@shrewd class Tree extends Disposable {
 
 	@shrewd({
 		renderer(this: Tree, v: Map<number, TreeNode>) {

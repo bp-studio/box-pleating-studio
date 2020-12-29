@@ -9,7 +9,7 @@ namespace TreeMaker {
 			return result;
 		} catch(e) {
 			if(typeof e == "string") throw new Error(e);
-			else throw new Error("File seems corrupted and cannot be loaded successfully.");
+			else throw new Error("plugin.TreeMaker.invalid");
 		}
 	}
 
@@ -20,17 +20,13 @@ namespace TreeMaker {
 			this.lines = data.split('\n').values();
 		}
 
-		public get next() {
-			let result = this.lines.next().value;
-			console.log(result);
-			return result;
-		}
+		public get next() {	return this.lines.next().value;	}
 		public get int() { return parseInt(this.next); }
 		public get float() { return parseFloat(this.next); }
 		public get bool() { return this.next == "true"; }
 
 		public skip(n: number) { for(let i = 0; i < n; i++) this.lines.next(); }
-		public skipArray() { this.skip(parseInt(this.next)); }
+		public skipArray() { this.skip(this.int); }
 	}
 
 	class TreeMakerParser {
@@ -42,15 +38,16 @@ namespace TreeMaker {
 		constructor(v: TreeMakerVisitor) {
 			this._visitor = v;
 
-			if(v.next != "tree" || v.next != "5.0") throw "File is not of TreeMaker 5 format.";
+			if(v.next != "tree" || v.next != "5.0") throw "plugin.TreeMaker.not5";
 
 			let width = v.float, height = v.float;
 			let scale = 1 / v.float;
 			let sw = Math.ceil(width * scale - 0.25);
 			let sh = Math.ceil(height * scale - 0.25);
+			if(sw < 8 || sh < 8) throw "plugin.TreeMaker.size8";
+
 			this.fx = sw / width;
 			this.fy = sh / height;
-			if(sw < 8 || sh < 8) throw "BP Studio requires sheet size at least 8.";
 
 			v.skip(11);
 			let numNode = v.int, numEdge = v.int;
@@ -75,7 +72,7 @@ namespace TreeMaker {
 			};
 
 			v.skip(2);
-			if(v.bool) {
+			if(v.bool) { // isLeafNode
 				this.result.layout.flaps.push({
 					id: vertex.id,
 					x: vertex.x,

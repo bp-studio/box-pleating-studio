@@ -177,7 +177,7 @@ interface RiverInfo {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class RiverComponent extends Disposible {
+@shrewd class RiverComponent extends Disposable {
 
 	constructor(private view: RiverView, private flap: Flap, private node: TreeNode) { super(view); }
 

@@ -271,6 +271,32 @@ label span.label {
 }
 
 /*********************************************
+ * Notify
+ *********************************************/
+
+.notify {
+	display: inline-block;
+	line-height: 3px;
+	font-size: 3px;
+	color: red;
+}
+
+.dropdown-item>.notify {
+	position: relative;
+	top: -0.5rem;
+}
+
+button>.notify {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+.notify::after {
+	content: '●';
+}
+
+/*********************************************
  * Bootstrap
  *********************************************/
 

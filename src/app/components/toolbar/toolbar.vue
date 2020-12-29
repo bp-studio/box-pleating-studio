@@ -9,10 +9,15 @@
 					{{$t("toolbar.tools.TreeMaker")}}
 				</uploader>
 			</dropdown>
-			<dropdown icon="far fa-question-circle" :title="$t('toolbar.help.title')">
+			<dropdown icon="far fa-question-circle" :title="$t('toolbar.help.title')" :notify="notify">
 				<div class="dropdown-item" @click="$emit('about')">
 					<i class="bp-info"></i>
 					{{$t('toolbar.help.about')}}
+				</div>
+				<div class="dropdown-item" @click="news">
+					<i class="fas fa-newspaper"></i>
+					{{$t('toolbar.help.news')}}
+					<div class="notify" v-if="notify"></div>
 				</div>
 				<divider></divider>
 				<a class="dropdown-item" href="donate.htm" target="_blank">
@@ -112,14 +117,31 @@
 	import { Component } from 'vue-property-decorator';
 	import { bp, Design } from '../import/BPStudio';
 	import { core } from '../core.vue';
-	import { readFile } from '../import/types';
-	import $ from 'jquery/index';
+	import { readFile, bufferToText } from '../import/types';
 
 	import BaseComponent from '../mixins/baseComponent';
 	import ContextMenu from '../gadget/contextmenu.vue';
 
+	declare const logs: number[];
+
 	@Component
 	export default class Toolbar extends BaseComponent {
+
+		private notify: boolean;
+
+		mounted() {
+			let v = parseInt(localStorage.getItem("last_log") || "0");
+			this.notify = v < logs[logs.length - 1];
+		}
+
+		private news() {
+			if(this.notify) {
+				localStorage.setItem("last_log", logs[logs.length - 1].toString());
+				this.notify = false;
+			}
+			this.$emit('news');
+		}
+
 		private get dragOption() {
 			return {
 				delay: 500,
@@ -145,12 +167,12 @@
 		public async TreeMaker(event) {
 			let f = event.target;
 			if(f.files.length == 0) return;
-			let buffer = await readFile(f.files[0]);
-			let content = new TextDecoder().decode(new Uint8Array(buffer));
+			let content = bufferToText(await readFile(f.files[0]));
+			let name = f.files[0].name;
 			try {
-				core.open(bp.TreeMaker.parse(f.files[0].name.replace(/\.tmd5$/i, ""), content));
+				core.open(bp.TreeMaker.parse(name.replace(/\.tmd5$/i, ""), content));
 			} catch(e) {
-				core.alert(e.message);
+				core.alert(this.$t(e.message, [name]));
 			}
 			f.value = "";
 		}

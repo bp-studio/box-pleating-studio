@@ -89,8 +89,8 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 		let [p1, p2] = g.pieces;
 		let sx = Math.ceil(Math.max(p1.sx, p2.sx));
 		let sy = Math.ceil(Math.max(p1.sy, p2.sy));
-		p1.revserse(sx, sy);
-		p2.revserse(sx, sy);
+		p1.reverse(sx, sy);
+		p2.reverse(sx, sy);
 		return g;
 	}
 

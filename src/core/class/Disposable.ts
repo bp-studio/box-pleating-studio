@@ -1,34 +1,34 @@
 
-interface IDisposible {
+interface IDisposable {
 	dispose(): void;
 }
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Disposible` 是所有具有「棄置」這種概念的基底類別。
+ * `Disposable` 是所有具有「棄置」這種概念的基底類別。
  * 除了進行垃圾回收之外，具體來說棄置到底要做什麼事是由繼承類別來定義的。
  *
- * `Disposible` 可以藉由覆寫 `shouldDispose` 計算屬性來設定棄置條件，
+ * `Disposable` 可以藉由覆寫 `shouldDispose` 計算屬性來設定棄置條件，
  * 以便條件滿足的時候自動棄置。
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd abstract class Disposible implements IDisposible{
+@shrewd abstract class Disposable implements IDisposable{
 
 	/** 內部的棄置狀態 */
 	@shrewd({
-		renderer(this: Disposible, v: boolean) {
+		renderer(this: Disposable, v: boolean) {
 			return v || this.shouldDispose;
 		}
 	})
 	private _disposed: boolean = false;
 
 	/** 建構子 */
-	constructor(parent?: Disposible) {
+	constructor(parent?: Disposable) {
 		this._disposeWith = parent;
 	}
 
-	private _disposeWith?: Disposible;
+	private _disposeWith?: Disposable;
 
 	@shrewd private _disposeEvent(): any {
 		if(this.disposed) {

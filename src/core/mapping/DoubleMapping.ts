@@ -10,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DoubleMapping<K extends Disposible, V extends Disposible> implements IDisposible, ReadonlyDoubleMap<K, V> {
+@shrewd class DoubleMapping<K extends Disposable, V extends Disposable> implements IDisposable, ReadonlyDoubleMap<K, V> {
 
 	constructor(source: IterableFactory<K>, constructor: (k1: K, k2: K) => V) {
 		this._source = source;

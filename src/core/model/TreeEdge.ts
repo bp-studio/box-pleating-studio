@@ -1,5 +1,5 @@
 
-@shrewd class TreeEdge extends Disposible implements IDesignObject {
+@shrewd class TreeEdge extends Disposable implements IDesignObject {
 
 	private readonly _n1: TreeNode;
 	private readonly _n2: TreeNode;

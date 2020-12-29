@@ -13,3 +13,5 @@ export interface FileFactory {
 export function sanitize(filename: string): string;
 
 export function readFile(f: File): Promise<ArrayBuffer>;
+
+export function bufferToText(buffer: ArrayBuffer): string;

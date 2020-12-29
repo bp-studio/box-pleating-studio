@@ -1,5 +1,5 @@
 
-@shrewd class TreeNode extends Disposible implements IDesignObject {
+@shrewd class TreeNode extends Disposable implements IDesignObject {
 
 	/** 程式內部參照用的 id，這是唯讀的值，因此由於點有可能被刪除而未必連號 */
 	public readonly id: number;

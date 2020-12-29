@@ -5,7 +5,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Mountable extends Disposible {
+abstract class Mountable extends Disposable {
 
 	protected readonly mountTarget: Mountable | BPStudio;
 
@@ -43,7 +43,7 @@ abstract class Mountable extends Disposible {
 
 	/**
 	 * 傳回目前這個 `Mountable` 是否為「活躍」，亦即除了其父元件是否有被掛載之外，它自己是否應該要被掛載。
-	 * 
+	 *
 	 * 預設行為是傳回恆真（亦即其掛載與否永遠和父元件同步），但子元件可以覆寫這個行為，
 	 * 而覆寫的行為通常是根據「父元件是否在某種意義上選取了自己」來決定。
 	 */

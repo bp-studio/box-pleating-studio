@@ -1,8 +1,8 @@
 
 /** 宣告一個屬性為非 enumerable */
-function nonenumerable(target: any, name: string): void;
-function nonenumerable(target: any, name: string, desc: PropertyDescriptor): PropertyDescriptor;
-function nonenumerable(target: any, name: string, desc?: any) {
+function nonEnumerable(target: any, name: string): void;
+function nonEnumerable(target: any, name: string, desc: PropertyDescriptor): PropertyDescriptor;
+function nonEnumerable(target: any, name: string, desc?: any) {
 	if(desc) {
 		desc.enumerable = false;
 		return desc;

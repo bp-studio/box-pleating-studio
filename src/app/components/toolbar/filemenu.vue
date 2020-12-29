@@ -44,7 +44,7 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { FileFactory, sanitize, readFile } from '../import/types';
+	import { FileFactory, sanitize, readFile, bufferToText } from '../import/types';
 	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import JSZip from 'jszip';
@@ -140,8 +140,7 @@
 				let buffer = await readFile(file);
 				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
 				if(test == "{") { // JSON
-					let content = new TextDecoder().decode(new Uint8Array(buffer));
-					core.addDesign(bp.load(content));
+					core.addDesign(bp.load(bufferToText(buffer)));
 				} else if(test == "P") { // PKZip
 					await this.openWorkspace(buffer);
 				} else throw 1;

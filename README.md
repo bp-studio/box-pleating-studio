@@ -19,15 +19,17 @@ If you visit the website by Chrome (or by Safari on an iPhone), it will also inf
 
 ## The toolbar
 
-Start from the upperleft, each button in the toolbar is explained as follows.
+Start from the upper-left, each button in the toolbar is explained as follows.
 
 - File menu: Create new project, download or share projects, etc.
 - Setting menu: Display options and app preferences (including language setting).
-- Project menu: Manage all opened projects.
-- Help menu: About the app, and how to support it.
+- Tools menu: Currently with one additional tool (TreeMaker format importing); more tools TBD.
+- Help menu: About the app, version info, and how to support it.
 - Tree structure: Edit the tree structure of your project.
 - Layout: Edit the Flap and Gadget layout of your project.
 - Option panel (only in mobile version): Opens the option panel. For desktop version the option panel is always in display on the right side.
+
+Right click on the tab (or use the dropdown menu for touch devices) will expose actions related to tabs (such as cloning projects and close multiple tabs at once). Dragging the tabs to re-order them.
 
 ## How to use
 
@@ -43,9 +45,9 @@ The coloring of hinges, ridges and axial-parallel creases follows Lang's convent
 
  It is not always possible for BP Studio to find working stretch patterns in any valid layout. So far the author had implemented enough algorithms for finding patterns for any valid layout with two flaps, and for most valid layouts with three flaps. The author will continue to implement more algorithms for more complicated patterns in the future.
 
-For the moment, BP Studio hasn't implemented the notion of elevation, half-integral unit structures, or meandering rivers. But you can widen or heighten your flaps by setting their width or height, and use them to create elevations in your final model. You can also use integral structures to roughtly represent the space occupied by the half-integral structures, and transform them into the latter in your folding process. Meandering rivers might be represented similarly by using stub flaps, or you can just pretend that it's there and fold your thing anyway :)
+For the moment, BP Studio hasn't implemented the notion of elevation, half-integral unit structures, or meandering rivers. But you can widen or heighten your flaps by setting their width or height, and use them to create elevations in your final model. You can also use integral structures to roughly represent the space occupied by the half-integral structures, and transform them into the latter in your folding process. Meandering rivers might be represented similarly by using stub flaps, or you can just pretend that it's there and fold your thing anyway :)
 
-Since generating a complete, flatfoldable mountain-valley CP would also require the notion of elevation as well as other considerations such as hinge direction choices, empty space filling etc., for the moment BP Studio also cannot automatically generate such CP for you, and you would have to complete those details using the theory of uniaxial box pleating bases. But the author do have plans to implement this feature in the future.
+Since generating a complete, flat-foldable mountain-valley CP would also require the notion of elevation as well as other considerations such as hinge direction choices, empty space filling etc., for the moment BP Studio also cannot automatically generate such CP for you, and you would have to complete those details using the theory of uniaxial box pleating bases. But the author do have plans to implement this feature in the future.
 
 Other features such as undo/redo editing, diagonal/tilted grid, Oripa/Orihime format exporting etc. are also planned.
 

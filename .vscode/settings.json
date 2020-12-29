@@ -30,5 +30,22 @@
 	"i18n-ally.sourceLanguage": "en",
 	"i18n-ally.keystyle": "nested",
 	"i18n-ally.indent": 4,
-	"i18n-ally.tabStyle": "tab"
+	"i18n-ally.tabStyle": "tab",
+	"vetur.experimental.templateInterpolationService": true,
+	"cSpell.words": [
+		"bpstudio",
+		"configurator",
+		"fullscreen",
+		"gops",
+		"gtag",
+		"kamiya",
+		"osme",
+		"overlappings",
+		"partitioner",
+		"scrollable",
+		"selectables",
+		"serializable",
+		"tsai",
+		"tsun"
+	]
 }

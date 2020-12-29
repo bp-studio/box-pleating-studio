@@ -8,6 +8,7 @@
 			data-toggle="dropdown"
 		>
 			<i :class="icon"></i>
+			<div class="notify" v-if="notify"></div>
 		</button>
 		<div class="dropdown-menu" @touchstartout="hide" @mousedownout="hide">
 			<slot></slot>
@@ -24,6 +25,7 @@
 	export default class Dropdown extends Vue {
 		@Prop(String) public icon: string;
 		@Prop(String) public title: string;
+		@Prop(Boolean) public notify: boolean;
 
 		private bt: any;
 

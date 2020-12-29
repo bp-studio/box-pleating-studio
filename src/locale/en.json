@@ -5,7 +5,7 @@
 		"title": "Welcome to Box Pleating Studio!",
 		"intro": [
 			"This app is made to help origami designers to make complex, crazy designs using box pleating and GOPS gadgets.",
-			"To begin, click on the upper-left menu button to create an empty new project, or read our brief user manual on {0}."
+			"To begin, click on the upper-left menu button to create an empty new project, or read our brief user manual on {0} (in English only)."
 		],
 		"install": {
 			"hint": "You can also install BP Studio as a standalone app to your device, and use it offline!",
@@ -57,6 +57,7 @@
 		"help": {
 			"title": "Help",
 			"about": "About",
+			"news": "Version info",
 			"donation": "Donation"
 		},
 		"view": {
@@ -137,7 +138,7 @@
 		"title": "Share project",
 		"copy": "Copy",
 		"share": "Share",
-		"message":  "Check out my project \"{0}\" designed with Box Pleating Studio!"
+		"message": "Check out my project \"{0}\" designed with Box Pleating Studio!"
 	},
 	"about": {
 		"title": "About Box Pleating Studio",
@@ -162,6 +163,13 @@
 		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and some stretch patterns may need to be re-selected. It will be updated to the latest format on the next saving.",
 		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
 		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?"
+	},
+	"plugin": {
+		"TreeMaker": {
+			"not5": "File \"{0}\" is not of TreeMaker 5 format.",
+			"size8": "BP Studio requires sheet size at least 8.",
+			"invalid": "File \"{0}\" seems corrupted and cannot be loaded successfully."
+		}
 	},
 	"keyword": {
 		"yes": "Yes",

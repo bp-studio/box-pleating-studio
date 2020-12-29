@@ -7,7 +7,6 @@
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import Popper from 'popper.js';
-	import $ from 'jquery/index';
 
 	@Component
 	export default class ContextMenu extends Vue {

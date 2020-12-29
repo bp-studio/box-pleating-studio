@@ -84,7 +84,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		tool.onKeyDown = this._canvasKeydown.bind(this);
 		tool.onKeyUp = this._canvasKeyup.bind(this);
 		tool.onMouseDown = this._canvasMousedown.bind(this);
-		tool.onMouseDrag = this._canvasMousedrag.bind(this);
+		tool.onMouseDrag = this._canvasMouseDrag.bind(this);
 		tool.onMouseUp = this._canvasMouseup.bind(this);
 
 		canvas.addEventListener("wheel", this._canvasWheel.bind(this));
@@ -276,7 +276,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	/** 處理滑鼠移動 */
-	private _canvasMousedrag(event: paper.ToolEvent) {
+	private _canvasMouseDrag(event: paper.ToolEvent) {
 		// 捲動中的話就不用在這邊處理了，交給 body 取處理
 		if(this._scrollStart) return;
 

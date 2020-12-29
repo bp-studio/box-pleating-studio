@@ -18,7 +18,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "457"
+			app_version: "495"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -43,24 +43,24 @@
 			if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 		}
 
-		(function() { // Stratup error handling, written in ES3 for maximal compatibility
+		(function() { // Startup error handling, written in ES3 for maximal compatibility
 			var debug = location.search.toLowerCase().indexOf("debug=startup") >= 0;
 			var display = function(id, v, c) {
 				var el = document.getElementById(id);
 				el.style.display = v;
 				if(c && debug) el.innerHTML += "<br>" + navigator.userAgent + "<br>" + c;
 			};
-			var err = undefined, werr = undefined, onErr = function(e) { err = e.target.src; }
+			var err = undefined, wErr = undefined, onErr = function(e) { err = e.target.src; }
 			var cb = function() {
-				if(err || werr) {
+				if(err || wErr) {
 					display('divWorkspace', 'none');
 					display('app', 'none');
-					display(err ? 'resource' : 'requirement', 'block', err || werr);
+					display(err ? 'resource' : 'requirement', 'block', err || wErr);
 				}
 				if(errorOB) errorOB.disconnect();
 			};
-			window.onerror = function(a, b, c, d) { werr = [a, b, c, d].toString(); }
-			if(!window.addEventListener) return werr = 'IE8', window.onload = cb;
+			window.onerror = function(a, b, c, d) { wErr = [a, b, c, d].toString(); }
+			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
 			window.addEventListener('DOMContentLoaded', cb);
 			var errorOB = new MutationObserver(function(mutations) {
 				mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
@@ -86,14 +86,16 @@
 	<script src="lib/vuedraggable.umd.min.js"></script>
 	<script src="lib/jszip.min.js"></script>
 	<script src="lib/vue-i18n.js"></script>
+	<script src="lib/marked.min.js"></script>
 
 	<link rel="stylesheet" href="assets/bps/style.css">
-	<link rel="stylesheet" href="main.css?d1c36eb">
+	<link rel="stylesheet" href="main.css?8bff550e">
 	<link rel="stylesheet" href="bpstudio.css?64faaaae">
 
+	<script src="log/log.js?b135ab49"></script>
 	<script src="shrewd.min.js?97d129ed"></script>
-	<script src="bpstudio.js?6b2eef7b"></script>
-	<script src="locale.js?48b1435d"></script>
+	<script src="bpstudio.js?557aa664"></script>
+	<script src="locale.js?da5a0ba0"></script>
 </head>
 
 <body>
@@ -122,6 +124,6 @@
 	</noscript>
 </body>
 
-<script src="main.js?80b707f4"></script>
+<script src="main.js?755e0c84"></script>
 
 </html>

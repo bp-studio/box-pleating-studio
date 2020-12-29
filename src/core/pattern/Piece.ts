@@ -54,7 +54,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		return result;
 	}
 
-	@nonenumerable private _offset?: IPoint;
+	@nonEnumerable private _offset?: IPoint;
 
 	@onDemand private get _shift(): Vector {
 		return new Vector(
@@ -142,7 +142,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	}
 
 	/** 在指定的 SCR 之下反轉自己 */
-	public revserse(tx: number, ty: number) {
+	public reverse(tx: number, ty: number) {
 		let { shift, detours, sx, sy } = this;
 		shift = shift || { x: 0, y: 0 };
 		let s = { x: tx - sx - shift.x, y: ty - sy - shift.y };

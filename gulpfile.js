@@ -8,6 +8,7 @@ let terser = require('gulp-terser');
 let ftp = require('vinyl-ftp');
 let log = require('fancy-log');
 
+let log2 = require('./.vscode/log');
 let gvpd = require('./.vscode/gvpd');
 let crc = require('./.vscode/crc');
 let i18n = require('./.vscode/i18n');
@@ -90,6 +91,13 @@ gulp.task('buildApp', () =>
 		.pipe(crc())
 );
 
+gulp.task('buildLog', () =>
+	gulp.src('dist/log/*.md')
+		.pipe(log2('log.js'))
+		.pipe(crc())
+		.pipe(gulp.dest('dist/log'))
+);
+
 gulp.task('buildLocale', () =>
 	gulp.src('src/locale/*.json')
 		.pipe(i18n())
@@ -132,6 +140,7 @@ gulp.task('deployDev', ftpFactory('bp-dev'));
 
 gulp.task('deployPub', gulp.series(
 	'buildCorePub',
+	'buildLog',
 	'uploadPub'
 ));
 
