@@ -20,7 +20,8 @@ namespace TreeMaker {
 			this.lines = data.split('\n').values();
 		}
 
-		public get next() {	return this.lines.next().value;	}
+		// 必須指定型態為 any，否則 TypeScript 不知道每次抓出來的結果不一樣
+		public get next(): any { return (this.lines.next().value as string).trim(); }
 		public get int() { return parseInt(this.next); }
 		public get float() { return parseFloat(this.next); }
 		public get bool() { return this.next == "true"; }
@@ -32,22 +33,14 @@ namespace TreeMaker {
 	class TreeMakerParser {
 		public result: JDesign = Migration.getSample();
 		private _visitor: TreeMakerVisitor;
-		private fx: number;
-		private fy: number;
+		private max: number = 0;
 
 		constructor(v: TreeMakerVisitor) {
 			this._visitor = v;
 
 			if(v.next != "tree" || v.next != "5.0") throw "plugin.TreeMaker.not5";
-
 			let width = v.float, height = v.float;
 			let scale = 1 / v.float;
-			let sw = Math.ceil(width * scale - 0.25);
-			let sh = Math.ceil(height * scale - 0.25);
-			if(sw < 8 || sh < 8) throw "plugin.TreeMaker.size8";
-
-			this.fx = sw / width;
-			this.fy = sh / height;
 
 			v.skip(11);
 			let numNode = v.int, numEdge = v.int;
@@ -55,6 +48,27 @@ namespace TreeMaker {
 			v.skip(6);
 			for(let i = 0; i < numNode; i++) this.parseNode();
 			for(let i = 0; i < numEdge; i++) this.parseEdge();
+
+			// 如果所有的邊長都小於 1，姑且猜測放大十倍；這個未來可以更加改進
+			let fix = this.max < 1 ? 10 : 1;
+			let sw = Math.ceil(width * scale * fix - 0.25);
+			let sh = Math.ceil(height * scale * fix - 0.25);
+			if(sw < 8 || sh < 8) throw "plugin.TreeMaker.size8";
+
+			let fx = sw / width;
+			let fy = sh / height;
+
+			for(let f of this.result.layout.flaps) {
+				f.x = Math.round(f.x * fx);
+				f.y = Math.round(f.y * fy);
+			}
+			for(let n of this.result.tree.nodes) {
+				n.x = Math.round(n.x * fx);
+				n.y = Math.round(n.y * fy);
+			}
+			for(let e of this.result.tree.edges) {
+				e.length = Math.max(Math.round(e.length * fix), 1);
+			}
 
 			let sheet: JSheet = { width: sw, height: sh, scale: 20 };
 			this.result.layout.sheet = sheet;
@@ -67,8 +81,8 @@ namespace TreeMaker {
 			let vertex: JVertex = {
 				id: v.int,
 				name: v.next,
-				x: Math.round(v.float * this.fx),
-				y: Math.round(v.float * this.fy),
+				x: v.float,
+				y: v.float,
 			};
 
 			v.skip(2);
@@ -94,9 +108,11 @@ namespace TreeMaker {
 			let v = this._visitor;
 			if(v.next != "edge") throw new Error();
 			v.skip(2);
+			let l = v.float * (1 + v.float);
+			if(this.max < l) this.max = l;
 			this.result.tree.edges.push({
-				length: Math.round(v.float),
-				n1: (v.skip(5), v.int),
+				length: l,
+				n1: (v.skip(4), v.int),
 				n2: v.int
 			});
 		}

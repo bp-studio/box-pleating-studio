@@ -12,7 +12,7 @@
 		<panel :show="showPanel"></panel>
 		<share ref="share"></share>
 		<about ref="about"></about>
-		<version ref="ver"></version>>
+		<version ref="ver"></version>
 		<preference ref="pref"></preference>
 	</div>
 </template>
