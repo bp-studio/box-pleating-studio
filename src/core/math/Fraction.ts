@@ -41,9 +41,9 @@ class Fraction {
 		}
 	}
 
-	private static toFraction(v: number, k2 = 1, k1 = 0): Fraction {
+	public static toFraction(v: number, k2 = 1, k1 = 0, err = Fraction.ERROR): Fraction {
 		let n = Math.floor(v), r = v - n, k0 = n * k1 + k2;
-		if(r / k0 / ((1 - r) * k0 + k1) < Fraction.ERROR) return new Fraction(n);
+		if(r / k0 / ((1 - r) * k0 + k1) < err) return new Fraction(n);
 		else return Fraction.toFraction(1 / r, k1, k0).i().a(n);
 	}
 

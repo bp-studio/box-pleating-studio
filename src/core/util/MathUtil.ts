@@ -19,6 +19,15 @@ namespace MathUtil {
 		return a ? a : b;
 	}
 
+	export function LCM(list: number[]) {
+		let lcm = list[0];
+		for(let i = 1; i < list.length; i++) {
+			let gcd = GCD(lcm, list[i]);
+			lcm = lcm * list[i] / gcd;
+		}
+		return lcm;
+	}
+
 	/** 把一對有理數進行化簡。 */
 	export function reduce<T extends bigint | number>(a: T, b: T): [T, T];
 	export function reduce(a: number, b: number): [number, number] {

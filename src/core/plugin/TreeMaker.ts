@@ -33,7 +33,7 @@ namespace TreeMaker {
 	class TreeMakerParser {
 		public result: JDesign = Migration.getSample();
 		private _visitor: TreeMakerVisitor;
-		private max: number = 0;
+		private set: Set<number> = new Set();
 
 		constructor(v: TreeMakerVisitor) {
 			this._visitor = v;
@@ -49,8 +49,7 @@ namespace TreeMaker {
 			for(let i = 0; i < numNode; i++) this.parseNode();
 			for(let i = 0; i < numEdge; i++) this.parseEdge();
 
-			// 如果所有的邊長都小於 1，姑且猜測放大十倍；這個未來可以更加改進
-			let fix = this.max < 1 ? 10 : 1;
+			let fix = MathUtil.LCM(Array.from(this.set));
 			let sw = Math.ceil(width * scale * fix - 0.25);
 			let sh = Math.ceil(height * scale * fix - 0.25);
 			if(sw < 8 || sh < 8) throw "plugin.TreeMaker.size8";
@@ -108,10 +107,10 @@ namespace TreeMaker {
 			let v = this._visitor;
 			if(v.next != "edge") throw new Error();
 			v.skip(2);
-			let l = v.float * (1 + v.float);
-			if(this.max < l) this.max = l;
+			let length = v.float;
+			this.set.add(Number(Fraction.toFraction(length, 1, 0, 0.1).$denominator));
 			this.result.tree.edges.push({
-				length: l,
+				length: length * (1 + v.float),
 				n1: (v.skip(4), v.int),
 				n2: v.int
 			});
