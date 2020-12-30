@@ -174,8 +174,8 @@
 		let dist = this.design.tree.distTriple(this.flap.node, nextQ.flap.node, joinQ.flap.node);
 
 		// 一般來說只有當 d > dist.d1 的時候有必要作導繪，
-		// 但是當 !ok 的時候整個情況會特別奇怪，因此額外開放。
-		if(d <= dist.d1 && ok) return undefined;
+		// 但是當 !ok && d == dist.d1 的時候整個情況會特別奇怪，因此額外開放。
+		if(d <= dist.d1 && (ok || d != dist.d1)) return undefined;
 
 		let d2 = d - dist.d1 + dist.d2;
 

@@ -15,7 +15,7 @@
 			"ed": "BP Studio 已經安裝到您的裝置上了。",
 			"open": "開啟 Box Pleating Studio App"
 		},
-		"copyright": "Copyright © 2020 蔡牧村"
+		"copyright": "Copyright © 2020{0} 蔡牧村"
 	},
 	"toolbar": {
 		"file": {
@@ -162,7 +162,8 @@
 		"min3vertex": "樹狀結構至少需要有三個頂點",
 		"oldVersion": "專案「{0}」是使用較舊版本的 BP Studio 產生的，部份伸展結構可能會需要重新選取。專案會在下次存檔時更新為最新格式。",
 		"patternNotFound": "在當前的設計中，存在一些角片重疊是雖然有效、但目前的 BP Studio 卻無法找到可行的伸展摺痕模式的。本應用程式的作者將會持續實作更多演算法以涵蓋更多情況。",
-		"unsaved": "專案「{0}」有尚未儲存的變更，確定要捨棄？"
+		"unsaved": "專案「{0}」有尚未儲存的變更，確定要捨棄？",
+		"connFail": "網路連線失敗；請稍後再試。"
 	},
 	"keyword": {
 		"yes": "是",

@@ -21,12 +21,13 @@
 				<a class="btn btn-primary" href="https://bpstudio.abstreamace.com/" target="_blank" v-t="'welcome.install.open'"></a>
 			</div>
 		</div>
-		<div style="position:absolute; bottom:1rem; right:1rem;" v-t="'welcome.copyright'"></div>
+		<div style="position:absolute; bottom:1rem; right:1rem;">{{copyright}}</div>
 	</div>
 </template>
 
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator';
+	import { core } from './core.vue';
 
 	declare global {
 		interface Navigator {
@@ -40,6 +41,8 @@
 		private bi: any;
 		private install: number = 0;
 		private ios: boolean = navigator.standalone === false;
+
+		private get copyright() { return core.copyright; }
 
 		created() {
 			window.addEventListener("beforeinstallprompt", event => {

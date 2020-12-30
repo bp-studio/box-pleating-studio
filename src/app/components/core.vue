@@ -78,6 +78,12 @@
 			window.addEventListener("beforeunload", () => this.save(true));
 		}
 
+		public get copyright() {
+			let y = new Date().getFullYear();
+			let end = y > 2020 ? "-" + y : "";
+			return this.$t('welcome.copyright', [end]);
+		}
+
 		private loadSettings() {
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {

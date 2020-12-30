@@ -6,7 +6,7 @@
 					<div class="h4 modal-title" v-t="'about.title'"></div>
 				</div>
 				<div class="modal-body">
-					<p v-t="'welcome.copyright'"></p>
+					<p>{{copyright}}</p>
 					<p v-t="'about.license'"></p>
 					<i18n path="about.visit" tag="p">
 						<a target="_blank" href="https://github.com/MuTsunTsai/box-pleating-studio" v-t="'about.homepage'"></a>
@@ -27,6 +27,7 @@
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { bp } from '../import/BPStudio';
+	import { core } from './../core.vue';
 	import $ from 'jquery/index';
 
 	declare const gtag: any;
@@ -34,12 +35,14 @@
 
 	@Component
 	export default class About extends Vue {
+		private get copyright() { return core.copyright; }
 		public show() {
 			$(this.$el).modal();
 			gtag('event', 'screen_view', { screen_name: 'About' });
 		}
 		public get version() {
-			return bp.version + " build " + app_config.app_version;
+			let meta = document.querySelector("meta[name=version]") as HTMLMetaElement;
+			return meta.content + " build " + app_config.app_version;
 		}
 	}
 </script>

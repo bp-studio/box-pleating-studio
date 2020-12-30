@@ -2,7 +2,12 @@
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
-				<div class="modal-body" v-html="record[index]"></div>
+				<div class="modal-body" style="max-height:80vh; overflow-y:auto;">
+					<div v-if="record[index]" v-html="record[index]"></div>
+					<div v-else class="m-5 display-2 text-muted text-center">
+						<i class="fas fa-spinner fa-spin"></i>
+					</div>
+				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1">
 						<button class="btn btn-primary" :disabled="index==0" @click="index--">
@@ -21,6 +26,7 @@
 
 <script lang="ts">
 	import { Vue, Component, Watch } from 'vue-property-decorator';
+	import { core } from '../core.vue';
 	import $ from 'jquery/index';
 
 	declare const gtag: any;
@@ -33,6 +39,7 @@
 		private record: Record<number, string> = {};
 		private index: number;
 		private max: number;
+		private active: boolean = false;
 
 		@Watch('index') onIndex() {
 			this.load();
@@ -42,17 +49,28 @@
 			this.index = this.max = logs.length - 1;
 		}
 
-		public async load() {
+		public async load(): Promise<boolean> {
 			if(!this.record[this.index]) {
-				let response = await fetch(`log/${logs[this.index]}.md`);
-				Vue.set(this.record, this.index, marked(await response.text()));
+				try {
+					let response = await fetch(`log/${logs[this.index]}.md`);
+					Vue.set(this.record, this.index, marked(await response.text()));
+				} catch(e) {
+					if(this.active) {
+						$(this.$el).modal('hide');
+						core.alert(this.$t("message.connFail"));
+					}
+					return false;
+				}
 			}
+			return true;
 		}
 
 		public async show() {
-			await this.load();
-			$(this.$el).modal();
-			gtag('event', 'screen_view', { screen_name: 'News' });
+			this.active = true;
+			if(await this.load()) {
+				$(this.$el).modal();
+				gtag('event', 'screen_view', { screen_name: 'News' });
+			}
 		}
 	}
 </script>
