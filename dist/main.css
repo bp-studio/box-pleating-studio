@@ -124,6 +124,7 @@ label span.label {
 
 .tab i {
 	cursor: pointer;
+	visibility: hidden;
 }
 
 .tab.active {
@@ -131,12 +132,13 @@ label span.label {
 	color: black;
 }
 
+.tab:hover i {
+	visibility: visible;
+}
+
 @media (hover: hover) {
 	.tab:not(:hover):not(.active) {
 		color: #444;
-	}
-	.tab:not(:hover) i {
-		visibility: hidden;
 	}
 }
 
@@ -377,6 +379,9 @@ button>.notify {
 	.btn-primary:hover:not(:focus) {
 		background-color: var(--primary);
 		border-color: var(--primary);
+	}
+	.tab i {
+		visibility: visible;
 	}
 }
 
