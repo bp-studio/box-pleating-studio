@@ -370,7 +370,7 @@ button>.notify {
 	transition-delay: 0.1s;
 }
 
-@media (hover: none) {
+@media (hover: none), (pointer: coarse) {
 	.btn-toolbar .dropdown-item {
 		padding: 0.4rem 2rem 0.4rem 0.5rem;
 	}
