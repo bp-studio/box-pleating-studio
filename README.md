@@ -15,7 +15,7 @@ Box Pleating Studio is not for origami beginners. In order to fully understand t
 
 Simply visit [https://bpstudio.abstreamace.com/](https://bpstudio.abstreamace.com/) to launch the BP Studio app, no downloading required! For the best performance, it is highly recommended that you use Chrome to visit the site. In any case, do update your browser to the latest version as BP Studio utilizes many new web features and will not work on legacy browsers.
 
-If you visit the website by Chrome (or by Safari on an iPhone), it will also inform you that you could install BP Studio to your device as a standalone app, and use it offline. Just follow the instructions to install it. This will provide the best user experience especially on mobile devices.
+If you visit the website by Chrome (on devices other than iPhone), Edge (on desktops), or Safari (on an iPhone), it will also inform you that you could install BP Studio to your device as a standalone app, and use it offline. Just follow the instructions to install it. This will provide the best user experience especially on mobile devices.
 
 ## The toolbar
 

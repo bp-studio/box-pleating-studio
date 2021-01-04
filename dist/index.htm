@@ -19,7 +19,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "516"
+			app_version: "517"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -51,24 +51,28 @@
 				el.style.display = v;
 				if(c && debug) el.innerHTML += "<br>" + navigator.userAgent + "<br>" + c;
 			};
-			var err = undefined, wErr = undefined, onErr = function(e) { err = e.target.src; }
+			var err, wErr, errorOB;
+			var onErr = function(e) { err = e.target.src; };
 			var cb = function() {
 				if(err || wErr) {
 					display('divWorkspace', 'none');
 					display('app', 'none');
 					display(err ? 'resource' : 'requirement', 'block', err || wErr);
+					if(wErr) gtag('event', 'unsupported', { agent: navigator.userAgent });
 				}
 				if(errorOB) errorOB.disconnect();
 			};
 			window.onerror = function(a, b, c, d) { wErr = [a, b, c, d].toString(); }
 			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
 			window.addEventListener('DOMContentLoaded', cb);
-			var errorOB = new MutationObserver(function(mutations) {
-				mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
-					(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
-				));
-			});
-			errorOB.observe(document, { childList: true, subtree: true });
+			if(MutationObserver) {
+				errorOB = new MutationObserver(function(mutations) {
+					mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
+						(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
+					));
+				});
+				errorOB.observe(document, { childList: true, subtree: true });
+			}
 		})();
 	</script>
 
