@@ -214,7 +214,7 @@
 			let title = d.title || this.$t("keyword.untitled");
 			if(d.modified) {
 				let message = this.$t("message.unsaved", [title]);
-				if(!(await (this.$refs.confirm as Confirm).show(message))) return false;
+				if(!(await this.confirm(message))) return false;
 			}
 			this.designs.splice(this.designs.indexOf(id), 1);
 			bp.close(id);
@@ -287,6 +287,9 @@
 
 		public async alert(message: string): Promise<void> {
 			await (this.$refs.alert as Alert).show(message);
+		}
+		public async confirm(message: string): Promise<boolean> {
+			return await (this.$refs.confirm as Confirm).show(message);
 		}
 	}
 </script>
