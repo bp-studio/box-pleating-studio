@@ -41,18 +41,28 @@
 		private max: number;
 		private active: boolean = false;
 
-		@Watch('index') onIndex() {
-			this.load();
+		@Watch('index') onIndex(index: number) {
+			this.load(index);
 		}
 
 		mounted() {
+			if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', async (event) => {
+				if(event.data.meta === 'workbox-broadcast-update') {
+					let m = event.data.payload.path.match(/\d+(?=\.md$)/);
+					if(m) {
+						let index = logs.indexOf(Number(m[0]));
+						delete this.record[index];
+						this.load(index);
+					}
+				}
+			});
 			this.index = this.max = logs.length - 1;
 		}
 
-		public async load(): Promise<boolean> {
-			if(!this.record[this.index]) {
+		public async load(index: number): Promise<boolean> {
+			if(!this.record[index]) {
 				try {
-					let response = await fetch(`log/${logs[this.index]}.md`);
+					let response = await fetch(`log/${logs[index]}.md`);
 					Vue.set(this.record, this.index, marked(await response.text()));
 				} catch(e) {
 					if(this.active) {
@@ -67,7 +77,7 @@
 
 		public async show() {
 			this.active = true;
-			if(await this.load()) {
+			if(await this.load(this.index)) {
 				$(this.$el).modal();
 				gtag('event', 'screen_view', { screen_name: 'News' });
 			}

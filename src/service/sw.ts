@@ -1,11 +1,16 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.4/workbox-sw.js');
-const { strategies, routing, expiration, googleAnalytics } = workbox;
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.0.2/workbox-sw.js');
+const { strategies, routing, expiration, googleAnalytics, broadcastUpdate } = workbox;
 
 // 啟動 Workbox GA
 googleAnalytics.initialize();
 
 // 預設的資源都使用靜態更新策略
-let defaultHandler = new strategies.StaleWhileRevalidate({ cacheName: 'assets' });
+let defaultHandler = new strategies.StaleWhileRevalidate({
+	cacheName: 'assets',
+	plugins: [new broadcastUpdate.BroadcastUpdatePlugin({
+		generatePayload: options => ({ path: new URL(options.request.url).pathname })
+	})]
+});
 routing.setDefaultHandler(defaultHandler);
 
 // POST 請求全部都只能在有網路的時候進行
@@ -15,7 +20,7 @@ routing.registerRoute(
 );
 
 function isInternal(url: URL): boolean {
-	return url.hostname == "bpstudio.abstreamace.com";
+	return url.hostname == self.location.hostname;
 }
 
 // 不管主頁面的 search query 有什麼，一律都用同樣的快取
