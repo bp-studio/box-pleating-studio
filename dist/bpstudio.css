@@ -3,6 +3,7 @@
 }
 
 #divWorkspace canvas {
+	position: -webkit-sticky; /* iPhone 6 */
 	position: sticky;
 	top: 0px;
 	left: 0px;

@@ -203,12 +203,6 @@ label span.label {
 	flex-wrap: nowrap
 }
 
-#divWorkspace canvas {
-	position: sticky;
-	top: 0px;
-	left: 0px;
-}
-
 #note {
 	position: absolute;
 	bottom: 20px;

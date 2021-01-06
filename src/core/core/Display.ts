@@ -50,6 +50,7 @@
 		// 加入一個填充空間、在 desktop 環境製造原生捲軸的 div
 		studio.$el.appendChild(this.spaceHolder = document.createElement("div"));
 		studio.$el.addEventListener("scroll", this.onScroll.bind(this));
+		this.spaceHolder.style.zIndex = "-10"; // 修正 iPhone 6 的問題
 
 		// 產生 <canvas>
 		this._canvas = document.createElement("canvas");

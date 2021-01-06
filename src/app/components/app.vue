@@ -35,5 +35,14 @@
 			bp.system.onLongPress = () => this.showPanel = true;
 			bp.system.onDrag = () => this.showPanel = false;
 		}
+
+		mounted() {
+			// iPhone 6 不支援 CSS 的 touch-action: none
+			if(getComputedStyle(this.$el).touchAction != "none") {
+				this.$el.addEventListener("touchmove", (e: TouchEvent) => {
+					if(e.touches.length > 1) e.preventDefault();
+				});
+			}
+		}
 	}
 </script>
