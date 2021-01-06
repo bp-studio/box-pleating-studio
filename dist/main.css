@@ -304,7 +304,7 @@ button>.notify {
 	line-height: 20px;
 }
 
-@media (max-width: 576px) {
+@media (max-width: 400px) {
 	.btn-toolbar .btn {
 		padding: 0.375rem 0.2rem !important;
 		width: 36px;
