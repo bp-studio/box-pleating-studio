@@ -120,7 +120,7 @@ gulp.task('buildDonate', () =>
 		.pipe(gulp.dest('dist/'))
 );
 
-const ftpFactory = (folder) => function() {
+const ftpFactory = (folder, g) => function() {
 	let options = require('./.vscode/ftp-pub.json');
 	options.log = log;
 	let conn = ftp.create(options);
@@ -129,12 +129,13 @@ const ftpFactory = (folder) => function() {
 		'!**/*.map',
 		'!**/debug.log'
 	];
+	if(g) globs = globs.concat(g);
 	return gulp.src(globs, { base: './dist', buffer: false })
 		.pipe(conn.newer(`/public_html/${folder}`))
 		.pipe(conn.dest(`/public_html/${folder}`));
 };
 
-gulp.task('uploadPub', ftpFactory('bp'));
+gulp.task('uploadPub', ftpFactory('bp', ['dist/.htaccess']));
 
 gulp.task('deployDev', ftpFactory('bp-dev'));
 

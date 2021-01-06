@@ -1,3 +1,5 @@
+FileETag All
+
 RewriteEngine On
 
 RewriteCond %{HTTP_HOST} !bpstudio.abstreamace.com$ [NC]
