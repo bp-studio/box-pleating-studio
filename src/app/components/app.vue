@@ -18,8 +18,9 @@
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
+	import { Vue, Component } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
+	import { core } from './core.vue';
 	import BaseComponent from './mixins/baseComponent';
 
 	@Component

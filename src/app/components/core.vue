@@ -71,6 +71,7 @@
 						bp.select(this.designs[session.open]);
 						Vue.nextTick(() => this.scrollTo(session.open));
 					}
+					Shrewd.commit();
 				}
 			}
 

@@ -15,6 +15,6 @@
 
 	@Component
 	export default class Repository extends Vue {
-		@Prop(Object) public repository: object;
+		@Prop(Object) public repository: any;
 	}
 </script>
