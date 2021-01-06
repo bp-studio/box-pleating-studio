@@ -1,6 +1,7 @@
 let gulp = require('gulp');
 let ts = require('gulp-typescript');
 let wrapJS = require("gulp-wrap-js");
+let wrap = require("gulp-wrap");
 let ifAnyNewer = require('gulp-if-any-newer');
 let sourcemaps = require('gulp-sourcemaps');
 let concat = require('gulp-concat');
@@ -47,10 +48,10 @@ gulp.task('buildCore', () =>
 gulp.task('buildCorePub', () =>
 	projCore.src()
 		.pipe(projCore())
-		.pipe(wrapJS(
+		.pipe(wrap(
 			`(function(root,factory){if(typeof define==='function'&&define.amd)
 			{define([],factory);}else if(typeof exports==='object'){module.exports=factory();}
-			else{root.BPStudio=factory();}}(this,function(){ %= body % ;return BPStudio;}));`
+			else{root.BPStudio=factory();}}(this,function(){ <%= contents %> ;return BPStudio;}));`
 		))
 		.pipe(terser(Object.assign({}, terserOption, { mangle: true })))
 		.pipe(crc())
@@ -84,6 +85,7 @@ gulp.task('buildApp', () =>
 	])
 		.pipe(gvpd())
 		.pipe(concat('main.js'))
+		.pipe(wrap("if(!err&&!wErr) { <%= contents %> }",))
 		.pipe(terser(terserOption))
 		.pipe(crc())
 		.pipe(gulp.dest('dist/')),
@@ -102,7 +104,7 @@ gulp.task('buildLocale', () =>
 	gulp.src('src/locale/*.json')
 		.pipe(i18n())
 		.pipe(concat('locale.js'))
-		.pipe(wrapJS("let locale={};%= body %"))
+		.pipe(wrap("let locale={};<%= contents %>"))
 		.pipe(terser())
 		.pipe(crc(['dist/index.htm', 'dist/donate.htm']))
 		.pipe(gulp.dest('dist/'))

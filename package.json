@@ -19,6 +19,7 @@
 		"gulp-sourcemaps": "^2.6.5",
 		"gulp-terser": "^1.4.1",
 		"gulp-typescript": "^5.0.1",
+		"gulp-wrap": "^0.15.0",
 		"gulp-wrap-js": "^0.4.1",
 		"jszip": "^3.5.0",
 		"popper.js": "^1.16.1",

@@ -42,7 +42,7 @@
 		private active: boolean = false;
 
 		@Watch('index') onIndex(index: number) {
-			this.load(index);
+			if(location.protocol == "https:") this.load(index);
 		}
 
 		mounted() {

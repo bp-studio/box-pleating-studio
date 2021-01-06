@@ -164,7 +164,7 @@
 				touchStartThreshold: 20,
 				animation: 200,
 				forceFallback: true,
-				dirction: "horizontal",
+				direction: "horizontal",
 				scroll: true
 			};
 		}
