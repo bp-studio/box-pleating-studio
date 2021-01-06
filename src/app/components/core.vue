@@ -43,6 +43,7 @@
 	@Component
 	export default class Core extends Vue {
 		public designs: number[] = [];
+		public tabHistory: number[] = [];
 		public autoSave: boolean = true;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
@@ -207,6 +208,8 @@
 		}
 		public select(id: number) {
 			bp.select(id);
+			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
+			this.tabHistory.unshift(id);
 			this.scrollTo(id);
 		}
 
@@ -214,17 +217,19 @@
 			let d = bp.designMap.get(id)!;
 			let title = d.title || this.$t("keyword.untitled");
 			if(d.modified) {
+				bp.select(id);
 				let message = this.$t("message.unsaved", [title]);
 				if(!(await this.confirm(message))) return false;
 			}
 			this.designs.splice(this.designs.indexOf(id), 1);
+			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
 			bp.close(id);
 			return true;
 		}
 		public async close(id?: number) {
 			if(id === undefined) id = bp.design.id;
 			if(await this.closeCore(id)) {
-				bp.select(this.designs.length ? this.designs[0] : null);
+				bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
 				Shrewd.commit();
 			}
 		}
@@ -242,7 +247,7 @@
 		}
 		public async closeAll() {
 			await this.closeBy(i => true);
-			bp.select(this.designs.length ? this.designs[0] : null);
+			bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
 		}
 		public clone(id?: number) {
 			if(id === undefined) id = bp.design.id;
@@ -254,6 +259,7 @@
 		}
 		public addDesign(d: Design) {
 			this.designs.push(d.id);
+			this.tabHistory.unshift(d.id);
 		}
 
 		private checkTitle(j: any) {

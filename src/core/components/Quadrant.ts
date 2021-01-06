@@ -170,7 +170,7 @@
 		if(!find) return undefined;
 
 		let { joinQ, nextQ } = find;
-		let ok = this.design.junctions.get(this.flap, nextQ.flap)!.status != JunctionStatus.tooClose;
+		let ok = this.design.junctions.get(this.flap, nextQ.flap)!.status == JunctionStatus.tooFar;
 		let dist = this.design.tree.distTriple(this.flap.node, nextQ.flap.node, joinQ.flap.node);
 
 		// 一般來說只有當 d > dist.d1 的時候有必要作導繪，
