@@ -33,6 +33,7 @@ namespace Trace {
 		let record = new Set<string>();
 		let candidates = new Set(lines);
 
+		if(debug) console.log([...inflections].toString());
 		do {
 			x = null;
 			for(let l of candidates) {
@@ -41,10 +42,11 @@ namespace Trace {
 				if(r) {
 					// 完全落在外邊的線不列入考慮，因為那其實跟反射無關
 					let ang = shift ? getAngle(v, shift) : undefined;
-					if(!isSideTouchable(l, p, v, !inflections.has(r.point.toString()), ang)) continue;
+					let f = inflections.has(r.point.toString()) ? -1 : 1;
+					if(!isSideTouchable(l, p, v, f, ang)) continue;
 
 					if(debug) console.log([JSON.stringify(r), l.toString()]);
-					if(intersectionCloser(r, x)) {
+					if(intersectionCloser(r, x, f)) {
 						x = r; line = l;
 					}
 				}
@@ -102,8 +104,8 @@ namespace Trace {
 	}
 
 	/** 判斷傳入的交點 `r` 是否在特定意義上比起交點 `x` 更「近」 */
-	function intersectionCloser(r: JIntersection | null, x: JIntersection | null): boolean {
-		return r != null && (x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle < x.angle);
+	function intersectionCloser(r: JIntersection | null, x: JIntersection | null, f: number): boolean {
+		return r != null && (x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f);
 	}
 
 	/** 取得這條線和給定動向的交點 */
@@ -133,8 +135,8 @@ namespace Trace {
 	}
 
 	/** 給定一線段，想像一下、把給定的動向稍微往側邊平移，是否還能碰得到？ */
-	function isSideTouchable(l: Line, p: Point, v: Vector, left: boolean, ang?: number): boolean {
-		let rv = v.rotate90(), f = left ? 1 : -1;
+	function isSideTouchable(l: Line, p: Point, v: Vector, f: number, ang?: number): boolean {
+		let rv = v.rotate90();
 		let v1 = l.p1.sub(p), v2 = l.p2.sub(p);
 		let r1 = v1.dot(rv), r2 = v2.dot(rv);
 		let d1 = v1.dot(v), d2 = v2.dot(v);
