@@ -18,10 +18,11 @@ namespace Trace {
 	 *
 	 * @param startPt 軌跡的起點
 	 * @param sv 軌跡的初始方向向量
+	 * @param inflections 反曲點座標字串的集合；如果遇到這些點的話，內外側的判定要顛倒
 	 * @param end 終點線；如果過程中撞到這條線則停止
 	 * @param start 指定起點線；這個值有指定表示要用導繪模式
 	 */
-	export function create(lines: readonly Line[], startPt: Point, sv: Vector, end: Line, start?: Line): Path {
+	export function create(lines: readonly Line[], startPt: Point, sv: Vector, inflections: Set<string>, end: Line, start?: Line): Path {
 		let history: Path = [];
 		let trace: Path = [];
 		let x: JIntersection | null;
@@ -35,15 +36,17 @@ namespace Trace {
 		do {
 			x = null;
 			for(let l of candidates) {
-				// 完全落在右邊的線不列入考慮，因為那其實跟反射無關
-				let ang = shift ? getAngle(v, shift) : undefined;
-				if(!isLeftTouchable(l, p, v, ang)) continue;
-
 				// 找出最接近的交點
 				let r = getIntersection(l, p, v);
-				if(debug && r) console.log([JSON.stringify(r), l.toString()]);
-				if(intersectionCloser(r, x)) {
-					x = r; line = l;
+				if(r) {
+					// 完全落在外邊的線不列入考慮，因為那其實跟反射無關
+					let ang = shift ? getAngle(v, shift) : undefined;
+					if(!isSideTouchable(l, p, v, !inflections.has(r.point.toString()), ang)) continue;
+
+					if(debug) console.log([JSON.stringify(r), l.toString()]);
+					if(intersectionCloser(r, x)) {
+						x = r; line = l;
+					}
 				}
 			}
 			if(x) {
@@ -129,12 +132,24 @@ namespace Trace {
 		return ang;
 	}
 
-	/** 給定一線段，想像一下、把給定的動向稍微往左平移，是否還能碰得到？ */
-	function isLeftTouchable(l: Line, p: Point, v: Vector, ang?: number): boolean {
-		let rv = v.rotate90();
+	/** 給定一線段，想像一下、把給定的動向稍微往側邊平移，是否還能碰得到？ */
+	function isSideTouchable(l: Line, p: Point, v: Vector, left: boolean, ang?: number): boolean {
+		let rv = v.rotate90(), f = left ? 1 : -1;
 		let v1 = l.p1.sub(p), v2 = l.p2.sub(p);
 		let r1 = v1.dot(rv), r2 = v2.dot(rv);
 		let d1 = v1.dot(v), d2 = v2.dot(v);
-		return (r1 > 0 || r2 > 0) && (d1 > 0 || d2 > 0 || !!ang && getAngle(v, l.vector) > ang);
+		let result =
+			(
+				// 線段的任何一端點完全落在指定側向
+				r1 * f > 0 || r2 * f > 0
+			)
+			&&
+			(
+				// 至少有一個端點位於前方
+				d1 > 0 || d2 > 0
+				// 或是給定線段的角度比前一次遇到的線段角度要更前面
+				|| !!ang && getAngle(v, l.vector) * f > ang * f
+			);
+		return result;
 	}
 }

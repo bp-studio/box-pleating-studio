@@ -88,9 +88,10 @@
 			// 在牽涉到融合的情況中，一個 Quadrant 需要負責的軌跡絕對不會超過 delta 線的範圍，
 			// 所以如果 delta 線可以被定義就以該線為終點，否則就採用直觀上的縱橫終點線
 			let end = this.findNextDelta(junctions, false);
-			let lead = this.findLead(junctions, r, lines);
+			let inflections = new Set<string>();
+			let lead = this.findLead(junctions, r, lines, inflections);
 			let start = lead ? this.findNextDelta(junctions, true) : undefined;
-			trace = Trace.create(lines, lead ?? startPt, this.pv, end ?? new Line(endPt, this.pv), start);
+			trace = Trace.create(lines, lead ?? startPt, this.pv, inflections, end ?? new Line(endPt, this.pv), start);
 
 			// 底下這部份的程式碼是為了在 join 的場合中順利聯集兩組輪廓而不會在中間出現缺口而設置的，
 			// 未來採用比較具宏觀性的演算法的話這段可以拿掉。
@@ -165,7 +166,7 @@
 	}
 
 	/** 判定在產生軌跡的時候是否有必要從更遠的地方開始描繪（導繪） */
-	private findLead(junctions: readonly Junction[], d: number, lines: Line[]): Point | undefined {
+	private findLead(junctions: readonly Junction[], d: number, lines: Line[], inflections: Set<string>): Point | undefined {
 		let find = this.findJoinNextQ(junctions, true, false);
 		if(!find) return undefined;
 
@@ -179,14 +180,11 @@
 
 		let d2 = d - dist.d1 + dist.d2;
 
-		// 必要的時候在線條清單裡面加入一小條額外的轉向線。
-		// 注意這個條件在此是比 !ok 更嚴格的。
-		if(d <= dist.d1) {
-			let p1 = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
-			lines.push(new Line(p1, this.qv.neg));
-		}
+		// 加入反曲點
+		let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
+		inflections.add(inflection.toString());
 
-		return nextQ.findLead(junctions, d2, lines) ?? nextQ.getStart(d2);
+		return nextQ.findLead(junctions, d2, lines, inflections) ?? nextQ.getStart(d2);
 	}
 
 	/** 在找出延伸河道輪廓的時候，應該被扣除的不該考慮部份 */
