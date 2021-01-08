@@ -264,7 +264,7 @@
 			let c = bp.restore(this.checkTitle(bp.designMap.get(id).toJSON()));
 			this.designs.splice(i + 1, 0, (bp.design = c).id);
 			Shrewd.commit();
-			gtag('event', 'project', { action: 'clone' });
+			gtag('event', 'project_clone');
 		}
 		public addDesign(d: Design) {
 			this.designs.push(d.id);

@@ -73,22 +73,22 @@
 
 		private newProject() {
 			core.create();
-			gtag('event', 'project', { action: 'create' });
+			gtag('event', 'project_create');
 		}
 
 		private notify() {
 			bp.design.history.notifySave();
-			gtag('event', 'project', { action: 'save' });
+			gtag('event', 'project_bps');
 		}
 		private notifyAll() {
 			bp.designMap.forEach(d => d.history.notifySave());
-			gtag('event', 'project', { action: 'save_workspace' });
+			gtag('event', 'project_bpz');
 		}
 		private svgSaved() {
-			gtag('event', 'project', { action: 'save_svg' });
+			gtag('event', 'project_svg');
 		}
 		private pngSaved() {
-			gtag('event', 'project', { action: 'save_png' });
+			gtag('event', 'project_png');
 		}
 
 		public get jsonFile(): FileFactory {
@@ -131,6 +131,7 @@
 			let f = event.target;
 			await this.openFiles(f.files)
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
+			gtag('event', 'project_open');
 		}
 		public async openFiles(files: FileList) {
 			if(files.length) for(let i = 0; i < files.length; i++) await this.open(files[i]);

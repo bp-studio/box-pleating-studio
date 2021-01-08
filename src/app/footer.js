@@ -23,6 +23,7 @@ if(lz != sessionStorage.getItem("project") && json) {
 	// 因此可以用這個來避免重刷頁面的時候再次載入的問題
 	sessionStorage.setItem("project", lz);
 	core.addDesign(bp.load(json));
+	gtag('event', 'share_open');
 }
 
 document.addEventListener("wheel", function(event) {
