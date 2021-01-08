@@ -39,7 +39,7 @@ function actionInner(target: any, name: string, option: ActionOption) {
 			if(result) {
 				if(name in record && record[name] != v) {
 					if(!('design' in this)) debugger;
-					this.design.fieldChange(this, name, record[name], v);
+					this.design.history.fieldChange(this, name, record[name], v);
 				}
 				record[name] = v;
 			}

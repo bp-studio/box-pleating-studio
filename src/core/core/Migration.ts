@@ -15,6 +15,11 @@ namespace Migration {
 			version: Migration.current,
 			fullscreen: true,
 			mode: "layout",
+			history: {
+				index: 0,
+				modified: false,
+				actions: []
+			},
 			layout: {
 				sheet: { width: 16, height: 16, scale: 20 },
 				flaps: [],

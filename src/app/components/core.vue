@@ -216,7 +216,7 @@
 		public async closeCore(id: number): Promise<boolean> {
 			let d = bp.designMap.get(id)!;
 			let title = d.title || this.$t("keyword.untitled");
-			if(d.modified) {
+			if(d.history.modified) {
 				bp.select(id);
 				let message = this.$t("message.unsaved", [title]);
 				if(!(await this.confirm(message))) return false;

@@ -27,8 +27,6 @@ interface IDesignObject {
 
 	public readonly tree: Tree;
 
-	private _modified: boolean = false;
-
 	constructor(studio: BPStudio, profile: RecursivePartial<JDesign>) {
 		super(studio, profile);
 
@@ -54,28 +52,8 @@ interface IDesignObject {
 		return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
 	}
 
-	public get modified(): boolean {
-		// TODO: 以後這邊要根據歷史移動來決定
-		return this._modified;
-	}
-
 	public get design(): Design {
 		return this;
-	}
-
-	public notifySave() {
-		this._modified = false;
-	}
-
-	public takeAction(action: () => void) {
-		// TODO: 以後這邊要改成歷史機制
-		this._modified = true;
-		action();
-	}
-
-	public fieldChange(obj: any, prop: string, oldValue: any, newValue: any) {
-		// TODO: 以後這邊要改成歷史機制
-		this._modified = true;
 	}
 
 	public toJSON(): JDesign {
@@ -102,7 +80,7 @@ interface IDesignObject {
 	}
 
 	public deleteVertices(vertices: readonly Vertex[]) {
-		this.takeAction(() => {
+		this.history.takeAction(() => {
 			let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
 			while(this.vertices.size > 3) {
 				let v = arr.find(v => v.node.degree == 1);
@@ -115,7 +93,7 @@ interface IDesignObject {
 	}
 
 	public deleteFlaps(flaps: readonly Flap[]) {
-		this.takeAction(() => {
+		this.history.takeAction(() => {
 			for(let f of flaps) {
 				if(this.vertices.size == 3) break;
 				f.node.dispose();

@@ -47,5 +47,9 @@
 		"serializable",
 		"tsai",
 		"tsun"
+	],
+	"cSpell.ignorePaths": [
+		"**/package*.json",
+		".vscode",
 	]
 }

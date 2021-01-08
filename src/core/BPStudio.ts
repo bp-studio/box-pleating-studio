@@ -150,8 +150,10 @@
 
 	public toBPS(): string {
 		if(!this.design) return "";
-		let json = JSON.stringify(this.design);
-		let blob = new Blob([json], { type: "application/octet-stream" });
+		let json = this.design.toJSON();
+		delete json.history; // 存檔的時候不用儲存歷史
+		let bps = JSON.stringify(json);
+		let blob = new Blob([bps], { type: "application/octet-stream" });
 		return URL.createObjectURL(blob);
 	}
 

@@ -77,11 +77,11 @@
 		}
 
 		private notify() {
-			bp.design.notifySave();
+			bp.design.history.notifySave();
 			gtag('event', 'project', { action: 'save' });
 		}
 		private notifyAll() {
-			bp.designMap.forEach(d => d.notifySave());
+			bp.designMap.forEach(d => d.history.notifySave());
 			gtag('event', 'project', { action: 'save_workspace' });
 		}
 		private svgSaved() {

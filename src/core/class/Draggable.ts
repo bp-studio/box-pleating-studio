@@ -36,12 +36,12 @@ abstract class Draggable extends ViewedControl {
 	public drag(by: Point | Vector) {
 		if(by instanceof Point) {
 			by = by.sub(this._dragOffset);
-			if(!by.eq(this.location)) this.design.takeAction(() => {
+			if(!by.eq(this.location)) this.design.history.takeAction(() => {
 				this.location.x = by.x;
 				this.location.y = by.y;
 			});
 		} else {
-			if(!by.eq(Vector.ZERO)) this.design.takeAction(() => {
+			if(!by.eq(Vector.ZERO)) this.design.history.takeAction(() => {
 				this.location.x += by.x;
 				this.location.y += by.y;
 			});

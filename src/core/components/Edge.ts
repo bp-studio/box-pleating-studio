@@ -33,11 +33,11 @@ interface JEdge {
 	}
 
 	public split() {
-		this.design.takeAction(() => this.toVertex(Tree.prototype.split));
+		this.design.history.takeAction(() => this.toVertex(Tree.prototype.split));
 	}
 
 	public deleteAndMerge() {
-		this.design.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
+		this.design.history.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
 	}
 
 	private toVertex(action: (e: TreeEdge) => TreeNode) {
