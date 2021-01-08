@@ -40,7 +40,8 @@
 			"axial": "顯示裝置中的軸平行摺痕",
 			"label": "顯示標籤",
 			"tip": "顯示角片頂點",
-			"preference": "喜好設定"
+			"preference": "喜好設定",
+			"dPad": "顯示方向鍵"
 		},
 		"project": {
 			"title": "開啟的專案",

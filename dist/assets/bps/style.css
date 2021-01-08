@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'bps';
   src:
-    url('fonts/bps.ttf?ap74dj') format('truetype'),
-    url('fonts/bps.woff?ap74dj') format('woff'),
-    url('fonts/bps.svg?ap74dj#bps') format('svg');
+    url('fonts/bps.ttf?sgm37n') format('truetype'),
+    url('fonts/bps.woff?sgm37n') format('woff'),
+    url('fonts/bps.svg?sgm37n#bps') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -24,6 +24,84 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.bp-arrow-down-left:before {
+  content: "\e903";
+}
+.bp-down-left:before {
+  content: "\e903";
+}
+.bp-arrow-bottom-left:before {
+  content: "\e903";
+}
+.bp-arrow-down-right:before {
+  content: "\e904";
+}
+.bp-down-right:before {
+  content: "\e904";
+}
+.bp-arrow-bottom-right:before {
+  content: "\e904";
+}
+.bp-arrow-up-left:before {
+  content: "\e905";
+}
+.bp-up-left:before {
+  content: "\e905";
+}
+.bp-arrow-top-left:before {
+  content: "\e905";
+}
+.bp-arrow-up-right:before {
+  content: "\e906";
+}
+.bp-up-right:before {
+  content: "\e906";
+}
+.bp-arrow-top-right:before {
+  content: "\e906";
+}
+.bp-arrow-right:before {
+  content: "\e907";
+}
+.bp-right:before {
+  content: "\e907";
+}
+.bp-next:before {
+  content: "\e907";
+}
+.bp-arrow-left:before {
+  content: "\e908";
+}
+.bp-left:before {
+  content: "\e908";
+}
+.bp-previous:before {
+  content: "\e908";
+}
+.bp-arrow-down:before {
+  content: "\e909";
+}
+.bp-down:before {
+  content: "\e909";
+}
+.bp-download:before {
+  content: "\e909";
+}
+.bp-bottom:before {
+  content: "\e909";
+}
+.bp-arrow-up:before {
+  content: "\e90a";
+}
+.bp-up:before {
+  content: "\e90a";
+}
+.bp-upload:before {
+  content: "\e90a";
+}
+.bp-top:before {
+  content: "\e90a";
+}
 .bp-info:before {
   content: "\e902";
 }

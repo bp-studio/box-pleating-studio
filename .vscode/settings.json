@@ -39,6 +39,8 @@
 		"gops",
 		"gtag",
 		"kamiya",
+		"mixins",
+		"notranslate",
 		"osme",
 		"overlappings",
 		"partitioner",
@@ -47,6 +49,9 @@
 		"serializable",
 		"tsai",
 		"tsun"
+	],
+	"cSpell.ignoreRegExpList": [
+		"/[A-Z]+(?![a-z])/g"
 	],
 	"cSpell.ignorePaths": [
 		"**/package*.json",

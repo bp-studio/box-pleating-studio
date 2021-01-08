@@ -10,7 +10,7 @@ let ftp = require('vinyl-ftp');
 let log = require('fancy-log');
 
 let log2 = require('./.vscode/log');
-let gvpd = require('./.vscode/gvpd');
+let vue = require('./.vscode/vue');
 let crc = require('./.vscode/crc');
 let i18n = require('./.vscode/i18n');
 
@@ -83,13 +83,13 @@ gulp.task('buildApp', () =>
 		'src/app/components/**/*.vue',
 		'src/app/footer.js'
 	])
-		.pipe(gvpd())
+		.pipe(vue())
 		.pipe(concat('main.js'))
 		.pipe(wrap("if(!err&&!wErr) { <%= contents %> }",))
 		.pipe(terser(terserOption))
 		.pipe(crc())
 		.pipe(gulp.dest('dist/')),
-	gulp.src('dist/main.css')
+	gulp.src(['dist/main.css', 'dist/assets/bps/style.css'])
 		.pipe(crc())
 );
 
@@ -115,7 +115,7 @@ gulp.task('buildDonate', () =>
 		'src/donate/main.vue',
 		'src/donate/main.js',
 	])
-		.pipe(gvpd())
+		.pipe(vue())
 		.pipe(concat('donate.js'))
 		.pipe(terser())
 		.pipe(crc('dist/donate.htm'))
@@ -139,7 +139,7 @@ const ftpFactory = (folder, g) => function() {
 
 gulp.task('uploadPub', ftpFactory('bp', ['dist/.htaccess']));
 
-gulp.task('deployDev', ftpFactory('bp-dev'));
+gulp.task('deployDev', ftpFactory('bp-dev', ['!dist/manifest.json']));
 
 gulp.task('deployPub', gulp.series(
 	'buildCorePub',

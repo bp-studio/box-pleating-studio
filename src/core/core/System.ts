@@ -172,13 +172,15 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		let active = document.activeElement;
 		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return true;
 
-		let canvas = this._canvas;
+		return this.key(event.key, event.modifiers.control);
+	}
 
+	public key(key: string, ctrl: boolean = false) {
 		let v = new Vector(0, 0);
-		switch(event.key) {
+		switch(key) {
 			case "space":
 				if(this._studio.$display.isScrollable()) {
-					canvas.style.cursor = "grab";
+					this._canvas.style.cursor = "grab";
 					this._spaceDown = true;
 				}
 				return false;
@@ -191,7 +193,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 			case "a":
 				let d = this._studio.design;
-				if(event.modifiers.control && d) {
+				if(ctrl && d) {
 					this._clearSelection();
 					if(d.mode == "layout") d.flaps.forEach(f => f.selected = true);
 					if(d.mode == "tree") d.vertices.forEach(v => v.selected = true);

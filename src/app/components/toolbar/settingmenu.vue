@@ -31,9 +31,18 @@
 			<i class="fas fa-genderless" v-else></i>
 			{{$t('toolbar.setting.tip')}}
 		</div>
+		<template v-if="core.isTouch">
+			<divider></divider>
+			<div class="dropdown-item" @click="toggle('showDPad', core)">
+				<i v-if="!core.showDPad"></i>
+				<i class="fas fa-arrows-alt" v-else></i>
+				{{$t('toolbar.setting.dPad')}}
+			</div>
+		</template>
 		<divider></divider>
 		<div class="dropdown-item" @click="$emit('pref')">
-			<i class="fas fa-cog"></i> {{$t('toolbar.setting.preference')}}
+			<i class="fas fa-cog"></i>
+			{{$t('toolbar.setting.preference')}}
 		</div>
 	</dropdown>
 </template>
@@ -42,16 +51,21 @@
 	import { Component } from 'vue-property-decorator';
 	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
-
 	import BaseComponent from '../mixins/baseComponent';
+
+	declare const gtag: any;
 
 	@Component
 	export default class SettingMenu extends BaseComponent {
+		private get core() { return core; }
 		private get settings() { return bp.$display.settings; }
 
-		private toggle(key: string,) {
-			this.settings[key] = !this.settings[key];
+		private toggle(key: string, target: any) {
+			if(!target) target = this.settings;
+			target[key] = !target[key];
 			core.saveSettings();
+
+			if(key == "showDPad") gtag('event', 'dpad_' + (target[key] ? "on" : "off"));
 		}
 	}
 </script>

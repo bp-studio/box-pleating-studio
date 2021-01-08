@@ -45,6 +45,9 @@
 		public designs: number[] = [];
 		public tabHistory: number[] = [];
 		public autoSave: boolean = true;
+		public showDPad: boolean = true;
+
+		public isTouch: boolean;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
 		private id: string = new Date().getTime().toString();
@@ -55,6 +58,10 @@
 		private get i18n() { return i18n; }
 
 		@Watch('i18n.locale') watchLocale() { this.onLocaleChanged(); }
+
+		created() {
+			this.isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
+		}
 
 		mounted() {
 			this.loadSettings();
@@ -90,6 +97,7 @@
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {
 				this.autoSave = settings.autoSave;
+				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
 				let d = bp.$display.settings;
 				for(let key in d) d[key] = settings[key];
 			}
@@ -133,6 +141,7 @@
 			else localStorage.removeItem("session");
 			localStorage.setItem("settings", JSON.stringify({
 				autoSave: this.autoSave,
+				showDPad: this.showDPad,
 				includeHiddenElement,
 				showGrid, showHinge, showRidge,
 				showAxialParallel, showLabel, showDot

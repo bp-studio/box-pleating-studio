@@ -10,6 +10,7 @@
 		<welcome v-if="!design"></welcome>
 		<div id="divShade" :class="{'show':showPanel}" @mousedown="showPanel=false" @touchstart="showPanel=false"></div>
 		<panel :show="showPanel"></panel>
+		<dpad></dpad>
 		<share ref="share"></share>
 		<about ref="about"></about>
 		<version ref="ver"></version>

@@ -27,7 +27,7 @@ function transform(file, encoding, callback) {
 	file.contents = Buffer.from(result, encoding);
 	return callback(null, file);
 }
-function gvpd() {
+function vue() {
 	return through.obj(transform);
 }
-module.exports = gvpd;
+module.exports = vue;

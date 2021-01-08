@@ -8,7 +8,7 @@
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio" />
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.1.10">
+	<meta name="version" content="0.2.0">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
@@ -19,7 +19,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "562"
+			app_version: "601"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -56,10 +56,7 @@
 				if(err || wErr) {
 					display('divWorkspace', 'none');
 					display(err ? 'resource' : 'requirement', 'block', err || wErr);
-					if(wErr) {
-						gtag('set', 'user_properties', { user_agent: navigator.userAgent });
-						gtag('event', 'unsupported');
-					}
+					if(wErr) gtag('event', 'unsupported', { error: wErr });
 				}
 				if(errorOB) errorOB.disconnect();
 			};
@@ -94,15 +91,15 @@
 	<script src="lib/vue-i18n.js" defer></script>
 	<script src="lib/marked.min.js" defer></script>
 
-	<link rel="stylesheet" href="assets/bps/style.css">
-	<link rel="stylesheet" href="main.css?7876594a">
+	<link rel="stylesheet" href="assets/bps/style.css?5f0317e5">
+	<link rel="stylesheet" href="main.css?f4620864">
 	<link rel="stylesheet" href="bpstudio.css?1079229d">
 
-	<script src="log/log.js?b135ab49" defer></script>
+	<script src="log/log.js?eb117691" defer></script>
 	<script src="shrewd.min.js?97d129ed" defer></script>
-	<script src="bpstudio.js?17880d0c" defer></script>
-	<script src="locale.js?70b8a220" defer></script>
-	<script src="main.js?8538f70a" defer></script>
+	<script src="bpstudio.js?8db58618" defer></script>
+	<script src="locale.js?77d604d5" defer></script>
+	<script src="main.js?c42c613d" defer></script>
 </head>
 
 <body>
