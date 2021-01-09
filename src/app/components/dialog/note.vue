@@ -3,12 +3,12 @@
 		<button id="note" class="btn btn-light text-warning" v-on:click="note">
 			<i class="fas fa-exclamation-triangle h1"></i>
 		</button>
-		<div id="mdlNote" class="modal fade">
+		<div class="modal fade" ref="mdl">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-body" v-t="'message.patternNotFound'"></div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" data-dismiss="modal" v-t="'keyword.ok'"></button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 					</div>
 				</div>
 			</div>
@@ -18,14 +18,18 @@
 
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator';
-	import $ from 'jquery/index';
+	import * as bootstrap from 'bootstrap';
 
 	declare const gtag: any;
 
 	@Component
 	export default class Note extends Vue {
+		private modal: Bootstrap.Modal;
+		mounted() {
+			this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement);
+		}
 		private note() {
-			$('#mdlNote').modal();
+			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'Note' });
 		}
 	}

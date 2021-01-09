@@ -8,7 +8,7 @@
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio" />
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.2.0">
+	<meta name="version" content="0.2.1">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
@@ -19,7 +19,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "602"
+			app_version: "650"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -74,12 +74,11 @@
 		})();
 	</script>
 
-	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" />
 	<link rel="stylesheet" href="lib/font-awesome/css/all.min.css">
 
-	<script src="lib/jquery.min.js" defer></script>
-	<script src="lib/bootstrap/js/popper.min.js" defer></script>
-	<script src="lib/bootstrap/js/bootstrap.min.js" defer></script>
+	<script src="lib/bootstrap/popper.min.js" defer></script>
+	<script src="lib/bootstrap/bootstrap.min.js" defer></script>
 	<script src="lib/paper-core.min.js" defer></script>
 	<script src="lib/vue.runtime.min.js" defer></script>
 	<script src="lib/vue-clipboard.min.js" defer></script>
@@ -92,14 +91,14 @@
 	<script src="lib/marked.min.js" defer></script>
 
 	<link rel="stylesheet" href="assets/bps/style.css?5f0317e5">
-	<link rel="stylesheet" href="main.css?f4620864">
+	<link rel="stylesheet" href="main.css?5f11d13c">
 	<link rel="stylesheet" href="bpstudio.css?1079229d">
 
 	<script src="log/log.js?eb117691" defer></script>
 	<script src="shrewd.min.js?97d129ed" defer></script>
-	<script src="bpstudio.js?8db58618" defer></script>
+	<script src="bpstudio.js?a779763e" defer></script>
 	<script src="locale.js?77d604d5" defer></script>
-	<script src="main.js?ff289af0" defer></script>
+	<script src="main.js?845400b2" defer></script>
 </head>
 
 <body>
@@ -108,13 +107,13 @@
 
 	<div id="app">
 		<div id="divToolbar" class="btn-toolbar p-2">
-			<div class="btn-group mr-2">
+			<div class="btn-group me-2">
 				<button type="button" disabled class="btn btn-primary"><i class="fas fa-file-alt"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="fas fa-tasks"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="fas fa-tools"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="far fa-question-circle"></i></button>
 			</div>
-			<div class="btn-group mr-2">
+			<div class="btn-group me-2">
 				<button type="button" disabled class="btn btn-primary"><i class="bp-tree"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="bp-layout"></i></button>
 			</div>

@@ -58,15 +58,19 @@
 		window.addEventListener("resize", this.setSize.bind(this));
 		this.setSize();
 
+		// 重新刷新頁面的時候在手機版上可能會有一瞬間大小判斷錯誤，
+		// 所以在建構的時候額外再多判斷一次
+		setTimeout(() => this.setSize(), 10);
+
 		// 產生列印用的 <img>
 		this.spaceHolder.appendChild(this._img = new Image());
 		window.addEventListener("beforeprint", this.beforePrint.bind(this));
 		window.addEventListener("afterprint", this.afterPrint.bind(this));
 
 		// 設置事件，在手機版鍵盤開啟時暫時鎖定
-		let mobile = matchMedia("(hover: none)").matches;
+		let isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 		document.addEventListener("focusin", e => {
-			if(mobile && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+			if(isTouch && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
 				this.lockViewport = true;
 			}
 		});

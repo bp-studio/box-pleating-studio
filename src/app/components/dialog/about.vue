@@ -17,7 +17,7 @@
 				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1">{{$t('keyword.version')}} {{version}}</div>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 				</div>
 			</div>
 		</div>
@@ -28,16 +28,20 @@
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { bp } from '../import/BPStudio';
 	import { core } from './../core.vue';
-	import $ from 'jquery/index';
+	import * as bootstrap from 'bootstrap';
 
 	declare const gtag: any;
 	declare const app_config: any;
 
 	@Component
 	export default class About extends Vue {
+		private modal: Bootstrap.Modal;
 		private get copyright() { return core.copyright; }
+		mounted() {
+			this.modal = new bootstrap.Modal(this.$el);
+		}
 		public show() {
-			$(this.$el).modal();
+			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'About' });
 		}
 		public get version() {

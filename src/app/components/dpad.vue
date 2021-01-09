@@ -1,5 +1,5 @@
 <template>
-	<div id="divDPad" v-bind:class="{'show':show}">
+	<div id="divDPad" v-bind:class="{'show':show,'disabled':disabled}">
 		<keybutton class="bp-up" style="top:0rem;left:2.5rem;" v-on:key="key('up')"></keybutton>
 		<keybutton class="bp-left" style="top:2.5rem;left:0rem;" v-on:key="key('left')"></keybutton>
 		<keybutton class="bp-right" style="top:2.5rem;left:5rem;" v-on:key="key('right')"></keybutton>
@@ -16,9 +16,8 @@
 
 	@Component
 	export default class DPad extends Vue {
-		private get show() {
-			return core.isTouch && core.showDPad && bp.system.selections.length > 0;
-		}
+		private get show() { return core.shouldShowDPad; }
+		private get disabled() { return bp.system.dragging; }
 		private key(key: string) {
 			bp.system.key(key);
 		}

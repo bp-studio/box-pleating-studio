@@ -6,7 +6,7 @@
 
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
-	import Popper from 'popper.js';
+	import Popper from '@popperjs/core';
 
 	@Component
 	export default class ContextMenu extends Vue {
@@ -14,7 +14,7 @@
 		private shown: boolean = false;
 
 		public show(e: MouseEvent) {
-			new Popper(
+			Popper.createPopper(
 				{
 					getBoundingClientRect() {
 						return {
@@ -25,11 +25,9 @@
 							width: 0,
 							height: 0
 						}
-					},
-					clientHeight: 0,
-					clientWidth: 0,
-				} as Popper.ReferenceObject,
-				this.$el,
+					}
+				} as Popper.VirtualElement,
+				this.$el as HTMLElement,
 				{
 					placement: "bottom-start"
 				}

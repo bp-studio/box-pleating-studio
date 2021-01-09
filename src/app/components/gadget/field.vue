@@ -1,13 +1,13 @@
 <template>
-	<div class="form-row" v-if="type == 'checkbox'">
+	<div class="row mb-2 py-1" v-if="type == 'checkbox'">
 		<div class="col">
-			<div class="custom-control custom-checkbox">
-				<input class="custom-control-input" type="checkbox" v-bind:id="id" v-model="v" />
-				<label class="custom-control-label" v-bind:for="id">{{label}}</label>
+			<div class="form-check form-switch">
+				<input class="form-check-input" type="checkbox" v-bind:id="id" v-model="v" />
+				<label class="form-check-label" v-bind:for="id">{{label}}</label>
 			</div>
 		</div>
 	</div>
-	<div class="form-row mb-1" v-else>
+	<div class="row mb-2" v-else>
 		<label class="col-form-label col-3">{{ label }}</label>
 		<div class="col-9">
 			<number v-if="type=='number'" :value="v" @input="$emit('input', $event)"></number>

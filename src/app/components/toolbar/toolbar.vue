@@ -1,6 +1,6 @@
 <template>
 	<div id="divToolbar" class="btn-toolbar p-2">
-		<div class="btn-group mr-2">
+		<div class="btn-group me-2">
 			<filemenu @share="$emit('share')"></filemenu>
 			<settingmenu @pref="$emit('pref')"></settingmenu>
 			<dropdown icon="fas fa-tools" :title="$t('toolbar.tools.title')">
@@ -32,7 +32,7 @@
 			</dropdown>
 		</div>
 
-		<div class="btn-group mr-2">
+		<div class="btn-group me-2">
 			<button
 				type="button"
 				class="btn btn-primary"

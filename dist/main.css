@@ -25,7 +25,6 @@ body, .modal-open .modal {
 input {
 	border: 1px solid black;
 	padding: 1px;
-	margin-bottom: 3px;
 	width: 100px;
 }
 
@@ -194,6 +193,11 @@ label span.label {
 	cursor: default;
 	padding: 10px;
 	transition: right 500ms;
+	overflow-y: auto;
+}
+
+#divPanel, #divPanel * {
+	touch-action: pan-y;
 }
 
 #divToolbar {
@@ -272,24 +276,21 @@ label span.label {
 
 .notify {
 	display: inline-block;
-	line-height: 3px;
-	font-size: 3px;
-	color: red;
+	height: 0.25em;
+	width: 0.25em;
+	border-radius: 0.125em;
+	background-color: red;
 }
 
 .dropdown-item>.notify {
 	position: relative;
-	top: -0.5rem;
+	top: -0.5em;
 }
 
 button>.notify {
 	position: absolute;
-	top: 2px;
-	right: 2px;
-}
-
-.notify::after {
-	content: '●';
+	top: 0.3rem;
+	right: 0.3rem;
 }
 
 /*********************************************
@@ -344,22 +345,6 @@ button>.notify {
 	display: none;
 }
 
-.custom-control {
-	padding: 0.375rem 0px 0.375rem 2rem;
-	margin-bottom: 3px;
-}
-
-.custom-control-label {
-	cursor: pointer;
-}
-
-.custom-control-label::before, .custom-control-label::after {
-	width: 1.5rem;
-	height: 1.5rem;
-	top: 0px;
-	left: -2rem;
-}
-
 .error {
 	color: red !important;
 	transition-property: color;
@@ -371,8 +356,8 @@ button>.notify {
 		padding: 0.4rem 2rem 0.4rem 0.5rem;
 	}
 	.btn-primary:hover:not(:focus) {
-		background-color: var(--primary);
-		border-color: var(--primary);
+		background-color: var(--bs-primary);
+		border-color: var(--bs-primary);
 	}
 	.tab i {
 		visibility: visible;
@@ -402,7 +387,7 @@ button>.notify {
 	bottom: 1rem;
 	left: 1rem;
 	border-radius: 3.75rem;
-	background-color: var(--primary);
+	background-color: var(--bs-primary);
 	opacity: 0;
 	pointer-events: none;
 	transition-property: opacity;
@@ -415,6 +400,11 @@ button>.notify {
 	opacity: 0.8;
 }
 
+#divDPad.show.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
 #divDPad i {
 	padding: 0.25rem;
 	height: 2.5rem;
@@ -422,4 +412,25 @@ button>.notify {
 	font-size: 2rem;
 	color: white;
 	position: absolute;
+}
+
+/*********************************************
+ * Switch
+ *********************************************/
+
+.form-switch {
+	padding-left: 3.5rem;
+}
+
+.form-switch label {
+	padding-top: 0.5rem;
+}
+
+.form-switch .form-check-input {
+	cursor: pointer;
+	height: 1.5rem;
+	width: 2.75rem;
+	border-radius: 3rem;
+	margin-top: 0.5rem;
+	margin-left: -3.5rem;
 }

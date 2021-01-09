@@ -17,7 +17,7 @@
 							<i class="fas fa-caret-right"></i>
 						</button>
 					</div>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 				</div>
 			</div>
 		</div>
@@ -27,7 +27,7 @@
 <script lang="ts">
 	import { Vue, Component, Watch } from 'vue-property-decorator';
 	import { core } from '../core.vue';
-	import $ from 'jquery/index';
+	import * as bootstrap from 'bootstrap';
 
 	declare const gtag: any;
 	declare const marked: any;
@@ -40,6 +40,7 @@
 		private index: number;
 		private max: number;
 		private active: boolean = false;
+		private modal: Bootstrap.Modal;
 
 		@Watch('index') onIndex(index: number) {
 			if(location.protocol == "https:") this.load(index);
@@ -56,6 +57,7 @@
 					}
 				}
 			});
+			this.modal = new bootstrap.Modal(this.$el);
 			this.index = this.max = logs.length - 1;
 		}
 
@@ -66,7 +68,7 @@
 					Vue.set(this.record, this.index, marked(await response.text()));
 				} catch(e) {
 					if(this.active) {
-						$(this.$el).modal('hide');
+						this.modal.hide();
 						core.alert(this.$t("message.connFail"));
 					}
 					return false;
@@ -78,7 +80,7 @@
 		public async show() {
 			this.active = true;
 			if(await this.load(this.index)) {
-				$(this.$el).modal();
+				this.modal.show();
 				gtag('event', 'screen_view', { screen_name: 'News' });
 			}
 		}

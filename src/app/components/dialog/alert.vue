@@ -4,7 +4,7 @@
 			<div class="modal-content">
 				<div class="modal-body">{{message}}</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 				</div>
 			</div>
 		</div>
@@ -17,8 +17,8 @@
 
 	@Component
 	export default class Alert extends Dialog<void> {
-		protected resolve(res, el) {
-			el.one('hidden.bs.modal', res);
+		protected resolve(res) {
+			this.$el.addEventListener('hidden.bs.modal', res, { once: true });
 		}
 	}
 </script>

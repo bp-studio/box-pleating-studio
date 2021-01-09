@@ -3,13 +3,13 @@
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
 		<note v-if="design&&design.patternNotFound"></note>
-		<div id="mdlLanguage" class="modal fade">
+		<div ref="mdlLanguage" class="modal fade">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-body">
 						<div class="row">
 							<div v-for="l in languages" :key="l" class="col text-center">
-								<button @click="i18n.locale=l" class="w-100 btn btn-light" data-dismiss="modal">
+								<button @click="i18n.locale=l" class="w-100 btn btn-light" data-bs-dismiss="modal">
 									<img :src="'assets/flags/'+$t('flag', l)+'.png'" />
 									<br />
 									{{$t('name', l)}}
@@ -28,6 +28,7 @@
 	import { set } from 'vue/types/umd';
 	import { bp, Shrewd } from './import/BPStudio';
 	import { sanitize } from './import/types';
+	import * as bootstrap from 'bootstrap';
 	import JSZip from 'jszip';
 
 	import Confirm from './dialog/confirm.vue';
@@ -54,6 +55,7 @@
 
 		private heartbeat: number | null = null;
 		private languages: string[] = [];
+		private mdlLanguage: Bootstrap.Modal;
 
 		private get i18n() { return i18n; }
 
@@ -64,6 +66,7 @@
 		}
 
 		mounted() {
+			this.mdlLanguage = new bootstrap.Modal(this.$refs.mdlLanguage as HTMLElement);
 			this.loadSettings();
 			bp.onDeprecate = (title: string) => {
 				title = title || this.$t("keyword.untitled");
@@ -93,6 +96,10 @@
 			return this.$t('welcome.copyright', [end]);
 		}
 
+		public get shouldShowDPad() {
+			return this.isTouch && this.showDPad && bp.system.selections.length > 0;
+		}
+
 		private loadSettings() {
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {
@@ -111,7 +118,7 @@
 				languages = Array.from(new Set(languages));
 				if(languages.length > 1) {
 					this.languages = languages;
-					$('#mdlLanguage').modal();
+					this.mdlLanguage.show();
 				}
 				l = languages[0] || navigator.languages[0];
 			}

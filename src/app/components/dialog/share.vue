@@ -26,7 +26,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 				</div>
 			</div>
 		</div>
@@ -36,7 +36,7 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
-	import $ from 'jquery/index';
+	import * as bootstrap from 'bootstrap';
 
 	declare const LZ: any;
 	declare const gtag: any;
@@ -44,7 +44,12 @@
 	@Component
 	export default class Share extends BaseComponent {
 		private url: string = "";
+		private modal: Bootstrap.Modal;
 		private canShare: boolean = !!navigator.share;
+
+		mounted() {
+			this.modal = new bootstrap.Modal(this.$el);
+		}
 
 		public json() {
 			if(!this.design) return undefined;
@@ -53,7 +58,7 @@
 
 		public show() {
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
-			$(this.$el).modal();
+			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'Share' });
 		}
 

@@ -1,16 +1,17 @@
 <template>
 	<div class="btn-group">
 		<button
+			ref="btn"
 			type="button"
 			@mouseenter="mouseenter"
 			:title="title"
 			class="btn btn-primary dropdown-toggle"
-			data-toggle="dropdown"
+			data-bs-toggle="dropdown"
 		>
 			<i :class="icon"></i>
 			<div class="notify" v-if="notify"></div>
 		</button>
-		<div class="dropdown-menu" @touchstartout="hide" @mousedownout="hide">
+		<div ref="menu" class="dropdown-menu" @touchstartout="hide" @mousedownout="hide">
 			<slot></slot>
 		</div>
 	</div>
@@ -19,7 +20,7 @@
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { core } from '../core.vue';
-	import $ from 'jquery/index';
+	import * as bootstrap from 'bootstrap';
 
 	@Component
 	export default class Dropdown extends Vue {
@@ -28,22 +29,22 @@
 		@Prop(Boolean) public notify: boolean;
 
 		private bt: any;
+		private dropdown: bootstrap.Dropdown;
 
 		mounted() {
 			let self = this;
-			this.bt = $(this.$el).find('button');
-			$(this.$el)
-				.on('shown.bs.dropdown', function() { core.dropdown = self })
-				.on('hide.bs.dropdown', function() { core.dropdown = null; })
-				.on('hidden.bs.dropdown', () => this.$emit('hide'));
+			this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {})
+			this.$el.addEventListener('shown.bs.dropdown', function() { core.dropdown = self });
+			this.$el.addEventListener('hide.bs.dropdown', function() { core.dropdown = null; });
+			this.$el.addEventListener('hidden.bs.dropdown', () => this.$emit('hide'));
 		}
 
 		private hide() {
-			this.bt.dropdown('hide');
+			this.dropdown.hide();
 		}
 
 		private mouseenter() {
-			if(core.dropdown && core.dropdown != this) this.bt.click();
+			if(core.dropdown && core.dropdown != this) (this.$refs.btn as HTMLButtonElement).click();
 		}
 	}
 </script>

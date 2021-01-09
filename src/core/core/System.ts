@@ -53,7 +53,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	private _lastKnownCursorLocation: Point;
 
 	/** 目前是否正在進行拖曳 */
-	private _dragging = false;
+	@shrewd public dragging = false;
 
 	/** 捲動開始的起點；null 表示沒有啟用捲動 */
 	private _scrollStart: Point | null;
@@ -252,7 +252,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			// 拖曳初始化
 			this._lastKnownCursorLocation = new Point(event.downPoint).round();
 			for(let o of this.draggableSelections()) o.dragStart(this._lastKnownCursorLocation);
-			this._dragging = true;
+			this.dragging = true;
 		}
 	}
 
@@ -284,10 +284,10 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 		if(this._possiblyReselect) {
 			this._reselect(event);
-			this._dragging = true;
+			this.dragging = true;
 		}
 
-		if(this._dragging) {
+		if(this.dragging) {
 
 			// 檢查滑鼠位置是否有發生變化，如果沒有的話後面的就都可不用做了
 			let pt = new Point(event.point).round();
@@ -398,7 +398,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	private _dragEnd() {
-		this._dragging = false;
+		this.dragging = false;
 		if(this._studio.design) this._studio.design.dragging = false;
 	}
 

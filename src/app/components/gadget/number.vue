@@ -1,10 +1,8 @@
 <template>
 	<div class="input-group">
-		<div class="input-group-prepend">
-			<button class="btn btn-sm btn-primary" type="button" @click="change(-1)">
-				<i class="fas fa-minus"></i>
-			</button>
-		</div>
+		<button class="btn btn-sm btn-primary" type="button" @click="change(-1)">
+			<i class="fas fa-minus"></i>
+		</button>
 		<input
 			class="form-control"
 			:class="{'error':v!=value}"
@@ -17,11 +15,9 @@
 			:max="max"
 			@wheel="wheel($event)"
 		/>
-		<div class="input-group-append">
-			<button class="btn btn-sm btn-primary" type="button" @click="change(1)">
-				<i class="fas fa-plus"></i>
-			</button>
-		</div>
+		<button class="btn btn-sm btn-primary" type="button" @click="change(1)">
+			<i class="fas fa-plus"></i>
+		</button>
 	</div>
 </template>
 
