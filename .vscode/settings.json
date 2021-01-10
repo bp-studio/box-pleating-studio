@@ -44,6 +44,8 @@
 		"osme",
 		"overlappings",
 		"partitioner",
+		"precache",
+		"precaching",
 		"scrollable",
 		"selectables",
 		"serializable",

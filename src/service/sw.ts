@@ -1,5 +1,5 @@
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.0.2/workbox-sw.js');
-const { strategies, routing, expiration, googleAnalytics, broadcastUpdate } = workbox;
+const { strategies, routing, googleAnalytics, broadcastUpdate, precaching } = workbox;
 
 // 啟動 Workbox GA
 googleAnalytics.initialize();
@@ -13,38 +13,37 @@ let defaultHandler = new strategies.StaleWhileRevalidate({
 });
 routing.setDefaultHandler(defaultHandler);
 
+// 啟動 workbox-precaching
+const precacheController = new precaching.PrecacheController({ cacheName: "assets" });
+precacheController.addToCacheList(self.__WB_MANIFEST as any);
+const precacheRoute = new precaching.PrecacheRoute(precacheController, {
+	ignoreURLParametersMatching: [/.*/],
+	directoryIndex: 'index.htm',
+	cleanURLs: false
+});
+routing.registerRoute(precacheRoute);
+
+// 這是舊版的 cache；如果找得到就刪除掉以釋放空間
+caches.delete("versioned");
+
+// Markdown 檔案都採用網路優先策略
+routing.registerRoute(
+	({ url }) => url.pathname.endsWith(".md"),
+	new strategies.NetworkFirst({ cacheName: 'assets' })
+)
+
 // POST 請求全部都只能在有網路的時候進行
 routing.registerRoute(
 	({ request }) => request.method == 'POST',
 	new strategies.NetworkOnly(), 'POST'
 );
 
-function isInternal(url: URL): boolean {
-	return url.hostname == self.location.hostname;
-}
-
-// 不管主頁面的 search query 有什麼，一律都用同樣的快取
-routing.registerRoute(
-	({ url }) => isInternal(url) && url.pathname == "/",
-	options => {
-		options.request = new Request("/");
-		return defaultHandler.handle(options);
-	}
-);
-
-// 其餘的資源只要是有加上 query 的都用快取優先策略，因為這邊使用 query 來作版本控制
-routing.registerRoute(
-	({ url }) => isInternal(url) && url.search != "",
-	new strategies.CacheFirst({
-		cacheName: 'versioned',
-		plugins: [new expiration.ExpirationPlugin({
-			maxEntries: 10,
-			purgeOnQuotaError: true
-		})]
-	})
-);
-
-self.addEventListener("install", event => {
-	self.skipWaiting();
+self.addEventListener('install', (event) => {
+	skipWaiting();
 	console.log("service worker installing");
+	precacheController.install(event);
+});
+
+self.addEventListener('activate', (event) => {
+	precacheController.activate(event);
 });

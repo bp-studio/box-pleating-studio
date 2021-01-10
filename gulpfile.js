@@ -9,9 +9,9 @@ let terser = require('gulp-terser');
 let ftp = require('vinyl-ftp');
 let log = require('fancy-log');
 
+let workbox = require('./.vscode/workbox');
 let log2 = require('./.vscode/log');
 let vue = require('./.vscode/vue');
-let crc = require('./.vscode/crc');
 let i18n = require('./.vscode/i18n');
 
 let projCore = ts.createProject('src/core/tsconfig.json');
@@ -30,7 +30,6 @@ gulp.task('update', () => (
 	gulp.src("../shrewd/dist/shrewd.min.js")
 		.pipe(sourcemaps.init({ loadMaps: true }))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../../shrewd/src' }))
-		.pipe(crc())
 		.pipe(gulp.dest('dist/')),
 	gulp.src("../shrewd/dist/*.d.ts")
 		.pipe(gulp.dest('src/core/global'))
@@ -54,16 +53,17 @@ gulp.task('buildCorePub', () =>
 			else{root.BPStudio=factory();}}(this,function(){ <%= contents %> ;return BPStudio;}));`
 		))
 		.pipe(terser(Object.assign({}, terserOption, { mangle: true })))
-		.pipe(crc())
 		.pipe(gulp.dest('dist/')),
-	gulp.src('dist/bpstudio.css')
-		.pipe(crc())
 );
 
 gulp.task('buildService', () =>
 	projService.src()
-		.pipe(ifAnyNewer("dist", { filter: 'sw.js' }))
 		.pipe(projService())
+		.pipe(workbox({
+			globDirectory: 'dist',
+			globPatterns: ['**/*.htm', '**/*.js', '**/*.css', '**/*.woff2', '**/bps.*', 'manifest.json'],
+			globIgnores: ['sw.js']
+		}))
 		.pipe(gulp.dest('dist/'))
 );
 
@@ -87,16 +87,12 @@ gulp.task('buildApp', () =>
 		.pipe(concat('main.js'))
 		.pipe(wrap("if(!err&&!wErr) { <%= contents %> }",))
 		.pipe(terser(terserOption))
-		.pipe(crc())
-		.pipe(gulp.dest('dist/')),
-	gulp.src(['dist/main.css', 'dist/assets/bps/style.css'])
-		.pipe(crc())
+		.pipe(gulp.dest('dist/'))
 );
 
 gulp.task('buildLog', () =>
 	gulp.src('dist/log/*.md')
 		.pipe(log2('log.js'))
-		.pipe(crc())
 		.pipe(gulp.dest('dist/log'))
 );
 
@@ -106,7 +102,6 @@ gulp.task('buildLocale', () =>
 		.pipe(concat('locale.js'))
 		.pipe(wrap("let locale={};<%= contents %>"))
 		.pipe(terser())
-		.pipe(crc(['dist/index.htm', 'dist/donate.htm']))
 		.pipe(gulp.dest('dist/'))
 )
 
@@ -118,7 +113,6 @@ gulp.task('buildDonate', () =>
 		.pipe(vue())
 		.pipe(concat('donate.js'))
 		.pipe(terser())
-		.pipe(crc('dist/donate.htm'))
 		.pipe(gulp.dest('dist/'))
 );
 
@@ -139,11 +133,17 @@ const ftpFactory = (folder, g) => function() {
 
 gulp.task('uploadPub', ftpFactory('bp', ['dist/.htaccess']));
 
-gulp.task('deployDev', ftpFactory('bp-dev', ['!dist/manifest.json']));
+gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json']));
+
+gulp.task('deployDev', gulp.series(
+	'buildService',
+	'uploadDev'
+));
 
 gulp.task('deployPub', gulp.series(
 	'buildCorePub',
 	'buildLog',
+	'buildService',
 	'uploadPub'
 ));
 

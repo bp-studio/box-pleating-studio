@@ -48,6 +48,7 @@
 		public autoSave: boolean = true;
 		public showDPad: boolean = true;
 
+		public updated: boolean = false;
 		public isTouch: boolean;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了

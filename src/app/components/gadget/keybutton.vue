@@ -1,5 +1,5 @@
 <template>
-	<i v-on:touchstart="down(750, $event)" v-on:touchend="up"></i>
+	<i v-on:touchstart="down(750, $event)" v-on:touchend="up" v-on:touchcancel="up"></i>
 </template>
 
 <script lang="ts">

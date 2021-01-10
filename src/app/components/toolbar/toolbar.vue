@@ -9,7 +9,7 @@
 					{{$t("toolbar.tools.TreeMaker")}}
 				</uploader>
 			</dropdown>
-			<dropdown icon="far fa-question-circle" :title="$t('toolbar.help.title')" :notify="notify||updated">
+			<dropdown icon="far fa-question-circle" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
 				<div class="dropdown-item" @click="$emit('about')">
 					<i class="bp-info"></i>
 					{{$t('toolbar.help.about')}}
@@ -19,7 +19,7 @@
 					{{$t('toolbar.help.news')}}
 					<div class="notify" v-if="notify"></div>
 				</div>
-				<div class="dropdown-item" @click="update" v-if="updated">
+				<div class="dropdown-item" @click="update" v-if="core.updated">
 					<i class="far fa-arrow-alt-circle-up"></i>
 					{{$t('toolbar.help.update')}}
 					<div class="notify"></div>
@@ -133,14 +133,8 @@
 	export default class Toolbar extends BaseComponent {
 
 		private notify: boolean;
-		private updated: boolean = false;
 
 		mounted() {
-			if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', async (event) => {
-				if(event.data.meta === 'workbox-broadcast-update') {
-					if(event.data.payload.path == "/") this.updated = true;
-				}
-			});
 			let v = parseInt(localStorage.getItem("last_log") || "0");
 			this.notify = v < logs[logs.length - 1];
 		}
