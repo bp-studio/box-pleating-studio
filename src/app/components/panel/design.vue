@@ -9,8 +9,8 @@
 			<h6 v-if="design.mode=='tree'" v-t="'panel.design.tree'"></h6>
 			<h6 v-if="design.mode=='layout'" v-t="'panel.design.layout'"></h6>
 		</div>
-		<field :label="$t('panel.design.width')" type="number" v-model.number="design.sheet.width"></field>
-		<field :label="$t('panel.design.height')" type="number" v-model.number="design.sheet.height"></field>
+		<field :label="$t('panel.design.width')" type="number" v-model.number="design.sheet.width" id="grid-width-input"></field>
+		<field :label="$t('panel.design.height')" type="number" v-model.number="design.sheet.height" id="grid-height-input"></field>
 		<field :label="$t('panel.design.autoScale')" type="checkbox" v-model="design.fullscreen"></field>
 		<field :label="$t('panel.design.scale')" v-if="!design.fullscreen" type="number" v-model.number="design.sheet.scale"></field>
 	</div>
