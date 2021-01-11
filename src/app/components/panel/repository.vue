@@ -3,7 +3,7 @@
 		<h5 v-t="'panel.repo.type'"></h5>
 		<store v-if="repository.size>1" :data="repository" :label="$t('panel.repo.config')"></store>
 		<store v-if="repository.entry.size>1" :data="repository.entry" :label="$t('panel.repo.pattern')"></store>
-		<div class="form-row" v-else-if="repository.size==1">
+		<div class="row" v-else-if="repository.size==1">
 			<label class="col-form-label col" v-t="'panel.repo.onlyOne'"></label>
 		</div>
 	</div>

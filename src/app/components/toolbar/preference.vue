@@ -9,7 +9,7 @@
 					<div class="row mb-2">
 						<label class="col-form-label col-4">{{$t('preference.language')}}</label>
 						<div class="col-8">
-							<select class="form-control" v-model="i18n.locale">
+							<select class="form-select" v-model="i18n.locale">
 								<option v-for="l in i18n.availableLocales" :key="l" :value="l" v-t="{path:'name',locale:l}"></option>
 							</select>
 						</div>

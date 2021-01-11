@@ -19,7 +19,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "662"
+			app_version: "668"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -42,7 +42,9 @@
 		if(location.protocol == 'https:') {
 			document.write(`<link rel="manifest" href="manifest.json">`);
 			if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(function(reg) {
-				reg.addEventListener('updatefound', function() { core.updated = true; });
+				reg.addEventListener('updatefound', function() {
+					reg.installing.addEventListener('statechange', function() { core.updated = true; });
+				});
 			});
 		}
 		var err, wErr;

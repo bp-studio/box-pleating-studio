@@ -6,13 +6,9 @@
 				<div v-t="'donate.intro'"></div>
 				<div class="form-row mt-3">
 					<div class="input-group">
-						<div class="input-group-prepend">
-							<div class="input-group-text">$</div>
-						</div>
+						<div class="input-group-text">$</div>
 						<input class="form-control" type="number" v-model.number="amount" @input="amountChange" />
-						<div class="input-group-append">
-							<div class="input-group-text">USD{{handling}}</div>
-						</div>
+						<div class="input-group-text">USD{{handling}}</div>
 					</div>
 					<div class="text-danger" v-show="error" v-t="'donate.error'"></div>
 				</div>
