@@ -244,7 +244,8 @@
 		}
 
 		private scrollTo(id: number) {
-			document.getElementById(`tab${id}`)?.scrollIntoView();
+			let el = document.getElementById(`tab${id}`);
+			if(el) el.scrollIntoView();
 		}
 		public select(id: number) {
 			bp.select(id);

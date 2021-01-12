@@ -50,7 +50,7 @@ function callService(data) {
 		}
 	});
 }
-navigator.serviceWorker?.addEventListener('message', event => {
+if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', event => {
 	if(event.data == "id") event.ports[0].postMessage(core.id);
 });
 
