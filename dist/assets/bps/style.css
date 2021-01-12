@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'bps';
   src:
-    url('fonts/bps.ttf?sgm37n') format('truetype'),
-    url('fonts/bps.woff?sgm37n') format('woff'),
-    url('fonts/bps.svg?sgm37n#bps') format('svg');
+    url('fonts/bps.ttf?tqay7r') format('truetype'),
+    url('fonts/bps.woff?tqay7r') format('woff'),
+    url('fonts/bps.svg?tqay7r#bps') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -24,41 +24,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.bp-arrow-down-left:before {
+.bp-spinner:before {
+  content: "\e90c";
+}
+.bp-tools:before {
   content: "\e903";
 }
-.bp-down-left:before {
-  content: "\e903";
-}
-.bp-arrow-bottom-left:before {
-  content: "\e903";
-}
-.bp-arrow-down-right:before {
+.bp-tasks:before {
   content: "\e904";
 }
-.bp-down-right:before {
-  content: "\e904";
-}
-.bp-arrow-bottom-right:before {
-  content: "\e904";
-}
-.bp-arrow-up-left:before {
+.bp-question-circle:before {
   content: "\e905";
 }
-.bp-up-left:before {
-  content: "\e905";
-}
-.bp-arrow-top-left:before {
-  content: "\e905";
-}
-.bp-arrow-up-right:before {
+.bp-sliders-h:before {
   content: "\e906";
 }
-.bp-up-right:before {
-  content: "\e906";
+.bp-file-alt:before {
+  content: "\e90b";
 }
-.bp-arrow-top-right:before {
-  content: "\e906";
+.bp-layout:before {
+  content: "\e900";
+}
+.bp-tree:before {
+  content: "\e901";
 }
 .bp-arrow-right:before {
   content: "\e907";
@@ -107,10 +95,4 @@
 }
 .bp-information:before {
   content: "\e902";
-}
-.bp-layout:before {
-  content: "\e900";
-}
-.bp-tree:before {
-  content: "\e901";
 }

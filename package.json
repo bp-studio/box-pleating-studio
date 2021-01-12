@@ -17,7 +17,7 @@
 		"gulp-concat": "^2.6.1",
 		"gulp-if-any-newer": "^2.0.0",
 		"gulp-sourcemaps": "^2.6.5",
-		"gulp-terser": "^1.4.1",
+		"gulp-terser": "^2.0.1",
 		"gulp-typescript": "^5.0.1",
 		"gulp-wrap": "^0.15.0",
 		"gulp-wrap-js": "^0.4.1",

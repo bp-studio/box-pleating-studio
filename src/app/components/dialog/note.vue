@@ -18,6 +18,7 @@
 
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator';
+	import { core } from '../core.vue';
 	import * as bootstrap from 'bootstrap';
 
 	declare const gtag: any;
@@ -26,9 +27,10 @@
 	export default class Note extends Vue {
 		private modal: Bootstrap.Modal;
 		mounted() {
-			this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement);
+			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement));
 		}
-		private note() {
+		private async note() {
+			await core.libReady;
 			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'Note' });
 		}

@@ -1,8 +1,6 @@
 
 if(typeof (TextDecoder) == "undefined") throw new Error("TextDecoder is needed");
 
-var bp = new BPStudio("#divWorkspace");
-
 function sanitize(filename) {
 	let c = '/\\:*|"<>'.split(''), r = "∕∖∶∗∣″‹›".split('');
 	for(let i in c) filename = filename.replace(RegExp("\\" + c[i], "g"), r[i])
@@ -41,3 +39,7 @@ const LZ = {
 		return LZMA.decompress(bytes);
 	}
 }
+
+document.addEventListener("wheel", function(event) {
+	if(event.ctrlKey) event.preventDefault();
+}, { passive: false });

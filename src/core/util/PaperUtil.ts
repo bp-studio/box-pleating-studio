@@ -42,6 +42,8 @@ namespace PaperUtil {
 		for(let set of lines) for(let l of set) PaperUtil.addLine(path, l.p1, l.p2);
 	}
 
-	export const Black = new paper.Color('black');
-	export const Red = new paper.Color('red');
+	let black: paper.Color, red: paper.Color;
+
+	export function Black() { return (black = black || new paper.Color('black')); }
+	export function Red() { return (red = red || new paper.Color('red')); }
 }

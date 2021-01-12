@@ -1,5 +1,5 @@
 <template>
-	<dropdown icon="fas fa-tasks" :title="$t('toolbar.setting.title')">
+	<dropdown icon="bp-tasks" :title="$t('toolbar.setting.title')">
 		<fullscreen></fullscreen>
 		<div class="dropdown-item" @click="toggle('showGrid')">
 			<i v-if="!settings.showGrid"></i>
@@ -58,7 +58,9 @@
 	@Component
 	export default class SettingMenu extends BaseComponent {
 		private get core() { return core; }
-		private get settings() { return bp.$display.settings; }
+		private get settings(): any {
+			return core.initialized ? bp.$display.settings : {};
+		}
 
 		private toggle(key: string, target: any) {
 			if(!target) target = this.settings;

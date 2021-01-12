@@ -1,6 +1,8 @@
 import { Vue, Component } from 'vue-property-decorator';
 import * as bootstrap from 'bootstrap';
 
+declare const core: any;
+
 @Component
 export default abstract class Dialog<T> extends Vue {
 	private modal: Bootstrap.Modal;
@@ -8,10 +10,11 @@ export default abstract class Dialog<T> extends Vue {
 	protected message: string
 
 	mounted() {
-		this.modal = new bootstrap.Modal(this.$el, { backdrop: 'static' });
+		core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el, { backdrop: 'static' }));
 	}
 
 	public async show(message?: string): Promise<T> {
+		await core.libReady;
 		this.message = message;
 		while(this.promise) await this.promise;
 		return await (this.promise = this.run());

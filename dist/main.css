@@ -170,7 +170,7 @@ label span.label {
  * Layout
  *********************************************/
 
-#divWelcome {
+.welcome {
 	background: white;
 }
 
@@ -219,7 +219,7 @@ label span.label {
 }
 
 @media screen {
-	#divWorkspace, #divShade, #divWelcome {
+	#divWorkspace, #divShade, .welcome {
 		position: absolute;
 		top: 3.75rem;
 		left: 0px;
@@ -234,7 +234,7 @@ label span.label {
 }
 
 @media (min-width: 100.01vh) and (min-width: 996px) {
-	#divWorkspace, #divWelcome {
+	#divWorkspace, .welcome {
 		right: 250px;
 	}
 	#panelToggle {
@@ -246,7 +246,7 @@ label span.label {
 }
 
 @media (max-width: 100vh), (max-width: 995px) {
-	#divWorkspace, #divWelcome, #divPanel.show {
+	#divWorkspace, .welcome, #divPanel.show {
 		right: 0px;
 	}
 	#divPanel {
@@ -310,10 +310,6 @@ button>.notify {
 		padding: 0.375rem 0.2rem !important;
 		width: 36px;
 	}
-}
-
-.btn-toolbar .btn.dropdown-toggle::after {
-	margin-left: 1rem;
 }
 
 .btn-toolbar .btn i {
@@ -433,4 +429,95 @@ button>.notify {
 	border-radius: 3rem;
 	margin-top: 0.5rem;
 	margin-left: -3.5rem;
+}
+
+/*********************************************
+ * BP Studio
+ *********************************************/
+
+#divWorkspace, #divWorkspace div {
+	overflow: hidden;
+}
+
+#divWorkspace canvas {
+	position: -webkit-sticky;
+	/* iPhone 6 */
+	position: sticky;
+	top: 0px;
+	left: 0px;
+}
+
+@media print {
+	#divWorkspace div {
+		width: unset !important;
+		height: unset !important;
+	}
+	#divWorkspace canvas {
+		display: none;
+	}
+	#divWorkspace img {
+		width: 100vw;
+		height: 100vh;
+	}
+}
+
+#divWorkspace img {
+	object-fit: contain;
+}
+
+@media screen {
+	#divWorkspace.scroll-x {
+		overflow-x: scroll;
+	}
+	#divWorkspace.scroll-y {
+		overflow-y: scroll;
+	}
+	#divWorkspace div {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+	#divWorkspace img {
+		opacity: 0;
+		max-width: 4096px;
+	}
+}
+
+/*********************************************
+ * FA spin
+ *********************************************/
+
+.btn-primary:disabled {
+	color: #fff;
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+	pointer-events: none;
+	opacity: .65;
+}
+
+.fa-spin {
+	-webkit-animation: fa-spin 2s linear infinite;
+	animation: fa-spin 2s linear infinite
+}
+
+@-webkit-keyframes fa-spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+	to {
+		-webkit-transform: rotate(1turn);
+		transform: rotate(1turn)
+	}
+}
+
+@keyframes fa-spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+	to {
+		-webkit-transform: rotate(1turn);
+		transform: rotate(1turn)
+	}
 }

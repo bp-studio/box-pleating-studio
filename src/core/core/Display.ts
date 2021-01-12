@@ -30,8 +30,6 @@
 
 	private _canvas: HTMLCanvasElement;
 
-	private _img: HTMLImageElement;
-
 	@shrewd private scroll: IPoint = { x: 0, y: 0 };
 
 	@shrewd public settings: DisplaySetting = {
@@ -62,8 +60,6 @@
 		// 所以在建構的時候額外再多判斷一次
 		setTimeout(() => this.setSize(), 10);
 
-		// 產生列印用的 <img>
-		this.spaceHolder.appendChild(this._img = new Image());
 		window.addEventListener("beforeprint", this.beforePrint.bind(this));
 		window.addEventListener("afterprint", this.afterPrint.bind(this));
 
@@ -80,7 +76,7 @@
 		studio.$paper.setup(this._canvas);
 		studio.$paper.settings.insertItems = false;
 		this.project = studio.$paper.project;
-		this.project.currentStyle.strokeColor = PaperUtil.Black;
+		this.project.currentStyle.strokeColor = PaperUtil.Black();
 		this.project.currentStyle.strokeScaling = false;
 
 		// 下面這段程式碼是用來檢視效能用的。
@@ -146,13 +142,18 @@
 		}
 	}
 
+	private _img: HTMLImageElement;
+	private get img(): HTMLImageElement {
+		if(!this._img) this.spaceHolder.appendChild(this._img = new Image());
+		return this._img;
+	}
+
 	private createPNG(): Promise<Blob> {
 		let canvas = document.createElement("canvas");
 		let ctx = canvas.getContext("2d")!;
-		let img = this._img;
+		let img = this.img;
 		return new Promise<Blob>(resolve => {
-			let callback = () => {
-				img.removeEventListener("load", callback);
+			img.addEventListener("load", () => {
 				canvas.width = img.clientWidth;
 				canvas.height = img.clientHeight;
 				// 繪製一層白色背景
@@ -165,8 +166,7 @@
 				);
 				this._printing = false;
 				canvas.toBlob(blob => resolve(blob!));
-			};
-			img.addEventListener("load", callback);
+			}, { once: true });
 			this.beforePrint();
 		});
 	}
@@ -196,13 +196,13 @@
 			// 但可以用下面的條件來排除這個情況
 			document.visibilityState == 'visible'
 		) {
-			let old = this._img.src;
+			let old = this.img.src;
 
 			// 一直到下一次要產生新的圖片時才回收掉上次產生的 ObjectURL，
 			// 而且設置了一個很大的延遲，這是為了解決在手機上透過外部服務列印時可能發生的延遲
 			setTimeout(() => URL.revokeObjectURL(old), 5000);
 
-			this._img.src = this.toSVG();
+			this.img.src = this.toSVG();
 			this._printing = true;
 		}
 	}

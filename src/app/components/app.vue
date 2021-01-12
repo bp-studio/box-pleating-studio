@@ -32,11 +32,6 @@
 			(this.$refs[el] as any).show();
 		}
 
-		created() {
-			bp.system.onLongPress = () => this.showPanel = true;
-			bp.system.onDrag = () => this.showPanel = false;
-		}
-
 		mounted() {
 			// iPhone 6 不支援 CSS 的 touch-action: none
 			if(getComputedStyle(this.$el).touchAction != "none") {

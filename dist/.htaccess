@@ -7,3 +7,8 @@ RewriteRule ^(.*)$ - [R=404,L]
 
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+<IfModule mod_expires.c>
+  ExpiresActive on
+  ExpiresDefault "access plus 1 year"
+</IfModule>

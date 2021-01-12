@@ -10,7 +10,7 @@
 						<div class="row">
 							<div v-for="l in languages" :key="l" class="col text-center">
 								<button @click="i18n.locale=l" class="w-100 btn btn-light" data-bs-dismiss="modal">
-									<img :src="'assets/flags/'+$t('flag', l)+'.png'" />
+									<img :src="'assets/flags/'+$t('flag', l)+'.png'" :alt="$t('flag', l)" width="64" height="64" />
 									<br />
 									{{$t('name', l)}}
 								</button>
@@ -39,6 +39,8 @@
 	declare const i18n: any;
 	declare const core: Core;
 	declare const gtag: any;
+	declare const LZ: any;
+
 	export { core };
 
 	@Component
@@ -50,6 +52,9 @@
 
 		public updated: boolean = false;
 		public isTouch: boolean;
+
+		public libReady: Promise<void>;
+		public initialized: boolean = false;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
 		private id: string = new Date().getTime().toString();
@@ -64,15 +69,28 @@
 
 		created() {
 			this.isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
+			this.libReady = new Promise<void>(resolve => {
+				// DOMContentLoaded 事件會在所有延遲函式庫載入完成之後觸發
+				window.addEventListener('DOMContentLoaded', () => resolve());
+			});
 		}
 
 		mounted() {
-			this.mdlLanguage = new bootstrap.Modal(this.$refs.mdlLanguage as HTMLElement);
+			this.libReady.then(() => this.mdlLanguage = new bootstrap.Modal(this.$refs.mdlLanguage as HTMLElement));
 			this.loadSettings();
+		}
+
+		public init() {
 			bp.onDeprecate = (title: string) => {
 				title = title || this.$t("keyword.untitled");
 				this.alert(this.$t("message.oldVersion", [title]));
 			};
+
+			let settings = JSON.parse(localStorage.getItem("settings"));
+			if(settings) {
+				let d = bp.$display.settings;
+				for(let key in d) d[key] = settings[key];
+			}
 
 			// 只有擁有存檔權的實體會去讀取 session
 			if(this.checkSession()) {
@@ -87,8 +105,22 @@
 				}
 			}
 
+			let url = new URL(location.href);
+			let lz = url.searchParams.get("project"), json;
+			if(lz) {
+				try { json = JSON.parse(LZ.decompress(lz)); } catch(e) { }
+			}
+			if(lz != sessionStorage.getItem("project") && json) {
+				// 寫入 sessionStorage 的值不會因為頁籤 reload 而遺失，
+				// 因此可以用這個來避免重刷頁面的時候再次載入的問題
+				sessionStorage.setItem("project", lz);
+				this.addDesign(bp.load(json));
+				gtag('event', 'share_open');
+			}
+
 			setInterval(() => this.save(), 5000);
 			window.addEventListener("beforeunload", () => this.save(true));
+			this.initialized = true;
 		}
 
 		public get copyright() {
@@ -98,7 +130,7 @@
 		}
 
 		public get shouldShowDPad() {
-			return this.isTouch && this.showDPad && bp.system.selections.length > 0;
+			return this.initialized && this.isTouch && this.showDPad && bp.system.selections.length > 0;
 		}
 
 		private loadSettings() {
@@ -106,8 +138,6 @@
 			if(settings) {
 				this.autoSave = settings.autoSave;
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
-				let d = bp.$display.settings;
-				for(let key in d) d[key] = settings[key];
 			}
 			let l = localStorage.getItem("locale");
 			let r = l => l.replace(/_/g, "-").toLowerCase();
@@ -119,7 +149,7 @@
 				languages = Array.from(new Set(languages));
 				if(languages.length > 1) {
 					this.languages = languages;
-					this.mdlLanguage.show();
+					this.libReady.then(() => this.mdlLanguage.show());
 				}
 				l = languages[0] || navigator.languages[0];
 			}
@@ -141,6 +171,7 @@
 		}
 
 		public saveSettings() {
+			if(!this.initialized) return;
 			let {
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement
@@ -207,11 +238,15 @@
 		public dropdown: any = null;
 
 		public get design() {
+			if(!this.initialized) return null;
 			let t = bp.design ? bp.design.title : null;
 			document.title = "Box Pleating Studio" + (t ? " - " + t : "");
 			return bp.design;
 		}
-		public get selections(): any { return bp.system.selections; }
+		public get selections(): any {
+			if(!this.initialized) return [];
+			return bp.system.selections;
+		}
 
 		public create() {
 			let j = { title: this.$t('keyword.untitled') };
@@ -221,7 +256,7 @@
 		}
 
 		private scrollTo(id: number) {
-			document.getElementById(`tab${id}`).scrollIntoView();
+			document.getElementById(`tab${id}`)?.scrollIntoView();
 		}
 		public select(id: number) {
 			bp.select(id);
@@ -289,6 +324,7 @@
 		}
 
 		public async zip(): Promise<string> {
+			await this.libReady;
 			let zip = new JSZip();
 			let names = new Set<string>();
 			for(let i = 0; i < this.designs.length; i++) {

@@ -3,13 +3,13 @@
 		<div class="btn-group me-2">
 			<filemenu @share="$emit('share')"></filemenu>
 			<settingmenu @pref="$emit('pref')"></settingmenu>
-			<dropdown icon="fas fa-tools" :title="$t('toolbar.tools.title')">
+			<dropdown icon="bp-tools" :title="$t('toolbar.tools.title')">
 				<uploader accept=".tmd5" @upload="TreeMaker($event)">
 					<i class="fas fa-file-import"></i>
 					{{$t("toolbar.tools.TreeMaker")}}
 				</uploader>
 			</dropdown>
-			<dropdown icon="far fa-question-circle" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
+			<dropdown icon="bp-question-circle" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
 				<div class="dropdown-item" @click="$emit('about')">
 					<i class="bp-info"></i>
 					{{$t('toolbar.help.about')}}
@@ -55,7 +55,7 @@
 			</button>
 		</div>
 
-		<div id="divTab" class="flex-grow-1" @wheel="tabWheel($event)" ref="tab">
+		<div id="divTab" class="flex-grow-1" @wheel="tabWheel($event)" ref="tab" v-if="ready">
 			<draggable v-bind="dragOption" v-model="core.designs">
 				<div
 					class="tab"
@@ -80,6 +80,8 @@
 				</div>
 			</draggable>
 		</div>
+		<div id="divTab" class="flex-grow-1" v-else></div>
+
 		<contextmenu ref="tabMenu">
 			<div class="dropdown-item" @click="core.clone(menuId)">
 				<i class="far fa-clone"></i>
@@ -112,7 +114,7 @@
 				:title="$t('toolbar.panel')"
 				:disabled="!design"
 			>
-				<i class="fas fa-sliders-h"></i>
+				<i class="bp-sliders-h"></i>
 			</button>
 		</div>
 	</div>
@@ -133,10 +135,12 @@
 	export default class Toolbar extends BaseComponent {
 
 		private notify: boolean;
+		private ready: boolean = false;
 
 		mounted() {
 			let v = parseInt(localStorage.getItem("last_log") || "0");
 			this.notify = v < logs[logs.length - 1];
+			core.libReady.then(() => this.ready = true);
 		}
 
 		private async update() {

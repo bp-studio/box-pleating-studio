@@ -19,6 +19,7 @@ let projService = ts.createProject('src/service/tsconfig.json');
 let projTest = ts.createProject('test/tsconfig.json');
 
 let terserOption = {
+	ecma: 2019,
 	compress: {
 		drop_console: false,
 		drop_debugger: false

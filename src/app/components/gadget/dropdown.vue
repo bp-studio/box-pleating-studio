@@ -5,6 +5,7 @@
 			type="button"
 			@mouseenter="mouseenter"
 			:title="title"
+			:disabled="!ready"
 			class="btn btn-primary dropdown-toggle"
 			data-bs-toggle="dropdown"
 		>
@@ -33,13 +34,16 @@
 
 		mounted() {
 			let self = this;
-			this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {})
+			core.libReady.then(() => this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {}));
 			this.$el.addEventListener('shown.bs.dropdown', function() { core.dropdown = self });
 			this.$el.addEventListener('hide.bs.dropdown', function() { core.dropdown = null; });
 			this.$el.addEventListener('hidden.bs.dropdown', () => this.$emit('hide'));
 		}
 
-		private hide() {
+		private get ready() { return core.initialized; }
+
+		private async hide() {
+			await core.libReady;
 			this.dropdown.hide();
 		}
 

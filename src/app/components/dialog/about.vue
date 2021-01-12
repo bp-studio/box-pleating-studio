@@ -9,7 +9,7 @@
 					<p>{{copyright}}</p>
 					<p v-t="'about.license'"></p>
 					<i18n path="about.visit" tag="p">
-						<a target="_blank" href="https://github.com/MuTsunTsai/box-pleating-studio" v-t="'about.homepage'"></a>
+						<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio" v-t="'about.homepage'"></a>
 					</i18n>
 					<i18n path="about.donation" tag="p">
 						<a target="_blank" href="donate.htm">PayPal</a>
@@ -38,9 +38,10 @@
 		private modal: Bootstrap.Modal;
 		private get copyright() { return core.copyright; }
 		mounted() {
-			this.modal = new bootstrap.Modal(this.$el);
+			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 		}
-		public show() {
+		public async show() {
+			await core.libReady;
 			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'About' });
 		}

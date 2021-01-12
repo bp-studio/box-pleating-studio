@@ -1,5 +1,4 @@
 if(typeof Shrewd != "object") throw new Error("BPStudio requires Shrewd.");
-if(typeof paper != "object") throw new Error("BPStudio requires paper.js.");
 
 const { shrewd } = Shrewd;
 

@@ -74,6 +74,8 @@
 	public onDeprecate?: (title: string) => void;
 
 	constructor(selector: string) {
+		if(typeof paper != "object") throw new Error("BPStudio requires paper.js.");
+
 		let el = document.querySelector(selector);
 		if(el == null || !(el instanceof HTMLElement)) {
 			throw new Error("selector is not valid");

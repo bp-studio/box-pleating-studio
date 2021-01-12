@@ -17,7 +17,7 @@
 	@Component
 	export default class DPad extends Vue {
 		private get show() { return core.shouldShowDPad; }
-		private get disabled() { return bp.system.dragging; }
+		private get disabled() { return !core.initialized || bp.system.dragging; }
 		private key(key: string) {
 			bp.system.key(key);
 		}

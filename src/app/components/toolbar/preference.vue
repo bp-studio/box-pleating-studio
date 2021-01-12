@@ -16,6 +16,7 @@
 					</div>
 					<field :label="$t('preference.autoSave')" type="checkbox" v-model="core.autoSave" @input="core.saveSettings()"></field>
 					<field
+						v-if="core.initialized"
 						:label="$t('preference.includeHidden')"
 						type="checkbox"
 						v-model="display.includeHiddenElement"
@@ -44,13 +45,14 @@
 		private modal: Bootstrap.Modal;
 		private get i18n() { return i18n; }
 		private get core() { return core; }
-		private get display() { return bp.$display.settings; }
+		private get display(): any { return core.initialized ? bp.$display.settings : {}; }
 
 		mounted() {
-			this.modal = new bootstrap.Modal(this.$el);
+			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 		}
 
-		public show() {
+		public async show() {
+			await core.libReady;
 			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'Preference' });
 		}

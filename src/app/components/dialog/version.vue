@@ -57,11 +57,12 @@
 					}
 				}
 			});
-			this.modal = new bootstrap.Modal(this.$el);
+			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 			this.index = this.max = logs.length - 1;
 		}
 
 		public async load(index: number): Promise<boolean> {
+			await core.libReady;
 			if(!this.record[index]) {
 				try {
 					let response = await fetch(`log/${logs[index]}.md`);
@@ -78,6 +79,7 @@
 		}
 
 		public async show() {
+			await core.libReady;
 			this.active = true;
 			if(await this.load(this.index)) {
 				this.modal.show();

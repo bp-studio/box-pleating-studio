@@ -1,5 +1,5 @@
 <template>
-	<dropdown icon="fas fa-file-alt" :title="$t('toolbar.file.title')" @hide="reset">
+	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset">
 		<div class="dropdown-item" @click="newProject">
 			<i class="far fa-file"></i>
 			{{$t('toolbar.file.new')}}

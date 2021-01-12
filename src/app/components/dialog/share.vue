@@ -9,7 +9,7 @@
 					<div class="mb-2">
 						<input class="form-control" :value="url" />
 					</div>
-					<div>
+					<div v-if="ready">
 						<button class="btn btn-primary" v-clipboard:copy="url" v-clipboard:success="onCopy">
 							<i class="fas fa-copy"></i>
 							{{$t('share.copy')}}
@@ -36,19 +36,25 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
+	import { core } from '../core.vue';
 	import * as bootstrap from 'bootstrap';
 
 	declare const LZ: any;
 	declare const gtag: any;
+	declare const VueClipboard: any;
 
 	@Component
 	export default class Share extends BaseComponent {
 		private url: string = "";
 		private modal: Bootstrap.Modal;
 		private canShare: boolean = !!navigator.share;
+		private ready: boolean = false;
 
 		mounted() {
-			this.modal = new bootstrap.Modal(this.$el);
+			core.libReady.then(() => {
+				this.ready = true;
+				this.modal = new bootstrap.Modal(this.$el);
+			});
 		}
 
 		public json() {
@@ -56,7 +62,8 @@
 			return JSON.stringify(this.design);
 		}
 
-		public show() {
+		public async show() {
+			await core.libReady;
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
 			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'Share' });
