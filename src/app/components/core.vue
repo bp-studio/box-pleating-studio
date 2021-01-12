@@ -27,7 +27,7 @@
 	import { Vue, Component, Watch } from 'vue-property-decorator';
 	import { set } from 'vue/types/umd';
 	import { bp, Shrewd } from './import/BPStudio';
-	import { sanitize } from './import/types';
+	import { sanitize, callService } from './import/types';
 	import * as bootstrap from 'bootstrap';
 	import JSZip from 'jszip';
 
@@ -57,7 +57,7 @@
 		public initialized: boolean = false;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
-		private id: string = new Date().getTime().toString();
+		private id: number = new Date().getTime();
 
 		private heartbeat: number | null = null;
 		private languages: string[] = [];
@@ -80,7 +80,7 @@
 			this.loadSettings();
 		}
 
-		public init() {
+		public async init() {
 			bp.onDeprecate = (title: string) => {
 				title = title || this.$t("keyword.untitled");
 				this.alert(this.$t("message.oldVersion", [title]));
@@ -92,8 +92,12 @@
 				for(let key in d) d[key] = settings[key];
 			}
 
+			// 舊資料；過一陣子之後可以拿掉這一段程式碼
+			localStorage.removeItem("sessionId");
+			localStorage.removeItem("sessionTime");
+
 			// 只有擁有存檔權的實體會去讀取 session
-			if(this.checkSession()) {
+			if(await this.checkSession()) {
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
 					session.jsons.forEach(j => this.addDesign(bp.restore(j)));
@@ -118,8 +122,8 @@
 				gtag('event', 'share_open');
 			}
 
-			setInterval(() => this.save(), 5000);
-			window.addEventListener("beforeunload", () => this.save(true));
+			setInterval(() => this.save(), 3000);
+			window.addEventListener("beforeunload", () => this.save());
 			this.initialized = true;
 		}
 
@@ -195,44 +199,28 @@
 			}
 		}
 
-		private checkSession(): boolean {
-			let sid = localStorage.getItem("sessionId");
-			let time = localStorage.getItem("sessionTime");
-			let now = new Date().getTime();
-
-			// 檢查存檔權；舊實體優先，或者失聯超過三秒也算（考慮到實體可能被強制中止）
-			if(!sid || sid > this.id || time < (now - 3000).toString()) {
-				localStorage.setItem("sessionId", sid = this.id);
-			}
-
-			// 設置存活通知
-			if(this.heartbeat && this.id != sid) {
-				clearInterval(this.heartbeat);
-				this.heartbeat = null;
-			} else if(!this.heartbeat && this.id == sid) {
-				this.heartbeat = setInterval(() => this.beat(), 1000);
-			}
-
-			return sid == this.id;
+		private checkSession(): Promise<boolean> {
+			return new Promise<boolean>(resolve => {
+				// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
+				let cancel = setTimeout(() => resolve(false), 250);
+				callService("id")
+					.then(
+						(id: number) => resolve(this.id < id), // 最舊的實體優先
+						() => resolve(true) // 沒有 Service Worker 的時候直接視為可以
+					)
+					.finally(() => clearTimeout(cancel));
+			});
 		}
 
-		private beat() {
-			localStorage.setItem("sessionTime", new Date().getTime().toString());
-		}
-
-		private save(exit: boolean = false) {
-			let ok = this.checkSession();
+		private async save() {
 			// 只有當前的實體取得存檔權的時候才會儲存
-			if(this.autoSave && ok) {
+			if(this.autoSave && await this.checkSession()) {
 				let session = {
 					jsons: this.designs.map(id => bp.designMap.get(id)!),
 					open: bp.design ? this.designs.indexOf(bp.design.id) : -1
 				};
 				localStorage.setItem("session", JSON.stringify(session));
 			}
-
-			// 要結束時讓出存檔權
-			if(exit && ok) localStorage.removeItem("sessionId");
 		}
 
 		public dropdown: any = null;

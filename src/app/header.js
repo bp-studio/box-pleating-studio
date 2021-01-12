@@ -1,6 +1,14 @@
 
 if(typeof (TextDecoder) == "undefined") throw new Error("TextDecoder is needed");
 
+document.addEventListener("wheel", function(event) {
+	if(event.ctrlKey) event.preventDefault();
+}, { passive: false });
+
+///////////////////////////////////////////////////
+// 檔案處理
+///////////////////////////////////////////////////
+
 function sanitize(filename) {
 	let c = '/\\:*|"<>'.split(''), r = "∕∖∶∗∣″‹›".split('');
 	for(let i in c) filename = filename.replace(RegExp("\\" + c[i], "g"), r[i])
@@ -25,6 +33,31 @@ function bufferToText(buffer) {
 	return new TextDecoder().decode(new Uint8Array(buffer));
 }
 
+///////////////////////////////////////////////////
+// Service Worker 溝通
+///////////////////////////////////////////////////
+
+function callService(data) {
+	return new Promise((resolve, reject) => {
+		if('serviceWorker' in navigator) {
+			navigator.serviceWorker.getRegistration('/').then(reg => {
+				let channel = new MessageChannel();
+				channel.port1.onmessage = event => resolve(event.data);
+				reg.active.postMessage(data, [channel.port2]);
+			}, reason => reject(reason));
+		} else {
+			reject("Service worker unavailable.");
+		}
+	});
+}
+navigator.serviceWorker?.addEventListener('message', event => {
+	if(event.data == "id") event.ports[0].postMessage(core.id);
+});
+
+///////////////////////////////////////////////////
+// LZMA
+///////////////////////////////////////////////////
+
 const LZ = {
 	compress(s) {
 		s = LZMA.compress(s, 1); // Experiments showed that 1 is good enough
@@ -39,7 +72,3 @@ const LZ = {
 		return LZMA.decompress(bytes);
 	}
 }
-
-document.addEventListener("wheel", function(event) {
-	if(event.ctrlKey) event.preventDefault();
-}, { passive: false });

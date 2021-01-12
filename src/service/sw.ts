@@ -38,12 +38,37 @@ routing.registerRoute(
 	new strategies.NetworkOnly(), 'POST'
 );
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
 	skipWaiting();
 	console.log("service worker installing");
 	precacheController.install(event);
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
 	precacheController.activate(event);
 });
+
+// 與 Client 的通訊
+self.addEventListener('message', event => {
+	event.waitUntil(message(event));
+});
+async function message(event: ExtendableMessageEvent) {
+	if(event.ports[0] && event.data == "id") {
+		let clients = await self.clients.matchAll({ type: 'window' });
+		let min = Number.POSITIVE_INFINITY;
+		for(let client of clients) {
+			if(client.id != (event.source as Client).id) {
+				let id = await callClient(client, "id") as number;
+				if(id < min) min = id;
+			}
+		}
+		event.ports[0].postMessage(min);
+	}
+};
+function callClient(client: Client, data: any) {
+	return new Promise(resolve => {
+		let channel = new MessageChannel();
+		channel.port1.onmessage = event => resolve(event.data);
+		client.postMessage(data, [channel.port2]);
+	});
+}
