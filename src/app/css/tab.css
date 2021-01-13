@@ -1,0 +1,95 @@
+#divTab::-webkit-scrollbar {
+	display: none;
+}
+
+#divTab {
+	overflow-x: scroll;
+	overflow-y: visible;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	margin: -.5rem .5rem;
+	height: 3.75rem;
+	white-space: nowrap;
+}
+
+#divTab, #divTab * {
+	touch-action: pan-x;
+}
+
+#divTab>div {
+	position: relative;
+	height: 100%;
+}
+
+.tab {
+	padding: .5rem;
+	flex-shrink: 0;
+	font-size: 1.25rem;
+	line-height: 2.5rem;
+	border-right: 1px solid gray;
+	cursor: default;
+	max-width: 150px;
+	height: 100%;
+	background-color: var(--bg-ui);
+	display: inline-block;
+}
+
+.tab:first-child {
+	border-left: 1px solid gray;
+}
+
+.tab :first-child {
+	flex-grow: 1;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.tab :last-child {
+	flex-shrink: 0;
+}
+
+.tab i {
+	cursor: pointer;
+	visibility: hidden;
+}
+
+.tab.active {
+	background-color: #999;
+	color: black;
+}
+
+.tab:hover i {
+	visibility: visible;
+}
+
+@media (hover: hover) {
+	.tab:not(:hover):not(.active) {
+		color: #444;
+	}
+}
+
+@media (max-width: 576px) {
+	#divTab {
+		position: absolute;
+		top: 3.75rem;
+		left: 0px;
+		margin: 0px;
+		width: 100vw;
+		height: 2.4rem;
+		background: var(--bg-ui);
+		border-top: 1px solid gray;
+	}
+	.tab {
+		line-height: 2rem;
+		font-size: 1rem;
+		padding: .2rem .5rem;
+	}
+	.tab:first-child {
+		border-left: none;
+	}
+	#panelToggle {
+		flex-grow: 1;
+		text-align: right;
+	}
+}

@@ -1,0 +1,71 @@
+
+/*********************************************
+ * Sortable
+ *********************************************/
+
+ .sortable-ghost {
+	cursor: move;
+}
+
+.sortable-fallback {
+	border: none;
+}
+
+/*********************************************
+ * D-Pad
+ *********************************************/
+
+#divDPad {
+	height: 7.5rem;
+	width: 7.5rem;
+	position: absolute;
+	bottom: 1rem;
+	left: 1rem;
+	border-radius: 3.75rem;
+	background-color: var(--bs-primary);
+	opacity: 0;
+	pointer-events: none;
+	transition-property: opacity;
+	transition-duration: 0.2s;
+	z-index: 100;
+}
+
+#divDPad.show {
+	pointer-events: all;
+	opacity: 0.8;
+}
+
+#divDPad.show.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+#divDPad i {
+	padding: 0.25rem;
+	height: 2.5rem;
+	width: 2.5rem;
+	font-size: 2rem;
+	color: white;
+	position: absolute;
+}
+
+/*********************************************
+ * Switch
+ *********************************************/
+
+.form-switch {
+	padding-left: 3.5rem;
+}
+
+.form-switch label {
+	padding-top: 0.5rem;
+}
+
+.form-switch .form-check-input {
+	cursor: pointer;
+	height: 1.5rem;
+	width: 2.75rem;
+	border-radius: 3rem;
+	margin-top: 0.5rem;
+	margin-left: -3.5rem;
+}

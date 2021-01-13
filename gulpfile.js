@@ -8,7 +8,11 @@ let concat = require('gulp-concat');
 let terser = require('gulp-terser');
 let ftp = require('vinyl-ftp');
 let log = require('fancy-log');
+let htmlMin = require('gulp-html-minifier-terser');
+let cleanCss = require('gulp-clean-css');
 
+let tweak = require('./.vscode/tweak');
+let env = require('./.vscode/env');
 let workbox = require('./.vscode/workbox');
 let log2 = require('./.vscode/log');
 let vue = require('./.vscode/vue');
@@ -24,6 +28,11 @@ let terserOption = {
 		drop_console: false,
 		drop_debugger: false
 	}
+};
+let htmlMinOption = {
+	collapseWhitespace: true,
+	removeComments: true,
+	minifyJS: true
 };
 
 // 更新模組
@@ -62,9 +71,17 @@ gulp.task('buildService', () =>
 		.pipe(projService())
 		.pipe(workbox({
 			globDirectory: 'dist',
-			globPatterns: ['**/*.htm', '**/*.js', '**/*.css', '**/*.woff2', '**/bps.*', 'manifest.json'],
+			globPatterns: [
+				'**/*.htm',
+				'**/*.js',
+				'**/*.css',
+				'**/*.woff2',
+				'**/bps.*',
+				'manifest.json'
+			],
 			globIgnores: ['sw.js']
 		}))
+		.pipe(terser())
 		.pipe(gulp.dest('dist/'))
 );
 
@@ -114,29 +131,60 @@ gulp.task('buildDonate', () =>
 		.pipe(vue())
 		.pipe(concat('donate.js'))
 		.pipe(terser())
+		.pipe(gulp.dest('dist/')),
+	gulp.src('src/donate/donate.htm')
+		.pipe(htmlMin(htmlMinOption))
 		.pipe(gulp.dest('dist/'))
 );
 
-const ftpFactory = (folder, g) => function() {
+gulp.task('buildNumber', () =>
+	gulp.src('src/app/index.htm')
+		.pipe(tweak(t => t.replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`)))
+		.pipe(gulp.dest('src/app'))
+);
+
+gulp.task('buildHtml', () =>
+	gulp.src('src/app/index.htm')
+		.pipe(env())
+		.pipe(htmlMin(htmlMinOption))
+		// 避免 VS Code Linter 出錯
+		.pipe(tweak(t => t.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>")))
+		.pipe(gulp.dest('dist'))
+);
+
+gulp.task('buildCss', () =>
+	gulp.src('src/app/css/*.css')
+		.pipe(concat('main.css'))
+		.pipe(cleanCss())
+		.pipe(gulp.dest('dist'))
+)
+
+const ftpFactory = (folder, g, t, f) => function() {
 	let options = require('./.vscode/ftp-pub.json');
 	options.log = log;
 	let conn = ftp.create(options);
-	var globs = [
+	let globs = [
 		'dist/**/*',
 		'!**/*.map',
-		'!**/debug.log'
-	];
-	if(g) globs = globs.concat(g);
-	return gulp.src(globs, { base: './dist', buffer: false })
+		'!**/debug.log',
+		'!dist/index.html'
+	].concat(g);
+	return gulp.src(globs, { base: './dist', buffer: !!t })
+		.pipe(tweak(t, f))
 		.pipe(conn.newer(`/public_html/${folder}`))
 		.pipe(conn.dest(`/public_html/${folder}`));
 };
 
 gulp.task('uploadPub', ftpFactory('bp', ['dist/.htaccess']));
 
-gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json']));
+gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json'],
+	t => t.replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', ""),
+	"index.htm"
+));
 
 gulp.task('deployDev', gulp.series(
+	'buildNumber',
+	'buildHtml',
 	'buildService',
 	'uploadDev'
 ));
@@ -144,6 +192,8 @@ gulp.task('deployDev', gulp.series(
 gulp.task('deployPub', gulp.series(
 	'buildCorePub',
 	'buildLog',
+	'buildNumber',
+	'buildHtml',
 	'buildService',
 	'uploadPub'
 ));

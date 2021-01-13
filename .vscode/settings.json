@@ -19,6 +19,7 @@
 		"**/*.snm": true,
 		"**/*.synctex.gz": true,
 		"**/*.toc": true,
+		"dist/index.html": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"

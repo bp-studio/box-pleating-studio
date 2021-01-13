@@ -1,0 +1,39 @@
+
+/*********************************************
+ * 這些是為了加速初始 rendering 而放在這裡的重複定義
+ *********************************************/
+
+.btn-primary:disabled {
+	color: #fff;
+	background-color: #0d6efd;
+	border-color: #0d6efd;
+	pointer-events: none;
+	opacity: .65;
+}
+
+.fa-spin {
+	-webkit-animation: fa-spin 2s linear infinite;
+	animation: fa-spin 2s linear infinite
+}
+
+@-webkit-keyframes fa-spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+	to {
+		-webkit-transform: rotate(1turn);
+		transform: rotate(1turn)
+	}
+}
+
+@keyframes fa-spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+	to {
+		-webkit-transform: rotate(1turn);
+		transform: rotate(1turn)
+	}
+}

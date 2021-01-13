@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html translate="no">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Box Pleating Studio</title>
+
+	<!-- Core info -->
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
+	<meta name="description" content="Super-complex origami design made easy!">
+	<meta name="google" content="notranslate">
+	<meta name="version" content="0.2.4">
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		var app_config = {
+			page_title: document.title,
+			page_path: "/",
+			app_name: document.title,
+			app_version: "718"
+		};
+		gtag('js', new Date());
+		gtag('config', 'G-GG1TEZGBCQ', app_config);
+	</script>
+
+	<!-- SEO -->
+	<meta property="og:url" content="https://bpstudio.abstreamace.com">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Box Pleating Studio">
+	<meta property="og:image" content="https://bpstudio.abstreamace.com/assets/mockup.jpg">
+	<meta property="og:description" content="Super-complex origami design made easy!">
+
+	<!-- PWA setup -->
+	<link rel="canonical" href="https://bpstudio.abstreamace.com" />
+	<link rel="manifest" href="manifest.json">
+	<link rel="icon" type="image/png" sizes="512x512" href="assets/icon/icon-512.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="assets/icon/icon-192.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="assets/icon/icon-96.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="assets/icon/icon-32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="assets/icon/icon-16.png">
+	<link rel='apple-touch-icon' sizes='192x192' href="assets/icon/icon-192.png">
+	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio">
+
+	<!-- Written in ES3 for maximal compatibility -->
+	<script>
+		if(location.protocol == 'https:' && 'serviceWorker' in navigator) {
+			navigator.serviceWorker.register('sw.js').then(function(reg) {
+				reg.addEventListener('updatefound', function() {
+					if(reg.active) reg.installing.addEventListener('statechange', function(e) {
+						if(e.target.state == "activated") core.updated = true;
+					});
+				});
+			});
+		}
+		var err, wErr;
+		(function() {
+			var debug = location.search.toLowerCase().indexOf("debug=startup") >= 0;
+			var display = function(id, v, c) {
+				var el = document.getElementById(id);
+				if(!el) return;
+				el.style.display = v;
+				if(c && debug) el.innerHTML += "<br>" + navigator.userAgent + "<br>" + c;
+			};
+			var onErr = function(e) { err = e.target.src; }, errorOb;
+			var cb = function() {
+				if(err || wErr) {
+					display('divWorkspace', 'none');
+					display('divWelcome', 'none');
+					display(err ? 'resource' : 'requirement', 'block', err || wErr);
+					if(wErr) gtag('event', 'unsupported', {
+						app_version: app_config.app_version,
+						error: wErr
+					});
+				}
+				if(errorOB) errorOB.disconnect();
+			};
+			window.onerror = function(a, b, c, d) { wErr = [a, b, c, d].toString(); }
+			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
+			window.addEventListener('DOMContentLoaded', cb);
+			if(MutationObserver) {
+				errorOB = new MutationObserver(function(mutations) {
+					mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
+						(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
+					));
+				});
+				errorOB.observe(document, { childList: true, subtree: true });
+			}
+		})();
+	</script>
+
+	<!-- Critical -->
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/bps/style.css">
+	<link rel="stylesheet" href="main.css">
+	<script src="lib/vue.runtime.min.js" defer></script>
+	<script src="lib/clickout-event.js" defer></script>
+	<script src="lib/vue-i18n.js" defer></script>
+	<script src="log/log.js" defer></script>
+	<script src="locale.js" defer></script>
+	<script src="main.js" defer></script>
+
+	<!-- BP Studio setup -->
+	<script src="lib/lzma_worker-min.js" defer></script>
+	<script src="lib/paper-core.min.js" defer></script>
+	<script src="shrewd.min.js" defer></script>
+	<script src="bpstudio.js" defer></script>
+
+	<!-- Non-critical -->
+	<link rel="stylesheet" href="lib/font-awesome/css/all.min.css" media="print" onload="this.media='all'; this.onload=null;">
+	<script src="lib/sortable.min.js" defer></script>
+	<script src="lib/vuedraggable.umd.min.js" defer></script>
+	<script src="lib/bootstrap/popper.min.js" defer></script>
+	<script src="lib/bootstrap/bootstrap.min.js" defer></script>
+	<script src="lib/vue-clipboard.min.js" defer></script>
+	<script src="lib/jszip.min.js" defer></script>
+	<script src="lib/marked.min.js" defer></script>
+</head>
+
+<body>
+	<!-- Error message -->
+	<div class="welcome p-3">
+		<div id="requirement" style="display:none;">
+			<h3>It appears that your browser or device is too old to support Box Pleating Studio.</h3>
+			<h5 class="mt-2">
+				Please upgrade your browser or use the latest version of Chrome, which is the recommended browser.
+				The author apologize for the inconvenience.<br>
+			</h5>
+		</div>
+		<div id="resource" style="display:none;">
+			<h3>Some of the required resources cannot be loaded successfully.</h3>
+			<h5 class="mt-2">
+				As a result, Box Pleating Studio cannot be started.
+				This is probably due to internet connection problem and/or missing cached resources.
+				Please check you network and try again.
+			</h5>
+		</div>
+		<noscript>
+			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
+		</noscript>
+	</div>
+
+	<!-- Actual app -->
+	<div id="divWorkspace"></div>
+	<div id="core"></div>
+	<div id="app">
+		<div id="divToolbar" class="btn-toolbar p-2">
+			<div class="btn-group me-2">
+				<button type="button" disabled class="btn btn-primary"><i class="bp-file-alt"></i></button>
+				<button type="button" disabled class="btn btn-primary"><i class="bp-tasks"></i></button>
+				<button type="button" disabled class="btn btn-primary"><i class="bp-tools"></i></button>
+				<button type="button" disabled class="btn btn-primary"><i class="bp-question-circle"></i></button>
+			</div>
+			<div class="btn-group me-2">
+				<button type="button" disabled class="btn btn-primary"><i class="bp-tree"></i></button>
+				<button type="button" disabled class="btn btn-primary"><i class="bp-layout"></i></button>
+			</div>
+			<div class="flex-grow-1"></div>
+			<div id="panelToggle" class="btn-group">
+				<button type="button" disabled class="btn btn-primary"><i class="bp-sliders-h"></i></button>
+			</div>
+		</div>
+		<div id="divPanel"></div>
+	</div>
+
+</body>
+
+</html>
