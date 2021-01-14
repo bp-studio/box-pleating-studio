@@ -9,7 +9,7 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.2.6">
+	<meta name="version" content="0.2.7">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
@@ -20,7 +20,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "726"
+			app_version: "728"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -46,16 +46,36 @@
 	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio">
 
 	<!-- iOS Splash -->
-	<link href="assets/splash/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/ipad_splash.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/ipadpro1_splash.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/ipadpro3_splash.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
-	<link href="assets/splash/ipadpro2_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+	<link href="assets/splash/iphone5_splash.png"
+		  media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/iphone6_splash.png"
+		  media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/iphoneplus_splash.png"
+		  media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/iphonex_splash.png"
+		  media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/iphonexr_splash.png"
+		  media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/iphonexsmax_splash.png"
+		  media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/ipad_splash.png"
+		  media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/ipadpro1_splash.png"
+		  media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/ipadpro3_splash.png"
+		  media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
+	<link href="assets/splash/ipadpro2_splash.png"
+		  media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
+		  rel="apple-touch-startup-image" />
 
 	<!-- Written in ES3 for maximal compatibility -->
 	<script>
@@ -78,14 +98,17 @@
 				var el = document.getElementById(id);
 				if(!el) return;
 				el.style.display = v;
-				if(c && debug) el.innerHTML += "<br>" + navigator.userAgent + "<br>" + c;
+				if(c) el.innerHTML +=
+					"<br>Build number: " + app_config.app_version +
+					"<br>" + navigator.userAgent +
+					"<br>" + c;
 			};
 			var onErr = function(e) { err = e.target.src; }, errorOb;
 			var cb = function() {
 				if(err || wErr) {
 					display('divWorkspace', 'none');
 					display('divWelcome', 'none');
-					display(err ? 'resource' : 'requirement', 'block', err || wErr);
+					display(err ? 'resource' : 'requirement', 'block', wErr);
 					if(wErr) gtag('event', 'unsupported', {
 						app_version: app_config.app_version,
 						error: wErr
@@ -93,7 +116,14 @@
 				}
 				if(errorOB) errorOB.disconnect();
 			};
-			window.onerror = function(a, b, c, d) { wErr = [a, b, c, d].toString(); }
+			window.onerror = function(a, b, c, d) {
+				wErr = [
+					a.replace(/^.+: (.+)$/, "$1"), // error message
+					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"), // path
+					c,	// line number
+					d	// column number
+				].toString();
+			}
 			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
 			window.addEventListener('DOMContentLoaded', cb);
 			if(MutationObserver) {
@@ -139,19 +169,32 @@
 	<!-- Error message -->
 	<div class="welcome p-3">
 		<div id="requirement" style="display:none;">
-			<h3>It appears that your browser or device is too old to support Box Pleating Studio.</h3>
-			<h5 class="mt-2">
-				Please upgrade your browser or use the latest version of Chrome, which is the recommended browser.
+			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
+			<div class="mt-2">
+				Possible causes include:
+				<ol>
+					<li>
+						Outdated browser<br>
+						If you haven't done so, please upgrade your browser or use the latest version of Chrome, which is the recommended browser.
+					</li>
+					<li>
+						Temporary bug<br>
+						Please try reloading the app and clearing cache to update BP Studio to the latest version, which might
+						have fixed the bug.
+					</li>
+				</ol>
+				In all cases, the error has been reported to the author, and he will try his best to fix the issue.
 				The author apologize for the inconvenience.<br>
-			</h5>
+				You could also submit an issue on <a href="https://github.com/MuTsunTsai/box-pleating-studio/issues">GitHub</a> to report this issue; please include the following diagnosis information in your submission.
+			</div>
 		</div>
 		<div id="resource" style="display:none;">
 			<h3>Some of the required resources cannot be loaded successfully.</h3>
-			<h5 class="mt-2">
+			<div class="mt-2">
 				As a result, Box Pleating Studio cannot be started.
 				This is probably due to internet connection problem and/or missing cached resources.
 				Please check you network and try again.
-			</h5>
+			</div>
 		</div>
 		<noscript>
 			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
