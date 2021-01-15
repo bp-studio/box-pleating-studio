@@ -11,12 +11,13 @@ let log = require('fancy-log');
 let htmlMin = require('gulp-html-minifier-terser');
 let cleanCss = require('gulp-clean-css');
 let workbox = require('gulp-workbox');
+let replace = require('gulp-replace');
+let gulpIf = require('gulp-if');
 
-let tweak = require('./.vscode/tweak');
-let env = require('./.vscode/env');
-let log2 = require('./.vscode/log');
-let vue = require('./.vscode/vue');
-let i18n = require('./.vscode/i18n');
+let env = require('./gulp/env');
+let log2 = require('./gulp/log');
+let vue = require('./gulp/vue');
+let i18n = require('./gulp/i18n');
 
 let projCore = ts.createProject('src/core/tsconfig.json');
 let projService = ts.createProject('src/service/tsconfig.json');
@@ -138,7 +139,7 @@ gulp.task('buildDonate', () =>
 
 gulp.task('buildNumber', () =>
 	gulp.src('src/app/index.htm')
-		.pipe(tweak(t => t.replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`)))
+		.pipe(replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`))
 		.pipe(gulp.dest('src/app'))
 );
 
@@ -147,7 +148,7 @@ gulp.task('buildHtml', () =>
 		.pipe(env())
 		.pipe(htmlMin(htmlMinOption))
 		// 避免 VS Code Linter 出錯
-		.pipe(tweak(t => t.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>")))
+		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
 		.pipe(gulp.dest('dist'))
 );
 
@@ -158,7 +159,7 @@ gulp.task('buildCss', () =>
 		.pipe(gulp.dest('dist'))
 )
 
-const ftpFactory = (folder, g, t, f) => function() {
+const ftpFactory = (folder, g, p) => function() {
 	let options = require('./.vscode/ftp-pub.json');
 	options.log = log;
 	let conn = ftp.create(options);
@@ -168,17 +169,19 @@ const ftpFactory = (folder, g, t, f) => function() {
 		'!**/debug.log',
 		'!dist/index.html'
 	].concat(g);
-	return gulp.src(globs, { base: './dist', buffer: !!t })
-		.pipe(tweak(t, f))
+	let pipe = gulp.src(globs, { base: './dist', buffer: false });
+	return (p ? p(pipe) : pipe)
 		.pipe(conn.newer(`/public_html/${folder}`))
 		.pipe(conn.dest(`/public_html/${folder}`));
 };
 
 gulp.task('uploadPub', ftpFactory('bp', ['dist/.htaccess']));
 
-gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json'],
-	t => t.replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', ""),
-	"index.htm"
+gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pipe.
+	pipe(gulpIf(
+		file => file.basename == "index.htm",
+		replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', "")
+	))
 ));
 
 gulp.task('deployDev', gulp.series(

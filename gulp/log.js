@@ -1,3 +1,4 @@
+"use strict";
 var through = require('through2');
 var path = require('path');
 
