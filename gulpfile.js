@@ -10,10 +10,10 @@ let ftp = require('vinyl-ftp');
 let log = require('fancy-log');
 let htmlMin = require('gulp-html-minifier-terser');
 let cleanCss = require('gulp-clean-css');
+let workbox = require('gulp-workbox');
 
 let tweak = require('./.vscode/tweak');
 let env = require('./.vscode/env');
-let workbox = require('./.vscode/workbox');
 let log2 = require('./.vscode/log');
 let vue = require('./.vscode/vue');
 let i18n = require('./.vscode/i18n');
