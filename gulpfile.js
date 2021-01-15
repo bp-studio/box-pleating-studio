@@ -14,6 +14,7 @@ let workbox = require('gulp-workbox');
 let replace = require('gulp-replace');
 let gulpIf = require('gulp-if');
 
+let woff2 = require('./gulp/woff2');
 let env = require('./gulp/env');
 let log2 = require('./gulp/log');
 let vue = require('./gulp/vue');
@@ -121,7 +122,7 @@ gulp.task('buildLocale', () =>
 		.pipe(wrap("let locale={};<%= contents %>"))
 		.pipe(terser())
 		.pipe(gulp.dest('dist/'))
-)
+);
 
 gulp.task('buildDonate', () =>
 	gulp.src([
@@ -157,7 +158,19 @@ gulp.task('buildCss', () =>
 		.pipe(concat('main.css'))
 		.pipe(cleanCss())
 		.pipe(gulp.dest('dist'))
-)
+);
+
+gulp.task('buildFont', () =>
+	gulp.src('dist/assets/bps/fonts/bps.ttf')
+		.pipe(woff2())
+		.pipe(gulp.dest('dist/assets/bps/fonts')),
+	gulp.src('dist/assets/bps/style.css')
+		.pipe(replace(
+			/(src:\n(\s+))(url\('fonts\/bps.ttf\?(......)'\) format\('truetype'\))/,
+			"$1url('fonts/bps.woff2?$4') format('woff2'),\n$2$3"
+		))
+		.pipe(gulp.dest('dist/assets/bps'))
+);
 
 const ftpFactory = (folder, g, p) => function() {
 	let options = require('./.vscode/ftp-pub.json');

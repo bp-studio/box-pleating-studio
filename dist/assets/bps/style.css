@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'bps';
   src:
-    url('fonts/bps.woff2?vscrag') format('woff2'),
-    url('fonts/bps.ttf?vscrag') format('truetype'),
-    url('fonts/bps.woff?vscrag') format('woff'),
-    url('fonts/bps.svg?vscrag#bps') format('svg');
+    url('fonts/bps.woff2?7xf0l6') format('woff2'),
+    url('fonts/bps.ttf?7xf0l6') format('truetype'),
+    url('fonts/bps.woff?7xf0l6') format('woff'),
+    url('fonts/bps.svg?7xf0l6#bps') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -45,6 +45,12 @@
 }
 .bp-tree:before {
   content: "\e901";
+}
+.bp-redo:before {
+  content: "\e90d";
+}
+.bp-undo:before {
+  content: "\e90e";
 }
 .bp-spinner:before {
   content: "\e90c";
