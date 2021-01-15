@@ -101,10 +101,7 @@
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
 					session.jsons.forEach(j => this.addDesign(bp.restore(j)));
-					if(session.open >= 0) {
-						bp.select(this.designs[session.open]);
-						Vue.nextTick(() => this.scrollTo(session.open));
-					}
+					if(session.open >= 0) this.select(this.designs[session.open]);
 					Shrewd.commit();
 				}
 			}
@@ -251,14 +248,18 @@
 			bp.select(id);
 			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
 			this.tabHistory.unshift(id);
-			this.scrollTo(id);
+			Vue.nextTick(() => this.scrollTo(id));
 		}
 
+		public selectLast(): void {
+			bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
+			Shrewd.commit();
+		}
 		public async closeCore(id: number): Promise<boolean> {
 			let d = bp.designMap.get(id)!;
 			let title = d.title || this.$t("keyword.untitled");
 			if(d.history.modified) {
-				bp.select(id);
+				this.select(id);
 				let message = this.$t("message.unsaved", [title]);
 				if(!(await this.confirm(message))) return false;
 			}
@@ -269,26 +270,22 @@
 		}
 		public async close(id?: number) {
 			if(id === undefined) id = bp.design.id;
-			if(await this.closeCore(id)) {
-				bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
-				Shrewd.commit();
-			}
+			if(await this.closeCore(id)) this.selectLast();
 		}
 		public async closeBy(predicate: (i: number) => boolean) {
-			for(let i of this.designs.concat()) if(predicate(i)) await this.closeCore(i);
-			Shrewd.commit();
+			let promises: Promise<boolean>[] = [];
+			for(let i of this.designs.concat()) if(predicate(i)) promises.push(this.closeCore(i));
+			await Promise.all(promises);
+			this.selectLast();
 		}
 		public async closeOther(id: number) {
-			bp.select(id);
 			await this.closeBy(i => i != id);
 		}
 		public async closeRight(id: number) {
-			if(bp.design.id > id) bp.select(id);
 			await this.closeBy(i => i > id);
 		}
 		public async closeAll() {
 			await this.closeBy(i => true);
-			bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
 		}
 		public clone(id?: number) {
 			if(id === undefined) id = bp.design.id;

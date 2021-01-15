@@ -15,8 +15,8 @@ export default abstract class Dialog<T> extends Vue {
 
 	public async show(message?: string): Promise<T> {
 		await core.libReady;
-		this.message = message;
 		while(this.promise) await this.promise;
+		this.message = message;
 		return await (this.promise = this.run());
 	}
 
