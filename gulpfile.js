@@ -76,7 +76,6 @@ gulp.task('buildService', () =>
 				'**/*.js',
 				'**/*.css',
 				'**/*.woff2',
-				'**/bps.*',
 				'manifest.json'
 			],
 			globIgnores: ['sw.js']
