@@ -1,24 +1,25 @@
-let gulp = require('gulp');
-let ts = require('gulp-typescript');
-let wrapJS = require("gulp-wrap-js");
-let wrap = require("gulp-wrap");
-let ifAnyNewer = require('gulp-if-any-newer');
-let sourcemaps = require('gulp-sourcemaps');
-let concat = require('gulp-concat');
-let terser = require('gulp-terser');
-let ftp = require('vinyl-ftp');
-let log = require('fancy-log');
-let htmlMin = require('gulp-html-minifier-terser');
 let cleanCss = require('gulp-clean-css');
-let workbox = require('gulp-workbox');
-let replace = require('gulp-replace');
+let concat = require('gulp-concat');
+let fs = require('fs');
+let ftp = require('vinyl-ftp');
+let gulp = require('gulp');
 let gulpIf = require('gulp-if');
+let htmlMin = require('gulp-html-minifier-terser');
+let ifAnyNewer = require('gulp-if-any-newer');
+let log = require('fancy-log');
+let replace = require('gulp-replace');
+let sourcemaps = require('gulp-sourcemaps');
+let terser = require('gulp-terser');
+let ts = require('gulp-typescript');
+let workbox = require('gulp-workbox');
+let wrap = require("gulp-wrap");
+let wrapJS = require("gulp-wrap-js");
 
-let woff2 = require('./gulp/woff2');
 let env = require('./gulp/env');
+let i18n = require('./gulp/i18n');
 let log2 = require('./gulp/log');
 let vue = require('./gulp/vue');
-let i18n = require('./gulp/i18n');
+let woff2 = require('./gulp/woff2');
 
 let projCore = ts.createProject('src/core/tsconfig.json');
 let projService = ts.createProject('src/service/tsconfig.json');
@@ -68,8 +69,16 @@ gulp.task('buildCorePub', () =>
 		.pipe(gulp.dest('dist/')),
 );
 
-gulp.task('buildService', () =>
-	projService.src()
+gulp.task('buildService', () => {
+	// 找出最後一個 log
+	let dir = fs.opendirSync("dist/log"), file, lastLog;
+	while((file = dir.readSync()) && file.isFile()) {
+		let [stem, ext] = file.name.split('.');
+		if(ext == "md" && (!lastLog || stem > lastLog)) lastLog = stem;
+	}
+	dir.closeSync();
+
+	return projService.src()
 		.pipe(projService())
 		.pipe(workbox({
 			globDirectory: 'dist',
@@ -78,13 +87,16 @@ gulp.task('buildService', () =>
 				'**/*.js',
 				'**/*.css',
 				'**/*.woff2',
-				'manifest.json'
+				'manifest.json',
+				'assets/icon/icon-32.png',
+				'assets/icon/icon-192.png',
+				`log/${lastLog}.md`
 			],
 			globIgnores: ['sw.js']
 		}))
 		.pipe(terser())
-		.pipe(gulp.dest('dist/'))
-);
+		.pipe(gulp.dest('dist/'));
+});
 
 gulp.task('buildTest', () =>
 	projTest.src()

@@ -30,6 +30,11 @@
 			"print": "Print current view",
 			"share": "Share current project"
 		},
+		"edit": {
+			"title": "Edit",
+			"undo": "Undo",
+			"redo": "Redo"
+		},
 		"setting": {
 			"title": "Settings",
 			"fullscreen": "Fullscreen",

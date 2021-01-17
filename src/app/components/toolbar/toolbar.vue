@@ -2,6 +2,7 @@
 	<div id="divToolbar" class="btn-toolbar p-2">
 		<div class="btn-group me-2">
 			<filemenu @share="$emit('share')"></filemenu>
+			<!-- <editmenu></editmenu> -->
 			<settingmenu @pref="$emit('pref')"></settingmenu>
 			<dropdown icon="bp-tools" :title="$t('toolbar.tools.title')">
 				<uploader accept=".tmd5" @upload="TreeMaker($event)">
@@ -65,13 +66,13 @@
 					:id="`tab${id}`"
 					@click="core.select(id)"
 				>
-					<div class="d-none d-sm-flex" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
+					<div class="tab-close" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
 						<div>{{getTitle(id)}}</div>
 						<div class="px-2" @click.stop="core.close(id)">
 							<i class="fas fa-times"></i>
 						</div>
 					</div>
-					<div class="d-flex d-sm-none" :title="getDesign(id).title">
+					<div class="tab-down" :title="getDesign(id).title">
 						<div>{{getTitle(id)}}</div>
 						<div class="px-2" @click.stop="tabMenu($event, id)">
 							<i class="fas fa-caret-down"></i>

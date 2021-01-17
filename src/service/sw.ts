@@ -26,11 +26,14 @@ routing.registerRoute(precacheRoute);
 // 這是舊版的 cache；如果找得到就刪除掉以釋放空間
 caches.delete("versioned");
 
-// Markdown 檔案都採用網路優先策略
+// 除了 precache 之外的 Markdown 檔案都採用網路優先策略
 routing.registerRoute(
 	({ url }) => url.pathname.endsWith(".md"),
-	new strategies.NetworkFirst({ cacheName: 'assets' })
-)
+	new strategies.NetworkFirst({
+		fetchOptions: { cache: 'reload' }, // 請瀏覽器不要使用快取
+		cacheName: 'assets'
+	})
+);
 
 // POST 請求全部都只能在有網路的時候進行
 routing.registerRoute(

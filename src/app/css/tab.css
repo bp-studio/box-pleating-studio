@@ -63,13 +63,21 @@
 	visibility: visible;
 }
 
+.tab-down {
+	display: none;
+}
+
+.tab-close {
+	display: flex;
+}
+
 @media (hover: hover) {
 	.tab:not(:hover):not(.active) {
 		color: #444;
 	}
 }
 
-@media (max-width: 576px) {
+@media (max-width: 650px) {
 	#divTab {
 		position: absolute;
 		top: 3.75rem;
@@ -91,5 +99,11 @@
 	#panelToggle {
 		flex-grow: 1;
 		text-align: right;
+	}
+	.tab-down {
+		display: flex;
+	}
+	.tab-close {
+		display: none;
 	}
 }

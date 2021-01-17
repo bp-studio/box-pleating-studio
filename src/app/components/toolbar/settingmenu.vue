@@ -31,14 +31,14 @@
 			<i class="fas fa-genderless" v-else></i>
 			{{$t('toolbar.setting.tip')}}
 		</div>
-		<template v-if="core.isTouch">
+		<div class="touch-only">
 			<divider></divider>
 			<div class="dropdown-item" @click="toggle('showDPad', core)">
 				<i v-if="!core.showDPad"></i>
 				<i class="fas fa-arrows-alt" v-else></i>
 				{{$t('toolbar.setting.dPad')}}
 			</div>
-		</template>
+		</div>
 		<divider></divider>
 		<div class="dropdown-item" @click="$emit('pref')">
 			<i class="fas fa-cog"></i>

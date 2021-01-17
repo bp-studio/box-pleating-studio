@@ -59,5 +59,8 @@
 	"cSpell.ignorePaths": [
 		"**/package*.json",
 		".vscode",
+	],
+	"cSpell.ignoreWords": [
+		"opendir"
 	]
 }

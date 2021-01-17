@@ -73,6 +73,11 @@
 		"tools": {
 			"TreeMaker": "匯入 TreeMaker 檔案",
 			"title": "工具"
+		},
+		"edit": {
+			"redo": "取消復原",
+			"title": "編輯",
+			"undo": "復原"
 		}
 	},
 	"preference": {

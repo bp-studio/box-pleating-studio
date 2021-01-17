@@ -55,7 +55,7 @@
 	}
 }
 
-@media screen and (max-width: 576px) {
+@media screen and (max-width: 650px) {
 	#divWorkspace, #divShade, #divPanel {
 		top: 6.15rem;
 	}
