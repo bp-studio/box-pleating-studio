@@ -102,7 +102,7 @@ gulp.task('buildTest', () =>
 	projTest.src()
 		.pipe(sourcemaps.init())
 		.pipe(projTest())
-		.pipe(wrapJS("let Shrewd=require('../dist/Shrewd.js');%= body %"))
+		.pipe(wrapJS("let Shrewd=require('../dist/shrewd.min.js');%= body %"))
 		.pipe(sourcemaps.write('.', { includeContent: false }))
 		.pipe(gulp.dest('test/'))
 );

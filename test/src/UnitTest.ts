@@ -1,11 +1,13 @@
 
 /// <reference path="Import.ts" />
 
-/// <reference path="../../src/core/class/disposible.ts" />
+/// <reference path="../../src/core/class/disposable.ts" />
 /// <reference path="../../src/core/model/Tree.ts" />
 /// <reference path="../../src/core/model/TreeEdge.ts" />
 /// <reference path="../../src/core/model/TreePath.ts" />
 /// <reference path="../../src/core/model/TreeNode.ts" />
+/// <reference path="../../src/core/global/Interface.ts" />
+/// <reference path="../../src/core/mapping/BaseMapping.ts" />
 /// <reference path="../../src/core/model/DoubleMap.ts" />
 /// <reference path="../../src/core/mapping/DoubleMapping.ts" />
 

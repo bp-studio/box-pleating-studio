@@ -1,6 +1,6 @@
 function TreeBasic() {
 
-	let t = new Tree();
+	let t = new Tree(null);
 	t.addEdge(1, 0, 2);
 	t.addEdge(0, 2, 1);
 	Shrewd.commit();
