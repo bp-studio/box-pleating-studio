@@ -21,9 +21,9 @@ interface IDesignObject {
 
 	@action public title: string;
 
-	protected readonly LayoutSheet: Sheet;
+	public readonly LayoutSheet: Sheet;
 
-	protected readonly TreeSheet: Sheet;
+	public readonly TreeSheet: Sheet;
 
 	public readonly tree: Tree;
 

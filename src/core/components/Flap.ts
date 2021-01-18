@@ -74,16 +74,26 @@ interface JFlap {
 		super(sheet);
 		this.node = node;
 
-		let option = this.sheet.design.options.get("flap", node.id);
+		let design = sheet.design;
+		let option = design.options.get("flap", node.id);
 		if(option) {
+			// 找得到設定就用設定值
 			this.location.x = option.x;
 			this.location.y = option.y;
 			this.width = option.width;
 			this.height = option.height;
+			this.isNew = false;
+		} else {
+			// 否則根據對應的頂點的位置來粗略估計初始化
+			Draggable.relocate(design.vertices.get(this.node)!, this);
 		}
 
 		this.quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
 		this.view = new FlapView(this);
+	}
+
+	protected onDragged() {
+		if(this.isNew) Draggable.relocate(this, this.design.vertices.get(this.node)!);
 	}
 
 	protected get shouldDispose(): boolean {

@@ -2,6 +2,7 @@
 interface JVertex extends IPoint {
 	id: number;
 	name: string;
+	isNew?: boolean;
 }
 
 
@@ -32,6 +33,10 @@ interface JVertex extends IPoint {
 		return this.location;
 	}
 
+	protected onDragged() {
+		if(this.isNew) Draggable.relocate(this, this.design.flaps.get(this.node)!);
+	}
+
 	public addLeaf(length = 1) {
 		this.design.history.takeAction(() => {
 			// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
@@ -48,7 +53,8 @@ interface JVertex extends IPoint {
 				id: node.id,
 				name: node.name,
 				x: p.x,
-				y: p.y
+				y: p.y,
+				isNew: true
 			});
 		});
 	}
@@ -90,6 +96,7 @@ interface JVertex extends IPoint {
 			if(option.name != undefined) this.node.name = option.name;
 			this.location.x = option.x;
 			this.location.y = option.y;
+			this.isNew = !!option.isNew;
 		}
 
 		this.view = new VertexView(this);

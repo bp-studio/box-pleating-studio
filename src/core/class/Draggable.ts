@@ -39,14 +39,19 @@ abstract class Draggable extends ViewedControl {
 			if(!by.eq(this.location)) this.design.history.takeAction(() => {
 				this.location.x = by.x;
 				this.location.y = by.y;
+				this.onDragged();
 			});
 		} else {
 			if(!by.eq(Vector.ZERO)) this.design.history.takeAction(() => {
 				this.location.x += by.x;
 				this.location.y += by.y;
+				this.onDragged();
 			});
 		}
 	}
+
+	/** 真的發生拖曳之後的 callback */
+	protected onDragged() { }
 
 	/**
 	 * 把一個傳入的 `Vector` 進行修正到實際上可以被容許的移動範圍之上，
@@ -62,6 +67,14 @@ abstract class Draggable extends ViewedControl {
 
 	/** 當前位置 */
 	@shrewd public location: IPoint = { x: 0, y: 0 };
+
+	/** 把 target 移動到 source 的相對應位置上 */
+	public static relocate(source: Draggable, target: Draggable) {
+		// TODO: 不同的形狀的 Sheet 要如何處理
+		let ss = source.sheet, ts = target.sheet;
+		target.location.x = Math.round(source.location.x / ss.width * ts.width);
+		target.location.y = Math.round(source.location.y / ss.height * ts.height);
+	}
 }
 
 //////////////////////////////////////////////////////////////////
@@ -73,6 +86,16 @@ abstract class Draggable extends ViewedControl {
 //////////////////////////////////////////////////////////////////
 
 abstract class IndependentDraggable extends Draggable {
+
+	private _isNew: boolean = true;
+
+	/** 這個物件自從建構以來，Design 是否尚未切換過 Sheet */
+	protected get isNew() { return this._isNew; }
+	protected set isNew(v) { if(!v) this._isNew = v; }
+
+	@shrewd private watchIsNew() {
+		if(this._isNew && this.sheet != this.design.sheet) this._isNew = false;
+	}
 
 	/** 物件在 Sheet 上佔據的高度 */
 	public abstract readonly height: number;

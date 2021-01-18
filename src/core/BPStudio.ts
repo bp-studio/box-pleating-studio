@@ -95,17 +95,11 @@
 	public create(json: any): Design {
 		Object.assign(json, {
 			version: Migration.current,
-			layout: {
-				flaps: [
-					{ id: 0, width: 0, height: 0, x: 8, y: 7 },
-					{ id: 2, width: 0, height: 0, x: 8, y: 9 }
-				]
-			},
 			tree: {
 				nodes: [
-					{ id: 0, name: "", x: 10, y: 13 },
+					{ id: 0, name: "", x: 10, y: 7 },
 					{ id: 1, name: "", x: 10, y: 10 },
-					{ id: 2, name: "", x: 10, y: 7 }
+					{ id: 2, name: "", x: 10, y: 13 }
 				],
 				edges: [
 					{ n1: 0, n2: 1, length: 1 },
