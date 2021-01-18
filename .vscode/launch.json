@@ -10,7 +10,7 @@
 			"name": "Launch in Chrome",
 			"preLaunchTask": "Gulp build",
 			"internalConsoleOptions": "neverOpen",
-			"file": "${workspaceFolder}/dist/index.html",
+			"file": "${workspaceFolder}/debug/index.htm",
 			"sourceMaps": true
 		},
 		{

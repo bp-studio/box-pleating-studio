@@ -15,7 +15,7 @@ let workbox = require('gulp-workbox');
 let wrap = require("gulp-wrap");
 let wrapJS = require("gulp-wrap-js");
 
-let env = require('./gulp/env');
+let debug = require('./gulp/debug');
 let i18n = require('./gulp/i18n');
 let log2 = require('./gulp/log');
 let vue = require('./gulp/vue');
@@ -39,34 +39,36 @@ let htmlMinOption = {
 };
 
 // 更新模組
-gulp.task('update', () => (
+gulp.task('shrewd', () => (
 	gulp.src("../shrewd/dist/shrewd.min.js")
+		.pipe(replace(/\/\/#.+?\n/, ""))
+		.pipe(gulp.dest('dist/')),
+	gulp.src("../shrewd/dist/shrewd.js")
 		.pipe(sourcemaps.init({ loadMaps: true }))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../../shrewd/src' }))
-		.pipe(gulp.dest('dist/')),
+		.pipe(gulp.dest('debug/')),
 	gulp.src("../shrewd/dist/*.d.ts")
 		.pipe(gulp.dest('src/core/global'))
 ));
 
 gulp.task('buildCore', () =>
 	projCore.src()
-		.pipe(ifAnyNewer("dist", { filter: 'bpstudio.js' }))
+		.pipe(ifAnyNewer("debug", { filter: 'bpstudio.js' }))
 		.pipe(sourcemaps.init())
 		.pipe(projCore())
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
-		.pipe(gulp.dest('dist/'))
+		.pipe(gulp.dest('debug/'))
 );
 
 gulp.task('buildCorePub', () =>
-	projCore.src()
-		.pipe(projCore())
+	gulp.src("debug/bpstudio.js")
 		.pipe(wrap(
 			`(function(root,factory){if(typeof define==='function'&&define.amd)
 			{define([],factory);}else if(typeof exports==='object'){module.exports=factory();}
 			else{root.BPStudio=factory();}}(this,function(){ <%= contents %> ;return BPStudio;}));`
 		))
 		.pipe(terser(Object.assign({}, terserOption, { mangle: true })))
-		.pipe(gulp.dest('dist/')),
+		.pipe(gulp.dest('dist/'))
 );
 
 gulp.task('buildService', () => {
@@ -158,7 +160,9 @@ gulp.task('buildNumber', () =>
 
 gulp.task('buildHtml', () =>
 	gulp.src('src/app/index.htm')
-		.pipe(env())
+		.pipe(debug())
+		.pipe(gulp.dest('debug')),
+	gulp.src('src/app/index.htm')
 		.pipe(htmlMin(htmlMinOption))
 		// 避免 VS Code Linter 出錯
 		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
@@ -190,9 +194,7 @@ const ftpFactory = (folder, g, p) => function() {
 	let conn = ftp.create(options);
 	let globs = [
 		'dist/**/*',
-		'!**/*.map',
 		'!**/debug.log',
-		'!dist/index.html'
 	].concat(g);
 	let pipe = gulp.src(globs, { base: './dist', buffer: false });
 	return (p ? p(pipe) : pipe)

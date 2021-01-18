@@ -90,11 +90,11 @@ To build BP Studio, first you need the following:
 2. Install [TypeScript](https://www.typescriptlang.org/) globally by the command `npm install --global typescript`.
 2. Install [Gulp](https://www.npmjs.com/package/gulp) globally by the command `npm install --global gulp-cli`.
 
-And then you can simply press `F5` in VS Code to build and launch the app automatically. Alternatively, run `gulp buildCore` to build the core part (`dist/bpstudio.js`, of which source code is under `src/core`) manually, and use any browser to open `dist/index.htm` to run it.
+And then you can simply press `F5` in VS Code to build and launch the app automatically. Alternatively, run `gulp buildCore` to build the core part (`debug/bpstudio.js`, of which source code is under `src/core`) manually, and use any browser to open `dist/index.htm` to run it.
 
 Other important gulp scripts include:
 
-- `buildCorePub`: build the release version of `bpstudio.js`, which will be minified.
+- `buildCorePub`: build the release version of `bpstudio.js` in `dist/`.
 - `buildApp`: build the UI part (`main.js`, source code under `src/app`) of the app, which is written in [Vue.js](https://vuejs.org/) version 2.
 - `buildLocale`: build `locale.js` (source code under `src/locale`).
 

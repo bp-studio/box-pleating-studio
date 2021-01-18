@@ -10,7 +10,6 @@
 	],
 	"files.exclude": {
 		"node_modules": true,
-		"**/*.map": true,
 		"**/debug.log": true,
 		"docs/**/*.log": true,
 		"**/*.aux": true,
@@ -18,8 +17,7 @@
 		"**/*.out": true,
 		"**/*.snm": true,
 		"**/*.synctex.gz": true,
-		"**/*.toc": true,
-		"dist/index.html": true
+		"**/*.toc": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"

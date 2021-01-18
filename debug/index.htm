@@ -4,6 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Box Pleating Studio</title>
+	<base href="../dist/">
 
 	<!-- Core info -->
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
@@ -12,7 +13,7 @@
 	<meta name="version" content="0.3.0">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
+	
 	<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag() { dataLayer.push(arguments); }
@@ -35,7 +36,7 @@
 
 	<!-- PWA setup -->
 	<link rel="canonical" href="https://bpstudio.abstreamace.com" />
-	<link rel="manifest" href="manifest.json">
+	
 	<link rel="icon" type="image/png" sizes="512x512" href="assets/icon/icon-512.png">
 	<link rel="icon" type="image/png" sizes="192x192" href="assets/icon/icon-192.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="assets/icon/icon-96.png">
@@ -141,7 +142,7 @@
 	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/bps/style.css">
 	<link rel="stylesheet" href="main.css">
-	<script src="lib/vue.runtime.min.js" defer></script>
+	<script src="../debug/vue.runtime.js" defer></script>
 	<script src="lib/clickout-event.js" defer></script>
 	<script src="lib/vue-i18n.js" defer></script>
 	<script src="log/log.js" defer></script>
@@ -150,9 +151,9 @@
 
 	<!-- BP Studio setup -->
 	<script src="lib/lzma_worker-min.js" defer></script>
-	<script src="lib/paper-core.min.js" defer></script>
-	<script src="shrewd.min.js" defer></script>
-	<script src="bpstudio.js" defer></script>
+	<script src="../debug/paper-core.js" defer></script>
+	<script src="../debug/shrewd.js" defer></script>
+	<script src="../debug/bpstudio.js" defer></script>
 
 	<!-- Non-critical -->
 	<link rel="stylesheet" href="lib/font-awesome/css/all.min.css" media="print" onload="this.media='all'; this.onload=null;">

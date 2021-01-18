@@ -70,6 +70,7 @@ abstract class Draggable extends ViewedControl {
 
 	/** 把 target 移動到 source 的相對應位置上 */
 	public static relocate(source: Draggable, target: Draggable) {
+		if(!source || !target) return;
 		// TODO: 不同的形狀的 Sheet 要如何處理
 		let ss = source.sheet, ts = target.sheet;
 		target.location.x = Math.round(source.location.x / ss.width * ts.width);
