@@ -145,7 +145,8 @@
 		"copy": "複製",
 		"message": "快來看我用 Box Pleating Studio 設計的專案「{0}」！",
 		"share": "分享",
-		"title": "分享專案"
+		"title": "分享專案",
+		"shorten": "縮短"
 	},
 	"about": {
 		"title": "關於 Box Pleating Studio",

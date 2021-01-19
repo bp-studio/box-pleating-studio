@@ -4,7 +4,7 @@
 			<i :class="icon"></i>
 			<slot></slot>
 		</div>
-		<div class="ms-3 text-right desktop-only">{{hk}}</div>
+		<div class="ms-3 text-end desktop-only">{{hk}}</div>
 	</div>
 </template>
 

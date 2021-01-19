@@ -369,7 +369,7 @@ Vue.component('dpad', { render() { with (this) {
 Vue.component('welcome', { render() { with (this) {
         return _c('div', { staticClass: "welcome p-3", attrs: { "id": "divWelcome" } }, [(core.initialized) ? [_c('div', [_c('h2', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.title'), expression: "'welcome.title'" }], staticClass: "d-none d-sm-block" }), _v(" "), _c('h3', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.title'), expression: "'welcome.title'" }], staticClass: "d-sm-none" }), _v(" "), _c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.intro[0]'), expression: "'welcome.intro[0]'" }], staticClass: "mt-4" }), _v(" "), _c('i18n', { attrs: { "path": "welcome.intro[1]", "tag": "p" } }, [_c('a', { attrs: { "target": "_blank", "rel": "noopener", "href": "https://github.com/MuTsunTsai/box-pleating-studio" } }, [_v("GitHub")])])], 1), _v(" "), _c('div', { staticClass: "browser-only" }, [((bi || ios) && !install) ? _c('div', [_c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.hint'), expression: "'welcome.install.hint'" }] }), _v(" "), (ios) ? _c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ios'), expression: "'welcome.install.ios'" }] }) : _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.bt'), expression: "'welcome.install.bt'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return bi.prompt(); } } })]) : _e(), _v(" "), (install == 1) ? _c('div', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ing'), expression: "'welcome.install.ing'" }] }) : _e(), _v(" "), (install == 2) ? _c('div', [_c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ed'), expression: "'welcome.install.ed'" }] }), _v(" "), _c('a', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.open'), expression: "'welcome.install.open'" }], staticClass: "btn btn-primary", attrs: { "rel": "noopener", "href": "https://bpstudio.abstreamace.com/", "target": "_blank" } })]) : _e()])] : _c('div', { staticClass: "h-100 d-flex text-center align-items-center" }, [_m(0)]), _v(" "), _c('div', { staticStyle: { "position": "absolute", "bottom": "1rem", "right": "1rem" } }, [_v(_s(core.copyright))])], 2);
     } }, staticRenderFns: [function () { with (this) {
-            return _c('div', { staticStyle: { "font-size": "min(15vh,15vw)", "color": "gray", "flex-grow": "1" } }, [_c('i', { staticClass: "bp-spinner fa-spin d-inline-block" })]);
+            return _c('div', { staticStyle: { "font-size": "min(15vh,15vw)", "color": "gray", "flex-grow": "1" } }, [_c('i', { staticClass: "bp-spinner fa-spin" })]);
         } }], data() { return { bi: undefined, install: 0, ios: navigator.standalone === false }; }, computed: { core() { return core; } }, methods: { detectInstallation() {
             if ('getInstalledRelatedApps' in navigator) {
                 navigator.getInstalledRelatedApps().then(apps => {
@@ -433,14 +433,15 @@ Vue.component('note', { render() { with (this) {
     } });
 
 Vue.component('share', { render() { with (this) {
-        return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-header" }, [_c('div', { directives: [{ name: "t", rawName: "v-t", value: ('share.title'), expression: "'share.title'" }], staticClass: "h4 modal-title" })]), _v(" "), _c('div', { staticClass: "modal-body" }, [_c('div', { staticClass: "mb-2" }, [_c('input', { staticClass: "form-control", domProps: { "value": url } })]), _v(" "), (ready) ? _c('div', [_c('button', { directives: [{ name: "clipboard", rawName: "v-clipboard:copy", value: (url), expression: "url", arg: "copy" }, { name: "clipboard", rawName: "v-clipboard:success", value: (onCopy), expression: "onCopy", arg: "success" }], staticClass: "btn btn-primary" }, [_c('i', { staticClass: "fas fa-copy" }), _v("\n\t\t\t\t\t\t" + _s($t('share.copy')) + "\n\t\t\t\t\t\t"), _c('i', { ref: "success", staticClass: "fas fa-check d-inline-block", staticStyle: { "transition": "width .5s", "width": "0px", "overflow": "hidden" } })]), _v(" "), (canShare) ? _c('button', { staticClass: "btn btn-primary", on: { "click": share } }, [_c('i', { staticClass: "fas fa-share" }), _v("\n\t\t\t\t\t\t" + _s($t('share.share')) + "\n\t\t\t\t\t")]) : _e()]) : _e()]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
-    } }, mixins: [BaseComponent], data() { return { url: "", modal: undefined, canShare: !!navigator.share, ready: false }; }, methods: { json() {
+        return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-header" }, [_c('div', { directives: [{ name: "t", rawName: "v-t", value: ('share.title'), expression: "'share.title'" }], staticClass: "h4 modal-title" })]), _v(" "), _c('div', { staticClass: "modal-body" }, [_c('div', { staticClass: "mb-2" }, [_c('div', { staticClass: "input-group" }, [_c('input', { staticClass: "form-control", attrs: { "disabled": sending }, domProps: { "value": url } }), _v(" "), (!short) ? _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": sending }, on: { "click": shorten } }, [_v("\n\t\t\t\t\t\t\t" + _s($t('share.shorten')) + "\n\t\t\t\t\t\t\t"), (sending) ? _c('i', { staticClass: "bp-spinner fa-spin" }) : _e()]) : _e()])]), _v(" "), (ready) ? _c('div', { staticClass: "d-flex" }, [_c('div', [_c('button', { directives: [{ name: "clipboard", rawName: "v-clipboard:copy", value: (url), expression: "url", arg: "copy" }, { name: "clipboard", rawName: "v-clipboard:success", value: (onCopy), expression: "onCopy", arg: "success" }], staticClass: "btn btn-primary", attrs: { "disabled": sending } }, [_c('i', { staticClass: "fas fa-copy" }), _v("\n\t\t\t\t\t\t\t" + _s($t('share.copy')) + "\n\t\t\t\t\t\t\t"), _c('i', { ref: "success", staticClass: "fas fa-check d-inline-block", staticStyle: { "transition": "width .5s", "width": "0px", "overflow": "hidden" } })]), _v(" "), (canShare) ? _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": sending }, on: { "click": share } }, [_c('i', { staticClass: "fas fa-share" }), _v("\n\t\t\t\t\t\t\t" + _s($t('share.share')) + "\n\t\t\t\t\t\t")]) : _e()]), _v(" "), _c('div', { staticClass: "flex-grow-1 text-end col-form-label" }, [_v(_s(error))])]) : _e()]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
+    } }, mixins: [BaseComponent], data() { return { url: "", modal: undefined, canShare: !!navigator.share, ready: false, sending: false, short: false, error: null }; }, methods: { json() {
             if (!this.design)
                 return undefined;
             return JSON.stringify(this.design);
         }, async show() {
             await core.libReady;
             this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
+            this.short = false;
             this.modal.show();
             gtag('event', 'screen_view', { screen_name: 'Share' });
         }, onCopy() {
@@ -455,6 +456,18 @@ Vue.component('share', { render() { with (this) {
                 url: this.url
             }).catch(() => { }); // 捕捉取消之類的錯誤，不處理
             gtag('event', 'share', { method: 'app', content_type: 'link' });
+        }, async shorten() {
+            this.sending = true;
+            try {
+                let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url));
+                this.url = await response.text();
+                this.short = true;
+            }
+            catch (e) {
+                this.error = this.$t('message.connFail');
+                setTimeout(() => this.error = null, 3000);
+            }
+            this.sending = false;
         } }, mounted() {
         core.libReady.then(() => {
             this.ready = true;
@@ -463,7 +476,7 @@ Vue.component('share', { render() { with (this) {
     } });
 
 Vue.component('version', { render() { with (this) {
-        return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-body", staticStyle: { "max-height": "70vh", "overflow-y": "auto" } }, [(record[index]) ? _c('div', { domProps: { "innerHTML": _s(record[index]) } }) : _c('div', { staticClass: "m-5 display-2 text-muted text-center" }, [_c('i', { staticClass: "fas fa-spinner fa-spin" })])]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == 0 }, on: { "click": function ($event) { index--; } } }, [_c('i', { staticClass: "fas fa-caret-left" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == max }, on: { "click": function ($event) { index++; } } }, [_c('i', { staticClass: "fas fa-caret-right" })])]), _v(" "), _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
+        return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-body", staticStyle: { "max-height": "70vh", "overflow-y": "auto" } }, [(record[index]) ? _c('div', { domProps: { "innerHTML": _s(record[index]) } }) : _c('div', { staticClass: "m-5 display-2 text-muted text-center" }, [_c('i', { staticClass: "bp-spinner fa-spin" })])]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == 0 }, on: { "click": function ($event) { index--; } } }, [_c('i', { staticClass: "fas fa-caret-left" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == max }, on: { "click": function ($event) { index++; } } }, [_c('i', { staticClass: "fas fa-caret-right" })])]), _v(" "), _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
     } }, data() { return { record: {}, index: undefined, max: undefined, active: false, modal: undefined }; }, watch: { 'index'(index) {
             if (location.protocol == "https:")
                 this.load(index);
@@ -621,7 +634,7 @@ Vue.component('field', { render() { with (this) {
         } } });
 
 Vue.component('hotkey', { render() { with (this) {
-        return _c('div', { staticClass: "d-flex" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('i', { class: icon }), _v(" "), _t("default")], 2), _v(" "), _c('div', { staticClass: "ms-3 text-right desktop-only" }, [_v(_s(hk))])]);
+        return _c('div', { staticClass: "d-flex" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('i', { class: icon }), _v(" "), _t("default")], 2), _v(" "), _c('div', { staticClass: "ms-3 text-end desktop-only" }, [_v(_s(hk))])]);
     } }, props: { icon: String, hk: String } });
 
 Vue.component('keybutton', { render() { with (this) {

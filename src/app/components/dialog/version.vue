@@ -5,7 +5,7 @@
 				<div class="modal-body" style="max-height:70vh; overflow-y:auto;">
 					<div v-if="record[index]" v-html="record[index]"></div>
 					<div v-else class="m-5 display-2 text-muted text-center">
-						<i class="fas fa-spinner fa-spin"></i>
+						<i class="bp-spinner fa-spin"></i>
 					</div>
 				</div>
 				<div class="modal-footer">

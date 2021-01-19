@@ -7,22 +7,31 @@
 				</div>
 				<div class="modal-body">
 					<div class="mb-2">
-						<input class="form-control" :value="url" />
+						<div class="input-group">
+							<input class="form-control" :value="url" :disabled="sending" />
+							<button class="btn btn-primary" v-if="!short" @click="shorten" :disabled="sending">
+								{{$t('share.shorten')}}
+								<i class="bp-spinner fa-spin" v-if="sending"></i>
+							</button>
+						</div>
 					</div>
-					<div v-if="ready">
-						<button class="btn btn-primary" v-clipboard:copy="url" v-clipboard:success="onCopy">
-							<i class="fas fa-copy"></i>
-							{{$t('share.copy')}}
-							<i
-								class="fas fa-check d-inline-block"
-								ref="success"
-								style="transition:width .5s; width:0px; overflow:hidden;"
-							></i>
-						</button>
-						<button v-if="canShare" class="btn btn-primary" @click="share">
-							<i class="fas fa-share"></i>
-							{{$t('share.share')}}
-						</button>
+					<div v-if="ready" class="d-flex">
+						<div>
+							<button class="btn btn-primary" :disabled="sending" v-clipboard:copy="url" v-clipboard:success="onCopy">
+								<i class="fas fa-copy"></i>
+								{{$t('share.copy')}}
+								<i
+									class="fas fa-check d-inline-block"
+									ref="success"
+									style="transition:width .5s; width:0px; overflow:hidden;"
+								></i>
+							</button>
+							<button v-if="canShare" :disabled="sending" class="btn btn-primary" @click="share">
+								<i class="fas fa-share"></i>
+								{{$t('share.share')}}
+							</button>
+						</div>
+						<div class="flex-grow-1 text-end col-form-label">{{error}}</div>
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -49,6 +58,9 @@
 		private modal: Bootstrap.Modal;
 		private canShare: boolean = !!navigator.share;
 		private ready: boolean = false;
+		private sending: boolean = false;
+		private short: boolean = false;
+		private error: string = null;
 
 		mounted() {
 			core.libReady.then(() => {
@@ -65,6 +77,7 @@
 		public async show() {
 			await core.libReady;
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
+			this.short = false;
 			this.modal.show();
 			gtag('event', 'screen_view', { screen_name: 'Share' });
 		}
@@ -83,6 +96,19 @@
 				url: this.url
 			}).catch(() => { }); // 捕捉取消之類的錯誤，不處理
 			gtag('event', 'share', { method: 'app', content_type: 'link' });
+		}
+
+		private async shorten() {
+			this.sending = true;
+			try {
+				let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url));
+				this.url = await response.text();
+				this.short = true;
+			} catch(e) {
+				this.error = this.$t('message.connFail');
+				setTimeout(() => this.error = null, 3000);
+			}
+			this.sending = false;
 		}
 	}
 </script>

@@ -59,6 +59,7 @@
 		".vscode",
 	],
 	"cSpell.ignoreWords": [
-		"opendir"
+		"opendir",
+		"tinyurl"
 	]
 }

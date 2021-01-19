@@ -31,7 +31,7 @@
 		</template>
 		<div v-else class="h-100 d-flex text-center align-items-center">
 			<div style="font-size:10rem; font-size:min(15vh,15vw); color:gray; flex-grow:1;">
-				<i class="bp-spinner fa-spin d-inline-block"></i>
+				<i class="bp-spinner fa-spin"></i>
 			</div>
 		</div>
 		<div style="position:absolute; bottom:1rem; right:1rem;">{{core.copyright}}</div>

@@ -35,11 +35,15 @@ routing.registerRoute(
 	})
 );
 
+let netOnly = new strategies.NetworkOnly({
+	fetchOptions: { cache: 'reload' }
+});
+
+// TinyURL 一律不要快取（沒有意義）
+routing.registerRoute(({ url }) => url.host == 'tinyurl.com', netOnly);
+
 // POST 請求全部都只能在有網路的時候進行
-routing.registerRoute(
-	({ request }) => request.method == 'POST',
-	new strategies.NetworkOnly(), 'POST'
-);
+routing.registerRoute(({ request }) => request.method == 'POST', netOnly, 'POST');
 
 self.addEventListener('install', event => {
 	skipWaiting();

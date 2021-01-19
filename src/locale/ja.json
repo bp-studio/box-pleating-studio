@@ -181,7 +181,8 @@
 		"copy": "コピー",
 		"message": "Box Pleating Studio で設計された私のプロジェクト \"{0}\" をチェックしてください！",
 		"share": "シェア",
-		"title": "プロジェクトを共有する"
+		"title": "プロジェクトを共有する",
+		"shorten": "短くする"
 	},
 	"plugin": {
 		"TreeMaker": {

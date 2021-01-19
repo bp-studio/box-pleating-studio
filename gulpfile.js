@@ -159,16 +159,22 @@ gulp.task('buildNumber', () =>
 		.pipe(gulp.dest('src/app'))
 );
 
-gulp.task('buildHtml', () =>
-	gulp.src('src/app/index.htm')
-		.pipe(debug())
-		.pipe(gulp.dest('debug')),
-	gulp.src('src/app/index.htm')
-		.pipe(htmlMin(htmlMinOption))
-		// 避免 VS Code Linter 出錯
-		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
-		.pipe(gulp.dest('dist'))
+gulp.task('buildHtmlDev', () => gulp.src('src/app/index.htm')
+	.pipe(debug())
+	.pipe(gulp.dest('debug'))
 );
+
+gulp.task('buildHtmlPub', () => gulp.src('src/app/index.htm')
+	.pipe(htmlMin(htmlMinOption))
+	// 避免 VS Code Linter 出錯
+	.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+	.pipe(gulp.dest('dist'))
+);
+
+gulp.task('buildHtml', gulp.series(
+	'buildHtmlDev',
+	'buildHtmlPub'
+));
 
 gulp.task('buildCss', () =>
 	gulp.src('src/app/css/*.css')

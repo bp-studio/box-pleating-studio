@@ -12,6 +12,7 @@
 }
 
 .fa-spin {
+	display: inline-block; /* 這是額外加的 */
 	-webkit-animation: fa-spin 2s linear infinite;
 	animation: fa-spin 2s linear infinite
 }
