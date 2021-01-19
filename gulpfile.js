@@ -119,6 +119,7 @@ gulp.task('buildApp', () =>
 		.pipe(vue())
 		.pipe(concat('main.js'))
 		.pipe(wrap("if(!err&&!wErr) { <%= contents %> }",))
+		.pipe(gulp.dest('debug/'))
 		.pipe(terser(terserOption))
 		.pipe(gulp.dest('dist/'))
 );

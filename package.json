@@ -32,7 +32,7 @@
 		"vinyl-ftp": "^0.6.1",
 		"vue": "^2.6.12",
 		"vue-property-decorator": "^9.0.2",
-		"vue-property-decorator-transpiler": "^2.0.5",
+		"vue-property-decorator-transpiler": "^2.0.6",
 		"vue-template-compiler": "^2.6.12",
 		"workbox-build": "^6.0.2"
 	},

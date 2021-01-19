@@ -20,6 +20,7 @@ function transform(file, encoding, callback) {
 	content = content.replace('<link rel="manifest" href="manifest.json">', "");
 
 	// 替換成偵錯版資源
+	content = content.replace('main.js', '../debug/main.js');
 	content = content.replace('lib/vue.runtime.min.js', '../debug/vue.runtime.js');
 	content = content.replace('lib/paper-core.min.js', '../debug/paper-core.js');
 	content = content.replace('shrewd.min.js', '../debug/shrewd.js');
