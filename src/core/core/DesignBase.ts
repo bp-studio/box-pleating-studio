@@ -247,12 +247,4 @@ abstract class DesignBase extends Mountable {
 	@shrewd private get activeStretches(): Stretch[] {
 		return [...this.stretches.values()].filter(s => s.isActive && !!s.pattern);
 	}
-
-	@shrewd public get overflow() {
-		return Math.max(...[
-			...this.flaps.values(),
-			...this.edges.values(),
-			...this.vertices.values()
-		].map(c => c.view.overflow));
-	}
 }

@@ -62,6 +62,7 @@ gulp.task('buildCore', () =>
 
 gulp.task('buildCorePub', () =>
 	gulp.src("debug/bpstudio.js")
+		.pipe(ifAnyNewer("dist", { filter: 'bpstudio.js' }))
 		.pipe(wrap(
 			`(function(root,factory){if(typeof define==='function'&&define.amd)
 			{define([],factory);}else if(typeof exports==='object'){module.exports=factory();}
@@ -116,6 +117,7 @@ gulp.task('buildApp', () =>
 		'src/app/components/**/*.vue',
 		'src/app/footer.js'
 	])
+		.pipe(ifAnyNewer("dist", { filter: 'main.js' }))
 		.pipe(vue())
 		.pipe(concat('main.js'))
 		.pipe(wrap("if(!err&&!wErr) { <%= contents %> }",))
@@ -226,7 +228,9 @@ gulp.task('deployDev', gulp.series(
 ));
 
 gulp.task('deployPub', gulp.series(
+	'buildCore',
 	'buildCorePub',
+	'buildApp',
 	'buildLog',
 	'buildNumber',
 	'buildHtml',

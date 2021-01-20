@@ -1368,13 +1368,6 @@ class DesignBase extends Mountable {
     get activeStretches() {
         return [...this.stretches.values()].filter(s => s.isActive && !!s.pattern);
     }
-    get overflow() {
-        return Math.max(...[
-            ...this.flaps.values(),
-            ...this.edges.values(),
-            ...this.vertices.values()
-        ].map(c => c.view.overflow));
-    }
 }
 DesignBase._id = 0;
 __decorate([
@@ -1416,9 +1409,6 @@ __decorate([
 __decorate([
     shrewd
 ], DesignBase.prototype, "activeStretches", null);
-__decorate([
-    shrewd
-], DesignBase.prototype, "overflow", null);
 class SheetObject extends Mountable {
     constructor(sheet) {
         super(sheet);
@@ -1433,6 +1423,7 @@ let Sheet = class Sheet extends Mountable {
         super(design);
         this._activeControlCache = [];
         this._independentRect = new Rectangle(Point.ZERO, Point.ZERO);
+        this.margin = 0;
         this.width = sheet.width;
         this.height = sheet.height;
         this.scale = sheet.scale;
@@ -1491,6 +1482,13 @@ let Sheet = class Sheet extends Mountable {
         }
         this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
     }
+    getMargin() {
+        if (this.design.sheet != this)
+            return;
+        let controls = this.controls.filter((c) => c instanceof ViewedControl);
+        let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;
+        setTimeout(() => this.margin = m, 0);
+    }
 };
 __decorate([
     shrewd
@@ -1545,6 +1543,12 @@ __decorate([
 __decorate([
     shrewd
 ], Sheet.prototype, "_getIndependentRect", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "margin", void 0);
+__decorate([
+    shrewd
+], Sheet.prototype, "getMargin", null);
 Sheet = __decorate([
     shrewd
 ], Sheet);
@@ -2539,6 +2543,7 @@ class ControlView extends View {
     drawSelection() {
         this.renderSelection(this.control.selected);
     }
+    get overflow() { return 0; }
 }
 __decorate([
     shrewd
@@ -3780,7 +3785,6 @@ let Display = class Display {
             includeHiddenElement: false,
         };
         this._printing = false;
-        this.horMargin = 0;
         this._studio = studio;
         studio.$el.appendChild(this.spaceHolder = document.createElement("div"));
         studio.$el.addEventListener("scroll", this.onScroll.bind(this));
@@ -3913,11 +3917,11 @@ let Display = class Display {
             return 1;
         }
     }
-    getHorMargin() {
+    get horMargin() {
         var _a, _b;
-        let m = Math.max(((_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.overflow) !== null && _b !== void 0 ? _b : 0) + 10, this.MARGIN);
-        setTimeout(() => this.horMargin = m, 0);
+        return Math.max(((_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet.margin) !== null && _b !== void 0 ? _b : 0) + 10, this.MARGIN);
     }
+    ;
     get sheetWidth() {
         var _a, _b, _c;
         return ((_c = (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.width) !== null && _c !== void 0 ? _c : 0) * this.scale + this.horMargin * 2;
@@ -4000,10 +4004,7 @@ __decorate([
 ], Display.prototype, "scale", null);
 __decorate([
     shrewd
-], Display.prototype, "horMargin", void 0);
-__decorate([
-    shrewd
-], Display.prototype, "getHorMargin", null);
+], Display.prototype, "horMargin", null);
 __decorate([
     shrewd
 ], Display.prototype, "sheetWidth", null);

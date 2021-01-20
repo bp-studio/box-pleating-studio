@@ -233,12 +233,9 @@
 		}
 	}
 
-	// 這個值如果直接做成計算屬性會導致循環參照，所以要用一個反應方法來延遲更新它
-	@shrewd private horMargin = 0;
-	@shrewd private getHorMargin() {
-		let m = Math.max((this._studio.design?.overflow ?? 0) + 10, this.MARGIN);
-		setTimeout(() => this.horMargin = m, 0);
-	}
+	@shrewd private get horMargin():number {
+		return Math.max((this._studio.design?.sheet.margin ?? 0) + 10, this.MARGIN);
+	};
 
 	@shrewd private get sheetWidth(): number {
 		return (this._studio.design?.sheet?.width ?? 0) * this.scale + this.horMargin * 2;

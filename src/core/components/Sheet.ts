@@ -123,4 +123,14 @@ interface JSheet {
 		}
 		this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
 	}
+
+	// 這個值如果直接做成計算屬性會導致循環參照，所以要用一個反應方法來延遲更新它
+	@shrewd public margin = 0;
+
+	@shrewd private getMargin() {
+		if(this.design.sheet != this) return;
+		let controls = this.controls.filter((c: Control): c is ViewedControl => c instanceof ViewedControl);
+		let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;
+		setTimeout(() => this.margin = m, 0);
+	}
 }

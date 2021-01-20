@@ -1,8 +1,8 @@
- 
+
 //////////////////////////////////////////////////////////////////
 /**
  * ControlView 是具有選取行為的 View 的基底類別。
- * 
+ *
  * 通常這種 View 在單純被選取的時候並不需要全部重新渲染而只需要簡單修改一些元件的樣式，
  * 因此這個類別單獨定義了抽象 renderSelection() 方法來讓子類別實作。
  */
@@ -18,9 +18,12 @@ abstract class ControlView<T extends Control> extends View {
 		this.control = control;
 	}
 
-	@shrewd	private drawSelection() {
+	@shrewd private drawSelection() {
 		this.renderSelection(this.control.selected);
 	}
 
 	protected abstract renderSelection(selected: boolean): void;
+
+	/** 一個 View 的標籤的橫向溢出大小；預設為零 */
+	public get overflow(): number { return 0; }
 }
