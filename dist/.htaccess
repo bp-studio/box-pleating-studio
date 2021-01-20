@@ -1,14 +1,17 @@
-FileETag All
 
 RewriteEngine On
 
+# Reject all requests from the wrong domain
 RewriteCond %{HTTP_HOST} !bpstudio.abstreamace.com$ [NC]
 RewriteRule ^(.*)$ - [R=404,L]
 
+# Force using HTTPS
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-<IfModule mod_expires.c>
-  ExpiresActive on
-  ExpiresDefault "access plus 1 year"
+# Necessary for Safari to prioritize service worker over memeroy cache
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
 </IfModule>

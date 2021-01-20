@@ -1424,6 +1424,7 @@ let Sheet = class Sheet extends Mountable {
         this._activeControlCache = [];
         this._independentRect = new Rectangle(Point.ZERO, Point.ZERO);
         this.margin = 0;
+        this.scroll = { x: 0, y: 0 };
         this.width = sheet.width;
         this.height = sheet.height;
         this.scale = sheet.scale;
@@ -1549,6 +1550,9 @@ __decorate([
 __decorate([
     shrewd
 ], Sheet.prototype, "getMargin", null);
+__decorate([
+    shrewd
+], Sheet.prototype, "scroll", void 0);
 Sheet = __decorate([
     shrewd
 ], Sheet);
@@ -3774,7 +3778,6 @@ let Display = class Display {
     constructor(studio) {
         this.MARGIN = 30;
         this.lockViewport = false;
-        this.scroll = { x: 0, y: 0 };
         this.settings = {
             showAxialParallel: true,
             showGrid: true,
@@ -3899,8 +3902,16 @@ let Display = class Display {
         }, 1000);
     }
     onScroll() {
-        this.scroll.x = this._studio.$el.scrollLeft;
-        this.scroll.y = this._studio.$el.scrollTop;
+        var _a;
+        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+        if (sheet) {
+            sheet.scroll.x = this._studio.$el.scrollLeft;
+            sheet.scroll.y = this._studio.$el.scrollTop;
+        }
+    }
+    get scroll() {
+        var _a, _b;
+        return (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet.scroll) !== null && _b !== void 0 ? _b : { x: 0, y: 0 };
     }
     get scale() {
         if (this._studio.design && this._studio.design.sheet) {
@@ -3937,9 +3948,10 @@ let Display = class Display {
         return this.sheetHeight > this.viewHeight + 1;
     }
     getAutoScale() {
-        var _a, _b, _c, _d, _e, _f;
-        let ws = (this.viewWidth - this.horMargin * 2) / ((_c = (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.width) !== null && _c !== void 0 ? _c : 1);
-        let hs = (this.viewHeight - this.MARGIN * 2) / ((_f = (_e = (_d = this._studio.design) === null || _d === void 0 ? void 0 : _d.sheet) === null || _e === void 0 ? void 0 : _e.height) !== null && _f !== void 0 ? _f : 1);
+        var _a, _b, _c;
+        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+        let ws = (this.viewWidth - this.horMargin * 2) / ((_b = sheet === null || sheet === void 0 ? void 0 : sheet.width) !== null && _b !== void 0 ? _b : 1);
+        let hs = (this.viewHeight - this.MARGIN * 2) / ((_c = sheet === null || sheet === void 0 ? void 0 : sheet.height) !== null && _c !== void 0 ? _c : 1);
         return Math.min(ws, hs);
     }
     isScrollable() {
@@ -3955,6 +3967,14 @@ let Display = class Display {
         this.project.layers[Layer.axisParallel].visible = this.settings.showAxialParallel;
         this.project.layers[Layer.label].visible = this.settings.showLabel;
         this.project.layers[Layer.dot].visible = this.settings.showDot || notLayout;
+    }
+    onSheetChange() {
+        var _a;
+        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+        if (sheet) {
+            this._studio.$el.scrollLeft = sheet.scroll.x;
+            this._studio.$el.scrollTop = sheet.scroll.y;
+        }
     }
     render() {
         let width = 0, height = 0, s = this.scale;
@@ -3995,9 +4015,6 @@ __decorate([
 ], Display.prototype, "viewHeight", void 0);
 __decorate([
     shrewd
-], Display.prototype, "scroll", void 0);
-__decorate([
-    shrewd
 ], Display.prototype, "settings", void 0);
 __decorate([
     shrewd
@@ -4023,6 +4040,9 @@ __decorate([
 __decorate([
     shrewd
 ], Display.prototype, "renderSetting", null);
+__decorate([
+    shrewd
+], Display.prototype, "onSheetChange", null);
 __decorate([
     shrewd
 ], Display.prototype, "render", null);

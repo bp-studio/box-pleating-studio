@@ -133,4 +133,6 @@ interface JSheet {
 		let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;
 		setTimeout(() => this.margin = m, 0);
 	}
+
+	@shrewd public scroll: IPoint = { x: 0, y: 0 };
 }

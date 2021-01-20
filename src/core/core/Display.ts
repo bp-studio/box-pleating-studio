@@ -30,8 +30,6 @@
 
 	private _canvas: HTMLCanvasElement;
 
-	@shrewd private scroll: IPoint = { x: 0, y: 0 };
-
 	@shrewd public settings: DisplaySetting = {
 		showAxialParallel: true,
 		showGrid: true,
@@ -215,8 +213,15 @@
 	}
 
 	private onScroll(): void {
-		this.scroll.x = this._studio.$el.scrollLeft;
-		this.scroll.y = this._studio.$el.scrollTop;
+		let sheet = this._studio.design?.sheet;
+		if(sheet) {
+			sheet.scroll.x = this._studio.$el.scrollLeft;
+			sheet.scroll.y = this._studio.$el.scrollTop;
+		}
+	}
+
+	private get scroll(): IPoint {
+		return this._studio.design?.sheet.scroll ?? { x: 0, y: 0 };
 	}
 
 	@shrewd public get scale() {
@@ -233,7 +238,7 @@
 		}
 	}
 
-	@shrewd private get horMargin():number {
+	@shrewd private get horMargin(): number {
 		return Math.max((this._studio.design?.sheet.margin ?? 0) + 10, this.MARGIN);
 	};
 
@@ -254,8 +259,9 @@
 	}
 
 	public getAutoScale(): number {
-		let ws = (this.viewWidth - this.horMargin * 2) / (this._studio.design?.sheet?.width ?? 1);
-		let hs = (this.viewHeight - this.MARGIN * 2) / (this._studio.design?.sheet?.height ?? 1);
+		let sheet = this._studio.design?.sheet;
+		let ws = (this.viewWidth - this.horMargin * 2) / (sheet?.width ?? 1);
+		let hs = (this.viewHeight - this.MARGIN * 2) / (sheet?.height ?? 1);
 		return Math.min(ws, hs);
 	}
 
@@ -272,6 +278,14 @@
 		this.project.layers[Layer.axisParallel].visible = this.settings.showAxialParallel;
 		this.project.layers[Layer.label].visible = this.settings.showLabel;
 		this.project.layers[Layer.dot].visible = this.settings.showDot || notLayout;
+	}
+
+	@shrewd private onSheetChange() {
+		let sheet = this._studio.design?.sheet;
+		if(sheet) {
+			this._studio.$el.scrollLeft = sheet.scroll.x;
+			this._studio.$el.scrollTop = sheet.scroll.y;
+		}
 	}
 
 	@shrewd public render() {
