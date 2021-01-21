@@ -20,6 +20,10 @@
 					{{$t('toolbar.help.news')}}
 					<div class="notify" v-if="notify"></div>
 				</div>
+				<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank">
+					<i class="far fa-comment-dots"></i>
+					{{$t("toolbar.help.discussions")}}
+				</a>
 				<div class="dropdown-item" @click="update" v-if="core.updated">
 					<i class="far fa-arrow-alt-circle-up"></i>
 					{{$t('toolbar.help.update')}}

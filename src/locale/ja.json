@@ -107,7 +107,8 @@
 			"donation": "寄付",
 			"title": "ヘルプ",
 			"news": "バージョン情報",
-			"update": "更新する準備ができました"
+			"update": "更新する準備ができました",
+			"discussions": "議論"
 		},
 		"panel": "オプションパネル",
 		"project": {

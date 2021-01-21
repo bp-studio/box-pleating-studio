@@ -65,7 +65,8 @@
 			"about": "About",
 			"news": "Version info",
 			"update": "Ready to update",
-			"donation": "Donation"
+			"donation": "Donation",
+			"discussions": "Discussions"
 		},
 		"view": {
 			"tree": "Tree structure",
