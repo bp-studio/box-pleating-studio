@@ -21,7 +21,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "768"
+			app_version: "769"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -117,12 +117,13 @@
 				}
 				if(errorOB) errorOB.disconnect();
 			};
-			window.onerror = function(a, b, c, d) {
+			window.onerror = function(a, b, c, d, e) {
 				wErr = [
 					a.replace(/^.+: (.+)$/, "$1"), // error message
 					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"), // path
-					c,	// line number
-					d	// column number
+					c,				// line number
+					d,				// column number
+					e && e.stack	// stack trace
 				].toString();
 			}
 			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
