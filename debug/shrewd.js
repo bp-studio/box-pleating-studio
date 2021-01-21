@@ -1,6 +1,6 @@
 /**
- * shrewd v0.0.9
- * (c) 2019-2020 Mu-Tsun Tsai
+ * shrewd v0.0.10
+ * (c) 2019-2021 Mu-Tsun Tsai
  * Released under the MIT License.
  */
 ;
@@ -276,8 +276,8 @@
         $terminate() {
             if (this._isTerminated)
                 return;
-            for (let memeber of this._members.values())
-                memeber.$terminate();
+            for (let member of this._members.values())
+                member.$terminate();
             this._isTerminated = true;
         }
         $getMember(key) {
@@ -385,13 +385,10 @@
             }
         }
         static $checkDeadEnd(observable) {
-            if (observable instanceof Observer && !observable._isTerminated) {
-                if (!(observable._isActive = observable.$checkActive())) {
-                    let oldReferences = new Set(observable._reference);
-                    Core.$dequeue(observable);
-                    for (let ref of oldReferences) {
-                        Observer.$checkDeadEnd(ref);
-                    }
+            if (observable instanceof Observer && !observable._isTerminated && observable._isActive && !(observable._isActive = observable.$checkActive())) {
+                Core.$dequeue(observable);
+                for (let ref of observable._reference) {
+                    Observer.$checkDeadEnd(ref);
                 }
             }
         }
@@ -597,7 +594,7 @@
         }
     }
     Helper._proxyMap = new WeakMap();
-    class DecoratedMemeber extends Observer {
+    class DecoratedMember extends Observer {
         constructor(parent, descriptor) {
             super(descriptor.$class + '.' + descriptor.$key.toString());
             this._descriptor = descriptor;
@@ -741,7 +738,7 @@
         }
     }
     MapHelper._handler = new MapProxyHandler();
-    class ComputedProperty extends DecoratedMemeber {
+    class ComputedProperty extends DecoratedMember {
         constructor(parent, descriptor) {
             super(parent, descriptor);
             this._getter = descriptor.$method;
@@ -769,7 +766,7 @@
             return this._value;
         }
     }
-    class ObservableProperty extends DecoratedMemeber {
+    class ObservableProperty extends DecoratedMember {
         constructor(parent, descriptor) {
             super(parent, descriptor);
             this._initialized = false;
@@ -899,7 +896,7 @@
         }
     }
     ObservableProperty._interceptor = {};
-    class ReactiveMethod extends DecoratedMemeber {
+    class ReactiveMethod extends DecoratedMember {
         constructor(parent, descriptor) {
             super(parent, descriptor);
             this._method = descriptor.$method;

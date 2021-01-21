@@ -31,6 +31,7 @@
 	import * as bootstrap from 'bootstrap';
 	import JSZip from 'jszip';
 
+	import Spinner from './gadget/spinner.vue';
 	import Confirm from './dialog/confirm.vue';
 	import Alert from './dialog/alert.vue';
 
@@ -62,6 +63,8 @@
 		private heartbeat: number | null = null;
 		private languages: string[] = [];
 		private mdlLanguage: Bootstrap.Modal;
+
+		public loader: Spinner;
 
 		private get i18n() { return i18n; }
 

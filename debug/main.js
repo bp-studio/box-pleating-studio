@@ -104,7 +104,7 @@ const InputMixin = { data() { return { id: "field" + this._uid, v: null, focused
         } }, mounted() { this.v = this.value; } };
 
 Vue.component('app', { render() { with (this) {
-        return _c('div', { attrs: { "id": "app" }, on: { "mousedown": function ($event) { $event.stopPropagation(); }, "touchstart": function ($event) { $event.stopPropagation(); } } }, [_c('toolbar', { on: { "panel": function ($event) { showPanel = !showPanel; }, "share": function ($event) { return show('share'); }, "about": function ($event) { return show('about'); }, "news": function ($event) { return show('ver'); }, "pref": function ($event) { return show('pref'); } } }), _v(" "), (!design) ? _c('welcome') : _e(), _v(" "), _c('div', { class: { 'show': showPanel }, attrs: { "id": "divShade" }, on: { "mousedown": function ($event) { showPanel = false; }, "touchstart": function ($event) { showPanel = false; } } }), _v(" "), _c('panel', { attrs: { "show": showPanel } }), _v(" "), _c('dpad'), _v(" "), _c('share', { ref: "share" }), _v(" "), _c('about', { ref: "about" }), _v(" "), _c('version', { ref: "ver" }), _v(" "), _c('preference', { ref: "pref" })], 1);
+        return _c('div', { attrs: { "id": "app" }, on: { "mousedown": function ($event) { $event.stopPropagation(); }, "touchstart": function ($event) { $event.stopPropagation(); } } }, [_c('toolbar', { on: { "panel": function ($event) { showPanel = !showPanel; }, "share": function ($event) { return show('share'); }, "about": function ($event) { return show('about'); }, "news": function ($event) { return show('ver'); }, "pref": function ($event) { return show('pref'); } } }), _v(" "), _c('welcome'), _v(" "), _c('spinner'), _v(" "), _c('div', { class: { 'show': showPanel }, attrs: { "id": "divShade" }, on: { "mousedown": function ($event) { showPanel = false; }, "touchstart": function ($event) { showPanel = false; } } }), _v(" "), _c('panel', { attrs: { "show": showPanel } }), _v(" "), _c('dpad'), _v(" "), _c('share', { ref: "share" }), _v(" "), _c('about', { ref: "about" }), _v(" "), _c('version', { ref: "ver" }), _v(" "), _c('preference', { ref: "pref" })], 1);
     } }, mixins: [BaseComponent], data() { return { showPanel: false }; }, methods: { show(el) {
             this.$refs[el].show();
         } }, mounted() {
@@ -119,7 +119,7 @@ Vue.component('app', { render() { with (this) {
 
 Vue.component('core', { render() { with (this) {
         return _c('div', [_c('confirm', { ref: "confirm" }), _v(" "), _c('alert', { ref: "alert" }), _v(" "), (design && design.patternNotFound) ? _c('note') : _e(), _v(" "), _c('div', { ref: "mdlLanguage", staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content" }, [_c('div', { staticClass: "modal-body" }, [_c('div', { staticClass: "row" }, _l((languages), function (l) { return _c('div', { key: l, staticClass: "col text-center" }, [_c('button', { staticClass: "w-100 btn btn-light", attrs: { "data-bs-dismiss": "modal" }, on: { "click": function ($event) { i18n.locale = l; } } }, [_c('img', { attrs: { "src": 'assets/flags/' + $t('flag', l) + '.png', "alt": $t('flag', l), "width": "64", "height": "64" } }), _v(" "), _c('br'), _v("\n\t\t\t\t\t\t\t\t" + _s($t('name', l)) + "\n\t\t\t\t\t\t\t")])]); }), 0)])])])])], 1);
-    } }, data() { return { designs: [], tabHistory: [], autoSave: true, showDPad: true, updated: false, isTouch: undefined, libReady: undefined, initialized: false, id: new Date().getTime(), heartbeat: null, languages: [], mdlLanguage: undefined, dropdown: null }; }, watch: { 'i18n.locale'() { this.onLocaleChanged(); } }, computed: { i18n() { return i18n; }, copyright() {
+    } }, data() { return { designs: [], tabHistory: [], autoSave: true, showDPad: true, updated: false, isTouch: undefined, libReady: undefined, initialized: false, id: new Date().getTime(), heartbeat: null, languages: [], mdlLanguage: undefined, loader: undefined, dropdown: null }; }, watch: { 'i18n.locale'() { this.onLocaleChanged(); } }, computed: { i18n() { return i18n; }, copyright() {
             let y = new Date().getFullYear();
             let end = y > 2020 ? "-" + y : "";
             return this.$t('welcome.copyright', [end]);
@@ -367,10 +367,8 @@ Vue.component('dpad', { render() { with (this) {
         } } });
 
 Vue.component('welcome', { render() { with (this) {
-        return _c('div', { staticClass: "welcome p-3", attrs: { "id": "divWelcome" } }, [(core.initialized) ? [_c('div', [_c('h2', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.title'), expression: "'welcome.title'" }], staticClass: "d-none d-sm-block" }), _v(" "), _c('h3', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.title'), expression: "'welcome.title'" }], staticClass: "d-sm-none" }), _v(" "), _c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.intro[0]'), expression: "'welcome.intro[0]'" }], staticClass: "mt-4" }), _v(" "), _c('i18n', { attrs: { "path": "welcome.intro[1]", "tag": "p" } }, [_c('a', { attrs: { "target": "_blank", "rel": "noopener", "href": "https://github.com/MuTsunTsai/box-pleating-studio" } }, [_v("GitHub")])])], 1), _v(" "), _c('div', { staticClass: "browser-only" }, [((bi || ios) && !install) ? _c('div', [_c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.hint'), expression: "'welcome.install.hint'" }] }), _v(" "), (ios) ? _c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ios'), expression: "'welcome.install.ios'" }] }) : _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.bt'), expression: "'welcome.install.bt'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return bi.prompt(); } } })]) : _e(), _v(" "), (install == 1) ? _c('div', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ing'), expression: "'welcome.install.ing'" }] }) : _e(), _v(" "), (install == 2) ? _c('div', [_c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ed'), expression: "'welcome.install.ed'" }] }), _v(" "), _c('a', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.open'), expression: "'welcome.install.open'" }], staticClass: "btn btn-primary", attrs: { "rel": "noopener", "href": "https://bpstudio.abstreamace.com/", "target": "_blank" } })]) : _e()])] : _c('div', { staticClass: "h-100 d-flex text-center align-items-center" }, [_m(0)]), _v(" "), _c('div', { staticStyle: { "position": "absolute", "bottom": "1rem", "right": "1rem" } }, [_v(_s(core.copyright))])], 2);
-    } }, staticRenderFns: [function () { with (this) {
-            return _c('div', { staticStyle: { "font-size": "min(15vh,15vw)", "color": "gray", "flex-grow": "1" } }, [_c('i', { staticClass: "bp-spinner fa-spin" })]);
-        } }], data() { return { bi: undefined, install: 0, ios: navigator.standalone === false }; }, computed: { core() { return core; } }, methods: { detectInstallation() {
+        return (!core.design && core.initialized) ? _c('div', { staticClass: "welcome p-3", attrs: { "id": "divWelcome" } }, [_c('div', [_c('h2', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.title'), expression: "'welcome.title'" }], staticClass: "d-none d-sm-block" }), _v(" "), _c('h3', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.title'), expression: "'welcome.title'" }], staticClass: "d-sm-none" }), _v(" "), _c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.intro[0]'), expression: "'welcome.intro[0]'" }], staticClass: "mt-4" }), _v(" "), _c('i18n', { attrs: { "path": "welcome.intro[1]", "tag": "p" } }, [_c('a', { attrs: { "target": "_blank", "rel": "noopener", "href": "https://github.com/MuTsunTsai/box-pleating-studio" } }, [_v("GitHub")])])], 1), _v(" "), _c('div', { staticClass: "browser-only" }, [((bi || ios) && !install) ? _c('div', [_c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.hint'), expression: "'welcome.install.hint'" }] }), _v(" "), (ios) ? _c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ios'), expression: "'welcome.install.ios'" }] }) : _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.bt'), expression: "'welcome.install.bt'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return bi.prompt(); } } })]) : _e(), _v(" "), (install == 1) ? _c('div', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ing'), expression: "'welcome.install.ing'" }] }) : _e(), _v(" "), (install == 2) ? _c('div', [_c('p', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.ed'), expression: "'welcome.install.ed'" }] }), _v(" "), _c('a', { directives: [{ name: "t", rawName: "v-t", value: ('welcome.install.open'), expression: "'welcome.install.open'" }], staticClass: "btn btn-primary", attrs: { "rel": "noopener", "href": "https://bpstudio.abstreamace.com/", "target": "_blank" } })]) : _e()]), _v(" "), _c('div', { staticStyle: { "position": "absolute", "bottom": "1rem", "right": "1rem" } }, [_v(_s(core.copyright))])]) : _e();
+    } }, data() { return { bi: undefined, install: 0, ios: navigator.standalone === false }; }, computed: { core() { return core; } }, methods: { detectInstallation() {
             if ('getInstalledRelatedApps' in navigator) {
                 navigator.getInstalledRelatedApps().then(apps => {
                     if (apps.length)
@@ -675,6 +673,30 @@ Vue.component('number', { render() { with (this) {
             Shrewd.commit();
         } } });
 
+Vue.component('spinner', { render() { with (this) {
+        return _c('div', { directives: [{ name: "show", rawName: "v-show", value: (!core.initialized || loading), expression: "!core.initialized||loading" }], staticClass: "welcome", class: { 'shift-down': core.designs.length } }, [_m(0)]);
+    } }, staticRenderFns: [function () { with (this) {
+            return _c('div', { staticClass: "h-100 d-flex text-center align-items-center" }, [_c('div', { staticStyle: { "font-size": "min(15vh,15vw)", "color": "gray", "flex-grow": "1" } }, [_c('i', { staticClass: "bp-spinner fa-spin" })])]);
+        } }], data() { return { loading: false }; }, computed: { core() { return core; } }, methods: { show() {
+            this.loading = true;
+            /**
+             * 在 Safari 裡面，如果沒有等候到動畫畫面渲染完畢就繼續執行 JavaScript，
+             * 結果就是動畫永遠不會出現。用 setTimeout 來延遲當然是一個辦法，
+             * 但是我們並無法精確知道要延遲多久才夠，而且對其它瀏覽器來說也是不必要的等候，
+             * 因此這邊我設置一個 Promise 來確定動畫開始，然後才繼續下一個步驟。
+             */
+            return new Promise(resolve => {
+                // 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
+                let to = setTimeout(() => resolve(), 1000);
+                this.$el.addEventListener("animationstart", () => {
+                    clearTimeout(to);
+                    resolve();
+                }, { once: true });
+            });
+        }, hide() {
+            this.loading = false;
+        } }, mounted() { core.loader = this; } });
+
 Vue.component('store', { render() { with (this) {
         return _c('div', { staticClass: "row mb-1" }, [_c('label', { staticClass: "col-form-label col-5" }, [_v(_s(label))]), _v(" "), _c('div', { staticClass: "col-7" }, [_c('div', { staticClass: "input-group" }, [_c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "type": "button" }, on: { "click": function ($event) { return data.move(-1); } } }, [_c('i', { staticClass: "fas fa-arrow-left" })]), _v(" "), _c('input', { staticClass: "form-control text-center", attrs: { "readonly": "", "type": "text" }, domProps: { "value": (data.index + 1) + ' / ' + data.size } }), _v(" "), _c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "type": "button" }, on: { "click": function ($event) { return data.move(1); } } }, [_c('i', { staticClass: "fas fa-arrow-right" })])])])]);
     } }, props: { data: Object, label: String } });
@@ -799,9 +821,11 @@ Vue.component('filemenu', { render() { with (this) {
             this.$refs.png.reset();
         }, async upload(event) {
             let f = event.target;
+            await core.loader.show();
             await this.openFiles(f.files);
             f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
             gtag('event', 'project_open');
+            core.loader.hide();
         }, async openFiles(files) {
             if (files.length)
                 for (let i = 0; i < files.length; i++)

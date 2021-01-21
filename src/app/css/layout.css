@@ -56,7 +56,7 @@
 }
 
 @media screen and (max-width: 650px) {
-	#divWorkspace, #divShade, #divPanel {
+	#divWorkspace, #divShade, #divPanel, .shift-down {
 		top: 6.15rem;
 	}
 }

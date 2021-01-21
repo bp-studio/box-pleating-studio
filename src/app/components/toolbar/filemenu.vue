@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
+	import { Vue, Component } from 'vue-property-decorator';
 	import { FileFactory, sanitize, readFile, bufferToText } from '../import/types';
 	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
@@ -138,9 +138,11 @@
 
 		public async upload(event) {
 			let f = event.target;
+			await core.loader.show();
 			await this.openFiles(f.files)
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
 			gtag('event', 'project_open');
+			core.loader.hide();
 		}
 		public async openFiles(files: FileList) {
 			if(files.length) for(let i = 0; i < files.length; i++) await this.open(files[i]);

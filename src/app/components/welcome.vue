@@ -1,37 +1,30 @@
 <template>
-	<div id="divWelcome" class="welcome p-3">
-		<template v-if="core.initialized">
-			<div>
-				<h2 class="d-none d-sm-block" v-t="'welcome.title'"></h2>
-				<h3 class="d-sm-none" v-t="'welcome.title'"></h3>
+	<div id="divWelcome" class="welcome p-3" v-if="!core.design&&core.initialized">
+		<div>
+			<h2 class="d-none d-sm-block" v-t="'welcome.title'"></h2>
+			<h3 class="d-sm-none" v-t="'welcome.title'"></h3>
 
-				<p class="mt-4" v-t="'welcome.intro[0]'"></p>
-				<i18n path="welcome.intro[1]" tag="p">
-					<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio">GitHub</a>
-				</i18n>
+			<p class="mt-4" v-t="'welcome.intro[0]'"></p>
+			<i18n path="welcome.intro[1]" tag="p">
+				<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio">GitHub</a>
+			</i18n>
+		</div>
+		<div class="browser-only">
+			<div v-if="(bi||ios)&&!install">
+				<p v-t="'welcome.install.hint'"></p>
+				<p v-if="ios" v-t="'welcome.install.ios'"></p>
+				<button v-else class="btn btn-primary" @click="bi.prompt()" v-t="'welcome.install.bt'"></button>
 			</div>
-			<div class="browser-only">
-				<div v-if="(bi||ios)&&!install">
-					<p v-t="'welcome.install.hint'"></p>
-					<p v-if="ios" v-t="'welcome.install.ios'"></p>
-					<button v-else class="btn btn-primary" @click="bi.prompt()" v-t="'welcome.install.bt'"></button>
-				</div>
-				<div v-if="install==1" v-t="'welcome.install.ing'"></div>
-				<div v-if="install==2">
-					<p v-t="'welcome.install.ed'"></p>
-					<a
-						class="btn btn-primary"
-						rel="noopener"
-						href="https://bpstudio.abstreamace.com/"
-						target="_blank"
-						v-t="'welcome.install.open'"
-					></a>
-				</div>
-			</div>
-		</template>
-		<div v-else class="h-100 d-flex text-center align-items-center">
-			<div style="font-size:10rem; font-size:min(15vh,15vw); color:gray; flex-grow:1;">
-				<i class="bp-spinner fa-spin"></i>
+			<div v-if="install==1" v-t="'welcome.install.ing'"></div>
+			<div v-if="install==2">
+				<p v-t="'welcome.install.ed'"></p>
+				<a
+					class="btn btn-primary"
+					rel="noopener"
+					href="https://bpstudio.abstreamace.com/"
+					target="_blank"
+					v-t="'welcome.install.open'"
+				></a>
 			</div>
 		</div>
 		<div style="position:absolute; bottom:1rem; right:1rem;">{{core.copyright}}</div>

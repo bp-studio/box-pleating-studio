@@ -1,6 +1,6 @@
 /**
- * shrewd v0.0.9
- * (c) 2019-2020 Mu-Tsun Tsai
+ * shrewd v0.0.10
+ * (c) 2019-2021 Mu-Tsun Tsai
  * Released under the MIT License.
  */
 
