@@ -29,7 +29,6 @@
 		@Prop(String) public title: string;
 		@Prop(Boolean) public notify: boolean;
 
-		private bt: any;
 		private dropdown: bootstrap.Dropdown;
 
 		mounted() {

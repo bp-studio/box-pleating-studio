@@ -5,7 +5,6 @@
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator';
 	import { core } from '../core.vue';
-	import { bp } from '../import/BPStudio';
 
 	@Component
 	export default class KeyButton extends Vue {

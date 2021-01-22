@@ -9,8 +9,6 @@
 
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
-	import { Shrewd } from '../import/BPStudio';
-	import InputMixin from '../mixins/inputMixin';
 
 	@Component
 	export default class Uploader extends Vue {

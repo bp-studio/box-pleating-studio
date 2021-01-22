@@ -22,7 +22,7 @@
 				let active = document.activeElement;
 				if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
 				if(e.ctrlKey) {
-					event.preventDefault();
+					e.preventDefault();
 					if(e.key == "z") {}
 					if(e.key == "y") {}
 				}

@@ -38,18 +38,18 @@
 		@Prop(null) public min?: number;
 		@Prop(null) public max?: number;
 
-		public input(event) {
-			let v = Number(event.target.value);
+		public input(event: InputEvent) {
+			let v = Number((event.target as HTMLInputElement).value);
 			if(v < this.min || v > this.max) return;
 			this.v = v;
 			this.$emit('input', this.v);
 		}
-		public change(by) {
+		public change(by: number) {
 			if(this.v + by < this.min || this.v + by > this.max) return;
 			this.$emit('input', this.v + by);
 			return this.v + by;
 		}
-		public wheel(event) {
+		public wheel(event: WheelEvent) {
 			event.stopPropagation();
 			event.preventDefault();
 			let by = Math.round(-event.deltaY / 100);

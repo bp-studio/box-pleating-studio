@@ -12,8 +12,6 @@
 	import { bp } from './import/BPStudio';
 	import { core } from './core.vue';
 
-	declare const gtag: any;
-
 	@Component
 	export default class DPad extends Vue {
 		private get show() { return core.shouldShowDPad; }

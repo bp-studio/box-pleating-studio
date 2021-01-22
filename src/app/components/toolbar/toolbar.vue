@@ -72,13 +72,13 @@
 				>
 					<div class="tab-close" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
 						<div>{{getTitle(id)}}</div>
-						<div class="px-2" @click.stop="core.close(id)">
+						<div class="px-2" @click.stop="core.close(id)" @pointerdown.stop @mousedown.stop>
 							<i class="fas fa-times"></i>
 						</div>
 					</div>
 					<div class="tab-down" :title="getDesign(id).title">
 						<div>{{getTitle(id)}}</div>
-						<div class="px-2" @click.stop="tabMenu($event, id)">
+						<div class="px-2" @click.stop="tabMenu($event, id)" @pointerdown.stop @touchstart.stop>
 							<i class="fas fa-caret-down"></i>
 						</div>
 					</div>

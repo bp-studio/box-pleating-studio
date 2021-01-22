@@ -25,7 +25,6 @@
 
 <script lang="ts">
 	import { Vue, Component, Watch } from 'vue-property-decorator';
-	import { set } from 'vue/types/umd';
 	import { bp, Shrewd } from './import/BPStudio';
 	import { sanitize, callService } from './import/types';
 	import * as bootstrap from 'bootstrap';

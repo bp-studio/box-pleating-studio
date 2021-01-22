@@ -50,7 +50,6 @@
 
 	declare const LZ: any;
 	declare const gtag: any;
-	declare const VueClipboard: any;
 
 	@Component
 	export default class Share extends BaseComponent {

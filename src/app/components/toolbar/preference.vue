@@ -32,8 +32,8 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Watch } from 'vue-property-decorator';
-	import { bp, Design } from '../import/BPStudio';
+	import { Vue, Component } from 'vue-property-decorator';
+	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import * as bootstrap from 'bootstrap';
 

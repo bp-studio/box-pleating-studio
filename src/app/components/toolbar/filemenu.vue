@@ -40,12 +40,11 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
 	import { FileFactory, sanitize, readFile, bufferToText } from '../import/types';
 	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import JSZip from 'jszip';
-	import $ from 'jquery/index';
 
 	declare const gtag: any;
 
@@ -54,7 +53,6 @@
 
 	@Component
 	export default class FileMenu extends BaseComponent {
-		private get core() { return core; }
 
 		mounted() {
 			document.body.addEventListener('dragover', e => {
@@ -72,7 +70,7 @@
 				let active = document.activeElement;
 				if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
 				if(e.ctrlKey && ["o", "s", "p"].includes(e.key)) {
-					event.preventDefault();
+					e.preventDefault();
 					if(e.key == "o") (this.$refs.open as any).click();
 					if(e.key == "s" && core.design) (this.$refs.bps as any).download();
 					if(e.key == "p" && core.design) window.print();
@@ -136,8 +134,8 @@
 			(this.$refs.png as Download).reset();
 		}
 
-		public async upload(event) {
-			let f = event.target;
+		public async upload(event: Event) {
+			let f = event.target as HTMLInputElement;
 			await core.loader.show();
 			await this.openFiles(f.files)
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
