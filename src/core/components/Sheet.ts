@@ -63,7 +63,7 @@ interface JSheet {
 	}) public scale: number;
 
 	private getMinScale() {
-		return Math.ceil(this.$studio?.$display.getAutoScale() ?? 10);
+		return Math.ceil(this.design.display.getAutoScale(this) ?? 10);
 	}
 
 	constructor(design: Design, sheet: JSheet, ...maps: IterableFactory<Control>[]) {

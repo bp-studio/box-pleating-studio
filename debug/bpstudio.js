@@ -1447,8 +1447,8 @@ let Sheet = class Sheet extends Mountable {
         return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
     }
     getMinScale() {
-        var _a, _b;
-        return Math.ceil((_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.getAutoScale()) !== null && _b !== void 0 ? _b : 10);
+        var _a;
+        return Math.ceil((_a = this.design.display.getAutoScale(this)) !== null && _a !== void 0 ? _a : 10);
     }
     get design() {
         return this.mountTarget;
@@ -1926,6 +1926,9 @@ let Design = class Design extends DesignBase {
     }
     get design() {
         return this;
+    }
+    get display() {
+        return this.mountTarget.$display;
     }
     toJSON() {
         this.tree.generateJID();
@@ -3958,9 +3961,9 @@ let Display = class Display {
     get isYScrollable() {
         return this.sheetHeight > this.viewHeight + 1;
     }
-    getAutoScale() {
+    getAutoScale(sheet) {
         var _a, _b, _c;
-        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+        sheet = sheet || ((_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet);
         let ws = (this.viewWidth - this.horMargin * 2) / ((_b = sheet === null || sheet === void 0 ? void 0 : sheet.width) !== null && _b !== void 0 ? _b : 1);
         let hs = (this.viewHeight - this.MARGIN * 2) / ((_c = sheet === null || sheet === void 0 ? void 0 : sheet.height) !== null && _c !== void 0 ? _c : 1);
         return Math.min(ws, hs);

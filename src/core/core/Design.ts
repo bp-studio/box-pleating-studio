@@ -56,6 +56,10 @@ interface IDesignObject {
 		return this;
 	}
 
+	public get display(): Display {
+		return (this.mountTarget as BPStudio).$display;
+	}
+
 	public toJSON(): JDesign {
 		this.tree.generateJID();
 		let result = {

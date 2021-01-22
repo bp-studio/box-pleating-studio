@@ -258,8 +258,8 @@
 		return this.sheetHeight > this.viewHeight + 1; // 加 1 以避免浮點數誤觸
 	}
 
-	public getAutoScale(): number {
-		let sheet = this._studio.design?.sheet;
+	public getAutoScale(sheet?: Sheet): number {
+		sheet = sheet || this._studio.design?.sheet;
 		let ws = (this.viewWidth - this.horMargin * 2) / (sheet?.width ?? 1);
 		let hs = (this.viewHeight - this.MARGIN * 2) / (sheet?.height ?? 1);
 		return Math.min(ws, hs);
