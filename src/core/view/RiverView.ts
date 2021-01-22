@@ -27,7 +27,7 @@
 
 		let edge = this.control.edge;
 		let a: readonly TreeEdge[];
-		let c: readonly [Flap, TreeNode][];
+		let c: readonly string[];
 
 		if(edge.wrapSide == 0) {
 			c = this.toComponents(edge.l1, edge.n1).concat(this.toComponents(edge.l2, edge.n2));
@@ -41,8 +41,8 @@
 		return { adjacent: a, length: edge.length, components: c };
 	}
 
-	private toComponents(l: readonly TreeNode[], n: TreeNode): [Flap, TreeNode][] {
-		return l.map(l => [this.design.flaps.get(l)!, n]);
+	private toComponents(l: readonly TreeNode[], n: TreeNode): string[] {
+		return l.map(l => l.id + "," + n.id);
 	}
 
 	public get design(): Design {
@@ -52,7 +52,7 @@
 	/** 建立一系列監視元件 */
 	private readonly components = new Mapping(
 		() => this.info.components,
-		([f, n]) => new RiverComponent(this, f, n)
+		key => new RiverComponent(this, key)
 	);
 
 	protected onDispose() {
@@ -67,7 +67,9 @@
 		for(let component of this.components.values()) {
 			let c = component.contour;
 			if(path.isEmpty()) path = c;
-			else path = path.unite(c, { insert: false });
+			else {
+				path = path.unite(c, { insert: false });
+			}
 		}
 		return path;
 	}
@@ -164,7 +166,7 @@
 interface RiverInfo {
 	readonly adjacent: readonly TreeEdge[];
 	readonly length: number;
-	readonly components: readonly [Flap, TreeNode][];
+	readonly components: readonly string[];
 }
 
 //////////////////////////////////////////////////////////////////
@@ -179,11 +181,25 @@ interface RiverInfo {
 
 @shrewd class RiverComponent extends Disposable {
 
-	constructor(private view: RiverView, private flap: Flap, private node: TreeNode) { super(view); }
+	private flap: Flap;
+	private node: TreeNode;
+
+	constructor(private view: RiverView, private key: string) {
+		super(view);
+		let [f, n] = key.split(',').map(v => Number(v));
+		this.flap = view.design.flapsById.get(f)!;
+		this.node = view.design.tree.node.get(n)!;
+	}
 
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.flap.disposed ||
-			!this.view.info.components.some(c => c[0] == this.flap);
+			!this.view.info.components.some(c => c == this.key);
+	}
+
+	protected onDispose() {
+		let self = this as any;
+		delete self.flap;
+		delete self.node;
 	}
 
 	@shrewd private get distance(): number {

@@ -2811,7 +2811,7 @@ JunctionView = JunctionView_1 = __decorate([
 let RiverView = class RiverView extends ControlView {
     constructor(river) {
         super(river);
-        this.components = new Mapping(() => this.info.components, ([f, n]) => new RiverComponent(this, f, n));
+        this.components = new Mapping(() => this.info.components, key => new RiverComponent(this, key));
         this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
         this.$addItem(Layer.hinge, this._hinge = new paper.CompoundPath(Style.hinge));
         this.$addItem(Layer.ridge, this._ridge = new paper.CompoundPath(Style.ridge));
@@ -2841,7 +2841,7 @@ let RiverView = class RiverView extends ControlView {
         return { adjacent: a, length: edge.length, components: c };
     }
     toComponents(l, n) {
-        return l.map(l => [this.design.flaps.get(l), n]);
+        return l.map(l => l.id + "," + n.id);
     }
     get design() {
         return this.control.sheet.design;
@@ -2858,8 +2858,9 @@ let RiverView = class RiverView extends ControlView {
             let c = component.contour;
             if (path.isEmpty())
                 path = c;
-            else
+            else {
                 path = path.unite(c, { insert: false });
+            }
         }
         return path;
     }
@@ -2957,15 +2958,22 @@ RiverView = __decorate([
     shrewd
 ], RiverView);
 let RiverComponent = class RiverComponent extends Disposable {
-    constructor(view, flap, node) {
+    constructor(view, key) {
         super(view);
         this.view = view;
-        this.flap = flap;
-        this.node = node;
+        this.key = key;
+        let [f, n] = key.split(',').map(v => Number(v));
+        this.flap = view.design.flapsById.get(f);
+        this.node = view.design.tree.node.get(n);
     }
     get shouldDispose() {
         return super.shouldDispose || this.flap.disposed ||
-            !this.view.info.components.some(c => c[0] == this.flap);
+            !this.view.info.components.some(c => c == this.key);
+    }
+    onDispose() {
+        let self = this;
+        delete self.flap;
+        delete self.node;
     }
     get distance() {
         if (this.disposed)
