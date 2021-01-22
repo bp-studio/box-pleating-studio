@@ -128,12 +128,14 @@ gulp.task('buildApp', () =>
 
 gulp.task('buildLog', () =>
 	gulp.src('dist/log/*.md')
+		.pipe(ifAnyNewer("dist/log", { filter: 'log.js' }))
 		.pipe(log2('log.js'))
 		.pipe(gulp.dest('dist/log'))
 );
 
 gulp.task('buildLocale', () =>
 	gulp.src('src/locale/*.json')
+		.pipe(ifAnyNewer("dist", { filter: 'locale.js' }))
 		.pipe(i18n())
 		.pipe(concat('locale.js'))
 		.pipe(wrap("let locale={};<%= contents %>"))
@@ -146,11 +148,13 @@ gulp.task('buildDonate', () =>
 		'src/donate/main.vue',
 		'src/donate/main.js',
 	])
+		.pipe(ifAnyNewer("dist", { filter: 'donate.js' }))
 		.pipe(vue())
 		.pipe(concat('donate.js'))
 		.pipe(terser())
 		.pipe(gulp.dest('dist/')),
 	gulp.src('src/donate/donate.htm')
+		.pipe(ifAnyNewer("dist", { filter: 'donate.htm' }))
 		.pipe(htmlMin(htmlMinOption))
 		.pipe(gulp.dest('dist/'))
 );
@@ -180,6 +184,7 @@ gulp.task('buildHtml', gulp.series(
 
 gulp.task('buildCss', () =>
 	gulp.src('src/app/css/*.css')
+		.pipe(ifAnyNewer("dist", { filter: 'main.css' }))
 		.pipe(concat('main.css'))
 		.pipe(cleanCss())
 		.pipe(gulp.dest('dist'))
@@ -220,21 +225,29 @@ gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pip
 	))
 ));
 
-gulp.task('deployDev', gulp.series(
+gulp.task('buildAll', gulp.series(
+	'buildCore',
+	'buildCorePub',
+	'buildCss',
+	'buildApp',
+	'buildLog',
+));
+
+gulp.task('update', gulp.series(
 	'buildNumber',
 	'buildHtml',
-	'buildService',
+	'buildService'
+));
+
+gulp.task('deployDev', gulp.series(
+	'buildAll',
+	'update',
 	'uploadDev'
 ));
 
 gulp.task('deployPub', gulp.series(
-	'buildCore',
-	'buildCorePub',
-	'buildApp',
-	'buildLog',
-	'buildNumber',
-	'buildHtml',
-	'buildService',
+	'buildAll',
+	'update',
 	'uploadPub'
 ));
 

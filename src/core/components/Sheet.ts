@@ -128,7 +128,7 @@ interface JSheet {
 	@shrewd public margin = 0;
 
 	@shrewd private getMargin() {
-		if(this.design.sheet != this) return;
+		if(!this.isActive || !this.design.isActive) return;
 		let controls = this.controls.filter((c: Control): c is ViewedControl => c instanceof ViewedControl);
 		let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;
 		setTimeout(() => this.margin = m, 0);

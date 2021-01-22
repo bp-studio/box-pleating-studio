@@ -52,6 +52,8 @@
 .tab i {
 	cursor: pointer;
 	visibility: hidden;
+	width: 1rem;
+	text-align: center;
 }
 
 .tab.active {

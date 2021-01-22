@@ -1484,7 +1484,7 @@ let Sheet = class Sheet extends Mountable {
         this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
     }
     getMargin() {
-        if (this.design.sheet != this)
+        if (!this.isActive || !this.design.isActive)
             return;
         let controls = this.controls.filter((c) => c instanceof ViewedControl);
         let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;

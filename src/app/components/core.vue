@@ -103,7 +103,7 @@
 			if(await this.checkSession()) {
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
-					session.jsons.forEach(j => this.addDesign(bp.restore(j)));
+					session.jsons.forEach(j => this.addDesign(bp.restore(j), false));
 					if(session.open >= 0) this.select(this.designs[session.open]);
 					Shrewd.commit();
 				}
@@ -240,18 +240,25 @@
 			let j = { title: this.$t('keyword.untitled') };
 			let d = bp.create(this.checkTitle(j));
 			this.addDesign(bp.design = d);
-			Vue.nextTick(() => this.scrollTo(d.id));
+			this.scrollTo(d.id);
 		}
 
 		private scrollTo(id: number) {
-			let el = document.getElementById(`tab${id}`);
-			if(el) el.scrollIntoView();
+			Vue.nextTick(() => {
+				let el = document.getElementById(`tab${id}`);
+				if(el) el.scrollIntoView({
+					behavior: "smooth",
+					inline: "end"
+				});
+			});
 		}
+
 		public select(id: number) {
 			bp.select(id);
-			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
+			let i = this.tabHistory.indexOf(id);
+			if(i >= 0) this.tabHistory.splice(i, 1);
 			this.tabHistory.unshift(id);
-			Vue.nextTick(() => this.scrollTo(id));
+			this.scrollTo(id);
 		}
 
 		public selectLast(): void {
@@ -298,9 +305,10 @@
 			Shrewd.commit();
 			gtag('event', 'project_clone');
 		}
-		public addDesign(d: Design) {
+		public addDesign(d: Design, select = true) {
 			this.designs.push(d.id);
-			this.tabHistory.unshift(d.id);
+			if(select) this.select(d.id);
+			else this.tabHistory.unshift(d.id);
 		}
 
 		private checkTitle(j: any) {
