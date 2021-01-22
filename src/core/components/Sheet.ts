@@ -58,15 +58,19 @@ interface JSheet {
 
 	@action({
 		validator(this: Sheet, v: number) {
-			return v >= Math.min(10, Math.ceil(this.$studio?.$display.getAutoScale() ?? 10));
+			return v >= Math.min(10, this.getMinScale());
 		}
 	}) public scale: number;
+
+	private getMinScale() {
+		return Math.ceil(this.$studio?.$display.getAutoScale() ?? 10);
+	}
 
 	constructor(design: Design, sheet: JSheet, ...maps: IterableFactory<Control>[]) {
 		super(design);
 		this.width = sheet.width;
 		this.height = sheet.height;
-		this.scale = sheet.scale;
+		this.scale = Math.max(sheet.scale, this.getMinScale());
 		this._controlMaps = maps;
 		this.view = new SheetView(this);
 	}

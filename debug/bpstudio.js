@@ -1427,7 +1427,7 @@ let Sheet = class Sheet extends Mountable {
         this.scroll = { x: 0, y: 0 };
         this.width = sheet.width;
         this.height = sheet.height;
-        this.scale = sheet.scale;
+        this.scale = Math.max(sheet.scale, this.getMinScale());
         this._controlMaps = maps;
         this.view = new SheetView(this);
     }
@@ -1445,6 +1445,10 @@ let Sheet = class Sheet extends Mountable {
     }
     constraint(v, p) {
         return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
+    }
+    getMinScale() {
+        var _a, _b;
+        return Math.ceil((_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.getAutoScale()) !== null && _b !== void 0 ? _b : 10);
     }
     get design() {
         return this.mountTarget;
@@ -1524,8 +1528,7 @@ __decorate([
 __decorate([
     action({
         validator(v) {
-            var _a, _b;
-            return v >= Math.min(10, Math.ceil((_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.getAutoScale()) !== null && _b !== void 0 ? _b : 10));
+            return v >= Math.min(10, this.getMinScale());
         }
     })
 ], Sheet.prototype, "scale", void 0);
