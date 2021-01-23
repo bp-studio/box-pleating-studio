@@ -1,5 +1,5 @@
 /**
- * shrewd v0.0.10
+ * shrewd v0.0.11
  * (c) 2019-2021 Mu-Tsun Tsai
  * Released under the MIT License.
  */
@@ -586,6 +586,12 @@
             }
             return value;
         }
+        static $clear(value) {
+            if (Helper.$hasHelper(value))
+                value = value[$observableHelper]._target;
+            if (Helper._proxyMap.has(value))
+                Helper._proxyMap.delete(value);
+        }
         static $hasHelper(value) {
             return value != null && typeof value == 'object' && HiddenProperty.$has(value, $observableHelper);
         }
@@ -765,6 +771,10 @@
         $terminateGet() {
             return this._value;
         }
+        _onTerminate() {
+            Helper.$clear(this._value);
+            super._onTerminate();
+        }
     }
     class ObservableProperty extends DecoratedMember {
         constructor(parent, descriptor) {
@@ -890,6 +900,8 @@
             Observable.$publish(this);
         }
         _onTerminate() {
+            Helper.$clear(this._inputValue);
+            Helper.$clear(this._outputValue);
             delete this._inputValue;
             delete this._option;
             super._onTerminate();
@@ -919,6 +931,10 @@
         $postrendering(result) {
             this._result = result;
             Observable.$publish(this);
+        }
+        _onTerminate() {
+            Helper.$clear(this._result);
+            super._onTerminate();
         }
     }
     class ArrayProxyHandler extends ObjectProxyHandler {

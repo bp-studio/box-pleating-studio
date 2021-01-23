@@ -52,7 +52,9 @@ interface IDisposable {
 	 *
 	 * 繼承類別覆寫此方法的時候一般來說應呼叫 super 方法，請務必記得。
 	 */
-	protected onDispose(): void { }
+	protected onDispose(): void {
+		delete this._disposeWith;
+	}
 
 	/** 當前的物件是否真的已經被棄置（手動或自動）。 */
 	@shrewd public get disposed() {

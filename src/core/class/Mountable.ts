@@ -37,8 +37,10 @@ abstract class Mountable extends Disposable {
 	}
 
 	protected onDispose() {
+		let self = this as any;
 		if(this._oldStudio) this.onDismount(this._oldStudio);
 		super.onDispose();
+		delete self.mountTarget;
 	}
 
 	/**

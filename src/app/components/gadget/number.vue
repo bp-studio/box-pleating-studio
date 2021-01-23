@@ -1,39 +1,39 @@
 <template>
-	<div class="input-group">
-		<button class="btn btn-sm btn-primary" type="button" @click="change(-1)">
-			<i class="fas fa-minus"></i>
-		</button>
-		<input
-			class="form-control"
-			:class="{'error':v!=value}"
-			type="number"
-			v-model="v"
-			@focus="focus($event)"
-			@blur="blur"
-			@input="input($event)"
-			:min="min"
-			:max="max"
-			@wheel="wheel($event)"
-		/>
-		<button class="btn btn-sm btn-primary" type="button" @click="change(1)">
-			<i class="fas fa-plus"></i>
-		</button>
+	<div :class="label?'row mb-2':''">
+		<label class="col-form-label col-3" v-if="label">{{ label }}</label>
+		<div :class="{'col-9':label}">
+			<div class="input-group">
+				<button class="btn btn-sm btn-primary" type="button" @click="change(-1)">
+					<i class="fas fa-minus"></i>
+				</button>
+				<input
+					class="form-control"
+					:class="{'error':v!=value}"
+					type="number"
+					v-model="v"
+					@focus="focus($event)"
+					@blur="blur"
+					@input="input($event)"
+					:min="min"
+					:max="max"
+					@wheel="wheel($event)"
+				/>
+				<button class="btn btn-sm btn-primary" type="button" @click="change(1)">
+					<i class="fas fa-plus"></i>
+				</button>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script lang="ts">
-	import { Component, Prop, Watch } from 'vue-property-decorator';
+	import { Component, Prop } from 'vue-property-decorator';
 	import { Shrewd } from '../import/BPStudio';
 	import InputMixin from '../mixins/inputMixin';
 
 	@Component({ name: "number" })
 	export default class NumberField extends InputMixin {
-		@Watch('v') onVChange(checked: boolean) {
-			if(this.type == 'checkbox') this.$emit('input', checked);
-		}
-
 		@Prop(String) public label: string;
-		@Prop(String) public type: string;
 
 		@Prop(null) public min?: number;
 		@Prop(null) public max?: number;

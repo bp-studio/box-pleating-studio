@@ -1,18 +1,8 @@
 <template>
-	<div class="row mb-2 py-1" v-if="type == 'checkbox'">
-		<div class="col">
-			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" v-bind:id="id" v-model="v" />
-				<label class="form-check-label" v-bind:for="id">{{label}}</label>
-			</div>
-		</div>
-	</div>
-	<div class="row mb-2" v-else>
+	<div class="row mb-2">
 		<label class="col-form-label col-3">{{ label }}</label>
 		<div class="col-9">
-			<number v-if="type=='number'" :value="v" @input="$emit('input', $event)"></number>
 			<input
-				v-else
 				v-model="v"
 				class="form-control"
 				:placeholder="placeholder"
@@ -27,15 +17,11 @@
 </template>
 
 <script lang="ts">
-	import { Component, Prop, Watch } from 'vue-property-decorator';
+	import { Component, Prop } from 'vue-property-decorator';
 	import InputMixin from '../mixins/inputMixin';
 
 	@Component
 	export default class Field extends InputMixin {
-		@Watch('v') onVChange(checked: boolean) {
-			if(this.type == 'checkbox') this.$emit('input', checked);
-		}
-
 		@Prop(String) public label: string;
 		@Prop(String) public type: string;
 		@Prop(String) public placeholder: string;

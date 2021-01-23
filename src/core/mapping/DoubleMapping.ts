@@ -21,9 +21,9 @@
 	private readonly _source: IterableFactory<K>;
 	private readonly _constructor: (k1: K, k2: K) => V;
 
-	public dispose():void {
-		Shrewd.terminate(this._map);
+	public dispose(): void {
 		Shrewd.terminate(this);
+		Shrewd.terminate(this._map);
 	}
 
 	@shrewd({

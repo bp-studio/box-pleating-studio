@@ -1,7 +1,7 @@
 <template >
 	<div>
 		<h5 v-t="'panel.edge.type'"></h5>
-		<field :label="$t('panel.edge.length')" type="number" v-model.number="selection.length"></field>
+		<number :label="$t('panel.edge.length')" v-model.number="selection.length"></number>
 		<div class="mt-3">
 			<button class="btn btn-primary" @click="selection.split()" v-t="'panel.edge.split'"></button>
 			<button

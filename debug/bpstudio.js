@@ -234,7 +234,9 @@ let Disposable = class Disposable {
     dispose() {
         this._disposed = true;
     }
-    onDispose() { }
+    onDispose() {
+        delete this._disposeWith;
+    }
     get disposed() {
         return this._disposed;
     }
@@ -602,8 +604,8 @@ let DoubleMapping = class DoubleMapping {
         this._map = new DoubleMap();
     }
     dispose() {
-        Shrewd.terminate(this._map);
         Shrewd.terminate(this);
+        Shrewd.terminate(this._map);
     }
     has(...args) { return this._map.has.apply(this._map, args); }
     get(...args) { return this._map.get.apply(this._map, args); }
@@ -988,9 +990,11 @@ class Mountable extends Disposable {
         }
     }
     onDispose() {
+        let self = this;
         if (this._oldStudio)
             this.onDismount(this._oldStudio);
         super.onDispose();
+        delete self.mountTarget;
     }
     get isActive() { return true; }
     static isActive(m) { return m.isActive; }

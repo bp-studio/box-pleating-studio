@@ -22,7 +22,8 @@ export default class InputMixin extends Vue {
 		this.focused = true;
 		(event.target as HTMLInputElement).select();
 	}
-	input(event: InputEvent) {
+
+	public input(event: InputEvent) {
 		this.v = (event.target as HTMLInputElement).value;
 		this.$emit('input', this.v);
 	}

@@ -8,5 +8,13 @@ export default class BaseComponent extends Vue {
 	public get selections(): any { return core.selections; }
 	public get selection(): any { return this.selections[0]; }
 
-	@Watch("selection") onSelection() {} // 持續監視以確保 GC
+	// 持續監視以確保 GC
+	@Watch("selection") onSelection() { }
+
+	destroyed() {
+		// 這算是 patch Vue 的缺陷；確保 GC
+		let self = this as any;
+		delete self._computedWatchers;
+		delete self._watchers;
+	}
 }

@@ -9,10 +9,10 @@
 			<h6 v-if="design.mode=='tree'" v-t="'panel.design.tree'"></h6>
 			<h6 v-if="design.mode=='layout'" v-t="'panel.design.layout'"></h6>
 		</div>
-		<field :label="$t('panel.design.width')" type="number" v-model.number="design.sheet.width"></field>
-		<field :label="$t('panel.design.height')" type="number" v-model.number="design.sheet.height"></field>
-		<field :label="$t('panel.design.autoScale')" type="checkbox" v-model="design.fullscreen"></field>
-		<field :label="$t('panel.design.scale')" v-if="!design.fullscreen" type="number" v-model.number="design.sheet.scale"></field>
+		<number :label="$t('panel.design.width')" v-model.number="design.sheet.width"></number>
+		<number :label="$t('panel.design.height')" v-model.number="design.sheet.height"></number>
+		<checkbox :label="$t('panel.design.autoScale')" v-model="design.fullscreen"></checkbox>
+		<number :label="$t('panel.design.scale')" v-if="!design.fullscreen" v-model.number="design.sheet.scale"></number>
 	</div>
 </template>
 

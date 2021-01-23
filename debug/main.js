@@ -72,7 +72,11 @@ const LZ = {
 	}
 }
 
-const BaseComponent = { watch: { "selection"() { } }, computed: { design() { return core.design; }, selections() { return core.selections; }, selection() { return this.selections[0]; } } };
+const BaseComponent = { watch: { "selection"() { } }, computed: { design() { return core.design; }, selections() { return core.selections; }, selection() { return this.selections[0]; } }, destroyed() {
+        let self = this;
+        delete self._computedWatchers;
+        delete self._watchers;
+    } };
 
 const Dialog = { data() { return { modal: undefined, promise: null, message: undefined }; }, methods: { async show(message) {
             await core.libReady;
@@ -527,6 +531,23 @@ Vue.component('version', { render() { with (this) {
         this.index = this.max = logs.length - 1;
     } });
 
+Vue.component('checkbox', { render() { with (this) {
+        return _c('div', { staticClass: "row mb-2 py-1" }, [_c('div', { staticClass: "col" }, [_c('div', { staticClass: "form-check form-switch" }, [_c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-check-input", attrs: { "type": "checkbox", "id": id }, domProps: { "checked": Array.isArray(v) ? _i(v, null) > -1 : (v) }, on: { "change": function ($event) { var $$a = v, $$el = $event.target, $$c = $$el.checked ? (true) : (false); if (Array.isArray($$a)) {
+                                var $$v = null, $$i = _i($$a, $$v);
+                                if ($$el.checked) {
+                                    $$i < 0 && (v = $$a.concat([$$v]));
+                                }
+                                else {
+                                    $$i > -1 && (v = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
+                                }
+                            }
+                            else {
+                                v = $$c;
+                            } } } }), _v(" "), _c('label', { staticClass: "form-check-label", attrs: { "for": id } }, [_v(_s(label))])])])]);
+    } }, mixins: [InputMixin], props: { label: String }, watch: { 'v'(checked) {
+            this.$emit('input', checked);
+        } } });
+
 Vue.component('contextmenu', { render() { with (this) {
         return _c('div', { staticClass: "dropdown-menu", on: { "touchstartout": hide, "mousedownout": hide, "touchend": hide, "mouseup": hide } }, [_t("default")], 2);
     } }, data() { return { shown: false }; }, methods: { show(e) {
@@ -612,18 +633,7 @@ Vue.component('dropdownitem', { render() { with (this) {
     } }, props: { disabled: Boolean } });
 
 Vue.component('field', { render() { with (this) {
-        return (type == 'checkbox') ? _c('div', { staticClass: "row mb-2 py-1" }, [_c('div', { staticClass: "col" }, [_c('div', { staticClass: "form-check form-switch" }, [_c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-check-input", attrs: { "type": "checkbox", "id": id }, domProps: { "checked": Array.isArray(v) ? _i(v, null) > -1 : (v) }, on: { "change": function ($event) { var $$a = v, $$el = $event.target, $$c = $$el.checked ? (true) : (false); if (Array.isArray($$a)) {
-                                var $$v = null, $$i = _i($$a, $$v);
-                                if ($$el.checked) {
-                                    $$i < 0 && (v = $$a.concat([$$v]));
-                                }
-                                else {
-                                    $$i > -1 && (v = $$a.slice(0, $$i).concat($$a.slice($$i + 1)));
-                                }
-                            }
-                            else {
-                                v = $$c;
-                            } } } }), _v(" "), _c('label', { staticClass: "form-check-label", attrs: { "for": id } }, [_v(_s(label))])])])]) : _c('div', { staticClass: "row mb-2" }, [_c('label', { staticClass: "col-form-label col-3" }, [_v(_s(label))]), _v(" "), _c('div', { staticClass: "col-9" }, [(type == 'number') ? _c('number', { attrs: { "value": v }, on: { "input": function ($event) { return $emit('input', $event); } } }) : ((type) === 'checkbox') ? _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { error: v != value }, attrs: { "placeholder": placeholder, "type": "checkbox" }, domProps: { "checked": Array.isArray(v) ? _i(v, null) > -1 : (v) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": function ($event) { return input($event); }, "change": function ($event) { var $$a = v, $$el = $event.target, $$c = $$el.checked ? (true) : (false); if (Array.isArray($$a)) {
+        return _c('div', { staticClass: "row mb-2" }, [_c('label', { staticClass: "col-form-label col-3" }, [_v(_s(label))]), _v(" "), _c('div', { staticClass: "col-9" }, [((type) === 'checkbox') ? _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { error: v != value }, attrs: { "placeholder": placeholder, "type": "checkbox" }, domProps: { "checked": Array.isArray(v) ? _i(v, null) > -1 : (v) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": function ($event) { return input($event); }, "change": function ($event) { var $$a = v, $$el = $event.target, $$c = $$el.checked ? (true) : (false); if (Array.isArray($$a)) {
                             var $$v = null, $$i = _i($$a, $$v);
                             if ($$el.checked) {
                                 $$i < 0 && (v = $$a.concat([$$v]));
@@ -635,11 +645,8 @@ Vue.component('field', { render() { with (this) {
                         else {
                             v = $$c;
                         } } } }) : ((type) === 'radio') ? _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { error: v != value }, attrs: { "placeholder": placeholder, "type": "radio" }, domProps: { "checked": _q(v, null) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": function ($event) { return input($event); }, "change": function ($event) { v = null; } } }) : _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { error: v != value }, attrs: { "placeholder": placeholder, "type": type }, domProps: { "value": (v) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": [function ($event) { if ($event.target.composing)
-                                return; v = $event.target.value; }, function ($event) { return input($event); }] } })], 1)]);
-    } }, mixins: [InputMixin], props: { label: String, type: String, placeholder: String }, watch: { 'v'(checked) {
-            if (this.type == 'checkbox')
-                this.$emit('input', checked);
-        } } });
+                                return; v = $event.target.value; }, function ($event) { return input($event); }] } })])]);
+    } }, mixins: [InputMixin], props: { label: String, type: String, placeholder: String } });
 
 Vue.component('hotkey', { render() { with (this) {
         return _c('div', { staticClass: "d-flex" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('i', { class: icon }), _v(" "), _t("default")], 2), _v(" "), _c('div', { staticClass: "ms-3 text-end desktop-only" }, [_v(_s(hk))])]);
@@ -659,12 +666,9 @@ Vue.component('keybutton', { render() { with (this) {
         } } });
 
 Vue.component('number', { render() { with (this) {
-        return _c('div', { staticClass: "input-group" }, [_c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "type": "button" }, on: { "click": function ($event) { return change(-1); } } }, [_c('i', { staticClass: "fas fa-minus" })]), _v(" "), _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { 'error': v != value }, attrs: { "type": "number", "min": min, "max": max }, domProps: { "value": (v) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": [function ($event) { if ($event.target.composing)
-                            return; v = $event.target.value; }, function ($event) { return input($event); }], "wheel": function ($event) { return wheel($event); } } }), _v(" "), _c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "type": "button" }, on: { "click": function ($event) { return change(1); } } }, [_c('i', { staticClass: "fas fa-plus" })])]);
-    } }, mixins: [InputMixin], props: { label: String, type: String, min: null, max: null }, watch: { 'v'(checked) {
-            if (this.type == 'checkbox')
-                this.$emit('input', checked);
-        } }, methods: { input(event) {
+        return _c('div', { class: label ? 'row mb-2' : '' }, [(label) ? _c('label', { staticClass: "col-form-label col-3" }, [_v(_s(label))]) : _e(), _v(" "), _c('div', { class: { 'col-9': label } }, [_c('div', { staticClass: "input-group" }, [_c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "type": "button" }, on: { "click": function ($event) { return change(-1); } } }, [_c('i', { staticClass: "fas fa-minus" })]), _v(" "), _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { 'error': v != value }, attrs: { "type": "number", "min": min, "max": max }, domProps: { "value": (v) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": [function ($event) { if ($event.target.composing)
+                                    return; v = $event.target.value; }, function ($event) { return input($event); }], "wheel": function ($event) { return wheel($event); } } }), _v(" "), _c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "type": "button" }, on: { "click": function ($event) { return change(1); } } }, [_c('i', { staticClass: "fas fa-plus" })])])])]);
+    } }, mixins: [InputMixin], props: { label: String, min: null, max: null }, methods: { input(event) {
             let v = Number(event.target.value);
             if (v < this.min || v > this.max)
                 return;
@@ -719,15 +723,15 @@ Vue.component('uploader', { render() { with (this) {
 
 Vue.component('design', { render() { with (this) {
         return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.type'), expression: "'panel.design.type'" }] }), _v(" "), _c('field', { attrs: { "label": $t('panel.design.title'), "type": "text", "placeholder": $t('panel.design.titlePH') }, model: { value: (design.title), callback: function ($$v) { $set(design, "title", $$v); }, expression: "design.title" } }), _v(" "), _c('div', { staticClass: "mt-1 mb-4" }, [_c('textarea', { directives: [{ name: "model", rawName: "v-model", value: (design.description), expression: "design.description" }], staticClass: "form-control", attrs: { "rows": "4", "placeholder": $t('panel.design.descriptionPH') }, domProps: { "value": (design.description) }, on: { "input": function ($event) { if ($event.target.composing)
-                            return; $set(design, "description", $event.target.value); } } })]), _v(" "), _c('div', { staticClass: "my-2" }, [(design.mode == 'tree') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.tree'), expression: "'panel.design.tree'" }] }) : _e(), _v(" "), (design.mode == 'layout') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.layout'), expression: "'panel.design.layout'" }] }) : _e()]), _v(" "), _c('field', { attrs: { "label": $t('panel.design.width'), "type": "number" }, model: { value: (design.sheet.width), callback: function ($$v) { $set(design.sheet, "width", _n($$v)); }, expression: "design.sheet.width" } }), _v(" "), _c('field', { attrs: { "label": $t('panel.design.height'), "type": "number" }, model: { value: (design.sheet.height), callback: function ($$v) { $set(design.sheet, "height", _n($$v)); }, expression: "design.sheet.height" } }), _v(" "), _c('field', { attrs: { "label": $t('panel.design.autoScale'), "type": "checkbox" }, model: { value: (design.fullscreen), callback: function ($$v) { $set(design, "fullscreen", $$v); }, expression: "design.fullscreen" } }), _v(" "), (!design.fullscreen) ? _c('field', { attrs: { "label": $t('panel.design.scale'), "type": "number" }, model: { value: (design.sheet.scale), callback: function ($$v) { $set(design.sheet, "scale", _n($$v)); }, expression: "design.sheet.scale" } }) : _e()], 1);
+                            return; $set(design, "description", $event.target.value); } } })]), _v(" "), _c('div', { staticClass: "my-2" }, [(design.mode == 'tree') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.tree'), expression: "'panel.design.tree'" }] }) : _e(), _v(" "), (design.mode == 'layout') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.layout'), expression: "'panel.design.layout'" }] }) : _e()]), _v(" "), _c('number', { attrs: { "label": $t('panel.design.width') }, model: { value: (design.sheet.width), callback: function ($$v) { $set(design.sheet, "width", _n($$v)); }, expression: "design.sheet.width" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.design.height') }, model: { value: (design.sheet.height), callback: function ($$v) { $set(design.sheet, "height", _n($$v)); }, expression: "design.sheet.height" } }), _v(" "), _c('checkbox', { attrs: { "label": $t('panel.design.autoScale') }, model: { value: (design.fullscreen), callback: function ($$v) { $set(design, "fullscreen", $$v); }, expression: "design.fullscreen" } }), _v(" "), (!design.fullscreen) ? _c('number', { attrs: { "label": $t('panel.design.scale') }, model: { value: (design.sheet.scale), callback: function ($$v) { $set(design.sheet, "scale", _n($$v)); }, expression: "design.sheet.scale" } }) : _e()], 1);
     } }, mixins: [BaseComponent] });
 
 Vue.component('edge', { render() { with (this) {
-        return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.edge.type'), expression: "'panel.edge.type'" }] }), _v(" "), _c('field', { attrs: { "label": $t('panel.edge.length'), "type": "number" }, model: { value: (selection.length), callback: function ($$v) { $set(selection, "length", _n($$v)); }, expression: "selection.length" } }), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.edge.split'), expression: "'panel.edge.split'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return selection.split(); } } }), _v(" "), (selection.edge.isRiver) ? _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.edge.merge'), expression: "'panel.edge.merge'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return selection.deleteAndMerge(); } } }) : _e()]), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: (selection.edge.isRiver ? 'panel.edge.goto' : 'panel.vertex.goto'), expression: "selection.edge.isRiver?'panel.edge.goto':'panel.vertex.goto'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.edgeToRiver(selection); } } })])], 1);
+        return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.edge.type'), expression: "'panel.edge.type'" }] }), _v(" "), _c('number', { attrs: { "label": $t('panel.edge.length') }, model: { value: (selection.length), callback: function ($$v) { $set(selection, "length", _n($$v)); }, expression: "selection.length" } }), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.edge.split'), expression: "'panel.edge.split'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return selection.split(); } } }), _v(" "), (selection.edge.isRiver) ? _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.edge.merge'), expression: "'panel.edge.merge'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return selection.deleteAndMerge(); } } }) : _e()]), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: (selection.edge.isRiver ? 'panel.edge.goto' : 'panel.vertex.goto'), expression: "selection.edge.isRiver?'panel.edge.goto':'panel.vertex.goto'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.edgeToRiver(selection); } } })])], 1);
     } }, mixins: [BaseComponent] });
 
 Vue.component('flap', { render() { with (this) {
-        return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.flap.type'), expression: "'panel.flap.type'" }] }), _v(" "), _c('field', { attrs: { "label": $t('panel.flap.name'), "type": "text" }, model: { value: (selection.name), callback: function ($$v) { $set(selection, "name", $$v); }, expression: "selection.name" } }), _v(" "), _c('field', { attrs: { "label": $t('panel.flap.radius'), "type": "number" }, model: { value: (selection.radius), callback: function ($$v) { $set(selection, "radius", _n($$v)); }, expression: "selection.radius" } }), _v(" "), _c('field', { attrs: { "label": $t('panel.flap.width'), "type": "number", "max": design.sheet.width }, model: { value: (selection.width), callback: function ($$v) { $set(selection, "width", _n($$v)); }, expression: "selection.width" } }), _v(" "), _c('field', { attrs: { "label": $t('panel.flap.height'), "type": "number", "max": design.sheet.height }, model: { value: (selection.height), callback: function ($$v) { $set(selection, "height", _n($$v)); }, expression: "selection.height" } }), _v(" "), _c('div', { staticClass: "mt-3" }, [(design.tree.node.size > 3) ? _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.delete'), expression: "'keyword.delete'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.deleteFlaps(selections); } } }, [_v("Delete")]) : _e()]), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.flap.goto'), expression: "'panel.flap.goto'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.flapToVertex(selections); } } })])], 1);
+        return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.flap.type'), expression: "'panel.flap.type'" }] }), _v(" "), _c('field', { attrs: { "label": $t('panel.flap.name'), "type": "text" }, model: { value: (selection.name), callback: function ($$v) { $set(selection, "name", $$v); }, expression: "selection.name" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.flap.radius') }, model: { value: (selection.radius), callback: function ($$v) { $set(selection, "radius", _n($$v)); }, expression: "selection.radius" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.flap.width'), "max": design.sheet.width }, model: { value: (selection.width), callback: function ($$v) { $set(selection, "width", _n($$v)); }, expression: "selection.width" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.flap.height'), "max": design.sheet.height }, model: { value: (selection.height), callback: function ($$v) { $set(selection, "height", _n($$v)); }, expression: "selection.height" } }), _v(" "), _c('div', { staticClass: "mt-3" }, [(design.tree.node.size > 3) ? _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.delete'), expression: "'keyword.delete'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.deleteFlaps(selections); } } }, [_v("Delete")]) : _e()]), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.flap.goto'), expression: "'panel.flap.goto'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.flapToVertex(selections); } } })])], 1);
     } }, mixins: [BaseComponent] });
 
 Vue.component('flaps', { render() { with (this) {
@@ -760,7 +764,7 @@ Vue.component('repository', { render() { with (this) {
     } }, props: { repository: Object } });
 
 Vue.component('river', { render() { with (this) {
-        return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.river.type'), expression: "'panel.river.type'" }] }), _v(" "), _c('field', { attrs: { "label": $t('panel.river.width'), "type": "number" }, model: { value: (selection.length), callback: function ($$v) { $set(selection, "length", _n($$v)); }, expression: "selection.length" } }), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.delete'), expression: "'keyword.delete'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return selection.delete(); } } })]), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.river.goto'), expression: "'panel.river.goto'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.riverToEdge(selection); } } })])], 1);
+        return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.river.type'), expression: "'panel.river.type'" }] }), _v(" "), _c('number', { attrs: { "label": $t('panel.river.width') }, model: { value: (selection.length), callback: function ($$v) { $set(selection, "length", _n($$v)); }, expression: "selection.length" } }), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.delete'), expression: "'keyword.delete'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return selection.delete(); } } })]), _v(" "), _c('div', { staticClass: "mt-3" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('panel.river.goto'), expression: "'panel.river.goto'" }], staticClass: "btn btn-primary", on: { "click": function ($event) { return design.riverToEdge(selection); } } })])], 1);
     } }, mixins: [BaseComponent] });
 
 Vue.component('vertex', { render() { with (this) {
