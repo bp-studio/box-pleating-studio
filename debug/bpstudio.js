@@ -1482,12 +1482,12 @@ let Sheet = class Sheet extends Mountable {
             let l = i.location;
             if (l.x < x1)
                 x1 = l.x;
-            if (l.x > x2)
-                x2 = l.x;
+            if (l.x + i.width > x2)
+                x2 = l.x + i.width;
             if (l.y < y1)
                 y1 = l.y;
-            if (l.y > y2)
-                y2 = l.y;
+            if (l.y + i.height > y2)
+                y2 = l.y + i.height;
         }
         this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
     }
