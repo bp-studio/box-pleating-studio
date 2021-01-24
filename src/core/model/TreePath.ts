@@ -14,6 +14,11 @@
 		return super.shouldDispose || this._n1.disposed || this._n2.disposed;
 	}
 
+	public findIntersection(path: TreePath): TreeEdge | undefined {
+		for(let e of this.edges) if(path.edges.includes(e)) return e;
+		return undefined;
+	}
+
 	@shrewd private get edges() {
 		let result: TreeEdge[] = [];
 		let now = this._n1;

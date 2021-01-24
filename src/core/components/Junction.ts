@@ -56,10 +56,15 @@ interface JJunction extends JRectangle {
 		return super.shouldDispose || this.f1.disposed || this.f2.disposed;
 	}
 
-	@shrewd private get baseRectangle(): Rectangle | undefined {
-		if(!this.isValid) return undefined;
+	/** 根據指定的基準點來取得覆蓋比較矩形 */
+	private getBaseRectangle(base: TreeNode): Rectangle | undefined {
 		let q = this.sx > 0 ? this.q2 : this.q1;
-		return q?.getBaseRectangle(this);
+		return q?.getBaseRectangle(this, base);
+	}
+
+	/** 這個 Junction 對應的路徑 */
+	@shrewd private get path(): TreePath {
+		return this.design.tree.path.get(this.f1.node, this.f2.node)!;
 	}
 
 	/** 判斷自身是否被另外一個 `Junction` 所涵蓋 */
@@ -67,8 +72,12 @@ interface JJunction extends JRectangle {
 		// 方向不一樣的話肯定不是覆蓋
 		if(this == o || this.direction % 2 != o.direction % 2) return false;
 
+		// 找出對應路徑上的一條共用邊，如果沒有的話肯定不是覆蓋
+		let e = this.path.findIntersection(o.path);
+		if(!e) return false;
+
 		// 基底矩形檢查
-		let [r1, r2] = [o.baseRectangle, this.baseRectangle];
+		let [r1, r2] = [o.getBaseRectangle(e.n1), this.getBaseRectangle(e.n1)];
 		if(!r1 || !r2 || !r1.contains(r2)) return false;
 
 		if(r1.equals(r2)) {
@@ -119,7 +128,7 @@ interface JJunction extends JRectangle {
 	}
 
 	@shrewd public get $treeDistance() {
-		return this.design.tree.dist(this.f1.node, this.f2.node);
+		return this.path?.length ?? 0;
 	}
 
 	@shrewd public get status() {

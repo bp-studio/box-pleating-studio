@@ -990,11 +990,9 @@ class Mountable extends Disposable {
         }
     }
     onDispose() {
-        let self = this;
         if (this._oldStudio)
             this.onDismount(this._oldStudio);
         super.onDispose();
-        delete self.mountTarget;
     }
     get isActive() { return true; }
     static isActive(m) { return m.isActive; }
@@ -1047,6 +1045,8 @@ let Tree = class Tree extends Disposable {
             this.jidMap.set(n.id, n.jid = i++);
     }
     dist(n1, n2) {
+        if (n1 == n2)
+            return 0;
         let path = this.path.get(n1, n2);
         return path ? path.length : NaN;
     }
@@ -1765,6 +1765,12 @@ let TreePath = class TreePath extends Disposable {
     get shouldDispose() {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
     }
+    findIntersection(path) {
+        for (let e of this.edges)
+            if (path.edges.includes(e))
+                return e;
+        return undefined;
+    }
     get edges() {
         let result = [];
         let now = this._n1;
@@ -2104,6 +2110,8 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         }
         else {
             let lines = pattern.linesForTracing[this.q].concat();
+            if (debug)
+                console.log(lines.map(l => l.toString()));
             let junctions = pattern.stretch.junctions;
             let end = this.findNextDelta(junctions, false);
             let inflections = new Set();
@@ -2113,8 +2121,12 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
             if (start && this.outside(trace[0], r, this.q % 2 != 1)) {
                 trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
             }
-            if (end && this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
-                trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
+            if (end) {
+                if (this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
+                    trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
+                }
+                let last = trace[trace.length - 1];
+                trace.push(this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y));
             }
         }
         return trace.map(p => p.toPaper());
@@ -2231,9 +2243,11 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
             dir += dir % 2 ? 1 : 3;
         return dir % 4;
     }
-    getBaseRectangle(j) {
+    getBaseRectangle(j, base) {
+        let d = this.design.tree.dist(base, this.flap.node);
         let r = this.flap.radius;
-        return new Rectangle(new Point(this.x(r), this.y(r)), new Point(this.x(r - j.ox), this.y(r - j.oy)));
+        let v = this.qv.scale(d - r);
+        return new Rectangle(new Point(this.x(r), this.y(r)).addBy(v), new Point(this.x(r - j.ox), this.y(r - j.oy)).addBy(v));
     }
     debug(d = 0) {
         debug = true;
@@ -2448,10 +2462,14 @@ let Pattern = class Pattern extends SheetObject {
                     }
                     else {
                         if (c.type == CornerType.intersection) {
-                            let q = d.partition.overlaps[o].c.find(m => m.type == CornerType.flap).q;
-                            let to = d.partition.getSideConnectionTarget(anchor, c, q);
-                            if (to)
-                                lines.push(new Line(anchor, to));
+                            let sq = d.partition.overlaps[o].c.find(m => m.type == CornerType.flap).q;
+                            if (sq != q)
+                                lines.push(new Line(anchor, anchor.add(vector)));
+                            else {
+                                let to = d.partition.getSideConnectionTarget(anchor, c, sq);
+                                if (to && !to.eq(anchor))
+                                    lines.push(new Line(anchor, to));
+                            }
                         }
                         else {
                             lines.push(new Line(anchor, this.getConnectionTarget(c)));
@@ -3573,16 +3591,20 @@ let Junction = class Junction extends SheetObject {
     get shouldDispose() {
         return super.shouldDispose || this.f1.disposed || this.f2.disposed;
     }
-    get baseRectangle() {
-        if (!this.isValid)
-            return undefined;
+    getBaseRectangle(base) {
         let q = this.sx > 0 ? this.q2 : this.q1;
-        return q === null || q === void 0 ? void 0 : q.getBaseRectangle(this);
+        return q === null || q === void 0 ? void 0 : q.getBaseRectangle(this, base);
+    }
+    get path() {
+        return this.design.tree.path.get(this.f1.node, this.f2.node);
     }
     isCoveredBy(o) {
         if (this == o || this.direction % 2 != o.direction % 2)
             return false;
-        let [r1, r2] = [o.baseRectangle, this.baseRectangle];
+        let e = this.path.findIntersection(o.path);
+        if (!e)
+            return false;
+        let [r1, r2] = [o.getBaseRectangle(e.n1), this.getBaseRectangle(e.n1)];
         if (!r1 || !r2 || !r1.contains(r2))
             return false;
         if (r1.equals(r2)) {
@@ -3627,7 +3649,8 @@ let Junction = class Junction extends SheetObject {
         return isQuadrant(this.direction) ? this.f2.quadrants[opposite(this.direction)] : null;
     }
     get $treeDistance() {
-        return this.design.tree.dist(this.f1.node, this.f2.node);
+        var _a, _b;
+        return (_b = (_a = this.path) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0;
     }
     get status() {
         if (this._flapDistance < this.$treeDistance)
@@ -3720,7 +3743,7 @@ let Junction = class Junction extends SheetObject {
 };
 __decorate([
     shrewd
-], Junction.prototype, "baseRectangle", null);
+], Junction.prototype, "path", null);
 __decorate([
     shrewd
 ], Junction.prototype, "coveredBy", null);

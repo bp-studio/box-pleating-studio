@@ -141,6 +141,7 @@
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
 			gtag('event', 'project_open');
 			core.loader.hide();
+			core.select(core.designs[core.designs.length - 1]);
 		}
 		public async openFiles(files: FileList) {
 			if(files.length) for(let i = 0; i < files.length; i++) await this.open(files[i]);

@@ -27,9 +27,14 @@
 	public readonly q: QuadrantDirection;
 	public readonly flap: Flap;
 
-	private readonly qv: Vector; // 角落方位向量
-	private readonly sv: Vector; // 起始點方位向量
-	private readonly pv: Vector; // 起始方向向量
+	/** 角落方位向量 */
+	private readonly qv: Vector;
+
+	/** 起始點方位向量 */
+	private readonly sv: Vector;
+
+	/** 起始方向向量 */
+	private readonly pv: Vector;
 
 	private readonly fx: number;
 	private readonly fy: number;
@@ -83,6 +88,7 @@
 			trace = [startPt, this.point.add(this.qv.scale(r))];
 		} else {
 			let lines = pattern.linesForTracing[this.q].concat();
+			if(debug) console.log(lines.map(l => l.toString()));
 			let junctions = pattern.stretch.junctions;
 
 			// 在牽涉到融合的情況中，一個 Quadrant 需要負責的軌跡絕對不會超過 delta 線的範圍，
@@ -98,13 +104,18 @@
 			if(start && this.outside(trace[0], r, this.q % 2 != 1)) {
 				trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
 			}
-			if(end && this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
-				trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
+			if(end) {
+				if(this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
+					trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
+				}
+				let last = trace[trace.length - 1];
+				trace.push(this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y));
 			}
 		}
 		return trace.map(p => p.toPaper())
 	}
 
+	/** 指定的點是否某個座標超過了自身的給定半徑範圍 */
 	private outside(p: Point, r: number, x: boolean) {
 		return x ? p.x * this.fx > this.x(r) * this.fx : p.y * this.fy > this.y(r) * this.fy;
 	}
@@ -254,11 +265,14 @@
 		return dir % 4;
 	}
 
-	public getBaseRectangle(j: Junction): Rectangle {
+	/** 將指定的 Junction 移動到指定的基準點上，取得覆蓋比較矩形 */
+	public getBaseRectangle(j: Junction, base: TreeNode): Rectangle {
+		let d = this.design.tree.dist(base, this.flap.node);
 		let r = this.flap.radius;
+		let v = this.qv.scale(d - r);
 		return new Rectangle(
-			new Point(this.x(r), this.y(r)),
-			new Point(this.x(r - j.ox), this.y(r - j.oy))
+			new Point(this.x(r), this.y(r)).addBy(v),
+			new Point(this.x(r - j.ox), this.y(r - j.oy)).addBy(v)
 		);
 	}
 

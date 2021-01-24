@@ -64,6 +64,7 @@
 	public readonly jidMap = new Map<number, number>();
 
 	public dist(n1: TreeNode, n2: TreeNode) {
+		if(n1 == n2) return 0;
 		let path = this.path.get(n1, n2);
 		return path ? path.length : NaN;
 	}

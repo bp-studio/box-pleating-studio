@@ -81,9 +81,12 @@ type GPattern = JPattern<Gadget>;
 					} else {
 						// 其餘情況則只連接到原本的頂點
 						if(c.type == CornerType.intersection) {
-							let q = d.partition.overlaps[o].c.find(m => m.type == CornerType.flap)!.q;
-							let to = d.partition.getSideConnectionTarget(anchor, c, q);
-							if(to) lines.push(new Line(anchor, to));
+							let sq = d.partition.overlaps[o].c.find(m => m.type == CornerType.flap)!.q;
+							if(sq != q) lines.push(new Line(anchor, anchor.add(vector)));
+							else {
+								let to = d.partition.getSideConnectionTarget(anchor, c, sq);
+								if(to && !to.eq(anchor)) lines.push(new Line(anchor, to));
+							}
 						} else {
 							lines.push(new Line(anchor, this.getConnectionTarget(c as JConnection)));
 						}
