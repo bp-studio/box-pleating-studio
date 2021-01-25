@@ -9,7 +9,7 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.3.8">
+	<meta name="version" content="0.3.9">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
@@ -20,7 +20,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "785"
+			app_version: "786"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -109,20 +109,25 @@
 					display('divWorkspace', 'none');
 					display('divWelcome', 'none');
 					display(err ? 'resource' : 'requirement', 'block', wErr);
-					if(wErr) gtag('event', 'unsupported', {
-						app_version: app_config.app_version,
-						error: wErr
-					});
+					if(wErr &&
+						// Filter out Facebook Clawer; no need to report related errors.
+						!(wErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)
+					) {
+						gtag('event', 'unsupported', {
+							app_version: app_config.app_version,
+							error: wErr
+						});
+					}
 				}
 				if(errorOB) errorOB.disconnect();
 			};
 			window.onerror = function(a, b, c, d, e) {
 				wErr = [
-					a.replace(/^.+: (.+)$/, "$1"), // error message
-					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"), // path
-					c,				// line number
-					d,				// column number
-					e && e.stack	// stack trace
+					a.replace(/^.+: (.+)$/, "$1"),							// error message
+					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
+					c,														// line number
+					d,														// column number
+					e && e.stack.replace(/^.+? at/, "")						// stack trace
 				].toString();
 			}
 			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
