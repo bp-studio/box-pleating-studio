@@ -3,7 +3,7 @@
 /**
  * `View` 是對應於元件的視圖，負責管理元件的繪製。
  * 它是一個擁有許多 `paper.Item` 物件（透過 `addItem()` 方法在建構式裡面加入）的 `Mountable` 物件。
- * 
+ *
  * 它的抽象方法 `render()` 內會進行繪製動作。
  */
 //////////////////////////////////////////////////////////////////
@@ -14,7 +14,7 @@ abstract class View extends Mountable {
 
 	/**
 	 * 視圖的自動繪製反應方法；會呼叫子類別實作的 `render()` 方法完成繪製。
-	 * 
+	 *
 	 * 可以透過相依於這個方法來達到確保繪製順序正確的目的。
 	 */
 	@shrewd public draw() {
@@ -27,7 +27,7 @@ abstract class View extends Mountable {
 
 	/**
 	 * 加入一個指定的項目到指定的圖層之中。
-	 * 
+	 *
 	 * 請注意，基於效能考量，這個方法只應該在繼承類別的建構式裡面使用；
 	 * 若在別的地方使用將會發生不可預期的結果。
 	 */
@@ -47,7 +47,7 @@ abstract class View extends Mountable {
 
 	/**
 	 * 當前的視圖是否「包含」指定的點，用於偵測點擊。
-	 * 
+	 *
 	 * 包含的具體邏輯由繼承類別實作，預設行為是一律傳回否（即視圖不可點擊）。
 	 */
 	public contains(point: paper.Point): boolean {

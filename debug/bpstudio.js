@@ -223,13 +223,13 @@ let Disposable = class Disposable {
         this._disposeWith = parent;
     }
     _disposeEvent() {
-        if (this.disposed) {
+        if (this._disposed) {
             Shrewd.terminate(this);
             this.onDispose();
         }
     }
     get shouldDispose() {
-        return this._disposeWith ? this._disposeWith.disposed : false;
+        return this._disposeWith ? this._disposeWith._disposed : false;
     }
     dispose() {
         this._disposed = true;
@@ -251,9 +251,6 @@ __decorate([
 __decorate([
     shrewd
 ], Disposable.prototype, "_disposeEvent", null);
-__decorate([
-    shrewd
-], Disposable.prototype, "disposed", null);
 Disposable = __decorate([
     shrewd
 ], Disposable);
@@ -2789,7 +2786,7 @@ Configuration = __decorate([
 ], Configuration);
 class LabeledView extends ControlView {
     get overflow() {
-        if (!this.$studio)
+        if (this.disposed || !this.$studio)
             return 0;
         this.render();
         let result = 0, b = this._label.bounds;

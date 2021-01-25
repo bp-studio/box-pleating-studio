@@ -31,7 +31,7 @@ interface IDisposable {
 	private _disposeWith?: Disposable;
 
 	@shrewd private _disposeEvent(): any {
-		if(this.disposed) {
+		if(this._disposed) {
 			Shrewd.terminate(this);
 			this.onDispose();
 		}
@@ -39,7 +39,7 @@ interface IDisposable {
 
 	/** 要自動棄置的條件。繼承類別覆寫的時候應記得參考 `super.shouldDispose`。 */
 	protected get shouldDispose(): boolean {
-		return this._disposeWith ? this._disposeWith.disposed : false;
+		return this._disposeWith ? this._disposeWith._disposed : false;
 	}
 
 	/** 手動棄置，繼承類別可以攔截這個操作並決定是否可以棄置。 */
@@ -56,8 +56,12 @@ interface IDisposable {
 		delete this._disposeWith;
 	}
 
-	/** 當前的物件是否真的已經被棄置（手動或自動）。 */
-	@shrewd public get disposed() {
+	/**
+	 * 當前的物件是否真的已經被棄置（手動或自動）。
+	 *
+	 * 提供這個非反應的公開存取子是為了避免在 terminate 的瞬間凍結住結果的值。
+	 */
+	public get disposed() {
 		return this._disposed;
 	}
 }
