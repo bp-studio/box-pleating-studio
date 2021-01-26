@@ -14944,7 +14944,10 @@ new function() {
 				value = item[get]();
 			if (entry.exportFilter
 					? entry.exportFilter(item, value)
-					: !parent || !Base.equals(parent[get](), value)) {
+					: true
+						//Mu-Tsun Tsai
+						//!parent || !Base.equals(parent[get](), value)
+					) {
 				if (type === 'color' && value != null) {
 					var alpha = value.getAlpha();
 					if (alpha < 1)

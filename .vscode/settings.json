@@ -59,6 +59,7 @@
 		".vscode",
 	],
 	"cSpell.ignoreWords": [
+		"fbclid",
 		"opendir",
 		"tinyurl"
 	]
