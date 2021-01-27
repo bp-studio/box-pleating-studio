@@ -44,6 +44,11 @@ namespace PaperUtil {
 
 	let black: paper.Color, red: paper.Color;
 
+	export function unite(p1: paper.PathItem, p2: paper.PathItem): paper.PathItem {
+		if(p1.isEmpty()) return p2;
+		else return p1.unite(p2, { insert: false });
+	}
+
 	export function Black() { return (black = black || new paper.Color('black')); }
 	export function Red() { return (red = red || new paper.Color('red')); }
 }

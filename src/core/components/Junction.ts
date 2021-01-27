@@ -203,6 +203,7 @@ interface JJunction extends JRectangle {
 		return 0;
 	}
 
+	/** 目前 isValid 的定義就是正常的 overlap */
 	@shrewd public get isValid(): boolean {
 		return this.status == JunctionStatus.overlap;
 

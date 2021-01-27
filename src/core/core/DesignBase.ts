@@ -185,8 +185,8 @@ abstract class DesignBase extends Mountable {
 		return this.validJunctions.filter(j => !j.isCovered);
 	}
 
-	@shrewd public get junctionsByQuadrant(): ReadonlyMap<Quadrant, readonly Junction[]> {
-		return DesignBase.ToQuadrantMap(this.junctions.values());
+	@shrewd public get validJunctionsByQuadrant(): ReadonlyMap<Quadrant, readonly Junction[]> {
+		return DesignBase.ToQuadrantMap(this.validJunctions);
 	}
 
 	@shrewd public get activeJunctionsByQuadrant(): ReadonlyMap<Quadrant, readonly Junction[]> {

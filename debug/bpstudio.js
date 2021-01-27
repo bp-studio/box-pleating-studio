@@ -1309,8 +1309,8 @@ class DesignBase extends Mountable {
     get activeJunctions() {
         return this.validJunctions.filter(j => !j.isCovered);
     }
-    get junctionsByQuadrant() {
-        return DesignBase.ToQuadrantMap(this.junctions.values());
+    get validJunctionsByQuadrant() {
+        return DesignBase.ToQuadrantMap(this.validJunctions);
     }
     get activeJunctionsByQuadrant() {
         return DesignBase.ToQuadrantMap(this.activeJunctions);
@@ -1394,7 +1394,7 @@ __decorate([
 ], DesignBase.prototype, "activeJunctions", null);
 __decorate([
     shrewd
-], DesignBase.prototype, "junctionsByQuadrant", null);
+], DesignBase.prototype, "validJunctionsByQuadrant", null);
 __decorate([
     shrewd
 ], DesignBase.prototype, "activeJunctionsByQuadrant", null);
@@ -2076,6 +2076,7 @@ var Quadrant_1;
 let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
     constructor(sheet, flap, q) {
         super(sheet);
+        this._validJunctions = [];
         this.flap = flap;
         this.q = q;
         this.qv = Quadrant_1.QV[q];
@@ -2214,13 +2215,14 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         let r = this.flap.radius;
         return this.point.add(this.qv.scale(r));
     }
-    get junctions() {
+    get validJunctions() {
         var _a;
-        return (_a = this.design.junctionsByQuadrant.get(this)) !== null && _a !== void 0 ? _a : [];
+        let result = (_a = this.design.validJunctionsByQuadrant.get(this)) !== null && _a !== void 0 ? _a : [];
+        return this._validJunctions = ArrayUtil.compare(this._validJunctions, result);
     }
     get coveredJunctions() {
-        return this.junctions
-            .filter(j => j.isValid && j.isCovered)
+        return this.validJunctions
+            .filter(j => j.isCovered)
             .map(j => {
             let q3 = j.q1 == this ? j.q2 : j.q1;
             return [j, j.coveredBy.map(c => c.q1 == q3 ? c.q2.point : c.q1.point)];
@@ -2272,7 +2274,7 @@ __decorate([
 ], Quadrant.prototype, "corner", null);
 __decorate([
     shrewd
-], Quadrant.prototype, "junctions", null);
+], Quadrant.prototype, "validJunctions", null);
 __decorate([
     shrewd
 ], Quadrant.prototype, "coveredJunctions", null);
@@ -2788,7 +2790,7 @@ class LabeledView extends ControlView {
     get overflow() {
         if (this.disposed || !this.$studio)
             return 0;
-        this.render();
+        this.draw();
         let result = 0, b = this._label.bounds;
         let w = this.$studio.$display.scale * this.control.sheet.width;
         let left = b.x, right = b.x + b.width;
@@ -2837,6 +2839,7 @@ let RiverView = class RiverView extends ControlView {
     constructor(river) {
         super(river);
         this.components = new Mapping(() => this.info.components, key => new RiverComponent(this, key));
+        this._rendered = false;
         this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
         this.$addItem(Layer.hinge, this._hinge = new paper.CompoundPath(Style.hinge));
         this.$addItem(Layer.ridge, this._ridge = new paper.CompoundPath(Style.ridge));
@@ -2880,42 +2883,52 @@ let RiverView = class RiverView extends ControlView {
         if (this.disposed)
             return path;
         for (let component of this.components.values()) {
-            let c = component.contour;
-            if (path.isEmpty())
-                path = c;
-            else {
-                path = path.unite(c, { insert: false });
-            }
+            path = PaperUtil.unite(path, component.contour);
         }
-        return path;
+        if (!path.compare(this._closure))
+            this._closure = path;
+        return this._closure;
     }
-    get actualPath() {
+    get interior() {
         var _a;
-        let { adjacent } = this.info;
-        let design = this.control.sheet.design;
-        let path = this.closure;
         if (this.disposed)
-            return path;
+            return this._interior;
+        let path = new paper.PathItem();
+        let design = this.control.sheet.design;
+        let { adjacent } = this.info;
         for (let e of adjacent) {
             if (e.isRiver) {
                 let r = design.rivers.get(e);
-                for (let item of (_a = r.view.closure.children) !== null && _a !== void 0 ? _a : [r.view.closure]) {
-                    path = path.subtract(item, { insert: false });
+                for (let c of (_a = r.view.closure.children) !== null && _a !== void 0 ? _a : [r.view.closure]) {
+                    path = PaperUtil.unite(path, c);
                 }
             }
             else {
                 let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2);
                 f.view.renderHinge();
-                path = path.subtract(f.view.hinge, { insert: false });
+                path = PaperUtil.unite(path, f.view.hinge);
             }
         }
-        return path.reorient(false, true);
+        if (!path.compare(this._interior))
+            this._interior = path;
+        return this._interior;
+    }
+    get actualPath() {
+        console.log("ap");
+        let path = this.closure;
+        if (this.disposed)
+            return path;
+        path = path.subtract(this.interior, { insert: false });
+        path = path.reorient(false, true);
+        if (!path.compare(this._actualPath))
+            this._actualPath = path;
+        return this._actualPath;
     }
     render() {
         PaperUtil.replaceContent(this.boundary, this.closure, true);
         PaperUtil.replaceContent(this._shade, this.actualPath, false);
         PaperUtil.replaceContent(this._hinge, this.actualPath, false);
-        this.renderRidge();
+        this._rendered = true;
     }
     get corners() {
         var _a;
@@ -2950,11 +2963,16 @@ let RiverView = class RiverView extends ControlView {
     }
     renderRidge() {
         var _a;
+        let oa = this.control.sheet.design.openAnchors;
+        this.draw();
+        if (!this._rendered)
+            return;
+        this._rendered = false;
         this._ridge.removeChildren();
         for (let [from, to, self] of this.corners) {
             let line = new Line(from, to);
             let f = line.slope.value, key = f + "," + (from.x - f * from.y);
-            let arr = (_a = this.control.sheet.design.openAnchors.get(key)) !== null && _a !== void 0 ? _a : [];
+            let arr = (_a = oa.get(key)) !== null && _a !== void 0 ? _a : [];
             let p = arr.find(p => line.contains(p, true));
             if (p)
                 PaperUtil.addLine(this._ridge, from, p);
@@ -2975,52 +2993,19 @@ __decorate([
 ], RiverView.prototype, "closure", null);
 __decorate([
     shrewd
+], RiverView.prototype, "interior", null);
+__decorate([
+    shrewd
 ], RiverView.prototype, "actualPath", null);
 __decorate([
     shrewd
 ], RiverView.prototype, "corners", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "renderRidge", null);
 RiverView = __decorate([
     shrewd
 ], RiverView);
-let RiverComponent = class RiverComponent extends Disposable {
-    constructor(view, key) {
-        super(view);
-        this.view = view;
-        this.key = key;
-        let [f, n] = key.split(',').map(v => Number(v));
-        this.flap = view.design.flapsById.get(f);
-        this.node = view.design.tree.node.get(n);
-    }
-    get shouldDispose() {
-        return super.shouldDispose || this.flap.disposed ||
-            !this.view.info.components.some(c => c == this.key);
-    }
-    onDispose() {
-        let self = this;
-        delete self.flap;
-        delete self.node;
-    }
-    get distance() {
-        if (this.disposed)
-            return 0;
-        let { design, info } = this.view, flap = this.flap;
-        let dis = design.tree.dist(flap.node, this.node);
-        return dis - flap.radius + info.length;
-    }
-    get contour() {
-        this.flap.view.draw();
-        return this.flap.view.makeContour(this.distance);
-    }
-};
-__decorate([
-    shrewd
-], RiverComponent.prototype, "distance", null);
-__decorate([
-    shrewd
-], RiverComponent.prototype, "contour", null);
-RiverComponent = __decorate([
-    shrewd
-], RiverComponent);
 class Draggable extends ViewedControl {
     constructor() {
         super(...arguments);
@@ -6126,6 +6111,18 @@ var TreeMaker;
         }
     }
 })(TreeMaker || (TreeMaker = {}));
+var ArrayUtil;
+(function (ArrayUtil) {
+    function compare(oldArray, newArray) {
+        if (oldArray.length != newArray.length)
+            return newArray;
+        for (let item of newArray)
+            if (!oldArray.includes(item))
+                return newArray;
+        return oldArray;
+    }
+    ArrayUtil.compare = compare;
+})(ArrayUtil || (ArrayUtil = {}));
 function deepCopy(target, ...sources) {
     for (let s of sources)
         if (s instanceof Object) {
@@ -6314,6 +6311,13 @@ var PaperUtil;
     }
     PaperUtil.setLines = setLines;
     let black, red;
+    function unite(p1, p2) {
+        if (p1.isEmpty())
+            return p2;
+        else
+            return p1.unite(p2, { insert: false });
+    }
+    PaperUtil.unite = unite;
     function Black() { return (black = black || new paper.Color('black')); }
     PaperUtil.Black = Black;
     function Red() { return (red = red || new paper.Color('red')); }
@@ -6356,5 +6360,44 @@ let DeviceView = class DeviceView extends ControlView {
 DeviceView = __decorate([
     shrewd
 ], DeviceView);
+let RiverComponent = class RiverComponent extends Disposable {
+    constructor(view, key) {
+        super(view);
+        this.view = view;
+        this.key = key;
+        let [f, n] = key.split(',').map(v => Number(v));
+        this.flap = view.design.flapsById.get(f);
+        this.node = view.design.tree.node.get(n);
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.flap.disposed ||
+            !this.view.info.components.some(c => c == this.key);
+    }
+    onDispose() {
+        let self = this;
+        delete self.flap;
+        delete self.node;
+    }
+    get distance() {
+        if (this.disposed)
+            return 0;
+        let { design, info } = this.view, flap = this.flap;
+        let dis = design.tree.dist(flap.node, this.node);
+        return dis - flap.radius + info.length;
+    }
+    get contour() {
+        this.flap.view.draw();
+        return this.flap.view.makeContour(this.distance);
+    }
+};
+__decorate([
+    shrewd
+], RiverComponent.prototype, "distance", null);
+__decorate([
+    shrewd
+], RiverComponent.prototype, "contour", null);
+RiverComponent = __decorate([
+    shrewd
+], RiverComponent);
 
 //# sourceMappingURL=bpstudio.js.map

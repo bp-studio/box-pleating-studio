@@ -230,13 +230,17 @@
 		return this.point.add(this.qv.scale(r));
 	}
 
-	@shrewd private get junctions(): readonly Junction[] {
-		return this.design.junctionsByQuadrant.get(this) ?? [];
+
+	private _validJunctions: readonly Junction[] = [];
+	@shrewd private get validJunctions(): readonly Junction[] {
+		let result = this.design.validJunctionsByQuadrant.get(this) ?? [];
+		return this._validJunctions = ArrayUtil.compare(this._validJunctions, result);
 	}
 
+	/** 傳回 */
 	@shrewd private get coveredJunctions(): readonly [Junction, Point[]][] {
-		return this.junctions
-			.filter(j => j.isValid && j.isCovered)
+		return this.validJunctions
+			.filter(j => j.isCovered)
 			.map(j => {
 				let q3 = j.q1 == this ? j.q2 : j.q1;
 				return [j, j.coveredBy.map(c => c.q1 == q3 ? c.q2!.point : c.q1!.point)];

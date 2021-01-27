@@ -65,41 +65,53 @@
 		let path = new paper.PathItem();
 		if(this.disposed) return path;
 		for(let component of this.components.values()) {
-			let c = component.contour;
-			if(path.isEmpty()) path = c;
-			else {
-				path = path.unite(c, { insert: false });
-			}
+			path = PaperUtil.unite(path, component.contour);
 		}
-		return path;
+		if(!path.compare(this._closure)) this._closure = path;
+		return this._closure;
 	}
+	private _closure: paper.PathItem;
 
-	/** 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向 */
-	@shrewd private get actualPath(): paper.PathItem {
-		let { adjacent } = this.info;
+	@shrewd private get interior(): paper.PathItem {
+		if(this.disposed) return this._interior;
+		let path = new paper.PathItem();
 		let design = this.control.sheet.design;
-		let path = this.closure;
-		if(this.disposed) return path;
+		let { adjacent } = this.info;
 		for(let e of adjacent) {
 			if(e.isRiver) {
 				let r = design.rivers.get(e)!;
-				for(let item of r.view.closure.children ?? [r.view.closure]) {
-					path = path.subtract(item as paper.PathItem, { insert: false });
+				for(let c of r.view.closure.children ?? [r.view.closure]) {
+					path = PaperUtil.unite(path, c as paper.PathItem);
 				}
 			} else {
 				let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2)!;
 				f.view.renderHinge();
-				path = path.subtract(f.view.hinge, { insert: false });
+				path = PaperUtil.unite(path, f.view.hinge);
 			}
 		}
-		return path.reorient(false, true); // 定向
+		if(!path.compare(this._interior)) this._interior = path;
+		return this._interior;
 	}
+	private _interior: paper.PathItem;
 
+	/** 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向 */
+	@shrewd private get actualPath(): paper.PathItem {
+		console.log("ap")		;
+		let path = this.closure;
+		if(this.disposed) return path;
+		path = path.subtract(this.interior, { insert: false });
+		path = path.reorient(false, true); // 定向
+		if(!path.compare(this._actualPath)) this._actualPath = path;
+		return this._actualPath;
+	}
+	private _actualPath: paper.PathItem;
+
+	private _rendered = false;
 	protected render() {
 		PaperUtil.replaceContent(this.boundary, this.closure, true);
 		PaperUtil.replaceContent(this._shade, this.actualPath, false);
 		PaperUtil.replaceContent(this._hinge, this.actualPath, false);
-		this.renderRidge();
+		this._rendered = true;
 	}
 
 	/** 收集所有自身的內直角資訊；這部份與 openAnchors 無關，分開計算以增加效能 */
@@ -140,14 +152,22 @@
 		return result;
 	}
 
-	private renderRidge() {
+	@shrewd private renderRidge() {
+		// 建立相依性
+		let oa = this.control.sheet.design.openAnchors;
+
+		// 如果同一回合裡面 draw() 沒有真的被執行（即沒有發生形狀的改變），那就跳過後面的動作
+		this.draw();
+		if(!this._rendered) return;
+		this._rendered = false;
+
 		this._ridge.removeChildren();
 
 		for(let [from, to, self] of this.corners) {
 			// 優先尋找 Pattern 的開放角落
 			let line = new Line(from, to);
 			let f = line.slope.value, key = f + "," + (from.x - f * from.y);
-			let arr = this.control.sheet.design.openAnchors.get(key) ?? [];
+			let arr = oa.get(key) ?? [];
 			let p = arr.find(p => line.contains(p, true));
 
 			if(p) PaperUtil.addLine(this._ridge, from, p);
@@ -167,50 +187,4 @@ interface RiverInfo {
 	readonly adjacent: readonly TreeEdge[];
 	readonly length: number;
 	readonly components: readonly string[];
-}
-
-//////////////////////////////////////////////////////////////////
-/**
- * `RiverComponent` 是負責監視針對特定的 `Flap` 在對應於特定 `River`
- * 的距離之下產生的輪廓的物件。
- *
- * 由於這些東西只要 Flap 本身以及相關的 Pattern 沒有發生變更就不需要重新計算，
- * 特別利用一個反應式物件來監視，以增進效能。
- */
-//////////////////////////////////////////////////////////////////
-
-@shrewd class RiverComponent extends Disposable {
-
-	private flap: Flap;
-	private node: TreeNode;
-
-	constructor(private view: RiverView, private key: string) {
-		super(view);
-		let [f, n] = key.split(',').map(v => Number(v));
-		this.flap = view.design.flapsById.get(f)!;
-		this.node = view.design.tree.node.get(n)!;
-	}
-
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.flap.disposed ||
-			!this.view.info.components.some(c => c == this.key);
-	}
-
-	protected onDispose() {
-		let self = this as any;
-		delete self.flap;
-		delete self.node;
-	}
-
-	@shrewd private get distance(): number {
-		if(this.disposed) return 0;
-		let { design, info } = this.view, flap = this.flap;
-		let dis = design.tree.dist(flap.node, this.node);
-		return dis - flap.radius + info.length;
-	}
-
-	@shrewd public get contour(): paper.PathItem {
-		this.flap.view.draw();
-		return this.flap.view.makeContour(this.distance);
-	}
 }
