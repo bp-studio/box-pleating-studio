@@ -27,6 +27,8 @@ interface IDesignObject {
 
 	public readonly tree: Tree;
 
+	public readonly junctions: DoubleMapping<Flap, Junction>;
+
 	constructor(studio: BPStudio, profile: RecursivePartial<JDesign>) {
 		super(studio, profile);
 
@@ -46,6 +48,12 @@ interface IDesignObject {
 		this.mode = this.data.mode;
 
 		this.tree = new Tree(this, this.data.tree.edges);
+
+		// 這個的初始化必須放在 Tree 的後面，不然會出錯
+		this.junctions = new DoubleMapping<Flap, Junction>(
+			() => this.flaps.values(),
+			(f1, f2) => new Junction(this.LayoutSheet, f1, f2)
+		);
 	}
 
 	@shrewd public get sheet(): Sheet {

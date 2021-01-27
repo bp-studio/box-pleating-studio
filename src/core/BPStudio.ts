@@ -28,7 +28,6 @@
 /// <reference path="view/View.ts" />
 /// <reference path="model/TreeNode.ts" />
 /// <reference path="model/TreeEdge.ts" />
-/// <reference path="model/TreePath.ts" />
 /// <reference path="math/Point.ts" />
 /// <reference path="math/Vector.ts" />
 

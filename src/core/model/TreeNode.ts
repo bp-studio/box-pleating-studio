@@ -15,6 +15,29 @@
 		this.id = id;
 	}
 
+	@shrewd({
+		renderer(this: TreeNode, n: TreeNode | null) {
+			// 如果原本的父點被刪除，那自己就成為新的 root
+			return n && n.disposed ? null : n;
+		}
+	})
+	public parent: TreeNode | null = null;
+
+	@shrewd public get parentEdge(): TreeEdge | null {
+		if(!this.parent) return null
+		return this.tree.edge.get(this, this.parent) ?? null;
+	}
+
+	@shrewd public get dist(): number {
+		if(!this.parentEdge) return 0;
+		return this.parentEdge!.length + this.parent!.dist;
+	}
+
+	@shrewd public get depth(): number {
+		if(!this.parent) return 0;
+		return this.parent.depth + 1;
+	}
+
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.tree.disposed;
 	}
@@ -46,11 +69,11 @@
 		return this.edges.length;
 	}
 
-	@shrewd public get firstEdge() {
-		return this.edges[0];
+	@shrewd public get leafEdge() {
+		return this.degree == 1 ? this.edges[0] : null;
 	}
 
 	@shrewd public get radius() {
-		return this.degree == 1 ? this.edges[0].length : NaN;
+		return this.leafEdge?.length ?? NaN;
 	}
 }

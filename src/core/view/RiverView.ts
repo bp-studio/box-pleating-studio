@@ -96,7 +96,6 @@
 
 	/** 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向 */
 	@shrewd private get actualPath(): paper.PathItem {
-		console.log("ap")		;
 		let path = this.closure;
 		if(this.disposed) return path;
 		path = path.subtract(this.interior, { insert: false });

@@ -39,14 +39,8 @@
 
 	protected onDispose(): void {
 		Shrewd.terminate(this.edge);
-		this.path.dispose();
+		this.pair.dispose();
 	}
-
-	/** 當前樹的全體路徑。樹上的任兩點之間都有唯一的一條路徑。 */
-	public readonly path = new DoubleMapping<TreeNode, TreePath>(
-		() => this.node.values(),
-		(n1, n2) => new TreePath(n1, n2)
-	);
 
 	@shrewd public get leaf(): ReadonlySet<TreeNode> {
 		var set: Set<TreeNode> = new Set();
@@ -63,10 +57,14 @@
 
 	public readonly jidMap = new Map<number, number>();
 
+	public readonly pair = new DoubleMapping<TreeNode, TreePair>(
+		() => this.node.values(),
+		(n1, n2) => new TreePair(n1, n2)
+	);
+
 	public dist(n1: TreeNode, n2: TreeNode) {
 		if(n1 == n2) return 0;
-		let path = this.path.get(n1, n2);
-		return path ? path.length : NaN;
+		return this.pair.get(n1, n2)!.dist;
 	}
 
 	private getOrAddNode(n: number) {
@@ -82,6 +80,9 @@
 	public split(e: TreeEdge) {
 		let N = this.getOrAddNode(this.nextId);
 		let { n1, n2 } = e;
+		if(n1.parent == n2) [n1, n2] = [n2, n1];
+		N.parent = n1;
+		n2.parent = N;
 		this.edge.delete(n1, n2);
 		this.edge.set(N, n1, new TreeEdge(N, n1, Math.ceil(e.length / 2)));
 		this.edge.set(N, n2, new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
@@ -92,14 +93,22 @@
 	public deleteAndMerge(e: TreeEdge) {
 		let N = this.getOrAddNode(this.nextId);
 		let { n1, n2, a1, a2 } = e;
+		if(n1.parent == n2) {
+			[n1, n2] = [n2, n1];
+			[a1, a2] = [a2, a1];
+		}
+
+		N.parent = n1.parent;
 		this.edge.delete(n1, n2);
 		for(let edge of a1) {
 			let n = edge.n(n1);
+			if(n != N.parent) n.parent = N;
 			this.edge.delete(n, n1);
 			this.edge.set(N, n, new TreeEdge(N, n, edge.length));
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
+			n.parent = N;
 			this.edge.delete(n, n2);
 			this.edge.set(N, n, new TreeEdge(N, n, edge.length));
 		}
@@ -115,9 +124,11 @@
 			return;
 		}
 		let e1 = edges[0], e2 = edges[1];
-		let N1 = e1.n(n), N2 = e2.n(n);
-		let edge = new TreeEdge(N1, N2, e1.length + e2.length);
-		this.edge.set(N1, N2, edge);
+		let n1 = e1.n(n), n2 = e2.n(n);
+		if(n.parent == n2) [n1, n2] = [n2, n1];
+		n2.parent = n1;
+		let edge = new TreeEdge(n1, n2, e1.length + e2.length);
+		this.edge.set(n1, n2, edge);
 		n.dispose(true);
 		return edge;
 	}
@@ -146,6 +157,12 @@
 			console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
 			return false;
 		}
+
+		if(has1) N2.parent = N1;
+		else if(has2) N1.parent = N2;
+		else if(n1 < n2) N2.parent = N1;
+		else N1.parent = N2;
+
 		let edge = new TreeEdge(N1, N2, length);
 		this.edge.set(N1, N2, edge);
 

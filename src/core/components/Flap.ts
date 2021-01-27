@@ -65,10 +65,11 @@ interface JFlap {
 	public get name() { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 
-	public get radius() {
-		return this.node.firstEdge?.length ?? 0;
+	public get radius() { return this.node.radius; }
+	public set radius(r) {
+		let e = this.node.leafEdge;
+		if(e) e.length = r;
 	}
-	public set radius(r) { this.node.firstEdge.length = r; }
 
 	constructor(sheet: Sheet, node: TreeNode) {
 		super(sheet);

@@ -1007,9 +1007,9 @@ let Tree = class Tree extends Disposable {
         super(design);
         this.node = new Map();
         this.edge = new DoubleMap();
-        this.path = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePath(n1, n2));
         this.nextId = 0;
         this.jidMap = new Map();
+        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
         this.design = design;
         while (edges === null || edges === void 0 ? void 0 : edges.length) {
             let remain = [], ok = false;
@@ -1027,7 +1027,7 @@ let Tree = class Tree extends Disposable {
     }
     onDispose() {
         Shrewd.terminate(this.edge);
-        this.path.dispose();
+        this.pair.dispose();
     }
     get leaf() {
         var set = new Set();
@@ -1044,8 +1044,7 @@ let Tree = class Tree extends Disposable {
     dist(n1, n2) {
         if (n1 == n2)
             return 0;
-        let path = this.path.get(n1, n2);
-        return path ? path.length : NaN;
+        return this.pair.get(n1, n2).dist;
     }
     getOrAddNode(n) {
         let N;
@@ -1061,6 +1060,10 @@ let Tree = class Tree extends Disposable {
     split(e) {
         let N = this.getOrAddNode(this.nextId);
         let { n1, n2 } = e;
+        if (n1.parent == n2)
+            [n1, n2] = [n2, n1];
+        N.parent = n1;
+        n2.parent = N;
         this.edge.delete(n1, n2);
         this.edge.set(N, n1, new TreeEdge(N, n1, Math.ceil(e.length / 2)));
         this.edge.set(N, n2, new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
@@ -1070,14 +1073,22 @@ let Tree = class Tree extends Disposable {
     deleteAndMerge(e) {
         let N = this.getOrAddNode(this.nextId);
         let { n1, n2, a1, a2 } = e;
+        if (n1.parent == n2) {
+            [n1, n2] = [n2, n1];
+            [a1, a2] = [a2, a1];
+        }
+        N.parent = n1.parent;
         this.edge.delete(n1, n2);
         for (let edge of a1) {
             let n = edge.n(n1);
+            if (n != N.parent)
+                n.parent = N;
             this.edge.delete(n, n1);
             this.edge.set(N, n, new TreeEdge(N, n, edge.length));
         }
         for (let edge of a2) {
             let n = edge.n(n2);
+            n.parent = N;
             this.edge.delete(n, n2);
             this.edge.set(N, n, new TreeEdge(N, n, edge.length));
         }
@@ -1092,9 +1103,12 @@ let Tree = class Tree extends Disposable {
             return;
         }
         let e1 = edges[0], e2 = edges[1];
-        let N1 = e1.n(n), N2 = e2.n(n);
-        let edge = new TreeEdge(N1, N2, e1.length + e2.length);
-        this.edge.set(N1, N2, edge);
+        let n1 = e1.n(n), n2 = e2.n(n);
+        if (n.parent == n2)
+            [n1, n2] = [n2, n1];
+        n2.parent = n1;
+        let edge = new TreeEdge(n1, n2, e1.length + e2.length);
+        this.edge.set(n1, n2, edge);
         n.dispose(true);
         return edge;
     }
@@ -1118,6 +1132,14 @@ let Tree = class Tree extends Disposable {
             console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
             return false;
         }
+        if (has1)
+            N2.parent = N1;
+        else if (has2)
+            N1.parent = N2;
+        else if (n1 < n2)
+            N2.parent = N1;
+        else
+            N1.parent = N2;
         let edge = new TreeEdge(N1, N2, length);
         this.edge.set(N1, N2, edge);
         return true;
@@ -1237,7 +1259,6 @@ class DesignBase extends Mountable {
         this.rivers = new Mapping(() => [...this.tree.edge.values()].filter(e => e.isRiver), e => new River(this.LayoutSheet, e));
         this.vertices = new Mapping(() => this.tree.node.values(), n => new Vertex(this.TreeSheet, n));
         this.flaps = new Mapping(() => this.tree.leaf, l => new Flap(this.LayoutSheet, l));
-        this.junctions = new DoubleMapping(() => this.flaps.values(), (f1, f2) => new Junction(this.LayoutSheet, f1, f2));
         this.stretches = new Mapping(() => this.teams.keys(), signature => new Stretch(this.LayoutSheet, signature));
         this.data = deepCopy(Migration.getSample(), profile);
         if (this.data.tree.nodes.length < 3)
@@ -1594,8 +1615,25 @@ let TreeNode = class TreeNode extends Disposable {
     constructor(tree, id) {
         super(tree);
         this.name = "";
+        this.parent = null;
         this.tree = tree;
         this.id = id;
+    }
+    get parentEdge() {
+        var _a;
+        if (!this.parent)
+            return null;
+        return (_a = this.tree.edge.get(this, this.parent)) !== null && _a !== void 0 ? _a : null;
+    }
+    get dist() {
+        if (!this.parentEdge)
+            return 0;
+        return this.parentEdge.length + this.parent.dist;
+    }
+    get depth() {
+        if (!this.parent)
+            return 0;
+        return this.parent.depth + 1;
     }
     get shouldDispose() {
         return super.shouldDispose || this.tree.disposed;
@@ -1620,16 +1658,33 @@ let TreeNode = class TreeNode extends Disposable {
     get degree() {
         return this.edges.length;
     }
-    get firstEdge() {
-        return this.edges[0];
+    get leafEdge() {
+        return this.degree == 1 ? this.edges[0] : null;
     }
     get radius() {
-        return this.degree == 1 ? this.edges[0].length : NaN;
+        var _a, _b;
+        return (_b = (_a = this.leafEdge) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : NaN;
     }
 };
 __decorate([
     action
 ], TreeNode.prototype, "name", void 0);
+__decorate([
+    shrewd({
+        renderer(n) {
+            return n && n.disposed ? null : n;
+        }
+    })
+], TreeNode.prototype, "parent", void 0);
+__decorate([
+    shrewd
+], TreeNode.prototype, "parentEdge", null);
+__decorate([
+    shrewd
+], TreeNode.prototype, "dist", null);
+__decorate([
+    shrewd
+], TreeNode.prototype, "depth", null);
 __decorate([
     shrewd
 ], TreeNode.prototype, "edges", null);
@@ -1638,7 +1693,7 @@ __decorate([
 ], TreeNode.prototype, "degree", null);
 __decorate([
     shrewd
-], TreeNode.prototype, "firstEdge", null);
+], TreeNode.prototype, "leafEdge", null);
 __decorate([
     shrewd
 ], TreeNode.prototype, "radius", null);
@@ -1753,51 +1808,6 @@ __decorate([
 TreeEdge = __decorate([
     shrewd
 ], TreeEdge);
-let TreePath = class TreePath extends Disposable {
-    constructor(n1, n2) {
-        super();
-        this._n1 = n1;
-        this._n2 = n2;
-    }
-    get shouldDispose() {
-        return super.shouldDispose || this._n1.disposed || this._n2.disposed;
-    }
-    findIntersection(path) {
-        for (let e of this.edges)
-            if (path.edges.includes(e))
-                return e;
-        return undefined;
-    }
-    get edges() {
-        let result = [];
-        let now = this._n1;
-        let ok = true;
-        while (now != this._n2 && ok) {
-            ok = false;
-            for (let e of now.edges) {
-                if (e.g(now).includes(this._n2)) {
-                    ok = true;
-                    result.push(e);
-                    now = e.n(now);
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-    get length() {
-        return this.edges.reduce((l, e) => l + e.length, 0);
-    }
-};
-__decorate([
-    shrewd
-], TreePath.prototype, "edges", null);
-__decorate([
-    shrewd
-], TreePath.prototype, "length", null);
-TreePath = __decorate([
-    shrewd
-], TreePath);
 class Point extends Couple {
     static get ZERO() {
         return new Point(0, 0);
@@ -1927,6 +1937,7 @@ let Design = class Design extends DesignBase {
         this.description = this.data.description;
         this.mode = this.data.mode;
         this.tree = new Tree(this, this.data.tree.edges);
+        this.junctions = new DoubleMapping(() => this.flaps.values(), (f1, f2) => new Junction(this.LayoutSheet, f1, f2));
     }
     get sheet() {
         return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
@@ -2914,7 +2925,6 @@ let RiverView = class RiverView extends ControlView {
         return this._interior;
     }
     get actualPath() {
-        console.log("ap");
         let path = this.closure;
         if (this.disposed)
             return path;
@@ -3118,6 +3128,8 @@ let FlapView = class FlapView extends LabeledView {
     }
     renderHinge() {
         var _a, _b;
+        if (this.control.disposed)
+            return;
         this._circle.visible = (_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showHinge) !== null && _b !== void 0 ? _b : false;
         this.hinge.removeSegments();
         this.control.quadrants.forEach(q => this.hinge.add(...q.makeContour(0)));
@@ -3265,11 +3277,12 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
     }
     get name() { return this.node.name; }
     set name(n) { this.node.name = n; }
-    get radius() {
-        var _a, _b;
-        return (_b = (_a = this.node.firstEdge) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0;
+    get radius() { return this.node.radius; }
+    set radius(r) {
+        let e = this.node.leafEdge;
+        if (e)
+            e.length = r;
     }
-    set radius(r) { this.node.firstEdge.length = r; }
     onDragged() {
         if (this.isNew)
             Draggable.relocate(this, this.design.vertices.get(this.node));
@@ -3577,16 +3590,26 @@ let Junction = class Junction extends SheetObject {
         let q = this.sx > 0 ? this.q2 : this.q1;
         return q === null || q === void 0 ? void 0 : q.getBaseRectangle(this, base);
     }
-    get path() {
-        return this.design.tree.path.get(this.f1.node, this.f2.node);
+    get _lca() {
+        let n1 = this.f1.node, n2 = this.f2.node;
+        return n1.tree.pair.get(n1, n2).lca;
+    }
+    findIntersection(j) {
+        let n1 = this._lca, n2 = j._lca;
+        if (n1 == n2)
+            return n1;
+        let n3 = n1.tree.pair.get(n1, n2).lca;
+        if (n3 != n1 && n3 != n2)
+            return null;
+        return n3 == n1 ? n2 : n1;
     }
     isCoveredBy(o) {
         if (this == o || this.direction % 2 != o.direction % 2)
             return false;
-        let e = this.path.findIntersection(o.path);
-        if (!e)
+        let n = this.findIntersection(o);
+        if (!n)
             return false;
-        let [r1, r2] = [o.getBaseRectangle(e.n1), this.getBaseRectangle(e.n1)];
+        let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
         if (!r1 || !r2 || !r1.contains(r2))
             return false;
         if (r1.equals(r2)) {
@@ -3631,8 +3654,10 @@ let Junction = class Junction extends SheetObject {
         return isQuadrant(this.direction) ? this.f2.quadrants[opposite(this.direction)] : null;
     }
     get $treeDistance() {
-        var _a, _b;
-        return (_b = (_a = this.path) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0;
+        let n1 = this.f1.node, n2 = this.f2.node;
+        if (n1.disposed || n2.disposed)
+            return 0;
+        return n1.tree.dist(n1, n2);
     }
     get status() {
         if (this._flapDistance < this.$treeDistance)
@@ -3723,9 +3748,6 @@ let Junction = class Junction extends SheetObject {
         return result;
     }
 };
-__decorate([
-    shrewd
-], Junction.prototype, "path", null);
 __decorate([
     shrewd
 ], Junction.prototype, "coveredBy", null);
@@ -5154,6 +5176,43 @@ var Trace;
         return result;
     }
 })(Trace || (Trace = {}));
+let TreePair = class TreePair extends Disposable {
+    constructor(n1, n2) {
+        super();
+        this._n1 = n1;
+        this._n2 = n2;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this._n1.disposed || this._n2.disposed;
+    }
+    get lca() {
+        let [n1, n2] = [this._n1, this._n2];
+        if (this.disposed)
+            return n1;
+        if (n1.depth < n2.depth)
+            [n1, n2] = [n2, n1];
+        let a1 = n1.parent, a2 = n2.parent;
+        if (n1.depth == n2.depth) {
+            if (a1 && a1 == a2)
+                return a1;
+            return n1.tree.pair.get(a1, a2).lca;
+        }
+        else {
+            if (a1 == n2)
+                return n2;
+            return n1.tree.pair.get(a1, n2).lca;
+        }
+    }
+    get dist() {
+        return this._n1.dist + this._n2.dist - 2 * this.lca.dist;
+    }
+};
+__decorate([
+    shrewd
+], TreePair.prototype, "lca", null);
+TreePair = __decorate([
+    shrewd
+], TreePair);
 var ConfigUtil;
 (function (ConfigUtil) {
     function joinOverlaps(o1, o2, i1, i2, oriented, reverse = false) {

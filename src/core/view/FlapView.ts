@@ -60,6 +60,7 @@
 
 	/** 這個獨立出來以提供 RiverView 的相依 */
 	@shrewd public renderHinge() {
+		if(this.control.disposed) return;
 		this._circle.visible = this.$studio?.$display.settings.showHinge ?? false;
 		this.hinge.removeSegments();
 		this.control.quadrants.forEach(q => this.hinge.add(...q.makeContour(0)));

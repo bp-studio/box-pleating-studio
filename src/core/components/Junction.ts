@@ -62,9 +62,17 @@ interface JJunction extends JRectangle {
 		return q?.getBaseRectangle(this, base);
 	}
 
-	/** 這個 Junction 對應的路徑 */
-	@shrewd private get path(): TreePath {
-		return this.design.tree.path.get(this.f1.node, this.f2.node)!;
+	private get _lca(): TreeNode {
+		let n1 = this.f1.node, n2 = this.f2.node;
+		return n1.tree.pair.get(n1, n2)!.lca;
+	}
+
+	private findIntersection(j: Junction): TreeNode | null {
+		let n1 = this._lca, n2 = j._lca;
+		if(n1 == n2) return n1;
+		let n3 = n1.tree.pair.get(n1, n2)!.lca;
+		if(n3 != n1 && n3 != n2) return null;
+		return n3 == n1 ? n2 : n1;
 	}
 
 	/** 判斷自身是否被另外一個 `Junction` 所涵蓋 */
@@ -72,12 +80,12 @@ interface JJunction extends JRectangle {
 		// 方向不一樣的話肯定不是覆蓋
 		if(this == o || this.direction % 2 != o.direction % 2) return false;
 
-		// 找出對應路徑上的一條共用邊，如果沒有的話肯定不是覆蓋
-		let e = this.path.findIntersection(o.path);
-		if(!e) return false;
+		// 找出對應路徑上的一個共用點，如果沒有的話肯定不是覆蓋
+		let n = this.findIntersection(o);
+		if(!n) return false;
 
 		// 基底矩形檢查
-		let [r1, r2] = [o.getBaseRectangle(e.n1), this.getBaseRectangle(e.n1)];
+		let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
 		if(!r1 || !r2 || !r1.contains(r2)) return false;
 
 		if(r1.equals(r2)) {
@@ -128,7 +136,9 @@ interface JJunction extends JRectangle {
 	}
 
 	@shrewd public get $treeDistance() {
-		return this.path?.length ?? 0;
+		let n1 = this.f1.node, n2 = this.f2.node;
+		if(n1.disposed || n2.disposed) return 0;
+		return n1.tree.dist(n1, n2);
 	}
 
 	@shrewd public get status() {
