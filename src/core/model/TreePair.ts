@@ -23,16 +23,15 @@
 	@shrewd public get lca(): TreeNode {
 		let [n1, n2] = [this._n1, this._n2];
 		if(this.disposed) return n1; // 隨便沒差
-		if(n1.depth < n2.depth) [n1, n2] = [n2, n1];
-		let a1 = n1.parent, a2 = n2.parent;
 
-		if(n1.depth == n2.depth) {
-			if(a1 && a1 == a2) return a1;
-			return n1.tree.pair.get(a1!, a2!)!.lca;
-		} else {
-			if(a1 == n2) return n2;
-			return n1.tree.pair.get(a1!, n2!)!.lca;
-		}
+		if(n1.depth < n2.depth) [n1, n2] = [n2, n1];	// 排序成 n1 低於 n2
+		if(n2.depth == 0) return n2;					// 如果 n2 根本就是根，直接傳回
+		while(n1.depth > n2.depth) n1 = n1.parent!;		// 回朔到 n1 n2 同高
+		if(n1 == n2) return n1;							// 如果一樣，那這個自動就是 lca
+
+		let a1 = n1.parent!, a2 = n2.parent!;
+		if(a1 == a2) return a1;
+		return n1.tree.pair.get(a1, a2)!.lca;
 	}
 
 	// 這個數值做成反應方法的意義有限，所以做成單純的存取子
