@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h5 v-t="'panel.flap.type'"></h5>
-		<field :label="$t('panel.flap.name')" type="text" v-model="selection.name"></field>
+		<field :label="$t('panel.flap.name')" v-model="selection.name"></field>
 		<number :label="$t('panel.flap.radius')" v-model.number="selection.radius"></number>
 		<number :label="$t('panel.flap.width')" v-model.number="selection.width" :max="design.sheet.width"></number>
 		<number :label="$t('panel.flap.height')" v-model.number="selection.height" :max="design.sheet.height"></number>

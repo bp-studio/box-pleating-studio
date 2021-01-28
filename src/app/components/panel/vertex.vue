@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h5 v-t="'panel.vertex.type'"></h5>
-		<field :label="$t('panel.vertex.name')" type="text" v-model="selection.name"></field>
+		<field :label="$t('panel.vertex.name')" v-model="selection.name"></field>
 		<div class="mt-3 d-flex">
 			<div class="flex-shrink-0 me-2">
 				<button class="btn btn-primary" @click="selection.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'"></button>

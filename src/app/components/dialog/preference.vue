@@ -14,14 +14,13 @@
 							</select>
 						</div>
 					</div>
-					<field :label="$t('preference.autoSave')" type="checkbox" v-model="core.autoSave" @input="core.saveSettings()"></field>
-					<field
+					<checkbox :label="$t('preference.autoSave')" v-model="core.autoSave" @input="core.saveSettings()"></checkbox>
+					<checkbox
 						v-if="core.initialized"
 						:label="$t('preference.includeHidden')"
-						type="checkbox"
 						v-model="display.includeHiddenElement"
 						@input="core.saveSettings()"
-					></field>
+					></checkbox>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
