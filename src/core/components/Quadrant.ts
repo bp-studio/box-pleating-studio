@@ -76,7 +76,7 @@
 	}
 
 	/** 產生此象限距離 d（不含半徑）的逆時鐘順序輪廓 */
-	public makeContour(d: number): paper.Point[] {
+	public makeContour(d: number): Path {
 		let r = this.flap.radius + d;
 		let v = this.sv.scale(r);
 		let startPt = this.getStart(r);
@@ -112,7 +112,7 @@
 				trace.push(this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y));
 			}
 		}
-		return trace.map(p => p.toPaper())
+		return trace;
 	}
 
 	/** 指定的點是否某個座標超過了自身的給定半徑範圍 */
@@ -199,25 +199,30 @@
 	}
 
 	/** 在找出延伸河道輪廓的時候，應該被扣除的不該考慮部份 */
-	public getOverriddenPath(d: number): paper.PathItem[] {
-		let result: paper.PathItem[] = [];
-		if(this.pattern) return result;
-		let r = this.flap.radius + d;
-		for(let [j, pts] of this.coveredJunctions) {
-			let { ox, oy } = j;
-			let p = this.point.add(this.qv.scale(r));
+	public getOverriddenSegments(d: number): PolyBool.Segments {
+		let result: PolyBool.Path[] = [];
+		if(!this.pattern) {
+			let r = this.flap.radius + d;
+			for(let [j, pts] of this.coveredJunctions) {
+				let { ox, oy } = j;
+				let p = this.point.add(this.qv.scale(r));
 
-			// 扣除的部份不要超過覆蓋者所能夠繪製的輪廓範圍，否則會扣太多
-			for(let pt of pts) {
-				let diff = pt.sub(p);
-				ox = Math.min(-diff.x * this.fx, ox);
-				oy = Math.min(-diff.y * this.fy, oy);
+				// 扣除的部份不要超過覆蓋者所能夠繪製的輪廓範圍，否則會扣太多
+				for(let pt of pts) {
+					let diff = pt.sub(p);
+					ox = Math.min(-diff.x * this.fx, ox);
+					oy = Math.min(-diff.y * this.fy, oy);
+				}
+
+				// 如果結果非正那就不用考慮
+				if(ox <= 0 || oy <= 0) continue;
+
+				let v = new Vector(ox * this.fx, oy * this.fy);
+				let rect = new Rectangle(p, p.sub(v));
+				result.push(rect.toPolyBoolPath());
 			}
-
-			let v = new Vector(ox * this.fx, oy * this.fy);
-			result.push(new paper.Path.Rectangle(p.toPaper(), p.sub(v).toPaper()));
 		}
-		return result;
+		return PolyBool.segments({ regions: result, inverted: false });
 	}
 
 	@shrewd public get pattern(): Pattern | null {

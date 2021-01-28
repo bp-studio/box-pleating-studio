@@ -48,22 +48,24 @@
 		});;
 	}
 
-	public makeContour(d: number): paper.PathItem {
-		let path = new paper.Path({ closed: true });
-		this.control.quadrants.forEach(q => path.add(...q.makeContour(d)));
-		let item: paper.PathItem = path;
-		for(let q of this.control.quadrants) {
-			for(let p of q.getOverriddenPath(d)) item = item.subtract(p, { insert: false });
-		}
-		return item;
+	public makeSegments(d: number): PolyBool.Segments {
+		let path: Path = [];
+		this.control.quadrants.forEach(q => path.push(...q.makeContour(d)));
+		return PathUtil.toSegments(path);
+	}
+
+	@segment() public get hingeSegments() {
+		return this.makeSegments(0);
 	}
 
 	/** 這個獨立出來以提供 RiverView 的相依 */
 	@shrewd public renderHinge() {
 		if(this.control.disposed) return;
 		this._circle.visible = this.$studio?.$display.settings.showHinge ?? false;
+		let paths = PaperUtil.fromSegments(this.hingeSegments);
 		this.hinge.removeSegments();
-		this.control.quadrants.forEach(q => this.hinge.add(...q.makeContour(0)));
+		if(paths.length) this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
+		else debugger;
 	}
 
 	protected render() {

@@ -32,4 +32,14 @@ class Rectangle {
 	public get height() { return this.p2._y.sub(this.p1._y).value; }
 	public get top() { return this.p2.y; }
 	public get right() { return this.p2.x; }
+
+	/** 產生順時鐘的路徑 */
+	public toPolyBoolPath(): PolyBool.Path {
+		return [
+			[this.p1.x, this.p1.y],
+			[this.p1.x, this.p2.y],
+			[this.p2.x, this.p2.y],
+			[this.p2.x, this.p1.y],
+		];
+	}
 }

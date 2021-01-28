@@ -122,6 +122,6 @@ interface JFlap {
 
 	/** 偵錯用；列印 makeContour(d) 的結果 */
 	public debug(d: number = 0): void {
-		console.log(this.view.makeContour(d).exportJSON());
+		//console.log(this.view.makeContour(d).exportJSON());
 	}
 }

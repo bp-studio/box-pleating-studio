@@ -10,7 +10,7 @@
 interface IHook {
 	/**
 	 * Trigger a "read" operation to record dependency.
-	 * 
+	 *
 	 * Returns whether a dependency is established.
 	 */
 	read(id: number): boolean;
@@ -21,7 +21,7 @@ interface IHook {
 	/**
 	 * Garbage collection; clearing up unsubscribed entries.
 	 * This method is called at the end of each committing stage.
-	 * 
+	 *
 	 * Returns an array of id's that were cleaned-up.
 	 */
 	gc(): number[];
@@ -47,6 +47,9 @@ interface IDecoratorOptions<T> {
 
 	/** Renderer function for ObservableProperty. */
 	renderer?: (value: T) => T;
+
+	/** Comparer function */
+	comparer?: (oldValue: T, newValue: T) => boolean;
 }
 
 /**

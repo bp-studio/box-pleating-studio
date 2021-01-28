@@ -746,16 +746,19 @@
     MapHelper._handler = new MapProxyHandler();
     class ComputedProperty extends DecoratedMember {
         constructor(parent, descriptor) {
+            var _a;
+            var _b;
             super(parent, descriptor);
             this._getter = descriptor.$method;
             if (this._option.active)
                 this.$notified();
+            (_a = (_b = this._option).comparer) !== null && _a !== void 0 ? _a : _b.comparer = (ov, nv) => ov === nv;
         }
         get $renderer() {
             return this._getter.bind(this._parent);
         }
         $postrendering(result) {
-            if (result !== this._value) {
+            if (!this._option.comparer(this._value, result)) {
                 this._value = result;
                 Observable.$publish(this);
             }

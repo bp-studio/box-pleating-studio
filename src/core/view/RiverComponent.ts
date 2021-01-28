@@ -39,8 +39,26 @@
 		return dis - flap.radius + info.length;
 	}
 
-	@shrewd public get contour(): paper.PathItem {
+	@segment() public get segment(): PolyBool.Segments {
 		this.flap.view.draw();
-		return this.flap.view.makeContour(this.distance);
+		return this.flap.view.makeSegments(this.distance);
+	}
+
+	private overridden(q: number) {
+		return this.flap.quadrants[q].getOverriddenSegments(this.distance);
+	}
+
+	@segment() public get q0() { return this.overridden(0); }
+	@segment() public get q1() { return this.overridden(1); }
+	@segment() public get q2() { return this.overridden(2); }
+	@segment() public get q3() { return this.overridden(3); }
+
+	@segment() public get contour(): PolyBool.Segments {
+		this.flap.view.draw();
+		let seg = this.segment;
+		for(let q of [this.q0, this.q1, this.q2, this.q3]) {
+			seg = PolyBool.difference(seg, q);
+		}
+		return seg;
 	}
 }

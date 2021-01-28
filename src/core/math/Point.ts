@@ -45,20 +45,8 @@ class Point extends Couple implements IPoint {
 		return this;
 	}
 
-	public diagonalXRange(min_X: number, max_X: number, reversed: boolean): void {
-		if(this._x.lt(min_X)) this.setDiagonalX(min_X, reversed);
-		if(this._x.gt(max_X)) this.setDiagonalX(max_X, reversed);
-	}
-
 	public toPaper(): paper.Point {
 		return new paper.Point(this.x, this.y);
-	}
-
-	private setDiagonalX(x: number, reversed: boolean): void {
-		var s = this._x.sub(x);
-		this._x.s(s);
-		if(reversed) this._y.a(s);
-		else this._y.s(s);
 	}
 
 	/** Point 類別的比較允許跟 IPoint 進行 */

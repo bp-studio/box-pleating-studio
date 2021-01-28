@@ -62,7 +62,7 @@ interface JJunction extends JRectangle {
 		return q?.getBaseRectangle(this, base);
 	}
 
-	private get _lca(): TreeNode {
+	@shrewd private get _lca(): TreeNode {
 		let n1 = this.f1.node, n2 = this.f2.node;
 		return n1.tree.pair.get(n1, n2)!.lca;
 	}

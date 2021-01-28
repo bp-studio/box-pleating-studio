@@ -254,6 +254,736 @@ __decorate([
 Disposable = __decorate([
     shrewd
 ], Disposable);
+var PolyBool;
+(function (PolyBool) {
+    function compare(seg1, seg2) {
+        return JSON.stringify(seg1) == JSON.stringify(seg2);
+    }
+    PolyBool.compare = compare;
+    function union(segments) {
+        var seg = segments[0];
+        for (var i = 1; i < segments.length; i++) {
+            var comb = combine(seg, segments[i]);
+            seg = selectUnion(comb);
+        }
+        return seg;
+    }
+    PolyBool.union = union;
+    function difference(seg1, seg2) {
+        let comb = combine(seg1, seg2);
+        return selectDifference(comb);
+    }
+    PolyBool.difference = difference;
+    function segments(poly) {
+        var i = Intersecter(true);
+        poly.regions.forEach(i.addRegion);
+        return {
+            segments: i.calculate(poly.inverted),
+            inverted: poly.inverted
+        };
+    }
+    PolyBool.segments = segments;
+    function combine(segments1, segments2) {
+        var i3 = Intersecter(false);
+        return {
+            combined: i3.combine(segments1.segments, segments1.inverted, segments2.segments, segments2.inverted),
+            inverted1: segments1.inverted,
+            inverted2: segments2.inverted
+        };
+    }
+    function selectUnion(combined) {
+        return {
+            segments: SegmentSelector.union(combined.combined),
+            inverted: combined.inverted1 || combined.inverted2
+        };
+    }
+    function selectDifference(combined) {
+        return {
+            segments: SegmentSelector.difference(combined.combined),
+            inverted: combined.inverted1 && !combined.inverted2
+        };
+    }
+    function polygon(segments) {
+        return {
+            regions: SegmentChainer(segments.segments),
+            inverted: segments.inverted
+        };
+    }
+    PolyBool.polygon = polygon;
+    function Intersecter(selfIntersection) {
+        function segmentNew(start, end) {
+            return {
+                start: start,
+                end: end,
+                myFill: {
+                    above: null,
+                    below: null
+                },
+                otherFill: null
+            };
+        }
+        function segmentCopy(start, end, seg) {
+            return {
+                start: start,
+                end: end,
+                myFill: {
+                    above: seg.myFill.above,
+                    below: seg.myFill.below
+                },
+                otherFill: null
+            };
+        }
+        var event_list = List.create();
+        function eventCompare(p1_isStart, p1_1, p1_2, p2_isStart, p2_1, p2_2) {
+            var comp = Epsilon.pointsCompare(p1_1, p2_1);
+            if (comp !== 0)
+                return comp;
+            if (Epsilon.pointsSame(p1_2, p2_2))
+                return 0;
+            if (p1_isStart !== p2_isStart)
+                return p1_isStart ? 1 : -1;
+            return Epsilon.pointAboveOrOnLine(p1_2, p2_isStart ? p2_1 : p2_2, p2_isStart ? p2_2 : p2_1) ? 1 : -1;
+        }
+        function eventAdd(ev, other_pt) {
+            event_list.insertBefore(ev, function (here) {
+                if (here === ev)
+                    return 0;
+                var comp = eventCompare(ev.isStart, ev.pt, other_pt, here.isStart, here.pt, here.other.pt);
+                return comp;
+            });
+        }
+        function eventAddSegmentStart(seg, primary) {
+            var ev_start = List.node({
+                isStart: true,
+                pt: seg.start,
+                seg: seg,
+                primary: primary,
+                other: null,
+                status: null
+            });
+            eventAdd(ev_start, seg.end);
+            return ev_start;
+        }
+        function eventAddSegmentEnd(ev_start, seg, primary) {
+            var ev_end = List.node({
+                isStart: false,
+                pt: seg.end,
+                seg: seg,
+                primary: primary,
+                other: ev_start,
+                status: null
+            });
+            ev_start.other = ev_end;
+            eventAdd(ev_end, ev_start.pt);
+        }
+        function eventAddSegment(seg, primary) {
+            var ev_start = eventAddSegmentStart(seg, primary);
+            eventAddSegmentEnd(ev_start, seg, primary);
+            return ev_start;
+        }
+        function eventUpdateEnd(ev, end) {
+            ev.other.remove();
+            ev.seg.end = end;
+            ev.other.pt = end;
+            eventAdd(ev.other, ev.pt);
+        }
+        function eventDivide(ev, pt) {
+            var ns = segmentCopy(pt, ev.seg.end, ev.seg);
+            eventUpdateEnd(ev, pt);
+            return eventAddSegment(ns, ev.primary);
+        }
+        function calculate(primaryPolyInverted, secondaryPolyInverted) {
+            var status_list = List.create();
+            function statusCompare(ev1, ev2) {
+                var a1 = ev1.seg.start;
+                var a2 = ev1.seg.end;
+                var b1 = ev2.seg.start;
+                var b2 = ev2.seg.end;
+                if (Epsilon.pointsCollinear(a1, b1, b2)) {
+                    if (Epsilon.pointsCollinear(a2, b1, b2))
+                        return 1;
+                    return Epsilon.pointAboveOrOnLine(a2, b1, b2) ? 1 : -1;
+                }
+                return Epsilon.pointAboveOrOnLine(a1, b1, b2) ? 1 : -1;
+            }
+            function statusFindSurrounding(ev) {
+                return status_list.findTransition({ ev: ev }, function (here) {
+                    if (here.ev === ev)
+                        return 0;
+                    var comp = statusCompare(ev, here.ev);
+                    return -comp;
+                });
+            }
+            function checkIntersection(ev1, ev2) {
+                var seg1 = ev1.seg;
+                var seg2 = ev2.seg;
+                var a1 = seg1.start;
+                var a2 = seg1.end;
+                var b1 = seg2.start;
+                var b2 = seg2.end;
+                var i = Epsilon.linesIntersect(a1, a2, b1, b2);
+                if (i === false) {
+                    if (!Epsilon.pointsCollinear(a1, a2, b1))
+                        return false;
+                    if (Epsilon.pointsSame(a1, b2) || Epsilon.pointsSame(a2, b1))
+                        return false;
+                    var a1_equ_b1 = Epsilon.pointsSame(a1, b1);
+                    var a2_equ_b2 = Epsilon.pointsSame(a2, b2);
+                    if (a1_equ_b1 && a2_equ_b2)
+                        return ev2;
+                    var a1_between = !a1_equ_b1 && Epsilon.pointBetween(a1, b1, b2);
+                    var a2_between = !a2_equ_b2 && Epsilon.pointBetween(a2, b1, b2);
+                    if (a1_equ_b1) {
+                        if (a2_between) {
+                            eventDivide(ev2, a2);
+                        }
+                        else {
+                            eventDivide(ev1, b2);
+                        }
+                        return ev2;
+                    }
+                    else if (a1_between) {
+                        if (!a2_equ_b2) {
+                            if (a2_between) {
+                                eventDivide(ev2, a2);
+                            }
+                            else {
+                                eventDivide(ev1, b2);
+                            }
+                        }
+                        eventDivide(ev2, a1);
+                    }
+                }
+                else {
+                    if (i.alongA === 0) {
+                        if (i.alongB === -1)
+                            eventDivide(ev1, b1);
+                        else if (i.alongB === 0)
+                            eventDivide(ev1, i.pt);
+                        else if (i.alongB === 1)
+                            eventDivide(ev1, b2);
+                    }
+                    if (i.alongB === 0) {
+                        if (i.alongA === -1)
+                            eventDivide(ev2, a1);
+                        else if (i.alongA === 0)
+                            eventDivide(ev2, i.pt);
+                        else if (i.alongA === 1)
+                            eventDivide(ev2, a2);
+                    }
+                }
+                return false;
+            }
+            var segments = [];
+            while (!event_list.isEmpty()) {
+                var ev = event_list.getHead();
+                if (ev.isStart) {
+                    var surrounding = statusFindSurrounding(ev);
+                    var above = surrounding.before ? surrounding.before.ev : null;
+                    var below = surrounding.after ? surrounding.after.ev : null;
+                    function checkBothIntersections() {
+                        if (above) {
+                            var eve = checkIntersection(ev, above);
+                            if (eve)
+                                return eve;
+                        }
+                        if (below)
+                            return checkIntersection(ev, below);
+                        return false;
+                    }
+                    var eve = checkBothIntersections();
+                    if (eve) {
+                        if (selfIntersection) {
+                            var toggle;
+                            if (ev.seg.myFill.below === null)
+                                toggle = true;
+                            else
+                                toggle = ev.seg.myFill.above !== ev.seg.myFill.below;
+                            if (toggle)
+                                eve.seg.myFill.above = !eve.seg.myFill.above;
+                        }
+                        else {
+                            eve.seg.otherFill = ev.seg.myFill;
+                        }
+                        ev.other.remove();
+                        ev.remove();
+                    }
+                    if (event_list.getHead() !== ev) {
+                        continue;
+                    }
+                    if (selfIntersection) {
+                        var toggle;
+                        if (ev.seg.myFill.below === null)
+                            toggle = true;
+                        else
+                            toggle = ev.seg.myFill.above !== ev.seg.myFill.below;
+                        if (!below) {
+                            ev.seg.myFill.below = primaryPolyInverted;
+                        }
+                        else {
+                            ev.seg.myFill.below = below.seg.myFill.above;
+                        }
+                        if (toggle)
+                            ev.seg.myFill.above = !ev.seg.myFill.below;
+                        else
+                            ev.seg.myFill.above = ev.seg.myFill.below;
+                    }
+                    else {
+                        if (ev.seg.otherFill === null) {
+                            var inside;
+                            if (!below) {
+                                inside =
+                                    ev.primary ? secondaryPolyInverted : primaryPolyInverted;
+                            }
+                            else {
+                                if (ev.primary === below.primary)
+                                    inside = below.seg.otherFill.above;
+                                else
+                                    inside = below.seg.myFill.above;
+                            }
+                            ev.seg.otherFill = {
+                                above: inside,
+                                below: inside
+                            };
+                        }
+                    }
+                    ev.other.status = surrounding.insert(List.node({ ev: ev }));
+                }
+                else {
+                    var st = ev.status;
+                    if (st === null) {
+                        throw new Error('PolyBool: Zero-length segment detected; your epsilon is ' +
+                            'probably too small or too large');
+                    }
+                    var i = status_list.getIndex(st);
+                    if (i > 0 && i < status_list.nodes.length - 1) {
+                        var before = status_list.nodes[i - 1], after = status_list.nodes[i + 1];
+                        checkIntersection(before.ev, after.ev);
+                    }
+                    st.remove();
+                    if (!ev.primary) {
+                        var s = ev.seg.myFill;
+                        ev.seg.myFill = ev.seg.otherFill;
+                        ev.seg.otherFill = s;
+                    }
+                    segments.push(ev.seg);
+                }
+                event_list.getHead().remove();
+            }
+            return segments;
+        }
+        if (!selfIntersection) {
+            return {
+                combine: function (segments1, inverted1, segments2, inverted2) {
+                    segments1.forEach(function (seg) {
+                        eventAddSegment(segmentCopy(seg.start, seg.end, seg), true);
+                    });
+                    segments2.forEach(function (seg) {
+                        eventAddSegment(segmentCopy(seg.start, seg.end, seg), false);
+                    });
+                    return calculate(inverted1, inverted2);
+                }
+            };
+        }
+        return {
+            addRegion: function (region) {
+                var pt1;
+                var pt2 = region[region.length - 1];
+                for (var i = 0; i < region.length; i++) {
+                    pt1 = pt2;
+                    pt2 = region[i];
+                    var forward = Epsilon.pointsCompare(pt1, pt2);
+                    if (forward === 0)
+                        continue;
+                    eventAddSegment(segmentNew(forward < 0 ? pt1 : pt2, forward < 0 ? pt2 : pt1), true);
+                }
+            },
+            calculate: function (inverted) {
+                return calculate(inverted, false);
+            }
+        };
+    }
+    let Epsilon;
+    (function (Epsilon) {
+        const eps = 0.0000000001;
+        function pointAboveOrOnLine(pt, left, right) {
+            var Ax = left[0];
+            var Ay = left[1];
+            var Bx = right[0];
+            var By = right[1];
+            var Cx = pt[0];
+            var Cy = pt[1];
+            return (Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax) >= -eps;
+        }
+        Epsilon.pointAboveOrOnLine = pointAboveOrOnLine;
+        function pointBetween(p, left, right) {
+            var d_py_ly = p[1] - left[1];
+            var d_rx_lx = right[0] - left[0];
+            var d_px_lx = p[0] - left[0];
+            var d_ry_ly = right[1] - left[1];
+            var dot = d_px_lx * d_rx_lx + d_py_ly * d_ry_ly;
+            if (dot < eps)
+                return false;
+            var sqlen = d_rx_lx * d_rx_lx + d_ry_ly * d_ry_ly;
+            if (dot - sqlen > -eps)
+                return false;
+            return true;
+        }
+        Epsilon.pointBetween = pointBetween;
+        function pointsSameX(p1, p2) {
+            return Math.abs(p1[0] - p2[0]) < eps;
+        }
+        Epsilon.pointsSameX = pointsSameX;
+        function pointsSameY(p1, p2) {
+            return Math.abs(p1[1] - p2[1]) < eps;
+        }
+        Epsilon.pointsSameY = pointsSameY;
+        function pointsSame(p1, p2) {
+            return pointsSameX(p1, p2) && pointsSameY(p1, p2);
+        }
+        Epsilon.pointsSame = pointsSame;
+        function pointsCompare(p1, p2) {
+            if (pointsSameX(p1, p2))
+                return pointsSameY(p1, p2) ? 0 : (p1[1] < p2[1] ? -1 : 1);
+            return p1[0] < p2[0] ? -1 : 1;
+        }
+        Epsilon.pointsCompare = pointsCompare;
+        function pointsCollinear(pt1, pt2, pt3) {
+            var dx1 = pt1[0] - pt2[0];
+            var dy1 = pt1[1] - pt2[1];
+            var dx2 = pt2[0] - pt3[0];
+            var dy2 = pt2[1] - pt3[1];
+            return Math.abs(dx1 * dy2 - dx2 * dy1) < eps;
+        }
+        Epsilon.pointsCollinear = pointsCollinear;
+        function linesIntersect(a0, a1, b0, b1) {
+            var adx = a1[0] - a0[0];
+            var ady = a1[1] - a0[1];
+            var bdx = b1[0] - b0[0];
+            var bdy = b1[1] - b0[1];
+            var axb = adx * bdy - ady * bdx;
+            if (Math.abs(axb) < eps)
+                return false;
+            var dx = a0[0] - b0[0];
+            var dy = a0[1] - b0[1];
+            var A = (bdx * dy - bdy * dx) / axb;
+            var B = (adx * dy - ady * dx) / axb;
+            var ret = {
+                alongA: 0,
+                alongB: 0,
+                pt: [
+                    a0[0] + A * adx,
+                    a0[1] + A * ady
+                ]
+            };
+            if (A <= -eps)
+                ret.alongA = -2;
+            else if (A < eps)
+                ret.alongA = -1;
+            else if (A - 1 <= -eps)
+                ret.alongA = 0;
+            else if (A - 1 < eps)
+                ret.alongA = 1;
+            else
+                ret.alongA = 2;
+            if (B <= -eps)
+                ret.alongB = -2;
+            else if (B < eps)
+                ret.alongB = -1;
+            else if (B - 1 <= -eps)
+                ret.alongB = 0;
+            else if (B - 1 < eps)
+                ret.alongB = 1;
+            else
+                ret.alongB = 2;
+            return ret;
+        }
+        Epsilon.linesIntersect = linesIntersect;
+        function pointInsideRegion(pt, region) {
+            var x = pt[0];
+            var y = pt[1];
+            var last_x = region[region.length - 1][0];
+            var last_y = region[region.length - 1][1];
+            var inside = false;
+            for (var i = 0; i < region.length; i++) {
+                var curr_x = region[i][0];
+                var curr_y = region[i][1];
+                if ((curr_y - y > eps) != (last_y - y > eps) &&
+                    (last_x - curr_x) * (y - curr_y) / (last_y - curr_y) + curr_x - x > eps)
+                    inside = !inside;
+                last_x = curr_x;
+                last_y = curr_y;
+            }
+            return inside;
+        }
+        Epsilon.pointInsideRegion = pointInsideRegion;
+    })(Epsilon || (Epsilon = {}));
+    let SegmentSelector;
+    (function (SegmentSelector) {
+        function select(segments, selection) {
+            var result = [];
+            segments.forEach(function (seg) {
+                var index = (seg.myFill.above ? 8 : 0) +
+                    (seg.myFill.below ? 4 : 0) +
+                    ((seg.otherFill && seg.otherFill.above) ? 2 : 0) +
+                    ((seg.otherFill && seg.otherFill.below) ? 1 : 0);
+                if (selection[index] !== 0) {
+                    result.push({
+                        start: seg.start,
+                        end: seg.end,
+                        myFill: {
+                            above: selection[index] === 1,
+                            below: selection[index] === 2
+                        },
+                        otherFill: null
+                    });
+                }
+            });
+            return result;
+        }
+        function union(segments) {
+            return select(segments, [
+                0, 2, 1, 0,
+                2, 2, 0, 0,
+                1, 0, 1, 0,
+                0, 0, 0, 0
+            ]);
+        }
+        SegmentSelector.union = union;
+        function difference(segments) {
+            return select(segments, [
+                0, 0, 0, 0,
+                2, 0, 2, 0,
+                1, 1, 0, 0,
+                0, 1, 2, 0
+            ]);
+        }
+        SegmentSelector.difference = difference;
+    })(SegmentSelector || (SegmentSelector = {}));
+    function SegmentChainer(segments) {
+        var chains = [];
+        var regions = [];
+        segments.forEach(function (seg) {
+            var pt1 = seg.start;
+            var pt2 = seg.end;
+            if (Epsilon.pointsSame(pt1, pt2)) {
+                console.warn('PolyBool: Warning: Zero-length segment detected; your epsilon is ' +
+                    'probably too small or too large');
+                return;
+            }
+            var first_match = {
+                index: 0,
+                matches_head: false,
+                matches_pt1: false
+            };
+            var second_match = {
+                index: 0,
+                matches_head: false,
+                matches_pt1: false
+            };
+            var next_match = first_match;
+            function setMatch(index, matches_head, matches_pt1) {
+                next_match.index = index;
+                next_match.matches_head = matches_head;
+                next_match.matches_pt1 = matches_pt1;
+                if (next_match === first_match) {
+                    next_match = second_match;
+                    return false;
+                }
+                next_match = null;
+                return true;
+            }
+            for (var i = 0; i < chains.length; i++) {
+                var chain = chains[i];
+                var head = chain[0];
+                var head2 = chain[1];
+                var tail = chain[chain.length - 1];
+                var tail2 = chain[chain.length - 2];
+                if (Epsilon.pointsSame(head, pt1)) {
+                    if (setMatch(i, true, true))
+                        break;
+                }
+                else if (Epsilon.pointsSame(head, pt2)) {
+                    if (setMatch(i, true, false))
+                        break;
+                }
+                else if (Epsilon.pointsSame(tail, pt1)) {
+                    if (setMatch(i, false, true))
+                        break;
+                }
+                else if (Epsilon.pointsSame(tail, pt2)) {
+                    if (setMatch(i, false, false))
+                        break;
+                }
+            }
+            if (next_match === first_match) {
+                chains.push([pt1, pt2]);
+                return;
+            }
+            if (next_match === second_match) {
+                var index = first_match.index;
+                var pt = first_match.matches_pt1 ? pt2 : pt1;
+                var addToHead = first_match.matches_head;
+                var chain = chains[index];
+                var grow = addToHead ? chain[0] : chain[chain.length - 1];
+                var grow2 = addToHead ? chain[1] : chain[chain.length - 2];
+                var oppo = addToHead ? chain[chain.length - 1] : chain[0];
+                var oppo2 = addToHead ? chain[chain.length - 2] : chain[1];
+                if (Epsilon.pointsCollinear(grow2, grow, pt)) {
+                    if (addToHead) {
+                        chain.shift();
+                    }
+                    else {
+                        chain.pop();
+                    }
+                    grow = grow2;
+                }
+                if (Epsilon.pointsSame(oppo, pt)) {
+                    chains.splice(index, 1);
+                    if (Epsilon.pointsCollinear(oppo2, oppo, grow)) {
+                        if (addToHead) {
+                            chain.pop();
+                        }
+                        else {
+                            chain.shift();
+                        }
+                    }
+                    regions.push(chain);
+                    return;
+                }
+                if (addToHead) {
+                    chain.unshift(pt);
+                }
+                else {
+                    chain.push(pt);
+                }
+                return;
+            }
+            function reverseChain(index) {
+                chains[index].reverse();
+            }
+            function appendChain(index1, index2) {
+                var chain1 = chains[index1];
+                var chain2 = chains[index2];
+                var tail = chain1[chain1.length - 1];
+                var tail2 = chain1[chain1.length - 2];
+                var head = chain2[0];
+                var head2 = chain2[1];
+                if (Epsilon.pointsCollinear(tail2, tail, head)) {
+                    chain1.pop();
+                    tail = tail2;
+                }
+                if (Epsilon.pointsCollinear(tail, head, head2)) {
+                    chain2.shift();
+                }
+                chains[index1] = chain1.concat(chain2);
+                chains.splice(index2, 1);
+            }
+            var F = first_match.index;
+            var S = second_match.index;
+            var reverseF = chains[F].length < chains[S].length;
+            if (first_match.matches_head) {
+                if (second_match.matches_head) {
+                    if (reverseF) {
+                        reverseChain(F);
+                        appendChain(F, S);
+                    }
+                    else {
+                        reverseChain(S);
+                        appendChain(S, F);
+                    }
+                }
+                else {
+                    appendChain(S, F);
+                }
+            }
+            else {
+                if (second_match.matches_head) {
+                    appendChain(F, S);
+                }
+                else {
+                    if (reverseF) {
+                        reverseChain(F);
+                        appendChain(S, F);
+                    }
+                    else {
+                        reverseChain(S);
+                        appendChain(F, S);
+                    }
+                }
+            }
+        });
+        return regions;
+    }
+    let List;
+    (function (List) {
+        function bisect(compare) {
+            return function right(a, x, lo, hi) {
+                if (!lo)
+                    lo = 0;
+                if (!hi)
+                    hi = a.length;
+                while (lo < hi) {
+                    var mid = lo + hi >>> 1;
+                    if (compare(a[mid], x) > 0)
+                        hi = mid;
+                    else
+                        lo = mid + 1;
+                }
+                return lo;
+            };
+        }
+        function create() {
+            var my = {
+                nodes: [],
+                exists: function (node) {
+                    return my.nodes.includes(node);
+                },
+                getIndex: function (node) {
+                    return my.nodes.indexOf(node);
+                },
+                isEmpty: function () {
+                    return my.nodes.length === 0;
+                },
+                getHead: function () {
+                    return my.nodes[0];
+                },
+                insertBefore: function (node, check) {
+                    my.findTransition(node, check).insert(node);
+                },
+                findTransition: function (node, check) {
+                    var i = bisect(function (a, b) { return check(b) - check(a); })(my.nodes, node);
+                    return {
+                        before: i === 0 ? null : my.nodes[i - 1],
+                        after: my.nodes[i] || null,
+                        insert: function (node) {
+                            my.nodes.splice(i, 0, node);
+                            node.remove = function () { my.nodes.splice(my.nodes.indexOf(node), 1); };
+                            return node;
+                        }
+                    };
+                }
+            };
+            return my;
+        }
+        List.create = create;
+        ;
+        function node(data) {
+            return data;
+        }
+        List.node = node;
+    })(List || (List = {}));
+})(PolyBool || (PolyBool = {}));
+function segment(msg) {
+    return shrewd({
+        comparer: (ov, nv) => {
+            let result = PolyBool.compare(ov, nv);
+            if (result && msg)
+                console.log(msg);
+            return result;
+        }
+    });
+}
 class Piece extends Region {
     constructor(piece) {
         super();
@@ -1298,8 +2028,11 @@ class DesignBase extends Mountable {
         Shrewd.terminate(this.stretches);
         this.junctions.dispose();
     }
+    get allJunctions() {
+        return Array.from(this.junctions.values());
+    }
     get validJunctions() {
-        return [...this.junctions.values()].filter(j => j.isValid);
+        return this.allJunctions.filter(j => j.isValid);
     }
     get teams() {
         let arr;
@@ -1401,6 +2134,9 @@ __decorate([
 __decorate([
     shrewd
 ], DesignBase.prototype, "patternNotFound", null);
+__decorate([
+    shrewd
+], DesignBase.prototype, "allJunctions", null);
 __decorate([
     shrewd
 ], DesignBase.prototype, "validJunctions", null);
@@ -1837,22 +2573,8 @@ class Point extends Couple {
         this._y.s(v.y);
         return this;
     }
-    diagonalXRange(min_X, max_X, reversed) {
-        if (this._x.lt(min_X))
-            this.setDiagonalX(min_X, reversed);
-        if (this._x.gt(max_X))
-            this.setDiagonalX(max_X, reversed);
-    }
     toPaper() {
         return new paper.Point(this.x, this.y);
-    }
-    setDiagonalX(x, reversed) {
-        var s = this._x.sub(x);
-        this._x.s(s);
-        if (reversed)
-            this._y.a(s);
-        else
-            this._y.s(s);
     }
     eq(p) {
         if (p instanceof Point || !p)
@@ -2138,7 +2860,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
                 trace.push(this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y));
             }
         }
-        return trace.map(p => p.toPaper());
+        return trace;
     }
     outside(p, r, x) {
         return x ? p.x * this.fx > this.x(r) * this.fx : p.y * this.fy > this.y(r) * this.fy;
@@ -2200,23 +2922,26 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         inflections.add(inflection.toString());
         return (_a = nextQ.findLead(junctions, d2, lines, inflections)) !== null && _a !== void 0 ? _a : nextQ.getStart(d2);
     }
-    getOverriddenPath(d) {
+    getOverriddenSegments(d) {
         let result = [];
-        if (this.pattern)
-            return result;
-        let r = this.flap.radius + d;
-        for (let [j, pts] of this.coveredJunctions) {
-            let { ox, oy } = j;
-            let p = this.point.add(this.qv.scale(r));
-            for (let pt of pts) {
-                let diff = pt.sub(p);
-                ox = Math.min(-diff.x * this.fx, ox);
-                oy = Math.min(-diff.y * this.fy, oy);
+        if (!this.pattern) {
+            let r = this.flap.radius + d;
+            for (let [j, pts] of this.coveredJunctions) {
+                let { ox, oy } = j;
+                let p = this.point.add(this.qv.scale(r));
+                for (let pt of pts) {
+                    let diff = pt.sub(p);
+                    ox = Math.min(-diff.x * this.fx, ox);
+                    oy = Math.min(-diff.y * this.fy, oy);
+                }
+                if (ox <= 0 || oy <= 0)
+                    continue;
+                let v = new Vector(ox * this.fx, oy * this.fy);
+                let rect = new Rectangle(p, p.sub(v));
+                result.push(rect.toPolyBoolPath());
             }
-            let v = new Vector(ox * this.fx, oy * this.fy);
-            result.push(new paper.Path.Rectangle(p.toPaper(), p.sub(v).toPaper()));
         }
-        return result;
+        return PolyBool.segments({ regions: result, inverted: false });
     }
     get pattern() {
         let stretch = this.design.getStretchByQuadrant(this);
@@ -2890,52 +3615,45 @@ let RiverView = class RiverView extends ControlView {
         super.onDispose();
     }
     get closure() {
-        let path = new paper.PathItem();
         if (this.disposed)
-            return path;
-        for (let component of this.components.values()) {
-            path = PaperUtil.unite(path, component.contour);
-        }
-        if (!path.compare(this._closure))
-            this._closure = path;
-        return this._closure;
+            return null;
+        return PolyBool.union([...this.components.values()].map(c => c.contour));
     }
     get interior() {
-        var _a;
         if (this.disposed)
-            return this._interior;
-        let path = new paper.PathItem();
+            return null;
+        let segments = [];
         let design = this.control.sheet.design;
-        let { adjacent } = this.info;
-        for (let e of adjacent) {
+        for (let e of this.info.adjacent) {
             if (e.isRiver) {
                 let r = design.rivers.get(e);
-                for (let c of (_a = r.view.closure.children) !== null && _a !== void 0 ? _a : [r.view.closure]) {
-                    path = PaperUtil.unite(path, c);
-                }
+                segments.push(r.view.closure);
             }
             else {
                 let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2);
-                f.view.renderHinge();
-                path = PaperUtil.unite(path, f.view.hinge);
+                segments.push(f.view.hingeSegments);
             }
         }
-        if (!path.compare(this._interior))
-            this._interior = path;
-        return this._interior;
+        return PolyBool.union(segments);
+    }
+    get closurePath() {
+        return new paper.CompoundPath({
+            children: PaperUtil.fromSegments(this.closure)
+        });
     }
     get actualPath() {
-        let path = this.closure;
         if (this.disposed)
-            return path;
-        path = path.subtract(this.interior, { insert: false });
-        path = path.reorient(false, true);
-        if (!path.compare(this._actualPath))
-            this._actualPath = path;
-        return this._actualPath;
+            return null;
+        let closure = this.closurePath.children;
+        let interior = PaperUtil.fromSegments(this.interior);
+        let actual = new paper.CompoundPath({
+            children: closure.concat(interior).map(p => p.clone())
+        });
+        actual.reorient(false, true);
+        return actual;
     }
     render() {
-        PaperUtil.replaceContent(this.boundary, this.closure, true);
+        PaperUtil.replaceContent(this.boundary, this.closurePath, false);
         PaperUtil.replaceContent(this._shade, this.actualPath, false);
         PaperUtil.replaceContent(this._hinge, this.actualPath, false);
         this._rendered = true;
@@ -2999,11 +3717,14 @@ __decorate([
     shrewd
 ], RiverView.prototype, "info", null);
 __decorate([
-    shrewd
+    segment()
 ], RiverView.prototype, "closure", null);
 __decorate([
-    shrewd
+    segment()
 ], RiverView.prototype, "interior", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "closurePath", null);
 __decorate([
     shrewd
 ], RiverView.prototype, "actualPath", null);
@@ -3116,23 +3837,25 @@ let FlapView = class FlapView extends LabeledView {
         });
         ;
     }
-    makeContour(d) {
-        let path = new paper.Path({ closed: true });
-        this.control.quadrants.forEach(q => path.add(...q.makeContour(d)));
-        let item = path;
-        for (let q of this.control.quadrants) {
-            for (let p of q.getOverriddenPath(d))
-                item = item.subtract(p, { insert: false });
-        }
-        return item;
+    makeSegments(d) {
+        let path = [];
+        this.control.quadrants.forEach(q => path.push(...q.makeContour(d)));
+        return PathUtil.toSegments(path);
+    }
+    get hingeSegments() {
+        return this.makeSegments(0);
     }
     renderHinge() {
         var _a, _b;
         if (this.control.disposed)
             return;
         this._circle.visible = (_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showHinge) !== null && _b !== void 0 ? _b : false;
+        let paths = PaperUtil.fromSegments(this.hingeSegments);
         this.hinge.removeSegments();
-        this.control.quadrants.forEach(q => this.hinge.add(...q.makeContour(0)));
+        if (paths.length)
+            this.hinge.add(...paths[0].segments);
+        else
+            debugger;
     }
     render() {
         let ds = this.control.sheet.displayScale;
@@ -3167,6 +3890,9 @@ let FlapView = class FlapView extends LabeledView {
 __decorate([
     shrewd
 ], FlapView.prototype, "circle", null);
+__decorate([
+    segment()
+], FlapView.prototype, "hingeSegments", null);
 __decorate([
     shrewd
 ], FlapView.prototype, "renderHinge", null);
@@ -3308,7 +4034,6 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         return v;
     }
     debug(d = 0) {
-        console.log(this.view.makeContour(d).exportJSON());
     }
 };
 __decorate([
@@ -3748,6 +4473,9 @@ let Junction = class Junction extends SheetObject {
         return result;
     }
 };
+__decorate([
+    shrewd
+], Junction.prototype, "_lca", null);
 __decorate([
     shrewd
 ], Junction.prototype, "coveredBy", null);
@@ -5039,6 +5767,10 @@ var PathUtil;
         p.push(...p.splice(0, j));
         return p;
     }
+    function toSegments(path) {
+        return PolyBool.segments({ regions: [path.map(p => [p.x, p.y])], inverted: false });
+    }
+    PathUtil.toSegments = toSegments;
 })(PathUtil || (PathUtil = {}));
 class Rectangle {
     constructor(p1, p2) {
@@ -5059,6 +5791,14 @@ class Rectangle {
     get height() { return this.p2._y.sub(this.p1._y).value; }
     get top() { return this.p2.y; }
     get right() { return this.p2.x; }
+    toPolyBoolPath() {
+        return [
+            [this.p1.x, this.p1.y],
+            [this.p1.x, this.p2.y],
+            [this.p2.x, this.p2.y],
+            [this.p2.x, this.p1.y],
+        ];
+    }
 }
 var Trace;
 (function (Trace) {
@@ -5191,17 +5931,16 @@ let TreePair = class TreePair extends Disposable {
             return n1;
         if (n1.depth < n2.depth)
             [n1, n2] = [n2, n1];
+        if (n2.depth == 0)
+            return n2;
+        while (n1.depth > n2.depth)
+            n1 = n1.parent;
+        if (n1 == n2)
+            return n1;
         let a1 = n1.parent, a2 = n2.parent;
-        if (n1.depth == n2.depth) {
-            if (a1 && a1 == a2)
-                return a1;
-            return n1.tree.pair.get(a1, a2).lca;
-        }
-        else {
-            if (a1 == n2)
-                return n2;
-            return n1.tree.pair.get(a1, n2).lca;
-        }
+        if (a1 == a2)
+            return a1;
+        return n1.tree.pair.get(a1, a2).lca;
     }
     get dist() {
         return this._n1.dist + this._n2.dist - 2 * this.lca.dist;
@@ -6381,6 +7120,14 @@ var PaperUtil;
     PaperUtil.Black = Black;
     function Red() { return (red = red || new paper.Color('red')); }
     PaperUtil.Red = Red;
+    function fromSegments(seg) {
+        let poly = PolyBool.polygon(seg);
+        return poly.regions.map(r => new paper.Path({
+            segments: r,
+            closed: true
+        }));
+    }
+    PaperUtil.fromSegments = fromSegments;
 })(PaperUtil || (PaperUtil = {}));
 let DeviceView = class DeviceView extends ControlView {
     constructor(device) {
@@ -6444,16 +7191,46 @@ let RiverComponent = class RiverComponent extends Disposable {
         let dis = design.tree.dist(flap.node, this.node);
         return dis - flap.radius + info.length;
     }
+    get segment() {
+        this.flap.view.draw();
+        return this.flap.view.makeSegments(this.distance);
+    }
+    overridden(q) {
+        return this.flap.quadrants[q].getOverriddenSegments(this.distance);
+    }
+    get q0() { return this.overridden(0); }
+    get q1() { return this.overridden(1); }
+    get q2() { return this.overridden(2); }
+    get q3() { return this.overridden(3); }
     get contour() {
         this.flap.view.draw();
-        return this.flap.view.makeContour(this.distance);
+        let seg = this.segment;
+        for (let q of [this.q0, this.q1, this.q2, this.q3]) {
+            seg = PolyBool.difference(seg, q);
+        }
+        return seg;
     }
 };
 __decorate([
     shrewd
 ], RiverComponent.prototype, "distance", null);
 __decorate([
-    shrewd
+    segment()
+], RiverComponent.prototype, "segment", null);
+__decorate([
+    segment()
+], RiverComponent.prototype, "q0", null);
+__decorate([
+    segment()
+], RiverComponent.prototype, "q1", null);
+__decorate([
+    segment()
+], RiverComponent.prototype, "q2", null);
+__decorate([
+    segment()
+], RiverComponent.prototype, "q3", null);
+__decorate([
+    segment()
 ], RiverComponent.prototype, "contour", null);
 RiverComponent = __decorate([
     shrewd

@@ -1,3 +1,4 @@
+
 @shrewd class RiverView extends ControlView<River> {
 
 	private _hinge: paper.CompoundPath;
@@ -61,53 +62,48 @@
 	}
 
 	/** 計算當前河的閉包 */
-	@shrewd private get closure(): paper.PathItem {
-		let path = new paper.PathItem();
-		if(this.disposed) return path;
-		for(let component of this.components.values()) {
-			path = PaperUtil.unite(path, component.contour);
-		}
-		if(!path.compare(this._closure)) this._closure = path;
-		return this._closure;
+	@segment() private get closure(): PolyBool.Segments {
+		if(this.disposed) return null as any;
+		return PolyBool.union([...this.components.values()].map(c => c.contour));
 	}
-	private _closure: paper.PathItem;
 
-	@shrewd private get interior(): paper.PathItem {
-		if(this.disposed) return this._interior;
-		let path = new paper.PathItem();
+	@segment() private get interior(): PolyBool.Segments {
+		if(this.disposed) return null as any;
+		let segments: PolyBool.Segments[] = [];
 		let design = this.control.sheet.design;
-		let { adjacent } = this.info;
-		for(let e of adjacent) {
+		for(let e of this.info.adjacent) {
 			if(e.isRiver) {
 				let r = design.rivers.get(e)!;
-				for(let c of r.view.closure.children ?? [r.view.closure]) {
-					path = PaperUtil.unite(path, c as paper.PathItem);
-				}
+				segments.push(r.view.closure);
 			} else {
 				let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2)!;
-				f.view.renderHinge();
-				path = PaperUtil.unite(path, f.view.hinge);
+				segments.push(f.view.hingeSegments);
 			}
 		}
-		if(!path.compare(this._interior)) this._interior = path;
-		return this._interior;
+		return PolyBool.union(segments);
 	}
-	private _interior: paper.PathItem;
+
+	@shrewd private get closurePath(): paper.CompoundPath {
+		return new paper.CompoundPath({
+			children: PaperUtil.fromSegments(this.closure)
+		});
+	}
 
 	/** 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向 */
-	@shrewd private get actualPath(): paper.PathItem {
-		let path = this.closure;
-		if(this.disposed) return path;
-		path = path.subtract(this.interior, { insert: false });
-		path = path.reorient(false, true); // 定向
-		if(!path.compare(this._actualPath)) this._actualPath = path;
-		return this._actualPath;
+	@shrewd private get actualPath(): paper.CompoundPath {
+		if(this.disposed) return null as any;
+		let closure = this.closurePath.children;
+		let interior = PaperUtil.fromSegments(this.interior);
+		let actual = new paper.CompoundPath({
+			children: closure.concat(interior).map(p => p.clone())
+		})
+		actual.reorient(false, true);
+		return actual;
 	}
-	private _actualPath: paper.PathItem;
 
 	private _rendered = false;
 	protected render() {
-		PaperUtil.replaceContent(this.boundary, this.closure, true);
+		PaperUtil.replaceContent(this.boundary, this.closurePath, false);
 		PaperUtil.replaceContent(this._shade, this.actualPath, false);
 		PaperUtil.replaceContent(this._hinge, this.actualPath, false);
 		this._rendered = true;

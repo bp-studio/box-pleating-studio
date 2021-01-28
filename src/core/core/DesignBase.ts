@@ -126,8 +126,12 @@ abstract class DesignBase extends Mountable {
 	/** 當前所有的 `Flap` 兩兩構成的 Junction */
 	public abstract readonly junctions: DoubleMapping<Flap, Junction>;
 
+	@shrewd public get allJunctions(): readonly Junction[] {
+		return Array.from(this.junctions.values());
+	}
+
 	@shrewd public get validJunctions(): readonly Junction[] {
-		return [...this.junctions.values()].filter(j => j.isValid);
+		return this.allJunctions.filter(j => j.isValid);
 	}
 
 	/**
