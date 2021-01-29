@@ -7,6 +7,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 if (typeof Shrewd != "object")
     throw new Error("BPStudio requires Shrewd.");
 const { shrewd } = Shrewd;
+Shrewd.option.debug = true;
+function unorderedArray(msg) {
+    return shrewd({
+        comparer: (ov, nv) => {
+            let result = Shrewd.comparer.unorderedArray(ov, nv);
+            if (result && msg) {
+                console.log(msg);
+            }
+            return result;
+        }
+    });
+}
 Shrewd.option.autoCommit = false;
 setInterval(() => Shrewd.commit(), 50);
 let debug = false;
@@ -70,119 +82,6 @@ function onDemand(target, name, desc) {
 }
 ;
 const onDemandMap = new WeakMap();
-class Partitioner {
-    constructor(config, data) {
-        this.configuration = config;
-        this.overlaps = data.overlaps;
-        this.strategy = data.strategy;
-    }
-    static getMaxIntersectionDistance(tree, r1, r2, oriented) {
-        let q = oriented ? 2 : 0;
-        let n1 = tree.node.get(r1.c[q].e);
-        let n2 = tree.node.get(r2.c[q].e);
-        let n3 = tree.node.get(r1.c[2 - q].e);
-        return tree.distTriple(n1, n2, n3).d3;
-    }
-    *generate() {
-        let { strategy } = this;
-        if (this.overlaps.length == 1) {
-            let o = this.overlaps[0];
-            let j = this.configuration.repository.structure[o.parent];
-            if (strategy == Strategy.halfIntegral) {
-                for (let g of this.halfKamiya(o, j.sx))
-                    yield { gadgets: [g] };
-            }
-            if (strategy == Strategy.universal) {
-                for (let g of this.universalGPS(o, j.sx))
-                    yield { gadgets: [g] };
-            }
-            else {
-                for (let p of Piece.gops(o, j.sx))
-                    yield { gadgets: [{ pieces: [p] }] };
-            }
-        }
-        if (this.overlaps.length == 2) {
-            let joiner = this.configuration.repository.getJoiner(this.overlaps);
-            if (strategy == Strategy.baseJoin) {
-                yield* joiner.baseJoin();
-            }
-            else if (strategy == Strategy.standardJoin) {
-                yield* joiner.standardJoin();
-            }
-            else {
-                yield* joiner.simpleJoin(strategy);
-            }
-        }
-    }
-    *universalGPS(o, sx) {
-        let d = 2, found = false;
-        while (!found) {
-            let bigO = clone(o);
-            bigO.ox *= d;
-            bigO.oy *= d;
-            for (let p of Piece.gops(bigO, sx * d)) {
-                let p1 = Piece.instantiate(p).shrink(d);
-                if (!Number.isInteger(p1.v))
-                    continue;
-                let { ox, oy, u, v } = p1;
-                let p2 = { ox, oy, u: v, v: u };
-                let pt1 = { x: 0, y: 0 }, pt2 = { x: oy + u + v, y: ox + u + v };
-                p1.detours = [[pt1, pt2]];
-                p2.detours = [[pt2, pt1]];
-                let sx = p1.oy + p1.u + p1.v, s = Math.ceil(sx) - sx;
-                let g = new Gadget({ pieces: [p1, p2] });
-                let gr = g.reverseGPS();
-                yield g.addSlack(2, s);
-                yield gr.addSlack(0, s);
-                found = true;
-            }
-            d += 2;
-        }
-    }
-    *halfKamiya(o, sx) {
-        if (o.ox % 2 == 0 || o.oy % 2 == 0)
-            return;
-        let doubleO = clone(o);
-        doubleO.ox <<= 1;
-        doubleO.oy <<= 1;
-        for (let p of Piece.gops(doubleO, sx * 2)) {
-            let p1 = Piece.instantiate(p);
-            if (p1.rank > 3)
-                continue;
-            let v_even = p1.v % 2 == 0;
-            if (p1.ox == p1.oy && v_even)
-                continue;
-            let { ox, oy, u, v } = p1.shrink(2);
-            let diff = Math.abs(ox - oy) / 2;
-            if (!Number.isInteger(diff))
-                debugger;
-            let sm = Math.min(ox, oy);
-            let p2;
-            if (v_even && ox >= oy) {
-                p1.detours = [[{ x: diff, y: 3 * diff }, { x: oy + u + v, y: ox + u + v }]];
-                p2 = {
-                    ox: sm, oy: sm, u: v, v: u - diff,
-                    detours: [[{ x: sm + u + v - diff, y: sm + u + v - diff }, { x: 0, y: 0 }]],
-                    shift: { x: diff, y: 3 * diff }
-                };
-            }
-            else if (!v_even && oy >= ox) {
-                p1.detours = [[{ x: oy + u + v, y: ox + u + v }, { x: diff * 3, y: diff }]];
-                p2 = {
-                    ox: sm, oy: sm, u: v - diff, v: u,
-                    detours: [[{ x: 0, y: 0 }, { x: sm + u + v - diff, y: sm + u + v - diff }]],
-                    shift: { x: diff * 3, y: diff }
-                };
-            }
-            else
-                continue;
-            let g = new Gadget({ pieces: [p1, p2] });
-            let gr = g.reverseGPS();
-            yield g.addSlack(2, 0.5);
-            yield gr.addSlack(0, 0.5);
-        }
-    }
-}
 class Region {
     get axisParallels() {
         let ref = this.shape.contour.find(p => p.isIntegral);
@@ -222,7 +121,7 @@ let Disposable = class Disposable {
         this._disposed = false;
         this._disposeWith = parent;
     }
-    _disposeEvent() {
+    disposeEvent() {
         if (this._disposed) {
             Shrewd.terminate(this);
             this.onDispose();
@@ -250,14 +149,17 @@ __decorate([
 ], Disposable.prototype, "_disposed", void 0);
 __decorate([
     shrewd
-], Disposable.prototype, "_disposeEvent", null);
+], Disposable.prototype, "disposeEvent", null);
 Disposable = __decorate([
     shrewd
 ], Disposable);
 var PolyBool;
 (function (PolyBool) {
     function compare(seg1, seg2) {
-        return JSON.stringify(seg1) == JSON.stringify(seg2);
+        if (!seg1 && seg2)
+            return false;
+        let comb = combine(seg1, seg2);
+        return selectXor(comb).segments.length == 0;
     }
     PolyBool.compare = compare;
     function union(segments) {
@@ -301,6 +203,12 @@ var PolyBool;
         return {
             segments: SegmentSelector.difference(combined.combined),
             inverted: combined.inverted1 && !combined.inverted2
+        };
+    }
+    function selectXor(combined) {
+        return {
+            segments: SegmentSelector.xor(combined.combined),
+            inverted: combined.inverted1 !== combined.inverted2
         };
     }
     function polygon(segments) {
@@ -759,6 +667,15 @@ var PolyBool;
             ]);
         }
         SegmentSelector.difference = difference;
+        function xor(segments) {
+            return select(segments, [
+                0, 2, 1, 0,
+                2, 0, 0, 1,
+                1, 0, 0, 2,
+                0, 1, 2, 0
+            ]);
+        }
+        SegmentSelector.xor = xor;
     })(SegmentSelector || (SegmentSelector = {}));
     function SegmentChainer(segments) {
         var chains = [];
@@ -1329,6 +1246,7 @@ let DoubleMapping = class DoubleMapping {
         this._source = source;
         this._constructor = constructor;
         this._map = new DoubleMap();
+        Shrewd.initialize(this);
     }
     dispose() {
         Shrewd.terminate(this);
@@ -1538,141 +1456,120 @@ class Fraction {
     }
 }
 Fraction.ERROR = 1e-12;
-class Partition extends Partitioner {
+class Partitioner extends Disposable {
     constructor(config, data) {
-        super(config, data);
-        this.cornerMap = [];
-        for (let [i, o] of data.overlaps.entries()) {
-            for (let [j, c] of o.c.entries()) {
-                this.cornerMap.push([c, i, j]);
+        super(config);
+        this.configuration = config;
+        this.overlaps = data.overlaps;
+        this.strategy = data.strategy;
+    }
+    static getMaxIntersectionDistance(tree, r1, r2, oriented) {
+        let q = oriented ? 2 : 0;
+        let n1 = tree.node.get(r1.c[q].e);
+        let n2 = tree.node.get(r2.c[q].e);
+        let n3 = tree.node.get(r1.c[2 - q].e);
+        return tree.distTriple(n1, n2, n3).d3;
+    }
+    *generate() {
+        let { strategy } = this;
+        if (this.overlaps.length == 1) {
+            let o = this.overlaps[0];
+            let j = this.configuration.repository.structure[o.parent];
+            if (strategy == Strategy.halfIntegral) {
+                for (let g of this.halfKamiya(o, j.sx))
+                    yield { gadgets: [g] };
+            }
+            if (strategy == Strategy.universal) {
+                for (let g of this.universalGPS(o, j.sx))
+                    yield { gadgets: [g] };
+            }
+            else {
+                for (let p of Piece.gops(o, j.sx))
+                    yield { gadgets: [{ pieces: [p] }] };
+            }
+        }
+        if (this.overlaps.length == 2) {
+            let joiner = this.configuration.repository.getJoiner(this.overlaps);
+            if (strategy == Strategy.baseJoin) {
+                yield* joiner.baseJoin();
+            }
+            else if (strategy == Strategy.standardJoin) {
+                yield* joiner.standardJoin();
+            }
+            else {
+                yield* joiner.simpleJoin(strategy);
             }
         }
     }
-    get intersectionCorners() {
-        return this.cornerMap.filter(m => {
-            let type = m[0].type;
-            return type == CornerType.side ||
-                type == CornerType.intersection;
-        });
-    }
-    get outCorners() {
-        return this.intersectionCorners.concat(this.cornerMap.filter(m => m[0].type == CornerType.flap));
-    }
-    get constraints() {
-        return this.cornerMap.filter(m => {
-            let type = m[0].type;
-            return type == CornerType.socket ||
-                type == CornerType.internal ||
-                type == CornerType.flap;
-        });
-    }
-    getOriginalDisplacement(pattern) {
-        let o = this.overlaps.find(o => o.c[0].type != CornerType.coincide);
-        return pattern.getConnectionTarget(o.c[0])
-            .sub(this.configuration.repository.stretch.origin);
-    }
-    get _sideConnectionTarget() {
-        let result = new Map();
-        let flaps = this.configuration.sheet.design.flapsById;
-        for (let [c, o, q1] of this.intersectionCorners) {
-            let ov = this.overlaps[o];
-            let parent = this.getParent(ov);
-            let [c1, c2] = [parent.c[0], parent.c[2]];
-            let [f1, f2] = [flaps.get(c1.e), flaps.get(c2.e)];
-            let quad1 = f1.quadrants[c1.q], d1 = 0;
-            let quad2 = f2.quadrants[c2.q], d2 = 0;
-            if (c.type == CornerType.intersection) {
-                let oriented = ov.c[0].e < 0;
-                let tree = this.configuration.sheet.design.tree;
-                let n3 = tree.node.get(c.e);
-                let t = tree.distTriple(f1.node, f2.node, n3);
-                if (oriented)
-                    d2 = t.d2 - f2.radius;
-                else
-                    d1 = t.d1 - f1.radius;
-                if (isNaN(d1) || isNaN(d2))
-                    debugger;
+    *universalGPS(o, sx) {
+        let d = 2, found = false;
+        while (!found) {
+            let bigO = clone(o);
+            bigO.ox *= d;
+            bigO.oy *= d;
+            for (let p of Piece.gops(bigO, sx * d)) {
+                let p1 = Piece.instantiate(p).shrink(d);
+                if (!Number.isInteger(p1.v))
+                    continue;
+                let { ox, oy, u, v } = p1;
+                let p2 = { ox, oy, u: v, v: u };
+                let pt1 = { x: 0, y: 0 }, pt2 = { x: oy + u + v, y: ox + u + v };
+                p1.detours = [[pt1, pt2]];
+                p2.detours = [[pt2, pt1]];
+                let sx = p1.oy + p1.u + p1.v, s = Math.ceil(sx) - sx;
+                let g = new Gadget({ pieces: [p1, p2] });
+                let gr = g.reverseGPS();
+                yield g.addSlack(2, s);
+                yield gr.addSlack(0, s);
+                found = true;
             }
-            ov = this.getExposedOverlap(ov);
-            let p1 = quad1.getOverlapCorner(ov, parent, q1, d1);
-            let p2 = quad2.getOverlapCorner(ov, parent, opposite(q1), d2);
-            result.set(c, [p1, p2]);
+            d += 2;
         }
-        return result;
     }
-    getExposedOverlap(ov) {
-        var _a;
-        if (this.overlaps.length == 1)
-            return ov;
-        let result = clone(ov), parent = this.getParent(ov);
-        result.shift = (_a = result.shift) !== null && _a !== void 0 ? _a : { x: 0, y: 0 };
-        for (let o of this.overlaps)
-            if (o != ov) {
-                let p = this.getParent(o);
-                let w = result.ox + result.shift.x;
-                let h = result.oy + result.shift.y;
-                if (p.c[0].e == parent.c[0].e) {
-                    if (p.ox < parent.ox)
-                        result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
-                    if (p.oy < parent.oy)
-                        result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
-                }
-                if (p.c[2].e == parent.c[2].e) {
-                    if (p.ox < parent.ox)
-                        result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
-                    if (p.oy < parent.oy)
-                        result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
-                }
+    *halfKamiya(o, sx) {
+        if (o.ox % 2 == 0 || o.oy % 2 == 0)
+            return;
+        let doubleO = clone(o);
+        doubleO.ox <<= 1;
+        doubleO.oy <<= 1;
+        for (let p of Piece.gops(doubleO, sx * 2)) {
+            let p1 = Piece.instantiate(p);
+            if (p1.rank > 3)
+                continue;
+            let v_even = p1.v % 2 == 0;
+            if (p1.ox == p1.oy && v_even)
+                continue;
+            let { ox, oy, u, v } = p1.shrink(2);
+            let diff = Math.abs(ox - oy) / 2;
+            if (!Number.isInteger(diff))
+                debugger;
+            let sm = Math.min(ox, oy);
+            let p2;
+            if (v_even && ox >= oy) {
+                p1.detours = [[{ x: diff, y: 3 * diff }, { x: oy + u + v, y: ox + u + v }]];
+                p2 = {
+                    ox: sm, oy: sm, u: v, v: u - diff,
+                    detours: [[{ x: sm + u + v - diff, y: sm + u + v - diff }, { x: 0, y: 0 }]],
+                    shift: { x: diff, y: 3 * diff }
+                };
             }
-        return result;
-    }
-    getParent(ov) {
-        return this.configuration.repository.structure[ov.parent];
-    }
-    getSideConnectionTarget(point, c, q) {
-        let [p1, p2] = this._sideConnectionTarget.get(c);
-        if (p1._x.gt(p2._x))
-            [p1, p2] = [p2, p1];
-        if (q === undefined) {
-            if (point._x.le(p1._x))
-                return p1;
-            if (point._x.ge(p2._x))
-                return p2;
-            return null;
-        }
-        else {
-            return q == 0 || q == 3 ? p1 : p2;
-        }
-    }
-    toJSON() {
-        let result = {
-            overlaps: this.overlaps,
-            strategy: this.strategy
-        };
-        let map = this.configuration.jidMap;
-        if (map.size > 0) {
-            result.overlaps = clone(result.overlaps);
-            for (let o of result.overlaps) {
-                for (let c of o.c)
-                    if (c.e !== undefined && c.e >= 0)
-                        c.e = map.get(c.e);
+            else if (!v_even && oy >= ox) {
+                p1.detours = [[{ x: oy + u + v, y: ox + u + v }, { x: diff * 3, y: diff }]];
+                p2 = {
+                    ox: sm, oy: sm, u: v - diff, v: u,
+                    detours: [[{ x: 0, y: 0 }, { x: sm + u + v - diff, y: sm + u + v - diff }]],
+                    shift: { x: diff * 3, y: diff }
+                };
             }
+            else
+                continue;
+            let g = new Gadget({ pieces: [p1, p2] });
+            let gr = g.reverseGPS();
+            yield g.addSlack(2, 0.5);
+            yield gr.addSlack(0, 0.5);
         }
-        return result;
     }
 }
-__decorate([
-    onDemand
-], Partition.prototype, "intersectionCorners", null);
-__decorate([
-    onDemand
-], Partition.prototype, "outCorners", null);
-__decorate([
-    onDemand
-], Partition.prototype, "constraints", null);
-__decorate([
-    shrewd
-], Partition.prototype, "_sideConnectionTarget", null);
 let Mapping = class Mapping extends BaseMapping {
     constructor(source, constructor) {
         super(source, k => k, constructor, (k, v) => v.disposed);
@@ -1708,6 +1605,7 @@ class Mountable extends Disposable {
             return this.mountTarget.$studio;
     }
     mountEvents() {
+        this.disposeEvent();
         if (this.$studio !== this._oldStudio) {
             if (this.$studio)
                 this.onMount(this.$studio);
@@ -1739,7 +1637,6 @@ let Tree = class Tree extends Disposable {
         this.edge = new DoubleMap();
         this.nextId = 0;
         this.jidMap = new Map();
-        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
         this.design = design;
         while (edges === null || edges === void 0 ? void 0 : edges.length) {
             let remain = [], ok = false;
@@ -1754,6 +1651,7 @@ let Tree = class Tree extends Disposable {
                 break;
             edges = remain;
         }
+        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
     }
     onDispose() {
         Shrewd.terminate(this.edge);
@@ -1980,6 +1878,145 @@ class Couple {
         return { x: this.x, y: this.y };
     }
 }
+let Partition = class Partition extends Partitioner {
+    constructor(config, data) {
+        super(config, data);
+        this.cornerMap = [];
+        for (let [i, o] of data.overlaps.entries()) {
+            for (let [j, c] of o.c.entries()) {
+                this.cornerMap.push([c, i, j]);
+            }
+        }
+    }
+    get intersectionCorners() {
+        return this.cornerMap.filter(m => {
+            let type = m[0].type;
+            return type == CornerType.side ||
+                type == CornerType.intersection;
+        });
+    }
+    get outCorners() {
+        return this.intersectionCorners.concat(this.cornerMap.filter(m => m[0].type == CornerType.flap));
+    }
+    get constraints() {
+        return this.cornerMap.filter(m => {
+            let type = m[0].type;
+            return type == CornerType.socket ||
+                type == CornerType.internal ||
+                type == CornerType.flap;
+        });
+    }
+    getOriginalDisplacement(pattern) {
+        let o = this.overlaps.find(o => o.c[0].type != CornerType.coincide);
+        return pattern.getConnectionTarget(o.c[0])
+            .sub(this.configuration.repository.stretch.origin);
+    }
+    get _sideConnectionTarget() {
+        this.disposeEvent();
+        let result = new Map();
+        let flaps = this.configuration.sheet.design.flapsById;
+        for (let [c, o, q1] of this.intersectionCorners) {
+            let ov = this.overlaps[o];
+            let parent = this.getParent(ov);
+            let [c1, c2] = [parent.c[0], parent.c[2]];
+            let [f1, f2] = [flaps.get(c1.e), flaps.get(c2.e)];
+            let quad1 = f1.quadrants[c1.q], d1 = 0;
+            let quad2 = f2.quadrants[c2.q], d2 = 0;
+            if (c.type == CornerType.intersection) {
+                let oriented = ov.c[0].e < 0;
+                let tree = this.configuration.sheet.design.tree;
+                let n3 = tree.node.get(c.e);
+                let t = tree.distTriple(f1.node, f2.node, n3);
+                if (oriented)
+                    d2 = t.d2 - f2.radius;
+                else
+                    d1 = t.d1 - f1.radius;
+                if (isNaN(d1) || isNaN(d2))
+                    debugger;
+            }
+            ov = this.getExposedOverlap(ov);
+            let p1 = quad1.getOverlapCorner(ov, parent, q1, d1);
+            let p2 = quad2.getOverlapCorner(ov, parent, opposite(q1), d2);
+            result.set(c, [p1, p2]);
+        }
+        return result;
+    }
+    getExposedOverlap(ov) {
+        var _a;
+        if (this.overlaps.length == 1)
+            return ov;
+        let result = clone(ov), parent = this.getParent(ov);
+        result.shift = (_a = result.shift) !== null && _a !== void 0 ? _a : { x: 0, y: 0 };
+        for (let o of this.overlaps)
+            if (o != ov) {
+                let p = this.getParent(o);
+                let w = result.ox + result.shift.x;
+                let h = result.oy + result.shift.y;
+                if (p.c[0].e == parent.c[0].e) {
+                    if (p.ox < parent.ox)
+                        result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
+                    if (p.oy < parent.oy)
+                        result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
+                }
+                if (p.c[2].e == parent.c[2].e) {
+                    if (p.ox < parent.ox)
+                        result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
+                    if (p.oy < parent.oy)
+                        result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
+                }
+            }
+        return result;
+    }
+    getParent(ov) {
+        return this.configuration.repository.structure[ov.parent];
+    }
+    getSideConnectionTarget(point, c, q) {
+        let [p1, p2] = this._sideConnectionTarget.get(c);
+        if (p1._x.gt(p2._x))
+            [p1, p2] = [p2, p1];
+        if (q === undefined) {
+            if (point._x.le(p1._x))
+                return p1;
+            if (point._x.ge(p2._x))
+                return p2;
+            return null;
+        }
+        else {
+            return q == 0 || q == 3 ? p1 : p2;
+        }
+    }
+    toJSON() {
+        let result = {
+            overlaps: this.overlaps,
+            strategy: this.strategy
+        };
+        let map = this.configuration.jidMap;
+        if (map.size > 0) {
+            result.overlaps = clone(result.overlaps);
+            for (let o of result.overlaps) {
+                for (let c of o.c)
+                    if (c.e !== undefined && c.e >= 0)
+                        c.e = map.get(c.e);
+            }
+        }
+        return result;
+    }
+};
+__decorate([
+    onDemand
+], Partition.prototype, "intersectionCorners", null);
+__decorate([
+    onDemand
+], Partition.prototype, "outCorners", null);
+__decorate([
+    onDemand
+], Partition.prototype, "constraints", null);
+__decorate([
+    shrewd
+], Partition.prototype, "_sideConnectionTarget", null);
+Partition = __decorate([
+    shrewd
+], Partition);
 class DesignBase extends Mountable {
     constructor(studio, profile) {
         super(studio);
@@ -2029,7 +2066,8 @@ class DesignBase extends Mountable {
         this.junctions.dispose();
     }
     get allJunctions() {
-        return Array.from(this.junctions.values());
+        let result = Array.from(this.junctions.values());
+        return result;
     }
     get validJunctions() {
         return this.allJunctions.filter(j => j.isValid);
@@ -2135,10 +2173,10 @@ __decorate([
     shrewd
 ], DesignBase.prototype, "patternNotFound", null);
 __decorate([
-    shrewd
+    unorderedArray("allJ")
 ], DesignBase.prototype, "allJunctions", null);
 __decorate([
-    shrewd
+    unorderedArray("vj")
 ], DesignBase.prototype, "validJunctions", null);
 __decorate([
     shrewd
@@ -2147,7 +2185,7 @@ __decorate([
     shrewd
 ], DesignBase.prototype, "devices", null);
 __decorate([
-    shrewd
+    unorderedArray("aj")
 ], DesignBase.prototype, "activeJunctions", null);
 __decorate([
     shrewd
@@ -2388,6 +2426,7 @@ let TreeNode = class TreeNode extends Disposable {
     }
     get design() { return this.tree.design; }
     get edges() {
+        this.disposeEvent();
         let e = this.tree.edge.get(this);
         return e ? Array.from(e.values()) : [];
     }
@@ -2809,7 +2848,6 @@ var Quadrant_1;
 let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
     constructor(sheet, flap, q) {
         super(sheet);
-        this._validJunctions = [];
         this.flap = flap;
         this.q = q;
         this.qv = Quadrant_1.QV[q];
@@ -2953,8 +2991,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
     }
     get validJunctions() {
         var _a;
-        let result = (_a = this.design.validJunctionsByQuadrant.get(this)) !== null && _a !== void 0 ? _a : [];
-        return this._validJunctions = ArrayUtil.compare(this._validJunctions, result);
+        return (_a = this.design.validJunctionsByQuadrant.get(this)) !== null && _a !== void 0 ? _a : [];
     }
     get coveredJunctions() {
         return this.validJunctions
@@ -3009,7 +3046,7 @@ __decorate([
     shrewd
 ], Quadrant.prototype, "corner", null);
 __decorate([
-    shrewd
+    unorderedArray("qvj")
 ], Quadrant.prototype, "validJunctions", null);
 __decorate([
     shrewd
@@ -3615,13 +3652,11 @@ let RiverView = class RiverView extends ControlView {
         super.onDispose();
     }
     get closure() {
-        if (this.disposed)
-            return null;
+        this.disposeEvent();
         return PolyBool.union([...this.components.values()].map(c => c.contour));
     }
     get interior() {
-        if (this.disposed)
-            return null;
+        this.disposeEvent();
         let segments = [];
         let design = this.control.sheet.design;
         for (let e of this.info.adjacent) {
@@ -3642,8 +3677,7 @@ let RiverView = class RiverView extends ControlView {
         });
     }
     get actualPath() {
-        if (this.disposed)
-            return null;
+        this.disposeEvent();
         let closure = this.closurePath.children;
         let interior = PaperUtil.fromSegments(this.interior);
         let actual = new paper.CompoundPath({
@@ -3660,8 +3694,7 @@ let RiverView = class RiverView extends ControlView {
     }
     get corners() {
         var _a;
-        if (this.disposed)
-            return [];
+        this.disposeEvent();
         let path = this.actualPath;
         let p_paths = ((_a = path.children) !== null && _a !== void 0 ? _a : [path]);
         let r_paths = p_paths.map(path => path.segments.map(p => new Point(p.point)));
@@ -3717,10 +3750,10 @@ __decorate([
     shrewd
 ], RiverView.prototype, "info", null);
 __decorate([
-    segment()
+    segment("closure")
 ], RiverView.prototype, "closure", null);
 __decorate([
-    segment()
+    segment("interior")
 ], RiverView.prototype, "interior", null);
 __decorate([
     shrewd
@@ -3843,6 +3876,7 @@ let FlapView = class FlapView extends LabeledView {
         return PathUtil.toSegments(path);
     }
     get hingeSegments() {
+        this.disposeEvent();
         return this.makeSegments(0);
     }
     renderHinge() {
@@ -3891,7 +3925,7 @@ __decorate([
     shrewd
 ], FlapView.prototype, "circle", null);
 __decorate([
-    segment()
+    segment("hinge")
 ], FlapView.prototype, "hingeSegments", null);
 __decorate([
     shrewd
@@ -4316,6 +4350,7 @@ let Junction = class Junction extends SheetObject {
         return q === null || q === void 0 ? void 0 : q.getBaseRectangle(this, base);
     }
     get _lca() {
+        this.disposeEvent();
         let n1 = this.f1.node, n2 = this.f2.node;
         return n1.tree.pair.get(n1, n2).lca;
     }
@@ -4343,11 +4378,13 @@ let Junction = class Junction extends SheetObject {
         return true;
     }
     get coveredBy() {
+        this.disposeEvent();
         if (!this.isValid)
             return [];
         return this.sheet.design.validJunctions.filter(j => this.isCoveredBy(j));
     }
     get isCovered() {
+        this.disposeEvent();
         return this.coveredBy.some(j => j.coveredBy.length == 0);
     }
     toJSON() {
@@ -4364,6 +4401,7 @@ let Junction = class Junction extends SheetObject {
         };
     }
     get neighbors() {
+        this.disposeEvent();
         if (this.direction > 3)
             return [];
         let a1 = this.q1.activeJunctions.concat();
@@ -4379,9 +4417,8 @@ let Junction = class Junction extends SheetObject {
         return isQuadrant(this.direction) ? this.f2.quadrants[opposite(this.direction)] : null;
     }
     get $treeDistance() {
+        this.disposeEvent();
         let n1 = this.f1.node, n2 = this.f2.node;
-        if (n1.disposed || n2.disposed)
-            return 0;
         return n1.tree.dist(n1, n2);
     }
     get status() {
@@ -5926,9 +5963,8 @@ let TreePair = class TreePair extends Disposable {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
     }
     get lca() {
+        this.disposeEvent();
         let [n1, n2] = [this._n1, this._n2];
-        if (this.disposed)
-            return n1;
         if (n1.depth < n2.depth)
             [n1, n2] = [n2, n1];
         if (n2.depth == 0)
@@ -7185,17 +7221,18 @@ let RiverComponent = class RiverComponent extends Disposable {
         delete self.node;
     }
     get distance() {
-        if (this.disposed)
-            return 0;
+        this.disposeEvent();
         let { design, info } = this.view, flap = this.flap;
         let dis = design.tree.dist(flap.node, this.node);
         return dis - flap.radius + info.length;
     }
     get segment() {
+        this.disposeEvent();
         this.flap.view.draw();
         return this.flap.view.makeSegments(this.distance);
     }
     overridden(q) {
+        this.disposeEvent();
         return this.flap.quadrants[q].getOverriddenSegments(this.distance);
     }
     get q0() { return this.overridden(0); }
@@ -7203,6 +7240,7 @@ let RiverComponent = class RiverComponent extends Disposable {
     get q2() { return this.overridden(2); }
     get q3() { return this.overridden(3); }
     get contour() {
+        this.disposeEvent();
         this.flap.view.draw();
         let seg = this.segment;
         for (let q of [this.q0, this.q1, this.q2, this.q3]) {
@@ -7215,22 +7253,22 @@ __decorate([
     shrewd
 ], RiverComponent.prototype, "distance", null);
 __decorate([
-    segment()
+    segment("segment")
 ], RiverComponent.prototype, "segment", null);
 __decorate([
-    segment()
+    segment("q0")
 ], RiverComponent.prototype, "q0", null);
 __decorate([
-    segment()
+    segment("q1")
 ], RiverComponent.prototype, "q1", null);
 __decorate([
-    segment()
+    segment("q2")
 ], RiverComponent.prototype, "q2", null);
 __decorate([
-    segment()
+    segment("q3")
 ], RiverComponent.prototype, "q3", null);
 __decorate([
-    segment()
+    segment("contour")
 ], RiverComponent.prototype, "contour", null);
 RiverComponent = __decorate([
     shrewd

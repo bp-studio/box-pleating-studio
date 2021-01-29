@@ -14,6 +14,36 @@
     }
 }(this, function () {
     'use strict';
+    var Comparer;
+    (function (Comparer) {
+        function array(oldValue, newValue) {
+            if (!oldValue != !newValue)
+                return false;
+            if (oldValue == newValue)
+                return true;
+            if (oldValue.length != newValue.length)
+                return false;
+            for (let i = 0; i < oldValue.length; i++) {
+                if (oldValue[i] !== newValue[i])
+                    return false;
+            }
+            return true;
+        }
+        Comparer.array = array;
+        function unorderedArray(oldValue, newValue) {
+            if (!oldValue != !newValue)
+                return false;
+            if (oldValue == newValue)
+                return true;
+            if (oldValue.length != newValue.length)
+                return false;
+            for (let v of oldValue)
+                if (!newValue.includes(v))
+                    return false;
+            return true;
+        }
+        Comparer.unorderedArray = unorderedArray;
+    }(Comparer || (Comparer = {})));
     class Observable {
         constructor() {
             this._subscribers = new Set();
@@ -39,7 +69,10 @@
         static $publish(observable) {
             Core.$option.hook.write(observable.$id);
             for (let observer of observable._subscribers) {
-                observer.$notified();
+                if (Core.$option.debug)
+                    observer.$notified(observable);
+                else
+                    observer.$notified();
             }
         }
         $subscribe(observer) {
@@ -113,7 +146,7 @@
             Global.$pushState({ $isCommitting: true });
             try {
                 for (let observer of Core._renderQueue) {
-                    Observer.$render(observer);
+                    Observer.$render(observer, true);
                 }
             } finally {
                 Observer.$clearPending();
@@ -135,11 +168,25 @@
         static $queueInitialization(member) {
             Core._initializeQueue.add(member);
         }
-        static $initialize() {
+        static $initializeAll() {
             if (Core._initializing)
                 return;
             Core._initializing = true;
             for (let member of Core._initializeQueue) {
+                Core._initializeQueue.delete(member);
+                member.$initialize();
+            }
+            Core._initializing = false;
+        }
+        static $initialize(target) {
+            if (!target[$shrewdObject]) {
+                Decorators.$immediateInit.add(target);
+                return;
+            }
+            if (Core._initializing)
+                return;
+            Core._initializing = true;
+            for (let member of target[$shrewdObject].$getMember()) {
                 Core._initializeQueue.delete(member);
                 member.$initialize();
             }
@@ -175,7 +222,7 @@
     Core.$option = {
         hook: new DefaultHook(),
         autoCommit: true,
-        debug: true
+        debug: false
     };
     Core._renderQueue = new Set();
     Core._terminateQueue = new Set();
@@ -241,6 +288,10 @@
                 let self = Reflect.construct(target, args, newTarget);
                 if (self.constructor == target)
                     new ShrewdObject(self);
+                if (Decorators.$immediateInit.has(self)) {
+                    Decorators.$immediateInit.delete(self);
+                    Core.$initialize(self);
+                }
                 return self;
             } finally {
                 Observer.$trace.pop();
@@ -248,6 +299,7 @@
             }
         }
     };
+    Decorators.$immediateInit = new Set();
     const $shrewdObject = Symbol('ShrewdObject');
     class ShrewdObject {
         constructor(parent) {
@@ -281,6 +333,8 @@
             this._isTerminated = true;
         }
         $getMember(key) {
+            if (!key)
+                return this._members.values();
             return this._members.get(key);
         }
         get $observables() {
@@ -363,6 +417,7 @@
             this._isRendering = false;
             this._state = ObserverState.$outdated;
             this._isTerminated = false;
+            this.trigger = new Set();
             Observer._map.set(this.$id, this);
             this._name = name;
         }
@@ -392,7 +447,12 @@
                 }
             }
         }
-        static $render(observer) {
+        static $render(observer, backtrack = false) {
+            if (backtrack) {
+                observer._backtrack();
+                if (observer._isTerminated)
+                    return;
+            }
             Global.$pushState({
                 $isConstructing: false,
                 $target: observer
@@ -410,6 +470,8 @@
                     observer.$cleanup();
                 }
                 observer._update();
+                if (Core.$option.debug)
+                    observer.trigger.clear();
                 if (!observer._isTerminated) {
                     for (let observable of observer._reference) {
                         oldReferences.delete(observable);
@@ -430,9 +492,9 @@
         get $isRendering() {
             return this._isRendering;
         }
-        $notified() {
+        $notified(by) {
             this._pend();
-            this._outdate();
+            this._outdate(by);
             if (this.$isActive) {
                 Core.$enqueue(this);
             }
@@ -471,16 +533,7 @@
                 return;
             Observer.$trace.push(this);
             try {
-                for (let ref of this._reference) {
-                    if (ref instanceof Observer) {
-                        if (ref._isRendering) {
-                            Observer.$render(this);
-                            break;
-                        } else if (ref._state != ObserverState.$updated) {
-                            ref._determineStateAndRender();
-                        }
-                    }
-                }
+                this._backtrack();
                 if (this._state == ObserverState.$outdated) {
                     Observer.$render(this);
                 } else {
@@ -489,6 +542,18 @@
                 }
             } finally {
                 Observer.$trace.pop();
+            }
+        }
+        _backtrack() {
+            for (let ref of this._reference) {
+                if (ref instanceof Observer) {
+                    if (ref._isRendering) {
+                        Observer.$render(this);
+                        break;
+                    } else if (ref._state != ObserverState.$updated) {
+                        ref._determineStateAndRender();
+                    }
+                }
             }
         }
         _onCyclicDependencyFound() {
@@ -507,7 +572,9 @@
         _update() {
             this._state = ObserverState.$updated;
         }
-        _outdate() {
+        _outdate(by) {
+            if (by)
+                this.trigger.add(by);
             this._state = ObserverState.$outdated;
         }
         get $state() {
@@ -783,7 +850,7 @@
         constructor(parent, descriptor) {
             super(parent, descriptor);
             this._initialized = false;
-            this._inputValue = parent[descriptor.$key];
+            this._outputValue = this._inputValue = parent[descriptor.$key];
             Object.defineProperty(parent, descriptor.$key, ObservableProperty.$interceptor(descriptor.$key));
             if (!this._option.renderer) {
                 this._update();
@@ -833,9 +900,9 @@
             }
             this._initialized = true;
         }
-        _outdate() {
+        _outdate(by) {
             if (this._option.renderer) {
-                super._outdate();
+                super._outdate(by);
             }
         }
         _initialValidation() {
@@ -972,11 +1039,13 @@
         Shrewd.symbol = $shrewdObject;
         Shrewd.commit = Core.$commit;
         Shrewd.terminate = Core.$terminate;
+        Shrewd.initialize = Core.$initialize;
         Shrewd.hook = {
             default: DefaultHook,
             vue: VueHook
         };
         Shrewd.option = Core.$option;
+        Shrewd.comparer = Comparer;
     }(Shrewd || (Shrewd = {})));
     if (typeof window !== 'undefined' && window.Vue) {
         Core.$option.hook = new VueHook();
@@ -1063,7 +1132,7 @@
         static $restore() {
             Global._state = Global._history.pop();
             if (Global._history.length == 0)
-                Core.$initialize();
+                Core.$initializeAll();
         }
         static get $isCommitting() {
             return Global._state.$isCommitting;

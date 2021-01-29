@@ -33,27 +33,30 @@
 	}
 
 	@shrewd private get distance(): number {
-		if(this.disposed) return 0;
+		this.disposeEvent();
 		let { design, info } = this.view, flap = this.flap;
 		let dis = design.tree.dist(flap.node, this.node);
 		return dis - flap.radius + info.length;
 	}
 
-	@segment() public get segment(): PolyBool.Segments {
+	@segment("segment") public get segment(): PolyBool.Segments {
+		this.disposeEvent();
 		this.flap.view.draw();
 		return this.flap.view.makeSegments(this.distance);
 	}
 
 	private overridden(q: number) {
+		this.disposeEvent();
 		return this.flap.quadrants[q].getOverriddenSegments(this.distance);
 	}
 
-	@segment() public get q0() { return this.overridden(0); }
-	@segment() public get q1() { return this.overridden(1); }
-	@segment() public get q2() { return this.overridden(2); }
-	@segment() public get q3() { return this.overridden(3); }
+	@segment("q0") public get q0() { return this.overridden(0); }
+	@segment("q1") public get q1() { return this.overridden(1); }
+	@segment("q2") public get q2() { return this.overridden(2); }
+	@segment("q3") public get q3() { return this.overridden(3); }
 
-	@segment() public get contour(): PolyBool.Segments {
+	@segment("contour") public get contour(): PolyBool.Segments {
+		this.disposeEvent();
 		this.flap.view.draw();
 		let seg = this.segment;
 		for(let q of [this.q0, this.q1, this.q2, this.q3]) {

@@ -7,7 +7,7 @@
  * polybooljs 是根據 Martinez-Rueda-Feito 演算法（2008）實作的超高速多邊形布林運算函式庫，
  * 執行上比 paper.js 的多邊形布林運算至少快了三倍。
  *
- * 由於我不需要 union 和 difference 以外的其它運算，也不需要 buildLog，
+ * 由於我不需要 union, difference, xor 以外的其它運算，也不需要 buildLog，
  * 我把那些沒用到的部份都刪除掉以節省大小。
  */
 //////////////////////////////////////////////////////////////////
@@ -23,7 +23,9 @@ namespace PolyBool {
 	export type Path = Point[];
 
 	export function compare(seg1: Segments, seg2: Segments): boolean {
-		return JSON.stringify(seg1) == JSON.stringify(seg2);
+		if(!seg1 && seg2) return false;
+		let comb = combine(seg1, seg2);
+		return selectXor(comb).segments.length == 0;
 	}
 
 	export function union(segments: Segments[]): Segments {
@@ -95,6 +97,13 @@ namespace PolyBool {
 		return {
 			segments: SegmentSelector.difference(combined.combined),
 			inverted: combined.inverted1 && !combined.inverted2
+		}
+	}
+
+	function selectXor(combined: Combined) {
+		return {
+			segments: SegmentSelector.xor(combined.combined),
+			inverted: combined.inverted1 !== combined.inverted2
 		}
 	}
 
@@ -815,6 +824,32 @@ namespace PolyBool {
 				0, 0, 0, 0,
 				2, 0, 2, 0,
 				1, 1, 0, 0,
+				0, 1, 2, 0
+			]);
+		}
+
+		export function xor(segments: Segment[]) { // primary ^ secondary
+			// above1 below1 above2 below2    Keep?               Value
+			//    0      0      0      0   =>   no                  0
+			//    0      0      0      1   =>   yes filled below    2
+			//    0      0      1      0   =>   yes filled above    1
+			//    0      0      1      1   =>   no                  0
+			//    0      1      0      0   =>   yes filled below    2
+			//    0      1      0      1   =>   no                  0
+			//    0      1      1      0   =>   no                  0
+			//    0      1      1      1   =>   yes filled above    1
+			//    1      0      0      0   =>   yes filled above    1
+			//    1      0      0      1   =>   no                  0
+			//    1      0      1      0   =>   no                  0
+			//    1      0      1      1   =>   yes filled below    2
+			//    1      1      0      0   =>   no                  0
+			//    1      1      0      1   =>   yes filled above    1
+			//    1      1      1      0   =>   yes filled below    2
+			//    1      1      1      1   =>   no                  0
+			return select(segments, [
+				0, 2, 1, 0,
+				2, 0, 0, 1,
+				1, 0, 0, 2,
 				0, 1, 2, 0
 			]);
 		}

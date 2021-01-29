@@ -1,7 +1,6 @@
 // Level 0
 /// <reference path="global/import.ts" />
 /// <reference path="util/Decorators.ts" />
-/// <reference path="pattern/Partitioner.ts" />
 /// <reference path="pattern/Region.ts" />
 /// <reference path="class/Disposable.ts" />
 /// <reference path="math/PolyBool.ts" />
@@ -13,7 +12,7 @@
 /// <reference path="mapping/BaseMapping.ts" />
 /// <reference path="mapping/DoubleMapping.ts" />
 /// <reference path="math/Fraction.ts" />
-/// <reference path="pattern/Partition.ts" />
+/// <reference path="pattern/Partitioner.ts" />
 
 // Level 2
 /// <reference path="mapping/Mapping.ts" />
@@ -21,6 +20,7 @@
 /// <reference path="class/Mountable.ts" />
 /// <reference path="model/Tree.ts" />
 /// <reference path="math/Couple.ts" />
+/// <reference path="pattern/Partition.ts" />
 
 // Level 3
 /// <reference path="core/DesignBase.ts" />

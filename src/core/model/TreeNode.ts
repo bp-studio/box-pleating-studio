@@ -61,6 +61,7 @@
 	public get design() { return this.tree.design; }
 
 	@shrewd public get edges(): ReadonlyArray<TreeEdge> {
+		this.disposeEvent();
 		let e = this.tree.edge.get(this);
 		return e ? Array.from(e.values()) : [];
 	}

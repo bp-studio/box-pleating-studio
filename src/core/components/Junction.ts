@@ -63,6 +63,7 @@ interface JJunction extends JRectangle {
 	}
 
 	@shrewd private get _lca(): TreeNode {
+		this.disposeEvent();
 		let n1 = this.f1.node, n2 = this.f2.node;
 		return n1.tree.pair.get(n1, n2)!.lca;
 	}
@@ -96,11 +97,13 @@ interface JJunction extends JRectangle {
 	}
 
 	@shrewd public get coveredBy(): Junction[] {
+		this.disposeEvent();
 		if(!this.isValid) return [];
 		return this.sheet.design.validJunctions.filter(j => this.isCoveredBy(j));
 	}
 
 	@shrewd public get isCovered(): boolean {
+		this.disposeEvent();
 		return this.coveredBy.some(j => j.coveredBy.length == 0);
 	}
 
@@ -119,6 +122,7 @@ interface JJunction extends JRectangle {
 	}
 
 	@shrewd public get neighbors() {
+		this.disposeEvent();
 		if(this.direction > 3) return [];
 		let a1 = this.q1!.activeJunctions.concat();
 		let a2 = this.q2!.activeJunctions.concat();
@@ -136,8 +140,8 @@ interface JJunction extends JRectangle {
 	}
 
 	@shrewd public get $treeDistance() {
+		this.disposeEvent();
 		let n1 = this.f1.node, n2 = this.f2.node;
-		if(n1.disposed || n2.disposed) return 0;
 		return n1.tree.dist(n1, n2);
 	}
 

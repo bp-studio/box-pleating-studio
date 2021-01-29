@@ -62,13 +62,13 @@
 	}
 
 	/** 計算當前河的閉包 */
-	@segment() private get closure(): PolyBool.Segments {
-		if(this.disposed) return null as any;
+	@segment("closure") private get closure(): PolyBool.Segments {
+		this.disposeEvent();
 		return PolyBool.union([...this.components.values()].map(c => c.contour));
 	}
 
-	@segment() private get interior(): PolyBool.Segments {
-		if(this.disposed) return null as any;
+	@segment("interior") private get interior(): PolyBool.Segments {
+		this.disposeEvent();
 		let segments: PolyBool.Segments[] = [];
 		let design = this.control.sheet.design;
 		for(let e of this.info.adjacent) {
@@ -91,7 +91,7 @@
 
 	/** 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向 */
 	@shrewd private get actualPath(): paper.CompoundPath {
-		if(this.disposed) return null as any;
+		this.disposeEvent();
 		let closure = this.closurePath.children;
 		let interior = PaperUtil.fromSegments(this.interior);
 		let actual = new paper.CompoundPath({
@@ -111,7 +111,7 @@
 
 	/** 收集所有自身的內直角資訊；這部份與 openAnchors 無關，分開計算以增加效能 */
 	@shrewd private get corners(): [Point, Point, boolean][] {
-		if(this.disposed) return [];
+		this.disposeEvent();
 
 		// paper.js 的 Point 類別可能會有計算偏差，因此這邊都轉換成有理數型物件
 		let path = this.actualPath;

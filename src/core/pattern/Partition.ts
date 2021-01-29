@@ -23,7 +23,7 @@ interface JPartition {
  */
 //////////////////////////////////////////////////////////////////
 
-class Partition extends Partitioner implements ISerializable<JPartition> {
+@shrewd class Partition extends Partitioner implements ISerializable<JPartition> {
 
 	/** 這個 Partition 所有的角落，檢索得到所屬的 Overlap 以及相位索引 */
 	public readonly cornerMap: CornerMap[] = [];
@@ -74,6 +74,7 @@ class Partition extends Partitioner implements ISerializable<JPartition> {
 	}
 
 	@shrewd private get _sideConnectionTarget(): ReadonlyMap<JCorner, [Point, Point]> {
+		this.disposeEvent();
 		let result = new Map<JCorner, [Point, Point]>();
 		let flaps = this.configuration.sheet.design.flapsById;
 		for(let [c, o, q1] of this.intersectionCorners) {

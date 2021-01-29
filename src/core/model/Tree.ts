@@ -35,6 +35,11 @@
 			if(!ok) break; // 防呆
 			edges = remain;
 		}
+
+		this.pair = new DoubleMapping<TreeNode, TreePair>(
+			() => this.node.values(),
+			(n1, n2) => new TreePair(n1, n2)
+		);
 	}
 
 	protected onDispose(): void {
@@ -57,10 +62,7 @@
 
 	public readonly jidMap = new Map<number, number>();
 
-	public readonly pair = new DoubleMapping<TreeNode, TreePair>(
-		() => this.node.values(),
-		(n1, n2) => new TreePair(n1, n2)
-	);
+	public readonly pair: DoubleMapping<TreeNode, TreePair>;
 
 	public dist(n1: TreeNode, n2: TreeNode) {
 		if(n1 == n2) return 0;

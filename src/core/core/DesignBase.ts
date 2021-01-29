@@ -126,11 +126,12 @@ abstract class DesignBase extends Mountable {
 	/** 當前所有的 `Flap` 兩兩構成的 Junction */
 	public abstract readonly junctions: DoubleMapping<Flap, Junction>;
 
-	@shrewd public get allJunctions(): readonly Junction[] {
-		return Array.from(this.junctions.values());
+	@unorderedArray("allJ") public get allJunctions(): readonly Junction[] {
+		let result = Array.from(this.junctions.values());
+		return result;
 	}
 
-	@shrewd public get validJunctions(): readonly Junction[] {
+	@unorderedArray("vj") public get validJunctions(): readonly Junction[] {
 		return this.allJunctions.filter(j => j.isValid);
 	}
 
@@ -182,7 +183,7 @@ abstract class DesignBase extends Mountable {
 	 *
 	 * 這會排除掉被覆蓋的 `Junction`。
 	 */
-	@shrewd private get activeJunctions(): readonly Junction[] {
+	@unorderedArray("aj") private get activeJunctions(): readonly Junction[] {
 		return this.validJunctions.filter(j => !j.isCovered);
 	}
 

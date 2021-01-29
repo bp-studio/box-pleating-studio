@@ -21,9 +21,9 @@
 	}
 
 	@shrewd public get lca(): TreeNode {
-		let [n1, n2] = [this._n1, this._n2];
-		if(this.disposed) return n1; // 隨便沒差
+		this.disposeEvent();
 
+		let [n1, n2] = [this._n1, this._n2];
 		if(n1.depth < n2.depth) [n1, n2] = [n2, n1];	// 排序成 n1 低於 n2
 		if(n2.depth == 0) return n2;					// 如果 n2 根本就是根，直接傳回
 		while(n1.depth > n2.depth) n1 = n1.parent!;		// 回朔到 n1 n2 同高

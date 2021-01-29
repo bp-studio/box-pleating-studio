@@ -30,7 +30,7 @@ interface IDisposable {
 
 	private _disposeWith?: Disposable;
 
-	@shrewd private _disposeEvent(): any {
+	@shrewd protected disposeEvent(): any {
 		if(this._disposed) {
 			Shrewd.terminate(this);
 			this.onDispose();

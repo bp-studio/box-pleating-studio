@@ -6,13 +6,14 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class Partitioner {
+class Partitioner extends Disposable {
 
 	public readonly configuration: Configuration;
 	public readonly overlaps: readonly JOverlap[];
 	protected readonly strategy?: Strategy;
 
 	constructor(config: Configuration, data: JPartition) {
+		super(config);
 		this.configuration = config;
 		this.overlaps = data.overlaps;
 		this.strategy = data.strategy;

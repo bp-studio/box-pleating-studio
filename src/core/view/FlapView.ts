@@ -54,7 +54,8 @@
 		return PathUtil.toSegments(path);
 	}
 
-	@segment() public get hingeSegments() {
+	@segment("hinge") public get hingeSegments() {
+		this.disposeEvent();
 		return this.makeSegments(0);
 	}
 

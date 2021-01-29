@@ -89,6 +89,12 @@ export function commit(): void;
 export function terminate(target: object): void;
 
 /**
+ * By default Shrewd will initialize each Shrewd object in the same order of their construction.
+ * If for some reason you need to initialize individual objects manually, you can call this method.
+ */
+export function initialize(target: object): void;
+
+/**
  * Built-in hooks.
  */
 export const hook: {
@@ -130,5 +136,13 @@ export const option: IShrewdOption;
  * ShrewdObject symbol, for debug purpose.
  */
 export const symbol: Symbol;
+
+export namespace comparer {
+	/** Shallow compare two array; elements must match index-wise. */
+	export function array(oldValue: any[], newValue: any[]): boolean;
+
+	/** Shallow compare two array; element ordering is ignored. */
+	export function unorderedArray(oldValue: any[], newValue: any[]): boolean;
+}
 
 export as namespace Shrewd;
