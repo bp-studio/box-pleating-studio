@@ -30,6 +30,9 @@
 			return null;
 		}
 
+		// 確保 GC
+		@Watch("repository") repo() { }
+
 		@Watch("design.mode") onModeChange() {
 			let el = document.activeElement as HTMLElement;
 			if(el && (this.$refs.panel as HTMLDivElement).contains(el)) el.blur();
