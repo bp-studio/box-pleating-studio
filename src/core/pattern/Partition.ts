@@ -85,6 +85,9 @@ interface JPartition {
 
 			let [c1, c2] = [parent.c[0], parent.c[2]];
 			let [f1, f2] = [flaps.get(c1.e!)!, flaps.get(c2.e!)!];
+
+			if(!f1||!f2) debugger;
+
 			let quad1 = f1.quadrants[c1.q!], d1 = 0;
 			let quad2 = f2.quadrants[c2.q!], d2 = 0;
 

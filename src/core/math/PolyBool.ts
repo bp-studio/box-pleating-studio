@@ -1123,13 +1123,3 @@ namespace PolyBool {
 		}
 	}
 }
-
-function segment(msg?: string) {
-	return shrewd({
-		comparer: (ov: PolyBool.Segments, nv: PolyBool.Segments) => {
-			let result = PolyBool.compare(ov, nv);
-			if(result && msg) console.log(msg);
-			return result;
-		}
-	});
-}

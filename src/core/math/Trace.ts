@@ -22,7 +22,13 @@ namespace Trace {
 	 * @param end 終點線；如果過程中撞到這條線則停止
 	 * @param start 指定起點線；這個值有指定表示要用導繪模式
 	 */
-	export function create(lines: readonly Line[], startPt: Point, sv: Vector, inflections: Set<string>, end: Line, start?: Line): Path {
+	export function create(
+		lines: readonly Line[],
+		startPt: Point, endPt: Point,
+		sv: Vector,
+		inflections: Set<string>,
+		end: Line, start?: Line
+	): Path {
 		let history: Path = [];
 		let trace: Path = [];
 		let x: JIntersection | null;
@@ -64,8 +70,8 @@ namespace Trace {
 					}
 				}
 
-				// 撞到了終點線，停止輸出
-				let goal = l.intersection(end);
+				// 撞到了終點（優先）或終點線，停止輸出
+				let goal = l.contains(endPt) ? endPt : l.intersection(end);
 				if(goal) { trace.push(goal); break; }
 
 				// 偵測迴圈；迴圈是只有當有 meandering 的時候才會產生
@@ -78,7 +84,6 @@ namespace Trace {
 					// 自動化簡輸出，不連續輸出同樣的點
 					if(!trace.length || !trace[trace.length - 1].eq(pt)) trace.push(pt);
 				}
-
 
 				// 暫存偏移向量以幫助下一次的判斷
 				shift = line.vector;

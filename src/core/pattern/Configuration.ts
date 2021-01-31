@@ -51,6 +51,10 @@ interface JConfiguration {
 		this.generator = this.generate();
 	}
 
+	protected get shouldDispose(): boolean {
+		return super.shouldDispose || this.repository.disposed;
+	}
+
 	@shrewd public get isActive() {
 		return this.repository.isActive && this.repository.entry == this;
 	}

@@ -65,8 +65,8 @@
 		this._circle.visible = this.$studio?.$display.settings.showHinge ?? false;
 		let paths = PaperUtil.fromSegments(this.hingeSegments);
 		this.hinge.removeSegments();
-		if(paths.length) this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
-		else debugger;
+		// if(!paths.length) debugger;
+		this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
 	}
 
 	protected render() {

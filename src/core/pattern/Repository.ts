@@ -35,6 +35,10 @@
 		);
 	}
 
+	protected get shouldDispose(): boolean {
+		return super.shouldDispose || this.stretch.disposed;
+	}
+
 	@shrewd public get isActive(): boolean {
 		return this.stretch.isActive && this.stretch.repository == this;
 	}

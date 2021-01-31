@@ -98,6 +98,7 @@ class Line {
 
 	/** 把當前的線段扣除掉傳入的線段集中任何重疊到的部份，並傳回剩下的各部份線段。 */
 	private cancel(set: Line[]): Line[] {
+
 		let result: Line[] = [this];
 		for(let l2 of set) {
 			let next: Line[] = [];
@@ -110,8 +111,13 @@ class Line {
 	private *_cancel(l: Line): Generator<Line> {
 		let a = this.contains(l.p1, true), b = this.contains(l.p2, true);
 		let c = l.contains(this.p1, true), d = l.contains(this.p2, true);
+
+		// 自己完全被包含在對方之中，則會完全消滅
 		if(c && d) return;
-		if(!a && !b || !c && !d) yield this;
+
+		// 不然如果自己並未包含對方的任何一端點，表示自己和對方完全無交集，傳回自身
+		if(!a && !b) yield this;
+
 		else if(a && b) {
 			let l11 = new Line(this.p1, l.p1), l12 = new Line(this.p1, l.p2);
 			let l21 = new Line(this.p2, l.p1), l22 = new Line(this.p2, l.p2);

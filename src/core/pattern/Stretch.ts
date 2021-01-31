@@ -99,6 +99,7 @@ interface JStretch {
 	}
 
 	@shrewd public get isActive() {
+		// 這個涵蓋了任何一個 Flap 被刪除掉的情況
 		return this.design.teams.has(this.signature);
 	}
 

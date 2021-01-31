@@ -49,7 +49,7 @@ interface IDecoratorOptions<T> {
 	renderer?: (value: T) => T;
 
 	/** Comparer function */
-	comparer?: (oldValue: T, newValue: T) => boolean;
+	comparer?: (oldValue: T, newValue: T, member?: any) => boolean;
 }
 
 /**
@@ -59,7 +59,7 @@ interface IDecoratorOptions<T> {
  */
 
 // For classes.
- export function shrewd<
+export function shrewd<
 	// We use `Function` here to make it compatible with abstract classes,
 	// although one doesn't have to add the @shrewd decorator on such classes.
 	T extends Function
@@ -143,6 +143,10 @@ export namespace comparer {
 
 	/** Shallow compare two array; element ordering is ignored. */
 	export function unorderedArray(oldValue: any[], newValue: any[]): boolean;
+}
+
+export namespace debug {
+	export function trigger(target: any, key?: string): void;
 }
 
 export as namespace Shrewd;

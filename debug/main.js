@@ -751,7 +751,7 @@ Vue.component('flaps', { render() { with (this) {
 
 Vue.component('panel', { render() { with (this) {
         return _c('div', { ref: "panel", class: { 'show': show }, attrs: { "id": "divPanel" }, on: { "contextmenu": function ($event) { $event.stopPropagation(); return onContextMenu($event); } } }, [(design) ? [(selections.length == 0) ? _c('design', { key: design.sheet.guid }) : (selections.length == 1) ? _c('div', { key: selection.guid }, [(repository) ? _c('repository', { attrs: { "repository": repository } }) : _c(selection.type.toLowerCase(), { tag: "component" })], 1) : _c('div', [(selection.type == 'Flap') ? _c('flaps') : _e(), _v(" "), (selection.type == 'Vertex') ? _c('vertices') : _e()], 1)] : _e()], 2);
-    } }, mixins: [BaseComponent], props: { show: Boolean }, watch: { "design.mode"() {
+    } }, mixins: [BaseComponent], props: { show: Boolean }, watch: { "repository"() { }, "design.mode"() {
             let el = document.activeElement;
             if (el && this.$refs.panel.contains(el))
                 el.blur();

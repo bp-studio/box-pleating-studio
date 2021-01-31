@@ -116,10 +116,9 @@ type GDevice = JDevice<Gadget>;
 
 	/** 這個 Device 實際上要繪製出來的脊線（扣除掉跟相鄰 Device 重疊部份之後） */
 	@shrewd public get ridges(): readonly Line[] {
-		return Line.subtract(
-			this.rawRidges,
-			this.neighbors.reduce((arr, g) => (arr.push(...g.rawRidges), arr), [] as Line[])
-		);
+		let raw = this.rawRidges;
+		let nei = this.neighbors.reduce((arr, g) => (arr.push(...g.rawRidges), arr), [] as Line[]);
+		return Line.subtract(raw, nei);
 	}
 
 	@shrewd public get axisParallels(): readonly Line[] {

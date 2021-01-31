@@ -8,13 +8,28 @@ if (typeof Shrewd != "object")
     throw new Error("BPStudio requires Shrewd.");
 const { shrewd } = Shrewd;
 Shrewd.option.debug = true;
+const diagnose = false;
 function unorderedArray(msg) {
     return shrewd({
-        comparer: (ov, nv) => {
+        comparer: (ov, nv, member) => {
             let result = Shrewd.comparer.unorderedArray(ov, nv);
-            if (result && msg) {
+            if (diagnose && result && msg) {
                 console.log(msg);
             }
+            return result;
+        }
+    });
+}
+function segment(msg) {
+    return shrewd({
+        comparer: (ov, nv) => {
+            if (!ov != !nv)
+                return false;
+            if (!ov)
+                return true;
+            let result = PolyBool.compare(ov, nv);
+            if (diagnose && result && msg)
+                console.log(msg);
             return result;
         }
     });
@@ -891,16 +906,6 @@ var PolyBool;
         List.node = node;
     })(List || (List = {}));
 })(PolyBool || (PolyBool = {}));
-function segment(msg) {
-    return shrewd({
-        comparer: (ov, nv) => {
-            let result = PolyBool.compare(ov, nv);
-            if (result && msg)
-                console.log(msg);
-            return result;
-        }
-    });
-}
 class Piece extends Region {
     constructor(piece) {
         super();
@@ -1920,6 +1925,8 @@ let Partition = class Partition extends Partitioner {
             let parent = this.getParent(ov);
             let [c1, c2] = [parent.c[0], parent.c[2]];
             let [f1, f2] = [flaps.get(c1.e), flaps.get(c2.e)];
+            if (!f1 || !f2)
+                debugger;
             let quad1 = f1.quadrants[c1.q], d1 = 0;
             let quad2 = f2.quadrants[c2.q], d2 = 0;
             if (c.type == CornerType.intersection) {
@@ -2072,6 +2079,9 @@ class DesignBase extends Mountable {
     get validJunctions() {
         return this.allJunctions.filter(j => j.isValid);
     }
+    get activeJunctions() {
+        return this.validJunctions.filter(j => !j.isCovered);
+    }
     get teams() {
         let arr;
         let set = new Set(this.activeJunctions);
@@ -2096,29 +2106,6 @@ class DesignBase extends Mountable {
         let result = [];
         for (let s of this.stretches.values())
             result.push(...s.devices);
-        return result;
-    }
-    get activeJunctions() {
-        return this.validJunctions.filter(j => !j.isCovered);
-    }
-    get validJunctionsByQuadrant() {
-        return DesignBase.ToQuadrantMap(this.validJunctions);
-    }
-    get activeJunctionsByQuadrant() {
-        return DesignBase.ToQuadrantMap(this.activeJunctions);
-    }
-    static ToQuadrantMap(junctions) {
-        let result = new Map();
-        function add(q, j) {
-            let arr = result.get(q);
-            if (!arr)
-                result.set(q, arr = []);
-            arr.push(j);
-        }
-        for (let j of junctions) {
-            add(j.q1, j);
-            add(j.q2, j);
-        }
         return result;
     }
     get stretchByQuadrant() {
@@ -2179,20 +2166,14 @@ __decorate([
     unorderedArray("vj")
 ], DesignBase.prototype, "validJunctions", null);
 __decorate([
+    unorderedArray("aj")
+], DesignBase.prototype, "activeJunctions", null);
+__decorate([
     shrewd
 ], DesignBase.prototype, "teams", null);
 __decorate([
     shrewd
 ], DesignBase.prototype, "devices", null);
-__decorate([
-    unorderedArray("aj")
-], DesignBase.prototype, "activeJunctions", null);
-__decorate([
-    shrewd
-], DesignBase.prototype, "validJunctionsByQuadrant", null);
-__decorate([
-    shrewd
-], DesignBase.prototype, "activeJunctionsByQuadrant", null);
 __decorate([
     shrewd
 ], DesignBase.prototype, "stretchByQuadrant", null);
@@ -2886,7 +2867,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
             let inflections = new Set();
             let lead = this.findLead(junctions, r, lines, inflections);
             let start = lead ? this.findNextDelta(junctions, true) : undefined;
-            trace = Trace.create(lines, lead !== null && lead !== void 0 ? lead : startPt, this.pv, inflections, end !== null && end !== void 0 ? end : new Line(endPt, this.pv), start);
+            trace = Trace.create(lines, lead !== null && lead !== void 0 ? lead : startPt, endPt, this.pv, inflections, end !== null && end !== void 0 ? end : new Line(endPt, this.pv), start);
             if (start && this.outside(trace[0], r, this.q % 2 != 1)) {
                 trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
             }
@@ -2976,10 +2957,12 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
                     continue;
                 let v = new Vector(ox * this.fx, oy * this.fy);
                 let rect = new Rectangle(p, p.sub(v));
-                result.push(rect.toPolyBoolPath());
+                let path = rect.toPolyBoolPath();
+                let seg = PolyBool.segments({ regions: [path], inverted: false });
+                result.push(seg);
             }
         }
-        return PolyBool.segments({ regions: result, inverted: false });
+        return result.length ? PolyBool.union(result) : null;
     }
     get pattern() {
         let stretch = this.design.getStretchByQuadrant(this);
@@ -2990,8 +2973,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         return this.point.add(this.qv.scale(r));
     }
     get validJunctions() {
-        var _a;
-        return (_a = this.design.validJunctionsByQuadrant.get(this)) !== null && _a !== void 0 ? _a : [];
+        return this.flap.validJunctions.filter(j => j.q1 == this || j.q2 == this);
     }
     get coveredJunctions() {
         return this.validJunctions
@@ -3005,8 +2987,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         return this.flap.points[this.q];
     }
     get activeJunctions() {
-        let result = this.design.activeJunctionsByQuadrant.get(this);
-        return result ? result : [];
+        return this.validJunctions.filter(j => !j.isCovered);
     }
     static transform(dir, fx, fy) {
         if (fx < 0)
@@ -3055,7 +3036,7 @@ __decorate([
     shrewd
 ], Quadrant.prototype, "point", null);
 __decorate([
-    shrewd
+    unorderedArray("qaj")
 ], Quadrant.prototype, "activeJunctions", null);
 Quadrant = Quadrant_1 = __decorate([
     shrewd
@@ -3445,6 +3426,9 @@ let Configuration = class Configuration extends Store {
         this.overlapMap = overlapMap;
         this.partitions = config.partitions.map(p => new Partition(this, p));
         this.generator = this.generate();
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.repository.disposed;
     }
     get isActive() {
         return this.repository.isActive && this.repository.entry == this;
@@ -3886,10 +3870,9 @@ let FlapView = class FlapView extends LabeledView {
         this._circle.visible = (_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showHinge) !== null && _b !== void 0 ? _b : false;
         let paths = PaperUtil.fromSegments(this.hingeSegments);
         this.hinge.removeSegments();
-        if (paths.length)
-            this.hinge.add(...paths[0].segments);
-        else
+        if (!paths.length)
             debugger;
+        this.hinge.add(...paths[0].segments);
     }
     render() {
         let ds = this.control.sheet.displayScale;
@@ -4004,6 +3987,8 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         super(sheet);
         this.width = 0;
         this.height = 0;
+        this.$junctions = [];
+        this.$junctionChanged = false;
         this.node = node;
         let design = sheet.design;
         let option = design.options.get("flap", node.id);
@@ -4034,6 +4019,13 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
             new Point(x, y),
             new Point(x + w, y)
         ];
+    }
+    get junctions() {
+        this.design.junctions;
+        return this.$junctions;
+    }
+    get validJunctions() {
+        return this.junctions.filter(j => j.isValid);
     }
     get name() { return this.node.name; }
     set name(n) { this.node.name = n; }
@@ -4098,6 +4090,18 @@ __decorate([
 __decorate([
     shrewd
 ], Flap.prototype, "points", null);
+__decorate([
+    shrewd({
+        comparer() {
+            let result = this.$junctionChanged;
+            this.$junctionChanged = false;
+            return !result;
+        }
+    })
+], Flap.prototype, "junctions", null);
+__decorate([
+    shrewd
+], Flap.prototype, "validJunctions", null);
 Flap = Flap_1 = __decorate([
     shrewd
 ], Flap);
@@ -4324,6 +4328,10 @@ let Junction = class Junction extends SheetObject {
             [f1, f2] = [f2, f1];
         this.f1 = f1;
         this.f2 = f2;
+        f1.$junctions.push(this);
+        f2.$junctions.push(this);
+        f1.$junctionChanged = true;
+        f2.$junctionChanged = true;
         this.id = f1.node.id + ":" + f2.node.id;
         new JunctionView(this);
     }
@@ -4345,6 +4353,12 @@ let Junction = class Junction extends SheetObject {
     get shouldDispose() {
         return super.shouldDispose || this.f1.disposed || this.f2.disposed;
     }
+    onDispose() {
+        this.f1.$junctions.splice(this.f1.$junctions.indexOf(this), 1);
+        this.f2.$junctions.splice(this.f2.$junctions.indexOf(this), 1);
+        this.f1.$junctionChanged = true;
+        this.f2.$junctionChanged = true;
+    }
     getBaseRectangle(base) {
         let q = this.sx > 0 ? this.q2 : this.q1;
         return q === null || q === void 0 ? void 0 : q.getBaseRectangle(this, base);
@@ -4363,11 +4377,17 @@ let Junction = class Junction extends SheetObject {
             return null;
         return n3 == n1 ? n2 : n1;
     }
-    isCoveredBy(o) {
+    get coverCandidate() {
+        let result = [];
+        for (let j of this.sheet.design.validJunctions) {
+            let n = this.findIntersection(j);
+            if (n)
+                result.push([j, n]);
+        }
+        return result;
+    }
+    isCoveredBy(o, n) {
         if (this == o || this.direction % 2 != o.direction % 2)
-            return false;
-        let n = this.findIntersection(o);
-        if (!n)
             return false;
         let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
         if (!r1 || !r2 || !r1.contains(r2))
@@ -4381,7 +4401,12 @@ let Junction = class Junction extends SheetObject {
         this.disposeEvent();
         if (!this.isValid)
             return [];
-        return this.sheet.design.validJunctions.filter(j => this.isCoveredBy(j));
+        let result = [];
+        for (let [j, n] of this.coverCandidate) {
+            if (this.isCoveredBy(j, n))
+                result.push(j);
+        }
+        return result;
     }
     get isCovered() {
         this.disposeEvent();
@@ -4465,8 +4490,10 @@ let Junction = class Junction extends SheetObject {
             return sy;
         return NaN;
     }
+    get signX() { return Math.sign(this.sx); }
+    get signY() { return Math.sign(this.sy); }
     get direction() {
-        let x = this.sx, y = this.sy;
+        let x = this.signX, y = this.signY;
         if (x < 0 && y < 0)
             return Direction.UR;
         if (x > 0 && y < 0)
@@ -4515,6 +4542,9 @@ __decorate([
 ], Junction.prototype, "_lca", null);
 __decorate([
     shrewd
+], Junction.prototype, "coverCandidate", null);
+__decorate([
+    shrewd
 ], Junction.prototype, "coveredBy", null);
 __decorate([
     shrewd
@@ -4552,6 +4582,12 @@ __decorate([
 __decorate([
     shrewd
 ], Junction.prototype, "sy", null);
+__decorate([
+    shrewd
+], Junction.prototype, "signX", null);
+__decorate([
+    shrewd
+], Junction.prototype, "signY", null);
 __decorate([
     shrewd
 ], Junction.prototype, "direction", null);
@@ -5589,7 +5625,7 @@ class Line {
         let c = l.contains(this.p1, true), d = l.contains(this.p2, true);
         if (c && d)
             return;
-        if (!a && !b || !c && !d)
+        if (!a && !b)
             yield this;
         else if (a && b) {
             let l11 = new Line(this.p1, l.p1), l12 = new Line(this.p1, l.p2);
@@ -5839,7 +5875,7 @@ class Rectangle {
 }
 var Trace;
 (function (Trace) {
-    function create(lines, startPt, sv, inflections, end, start) {
+    function create(lines, startPt, endPt, sv, inflections, end, start) {
         let history = [];
         let trace = [];
         let x;
@@ -5878,7 +5914,7 @@ var Trace;
                         start = undefined;
                     }
                 }
-                let goal = l.intersection(end);
+                let goal = l.contains(endPt) ? endPt : l.intersection(end);
                 if (goal) {
                     trace.push(goal);
                     break;
@@ -6271,7 +6307,9 @@ let Device = class Device extends Draggable {
         return Line.distinct(result);
     }
     get ridges() {
-        return Line.subtract(this.rawRidges, this.neighbors.reduce((arr, g) => (arr.push(...g.rawRidges), arr), []));
+        let raw = this.rawRidges;
+        let nei = this.neighbors.reduce((arr, g) => (arr.push(...g.rawRidges), arr), []);
+        return Line.subtract(raw, nei);
     }
     get axisParallels() {
         let { fx, fy } = this.pattern.stretch;
@@ -6815,6 +6853,9 @@ let Repository = class Repository extends Store {
     builder(prototype) {
         return prototype;
     }
+    get shouldDispose() {
+        return super.shouldDispose || this.stretch.disposed;
+    }
     get isActive() {
         return this.stretch.isActive && this.stretch.repository == this;
     }
@@ -7228,7 +7269,6 @@ let RiverComponent = class RiverComponent extends Disposable {
     }
     get segment() {
         this.disposeEvent();
-        this.flap.view.draw();
         return this.flap.view.makeSegments(this.distance);
     }
     overridden(q) {
@@ -7241,10 +7281,10 @@ let RiverComponent = class RiverComponent extends Disposable {
     get q3() { return this.overridden(3); }
     get contour() {
         this.disposeEvent();
-        this.flap.view.draw();
         let seg = this.segment;
         for (let q of [this.q0, this.q1, this.q2, this.q3]) {
-            seg = PolyBool.difference(seg, q);
+            if (q)
+                seg = PolyBool.difference(seg, q);
         }
         return seg;
     }

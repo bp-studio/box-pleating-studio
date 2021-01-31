@@ -48,12 +48,23 @@ interface JJunction extends JRectangle {
 		if(f1.node.id > f2.node.id) [f1, f2] = [f2, f1];
 		this.f1 = f1;
 		this.f2 = f2;
+		f1.$junctions.push(this);
+		f2.$junctions.push(this);
+		f1.$junctionChanged = true;
+		f2.$junctionChanged = true;
 		this.id = f1.node.id + ":" + f2.node.id;
 		new JunctionView(this);
 	}
 
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.f1.disposed || this.f2.disposed;
+	}
+
+	protected onDispose() {
+		this.f1.$junctions.splice(this.f1.$junctions.indexOf(this), 1);
+		this.f2.$junctions.splice(this.f2.$junctions.indexOf(this), 1);
+		this.f1.$junctionChanged = true;
+		this.f2.$junctionChanged = true;
 	}
 
 	/** 根據指定的基準點來取得覆蓋比較矩形 */
@@ -76,14 +87,21 @@ interface JJunction extends JRectangle {
 		return n3 == n1 ? n2 : n1;
 	}
 
+	/** 自身有可能被覆蓋的 Junction 列表 */
+	@shrewd private get coverCandidate(): [Junction, TreeNode][] {
+		let result: [Junction, TreeNode][] = [];
+		for(let j of this.sheet.design.validJunctions) {
+			// 找出對應路徑上的一個共用點，如果沒有的話肯定不是覆蓋
+			let n = this.findIntersection(j);
+			if(n) result.push([j, n]);
+		}
+		return result;
+	}
+
 	/** 判斷自身是否被另外一個 `Junction` 所涵蓋 */
-	private isCoveredBy(o: Junction): boolean {
+	private isCoveredBy(o: Junction, n: TreeNode): boolean {
 		// 方向不一樣的話肯定不是覆蓋
 		if(this == o || this.direction % 2 != o.direction % 2) return false;
-
-		// 找出對應路徑上的一個共用點，如果沒有的話肯定不是覆蓋
-		let n = this.findIntersection(o);
-		if(!n) return false;
 
 		// 基底矩形檢查
 		let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
@@ -99,7 +117,11 @@ interface JJunction extends JRectangle {
 	@shrewd public get coveredBy(): Junction[] {
 		this.disposeEvent();
 		if(!this.isValid) return [];
-		return this.sheet.design.validJunctions.filter(j => this.isCoveredBy(j));
+		let result: Junction[] = [];
+		for(let [j, n] of this.coverCandidate) {
+			if(this.isCoveredBy(j, n)) result.push(j);
+		}
+		return result;
 	}
 
 	@shrewd public get isCovered(): boolean {
@@ -195,8 +217,10 @@ interface JJunction extends JRectangle {
 		return NaN;
 	}
 
+	@shrewd public get signX() { return Math.sign(this.sx); }
+	@shrewd public get signY() { return Math.sign(this.sy); }
 	@shrewd public get direction() {
-		let x = this.sx, y = this.sy;
+		let x = this.signX, y = this.signY;
 		if(x < 0 && y < 0) return Direction.UR;
 		if(x > 0 && y < 0) return Direction.UL;
 		if(x > 0 && y > 0) return Direction.LL;
@@ -217,12 +241,9 @@ interface JJunction extends JRectangle {
 		return 0;
 	}
 
-	/** 目前 isValid 的定義就是正常的 overlap */
+	/** 目前 isValid 的定義就是 `status == JunctionStatus.overlap` */
 	@shrewd public get isValid(): boolean {
 		return this.status == JunctionStatus.overlap;
-
-		// 有待釐清：原本有加上這個條件，但是有需要如此嚴苛嗎？
-		// && this.q1!.isValid && this.q2!.isValid;
 	}
 
 	/**

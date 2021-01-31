@@ -136,6 +136,15 @@ abstract class DesignBase extends Mountable {
 	}
 
 	/**
+	 * 當前所有「活躍」的 `Junction`，亦即實際上會被納入 `Pattern` 計算的那些。
+	 *
+	 * 這會排除掉被覆蓋的 `Junction`。
+	 */
+	@unorderedArray("aj") private get activeJunctions(): readonly Junction[] {
+		return this.validJunctions.filter(j => !j.isCovered);
+	}
+
+	/**
 	 * 當前所有的 `Junction` 群組（即 `Team`，雖然這不是程式碼中的類別）。
 	 */
 	@shrewd public get teams(): Map<string, readonly Junction[]> {
@@ -175,37 +184,6 @@ abstract class DesignBase extends Mountable {
 	@shrewd protected get devices(): Device[] {
 		let result: Device[] = [];
 		for(let s of this.stretches.values()) result.push(...s.devices);
-		return result;
-	}
-
-	/**
-	 * 當前所有「活躍」的 `Junction`，亦即實際上會被納入 `Pattern` 計算的那些。
-	 *
-	 * 這會排除掉被覆蓋的 `Junction`。
-	 */
-	@unorderedArray("aj") private get activeJunctions(): readonly Junction[] {
-		return this.validJunctions.filter(j => !j.isCovered);
-	}
-
-	@shrewd public get validJunctionsByQuadrant(): ReadonlyMap<Quadrant, readonly Junction[]> {
-		return DesignBase.ToQuadrantMap(this.validJunctions);
-	}
-
-	@shrewd public get activeJunctionsByQuadrant(): ReadonlyMap<Quadrant, readonly Junction[]> {
-		return DesignBase.ToQuadrantMap(this.activeJunctions);
-	}
-
-	private static ToQuadrantMap(junctions: Iterable<Junction>) {
-		let result = new Map<Quadrant, Junction[]>();
-		function add(q: Quadrant, j: Junction) {
-			let arr = result.get(q);
-			if(!arr) result.set(q, arr = []);
-			arr.push(j);
-		}
-		for(let j of junctions) {
-			add(j.q1!, j);
-			add(j.q2!, j);
-		}
 		return result;
 	}
 

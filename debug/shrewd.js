@@ -156,6 +156,8 @@
                     shrewd.$terminate();
                 }
                 Core._terminateQueue.clear();
+                if (Core.$option.debug)
+                    Observer.$clearTrigger();
                 for (let id of Core.$option.hook.gc()) {
                     let ob = Observer._map.get(id);
                     if (ob)
@@ -429,6 +431,25 @@
                 }
             }
         }
+        static $clearTrigger() {
+            for (let ob of Observer._trigger)
+                ob.trigger.clear();
+            Observer._trigger.clear();
+        }
+        static $debug(ob) {
+            let path = [ob._name];
+            while (ob.trigger.size) {
+                let next = ob.trigger.values().next().value;
+                if (!(next instanceof Observer))
+                    break;
+                let msg = next._name;
+                if (next instanceof DecoratedMember)
+                    msg += '(' + DecoratedMember.$getParent(next) + ')';
+                path.push(msg);
+                ob = next;
+            }
+            console.log(path);
+        }
         static $refer(observable) {
             if (observable instanceof Observer && observable._isTerminated)
                 return;
@@ -470,8 +491,6 @@
                     observer.$cleanup();
                 }
                 observer._update();
-                if (Core.$option.debug)
-                    observer.trigger.clear();
                 if (!observer._isTerminated) {
                     for (let observable of observer._reference) {
                         oldReferences.delete(observable);
@@ -573,8 +592,10 @@
             this._state = ObserverState.$updated;
         }
         _outdate(by) {
-            if (by)
+            if (by) {
+                Observer._trigger.add(this);
                 this.trigger.add(by);
+            }
             this._state = ObserverState.$outdated;
         }
         get $state() {
@@ -620,6 +641,7 @@
         }
     }
     Observer._pending = new Set();
+    Observer._trigger = new Set();
     Observer._map = new Map();
     Observer.$trace = [];
     const $observableHelper = Symbol('Observable Helper');
@@ -673,6 +695,9 @@
             this._descriptor = descriptor;
             this._option = Object.assign(this._defaultOption, descriptor.$option);
             this._parent = parent;
+        }
+        static $getParent(dm) {
+            return dm._parent.constructor.name;
         }
         get $internalKey() {
             return this._descriptor.$class + '.' + this._descriptor.$key.toString();
@@ -825,7 +850,11 @@
             return this._getter.bind(this._parent);
         }
         $postrendering(result) {
-            if (!this._option.comparer(this._value, result)) {
+            if (!this._option.comparer.apply(this._parent, [
+                    this._value,
+                    result,
+                    this
+                ])) {
                 this._value = result;
                 Observable.$publish(this);
             }
@@ -1046,6 +1075,18 @@
         };
         Shrewd.option = Core.$option;
         Shrewd.comparer = Comparer;
+        Shrewd.debug = {
+            trigger(target, key) {
+                if (HiddenProperty.$has(target, $shrewdObject)) {
+                    let member = target[$shrewdObject].$getMember(key);
+                    if (!member)
+                        console.log('Member not found');
+                    Observer.$debug(member);
+                } else if (target instanceof Observer) {
+                    Observer.$debug(target);
+                }
+            }
+        };
     }(Shrewd || (Shrewd = {})));
     if (typeof window !== 'undefined' && window.Vue) {
         Core.$option.hook = new VueHook();

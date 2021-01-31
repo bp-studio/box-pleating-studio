@@ -41,7 +41,6 @@
 
 	@segment("segment") public get segment(): PolyBool.Segments {
 		this.disposeEvent();
-		this.flap.view.draw();
 		return this.flap.view.makeSegments(this.distance);
 	}
 
@@ -57,10 +56,9 @@
 
 	@segment("contour") public get contour(): PolyBool.Segments {
 		this.disposeEvent();
-		this.flap.view.draw();
 		let seg = this.segment;
 		for(let q of [this.q0, this.q1, this.q2, this.q3]) {
-			seg = PolyBool.difference(seg, q);
+			if(q) seg = PolyBool.difference(seg, q);
 		}
 		return seg;
 	}

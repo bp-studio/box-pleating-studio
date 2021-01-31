@@ -62,6 +62,26 @@ interface JFlap {
 		];
 	}
 
+
+	public readonly $junctions: Junction[] = [];
+	public $junctionChanged: boolean = false;
+
+	@shrewd({
+		comparer(this: Flap) {
+			let result = this.$junctionChanged;
+			this.$junctionChanged = false;
+			return !result;
+		}
+	})
+	public get junctions(): readonly Junction[] {
+		this.design.junctions;
+		return this.$junctions;
+	}
+
+	@shrewd get validJunctions(): readonly Junction[] {
+		return this.junctions.filter(j => j.isValid);
+	}
+
 	public get name() { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 

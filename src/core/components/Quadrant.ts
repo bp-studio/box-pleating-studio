@@ -97,7 +97,7 @@
 			let inflections = new Set<string>();
 			let lead = this.findLead(junctions, r, lines, inflections);
 			let start = lead ? this.findNextDelta(junctions, true) : undefined;
-			trace = Trace.create(lines, lead ?? startPt, this.pv, inflections, end ?? new Line(endPt, this.pv), start);
+			trace = Trace.create(lines, lead ?? startPt, endPt, this.pv, inflections, end ?? new Line(endPt, this.pv), start);
 
 			// 底下這部份的程式碼是為了在 join 的場合中順利聯集兩組輪廓而不會在中間出現缺口而設置的，
 			// 未來採用比較具宏觀性的演算法的話這段可以拿掉。
@@ -199,8 +199,8 @@
 	}
 
 	/** 在找出延伸河道輪廓的時候，應該被扣除的不該考慮部份 */
-	public getOverriddenSegments(d: number): PolyBool.Segments {
-		let result: PolyBool.Path[] = [];
+	public getOverriddenSegments(d: number): PolyBool.Segments | null {
+		let result: PolyBool.Segments[] = [];
 		if(!this.pattern) {
 			let r = this.flap.radius + d;
 			for(let [j, pts] of this.coveredJunctions) {
@@ -219,10 +219,12 @@
 
 				let v = new Vector(ox * this.fx, oy * this.fy);
 				let rect = new Rectangle(p, p.sub(v));
-				result.push(rect.toPolyBoolPath());
+				let path = rect.toPolyBoolPath();
+				let seg = PolyBool.segments({ regions: [path], inverted: false });
+				result.push(seg);
 			}
 		}
-		return PolyBool.segments({ regions: result, inverted: false });
+		return result.length ? PolyBool.union(result) : null;
 	}
 
 	@shrewd public get pattern(): Pattern | null {
@@ -235,11 +237,11 @@
 		return this.point.add(this.qv.scale(r));
 	}
 
-	@unorderedArray("qvj")	private get validJunctions(): readonly Junction[] {
-		return this.design.validJunctionsByQuadrant.get(this) ?? [];
+	@unorderedArray("qvj") private get validJunctions(): readonly Junction[] {
+		return this.flap.validJunctions.filter(j => j.q1 == this || j.q2 == this);
 	}
 
-	@shrewd	private get coveredJunctions(): readonly [Junction, Point[]][] {
+	@shrewd private get coveredJunctions(): readonly [Junction, Point[]][] {
 		return this.validJunctions
 			.filter(j => j.isCovered)
 			.map(j => {
@@ -248,19 +250,13 @@
 			});
 	}
 
-	// 有待釐清：疑似用不到（參見 Junction.isValid）
-	// @shrewd public get isValid(): boolean {
-	// 	return !this.junctions.some(j => j.status == JunctionStatus.tooClose);
-	// }
-
 	@shrewd public get point(): Point {
 		return this.flap.points[this.q];
 	}
 
 	/** 傳回此向量目前所有的活躍 `Junction` 物件 */
-	@shrewd public get activeJunctions(): readonly Junction[] {
-		let result = this.design.activeJunctionsByQuadrant.get(this);
-		return result ? result : [];
+	@unorderedArray("qaj") public get activeJunctions(): readonly Junction[] {
+		return this.validJunctions.filter(j => !j.isCovered);
 	}
 
 	/** 把一個象限方向作相位變換處理 */
