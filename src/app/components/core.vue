@@ -25,7 +25,7 @@
 
 <script lang="ts">
 	import { Vue, Component, Watch } from 'vue-property-decorator';
-	import { bp, Shrewd } from './import/BPStudio';
+	import { bp } from './import/BPStudio';
 	import { sanitize, callService } from './import/types';
 	import * as bootstrap from 'bootstrap';
 	import JSZip from 'jszip';
@@ -104,7 +104,7 @@
 				if(session) {
 					session.jsons.forEach(j => this.addDesign(bp.restore(j), false));
 					if(session.open >= 0) this.select(this.designs[session.open]);
-					Shrewd.commit();
+					bp.update();
 				}
 			}
 
@@ -212,13 +212,20 @@
 		}
 
 		private async save() {
+			// 拖曳的時候存檔無意義且浪費效能，跳過
+			if(bp.system.dragging) return;
+
 			// 只有當前的實體取得存檔權的時候才會儲存
 			if(this.autoSave && await this.checkSession()) {
-				let session = {
-					jsons: this.designs.map(id => bp.designMap.get(id)!),
-					open: bp.design ? this.designs.indexOf(bp.design.id) : -1
+				// 排程到下一次 BPStudio 更新完畢之後存檔，
+				// 避免在存檔的瞬間製造出 glitch
+				bp.onUpdate = () => {
+					let session = {
+						jsons: this.designs.map(id => bp.designMap.get(id)!),
+						open: bp.design ? this.designs.indexOf(bp.design.id) : -1
+					};
+					localStorage.setItem("session", JSON.stringify(session));
 				};
-				localStorage.setItem("session", JSON.stringify(session));
 			}
 		}
 
@@ -262,7 +269,7 @@
 
 		public selectLast(): void {
 			bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
-			Shrewd.commit();
+			bp.update();
 		}
 		public async closeCore(id: number): Promise<boolean> {
 			let d = bp.designMap.get(id)!;
@@ -301,7 +308,7 @@
 			let i = this.designs.indexOf(id);
 			let c = bp.restore(this.checkTitle(bp.designMap.get(id).toJSON()));
 			this.designs.splice(i + 1, 0, (bp.design = c).id);
-			Shrewd.commit();
+			bp.update();
 			gtag('event', 'project_clone');
 		}
 		public addDesign(d: Design, select = true) {

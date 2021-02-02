@@ -95,11 +95,11 @@ abstract class DesignBase extends Mountable {
 	}
 
 	protected onDispose(): void {
-		Shrewd.terminate(this.edges);
-		Shrewd.terminate(this.vertices);
-		Shrewd.terminate(this.rivers);
-		Shrewd.terminate(this.flaps);
-		Shrewd.terminate(this.stretches);
+		this.edges.dispose();
+		this.vertices.dispose();
+		this.rivers.dispose();
+		this.flaps.dispose();
+		this.stretches.dispose();
 		this.junctions.dispose();
 	}
 

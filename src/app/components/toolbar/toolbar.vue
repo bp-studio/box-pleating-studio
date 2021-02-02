@@ -20,7 +20,12 @@
 					{{$t('toolbar.help.news')}}
 					<div class="notify" v-if="notify"></div>
 				</div>
-				<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank">
+				<a
+					class="dropdown-item"
+					href="https://github.com/MuTsunTsai/box-pleating-studio/discussions"
+					target="_blank"
+					rel="noopener"
+				>
 					<i class="far fa-comment-dots"></i>
 					{{$t("toolbar.help.discussions")}}
 				</a>
@@ -30,7 +35,7 @@
 					<div class="notify"></div>
 				</div>
 				<divider></divider>
-				<a class="dropdown-item" href="donate.htm" target="_blank">
+				<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
 					<i class="fas fa-hand-holding-usd"></i>
 					{{$t('toolbar.help.donation')}}
 				</a>

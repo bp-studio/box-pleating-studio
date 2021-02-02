@@ -1,5 +1,5 @@
 
-@shrewd class RiverView extends ControlView<River> {
+@shrewd class RiverView extends ControlView<River> implements ClosureView {
 
 	private _hinge: paper.CompoundPath;
 	private _shade: paper.CompoundPath;
@@ -24,22 +24,34 @@
 
 	/** 跟當前的河有關的基本資訊；這些除非樹的結構有改變，不然不用重新計算 */
 	@shrewd public get info(): RiverInfo {
-		if(this.disposed) return { adjacent: [], length: 0, components: [] };
+		if(this.disposed) return { inner: [], length: 0, components: [] };
 
 		let edge = this.control.edge;
-		let a: readonly TreeEdge[];
-		let c: readonly string[];
+		let adjacent: readonly TreeEdge[];
+		let components: readonly string[];
 
 		if(edge.wrapSide == 0) {
-			c = this.toComponents(edge.l1, edge.n1).concat(this.toComponents(edge.l2, edge.n2));
-			a = edge.a1.concat(edge.a2);
+			components = this.toComponents(edge.l1, edge.n1).concat(this.toComponents(edge.l2, edge.n2));
+			adjacent = edge.a1.concat(edge.a2);
 		} else if(edge.wrapSide == 2) {
-			c = this.toComponents(edge.l2, edge.n2); a = edge.a2;
+			components = this.toComponents(edge.l2, edge.n2); adjacent = edge.a2;
 		} else {
-			c = this.toComponents(edge.l1, edge.n1); a = edge.a1;
+			components = this.toComponents(edge.l1, edge.n1); adjacent = edge.a1;
 		}
 
-		return { adjacent: a, length: edge.length, components: c };
+		let inner: ClosureView[] = [];
+		let design = this.design;
+		for(let e of adjacent) {
+			if(e.isRiver) {
+				let r = design.rivers.get(e)!;
+				inner.push(r.view);
+			} else {
+				let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2)!;
+				inner.push(f.view);
+			}
+		}
+
+		return { inner, length: edge.length, components };
 	}
 
 	private toComponents(l: readonly TreeNode[], n: TreeNode): string[] {
@@ -53,7 +65,7 @@
 	/** 建立一系列監視元件 */
 	private readonly components = new Mapping(
 		() => this.info.components,
-		key => new RiverComponent(this, key)
+		key => new RiverHelper(this, key.split(',').map(v => Number(v)))
 	);
 
 	protected onDispose() {
@@ -61,25 +73,17 @@
 		super.onDispose();
 	}
 
-	/** 計算當前河的閉包 */
-	@segment("closure") private get closure(): PolyBool.Segments {
+	/** 計算當前河的閉包輪廓 */
+	@segment("closure") public get closure(): PolyBool.Segments {
 		this.disposeEvent();
 		return PolyBool.union([...this.components.values()].map(c => c.contour));
 	}
 
+	/** 當前河的內部輪廓 */
 	@segment("interior") private get interior(): PolyBool.Segments {
 		this.disposeEvent();
 		let segments: PolyBool.Segments[] = [];
-		let design = this.control.sheet.design;
-		for(let e of this.info.adjacent) {
-			if(e.isRiver) {
-				let r = design.rivers.get(e)!;
-				segments.push(r.view.closure);
-			} else {
-				let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2)!;
-				segments.push(f.view.hingeSegments);
-			}
-		}
+		for(let v of this.info.inner) segments.push(v.closure);
 		return PolyBool.union(segments);
 	}
 
@@ -89,7 +93,13 @@
 		});
 	}
 
-	/** 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向 */
+	/**
+	 * 扣除掉內部的河的閉包，得到當前河的正確路徑；其中外側會以逆時鐘定向、內側以順時鐘定向。
+	 *
+	 * 這邊的一個關鍵在於我們不需要再執行一次多邊形布林運算；
+	 * 由於閉包輪廓和內部輪廓理論上不會相交，
+	 * 我們只要把它們都放入 CompoundPath 之中、然後再重新定向就自動會是對的了。
+	 */
 	@shrewd private get actualPath(): paper.CompoundPath {
 		this.disposeEvent();
 		let closure = this.closurePath.children;
@@ -178,8 +188,12 @@
 	}
 }
 
+interface ClosureView extends View {
+	closure: PolyBool.Segments;
+}
+
 interface RiverInfo {
-	readonly adjacent: readonly TreeEdge[];
+	readonly inner: readonly ClosureView[];
 	readonly length: number;
 	readonly components: readonly string[];
 }

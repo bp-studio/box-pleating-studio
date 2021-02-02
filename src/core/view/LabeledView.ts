@@ -1,8 +1,13 @@
 
+interface LabeledControl extends ViewedControl {
+	view: LabeledView<ViewedControl>;
+}
+
 abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 	protected abstract readonly _label: paper.PointText;
 
+	/** 一個 View 的標籤的橫向溢出大小 */
 	@shrewd public get overflow() {
 		if(this.disposed || !this.$studio) return 0;
 		this.draw();

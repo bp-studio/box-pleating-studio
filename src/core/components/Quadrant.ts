@@ -28,7 +28,7 @@
 	public readonly flap: Flap;
 
 	/** 角落方位向量 */
-	private readonly qv: Vector;
+	public readonly qv: Vector;
 
 	/** 起始點方位向量 */
 	private readonly sv: Vector;
@@ -36,8 +36,8 @@
 	/** 起始方向向量 */
 	private readonly pv: Vector;
 
-	private readonly fx: number;
-	private readonly fy: number;
+	public readonly fx: number;
+	public readonly fy: number;
 
 	constructor(sheet: Sheet, flap: Flap, q: QuadrantDirection) {
 		super(sheet);
@@ -103,6 +103,8 @@
 			// 未來採用比較具宏觀性的演算法的話這段可以拿掉。
 			if(start && this.outside(trace[0], r, this.q % 2 != 1)) {
 				trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
+			} else {
+				trace.unshift(startPt); // 這是為了確保輸出和前一種情況一致
 			}
 			if(end) {
 				if(this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
@@ -198,35 +200,6 @@
 		return nextQ.findLead(junctions, d2, lines, inflections) ?? nextQ.getStart(d2);
 	}
 
-	/** 在找出延伸河道輪廓的時候，應該被扣除的不該考慮部份 */
-	public getOverriddenSegments(d: number): PolyBool.Segments | null {
-		let result: PolyBool.Segments[] = [];
-		if(!this.pattern) {
-			let r = this.flap.radius + d;
-			for(let [j, pts] of this.coveredJunctions) {
-				let { ox, oy } = j;
-				let p = this.point.add(this.qv.scale(r));
-
-				// 扣除的部份不要超過覆蓋者所能夠繪製的輪廓範圍，否則會扣太多
-				for(let pt of pts) {
-					let diff = pt.sub(p);
-					ox = Math.min(-diff.x * this.fx, ox);
-					oy = Math.min(-diff.y * this.fy, oy);
-				}
-
-				// 如果結果非正那就不用考慮
-				if(ox <= 0 || oy <= 0) continue;
-
-				let v = new Vector(ox * this.fx, oy * this.fy);
-				let rect = new Rectangle(p, p.sub(v));
-				let path = rect.toPolyBoolPath();
-				let seg = PolyBool.segments({ regions: [path], inverted: false });
-				result.push(seg);
-			}
-		}
-		return result.length ? PolyBool.union(result) : null;
-	}
-
 	@shrewd public get pattern(): Pattern | null {
 		let stretch = this.design.getStretchByQuadrant(this);
 		return stretch ? stretch.pattern : null;
@@ -241,7 +214,7 @@
 		return this.flap.validJunctions.filter(j => j.q1 == this || j.q2 == this);
 	}
 
-	@shrewd private get coveredJunctions(): readonly [Junction, Point[]][] {
+	@shrewd public get coveredJunctions(): readonly [Junction, Point[]][] {
 		return this.validJunctions
 			.filter(j => j.isCovered)
 			.map(j => {

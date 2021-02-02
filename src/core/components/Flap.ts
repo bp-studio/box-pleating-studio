@@ -62,26 +62,6 @@ interface JFlap {
 		];
 	}
 
-
-	public readonly $junctions: Junction[] = [];
-	public $junctionChanged: boolean = false;
-
-	@shrewd({
-		comparer(this: Flap) {
-			let result = this.$junctionChanged;
-			this.$junctionChanged = false;
-			return !result;
-		}
-	})
-	public get junctions(): readonly Junction[] {
-		this.design.junctions;
-		return this.$junctions;
-	}
-
-	@shrewd get validJunctions(): readonly Junction[] {
-		return this.junctions.filter(j => j.isValid);
-	}
-
 	public get name() { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 
@@ -143,5 +123,32 @@ interface JFlap {
 	/** 偵錯用；列印 makeContour(d) 的結果 */
 	public debug(d: number = 0): void {
 		//console.log(this.view.makeContour(d).exportJSON());
+	}
+
+	////////////////////////////////////////////////////////////
+	/**
+	 * 底下這一部份的程式碼負責整理一個 Flap 具有哪些 Junction。
+	 * 因為 Junction 的總數非常多，採用純粹的反應式框架來篩選反而速度慢，
+	 * 因此特別這一部份改用一個主動式架構來通知 Flap.junctions 的更新。
+	 */
+	////////////////////////////////////////////////////////////
+
+	public readonly $junctions: Junction[] = [];
+	public $junctionChanged: boolean = false;
+
+	@shrewd({
+		comparer(this: Flap) {
+			let result = this.$junctionChanged;
+			this.$junctionChanged = false;
+			return !result;
+		}
+	})
+	public get junctions(): readonly Junction[] {
+		this.design.junctions;
+		return this.$junctions;
+	}
+
+	@shrewd get validJunctions(): readonly Junction[] {
+		return this.junctions.filter(j => j.isValid);
 	}
 }

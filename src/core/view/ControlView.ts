@@ -23,7 +23,4 @@ abstract class ControlView<T extends Control> extends View {
 	}
 
 	protected abstract renderSelection(selected: boolean): void;
-
-	/** 一個 View 的標籤的橫向溢出大小；預設為零 */
-	public get overflow(): number { return 0; }
 }

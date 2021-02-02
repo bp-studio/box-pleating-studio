@@ -11,7 +11,8 @@
 			"preLaunchTask": "Gulp build",
 			"internalConsoleOptions": "neverOpen",
 			"file": "${workspaceFolder}/debug/index.htm",
-			"sourceMaps": true
+			"sourceMaps": true,
+			"runtimeArgs": ["--allow-file-access-from-files"]
 		},
 		{
 			"type": "node",

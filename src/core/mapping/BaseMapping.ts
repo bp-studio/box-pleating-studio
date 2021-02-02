@@ -11,7 +11,7 @@ type Predicate<A, B> = (a: A, b: B) => boolean;
  * 會反應市地根據提供的 source 和 keyGen 來產生 key，
  * 再根據 ctor 來建構 source 對應的 V 類別物件實體，
  * 並且根據 dtor 來自動從清單中移除。
- * 
+ *
  * 值得注意的是，即使一個對應的 key 從 source 中消失了，
  * 只要對應的 value 尚未滿足 dtor 的條件，這個項目仍舊會被保留。
  * 這個設計是考慮到有一些應用情境 key 有可能暫時性消失、
@@ -19,7 +19,7 @@ type Predicate<A, B> = (a: A, b: B) => boolean;
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class BaseMapping<Key, Source, Value extends object> implements ReadonlyMap<Key, Value> {
+abstract class BaseMapping<Key, Source, Value extends object> implements ReadonlyMap<Key, Value>, IDisposable {
 
 	constructor(
 		private readonly source: IterableFactory<Source>,
@@ -27,6 +27,13 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 		private readonly ctor: Func<Source, Value>,
 		private readonly dtor: Predicate<Key, Value>
 	) {	}
+
+	public dispose() {
+		Shrewd.terminate(this);
+		this._map.clear();
+		// @ts-ignore
+		delete this._map;
+	}
 
 	private readonly _map: Map<Key, Value> = new Map();
 

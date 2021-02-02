@@ -23,6 +23,7 @@ let woff2 = require('./gulp/woff2');
 
 let projCore = ts.createProject('src/core/tsconfig.json');
 let projService = ts.createProject('src/service/tsconfig.json');
+let projWorker = ts.createProject('src/worker/tsconfig.json');
 let projTest = ts.createProject('test/tsconfig.json');
 
 let terserOption = {
@@ -70,6 +71,13 @@ gulp.task('buildCorePub', () =>
 		))
 		.pipe(terser(Object.assign({}, terserOption, { mangle: true })))
 		.pipe(gulp.dest('dist/'))
+);
+
+gulp.task('buildWorker', () =>
+	projWorker.src()
+		.pipe(projWorker())
+		.pipe(terser())
+		.pipe(gulp.dest('dist/lib'))
 );
 
 gulp.task('buildService', () => {

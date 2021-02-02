@@ -1,16 +1,16 @@
 if(typeof Shrewd != "object") throw new Error("BPStudio requires Shrewd.");
 
 const { shrewd } = Shrewd;
-Shrewd.option.debug = true;
 
 const diagnose = false;
 
 function unorderedArray(msg?: string) {
 	return shrewd({
 		comparer: (ov: any[], nv: any[], member) => {
+			if(ov === nv) return true;
 			let result = Shrewd.comparer.unorderedArray(ov, nv);
 			if(diagnose && result && msg) {
-				// if(msg=="qvj") {
+				// if(msg=="sheet.independents") {
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
 				// }
@@ -22,21 +22,47 @@ function unorderedArray(msg?: string) {
 }
 function segment(msg?: string) {
 	return shrewd({
-		comparer: (ov: PolyBool.Segments, nv: PolyBool.Segments) => {
+		comparer: (ov: PolyBool.Segments, nv: PolyBool.Segments, member) => {
+			if(ov === nv) return true;
 			if(!ov != !nv) return false;
 			if(!ov) return true
 			let result = PolyBool.compare(ov, nv);
-			if(diagnose && result && msg) console.log(msg);
+			if(diagnose && result && msg) {
+				// if(msg == "contour") {
+				// 	Shrewd.debug.trigger(member);
+				// 	debugger;
+				// }
+				console.log(msg);
+			}
 			return result;
 		}
 	});
 }
 
-// 目前的實驗結果是這樣：如果打開自動認可，
-// 那麼當 chrome 開啟 debug 模式的時候會明顯感覺得到比較卡，
-// 但如果不開啟 debug 模式，那即使打開自動認可，在桌機上跑也不會卡。
+function path(msg?: string) {
+	return shrewd({
+		comparer: (ov: Path, nv: Path, member) => {
+			if(ov === nv) return true;
+			if(!ov != !nv) return false;
+			if(!ov) return true
+			if(ov.length != nv.length) return false;
+			for(let i = 0; i < ov.length; i++) {
+				if(!ov[i].eq(nv[i])) return false;
+			}
+			if(diagnose && msg) {
+				// if(msg == "qc") {
+				// 	Shrewd.debug.trigger(member);
+				// 	debugger;
+				// }
+				console.log(msg);
+			}
+			return true;
+		}
+	});
+}
+
+Shrewd.option.debug = diagnose;
 Shrewd.option.autoCommit = false;
-setInterval(() => Shrewd.commit(), 50);
 
 /** 全域的 debug 用變數 */
 let debug = false;

@@ -13,7 +13,7 @@ interface JSheet {
 
 @shrewd class Sheet extends Mountable implements ISerializable<JSheet>, IDesignObject {
 
-	@shrewd public get controls(): Control[] {
+	@unorderedArray("sheetControls") public get controls(): Control[] {
 		var result: Control[] = [];
 		for(let map of this._controlMaps) result.push(...map());
 		return result;
@@ -102,7 +102,7 @@ interface JSheet {
 		return 0 <= p.x && p.x <= this.width && 0 <= p.y && p.y <= this.height;
 	}
 
-	@shrewd get independents(): IndependentDraggable[] {
+	@unorderedArray("sheet.independents") get independents(): IndependentDraggable[] {
 		return this.controls.filter((c: Control): c is IndependentDraggable => c instanceof IndependentDraggable);
 	}
 
@@ -128,12 +128,18 @@ interface JSheet {
 		this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
 	}
 
+	@unorderedArray("sheet.viewedControls") private get viewedControls() {
+		return this.controls.filter((c: Control): c is LabeledControl =>
+			(c instanceof ViewedControl) && (c.view instanceof LabeledView)
+		);
+	}
+
 	// 這個值如果直接做成計算屬性會導致循環參照，所以要用一個反應方法來延遲更新它
 	@shrewd public margin = 0;
 
 	@shrewd private getMargin() {
 		if(!this.isActive || !this.design.isActive) return;
-		let controls = this.controls.filter((c: Control): c is ViewedControl => c instanceof ViewedControl);
+		let controls = this.viewedControls;
 		let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;
 		setTimeout(() => this.margin = m, 0);
 	}

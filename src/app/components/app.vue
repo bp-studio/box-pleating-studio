@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
+	import { Component, Watch } from 'vue-property-decorator';
 	import BaseComponent from './mixins/baseComponent';
 
 	@Component
@@ -29,6 +29,10 @@
 
 		private show(el: string) {
 			(this.$refs[el] as any).show();
+		}
+
+		@Watch("design") onDesign(v: any) {
+			if(!v) this.showPanel = false;
 		}
 
 		mounted() {

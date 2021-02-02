@@ -32,16 +32,22 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	/**
+	 * 持續更新 this._draggableSelections 的反應方法。
+	 */
+	@shrewd public draggableSelections() {
+		// 連裡面的選取邏輯也是乖乖照寫；這是還好啦，不會對效能有真正的影響
+		this._draggableSelections = this.selections.filter((o): o is Draggable => o instanceof Draggable);
+	}
+
+	/**
 	 * 當前選取的 `Control` 之中可以被拖曳的子陣列。
 	 *
 	 * 當然，理論上這個陣列要嘛為空、要嘛就等於全體的 `selections`，
 	 * 但是這邊為了型別檢查上的方便，故意把它獨立成一個屬性。
-	 * 這個東西設定成反應方法以確保其持續更新，這對於垃圾回收來說是必要的。
+	 *
+	 * 這個東西本身不做成反應方法，以避免觸發 glitch。
 	 */
-	@shrewd public draggableSelections(): Draggable[] {
-		// 連裡面的選取邏輯也是乖乖照寫；這是還好啦，不會對效能有真正的影響
-		return this.selections.filter((o): o is Draggable => o instanceof Draggable);
-	}
+	private _draggableSelections: Draggable[];
 
 	private _dragSelectables: DragSelectableControl[];
 
@@ -138,6 +144,9 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		}
 
 		this._ctrl = [nowCtrl, nextCtrl];
+
+		// 選取完之後必須立刻更新以確保 this._draggableSelections 正確
+		this._studio.update();
 	}
 
 	private _processNextSelection(): void {
@@ -147,6 +156,9 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			if(nowCtrl && !nextCtrl) this._clearSelection(nowCtrl);
 			if(nextCtrl) this._select(nextCtrl);
 		}
+
+		// 選取完之後必須立刻更新以確保 this._draggableSelections 正確
+		this._studio.update();
 	}
 
 	private _select(c: Control): void {
@@ -172,7 +184,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		let active = document.activeElement;
 		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return true;
 
-		return this.key(event.key, event.modifiers.control);
+		return this.key(event.key, event.modifiers.control || event.modifiers.meta);
 	}
 
 	public key(key: string, ctrl: boolean = false) {
@@ -207,7 +219,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			default: return true;
 		}
 
-		let sel = this.draggableSelections();
+		let sel = this._draggableSelections;
 
 		// 沒有東西被選取則允許捲動 viewport
 		if(sel.length == 0) return true;
@@ -239,7 +251,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		if(!this._checkEvent(event.event) || this._scrollStart) return;
 
 		let point = event.point;
-		this._processSelection(point, event.modifiers.control);
+		this._processSelection(point, event.modifiers.control || event.modifiers.meta);
 
 		// 設置長壓等待
 		if(this.selections.length == 1 && this.isTouch(event.event)) {
@@ -248,10 +260,10 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			}, 750);
 		}
 
-		if(this.draggableSelections().length) {
+		if(this._draggableSelections.length) {
 			// 拖曳初始化
 			this._lastKnownCursorLocation = new Point(event.downPoint).round();
-			for(let o of this.draggableSelections()) o.dragStart(this._lastKnownCursorLocation);
+			for(let o of this._draggableSelections) o.dragStart(this._lastKnownCursorLocation);
 			this.dragging = true;
 		}
 	}
@@ -266,14 +278,14 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			}
 			return;
 		}
-		if(!event.modifiers.control) this._processNextSelection();
+		if(!event.modifiers.control && !event.modifiers.meta) this._processNextSelection();
 	}
 
 	private _reselect(event: paper.ToolEvent) {
 		this._clearSelection();
 		this._processSelection(event.point, false);
-		Shrewd.commit();
-		for(let o of this.draggableSelections()) o.dragStart(this._lastKnownCursorLocation);
+		this._studio.update();
+		for(let o of this._draggableSelections) o.dragStart(this._lastKnownCursorLocation);
 		this._possiblyReselect = false;
 	}
 
@@ -300,10 +312,10 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			this._lastKnownCursorLocation.set(pt);
 
 			// 請求拖曳中的 Draggable 去檢查並修正位置
-			for(let o of this.draggableSelections()) pt = o.dragConstraint(pt);
+			for(let o of this._draggableSelections) pt = o.dragConstraint(pt);
 
 			// 修正完成之後進行真正的拖曳
-			for(let o of this.draggableSelections()) o.drag(pt);
+			for(let o of this._draggableSelections) o.drag(pt);
 
 			// 通知 Design 現在正在進行拖曳
 			this._studio.design!.dragging = true;
@@ -312,22 +324,22 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			if(!this._dragSelectView.visible) {
 				// 觸碰的情況中要拖曳至一定距離才開始觸發拖曳選取
 				if(this.isTouch(event.event) && event.downPoint.getDistance(event.point) < 1) return;
-
 				this._clearSelection();
 				this._dragSelectView.visible = true;
 				this._dragSelectView.down = event.downPoint;
-				Shrewd.commit();
+				//this._studio.update();
 			}
 			this._dragSelectView.now = event.point;
-			this._dragSelectView.draw();
+			//this._dragSelectView.draw();
 			for(let c of this._dragSelectables) {
 				c.selected = this._dragSelectView.contains(new paper.Point(c.dragSelectAnchor));
 			}
+
 		}
 	}
 
 	private _canvasWheel(event: WheelEvent) {
-		if(event.ctrlKey) {
+		if(event.ctrlKey || event.metaKey) {
 			event.preventDefault();
 			let d = this._studio.design;
 			if(d) {

@@ -45,7 +45,7 @@ interface JEdge {
 		let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
 		let node: TreeNode = action.apply(this.design.tree, [this.edge]);
 		this.design.options.set("vertex", node.id, { id: node.id, name: node.name, x, y });
-		Shrewd.commit();
+		this.$studio?.update();
 		this.design.vertices.get(node)!.selected = true;
 	}
 

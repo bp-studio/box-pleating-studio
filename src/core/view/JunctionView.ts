@@ -13,22 +13,11 @@
 	protected render() {
 		if(this._shade.visible = this._junction.status == JunctionStatus.tooClose) {
 			let f1 = this._junction.f1, f2 = this._junction.f2;
-			this._shade.removeChildren();
+			let v1 = f1.view, v2 = f2.view;
 			let d = this._junction.$treeDistance - (f1.radius + f2.radius);
-			if(d == 0) {
-				this._shade.addChild(f1.view.circle.intersect(f2.view.circle));
-				this._shade.strokeWidth = JunctionView.widthForArea(this._shade.area);
-			} else {
-				let c1 = f1.view.makeRectangle(d), c2 = f2.view.makeRectangle(d);
-				this._shade.addChild(f1.view.circle.intersect(c2));
-				this._shade.addChild(f2.view.circle.intersect(c1));
-				this._shade.strokeWidth = JunctionView.widthForArea(this._shade.area);
-			}
+			let json = [v1.circleJSON, v2.circleJSON];
+			if(d != 0) json.push(v1.makeJSON(d), v2.makeJSON(d));
+			PaperWorker.processJunction(this._shade, json);
 		}
-	}
-
-	/** 當相交面積太小的時候加粗框線以免重疊不明顯 */
-	private static widthForArea(a:number):number {
-		return a < 0.25 ? 4 : a < 0.5 ? 3 : a < 1 ? 2 : 1;
 	}
 }

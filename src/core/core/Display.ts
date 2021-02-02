@@ -74,8 +74,11 @@
 		studio.$paper.setup(this._canvas);
 		studio.$paper.settings.insertItems = false;
 		this.project = studio.$paper.project;
+		this.project.view.autoUpdate = false;
 		this.project.currentStyle.strokeColor = PaperUtil.Black();
 		this.project.currentStyle.strokeScaling = false;
+
+		setInterval(() => this._studio.update(), 50);
 
 		// 下面這段程式碼是用來檢視效能用的。
 		/* this.project.view.onFrame = (event: any) => {

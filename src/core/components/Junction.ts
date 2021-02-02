@@ -91,6 +91,7 @@ interface JJunction extends JRectangle {
 	@shrewd private get coverCandidate(): [Junction, TreeNode][] {
 		let result: [Junction, TreeNode][] = [];
 		for(let j of this.sheet.design.validJunctions) {
+			if(j == this) continue;
 			// 找出對應路徑上的一個共用點，如果沒有的話肯定不是覆蓋
 			let n = this.findIntersection(j);
 			if(n) result.push([j, n]);
@@ -101,7 +102,7 @@ interface JJunction extends JRectangle {
 	/** 判斷自身是否被另外一個 `Junction` 所涵蓋 */
 	private isCoveredBy(o: Junction, n: TreeNode): boolean {
 		// 方向不一樣的話肯定不是覆蓋
-		if(this == o || this.direction % 2 != o.direction % 2) return false;
+		if(this.direction % 2 != o.direction % 2) return false;
 
 		// 基底矩形檢查
 		let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
@@ -114,7 +115,7 @@ interface JJunction extends JRectangle {
 		return true; // 否則大的覆蓋小的
 	}
 
-	@shrewd public get coveredBy(): Junction[] {
+	@unorderedArray("jcb") public get coveredBy(): Junction[] {
 		this.disposeEvent();
 		if(!this.isValid) return [];
 		let result: Junction[] = [];

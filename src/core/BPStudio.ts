@@ -13,6 +13,8 @@
 /// <reference path="mapping/DoubleMapping.ts" />
 /// <reference path="math/Fraction.ts" />
 /// <reference path="pattern/Partitioner.ts" />
+/// <reference path="helper/RiverHelperBase.ts" />
+/// <reference path="helper/QuadrantHelper.ts" />
 
 // Level 2
 /// <reference path="mapping/Mapping.ts" />
@@ -21,6 +23,7 @@
 /// <reference path="model/Tree.ts" />
 /// <reference path="math/Couple.ts" />
 /// <reference path="pattern/Partition.ts" />
+/// <reference path="helper/RiverHelper.ts" />
 
 // Level 3
 /// <reference path="core/DesignBase.ts" />
@@ -140,7 +143,7 @@
 	private tryLoad(design: RecursivePartial<JDesign>): Design {
 		this.design = new Design(this, design);
 		this.designMap.set(this.design.id, this.design);
-		Shrewd.commit();
+		this.update();
 		return this.design;
 	}
 
@@ -154,4 +157,25 @@
 	}
 
 	public get TreeMaker() { return TreeMaker; }
+
+	public get running() { return this._updating; }
+	private _updating: boolean = false;
+
+	public onUpdate?: Function;
+
+	public async update() {
+		if(this._updating) return;
+		this._updating = true;
+
+		Shrewd.commit();
+		await PaperWorker.done();
+		this.$display.project.view.update();
+
+		if(this.onUpdate) {
+			this.onUpdate();
+			delete this.onUpdate;
+		}
+
+		this._updating = false;
+	}
 }

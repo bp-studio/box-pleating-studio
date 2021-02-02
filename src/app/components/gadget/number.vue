@@ -28,7 +28,7 @@
 
 <script lang="ts">
 	import { Component, Prop } from 'vue-property-decorator';
-	import { Shrewd } from '../import/BPStudio';
+	import { bp } from '../import/BPStudio';
 	import InputMixin from '../mixins/inputMixin';
 
 	@Component({ name: "number" })
@@ -54,7 +54,7 @@
 			event.preventDefault();
 			let by = Math.round(-event.deltaY / 100);
 			this.v = this.change(by);
-			Shrewd.commit();
+			bp.update();
 		}
 	}
 </script>

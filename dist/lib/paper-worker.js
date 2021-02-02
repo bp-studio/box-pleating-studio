@@ -1,0 +1,1 @@
+importScripts("paper-core.min.js"),paper.install(this),paper.setup([128,128]),console.log(project),project.view.autoUpdate=!1,onmessage=function(t){if(t.ports[0]){let[e,p]=t.data,o=project.importJSON(e),r=project.importJSON(p),s=o.intersect(r),a=[s.exportJSON(),s.area];t.ports[0].postMessage(a)}};

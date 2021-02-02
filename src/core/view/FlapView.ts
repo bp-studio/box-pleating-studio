@@ -1,5 +1,5 @@
 
-@shrewd class FlapView extends LabeledView<Flap> {
+@shrewd class FlapView extends LabeledView<Flap> implements ClosureView {
 
 	protected readonly _label: paper.PointText;
 	public readonly hinge: paper.Path;
@@ -9,6 +9,7 @@
 	private readonly _outerRidges: paper.CompoundPath;
 	private readonly _innerRidges: paper.CompoundPath;
 	private readonly _glow: paper.PointText;
+	private readonly _component: RiverHelperBase;
 
 	constructor(flap: Flap) {
 		super(flap);
@@ -27,6 +28,8 @@
 		this.$addItem(Layer.ridge, this._outerRidges = new paper.CompoundPath(Style.ridge));
 		this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
 		this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
+
+		this._component = new RiverHelperBase(this, flap);
 	}
 
 	public contains(point: paper.Point) {
@@ -36,6 +39,10 @@
 
 	@shrewd public get circle() {
 		return this.makeRectangle(0);
+	}
+
+	@shrewd public get circleJSON() {
+		return this.circle.exportJSON();
 	}
 
 	/** 產生（附加額外距離 d）的矩形，預設會帶有圓角 */
@@ -48,24 +55,28 @@
 		});;
 	}
 
-	public makeSegments(d: number): PolyBool.Segments {
-		let path: Path = [];
-		this.control.quadrants.forEach(q => path.push(...q.makeContour(d)));
-		return PathUtil.toSegments(path);
+	private jsonCache: string[] = [];
+
+	public makeJSON(d: number) {
+		if(this.control.selected) return this.makeRectangle(d).exportJSON();
+		return this.jsonCache[d] = this.jsonCache[d] || this.makeRectangle(d).exportJSON();
 	}
 
-	@segment("hinge") public get hingeSegments() {
-		this.disposeEvent();
-		return this.makeSegments(0);
+	@shrewd private clearCache() {
+		if(!this.control.design.dragging && this.jsonCache.length) this.jsonCache = [];
+	}
+
+	@segment("flap.closure") public get closure() {
+		return this._component.segment;
 	}
 
 	/** 這個獨立出來以提供 RiverView 的相依 */
 	@shrewd public renderHinge() {
 		if(this.control.disposed) return;
 		this._circle.visible = this.$studio?.$display.settings.showHinge ?? false;
-		let paths = PaperUtil.fromSegments(this.hingeSegments);
+		let paths = PaperUtil.fromSegments(this.closure);
 		this.hinge.removeSegments();
-		// if(!paths.length) debugger;
+		if(!paths.length) debugger;
 		this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
 	}
 

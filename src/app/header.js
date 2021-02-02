@@ -5,6 +5,8 @@ document.addEventListener("wheel", function(event) {
 	if(event.ctrlKey) event.preventDefault();
 }, { passive: false });
 
+const isMac = navigator.platform.toLowerCase().startsWith("mac");
+
 ///////////////////////////////////////////////////
 // 檔案處理
 ///////////////////////////////////////////////////
@@ -41,11 +43,11 @@ function callService(data) {
 	return new Promise((resolve, reject) => {
 		if('serviceWorker' in navigator) {
 			navigator.serviceWorker.getRegistration('/').then(reg => {
-				if(!reg.active) reject(); // Safari 在第一次執行的時候可能會進到這裡
+				if(!reg.active) return reject(); // Safari 在第一次執行的時候可能會進到這裡
 				let channel = new MessageChannel();
 				channel.port1.onmessage = event => resolve(event.data);
 				reg.active.postMessage(data, [channel.port2]);
-			}, reason => reject());
+			}, () => reject());
 		} else reject();
 	});
 }

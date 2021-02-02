@@ -41,6 +41,12 @@ type GPattern = JPattern<Gadget>;
 		this.devices = pattern.devices.map((d, i) => new Device(this, configuration.partitions[i], d));
 		this.gadgets = this.devices.reduce((arr, d) => arr.concat(d.gadgets), [] as Gadget[]);
 		this.signature = JSON.stringify(pattern);
+
+		// 如果有發生 glitch 的話，把底下這些打開可以偵錯
+		// // @ts-ignore
+		// if(!bp.running) {
+		// 	console.log("manual")
+		// }
 	}
 
 	protected get shouldDispose(): boolean {

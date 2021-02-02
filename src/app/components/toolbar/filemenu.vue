@@ -6,10 +6,10 @@
 		</div>
 		<divider></divider>
 		<uploader accept=".bps, .bpz, .json, .zip" ref="open" multiple @upload="upload($event)">
-			<hotkey icon="far fa-folder-open" hk="Ctrl+O">{{$t('toolbar.file.open')}}</hotkey>
+			<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 		</uploader>
 		<download :disabled="!design" :file="jsonFile" ref="bps" @download="notify">
-			<hotkey icon="fas fa-download" hk="Ctrl+S">{{$t('toolbar.file.saveBPS')}}</hotkey>
+			<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.saveBPS')}}</hotkey>
 		</download>
 		<download :disabled="!design" :file="workspaceFile" ref="bpz" @download="notifyAll">
 			<i class="fas fa-download"></i>
@@ -30,7 +30,7 @@
 		</dropdownitem>
 		<divider></divider>
 		<dropdownitem @click="print" :disabled="!design">
-			<hotkey icon="fas fa-print" hk="Ctrl+P">{{$t('toolbar.file.print')}}</hotkey>
+			<hotkey icon="fas fa-print" ctrl hk="P">{{$t('toolbar.file.print')}}</hotkey>
 		</dropdownitem>
 		<dropdownitem @click="$emit('share')" :disabled="!design">
 			<i class="fas fa-share-alt"></i>
@@ -69,7 +69,7 @@
 				// 如果正在使用輸入框，不處理一切後續
 				let active = document.activeElement;
 				if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
-				if(e.ctrlKey && ["o", "s", "p"].includes(e.key)) {
+				if((e.metaKey || e.ctrlKey) && ["o", "s", "p"].includes(e.key)) {
 					e.preventDefault();
 					if(e.key == "o") (this.$refs.open as any).click();
 					if(e.key == "s" && core.design) (this.$refs.bps as any).download();

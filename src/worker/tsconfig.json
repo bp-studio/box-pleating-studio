@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"target": "es2017",
+		"removeComments": true,
+		"lib": ["webworker", "esnext"],
+		"skipLibCheck": true,
+		"allowJs": true,
+		"outDir": "../../dist/lib",
+		"baseUrl": "../../node_modules/"
+	},
+	"include": [
+		"./**/*.ts",
+		"./**/*.js"
+	]
+}

@@ -99,7 +99,7 @@ interface IDesignObject {
 				if(!v) break;
 				v.node.dispose()
 				arr.splice(arr.indexOf(v), 1);
-				Shrewd.commit();
+				this.$studio?.update();
 			}
 		});
 	}
@@ -109,7 +109,7 @@ interface IDesignObject {
 			for(let f of flaps) {
 				if(this.vertices.size == 3) break;
 				f.node.dispose();
-				Shrewd.commit();
+				this.$studio?.update();
 			}
 		})
 	}

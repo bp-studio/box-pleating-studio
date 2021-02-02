@@ -82,7 +82,7 @@ interface JVertex extends IPoint {
 		if(this.node.degree != 2) return;
 		this.design.history.takeAction(() => {
 			let edge = this.node.dispose()!;
-			Shrewd.commit();
+			this.$studio?.update();
 			this.design.edges.get(edge)!.selected = true;
 		});
 	}

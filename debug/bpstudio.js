@@ -7,11 +7,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 if (typeof Shrewd != "object")
     throw new Error("BPStudio requires Shrewd.");
 const { shrewd } = Shrewd;
-Shrewd.option.debug = true;
 const diagnose = false;
 function unorderedArray(msg) {
     return shrewd({
         comparer: (ov, nv, member) => {
+            if (ov === nv)
+                return true;
             let result = Shrewd.comparer.unorderedArray(ov, nv);
             if (diagnose && result && msg) {
                 console.log(msg);
@@ -22,20 +23,45 @@ function unorderedArray(msg) {
 }
 function segment(msg) {
     return shrewd({
-        comparer: (ov, nv) => {
+        comparer: (ov, nv, member) => {
+            if (ov === nv)
+                return true;
             if (!ov != !nv)
                 return false;
             if (!ov)
                 return true;
             let result = PolyBool.compare(ov, nv);
-            if (diagnose && result && msg)
+            if (diagnose && result && msg) {
                 console.log(msg);
+            }
             return result;
         }
     });
 }
+function path(msg) {
+    return shrewd({
+        comparer: (ov, nv, member) => {
+            if (ov === nv)
+                return true;
+            if (!ov != !nv)
+                return false;
+            if (!ov)
+                return true;
+            if (ov.length != nv.length)
+                return false;
+            for (let i = 0; i < ov.length; i++) {
+                if (!ov[i].eq(nv[i]))
+                    return false;
+            }
+            if (diagnose && msg) {
+                console.log(msg);
+            }
+            return true;
+        }
+    });
+}
+Shrewd.option.debug = diagnose;
 Shrewd.option.autoCommit = false;
-setInterval(() => Shrewd.commit(), 50);
 let debug = false;
 function nonEnumerable(target, name, desc) {
     if (desc) {
@@ -1217,6 +1243,11 @@ class BaseMapping {
         this.dtor = dtor;
         this._map = new Map();
     }
+    dispose() {
+        Shrewd.terminate(this);
+        this._map.clear();
+        delete this._map;
+    }
     render() {
         for (let [key, value] of this._map) {
             if (this.dtor(key, value))
@@ -1575,6 +1606,79 @@ class Partitioner extends Disposable {
         }
     }
 }
+let RiverHelperBase = class RiverHelperBase extends Disposable {
+    constructor(view, flap) {
+        super(view);
+        this.view = view;
+        this.flap = flap;
+        this.quadrants = MakePerQuadrant(q => new QuadrantHelper(this, q));
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.flap.disposed;
+    }
+    onDispose() {
+        delete this.flap;
+    }
+    get distance() { return 0; }
+    get segment() {
+        this.disposeEvent();
+        let path = [];
+        this.quadrants.forEach(q => path.push(...q.contour));
+        return PathUtil.toSegments(path);
+    }
+};
+__decorate([
+    segment("segment")
+], RiverHelperBase.prototype, "segment", null);
+RiverHelperBase = __decorate([
+    shrewd
+], RiverHelperBase);
+let QuadrantHelper = class QuadrantHelper extends Disposable {
+    constructor(parent, q) {
+        super(parent);
+        this.parent = parent;
+        this.quadrant = parent.flap.quadrants[q];
+    }
+    get overridden() {
+        this.disposeEvent();
+        let result = [];
+        let d = this.parent.distance;
+        let { qv, fx, fy, point, coveredJunctions, pattern } = this.quadrant;
+        if (!pattern) {
+            let r = this.parent.flap.radius + d;
+            for (let [j, pts] of coveredJunctions) {
+                let { ox, oy } = j;
+                let p = point.add(qv.scale(r));
+                for (let pt of pts) {
+                    let diff = pt.sub(p);
+                    ox = Math.min(-diff.x * fx, ox);
+                    oy = Math.min(-diff.y * fy, oy);
+                }
+                if (ox <= 0 || oy <= 0)
+                    continue;
+                let v = new Vector(ox * fx, oy * fy);
+                let rect = new Rectangle(p, p.sub(v));
+                let path = rect.toPolyBoolPath();
+                let seg = PolyBool.segments({ regions: [path], inverted: false });
+                result.push(seg);
+            }
+        }
+        return result.length ? PolyBool.union(result) : null;
+    }
+    get contour() {
+        this.disposeEvent();
+        return this.quadrant.makeContour(this.parent.distance);
+    }
+};
+__decorate([
+    segment("qo")
+], QuadrantHelper.prototype, "overridden", null);
+__decorate([
+    path("qc")
+], QuadrantHelper.prototype, "contour", null);
+QuadrantHelper = __decorate([
+    shrewd
+], QuadrantHelper);
 let Mapping = class Mapping extends BaseMapping {
     constructor(source, constructor) {
         super(source, k => k, constructor, (k, v) => v.disposed);
@@ -2024,6 +2128,44 @@ __decorate([
 Partition = __decorate([
     shrewd
 ], Partition);
+let RiverHelper = class RiverHelper extends RiverHelperBase {
+    constructor(view, ids) {
+        super(view, view.design.flapsById.get(ids[0]));
+        this.node = view.design.tree.node.get(ids[1]);
+        this.key = ids[0] + "," + ids[1];
+    }
+    get shouldDispose() {
+        return super.shouldDispose || !this.view.info.components.some(c => c == this.key);
+    }
+    onDispose() {
+        super.onDispose();
+        delete this.node;
+    }
+    get distance() {
+        this.disposeEvent();
+        let { design, info } = this.view, flap = this.flap;
+        let dis = design.tree.dist(flap.node, this.node);
+        return dis - flap.radius + info.length;
+    }
+    get contour() {
+        this.disposeEvent();
+        let seg = this.segment;
+        for (let q of this.quadrants) {
+            if (q.overridden)
+                seg = PolyBool.difference(seg, q.overridden);
+        }
+        return seg;
+    }
+};
+__decorate([
+    shrewd
+], RiverHelper.prototype, "distance", null);
+__decorate([
+    segment("contour")
+], RiverHelper.prototype, "contour", null);
+RiverHelper = __decorate([
+    shrewd
+], RiverHelper);
 class DesignBase extends Mountable {
     constructor(studio, profile) {
         super(studio);
@@ -2065,11 +2207,11 @@ class DesignBase extends Mountable {
         return [...this.stretches.values()].some(s => s.isTotallyValid && s.pattern == null);
     }
     onDispose() {
-        Shrewd.terminate(this.edges);
-        Shrewd.terminate(this.vertices);
-        Shrewd.terminate(this.rivers);
-        Shrewd.terminate(this.flaps);
-        Shrewd.terminate(this.stretches);
+        this.edges.dispose();
+        this.vertices.dispose();
+        this.rivers.dispose();
+        this.flaps.dispose();
+        this.stretches.dispose();
         this.junctions.dispose();
     }
     get allJunctions() {
@@ -2264,16 +2406,19 @@ let Sheet = class Sheet extends Mountable {
         }
         this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
     }
+    get viewedControls() {
+        return this.controls.filter((c) => (c instanceof ViewedControl) && (c.view instanceof LabeledView));
+    }
     getMargin() {
         if (!this.isActive || !this.design.isActive)
             return;
-        let controls = this.controls.filter((c) => c instanceof ViewedControl);
+        let controls = this.viewedControls;
         let m = controls.length ? Math.max(...controls.map(c => c.view.overflow)) : 0;
         setTimeout(() => this.margin = m, 0);
     }
 };
 __decorate([
-    shrewd
+    unorderedArray("sheetControls")
 ], Sheet.prototype, "controls", null);
 __decorate([
     shrewd
@@ -2319,11 +2464,14 @@ __decorate([
     shrewd
 ], Sheet.prototype, "size", null);
 __decorate([
-    shrewd
+    unorderedArray("sheet.independents")
 ], Sheet.prototype, "independents", null);
 __decorate([
     shrewd
 ], Sheet.prototype, "_getIndependentRect", null);
+__decorate([
+    unorderedArray("sheet.viewedControls")
+], Sheet.prototype, "viewedControls", null);
 __decorate([
     shrewd
 ], Sheet.prototype, "margin", void 0);
@@ -2714,6 +2862,7 @@ let Design = class Design extends DesignBase {
     }
     deleteVertices(vertices) {
         this.history.takeAction(() => {
+            var _a;
             let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
             while (this.vertices.size > 3) {
                 let v = arr.find(v => v.node.degree == 1);
@@ -2721,17 +2870,18 @@ let Design = class Design extends DesignBase {
                     break;
                 v.node.dispose();
                 arr.splice(arr.indexOf(v), 1);
-                Shrewd.commit();
+                (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
             }
         });
     }
     deleteFlaps(flaps) {
         this.history.takeAction(() => {
+            var _a;
             for (let f of flaps) {
                 if (this.vertices.size == 3)
                     break;
                 f.node.dispose();
-                Shrewd.commit();
+                (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
             }
         });
     }
@@ -2871,6 +3021,9 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
             if (start && this.outside(trace[0], r, this.q % 2 != 1)) {
                 trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
             }
+            else {
+                trace.unshift(startPt);
+            }
             if (end) {
                 if (this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
                     trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
@@ -2940,29 +3093,6 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
         inflections.add(inflection.toString());
         return (_a = nextQ.findLead(junctions, d2, lines, inflections)) !== null && _a !== void 0 ? _a : nextQ.getStart(d2);
-    }
-    getOverriddenSegments(d) {
-        let result = [];
-        if (!this.pattern) {
-            let r = this.flap.radius + d;
-            for (let [j, pts] of this.coveredJunctions) {
-                let { ox, oy } = j;
-                let p = this.point.add(this.qv.scale(r));
-                for (let pt of pts) {
-                    let diff = pt.sub(p);
-                    ox = Math.min(-diff.x * this.fx, ox);
-                    oy = Math.min(-diff.y * this.fy, oy);
-                }
-                if (ox <= 0 || oy <= 0)
-                    continue;
-                let v = new Vector(ox * this.fx, oy * this.fy);
-                let rect = new Rectangle(p, p.sub(v));
-                let path = rect.toPolyBoolPath();
-                let seg = PolyBool.segments({ regions: [path], inverted: false });
-                result.push(seg);
-            }
-        }
-        return result.length ? PolyBool.union(result) : null;
     }
     get pattern() {
         let stretch = this.design.getStretchByQuadrant(this);
@@ -3302,10 +3432,11 @@ class Store extends SheetObject {
         return this._cache[i] = this._cache[i] || this.builder(e[i]);
     }
     move(by = 1) {
+        var _a;
         let from = this.index, l = this._prototypes.length;
         this.index = (this.index + by + l) % l;
         this.onMove(this.index, from);
-        Shrewd.commit();
+        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
     }
     get size() {
         return this._prototypes.length;
@@ -3328,7 +3459,6 @@ class ControlView extends View {
     drawSelection() {
         this.renderSelection(this.control.selected);
     }
-    get overflow() { return 0; }
 }
 __decorate([
     shrewd
@@ -3561,8 +3691,7 @@ class LabeledView extends ControlView {
 __decorate([
     shrewd
 ], LabeledView.prototype, "overflow", null);
-var JunctionView_1;
-let JunctionView = JunctionView_1 = class JunctionView extends View {
+let JunctionView = class JunctionView extends View {
     constructor(junction) {
         super(junction);
         this._junction = junction;
@@ -3571,31 +3700,22 @@ let JunctionView = JunctionView_1 = class JunctionView extends View {
     render() {
         if (this._shade.visible = this._junction.status == JunctionStatus.tooClose) {
             let f1 = this._junction.f1, f2 = this._junction.f2;
-            this._shade.removeChildren();
+            let v1 = f1.view, v2 = f2.view;
             let d = this._junction.$treeDistance - (f1.radius + f2.radius);
-            if (d == 0) {
-                this._shade.addChild(f1.view.circle.intersect(f2.view.circle));
-                this._shade.strokeWidth = JunctionView_1.widthForArea(this._shade.area);
-            }
-            else {
-                let c1 = f1.view.makeRectangle(d), c2 = f2.view.makeRectangle(d);
-                this._shade.addChild(f1.view.circle.intersect(c2));
-                this._shade.addChild(f2.view.circle.intersect(c1));
-                this._shade.strokeWidth = JunctionView_1.widthForArea(this._shade.area);
-            }
+            let json = [v1.circleJSON, v2.circleJSON];
+            if (d != 0)
+                json.push(v1.makeJSON(d), v2.makeJSON(d));
+            PaperWorker.processJunction(this._shade, json);
         }
     }
-    static widthForArea(a) {
-        return a < 0.25 ? 4 : a < 0.5 ? 3 : a < 1 ? 2 : 1;
-    }
 };
-JunctionView = JunctionView_1 = __decorate([
+JunctionView = __decorate([
     shrewd
 ], JunctionView);
 let RiverView = class RiverView extends ControlView {
     constructor(river) {
         super(river);
-        this.components = new Mapping(() => this.info.components, key => new RiverComponent(this, key));
+        this.components = new Mapping(() => this.info.components, key => new RiverHelper(this, key.split(',').map(v => Number(v))));
         this._rendered = false;
         this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
         this.$addItem(Layer.hinge, this._hinge = new paper.CompoundPath(Style.hinge));
@@ -3607,23 +3727,35 @@ let RiverView = class RiverView extends ControlView {
     }
     get info() {
         if (this.disposed)
-            return { adjacent: [], length: 0, components: [] };
+            return { inner: [], length: 0, components: [] };
         let edge = this.control.edge;
-        let a;
-        let c;
+        let adjacent;
+        let components;
         if (edge.wrapSide == 0) {
-            c = this.toComponents(edge.l1, edge.n1).concat(this.toComponents(edge.l2, edge.n2));
-            a = edge.a1.concat(edge.a2);
+            components = this.toComponents(edge.l1, edge.n1).concat(this.toComponents(edge.l2, edge.n2));
+            adjacent = edge.a1.concat(edge.a2);
         }
         else if (edge.wrapSide == 2) {
-            c = this.toComponents(edge.l2, edge.n2);
-            a = edge.a2;
+            components = this.toComponents(edge.l2, edge.n2);
+            adjacent = edge.a2;
         }
         else {
-            c = this.toComponents(edge.l1, edge.n1);
-            a = edge.a1;
+            components = this.toComponents(edge.l1, edge.n1);
+            adjacent = edge.a1;
         }
-        return { adjacent: a, length: edge.length, components: c };
+        let inner = [];
+        let design = this.design;
+        for (let e of adjacent) {
+            if (e.isRiver) {
+                let r = design.rivers.get(e);
+                inner.push(r.view);
+            }
+            else {
+                let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2);
+                inner.push(f.view);
+            }
+        }
+        return { inner, length: edge.length, components };
     }
     toComponents(l, n) {
         return l.map(l => l.id + "," + n.id);
@@ -3642,17 +3774,8 @@ let RiverView = class RiverView extends ControlView {
     get interior() {
         this.disposeEvent();
         let segments = [];
-        let design = this.control.sheet.design;
-        for (let e of this.info.adjacent) {
-            if (e.isRiver) {
-                let r = design.rivers.get(e);
-                segments.push(r.view.closure);
-            }
-            else {
-                let f = design.flaps.get(e.n1.degree == 1 ? e.n1 : e.n2);
-                segments.push(f.view.hingeSegments);
-            }
-        }
+        for (let v of this.info.inner)
+            segments.push(v.closure);
         return PolyBool.union(segments);
     }
     get closurePath() {
@@ -3825,6 +3948,7 @@ __decorate([
 let FlapView = class FlapView extends LabeledView {
     constructor(flap) {
         super(flap);
+        this.jsonCache = [];
         this.$addItem(Layer.shade, this._shade = new paper.Path.Rectangle(Style.shade));
         this.$addItem(Layer.hinge, this.hinge = new paper.Path.Rectangle(Style.hinge));
         this.$addItem(Layer.shade, this._circle = new paper.Path(Style.circle));
@@ -3837,6 +3961,7 @@ let FlapView = class FlapView extends LabeledView {
         this.$addItem(Layer.ridge, this._outerRidges = new paper.CompoundPath(Style.ridge));
         this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
         this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
+        this._component = new RiverHelperBase(this, flap);
     }
     contains(point) {
         return this.control.sheet.view.contains(point) &&
@@ -3844,6 +3969,9 @@ let FlapView = class FlapView extends LabeledView {
     }
     get circle() {
         return this.makeRectangle(0);
+    }
+    get circleJSON() {
+        return this.circle.exportJSON();
     }
     makeRectangle(d) {
         let p = this.control.points, r = this.control.node.radius + d;
@@ -3854,21 +3982,24 @@ let FlapView = class FlapView extends LabeledView {
         });
         ;
     }
-    makeSegments(d) {
-        let path = [];
-        this.control.quadrants.forEach(q => path.push(...q.makeContour(d)));
-        return PathUtil.toSegments(path);
+    makeJSON(d) {
+        if (this.control.selected)
+            return this.makeRectangle(d).exportJSON();
+        return this.jsonCache[d] = this.jsonCache[d] || this.makeRectangle(d).exportJSON();
     }
-    get hingeSegments() {
-        this.disposeEvent();
-        return this.makeSegments(0);
+    clearCache() {
+        if (!this.control.design.dragging && this.jsonCache.length)
+            this.jsonCache = [];
+    }
+    get closure() {
+        return this._component.segment;
     }
     renderHinge() {
         var _a, _b;
         if (this.control.disposed)
             return;
         this._circle.visible = (_b = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showHinge) !== null && _b !== void 0 ? _b : false;
-        let paths = PaperUtil.fromSegments(this.hingeSegments);
+        let paths = PaperUtil.fromSegments(this.closure);
         this.hinge.removeSegments();
         if (!paths.length)
             debugger;
@@ -3908,8 +4039,14 @@ __decorate([
     shrewd
 ], FlapView.prototype, "circle", null);
 __decorate([
-    segment("hinge")
-], FlapView.prototype, "hingeSegments", null);
+    shrewd
+], FlapView.prototype, "circleJSON", null);
+__decorate([
+    shrewd
+], FlapView.prototype, "clearCache", null);
+__decorate([
+    segment("flap.closure")
+], FlapView.prototype, "closure", null);
 __decorate([
     shrewd
 ], FlapView.prototype, "renderHinge", null);
@@ -4020,13 +4157,6 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
             new Point(x + w, y)
         ];
     }
-    get junctions() {
-        this.design.junctions;
-        return this.$junctions;
-    }
-    get validJunctions() {
-        return this.junctions.filter(j => j.isValid);
-    }
     get name() { return this.node.name; }
     set name(n) { this.node.name = n; }
     get radius() { return this.node.radius; }
@@ -4060,6 +4190,13 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         return v;
     }
     debug(d = 0) {
+    }
+    get junctions() {
+        this.design.junctions;
+        return this.$junctions;
+    }
+    get validJunctions() {
+        return this.junctions.filter(j => j.isValid);
     }
 };
 __decorate([
@@ -4170,8 +4307,9 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         if (this.node.degree != 2)
             return;
         this.design.history.takeAction(() => {
+            var _a;
             let edge = this.node.dispose();
-            Shrewd.commit();
+            (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
             this.design.edges.get(edge).selected = true;
         });
     }
@@ -4198,6 +4336,7 @@ let BPStudio = class BPStudio {
     constructor(selector) {
         this.designMap = new Map();
         this.design = null;
+        this._updating = false;
         if (typeof paper != "object")
             throw new Error("BPStudio requires paper.js.");
         let el = document.querySelector(selector);
@@ -4261,7 +4400,7 @@ let BPStudio = class BPStudio {
     tryLoad(design) {
         this.design = new Design(this, design);
         this.designMap.set(this.design.id, this.design);
-        Shrewd.commit();
+        this.update();
         return this.design;
     }
     toBPS() {
@@ -4274,6 +4413,20 @@ let BPStudio = class BPStudio {
         return URL.createObjectURL(blob);
     }
     get TreeMaker() { return TreeMaker; }
+    get running() { return this._updating; }
+    async update() {
+        if (this._updating)
+            return;
+        this._updating = true;
+        Shrewd.commit();
+        await PaperWorker.done();
+        this.$display.project.view.update();
+        if (this.onUpdate) {
+            this.onUpdate();
+            delete this.onUpdate;
+        }
+        this._updating = false;
+    }
 };
 __decorate([
     shrewd
@@ -4300,11 +4453,12 @@ let Edge = class Edge extends ViewedControl {
         this.design.history.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
     }
     toVertex(action) {
+        var _a;
         let l1 = this.v1.location, l2 = this.v2.location;
         let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
         let node = action.apply(this.design.tree, [this.edge]);
         this.design.options.set("vertex", node.id, { id: node.id, name: node.name, x, y });
-        Shrewd.commit();
+        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
         this.design.vertices.get(node).selected = true;
     }
     get length() { return this.edge.length; }
@@ -4380,6 +4534,8 @@ let Junction = class Junction extends SheetObject {
     get coverCandidate() {
         let result = [];
         for (let j of this.sheet.design.validJunctions) {
+            if (j == this)
+                continue;
             let n = this.findIntersection(j);
             if (n)
                 result.push([j, n]);
@@ -4387,7 +4543,7 @@ let Junction = class Junction extends SheetObject {
         return result;
     }
     isCoveredBy(o, n) {
-        if (this == o || this.direction % 2 != o.direction % 2)
+        if (this.direction % 2 != o.direction % 2)
             return false;
         let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
         if (!r1 || !r2 || !r1.contains(r2))
@@ -4544,7 +4700,7 @@ __decorate([
     shrewd
 ], Junction.prototype, "coverCandidate", null);
 __decorate([
-    shrewd
+    unorderedArray("jcb")
 ], Junction.prototype, "coveredBy", null);
 __decorate([
     shrewd
@@ -4655,8 +4811,10 @@ let Display = class Display {
         studio.$paper.setup(this._canvas);
         studio.$paper.settings.insertItems = false;
         this.project = studio.$paper.project;
+        this.project.view.autoUpdate = false;
         this.project.currentStyle.strokeColor = PaperUtil.Black();
         this.project.currentStyle.strokeScaling = false;
+        setInterval(() => this._studio.update(), 50);
         for (let l of Enum.values(Layer)) {
             this.project.addLayer(new paper.Layer({ name: Layer[l] }));
         }
@@ -5056,6 +5214,59 @@ class OptionManager {
         this.options.set(type + id, option);
     }
 }
+var PaperWorker;
+(function (PaperWorker) {
+    function done() {
+        return running;
+    }
+    PaperWorker.done = done;
+    const master = new Worker("./lib/paper-master.js");
+    let running = Promise.resolve();
+    let end = null;
+    let count = 0;
+    async function processJunction(shade, j) {
+        if (!end)
+            running = new Promise(res => end = res);
+        count++;
+        if (j.length == 2) {
+            let [i, a] = await getIntersection(j[0], j[1]);
+            shade.removeChildren();
+            shade.addChild(i);
+            shade.strokeWidth = widthForArea(a);
+        }
+        else {
+            let [r1, r2] = await Promise.all([
+                getIntersection(j[0], j[3]),
+                getIntersection(j[1], j[2])
+            ]);
+            let [i1, a1] = r1, [i2, a2] = r2;
+            shade.removeChildren();
+            shade.addChild(i1);
+            shade.addChild(i2);
+            shade.strokeWidth = widthForArea(a1 + a2);
+        }
+        if (--count == 0) {
+            end();
+            end = null;
+        }
+    }
+    PaperWorker.processJunction = processJunction;
+    function getIntersection(s1, s2) {
+        return new Promise(resolve => {
+            let channel = new MessageChannel();
+            channel.port1.onmessage = event => {
+                let [json, area] = event.data;
+                let item = new paper.Path();
+                item.importJSON(json);
+                resolve([item, area]);
+            };
+            master.postMessage([s1, s2], [channel.port2]);
+        });
+    }
+    function widthForArea(a) {
+        return a < 0.25 ? 4 : a < 0.5 ? 3 : a < 1 ? 2 : 1;
+    }
+})(PaperWorker || (PaperWorker = {}));
 var System_1;
 const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 let System = System_1 = class System {
@@ -5101,7 +5312,7 @@ let System = System_1 = class System {
         return this._controls.filter(c => c.selected);
     }
     draggableSelections() {
-        return this.selections.filter((o) => o instanceof Draggable);
+        this._draggableSelections = this.selections.filter((o) => o instanceof Draggable);
     }
     get _canvas() { return this._studio.$paper.view.element; }
     _processSelection(point, ctrlKey) {
@@ -5138,6 +5349,7 @@ let System = System_1 = class System {
                 this._select(nextCtrl);
         }
         this._ctrl = [nowCtrl, nextCtrl];
+        this._studio.update();
     }
     _processNextSelection() {
         var [nowCtrl, nextCtrl] = this._ctrl;
@@ -5149,6 +5361,7 @@ let System = System_1 = class System {
             if (nextCtrl)
                 this._select(nextCtrl);
         }
+        this._studio.update();
     }
     _select(c) {
         if (!c.selected && (this.selections.length == 0 || this.selections[0].selectableWith(c))) {
@@ -5172,7 +5385,7 @@ let System = System_1 = class System {
         let active = document.activeElement;
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement)
             return true;
-        return this.key(event.key, event.modifiers.control);
+        return this.key(event.key, event.modifiers.control || event.modifiers.meta);
     }
     key(key, ctrl = false) {
         let v = new Vector(0, 0);
@@ -5214,7 +5427,7 @@ let System = System_1 = class System {
                 break;
             default: return true;
         }
-        let sel = this.draggableSelections();
+        let sel = this._draggableSelections;
         if (sel.length == 0)
             return true;
         if (sel[0] instanceof Device)
@@ -5241,15 +5454,15 @@ let System = System_1 = class System {
         if (!this._checkEvent(event.event) || this._scrollStart)
             return;
         let point = event.point;
-        this._processSelection(point, event.modifiers.control);
+        this._processSelection(point, event.modifiers.control || event.modifiers.meta);
         if (this.selections.length == 1 && this.isTouch(event.event)) {
             this._longPressTimeout = window.setTimeout(() => {
                 this.onLongPress();
             }, 750);
         }
-        if (this.draggableSelections().length) {
+        if (this._draggableSelections.length) {
             this._lastKnownCursorLocation = new Point(event.downPoint).round();
-            for (let o of this.draggableSelections())
+            for (let o of this._draggableSelections)
                 o.dragStart(this._lastKnownCursorLocation);
             this.dragging = true;
         }
@@ -5264,14 +5477,14 @@ let System = System_1 = class System {
             }
             return;
         }
-        if (!event.modifiers.control)
+        if (!event.modifiers.control && !event.modifiers.meta)
             this._processNextSelection();
     }
     _reselect(event) {
         this._clearSelection();
         this._processSelection(event.point, false);
-        Shrewd.commit();
-        for (let o of this.draggableSelections())
+        this._studio.update();
+        for (let o of this._draggableSelections)
             o.dragStart(this._lastKnownCursorLocation);
         this._possiblyReselect = false;
     }
@@ -5290,9 +5503,9 @@ let System = System_1 = class System {
             window.clearTimeout(this._longPressTimeout);
             (_a = this.onDrag) === null || _a === void 0 ? void 0 : _a.apply(null);
             this._lastKnownCursorLocation.set(pt);
-            for (let o of this.draggableSelections())
+            for (let o of this._draggableSelections)
                 pt = o.dragConstraint(pt);
-            for (let o of this.draggableSelections())
+            for (let o of this._draggableSelections)
                 o.drag(pt);
             this._studio.design.dragging = true;
         }
@@ -5303,17 +5516,15 @@ let System = System_1 = class System {
                 this._clearSelection();
                 this._dragSelectView.visible = true;
                 this._dragSelectView.down = event.downPoint;
-                Shrewd.commit();
             }
             this._dragSelectView.now = event.point;
-            this._dragSelectView.draw();
             for (let c of this._dragSelectables) {
                 c.selected = this._dragSelectView.contains(new paper.Point(c.dragSelectAnchor));
             }
         }
     }
     _canvasWheel(event) {
-        if (event.ctrlKey) {
+        if (event.ctrlKey || event.metaKey) {
             event.preventDefault();
             let d = this._studio.design;
             if (d) {
@@ -7243,75 +7454,5 @@ let DeviceView = class DeviceView extends ControlView {
 DeviceView = __decorate([
     shrewd
 ], DeviceView);
-let RiverComponent = class RiverComponent extends Disposable {
-    constructor(view, key) {
-        super(view);
-        this.view = view;
-        this.key = key;
-        let [f, n] = key.split(',').map(v => Number(v));
-        this.flap = view.design.flapsById.get(f);
-        this.node = view.design.tree.node.get(n);
-    }
-    get shouldDispose() {
-        return super.shouldDispose || this.flap.disposed ||
-            !this.view.info.components.some(c => c == this.key);
-    }
-    onDispose() {
-        let self = this;
-        delete self.flap;
-        delete self.node;
-    }
-    get distance() {
-        this.disposeEvent();
-        let { design, info } = this.view, flap = this.flap;
-        let dis = design.tree.dist(flap.node, this.node);
-        return dis - flap.radius + info.length;
-    }
-    get segment() {
-        this.disposeEvent();
-        return this.flap.view.makeSegments(this.distance);
-    }
-    overridden(q) {
-        this.disposeEvent();
-        return this.flap.quadrants[q].getOverriddenSegments(this.distance);
-    }
-    get q0() { return this.overridden(0); }
-    get q1() { return this.overridden(1); }
-    get q2() { return this.overridden(2); }
-    get q3() { return this.overridden(3); }
-    get contour() {
-        this.disposeEvent();
-        let seg = this.segment;
-        for (let q of [this.q0, this.q1, this.q2, this.q3]) {
-            if (q)
-                seg = PolyBool.difference(seg, q);
-        }
-        return seg;
-    }
-};
-__decorate([
-    shrewd
-], RiverComponent.prototype, "distance", null);
-__decorate([
-    segment("segment")
-], RiverComponent.prototype, "segment", null);
-__decorate([
-    segment("q0")
-], RiverComponent.prototype, "q0", null);
-__decorate([
-    segment("q1")
-], RiverComponent.prototype, "q1", null);
-__decorate([
-    segment("q2")
-], RiverComponent.prototype, "q2", null);
-__decorate([
-    segment("q3")
-], RiverComponent.prototype, "q3", null);
-__decorate([
-    segment("contour")
-], RiverComponent.prototype, "contour", null);
-RiverComponent = __decorate([
-    shrewd
-], RiverComponent);
 
 //# sourceMappingURL=bpstudio.js.map
