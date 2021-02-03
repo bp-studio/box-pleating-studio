@@ -161,7 +161,7 @@
 	public get running() { return this._updating; }
 	private _updating: boolean = false;
 
-	public onUpdate?: Function;
+	public onUpdate?: Action;
 
 	public async update() {
 		if(this._updating) return;

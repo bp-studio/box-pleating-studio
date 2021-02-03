@@ -1,9 +1,6 @@
 
 interface IDesignObject {
 	readonly design: Design;
-
-	/** 用來唯一識別這個物件的字串 */
-	//readonly tag: string;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -14,7 +11,7 @@ interface IDesignObject {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Design extends DesignBase implements ISerializable<JDesign>, IDesignObject {
+@shrewd class Design extends DesignBase implements ISerializable<JDesign>, IDesignObject, ITagObject {
 
 	@shrewd public fullscreen: boolean;
 
@@ -35,13 +32,13 @@ interface IDesignObject {
 	constructor(studio: BPStudio, profile: RecursivePartial<JDesign>) {
 		super(studio, profile);
 
-		this.LayoutSheet = new Sheet(this, this.data.layout.sheet,
+		this.LayoutSheet = new Sheet(this, "layout", this.data.layout.sheet,
 			() => this.flaps.values(),
 			() => this.rivers.values(),
 			() => this.stretches.values(),
 			() => this.devices,
 		);
-		this.TreeSheet = new Sheet(this, this.data.tree.sheet,
+		this.TreeSheet = new Sheet(this, "tree", this.data.tree.sheet,
 			() => this.edges.values(),
 			() => this.vertices.values()
 		);
@@ -64,7 +61,7 @@ interface IDesignObject {
 	}
 
 	public readonly design = this;
-	public readonly tag = "d";
+	public readonly tag = "design";
 
 	public get display(): Display {
 		return (this.mountTarget as BPStudio).$display;
@@ -93,7 +90,7 @@ interface IDesignObject {
 	}
 
 	public deleteVertices(vertices: readonly Vertex[]) {
-		this.history.takeAction(() => {
+		this.history.takeStep(() => {
 			let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
 			while(this.vertices.size > 3) {
 				let v = arr.find(v => v.node.degree == 1);
@@ -106,7 +103,7 @@ interface IDesignObject {
 	}
 
 	public deleteFlaps(flaps: readonly Flap[]) {
-		this.history.takeAction(() => {
+		this.history.takeStep(() => {
 			for(let f of flaps) {
 				if(this.vertices.size == 3) break;
 				f.node.dispose();
@@ -160,5 +157,23 @@ interface IDesignObject {
 			if(f) f.selected = true;
 		}
 		this.mode = "layout";
+	}
+
+	/** 根據 tag 來找出唯一的對應物件 */
+	public find(tag: string): ITagObject | undefined {
+		if(tag == "design") return this;
+		if(tag == "layout") return this.LayoutSheet;
+		if(tag == "tree") return this.TreeSheet;
+		let m = tag.match(/^(.)(\d+)(?:-(\d+))?$/);
+		if(m) {
+			let init = m[1], id = Number(m[2]), to = Number(m[3]);
+			let t = this.tree;
+			let n = t.node.get(id)!;
+			if(init == "n") return n;
+			if(init == "f") return this.flaps.get(n);
+			if(init == "e") return t.edge.get(n, t.node.get(to)!);
+			if(init == "v") return this.vertices.get(n);
+		}
+		return undefined;
 	}
 }

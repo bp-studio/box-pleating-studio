@@ -37,7 +37,7 @@ class Configurator {
 	}
 
 	/** 搜尋的入口起點 */
-	public *generate(callback: Function): Generator<Configuration> {
+	public *generate(callback: Action): Generator<Configuration> {
 		if(this.seed && this.pattern) {
 			try {
 				// 如果有存檔，直接先把存檔吐回去為快

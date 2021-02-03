@@ -1,5 +1,7 @@
 
-@shrewd class TreeEdge extends Disposable implements IDesignObject {
+@shrewd class TreeEdge extends Disposable implements IDesignObject, ITagObject {
+
+	public get tag() { return "e" + this._n1.id + "-" + this._n2.id; }
 
 	private readonly _n1: TreeNode;
 	private readonly _n2: TreeNode;

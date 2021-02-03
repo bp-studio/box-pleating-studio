@@ -8,16 +8,20 @@ interface JHistory {
 	modified: boolean;
 
 	/** 所有的歷史記錄 */
-	actions: JAction[];
+	steps: JStep[];
 }
 
-interface JAction {
+interface JStep {
+	actions: JCommand[];
+}
 
+interface JCommand {
+	type: CommandType;
 }
 
 class HistoryManager {
 
-	private design: DesignBase;
+	private readonly design: DesignBase;
 
 	private _modified: boolean = false;
 
@@ -34,7 +38,7 @@ class HistoryManager {
 		this._modified = false;
 	}
 
-	public takeAction(action: () => void) {
+	public takeStep(action: Action) {
 		// TODO: 以後這邊要改成歷史機制
 		this._modified = true;
 		action();

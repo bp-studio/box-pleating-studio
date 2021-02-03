@@ -11,7 +11,9 @@ interface JSheet {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Sheet extends Mountable implements ISerializable<JSheet>, IDesignObject {
+@shrewd class Sheet extends Mountable implements ISerializable<JSheet>, IDesignObject, ITagObject {
+
+	public readonly tag: string;
 
 	@unorderedArray("sheetControls") public get controls(): Control[] {
 		var result: Control[] = [];
@@ -56,7 +58,7 @@ interface JSheet {
 	})
 	public height: number;
 
-	@action({
+	@shrewd({
 		validator(this: Sheet, v: number) {
 			return v >= Math.min(10, this.getMinScale());
 		}
@@ -66,8 +68,9 @@ interface JSheet {
 		return Math.ceil(this.design.display.getAutoScale(this) ?? 10);
 	}
 
-	constructor(design: Design, sheet: JSheet, ...maps: IterableFactory<Control>[]) {
+	constructor(design: Design, tag: string, sheet: JSheet, ...maps: IterableFactory<Control>[]) {
 		super(design);
+		this.tag = tag;
 		this.width = sheet.width;
 		this.height = sheet.height;
 		this.scale = Math.max(sheet.scale, this.getMinScale());

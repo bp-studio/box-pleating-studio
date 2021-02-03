@@ -1924,7 +1924,7 @@ Tree = __decorate([
 ], Tree);
 class Couple {
     constructor(...p) {
-        if (p[1] === undefined)
+        if (p.length == 1)
             p = [p[0]._x, p[0]._y];
         this._x = new Fraction(p[0]);
         this._y = new Fraction(p[1]);
@@ -2342,12 +2342,13 @@ class SheetObject extends Mountable {
     }
 }
 let Sheet = class Sheet extends Mountable {
-    constructor(design, sheet, ...maps) {
+    constructor(design, tag, sheet, ...maps) {
         super(design);
         this._activeControlCache = [];
         this._independentRect = new Rectangle(Point.ZERO, Point.ZERO);
         this.margin = 0;
         this.scroll = { x: 0, y: 0 };
+        this.tag = tag;
         this.width = sheet.width;
         this.height = sheet.height;
         this.scale = Math.max(sheet.scale, this.getMinScale());
@@ -2452,7 +2453,7 @@ __decorate([
     })
 ], Sheet.prototype, "height", void 0);
 __decorate([
-    action({
+    shrewd({
         validator(v) {
             return v >= Math.min(10, this.getMinScale());
         }
@@ -2529,6 +2530,7 @@ let TreeNode = class TreeNode extends Disposable {
     static setJID(n, id) {
         n._jid = id;
     }
+    get tag() { return "n" + this.id; }
     get id() {
         return this.tree.jid ? this._jid : this._id;
     }
@@ -2621,6 +2623,7 @@ let TreeEdge = class TreeEdge extends Disposable {
         this._n2 = n2;
         this.length = length;
     }
+    get tag() { return "e" + this._n1.id + "-" + this._n2.id; }
     get design() { return this.n1.design; }
     get shouldDispose() {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
@@ -2727,7 +2730,7 @@ class Point extends Couple {
         return new Point(0, 0);
     }
     constructor(...p) {
-        if (p[1] === undefined)
+        if (p.length == 1)
             super(p[0].x, p[0].y);
         else
             super(...p);
@@ -2771,7 +2774,7 @@ class Vector extends Couple {
         return new Vector(0, 0);
     }
     constructor(...p) {
-        if (p[1] === undefined)
+        if (p.length == 1)
             super(p[0].x, p[0].y);
         else
             super(...p);
@@ -2830,9 +2833,9 @@ let Design = class Design extends DesignBase {
     constructor(studio, profile) {
         super(studio, profile);
         this.design = this;
-        this.tag = "d";
-        this.LayoutSheet = new Sheet(this, this.data.layout.sheet, () => this.flaps.values(), () => this.rivers.values(), () => this.stretches.values(), () => this.devices);
-        this.TreeSheet = new Sheet(this, this.data.tree.sheet, () => this.edges.values(), () => this.vertices.values());
+        this.tag = "design";
+        this.LayoutSheet = new Sheet(this, "layout", this.data.layout.sheet, () => this.flaps.values(), () => this.rivers.values(), () => this.stretches.values(), () => this.devices);
+        this.TreeSheet = new Sheet(this, "tree", this.data.tree.sheet, () => this.edges.values(), () => this.vertices.values());
         this.title = this.data.title;
         ;
         this.fullscreen = this.data.fullscreen;
@@ -2869,7 +2872,7 @@ let Design = class Design extends DesignBase {
         return result;
     }
     deleteVertices(vertices) {
-        this.history.takeAction(() => {
+        this.history.takeStep(() => {
             var _a;
             let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
             while (this.vertices.size > 3) {
@@ -2883,7 +2886,7 @@ let Design = class Design extends DesignBase {
         });
     }
     deleteFlaps(flaps) {
-        this.history.takeAction(() => {
+        this.history.takeStep(() => {
             var _a;
             for (let f of flaps) {
                 if (this.vertices.size == 3)
@@ -2941,6 +2944,29 @@ let Design = class Design extends DesignBase {
                 f.selected = true;
         }
         this.mode = "layout";
+    }
+    find(tag) {
+        if (tag == "design")
+            return this;
+        if (tag == "layout")
+            return this.LayoutSheet;
+        if (tag == "tree")
+            return this.TreeSheet;
+        let m = tag.match(/^(.)(\d+)(?:-(\d+))?$/);
+        if (m) {
+            let init = m[1], id = Number(m[2]), to = Number(m[3]);
+            let t = this.tree;
+            let n = t.node.get(id);
+            if (init == "n")
+                return n;
+            if (init == "f")
+                return this.flaps.get(n);
+            if (init == "e")
+                return t.edge.get(n, t.node.get(to));
+            if (init == "v")
+                return this.vertices.get(n);
+        }
+        return undefined;
     }
 };
 __decorate([
@@ -3904,7 +3930,7 @@ class Draggable extends ViewedControl {
         if (by instanceof Point) {
             by = by.sub(this._dragOffset);
             if (!by.eq(this.location))
-                this.design.history.takeAction(() => {
+                this.design.history.takeStep(() => {
                     this.location.x = by.x;
                     this.location.y = by.y;
                     this.onDragged();
@@ -3912,7 +3938,7 @@ class Draggable extends ViewedControl {
         }
         else {
             if (!by.eq(Vector.ZERO))
-                this.design.history.takeAction(() => {
+                this.design.history.takeStep(() => {
                     this.location.x += by.x;
                     this.location.y += by.y;
                     this.onDragged();
@@ -4148,6 +4174,7 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         this.view = new FlapView(this);
     }
     get type() { return "Flap"; }
+    get tag() { return "f" + this.node.id; }
     selectableWith(c) { return c instanceof Flap_1; }
     get dragSelectAnchor() {
         return { x: this.location.x + this.width / 2, y: this.location.y + this.height / 2 };
@@ -4265,6 +4292,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         this.view = new VertexView(this);
     }
     get type() { return "Vertex"; }
+    get tag() { return "v" + this.node.id; }
     get name() { return this.node.name; }
     set name(n) { this.node.name = n; }
     get degree() { return this.node.degree; }
@@ -4277,7 +4305,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
             Draggable.relocate(this, this.design.flaps.get(this.node));
     }
     addLeaf(length = 1) {
-        this.design.history.takeAction(() => {
+        this.design.history.takeStep(() => {
             let v = [...this.design.vertices.values()];
             let node = this.node.addLeaf(length);
             let p = this.findClosestEmptyPoint(v);
@@ -4311,7 +4339,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
     deleteAndJoin() {
         if (this.node.degree != 2)
             return;
-        this.design.history.takeAction(() => {
+        this.design.history.takeStep(() => {
             var _a;
             let edge = this.node.dispose();
             (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
@@ -4440,19 +4468,27 @@ BPStudio = __decorate([
     shrewd
 ], BPStudio);
 class FieldCommand {
-    constructor(target, prop, value) {
-        this._target = target;
-        this._prop = prop;
-        this._old = target[prop];
-        this._new = value;
+    constructor(...p) {
+        if (p.length == 2) {
+            this._target = p[1].find(p[0].target);
+            this._prop = p[0].prop;
+            this._old = p[0].old;
+            this._new = p[0].new;
+        }
+        else {
+            this._target = p[0];
+            this._prop = p[1];
+            this._old = p[0][p[1]];
+            this._new = p[2];
+        }
     }
     toJSON() {
         return {
             type: CommandType.field,
-            target: this._target,
+            target: this._target.tag,
             prop: this._prop,
-            oldValue: this._old,
-            newValue: this._new
+            old: this._old,
+            "new": this._new
         };
     }
     undo() {
@@ -4462,6 +4498,11 @@ class FieldCommand {
         this._target[this._prop] = this._new;
     }
 }
+var CommandType;
+(function (CommandType) {
+    CommandType[CommandType["field"] = 0] = "field";
+    CommandType[CommandType["move"] = 1] = "move";
+})(CommandType || (CommandType = {}));
 let Edge = class Edge extends ViewedControl {
     constructor(sheet, v1, v2, edge) {
         super(sheet);
@@ -4471,15 +4512,14 @@ let Edge = class Edge extends ViewedControl {
         this.view = new EdgeView(this);
     }
     get type() { return "Edge"; }
-    get tag() { return "e" + this.edge.n1.id; }
     get shouldDispose() {
         return super.shouldDispose || this.edge.disposed;
     }
     split() {
-        this.design.history.takeAction(() => this.toVertex(Tree.prototype.split));
+        this.design.history.takeStep(() => this.toVertex(Tree.prototype.split));
     }
     deleteAndMerge() {
-        this.design.history.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
+        this.design.history.takeStep(() => this.toVertex(Tree.prototype.deleteAndMerge));
     }
     toVertex(action) {
         var _a;
@@ -4504,6 +4544,12 @@ let Edge = class Edge extends ViewedControl {
 Edge = __decorate([
     shrewd
 ], Edge);
+var JunctionStatus;
+(function (JunctionStatus) {
+    JunctionStatus[JunctionStatus["tooClose"] = 0] = "tooClose";
+    JunctionStatus[JunctionStatus["overlap"] = 1] = "overlap";
+    JunctionStatus[JunctionStatus["tooFar"] = 2] = "tooFar";
+})(JunctionStatus || (JunctionStatus = {}));
 let Junction = class Junction extends SheetObject {
     constructor(sheet, f1, f2) {
         super(sheet);
@@ -5093,7 +5139,7 @@ class HistoryManager {
     notifySave() {
         this._modified = false;
     }
-    takeAction(action) {
+    takeStep(action) {
         this._modified = true;
         action();
     }
@@ -5656,16 +5702,6 @@ var Enum;
     }
     Enum.values = values;
 })(Enum || (Enum = {}));
-var CommandType;
-(function (CommandType) {
-    CommandType[CommandType["field"] = 0] = "field";
-})(CommandType || (CommandType = {}));
-var JunctionStatus;
-(function (JunctionStatus) {
-    JunctionStatus[JunctionStatus["tooClose"] = 0] = "tooClose";
-    JunctionStatus[JunctionStatus["overlap"] = 1] = "overlap";
-    JunctionStatus[JunctionStatus["tooFar"] = 2] = "tooFar";
-})(JunctionStatus || (JunctionStatus = {}));
 var Direction;
 (function (Direction) {
     Direction[Direction["UR"] = 0] = "UR";
@@ -5805,7 +5841,7 @@ class Line {
         return this.vector.parallel(p.sub(this.p1));
     }
     intersection(...t) {
-        if (t[1] === undefined)
+        if (t.length == 1)
             return this.intersection(t[0].p1, t[0].p2.sub(t[0].p1));
         let [p, v, isRay] = t;
         var v1 = this.p2.sub(this.p1);
@@ -7230,18 +7266,6 @@ var TreeMaker;
         }
     }
 })(TreeMaker || (TreeMaker = {}));
-var ArrayUtil;
-(function (ArrayUtil) {
-    function compare(oldArray, newArray) {
-        if (oldArray.length != newArray.length)
-            return newArray;
-        for (let item of newArray)
-            if (!oldArray.includes(item))
-                return newArray;
-        return oldArray;
-    }
-    ArrayUtil.compare = compare;
-})(ArrayUtil || (ArrayUtil = {}));
 function deepCopy(target, ...sources) {
     for (let s of sources)
         if (s instanceof Object) {

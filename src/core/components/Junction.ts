@@ -4,6 +4,16 @@ interface JJunction extends JRectangle {
 	sx: number;
 }
 
+/** Junction 的重疊狀態 */
+enum JunctionStatus {
+	/** 兩者重疊過頭 */
+	tooClose,
+	/** 兩者合法重疊 */
+	overlap,
+	/** 兩者沒有重疊 */
+	tooFar
+}
+
 //////////////////////////////////////////////////////////////////
 /**
  * `Junction` 是負責管理兩個 `Flap` 之間的相對狀態的抽象物件。

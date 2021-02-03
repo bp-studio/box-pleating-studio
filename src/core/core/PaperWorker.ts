@@ -17,7 +17,7 @@ namespace PaperWorker {
 	type Payload = [paper.Item, number];
 
 	let running = Promise.resolve();
-	let end: Function | null = null;
+	let end: Action | null = null;
 	let count = 0;
 
 	export async function processJunction(shade: paper.CompoundPath, j: string[]): Promise<void> {

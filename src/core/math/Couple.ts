@@ -17,8 +17,8 @@ abstract class Couple {
 	/**Create a Couple object */
 	constructor(c: Couple);
 	constructor(x: Rational, y: Rational);
-	constructor(...p: [Couple, undefined?] | [Rational, Rational]) {
-		if(p[1] === undefined) p = [p[0]._x, p[0]._y];
+	constructor(...p: [Couple] | [Rational, Rational]) {
+		if(p.length == 1) p = [p[0]._x, p[0]._y];
 		this._x = new Fraction(p[0]);
 		this._y = new Fraction(p[1]);
 	}

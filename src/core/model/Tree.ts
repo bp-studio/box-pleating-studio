@@ -51,7 +51,7 @@
 	private nextId = 0;
 
 	/** 在 JID 啟動的模式之下執行指定操作 */
-	public withJID(action: Function) {
+	public withJID(action: Action) {
 		let arr = Array.from(this.node.values()).sort((a, b) => a.id - b.id), i = 0;
 		for(let n of arr) TreeNode.setJID(n, i++);
 		this._jid = true;

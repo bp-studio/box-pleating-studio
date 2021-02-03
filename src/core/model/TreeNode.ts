@@ -1,9 +1,11 @@
 
-@shrewd class TreeNode extends Disposable implements IDesignObject {
+@shrewd class TreeNode extends Disposable implements IDesignObject, ITagObject {
 
 	public static setJID(n: TreeNode, id: number) {
 		n._jid = id;
 	}
+
+	public get tag() { return "n" + this.id; }
 
 	/** 程式內部參照用的 id，這是唯讀的值，因此由於點有可能被刪除而未必連號 */
 	private readonly _id: number;

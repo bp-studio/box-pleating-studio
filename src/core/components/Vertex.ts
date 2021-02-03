@@ -12,9 +12,10 @@ interface JVertex extends IPoint {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Vertex extends IndependentDraggable implements ISerializable<JVertex> {
+@shrewd class Vertex extends IndependentDraggable implements ISerializable<JVertex>, ITagObject {
 
 	public get type() { return "Vertex"; }
+	public get tag() { return "v" + this.node.id; }
 
 	public readonly node: TreeNode;
 	public readonly view: VertexView;
@@ -38,7 +39,7 @@ interface JVertex extends IPoint {
 	}
 
 	public addLeaf(length = 1) {
-		this.design.history.takeAction(() => {
+		this.design.history.takeStep(() => {
 			// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
 			// 不然等一下讀取 design.vertices 會觸發新的 Vertex 的自動生成，
 			// 而那會比我設置 option 更早
@@ -80,7 +81,7 @@ interface JVertex extends IPoint {
 
 	public deleteAndJoin() {
 		if(this.node.degree != 2) return;
-		this.design.history.takeAction(() => {
+		this.design.history.takeStep(() => {
 			let edge = this.node.dispose()!;
 			this.$studio?.update();
 			this.design.edges.get(edge)!.selected = true;

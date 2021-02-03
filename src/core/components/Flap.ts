@@ -14,9 +14,10 @@ interface JFlap {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Flap extends IndependentDraggable implements ISerializable<JFlap> {
+@shrewd class Flap extends IndependentDraggable implements ISerializable<JFlap>, ITagObject {
 
 	public get type() { return "Flap"; }
+	public get tag() { return "f" + this.node.id; }
 
 	@action({
 		validator(this: Flap, v: number) {

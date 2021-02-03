@@ -40,8 +40,8 @@ class Line {
 	/** 取得這條線段（含端點）與給定動向（視為直線，除非指定 isRay）的交點 */
 	public intersection(l: Line): Point | null
 	public intersection(p: Point, v: Vector, isRay?: boolean): Point | null;
-	public intersection(...t: [Point, Vector, boolean?] | [Line, undefined?]): Point | null {
-		if(t[1] === undefined) return this.intersection(t[0].p1, t[0].p2.sub(t[0].p1));
+	public intersection(...t: [Point, Vector, boolean?] | [Line]): Point | null {
+		if(t.length == 1) return this.intersection(t[0].p1, t[0].p2.sub(t[0].p1));
 		let [p, v, isRay] = t;
 		var v1 = this.p2.sub(this.p1);
 		var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;

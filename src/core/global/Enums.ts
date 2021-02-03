@@ -9,8 +9,6 @@ namespace Enum {
 	}
 }
 
-enum JunctionStatus { tooClose, overlap, tooFar }
-
 enum Direction { UR, UL, LL, LR, R, T, L, B, none }
 
 enum Layer { sheet, shade, hinge, ridge, axisParallel, junction, dot, label, drag }

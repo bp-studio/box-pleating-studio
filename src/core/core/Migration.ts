@@ -18,7 +18,7 @@ namespace Migration {
 			history: {
 				index: 0,
 				modified: false,
-				actions: []
+				steps: []
 			},
 			layout: {
 				sheet: { width: 16, height: 16, scale: 20 },
