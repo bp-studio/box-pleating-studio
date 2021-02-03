@@ -41,7 +41,7 @@ function bufferToText(buffer) {
 
 function callService(data) {
 	return new Promise((resolve, reject) => {
-		if('serviceWorker' in navigator) {
+		if('serviceWorker' in navigator && location.protocol == "https:") {
 			navigator.serviceWorker.getRegistration('/').then(reg => {
 				if(!reg.active) return reject(); // Safari 在第一次執行的時候可能會進到這裡
 				let channel = new MessageChannel();
@@ -249,13 +249,17 @@ Vue.component('core', { render() { with (this) {
             }
         }, checkSession() {
             return new Promise(resolve => {
-                // 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
-                let cancel = setTimeout(() => resolve(false), 250);
-                callService("id")
-                    .then((id) => resolve(this.id < id), // 最舊的實體優先
-                () => resolve(true) // 沒有 Service Worker 的時候直接視為可以
-                )
-                    .finally(() => clearTimeout(cancel));
+                if (location.protocol != "https:")
+                    resolve(true);
+                else {
+                    // 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
+                    let cancel = setTimeout(() => resolve(false), 250);
+                    callService("id")
+                        .then((id) => resolve(this.id < id), // 最舊的實體優先
+                    () => resolve(true) // 沒有 Service Worker 的時候直接視為可以
+                    )
+                        .finally(() => clearTimeout(cancel));
+                }
             });
         }, async save() {
             // 拖曳的時候存檔無意義且浪費效能，跳過

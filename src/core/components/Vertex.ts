@@ -108,7 +108,7 @@ interface JVertex extends IPoint {
 
 	public toJSON(): JVertex {
 		return {
-			id: this.node.jid,
+			id: this.node.id,
 			name: this.name,
 			x: this.location.x,
 			y: this.location.y

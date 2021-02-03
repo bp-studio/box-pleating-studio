@@ -161,7 +161,7 @@ abstract class DesignBase extends Mountable {
 			arr = [];
 			add(set.values().next().value);
 			arr.sort(Junction.sort);
-			result.set(Junction.createTeamId(arr, f => f.node.id), arr);
+			result.set(Junction.createTeamId(arr), arr);
 		}
 		return result;
 	}

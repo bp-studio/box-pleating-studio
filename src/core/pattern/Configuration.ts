@@ -177,8 +177,4 @@ interface JConfiguration {
 	public toJSON(): JConfiguration {
 		return { partitions: this.partitions.map(p => p.toJSON()) };
 	}
-
-	public get jidMap() {
-		return this.design.tree.jidMap;
-	}
 }

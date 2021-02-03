@@ -16,13 +16,12 @@ interface JJunction extends JRectangle {
 	 * 針對一個 `Junction` 群組產生簽章 id；
 	 * 目前採用的格式是直接依 `Flap` 的 id 照順序以逗點分隔。
 	 * 實務上這樣決定出來的 `Junction` 群組必然是唯一的。
-	 * @param idFactory 可以用來決定是以 id 或用 jid 來產
 	 */
-	public static createTeamId(arr: readonly Junction[], idFactory: (f: Flap) => number) {
+	public static createTeamId(arr: readonly Junction[]) {
 		let set = new Set<number>();
 		arr.forEach(o => {
-			set.add(idFactory(o.f1));
-			set.add(idFactory(o.f2));
+			set.add(o.f1.node.id);
+			set.add(o.f2.node.id);
 		});
 		return Array.from(set).sort((a, b) => a - b).join(",");
 	}

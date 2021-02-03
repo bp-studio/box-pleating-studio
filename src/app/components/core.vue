@@ -200,14 +200,18 @@
 
 		private checkSession(): Promise<boolean> {
 			return new Promise<boolean>(resolve => {
-				// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
-				let cancel = setTimeout(() => resolve(false), 250);
-				callService("id")
-					.then(
-						(id: number) => resolve(this.id < id), // 最舊的實體優先
-						() => resolve(true) // 沒有 Service Worker 的時候直接視為可以
-					)
-					.finally(() => clearTimeout(cancel));
+				// 減少本地偵錯的負擔
+				if(location.protocol != "https:") resolve(true);
+				else {
+					// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
+					let cancel = setTimeout(() => resolve(false), 250);
+					callService("id")
+						.then(
+							(id: number) => resolve(this.id < id), // 最舊的實體優先
+							() => resolve(true) // 沒有 Service Worker 的時候直接視為可以
+						)
+						.finally(() => clearTimeout(cancel));
+				}
 			});
 		}
 

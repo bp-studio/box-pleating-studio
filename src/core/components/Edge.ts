@@ -54,8 +54,8 @@ interface JEdge {
 
 	public toJSON(): JEdge {
 		return {
-			n1: this.v1.node.jid,
-			n2: this.v2.node.jid,
+			n1: this.v1.node.id,
+			n2: this.v2.node.id,
 			length: this.edge.length
 		};
 	}

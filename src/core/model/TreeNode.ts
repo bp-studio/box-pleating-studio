@@ -1,18 +1,27 @@
 
 @shrewd class TreeNode extends Disposable implements IDesignObject {
 
+	public static setJID(n: TreeNode, id: number) {
+		n._jid = id;
+	}
+
 	/** 程式內部參照用的 id，這是唯讀的值，因此由於點有可能被刪除而未必連號 */
-	public readonly id: number;
+	private readonly _id: number;
 
 	/** 輸出到 JSON 時使用的 id，這會是連號的，且順序跟 id 的順序相同 */
-	public jid: number;
+	private _jid: number;
+
+	/** 自動根據當前是否正在存檔來決定傳回 id 還是 jid */
+	public get id(): number {
+		return this.tree.jid ? this._jid : this._id;
+	}
 
 	@action public name: string = "";
 
 	constructor(tree: Tree, id: number) {
 		super(tree);
 		this.tree = tree;
-		this.id = id;
+		this._id = id;
 	}
 
 	@shrewd({

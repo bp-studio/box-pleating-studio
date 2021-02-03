@@ -35,11 +35,6 @@
 			if(!ok) break; // 防呆
 			edges = remain;
 		}
-
-		this.pair = new DoubleMapping<TreeNode, TreePair>(
-			() => this.node.values(),
-			(n1, n2) => new TreePair(n1, n2)
-		);
 	}
 
 	protected onDispose(): void {
@@ -55,14 +50,23 @@
 
 	private nextId = 0;
 
-	public generateJID() {
+	/** 在 JID 啟動的模式之下執行指定操作 */
+	public withJID(action: Function) {
 		let arr = Array.from(this.node.values()).sort((a, b) => a.id - b.id), i = 0;
-		for(let n of arr) this.jidMap.set(n.id, n.jid = i++);
+		for(let n of arr) TreeNode.setJID(n, i++);
+		this._jid = true;
+		action();
+		this._jid = false;
 	}
 
-	public readonly jidMap = new Map<number, number>();
+	private _jid = false;
 
-	public readonly pair: DoubleMapping<TreeNode, TreePair>;
+	public get jid() { return this._jid; }
+
+	public readonly pair = new DoubleMapping<TreeNode, TreePair>(
+		() => this.node.values(),
+		(n1, n2) => new TreePair(n1, n2)
+	);
 
 	public dist(n1: TreeNode, n2: TreeNode) {
 		if(n1 == n2) return 0;

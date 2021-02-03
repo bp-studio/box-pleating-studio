@@ -86,7 +86,7 @@ interface JPartition {
 			let [c1, c2] = [parent.c[0], parent.c[2]];
 			let [f1, f2] = [flaps.get(c1.e!)!, flaps.get(c2.e!)!];
 
-			if(!f1||!f2) debugger;
+			if(!f1 || !f2) debugger;
 
 			let quad1 = f1.quadrants[c1.q!], d1 = 0;
 			let quad2 = f2.quadrants[c2.q!], d2 = 0;
@@ -163,12 +163,14 @@ interface JPartition {
 			strategy: this.strategy
 		};
 
-		// 如果有 jid（亦即此時為存檔中）則進行修改
-		let map = this.configuration.jidMap;
-		if(map.size > 0) {
+		// 如果啟用 jid（亦即此時為存檔中）則進行修改
+		let tree = this.configuration.design.tree;
+		if(tree.jid) {
 			result.overlaps = clone(result.overlaps);
 			for(let o of result.overlaps) {
-				for(let c of o.c) if(c.e !== undefined && c.e >= 0) c.e = map.get(c.e)!;
+				for(let c of o.c) if(c.e !== undefined && c.e >= 0) {
+					c.e = tree.node.get(c.e)!.id;
+				}
 			}
 		}
 

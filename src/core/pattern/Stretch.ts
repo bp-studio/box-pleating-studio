@@ -138,7 +138,7 @@ interface JStretch {
 
 	public toJSON(): JStretch {
 		return {
-			id: Junction.createTeamId(this.junctions, f => f.node.jid),
+			id: Junction.createTeamId(this.junctions),
 
 			configuration: this.pattern?.configuration.toJSON() ?? undefined,
 

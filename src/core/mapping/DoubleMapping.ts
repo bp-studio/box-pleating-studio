@@ -16,9 +16,6 @@
 		this._source = source;
 		this._constructor = constructor;
 		this._map = new DoubleMap();
-
-		// 為了初始化效能上的考量，DoubleMapping 會立刻初始化自身。
-		Shrewd.initialize(this);
 	}
 
 	private readonly _source: IterableFactory<K>;

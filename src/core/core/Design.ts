@@ -1,6 +1,9 @@
 
 interface IDesignObject {
 	readonly design: Design;
+
+	/** 用來唯一識別這個物件的字串 */
+	//readonly tag: string;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -60,17 +63,16 @@ interface IDesignObject {
 		return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
 	}
 
-	public get design(): Design {
-		return this;
-	}
+	public readonly design = this;
+	public readonly tag = "d";
 
 	public get display(): Display {
 		return (this.mountTarget as BPStudio).$display;
 	}
 
 	public toJSON(): JDesign {
-		this.tree.generateJID();
-		let result = {
+		let result!: JDesign;
+		this.tree.withJID(() => result = {
 			title: this.title,
 			description: this.description,
 			fullscreen: this.fullscreen,
@@ -86,8 +88,7 @@ interface IDesignObject {
 				nodes: this.vertices.toJSON(),
 				edges: this.sortJEdge()
 			}
-		};
-		this.tree.jidMap.clear();
+		});
 		return result;
 	}
 

@@ -103,7 +103,7 @@ interface JFlap {
 
 	public toJSON(): JFlap {
 		return {
-			id: this.node.jid,
+			id: this.node.id,
 			width: this.width,
 			height: this.height,
 			x: this.location.x,

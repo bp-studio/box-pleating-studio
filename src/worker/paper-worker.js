@@ -6,8 +6,6 @@ importScripts("paper-core.min.js")
 paper.install(this);
 paper.setup([128, 128]); // 這個尺寸隨便都可以，不影響使用
 
-console.log(project);
-
 // 關掉自動更新，因為實際上這個 Worker 完全沒有要進行繪製
 project.view.autoUpdate = false;
 

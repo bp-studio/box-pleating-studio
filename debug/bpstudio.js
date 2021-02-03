@@ -1282,7 +1282,6 @@ let DoubleMapping = class DoubleMapping {
         this._source = source;
         this._constructor = constructor;
         this._map = new DoubleMap();
-        Shrewd.initialize(this);
     }
     dispose() {
         Shrewd.terminate(this);
@@ -1745,7 +1744,8 @@ let Tree = class Tree extends Disposable {
         this.node = new Map();
         this.edge = new DoubleMap();
         this.nextId = 0;
-        this.jidMap = new Map();
+        this._jid = false;
+        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
         this.design = design;
         while (edges === null || edges === void 0 ? void 0 : edges.length) {
             let remain = [], ok = false;
@@ -1760,7 +1760,6 @@ let Tree = class Tree extends Disposable {
                 break;
             edges = remain;
         }
-        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
     }
     onDispose() {
         Shrewd.terminate(this.edge);
@@ -1773,11 +1772,15 @@ let Tree = class Tree extends Disposable {
                 set.add(node);
         return set;
     }
-    generateJID() {
+    withJID(action) {
         let arr = Array.from(this.node.values()).sort((a, b) => a.id - b.id), i = 0;
         for (let n of arr)
-            this.jidMap.set(n.id, n.jid = i++);
+            TreeNode.setJID(n, i++);
+        this._jid = true;
+        action();
+        this._jid = false;
     }
+    get jid() { return this._jid; }
     dist(n1, n2) {
         if (n1 == n2)
             return 0;
@@ -2101,13 +2104,14 @@ let Partition = class Partition extends Partitioner {
             overlaps: this.overlaps,
             strategy: this.strategy
         };
-        let map = this.configuration.jidMap;
-        if (map.size > 0) {
+        let tree = this.configuration.design.tree;
+        if (tree.jid) {
             result.overlaps = clone(result.overlaps);
             for (let o of result.overlaps) {
                 for (let c of o.c)
-                    if (c.e !== undefined && c.e >= 0)
-                        c.e = map.get(c.e);
+                    if (c.e !== undefined && c.e >= 0) {
+                        c.e = tree.node.get(c.e).id;
+                    }
             }
         }
         return result;
@@ -2240,7 +2244,7 @@ class DesignBase extends Mountable {
             arr = [];
             add(set.values().next().value);
             arr.sort(Junction.sort);
-            result.set(Junction.createTeamId(arr, f => f.node.id), arr);
+            result.set(Junction.createTeamId(arr), arr);
         }
         return result;
     }
@@ -2520,7 +2524,13 @@ let TreeNode = class TreeNode extends Disposable {
         this.name = "";
         this.parent = null;
         this.tree = tree;
-        this.id = id;
+        this._id = id;
+    }
+    static setJID(n, id) {
+        n._jid = id;
+    }
+    get id() {
+        return this.tree.jid ? this._jid : this._id;
     }
     get parentEdge() {
         var _a;
@@ -2819,6 +2829,8 @@ class Vector extends Couple {
 let Design = class Design extends DesignBase {
     constructor(studio, profile) {
         super(studio, profile);
+        this.design = this;
+        this.tag = "d";
         this.LayoutSheet = new Sheet(this, this.data.layout.sheet, () => this.flaps.values(), () => this.rivers.values(), () => this.stretches.values(), () => this.devices);
         this.TreeSheet = new Sheet(this, this.data.tree.sheet, () => this.edges.values(), () => this.vertices.values());
         this.title = this.data.title;
@@ -2832,15 +2844,12 @@ let Design = class Design extends DesignBase {
     get sheet() {
         return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
     }
-    get design() {
-        return this;
-    }
     get display() {
         return this.mountTarget.$display;
     }
     toJSON() {
-        this.tree.generateJID();
-        let result = {
+        let result;
+        this.tree.withJID(() => result = {
             title: this.title,
             description: this.description,
             fullscreen: this.fullscreen,
@@ -2856,8 +2865,7 @@ let Design = class Design extends DesignBase {
                 nodes: this.vertices.toJSON(),
                 edges: this.sortJEdge()
             }
-        };
-        this.tree.jidMap.clear();
+        });
         return result;
     }
     deleteVertices(vertices) {
@@ -3263,7 +3271,7 @@ let Stretch = class Stretch extends Control {
     toJSON() {
         var _a, _b, _c, _d;
         return {
-            id: Junction.createTeamId(this.junctions, f => f.node.jid),
+            id: Junction.createTeamId(this.junctions),
             configuration: (_b = (_a = this.pattern) === null || _a === void 0 ? void 0 : _a.configuration.toJSON()) !== null && _b !== void 0 ? _b : undefined,
             pattern: (_d = (_c = this.pattern) === null || _c === void 0 ? void 0 : _c.toJSON()) !== null && _d !== void 0 ? _d : undefined
         };
@@ -3662,9 +3670,6 @@ let Configuration = class Configuration extends Store {
     }
     toJSON() {
         return { partitions: this.partitions.map(p => p.toJSON()) };
-    }
-    get jidMap() {
-        return this.design.tree.jidMap;
     }
 };
 __decorate([
@@ -4174,7 +4179,7 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
     }
     toJSON() {
         return {
-            id: this.node.jid,
+            id: this.node.id,
             width: this.width,
             height: this.height,
             x: this.location.x,
@@ -4318,7 +4323,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
     }
     toJSON() {
         return {
-            id: this.node.jid,
+            id: this.node.id,
             name: this.name,
             x: this.location.x,
             y: this.location.y
@@ -4434,6 +4439,29 @@ __decorate([
 BPStudio = __decorate([
     shrewd
 ], BPStudio);
+class FieldCommand {
+    constructor(target, prop, value) {
+        this._target = target;
+        this._prop = prop;
+        this._old = target[prop];
+        this._new = value;
+    }
+    toJSON() {
+        return {
+            type: CommandType.field,
+            target: this._target,
+            prop: this._prop,
+            oldValue: this._old,
+            newValue: this._new
+        };
+    }
+    undo() {
+        this._target[this._prop] = this._old;
+    }
+    redo() {
+        this._target[this._prop] = this._new;
+    }
+}
 let Edge = class Edge extends ViewedControl {
     constructor(sheet, v1, v2, edge) {
         super(sheet);
@@ -4443,6 +4471,7 @@ let Edge = class Edge extends ViewedControl {
         this.view = new EdgeView(this);
     }
     get type() { return "Edge"; }
+    get tag() { return "e" + this.edge.n1.id; }
     get shouldDispose() {
         return super.shouldDispose || this.edge.disposed;
     }
@@ -4466,8 +4495,8 @@ let Edge = class Edge extends ViewedControl {
     set length(v) { this.edge.length = v; }
     toJSON() {
         return {
-            n1: this.v1.node.jid,
-            n2: this.v2.node.jid,
+            n1: this.v1.node.id,
+            n2: this.v2.node.id,
             length: this.edge.length
         };
     }
@@ -4489,11 +4518,11 @@ let Junction = class Junction extends SheetObject {
         this.id = f1.node.id + ":" + f2.node.id;
         new JunctionView(this);
     }
-    static createTeamId(arr, idFactory) {
+    static createTeamId(arr) {
         let set = new Set();
         arr.forEach(o => {
-            set.add(idFactory(o.f1));
-            set.add(idFactory(o.f2));
+            set.add(o.f1.node.id);
+            set.add(o.f2.node.id);
         });
         return Array.from(set).sort((a, b) => a - b).join(",");
     }
@@ -5084,7 +5113,7 @@ var Migration;
             history: {
                 index: 0,
                 modified: false,
-                actions: []
+                steps: []
             },
             layout: {
                 sheet: { width: 16, height: 16, scale: 20 },
@@ -5627,6 +5656,10 @@ var Enum;
     }
     Enum.values = values;
 })(Enum || (Enum = {}));
+var CommandType;
+(function (CommandType) {
+    CommandType[CommandType["field"] = 0] = "field";
+})(CommandType || (CommandType = {}));
 var JunctionStatus;
 (function (JunctionStatus) {
     JunctionStatus[JunctionStatus["tooClose"] = 0] = "tooClose";
