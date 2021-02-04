@@ -33,7 +33,8 @@
 		"edit": {
 			"title": "Edit",
 			"undo": "Undo",
-			"redo": "Redo"
+			"redo": "Redo",
+			"selectAll": "Select all"
 		},
 		"setting": {
 			"title": "Settings",

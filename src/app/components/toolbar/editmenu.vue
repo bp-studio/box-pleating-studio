@@ -1,32 +1,42 @@
 <template>
 	<dropdown icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
-		<div class="dropdown-item">
+		<dropdownitem :disabled="!design||!design.history.canUndo" @click="undo">
 			<hotkey icon="bp-undo" ctrl hk="Z">{{$t('toolbar.edit.undo')}}</hotkey>
-		</div>
-		<div class="dropdown-item">
+		</dropdownitem>
+		<dropdownitem :disabled="!design||!design.history.canRedo" @click="redo">
 			<hotkey icon="bp-redo" ctrl hk="Y">{{$t('toolbar.edit.redo')}}</hotkey>
-		</div>
+		</dropdownitem>
+		<divider></divider>
+		<dropdownitem :disabled="!design" @click="selectAll">
+			<hotkey icon="far fa-object-group" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
+		</dropdownitem>
 	</dropdown>
 </template>
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { bp } from '../import/BPStudio';
 	import BaseComponent from '../mixins/baseComponent';
+	import { registerHotkey } from '../import/types';
 
 	@Component
 	export default class EditMenu extends BaseComponent {
 		mounted() {
-			document.body.addEventListener("keydown", e => {
-				// 如果正在使用輸入框，不處理一切後續
-				let active = document.activeElement;
-				if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
-				if(e.metaKey || e.ctrlKey) {
-					e.preventDefault();
-					if(e.key == "z") {}
-					if(e.key == "y") {}
-				}
-			})
+			registerHotkey(() => this.undo(), "z");
+			registerHotkey(() => this.redo(), "y");
+			registerHotkey(() => this.redo(), "z", true);
+			registerHotkey(() => this.selectAll(), "a");
+		}
+
+		private undo() {
+			this.design?.history.undo();
+		}
+
+		private redo() {
+			this.design?.history.redo();
+		}
+
+		private selectAll() {
+			this.design?.selectAll();
 		}
 	}
 </script>

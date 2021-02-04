@@ -90,7 +90,7 @@ interface IDesignObject {
 	}
 
 	public deleteVertices(vertices: readonly Vertex[]) {
-		this.history.takeStep(() => {
+		this.history.takeAction(() => {
 			let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
 			while(this.vertices.size > 3) {
 				let v = arr.find(v => v.node.degree == 1);
@@ -103,7 +103,7 @@ interface IDesignObject {
 	}
 
 	public deleteFlaps(flaps: readonly Flap[]) {
-		this.history.takeStep(() => {
+		this.history.takeAction(() => {
 			for(let f of flaps) {
 				if(this.vertices.size == 3) break;
 				f.node.dispose();
@@ -157,6 +157,12 @@ interface IDesignObject {
 			if(f) f.selected = true;
 		}
 		this.mode = "layout";
+	}
+
+	public selectAll() {
+		this.$studio?.system.$clearSelection();
+		if(this.mode == "layout") this.flaps.forEach(f => f.selected = true);
+		if(this.mode == "tree") this.vertices.forEach(v => v.selected = true);
 	}
 
 	/** 根據 tag 來找出唯一的對應物件 */

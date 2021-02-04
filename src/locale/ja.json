@@ -150,7 +150,8 @@
 		"edit": {
 			"redo": "やり直し",
 			"title": "編集",
-			"undo": "元に戻す"
+			"undo": "元に戻す",
+			"selectAll": "すべて選択"
 		}
 	},
 	"welcome": {

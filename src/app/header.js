@@ -73,3 +73,28 @@ const LZ = {
 		return LZMA.decompress(bytes);
 	}
 }
+
+///////////////////////////////////////////////////
+// Hotkeys
+///////////////////////////////////////////////////
+
+const hotkeys = [];
+
+function registerHotkey(action, key, shift) {
+	hotkeys.push([action, key.toLowerCase(), !!shift]);
+}
+
+document.body.addEventListener("keydown", e => {
+	// 如果正在使用輸入框，不處理一切後續
+	let active = document.activeElement;
+	if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+	if(e.metaKey || e.ctrlKey) {
+		e.preventDefault();
+		for(let [action, key, shift] of hotkeys) {
+			if(e.key.toLowerCase() == key && e.shiftKey == shift) {
+				action();
+				return;
+			}
+		}
+	}
+})

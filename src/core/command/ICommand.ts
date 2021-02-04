@@ -7,9 +7,14 @@ interface ITagObject {
 	[key: string]: any;
 }
 
-interface ICommand {
+interface ICommand extends ISerializable<JCommand> {
 	undo(): void;
 	redo(): void;
+	tryAddTo(step: Step): boolean;
+}
+
+interface JCommand {
+	type: CommandType;
 }
 
 enum CommandType {

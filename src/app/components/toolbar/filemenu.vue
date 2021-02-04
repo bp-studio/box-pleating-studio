@@ -41,7 +41,7 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { FileFactory, sanitize, readFile, bufferToText } from '../import/types';
+	import { FileFactory, sanitize, readFile, bufferToText, registerHotkey } from '../import/types';
 	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import JSZip from 'jszip';
@@ -65,17 +65,9 @@
 				if(e.dataTransfer) this.openFiles(e.dataTransfer.files);
 			})
 
-			document.body.addEventListener("keydown", e => {
-				// 如果正在使用輸入框，不處理一切後續
-				let active = document.activeElement;
-				if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
-				if((e.metaKey || e.ctrlKey) && ["o", "s", "p"].includes(e.key)) {
-					e.preventDefault();
-					if(e.key == "o") (this.$refs.open as any).click();
-					if(e.key == "s" && core.design) (this.$refs.bps as any).download();
-					if(e.key == "p" && core.design) window.print();
-				}
-			})
+			registerHotkey(() => (this.$refs.open as any).click(), "o");
+			registerHotkey(() => core.design && (this.$refs.bps as any).download(), "s");
+			registerHotkey(() => this.print(), "p");
 		}
 
 		private newProject() {
@@ -176,6 +168,7 @@
 		}
 
 		protected print() {
+			if(!core.design) return;
 			bp.$display.beforePrint();
 			setTimeout(window.print, 500);
 			gtag('event', 'print', {});

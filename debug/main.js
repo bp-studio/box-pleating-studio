@@ -41,7 +41,7 @@ function bufferToText(buffer) {
 
 function callService(data) {
 	return new Promise((resolve, reject) => {
-		if('serviceWorker' in navigator && location.protocol == "https:") {
+		if('serviceWorker' in navigator) {
 			navigator.serviceWorker.getRegistration('/').then(reg => {
 				if(!reg.active) return reject(); // Safari 在第一次執行的時候可能會進到這裡
 				let channel = new MessageChannel();
@@ -73,6 +73,31 @@ const LZ = {
 		return LZMA.decompress(bytes);
 	}
 }
+
+///////////////////////////////////////////////////
+// Hotkeys
+///////////////////////////////////////////////////
+
+const hotkeys = [];
+
+function registerHotkey(action, key, shift) {
+	hotkeys.push([action, key.toLowerCase(), !!shift]);
+}
+
+document.body.addEventListener("keydown", e => {
+	// 如果正在使用輸入框，不處理一切後續
+	let active = document.activeElement;
+	if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+	if(e.metaKey || e.ctrlKey) {
+		e.preventDefault();
+		for(let [action, key, shift] of hotkeys) {
+			if(e.key.toLowerCase() == key && e.shiftKey == shift) {
+				action();
+				return;
+			}
+		}
+	}
+})
 
 const BaseComponent = { watch: { "selection"() { } }, computed: { design() { return core.design; }, selections() { return core.selections; }, selection() { return this.selections[0]; } }, destroyed() {
         // 這算是 patch Vue 的缺陷；確保 GC
@@ -249,6 +274,7 @@ Vue.component('core', { render() { with (this) {
             }
         }, checkSession() {
             return new Promise(resolve => {
+                // 減少本地偵錯的負擔
                 if (location.protocol != "https:")
                     resolve(true);
                 else {
@@ -803,19 +829,18 @@ Vue.component('vertices', { render() { with (this) {
     } }, mixins: [BaseComponent] });
 
 Vue.component('editmenu', { render() { with (this) {
-        return _c('dropdown', { attrs: { "icon": "bp-pencil-ruler", "title": $t('toolbar.edit.title') } }, [_c('div', { staticClass: "dropdown-item" }, [_c('hotkey', { attrs: { "icon": "bp-undo", "ctrl": "", "hk": "Z" } }, [_v(_s($t('toolbar.edit.undo')))])], 1), _v(" "), _c('div', { staticClass: "dropdown-item" }, [_c('hotkey', { attrs: { "icon": "bp-redo", "ctrl": "", "hk": "Y" } }, [_v(_s($t('toolbar.edit.redo')))])], 1)]);
-    } }, mixins: [BaseComponent], mounted() {
-        document.body.addEventListener("keydown", e => {
-            // 如果正在使用輸入框，不處理一切後續
-            let active = document.activeElement;
-            if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement)
-                return;
-            if (e.metaKey || e.ctrlKey) {
-                e.preventDefault();
-                if (e.key == "z") { }
-                if (e.key == "y") { }
-            }
-        });
+        return _c('dropdown', { attrs: { "icon": "bp-pencil-ruler", "title": $t('toolbar.edit.title') } }, [_c('dropdownitem', { attrs: { "disabled": !design || !design.history.canUndo }, on: { "click": undo } }, [_c('hotkey', { attrs: { "icon": "bp-undo", "ctrl": "", "hk": "Z" } }, [_v(_s($t('toolbar.edit.undo')))])], 1), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design || !design.history.canRedo }, on: { "click": redo } }, [_c('hotkey', { attrs: { "icon": "bp-redo", "ctrl": "", "hk": "Y" } }, [_v(_s($t('toolbar.edit.redo')))])], 1), _v(" "), _c('divider'), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": selectAll } }, [_c('hotkey', { attrs: { "icon": "far fa-object-group", "ctrl": "", "hk": "A" } }, [_v(_s($t('toolbar.edit.selectAll')))])], 1)], 1);
+    } }, mixins: [BaseComponent], methods: { undo() {
+            this.design?.history.undo();
+        }, redo() {
+            this.design?.history.redo();
+        }, selectAll() {
+            this.design?.selectAll();
+        } }, mounted() {
+        registerHotkey(() => this.undo(), "z");
+        registerHotkey(() => this.redo(), "y");
+        registerHotkey(() => this.redo(), "z", true);
+        registerHotkey(() => this.selectAll(), "a");
     } });
 
 Vue.component('filemenu', { render() { with (this) {
@@ -904,6 +929,8 @@ Vue.component('filemenu', { render() { with (this) {
                 }
             }
         }, print() {
+            if (!core.design)
+                return;
             bp.$display.beforePrint();
             setTimeout(window.print, 500);
             gtag('event', 'print', {});
@@ -918,21 +945,9 @@ Vue.component('filemenu', { render() { with (this) {
             if (e.dataTransfer)
                 this.openFiles(e.dataTransfer.files);
         });
-        document.body.addEventListener("keydown", e => {
-            // 如果正在使用輸入框，不處理一切後續
-            let active = document.activeElement;
-            if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement)
-                return;
-            if ((e.metaKey || e.ctrlKey) && ["o", "s", "p"].includes(e.key)) {
-                e.preventDefault();
-                if (e.key == "o")
-                    this.$refs.open.click();
-                if (e.key == "s" && core.design)
-                    this.$refs.bps.download();
-                if (e.key == "p" && core.design)
-                    window.print();
-            }
-        });
+        registerHotkey(() => this.$refs.open.click(), "o");
+        registerHotkey(() => core.design && this.$refs.bps.download(), "s");
+        registerHotkey(() => this.print(), "p");
     } });
 
 Vue.component('fullscreen', { render() { with (this) {
@@ -974,7 +989,7 @@ Vue.component('settingmenu', { render() { with (this) {
         } } });
 
 Vue.component('toolbar', { render() { with (this) {
-        return _c('div', { staticClass: "btn-toolbar p-2", attrs: { "id": "divToolbar" } }, [_c('div', { staticClass: "btn-group me-2" }, [_c('filemenu', { on: { "share": function ($event) { return $emit('share'); } } }), _v(" "), _c('settingmenu', { on: { "pref": function ($event) { return $emit('pref'); } } }), _v(" "), _c('dropdown', { attrs: { "icon": "bp-tools", "title": $t('toolbar.tools.title') } }, [_c('uploader', { attrs: { "accept": ".tmd5" }, on: { "upload": function ($event) { return TreeMaker($event); } } }, [_c('i', { staticClass: "fas fa-file-import" }), _v("\n\t\t\t\t" + _s($t("toolbar.tools.TreeMaker")) + "\n\t\t\t")])], 1), _v(" "), _c('dropdown', { attrs: { "icon": "bp-question-circle", "title": $t('toolbar.help.title'), "notify": notify || core.updated } }, [_c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return $emit('about'); } } }, [_c('i', { staticClass: "bp-info" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.about')) + "\n\t\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": news } }, [_c('i', { staticClass: "fas fa-newspaper" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.news')) + "\n\t\t\t\t"), (notify) ? _c('div', { staticClass: "notify" }) : _e()]), _v(" "), _c('a', { staticClass: "dropdown-item", attrs: { "href": "https://github.com/MuTsunTsai/box-pleating-studio/discussions", "target": "_blank", "rel": "noopener" } }, [_c('i', { staticClass: "far fa-comment-dots" }), _v("\n\t\t\t\t" + _s($t("toolbar.help.discussions")) + "\n\t\t\t")]), _v(" "), (core.updated) ? _c('div', { staticClass: "dropdown-item", on: { "click": update } }, [_c('i', { staticClass: "far fa-arrow-alt-circle-up" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.update')) + "\n\t\t\t\t"), _c('div', { staticClass: "notify" })]) : _e(), _v(" "), _c('divider'), _v(" "), _c('a', { staticClass: "dropdown-item", attrs: { "href": "donate.htm", "target": "_blank", "rel": "noopener" } }, [_c('i', { staticClass: "fas fa-hand-holding-usd" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.donation')) + "\n\t\t\t")])], 1)], 1), _v(" "), _c('div', { staticClass: "btn-group me-2" }, [_c('button', { staticClass: "btn btn-primary", class: { active: design && design.mode == 'tree' }, attrs: { "type": "button", "title": $t('toolbar.view.tree'), "disabled": !design }, on: { "click": toTree } }, [_c('i', { staticClass: "bp-tree" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", class: { active: design && design.mode == 'layout' }, attrs: { "type": "button", "title": $t('toolbar.view.layout'), "disabled": !design }, on: { "click": toLayout } }, [_c('i', { staticClass: "bp-layout" })])]), _v(" "), (ready) ? _c('div', { ref: "tab", staticClass: "flex-grow-1", attrs: { "id": "divTab" }, on: { "wheel": function ($event) { return tabWheel($event); } } }, [_c('draggable', _b({ model: { value: (core.designs), callback: function ($$v) { $set(core, "designs", $$v); }, expression: "core.designs" } }, 'draggable', dragOption, false), _l((core.designs), function (id) { return _c('div', { key: id, staticClass: "tab", class: { active: design == getDesign(id) }, attrs: { "id": `tab${id}` }, on: { "click": function ($event) { return core.select(id); } } }, [_c('div', { staticClass: "tab-close", attrs: { "title": getDesign(id).title }, on: { "contextmenu": function ($event) { return tabMenu($event, id); } } }, [_c('div', [_v(_s(getTitle(id)))]), _v(" "), _c('div', { staticClass: "px-2", on: { "click": function ($event) { $event.stopPropagation(); return core.close(id); }, "pointerdown": function ($event) { $event.stopPropagation(); }, "mousedown": function ($event) { $event.stopPropagation(); } } }, [_c('i', { staticClass: "fas fa-times" })])]), _v(" "), _c('div', { staticClass: "tab-down", attrs: { "title": getDesign(id).title } }, [_c('div', [_v(_s(getTitle(id)))]), _v(" "), _c('div', { staticClass: "px-2", on: { "click": function ($event) { $event.stopPropagation(); return tabMenu($event, id); }, "pointerdown": function ($event) { $event.stopPropagation(); }, "touchstart": function ($event) { $event.stopPropagation(); } } }, [_c('i', { staticClass: "fas fa-caret-down" })])])]); }), 0)], 1) : _c('div', { staticClass: "flex-grow-1", attrs: { "id": "divTab" } }), _v(" "), _c('contextmenu', { ref: "tabMenu" }, [_c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.clone(menuId); } } }, [_c('i', { staticClass: "far fa-clone" }), _v("\n\t\t\t" + _s($t('toolbar.tab.clone')) + "\n\t\t")]), _v(" "), _c('divider'), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.close(menuId); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.close')) + "\n\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.closeOther(menuId); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.closeOther')) + "\n\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.closeRight(menuId); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.closeRight')) + "\n\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.closeAll(); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.closeAll')) + "\n\t\t")])], 1), _v(" "), _c('div', { staticClass: "btn-group", attrs: { "id": "panelToggle" } }, [_c('button', { staticClass: "btn btn-primary", attrs: { "type": "button", "title": $t('toolbar.panel'), "disabled": !design }, on: { "click": function ($event) { return $emit('panel'); } } }, [_c('i', { staticClass: "bp-sliders-h" })])])], 1);
+        return _c('div', { staticClass: "btn-toolbar p-2", attrs: { "id": "divToolbar" } }, [_c('div', { staticClass: "btn-group me-2" }, [_c('filemenu', { on: { "share": function ($event) { return $emit('share'); } } }), _v(" "), _c('editmenu'), _v(" "), _c('settingmenu', { on: { "pref": function ($event) { return $emit('pref'); } } }), _v(" "), _c('dropdown', { attrs: { "icon": "bp-tools", "title": $t('toolbar.tools.title') } }, [_c('uploader', { attrs: { "accept": ".tmd5" }, on: { "upload": function ($event) { return TreeMaker($event); } } }, [_c('i', { staticClass: "fas fa-file-import" }), _v("\n\t\t\t\t" + _s($t("toolbar.tools.TreeMaker")) + "\n\t\t\t")])], 1), _v(" "), _c('dropdown', { attrs: { "icon": "bp-question-circle", "title": $t('toolbar.help.title'), "notify": notify || core.updated } }, [_c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return $emit('about'); } } }, [_c('i', { staticClass: "bp-info" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.about')) + "\n\t\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": news } }, [_c('i', { staticClass: "fas fa-newspaper" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.news')) + "\n\t\t\t\t"), (notify) ? _c('div', { staticClass: "notify" }) : _e()]), _v(" "), _c('a', { staticClass: "dropdown-item", attrs: { "href": "https://github.com/MuTsunTsai/box-pleating-studio/discussions", "target": "_blank", "rel": "noopener" } }, [_c('i', { staticClass: "far fa-comment-dots" }), _v("\n\t\t\t\t" + _s($t("toolbar.help.discussions")) + "\n\t\t\t")]), _v(" "), (core.updated) ? _c('div', { staticClass: "dropdown-item", on: { "click": update } }, [_c('i', { staticClass: "far fa-arrow-alt-circle-up" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.update')) + "\n\t\t\t\t"), _c('div', { staticClass: "notify" })]) : _e(), _v(" "), _c('divider'), _v(" "), _c('a', { staticClass: "dropdown-item", attrs: { "href": "donate.htm", "target": "_blank", "rel": "noopener" } }, [_c('i', { staticClass: "fas fa-hand-holding-usd" }), _v("\n\t\t\t\t" + _s($t('toolbar.help.donation')) + "\n\t\t\t")])], 1)], 1), _v(" "), _c('div', { staticClass: "btn-group me-2" }, [_c('button', { staticClass: "btn btn-primary", class: { active: design && design.mode == 'tree' }, attrs: { "type": "button", "title": $t('toolbar.view.tree'), "disabled": !design }, on: { "click": toTree } }, [_c('i', { staticClass: "bp-tree" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", class: { active: design && design.mode == 'layout' }, attrs: { "type": "button", "title": $t('toolbar.view.layout'), "disabled": !design }, on: { "click": toLayout } }, [_c('i', { staticClass: "bp-layout" })])]), _v(" "), (ready) ? _c('div', { ref: "tab", staticClass: "flex-grow-1", attrs: { "id": "divTab" }, on: { "wheel": function ($event) { return tabWheel($event); } } }, [_c('draggable', _b({ model: { value: (core.designs), callback: function ($$v) { $set(core, "designs", $$v); }, expression: "core.designs" } }, 'draggable', dragOption, false), _l((core.designs), function (id) { return _c('div', { key: id, staticClass: "tab", class: { active: design == getDesign(id) }, attrs: { "id": `tab${id}` }, on: { "click": function ($event) { return core.select(id); } } }, [_c('div', { staticClass: "tab-close", attrs: { "title": getDesign(id).title }, on: { "contextmenu": function ($event) { return tabMenu($event, id); } } }, [_c('div', [_v(_s(getTitle(id)))]), _v(" "), _c('div', { staticClass: "px-2", on: { "click": function ($event) { $event.stopPropagation(); return core.close(id); }, "pointerdown": function ($event) { $event.stopPropagation(); }, "mousedown": function ($event) { $event.stopPropagation(); } } }, [_c('i', { staticClass: "fas fa-times" })])]), _v(" "), _c('div', { staticClass: "tab-down", attrs: { "title": getDesign(id).title } }, [_c('div', [_v(_s(getTitle(id)))]), _v(" "), _c('div', { staticClass: "px-2", on: { "click": function ($event) { $event.stopPropagation(); return tabMenu($event, id); }, "pointerdown": function ($event) { $event.stopPropagation(); }, "touchstart": function ($event) { $event.stopPropagation(); } } }, [_c('i', { staticClass: "fas fa-caret-down" })])])]); }), 0)], 1) : _c('div', { staticClass: "flex-grow-1", attrs: { "id": "divTab" } }), _v(" "), _c('contextmenu', { ref: "tabMenu" }, [_c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.clone(menuId); } } }, [_c('i', { staticClass: "far fa-clone" }), _v("\n\t\t\t" + _s($t('toolbar.tab.clone')) + "\n\t\t")]), _v(" "), _c('divider'), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.close(menuId); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.close')) + "\n\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.closeOther(menuId); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.closeOther')) + "\n\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.closeRight(menuId); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.closeRight')) + "\n\t\t")]), _v(" "), _c('div', { staticClass: "dropdown-item", on: { "click": function ($event) { return core.closeAll(); } } }, [_c('i', { staticClass: "far fa-window-close" }), _v("\n\t\t\t" + _s($t('toolbar.tab.closeAll')) + "\n\t\t")])], 1), _v(" "), _c('div', { staticClass: "btn-group", attrs: { "id": "panelToggle" } }, [_c('button', { staticClass: "btn btn-primary", attrs: { "type": "button", "title": $t('toolbar.panel'), "disabled": !design }, on: { "click": function ($event) { return $emit('panel'); } } }, [_c('i', { staticClass: "bp-sliders-h" })])])], 1);
     } }, mixins: [BaseComponent], data() { return { notify: undefined, ready: false, menuId: undefined }; }, computed: { dragOption() {
             return {
                 delay: 500,

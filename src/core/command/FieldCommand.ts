@@ -6,44 +6,53 @@ interface JFieldCommand extends JCommand {
 	new: any;
 }
 
-class FieldCommand implements ICommand, ISerializable<JFieldCommand> {
+class FieldCommand implements ICommand {
 
-	private _target: ITagObject;
-	private _prop: string;
-	private _old: any;
-	private _new: any;
+	public readonly target: ITagObject;
+	public prop: string;
+	public old: any;
+	public new: any;
 
 	constructor(json: JFieldCommand, design: Design);
 	constructor(target: ITagObject, prop: string, value: any);
 	constructor(...p: [JFieldCommand, Design] | [ITagObject, string, any]) {
 		if(p.length == 2) {
-			this._target = p[1].find(p[0].target)!;
-			this._prop = p[0].prop;
-			this._old = p[0].old;
-			this._new = p[0].new;
+			this.target = p[1].find(p[0].target)!;
+			this.prop = p[0].prop;
+			this.old = p[0].old;
+			this.new = p[0].new;
 		} else {
-			this._target = p[0];
-			this._prop = p[1];
-			this._old = p[0][p[1]];
-			this._new = p[2];
+			this.target = p[0];
+			this.prop = p[1];
+			this.old = p[0][p[1]];
+			this.new = p[2];
 		}
+	}
+
+	public tryAddTo(step: Step): boolean {
+		let c: any;
+		if((c = step.commands[0]) instanceof FieldCommand && c.target == this.target && c.prop == this.prop) {
+			if(c.new != this.old) debugger;
+			c.new = this.new;
+			return true;
+		} else return false;
 	}
 
 	public toJSON(): JFieldCommand {
 		return {
 			type: CommandType.field,
-			target: this._target.tag,
-			prop: this._prop,
-			old: this._old,
-			"new": this._new
+			target: this.target.tag,
+			prop: this.prop,
+			old: this.old,
+			new: this.new
 		};
 	}
 
 	public undo() {
-		this._target[this._prop] = this._old;
+		this.target[this.prop] = this.old;
 	}
 
 	public redo() {
-		this._target[this._prop] = this._new;
+		this.target[this.prop] = this.new;
 	}
 }

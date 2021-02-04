@@ -2,7 +2,7 @@
 	<div id="divToolbar" class="btn-toolbar p-2">
 		<div class="btn-group me-2">
 			<filemenu @share="$emit('share')"></filemenu>
-			<!-- <editmenu></editmenu> -->
+			<editmenu></editmenu>
 			<settingmenu @pref="$emit('pref')"></settingmenu>
 			<dropdown icon="bp-tools" :title="$t('toolbar.tools.title')">
 				<uploader accept=".tmd5" @upload="TreeMaker($event)">

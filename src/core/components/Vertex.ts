@@ -39,7 +39,7 @@ interface JVertex extends IPoint {
 	}
 
 	public addLeaf(length = 1) {
-		this.design.history.takeStep(() => {
+		this.design.history.takeAction(() => {
 			// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
 			// 不然等一下讀取 design.vertices 會觸發新的 Vertex 的自動生成，
 			// 而那會比我設置 option 更早
@@ -81,7 +81,7 @@ interface JVertex extends IPoint {
 
 	public deleteAndJoin() {
 		if(this.node.degree != 2) return;
-		this.design.history.takeStep(() => {
+		this.design.history.takeAction(() => {
 			let edge = this.node.dispose()!;
 			this.$studio?.update();
 			this.design.edges.get(edge)!.selected = true;

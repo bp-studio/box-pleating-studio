@@ -2872,7 +2872,7 @@ let Design = class Design extends DesignBase {
         return result;
     }
     deleteVertices(vertices) {
-        this.history.takeStep(() => {
+        this.history.takeAction(() => {
             var _a;
             let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
             while (this.vertices.size > 3) {
@@ -2886,7 +2886,7 @@ let Design = class Design extends DesignBase {
         });
     }
     deleteFlaps(flaps) {
-        this.history.takeStep(() => {
+        this.history.takeAction(() => {
             var _a;
             for (let f of flaps) {
                 if (this.vertices.size == 3)
@@ -2944,6 +2944,14 @@ let Design = class Design extends DesignBase {
                 f.selected = true;
         }
         this.mode = "layout";
+    }
+    selectAll() {
+        var _a;
+        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.system.$clearSelection();
+        if (this.mode == "layout")
+            this.flaps.forEach(f => f.selected = true);
+        if (this.mode == "tree")
+            this.vertices.forEach(v => v.selected = true);
     }
     find(tag) {
         if (tag == "design")
@@ -3930,7 +3938,7 @@ class Draggable extends ViewedControl {
         if (by instanceof Point) {
             by = by.sub(this._dragOffset);
             if (!by.eq(this.location))
-                this.design.history.takeStep(() => {
+                this.design.history.takeAction(() => {
                     this.location.x = by.x;
                     this.location.y = by.y;
                     this.onDragged();
@@ -3938,7 +3946,7 @@ class Draggable extends ViewedControl {
         }
         else {
             if (!by.eq(Vector.ZERO))
-                this.design.history.takeStep(() => {
+                this.design.history.takeAction(() => {
                     this.location.x += by.x;
                     this.location.y += by.y;
                     this.onDragged();
@@ -4305,7 +4313,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
             Draggable.relocate(this, this.design.flaps.get(this.node));
     }
     addLeaf(length = 1) {
-        this.design.history.takeStep(() => {
+        this.design.history.takeAction(() => {
             let v = [...this.design.vertices.values()];
             let node = this.node.addLeaf(length);
             let p = this.findClosestEmptyPoint(v);
@@ -4339,7 +4347,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
     deleteAndJoin() {
         if (this.node.degree != 2)
             return;
-        this.design.history.takeStep(() => {
+        this.design.history.takeAction(() => {
             var _a;
             let edge = this.node.dispose();
             (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
@@ -4470,39 +4478,139 @@ BPStudio = __decorate([
 class FieldCommand {
     constructor(...p) {
         if (p.length == 2) {
-            this._target = p[1].find(p[0].target);
-            this._prop = p[0].prop;
-            this._old = p[0].old;
-            this._new = p[0].new;
+            this.target = p[1].find(p[0].target);
+            this.prop = p[0].prop;
+            this.old = p[0].old;
+            this.new = p[0].new;
         }
         else {
-            this._target = p[0];
-            this._prop = p[1];
-            this._old = p[0][p[1]];
-            this._new = p[2];
+            this.target = p[0];
+            this.prop = p[1];
+            this.old = p[0][p[1]];
+            this.new = p[2];
         }
+    }
+    tryAddTo(step) {
+        let c;
+        if ((c = step.commands[0]) instanceof FieldCommand && c.target == this.target && c.prop == this.prop) {
+            if (c.new != this.old)
+                debugger;
+            c.new = this.new;
+            return true;
+        }
+        else
+            return false;
     }
     toJSON() {
         return {
             type: CommandType.field,
-            target: this._target.tag,
-            prop: this._prop,
-            old: this._old,
-            "new": this._new
+            target: this.target.tag,
+            prop: this.prop,
+            old: this.old,
+            new: this.new
         };
     }
     undo() {
-        this._target[this._prop] = this._old;
+        this.target[this.prop] = this.old;
     }
     redo() {
-        this._target[this._prop] = this._new;
+        this.target[this.prop] = this.new;
     }
 }
+let HistoryManager = class HistoryManager {
+    constructor(design) {
+        this.steps = [];
+        this.index = 0;
+        this._moving = false;
+        this._modified = false;
+        this.design = design;
+    }
+    get modified() {
+        return this._modified;
+    }
+    notifySave() {
+        this._modified = false;
+    }
+    takeAction(action) {
+        this._modified = true;
+        action();
+    }
+    addStep(step) {
+        if (this.steps.length > this.index)
+            this.steps.length = this.index;
+        this.steps[this.index++] = step;
+    }
+    get lastStep() {
+        if (this.index == 0 || this.index < this.steps.length)
+            return undefined;
+        return this.steps[this.index - 1];
+    }
+    fieldChange(target, prop, oldValue, newValue) {
+        if (this._moving)
+            return;
+        let c = new FieldCommand(target, prop, newValue), s = this.lastStep;
+        if (!s || !c.tryAddTo(s))
+            this.addStep(new Step(c));
+        this._modified = true;
+    }
+    get canUndo() {
+        return this.index > 0;
+    }
+    get canRedo() {
+        return this.index < this.steps.length;
+    }
+    ;
+    undo() {
+        if (this.canUndo) {
+            this._moving = true;
+            this.steps[--this.index].undo();
+            this._moving = false;
+        }
+    }
+    redo() {
+        if (this.canRedo) {
+            this._moving = true;
+            this.steps[this.index++].redo();
+            this._moving = false;
+        }
+    }
+};
+__decorate([
+    shrewd
+], HistoryManager.prototype, "steps", void 0);
+__decorate([
+    shrewd
+], HistoryManager.prototype, "index", void 0);
+__decorate([
+    shrewd
+], HistoryManager.prototype, "canUndo", null);
+__decorate([
+    shrewd
+], HistoryManager.prototype, "canRedo", null);
+HistoryManager = __decorate([
+    shrewd
+], HistoryManager);
 var CommandType;
 (function (CommandType) {
     CommandType[CommandType["field"] = 0] = "field";
     CommandType[CommandType["move"] = 1] = "move";
 })(CommandType || (CommandType = {}));
+class Step {
+    constructor(...commands) {
+        this.commands = commands;
+    }
+    toJSON() {
+        return { commands: this.commands.map(c => c.toJSON()) };
+    }
+    undo() {
+        for (let c of this.commands)
+            c.undo();
+    }
+    redo() {
+        for (let c of this.commands)
+            c.redo();
+    }
+}
 let Edge = class Edge extends ViewedControl {
     constructor(sheet, v1, v2, edge) {
         super(sheet);
@@ -4516,10 +4624,10 @@ let Edge = class Edge extends ViewedControl {
         return super.shouldDispose || this.edge.disposed;
     }
     split() {
-        this.design.history.takeStep(() => this.toVertex(Tree.prototype.split));
+        this.design.history.takeAction(() => this.toVertex(Tree.prototype.split));
     }
     deleteAndMerge() {
-        this.design.history.takeStep(() => this.toVertex(Tree.prototype.deleteAndMerge));
+        this.design.history.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
     }
     toVertex(action) {
         var _a;
@@ -5128,25 +5236,6 @@ __decorate([
 Display = __decorate([
     shrewd
 ], Display);
-class HistoryManager {
-    constructor(design) {
-        this._modified = false;
-        this.design = design;
-    }
-    get modified() {
-        return this._modified;
-    }
-    notifySave() {
-        this._modified = false;
-    }
-    takeStep(action) {
-        this._modified = true;
-        action();
-    }
-    fieldChange(obj, prop, oldValue, newValue) {
-        this._modified = true;
-    }
-}
 var Migration;
 (function (Migration) {
     Migration.current = "0";
@@ -5413,7 +5502,7 @@ let System = System_1 = class System {
         }
         if (!ctrlKey) {
             if (!nowCtrl)
-                this._clearSelection();
+                this.$clearSelection();
             if (!nowCtrl && nextCtrl)
                 this._select(nextCtrl);
         }
@@ -5430,9 +5519,9 @@ let System = System_1 = class System {
         var [nowCtrl, nextCtrl] = this._ctrl;
         if (this._studio.design && !this._studio.design.dragging) {
             if (nowCtrl && nextCtrl)
-                this._clearSelection();
+                this.$clearSelection();
             if (nowCtrl && !nextCtrl)
-                this._clearSelection(nowCtrl);
+                this.$clearSelection(nowCtrl);
             if (nextCtrl)
                 this._select(nextCtrl);
         }
@@ -5443,7 +5532,7 @@ let System = System_1 = class System {
             c.selected = true;
         }
     }
-    _clearSelection(c = null) {
+    $clearSelection(c = null) {
         this._dragSelectView.visible = false;
         for (let control of this.selections)
             if (control != c)
@@ -5460,9 +5549,9 @@ let System = System_1 = class System {
         let active = document.activeElement;
         if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement)
             return true;
-        return this.key(event.key, event.modifiers.control || event.modifiers.meta);
+        return this.key(event.key);
     }
-    key(key, ctrl = false) {
+    key(key) {
         let v = new Vector(0, 0);
         switch (key) {
             case "space":
@@ -5477,16 +5566,6 @@ let System = System_1 = class System {
                     this._studio.design.deleteFlaps(this.selections);
                 if (s instanceof Vertex)
                     this._studio.design.deleteVertices(this.selections);
-                return false;
-            case "a":
-                let d = this._studio.design;
-                if (ctrl && d) {
-                    this._clearSelection();
-                    if (d.mode == "layout")
-                        d.flaps.forEach(f => f.selected = true);
-                    if (d.mode == "tree")
-                        d.vertices.forEach(v => v.selected = true);
-                }
                 return false;
             case "up":
                 v.set(0, 1);
@@ -5556,7 +5635,7 @@ let System = System_1 = class System {
             this._processNextSelection();
     }
     _reselect(event) {
-        this._clearSelection();
+        this.$clearSelection();
         this._processSelection(event.point, false);
         this._studio.update();
         for (let o of this._draggableSelections)
@@ -5588,7 +5667,7 @@ let System = System_1 = class System {
             if (!this._dragSelectView.visible) {
                 if (this.isTouch(event.event) && event.downPoint.getDistance(event.point) < 1)
                     return;
-                this._clearSelection();
+                this.$clearSelection();
                 this._dragSelectView.visible = true;
                 this._dragSelectView.down = event.downPoint;
             }
@@ -5613,7 +5692,7 @@ let System = System_1 = class System {
     }
     _canvasTouch(event) {
         if (event.touches.length > 1) {
-            this._clearSelection();
+            this.$clearSelection();
             this._setScroll(event);
             this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
         }

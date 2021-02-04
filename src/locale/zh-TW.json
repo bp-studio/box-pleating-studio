@@ -78,7 +78,8 @@
 		"edit": {
 			"redo": "取消復原",
 			"title": "編輯",
-			"undo": "復原"
+			"undo": "復原",
+			"selectAll": "全選"
 		}
 	},
 	"preference": {

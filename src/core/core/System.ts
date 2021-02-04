@@ -136,7 +136,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 		// 滑鼠按下時的選取邏輯
 		if(!ctrlKey) {
-			if(!nowCtrl) this._clearSelection();
+			if(!nowCtrl) this.$clearSelection();
 			if(!nowCtrl && nextCtrl) this._select(nextCtrl);
 		} else {
 			if(nowCtrl && !nextCtrl) nowCtrl.toggle();
@@ -152,8 +152,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	private _processNextSelection(): void {
 		var [nowCtrl, nextCtrl] = this._ctrl;
 		if(this._studio.design && !this._studio.design.dragging) {
-			if(nowCtrl && nextCtrl) this._clearSelection();
-			if(nowCtrl && !nextCtrl) this._clearSelection(nowCtrl);
+			if(nowCtrl && nextCtrl) this.$clearSelection();
+			if(nowCtrl && !nextCtrl) this.$clearSelection(nowCtrl);
 			if(nextCtrl) this._select(nextCtrl);
 		}
 
@@ -167,7 +167,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		}
 	}
 
-	private _clearSelection(c: Control | null = null): void {
+	public $clearSelection(c: Control | null = null): void {
 		this._dragSelectView.visible = false;
 		for(let control of this.selections) if(control != c) control.selected = false;
 	}
@@ -184,10 +184,10 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		let active = document.activeElement;
 		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return true;
 
-		return this.key(event.key, event.modifiers.control || event.modifiers.meta);
+		return this.key(event.key);
 	}
 
-	public key(key: string, ctrl: boolean = false) {
+	public key(key: string) {
 		let v = new Vector(0, 0);
 		switch(key) {
 			case "space":
@@ -201,15 +201,6 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 				let s = this.selections[0];
 				if(s instanceof Flap) this._studio.design!.deleteFlaps(this.selections as Flap[]);
 				if(s instanceof Vertex) this._studio.design!.deleteVertices(this.selections as Vertex[]);
-				return false;
-
-			case "a":
-				let d = this._studio.design;
-				if(ctrl && d) {
-					this._clearSelection();
-					if(d.mode == "layout") d.flaps.forEach(f => f.selected = true);
-					if(d.mode == "tree") d.vertices.forEach(v => v.selected = true);
-				}
 				return false;
 
 			case "up": v.set(0, 1); break;
@@ -282,7 +273,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	private _reselect(event: paper.ToolEvent) {
-		this._clearSelection();
+		this.$clearSelection();
 		this._processSelection(event.point, false);
 		this._studio.update();
 		for(let o of this._draggableSelections) o.dragStart(this._lastKnownCursorLocation);
@@ -324,7 +315,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			if(!this._dragSelectView.visible) {
 				// 觸碰的情況中要拖曳至一定距離才開始觸發拖曳選取
 				if(this.isTouch(event.event) && event.downPoint.getDistance(event.point) < 1) return;
-				this._clearSelection();
+				this.$clearSelection();
 				this._dragSelectView.visible = true;
 				this._dragSelectView.down = event.downPoint;
 				//this._studio.update();
@@ -354,7 +345,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 	private _canvasTouch(event: TouchEvent) {
 		if(event.touches.length > 1) {
-			this._clearSelection();
+			this.$clearSelection();
 			this._setScroll(event);
 			this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
 		}

@@ -17,3 +17,5 @@ export function readFile(f: File): Promise<ArrayBuffer>;
 export function bufferToText(buffer: ArrayBuffer): string;
 
 export function callService(data: any): Promise<any>;
+
+export function registerHotkey(action: () => void, key: string, shift?: boolean);
