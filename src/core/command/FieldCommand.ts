@@ -1,58 +1,43 @@
 
 interface JFieldCommand extends JCommand {
-	target: string;
-	prop: string;
-	old: any;
-	new: any;
+	readonly prop: string;
+	readonly old: any;
+	readonly new: any;
 }
 
-class FieldCommand implements ICommand {
+class FieldCommand implements ICommand, JFieldCommand {
 
-	public readonly target: ITagObject;
-	public prop: string;
+	@nonEnumerable private readonly _design: Design;
+	public readonly type = CommandType.field;
+	public readonly tag: string;
+	public readonly prop: string;
 	public old: any;
 	public new: any;
 
-	constructor(json: JFieldCommand, design: Design);
-	constructor(target: ITagObject, prop: string, value: any);
-	constructor(...p: [JFieldCommand, Design] | [ITagObject, string, any]) {
-		if(p.length == 2) {
-			this.target = p[1].find(p[0].target)!;
-			this.prop = p[0].prop;
-			this.old = p[0].old;
-			this.new = p[0].new;
-		} else {
-			this.target = p[0];
-			this.prop = p[1];
-			this.old = p[0][p[1]];
-			this.new = p[2];
-		}
+	constructor(design: Design, json: Omit<JFieldCommand, 'type'>) {
+		this._design = design;
+		this.tag = json.tag;
+		this.prop = json.prop;
+		this.old = json.old;
+		this.new = json.new;
 	}
 
 	public tryAddTo(step: Step): boolean {
 		let c: any;
-		if((c = step.commands[0]) instanceof FieldCommand && c.target == this.target && c.prop == this.prop) {
+		if((c = step.commands[0]) instanceof FieldCommand && c.tag == this.tag && c.prop == this.prop) {
 			if(c.new != this.old) debugger;
 			c.new = this.new;
 			return true;
 		} else return false;
 	}
 
-	public toJSON(): JFieldCommand {
-		return {
-			type: CommandType.field,
-			target: this.target.tag,
-			prop: this.prop,
-			old: this.old,
-			new: this.new
-		};
-	}
-
 	public undo() {
-		this.target[this.prop] = this.old;
+		let target = this._design.find(this.tag)!;
+		target[this.prop] = this.old;
 	}
 
 	public redo() {
-		this.target[this.prop] = this.new;
+		let target = this._design.find(this.tag)!;
+		target[this.prop] = this.new;
 	}
 }

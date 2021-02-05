@@ -12,8 +12,7 @@
 			<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.saveBPS')}}</hotkey>
 		</download>
 		<download :disabled="!design" :file="workspaceFile" ref="bpz" @download="notifyAll">
-			<i class="fas fa-download"></i>
-			{{$t('toolbar.file.saveBPZ')}}
+			<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.saveBPZ')}}</hotkey>
 		</download>
 		<divider></divider>
 		<download :disabled="!design" :file="svgFile" ref="svg" @download="svgSaved">
@@ -67,6 +66,7 @@
 
 			registerHotkey(() => (this.$refs.open as any).click(), "o");
 			registerHotkey(() => core.design && (this.$refs.bps as any).download(), "s");
+			registerHotkey(() => core.design && (this.$refs.bpz as any).download(), "s", true);
 			registerHotkey(() => this.print(), "p");
 		}
 

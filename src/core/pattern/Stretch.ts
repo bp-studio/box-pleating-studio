@@ -43,7 +43,7 @@ interface JStretch {
 	}
 
 	/** `Stretch` 的簽章，格式就是所有 `Flap` 的 id 以逗點隔開 */
-	private readonly signature: string;
+	public readonly signature: string;
 
 	constructor(sheet: Sheet, signature: string) {
 		super(sheet);

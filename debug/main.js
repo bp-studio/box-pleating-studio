@@ -75,7 +75,7 @@ const LZ = {
 }
 
 ///////////////////////////////////////////////////
-// Hotkeys
+// 快捷鍵註冊
 ///////////////////////////////////////////////////
 
 const hotkeys = [];
@@ -297,7 +297,7 @@ Vue.component('core', { render() { with (this) {
                 // 避免在存檔的瞬間製造出 glitch
                 bp.onUpdate = () => {
                     let session = {
-                        jsons: this.designs.map(id => bp.designMap.get(id)),
+                        jsons: this.designs.map(id => bp.designMap.get(id).toJSON(true)),
                         open: bp.design ? this.designs.indexOf(bp.design.id) : -1
                     };
                     localStorage.setItem("session", JSON.stringify(session));
@@ -702,8 +702,8 @@ Vue.component('field', { render() { with (this) {
     } }, mixins: [InputMixin], props: { label: String, type: String, placeholder: String } });
 
 Vue.component('hotkey', { render() { with (this) {
-        return _c('div', { staticClass: "d-flex" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('i', { class: icon }), _v(" "), _t("default")], 2), _v(" "), _c('div', { staticClass: "ms-3 text-end desktop-only" }, [(ctrl) ? [(isMac) ? _c('i', { staticClass: "bp-command" }) : _c('span', [_v("Ctrl+")])] : _e(), _v("\n\t\t" + _s(hk) + "\n\t")], 2)]);
-    } }, props: { icon: String, hk: String, ctrl: Boolean }, computed: { isMac() { return isMac; } } });
+        return _c('div', { staticClass: "d-flex" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('i', { class: icon }), _v(" "), _t("default")], 2), _v(" "), _c('div', { staticClass: "ms-3 text-end desktop-only" }, [(ctrl) ? [(isMac) ? _c('i', { staticClass: "bp-command" }) : _c('span', [_v("Ctrl+")])] : _e(), _v(" "), (shift) ? [(isMac) ? _c('i', { staticClass: "bp-shift" }) : _c('span', [_v("Shift+")])] : _e(), _v("\n\t\t" + _s(hk) + "\n\t")], 2)]);
+    } }, props: { icon: String, hk: String, ctrl: Boolean, shift: Boolean }, computed: { isMac() { return isMac; } } });
 
 Vue.component('keybutton', { render() { with (this) {
         return _c('i', { on: { "touchstart": function ($event) { return down(750, $event); }, "touchend": up, "touchcancel": up } });
@@ -829,7 +829,7 @@ Vue.component('vertices', { render() { with (this) {
     } }, mixins: [BaseComponent] });
 
 Vue.component('editmenu', { render() { with (this) {
-        return _c('dropdown', { attrs: { "icon": "bp-pencil-ruler", "title": $t('toolbar.edit.title') } }, [_c('dropdownitem', { attrs: { "disabled": !design || !design.history.canUndo }, on: { "click": undo } }, [_c('hotkey', { attrs: { "icon": "bp-undo", "ctrl": "", "hk": "Z" } }, [_v(_s($t('toolbar.edit.undo')))])], 1), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design || !design.history.canRedo }, on: { "click": redo } }, [_c('hotkey', { attrs: { "icon": "bp-redo", "ctrl": "", "hk": "Y" } }, [_v(_s($t('toolbar.edit.redo')))])], 1), _v(" "), _c('divider'), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": selectAll } }, [_c('hotkey', { attrs: { "icon": "far fa-object-group", "ctrl": "", "hk": "A" } }, [_v(_s($t('toolbar.edit.selectAll')))])], 1)], 1);
+        return _c('dropdown', { attrs: { "icon": "bp-pencil-ruler", "title": $t('toolbar.edit.title') } }, [_c('dropdownitem', { attrs: { "disabled": !design || !design.history.canUndo }, on: { "click": undo } }, [_c('hotkey', { attrs: { "icon": "bp-undo", "ctrl": "", "hk": "Z" } }, [_v(_s($t('toolbar.edit.undo')))])], 1), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design || !design.history.canRedo }, on: { "click": redo } }, [_c('hotkey', { attrs: { "icon": "bp-redo", "ctrl": "", "hk": "Y" } }, [_v(_s($t('toolbar.edit.redo')))])], 1), _v(" "), _c('divider'), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": selectAll } }, [_c('hotkey', { attrs: { "icon": "fas fa-th", "ctrl": "", "hk": "A" } }, [_v(_s($t('toolbar.edit.selectAll')))])], 1)], 1);
     } }, mixins: [BaseComponent], methods: { undo() {
             this.design?.history.undo();
         }, redo() {
@@ -844,7 +844,7 @@ Vue.component('editmenu', { render() { with (this) {
     } });
 
 Vue.component('filemenu', { render() { with (this) {
-        return _c('dropdown', { attrs: { "icon": "bp-file-alt", "title": $t('toolbar.file.title') }, on: { "hide": reset } }, [_c('div', { staticClass: "dropdown-item", on: { "click": newProject } }, [_c('i', { staticClass: "far fa-file" }), _v("\n\t\t" + _s($t('toolbar.file.new')) + "\n\t")]), _v(" "), _c('divider'), _v(" "), _c('uploader', { ref: "open", attrs: { "accept": ".bps, .bpz, .json, .zip", "multiple": "" }, on: { "upload": function ($event) { return upload($event); } } }, [_c('hotkey', { attrs: { "icon": "far fa-folder-open", "ctrl": "", "hk": "O" } }, [_v(_s($t('toolbar.file.open')))])], 1), _v(" "), _c('download', { ref: "bps", attrs: { "disabled": !design, "file": jsonFile }, on: { "download": notify } }, [_c('hotkey', { attrs: { "icon": "fas fa-download", "ctrl": "", "hk": "S" } }, [_v(_s($t('toolbar.file.saveBPS')))])], 1), _v(" "), _c('download', { ref: "bpz", attrs: { "disabled": !design, "file": workspaceFile }, on: { "download": notifyAll } }, [_c('i', { staticClass: "fas fa-download" }), _v("\n\t\t" + _s($t('toolbar.file.saveBPZ')) + "\n\t")]), _v(" "), _c('divider'), _v(" "), _c('download', { ref: "svg", attrs: { "disabled": !design, "file": svgFile }, on: { "download": svgSaved } }, [_c('i', { staticClass: "far fa-file-image" }), _v("\n\t\t" + _s($t('toolbar.file.saveSVG')) + "\n\t")]), _v(" "), _c('download', { ref: "png", attrs: { "disabled": !design, "file": pngFile }, on: { "download": pngSaved } }, [_c('i', { staticClass: "far fa-file-image" }), _v("\n\t\t" + _s($t('toolbar.file.savePNG')) + "\n\t")]), _v(" "), (copyEnabled) ? _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": copyPNG } }, [_c('i', { staticClass: "far fa-copy" }), _v("\n\t\t" + _s($t('toolbar.file.copyPNG')) + "\n\t")]) : _e(), _v(" "), _c('divider'), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": print } }, [_c('hotkey', { attrs: { "icon": "fas fa-print", "ctrl": "", "hk": "P" } }, [_v(_s($t('toolbar.file.print')))])], 1), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": function ($event) { return $emit('share'); } } }, [_c('i', { staticClass: "fas fa-share-alt" }), _v("\n\t\t" + _s($t('toolbar.file.share')) + "\n\t")])], 1);
+        return _c('dropdown', { attrs: { "icon": "bp-file-alt", "title": $t('toolbar.file.title') }, on: { "hide": reset } }, [_c('div', { staticClass: "dropdown-item", on: { "click": newProject } }, [_c('i', { staticClass: "far fa-file" }), _v("\n\t\t" + _s($t('toolbar.file.new')) + "\n\t")]), _v(" "), _c('divider'), _v(" "), _c('uploader', { ref: "open", attrs: { "accept": ".bps, .bpz, .json, .zip", "multiple": "" }, on: { "upload": function ($event) { return upload($event); } } }, [_c('hotkey', { attrs: { "icon": "far fa-folder-open", "ctrl": "", "hk": "O" } }, [_v(_s($t('toolbar.file.open')))])], 1), _v(" "), _c('download', { ref: "bps", attrs: { "disabled": !design, "file": jsonFile }, on: { "download": notify } }, [_c('hotkey', { attrs: { "icon": "fas fa-download", "ctrl": "", "hk": "S" } }, [_v(_s($t('toolbar.file.saveBPS')))])], 1), _v(" "), _c('download', { ref: "bpz", attrs: { "disabled": !design, "file": workspaceFile }, on: { "download": notifyAll } }, [_c('hotkey', { attrs: { "icon": "fas fa-download", "ctrl": "", "shift": "", "hk": "S" } }, [_v(_s($t('toolbar.file.saveBPZ')))])], 1), _v(" "), _c('divider'), _v(" "), _c('download', { ref: "svg", attrs: { "disabled": !design, "file": svgFile }, on: { "download": svgSaved } }, [_c('i', { staticClass: "far fa-file-image" }), _v("\n\t\t" + _s($t('toolbar.file.saveSVG')) + "\n\t")]), _v(" "), _c('download', { ref: "png", attrs: { "disabled": !design, "file": pngFile }, on: { "download": pngSaved } }, [_c('i', { staticClass: "far fa-file-image" }), _v("\n\t\t" + _s($t('toolbar.file.savePNG')) + "\n\t")]), _v(" "), (copyEnabled) ? _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": copyPNG } }, [_c('i', { staticClass: "far fa-copy" }), _v("\n\t\t" + _s($t('toolbar.file.copyPNG')) + "\n\t")]) : _e(), _v(" "), _c('divider'), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": print } }, [_c('hotkey', { attrs: { "icon": "fas fa-print", "ctrl": "", "hk": "P" } }, [_v(_s($t('toolbar.file.print')))])], 1), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": function ($event) { return $emit('share'); } } }, [_c('i', { staticClass: "fas fa-share-alt" }), _v("\n\t\t" + _s($t('toolbar.file.share')) + "\n\t")])], 1);
     } }, mixins: [BaseComponent], computed: { jsonFile() {
             return !this.design ?
                 { name: "", content: () => "" } :
@@ -947,6 +947,7 @@ Vue.component('filemenu', { render() { with (this) {
         });
         registerHotkey(() => this.$refs.open.click(), "o");
         registerHotkey(() => core.design && this.$refs.bps.download(), "s");
+        registerHotkey(() => core.design && this.$refs.bpz.download(), "s", true);
         registerHotkey(() => this.print(), "p");
     } });
 

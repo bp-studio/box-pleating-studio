@@ -18,4 +18,4 @@ export function bufferToText(buffer: ArrayBuffer): string;
 
 export function callService(data: any): Promise<any>;
 
-export function registerHotkey(action: () => void, key: string, shift?: boolean);
+export function registerHotkey(action: () => void, key: string, shift?: boolean): void;

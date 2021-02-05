@@ -31,9 +31,6 @@ abstract class DesignBase extends Mountable {
 	/** 物件初始設定值 */
 	public readonly options: OptionManager;
 
-	/** 管理 Design 的編輯歷史 */
-	public readonly history: HistoryManager;
-
 	/** 給 Vue 排序用的 id */
 	public readonly id: number = DesignBase._id++;
 
@@ -53,7 +50,6 @@ abstract class DesignBase extends Mountable {
 		if(this.data.tree.nodes.length < 3) throw new Error("Invalid format.");
 
 		this.options = new OptionManager(this.data);
-		this.history = new HistoryManager(this);
 	}
 
 	/**

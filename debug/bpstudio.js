@@ -78,11 +78,11 @@ function nonEnumerable(target, name, desc) {
     });
 }
 ;
-function action(target, name) {
-    if (name === undefined)
-        return (obj, name) => actionInner(obj, name, target);
+function action(...p) {
+    if (p.length == 1)
+        return (obj, name) => actionInner(obj, name, p[0]);
     else
-        actionInner(target, name, {});
+        actionInner(p[0], p[1], {});
 }
 function actionInner(target, name, option) {
     shrewd({
@@ -94,8 +94,6 @@ function actionInner(target, name, option) {
             let result = (_b = (_a = option.validator) === null || _a === void 0 ? void 0 : _a.apply(this, [v])) !== null && _b !== void 0 ? _b : true;
             if (result) {
                 if (name in record && record[name] != v) {
-                    if (!('design' in this))
-                        debugger;
                     this.design.history.fieldChange(this, name, record[name], v);
                 }
                 record[name] = v;
@@ -2184,7 +2182,6 @@ class DesignBase extends Mountable {
         if (this.data.tree.nodes.length < 3)
             throw new Error("Invalid format.");
         this.options = new OptionManager(this.data);
-        this.history = new HistoryManager(this);
     }
     sortJEdge() {
         let edges = this.edges.toJSON();
@@ -2370,6 +2367,26 @@ let Sheet = class Sheet extends Mountable {
     constraint(v, p) {
         return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
     }
+    get width() { return this._width; }
+    set width(v) {
+        if (v >= 8 && v >= this._independentRect.width) {
+            let d = v - this._independentRect.right;
+            if (d < 0)
+                for (let i of this.independents)
+                    i.location.x += d;
+            this._width = v;
+        }
+    }
+    get height() { return this._height; }
+    set height(v) {
+        if (v >= 8 && v >= this._independentRect.height) {
+            let d = v - this._independentRect.top;
+            if (d < 0)
+                for (let i of this.independents)
+                    i.location.y += d;
+            this._height = v;
+        }
+    }
     getMinScale() {
         var _a;
         return Math.ceil((_a = this.design.display.getAutoScale(this)) !== null && _a !== void 0 ? _a : 10);
@@ -2429,29 +2446,11 @@ __decorate([
     shrewd
 ], Sheet.prototype, "activeControls", null);
 __decorate([
-    action({
-        validator(v) {
-            let ok = v >= 8 && v >= this._independentRect.width;
-            let d = v - this._independentRect.right;
-            if (ok && d < 0)
-                for (let i of this.independents)
-                    i.location.x += d;
-            return ok;
-        }
-    })
-], Sheet.prototype, "width", void 0);
+    shrewd
+], Sheet.prototype, "_width", void 0);
 __decorate([
-    action({
-        validator(v) {
-            let ok = v >= 8 && v >= this._independentRect.height;
-            let d = v - this._independentRect.top;
-            if (ok && d < 0)
-                for (let i of this.independents)
-                    i.location.y += d;
-            return ok;
-        }
-    })
-], Sheet.prototype, "height", void 0);
+    shrewd
+], Sheet.prototype, "_height", void 0);
 __decorate([
     shrewd({
         validator(v) {
@@ -2843,6 +2842,7 @@ let Design = class Design extends DesignBase {
         this.mode = this.data.mode;
         this.tree = new Tree(this, this.data.tree.edges);
         this.junctions = new DoubleMapping(() => this.flaps.values(), (f1, f2) => new Junction(this.LayoutSheet, f1, f2));
+        this.history = new HistoryManager(this, this.data.history);
     }
     get sheet() {
         return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
@@ -2850,24 +2850,28 @@ let Design = class Design extends DesignBase {
     get display() {
         return this.mountTarget.$display;
     }
-    toJSON() {
+    toJSON(history = false) {
         let result;
-        this.tree.withJID(() => result = {
-            title: this.title,
-            description: this.description,
-            fullscreen: this.fullscreen,
-            version: Migration.current,
-            mode: this.mode,
-            layout: {
-                sheet: this.LayoutSheet.toJSON(),
-                flaps: this.flaps.toJSON(),
-                stretches: this.stretches.toJSON()
-            },
-            tree: {
-                sheet: this.TreeSheet.toJSON(),
-                nodes: this.vertices.toJSON(),
-                edges: this.sortJEdge()
-            }
+        this.tree.withJID(() => {
+            result = {
+                title: this.title,
+                description: this.description,
+                fullscreen: this.fullscreen,
+                version: Migration.current,
+                mode: this.mode,
+                layout: {
+                    sheet: this.LayoutSheet.toJSON(),
+                    flaps: this.flaps.toJSON(),
+                    stretches: this.stretches.toJSON()
+                },
+                tree: {
+                    sheet: this.TreeSheet.toJSON(),
+                    nodes: this.vertices.toJSON(),
+                    edges: this.sortJEdge()
+                }
+            };
+            if (history)
+                result.history = this.history.toJSON();
         });
         return result;
     }
@@ -2954,17 +2958,22 @@ let Design = class Design extends DesignBase {
             this.vertices.forEach(v => v.selected = true);
     }
     find(tag) {
+        var _a;
         if (tag == "design")
             return this;
         if (tag == "layout")
             return this.LayoutSheet;
         if (tag == "tree")
             return this.TreeSheet;
-        let m = tag.match(/^(.)(\d+)(?:-(\d+))?$/);
+        let m = tag.match(/^(\w+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
         if (m) {
-            let init = m[1], id = Number(m[2]), to = Number(m[3]);
+            let init = m[1], id = m[2], to = Number(m[3]);
+            if (init == "rp")
+                return this.stretches.get(id).repository || undefined;
+            if (init == "cf")
+                return (_a = this.stretches.get(id).repository) === null || _a === void 0 ? void 0 : _a.get(to);
             let t = this.tree;
-            let n = t.node.get(id);
+            let n = t.node.get(Number(id));
             if (init == "n")
                 return n;
             if (init == "f")
@@ -3436,31 +3445,31 @@ class Store extends SheetObject {
     constructor() {
         super(...arguments);
         this.index = 0;
-        this._prototypeCache = [];
         this._cache = [];
+        this._entries = [];
     }
     get _prototypes() {
         if (!this.generator)
-            return this._prototypeCache;
+            return this._cache;
         if (this.design.dragging) {
             this.buildFirst();
-            return this._prototypeCache.concat();
+            return this._cache.concat();
         }
         else {
-            if (this._cache.length == 0)
+            if (this._entries.length == 0)
                 this.buildFirst();
             for (let entry of this.generator)
-                this._prototypeCache.push(entry);
+                this._cache.push(entry);
             delete this.generator;
-            return this._prototypeCache;
+            return this._cache;
         }
     }
     buildFirst() {
         let entry = this.generator.next();
         if (!entry.done) {
             try {
-                this._cache[0] = this.builder(entry.value);
-                this._prototypeCache.push(entry.value);
+                this._entries[0] = this.builder(entry.value);
+                this._cache.push(entry.value);
             }
             catch (e) {
                 console.log("Incompatible old version.");
@@ -3471,7 +3480,7 @@ class Store extends SheetObject {
         let e = this._prototypes, i = this.index;
         if (e.length == 0)
             return null;
-        return this._cache[i] = this._cache[i] || this.builder(e[i]);
+        return this._entries[i] = this._entries[i] || this.builder(e[i]);
     }
     move(by = 1) {
         var _a;
@@ -3482,6 +3491,12 @@ class Store extends SheetObject {
     }
     get size() {
         return this._prototypes.length;
+    }
+    indexOf(entry) {
+        return this._entries.indexOf(entry);
+    }
+    get(index) {
+        return this._entries[index];
     }
 }
 __decorate([
@@ -3598,6 +3613,9 @@ let Configuration = class Configuration extends Store {
         this.overlapMap = overlapMap;
         this.partitions = config.partitions.map(p => new Partition(this, p));
         this.generator = this.generate();
+    }
+    get tag() {
+        return "cf" + this.repository.stretch.signature + "-" + this.repository.indexOf(this);
     }
     get shouldDispose() {
         return super.shouldDispose || this.repository.disposed;
@@ -4476,23 +4494,17 @@ BPStudio = __decorate([
     shrewd
 ], BPStudio);
 class FieldCommand {
-    constructor(...p) {
-        if (p.length == 2) {
-            this.target = p[1].find(p[0].target);
-            this.prop = p[0].prop;
-            this.old = p[0].old;
-            this.new = p[0].new;
-        }
-        else {
-            this.target = p[0];
-            this.prop = p[1];
-            this.old = p[0][p[1]];
-            this.new = p[2];
-        }
+    constructor(design, json) {
+        this.type = CommandType.field;
+        this._design = design;
+        this.tag = json.tag;
+        this.prop = json.prop;
+        this.old = json.old;
+        this.new = json.new;
     }
     tryAddTo(step) {
         let c;
-        if ((c = step.commands[0]) instanceof FieldCommand && c.target == this.target && c.prop == this.prop) {
+        if ((c = step.commands[0]) instanceof FieldCommand && c.tag == this.tag && c.prop == this.prop) {
             if (c.new != this.old)
                 debugger;
             c.new = this.new;
@@ -4501,29 +4513,32 @@ class FieldCommand {
         else
             return false;
     }
-    toJSON() {
-        return {
-            type: CommandType.field,
-            target: this.target.tag,
-            prop: this.prop,
-            old: this.old,
-            new: this.new
-        };
-    }
     undo() {
-        this.target[this.prop] = this.old;
+        let target = this._design.find(this.tag);
+        target[this.prop] = this.old;
     }
     redo() {
-        this.target[this.prop] = this.new;
+        let target = this._design.find(this.tag);
+        target[this.prop] = this.new;
     }
 }
+__decorate([
+    nonEnumerable
+], FieldCommand.prototype, "_design", void 0);
 let HistoryManager = class HistoryManager {
-    constructor(design) {
+    constructor(design, json) {
         this.steps = [];
         this.index = 0;
         this._moving = false;
         this._modified = false;
         this.design = design;
+    }
+    toJSON() {
+        return {
+            index: this.index,
+            modified: this.modified,
+            steps: this.steps
+        };
     }
     get modified() {
         return this._modified;
@@ -4548,7 +4563,13 @@ let HistoryManager = class HistoryManager {
     fieldChange(target, prop, oldValue, newValue) {
         if (this._moving)
             return;
-        let c = new FieldCommand(target, prop, newValue), s = this.lastStep;
+        let c = new FieldCommand(this.design, {
+            tag: target.tag,
+            prop,
+            old: oldValue,
+            new: newValue
+        });
+        let s = this.lastStep;
         if (!s || !c.tryAddTo(s))
             this.addStep(new Step(c));
         this._modified = true;
@@ -4598,9 +4619,6 @@ var CommandType;
 class Step {
     constructor(...commands) {
         this.commands = commands;
-    }
-    toJSON() {
-        return { commands: this.commands.map(c => c.toJSON()) };
     }
     undo() {
         for (let c of this.commands)
@@ -7208,6 +7226,9 @@ let Repository = class Repository extends Store {
         this.signature = signature;
         this.structure = JSON.parse(signature);
         this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());
+    }
+    get tag() {
+        return "rp" + this.stretch.signature;
     }
     builder(prototype) {
         return prototype;

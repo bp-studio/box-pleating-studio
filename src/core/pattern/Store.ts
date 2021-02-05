@@ -14,7 +14,9 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Store<P, T extends SheetObject> extends SheetObject {
+abstract class Store<P, T extends SheetObject> extends SheetObject implements ITagObject {
+
+	public abstract get tag(): string;
 
 	/** 原型資料生成器 */
 	protected abstract generator: Generator<P>;
@@ -27,15 +29,15 @@ abstract class Store<P, T extends SheetObject> extends SheetObject {
 
 	/** 目前的 `Collection` 所有可用的 prototype */
 	@shrewd private get _prototypes(): P[] {
-		if(!this.generator) return this._prototypeCache;
+		if(!this.generator) return this._cache;
 		if(this.design.dragging) {
 			this.buildFirst();
-			return this._prototypeCache.concat();
+			return this._cache.concat();
 		} else {
-			if(this._cache.length == 0) this.buildFirst();
-			for(let entry of this.generator) this._prototypeCache.push(entry);
+			if(this._entries.length == 0) this.buildFirst();
+			for(let entry of this.generator) this._cache.push(entry);
 			delete (this as any).generator;
-			return this._prototypeCache;
+			return this._cache;
 		}
 	}
 
@@ -45,8 +47,8 @@ abstract class Store<P, T extends SheetObject> extends SheetObject {
 			try {
 				// 產生第一個原型的同時也順便直接建構第一個實體，
 				// 以便檢查存檔的版本是否相容
-				this._cache[0] = this.builder(entry.value);
-				this._prototypeCache.push(entry.value);
+				this._entries[0] = this.builder(entry.value);
+				this._cache.push(entry.value);
 			} catch(e) {
 				console.log("Incompatible old version.");
 			}
@@ -54,10 +56,10 @@ abstract class Store<P, T extends SheetObject> extends SheetObject {
 	}
 
 	/** prototype 快取 */
-	private _prototypeCache: P[] = [];
+	private _cache: P[] = [];
 
-	/** entry 快取 */
-	private _cache: T[] = [];
+	/** 所有的 entry */
+	private _entries: T[] = [];
 
 	/**
 	 * 當前選用的 entry。
@@ -67,7 +69,7 @@ abstract class Store<P, T extends SheetObject> extends SheetObject {
 	@shrewd public get entry(): T | null {
 		let e = this._prototypes, i = this.index;
 		if(e.length == 0) return null;
-		return this._cache[i] = this._cache[i] || this.builder(e[i]);
+		return this._entries[i] = this._entries[i] || this.builder(e[i]);
 	}
 
 	/** 切換至某個 entry */
@@ -81,6 +83,14 @@ abstract class Store<P, T extends SheetObject> extends SheetObject {
 	/** 當前 `Store` 的大小 */
 	public get size(): number {
 		return this._prototypes.length;
+	}
+
+	public indexOf(entry: T): number {
+		return this._entries.indexOf(entry);
+	}
+
+	public get(index: number): T | undefined {
+		return this._entries[index];
 	}
 
 	/** 給 `Store` 的實作類別註冊 entry 切換之後要發生的事情 */

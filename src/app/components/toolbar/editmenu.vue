@@ -8,7 +8,7 @@
 		</dropdownitem>
 		<divider></divider>
 		<dropdownitem :disabled="!design" @click="selectAll">
-			<hotkey icon="far fa-object-group" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
+			<hotkey icon="fas fa-th" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
 		</dropdownitem>
 	</dropdown>
 </template>

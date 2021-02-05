@@ -9,6 +9,10 @@
 				<i v-if="isMac" class="bp-command"></i>
 				<span v-else>Ctrl+</span>
 			</template>
+			<template v-if="shift">
+				<i v-if="isMac" class="bp-shift"></i>
+				<span v-else>Shift+</span>
+			</template>
 			{{hk}}
 		</div>
 	</div>
@@ -24,6 +28,7 @@
 		@Prop(String) public icon: string;
 		@Prop(String) public hk: string;
 		@Prop(Boolean) public ctrl: boolean;
+		@Prop(Boolean) public shift: boolean;
 
 		private get isMac() { return isMac; }
 	}

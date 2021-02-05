@@ -13,6 +13,10 @@ interface JConfiguration {
 
 @shrewd class Configuration extends Store<JPattern, Pattern> implements ISerializable<JConfiguration> {
 
+	public get tag() {
+		return "cf" + this.repository.stretch.signature + "-" + this.repository.indexOf(this);
+	}
+
 	public readonly repository: Repository;
 
 	/** 依照 Overlap 的 id（負數）來檢索，得出它對應於第幾個 Partition 的第幾個 Overlap */

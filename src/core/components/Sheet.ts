@@ -38,25 +38,25 @@ interface JSheet {
 		return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
 	}
 
-	@action({
-		validator(this: Sheet, v: number) {
-			let ok = v >= 8 && v >= this._independentRect.width;
+	@shrewd private _width: number;
+	public get width() { return this._width; }
+	public set width(v) {
+		if(v >= 8 && v >= this._independentRect.width) {
 			let d = v - this._independentRect.right;
-			if(ok && d < 0) for(let i of this.independents) i.location.x += d;
-			return ok;
+			if(d < 0) for(let i of this.independents) i.location.x += d;
+			this._width = v;
 		}
-	})
-	public width: number;
+	}
 
-	@action({
-		validator(this: Sheet, v: number) {
-			let ok = v >= 8 && v >= this._independentRect.height;
+	@shrewd private _height: number;
+	public get height() { return this._height; }
+	public set height(v) {
+		if(v >= 8 && v >= this._independentRect.height) {
 			let d = v - this._independentRect.top;
-			if(ok && d < 0) for(let i of this.independents) i.location.y += d;
-			return ok;
+			if(d < 0) for(let i of this.independents) i.location.y += d;
+			this._height = v;
 		}
-	})
-	public height: number;
+	}
 
 	@shrewd({
 		validator(this: Sheet, v: number) {

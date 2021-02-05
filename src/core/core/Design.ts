@@ -29,6 +29,9 @@ interface IDesignObject {
 
 	public readonly junctions: DoubleMapping<Flap, Junction>;
 
+	/** 管理 Design 的編輯歷史 */
+	public readonly history: HistoryManager;
+
 	constructor(studio: BPStudio, profile: RecursivePartial<JDesign>) {
 		super(studio, profile);
 
@@ -54,6 +57,8 @@ interface IDesignObject {
 			() => this.flaps.values(),
 			(f1, f2) => new Junction(this.LayoutSheet, f1, f2)
 		);
+
+		this.history = new HistoryManager(this, this.data.history);
 	}
 
 	@shrewd public get sheet(): Sheet {
@@ -67,24 +72,27 @@ interface IDesignObject {
 		return (this.mountTarget as BPStudio).$display;
 	}
 
-	public toJSON(): JDesign {
+	public toJSON(history: boolean = false): JDesign {
 		let result!: JDesign;
-		this.tree.withJID(() => result = {
-			title: this.title,
-			description: this.description,
-			fullscreen: this.fullscreen,
-			version: Migration.current,
-			mode: this.mode,
-			layout: {
-				sheet: this.LayoutSheet.toJSON(),
-				flaps: this.flaps.toJSON(),
-				stretches: this.stretches.toJSON()
-			},
-			tree: {
-				sheet: this.TreeSheet.toJSON(),
-				nodes: this.vertices.toJSON(),
-				edges: this.sortJEdge()
-			}
+		this.tree.withJID(() => {
+			result = {
+				title: this.title,
+				description: this.description,
+				fullscreen: this.fullscreen,
+				version: Migration.current,
+				mode: this.mode,
+				layout: {
+					sheet: this.LayoutSheet.toJSON(),
+					flaps: this.flaps.toJSON(),
+					stretches: this.stretches.toJSON()
+				},
+				tree: {
+					sheet: this.TreeSheet.toJSON(),
+					nodes: this.vertices.toJSON(),
+					edges: this.sortJEdge()
+				}
+			};
+			if(history) result.history = this.history.toJSON();
 		});
 		return result;
 	}
@@ -170,11 +178,13 @@ interface IDesignObject {
 		if(tag == "design") return this;
 		if(tag == "layout") return this.LayoutSheet;
 		if(tag == "tree") return this.TreeSheet;
-		let m = tag.match(/^(.)(\d+)(?:-(\d+))?$/);
+		let m = tag.match(/^(\w+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
 		if(m) {
-			let init = m[1], id = Number(m[2]), to = Number(m[3]);
+			let init = m[1], id = m[2], to = Number(m[3]);
+			if(init == "rp") return this.stretches.get(id)!.repository || undefined;
+			if(init == "cf") return this.stretches.get(id)!.repository?.get(to);
 			let t = this.tree;
-			let n = t.node.get(id)!;
+			let n = t.node.get(Number(id))!;
 			if(init == "n") return n;
 			if(init == "f") return this.flaps.get(n);
 			if(init == "e") return t.edge.get(n, t.node.get(to)!);

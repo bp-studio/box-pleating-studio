@@ -225,7 +225,9 @@
 				// 避免在存檔的瞬間製造出 glitch
 				bp.onUpdate = () => {
 					let session = {
-						jsons: this.designs.map(id => bp.designMap.get(id)!),
+						jsons: this.designs.map(
+							id => bp.designMap.get(id)!.toJSON(true)
+						),
 						open: bp.design ? this.designs.indexOf(bp.design.id) : -1
 					};
 					localStorage.setItem("session", JSON.stringify(session));

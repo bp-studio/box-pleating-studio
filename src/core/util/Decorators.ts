@@ -25,20 +25,19 @@ type ActionOption = Omit<Shrewd.IDecoratorOptions<any>, "renderer">;
  * 跟 `@shrewd` 的效果一樣，不過在值即將發生變更的時候會觸發動作。
  */
 function action(option: ActionOption): PropertyDecorator;
-function action(target: any, name: string): void;
-function action(target: any, name?: string): void | PropertyDecorator {
-	if(name === undefined) return (obj, name: string) => actionInner(obj, name, target);
-	else actionInner(target, name, {});
+function action(target: ITagObject, name: string): void;
+function action(...p: [ActionOption] | [ITagObject, string]): void | PropertyDecorator {
+	if(p.length == 1) return (obj, name: string) => actionInner(obj, name, p[0]);
+	else actionInner(p[0], p[1], {});
 }
 function actionInner(target: any, name: string, option: ActionOption) {
 	shrewd({
-		validator(this: IDesignObject, v: any) {
+		validator(this: ITagObject, v: any) {
 			let record = actionMap.get(this);
 			if(!record) actionMap.set(this, record = {});
 			let result = option.validator?.apply(this, [v]) ?? true;
 			if(result) {
 				if(name in record && record[name] != v) {
-					if(!('design' in this)) debugger;
 					this.design.history.fieldChange(this, name, record[name], v);
 				}
 				record[name] = v;

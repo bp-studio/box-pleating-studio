@@ -11,9 +11,9 @@ interface JHistory {
 	steps: JStep[];
 }
 
-@shrewd class HistoryManager {
+@shrewd class HistoryManager implements ISerializable<JHistory> {
 
-	private readonly design: DesignBase;
+	private readonly design: Design;
 	@shrewd private readonly steps: Step[] = [];
 	@shrewd private index: number = 0;
 
@@ -22,8 +22,16 @@ interface JHistory {
 
 	private _modified: boolean = false;
 
-	constructor(design: DesignBase) {
+	constructor(design: Design, json?: JHistory) {
 		this.design = design;
+	}
+
+	public toJSON(): JHistory {
+		return {
+			index: this.index,
+			modified: this.modified,
+			steps: this.steps
+		}
 	}
 
 	public get modified(): boolean {
@@ -52,9 +60,15 @@ interface JHistory {
 		return this.steps[this.index - 1];
 	}
 
-	public fieldChange(target: any, prop: string, oldValue: any, newValue: any) {
+	public fieldChange(target: ITagObject, prop: string, oldValue: any, newValue: any) {
 		if(this._moving) return;
-		let c = new FieldCommand(target, prop, newValue), s = this.lastStep;
+		let c = new FieldCommand(this.design, {
+			tag: target.tag,
+			prop,
+			old: oldValue,
+			new: newValue
+		});
+		let s = this.lastStep;
 		if(!s || !c.tryAddTo(s)) this.addStep(new Step(c));
 		this._modified = true;
 	}
