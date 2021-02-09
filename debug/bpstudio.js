@@ -1780,6 +1780,7 @@ let Tree = class Tree extends Disposable {
     }
     get jid() { return this._jid; }
     dist(n1, n2) {
+        this.disposeEvent();
         if (n1 == n2)
             return 0;
         return this.pair.get(n1, n2).dist;

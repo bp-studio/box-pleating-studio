@@ -20,7 +20,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "817"
+			app_version: "821"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -122,7 +122,23 @@
 				}
 				if(errorOB) errorOB.disconnect();
 			};
+
+			// Some in-app browsers might attempt to call the following functions,
+			// and we shall ignore such errors.
+			var ignoreError = [
+				"WeixinJSBridge",
+				"_WXJS",
+				"__firefox__",
+				"$UCBrowser",
+				"_WebViewJavascriptBridge",
+				"hackLocationSuccess"
+			];
+
 			window.onerror = function(a, b, c, d, e) {
+				if(!b&&!c&&!d) return; // error is caused by injection; ignore.
+				for(var i = 0; i < ignoreError.length; i++) {
+					if(a.match(ignoreError[i])) return;
+				}
 				wErr = [
 					a.replace(/^.+: (.+)$/, "$1"),							// error message
 					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
@@ -222,6 +238,7 @@
 		<div id="divToolbar" class="btn-toolbar p-2">
 			<div class="btn-group me-2">
 				<button type="button" disabled class="btn btn-primary"><i class="bp-file-alt"></i></button>
+				<button type="button" disabled class="btn btn-primary"><i class="bp-pencil-ruler"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="bp-tasks"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="bp-tools"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="bp-question-circle"></i></button>

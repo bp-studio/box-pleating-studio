@@ -154,7 +154,7 @@ Vue.component('app', { render() { with (this) {
 
 Vue.component('core', { render() { with (this) {
         return _c('div', [_c('confirm', { ref: "confirm" }), _v(" "), _c('alert', { ref: "alert" }), _v(" "), (design && design.patternNotFound) ? _c('note') : _e(), _v(" "), _c('div', { ref: "mdlLanguage", staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content" }, [_c('div', { staticClass: "modal-body" }, [_c('div', { staticClass: "row" }, _l((languages), function (l) { return _c('div', { key: l, staticClass: "col text-center" }, [_c('button', { staticClass: "w-100 btn btn-light", attrs: { "data-bs-dismiss": "modal" }, on: { "click": function ($event) { i18n.locale = l; } } }, [_c('img', { attrs: { "src": 'assets/flags/' + $t('flag', l) + '.png', "alt": $t('flag', l), "width": "64", "height": "64" } }), _v(" "), _c('br'), _v("\n\t\t\t\t\t\t\t\t" + _s($t('name', l)) + "\n\t\t\t\t\t\t\t")])]); }), 0)])])])])], 1);
-    } }, data() { return { designs: [], tabHistory: [], autoSave: true, showDPad: true, updated: false, isTouch: undefined, libReady: undefined, initialized: false, id: new Date().getTime(), heartbeat: null, languages: [], mdlLanguage: undefined, loader: undefined, dropdown: null }; }, watch: { 'i18n.locale'() { this.onLocaleChanged(); } }, computed: { i18n() { return i18n; }, copyright() {
+    } }, data() { return { designs: [], tabHistory: [], autoSave: true, showDPad: true, updated: false, isTouch: undefined, libReady: undefined, initReady: undefined, initialized: false, id: new Date().getTime(), languages: [], mdlLanguage: undefined, loader: undefined, dropdown: null }; }, watch: { 'i18n.locale'() { this.onLocaleChanged(); } }, computed: { i18n() { return i18n; }, copyright() {
             let y = new Date().getFullYear();
             let end = y > 2020 ? "-" + y : "";
             return this.$t('welcome.copyright', [end]);
@@ -411,6 +411,12 @@ Vue.component('core', { render() { with (this) {
         this.libReady = new Promise(resolve => {
             // DOMContentLoaded 事件會在所有延遲函式庫載入完成之後觸發
             window.addEventListener('DOMContentLoaded', () => resolve());
+        });
+        this.initReady = new Promise(resolve => {
+            // 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
+            setTimeout(() => resolve(), 1000);
+            // 程式剛載入的時候 Spinner 動畫的啟動用來當作載入的觸發依據
+            document.addEventListener("animationstart", () => resolve(), { once: true });
         });
     }, mounted() {
         this.libReady.then(() => this.mdlLanguage = new bootstrap.Modal(this.$refs.mdlLanguage));
@@ -754,11 +760,8 @@ Vue.component('spinner', { render() { with (this) {
              */
             return new Promise(resolve => {
                 // 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
-                let to = setTimeout(() => resolve(), 1000);
-                this.$el.addEventListener("animationstart", () => {
-                    clearTimeout(to);
-                    resolve();
-                }, { once: true });
+                setTimeout(() => resolve(), 1000);
+                this.$el.addEventListener("animationstart", () => resolve(), { once: true });
             });
         }, hide() {
             this.loading = false;
@@ -1053,6 +1056,7 @@ core.$mount('#core');
 var app = new Vue.options.components['app']({ i18n });
 app.$mount('#app');
 
+// 避免 core 被某些第三方套件覆寫
 Object.defineProperty(window, "core", {
 	get: () => core,
 	set: v => { }
@@ -1060,11 +1064,13 @@ Object.defineProperty(window, "core", {
 
 var bp;
 window.addEventListener("DOMContentLoaded", () => {
-	bp = new BPStudio("#divWorkspace");
-	bp.system.onLongPress = () => app.showPanel = true;
-	bp.system.onDrag = () => app.showPanel = false;
-
 	// 製造執行緒的斷點，讓 Android PWA 偵測到以結束 splash screen
-	setTimeout(() => core.init(), 10);
+	setTimeout(async () => {
+		await core.initReady;
+		bp = new BPStudio("#divWorkspace");
+		bp.system.onLongPress = () => app.showPanel = true;
+		bp.system.onDrag = () => app.showPanel = false;
+		core.init();
+	}, 10);
 });
  }

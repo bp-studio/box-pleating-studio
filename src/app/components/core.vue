@@ -54,12 +54,12 @@
 		public isTouch: boolean;
 
 		public libReady: Promise<void>;
+		public initReady: Promise<void>;
 		public initialized: boolean = false;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
 		private id: number = new Date().getTime();
 
-		private heartbeat: number | null = null;
 		private languages: string[] = [];
 		private mdlLanguage: Bootstrap.Modal;
 
@@ -74,6 +74,12 @@
 			this.libReady = new Promise<void>(resolve => {
 				// DOMContentLoaded 事件會在所有延遲函式庫載入完成之後觸發
 				window.addEventListener('DOMContentLoaded', () => resolve());
+			});
+			this.initReady = new Promise<void>(resolve => {
+				// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
+				setTimeout(() => resolve(), 1000);
+				// 程式剛載入的時候 Spinner 動畫的啟動用來當作載入的觸發依據
+				document.addEventListener("animationstart", () => resolve(), { once: true })
 			});
 		}
 

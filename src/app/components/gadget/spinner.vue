@@ -29,11 +29,8 @@
 			 */
 			return new Promise<void>(resolve => {
 				// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
-				let to = setTimeout(() => resolve(), 1000);
-				this.$el.addEventListener("animationstart", () => {
-					clearTimeout(to);
-					resolve();
-				}, { once: true });
+				setTimeout(() => resolve(), 1000);
+				this.$el.addEventListener("animationstart", () => resolve(), { once: true });
 			});
 		}
 

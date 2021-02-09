@@ -10,6 +10,7 @@ core.$mount('#core');
 var app = new Vue.options.components['app']({ i18n });
 app.$mount('#app');
 
+// 避免 core 被某些第三方套件覆寫
 Object.defineProperty(window, "core", {
 	get: () => core,
 	set: v => { }
@@ -17,10 +18,12 @@ Object.defineProperty(window, "core", {
 
 var bp;
 window.addEventListener("DOMContentLoaded", () => {
-	bp = new BPStudio("#divWorkspace");
-	bp.system.onLongPress = () => app.showPanel = true;
-	bp.system.onDrag = () => app.showPanel = false;
-
 	// 製造執行緒的斷點，讓 Android PWA 偵測到以結束 splash screen
-	setTimeout(() => core.init(), 10);
+	setTimeout(async () => {
+		await core.initReady;
+		bp = new BPStudio("#divWorkspace");
+		bp.system.onLongPress = () => app.showPanel = true;
+		bp.system.onDrag = () => app.showPanel = false;
+		core.init();
+	}, 10);
 });
