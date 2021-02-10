@@ -6,9 +6,7 @@ Shrewd.option.autoCommit = false;
 type Design = any;
 type JEdge = any;
 type IDesignObject = any;
+type ITagObject = any;
+type Action = () => void;
 
-function action(option: any): PropertyDecorator;
-function action(target: any, name: string): void;
-function action(target: any, name?: string): void | PropertyDecorator {
-	if(name === undefined) return (obj, name: string) => {};
-}
+const action = shrewd;

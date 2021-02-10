@@ -74,20 +74,23 @@ namespace PathUtil {
 	}
 
 	/**
-	 * 實作射線演算法來判斷一個點是否完全落在一個多邊形裡面（預設是不計邊緣）
+	 * 判斷一個點是否完全落在一個多邊形裡面（預設是不計邊緣）
 	 *
-	 * 參考 W. Randolph Franklin 的 PNPOLY 演算法寫成。
+	 * 參考 W. Randolph Franklin 的 PNPOLY 演算法寫成：
+	 * https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
 	 */
 	function pointInPolygon(p: Point, path: Path, boundary = false): boolean {
 		// 退化的情況
 		if(path.length == 2) return boundary && new Line(path[0], path[1]).contains(p, true);
 
+		// 先進行數值化以加速演算；產生的誤差在這裡的應用上不會是個問題
 		let dx: number[] = [], dy: number[] = [];
 		for(let v of path) {
 			dx.push(v._x.sub(p._x).value);
 			dy.push(v._y.sub(p._y).value);
 		}
 
+		// PNPOLY 演算法的主體，基本上就是射線演算法的高速實作
 		let n = false;
 		for(let i = 0, j = path.length - 1; i < path.length; j = i++) {
 			let [xi, yi] = [dx[i], dy[i]];

@@ -11,29 +11,26 @@ var __decorate = this && this.__decorate || function (decorators, target, key, d
 };
 const {shrewd} = Shrewd;
 Shrewd.option.autoCommit = false;
-function action(target, name) {
-    if (name === undefined)
-        return (obj, name) => {
-        };
-}
+const action = shrewd;
 let Disposable = class Disposable {
     constructor(parent) {
         this._disposed = false;
         this._disposeWith = parent;
     }
-    _disposeEvent() {
-        if (this.disposed) {
+    disposeEvent() {
+        if (this._disposed) {
             Shrewd.terminate(this);
             this.onDispose();
         }
     }
     get shouldDispose() {
-        return this._disposeWith ? this._disposeWith.disposed : false;
+        return this._disposeWith ? this._disposeWith._disposed : false;
     }
     dispose() {
         this._disposed = true;
     }
     onDispose() {
+        delete this._disposeWith;
     }
     get disposed() {
         return this._disposed;
@@ -44,17 +41,16 @@ __decorate([shrewd({
             return v || this.shouldDispose;
         }
     })], Disposable.prototype, '_disposed', void 0);
-__decorate([shrewd], Disposable.prototype, '_disposeEvent', null);
-__decorate([shrewd], Disposable.prototype, 'disposed', null);
+__decorate([shrewd], Disposable.prototype, 'disposeEvent', null);
 Disposable = __decorate([shrewd], Disposable);
 let Tree = class Tree extends Disposable {
     constructor(design, edges) {
         super(design);
         this.node = new Map();
         this.edge = new DoubleMap();
-        this.path = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePath(n1, n2));
         this.nextId = 0;
-        this.jidMap = new Map();
+        this._jid = false;
+        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
         this.design = design;
         while (edges === null || edges === void 0 ? void 0 : edges.length) {
             let remain = [], ok = false;
@@ -72,7 +68,7 @@ let Tree = class Tree extends Disposable {
     }
     onDispose() {
         Shrewd.terminate(this.edge);
-        this.path.dispose();
+        this.pair.dispose();
     }
     get leaf() {
         var set = new Set();
@@ -81,14 +77,22 @@ let Tree = class Tree extends Disposable {
                 set.add(node);
         return set;
     }
-    generateJID() {
+    withJID(action) {
         let arr = Array.from(this.node.values()).sort((a, b) => a.id - b.id), i = 0;
         for (let n of arr)
-            this.jidMap.set(n.id, n.jid = i++);
+            TreeNode.setJID(n, i++);
+        this._jid = true;
+        action();
+        this._jid = false;
+    }
+    get jid() {
+        return this._jid;
     }
     dist(n1, n2) {
-        let path = this.path.get(n1, n2);
-        return path ? path.length : NaN;
+        this.disposeEvent();
+        if (n1 == n2)
+            return 0;
+        return this.pair.get(n1, n2).dist;
     }
     getOrAddNode(n) {
         let N;
@@ -104,6 +108,13 @@ let Tree = class Tree extends Disposable {
     split(e) {
         let N = this.getOrAddNode(this.nextId);
         let {n1, n2} = e;
+        if (n1.parent == n2)
+            [n1, n2] = [
+                n2,
+                n1
+            ];
+        N.parent = n1;
+        n2.parent = N;
         this.edge.delete(n1, n2);
         this.edge.set(N, n1, new TreeEdge(N, n1, Math.ceil(e.length / 2)));
         this.edge.set(N, n2, new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
@@ -113,14 +124,28 @@ let Tree = class Tree extends Disposable {
     deleteAndMerge(e) {
         let N = this.getOrAddNode(this.nextId);
         let {n1, n2, a1, a2} = e;
+        if (n1.parent == n2) {
+            [n1, n2] = [
+                n2,
+                n1
+            ];
+            [a1, a2] = [
+                a2,
+                a1
+            ];
+        }
+        N.parent = n1.parent;
         this.edge.delete(n1, n2);
         for (let edge of a1) {
             let n = edge.n(n1);
+            if (n != N.parent)
+                n.parent = N;
             this.edge.delete(n, n1);
             this.edge.set(N, n, new TreeEdge(N, n, edge.length));
         }
         for (let edge of a2) {
             let n = edge.n(n2);
+            n.parent = N;
             this.edge.delete(n, n2);
             this.edge.set(N, n, new TreeEdge(N, n, edge.length));
         }
@@ -135,9 +160,15 @@ let Tree = class Tree extends Disposable {
             return;
         }
         let e1 = edges[0], e2 = edges[1];
-        let N1 = e1.n(n), N2 = e2.n(n);
-        let edge = new TreeEdge(N1, N2, e1.length + e2.length);
-        this.edge.set(N1, N2, edge);
+        let n1 = e1.n(n), n2 = e2.n(n);
+        if (n.parent == n2)
+            [n1, n2] = [
+                n2,
+                n1
+            ];
+        n2.parent = n1;
+        let edge = new TreeEdge(n1, n2, e1.length + e2.length);
+        this.edge.set(n1, n2, edge);
         n.dispose(true);
         return edge;
     }
@@ -160,6 +191,14 @@ let Tree = class Tree extends Disposable {
             console.warn(`Adding edge (${ n1 },${ n2 }) will cause circuit.`);
             return false;
         }
+        if (has1)
+            N2.parent = N1;
+        else if (has2)
+            N1.parent = N2;
+        else if (n1 < n2)
+            N2.parent = N1;
+        else
+            N1.parent = N2;
         let edge = new TreeEdge(N1, N2, length);
         this.edge.set(N1, N2, edge);
         return true;
@@ -200,6 +239,9 @@ let TreeEdge = class TreeEdge extends Disposable {
         this._n1 = n1;
         this._n2 = n2;
         this.length = length;
+    }
+    get tag() {
+        return 'e' + this._n1.id + '-' + this._n2.id;
     }
     get design() {
         return this.n1.design;
@@ -296,7 +338,7 @@ __decorate([shrewd], TreeEdge.prototype, 'p1', null);
 __decorate([shrewd], TreeEdge.prototype, 'p2', null);
 __decorate([shrewd], TreeEdge.prototype, 'wrapSide', null);
 TreeEdge = __decorate([shrewd], TreeEdge);
-let TreePath = class TreePath extends Disposable {
+let TreePair = class TreePair extends Disposable {
     constructor(n1, n2) {
         super();
         this._n1 = n1;
@@ -305,36 +347,66 @@ let TreePath = class TreePath extends Disposable {
     get shouldDispose() {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
     }
-    get edges() {
-        let result = [];
-        let now = this._n1;
-        let ok = true;
-        while (now != this._n2 && ok) {
-            ok = false;
-            for (let e of now.edges) {
-                if (e.g(now).includes(this._n2)) {
-                    ok = true;
-                    result.push(e);
-                    now = e.n(now);
-                    break;
-                }
-            }
-        }
-        return result;
+    get lca() {
+        this.disposeEvent();
+        let [n1, n2] = [
+            this._n1,
+            this._n2
+        ];
+        if (n1.depth < n2.depth)
+            [n1, n2] = [
+                n2,
+                n1
+            ];
+        if (n2.depth == 0)
+            return n2;
+        while (n1.depth > n2.depth)
+            n1 = n1.parent;
+        if (n1 == n2)
+            return n1;
+        let a1 = n1.parent, a2 = n2.parent;
+        if (a1 == a2)
+            return a1;
+        return n1.tree.pair.get(a1, a2).lca;
     }
-    get length() {
-        return this.edges.reduce((l, e) => l + e.length, 0);
+    get dist() {
+        return this._n1.dist + this._n2.dist - 2 * this.lca.dist;
     }
 };
-__decorate([shrewd], TreePath.prototype, 'edges', null);
-__decorate([shrewd], TreePath.prototype, 'length', null);
-TreePath = __decorate([shrewd], TreePath);
+__decorate([shrewd], TreePair.prototype, 'lca', null);
+TreePair = __decorate([shrewd], TreePair);
 let TreeNode = class TreeNode extends Disposable {
     constructor(tree, id) {
         super(tree);
         this.name = '';
+        this.parent = null;
         this.tree = tree;
-        this.id = id;
+        this._id = id;
+    }
+    static setJID(n, id) {
+        n._jid = id;
+    }
+    get tag() {
+        return 'n' + this.id;
+    }
+    get id() {
+        return this.tree.jid ? this._jid : this._id;
+    }
+    get parentEdge() {
+        var _a;
+        if (!this.parent)
+            return null;
+        return (_a = this.tree.edge.get(this, this.parent)) !== null && _a !== void 0 ? _a : null;
+    }
+    get dist() {
+        if (!this.parentEdge)
+            return 0;
+        return this.parentEdge.length + this.parent.dist;
+    }
+    get depth() {
+        if (!this.parent)
+            return 0;
+        return this.parent.depth + 1;
     }
     get shouldDispose() {
         return super.shouldDispose || this.tree.disposed;
@@ -355,23 +427,33 @@ let TreeNode = class TreeNode extends Disposable {
         return this.tree.design;
     }
     get edges() {
+        this.disposeEvent();
         let e = this.tree.edge.get(this);
         return e ? Array.from(e.values()) : [];
     }
     get degree() {
         return this.edges.length;
     }
-    get firstEdge() {
-        return this.edges[0];
+    get leafEdge() {
+        return this.degree == 1 ? this.edges[0] : null;
     }
     get radius() {
-        return this.degree == 1 ? this.edges[0].length : NaN;
+        var _a, _b;
+        return (_b = (_a = this.leafEdge) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : NaN;
     }
 };
 __decorate([action], TreeNode.prototype, 'name', void 0);
+__decorate([shrewd({
+        renderer(n) {
+            return n && n.disposed ? null : n;
+        }
+    })], TreeNode.prototype, 'parent', void 0);
+__decorate([shrewd], TreeNode.prototype, 'parentEdge', null);
+__decorate([shrewd], TreeNode.prototype, 'dist', null);
+__decorate([shrewd], TreeNode.prototype, 'depth', null);
 __decorate([shrewd], TreeNode.prototype, 'edges', null);
 __decorate([shrewd], TreeNode.prototype, 'degree', null);
-__decorate([shrewd], TreeNode.prototype, 'firstEdge', null);
+__decorate([shrewd], TreeNode.prototype, 'leafEdge', null);
 __decorate([shrewd], TreeNode.prototype, 'radius', null);
 TreeNode = __decorate([shrewd], TreeNode);
 class BaseMapping {
@@ -381,6 +463,11 @@ class BaseMapping {
         this.ctor = ctor;
         this.dtor = dtor;
         this._map = new Map();
+    }
+    dispose() {
+        Shrewd.terminate(this);
+        this._map.clear();
+        delete this._map;
     }
     render() {
         for (let [key, value] of this._map) {
@@ -540,8 +627,8 @@ let DoubleMapping = class DoubleMapping {
         this._map = new DoubleMap();
     }
     dispose() {
-        Shrewd.terminate(this._map);
         Shrewd.terminate(this);
+        Shrewd.terminate(this._map);
     }
     has(...args) {
         return this._map.has.apply(this._map, args);
@@ -679,12 +766,13 @@ function TreeBasic() {
     t.addEdge(0, 2, 1);
     Shrewd.commit();
     let A = t.node.get(1), B = t.node.get(2), a = t.node.get(0);
+    let out;
     console.assert(t.node.size == 3 && A != undefined && B != undefined && a != undefined, t.node);
     console.assert(t.leaf.size == 2 && t.leaf.has(A) && t.leaf.has(B), t.leaf);
     console.assert(a.degree == 2, a);
     console.assert(t.edge.get(a, B).length == 1, a);
     console.assert(t.edge.size == 2, t);
-    console.assert(t.dist(A, B) == 3, t.path.get(A, B));
+    console.assert((out = t.dist(A, B)) == 3, out);
     t.addEdge(0, 2, 4);
     t.addEdge(0, 3, 3);
     let C = t.node.get(3);
@@ -693,7 +781,7 @@ function TreeBasic() {
     console.assert(a.degree == 3, '度數正確', a.degree);
     console.assert(t.edge.get(a, B).length == 4, '應該要更新為新的長度');
     console.assert(t.edge.size == 3);
-    console.assert(t.dist(A, B) == 6, 'AB 長度為 6', t.path.get(A, B));
+    console.assert((out = t.dist(A, B)) == 6, 'AB 長度為 6', out);
     UnitTest.consoleHack = true;
     t.addEdge(1, 2, 5);
     t.addEdge(4, 5, 1);
@@ -703,7 +791,7 @@ function TreeBasic() {
     console.assert(UnitTest.warnings[0] == 'Adding edge (1,2) will cause circuit.');
     console.assert(UnitTest.warnings[1] == 'Adding edge (4,5) disconnects the graph.');
     console.assert(UnitTest.warnings[2] == 'Node [0] is not a leaf.');
-    let P = t.path.get(A, C);
+    let P = t.pair.get(A, C);
     let E = t.edge.get(C, a);
     console.assert(!P.disposed && !E.disposed && !C.disposed);
     C.dispose();
