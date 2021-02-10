@@ -5942,12 +5942,12 @@ class Line {
         if (t.length == 1)
             return this.intersection(t[0].p1, t[0].p2.sub(t[0].p1));
         let [p, v, isRay] = t;
-        var v1 = this.p2.sub(this.p1);
-        var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+        let v1 = this.p2.sub(this.p1);
+        let m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
         if (m == null)
             return null;
-        var r = m.multiply(new Point(p.sub(this.p1)));
-        var a = r._x, b = r._y.neg;
+        let r = m.multiply(new Point(p.sub(this.p1)));
+        let a = r._x, b = r._y.neg;
         if (a.lt(0) || a.gt(1))
             return null;
         if (isRay && b.lt(0))
@@ -6174,45 +6174,43 @@ var PathUtil;
     }
     PathUtil.shift = shift;
     function polygonIntersect(p1, p2) {
-        let l1 = pathToLines(p1), l2 = pathToLines(p2);
-        return p1.some(p => pointInPolygon(p, l2)) || p2.some(p => pointInPolygon(p, l1));
+        return p1.some(p => pointInPolygon(p, p2)) || p2.some(p => pointInPolygon(p, p1));
     }
     PathUtil.polygonIntersect = polygonIntersect;
     function lineInsidePath(l, path) {
-        let lines = pathToLines(path);
-        return pointInPolygon(l.p1, lines, true) && pointInPolygon(l.p2, lines, true);
+        return pointInPolygon(l.p1, path, true) && pointInPolygon(l.p2, path, true);
     }
     PathUtil.lineInsidePath = lineInsidePath;
     function pointInsidePath(p, path) {
-        return pointInPolygon(p, pathToLines(path));
+        return pointInPolygon(p, path);
     }
     PathUtil.pointInsidePath = pointInsidePath;
-    function pathToLines(p) {
-        let result = [];
-        for (let i = 0; i < p.length; i++) {
-            let [p1, p2] = [p[i], p[(i + 1) % p.length]];
-            if (!p1.eq(p2))
-                result.push(new Line(p1, p2));
+    function pointInPolygon(p, path, boundary = false) {
+        if (path.length == 2)
+            return boundary && new Line(path[0], path[1]).contains(p, true);
+        let dx = [], dy = [];
+        for (let v of path) {
+            dx.push(v._x.sub(p._x).value);
+            dy.push(v._y.sub(p._y).value);
         }
-        return result;
-    }
-    function pointInPolygon(p, lines, boundary = false) {
-        if (lines.length <= 2)
-            return boundary && lines[0].contains(p, true);
-        let n = 0, v = new Vector(1, 0);
-        for (let l of lines) {
-            if (l.p1.eq(p) || l.p2.eq(p))
-                return boundary;
-            let int = l.intersection(p, v, true);
-            if (!int)
+        let n = false;
+        for (let i = 0, j = path.length - 1; i < path.length; j = i++) {
+            let [xi, yi] = [dx[i], dy[i]];
+            let [xj, yj] = [dx[j], dy[j]];
+            let mx = xi >= 0, nx = xj >= 0;
+            let my = yi >= 0, ny = yj >= 0;
+            if (!((my || ny) && (mx || nx)) || (mx && nx))
                 continue;
-            if (int.eq(p))
-                return boundary;
-            let e1 = int.eq(l.p1), e2 = int.eq(l.p2);
-            if (!e1 && !e2 || e1 && l.p2._y.lt(p._y) || e2 && l.p1._y.lt(p._y))
-                n++;
+            if (!(my && ny && (mx || nx) && !(mx && nx))) {
+                let test = (yi * xj - xi * yj) / (xj - xi);
+                if (test < 0)
+                    continue;
+                if (test == 0)
+                    return boundary;
+            }
+            n = !n;
         }
-        return n % 2 == 1;
+        return n;
     }
     function rotate(p, j) {
         p.push(...p.splice(0, j));
@@ -6254,7 +6252,7 @@ class Rectangle {
 var Trace;
 (function (Trace) {
     function create(lines, startPt, endPt, sv, inflections, end, start) {
-        let history = [];
+        let full = [];
         let trace = [];
         let x;
         let v = sv;
@@ -6298,11 +6296,14 @@ var Trace;
                     break;
                 }
                 let sg = pt.toString();
-                if (record.has(sg))
-                    processLoop(history, pt, candidates);
+                if (record.has(sg)) {
+                    if (!pt.eq(full[full.length - 1]))
+                        processLoop(full, pt, candidates);
+                }
                 else
                     record.add(sg);
-                history.push(pt);
+                if (!full.length || !full[full.length - 1].eq(pt))
+                    full.push(pt);
                 if (!start) {
                     if (!trace.length || !trace[trace.length - 1].eq(pt))
                         trace.push(pt);
@@ -6323,8 +6324,6 @@ var Trace;
         do {
             path.push(trace[i]);
         } while (!trace[i--].eq(pt));
-        if (path.length <= 2)
-            return;
         for (let l of candidates)
             if (PathUtil.lineInsidePath(l, path))
                 candidates.delete(l);

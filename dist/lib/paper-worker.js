@@ -1,1 +1,1 @@
-importScripts("paper-core.min.js"),paper.install(this),paper.setup([128,128]),project.view.autoUpdate=!1,onmessage=function(t){if(t.ports[0]){let[e,p]=t.data,r=project.importJSON(e),o=project.importJSON(p),s=r.intersect(o),a=[s.exportJSON(),s.area];t.ports[0].postMessage(a)}};
+importScripts("paper-core.min.js"),function(){let e=new paper.PaperScope;e.setup([128,128]);let t=e.project;t.view.autoUpdate=!1,onmessage=function(e){if(e.ports[0]){let[p,o]=e.data,r=t.importJSON(p),a=t.importJSON(o),s=r.intersect(a),i=[s.exportJSON(),s.area];e.ports[0].postMessage(i)}}}();

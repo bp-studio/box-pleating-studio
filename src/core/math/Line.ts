@@ -43,12 +43,12 @@ class Line {
 	public intersection(...t: [Point, Vector, boolean?] | [Line]): Point | null {
 		if(t.length == 1) return this.intersection(t[0].p1, t[0].p2.sub(t[0].p1));
 		let [p, v, isRay] = t;
-		var v1 = this.p2.sub(this.p1);
-		var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+		let v1 = this.p2.sub(this.p1);
+		let m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
 		if(m == null) return null;
 
-		var r = m.multiply(new Point(p.sub(this.p1)));
-		var a = r._x, b = r._y.neg;
+		let r = m.multiply(new Point(p.sub(this.p1)));
+		let a = r._x, b = r._y.neg;
 		if(a.lt(0) || a.gt(1)) return null;
 		if(isRay && b.lt(0)) return null;
 

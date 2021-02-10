@@ -62,43 +62,47 @@ namespace PathUtil {
 	 * 因此這個演算法並未考慮兩個多邊形互相穿刺的情形，但是應該暫且堪用。
 	 */
 	export function polygonIntersect(p1: Path, p2: Path): boolean {
-		let l1 = pathToLines(p1), l2 = pathToLines(p2);
-		return p1.some(p => pointInPolygon(p, l2)) || p2.some(p => pointInPolygon(p, l1));
+		return p1.some(p => pointInPolygon(p, p2)) || p2.some(p => pointInPolygon(p, p1));
 	}
 
 	export function lineInsidePath(l: Line, path: Path) {
-		let lines = pathToLines(path);
-		return pointInPolygon(l.p1, lines, true) && pointInPolygon(l.p2, lines, true);
+		return pointInPolygon(l.p1, path, true) && pointInPolygon(l.p2, path, true);
 	}
 
 	export function pointInsidePath(p: Point, path: Path) {
-		return pointInPolygon(p, pathToLines(path));
+		return pointInPolygon(p, path);
 	}
 
-	function pathToLines(p: Path): Line[] {
-		let result: Line[] = [];
-		for(let i = 0; i < p.length; i++) {
-			let [p1, p2] = [p[i], p[(i + 1) % p.length]];
-			if(!p1.eq(p2)) result.push(new Line(p1, p2));
-		}
-		return result;
-	}
-
-	/** 實作射線演算法來判斷一個點是否完全落在一個多邊形裡面（預設是不計邊緣） */
-	function pointInPolygon(p: Point, lines: Line[], boundary = false): boolean {
+	/**
+	 * 實作射線演算法來判斷一個點是否完全落在一個多邊形裡面（預設是不計邊緣）
+	 *
+	 * 參考 W. Randolph Franklin 的 PNPOLY 演算法寫成。
+	 */
+	function pointInPolygon(p: Point, path: Path, boundary = false): boolean {
 		// 退化的情況
-		if(lines.length <= 2) return boundary && lines[0].contains(p, true);
+		if(path.length == 2) return boundary && new Line(path[0], path[1]).contains(p, true);
 
-		let n = 0, v = new Vector(1, 0);
-		for(let l of lines) {
-			if(l.p1.eq(p) || l.p2.eq(p)) return boundary;
-			let int = l.intersection(p, v, true);
-			if(!int) continue;
-			if(int.eq(p)) return boundary;
-			let e1 = int.eq(l.p1), e2 = int.eq(l.p2);
-			if(!e1 && !e2 || e1 && l.p2._y.lt(p._y) || e2 && l.p1._y.lt(p._y)) n++;
+		let dx: number[] = [], dy: number[] = [];
+		for(let v of path) {
+			dx.push(v._x.sub(p._x).value);
+			dy.push(v._y.sub(p._y).value);
 		}
-		return n % 2 == 1;
+
+		let n = false;
+		for(let i = 0, j = path.length - 1; i < path.length; j = i++) {
+			let [xi, yi] = [dx[i], dy[i]];
+			let [xj, yj] = [dx[j], dy[j]];
+			let mx = xi >= 0, nx = xj >= 0;
+			let my = yi >= 0, ny = yj >= 0;
+			if(!((my || ny) && (mx || nx)) || (mx && nx)) continue;
+			if(!(my && ny && (mx || nx) && !(mx && nx))) {
+				let test = (yi * xj - xi * yj) / (xj - xi);
+				if(test < 0) continue;
+				if(test == 0) return boundary;
+			}
+			n = !n;
+		}
+		return n;
 	}
 
 	/** 把一個路徑的前面 j 個點移到後面去，並且傳回路徑自身 */

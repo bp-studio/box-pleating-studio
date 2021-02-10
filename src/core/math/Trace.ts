@@ -29,7 +29,7 @@ namespace Trace {
 		inflections: Set<string>,
 		end: Line, start?: Line
 	): Path {
-		let history: Path = [];
+		let full: Path = [];
 		let trace: Path = [];
 		let x: JIntersection | null;
 		let v = sv;
@@ -76,9 +76,10 @@ namespace Trace {
 
 				// 偵測迴圈；迴圈是只有當有 meandering 的時候才會產生
 				let sg = pt.toString();
-				if(record.has(sg)) processLoop(history, pt, candidates);
-				else record.add(sg);
-				history.push(pt);
+				if(record.has(sg)) {
+					if(!pt.eq(full[full.length - 1])) processLoop(full, pt, candidates);
+				} else record.add(sg);
+				if(!full.length || !full[full.length - 1].eq(pt)) full.push(pt);
 
 				if(!start) {
 					// 自動化簡輸出，不連續輸出同樣的點
@@ -104,7 +105,6 @@ namespace Trace {
 	function processLoop(trace: Path, pt: Point, candidates: Set<Line>) {
 		let path: Path = [], i = trace.length - 1;
 		do { path.push(trace[i]); } while(!trace[i--].eq(pt));
-		if(path.length <= 2) return; // 三角形以上才需要處理
 		for(let l of candidates) if(PathUtil.lineInsidePath(l, path)) candidates.delete(l)
 	}
 
