@@ -67,12 +67,13 @@ type GPattern = JPattern<Gadget>;
 
 		let dir = this.configuration.repository.stretch.junctions[0].direction;
 		let { fx, fy } = this.stretch;
+		let size = new Fraction(this.design.sheet.size);
 		return MakePerQuadrant(q => {
 			let lines: Line[] = [];
 			if(dir % 2 != q % 2) return lines;
 			for(let d of this.devices) {
 				let qv = Quadrant.QV[q];
-				let vector = qv.scale(this.design.sheet.size);
+				let vector = qv.scale(size);
 				lines.push(...d.ridges);
 				lines.push(...d.getConnectionRidges(true));
 

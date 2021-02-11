@@ -11,7 +11,7 @@ interface JHistory {
 	steps: JStep[];
 }
 
-@shrewd class HistoryManager implements ISerializable<JHistory> {
+@shrewd class HistoryManager extends Disposable implements ISerializable<JHistory> {
 
 	private readonly design: Design;
 	@shrewd private readonly steps: Step[] = [];
@@ -23,6 +23,7 @@ interface JHistory {
 	private _modified: boolean = false;
 
 	constructor(design: Design, json?: JHistory) {
+		super(design);
 		this.design = design;
 	}
 

@@ -47,13 +47,13 @@ class Vector extends Couple {
 	}
 
 	/** 縮放並傳回新的向量 */
-	public scale(r: Rational): Vector;
+	public scale(r: Fraction): Vector;
 	public scale(c: Couple): Vector;
-	public scale(x: Rational, y: Rational): Vector;
-	public scale(x: Rational | Couple, y?: Rational): Vector {
+	public scale(x: Fraction, y: Fraction): Vector;
+	public scale(x: Fraction | Couple, y?: Fraction): Vector {
 		if(x instanceof Couple) return this.scale(x._x, x._y);
 		if(!y) y = x;
-		return new Vector(this._x.mul(x), this._y.mul(y)).smp();
+		return new Vector(this._x.mul(x), this._y.mul(y));
 	}
 
 	/** 計算向量內積 */

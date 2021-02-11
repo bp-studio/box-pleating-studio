@@ -88,10 +88,10 @@ interface JStretch {
 	}
 
 	/** 整個 `Stretch` 所共用的相位參數，一律以第一個 Junction 為準 */
-	public get fx(): number { return this.junctions[0]?.fx ?? 1; }
+	public get fx(): Sign { return this.junctions[0]?.fx ?? 1; }
 
 	/** 整個 `Stretch` 所共用的相位參數，一律以第一個 Junction 為準 */
-	public get fy(): number { return this.junctions[0]?.fy ?? 1; }
+	public get fy(): Sign { return this.junctions[0]?.fy ?? 1; }
 
 	protected get shouldDispose(): boolean {
 		// 正在拖曳中的時候 Stretch 會暫時保留，以免因為單一 Flap 的拖曳經過導致當前的設定全部流失

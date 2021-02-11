@@ -49,14 +49,14 @@ class Line {
 
 		let r = m.multiply(new Point(p.sub(this.p1)));
 		let a = r._x, b = r._y.neg;
-		if(a.lt(0) || a.gt(1)) return null;
-		if(isRay && b.lt(0)) return null;
+		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
+		if(isRay && b.lt(Fraction.ZERO)) return null;
 
 		return p.add(v.scale(b));
 	}
 
-	/** 根據指定的參數變換並傳回一條新的直線 */
-	public transform(fx: number, fy: number) {
+	/** 根據指定的相位變換並傳回一條新的直線 */
+	public transform(fx: Sign, fy: Sign) {
 		return new Line(this.p1.transform(fx, fy), this.p2.transform(fx, fy));
 	}
 
@@ -137,9 +137,9 @@ class Line {
 		}
 	}
 
-	/** 傳回分數斜率 */
+	/** 傳回分數斜率（有可能為 1/0 無限大） */
 	public get slope(): Fraction {
-		return this.p1._x.sub(this.p2._x).d(this.p1._y.sub(this.p2._y));
+		return this.p1._y.sub(this.p2._y).d(this.p1._x.sub(this.p2._x));
 	}
 
 	/** 把自身的頂點依 x 座標排序並且傳回 */
@@ -169,12 +169,14 @@ class Line {
 
 	public xIntersection(x: number) {
 		let v = this.p2.sub(this.p1);
-		return new Point(x, this.p1._y.sub(v.slope.mul(this.p1._x.sub(x))).smp());
+		let f = new Fraction(x);
+		return new Point(f, this.p1._y.sub(v.slope.mul(this.p1._x.sub(f))));
 	}
 
 	public yIntersection(y: number) {
 		let v = this.p2.sub(this.p1);
-		return new Point(this.p1._x.sub(this.p1._y.sub(y).div(v.slope)).smp(), y);
+		let f = new Fraction(y);
+		return new Point(this.p1._x.sub(this.p1._y.sub(f).div(v.slope)), f);
 	}
 
 	/** 把給定的向量對於這條線作鏡射 */

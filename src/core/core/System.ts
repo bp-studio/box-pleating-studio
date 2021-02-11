@@ -216,7 +216,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		if(sel.length == 0) return true;
 
 		// 如果被選中的是 Gadget，必須把移動量放大兩倍才會有效果
-		if(sel[0] instanceof Device) v = v.scale(2);
+		if(sel[0] instanceof Device) v = v.scale(Fraction.TWO);
 
 		for(let o of sel) v = o.dragConstraint(v);
 		for(let o of sel) o.drag(v);

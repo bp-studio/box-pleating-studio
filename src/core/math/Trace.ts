@@ -123,7 +123,7 @@ namespace Trace {
 		var a = r._x, b = r._y.neg;
 
 		// 交點必須是在動向的前方且在線段的內部（含端點）
-		if(a.lt(0) || a.gt(1) || b.lt(0)) return null;
+		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE) || b.lt(Fraction.ZERO)) return null;
 
 		return {
 			point: p.add(v.scale(b)),

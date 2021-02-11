@@ -35,13 +35,13 @@ class Point extends Couple implements IPoint {
 	public sub(v: Vector): Point;
 	public sub(p: IPoint): Vector;
 	public sub(c: Vector | IPoint) {
-		if(c instanceof Vector) return new Point(this._x.sub(c._x), this._y.sub(c._y)).smp();
-		else if(c instanceof Point) return new Vector(this._x.sub(c._x), this._y.sub(c._y)).smp();
-		else return new Vector(this._x.sub(c.x), this._y.sub(c.y)).smp();
+		if(c instanceof Vector) return new Point(this._x.sub(c._x), this._y.sub(c._y));
+		else if(c instanceof Point) return new Vector(this._x.sub(c._x), this._y.sub(c._y));
+		else return new Vector(this._x.sub(new Fraction(c.x)), this._y.sub(new Fraction(c.y)));
 	}
 	public subBy(v: Vector): this {
-		this._x.s(v.x);
-		this._y.s(v.y);
+		this._x.s(v._x);
+		this._y.s(v._y);
 		return this;
 	}
 
@@ -58,10 +58,11 @@ class Point extends Couple implements IPoint {
 	}
 
 	public get isIntegral(): boolean {
-		return this._x.$denominator === BIG1 && this._y.$denominator === BIG1;
+		return this._x.isIntegral && this._y.isIntegral;
 	}
 
-	public transform(fx: number, fy: number): Point {
-		return new Point(this._x.mul(fx), this._y.mul(fy));
+	/** 根據指定的相位進行變換 */
+	public transform(fx: Sign, fy: Sign): Point {
+		return new Point(this._x.fac(fx), this._y.fac(fy));
 	}
 }

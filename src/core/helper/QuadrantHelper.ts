@@ -15,7 +15,7 @@
 		let d = this.parent.distance;
 		let { qv, fx, fy, point, coveredJunctions, pattern } = this.quadrant;
 		if(!pattern) {
-			let r = this.parent.flap.radius + d;
+			let r = new Fraction(this.parent.flap.radius + d);
 			for(let [j, pts] of coveredJunctions) {
 				let { ox, oy } = j;
 				let p = point.add(qv.scale(r));

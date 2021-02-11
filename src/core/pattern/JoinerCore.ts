@@ -180,7 +180,7 @@ class JoinerCore {
 		if(cw != (p1.direction.slope.gt(p2.direction.slope))) return;
 
 		if(!this.setupAnchor(D)) return;
-		let P = D.sub(B).slope.gt(1) ? e.xIntersection(D.x) : e.yIntersection(D.y);
+		let P = D.sub(B).slope.gt(Fraction.ONE) ? e.xIntersection(D.x) : e.yIntersection(D.y);
 		let T = this.closestGridPoint(this.substituteEnd(e, B), D);
 
 		// 如果找到的最近整點就是整個 Gadget 的尖端，
@@ -213,7 +213,7 @@ class JoinerCore {
 		// TODO: 未來改進 river 的演算法以接受這樣的 pattern
 		if(T.eq(e.p1) || T.eq(e.p2)) return;
 
-		let P = D.sub(B).slope.gt(1) ? delta.yIntersection(T.y) : delta.xIntersection(T.x);
+		let P = D.sub(B).slope.gt(Fraction.ONE) ? delta.yIntersection(T.y) : delta.xIntersection(T.x);
 		let R = PathUtil.triangleTransform([T, D, P], B);
 		if(!this.setupAnchor(R)) return;
 		this.data.addOns = [{

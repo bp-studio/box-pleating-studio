@@ -111,7 +111,8 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 		let c1 = this.contour, c2 = g.contour;
 		let f = q1 == 0 ? 1 : -1;
 		let step = new Vector(f, f);
-		let v = g.anchorMap[q2][0].sub(Point.ZERO).addBy(step.scale(this._getSlack(q1)));
+		let slack = new Fraction(this._getSlack(q1))
+		let v = g.anchorMap[q2][0].sub(Point.ZERO).addBy(step.scale(slack));
 
 		// 下一行中的 Point.ZERO 原本是 this.anchorMap[0][0].add(step.scale(this._getSlack(0)))
 		// 這個照我的理解基本上一定就是 Point.ZERO，因此可以簡化

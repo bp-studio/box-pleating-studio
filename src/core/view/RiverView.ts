@@ -138,6 +138,7 @@
 			let prev = p[l - 1];
 			let now = p[0];
 			let v_in = now.sub(prev);
+			let width = new Fraction(this.control.length);
 			for(let i = 0; i < l; i++) {
 				let next = p[(i + 1) % l];
 				let v_out = next.sub(now);
@@ -145,7 +146,7 @@
 					let v = new Vector(
 						Math.sign(v_out.x) - Math.sign(v_in.x),
 						Math.sign(v_out.y) - Math.sign(v_in.y)
-					).scale(this.control.length);
+					).scale(width);
 					let target = now.add(v);
 					result.push([now, target, map.has(target.toString())]);
 				}

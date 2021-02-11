@@ -136,7 +136,7 @@ class Region {
         }
         let ap = [];
         for (let i = Math.ceil(min); i <= Math.floor(max); i++) {
-            let p = ref.add(step.scale(i));
+            let p = ref.add(step.scale(new Fraction(i)));
             let intersections = [];
             for (let r of this.shape.ridges) {
                 let j = r.intersection(p, dir);
@@ -1322,26 +1322,16 @@ __decorate([
 DoubleMapping = __decorate([
     shrewd
 ], DoubleMapping);
-window.BigInt = window.BigInt || ((n) => n);
-const BIG1 = BigInt(1);
 class Fraction {
     constructor(n, d = 1) {
         if (n instanceof Fraction) {
             this._p = n._p;
-            this._q = n._q * BigInt(d);
-        }
-        else if (typeof n == 'bigint' && typeof d == 'bigint') {
-            this._p = n;
-            this._q = d;
-        }
-        else if (typeof n == 'bigint' && d === 1) {
-            this._p = n;
-            this._q = BIG1;
+            this._q = n._q * d;
         }
         else if (typeof n == 'number' && typeof d == 'number') {
             if (Number.isSafeInteger(n) && Number.isSafeInteger(d)) {
-                this._p = BigInt(n);
-                this._q = BigInt(d);
+                this._p = n;
+                this._q = d;
             }
             else if (!Number.isFinite(n / d)) {
                 debugger;
@@ -1360,75 +1350,77 @@ class Fraction {
     }
     static toFraction(v, k2 = 1, k1 = 0, err = Fraction.ERROR) {
         let n = Math.floor(v), r = v - n, k0 = n * k1 + k2;
+        let f = new Fraction(n);
         if (r / k0 / ((1 - r) * k0 + k1) < err)
-            return new Fraction(n);
+            return f;
         else
-            return Fraction.toFraction(1 / r, k1, k0).i().a(n);
+            return Fraction.toFraction(1 / r, k1, k0).i().a(f);
     }
     get $numerator() { return this._p; }
     get $denominator() { return this._q; }
-    get value() { return Number(this._p) / Number(this._q); }
-    toString() { this.smp(); return this._p + (this._q > 1 ? "/" + this._q : ""); }
+    get value() {
+        return this._p / this._q;
+    }
+    toString() {
+        this._smp();
+        return this._p + (this._q > 1 ? "/" + this._q : "");
+    }
     c() { return new Fraction(this._p, this._q); }
-    smp() {
+    _smp() {
         [this._p, this._q] = MathUtil.reduce(this._p, this._q);
+    }
+    n() {
+        this._p = -this._p;
+        return this;
+    }
+    i() {
+        [this._p, this._q] = [this._q, this._p];
         return this._check();
     }
-    n() { this._p = -this._p; return this; }
-    i() { [this._p, this._q] = [this._q, this._p]; return this; }
     r() {
-        this._p = BigInt(Math.round(this.value));
-        this._q = BIG1;
+        this._p = Math.round(this.value);
+        this._q = 1;
         return this;
     }
     a(v) {
-        if (v instanceof Fraction) {
-            this._p = this._p * v._q + this._q * v._p;
-            this._q *= v._q;
-        }
-        else if (Number.isInteger(v))
-            this._p += BigInt(v) * this._q;
-        else
-            this.a(new Fraction(v));
-        return this;
+        this._p = this._p * v._q + this._q * v._p;
+        this._q *= v._q;
+        return this._check();
     }
     s(v) {
-        if (v instanceof Fraction) {
-            this._p = this._p * v._q - this._q * v._p;
-            this._q *= v._q;
-        }
-        else if (Number.isInteger(v))
-            this._p -= BigInt(v) * this._q;
-        else
-            this.s(new Fraction(v));
-        return this;
+        this._p = this._p * v._q - this._q * v._p;
+        this._q *= v._q;
+        return this._check();
     }
     m(v) {
-        if (v instanceof Fraction) {
-            this._p *= v._p;
-            this._q *= v._q;
-        }
-        else if (Number.isInteger(v))
-            this._p *= BigInt(v);
-        else
-            this.m(new Fraction(v));
+        this._p *= v._p;
+        this._q *= v._q;
         return this._check();
     }
-    d(v) {
-        if (v instanceof Fraction) {
-            this._p *= v._q;
-            this._q *= v._p;
-        }
-        else if (Number.isInteger(v))
-            this._q *= BigInt(v);
-        else
-            this.d(new Fraction(v));
+    d(f) {
+        this._p *= f._q;
+        this._q *= f._p;
         return this._check();
+    }
+    f(f) {
+        this._p *= f;
+        return this;
+    }
+    get isIntegral() {
+        this._smp();
+        return this._q == 1;
     }
     _check() {
+        const MAX = 67100000;
+        if (this._p > MAX || this._p < -MAX || this._q > MAX || this._q < -MAX) {
+            this._smp();
+        }
         if (this._q < 0) {
             this._q = -this._q;
             this._p = -this._p;
+        }
+        else if (this._q == 0) {
+            this._p = 1;
         }
         return this;
     }
@@ -1437,57 +1429,30 @@ class Fraction {
     add(v) { return this.c().a(v); }
     sub(v) { return this.c().s(v); }
     mul(v) { return this.c().m(v); }
+    fac(f) { return this.c().f(f); }
     div(v) { return this.c().d(v); }
     eq(v) {
-        if (v instanceof Fraction)
-            return this._p * v._q == this._q * v._p;
-        else
-            return this._p == this._q * BigInt(v);
-    }
-    ne(v) {
-        if (v instanceof Fraction)
-            return this._p * v._q != this._q * v._p;
-        else if (Number.isSafeInteger(v))
-            return this._p != this._q * BigInt(v);
-        else
-            return this.ne(new Fraction(v));
+        return this._p * v._q == this._q * v._p;
     }
     lt(v) {
-        if (v instanceof Fraction)
-            return this._p * v._q < this._q * v._p;
-        else if (Number.isSafeInteger(v))
-            return this._p < this._q * BigInt(v);
-        else
-            return this.lt(new Fraction(v));
+        return this._p * v._q < this._q * v._p;
     }
     gt(v) {
-        if (v instanceof Fraction)
-            return this._p * v._q > this._q * v._p;
-        else if (Number.isSafeInteger(v))
-            return this._p > this._q * BigInt(v);
-        else
-            return this.gt(new Fraction(v));
+        return this._p * v._q > this._q * v._p;
     }
     le(v) {
-        if (v instanceof Fraction)
-            return this._p * v._q <= this._q * v._p;
-        else if (Number.isSafeInteger(v))
-            return this._p <= this._q * BigInt(v);
-        else
-            return this.le(new Fraction(v));
+        return this._p * v._q <= this._q * v._p;
     }
     ge(v) {
-        if (v instanceof Fraction)
-            return this._p * v._q >= this._q * v._p;
-        else if (Number.isSafeInteger(v))
-            return this._p >= this._q * BigInt(v);
-        else
-            return this.ge(new Fraction(v));
+        return this._p * v._q >= this._q * v._p;
     }
     toJSON() {
         return this.toString();
     }
 }
+Fraction.ZERO = new Fraction(0);
+Fraction.ONE = new Fraction(1);
+Fraction.TWO = new Fraction(2);
 Fraction.ERROR = 1e-12;
 class Partitioner extends Disposable {
     constructor(config, data) {
@@ -1642,7 +1607,7 @@ let QuadrantHelper = class QuadrantHelper extends Disposable {
         let d = this.parent.distance;
         let { qv, fx, fy, point, coveredJunctions, pattern } = this.quadrant;
         if (!pattern) {
-            let r = this.parent.flap.radius + d;
+            let r = new Fraction(this.parent.flap.radius + d);
             for (let [j, pts] of coveredJunctions) {
                 let { ox, oy } = j;
                 let p = point.add(qv.scale(r));
@@ -1932,11 +1897,6 @@ class Couple {
     set x(v) { this._x = new Fraction(v); }
     get y() { return this._y.value; }
     set y(v) { this._y = new Fraction(v); }
-    smp() {
-        this._x.smp();
-        this._y.smp();
-        return this;
-    }
     eq(c) {
         if (!c)
             return false;
@@ -1962,27 +1922,28 @@ class Couple {
         return this;
     }
     add(v) {
-        return new this.constructor(this._x.add(v._x), this._y.add(v._y)).smp();
+        return new this.constructor(this._x.add(v._x), this._y.add(v._y));
     }
     addBy(v) {
         this._x.a(v._x);
         this._y.a(v._y);
-        return this.smp();
+        return this;
     }
     round(scale = 1) {
-        this._x.d(scale).r().m(scale);
-        this._y.d(scale).r().m(scale);
-        return this.smp();
+        let s = new Fraction(scale);
+        this._x.d(s).r().m(s);
+        this._y.d(s).r().m(s);
+        return this;
     }
     range(min_X, max_X, min_Y, max_Y) {
         if (this._x.lt(min_X))
-            this._x = new Fraction(min_X);
+            this._x = min_X;
         if (this._x.gt(max_X))
-            this._x = new Fraction(max_X);
+            this._x = max_X;
         if (this._y.lt(min_Y))
-            this._y = new Fraction(min_Y);
+            this._y = min_Y;
         if (this._y.gt(max_Y))
-            this._y = new Fraction(max_Y);
+            this._y = max_Y;
         return this;
     }
     toIPoint() {
@@ -2366,7 +2327,7 @@ let Sheet = class Sheet extends Mountable {
         return this._activeControlCache;
     }
     constraint(v, p) {
-        return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
+        return v.range(new Fraction(-p.x), new Fraction(this.width - p.x), new Fraction(-p.y), new Fraction(this.height - p.y));
     }
     get width() { return this._width; }
     set width(v) {
@@ -2743,15 +2704,15 @@ class Point extends Couple {
     }
     sub(c) {
         if (c instanceof Vector)
-            return new Point(this._x.sub(c._x), this._y.sub(c._y)).smp();
+            return new Point(this._x.sub(c._x), this._y.sub(c._y));
         else if (c instanceof Point)
-            return new Vector(this._x.sub(c._x), this._y.sub(c._y)).smp();
+            return new Vector(this._x.sub(c._x), this._y.sub(c._y));
         else
-            return new Vector(this._x.sub(c.x), this._y.sub(c.y)).smp();
+            return new Vector(this._x.sub(new Fraction(c.x)), this._y.sub(new Fraction(c.y)));
     }
     subBy(v) {
-        this._x.s(v.x);
-        this._y.s(v.y);
+        this._x.s(v._x);
+        this._y.s(v._y);
         return this;
     }
     toPaper() {
@@ -2763,10 +2724,10 @@ class Point extends Couple {
         return this.x == p.x && this.y == p.y;
     }
     get isIntegral() {
-        return this._x.$denominator === BIG1 && this._y.$denominator === BIG1;
+        return this._x.isIntegral && this._y.isIntegral;
     }
     transform(fx, fy) {
-        return new Point(this._x.mul(fx), this._y.mul(fy));
+        return new Point(this._x.fac(fx), this._y.fac(fy));
     }
 }
 class Vector extends Couple {
@@ -2796,7 +2757,7 @@ class Vector extends Couple {
             return this.scale(x._x, x._y);
         if (!y)
             y = x;
-        return new Vector(this._x.mul(x), this._y.mul(y)).smp();
+        return new Vector(this._x.mul(x), this._y.mul(y));
     }
     dot(v) {
         return this._x.mul(v._x).a(this._y.mul(v._y)).value;
@@ -3052,13 +3013,14 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
     }
     makeContour(d) {
         let r = this.flap.radius + d;
-        let v = this.sv.scale(r);
-        let startPt = this.getStart(r);
+        let s = new Fraction(r);
+        let v = this.sv.scale(s);
+        let startPt = this.getStart(s);
         let endPt = this.point.add(v.rotate90());
         let pattern = this.pattern;
         let trace;
         if (!pattern) {
-            trace = [startPt, this.point.add(this.qv.scale(r))];
+            trace = [startPt, this.point.add(this.qv.scale(s))];
         }
         else {
             let lines = pattern.linesForTracing[this.q].concat();
@@ -3144,14 +3106,14 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         let d2 = d - dist.d1 + dist.d2;
         let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
         inflections.add(inflection.toString());
-        return (_a = nextQ.findLead(junctions, d2, lines, inflections)) !== null && _a !== void 0 ? _a : nextQ.getStart(d2);
+        return (_a = nextQ.findLead(junctions, d2, lines, inflections)) !== null && _a !== void 0 ? _a : nextQ.getStart(new Fraction(d2));
     }
     get pattern() {
         let stretch = this.design.getStretchByQuadrant(this);
         return stretch ? stretch.pattern : null;
     }
     get corner() {
-        let r = this.flap.radius;
+        let r = new Fraction(this.flap.radius);
         return this.point.add(this.qv.scale(r));
     }
     get validJunctions() {
@@ -3181,7 +3143,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
     getBaseRectangle(j, base) {
         let d = this.design.tree.dist(base, this.flap.node);
         let r = this.flap.radius;
-        let v = this.qv.scale(d - r);
+        let v = this.qv.scale(new Fraction(d - r));
         return new Rectangle(new Point(this.x(r), this.y(r)).addBy(v), new Point(this.x(r - j.ox), this.y(r - j.oy)).addBy(v));
     }
     debug(d = 0) {
@@ -3379,13 +3341,14 @@ let Pattern = class Pattern extends SheetObject {
             return MakePerQuadrant(i => []);
         let dir = this.configuration.repository.stretch.junctions[0].direction;
         let { fx, fy } = this.stretch;
+        let size = new Fraction(this.design.sheet.size);
         return MakePerQuadrant(q => {
             let lines = [];
             if (dir % 2 != q % 2)
                 return lines;
             for (let d of this.devices) {
                 let qv = Quadrant.QV[q];
-                let vector = qv.scale(this.design.sheet.size);
+                let vector = qv.scale(size);
                 lines.push(...d.ridges);
                 lines.push(...d.getConnectionRidges(true));
                 for (let [c, o, cq] of d.partition.outCorners) {
@@ -3872,11 +3835,12 @@ let RiverView = class RiverView extends ControlView {
             let prev = p[l - 1];
             let now = p[0];
             let v_in = now.sub(prev);
+            let width = new Fraction(this.control.length);
             for (let i = 0; i < l; i++) {
                 let next = p[(i + 1) % l];
                 let v_out = next.sub(now);
                 if (v_in.dot(v_out) == 0 && v_in.rotate90().dot(v_out) > 0) {
-                    let v = new Vector(Math.sign(v_out.x) - Math.sign(v_in.x), Math.sign(v_out.y) - Math.sign(v_in.y)).scale(this.control.length);
+                    let v = new Vector(Math.sign(v_out.x) - Math.sign(v_in.x), Math.sign(v_out.y) - Math.sign(v_in.y)).scale(width);
                     let target = now.add(v);
                     result.push([now, target, map.has(target.toString())]);
                 }
@@ -4526,8 +4490,9 @@ class FieldCommand {
 __decorate([
     nonEnumerable
 ], FieldCommand.prototype, "_design", void 0);
-let HistoryManager = class HistoryManager {
+let HistoryManager = class HistoryManager extends Disposable {
     constructor(design, json) {
+        super(design);
         this.steps = [];
         this.index = 0;
         this._moving = false;
@@ -5604,7 +5569,7 @@ let System = System_1 = class System {
         if (sel.length == 0)
             return true;
         if (sel[0] instanceof Device)
-            v = v.scale(2);
+            v = v.scale(Fraction.TWO);
         for (let o of sel)
             v = o.dragConstraint(v);
         for (let o of sel)
@@ -5948,9 +5913,9 @@ class Line {
             return null;
         let r = m.multiply(new Point(p.sub(this.p1)));
         let a = r._x, b = r._y.neg;
-        if (a.lt(0) || a.gt(1))
+        if (a.lt(Fraction.ZERO) || a.gt(Fraction.ONE))
             return null;
-        if (isRay && b.lt(0))
+        if (isRay && b.lt(Fraction.ZERO))
             return null;
         return p.add(v.scale(b));
     }
@@ -6033,7 +5998,7 @@ class Line {
         }
     }
     get slope() {
-        return this.p1._x.sub(this.p2._x).d(this.p1._y.sub(this.p2._y));
+        return this.p1._y.sub(this.p2._y).d(this.p1._x.sub(this.p2._x));
     }
     xOrient() {
         if (this.p1._x.gt(this.p2._x))
@@ -6062,11 +6027,13 @@ class Line {
     }
     xIntersection(x) {
         let v = this.p2.sub(this.p1);
-        return new Point(x, this.p1._y.sub(v.slope.mul(this.p1._x.sub(x))).smp());
+        let f = new Fraction(x);
+        return new Point(f, this.p1._y.sub(v.slope.mul(this.p1._x.sub(f))));
     }
     yIntersection(y) {
         let v = this.p2.sub(this.p1);
-        return new Point(this.p1._x.sub(this.p1._y.sub(y).div(v.slope)).smp(), y);
+        let f = new Fraction(y);
+        return new Point(this.p1._x.sub(this.p1._y.sub(f).div(v.slope)), f);
     }
     reflect(v) {
         v = v.neg;
@@ -6085,31 +6052,24 @@ class Line {
 }
 class Matrix {
     constructor(a, b, c, d, det) {
-        this.a = new Fraction(a);
-        this.b = new Fraction(b);
-        this.c = new Fraction(c);
-        this.d = new Fraction(d);
+        this.a = a.c();
+        this.b = b.c();
+        this.c = c.c();
+        this.d = d.c();
         if (det)
             this.det = det;
         else
-            this.det = this.a.mul(this.d).s(this.b.mul(this.c)).smp();
+            this.det = this.a.mul(this.d).s(this.b.mul(this.c));
     }
     toString() { return [this.a, this.b, this.c, this.d].toString(); }
-    smp() {
-        this.a.smp();
-        this.b.smp();
-        this.c.smp();
-        this.d.smp();
-        return this;
-    }
     get determinant() { return this.det.value; }
     get inverse() {
-        if (this.det.eq(0))
+        if (this.det.eq(Fraction.ZERO))
             return null;
-        return new Matrix(this.d.div(this.det), this.b.neg.d(this.det), this.c.neg.d(this.det), this.a.div(this.det), this.det.inv).smp();
+        return new Matrix(this.d.div(this.det), this.b.neg.d(this.det), this.c.neg.d(this.det), this.a.div(this.det), this.det.inv);
     }
     multiply(that) {
-        return new that.constructor(this.a.mul(that._x).a(this.b.mul(that._y)), this.c.mul(that._x).a(this.d.mul(that._y))).smp();
+        return new that.constructor(this.a.mul(that._x).a(this.b.mul(that._y)), this.c.mul(that._x).a(this.d.mul(that._y)));
     }
     static getTransformMatrix(from, to) {
         if (from.eq(Vector.ZERO))
@@ -6338,7 +6298,7 @@ var Trace;
             return null;
         var r = m.multiply(new Point(p.sub(l.p1)));
         var a = r._x, b = r._y.neg;
-        if (a.lt(0) || a.gt(1) || b.lt(0))
+        if (a.lt(Fraction.ZERO) || a.gt(Fraction.ONE) || b.lt(Fraction.ZERO))
             return null;
         return {
             point: p.add(v.scale(b)),
@@ -6870,7 +6830,8 @@ class Gadget {
         let c1 = this.contour, c2 = g.contour;
         let f = q1 == 0 ? 1 : -1;
         let step = new Vector(f, f);
-        let v = g.anchorMap[q2][0].sub(Point.ZERO).addBy(step.scale(this._getSlack(q1)));
+        let slack = new Fraction(this._getSlack(q1));
+        let v = g.anchorMap[q2][0].sub(Point.ZERO).addBy(step.scale(slack));
         c1 = PathUtil.shift(c1, q1 == 0 ? v : v.add(Point.ZERO.sub(this.anchorMap[2][0])));
         let s = 0;
         while (PathUtil.polygonIntersect(c1, c2)) {
@@ -7143,7 +7104,7 @@ class JoinerCore {
             return;
         if (!this.setupAnchor(D))
             return;
-        let P = D.sub(B).slope.gt(1) ? e.xIntersection(D.x) : e.yIntersection(D.y);
+        let P = D.sub(B).slope.gt(Fraction.ONE) ? e.xIntersection(D.x) : e.yIntersection(D.y);
         let T = this.closestGridPoint(this.substituteEnd(e, B), D);
         if (T.eq(e.p1) || T.eq(e.p2))
             return;
@@ -7165,7 +7126,7 @@ class JoinerCore {
         let T = this.closestGridPoint(this.substituteEnd(e, D), B);
         if (T.eq(e.p1) || T.eq(e.p2))
             return;
-        let P = D.sub(B).slope.gt(1) ? delta.yIntersection(T.y) : delta.xIntersection(T.x);
+        let P = D.sub(B).slope.gt(Fraction.ONE) ? delta.yIntersection(T.y) : delta.xIntersection(T.x);
         let R = PathUtil.triangleTransform([T, D, P], B);
         if (!this.setupAnchor(R))
             return;

@@ -39,7 +39,7 @@ abstract class Region {
 		// 計算所有的軸平行摺痕
 		let ap: Line[] = [];
 		for(let i = Math.ceil(min); i <= Math.floor(max); i++) {
-			let p = ref.add(step.scale(i));
+			let p = ref.add(step.scale(new Fraction(i)));
 			let intersections: Point[] = [];
 			for(let r of this.shape.ridges) {
 				let j = r.intersection(p, dir);

@@ -12,33 +12,26 @@ class Matrix {
 
 	public readonly det: Fraction;
 
-	constructor(a: Rational, b: Rational, c: Rational, d: Rational, det?: Fraction) {
-		this.a = new Fraction(a); this.b = new Fraction(b);
-		this.c = new Fraction(c); this.d = new Fraction(d);
+	constructor(a: Fraction, b: Fraction, c: Fraction, d: Fraction, det?: Fraction) {
+		this.a = a.c(); this.b = b.c();
+		this.c = c.c(); this.d = d.c();
 		if(det) this.det = det;
-		else this.det = this.a.mul(this.d).s(this.b.mul(this.c)).smp();
+		else this.det = this.a.mul(this.d).s(this.b.mul(this.c));
 	}
 
 	toString() { return [this.a, this.b, this.c, this.d].toString(); }
-
-	/**Simplify all Fractions in the matrix */
-	smp() {
-		this.a.smp(); this.b.smp();
-		this.c.smp(); this.d.smp();
-		return this;
-	}
 
 	/** 矩陣的行列式值轉換成數值 */
 	get determinant(): number { return this.det.value; }
 
 	/** 傳回反矩陣作為新的矩陣實體 */
 	get inverse() {
-		if(this.det.eq(0)) return null;
+		if(this.det.eq(Fraction.ZERO)) return null;
 		return new Matrix(
 			this.d.div(this.det), this.b.neg.d(this.det),
 			this.c.neg.d(this.det), this.a.div(this.det),
 			this.det.inv
-		).smp();
+		);
 	}
 
 	/** 矩陣乘法；暫時因為用不到所以沒有實作矩陣對矩陣的乘法 */
@@ -48,7 +41,7 @@ class Matrix {
 		return new that.constructor(
 			this.a.mul(that._x).a(this.b.mul(that._y)),
 			this.c.mul(that._x).a(this.d.mul(that._y))
-		).smp();
+		);
 	}
 
 	/** 求出會把 from 變成 to 的旋轉縮放矩陣 */

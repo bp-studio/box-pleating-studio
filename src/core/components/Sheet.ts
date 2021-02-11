@@ -35,7 +35,10 @@ interface JSheet {
 
 	/** 考慮一個點進行指定位移之後的結果來修正位移 */
 	public constraint(v: Vector, p: Readonly<IPoint>): Vector {
-		return v.range(-p.x, this.width - p.x, -p.y, this.height - p.y);
+		return v.range(
+			new Fraction(-p.x), new Fraction(this.width - p.x),
+			new Fraction(-p.y), new Fraction(this.height - p.y)
+		);
 	}
 
 	@shrewd private _width: number;

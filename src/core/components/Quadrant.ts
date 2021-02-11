@@ -78,14 +78,15 @@
 	/** 產生此象限距離 d（不含半徑）的逆時鐘順序輪廓 */
 	public makeContour(d: number): Path {
 		let r = this.flap.radius + d;
-		let v = this.sv.scale(r);
-		let startPt = this.getStart(r);
+		let s = new Fraction(r);
+		let v = this.sv.scale(s);
+		let startPt = this.getStart(s);
 		let endPt = this.point.add(v.rotate90());
 		let pattern = this.pattern;
 		let trace: Path;
 
 		if(!pattern) {
-			trace = [startPt, this.point.add(this.qv.scale(r))];
+			trace = [startPt, this.point.add(this.qv.scale(s))];
 		} else {
 			let lines = pattern.linesForTracing[this.q].concat();
 			if(debug) console.log(lines.map(l => l.toString()));
@@ -123,7 +124,7 @@
 	}
 
 	/** 產生此象限距離 d（含半徑！）的輪廓起點 */
-	private getStart(d: number) {
+	private getStart(d: Fraction) {
 		return this.point.add(this.sv.scale(d));
 	}
 
@@ -197,7 +198,7 @@
 		let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
 		inflections.add(inflection.toString());
 
-		return nextQ.findLead(junctions, d2, lines, inflections) ?? nextQ.getStart(d2);
+		return nextQ.findLead(junctions, d2, lines, inflections) ?? nextQ.getStart(new Fraction(d2));
 	}
 
 	@shrewd public get pattern(): Pattern | null {
@@ -206,7 +207,7 @@
 	}
 
 	@shrewd public get corner(): Point {
-		let r = this.flap.radius;
+		let r = new Fraction(this.flap.radius);
 		return this.point.add(this.qv.scale(r));
 	}
 
@@ -243,7 +244,7 @@
 	public getBaseRectangle(j: Junction, base: TreeNode): Rectangle {
 		let d = this.design.tree.dist(base, this.flap.node);
 		let r = this.flap.radius;
-		let v = this.qv.scale(d - r);
+		let v = this.qv.scale(new Fraction(d - r));
 		return new Rectangle(
 			new Point(this.x(r), this.y(r)).addBy(v),
 			new Point(this.x(r - j.ox), this.y(r - j.oy)).addBy(v)

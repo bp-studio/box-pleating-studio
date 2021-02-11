@@ -184,13 +184,13 @@ enum JunctionStatus {
 	}
 
 	/** 「f」在這邊是代表乘法係數。 */
-	@shrewd public get fx() {
-		return -Math.sign(this.sx);
+	@shrewd public get fx(): Sign {
+		return -Math.sign(this.sx) as Sign;
 	}
 
 	/** 「f」在這邊是代表乘法係數。 */
-	@shrewd public get fy() {
-		return -Math.sign(this.sy);
+	@shrewd public get fy(): Sign {
+		return -Math.sign(this.sy) as Sign;
 	}
 
 	/** 「o」是代表重疊區域。 */
