@@ -7,6 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 if (typeof Shrewd != "object")
     throw new Error("BPStudio requires Shrewd.");
 const { shrewd } = Shrewd;
+const perf = false;
+let perfTime = 0;
 const diagnose = false;
 function unorderedArray(msg) {
     return shrewd({
@@ -1327,20 +1329,20 @@ class Fraction {
         if (n instanceof Fraction) {
             this._p = n._p;
             this._q = n._q * d;
+            this._check();
         }
         else if (typeof n == 'number' && typeof d == 'number') {
             if (Number.isSafeInteger(n) && Number.isSafeInteger(d)) {
                 this._p = n;
                 this._q = d;
+                this._check();
             }
             else if (!Number.isFinite(n / d)) {
                 debugger;
                 throw new Error("Parameters are not valid");
             }
             else {
-                let f = Fraction.toFraction(n / d);
-                this._p = f._p;
-                this._q = f._q;
+                return Fraction.toFraction(n / d);
             }
         }
         else {
@@ -1365,7 +1367,9 @@ class Fraction {
         this._smp();
         return this._p + (this._q > 1 ? "/" + this._q : "");
     }
-    c() { return new Fraction(this._p, this._q); }
+    c() {
+        return new Fraction(this._p, this._q);
+    }
     _smp() {
         [this._p, this._q] = MathUtil.reduce(this._p, this._q);
     }
@@ -1411,8 +1415,7 @@ class Fraction {
         return this._q == 1;
     }
     _check() {
-        const MAX = 67100000;
-        if (this._p > MAX || this._p < -MAX || this._q > MAX || this._q < -MAX) {
+        if (Math.abs(this._p) >> 26 || Math.abs(this._q) >> 26) {
             this._smp();
         }
         if (this._q < 0) {
@@ -1911,8 +1914,8 @@ class Couple {
     }
     set(x, y = 0) {
         if (x instanceof Couple) {
-            this._x = new Fraction(x._x);
-            this._y = new Fraction(x._y);
+            this._x = x._x.c();
+            this._y = x._y.c();
         }
         else {
             this._x = new Fraction(x);
@@ -2351,7 +2354,7 @@ let Sheet = class Sheet extends Mountable {
     }
     getMinScale() {
         var _a;
-        return Math.ceil((_a = this.design.display.getAutoScale(this)) !== null && _a !== void 0 ? _a : 10);
+        return Math.floor((_a = this.design.display.getAutoScale(this)) !== null && _a !== void 0 ? _a : 10);
     }
     get design() {
         return this.mountTarget;
@@ -2457,10 +2460,8 @@ class View extends Mountable {
     }
     draw() {
         this.mountEvents();
-        if (this.$studio) {
-            this.$studio.$display.render();
+        if (this.$studio)
             this.render();
-        }
     }
     $addItem(layer, item) {
         this._paths.push([layer, item]);
@@ -4028,18 +4029,10 @@ let FlapView = class FlapView extends LabeledView {
         this.hinge.add(...paths[0].segments);
     }
     render() {
-        let ds = this.control.sheet.displayScale;
         let w = this.control.width, h = this.control.height;
         this._circle.copyContent(this.circle);
         this.renderHinge();
-        let fix = (p) => [p.x * ds, -p.y * ds];
-        let p = MakePerQuadrant(i => {
-            let pt = this.control.points[i].toPaper();
-            this._dots[i].position.set(fix(pt));
-            return pt;
-        });
-        this._dots[2].visible = w > 0 || h > 0;
-        this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
+        let p = MakePerQuadrant(i => this.control.points[i].toPaper());
         this._innerRidges.removeChildren();
         this._innerRidges.moveTo(p[3]);
         p.forEach(p => this._innerRidges.lineTo(p));
@@ -4049,9 +4042,25 @@ let FlapView = class FlapView extends LabeledView {
             if (q.pattern == null)
                 PaperUtil.addLine(this._outerRidges, p[i], q.corner);
         });
+        this._shade.copyContent(this.hinge);
+    }
+    renderUnscaled() {
+        this.mountEvents();
+        if (!this.$studio)
+            return;
+        this.$studio.$display.render();
+        let ds = this.control.sheet.displayScale;
+        let w = this.control.width, h = this.control.height;
+        let fix = (p) => [p.x * ds, -p.y * ds];
+        MakePerQuadrant(i => {
+            let pt = this.control.points[i].toPaper();
+            this._dots[i].position.set(fix(pt));
+            return pt;
+        });
+        this._dots[2].visible = w > 0 || h > 0;
+        this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
         this._label.content = this.control.node.name;
         LabelUtil.setLabel(this.control.sheet, this._label, this._glow, this.control.dragSelectAnchor, this._dots[0]);
-        this._shade.copyContent(this.hinge);
     }
     renderSelection(selected) {
         this._shade.visible = selected;
@@ -4072,6 +4081,9 @@ __decorate([
 __decorate([
     shrewd
 ], FlapView.prototype, "renderHinge", null);
+__decorate([
+    shrewd
+], FlapView.prototype, "renderUnscaled", null);
 FlapView = __decorate([
     shrewd
 ], FlapView);
@@ -4442,9 +4454,13 @@ let BPStudio = class BPStudio {
         if (this._updating)
             return;
         this._updating = true;
+        if (perf)
+            perfTime = 0;
         Shrewd.commit();
         await PaperWorker.done();
         this.$display.project.view.update();
+        if (perf && perfTime)
+            console.log("Total time: " + perfTime + " ms");
         if (this.onUpdate) {
             this.onUpdate();
             delete this.onUpdate;
@@ -6214,43 +6230,43 @@ var Trace;
     function create(lines, startPt, endPt, sv, inflections, end, start) {
         let full = [];
         let trace = [];
-        let x;
-        let v = sv;
-        let p = startPt;
+        let currentIntersection;
+        let currentVector = sv;
+        let currentPoint = startPt;
         let shift;
-        let line;
+        let currentLine;
         let record = new Set();
         let candidates = new Set(lines);
         if (debug)
             console.log([...inflections].toString());
         do {
-            x = null;
-            for (let l of candidates) {
-                let r = getIntersection(l, p, v);
-                if (r) {
-                    let ang = shift ? getAngle(v, shift) : undefined;
-                    let f = inflections.has(r.point.toString()) ? -1 : 1;
-                    if (!isSideTouchable(l, p, v, f, ang))
+            currentIntersection = null;
+            for (let line of candidates) {
+                let intersection = getIntersection(line, currentPoint, currentVector);
+                if (intersection) {
+                    let angle = shift ? getAngle(currentVector, shift) : undefined;
+                    let f = inflections.has(intersection.point.toString()) ? -1 : 1;
+                    if (!intersection.interior && !isSideTouchable(line, currentPoint, currentVector, f, angle))
                         continue;
                     if (debug)
-                        console.log([JSON.stringify(r), l.toString()]);
-                    if (intersectionCloser(r, x, f)) {
-                        x = r;
-                        line = l;
+                        console.log([JSON.stringify(intersection), line.toString()]);
+                    if (intersectionCloser(intersection, currentIntersection, f)) {
+                        currentIntersection = intersection;
+                        currentLine = line;
                     }
                 }
             }
-            if (x) {
-                let pt = x.point;
-                let l = new Line(p, pt);
+            if (currentIntersection) {
+                let pt = currentIntersection.point;
+                let currentSegment = new Line(currentPoint, pt);
                 if (start) {
-                    let p = l.intersection(start);
+                    let p = currentSegment.intersection(start);
                     if (p) {
                         trace.push(p);
                         start = undefined;
                     }
                 }
-                let goal = l.contains(endPt) ? endPt : l.intersection(end);
+                let goal = currentSegment.contains(endPt) ? endPt : currentSegment.intersection(end);
                 if (goal) {
                     trace.push(goal);
                     break;
@@ -6268,14 +6284,14 @@ var Trace;
                     if (!trace.length || !trace[trace.length - 1].eq(pt))
                         trace.push(pt);
                 }
-                shift = line.vector;
-                v = line.reflect(v);
+                shift = currentLine.vector;
+                currentVector = currentLine.reflect(currentVector);
                 if (debug)
-                    console.log([pt.toString(), line.toString(), v.toString(), shift.toString()]);
-                p = pt;
-                candidates.delete(line);
+                    console.log([pt.toString(), currentLine.toString(), currentVector.toString(), shift.toString()]);
+                currentPoint = pt;
+                candidates.delete(currentLine);
             }
-        } while (x != null);
+        } while (currentIntersection != null);
         return trace;
     }
     Trace.create = create;
@@ -6289,7 +6305,7 @@ var Trace;
                 candidates.delete(l);
     }
     function intersectionCloser(r, x, f) {
-        return r != null && (x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f);
+        return x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f;
     }
     function getIntersection(l, p, v) {
         var v1 = l.p2.sub(l.p1);
@@ -6303,7 +6319,8 @@ var Trace;
         return {
             point: p.add(v.scale(b)),
             dist: b,
-            angle: getAngle(v, v1)
+            angle: getAngle(v, v1),
+            interior: a.gt(Fraction.ZERO) && a.lt(Fraction.ONE)
         };
     }
     function getAngle(v1, v2) {
@@ -6314,15 +6331,15 @@ var Trace;
             ang -= Math.PI;
         return ang;
     }
-    function isSideTouchable(l, p, v, f, ang) {
+    function isSideTouchable(line, from, v, f, ang) {
         let rv = v.rotate90();
-        let v1 = l.p1.sub(p), v2 = l.p2.sub(p);
+        let v1 = line.p1.sub(from), v2 = line.p2.sub(from);
         let r1 = v1.dot(rv), r2 = v2.dot(rv);
         let d1 = v1.dot(v), d2 = v2.dot(v);
         let result = (r1 * f > 0 || r2 * f > 0)
             &&
                 (d1 > 0 || d2 > 0
-                    || !!ang && getAngle(v, l.vector) * f > ang * f);
+                    || !!ang && getAngle(v, line.vector) * f > ang * f);
         return result;
     }
 })(Trace || (Trace = {}));

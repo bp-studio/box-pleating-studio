@@ -75,10 +75,10 @@
                     observer.$notified();
             }
         }
-        $subscribe(observer) {
+        $addSubscriber(observer) {
             this._subscribers.add(observer);
         }
-        $unsubscribe(observer) {
+        $removeSubscriber(observer) {
             this._subscribers.delete(observer);
         }
         get $hasSubscriber() {
@@ -158,14 +158,26 @@
                 Core._terminateQueue.clear();
                 if (Core.$option.debug)
                     Observer.$clearTrigger();
-                for (let id of Core.$option.hook.gc()) {
-                    let ob = Observer._map.get(id);
-                    if (ob)
-                        Observer.$checkDeadEnd(ob);
-                }
+                Core._deadCheck();
             }
             if (Core.$option.hook.postcommit)
                 Core.$option.hook.postcommit();
+        }
+        static _deadCheck() {
+            for (let ob of Core._deadQueue) {
+                Observer.$checkDeadEnd(ob);
+            }
+            Core._deadQueue.clear();
+            for (let id of Core.$option.hook.gc()) {
+                let ob = Observer._map.get(id);
+                if (ob)
+                    Observer.$checkDeadEnd(ob);
+            }
+            Core.$deadChecked.clear();
+        }
+        static $queueDeadCheck(observable) {
+            if (observable instanceof Observer)
+                Core._deadQueue.add(observable);
         }
         static $queueInitialization(member) {
             Core._initializeQueue.add(member);
@@ -229,6 +241,8 @@
     Core._renderQueue = new Set();
     Core._terminateQueue = new Set();
     Core._initializeQueue = new Set();
+    Core._deadQueue = new Set();
+    Core.$deadChecked = new Set();
     Core._promised = false;
     Core._initializing = false;
     class Decorators {
@@ -460,11 +474,14 @@
                 target._reference.add(observable);
             }
         }
-        static $checkDeadEnd(observable) {
-            if (observable instanceof Observer && !observable._isTerminated && observable._isActive && !(observable._isActive = observable.$checkActive())) {
-                Core.$dequeue(observable);
-                for (let ref of observable._reference) {
-                    Observer.$checkDeadEnd(ref);
+        static $checkDeadEnd(observer) {
+            if (!Core.$deadChecked.has(observer)) {
+                Core.$deadChecked.add(observer);
+                if (!observer._isTerminated && !(observer._isActive = observer.$checkActive())) {
+                    for (let ref of observer._reference) {
+                        if (ref instanceof Observer)
+                            Observer.$checkDeadEnd(ref);
+                    }
                 }
             }
         }
@@ -494,14 +511,14 @@
                 if (!observer._isTerminated) {
                     for (let observable of observer._reference) {
                         oldReferences.delete(observable);
-                        observable.$subscribe(observer);
+                        observable.$addSubscriber(observer);
                         if (observer.$isActive && observable instanceof Observer) {
                             observable._activate();
                         }
                     }
                 }
                 for (let observable of oldReferences) {
-                    Observer.$checkDeadEnd(observable);
+                    Core.$queueDeadCheck(observable);
                 }
             } finally {
                 observer._isRendering = false;
@@ -531,7 +548,7 @@
             this._clearReference();
             for (let subscriber of this.$subscribers) {
                 subscriber._reference.delete(this);
-                this.$unsubscribe(subscriber);
+                this.$removeSubscriber(subscriber);
             }
             this._update();
             this._isRendering = false;
@@ -630,7 +647,7 @@
         }
         _clearReference() {
             for (let observable of this._reference)
-                observable.$unsubscribe(this);
+                observable.$removeSubscriber(this);
             this._reference.clear();
         }
         get $hasReferences() {
@@ -1081,7 +1098,8 @@
                     let member = target[$shrewdObject].$getMember(key);
                     if (!member)
                         console.log('Member not found');
-                    Observer.$debug(member);
+                    else
+                        Observer.$debug(member);
                 } else if (target instanceof Observer) {
                     Observer.$debug(target);
                 }

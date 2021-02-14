@@ -81,22 +81,13 @@
 	}
 
 	protected render() {
-		let ds = this.control.sheet.displayScale;
 		let w = this.control.width, h = this.control.height;
 
 		this._circle.copyContent(this.circle);
 
 		this.renderHinge();
 
-		// dots
-		let fix = (p: paper.Point) => [p.x * ds, -p.y * ds];
-		let p = MakePerQuadrant(i => {
-			let pt = this.control.points[i].toPaper();
-			this._dots[i].position.set(fix(pt));
-			return pt;
-		});
-		this._dots[2].visible = w > 0 || h > 0;
-		this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
+		let p = MakePerQuadrant(i => this.control.points[i].toPaper());
 
 		// inner ridges
 		this._innerRidges.removeChildren();
@@ -110,10 +101,28 @@
 			if(q.pattern == null) PaperUtil.addLine(this._outerRidges, p[i], q.corner);
 		});
 
+		this._shade.copyContent(this.hinge);
+	}
+
+	@shrewd private renderUnscaled() {
+		this.mountEvents();
+		if(!this.$studio) return;
+		this.$studio.$display.render();
+
+		let ds = this.control.sheet.displayScale;
+		let w = this.control.width, h = this.control.height;
+
+		let fix = (p: paper.Point) => [p.x * ds, -p.y * ds];
+		MakePerQuadrant(i => {
+			let pt = this.control.points[i].toPaper();
+			this._dots[i].position.set(fix(pt));
+			return pt;
+		});
+		this._dots[2].visible = w > 0 || h > 0;
+		this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
+
 		this._label.content = this.control.node.name;
 		LabelUtil.setLabel(this.control.sheet, this._label, this._glow, this.control.dragSelectAnchor, this._dots[0]);
-
-		this._shade.copyContent(this.hinge);
 	}
 
 	protected renderSelection(selected: boolean) {

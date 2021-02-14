@@ -3,6 +3,9 @@ interface JIntersection {
 	point: Point;
 	dist: Fraction;
 	angle: number;
+
+	/** 交點是否在線段內部 */
+	interior: boolean;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -31,39 +34,51 @@ namespace Trace {
 	): Path {
 		let full: Path = [];
 		let trace: Path = [];
-		let x: JIntersection | null;
-		let v = sv;
-		let p = startPt;
+		let currentIntersection: JIntersection | null;
+		let currentVector = sv;
+		let currentPoint = startPt;
 		let shift: Vector | undefined;
-		let line!: Line;
+		let currentLine!: Line;
 		let record = new Set<string>();
 		let candidates = new Set(lines);
 
 		if(debug) console.log([...inflections].toString());
 		do {
-			x = null;
-			for(let l of candidates) {
-				// 找出最接近的交點
-				let r = getIntersection(l, p, v);
-				if(r) {
+			/**
+			 * 底下這段程式碼負責解決 ray shooting problem。
+			 *
+			 * 這邊我使用的是最直觀但也最沒有效率的逐一檢查每一條線段的方法，
+			 * 這樣做的話每回合都需要 O(n) 的運算量，再加上全部約有 O(n) 的回合數，
+			 * 全部的運算量高達 O(n^2)；然而從效能的角度來看，
+			 * 這一部份的計算耗時並不是目前最吃重的部份，所以並不是非常急著改進。
+			 */
+			currentIntersection = null;
+			for(let line of candidates) {
+				let intersection = getIntersection(line, currentPoint, currentVector);
+				if(intersection) {
 					// 完全落在外邊的線不列入考慮，因為那其實跟反射無關
-					let ang = shift ? getAngle(v, shift) : undefined;
-					let f = inflections.has(r.point.toString()) ? -1 : 1;
-					if(!isSideTouchable(l, p, v, f, ang)) continue;
+					let angle = shift ? getAngle(currentVector, shift) : undefined;
+					let f: Sign = inflections.has(intersection.point.toString()) ? -1 : 1;
+					if(!intersection.interior && !isSideTouchable(line, currentPoint, currentVector, f, angle)) continue;
 
-					if(debug) console.log([JSON.stringify(r), l.toString()]);
-					if(intersectionCloser(r, x, f)) {
-						x = r; line = l;
+					if(debug) console.log([JSON.stringify(intersection), line.toString()]);
+					if(intersectionCloser(intersection, currentIntersection, f)) {
+						currentIntersection = intersection;
+						currentLine = line;
 					}
 				}
 			}
-			if(x) {
-				let pt = x.point;
-				let l = new Line(p, pt);
+
+			/**
+			 * 底下這段程式碼負責處理找到最近交點之後的事情。
+			 */
+			if(currentIntersection) {
+				let pt = currentIntersection.point;
+				let currentSegment = new Line(currentPoint, pt);
 
 				// 導繪模式的處理
 				if(start) {
-					let p = l.intersection(start);
+					let p = currentSegment.intersection(start);
 					if(p) { // 撞到了起點線，加入交點
 						trace.push(p);
 						start = undefined;
@@ -71,7 +86,7 @@ namespace Trace {
 				}
 
 				// 撞到了終點（優先）或終點線，停止輸出
-				let goal = l.contains(endPt) ? endPt : l.intersection(end);
+				let goal = currentSegment.contains(endPt) ? endPt : currentSegment.intersection(end);
 				if(goal) { trace.push(goal); break; }
 
 				// 偵測迴圈；迴圈是只有當有 meandering 的時候才會產生
@@ -87,16 +102,16 @@ namespace Trace {
 				}
 
 				// 暫存偏移向量以幫助下一次的判斷
-				shift = line.vector;
+				shift = currentLine.vector;
 
-				v = line.reflect(v);
-				if(debug) console.log([pt.toString(), line.toString(), v.toString(), shift.toString()]);
-				p = pt;
+				currentVector = currentLine.reflect(currentVector);
+				if(debug) console.log([pt.toString(), currentLine.toString(), currentVector.toString(), shift.toString()]);
+				currentPoint = pt;
 
 				// 反射過的線就不再列入考慮；理論上只要輸入資料沒錯，不可能同一條線會用到兩次
-				candidates.delete(line);
+				candidates.delete(currentLine);
 			}
-		} while(x != null);
+		} while(currentIntersection != null);
 
 		return trace;
 	}
@@ -109,8 +124,8 @@ namespace Trace {
 	}
 
 	/** 判斷傳入的交點 `r` 是否在特定意義上比起交點 `x` 更「近」 */
-	function intersectionCloser(r: JIntersection | null, x: JIntersection | null, f: number): boolean {
-		return r != null && (x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f);
+	function intersectionCloser(r: JIntersection, x: JIntersection | null, f: Sign): boolean {
+		return x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f;
 	}
 
 	/** 取得這條線和給定動向的交點 */
@@ -128,7 +143,8 @@ namespace Trace {
 		return {
 			point: p.add(v.scale(b)),
 			dist: b,
-			angle: getAngle(v, v1)
+			angle: getAngle(v, v1),
+			interior: a.gt(Fraction.ZERO) && a.lt(Fraction.ONE)
 		};
 	}
 
@@ -140,9 +156,9 @@ namespace Trace {
 	}
 
 	/** 給定一線段，想像一下、把給定的動向稍微往側邊平移，是否還能碰得到？ */
-	function isSideTouchable(l: Line, p: Point, v: Vector, f: number, ang?: number): boolean {
+	function isSideTouchable(line: Line, from: Point, v: Vector, f: number, ang?: number): boolean {
 		let rv = v.rotate90();
-		let v1 = l.p1.sub(p), v2 = l.p2.sub(p);
+		let v1 = line.p1.sub(from), v2 = line.p2.sub(from);
 		let r1 = v1.dot(rv), r2 = v2.dot(rv);
 		let d1 = v1.dot(v), d2 = v2.dot(v);
 		let result =
@@ -155,7 +171,7 @@ namespace Trace {
 				// 至少有一個端點位於前方
 				d1 > 0 || d2 > 0
 				// 或是給定線段的角度比前一次遇到的線段角度要更前面
-				|| !!ang && getAngle(v, l.vector) * f > ang * f
+				|| !!ang && getAngle(v, line.vector) * f > ang * f
 			);
 		return result;
 	}

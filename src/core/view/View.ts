@@ -19,10 +19,7 @@ abstract class View extends Mountable {
 	 */
 	@shrewd public draw() {
 		this.mountEvents();
-		if(this.$studio) {
-			this.$studio.$display.render();
-			this.render();
-		}
+		if(this.$studio) this.render();
 	}
 
 	/**

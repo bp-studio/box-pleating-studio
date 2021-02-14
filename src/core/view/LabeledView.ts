@@ -8,7 +8,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 	protected abstract readonly _label: paper.PointText;
 
 	/** 一個 View 的標籤的橫向溢出大小 */
-	@shrewd public get overflow() {
+	@shrewd public get overflow(): number {
 		if(this.disposed || !this.$studio) return 0;
 		this.draw();
 		let result = 0, b = this._label.bounds;

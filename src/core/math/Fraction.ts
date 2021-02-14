@@ -156,13 +156,13 @@ class Fraction {
 	/** Normalization after each operation */
 	private _check() {
 		/**
-		 * This constant is chosen to be less than sqrt(max_safe_integer / 2),
-		 * so that it guarantees the fraction can at least perform one more operation without overflow.
+		 * Test if the numbers are greater than 67108863 = floor(sqrt(max_safe_integer / 2)).
+		 * If one of them are greater, then one more operation could lead to overflow,
+		 * and thus we run automatic simplification.
+		 * Using Math.abs(x) >> 26 to perform the test is basically the fastest method,
+		 * according to benchmark result by JSBench.me
 		 */
-		const MAX = 67100000;
-
-		// Auto simplify
-		if(this._p > MAX || this._p < -MAX || this._q > MAX || this._q < -MAX) {
+		if(Math.abs(this._p) >> 26 || Math.abs(this._q) >> 26) {
 			this._smp();
 		}
 

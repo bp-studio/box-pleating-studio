@@ -167,9 +167,13 @@
 		if(this._updating) return;
 		this._updating = true;
 
+		if(perf) perfTime = 0;
+
 		Shrewd.commit();
 		await PaperWorker.done();
 		this.$display.project.view.update();
+
+		if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 
 		if(this.onUpdate) {
 			this.onUpdate();
