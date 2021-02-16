@@ -123,7 +123,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 
 	@onDemand public get direction(): Vector {
 		let { oy, v } = this;
-		return new Vector(oy + v, v).doubleAngle();
+		return new Vector(oy + v, v).doubleAngle().reduceToInt();
 	}
 
 	public get sx() {

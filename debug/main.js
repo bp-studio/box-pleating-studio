@@ -99,12 +99,7 @@ document.body.addEventListener("keydown", e => {
 	}
 })
 
-const BaseComponent = { watch: { "selection"() { } }, computed: { design() { return core.design; }, selections() { return core.selections; }, selection() { return this.selections[0]; } }, destroyed() {
-        // 這算是 patch Vue 的缺陷；確保 GC
-        let self = this;
-        delete self._computedWatchers;
-        delete self._watchers;
-    } };
+const BaseComponent = { computed: { design() { return core.design; }, selections() { return core.selections; }, selection() { return this.selections[0]; } } };
 
 const Dialog = { data() { return { modal: undefined, promise: null, message: undefined }; }, methods: { async show(message) {
             await core.libReady;

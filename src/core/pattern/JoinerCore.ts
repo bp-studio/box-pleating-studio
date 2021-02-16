@@ -193,6 +193,11 @@ class JoinerCore {
 		// 太過細小的三角形可能會超出範圍，此時不考慮
 		if(R.x * f < pt.x * f) return;
 
+		// 利用線段交叉來檢查變換之後的 R 點有沒有跑到外面去
+		e = this.substituteEnd([e1, e2][1 - i], D)
+		let test = e.intersection(new Line(T, R));
+		if(test && !test.eq(T) && !test.eq(R)) return;
+
 		this.data.addOns = [{
 			contour: [D, T, R].map(p => p.toIPoint()),
 			dir: new Line(T, R).reflect(p.direction).toIPoint()

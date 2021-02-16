@@ -1001,7 +1001,7 @@ class Piece extends Region {
     }
     get direction() {
         let { oy, v } = this;
-        return new Vector(oy + v, v).doubleAngle();
+        return new Vector(oy + v, v).doubleAngle().reduceToInt();
     }
     get sx() {
         return this.oy + this.u + this.v;
@@ -1124,7 +1124,7 @@ class AddOn extends Region {
         return { contour, ridges };
     }
     get direction() {
-        return new Vector(this.dir);
+        return new Vector(this.dir).reduceToInt();
     }
     static instantiate(a) {
         return a instanceof AddOn ? a : new AddOn(a);
@@ -1341,8 +1341,12 @@ class Fraction {
                 debugger;
                 throw new Error("Parameters are not valid");
             }
-            else {
+            else if (Number.isSafeInteger(Math.floor(n / d))) {
                 return Fraction.toFraction(n / d);
+            }
+            else {
+                this._p = n;
+                this._q = d;
             }
         }
         else {
@@ -1386,19 +1390,19 @@ class Fraction {
         this._q = 1;
         return this;
     }
-    a(v) {
-        this._p = this._p * v._q + this._q * v._p;
-        this._q *= v._q;
+    a(f) {
+        this._p = this._p * f._q + this._q * f._p;
+        this._q *= f._q;
         return this._check();
     }
-    s(v) {
-        this._p = this._p * v._q - this._q * v._p;
-        this._q *= v._q;
+    s(f) {
+        this._p = this._p * f._q - this._q * f._p;
+        this._q *= f._q;
         return this._check();
     }
-    m(v) {
-        this._p *= v._p;
-        this._q *= v._q;
+    m(f) {
+        this._p *= f._p;
+        this._q *= f._q;
         return this._check();
     }
     d(f) {
@@ -1415,9 +1419,8 @@ class Fraction {
         return this._q == 1;
     }
     _check() {
-        if (Math.abs(this._p) >> 26 || Math.abs(this._q) >> 26) {
+        if (this._isDangerous)
             this._smp();
-        }
         if (this._q < 0) {
             this._q = -this._q;
             this._p = -this._p;
@@ -1426,6 +1429,9 @@ class Fraction {
             this._p = 1;
         }
         return this;
+    }
+    get _isDangerous() {
+        return !!(Math.abs(this._p) >> 26) || !!(Math.abs(this._q) >> 26);
     }
     get neg() { return this.c().n(); }
     get inv() { return this.c().i(); }
@@ -1448,6 +1454,19 @@ class Fraction {
     }
     ge(v) {
         return this._p * v._q >= this._q * v._p;
+    }
+    reduceWith(f) {
+        this._smp();
+        f._smp();
+        let [n1, n2] = MathUtil.reduce(this._p, f._p);
+        let [d1, d2] = MathUtil.reduce(this._q, f._q);
+        return [new Fraction(n1, d1), new Fraction(n2, d2)];
+    }
+    reduceToIntWith(f) {
+        this._smp();
+        f._smp();
+        let [n1, n2] = MathUtil.reduce(this._p * f._q, this._q * f._p);
+        return [new Fraction(n1), new Fraction(n2)];
     }
     toJSON() {
         return this.toString();
@@ -2770,15 +2789,14 @@ class Vector extends Couple {
         return Math.atan2(this.y, this.x);
     }
     reduce() {
-        let [nx, ny] = [this._x.$numerator, this._y.$numerator];
-        let [dx, dy] = [this._x.$denominator, this._y.$denominator];
-        let [x, y] = MathUtil.reduce(nx * dy, ny * dx);
-        return new Vector(Number(x), Number(y));
+        return new Vector(...this._x.reduceWith(this._y));
     }
-    doubleAngle(fx = 1) {
-        let { x, y } = this.reduce();
-        [x, y] = MathUtil.reduce(x * x - y * y, 2 * x * y);
-        return new Vector(fx * x, fx * y);
+    reduceToInt() {
+        return new Vector(...this._x.reduceToIntWith(this._y));
+    }
+    doubleAngle() {
+        let { _x, _y } = this.reduce();
+        return new Vector(_x.mul(_x).s(_y.mul(_y)), Fraction.TWO.mul(_x).m(_y));
     }
     parallel(v) {
         return this._x.mul(v._y).eq(this._y.mul(v._x));
@@ -3033,6 +3051,8 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
             let lead = this.findLead(junctions, r, lines, inflections);
             let start = lead ? this.findNextDelta(junctions, true) : undefined;
             trace = Trace.create(lines, lead !== null && lead !== void 0 ? lead : startPt, endPt, this.pv, inflections, end !== null && end !== void 0 ? end : new Line(endPt, this.pv), start);
+            while (this.isInvalidHead(trace[0], r, this.q % 2 != 1))
+                trace.shift();
             if (start && this.outside(trace[0], r, this.q % 2 != 1)) {
                 trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
             }
@@ -3049,7 +3069,18 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         }
         return trace;
     }
+    isInvalidHead(p, r, x) {
+        if (!p)
+            return false;
+        let prevQ = this.flap.quadrants[(this.q + 3) % 4];
+        return (x ?
+            (p.y - this.point.y) * this.fy < 0 && p.x == this.x(r) :
+            (p.x - this.point.x) * this.fx < 0 && p.y == this.y(r)) &&
+            prevQ.outside(p, r, !x);
+    }
     outside(p, r, x) {
+        if (!p)
+            return false;
         return x ? p.x * this.fx > this.x(r) * this.fx : p.y * this.fy > this.y(r) * this.fy;
     }
     getStart(d) {
@@ -3102,11 +3133,15 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         let { joinQ, nextQ } = find;
         let ok = this.design.junctions.get(this.flap, nextQ.flap).status == JunctionStatus.tooFar;
         let dist = this.design.tree.distTriple(this.flap.node, nextQ.flap.node, joinQ.flap.node);
-        if (d <= dist.d1 && (ok || d != dist.d1))
+        if (d <= dist.d1 && ok)
             return undefined;
         let d2 = d - dist.d1 + dist.d2;
         let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
         inflections.add(inflection.toString());
+        if (d2 == 0)
+            inflections.add(nextQ.point.toString());
+        if (d < dist.d1)
+            lines.push(new Line(inflection, this.qv));
         return (_a = nextQ.findLead(junctions, d2, lines, inflections)) !== null && _a !== void 0 ? _a : nextQ.getStart(new Fraction(d2));
     }
     get pattern() {
@@ -4026,7 +4061,8 @@ let FlapView = class FlapView extends LabeledView {
         this.hinge.removeSegments();
         if (!paths.length)
             debugger;
-        this.hinge.add(...paths[0].segments);
+        else
+            this.hinge.add(...paths[0].segments);
     }
     render() {
         let w = this.control.width, h = this.control.height;
@@ -4485,9 +4521,10 @@ class FieldCommand {
     }
     tryAddTo(step) {
         let c;
-        if ((c = step.commands[0]) instanceof FieldCommand && c.tag == this.tag && c.prop == this.prop) {
-            if (c.new != this.old)
-                debugger;
+        if ((c = step.commands[0]) instanceof FieldCommand
+            && c.tag == this.tag
+            && c.prop == this.prop
+            && c.new == this.old) {
             c.new = this.new;
             return true;
         }
@@ -5760,10 +5797,10 @@ let System = System_1 = class System {
     }
 };
 __decorate([
-    shrewd
+    unorderedArray()
 ], System.prototype, "_controls", null);
 __decorate([
-    shrewd
+    unorderedArray()
 ], System.prototype, "selections", null);
 __decorate([
     shrewd
@@ -6237,8 +6274,11 @@ var Trace;
         let currentLine;
         let record = new Set();
         let candidates = new Set(lines);
-        if (debug)
-            console.log([...inflections].toString());
+        if (debug) {
+            console.log("StartPt: " + startPt.toString());
+            console.log("Start: " + (start === null || start === void 0 ? void 0 : start.toString()));
+            console.log("Inflections: ", [...inflections].toString());
+        }
         do {
             currentIntersection = null;
             for (let line of candidates) {
@@ -7128,6 +7168,10 @@ class JoinerCore {
         let R = PathUtil.triangleTransform([D, P, B], T);
         if (R.x * f < pt.x * f)
             return;
+        e = this.substituteEnd([e1, e2][1 - i], D);
+        let test = e.intersection(new Line(T, R));
+        if (test && !test.eq(T) && !test.eq(R))
+            return;
         this.data.addOns = [{
                 contour: [D, T, R].map(p => p.toIPoint()),
                 dir: new Line(T, R).reflect(p.direction).toIPoint()
@@ -7455,11 +7499,11 @@ var MathUtil;
 (function (MathUtil) {
     function GCD(a, b) {
         if (typeof a == 'number' && !Number.isSafeInteger(a))
-            throw new Error("Not a safe integer: " + a);
+            return 1;
         if (typeof b == 'number' && !Number.isSafeInteger(b))
-            throw new Error("Not a safe integer: " + b);
+            return 1;
         if (a == 0 && b == 0)
-            throw new Error("Input cannot be both zero");
+            return 1;
         if (a < 0)
             a = -a;
         if (b < 0)
@@ -7488,7 +7532,7 @@ var MathUtil;
             b = Number(af.$denominator * bf.$numerator);
         }
         let gcd = this.GCD(a, b);
-        return [a / gcd, b / gcd];
+        return [a / gcd, b / gcd, gcd];
     }
     MathUtil.reduce = reduce;
     function int(x, f) {

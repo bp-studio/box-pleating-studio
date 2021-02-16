@@ -29,7 +29,7 @@ class AddOn extends Region implements JAddOn {
 	}
 
 	@onDemand public get direction() {
-		return new Vector(this.dir);
+		return new Vector(this.dir).reduceToInt();
 	}
 
 	public static instantiate(a: JAddOn): AddOn {

@@ -18,7 +18,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	/** 當前所有活躍的 `Control` 陣列，依照優先度排序 */
-	@shrewd private get _controls(): Control[] {
+	@unorderedArray() private get _controls(): Control[] {
 		let c = this._studio.design ? this._studio.design.sheet.activeControls.concat() : [];
 		c.sort((a, b) => System.controlPriority(a) - System.controlPriority(b));
 		this._dragSelectables = c.filter(Control.isDragSelectable);
@@ -27,7 +27,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	/** 當前所有被選取的 `Control` */
-	@shrewd public get selections(): Control[] {
+	@unorderedArray() public get selections(): Control[] {
 		return this._controls.filter(c => c.selected);
 	}
 

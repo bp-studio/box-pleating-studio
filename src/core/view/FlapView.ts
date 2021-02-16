@@ -77,7 +77,7 @@
 		let paths = PaperUtil.fromSegments(this.closure);
 		this.hinge.removeSegments();
 		if(!paths.length) debugger;
-		this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
+		else this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
 	}
 
 	protected render() {

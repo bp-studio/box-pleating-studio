@@ -10,9 +10,11 @@ namespace MathUtil {
 	/** 求出整數的最大公因數。 */
 	export function GCD<T extends bigint | number>(a: T, b: T): T;
 	export function GCD(a: number, b: number): number {
-		if(typeof a == 'number' && !Number.isSafeInteger(a)) throw new Error("Not a safe integer: " + a);
-		if(typeof b == 'number' && !Number.isSafeInteger(b)) throw new Error("Not a safe integer: " + b);
-		if(a == 0 && b == 0) throw new Error("Input cannot be both zero");
+		// 在幾種數值無效的情況中，直接傳回 1 使得相依的程式什麼都不做
+		if(typeof a == 'number' && !Number.isSafeInteger(a)) return 1;
+		if(typeof b == 'number' && !Number.isSafeInteger(b)) return 1;
+		if(a == 0 && b == 0) return 1;
+
 		if(a < 0) a = -a;
 		if(b < 0) b = -b;
 		while(a && b) { a %= b; if(a) b %= a; }
@@ -29,15 +31,15 @@ namespace MathUtil {
 	}
 
 	/** 把一對有理數進行化簡。 */
-	export function reduce<T extends bigint | number>(a: T, b: T): [T, T];
-	export function reduce(a: number, b: number): [number, number] {
+	export function reduce<T extends bigint | number>(a: T, b: T): [T, T, T];
+	export function reduce(a: number, b: number): [number, number, number] {
 		if(typeof a == 'number' && !Number.isInteger(a) || typeof b == 'number' && !Number.isInteger(b)) {
 			let af = new Fraction(a), bf = new Fraction(b);
 			a = Number(af.$numerator * bf.$denominator);
 			b = Number(af.$denominator * bf.$numerator);
 		}
 		let gcd = this.GCD(a, b);
-		return [a / gcd, b / gcd];
+		return [a / gcd, b / gcd, gcd];
 	}
 
 	/** 把數值 x 朝著 f 指定的方向取下一個整數 */

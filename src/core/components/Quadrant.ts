@@ -100,6 +100,10 @@
 			let start = lead ? this.findNextDelta(junctions, true) : undefined;
 			trace = Trace.create(lines, lead ?? startPt, endPt, this.pv, inflections, end ?? new Line(endPt, this.pv), start);
 
+			// 下面這一行去掉一些在非法導繪模式中可能產生的無效點；
+			// 那些點會干擾 PolyBool 演算法
+			while(this.isInvalidHead(trace[0], r, this.q % 2 != 1)) trace.shift();
+
 			// 底下這部份的程式碼是為了在 join 的場合中順利聯集兩組輪廓而不會在中間出現缺口而設置的，
 			// 未來採用比較具宏觀性的演算法的話這段可以拿掉。
 			if(start && this.outside(trace[0], r, this.q % 2 != 1)) {
@@ -118,8 +122,19 @@
 		return trace;
 	}
 
+	/** 指定的點是否是在非法導繪模式中產生的無效點 */
+	private isInvalidHead(p: Point, r: number, x: boolean): boolean {
+		if(!p) return false;
+		let prevQ = this.flap.quadrants[(this.q +3) % 4];
+		return (x ?
+			(p.y - this.point.y) * this.fy < 0 && p.x == this.x(r) :
+			(p.x - this.point.x) * this.fx < 0 && p.y == this.y(r)) &&
+			prevQ.outside(p, r, !x);
+	}
+
 	/** 指定的點是否某個座標超過了自身的給定半徑範圍 */
-	private outside(p: Point, r: number, x: boolean) {
+	private outside(p: Point, r: number, x: boolean): boolean {
+		if(!p) return false;
 		return x ? p.x * this.fx > this.x(r) * this.fx : p.y * this.fy > this.y(r) * this.fy;
 	}
 
@@ -189,14 +204,18 @@
 		let dist = this.design.tree.distTriple(this.flap.node, nextQ.flap.node, joinQ.flap.node);
 
 		// 一般來說只有當 d > dist.d1 的時候有必要作導繪，
-		// 但是當 !ok && d == dist.d1 的時候整個情況會特別奇怪，因此額外開放。
-		if(d <= dist.d1 && (ok || d != dist.d1)) return undefined;
+		// 但是當 !ok 的時候整個情況會特別奇怪，因此額外開放。
+		if(d <= dist.d1 && ok) return undefined;
 
 		let d2 = d - dist.d1 + dist.d2;
 
 		// 加入反曲點
 		let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
 		inflections.add(inflection.toString());
+		if(d2 == 0) inflections.add(nextQ.point.toString());
+
+		// 加入額外線條
+		if(d < dist.d1) lines.push(new Line(inflection, this.qv));
 
 		return nextQ.findLead(junctions, d2, lines, inflections) ?? nextQ.getStart(new Fraction(d2));
 	}

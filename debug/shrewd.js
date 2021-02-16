@@ -105,6 +105,7 @@
     class VueHook {
         constructor(vue) {
             this._writes = new Set();
+            this._created = new Set();
             this._Vue = vue || typeof window != 'undefined' && window.Vue;
             if (!this._Vue)
                 throw new Error('Global Vue not found; you need to pass a Vue constructor to VueHook.');
@@ -128,7 +129,12 @@
         gc() {
             let result = [];
             for (let id in this._vue.shrewd) {
-                if (this._vue.shrewd[id].__ob__.dep.subs.length == 0) {
+                let n = Number(id);
+                if (!Core.$option.autoCommit && !this._created.has(n)) {
+                    this._created.add(n);
+                } else if (this._vue.shrewd[id].__ob__.dep.subs.length == 0) {
+                    if (!Core.$option.autoCommit)
+                        this._created.delete(n);
                     this._Vue.delete(this._vue.shrewd, id);
                     result.push(Number(id));
                 }

@@ -72,35 +72,31 @@ class Vector extends Couple {
 	}
 
 	/**
-	 * 化簡向量並傳回同方向但是座標為整數的新向量。
+	 * 化簡向量並傳回同方向但是座標的分子分母盡可能小的新向量。
+	 */
+	public reduce(): Vector {
+		return new Vector(...this._x.reduceWith(this._y));
+	}
+
+	/**
+	 * 化簡向量並傳回方向相同、但是座標為最小整數的新向量。
+	 * 這個方法的主要用途是要將方向向量標準化，以便驗證 Pattern 相符。
 	 *
 	 * 視原向量的分母而定，新向量的大小可能遠比本來的向量更大。
 	 */
-	public reduce(): Vector {
-		let [nx, ny] = [this._x.$numerator, this._y.$numerator];
-		let [dx, dy] = [this._x.$denominator, this._y.$denominator];
-		let [x, y] = MathUtil.reduce(nx * dy, ny * dx);
-		return new Vector(Number(x), Number(y));
+	public reduceToInt(): Vector {
+		return new Vector(...this._x.reduceToIntWith(this._y));
 	}
 
 	/**
 	 * 放大兩倍主輻角，並且傳回新的向量。
 	 *
 	 * 請注意新向量與原向量的長度之間沒有任何關聯。
-	 * @param fx 傳入 -1 表示要把位於二三象限的向量朝反方向放大；預設值為 1。`fy` 因為會在算式中抵銷，無須帶入。
 	 */
-	public doubleAngle(fx: number = 1): Vector {
-		let { x, y } = this.reduce();
-		[x, y] = MathUtil.reduce(x * x - y * y, 2 * x * y);
-		return new Vector(fx * x, fx * y);
+	public doubleAngle(): Vector {
+		let { _x, _y } = this.reduce();
+		return new Vector(_x.mul(_x).s(_y.mul(_y)), Fraction.TWO.mul(_x).m(_y));
 	}
-
-	// 這個似乎用不到了
-	// /** 原地對調 x, y 值 */
-	// public flip(): Vector {
-	// 	[this._x, this._y] = [this._y, this._x];
-	// 	return this;
-	// }
 
 	/** 檢查自身跟傳入的向量是否平行 */
 	public parallel(v: Vector): boolean {

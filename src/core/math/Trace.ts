@@ -42,7 +42,11 @@ namespace Trace {
 		let record = new Set<string>();
 		let candidates = new Set(lines);
 
-		if(debug) console.log([...inflections].toString());
+		if(debug) {
+			console.log("StartPt: " + startPt.toString());
+			console.log("Start: " + start?.toString());
+			console.log("Inflections: ", [...inflections].toString());
+		}
 		do {
 			/**
 			 * 底下這段程式碼負責解決 ray shooting problem。

@@ -39,8 +39,12 @@ class Fraction {
 			} else if(!Number.isFinite(n / d)) {
 				debugger;
 				throw new Error("Parameters are not valid");
-			} else {
+			} else if(Number.isSafeInteger(Math.floor(n / d))) {
 				return Fraction.toFraction(n / d);
+			} else {
+				// 最後的 fallback，使用不精確模式
+				this._p = n;
+				this._q = d;
 			}
 		} else {
 			debugger;
@@ -114,23 +118,23 @@ class Fraction {
 	/////////////////////////////////
 
 	/** Addition in place */
-	public a(v: Fraction): this {
-		this._p = this._p * v._q + this._q * v._p;
-		this._q *= v._q;
+	public a(f: Fraction): this {
+		this._p = this._p * f._q + this._q * f._p;
+		this._q *= f._q;
 		return this._check();
 	}
 
 	/** Subtraction in place */
-	public s(v: Fraction): this {
-		this._p = this._p * v._q - this._q * v._p;
-		this._q *= v._q;
+	public s(f: Fraction): this {
+		this._p = this._p * f._q - this._q * f._p;
+		this._q *= f._q;
 		return this._check();
 	}
 
 	/** Multiplication in place */
-	public m(v: Fraction): this {
-		this._p *= v._p;
-		this._q *= v._q;
+	public m(f: Fraction): this {
+		this._p *= f._p;
+		this._q *= f._q;
 		return this._check();
 	}
 
@@ -155,16 +159,8 @@ class Fraction {
 
 	/** Normalization after each operation */
 	private _check() {
-		/**
-		 * Test if the numbers are greater than 67108863 = floor(sqrt(max_safe_integer / 2)).
-		 * If one of them are greater, then one more operation could lead to overflow,
-		 * and thus we run automatic simplification.
-		 * Using Math.abs(x) >> 26 to perform the test is basically the fastest method,
-		 * according to benchmark result by JSBench.me
-		 */
-		if(Math.abs(this._p) >> 26 || Math.abs(this._q) >> 26) {
-			this._smp();
-		}
+		// Try auto simplifying.
+		if(this._isDangerous) this._smp();
 
 		// Make sure that q is always positive.
 		if(this._q < 0) { this._q = -this._q; this._p = -this._p; }
@@ -175,6 +171,17 @@ class Fraction {
 		}
 
 		return this;
+	}
+
+	/**
+	 * Test if the numbers are greater than 67108863 = floor(sqrt(max_safe_integer / 2)).
+	 * If one of them are greater, then one more operation could lead to overflow,
+	 * and we call that "dangerous".
+	 * Using Math.abs(x) >> 26 to perform the test is basically the fastest method,
+	 * according to benchmark result by JSBench.me
+	 */
+	private get _isDangerous(): boolean {
+		return !!(Math.abs(this._p) >> 26) || !!(Math.abs(this._q) >> 26);
 	}
 
 	/////////////////////////////////
@@ -229,6 +236,23 @@ class Fraction {
 	/**greater than or equal to */
 	public ge(v: Fraction): boolean {
 		return this._p * v._q >= this._q * v._p;
+	}
+
+	/////////////////////////////////
+	// Other methods
+	/////////////////////////////////
+
+	public reduceWith(f: Fraction): [Fraction, Fraction] {
+		this._smp(); f._smp();
+		let [n1, n2] = MathUtil.reduce(this._p, f._p);
+		let [d1, d2] = MathUtil.reduce(this._q, f._q);
+		return [new Fraction(n1, d1), new Fraction(n2, d2)];
+	}
+
+	public reduceToIntWith(f: Fraction): [Fraction, Fraction] {
+		this._smp(); f._smp();
+		let [n1, n2] = MathUtil.reduce(this._p * f._q, this._q * f._p);
+		return [new Fraction(n1), new Fraction(n2)];
 	}
 
 	public toJSON() {

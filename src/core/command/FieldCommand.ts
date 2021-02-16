@@ -24,8 +24,12 @@ class FieldCommand implements ICommand, JFieldCommand {
 
 	public tryAddTo(step: Step): boolean {
 		let c: any;
-		if((c = step.commands[0]) instanceof FieldCommand && c.tag == this.tag && c.prop == this.prop) {
-			if(c.new != this.old) debugger;
+		if(
+			(c = step.commands[0]) instanceof FieldCommand
+			&& c.tag == this.tag
+			&& c.prop == this.prop
+			&& c.new == this.old
+		) {
 			c.new = this.new;
 			return true;
 		} else return false;
