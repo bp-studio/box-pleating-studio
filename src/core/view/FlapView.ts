@@ -37,6 +37,10 @@
 			(this.hinge.contains(point) || this.hinge.hitTest(point) != null);
 	}
 
+	public get dragging(): boolean {
+		return this._component.dragging;
+	}
+
 	@shrewd public get circle() {
 		return this.makeRectangle(0);
 	}
@@ -66,7 +70,7 @@
 		if(!this.control.design.dragging && this.jsonCache.length) this.jsonCache = [];
 	}
 
-	@segment("flap.closure") public get closure() {
+	public get closure() {
 		return this._component.segment;
 	}
 

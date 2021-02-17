@@ -1,5 +1,6 @@
 // Level 0
 /// <reference path="global/import.ts" />
+/// <reference path="global/Decorators.ts" />
 /// <reference path="util/Decorators.ts" />
 /// <reference path="pattern/Region.ts" />
 /// <reference path="class/Disposable.ts" />

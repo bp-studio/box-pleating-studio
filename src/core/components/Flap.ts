@@ -7,7 +7,6 @@ interface JFlap {
 	y: number;
 }
 
-
 //////////////////////////////////////////////////////////////////
 /**
  * `Flap` 是摺痕圖中的角片元件，是決定整個摺痕圖配置的關鍵。
@@ -121,11 +120,6 @@ interface JFlap {
 		return v;
 	}
 
-	/** 偵錯用；列印 makeContour(d) 的結果 */
-	public debug(d: number = 0): void {
-		//console.log(this.view.makeContour(d).exportJSON());
-	}
-
 	////////////////////////////////////////////////////////////
 	/**
 	 * 底下這一部份的程式碼負責整理一個 Flap 具有哪些 Junction。
@@ -149,7 +143,7 @@ interface JFlap {
 		return this.$junctions;
 	}
 
-	@shrewd get validJunctions(): readonly Junction[] {
+	@noCompare get validJunctions(): readonly Junction[] {
 		return this.junctions.filter(j => j.isValid);
 	}
 }

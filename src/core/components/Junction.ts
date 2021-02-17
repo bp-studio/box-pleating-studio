@@ -97,7 +97,17 @@ enum JunctionStatus {
 	}
 
 	/** 自身有可能被覆蓋的 Junction 列表 */
-	@shrewd private get coverCandidate(): [Junction, TreeNode][] {
+	@shrewd({
+		comparer(ov: [Junction, TreeNode][], nv: [Junction, TreeNode][]) {
+			if(!ov) return false;
+			if(ov.length != nv.length) return false;
+			for(let i = 0; i < ov.length; i++) {
+				if(ov[i][0] != nv[i][0] || ov[i][1] != nv[i][1]) return false;
+			}
+			return true;
+		}
+	})
+	private get coverCandidate(): [Junction, TreeNode][] {
 		let result: [Junction, TreeNode][] = [];
 		for(let j of this.sheet.design.validJunctions) {
 			if(j == this) continue;
@@ -124,7 +134,7 @@ enum JunctionStatus {
 		return true; // 否則大的覆蓋小的
 	}
 
-	@unorderedArray("jcb") public get coveredBy(): Junction[] {
+	@orderedArray("jcb") public get coveredBy(): Junction[] {
 		this.disposeEvent();
 		if(!this.isValid) return [];
 		let result: Junction[] = [];

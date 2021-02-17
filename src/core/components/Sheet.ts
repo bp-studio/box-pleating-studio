@@ -15,8 +15,8 @@ interface JSheet {
 
 	public readonly tag: string;
 
-	@unorderedArray("sheetControls") public get controls(): Control[] {
-		var result: Control[] = [];
+	@unorderedArray public get controls(): Control[] {
+		let result: Control[] = [];
 		for(let map of this._controlMaps) result.push(...map());
 		return result;
 	}
@@ -108,7 +108,7 @@ interface JSheet {
 		return 0 <= p.x && p.x <= this.width && 0 <= p.y && p.y <= this.height;
 	}
 
-	@unorderedArray("sheet.independents") get independents(): IndependentDraggable[] {
+	@unorderedArray get independents(): IndependentDraggable[] {
 		return this.controls.filter((c: Control): c is IndependentDraggable => c instanceof IndependentDraggable);
 	}
 
@@ -134,7 +134,7 @@ interface JSheet {
 		this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
 	}
 
-	@unorderedArray("sheet.viewedControls") private get viewedControls() {
+	@unorderedArray private get viewedControls() {
 		return this.controls.filter((c: Control): c is LabeledControl =>
 			(c instanceof ViewedControl) && (c.view instanceof LabeledView)
 		);

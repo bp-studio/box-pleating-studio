@@ -29,9 +29,9 @@ namespace PolyBool {
 	}
 
 	export function union(segments: Segments[]): Segments {
-		var seg = segments[0];
-		for(var i = 1; i < segments.length; i++) {
-			var comb = combine(seg, segments[i]);
+		let seg = segments[0];
+		for(let i = 1; i < segments.length; i++) {
+			let comb = combine(seg, segments[i]);
 			seg = selectUnion(comb);
 		}
 		return seg;

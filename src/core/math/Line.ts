@@ -29,7 +29,7 @@ class Line {
 	public contains(point: Point | IPoint, includeEndpoints: boolean = false) {
 		let p = point instanceof Point ? point : new Point(point);
 		if(includeEndpoints && (p.eq(this.p1) || p.eq(this.p2))) return true;
-		var v1 = p.sub(this.p1), v2 = p.sub(this.p2);
+		let v1 = p.sub(this.p1), v2 = p.sub(this.p2);
 		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
 	}
 
@@ -182,17 +182,12 @@ class Line {
 	/** 把給定的向量對於這條線作鏡射 */
 	public reflect(v: Vector): Vector {
 		v = v.neg;
-		var m = new Matrix(v._x, v._y.neg, v._y, v._x);
-		var mi = m.inverse!;
+		let m = new Matrix(v._x, v._y.neg, v._y, v._x);
+		let mi = m.inverse!;
 		v = mi.multiply(this.p2.sub(this.p1));
 		v = v.doubleAngle();
 		return m.multiply(v).reduce();
 	}
-
-	// 疑似暫時用不到
-	// public get isOrthogonal() {
-	// 	return this.p1._x.eq(this.p2._x) || this.p1._y.eq(this.p2._y);
-	// }
 
 	/** 直線是否和給定的向量垂直 */
 	public perpendicular(v: Vector): boolean {

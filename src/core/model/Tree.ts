@@ -43,7 +43,7 @@
 	}
 
 	@shrewd public get leaf(): ReadonlySet<TreeNode> {
-		var set: Set<TreeNode> = new Set();
+		let set: Set<TreeNode> = new Set();
 		for(let node of this.node.values()) if(node.degree == 1) set.add(node);
 		return set;
 	}

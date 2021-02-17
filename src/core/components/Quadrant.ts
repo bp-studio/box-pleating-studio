@@ -1,4 +1,5 @@
 
+type CoveredInfo = [number, number, Point[]];
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -89,7 +90,9 @@
 			trace = [startPt, this.point.add(this.qv.scale(s))];
 		} else {
 			let lines = pattern.linesForTracing[this.q].concat();
-			if(debug) console.log(lines.map(l => l.toString()));
+			if(debugEnabled && debug) {
+				console.log(lines.map(l => l.toString()));
+			}
 			let junctions = pattern.stretch.junctions;
 
 			// 在牽涉到融合的情況中，一個 Quadrant 需要負責的軌跡絕對不會超過 delta 線的範圍，
@@ -109,23 +112,40 @@
 			if(start && this.outside(trace[0], r, this.q % 2 != 1)) {
 				trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
 			} else {
-				trace.unshift(startPt); // 這是為了確保輸出和前一種情況一致
+				// 底下的程式碼是為了確保輸出和前一種情況一致
+				let l: number;
+				while((l = trace.length) > 1 && new Line(startPt, trace[1]).lineContains(trace[0])) {
+					trace.shift();
+				}
+				trace.unshift(startPt);
 			}
+
 			if(end) {
 				if(this.outside(trace[trace.length - 1], r, this.q % 2 == 1)) {
 					trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
 				}
 				let last = trace[trace.length - 1];
-				trace.push(this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y));
+				let append = this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y);
+				if(!append.eq(endPt)) trace.push(append);
 			}
 		}
+
+		// 底下的程式碼是為了確保輸出一致
+		let l: number;
+		while((l = trace.length) > 1 && new Line(endPt, trace[l - 2]).contains(trace[l - 1])) {
+			trace.pop();
+		}
+
+		// 底下這一行是用來偵錯數值爆表用的
+		// if(trace.some(p => p._x.$isDangerous || p._y.$isDangerous)) console.log("danger");
+
 		return trace;
 	}
 
 	/** 指定的點是否是在非法導繪模式中產生的無效點 */
 	private isInvalidHead(p: Point, r: number, x: boolean): boolean {
 		if(!p) return false;
-		let prevQ = this.flap.quadrants[(this.q +3) % 4];
+		let prevQ = this.flap.quadrants[(this.q + 3) % 4];
 		return (x ?
 			(p.y - this.point.y) * this.fy < 0 && p.x == this.x(r) :
 			(p.x - this.point.x) * this.fx < 0 && p.y == this.y(r)) &&
@@ -214,8 +234,17 @@
 		inflections.add(inflection.toString());
 		if(d2 == 0) inflections.add(nextQ.point.toString());
 
-		// 加入額外線條
-		if(d < dist.d1) lines.push(new Line(inflection, this.qv));
+		// 距離更小的時候的特殊處理
+		if(d < dist.d1) {
+			let i = lines.findIndex(l => l.contains(inflection));
+			if(i >= 0) {
+				// 如果 delta 線包含了反曲點，那軌跡繪製的時候必須忽略 delta 線，否則結果會有 bug
+				lines.splice(i, 1);
+			} else {
+				// 否則加入額外線條
+				lines.push(new Line(inflection, this.qv));
+			}
+		}
 
 		return nextQ.findLead(junctions, d2, lines, inflections) ?? nextQ.getStart(new Fraction(d2));
 	}
@@ -230,17 +259,18 @@
 		return this.point.add(this.qv.scale(r));
 	}
 
-	@unorderedArray("qvj") private get validJunctions(): readonly Junction[] {
+	@orderedArray("qvj") private get validJunctions(): readonly Junction[] {
 		return this.flap.validJunctions.filter(j => j.q1 == this || j.q2 == this);
 	}
 
-	@shrewd public get coveredJunctions(): readonly [Junction, Point[]][] {
-		return this.validJunctions
-			.filter(j => j.isCovered)
-			.map(j => {
-				let q3 = j.q1 == this ? j.q2 : j.q1;
-				return [j, j.coveredBy.map(c => c.q1 == q3 ? c.q2!.point : c.q1!.point)];
-			});
+	@orderedArray("qcj") public get coveredJunctions(): readonly Junction[] {
+		return this.validJunctions.filter(j => j.isCovered);
+	}
+
+	@noCompare public get coveredInfo(): readonly CoveredInfo[] {
+		return this.coveredJunctions.map(j =>
+			[j.ox, j.oy, j.coveredBy.map(c => c.q1!.q == this.q ? c.q1!.point : c.q2!.point)]
+		);
 	}
 
 	@shrewd public get point(): Point {
@@ -248,7 +278,7 @@
 	}
 
 	/** 傳回此向量目前所有的活躍 `Junction` 物件 */
-	@unorderedArray("qaj") public get activeJunctions(): readonly Junction[] {
+	@orderedArray("qaj") public get activeJunctions(): readonly Junction[] {
 		return this.validJunctions.filter(j => !j.isCovered);
 	}
 

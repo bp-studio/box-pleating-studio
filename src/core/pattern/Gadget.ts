@@ -153,8 +153,9 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 	}
 
 	/** 自身是否包含指定的點（座標為 offset 之前的座標） */
-	public contains(p: Point) {
-		return this.pieces.some(pc => PathUtil.pointInsidePath(p, pc.shape.contour));
+	public intersects(p: Point, v: Vector): boolean {
+		let test = this.contour.map((v, i, a) => new Line(v, a[(i + 1) % a.length]));
+		return test.some(l => Trace.getIntersection(l, p, v));
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////

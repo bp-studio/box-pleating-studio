@@ -63,12 +63,12 @@ type GPattern = JPattern<Gadget>;
 	 * 這跟一個 Pattern 實際上會繪製出來的 ridge 並不全然一樣。
 	 */
 	@shrewd public get linesForTracing(): PerQuadrant<readonly Line[]> {
-		if(!this.isActive) return MakePerQuadrant(i => []);
+		if(!this.isActive) return this._lineCache;
 
 		let dir = this.configuration.repository.stretch.junctions[0].direction;
 		let { fx, fy } = this.stretch;
-		let size = new Fraction(this.design.sheet.size);
-		return MakePerQuadrant(q => {
+		let size = new Fraction(this.design.LayoutSheet.size);
+		return this._lineCache = MakePerQuadrant(q => {
 			let lines: Line[] = [];
 			if(dir % 2 != q % 2) return lines;
 			for(let d of this.devices) {
@@ -103,6 +103,7 @@ type GPattern = JPattern<Gadget>;
 			return Line.distinct(lines);
 		});
 	}
+	private _lineCache: PerQuadrant<readonly Line[]> = MakePerQuadrant(i => []);
 
 	public toJSON(): JPattern {
 		return { devices: this.devices.map(d => d.toJSON()) };

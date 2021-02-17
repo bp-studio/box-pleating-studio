@@ -96,6 +96,7 @@ interface JConfiguration {
 		let devices = prototypes as GDevice[];
 		let junctions = this.repository.structure;
 
+		// 單一普通 Device
 		if(junctions.length == 1) {
 			let sx = junctions[0].sx;
 
@@ -118,6 +119,7 @@ interface JConfiguration {
 			}
 		}
 
+		// 單一 Join Device
 		if(junctions.length == 2 && this.partitions.length == 1) {
 			let [o1, o2] = this.overlaps;
 			let [j1, j2] = [o1, o2].map(o => this.repository.structure[o.parent]);
@@ -128,6 +130,7 @@ interface JConfiguration {
 			return { devices };
 		}
 
+		// 兩個 Device Relay
 		if(junctions.length == 2 && this.partitions.length == 2) {
 			// TODO: 目前這一段幾乎是暴力解，更一般的作法還有待思考
 			let [g1, g2] = devices.map(d => d.gadgets[0]);
@@ -151,8 +154,9 @@ interface JConfiguration {
 
 			if(tx > sx) return null;
 
-			// 已經靠攏之後如果 delta 點被包在 g2（被接力者）之中那肯定行不通
-			if(g2.contains(this.getRelativeDelta(j1, j2, g2))) return null;
+			// 已經靠攏之後如果 delta 比 g2（被接力者）還要更近那當然不行
+			let delta = this.getRelativeDelta(j1, j2, g2);
+			if(g2.intersects(delta, oriented ? Quadrant.QV[0] : Quadrant.QV[2])) return null;
 
 			devices.forEach((d, i) => d.offset = offsets[i]);
 			return { devices };

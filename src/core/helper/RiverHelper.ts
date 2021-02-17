@@ -38,7 +38,14 @@
 		return dis - flap.radius + info.length;
 	}
 
-	@segment("contour") public get contour(): PolyBool.Segments {
+	//@noCompare // segments 和 overridden 都有把關
+	@shrewd({
+		comparer(ov: PolyBool.Segments, nv: PolyBool.Segments, member) {
+			(member as any).ov = ov;
+			return false;
+		}
+	})
+	public get contour(): PolyBool.Segments {
 		this.disposeEvent();
 		let seg = this.segment;
 		for(let q of this.quadrants) {

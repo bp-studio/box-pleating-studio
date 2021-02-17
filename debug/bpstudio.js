@@ -9,9 +9,33 @@ if (typeof Shrewd != "object")
 const { shrewd } = Shrewd;
 const perf = false;
 let perfTime = 0;
-const diagnose = false;
-function unorderedArray(msg) {
-    return shrewd({
+const diagnose = true;
+const debugEnabled = true;
+let debug = false;
+Shrewd.option.debug = diagnose;
+Shrewd.option.autoCommit = false;
+const noCompare = shrewd;
+function orderedArray(...p) {
+    let msg = p.length == 2 ? undefined : p[0];
+    let option = {
+        comparer: (ov, nv, member) => {
+            if (ov === nv)
+                return true;
+            let result = Shrewd.comparer.array(ov, nv);
+            if (diagnose && result && msg) {
+                console.log(msg);
+            }
+            return result;
+        }
+    };
+    if (p.length == 2)
+        shrewd(option)(...p);
+    else
+        return shrewd(option);
+}
+function unorderedArray(...p) {
+    let msg = p.length == 2 ? undefined : p[0];
+    let option = {
         comparer: (ov, nv, member) => {
             if (ov === nv)
                 return true;
@@ -21,10 +45,15 @@ function unorderedArray(msg) {
             }
             return result;
         }
-    });
+    };
+    if (p.length == 2)
+        shrewd(option)(...p);
+    else
+        return shrewd(option);
 }
-function segment(msg) {
-    return shrewd({
+function segment(...p) {
+    let msg = p.length == 2 ? undefined : p[0];
+    let option = {
         comparer: (ov, nv, member) => {
             if (ov === nv)
                 return true;
@@ -38,11 +67,17 @@ function segment(msg) {
             }
             return result;
         }
-    });
+    };
+    if (p.length == 2)
+        shrewd(option)(...p);
+    else
+        return shrewd(option);
 }
-function path(msg) {
-    return shrewd({
+function path(...p) {
+    let msg = p.length == 2 ? undefined : p[0];
+    let option = {
         comparer: (ov, nv, member) => {
+            member.ov = ov;
             if (ov === nv)
                 return true;
             if (!ov != !nv)
@@ -60,11 +95,12 @@ function path(msg) {
             }
             return true;
         }
-    });
+    };
+    if (p.length == 2)
+        shrewd(option)(...p);
+    else
+        return shrewd(option);
 }
-Shrewd.option.debug = diagnose;
-Shrewd.option.autoCommit = false;
-let debug = false;
 function nonEnumerable(target, name, desc) {
     if (desc) {
         desc.enumerable = false;
@@ -204,9 +240,9 @@ var PolyBool;
     }
     PolyBool.compare = compare;
     function union(segments) {
-        var seg = segments[0];
-        for (var i = 1; i < segments.length; i++) {
-            var comb = combine(seg, segments[i]);
+        let seg = segments[0];
+        for (let i = 1; i < segments.length; i++) {
+            let comb = combine(seg, segments[i]);
             seg = selectUnion(comb);
         }
         return seg;
@@ -1324,6 +1360,7 @@ __decorate([
 DoubleMapping = __decorate([
     shrewd
 ], DoubleMapping);
+const MAX_SAFE = 67108863;
 class Fraction {
     constructor(n, d = 1) {
         if (n instanceof Fraction) {
@@ -1419,7 +1456,7 @@ class Fraction {
         return this._q == 1;
     }
     _check() {
-        if (this._isDangerous)
+        if (this.$isDangerous)
             this._smp();
         if (this._q < 0) {
             this._q = -this._q;
@@ -1430,8 +1467,8 @@ class Fraction {
         }
         return this;
     }
-    get _isDangerous() {
-        return !!(Math.abs(this._p) >> 26) || !!(Math.abs(this._q) >> 26);
+    get $isDangerous() {
+        return Math.abs(this._p) > MAX_SAFE || Math.abs(this._q) > MAX_SAFE;
     }
     get neg() { return this.c().n(); }
     get inv() { return this.c().i(); }
@@ -1603,6 +1640,9 @@ let RiverHelperBase = class RiverHelperBase extends Disposable {
     onDispose() {
         delete this.flap;
     }
+    get dragging() {
+        return this.flap.design.dragging && this.flap.selected;
+    }
     get distance() { return 0; }
     get segment() {
         this.disposeEvent();
@@ -1612,7 +1652,10 @@ let RiverHelperBase = class RiverHelperBase extends Disposable {
     }
 };
 __decorate([
-    segment("segment")
+    shrewd
+], RiverHelperBase.prototype, "dragging", null);
+__decorate([
+    noCompare
 ], RiverHelperBase.prototype, "segment", null);
 RiverHelperBase = __decorate([
     shrewd
@@ -1627,16 +1670,15 @@ let QuadrantHelper = class QuadrantHelper extends Disposable {
         this.disposeEvent();
         let result = [];
         let d = this.parent.distance;
-        let { qv, fx, fy, point, coveredJunctions, pattern } = this.quadrant;
+        let { qv, fx, fy, point, coveredInfo, pattern } = this.quadrant;
         if (!pattern) {
             let r = new Fraction(this.parent.flap.radius + d);
-            for (let [j, pts] of coveredJunctions) {
-                let { ox, oy } = j;
-                let p = point.add(qv.scale(r));
+            let p = point.add(qv.scale(r));
+            for (let [ox, oy, pts] of coveredInfo) {
                 for (let pt of pts) {
-                    let diff = pt.sub(p);
-                    ox = Math.min(-diff.x * fx, ox);
-                    oy = Math.min(-diff.y * fy, oy);
+                    let diff = p.sub(pt);
+                    ox = Math.min(diff.x * fx, ox);
+                    oy = Math.min(diff.y * fy, oy);
                 }
                 if (ox <= 0 || oy <= 0)
                     continue;
@@ -1751,7 +1793,7 @@ let Tree = class Tree extends Disposable {
         this.pair.dispose();
     }
     get leaf() {
-        var set = new Set();
+        let set = new Set();
         for (let node of this.node.values())
             if (node.degree == 1)
                 set.add(node);
@@ -2147,7 +2189,12 @@ __decorate([
     shrewd
 ], RiverHelper.prototype, "distance", null);
 __decorate([
-    segment("contour")
+    shrewd({
+        comparer(ov, nv, member) {
+            member.ov = ov;
+            return false;
+        }
+    })
 ], RiverHelper.prototype, "contour", null);
 RiverHelper = __decorate([
     shrewd
@@ -2290,10 +2337,10 @@ __decorate([
     unorderedArray("allJ")
 ], DesignBase.prototype, "allJunctions", null);
 __decorate([
-    unorderedArray("vj")
+    orderedArray("vj")
 ], DesignBase.prototype, "validJunctions", null);
 __decorate([
-    unorderedArray("aj")
+    orderedArray("aj")
 ], DesignBase.prototype, "activeJunctions", null);
 __decorate([
     shrewd
@@ -2337,7 +2384,7 @@ let Sheet = class Sheet extends Mountable {
         this.view = new SheetView(this);
     }
     get controls() {
-        var result = [];
+        let result = [];
         for (let map of this._controlMaps)
             result.push(...map());
         return result;
@@ -2424,7 +2471,7 @@ let Sheet = class Sheet extends Mountable {
     }
 };
 __decorate([
-    unorderedArray("sheetControls")
+    unorderedArray
 ], Sheet.prototype, "controls", null);
 __decorate([
     shrewd
@@ -2452,13 +2499,13 @@ __decorate([
     shrewd
 ], Sheet.prototype, "size", null);
 __decorate([
-    unorderedArray("sheet.independents")
+    unorderedArray
 ], Sheet.prototype, "independents", null);
 __decorate([
     shrewd
 ], Sheet.prototype, "_getIndependentRect", null);
 __decorate([
-    unorderedArray("sheet.viewedControls")
+    unorderedArray
 ], Sheet.prototype, "viewedControls", null);
 __decorate([
     shrewd
@@ -3043,8 +3090,9 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         }
         else {
             let lines = pattern.linesForTracing[this.q].concat();
-            if (debug)
+            if (debugEnabled && debug) {
                 console.log(lines.map(l => l.toString()));
+            }
             let junctions = pattern.stretch.junctions;
             let end = this.findNextDelta(junctions, false);
             let inflections = new Set();
@@ -3057,6 +3105,10 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
                 trace.unshift(this.q % 2 ? start.yIntersection(this.y(r)) : start.xIntersection(this.x(r)));
             }
             else {
+                let l;
+                while ((l = trace.length) > 1 && new Line(startPt, trace[1]).lineContains(trace[0])) {
+                    trace.shift();
+                }
                 trace.unshift(startPt);
             }
             if (end) {
@@ -3064,8 +3116,14 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
                     trace.push(this.q % 2 ? end.xIntersection(this.x(r)) : end.yIntersection(this.y(r)));
                 }
                 let last = trace[trace.length - 1];
-                trace.push(this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y));
+                let append = this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y);
+                if (!append.eq(endPt))
+                    trace.push(append);
             }
+        }
+        let l;
+        while ((l = trace.length) > 1 && new Line(endPt, trace[l - 2]).contains(trace[l - 1])) {
+            trace.pop();
         }
         return trace;
     }
@@ -3140,8 +3198,15 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         inflections.add(inflection.toString());
         if (d2 == 0)
             inflections.add(nextQ.point.toString());
-        if (d < dist.d1)
-            lines.push(new Line(inflection, this.qv));
+        if (d < dist.d1) {
+            let i = lines.findIndex(l => l.contains(inflection));
+            if (i >= 0) {
+                lines.splice(i, 1);
+            }
+            else {
+                lines.push(new Line(inflection, this.qv));
+            }
+        }
         return (_a = nextQ.findLead(junctions, d2, lines, inflections)) !== null && _a !== void 0 ? _a : nextQ.getStart(new Fraction(d2));
     }
     get pattern() {
@@ -3156,12 +3221,10 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         return this.flap.validJunctions.filter(j => j.q1 == this || j.q2 == this);
     }
     get coveredJunctions() {
-        return this.validJunctions
-            .filter(j => j.isCovered)
-            .map(j => {
-            let q3 = j.q1 == this ? j.q2 : j.q1;
-            return [j, j.coveredBy.map(c => c.q1 == q3 ? c.q2.point : c.q1.point)];
-        });
+        return this.validJunctions.filter(j => j.isCovered);
+    }
+    get coveredInfo() {
+        return this.coveredJunctions.map(j => [j.ox, j.oy, j.coveredBy.map(c => c.q1.q == this.q ? c.q1.point : c.q2.point)]);
     }
     get point() {
         return this.flap.points[this.q];
@@ -3207,16 +3270,19 @@ __decorate([
     shrewd
 ], Quadrant.prototype, "corner", null);
 __decorate([
-    unorderedArray("qvj")
+    orderedArray("qvj")
 ], Quadrant.prototype, "validJunctions", null);
 __decorate([
-    shrewd
+    orderedArray("qcj")
 ], Quadrant.prototype, "coveredJunctions", null);
+__decorate([
+    noCompare
+], Quadrant.prototype, "coveredInfo", null);
 __decorate([
     shrewd
 ], Quadrant.prototype, "point", null);
 __decorate([
-    unorderedArray("qaj")
+    orderedArray("qaj")
 ], Quadrant.prototype, "activeJunctions", null);
 Quadrant = Quadrant_1 = __decorate([
     shrewd
@@ -3349,6 +3415,7 @@ Stretch = __decorate([
 let Pattern = class Pattern extends SheetObject {
     constructor(configuration, pattern) {
         super(configuration.sheet);
+        this._lineCache = MakePerQuadrant(i => []);
         this.configuration = configuration;
         this.devices = pattern.devices.map((d, i) => new Device(this, configuration.partitions[i], d));
         this.gadgets = this.devices.reduce((arr, d) => arr.concat(d.gadgets), []);
@@ -3374,11 +3441,11 @@ let Pattern = class Pattern extends SheetObject {
     }
     get linesForTracing() {
         if (!this.isActive)
-            return MakePerQuadrant(i => []);
+            return this._lineCache;
         let dir = this.configuration.repository.stretch.junctions[0].direction;
         let { fx, fy } = this.stretch;
-        let size = new Fraction(this.design.sheet.size);
-        return MakePerQuadrant(q => {
+        let size = new Fraction(this.design.LayoutSheet.size);
+        return this._lineCache = MakePerQuadrant(q => {
             let lines = [];
             if (dir % 2 != q % 2)
                 return lines;
@@ -3698,7 +3765,8 @@ let Configuration = class Configuration extends Store {
                 offsets.reverse();
             if (tx > sx)
                 return null;
-            if (g2.contains(this.getRelativeDelta(j1, j2, g2)))
+            let delta = this.getRelativeDelta(j1, j2, g2);
+            if (g2.intersects(delta, oriented ? Quadrant.QV[0] : Quadrant.QV[2]))
                 return null;
             devices.forEach((d, i) => d.offset = offsets[i]);
             return { devices };
@@ -3772,7 +3840,7 @@ JunctionView = __decorate([
 let RiverView = class RiverView extends ControlView {
     constructor(river) {
         super(river);
-        this.components = new Mapping(() => this.info.components, key => new RiverHelper(this, key.split(',').map(v => Number(v))));
+        this._components = new Mapping(() => this.info.components, key => new RiverHelper(this, key.split(',').map(v => Number(v))));
         this._rendered = false;
         this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
         this.$addItem(Layer.hinge, this._hinge = new paper.CompoundPath(Style.hinge));
@@ -3820,20 +3888,51 @@ let RiverView = class RiverView extends ControlView {
     get design() {
         return this.control.sheet.design;
     }
+    get components() {
+        return [...this._components.values()];
+    }
+    get dragging() {
+        return this.components.some(c => c.dragging);
+    }
     onDispose() {
         Shrewd.terminate(this.components);
         super.onDispose();
     }
+    get staticClosure() {
+        this.disposeEvent();
+        let comps = this.components.filter(c => !c.dragging);
+        return comps.length ? PolyBool.union(comps.map(c => c.contour)) : null;
+    }
+    get dynamicClosure() {
+        this.disposeEvent();
+        let comps = this.components.filter(c => c.dragging);
+        return comps.length ? PolyBool.union(comps.map(c => c.contour)) : null;
+    }
     get closure() {
         this.disposeEvent();
-        return PolyBool.union([...this.components.values()].map(c => c.contour));
+        if (!this.staticClosure)
+            return this.dynamicClosure;
+        if (!this.dynamicClosure)
+            return this.staticClosure;
+        return PolyBool.union([this.staticClosure, this.dynamicClosure]);
+    }
+    get staticInterior() {
+        this.disposeEvent();
+        let comps = this.info.inner.filter(c => !c.dragging);
+        return comps.length ? PolyBool.union(comps.map(c => c.closure)) : null;
+    }
+    get dynamicInterior() {
+        this.disposeEvent();
+        let comps = this.info.inner.filter(c => c.dragging);
+        return comps.length ? PolyBool.union(comps.map(c => c.closure)) : null;
     }
     get interior() {
         this.disposeEvent();
-        let segments = [];
-        for (let v of this.info.inner)
-            segments.push(v.closure);
-        return PolyBool.union(segments);
+        if (!this.staticInterior)
+            return this.dynamicInterior;
+        if (!this.dynamicInterior)
+            return this.staticInterior;
+        return PolyBool.union([this.staticInterior, this.dynamicInterior]);
     }
     get closurePath() {
         return new paper.CompoundPath({
@@ -3915,8 +4014,20 @@ __decorate([
     shrewd
 ], RiverView.prototype, "info", null);
 __decorate([
+    segment("staticClosure")
+], RiverView.prototype, "staticClosure", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "dynamicClosure", null);
+__decorate([
     segment("closure")
 ], RiverView.prototype, "closure", null);
+__decorate([
+    segment("staticInterior")
+], RiverView.prototype, "staticInterior", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "dynamicInterior", null);
 __decorate([
     segment("interior")
 ], RiverView.prototype, "interior", null);
@@ -4025,6 +4136,9 @@ let FlapView = class FlapView extends LabeledView {
         return this.control.sheet.view.contains(point) &&
             (this.hinge.contains(point) || this.hinge.hitTest(point) != null);
     }
+    get dragging() {
+        return this._component.dragging;
+    }
     get circle() {
         return this.makeRectangle(0);
     }
@@ -4111,9 +4225,6 @@ __decorate([
 __decorate([
     shrewd
 ], FlapView.prototype, "clearCache", null);
-__decorate([
-    segment("flap.closure")
-], FlapView.prototype, "closure", null);
 __decorate([
     shrewd
 ], FlapView.prototype, "renderHinge", null);
@@ -4260,8 +4371,6 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         });
         return v;
     }
-    debug(d = 0) {
-    }
     get junctions() {
         this.design.junctions;
         return this.$junctions;
@@ -4308,7 +4417,7 @@ __decorate([
     })
 ], Flap.prototype, "junctions", null);
 __decorate([
-    shrewd
+    noCompare
 ], Flap.prototype, "validJunctions", null);
 Flap = Flap_1 = __decorate([
     shrewd
@@ -4917,10 +5026,22 @@ __decorate([
     shrewd
 ], Junction.prototype, "_lca", null);
 __decorate([
-    shrewd
+    shrewd({
+        comparer(ov, nv) {
+            if (!ov)
+                return false;
+            if (ov.length != nv.length)
+                return false;
+            for (let i = 0; i < ov.length; i++) {
+                if (ov[i][0] != nv[i][0] || ov[i][1] != nv[i][1])
+                    return false;
+            }
+            return true;
+        }
+    })
 ], Junction.prototype, "coverCandidate", null);
 __decorate([
-    unorderedArray("jcb")
+    orderedArray("jcb")
 ], Junction.prototype, "coveredBy", null);
 __decorate([
     shrewd
@@ -5517,10 +5638,10 @@ let System = System_1 = class System {
     }
     get _canvas() { return this._studio.$paper.view.element; }
     _processSelection(point, ctrlKey) {
-        var firstCtrl = null;
-        var nowCtrl = null;
-        var nextCtrl = null;
-        var controls = this._controls.filter(o => o.contains(point));
+        let firstCtrl = null;
+        let nowCtrl = null;
+        let nextCtrl = null;
+        let controls = this._controls.filter(o => o.contains(point));
         for (let o of controls) {
             if (!firstCtrl)
                 firstCtrl = o;
@@ -5553,7 +5674,7 @@ let System = System_1 = class System {
         this._studio.update();
     }
     _processNextSelection() {
-        var [nowCtrl, nextCtrl] = this._ctrl;
+        let [nowCtrl, nextCtrl] = this._ctrl;
         if (this._studio.design && !this._studio.design.dragging) {
             if (nowCtrl && nextCtrl)
                 this.$clearSelection();
@@ -5950,7 +6071,7 @@ class Line {
         let p = point instanceof Point ? point : new Point(point);
         if (includeEndpoints && (p.eq(this.p1) || p.eq(this.p2)))
             return true;
-        var v1 = p.sub(this.p1), v2 = p.sub(this.p2);
+        let v1 = p.sub(this.p1), v2 = p.sub(this.p2);
         return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
     }
     lineContains(p) {
@@ -6090,8 +6211,8 @@ class Line {
     }
     reflect(v) {
         v = v.neg;
-        var m = new Matrix(v._x, v._y.neg, v._y, v._x);
-        var mi = m.inverse;
+        let m = new Matrix(v._x, v._y.neg, v._y, v._x);
+        let mi = m.inverse;
         v = mi.multiply(this.p2.sub(this.p1));
         v = v.doubleAngle();
         return m.multiply(v).reduce();
@@ -6274,7 +6395,7 @@ var Trace;
         let currentLine;
         let record = new Set();
         let candidates = new Set(lines);
-        if (debug) {
+        if (debugEnabled && debug) {
             console.log("StartPt: " + startPt.toString());
             console.log("Start: " + (start === null || start === void 0 ? void 0 : start.toString()));
             console.log("Inflections: ", [...inflections].toString());
@@ -6288,8 +6409,9 @@ var Trace;
                     let f = inflections.has(intersection.point.toString()) ? -1 : 1;
                     if (!intersection.interior && !isSideTouchable(line, currentPoint, currentVector, f, angle))
                         continue;
-                    if (debug)
+                    if (debugEnabled && debug) {
                         console.log([JSON.stringify(intersection), line.toString()]);
+                    }
                     if (intersectionCloser(intersection, currentIntersection, f)) {
                         currentIntersection = intersection;
                         currentLine = line;
@@ -6306,7 +6428,9 @@ var Trace;
                         start = undefined;
                     }
                 }
-                let goal = currentSegment.contains(endPt) ? endPt : currentSegment.intersection(end);
+                if (currentSegment.contains(endPt, true))
+                    break;
+                let goal = currentSegment.intersection(end);
                 if (goal) {
                     trace.push(goal);
                     break;
@@ -6326,8 +6450,9 @@ var Trace;
                 }
                 shift = currentLine.vector;
                 currentVector = currentLine.reflect(currentVector);
-                if (debug)
+                if (debugEnabled && debug) {
                     console.log([pt.toString(), currentLine.toString(), currentVector.toString(), shift.toString()]);
+                }
                 currentPoint = pt;
                 candidates.delete(currentLine);
             }
@@ -6348,12 +6473,12 @@ var Trace;
         return x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f;
     }
     function getIntersection(l, p, v) {
-        var v1 = l.p2.sub(l.p1);
-        var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+        let v1 = l.p2.sub(l.p1);
+        let m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
         if (m == null)
             return null;
-        var r = m.multiply(new Point(p.sub(l.p1)));
-        var a = r._x, b = r._y.neg;
+        let r = m.multiply(p.sub(l.p1));
+        let a = r._x, b = r._y.neg;
         if (a.lt(Fraction.ZERO) || a.gt(Fraction.ONE) || b.lt(Fraction.ZERO))
             return null;
         return {
@@ -6363,8 +6488,9 @@ var Trace;
             interior: a.gt(Fraction.ZERO) && a.lt(Fraction.ONE)
         };
     }
+    Trace.getIntersection = getIntersection;
     function getAngle(v1, v2) {
-        var ang = v1.angle - v2.angle;
+        let ang = v1.angle - v2.angle;
         while (ang < 0)
             ang += Math.PI;
         while (ang > Math.PI)
@@ -6910,8 +7036,9 @@ class Gadget {
     ry(q1, q2) {
         return Math.abs(this.anchorMap[q1][0].y - this.anchorMap[q2][0].y);
     }
-    contains(p) {
-        return this.pieces.some(pc => PathUtil.pointInsidePath(p, pc.shape.contour));
+    intersects(p, v) {
+        let test = this.contour.map((v, i, a) => new Line(v, a[(i + 1) % a.length]));
+        return test.some(l => Trace.getIntersection(l, p, v));
     }
     static instantiate(g) {
         if (g instanceof Gadget)

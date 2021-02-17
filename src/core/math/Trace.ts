@@ -42,7 +42,7 @@ namespace Trace {
 		let record = new Set<string>();
 		let candidates = new Set(lines);
 
-		if(debug) {
+		if(debugEnabled && debug) {
 			console.log("StartPt: " + startPt.toString());
 			console.log("Start: " + start?.toString());
 			console.log("Inflections: ", [...inflections].toString());
@@ -65,7 +65,9 @@ namespace Trace {
 					let f: Sign = inflections.has(intersection.point.toString()) ? -1 : 1;
 					if(!intersection.interior && !isSideTouchable(line, currentPoint, currentVector, f, angle)) continue;
 
-					if(debug) console.log([JSON.stringify(intersection), line.toString()]);
+					if(debugEnabled && debug) {
+						console.log([JSON.stringify(intersection), line.toString()]);
+					}
 					if(intersectionCloser(intersection, currentIntersection, f)) {
 						currentIntersection = intersection;
 						currentLine = line;
@@ -90,7 +92,8 @@ namespace Trace {
 				}
 
 				// 撞到了終點（優先）或終點線，停止輸出
-				let goal = currentSegment.contains(endPt) ? endPt : currentSegment.intersection(end);
+				if(currentSegment.contains(endPt, true)) break;
+				let goal = currentSegment.intersection(end);
 				if(goal) { trace.push(goal); break; }
 
 				// 偵測迴圈；迴圈是只有當有 meandering 的時候才會產生
@@ -109,7 +112,9 @@ namespace Trace {
 				shift = currentLine.vector;
 
 				currentVector = currentLine.reflect(currentVector);
-				if(debug) console.log([pt.toString(), currentLine.toString(), currentVector.toString(), shift.toString()]);
+				if(debugEnabled && debug) {
+					console.log([pt.toString(), currentLine.toString(), currentVector.toString(), shift.toString()]);
+				}
 				currentPoint = pt;
 
 				// 反射過的線就不再列入考慮；理論上只要輸入資料沒錯，不可能同一條線會用到兩次
@@ -132,14 +137,14 @@ namespace Trace {
 		return x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f;
 	}
 
-	/** 取得這條線和給定動向的交點 */
-	function getIntersection(l: Line, p: Point, v: Vector): JIntersection | null {
-		var v1 = l.p2.sub(l.p1);
-		var m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+	/** 取得指定線段和給定動向的交點 */
+	export function getIntersection(l: Line, p: Point, v: Vector): JIntersection | null {
+		let v1 = l.p2.sub(l.p1);
+		let m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
 		if(m == null) return null;
 
-		var r = m.multiply(new Point(p.sub(l.p1)));
-		var a = r._x, b = r._y.neg;
+		let r = m.multiply(p.sub(l.p1));
+		let a = r._x, b = r._y.neg;
 
 		// 交點必須是在動向的前方且在線段的內部（含端點）
 		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE) || b.lt(Fraction.ZERO)) return null;
@@ -153,7 +158,7 @@ namespace Trace {
 	}
 
 	function getAngle(v1: Vector, v2: Vector) {
-		var ang = v1.angle - v2.angle;
+		let ang = v1.angle - v2.angle;
 		while(ang < 0) ang += Math.PI;
 		while(ang > Math.PI) ang -= Math.PI;
 		return ang;

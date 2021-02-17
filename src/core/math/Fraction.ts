@@ -1,4 +1,7 @@
 
+/** floor(sqrt(max_safe_integer / 2)) */
+const MAX_SAFE = 67108863;
+
 //////////////////////////////////////////////////////////////////
 /**
  * 代表一個有理分數。
@@ -160,7 +163,7 @@ class Fraction {
 	/** Normalization after each operation */
 	private _check() {
 		// Try auto simplifying.
-		if(this._isDangerous) this._smp();
+		if(this.$isDangerous) this._smp();
 
 		// Make sure that q is always positive.
 		if(this._q < 0) { this._q = -this._q; this._p = -this._p; }
@@ -174,14 +177,12 @@ class Fraction {
 	}
 
 	/**
-	 * Test if the numbers are greater than 67108863 = floor(sqrt(max_safe_integer / 2)).
+	 * Test if the numbers are greater than MAX_SAFE.
 	 * If one of them are greater, then one more operation could lead to overflow,
 	 * and we call that "dangerous".
-	 * Using Math.abs(x) >> 26 to perform the test is basically the fastest method,
-	 * according to benchmark result by JSBench.me
 	 */
-	private get _isDangerous(): boolean {
-		return !!(Math.abs(this._p) >> 26) || !!(Math.abs(this._q) >> 26);
+	public get $isDangerous(): boolean {
+		return Math.abs(this._p) > MAX_SAFE || Math.abs(this._q) > MAX_SAFE;
 	}
 
 	/////////////////////////////////

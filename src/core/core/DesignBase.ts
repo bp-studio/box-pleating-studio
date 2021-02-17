@@ -127,7 +127,7 @@ abstract class DesignBase extends Mountable {
 		return result;
 	}
 
-	@unorderedArray("vj") public get validJunctions(): readonly Junction[] {
+	@orderedArray("vj") public get validJunctions(): readonly Junction[] {
 		return this.allJunctions.filter(j => j.isValid);
 	}
 
@@ -136,7 +136,7 @@ abstract class DesignBase extends Mountable {
 	 *
 	 * 這會排除掉被覆蓋的 `Junction`。
 	 */
-	@unorderedArray("aj") private get activeJunctions(): readonly Junction[] {
+	@orderedArray("aj") private get activeJunctions(): readonly Junction[] {
 		return this.validJunctions.filter(j => !j.isCovered);
 	}
 

@@ -13,18 +13,18 @@
 		this.disposeEvent();
 		let result: PolyBool.Segments[] = [];
 		let d = this.parent.distance;
-		let { qv, fx, fy, point, coveredJunctions, pattern } = this.quadrant;
+		let { qv, fx, fy, point, coveredInfo, pattern } = this.quadrant;
 		if(!pattern) {
 			let r = new Fraction(this.parent.flap.radius + d);
-			for(let [j, pts] of coveredJunctions) {
-				let { ox, oy } = j;
-				let p = point.add(qv.scale(r));
+			let p = point.add(qv.scale(r));
+
+			for(let [ox, oy, pts] of coveredInfo) {
 
 				// 扣除的部份不要超過覆蓋者所能夠繪製的輪廓範圍，否則會扣太多
 				for(let pt of pts) {
-					let diff = pt.sub(p);
-					ox = Math.min(-diff.x * fx, ox);
-					oy = Math.min(-diff.y * fy, oy);
+					let diff = p.sub(pt);
+					ox = Math.min(diff.x * fx, ox);
+					oy = Math.min(diff.y * fy, oy);
 				}
 
 				// 如果結果非正那就不用考慮
@@ -40,7 +40,7 @@
 		return result.length ? PolyBool.union(result) : null;
 	}
 
-	@path("qc") public get contour() {
+	@path("qc") public get contour(): Path {
 		this.disposeEvent();
 		return this.quadrant.makeContour(this.parent.distance);
 	}

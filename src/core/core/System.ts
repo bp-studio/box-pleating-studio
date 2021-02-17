@@ -112,12 +112,12 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	private get _canvas(): HTMLCanvasElement { return this._studio.$paper.view.element; }
 
 	private _processSelection(point: paper.Point, ctrlKey: boolean): void {
-		var firstCtrl: Control | null = null;	// 重疊之中的第一個 Control
-		var nowCtrl: Control | null = null;		// 重疊之中目前被選取的 Control 中的最後一個
-		var nextCtrl: Control | null = null;	// 重疊之中下一個尚未被選取的 Control
+		let firstCtrl: Control | null = null;	// 重疊之中的第一個 Control
+		let nowCtrl: Control | null = null;		// 重疊之中目前被選取的 Control 中的最後一個
+		let nextCtrl: Control | null = null;	// 重疊之中下一個尚未被選取的 Control
 
 		// 找出所有點擊位置中的重疊 Control
-		var controls = this._controls.filter(o => o.contains(point));
+		let controls = this._controls.filter(o => o.contains(point));
 
 		// 找出前述的三個關鍵 Control
 		for(let o of controls) {
@@ -150,7 +150,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	private _processNextSelection(): void {
-		var [nowCtrl, nextCtrl] = this._ctrl;
+		let [nowCtrl, nextCtrl] = this._ctrl;
 		if(this._studio.design && !this._studio.design.dragging) {
 			if(nowCtrl && nextCtrl) this.$clearSelection();
 			if(nowCtrl && !nextCtrl) this.$clearSelection(nowCtrl);

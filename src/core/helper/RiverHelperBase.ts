@@ -21,9 +21,14 @@
 		delete this.flap;
 	}
 
+	@shrewd get dragging(): boolean {
+		return this.flap.design.dragging && this.flap.selected;
+	}
+
 	public get distance(): number { return 0; }
 
-	@segment("segment") public get segment(): PolyBool.Segments {
+	@noCompare // 已經透過 q.contour 來把關
+	public get segment(): PolyBool.Segments {
 		this.disposeEvent();
 		let path: Path = [];
 		this.quadrants.forEach(q => path.push(...q.contour));
