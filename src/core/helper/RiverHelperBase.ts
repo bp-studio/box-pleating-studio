@@ -21,10 +21,6 @@
 		delete this.flap;
 	}
 
-	@shrewd get dragging(): boolean {
-		return this.flap.design.dragging && this.flap.selected;
-	}
-
 	public get distance(): number { return 0; }
 
 	@noCompare // 已經透過 q.contour 來把關

@@ -5,34 +5,33 @@ interface JFieldCommand extends JCommand {
 	readonly new: any;
 }
 
-class FieldCommand implements ICommand, JFieldCommand {
+//////////////////////////////////////////////////////////////////
+/**
+ * 使用者對於某個欄位值進行修改的操作。
+ */
+//////////////////////////////////////////////////////////////////
 
-	@nonEnumerable private readonly _design: Design;
+class FieldCommand extends Command implements JFieldCommand {
+
+	public static create(target: ITagObject, prop: string, oldValue: any, newValue: any) {
+		new FieldCommand(target.design, {
+			tag: target.tag,
+			prop,
+			old: oldValue,
+			new: newValue
+		});
+	}
+
 	public readonly type = CommandType.field;
-	public readonly tag: string;
 	public readonly prop: string;
 	public old: any;
 	public new: any;
 
 	constructor(design: Design, json: Omit<JFieldCommand, 'type'>) {
-		this._design = design;
-		this.tag = json.tag;
+		super(design, json);
 		this.prop = json.prop;
 		this.old = json.old;
 		this.new = json.new;
-	}
-
-	public tryAddTo(step: Step): boolean {
-		let c: any;
-		if(
-			(c = step.commands[0]) instanceof FieldCommand
-			&& c.tag == this.tag
-			&& c.prop == this.prop
-			&& c.new == this.old
-		) {
-			c.new = this.new;
-			return true;
-		} else return false;
 	}
 
 	public undo() {

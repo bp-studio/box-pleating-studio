@@ -9,8 +9,8 @@ if (typeof Shrewd != "object")
 const { shrewd } = Shrewd;
 const perf = false;
 let perfTime = 0;
-const diagnose = true;
-const debugEnabled = true;
+const diagnose = false;
+const debugEnabled = false;
 let debug = false;
 Shrewd.option.debug = diagnose;
 Shrewd.option.autoCommit = false;
@@ -968,6 +968,21 @@ var PolyBool;
         List.node = node;
     })(List || (List = {}));
 })(PolyBool || (PolyBool = {}));
+var CommandType;
+(function (CommandType) {
+    CommandType[CommandType["field"] = 0] = "field";
+    CommandType[CommandType["move"] = 1] = "move";
+})(CommandType || (CommandType = {}));
+class Command {
+    constructor(design, json) {
+        this._design = design;
+        this.tag = json.tag;
+        design.history.queue(this);
+    }
+}
+__decorate([
+    nonEnumerable
+], Command.prototype, "_design", void 0);
 class Piece extends Region {
     constructor(piece) {
         super();
@@ -1640,9 +1655,6 @@ let RiverHelperBase = class RiverHelperBase extends Disposable {
     onDispose() {
         delete this.flap;
     }
-    get dragging() {
-        return this.flap.design.dragging && this.flap.selected;
-    }
     get distance() { return 0; }
     get segment() {
         this.disposeEvent();
@@ -1651,9 +1663,6 @@ let RiverHelperBase = class RiverHelperBase extends Disposable {
         return PathUtil.toSegments(path);
     }
 };
-__decorate([
-    shrewd
-], RiverHelperBase.prototype, "dragging", null);
 __decorate([
     noCompare
 ], RiverHelperBase.prototype, "segment", null);
@@ -1705,6 +1714,59 @@ __decorate([
 QuadrantHelper = __decorate([
     shrewd
 ], QuadrantHelper);
+class FieldCommand extends Command {
+    constructor(design, json) {
+        super(design, json);
+        this.type = CommandType.field;
+        this.prop = json.prop;
+        this.old = json.old;
+        this.new = json.new;
+    }
+    static create(target, prop, oldValue, newValue) {
+        new FieldCommand(target.design, {
+            tag: target.tag,
+            prop,
+            old: oldValue,
+            new: newValue
+        });
+    }
+    undo() {
+        let target = this._design.find(this.tag);
+        target[this.prop] = this.old;
+    }
+    redo() {
+        let target = this._design.find(this.tag);
+        target[this.prop] = this.new;
+    }
+}
+class MoveCommand extends Command {
+    constructor(design, json) {
+        super(design, json);
+        this.type = CommandType.move;
+        this.old = json.old;
+        this.new = json.new;
+    }
+    static create(target, loc) {
+        new MoveCommand(target.design, {
+            tag: target.tag,
+            old: clone(target.location),
+            new: loc
+        });
+        MoveCommand.assign(target.location, loc);
+    }
+    static assign(target, value) {
+        target.x = value.x;
+        target.y = value.y;
+    }
+    undo() {
+        let target = this._design.find(this.tag);
+        MoveCommand.assign(target['location'], this.old);
+    }
+    redo() {
+        let target = this._design.find(this.tag);
+        MoveCommand.assign(target['location'], this.new);
+    }
+}
 let Mapping = class Mapping extends BaseMapping {
     constructor(source, constructor) {
         super(source, k => k, constructor, (k, v) => v.disposed);
@@ -3080,15 +3142,15 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
     makeContour(d) {
         let r = this.flap.radius + d;
         let s = new Fraction(r);
-        let v = this.sv.scale(s);
         let startPt = this.getStart(s);
-        let endPt = this.point.add(v.rotate90());
         let pattern = this.pattern;
         let trace;
         if (!pattern) {
             trace = [startPt, this.point.add(this.qv.scale(s))];
         }
         else {
+            let v = this.sv.scale(s);
+            let endPt = this.point.add(v.rotate90());
             let lines = pattern.linesForTracing[this.q].concat();
             if (debugEnabled && debug) {
                 console.log(lines.map(l => l.toString()));
@@ -3120,10 +3182,10 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
                 if (!append.eq(endPt))
                     trace.push(append);
             }
-        }
-        let l;
-        while ((l = trace.length) > 1 && new Line(endPt, trace[l - 2]).contains(trace[l - 1])) {
-            trace.pop();
+            let l;
+            while ((l = trace.length) > 1 && new Line(endPt, trace[l - 2]).contains(trace[l - 1])) {
+                trace.pop();
+            }
         }
         return trace;
     }
@@ -3891,48 +3953,17 @@ let RiverView = class RiverView extends ControlView {
     get components() {
         return [...this._components.values()];
     }
-    get dragging() {
-        return this.components.some(c => c.dragging);
-    }
     onDispose() {
         Shrewd.terminate(this.components);
         super.onDispose();
     }
-    get staticClosure() {
-        this.disposeEvent();
-        let comps = this.components.filter(c => !c.dragging);
-        return comps.length ? PolyBool.union(comps.map(c => c.contour)) : null;
-    }
-    get dynamicClosure() {
-        this.disposeEvent();
-        let comps = this.components.filter(c => c.dragging);
-        return comps.length ? PolyBool.union(comps.map(c => c.contour)) : null;
-    }
     get closure() {
         this.disposeEvent();
-        if (!this.staticClosure)
-            return this.dynamicClosure;
-        if (!this.dynamicClosure)
-            return this.staticClosure;
-        return PolyBool.union([this.staticClosure, this.dynamicClosure]);
-    }
-    get staticInterior() {
-        this.disposeEvent();
-        let comps = this.info.inner.filter(c => !c.dragging);
-        return comps.length ? PolyBool.union(comps.map(c => c.closure)) : null;
-    }
-    get dynamicInterior() {
-        this.disposeEvent();
-        let comps = this.info.inner.filter(c => c.dragging);
-        return comps.length ? PolyBool.union(comps.map(c => c.closure)) : null;
+        return PolyBool.union(this.components.map(c => c.contour));
     }
     get interior() {
         this.disposeEvent();
-        if (!this.staticInterior)
-            return this.dynamicInterior;
-        if (!this.dynamicInterior)
-            return this.staticInterior;
-        return PolyBool.union([this.staticInterior, this.dynamicInterior]);
+        return PolyBool.union(this.info.inner.map(c => c.closure));
     }
     get closurePath() {
         return new paper.CompoundPath({
@@ -4014,20 +4045,8 @@ __decorate([
     shrewd
 ], RiverView.prototype, "info", null);
 __decorate([
-    segment("staticClosure")
-], RiverView.prototype, "staticClosure", null);
-__decorate([
-    shrewd
-], RiverView.prototype, "dynamicClosure", null);
-__decorate([
     segment("closure")
 ], RiverView.prototype, "closure", null);
-__decorate([
-    segment("staticInterior")
-], RiverView.prototype, "staticInterior", null);
-__decorate([
-    shrewd
-], RiverView.prototype, "dynamicInterior", null);
 __decorate([
     segment("interior")
 ], RiverView.prototype, "interior", null);
@@ -4069,16 +4088,14 @@ class Draggable extends ViewedControl {
             by = by.sub(this._dragOffset);
             if (!by.eq(this.location))
                 this.design.history.takeAction(() => {
-                    this.location.x = by.x;
-                    this.location.y = by.y;
+                    MoveCommand.create(this, { x: by.x, y: by.y });
                     this.onDragged();
                 });
         }
         else {
             if (!by.eq(Vector.ZERO))
                 this.design.history.takeAction(() => {
-                    this.location.x += by.x;
-                    this.location.y += by.y;
+                    MoveCommand.create(this, { x: this.location.x + by.x, y: this.location.y + by.y });
                     this.onDragged();
                 });
         }
@@ -4135,9 +4152,6 @@ let FlapView = class FlapView extends LabeledView {
     contains(point) {
         return this.control.sheet.view.contains(point) &&
             (this.hinge.contains(point) || this.hinge.hitTest(point) != null);
-    }
-    get dragging() {
-        return this._component.dragging;
     }
     get circle() {
         return this.makeRectangle(0);
@@ -4619,46 +4633,14 @@ __decorate([
 BPStudio = __decorate([
     shrewd
 ], BPStudio);
-class FieldCommand {
-    constructor(design, json) {
-        this.type = CommandType.field;
-        this._design = design;
-        this.tag = json.tag;
-        this.prop = json.prop;
-        this.old = json.old;
-        this.new = json.new;
-    }
-    tryAddTo(step) {
-        let c;
-        if ((c = step.commands[0]) instanceof FieldCommand
-            && c.tag == this.tag
-            && c.prop == this.prop
-            && c.new == this.old) {
-            c.new = this.new;
-            return true;
-        }
-        else
-            return false;
-    }
-    undo() {
-        let target = this._design.find(this.tag);
-        target[this.prop] = this.old;
-    }
-    redo() {
-        let target = this._design.find(this.tag);
-        target[this.prop] = this.new;
-    }
-}
-__decorate([
-    nonEnumerable
-], FieldCommand.prototype, "_design", void 0);
 let HistoryManager = class HistoryManager extends Disposable {
     constructor(design, json) {
         super(design);
         this.steps = [];
         this.index = 0;
+        this._queue = [];
         this._moving = false;
-        this._modified = false;
+        this._savedIndex = 0;
         this.design = design;
     }
     toJSON() {
@@ -4668,15 +4650,27 @@ let HistoryManager = class HistoryManager extends Disposable {
             steps: this.steps
         };
     }
+    queue(command) {
+        this._queue.push(command);
+    }
+    flush() {
+        if (this._queue.length) {
+            let s = this.lastStep;
+            if (!s || !s.tryAdd(this._queue)) {
+                this.addStep(new Step(this._queue));
+            }
+            this._queue = [];
+        }
+    }
     get modified() {
-        return this._modified;
+        return this._savedIndex != this.index;
     }
     notifySave() {
-        this._modified = false;
+        this._savedIndex = this.index;
     }
     takeAction(action) {
-        this._modified = true;
         action();
+        this.flush();
     }
     addStep(step) {
         if (this.steps.length > this.index)
@@ -4691,16 +4685,8 @@ let HistoryManager = class HistoryManager extends Disposable {
     fieldChange(target, prop, oldValue, newValue) {
         if (this._moving)
             return;
-        let c = new FieldCommand(this.design, {
-            tag: target.tag,
-            prop,
-            old: oldValue,
-            new: newValue
-        });
-        let s = this.lastStep;
-        if (!s || !c.tryAddTo(s))
-            this.addStep(new Step(c));
-        this._modified = true;
+        FieldCommand.create(target, prop, oldValue, newValue);
+        this.flush();
     }
     get canUndo() {
         return this.index > 0;
@@ -4739,14 +4725,12 @@ __decorate([
 HistoryManager = __decorate([
     shrewd
 ], HistoryManager);
-var CommandType;
-(function (CommandType) {
-    CommandType[CommandType["field"] = 0] = "field";
-    CommandType[CommandType["move"] = 1] = "move";
-})(CommandType || (CommandType = {}));
 class Step {
-    constructor(...commands) {
+    constructor(commands) {
         this.commands = commands;
+    }
+    tryAdd(commands) {
+        return false;
     }
     undo() {
         for (let c of this.commands)
@@ -6770,6 +6754,7 @@ let Device = class Device extends Draggable {
         this.view = new DeviceView(this);
     }
     get type() { return "Device"; }
+    get tag() { return ""; }
     toJSON() {
         return {
             gadgets: this.gadgets.map(g => g.toJSON()),

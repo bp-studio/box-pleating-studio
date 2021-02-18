@@ -5,6 +5,7 @@
 /// <reference path="pattern/Region.ts" />
 /// <reference path="class/Disposable.ts" />
 /// <reference path="math/PolyBool.ts" />
+/// <reference path="command/Command.ts" />
 
 // Level 1
 /// <reference path="pattern/Piece.ts" />
@@ -16,6 +17,8 @@
 /// <reference path="pattern/Partitioner.ts" />
 /// <reference path="helper/RiverHelperBase.ts" />
 /// <reference path="helper/QuadrantHelper.ts" />
+/// <reference path="command/FieldCommand.ts" />
+/// <reference path="command/MoveCommand.ts" />
 
 // Level 2
 /// <reference path="mapping/Mapping.ts" />

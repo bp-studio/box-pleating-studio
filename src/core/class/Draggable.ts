@@ -7,7 +7,9 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Draggable extends ViewedControl {
+abstract class Draggable extends ViewedControl implements ITagObject {
+
+	public abstract get tag(): string;
 
 	/** 拖曳剛開始的時候，滑鼠位置與物件位置之間的差異向量 */
 	private _dragOffset: Vector;
@@ -37,14 +39,12 @@ abstract class Draggable extends ViewedControl {
 		if(by instanceof Point) {
 			by = by.sub(this._dragOffset);
 			if(!by.eq(this.location)) this.design.history.takeAction(() => {
-				this.location.x = by.x;
-				this.location.y = by.y;
+				MoveCommand.create(this, { x: by.x, y: by.y });
 				this.onDragged();
 			});
 		} else {
 			if(!by.eq(Vector.ZERO)) this.design.history.takeAction(() => {
-				this.location.x += by.x;
-				this.location.y += by.y;
+				MoveCommand.create(this, { x: this.location.x + by.x, y: this.location.y + by.y });
 				this.onDragged();
 			});
 		}

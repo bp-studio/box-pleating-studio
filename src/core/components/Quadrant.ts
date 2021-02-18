@@ -80,15 +80,16 @@ type CoveredInfo = [number, number, Point[]];
 	public makeContour(d: number): Path {
 		let r = this.flap.radius + d;
 		let s = new Fraction(r);
-		let v = this.sv.scale(s);
 		let startPt = this.getStart(s);
-		let endPt = this.point.add(v.rotate90());
 		let pattern = this.pattern;
 		let trace: Path;
 
 		if(!pattern) {
 			trace = [startPt, this.point.add(this.qv.scale(s))];
 		} else {
+			let v = this.sv.scale(s);
+			let endPt = this.point.add(v.rotate90());
+
 			let lines = pattern.linesForTracing[this.q].concat();
 			if(debugEnabled && debug) {
 				console.log(lines.map(l => l.toString()));
@@ -128,12 +129,12 @@ type CoveredInfo = [number, number, Point[]];
 				let append = this.q % 2 ? new Point(last._x, endPt._y) : new Point(endPt._x, last._y);
 				if(!append.eq(endPt)) trace.push(append);
 			}
-		}
 
-		// 底下的程式碼是為了確保輸出一致
-		let l: number;
-		while((l = trace.length) > 1 && new Line(endPt, trace[l - 2]).contains(trace[l - 1])) {
-			trace.pop();
+			// 底下的程式碼是為了確保輸出一致
+			let l: number;
+			while((l = trace.length) > 1 && new Line(endPt, trace[l - 2]).contains(trace[l - 1])) {
+				trace.pop();
+			}
 		}
 
 		// 底下這一行是用來偵錯數值爆表用的

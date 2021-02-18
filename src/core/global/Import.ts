@@ -7,10 +7,10 @@ const perf = false;
 let perfTime: number = 0;
 
 /** 診斷模式 */
-const diagnose = true;
+const diagnose = false;
 
 /** 接受診斷模式 */
-const debugEnabled = true;
+const debugEnabled = false;
 
 /** 全域的 debug 用變數 */
 let debug = false;

@@ -12,7 +12,7 @@ interface JVertex extends IPoint {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Vertex extends IndependentDraggable implements ISerializable<JVertex>, ITagObject {
+@shrewd class Vertex extends IndependentDraggable implements ISerializable<JVertex> {
 
 	public get type() { return "Vertex"; }
 	public get tag() { return "v" + this.node.id; }

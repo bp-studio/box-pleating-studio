@@ -72,53 +72,21 @@
 		return [...this._components.values()];
 	}
 
-	public get dragging(): boolean {
-		return this.components.some(c => c.dragging);
-	}
-
 	protected onDispose() {
 		Shrewd.terminate(this.components);
 		super.onDispose();
 	}
 
-	@segment("staticClosure") private get staticClosure() {
-		this.disposeEvent();
-		let comps = this.components.filter(c => !c.dragging);
-		return comps.length ? PolyBool.union(comps.map(c => c.contour)) : null;
-	}
-
-	@shrewd private get dynamicClosure() {
-		this.disposeEvent();
-		let comps = this.components.filter(c => c.dragging);
-		return comps.length ? PolyBool.union(comps.map(c => c.contour)) : null;
-	}
-
 	/** 計算當前河的閉包輪廓 */
 	@segment("closure") public get closure(): PolyBool.Segments {
 		this.disposeEvent();
-		if(!this.staticClosure) return this.dynamicClosure!;
-		if(!this.dynamicClosure) return this.staticClosure!;
-		return PolyBool.union([this.staticClosure, this.dynamicClosure]);
-	}
-
-	@segment("staticInterior") private get staticInterior() {
-		this.disposeEvent();
-		let comps = this.info.inner.filter(c => !c.dragging);
-		return comps.length ? PolyBool.union(comps.map(c => c.closure)) : null;
-	}
-
-	@shrewd private get dynamicInterior() {
-		this.disposeEvent();
-		let comps = this.info.inner.filter(c => c.dragging);
-		return comps.length ? PolyBool.union(comps.map(c => c.closure)) : null;
+		return PolyBool.union(this.components.map(c => c.contour))
 	}
 
 	/** 當前河的內部輪廓 */
 	@segment("interior") private get interior(): PolyBool.Segments {
 		this.disposeEvent();
-		if(!this.staticInterior) return this.dynamicInterior!;
-		if(!this.dynamicInterior) return this.staticInterior!;
-		return PolyBool.union([this.staticInterior, this.dynamicInterior]);
+		return PolyBool.union(this.info.inner.map(c => c.closure))
 	}
 
 	@shrewd private get closurePath(): paper.CompoundPath {
@@ -225,7 +193,6 @@
 
 interface ClosureView extends View {
 	closure: PolyBool.Segments;
-	dragging: boolean;
 }
 
 interface RiverInfo {

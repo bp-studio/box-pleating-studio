@@ -5,11 +5,15 @@ interface JStep {
 
 class Step implements JStep {
 
-	constructor(...commands: ICommand[]) {
+	constructor(commands: Command[]) {
 		this.commands = commands;
 	}
 
-	public readonly commands: ICommand[];
+	public readonly commands: Command[];
+
+	public tryAdd(commands: Command[]) {
+		return false;
+	}
 
 	public undo() {
 		for(let c of this.commands) c.undo();

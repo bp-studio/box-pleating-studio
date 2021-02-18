@@ -37,10 +37,6 @@
 			(this.hinge.contains(point) || this.hinge.hitTest(point) != null);
 	}
 
-	public get dragging(): boolean {
-		return this._component.dragging;
-	}
-
 	@shrewd public get circle() {
 		return this.makeRectangle(0);
 	}

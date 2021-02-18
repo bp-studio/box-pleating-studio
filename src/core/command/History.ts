@@ -17,10 +17,12 @@ interface JHistory {
 	@shrewd private readonly steps: Step[] = [];
 	@shrewd private index: number = 0;
 
+	private _queue: Command[] = [];
+
 	/** 是否正在移動歷史 */
 	private _moving: boolean = false;
 
-	private _modified: boolean = false;
+	private _savedIndex: number = 0;
 
 	constructor(design: Design, json?: JHistory) {
 		super(design);
@@ -35,19 +37,31 @@ interface JHistory {
 		}
 	}
 
+	public queue(command: Command) {
+		this._queue.push(command);
+	}
+
+	public flush(): void {
+		if(this._queue.length) {
+			let s = this.lastStep;
+			if(!s || !s.tryAdd(this._queue)) {
+				this.addStep(new Step(this._queue));
+			}
+			this._queue = [];
+		}
+	}
+
 	public get modified(): boolean {
-		// TODO: 以後這邊要根據歷史移動來決定
-		return this._modified;
+		return this._savedIndex != this.index;
 	}
 
 	public notifySave() {
-		this._modified = false;
+		this._savedIndex = this.index;
 	}
 
 	public takeAction(action: Action) {
-		// TODO: 以後這邊要改成歷史機制
-		this._modified = true;
 		action();
+		this.flush();
 	}
 
 	private addStep(step: Step) {
@@ -63,15 +77,8 @@ interface JHistory {
 
 	public fieldChange(target: ITagObject, prop: string, oldValue: any, newValue: any) {
 		if(this._moving) return;
-		let c = new FieldCommand(this.design, {
-			tag: target.tag,
-			prop,
-			old: oldValue,
-			new: newValue
-		});
-		let s = this.lastStep;
-		if(!s || !c.tryAddTo(s)) this.addStep(new Step(c));
-		this._modified = true;
+		FieldCommand.create(target, prop, oldValue, newValue);
+		this.flush();
 	}
 
 	@shrewd public get canUndo() {
