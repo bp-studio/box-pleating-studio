@@ -10,6 +10,8 @@ interface JCommand {
 	readonly tag: string;
 }
 
+type Typeless<T extends JCommand> = Omit<T, 'type'>;
+
 //////////////////////////////////////////////////////////////////
 /**
  * `Command` 類別是使用者編輯操作的基底類別。
@@ -17,16 +19,20 @@ interface JCommand {
 //////////////////////////////////////////////////////////////////
 
 abstract class Command implements JCommand {
+
 	@nonEnumerable protected readonly _design: Design;
 	public abstract readonly type: CommandType;
 	public readonly tag: string;
 
-	constructor(design: Design, json: Omit<JCommand, 'type'>) {
+	public get signature() { return this.type + ":" + this.tag; }
+
+	constructor(design: Design, json: Typeless<JCommand>) {
 		this._design = design;
 		this.tag = json.tag;
-		design.history.queue(this);
 	}
 
+	public abstract canAddTo(command: Command): boolean;
+	public abstract addTo(command: Command): void;
 	public abstract undo(): void;
 	public abstract redo(): void;
 }

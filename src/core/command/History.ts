@@ -38,13 +38,16 @@ interface JHistory {
 	}
 
 	public queue(command: Command) {
+		for(let q of this._queue) {
+			if(command.canAddTo(q)) return command.addTo(q);
+		}
 		this._queue.push(command);
 	}
 
 	public flush(): void {
 		if(this._queue.length) {
 			let s = this.lastStep;
-			if(!s || !s.tryAdd(this._queue)) {
+			if(!s  || !s.tryAdd(this._queue)) {
 				this.addStep(new Step(this._queue));
 			}
 			this._queue = [];
@@ -57,11 +60,6 @@ interface JHistory {
 
 	public notifySave() {
 		this._savedIndex = this.index;
-	}
-
-	public takeAction(action: Action) {
-		action();
-		this.flush();
 	}
 
 	private addStep(step: Step) {
@@ -78,7 +76,6 @@ interface JHistory {
 	public fieldChange(target: ITagObject, prop: string, oldValue: any, newValue: any) {
 		if(this._moving) return;
 		FieldCommand.create(target, prop, oldValue, newValue);
-		this.flush();
 	}
 
 	@shrewd public get canUndo() {

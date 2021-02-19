@@ -41,22 +41,26 @@ interface JSheet {
 		);
 	}
 
-	@shrewd private _width: number;
+	@action private _width: number;
 	public get width() { return this._width; }
 	public set width(v) {
 		if(v >= 8 && v >= this._independentRect.width) {
 			let d = v - this._independentRect.right;
-			if(d < 0) for(let i of this.independents) i.location.x += d;
+			if(d < 0) for(let i of this.independents) {
+				MoveCommand.create(i, { x: i.location.x + d, y: i.location.y });
+			}
 			this._width = v;
 		}
 	}
 
-	@shrewd private _height: number;
+	@action private _height: number;
 	public get height() { return this._height; }
 	public set height(v) {
 		if(v >= 8 && v >= this._independentRect.height) {
 			let d = v - this._independentRect.top;
-			if(d < 0) for(let i of this.independents) i.location.y += d;
+			if(d < 0) for(let i of this.independents) {
+				MoveCommand.create(i, { x: i.location.x, y: i.location.y + d });
+			}
 			this._height = v;
 		}
 	}

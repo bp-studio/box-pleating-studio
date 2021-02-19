@@ -98,26 +98,22 @@ interface IDesignObject {
 	}
 
 	public deleteVertices(vertices: readonly Vertex[]) {
-		this.history.takeAction(() => {
-			let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
-			while(this.vertices.size > 3) {
-				let v = arr.find(v => v.node.degree == 1);
-				if(!v) break;
-				v.node.dispose()
-				arr.splice(arr.indexOf(v), 1);
-				this.$studio?.update();
-			}
-		});
+		let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
+		while(this.vertices.size > 3) {
+			let v = arr.find(v => v.node.degree == 1);
+			if(!v) break;
+			v.node.dispose()
+			arr.splice(arr.indexOf(v), 1);
+			this.$studio?.update();
+		}
 	}
 
 	public deleteFlaps(flaps: readonly Flap[]) {
-		this.history.takeAction(() => {
-			for(let f of flaps) {
-				if(this.vertices.size == 3) break;
-				f.node.dispose();
-				this.$studio?.update();
-			}
-		})
+		for(let f of flaps) {
+			if(this.vertices.size == 3) break;
+			f.node.dispose();
+			this.$studio?.update();
+		}
 	}
 
 	public clearCPSelection() {
@@ -178,7 +174,7 @@ interface IDesignObject {
 		if(tag == "design") return this;
 		if(tag == "layout") return this.LayoutSheet;
 		if(tag == "tree") return this.TreeSheet;
-		let m = tag.match(/^(\w+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
+		let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
 		if(m) {
 			let init = m[1], id = m[2], to = Number(m[3]);
 			if(init == "rp") return this.stretches.get(id)!.repository || undefined;

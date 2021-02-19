@@ -171,13 +171,15 @@
 		if(this._updating) return;
 		this._updating = true;
 
-		if(perf) perfTime = 0;
+		//if(perf) perfTime = 0;
 
 		Shrewd.commit();
 		await PaperWorker.done();
 		this.$display.project.view.update();
 
-		if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
+		if(this.design) this.design.history.flush();
+
+		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 
 		if(this.onUpdate) {
 			this.onUpdate();

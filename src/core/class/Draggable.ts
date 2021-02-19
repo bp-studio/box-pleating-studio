@@ -36,17 +36,11 @@ abstract class Draggable extends ViewedControl implements ITagObject {
 	public drag(point: Point): void;
 	public drag(vector: Vector): void;
 	public drag(by: Point | Vector) {
-		if(by instanceof Point) {
-			by = by.sub(this._dragOffset);
-			if(!by.eq(this.location)) this.design.history.takeAction(() => {
-				MoveCommand.create(this, { x: by.x, y: by.y });
-				this.onDragged();
-			});
-		} else {
-			if(!by.eq(Vector.ZERO)) this.design.history.takeAction(() => {
-				MoveCommand.create(this, { x: this.location.x + by.x, y: this.location.y + by.y });
-				this.onDragged();
-			});
+		if(by instanceof Point) by = by.sub(this._dragOffset);
+		else by = new Point(this.location).add(by);
+		if(!by.eq(this.location)) {
+			MoveCommand.create(this, { x: by.x, y: by.y });
+			this.onDragged();
 		}
 	}
 

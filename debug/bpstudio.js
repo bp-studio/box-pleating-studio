@@ -968,17 +968,12 @@ var PolyBool;
         List.node = node;
     })(List || (List = {}));
 })(PolyBool || (PolyBool = {}));
-var CommandType;
-(function (CommandType) {
-    CommandType[CommandType["field"] = 0] = "field";
-    CommandType[CommandType["move"] = 1] = "move";
-})(CommandType || (CommandType = {}));
 class Command {
     constructor(design, json) {
         this._design = design;
         this.tag = json.tag;
-        design.history.queue(this);
     }
+    get signature() { return this.type + ":" + this.tag; }
 }
 __decorate([
     nonEnumerable
@@ -1723,12 +1718,19 @@ class FieldCommand extends Command {
         this.new = json.new;
     }
     static create(target, prop, oldValue, newValue) {
-        new FieldCommand(target.design, {
+        let command = new FieldCommand(target.design, {
             tag: target.tag,
             prop,
             old: oldValue,
             new: newValue
         });
+        target.design.history.queue(command);
+    }
+    canAddTo(command) {
+        return command instanceof FieldCommand && command.tag == this.tag && command.new == this.old;
+    }
+    addTo(command) {
+        command.new = this.new;
     }
     undo() {
         let target = this._design.find(this.tag);
@@ -1747,23 +1749,35 @@ class MoveCommand extends Command {
         this.new = json.new;
     }
     static create(target, loc) {
-        new MoveCommand(target.design, {
+        let command = new MoveCommand(target.design, {
             tag: target.tag,
             old: clone(target.location),
             new: loc
         });
         MoveCommand.assign(target.location, loc);
+        target.design.history.queue(command);
     }
     static assign(target, value) {
         target.x = value.x;
         target.y = value.y;
     }
+    canAddTo(command) {
+        return command instanceof MoveCommand && command.tag == this.tag &&
+            command.new.x == this.old.x && command.new.y == this.old.y;
+    }
+    addTo(command) {
+        MoveCommand.assign(command.new, this.new);
+    }
     undo() {
         let target = this._design.find(this.tag);
+        if (!target['location'])
+            debugger;
         MoveCommand.assign(target['location'], this.old);
     }
     redo() {
         let target = this._design.find(this.tag);
+        if (!target['location'])
+            debugger;
         MoveCommand.assign(target['location'], this.new);
     }
 }
@@ -2465,8 +2479,9 @@ let Sheet = class Sheet extends Mountable {
         if (v >= 8 && v >= this._independentRect.width) {
             let d = v - this._independentRect.right;
             if (d < 0)
-                for (let i of this.independents)
-                    i.location.x += d;
+                for (let i of this.independents) {
+                    MoveCommand.create(i, { x: i.location.x + d, y: i.location.y });
+                }
             this._width = v;
         }
     }
@@ -2475,8 +2490,9 @@ let Sheet = class Sheet extends Mountable {
         if (v >= 8 && v >= this._independentRect.height) {
             let d = v - this._independentRect.top;
             if (d < 0)
-                for (let i of this.independents)
-                    i.location.y += d;
+                for (let i of this.independents) {
+                    MoveCommand.create(i, { x: i.location.x, y: i.location.y + d });
+                }
             this._height = v;
         }
     }
@@ -2539,10 +2555,10 @@ __decorate([
     shrewd
 ], Sheet.prototype, "activeControls", null);
 __decorate([
-    shrewd
+    action
 ], Sheet.prototype, "_width", void 0);
 __decorate([
-    shrewd
+    action
 ], Sheet.prototype, "_height", void 0);
 __decorate([
     shrewd({
@@ -2966,29 +2982,25 @@ let Design = class Design extends DesignBase {
         return result;
     }
     deleteVertices(vertices) {
-        this.history.takeAction(() => {
-            var _a;
-            let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
-            while (this.vertices.size > 3) {
-                let v = arr.find(v => v.node.degree == 1);
-                if (!v)
-                    break;
-                v.node.dispose();
-                arr.splice(arr.indexOf(v), 1);
-                (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
-            }
-        });
+        var _a;
+        let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
+        while (this.vertices.size > 3) {
+            let v = arr.find(v => v.node.degree == 1);
+            if (!v)
+                break;
+            v.node.dispose();
+            arr.splice(arr.indexOf(v), 1);
+            (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
+        }
     }
     deleteFlaps(flaps) {
-        this.history.takeAction(() => {
-            var _a;
-            for (let f of flaps) {
-                if (this.vertices.size == 3)
-                    break;
-                f.node.dispose();
-                (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
-            }
-        });
+        var _a;
+        for (let f of flaps) {
+            if (this.vertices.size == 3)
+                break;
+            f.node.dispose();
+            (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
+        }
     }
     clearCPSelection() {
         for (let c of this.LayoutSheet.controls)
@@ -3055,7 +3067,7 @@ let Design = class Design extends DesignBase {
             return this.LayoutSheet;
         if (tag == "tree")
             return this.TreeSheet;
-        let m = tag.match(/^(\w+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
+        let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
         if (m) {
             let init = m[1], id = m[2], to = Number(m[3]);
             if (init == "rp")
@@ -4084,20 +4096,13 @@ class Draggable extends ViewedControl {
         }
     }
     drag(by) {
-        if (by instanceof Point) {
+        if (by instanceof Point)
             by = by.sub(this._dragOffset);
-            if (!by.eq(this.location))
-                this.design.history.takeAction(() => {
-                    MoveCommand.create(this, { x: by.x, y: by.y });
-                    this.onDragged();
-                });
-        }
-        else {
-            if (!by.eq(Vector.ZERO))
-                this.design.history.takeAction(() => {
-                    MoveCommand.create(this, { x: this.location.x + by.x, y: this.location.y + by.y });
-                    this.onDragged();
-                });
+        else
+            by = new Point(this.location).add(by);
+        if (!by.eq(this.location)) {
+            MoveCommand.create(this, { x: by.x, y: by.y });
+            this.onDragged();
         }
     }
     onDragged() { }
@@ -4467,17 +4472,15 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
             Draggable.relocate(this, this.design.flaps.get(this.node));
     }
     addLeaf(length = 1) {
-        this.design.history.takeAction(() => {
-            let v = [...this.design.vertices.values()];
-            let node = this.node.addLeaf(length);
-            let p = this.findClosestEmptyPoint(v);
-            this.design.options.set("vertex", node.id, {
-                id: node.id,
-                name: node.name,
-                x: p.x,
-                y: p.y,
-                isNew: true
-            });
+        let v = [...this.design.vertices.values()];
+        let node = this.node.addLeaf(length);
+        let p = this.findClosestEmptyPoint(v);
+        this.design.options.set("vertex", node.id, {
+            id: node.id,
+            name: node.name,
+            x: p.x,
+            y: p.y,
+            isNew: true
         });
     }
     findClosestEmptyPoint(vertices) {
@@ -4499,14 +4502,12 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         return arr[0][0];
     }
     deleteAndJoin() {
+        var _a;
         if (this.node.degree != 2)
             return;
-        this.design.history.takeAction(() => {
-            var _a;
-            let edge = this.node.dispose();
-            (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
-            this.design.edges.get(edge).selected = true;
-        });
+        let edge = this.node.dispose();
+        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
+        this.design.edges.get(edge).selected = true;
     }
     get shouldDispose() {
         return super.shouldDispose || this.node.disposed;
@@ -4613,13 +4614,11 @@ let BPStudio = class BPStudio {
         if (this._updating)
             return;
         this._updating = true;
-        if (perf)
-            perfTime = 0;
         Shrewd.commit();
         await PaperWorker.done();
         this.$display.project.view.update();
-        if (perf && perfTime)
-            console.log("Total time: " + perfTime + " ms");
+        if (this.design)
+            this.design.history.flush();
         if (this.onUpdate) {
             this.onUpdate();
             delete this.onUpdate;
@@ -4651,6 +4650,10 @@ let HistoryManager = class HistoryManager extends Disposable {
         };
     }
     queue(command) {
+        for (let q of this._queue) {
+            if (command.canAddTo(q))
+                return command.addTo(q);
+        }
         this._queue.push(command);
     }
     flush() {
@@ -4668,10 +4671,6 @@ let HistoryManager = class HistoryManager extends Disposable {
     notifySave() {
         this._savedIndex = this.index;
     }
-    takeAction(action) {
-        action();
-        this.flush();
-    }
     addStep(step) {
         if (this.steps.length > this.index)
             this.steps.length = this.index;
@@ -4686,7 +4685,6 @@ let HistoryManager = class HistoryManager extends Disposable {
         if (this._moving)
             return;
         FieldCommand.create(target, prop, oldValue, newValue);
-        this.flush();
     }
     get canUndo() {
         return this.index > 0;
@@ -4727,20 +4725,51 @@ HistoryManager = __decorate([
 ], HistoryManager);
 class Step {
     constructor(commands) {
+        this._fixed = false;
         this.commands = commands;
+        this.signature = Step.signature(commands);
+        this.reset();
+    }
+    static signature(commands) {
+        commands.sort((a, b) => a.signature.localeCompare(b.signature));
+        return commands.map(c => c.signature).join(";");
+    }
+    reset() {
+        if (this._timeout)
+            clearTimeout(this._timeout);
+        this._timeout = setTimeout(() => this._fixed = true, 1000);
     }
     tryAdd(commands) {
-        return false;
+        if (this._fixed)
+            return false;
+        if (Step.signature(commands) != this.signature)
+            return false;
+        for (let i = 0; i < commands.length; i++) {
+            if (!commands[i].canAddTo(this.commands[i]))
+                return false;
+        }
+        for (let i = 0; i < commands.length; i++) {
+            commands[i].addTo(this.commands[i]);
+        }
+        this.reset();
+        return true;
     }
     undo() {
         for (let c of this.commands)
             c.undo();
+        this._fixed = true;
     }
     redo() {
         for (let c of this.commands)
             c.redo();
+        this._fixed = true;
     }
 }
+var CommandType;
+(function (CommandType) {
+    CommandType[CommandType["field"] = 0] = "field";
+    CommandType[CommandType["move"] = 1] = "move";
+})(CommandType || (CommandType = {}));
 let Edge = class Edge extends ViewedControl {
     constructor(sheet, v1, v2, edge) {
         super(sheet);
@@ -4754,10 +4783,10 @@ let Edge = class Edge extends ViewedControl {
         return super.shouldDispose || this.edge.disposed;
     }
     split() {
-        this.design.history.takeAction(() => this.toVertex(Tree.prototype.split));
+        this.toVertex(Tree.prototype.split);
     }
     deleteAndMerge() {
-        this.design.history.takeAction(() => this.toVertex(Tree.prototype.deleteAndMerge));
+        this.toVertex(Tree.prototype.deleteAndMerge);
     }
     toVertex(action) {
         var _a;

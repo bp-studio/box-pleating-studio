@@ -13,12 +13,13 @@ interface JMoveCommand extends JCommand {
 class MoveCommand extends Command implements JMoveCommand {
 
 	public static create(target: Draggable, loc: IPoint) {
-		new MoveCommand(target.design, {
+		let command = new MoveCommand(target.design, {
 			tag: target.tag,
 			old: clone(target.location),
 			new: loc
 		});
 		MoveCommand.assign(target.location, loc);
+		target.design.history.queue(command);
 	}
 
 	private static assign(target: IPoint, value: IPoint) {
@@ -31,19 +32,30 @@ class MoveCommand extends Command implements JMoveCommand {
 	public old: IPoint;
 	public new: IPoint;
 
-	constructor(design: Design, json: Omit<JMoveCommand, 'type'>) {
+	constructor(design: Design, json: Typeless<JMoveCommand>) {
 		super(design, json);
 		this.old = json.old;
 		this.new = json.new;
 	}
 
+	public canAddTo(command: Command): boolean {
+		return command instanceof MoveCommand && command.tag == this.tag &&
+			command.new.x == this.old.x && command.new.y == this.old.y;
+	}
+
+	public addTo(command: Command) {
+		MoveCommand.assign((command as MoveCommand).new, this.new);
+	}
+
 	public undo() {
 		let target = this._design.find(this.tag)!;
+		if(!target['location']) debugger;
 		MoveCommand.assign(target['location'], this.old);
 	}
 
 	public redo() {
 		let target = this._design.find(this.tag)!;
+		if(!target['location']) debugger;
 		MoveCommand.assign(target['location'], this.new);
 	}
 }

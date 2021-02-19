@@ -14,12 +14,13 @@ interface JFieldCommand extends JCommand {
 class FieldCommand extends Command implements JFieldCommand {
 
 	public static create(target: ITagObject, prop: string, oldValue: any, newValue: any) {
-		new FieldCommand(target.design, {
+		let command = new FieldCommand(target.design, {
 			tag: target.tag,
 			prop,
 			old: oldValue,
 			new: newValue
 		});
+		target.design.history.queue(command);
 	}
 
 	public readonly type = CommandType.field;
@@ -27,11 +28,19 @@ class FieldCommand extends Command implements JFieldCommand {
 	public old: any;
 	public new: any;
 
-	constructor(design: Design, json: Omit<JFieldCommand, 'type'>) {
+	constructor(design: Design, json: Typeless<JFieldCommand>) {
 		super(design, json);
 		this.prop = json.prop;
 		this.old = json.old;
 		this.new = json.new;
+	}
+
+	public canAddTo(command: Command): boolean {
+		return command instanceof FieldCommand && command.tag == this.tag && command.new == this.old;
+	}
+
+	public addTo(command: Command) {
+		(command as FieldCommand).new = this.new;
 	}
 
 	public undo() {

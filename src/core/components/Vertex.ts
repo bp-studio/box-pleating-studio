@@ -39,24 +39,22 @@ interface JVertex extends IPoint {
 	}
 
 	public addLeaf(length = 1) {
-		this.design.history.takeAction(() => {
-			// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
-			// 不然等一下讀取 design.vertices 會觸發新的 Vertex 的自動生成，
-			// 而那會比我設置 option 更早
-			let v = [...this.design.vertices.values()];
+		// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
+		// 不然等一下讀取 design.vertices 會觸發新的 Vertex 的自動生成，
+		// 而那會比我設置 option 更早
+		let v = [...this.design.vertices.values()];
 
-			// 加入 TreeNode
-			let node = this.node.addLeaf(length);
+		// 加入 TreeNode
+		let node = this.node.addLeaf(length);
 
-			// 找尋最近的空位去放
-			let p = this.findClosestEmptyPoint(v);
-			this.design.options.set("vertex", node.id, {
-				id: node.id,
-				name: node.name,
-				x: p.x,
-				y: p.y,
-				isNew: true
-			});
+		// 找尋最近的空位去放
+		let p = this.findClosestEmptyPoint(v);
+		this.design.options.set("vertex", node.id, {
+			id: node.id,
+			name: node.name,
+			x: p.x,
+			y: p.y,
+			isNew: true
 		});
 	}
 
@@ -81,11 +79,9 @@ interface JVertex extends IPoint {
 
 	public deleteAndJoin() {
 		if(this.node.degree != 2) return;
-		this.design.history.takeAction(() => {
-			let edge = this.node.dispose()!;
-			this.$studio?.update();
-			this.design.edges.get(edge)!.selected = true;
-		});
+		let edge = this.node.dispose()!;
+		this.$studio?.update();
+		this.design.edges.get(edge)!.selected = true;
 	}
 
 	constructor(sheet: Sheet, node: TreeNode) {
