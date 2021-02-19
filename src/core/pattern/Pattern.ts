@@ -12,7 +12,16 @@ type GPattern = JPattern<Gadget>;
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Pattern extends SheetObject implements ISerializable<JPattern> {
+@shrewd class Pattern extends SheetObject implements ISerializable<JPattern>, IQueryable {
+
+	public get tag() {
+		return this.configuration.tag + "." + this.configuration.indexOf(this);
+	}
+
+	public query(tag: string): ITagObject | undefined {
+		if(!tag) return this;
+		else return this.devices[Number(tag)];
+	}
 
 	public static getSignature(pattern: JPattern) {
 		let d = pattern.devices;

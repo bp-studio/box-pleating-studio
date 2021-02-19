@@ -36,6 +36,7 @@ class Step implements JStep {
 		if(this._fixed) return false;
 
 		// 先確定合併可以執行
+		// TODO：這邊要加入考慮到建構解構的 Command
 		if(Step.signature(commands) != this.signature) return false;
 		for(let i = 0; i < commands.length; i++) {
 			if(!commands[i].canAddTo(this.commands[i])) return false;

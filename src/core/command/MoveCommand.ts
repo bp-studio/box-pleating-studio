@@ -48,13 +48,13 @@ class MoveCommand extends Command implements JMoveCommand {
 	}
 
 	public undo() {
-		let target = this._design.find(this.tag)!;
+		let target = this._design.query(this.tag)!;
 		if(!target['location']) debugger;
 		MoveCommand.assign(target['location'], this.old);
 	}
 
 	public redo() {
-		let target = this._design.find(this.tag)!;
+		let target = this._design.query(this.tag)!;
 		if(!target['location']) debugger;
 		MoveCommand.assign(target['location'], this.new);
 	}

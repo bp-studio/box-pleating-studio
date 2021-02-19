@@ -44,12 +44,12 @@ class FieldCommand extends Command implements JFieldCommand {
 	}
 
 	public undo() {
-		let target = this._design.find(this.tag)!;
+		let target = this._design.query(this.tag)!;
 		target[this.prop] = this.old;
 	}
 
 	public redo() {
-		let target = this._design.find(this.tag)!;
+		let target = this._design.query(this.tag)!;
 		target[this.prop] = this.new;
 	}
 }

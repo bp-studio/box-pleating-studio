@@ -14,7 +14,7 @@ interface JConfiguration {
 @shrewd class Configuration extends Store<JPattern, Pattern> implements ISerializable<JConfiguration> {
 
 	public get tag() {
-		return "cf" + this.repository.stretch.signature + "-" + this.repository.indexOf(this);
+		return this.repository.tag + "." + this.repository.indexOf(this);
 	}
 
 	public readonly repository: Repository;

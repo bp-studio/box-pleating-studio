@@ -7,6 +7,10 @@ interface ITagObject extends IDesignObject {
 	[key: string]: any;
 }
 
+interface IQueryable extends ITagObject {
+	query(tag: string): ITagObject | undefined;
+}
+
 enum CommandType {
 	field = 0,
 	move = 1,

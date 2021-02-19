@@ -1733,11 +1733,11 @@ class FieldCommand extends Command {
         command.new = this.new;
     }
     undo() {
-        let target = this._design.find(this.tag);
+        let target = this._design.query(this.tag);
         target[this.prop] = this.old;
     }
     redo() {
-        let target = this._design.find(this.tag);
+        let target = this._design.query(this.tag);
         target[this.prop] = this.new;
     }
 }
@@ -1769,13 +1769,13 @@ class MoveCommand extends Command {
         MoveCommand.assign(command.new, this.new);
     }
     undo() {
-        let target = this._design.find(this.tag);
+        let target = this._design.query(this.tag);
         if (!target['location'])
             debugger;
         MoveCommand.assign(target['location'], this.old);
     }
     redo() {
-        let target = this._design.find(this.tag);
+        let target = this._design.query(this.tag);
         if (!target['location'])
             debugger;
         MoveCommand.assign(target['location'], this.new);
@@ -1889,6 +1889,12 @@ let Tree = class Tree extends Disposable {
         if (n1 == n2)
             return 0;
         return this.pair.get(n1, n2).dist;
+    }
+    find(id) {
+        let [n1, n2] = id.split(',').map(i => this.node.get(Number(i)));
+        if (!n1 || !n2)
+            return undefined;
+        return this.edge.get(n1, n2);
     }
     getOrAddNode(n) {
         let N;
@@ -2729,7 +2735,7 @@ let TreeEdge = class TreeEdge extends Disposable {
         this._n2 = n2;
         this.length = length;
     }
-    get tag() { return "e" + this._n1.id + "-" + this._n2.id; }
+    get tag() { return "e" + this._n1.id + "," + this._n2.id; }
     get design() { return this.n1.design; }
     get shouldDispose() {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
@@ -3059,7 +3065,7 @@ let Design = class Design extends DesignBase {
         if (this.mode == "tree")
             this.vertices.forEach(v => v.selected = true);
     }
-    find(tag) {
+    query(tag) {
         var _a;
         if (tag == "design")
             return this;
@@ -3067,21 +3073,19 @@ let Design = class Design extends DesignBase {
             return this.LayoutSheet;
         if (tag == "tree")
             return this.TreeSheet;
-        let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
+        let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
         if (m) {
-            let init = m[1], id = m[2], to = Number(m[3]);
-            if (init == "rp")
-                return this.stretches.get(id).repository || undefined;
-            if (init == "cf")
-                return (_a = this.stretches.get(id).repository) === null || _a === void 0 ? void 0 : _a.get(to);
+            let init = m[1], id = m[2], then = m[3];
+            if (init == "r")
+                return (_a = this.stretches.get(id).repository) === null || _a === void 0 ? void 0 : _a.query(then);
             let t = this.tree;
+            if (init == "e")
+                return t.find(id);
             let n = t.node.get(Number(id));
             if (init == "n")
                 return n;
             if (init == "f")
                 return this.flaps.get(n);
-            if (init == "e")
-                return t.edge.get(n, t.node.get(to));
             if (init == "v")
                 return this.vertices.get(n);
         }
@@ -3495,6 +3499,15 @@ let Pattern = class Pattern extends SheetObject {
         this.gadgets = this.devices.reduce((arr, d) => arr.concat(d.gadgets), []);
         this.signature = JSON.stringify(pattern);
     }
+    get tag() {
+        return this.configuration.tag + "." + this.configuration.indexOf(this);
+    }
+    query(tag) {
+        if (!tag)
+            return this;
+        else
+            return this.devices[Number(tag)];
+    }
     static getSignature(pattern) {
         let d = pattern.devices;
         pattern.devices = pattern.devices.map(d => {
@@ -3588,6 +3601,17 @@ class Store extends SheetObject {
         this.index = 0;
         this._cache = [];
         this._entries = [];
+    }
+    query(tag) {
+        var _a;
+        if (!tag)
+            return this;
+        let m = tag.match(/^(\d+)(?:\.(.+))?$/);
+        if (m) {
+            let id = Number(m[1]), then = m[2];
+            return (_a = this.get(id)) === null || _a === void 0 ? void 0 : _a.query(then);
+        }
+        return undefined;
     }
     get _prototypes() {
         if (!this.generator)
@@ -3756,7 +3780,7 @@ let Configuration = class Configuration extends Store {
         this.generator = this.generate();
     }
     get tag() {
-        return "cf" + this.repository.stretch.signature + "-" + this.repository.indexOf(this);
+        return this.repository.tag + "." + this.repository.indexOf(this);
     }
     get shouldDispose() {
         return super.shouldDispose || this.repository.disposed;
@@ -6783,7 +6807,7 @@ let Device = class Device extends Draggable {
         this.view = new DeviceView(this);
     }
     get type() { return "Device"; }
-    get tag() { return ""; }
+    get tag() { return this.pattern.tag + "." + this.pattern.devices.indexOf(this); }
     toJSON() {
         return {
             gadgets: this.gadgets.map(g => g.toJSON()),
@@ -7391,7 +7415,7 @@ let Repository = class Repository extends Store {
         this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());
     }
     get tag() {
-        return "rp" + this.stretch.signature;
+        return "r" + this.stretch.signature;
     }
     builder(prototype) {
         return prototype;

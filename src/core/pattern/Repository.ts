@@ -11,7 +11,7 @@
 @shrewd class Repository extends Store<Configuration, Configuration> {
 
 	public get tag() {
-		return "rp" + this.stretch.signature;
+		return "r" + this.stretch.signature;
 	}
 
 	public readonly stretch: Stretch;

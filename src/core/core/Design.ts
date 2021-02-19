@@ -11,7 +11,7 @@ interface IDesignObject {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Design extends DesignBase implements ISerializable<JDesign>, IDesignObject, ITagObject {
+@shrewd class Design extends DesignBase implements ISerializable<JDesign>, IQueryable {
 
 	@shrewd public fullscreen: boolean;
 
@@ -170,20 +170,21 @@ interface IDesignObject {
 	}
 
 	/** 根據 tag 來找出唯一的對應物件 */
-	public find(tag: string): ITagObject | undefined {
+	public query(tag: string): ITagObject | undefined {
 		if(tag == "design") return this;
 		if(tag == "layout") return this.LayoutSheet;
 		if(tag == "tree") return this.TreeSheet;
-		let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:-(\d+))?$/);
+		let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
 		if(m) {
-			let init = m[1], id = m[2], to = Number(m[3]);
-			if(init == "rp") return this.stretches.get(id)!.repository || undefined;
-			if(init == "cf") return this.stretches.get(id)!.repository?.get(to);
+			let init = m[1], id = m[2], then = m[3];
+			if(init == "r") return this.stretches.get(id)!.repository?.query(then);
+
 			let t = this.tree;
+			if(init == "e") return t.find(id);
+
 			let n = t.node.get(Number(id))!;
 			if(init == "n") return n;
 			if(init == "f") return this.flaps.get(n);
-			if(init == "e") return t.edge.get(n, t.node.get(to)!);
 			if(init == "v") return this.vertices.get(n);
 		}
 		return undefined;

@@ -74,6 +74,12 @@
 		return this.pair.get(n1, n2)!.dist;
 	}
 
+	public find(id: string): TreeEdge | undefined {
+		let [n1, n2] = id.split(',').map(i => this.node.get(Number(i)));
+		if(!n1 || !n2) return undefined;
+		return this.edge.get(n1, n2);
+	}
+
 	private getOrAddNode(n: number) {
 		let N: TreeNode;
 		if(this.node.has(n)) N = this.node.get(n)!;

@@ -14,9 +14,19 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Store<P, T extends SheetObject> extends SheetObject implements ITagObject {
+abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject implements IQueryable {
 
 	public abstract get tag(): string;
+
+	public query(tag: string): ITagObject | undefined {
+		if(!tag) return this;
+		let m = tag.match(/^(\d+)(?:\.(.+))?$/);
+		if(m) {
+			let id = Number(m[1]), then = m[2];
+			return this.get(id)?.query(then);
+		}
+		return undefined;
+	}
 
 	/** 原型資料生成器 */
 	protected abstract generator: Generator<P>;
