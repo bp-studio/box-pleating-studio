@@ -4,10 +4,10 @@
 	public line: paper.Path;
 
 	protected _label: paper.PointText;
+	protected _glow: paper.PointText;
 
 	/** 加粗的直線空間，方便判定選取動作 */
 	private _lineRegion: paper.Path;
-	private _glow: paper.PointText;
 
 	constructor(edge: Edge) {
 		super(edge);
@@ -28,19 +28,22 @@
 
 	protected render() {
 		let l1 = this.control.v1.location, l2 = this.control.v2.location;
-		let center: IPoint = { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
-
 		this._lineRegion.segments[0].point.set([l1.x, l1.y]);
 		this._lineRegion.segments[1].point.set([l2.x, l2.y]);
 		this.line.copyContent(this._lineRegion);
-
-		this._label.content = this.control.length.toString();
-		LabelUtil.setLabel(this.control.sheet, this._label, this._glow, center, this.line);
 	}
 
 	protected renderSelection(selected: boolean) {
 		let color = selected ? PaperUtil.Red() : PaperUtil.Black();
 		this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
 		this.line.strokeWidth = selected ? 3 : 2;
+	}
+
+	protected renderUnscaled() {
+		this.draw();
+		let l1 = this.control.v1.location, l2 = this.control.v2.location;
+		let center: IPoint = { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
+		this._label.content = this.control.length.toString();
+		LabelUtil.setLabel(this.control.sheet, this._label, this._glow, center, this.line);
 	}
 }

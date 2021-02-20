@@ -268,6 +268,7 @@
 		return Math.min(ws, hs);
 	}
 
+	/** 設置捲軸的顯示與否、並且傳回當前是否可捲動 */
 	@shrewd public isScrollable(): boolean {
 		this._studio.$el.classList.toggle("scroll-x", this.isXScrollable);
 		this._studio.$el.classList.toggle("scroll-y", this.isYScrollable);
@@ -307,13 +308,16 @@
 		// TODO：未來這一段應該要轉移到 Sheet 物件上頭
 		PaperUtil.setRectangleSize(this.boundary, width, height);
 
-		// 依照數值配置 Paper.js 的 View 的大小和變換矩陣
+		// 計算配置
 		let el = this._studio.$el;
 		let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
 
+		// 配置 Paper.js 的 View 的大小
+		this.isScrollable(); // 順序上必須先把捲軸設定完成、clientWidth/Height 才會是正確的值
 		if(this.lockViewport) this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
 		else this.project.view.viewSize.set(el.clientWidth, el.clientHeight);
 
+		// 配置變換矩陣
 		this.project.view.matrix.set(s, 0, 0, -s, mw - this.scroll.x, mh - this.scroll.y);
 
 		// 設定各個圖層的邊界和變換矩陣

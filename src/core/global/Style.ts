@@ -49,7 +49,9 @@ namespace Style {
 		fontSize: 14
 	};
 
-	export const edge: StyleDeclaration = {};
+	export const edge: StyleDeclaration = {
+		strokeWidth: 2
+	};
 
 	export const ridge: StyleDeclaration = {
 		strokeWidth: 1.25,

@@ -2570,6 +2570,9 @@ __decorate([
     shrewd({
         validator(v) {
             return v >= Math.min(10, this.getMinScale());
+        },
+        renderer(v) {
+            return Math.max(v, Math.min(10, this.getMinScale()));
         }
     })
 ], Sheet.prototype, "scale", void 0);
@@ -2607,6 +2610,7 @@ class View extends Mountable {
     constructor() {
         super(...arguments);
         this._paths = [];
+        this._scale = 1;
     }
     draw() {
         this.mountEvents();
@@ -2614,7 +2618,7 @@ class View extends Mountable {
             this.render();
     }
     $addItem(layer, item) {
-        this._paths.push([layer, item]);
+        this._paths.push([layer, item, item.strokeWidth]);
     }
     onMount(studio) {
         for (let [l, p] of this._paths)
@@ -2627,10 +2631,27 @@ class View extends Mountable {
     contains(point) {
         return false;
     }
+    get scale() {
+        this.mountEvents();
+        if (!this.$studio)
+            return this._scale;
+        let s = this.$studio.$display.scale;
+        return this._scale = s < 10 ? s / 10 : 1;
+    }
+    renderScale() {
+        for (let [l, p, w] of this._paths)
+            p.strokeWidth = w * this.scale;
+    }
 }
 __decorate([
     shrewd
 ], View.prototype, "draw", null);
+__decorate([
+    shrewd
+], View.prototype, "scale", null);
+__decorate([
+    shrewd
+], View.prototype, "renderScale", null);
 let TreeNode = class TreeNode extends Disposable {
     constructor(tree, id) {
         super(tree);
@@ -3679,7 +3700,9 @@ class ControlView extends View {
         this.control = control;
     }
     drawSelection() {
-        this.renderSelection(this.control.selected);
+        this.mountEvents();
+        if (this.$studio)
+            this.renderSelection(this.control.selected);
     }
 }
 __decorate([
@@ -3733,13 +3756,10 @@ let SheetView = class SheetView extends View {
         return this._border.contains(point);
     }
     render() {
-        var _a;
-        if (!this.$studio)
-            return;
         let width = this._sheet.width;
         let height = this._sheet.height;
         PaperUtil.setRectangleSize(this._border, width, height);
-        this._grid.visible = (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.settings.showGrid;
+        this._grid.visible = this.$studio.$display.settings.showGrid;
         this._grid.removeChildren();
         for (let i = 1; i < height; i++) {
             PaperUtil.addLine(this._grid, new paper.Point(0, i), new paper.Point(width, i));
@@ -3897,13 +3917,23 @@ Configuration = __decorate([
     shrewd
 ], Configuration);
 class LabeledView extends ControlView {
+    drawUnscaled() {
+        this.mountEvents();
+        if (!this.$studio)
+            return;
+        this.$studio.$display.render();
+        this.renderUnscaled();
+        let s = 14 * Math.sqrt(this.scale);
+        this._label.fontSize = s;
+        this._glow.fontSize = s;
+    }
     get overflow() {
         if (this.disposed || !this.$studio)
             return 0;
-        this.draw();
-        let result = 0, b = this._label.bounds;
+        this.drawUnscaled();
+        let result = 0;
         let w = this.$studio.$display.scale * this.control.sheet.width;
-        let left = b.x, right = b.x + b.width;
+        let { left, right } = this._label.bounds;
         if (left < 0)
             result = -left;
         if (right > w)
@@ -3911,6 +3941,9 @@ class LabeledView extends ControlView {
         return Math.ceil(result);
     }
 }
+__decorate([
+    shrewd
+], LabeledView.prototype, "drawUnscaled", null);
 __decorate([
     shrewd
 ], LabeledView.prototype, "overflow", null);
@@ -4238,10 +4271,6 @@ let FlapView = class FlapView extends LabeledView {
         this._shade.copyContent(this.hinge);
     }
     renderUnscaled() {
-        this.mountEvents();
-        if (!this.$studio)
-            return;
-        this.$studio.$display.render();
         let ds = this.control.sheet.displayScale;
         let w = this.control.width, h = this.control.height;
         let fix = (p) => [p.x * ds, -p.y * ds];
@@ -4254,6 +4283,15 @@ let FlapView = class FlapView extends LabeledView {
         this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
         this._label.content = this.control.node.name;
         LabelUtil.setLabel(this.control.sheet, this._label, this._glow, this.control.dragSelectAnchor, this._dots[0]);
+    }
+    renderDot() {
+        let s = 3 * Math.pow(this.scale, 0.75);
+        MakePerQuadrant(i => {
+            this._dots[i].copyContent(new paper.Path.Circle({
+                position: this._dots[i].position,
+                radius: s
+            }));
+        });
     }
     renderSelection(selected) {
         this._shade.visible = selected;
@@ -4273,7 +4311,7 @@ __decorate([
 ], FlapView.prototype, "renderHinge", null);
 __decorate([
     shrewd
-], FlapView.prototype, "renderUnscaled", null);
+], FlapView.prototype, "renderDot", null);
 FlapView = __decorate([
     shrewd
 ], FlapView);
@@ -4293,17 +4331,21 @@ let EdgeView = class EdgeView extends LabeledView {
     }
     render() {
         let l1 = this.control.v1.location, l2 = this.control.v2.location;
-        let center = { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
         this._lineRegion.segments[0].point.set([l1.x, l1.y]);
         this._lineRegion.segments[1].point.set([l2.x, l2.y]);
         this.line.copyContent(this._lineRegion);
-        this._label.content = this.control.length.toString();
-        LabelUtil.setLabel(this.control.sheet, this._label, this._glow, center, this.line);
     }
     renderSelection(selected) {
         let color = selected ? PaperUtil.Red() : PaperUtil.Black();
         this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
         this.line.strokeWidth = selected ? 3 : 2;
+    }
+    renderUnscaled() {
+        this.draw();
+        let l1 = this.control.v1.location, l2 = this.control.v2.location;
+        let center = { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
+        this._label.content = this.control.length.toString();
+        LabelUtil.setLabel(this.control.sheet, this._label, this._glow, center, this.line);
     }
 };
 EdgeView = __decorate([
@@ -4327,6 +4369,19 @@ let VertexView = class VertexView extends LabeledView {
         let x = this.control.location.x, y = this.control.location.y;
         this._circle.position.set([x, y]);
         this._dot.position.set([x * ds, -y * ds]);
+    }
+    renderSelection(selected) {
+        this._dot.set(selected ? Style.dotSelected : Style.dot);
+    }
+    renderDot() {
+        let s = 4 * Math.sqrt(this.scale);
+        this._dot.copyContent(new paper.Path.Circle({
+            position: this._dot.position,
+            radius: s
+        }));
+    }
+    renderUnscaled() {
+        let x = this.control.location.x, y = this.control.location.y;
         let lines = this.control.node.edges.map(e => {
             let edgeView = this.control.sheet.design.edges.get(e).view;
             edgeView.draw();
@@ -4335,10 +4390,10 @@ let VertexView = class VertexView extends LabeledView {
         this._label.content = this.control.node.name;
         LabelUtil.setLabel(this.control.sheet, this._label, this._glow, { x, y }, this._dot, ...lines);
     }
-    renderSelection(selected) {
-        this._dot.set(selected ? Style.dotSelected : Style.dot);
-    }
 };
+__decorate([
+    shrewd
+], VertexView.prototype, "renderDot", null);
 VertexView = __decorate([
     shrewd
 ], VertexView);
@@ -5370,6 +5425,7 @@ let Display = class Display {
         PaperUtil.setRectangleSize(this.boundary, width, height);
         let el = this._studio.$el;
         let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+        this.isScrollable();
         if (this.lockViewport)
             this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
         else
@@ -6059,7 +6115,9 @@ var Style;
         strokeColor: 'white',
         fontSize: 14
     };
-    Style.edge = {};
+    Style.edge = {
+        strokeWidth: 2
+    };
     Style.ridge = {
         strokeWidth: 1.25,
         strokeColor: "red"

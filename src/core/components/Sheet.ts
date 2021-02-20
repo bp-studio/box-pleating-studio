@@ -68,6 +68,9 @@ interface JSheet {
 	@shrewd({
 		validator(this: Sheet, v: number) {
 			return v >= Math.min(10, this.getMinScale());
+		},
+		renderer(this: Sheet, v: number) {
+			return Math.max(v, Math.min(10, this.getMinScale()));
 		}
 	}) public scale: number;
 

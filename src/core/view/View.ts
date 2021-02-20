@@ -10,7 +10,7 @@
 
 abstract class View extends Mountable {
 
-	private _paths: [Layer, paper.Item][] = [];
+	private _paths: [Layer, paper.Item, number][] = [];
 
 	/**
 	 * 視圖的自動繪製反應方法；會呼叫子類別實作的 `render()` 方法完成繪製。
@@ -29,7 +29,7 @@ abstract class View extends Mountable {
 	 * 若在別的地方使用將會發生不可預期的結果。
 	 */
 	public $addItem(layer: Layer, item: paper.Item): void {
-		this._paths.push([layer, item]);
+		this._paths.push([layer, item, item.strokeWidth]);
 	}
 
 	protected onMount(studio: BPStudio): void {
@@ -55,4 +55,17 @@ abstract class View extends Mountable {
 	 * 視圖必須實作抽象的 render 方法以定義繪製的具體行為。
 	 */
 	protected abstract render(): void;
+
+	/** 當尺度太小的時候調整線條粗細 */
+	@shrewd protected get scale() {
+		this.mountEvents();
+		if(!this.$studio) return this._scale;
+		let s = this.$studio.$display.scale;
+		return this._scale = s < 10 ? s / 10 : 1;
+	}
+	private _scale = 1;
+
+	@shrewd private renderScale() {
+		for(let [l, p, w] of this._paths) p.strokeWidth = w * this.scale;
+	}
 }

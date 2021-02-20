@@ -2,13 +2,13 @@
 @shrewd class FlapView extends LabeledView<Flap> implements ClosureView {
 
 	protected readonly _label: paper.PointText;
+	protected readonly _glow: paper.PointText;
 	public readonly hinge: paper.Path;
 	private readonly _shade: paper.Path;
 	private readonly _dots: PerQuadrant<paper.Path.Circle>;
 	private readonly _circle: paper.Path;
 	private readonly _outerRidges: paper.CompoundPath;
 	private readonly _innerRidges: paper.CompoundPath;
-	private readonly _glow: paper.PointText;
 	private readonly _component: RiverHelperBase;
 
 	constructor(flap: Flap) {
@@ -104,11 +104,7 @@
 		this._shade.copyContent(this.hinge);
 	}
 
-	@shrewd private renderUnscaled() {
-		this.mountEvents();
-		if(!this.$studio) return;
-		this.$studio.$display.render();
-
+	protected renderUnscaled() {
 		let ds = this.control.sheet.displayScale;
 		let w = this.control.width, h = this.control.height;
 
@@ -123,6 +119,17 @@
 
 		this._label.content = this.control.node.name;
 		LabelUtil.setLabel(this.control.sheet, this._label, this._glow, this.control.dragSelectAnchor, this._dots[0]);
+	}
+
+	/** 尺度太小的時候調整頂點繪製 */
+	@shrewd private renderDot() {
+		let s = 3 * Math.pow(this.scale, 0.75);
+		MakePerQuadrant(i => {
+			this._dots[i].copyContent(new paper.Path.Circle({
+				position: this._dots[i].position,
+				radius: s
+			}))
+		});
 	}
 
 	protected renderSelection(selected: boolean) {

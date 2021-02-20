@@ -19,7 +19,8 @@ abstract class ControlView<T extends Control> extends View {
 	}
 
 	@shrewd private drawSelection() {
-		this.renderSelection(this.control.selected);
+		this.mountEvents();
+		if(this.$studio) this.renderSelection(this.control.selected);
 	}
 
 	protected abstract renderSelection(selected: boolean): void;
