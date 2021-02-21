@@ -292,6 +292,44 @@
 		}
 	}
 
+	@shrewd private get margin() {
+		let cw = Math.max(this.sheetWidth, this.viewWidth);
+		let ch = Math.max(this.sheetHeight, this.viewHeight);
+		this.spaceHolder.style.width = cw + "px";
+		this.spaceHolder.style.height = ch + "px";
+		let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+		return { x: mw - this.scroll.x, y: mh - this.scroll.y };
+	}
+
+	public zoom(scale: number, center: IPoint) {
+		let sheet = this._studio.design?.sheet;
+		let el = this._studio.$el;
+		if(!sheet || sheet.scale == scale) return;
+		this._studio.design!.fullscreen = false;
+
+		let rect = el.getBoundingClientRect();
+		center.x -= rect.left;
+		center.y -= rect.top;
+
+		console.log(this.margin);
+
+		let { x, y } = this.margin, s = this.scale;
+		let cx = (center.x - x) / s, cy = (y - center.y) / s;
+
+		sheet.scale = scale; // 執行完這行之後，再次存取 this.margin 會發生改變
+		if(sheet.scale != scale) return; // 變更失敗（太小），結束操作
+
+		x = sheet.scroll.x + cx * scale + this.margin.x - center.x;
+		y = sheet.scroll.y + this.margin.y - cy * scale - center.y;
+		if(x < 0) x = 0;
+		if(y < 0) y = 0;
+		if(x > el.scrollWidth) x = el.scrollWidth;
+		if(y > el.scrollHeight) y = el.scrollHeight;
+		sheet.scroll.x = x;
+		sheet.scroll.y = y;
+		this._studio.update();
+	}
+
 	@shrewd public render() {
 		let width = 0, height = 0, s = this.scale;
 
@@ -299,26 +337,20 @@
 		if(this._studio.design && this._studio.design.sheet) {
 			({ width, height } = this._studio.design.sheet);
 		}
-		let cw = Math.max(this.sheetWidth, this.viewWidth);
-		let ch = Math.max(this.sheetHeight, this.viewHeight);
-		this.spaceHolder.style.width = cw + "px";
-		this.spaceHolder.style.height = ch + "px";
 
 		// 更新目前的邊界繪製
 		// TODO：未來這一段應該要轉移到 Sheet 物件上頭
 		PaperUtil.setRectangleSize(this.boundary, width, height);
 
-		// 計算配置
-		let el = this._studio.$el;
-		let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
-
 		// 配置 Paper.js 的 View 的大小
+		let el = this._studio.$el;
+		let { x, y } = this.margin;
 		this.isScrollable(); // 順序上必須先把捲軸設定完成、clientWidth/Height 才會是正確的值
 		if(this.lockViewport) this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
 		else this.project.view.viewSize.set(el.clientWidth, el.clientHeight);
 
 		// 配置變換矩陣
-		this.project.view.matrix.set(s, 0, 0, -s, mw - this.scroll.x, mh - this.scroll.y);
+		this.project.view.matrix.set(s, 0, 0, -s, x, y);
 
 		// 設定各個圖層的邊界和變換矩陣
 		for(let l of Enum.values(Layer)) {

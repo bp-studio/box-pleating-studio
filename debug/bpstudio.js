@@ -5535,24 +5535,58 @@ let Display = class Display {
             this._studio.$el.scrollTop = sheet.scroll.y;
         }
     }
+    get margin() {
+        let cw = Math.max(this.sheetWidth, this.viewWidth);
+        let ch = Math.max(this.sheetHeight, this.viewHeight);
+        this.spaceHolder.style.width = cw + "px";
+        this.spaceHolder.style.height = ch + "px";
+        let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+        return { x: mw - this.scroll.x, y: mh - this.scroll.y };
+    }
+    zoom(scale, center) {
+        var _a;
+        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+        let el = this._studio.$el;
+        if (!sheet || sheet.scale == scale)
+            return;
+        this._studio.design.fullscreen = false;
+        let rect = el.getBoundingClientRect();
+        center.x -= rect.left;
+        center.y -= rect.top;
+        console.log(this.margin);
+        let { x, y } = this.margin, s = this.scale;
+        let cx = (center.x - x) / s, cy = (y - center.y) / s;
+        sheet.scale = scale;
+        if (sheet.scale != scale)
+            return;
+        x = sheet.scroll.x + cx * scale + this.margin.x - center.x;
+        y = sheet.scroll.y + this.margin.y - cy * scale - center.y;
+        if (x < 0)
+            x = 0;
+        if (y < 0)
+            y = 0;
+        if (x > el.scrollWidth)
+            x = el.scrollWidth;
+        if (y > el.scrollHeight)
+            y = el.scrollHeight;
+        sheet.scroll.x = x;
+        sheet.scroll.y = y;
+        this._studio.update();
+    }
     render() {
         let width = 0, height = 0, s = this.scale;
         if (this._studio.design && this._studio.design.sheet) {
             ({ width, height } = this._studio.design.sheet);
         }
-        let cw = Math.max(this.sheetWidth, this.viewWidth);
-        let ch = Math.max(this.sheetHeight, this.viewHeight);
-        this.spaceHolder.style.width = cw + "px";
-        this.spaceHolder.style.height = ch + "px";
         PaperUtil.setRectangleSize(this.boundary, width, height);
         let el = this._studio.$el;
-        let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+        let { x, y } = this.margin;
         this.isScrollable();
         if (this.lockViewport)
             this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
         else
             this.project.view.viewSize.set(el.clientWidth, el.clientHeight);
-        this.project.view.matrix.set(s, 0, 0, -s, mw - this.scroll.x, mh - this.scroll.y);
+        this.project.view.matrix.set(s, 0, 0, -s, x, y);
         for (let l of Enum.values(Layer)) {
             let layer = this.project.layers[l];
             if (LayerOptions[l].clipped) {
@@ -5603,6 +5637,9 @@ __decorate([
 __decorate([
     shrewd
 ], Display.prototype, "onSheetChange", null);
+__decorate([
+    shrewd
+], Display.prototype, "margin", null);
 __decorate([
     shrewd
 ], Display.prototype, "render", null);
@@ -6053,13 +6090,14 @@ let System = System_1 = class System {
     _canvasWheel(event) {
         if (event.ctrlKey || event.metaKey) {
             event.preventDefault();
+            let display = this._studio.$display;
             let d = this._studio.design;
             if (d) {
                 if (d.fullscreen) {
-                    d.sheet.scale = Math.round(this._studio.$display.scale);
+                    d.sheet.scale = Math.round(display.scale);
                     d.fullscreen = false;
                 }
-                d.sheet.scale -= Math.round(event.deltaY / 100);
+                display.zoom(d.sheet.scale - Math.round(event.deltaY / 100), { x: event.pageX, y: event.pageY });
             }
         }
     }
@@ -6074,6 +6112,10 @@ let System = System_1 = class System {
         let t = event.touches, dx = t[1].screenX - t[0].screenX, dy = t[1].screenY - t[0].screenY;
         return Math.sqrt(dx * dx + dy * dy);
     }
+    getTouchCenter(event) {
+        let t = event.touches;
+        return { x: (t[1].pageX + t[0].pageX) / 2, y: (t[1].pageY + t[0].pageY) / 2 };
+    }
     _bodyMousemove(event) {
         var _a;
         if (this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
@@ -6081,23 +6123,24 @@ let System = System_1 = class System {
             let pt = new Point(e.screenX, e.screenY);
             let diff = pt.sub(this._lastKnownCursorLocation);
             let el = this._studio.$el;
-            if (this._studio.$display.isXScrollable)
+            let display = this._studio.$display;
+            if (display.isXScrollable)
                 el.scrollLeft = this._scrollStart.x - diff.x;
-            if (this._studio.$display.isYScrollable)
+            if (display.isYScrollable)
                 el.scrollTop = this._scrollStart.y - diff.y;
             if (this.isTouch(event)) {
                 let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
                 if (sheet) {
-                    let s = (this.getTouchDistance(event) - this._touchScaling[0]) / 30;
-                    let auto = this._studio.$display.getAutoScale();
+                    let raw = this.getTouchDistance(event) - this._touchScaling[0];
+                    let s = Math.sign(raw) * Math.max(Math.abs(raw) - 40, 0) / 30;
+                    let auto = display.getAutoScale();
                     s = Math.round(s + this._touchScaling[1]);
                     if (s <= auto) {
                         sheet.scale = Math.ceil(auto);
                         sheet.design.fullscreen = true;
                     }
                     else {
-                        sheet.scale = Math.ceil(s);
-                        sheet.design.fullscreen = false;
+                        display.zoom(Math.ceil(s), this.getTouchCenter(event));
                     }
                 }
             }

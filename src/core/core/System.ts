@@ -332,13 +332,17 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	private _canvasWheel(event: WheelEvent) {
 		if(event.ctrlKey || event.metaKey) {
 			event.preventDefault();
+			let display = this._studio.$display;
 			let d = this._studio.design;
 			if(d) {
 				if(d.fullscreen) {
-					d.sheet.scale = Math.round(this._studio.$display.scale);
+					d.sheet.scale = Math.round(display.scale);
 					d.fullscreen = false;
 				}
-				d.sheet.scale -= Math.round(event.deltaY / 100);
+				display.zoom(
+					d.sheet.scale - Math.round(event.deltaY / 100),
+					{ x: event.pageX, y: event.pageY }
+				);
 			}
 		}
 	}
@@ -356,6 +360,11 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
+	private getTouchCenter(event: TouchEvent): IPoint {
+		let t = event.touches;
+		return { x: (t[1].pageX + t[0].pageX) / 2, y: (t[1].pageY + t[0].pageY) / 2 };
+	}
+
 	private _bodyMousemove(event: MouseEvent | TouchEvent) {
 		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留
 		if(this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
@@ -365,17 +374,25 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			let el = this._studio.$el;
 
 			// 這邊不用考慮範圍問題，瀏覽器會處理掉
-			if(this._studio.$display.isXScrollable) el.scrollLeft = this._scrollStart.x - diff.x;
-			if(this._studio.$display.isYScrollable) el.scrollTop = this._scrollStart.y - diff.y;
+			let display = this._studio.$display;
+			if(display.isXScrollable) el.scrollLeft = this._scrollStart.x - diff.x;
+			if(display.isYScrollable) el.scrollTop = this._scrollStart.y - diff.y;
 
 			if(this.isTouch(event)) {
 				let sheet = this._studio.design?.sheet
 				if(sheet) {
-					let s = (this.getTouchDistance(event) - this._touchScaling[0]) / 30;
-					let auto = this._studio.$display.getAutoScale();
+					// 要一定程度以上的差距才會觸發縮放，以免太容易誤觸
+					let raw = this.getTouchDistance(event) - this._touchScaling[0];
+					let s = Math.sign(raw) * Math.max(Math.abs(raw) - 40, 0) / 30;
+
+					let auto = display.getAutoScale();
 					s = Math.round(s + this._touchScaling[1]);
-					if(s <= auto) { sheet.scale = Math.ceil(auto); sheet.design.fullscreen = true; }
-					else { sheet.scale = Math.ceil(s); sheet.design.fullscreen = false; }
+					if(s <= auto) {
+						sheet.scale = Math.ceil(auto);
+						sheet.design.fullscreen = true;
+					} else {
+						display.zoom(Math.ceil(s), this.getTouchCenter(event));
+					}
 				}
 			}
 			this._scrolled = true;
