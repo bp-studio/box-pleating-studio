@@ -177,6 +177,7 @@ interface IDesignObject {
 		let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
 		if(m) {
 			let init = m[1], id = m[2], then = m[3];
+			if(init == "s") return this.stretches.get(id);
 			if(init == "r") return this.stretches.get(id)!.repository?.query(then);
 
 			let t = this.tree;

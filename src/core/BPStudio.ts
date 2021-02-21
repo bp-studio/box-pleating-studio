@@ -19,6 +19,8 @@
 /// <reference path="helper/QuadrantHelper.ts" />
 /// <reference path="command/FieldCommand.ts" />
 /// <reference path="command/MoveCommand.ts" />
+/// <reference path="command/AddCommand.ts" />
+/// <reference path="command/RemoveCommand.ts" />
 
 // Level 2
 /// <reference path="mapping/Mapping.ts" />

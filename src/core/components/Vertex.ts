@@ -49,7 +49,7 @@ interface JVertex extends IPoint {
 
 		// 找尋最近的空位去放
 		let p = this.findClosestEmptyPoint(v);
-		this.design.options.set("vertex", node.id, {
+		this.design.options.set(node.tag, {
 			id: node.id,
 			name: node.name,
 			x: p.x,
@@ -88,7 +88,7 @@ interface JVertex extends IPoint {
 		super(sheet);
 		this.node = node;
 
-		let option = sheet.design.options.get("vertex", this.node.id);
+		let option = sheet.design.options.get(this);
 		if(option) {
 			if(option.name != undefined) this.node.name = option.name;
 			this.location.x = option.x;
@@ -97,10 +97,21 @@ interface JVertex extends IPoint {
 		}
 
 		this.view = new VertexView(this);
+
+		sheet.design.history.construct(this.toMemento());
 	}
 
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.node.disposed;
+	}
+
+	protected onDispose(): void {
+		this.design.history.destruct(this.toMemento());
+		super.onDispose();
+	}
+
+	public toMemento(): Memento {
+		return [this.node.tag, this.toJSON()];
 	}
 
 	public toJSON(): JVertex {

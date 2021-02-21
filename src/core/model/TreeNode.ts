@@ -1,5 +1,5 @@
 
-@shrewd class TreeNode extends Disposable implements IDesignObject, ITagObject {
+@shrewd class TreeNode extends Disposable implements ITagObject {
 
 	public static setJID(n: TreeNode, id: number) {
 		n._jid = id;
@@ -63,7 +63,7 @@
 		return undefined;
 	}
 
-	public addLeaf(length: number) {
+	public addLeaf(length: number): TreeNode {
 		return this.tree.addLeafAt(this.id, length);
 	}
 

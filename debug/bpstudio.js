@@ -1748,7 +1748,11 @@ class MoveCommand extends Command {
         this.old = json.old;
         this.new = json.new;
     }
-    static create(target, loc) {
+    static create(target, loc, relative = true) {
+        if (relative) {
+            loc.x += target.location.x;
+            loc.y += target.location.y;
+        }
         let command = new MoveCommand(target.design, {
             tag: target.tag,
             old: clone(target.location),
@@ -1779,6 +1783,32 @@ class MoveCommand extends Command {
         if (!target['location'])
             debugger;
         MoveCommand.assign(target['location'], this.new);
+    }
+}
+class AddCommand extends Command {
+    constructor(design, json) {
+        super(design, json);
+        this.type = CommandType.add;
+        this.memento = json.memento;
+    }
+    static create(target) {
+        let command = new AddCommand(target.design, {
+            tag: target.tag,
+            memento: target.toJSON()
+        });
+        target.design.history.queue(command);
+    }
+    canAddTo(command) {
+        return false;
+    }
+    addTo(command) { }
+    undo() {
+        let target = this._design.query(this.tag);
+        if (target instanceof TreeEdge)
+            target.delete();
+    }
+    redo() {
+        this._design.tree.addEdge(this.memento.n1, this.memento.n2, this.memento.length);
     }
 }
 let Mapping = class Mapping extends BaseMapping {
@@ -1853,8 +1883,9 @@ let Tree = class Tree extends Disposable {
         while (edges === null || edges === void 0 ? void 0 : edges.length) {
             let remain = [], ok = false;
             for (let e of edges) {
-                if (this.addEdge(e.n1, e.n2, e.length))
+                if (this.addEdge(e.n1, e.n2, e.length)) {
                     ok = true;
+                }
                 else {
                     remain.push(e);
                 }
@@ -1964,23 +1995,24 @@ let Tree = class Tree extends Disposable {
     }
     addLeafAt(n, length) {
         let id = this.nextId;
-        this.addEdge(n, id, length);
+        let edge = this.addEdge(n, id, length);
+        AddCommand.create(edge);
         return this.node.get(id);
     }
     addEdge(n1, n2, length) {
         let has1 = this.node.has(n1), has2 = this.node.has(n2);
         if (this.node.size != 0 && !has1 && !has2) {
             console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
-            return false;
+            return null;
         }
         let N1 = this.getOrAddNode(n1), N2 = this.getOrAddNode(n2);
         if (this.edge.has(N1, N2)) {
             this.edge.get(N1, N2).length = length;
-            return false;
+            return null;
         }
         else if (has1 && has2) {
             console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
-            return false;
+            return null;
         }
         if (has1)
             N2.parent = N1;
@@ -1992,7 +2024,7 @@ let Tree = class Tree extends Disposable {
             N1.parent = N2;
         let edge = new TreeEdge(N1, N2, length);
         this.edge.set(N1, N2, edge);
-        return true;
+        return edge;
     }
     distTriple(n1, n2, n3) {
         let d12 = this.dist(n1, n2);
@@ -2480,26 +2512,26 @@ let Sheet = class Sheet extends Mountable {
     constraint(v, p) {
         return v.range(new Fraction(-p.x), new Fraction(this.width - p.x), new Fraction(-p.y), new Fraction(this.height - p.y));
     }
-    get width() { return this._width; }
+    get width() { return this.mWidth; }
     set width(v) {
         if (v >= 8 && v >= this._independentRect.width) {
             let d = v - this._independentRect.right;
             if (d < 0)
                 for (let i of this.independents) {
-                    MoveCommand.create(i, { x: i.location.x + d, y: i.location.y });
+                    MoveCommand.create(i, { x: d, y: 0 });
                 }
-            this._width = v;
+            this.mWidth = v;
         }
     }
-    get height() { return this._height; }
+    get height() { return this.mHeight; }
     set height(v) {
         if (v >= 8 && v >= this._independentRect.height) {
             let d = v - this._independentRect.top;
             if (d < 0)
                 for (let i of this.independents) {
-                    MoveCommand.create(i, { x: i.location.x, y: i.location.y + d });
+                    MoveCommand.create(i, { x: 0, y: d });
                 }
-            this._height = v;
+            this.mHeight = v;
         }
     }
     getMinScale() {
@@ -2562,10 +2594,10 @@ __decorate([
 ], Sheet.prototype, "activeControls", null);
 __decorate([
     action
-], Sheet.prototype, "_width", void 0);
+], Sheet.prototype, "mWidth", void 0);
 __decorate([
     action
-], Sheet.prototype, "_height", void 0);
+], Sheet.prototype, "mHeight", void 0);
 __decorate([
     shrewd({
         validator(v) {
@@ -2757,12 +2789,25 @@ let TreeEdge = class TreeEdge extends Disposable {
         this.length = length;
     }
     get tag() { return "e" + this._n1.id + "," + this._n2.id; }
+    toJSON() {
+        return {
+            n1: this._n1.id,
+            n2: this._n2.id,
+            length: this.length
+        };
+    }
     get design() { return this.n1.design; }
     get shouldDispose() {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
     }
+    delete() {
+        if (this._n1.degree == 1)
+            this._n1.dispose();
+        if (this._n2.degree == 1)
+            this._n2.dispose();
+    }
     get isRiver() {
-        return this.g1.length > 1 && this.g2.length > 1;
+        return this._n1.degree > 1 && this._n2.degree > 1;
     }
     adjacentEdges(n) { return n.edges.filter(e => e != this); }
     get a1() { return this.adjacentEdges(this._n1); }
@@ -3097,6 +3142,8 @@ let Design = class Design extends DesignBase {
         let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
         if (m) {
             let init = m[1], id = m[2], then = m[3];
+            if (init == "s")
+                return this.stretches.get(id);
             if (init == "r")
                 return (_a = this.stretches.get(id).repository) === null || _a === void 0 ? void 0 : _a.query(then);
             let t = this.tree;
@@ -3164,6 +3211,9 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         this.pv = Quadrant_1.SV[(q + 1) % 4];
         this.fx = this.q == 0 || this.q == 3 ? 1 : -1;
         this.fy = this.q == 0 || this.q == 1 ? 1 : -1;
+    }
+    get shouldDispose() {
+        return super.shouldDispose || this.flap.disposed;
     }
     getOverlapCorner(ov, parent, q, d) {
         var _a, _b, _c, _d;
@@ -3313,6 +3363,7 @@ let Quadrant = Quadrant_1 = class Quadrant extends SheetObject {
         return stretch ? stretch.pattern : null;
     }
     get corner() {
+        this.disposeEvent();
         let r = new Fraction(this.flap.radius);
         return this.point.add(this.qv.scale(r));
     }
@@ -3393,6 +3444,7 @@ let Stretch = class Stretch extends Control {
         this.signature = signature;
     }
     get type() { return "Stretch"; }
+    get tag() { return "s" + this.signature; }
     get junctions() {
         var _a;
         let result = (_a = this.design.teams.get(this.signature)) !== null && _a !== void 0 ? _a : [];
@@ -3426,7 +3478,7 @@ let Stretch = class Stretch extends Control {
         if (this._repoCache.has(structure))
             result = this._repoCache.get(structure);
         else {
-            let option = this.design.options.get("stretch", this.signature);
+            let option = this.design.options.get(this);
             result = new Repository(this, structure, option);
         }
         if (!this.design.dragging)
@@ -4158,7 +4210,7 @@ class Draggable extends ViewedControl {
         else
             by = new Point(this.location).add(by);
         if (!by.eq(this.location)) {
-            MoveCommand.create(this, { x: by.x, y: by.y });
+            MoveCommand.create(this, by.toIPoint(), false);
             this.onDragged();
         }
     }
@@ -4166,12 +4218,18 @@ class Draggable extends ViewedControl {
     constraint(v, location) {
         return Vector.ZERO;
     }
-    static relocate(source, target) {
+    static relocate(source, target, init = false) {
         if (!source || !target)
             return;
         let ss = source.sheet, ts = target.sheet;
-        target.location.x = Math.round(source.location.x / ss.width * ts.width);
-        target.location.y = Math.round(source.location.y / ss.height * ts.height);
+        let pt = {
+            x: Math.round(source.location.x / ss.width * ts.width),
+            y: Math.round(source.location.y / ss.height * ts.height)
+        };
+        if (init)
+            MoveCommand.assign(target.location, pt);
+        else
+            MoveCommand.create(target, pt, false);
     }
 }
 __decorate([
@@ -4401,13 +4459,13 @@ var Flap_1;
 let Flap = Flap_1 = class Flap extends IndependentDraggable {
     constructor(sheet, node) {
         super(sheet);
-        this.width = 0;
-        this.height = 0;
+        this.mWidth = 0;
+        this.mHeight = 0;
         this.$junctions = [];
         this.$junctionChanged = false;
         this.node = node;
         let design = sheet.design;
-        let option = design.options.get("flap", node.id);
+        let option = design.options.get(this);
         if (option) {
             this.location.x = option.x;
             this.location.y = option.y;
@@ -4416,13 +4474,32 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
             this.isNew = false;
         }
         else {
-            Draggable.relocate(design.vertices.get(this.node), this);
+            Draggable.relocate(design.vertices.get(this.node), this, true);
         }
         this.quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
         this.view = new FlapView(this);
+        design.history.construct(this.toMemento());
     }
     get type() { return "Flap"; }
     get tag() { return "f" + this.node.id; }
+    get width() { return this.mWidth; }
+    set width(v) {
+        if (v >= 0 && v <= this.sheet.width) {
+            let d = this.location.x + v - this.sheet.width;
+            if (d > 0)
+                MoveCommand.create(this, { x: -d, y: 0 });
+            this.mWidth = v;
+        }
+    }
+    get height() { return this.mHeight; }
+    set height(v) {
+        if (v >= 0 && v <= this.sheet.height) {
+            let d = this.location.y + v - this.sheet.height;
+            if (d > 0)
+                MoveCommand.create(this, { x: 0, y: -d });
+            this.mHeight = v;
+        }
+    }
     selectableWith(c) { return c instanceof Flap_1; }
     get dragSelectAnchor() {
         return { x: this.location.x + this.width / 2, y: this.location.y + this.height / 2 };
@@ -4452,6 +4529,13 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
     get shouldDispose() {
         return super.shouldDispose || this.node.disposed || this.node.degree != 1;
     }
+    onDispose() {
+        this.design.history.destruct(this.toMemento());
+        super.onDispose();
+    }
+    toMemento() {
+        return [this.tag, this.toJSON()];
+    }
     toJSON() {
         return {
             id: this.node.id,
@@ -4478,27 +4562,11 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
     }
 };
 __decorate([
-    action({
-        validator(v) {
-            let ok = v >= 0 && v <= this.sheet.width;
-            let d = this.location.x + v - this.sheet.width;
-            if (d > 0)
-                this.location.x -= d;
-            return ok;
-        }
-    })
-], Flap.prototype, "width", void 0);
+    action
+], Flap.prototype, "mWidth", void 0);
 __decorate([
-    action({
-        validator(v) {
-            let ok = v >= 0 && v <= this.sheet.height;
-            let d = this.location.y + v - this.sheet.height;
-            if (d > 0)
-                this.location.y -= d;
-            return ok;
-        }
-    })
-], Flap.prototype, "height", void 0);
+    action
+], Flap.prototype, "mHeight", void 0);
 __decorate([
     shrewd
 ], Flap.prototype, "dragSelectAnchor", null);
@@ -4527,7 +4595,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         this.height = 0;
         this.width = 0;
         this.node = node;
-        let option = sheet.design.options.get("vertex", this.node.id);
+        let option = sheet.design.options.get(this);
         if (option) {
             if (option.name != undefined)
                 this.node.name = option.name;
@@ -4536,6 +4604,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
             this.isNew = !!option.isNew;
         }
         this.view = new VertexView(this);
+        sheet.design.history.construct(this.toMemento());
     }
     get type() { return "Vertex"; }
     get tag() { return "v" + this.node.id; }
@@ -4554,7 +4623,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         let v = [...this.design.vertices.values()];
         let node = this.node.addLeaf(length);
         let p = this.findClosestEmptyPoint(v);
-        this.design.options.set("vertex", node.id, {
+        this.design.options.set(node.tag, {
             id: node.id,
             name: node.name,
             x: p.x,
@@ -4590,6 +4659,13 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
     }
     get shouldDispose() {
         return super.shouldDispose || this.node.disposed;
+    }
+    onDispose() {
+        this.design.history.destruct(this.toMemento());
+        super.onDispose();
+    }
+    toMemento() {
+        return [this.node.tag, this.toJSON()];
     }
     toJSON() {
         return {
@@ -4717,7 +4793,9 @@ let HistoryManager = class HistoryManager extends Disposable {
         this.steps = [];
         this.index = 0;
         this._queue = [];
-        this._moving = false;
+        this._construct = [];
+        this._destruct = [];
+        this._moving = true;
         this._savedIndex = 0;
         this.design = design;
     }
@@ -4729,20 +4807,35 @@ let HistoryManager = class HistoryManager extends Disposable {
         };
     }
     queue(command) {
+        if (this._moving)
+            return;
         for (let q of this._queue) {
             if (command.canAddTo(q))
                 return command.addTo(q);
         }
         this._queue.push(command);
     }
+    construct(memento) {
+        if (this._moving)
+            return;
+        this._construct.push(memento);
+    }
+    destruct(memento) {
+        if (this._moving)
+            return;
+        this._destruct.push(memento);
+    }
     flush() {
         if (this._queue.length) {
             let s = this.lastStep;
-            if (!s || !s.tryAdd(this._queue)) {
-                this.addStep(new Step(this._queue));
+            if (!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
+                this.addStep(new Step(this._queue, this._construct, this._destruct));
             }
             this._queue = [];
+            this._construct = [];
+            this._destruct = [];
         }
+        this._moving = false;
     }
     get modified() {
         return this._savedIndex != this.index;
@@ -4754,6 +4847,11 @@ let HistoryManager = class HistoryManager extends Disposable {
         if (this.steps.length > this.index)
             this.steps.length = this.index;
         this.steps[this.index++] = step;
+        if (this.steps.length > 30) {
+            this.steps.shift();
+            this.index--;
+            this._savedIndex--;
+        }
     }
     get lastStep() {
         if (this.index == 0 || this.index < this.steps.length)
@@ -4775,15 +4873,13 @@ let HistoryManager = class HistoryManager extends Disposable {
     undo() {
         if (this.canUndo) {
             this._moving = true;
-            this.steps[--this.index].undo();
-            this._moving = false;
+            this.steps[--this.index].undo(this.design);
         }
     }
     redo() {
         if (this.canRedo) {
             this._moving = true;
-            this.steps[this.index++].redo();
-            this._moving = false;
+            this.steps[this.index++].redo(this.design);
         }
     }
 };
@@ -4803,10 +4899,12 @@ HistoryManager = __decorate([
     shrewd
 ], HistoryManager);
 class Step {
-    constructor(commands) {
+    constructor(commands, construct, destruct) {
         this._fixed = false;
         this.commands = commands;
         this.signature = Step.signature(commands);
+        this.construct = construct;
+        this.destruct = destruct;
         this.reset();
     }
     static signature(commands) {
@@ -4818,7 +4916,7 @@ class Step {
             clearTimeout(this._timeout);
         this._timeout = setTimeout(() => this._fixed = true, 1000);
     }
-    tryAdd(commands) {
+    tryAdd(commands, construct, destruct) {
         if (this._fixed)
             return false;
         if (Step.signature(commands) != this.signature)
@@ -4830,24 +4928,49 @@ class Step {
         for (let i = 0; i < commands.length; i++) {
             commands[i].addTo(this.commands[i]);
         }
+        this.construct.push(...construct);
+        this.destruct.push(...destruct);
         this.reset();
         return true;
     }
-    undo() {
+    undo(design) {
         for (let c of this.commands)
             c.undo();
+        for (let memento of this.destruct)
+            design.options.set(...memento);
         this._fixed = true;
     }
-    redo() {
+    redo(design) {
         for (let c of this.commands)
             c.redo();
+        for (let memento of this.construct)
+            design.options.set(...memento);
         this._fixed = true;
     }
+    toJSON() {
+        let result = clone(this);
+        if (!this.construct.length)
+            delete result.construct;
+        if (!this.destruct.length)
+            delete result.destruct;
+        return result;
+    }
 }
+__decorate([
+    nonEnumerable
+], Step.prototype, "signature", void 0);
+__decorate([
+    nonEnumerable
+], Step.prototype, "_fixed", void 0);
+__decorate([
+    nonEnumerable
+], Step.prototype, "_timeout", void 0);
 var CommandType;
 (function (CommandType) {
     CommandType[CommandType["field"] = 0] = "field";
     CommandType[CommandType["move"] = 1] = "move";
+    CommandType[CommandType["add"] = 2] = "add";
+    CommandType[CommandType["remove"] = 3] = "remove";
 })(CommandType || (CommandType = {}));
 let Edge = class Edge extends ViewedControl {
     constructor(sheet, v1, v2, edge) {
@@ -4867,12 +4990,15 @@ let Edge = class Edge extends ViewedControl {
     deleteAndMerge() {
         this.toVertex(Tree.prototype.deleteAndMerge);
     }
+    delete() {
+        this.edge.delete();
+    }
     toVertex(action) {
         var _a;
         let l1 = this.v1.location, l2 = this.v2.location;
         let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
         let node = action.apply(this.design.tree, [this.edge]);
-        this.design.options.set("vertex", node.id, { id: node.id, name: node.name, x, y });
+        this.design.options.set(node.tag, { id: node.id, name: node.name, x, y });
         (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
         this.design.vertices.get(node).selected = true;
     }
@@ -4880,11 +5006,7 @@ let Edge = class Edge extends ViewedControl {
     ;
     set length(v) { this.edge.length = v; }
     toJSON() {
-        return {
-            n1: this.v1.node.id,
-            n2: this.v2.node.id,
-            length: this.edge.length
-        };
+        return this.edge.toJSON();
     }
 };
 Edge = __decorate([
@@ -5613,20 +5735,20 @@ class OptionManager {
     constructor(design) {
         this.options = new Map();
         for (let n of design.tree.nodes)
-            this.set("vertex", n.id, n);
+            this.set("v" + n.id, n);
         for (let f of design.layout.flaps)
-            this.set("flap", f.id, f);
+            this.set("f" + f.id, f);
         for (let s of design.layout.stretches)
-            this.set("stretch", s.id, s);
+            this.set("s" + s.id, s);
     }
-    get(type, id) {
-        id = type + id;
-        let option = this.options.get(id);
-        this.options.delete(id);
+    get(target) {
+        let tag = target.tag;
+        let option = this.options.get(tag);
+        this.options.delete(tag);
         return option;
     }
-    set(type, id, option) {
-        this.options.set(type + id, option);
+    set(tag, option) {
+        this.options.set(tag, option);
     }
 }
 var PaperWorker;

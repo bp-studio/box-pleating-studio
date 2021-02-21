@@ -1,9 +1,11 @@
 
 interface JStep {
 	commands: JCommand[];
+	construct?: any[];
+	destruct?: any[];
 }
 
-class Step implements JStep {
+class Step implements ISerializable<JStep> {
 
 	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
 	private static signature(commands: Command[]): string {
@@ -11,19 +13,24 @@ class Step implements JStep {
 		return commands.map(c => c.signature).join(";");
 	}
 
-	constructor(commands: Command[]) {
+	constructor(commands: Command[], construct: any[], destruct: any[]) {
 		this.commands = commands;
 		this.signature = Step.signature(commands);
+		this.construct = construct;
+		this.destruct = destruct;
 		this.reset();
 	}
 
 	public readonly commands: Command[];
-	public readonly signature: string;
+	public readonly construct: Memento[];
+	public readonly destruct: Memento[];
+
+	@nonEnumerable public readonly signature: string;
 
 	/** 已經不允許合併 */
-	private _fixed: boolean = false;
+	@nonEnumerable private _fixed: boolean = false;
 
-	private _timeout: number;
+	@nonEnumerable private _timeout: number;
 
 	/** 一秒鐘之後自動鎖定自身 */
 	public reset() {
@@ -31,7 +38,7 @@ class Step implements JStep {
 		this._timeout = setTimeout(() => this._fixed = true, 1000);
 	}
 
-	public tryAdd(commands: Command[]) {
+	public tryAdd(commands: Command[], construct: Memento[], destruct: Memento[]) {
 		// 已經操作過的 Step 是無法被合併的
 		if(this._fixed) return false;
 
@@ -46,17 +53,28 @@ class Step implements JStep {
 		for(let i = 0; i < commands.length; i++) {
 			commands[i].addTo(this.commands[i]);
 		}
+		this.construct.push(...construct);
+		this.destruct.push(...destruct);
 		this.reset();
 		return true;
 	}
 
-	public undo() {
+	public undo(design: Design) {
 		for(let c of this.commands) c.undo();
+		for(let memento of this.destruct) design.options.set(...memento);
 		this._fixed = true;
 	}
 
-	public redo() {
+	public redo(design: Design) {
 		for(let c of this.commands) c.redo();
+		for(let memento of this.construct) design.options.set(...memento);
 		this._fixed = true;
+	}
+
+	public toJSON(): JStep {
+		let result = clone<JStep>(this);
+		if(!this.construct.length) delete result.construct;
+		if(!this.destruct.length) delete result.destruct;
+		return result;
 	}
 }

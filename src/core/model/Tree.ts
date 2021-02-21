@@ -27,8 +27,9 @@
 		while(edges?.length) {
 			let remain: JEdge[] = [], ok = false;
 			for(let e of edges) {
-				if(this.addEdge(e.n1, e.n2, e.length)) ok = true;
-				else {
+				if(this.addEdge(e.n1, e.n2, e.length)) {
+					ok = true;
+				} else {
 					remain.push(e);
 				}
 			}
@@ -146,29 +147,30 @@
 		return edge;
 	}
 
-	public addLeafAt(n: number, length: number) {
+	public addLeafAt(n: number, length: number): TreeNode {
 		let id = this.nextId;
-		this.addEdge(n, id, length);
+		let edge = this.addEdge(n, id, length)!;
+		AddCommand.create(edge);
 		return this.node.get(id)!;
 	}
 
-	/** 加入一條邊並且傳回是否成功 */
-	public addEdge(n1: number, n2: number, length: number) {
+	/** 加入一條邊並且傳回；若失敗則傳回 null */
+	public addEdge(n1: number, n2: number, length: number): TreeEdge | null {
 		let has1 = this.node.has(n1), has2 = this.node.has(n2);
 
 		// 如果圖非空，那加入的邊一定至少要有一點已經存在
 		if(this.node.size != 0 && !has1 && !has2) {
 			console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
-			return false;
+			return null;
 		}
 		let N1 = this.getOrAddNode(n1), N2 = this.getOrAddNode(n2);
 
 		if(this.edge.has(N1, N2)) { // 如果邊已經存在，純粹更新長度
 			this.edge.get(N1, N2)!.length = length;
-			return false;
+			return null;
 		} else if(has1 && has2) { // 不能加入一條邊是兩個結點都已經存在的
 			console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
-			return false;
+			return null;
 		}
 
 		if(has1) N2.parent = N1;
@@ -178,8 +180,7 @@
 
 		let edge = new TreeEdge(N1, N2, length);
 		this.edge.set(N1, N2, edge);
-
-		return true;
+		return edge;
 	}
 
 	/** 傳入樹中的三個點，傳回三個點分別到「路口」的距離。 */

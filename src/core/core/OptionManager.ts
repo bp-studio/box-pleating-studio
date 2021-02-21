@@ -1,11 +1,5 @@
 
-interface OptionMap {
-	'vertex': JVertex;
-	'flap': JFlap;
-	'stretch': JStretch;
-}
-
-type OptionType = keyof OptionMap;
+type Memento = [string, any];
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -22,27 +16,27 @@ class OptionManager {
 	private readonly options: Map<string, any> = new Map();
 
 	constructor(design: JDesign) {
-		for(let n of design.tree.nodes) this.set("vertex", n.id, n);
-		for(let f of design.layout.flaps) this.set("flap", f.id, f);
-		for(let s of design.layout.stretches) this.set("stretch", s.id, s);
+		for(let n of design.tree.nodes) this.set("v" + n.id, n);
+		for(let f of design.layout.flaps) this.set("f" + f.id, f);
+		for(let s of design.layout.stretches) this.set("s" + s.id, s);
 	}
 
 	/**
 	 * 取出物件初始化設定。
-	 * 
+	 *
 	 * 一旦被取出，對應的資料就會同時消滅。
 	 */
-	public get<T extends OptionType>(type: T, id: string | number): OptionMap[T] | undefined {
-		id = type + id;
-		let option = this.options.get(id);
-		this.options.delete(id);
+	public get<T>(target: ITagObject & ISerializable<T>): T | undefined {
+		let tag = target.tag;
+		let option = this.options.get(tag);
+		this.options.delete(tag);
 		return option;
 	}
 
 	/**
 	 * 設定一個指定類別和 id 的、預期會被自動生成的元件的初始設定值。
 	 */
-	public set<T extends OptionType>(type: T, id: string | number, option: OptionMap[T]) {
-		this.options.set(type + id, option);
+	public set(tag: string, option: object) {
+		this.options.set(tag, option);
 	}
 }

@@ -1,5 +1,11 @@
 
-@shrewd class TreeEdge extends Disposable implements IDesignObject, ITagObject {
+interface JEdge {
+	n1: number;
+	n2: number;
+	length: number;
+}
+
+@shrewd class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {
 
 	public get tag() { return "e" + this._n1.id + "," + this._n2.id; }
 
@@ -15,14 +21,27 @@
 		this.length = length;
 	}
 
+	public toJSON(): JEdge {
+		return {
+			n1: this._n1.id,
+			n2: this._n2.id,
+			length: this.length
+		};
+	}
+
 	public get design() { return this.n1.design; }
 
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this._n1.disposed || this._n2.disposed;
 	}
 
+	public delete() {
+		if(this._n1.degree == 1) this._n1.dispose();
+		if(this._n2.degree == 1) this._n2.dispose();
+	}
+
 	@shrewd public get isRiver() {
-		return this.g1.length > 1 && this.g2.length > 1;
+		return this._n1.degree > 1 && this._n2.degree > 1;
 	}
 
 	/////////////////////////////////////////////////////////////////

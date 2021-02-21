@@ -18,25 +18,25 @@ interface JFlap {
 	public get type() { return "Flap"; }
 	public get tag() { return "f" + this.node.id; }
 
-	@action({
-		validator(this: Flap, v: number) {
-			let ok = v >= 0 && v <= this.sheet.width;
+	@action private mWidth: number = 0;
+	public get width() { return this.mWidth; }
+	public set width(v: number) {
+		if(v >= 0 && v <= this.sheet.width) {
 			let d = this.location.x + v - this.sheet.width;
-			if(d > 0) this.location.x -= d;
-			return ok;
+			if(d > 0) MoveCommand.create(this, { x: -d, y: 0 });
+			this.mWidth = v;
 		}
-	})
-	public width: number = 0;
+	}
 
-	@action({
-		validator(this: Flap, v: number) {
-			let ok = v >= 0 && v <= this.sheet.height;
+	@action private mHeight: number = 0;
+	public get height() { return this.mHeight; }
+	public set height(v: number) {
+		if(v >= 0 && v <= this.sheet.height) {
 			let d = this.location.y + v - this.sheet.height;
-			if(d > 0) this.location.y -= d;
-			return ok;
+			if(d > 0) MoveCommand.create(this, { x: 0, y: -d });
+			this.mHeight = v;
 		}
-	})
-	public height: number = 0;
+	}
 
 	public readonly node: TreeNode;
 
@@ -76,7 +76,7 @@ interface JFlap {
 		this.node = node;
 
 		let design = sheet.design;
-		let option = design.options.get("flap", node.id);
+		let option = design.options.get(this);
 		if(option) {
 			// 找得到設定就用設定值
 			this.location.x = option.x;
@@ -86,11 +86,13 @@ interface JFlap {
 			this.isNew = false;
 		} else {
 			// 否則根據對應的頂點的位置來粗略估計初始化
-			Draggable.relocate(design.vertices.get(this.node)!, this);
+			Draggable.relocate(design.vertices.get(this.node)!, this, true);
 		}
 
 		this.quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
 		this.view = new FlapView(this);
+
+		design.history.construct(this.toMemento());
 	}
 
 	protected onDragged() {
@@ -99,6 +101,15 @@ interface JFlap {
 
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.node.disposed || this.node.degree != 1;
+	}
+
+	protected onDispose(): void {
+		this.design.history.destruct(this.toMemento());
+		super.onDispose();
+	}
+
+	public toMemento(): Memento {
+		return [this.tag, this.toJSON()];
 	}
 
 	public toJSON(): JFlap {

@@ -16,9 +16,10 @@ interface JStretch {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Stretch extends Control implements ISerializable<JStretch> {
+@shrewd class Stretch extends Control implements ISerializable<JStretch>, ITagObject {
 
 	public get type() { return "Stretch"; }
+	public get tag() { return "s" + this.signature; }
 
 	/**
 	 * 構成這個 `Stretch` 的所有 `Junction` 之陣列。
@@ -74,7 +75,7 @@ interface JStretch {
 
 		if(this._repoCache.has(structure)) result = this._repoCache.get(structure)!;
 		else {
-			let option = this.design.options.get("stretch", this.signature);
+			let option = this.design.options.get(this);
 			result = new Repository(this, structure, option);
 		}
 

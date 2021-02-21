@@ -39,12 +39,16 @@ abstract class Draggable extends ViewedControl implements ITagObject {
 		if(by instanceof Point) by = by.sub(this._dragOffset);
 		else by = new Point(this.location).add(by);
 		if(!by.eq(this.location)) {
-			MoveCommand.create(this, { x: by.x, y: by.y });
+			MoveCommand.create(this, by.toIPoint(), false);
 			this.onDragged();
 		}
 	}
 
-	/** 真的發生拖曳之後的 callback */
+	/**
+	 * 真的發生拖曳之後的 callback；預設是什麼都不會發生。
+	 *
+	 * 在 `Flap` 和 `Vertex` 中有覆寫此行為。
+	 */
 	protected onDragged() { }
 
 	/**
@@ -63,12 +67,17 @@ abstract class Draggable extends ViewedControl implements ITagObject {
 	@shrewd public location: IPoint = { x: 0, y: 0 };
 
 	/** 把 target 移動到 source 的相對應位置上 */
-	public static relocate(source: Draggable, target: Draggable) {
+	public static relocate(source: Draggable, target: Draggable, init = false) {
 		if(!source || !target) return;
 		// TODO: 不同的形狀的 Sheet 要如何處理
 		let ss = source.sheet, ts = target.sheet;
-		target.location.x = Math.round(source.location.x / ss.width * ts.width);
-		target.location.y = Math.round(source.location.y / ss.height * ts.height);
+		let pt: IPoint = {
+			x: Math.round(source.location.x / ss.width * ts.width),
+			y: Math.round(source.location.y / ss.height * ts.height)
+		};
+
+		if(init) MoveCommand.assign(target.location, pt);
+		else MoveCommand.create(target, pt, false);
 	}
 }
 

@@ -10,6 +10,7 @@
 				@click="selection.deleteAndMerge()"
 				v-t="'panel.edge.merge'"
 			></button>
+			<button class="btn btn-primary" v-else @click="selection.delete()" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
 			<button

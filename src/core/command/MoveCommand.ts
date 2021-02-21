@@ -12,7 +12,11 @@ interface JMoveCommand extends JCommand {
 
 class MoveCommand extends Command implements JMoveCommand {
 
-	public static create(target: Draggable, loc: IPoint) {
+	public static create(target: Draggable, loc: IPoint, relative: boolean = true) {
+		if(relative) {
+			loc.x += target.location.x;
+			loc.y += target.location.y;
+		}
 		let command = new MoveCommand(target.design, {
 			tag: target.tag,
 			old: clone(target.location),
@@ -22,13 +26,12 @@ class MoveCommand extends Command implements JMoveCommand {
 		target.design.history.queue(command);
 	}
 
-	private static assign(target: IPoint, value: IPoint) {
+	public static assign(target: IPoint, value: IPoint) {
 		target.x = value.x;
 		target.y = value.y;
 	}
 
 	public readonly type = CommandType.move;
-	public readonly tag: string;
 	public old: IPoint;
 	public new: IPoint;
 

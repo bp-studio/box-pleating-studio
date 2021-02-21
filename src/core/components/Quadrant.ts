@@ -53,6 +53,10 @@ type CoveredInfo = [number, number, Point[]];
 		this.fy = this.q == 0 || this.q == 1 ? 1 : -1;
 	}
 
+	protected get shouldDispose(): boolean {
+		return super.shouldDispose || this.flap.disposed;
+	}
+
 	/**
 	 * 在有河的情況下，計算相對於當前 `Quadrant` 的重疊區域的角落
 	 *
@@ -256,6 +260,7 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	@shrewd public get corner(): Point {
+		this.disposeEvent();
 		let r = new Fraction(this.flap.radius);
 		return this.point.add(this.qv.scale(r));
 	}

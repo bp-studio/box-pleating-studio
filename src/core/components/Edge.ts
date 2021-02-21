@@ -1,10 +1,4 @@
 
-interface JEdge {
-	n1: number;
-	n2: number;
-	length: number;
-}
-
 //////////////////////////////////////////////////////////////////
 /**
  * `Edge` 是對應於樹狀結構中的 `TreeEdge` 的元件。
@@ -40,11 +34,15 @@ interface JEdge {
 		this.toVertex(Tree.prototype.deleteAndMerge);
 	}
 
+	public delete() {
+		this.edge.delete();
+	}
+
 	private toVertex(action: (e: TreeEdge) => TreeNode) {
 		let l1 = this.v1.location, l2 = this.v2.location;
 		let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
 		let node: TreeNode = action.apply(this.design.tree, [this.edge]);
-		this.design.options.set("vertex", node.id, { id: node.id, name: node.name, x, y });
+		this.design.options.set(node.tag, { id: node.id, name: node.name, x, y });
 		this.$studio?.update();
 		this.design.vertices.get(node)!.selected = true;
 	}
@@ -53,10 +51,6 @@ interface JEdge {
 	public set length(v) { this.edge.length = v; }
 
 	public toJSON(): JEdge {
-		return {
-			n1: this.v1.node.id,
-			n2: this.v2.node.id,
-			length: this.edge.length
-		};
+		return this.edge.toJSON();
 	}
 }
