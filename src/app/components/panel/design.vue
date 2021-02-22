@@ -11,8 +11,7 @@
 		</div>
 		<number :label="$t('panel.design.width')" v-model.number="design.sheet.width"></number>
 		<number :label="$t('panel.design.height')" v-model.number="design.sheet.height"></number>
-		<checkbox :label="$t('panel.design.autoScale')" v-model="design.fullscreen"></checkbox>
-		<number :label="$t('panel.design.scale')" v-if="!design.fullscreen" v-model.number="design.sheet.scale"></number>
+		<number :label="$t('panel.design.scale')" :step="step" v-model.number="design.sheet.scale"></number>
 	</div>
 </template>
 
@@ -21,5 +20,10 @@
 	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
-	export default class Design extends BaseComponent { }
+	export default class Design extends BaseComponent {
+		private get step() {
+			let s: number = this.design.sheet.scale;
+			return (2 ** Math.floor(Math.log2(s / 100))) * 25;
+		}
+	}
 </script>

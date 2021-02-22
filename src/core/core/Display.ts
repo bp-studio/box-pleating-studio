@@ -221,16 +221,11 @@
 	}
 
 	@shrewd public get scale() {
-		if(this._studio.design && this._studio.design.sheet) {
-			if(this._studio.design.fullscreen) {
-				let ws = (this.viewWidth - this.horMargin * 2) / this._studio.design.sheet.width;
-				let wh = (this.viewHeight - this.MARGIN * 2) / this._studio.design.sheet.height;
-				return Math.min(ws, wh);
-			} else {
-				return this._studio.design.sheet.scale;
-			}
+		if(this._studio.design) {
+			let s = this.getAutoScale(this._studio.design.sheet);
+			return this._studio.design.sheet.scale * s / 100;
 		} else {
-			return 1;
+			return 100;
 		}
 	}
 
@@ -280,54 +275,57 @@
 	@shrewd private onSheetChange() {
 		let sheet = this._studio.design?.sheet;
 		if(sheet) {
-			this._studio.$el.scrollLeft = sheet.scroll.x;
-			this._studio.$el.scrollTop = sheet.scroll.y;
+			this.spaceHolder.style.width = this.canvasWidth + "px";
+			this.spaceHolder.style.height = this.canvasHeight + "px";
+			this._studio.system.scrollTo(sheet.scroll.x, sheet.scroll.y);
 		}
 	}
 
-	@shrewd private get margin() {
-		let cw = Math.max(this.sheetWidth, this.viewWidth);
-		let ch = Math.max(this.sheetHeight, this.viewHeight);
-		this.spaceHolder.style.width = cw + "px";
-		this.spaceHolder.style.height = ch + "px";
+	@shrewd private get canvasWidth() { return Math.max(this.sheetWidth, this.viewWidth); }
+	@shrewd private get canvasHeight() { return Math.max(this.sheetHeight, this.viewHeight); }
+
+	@shrewd private get margin(): IPoint {
+		let cw = this.canvasWidth, ch = this.canvasHeight;
 		let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
 		return { x: mw - this.scroll.x, y: mh - this.scroll.y };
 	}
 
-	public zoom(scale: number, center: IPoint) {
+	public zoom(scale: number, center?: IPoint) {
 		let sheet = this._studio.design?.sheet;
-		let el = this._studio.$el;
+		if(scale < 100) scale = 100;
 		if(!sheet || sheet.scale == scale) return;
-		this._studio.design!.fullscreen = false;
 
-		let rect = el.getBoundingClientRect();
-		center.x -= rect.left;
-		center.y -= rect.top;
+		if(center) {
+			let rect = this._studio.$el.getBoundingClientRect();
+			center.x -= rect.left;
+			center.y -= rect.top;
+		} else {
+			center = { x: this.viewWidth / 2, y: this.viewHeight / 2 };
+		}
 
-		let { x, y } = this.margin, s = this.scale;
-		let cx = (center.x - x) / s, cy = (y - center.y) / s;
+		let m = this.margin, s = this.scale;
+		let cx = (center.x - m.x) / s, cy = (m.y - center.y) / s;
 
-		sheet.scale = scale; // 執行完這行之後，再次存取 this.margin 會發生改變
-		if(sheet.scale != scale) return; // 變更失敗（太小），結束操作
+		sheet.mScale = scale; // 執行完這行之後，再次存取 this.scale 和 this.margin 會發生改變
+		m = this.margin;
+		s = this.scale;
 
 		this.scrollTo(
-			sheet.scroll.x + cx * scale + this.margin.x - center.x,
-			sheet.scroll.y + this.margin.y - cy * scale - center.y
+			sheet.scroll.x + cx * s + m.x - center.x,
+			sheet.scroll.y + m.y - cy * s - center.y
 		);
-		this._studio.update();
 	}
 
 	public scrollTo(x: number, y: number) {
 		let sheet = this._studio.design!.sheet;
-		let el = this._studio.$el;
-		let w = el.scrollWidth - el.clientWidth;
-		let h = el.scrollHeight - el.clientHeight;
+		let w = this.canvasWidth - this.viewWidth;
+		let h = this.canvasHeight - this.viewHeight;
 		if(x < 0) x = 0;
 		if(y < 0) y = 0;
 		if(x > w) x = w;
 		if(y > h) y = h;
-		sheet.scroll.x = x;
-		sheet.scroll.y = y;
+		sheet.scroll.x = Math.round(x);
+		sheet.scroll.y = Math.round(y);
 	}
 
 	@shrewd public render() {

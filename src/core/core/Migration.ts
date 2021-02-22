@@ -7,13 +7,12 @@
 
 namespace Migration {
 
-	export const current: string = "0";
+	export const current: string = "0.4";
 
 	export function getSample(): JDesign {
 		return {
 			title: "",
 			version: Migration.current,
-			fullscreen: true,
 			mode: "layout",
 			history: {
 				index: 0,
@@ -21,12 +20,12 @@ namespace Migration {
 				steps: []
 			},
 			layout: {
-				sheet: { width: 16, height: 16, scale: 20 },
+				sheet: { width: 16, height: 16, scale: 100 },
 				flaps: [],
 				stretches: [],
 			},
 			tree: {
-				sheet: { width: 20, height: 20, scale: 16 },
+				sheet: { width: 20, height: 20, scale: 100 },
 				nodes: [],
 				edges: []
 			}
@@ -98,6 +97,13 @@ namespace Migration {
 
 		// 版本 0 與 rc1 完全相同，純粹為了紀念發行而改變號碼
 		if(design.version == "rc1") design.version = "0";
+
+		// 版本 0.4 捨棄了 fullscreen，並且 scale 改成用百分比方式計算
+		if(design.version == "0") {
+			design.version = "0.4";
+			design.layout.sheet.scale = design.fullscreen ? 100 : Math.max(100, design.layout.sheet.scale * 10);
+			design.tree.sheet.scale = design.fullscreen ? 100 : Math.max(100, design.tree.sheet.scale * 10);
+		}
 
 		if(deprecate && onDeprecated) onDeprecated(design.title);
 		return design;

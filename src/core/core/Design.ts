@@ -13,8 +13,6 @@ interface IDesignObject {
 
 @shrewd class Design extends DesignBase implements ISerializable<JDesign>, IQueryable {
 
-	@shrewd public fullscreen: boolean;
-
 	@shrewd public mode: string;
 
 	@action public description?: string;
@@ -46,7 +44,6 @@ interface IDesignObject {
 			() => this.vertices.values()
 		);
 		this.title = this.data.title;;
-		this.fullscreen = this.data.fullscreen;
 		this.description = this.data.description;
 		this.mode = this.data.mode;
 
@@ -78,7 +75,6 @@ interface IDesignObject {
 			result = {
 				title: this.title,
 				description: this.description,
-				fullscreen: this.fullscreen,
 				version: Migration.current,
 				mode: this.mode,
 				layout: {

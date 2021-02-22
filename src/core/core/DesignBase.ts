@@ -2,7 +2,6 @@
 interface JDesign {
 	title: string;
 	description?: string;
-	fullscreen: boolean;
 	version: string,
 	mode: string;
 	history?: JHistory;

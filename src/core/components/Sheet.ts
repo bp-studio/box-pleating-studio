@@ -65,17 +65,11 @@ interface JSheet {
 		}
 	}
 
-	@shrewd({
-		validator(this: Sheet, v: number) {
-			return v >= Math.min(10, this.getMinScale());
-		},
-		renderer(this: Sheet, v: number) {
-			return Math.max(v, Math.min(10, this.getMinScale()));
-		}
-	}) public scale: number;
-
-	private getMinScale() {
-		return Math.floor(this.design.display.getAutoScale(this) ?? 10);
+	@shrewd public mScale: number;
+	public get scale() { return this.mScale; }
+	public set scale(v) {
+		if(v < 100) return;
+		this.$studio?.$display.zoom(v);
 	}
 
 	constructor(design: Design, tag: string, sheet: JSheet, ...maps: IterableFactory<Control>[]) {
@@ -83,7 +77,7 @@ interface JSheet {
 		this.tag = tag;
 		this.width = sheet.width;
 		this.height = sheet.height;
-		this.scale = Math.max(sheet.scale, this.getMinScale());
+		this.mScale = Math.max(sheet.scale, 100);
 		this._controlMaps = maps;
 		this.view = new SheetView(this);
 	}

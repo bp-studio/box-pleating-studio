@@ -363,12 +363,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			let display = this._studio.$display;
 			let d = this._studio.design;
 			if(d) {
-				if(d.fullscreen) {
-					d.sheet.scale = Math.round(display.scale);
-					d.fullscreen = false;
-				}
 				display.zoom(
-					d.sheet.scale - Math.round(event.deltaY / 100),
+					d.sheet.scale - Math.round(d.sheet.scale * event.deltaY / 10000) * 5,
 					{ x: event.pageX, y: event.pageY }
 				);
 			}
@@ -376,10 +372,10 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	private _canvasTouch(event: TouchEvent) {
-		if(event.touches.length > 1 && !this._scrollStart) {
+		if(event.touches.length > 1 && !this._scrollStart && this._studio.design) {
 			this.$clearSelection();
 			this._setScroll(event);
-			this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
+			this._touchScaling = [this.getTouchDistance(event), this._studio.design.sheet.scale];
 			this._lastKnownCursorLocation = this._locate(event);
 		}
 	}
@@ -399,46 +395,47 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		if(this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			let pt = this._locate(event);
 			let diff = pt.sub(this._lastKnownCursorLocation);
-			let scroll = this._studio.design!.sheet.scroll;
+			let sheet = this._studio.design?.sheet;
+			if(!sheet) return;
+
 			let display = this._studio.$display;
 
-			let { x, y } = scroll;
+			let { x, y } = sheet.scroll;
 			if(display.isXScrollable) x -= diff.x;
 			if(display.isYScrollable) y -= diff.y;
 			display.scrollTo(x, y);
 			this._lastKnownCursorLocation = this._locate(event);
 
 			if(this.isTouch(event)) {
-				let sheet = this._studio.design?.sheet
-				if(sheet) {
-					let raw = this.getTouchDistance(event) - this._touchScaling[0];
-					let dpi = window.devicePixelRatio ?? 1;
-					let s = raw / dpi / 10;
-
-					let auto = display.getAutoScale();
-					s = Math.round(s + this._touchScaling[1]);
-					if(s <= auto) {
-						sheet.scale = Math.round(auto);
-						scroll.x = 0;
-						scroll.y = 0;
-						sheet.design.fullscreen = true;
-					} else {
-						display.zoom(Math.ceil(s), this.getTouchCenter(event));
-					}
-				}
+				let dist = this.getTouchDistance(event);
+				let raw = dist - this._touchScaling[0];
+				let dpi = window.devicePixelRatio ?? 1;
+				let s = sheet.scale * raw / dpi / 100;
+				s = Math.round(s + this._touchScaling[1]);
+				display.zoom(s, this.getTouchCenter(event));
+				this._touchScaling = [dist, s];
 			}
 
 			this._scrolled = true;
 		}
 	}
 
+	private _scrollLock = false;
 	private onScroll(): void {
+		if(this._scrollLock) {
+			this._scrollLock = false;
+			return;
+		}
 		if(this._scrollStart) return;
 		let sheet = this._studio.design?.sheet;
 		if(sheet) {
-			sheet.scroll.x = this._studio.$el.scrollLeft;
-			sheet.scroll.y = this._studio.$el.scrollTop;
+			sheet.scroll.x = Math.round(this._studio.$el.scrollLeft);
+			sheet.scroll.y = Math.round(this._studio.$el.scrollTop);
 		}
+	}
+	public scrollTo(x: number, y: number) {
+		this._scrollLock = true;
+		this._studio.$el.scrollTo(x, y);
 	}
 
 	private _setScroll(event: MouseEvent | TouchEvent) {

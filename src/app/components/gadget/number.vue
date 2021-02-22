@@ -3,7 +3,7 @@
 		<label class="col-form-label col-3" v-if="label">{{ label }}</label>
 		<div :class="{'col-9':label}">
 			<div class="input-group">
-				<button class="btn btn-sm btn-primary" type="button" @click="change(-1)">
+				<button class="btn btn-sm btn-primary" type="button" @click="change(-step)">
 					<i class="fas fa-minus"></i>
 				</button>
 				<input
@@ -18,7 +18,7 @@
 					:max="max"
 					@wheel="wheel($event)"
 				/>
-				<button class="btn btn-sm btn-primary" type="button" @click="change(1)">
+				<button class="btn btn-sm btn-primary" type="button" @click="change(step)">
 					<i class="fas fa-plus"></i>
 				</button>
 			</div>
@@ -37,6 +37,7 @@
 
 		@Prop(null) public min?: number;
 		@Prop(null) public max?: number;
+		@Prop(Number) public step: number = 1;
 
 		public input(event: InputEvent) {
 			let v = Number((event.target as HTMLInputElement).value);
@@ -45,15 +46,16 @@
 			this.$emit('input', this.v);
 		}
 		public change(by: number) {
-			if(this.v + by < this.min || this.v + by > this.max) return;
-			this.$emit('input', this.v + by);
-			return this.v + by;
+			let v = Math.round((this.v + by) / this.step) * this.step;
+			if(v < this.min || v > this.max) return;
+			this.$emit('input', v);
+			return v;
 		}
 		public wheel(event: WheelEvent) {
 			event.stopPropagation();
 			event.preventDefault();
 			let by = Math.round(-event.deltaY / 100);
-			this.v = this.change(by);
+			this.v = this.change(by * this.step);
 			bp.update();
 		}
 	}

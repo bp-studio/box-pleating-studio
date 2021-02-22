@@ -2493,7 +2493,7 @@ let Sheet = class Sheet extends Mountable {
         this.tag = tag;
         this.width = sheet.width;
         this.height = sheet.height;
-        this.scale = Math.max(sheet.scale, this.getMinScale());
+        this.mScale = Math.max(sheet.scale, 100);
         this._controlMaps = maps;
         this.view = new SheetView(this);
     }
@@ -2534,9 +2534,12 @@ let Sheet = class Sheet extends Mountable {
             this.mHeight = v;
         }
     }
-    getMinScale() {
+    get scale() { return this.mScale; }
+    set scale(v) {
         var _a;
-        return Math.floor((_a = this.design.display.getAutoScale(this)) !== null && _a !== void 0 ? _a : 10);
+        if (v < 100)
+            return;
+        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.$display.zoom(v);
     }
     get design() {
         return this.mountTarget;
@@ -2599,15 +2602,8 @@ __decorate([
     action
 ], Sheet.prototype, "mHeight", void 0);
 __decorate([
-    shrewd({
-        validator(v) {
-            return v >= Math.min(10, this.getMinScale());
-        },
-        renderer(v) {
-            return Math.max(v, Math.min(10, this.getMinScale()));
-        }
-    })
-], Sheet.prototype, "scale", void 0);
+    shrewd
+], Sheet.prototype, "mScale", void 0);
 __decorate([
     shrewd
 ], Sheet.prototype, "isActive", null);
@@ -3015,7 +3011,6 @@ let Design = class Design extends DesignBase {
         this.TreeSheet = new Sheet(this, "tree", this.data.tree.sheet, () => this.edges.values(), () => this.vertices.values());
         this.title = this.data.title;
         ;
-        this.fullscreen = this.data.fullscreen;
         this.description = this.data.description;
         this.mode = this.data.mode;
         this.tree = new Tree(this, this.data.tree.edges);
@@ -3034,7 +3029,6 @@ let Design = class Design extends DesignBase {
             result = {
                 title: this.title,
                 description: this.description,
-                fullscreen: this.fullscreen,
                 version: Migration.current,
                 mode: this.mode,
                 layout: {
@@ -3160,9 +3154,6 @@ let Design = class Design extends DesignBase {
         return undefined;
     }
 };
-__decorate([
-    shrewd
-], Design.prototype, "fullscreen", void 0);
 __decorate([
     shrewd
 ], Design.prototype, "mode", void 0);
@@ -5465,18 +5456,12 @@ let Display = class Display {
         return (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet.scroll) !== null && _b !== void 0 ? _b : { x: 0, y: 0 };
     }
     get scale() {
-        if (this._studio.design && this._studio.design.sheet) {
-            if (this._studio.design.fullscreen) {
-                let ws = (this.viewWidth - this.horMargin * 2) / this._studio.design.sheet.width;
-                let wh = (this.viewHeight - this.MARGIN * 2) / this._studio.design.sheet.height;
-                return Math.min(ws, wh);
-            }
-            else {
-                return this._studio.design.sheet.scale;
-            }
+        if (this._studio.design) {
+            let s = this.getAutoScale(this._studio.design.sheet);
+            return this._studio.design.sheet.scale * s / 100;
         }
         else {
-            return 1;
+            return 100;
         }
     }
     get horMargin() {
@@ -5523,41 +5508,44 @@ let Display = class Display {
         var _a;
         let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
         if (sheet) {
-            this._studio.$el.scrollLeft = sheet.scroll.x;
-            this._studio.$el.scrollTop = sheet.scroll.y;
+            this.spaceHolder.style.width = this.canvasWidth + "px";
+            this.spaceHolder.style.height = this.canvasHeight + "px";
+            this._studio.system.scrollTo(sheet.scroll.x, sheet.scroll.y);
         }
     }
+    get canvasWidth() { return Math.max(this.sheetWidth, this.viewWidth); }
+    get canvasHeight() { return Math.max(this.sheetHeight, this.viewHeight); }
     get margin() {
-        let cw = Math.max(this.sheetWidth, this.viewWidth);
-        let ch = Math.max(this.sheetHeight, this.viewHeight);
-        this.spaceHolder.style.width = cw + "px";
-        this.spaceHolder.style.height = ch + "px";
+        let cw = this.canvasWidth, ch = this.canvasHeight;
         let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
         return { x: mw - this.scroll.x, y: mh - this.scroll.y };
     }
     zoom(scale, center) {
         var _a;
         let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
-        let el = this._studio.$el;
+        if (scale < 100)
+            scale = 100;
         if (!sheet || sheet.scale == scale)
             return;
-        this._studio.design.fullscreen = false;
-        let rect = el.getBoundingClientRect();
-        center.x -= rect.left;
-        center.y -= rect.top;
-        let { x, y } = this.margin, s = this.scale;
-        let cx = (center.x - x) / s, cy = (y - center.y) / s;
-        sheet.scale = scale;
-        if (sheet.scale != scale)
-            return;
-        this.scrollTo(sheet.scroll.x + cx * scale + this.margin.x - center.x, sheet.scroll.y + this.margin.y - cy * scale - center.y);
-        this._studio.update();
+        if (center) {
+            let rect = this._studio.$el.getBoundingClientRect();
+            center.x -= rect.left;
+            center.y -= rect.top;
+        }
+        else {
+            center = { x: this.viewWidth / 2, y: this.viewHeight / 2 };
+        }
+        let m = this.margin, s = this.scale;
+        let cx = (center.x - m.x) / s, cy = (m.y - center.y) / s;
+        sheet.mScale = scale;
+        m = this.margin;
+        s = this.scale;
+        this.scrollTo(sheet.scroll.x + cx * s + m.x - center.x, sheet.scroll.y + m.y - cy * s - center.y);
     }
     scrollTo(x, y) {
         let sheet = this._studio.design.sheet;
-        let el = this._studio.$el;
-        let w = el.scrollWidth - el.clientWidth;
-        let h = el.scrollHeight - el.clientHeight;
+        let w = this.canvasWidth - this.viewWidth;
+        let h = this.canvasHeight - this.viewHeight;
         if (x < 0)
             x = 0;
         if (y < 0)
@@ -5566,8 +5554,8 @@ let Display = class Display {
             x = w;
         if (y > h)
             y = h;
-        sheet.scroll.x = x;
-        sheet.scroll.y = y;
+        sheet.scroll.x = Math.round(x);
+        sheet.scroll.y = Math.round(y);
     }
     render() {
         let width = 0, height = 0, s = this.scale;
@@ -5635,6 +5623,12 @@ __decorate([
 ], Display.prototype, "onSheetChange", null);
 __decorate([
     shrewd
+], Display.prototype, "canvasWidth", null);
+__decorate([
+    shrewd
+], Display.prototype, "canvasHeight", null);
+__decorate([
+    shrewd
 ], Display.prototype, "margin", null);
 __decorate([
     shrewd
@@ -5644,12 +5638,11 @@ Display = __decorate([
 ], Display);
 var Migration;
 (function (Migration) {
-    Migration.current = "0";
+    Migration.current = "0.4";
     function getSample() {
         return {
             title: "",
             version: Migration.current,
-            fullscreen: true,
             mode: "layout",
             history: {
                 index: 0,
@@ -5657,12 +5650,12 @@ var Migration;
                 steps: []
             },
             layout: {
-                sheet: { width: 16, height: 16, scale: 20 },
+                sheet: { width: 16, height: 16, scale: 100 },
                 flaps: [],
                 stretches: [],
             },
             tree: {
-                sheet: { width: 20, height: 20, scale: 16 },
+                sheet: { width: 20, height: 20, scale: 100 },
                 nodes: [],
                 edges: []
             }
@@ -5730,6 +5723,11 @@ var Migration;
         }
         if (design.version == "rc1")
             design.version = "0";
+        if (design.version == "0") {
+            design.version = "0.4";
+            design.layout.sheet.scale = design.fullscreen ? 100 : Math.max(100, design.layout.sheet.scale * 10);
+            design.tree.sheet.scale = design.fullscreen ? 100 : Math.max(100, design.tree.sheet.scale * 10);
+        }
         if (deprecate && onDeprecated)
             onDeprecated(design.title);
         return design;
@@ -5846,6 +5844,7 @@ let System = System_1 = class System {
         this._touchScaling = [0, 0];
         this._scrolled = false;
         this._possiblyReselect = false;
+        this._scrollLock = false;
         this._studio = studio;
         let canvas = studio.$paper.view.element;
         let tool = studio.$paper.tool = new paper.Tool();
@@ -6113,19 +6112,15 @@ let System = System_1 = class System {
             let display = this._studio.$display;
             let d = this._studio.design;
             if (d) {
-                if (d.fullscreen) {
-                    d.sheet.scale = Math.round(display.scale);
-                    d.fullscreen = false;
-                }
-                display.zoom(d.sheet.scale - Math.round(event.deltaY / 100), { x: event.pageX, y: event.pageY });
+                display.zoom(d.sheet.scale - Math.round(d.sheet.scale * event.deltaY / 10000) * 5, { x: event.pageX, y: event.pageY });
             }
         }
     }
     _canvasTouch(event) {
-        if (event.touches.length > 1 && !this._scrollStart) {
+        if (event.touches.length > 1 && !this._scrollStart && this._studio.design) {
             this.$clearSelection();
             this._setScroll(event);
-            this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
+            this._touchScaling = [this.getTouchDistance(event), this._studio.design.sheet.scale];
             this._lastKnownCursorLocation = this._locate(event);
         }
     }
@@ -6142,9 +6137,11 @@ let System = System_1 = class System {
         if (this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
             let pt = this._locate(event);
             let diff = pt.sub(this._lastKnownCursorLocation);
-            let scroll = this._studio.design.sheet.scroll;
+            let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+            if (!sheet)
+                return;
             let display = this._studio.$display;
-            let { x, y } = scroll;
+            let { x, y } = sheet.scroll;
             if (display.isXScrollable)
                 x -= diff.x;
             if (display.isYScrollable)
@@ -6152,36 +6149,34 @@ let System = System_1 = class System {
             display.scrollTo(x, y);
             this._lastKnownCursorLocation = this._locate(event);
             if (this.isTouch(event)) {
-                let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
-                if (sheet) {
-                    let raw = this.getTouchDistance(event) - this._touchScaling[0];
-                    let dpi = (_b = window.devicePixelRatio) !== null && _b !== void 0 ? _b : 1;
-                    let s = raw / dpi / 10;
-                    let auto = display.getAutoScale();
-                    s = Math.round(s + this._touchScaling[1]);
-                    if (s <= auto) {
-                        sheet.scale = Math.round(auto);
-                        scroll.x = 0;
-                        scroll.y = 0;
-                        sheet.design.fullscreen = true;
-                    }
-                    else {
-                        display.zoom(Math.ceil(s), this.getTouchCenter(event));
-                    }
-                }
+                let dist = this.getTouchDistance(event);
+                let raw = dist - this._touchScaling[0];
+                let dpi = (_b = window.devicePixelRatio) !== null && _b !== void 0 ? _b : 1;
+                let s = sheet.scale * raw / dpi / 100;
+                s = Math.round(s + this._touchScaling[1]);
+                display.zoom(s, this.getTouchCenter(event));
+                this._touchScaling = [dist, s];
             }
             this._scrolled = true;
         }
     }
     onScroll() {
         var _a;
+        if (this._scrollLock) {
+            this._scrollLock = false;
+            return;
+        }
         if (this._scrollStart)
             return;
         let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
         if (sheet) {
-            sheet.scroll.x = this._studio.$el.scrollLeft;
-            sheet.scroll.y = this._studio.$el.scrollTop;
+            sheet.scroll.x = Math.round(this._studio.$el.scrollLeft);
+            sheet.scroll.y = Math.round(this._studio.$el.scrollTop);
         }
+    }
+    scrollTo(x, y) {
+        this._scrollLock = true;
+        this._studio.$el.scrollTo(x, y);
     }
     _setScroll(event) {
         window.clearTimeout(this._longPressTimeout);
