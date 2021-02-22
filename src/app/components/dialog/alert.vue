@@ -18,7 +18,7 @@
 	@Component
 	export default class Alert extends Dialog<void> {
 		protected resolve(res: () => void) {
-			this.$el.addEventListener('hidden.bs.modal', res, { once: true });
+			this.$el.addEventListener('hidden.bs.modal', () => res(), { once: true });
 		}
 	}
 </script>

@@ -62,7 +62,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	@shrewd public dragging = false;
 
 	/** 捲動開始的起點；null 表示沒有啟用捲動 */
-	private _scrollStart: Point | null;
+	private _scrollStart: boolean;
 
 	/** 目前是否呈現移動手勢狀態 */
 	private _spaceDown = false;
@@ -89,7 +89,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		let tool = studio.$paper.tool = new paper.Tool();
 		tool.onKeyDown = this._canvasKeydown.bind(this);
 		tool.onKeyUp = this._canvasKeyup.bind(this);
-		tool.onMouseDown = this._canvasMousedown.bind(this);
+		tool.onMouseDown = this._canvasPointerDown.bind(this);
 		tool.onMouseDrag = this._canvasMouseDrag.bind(this);
 		tool.onMouseUp = this._canvasMouseup.bind(this);
 
@@ -101,6 +101,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		document.addEventListener("mouseup", this._bodyMouseup.bind(this));
 		document.addEventListener("touchend", this._bodyMouseup.bind(this));
 		document.addEventListener("contextmenu", this._bodyMenu.bind(this));
+
+		studio.$el.addEventListener("scroll", this.onScroll.bind(this));
 
 		this._dragSelectView = new DragSelectView(studio);
 	}
@@ -172,7 +174,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		for(let control of this.selections) if(control != c) control.selected = false;
 	}
 
-	private _checkEvent(event: MouseEvent | TouchEvent): boolean {
+	/** 檢查事件是否符合「選取」的前提（單點觸控或者滑鼠左鍵操作） */
+	private _isSelectEvent(event: MouseEvent | TouchEvent): boolean {
 		if(this.isTouch(event) && event.touches.length > 1) return false;
 		if(event instanceof MouseEvent && event.button != 0) return false;
 		return true;
@@ -228,7 +231,12 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		this._spaceDown = false;
 	}
 
-	private _canvasMousedown(event: paper.ToolEvent): void {
+	private _canvasPointerDown(event: paper.ToolEvent): void {
+		let ev = event.event;
+
+		let el = document.activeElement;
+		if(el instanceof HTMLElement) el.blur();
+
 		// 執行捲動，支援空白鍵捲動和右鍵捲動兩種操作方法
 		if(event.event instanceof MouseEvent && (this._spaceDown || event.event.button == 2)) {
 			console.log(event.point.round().toString());
@@ -236,23 +244,40 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			return;
 		}
 
-		let el = document.activeElement;
-		if(el instanceof HTMLElement) el.blur();
+		if(!this._isSelectEvent(ev) || this._scrollStart) return;
 
-		if(!this._checkEvent(event.event) || this._scrollStart) return;
+		if(this.isTouch(ev)) this._canvasTouchDown(event);
+		else this._canvasMouseDown(event);
+	}
 
+	private _canvasTouchDown(event: paper.ToolEvent): void {
 		let point = event.point;
+		let oldSel = this._draggableSelections.concat();
 		this._processSelection(point, event.modifiers.control || event.modifiers.meta);
+		let newSel = this._draggableSelections.concat();
 
 		// 設置長壓等待
-		if(this.selections.length == 1 && this.isTouch(event.event)) {
+		if(this.selections.length == 1) {
 			this._longPressTimeout = window.setTimeout(() => {
 				this.onLongPress();
 			}, 750);
 		}
 
+		// 觸控的情況中，規定一定要先選取才能拖曳，不能直接拖（不然太容易誤觸）
+		if(Shrewd.comparer.unorderedArray(oldSel, newSel)) this._initDrag(event);
+	}
+
+	private _canvasMouseDown(event: paper.ToolEvent): void {
+		let point = event.point;
+		this._processSelection(point, event.modifiers.control || event.modifiers.meta);
+
+		// 滑鼠操作時可以直接點擊拖曳
+		this._initDrag(event);
+	}
+
+	/** 點擊時進行拖曳初始化 */
+	private _initDrag(event: paper.ToolEvent): void {
 		if(this._draggableSelections.length) {
-			// 拖曳初始化
 			this._lastKnownCursorLocation = new Point(event.downPoint).round();
 			for(let o of this._draggableSelections) o.dragStart(this._lastKnownCursorLocation);
 			this.dragging = true;
@@ -260,16 +285,17 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	private _canvasMouseup(event: paper.ToolEvent): void {
+		let sel = this._dragSelectView.visible;
 		this._dragSelectView.visible = false;
-		if(!this._checkEvent(event.event)) return;
+		if(!this._isSelectEvent(event.event)) return;
 		if(this._scrollStart) {
 			// 空白鍵捲動放開的攔截必須寫在這裡，因為事件會被取消掉
 			if(event.event instanceof MouseEvent) {
-				this._scrollStart = null;
+				this._scrollStart = false;
 			}
 			return;
 		}
-		if(!event.modifiers.control && !event.modifiers.meta) this._processNextSelection();
+		if(!sel && !event.modifiers.control && !event.modifiers.meta) this._processNextSelection();
 	}
 
 	private _reselect(event: paper.ToolEvent) {
@@ -282,7 +308,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 	/** 處理滑鼠移動 */
 	private _canvasMouseDrag(event: paper.ToolEvent) {
-		// 捲動中的話就不用在這邊處理了，交給 body 取處理
+		// 捲動中的話就不用在這邊處理了，交給 body 上註冊的 handler 去處理
 		if(this._scrollStart) return;
 
 		if(this._possiblyReselect) {
@@ -296,8 +322,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			let pt = new Point(event.point).round();
 			if(this._lastKnownCursorLocation.eq(pt)) return;
 
-			window.clearTimeout(this._longPressTimeout);
-			this.onDrag?.apply(null);
+			this._cancelLongPress();
 
 			// 更新暫存的位置
 			this._lastKnownCursorLocation.set(pt);
@@ -318,15 +343,18 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 				this.$clearSelection();
 				this._dragSelectView.visible = true;
 				this._dragSelectView.down = event.downPoint;
-				//this._studio.update();
 			}
+			this._cancelLongPress();
 			this._dragSelectView.now = event.point;
-			//this._dragSelectView.draw();
 			for(let c of this._dragSelectables) {
 				c.selected = this._dragSelectView.contains(new paper.Point(c.dragSelectAnchor));
 			}
-
 		}
+	}
+
+	private _cancelLongPress(): void {
+		window.clearTimeout(this._longPressTimeout);
+		this.onDrag?.apply(null);
 	}
 
 	private _canvasWheel(event: WheelEvent) {
@@ -348,15 +376,16 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	}
 
 	private _canvasTouch(event: TouchEvent) {
-		if(event.touches.length > 1) {
+		if(event.touches.length > 1 && !this._scrollStart) {
 			this.$clearSelection();
 			this._setScroll(event);
 			this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
+			this._lastKnownCursorLocation = this._locate(event);
 		}
 	}
 
 	private getTouchDistance(event: TouchEvent) {
-		let t = event.touches, dx = t[1].screenX - t[0].screenX, dy = t[1].screenY - t[0].screenY;
+		let t = event.touches, dx = t[1].pageX - t[0].pageX, dy = t[1].pageY - t[0].pageY;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
@@ -368,44 +397,59 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	private _bodyMousemove(event: MouseEvent | TouchEvent) {
 		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留
 		if(this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
-			let e = this.isTouch(event) ? event.touches[0] : event;
-			let pt = new Point(e.screenX, e.screenY);
+			let pt = this._locate(event);
 			let diff = pt.sub(this._lastKnownCursorLocation);
-			let el = this._studio.$el;
-
-			// 這邊不用考慮範圍問題，瀏覽器會處理掉
+			let scroll = this._studio.design!.sheet.scroll;
 			let display = this._studio.$display;
-			if(display.isXScrollable) el.scrollLeft = this._scrollStart.x - diff.x;
-			if(display.isYScrollable) el.scrollTop = this._scrollStart.y - diff.y;
+
+			let { x, y } = scroll;
+			if(display.isXScrollable) x -= diff.x;
+			if(display.isYScrollable) y -= diff.y;
+			display.scrollTo(x, y);
+			this._lastKnownCursorLocation = this._locate(event);
 
 			if(this.isTouch(event)) {
 				let sheet = this._studio.design?.sheet
 				if(sheet) {
-					// 要一定程度以上的差距才會觸發縮放，以免太容易誤觸
 					let raw = this.getTouchDistance(event) - this._touchScaling[0];
-					let s = Math.sign(raw) * Math.max(Math.abs(raw) - 40, 0) / 30;
+					let dpi = window.devicePixelRatio ?? 1;
+					let s = raw / dpi / 10;
 
 					let auto = display.getAutoScale();
 					s = Math.round(s + this._touchScaling[1]);
 					if(s <= auto) {
-						sheet.scale = Math.ceil(auto);
+						sheet.scale = Math.round(auto);
+						scroll.x = 0;
+						scroll.y = 0;
 						sheet.design.fullscreen = true;
 					} else {
 						display.zoom(Math.ceil(s), this.getTouchCenter(event));
 					}
 				}
 			}
+
 			this._scrolled = true;
 		}
 	}
 
+	private onScroll(): void {
+		if(this._scrollStart) return;
+		let sheet = this._studio.design?.sheet;
+		if(sheet) {
+			sheet.scroll.x = this._studio.$el.scrollLeft;
+			sheet.scroll.y = this._studio.$el.scrollTop;
+		}
+	}
+
 	private _setScroll(event: MouseEvent | TouchEvent) {
-		let el = this._studio.$el;
-		let e = this.isTouch(event) ? event.touches[0] : event;
 		window.clearTimeout(this._longPressTimeout);
-		this._scrollStart = new Point(el.scrollLeft, el.scrollTop);
+		this._scrollStart = true;
 		this._scrolled = false;
-		this._lastKnownCursorLocation = new Point(e.screenX, e.screenY);
+		this._lastKnownCursorLocation = this._locate(event);
+	}
+
+	private _locate(e: MouseEvent | TouchEvent): Point {
+		return this.isTouch(e) ? new Point(this.getTouchCenter(e)) : new Point(e.pageX, e.pageY);
 	}
 
 	private _bodyMouseup(event: MouseEvent | TouchEvent) {
@@ -413,7 +457,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		window.clearTimeout(this._longPressTimeout);
 		if(this.isTouch(event) && event.touches.length == 0) {
 			// paper.js 的奇怪設計使得多點觸控的第二點放開必須獨立攔截
-			this._scrollStart = null;
+			this._scrollStart = false;
 		}
 	}
 
@@ -426,7 +470,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		// 右鍵捲動的情況中，這個事件會比右鍵放開還要早觸發，
 		// 而這個攔截掉也會導致後者不會觸發，所以該做的事情都要在這邊處理
 		event.preventDefault();
-		this._scrollStart = null;
+		this._scrollStart = false;
 	}
 
 	private isTouch(event: Event): event is TouchEvent {

@@ -5334,6 +5334,7 @@ River = __decorate([
 let Display = class Display {
     constructor(studio) {
         this.MARGIN = 30;
+        this.DPI = devicePixelRatio !== null && devicePixelRatio !== void 0 ? devicePixelRatio : 1;
         this.lockViewport = false;
         this.settings = {
             showAxialParallel: true,
@@ -5347,7 +5348,6 @@ let Display = class Display {
         this._printing = false;
         this._studio = studio;
         studio.$el.appendChild(this.spaceHolder = document.createElement("div"));
-        studio.$el.addEventListener("scroll", this.onScroll.bind(this));
         this.spaceHolder.style.zIndex = "-10";
         this._canvas = document.createElement("canvas");
         studio.$el.appendChild(this._canvas);
@@ -5460,14 +5460,6 @@ let Display = class Display {
             this._debounce = NaN;
         }, 1000);
     }
-    onScroll() {
-        var _a;
-        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
-        if (sheet) {
-            sheet.scroll.x = this._studio.$el.scrollLeft;
-            sheet.scroll.y = this._studio.$el.scrollTop;
-        }
-    }
     get scroll() {
         var _a, _b;
         return (_b = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet.scroll) !== null && _b !== void 0 ? _b : { x: 0, y: 0 };
@@ -5553,25 +5545,29 @@ let Display = class Display {
         let rect = el.getBoundingClientRect();
         center.x -= rect.left;
         center.y -= rect.top;
-        console.log(this.margin);
         let { x, y } = this.margin, s = this.scale;
         let cx = (center.x - x) / s, cy = (y - center.y) / s;
         sheet.scale = scale;
         if (sheet.scale != scale)
             return;
-        x = sheet.scroll.x + cx * scale + this.margin.x - center.x;
-        y = sheet.scroll.y + this.margin.y - cy * scale - center.y;
+        this.scrollTo(sheet.scroll.x + cx * scale + this.margin.x - center.x, sheet.scroll.y + this.margin.y - cy * scale - center.y);
+        this._studio.update();
+    }
+    scrollTo(x, y) {
+        let sheet = this._studio.design.sheet;
+        let el = this._studio.$el;
+        let w = el.scrollWidth - el.clientWidth;
+        let h = el.scrollHeight - el.clientHeight;
         if (x < 0)
             x = 0;
         if (y < 0)
             y = 0;
-        if (x > el.scrollWidth)
-            x = el.scrollWidth;
-        if (y > el.scrollHeight)
-            y = el.scrollHeight;
+        if (x > w)
+            x = w;
+        if (y > h)
+            y = h;
         sheet.scroll.x = x;
         sheet.scroll.y = y;
-        this._studio.update();
     }
     render() {
         let width = 0, height = 0, s = this.scale;
@@ -5855,7 +5851,7 @@ let System = System_1 = class System {
         let tool = studio.$paper.tool = new paper.Tool();
         tool.onKeyDown = this._canvasKeydown.bind(this);
         tool.onKeyUp = this._canvasKeyup.bind(this);
-        tool.onMouseDown = this._canvasMousedown.bind(this);
+        tool.onMouseDown = this._canvasPointerDown.bind(this);
         tool.onMouseDrag = this._canvasMouseDrag.bind(this);
         tool.onMouseUp = this._canvasMouseup.bind(this);
         canvas.addEventListener("wheel", this._canvasWheel.bind(this));
@@ -5865,6 +5861,7 @@ let System = System_1 = class System {
         document.addEventListener("mouseup", this._bodyMouseup.bind(this));
         document.addEventListener("touchend", this._bodyMouseup.bind(this));
         document.addEventListener("contextmenu", this._bodyMenu.bind(this));
+        studio.$el.addEventListener("scroll", this.onScroll.bind(this));
         this._dragSelectView = new DragSelectView(studio);
     }
     static controlPriority(c) {
@@ -5948,7 +5945,7 @@ let System = System_1 = class System {
             if (control != c)
                 control.selected = false;
     }
-    _checkEvent(event) {
+    _isSelectEvent(event) {
         if (this.isTouch(event) && event.touches.length > 1)
             return false;
         if (event instanceof MouseEvent && event.button != 0)
@@ -6006,24 +6003,42 @@ let System = System_1 = class System {
         this._canvas.style.cursor = "unset";
         this._spaceDown = false;
     }
-    _canvasMousedown(event) {
+    _canvasPointerDown(event) {
+        let ev = event.event;
+        let el = document.activeElement;
+        if (el instanceof HTMLElement)
+            el.blur();
         if (event.event instanceof MouseEvent && (this._spaceDown || event.event.button == 2)) {
             console.log(event.point.round().toString());
             this._setScroll(event.event);
             return;
         }
-        let el = document.activeElement;
-        if (el instanceof HTMLElement)
-            el.blur();
-        if (!this._checkEvent(event.event) || this._scrollStart)
+        if (!this._isSelectEvent(ev) || this._scrollStart)
             return;
+        if (this.isTouch(ev))
+            this._canvasTouchDown(event);
+        else
+            this._canvasMouseDown(event);
+    }
+    _canvasTouchDown(event) {
         let point = event.point;
+        let oldSel = this._draggableSelections.concat();
         this._processSelection(point, event.modifiers.control || event.modifiers.meta);
-        if (this.selections.length == 1 && this.isTouch(event.event)) {
+        let newSel = this._draggableSelections.concat();
+        if (this.selections.length == 1) {
             this._longPressTimeout = window.setTimeout(() => {
                 this.onLongPress();
             }, 750);
         }
+        if (Shrewd.comparer.unorderedArray(oldSel, newSel))
+            this._initDrag(event);
+    }
+    _canvasMouseDown(event) {
+        let point = event.point;
+        this._processSelection(point, event.modifiers.control || event.modifiers.meta);
+        this._initDrag(event);
+    }
+    _initDrag(event) {
         if (this._draggableSelections.length) {
             this._lastKnownCursorLocation = new Point(event.downPoint).round();
             for (let o of this._draggableSelections)
@@ -6032,16 +6047,17 @@ let System = System_1 = class System {
         }
     }
     _canvasMouseup(event) {
+        let sel = this._dragSelectView.visible;
         this._dragSelectView.visible = false;
-        if (!this._checkEvent(event.event))
+        if (!this._isSelectEvent(event.event))
             return;
         if (this._scrollStart) {
             if (event.event instanceof MouseEvent) {
-                this._scrollStart = null;
+                this._scrollStart = false;
             }
             return;
         }
-        if (!event.modifiers.control && !event.modifiers.meta)
+        if (!sel && !event.modifiers.control && !event.modifiers.meta)
             this._processNextSelection();
     }
     _reselect(event) {
@@ -6053,7 +6069,6 @@ let System = System_1 = class System {
         this._possiblyReselect = false;
     }
     _canvasMouseDrag(event) {
-        var _a;
         if (this._scrollStart)
             return;
         if (this._possiblyReselect) {
@@ -6064,8 +6079,7 @@ let System = System_1 = class System {
             let pt = new Point(event.point).round();
             if (this._lastKnownCursorLocation.eq(pt))
                 return;
-            window.clearTimeout(this._longPressTimeout);
-            (_a = this.onDrag) === null || _a === void 0 ? void 0 : _a.apply(null);
+            this._cancelLongPress();
             this._lastKnownCursorLocation.set(pt);
             for (let o of this._draggableSelections)
                 pt = o.dragConstraint(pt);
@@ -6081,11 +6095,17 @@ let System = System_1 = class System {
                 this._dragSelectView.visible = true;
                 this._dragSelectView.down = event.downPoint;
             }
+            this._cancelLongPress();
             this._dragSelectView.now = event.point;
             for (let c of this._dragSelectables) {
                 c.selected = this._dragSelectView.contains(new paper.Point(c.dragSelectAnchor));
             }
         }
+    }
+    _cancelLongPress() {
+        var _a;
+        window.clearTimeout(this._longPressTimeout);
+        (_a = this.onDrag) === null || _a === void 0 ? void 0 : _a.apply(null);
     }
     _canvasWheel(event) {
         if (event.ctrlKey || event.metaKey) {
@@ -6102,14 +6122,15 @@ let System = System_1 = class System {
         }
     }
     _canvasTouch(event) {
-        if (event.touches.length > 1) {
+        if (event.touches.length > 1 && !this._scrollStart) {
             this.$clearSelection();
             this._setScroll(event);
             this._touchScaling = [this.getTouchDistance(event), this._studio.$display.scale];
+            this._lastKnownCursorLocation = this._locate(event);
         }
     }
     getTouchDistance(event) {
-        let t = event.touches, dx = t[1].screenX - t[0].screenX, dy = t[1].screenY - t[0].screenY;
+        let t = event.touches, dx = t[1].pageX - t[0].pageX, dy = t[1].pageY - t[0].pageY;
         return Math.sqrt(dx * dx + dy * dy);
     }
     getTouchCenter(event) {
@@ -6117,26 +6138,31 @@ let System = System_1 = class System {
         return { x: (t[1].pageX + t[0].pageX) / 2, y: (t[1].pageY + t[0].pageY) / 2 };
     }
     _bodyMousemove(event) {
-        var _a;
+        var _a, _b;
         if (this._scrollStart && (event instanceof MouseEvent || event.touches.length >= 2)) {
-            let e = this.isTouch(event) ? event.touches[0] : event;
-            let pt = new Point(e.screenX, e.screenY);
+            let pt = this._locate(event);
             let diff = pt.sub(this._lastKnownCursorLocation);
-            let el = this._studio.$el;
+            let scroll = this._studio.design.sheet.scroll;
             let display = this._studio.$display;
+            let { x, y } = scroll;
             if (display.isXScrollable)
-                el.scrollLeft = this._scrollStart.x - diff.x;
+                x -= diff.x;
             if (display.isYScrollable)
-                el.scrollTop = this._scrollStart.y - diff.y;
+                y -= diff.y;
+            display.scrollTo(x, y);
+            this._lastKnownCursorLocation = this._locate(event);
             if (this.isTouch(event)) {
                 let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
                 if (sheet) {
                     let raw = this.getTouchDistance(event) - this._touchScaling[0];
-                    let s = Math.sign(raw) * Math.max(Math.abs(raw) - 40, 0) / 30;
+                    let dpi = (_b = window.devicePixelRatio) !== null && _b !== void 0 ? _b : 1;
+                    let s = raw / dpi / 10;
                     let auto = display.getAutoScale();
                     s = Math.round(s + this._touchScaling[1]);
                     if (s <= auto) {
-                        sheet.scale = Math.ceil(auto);
+                        sheet.scale = Math.round(auto);
+                        scroll.x = 0;
+                        scroll.y = 0;
                         sheet.design.fullscreen = true;
                     }
                     else {
@@ -6147,19 +6173,30 @@ let System = System_1 = class System {
             this._scrolled = true;
         }
     }
+    onScroll() {
+        var _a;
+        if (this._scrollStart)
+            return;
+        let sheet = (_a = this._studio.design) === null || _a === void 0 ? void 0 : _a.sheet;
+        if (sheet) {
+            sheet.scroll.x = this._studio.$el.scrollLeft;
+            sheet.scroll.y = this._studio.$el.scrollTop;
+        }
+    }
     _setScroll(event) {
-        let el = this._studio.$el;
-        let e = this.isTouch(event) ? event.touches[0] : event;
         window.clearTimeout(this._longPressTimeout);
-        this._scrollStart = new Point(el.scrollLeft, el.scrollTop);
+        this._scrollStart = true;
         this._scrolled = false;
-        this._lastKnownCursorLocation = new Point(e.screenX, e.screenY);
+        this._lastKnownCursorLocation = this._locate(event);
+    }
+    _locate(e) {
+        return this.isTouch(e) ? new Point(this.getTouchCenter(e)) : new Point(e.pageX, e.pageY);
     }
     _bodyMouseup(event) {
         this._dragEnd();
         window.clearTimeout(this._longPressTimeout);
         if (this.isTouch(event) && event.touches.length == 0) {
-            this._scrollStart = null;
+            this._scrollStart = false;
         }
     }
     _dragEnd() {
@@ -6169,7 +6206,7 @@ let System = System_1 = class System {
     }
     _bodyMenu(event) {
         event.preventDefault();
-        this._scrollStart = null;
+        this._scrollStart = false;
     }
     isTouch(event) {
         return TOUCH_SUPPORT && event instanceof TouchEvent;

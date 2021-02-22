@@ -20,7 +20,7 @@
 	export default class Confirm extends Dialog<boolean> {
 		private value: boolean = false;
 
-		protected resolve(res) {
+		protected resolve(res: (v: boolean) => void) {
 			this.value = false;
 			this.$el.addEventListener('hidden.bs.modal', () => res(this.value), { once: true });
 		}

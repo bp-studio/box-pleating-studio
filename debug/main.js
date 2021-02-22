@@ -468,7 +468,7 @@ Vue.component('about', { render() { with (this) {
 Vue.component('alert', { render() { with (this) {
         return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content" }, [_c('div', { staticClass: "modal-body" }, [_v(_s(message))]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
     } }, mixins: [Dialog], methods: { resolve(res) {
-            this.$el.addEventListener('hidden.bs.modal', res, { once: true });
+            this.$el.addEventListener('hidden.bs.modal', () => res(), { once: true });
         } } });
 
 Vue.component('confirm', { render() { with (this) {

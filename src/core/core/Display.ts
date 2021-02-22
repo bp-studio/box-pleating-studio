@@ -20,6 +20,8 @@
 
 	private readonly MARGIN = 30;
 
+	private readonly DPI = devicePixelRatio ?? 1;
+
 	/** 暫時鎖定 Viewport 大小 */
 	private lockViewport: boolean = false;
 
@@ -45,7 +47,6 @@
 
 		// 加入一個填充空間、在 desktop 環境製造原生捲軸的 div
 		studio.$el.appendChild(this.spaceHolder = document.createElement("div"));
-		studio.$el.addEventListener("scroll", this.onScroll.bind(this));
 		this.spaceHolder.style.zIndex = "-10"; // 修正 iPhone 6 的問題
 
 		// 產生 <canvas>
@@ -215,14 +216,6 @@
 		}, 1000);
 	}
 
-	private onScroll(): void {
-		let sheet = this._studio.design?.sheet;
-		if(sheet) {
-			sheet.scroll.x = this._studio.$el.scrollLeft;
-			sheet.scroll.y = this._studio.$el.scrollTop;
-		}
-	}
-
 	private get scroll(): IPoint {
 		return this._studio.design?.sheet.scroll ?? { x: 0, y: 0 };
 	}
@@ -311,23 +304,30 @@
 		center.x -= rect.left;
 		center.y -= rect.top;
 
-		console.log(this.margin);
-
 		let { x, y } = this.margin, s = this.scale;
 		let cx = (center.x - x) / s, cy = (y - center.y) / s;
 
 		sheet.scale = scale; // 執行完這行之後，再次存取 this.margin 會發生改變
 		if(sheet.scale != scale) return; // 變更失敗（太小），結束操作
 
-		x = sheet.scroll.x + cx * scale + this.margin.x - center.x;
-		y = sheet.scroll.y + this.margin.y - cy * scale - center.y;
+		this.scrollTo(
+			sheet.scroll.x + cx * scale + this.margin.x - center.x,
+			sheet.scroll.y + this.margin.y - cy * scale - center.y
+		);
+		this._studio.update();
+	}
+
+	public scrollTo(x: number, y: number) {
+		let sheet = this._studio.design!.sheet;
+		let el = this._studio.$el;
+		let w = el.scrollWidth - el.clientWidth;
+		let h = el.scrollHeight - el.clientHeight;
 		if(x < 0) x = 0;
 		if(y < 0) y = 0;
-		if(x > el.scrollWidth) x = el.scrollWidth;
-		if(y > el.scrollHeight) y = el.scrollHeight;
+		if(x > w) x = w;
+		if(y > h) y = h;
 		sheet.scroll.x = x;
 		sheet.scroll.y = y;
-		this._studio.update();
 	}
 
 	@shrewd public render() {
