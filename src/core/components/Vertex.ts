@@ -77,6 +77,10 @@ interface JVertex extends IPoint {
 		return arr[0][0];
 	}
 
+	public delete() {
+		RemoveCommand.create(this.node);
+	}
+
 	public deleteAndJoin() {
 		if(this.node.degree != 2) return;
 		let edge = this.node.dispose()!;
@@ -111,7 +115,7 @@ interface JVertex extends IPoint {
 	}
 
 	public toMemento(): Memento {
-		return [this.node.tag, this.toJSON()];
+		return [this.tag, this.toJSON()];
 	}
 
 	public toJSON(): JVertex {

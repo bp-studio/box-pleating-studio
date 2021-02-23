@@ -4,8 +4,8 @@ interface JHistory {
 	/** 現在所在的位置 */
 	index: number;
 
-	/** 自從上次存檔以來是否有修改過 */
-	modified: boolean;
+	/** 上次存檔時的位置 */
+	savedIndex: number;
 
 	/** 所有的歷史記錄 */
 	steps: JStep[];
@@ -24,17 +24,24 @@ interface JHistory {
 	/** 是否正在移動歷史 */
 	private _moving: boolean = true;
 
-	private _savedIndex: number = 0;
+	public savedIndex: number = 0;
 
 	constructor(design: Design, json?: JHistory) {
 		super(design);
 		this.design = design;
+		if(json) {
+			try {
+				this.steps.push(...json.steps.map(s => Step.restore(design, s)));
+				this.index = json.index;
+				this.savedIndex = json.savedIndex;
+			} catch(e) { }
+		}
 	}
 
 	public toJSON(): JHistory {
 		return {
 			index: this.index,
-			modified: this.modified,
+			savedIndex: this.savedIndex,
 			steps: this.steps
 		}
 	}
@@ -71,11 +78,11 @@ interface JHistory {
 	}
 
 	public get modified(): boolean {
-		return this._savedIndex != this.index;
+		return this.savedIndex != this.index;
 	}
 
 	public notifySave(): void {
-		this._savedIndex = this.index;
+		this.savedIndex = this.index;
 	}
 
 	private addStep(step: Step): void {
@@ -87,7 +94,7 @@ interface JHistory {
 		if(this.steps.length > 30) {
 			this.steps.shift();
 			this.index--;
-			this._savedIndex--;
+			this.savedIndex--;
 		}
 	}
 

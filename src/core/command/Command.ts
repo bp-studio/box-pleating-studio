@@ -20,6 +20,14 @@ type Typeless<T extends JCommand> = Omit<T, 'type'>;
 
 abstract class Command implements JCommand {
 
+	public static restore(design: Design, c: JCommand): Command {
+		if(c.type == CommandType.field) return new FieldCommand(design, c as JFieldCommand);
+		if(c.type == CommandType.move) return new MoveCommand(design, c as JMoveCommand);
+		if(c.type == CommandType.add) return new AddCommand(design, c as JAddCommand);
+		if(c.type == CommandType.remove) return new RemoveCommand(design, c as JRemoveCommand);
+		throw new Error();
+	}
+
 	@nonEnumerable protected readonly _design: Design;
 	public abstract readonly type: CommandType;
 	public readonly tag: string;

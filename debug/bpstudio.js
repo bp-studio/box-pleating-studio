@@ -973,6 +973,17 @@ class Command {
         this._design = design;
         this.tag = json.tag;
     }
+    static restore(design, c) {
+        if (c.type == CommandType.field)
+            return new FieldCommand(design, c);
+        if (c.type == CommandType.move)
+            return new MoveCommand(design, c);
+        if (c.type == CommandType.add)
+            return new AddCommand(design, c);
+        if (c.type == CommandType.remove)
+            return new RemoveCommand(design, c);
+        throw new Error();
+    }
     get signature() { return this.type + ":" + this.tag; }
 }
 __decorate([
@@ -1809,6 +1820,33 @@ class AddCommand extends Command {
     }
     redo() {
         this._design.tree.addEdge(this.memento.n1, this.memento.n2, this.memento.length);
+    }
+}
+class RemoveCommand extends Command {
+    constructor(design, json) {
+        super(design, json);
+        this.type = CommandType.remove;
+        this.memento = json.memento;
+    }
+    static create(target) {
+        let command = new RemoveCommand(target.design, {
+            tag: target.tag,
+            memento: target.edges[0].toJSON()
+        });
+        target.dispose(true);
+        target.design.history.queue(command);
+    }
+    canAddTo(command) {
+        return false;
+    }
+    addTo(command) { }
+    undo() {
+        this._design.tree.addEdge(this.memento.n1, this.memento.n2, this.memento.length);
+    }
+    redo() {
+        let target = this._design.query(this.tag);
+        if (target instanceof TreeNode)
+            target.dispose();
     }
 }
 let Mapping = class Mapping extends BaseMapping {
@@ -3060,7 +3098,7 @@ let Design = class Design extends DesignBase {
             let v = arr.find(v => v.node.degree == 1);
             if (!v)
                 break;
-            v.node.dispose();
+            RemoveCommand.create(v.node);
             arr.splice(arr.indexOf(v), 1);
             (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
         }
@@ -3070,7 +3108,7 @@ let Design = class Design extends DesignBase {
         for (let f of flaps) {
             if (this.vertices.size == 3)
                 break;
-            f.node.dispose();
+            RemoveCommand.create(f.node);
             (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
         }
     }
@@ -4646,6 +4684,9 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         arr.sort((a, b) => a[1] - b[1]);
         return arr[0][0];
     }
+    delete() {
+        RemoveCommand.create(this.node);
+    }
     deleteAndJoin() {
         var _a;
         if (this.node.degree != 2)
@@ -4662,7 +4703,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         super.onDispose();
     }
     toMemento() {
-        return [this.node.tag, this.toJSON()];
+        return [this.tag, this.toJSON()];
     }
     toJSON() {
         return {
@@ -4793,13 +4834,21 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._construct = [];
         this._destruct = [];
         this._moving = true;
-        this._savedIndex = 0;
+        this.savedIndex = 0;
         this.design = design;
+        if (json) {
+            try {
+                this.steps.push(...json.steps.map(s => Step.restore(design, s)));
+                this.index = json.index;
+                this.savedIndex = json.savedIndex;
+            }
+            catch (e) { }
+        }
     }
     toJSON() {
         return {
             index: this.index,
-            modified: this.modified,
+            savedIndex: this.savedIndex,
             steps: this.steps
         };
     }
@@ -4835,10 +4884,10 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._moving = false;
     }
     get modified() {
-        return this._savedIndex != this.index;
+        return this.savedIndex != this.index;
     }
     notifySave() {
-        this._savedIndex = this.index;
+        this.savedIndex = this.index;
     }
     addStep(step) {
         if (this.steps.length > this.index)
@@ -4847,7 +4896,7 @@ let HistoryManager = class HistoryManager extends Disposable {
         if (this.steps.length > 30) {
             this.steps.shift();
             this.index--;
-            this._savedIndex--;
+            this.savedIndex--;
         }
     }
     get lastStep() {
@@ -4903,6 +4952,11 @@ class Step {
         this.construct = construct;
         this.destruct = destruct;
         this.reset();
+    }
+    static restore(design, json) {
+        var _a, _b;
+        let commands = json.commands.map(c => Command.restore(design, c));
+        return new Step(commands, (_a = json.construct) !== null && _a !== void 0 ? _a : [], (_b = json.destruct) !== null && _b !== void 0 ? _b : []);
     }
     static signature(commands) {
         commands.sort((a, b) => a.signature.localeCompare(b.signature));
@@ -5649,11 +5703,6 @@ var Migration;
             title: "",
             version: Migration.current,
             mode: "layout",
-            history: {
-                index: 0,
-                modified: false,
-                steps: []
-            },
             layout: {
                 sheet: { width: 16, height: 16 },
                 flaps: [],
@@ -5728,6 +5777,8 @@ var Migration;
         }
         if (design.version == "rc1")
             design.version = "0";
+        if (design.version == "0")
+            design.version = "0.4";
         if (deprecate && onDeprecated)
             onDeprecated(design.title);
         return design;
@@ -6301,17 +6352,17 @@ var Style;
     Style.label = {
         point: [0, 0],
         fillColor: 'black',
-        fontWeight: 'bold',
-        strokeWidth: 0,
-        fontSize: 16
+        fontWeight: 'normal',
+        strokeWidth: 0.5,
+        fontSize: 14
     };
     Style.glow = {
         point: [0, 0],
-        fontWeight: 'bold',
+        fontWeight: 'normal',
         fillColor: 'white',
         strokeWidth: 2.5,
         strokeColor: 'white',
-        fontSize: 16
+        fontSize: 14
     };
     Style.edge = {
         strokeWidth: 2

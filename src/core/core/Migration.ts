@@ -14,11 +14,6 @@ namespace Migration {
 			title: "",
 			version: Migration.current,
 			mode: "layout",
-			history: {
-				index: 0,
-				modified: false,
-				steps: []
-			},
 			layout: {
 				sheet: { width: 16, height: 16 },
 				flaps: [],
@@ -97,6 +92,10 @@ namespace Migration {
 
 		// 版本 0 與 rc1 完全相同，純粹為了紀念發行而改變號碼
 		if(design.version == "rc1") design.version = "0";
+
+		// 版本 0.4 完全向下相容於版本 0，並不需要作任何修改；所有不同的地方都會自動被忽略
+		// 差別包括多了 history（不存檔）、棄用 fullscreen、scale 改成 zoom（不存檔）
+		if(design.version == "0") design.version = "0.4";
 
 		if(deprecate && onDeprecated) onDeprecated(design.title);
 		return design;

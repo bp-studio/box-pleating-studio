@@ -98,7 +98,7 @@ interface IDesignObject {
 		while(this.vertices.size > 3) {
 			let v = arr.find(v => v.node.degree == 1);
 			if(!v) break;
-			v.node.dispose()
+			RemoveCommand.create(v.node);
 			arr.splice(arr.indexOf(v), 1);
 			this.$studio?.update();
 		}
@@ -107,7 +107,7 @@ interface IDesignObject {
 	public deleteFlaps(flaps: readonly Flap[]) {
 		for(let f of flaps) {
 			if(this.vertices.size == 3) break;
-			f.node.dispose();
+			RemoveCommand.create(f.node);
 			this.$studio?.update();
 		}
 	}

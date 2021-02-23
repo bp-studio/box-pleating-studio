@@ -12,7 +12,7 @@
 			</div>
 		</div>
 		<div class="mt-3" v-if="design.tree.node.size>3">
-			<button class="btn btn-primary" v-if="selection.degree==1" @click="selection.node.dispose()" v-t="'keyword.delete'"></button>
+			<button class="btn btn-primary" v-if="selection.degree==1" @click="selection.delete()" v-t="'keyword.delete'"></button>
 			<button
 				class="btn btn-primary"
 				v-if="selection.degree==2"
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-	import { Component, Prop, Watch } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
 
 	@Component

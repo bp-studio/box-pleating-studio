@@ -7,6 +7,11 @@ interface JStep {
 
 class Step implements ISerializable<JStep> {
 
+	public static restore(design: Design, json: JStep): Step {
+		let commands = json.commands.map(c => Command.restore(design, c));
+		return new Step(commands, json.construct ?? [], json.destruct ?? []);
+	}
+
 	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
 	private static signature(commands: Command[]): string {
 		commands.sort((a, b) => a.signature.localeCompare(b.signature));
