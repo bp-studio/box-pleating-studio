@@ -69,7 +69,7 @@ interface IDesignObject {
 		return (this.mountTarget as BPStudio).$display;
 	}
 
-	public toJSON(history: boolean = false): JDesign {
+	public toJSON(session: boolean = false): JDesign {
 		let result!: JDesign;
 		this.tree.withJID(() => {
 			result = {
@@ -78,17 +78,17 @@ interface IDesignObject {
 				version: Migration.current,
 				mode: this.mode,
 				layout: {
-					sheet: this.LayoutSheet.toJSON(),
+					sheet: this.LayoutSheet.toJSON(session),
 					flaps: this.flaps.toJSON(),
 					stretches: this.stretches.toJSON()
 				},
 				tree: {
-					sheet: this.TreeSheet.toJSON(),
+					sheet: this.TreeSheet.toJSON(session),
 					nodes: this.vertices.toJSON(),
 					edges: this.sortJEdge()
 				}
 			};
-			if(history) result.history = this.history.toJSON();
+			if(session) result.history = this.history.toJSON();
 		});
 		return result;
 	}

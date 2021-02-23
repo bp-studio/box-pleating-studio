@@ -30,16 +30,15 @@
 	},
 	"panel": {
 		"design": {
-			"autoScale": "自動スケール",
 			"descriptionPH": "(プロジェクトの説明)",
 			"height": "高さ",
 			"layout": "配置ビュー",
-			"scale": "スケール",
 			"title": "題名",
 			"titlePH": "(プロジェクト名)",
 			"tree": "木構造ビュー",
 			"type": "Box Pleating Studio プロジェクト",
-			"width": "幅"
+			"width": "幅",
+			"zoom": "ズーム"
 		},
 		"edge": {
 			"goto": "帯領域に移動",

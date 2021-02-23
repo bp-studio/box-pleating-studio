@@ -5,7 +5,8 @@ document.addEventListener("wheel", function(event) {
 	if(event.ctrlKey) event.preventDefault();
 }, { passive: false });
 
-const isMac = navigator.platform.toLowerCase().startsWith("mac");
+// 這邊宣告成 const 或 let 會在 Safari 中出錯，底下其它變數亦同
+var isMac = navigator.platform.toLowerCase().startsWith("mac");
 
 ///////////////////////////////////////////////////
 // 檔案處理
@@ -59,7 +60,7 @@ if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('messa
 // LZMA
 ///////////////////////////////////////////////////
 
-const LZ = {
+var LZ = {
 	compress(s) {
 		s = LZMA.compress(s, 1); // Experiments showed that 1 is good enough
 		s = btoa(String.fromCharCode.apply(null, Uint8Array.from(s)));
@@ -78,7 +79,7 @@ const LZ = {
 // 快捷鍵註冊
 ///////////////////////////////////////////////////
 
-const hotkeys = [];
+var hotkeys = [];
 
 function registerHotkey(action, key, shift) {
 	hotkeys.push([action, key.toLowerCase(), !!shift]);

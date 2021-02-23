@@ -97,8 +97,7 @@
 			"layout": "Layout view",
 			"width": "Width",
 			"height": "Height",
-			"autoScale": "Auto-scale",
-			"scale": "Scale"
+			"zoom": "Zoom"
 		},
 		"flap": {
 			"type": "Flap",

@@ -223,7 +223,7 @@
 	@shrewd public get scale() {
 		if(this._studio.design) {
 			let s = this.getAutoScale(this._studio.design.sheet);
-			return this._studio.design.sheet.scale * s / 100;
+			return this._studio.design.sheet.zoom * s / 100;
 		} else {
 			return 100;
 		}
@@ -275,25 +275,24 @@
 	@shrewd private onSheetChange() {
 		let sheet = this._studio.design?.sheet;
 		if(sheet) {
-			this.spaceHolder.style.width = this.canvasWidth + "px";
-			this.spaceHolder.style.height = this.canvasHeight + "px";
+			this.spaceHolder.style.width = this.totalWidth + "px";
+			this.spaceHolder.style.height = this.totalHeight + "px";
 			this._studio.system.scrollTo(sheet.scroll.x, sheet.scroll.y);
 		}
 	}
 
-	@shrewd private get canvasWidth() { return Math.max(this.sheetWidth, this.viewWidth); }
-	@shrewd private get canvasHeight() { return Math.max(this.sheetHeight, this.viewHeight); }
+	@shrewd private get totalWidth() { return Math.max(this.sheetWidth, this.viewWidth); }
+	@shrewd private get totalHeight() { return Math.max(this.sheetHeight, this.viewHeight); }
 
 	@shrewd private get margin(): IPoint {
-		let cw = this.canvasWidth, ch = this.canvasHeight;
-		let mw = (cw - this.sheetWidth) / 2 + this.horMargin, mh = (ch + this.sheetHeight) / 2 - this.MARGIN;
+		let tw = this.totalWidth, th = this.totalHeight;
+		let mw = (tw - this.sheetWidth) / 2 + this.horMargin, mh = (th + this.sheetHeight) / 2 - this.MARGIN;
 		return { x: mw - this.scroll.x, y: mh - this.scroll.y };
 	}
 
-	public zoom(scale: number, center?: IPoint) {
-		let sheet = this._studio.design?.sheet;
-		if(scale < 100) scale = 100;
-		if(!sheet || sheet.scale == scale) return;
+	public zoom(zoom: number, sheet: Sheet, center?: IPoint) {
+		if(zoom < 100) zoom = 100;
+		if(!sheet || sheet.zoom == zoom) return;
 
 		if(center) {
 			let rect = this._studio.$el.getBoundingClientRect();
@@ -306,7 +305,7 @@
 		let m = this.margin, s = this.scale;
 		let cx = (center.x - m.x) / s, cy = (m.y - center.y) / s;
 
-		sheet.mScale = scale; // 執行完這行之後，再次存取 this.scale 和 this.margin 會發生改變
+		sheet.mZoom = zoom; // 執行完這行之後，再次存取 this.scale 和 this.margin 會發生改變
 		m = this.margin;
 		s = this.scale;
 
@@ -318,8 +317,8 @@
 
 	public scrollTo(x: number, y: number) {
 		let sheet = this._studio.design!.sheet;
-		let w = this.canvasWidth - this.viewWidth;
-		let h = this.canvasHeight - this.viewHeight;
+		let w = this.totalWidth - this.viewWidth;
+		let h = this.totalHeight - this.viewHeight;
 		if(x < 0) x = 0;
 		if(y < 0) y = 0;
 		if(x > w) x = w;
@@ -343,8 +342,9 @@
 		// 配置 Paper.js 的 View 的大小
 		let el = this._studio.$el;
 		let { x, y } = this.margin;
+		let [w, h] = [this.viewWidth, this.viewHeight]; // 不管怎樣都要建立相依性以保證重新繪製
 		this.isScrollable(); // 順序上必須先把捲軸設定完成、clientWidth/Height 才會是正確的值
-		if(this.lockViewport) this.project.view.viewSize.set(this.viewWidth, this.viewHeight);
+		if(this.lockViewport) this.project.view.viewSize.set(w, h);
 		else this.project.view.viewSize.set(el.clientWidth, el.clientHeight);
 
 		// 配置變換矩陣

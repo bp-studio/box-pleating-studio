@@ -5,7 +5,8 @@ document.addEventListener("wheel", function(event) {
 	if(event.ctrlKey) event.preventDefault();
 }, { passive: false });
 
-const isMac = navigator.platform.toLowerCase().startsWith("mac");
+// 這邊宣告成 const 或 let 會在 Safari 中出錯，底下其它變數亦同
+var isMac = navigator.platform.toLowerCase().startsWith("mac");
 
 ///////////////////////////////////////////////////
 // 檔案處理
@@ -59,7 +60,7 @@ if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('messa
 // LZMA
 ///////////////////////////////////////////////////
 
-const LZ = {
+var LZ = {
 	compress(s) {
 		s = LZMA.compress(s, 1); // Experiments showed that 1 is good enough
 		s = btoa(String.fromCharCode.apply(null, Uint8Array.from(s)));
@@ -78,7 +79,7 @@ const LZ = {
 // 快捷鍵註冊
 ///////////////////////////////////////////////////
 
-const hotkeys = [];
+var hotkeys = [];
 
 function registerHotkey(action, key, shift) {
 	hotkeys.push([action, key.toLowerCase(), !!shift]);
@@ -624,7 +625,7 @@ Vue.component('contextmenu', { render() { with (this) {
         }, hide() {
             if (this.shown) {
                 // 這邊必須設置一個延遲，否則觸控模式中會不能按
-                setTimeout(() => this.$el.classList.remove('show'), 10);
+                setTimeout(() => this.$el.classList.remove('show'), 50);
                 this.shown = false;
             }
         } } });
@@ -634,8 +635,8 @@ Vue.component('divider', { render() { with (this) {
     } } });
 
 Vue.component('download', { render() { with (this) {
-        return (!disabled) ? _c('a', { class: btn ? 'btn btn-primary' : 'dropdown-item', attrs: { "href": href, "download": file.name, "title": $t('message.downloadHint') }, on: { "click": download, "mouseover": getFile, "contextmenu": function ($event) { $event.stopPropagation(); return contextMenu($event); } } }, [_t("default")], 2) : _c('div', { staticClass: "dropdown-item disabled", on: { "click": function ($event) { $event.stopPropagation(); } } }, [_t("default")], 2);
-    } }, data() { return { href: "#", downloaded: undefined, downloading: undefined, creating: null }; }, props: { file: Object, disabled: Boolean, btn: { type: Boolean, default: false } }, methods: { download() {
+        return (!disabled) ? _c('a', { class: btn ? 'btn btn-primary' : 'dropdown-item', attrs: { "href": href, "download": file.name, "title": $t('message.downloadHint') }, on: { "click": function ($event) { return download($event); }, "mouseover": getFile, "contextmenu": function ($event) { $event.stopPropagation(); return contextMenu($event); } } }, [_t("default")], 2) : _c('div', { staticClass: "dropdown-item disabled", on: { "click": function ($event) { $event.stopPropagation(); } } }, [_t("default")], 2);
+    } }, data() { return { href: "#", downloaded: undefined, downloading: undefined, creating: null }; }, props: { file: Object, disabled: Boolean, btn: { type: Boolean, default: false } }, methods: { download(event) {
             if (this.href == "#") {
                 this.downloading = new Promise(resolve => this.downloaded = resolve);
                 event.preventDefault();
@@ -768,16 +769,19 @@ Vue.component('store', { render() { with (this) {
     } }, props: { data: Object, label: String } });
 
 Vue.component('uploader', { render() { with (this) {
-        return _c('div', [_c('input', { staticClass: "d-none", attrs: { "type": "file", "id": id, "accept": accept, "multiple": multiple }, on: { "change": function ($event) { return $emit('upload', $event); } } }), _v(" "), _c('label', { ref: "lbl", staticClass: "dropdown-item m-0", attrs: { "for": id } }, [_t("default")], 2)]);
-    } }, data() { return { id: "file" + this._uid }; }, props: { accept: String, multiple: Boolean }, methods: { click() {
+        return _c('div', [_c('input', { staticClass: "d-none", attrs: { "type": "file", "id": id, "accept": type, "multiple": multiple }, on: { "change": function ($event) { return $emit('upload', $event); } } }), _v(" "), _c('label', { ref: "lbl", staticClass: "dropdown-item m-0", attrs: { "for": id } }, [_t("default")], 2)]);
+    } }, data() { return { id: "file" + this._uid }; }, props: { accept: String, multiple: Boolean }, computed: { type() {
+            // 已知 Safari 對於 accept 屬性的支援有問題
+            return (navigator.vendor && navigator.vendor.startsWith("Apple")) ? "" : this.accept;
+        } }, methods: { click() {
             this.$refs.lbl.click();
         } } });
 
 Vue.component('design', { render() { with (this) {
         return _c('div', [_c('h5', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.type'), expression: "'panel.design.type'" }] }), _v(" "), _c('field', { attrs: { "label": $t('panel.design.title'), "placeholder": $t('panel.design.titlePH') }, model: { value: (design.title), callback: function ($$v) { $set(design, "title", $$v); }, expression: "design.title" } }), _v(" "), _c('div', { staticClass: "mt-1 mb-4" }, [_c('textarea', { directives: [{ name: "model", rawName: "v-model", value: (design.description), expression: "design.description" }], staticClass: "form-control", attrs: { "rows": "4", "placeholder": $t('panel.design.descriptionPH') }, domProps: { "value": (design.description) }, on: { "input": function ($event) { if ($event.target.composing)
-                            return; $set(design, "description", $event.target.value); } } })]), _v(" "), _c('div', { staticClass: "my-2" }, [(design.mode == 'tree') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.tree'), expression: "'panel.design.tree'" }] }) : _e(), _v(" "), (design.mode == 'layout') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.layout'), expression: "'panel.design.layout'" }] }) : _e()]), _v(" "), _c('number', { attrs: { "label": $t('panel.design.width') }, model: { value: (design.sheet.width), callback: function ($$v) { $set(design.sheet, "width", _n($$v)); }, expression: "design.sheet.width" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.design.height') }, model: { value: (design.sheet.height), callback: function ($$v) { $set(design.sheet, "height", _n($$v)); }, expression: "design.sheet.height" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.design.scale'), "step": step }, model: { value: (design.sheet.scale), callback: function ($$v) { $set(design.sheet, "scale", _n($$v)); }, expression: "design.sheet.scale" } })], 1);
+                            return; $set(design, "description", $event.target.value); } } })]), _v(" "), _c('div', { staticClass: "my-2" }, [(design.mode == 'tree') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.tree'), expression: "'panel.design.tree'" }] }) : _e(), _v(" "), (design.mode == 'layout') ? _c('h6', { directives: [{ name: "t", rawName: "v-t", value: ('panel.design.layout'), expression: "'panel.design.layout'" }] }) : _e()]), _v(" "), _c('number', { attrs: { "label": $t('panel.design.width') }, model: { value: (design.sheet.width), callback: function ($$v) { $set(design.sheet, "width", _n($$v)); }, expression: "design.sheet.width" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.design.height') }, model: { value: (design.sheet.height), callback: function ($$v) { $set(design.sheet, "height", _n($$v)); }, expression: "design.sheet.height" } }), _v(" "), _c('number', { attrs: { "label": $t('panel.design.zoom'), "step": step }, model: { value: (design.sheet.zoom), callback: function ($$v) { $set(design.sheet, "zoom", _n($$v)); }, expression: "design.sheet.zoom" } })], 1);
     } }, mixins: [BaseComponent], computed: { step() {
-            let s = this.design.sheet.scale;
+            let s = this.design.sheet.zoom;
             return (2 ** Math.floor(Math.log2(s / 100))) * 25;
         } } });
 
@@ -833,11 +837,14 @@ Vue.component('vertices', { render() { with (this) {
 Vue.component('editmenu', { render() { with (this) {
         return _c('dropdown', { attrs: { "icon": "bp-pencil-ruler", "title": $t('toolbar.edit.title') } }, [_c('dropdownitem', { attrs: { "disabled": !design || !design.history.canUndo }, on: { "click": undo } }, [_c('hotkey', { attrs: { "icon": "bp-undo", "ctrl": "", "hk": "Z" } }, [_v(_s($t('toolbar.edit.undo')))])], 1), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design || !design.history.canRedo }, on: { "click": redo } }, [_c('hotkey', { attrs: { "icon": "bp-redo", "ctrl": "", "hk": "Y" } }, [_v(_s($t('toolbar.edit.redo')))])], 1), _v(" "), _c('divider'), _v(" "), _c('dropdownitem', { attrs: { "disabled": !design }, on: { "click": selectAll } }, [_c('hotkey', { attrs: { "icon": "fas fa-th", "ctrl": "", "hk": "A" } }, [_v(_s($t('toolbar.edit.selectAll')))])], 1)], 1);
     } }, mixins: [BaseComponent], methods: { undo() {
-            this.design?.history.undo();
+            if (this.design)
+                this.design.history.undo();
         }, redo() {
-            this.design?.history.redo();
+            if (this.design)
+                this.design.history.redo();
         }, selectAll() {
-            this.design?.selectAll();
+            if (this.design)
+                this.design.selectAll();
         } }, mounted() {
         registerHotkey(() => this.undo(), "z");
         registerHotkey(() => this.redo(), "y");

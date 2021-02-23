@@ -364,7 +364,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			let d = this._studio.design;
 			if(d) {
 				display.zoom(
-					d.sheet.scale - Math.round(d.sheet.scale * event.deltaY / 10000) * 5,
+					d.sheet.zoom - Math.round(d.sheet.zoom * event.deltaY / 10000) * 5,
+					d.sheet,
 					{ x: event.pageX, y: event.pageY }
 				);
 			}
@@ -375,7 +376,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		if(event.touches.length > 1 && !this._scrollStart && this._studio.design) {
 			this.$clearSelection();
 			this._setScroll(event);
-			this._touchScaling = [this.getTouchDistance(event), this._studio.design.sheet.scale];
+			this._touchScaling = [this.getTouchDistance(event), this._studio.design.sheet.zoom];
 			this._lastKnownCursorLocation = this._locate(event);
 		}
 	}
@@ -410,9 +411,9 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 				let dist = this.getTouchDistance(event);
 				let raw = dist - this._touchScaling[0];
 				let dpi = window.devicePixelRatio ?? 1;
-				let s = sheet.scale * raw / dpi / 100;
+				let s = sheet.zoom * raw / dpi / 100;
 				s = Math.round(s + this._touchScaling[1]);
-				display.zoom(s, this.getTouchCenter(event));
+				display.zoom(s, sheet, this.getTouchCenter(event));
 				this._touchScaling = [dist, s];
 			}
 
@@ -429,8 +430,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 		if(this._scrollStart) return;
 		let sheet = this._studio.design?.sheet;
 		if(sheet) {
-			sheet.scroll.x = Math.round(this._studio.$el.scrollLeft);
-			sheet.scroll.y = Math.round(this._studio.$el.scrollTop);
+			sheet.scroll.x = this._studio.$el.scrollLeft;
+			sheet.scroll.y = this._studio.$el.scrollTop;
 		}
 	}
 	public scrollTo(x: number, y: number) {

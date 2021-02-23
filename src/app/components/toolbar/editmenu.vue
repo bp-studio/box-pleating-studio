@@ -28,15 +28,15 @@
 		}
 
 		private undo() {
-			this.design?.history.undo();
+			if(this.design) this.design.history.undo();
 		}
 
 		private redo() {
-			this.design?.history.redo();
+			if(this.design) this.design.history.redo();
 		}
 
 		private selectAll() {
-			this.design?.selectAll();
+			if(this.design) this.design.selectAll();
 		}
 	}
 </script>

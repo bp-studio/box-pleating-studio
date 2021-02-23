@@ -97,8 +97,7 @@
 			"layout": "配置檢視",
 			"width": "寬度",
 			"height": "高度",
-			"autoScale": "自動縮放",
-			"scale": "尺度"
+			"zoom": "縮放"
 		},
 		"flap": {
 			"type": "角片",

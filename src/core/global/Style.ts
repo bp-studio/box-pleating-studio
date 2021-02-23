@@ -36,17 +36,18 @@ namespace Style {
 	export const label: StyleDeclaration = {
 		point: [0, 0],
 		fillColor: 'black',
-		fontWeight: 'normal',
-		strokeWidth: 0.5,
-		fontSize: 14
+		fontWeight: 'bold',
+		strokeWidth: 0,
+		fontSize: 16
 	};
 
 	export const glow: StyleDeclaration = {
 		point: [0, 0],
-		fontWeight: 'normal',
+		fontWeight: 'bold',
+		fillColor: 'white',
 		strokeWidth: 2.5,
 		strokeColor: 'white',
-		fontSize: 14
+		fontSize: 16
 	};
 
 	export const edge: StyleDeclaration = {

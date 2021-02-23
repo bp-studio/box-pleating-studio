@@ -11,7 +11,7 @@
 		</div>
 		<number :label="$t('panel.design.width')" v-model.number="design.sheet.width"></number>
 		<number :label="$t('panel.design.height')" v-model.number="design.sheet.height"></number>
-		<number :label="$t('panel.design.scale')" :step="step" v-model.number="design.sheet.scale"></number>
+		<number :label="$t('panel.design.zoom')" :step="step" v-model.number="design.sheet.zoom"></number>
 	</div>
 </template>
 
@@ -22,7 +22,7 @@
 	@Component
 	export default class Design extends BaseComponent {
 		private get step() {
-			let s: number = this.design.sheet.scale;
+			let s: number = this.design.sheet.zoom;
 			return (2 ** Math.floor(Math.log2(s / 100))) * 25;
 		}
 	}

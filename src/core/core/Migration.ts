@@ -20,12 +20,12 @@ namespace Migration {
 				steps: []
 			},
 			layout: {
-				sheet: { width: 16, height: 16, scale: 100 },
+				sheet: { width: 16, height: 16 },
 				flaps: [],
 				stretches: [],
 			},
 			tree: {
-				sheet: { width: 20, height: 20, scale: 100 },
+				sheet: { width: 20, height: 20 },
 				nodes: [],
 				edges: []
 			}
@@ -97,13 +97,6 @@ namespace Migration {
 
 		// 版本 0 與 rc1 完全相同，純粹為了紀念發行而改變號碼
 		if(design.version == "rc1") design.version = "0";
-
-		// 版本 0.4 捨棄了 fullscreen，並且 scale 改成用百分比方式計算
-		if(design.version == "0") {
-			design.version = "0.4";
-			design.layout.sheet.scale = design.fullscreen ? 100 : Math.max(100, design.layout.sheet.scale * 10);
-			design.tree.sheet.scale = design.fullscreen ? 100 : Math.max(100, design.tree.sheet.scale * 10);
-		}
 
 		if(deprecate && onDeprecated) onDeprecated(design.title);
 		return design;

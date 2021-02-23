@@ -39,7 +39,8 @@
 		private hide() {
 			if(this.shown) {
 				// 這邊必須設置一個延遲，否則觸控模式中會不能按
-				setTimeout(() => this.$el.classList.remove('show'), 10);
+				// 已知設定延遲為 10 在某些版本的 Safari 上面是不夠的，所以安全起見設成 50
+				setTimeout(() => this.$el.classList.remove('show'), 50);
 				this.shown = false;
 			}
 		}

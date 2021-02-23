@@ -2,7 +2,8 @@
 interface JSheet {
 	width: number;
 	height: number;
-	scale: number;
+	zoom?: number;
+	scroll?: IPoint;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -65,11 +66,11 @@ interface JSheet {
 		}
 	}
 
-	@shrewd public mScale: number;
-	public get scale() { return this.mScale; }
-	public set scale(v) {
+	@shrewd public mZoom: number;
+	public get zoom() { return this.mZoom; }
+	public set zoom(v) {
 		if(v < 100) return;
-		this.$studio?.$display.zoom(v);
+		this.$studio?.$display.zoom(v, this);
 	}
 
 	constructor(design: Design, tag: string, sheet: JSheet, ...maps: IterableFactory<Control>[]) {
@@ -77,7 +78,8 @@ interface JSheet {
 		this.tag = tag;
 		this.width = sheet.width;
 		this.height = sheet.height;
-		this.mScale = Math.max(sheet.scale, 100);
+		this.mZoom = sheet.zoom ?? 100;
+		this.scroll = sheet.scroll ?? { x: 0, y: 0 };
 		this._controlMaps = maps;
 		this.view = new SheetView(this);
 	}
@@ -97,8 +99,13 @@ interface JSheet {
 		return this.$studio ? this.$studio.$display.scale : 1;
 	}
 
-	public toJSON(): JSheet {
-		return { width: this.width, height: this.height, scale: this.scale };
+	public toJSON(session: boolean = false): JSheet {
+		let result: JSheet = { width: this.width, height: this.height };
+		if(session) {
+			result.zoom = this.zoom;
+			result.scroll = this.scroll;
+		}
+		return result;
 	}
 
 	@shrewd get size() {
@@ -151,5 +158,5 @@ interface JSheet {
 		setTimeout(() => this.margin = m, 0);
 	}
 
-	@shrewd public scroll: IPoint = { x: 0, y: 0 };
+	@shrewd public scroll: IPoint;
 }

@@ -3,7 +3,7 @@
 		v-if="!disabled"
 		:class="btn?'btn btn-primary':'dropdown-item'"
 		:href="href"
-		@click="download"
+		@click="download($event)"
 		@mouseover="getFile"
 		@contextmenu.stop="contextMenu"
 		:download="file.name"
@@ -20,8 +20,6 @@
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { FileFactory } from '../import/types';
 
-	declare const saveAs: any;
-
 	@Component
 	export default class Download extends Vue {
 		private href: string = "#";
@@ -34,7 +32,7 @@
 		@Prop(Boolean) public disabled: boolean;
 		@Prop(Boolean) public btn: boolean = false;
 
-		public download() {
+		public download(event: Event) {
 			if(this.href == "#") {
 				this.downloading = new Promise(resolve => this.downloaded = resolve);
 				event.preventDefault();
