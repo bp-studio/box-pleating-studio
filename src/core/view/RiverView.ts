@@ -68,12 +68,12 @@
 		key => new RiverHelper(this, key.split(',').map(v => Number(v)))
 	);
 
-	private get components(): readonly RiverHelper[] {
+	@shrewd private get components(): readonly RiverHelper[] {
 		return [...this._components.values()];
 	}
 
 	protected onDispose() {
-		Shrewd.terminate(this.components);
+		Shrewd.terminate(this._components);
 		super.onDispose();
 	}
 

@@ -85,13 +85,13 @@ enum JunctionStatus {
 	@shrewd private get _lca(): TreeNode {
 		this.disposeEvent();
 		let n1 = this.f1.node, n2 = this.f2.node;
-		return n1.tree.pair.get(n1, n2)!.lca;
+		return n1.tree.lca(n1, n2);
 	}
 
 	private findIntersection(j: Junction): TreeNode | null {
 		let n1 = this._lca, n2 = j._lca;
 		if(n1 == n2) return n1;
-		let n3 = n1.tree.pair.get(n1, n2)!.lca;
+		let n3 = n1.tree.lca(n1, n2);
 		if(n3 != n1 && n3 != n2) return null;
 		return n3 == n1 ? n2 : n1;
 	}

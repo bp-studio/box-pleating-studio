@@ -71,7 +71,7 @@ interface IDesignObject {
 
 	public toJSON(session: boolean = false): JDesign {
 		let result!: JDesign;
-		this.tree.withJID(() => {
+		let action = () => {
 			result = {
 				title: this.title,
 				description: this.description,
@@ -89,7 +89,9 @@ interface IDesignObject {
 				}
 			};
 			if(session) result.history = this.history.toJSON();
-		});
+		};
+		if(session) action();
+		else this.tree.withJID(action);
 		return result;
 	}
 
@@ -100,7 +102,6 @@ interface IDesignObject {
 			if(!v) break;
 			RemoveCommand.create(v.node);
 			arr.splice(arr.indexOf(v), 1);
-			this.$studio?.update();
 		}
 	}
 

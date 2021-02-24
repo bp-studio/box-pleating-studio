@@ -1,6 +1,6 @@
 
 interface JStep {
-	commands: JCommand[];
+	commands: readonly JCommand[];
 	construct?: any[];
 	destruct?: any[];
 }
@@ -13,12 +13,13 @@ class Step implements ISerializable<JStep> {
 	}
 
 	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
-	private static signature(commands: Command[]): string {
-		commands.sort((a, b) => a.signature.localeCompare(b.signature));
-		return commands.map(c => c.signature).join(";");
+	private static signature(commands: readonly Command[]): string {
+		let arr = commands.concat();
+		arr.sort((a, b) => a.signature.localeCompare(b.signature));
+		return arr.map(c => c.signature).join(";");
 	}
 
-	constructor(commands: Command[], construct: any[], destruct: any[]) {
+	constructor(commands: readonly Command[], construct: any[], destruct: any[]) {
 		this.commands = commands;
 		this.signature = Step.signature(commands);
 		this.construct = construct;
@@ -26,7 +27,7 @@ class Step implements ISerializable<JStep> {
 		this.reset();
 	}
 
-	public readonly commands: Command[];
+	public readonly commands: readonly Command[];
 	public readonly construct: Memento[];
 	public readonly destruct: Memento[];
 
@@ -43,7 +44,7 @@ class Step implements ISerializable<JStep> {
 		this._timeout = setTimeout(() => this._fixed = true, 1000);
 	}
 
-	public tryAdd(commands: Command[], construct: Memento[], destruct: Memento[]) {
+	public tryAdd(commands: readonly Command[], construct: Memento[], destruct: Memento[]) {
 		// 已經操作過的 Step 是無法被合併的
 		if(this._fixed) return false;
 
@@ -65,7 +66,8 @@ class Step implements ISerializable<JStep> {
 	}
 
 	public undo(design: Design) {
-		for(let c of this.commands) c.undo();
+		// undo 的時候以相反順序執行
+		for(let i = this.commands.length - 1; i >= 0; i--) this.commands[i].undo();
 		for(let memento of this.destruct) design.options.set(...memento);
 		this._fixed = true;
 	}

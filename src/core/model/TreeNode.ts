@@ -44,9 +44,9 @@
 		return this.parentEdge!.length + this.parent!.dist;
 	}
 
-	@shrewd public get depth(): number {
-		if(!this.parent) return 0;
-		return this.parent.depth + 1;
+	@shrewd public get path(): readonly TreeNode[] {
+		if(!this.parent) return [this];
+		else return this.parent.path.concat(this);
 	}
 
 	protected get shouldDispose(): boolean {

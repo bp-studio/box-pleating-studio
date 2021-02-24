@@ -41,6 +41,7 @@ interface JEdge {
 	}
 
 	@shrewd public get isRiver() {
+		this.disposeEvent();
 		return this._n1.degree > 1 && this._n2.degree > 1;
 	}
 
@@ -49,10 +50,16 @@ interface JEdge {
 	private adjacentEdges(n: TreeNode) { return n.edges.filter(e => e != this); }
 
 	/** 相對於 n1 的所有相鄰邊 */
-	@shrewd public get a1(): readonly TreeEdge[] { return this.adjacentEdges(this._n1); }
+	@shrewd public get a1(): readonly TreeEdge[] {
+		this.disposeEvent();
+		return this.adjacentEdges(this._n1);
+	}
 
 	/** 相對於 n2 的所有相鄰邊 */
-	@shrewd public get a2(): readonly TreeEdge[] { return this.adjacentEdges(this._n2); }
+	@shrewd public get a2(): readonly TreeEdge[] {
+		this.disposeEvent();
+		return this.adjacentEdges(this._n2);
+	}
 
 	/////////////////////////////////////////////////////////////////
 	// 結點群組
@@ -63,10 +70,16 @@ interface JEdge {
 	}
 
 	/** 相對於 n1 側的結點群組 */
-	@shrewd public get g1(): readonly TreeNode[] { return this.group(this._n1, this.a1); }
+	@shrewd public get g1(): readonly TreeNode[] {
+		this.disposeEvent();
+		return this.group(this._n1, this.a1);
+	}
 
 	/** 相對於 n2 側的結點群組 */
-	@shrewd public get g2(): readonly TreeNode[] { return this.group(this._n2, this.a2); }
+	@shrewd public get g2(): readonly TreeNode[] {
+		this.disposeEvent();
+		return this.group(this._n2, this.a2);
+	}
 
 	/** 相反於輸入的點的那一側的結點群組 */
 	public g(n: TreeNode) { return n == this._n1 ? this.g2 : this.g1; }
@@ -74,18 +87,22 @@ interface JEdge {
 	/////////////////////////////////////////////////////////////////
 	// 單側葉點
 	@shrewd public get l1(): TreeNode[] {
+		this.disposeEvent();
 		return this.g1.filter(n => n.degree == 1);
 	}
 	@shrewd public get l2(): TreeNode[] {
+		this.disposeEvent();
 		return this.g2.filter(n => n.degree == 1);
 	}
 
 	/////////////////////////////////////////////////////////////////
 	// 單側總邊長
 	@shrewd private get t1(): number {
+		this.disposeEvent();
 		return this.a1.map(e => e.t(this._n1) + e.length).reduce((n, x) => n + x, 0);
 	}
 	@shrewd private get t2(): number {
+		this.disposeEvent();
 		return this.a2.map(e => e.t(this._n2) + e.length).reduce((n, x) => n + x, 0);
 	}
 	private t(n: TreeNode) { return n == this._n1 ? this.t2 : this.t1; }
@@ -93,14 +110,17 @@ interface JEdge {
 	/////////////////////////////////////////////////////////////////
 	// 單側最長路徑長
 	@shrewd private get p1(): number {
+		this.disposeEvent();
 		return Math.max(...this.l1.map(n => n.tree.dist(n, this.n1)));
 	}
 	@shrewd private get p2(): number {
+		this.disposeEvent();
 		return Math.max(...this.l2.map(n => n.tree.dist(n, this.n2)));
 	}
 
 	/** 決定這條邊的環繞側 */
 	@shrewd public get wrapSide(): number {
+		this.disposeEvent();
 		if(!this.isRiver) return 0; // 只有河需要考慮這個問題
 
 		// 先看最長路徑，取較短一側

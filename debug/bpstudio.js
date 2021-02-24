@@ -1916,7 +1916,6 @@ let Tree = class Tree extends Disposable {
         this.edge = new DoubleMap();
         this.nextId = 0;
         this._jid = false;
-        this.pair = new DoubleMapping(() => this.node.values(), (n1, n2) => new TreePair(n1, n2));
         this.design = design;
         while (edges === null || edges === void 0 ? void 0 : edges.length) {
             let remain = [], ok = false;
@@ -1935,7 +1934,6 @@ let Tree = class Tree extends Disposable {
     }
     onDispose() {
         Shrewd.terminate(this.edge);
-        this.pair.dispose();
     }
     get leaf() {
         let set = new Set();
@@ -1957,7 +1955,13 @@ let Tree = class Tree extends Disposable {
         this.disposeEvent();
         if (n1 == n2)
             return 0;
-        return this.pair.get(n1, n2).dist;
+        return n1.dist + n2.dist - 2 * this.lca(n1, n2).dist;
+    }
+    lca(n1, n2) {
+        let p1 = n1.path, p2 = n2.path, lca = p1[0], i = 1;
+        while (i < p1.length && i < p2.length && p1[i] == p2[i])
+            lca = p1[i++];
+        return lca;
     }
     find(id) {
         let [n1, n2] = id.split(',').map(i => this.node.get(Number(i)));
@@ -2750,10 +2754,11 @@ let TreeNode = class TreeNode extends Disposable {
             return 0;
         return this.parentEdge.length + this.parent.dist;
     }
-    get depth() {
+    get path() {
         if (!this.parent)
-            return 0;
-        return this.parent.depth + 1;
+            return [this];
+        else
+            return this.parent.path.concat(this);
     }
     get shouldDispose() {
         return super.shouldDispose || this.tree.disposed;
@@ -2805,7 +2810,7 @@ __decorate([
 ], TreeNode.prototype, "dist", null);
 __decorate([
     shrewd
-], TreeNode.prototype, "depth", null);
+], TreeNode.prototype, "path", null);
 __decorate([
     shrewd
 ], TreeNode.prototype, "edges", null);
@@ -2847,40 +2852,60 @@ let TreeEdge = class TreeEdge extends Disposable {
             this._n2.dispose();
     }
     get isRiver() {
+        this.disposeEvent();
         return this._n1.degree > 1 && this._n2.degree > 1;
     }
     adjacentEdges(n) { return n.edges.filter(e => e != this); }
-    get a1() { return this.adjacentEdges(this._n1); }
-    get a2() { return this.adjacentEdges(this._n2); }
+    get a1() {
+        this.disposeEvent();
+        return this.adjacentEdges(this._n1);
+    }
+    get a2() {
+        this.disposeEvent();
+        return this.adjacentEdges(this._n2);
+    }
     group(n, edges) {
         let result = [n];
         for (let edge of edges)
             result.push(...edge.g(n));
         return result;
     }
-    get g1() { return this.group(this._n1, this.a1); }
-    get g2() { return this.group(this._n2, this.a2); }
+    get g1() {
+        this.disposeEvent();
+        return this.group(this._n1, this.a1);
+    }
+    get g2() {
+        this.disposeEvent();
+        return this.group(this._n2, this.a2);
+    }
     g(n) { return n == this._n1 ? this.g2 : this.g1; }
     get l1() {
+        this.disposeEvent();
         return this.g1.filter(n => n.degree == 1);
     }
     get l2() {
+        this.disposeEvent();
         return this.g2.filter(n => n.degree == 1);
     }
     get t1() {
+        this.disposeEvent();
         return this.a1.map(e => e.t(this._n1) + e.length).reduce((n, x) => n + x, 0);
     }
     get t2() {
+        this.disposeEvent();
         return this.a2.map(e => e.t(this._n2) + e.length).reduce((n, x) => n + x, 0);
     }
     t(n) { return n == this._n1 ? this.t2 : this.t1; }
     get p1() {
+        this.disposeEvent();
         return Math.max(...this.l1.map(n => n.tree.dist(n, this.n1)));
     }
     get p2() {
+        this.disposeEvent();
         return Math.max(...this.l2.map(n => n.tree.dist(n, this.n2)));
     }
     get wrapSide() {
+        this.disposeEvent();
         if (!this.isRiver)
             return 0;
         if (this.p1 > this.p2)
@@ -3069,7 +3094,7 @@ let Design = class Design extends DesignBase {
     }
     toJSON(session = false) {
         let result;
-        this.tree.withJID(() => {
+        let action = () => {
             result = {
                 title: this.title,
                 description: this.description,
@@ -3088,11 +3113,14 @@ let Design = class Design extends DesignBase {
             };
             if (session)
                 result.history = this.history.toJSON();
-        });
+        };
+        if (session)
+            action();
+        else
+            this.tree.withJID(action);
         return result;
     }
     deleteVertices(vertices) {
-        var _a;
         let arr = vertices.concat().sort((a, b) => a.node.degree - b.node.degree);
         while (this.vertices.size > 3) {
             let v = arr.find(v => v.node.degree == 1);
@@ -3100,7 +3128,6 @@ let Design = class Design extends DesignBase {
                 break;
             RemoveCommand.create(v.node);
             arr.splice(arr.indexOf(v), 1);
-            (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
         }
     }
     deleteFlaps(flaps) {
@@ -4110,7 +4137,7 @@ let RiverView = class RiverView extends ControlView {
         return [...this._components.values()];
     }
     onDispose() {
-        Shrewd.terminate(this.components);
+        Shrewd.terminate(this._components);
         super.onDispose();
     }
     get closure() {
@@ -4200,6 +4227,9 @@ let RiverView = class RiverView extends ControlView {
 __decorate([
     shrewd
 ], RiverView.prototype, "info", null);
+__decorate([
+    shrewd
+], RiverView.prototype, "components", null);
 __decorate([
     segment("closure")
 ], RiverView.prototype, "closure", null);
@@ -4959,8 +4989,9 @@ class Step {
         return new Step(commands, (_a = json.construct) !== null && _a !== void 0 ? _a : [], (_b = json.destruct) !== null && _b !== void 0 ? _b : []);
     }
     static signature(commands) {
-        commands.sort((a, b) => a.signature.localeCompare(b.signature));
-        return commands.map(c => c.signature).join(";");
+        let arr = commands.concat();
+        arr.sort((a, b) => a.signature.localeCompare(b.signature));
+        return arr.map(c => c.signature).join(";");
     }
     reset() {
         if (this._timeout)
@@ -4985,8 +5016,8 @@ class Step {
         return true;
     }
     undo(design) {
-        for (let c of this.commands)
-            c.undo();
+        for (let i = this.commands.length - 1; i >= 0; i--)
+            this.commands[i].undo();
         for (let memento of this.destruct)
             design.options.set(...memento);
         this._fixed = true;
@@ -5114,13 +5145,13 @@ let Junction = class Junction extends SheetObject {
     get _lca() {
         this.disposeEvent();
         let n1 = this.f1.node, n2 = this.f2.node;
-        return n1.tree.pair.get(n1, n2).lca;
+        return n1.tree.lca(n1, n2);
     }
     findIntersection(j) {
         let n1 = this._lca, n2 = j._lca;
         if (n1 == n2)
             return n1;
-        let n3 = n1.tree.pair.get(n1, n2).lca;
+        let n3 = n1.tree.lca(n1, n2);
         if (n3 != n1 && n3 != n2)
             return null;
         return n3 == n1 ? n2 : n1;
@@ -6853,41 +6884,6 @@ var Trace;
         return result;
     }
 })(Trace || (Trace = {}));
-let TreePair = class TreePair extends Disposable {
-    constructor(n1, n2) {
-        super();
-        this._n1 = n1;
-        this._n2 = n2;
-    }
-    get shouldDispose() {
-        return super.shouldDispose || this._n1.disposed || this._n2.disposed;
-    }
-    get lca() {
-        this.disposeEvent();
-        let [n1, n2] = [this._n1, this._n2];
-        if (n1.depth < n2.depth)
-            [n1, n2] = [n2, n1];
-        if (n2.depth == 0)
-            return n2;
-        while (n1.depth > n2.depth)
-            n1 = n1.parent;
-        if (n1 == n2)
-            return n1;
-        let a1 = n1.parent, a2 = n2.parent;
-        if (a1 == a2)
-            return a1;
-        return n1.tree.pair.get(a1, a2).lca;
-    }
-    get dist() {
-        return this._n1.dist + this._n2.dist - 2 * this.lca.dist;
-    }
-};
-__decorate([
-    shrewd
-], TreePair.prototype, "lca", null);
-TreePair = __decorate([
-    shrewd
-], TreePair);
 var ConfigUtil;
 (function (ConfigUtil) {
     function joinOverlaps(o1, o2, i1, i2, oriented, reverse = false) {

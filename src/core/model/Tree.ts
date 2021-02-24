@@ -1,22 +1,6 @@
 
 @shrewd class Tree extends Disposable {
 
-	@shrewd({
-		renderer(this: Tree, v: Map<number, TreeNode>) {
-			for(let [id, node] of v) if(node.disposed) v.delete(id);
-			return v;
-		}
-	})
-	public node: Map<number, TreeNode> = new Map();
-
-	@shrewd({
-		renderer(this: Tree, v: DoubleMap<TreeNode, TreeEdge>) {
-			for(let node of v.firstKeys()) if(node.disposed) v.delete(node);
-			return v;
-		}
-	})
-	public edge: DoubleMap<TreeNode, TreeEdge> = new DoubleMap();
-
 	public readonly design: Design;
 
 	constructor(design: Design, edges?: JEdge[]) {
@@ -40,8 +24,23 @@
 
 	protected onDispose(): void {
 		Shrewd.terminate(this.edge);
-		this.pair.dispose();
 	}
+
+	@shrewd({
+		renderer(this: Tree, v: Map<number, TreeNode>) {
+			for(let [id, node] of v) if(node.disposed) v.delete(id);
+			return v;
+		}
+	})
+	public node: Map<number, TreeNode> = new Map();
+
+	@shrewd({
+		renderer(this: Tree, v: DoubleMap<TreeNode, TreeEdge>) {
+			for(let node of v.firstKeys()) if(node.disposed) v.delete(node);
+			return v;
+		}
+	})
+	public edge: DoubleMap<TreeNode, TreeEdge> = new DoubleMap();
 
 	@shrewd public get leaf(): ReadonlySet<TreeNode> {
 		let set: Set<TreeNode> = new Set();
@@ -64,15 +63,39 @@
 
 	public get jid() { return this._jid; }
 
-	public readonly pair = new DoubleMapping<TreeNode, TreePair>(
-		() => this.node.values(),
-		(n1, n2) => new TreePair(n1, n2)
-	);
-
+	/**
+	 * 利用 LCA 來計算任意兩點之間的距離。
+	 *
+	 * 由於這個計算本身是空間 0 耗時 O(1)，所以其時空成本跟 LCA 是一樣的。
+	 *
+	 * 最早採用的演算法是暴力儲存 TreePath 以持續追蹤距離，
+	 * 其耗時 O(1) 但空間消耗高達 O(n^3)，非常可怕，更動也因此極慢。
+	 */
 	public dist(n1: TreeNode, n2: TreeNode) {
 		this.disposeEvent();
 		if(n1 == n2) return 0;
-		return this.pair.get(n1, n2)!.dist;
+		return n1.dist + n2.dist - 2 * this.lca(n1, n2).dist;
+	}
+
+	/**
+	 * 找出兩個點的 Lowest Common Ancestor（LCA）。
+	 *
+	 * 這邊採用的新演算法是根據 TreeNode.path 來查找，
+	 * 儲存空間 O(n log n)、查找耗時 O(log n)、更動耗時 O(n)。
+	 *
+	 * 前一版的演算法（利用 TreePair 物件持續追蹤 LCA）則是儲存 O(n^2) 查找 O(1) 更動 O(n^2)，
+	 * 雖然它查找最快，但是儲存和更動成本太高，新版的演算法比較平衡。
+	 *
+	 * 理論上其實是存在儲存 O(n) 查找 O(1) 更動 O(n) 的演算法，
+	 * 其概念是把 LCA 問題轉換成 RMQ 然後再用複雜的方式預先處理以便可以耗時 O(1) 回答 RMQ 問題，
+	 * 但是這個演算法一方面實作很困難，
+	 * 另一方面這個演算法一旦樹有局部更動就要全部預存資料重新計算（雖然理論上耗時仍然是 O(n)），
+	 * 我實務上會遇到的樹大小應該難以讓這種演算法展現優勢，所以我先不考慮。
+	 */
+	public lca(n1: TreeNode, n2: TreeNode) {
+		let p1 = n1.path, p2 = n2.path, lca = p1[0], i = 1;
+		while(i < p1.length && i < p2.length && p1[i] == p2[i]) lca = p1[i++];
+		return lca;
 	}
 
 	public find(id: string): TreeEdge | undefined {
