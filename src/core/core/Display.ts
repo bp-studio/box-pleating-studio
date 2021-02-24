@@ -79,8 +79,6 @@
 		this.project.currentStyle.strokeColor = PaperUtil.Black();
 		this.project.currentStyle.strokeScaling = false;
 
-		setInterval(() => this._studio.update(), 50);
-
 		// 下面這段程式碼是用來檢視效能用的。
 		/* this.project.view.onFrame = (event: any) => {
 			this._frameRateCount++;

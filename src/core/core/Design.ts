@@ -109,7 +109,6 @@ interface IDesignObject {
 		for(let f of flaps) {
 			if(this.vertices.size == 3) break;
 			RemoveCommand.create(f.node);
-			this.$studio?.update();
 		}
 	}
 

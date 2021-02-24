@@ -33,6 +33,8 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 	/**
 	 * 持續更新 this._draggableSelections 的反應方法。
+	 *
+	 * 這個方法也會在一些場合中被單獨呼叫以便立即更新。
 	 */
 	@shrewd public draggableSelections() {
 		// 連裡面的選取邏輯也是乖乖照寫；這是還好啦，不會對效能有真正的影響
@@ -147,8 +149,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 
 		this._ctrl = [nowCtrl, nextCtrl];
 
-		// 選取完之後必須立刻更新以確保 this._draggableSelections 正確
-		this._studio.update();
+		this.draggableSelections();
 	}
 
 	private _processNextSelection(): void {
@@ -159,8 +160,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 			if(nextCtrl) this._select(nextCtrl);
 		}
 
-		// 選取完之後必須立刻更新以確保 this._draggableSelections 正確
-		this._studio.update();
+		this.draggableSelections();
 	}
 
 	private _select(c: Control): void {
@@ -301,7 +301,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
 	private _reselect(event: paper.ToolEvent) {
 		this.$clearSelection();
 		this._processSelection(event.point, false);
-		this._studio.update();
+		this.draggableSelections();
 		for(let o of this._draggableSelections) o.dragStart(this._lastKnownCursorLocation);
 		this._possiblyReselect = false;
 	}

@@ -3,6 +3,7 @@ interface JEdge {
 	n1: number;
 	n2: number;
 	length: number;
+	selected?: boolean;
 }
 
 @shrewd class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {

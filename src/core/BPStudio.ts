@@ -94,6 +94,8 @@
 		this.$paper = new paper.PaperScope();
 		this.$display = new Display(this);
 		this.system = new System(this);
+
+		this.update();
 	}
 
 	public load(json: string | object): Design {
@@ -149,7 +151,10 @@
 	private tryLoad(design: RecursivePartial<JDesign>): Design {
 		this.design = new Design(this, design);
 		this.designMap.set(this.design.id, this.design);
+
+		// 這邊順便直接更新，不然載入大專案的時候會跟 tab 之間有一點時間差
 		this.update();
+
 		return this.design;
 	}
 
@@ -164,12 +169,23 @@
 
 	public get TreeMaker() { return TreeMaker; }
 
+	/** 這是一個偵錯 glitch 用的屬性，正常情況不會用到（參見 Pattern.ts） */
 	public get running() { return this._updating; }
-	private _updating: boolean = false;
 
+	private _updating: boolean = false;
+	private _lastUpdate: number = performance.now();
+
+	/** 提供 UI 來註冊儲存 session 的動作 */
 	public onUpdate?: Action;
 
-	public async update() {
+	/** 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法 */
+	public async update(time?: number) {
+		time = time ?? performance.now();
+		if(time - this._lastUpdate < 50) {
+			requestAnimationFrame(this.update.bind(this));
+			return;
+		}
+
 		if(this._updating) return;
 		this._updating = true;
 
@@ -189,5 +205,8 @@
 		}
 
 		this._updating = false;
+
+		this._lastUpdate = time;
+		requestAnimationFrame(this.update.bind(this));
 	}
 }

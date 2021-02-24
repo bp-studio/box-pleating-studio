@@ -4,6 +4,11 @@
 	protected _label: paper.PointText;
 	protected _glow: paper.PointText;
 	private _dot: paper.Path.Circle;
+
+	// 在新的縮放框架之下物件的繪圖粗細不能隨便改變，所以另開一個物件處理選取的問題
+	private _dotSel: paper.Path.Circle;
+
+	// 偵測選取用的圓形區域，比真正繪製的圓大很多
 	private _circle: paper.Path.Circle;
 
 	constructor(vertex: Vertex) {
@@ -11,6 +16,8 @@
 
 		let option = Object.assign({}, Style.dot, { radius: 4 });
 		this.$addItem(Layer.dot, this._dot = new paper.Path.Circle(option));
+		option = Object.assign({}, Style.dotSelected, { radius: 4 });
+		this.$addItem(Layer.dot, this._dotSel = new paper.Path.Circle(option));
 		this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
 		this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
 
@@ -27,10 +34,11 @@
 		let x = this.control.location.x, y = this.control.location.y;
 		this._circle.position.set([x, y]);
 		this._dot.position.set([x * ds, -y * ds]);
+		this._dotSel.position.set([x * ds, -y * ds]);
 	}
 
 	protected renderSelection(selected: boolean) {
-		this._dot.set(selected ? Style.dotSelected : Style.dot);
+		this._dotSel.visible = selected;
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */

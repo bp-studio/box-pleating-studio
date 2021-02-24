@@ -741,7 +741,6 @@ Vue.component('number', { render() { with (this) {
             event.preventDefault();
             let by = Math.round(-event.deltaY / 100);
             this.v = this.change(by * this.step);
-            bp.update();
         } } });
 
 Vue.component('spinner', { render() { with (this) {

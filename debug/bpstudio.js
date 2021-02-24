@@ -3131,12 +3131,10 @@ let Design = class Design extends DesignBase {
         }
     }
     deleteFlaps(flaps) {
-        var _a;
         for (let f of flaps) {
             if (this.vertices.size == 3)
                 break;
             RemoveCommand.create(f.node);
-            (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
         }
     }
     clearCPSelection() {
@@ -3783,11 +3781,9 @@ class Store extends SheetObject {
         return this._entries[i] = this._entries[i] || this.builder(e[i]);
     }
     move(by = 1) {
-        var _a;
         let from = this.index, l = this._prototypes.length;
         this.index = (this.index + by + l) % l;
         this.onMove(this.index, from);
-        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
     }
     get size() {
         return this._prototypes.length;
@@ -4479,6 +4475,8 @@ let VertexView = class VertexView extends LabeledView {
         super(vertex);
         let option = Object.assign({}, Style.dot, { radius: 4 });
         this.$addItem(Layer.dot, this._dot = new paper.Path.Circle(option));
+        option = Object.assign({}, Style.dotSelected, { radius: 4 });
+        this.$addItem(Layer.dot, this._dotSel = new paper.Path.Circle(option));
         this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
         this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
         this._circle = new paper.Path.Circle({ radius: 0.4 });
@@ -4492,9 +4490,10 @@ let VertexView = class VertexView extends LabeledView {
         let x = this.control.location.x, y = this.control.location.y;
         this._circle.position.set([x, y]);
         this._dot.position.set([x * ds, -y * ds]);
+        this._dotSel.position.set([x * ds, -y * ds]);
     }
     renderSelection(selected) {
-        this._dot.set(selected ? Style.dotSelected : Style.dot);
+        this._dotSel.visible = selected;
     }
     renderDot() {
         let s = 4 * Math.sqrt(this.scale);
@@ -4667,12 +4666,20 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
             this.location.x = option.x;
             this.location.y = option.y;
             this.isNew = !!option.isNew;
+            this.selected = !!option.selected;
         }
         this.view = new VertexView(this);
         sheet.design.history.construct(this.toMemento());
     }
     get type() { return "Vertex"; }
     get tag() { return "v" + this.node.id; }
+    get shouldDispose() {
+        return super.shouldDispose || this.node.disposed;
+    }
+    onDispose() {
+        this.design.history.destruct(this.toMemento());
+        super.onDispose();
+    }
     get name() { return this.node.name; }
     set name(n) { this.node.name = n; }
     get degree() { return this.node.degree; }
@@ -4688,7 +4695,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         let v = [...this.design.vertices.values()];
         let node = this.node.addLeaf(length);
         let p = this.findClosestEmptyPoint(v);
-        this.design.options.set(node.tag, {
+        this.design.options.set("v" + node.id, {
             id: node.id,
             name: node.name,
             x: p.x,
@@ -4718,19 +4725,12 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         RemoveCommand.create(this.node);
     }
     deleteAndJoin() {
-        var _a;
         if (this.node.degree != 2)
             return;
         let edge = this.node.dispose();
-        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
-        this.design.edges.get(edge).selected = true;
-    }
-    get shouldDispose() {
-        return super.shouldDispose || this.node.disposed;
-    }
-    onDispose() {
-        this.design.history.destruct(this.toMemento());
-        super.onDispose();
+        let json = edge.toJSON();
+        json.selected = true;
+        this.design.options.set(edge.tag, json);
     }
     toMemento() {
         return [this.tag, this.toJSON()];
@@ -4756,6 +4756,7 @@ let BPStudio = class BPStudio {
         this.designMap = new Map();
         this.design = null;
         this._updating = false;
+        this._lastUpdate = performance.now();
         if (typeof paper != "object")
             throw new Error("BPStudio requires paper.js.");
         let el = document.querySelector(selector);
@@ -4766,6 +4767,7 @@ let BPStudio = class BPStudio {
         this.$paper = new paper.PaperScope();
         this.$display = new Display(this);
         this.system = new System(this);
+        this.update();
     }
     load(json) {
         if (typeof json == "string")
@@ -4833,7 +4835,12 @@ let BPStudio = class BPStudio {
     }
     get TreeMaker() { return TreeMaker; }
     get running() { return this._updating; }
-    async update() {
+    async update(time) {
+        time = time !== null && time !== void 0 ? time : performance.now();
+        if (time - this._lastUpdate < 50) {
+            requestAnimationFrame(this.update.bind(this));
+            return;
+        }
         if (this._updating)
             return;
         this._updating = true;
@@ -4847,6 +4854,8 @@ let BPStudio = class BPStudio {
             delete this.onUpdate;
         }
         this._updating = false;
+        this._lastUpdate = time;
+        requestAnimationFrame(this.update.bind(this));
     }
 };
 __decorate([
@@ -5056,11 +5065,14 @@ var CommandType;
 })(CommandType || (CommandType = {}));
 let Edge = class Edge extends ViewedControl {
     constructor(sheet, v1, v2, edge) {
+        var _a;
         super(sheet);
         this.v1 = v1;
         this.v2 = v2;
         this.edge = edge;
         this.view = new EdgeView(this);
+        if ((_a = sheet.design.options.get(edge)) === null || _a === void 0 ? void 0 : _a.selected)
+            this.selected = true;
     }
     get type() { return "Edge"; }
     get shouldDispose() {
@@ -5076,13 +5088,10 @@ let Edge = class Edge extends ViewedControl {
         this.edge.delete();
     }
     toVertex(action) {
-        var _a;
         let l1 = this.v1.location, l2 = this.v2.location;
         let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
         let node = action.apply(this.design.tree, [this.edge]);
-        this.design.options.set(node.tag, { id: node.id, name: node.name, x, y });
-        (_a = this.$studio) === null || _a === void 0 ? void 0 : _a.update();
-        this.design.vertices.get(node).selected = true;
+        this.design.options.set("v" + node.id, { id: node.id, name: node.name, x, y, selected: true });
     }
     get length() { return this.edge.length; }
     ;
@@ -5451,7 +5460,6 @@ let Display = class Display {
         this.project.view.autoUpdate = false;
         this.project.currentStyle.strokeColor = PaperUtil.Black();
         this.project.currentStyle.strokeScaling = false;
-        setInterval(() => this._studio.update(), 50);
         for (let l of Enum.values(Layer)) {
             this.project.addLayer(new paper.Layer({ name: Layer[l] }));
         }
@@ -6001,7 +6009,7 @@ let System = System_1 = class System {
                 this._select(nextCtrl);
         }
         this._ctrl = [nowCtrl, nextCtrl];
-        this._studio.update();
+        this.draggableSelections();
     }
     _processNextSelection() {
         let [nowCtrl, nextCtrl] = this._ctrl;
@@ -6013,7 +6021,7 @@ let System = System_1 = class System {
             if (nextCtrl)
                 this._select(nextCtrl);
         }
-        this._studio.update();
+        this.draggableSelections();
     }
     _select(c) {
         if (!c.selected && (this.selections.length == 0 || this.selections[0].selectableWith(c))) {
@@ -6144,7 +6152,7 @@ let System = System_1 = class System {
     _reselect(event) {
         this.$clearSelection();
         this._processSelection(event.point, false);
-        this._studio.update();
+        this.draggableSelections();
         for (let o of this._draggableSelections)
             o.dragStart(this._lastKnownCursorLocation);
         this._possiblyReselect = false;

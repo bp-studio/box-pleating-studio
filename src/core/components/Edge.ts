@@ -20,6 +20,7 @@
 		this.v2 = v2;
 		this.edge = edge;
 		this.view = new EdgeView(this);
+		if(sheet.design.options.get(edge)?.selected) this.selected = true;
 	}
 
 	protected get shouldDispose(): boolean {
@@ -42,9 +43,7 @@
 		let l1 = this.v1.location, l2 = this.v2.location;
 		let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
 		let node: TreeNode = action.apply(this.design.tree, [this.edge]);
-		this.design.options.set(node.tag, { id: node.id, name: node.name, x, y });
-		this.$studio?.update();
-		this.design.vertices.get(node)!.selected = true;
+		this.design.options.set("v" + node.id, { id: node.id, name: node.name, x, y, selected: true });
 	}
 
 	public get length() { return this.edge.length; };

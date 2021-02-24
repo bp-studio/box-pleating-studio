@@ -87,7 +87,6 @@ abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject 
 		let from = this.index, l = this._prototypes.length;
 		this.index = (this.index + by + l) % l; // 加上 l 是為了避免 JavaScript 在負數的部份餘數取成負的
 		this.onMove(this.index, from);
-		this.$studio?.update();
 	}
 
 	/** 當前 `Store` 的大小 */
