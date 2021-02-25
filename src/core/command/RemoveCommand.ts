@@ -1,6 +1,6 @@
 
 interface JRemoveCommand extends JCommand {
-	memento: JEdge;
+	memento: JTreeElement;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -13,19 +13,20 @@ interface JRemoveCommand extends JCommand {
 
 class RemoveCommand extends Command implements JRemoveCommand {
 
-	public static create(target: TreeNode) {
+	public static create(target: TreeElement) {
 		let command = new RemoveCommand(target.design, {
 			tag: target.tag,
-			memento: target.edges[0].toJSON()
+			memento: target.toJSON()
 		});
+		if(target instanceof TreeEdge) target.design.tree.edge.delete(target.n1, target.n2);
 		target.dispose(true);
 		target.design.history.queue(command);
 	}
 
 	public readonly type = CommandType.remove;
-	public readonly memento: JEdge;
+	public readonly memento: JTreeElement;
 
-	constructor(design: Design, json: Typeless<JAddCommand>) {
+	constructor(design: Design, json: Typeless<JRemoveCommand>) {
 		super(design, json);
 		this.memento = json.memento;
 	}
@@ -37,11 +38,23 @@ class RemoveCommand extends Command implements JRemoveCommand {
 	public addTo(command: Command) { }
 
 	public undo() {
-		this._design.tree.addEdge(this.memento.n1, this.memento.n2, this.memento.length);
+		let tree = this._design.tree;
+		if(this.tag.startsWith("n")) {
+			let m = this.memento as JNode;
+			tree.getOrAddNode(m.id).parentId = m.parentId;
+		} else {
+			let m = this.memento as JEdge;
+			let n1 = tree.getOrAddNode(m.n1), n2 = tree.getOrAddNode(m.n2);
+			tree.edge.set(n1, n2, new TreeEdge(n1, n2, m.length));
+		}
 	}
 
 	public redo() {
 		let target = this._design.query(this.tag)!;
-		if(target instanceof TreeNode) target.dispose();
+		if(target instanceof TreeNode) target.dispose(true);
+		if(target instanceof TreeEdge) {
+			this._design.tree.edge.delete(target.n1, target.n2);
+			target.dispose();
+		}
 	}
 }

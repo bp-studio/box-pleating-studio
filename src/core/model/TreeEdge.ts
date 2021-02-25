@@ -23,9 +23,11 @@ interface JEdge {
 	}
 
 	public toJSON(): JEdge {
+		let [n1, n2] = [this._n1, this._n2];
+		if(n1.parentId == n2.id) [n1, n2] = [n2, n1];
 		return {
-			n1: this._n1.id,
-			n2: this._n2.id,
+			n1: n1.id,
+			n2: n2.id,
 			length: this.length
 		};
 	}

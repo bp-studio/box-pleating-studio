@@ -106,7 +106,7 @@ interface JVertex extends IPoint {
 	}
 
 	public delete() {
-		RemoveCommand.create(this.node);
+		this.node.delete();
 	}
 
 	public deleteAndJoin() {

@@ -47,15 +47,16 @@ interface IDesignObject {
 		this.description = this.data.description;
 		this.mode = this.data.mode;
 
+		this.history = new HistoryManager(this, this.data.history);
+
+		// Tree 相依於 HistoryManager
 		this.tree = new Tree(this, this.data.tree.edges);
 
-		// 這個的初始化必須放在 Tree 的後面，不然會出錯
+		// Junctions 相依於 Tree
 		this.junctions = new DoubleMapping<Flap, Junction>(
 			() => this.flaps.values(),
 			(f1, f2) => new Junction(this.LayoutSheet, f1, f2)
 		);
-
-		this.history = new HistoryManager(this, this.data.history);
 	}
 
 	@shrewd public get sheet(): Sheet {
@@ -100,7 +101,7 @@ interface IDesignObject {
 		while(this.vertices.size > 3) {
 			let v = arr.find(v => v.node.degree == 1);
 			if(!v) break;
-			RemoveCommand.create(v.node);
+			v.node.delete();
 			arr.splice(arr.indexOf(v), 1);
 		}
 	}
@@ -108,7 +109,7 @@ interface IDesignObject {
 	public deleteFlaps(flaps: readonly Flap[]) {
 		for(let f of flaps) {
 			if(this.vertices.size == 3) break;
-			RemoveCommand.create(f.node);
+			f.node.delete();
 		}
 	}
 

@@ -1,5 +1,10 @@
 
-@shrewd class TreeNode extends Disposable implements ITagObject {
+interface JNode {
+	id: number;
+	parentId?: number;
+}
+
+@shrewd class TreeNode extends Disposable implements ITagObject, ISerializable<JNode> {
 
 	public static setJID(n: TreeNode, id: number) {
 		n._jid = id;
@@ -26,13 +31,18 @@
 		this._id = id;
 	}
 
-	@shrewd({
-		renderer(this: TreeNode, n: TreeNode | null) {
-			// 如果原本的父點被刪除，那自己就成為新的 root
-			return n && n.disposed ? null : n;
-		}
-	})
-	public parent: TreeNode | null = null;
+	public delete() {
+		let e = this.edges[0];
+		RemoveCommand.create(e);
+		if(this.parentId === undefined) e.n(this).parentId = undefined;
+		RemoveCommand.create(this);
+	}
+
+	@action public parentId?: number;
+
+	@shrewd public get parent(): TreeNode | null {
+		return this.parentId !== undefined ? this.tree.node.get(this.parentId)! : null;
+	}
 
 	@shrewd public get parentEdge(): TreeEdge | null {
 		if(!this.parent) return null
@@ -74,7 +84,8 @@
 	@shrewd public get edges(): ReadonlyArray<TreeEdge> {
 		this.disposeEvent();
 		let e = this.tree.edge.get(this);
-		return e ? Array.from(e.values()) : [];
+		let result = e ? Array.from(e.values()) : [];
+		return result;
 	}
 
 	@shrewd public get degree() {
@@ -87,5 +98,12 @@
 
 	@shrewd public get radius() {
 		return this.leafEdge?.length ?? NaN;
+	}
+
+	public toJSON() {
+		return {
+			id: this.id,
+			parentId: this.parentId
+		};
 	}
 }

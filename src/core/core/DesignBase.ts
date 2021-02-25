@@ -53,18 +53,15 @@ abstract class DesignBase extends Mountable {
 
 	/**
 	 * 把 `this.edges.toJSON()` 產出的 `JEdge[]` 做一個排序，
-	 * 使得從第一條邊開始逐一加入邊都能維持連通性。
-	 *
-	 * 雖然現在載入資料的程式也已經做了防呆，但總之還是把這個做上去。
+	 * 使得從第一條邊開始逐一加入邊都能維持連通性，且 parent 的方向正確。
 	 */
 	protected sortJEdge(): JEdge[] {
 		let edges = this.edges.toJSON();
-		if(edges.length == 0) return [];
 		let nodes = new Set<number>();
 		let result: JEdge[] = [];
 		while(edges.length) {
 			let e = edges.shift()!;
-			if(nodes.size == 0 || nodes.has(e.n1) || nodes.has(e.n2)) {
+			if(nodes.size == 0 || nodes.has(e.n1)) {
 				result.push(e);
 				nodes.add(e.n1);
 				nodes.add(e.n2);

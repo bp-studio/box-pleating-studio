@@ -1808,6 +1808,7 @@ class AddCommand extends Command {
             memento: target.toJSON()
         });
         target.design.history.queue(command);
+        return target;
     }
     canAddTo(command) {
         return false;
@@ -1816,10 +1817,20 @@ class AddCommand extends Command {
     undo() {
         let target = this._design.query(this.tag);
         if (target instanceof TreeEdge)
-            target.delete();
+            target.design.tree.edge.delete(target.n1, target.n2);
+        target.dispose(true);
     }
     redo() {
-        this._design.tree.addEdge(this.memento.n1, this.memento.n2, this.memento.length);
+        let tree = this._design.tree;
+        if (this.tag.startsWith('e')) {
+            let m = this.memento;
+            let n1 = tree.getOrAddNode(m.n1), n2 = tree.getOrAddNode(m.n2);
+            tree.edge.set(n1, n2, new TreeEdge(n1, n2, m.length));
+        }
+        else {
+            let m = this.memento;
+            tree.getOrAddNode(m.id);
+        }
     }
 }
 class RemoveCommand extends Command {
@@ -1831,8 +1842,10 @@ class RemoveCommand extends Command {
     static create(target) {
         let command = new RemoveCommand(target.design, {
             tag: target.tag,
-            memento: target.edges[0].toJSON()
+            memento: target.toJSON()
         });
+        if (target instanceof TreeEdge)
+            target.design.tree.edge.delete(target.n1, target.n2);
         target.dispose(true);
         target.design.history.queue(command);
     }
@@ -1841,12 +1854,25 @@ class RemoveCommand extends Command {
     }
     addTo(command) { }
     undo() {
-        this._design.tree.addEdge(this.memento.n1, this.memento.n2, this.memento.length);
+        let tree = this._design.tree;
+        if (this.tag.startsWith("n")) {
+            let m = this.memento;
+            tree.getOrAddNode(m.id).parentId = m.parentId;
+        }
+        else {
+            let m = this.memento;
+            let n1 = tree.getOrAddNode(m.n1), n2 = tree.getOrAddNode(m.n2);
+            tree.edge.set(n1, n2, new TreeEdge(n1, n2, m.length));
+        }
     }
     redo() {
         let target = this._design.query(this.tag);
         if (target instanceof TreeNode)
+            target.dispose(true);
+        if (target instanceof TreeEdge) {
+            this._design.tree.edge.delete(target.n1, target.n2);
             target.dispose();
+        }
     }
 }
 let Mapping = class Mapping extends BaseMapping {
@@ -1974,7 +2000,7 @@ let Tree = class Tree extends Disposable {
         if (this.node.has(n))
             N = this.node.get(n);
         else {
-            this.node.set(n, N = new TreeNode(this, n));
+            this.node.set(n, AddCommand.create(N = new TreeNode(this, n)));
             if (n >= this.nextId)
                 this.nextId = n + 1;
         }
@@ -1985,38 +2011,38 @@ let Tree = class Tree extends Disposable {
         let { n1, n2 } = e;
         if (n1.parent == n2)
             [n1, n2] = [n2, n1];
-        N.parent = n1;
-        n2.parent = N;
-        this.edge.delete(n1, n2);
-        this.edge.set(N, n1, new TreeEdge(N, n1, Math.ceil(e.length / 2)));
-        this.edge.set(N, n2, new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
-        e.dispose();
+        N.parentId = n1.id;
+        n2.parentId = N.id;
+        this.edge.set(N, n1, AddCommand.create(new TreeEdge(N, n1, Math.ceil(e.length / 2))));
+        this.edge.set(N, n2, AddCommand.create(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1))));
+        RemoveCommand.create(e);
         return N;
     }
     deleteAndMerge(e) {
+        var _a;
         let N = this.getOrAddNode(this.nextId);
         let { n1, n2, a1, a2 } = e;
         if (n1.parent == n2) {
             [n1, n2] = [n2, n1];
             [a1, a2] = [a2, a1];
         }
-        N.parent = n1.parent;
-        this.edge.delete(n1, n2);
+        N.parentId = (_a = n1.parent) === null || _a === void 0 ? void 0 : _a.id;
+        RemoveCommand.create(e);
         for (let edge of a1) {
             let n = edge.n(n1);
             if (n != N.parent)
-                n.parent = N;
-            this.edge.delete(n, n1);
-            this.edge.set(N, n, new TreeEdge(N, n, edge.length));
+                n.parentId = N.id;
+            RemoveCommand.create(edge);
+            this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
         }
         for (let edge of a2) {
             let n = edge.n(n2);
-            n.parent = N;
-            this.edge.delete(n, n2);
-            this.edge.set(N, n, new TreeEdge(N, n, edge.length));
+            n.parentId = N.id;
+            RemoveCommand.create(edge);
+            this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
         }
-        n1.dispose(true);
-        n2.dispose(true);
+        RemoveCommand.create(n1);
+        RemoveCommand.create(n2);
         return N;
     }
     deleteAndJoin(n) {
@@ -2029,16 +2055,17 @@ let Tree = class Tree extends Disposable {
         let n1 = e1.n(n), n2 = e2.n(n);
         if (n.parent == n2)
             [n1, n2] = [n2, n1];
-        n2.parent = n1;
+        n2.parentId = n1.id;
         let edge = new TreeEdge(n1, n2, e1.length + e2.length);
-        this.edge.set(n1, n2, edge);
-        n.dispose(true);
+        this.edge.set(n1, n2, AddCommand.create(edge));
+        RemoveCommand.create(e1);
+        RemoveCommand.create(e2);
+        RemoveCommand.create(n);
         return edge;
     }
     addLeafAt(n, length) {
         let id = this.nextId;
-        let edge = this.addEdge(n, id, length);
-        AddCommand.create(edge);
+        this.addEdge(n, id, length);
         return this.node.get(id);
     }
     addEdge(n1, n2, length) {
@@ -2057,14 +2084,12 @@ let Tree = class Tree extends Disposable {
             return null;
         }
         if (has1)
-            N2.parent = N1;
+            N2.parentId = n1;
         else if (has2)
-            N1.parent = N2;
-        else if (n1 < n2)
-            N2.parent = N1;
+            N1.parentId = n2;
         else
-            N1.parent = N2;
-        let edge = new TreeEdge(N1, N2, length);
+            N2.parentId = n1;
+        let edge = AddCommand.create(new TreeEdge(N1, N2, length));
         this.edge.set(N1, N2, edge);
         return edge;
     }
@@ -2372,13 +2397,11 @@ class DesignBase extends Mountable {
     }
     sortJEdge() {
         let edges = this.edges.toJSON();
-        if (edges.length == 0)
-            return [];
         let nodes = new Set();
         let result = [];
         while (edges.length) {
             let e = edges.shift();
-            if (nodes.size == 0 || nodes.has(e.n1) || nodes.has(e.n2)) {
+            if (nodes.size == 0 || nodes.has(e.n1)) {
                 result.push(e);
                 nodes.add(e.n1);
                 nodes.add(e.n2);
@@ -2732,7 +2755,6 @@ let TreeNode = class TreeNode extends Disposable {
     constructor(tree, id) {
         super(tree);
         this.name = "";
-        this.parent = null;
         this.tree = tree;
         this._id = id;
     }
@@ -2742,6 +2764,16 @@ let TreeNode = class TreeNode extends Disposable {
     get tag() { return "n" + this.id; }
     get id() {
         return this.tree.jid ? this._jid : this._id;
+    }
+    delete() {
+        let e = this.edges[0];
+        RemoveCommand.create(e);
+        if (this.parentId === undefined)
+            e.n(this).parentId = undefined;
+        RemoveCommand.create(this);
+    }
+    get parent() {
+        return this.parentId !== undefined ? this.tree.node.get(this.parentId) : null;
     }
     get parentEdge() {
         var _a;
@@ -2779,7 +2811,8 @@ let TreeNode = class TreeNode extends Disposable {
     get edges() {
         this.disposeEvent();
         let e = this.tree.edge.get(this);
-        return e ? Array.from(e.values()) : [];
+        let result = e ? Array.from(e.values()) : [];
+        return result;
     }
     get degree() {
         return this.edges.length;
@@ -2791,17 +2824,22 @@ let TreeNode = class TreeNode extends Disposable {
         var _a, _b;
         return (_b = (_a = this.leafEdge) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : NaN;
     }
+    toJSON() {
+        return {
+            id: this.id,
+            parentId: this.parentId
+        };
+    }
 };
 __decorate([
     action
 ], TreeNode.prototype, "name", void 0);
 __decorate([
-    shrewd({
-        renderer(n) {
-            return n && n.disposed ? null : n;
-        }
-    })
-], TreeNode.prototype, "parent", void 0);
+    action
+], TreeNode.prototype, "parentId", void 0);
+__decorate([
+    shrewd
+], TreeNode.prototype, "parent", null);
 __decorate([
     shrewd
 ], TreeNode.prototype, "parentEdge", null);
@@ -2835,9 +2873,12 @@ let TreeEdge = class TreeEdge extends Disposable {
     }
     get tag() { return "e" + this._n1.id + "," + this._n2.id; }
     toJSON() {
+        let [n1, n2] = [this._n1, this._n2];
+        if (n1.parentId == n2.id)
+            [n1, n2] = [n2, n1];
         return {
-            n1: this._n1.id,
-            n2: this._n2.id,
+            n1: n1.id,
+            n2: n2.id,
             length: this.length
         };
     }
@@ -3082,9 +3123,9 @@ let Design = class Design extends DesignBase {
         ;
         this.description = this.data.description;
         this.mode = this.data.mode;
+        this.history = new HistoryManager(this, this.data.history);
         this.tree = new Tree(this, this.data.tree.edges);
         this.junctions = new DoubleMapping(() => this.flaps.values(), (f1, f2) => new Junction(this.LayoutSheet, f1, f2));
-        this.history = new HistoryManager(this, this.data.history);
     }
     get sheet() {
         return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
@@ -3126,7 +3167,7 @@ let Design = class Design extends DesignBase {
             let v = arr.find(v => v.node.degree == 1);
             if (!v)
                 break;
-            RemoveCommand.create(v.node);
+            v.node.delete();
             arr.splice(arr.indexOf(v), 1);
         }
     }
@@ -3134,7 +3175,7 @@ let Design = class Design extends DesignBase {
         for (let f of flaps) {
             if (this.vertices.size == 3)
                 break;
-            RemoveCommand.create(f.node);
+            f.node.delete();
         }
     }
     clearCPSelection() {
@@ -4092,8 +4133,7 @@ let RiverView = class RiverView extends ControlView {
         return this.control.sheet.view.contains(point) && this._shade.contains(point);
     }
     get info() {
-        if (this.disposed)
-            return { inner: [], length: 0, components: [] };
+        this.disposeEvent();
         let edge = this.control.edge;
         let adjacent;
         let components;
@@ -4722,7 +4762,7 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         return arr[0][0];
     }
     delete() {
-        RemoveCommand.create(this.node);
+        this.node.delete();
     }
     deleteAndJoin() {
         if (this.node.degree != 2)
@@ -4779,13 +4819,13 @@ let BPStudio = class BPStudio {
             version: Migration.current,
             tree: {
                 nodes: [
-                    { id: 0, name: "", x: 10, y: 7 },
-                    { id: 1, name: "", x: 10, y: 10 },
-                    { id: 2, name: "", x: 10, y: 13 }
+                    { id: 0, name: "", x: 10, y: 10 },
+                    { id: 1, name: "", x: 10, y: 13 },
+                    { id: 2, name: "", x: 10, y: 7 }
                 ],
                 edges: [
                     { n1: 0, n2: 1, length: 1 },
-                    { n1: 2, n2: 1, length: 1 }
+                    { n1: 0, n2: 2, length: 1 }
                 ]
             }
         });

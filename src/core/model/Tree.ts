@@ -104,11 +104,11 @@
 		return this.edge.get(n1, n2);
 	}
 
-	private getOrAddNode(n: number) {
+	public getOrAddNode(n: number) {
 		let N: TreeNode;
 		if(this.node.has(n)) N = this.node.get(n)!;
 		else {
-			this.node.set(n, N = new TreeNode(this, n));
+			this.node.set(n, AddCommand.create(N = new TreeNode(this, n)));
 			if(n >= this.nextId) this.nextId = n + 1;
 		}
 		return N;
@@ -118,12 +118,11 @@
 		let N = this.getOrAddNode(this.nextId);
 		let { n1, n2 } = e;
 		if(n1.parent == n2) [n1, n2] = [n2, n1];
-		N.parent = n1;
-		n2.parent = N;
-		this.edge.delete(n1, n2);
-		this.edge.set(N, n1, new TreeEdge(N, n1, Math.ceil(e.length / 2)));
-		this.edge.set(N, n2, new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
-		e.dispose();
+		N.parentId = n1.id;
+		n2.parentId = N.id;
+		this.edge.set(N, n1, AddCommand.create(new TreeEdge(N, n1, Math.ceil(e.length / 2))));
+		this.edge.set(N, n2, AddCommand.create(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1))));
+		RemoveCommand.create(e);
 		return N;
 	}
 
@@ -135,22 +134,23 @@
 			[a1, a2] = [a2, a1];
 		}
 
-		N.parent = n1.parent;
-		this.edge.delete(n1, n2);
+		N.parentId = n1.parent?.id;
+		RemoveCommand.create(e);
+
 		for(let edge of a1) {
 			let n = edge.n(n1);
-			if(n != N.parent) n.parent = N;
-			this.edge.delete(n, n1);
-			this.edge.set(N, n, new TreeEdge(N, n, edge.length));
+			if(n != N.parent) n.parentId = N.id;
+			RemoveCommand.create(edge);
+			this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
-			n.parent = N;
-			this.edge.delete(n, n2);
-			this.edge.set(N, n, new TreeEdge(N, n, edge.length));
+			n.parentId = N.id;
+			RemoveCommand.create(edge)
+			this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
 		}
-		n1.dispose(true);
-		n2.dispose(true);
+		RemoveCommand.create(n1);
+		RemoveCommand.create(n2);
 		return N;
 	}
 
@@ -163,17 +163,19 @@
 		let e1 = edges[0], e2 = edges[1];
 		let n1 = e1.n(n), n2 = e2.n(n);
 		if(n.parent == n2) [n1, n2] = [n2, n1];
-		n2.parent = n1;
+
+		n2.parentId = n1.id;
 		let edge = new TreeEdge(n1, n2, e1.length + e2.length);
-		this.edge.set(n1, n2, edge);
-		n.dispose(true);
+		this.edge.set(n1, n2, AddCommand.create(edge));
+		RemoveCommand.create(e1);
+		RemoveCommand.create(e2);
+		RemoveCommand.create(n);
 		return edge;
 	}
 
 	public addLeafAt(n: number, length: number): TreeNode {
 		let id = this.nextId;
-		let edge = this.addEdge(n, id, length)!;
-		AddCommand.create(edge);
+		this.addEdge(n, id, length)!;
 		return this.node.get(id)!;
 	}
 
@@ -196,12 +198,11 @@
 			return null;
 		}
 
-		if(has1) N2.parent = N1;
-		else if(has2) N1.parent = N2;
-		else if(n1 < n2) N2.parent = N1;
-		else N1.parent = N2;
+		if(has1) N2.parentId = n1;
+		else if(has2) N1.parentId = n2;
+		else N2.parentId = n1;
 
-		let edge = new TreeEdge(N1, N2, length);
+		let edge = AddCommand.create(new TreeEdge(N1, N2, length));
 		this.edge.set(N1, N2, edge);
 		return edge;
 	}

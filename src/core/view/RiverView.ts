@@ -24,8 +24,7 @@
 
 	/** 跟當前的河有關的基本資訊；這些除非樹的結構有改變，不然不用重新計算 */
 	@shrewd public get info(): RiverInfo {
-		if(this.disposed) return { inner: [], length: 0, components: [] };
-
+		this.disposeEvent();
 		let edge = this.control.edge;
 		let adjacent: readonly TreeEdge[];
 		let components: readonly string[];
