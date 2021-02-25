@@ -13,7 +13,7 @@ type GDevice = JDevice<Gadget>;
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Device extends Draggable implements ISerializable<JDevice>, ITagObject {
+@shrewd class Device extends Draggable implements ISerializable<JDevice> {
 
 	public get type() { return "Device"; }
 	public get tag() { return this.pattern.tag + "." + this.pattern.devices.indexOf(this); }

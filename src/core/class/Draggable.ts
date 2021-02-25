@@ -7,7 +7,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Draggable extends ViewedControl implements ITagObject {
+abstract class Draggable extends ViewedControl {
 
 	public abstract get tag(): string;
 

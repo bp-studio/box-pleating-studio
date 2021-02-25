@@ -1,15 +1,18 @@
 
-interface JStep {
-	commands: readonly JCommand[];
+interface JStep<T extends JCommand = JCommand> {
+	commands: readonly T[];
 	construct?: any[];
 	destruct?: any[];
+	mode: string;
+	before: string[];
+	after: string[];
 }
 
 class Step implements ISerializable<JStep> {
 
 	public static restore(design: Design, json: JStep): Step {
-		let commands = json.commands.map(c => Command.restore(design, c));
-		return new Step(commands, json.construct ?? [], json.destruct ?? []);
+		json.commands = json.commands.map(c => Command.restore(design, c));
+		return new Step(json as JStep<Command>);
 	}
 
 	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
@@ -19,17 +22,23 @@ class Step implements ISerializable<JStep> {
 		return arr.map(c => c.signature).join(";");
 	}
 
-	constructor(commands: readonly Command[], construct: any[], destruct: any[]) {
-		this.commands = commands;
-		this.signature = Step.signature(commands);
-		this.construct = construct;
-		this.destruct = destruct;
+	constructor(json: JStep<Command>) {
+		this.commands = json.commands;
+		this.signature = Step.signature(json.commands);
+		this.construct = json.construct ?? [];
+		this.destruct = json.destruct ?? [];
+		this.before = json.before;
+		this.after = json.after;
+		this.mode = json.mode;
 		this.reset();
 	}
 
 	public readonly commands: readonly Command[];
 	public readonly construct: Memento[];
 	public readonly destruct: Memento[];
+	public readonly mode: string;
+	public readonly before: string[];
+	public readonly after: string[];
 
 	@nonEnumerable public readonly signature: string;
 
@@ -69,12 +78,16 @@ class Step implements ISerializable<JStep> {
 		// undo 的時候以相反順序執行
 		for(let i = this.commands.length - 1; i >= 0; i--) this.commands[i].undo();
 		for(let memento of this.destruct) design.options.set(...memento);
+		design.mode = this.mode;
+		design.restoreSelection(this.before);
 		this._fixed = true;
 	}
 
 	public redo(design: Design) {
 		for(let c of this.commands) c.redo();
 		for(let memento of this.construct) design.options.set(...memento);
+		design.mode = this.mode;
+		design.restoreSelection(this.after);
 		this._fixed = true;
 	}
 

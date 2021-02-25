@@ -8,7 +8,7 @@
 @shrewd class Edge extends ViewedControl implements ISerializable<JEdge> {
 
 	public get type() { return "Edge"; }
-
+	public get tag() { return "e" + this.edge.tag; }
 	public readonly v1: Vertex;
 	public readonly v2: Vertex;
 	public readonly edge: TreeEdge;

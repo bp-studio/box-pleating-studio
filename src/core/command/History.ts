@@ -21,6 +21,9 @@ interface JHistory {
 	private _construct: Memento[] = [];
 	private _destruct: Memento[] = [];
 
+	/** 最後已知的選取 `Control` 的 tag */
+	private _selection: string[] = [];
+
 	/** 是否正在移動歷史 */
 	private _moving: boolean = true;
 
@@ -64,16 +67,25 @@ interface JHistory {
 		this._destruct.push(memento);
 	}
 
-	public flush(): void {
+	public flush(selection: Control[]): void {
+		let sel = selection.map(c => c.tag);
 		if(this._queue.length) {
 			let s = this.lastStep;
 			if(!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
-				this.addStep(new Step(this._queue, this._construct, this._destruct));
+				this.addStep(new Step({
+					commands: this._queue,
+					construct: this._construct,
+					destruct: this._destruct,
+					mode: this.design.mode,
+					before: this._selection,
+					after: sel
+				}));
 			}
 			this._queue = [];
 			this._construct = [];
 			this._destruct = [];
 		}
+		this._selection = sel;
 		this._moving = false;
 	}
 

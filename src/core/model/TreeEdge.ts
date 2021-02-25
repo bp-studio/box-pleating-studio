@@ -22,6 +22,11 @@ interface JEdge {
 		this.length = length;
 	}
 
+	public dispose(force: boolean = false) {
+		if(force) this.design.tree.edge.delete(this._n1, this._n2);
+		super.dispose();
+	}
+
 	public toJSON(): JEdge {
 		let [n1, n2] = [this._n1, this._n2];
 		if(n1.parentId == n2.id) [n1, n2] = [n2, n1];
@@ -32,6 +37,7 @@ interface JEdge {
 		};
 	}
 
+	public get tree() { return this.n1.tree; }
 	public get design() { return this.n1.design; }
 
 	protected get shouldDispose(): boolean {

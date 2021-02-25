@@ -108,7 +108,7 @@
 		let N: TreeNode;
 		if(this.node.has(n)) N = this.node.get(n)!;
 		else {
-			this.node.set(n, AddCommand.create(N = new TreeNode(this, n)));
+			EditCommand.add(N = new TreeNode(this, n));
 			if(n >= this.nextId) this.nextId = n + 1;
 		}
 		return N;
@@ -120,9 +120,9 @@
 		if(n1.parent == n2) [n1, n2] = [n2, n1];
 		N.parentId = n1.id;
 		n2.parentId = N.id;
-		this.edge.set(N, n1, AddCommand.create(new TreeEdge(N, n1, Math.ceil(e.length / 2))));
-		this.edge.set(N, n2, AddCommand.create(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1))));
-		RemoveCommand.create(e);
+		EditCommand.add(new TreeEdge(N, n1, Math.ceil(e.length / 2)));
+		EditCommand.add(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
+		EditCommand.remove(e);
 		return N;
 	}
 
@@ -135,22 +135,22 @@
 		}
 
 		N.parentId = n1.parent?.id;
-		RemoveCommand.create(e);
+		EditCommand.remove(e);
 
 		for(let edge of a1) {
 			let n = edge.n(n1);
 			if(n != N.parent) n.parentId = N.id;
-			RemoveCommand.create(edge);
-			this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
+			EditCommand.remove(edge);
+			EditCommand.add(new TreeEdge(N, n, edge.length));
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
 			n.parentId = N.id;
-			RemoveCommand.create(edge)
-			this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
+			EditCommand.remove(edge)
+			EditCommand.add(new TreeEdge(N, n, edge.length));
 		}
-		RemoveCommand.create(n1);
-		RemoveCommand.create(n2);
+		EditCommand.remove(n1);
+		EditCommand.remove(n2);
 		return N;
 	}
 
@@ -165,11 +165,10 @@
 		if(n.parent == n2) [n1, n2] = [n2, n1];
 
 		n2.parentId = n1.id;
-		let edge = new TreeEdge(n1, n2, e1.length + e2.length);
-		this.edge.set(n1, n2, AddCommand.create(edge));
-		RemoveCommand.create(e1);
-		RemoveCommand.create(e2);
-		RemoveCommand.create(n);
+		let edge = EditCommand.add(new TreeEdge(n1, n2, e1.length + e2.length));
+		EditCommand.remove(e1);
+		EditCommand.remove(e2);
+		EditCommand.remove(n);
 		return edge;
 	}
 
@@ -202,9 +201,7 @@
 		else if(has2) N1.parentId = n2;
 		else N2.parentId = n1;
 
-		let edge = AddCommand.create(new TreeEdge(N1, N2, length));
-		this.edge.set(N1, N2, edge);
-		return edge;
+		return EditCommand.add(new TreeEdge(N1, N2, length));
 	}
 
 	/** 傳入樹中的三個點，傳回三個點分別到「路口」的距離。 */

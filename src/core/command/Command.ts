@@ -23,8 +23,9 @@ abstract class Command implements JCommand {
 	public static restore(design: Design, c: JCommand): Command {
 		if(c.type == CommandType.field) return new FieldCommand(design, c as JFieldCommand);
 		if(c.type == CommandType.move) return new MoveCommand(design, c as JMoveCommand);
-		if(c.type == CommandType.add) return new AddCommand(design, c as JAddCommand);
-		if(c.type == CommandType.remove) return new RemoveCommand(design, c as JRemoveCommand);
+		if(c.type == CommandType.add || c.type == CommandType.remove) {
+			return new EditCommand(design, c as JEditCommand);
+		}
 		throw new Error();
 	}
 

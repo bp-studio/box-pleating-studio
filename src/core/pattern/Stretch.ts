@@ -16,7 +16,7 @@ interface JStretch {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Stretch extends Control implements ISerializable<JStretch>, ITagObject {
+@shrewd class Stretch extends Control implements ISerializable<JStretch> {
 
 	public get type() { return "Stretch"; }
 	public get tag() { return "s" + this.signature; }

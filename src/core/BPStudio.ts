@@ -19,8 +19,7 @@
 /// <reference path="helper/QuadrantHelper.ts" />
 /// <reference path="command/FieldCommand.ts" />
 /// <reference path="command/MoveCommand.ts" />
-/// <reference path="command/AddCommand.ts" />
-/// <reference path="command/RemoveCommand.ts" />
+/// <reference path="command/EditCommand.ts" />
 
 // Level 2
 /// <reference path="mapping/Mapping.ts" />
@@ -195,7 +194,7 @@
 		await PaperWorker.done();
 		this.$display.project.view.update();
 
-		if(this.design) this.design.history.flush();
+		if(this.design) this.design.history.flush(this.system.selections);
 
 		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 

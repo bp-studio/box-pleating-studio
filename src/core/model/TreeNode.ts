@@ -33,9 +33,9 @@ interface JNode {
 
 	public delete() {
 		let e = this.edges[0];
-		RemoveCommand.create(e);
+		EditCommand.remove(e);
 		if(this.parentId === undefined) e.n(this).parentId = undefined;
-		RemoveCommand.create(this);
+		EditCommand.remove(this);
 	}
 
 	@action public parentId?: number;
@@ -66,7 +66,7 @@ interface JNode {
 	/**
 	 * @param force 是否要無視頂點度數限制、強制棄置
 	 */
-	public dispose(force = false) {
+	public dispose(force: boolean = false) {
 		if(force || this.degree == 1) super.dispose();
 		else if(this.degree == 2) return this.tree.deleteAndJoin(this);
 		else if(this.degree != 1) console.warn(`Node [${this.name ? this.name : this.id}] is not a leaf.`);

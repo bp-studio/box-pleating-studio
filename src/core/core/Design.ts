@@ -113,7 +113,7 @@ interface IDesignObject {
 		}
 	}
 
-	public clearCPSelection() {
+	public clearLayoutSelection() {
 		for(let c of this.LayoutSheet.controls) c.selected = false;
 	}
 
@@ -131,7 +131,7 @@ interface IDesignObject {
 	}
 
 	public vertexToFlap(vertices: Vertex[]) {
-		this.clearCPSelection();
+		this.clearLayoutSelection();
 		for(let v of vertices) {
 			let f = this.flaps.get(v.node)
 			if(f) f.selected = true;
@@ -147,7 +147,7 @@ interface IDesignObject {
 	}
 
 	public edgeToRiver(edge: Edge) {
-		this.clearCPSelection();
+		this.clearLayoutSelection();
 		let te = edge.edge;
 		if(te.isRiver) {
 			let r = this.rivers.get(te);
@@ -178,7 +178,13 @@ interface IDesignObject {
 			if(init == "r") return this.stretches.get(id)!.repository?.query(then);
 
 			let t = this.tree;
-			if(init == "e") return t.find(id);
+			if(init == "e" || init == "re" || init == "ee") {
+				let edge = t.find(id);
+				if(!edge) return undefined;
+				if(init == "e") return edge;
+				if(init == "re") return this.rivers.get(edge);
+				if(init == "ee") return this.edges.get(edge);
+			}
 
 			let n = t.node.get(Number(id))!;
 			if(init == "n") return n;
@@ -186,5 +192,14 @@ interface IDesignObject {
 			if(init == "v") return this.vertices.get(n);
 		}
 		return undefined;
+	}
+
+	public restoreSelection(tags: string[]) {
+		if(this.mode == "Layout") this.clearLayoutSelection();
+		else this.clearTreeSelection();
+		for(let tag of tags) {
+			let obj = this.query(tag);
+			if(obj instanceof Control) obj.selected = true;
+		}
 	}
 }

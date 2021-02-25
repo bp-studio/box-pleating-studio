@@ -978,10 +978,9 @@ class Command {
             return new FieldCommand(design, c);
         if (c.type == CommandType.move)
             return new MoveCommand(design, c);
-        if (c.type == CommandType.add)
-            return new AddCommand(design, c);
-        if (c.type == CommandType.remove)
-            return new RemoveCommand(design, c);
+        if (c.type == CommandType.add || c.type == CommandType.remove) {
+            return new EditCommand(design, c);
+        }
         throw new Error();
     }
     get signature() { return this.type + ":" + this.tag; }
@@ -1796,31 +1795,44 @@ class MoveCommand extends Command {
         MoveCommand.assign(target['location'], this.new);
     }
 }
-class AddCommand extends Command {
+class EditCommand extends Command {
     constructor(design, json) {
         super(design, json);
-        this.type = CommandType.add;
+        this.type = json.type;
         this.memento = json.memento;
     }
-    static create(target) {
-        let command = new AddCommand(target.design, {
+    static add(target) {
+        let command = new EditCommand(target.design, {
+            type: CommandType.add,
             tag: target.tag,
             memento: target.toJSON()
         });
+        if (target instanceof TreeNode) {
+            target.tree.node.set(target.id, target);
+        }
+        else {
+            target.tree.edge.set(target.n1, target.n2, target);
+        }
         target.design.history.queue(command);
         return target;
+    }
+    static remove(target) {
+        let command = new EditCommand(target.design, {
+            type: CommandType.remove,
+            tag: target.tag,
+            memento: target.toJSON()
+        });
+        target.dispose(true);
+        target.design.history.queue(command);
     }
     canAddTo(command) {
         return false;
     }
     addTo(command) { }
-    undo() {
-        let target = this._design.query(this.tag);
-        if (target instanceof TreeEdge)
-            target.design.tree.edge.delete(target.n1, target.n2);
-        target.dispose(true);
+    _remove() {
+        this._design.query(this.tag).dispose(true);
     }
-    redo() {
+    _add() {
         let tree = this._design.tree;
         if (this.tag.startsWith('e')) {
             let m = this.memento;
@@ -1829,50 +1841,14 @@ class AddCommand extends Command {
         }
         else {
             let m = this.memento;
-            tree.getOrAddNode(m.id);
-        }
-    }
-}
-class RemoveCommand extends Command {
-    constructor(design, json) {
-        super(design, json);
-        this.type = CommandType.remove;
-        this.memento = json.memento;
-    }
-    static create(target) {
-        let command = new RemoveCommand(target.design, {
-            tag: target.tag,
-            memento: target.toJSON()
-        });
-        if (target instanceof TreeEdge)
-            target.design.tree.edge.delete(target.n1, target.n2);
-        target.dispose(true);
-        target.design.history.queue(command);
-    }
-    canAddTo(command) {
-        return false;
-    }
-    addTo(command) { }
-    undo() {
-        let tree = this._design.tree;
-        if (this.tag.startsWith("n")) {
-            let m = this.memento;
             tree.getOrAddNode(m.id).parentId = m.parentId;
         }
-        else {
-            let m = this.memento;
-            let n1 = tree.getOrAddNode(m.n1), n2 = tree.getOrAddNode(m.n2);
-            tree.edge.set(n1, n2, new TreeEdge(n1, n2, m.length));
-        }
+    }
+    undo() {
+        this.type == CommandType.add ? this._remove() : this._add();
     }
     redo() {
-        let target = this._design.query(this.tag);
-        if (target instanceof TreeNode)
-            target.dispose(true);
-        if (target instanceof TreeEdge) {
-            this._design.tree.edge.delete(target.n1, target.n2);
-            target.dispose();
-        }
+        this.type == CommandType.add ? this._add() : this._remove();
     }
 }
 let Mapping = class Mapping extends BaseMapping {
@@ -2000,7 +1976,7 @@ let Tree = class Tree extends Disposable {
         if (this.node.has(n))
             N = this.node.get(n);
         else {
-            this.node.set(n, AddCommand.create(N = new TreeNode(this, n)));
+            EditCommand.add(N = new TreeNode(this, n));
             if (n >= this.nextId)
                 this.nextId = n + 1;
         }
@@ -2013,9 +1989,9 @@ let Tree = class Tree extends Disposable {
             [n1, n2] = [n2, n1];
         N.parentId = n1.id;
         n2.parentId = N.id;
-        this.edge.set(N, n1, AddCommand.create(new TreeEdge(N, n1, Math.ceil(e.length / 2))));
-        this.edge.set(N, n2, AddCommand.create(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1))));
-        RemoveCommand.create(e);
+        EditCommand.add(new TreeEdge(N, n1, Math.ceil(e.length / 2)));
+        EditCommand.add(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
+        EditCommand.remove(e);
         return N;
     }
     deleteAndMerge(e) {
@@ -2027,22 +2003,22 @@ let Tree = class Tree extends Disposable {
             [a1, a2] = [a2, a1];
         }
         N.parentId = (_a = n1.parent) === null || _a === void 0 ? void 0 : _a.id;
-        RemoveCommand.create(e);
+        EditCommand.remove(e);
         for (let edge of a1) {
             let n = edge.n(n1);
             if (n != N.parent)
                 n.parentId = N.id;
-            RemoveCommand.create(edge);
-            this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
+            EditCommand.remove(edge);
+            EditCommand.add(new TreeEdge(N, n, edge.length));
         }
         for (let edge of a2) {
             let n = edge.n(n2);
             n.parentId = N.id;
-            RemoveCommand.create(edge);
-            this.edge.set(N, n, AddCommand.create(new TreeEdge(N, n, edge.length)));
+            EditCommand.remove(edge);
+            EditCommand.add(new TreeEdge(N, n, edge.length));
         }
-        RemoveCommand.create(n1);
-        RemoveCommand.create(n2);
+        EditCommand.remove(n1);
+        EditCommand.remove(n2);
         return N;
     }
     deleteAndJoin(n) {
@@ -2056,11 +2032,10 @@ let Tree = class Tree extends Disposable {
         if (n.parent == n2)
             [n1, n2] = [n2, n1];
         n2.parentId = n1.id;
-        let edge = new TreeEdge(n1, n2, e1.length + e2.length);
-        this.edge.set(n1, n2, AddCommand.create(edge));
-        RemoveCommand.create(e1);
-        RemoveCommand.create(e2);
-        RemoveCommand.create(n);
+        let edge = EditCommand.add(new TreeEdge(n1, n2, e1.length + e2.length));
+        EditCommand.remove(e1);
+        EditCommand.remove(e2);
+        EditCommand.remove(n);
         return edge;
     }
     addLeafAt(n, length) {
@@ -2089,9 +2064,7 @@ let Tree = class Tree extends Disposable {
             N1.parentId = n2;
         else
             N2.parentId = n1;
-        let edge = AddCommand.create(new TreeEdge(N1, N2, length));
-        this.edge.set(N1, N2, edge);
-        return edge;
+        return EditCommand.add(new TreeEdge(N1, N2, length));
     }
     distTriple(n1, n2, n3) {
         let d12 = this.dist(n1, n2);
@@ -2767,10 +2740,10 @@ let TreeNode = class TreeNode extends Disposable {
     }
     delete() {
         let e = this.edges[0];
-        RemoveCommand.create(e);
+        EditCommand.remove(e);
         if (this.parentId === undefined)
             e.n(this).parentId = undefined;
-        RemoveCommand.create(this);
+        EditCommand.remove(this);
     }
     get parent() {
         return this.parentId !== undefined ? this.tree.node.get(this.parentId) : null;
@@ -2872,6 +2845,11 @@ let TreeEdge = class TreeEdge extends Disposable {
         this.length = length;
     }
     get tag() { return "e" + this._n1.id + "," + this._n2.id; }
+    dispose(force = false) {
+        if (force)
+            this.design.tree.edge.delete(this._n1, this._n2);
+        super.dispose();
+    }
     toJSON() {
         let [n1, n2] = [this._n1, this._n2];
         if (n1.parentId == n2.id)
@@ -2882,6 +2860,7 @@ let TreeEdge = class TreeEdge extends Disposable {
             length: this.length
         };
     }
+    get tree() { return this.n1.tree; }
     get design() { return this.n1.design; }
     get shouldDispose() {
         return super.shouldDispose || this._n1.disposed || this._n2.disposed;
@@ -3178,7 +3157,7 @@ let Design = class Design extends DesignBase {
             f.node.delete();
         }
     }
-    clearCPSelection() {
+    clearLayoutSelection() {
         for (let c of this.LayoutSheet.controls)
             c.selected = false;
     }
@@ -3196,7 +3175,7 @@ let Design = class Design extends DesignBase {
         this.mode = "tree";
     }
     vertexToFlap(vertices) {
-        this.clearCPSelection();
+        this.clearLayoutSelection();
         for (let v of vertices) {
             let f = this.flaps.get(v.node);
             if (f)
@@ -3212,7 +3191,7 @@ let Design = class Design extends DesignBase {
         this.mode = "tree";
     }
     edgeToRiver(edge) {
-        this.clearCPSelection();
+        this.clearLayoutSelection();
         let te = edge.edge;
         if (te.isRiver) {
             let r = this.rivers.get(te);
@@ -3251,8 +3230,17 @@ let Design = class Design extends DesignBase {
             if (init == "r")
                 return (_a = this.stretches.get(id).repository) === null || _a === void 0 ? void 0 : _a.query(then);
             let t = this.tree;
-            if (init == "e")
-                return t.find(id);
+            if (init == "e" || init == "re" || init == "ee") {
+                let edge = t.find(id);
+                if (!edge)
+                    return undefined;
+                if (init == "e")
+                    return edge;
+                if (init == "re")
+                    return this.rivers.get(edge);
+                if (init == "ee")
+                    return this.edges.get(edge);
+            }
             let n = t.node.get(Number(id));
             if (init == "n")
                 return n;
@@ -3262,6 +3250,17 @@ let Design = class Design extends DesignBase {
                 return this.vertices.get(n);
         }
         return undefined;
+    }
+    restoreSelection(tags) {
+        if (this.mode == "Layout")
+            this.clearLayoutSelection();
+        else
+            this.clearTreeSelection();
+        for (let tag of tags) {
+            let obj = this.query(tag);
+            if (obj instanceof Control)
+                obj.selected = true;
+        }
     }
 };
 __decorate([
@@ -4888,7 +4887,7 @@ let BPStudio = class BPStudio {
         await PaperWorker.done();
         this.$display.project.view.update();
         if (this.design)
-            this.design.history.flush();
+            this.design.history.flush(this.system.selections);
         if (this.onUpdate) {
             this.onUpdate();
             delete this.onUpdate;
@@ -4912,6 +4911,7 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._queue = [];
         this._construct = [];
         this._destruct = [];
+        this._selection = [];
         this._moving = true;
         this.savedIndex = 0;
         this.design = design;
@@ -4930,6 +4930,9 @@ let HistoryManager = class HistoryManager extends Disposable {
             savedIndex: this.savedIndex,
             steps: this.steps
         };
+    }
+    select(controls) {
+        this._selection = controls.map(c => c.tag);
     }
     queue(command) {
         if (this._moving)
@@ -4950,16 +4953,25 @@ let HistoryManager = class HistoryManager extends Disposable {
             return;
         this._destruct.push(memento);
     }
-    flush() {
+    flush(selection) {
+        let sel = selection.map(c => c.tag);
         if (this._queue.length) {
             let s = this.lastStep;
             if (!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
-                this.addStep(new Step(this._queue, this._construct, this._destruct));
+                this.addStep(new Step({
+                    commands: this._queue,
+                    construct: this._construct,
+                    destruct: this._destruct,
+                    mode: this.design.mode,
+                    before: this._selection,
+                    after: sel
+                }));
             }
             this._queue = [];
             this._construct = [];
             this._destruct = [];
         }
+        this._selection = sel;
         this._moving = false;
     }
     get modified() {
@@ -5024,18 +5036,21 @@ HistoryManager = __decorate([
     shrewd
 ], HistoryManager);
 class Step {
-    constructor(commands, construct, destruct) {
+    constructor(json) {
+        var _a, _b;
         this._fixed = false;
-        this.commands = commands;
-        this.signature = Step.signature(commands);
-        this.construct = construct;
-        this.destruct = destruct;
+        this.commands = json.commands;
+        this.signature = Step.signature(json.commands);
+        this.construct = (_a = json.construct) !== null && _a !== void 0 ? _a : [];
+        this.destruct = (_b = json.destruct) !== null && _b !== void 0 ? _b : [];
+        this.before = json.before;
+        this.after = json.after;
+        this.mode = json.mode;
         this.reset();
     }
     static restore(design, json) {
-        var _a, _b;
-        let commands = json.commands.map(c => Command.restore(design, c));
-        return new Step(commands, (_a = json.construct) !== null && _a !== void 0 ? _a : [], (_b = json.destruct) !== null && _b !== void 0 ? _b : []);
+        json.commands = json.commands.map(c => Command.restore(design, c));
+        return new Step(json);
     }
     static signature(commands) {
         let arr = commands.concat();
@@ -5069,6 +5084,8 @@ class Step {
             this.commands[i].undo();
         for (let memento of this.destruct)
             design.options.set(...memento);
+        design.mode = this.mode;
+        design.restoreSelection(this.before);
         this._fixed = true;
     }
     redo(design) {
@@ -5076,6 +5093,8 @@ class Step {
             c.redo();
         for (let memento of this.construct)
             design.options.set(...memento);
+        design.mode = this.mode;
+        design.restoreSelection(this.after);
         this._fixed = true;
     }
     toJSON() {
@@ -5115,6 +5134,7 @@ let Edge = class Edge extends ViewedControl {
             this.selected = true;
     }
     get type() { return "Edge"; }
+    get tag() { return "e" + this.edge.tag; }
     get shouldDispose() {
         return super.shouldDispose || this.edge.disposed;
     }
@@ -5449,6 +5469,7 @@ let River = class River extends ViewedControl {
         this.view = new RiverView(this);
     }
     get type() { return "River"; }
+    get tag() { return "r" + this.edge.tag; }
     get shouldDispose() {
         return super.shouldDispose || this.edge.disposed || !this.edge.isRiver;
     }

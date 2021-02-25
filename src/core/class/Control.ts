@@ -5,7 +5,9 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Control extends SheetObject {
+abstract class Control extends SheetObject implements ITagObject {
+
+	public abstract get tag(): string;
 
 	/** 是否可以跟另外一個物件一起被多重選取 */
 	public selectableWith(c: Control): boolean { return false; }

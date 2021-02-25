@@ -10,6 +10,8 @@
 
 	public get type() { return "River"; }
 
+	public get tag() { return "r" + this.edge.tag; }
+
 	public readonly view: RiverView;
 
 	public readonly edge: TreeEdge;
