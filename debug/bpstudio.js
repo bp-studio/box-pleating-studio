@@ -5065,6 +5065,12 @@ __decorate([
 ], HistoryManager.prototype, "index", void 0);
 __decorate([
     shrewd
+], HistoryManager.prototype, "_savedIndex", void 0);
+__decorate([
+    shrewd
+], HistoryManager.prototype, "modified", null);
+__decorate([
+    shrewd
 ], HistoryManager.prototype, "canUndo", null);
 __decorate([
     shrewd

@@ -16,6 +16,7 @@ interface JHistory {
 	private readonly _design: Design;
 	@shrewd private readonly steps: Step[] = [];
 	@shrewd private index: number = 0;
+	@shrewd private _savedIndex: number = 0;
 
 	private _queue: Command[] = [];
 	private _construct: Memento[] = [];
@@ -26,8 +27,6 @@ interface JHistory {
 
 	/** 是否正在移動歷史 */
 	private _moving: boolean = true;
-
-	private _savedIndex: number = 0;
 
 	constructor(design: Design, json?: JHistory) {
 		super(design);
@@ -92,7 +91,12 @@ interface JHistory {
 		this._moving = false;
 	}
 
-	public get modified(): boolean {
+	/**
+	 * 自從上次存檔以來是否有經過修改。
+	 *
+	 * 這個必須是反應方法才能在 UI 上頭反應。
+	 */
+	@shrewd public get modified(): boolean {
 		return this._savedIndex != this.index;
 	}
 
