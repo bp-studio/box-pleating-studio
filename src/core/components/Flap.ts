@@ -140,18 +140,12 @@ interface JFlap {
 	////////////////////////////////////////////////////////////
 
 	public readonly $junctions: Junction[] = [];
-	public $junctionChanged: boolean = false;
 
-	@shrewd({
-		comparer(this: Flap) {
-			let result = this.$junctionChanged;
-			this.$junctionChanged = false;
-			return !result;
-		}
-	})
-	public get junctions(): readonly Junction[] {
-		this.design.junctions;
-		return this.$junctions;
+	@unorderedArray	public get junctions(): readonly Junction[] {
+		// DoubleMapping 本身不是一個反應屬性，它的 size 才是
+		this.design.junctions.size;
+		// 利用 concat 傳回一個複製的陣列去跟上次已知的值來進行 unorderedArray 比較
+		return this.$junctions.concat();
 	}
 
 	@noCompare get validJunctions(): readonly Junction[] {

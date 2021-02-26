@@ -59,8 +59,6 @@ enum JunctionStatus {
 		this.f2 = f2;
 		f1.$junctions.push(this);
 		f2.$junctions.push(this);
-		f1.$junctionChanged = true;
-		f2.$junctionChanged = true;
 		this.id = f1.node.id + ":" + f2.node.id;
 		new JunctionView(this);
 	}
@@ -72,8 +70,6 @@ enum JunctionStatus {
 	protected onDispose() {
 		this.f1.$junctions.splice(this.f1.$junctions.indexOf(this), 1);
 		this.f2.$junctions.splice(this.f2.$junctions.indexOf(this), 1);
-		this.f1.$junctionChanged = true;
-		this.f2.$junctionChanged = true;
 	}
 
 	/** 根據指定的基準點來取得覆蓋比較矩形 */
@@ -271,6 +267,7 @@ enum JunctionStatus {
 	 * @param f 傳入 1 表示要找最大、-1 表示要找最小
 	 */
 	public static findMinMax(junctions: readonly Junction[], key: JunctionDimension, f: number): Junction {
+		if(!junctions[0]) debugger;
 		let value = junctions[0][key];
 		let result: Junction = junctions[0];
 		for(let j = 1; j < junctions.length; j++) if(junctions[j][key] * f > value * f) {

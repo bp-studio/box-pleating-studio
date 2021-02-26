@@ -29,7 +29,8 @@ interface JEdge {
 
 	public toJSON(): JEdge {
 		let [n1, n2] = [this._n1, this._n2];
-		if(n1.parentId == n2.id) [n1, n2] = [n2, n1];
+		// 考慮到 JID，這邊要用 parent.id 而非 parentId
+		if(n1.parent?.id === n2.id) [n1, n2] = [n2, n1];
 		return {
 			n1: n1.id,
 			n2: n2.id,

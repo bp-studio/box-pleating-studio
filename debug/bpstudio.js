@@ -2862,8 +2862,9 @@ let TreeEdge = class TreeEdge extends Disposable {
         super.dispose();
     }
     toJSON() {
+        var _a;
         let [n1, n2] = [this._n1, this._n2];
-        if (n1.parentId == n2.id)
+        if (((_a = n1.parent) === null || _a === void 0 ? void 0 : _a.id) === n2.id)
             [n1, n2] = [n2, n1];
         return {
             n1: n1.id,
@@ -4604,7 +4605,6 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         this.mWidth = 0;
         this.mHeight = 0;
         this.$junctions = [];
-        this.$junctionChanged = false;
         this.node = node;
         let design = sheet.design;
         let option = design.options.get(this);
@@ -4696,8 +4696,8 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         return v;
     }
     get junctions() {
-        this.design.junctions;
-        return this.$junctions;
+        this.design.junctions.size;
+        return this.$junctions.concat();
     }
     get validJunctions() {
         return this.junctions.filter(j => j.isValid);
@@ -4716,13 +4716,7 @@ __decorate([
     shrewd
 ], Flap.prototype, "points", null);
 __decorate([
-    shrewd({
-        comparer() {
-            let result = this.$junctionChanged;
-            this.$junctionChanged = false;
-            return !result;
-        }
-    })
+    unorderedArray
 ], Flap.prototype, "junctions", null);
 __decorate([
     noCompare
@@ -5243,8 +5237,6 @@ let Junction = class Junction extends SheetObject {
         this.f2 = f2;
         f1.$junctions.push(this);
         f2.$junctions.push(this);
-        f1.$junctionChanged = true;
-        f2.$junctionChanged = true;
         this.id = f1.node.id + ":" + f2.node.id;
         new JunctionView(this);
     }
@@ -5269,8 +5261,6 @@ let Junction = class Junction extends SheetObject {
     onDispose() {
         this.f1.$junctions.splice(this.f1.$junctions.indexOf(this), 1);
         this.f2.$junctions.splice(this.f2.$junctions.indexOf(this), 1);
-        this.f1.$junctionChanged = true;
-        this.f2.$junctionChanged = true;
     }
     getBaseRectangle(base) {
         let q = this.sx > 0 ? this.q2 : this.q1;
@@ -5442,6 +5432,8 @@ let Junction = class Junction extends SheetObject {
         return this.status == JunctionStatus.overlap;
     }
     static findMinMax(junctions, key, f) {
+        if (!junctions[0])
+            debugger;
         let value = junctions[0][key];
         let result = junctions[0];
         for (let j = 1; j < junctions.length; j++)
