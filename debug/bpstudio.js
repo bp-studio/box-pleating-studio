@@ -4084,13 +4084,17 @@ let Configuration = class Configuration extends Store {
     onMove() {
         this.repository.stretch.selected = !(this.entry.selected);
     }
+    getMemento() {
+        let result = this._initMemento ? this._prototypes :
+            this.memento.map(p => p instanceof Pattern ? p.toJSON() : p);
+        this._initMemento = false;
+        return result;
+    }
     toJSON(session = false) {
         let result = { partitions: this.partitions.map(p => p.toJSON()) };
         if (session) {
-            result.patterns = this._initMemento ? this._prototypes :
-                this.memento.map(p => p instanceof Pattern ? p.toJSON() : p);
+            result.patterns = this.getMemento();
             result.index = this.index;
-            this._initMemento = false;
         }
         return result;
     }
@@ -7244,7 +7248,7 @@ let Device = class Device extends Draggable {
     toJSON() {
         return {
             gadgets: this.gadgets.map(g => g.toJSON()),
-            offset: this.offset,
+            offset: this.getOffset(),
             addOns: this.addOns.length ? this.addOns : undefined
         };
     }
@@ -7377,11 +7381,13 @@ let Device = class Device extends Draggable {
             dx = bound;
         return dx;
     }
-    get offset() {
+    getOffset() {
         this.disposeEvent();
+        if (this.design.dragging)
+            return this._offsetCache;
         let dx = this.partition.getOriginalDisplacement(this.pattern).x;
         dx -= this._originalDisplacement.x;
-        return (this.location.x - dx) * this.pattern.stretch.fx;
+        return this._offsetCache = (this.location.x - dx) * this.pattern.stretch.fx;
     }
 };
 __decorate([
@@ -7425,7 +7431,7 @@ __decorate([
 ], Device.prototype, "neighbors", null);
 __decorate([
     shrewd
-], Device.prototype, "offset", null);
+], Device.prototype, "getOffset", null);
 Device = __decorate([
     shrewd
 ], Device);
@@ -7858,7 +7864,6 @@ let Repository = class Repository extends Store {
         let json = stretch.design.options.get(this);
         if (json) {
             this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
-            this._everActive = true;
         }
         else {
             this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());
@@ -7870,11 +7875,13 @@ let Repository = class Repository extends Store {
     builder(prototype) {
         return prototype;
     }
-    get shouldDispose() {
+    _onSettle() {
         if (!this._everActive && this.isActive && !this.design.dragging) {
             this._everActive = true;
             this.design.history.construct(this.toMemento());
         }
+    }
+    get shouldDispose() {
         return super.shouldDispose || this.stretch.disposed || !this.isActive && !this.design.dragging;
     }
     onDispose() {
@@ -7905,6 +7912,9 @@ let Repository = class Repository extends Store {
         return [this.tag, this.toJSON()];
     }
 };
+__decorate([
+    shrewd
+], Repository.prototype, "_onSettle", null);
 __decorate([
     shrewd
 ], Repository.prototype, "isActive", null);

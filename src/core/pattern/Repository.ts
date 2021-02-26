@@ -43,7 +43,6 @@ interface JRepository {
 		let json = stretch.design.options.get(this);
 		if(json) {
 			this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
-			this._everActive = true;
 		} else {
 			this.generator = new Configurator(this, option).generate(
 				() => this.joinerCache.clear() // 搜尋完成之後清除快取
@@ -53,7 +52,8 @@ interface JRepository {
 
 	private _everActive: boolean = false;
 
-	protected get shouldDispose(): boolean {
+	/** 一旦安定下來了之後就記錄自己的建構 */
+	@shrewd private _onSettle() {
 		if(!this._everActive && this.isActive && !this.design.dragging) {
 			this._everActive = true;
 
@@ -63,6 +63,9 @@ interface JRepository {
 			// 此時如果沒有 100% 留下正確的 Memento，歷史移動方面就可能會有瑕疵。
 			this.design.history.construct(this.toMemento());
 		}
+	}
+
+	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.stretch.disposed || !this.isActive && !this.design.dragging;
 	}
 

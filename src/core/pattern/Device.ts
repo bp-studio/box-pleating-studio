@@ -40,7 +40,7 @@ type GDevice = JDevice<Gadget>;
 	public toJSON(): JDevice {
 		return {
 			gadgets: this.gadgets.map(g => g.toJSON()),
-			offset: this.offset,
+			offset: this.getOffset(),
 			addOns: this.addOns.length ? this.addOns : undefined
 		};
 	}
@@ -202,10 +202,17 @@ type GDevice = JDevice<Gadget>;
 		return dx;
 	}
 
-	@shrewd public get offset(): number {
+	// 做成反應方法以確保有持續更新
+	@shrewd public getOffset(): number {
+		// 利用這個相依性來確保當解構的時候這個方法不會再被執行一次
 		this.disposeEvent();
+
+		// 即將要在拖曳過程中被解構的時候不能繼續更新數值，持續傳回最後知道的值。
+		if(this.design.dragging) return this._offsetCache;
+
 		let dx = this.partition.getOriginalDisplacement(this.pattern).x;
 		dx -= this._originalDisplacement.x;
-		return (this.location.x - dx) * this.pattern.stretch.fx;
+		return this._offsetCache = (this.location.x - dx) * this.pattern.stretch.fx;
 	}
+	private _offsetCache: number;
 }
