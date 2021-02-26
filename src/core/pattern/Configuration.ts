@@ -2,6 +2,8 @@
 interface JConfiguration {
 	/** 這個 Configuration 裡面所有的 Partition */
 	partitions: readonly JPartition[];
+	patterns?: JPattern[];
+	index?: number;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -52,7 +54,11 @@ interface JConfiguration {
 
 		this.partitions = config.partitions.map(p => new Partition(this, p));
 
-		this.generator = this.generate();
+		if(config.patterns) {
+			this.restore(config.patterns, config.index!);
+		} else {
+			this.generator = this.generate();
+		}
 	}
 
 	protected get shouldDispose(): boolean {
@@ -182,7 +188,22 @@ interface JConfiguration {
 		this.repository.stretch.selected = !(this.entry!.selected);
 	}
 
-	public toJSON(): JConfiguration {
-		return { partitions: this.partitions.map(p => p.toJSON()) };
+	/** 是否為第一次產生 Memento */
+	private _initMemento = true;
+
+	public toJSON(session: boolean = false): JConfiguration {
+		let result: JConfiguration = { partitions: this.partitions.map(p => p.toJSON()) };
+		if(session) {
+			// 第一次產生（即建構）的時候直接使用 this._prototypes 的資料即可，因為還沒有任何移動；
+			// 之後才是真的根據 this.memento 的資料來生。
+			// 這樣做的原因一方面建構時的生成當然比較快，另一方面建構時也不能真的呼叫 p.toJSON()，
+			// 因為裡頭的 offset 計算會跑出循環參照（原因尚未完全釐清，不過暫時先不深究）。
+			result.patterns = this._initMemento ? this._prototypes :
+				this.memento.map(p => p instanceof Pattern ? p.toJSON() : p);
+
+			result.index = this.index;
+			this._initMemento = false;
+		}
+		return result;
 	}
 }

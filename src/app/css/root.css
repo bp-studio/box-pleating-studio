@@ -2,15 +2,7 @@
 	--bg-ui: #AAA;
 }
 
-*:not(input):not(textarea) {
-	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
-}
-
 * {
-	/* 無法捲動也無法縮放 */
 	touch-action: none;
 }
 
@@ -22,13 +14,22 @@ body, .modal-open .modal {
 	overflow: hidden;
 }
 
-input {
-	border: 1px solid black;
-	padding: 1px;
-	width: 100px;
+/*********************************************
+ * 禁止長按選取
+ *********************************************/
+
+*:not(input):not(textarea) {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
 }
 
-::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+/*********************************************
+ * 表單元件設定
+ *********************************************/
+
+ ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
 	/* Chrome, Safari, Edge, Opera 中隱藏 spinner */
 	-webkit-appearance: none;
 	display: none;
@@ -37,11 +38,6 @@ input {
 input[type=number] {
 	/* Firefox 中隱藏 spinner */
 	-moz-appearance: textfield;
-}
-
-input[type=button] {
-	width: auto;
-	padding: 5px;
 }
 
 input:invalid {
@@ -54,14 +50,4 @@ textarea {
 
 ::placeholder, ::-webkit-input-placeholder, ::-moz-placeholder, ::-ms-input-placeholder {
 	opacity: 0.5 !important;
-}
-
-label {
-	display: block;
-	min-height: 24px;
-}
-
-label span.label {
-	display: inline-block;
-	width: 60px;
 }

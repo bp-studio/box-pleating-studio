@@ -190,7 +190,12 @@
 
 		//if(perf) perfTime = 0;
 
-		Shrewd.commit();
+		try {
+			Shrewd.commit();
+		} catch(e) {
+			debugger;
+		}
+
 		await PaperWorker.done();
 		this.$display.project.view.update();
 
@@ -204,7 +209,6 @@
 		}
 
 		this._updating = false;
-
 		this._lastUpdate = time;
 		requestAnimationFrame(this.update.bind(this));
 	}

@@ -59,6 +59,10 @@ class EditCommand extends Command implements JEditCommand {
 
 	public addTo(command: Command) { }
 
+	public get isVoid(): boolean {
+		return false; // EditCommand 不可能是 void
+	}
+
 	private _remove() {
 		this._design.query(this.tag)!.dispose(true);
 	}

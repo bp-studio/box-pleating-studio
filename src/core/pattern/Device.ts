@@ -46,11 +46,12 @@ type GDevice = JDevice<Gadget>;
 	}
 
 	/** 參考原點跟所屬的 `Stretch` 原點之間的位移；參考原點需要透過這個來計算得到 */
-	private _originalDisplacement: Vector;
+	@onDemand private get _originalDisplacement(): Vector {
+		return this.partition.getOriginalDisplacement(this.pattern);
+	}
 
 	/** 參考原點；`location` 是相對於這個原點在表示的 */
 	private get _origin(): Point {
-		this._originalDisplacement ||= this.partition.getOriginalDisplacement(this.pattern);
 		return this.pattern.stretch.origin.add(this._originalDisplacement);
 	}
 
@@ -201,7 +202,8 @@ type GDevice = JDevice<Gadget>;
 		return dx;
 	}
 
-	public get offset(): number {
+	@shrewd public get offset(): number {
+		this.disposeEvent();
 		let dx = this.partition.getOriginalDisplacement(this.pattern).x;
 		dx -= this._originalDisplacement.x;
 		return (this.location.x - dx) * this.pattern.stretch.fx;

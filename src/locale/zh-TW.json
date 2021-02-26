@@ -57,7 +57,8 @@
 			"donation": "捐款",
 			"news": "版本資訊",
 			"update": "準備更新",
-			"discussions": "討論區"
+			"discussions": "討論區",
+			"issue": "回報問題"
 		},
 		"view": {
 			"tree": "樹狀結構",

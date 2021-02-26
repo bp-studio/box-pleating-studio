@@ -42,6 +42,7 @@ abstract class Command implements JCommand {
 
 	public abstract canAddTo(command: Command): boolean;
 	public abstract addTo(command: Command): void;
+	public abstract get isVoid(): boolean;
 	public abstract undo(): void;
 	public abstract redo(): void;
 }

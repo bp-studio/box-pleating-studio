@@ -2,7 +2,7 @@
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
-				<div class="modal-body" style="max-height:70vh; overflow-y:auto;">
+				<div class="modal-body scroll-shadow" style="max-height:70vh;">
 					<div v-if="record[index]" v-html="record[index]"></div>
 					<div v-else class="m-5 display-2 text-muted text-center">
 						<i class="bp-spinner fa-spin"></i>

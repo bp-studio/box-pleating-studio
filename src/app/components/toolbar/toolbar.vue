@@ -29,11 +29,23 @@
 					<i class="far fa-comment-dots"></i>
 					{{$t("toolbar.help.discussions")}}
 				</a>
-				<div class="dropdown-item" @click="update" v-if="core.updated">
-					<i class="far fa-arrow-alt-circle-up"></i>
-					{{$t('toolbar.help.update')}}
-					<div class="notify"></div>
-				</div>
+					<a
+					class="dropdown-item"
+					href="https://github.com/MuTsunTsai/box-pleating-studio/issues"
+					target="_blank"
+					rel="noopener"
+				>
+					<i class="fas fa-bug"></i>
+					{{$t("toolbar.help.issue")}}
+				</a>
+				<template v-if="core.updated">
+					<divider></divider>
+					<div class="dropdown-item" @click="update">
+						<i class="far fa-arrow-alt-circle-up"></i>
+						{{$t('toolbar.help.update')}}
+						<div class="notify"></div>
+					</div>
+				</template>
 				<divider></divider>
 				<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
 					<i class="fas fa-hand-holding-usd"></i>

@@ -38,7 +38,7 @@ abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject 
 	@action public index: number = 0;
 
 	/** 目前的 `Collection` 所有可用的 prototype */
-	@shrewd private get _prototypes(): P[] {
+	@shrewd protected get _prototypes(): P[] {
 		if(!this.generator) return this._cache;
 		if(this.design.dragging) {
 			this.buildFirst();
@@ -46,9 +46,15 @@ abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject 
 		} else {
 			if(this._entries.length == 0) this.buildFirst();
 			for(let entry of this.generator) this._cache.push(entry);
-			delete (this as any).generator;
+			// @ts-ignore
+			delete this.generator;
 			return this._cache;
 		}
+	}
+
+	protected restore(prototypes: P[], index: number) {
+		this._cache = prototypes;
+		this.index = index;
 	}
 
 	private buildFirst(): void {
@@ -70,6 +76,14 @@ abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject 
 
 	/** 所有的 entry */
 	private _entries: T[] = [];
+
+	protected get memento(): (P | T)[] {
+		let result: (P | T)[] = [];
+		for(let i = 0; i < this._prototypes.length; i++) {
+			result.push(this._entries[i] || this._cache[i]);
+		}
+		return result;
+	}
 
 	/**
 	 * 當前選用的 entry。

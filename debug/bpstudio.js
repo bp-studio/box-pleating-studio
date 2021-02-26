@@ -1742,6 +1742,9 @@ class FieldCommand extends Command {
     addTo(command) {
         command.new = this.new;
     }
+    get isVoid() {
+        return this.old == this.new;
+    }
     undo() {
         let target = this._design.query(this.tag);
         target[this.prop] = this.old;
@@ -1781,6 +1784,9 @@ class MoveCommand extends Command {
     }
     addTo(command) {
         MoveCommand.assign(command.new, this.new);
+    }
+    get isVoid() {
+        return this.old.x == this.new.x && this.old.y == this.new.y;
     }
     undo() {
         let target = this._design.query(this.tag);
@@ -1829,6 +1835,9 @@ class EditCommand extends Command {
         return false;
     }
     addTo(command) { }
+    get isVoid() {
+        return false;
+    }
     _remove() {
         this._design.query(this.tag).dispose(true);
     }
@@ -3802,6 +3811,10 @@ class Store extends SheetObject {
             return this._cache;
         }
     }
+    restore(prototypes, index) {
+        this._cache = prototypes;
+        this.index = index;
+    }
     buildFirst() {
         let entry = this.generator.next();
         if (!entry.done) {
@@ -3813,6 +3826,13 @@ class Store extends SheetObject {
                 console.log("Incompatible old version.");
             }
         }
+    }
+    get memento() {
+        let result = [];
+        for (let i = 0; i < this._prototypes.length; i++) {
+            result.push(this._entries[i] || this._cache[i]);
+        }
+        return result;
     }
     get entry() {
         let e = this._prototypes, i = this.index;
@@ -3931,6 +3951,7 @@ class ViewedControl extends Control {
 let Configuration = class Configuration extends Store {
     constructor(set, config, seed) {
         super(set.sheet);
+        this._initMemento = true;
         this.repository = set;
         this.seed = seed;
         if (seed)
@@ -3947,7 +3968,12 @@ let Configuration = class Configuration extends Store {
         this.overlaps = overlaps;
         this.overlapMap = overlapMap;
         this.partitions = config.partitions.map(p => new Partition(this, p));
-        this.generator = this.generate();
+        if (config.patterns) {
+            this.restore(config.patterns, config.index);
+        }
+        else {
+            this.generator = this.generate();
+        }
     }
     get tag() {
         return this.repository.tag + "." + this.repository.indexOf(this);
@@ -4056,8 +4082,15 @@ let Configuration = class Configuration extends Store {
     onMove() {
         this.repository.stretch.selected = !(this.entry.selected);
     }
-    toJSON() {
-        return { partitions: this.partitions.map(p => p.toJSON()) };
+    toJSON(session = false) {
+        let result = { partitions: this.partitions.map(p => p.toJSON()) };
+        if (session) {
+            result.patterns = this._initMemento ? this._prototypes :
+                this.memento.map(p => p instanceof Pattern ? p.toJSON() : p);
+            result.index = this.index;
+            this._initMemento = false;
+        }
+        return result;
     }
 };
 __decorate([
@@ -4883,7 +4916,12 @@ let BPStudio = class BPStudio {
         if (this._updating)
             return;
         this._updating = true;
-        Shrewd.commit();
+        try {
+            Shrewd.commit();
+        }
+        catch (e) {
+            debugger;
+        }
         await PaperWorker.done();
         this.$display.project.view.update();
         if (this.design)
@@ -4913,13 +4951,13 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._destruct = [];
         this._selection = [];
         this._moving = true;
-        this.savedIndex = 0;
-        this.design = design;
+        this._savedIndex = 0;
+        this._design = design;
         if (json) {
             try {
                 this.steps.push(...json.steps.map(s => Step.restore(design, s)));
                 this.index = json.index;
-                this.savedIndex = json.savedIndex;
+                this._savedIndex = json.savedIndex;
             }
             catch (e) { }
         }
@@ -4927,12 +4965,9 @@ let HistoryManager = class HistoryManager extends Disposable {
     toJSON() {
         return {
             index: this.index,
-            savedIndex: this.savedIndex,
+            savedIndex: this._savedIndex,
             steps: this.steps
         };
-    }
-    select(controls) {
-        this._selection = controls.map(c => c.tag);
     }
     queue(command) {
         if (this._moving)
@@ -4954,18 +4989,24 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._destruct.push(memento);
     }
     flush(selection) {
+        if (this._design.dragging)
+            return;
         let sel = selection.map(c => c.tag);
         if (this._queue.length) {
             let s = this.lastStep;
             if (!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
-                this.addStep(new Step({
+                this.addStep(new Step(this._design, {
                     commands: this._queue,
                     construct: this._construct,
                     destruct: this._destruct,
-                    mode: this.design.mode,
+                    mode: this._design.mode,
                     before: this._selection,
                     after: sel
                 }));
+            }
+            else if (s.isVoid) {
+                this.steps.pop();
+                this.index--;
             }
             this._queue = [];
             this._construct = [];
@@ -4975,10 +5016,10 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._moving = false;
     }
     get modified() {
-        return this.savedIndex != this.index;
+        return this._savedIndex != this.index;
     }
     notifySave() {
-        this.savedIndex = this.index;
+        this._savedIndex = this.index;
     }
     addStep(step) {
         if (this.steps.length > this.index)
@@ -4987,7 +5028,7 @@ let HistoryManager = class HistoryManager extends Disposable {
         if (this.steps.length > 30) {
             this.steps.shift();
             this.index--;
-            this.savedIndex--;
+            this._savedIndex--;
         }
     }
     get lastStep() {
@@ -5010,13 +5051,13 @@ let HistoryManager = class HistoryManager extends Disposable {
     undo() {
         if (this.canUndo) {
             this._moving = true;
-            this.steps[--this.index].undo(this.design);
+            this.steps[--this.index].undo();
         }
     }
     redo() {
         if (this.canRedo) {
             this._moving = true;
-            this.steps[this.index++].redo(this.design);
+            this.steps[this.index++].redo();
         }
     }
 };
@@ -5036,36 +5077,44 @@ HistoryManager = __decorate([
     shrewd
 ], HistoryManager);
 class Step {
-    constructor(json) {
+    constructor(design, json) {
         var _a, _b;
         this._fixed = false;
+        this._design = design;
+        this._signature = Step.signature(json.commands);
         this.commands = json.commands;
-        this.signature = Step.signature(json.commands);
         this.construct = (_a = json.construct) !== null && _a !== void 0 ? _a : [];
         this.destruct = (_b = json.destruct) !== null && _b !== void 0 ? _b : [];
         this.before = json.before;
         this.after = json.after;
         this.mode = json.mode;
-        this.reset();
+        this._reset();
     }
     static restore(design, json) {
         json.commands = json.commands.map(c => Command.restore(design, c));
-        return new Step(json);
+        return new Step(design, json);
     }
     static signature(commands) {
         let arr = commands.concat();
         arr.sort((a, b) => a.signature.localeCompare(b.signature));
         return arr.map(c => c.signature).join(";");
     }
-    reset() {
+    _reset() {
         if (this._timeout)
             clearTimeout(this._timeout);
-        this._timeout = setTimeout(() => this._fixed = true, 1000);
+        if (!this._fixed)
+            this._timeout = setTimeout(() => this._fix(), 1000);
+    }
+    _fix() {
+        if (this._design.dragging)
+            this._reset();
+        else
+            this._fixed = true;
     }
     tryAdd(commands, construct, destruct) {
         if (this._fixed)
             return false;
-        if (Step.signature(commands) != this.signature)
+        if (Step.signature(commands) != this._signature)
             return false;
         for (let i = 0; i < commands.length; i++) {
             if (!commands[i].canAddTo(this.commands[i]))
@@ -5076,25 +5125,30 @@ class Step {
         }
         this.construct.push(...construct);
         this.destruct.push(...destruct);
-        this.reset();
+        this._reset();
         return true;
     }
-    undo(design) {
-        for (let i = this.commands.length - 1; i >= 0; i--)
-            this.commands[i].undo();
-        for (let memento of this.destruct)
-            design.options.set(...memento);
-        design.mode = this.mode;
-        design.restoreSelection(this.before);
+    get isVoid() {
+        return this.commands.every(c => c.isVoid);
+    }
+    undo() {
+        let com = this.commands.concat().reverse();
+        for (let c of com)
+            c.undo();
+        let des = this.destruct.concat().reverse();
+        for (let memento of des)
+            this._design.options.set(...memento);
+        this._design.mode = this.mode;
+        this._design.restoreSelection(this.before);
         this._fixed = true;
     }
-    redo(design) {
+    redo() {
         for (let c of this.commands)
             c.redo();
         for (let memento of this.construct)
-            design.options.set(...memento);
-        design.mode = this.mode;
-        design.restoreSelection(this.after);
+            this._design.options.set(...memento);
+        this._design.mode = this.mode;
+        this._design.restoreSelection(this.after);
         this._fixed = true;
     }
     toJSON() {
@@ -5108,7 +5162,10 @@ class Step {
 }
 __decorate([
     nonEnumerable
-], Step.prototype, "signature", void 0);
+], Step.prototype, "_design", void 0);
+__decorate([
+    nonEnumerable
+], Step.prototype, "_signature", void 0);
 __decorate([
     nonEnumerable
 ], Step.prototype, "_fixed", void 0);
@@ -7187,8 +7244,10 @@ let Device = class Device extends Draggable {
             addOns: this.addOns.length ? this.addOns : undefined
         };
     }
+    get _originalDisplacement() {
+        return this.partition.getOriginalDisplacement(this.pattern);
+    }
     get _origin() {
-        this._originalDisplacement || (this._originalDisplacement = this.partition.getOriginalDisplacement(this.pattern));
         return this.pattern.stretch.origin.add(this._originalDisplacement);
     }
     get shouldDispose() {
@@ -7315,11 +7374,15 @@ let Device = class Device extends Draggable {
         return dx;
     }
     get offset() {
+        this.disposeEvent();
         let dx = this.partition.getOriginalDisplacement(this.pattern).x;
         dx -= this._originalDisplacement.x;
         return (this.location.x - dx) * this.pattern.stretch.fx;
     }
 };
+__decorate([
+    onDemand
+], Device.prototype, "_originalDisplacement", null);
 __decorate([
     shrewd
 ], Device.prototype, "isActive", null);
@@ -7356,6 +7419,9 @@ __decorate([
 __decorate([
     shrewd
 ], Device.prototype, "neighbors", null);
+__decorate([
+    shrewd
+], Device.prototype, "offset", null);
 Device = __decorate([
     shrewd
 ], Device);
@@ -7781,10 +7847,17 @@ let Repository = class Repository extends Store {
     constructor(stretch, signature, option) {
         super(stretch.sheet);
         this.joinerCache = new Map();
+        this._everActive = false;
         this.stretch = stretch;
         this.signature = signature;
         this.structure = JSON.parse(signature);
-        this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());
+        let json = stretch.design.options.get(this);
+        if (json) {
+            this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
+        }
+        else {
+            this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());
+        }
     }
     get tag() {
         return "r" + this.stretch.signature;
@@ -7793,7 +7866,16 @@ let Repository = class Repository extends Store {
         return prototype;
     }
     get shouldDispose() {
-        return super.shouldDispose || this.stretch.disposed;
+        if (!this._everActive && this.isActive && !this.design.dragging) {
+            this._everActive = true;
+            this.design.history.construct(this.toMemento());
+        }
+        return super.shouldDispose || this.stretch.disposed || !this.isActive && !this.design.dragging;
+    }
+    onDispose() {
+        if (this._everActive)
+            this.design.history.destruct(this.toMemento());
+        super.onDispose();
     }
     get isActive() {
         return this.stretch.isActive && this.stretch.repository == this;
@@ -7807,6 +7889,15 @@ let Repository = class Repository extends Store {
         if (!j)
             this.joinerCache.set(key, j = new Joiner(overlaps, this));
         return j;
+    }
+    toJSON() {
+        return {
+            configurations: this.memento.map(c => c.toJSON(true)),
+            index: this.index
+        };
+    }
+    toMemento() {
+        return [this.tag, this.toJSON()];
     }
 };
 __decorate([

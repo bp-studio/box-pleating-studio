@@ -1,5 +1,5 @@
 <template>
-	<div id="divPanel" :class="{'show':show}" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
+	<div id="divPanel" class="scroll-shadow" :class="{'show':show}" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
 		<template v-if="design">
 			<design v-if="selections.length==0" :key="design.sheet.guid"></design>
 			<div v-else-if="selections.length==1" :key="selection.guid">

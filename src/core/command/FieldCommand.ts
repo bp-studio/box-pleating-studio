@@ -43,6 +43,10 @@ class FieldCommand extends Command implements JFieldCommand {
 		(command as FieldCommand).new = this.new;
 	}
 
+	public get isVoid() {
+		return this.old == this.new;
+	}
+
 	public undo() {
 		let target = this._design.query(this.tag)!;
 		target[this.prop] = this.old;

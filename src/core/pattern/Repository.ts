@@ -1,4 +1,9 @@
 
+interface JRepository {
+	configurations: JConfiguration[];
+	index: number;
+}
+
 //////////////////////////////////////////////////////////////////
 /**
  * `Repository` 是針對 `Stretch` 的特定配置算出的若干套 `Configuration` 的組合。
@@ -8,7 +13,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Repository extends Store<Configuration, Configuration> {
+@shrewd class Repository extends Store<Configuration, Configuration> implements ISerializable<JRepository> {
 
 	public get tag() {
 		return "r" + this.stretch.signature;
@@ -34,13 +39,35 @@
 		this.stretch = stretch;
 		this.signature = signature;
 		this.structure = JSON.parse(signature);
-		this.generator = new Configurator(this, option).generate(
-			() => this.joinerCache.clear() // 搜尋完成之後清除快取
-		);
+
+		let json = stretch.design.options.get(this);
+		if(json) {
+			this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
+		} else {
+			this.generator = new Configurator(this, option).generate(
+				() => this.joinerCache.clear() // 搜尋完成之後清除快取
+			);
+		}
 	}
 
+	private _everActive: boolean = false;
+
 	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.stretch.disposed;
+		if(!this._everActive && this.isActive && !this.design.dragging) {
+			this._everActive = true;
+
+			// 乍看之下不需要特別記錄 Repository 的建構 Memento（因為重新移動到位的時候必然會計算出一樣的東西），
+			// 但是一方面記錄下來確實在歷史移動的時候會加速、
+			// 另一方面也是考慮到可能未來會隨著版本改變而算出不同的東西，
+			// 此時如果沒有 100% 留下正確的 Memento，歷史移動方面就可能會有瑕疵。
+			this.design.history.construct(this.toMemento());
+		}
+		return super.shouldDispose || this.stretch.disposed || !this.isActive && !this.design.dragging;
+	}
+
+	protected onDispose() {
+		if(this._everActive) this.design.history.destruct(this.toMemento());
+		super.onDispose();
 	}
 
 	@shrewd public get isActive(): boolean {
@@ -57,5 +84,16 @@
 		let j = this.joinerCache.get(key);
 		if(!j) this.joinerCache.set(key, j = new Joiner(overlaps, this));
 		return j;
+	}
+
+	public toJSON(): JRepository {
+		return {
+			configurations: this.memento.map(c => c.toJSON(true)),
+			index: this.index
+		};
+	}
+
+	public toMemento(): Memento {
+		return [this.tag, this.toJSON()];
 	}
 }

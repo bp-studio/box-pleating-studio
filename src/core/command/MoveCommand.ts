@@ -50,6 +50,10 @@ class MoveCommand extends Command implements JMoveCommand {
 		MoveCommand.assign((command as MoveCommand).new, this.new);
 	}
 
+	public get isVoid(): boolean {
+		return this.old.x == this.new.x && this.old.y == this.new.y;
+	}
+
 	public undo() {
 		let target = this._design.query(this.tag)!;
 		if(!target['location']) debugger;

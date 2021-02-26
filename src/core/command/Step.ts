@@ -12,7 +12,7 @@ class Step implements ISerializable<JStep> {
 
 	public static restore(design: Design, json: JStep): Step {
 		json.commands = json.commands.map(c => Command.restore(design, c));
-		return new Step(json as JStep<Command>);
+		return new Step(design, json as JStep<Command>);
 	}
 
 	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
@@ -22,15 +22,18 @@ class Step implements ISerializable<JStep> {
 		return arr.map(c => c.signature).join(";");
 	}
 
-	constructor(json: JStep<Command>) {
+	constructor(design: Design, json: JStep<Command>) {
+		this._design = design;
+		this._signature = Step.signature(json.commands);
+
 		this.commands = json.commands;
-		this.signature = Step.signature(json.commands);
 		this.construct = json.construct ?? [];
 		this.destruct = json.destruct ?? [];
 		this.before = json.before;
 		this.after = json.after;
 		this.mode = json.mode;
-		this.reset();
+
+		this._reset();
 	}
 
 	public readonly commands: readonly Command[];
@@ -40,17 +43,24 @@ class Step implements ISerializable<JStep> {
 	public readonly before: string[];
 	public readonly after: string[];
 
-	@nonEnumerable public readonly signature: string;
+	@nonEnumerable private readonly _design: Design;
+	@nonEnumerable private readonly _signature: string;
 
 	/** 已經不允許合併 */
 	@nonEnumerable private _fixed: boolean = false;
 
 	@nonEnumerable private _timeout: number;
 
-	/** 一秒鐘之後自動鎖定自身 */
-	public reset() {
+	/** 重置自動鎖定 */
+	private _reset() {
 		if(this._timeout) clearTimeout(this._timeout);
-		this._timeout = setTimeout(() => this._fixed = true, 1000);
+		if(!this._fixed) this._timeout = setTimeout(() => this._fix(), 1000);
+	}
+
+	/** 自動鎖定自身 */
+	private _fix() {
+		if(this._design.dragging) this._reset(); // 還在拖曳中的話先不鎖定
+		else this._fixed = true;
 	}
 
 	public tryAdd(commands: readonly Command[], construct: Memento[], destruct: Memento[]) {
@@ -59,7 +69,7 @@ class Step implements ISerializable<JStep> {
 
 		// 先確定合併可以執行
 		// TODO：這邊要加入考慮到建構解構的 Command
-		if(Step.signature(commands) != this.signature) return false;
+		if(Step.signature(commands) != this._signature) return false;
 		for(let i = 0; i < commands.length; i++) {
 			if(!commands[i].canAddTo(this.commands[i])) return false;
 		}
@@ -70,24 +80,31 @@ class Step implements ISerializable<JStep> {
 		}
 		this.construct.push(...construct);
 		this.destruct.push(...destruct);
-		this.reset();
+		this._reset();
 		return true;
 	}
 
-	public undo(design: Design) {
+	/** 這整個 `Step` 是否等於什麼都沒做 */
+	public get isVoid(): boolean {
+		return this.commands.every(c => c.isVoid);
+	}
+
+	public undo() {
 		// undo 的時候以相反順序執行
-		for(let i = this.commands.length - 1; i >= 0; i--) this.commands[i].undo();
-		for(let memento of this.destruct) design.options.set(...memento);
-		design.mode = this.mode;
-		design.restoreSelection(this.before);
+		let com = this.commands.concat().reverse();
+		for(let c of com) c.undo();
+		let des = this.destruct.concat().reverse();
+		for(let memento of des) this._design.options.set(...memento);
+		this._design.mode = this.mode;
+		this._design.restoreSelection(this.before);
 		this._fixed = true;
 	}
 
-	public redo(design: Design) {
+	public redo() {
 		for(let c of this.commands) c.redo();
-		for(let memento of this.construct) design.options.set(...memento);
-		design.mode = this.mode;
-		design.restoreSelection(this.after);
+		for(let memento of this.construct) this._design.options.set(...memento);
+		this._design.mode = this.mode;
+		this._design.restoreSelection(this.after);
 		this._fixed = true;
 	}
 

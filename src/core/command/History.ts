@@ -13,7 +13,7 @@ interface JHistory {
 
 @shrewd class HistoryManager extends Disposable implements ISerializable<JHistory> {
 
-	private readonly design: Design;
+	private readonly _design: Design;
 	@shrewd private readonly steps: Step[] = [];
 	@shrewd private index: number = 0;
 
@@ -27,16 +27,16 @@ interface JHistory {
 	/** 是否正在移動歷史 */
 	private _moving: boolean = true;
 
-	public savedIndex: number = 0;
+	private _savedIndex: number = 0;
 
 	constructor(design: Design, json?: JHistory) {
 		super(design);
-		this.design = design;
+		this._design = design;
 		if(json) {
 			try {
 				this.steps.push(...json.steps.map(s => Step.restore(design, s)));
 				this.index = json.index;
-				this.savedIndex = json.savedIndex;
+				this._savedIndex = json.savedIndex;
 			} catch(e) { }
 		}
 	}
@@ -44,7 +44,7 @@ interface JHistory {
 	public toJSON(): JHistory {
 		return {
 			index: this.index,
-			savedIndex: this.savedIndex,
+			savedIndex: this._savedIndex,
 			steps: this.steps
 		}
 	}
@@ -68,18 +68,22 @@ interface JHistory {
 	}
 
 	public flush(selection: Control[]): void {
+		if(this._design.dragging) return;
 		let sel = selection.map(c => c.tag);
 		if(this._queue.length) {
 			let s = this.lastStep;
 			if(!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
-				this.addStep(new Step({
+				this.addStep(new Step(this._design, {
 					commands: this._queue,
 					construct: this._construct,
 					destruct: this._destruct,
-					mode: this.design.mode,
+					mode: this._design.mode,
 					before: this._selection,
 					after: sel
 				}));
+			} else if(s.isVoid) {
+				this.steps.pop();
+				this.index--;
 			}
 			this._queue = [];
 			this._construct = [];
@@ -90,11 +94,11 @@ interface JHistory {
 	}
 
 	public get modified(): boolean {
-		return this.savedIndex != this.index;
+		return this._savedIndex != this.index;
 	}
 
 	public notifySave(): void {
-		this.savedIndex = this.index;
+		this._savedIndex = this.index;
 	}
 
 	private addStep(step: Step): void {
@@ -106,7 +110,7 @@ interface JHistory {
 		if(this.steps.length > 30) {
 			this.steps.shift();
 			this.index--;
-			this.savedIndex--;
+			this._savedIndex--;
 		}
 	}
 
@@ -131,14 +135,14 @@ interface JHistory {
 	public undo(): void {
 		if(this.canUndo) {
 			this._moving = true;
-			this.steps[--this.index].undo(this.design);
+			this.steps[--this.index].undo();
 		}
 	}
 
 	public redo(): void {
 		if(this.canRedo) {
 			this._moving = true;
-			this.steps[this.index++].redo(this.design);
+			this.steps[this.index++].redo();
 		}
 	}
 }

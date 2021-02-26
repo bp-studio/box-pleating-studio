@@ -21,11 +21,6 @@
 	cursor: default;
 	padding: 10px;
 	transition: right 500ms;
-	overflow-y: auto;
-}
-
-#divPanel, #divPanel * {
-	touch-action: pan-y;
 }
 
 #divToolbar {
