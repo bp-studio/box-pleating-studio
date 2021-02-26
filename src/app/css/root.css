@@ -10,7 +10,13 @@ html {
 	font-size: 9pt;
 }
 
-body, .modal-open .modal {
+html, body {
+	height: 100%;
+	overflow: hidden;
+	position: fixed;
+}
+
+.modal-open .modal {
 	overflow: hidden;
 }
 

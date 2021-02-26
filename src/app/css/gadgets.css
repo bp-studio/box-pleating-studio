@@ -5,6 +5,7 @@
 
 .scroll-shadow {
 	overflow-y: auto;
+	-webkit-overflow-scrolling: touch; /* Safari 上啟用動能捲動 */
 
 	background:
 		/* Shadow covers */
