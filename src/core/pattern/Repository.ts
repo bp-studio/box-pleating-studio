@@ -43,6 +43,7 @@ interface JRepository {
 		let json = stretch.design.options.get(this);
 		if(json) {
 			this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
+			this._everActive = true;
 		} else {
 			this.generator = new Configurator(this, option).generate(
 				() => this.joinerCache.clear() // 搜尋完成之後清除快取

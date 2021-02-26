@@ -195,7 +195,7 @@ interface IDesignObject {
 	}
 
 	public restoreSelection(tags: string[]) {
-		if(this.mode == "Layout") this.clearLayoutSelection();
+		if(this.mode == "layout") this.clearLayoutSelection();
 		else this.clearTreeSelection();
 		for(let tag of tags) {
 			let obj = this.query(tag);

@@ -2217,6 +2217,8 @@ let Partition = class Partition extends Partitioner {
         for (let [c, o, q1] of this.intersectionCorners) {
             let ov = this.overlaps[o];
             let parent = this.getParent(ov);
+            if (!ov || !parent)
+                debugger;
             let [c1, c2] = [parent.c[0], parent.c[2]];
             let [f1, f2] = [flaps.get(c1.e), flaps.get(c2.e)];
             if (!f1 || !f2)
@@ -3261,7 +3263,7 @@ let Design = class Design extends DesignBase {
         return undefined;
     }
     restoreSelection(tags) {
-        if (this.mode == "Layout")
+        if (this.mode == "layout")
             this.clearLayoutSelection();
         else
             this.clearTreeSelection();
@@ -4916,16 +4918,12 @@ let BPStudio = class BPStudio {
         if (this._updating)
             return;
         this._updating = true;
-        try {
-            Shrewd.commit();
-        }
-        catch (e) {
-            debugger;
+        Shrewd.commit();
+        if (this.design && !this.design.dragging) {
+            this.design.history.flush(this.system.selections);
         }
         await PaperWorker.done();
         this.$display.project.view.update();
-        if (this.design)
-            this.design.history.flush(this.system.selections);
         if (this.onUpdate) {
             this.onUpdate();
             delete this.onUpdate;
@@ -4989,8 +4987,6 @@ let HistoryManager = class HistoryManager extends Disposable {
         this._destruct.push(memento);
     }
     flush(selection) {
-        if (this._design.dragging)
-            return;
         let sel = selection.map(c => c.tag);
         if (this._queue.length) {
             let s = this.lastStep;
@@ -7854,6 +7850,7 @@ let Repository = class Repository extends Store {
         let json = stretch.design.options.get(this);
         if (json) {
             this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
+            this._everActive = true;
         }
         else {
             this.generator = new Configurator(this, option).generate(() => this.joinerCache.clear());

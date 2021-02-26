@@ -83,6 +83,8 @@ interface JPartition {
 			// 找出原始對應的 flap
 			let parent = this.getParent(ov);
 
+			if(!ov || !parent) debugger;
+
 			let [c1, c2] = [parent.c[0], parent.c[2]];
 			let [f1, f2] = [flaps.get(c1.e!)!, flaps.get(c2.e!)!];
 

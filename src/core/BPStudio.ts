@@ -190,16 +190,13 @@
 
 		//if(perf) perfTime = 0;
 
-		try {
-			Shrewd.commit();
-		} catch(e) {
-			debugger;
+		Shrewd.commit();
+		if(this.design && !this.design.dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
+			this.design.history.flush(this.system.selections);
 		}
 
 		await PaperWorker.done();
 		this.$display.project.view.update();
-
-		if(this.design) this.design.history.flush(this.system.selections);
 
 		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 

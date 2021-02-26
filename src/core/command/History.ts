@@ -68,7 +68,6 @@ interface JHistory {
 	}
 
 	public flush(selection: Control[]): void {
-		if(this._design.dragging) return;
 		let sel = selection.map(c => c.tag);
 		if(this._queue.length) {
 			let s = this.lastStep;
