@@ -71,14 +71,15 @@ interface JHistory {
 		if(this._queue.length) {
 			let s = this.lastStep;
 			if(!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
-				this.addStep(new Step(this._design, {
+				let step = new Step(this._design, {
 					commands: this._queue,
 					construct: this._construct,
 					destruct: this._destruct,
 					mode: this._design.mode,
 					before: this._selection,
 					after: sel
-				}));
+				});
+				if(!step.isVoid) this.addStep(step);
 			} else if(s.isVoid) {
 				this.steps.pop();
 				this.index--;
