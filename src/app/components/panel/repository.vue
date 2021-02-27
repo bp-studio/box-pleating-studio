@@ -1,6 +1,6 @@
 <template >
 	<div>
-		<h5 v-t="'panel.repo.type'"></h5>
+		<h5 v-t="'panel.repo.type'" class="panel-title"></h5>
 		<store v-if="repository.size>1" :data="repository" :label="$t('panel.repo.config')"></store>
 		<store v-if="repository.entry.size>1" :data="repository.entry" :label="$t('panel.repo.pattern')"></store>
 		<div class="row" v-else-if="repository.size==1">

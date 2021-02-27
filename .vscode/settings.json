@@ -59,11 +59,12 @@
 	],
 	"cSpell.ignorePaths": [
 		"**/package*.json",
+		"src/locale/es.json",
 		".vscode",
 	],
 	"cSpell.ignoreWords": [
 		"fbclid",
 		"opendir",
 		"tinyurl"
-	]
+	],
 }

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h5 v-t="'panel.design.type'"></h5>
+		<h5 v-t="'panel.design.type'" class="panel-title"></h5>
 		<field :label="$t('panel.design.title')" v-model="design.title" :placeholder="$t('panel.design.titlePH')"></field>
 		<div class="mt-1 mb-4">
 			<textarea class="form-control" v-model="design.description" rows="4" :placeholder="$t('panel.design.descriptionPH')"></textarea>
