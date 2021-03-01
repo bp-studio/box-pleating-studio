@@ -35,7 +35,7 @@
 		public download(event: Event) {
 			if(this.href == "#") {
 				this.downloading = new Promise(resolve => this.downloaded = resolve);
-				event.preventDefault();
+				if(event) event.preventDefault();
 				this.getFile().then(() => (this.$el as any).click());
 			} else {
 				if(this.downloaded) this.downloaded();

@@ -133,7 +133,7 @@
 			"type": "Edge",
 			"length": "Length",
 			"split": "Split",
-			"merge": "Merge ends",
+			"merge": "Merge end vertices",
 			"goto": "Go to river"
 		},
 		"repo": {

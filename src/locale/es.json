@@ -52,7 +52,7 @@
 		"edge": {
 			"goto": "Ir al río",
 			"length": "Largo",
-			"merge": "Fusionar",
+			"merge": "Fusionar vértices finales",
 			"split": "Separar",
 			"type": "Borde"
 		},

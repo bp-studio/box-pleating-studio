@@ -3,7 +3,7 @@
 		<label class="col-form-label col-3" v-if="label">{{ label }}</label>
 		<div :class="{'col-9':label}">
 			<div class="input-group" style="flex-wrap:nowrap">
-				<button class="btn btn-sm btn-primary" type="button" @click="change(-step)">
+				<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)">
 					<i class="fas fa-minus"></i>
 				</button>
 				<input
@@ -19,7 +19,7 @@
 					@wheel="wheel($event)"
 					style="min-width:30px;"
 				/>
-				<button class="btn btn-sm btn-primary" type="button" @click="change(step)">
+				<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)">
 					<i class="fas fa-plus"></i>
 				</button>
 			</div>
@@ -39,6 +39,13 @@
 		@Prop(null) public max?: number;
 		@Prop(Number) public step: number = 1;
 
+		protected get canMinus() {
+			return this.min === undefined || this.v > this.min;
+		}
+		protected get canPlus() {
+			return this.max === undefined || this.v < this.max;
+		}
+
 		public input(event: InputEvent) {
 			let v = Number((event.target as HTMLInputElement).value);
 			if(v < this.min || v > this.max) return;
@@ -46,16 +53,18 @@
 			this.$emit('input', this.v);
 		}
 		public change(by: number) {
-			let v = Math.round((this.v + by) / this.step) * this.step;
+			// 這邊的計算起點採用 this.value 而非 this.v，
+			// 以免高速的滾動導致結果錯誤
+			let v = Math.round((this.value + by) / this.step) * this.step;
 			if(v < this.min || v > this.max) return;
 			this.$emit('input', v);
-			return v;
+			return this.v = v;
 		}
 		public wheel(event: WheelEvent) {
 			event.stopPropagation();
 			event.preventDefault();
 			let by = Math.round(-event.deltaY / 100);
-			this.v = this.change(by * this.step);
+			this.change(by * this.step);
 		}
 	}
 </script>

@@ -1,7 +1,7 @@
 <template >
 	<div>
 		<h5 v-t="'panel.river.type'" class="panel-title"></h5>
-		<number :label="$t('panel.river.width')" v-model.number="selection.length"></number>
+		<number :label="$t('panel.river.width')" v-model.number="selection.length" :min="0"></number>
 		<div class="mt-3">
 			<button class="btn btn-primary" @click="selection.delete()" v-t="'keyword.delete'"></button>
 		</div>

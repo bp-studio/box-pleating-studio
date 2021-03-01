@@ -9,9 +9,9 @@
 			<h6 v-if="design.mode=='tree'" v-t="'panel.design.tree'"></h6>
 			<h6 v-if="design.mode=='layout'" v-t="'panel.design.layout'"></h6>
 		</div>
-		<number :label="$t('panel.design.width')" v-model.number="design.sheet.width"></number>
-		<number :label="$t('panel.design.height')" v-model.number="design.sheet.height"></number>
-		<number :label="$t('panel.design.zoom')" :step="step" v-model.number="design.sheet.zoom"></number>
+		<number :label="$t('panel.design.width')" v-model.number="design.sheet.width" :min="8"></number>
+		<number :label="$t('panel.design.height')" v-model.number="design.sheet.height" :min="8"></number>
+		<number :label="$t('panel.design.zoom')" :step="step" v-model.number="design.sheet.zoom" :min="100"></number>
 	</div>
 </template>
 
