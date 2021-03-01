@@ -2,7 +2,7 @@
 	"name": "Español",
 	"flag": "spain",
 	"about": {
-		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyar esta aplicación, puede donar cualquier cantidad con {0}.",
+		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyarla, puede donar cualquier cantidad con {0}.",
 		"homepage": "página principal",
 		"license": "Publicado bajo licencia MIT.",
 		"title": "Acerca de Box Pleating Studio",
@@ -10,10 +10,10 @@
 	},
 	"donate": {
 		"error": "Por favor, introduzca un número",
-		"intro": "¡Gracias por considerar su apoyo a Box Pleating Studio! Ingrese la cantidad que le gustaría donar. Puedes comprarme un café con $ 1 o una cena con $ 10, etc. 😄 (la tarifa de manejo de PayPal se agregará durante el pago)",
+		"intro": "¡Gracias por considerar su apoyo a Box Pleating Studio! Indique la cantidad que le gustaría donar. Puedes comprarme un café con $ 1 o una cena con $ 10, etc. 😄 (la comisión de PayPal se agregará durante el pago)",
 		"nextTime": "Quizás la próxima vez",
 		"thank": "¡Muchas gracias, {0}, por tu amable donación!",
-		"then": "Luego haga clic en el botón de abajo y siga las instrucciones para completar.",
+		"then": "A continuación haga clic en el botón de abajo y siga las instrucciones para completar el pago.",
 		"title": "Box Pleating Studio de apoyo",
 		"wait": "Espere hasta que PayPal complete su transacción ..."
 	},
@@ -22,25 +22,25 @@
 		"delete": "Borrar",
 		"no": "No",
 		"ok": "OK",
-		"untitled": "Intitulado",
+		"untitled": "Sin título",
 		"version": "Versión",
 		"workspace": "espacio de trabajo",
 		"yes": "sí"
 	},
 	"message": {
 		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
-		"downloadHint": "Haz clic derecho y usa \"Guardar como\" para elegir la ubicación del archivo.",
+		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
 		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
 		"min3vertex": "El árbol debe tener al menos 3 vértices.",
-		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente en el próximo guardado.",
-		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero por ahora BP Studio no puede encontrar patrones de estiramiento que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos para cubrir más casos.",
+		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
+		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
 		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?"
 	},
 	"panel": {
 		"design": {
 			"descriptionPH": "(Descripción del Proyecto)",
-			"height": "Altura",
+			"height": "Alto",
 			"layout": "Vista de maquetación",
 			"title": "Título",
 			"titlePH": "(Título del Proyecto)",
@@ -52,7 +52,7 @@
 		"edge": {
 			"goto": "Ir al río",
 			"length": "Largo",
-			"merge": "Fusionar termina",
+			"merge": "Fusionar",
 			"split": "Separar",
 			"type": "Borde"
 		},
@@ -105,7 +105,7 @@
 		"language": "Idioma"
 	},
 	"share": {
-		"copy": "Dupdo",
+		"copy": "Copiar",
 		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!",
 		"share": "Cuota",
 		"shorten": "Acortar",
@@ -123,18 +123,18 @@
 			"new": "Nuevo proyecto",
 			"open": "Proyectos abiertos / espacios de trabajo",
 			"print": "Imprimir vista actual",
-			"saveBPS": "Descargar proyecto actual",
-			"saveBPZ": "Descargar espacio de trabajo",
-			"savePNG": "Descargar la vista actual como PNG",
-			"saveSVG": "Descargar la vista actual como SVG",
+			"saveBPS": "Exportar proyecto actual",
+			"saveBPZ": "Exportar espacio de trabajo",
+			"savePNG": "Exportar la vista actual como PNG",
+			"saveSVG": "Exportar la vista actual como SVG",
 			"share": "Compartir proyecto actual",
 			"title": "Archivos"
 		},
 		"help": {
-			"about": "Sobre",
+			"about": "Acerca de",
 			"discussions": "Discusiones",
 			"donation": "Donación",
-			"issue": "Informar problema",
+			"issue": "Reportar error",
 			"news": "Información de la versión",
 			"title": "Ayuda",
 			"update": "Listo para actualizar"
@@ -154,23 +154,23 @@
 			"fullscreen": "Pantalla completa",
 			"fullscreenExit": "Salir de pantalla completa",
 			"grid": "Mostrar líneas de cuadrícula",
-			"hinge": "Mostrar pliegues bisagra",
+			"hinge": "Mostrar pliegues de bisagra",
 			"label": "Mostrar etiquetas",
 			"preference": "Preferencias",
-			"ridge": "Mostrar pliegues cresta",
-			"tip": "Mostrar consejos de solapa",
+			"ridge": "Mostrar pliegues de cresta",
+			"tip": "Mostrar puntas",
 			"title": "Ajustes"
 		},
 		"tab": {
-			"clone": "Clon",
+			"clone": "Clonar",
 			"close": "Cerrar",
-			"closeAll": "Cierra todo",
+			"closeAll": "Cerrar todo",
 			"closeOther": "Cerrar otros",
-			"closeRight": "Cierra todo a la derecha"
+			"closeRight": "Cerrar todo a la derecha"
 		},
 		"tools": {
 			"TreeMaker": "Importar archivo TreeMaker",
-			"title": "Instrumentos"
+			"title": "Herramientas"
 		},
 		"view": {
 			"layout": "Diseño",
@@ -188,8 +188,8 @@
 			"open": "Aplicación Open Box Pleating Studio"
 		},
 		"intro": [
-			"Esta aplicación está diseñada para ayudar a los diseñadores de origami a crear diseños locos y complejos utilizando pliegue en grilla cuadriculada (box pleating) y dispositivos GOPS.",
-			"Para comenzar, haga clic en el botón de menú superior izquierdo para crear un nuevo proyecto vacío o lea nuestro breve manual de usuario en {0} (solo en inglés)."
+			"Esta aplicación está diseñada para ayudar a los diseñadores de origami a crear diseños locos y complejos utilizando pliegues sobre grillas cuadradas (o box pleating en su expresión inglesa) y dispositivos GOPS.",
+			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0} (solo en inglés)."
 		],
 		"title": "¡Bienvenido a Box Pleating Studio!"
 	}
