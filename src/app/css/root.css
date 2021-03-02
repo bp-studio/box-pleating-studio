@@ -30,7 +30,7 @@ html, body {
  * 禁止長按選取
  *********************************************/
 
-*:not(input):not(textarea) {
+*:not(input):not(textarea):not(.requirement) {
 	user-select: none;
 	-moz-user-select: none;
 	-webkit-user-select: none;
