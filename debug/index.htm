@@ -21,7 +21,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "919"
+			app_version: "922"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -88,7 +88,7 @@
 				// but eventually the service worker and the app it will update.
 				reg.addEventListener('updatefound', function() {
 					if(reg.active) reg.installing.addEventListener('statechange', function(e) {
-						if(e.target.state == "activated") core.updated = true;
+						if(e.target.state == "activated") setTimeout(function() { core.updated = true; }, 0);
 					});
 				});
 			});
@@ -136,7 +136,7 @@
 			];
 
 			window.onerror = function(a, b, c, d, e) {
-				if(!b&&!c&&!d) return; // error is caused by injection; ignore.
+				if(!b && !c && !d) return; // error is caused by injection; ignore.
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(a.match(ignoreError[i])) return;
 				}

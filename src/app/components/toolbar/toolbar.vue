@@ -29,7 +29,7 @@
 					<i class="far fa-comment-dots"></i>
 					{{$t("toolbar.help.discussions")}}
 				</a>
-					<a
+				<a
 					class="dropdown-item"
 					href="https://github.com/MuTsunTsai/box-pleating-studio/issues"
 					target="_blank"
@@ -38,14 +38,16 @@
 					<i class="fas fa-bug"></i>
 					{{$t("toolbar.help.issue")}}
 				</a>
-				<template v-if="core.updated">
-					<divider></divider>
-					<div class="dropdown-item" @click="update">
-						<i class="far fa-arrow-alt-circle-up"></i>
-						{{$t('toolbar.help.update')}}
-						<div class="notify"></div>
-					</div>
-				</template>
+				<divider></divider>
+				<div class="dropdown-item" @click="update" v-if="core.updated">
+					<i class="far fa-arrow-alt-circle-up"></i>
+					{{$t('toolbar.help.update')}}
+					<div class="notify"></div>
+				</div>
+				<div class="dropdown-item" @click="checkUpdate" v-else>
+					<i class="far fa-arrow-alt-circle-up"></i>
+					{{$t('toolbar.help.checkUpdate')}}
+				</div>
 				<divider></divider>
 				<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
 					<i class="fas fa-hand-holding-usd"></i>
@@ -173,6 +175,17 @@
 
 		private async update() {
 			if(await core.confirm(this.$t("message.updateReady"))) location.reload();
+		}
+
+		private async checkUpdate() {
+			let reg = await navigator.serviceWorker.ready;
+			let cb = () => this.update();
+			reg.addEventListener("updatefound", cb, { once: true });
+			await reg.update();
+			if(!reg.installing && !reg.waiting) {
+				reg.removeEventListener("updatefound", cb);
+				await core.alert(this.$t("message.latest"));
+			}
 		}
 
 		private news() {

@@ -36,7 +36,8 @@
 		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
 		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
-		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?"
+		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
+		"latest": "Ya tienes la última versión de BP Studio."
 	},
 	"panel": {
 		"design": {
@@ -138,7 +139,8 @@
 			"issue": "Reportar error",
 			"news": "Información de la versión",
 			"title": "Ayuda",
-			"update": "Listo para actualizar"
+			"update": "Listo para actualizar",
+			"checkUpdate": "Buscar actualizaciones"
 		},
 		"panel": "Panel de opciones",
 		"project": {
