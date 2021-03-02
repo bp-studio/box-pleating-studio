@@ -1,6 +1,7 @@
 {
 	"name": "简体中文",
 	"flag": "china",
+	"since": 900,
 	"about": {
 		"donation": "BP Studio 的使用是完全免费的。若您觉得本 App 对您的折纸设计有帮助并有兴趣提供支持，欢迎您透过 {0} 任意捐款。",
 		"homepage": "首页",

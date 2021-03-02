@@ -1,6 +1,7 @@
 {
 	"name": "Español",
 	"flag": "spain",
+	"since": 900,
 	"about": {
 		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyarla, puede donar cualquier cantidad con {0}.",
 		"homepage": "página principal",

@@ -40,6 +40,7 @@
 	declare const core: Core;
 	declare const gtag: any;
 	declare const LZ: any;
+	declare const app_config: any;
 
 	export { core };
 
@@ -149,21 +150,26 @@
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
 			}
 			let l = localStorage.getItem("locale");
+			let v = Number(localStorage.getItem("build") ?? 0);
 			let r = (l: string) => l.replace(/_/g, "-").toLowerCase();
-			if(!l && navigator.languages) {
+			if(navigator.languages) {
 				let locales = Object.keys(locale);
 				let languages = navigator.languages
 					.map(a => locales.find(l => r(a).startsWith(l)))
 					.filter(l => !!l);
+				if(l) languages.unshift(l);
 				languages = Array.from(new Set(languages));
-				if(languages.length > 1) {
+
+				// 跳出語言選項的條件：沒有語言設定、或者有新加入的支援語言
+				if(languages.length > 1 && (!l || languages.some(l => locale[l].since > v))) {
 					this.languages = languages;
 					this.libReady.then(() => this.mdlLanguage.show());
 				}
-				l = languages[0] || navigator.languages[0];
+				if(!l) l = languages[0] || navigator.languages[0];
 			}
 			if(!l) l = "en";
 			i18n.locale = r(l);
+			localStorage.setItem("build", app_config.app_version);
 			this.onLocaleChanged();
 		}
 
