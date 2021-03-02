@@ -149,7 +149,7 @@
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
 			}
 			let l = localStorage.getItem("locale");
-			let r = l => l.replace(/_/g, "-").toLowerCase();
+			let r = (l: string) => l.replace(/_/g, "-").toLowerCase();
 			if(!l && navigator.languages) {
 				let locales = Object.keys(locale);
 				let languages = navigator.languages

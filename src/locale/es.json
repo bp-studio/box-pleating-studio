@@ -25,7 +25,7 @@
 		"untitled": "Sin título",
 		"version": "Versión",
 		"workspace": "espacio de trabajo",
-		"yes": "sí"
+		"yes": "Sí"
 	},
 	"message": {
 		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
@@ -188,7 +188,7 @@
 			"open": "Aplicación Open Box Pleating Studio"
 		},
 		"intro": [
-			"Esta aplicación está diseñada para ayudar a los diseñadores de origami a crear diseños locos y complejos utilizando pliegues sobre grillas cuadradas (o box pleating en su expresión inglesa) y dispositivos GOPS.",
+			"Esta aplicación se ha desarrollado para ayudar a los diseñadores de origami a crear modelos complejos y sorprendentes utilizando pliegues en grilla cuadriculada (box pleating) y dispositivos GOPS.",
 			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0} (solo en inglés)."
 		],
 		"title": "¡Bienvenido a Box Pleating Studio!"

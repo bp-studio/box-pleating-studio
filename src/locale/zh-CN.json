@@ -1,0 +1,196 @@
+{
+	"name": "简体中文",
+	"flag": "china",
+	"about": {
+		"donation": "BP Studio 的使用是完全免费的。若您觉得本 App 对您的折纸设计有帮助并有兴趣提供支持，欢迎您透过 {0} 任意捐款。",
+		"homepage": "首页",
+		"license": "依 MIT 授权条款发行",
+		"title": "关于 Box Pleating Studio",
+		"visit": "欲参阅指南或提供意见回馈，请前往本 App 在 GitHub 上的 {0}。"
+	},
+	"donate": {
+		"error": "请输入一个数字",
+		"intro": "感谢您考虑赞助 Box Pleating Studio！请输入任何您想捐款的数字。您可以捐美金 $1 请我喝杯咖啡，或 $10 请我吃顿饭之类的。 😄 (PayPal 手续费会在结帐时加上去)",
+		"nextTime": "下次再说",
+		"thank": "{0}，感谢您的热情捐款！",
+		"then": "然后按下底下的按钮并依指示完成捐款。",
+		"title": "赞助 Box Pleating Studio",
+		"wait": "请等待 PayPal 完成您的交易……"
+	},
+	"keyword": {
+		"close": "关闭",
+		"delete": "删除",
+		"no": "否",
+		"ok": "确定",
+		"untitled": "未命名",
+		"version": "版本",
+		"workspace": "工作区",
+		"yes": "是"
+	},
+	"message": {
+		"connFail": "网络连线失败；请稍后再试。",
+		"downloadHint": "按右键并点选「另存连结」可指定存档位置",
+		"invalidFormat": "文件「{0}」的格式无效。",
+		"min3vertex": "树状结构至少需要有三个顶点",
+		"oldVersion": "项目「{0}」是使用较旧版本的 BP Studio 产生的，部份伸展结构可能会需要重新选取。项目会在下次存档时更新为最新格式。",
+		"patternNotFound": "在当前的设计中，存在一些角片重叠是虽然有效、但目前的 BP Studio 却无法找到可行的伸展折痕模式的。本应用的作者将会持续实作更多演算法以涵盖更多情况。",
+		"unsaved": "项目「{0}」有尚未保存的变更，确定要舍弃？",
+		"updateReady": "更新版本的 BP Studio 已准备就绪，并将在重新启动时自动更新。您想要现在立刻重新启动吗？"
+	},
+	"panel": {
+		"design": {
+			"descriptionPH": "(项目描述)",
+			"height": "高度",
+			"layout": "配置视图",
+			"title": "标题",
+			"titlePH": "(项目标题)",
+			"tree": "树状结构视图",
+			"type": "Box Pleating Studio 项目",
+			"width": "宽度",
+			"zoom": "缩放"
+		},
+		"edge": {
+			"goto": "前往河",
+			"length": "长度",
+			"merge": "融合端点",
+			"split": "分割",
+			"type": "边"
+		},
+		"flap": {
+			"goto": "前往顶点",
+			"height": "高度",
+			"name": "名称",
+			"radius": "半径",
+			"type": "角片",
+			"width": "宽度"
+		},
+		"flaps": {
+			"goto": "前往顶点",
+			"type": "角片"
+		},
+		"repo": {
+			"config": "组态",
+			"onlyOne": "只找到了一种折痕模式",
+			"pattern": "折痕模式",
+			"type": "伸展结构"
+		},
+		"river": {
+			"goto": "前往边",
+			"type": "河",
+			"width": "宽度"
+		},
+		"vertex": {
+			"addLeaf": "新增叶边",
+			"delJoin": "删除并合并端点",
+			"goto": "前往角片",
+			"name": "名称",
+			"ofLength": "长度为",
+			"type": "顶点"
+		},
+		"vertices": {
+			"goto": "前往角片",
+			"type": "顶点"
+		}
+	},
+	"plugin": {
+		"TreeMaker": {
+			"invalid": "文件「{0}」似乎已损坏，无法成功读取。",
+			"not5": "文件「{0}」不是 TreeMaker 5 的格式。",
+			"size8": "BP Studio 要求纸张大小至少为 8。"
+		}
+	},
+	"preference": {
+		"autoSave": "自动保存工作区",
+		"includeHidden": "在 SVG 输出中包含隐藏元件",
+		"language": "语言"
+	},
+	"share": {
+		"copy": "复制",
+		"message": "快来看我用 Box Pleating Studio 设计的项目「{0}」！",
+		"share": "分享",
+		"shorten": "缩短",
+		"title": "分享项目"
+	},
+	"toolbar": {
+		"edit": {
+			"redo": "恢复",
+			"selectAll": "全选",
+			"title": "编辑",
+			"undo": "撤消"
+		},
+		"file": {
+			"copyPNG": "以 PNG 格式复制目前的视图",
+			"new": "新建项目",
+			"open": "打开项目 / 工作区",
+			"print": "打印目前的视图",
+			"saveBPS": "下载目前的项目",
+			"saveBPZ": "下载工作区",
+			"savePNG": "以 PNG 格式下载目前的视图",
+			"saveSVG": "以 SVG 格式下载目前的视图",
+			"share": "分享目前的项目",
+			"title": "文件"
+		},
+		"help": {
+			"about": "关于",
+			"discussions": "讨论区",
+			"donation": "捐款",
+			"issue": "回报问题",
+			"news": "版本资讯",
+			"title": "说明",
+			"update": "准备更新"
+		},
+		"panel": "选项面板",
+		"project": {
+			"clone": "复制目前的项目",
+			"close": "关闭目前的项目",
+			"closeAll": "关闭所有项目",
+			"empty": "目前没有打开的项目",
+			"noTitle": "(无标题)",
+			"title": "打开的项目"
+		},
+		"setting": {
+			"axial": "显示装置中的轴平行折痕",
+			"dPad": "显示方向键",
+			"fullscreen": "全屏模式",
+			"fullscreenExit": "退出全屏模式",
+			"grid": "显示格线",
+			"hinge": "显示枢纽折痕",
+			"label": "显示标签",
+			"preference": "首选项",
+			"ridge": "显示脊折痕",
+			"tip": "显示角片顶点",
+			"title": "设置"
+		},
+		"tab": {
+			"clone": "复制",
+			"close": "关闭",
+			"closeAll": "全部关闭",
+			"closeOther": "关闭其它",
+			"closeRight": "关闭右侧"
+		},
+		"tools": {
+			"TreeMaker": "汇入 TreeMaker 文件",
+			"title": "工具"
+		},
+		"view": {
+			"layout": "配置",
+			"tree": "树状结构"
+		}
+	},
+	"welcome": {
+		"copyright": "Copyright © 2020{0} 蔡牧村",
+		"install": {
+			"bt": "安装 Box Pleating Studio App",
+			"ed": "BP Studio 已经安装到您的装置上了。",
+			"hint": "您也可以将 BP Studio 以独立应用的形式安装至您的装置上，并离线使用！",
+			"ing": "安装 App 中，请稍待……",
+			"ios": "iOS 安装方法：在 Safari 中打开本网址，按下屏幕中间下方的分享按钮，并且点选「加入至首页」。",
+			"open": "打开 Box Pleating Studio App"
+		},
+		"intro": [
+			"本应用是做来帮助折纸设计者利用箱形褶（box pleating，日文作「蛇腹折り」）系统和 GOPS 来设计超复杂超狂的作品。",
+			"您可以从左上角的菜单建立新的空白项目，或是至 {0} 阅读简短的指南（英文版）。"
+		],
+		"title": "欢迎使用 Box Pleating Studio！"
+	}
+}
