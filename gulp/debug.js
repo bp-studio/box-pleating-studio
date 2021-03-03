@@ -15,8 +15,25 @@ function transform(file, encoding, callback) {
 	// 變換基底
 	content = content.replace('</title>', '</title>\n\t<base href="../dist/">');
 
-	// 本地端測試檔案不加上的東西
-	content = content.replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', "");
+	// 本地端測試檔案的修改
+	content = content.replace(
+		'<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>',
+		`<script>
+		// Local fetch polyfill
+		let org_fetch = fetch;
+		fetch = function(url) {
+			if(url.startsWith("h")) return org_fetch(url);
+			else return new Promise(resolve => {
+				let oReq = new XMLHttpRequest();
+				oReq.addEventListener("load", e =>
+					resolve({ text: () => e.target.responseText })
+				);
+				oReq.open("GET", url);
+				oReq.send();
+			})
+		};
+	</script>`
+	);
 	content = content.replace('<link rel="manifest" href="manifest.json">', "");
 
 	// 替換成偵錯版資源

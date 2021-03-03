@@ -39,6 +39,8 @@
 		@Prop(null) public max?: number;
 		@Prop(Number) public step: number = 1;
 
+		private lastWheel: number = performance.now();
+
 		protected get canMinus() {
 			return this.min === undefined || this.v > this.min;
 		}
@@ -52,6 +54,7 @@
 			this.v = v;
 			this.$emit('input', this.v);
 		}
+
 		public change(by: number) {
 			// 這邊的計算起點採用 this.value 而非 this.v，
 			// 以免高速的滾動導致結果錯誤
@@ -60,9 +63,16 @@
 			this.$emit('input', v);
 			return this.v = v;
 		}
+
 		public wheel(event: WheelEvent) {
 			event.stopPropagation();
 			event.preventDefault();
+
+			// 做一個 throttle 以免過度觸發
+			let now = performance.now();
+			if(now - this.lastWheel < 50) return;
+			this.lastWheel = now;
+
 			let by = Math.round(-event.deltaY / 100);
 			this.change(by * this.step);
 		}

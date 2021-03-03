@@ -549,7 +549,7 @@ Vue.component('share', { render() { with (this) {
     } });
 
 Vue.component('version', { render() { with (this) {
-        return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-body scroll-shadow", staticStyle: { "max-height": "70vh" } }, [(record[index]) ? _c('div', { domProps: { "innerHTML": _s(record[index]) } }) : _c('div', { staticClass: "m-5 display-2 text-muted text-center" }, [_c('i', { staticClass: "bp-spinner fa-spin" })])]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == 0 }, on: { "click": function ($event) { index--; } } }, [_c('i', { staticClass: "fas fa-caret-left" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == max }, on: { "click": function ($event) { index++; } } }, [_c('i', { staticClass: "fas fa-caret-right" })])]), _v(" "), _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
+        return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-body scroll-shadow", staticStyle: { "max-height": "70vh", "border-radius": "0.3rem" } }, [(record[index]) ? _c('div', { domProps: { "innerHTML": _s(record[index]) } }) : _c('div', { staticClass: "m-5 display-2 text-muted text-center" }, [_c('i', { staticClass: "bp-spinner fa-spin" })])]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == 0 }, on: { "click": function ($event) { index--; } } }, [_c('i', { staticClass: "fas fa-caret-left" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == max }, on: { "click": function ($event) { index++; } } }, [_c('i', { staticClass: "fas fa-caret-right" })])]), _v(" "), _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
     } }, data() { return { record: {}, index: undefined, max: undefined, active: false, modal: undefined }; }, watch: { 'index'(index) {
             if (location.protocol == "https:")
                 this.load(index);
@@ -731,7 +731,7 @@ Vue.component('keybutton', { render() { with (this) {
 Vue.component('number', { render() { with (this) {
         return _c('div', { class: label ? 'row mb-2' : '' }, [(label) ? _c('label', { staticClass: "col-form-label col-3" }, [_v(_s(label))]) : _e(), _v(" "), _c('div', { class: { 'col-9': label } }, [_c('div', { staticClass: "input-group", staticStyle: { "flex-wrap": "nowrap" } }, [_c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "disabled": !canMinus, "type": "button" }, on: { "click": function ($event) { return change(-step); } } }, [_c('i', { staticClass: "fas fa-minus" })]), _v(" "), _c('input', { directives: [{ name: "model", rawName: "v-model", value: (v), expression: "v" }], staticClass: "form-control", class: { 'error': v != value }, staticStyle: { "min-width": "30px" }, attrs: { "type": "number", "min": min, "max": max }, domProps: { "value": (v) }, on: { "focus": function ($event) { return focus($event); }, "blur": blur, "input": [function ($event) { if ($event.target.composing)
                                     return; v = $event.target.value; }, function ($event) { return input($event); }], "wheel": function ($event) { return wheel($event); } } }), _v(" "), _c('button', { staticClass: "btn btn-sm btn-primary", attrs: { "disabled": !canPlus, "type": "button" }, on: { "click": function ($event) { return change(step); } } }, [_c('i', { staticClass: "fas fa-plus" })])])])]);
-    } }, mixins: [InputMixin], props: { label: String, min: null, max: null, step: { type: Number, default: 1 } }, computed: { canMinus() {
+    } }, mixins: [InputMixin], data() { return { lastWheel: performance.now() }; }, props: { label: String, min: null, max: null, step: { type: Number, default: 1 } }, computed: { canMinus() {
             return this.min === undefined || this.v > this.min;
         }, canPlus() {
             return this.max === undefined || this.v < this.max;
@@ -752,6 +752,11 @@ Vue.component('number', { render() { with (this) {
         }, wheel(event) {
             event.stopPropagation();
             event.preventDefault();
+            // 做一個 throttle 以免過度觸發
+            let now = performance.now();
+            if (now - this.lastWheel < 50)
+                return;
+            this.lastWheel = now;
             let by = Math.round(-event.deltaY / 100);
             this.change(by * this.step);
         } } });

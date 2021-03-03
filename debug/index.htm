@@ -13,7 +13,21 @@
 	<meta name="version" content="0.4.0">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
-	
+	<script>
+		// Local fetch polyfill
+		let org_fetch = fetch;
+		fetch = function(url) {
+			if(url.startsWith("h")) return org_fetch(url);
+			else return new Promise(resolve => {
+				let oReq = new XMLHttpRequest();
+				oReq.addEventListener("load", e =>
+					resolve({ text: () => e.target.responseText })
+				);
+				oReq.open("GET", url);
+				oReq.send();
+			})
+		};
+	</script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag() { dataLayer.push(arguments); }
@@ -21,7 +35,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "922"
+			app_version: "927"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
