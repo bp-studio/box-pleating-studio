@@ -43,7 +43,7 @@
 		private modal: Bootstrap.Modal;
 
 		@Watch('index') onIndex(index: number) {
-			if(location.protocol == "https:") this.load(index);
+			this.load(index);
 		}
 
 		mounted() {

@@ -12,9 +12,8 @@
 	<meta name="google" content="notranslate">
 	<meta name="version" content="0.4.0">
 
-	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<!-- Local fetch polyfill -->
 	<script>
-		// Local fetch polyfill
 		let org_fetch = fetch;
 		fetch = function(url) {
 			if(url.startsWith("h")) return org_fetch(url);
@@ -35,7 +34,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "927"
+			app_version: "928"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);

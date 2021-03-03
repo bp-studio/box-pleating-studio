@@ -551,8 +551,7 @@ Vue.component('share', { render() { with (this) {
 Vue.component('version', { render() { with (this) {
         return _c('div', { staticClass: "modal fade" }, [_c('div', { staticClass: "modal-dialog modal-dialog-centered" }, [_c('div', { staticClass: "modal-content mx-4" }, [_c('div', { staticClass: "modal-body scroll-shadow", staticStyle: { "max-height": "70vh", "border-radius": "0.3rem" } }, [(record[index]) ? _c('div', { domProps: { "innerHTML": _s(record[index]) } }) : _c('div', { staticClass: "m-5 display-2 text-muted text-center" }, [_c('i', { staticClass: "bp-spinner fa-spin" })])]), _v(" "), _c('div', { staticClass: "modal-footer" }, [_c('div', { staticClass: "flex-grow-1" }, [_c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == 0 }, on: { "click": function ($event) { index--; } } }, [_c('i', { staticClass: "fas fa-caret-left" })]), _v(" "), _c('button', { staticClass: "btn btn-primary", attrs: { "disabled": index == max }, on: { "click": function ($event) { index++; } } }, [_c('i', { staticClass: "fas fa-caret-right" })])]), _v(" "), _c('button', { directives: [{ name: "t", rawName: "v-t", value: ('keyword.ok'), expression: "'keyword.ok'" }], staticClass: "btn btn-primary", attrs: { "type": "button", "data-bs-dismiss": "modal" } })])])])]);
     } }, data() { return { record: {}, index: undefined, max: undefined, active: false, modal: undefined }; }, watch: { 'index'(index) {
-            if (location.protocol == "https:")
-                this.load(index);
+            this.load(index);
         } }, methods: { async load(index) {
             await core.libReady;
             if (!this.record[index]) {

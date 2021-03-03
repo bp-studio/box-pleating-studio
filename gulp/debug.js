@@ -16,10 +16,11 @@ function transform(file, encoding, callback) {
 	content = content.replace('</title>', '</title>\n\t<base href="../dist/">');
 
 	// 本地端測試檔案的修改
+	content = content.replace('<link rel="manifest" href="manifest.json">', "");
 	content = content.replace(
-		'<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>',
-		`<script>
-		// Local fetch polyfill
+		/<!-- Global site tag .+?<\/script>/s,
+		`<!-- Local fetch polyfill -->
+	<script>
 		let org_fetch = fetch;
 		fetch = function(url) {
 			if(url.startsWith("h")) return org_fetch(url);
@@ -34,7 +35,6 @@ function transform(file, encoding, callback) {
 		};
 	</script>`
 	);
-	content = content.replace('<link rel="manifest" href="manifest.json">', "");
 
 	// 替換成偵錯版資源
 	content = content.replace('main.js', '../debug/main.js');
