@@ -4828,7 +4828,6 @@ let BPStudio = class BPStudio {
         this.designMap = new Map();
         this.design = null;
         this._updating = false;
-        this._lastUpdate = performance.now();
         if (typeof paper != "object")
             throw new Error("BPStudio requires paper.js.");
         let el = document.querySelector(selector);
@@ -4839,7 +4838,7 @@ let BPStudio = class BPStudio {
         this.$paper = new paper.PaperScope();
         this.$display = new Display(this);
         this.system = new System(this);
-        this.update();
+        new Animator(this.update.bind(this), 50);
     }
     load(json) {
         if (typeof json == "string")
@@ -4907,12 +4906,7 @@ let BPStudio = class BPStudio {
     }
     get TreeMaker() { return TreeMaker; }
     get running() { return this._updating; }
-    async update(time) {
-        time = time !== null && time !== void 0 ? time : performance.now();
-        if (time - this._lastUpdate < 50) {
-            requestAnimationFrame(this.update.bind(this));
-            return;
-        }
+    async update() {
         if (this._updating)
             return;
         this._updating = true;
@@ -4927,8 +4921,6 @@ let BPStudio = class BPStudio {
             delete this.onUpdate;
         }
         this._updating = false;
-        this._lastUpdate = time;
-        requestAnimationFrame(this.update.bind(this));
     }
 };
 __decorate([
@@ -5540,6 +5532,28 @@ let River = class River extends ViewedControl {
 River = __decorate([
     shrewd
 ], River);
+class Animator {
+    constructor(action, throttle = 0) {
+        this._last = performance.now();
+        this._action = action;
+        this._throttle = throttle;
+        this._run = (time) => {
+            if (time - this._last >= this._throttle) {
+                this._action();
+                this._last = time;
+            }
+            this._next();
+        };
+        this._next();
+        setInterval(() => {
+            cancelAnimationFrame(this._request);
+            this._next();
+        }, 300);
+    }
+    _next() {
+        this._request = requestAnimationFrame(this._run);
+    }
+}
 let Display = class Display {
     constructor(studio) {
         this.MARGIN = 30;

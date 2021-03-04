@@ -94,7 +94,7 @@
 		this.$display = new Display(this);
 		this.system = new System(this);
 
-		this.update();
+		new Animator(this.update.bind(this), 50);
 	}
 
 	public load(json: string | object): Design {
@@ -172,19 +172,12 @@
 	public get running() { return this._updating; }
 
 	private _updating: boolean = false;
-	private _lastUpdate: number = performance.now();
 
 	/** 提供 UI 來註冊儲存 session 的動作 */
 	public onUpdate?: Action;
 
 	/** 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法 */
-	public async update(time?: number) {
-		time = time ?? performance.now();
-		if(time - this._lastUpdate < 50) {
-			requestAnimationFrame(this.update.bind(this));
-			return;
-		}
-
+	public async update() {
 		if(this._updating) return;
 		this._updating = true;
 
@@ -206,7 +199,5 @@
 		}
 
 		this._updating = false;
-		this._lastUpdate = time;
-		requestAnimationFrame(this.update.bind(this));
 	}
 }
