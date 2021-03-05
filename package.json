@@ -29,6 +29,7 @@
 		"gulp-workbox": "^1.0.2",
 		"gulp-wrap": "^0.15.0",
 		"gulp-wrap-js": "^0.4.1",
+		"inquirer": "^8.0.0",
 		"jszip": "^3.5.0",
 		"ttf2woff2": "^4.0.1",
 		"typescript": "^4.0.5",

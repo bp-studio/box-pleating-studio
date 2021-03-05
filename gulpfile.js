@@ -14,6 +14,7 @@ let ts = require('gulp-typescript');
 let workbox = require('gulp-workbox');
 let wrap = require("gulp-wrap");
 let wrapJS = require("gulp-wrap-js");
+let inquirer = require('inquirer');
 
 let debug = require('./gulp/debug');
 let i18n = require('./gulp/i18n');
@@ -39,7 +40,7 @@ let htmlMinOption = {
 	minifyJS: true
 };
 
-// 更新模組
+// 本地更新 Shrewd 模組
 gulp.task('shrewd', () => (
 	gulp.src("../shrewd/dist/shrewd.min.js")
 		.pipe(replace(/\/\/#.+?\n/, ""))
@@ -101,7 +102,7 @@ gulp.task('buildService', () => {
 				'manifest.json',
 				'assets/icon/icon-32.png',
 				'assets/icon/icon-192.png',
-				`log/${lastLog}.md`
+				`log/${lastLog}.md` // 只有最後一個 log 會被 precache
 			],
 			globIgnores: ['sw.js']
 		}))
@@ -233,10 +234,13 @@ gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pip
 	))
 ));
 
-gulp.task('buildAll', gulp.series(
-	'buildCore',
-	'buildCorePub',
+gulp.task('buildAll', gulp.parallel(
+	gulp.series(
+		'buildCore',
+		'buildCorePub'
+	),
 	'buildCss',
+	'buildLocale',
 	'buildApp',
 	'buildLog',
 ));
@@ -253,10 +257,20 @@ gulp.task('deployDev', gulp.series(
 	'uploadDev'
 ));
 
-gulp.task('deployPub', gulp.series(
-	'buildAll',
-	'update',
-	'uploadPub'
-));
+gulp.task('deployPub', async done => {
+	let answers = await inquirer.prompt([{
+		type: 'confirm',
+		message: '請記得在發布之前更新版本號並加入更新 log。確定發布到正式版？',
+		name: 'ok'
+	}]);
+	if(answers.ok) {
+		await new Promise(cb => gulp.series(
+			'buildAll',
+			'update',
+			'uploadPub'
+		)(cb));
+	}
+	done();
+});
 
 gulp.task('default', gulp.series('buildCore'));

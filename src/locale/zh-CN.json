@@ -136,7 +136,7 @@
 			"about": "关于",
 			"discussions": "讨论区",
 			"donation": "捐款",
-			"issue": "回报问题",
+			"issue": "问题反馈",
 			"news": "版本资讯",
 			"title": "说明",
 			"update": "已准备更新",
@@ -172,7 +172,7 @@
 			"closeRight": "关闭右侧"
 		},
 		"tools": {
-			"TreeMaker": "汇入 TreeMaker 文件",
+			"TreeMaker": "导入 TreeMaker 文件",
 			"title": "工具"
 		},
 		"view": {
@@ -191,7 +191,7 @@
 			"open": "打开 Box Pleating Studio App"
 		},
 		"intro": [
-			"本应用是做来帮助折纸设计者利用箱形褶（box pleating，日文作「蛇腹折り」）系统和 GOPS 来设计超复杂超狂的作品。",
+			"本应用是用来帮助折纸设计者利用箱形褶（box pleating，日文作「蛇腹折り」）系统和 GOPS 来设计超复杂超狂的作品。",
 			"您可以从左上角的菜单建立新的空白项目，或是至 {0} 阅读简短的指南（英文版）。"
 		],
 		"title": "欢迎使用 Box Pleating Studio！"
