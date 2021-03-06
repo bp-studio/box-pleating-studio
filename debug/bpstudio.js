@@ -5397,10 +5397,10 @@ let Junction = class Junction extends SheetObject {
             return sy;
         return NaN;
     }
-    get signX() { return Math.sign(this.sx); }
-    get signY() { return Math.sign(this.sy); }
+    get _signX() { return Math.sign(this.sx); }
+    get _signY() { return Math.sign(this.sy); }
     get direction() {
-        let x = this.signX, y = this.signY;
+        let x = this._signX, y = this._signY;
         if (x < 0 && y < 0)
             return Direction.UR;
         if (x > 0 && y < 0)
@@ -5505,10 +5505,10 @@ __decorate([
 ], Junction.prototype, "sy", null);
 __decorate([
     shrewd
-], Junction.prototype, "signX", null);
+], Junction.prototype, "_signX", null);
 __decorate([
     shrewd
-], Junction.prototype, "signY", null);
+], Junction.prototype, "_signY", null);
 __decorate([
     shrewd
 ], Junction.prototype, "direction", null);

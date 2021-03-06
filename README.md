@@ -22,6 +22,7 @@ If you visit the website by Chrome (on devices other than iPhone), Edge (on desk
 Start from the upper-left, each button in the toolbar is explained as follows.
 
 - File menu: Create new project, download or share projects, etc.
+- Edit menu: Undo/redo (up to 30 steps), select all; more functions TBD.
 - Setting menu: Display options and app preferences (including language setting).
 - Tools menu: Currently with one additional tool (TreeMaker format importing); more tools TBD.
 - Help menu: About the app, version info, and how to support it.
@@ -49,7 +50,7 @@ For the moment, BP Studio hasn't implemented the notion of elevation, half-integ
 
 Since generating a complete, flat-foldable mountain-valley CP would also require the notion of elevation as well as other considerations such as hinge direction choices, empty space filling etc., for the moment BP Studio also cannot automatically generate such CP for you, and you would have to complete those details using the theory of uniaxial box pleating bases. But the author do have plans to implement this feature in the future.
 
-Other features such as undo/redo editing, diagonal/tilted grid, Oripa/Orihime format exporting etc. are also planned.
+Other features such as diagonal/tilted grid, Oripa/Orihime format exporting etc. are also planned.
 
 ## Feedbacks are greatly appreciated!
 
