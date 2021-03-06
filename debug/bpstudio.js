@@ -2776,6 +2776,9 @@ let TreeNode = class TreeNode extends Disposable {
         else
             return this.parent.path.concat(this);
     }
+    get depth() {
+        return this.path.length;
+    }
     get shouldDispose() {
         return super.shouldDispose || this.tree.disposed;
     }
@@ -5260,17 +5263,24 @@ let Junction = class Junction extends SheetObject {
     }
     get _lca() {
         this.disposeEvent();
-        let n1 = this.f1.node, n2 = this.f2.node;
-        return n1.tree.lca(n1, n2);
+        return this.design.tree.lca(this.n1, this.n2);
     }
+    get n1() { return this.f1.node; }
+    get n2() { return this.f2.node; }
     findIntersection(j) {
-        let n1 = this._lca, n2 = j._lca;
-        if (n1 == n2)
-            return n1;
-        let n3 = n1.tree.lca(n1, n2);
-        if (n3 != n1 && n3 != n2)
-            return null;
-        return n3 == n1 ? n2 : n1;
+        let a1 = this._lca, a2 = j._lca;
+        let tree = this.design.tree;
+        if (a1 == a2)
+            return a1;
+        if (a1.depth > a2.depth) {
+            if (tree.lca(a2, this.n1) == a2 || tree.lca(a2, this.n2) == a2)
+                return a2;
+        }
+        else if (a2.depth > a1.depth) {
+            if (tree.lca(a1, j.n1) == a1 || tree.lca(a1, j.n2) == a1)
+                return a1;
+        }
+        return null;
     }
     get coverCandidate() {
         let result = [];

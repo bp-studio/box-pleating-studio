@@ -59,6 +59,10 @@ interface JNode {
 		else return this.parent.path.concat(this);
 	}
 
+	public get depth(): number {
+		return this.path.length;
+	}
+
 	protected get shouldDispose(): boolean {
 		return super.shouldDispose || this.tree.disposed;
 	}

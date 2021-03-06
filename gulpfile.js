@@ -260,7 +260,7 @@ gulp.task('deployDev', gulp.series(
 gulp.task('deployPub', async done => {
 	let answers = await inquirer.prompt([{
 		type: 'confirm',
-		message: '請記得在發布之前更新版本號並加入更新 log。確定發布到正式版？',
+		message: '請記得在發布之前更新版本號、加入更新 log、並適度修改 README.md。確定發布到正式版？',
 		name: 'ok'
 	}]);
 	if(answers.ok) {

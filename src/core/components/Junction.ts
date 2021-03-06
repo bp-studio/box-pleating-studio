@@ -14,6 +14,8 @@ enum JunctionStatus {
 	tooFar
 }
 
+type JunctionDimension = 'ox' | 'oy';
+
 //////////////////////////////////////////////////////////////////
 /**
  * `Junction` 是負責管理兩個 `Flap` 之間的相對狀態的抽象物件。
@@ -80,16 +82,30 @@ enum JunctionStatus {
 
 	@shrewd private get _lca(): TreeNode {
 		this.disposeEvent();
-		let n1 = this.f1.node, n2 = this.f2.node;
-		return n1.tree.lca(n1, n2);
+		return this.design.tree.lca(this.n1, this.n2);
 	}
 
+	private get n1() { return this.f1.node; }
+	private get n2() { return this.f2.node; }
+
+	/**
+	 * 找出對應路徑上的一個共用點。
+	 *
+	 * 目前的演算法用了 LCA 的原理來尋找，雖然理論上速度 OK，
+	 * 但是會使得 coverCandidate 大量相依於頂點的 path，所以也不能說很理想。
+	 * 日後可以再思考改進的方法。
+	 */
 	private findIntersection(j: Junction): TreeNode | null {
-		let n1 = this._lca, n2 = j._lca;
-		if(n1 == n2) return n1;
-		let n3 = n1.tree.lca(n1, n2);
-		if(n3 != n1 && n3 != n2) return null;
-		return n3 == n1 ? n2 : n1;
+		let a1 = this._lca, a2 = j._lca;
+		let tree = this.design.tree;
+		if(a1 == a2) return a1;
+
+		if(a1.depth > a2.depth) {
+			if(tree.lca(a2, this.n1) == a2 || tree.lca(a2, this.n2) == a2) return a2;
+		} else if(a2.depth > a1.depth) {
+			if(tree.lca(a1, j.n1) == a1 || tree.lca(a1, j.n2) == a1) return a1;
+		}
+		return null;
 	}
 
 	/** 自身有可能被覆蓋的 Junction 列表 */
@@ -107,7 +123,7 @@ enum JunctionStatus {
 		let result: [Junction, TreeNode][] = [];
 		for(let j of this.sheet.design.validJunctions) {
 			if(j == this) continue;
-			// 找出對應路徑上的一個共用點，如果沒有的話肯定不是覆蓋
+			// 若對應路徑沒有共用點（亦即路徑不重疊）則肯定沒有覆蓋
 			let n = this.findIntersection(j);
 			if(n) result.push([j, n]);
 		}
@@ -233,10 +249,10 @@ enum JunctionStatus {
 		return NaN;
 	}
 
-	@shrewd public get signX() { return Math.sign(this.sx); }
-	@shrewd public get signY() { return Math.sign(this.sy); }
+	@shrewd private get _signX() { return Math.sign(this.sx); }
+	@shrewd private get _signY() { return Math.sign(this.sy); }
 	@shrewd public get direction() {
-		let x = this.signX, y = this.signY;
+		let x = this._signX, y = this._signY;
 		if(x < 0 && y < 0) return Direction.UR;
 		if(x > 0 && y < 0) return Direction.UL;
 		if(x > 0 && y > 0) return Direction.LL;
@@ -277,5 +293,3 @@ enum JunctionStatus {
 		return result;
 	}
 }
-
-type JunctionDimension = 'ox' | 'oy';
