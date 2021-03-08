@@ -1,7 +1,9 @@
 <template >
 	<div>
 		<h5 v-t="'panel.edge.type'" class="panel-title"></h5>
-		<number :label="$t('panel.edge.length')" v-model.number="selection.length"></number>
+		<div class="panel-grid">
+			<number :label="$t('panel.edge.length')" v-model.number="selection.length"></number>
+		</div>
 		<div class="mt-3">
 			<button class="btn btn-primary" @click="selection.split()" v-t="'panel.edge.split'"></button>
 			<button

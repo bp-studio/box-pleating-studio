@@ -9,7 +9,7 @@ module.exports = function(file) {
 	function bufferContents(file, enc, cb) {
 		if(file.isNull()) return cb();
 		if(file.isStream()) {
-			this.emit('error', new Error('gulp-concat: Streaming not supported'));
+			this.emit('error', new Error('log: Streaming not supported'));
 			return cb();
 		}
 

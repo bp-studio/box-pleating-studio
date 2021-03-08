@@ -19,6 +19,7 @@ let inquirer = require('inquirer');
 let debug = require('./gulp/debug');
 let i18n = require('./gulp/i18n');
 let log2 = require('./gulp/log');
+let order = require('./gulp/order');
 let vue = require('./gulp/vue');
 let woff2 = require('./gulp/woff2');
 
@@ -145,6 +146,8 @@ gulp.task('buildLog', () =>
 gulp.task('buildLocale', () =>
 	gulp.src('src/locale/*.json')
 		.pipe(ifAnyNewer("dist", { filter: 'locale.js' }))
+		.pipe(order('en.json'))
+		.pipe(gulp.dest('src/locale/'))
 		.pipe(i18n())
 		.pipe(concat('locale.js'))
 		.pipe(wrap("let locale={};<%= contents %>"))

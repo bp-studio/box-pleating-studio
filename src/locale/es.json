@@ -2,167 +2,79 @@
 	"name": "Español",
 	"flag": "spain",
 	"since": 900,
-	"about": {
-		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyarla, puede donar cualquier cantidad con {0}.",
-		"homepage": "página principal",
-		"license": "Publicado bajo licencia MIT.",
-		"title": "Acerca de Box Pleating Studio",
-		"visit": "Para obtener un manual de usuario y comentarios, visite la aplicación {0} en Github."
-	},
-	"donate": {
-		"error": "Por favor, introduzca un número",
-		"intro": "¡Gracias por considerar su apoyo a Box Pleating Studio! Indique la cantidad que le gustaría donar. Puedes comprarme un café con $ 1 o una cena con $ 10, etc. 😄 (la comisión de PayPal se agregará durante el pago)",
-		"nextTime": "Quizás la próxima vez",
-		"thank": "¡Muchas gracias, {0}, por tu amable donación!",
-		"then": "A continuación haga clic en el botón de abajo y siga las instrucciones para completar el pago.",
-		"title": "Box Pleating Studio de apoyo",
-		"wait": "Espere hasta que PayPal complete su transacción ..."
-	},
-	"keyword": {
-		"close": "Cerrar",
-		"delete": "Borrar",
-		"no": "No",
-		"ok": "OK",
-		"untitled": "Sin título",
-		"version": "Versión",
-		"workspace": "espacio de trabajo",
-		"yes": "Sí"
-	},
-	"message": {
-		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
-		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
-		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
-		"min3vertex": "El árbol debe tener al menos 3 vértices.",
-		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
-		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
-		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
-		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
-		"latest": "Ya tienes la última versión de BP Studio."
-	},
-	"panel": {
-		"design": {
-			"descriptionPH": "(Descripción del Proyecto)",
-			"height": "Alto",
-			"layout": "Vista de maquetación",
-			"title": "Título",
-			"titlePH": "(Título del Proyecto)",
-			"tree": "Vista de estructura de árbol",
-			"type": "Proyecto de Box Pleating Studio",
-			"width": "Ancho",
-			"zoom": "Zoom"
+	"welcome": {
+		"title": "¡Bienvenido a Box Pleating Studio!",
+		"intro": [
+			"Esta aplicación se ha desarrollado para ayudar a los diseñadores de origami a crear modelos complejos y sorprendentes utilizando pliegues en grilla cuadriculada (box pleating) y dispositivos GOPS.",
+			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0} (solo en inglés)."
+		],
+		"install": {
+			"hint": "¡También puede instalar BP Studio como una aplicación independiente en su dispositivo y usarla sin conexión!",
+			"ios": "Cómo instalar en iOS: Abra este sitio web en Safari, toque el icono \"Compartir\" en la parte inferior de la pantalla y luego toque \"Agregar a la pantalla de inicio\".",
+			"bt": "Instalar la aplicación Box Pleating Studio",
+			"ing": "Instalando la aplicación, espere ...",
+			"ed": "BP Studio ya está instalado en su dispositivo.",
+			"open": "Aplicación Open Box Pleating Studio"
 		},
-		"edge": {
-			"goto": "Ir al río",
-			"length": "Largo",
-			"merge": "Fusionar vértices finales",
-			"split": "Separar",
-			"type": "Borde"
-		},
-		"flap": {
-			"goto": "Ir al vértice",
-			"height": "Altura",
-			"name": "Nombre",
-			"radius": "Radio",
-			"type": "Solapa",
-			"width": "Ancho"
-		},
-		"flaps": {
-			"goto": "Ir a vértices",
-			"type": "Solapas"
-		},
-		"repo": {
-			"config": "Configuración",
-			"onlyOne": "Solo se encuentra un patrón.",
-			"pattern": "Patrón",
-			"type": "Tramo"
-		},
-		"river": {
-			"goto": "Ir al borde",
-			"type": "río",
-			"width": "Ancho"
-		},
-		"vertex": {
-			"addLeaf": "Agregar hoja",
-			"delJoin": "Eliminar y unirse",
-			"goto": "Ir a la solapa",
-			"name": "Nombre",
-			"ofLength": "de longitud",
-			"type": "Vértice"
-		},
-		"vertices": {
-			"goto": "Ir a solapas",
-			"type": "Vértices"
-		}
-	},
-	"plugin": {
-		"TreeMaker": {
-			"invalid": "El archivo \"{0}\" parece dañado y no se puede cargar correctamente.",
-			"not5": "El archivo \"{0}\" no tiene el formato TreeMaker 5.",
-			"size8": "BP Studio requiere un tamaño de hoja de al menos 8."
-		}
-	},
-	"preference": {
-		"autoSave": "Guardar el espacio de trabajo automáticamente",
-		"includeHidden": "Incluir elementos ocultos en las exportaciones SVG",
-		"language": "Idioma"
-	},
-	"share": {
-		"copy": "Copiar",
-		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!",
-		"share": "Cuota",
-		"shorten": "Acortar",
-		"title": "Compartir proyecto"
+		"copyright": "Copyright © 2020{0} por Mu-Tsun Tsai"
 	},
 	"toolbar": {
-		"edit": {
-			"redo": "Rehacer",
-			"selectAll": "Seleccionar todo",
-			"title": "Editar",
-			"undo": "Deshacer"
-		},
 		"file": {
-			"copyPNG": "Copiar la vista actual como PNG",
+			"title": "Archivos",
 			"new": "Nuevo proyecto",
 			"open": "Proyectos abiertos / espacios de trabajo",
-			"print": "Imprimir vista actual",
 			"saveBPS": "Descargar proyecto actual",
 			"saveBPZ": "Descargar espacio de trabajo",
-			"savePNG": "Descargar la vista actual como PNG",
 			"saveSVG": "Descargar la vista actual como SVG",
-			"share": "Compartir proyecto actual",
-			"title": "Archivos"
+			"savePNG": "Descargar la vista actual como PNG",
+			"copyPNG": "Copiar la vista actual como PNG",
+			"print": "Imprimir vista actual",
+			"share": "Compartir proyecto actual"
 		},
-		"help": {
-			"about": "Acerca de",
-			"discussions": "Discusiones",
-			"donation": "Donación",
-			"issue": "Reportar error",
-			"news": "Información de la versión",
-			"title": "Ayuda",
-			"update": "Listo para actualizar",
-			"checkUpdate": "Buscar actualizaciones"
-		},
-		"panel": "Panel de opciones",
-		"project": {
-			"clone": "Clonar proyecto actual",
-			"close": "Cerrar proyecto actual",
-			"closeAll": "Cerrar todos los proyectos",
-			"empty": "No hay proyectos abiertos",
-			"noTitle": "(Sin título)",
-			"title": "Proyectos abiertos"
+		"edit": {
+			"title": "Editar",
+			"undo": "Deshacer",
+			"redo": "Rehacer",
+			"selectAll": "Seleccionar todo"
 		},
 		"setting": {
-			"axial": "Mostrar pliegues axiales-paralelos en gadgets",
-			"dPad": "Mostrar D-pad",
+			"title": "Ajustes",
 			"fullscreen": "Pantalla completa",
 			"fullscreenExit": "Salir de pantalla completa",
 			"grid": "Mostrar líneas de cuadrícula",
 			"hinge": "Mostrar pliegues de bisagra",
-			"label": "Mostrar etiquetas",
-			"preference": "Preferencias",
 			"ridge": "Mostrar pliegues de cresta",
+			"axial": "Mostrar pliegues axiales-paralelos en gadgets",
+			"label": "Mostrar etiquetas",
 			"tip": "Mostrar puntas",
-			"title": "Ajustes"
+			"dPad": "Mostrar D-pad",
+			"preference": "Preferencias"
+		},
+		"project": {
+			"title": "Proyectos abiertos",
+			"empty": "No hay proyectos abiertos",
+			"noTitle": "(Sin título)",
+			"clone": "Clonar proyecto actual",
+			"close": "Cerrar proyecto actual",
+			"closeAll": "Cerrar todos los proyectos"
+		},
+		"tools": {
+			"title": "Herramientas",
+			"TreeMaker": "Importar archivo TreeMaker"
+		},
+		"help": {
+			"title": "Ayuda",
+			"about": "Acerca de",
+			"news": "Información de la versión",
+			"update": "Listo para actualizar",
+			"checkUpdate": "Buscar actualizaciones",
+			"donation": "Donación",
+			"discussions": "Discusiones",
+			"issue": "Reportar error"
+		},
+		"view": {
+			"tree": "Estructura de árbol",
+			"layout": "Diseño"
 		},
 		"tab": {
 			"clone": "Clonar",
@@ -171,29 +83,117 @@
 			"closeOther": "Cerrar otros",
 			"closeRight": "Cerrar todo a la derecha"
 		},
-		"tools": {
-			"TreeMaker": "Importar archivo TreeMaker",
-			"title": "Herramientas"
+		"panel": "Panel de opciones"
+	},
+	"preference": {
+		"language": "Idioma",
+		"autoSave": "Guardar el espacio de trabajo automáticamente",
+		"includeHidden": "Incluir elementos ocultos en las exportaciones SVG"
+	},
+	"panel": {
+		"design": {
+			"type": "Proyecto de Box Pleating Studio",
+			"title": "Título",
+			"titlePH": "(Título del Proyecto)",
+			"descriptionPH": "(Descripción del Proyecto)",
+			"tree": "Vista de estructura de árbol",
+			"layout": "Vista de maquetación",
+			"width": "Ancho",
+			"height": "Alto",
+			"zoom": "Zoom"
 		},
-		"view": {
-			"layout": "Diseño",
-			"tree": "Estructura de árbol"
+		"flap": {
+			"type": "Solapa",
+			"name": "Nombre",
+			"radius": "Radio",
+			"width": "Ancho",
+			"height": "Altura",
+			"goto": "Ir al vértice"
+		},
+		"flaps": {
+			"type": "Solapas",
+			"goto": "Ir a vértices"
+		},
+		"river": {
+			"type": "río",
+			"width": "Ancho",
+			"goto": "Ir al borde"
+		},
+		"vertex": {
+			"type": "Vértice",
+			"name": "Nombre",
+			"addLeaf": "Agregar hoja",
+			"ofLength": "de longitud",
+			"delJoin": "Eliminar y unirse",
+			"goto": "Ir a la solapa"
+		},
+		"vertices": {
+			"type": "Vértices",
+			"goto": "Ir a solapas"
+		},
+		"edge": {
+			"type": "Borde",
+			"length": "Largo",
+			"split": "Separar",
+			"merge": "Fusionar vértices finales",
+			"goto": "Ir al río"
+		},
+		"repo": {
+			"type": "Tramo",
+			"config": "Configuración",
+			"pattern": "Patrón",
+			"onlyOne": "Solo se encuentra un patrón."
 		}
 	},
-	"welcome": {
-		"copyright": "Copyright © 2020{0} por Mu-Tsun Tsai",
-		"install": {
-			"bt": "Instalar la aplicación Box Pleating Studio",
-			"ed": "BP Studio ya está instalado en su dispositivo.",
-			"hint": "¡También puede instalar BP Studio como una aplicación independiente en su dispositivo y usarla sin conexión!",
-			"ing": "Instalando la aplicación, espere ...",
-			"ios": "Cómo instalar en iOS: Abra este sitio web en Safari, toque el icono \"Compartir\" en la parte inferior de la pantalla y luego toque \"Agregar a la pantalla de inicio\".",
-			"open": "Aplicación Open Box Pleating Studio"
-		},
-		"intro": [
-			"Esta aplicación se ha desarrollado para ayudar a los diseñadores de origami a crear modelos complejos y sorprendentes utilizando pliegues en grilla cuadriculada (box pleating) y dispositivos GOPS.",
-			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0} (solo en inglés)."
-		],
-		"title": "¡Bienvenido a Box Pleating Studio!"
+	"share": {
+		"title": "Compartir proyecto",
+		"copy": "Copiar",
+		"share": "Cuota",
+		"shorten": "Acortar",
+		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!"
+	},
+	"about": {
+		"title": "Acerca de Box Pleating Studio",
+		"license": "Publicado bajo licencia MIT.",
+		"visit": "Para obtener un manual de usuario y comentarios, visite la aplicación {0} en Github.",
+		"homepage": "página principal",
+		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyarla, puede donar cualquier cantidad con {0}."
+	},
+	"donate": {
+		"title": "Box Pleating Studio de apoyo",
+		"intro": "¡Gracias por considerar su apoyo a Box Pleating Studio! Indique la cantidad que le gustaría donar. Puedes comprarme un café con $ 1 o una cena con $ 10, etc. 😄 (la comisión de PayPal se agregará durante el pago)",
+		"error": "Por favor, introduzca un número",
+		"then": "A continuación haga clic en el botón de abajo y siga las instrucciones para completar el pago.",
+		"wait": "Espere hasta que PayPal complete su transacción ...",
+		"nextTime": "Quizás la próxima vez",
+		"thank": "¡Muchas gracias, {0}, por tu amable donación!"
+	},
+	"message": {
+		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
+		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
+		"min3vertex": "El árbol debe tener al menos 3 vértices.",
+		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
+		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
+		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
+		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
+		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
+		"latest": "Ya tienes la última versión de BP Studio."
+	},
+	"plugin": {
+		"TreeMaker": {
+			"not5": "El archivo \"{0}\" no tiene el formato TreeMaker 5.",
+			"size8": "BP Studio requiere un tamaño de hoja de al menos 8.",
+			"invalid": "El archivo \"{0}\" parece dañado y no se puede cargar correctamente."
+		}
+	},
+	"keyword": {
+		"yes": "Sí",
+		"no": "No",
+		"ok": "OK",
+		"close": "Cerrar",
+		"delete": "Borrar",
+		"version": "Versión",
+		"untitled": "Sin título",
+		"workspace": "espacio de trabajo"
 	}
 }

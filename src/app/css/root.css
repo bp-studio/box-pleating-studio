@@ -27,6 +27,24 @@ html, body {
 }
 
 /*********************************************
+ * grid
+ *********************************************/
+
+.panel-grid {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: 0.5rem 1rem;
+}
+
+.panel-row {
+	display: contents;
+}
+
+.panel-row .col-form-label {
+	white-space: nowrap;
+}
+
+/*********************************************
  * 禁止長按選取
  *********************************************/
 
@@ -41,7 +59,7 @@ html, body {
  * 表單元件設定
  *********************************************/
 
- ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
 	/* Chrome, Safari, Edge, Opera 中隱藏 spinner */
 	-webkit-appearance: none;
 	display: none;

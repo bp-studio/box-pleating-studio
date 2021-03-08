@@ -1,30 +1,27 @@
 <template>
-	<div :class="label?'row mb-2':''">
-		<label class="col-form-label col-3" v-if="label">{{ label }}</label>
-		<div :class="{'col-9':label}">
-			<div class="input-group" style="flex-wrap:nowrap">
-				<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)">
-					<i class="fas fa-minus"></i>
-				</button>
-				<input
-					class="form-control"
-					:class="{'error':v!=value}"
-					type="number"
-					v-model="v"
-					@focus="focus($event)"
-					@blur="blur"
-					@input="input($event)"
-					:min="min"
-					:max="max"
-					@wheel="wheel($event)"
-					style="min-width:30px;"
-				/>
-				<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)">
-					<i class="fas fa-plus"></i>
-				</button>
-			</div>
+	<row :label="label">
+		<div class="input-group" style="flex-wrap:nowrap">
+			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)">
+				<i class="fas fa-minus"></i>
+			</button>
+			<input
+				class="form-control"
+				:class="{'error':v!=value}"
+				type="number"
+				v-model="v"
+				@focus="focus($event)"
+				@blur="blur"
+				@input="input($event)"
+				:min="min"
+				:max="max"
+				@wheel="wheel($event)"
+				style="min-width:30px;"
+			/>
+			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)">
+				<i class="fas fa-plus"></i>
+			</button>
 		</div>
-	</div>
+	</row>
 </template>
 
 <script lang="ts">

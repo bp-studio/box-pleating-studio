@@ -31,6 +31,12 @@
 			"print": "列印目前的視圖",
 			"share": "分享目前的專案"
 		},
+		"edit": {
+			"title": "編輯",
+			"undo": "復原",
+			"redo": "取消復原",
+			"selectAll": "全選"
+		},
 		"setting": {
 			"title": "設定",
 			"fullscreen": "全螢幕模式",
@@ -41,8 +47,8 @@
 			"axial": "顯示裝置中的軸平行摺痕",
 			"label": "顯示標籤",
 			"tip": "顯示角片頂點",
-			"preference": "喜好設定",
-			"dPad": "顯示方向鍵"
+			"dPad": "顯示方向鍵",
+			"preference": "喜好設定"
 		},
 		"project": {
 			"title": "開啟的專案",
@@ -52,21 +58,24 @@
 			"close": "關閉目前的專案",
 			"closeAll": "關閉所有專案"
 		},
+		"tools": {
+			"title": "工具",
+			"TreeMaker": "匯入 TreeMaker 檔案"
+		},
 		"help": {
 			"title": "說明",
 			"about": "關於",
-			"donation": "捐款",
 			"news": "版本資訊",
 			"update": "已準備更新",
+			"checkUpdate": "檢查更新",
+			"donation": "捐款",
 			"discussions": "討論區",
-			"issue": "回報問題",
-			"checkUpdate": "檢查更新"
+			"issue": "回報問題"
 		},
 		"view": {
 			"tree": "樹狀結構",
 			"layout": "配置"
 		},
-		"panel": "選項面板",
 		"tab": {
 			"clone": "複製",
 			"close": "關閉",
@@ -74,16 +83,7 @@
 			"closeOther": "關閉其它",
 			"closeRight": "關閉右側"
 		},
-		"tools": {
-			"TreeMaker": "匯入 TreeMaker 檔案",
-			"title": "工具"
-		},
-		"edit": {
-			"redo": "取消復原",
-			"title": "編輯",
-			"undo": "復原",
-			"selectAll": "全選"
-		}
+		"panel": "選項面板"
 	},
 	"preference": {
 		"language": "語言",
@@ -146,11 +146,11 @@
 		}
 	},
 	"share": {
-		"copy": "複製",
-		"message": "快來看我用 Box Pleating Studio 設計的專案「{0}」！",
-		"share": "分享",
 		"title": "分享專案",
-		"shorten": "縮短"
+		"copy": "複製",
+		"share": "分享",
+		"shorten": "縮短",
+		"message": "快來看我用 Box Pleating Studio 設計的專案「{0}」！"
 	},
 	"about": {
 		"title": "關於 Box Pleating Studio",
@@ -179,21 +179,21 @@
 		"updateReady": "更新版本的 BP Studio 已準備就緒，並將在重新啟動時自動更新。您想要現在立刻重新啟動嗎？",
 		"latest": "您已經擁有最新版本的 BP Studio。"
 	},
+	"plugin": {
+		"TreeMaker": {
+			"not5": "檔案「{0}」不是 TreeMaker 5 的格式。",
+			"size8": "BP Studio 要求紙張大小至少為 8。",
+			"invalid": "檔案「{0}」似乎已損壞，無法成功讀取。"
+		}
+	},
 	"keyword": {
 		"yes": "是",
 		"no": "否",
 		"ok": "確定",
+		"close": "關閉",
 		"delete": "刪除",
 		"version": "版本",
 		"untitled": "未命名",
-		"workspace": "工作區",
-		"close": "關閉"
-	},
-	"plugin": {
-		"TreeMaker": {
-			"invalid": "檔案「{0}」似乎已損壞，無法成功讀取。",
-			"not5": "檔案「{0}」不是 TreeMaker 5 的格式。",
-			"size8": "BP Studio 要求紙張大小至少為 8。"
-		}
+		"workspace": "工作區"
 	}
 }

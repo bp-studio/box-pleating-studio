@@ -1,19 +1,16 @@
 <template>
-	<div class="row mb-2">
-		<label class="col-form-label col-3">{{ label }}</label>
-		<div class="col-9">
-			<input
-				v-model="v"
-				class="form-control"
-				:placeholder="placeholder"
-				:class="{ error: v != value }"
-				:type="type"
-				@focus="focus($event)"
-				@blur="blur"
-				@input="input($event)"
-			/>
-		</div>
-	</div>
+	<row :label="label">
+		<input
+			v-model="v"
+			class="form-control"
+			:placeholder="placeholder"
+			:class="{ error: v != value }"
+			:type="type"
+			@focus="focus($event)"
+			@blur="blur"
+			@input="input($event)"
+		/>
+	</row>
 </template>
 
 <script lang="ts">
