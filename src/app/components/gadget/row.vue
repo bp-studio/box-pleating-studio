@@ -1,9 +1,12 @@
 <template>
-	<div class="panel-row">
+	<div v-if="label" style="display:contents;">
 		<div class="col-form-label">{{ label }}</div>
 		<div>
 			<slot></slot>
 		</div>
+	</div>
+	<div v-else style="grid-column-end:span 2">
+		<slot></slot>
 	</div>
 </template>
 

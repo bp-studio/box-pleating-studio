@@ -32,15 +32,11 @@ html, body {
 
 .panel-grid {
 	display: grid;
-	grid-template-columns: auto 1fr;
+	grid-template-columns: minmax(4rem, max-content) 1fr;
 	grid-gap: 0.5rem 1rem;
 }
 
-.panel-row {
-	display: contents;
-}
-
-.panel-row .col-form-label {
+.col-form-label {
 	white-space: nowrap;
 }
 

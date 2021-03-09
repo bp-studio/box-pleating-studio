@@ -6,9 +6,9 @@
 		</div>
 		<div class="mt-3 d-flex" style="flex-wrap:wrap;">
 			<button class="btn btn-primary flex-shrink-0" @click="selection.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'"></button>
-			<div class="flex-grow-1 d-flex justify-content-end" style="flex-basis:150px;">
+			<div class="flex-grow-1 d-flex justify-content-end" style="flex-basis:150px; width:0px;">
 				<label class="col-form-label mx-2 flex-shrink-0">{{$t('panel.vertex.ofLength')}}</label>
-				<div class="flex-grow-1" style="max-width:130px;">
+				<div class="flex-grow-1" style="max-width:calc(200px - 50%)">
 					<number v-model="newLength" :min="1"></number>
 				</div>
 			</div>

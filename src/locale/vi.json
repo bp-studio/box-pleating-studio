@@ -43,12 +43,12 @@
 			"fullscreenExit": "Thoát toàn màn hình",
 			"grid": "Hiện đường lưới",
 			"hinge": "Hiện nếp gấp bản lề",
-			"ridge": "Hiện nếp gấp ở sườn Hiển",
+			"ridge": "Hiện nếp gấp ở sườn",
 			"axial": "Hiện nếp gấp trục song song trong tiện ích",
 			"label": "Hiện nhãn",
 			"tip": "Hiện mẹo nhánh",
 			"dPad": "Hiện D-pad",
-			"preference": "Sở thích"
+			"preference": "Tùy chọn"
 		},
 		"project": {
 			"title": "Mở các dự án",
@@ -117,7 +117,7 @@
 		"river": {
 			"type": "Sông",
 			"width": "Chiều rộng",
-			"goto": "Đi đến cạnh"
+			"goto": "Đi tới cạnh"
 		},
 		"vertex": {
 			"type": "Đỉnh",
@@ -125,18 +125,18 @@
 			"addLeaf": "Thêm lá",
 			"ofLength": "chiều dài",
 			"delJoin": "Xóa và đến",
-			"goto": "Đi đến vỗ"
+			"goto": "Đi tới nhánh"
 		},
 		"vertices": {
-			"type": "Dọc",
-			"goto": "Chuyển đến nhánh áo"
+			"type": "Đỉnh",
+			"goto": "Đi tới nhánh"
 		},
 		"edge": {
 			"type": "Cạnh",
 			"length": "Chiều dài",
 			"split": "Tách ra",
 			"merge": "Hợp nhất các đỉnh cuối",
-			"goto": "Đi đến sông"
+			"goto": "Đi tới sông"
 		},
 		"repo": {
 			"type": "Căng ra",
