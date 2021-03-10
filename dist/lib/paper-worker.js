@@ -1,1 +1,0 @@
-importScripts("paper-core.min.js"),function(){let e=new paper.PaperScope;e.setup([128,128]);let t=e.project;t.view.autoUpdate=!1,onmessage=function(e){if(e.ports[0]){let[p,o]=e.data,r=t.importJSON(p),a=t.importJSON(o),s=r.intersect(a),i=[s.exportJSON(),s.area];e.ports[0].postMessage(i)}}}();

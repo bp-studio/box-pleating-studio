@@ -123,7 +123,7 @@
 			"type": "Vértice",
 			"name": "Nombre",
 			"addLeaf": "Agregar hoja",
-			"ofLength": "...de longitud",
+			"ofLength": "de longitud",
 			"delJoin": "Eliminar y unirse",
 			"goto": "Ir a la solapa"
 		},

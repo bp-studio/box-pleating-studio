@@ -1,0 +1,5 @@
+{
+	"collapseWhitespace": true,
+	"removeComments": true,
+	"minifyJS": true
+}

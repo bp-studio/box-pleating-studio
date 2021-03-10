@@ -1,7 +1,6 @@
 @font-face {
   font-family: 'bps';
   src:
-    url('fonts/bps.woff2?1vd99b') format('woff2'),
     url('fonts/bps.ttf?1vd99b') format('truetype'),
     url('fonts/bps.woff?1vd99b') format('woff'),
     url('fonts/bps.svg?1vd99b#bps') format('svg');

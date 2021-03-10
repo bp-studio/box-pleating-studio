@@ -8,15 +8,23 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 	import { core } from './core.vue';
 
 	@Component
 	export default class DPad extends Vue {
-		private get show() { return core.shouldShowDPad; }
-		private get disabled() { return !core.initialized || bp.system.dragging; }
-		private key(key: string) {
+		@Prop(Boolean) hide: boolean = false;
+
+		protected get show(): boolean {
+			return core.shouldShowDPad && !this.hide;
+		}
+
+		protected get disabled(): boolean {
+			return !core.initialized || bp.system.dragging;
+		}
+
+		protected key(key: string) {
 			bp.system.key(key);
 		}
 	}

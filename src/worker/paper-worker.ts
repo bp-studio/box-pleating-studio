@@ -1,7 +1,7 @@
 /// <reference path="../core/global/paper.d.ts" />
 
 // 載入並啟動 paper.js
-importScripts("paper-core.min.js");
+importScripts("./lib/paper-core.min.js");
 
 (function() {
 

@@ -1,5 +1,5 @@
 {
-	// 如需 tasks.json 格式的文件， 
+	// 如需 tasks.json 格式的文件，
 	// 請參與 https://go.microsoft.com/fwlink/?LinkId=733558
 	"version": "2.0.0",
 	"tasks": [
@@ -28,8 +28,8 @@
 				},
 				"background": {
 					"activeOnStart": true,
-					"beginsPattern": "^\\[.{8}\\]\\sStarting\\s\\'build",
-					"endsPattern": "^\\[.{8}\\]\\sFinished"
+					"beginsPattern": "^\\[.{8}\\]\\sStarting\\s\\'default",
+					"endsPattern": "^\\[.{8}\\]\\sFinished\\s\\'default"
 				}
 			},
 			"group": {

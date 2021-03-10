@@ -7,7 +7,7 @@ module.exports = function(file) {
 	var concat = [];
 
 	function bufferContents(file, enc, cb) {
-		if(file.isNull()) return cb();
+		if(file.isNull()) return cb(null, file);
 		if(file.isStream()) {
 			this.emit('error', new Error('log: Streaming not supported'));
 			return cb();
@@ -15,7 +15,7 @@ module.exports = function(file) {
 
 		latestFile = file;
 		concat.push(file.stem);
-		cb();
+		cb(null, file);
 	}
 
 	function endStream(cb) {

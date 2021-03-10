@@ -5,7 +5,7 @@
 		"lib": ["webworker", "esnext"],
 		"skipLibCheck": true,
 		"allowJs": true,
-		"outDir": "../../dist/lib",
+		"outDir": "../../dist",
 		"baseUrl": "../../node_modules/"
 	},
 	"include": [

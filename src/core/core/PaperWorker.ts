@@ -12,7 +12,7 @@ namespace PaperWorker {
 		return running;
 	}
 
-	const master = new Worker("./lib/paper-master.js");
+	const master = new Worker("./paper-master.js");
 
 	type Payload = [paper.Item, number];
 

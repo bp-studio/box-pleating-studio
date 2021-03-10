@@ -11,7 +11,7 @@
 		<spinner></spinner>
 		<div id="divShade" :class="{'show':showPanel}" @mousedown="showPanel=false" @touchstart="showPanel=false"></div>
 		<panel :show="showPanel"></panel>
-		<dpad></dpad>
+		<dpad :hide="showPanel"></dpad>
 		<share ref="share"></share>
 		<about ref="about"></about>
 		<version ref="ver"></version>
@@ -25,9 +25,9 @@
 
 	@Component
 	export default class App extends BaseComponent {
-		private showPanel = false;
+		protected showPanel = false;
 
-		private show(el: string) {
+		protected show(el: string) {
 			(this.$refs[el] as any).show();
 		}
 

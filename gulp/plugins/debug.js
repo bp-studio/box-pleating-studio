@@ -38,9 +38,9 @@ function transform(file, encoding, callback) {
 
 	// 替換成偵錯版資源
 	content = content.replace('main.js', '../debug/main.js');
-	content = content.replace('lib/vue.runtime.min.js', '../debug/vue.runtime.js');
-	content = content.replace('lib/paper-core.min.js', '../debug/paper-core.js');
-	content = content.replace('shrewd.min.js', '../debug/shrewd.js');
+	content = content.replace('lib/vue.runtime.min.js', '../debug/lib/vue.runtime.js');
+	content = content.replace('lib/paper-core.min.js', '../debug/lib/paper-core.js');
+	content = content.replace('lib/shrewd.min.js', '../debug/lib/shrewd.js');
 	content = content.replace('bpstudio.js', '../debug/bpstudio.js');
 
 	file.contents = Buffer.from(content, encoding);
