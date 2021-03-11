@@ -1,3 +1,4 @@
+let fs = require('fs');
 let gulp = require('gulp');
 let gulpIf = require('gulp-if');
 let all = require('gulp-all');
@@ -44,16 +45,35 @@ gulp.task('static', () => all(
 		.pipe(log2('log.js'))
 		.pipe(gulp.dest('dist/log')),
 
+	// 複製 debug 資源
+	gulp.src([
+		'public/lib/*.js',
+		'public/lib/*.js.map',
+	])
+		.pipe(filter(file => {
+			// 過濾掉具有 min 版本的 .js 檔案
+			if(file.extname != ".js") return true;
+			return fs.existsSync(file.path.replace(/js$/, "min.js"));
+		}))
+		.pipe(newer("debug/lib")) // 採用 1:1 比對目標的策略
+		.pipe(gulp.dest('debug/lib')),
+
 	// 複製靜態資源
 	gulp.src([
-			'public/**/*',
-			'public/.htaccess', // 這種檔案需要另外指定
-			// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
-			'!public/index.htm',
-			'!public/log/*',
-			'!public/assets/bps/**/*',
-			'!public/lib/**/*.css'
-		])
+		'public/**/*',
+		'public/.htaccess', // 這種檔案需要另外指定
+		// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
+		'!public/index.htm',
+		'!public/log/*',
+		'!public/assets/bps/**/*',
+		'!public/lib/**/*.css',
+		'!**/*.js.map'
+	])
+		.pipe(filter(file => {
+			// 過濾掉具有 min 版本的 .js 檔案
+			if(file.extname != ".js") return true;
+			return !fs.existsSync(file.path.replace(/js$/, "min.js"));
+		}))
 		.pipe(newer("dist")) // 採用 1:1 比對目標的策略
 		.pipe(gulp.dest('dist'))
 ));

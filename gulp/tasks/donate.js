@@ -9,6 +9,7 @@ let vue = require('../plugins/vue');
 let htmlMinOption = require('../html.json');
 
 gulp.task('donate', () => all(
+	// Vue
 	gulp.src([
 		'src/donate/main.vue',
 		'src/donate/main.js',
@@ -18,6 +19,8 @@ gulp.task('donate', () => all(
 		.pipe(concat('donate.js'))
 		.pipe(terser())
 		.pipe(gulp.dest('dist')),
+
+	// Html
 	gulp.src('src/donate/donate.htm')
 		.pipe(newer("dist"))
 		.pipe(htmlMin(htmlMinOption))

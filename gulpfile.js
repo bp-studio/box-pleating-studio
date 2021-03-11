@@ -45,7 +45,7 @@ gulp.task('deployPub', () => seriesIf(
 ));
 
 // 清除一切建置檔案
-gulp.task('clean', () => del(['dist', 'debug/*.*']));
+gulp.task('clean', () => del(['dist', 'debug']));
 
 // 預設建置，會建置到可以在本地執行的程度；
 // 在 VS Code 裡面按下 F5 預設就會執行這個建置動作
