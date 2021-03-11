@@ -20,10 +20,12 @@ const compare = 'src/app/components/**/*.vue'; // 這邊必須指定副檔名，
  * 所以針對每一個檔案都要自己產一組 stream。
  */
 function makePurify(path) {
-	return gulp.src([`public/lib/${path}`, compare], { base: 'public/lib' })
-		.pipe(newer(`dist/lib/${path}`)) // 先全部對目標檔案做比較
-		.pipe(filter('**/*.css')) // 比較完了之後，過濾到只剩 CSS 檔案本身
-		.pipe(purify([compare], { minify: true })) // 執行淨化
+	return gulp.src(`public/lib/${path}`, { base: 'public/lib' })
+		.pipe(newer({
+			dest: `dist/lib/${path}`,
+			extra: compare
+		}))
+		.pipe(purify([compare], { minify: true }))
 		.pipe(gulp.dest('dist/lib'))
 }
 
@@ -51,7 +53,7 @@ gulp.task('static', () => all(
 		'public/lib/*.js.map',
 	])
 		.pipe(filter(file => {
-			// 過濾掉具有 min 版本的 .js 檔案
+			// 選取具有 min 版本的 .js 檔案
 			if(file.extname != ".js") return true;
 			return fs.existsSync(file.path.replace(/js$/, "min.js"));
 		}))

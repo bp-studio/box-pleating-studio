@@ -4,23 +4,36 @@ let gulpIf = require('gulp-if');
 let log = require('fancy-log');
 let replace = require('gulp-replace');
 
-const ftpFactory = (folder, g, p) => function() {
+function connect() {
 	let options = require('../../.vscode/ftp-pub.json'); // This file is not in the repo, of course
 	options.log = log;
-	let conn = ftp.create(options);
+	return ftp.create(options);
+}
+
+function cleanFactory(folder) {
+	let conn = connect();
+	return conn.clean(`/public_html/${folder}/**/*.*`, './dist');
+}
+
+function ftpFactory(folder, g, p) {
+	let conn = connect();
 	let globs = [
 		'dist/**/*',
 		'!**/debug.log',
 	].concat(g);
+
+	let base = `/public_html/${folder}`;
 	let pipe = gulp.src(globs, { base: './dist', buffer: false });
 	return (p ? p(pipe) : pipe)
-		.pipe(conn.newer(`/public_html/${folder}`))
-		.pipe(conn.dest(`/public_html/${folder}`));
+		.pipe(conn.newer(base))
+		.pipe(conn.dest(base));
 };
 
-gulp.task('uploadPub', ftpFactory('bp', ['dist/.htaccess']));
+gulp.task('cleanPub', () => cleanFactory('bp'));
+gulp.task('uploadPub', () => ftpFactory('bp', ['dist/.htaccess']));
 
-gulp.task('uploadDev', ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pipe.
+gulp.task('cleanDev', () => cleanFactory('bp-dev'));
+gulp.task('uploadDev', () => ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pipe.
 	pipe(gulpIf(
 		file => file.basename == "index.htm",
 		replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', "")
