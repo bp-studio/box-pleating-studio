@@ -1,5 +1,11 @@
 <template>
-	<div id="divPanel" class="scroll-shadow" :class="{'show':show}" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
+	<div
+		id="divPanel"
+		class="scroll-shadow"
+		:class="{'show':show}"
+		ref="panel"
+		v-on:contextmenu.stop="onContextMenu($event)"
+	>
 		<template v-if="design">
 			<design v-if="selections.length==0" :key="design.sheet.guid"></design>
 			<div v-else-if="selections.length==1" :key="selection.guid">
@@ -38,9 +44,22 @@
 			if(el && (this.$refs.panel as HTMLDivElement).contains(el)) el.blur();
 		}
 
-		private onContextMenu(event: Event) {
+		protected onContextMenu(event: Event) {
 			if(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) { }
 			else event.preventDefault();
 		}
 	}
 </script>
+
+<style>
+	.panel-title {
+		line-height: 1.5;
+		white-space: nowrap;
+	}
+
+	.panel-grid {
+		display: grid;
+		grid-template-columns: minmax(4rem, max-content) 1fr;
+		grid-gap: 0.5rem 1rem;
+	}
+</style>

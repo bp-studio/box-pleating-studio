@@ -1,6 +1,8 @@
 let cleanCss = require('gulp-clean-css');
 let concat = require('gulp-concat');
 let gulp = require('gulp');
+let gulpIf = require('gulp-if');
+let lazypipe = require('lazypipe');
 let newer = require('gulp-newer');
 let terser = require('gulp-terser');
 let wrap = require('gulp-wrap');
@@ -11,19 +13,22 @@ let vue = require('../plugins/vue');
 
 let terserOption = require('../terser.json');
 
+let jsPipe = lazypipe()
+	.pipe(() => wrap("if(!err&&!wErr) { <%= contents %> }"))
+	.pipe(() => gulp.dest('debug/'))
+	.pipe(() => terser(terserOption));
+
 gulp.task('app', () =>
 	gulp.src([
+		'src/app/css/*.css',
 		'src/app/header.js',
 		'src/app/components/mixins/*.ts',
 		'src/app/components/**/*.vue',
 		'src/app/footer.js'
 	])
 		.pipe(newer("dist/main.js"))
-		.pipe(vue())
-		.pipe(concat('main.js'))
-		.pipe(wrap("if(!err&&!wErr) { <%= contents %> }",))
-		.pipe(gulp.dest('debug/'))
-		.pipe(terser(terserOption))
+		.pipe(vue('main.js', 'main.css'))
+		.pipe(gulpIf(file => file.extname == ".js", jsPipe(), cleanCss()))
 		.pipe(gulp.dest('dist/'))
 );
 
@@ -37,12 +42,4 @@ gulp.task('locale', () =>
 		.pipe(wrap("let locale={};<%= contents %>"))
 		.pipe(terser())
 		.pipe(gulp.dest('dist/'))
-);
-
-gulp.task('css', () =>
-	gulp.src('src/app/css/*.css')
-		.pipe(newer("dist/main.css"))
-		.pipe(concat('main.css'))
-		.pipe(cleanCss())
-		.pipe(gulp.dest('dist'))
 );

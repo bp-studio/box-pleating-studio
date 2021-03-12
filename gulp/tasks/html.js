@@ -1,8 +1,8 @@
-let gulp = require('gulp');
-let newer = require('gulp-newer');
-let htmlMin = require('gulp-html-minifier-terser');
-let replace = require('gulp-replace');
 let all = require('gulp-all');
+let gulp = require('gulp');
+let htmlMin = require('gulp-html-minifier-terser');
+let newer = require('gulp-newer');
+let replace = require('gulp-replace');
 
 let debug = require('../plugins/debug');
 let htmlMinOption = require('../html.json');

@@ -10,50 +10,7 @@
 					{{$t("toolbar.tools.TreeMaker")}}
 				</uploader>
 			</dropdown>
-			<dropdown icon="bp-question-circle" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
-				<div class="dropdown-item" @click="$emit('about')">
-					<i class="bp-info"></i>
-					{{$t('toolbar.help.about')}}
-				</div>
-				<div class="dropdown-item" @click="news">
-					<i class="fas fa-newspaper"></i>
-					{{$t('toolbar.help.news')}}
-					<div class="notify" v-if="notify"></div>
-				</div>
-				<a
-					class="dropdown-item"
-					href="https://github.com/MuTsunTsai/box-pleating-studio/discussions"
-					target="_blank"
-					rel="noopener"
-				>
-					<i class="far fa-comment-dots"></i>
-					{{$t("toolbar.help.discussions")}}
-				</a>
-				<a
-					class="dropdown-item"
-					href="https://github.com/MuTsunTsai/box-pleating-studio/issues"
-					target="_blank"
-					rel="noopener"
-				>
-					<i class="fas fa-bug"></i>
-					{{$t("toolbar.help.issue")}}
-				</a>
-				<divider></divider>
-				<div class="dropdown-item" @click="update" v-if="core.updated">
-					<i class="far fa-arrow-alt-circle-up"></i>
-					{{$t('toolbar.help.update')}}
-					<div class="notify"></div>
-				</div>
-				<div class="dropdown-item" @click="checkUpdate" v-else>
-					<i class="far fa-arrow-alt-circle-up"></i>
-					{{$t('toolbar.help.checkUpdate')}}
-				</div>
-				<divider></divider>
-				<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
-					<i class="fas fa-hand-holding-usd"></i>
-					{{$t('toolbar.help.donation')}}
-				</a>
-			</dropdown>
+			<helpmenu @about="$emit('about')" @news="$emit('news')"></helpmenu>
 		</div>
 
 		<div class="btn-group me-2">
@@ -79,62 +36,7 @@
 			</button>
 		</div>
 
-		<div id="divTab" class="flex-grow-1" @wheel="tabWheel($event)" ref="tab" v-if="ready">
-			<draggable v-bind="dragOption" v-model="core.designs">
-				<div
-					class="tab"
-					:class="{active:design==getDesign(id)}"
-					v-for="id in core.designs"
-					:key="id"
-					:id="`tab${id}`"
-					@click="core.select(id)"
-				>
-					<div class="tab-close" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
-						<div>
-							<span v-if="getDesign(id).history.modified">*</span>
-							{{getTitle(id)}}
-						</div>
-						<div class="px-2" @click.stop="core.close(id)" @pointerdown.stop @mousedown.stop>
-							<i class="fas fa-times"></i>
-						</div>
-					</div>
-					<div class="tab-down" :title="getDesign(id).title">
-						<div>
-							<span v-if="getDesign(id).history.modified">*</span>
-							{{getTitle(id)}}
-						</div>
-						<div class="px-2" @click.stop="tabMenu($event, id)" @pointerdown.stop @touchstart.stop>
-							<i class="fas fa-caret-down"></i>
-						</div>
-					</div>
-				</div>
-			</draggable>
-		</div>
-		<div id="divTab" class="flex-grow-1" v-else></div>
-
-		<contextmenu ref="tabMenu">
-			<div class="dropdown-item" @click="core.clone(menuId)">
-				<i class="far fa-clone"></i>
-				{{$t('toolbar.tab.clone')}}
-			</div>
-			<divider></divider>
-			<div class="dropdown-item" @click="core.close(menuId)">
-				<i class="far fa-window-close"></i>
-				{{$t('toolbar.tab.close')}}
-			</div>
-			<div class="dropdown-item" @click="core.closeOther(menuId)">
-				<i class="far fa-window-close"></i>
-				{{$t('toolbar.tab.closeOther')}}
-			</div>
-			<div class="dropdown-item" @click="core.closeRight(menuId)">
-				<i class="far fa-window-close"></i>
-				{{$t('toolbar.tab.closeRight')}}
-			</div>
-			<div class="dropdown-item" @click="core.closeAll()">
-				<i class="far fa-window-close"></i>
-				{{$t('toolbar.tab.closeAll')}}
-			</div>
-		</contextmenu>
+		<tabs></tabs>
 
 		<div class="btn-group" id="panelToggle">
 			<button
@@ -152,71 +54,17 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { bp, Design } from '../import/BPStudio';
+	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import { readFile, bufferToText } from '../import/types';
 
 	import BaseComponent from '../mixins/baseComponent';
-	import ContextMenu from '../gadget/contextmenu.vue';
-
-	declare const logs: number[];
 
 	@Component
 	export default class Toolbar extends BaseComponent {
 
-		private notify: boolean;
-		private ready: boolean = false;
-
-		mounted() {
-			let v = parseInt(localStorage.getItem("last_log") || "0");
-			this.notify = v < logs[logs.length - 1];
-			core.libReady.then(() => this.ready = true);
-		}
-
-		private async update() {
-			if(await core.confirm(this.$t("message.updateReady"))) location.reload();
-		}
-
-		private async checkUpdate() {
-			let reg = await navigator.serviceWorker.ready;
-			let cb = () => this.update();
-			reg.addEventListener("updatefound", cb, { once: true });
-			await reg.update();
-			if(!reg.installing && !reg.waiting) {
-				reg.removeEventListener("updatefound", cb);
-				await core.alert(this.$t("message.latest"));
-			}
-		}
-
-		private news() {
-			if(this.notify) {
-				localStorage.setItem("last_log", logs[logs.length - 1].toString());
-				this.notify = false;
-			}
-			this.$emit('news');
-		}
-
-		private get dragOption() {
-			return {
-				delay: 500,
-				delayOnTouchOnly: true,
-				touchStartThreshold: 20,
-				animation: 200,
-				forceFallback: true,
-				direction: "horizontal",
-				scroll: true
-			};
-		}
-		private get core() { return core; }
-
 		public toLayout() { this.design.mode = "layout"; }
 		public toTree() { this.design.mode = "tree"; }
-
-		private tabWheel(event: WheelEvent) {
-			if(event.deltaX == 0) {
-				(this.$refs.tab as HTMLDivElement).scrollLeft -= event.deltaY / 5;
-			}
-		}
 
 		public async TreeMaker(event) {
 			let f = event.target;
@@ -229,20 +77,6 @@
 				core.alert(this.$t(e.message, [name]));
 			}
 			f.value = "";
-		}
-
-		private menuId: number;
-		private tabMenu(event: MouseEvent, id: number) {
-			this.menuId = id;
-			(this.$refs.tabMenu as ContextMenu).show(event);
-		}
-
-		public getDesign(id: number): Design {
-			return bp.designMap.get(id)!;
-		}
-		public getTitle(id: number): string {
-			let title = this.getDesign(id).title;
-			return title ? title : this.$t('toolbar.project.noTitle');
 		}
 	}
 </script>

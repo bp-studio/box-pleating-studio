@@ -1,11 +1,11 @@
+let all = require('gulp-all');
+let cleanCss = require('gulp-clean-css');
+let filter = require('gulp-filter');
 let fs = require('fs');
 let gulp = require('gulp');
 let gulpIf = require('gulp-if');
-let all = require('gulp-all');
 let ifAnyNewer = require('gulp-if-any-newer');
 let newer = require('gulp-newer');
-let filter = require('gulp-filter');
-let cleanCss = require('gulp-clean-css');
 let purify = require('gulp-purifycss');
 
 let log2 = require('../plugins/log');

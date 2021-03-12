@@ -1,7 +1,7 @@
+let all = require('gulp-all');
 let gulp = require('gulp');
 let replace = require('gulp-replace');
 let sourcemaps = require('gulp-sourcemaps');
-let all = require('gulp-all');
 
 // 本地更新 Shrewd 模組
 gulp.task('shrewd', () => all(

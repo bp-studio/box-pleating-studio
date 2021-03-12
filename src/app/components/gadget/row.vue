@@ -18,3 +18,9 @@
 		@Prop(String) public label: string;
 	}
 </script>
+
+<style>
+	.col-form-label {
+		white-space: nowrap;
+	}
+</style>

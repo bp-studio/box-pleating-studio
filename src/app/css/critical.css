@@ -1,4 +1,3 @@
-
 /*********************************************
  * 這些是為了加速初始 rendering 而放在這裡的重複定義
  *********************************************/
@@ -12,7 +11,8 @@
 }
 
 .fa-spin {
-	display: inline-block; /* 這是額外加的 */
+	display: inline-block;
+	/* 這是額外加的 */
 	-webkit-animation: fa-spin 2s linear infinite;
 	animation: fa-spin 2s linear infinite
 }

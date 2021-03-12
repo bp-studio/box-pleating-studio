@@ -16,7 +16,7 @@
 	cursor: pointer;
 }
 
-.btn-toolbar .dropdown-item > i, .btn-toolbar .dropdown-item .flex-grow-1 > i {
+.btn-toolbar .dropdown-item>i, .btn-toolbar .dropdown-item .flex-grow-1>i {
 	display: inline-block;
 	width: 20px;
 	text-align: center;

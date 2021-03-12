@@ -21,25 +21,6 @@ html, body {
 	overflow: hidden;
 }
 
-.panel-title {
-	line-height: 1.5;
-	white-space: nowrap;
-}
-
-/*********************************************
- * grid
- *********************************************/
-
-.panel-grid {
-	display: grid;
-	grid-template-columns: minmax(4rem, max-content) 1fr;
-	grid-gap: 0.5rem 1rem;
-}
-
-.col-form-label {
-	white-space: nowrap;
-}
-
 /*********************************************
  * 禁止長按選取
  *********************************************/

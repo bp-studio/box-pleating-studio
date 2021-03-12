@@ -13,7 +13,6 @@ gulp.task('build', gulp.parallel(
 	'donate',
 	'core',
 	'worker',
-	'css',
 	'locale',
 	'app'
 ));

@@ -29,3 +29,43 @@
 		}
 	}
 </script>
+
+<style>
+	#divDPad {
+		height: 7.5rem;
+		width: 7.5rem;
+		position: absolute;
+		bottom: 1rem;
+		left: 1rem;
+		border-radius: 3.75rem;
+		background-color: var(--bs-primary);
+		opacity: 0;
+		pointer-events: none;
+		transition-property: opacity;
+		transition-duration: 0.1s;
+		/* 消失速度比較快 */
+		z-index: 100;
+	}
+
+	#divDPad.show {
+		pointer-events: all;
+		transition-delay: 60ms;
+		/* 稍微延遲顯示，以避免兩指觸控的時候閃現 */
+		transition-duration: 0.2s;
+		opacity: 0.8;
+	}
+
+	#divDPad.show.disabled {
+		pointer-events: none;
+		opacity: 0.5;
+	}
+
+	#divDPad i {
+		padding: 0.25rem;
+		height: 2.5rem;
+		width: 2.5rem;
+		font-size: 2rem;
+		color: white;
+		position: absolute;
+	}
+</style>

@@ -5,7 +5,7 @@ let log = require('fancy-log');
 let replace = require('gulp-replace');
 
 function connect() {
-	let options = require('../../.vscode/ftp-pub.json'); // This file is not in the repo, of course
+	let options = require('../../.vscode/ftp.json'); // This file is not in the repo, of course
 	options.log = log;
 	return ftp.create(options);
 }

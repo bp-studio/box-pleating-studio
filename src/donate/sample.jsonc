@@ -1,6 +1,6 @@
 // This is a sample json data returned after transaction is completed.
 // It is included in the repo only for future reference purpose.
-// This is genereated from a PayPal sandbox account, so you won't find any sensitive info here.
+// This is generated from a PayPal sandbox account, so you won't find any sensitive info here.
 {
 	"create_time": "2020-12-01T03:31:26Z",
 	"update_time": "2020-12-01T03:32:46Z",
