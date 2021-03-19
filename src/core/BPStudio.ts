@@ -185,7 +185,7 @@
 
 		Shrewd.commit();
 		if(this.design && !this.design.dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
-			this.design.history.flush(this.system.selections);
+			this.design.history.flush(this.system.selection.items);
 		}
 
 		await PaperWorker.done();

@@ -275,7 +275,7 @@
 		if(sheet) {
 			this.spaceHolder.style.width = this.totalWidth + "px";
 			this.spaceHolder.style.height = this.totalHeight + "px";
-			this._studio.system.scrollTo(sheet.scroll.x, sheet.scroll.y);
+			this._studio.system.scroll.to(sheet.scroll.x, sheet.scroll.y);
 		}
 	}
 

@@ -21,7 +21,7 @@
 		}
 
 		protected get disabled(): boolean {
-			return !core.initialized || bp.system.dragging;
+			return !core.initialized || bp.system.drag.on;
 		}
 
 		protected key(key: string) {

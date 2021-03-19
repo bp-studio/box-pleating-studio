@@ -140,7 +140,7 @@
 		}
 
 		public get shouldShowDPad() {
-			return this.initialized && this.isTouch && this.showDPad && bp.system.selections.length > 0;
+			return this.initialized && this.isTouch && this.showDPad && bp.system.selection.items.length > 0;
 		}
 
 		private loadSettings() {
@@ -229,7 +229,7 @@
 
 		private async save() {
 			// 拖曳的時候存檔無意義且浪費效能，跳過
-			if(bp.system.dragging) return;
+			if(bp.system.drag.on) return;
 
 			// 只有當前的實體取得存檔權的時候才會儲存
 			if(this.autoSave && await this.checkSession()) {
@@ -257,7 +257,7 @@
 		}
 		public get selections(): any {
 			if(!this.initialized) return [];
-			return bp.system.selections;
+			return bp.system.selection.items;
 		}
 
 		public create() {
@@ -324,9 +324,10 @@
 		public clone(id?: number) {
 			if(id === undefined) id = bp.design.id;
 			let i = this.designs.indexOf(id);
-			let c = bp.restore(this.checkTitle(bp.designMap.get(id).toJSON()));
-			this.designs.splice(i + 1, 0, (bp.design = c).id);
-			bp.update();
+			let d = bp.designMap.get(id).toJSON(true);
+			let c = bp.restore(this.checkTitle(d));
+			this.designs.splice(i + 1, 0, c.id);
+			this.select(c.id);
 			gtag('event', 'project_clone');
 		}
 		public addDesign(d: Design, select = true) {

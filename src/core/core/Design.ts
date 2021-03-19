@@ -161,7 +161,7 @@ interface IDesignObject {
 	}
 
 	public selectAll() {
-		this.$studio?.system.$clearSelection();
+		this.$studio?.system.selection.clear();
 		if(this.mode == "layout") this.flaps.forEach(f => f.selected = true);
 		if(this.mode == "tree") this.vertices.forEach(v => v.selected = true);
 	}
