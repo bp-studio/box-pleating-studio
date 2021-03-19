@@ -26,7 +26,10 @@ gulp.task('app', () =>
 		'src/app/components/**/*.vue',
 		'src/app/footer.js'
 	])
-		.pipe(newer("dist/main.js"))
+		.pipe(newer({
+			dest: 'dist/main.js',
+			extra: __filename
+		}))
 		.pipe(vue('main.js', 'main.css'))
 		.pipe(gulpIf(file => file.extname == ".js", jsPipe(), cleanCss()))
 		.pipe(gulp.dest('dist/'))
@@ -34,7 +37,10 @@ gulp.task('app', () =>
 
 gulp.task('locale', () =>
 	gulp.src('src/locale/*.json')
-		.pipe(newer("dist/locale.js"))
+		.pipe(newer({
+			dest: 'dist/locale.js',
+			extra: __filename
+		}))
 		.pipe(order('en.json'))
 		.pipe(gulp.dest('src/locale/'))
 		.pipe(i18n())

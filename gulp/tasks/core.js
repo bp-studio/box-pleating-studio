@@ -13,7 +13,10 @@ let terserOption = require('../terser.json');
 
 gulp.task('coreDev', () =>
 	projCore.src()
-		.pipe(newer('debug/bpstudio.js'))
+		.pipe(newer({
+			dest: 'debug/bpstudio.js',
+			extra: __filename
+		}))
 		.pipe(sourcemaps.init())
 		.pipe(projCore())
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
@@ -22,7 +25,10 @@ gulp.task('coreDev', () =>
 
 gulp.task('corePub', () =>
 	gulp.src("debug/bpstudio.js")
-		.pipe(newer('dist/bpstudio.js'))
+		.pipe(newer({
+			dest: 'dist/bpstudio.js',
+			extra: __filename
+		}))
 		.pipe(wrap(
 			`(function(root,factory){if(typeof define==='function'&&define.amd)
 			{define([],factory);}else if(typeof exports==='object'){module.exports=factory();}

@@ -1,8 +1,11 @@
 let ftp = require('vinyl-ftp');
 let gulp = require('gulp');
 let gulpIf = require('gulp-if');
+let inquirer = require('inquirer');
 let log = require('fancy-log');
 let replace = require('gulp-replace');
+
+let seriesIf = require('../utils/seriesIf');
 
 function connect() {
 	let options = require('../../.vscode/ftp.json'); // This file is not in the repo, of course
@@ -29,7 +32,17 @@ function ftpFactory(folder, g, p) {
 		.pipe(conn.dest(base));
 };
 
-gulp.task('cleanPub', () => cleanFactory('bp'));
+gulp.task('cleanPub', () => seriesIf(
+	async () => {
+		let answers = await inquirer.prompt([{
+			type: 'confirm',
+			message: '確定要清理正式版遠端資料夾？請確定已經執行過正式版發布。',
+			name: 'ok'
+		}])
+		return answers.ok;
+	},
+	() => cleanFactory('bp')
+));
 gulp.task('uploadPub', () => ftpFactory('bp', ['dist/.htaccess']));
 
 gulp.task('cleanDev', () => cleanFactory('bp-dev'));

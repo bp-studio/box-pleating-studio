@@ -16,13 +16,19 @@ gulp.task('version', () =>
 gulp.task('html', () => all(
 	// 偵錯版
 	gulp.src('public/index.htm')
-		.pipe(newer('debug'))
+		.pipe(newer({
+			dest: 'debug/index.htm',
+			extra: __filename
+		}))
 		.pipe(debug())
 		.pipe(gulp.dest('debug')),
 
 	// 正式版
 	gulp.src('public/index.htm')
-		.pipe(newer('dist'))
+		.pipe(newer({
+			dest: 'dist/index.htm',
+			extra: __filename
+		}))
 		.pipe(htmlMin(htmlMinOption))
 		// 避免 VS Code Linter 出錯
 		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
