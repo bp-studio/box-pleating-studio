@@ -53,6 +53,8 @@
 		public async show() {
 			await core.libReady;
 			this.modal.show();
+			var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'Preference' });
 		}
 	}

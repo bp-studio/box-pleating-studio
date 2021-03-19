@@ -17,6 +17,11 @@
 
 	@Component
 	export default class Alert extends Dialog<void> {
+		protected key(e: KeyboardEvent) {
+			let key = e.key.toLowerCase();
+			if(key == " " || key == "enter") this.close();
+		}
+
 		protected resolve(res: () => void) {
 			this.$el.addEventListener('hidden.bs.modal', () => res(), { once: true });
 		}

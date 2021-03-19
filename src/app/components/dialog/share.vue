@@ -17,7 +17,7 @@
 					</div>
 					<div v-if="ready" class="d-flex">
 						<div>
-							<button class="btn btn-primary" :disabled="sending" v-clipboard:copy="url" v-clipboard:success="onCopy">
+							<button class="btn btn-primary" :disabled="sending" v-clipboard:copy="url" v-clipboard:success="onCopy" ref="bt">
 								<i class="fas fa-copy"></i>
 								{{$t('share.copy')}}
 								<i
@@ -78,6 +78,8 @@
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
 			this.short = false;
 			this.modal.show();
+			var bt = this.$refs.bt as HTMLButtonElement;
+			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'Share' });
 		}
 

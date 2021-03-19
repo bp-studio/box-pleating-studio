@@ -10,10 +10,10 @@
 				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1">
-						<button class="btn btn-primary" :disabled="index==0" @click="index--">
+						<button class="btn btn-primary" style="width:2.5rem" :disabled="index==0" @click="index--">
 							<i class="fas fa-caret-left"></i>
 						</button>
-						<button class="btn btn-primary" :disabled="index==max" @click="index++">
+						<button class="btn btn-primary" style="width:2.5rem" :disabled="index==max" @click="index++">
 							<i class="fas fa-caret-right"></i>
 						</button>
 					</div>
@@ -83,6 +83,8 @@
 			this.active = true;
 			if(await this.load(this.index)) {
 				this.modal.show();
+				var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+				this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 				gtag('event', 'screen_view', { screen_name: 'News' });
 			}
 		}

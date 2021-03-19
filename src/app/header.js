@@ -85,10 +85,22 @@ function registerHotkey(action, key, shift) {
 	hotkeys.push([action, key.toLowerCase(), !!shift]);
 }
 
-document.body.addEventListener("keydown", e => {
-	// 如果正在使用輸入框，不處理一切後續
-	let active = document.activeElement;
-	if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+function registerHotkeyCore(callback) {
+	let handler = e => {
+		// 如果正在使用輸入框，不處理一切後續
+		let active = document.activeElement;
+		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+		callback(e);
+	};
+	document.body.addEventListener("keydown", handler);
+	return handler;
+}
+
+function unregisterHotkeyCore(handler) {
+	document.body.removeEventListener("keydown", handler);
+}
+
+registerHotkeyCore(e => {
 	if(e.metaKey || e.ctrlKey) {
 		e.preventDefault();
 		for(let [action, key, shift] of hotkeys) {
@@ -98,4 +110,4 @@ document.body.addEventListener("keydown", e => {
 			}
 		}
 	}
-})
+});

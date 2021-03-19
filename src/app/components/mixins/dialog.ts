@@ -1,5 +1,6 @@
 import { Vue, Component } from 'vue-property-decorator';
 import * as bootstrap from 'bootstrap';
+import { registerHotkeyCore, unregisterHotkeyCore } from '../import/types';
 
 declare const core: any;
 
@@ -21,15 +22,23 @@ export default abstract class Dialog<T> extends Vue {
 	}
 
 	private run(): Promise<T> {
+		let handler = registerHotkeyCore(this.key.bind(this));
 		let p = new Promise<T>(resolve =>
 			this.resolve((v: T) => {
 				this.promise = null;
+				unregisterHotkeyCore(handler);
 				resolve(v);
 			})
 		);
 		this.modal.show();
 		return p;
 	}
+
+	protected close() {
+		this.modal.hide();
+	}
+
+	protected abstract key(e: KeyboardEvent): void;
 
 	protected abstract resolve(resolve: (v: T) => void): void;
 }

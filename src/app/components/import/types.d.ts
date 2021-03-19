@@ -19,3 +19,7 @@ export function bufferToText(buffer: ArrayBuffer): string;
 export function callService(data: any): Promise<any>;
 
 export function registerHotkey(action: () => void, key: string, shift?: boolean): void;
+
+export function registerHotkeyCore(callback: (e: KeyboardEvent) => void): EventListener;
+
+export function unregisterHotkeyCore(handler: EventListener): void;

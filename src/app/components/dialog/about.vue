@@ -35,15 +35,20 @@
 	@Component
 	export default class About extends Vue {
 		private modal: Bootstrap.Modal;
-		private get copyright() { return core.copyright; }
+		protected get copyright() { return core.copyright; }
+
 		mounted() {
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 		}
+
 		public async show() {
 			await core.libReady;
 			this.modal.show();
+			var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'About' });
 		}
+
 		public get version() {
 			let meta = document.querySelector("meta[name=version]") as HTMLMetaElement;
 			return meta.content + " build " + app_config.app_version;
