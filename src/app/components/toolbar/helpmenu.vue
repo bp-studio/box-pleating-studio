@@ -1,5 +1,5 @@
 <template>
-	<dropdown icon="bp-question-circle" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
+	<dropdown :icon="icon" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
 		<div class="dropdown-item" @click="$emit('about')">
 			<i class="bp-info"></i>
 			{{$t('toolbar.help.about')}}
@@ -28,7 +28,11 @@
 			{{$t("toolbar.help.issue")}}
 		</a>
 		<divider></divider>
-		<div class="dropdown-item" @click="update" v-if="core.updated">
+		<dropdownitem disabled v-if="checking">
+			<i class="bp-spinner fa-spin"></i>
+			{{$t('toolbar.help.checkUpdate')}}
+		</dropdownitem>
+		<div class="dropdown-item" @click="update" v-else-if="core.updated">
 			<i class="far fa-arrow-alt-circle-up"></i>
 			{{$t('toolbar.help.update')}}
 			<div class="notify"></div>
@@ -57,10 +61,15 @@
 	export default class HelpMenu extends BaseComponent {
 
 		private notify: boolean;
+		private checking: boolean = false;
 
 		mounted() {
 			let v = parseInt(localStorage.getItem("last_log") || "0");
 			this.notify = v < logs[logs.length - 1];
+		}
+
+		protected get icon() {
+			return this.checking ? "bp-spinner fa-spin" : "bp-question-circle";
 		}
 
 		protected async update() {
@@ -68,13 +77,20 @@
 		}
 
 		protected async checkUpdate() {
+			this.checking = true;
 			let reg = await navigator.serviceWorker.ready;
-			let cb = () => this.update();
-			reg.addEventListener("updatefound", cb, { once: true });
 			await reg.update();
-			if(!reg.installing && !reg.waiting) {
-				reg.removeEventListener("updatefound", cb);
+			let sw = reg.installing || reg.waiting;
+			if(!sw) {
+				this.checking = false;
 				await core.alert(this.$t("message.latest"));
+			} else {
+				sw.addEventListener('statechange', e => {
+					if(sw.state == "activated") {
+						this.checking = false;
+						this.update();
+					}
+				});
 			}
 		}
 
