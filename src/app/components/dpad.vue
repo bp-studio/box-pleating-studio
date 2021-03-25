@@ -25,7 +25,7 @@
 		}
 
 		protected key(key: string) {
-			bp.system.key(key);
+			bp.system.drag.processKey(key);
 		}
 	}
 </script>
