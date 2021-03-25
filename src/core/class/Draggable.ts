@@ -15,8 +15,8 @@ abstract class Draggable extends ViewedControl {
 	private _dragOffset: Vector;
 
 	/** 初始化拖曳 */
-	public dragStart(cursor: Point) {
-		this._dragOffset = cursor.sub(this.location);
+	public dragStart() {
+		this._dragOffset = CursorController.offset(this.location);
 	}
 
 	/** 修正拖曳；可以傳入滑鼠位置或位移向量 */

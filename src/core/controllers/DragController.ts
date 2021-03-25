@@ -41,11 +41,10 @@
 
 	/** 點擊時進行拖曳初始化 */
 	public init(event: paper.ToolEvent): void {
-		let cursor = CursorController.instance;
 		let selections = this.draggable;
 		if(selections.length) {
-			cursor.set(new Point(event.downPoint).round());
-			for(let o of selections) o.dragStart(cursor.last);
+			CursorController.update(new Point(event.downPoint).round());
+			for(let o of selections) o.dragStart();
 			this.on = true;
 		}
 	}
@@ -54,11 +53,7 @@
 	public process(event: paper.ToolEvent): boolean {
 		// 檢查滑鼠位置是否有發生變化
 		let pt = new Point(event.point).round();
-		let cursor = CursorController.instance;
-		if(cursor.last.eq(pt)) return false;
-
-		// 更新暫存的位置
-		cursor.set(pt);
+		if(!CursorController.update(pt)) return false;
 
 		// 請求拖曳中的 Draggable 去檢查並修正位置
 		for(let o of this.draggable) pt = o.dragConstraint(pt);

@@ -141,8 +141,7 @@
 		this.clear();
 		this.process(event, false);
 		this._updateDraggable();
-		let last = CursorController.instance.last;
-		for(let o of this.draggable) o.dragStart(last);
+		for(let o of this.draggable) o.dragStart();
 		this._possiblyReselect = false;
 		return true;
 	}

@@ -88,7 +88,7 @@ class ScrollController {
 
 		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留
 		if(this._scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
-			let diff = CursorController.instance.diff(event);
+			let diff = CursorController.diff(event);
 			this.process(diff);
 			if(System.isTouch(event)) this._studio.system.zoom.process(event);
 		}

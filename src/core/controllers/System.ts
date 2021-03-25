@@ -22,7 +22,6 @@ class System {
 	public readonly scroll: ScrollController;
 	public readonly zoom: ZoomController;
 	private readonly longPress: LongPressController;
-	private readonly cursor: CursorController;
 	private readonly drag: DragController;
 
 	constructor(studio: BPStudio) {
@@ -42,7 +41,6 @@ class System {
 		this.selection = new SelectionController(studio);
 		this.zoom = new ZoomController(studio, canvas);
 		this.scroll = new ScrollController(studio);
-		this.cursor = CursorController.instance;
 		this.drag = new DragController(studio);
 	}
 
@@ -84,16 +82,16 @@ class System {
 		if(el instanceof HTMLElement) el.blur();
 
 		// 執行捲動，支援空白鍵捲動和右鍵捲動兩種操作方法
-		let space = KeyboardController.instance.isPressed("space");
+		let space = KeyboardController.isPressed("space");
 		if(event.event instanceof MouseEvent && (space || event.event.button == 2)) {
 			console.log(event.point.round().toString());
 			this.longPress.cancel();
 			this.scroll.init();
-			this.cursor.update(event.event);
+			CursorController.update(event.event);
 			return;
 		}
 
-		if(!this._isSelectEvent(ev) || this.scroll.on) return;
+		if(!System.isSelectEvent(ev) || this.scroll.on) return;
 
 		if(System.isTouch(ev)) this._canvasTouchDown(event);
 		else this._canvasMouseDown(event);
@@ -118,18 +116,11 @@ class System {
 
 	private _canvasMouseup(event: paper.ToolEvent): void {
 		let dragging = this.selection.endDrag();
-		if(!this._isSelectEvent(event.event)) return;
+		if(!System.isSelectEvent(event.event)) return;
 		if(this.scroll.tryEnd(event)) return;
 		if(!dragging && !event.modifiers.control && !event.modifiers.meta) {
 			this.selection.processNext();
 		}
-	}
-
-	/** 檢查事件是否符合「選取」的前提（單點觸控或者滑鼠左鍵操作） */
-	private _isSelectEvent(event: MouseEvent | TouchEvent): boolean {
-		if(System.isTouch(event) && event.touches.length > 1) return false;
-		if(event instanceof MouseEvent && event.button != 0) return false;
-		return true;
 	}
 
 	/** 處理滑鼠移動 */
@@ -159,8 +150,15 @@ class System {
 			this.longPress.cancel();
 			this.scroll.init();
 			this.zoom.init(event);
-			this.cursor.update(event);
+			CursorController.update(event);
 		}
+	}
+
+	/** 檢查事件是否符合「選取」的前提（單點觸控或者滑鼠左鍵操作） */
+	private static isSelectEvent(event: MouseEvent | TouchEvent): boolean {
+		if(System.isTouch(event) && event.touches.length > 1) return false;
+		if(event instanceof MouseEvent && event.button != 0) return false;
+		return true;
 	}
 
 	public static isTouch(event: Event): event is TouchEvent {

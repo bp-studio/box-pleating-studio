@@ -5,29 +5,20 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class KeyboardController {
+namespace KeyboardController {
 
-	private _states: Record<string, boolean> = {};
+	let _states: Record<string, boolean> = {};
 
-	private static _instance: KeyboardController;
-	public static get instance() {
-		return KeyboardController._instance = KeyboardController._instance || new KeyboardController();
+	export function set(e: KeyboardEvent, on: boolean) {
+		_states[e.code.toLowerCase()] = on;
+		_states[e.key.toLowerCase()] = on;
 	}
 
-	private constructor() {
-		document.body.addEventListener('keydown', e => this.set(e, true));
-		document.body.addEventListener('keyup', e => this.set(e, false));
-		window.addEventListener('blur', () => this._states = {});
+	export function isPressed(key: string) {
+		return !!_states[key];
 	}
 
-	private set(e: KeyboardEvent, on: boolean) {
-		this._states[e.code.toLowerCase()] = on;
-		this._states[e.key.toLowerCase()] = on;
-	}
-
-	public isPressed(key: string) {
-		return !!this._states[key];
-	}
+	document.body.addEventListener('keydown', e => set(e, true));
+	document.body.addEventListener('keyup', e => set(e, false));
+	window.addEventListener('blur', () => _states = {});
 }
-
-KeyboardController.instance; // 立刻初始化 KeyboardController 的 singleton

@@ -5,38 +5,30 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class CursorController {
-
-	private static _instance: CursorController;
-	public static get instance() {
-		return CursorController._instance = CursorController._instance || new CursorController();
-	}
+namespace CursorController {
 
 	/** 暫存的滑鼠拖曳位置，用來比較以確認是否有新的位移 */
-	private _lastKnownCursorLocation: Point;
+	let location: Point;
 
-	private constructor() { }
-
-	public get last() {
-		return this._lastKnownCursorLocation;
+	export function update(data: MouseEvent | TouchEvent | Point): boolean {
+		if(data instanceof Event) data = _locate(data);
+		if(location.eq(data)) return false;
+		location.set(data);
+		return true;
 	}
 
-	public set(pt: Point) {
-		this._lastKnownCursorLocation = pt;
-	}
-
-	public update(event: MouseEvent | TouchEvent) {
-		this._lastKnownCursorLocation = this._locate(event);
-	}
-
-	public diff(event: MouseEvent | TouchEvent): Vector {
-		let pt = this._locate(event);
-		let diff = pt.sub(this._lastKnownCursorLocation);
-		this._lastKnownCursorLocation = pt;
+	export function diff(event: MouseEvent | TouchEvent): Vector {
+		let pt = _locate(event);
+		let diff = pt.sub(location);
+		location = pt;
 		return diff;
 	}
 
-	private _locate(e: MouseEvent | TouchEvent): Point {
+	export function offset(pt: IPoint): Vector {
+		return location.sub(pt);
+	}
+
+	function _locate(e: MouseEvent | TouchEvent): Point {
 		return System.isTouch(e) ? new Point(System.getTouchCenter(e)) : new Point(e.pageX, e.pageY);
 	}
 }
