@@ -12,8 +12,11 @@ namespace CursorController {
 
 	export function update(data: MouseEvent | TouchEvent | Point): boolean {
 		if(data instanceof Event) data = _locate(data);
-		if(location.eq(data)) return false;
-		location.set(data);
+		if(!location) location = data;
+		else {
+			if(location.eq(data)) return false;
+			location.set(data);
+		}
 		return true;
 	}
 
