@@ -66,8 +66,8 @@
 		public toLayout() { this.design.mode = "layout"; }
 		public toTree() { this.design.mode = "tree"; }
 
-		public async TreeMaker(event) {
-			let f = event.target;
+		public async TreeMaker(event: Event) {
+			let f = event.target as HTMLInputElement;
 			if(f.files.length == 0) return;
 			let content = bufferToText(await readFile(f.files[0]));
 			let name = f.files[0].name;

@@ -3,40 +3,23 @@
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
 		<note v-if="design&&design.patternNotFound"></note>
-		<div ref="mdlLanguage" class="modal fade">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-body">
-						<div class="row">
-							<div v-for="l in languages" :key="l" class="col text-center">
-								<button @click="i18n.locale=l" class="w-100 btn btn-light" data-bs-dismiss="modal">
-									<img :src="'assets/flags/'+$t('flag', l)+'.png'" :alt="$t('flag', l)" width="64" height="64" />
-									<br />
-									{{$t('name', l)}}
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<language ref="language"></language>
 	</div>
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Watch } from 'vue-property-decorator';
+	import { Vue, Component } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 	import { sanitize, callService } from './import/types';
-	import * as bootstrap from 'bootstrap';
+
 	import JSZip from 'jszip';
 
 	import Spinner from './gadget/spinner.vue';
 	import Confirm from './dialog/confirm.vue';
 	import Alert from './dialog/alert.vue';
+	import Language from './dialog/language.vue';
 
-	declare const locale: any;
 	declare const setInterval: any;
-	declare const i18n: any;
 	declare const core: Core;
 	declare const gtag: any;
 	declare const LZ: any;
@@ -61,14 +44,7 @@
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
 		private id: number = new Date().getTime();
 
-		private languages: string[] = [];
-		private mdlLanguage: Bootstrap.Modal;
-
 		public loader: Spinner;
-
-		private get i18n() { return i18n; }
-
-		@Watch('i18n.locale') watchLocale() { this.onLocaleChanged(); }
 
 		created() {
 			this.isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
@@ -85,8 +61,14 @@
 		}
 
 		mounted() {
-			this.libReady.then(() => this.mdlLanguage = new bootstrap.Modal(this.$refs.mdlLanguage as HTMLElement));
-			this.loadSettings();
+			let settings = JSON.parse(localStorage.getItem("settings"));
+			if(settings) {
+				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
+				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
+			}
+			let v = Number(localStorage.getItem("build") || 0);
+			(this.$refs.language as Language).init(v);
+			localStorage.setItem("build", app_config.app_version);
 		}
 
 		public async init() {
@@ -116,7 +98,7 @@
 			}
 
 			let url = new URL(location.href);
-			let lz = url.searchParams.get("project"), json;
+			let lz = url.searchParams.get("project"), json: any;
 			if(lz) {
 				try { json = JSON.parse(LZ.decompress(lz)); } catch(e) { }
 			}
@@ -140,49 +122,7 @@
 		}
 
 		public get shouldShowDPad() {
-			return this.initialized && this.isTouch && this.showDPad && bp.system.selection.items.length > 0;
-		}
-
-		private loadSettings() {
-			let settings = JSON.parse(localStorage.getItem("settings"));
-			if(settings) {
-				this.autoSave = settings.autoSave;
-				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
-			}
-			let l = localStorage.getItem("locale");
-			let v = Number(localStorage.getItem("build") || 0);
-			let r = (l: string) => l.replace(/_/g, "-").toLowerCase();
-			if(navigator.languages) {
-				let locales = Object.keys(locale);
-				let languages = navigator.languages
-					.map(a => locales.find(l => r(a).startsWith(l)))
-					.filter(l => !!l);
-				if(l) languages.unshift(l);
-				languages = Array.from(new Set(languages));
-
-				// 跳出語言選項的條件：沒有語言設定、或者有新加入的支援語言
-				if(languages.length > 1 && (!l || languages.some(l => locale[l].since > v))) {
-					this.languages = languages;
-					this.libReady.then(() => this.mdlLanguage.show());
-				}
-				if(!l) l = languages[0] || navigator.languages[0];
-			}
-			if(!l) l = "en";
-			i18n.locale = r(l);
-			localStorage.setItem("build", app_config.app_version);
-			this.onLocaleChanged();
-		}
-
-		private onLocaleChanged() {
-			if(i18n.locale in locale) {
-				localStorage.setItem("locale", i18n.locale);
-			} else Vue.nextTick(() => {
-				let chain = i18n._localeChainCache[i18n.locale];
-				for(let l of chain) if(l in locale) {
-					i18n.locale = l;
-					return;
-				}
-			});
+			return this.initialized && this.isTouch && this.showDPad && bp.system.selection.draggable.length > 0;
 		}
 
 		public saveSettings() {

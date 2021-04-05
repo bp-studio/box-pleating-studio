@@ -57,12 +57,13 @@
 
 	@Component
 	export default class SettingMenu extends BaseComponent {
-		private get core() { return core; }
 		private get settings(): any {
 			return core.initialized ? bp.$display.settings : {};
 		}
 
-		private toggle(key: string, target: any) {
+		protected get core() { return core; }
+
+		protected toggle(key: string, target: any) {
 			if(!target) target = this.settings;
 			target[key] = !target[key];
 			core.saveSettings();

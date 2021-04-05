@@ -9,12 +9,13 @@ class LongPressController {
 
 	private _callback: Action;
 
-	private _timeout: number;
+	private _timeout?: number;
 
 	constructor(callback: Action) {
 		this._callback = callback;
-
-		document.addEventListener("mouseup", this.cancel.bind(this));
+		let handler = this.cancel.bind(this);
+		document.addEventListener("mouseup", handler);
+		document.addEventListener("touchend", handler);
 	}
 
 	public init() {
@@ -22,6 +23,7 @@ class LongPressController {
 	}
 
 	public cancel() {
-		window.clearTimeout(this._timeout);
+		if(this._timeout !== undefined) window.clearTimeout(this._timeout);
+		this._timeout = undefined;
 	}
 }
