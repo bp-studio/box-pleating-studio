@@ -58,7 +58,7 @@
 	@Component
 	export default class SettingMenu extends BaseComponent {
 		private get settings(): any {
-			return core.initialized ? bp.$display.settings : {};
+			return core.initialized ? bp.display.settings : {};
 		}
 
 		protected get core() { return core; }

@@ -23,7 +23,7 @@ interface JNode {
 		return this.tree.jid ? this._jid : this._id;
 	}
 
-	@action public name: string = "";
+	@exported @action public name: string = "";
 
 	constructor(tree: Tree, id: number) {
 		super(tree);

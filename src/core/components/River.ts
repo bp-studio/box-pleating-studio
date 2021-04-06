@@ -31,6 +31,6 @@
 		this.design.edges.get(this.edge)!.deleteAndMerge();
 	}
 
-	public get length() { return this.edge.length; };
+	@exported public get length() { return this.edge.length; };
 	public set length(v) { this.edge.length = v; }
 }

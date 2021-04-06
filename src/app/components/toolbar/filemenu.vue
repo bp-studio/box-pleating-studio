@@ -98,12 +98,12 @@
 		public get svgFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".svg", content: () => bp.$display.toSVG() };
+				{ name: sanitize(this.design.title) + ".svg", content: () => bp.display.toSVG() };
 		}
 		public get pngFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".png", content: () => bp.$display.toPNG() };
+				{ name: sanitize(this.design.title) + ".png", content: () => bp.display.toPNG() };
 		}
 		public get workspaceFile(): FileFactory {
 			return !core.designs.length ?
@@ -114,7 +114,7 @@
 			return navigator.clipboard && 'write' in navigator.clipboard;
 		}
 		public copyPNG(): void {
-			bp.$display.copyPNG();
+			bp.display.copyPNG();
 			gtag('event', 'share', { method: 'copy', content_type: 'image' });
 		}
 
@@ -169,7 +169,7 @@
 
 		protected print() {
 			if(!core.design) return;
-			bp.$display.beforePrint();
+			bp.display.beforePrint();
 			setTimeout(window.print, 500);
 			gtag('event', 'print', {});
 		}

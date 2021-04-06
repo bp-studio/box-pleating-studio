@@ -15,7 +15,7 @@
 		return result;
 	}
 
-	public delete(flaps: readonly Flap[]) {
+	@exported public delete(flaps: readonly Flap[]) {
 		for(let f of flaps) {
 			if(this._design.vertices.size == 3) break;
 			f.node.delete();
@@ -26,7 +26,7 @@
 		this.forEach(f => f.selected = true);
 	}
 
-	public toVertex(flaps: Flap[]) {
+	@exported public toVertex(flaps: Flap[]) {
 		this._design.TreeSheet.clearSelection();
 		for(let f of flaps) {
 			let v = this._design.vertices.get(f.node)

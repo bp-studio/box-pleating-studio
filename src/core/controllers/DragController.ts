@@ -17,7 +17,7 @@
 		return this._studio.system.selection.draggable;
 	}
 
-	public processKey(key: string) {
+	@exported public processKey(key: string) {
 		let v = new Vector(0, 0);
 		switch(key) {
 			case "up": v.set(0, 1); break;

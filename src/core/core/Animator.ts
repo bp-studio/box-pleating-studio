@@ -1,11 +1,18 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * `Animator` 類別負責控制 `requestAnimationFrame` 的呼叫，
+ * 並且定時清除呼叫堆疊以利偵錯。
+ */
+//////////////////////////////////////////////////////////////////
+
 class Animator {
 
-	private _action: Action;
-	private _throttle: number;
+	private readonly _action: Action;
+	private readonly _run: (time: number) => void;
+	private readonly _throttle: number;
 	private _request: number;
 	private _last: number = performance.now();
-	private _run: (time: number) => void;
 
 	constructor(action: Action, throttle: number = 0) {
 		this._action = action;

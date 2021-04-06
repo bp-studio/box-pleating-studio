@@ -42,9 +42,9 @@
 	@Component
 	export default class Preference extends Vue {
 		private modal: Bootstrap.Modal;
-		private get i18n() { return i18n; }
-		private get core() { return core; }
-		private get display(): any { return core.initialized ? bp.$display.settings : {}; }
+		protected get i18n() { return i18n; }
+		protected get core() { return core; }
+		protected get display(): any { return core.initialized ? bp.display.settings : {}; }
 
 		mounted() {
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));

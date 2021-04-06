@@ -79,7 +79,7 @@
 
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {
-				let d = bp.$display.settings;
+				let d = bp.display.settings;
 				for(let key in d) d[key] = settings[key];
 			}
 
@@ -130,7 +130,7 @@
 			let {
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement
-			} = bp.$display.settings;
+			} = bp.display.settings;
 			if(this.autoSave) this.save();
 			else localStorage.removeItem("session");
 			localStorage.setItem("settings", JSON.stringify({

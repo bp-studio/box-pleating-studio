@@ -8,7 +8,7 @@ class RiverContainer extends BaseContainer<TreeEdge, River> {
 		);
 	}
 
-	public toEdge(river: River) {
+	@exported public toEdge(river: River) {
 		this._design.TreeSheet.clearSelection();
 		let e = this._design.edges.get(river.edge);
 		if(e) e.selected = true;

@@ -57,7 +57,7 @@ class ScrollController {
 	}
 
 	public process(diff: Vector) {
-		let display = this._studio.$display;
+		let display = this._studio.display;
 		let { x, y } = this._studio.design!.sheet.scroll;
 		if(display.isXScrollable) x -= diff.x;
 		if(display.isYScrollable) y -= diff.y;

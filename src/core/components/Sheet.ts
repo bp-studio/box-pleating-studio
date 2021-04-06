@@ -43,7 +43,7 @@ interface JSheet {
 		);
 	}
 
-	@action private mWidth: number;
+	@exported @action private mWidth: number;
 	public get width() { return this.mWidth; }
 	public set width(v) {
 		if(v >= 8 && v >= this._independentRect.width) {
@@ -55,7 +55,7 @@ interface JSheet {
 		}
 	}
 
-	@action private mHeight: number;
+	@exported @action private mHeight: number;
 	public get height() { return this.mHeight; }
 	public set height(v) {
 		if(v >= 8 && v >= this._independentRect.height) {
@@ -67,11 +67,11 @@ interface JSheet {
 		}
 	}
 
-	@shrewd public mZoom: number;
+	@exported @shrewd public mZoom: number;
 	public get zoom() { return this.mZoom; }
 	public set zoom(v) {
 		if(v < 100) return;
-		this.$studio?.$display.zoom(v, this);
+		this.$studio?.display.zoom(v, this);
 	}
 
 	constructor(design: Design, tag: string, sheet: JSheet, ...maps: IterableFactory<Control>[]) {
@@ -97,7 +97,7 @@ interface JSheet {
 	}
 
 	@shrewd public get displayScale() {
-		return this.$studio ? this.$studio.$display.scale : 1;
+		return this.$studio ? this.$studio.display.scale : 1;
 	}
 
 	public toJSON(session: boolean = false): JSheet {

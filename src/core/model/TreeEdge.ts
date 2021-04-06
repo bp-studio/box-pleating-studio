@@ -13,7 +13,7 @@ interface JEdge {
 	private readonly _n1: TreeNode;
 	private readonly _n2: TreeNode;
 
-	@action({ validator: (v: number) => v > 0 }) public length: number;
+	@exported @action({ validator: (v: number) => v > 0 }) public length: number;
 
 	constructor(n1: TreeNode, n2: TreeNode, length: number) {
 		super();

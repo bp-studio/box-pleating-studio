@@ -51,7 +51,7 @@ interface JVertex extends IPoint {
 	public readonly height = 0;
 	public readonly width = 0;
 
-	public get name() { return this.node.name; }
+	@exported public get name() { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 
 	public get degree() { return this.node.degree; }

@@ -34,7 +34,7 @@ abstract class View extends Mountable {
 
 	protected onMount(studio: BPStudio): void {
 		// 掛載時將所有的項目加入圖層之中
-		for(let [l, p] of this._paths) studio.$display.project.layers[l].addChild(p);
+		for(let [l, p] of this._paths) studio.display.project.layers[l].addChild(p);
 	}
 
 	protected onDismount(studio: BPStudio): void {
@@ -60,7 +60,7 @@ abstract class View extends Mountable {
 	@shrewd protected get scale() {
 		this.mountEvents();
 		if(!this.$studio) return this._scale;
-		let s = this.$studio.$display.scale;
+		let s = this.$studio.display.scale;
 		return this._scale = s < 10 ? s / 10 : 1;
 	}
 	private _scale = 1;

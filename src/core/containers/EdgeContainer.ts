@@ -28,7 +28,7 @@ class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
 		return result;
 	}
 
-	public toRiver(edge: Edge) {
+	@exported public toRiver(edge: Edge) {
 		this._design.LayoutSheet.clearSelection();
 		let te = edge.edge;
 		if(te.isRiver) {

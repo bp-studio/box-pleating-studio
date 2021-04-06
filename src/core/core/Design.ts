@@ -24,18 +24,16 @@ interface IDesignObject {
 //////////////////////////////////////////////////////////////////
 /**
  * `Design` 是包含了樹狀結構以及摺痕圖的一個完整專案單位。
- *
- * 這個檔案包含了 `Design` 的對外操作方法；其它核心程式碼整理在 `DesignBase` 之中。
  */
 //////////////////////////////////////////////////////////////////
 
 @shrewd class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
 
-	@shrewd public mode: string;
+	@exported @shrewd public mode: string;
 
-	@action public description?: string;
+	@exported @action public description?: string;
 
-	@action public title: string;
+	@exported @action public title: string;
 
 	private static _id = 0;
 
@@ -43,7 +41,7 @@ interface IDesignObject {
 	public readonly options: OptionManager;
 
 	/** 給 Vue 排序用的 id */
-	public readonly id: number = Design._id++;
+	@exported public readonly id: number = Design._id++;
 
 	public readonly LayoutSheet: Sheet;
 
@@ -52,7 +50,7 @@ interface IDesignObject {
 	public readonly tree: Tree;
 
 	/** 管理 Design 的編輯歷史 */
-	public readonly history: HistoryManager;
+	@exported public readonly history: HistoryManager;
 
 	constructor(studio: BPStudio, design: RecursivePartial<JDesign>) {
 		super(studio);
@@ -115,10 +113,10 @@ interface IDesignObject {
 	public readonly rivers = new RiverContainer(this);
 	public readonly vertices = new VertexContainer(this);
 	public readonly flaps = new FlapContainer(this);
-	public readonly stretches = new StretchContainer(this);
+	@exported public readonly stretches = new StretchContainer(this);
 	public readonly junctions: JunctionContainer;
 
-	@shrewd public get sheet(): Sheet {
+	@exported @shrewd public get sheet(): Sheet {
 		return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
 	}
 
@@ -148,7 +146,7 @@ interface IDesignObject {
 		return result;
 	}
 
-	public selectAll() {
+	@exported public selectAll() {
 		this.$studio?.system.selection.clear();
 		if(this.mode == "layout") this.flaps.selectAll();
 		if(this.mode == "tree") this.vertices.selectAll();

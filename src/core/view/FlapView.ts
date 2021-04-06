@@ -73,7 +73,7 @@
 	/** 這個獨立出來以提供 RiverView 的相依 */
 	@shrewd public renderHinge() {
 		if(this.control.disposed) return;
-		this._circle.visible = this.$studio?.$display.settings.showHinge ?? false;
+		this._circle.visible = this.$studio?.display.settings.showHinge ?? false;
 		let paths = PaperUtil.fromSegments(this.closure);
 		this.hinge.removeSegments();
 		if(!paths.length) debugger;

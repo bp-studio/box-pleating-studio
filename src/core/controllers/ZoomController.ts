@@ -34,14 +34,14 @@ class ZoomController {
 		let dpi = window.devicePixelRatio ?? 1;
 		let s = sheet.zoom * raw / dpi / 100;
 		s = Math.round(s + this._touchScaling[1]);
-		this._studio.$display.zoom(s, sheet, System.getTouchCenter(event));
+		this._studio.display.zoom(s, sheet, System.getTouchCenter(event));
 		this._touchScaling = [dist, s];
 	}
 
 	private _canvasWheel(event: WheelEvent) {
 		if(event.ctrlKey || event.metaKey) {
 			event.preventDefault();
-			let display = this._studio.$display;
+			let display = this._studio.display;
 			let d = this._studio.design;
 			if(d) {
 				display.zoom(

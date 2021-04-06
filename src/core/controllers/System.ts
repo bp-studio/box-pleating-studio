@@ -13,16 +13,16 @@ class System {
 	private _studio: BPStudio;
 
 	/** 註冊長壓的 callback */
-	public onLongPress: () => void;
+	@exported public onLongPress: () => void;
 
 	/** 註冊拖曳的 callback */
-	public onDrag: () => void;
+	@exported public onDrag: () => void;
 
-	public readonly selection: SelectionController;
-	public readonly scroll: ScrollController;
+	@exported public readonly selection: SelectionController;
+	@exported public readonly scroll: ScrollController;
+	@exported public readonly drag: DragController;
 	public readonly zoom: ZoomController;
 	private readonly longPress: LongPressController;
-	private readonly drag: DragController;
 
 	constructor(studio: BPStudio) {
 		this._studio = studio;
@@ -56,7 +56,7 @@ class System {
 
 		switch(event.key) {
 			case "space":
-				if(this._studio.$display.isScrollable()) {
+				if(this._studio.display.isScrollable()) {
 					this._canvas.style.cursor = "grab";
 				}
 				return false;

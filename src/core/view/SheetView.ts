@@ -30,7 +30,7 @@
 
 		PaperUtil.setRectangleSize(this._border, width, height);
 
-		this._grid.visible = this.$studio!.$display.settings.showGrid;
+		this._grid.visible = this.$studio!.display.settings.showGrid;
 		this._grid.removeChildren();
 		for(let i = 1; i < height; i++) {
 			PaperUtil.addLine(this._grid, new paper.Point(0, i), new paper.Point(width, i));

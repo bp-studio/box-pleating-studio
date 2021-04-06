@@ -18,7 +18,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 	@shrewd private drawUnscaled() {
 		this.mountEvents();
 		if(!this.$studio) return;
-		this.$studio.$display.render();
+		this.$studio.display.render();
 		this.renderUnscaled();
 
 		let s = 14 * Math.sqrt(this.scale);
@@ -31,7 +31,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 		if(this.disposed || !this.$studio) return 0;
 		this.drawUnscaled();
 		let result = 0;
-		let w = this.$studio.$display.scale * this.control.sheet.width;
+		let w = this.$studio.display.scale * this.control.sheet.width;
 		let { left, right } = this._label.bounds;
 		if(left < 0) result = -left;
 		if(right > w) result = Math.max(result, right - w);

@@ -18,7 +18,7 @@ interface JFlap {
 	public get type() { return "Flap"; }
 	public get tag() { return "f" + this.node.id; }
 
-	@action private mWidth: number = 0;
+	@exported @action private mWidth: number = 0;
 	public get width() { return this.mWidth; }
 	public set width(v: number) {
 		if(v >= 0 && v <= this.sheet.width) {
@@ -28,7 +28,7 @@ interface JFlap {
 		}
 	}
 
-	@action private mHeight: number = 0;
+	@exported @action private mHeight: number = 0;
 	public get height() { return this.mHeight; }
 	public set height(v: number) {
 		if(v >= 0 && v <= this.sheet.height) {
@@ -62,7 +62,7 @@ interface JFlap {
 		];
 	}
 
-	public get name() { return this.node.name; }
+	@exported public get name() { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 
 	public get radius() { return this.node.radius; }

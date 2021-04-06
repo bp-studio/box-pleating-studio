@@ -75,16 +75,14 @@
 
 @shrewd class BPStudio {
 
+	@exported public readonly system: System;
+	@exported public readonly designMap: Map<number, Design> = new Map();
+	@exported public readonly display: Display;
+	@exported public onDeprecate?: (title: string) => void;
+	@exported @shrewd public design: Design | null = null;
+
 	public readonly $el: HTMLElement;
-	public readonly $display: Display;
-	public readonly system: System;
 	public readonly $paper: paper.PaperScope;
-
-	public readonly designMap: Map<number, Design> = new Map();
-
-	@shrewd public design: Design | null = null;
-
-	public onDeprecate?: (title: string) => void;
 
 	constructor(selector: string) {
 		if(typeof paper != "object") throw new Error("BPStudio requires paper.js.");
@@ -96,7 +94,7 @@
 
 		this.$el = el;
 		this.$paper = new paper.PaperScope();
-		this.$display = new Display(this);
+		this.display = new Display(this);
 		this.system = new System(this);
 
 		new Animator(this.update.bind(this), 50);
@@ -131,14 +129,14 @@
 		return design;
 	}
 
-	public select(id: number | null): void {
+	@exported public select(id: number | null): void {
 		if(id != null) {
 			let d = this.designMap.get(id);
 			if(d) this.design = d;
 		} else this.design = null;
 	}
 
-	public close(id: number): void {
+	@exported public close(id: number): void {
 		let d = this.designMap.get(id);
 		if(d) {
 			this.designMap.delete(id);
@@ -146,7 +144,7 @@
 		}
 	}
 
-	public closeAll(): void {
+	@exported public closeAll(): void {
 		this.design = null;
 		for(let d of this.designMap.values()) d.dispose();
 		this.designMap.clear();
@@ -162,7 +160,7 @@
 		return this.design;
 	}
 
-	public toBPS(): string {
+	@exported public toBPS(): string {
 		if(!this.design) return "";
 		let json = this.design.toJSON();
 		delete json.history; // 存檔的時候不用儲存歷史
@@ -171,7 +169,7 @@
 		return URL.createObjectURL(blob);
 	}
 
-	public get TreeMaker() { return TreeMaker; }
+	@exported public get TreeMaker() { return TreeMaker; }
 
 	/** 這是一個偵錯 glitch 用的屬性，正常情況不會用到（參見 Pattern.ts） */
 	public get running() { return this._updating; }
@@ -179,10 +177,10 @@
 	private _updating: boolean = false;
 
 	/** 提供 UI 來註冊儲存 session 的動作 */
-	public onUpdate?: Action;
+	@exported public onUpdate?: Action;
 
 	/** 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法 */
-	public async update() {
+	@exported public async update() {
 		if(this._updating) return;
 		this._updating = true;
 
@@ -194,7 +192,7 @@
 		}
 
 		await PaperWorker.done();
-		this.$display.project.view.update();
+		this.display.project.view.update();
 
 		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 
