@@ -8,7 +8,7 @@
 			<button class="btn btn-primary" @click="selection.delete()" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" @click="design.riverToEdge(selection)" v-t="'panel.river.goto'"></button>
+			<button class="btn btn-primary" @click="design.rivers.toEdge(selection)" v-t="'panel.river.goto'"></button>
 		</div>
 	</div>
 </template>

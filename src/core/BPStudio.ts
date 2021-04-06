@@ -29,9 +29,10 @@
 /// <reference path="math/Couple.ts" />
 /// <reference path="pattern/Partition.ts" />
 /// <reference path="helper/RiverHelper.ts" />
+/// <reference path="containers/JunctionContainer.ts" />
 
 // Level 3
-/// <reference path="core/DesignBase.ts" />
+/// <reference path="core/Design.ts" />
 /// <reference path="class/SheetObject.ts" />
 /// <reference path="components/Sheet.ts" />
 /// <reference path="view/View.ts" />
@@ -39,9 +40,9 @@
 /// <reference path="model/TreeEdge.ts" />
 /// <reference path="math/Point.ts" />
 /// <reference path="math/Vector.ts" />
+/// <reference path="containers/BaseContainer.ts" />
 
 // Level 4
-/// <reference path="core/Design.ts" />
 /// <reference path="class/Control.ts" />
 /// <reference path="components/Quadrant.ts" />
 /// <reference path="pattern/Stretch.ts" />
@@ -50,6 +51,10 @@
 /// <reference path="view/ControlView.ts" />
 /// <reference path="view/DragSelectView.ts" />
 /// <reference path="view/SheetView.ts" />
+/// <reference path="containers/StretchContainer.ts" />
+/// <reference path="containers/EdgeContainer.ts" />
+/// <reference path="containers/FlapContainer.ts" />
+/// <reference path="containers/VertexContainer.ts" />
 
 // Level 5
 /// <reference path="class/ViewedControl.ts" />

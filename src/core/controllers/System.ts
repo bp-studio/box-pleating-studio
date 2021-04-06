@@ -63,8 +63,8 @@ class System {
 
 			case "delete":
 				let s = this.selection.items[0];
-				if(s instanceof Flap) this._studio.design!.deleteFlaps(this.selection.items as Flap[]);
-				if(s instanceof Vertex) this._studio.design!.deleteVertices(this.selection.items as Vertex[]);
+				if(s instanceof Flap) this._studio.design!.flaps.delete(this.selection.items as Flap[]);
+				if(s instanceof Vertex) this._studio.design!.vertices.delete(this.selection.items as Vertex[]);
 				return false;
 
 			default: return this.drag.processKey(event.key);

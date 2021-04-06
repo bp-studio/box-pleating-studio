@@ -11,12 +11,12 @@
 			<button
 				class="btn btn-primary"
 				v-if="design.tree.node.size>3"
-				@click="design.deleteFlaps(selections)"
+				@click="design.flaps.delete(selections)"
 				v-t="'keyword.delete'"
 			>Delete</button>
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" @click="design.flapToVertex(selections)" v-t="'panel.flap.goto'"></button>
+			<button class="btn btn-primary" @click="design.flaps.toVertex(selections)" v-t="'panel.flap.goto'"></button>
 		</div>
 	</div>
 </template>

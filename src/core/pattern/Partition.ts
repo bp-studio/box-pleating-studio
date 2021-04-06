@@ -76,7 +76,7 @@ interface JPartition {
 	@shrewd private get _sideConnectionTarget(): ReadonlyMap<JCorner, [Point, Point]> {
 		this.disposeEvent();
 		let result = new Map<JCorner, [Point, Point]>();
-		let flaps = this.configuration.sheet.design.flapsById;
+		let flaps = this.configuration.sheet.design.flaps.byId;
 		for(let [c, o, q1] of this.intersectionCorners) {
 			let ov = this.overlaps[o];
 

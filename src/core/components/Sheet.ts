@@ -24,6 +24,7 @@ interface JSheet {
 
 	private _activeControlCache: Control[] = [];
 	@shrewd public get activeControls(): readonly Control[] {
+		this.disposeEvent();
 		if(!this.design.dragging) {
 			// 因為 isActive 是一個會完整更新 Pattern 的龐大計算，我們只有在非拖曳的時候完整更新清單，
 			// 以避免拖曳的時候被 Vue.js 的呼叫觸發了多餘的計算和繪製
@@ -159,4 +160,9 @@ interface JSheet {
 	}
 
 	@shrewd public scroll: IPoint;
+
+
+	public clearSelection() {
+		for(let c of this.controls) c.selected = false;
+	}
 }

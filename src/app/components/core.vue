@@ -2,7 +2,7 @@
 	<div>
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
-		<note v-if="design&&design.patternNotFound"></note>
+		<note v-if="design&&design.stretches.patternNotFound"></note>
 		<language ref="language"></language>
 	</div>
 </template>

@@ -96,7 +96,7 @@ class Step implements ISerializable<JStep> {
 		let des = this.destruct.concat().reverse();
 		for(let memento of des) this._design.options.set(...memento);
 		this._design.mode = this.mode;
-		this._design.restoreSelection(this.before);
+		this.restoreSelection(this.before);
 		this._fixed = true;
 	}
 
@@ -104,7 +104,7 @@ class Step implements ISerializable<JStep> {
 		for(let c of this.commands) c.redo();
 		for(let memento of this.construct) this._design.options.set(...memento);
 		this._design.mode = this.mode;
-		this._design.restoreSelection(this.after);
+		this.restoreSelection(this.after);
 		this._fixed = true;
 	}
 
@@ -113,5 +113,13 @@ class Step implements ISerializable<JStep> {
 		if(!this.construct.length) delete result.construct;
 		if(!this.destruct.length) delete result.destruct;
 		return result;
+	}
+
+	private restoreSelection(tags: string[]) {
+		this._design.sheet.clearSelection();
+		for(let tag of tags) {
+			let obj = this._design.query(tag);
+			if(obj instanceof Control) obj.selected = true;
+		}
 	}
 }

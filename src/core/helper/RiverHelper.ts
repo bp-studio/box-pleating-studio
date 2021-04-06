@@ -16,7 +16,7 @@
 	protected readonly view: RiverView;
 
 	constructor(view: RiverView, ids: number[]) {
-		super(view, view.design.flapsById.get(ids[0])!);
+		super(view, view.design.flaps.byId.get(ids[0])!);
 		this.node = view.design.tree.node.get(ids[1])!;
 		this.key = ids[0] + "," + ids[1];
 	}

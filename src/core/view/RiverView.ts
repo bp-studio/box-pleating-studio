@@ -161,7 +161,7 @@
 
 	@shrewd private renderRidge() {
 		// 建立相依性
-		let oa = this.control.sheet.design.openAnchors;
+		let oa = this.control.sheet.design.stretches.openAnchors;
 
 		// 如果同一回合裡面 draw() 沒有真的被執行（即沒有發生形狀的改變），那就跳過後面的動作
 		this.draw();

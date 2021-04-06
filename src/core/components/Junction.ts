@@ -121,7 +121,7 @@ type JunctionDimension = 'ox' | 'oy';
 	})
 	private get coverCandidate(): [Junction, TreeNode][] {
 		let result: [Junction, TreeNode][] = [];
-		for(let j of this.sheet.design.validJunctions) {
+		for(let j of this.sheet.design.junctions.valid) {
 			if(j == this) continue;
 			// 若對應路徑沒有共用點（亦即路徑不重疊）則肯定沒有覆蓋
 			let n = this.findIntersection(j);

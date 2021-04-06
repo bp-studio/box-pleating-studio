@@ -27,7 +27,7 @@ interface JStretch {
 	 * 這裡面的 `Junction` 順序是依照對應的 `Flap` 來排序的。
 	 */
 	@shrewd public get junctions(): readonly Junction[] {
-		let result = this.design.teams.get(this.signature) ?? [];
+		let result = this.design.junctions.teams.get(this.signature) ?? [];
 		if(this.junctionCache && this.junctionCache.length == result.length) {
 			for(let i in result) if(result[i] != this.junctionCache[i]) {
 				return this.junctionCache = result;
@@ -101,7 +101,7 @@ interface JStretch {
 
 	@shrewd public get isActive() {
 		// 這個涵蓋了任何一個 Flap 被刪除掉的情況
-		return this.design.teams.has(this.signature);
+		return this.design.junctions.teams.has(this.signature);
 	}
 
 	@shrewd public get pattern(): Pattern | null {

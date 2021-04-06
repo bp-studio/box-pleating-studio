@@ -17,7 +17,7 @@
 		<div class="mt-3">
 			<button
 				class="btn btn-primary"
-				@click="design.edgeToRiver(selection)"
+				@click="design.edges.toRiver(selection)"
 				v-t="selection.edge.isRiver?'panel.edge.goto':'panel.vertex.goto'"
 			></button>
 		</div>

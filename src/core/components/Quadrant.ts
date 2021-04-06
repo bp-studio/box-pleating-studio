@@ -255,7 +255,7 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	@shrewd public get pattern(): Pattern | null {
-		let stretch = this.design.getStretchByQuadrant(this);
+		let stretch = this.design.stretches.getByQuadrant(this);
 		return stretch ? stretch.pattern : null;
 	}
 
