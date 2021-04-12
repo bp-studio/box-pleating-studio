@@ -199,8 +199,8 @@ class JoinerCore {
 		if(test && !test.eq(T) && !test.eq(R)) return;
 
 		this.data.addOns = [{
-			$contour: [D, T, R].map(p => p.$toIPoint()),
-			$dir: new Line(T, R).$reflect(p.$direction).$toIPoint()
+			contour: [D, T, R].map(p => p.$toIPoint()),
+			dir: new Line(T, R).$reflect(p.$direction).$toIPoint()
 		}];
 		this._setupDetour([i == 0 ? T : D, R], [i == 0 ? D : T, R]);
 		yield this._result(true, R.$dist(T));
@@ -222,8 +222,8 @@ class JoinerCore {
 		let R = PathUtil.$triangleTransform([T, D, P], B);
 		if(!this._setupAnchor(R)) return;
 		this.data.addOns = [{
-			$contour: [B, T, R].map(p => p.$toIPoint()),
-			$dir: new Line(T, B).$reflect(p.$direction).$toIPoint()
+			contour: [B, T, R].map(p => p.$toIPoint()),
+			dir: new Line(T, B).$reflect(p.$direction).$toIPoint()
 		}];
 		this._setupDetour(i == 0 ? [T, B] : [B], i == 0 ? [B] : [T, B]);
 		yield this._result(true, B.$dist(T));

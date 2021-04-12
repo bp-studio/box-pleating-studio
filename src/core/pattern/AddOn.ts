@@ -1,7 +1,7 @@
 
 interface JAddOn {
-	$contour: IPoint[];
-	$dir: IPoint;
+	contour: IPoint[];
+	dir: IPoint;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -13,23 +13,23 @@ interface JAddOn {
 
 class AddOn extends Region implements JAddOn {
 
-	public readonly $contour: IPoint[];
-	public readonly $dir: IPoint;
+	public readonly contour: IPoint[];
+	public readonly dir: IPoint;
 
 	constructor(data: JAddOn) {
 		super();
-		this.$contour = data.$contour;
-		this.$dir = data.$dir;
+		this.contour = data.contour;
+		this.dir = data.dir;
 	}
 
 	@onDemand public get $shape() {
-		let contour = this.$contour.map(p => new Point(p));
+		let contour = this.contour.map(p => new Point(p));
 		let ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
 		return { contour, ridges };
 	}
 
 	@onDemand public get $direction() {
-		return new Vector(this.$dir).$reduceToInt();
+		return new Vector(this.dir).$reduceToInt();
 	}
 
 	public static $instantiate(a: JAddOn): AddOn {
