@@ -1,5 +1,6 @@
 let gulp = require('gulp');
 let newer = require('gulp-newer');
+let replace = require('gulp-replace');
 let sourcemaps = require('gulp-sourcemaps');
 let terser = require('gulp-terser');
 let ts = require('gulp-typescript');
@@ -34,7 +35,11 @@ gulp.task('corePub', () =>
 			{define([],factory);}else if(typeof exports==='object'){module.exports=factory();}
 			else{root.BPStudio=factory();}}(this,function(){ <%= contents %> ;return BPStudio;}));`
 		))
-		.pipe(terser(Object.assign({}, terserOption, { mangle: true })))
+		.pipe(replace(/("[$_][a-z0-9]+")/gi, '$$$$$$$$[$1]')) // Prepare decorator mangling
+		.pipe(terser(Object.assign({}, terserOption, {
+			mangle: { properties: { regex: /^[$_]/ } }
+		})))
+		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, '"$1"')) // Restore
 		.pipe(gulp.dest('dist'))
 );
 

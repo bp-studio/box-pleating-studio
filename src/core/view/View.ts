@@ -17,9 +17,9 @@ abstract class View extends Mountable {
 	 *
 	 * 可以透過相依於這個方法來達到確保繪製順序正確的目的。
 	 */
-	@shrewd public draw() {
-		this.mountEvents();
-		if(this.$studio) this.render();
+	@shrewd public $draw() {
+		this.$mountEvents();
+		if(this.$studio) this.$render();
 	}
 
 	/**
@@ -32,12 +32,12 @@ abstract class View extends Mountable {
 		this._paths.push([layer, item, item.strokeWidth]);
 	}
 
-	protected onMount(studio: BPStudio): void {
+	protected $onMount(studio: BPStudio): void {
 		// 掛載時將所有的項目加入圖層之中
-		for(let [l, p] of this._paths) studio.display.project.layers[l].addChild(p);
+		for(let [l, p] of this._paths) studio.display.$project.layers[l].addChild(p);
 	}
 
-	protected onDismount(studio: BPStudio): void {
+	protected $onDismount(studio: BPStudio): void {
 		// 卸載時移除所有的項目
 		for(let [l, p] of this._paths) p.remove();
 	}
@@ -47,25 +47,25 @@ abstract class View extends Mountable {
 	 *
 	 * 包含的具體邏輯由繼承類別實作，預設行為是一律傳回否（即視圖不可點擊）。
 	 */
-	public contains(point: paper.Point): boolean {
+	public $contains(point: paper.Point): boolean {
 		return false;
 	}
 
 	/**
 	 * 視圖必須實作抽象的 render 方法以定義繪製的具體行為。
 	 */
-	protected abstract render(): void;
+	protected abstract $render(): void;
 
 	/** 當尺度太小的時候調整線條粗細 */
 	@shrewd protected get scale() {
-		this.mountEvents();
+		this.$mountEvents();
 		if(!this.$studio) return this._scale;
-		let s = this.$studio.display.scale;
+		let s = this.$studio.display.$scale;
 		return this._scale = s < 10 ? s / 10 : 1;
 	}
 	private _scale = 1;
 
-	@shrewd private renderScale() {
+	@shrewd private _renderScale() {
 		for(let [l, p, w] of this._paths) p.strokeWidth = w * this.scale;
 	}
 }

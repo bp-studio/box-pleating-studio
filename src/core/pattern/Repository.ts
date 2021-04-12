@@ -15,19 +15,19 @@ interface JRepository {
 
 @shrewd class Repository extends Store<Configuration, Configuration> implements ISerializable<JRepository> {
 
-	public get tag() {
-		return "r" + this.stretch.signature;
+	public get $tag() {
+		return "r" + this.$stretch.$signature;
 	}
 
-	public readonly stretch: Stretch;
-	public readonly signature: string;
-	public readonly structure: JStructure;
+	public readonly $stretch: Stretch;
+	public readonly $signature: string;
+	public readonly $structure: JStructure;
 
-	protected generator: Generator<Configuration>;
+	protected $generator: Generator<Configuration>;
 
 	private readonly joinerCache: Map<string, Joiner> = new Map();
 
-	protected builder(prototype: Configuration) {
+	protected $builder(prototype: Configuration) {
 		// Repository 沒辦法使用快速建構機制，
 		// 因為它在生成的時候必須先確定 Configuration 裡面真的有 Pattern，
 		// 所以它當場就必須把 Configuration 的實體建構完畢。
@@ -35,16 +35,16 @@ interface JRepository {
 	}
 
 	constructor(stretch: Stretch, signature: string, option?: JStretch) {
-		super(stretch.sheet);
-		this.stretch = stretch;
-		this.signature = signature;
-		this.structure = JSON.parse(signature);
+		super(stretch.$sheet);
+		this.$stretch = stretch;
+		this.$signature = signature;
+		this.$structure = JSON.parse(signature);
 
-		let json = stretch.design.options.get(this);
+		let json = stretch.$design.$options.get(this);
 		if(json) {
-			this.restore(json.configurations.map(c => new Configuration(this, c)), json.index);
+			this.$restore(json.configurations.map(c => new Configuration(this, c)), json.index);
 		} else {
-			this.generator = new Configurator(this, option).generate(
+			this.$generator = new Configurator(this, option).$generate(
 				() => this.joinerCache.clear() // 搜尋完成之後清除快取
 			);
 		}
@@ -54,32 +54,32 @@ interface JRepository {
 
 	/** 一旦安定下來了之後就記錄自己的建構 */
 	@shrewd private _onSettle() {
-		if(!this._everActive && this.isActive && !this.design.dragging) {
+		if(!this._everActive && this.$isActive && !this.$design.$dragging) {
 			this._everActive = true;
 
 			// 乍看之下不需要特別記錄 Repository 的建構 Memento（因為重新移動到位的時候必然會計算出一樣的東西），
 			// 但是一方面記錄下來確實在歷史移動的時候會加速、
 			// 另一方面也是考慮到可能未來會隨著版本改變而算出不同的東西，
 			// 此時如果沒有 100% 留下正確的 Memento，歷史移動方面就可能會有瑕疵。
-			this.design.history.construct(this.toMemento());
+			this.$design.history.$construct(this.$toMemento());
 		}
 	}
 
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.stretch.disposed || !this.isActive && !this.design.dragging;
+	protected get $shouldDispose(): boolean {
+		return super.$shouldDispose || this.$stretch.$disposed || !this.$isActive && !this.$design.$dragging;
 	}
 
-	protected onDispose() {
-		if(this._everActive) this.design.history.destruct(this.toMemento());
-		super.onDispose();
+	protected $onDispose() {
+		if(this._everActive) this.$design.history.$destruct(this.$toMemento());
+		super.$onDispose();
 	}
 
-	@shrewd public get isActive(): boolean {
-		return this.stretch.isActive && this.stretch.repository == this;
+	@shrewd public get $isActive(): boolean {
+		return this.$stretch.$isActive && this.$stretch.repository == this;
 	}
 
-	protected onMove(): void {
-		this.stretch.selected = !(this.entry!.entry!.selected);
+	protected $onMove(): void {
+		this.$stretch.$selected = !(this.entry!.entry!.$selected);
 	}
 
 	/** 根據 `JOverlap` 組合來產生（或沿用）一個 `Joiner` */
@@ -92,12 +92,12 @@ interface JRepository {
 
 	public toJSON(): JRepository {
 		return {
-			configurations: this.memento.map(c => c.toJSON(true)),
+			configurations: this.$memento.map(c => c.toJSON(true)),
 			index: this.index
 		};
 	}
 
-	public toMemento(): Memento {
-		return [this.tag, this.toJSON()];
+	public $toMemento(): Memento {
+		return [this.$tag, this.toJSON()];
 	}
 }

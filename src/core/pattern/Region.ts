@@ -18,19 +18,19 @@ interface IRegionShape {
 
 abstract class Region {
 
-	public abstract get shape(): IRegionShape;
+	public abstract get $shape(): IRegionShape;
 
 	/** 軸平行摺痕的方向 */
-	public abstract get direction(): Vector;
+	public abstract get $direction(): Vector;
 
-	@onDemand public get axisParallels(): readonly Line[] {
-		let ref = this.shape.contour.find(p => p.isIntegral)!;
+	@onDemand public get $axisParallels(): readonly Line[] {
+		let ref = this.$shape.contour.find(p => p.$isIntegral)!;
 
 		// 計算軸平行摺痕的設置範圍
-		let dir = this.direction;
-		let step = dir.rotate90().normalize();
+		let dir = this.$direction;
+		let step = dir.$rotate90().$normalize();
 		let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
-		for(let p of this.shape.contour) {
+		for(let p of this.$shape.contour) {
 			let units = p.sub(ref).dot(step);
 			if(units > max) max = units;
 			if(units < min) min = units;
@@ -39,10 +39,10 @@ abstract class Region {
 		// 計算所有的軸平行摺痕
 		let ap: Line[] = [];
 		for(let i = Math.ceil(min); i <= Math.floor(max); i++) {
-			let p = ref.add(step.scale(new Fraction(i)));
+			let p = ref.add(step.$scale(new Fraction(i)));
 			let intersections: Point[] = [];
-			for(let r of this.shape.ridges) {
-				let j = r.intersection(p, dir);
+			for(let r of this.$shape.ridges) {
+				let j = r.$intersection(p, dir);
 				if(j && !j.eq(intersections[0])) intersections.push(j);
 				if(intersections.length == 2) break;
 			}

@@ -14,8 +14,8 @@ interface JHistory {
 @shrewd class HistoryManager extends Disposable implements ISerializable<JHistory> {
 
 	private readonly _design: Design;
-	@shrewd private readonly steps: Step[] = [];
-	@shrewd private index: number = 0;
+	@shrewd private readonly _steps: Step[] = [];
+	@shrewd private _index: number = 0;
 	@shrewd private _savedIndex: number = 0;
 
 	private _queue: Command[] = [];
@@ -33,8 +33,8 @@ interface JHistory {
 		this._design = design;
 		if(json) {
 			try {
-				this.steps.push(...json.steps.map(s => Step.restore(design, s)));
-				this.index = json.index;
+				this._steps.push(...json.steps.map(s => Step.restore(design, s)));
+				this._index = json.index;
 				this._savedIndex = json.savedIndex;
 			} catch(e) { }
 		}
@@ -42,35 +42,35 @@ interface JHistory {
 
 	public toJSON(): JHistory {
 		return {
-			index: this.index,
+			index: this._index,
 			savedIndex: this._savedIndex,
-			steps: this.steps
+			steps: this._steps
 		}
 	}
 
-	public queue(command: Command): void {
+	public $queue(command: Command): void {
 		if(this._moving) return;
 		for(let q of this._queue) {
-			if(command.canAddTo(q)) return command.addTo(q);
+			if(command.$canAddTo(q)) return command.$addTo(q);
 		}
 		this._queue.push(command);
 	}
 
-	public construct(memento: Memento): void {
+	public $construct(memento: Memento): void {
 		if(this._moving) return;
 		this._construct.push(memento);
 	}
 
-	public destruct(memento: Memento): void {
+	public $destruct(memento: Memento): void {
 		if(this._moving) return;
 		this._destruct.push(memento);
 	}
 
-	public flush(selection: Control[]): void {
-		let sel = selection.map(c => c.tag);
+	public $flush(selection: Control[]): void {
+		let sel = selection.map(c => c.$tag);
 		if(this._queue.length) {
-			let s = this.lastStep;
-			if(!s || !s.tryAdd(this._queue, this._construct, this._destruct)) {
+			let s = this._lastStep;
+			if(!s || !s.$tryAdd(this._queue, this._construct, this._destruct)) {
 				let step = new Step(this._design, {
 					commands: this._queue,
 					construct: this._construct,
@@ -79,10 +79,10 @@ interface JHistory {
 					before: this._selection,
 					after: sel
 				});
-				if(!step.isVoid) this.addStep(step);
-			} else if(s.isVoid) {
-				this.steps.pop();
-				this.index--;
+				if(!step.$isVoid) this._addStep(step);
+			} else if(s.$isVoid) {
+				this._steps.pop();
+				this._index--;
 			}
 			this._queue = [];
 			this._construct = [];
@@ -96,57 +96,64 @@ interface JHistory {
 	 * 自從上次存檔以來是否有經過修改。
 	 *
 	 * 這個必須是反應方法才能在 UI 上頭反應。
+	 *
+	 * @exports
 	 */
 	@shrewd public get modified(): boolean {
-		return this._savedIndex != this.index;
+		return this._savedIndex != this._index;
 	}
 
+	/** @exports */
 	public notifySave(): void {
-		this._savedIndex = this.index;
+		this._savedIndex = this._index;
 	}
 
-	private addStep(step: Step): void {
+	private _addStep(step: Step): void {
 		// 移除所有後面的 Step
-		if(this.steps.length > this.index) this.steps.length = this.index;
-		this.steps[this.index++] = step;
+		if(this._steps.length > this._index) this._steps.length = this._index;
+		this._steps[this._index++] = step;
 
 		// 最多儲存到 30 步
-		if(this.steps.length > 30) {
-			this.steps.shift();
-			this.index--;
+		if(this._steps.length > 30) {
+			this._steps.shift();
+			this._index--;
 			this._savedIndex--;
 		}
 	}
 
-	private get lastStep(): Step | undefined {
-		if(this.index == 0 || this.index < this.steps.length) return undefined;
-		return this.steps[this.index - 1];
+	private get _lastStep(): Step | undefined {
+		if(this._index == 0 || this._index < this._steps.length) return undefined;
+		return this._steps[this._index - 1];
 	}
 
-	public fieldChange(target: ITagObject, prop: string, oldValue: any, newValue: any): void {
+	public $fieldChange(target: ITagObject, prop: string, oldValue: any, newValue: any): void {
 		if(this._moving) return;
 		FieldCommand.create(target, prop, oldValue, newValue);
 	}
 
+	/** @exports */
 	@shrewd public get canUndo(): boolean {
-		return this.index > 0;
+		return this._index > 0;
 	}
 
+	/** @exports */
 	@shrewd public get canRedo(): boolean {
-		return this.index < this.steps.length;
+		return this._index < this._steps.length;
 	};
 
+	/** @exports */
 	public undo(): void {
 		if(this.canUndo) {
 			this._moving = true;
-			this.steps[--this.index].undo();
+			this._steps[--this._index].$undo();
 		}
 	}
 
+	/** @exports */
 	public redo(): void {
 		if(this.canRedo) {
 			this._moving = true;
-			this.steps[this.index++].redo();
+			this._steps[this._index++].$redo();
 		}
 	}
 }

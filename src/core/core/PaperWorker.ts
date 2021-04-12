@@ -8,20 +8,20 @@
 
 namespace PaperWorker {
 
-	export function done() {
-		return running;
+	export function $done() {
+		return task;
 	}
 
 	const master = new Worker("./paper-master.js");
 
 	type Payload = [paper.Item, number];
 
-	let running = Promise.resolve();
+	let task = Promise.resolve();
 	let end: Action | null = null;
 	let count = 0;
 
-	export async function processJunction(shade: paper.CompoundPath, j: string[]): Promise<void> {
-		if(!end) running = new Promise(res => end = res);
+	export async function $processJunction(shade: paper.CompoundPath, j: string[]): Promise<void> {
+		if(!end) task = new Promise(res => end = res);
 		count++;
 		if(j.length == 2) {
 			let [i, a] = await getIntersection(j[0], j[1]);

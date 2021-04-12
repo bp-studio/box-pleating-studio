@@ -25,7 +25,7 @@ namespace Trace {
 	 * @param end 終點線；如果過程中撞到這條線則停止
 	 * @param start 指定起點線；這個值有指定表示要用導繪模式
 	 */
-	export function create(
+	export function $create(
 		lines: readonly Line[],
 		startPt: Point, endPt: Point,
 		sv: Vector,
@@ -58,7 +58,7 @@ namespace Trace {
 			 */
 			currentIntersection = null;
 			for(let line of candidates) {
-				let intersection = getIntersection(line, currentPoint, currentVector);
+				let intersection = $getIntersection(line, currentPoint, currentVector);
 				if(intersection) {
 					// 完全落在外邊的線不列入考慮，因為那其實跟反射無關
 					let angle = shift ? getAngle(currentVector, shift) : undefined;
@@ -84,7 +84,7 @@ namespace Trace {
 
 				// 導繪模式的處理
 				if(start) {
-					let p = currentSegment.intersection(start);
+					let p = currentSegment.$intersection(start);
 					if(p) { // 撞到了起點線，加入交點
 						trace.push(p);
 						start = undefined;
@@ -92,8 +92,8 @@ namespace Trace {
 				}
 
 				// 撞到了終點（優先）或終點線，停止輸出
-				if(currentSegment.contains(endPt, true)) break;
-				let goal = currentSegment.intersection(end);
+				if(currentSegment.$contains(endPt, true)) break;
+				let goal = currentSegment.$intersection(end);
 				if(goal) { trace.push(goal); break; }
 
 				// 偵測迴圈；迴圈是只有當有 meandering 的時候才會產生
@@ -109,9 +109,9 @@ namespace Trace {
 				}
 
 				// 暫存偏移向量以幫助下一次的判斷
-				shift = currentLine.vector;
+				shift = currentLine.$vector;
 
-				currentVector = currentLine.reflect(currentVector);
+				currentVector = currentLine.$reflect(currentVector);
 				if(debugEnabled && debug) {
 					console.log([pt.toString(), currentLine.toString(), currentVector.toString(), shift.toString()]);
 				}
@@ -129,7 +129,7 @@ namespace Trace {
 	function processLoop(trace: Path, pt: Point, candidates: Set<Line>) {
 		let path: Path = [], i = trace.length - 1;
 		do { path.push(trace[i]); } while(!trace[i--].eq(pt));
-		for(let l of candidates) if(PathUtil.lineInsidePath(l, path)) candidates.delete(l)
+		for(let l of candidates) if(PathUtil.$lineInsidePath(l, path)) candidates.delete(l)
 	}
 
 	/** 判斷傳入的交點 `r` 是否在特定意義上比起交點 `x` 更「近」 */
@@ -138,19 +138,19 @@ namespace Trace {
 	}
 
 	/** 取得指定線段和給定動向的交點 */
-	export function getIntersection(l: Line, p: Point, v: Vector): JIntersection | null {
+	export function $getIntersection(l: Line, p: Point, v: Vector): JIntersection | null {
 		let v1 = l.p2.sub(l.p1);
-		let m = (new Matrix(v1._x, v._x, v1._y, v._y)).inverse;
+		let m = (new Matrix(v1._x, v._x, v1._y, v._y)).$inverse;
 		if(m == null) return null;
 
-		let r = m.multiply(p.sub(l.p1));
+		let r = m.$multiply(p.sub(l.p1));
 		let a = r._x, b = r._y.neg;
 
 		// 交點必須是在動向的前方且在線段的內部（含端點）
 		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE) || b.lt(Fraction.ZERO)) return null;
 
 		return {
-			point: p.add(v.scale(b)),
+			point: p.add(v.$scale(b)),
 			dist: b,
 			angle: getAngle(v, v1),
 			interior: a.gt(Fraction.ZERO) && a.lt(Fraction.ONE)
@@ -158,7 +158,7 @@ namespace Trace {
 	}
 
 	function getAngle(v1: Vector, v2: Vector) {
-		let ang = v1.angle - v2.angle;
+		let ang = v1.$angle - v2.$angle;
 		while(ang < 0) ang += Math.PI;
 		while(ang > Math.PI) ang -= Math.PI;
 		return ang;
@@ -166,7 +166,7 @@ namespace Trace {
 
 	/** 給定一線段，想像一下、把給定的動向稍微往側邊平移，是否還能碰得到？ */
 	function isSideTouchable(line: Line, from: Point, v: Vector, f: number, ang?: number): boolean {
-		let rv = v.rotate90();
+		let rv = v.$rotate90();
 		let v1 = line.p1.sub(from), v2 = line.p2.sub(from);
 		let r1 = v1.dot(rv), r2 = v2.dot(rv);
 		let d1 = v1.dot(v), d2 = v2.dot(v);
@@ -180,7 +180,7 @@ namespace Trace {
 				// 至少有一個端點位於前方
 				d1 > 0 || d2 > 0
 				// 或是給定線段的角度比前一次遇到的線段角度要更前面
-				|| !!ang && getAngle(v, line.vector) * f > ang * f
+				|| !!ang && getAngle(v, line.$vector) * f > ang * f
 			);
 		return result;
 	}

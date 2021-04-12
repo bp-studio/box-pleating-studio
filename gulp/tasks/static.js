@@ -12,7 +12,7 @@ let log2 = require('../plugins/log');
 let woff2 = require('../plugins/woff2');
 
 // 這邊必須指定副檔名，否則資料夾也會被比進去
-const compare = ['src/app/**/*.vue', 'src/app/**/*.css'];
+const compare = ['src/app/**/*.vue', 'src/app/**/*.css', 'src/donate/**/*.vue', 'public/*.htm'];
 
 /**
  * 個別淨化一個 lib 的 CSS 檔案

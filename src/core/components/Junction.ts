@@ -29,7 +29,7 @@ type JunctionDimension = 'ox' | 'oy';
 	 * 目前採用的格式是直接依 `Flap` 的 id 照順序以逗點分隔。
 	 * 實務上這樣決定出來的 `Junction` 群組必然是唯一的。
 	 */
-	public static createTeamId(arr: readonly Junction[]) {
+	public static $createTeamId(arr: readonly Junction[]) {
 		let set = new Set<number>();
 		arr.forEach(o => {
 			set.add(o.f1.node.id);
@@ -39,7 +39,7 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** `Junction` 群組用的排序函數 */
-	public static sort(j1: Junction, j2: Junction): number {
+	public static $sort(j1: Junction, j2: Junction): number {
 		let d = j1.f1.node.id - j2.f1.node.id;
 		if(d != 0) return d;
 		else return j1.f2.node.id - j2.f2.node.id;
@@ -51,38 +51,34 @@ type JunctionDimension = 'ox' | 'oy';
 	/** `Junction` 的兩個 `Flap` 當中 id 較大者 */
 	public readonly f2: Flap;
 
-	/** 識別 id；其格式是「n1:n2」，而 n1 < n2 是對應 `TreeNode` 的 id。 */
-	public readonly id: string;
-
 	constructor(sheet: Sheet, f1: Flap, f2: Flap) {
 		super(sheet);
 		if(f1.node.id > f2.node.id) [f1, f2] = [f2, f1];
 		this.f1 = f1;
 		this.f2 = f2;
-		f1.$junctions.push(this);
-		f2.$junctions.push(this);
-		this.id = f1.node.id + ":" + f2.node.id;
+		f1._junctions.push(this);
+		f2._junctions.push(this);
 		new JunctionView(this);
 	}
 
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.f1.disposed || this.f2.disposed;
+	protected get $shouldDispose(): boolean {
+		return super.$shouldDispose || this.f1.$disposed || this.f2.$disposed;
 	}
 
-	protected onDispose() {
-		this.f1.$junctions.splice(this.f1.$junctions.indexOf(this), 1);
-		this.f2.$junctions.splice(this.f2.$junctions.indexOf(this), 1);
+	protected $onDispose() {
+		this.f1._junctions.splice(this.f1._junctions.indexOf(this), 1);
+		this.f2._junctions.splice(this.f2._junctions.indexOf(this), 1);
 	}
 
 	/** 根據指定的基準點來取得覆蓋比較矩形 */
-	private getBaseRectangle(base: TreeNode): Rectangle | undefined {
+	private _getBaseRectangle(base: TreeNode): Rectangle | undefined {
 		let q = this.sx > 0 ? this.q2 : this.q1;
-		return q?.getBaseRectangle(this, base);
+		return q?.$getBaseRectangle(this, base);
 	}
 
 	@shrewd private get _lca(): TreeNode {
-		this.disposeEvent();
-		return this.design.tree.lca(this.n1, this.n2);
+		this.$disposeEvent();
+		return this.$design.tree.lca(this.n1, this.n2);
 	}
 
 	private get n1() { return this.f1.node; }
@@ -95,14 +91,14 @@ type JunctionDimension = 'ox' | 'oy';
 	 * 但是會使得 coverCandidate 大量相依於頂點的 path，所以也不能說很理想。
 	 * 日後可以再思考改進的方法。
 	 */
-	private findIntersection(j: Junction): TreeNode | null {
+	private _findIntersection(j: Junction): TreeNode | null {
 		let a1 = this._lca, a2 = j._lca;
-		let tree = this.design.tree;
+		let tree = this.$design.tree;
 		if(a1 == a2) return a1;
 
-		if(a1.depth > a2.depth) {
+		if(a1.$depth > a2.$depth) {
 			if(tree.lca(a2, this.n1) == a2 || tree.lca(a2, this.n2) == a2) return a2;
-		} else if(a2.depth > a1.depth) {
+		} else if(a2.$depth > a1.$depth) {
 			if(tree.lca(a1, j.n1) == a1 || tree.lca(a1, j.n2) == a1) return a1;
 		}
 		return null;
@@ -119,55 +115,55 @@ type JunctionDimension = 'ox' | 'oy';
 			return true;
 		}
 	})
-	private get coverCandidate(): [Junction, TreeNode][] {
+	private get _coverCandidate(): [Junction, TreeNode][] {
 		let result: [Junction, TreeNode][] = [];
-		for(let j of this.sheet.design.junctions.valid) {
+		for(let j of this.$sheet.$design.$junctions.$valid) {
 			if(j == this) continue;
 			// 若對應路徑沒有共用點（亦即路徑不重疊）則肯定沒有覆蓋
-			let n = this.findIntersection(j);
+			let n = this._findIntersection(j);
 			if(n) result.push([j, n]);
 		}
 		return result;
 	}
 
 	/** 判斷自身是否被另外一個 `Junction` 所涵蓋 */
-	private isCoveredBy(o: Junction, n: TreeNode): boolean {
+	private _isCoveredBy(o: Junction, n: TreeNode): boolean {
 		// 方向不一樣的話肯定不是覆蓋
-		if(this.direction % 2 != o.direction % 2) return false;
+		if(this.$direction % 2 != o.$direction % 2) return false;
 
 		// 基底矩形檢查
-		let [r1, r2] = [o.getBaseRectangle(n), this.getBaseRectangle(n)];
-		if(!r1 || !r2 || !r1.contains(r2)) return false;
+		let [r1, r2] = [o._getBaseRectangle(n), this._getBaseRectangle(n)];
+		if(!r1 || !r2 || !r1.$contains(r2)) return false;
 
-		if(r1.equals(r2)) {
+		if(r1.eq(r2)) {
 			// 如果兩者完全一樣大，則比較近的覆蓋比較遠的
 			return Math.abs(o.sx) < Math.abs(this.sx) || Math.abs(o.sy) < Math.abs(this.sy);
 		}
 		return true; // 否則大的覆蓋小的
 	}
 
-	@orderedArray("jcb") public get coveredBy(): Junction[] {
-		this.disposeEvent();
-		if(!this.isValid) return [];
+	@orderedArray("jcb") public get $coveredBy(): Junction[] {
+		this.$disposeEvent();
+		if(!this.$isValid) return [];
 		let result: Junction[] = [];
-		for(let [j, n] of this.coverCandidate) {
-			if(this.isCoveredBy(j, n)) result.push(j);
+		for(let [j, n] of this._coverCandidate) {
+			if(this._isCoveredBy(j, n)) result.push(j);
 		}
 		return result;
 	}
 
-	@shrewd public get isCovered(): boolean {
-		this.disposeEvent();
-		return this.coveredBy.some(j => j.coveredBy.length == 0);
+	@shrewd public get $isCovered(): boolean {
+		this.$disposeEvent();
+		return this.$coveredBy.some(j => j.$coveredBy.length == 0);
 	}
 
 	public toJSON(): JJunction {
 		return {
 			c: [
-				{ type: CornerType.flap, e: this.f1.node.id, q: this.q1!.q },
-				{ type: CornerType.side },
-				{ type: CornerType.flap, e: this.f2.node.id, q: this.q2!.q },
-				{ type: CornerType.side }
+				{ type: CornerType.$flap, e: this.f1.node.id, q: this.q1!.q },
+				{ type: CornerType.$side },
+				{ type: CornerType.$flap, e: this.f2.node.id, q: this.q2!.q },
+				{ type: CornerType.$side }
 			],
 			ox: this.ox,
 			oy: this.oy,
@@ -175,31 +171,31 @@ type JunctionDimension = 'ox' | 'oy';
 		};
 	}
 
-	@shrewd public get neighbors() {
-		this.disposeEvent();
-		if(this.direction > 3) return [];
-		let a1 = this.q1!.activeJunctions.concat();
-		let a2 = this.q2!.activeJunctions.concat();
+	@shrewd public get $neighbors() {
+		this.$disposeEvent();
+		if(this.$direction > 3) return [];
+		let a1 = this.q1!.$activeJunctions.concat();
+		let a2 = this.q2!.$activeJunctions.concat();
 		a1.splice(a1.indexOf(this), 1);
 		a2.splice(a2.indexOf(this), 1);
 		return a1.concat(a2);
 	}
 
 	@shrewd public get q1() {
-		return isQuadrant(this.direction) ? this.f1.quadrants[this.direction] : null;
+		return isQuadrant(this.$direction) ? this.f1.$quadrants[this.$direction] : null;
 	}
 
 	@shrewd public get q2() {
-		return isQuadrant(this.direction) ? this.f2.quadrants[opposite(this.direction)] : null;
+		return isQuadrant(this.$direction) ? this.f2.$quadrants[opposite(this.$direction)] : null;
 	}
 
 	@shrewd public get $treeDistance() {
-		this.disposeEvent();
+		this.$disposeEvent();
 		let n1 = this.f1.node, n2 = this.f2.node;
-		return n1.tree.dist(n1, n2);
+		return n1.$tree.$dist(n1, n2);
 	}
 
-	@shrewd public get status() {
+	@shrewd public get $status() {
 		if(this._flapDistance < this.$treeDistance) return JunctionStatus.tooClose;
 		else if(this.ox && this.oy) return JunctionStatus.overlap;
 		else return JunctionStatus.tooFar;
@@ -229,7 +225,7 @@ type JunctionDimension = 'ox' | 'oy';
 
 	/** 「s」是代表角片尖端構成的方框。這個值可能是負值，視 f1 f2 相對位置而定。 */
 	@shrewd public get sx() {
-		let x1 = this.f1.location.x, x2 = this.f2.location.x;
+		let x1 = this.f1.$location.x, x2 = this.f2.$location.x;
 		let w1 = this.f1.width, w2 = this.f2.width;
 		let sx = x1 - x2 - w2;
 		if(sx >= 0) return sx;
@@ -240,7 +236,7 @@ type JunctionDimension = 'ox' | 'oy';
 
 	/** 「s」是代表角片尖端構成的方框。這個值可能是負值，視 f1 f2 相對位置而定。 */
 	@shrewd public get sy() {
-		let y1 = this.f1.location.y, y2 = this.f2.location.y;
+		let y1 = this.f1.$location.y, y2 = this.f2.$location.y;
 		let h1 = this.f1.height, h2 = this.f2.height;
 		let sy = y1 - y2 - h2;
 		if(sy >= 0) return sy;
@@ -251,7 +247,7 @@ type JunctionDimension = 'ox' | 'oy';
 
 	@shrewd private get _signX() { return Math.sign(this.sx); }
 	@shrewd private get _signY() { return Math.sign(this.sy); }
-	@shrewd public get direction() {
+	@shrewd public get $direction() {
 		let x = this._signX, y = this._signY;
 		if(x < 0 && y < 0) return Direction.UR;
 		if(x > 0 && y < 0) return Direction.UL;
@@ -274,15 +270,15 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** 目前 isValid 的定義就是 `status == JunctionStatus.overlap` */
-	@shrewd public get isValid(): boolean {
-		return this.status == JunctionStatus.overlap;
+	@shrewd public get $isValid(): boolean {
+		return this.$status == JunctionStatus.overlap;
 	}
 
 	/**
 	 * 找出給定的 `Junction[]` 裡面 ox 或 oy 最大或最小的
 	 * @param f 傳入 1 表示要找最大、-1 表示要找最小
 	 */
-	public static findMinMax(junctions: readonly Junction[], key: JunctionDimension, f: number): Junction {
+	public static $findMinMax(junctions: readonly Junction[], key: JunctionDimension, f: number): Junction {
 		if(!junctions[0]) debugger;
 		let value = junctions[0][key];
 		let result: Junction = junctions[0];

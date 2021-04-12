@@ -23,13 +23,13 @@ namespace LabelUtil {
 		label.point.set(lx + dx * d, ly - dy * d - oy);
 	}
 
-	export function setLabel(sheet: Sheet, label: paper.PointText, glow: paper.PointText, pt: IPoint, ...avoid: paper.Path[]) {
+	export function $setLabel(sheet: Sheet, label: paper.PointText, glow: paper.PointText, pt: IPoint, ...avoid: paper.Path[]) {
 
 		glow.content = label.content;
 		if(!label.content) return;
 
 		let x = pt.x, y = pt.y;
-		let ss = sheet.displayScale, sw = sheet.width, sh = sheet.height;
+		let ss = sheet.$displayScale, sw = sheet.width, sh = sheet.height;
 		let lh = label.bounds.height;
 		let lx = x * ss, ly = -y * ss;
 

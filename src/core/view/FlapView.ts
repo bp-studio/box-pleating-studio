@@ -14,40 +14,40 @@
 	constructor(flap: Flap) {
 		super(flap);
 
-		this.$addItem(Layer.shade, this._shade = new paper.Path.Rectangle(Style.shade));
-		this.$addItem(Layer.hinge, this.hinge = new paper.Path.Rectangle(Style.hinge));
-		this.$addItem(Layer.shade, this._circle = new paper.Path(Style.circle));
+		this.$addItem(Layer.$shade, this._shade = new paper.Path.Rectangle(Style.$shade));
+		this.$addItem(Layer.$hinge, this.hinge = new paper.Path.Rectangle(Style.$hinge));
+		this.$addItem(Layer.$shade, this._circle = new paper.Path(Style.$circle));
 
 		this._dots = MakePerQuadrant(i => {
-			let d = new paper.Path.Circle(Style.dot);
-			this.$addItem(Layer.dot, d);
+			let d = new paper.Path.Circle(Style.$dot);
+			this.$addItem(Layer.$dot, d);
 			return d;
 		});
 
-		this.$addItem(Layer.ridge, this._innerRidges = new paper.CompoundPath(Style.ridge));
-		this.$addItem(Layer.ridge, this._outerRidges = new paper.CompoundPath(Style.ridge));
-		this.$addItem(Layer.label, this._glow = new paper.PointText(Style.glow));
-		this.$addItem(Layer.label, this._label = new paper.PointText(Style.label));
+		this.$addItem(Layer.$ridge, this._innerRidges = new paper.CompoundPath(Style.$ridge));
+		this.$addItem(Layer.$ridge, this._outerRidges = new paper.CompoundPath(Style.$ridge));
+		this.$addItem(Layer.$label, this._glow = new paper.PointText(Style.$glow));
+		this.$addItem(Layer.$label, this._label = new paper.PointText(Style.$label));
 
 		this._component = new RiverHelperBase(this, flap);
 	}
 
-	public contains(point: paper.Point) {
-		return this.control.sheet.view.contains(point) &&
+	public $contains(point: paper.Point) {
+		return this._control.$sheet.$view.$contains(point) &&
 			(this.hinge.contains(point) || this.hinge.hitTest(point) != null);
 	}
 
-	@shrewd public get circle() {
-		return this.makeRectangle(0);
+	@shrewd public get $circle() {
+		return this._makeRectangle(0);
 	}
 
-	@shrewd public get circleJSON() {
-		return this.circle.exportJSON();
+	@shrewd public get $circleJSON() {
+		return this.$circle.exportJSON();
 	}
 
 	/** 產生（附加額外距離 d）的矩形，預設會帶有圓角 */
-	public makeRectangle(d: number) {
-		let p = this.control.points, r = this.control.node.radius + d;
+	private _makeRectangle(d: number) {
+		let p = this._control.$points, r = this._control.node.$radius + d;
 		return new paper.Path.Rectangle({
 			from: [p[2].x - r, p[2].y - r],
 			to: [p[0].x + r, p[0].y + r],
@@ -55,39 +55,39 @@
 		});;
 	}
 
-	private jsonCache: string[] = [];
+	private _jsonCache: string[] = [];
 
-	public makeJSON(d: number) {
-		if(this.control.selected) return this.makeRectangle(d).exportJSON();
-		return this.jsonCache[d] = this.jsonCache[d] || this.makeRectangle(d).exportJSON();
+	public $makeJSON(d: number) {
+		if(this._control.$selected) return this._makeRectangle(d).exportJSON();
+		return this._jsonCache[d] = this._jsonCache[d] || this._makeRectangle(d).exportJSON();
 	}
 
-	@shrewd private clearCache() {
-		if(!this.control.design.dragging && this.jsonCache.length) this.jsonCache = [];
+	@shrewd private _clearCache() {
+		if(!this._control.$design.$dragging && this._jsonCache.length) this._jsonCache = [];
 	}
 
-	public get closure() {
-		return this._component.segment;
+	public get $closure() {
+		return this._component.$segment;
 	}
 
 	/** 這個獨立出來以提供 RiverView 的相依 */
-	@shrewd public renderHinge() {
-		if(this.control.disposed) return;
+	@shrewd public $renderHinge() {
+		if(this._control.$disposed) return;
 		this._circle.visible = this.$studio?.display.settings.showHinge ?? false;
-		let paths = PaperUtil.fromSegments(this.closure);
+		let paths = PaperUtil.$fromSegments(this.$closure);
 		this.hinge.removeSegments();
 		if(!paths.length) debugger;
 		else this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
 	}
 
-	protected render() {
-		let w = this.control.width, h = this.control.height;
+	protected $render() {
+		let w = this._control.width, h = this._control.height;
 
-		this._circle.copyContent(this.circle);
+		this._circle.copyContent(this.$circle);
 
-		this.renderHinge();
+		this.$renderHinge();
 
-		let p = MakePerQuadrant(i => this.control.points[i].toPaper());
+		let p = MakePerQuadrant(i => this._control.$points[i].$toPaper());
 
 		// inner ridges
 		this._innerRidges.removeChildren();
@@ -97,32 +97,32 @@
 
 		// outer ridges
 		this._outerRidges.removeChildren();
-		this.control.quadrants.forEach((q, i) => {
-			if(q.pattern == null) PaperUtil.addLine(this._outerRidges, p[i], q.corner);
+		this._control.$quadrants.forEach((q, i) => {
+			if(q.$pattern == null) PaperUtil.$addLine(this._outerRidges, p[i], q.$corner);
 		});
 
 		this._shade.copyContent(this.hinge);
 	}
 
-	protected renderUnscaled() {
-		let ds = this.control.sheet.displayScale;
-		let w = this.control.width, h = this.control.height;
+	protected $renderUnscaled() {
+		let ds = this._control.$sheet.$displayScale;
+		let w = this._control.width, h = this._control.height;
 
 		let fix = (p: paper.Point) => [p.x * ds, -p.y * ds];
 		MakePerQuadrant(i => {
-			let pt = this.control.points[i].toPaper();
+			let pt = this._control.$points[i].$toPaper();
 			this._dots[i].position.set(fix(pt));
 			return pt;
 		});
 		this._dots[2].visible = w > 0 || h > 0;
 		this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
 
-		this._label.content = this.control.node.name;
-		LabelUtil.setLabel(this.control.sheet, this._label, this._glow, this.control.dragSelectAnchor, this._dots[0]);
+		this._label.content = this._control.node.name;
+		LabelUtil.$setLabel(this._control.$sheet, this._label, this._glow, this._control.$dragSelectAnchor, this._dots[0]);
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */
-	@shrewd private renderDot() {
+	@shrewd private _renderDot() {
 		let s = 3 * Math.pow(this.scale, 0.75);
 		MakePerQuadrant(i => {
 			this._dots[i].copyContent(new paper.Path.Circle({
@@ -132,7 +132,7 @@
 		});
 	}
 
-	protected renderSelection(selected: boolean) {
+	protected $renderSelection(selected: boolean) {
 		this._shade.visible = selected;
 	}
 }

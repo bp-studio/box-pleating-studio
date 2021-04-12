@@ -20,7 +20,7 @@ type Typeless<T extends JCommand> = Omit<T, 'type'>;
 
 abstract class Command implements JCommand {
 
-	public static restore(design: Design, c: JCommand): Command {
+	public static $restore(design: Design, c: JCommand): Command {
 		if(c.type == CommandType.field) return new FieldCommand(design, c as JFieldCommand);
 		if(c.type == CommandType.move) return new MoveCommand(design, c as JMoveCommand);
 		if(c.type == CommandType.add || c.type == CommandType.remove) {
@@ -30,19 +30,23 @@ abstract class Command implements JCommand {
 	}
 
 	@nonEnumerable protected readonly _design: Design;
+
+	/** @exports */
 	public abstract readonly type: CommandType;
+
+	/** @exports */
 	public readonly tag: string;
 
-	public get signature() { return this.type + ":" + this.tag; }
+	public get $signature() { return this.type + ":" + this.tag; }
 
 	constructor(design: Design, json: Typeless<JCommand>) {
 		this._design = design;
 		this.tag = json.tag;
 	}
 
-	public abstract canAddTo(command: Command): boolean;
-	public abstract addTo(command: Command): void;
-	public abstract get isVoid(): boolean;
-	public abstract undo(): void;
-	public abstract redo(): void;
+	public abstract $canAddTo(command: Command): boolean;
+	public abstract $addTo(command: Command): void;
+	public abstract get $isVoid(): boolean;
+	public abstract $undo(): void;
+	public abstract $redo(): void;
 }

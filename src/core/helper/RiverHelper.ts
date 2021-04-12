@@ -11,31 +11,31 @@
 
 @shrewd class RiverHelper extends RiverHelperBase {
 
-	private readonly node: TreeNode;
-	private readonly key: string;
-	protected readonly view: RiverView;
+	private readonly _node: TreeNode;
+	private readonly _key: string;
+	protected readonly _view: RiverView;
 
 	constructor(view: RiverView, ids: number[]) {
-		super(view, view.design.flaps.byId.get(ids[0])!);
-		this.node = view.design.tree.node.get(ids[1])!;
-		this.key = ids[0] + "," + ids[1];
+		super(view, view.$design.flaps.$byId.get(ids[0])!);
+		this._node = view.$design.tree.$node.get(ids[1])!;
+		this._key = ids[0] + "," + ids[1];
 	}
 
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || !this.view.info.components.some(c => c == this.key);
+	protected get $shouldDispose(): boolean {
+		return super.$shouldDispose || !this._view.$info.components.some(c => c == this._key);
 	}
 
-	protected onDispose() {
-		super.onDispose();
+	protected $onDispose() {
+		super.$onDispose();
 		// @ts-ignore
-		delete this.node;
+		delete this._node;
 	}
 
-	@shrewd public get distance(): number {
-		this.disposeEvent();
-		let { design, info } = this.view, flap = this.flap;
-		let dis = design.tree.dist(flap.node, this.node);
-		return dis - flap.radius + info.length;
+	@shrewd public get $distance(): number {
+		this.$disposeEvent();
+		let { $design, $info } = this._view, flap = this.$flap;
+		let dis = $design.tree.$dist(flap.node, this._node);
+		return dis - flap.radius + $info.length;
 	}
 
 	//@noCompare // segments 和 overridden 都有把關
@@ -45,11 +45,11 @@
 			return false;
 		}
 	})
-	public get contour(): PolyBool.Segments {
-		this.disposeEvent();
-		let seg = this.segment;
-		for(let q of this.quadrants) {
-			if(q.overridden) seg = PolyBool.difference(seg, q.overridden);
+	public get $contour(): PolyBool.Segments {
+		this.$disposeEvent();
+		let seg = this.$segment;
+		for(let q of this._quadrants) {
+			if(q.$overridden) seg = PolyBool.difference(seg, q.$overridden);
 		}
 		return seg;
 	}

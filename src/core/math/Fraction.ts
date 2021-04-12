@@ -43,7 +43,7 @@ class Fraction {
 				debugger;
 				throw new Error("Parameters are not valid");
 			} else if(Number.isSafeInteger(Math.floor(n / d))) {
-				return Fraction.toFraction(n / d);
+				return Fraction.$toFraction(n / d);
 			} else {
 				// 最後的 fallback，使用不精確模式
 				this._p = n;
@@ -55,15 +55,15 @@ class Fraction {
 		}
 	}
 
-	public static toFraction(v: number, k2 = 1, k1 = 0, err = Fraction.ERROR): Fraction {
+	public static $toFraction(v: number, k2 = 1, k1 = 0, err = Fraction.$ERROR): Fraction {
 		let n = Math.floor(v), r = v - n, k0 = n * k1 + k2;
 		let f = new Fraction(n);
 		if(r / k0 / ((1 - r) * k0 + k1) < err) return f;
-		else return Fraction.toFraction(1 / r, k1, k0).i().a(f);
+		else return Fraction.$toFraction(1 / r, k1, k0).i().a(f);
 	}
 
 	/** 把浮點數轉換成有理數時的可允許誤差範圍 */
-	private static readonly ERROR = 1e-12;
+	private static readonly $ERROR = 1e-12;
 
 	public get $numerator(): number { return this._p; }
 	public get $denominator(): number { return this._q; }
@@ -73,7 +73,7 @@ class Fraction {
 	/////////////////////////////////
 
 	/** The value of the fraction as number */
-	public get value(): number {
+	public get $value(): number {
 		return this._p / this._q;
 	}
 
@@ -94,7 +94,7 @@ class Fraction {
 
 	/** Simplification in place */
 	private _smp() {
-		[this._p, this._q] = MathUtil.reduce(this._p, this._q);
+		[this._p, this._q] = MathUtil.$reduce(this._p, this._q);
 	}
 
 	/** Negation in place */
@@ -111,7 +111,7 @@ class Fraction {
 
 	/** Round to the nearest integer in place */
 	public r(): this {
-		this._p = Math.round(this.value);
+		this._p = Math.round(this.$value);
 		this._q = 1;
 		return this;
 	}
@@ -243,16 +243,16 @@ class Fraction {
 	// Other methods
 	/////////////////////////////////
 
-	public reduceWith(f: Fraction): [Fraction, Fraction] {
+	public $reduceWith(f: Fraction): [Fraction, Fraction] {
 		this._smp(); f._smp();
-		let [n1, n2] = MathUtil.reduce(this._p, f._p);
-		let [d1, d2] = MathUtil.reduce(this._q, f._q);
+		let [n1, n2] = MathUtil.$reduce(this._p, f._p);
+		let [d1, d2] = MathUtil.$reduce(this._q, f._q);
 		return [new Fraction(n1, d1), new Fraction(n2, d2)];
 	}
 
-	public reduceToIntWith(f: Fraction): [Fraction, Fraction] {
+	public $reduceToIntWith(f: Fraction): [Fraction, Fraction] {
 		this._smp(); f._smp();
-		let [n1, n2] = MathUtil.reduce(this._p * f._q, this._q * f._p);
+		let [n1, n2] = MathUtil.$reduce(this._p * f._q, this._q * f._p);
 		return [new Fraction(n1), new Fraction(n2)];
 	}
 

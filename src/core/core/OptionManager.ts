@@ -13,7 +13,7 @@ class OptionManager {
 	 * 當專案載入進來的時候暫存個別元件屬性的 `Map`，
 	 * 當元件被反應框架自動生成的時候會去這裡面尋找對應的設定值來自我初始化。
 	 */
-	private readonly options: Map<string, any> = new Map();
+	private readonly _options: Map<string, any> = new Map();
 
 	constructor(design: JDesign) {
 		for(let n of design.tree.nodes) this.set("v" + n.id, n);
@@ -27,9 +27,9 @@ class OptionManager {
 	 * 一旦被取出，對應的資料就會同時消滅。
 	 */
 	public get<T>(target: ITagObject & ISerializable<T>): T | undefined {
-		let tag = target.tag;
-		let option = this.options.get(tag);
-		this.options.delete(tag);
+		let tag = target.$tag;
+		let option = this._options.get(tag);
+		this._options.delete(tag);
 		return option;
 	}
 
@@ -37,6 +37,6 @@ class OptionManager {
 	 * 設定一個指定類別和 id 的、預期會被自動生成的元件的初始設定值。
 	 */
 	public set(tag: string, option: object) {
-		this.options.set(tag, option);
+		this._options.set(tag, option);
 	}
 }

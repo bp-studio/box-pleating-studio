@@ -1,11 +1,11 @@
 
-class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
+@shrewd class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
 
 	constructor(design: Design) {
 		super(
 			design,
-			() => design.tree.edge.values(),
-			e => new Edge(design.TreeSheet, design.vertices.get(e.n1)!, design.vertices.get(e.n2)!, e)
+			() => design.tree.$edge.values(),
+			e => new Edge(design.$TreeSheet, design.vertices.get(e.n1)!, design.vertices.get(e.n2)!, e)
 		);
 	}
 
@@ -28,16 +28,17 @@ class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
 		return result;
 	}
 
-	@exported public toRiver(edge: Edge) {
-		this._design.LayoutSheet.clearSelection();
+	/** @exports */
+	public toRiver(edge: Edge) {
+		this._design.$LayoutSheet.$clearSelection();
 		let te = edge.edge;
 		if(te.isRiver) {
 			let r = this._design.rivers.get(te);
-			if(r) r.selected = true;
+			if(r) r.$selected = true;
 		} else {
-			let n = te.n1.degree == 1 ? te.n1 : te.n2;
+			let n = te.n1.$degree == 1 ? te.n1 : te.n2;
 			let f = this._design.flaps.get(n);
-			if(f) f.selected = true;
+			if(f) f.$selected = true;
 		}
 		this._design.mode = "layout";
 	}

@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts">
-	import { Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Watch } from 'vue-property-decorator';
 	import InputMixin from '../mixins/inputMixin';
 
 	@Component({ name: "number" })
@@ -37,6 +37,11 @@
 		@Prop(Number) public step: number = 1;
 
 		private lastWheel: number = performance.now();
+		private timeout: number = 0;
+
+		@Watch("value") onValue(v: number) {
+			window.clearTimeout(this.timeout);
+		}
 
 		protected get canMinus() {
 			return this.min === undefined || this.v > this.min;
@@ -57,6 +62,7 @@
 			// 以免高速的滾動導致結果錯誤
 			let v = Math.round((this.value + by) / this.step) * this.step;
 			if(v < this.min || v > this.max) return;
+			this.timeout = window.setTimeout(() => this.v = this.value, 50);
 			this.$emit('input', v);
 			return this.v = v;
 		}

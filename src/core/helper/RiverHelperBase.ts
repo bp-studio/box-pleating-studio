@@ -1,33 +1,33 @@
 
 @shrewd class RiverHelperBase extends Disposable {
 
-	public readonly flap: Flap;
-	protected readonly view: View;
-	protected readonly quadrants: readonly QuadrantHelper[];
+	public readonly $flap: Flap;
+	protected readonly _view: View;
+	protected readonly _quadrants: readonly QuadrantHelper[];
 
 	constructor(view: View, flap: Flap) {
 		super(view);
-		this.view = view;
-		this.flap = flap;
-		this.quadrants = MakePerQuadrant(q => new QuadrantHelper(this, q));
+		this._view = view;
+		this.$flap = flap;
+		this._quadrants = MakePerQuadrant(q => new QuadrantHelper(this, q));
 	}
 
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.flap.disposed;
+	protected get $shouldDispose(): boolean {
+		return super.$shouldDispose || this.$flap.$disposed;
 	}
 
-	protected onDispose() {
+	protected $onDispose() {
 		// @ts-ignore
-		delete this.flap;
+		delete this.$flap;
 	}
 
-	public get distance(): number { return 0; }
+	public get $distance(): number { return 0; }
 
 	@noCompare // 已經透過 q.contour 來把關
-	public get segment(): PolyBool.Segments {
-		this.disposeEvent();
+	public get $segment(): PolyBool.Segments {
+		this.$disposeEvent();
 		let path: Path = [];
-		this.quadrants.forEach(q => path.push(...q.contour));
-		return PathUtil.toSegments(path);
+		this._quadrants.forEach(q => path.push(...q.$contour));
+		return PathUtil.$toSegments(path);
 	}
 }

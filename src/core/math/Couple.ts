@@ -23,9 +23,9 @@ abstract class Couple {
 		this._y = new Fraction(p[1]);
 	}
 
-	public get x() { return this._x.value; }
+	public get x() { return this._x.$value; }
 	public set x(v: number) { this._x = new Fraction(v); }
-	public get y() { return this._y.value; }
+	public get y() { return this._y.$value; }
 	public set y(v: number) { this._y = new Fraction(v); }
 
 	// Specify `c` as type `this` will block any calling of this method
@@ -35,7 +35,7 @@ abstract class Couple {
 		return this._x.eq(c._x) && this._y.eq(c._y);
 	}
 
-	public clone(): this {
+	public $clone(): this {
 		return new this.constructor(this._x, this._y);
 	}
 
@@ -68,14 +68,14 @@ abstract class Couple {
 	}
 
 	/** 把 `Couple` 四捨五入至最接近的位數（預設為個位） */
-	public round(scale = 1) {
+	public $round(scale = 1) {
 		let s = new Fraction(scale);
 		this._x.d(s).r().m(s); this._y.d(s).r().m(s);
 		return this;
 	}
 
 	/** Restrict the Couple to a certain rectangular range */
-	public range(min_X: Fraction, max_X: Fraction, min_Y: Fraction, max_Y: Fraction) {
+	public $range(min_X: Fraction, max_X: Fraction, min_Y: Fraction, max_Y: Fraction) {
 		if(this._x.lt(min_X)) this._x = min_X;
 		if(this._x.gt(max_X)) this._x = max_X;
 		if(this._y.lt(min_Y)) this._y = min_Y;
@@ -84,7 +84,7 @@ abstract class Couple {
 	}
 
 	/** 把自己轉換成 IPoint 介面 */
-	public toIPoint(): IPoint {
+	public $toIPoint(): IPoint {
 		return { x: this.x, y: this.y };
 	}
 }

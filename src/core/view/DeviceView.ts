@@ -12,37 +12,37 @@
 	constructor(device: Device) {
 		super(device);
 
-		this.$addItem(Layer.axisParallel, this._axisParallels = new paper.CompoundPath(Style.axisParallel));
-		this.$addItem(Layer.ridge, this._ridges = new paper.CompoundPath(Style.ridge));
-		this.$addItem(Layer.shade, this._shade = new paper.CompoundPath(Style.shade));
+		this.$addItem(Layer.$axisParallels, this._axisParallels = new paper.CompoundPath(Style.$axisParallels));
+		this.$addItem(Layer.$ridge, this._ridges = new paper.CompoundPath(Style.$ridge));
+		this.$addItem(Layer.$shade, this._shade = new paper.CompoundPath(Style.$shade));
 	}
 
-	public contains(point: paper.Point) {
+	public $contains(point: paper.Point) {
 		return this._shade.contains(point);
 	}
 
-	protected render() {
+	protected $render() {
 		let path: paper.PathItem | null = null;
-		for(let r of this.control.regions) {
-			let cPath = this.contourToPath(r.shape.contour);
+		for(let r of this._control.$regions) {
+			let cPath = this._contourToPath(r.$shape.contour);
 			if(!path) path = cPath;
 			else path = path.unite(cPath, { insert: false });
 		}
-		PaperUtil.replaceContent(this._shade, path!, false);
+		PaperUtil.$replaceContent(this._shade, path!, false);
 
-		PaperUtil.setLines(this._ridges, this.control.ridges, this.control.outerRidges);
-		PaperUtil.setLines(this._axisParallels, this.control.axisParallels);
+		PaperUtil.$setLines(this._ridges, this._control.$ridges, this._control.$outerRidges);
+		PaperUtil.$setLines(this._axisParallels, this._control.$axisParallels);
 	}
 
-	private contourToPath(contour: ReadonlyPath): paper.Path {
+	private _contourToPath(contour: ReadonlyPath): paper.Path {
 		let path = new paper.Path({ closed: true });
-		let { fx, fy } = this.control.pattern.stretch;
-		let delta = this.control.delta;
-		contour.forEach(c => path.add(c.transform(fx, fy).add(delta).toPaper()));
+		let { fx, fy } = this._control.pattern.$stretch;
+		let delta = this._control.$delta;
+		contour.forEach(c => path.add(c.$transform(fx, fy).add(delta).$toPaper()));
 		return path;
 	}
 
-	protected renderSelection(selected: boolean) {
-		this._shade.visible = selected || this.control.pattern.configuration.repository.stretch.selected;
+	protected $renderSelection(selected: boolean) {
+		this._shade.visible = selected || this._control.pattern.configuration.repository.$stretch.$selected;
 	}
 }

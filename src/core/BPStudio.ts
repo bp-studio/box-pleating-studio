@@ -75,11 +75,20 @@
 
 @shrewd class BPStudio {
 
-	@exported public readonly system: System;
-	@exported public readonly designMap: Map<number, Design> = new Map();
-	@exported public readonly display: Display;
-	@exported public onDeprecate?: (title: string) => void;
-	@exported @shrewd public design: Design | null = null;
+	/** @exports */
+	public readonly system: System;
+
+	/** @exports */
+	public readonly designMap: Map<number, Design> = new Map();
+
+	/** @exports */
+	public readonly display: Display;
+
+	/** @exports */
+	public onDeprecate?: (title: string) => void;
+
+	/** @exports */
+	@shrewd public design: Design | null = null;
 
 	public readonly $el: HTMLElement;
 	public readonly $paper: paper.PaperScope;
@@ -102,12 +111,12 @@
 
 	public load(json: string | object): Design {
 		if(typeof json == "string") json = JSON.parse(json);
-		return this.tryLoad(Migration.process(json, this.onDeprecate));
+		return this._tryLoad(Migration.$process(json, this.onDeprecate));
 	}
 
 	public create(json: any): Design {
 		Object.assign(json, {
-			version: Migration.current,
+			version: Migration.$current,
 			tree: {
 				nodes: [
 					{ id: 0, name: "", x: 10, y: 10 },
@@ -124,33 +133,36 @@
 	}
 
 	public restore(json: any): Design {
-		let design = new Design(this, Migration.process(json, this.onDeprecate));
+		let design = new Design(this, Migration.$process(json, this.onDeprecate));
 		this.designMap.set(design.id, design);
 		return design;
 	}
 
-	@exported public select(id: number | null): void {
+	/** @exports */
+	public select(id: number | null): void {
 		if(id != null) {
 			let d = this.designMap.get(id);
 			if(d) this.design = d;
 		} else this.design = null;
 	}
 
-	@exported public close(id: number): void {
+	/** @exports */
+	public close(id: number): void {
 		let d = this.designMap.get(id);
 		if(d) {
 			this.designMap.delete(id);
-			d.dispose();
+			d.$dispose();
 		}
 	}
 
-	@exported public closeAll(): void {
+	/** @exports */
+	public closeAll(): void {
 		this.design = null;
-		for(let d of this.designMap.values()) d.dispose();
+		for(let d of this.designMap.values()) d.$dispose();
 		this.designMap.clear();
 	}
 
-	private tryLoad(design: RecursivePartial<JDesign>): Design {
+	private _tryLoad(design: RecursivePartial<JDesign>): Design {
 		this.design = new Design(this, design);
 		this.designMap.set(this.design.id, this.design);
 
@@ -160,7 +172,8 @@
 		return this.design;
 	}
 
-	@exported public toBPS(): string {
+	/** @exports */
+	public toBPS(): string {
 		if(!this.design) return "";
 		let json = this.design.toJSON();
 		delete json.history; // 存檔的時候不用儲存歷史
@@ -169,30 +182,39 @@
 		return URL.createObjectURL(blob);
 	}
 
-	@exported public get TreeMaker() { return TreeMaker; }
+	/** @exports */
+	public get TreeMaker() { return TreeMaker; }
 
 	/** 這是一個偵錯 glitch 用的屬性，正常情況不會用到（參見 Pattern.ts） */
 	public get running() { return this._updating; }
 
 	private _updating: boolean = false;
 
-	/** 提供 UI 來註冊儲存 session 的動作 */
-	@exported public onUpdate?: Action;
+	/**
+	 * 提供 UI 來註冊儲存 session 的動作
+	 *
+	 * @exports
+	 */
+	public onUpdate?: Action;
 
-	/** 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法 */
-	@exported public async update() {
+	/**
+	 * 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法
+	 *
+	 * @exports
+	 */
+	public async update() {
 		if(this._updating) return;
 		this._updating = true;
 
 		//if(perf) perfTime = 0;
 
 		Shrewd.commit();
-		if(this.design && !this.design.dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
-			this.design.history.flush(this.system.selection.items);
+		if(this.design && !this.design.$dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
+			this.design.history.$flush(this.system.selection.items);
 		}
 
-		await PaperWorker.done();
-		this.display.project.view.update();
+		await PaperWorker.$done();
+		this.display.$project.view.update();
 
 		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 

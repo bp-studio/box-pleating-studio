@@ -7,12 +7,12 @@
 
 namespace Migration {
 
-	export const current: string = "0.4";
+	export const $current: string = "0.4";
 
-	export function getSample(): JDesign {
+	export function $getSample(): JDesign {
 		return {
 			title: "",
-			version: Migration.current,
+			version: Migration.$current,
 			mode: "layout",
 			layout: {
 				sheet: { width: 16, height: 16 },
@@ -27,7 +27,7 @@ namespace Migration {
 		};
 	}
 
-	export function process(design: any, onDeprecated?: (title: string) => void): JDesign {
+	export function $process(design: any, onDeprecated?: (title: string) => void): JDesign {
 		let deprecate = false;
 
 		// beta 版把原本的 cp 模式改名為 layout 模式，以預留 cp 模式給未來使用
@@ -48,7 +48,7 @@ namespace Migration {
 			if(st) for(let s of st.concat()) {
 				let cf: any = s.configuration;
 				if(cf && (!cf.overlaps || cf.overlaps.some((o: any) =>
-					o.c.some((c: any) => c.type == CornerType.intersection && c.e === undefined)
+					o.c.some((c: any) => c.type == CornerType.$intersection && c.e === undefined)
 				))) {
 					st.splice(st.indexOf(s), 1);
 					deprecate = true;
@@ -109,7 +109,7 @@ namespace Migration {
 			if(partitionMap.has(i)) continue;
 
 			// 找出所有重合的錨點
-			let coin = o.c.filter(c => c.type == CornerType.coincide);
+			let coin = o.c.filter(c => c.type == CornerType.$coincide);
 
 			let c = coin.find(c => partitionMap.has(-c.e! - 1));
 			let j = partitions.length;

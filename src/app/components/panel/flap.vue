@@ -10,7 +10,7 @@
 		<div class="mt-3">
 			<button
 				class="btn btn-primary"
-				v-if="design.tree.node.size>3"
+				v-if="!design.tree.isMinimal"
 				@click="design.flaps.delete(selections)"
 				v-t="'keyword.delete'"
 			>Delete</button>

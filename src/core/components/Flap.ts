@@ -15,44 +15,48 @@ interface JFlap {
 
 @shrewd class Flap extends IndependentDraggable implements ISerializable<JFlap> {
 
+	/** @exports */
 	public get type() { return "Flap"; }
-	public get tag() { return "f" + this.node.id; }
+	public get $tag() { return "f" + this.node.id; }
 
-	@exported @action private mWidth: number = 0;
+	/** @exports */
 	public get width() { return this.mWidth; }
 	public set width(v: number) {
-		if(v >= 0 && v <= this.sheet.width) {
-			let d = this.location.x + v - this.sheet.width;
-			if(d > 0) MoveCommand.create(this, { x: -d, y: 0 });
+		if(v >= 0 && v <= this.$sheet.width) {
+			let d = this.$location.x + v - this.$sheet.width;
+			if(d > 0) MoveCommand.$create(this, { x: -d, y: 0 });
 			this.mWidth = v;
 		}
 	}
+	@action private mWidth: number = 0;
 
-	@exported @action private mHeight: number = 0;
+	/** @exports */
 	public get height() { return this.mHeight; }
 	public set height(v: number) {
-		if(v >= 0 && v <= this.sheet.height) {
-			let d = this.location.y + v - this.sheet.height;
-			if(d > 0) MoveCommand.create(this, { x: 0, y: -d });
+		if(v >= 0 && v <= this.$sheet.height) {
+			let d = this.$location.y + v - this.$sheet.height;
+			if(d > 0) MoveCommand.$create(this, { x: 0, y: -d });
 			this.mHeight = v;
 		}
 	}
+	@action private mHeight: number = 0;
 
+	/** @exports */
 	public readonly node: TreeNode;
 
-	public readonly view: FlapView;
+	public readonly $view: FlapView;
 
-	public readonly quadrants: PerQuadrant<Quadrant>;
+	public readonly $quadrants: PerQuadrant<Quadrant>;
 
-	public selectableWith(c: Control) { return c instanceof Flap; }
+	public $selectableWith(c: Control) { return c instanceof Flap; }
 
-	@shrewd public get dragSelectAnchor() {
-		return { x: this.location.x + this.width / 2, y: this.location.y + this.height / 2 };
+	@shrewd public get $dragSelectAnchor() {
+		return { x: this.$location.x + this.width / 2, y: this.$location.y + this.height / 2 };
 	}
 
 	/** 這個 Flap 的各象限上的頂點 */
-	@shrewd public get points(): readonly Point[] {
-		let x = this.location.x, y = this.location.y;
+	@shrewd public get $points(): readonly Point[] {
+		let x = this.$location.x, y = this.$location.y;
 		let w = this.width, h = this.height;
 		return [
 			new Point(x + w, y + h),
@@ -62,12 +66,14 @@ interface JFlap {
 		];
 	}
 
-	@exported public get name() { return this.node.name; }
+	/** @exports */
+	public get name() { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 
-	public get radius() { return this.node.radius; }
+	/** @exports */
+	public get radius() { return this.node.$radius; }
 	public set radius(r) {
-		let e = this.node.leafEdge;
+		let e = this.node.$leafEdge;
 		if(e) e.length = r;
 	}
 
@@ -75,41 +81,41 @@ interface JFlap {
 		super(sheet);
 		this.node = node;
 
-		let design = sheet.design;
-		let option = design.options.get(this);
+		let design = sheet.$design;
+		let option = design.$options.get(this);
 		if(option) {
 			// 找得到設定就用設定值
-			this.location.x = option.x;
-			this.location.y = option.y;
+			this.$location.x = option.x;
+			this.$location.y = option.y;
 			this.width = option.width;
 			this.height = option.height;
-			this.isNew = false;
+			this.$isNew = false;
 		} else {
 			// 否則根據對應的頂點的位置來粗略估計初始化
-			Draggable.relocate(design.vertices.get(this.node)!, this, true);
+			Draggable.$relocate(design.vertices.get(this.node)!, this, true);
 		}
 
-		this.quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
-		this.view = new FlapView(this);
+		this.$quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
+		this.$view = new FlapView(this);
 
-		design.history.construct(this.toMemento());
+		design.history.$construct(this.$toMemento());
 	}
 
-	protected onDragged() {
-		if(this.isNew) Draggable.relocate(this, this.design.vertices.get(this.node)!);
+	protected $onDragged() {
+		if(this.$isNew) Draggable.$relocate(this, this.$design.vertices.get(this.node)!);
 	}
 
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.node.disposed || this.node.degree != 1;
+	protected get $shouldDispose(): boolean {
+		return super.$shouldDispose || this.node.$disposed || this.node.$degree != 1;
 	}
 
-	protected onDispose(): void {
-		this.design.history.destruct(this.toMemento());
-		super.onDispose();
+	protected $onDispose(): void {
+		this.$design.history.$destruct(this.$toMemento());
+		super.$onDispose();
 	}
 
-	public toMemento(): Memento {
-		return [this.tag, this.toJSON()];
+	public $toMemento(): Memento {
+		return [this.$tag, this.toJSON()];
 	}
 
 	public toJSON(): JFlap {
@@ -117,14 +123,14 @@ interface JFlap {
 			id: this.node.id,
 			width: this.width,
 			height: this.height,
-			x: this.location.x,
-			y: this.location.y
+			x: this.$location.x,
+			y: this.$location.y
 		};
 	}
 
-	protected constraint(v: Vector, location: Readonly<IPoint>) {
-		this.sheet.constraint(v, location);
-		this.sheet.constraint(v, {
+	protected $constraint(v: Vector, location: Readonly<IPoint>) {
+		this.$sheet.$constraint(v, location);
+		this.$sheet.$constraint(v, {
 			x: location.x + this.width,
 			y: location.y + this.height
 		});
@@ -139,16 +145,16 @@ interface JFlap {
 	 */
 	////////////////////////////////////////////////////////////
 
-	public readonly $junctions: Junction[] = [];
+	public readonly _junctions: Junction[] = [];
 
-	@unorderedArray	public get junctions(): readonly Junction[] {
+	@unorderedArray public get $junctions(): readonly Junction[] {
 		// DoubleMapping 本身不是一個反應屬性，它的 size 才是
-		this.design.junctions.size;
+		this.$design.$junctions.size;
 		// 利用 concat 傳回一個複製的陣列去跟上次已知的值來進行 unorderedArray 比較
-		return this.$junctions.concat();
+		return this._junctions.concat();
 	}
 
-	@noCompare get validJunctions(): readonly Junction[] {
-		return this.junctions.filter(j => j.isValid);
+	@noCompare get $validJunctions(): readonly Junction[] {
+		return this.$junctions.filter(j => j.$isValid);
 	}
 }

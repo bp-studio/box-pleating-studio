@@ -11,16 +11,34 @@ interface JStep<T extends JCommand = JCommand> {
 class Step implements ISerializable<JStep> {
 
 	public static restore(design: Design, json: JStep): Step {
-		json.commands = json.commands.map(c => Command.restore(design, c));
+		json.commands = json.commands.map(c => Command.$restore(design, c));
 		return new Step(design, json as JStep<Command>);
 	}
 
 	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
 	private static signature(commands: readonly Command[]): string {
 		let arr = commands.concat();
-		arr.sort((a, b) => a.signature.localeCompare(b.signature));
-		return arr.map(c => c.signature).join(";");
+		arr.sort((a, b) => a.$signature.localeCompare(b.$signature));
+		return arr.map(c => c.$signature).join(";");
 	}
+
+	/** @exports */
+	public readonly commands: readonly Command[];
+
+	/** @exports */
+	public readonly construct: Memento[];
+
+	/** @exports */
+	public readonly destruct: Memento[];
+
+	/** @exports */
+	public readonly mode: string;
+
+	/** @exports */
+	public readonly before: string[];
+
+	/** @exports */
+	public readonly after: string[];
 
 	constructor(design: Design, json: JStep<Command>) {
 		this._design = design;
@@ -35,13 +53,6 @@ class Step implements ISerializable<JStep> {
 
 		this._reset();
 	}
-
-	public readonly commands: readonly Command[];
-	public readonly construct: Memento[];
-	public readonly destruct: Memento[];
-	public readonly mode: string;
-	public readonly before: string[];
-	public readonly after: string[];
 
 	@nonEnumerable private readonly _design: Design;
 	@nonEnumerable private readonly _signature: string;
@@ -59,11 +70,11 @@ class Step implements ISerializable<JStep> {
 
 	/** 自動鎖定自身 */
 	private _fix() {
-		if(this._design.dragging) this._reset(); // 還在拖曳中的話先不鎖定
+		if(this._design.$dragging) this._reset(); // 還在拖曳中的話先不鎖定
 		else this._fixed = true;
 	}
 
-	public tryAdd(commands: readonly Command[], construct: Memento[], destruct: Memento[]) {
+	public $tryAdd(commands: readonly Command[], construct: Memento[], destruct: Memento[]) {
 		// 已經操作過的 Step 是無法被合併的
 		if(this._fixed) return false;
 
@@ -71,12 +82,12 @@ class Step implements ISerializable<JStep> {
 		// TODO：這邊要加入考慮到建構解構的 Command
 		if(Step.signature(commands) != this._signature) return false;
 		for(let i = 0; i < commands.length; i++) {
-			if(!commands[i].canAddTo(this.commands[i])) return false;
+			if(!commands[i].$canAddTo(this.commands[i])) return false;
 		}
 
 		// 再正式合併
 		for(let i = 0; i < commands.length; i++) {
-			commands[i].addTo(this.commands[i]);
+			commands[i].$addTo(this.commands[i]);
 		}
 		this.construct.push(...construct);
 		this.destruct.push(...destruct);
@@ -85,26 +96,26 @@ class Step implements ISerializable<JStep> {
 	}
 
 	/** 這整個 `Step` 是否等於什麼都沒做 */
-	public get isVoid(): boolean {
-		return this.commands.every(c => c.isVoid);
+	public get $isVoid(): boolean {
+		return this.commands.every(c => c.$isVoid);
 	}
 
-	public undo() {
+	public $undo() {
 		// undo 的時候以相反順序執行
 		let com = this.commands.concat().reverse();
-		for(let c of com) c.undo();
+		for(let c of com) c.$undo();
 		let des = this.destruct.concat().reverse();
-		for(let memento of des) this._design.options.set(...memento);
+		for(let memento of des) this._design.$options.set(...memento);
 		this._design.mode = this.mode;
-		this.restoreSelection(this.before);
+		this._restoreSelection(this.before);
 		this._fixed = true;
 	}
 
-	public redo() {
-		for(let c of this.commands) c.redo();
-		for(let memento of this.construct) this._design.options.set(...memento);
+	public $redo() {
+		for(let c of this.commands) c.$redo();
+		for(let memento of this.construct) this._design.$options.set(...memento);
 		this._design.mode = this.mode;
-		this.restoreSelection(this.after);
+		this._restoreSelection(this.after);
 		this._fixed = true;
 	}
 
@@ -115,11 +126,11 @@ class Step implements ISerializable<JStep> {
 		return result;
 	}
 
-	private restoreSelection(tags: string[]) {
-		this._design.sheet.clearSelection();
+	private _restoreSelection(tags: string[]) {
+		this._design.sheet.$clearSelection();
 		for(let tag of tags) {
-			let obj = this._design.query(tag);
-			if(obj instanceof Control) obj.selected = true;
+			let obj = this._design.$query(tag);
+			if(obj instanceof Control) obj.$selected = true;
 		}
 	}
 }

@@ -173,17 +173,17 @@ namespace PolyBool {
 			p2_isStart: boolean, p2_1: Point, p2_2: Point
 		): compare {
 			// compare the selected points first
-			var comp = Epsilon.pointsCompare(p1_1, p2_1);
+			var comp = Epsilon.$pointsCompare(p1_1, p2_1);
 			if(comp !== 0) return comp;	// the selected points are the same
 
-			if(Epsilon.pointsSame(p1_2, p2_2)) // if the non-selected points are the same too...
+			if(Epsilon.$pointsSame(p1_2, p2_2)) // if the non-selected points are the same too...
 				return 0; // then the segments are equal
 
 			if(p1_isStart !== p2_isStart) // if one is a start and the other isn't...
 				return p1_isStart ? 1 : -1; // favor the one that isn't the start
 
 			// otherwise, we'll have to calculate which one is below the other manually
-			return Epsilon.pointAboveOrOnLine(p1_2,
+			return Epsilon.$pointAboveOrOnLine(p1_2,
 				p2_isStart ? p2_1 : p2_2, // order matters
 				p2_isStart ? p2_2 : p2_1
 			) ? 1 : -1;
@@ -265,12 +265,12 @@ namespace PolyBool {
 				var b1 = ev2.seg.start;
 				var b2 = ev2.seg.end;
 
-				if(Epsilon.pointsCollinear(a1, b1, b2)) {
-					if(Epsilon.pointsCollinear(a2, b1, b2))
+				if(Epsilon.$pointsCollinear(a1, b1, b2)) {
+					if(Epsilon.$pointsCollinear(a2, b1, b2))
 						return 1;//eventCompare(true, a1, a2, true, b1, b2);
-					return Epsilon.pointAboveOrOnLine(a2, b1, b2) ? 1 : -1;
+					return Epsilon.$pointAboveOrOnLine(a2, b1, b2) ? 1 : -1;
 				}
-				return Epsilon.pointAboveOrOnLine(a1, b1, b2) ? 1 : -1;
+				return Epsilon.$pointAboveOrOnLine(a1, b1, b2) ? 1 : -1;
 			}
 
 			function statusFindSurrounding(ev: Event) {
@@ -291,27 +291,27 @@ namespace PolyBool {
 				var b1 = seg2.start;
 				var b2 = seg2.end;
 
-				var i = Epsilon.linesIntersect(a1, a2, b1, b2);
+				var i = Epsilon.$linesIntersect(a1, a2, b1, b2);
 
 				if(i === false) {
 					// segments are parallel or coincident
 
 					// if points aren't collinear, then the segments are parallel, so no intersections
-					if(!Epsilon.pointsCollinear(a1, a2, b1))
+					if(!Epsilon.$pointsCollinear(a1, a2, b1))
 						return false;
 					// otherwise, segments are on top of each other somehow (aka coincident)
 
-					if(Epsilon.pointsSame(a1, b2) || Epsilon.pointsSame(a2, b1))
+					if(Epsilon.$pointsSame(a1, b2) || Epsilon.$pointsSame(a2, b1))
 						return false; // segments touch at endpoints... no intersection
 
-					var a1_equ_b1 = Epsilon.pointsSame(a1, b1);
-					var a2_equ_b2 = Epsilon.pointsSame(a2, b2);
+					var a1_equ_b1 = Epsilon.$pointsSame(a1, b1);
+					var a2_equ_b2 = Epsilon.$pointsSame(a2, b2);
 
 					if(a1_equ_b1 && a2_equ_b2)
 						return ev2; // segments are exactly equal
 
-					var a1_between = !a1_equ_b1 && Epsilon.pointBetween(a1, b1, b2);
-					var a2_between = !a2_equ_b2 && Epsilon.pointBetween(a2, b1, b2);
+					var a1_between = !a1_equ_b1 && Epsilon.$pointBetween(a1, b1, b2);
+					var a2_between = !a2_equ_b2 && Epsilon.$pointBetween(a2, b1, b2);
 
 					// handy for debugging:
 					// buildLog.log({
@@ -569,7 +569,7 @@ namespace PolyBool {
 					pt1 = pt2;
 					pt2 = region[i];
 
-					var forward = Epsilon.pointsCompare(pt1, pt2);
+					var forward = Epsilon.$pointsCompare(pt1, pt2);
 					if(forward === 0) // points are equal, so we have a zero-length segment
 						continue; // just skip it
 
@@ -594,7 +594,7 @@ namespace PolyBool {
 
 		const eps = 0.0000000001;
 
-		export function pointAboveOrOnLine(pt: Point, left: Point, right: Point): boolean {
+		export function $pointAboveOrOnLine(pt: Point, left: Point, right: Point): boolean {
 			var Ax = left[0];
 			var Ay = left[1];
 			var Bx = right[0];
@@ -604,7 +604,7 @@ namespace PolyBool {
 			return (Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax) >= -eps;
 		}
 
-		export function pointBetween(p: Point, left: Point, right: Point) {
+		export function $pointBetween(p: Point, left: Point, right: Point) {
 			// p must be collinear with left->right
 			// returns false if p == left, p == right, or left == right
 			var d_py_ly = p[1] - left[1];
@@ -627,26 +627,26 @@ namespace PolyBool {
 			return true;
 		}
 
-		export function pointsSameX(p1: Point, p2: Point) {
+		export function $pointsSameX(p1: Point, p2: Point) {
 			return Math.abs(p1[0] - p2[0]) < eps;
 		}
 
-		export function pointsSameY(p1: Point, p2: Point) {
+		export function $pointsSameY(p1: Point, p2: Point) {
 			return Math.abs(p1[1] - p2[1]) < eps;
 		}
 
-		export function pointsSame(p1: Point, p2: Point) {
-			return pointsSameX(p1, p2) && pointsSameY(p1, p2);
+		export function $pointsSame(p1: Point, p2: Point) {
+			return $pointsSameX(p1, p2) && $pointsSameY(p1, p2);
 		}
 
-		export function pointsCompare(p1: Point, p2: Point): compare {
+		export function $pointsCompare(p1: Point, p2: Point): compare {
 			// returns -1 if p1 is smaller, 1 if p2 is smaller, 0 if equal
-			if(pointsSameX(p1, p2))
-				return pointsSameY(p1, p2) ? 0 : (p1[1] < p2[1] ? -1 : 1);
+			if($pointsSameX(p1, p2))
+				return $pointsSameY(p1, p2) ? 0 : (p1[1] < p2[1] ? -1 : 1);
 			return p1[0] < p2[0] ? -1 : 1;
 		}
 
-		export function pointsCollinear(pt1: Point, pt2: Point, pt3: Point) {
+		export function $pointsCollinear(pt1: Point, pt2: Point, pt3: Point) {
 			// does pt1->pt2->pt3 make a straight line?
 			// essentially this is just checking to see if the slope(pt1->pt2) === slope(pt2->pt3)
 			// if slopes are equal, then they must be collinear, because they share pt2
@@ -657,7 +657,7 @@ namespace PolyBool {
 			return Math.abs(dx1 * dy2 - dx2 * dy1) < eps;
 		}
 
-		export function linesIntersect(a0: Point, a1: Point, b0: Point, b1: Point) {
+		export function $linesIntersect(a0: Point, a1: Point, b0: Point, b1: Point) {
 			// returns false if the lines are coincident (e.g., parallel or on top of each other)
 			//
 			// returns an object if the lines intersect:
@@ -727,27 +727,27 @@ namespace PolyBool {
 			return ret;
 		}
 
-		export function pointInsideRegion(pt: Point, region: Path) {
-			var x = pt[0];
-			var y = pt[1];
-			var last_x = region[region.length - 1][0];
-			var last_y = region[region.length - 1][1];
-			var inside = false;
-			for(var i = 0; i < region.length; i++) {
-				var curr_x = region[i][0];
-				var curr_y = region[i][1];
+		// export function pointInsideRegion(pt: Point, region: Path) {
+		// 	var x = pt[0];
+		// 	var y = pt[1];
+		// 	var last_x = region[region.length - 1][0];
+		// 	var last_y = region[region.length - 1][1];
+		// 	var inside = false;
+		// 	for(var i = 0; i < region.length; i++) {
+		// 		var curr_x = region[i][0];
+		// 		var curr_y = region[i][1];
 
-				// if y is between curr_y and last_y, and
-				// x is to the right of the boundary created by the line
-				if((curr_y - y > eps) != (last_y - y > eps) &&
-					(last_x - curr_x) * (y - curr_y) / (last_y - curr_y) + curr_x - x > eps)
-					inside = !inside
+		// 		// if y is between curr_y and last_y, and
+		// 		// x is to the right of the boundary created by the line
+		// 		if((curr_y - y > eps) != (last_y - y > eps) &&
+		// 			(last_x - curr_x) * (y - curr_y) / (last_y - curr_y) + curr_x - x > eps)
+		// 			inside = !inside
 
-				last_x = curr_x;
-				last_y = curr_y;
-			}
-			return inside;
-		}
+		// 		last_x = curr_x;
+		// 		last_y = curr_y;
+		// 	}
+		// 	return inside;
+		// }
 	}
 
 	namespace SegmentSelector {
@@ -868,7 +868,7 @@ namespace PolyBool {
 		segments.forEach(function(seg) {
 			var pt1 = seg.start;
 			var pt2 = seg.end;
-			if(Epsilon.pointsSame(pt1, pt2)) {
+			if(Epsilon.$pointsSame(pt1, pt2)) {
 				console.warn('PolyBool: Warning: Zero-length segment detected; your epsilon is ' +
 					'probably too small or too large');
 				return;
@@ -904,19 +904,19 @@ namespace PolyBool {
 				var head2 = chain[1];
 				var tail = chain[chain.length - 1];
 				var tail2 = chain[chain.length - 2];
-				if(Epsilon.pointsSame(head, pt1)) {
+				if(Epsilon.$pointsSame(head, pt1)) {
 					if(setMatch(i, true, true))
 						break;
 				}
-				else if(Epsilon.pointsSame(head, pt2)) {
+				else if(Epsilon.$pointsSame(head, pt2)) {
 					if(setMatch(i, true, false))
 						break;
 				}
-				else if(Epsilon.pointsSame(tail, pt1)) {
+				else if(Epsilon.$pointsSame(tail, pt1)) {
 					if(setMatch(i, false, true))
 						break;
 				}
-				else if(Epsilon.pointsSame(tail, pt2)) {
+				else if(Epsilon.$pointsSame(tail, pt2)) {
 					if(setMatch(i, false, false))
 						break;
 				}
@@ -944,7 +944,7 @@ namespace PolyBool {
 				var oppo = addToHead ? chain[chain.length - 1] : chain[0];
 				var oppo2 = addToHead ? chain[chain.length - 2] : chain[1];
 
-				if(Epsilon.pointsCollinear(grow2, grow, pt)) {
+				if(Epsilon.$pointsCollinear(grow2, grow, pt)) {
 					// grow isn't needed because it's directly between grow2 and pt:
 					// grow2 ---grow---> pt
 					if(addToHead) {
@@ -956,11 +956,11 @@ namespace PolyBool {
 					grow = grow2; // old grow is gone... new grow is what grow2 was
 				}
 
-				if(Epsilon.pointsSame(oppo, pt)) {
+				if(Epsilon.$pointsSame(oppo, pt)) {
 					// we're closing the loop, so remove chain from chains
 					chains.splice(index, 1);
 
-					if(Epsilon.pointsCollinear(oppo2, oppo, grow)) {
+					if(Epsilon.$pointsCollinear(oppo2, oppo, grow)) {
 						// oppo isn't needed because it's directly between oppo2 and grow:
 						// oppo2 ---oppo--->grow
 						if(addToHead) {
@@ -1001,14 +1001,14 @@ namespace PolyBool {
 				var head = chain2[0];
 				var head2 = chain2[1];
 
-				if(Epsilon.pointsCollinear(tail2, tail, head)) {
+				if(Epsilon.$pointsCollinear(tail2, tail, head)) {
 					// tail isn't needed because it's directly between tail2 and head
 					// tail2 ---tail---> head
 					chain1.pop();
 					tail = tail2; // old tail is gone... new tail is what tail2 was
 				}
 
-				if(Epsilon.pointsCollinear(tail, head, head2)) {
+				if(Epsilon.$pointsCollinear(tail, head, head2)) {
 					// head isn't needed because it's directly between tail and head2
 					// tail ---head---> head2
 					chain2.shift();

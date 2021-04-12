@@ -10,14 +10,14 @@
 
 abstract class SheetObject extends Mountable implements IDesignObject {
 
-	public readonly sheet: Sheet;
+	public readonly $sheet: Sheet;
 
 	public constructor(sheet: Sheet) {
 		super(sheet);
-		this.sheet = sheet;
+		this.$sheet = sheet;
 	}
 
-	public get design() {
-		return this.sheet.design;
+	public get $design() {
+		return this.$sheet.$design;
 	}
 }

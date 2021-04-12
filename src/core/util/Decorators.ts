@@ -23,6 +23,9 @@ type ActionOption = Omit<Shrewd.IDecoratorOptions<any>, "renderer">;
 
 /**
  * 跟 `@shrewd` 的效果一樣，不過在值即將發生變更的時候會觸發動作。
+ *
+ * 所有有註記 `@action` 的屬性都不能夠被改編，
+ * 因為必須確保即使程式改版、歷史紀錄仍然能夠被正確移動。
  */
 function action(option: ActionOption): PropertyDecorator;
 function action(target: ITagObject, name: string): void;
@@ -38,7 +41,7 @@ function actionInner(target: any, name: string, option: ActionOption) {
 			let result = option.validator?.apply(this, [v]) ?? true;
 			if(result) {
 				if(name in record && record[name] != v) {
-					this.design.history.fieldChange(this, name, record[name], v);
+					this.$design.history.$fieldChange(this, name, record[name], v);
 				}
 				record[name] = v;
 			}

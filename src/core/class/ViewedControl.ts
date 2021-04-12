@@ -9,10 +9,10 @@
 
 abstract class ViewedControl extends Control {
 
-	public abstract readonly view: ControlView<ViewedControl>;
+	public abstract readonly $view: ControlView<ViewedControl>;
 
-	public contains(point: paper.Point) {
-		this.view.draw();
-		return this.view.contains(point);
+	public $contains(point: paper.Point) {
+		this.$view.$draw();
+		return this.$view.$contains(point);
 	}
 }

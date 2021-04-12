@@ -23,14 +23,14 @@ class Point extends Couple implements IPoint {
 	}
 
 	/**Distance to another Point */
-	public dist(p: Point): number {
-		return this.sub(p).length;
+	public $dist(p: Point): number {
+		return this.sub(p).$length;
 	}
 
-	/** 傳回 x, y 分量的最大差距 */
-	public paramDist(p: Point) {
-		return Math.max(Math.abs(p.x - this.x), Math.abs(p.y - this.y));
-	}
+	// /** 傳回 x, y 分量的最大差距 */
+	// public paramDist(p: Point) {
+	// 	return Math.max(Math.abs(p.x - this.x), Math.abs(p.y - this.y));
+	// }
 
 	public sub(v: Vector): Point;
 	public sub(p: IPoint): Vector;
@@ -45,7 +45,7 @@ class Point extends Couple implements IPoint {
 		return this;
 	}
 
-	public toPaper(): paper.Point {
+	public $toPaper(): paper.Point {
 		return new paper.Point(this.x, this.y);
 	}
 
@@ -57,12 +57,12 @@ class Point extends Couple implements IPoint {
 		return this.x == p.x && this.y == p.y;
 	}
 
-	public get isIntegral(): boolean {
+	public get $isIntegral(): boolean {
 		return this._x.isIntegral && this._y.isIntegral;
 	}
 
 	/** 根據指定的相位進行變換 */
-	public transform(fx: Sign, fy: Sign): Point {
+	public $transform(fx: Sign, fy: Sign): Point {
 		return new Point(this._x.fac(fx), this._y.fac(fy));
 	}
 }

@@ -16,54 +16,54 @@
 
 abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject implements IQueryable {
 
-	public abstract get tag(): string;
+	public abstract get $tag(): string;
 
-	public query(tag: string): ITagObject | undefined {
+	public $query(tag: string): ITagObject | undefined {
 		if(!tag) return this;
 		let m = tag.match(/^(\d+)(?:\.(.+))?$/);
 		if(m) {
 			let id = Number(m[1]), then = m[2];
-			return this.get(id)?.query(then);
+			return this.$get(id)?.$query(then);
 		}
 		return undefined;
 	}
 
 	/** 原型資料生成器 */
-	protected abstract generator: Generator<P>;
+	protected abstract $generator: Generator<P>;
 
 	/** 從原型資料產生實體物件的建造器 */
-	protected abstract builder(prototype: P): T;
+	protected abstract $builder(prototype: P): T;
 
 	/** 目前選取的 entry 索引 */
 	@action public index: number = 0;
 
 	/** 目前的 `Collection` 所有可用的 prototype */
 	@shrewd protected get _prototypes(): P[] {
-		if(!this.generator) return this._cache;
-		if(this.design.dragging) {
-			this.buildFirst();
+		if(!this.$generator) return this._cache;
+		if(this.$design.$dragging) {
+			this._buildFirst();
 			return this._cache.concat();
 		} else {
-			if(this._entries.length == 0) this.buildFirst();
-			for(let entry of this.generator) this._cache.push(entry);
+			if(this._entries.length == 0) this._buildFirst();
+			for(let entry of this.$generator) this._cache.push(entry);
 			// @ts-ignore
-			delete this.generator;
+			delete this.$generator;
 			return this._cache;
 		}
 	}
 
-	protected restore(prototypes: P[], index: number) {
+	protected $restore(prototypes: P[], index: number) {
 		this._cache = prototypes;
 		this.index = index;
 	}
 
-	private buildFirst(): void {
-		let entry = this.generator.next();
+	private _buildFirst(): void {
+		let entry = this.$generator.next();
 		if(!entry.done) {
 			try {
 				// 產生第一個原型的同時也順便直接建構第一個實體，
 				// 以便檢查存檔的版本是否相容
-				this._entries[0] = this.builder(entry.value);
+				this._entries[0] = this.$builder(entry.value);
 				this._cache.push(entry.value);
 			} catch(e) {
 				console.log("Incompatible old version.");
@@ -77,7 +77,7 @@ abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject 
 	/** 所有的 entry */
 	private _entries: T[] = [];
 
-	protected get memento(): (P | T)[] {
+	protected get $memento(): (P | T)[] {
 		let result: (P | T)[] = [];
 		for(let i = 0; i < this._prototypes.length; i++) {
 			result.push(this._entries[i] || this._cache[i]);
@@ -89,33 +89,42 @@ abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject 
 	 * 當前選用的 entry。
 	 *
 	 * 只要當前的 `Store` 非空就會有一個被選中，所以傳回 null 也表示 `Store` 為空。
+	 * @exports
 	 */
 	@shrewd public get entry(): T | null {
 		let e = this._prototypes, i = this.index;
 		if(e.length == 0) return null;
-		return this._entries[i] = this._entries[i] || this.builder(e[i]);
+		return this._entries[i] = this._entries[i] || this.$builder(e[i]);
 	}
 
-	/** 切換至某個 entry */
+	/**
+	 * 切換至某個 entry
+	 *
+	 * @exports
+	 */
 	public move(by: number = 1): void {
 		let from = this.index, l = this._prototypes.length;
 		this.index = (this.index + by + l) % l; // 加上 l 是為了避免 JavaScript 在負數的部份餘數取成負的
-		this.onMove(this.index, from);
+		this.$onMove();
 	}
 
-	/** 當前 `Store` 的大小 */
+	/**
+	 * 當前 `Store` 的大小
+	 *
+	 * @exports
+	 */
 	public get size(): number {
 		return this._prototypes.length;
 	}
 
-	public indexOf(entry: T): number {
+	public $indexOf(entry: T): number {
 		return this._entries.indexOf(entry);
 	}
 
-	public get(index: number): T | undefined {
+	public $get(index: number): T | undefined {
 		return this._entries[index];
 	}
 
 	/** 給 `Store` 的實作類別註冊 entry 切換之後要發生的事情 */
-	protected abstract onMove(to: number, from: number): void;
+	protected abstract $onMove(): void;
 }

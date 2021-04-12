@@ -20,18 +20,18 @@ class ScrollController {
 		document.addEventListener("mouseup", this._bodyMouseup.bind(this));
 		document.addEventListener("touchend", this._bodyMouseup.bind(this));
 
-		studio.$el.addEventListener("scroll", this.onScroll.bind(this));
+		studio.$el.addEventListener("scroll", this._onScroll.bind(this));
 	}
 
 	public get on() {
 		return this._scrolling;
 	}
 
-	public init() {
+	public $init() {
 		this._scrolling = true;
 	}
 
-	public tryEnd(event: paper.ToolEvent): boolean {
+	public $tryEnd(event: paper.ToolEvent): boolean {
 		if(this._scrolling) {
 			// 空白鍵捲動放開的攔截必須寫在這裡，因為事件會被取消掉
 			if(event.event instanceof MouseEvent) {
@@ -43,7 +43,7 @@ class ScrollController {
 	}
 
 	private _scrollLock = false;
-	private onScroll(): void {
+	private _onScroll(): void {
 		if(this._scrollLock) {
 			this._scrollLock = false;
 			return;
@@ -51,17 +51,17 @@ class ScrollController {
 		if(this._scrolling) return;
 		let sheet = this._studio.design?.sheet;
 		if(sheet) {
-			sheet.scroll.x = this._studio.$el.scrollLeft;
-			sheet.scroll.y = this._studio.$el.scrollTop;
+			sheet.$scroll.x = this._studio.$el.scrollLeft;
+			sheet.$scroll.y = this._studio.$el.scrollTop;
 		}
 	}
 
-	public process(diff: Vector) {
+	public $process(diff: Vector) {
 		let display = this._studio.display;
-		let { x, y } = this._studio.design!.sheet.scroll;
-		if(display.isXScrollable) x -= diff.x;
-		if(display.isYScrollable) y -= diff.y;
-		display.scrollTo(x, y);
+		let { x, y } = this._studio.design!.sheet.$scroll;
+		if(display.$isXScrollable) x -= diff.x;
+		if(display.$isYScrollable) y -= diff.y;
+		display.$scrollTo(x, y);
 	}
 
 	public to(x: number, y: number) {
@@ -77,7 +77,7 @@ class ScrollController {
 	}
 
 	private _bodyMouseup(event: MouseEvent | TouchEvent) {
-		if(System.isTouch(event) && event.touches.length == 0) {
+		if(System.$isTouch(event) && event.touches.length == 0) {
 			// paper.js 的奇怪設計使得多點觸控的第二點放開必須獨立攔截
 			this._scrolling = false;
 		}
@@ -88,9 +88,9 @@ class ScrollController {
 
 		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留
 		if(this._scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
-			let diff = CursorController.diff(event);
-			this.process(diff);
-			if(System.isTouch(event)) this._studio.system.zoom.process(event);
+			let diff = CursorController.$diff(event);
+			this.$process(diff);
+			if(System.$isTouch(event)) this._studio.system.$zoom.$process(event);
 		}
 	}
 }

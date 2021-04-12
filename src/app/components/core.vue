@@ -122,7 +122,7 @@
 		}
 
 		public get shouldShowDPad() {
-			return this.initialized && this.isTouch && this.showDPad && bp.system.selection.draggable.length > 0;
+			return this.initialized && this.isTouch && this.showDPad && bp.system.selection.hasDraggable();
 		}
 
 		public saveSettings() {

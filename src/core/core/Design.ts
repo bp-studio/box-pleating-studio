@@ -18,7 +18,7 @@ interface JDesign {
 }
 
 interface IDesignObject {
-	readonly design: Design;
+	readonly $design: Design;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -29,44 +29,53 @@ interface IDesignObject {
 
 @shrewd class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
 
-	@exported @shrewd public mode: string;
+	/** @exports */
+	@shrewd public mode: string;
 
-	@exported @action public description?: string;
+	/** @exports */
+	@action public description?: string;
 
-	@exported @action public title: string;
+	/** @exports */
+	@action public title: string;
 
 	private static _id = 0;
 
 	/** 物件初始設定值 */
-	public readonly options: OptionManager;
+	public readonly $options: OptionManager;
 
-	/** 給 Vue 排序用的 id */
-	@exported public readonly id: number = Design._id++;
+	/**
+	 * 給 Vue 排序用的 id
+	 *
+	 * @exports
+	 */
+	public readonly id: number = Design._id++;
 
-	public readonly LayoutSheet: Sheet;
+	public readonly $LayoutSheet: Sheet;
 
-	public readonly TreeSheet: Sheet;
+	public readonly $TreeSheet: Sheet;
 
+	/** @exports */
 	public readonly tree: Tree;
 
 	/** 管理 Design 的編輯歷史 */
-	@exported public readonly history: HistoryManager;
+	/** @exports */
+	public readonly history: HistoryManager;
 
 	constructor(studio: BPStudio, design: RecursivePartial<JDesign>) {
 		super(studio);
 
-		const data = deepCopy<JDesign>(Migration.getSample(), design);
+		const data = deepCopy<JDesign>(Migration.$getSample(), design);
 		if(data.tree.nodes.length < 3) throw new Error("Invalid format.");
 
-		this.options = new OptionManager(data);
+		this.$options = new OptionManager(data);
 
-		this.LayoutSheet = new Sheet(this, "layout", data.layout.sheet,
+		this.$LayoutSheet = new Sheet(this, "layout", data.layout.sheet,
 			() => this.flaps.values(),
 			() => this.rivers.values(),
 			() => this.stretches.values(),
-			() => this.stretches.devices,
+			() => this.stretches.$devices,
 		);
-		this.TreeSheet = new Sheet(this, "tree", data.tree.sheet,
+		this.$TreeSheet = new Sheet(this, "tree", data.tree.sheet,
 			() => this.edges.values(),
 			() => this.vertices.values()
 		);
@@ -81,21 +90,21 @@ interface IDesignObject {
 		this.tree = new Tree(this, data.tree.edges);
 
 		// Junctions 相依於 Tree
-		this.junctions = new JunctionContainer(this);
+		this.$junctions = new JunctionContainer(this);
 	}
 
-	public readonly tag = "design";
+	public readonly $tag = "design";
 
-	protected onDispose(): void {
-		this.edges.dispose();
-		this.vertices.dispose();
-		this.rivers.dispose();
-		this.flaps.dispose();
-		this.stretches.dispose();
-		this.junctions.dispose();
+	protected $onDispose(): void {
+		this.edges.$dispose();
+		this.vertices.$dispose();
+		this.rivers.$dispose();
+		this.flaps.$dispose();
+		this.stretches.$dispose();
+		this.$junctions.$dispose();
 	}
 
-	public get design() { return this; }
+	public get $design() { return this; }
 
 	/**
 	 * 目前的 `Design` 是否正在拖曳當中。
@@ -103,21 +112,32 @@ interface IDesignObject {
 	 * 跟 `System._dragging` 的小差異是，前者只有真的發生整數拖曳時才會為真，
 	 * 後者則只要滑鼠有微微拖曳就會為真。
 	 */
-	@shrewd public dragging: boolean = false;
+	@shrewd public $dragging: boolean = false;
 
-	@shrewd public get isActive(): boolean {
-		return (this instanceof Design) && (this.mountTarget as BPStudio).design == this;
+	@shrewd public get $isActive(): boolean {
+		return (this instanceof Design) && (this.$mountTarget as BPStudio).design == this;
 	}
 
+	/** @exports */
 	public readonly edges = new EdgeContainer(this);
-	public readonly rivers = new RiverContainer(this);
-	public readonly vertices = new VertexContainer(this);
-	public readonly flaps = new FlapContainer(this);
-	@exported public readonly stretches = new StretchContainer(this);
-	public readonly junctions: JunctionContainer;
 
-	@exported @shrewd public get sheet(): Sheet {
-		return this.mode == "layout" ? this.LayoutSheet : this.TreeSheet;
+	/** @exports */
+	public readonly rivers = new RiverContainer(this);
+
+	/** @exports */
+	public readonly vertices = new VertexContainer(this);
+
+	/** @exports */
+	public readonly flaps = new FlapContainer(this);
+
+	/** @exports */
+	public readonly stretches = new StretchContainer(this);
+
+	public readonly $junctions: JunctionContainer;
+
+	/** @exports */
+	@shrewd public get sheet(): Sheet {
+		return this.mode == "layout" ? this.$LayoutSheet : this.$TreeSheet;
 	}
 
 	public toJSON(session: boolean = false): JDesign {
@@ -126,15 +146,15 @@ interface IDesignObject {
 			result = {
 				title: this.title,
 				description: this.description,
-				version: Migration.current,
+				version: Migration.$current,
 				mode: this.mode,
 				layout: {
-					sheet: this.LayoutSheet.toJSON(session),
+					sheet: this.$LayoutSheet.toJSON(session),
 					flaps: this.flaps.toJSON(),
 					stretches: this.stretches.toJSON()
 				},
 				tree: {
-					sheet: this.TreeSheet.toJSON(session),
+					sheet: this.$TreeSheet.toJSON(session),
 					nodes: this.vertices.toJSON(),
 					edges: this.edges.sort()
 				}
@@ -146,33 +166,34 @@ interface IDesignObject {
 		return result;
 	}
 
-	@exported public selectAll() {
-		this.$studio?.system.selection.clear();
-		if(this.mode == "layout") this.flaps.selectAll();
-		if(this.mode == "tree") this.vertices.selectAll();
+	/** @exports */
+	public selectAll() {
+		this.$studio?.system.selection.$clear();
+		if(this.mode == "layout") this.flaps.$selectAll();
+		if(this.mode == "tree") this.vertices.$selectAll();
 	}
 
 	/** 根據 tag 來找出唯一的對應物件 */
-	public query(tag: string): ITagObject | undefined {
+	public $query(tag: string): ITagObject | undefined {
 		if(tag == "design") return this;
-		if(tag == "layout") return this.LayoutSheet;
-		if(tag == "tree") return this.TreeSheet;
+		if(tag == "layout") return this.$LayoutSheet;
+		if(tag == "tree") return this.$TreeSheet;
 		let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
 		if(m) {
 			let init = m[1], id = m[2], then = m[3];
 			if(init == "s") return this.stretches.get(id);
-			if(init == "r") return this.stretches.get(id)!.repository?.query(then);
+			if(init == "r") return this.stretches.get(id)!.repository?.$query(then);
 
 			let t = this.tree;
 			if(init == "e" || init == "re" || init == "ee") {
-				let edge = t.find(id);
+				let edge = t.$find(id);
 				if(!edge) return undefined;
 				if(init == "e") return edge;
 				if(init == "re") return this.rivers.get(edge);
 				if(init == "ee") return this.edges.get(edge);
 			}
 
-			let n = t.node.get(Number(id))!;
+			let n = t.$node.get(Number(id))!;
 			if(init == "n") return n;
 			if(init == "f") return this.flaps.get(n);
 			if(init == "v") return this.vertices.get(n);

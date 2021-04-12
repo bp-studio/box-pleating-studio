@@ -18,23 +18,23 @@ class ZoomController {
 		canvas.addEventListener("wheel", this._canvasWheel.bind(this));
 	}
 
-	private getTouchDistance(event: TouchEvent) {
+	private _getTouchDistance(event: TouchEvent) {
 		let t = event.touches, dx = t[1].pageX - t[0].pageX, dy = t[1].pageY - t[0].pageY;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
-	public init(event: TouchEvent) {
-		this._touchScaling = [this.getTouchDistance(event), this._studio.design!.sheet.zoom];
+	public $init(event: TouchEvent) {
+		this._touchScaling = [this._getTouchDistance(event), this._studio.design!.sheet.zoom];
 	}
 
-	public process(event: TouchEvent) {
+	public $process(event: TouchEvent) {
 		let sheet = this._studio.design!.sheet;
-		let dist = this.getTouchDistance(event);
+		let dist = this._getTouchDistance(event);
 		let raw = dist - this._touchScaling[0];
 		let dpi = window.devicePixelRatio ?? 1;
 		let s = sheet.zoom * raw / dpi / 100;
 		s = Math.round(s + this._touchScaling[1]);
-		this._studio.display.zoom(s, sheet, System.getTouchCenter(event));
+		this._studio.display.$zoom(s, sheet, System.$getTouchCenter(event));
 		this._touchScaling = [dist, s];
 	}
 
@@ -44,7 +44,7 @@ class ZoomController {
 			let display = this._studio.display;
 			let d = this._studio.design;
 			if(d) {
-				display.zoom(
+				display.$zoom(
 					d.sheet.zoom - Math.round(d.sheet.zoom * event.deltaY / 10000) * 5,
 					d.sheet,
 					{ x: event.pageX, y: event.pageY }

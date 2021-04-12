@@ -8,29 +8,33 @@
 
 @shrewd class River extends ViewedControl {
 
+	/** @exports */
 	public get type() { return "River"; }
 
-	public get tag() { return "r" + this.edge.tag; }
+	public get $tag() { return "r" + this.edge.$tag; }
 
-	public readonly view: RiverView;
+	public readonly $view: RiverView;
 
+	/** @exports */
 	public readonly edge: TreeEdge;
 
 	constructor(sheet: Sheet, edge: TreeEdge) {
 		super(sheet);
 		this.edge = edge;
-		this.view = new RiverView(this);
+		this.$view = new RiverView(this);
 	}
 
-	protected get shouldDispose(): boolean {
-		return super.shouldDispose || this.edge.disposed || !this.edge.isRiver;
+	protected get $shouldDispose(): boolean {
+		return super.$shouldDispose || this.edge.$disposed || !this.edge.isRiver;
 	}
 
+	/** @exports */
 	public delete(): void {
 		// 裡面有 action，因此這邊不用加上
-		this.design.edges.get(this.edge)!.deleteAndMerge();
+		this.$design.edges.get(this.edge)!.deleteAndMerge();
 	}
 
-	@exported public get length() { return this.edge.length; };
+	/** @exports */
+	public get length() { return this.edge.length; };
 	public set length(v) { this.edge.length = v; }
 }

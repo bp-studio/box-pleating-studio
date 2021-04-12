@@ -1,22 +1,22 @@
 
 @shrewd class QuadrantHelper extends Disposable {
 
-	private quadrant: Quadrant;
+	private _quadrant: Quadrant;
 
 	constructor(private parent: RiverHelperBase, q: number) {
 		super(parent);
-		this.quadrant = parent.flap.quadrants[q];
+		this._quadrant = parent.$flap.$quadrants[q];
 	}
 
 	/** 在找出延伸河道輪廓的時候，應該被扣除的不該考慮部份 */
-	@segment("qo") public get overridden(): PolyBool.Segments | null {
-		this.disposeEvent();
+	@segment("qo") public get $overridden(): PolyBool.Segments | null {
+		this.$disposeEvent();
 		let result: PolyBool.Segments[] = [];
-		let d = this.parent.distance;
-		let { qv, fx, fy, point, coveredInfo, pattern } = this.quadrant;
+		let d = this.parent.$distance;
+		let { qv, fx, fy, $point: point, $coveredInfo: coveredInfo, $pattern: pattern } = this._quadrant;
 		if(!pattern) {
-			let r = new Fraction(this.parent.flap.radius + d);
-			let p = point.add(qv.scale(r));
+			let r = new Fraction(this.parent.$flap.radius + d);
+			let p = point.add(qv.$scale(r));
 
 			for(let [ox, oy, pts] of coveredInfo) {
 
@@ -32,7 +32,7 @@
 
 				let v = new Vector(ox * fx, oy * fy);
 				let rect = new Rectangle(p, p.sub(v));
-				let path = rect.toPolyBoolPath();
+				let path = rect.$toPolyBoolPath();
 				let seg = PolyBool.segments({ regions: [path], inverted: false });
 				result.push(seg);
 			}
@@ -40,8 +40,8 @@
 		return result.length ? PolyBool.union(result) : null;
 	}
 
-	@path("qc") public get contour(): Path {
-		this.disposeEvent();
-		return this.quadrant.makeContour(this.parent.distance);
+	@path("qc") public get $contour(): Path {
+		this.$disposeEvent();
+		return this._quadrant.$makeContour(this.parent.$distance);
 	}
 }

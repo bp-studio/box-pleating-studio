@@ -9,5 +9,5 @@ export default class BaseComponent extends Vue {
 	public get selection(): any { return this.selections[0]; }
 
 	// Keep watching the design to help GC
-	@Watch("design") onDesign() {}
+	@Watch("design") _onDesign() {}
 }

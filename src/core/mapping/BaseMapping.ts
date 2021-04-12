@@ -22,13 +22,13 @@ type Predicate<A, B> = (a: A, b: B) => boolean;
 abstract class BaseMapping<Key, Source, Value extends object> implements ReadonlyMap<Key, Value>, IDisposable {
 
 	constructor(
-		private readonly source: IterableFactory<Source>,
-		private readonly keyGen: Func<Source, Key>,
-		private readonly ctor: Func<Source, Value>,
-		private readonly dtor: Predicate<Key, Value>
+		private readonly _source: IterableFactory<Source>,
+		private readonly _keyGen: Func<Source, Key>,
+		private readonly _ctor: Func<Source, Value>,
+		private readonly _dtor: Predicate<Key, Value>
 	) {	}
 
-	public dispose() {
+	public $dispose() {
 		Shrewd.terminate(this);
 		this._map.clear();
 		// @ts-ignore
@@ -39,11 +39,11 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 
 	@shrewd private render(): ReadonlyMap<Key, Value> {
 		for(let [key, value] of this._map) {
-			if(this.dtor(key, value)) this._map.delete(key);
+			if(this._dtor(key, value)) this._map.delete(key);
 		}
-		for(let group of this.source()) {
-			let key = this.keyGen(group);
-			if(!this._map.has(key)) this._map.set(key, this.ctor(group));
+		for(let group of this._source()) {
+			let key = this._keyGen(group);
+			if(!this._map.has(key)) this._map.set(key, this._ctor(group));
 		}
 		return new Map(this._map);
 	}

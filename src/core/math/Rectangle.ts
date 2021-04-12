@@ -19,22 +19,22 @@ class Rectangle {
 		[this.p1, this.p2] = [p1, p2];
 	}
 
-	public contains(rec: Rectangle): boolean {
+	public $contains(rec: Rectangle): boolean {
 		return this.p1._x.le(rec.p1._x) && this.p1._y.le(rec.p1._y) &&
 			this.p2._x.ge(rec.p2._x) && this.p2._y.ge(rec.p2._y);
 	}
 
-	public equals(rec: Rectangle): boolean {
+	public eq(rec: Rectangle): boolean {
 		return this.p1.eq(rec.p1) && this.p2.eq(rec.p2);
 	}
 
-	public get width() { return this.p2._x.sub(this.p1._x).value; }
-	public get height() { return this.p2._y.sub(this.p1._y).value; }
+	public get width() { return this.p2._x.sub(this.p1._x).$value; }
+	public get height() { return this.p2._y.sub(this.p1._y).$value; }
 	public get top() { return this.p2.y; }
 	public get right() { return this.p2.x; }
 
 	/** 產生順時鐘的路徑 */
-	public toPolyBoolPath(): PolyBool.Path {
+	public $toPolyBoolPath(): PolyBool.Path {
 		return [
 			[this.p1.x, this.p1.y],
 			[this.p1.x, this.p2.y],

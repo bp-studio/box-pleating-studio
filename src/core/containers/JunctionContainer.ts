@@ -4,17 +4,17 @@
 	constructor(design: Design) {
 		super(
 			() => design.flaps.values(),
-			(f1, f2) => new Junction(design.LayoutSheet, f1, f2)
+			(f1, f2) => new Junction(design.$LayoutSheet, f1, f2)
 		);
 	}
 
-	@unorderedArray("allJ") public get all(): readonly Junction[] {
+	@unorderedArray("allJ") public get $all(): readonly Junction[] {
 		let result = Array.from(this.values());
 		return result;
 	}
 
-	@orderedArray("vj") public get valid(): readonly Junction[] {
-		return this.all.filter(j => j.isValid);
+	@orderedArray("vj") public get $valid(): readonly Junction[] {
+		return this.$all.filter(j => j.$isValid);
 	}
 
 	/**
@@ -22,28 +22,28 @@
 	 *
 	 * 這會排除掉被覆蓋的 `Junction`。
 	 */
-	@orderedArray("aj") public get active(): readonly Junction[] {
-		return this.valid.filter(j => !j.isCovered);
+	@orderedArray("aj") public get $active(): readonly Junction[] {
+		return this.$valid.filter(j => !j.$isCovered);
 	}
 
 	/**
 	 * 當前所有的 `Junction` 群組（即 `Team`，雖然這不是程式碼中的類別）。
 	 */
-	@shrewd public get teams(): Map<string, readonly Junction[]> {
+	@shrewd public get $teams(): Map<string, readonly Junction[]> {
 		let arr: Junction[];
-		let set = new Set<Junction>(this.active);
+		let set = new Set<Junction>(this.$active);
 		let result = new Map<string, Junction[]>();
 		function add(junction: Junction) {
 			if(!set.has(junction)) return;
 			arr.push(junction);
 			set.delete(junction);
-			for(let j of junction.neighbors) add(j);
+			for(let j of junction.$neighbors) add(j);
 		}
 		while(set.size > 0) {
 			arr = [];
 			add(set.values().next().value);
-			arr.sort(Junction.sort);
-			result.set(Junction.createTeamId(arr), arr);
+			arr.sort(Junction.$sort);
+			result.set(Junction.$createTeamId(arr), arr);
 		}
 		return result;
 	}

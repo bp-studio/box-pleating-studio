@@ -1,6 +1,6 @@
 
 interface IDisposable {
-	dispose(): void;
+	$dispose(): void;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ interface IDisposable {
 	/** 內部的棄置狀態 */
 	@shrewd({
 		renderer(this: Disposable, v: boolean) {
-			return v || this.shouldDispose;
+			return v || this.$shouldDispose;
 		}
 	})
 	private _disposed: boolean = false;
@@ -30,20 +30,20 @@ interface IDisposable {
 
 	private _disposeWith?: Disposable;
 
-	@shrewd protected disposeEvent(): any {
+	@shrewd protected $disposeEvent(): any {
 		if(this._disposed) {
 			Shrewd.terminate(this);
-			this.onDispose();
+			this.$onDispose();
 		}
 	}
 
 	/** 要自動棄置的條件。繼承類別覆寫的時候應記得參考 `super.shouldDispose`。 */
-	protected get shouldDispose(): boolean {
+	protected get $shouldDispose(): boolean {
 		return this._disposeWith ? this._disposeWith._disposed : false;
 	}
 
 	/** 手動棄置，繼承類別可以攔截這個操作並決定是否可以棄置。 */
-	public dispose() {
+	public $dispose() {
 		this._disposed = true;
 	}
 
@@ -52,7 +52,7 @@ interface IDisposable {
 	 *
 	 * 繼承類別覆寫此方法的時候一般來說應呼叫 super 方法，請務必記得。
 	 */
-	protected onDispose(): void {
+	protected $onDispose(): void {
 		delete this._disposeWith;
 	}
 
@@ -61,7 +61,7 @@ interface IDisposable {
 	 *
 	 * 提供這個非反應的公開存取子是為了避免在 terminate 的瞬間凍結住結果的值。
 	 */
-	public get disposed() {
+	public get $disposed() {
 		return this._disposed;
 	}
 }

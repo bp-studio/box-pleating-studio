@@ -1,17 +1,17 @@
 
 @shrewd class Tree extends Disposable {
 
-	public readonly design: Design;
+	public readonly $design: Design;
 
 	constructor(design: Design, edges?: JEdge[]) {
 		super(design);
-		this.design = design;
+		this.$design = design;
 
 		// 防呆載入所有的邊；傳入資料的順序無所謂
 		while(edges?.length) {
 			let remain: JEdge[] = [], ok = false;
 			for(let e of edges) {
-				if(this.addEdge(e.n1, e.n2, e.length)) {
+				if(this.$addEdge(e.n1, e.n2, e.length)) {
 					ok = true;
 				} else {
 					remain.push(e);
@@ -22,38 +22,43 @@
 		}
 	}
 
-	protected onDispose(): void {
-		Shrewd.terminate(this.edge);
+	protected $onDispose(): void {
+		Shrewd.terminate(this.$edge);
+	}
+
+	/** @exports */
+	public get isMinimal(): boolean {
+		return this.$node.size <= 3;
 	}
 
 	@shrewd({
 		renderer(this: Tree, v: Map<number, TreeNode>) {
-			for(let [id, node] of v) if(node.disposed) v.delete(id);
+			for(let [id, node] of v) if(node.$disposed) v.delete(id);
 			return v;
 		}
 	})
-	public node: Map<number, TreeNode> = new Map();
+	public $node: Map<number, TreeNode> = new Map();
 
 	@shrewd({
 		renderer(this: Tree, v: DoubleMap<TreeNode, TreeEdge>) {
-			for(let node of v.firstKeys()) if(node.disposed) v.delete(node);
+			for(let node of v.firstKeys()) if(node.$disposed) v.delete(node);
 			return v;
 		}
 	})
-	public edge: DoubleMap<TreeNode, TreeEdge> = new DoubleMap();
+	public $edge: DoubleMap<TreeNode, TreeEdge> = new DoubleMap();
 
-	@shrewd public get leaf(): ReadonlySet<TreeNode> {
+	@shrewd public get $leaf(): ReadonlySet<TreeNode> {
 		let set: Set<TreeNode> = new Set();
-		for(let node of this.node.values()) if(node.degree == 1) set.add(node);
+		for(let node of this.$node.values()) if(node.$degree == 1) set.add(node);
 		return set;
 	}
 
-	private nextId = 0;
+	private _nextId = 0;
 
 	/** 在 JID 啟動的模式之下執行指定操作 */
 	public withJID(action: Action) {
-		let arr = Array.from(this.node.values()).sort((a, b) => a.id - b.id), i = 0;
-		for(let n of arr) TreeNode.setJID(n, i++);
+		let arr = Array.from(this.$node.values()).sort((a, b) => a.id - b.id), i = 0;
+		for(let n of arr) TreeNode.$setJID(n, i++);
 		this._jid = true;
 		action();
 		this._jid = false;
@@ -61,7 +66,7 @@
 
 	private _jid = false;
 
-	public get jid() { return this._jid; }
+	public get $jid() { return this._jid; }
 
 	/**
 	 * 利用 LCA 來計算任意兩點之間的距離。
@@ -71,10 +76,10 @@
 	 * 最早採用的演算法是暴力儲存 TreePath 以持續追蹤距離，
 	 * 其耗時 O(1) 但空間消耗高達 O(n^3)，非常可怕，更動也因此極慢。
 	 */
-	public dist(n1: TreeNode, n2: TreeNode) {
-		this.disposeEvent();
+	public $dist(n1: TreeNode, n2: TreeNode) {
+		this.$disposeEvent();
 		if(n1 == n2) return 0;
-		return n1.dist + n2.dist - 2 * this.lca(n1, n2).dist;
+		return n1.$dist + n2.$dist - 2 * this.lca(n1, n2).$dist;
 	}
 
 	/**
@@ -93,68 +98,68 @@
 	 * 我實務上會遇到的樹大小應該難以讓這種演算法展現優勢，所以我先不考慮。
 	 */
 	public lca(n1: TreeNode, n2: TreeNode) {
-		let p1 = n1.path, p2 = n2.path, lca = p1[0], i = 1;
+		let p1 = n1.$path, p2 = n2.$path, lca = p1[0], i = 1;
 		while(i < p1.length && i < p2.length && p1[i] == p2[i]) lca = p1[i++];
 		return lca;
 	}
 
-	public find(id: string): TreeEdge | undefined {
-		let [n1, n2] = id.split(',').map(i => this.node.get(Number(i)));
+	public $find(id: string): TreeEdge | undefined {
+		let [n1, n2] = id.split(',').map(i => this.$node.get(Number(i)));
 		if(!n1 || !n2) return undefined;
-		return this.edge.get(n1, n2);
+		return this.$edge.get(n1, n2);
 	}
 
-	public getOrAddNode(n: number) {
+	public $getOrAddNode(n: number) {
 		let N: TreeNode;
-		if(this.node.has(n)) N = this.node.get(n)!;
+		if(this.$node.has(n)) N = this.$node.get(n)!;
 		else {
-			EditCommand.add(N = new TreeNode(this, n));
-			if(n >= this.nextId) this.nextId = n + 1;
+			EditCommand.$add(N = new TreeNode(this, n));
+			if(n >= this._nextId) this._nextId = n + 1;
 		}
 		return N;
 	}
 
-	public split(e: TreeEdge) {
-		let N = this.getOrAddNode(this.nextId);
+	public $split(e: TreeEdge) {
+		let N = this.$getOrAddNode(this._nextId);
 		let { n1, n2 } = e;
-		if(n1.parent == n2) [n1, n2] = [n2, n1];
-		N.parentId = n1.id;
-		n2.parentId = N.id;
-		EditCommand.add(new TreeEdge(N, n1, Math.ceil(e.length / 2)));
-		EditCommand.add(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
-		EditCommand.remove(e);
+		if(n1.$parent == n2) [n1, n2] = [n2, n1];
+		N.$parentId = n1.id;
+		n2.$parentId = N.id;
+		EditCommand.$add(new TreeEdge(N, n1, Math.ceil(e.length / 2)));
+		EditCommand.$add(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
+		EditCommand.$remove(e);
 		return N;
 	}
 
-	public deleteAndMerge(e: TreeEdge) {
-		let N = this.getOrAddNode(this.nextId);
+	public $deleteAndMerge(e: TreeEdge) {
+		let N = this.$getOrAddNode(this._nextId);
 		let { n1, n2, a1, a2 } = e;
-		if(n1.parent == n2) {
+		if(n1.$parent == n2) {
 			[n1, n2] = [n2, n1];
 			[a1, a2] = [a2, a1];
 		}
 
-		N.parentId = n1.parent?.id;
-		EditCommand.remove(e);
+		N.$parentId = n1.$parent?.id;
+		EditCommand.$remove(e);
 
 		for(let edge of a1) {
 			let n = edge.n(n1);
-			if(n != N.parent) n.parentId = N.id;
-			EditCommand.remove(edge);
-			EditCommand.add(new TreeEdge(N, n, edge.length));
+			if(n != N.$parent) n.$parentId = N.id;
+			EditCommand.$remove(edge);
+			EditCommand.$add(new TreeEdge(N, n, edge.length));
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
-			n.parentId = N.id;
-			EditCommand.remove(edge)
-			EditCommand.add(new TreeEdge(N, n, edge.length));
+			n.$parentId = N.id;
+			EditCommand.$remove(edge)
+			EditCommand.$add(new TreeEdge(N, n, edge.length));
 		}
-		EditCommand.remove(n1);
-		EditCommand.remove(n2);
+		EditCommand.$remove(n1);
+		EditCommand.$remove(n2);
 		return N;
 	}
 
-	public deleteAndJoin(n: TreeNode) {
+	public $deleteAndJoin(n: TreeNode) {
 		let edges = n.edges;
 		if(edges.length != 2) {
 			console.warn(`Incorrectly calling delete-and-join at [${n.id}].`);
@@ -162,53 +167,53 @@
 		}
 		let e1 = edges[0], e2 = edges[1];
 		let n1 = e1.n(n), n2 = e2.n(n);
-		if(n.parent == n2) [n1, n2] = [n2, n1];
+		if(n.$parent == n2) [n1, n2] = [n2, n1];
 
-		n2.parentId = n1.id;
-		let edge = EditCommand.add(new TreeEdge(n1, n2, e1.length + e2.length));
-		EditCommand.remove(e1);
-		EditCommand.remove(e2);
-		EditCommand.remove(n);
+		n2.$parentId = n1.id;
+		let edge = EditCommand.$add(new TreeEdge(n1, n2, e1.length + e2.length));
+		EditCommand.$remove(e1);
+		EditCommand.$remove(e2);
+		EditCommand.$remove(n);
 		return edge;
 	}
 
-	public addLeafAt(n: number, length: number): TreeNode {
-		let id = this.nextId;
-		this.addEdge(n, id, length)!;
-		return this.node.get(id)!;
+	public $addLeafAt(n: number, length: number): TreeNode {
+		let id = this._nextId;
+		this.$addEdge(n, id, length)!;
+		return this.$node.get(id)!;
 	}
 
 	/** 加入一條邊並且傳回；若失敗則傳回 null */
-	public addEdge(n1: number, n2: number, length: number): TreeEdge | null {
-		let has1 = this.node.has(n1), has2 = this.node.has(n2);
+	public $addEdge(n1: number, n2: number, length: number): TreeEdge | null {
+		let has1 = this.$node.has(n1), has2 = this.$node.has(n2);
 
 		// 如果圖非空，那加入的邊一定至少要有一點已經存在
-		if(this.node.size != 0 && !has1 && !has2) {
+		if(this.$node.size != 0 && !has1 && !has2) {
 			console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
 			return null;
 		}
-		let N1 = this.getOrAddNode(n1), N2 = this.getOrAddNode(n2);
+		let N1 = this.$getOrAddNode(n1), N2 = this.$getOrAddNode(n2);
 
-		if(this.edge.has(N1, N2)) { // 如果邊已經存在，純粹更新長度
-			this.edge.get(N1, N2)!.length = length;
+		if(this.$edge.has(N1, N2)) { // 如果邊已經存在，純粹更新長度
+			this.$edge.get(N1, N2)!.length = length;
 			return null;
 		} else if(has1 && has2) { // 不能加入一條邊是兩個結點都已經存在的
 			console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
 			return null;
 		}
 
-		if(has1) N2.parentId = n1;
-		else if(has2) N1.parentId = n2;
-		else N2.parentId = n1;
+		if(has1) N2.$parentId = n1;
+		else if(has2) N1.$parentId = n2;
+		else N2.$parentId = n1;
 
-		return EditCommand.add(new TreeEdge(N1, N2, length));
+		return EditCommand.$add(new TreeEdge(N1, N2, length));
 	}
 
 	/** 傳入樹中的三個點，傳回三個點分別到「路口」的距離。 */
-	public distTriple(n1: TreeNode, n2: TreeNode, n3: TreeNode) {
-		let d12 = this.dist(n1, n2);
-		let d13 = this.dist(n1, n3);
-		let d23 = this.dist(n2, n3);
+	public $distTriple(n1: TreeNode, n2: TreeNode, n3: TreeNode) {
+		let d12 = this.$dist(n1, n2);
+		let d13 = this.$dist(n1, n3);
+		let d23 = this.$dist(n2, n3);
 		let total = (d12 + d13 + d23) / 2;
 		return {
 			d1: total - d23,

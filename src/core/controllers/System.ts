@@ -12,17 +12,31 @@ class System {
 
 	private _studio: BPStudio;
 
-	/** 註冊長壓的 callback */
-	@exported public onLongPress: () => void;
+	/**
+	 * 註冊長壓的 callback
+	 *
+	 * @exports
+	 */
+	public onLongPress: () => void;
 
-	/** 註冊拖曳的 callback */
-	@exported public onDrag: () => void;
+	/**
+	 * 註冊拖曳的 callback
+	 *
+	 * @exports
+	 */
+	public onDrag: () => void;
 
-	@exported public readonly selection: SelectionController;
-	@exported public readonly scroll: ScrollController;
-	@exported public readonly drag: DragController;
-	public readonly zoom: ZoomController;
-	private readonly longPress: LongPressController;
+	/** @exports */
+	public readonly selection: SelectionController;
+
+	/** @exports */
+	public readonly scroll: ScrollController;
+
+	/** @exports */
+	public readonly drag: DragController;
+
+	public readonly $zoom: ZoomController;
+	private readonly _longPress: LongPressController;
 
 	constructor(studio: BPStudio) {
 		this._studio = studio;
@@ -37,15 +51,12 @@ class System {
 
 		canvas.addEventListener("touchstart", this._canvasTouch.bind(this));
 
-		this.longPress = new LongPressController(() => this.onLongPress());
+		this._longPress = new LongPressController(() => this.onLongPress());
+		this.$zoom = new ZoomController(studio, canvas);
 		this.selection = new SelectionController(studio);
-		this.zoom = new ZoomController(studio, canvas);
 		this.scroll = new ScrollController(studio);
 		this.drag = new DragController(studio);
 	}
-
-	/** 目前是否正在進行拖曳 */
-	public get dragging() { return this.drag.on; }
 
 	private get _canvas(): HTMLCanvasElement { return this._studio.$paper.view.element; }
 
@@ -56,7 +67,7 @@ class System {
 
 		switch(event.key) {
 			case "space":
-				if(this._studio.display.isScrollable()) {
+				if(this._studio.display.$isScrollable()) {
 					this._canvas.style.cursor = "grab";
 				}
 				return false;
@@ -82,44 +93,44 @@ class System {
 		if(el instanceof HTMLElement) el.blur();
 
 		// 執行捲動，支援空白鍵捲動和右鍵捲動兩種操作方法
-		let space = KeyboardController.isPressed("space");
+		let space = KeyboardController.$isPressed("space");
 		if(event.event instanceof MouseEvent && (space || event.event.button == 2)) {
 			console.log(event.point.round().toString());
-			this.longPress.cancel();
-			this.scroll.init();
-			CursorController.update(event.event);
+			this._longPress.$cancel();
+			this.scroll.$init();
+			CursorController.$update(event.event);
 			return;
 		}
 
-		if(!System.isSelectEvent(ev) || this.scroll.on) return;
+		if(!System._isSelectEvent(ev) || this.scroll.on) return;
 
-		if(System.isTouch(ev)) this._canvasTouchDown(event);
+		if(System.$isTouch(ev)) this._canvasTouchDown(event);
 		else this._canvasMouseDown(event);
 	}
 
 	private _canvasTouchDown(event: paper.ToolEvent): void {
-		let ok = this.selection.compare(event);
+		let ok = this.selection.$compare(event);
 
 		// 設置長壓等待
-		if(this.selection.items.length == 1) this.longPress.init();
+		if(this.selection.items.length == 1) this._longPress.$init();
 
 		// 觸控的情況中，規定一定要先選取才能拖曳，不能直接拖（不然太容易誤觸）
-		if(ok) this.drag.init(event);
+		if(ok) this.drag.$init(event);
 	}
 
 	private _canvasMouseDown(event: paper.ToolEvent): void {
-		this.selection.process(event);
+		this.selection.$process(event);
 
 		// 滑鼠操作時可以直接點擊拖曳
-		this.drag.init(event);
+		this.drag.$init(event);
 	}
 
 	private _canvasMouseup(event: paper.ToolEvent): void {
-		let dragging = this.selection.endDrag();
-		if(!System.isSelectEvent(event.event)) return;
-		if(this.scroll.tryEnd(event)) return;
+		let dragging = this.selection.$endDrag();
+		if(!System._isSelectEvent(event.event)) return;
+		if(this.scroll.$tryEnd(event)) return;
 		if(!dragging && !event.modifiers.control && !event.modifiers.meta) {
-			this.selection.processNext();
+			this.selection.$processNext();
 		}
 	}
 
@@ -128,44 +139,44 @@ class System {
 		// 捲動中的話就不用在這邊處理了，交給 body 上註冊的 handler 去處理
 		if(this.scroll.on) return;
 
-		if(this.selection.tryReselect(event)) {
+		if(this.selection.$tryReselect(event)) {
 			this.drag.on = true;
 		}
 
 		if(this.drag.on) {
-			if(this.drag.process(event)) {
-				this.longPress.cancel();
+			if(this.drag.$process(event)) {
+				this._longPress.$cancel();
 				this.onDrag?.();
 			}
-		} else if(this.selection.dragSelectables.length) {
-			this.longPress.cancel();
-			this.selection.processDragSelect(event);
+		} else if(this.selection.$dragSelectables.length) {
+			this._longPress.$cancel();
+			this.selection.$processDragSelect(event);
 			this.onDrag?.();
 		}
 	}
 
 	private _canvasTouch(event: TouchEvent) {
 		if(event.touches.length > 1 && !this.scroll.on && this._studio.design) {
-			this.selection.clear();
-			this.longPress.cancel();
-			this.scroll.init();
-			this.zoom.init(event);
-			CursorController.update(event);
+			this.selection.$clear();
+			this._longPress.$cancel();
+			this.scroll.$init();
+			this.$zoom.$init(event);
+			CursorController.$update(event);
 		}
 	}
 
 	/** 檢查事件是否符合「選取」的前提（單點觸控或者滑鼠左鍵操作） */
-	private static isSelectEvent(event: MouseEvent | TouchEvent): boolean {
-		if(System.isTouch(event) && event.touches.length > 1) return false;
+	private static _isSelectEvent(event: MouseEvent | TouchEvent): boolean {
+		if(System.$isTouch(event) && event.touches.length > 1) return false;
 		if(event instanceof MouseEvent && event.button != 0) return false;
 		return true;
 	}
 
-	public static isTouch(event: Event): event is TouchEvent {
+	public static $isTouch(event: Event): event is TouchEvent {
 		return TOUCH_SUPPORT && event instanceof TouchEvent;
 	}
 
-	public static getTouchCenter(event: TouchEvent): IPoint {
+	public static $getTouchCenter(event: TouchEvent): IPoint {
 		let t = event.touches;
 		return { x: (t[1].pageX + t[0].pageX) / 2, y: (t[1].pageY + t[0].pageY) / 2 };
 	}

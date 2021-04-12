@@ -11,17 +11,17 @@
 abstract class ControlView<T extends Control> extends View {
 
 	/** 這個 `ControlView` 所對應的 `Control` 元件 */
-	protected readonly control: T;
+	protected readonly _control: T;
 
 	constructor(control: T) {
 		super(control);
-		this.control = control;
+		this._control = control;
 	}
 
-	@shrewd private drawSelection() {
-		this.mountEvents();
-		if(this.$studio) this.renderSelection(this.control.selected);
+	@shrewd private _drawSelection() {
+		this.$mountEvents();
+		if(this.$studio) this.$renderSelection(this._control.$selected);
 	}
 
-	protected abstract renderSelection(selected: boolean): void;
+	protected abstract $renderSelection(selected: boolean): void;
 }

@@ -21,7 +21,7 @@
 	private readonly _source: IterableFactory<K>;
 	private readonly _constructor: (k1: K, k2: K) => V;
 
-	public dispose(): void {
+	public $dispose(): void {
 		Shrewd.terminate(this);
 		Shrewd.terminate(this._map);
 	}
@@ -29,7 +29,7 @@
 	@shrewd({
 		renderer(this: DoubleMapping<K, V>, map: DoubleMap<K, V>) {
 			for(let key of map.firstKeys()) {
-				if(key.disposed) map.delete(key);
+				if(key.$disposed) map.delete(key);
 			}
 			let source = Array.from(this._source());
 			if(source.length > 1 && map.size == 0) {

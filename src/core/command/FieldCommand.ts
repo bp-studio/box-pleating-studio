@@ -14,18 +14,25 @@ interface JFieldCommand extends JCommand {
 class FieldCommand extends Command implements JFieldCommand {
 
 	public static create(target: ITagObject, prop: string, oldValue: any, newValue: any) {
-		let command = new FieldCommand(target.design, {
-			tag: target.tag,
+		let command = new FieldCommand(target.$design, {
+			tag: target.$tag,
 			prop,
 			old: oldValue,
 			new: newValue
 		});
-		target.design.history.queue(command);
+		target.$design.history.$queue(command);
 	}
 
+	/** @exports */
 	public readonly type = CommandType.field;
+
+	/** @exports */
 	public readonly prop: string;
+
+	/** @exports */
 	public old: any;
+
+	/** @exports */
 	public new: any;
 
 	constructor(design: Design, json: Typeless<JFieldCommand>) {
@@ -35,25 +42,25 @@ class FieldCommand extends Command implements JFieldCommand {
 		this.new = json.new;
 	}
 
-	public canAddTo(command: Command): boolean {
+	public $canAddTo(command: Command): boolean {
 		return command instanceof FieldCommand && command.tag == this.tag && command.new == this.old;
 	}
 
-	public addTo(command: Command) {
+	public $addTo(command: Command) {
 		(command as FieldCommand).new = this.new;
 	}
 
-	public get isVoid() {
+	public get $isVoid() {
 		return this.old == this.new;
 	}
 
-	public undo() {
-		let target = this._design.query(this.tag)!;
+	public $undo() {
+		let target = this._design.$query(this.tag)!;
 		target[this.prop] = this.old;
 	}
 
-	public redo() {
-		let target = this._design.query(this.tag)!;
+	public $redo() {
+		let target = this._design.$query(this.tag)!;
 		target[this.prop] = this.new;
 	}
 }

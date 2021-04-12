@@ -16,7 +16,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="mt-3" v-if="design.tree.node.size>3">
+		<div class="mt-3" v-if="!design.tree.isMinimal">
 			<button class="btn btn-primary" v-if="selection.degree==1" @click="selection.delete()" v-t="'keyword.delete'"></button>
 			<button
 				class="btn btn-primary"

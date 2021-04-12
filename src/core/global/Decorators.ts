@@ -1,11 +1,4 @@
 
-/**
- * 特別用來標注某一個成員最後會被輸出到 Vue UI 上使用。
- *
- * 這樣的成員在重構的時候必須特別注意 UI 的串接要作對應的修改。
- */
-function exported(target: object, prop: string | symbol) { }
-
 /** 特別用來標注某一項計算屬性經過實驗顯示不用進行比較檢查 */
 const noCompare = shrewd;
 
