@@ -97,9 +97,9 @@ type JunctionDimension = 'ox' | 'oy';
 		if(a1 == a2) return a1;
 
 		if(a1.$depth > a2.$depth) {
-			if(tree.lca(a2, this.n1) == a2 || tree.lca(a2, this.n2) == a2) return a2;
-		} else if(a2.$depth > a1.$depth) {
 			if(tree.lca(a1, j.n1) == a1 || tree.lca(a1, j.n2) == a1) return a1;
+		} else if(a2.$depth > a1.$depth) {
+			if(tree.lca(a2, this.n1) == a2 || tree.lca(a2, this.n2) == a2) return a2;
 		}
 		return null;
 	}
