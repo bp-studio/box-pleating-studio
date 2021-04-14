@@ -2,6 +2,8 @@
 var through = require('through2');
 var path = require('path');
 
+// 用來建立 log 檔案目錄
+
 module.exports = function(file) {
 	var latestFile;
 	var concat = [];

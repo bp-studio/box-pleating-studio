@@ -1,6 +1,8 @@
 "use strict";
 const through = require("through2");
 
+// 用來彙整語系檔案
+
 function transform(file, encoding, callback) {
 	if(file.isNull()) return callback(null, file);
 	if(file.isStream()) {

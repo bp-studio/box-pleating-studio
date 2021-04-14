@@ -3,6 +3,8 @@ const through = require("through2");
 const transpiler = require("vue-property-decorator-transpiler");
 const compile = require('vue-template-compiler');
 
+// 用來編譯 Vue SFC 專案
+
 module.exports = function(jsName, cssName) {
 	let js = [], css = [];
 	let baseFile;

@@ -46,7 +46,7 @@ gulp.task('static', () => all(
 	// 建置 BPS 圖示集
 	gulp.src('public/assets/bps/**/*')
 		.pipe(ifAnyNewer("dist/assets/bps"))
-		.pipe(woff2())
+		.pipe(woff2('bps'))
 		.pipe(gulpIf(file => file.extname == ".css", cleanCss()))
 		.pipe(gulp.dest('dist/assets/bps')),
 

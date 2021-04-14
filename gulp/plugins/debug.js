@@ -1,6 +1,8 @@
 "use strict";
 const through = require("through2");
 
+// 用來產生偵錯版本建置
+
 function transform(file, encoding, callback) {
 	if(file.isNull()) return callback(null, file);
 	if(file.isStream()) {
