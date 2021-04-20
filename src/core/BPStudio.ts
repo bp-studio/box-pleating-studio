@@ -54,7 +54,7 @@
 /// <reference path="design/containers/EdgeContainer.ts" />
 /// <reference path="design/containers/FlapContainer.ts" />
 /// <reference path="design/containers/VertexContainer.ts" />
-/// <reference path="core/controllers/CursorController.ts" />
+/// <reference path="env/controllers/CursorController.ts" />
 
 // Level 5
 /// <reference path="class/ViewedControl.ts" />

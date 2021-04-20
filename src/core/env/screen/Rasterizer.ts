@@ -80,7 +80,7 @@ class Rasterizer {
 
 	/** 產生 SVG 檔案連結 */
 	public $createSvgUrl(): string {
-		let rect = this._display.$getCompleteBound();
+		let rect = this._display.$getBound();
 		let svg = this._display.$project.exportSVG({
 			bounds: rect,
 			matrix: this._display.$project.view.matrix

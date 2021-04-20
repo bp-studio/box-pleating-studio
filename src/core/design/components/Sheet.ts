@@ -73,7 +73,7 @@ interface JSheet {
 	public get zoom() { return this._zoom; }
 	public set zoom(v) {
 		if(v < 100) return;
-		this.$studio?.$display.$zoom(v, this);
+		this.$studio?.$display.$zoom(v);
 	}
 	@shrewd public _zoom: number;
 

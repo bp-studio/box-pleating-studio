@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Viewport` 物件負責管理工作區域的大小
+ * `Viewport` 物件負責管理顯示區域的大小
  */
 //////////////////////////////////////////////////////////////////
 
@@ -13,7 +13,7 @@
 
 	private _el: HTMLElement;
 
-	/** 暫時鎖定工作區域大小 */
+	/** 暫時鎖定顯示區域大小 */
 	private _lockViewport: boolean = false;
 
 	constructor(el: HTMLElement) {
@@ -44,7 +44,8 @@
 	}
 
 	/** 根據自身狀態來幫助設定 paper project 的大小 */
-	public $setup(size: paper.Size) {
+	public $setup(display: Display, size: paper.Size) {
+		display.$isScrollable();  // 順序上必須先把捲軸設定完成、clientWidth/Height 才會是正確的值
 		let [w, h] = [this.$width, this.$height];
 		if(this._lockViewport) size.set(w, h);
 		else size.set(this._el.clientWidth, this._el.clientHeight);

@@ -34,7 +34,7 @@ class ZoomController {
 		let dpi = window.devicePixelRatio ?? 1;
 		let newZoom = sheet.zoom * delta / dpi / 100;
 		newZoom = Math.round(newZoom + this._touchScaling[1]);
-		this._studio.$display.$zoom(newZoom, sheet, System.$getEventCenter(event));
+		this._studio.$display.$zoom(newZoom, System.$getEventCenter(event));
 		this._touchScaling = [touchDistance, newZoom];
 	}
 
@@ -52,7 +52,6 @@ class ZoomController {
 			if(design) {
 				display.$zoom(
 					design.sheet.zoom - Math.round(design.sheet.zoom * event.deltaY / 10000) * 5,
-					design.sheet,
 					{ x: event.pageX, y: event.pageY }
 				);
 			}
