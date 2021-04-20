@@ -7,7 +7,8 @@ let ts = require('gulp-typescript');
 let wrap = require('gulp-wrap');
 let wrapJS = require('gulp-wrap-js');
 
-let projCore = ts.createProject('src/core/tsconfig.json');
+let coreConfig = 'src/core/tsconfig.json';
+let projCore = ts.createProject(coreConfig);
 let projTest = ts.createProject('test/tsconfig.json');
 
 let terserOption = require('../terser.json');
@@ -16,7 +17,7 @@ gulp.task('coreDev', () =>
 	projCore.src()
 		.pipe(newer({
 			dest: 'debug/bpstudio.js',
-			extra: __filename
+			extra: [__filename, coreConfig]
 		}))
 		.pipe(sourcemaps.init())
 		.pipe(projCore())
@@ -28,7 +29,7 @@ gulp.task('corePub', () =>
 	gulp.src("debug/bpstudio.js")
 		.pipe(newer({
 			dest: 'dist/bpstudio.js',
-			extra: __filename
+			extra: [__filename, coreConfig]
 		}))
 		.pipe(wrap(
 			`(function(root,factory){if(typeof define==='function'&&define.amd)

@@ -87,9 +87,9 @@ function registerHotkey(action, key, shift) {
 
 function registerHotkeyCore(callback) {
 	let handler = e => {
-		// 如果正在使用輸入框，不處理一切後續
-		let active = document.activeElement;
-		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+
+		// let active = document.activeElement;
+		// if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
 		callback(e);
 	};
 	document.body.addEventListener("keydown", handler);
@@ -99,6 +99,12 @@ function registerHotkeyCore(callback) {
 function unregisterHotkeyCore(handler) {
 	document.body.removeEventListener("keydown", handler);
 }
+
+document.addEventListener('keydown', event => {
+	// 如果正在使用輸入框，把一切的正常事件監聽都阻斷掉
+	let active = document.activeElement;
+	if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) event.stopImmediatePropagation();
+}, { capture: true });
 
 registerHotkeyCore(e => {
 	if(e.metaKey || e.ctrlKey) {

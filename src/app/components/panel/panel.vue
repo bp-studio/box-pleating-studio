@@ -10,11 +10,11 @@
 			<design v-if="selections.length==0" :key="design.sheet.guid"></design>
 			<div v-else-if="selections.length==1" :key="selection.guid">
 				<repository v-if="repository" :repository="repository"></repository>
-				<component v-else :is="selection.type.toLowerCase()"></component>
+				<component v-else :is="type.toLowerCase()"></component>
 			</div>
 			<div v-else>
-				<flaps v-if="selection.type=='Flap'"></flaps>
-				<vertices v-if="selection.type=='Vertex'"></vertices>
+				<flaps v-if="type=='Flap'"></flaps>
+				<vertices v-if="type=='Vertex'"></vertices>
 			</div>
 		</template>
 	</div>
@@ -23,18 +23,16 @@
 <script lang="ts">
 	import { Component, Watch, Prop } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
+	import { bp } from '../import/BPStudio';
+	import { core } from '../core.vue';
 
 	@Component
 	export default class Panel extends BaseComponent {
 		@Prop(Boolean) public show: boolean;
 
-		public get repository() {
-			let s = this.selection;
-			if(!s) return null;
-			if(s.type == "Device") return s.pattern.configuration.repository;
-			if(s.type == "Stretch") return s.repository;
-			return null;
-		}
+		public get repository() { return core.initialized && bp.getRepository(this.selection); }
+
+		public get type() { return core.initialized && bp.getType(this.selection); }
 
 		// 確保 GC
 		@Watch("repository") repo() { }

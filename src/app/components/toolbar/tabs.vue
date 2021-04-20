@@ -12,7 +12,7 @@
 				>
 					<div class="tab-close" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
 						<div>
-							<span v-if="getDesign(id).history.modified">*</span>
+							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
 						</div>
 						<div class="px-2" @click.stop="core.close(id)" @pointerdown.stop @mousedown.stop>
@@ -21,7 +21,7 @@
 					</div>
 					<div class="tab-down" :title="getDesign(id).title">
 						<div>
-							<span v-if="getDesign(id).history.modified">*</span>
+							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
 						</div>
 						<div class="px-2" @click.stop="tabMenu($event, id)" @pointerdown.stop @touchstart.stop>
@@ -101,8 +101,11 @@
 			(this.$refs.tabMenu as ContextMenu).show(event);
 		}
 
+		protected isModified(id: number): boolean {
+			return bp.isModified(this.getDesign(id));
+		}
 		public getDesign(id: number): Design {
-			return bp.designMap.get(id)!;
+			return bp.getDesign(id)!;
 		}
 		public getTitle(id: number): string {
 			let title = this.getDesign(id).title;

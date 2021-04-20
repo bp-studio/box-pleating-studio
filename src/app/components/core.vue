@@ -72,14 +72,14 @@
 		}
 
 		public async init() {
-			bp.onDeprecate = (title: string) => {
+			bp.option.onDeprecate = (title: string) => {
 				title = title || this.$t("keyword.untitled");
 				this.alert(this.$t("message.oldVersion", [title]));
 			};
 
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {
-				let d = bp.display.settings;
+				let d = bp.settings;
 				for(let key in d) d[key] = settings[key];
 			}
 
@@ -122,7 +122,7 @@
 		}
 
 		public get shouldShowDPad() {
-			return this.initialized && this.isTouch && this.showDPad && bp.system.selection.hasDraggable();
+			return this.initialized && this.isTouch && this.showDPad && bp.draggableSelected;
 		}
 
 		public saveSettings() {
@@ -130,7 +130,7 @@
 			let {
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement
-			} = bp.display.settings;
+			} = bp.settings;
 			if(this.autoSave) this.save();
 			else localStorage.removeItem("session");
 			localStorage.setItem("settings", JSON.stringify({
@@ -169,16 +169,16 @@
 
 		private async save() {
 			// 拖曳的時候存檔無意義且浪費效能，跳過
-			if(bp.system.drag.on) return;
+			if(bp.isDragging) return;
 
 			// 只有當前的實體取得存檔權的時候才會儲存
 			if(this.autoSave && await this.checkSession()) {
 				// 排程到下一次 BPStudio 更新完畢之後存檔，
 				// 避免在存檔的瞬間製造出 glitch
-				bp.onUpdate = () => {
+				bp.option.onUpdate = () => {
 					let session = {
 						jsons: this.designs.map(
-							id => bp.designMap.get(id)!.toJSON(true)
+							id => bp.getDesign(id)!.toJSON(true)
 						),
 						open: bp.design ? this.designs.indexOf(bp.design.id) : -1
 					};
@@ -197,7 +197,7 @@
 		}
 		public get selections(): any {
 			if(!this.initialized) return [];
-			return bp.system.selection.items;
+			return bp.selection;
 		}
 
 		public create() {
@@ -230,9 +230,9 @@
 			bp.update();
 		}
 		public async closeCore(id: number): Promise<boolean> {
-			let d = bp.designMap.get(id)!;
+			let d = bp.getDesign(id)!;
 			let title = d.title || this.$t("keyword.untitled");
-			if(d.history.modified) {
+			if(bp.isModified(d)) {
 				this.select(id);
 				let message = this.$t("message.unsaved", [title]);
 				if(!(await this.confirm(message))) return false;
@@ -264,7 +264,7 @@
 		public clone(id?: number) {
 			if(id === undefined) id = bp.design.id;
 			let i = this.designs.indexOf(id);
-			let d = bp.designMap.get(id).toJSON(true);
+			let d = bp.getDesign(id).toJSON(true);
 			let c = bp.restore(this.checkTitle(d));
 			this.designs.splice(i + 1, 0, c.id);
 			this.select(c.id);
@@ -278,7 +278,7 @@
 
 		private checkTitle(j: any) {
 			let t = j.title.replace(/ - \d+$/, ""), n = 1;
-			let designs = [...bp.designMap.values()];
+			let designs = bp.getDesigns();
 			if(!designs.some(d => d.title == t)) return j;
 			while(designs.some(d => d.title == t + " - " + n)) n++;
 			j.title = t + " - " + n;
@@ -290,7 +290,7 @@
 			let zip = new JSZip();
 			let names = new Set<string>();
 			for(let i = 0; i < this.designs.length; i++) {
-				let design = bp.designMap.get(this.designs[i]);
+				let design = bp.getDesign(this.designs[i]);
 				let name = sanitize(design.title);
 				if(names.has(name)) {
 					for(var j = 1; names.has(name + " (" + j + ")"); j++);

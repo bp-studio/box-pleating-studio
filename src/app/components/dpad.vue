@@ -21,11 +21,11 @@
 		}
 
 		protected get disabled(): boolean {
-			return !core.initialized || bp.system.drag.on;
+			return !core.initialized || bp.isDragging;
 		}
 
 		protected key(key: string) {
-			bp.system.drag.processKey(key);
+			bp.dragByKey(key);
 		}
 	}
 </script>

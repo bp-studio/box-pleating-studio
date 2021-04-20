@@ -1,228 +1,187 @@
 // Level 0
 /// <reference path="global/import.ts" />
 /// <reference path="global/Decorators.ts" />
-/// <reference path="util/Decorators.ts" />
-/// <reference path="pattern/Region.ts" />
+/// <reference path="design/layout/Region.ts" />
 /// <reference path="class/Disposable.ts" />
-/// <reference path="math/PolyBool.ts" />
-/// <reference path="command/Command.ts" />
+/// <reference path="class/math/PolyBool.ts" />
+/// <reference path="design/command/Command.ts" />
 
 // Level 1
-/// <reference path="pattern/Piece.ts" />
-/// <reference path="pattern/AddOn.ts" />
-/// <reference path="model/DoubleMap.ts" />
-/// <reference path="mapping/BaseMapping.ts" />
-/// <reference path="mapping/DoubleMapping.ts" />
-/// <reference path="math/Fraction.ts" />
-/// <reference path="pattern/Partitioner.ts" />
-/// <reference path="helper/RiverHelperBase.ts" />
-/// <reference path="helper/QuadrantHelper.ts" />
-/// <reference path="command/FieldCommand.ts" />
-/// <reference path="command/MoveCommand.ts" />
-/// <reference path="command/EditCommand.ts" />
+/// <reference path="design/layout/Piece.ts" />
+/// <reference path="design/layout/AddOn.ts" />
+/// <reference path="class/mapping/DoubleMap.ts" />
+/// <reference path="class/mapping/BaseMapping.ts" />
+/// <reference path="class/mapping/DoubleMapping.ts" />
+/// <reference path="class/math/Fraction.ts" />
+/// <reference path="design/layout/Partitioner.ts" />
+/// <reference path="design/helper/RiverHelperBase.ts" />
+/// <reference path="design/helper/QuadrantHelper.ts" />
+/// <reference path="design/command/FieldCommand.ts" />
+/// <reference path="design/command/MoveCommand.ts" />
+/// <reference path="design/command/EditCommand.ts" />
 
 // Level 2
-/// <reference path="mapping/Mapping.ts" />
-/// <reference path="mapping/GroupMapping.ts" />
+/// <reference path="class/mapping/Mapping.ts" />
+/// <reference path="class/mapping/GroupMapping.ts" />
 /// <reference path="class/Mountable.ts" />
-/// <reference path="model/Tree.ts" />
-/// <reference path="math/Couple.ts" />
-/// <reference path="pattern/Partition.ts" />
-/// <reference path="helper/RiverHelper.ts" />
-/// <reference path="containers/JunctionContainer.ts" />
+/// <reference path="design/schema/Tree.ts" />
+/// <reference path="class/math/Couple.ts" />
+/// <reference path="design/layout/Partition.ts" />
+/// <reference path="design/helper/RiverHelper.ts" />
+/// <reference path="design/containers/JunctionContainer.ts" />
 
 // Level 3
-/// <reference path="core/Design.ts" />
+/// <reference path="design/Design.ts" />
 /// <reference path="class/SheetObject.ts" />
-/// <reference path="components/Sheet.ts" />
-/// <reference path="view/View.ts" />
-/// <reference path="model/TreeNode.ts" />
-/// <reference path="model/TreeEdge.ts" />
-/// <reference path="math/Point.ts" />
-/// <reference path="math/Vector.ts" />
-/// <reference path="containers/BaseContainer.ts" />
+/// <reference path="design/components/Sheet.ts" />
+/// <reference path="design/view/View.ts" />
+/// <reference path="design/schema/TreeNode.ts" />
+/// <reference path="design/schema/TreeEdge.ts" />
+/// <reference path="class/math/Point.ts" />
+/// <reference path="class/math/Vector.ts" />
+/// <reference path="design/containers/BaseContainer.ts" />
 
 // Level 4
 /// <reference path="class/Control.ts" />
-/// <reference path="components/Quadrant.ts" />
-/// <reference path="pattern/Stretch.ts" />
-/// <reference path="pattern/Pattern.ts" />
-/// <reference path="pattern/Store.ts" />
-/// <reference path="view/ControlView.ts" />
-/// <reference path="view/DragSelectView.ts" />
-/// <reference path="view/SheetView.ts" />
-/// <reference path="containers/StretchContainer.ts" />
-/// <reference path="containers/EdgeContainer.ts" />
-/// <reference path="containers/FlapContainer.ts" />
-/// <reference path="containers/VertexContainer.ts" />
+/// <reference path="design/components/Quadrant.ts" />
+/// <reference path="design/layout/Stretch.ts" />
+/// <reference path="design/layout/Pattern.ts" />
+/// <reference path="design/layout/Store.ts" />
+/// <reference path="design/view/ControlView.ts" />
+/// <reference path="design/view/DragSelectView.ts" />
+/// <reference path="design/view/SheetView.ts" />
+/// <reference path="design/containers/StretchContainer.ts" />
+/// <reference path="design/containers/EdgeContainer.ts" />
+/// <reference path="design/containers/FlapContainer.ts" />
+/// <reference path="design/containers/VertexContainer.ts" />
+/// <reference path="core/controllers/CursorController.ts" />
 
 // Level 5
 /// <reference path="class/ViewedControl.ts" />
-/// <reference path="pattern/Configuration.ts" />
-/// <reference path="view/LabeledView.ts" />
-/// <reference path="view/JunctionView.ts" />
-/// <reference path="view/RiverView.ts" />
+/// <reference path="design/layout/Configuration.ts" />
+/// <reference path="design/view/LabeledView.ts" />
+/// <reference path="design/view/JunctionView.ts" />
+/// <reference path="design/view/RiverView.ts" />
 
 // Level 6
 /// <reference path="class/Draggable.ts" />
-/// <reference path="view/FlapView.ts" />
-/// <reference path="view/EdgeView.ts" />
-/// <reference path="view/VertexView.ts" />
+/// <reference path="design/view/FlapView.ts" />
+/// <reference path="design/view/EdgeView.ts" />
+/// <reference path="design/view/VertexView.ts" />
 
 // Level 7
-/// <reference path="components/Flap.ts" />
-/// <reference path="components/Vertex.ts" />
+/// <reference path="class/IndependentDraggable.ts" />
+/// <reference path="design/layout/Device.ts" />
 
-@shrewd class BPStudio {
+// Level 8
+/// <reference path="design/components/Flap.ts" />
+/// <reference path="design/components/Vertex.ts" />
 
-	/** @exports */
-	public readonly system: System;
 
-	/** @exports */
-	public readonly designMap: Map<number, Design> = new Map();
+//////////////////////////////////////////////////////////////////
+/**
+ * `BPStudio` 類別是 `Studio` 類別的對外包裝，
+ * 終極目標是要將所有的對外介面集中到這個類別裡面來統一管理，
+ * 並且隔離這些介面背後對應的實作。
+ *
+ * 這個類別底下所有的公開成員自動全部都是對外介面，所以不特別註記 @exports。
+ */
+//////////////////////////////////////////////////////////////////
 
-	/** @exports */
-	public readonly display: Display;
+class BPStudio {
 
-	/** @exports */
-	public onDeprecate?: (title: string) => void;
-
-	/** @exports */
-	@shrewd public design: Design | null = null;
-
-	public readonly $el: HTMLElement;
-	public readonly $paper: paper.PaperScope;
+	private readonly _studio: Studio;
 
 	constructor(selector: string) {
 		if(typeof paper != "object") throw new Error("BPStudio requires paper.js.");
-
-		let el = document.querySelector(selector);
-		if(el == null || !(el instanceof HTMLElement)) {
-			throw new Error("selector is not valid");
-		}
-
-		this.$el = el;
-		this.$paper = new paper.PaperScope();
-		this.display = new Display(this);
-		this.system = new System(this);
-
-		new Animator(this.update.bind(this), 50);
+		this._studio = new Studio(selector);
 	}
 
-	public load(json: string | object): Design {
-		if(typeof json == "string") json = JSON.parse(json);
-		return this._tryLoad(Migration.$process(json, this.onDeprecate));
-	}
+	//////////////////////////////////////////////////////////////////
+	// 公開子物件
+	//////////////////////////////////////////////////////////////////
 
-	public create(json: any): Design {
-		Object.assign(json, {
-			version: Migration.$current,
-			tree: {
-				nodes: [
-					{ id: 0, name: "", x: 10, y: 10 },
-					{ id: 1, name: "", x: 10, y: 13 },
-					{ id: 2, name: "", x: 10, y: 7 }
-				],
-				edges: [
-					{ n1: 0, n2: 1, length: 1 },
-					{ n1: 0, n2: 2, length: 1 }
-				]
-			}
-		});
-		return this.restore(json);
-	}
-
-	public restore(json: any): Design {
-		let design = new Design(this, Migration.$process(json, this.onDeprecate));
-		this.designMap.set(design.id, design);
-		return design;
-	}
-
-	/** @exports */
-	public select(id: number | null): void {
-		if(id != null) {
-			let d = this.designMap.get(id);
-			if(d) this.design = d;
-		} else this.design = null;
-	}
-
-	/** @exports */
-	public close(id: number): void {
-		let d = this.designMap.get(id);
-		if(d) {
-			this.designMap.delete(id);
-			d.$dispose();
-		}
-	}
-
-	/** @exports */
-	public closeAll(): void {
-		this.design = null;
-		for(let d of this.designMap.values()) d.$dispose();
-		this.designMap.clear();
-	}
-
-	private _tryLoad(design: RecursivePartial<JDesign>): Design {
-		this.design = new Design(this, design);
-		this.designMap.set(this.design.id, this.design);
-
-		// 這邊順便直接更新，不然載入大專案的時候會跟 tab 之間有一點時間差
-		this.update();
-
-		return this.design;
-	}
-
-	/** @exports */
-	public toBPS(): string {
-		if(!this.design) return "";
-		let json = this.design.toJSON();
-		delete json.history; // 存檔的時候不用儲存歷史
-		let bps = JSON.stringify(json);
-		let blob = new Blob([bps], { type: "application/octet-stream" });
-		return URL.createObjectURL(blob);
-	}
-
-	/** @exports */
+	public get option(): StudioOptions { return this._studio.$option; }
+	public get settings(): DisplaySetting { return this._studio.$display.$settings; }
 	public get TreeMaker() { return TreeMaker; }
 
+
+	//////////////////////////////////////////////////////////////////
+	// 存取子
+	//////////////////////////////////////////////////////////////////
+
+	public get design(): Design | null { return this._studio.$design; }
+	public set design(d) { this._studio.$design = d; }
+
 	/** 這是一個偵錯 glitch 用的屬性，正常情況不會用到（參見 Pattern.ts） */
-	public get running() { return this._updating; }
+	public get running() { return this._studio.$updater.$updating; }
 
-	private _updating: boolean = false;
 
-	/**
-	 * 提供 UI 來註冊儲存 session 的動作
-	 *
-	 * @exports
-	 */
-	public onUpdate?: Action;
+	//////////////////////////////////////////////////////////////////
+	// UI 方法
+	//////////////////////////////////////////////////////////////////
 
-	/**
-	 * 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法
-	 *
-	 * @exports
-	 */
-	public async update() {
-		if(this._updating) return;
-		this._updating = true;
+	/** 除了動畫呼叫之外，跟 tab 有關的操作也會呼叫此方法 */
+	public update(): Promise<void> { return this._studio.$updater.$update(); }
 
-		//if(perf) perfTime = 0;
+	public get selection(): Control[] { return this._studio.$system.$selection.$items; }
+	public get draggableSelected(): boolean { return this._studio.$system.$selection.$hasDraggable(); }
+	public get isDragging(): boolean { return this._studio.$system.$drag.$on; }
+	public dragByKey(key: string): void { this._studio.$system.$drag.processKey(key); }
 
-		Shrewd.commit();
-		if(this.design && !this.design.$dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
-			this.design.history.$flush(this.system.selection.items);
-		}
 
-		await PaperWorker.$done();
-		this.display.$project.view.update();
+	//////////////////////////////////////////////////////////////////
+	// 物件導覽
+	//////////////////////////////////////////////////////////////////
 
-		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
-
-		if(this.onUpdate) {
-			this.onUpdate();
-			delete this.onUpdate;
-		}
-
-		this._updating = false;
+	/** 傳回物件對應的 `Repository`、若有的話 */
+	public getRepository(target: any): Repository | null {
+		if(target instanceof Device) return target.$pattern.$configuration.$repository;
+		else if(target instanceof Stretch) return target.$repository;
+		else return null;
 	}
+
+	/** 傳回控制項的類別字串 */
+	public getType(target: any): string | null {
+		if(target instanceof Control) return target.$type;
+		return null;
+	}
+
+
+	//////////////////////////////////////////////////////////////////
+	// 專案管理
+	//////////////////////////////////////////////////////////////////
+
+	public getDesigns(): Design[] { return [...this._studio.$designMap.values()]; }
+	public getDesign(id: number): Design | undefined { return this._studio.$designMap.get(id); }
+	public load(json: string | object): Design { return this._studio.$load(json); }
+	public create(json: any): Design { return this._studio.$create(json); }
+	public restore(json: any): Design { return this._studio.$restore(json); }
+	public select(id: number | null): void { this._studio.$select(id); }
+	public close(id: number): void { this._studio.$close(id); }
+	public closeAll(): void { this._studio.$closeAll(); }
+	public toBPS(): string { return this._studio.$CreateBpsUrl(); }
+
+
+	//////////////////////////////////////////////////////////////////
+	// 圖像處理
+	//////////////////////////////////////////////////////////////////
+
+	public onBeforePrint(): void { this._studio.$display.$rasterizer.$beforePrint(); }
+	public toSVG(): string { return this._studio.$display.$rasterizer.$createSvgUrl(); }
+	public toPNG(): Promise<string> { return this._studio.$display.$rasterizer.$createPngUrl(); }
+	public copyPNG(): Promise<void> { return this._studio.$display.$rasterizer.$copyPNG(); }
+
+
+	//////////////////////////////////////////////////////////////////
+	// 歷史操作
+	//////////////////////////////////////////////////////////////////
+
+	public notifySaveAll() { this._studio.$designMap.forEach(d => this.notifySave(d)); }
+	public notifySave(design: any) { if(design instanceof Design) design.$history.$notifySave(); }
+	public isModified(design: any): boolean { return design instanceof Design ? design.$history.$modified : false; }
+	public canUndo(design: any): boolean { return design instanceof Design ? design.$history.$canUndo : false; }
+	public canRedo(design: any): boolean { return design instanceof Design ? design.$history.$canRedo : false; }
+	public undo(design: any): void { if(design instanceof Design) design.$history.$undo(); }
+	public redo(design: any): void { if(design instanceof Design) design.$history.$redo(); }
 }

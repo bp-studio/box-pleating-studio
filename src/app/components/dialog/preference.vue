@@ -44,7 +44,7 @@
 		private modal: Bootstrap.Modal;
 		protected get i18n() { return i18n; }
 		protected get core() { return core; }
-		protected get display(): any { return core.initialized ? bp.display.settings : {}; }
+		protected get display(): any { return core.initialized ? bp.settings : {}; }
 
 		mounted() {
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));

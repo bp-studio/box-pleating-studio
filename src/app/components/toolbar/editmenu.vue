@@ -1,9 +1,9 @@
 <template>
 	<dropdown icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
-		<dropdownitem :disabled="!design||!design.history.canUndo" @click="undo">
+		<dropdownitem :disabled="!canUndo" @click="undo">
 			<hotkey icon="bp-undo" ctrl hk="Z">{{$t('toolbar.edit.undo')}}</hotkey>
 		</dropdownitem>
-		<dropdownitem :disabled="!design||!design.history.canRedo" @click="redo">
+		<dropdownitem :disabled="!canRedo" @click="redo">
 			<hotkey icon="bp-redo" ctrl hk="Y">{{$t('toolbar.edit.redo')}}</hotkey>
 		</dropdownitem>
 		<divider></divider>
@@ -17,6 +17,9 @@
 	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
 	import { registerHotkey } from '../import/types';
+	import { bp } from '../import/BPStudio';
+
+	import { core } from '../core.vue';
 
 	@Component
 	export default class EditMenu extends BaseComponent {
@@ -27,13 +30,10 @@
 			registerHotkey(() => this.selectAll(), "a");
 		}
 
-		private undo() {
-			if(this.design) this.design.history.undo();
-		}
-
-		private redo() {
-			if(this.design) this.design.history.redo();
-		}
+		protected get canUndo() { return core.initialized && bp.canUndo(this.design); }
+		protected get canRedo() { return core.initialized && bp.canRedo(this.design); }
+		protected undo() { bp.undo(this.design); }
+		protected redo() { bp.redo(this.design); }
 
 		private selectAll() {
 			if(this.design) this.design.selectAll();

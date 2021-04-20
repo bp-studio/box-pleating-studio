@@ -22,8 +22,8 @@ window.addEventListener("DOMContentLoaded", () => {
 	setTimeout(async () => {
 		await core.initReady;
 		bp = new BPStudio("#divWorkspace");
-		bp.system.onLongPress = () => app.showPanel = true;
-		bp.system.onDrag = () => app.showPanel = false;
+		bp.option.onLongPress = () => app.showPanel = true;
+		bp.option.onDrag = () => app.showPanel = false;
 		core.init();
 	}, 10);
 });

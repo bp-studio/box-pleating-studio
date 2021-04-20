@@ -70,17 +70,17 @@
 			registerHotkey(() => this.print(), "p");
 		}
 
-		private newProject() {
+		protected newProject() {
 			core.create();
 			gtag('event', 'project_create');
 		}
 
-		private notify() {
-			bp.design.history.notifySave();
+		protected notify() {
+			bp.notifySave(bp.design);
 			gtag('event', 'project_bps');
 		}
-		private notifyAll() {
-			bp.designMap.forEach(d => d.history.notifySave());
+		protected notifyAll() {
+			bp.notifySaveAll();
 			gtag('event', 'project_bpz');
 		}
 		private svgSaved() {
@@ -98,12 +98,12 @@
 		public get svgFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".svg", content: () => bp.display.toSVG() };
+				{ name: sanitize(this.design.title) + ".svg", content: () => bp.toSVG() };
 		}
 		public get pngFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".png", content: () => bp.display.toPNG() };
+				{ name: sanitize(this.design.title) + ".png", content: () => bp.toPNG() };
 		}
 		public get workspaceFile(): FileFactory {
 			return !core.designs.length ?
@@ -114,7 +114,7 @@
 			return navigator.clipboard && 'write' in navigator.clipboard;
 		}
 		public copyPNG(): void {
-			bp.display.copyPNG();
+			bp.copyPNG();
 			gtag('event', 'share', { method: 'copy', content_type: 'image' });
 		}
 
@@ -169,7 +169,7 @@
 
 		protected print() {
 			if(!core.design) return;
-			bp.display.beforePrint();
+			bp.onBeforePrint();
 			setTimeout(window.print, 500);
 			gtag('event', 'print', {});
 		}

@@ -33,10 +33,8 @@ abstract class Control extends SheetObject implements ITagObject {
 	 *
 	 * 考慮到程式碼最後被 mangle 的可能性，這邊不直接抓取建構子的 name，
 	 * 而要求實體繼承類別實作這個值。
-	 *
-	 * @exports
 	 */
-	public abstract get type(): string;
+	public abstract get $type(): string;
 
 	/** 切換選取狀態 */
 	public $toggle(): void {
