@@ -5,19 +5,20 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Viewport {
+abstract class Viewport {
 
-	@shrewd public $width: number;
+	@shrewd protected _viewWidth: number;
+	@shrewd protected _viewHeight: number;
 
-	@shrewd public $height: number;
-
-	private _el: HTMLElement;
+	protected readonly _studio: Studio;
+	protected readonly _el: HTMLElement;
 
 	/** 暫時鎖定顯示區域大小 */
 	private _lockViewport: boolean = false;
 
-	constructor(el: HTMLElement) {
-		this._el = el;
+	constructor(studio: Studio) {
+		this._studio = studio;
+		this._el = studio.$el;
 
 		window.addEventListener("resize", this._setSize.bind(this));
 		this._setSize();
@@ -39,14 +40,13 @@
 	/** 視窗大小有變動的時候重設 canvas 大小 */
 	private _setSize() {
 		if(this._lockViewport) return;
-		this.$width = this._el.clientWidth;
-		this.$height = this._el.clientHeight;
+		this._viewWidth = this._el.clientWidth;
+		this._viewHeight = this._el.clientHeight;
 	}
 
 	/** 根據自身狀態來幫助設定 paper project 的大小 */
-	public $setup(display: Display, size: paper.Size) {
-		display.$isScrollable();  // 順序上必須先把捲軸設定完成、clientWidth/Height 才會是正確的值
-		let [w, h] = [this.$width, this.$height];
+	protected _setupViewport(size: paper.Size) {
+		let [w, h] = [this._viewWidth, this._viewHeight];
 		if(this._lockViewport) size.set(w, h);
 		else size.set(this._el.clientWidth, this._el.clientHeight);
 	}

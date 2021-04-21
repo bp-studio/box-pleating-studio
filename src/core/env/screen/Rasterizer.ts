@@ -54,7 +54,7 @@ class Rasterizer {
 			// 而且設置了一個很大的延遲，這是為了解決在手機上透過外部服務列印時可能發生的延遲
 			setTimeout(() => URL.revokeObjectURL(old), 5000);
 
-			this._img.src = this.$createSvgUrl();
+			this._img.src = this._display.$createSvgUrl();
 			this._printing = true;
 		}
 	}
@@ -76,27 +76,5 @@ class Rasterizer {
 		return navigator.clipboard.write([
 			new ClipboardItem({ 'image/png': blob })
 		]);
-	}
-
-	/** 產生 SVG 檔案連結 */
-	public $createSvgUrl(): string {
-		let rect = this._display.$getBound();
-		let svg = this._display.$project.exportSVG({
-			bounds: rect,
-			matrix: this._display.$project.view.matrix
-		}) as SVGElement;
-		if(!this._display.$settings.includeHiddenElement) this._removeHidden(svg);
-
-		let blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-		return URL.createObjectURL(blob);
-	}
-
-	/** 遞迴移除所有具有 visibility="hidden" 屬性的標籤 */
-	private _removeHidden(node: Element) {
-		let children = Array.from(node.children);
-		for(let c of children) {
-			if(c.getAttribute('visibility') == 'hidden') node.removeChild(c);
-			else this._removeHidden(c);
-		}
 	}
 }

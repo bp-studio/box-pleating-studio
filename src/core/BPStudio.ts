@@ -1,82 +1,3 @@
-// Level 0
-/// <reference path="global/import.ts" />
-/// <reference path="global/Decorators.ts" />
-/// <reference path="design/layout/Region.ts" />
-/// <reference path="class/Disposable.ts" />
-/// <reference path="class/math/PolyBool.ts" />
-/// <reference path="design/command/Command.ts" />
-
-// Level 1
-/// <reference path="design/layout/Piece.ts" />
-/// <reference path="design/layout/AddOn.ts" />
-/// <reference path="class/mapping/DoubleMap.ts" />
-/// <reference path="class/mapping/BaseMapping.ts" />
-/// <reference path="class/mapping/DoubleMapping.ts" />
-/// <reference path="class/math/Fraction.ts" />
-/// <reference path="design/layout/Partitioner.ts" />
-/// <reference path="design/helper/RiverHelperBase.ts" />
-/// <reference path="design/helper/QuadrantHelper.ts" />
-/// <reference path="design/command/FieldCommand.ts" />
-/// <reference path="design/command/MoveCommand.ts" />
-/// <reference path="design/command/EditCommand.ts" />
-
-// Level 2
-/// <reference path="class/mapping/Mapping.ts" />
-/// <reference path="class/mapping/GroupMapping.ts" />
-/// <reference path="class/Mountable.ts" />
-/// <reference path="design/schema/Tree.ts" />
-/// <reference path="class/math/Couple.ts" />
-/// <reference path="design/layout/Partition.ts" />
-/// <reference path="design/helper/RiverHelper.ts" />
-/// <reference path="design/containers/JunctionContainer.ts" />
-
-// Level 3
-/// <reference path="design/Design.ts" />
-/// <reference path="class/SheetObject.ts" />
-/// <reference path="design/components/Sheet.ts" />
-/// <reference path="design/view/View.ts" />
-/// <reference path="design/schema/TreeNode.ts" />
-/// <reference path="design/schema/TreeEdge.ts" />
-/// <reference path="class/math/Point.ts" />
-/// <reference path="class/math/Vector.ts" />
-/// <reference path="design/containers/BaseContainer.ts" />
-
-// Level 4
-/// <reference path="class/Control.ts" />
-/// <reference path="design/components/Quadrant.ts" />
-/// <reference path="design/layout/Stretch.ts" />
-/// <reference path="design/layout/Pattern.ts" />
-/// <reference path="design/layout/Store.ts" />
-/// <reference path="design/view/ControlView.ts" />
-/// <reference path="design/view/DragSelectView.ts" />
-/// <reference path="design/view/SheetView.ts" />
-/// <reference path="design/containers/StretchContainer.ts" />
-/// <reference path="design/containers/EdgeContainer.ts" />
-/// <reference path="design/containers/FlapContainer.ts" />
-/// <reference path="design/containers/VertexContainer.ts" />
-/// <reference path="env/controllers/CursorController.ts" />
-
-// Level 5
-/// <reference path="class/ViewedControl.ts" />
-/// <reference path="design/layout/Configuration.ts" />
-/// <reference path="design/view/LabeledView.ts" />
-/// <reference path="design/view/JunctionView.ts" />
-/// <reference path="design/view/RiverView.ts" />
-
-// Level 6
-/// <reference path="class/Draggable.ts" />
-/// <reference path="design/view/FlapView.ts" />
-/// <reference path="design/view/EdgeView.ts" />
-/// <reference path="design/view/VertexView.ts" />
-
-// Level 7
-/// <reference path="class/IndependentDraggable.ts" />
-/// <reference path="design/layout/Device.ts" />
-
-// Level 8
-/// <reference path="design/components/Flap.ts" />
-/// <reference path="design/components/Vertex.ts" />
-
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -85,6 +6,8 @@
  * 並且隔離這些介面背後對應的實作。
  *
  * 這個類別底下所有的公開成員自動全部都是對外介面，所以不特別註記 @exports。
+ * 同時由於無法完全假定呼叫的程式能正確傳入資料型別，
+ * 因此原則上對於傳入的參數都應該進行基本的檢查。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -111,7 +34,10 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public get design(): Design | null { return this._studio.$design; }
-	public set design(d) { this._studio.$design = d; }
+	public set design(d) {
+		if(d !== null && !(d instanceof Design)) return;
+		this._studio.$design = d;
+	}
 
 	/** 這是一個偵錯 glitch 用的屬性，正常情況不會用到（參見 Pattern.ts） */
 	public get running() { return this._studio.$updater.$updating; }
@@ -127,7 +53,10 @@ class BPStudio {
 	public get selection(): Control[] { return this._studio.$system.$selection.$items; }
 	public get draggableSelected(): boolean { return this._studio.$system.$selection.$hasDraggable(); }
 	public get isDragging(): boolean { return this._studio.$system.$drag.$on; }
-	public dragByKey(key: string): void { this._studio.$system.$drag.processKey(key); }
+	public dragByKey(key: any): void {
+		if(typeof key != 'string') return;
+		this._studio.$system.$drag.processKey(key);
+	}
 
 
 	//////////////////////////////////////////////////////////////////
@@ -147,6 +76,29 @@ class BPStudio {
 		return null;
 	}
 
+	/** 導覽至對偶的控制項 */
+	public goToDual(subject: any) {
+		let design = this._studio.$design;
+		if(!design) return;
+
+		if(Array.isArray(subject)) {
+			let sample = subject[0];
+			if(sample instanceof Vertex) design.vertices.$toFlap(subject);
+			if(sample instanceof Flap) design.flaps.$toVertex(subject);
+		} else {
+			if(subject instanceof Edge) design.edges.$toRiver(subject);
+			if(subject instanceof River) design.rivers.$toEdge(subject);
+		}
+	}
+
+	/** 替物件產生 GUID 並且傳回 */
+	public guid(object: any): string {
+		if(typeof object != 'object') return "";
+		let id = this._guid.get(object);
+		if(!id) this._guid.set(object, id = MathUtil.$guid());
+		return id;
+	}
+	private _guid: WeakMap<object, string> = new WeakMap();
 
 	//////////////////////////////////////////////////////////////////
 	// 專案管理
@@ -154,7 +106,6 @@ class BPStudio {
 
 	public getDesigns(): Design[] { return [...this._studio.$designMap.values()]; }
 	public getDesign(id: number): Design | undefined { return this._studio.$designMap.get(id); }
-	public load(json: string | object): Design { return this._studio.$load(json); }
 	public create(json: any): Design { return this._studio.$create(json); }
 	public restore(json: any): Design { return this._studio.$restore(json); }
 	public select(id: number | null): void { this._studio.$select(id); }
@@ -162,13 +113,21 @@ class BPStudio {
 	public closeAll(): void { this._studio.$closeAll(); }
 	public toBPS(): string { return this._studio.$CreateBpsUrl(); }
 
+	public load(json: string | object): Design | undefined {
+		try {
+			return this._studio.$load(json);
+		} catch(e) {
+			return undefined;
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////////
 	// 圖像處理
 	//////////////////////////////////////////////////////////////////
 
 	public onBeforePrint(): void { this._studio.$display.$rasterizer.$beforePrint(); }
-	public toSVG(): string { return this._studio.$display.$rasterizer.$createSvgUrl(); }
+	public toSVG(): string { return this._studio.$display.$createSvgUrl(); }
 	public toPNG(): Promise<string> { return this._studio.$display.$rasterizer.$createPngUrl(); }
 	public copyPNG(): Promise<void> { return this._studio.$display.$rasterizer.$copyPNG(); }
 

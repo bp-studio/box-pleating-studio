@@ -34,7 +34,7 @@ abstract class View extends Mountable {
 
 	protected $onMount(studio: Studio): void {
 		// 掛載時將所有的項目加入圖層之中
-		for(let [l, p] of this._paths) studio.$display.$project.layers[l].addChild(p);
+		for(let [l, p] of this._paths) studio.$display.$addToLayer(p, l);
 	}
 
 	protected $onDismount(studio: Studio): void {

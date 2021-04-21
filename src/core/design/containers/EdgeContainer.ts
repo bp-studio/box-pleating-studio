@@ -28,8 +28,7 @@
 		return result;
 	}
 
-	/** @exports */
-	public toRiver(edge: Edge) {
+	public $toRiver(edge: Edge) {
 		this._design.$LayoutSheet.$clearSelection();
 		let te = edge.edge;
 		if(te.isRiver) {

@@ -9,7 +9,6 @@
 		);
 	}
 
-
 	/** @exports */
 	public delete(vertices: readonly Vertex[]) {
 		let arr = vertices.concat().sort((a, b) => a.$node.$degree - b.$node.$degree);
@@ -25,8 +24,7 @@
 		this.forEach(f => f.$selected = true);
 	}
 
-	/** @exports */
-	public toFlap(vertices: Vertex[]) {
+	public $toFlap(vertices: Vertex[]) {
 		this._design.$LayoutSheet.$clearSelection();
 		for(let v of vertices) {
 			let f = this._design.flaps.get(v.$node)

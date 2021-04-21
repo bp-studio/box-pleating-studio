@@ -68,6 +68,7 @@ interface StudioOptions {
 		return design;
 	}
 
+	/** 此方法有防呆 */
 	public $select(id: number | null): void {
 		if(id != null) {
 			let d = this.$designMap.get(id);
@@ -75,6 +76,7 @@ interface StudioOptions {
 		} else this.$design = null;
 	}
 
+	/** 此方法有防呆 */
 	public $close(id: number): void {
 		let d = this.$designMap.get(id);
 		if(d) {

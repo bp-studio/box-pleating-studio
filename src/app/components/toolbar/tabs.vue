@@ -61,7 +61,7 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { bp, Design } from '../import/BPStudio';
+	import { Design } from '../import/BPStudio';
 	import { core } from '../core.vue';
 
 	import BaseComponent from '../mixins/baseComponent';
@@ -102,10 +102,10 @@
 		}
 
 		protected isModified(id: number): boolean {
-			return bp.isModified(this.getDesign(id));
+			return this.bp.isModified(this.getDesign(id));
 		}
 		public getDesign(id: number): Design {
-			return bp.getDesign(id)!;
+			return this.bp.getDesign(id)!;
 		}
 		public getTitle(id: number): string {
 			let title = this.getDesign(id).title;

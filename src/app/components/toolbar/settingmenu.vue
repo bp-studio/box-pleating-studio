@@ -49,7 +49,6 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import BaseComponent from '../mixins/baseComponent';
 
@@ -58,7 +57,7 @@
 	@Component
 	export default class SettingMenu extends BaseComponent {
 		private get settings(): any {
-			return core.initialized ? bp.settings : {};
+			return core.initialized ? this.bp.settings : {};
 		}
 
 		protected get core() { return core; }

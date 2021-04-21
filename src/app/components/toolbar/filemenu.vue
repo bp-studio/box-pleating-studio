@@ -41,7 +41,6 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 	import { FileFactory, sanitize, readFile, bufferToText, registerHotkey } from '../import/types';
-	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import JSZip from 'jszip';
 
@@ -76,11 +75,11 @@
 		}
 
 		protected notify() {
-			bp.notifySave(bp.design);
+			this.bp.notifySave(this.bp.design);
 			gtag('event', 'project_bps');
 		}
 		protected notifyAll() {
-			bp.notifySaveAll();
+			this.bp.notifySaveAll();
 			gtag('event', 'project_bpz');
 		}
 		private svgSaved() {
@@ -93,17 +92,17 @@
 		public get jsonFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".bps", content: () => bp.toBPS() };
+				{ name: sanitize(this.design.title) + ".bps", content: () => this.bp.toBPS() };
 		}
 		public get svgFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".svg", content: () => bp.toSVG() };
+				{ name: sanitize(this.design.title) + ".svg", content: () => this.bp.toSVG() };
 		}
 		public get pngFile(): FileFactory {
 			return !this.design ?
 				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".png", content: () => bp.toPNG() };
+				{ name: sanitize(this.design.title) + ".png", content: () => this.bp.toPNG() };
 		}
 		public get workspaceFile(): FileFactory {
 			return !core.designs.length ?
@@ -114,7 +113,7 @@
 			return navigator.clipboard && 'write' in navigator.clipboard;
 		}
 		public copyPNG(): void {
-			bp.copyPNG();
+			this.bp.copyPNG();
 			gtag('event', 'share', { method: 'copy', content_type: 'image' });
 		}
 
@@ -143,7 +142,7 @@
 				let buffer = await readFile(file);
 				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
 				if(test == "{") { // JSON
-					core.addDesign(bp.load(bufferToText(buffer)));
+					core.addDesign(this.bp.load(bufferToText(buffer)));
 				} else if(test == "P") { // PKZip
 					await this.openWorkspace(buffer);
 				} else throw 1;
@@ -159,7 +158,7 @@
 			for(let f of files) {
 				try {
 					let data = await zip.file(f).async("text");
-					core.addDesign(bp.load(data));
+					core.addDesign(this.bp.load(data));
 				} catch(e) {
 					debugger;
 					await core.alert(this.$t('message.invalidFormat', [f]));
@@ -169,7 +168,7 @@
 
 		protected print() {
 			if(!core.design) return;
-			bp.onBeforePrint();
+			this.bp.onBeforePrint();
 			setTimeout(window.print, 500);
 			gtag('event', 'print', {});
 		}

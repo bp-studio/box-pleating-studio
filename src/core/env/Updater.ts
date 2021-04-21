@@ -23,7 +23,7 @@ class Updater extends Animator {
 		}
 
 		await PaperWorker.$done();
-		this._studio.$display.$project.view.update();
+		this._studio.$display.$update();
 
 		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 

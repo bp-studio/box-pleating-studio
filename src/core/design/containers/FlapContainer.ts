@@ -27,8 +27,7 @@
 		this.forEach(f => f.$selected = true);
 	}
 
-	/** @exports */
-	public toVertex(flaps: Flap[]) {
+	public $toVertex(flaps: Flap[]) {
 		this._design.$TreeSheet.$clearSelection();
 		for(let f of flaps) {
 			let v = this._design.vertices.get(f.node)

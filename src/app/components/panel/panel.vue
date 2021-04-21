@@ -7,8 +7,8 @@
 		v-on:contextmenu.stop="onContextMenu($event)"
 	>
 		<template v-if="design">
-			<design v-if="selections.length==0" :key="design.sheet.guid"></design>
-			<div v-else-if="selections.length==1" :key="selection.guid">
+			<design v-if="selections.length==0" :key="bp.guid(design.sheet)"></design>
+			<div v-else-if="selections.length==1" :key="bp.guid(selection)">
 				<repository v-if="repository" :repository="repository"></repository>
 				<component v-else :is="type.toLowerCase()"></component>
 			</div>
@@ -23,16 +23,15 @@
 <script lang="ts">
 	import { Component, Watch, Prop } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
-	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 
 	@Component
 	export default class Panel extends BaseComponent {
 		@Prop(Boolean) public show: boolean;
 
-		public get repository() { return core.initialized && bp.getRepository(this.selection); }
+		public get repository() { return core.initialized && this.bp.getRepository(this.selection); }
 
-		public get type() { return core.initialized && bp.getType(this.selection); }
+		public get type() { return core.initialized && this.bp.getType(this.selection); }
 
 		// 確保 GC
 		@Watch("repository") repo() { }

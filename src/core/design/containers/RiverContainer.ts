@@ -8,8 +8,7 @@
 		);
 	}
 
-	/** @exports */
-	public toEdge(river: River) {
+	public $toEdge(river: River) {
 		this._design.$TreeSheet.$clearSelection();
 		let e = this._design.edges.get(river.edge);
 		if(e) e.$selected = true;

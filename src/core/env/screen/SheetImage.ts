@@ -6,20 +6,16 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class SheetImage {
+abstract class SheetImage extends Viewport {
 
 	private readonly _MARGIN = 30;
 
-	private readonly _studio: Studio;
-	private readonly _viewport: Viewport;
-
-	constructor(studio: Studio, viewport: Viewport) {
-		this._studio = studio;
-		this._viewport = viewport;
+	protected get _design(): Design | null {
+		return this._studio.$design;
 	}
 
-	private get _design(): Design | null {
-		return this._studio.$design;
+	constructor(studio: Studio) {
+		super(studio)
 	}
 
 	@shrewd public get $scale() {
@@ -31,32 +27,32 @@
 		}
 	}
 
+	/** 輸出圖像的高度 */
+	@shrewd protected get _imgHeight(): number {
+		return (this._design?.sheet?.height ?? 0) * this.$scale + this._MARGIN * 2;
+	}
+
+	/** 輸出圖像的寬度 */
+	@shrewd protected get _imgWidth(): number {
+		return (this._design?.sheet?.width ?? 0) * this.$scale + this._horMargin * 2;
+	}
+
+	protected _getPadding(scroll: IPoint): IPoint {
+		return {
+			x: (scroll.x - this._imgWidth) / 2 + this._horMargin,
+			y: (scroll.y + this._imgHeight) / 2 - this._MARGIN
+		};
+	}
+
 	/** 因為文字標籤而產生的實際水平邊距 */
 	@shrewd private get _horMargin(): number {
 		return Math.max((this._design?.sheet.$margin ?? 0) + 10, this._MARGIN);
 	};
 
-	/** 輸出圖像的寬度 */
-	@shrewd public get $width(): number {
-		return (this._design?.sheet?.width ?? 0) * this.$scale + this._horMargin * 2;
-	}
-
-	/** 輸出圖像的高度 */
-	@shrewd public get $height(): number {
-		return (this._design?.sheet?.height ?? 0) * this.$scale + this._MARGIN * 2;
-	}
-
 	private _getAutoScale(sheet?: Sheet): number {
 		sheet = sheet || this._design?.sheet;
-		let ws = (this._viewport.$width - this._horMargin * 2) / (sheet?.width ?? 1);
-		let hs = (this._viewport.$height - this._MARGIN * 2) / (sheet?.height ?? 1);
+		let ws = (this._viewWidth - this._horMargin * 2) / (sheet?.width ?? 1);
+		let hs = (this._viewHeight - this._MARGIN * 2) / (sheet?.height ?? 1);
 		return Math.min(ws, hs);
-	}
-
-	public getPadding(scroll: IPoint): IPoint {
-		return {
-			x: (scroll.x - this.$width) / 2 + this._horMargin,
-			y: (scroll.y + this.$height) / 2 - this._MARGIN
-		};
 	}
 }

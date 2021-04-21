@@ -17,7 +17,6 @@
 	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
 	import { registerHotkey } from '../import/types';
-	import { bp } from '../import/BPStudio';
 
 	import { core } from '../core.vue';
 
@@ -30,10 +29,10 @@
 			registerHotkey(() => this.selectAll(), "a");
 		}
 
-		protected get canUndo() { return core.initialized && bp.canUndo(this.design); }
-		protected get canRedo() { return core.initialized && bp.canRedo(this.design); }
-		protected undo() { bp.undo(this.design); }
-		protected redo() { bp.redo(this.design); }
+		protected get canUndo() { return core.initialized && this.bp.canUndo(this.design); }
+		protected get canRedo() { return core.initialized && this.bp.canRedo(this.design); }
+		protected undo() { this.bp.undo(this.design); }
+		protected redo() { this.bp.redo(this.design); }
 
 		private selectAll() {
 			if(this.design) this.design.selectAll();

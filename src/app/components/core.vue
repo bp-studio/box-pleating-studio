@@ -14,6 +14,7 @@
 
 	import JSZip from 'jszip';
 
+	import CoreBase from './mixins/coreBase';
 	import Spinner from './gadget/spinner.vue';
 	import Confirm from './dialog/confirm.vue';
 	import Alert from './dialog/alert.vue';
@@ -28,7 +29,7 @@
 	export { core };
 
 	@Component
-	export default class Core extends Vue {
+	export default class Core extends CoreBase {
 		public designs: number[] = [];
 		public tabHistory: number[] = [];
 		public autoSave: boolean = true;
@@ -39,7 +40,6 @@
 
 		public libReady: Promise<void>;
 		public initReady: Promise<void>;
-		public initialized: boolean = false;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
 		private id: number = new Date().getTime();
@@ -188,17 +188,6 @@
 		}
 
 		public dropdown: any = null;
-
-		public get design() {
-			if(!this.initialized) return null;
-			let t = bp.design ? bp.design.title : null;
-			document.title = "Box Pleating Studio" + (t ? " - " + t : "");
-			return bp.design;
-		}
-		public get selections(): any {
-			if(!this.initialized) return [];
-			return bp.selection;
-		}
 
 		public create() {
 			let j = { title: this.$t('keyword.untitled') };

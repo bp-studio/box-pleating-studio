@@ -54,7 +54,6 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { bp } from '../import/BPStudio';
 	import { core } from '../core.vue';
 	import { readFile, bufferToText } from '../import/types';
 
@@ -72,7 +71,7 @@
 			let content = bufferToText(await readFile(f.files[0]));
 			let name = f.files[0].name;
 			try {
-				core.open(bp.TreeMaker.parse(name.replace(/\.tmd5$/i, ""), content));
+				core.open(this.bp.TreeMaker.parse(name.replace(/\.tmd5$/i, ""), content));
 			} catch(e) {
 				core.alert(this.$t(e.message, [name]));
 			}
