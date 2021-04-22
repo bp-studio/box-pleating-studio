@@ -2,10 +2,6 @@ if(typeof Shrewd != "object") throw new Error("BPStudio requires Shrewd.");
 
 const { shrewd } = Shrewd;
 
-/** 效能分析模式 */
-const perf = false;
-let perfTime: number = 0;
-
 /** 診斷模式 */
 const diagnose = false;
 

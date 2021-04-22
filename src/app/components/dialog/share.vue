@@ -93,7 +93,7 @@
 		private share() {
 			navigator.share({
 				title: "Box Pleating Studio",
-				text: this.$t("share.message", [this.design.title]),
+				text: this.$t("share.message", [this.design.title]).toString(),
 				url: this.url
 			}).catch(() => { }); // 捕捉取消之類的錯誤，不處理
 			gtag('event', 'share', { method: 'app', content_type: 'link' });
@@ -106,7 +106,7 @@
 				this.url = await response.text();
 				this.short = true;
 			} catch(e) {
-				this.error = this.$t('message.connFail');
+				this.error = this.$t('message.connFail').toString();
 				setTimeout(() => this.error = null, 3000);
 			}
 			this.sending = false;

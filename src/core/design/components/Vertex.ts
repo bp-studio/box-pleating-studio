@@ -68,7 +68,7 @@ interface JVertex extends IPoint {
 	}
 
 	protected $onDragged() {
-		if(this.$isNew) Draggable.$relocate(this, this.$design.flaps.get(this.$node)!);
+		if(this.$isNew) Draggable.$relocate(this, this.$design.$flaps.get(this.$node)!);
 	}
 
 	/** @exports */
@@ -76,7 +76,7 @@ interface JVertex extends IPoint {
 		// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
 		// 不然等一下讀取 design.vertices 會觸發新的 Vertex 的自動生成，
 		// 而那會比我設置 option 更早
-		let v = [...this.$design.vertices.values()];
+		let v = [...this.$design.$vertices.values()];
 
 		// 加入 TreeNode
 		let node = this.$node.$addLeaf(length);

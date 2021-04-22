@@ -53,7 +53,7 @@
 	protected $renderUnscaled() {
 		let x = this._control.$location.x, y = this._control.$location.y;
 		let lines = this._control.$node.edges.map(e => {
-			let edgeView = this._control.$sheet.$design.edges.get(e)!.$view;
+			let edgeView = this._control.$sheet.$design.$edges.get(e)!.$view;
 			edgeView.$draw();
 			return edgeView.line;
 		});

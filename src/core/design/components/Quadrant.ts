@@ -183,7 +183,7 @@ type CoveredInfo = [number, number, Point[]];
 		if(!find) return undefined;
 
 		let { joinQ, nextQ, mode } = find;
-		let { d1, d2 } = this.$design.tree.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
+		let { d1, d2 } = this.$design.$tree.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
 		let int = mode ? new Point(nextQ.x(d2), this.y(d1)) : new Point(this.x(d1), nextQ.y(d2));
 
 		// 傳回 delta 直線
@@ -226,7 +226,7 @@ type CoveredInfo = [number, number, Point[]];
 
 		let { joinQ, nextQ } = find;
 		let ok = this.$design.$junctions.get(this._flap, nextQ._flap)!.$status == JunctionStatus.tooFar;
-		let dist = this.$design.tree.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
+		let dist = this.$design.$tree.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
 
 		// 一般來說只有當 d > dist.d1 的時候有必要作導繪，
 		// 但是當 !ok 的時候整個情況會特別奇怪，因此額外開放。
@@ -255,7 +255,7 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	@shrewd public get $pattern(): Pattern | null {
-		let stretch = this.$design.stretches.$getByQuadrant(this);
+		let stretch = this.$design.$stretches.$getByQuadrant(this);
 		return stretch ? stretch.$pattern : null;
 	}
 
@@ -297,7 +297,7 @@ type CoveredInfo = [number, number, Point[]];
 
 	/** 將指定的 Junction 移動到指定的基準點上，取得覆蓋比較矩形 */
 	public $getBaseRectangle(j: Junction, base: TreeNode): Rectangle {
-		let distance = this.$design.tree.$dist(base, this._flap.node);
+		let distance = this.$design.$tree.$dist(base, this._flap.node);
 		let radius = this._flap.radius;
 		let shift = this.qv.$scale(new Fraction(distance - radius));
 		return new Rectangle(

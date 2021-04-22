@@ -1,5 +1,6 @@
 
-type StyleDeclaration = Record<string, any>;
+type StyleValue = number | string | number[];
+type StyleDeclaration = Record<string, StyleValue>;
 
 //////////////////////////////////////////////////////////////////
 // Style

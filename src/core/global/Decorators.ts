@@ -53,7 +53,7 @@ function segment(msg?: string): PropertyDecorator;
 function segment(target: object, prop: string | symbol): void;
 function segment(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
-	let option: Shrewd.IDecoratorOptions<any> = {
+	let option: Shrewd.IDecoratorOptions<PolyBool.Segments> = {
 		comparer: (ov: PolyBool.Segments, nv: PolyBool.Segments, member) => {
 			if(ov === nv) return true;
 			if(!ov != !nv) return false;

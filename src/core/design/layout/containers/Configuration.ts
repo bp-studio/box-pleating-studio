@@ -174,7 +174,7 @@ interface JConfiguration {
 	/** 取得 delta 點相對於特定 Gadget 的座標 */
 	private _getRelativeDelta(j1: JJunction, j2: JJunction, g: Gadget) {
 		let oriented = j1.c[0].e == j2.c[0].e;
-		let r = Partitioner.$getMaxIntersectionDistance(this.$design.tree, j1, j2, oriented);
+		let r = Partitioner.$getMaxIntersectionDistance(this.$design.$tree, j1, j2, oriented);
 		if(j2.ox > j1.ox) [j1, j2] = [j2, j1];
 		let p: IPoint = { x: r - j2.ox, y: r - j1.oy };
 		if(!oriented) {

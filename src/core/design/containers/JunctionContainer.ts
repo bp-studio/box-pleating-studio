@@ -3,7 +3,7 @@
 
 	constructor(design: Design) {
 		super(
-			() => design.flaps.values(),
+			() => design.$flaps.values(),
 			(f1, f2) => new Junction(design.$LayoutSheet, f1, f2)
 		);
 	}

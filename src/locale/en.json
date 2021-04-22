@@ -169,6 +169,7 @@
 		"thank": "Thank you very much, {0}, for your kind donation!"
 	},
 	"message": {
+		"invalidLink": "Unexpected error occurred upon opening the project link; the data might be corrupted.",
 		"invalidFormat": "File \"{0}\" is of invalid format.",
 		"downloadHint": "Right-click and use \"Save As\" to choose file location.",
 		"min3vertex": "The tree needs to have at least 3 vertices.",

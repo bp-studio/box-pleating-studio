@@ -23,7 +23,7 @@ interface PerQuadrant<T> extends PerQuadrantBase<T> { }
 const quadrants: PerQuadrant<QuadrantDirection> = [0, 1, 2, 3];
 
 function MakePerQuadrant<T>(factory: (q: QuadrantDirection) => T): PerQuadrant<T> {
-	return quadrants.map(factory) as any;
+	return quadrants.map(factory) as unknown as PerQuadrant<T>;
 }
 
 function isQuadrant(direction: Direction): direction is QuadrantDirection {

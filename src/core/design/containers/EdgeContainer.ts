@@ -4,8 +4,8 @@
 	constructor(design: Design) {
 		super(
 			design,
-			() => design.tree.$edge.values(),
-			e => new Edge(design.$TreeSheet, design.vertices.get(e.n1)!, design.vertices.get(e.n2)!, e)
+			() => design.$tree.$edge.values(),
+			e => new Edge(design.$TreeSheet, design.$vertices.get(e.n1)!, design.$vertices.get(e.n2)!, e)
 		);
 	}
 
@@ -13,7 +13,7 @@
 	 * 把 `this.edges.toJSON()` 產出的 `JEdge[]` 做一個排序，
 	 * 使得從第一條邊開始逐一加入邊都能維持連通性，且 parent 的方向正確。
 	 */
-	public sort(): JEdge[] {
+	public $sort(): JEdge[] {
 		let edges = this.toJSON();
 		let nodes = new Set<number>();
 		let result: JEdge[] = [];
@@ -30,13 +30,13 @@
 
 	public $toRiver(edge: Edge) {
 		this._design.$LayoutSheet.$clearSelection();
-		let te = edge.edge;
-		if(te.isRiver) {
-			let r = this._design.rivers.get(te);
+		let te = edge.$edge;
+		if(te.$isRiver) {
+			let r = this._design.$rivers.get(te);
 			if(r) r.$selected = true;
 		} else {
 			let n = te.n1.$degree == 1 ? te.n1 : te.n2;
-			let f = this._design.flaps.get(n);
+			let f = this._design.$flaps.get(n);
 			if(f) f.$selected = true;
 		}
 		this._design.mode = "layout";

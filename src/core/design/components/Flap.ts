@@ -91,7 +91,7 @@ interface JFlap {
 			this.$isNew = false;
 		} else {
 			// 否則根據對應的頂點的位置來粗略估計初始化
-			Draggable.$relocate(design.vertices.get(this.node)!, this, true);
+			Draggable.$relocate(design.$vertices.get(this.node)!, this, true);
 		}
 
 		this.$quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
@@ -101,7 +101,7 @@ interface JFlap {
 	}
 
 	protected $onDragged() {
-		if(this.$isNew) Draggable.$relocate(this, this.$design.vertices.get(this.node)!);
+		if(this.$isNew) Draggable.$relocate(this, this.$design.$vertices.get(this.node)!);
 	}
 
 	protected get $shouldDispose(): boolean {

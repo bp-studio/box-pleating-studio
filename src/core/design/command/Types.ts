@@ -1,10 +1,8 @@
 
-interface ITagObject extends IDesignObject {
+interface ITagObject extends IDesignObject, Record<string, any> {
 
 	/** 用來唯一識別這個物件的字串 */
 	readonly $tag: string;
-
-	[key: string]: any;
 }
 
 interface IQueryable extends ITagObject {

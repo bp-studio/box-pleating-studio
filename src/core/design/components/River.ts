@@ -24,13 +24,14 @@
 	}
 
 	protected get $shouldDispose(): boolean {
-		return super.$shouldDispose || this.edge.$disposed || !this.edge.isRiver;
+		return super.$shouldDispose || this.edge.$disposed || !this.edge.$isRiver;
 	}
 
-	/** @exports */
-	public delete(): void {
+	public $delete(): boolean {
 		// 裡面有 action，因此這邊不用加上
-		this.$design.edges.get(this.edge)!.deleteAndMerge();
+		let edge = this.$design.$edges.get(this.edge);
+		if(!edge) return false;
+		return edge.deleteAndMerge();
 	}
 
 	/** @exports */

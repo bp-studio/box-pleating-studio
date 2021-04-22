@@ -2,7 +2,9 @@ import { Vue, Component } from 'vue-property-decorator';
 import * as bootstrap from 'bootstrap';
 import { registerHotkeyCore, unregisterHotkeyCore } from '../import/types';
 
-declare const core: any;
+import CoreBase from './coreBase';
+
+declare const core: CoreBase;
 
 @Component
 export default abstract class Dialog<T> extends Vue {

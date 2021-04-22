@@ -2,7 +2,7 @@
 	<div>
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
-		<note v-if="design&&design.stretches.patternNotFound"></note>
+		<note v-if="design&&bp.patternNotFound(design)"></note>
 		<language ref="language"></language>
 	</div>
 </template>
@@ -12,6 +12,7 @@
 	import { bp } from './import/BPStudio';
 	import { sanitize, callService } from './import/types';
 
+	import VueI18n from 'vue-i18n';
 	import JSZip from 'jszip';
 
 	import CoreBase from './mixins/coreBase';
@@ -38,7 +39,6 @@
 		public updated: boolean = false;
 		public isTouch: boolean;
 
-		public libReady: Promise<void>;
 		public initReady: Promise<void>;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
@@ -73,8 +73,9 @@
 
 		public async init() {
 			bp.option.onDeprecate = (title: string) => {
-				title = title || this.$t("keyword.untitled");
-				this.alert(this.$t("message.oldVersion", [title]));
+				let t = title || this.$t("keyword.untitled");
+				let message = this.$t("message.oldVersion", [t])
+				this.alert(message);
 			};
 
 			let settings = JSON.parse(localStorage.getItem("settings"));
@@ -100,7 +101,11 @@
 			let url = new URL(location.href);
 			let lz = url.searchParams.get("project"), json: any;
 			if(lz) {
-				try { json = JSON.parse(LZ.decompress(lz)); } catch(e) { }
+				try {
+					json = JSON.parse(LZ.decompress(lz));
+				} catch(e) {
+					await this.alert(this.$t('message.invalidLink'));
+				}
 			}
 			if(lz != sessionStorage.getItem("project") && json) {
 				// 寫入 sessionStorage 的值不會因為頁籤 reload 而遺失，
@@ -296,11 +301,11 @@
 			return URL.createObjectURL(blob);
 		}
 
-		public async alert(message: string): Promise<void> {
-			await (this.$refs.alert as Alert).show(message);
+		public async alert(message: VueI18n.TranslateResult): Promise<void> {
+			await (this.$refs.alert as Alert).show(message.toString());
 		}
-		public async confirm(message: string): Promise<boolean> {
-			return await (this.$refs.confirm as Confirm).show(message);
+		public async confirm(message: VueI18n.TranslateResult): Promise<boolean> {
+			return await (this.$refs.confirm as Confirm).show(message.toString());
 		}
 	}
 </script>

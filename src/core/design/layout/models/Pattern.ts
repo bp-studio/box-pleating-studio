@@ -129,7 +129,7 @@ type GPattern = JPattern<Gadget>;
 
 	/** 根據指定的 JConnection 資料求出連接目標點的實體 */
 	public $getConnectionTarget(c: JConnection): Point {
-		if(c.e >= 0) return this.$design.flaps.$byId.get(c.e)!.$points[c.q];
+		if(c.e >= 0) return this.$design.$flaps.$byId.get(c.e)!.$points[c.q];
 		else {
 			let [i, j] = this.$configuration.$overlapMap.get(c.e)!
 			return this.$devices[i].$anchors[j][c.q];

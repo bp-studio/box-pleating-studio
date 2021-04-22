@@ -21,11 +21,10 @@ namespace TreeMaker {
 			this._lines = data.split('\n').values();
 		}
 
-		// 必須指定型態為 any，否則 TypeScript 不知道每次抓出來的結果不一樣
-		public get $next(): any { return (this._lines.next().value as string).trim(); }
-		public get $int() { return parseInt(this.$next); }
-		public get $float() { return parseFloat(this.$next); }
-		public get $bool() { return this.$next == "true"; }
+		public $next() { return (this._lines.next().value as string).trim(); }
+		public get $int() { return parseInt(this.$next()); }
+		public get $float() { return parseFloat(this.$next()); }
+		public get $bool() { return this.$next() == "true"; }
 
 		public $skip(n: number) { for(let i = 0; i < n; i++) this._lines.next(); }
 		public $skipArray() { this.$skip(this.$int); }
@@ -39,7 +38,7 @@ namespace TreeMaker {
 		constructor(v: TreeMakerVisitor) {
 			this._visitor = v;
 
-			if(v.$next != "tree" || v.$next != "5.0") throw "plugin.TreeMaker.not5";
+			if(v.$next() != "tree" || v.$next() != "5.0") throw "plugin.TreeMaker.not5";
 			let width = v.$float, height = v.$float;
 			let scale = 1 / v.$float;
 
@@ -77,10 +76,10 @@ namespace TreeMaker {
 
 		private _parseNode() {
 			let v = this._visitor;
-			if(v.$next != "node") throw new Error();
+			if(v.$next() != "node") throw new Error();
 			let vertex: JVertex = {
 				id: v.$int,
-				name: v.$next,
+				name: v.$next(),
 				x: v.$float,
 				y: v.$float,
 			};
@@ -101,12 +100,12 @@ namespace TreeMaker {
 			v.$skipArray();
 			v.$skipArray();
 			v.$skipArray();
-			if(v.$next == "1") v.$next;
+			if(v.$next() == "1") v.$next;
 		}
 
 		private _parseEdge() {
 			let v = this._visitor;
-			if(v.$next != "edge") throw new Error();
+			if(v.$next() != "edge") throw new Error();
 			v.$skip(2);
 			let length = v.$float;
 			this._set.add(Number(Fraction.$toFraction(length, 1, 0, 0.1).$denominator));

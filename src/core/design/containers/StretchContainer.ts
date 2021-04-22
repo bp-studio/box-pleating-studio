@@ -52,8 +52,7 @@
 		return result;
 	}
 
-	/** @exports */
-	@shrewd public get patternNotFound() {
+	@shrewd public get $patternNotFound() {
 		return [...this.values()].some(s => s.$isTotallyValid && s.$pattern == null);
 	}
 }

@@ -41,11 +41,11 @@
 		let inner: ClosureView[] = [];
 		let design = this.$design;
 		for(let e of adjacent) {
-			if(e.isRiver) {
-				let r = design.rivers.get(e)!;
+			if(e.$isRiver) {
+				let r = design.$rivers.get(e)!;
 				inner.push(r.$view);
 			} else {
-				let f = design.flaps.get(e.n1.$degree == 1 ? e.n1 : e.n2)!;
+				let f = design.$flaps.get(e.n1.$degree == 1 ? e.n1 : e.n2)!;
 				inner.push(f.$view);
 			}
 		}
@@ -161,7 +161,7 @@
 
 	@shrewd private _renderRidge() {
 		// 建立相依性
-		let oa = this._control.$sheet.$design.stretches.$openAnchors;
+		let oa = this._control.$sheet.$design.$stretches.$openAnchors;
 
 		// 如果同一回合裡面 draw() 沒有真的被執行（即沒有發生形狀的改變），那就跳過後面的動作
 		this.$draw();

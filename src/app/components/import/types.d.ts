@@ -1,9 +1,12 @@
+import VueI18n from 'vue-i18n';
+
 declare module 'vue-property-decorator' {
 	interface Vue {
-		$t(path: string, data?: any): string;
 		_uid: string;
 	}
 }
+
+export declare const i18n: VueI18n;
 
 export interface FileFactory {
 	name: string;

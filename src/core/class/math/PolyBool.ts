@@ -53,14 +53,16 @@ namespace PolyBool {
 		inverted2: boolean;
 	}
 
+	interface Fill {
+		above: boolean | null;
+		below: boolean | null;
+	}
+
 	interface Segment {
 		start: Point;
 		end: Point;
-		myFill: {
-			above: any;
-			below: any;
-		};
-		otherFill: any
+		myFill: Fill;
+		otherFill: Fill | null;
 	}
 
 	type compare = 0 | 1 | -1;
@@ -115,7 +117,7 @@ namespace PolyBool {
 	}
 
 	interface Node {
-		remove?: any;
+		remove?: Function;
 	}
 
 	interface Event extends Node {
@@ -123,8 +125,8 @@ namespace PolyBool {
 		pt: Point
 		seg: Segment;
 		primary: boolean;
-		other: Event;
-		status: any;
+		other: Event | null;
+		status: Status | null;
 	}
 
 	interface Status extends Node {
@@ -195,7 +197,7 @@ namespace PolyBool {
 				if(here === ev) return 0;
 				var comp = eventCompare(
 					ev.isStart, ev.pt, other_pt,
-					here.isStart, here.pt, here.other.pt
+					here.isStart, here.pt, here.other!.pt
 				);
 				return comp;
 			});
@@ -207,7 +209,7 @@ namespace PolyBool {
 				pt: seg.start,
 				seg: seg,
 				primary: primary,
-				other: null as any,
+				other: null,
 				status: null
 			});
 			eventAdd(ev_start, seg.end);
@@ -238,10 +240,10 @@ namespace PolyBool {
 			//   (start)------------(end)    to:
 			//   (start)---(end)
 
-			ev.other.remove();
+			ev.other!.remove!();
 			ev.seg.end = end;
-			ev.other.pt = end;
-			eventAdd(ev.other, ev.pt);
+			ev.other!.pt = end;
+			eventAdd(ev.other!, ev.pt);
 		}
 
 		function eventDivide(ev: Event, pt: Point) {
@@ -432,8 +434,8 @@ namespace PolyBool {
 							eve.seg.otherFill = ev.seg.myFill;
 						}
 
-						ev.other.remove();
-						ev.remove();
+						ev.other!.remove!();
+						ev.remove!();
 					}
 
 					if(event_list.getHead() !== ev) {
@@ -487,7 +489,7 @@ namespace PolyBool {
 							else { // otherwise, something is below us
 								// so copy the below segment's other polygon's above
 								if(ev.primary === below.primary)
-									inside = below.seg.otherFill.above;
+									inside = below.seg.otherFill!.above;
 								else
 									inside = below.seg.myFill.above;
 							}
@@ -499,7 +501,7 @@ namespace PolyBool {
 					}
 
 					// insert the status and remember it for later removal
-					ev.other.status = surrounding.insert(List.node<Status>({ ev: ev }));
+					ev.other!.status = surrounding.insert(List.node<Status>({ ev: ev }));
 				}
 				else {
 					var st = ev.status;
@@ -518,21 +520,21 @@ namespace PolyBool {
 					}
 
 					// remove the status
-					st.remove();
+					st.remove!();
 
 					// if we've reached this point, we've calculated everything there is to know, so
 					// save the segment for reporting
 					if(!ev.primary) {
 						// make sure `seg.myFill` actually points to the primary polygon though
 						var s = ev.seg.myFill;
-						ev.seg.myFill = ev.seg.otherFill;
+						ev.seg.myFill = ev.seg.otherFill!;
 						ev.seg.otherFill = s;
 					}
 					segments.push(ev.seg);
 				}
 
 				// remove the event and continue
-				event_list.getHead().remove();
+				event_list.getHead().remove!();
 			}
 
 			return segments;
@@ -885,17 +887,17 @@ namespace PolyBool {
 				matches_head: false,
 				matches_pt1: false
 			};
-			var next_match = first_match;
+			var next_match: Match | null = first_match;
 			function setMatch(index: number, matches_head: boolean, matches_pt1: boolean) {
 				// return true if we've matched twice
-				next_match.index = index;
-				next_match.matches_head = matches_head;
-				next_match.matches_pt1 = matches_pt1;
+				next_match!.index = index;
+				next_match!.matches_head = matches_head;
+				next_match!.matches_pt1 = matches_pt1;
 				if(next_match === first_match) {
 					next_match = second_match;
 					return false;
 				}
-				next_match = null as any;
+				next_match = null;
 				return true; // we've matched twice, we're done here
 			}
 			for(var i = 0; i < chains.length; i++) {
@@ -1071,8 +1073,8 @@ namespace PolyBool {
 	}
 
 	namespace List {
-		function bisect(compare: any) {
-			return function right(a: any, x: any, lo?: number, hi?: number): number {
+		function bisect<T>(compare: (a: T, b: T) => number) {
+			return function right(a: T[], x: T, lo?: number, hi?: number): number {
 				if(!lo) lo = 0;
 				if(!hi) hi = a.length;
 				while(lo! < hi!) {
@@ -1107,7 +1109,7 @@ namespace PolyBool {
 					return {
 						before: i === 0 ? null : my.nodes[i - 1],
 						after: my.nodes[i] || null,
-						insert: function(node: T) {
+						insert: function(node: T): T {
 							my.nodes.splice(i, 0, node);
 							node.remove = function() { my.nodes.splice(my.nodes.indexOf(node), 1); };
 							return node;

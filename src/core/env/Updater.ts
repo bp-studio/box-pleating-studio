@@ -14,8 +14,6 @@ class Updater extends Animator {
 		if(this.$updating) return;
 		this.$updating = true;
 
-		//if(perf) perfTime = 0;
-
 		Shrewd.commit();
 		let design = this._studio.$design;
 		if(design && !design.$dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
@@ -24,8 +22,6 @@ class Updater extends Animator {
 
 		await PaperWorker.$done();
 		this._studio.$display.$update();
-
-		//if(perf && perfTime) console.log("Total time: " + perfTime + " ms");
 
 		let option = this._studio.$option;
 		if(option.onUpdate) {

@@ -67,12 +67,12 @@ class EditCommand extends Command implements JEditCommand {
 	}
 
 	private _remove() {
-		let obj = this._design.$query(this.tag)!;
+		let obj = this._design.$query(this.tag);
 		if(obj instanceof Disposable) obj.$dispose.call(obj, [true]);
 	}
 
 	private _add() {
-		let tree = this._design.tree;
+		let tree = this._design.$tree;
 		if(this.tag.startsWith('e')) {
 			let m = this.memento as JEdge;
 			let n1 = tree.$getOrAddNode(m.n1), n2 = tree.$getOrAddNode(m.n2);

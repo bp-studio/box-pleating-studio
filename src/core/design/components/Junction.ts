@@ -78,7 +78,7 @@ type JunctionDimension = 'ox' | 'oy';
 
 	@shrewd private get _lca(): TreeNode {
 		this.$disposeEvent();
-		return this.$design.tree.lca(this.n1, this.n2);
+		return this.$design.$tree.lca(this.n1, this.n2);
 	}
 
 	private get n1() { return this.f1.node; }
@@ -93,7 +93,7 @@ type JunctionDimension = 'ox' | 'oy';
 	 */
 	private _findIntersection(j: Junction): TreeNode | null {
 		let a1 = this._lca, a2 = j._lca;
-		let tree = this.$design.tree;
+		let tree = this.$design.$tree;
 		if(a1 == a2) return a1;
 
 		if(a1.$depth > a2.$depth) {

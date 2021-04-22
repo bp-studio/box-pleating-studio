@@ -5,7 +5,7 @@
 			<number :label="$t('panel.river.width')" v-model.number="subject.length" :min="0"></number>
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" @click="subject.delete()" v-t="'keyword.delete'"></button>
+			<button class="btn btn-primary" @click="bp.delete(subject)" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
 			<button class="btn btn-primary" @click="bp.goToDual(subject)" v-t="'panel.river.goto'"></button>

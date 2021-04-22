@@ -24,7 +24,7 @@ interface JEdge {
 	}
 
 	public $dispose(force: boolean = false) {
-		if(force) this.$design.tree.$edge.delete(this.n1, this.n2);
+		if(force) this.$design.$tree.$edge.delete(this.n1, this.n2);
 		super.$dispose();
 	}
 
@@ -46,13 +46,13 @@ interface JEdge {
 		return super.$shouldDispose || this.n1.$disposed || this.n2.$disposed;
 	}
 
-	public delete() {
-		if(this.n1.$degree == 1) this.n1.$dispose();
-		if(this.n2.$degree == 1) this.n2.$dispose();
+	public $delete(): boolean {
+		let n = [this.n1, this.n2].find(n => n.$degree == 1);
+		if(n) { n.$dispose(); return true; }
+		return false;
 	}
 
-	/** @exports */
-	@shrewd public get isRiver() {
+	@shrewd public get $isRiver() {
 		this.$disposeEvent();
 		return this.n1.$degree > 1 && this.n2.$degree > 1;
 	}
@@ -133,7 +133,7 @@ interface JEdge {
 	/** 決定這條邊的環繞側 */
 	@shrewd public get $wrapSide(): number {
 		this.$disposeEvent();
-		if(!this.isRiver) return 0; // 只有河需要考慮這個問題
+		if(!this.$isRiver) return 0; // 只有河需要考慮這個問題
 
 		// 先看最長路徑，取較短一側
 		if(this.p1 > this.p2) return 2;

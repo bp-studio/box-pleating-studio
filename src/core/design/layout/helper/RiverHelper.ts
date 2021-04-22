@@ -16,8 +16,8 @@
 	protected readonly _view: RiverView;
 
 	constructor(view: RiverView, ids: number[]) {
-		super(view, view.$design.flaps.$byId.get(ids[0])!);
-		this._node = view.$design.tree.$node.get(ids[1])!;
+		super(view, view.$design.$flaps.$byId.get(ids[0])!);
+		this._node = view.$design.$tree.$node.get(ids[1])!;
 		this._key = ids[0] + "," + ids[1];
 	}
 
@@ -34,7 +34,7 @@
 	@shrewd public get $distance(): number {
 		this.$disposeEvent();
 		let { $design, $info } = this._view, flap = this.$flap;
-		let dis = $design.tree.$dist(flap.node, this._node);
+		let dis = $design.$tree.$dist(flap.node, this._node);
 		return dis - flap.radius + $info.length;
 	}
 

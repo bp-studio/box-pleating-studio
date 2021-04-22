@@ -1,5 +1,5 @@
 
-type Memento = [string, any];
+type Memento = [string, object];
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -13,7 +13,7 @@ class OptionManager {
 	 * 當專案載入進來的時候暫存個別元件屬性的 `Map`，
 	 * 當元件被反應框架自動生成的時候會去這裡面尋找對應的設定值來自我初始化。
 	 */
-	private readonly _options: Map<string, any> = new Map();
+	private readonly _options: Map<string, object> = new Map();
 
 	constructor(design: JDesign) {
 		for(let n of design.tree.nodes) this.set("v" + n.id, n);
@@ -26,11 +26,11 @@ class OptionManager {
 	 *
 	 * 一旦被取出，對應的資料就會同時消滅。
 	 */
-	public get<T>(target: ITagObject & ISerializable<T>): T | undefined {
+	public get<T extends object>(target: ITagObject & ISerializable<T>): T | undefined {
 		let tag = target.$tag;
 		let option = this._options.get(tag);
 		this._options.delete(tag);
-		return option;
+		return option as T;
 	}
 
 	/**

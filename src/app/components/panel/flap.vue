@@ -10,8 +10,8 @@
 		<div class="mt-3">
 			<button
 				class="btn btn-primary"
-				v-if="!design.tree.isMinimal"
-				@click="design.flaps.delete([subject])"
+				v-if="!bp.isMinimal(design)"
+				@click="bp.delete([subject])"
 				v-t="'keyword.delete'"
 			>Delete</button>
 		</div>

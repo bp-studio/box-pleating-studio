@@ -26,8 +26,7 @@
 		Shrewd.terminate(this.$edge);
 	}
 
-	/** @exports */
-	public get isMinimal(): boolean {
+	public get $isMinimal(): boolean {
 		return this.$node.size <= 3;
 	}
 

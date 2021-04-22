@@ -3,9 +3,13 @@
 // Enums
 //////////////////////////////////////////////////////////////////
 
+type Enum<E> = Record<keyof E, number | string> & { [k: number]: string };
+
 namespace Enum {
-	export function values(e: any) {
-		return Object.values<number>(e).filter(a => !isNaN(Number(a)));
+	export function values<E extends Enum<E>>(e: E): (E[keyof E])[] {
+		return Object
+			.values<number>(e as Record<string, number>)
+			.filter(a => !isNaN(Number(a))) as (E[keyof E])[];
 	}
 }
 

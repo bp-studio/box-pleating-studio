@@ -44,6 +44,21 @@ class BPStudio {
 
 
 	//////////////////////////////////////////////////////////////////
+	// Design 性質
+	//////////////////////////////////////////////////////////////////
+
+	public patternNotFound(design: any):boolean {
+		if(design instanceof Design) return design.$stretches.$patternNotFound;
+		return false;
+	}
+
+	public isMinimal(design:any):boolean {
+		if(design instanceof Design) return design.$tree.$isMinimal;
+		return false;
+	}
+
+
+	//////////////////////////////////////////////////////////////////
 	// UI 方法
 	//////////////////////////////////////////////////////////////////
 
@@ -55,7 +70,7 @@ class BPStudio {
 	public get isDragging(): boolean { return this._studio.$system.$drag.$on; }
 	public dragByKey(key: any): void {
 		if(typeof key != 'string') return;
-		this._studio.$system.$drag.processKey(key);
+		this._studio.$system.$drag.$processKey(key);
 	}
 
 
@@ -82,23 +97,34 @@ class BPStudio {
 		if(!design) return;
 
 		if(Array.isArray(subject)) {
-			let sample = subject[0];
-			if(sample instanceof Vertex) design.vertices.$toFlap(subject);
-			if(sample instanceof Flap) design.flaps.$toVertex(subject);
+			if(isTypedArray(subject, Vertex)) design.$vertices.$toFlap(subject);
+			if(isTypedArray(subject, Flap)) design.$flaps.$toVertex(subject);
 		} else {
-			if(subject instanceof Edge) design.edges.$toRiver(subject);
-			if(subject instanceof River) design.rivers.$toEdge(subject);
+			if(subject instanceof Edge) design.$edges.$toRiver(subject);
+			if(subject instanceof River) design.$rivers.$toEdge(subject);
 		}
+	}
+
+	/** 刪除一個指定的物件，並傳回成功與否 */
+	public delete(subject: any): boolean {
+		let design = this._studio.$design;
+		if(!design) return false;
+
+		if(Array.isArray(subject)) {
+			if(isTypedArray(subject, Vertex)) return design.$vertices.$delete(subject);
+			if(isTypedArray(subject, Flap)) return design.$flaps.$delete(subject);
+		} else {
+			if(subject instanceof Edge) return subject.$edge.$delete();
+			if(subject instanceof River) return subject.$delete();
+		}
+		return false;
 	}
 
 	/** 替物件產生 GUID 並且傳回 */
 	public guid(object: any): string {
 		if(typeof object != 'object') return "";
-		let id = this._guid.get(object);
-		if(!id) this._guid.set(object, id = MathUtil.$guid());
-		return id;
+		return MathUtil.$guid(object);
 	}
-	private _guid: WeakMap<object, string> = new WeakMap();
 
 	//////////////////////////////////////////////////////////////////
 	// 專案管理

@@ -40,7 +40,7 @@ interface StudioOptions {
 	}
 
 	public $load(json: string | object): Design {
-		if(typeof json == "string") json = JSON.parse(json);
+		if(typeof json == "string") json = JSON.parse(json) as object;
 		return this._tryLoad(Migration.$process(json, this.$option.onDeprecate));
 	}
 

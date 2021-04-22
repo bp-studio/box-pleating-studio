@@ -4,8 +4,8 @@
 		<div v-if="subject.some(s=>s.degree==1)">
 			<button
 				class="btn btn-primary"
-				v-if="design.vertices.size>3"
-				@click="design.vertices.delete(subject)"
+				v-if="!bp.isMinimal(design)"
+				@click="bp.delete(subject)"
 				v-t="'keyword.delete'"
 			></button>
 			<span v-else v-t="'message.min3vertex'"></span>

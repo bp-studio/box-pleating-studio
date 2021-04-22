@@ -43,7 +43,7 @@ class Joiner {
 		this.cw = o1.ox > o2.ox;
 		this.q = this.$oriented ? 0 : 2;
 		[this.q1, this.q2] = this.$oriented ? (this.cw ? [2, 1] : [1, 2]) : (this.cw ? [0, 3] : [3, 0]);
-		this.$intDist = Partitioner.$getMaxIntersectionDistance(repo.$sheet.$design.tree, j1, j2, this.$oriented);
+		this.$intDist = Partitioner.$getMaxIntersectionDistance(repo.$sheet.$design.$tree, j1, j2, this.$oriented);
 
 		// 計算 Overlap 偏移
 		[this.s1, this.s2] = this.$oriented ?

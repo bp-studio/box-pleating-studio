@@ -27,24 +27,27 @@ namespace Migration {
 		};
 	}
 
-	export function $process(design: any, onDeprecated?: (title: string) => void): JDesign {
+	export function $process(design: Record<string, any>, onDeprecated?: (title: string) => void): JDesign {
+
 		let deprecate = false;
 
 		// beta 版把原本的 cp 模式改名為 layout 模式，以預留 cp 模式給未來使用
 		// 同時從 beta 版開始加上檔案版本代碼
 		if(!('version' in design)) {
 			if(design.mode == "cp") design.mode = "layout";
-			design.layout = design.cp;
-			delete design.cp;
+			if(design.cp) {
+				design.layout = design.cp;
+				delete design.cp;
+				if('stretches' in design.layout) delete design.layout.stretches;
+			}
 			design.version = "beta";
-			delete design.layout.stretches;
 			deprecate = true;
 		}
 
 		// 從 rc0 版本開始要求 intersection 都必須加上 e
 		if(design.version == "beta") {
 			design.version = "rc0";
-			let st = design.layout.stretches as JStretch[];
+			let st = design.layout?.stretches as JStretch[];
 			if(st) for(let s of st.concat()) {
 				let cf: any = s.configuration;
 				if(cf && (!cf.overlaps || cf.overlaps.some((o: any) =>
@@ -59,7 +62,7 @@ namespace Migration {
 		// rc1 版本中在資料結構上插入了 partition 和 device 的層次
 		if(design.version == "rc0") {
 			design.version = "rc1";
-			let st = design.layout.stretches;
+			let st = design.layout?.stretches;
 			if(st) for(let s of st.concat()) {
 				let cf = s.configuration;
 				if(cf) {
@@ -98,7 +101,7 @@ namespace Migration {
 		if(design.version == "0") design.version = "0.4";
 
 		if(deprecate && onDeprecated) onDeprecated(design.title);
-		return design;
+		return design as JDesign;
 	}
 
 	function toPartition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {

@@ -10,8 +10,6 @@
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 
-	declare const isMac: boolean;
-
 	@Component
 	export default class Uploader extends Vue {
 

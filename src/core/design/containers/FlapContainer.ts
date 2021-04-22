@@ -4,7 +4,7 @@
 	constructor(design: Design) {
 		super(
 			design,
-			() => design.tree.$leaf,
+			() => design.$tree.$leaf,
 			l => new Flap(design.$LayoutSheet, l)
 		);
 	}
@@ -15,12 +15,14 @@
 		return result;
 	}
 
-	/** @exports */
-	public delete(flaps: readonly Flap[]) {
+	public $delete(flaps: readonly Flap[]): boolean {
+		let success = false;
 		for(let f of flaps) {
-			if(this._design.vertices.size == 3) break;
+			if(this._design.$vertices.size == 3) break;
 			f.node.$delete();
+			success = true;
 		}
+		return success;
 	}
 
 	public $selectAll() {
@@ -30,7 +32,7 @@
 	public $toVertex(flaps: Flap[]) {
 		this._design.$TreeSheet.$clearSelection();
 		for(let f of flaps) {
-			let v = this._design.vertices.get(f.node)
+			let v = this._design.$vertices.get(f.node)
 			if(v) v.$selected = true;
 		}
 		this._design.mode = "tree";

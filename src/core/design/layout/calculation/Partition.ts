@@ -76,7 +76,7 @@ interface JPartition {
 	@shrewd private get _sideConnectionTarget(): ReadonlyMap<JCorner, [Point, Point]> {
 		this.$disposeEvent();
 		let result = new Map<JCorner, [Point, Point]>();
-		let flaps = this.$configuration.$sheet.$design.flaps.$byId;
+		let flaps = this.$configuration.$sheet.$design.$flaps.$byId;
 		for(let [c, o, q1] of this.$intersectionCorners) {
 			let ov = this.$overlaps[o];
 
@@ -97,7 +97,7 @@ interface JPartition {
 			// 這邊必須透過一連串額外的計算決定究竟 overlap 要設定在什麼距離之上
 			if(c.type == CornerType.$intersection) {
 				let oriented = ov.c[0].e! < 0;
-				let tree = this.$configuration.$sheet.$design.tree;
+				let tree = this.$configuration.$sheet.$design.$tree;
 				let n3 = tree.$node.get(c.e!)!; // 自從 rc0 版開始，規定此時 c.e 必須填上 f3 的 id
 				let t = tree.$distTriple(f1.node, f2.node, n3);
 				if(oriented) d2 = t.d2 - f2.radius;
@@ -166,7 +166,7 @@ interface JPartition {
 		};
 
 		// 如果啟用 jid（亦即此時為存檔中）則進行修改
-		let tree = this.$configuration.$design.tree;
+		let tree = this.$configuration.$design.$tree;
 		if(tree.$jid) {
 			result.overlaps = clone(result.overlaps);
 			for(let o of result.overlaps) {

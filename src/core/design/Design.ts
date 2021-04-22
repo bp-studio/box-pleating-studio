@@ -51,11 +51,8 @@ interface IDesignObject {
 	public readonly id: number = Design._id++;
 
 	public readonly $LayoutSheet: Sheet;
-
 	public readonly $TreeSheet: Sheet;
-
-	/** @exports */
-	public readonly tree: Tree;
+	public readonly $tree: Tree;
 
 	/** 管理 Design 的編輯歷史 */
 	public readonly $history: HistoryManager;
@@ -69,14 +66,14 @@ interface IDesignObject {
 		this.$options = new OptionManager(data);
 
 		this.$LayoutSheet = new Sheet(this, "layout", data.layout.sheet,
-			() => this.flaps.values(),
-			() => this.rivers.values(),
-			() => this.stretches.values(),
-			() => this.stretches.$devices,
+			() => this.$flaps.values(),
+			() => this.$rivers.values(),
+			() => this.$stretches.values(),
+			() => this.$stretches.$devices,
 		);
 		this.$TreeSheet = new Sheet(this, "tree", data.tree.sheet,
-			() => this.edges.values(),
-			() => this.vertices.values()
+			() => this.$edges.values(),
+			() => this.$vertices.values()
 		);
 
 		this.title = data.title;;
@@ -86,7 +83,7 @@ interface IDesignObject {
 		this.$history = new HistoryManager(this, data.history);
 
 		// Tree 相依於 HistoryManager
-		this.tree = new Tree(this, data.tree.edges);
+		this.$tree = new Tree(this, data.tree.edges);
 
 		// Junctions 相依於 Tree
 		this.$junctions = new JunctionContainer(this);
@@ -95,11 +92,11 @@ interface IDesignObject {
 	public readonly $tag = "design";
 
 	protected $onDispose(): void {
-		this.edges.$dispose();
-		this.vertices.$dispose();
-		this.rivers.$dispose();
-		this.flaps.$dispose();
-		this.stretches.$dispose();
+		this.$edges.$dispose();
+		this.$vertices.$dispose();
+		this.$rivers.$dispose();
+		this.$flaps.$dispose();
+		this.$stretches.$dispose();
 		this.$junctions.$dispose();
 	}
 
@@ -117,21 +114,11 @@ interface IDesignObject {
 		return (this instanceof Design) && (this.$mountTarget as Studio).$design == this;
 	}
 
-	/** @exports */
-	public readonly edges = new EdgeContainer(this);
-
-	/** @exports */
-	public readonly rivers = new RiverContainer(this);
-
-	/** @exports */
-	public readonly vertices = new VertexContainer(this);
-
-	/** @exports */
-	public readonly flaps = new FlapContainer(this);
-
-	/** @exports */
-	public readonly stretches = new StretchContainer(this);
-
+	public readonly $vertices = new VertexContainer(this);
+	public readonly $edges = new EdgeContainer(this);
+	public readonly $rivers = new RiverContainer(this);
+	public readonly $flaps = new FlapContainer(this);
+	public readonly $stretches = new StretchContainer(this);
 	public readonly $junctions: JunctionContainer;
 
 	/** @exports */
@@ -149,27 +136,27 @@ interface IDesignObject {
 				mode: this.mode,
 				layout: {
 					sheet: this.$LayoutSheet.toJSON(session),
-					flaps: this.flaps.toJSON(),
-					stretches: this.stretches.toJSON()
+					flaps: this.$flaps.toJSON(),
+					stretches: this.$stretches.toJSON()
 				},
 				tree: {
 					sheet: this.$TreeSheet.toJSON(session),
-					nodes: this.vertices.toJSON(),
-					edges: this.edges.sort()
+					nodes: this.$vertices.toJSON(),
+					edges: this.$edges.$sort()
 				}
 			};
 			if(session) result.history = this.$history.toJSON();
 		};
 		if(session) action();
-		else this.tree.withJID(action);
+		else this.$tree.withJID(action);
 		return result;
 	}
 
 	/** @exports */
 	public selectAll() {
 		this.$studio?.$system.$selection.$clear();
-		if(this.mode == "layout") this.flaps.$selectAll();
-		if(this.mode == "tree") this.vertices.$selectAll();
+		if(this.mode == "layout") this.$flaps.$selectAll();
+		if(this.mode == "tree") this.$vertices.$selectAll();
 	}
 
 	/** 根據 tag 來找出唯一的對應物件 */
@@ -180,22 +167,22 @@ interface IDesignObject {
 		let m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
 		if(m) {
 			let init = m[1], id = m[2], then = m[3];
-			if(init == "s") return this.stretches.get(id);
-			if(init == "r") return this.stretches.get(id)!.$repository?.$query(then);
+			if(init == "s") return this.$stretches.get(id);
+			if(init == "r") return this.$stretches.get(id)!.$repository?.$query(then);
 
-			let t = this.tree;
+			let t = this.$tree;
 			if(init == "e" || init == "re" || init == "ee") {
 				let edge = t.$find(id);
 				if(!edge) return undefined;
 				if(init == "e") return edge;
-				if(init == "re") return this.rivers.get(edge);
-				if(init == "ee") return this.edges.get(edge);
+				if(init == "re") return this.$rivers.get(edge);
+				if(init == "ee") return this.$edges.get(edge);
 			}
 
 			let n = t.$node.get(Number(id))!;
 			if(init == "n") return n;
-			if(init == "f") return this.flaps.get(n);
-			if(init == "v") return this.vertices.get(n);
+			if(init == "f") return this.$flaps.get(n);
+			if(init == "v") return this.$vertices.get(n);
 		}
 		return undefined;
 	}
