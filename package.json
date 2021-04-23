@@ -13,6 +13,7 @@
 		"url": "git+https://github.com/MuTsunTsai/box-pleating-studio.git"
 	},
 	"devDependencies": {
+		"@makeomatic/gulp-wrap-js": "^1.0.2",
 		"@popperjs/core": "^2.9.1",
 		"@types/bootstrap": "^5.0.12",
 		"del": "^6.0.0",
@@ -33,7 +34,6 @@
 		"gulp-typescript": "^5.0.1",
 		"gulp-workbox": "^1.0.2",
 		"gulp-wrap": "^0.15.0",
-		"gulp-wrap-js": "^0.4.1",
 		"inquirer": "^8.0.0",
 		"jszip": "^3.6.0",
 		"lazypipe": "^1.0.2",

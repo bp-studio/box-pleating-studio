@@ -120,6 +120,8 @@
 			this.initialized = true;
 		}
 
+		protected get bp() { return bp; }
+
 		public get copyright() {
 			let y = new Date().getFullYear();
 			let end = y > 2020 ? "-" + y : "";

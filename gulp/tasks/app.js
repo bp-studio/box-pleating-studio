@@ -5,7 +5,7 @@ let gulpIf = require('gulp-if');
 let lazypipe = require('lazypipe');
 let newer = require('gulp-newer');
 let terser = require('gulp-terser');
-let wrap = require('gulp-wrap');
+let wrap = require('@makeomatic/gulp-wrap-js');
 
 let i18n = require('../plugins/i18n');
 let order = require('../plugins/order');
@@ -14,7 +14,7 @@ let vue = require('../plugins/vue');
 let terserOption = require('../terser.json');
 
 let jsPipe = lazypipe()
-	.pipe(() => wrap("if(!err&&!wErr) { <%= contents %> }"))
+	.pipe(() => wrap("if(!err&&!wErr) { %= body % }"))
 	.pipe(() => gulp.dest('debug/'))
 	.pipe(() => terser(terserOption));
 
@@ -45,7 +45,7 @@ gulp.task('locale', () =>
 		.pipe(gulp.dest('src/locale/'))
 		.pipe(i18n())
 		.pipe(concat('locale.js'))
-		.pipe(wrap("let locale={};<%= contents %>"))
+		.pipe(wrap("let locale={};%= body %"))
 		.pipe(terser())
 		.pipe(gulp.dest('dist/'))
 );
