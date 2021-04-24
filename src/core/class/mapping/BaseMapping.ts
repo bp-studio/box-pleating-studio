@@ -26,7 +26,7 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 		private readonly _keyGen: Func<Source, Key>,
 		private readonly _ctor: Func<Source, Value>,
 		private readonly _dtor: Predicate<Key, Value>
-	) {	}
+	) { }
 
 	public $dispose() {
 		Shrewd.terminate(this);
@@ -62,7 +62,7 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 
 	/** 提供輸出成 JSON 物件陣列的快捷方法。 */
 	public toJSON(): Value extends ISerializable<infer U> ? U[] : never;
-	public toJSON(): any {
-		return Array.from(this.values()).map(v => (v as any).toJSON());
+	public toJSON(): any[] {
+		return Array.from(this.values()).map((v: any) => v.toJSON());
 	}
 }

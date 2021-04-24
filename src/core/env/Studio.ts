@@ -1,6 +1,6 @@
 
 interface StudioOptions {
-	onDeprecate?: (title: string) => void;
+	onDeprecate?: (title?: string) => void;
 	onUpdate?: Action;
 	onDrag?: Action;
 	onLongPress?: Action;
@@ -40,11 +40,12 @@ interface StudioOptions {
 	}
 
 	public $load(json: string | object): Design {
-		if(typeof json == "string") json = JSON.parse(json) as object;
-		return this._tryLoad(Migration.$process(json, this.$option.onDeprecate));
+		if(typeof json == "string") json = JSON.parse(json);
+		let design = Migration.$process(json as Pseudo<JDesign>, this.$option.onDeprecate);
+		return this._tryLoad(design);
 	}
 
-	public $create(json: any): Design {
+	public $create(json: Partial<JDesign>): Design {
 		Object.assign(json, {
 			version: Migration.$current,
 			tree: {
@@ -62,7 +63,7 @@ interface StudioOptions {
 		return this.$restore(json);
 	}
 
-	public $restore(json: any): Design {
+	public $restore(json: Pseudo<JDesign>): Design {
 		let design = new Design(this, Migration.$process(json, this.$option.onDeprecate));
 		this.$designMap.set(design.id, design);
 		return design;

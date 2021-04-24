@@ -49,11 +49,15 @@ class System {
 				return false;
 
 			case "delete":
-				let s = this.$selection.$items[0];
-				if(s instanceof Flap) this._studio.$design!.$flaps.$delete(this.$selection.$items as Flap[]);
-				if(s instanceof Vertex) this._studio.$design!.$vertices.$delete(this.$selection.$items as Vertex[]);
-				if(s instanceof River) s.$delete();
-				return false;
+				let design = this._studio.$design;
+				if(design) {
+					let items = this.$selection.$items
+					let first = items[0];
+					if(isTypedArray(items, Flap)) design.$flaps.$delete(items);
+					if(isTypedArray(items, Vertex)) design.$vertices.$delete(items);
+					if(first instanceof River) first.$delete();
+					return false;
+				}
 
 			default: return this.$drag.$processKey(event.key);
 		}

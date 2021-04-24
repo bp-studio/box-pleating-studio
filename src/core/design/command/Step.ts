@@ -1,8 +1,8 @@
 
 interface JStep<T extends JCommand = JCommand> {
 	commands: readonly T[];
-	construct?: any[];
-	destruct?: any[];
+	construct?: Memento[];
+	destruct?: Memento[];
 	mode: string;
 	before: string[];
 	after: string[];

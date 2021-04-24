@@ -1,8 +1,8 @@
 
 declare class ClipboardItem {
-	constructor(options: any);
+	constructor(options: object);
 }
 
 interface Clipboard {
-	write(items: any[]): Promise<void>;
+	write(items: object[]): Promise<void>;
 }

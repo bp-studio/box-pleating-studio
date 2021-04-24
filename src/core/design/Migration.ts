@@ -1,4 +1,12 @@
 
+type PseudoCore<T> =
+	T extends (infer U)[] ? PseudoCore<U>[] :
+	T extends object ? Pseudo<T> : T;
+
+type Pseudo<T> = Record<Exclude<string, keyof T>, any> & {
+	[key in keyof T]?: PseudoCore<T[key]>;
+};
+
 //////////////////////////////////////////////////////////////////
 /**
  * `Migration` 負責處理不同版本的檔案格式的遷移，以求向下相容。
@@ -27,7 +35,7 @@ namespace Migration {
 		};
 	}
 
-	export function $process(design: Record<string, any>, onDeprecated?: (title: string) => void): JDesign {
+	export function $process(design: Pseudo<JDesign>, onDeprecated?: (title?: string) => void): JDesign {
 
 		let deprecate = false;
 
@@ -38,7 +46,7 @@ namespace Migration {
 			if(design.cp) {
 				design.layout = design.cp;
 				delete design.cp;
-				if('stretches' in design.layout) delete design.layout.stretches;
+				if('stretches' in design.layout!) design.layout!.stretches = [];
 			}
 			design.version = "beta";
 			deprecate = true;
@@ -47,11 +55,11 @@ namespace Migration {
 		// 從 rc0 版本開始要求 intersection 都必須加上 e
 		if(design.version == "beta") {
 			design.version = "rc0";
-			let st = design.layout?.stretches as JStretch[];
+			let st = design.layout?.stretches;
 			if(st) for(let s of st.concat()) {
-				let cf: any = s.configuration;
-				if(cf && (!cf.overlaps || cf.overlaps.some((o: any) =>
-					o.c.some((c: any) => c.type == CornerType.$intersection && c.e === undefined)
+				let cf = s.configuration;
+				if(cf && (!cf.overlaps || cf.overlaps.some((o: JOverlap) =>
+					o.c.some((c: JCorner) => c.type == CornerType.$intersection && c.e === undefined)
 				))) {
 					st.splice(st.indexOf(s), 1);
 					deprecate = true;
@@ -67,24 +75,25 @@ namespace Migration {
 				let cf = s.configuration;
 				if(cf) {
 					s.configuration = {
-						partitions: toPartition(s.configuration.overlaps, s.configuration.strategy)
+						partitions: toPartition(cf.overlaps, cf.strategy)
 					};
 					let pt = s.pattern;
 					if(pt) {
+						let offsets = pt.offsets;
 						// rc0 版本產生出來的 pattern 只有兩種可能：單一 Device，
 						// 或是多個 Device 各自只有一個 Gadget
-						if(s.configuration.partitions.length == 1) {
+						if(cf.partitions!.length == 1) {
 							s.pattern = {
 								devices: [{
-									gadgets: s.pattern.gadgets,
-									offset: s.pattern.offsets?.[0]
+									gadgets: pt.gadgets,
+									offset: offsets?.[0]
 								}]
 							};
 						} else {
 							s.pattern = {
-								devices: s.pattern.gadgets.map((g: any, i: number) => ({
+								devices: pt.gadgets.map((g: JGadget, i: number) => ({
 									gadgets: [g],
-									offset: s.pattern.offsets?.[i]
+									offset: offsets?.[i]
 								}))
 							};
 						}
