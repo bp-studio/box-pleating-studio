@@ -7,7 +7,8 @@ let ts = require('gulp-typescript');
 let wrap = require('@makeomatic/gulp-wrap-js');
 
 let coreConfig = 'src/core/tsconfig.json';
-let projCore = ts.createProject(coreConfig);
+let projCoreDev = ts.createProject(coreConfig);
+let projCorePub = ts.createProject(coreConfig);
 let projTest = ts.createProject('test/tsconfig.json');
 
 let terserOption = require('../terser.json');
@@ -31,35 +32,35 @@ function createTemplate(debugEnabled) {
 }
 
 gulp.task('coreDev', () =>
-	projCore.src()
+	projCoreDev.src()
 		.pipe(newer({
 			dest: 'debug/bpstudio.js',
 			extra: [__filename, coreConfig]
 		}))
 		.pipe(sourcemaps.init())
-		.pipe(projCore())
+		.pipe(projCoreDev())
 		.pipe(wrap(createTemplate(true)))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
 		.pipe(gulp.dest('debug'))
 );
 
 gulp.task('corePub', () =>
-	projCore.src()
+	projCorePub.src()
 		.pipe(newer({
 			dest: 'dist/bpstudio.js',
 			extra: [__filename, coreConfig]
 		}))
-		.pipe(projCore())
-		.pipe(wrap(createTemplate(false)))
-		.pipe(replace(/("[$_][a-z0-9]+")/gi, '$$$$$$$$[$1]')) // Prepare decorator mangling
+		.pipe(projCorePub())
+		.pipe(wrap(createTemplate(false))) // string will all use '' after this step
+		.pipe(replace(/('[$_][a-z0-9]+')/gi, '$$$$$$$$[$1]')) // Prepare decorator mangling
 		.pipe(terser(Object.assign({}, terserOption, {
 			mangle: { properties: { regex: /^[$_]/ } }
 		})))
-		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, '"$1"')) // Restore
+		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest('dist'))
 );
 
-gulp.task('core', gulp.series('coreDev', 'corePub'));
+gulp.task('core', gulp.parallel('coreDev', 'corePub'));
 
 gulp.task('buildTest', () =>
 	projTest.src()

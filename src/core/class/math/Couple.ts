@@ -28,7 +28,7 @@ abstract class Couple {
 	public get y() { return this._y.$value; }
 	public set y(v: number) { this._y = new Fraction(v); }
 
-	// Specify `c` as type `this` will block any calling of this method
+	// Specify `c` as type `this` will block all calling of this method
 	// between different derivative classes, which is the desired behavior
 	public eq(c?: this | null): boolean {
 		if(!c) return false;

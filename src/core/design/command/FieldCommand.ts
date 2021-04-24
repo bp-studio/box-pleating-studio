@@ -1,8 +1,8 @@
 
 interface JFieldCommand extends JCommand {
 	readonly prop: string;
-	readonly old: any;
-	readonly new: any;
+	readonly old: unknown;
+	readonly new: unknown;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -13,7 +13,7 @@ interface JFieldCommand extends JCommand {
 
 class FieldCommand extends Command implements JFieldCommand {
 
-	public static create(target: ITagObject, prop: string, oldValue: any, newValue: any) {
+	public static create(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown) {
 		let command = new FieldCommand(target.$design, {
 			tag: target.$tag,
 			prop,
@@ -30,10 +30,10 @@ class FieldCommand extends Command implements JFieldCommand {
 	public readonly prop: string;
 
 	/** @exports */
-	public old: any;
+	public old: unknown;
 
 	/** @exports */
-	public new: any;
+	public new: unknown;
 
 	constructor(design: Design, json: Typeless<JFieldCommand>) {
 		super(design, json);

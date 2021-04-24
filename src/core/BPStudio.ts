@@ -47,12 +47,12 @@ class BPStudio {
 	// Design 性質
 	//////////////////////////////////////////////////////////////////
 
-	public patternNotFound(design: any):boolean {
+	public patternNotFound(design: unknown): boolean {
 		if(design instanceof Design) return design.$stretches.$patternNotFound;
 		return false;
 	}
 
-	public isMinimal(design:any):boolean {
+	public isMinimal(design: unknown): boolean {
 		if(design instanceof Design) return design.$tree.$isMinimal;
 		return false;
 	}
@@ -68,7 +68,7 @@ class BPStudio {
 	public get selection(): Control[] { return this._studio.$system.$selection.$items; }
 	public get draggableSelected(): boolean { return this._studio.$system.$selection.$hasDraggable(); }
 	public get isDragging(): boolean { return this._studio.$system.$drag.$on; }
-	public dragByKey(key: any): void {
+	public dragByKey(key: unknown): void {
 		if(typeof key != 'string') return;
 		this._studio.$system.$drag.$processKey(key);
 	}
@@ -79,20 +79,20 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	/** 傳回物件對應的 `Repository`、若有的話 */
-	public getRepository(target: any): Repository | null {
+	public getRepository(target: unknown): Repository | null {
 		if(target instanceof Device) return target.$pattern.$configuration.$repository;
 		else if(target instanceof Stretch) return target.$repository;
 		else return null;
 	}
 
 	/** 傳回控制項的類別字串 */
-	public getType(target: any): string | null {
+	public getType(target: unknown): string | null {
 		if(target instanceof Control) return target.$type;
 		return null;
 	}
 
 	/** 導覽至對偶的控制項 */
-	public goToDual(subject: any) {
+	public goToDual(subject: unknown) {
 		let design = this._studio.$design;
 		if(!design) return;
 
@@ -106,7 +106,7 @@ class BPStudio {
 	}
 
 	/** 刪除一個指定的物件，並傳回成功與否 */
-	public delete(subject: any): boolean {
+	public delete(subject: unknown): boolean {
 		let design = this._studio.$design;
 		if(!design) return false;
 
@@ -121,8 +121,8 @@ class BPStudio {
 	}
 
 	/** 替物件產生 GUID 並且傳回 */
-	public guid(object: any): string {
-		if(typeof object != 'object') return "";
+	public guid(object: unknown): string {
+		if(typeof object != 'object' || object == null) return "";
 		return MathUtil.$guid(object);
 	}
 
@@ -131,17 +131,32 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public getDesigns(): Design[] { return [...this._studio.$designMap.values()]; }
-	public getDesign(id: number): Design | undefined { return this._studio.$designMap.get(id); }
-	public create(json: any): Design { return this._studio.$create(json); }
-	public restore(json: any): Design { return this._studio.$restore(json); }
-	public select(id: number | null): void { this._studio.$select(id); }
-	public close(id: number): void { this._studio.$close(id); }
+	public getDesign(id: unknown): Design | undefined {
+		if(typeof id == 'number') return this._studio.$designMap.get(id);
+		else return undefined;
+	}
+	public create(json: unknown): Design {
+		if(json && typeof json == 'object') return this._studio.$create(json);
+		else throw new Error();
+	}
+	public restore(json: unknown): Design {
+		if(json && typeof json == 'object') return this._studio.$restore(json);
+		else throw new Error();
+	}
+	public select(id: unknown): void {
+		if(typeof id == 'number' || id == null) this._studio.$select(id as number | null);
+	}
+	public close(id: unknown): void {
+		if(typeof id == 'number') this._studio.$close(id);
+	}
 	public closeAll(): void { this._studio.$closeAll(); }
 	public toBPS(): string { return this._studio.$CreateBpsUrl(); }
 
-	public load(json: string | object): Design | undefined {
+	public load(json: unknown): Design | undefined {
 		try {
-			return this._studio.$load(json);
+			if(typeof json == 'string' || typeof json == 'object' && json != null) {
+				return this._studio.$load(json);
+			} else return undefined;
 		} catch(e) {
 			return undefined;
 		}
@@ -163,10 +178,10 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public notifySaveAll() { this._studio.$designMap.forEach(d => this.notifySave(d)); }
-	public notifySave(design: any) { if(design instanceof Design) design.$history.$notifySave(); }
-	public isModified(design: any): boolean { return design instanceof Design ? design.$history.$modified : false; }
-	public canUndo(design: any): boolean { return design instanceof Design ? design.$history.$canUndo : false; }
-	public canRedo(design: any): boolean { return design instanceof Design ? design.$history.$canRedo : false; }
-	public undo(design: any): void { if(design instanceof Design) design.$history.$undo(); }
-	public redo(design: any): void { if(design instanceof Design) design.$history.$redo(); }
+	public notifySave(design: unknown) { if(design instanceof Design) design.$history.$notifySave(); }
+	public isModified(design: unknown): boolean { return design instanceof Design ? design.$history.$modified : false; }
+	public canUndo(design: unknown): boolean { return design instanceof Design ? design.$history.$canUndo : false; }
+	public canRedo(design: unknown): boolean { return design instanceof Design ? design.$history.$canRedo : false; }
+	public undo(design: unknown): void { if(design instanceof Design) design.$history.$undo(); }
+	public redo(design: unknown): void { if(design instanceof Design) design.$history.$redo(); }
 }

@@ -473,7 +473,7 @@ namespace PolyBool {
 							ev.seg.myFill.above = ev.seg.myFill.below;
 					}
 					else {
-						// now we fill in any missing transition information, since we are all-knowing
+						// now we fill in whatever missing transition information, since we are all-knowing
 						// at this point
 
 						if(ev.seg.otherFill === null) {

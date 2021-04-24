@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////
 /**
  * DoubleMap 是將一對的 Key 對應到 Value 上的類別。
- * 
+ *
  * 在我的使用情境中，DoubleMap 的 Value 永遠會是根據 Key 對生成的物件，
  * 一旦生成之後就不會改變實體，因此我沒有必要讓整個 DoubleMap 的 get set 都是可觀測的，
  * 唯一需要開放的可觀測性質就只有 DoubleMap 的大小而已。
@@ -54,7 +54,7 @@
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: any) {
+	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: unknown) {
 		if(!thisArg) thisArg = this;
 		for(let [k1, k2, v] of this.entries()) callbackfn.apply(thisArg, [v, k1, k2, this]);
 	}
@@ -112,7 +112,7 @@ interface ReadonlyDoubleMap<K, V> {
 	get(key: K): ReadonlyMap<K, V> | undefined;
 	get(key1: K, key2: K): V | undefined;
 	size: number;
-	forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: any): void;
+	forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: unknown): void;
 
 	[Symbol.iterator](): IterableIterator<[K, K, V]>;
 	entries(): IterableIterator<[K, K, V]>;

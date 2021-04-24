@@ -1,11 +1,10 @@
 
-type PseudoCore<T> =
-	T extends (infer U)[] ? PseudoCore<U>[] :
+type PseudoValue<T> =
+	T extends (infer U)[] ? PseudoValue<U>[] :
 	T extends object ? Pseudo<T> : T;
-
-type Pseudo<T> = Record<Exclude<string, keyof T>, any> & {
-	[key in keyof T]?: PseudoCore<T[key]>;
-};
+type OtherKeys<T, V> = Record<Exclude<string, keyof T>, V>;
+type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
+type Pseudo<T> = PartialPseudo<T> & OtherKeys<T, any>;
 
 //////////////////////////////////////////////////////////////////
 /**

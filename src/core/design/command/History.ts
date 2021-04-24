@@ -128,7 +128,7 @@ interface JHistory {
 		return this._steps[this._index - 1];
 	}
 
-	public $fieldChange(target: ITagObject, prop: string, oldValue: any, newValue: any): void {
+	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown): void {
 		if(this._moving) return;
 		FieldCommand.create(target, prop, oldValue, newValue);
 	}

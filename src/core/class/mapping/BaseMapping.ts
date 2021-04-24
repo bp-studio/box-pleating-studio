@@ -50,7 +50,7 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 
 	public get(key: Key) { return this.render().get(key); }
 	public has(key: Key) { return this.render().has(key); }
-	public forEach(callbackfn: (value: Value, key: Key, map: ReadonlyMap<Key, Value>) => void, thisArg?: any) {
+	public forEach(callbackfn: (value: Value, key: Key, map: ReadonlyMap<Key, Value>) => void, thisArg?: unknown) {
 		return this.render().forEach(callbackfn, thisArg);
 	}
 	public get size() { return this.render().size; }
@@ -62,7 +62,8 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 
 	/** 提供輸出成 JSON 物件陣列的快捷方法。 */
 	public toJSON(): Value extends ISerializable<infer U> ? U[] : never;
-	public toJSON(): any[] {
-		return Array.from(this.values()).map((v: any) => v.toJSON());
+	public toJSON(): unknown[] {
+		let array = Array.from(this.values()) as ISerializable<unknown>[];
+		return array.map(v => v.toJSON());
 	}
 }

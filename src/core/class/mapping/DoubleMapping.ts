@@ -55,7 +55,7 @@
 	public get(...args: [K] | [K, K]) { return this._map.get.apply(this._map, args); }
 
 	public get size() { return this._map.size; }
-	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: any) {
+	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: unknown) {
 		return this._map.forEach(callbackfn, thisArg);
 	}
 

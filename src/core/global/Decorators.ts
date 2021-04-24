@@ -7,8 +7,8 @@ function orderedArray(msg?: string): PropertyDecorator;
 function orderedArray(target: object, prop: string | symbol): void;
 function orderedArray(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
-	let option: Shrewd.IDecoratorOptions<any> = {
-		comparer: (ov: any[], nv: any[], member) => {
+	let option: Shrewd.IDecoratorOptions<unknown> = {
+		comparer: (ov: unknown[], nv: unknown[], member) => {
 			if(ov === nv) return true;
 			let result = Shrewd.comparer.array(ov, nv);
 			if(diagnose && result && msg) {
@@ -30,8 +30,8 @@ function unorderedArray(msg?: string): PropertyDecorator;
 function unorderedArray(target: object, prop: string | symbol): void;
 function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
-	let option: Shrewd.IDecoratorOptions<any> = {
-		comparer: (ov: any[], nv: any[], member) => {
+	let option: Shrewd.IDecoratorOptions<unknown> = {
+		comparer: (ov: unknown[], nv: unknown[], member) => {
 			if(ov === nv) return true;
 			let result = Shrewd.comparer.unorderedArray(ov, nv);
 			if(diagnose && result && msg) {
@@ -103,9 +103,9 @@ function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | 
 }
 
 /** 宣告一個屬性為非 enumerable */
-function nonEnumerable(target: any, name: string): void;
-function nonEnumerable(target: any, name: string, desc: PropertyDescriptor): PropertyDescriptor;
-function nonEnumerable(target: any, name: string, desc?: any) {
+function nonEnumerable(target: object, name: string): void;
+function nonEnumerable(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor;
+function nonEnumerable(target: object, name: string, desc?: PropertyDescriptor): PropertyDescriptor | void {
 	if(desc) {
 		desc.enumerable = false;
 		return desc;
@@ -122,7 +122,7 @@ function nonEnumerable(target: any, name: string, desc?: any) {
 };
 
 /** action 的選項不應該有 renderer 存在 */
-type ActionOption = Omit<Shrewd.IDecoratorOptions<any>, "renderer">;
+type ActionOption = Omit<Shrewd.IDecoratorOptions<unknown>, "renderer">;
 
 /**
  * 跟 `@shrewd` 的效果一樣，不過在值即將發生變更的時候會觸發動作。
@@ -136,9 +136,9 @@ function action(...p: [ActionOption] | [ITagObject, string]): void | PropertyDec
 	if(p.length == 1) return (obj, name: string) => actionInner(obj, name, p[0]);
 	else actionInner(p[0], p[1], {});
 }
-function actionInner(target: any, name: string, option: ActionOption) {
+function actionInner(target: object, name: string, option: ActionOption) {
 	shrewd({
-		validator(this: ITagObject, v: any) {
+		validator(this: ITagObject, v: unknown) {
 			let record = actionMap.get(this);
 			if(!record) actionMap.set(this, record = {});
 			let result = option.validator?.apply(this, [v]) ?? true;
@@ -152,14 +152,14 @@ function actionInner(target: any, name: string, option: ActionOption) {
 		}
 	})(target, name);
 }
-const actionMap = new WeakMap<any, Record<string | symbol, any>>();
+const actionMap = new WeakMap<object, Record<string | symbol, unknown>>();
 
 /**
  * 建立一個只有在被呼叫的時候會執行一次然後之後就永遠快取的 getter。
  *
  * 這個會是非 enumerable 的。
  */
-function onDemand(target: any, name: string, desc: PropertyDescriptor): PropertyDescriptor {
+function onDemand(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor {
 	let getter = desc.get!;
 	return {
 		get() {
@@ -172,4 +172,4 @@ function onDemand(target: any, name: string, desc: PropertyDescriptor): Property
 		configurable: false
 	};
 };
-const onDemandMap = new WeakMap<any, Record<string, any>>();
+const onDemandMap = new WeakMap<object, Record<string, unknown>>();
