@@ -1,15 +1,17 @@
 
+interface JLayout {
+	sheet: JSheet,
+	flaps: JFlap[],
+	stretches: JStretch[]
+}
+
 interface JDesign {
 	title: string;
 	description?: string;
 	version: string,
 	mode: string;
 	history?: JHistory;
-	layout: {
-		sheet: JSheet,
-		flaps: JFlap[],
-		stretches: JStretch[]
-	};
+	layout: JLayout;
 	tree: {
 		sheet: JSheet,
 		nodes: JVertex[],

@@ -1,5 +1,5 @@
 
-interface ITagObject extends IDesignObject, Record<string, any> {
+interface ITagObject extends IDesignObject {
 
 	/** 用來唯一識別這個物件的字串 */
 	readonly $tag: string;

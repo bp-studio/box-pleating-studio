@@ -9,9 +9,9 @@
 	}
 
 	/** 在找出延伸河道輪廓的時候，應該被扣除的不該考慮部份 */
-	@segment("qo") public get $overridden(): PolyBool.Segments | null {
+	@shape("qo") public get $overridden(): PolyBool.Shape | null {
 		this.$disposeEvent();
-		let result: PolyBool.Segments[] = [];
+		let result: PolyBool.Shape[] = [];
 		let d = this.parent.$distance;
 		let { qv, fx, fy, $point: point, $coveredInfo: coveredInfo, $pattern: pattern } = this._quadrant;
 		if(!pattern) {
@@ -33,7 +33,7 @@
 				let v = new Vector(ox * fx, oy * fy);
 				let rect = new Rectangle(p, p.sub(v));
 				let path = rect.$toPolyBoolPath();
-				let seg = PolyBool.segments({ regions: [path], inverted: false });
+				let seg = PolyBool.shape({ regions: [path], inverted: false });
 				result.push(seg);
 			}
 		}

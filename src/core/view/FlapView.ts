@@ -67,14 +67,14 @@
 	}
 
 	public get $closure() {
-		return this._component.$segment;
+		return this._component.$shape;
 	}
 
 	/** 這個獨立出來以提供 RiverView 的相依 */
 	@shrewd public $renderHinge() {
 		if(this._control.$disposed) return;
 		this._circle.visible = this.$studio?.$display.$settings.showHinge ?? false;
-		let paths = PaperUtil.$fromSegments(this.$closure);
+		let paths = PaperUtil.$fromShape(this.$closure);
 		this.hinge.removeSegments();
 		if(!paths.length) debugger;
 		else this.hinge.add(...paths[0].segments); // 這邊頂多只有一個

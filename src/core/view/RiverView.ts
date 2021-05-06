@@ -77,20 +77,27 @@
 	}
 
 	/** 計算當前河的閉包輪廓 */
-	@segment("closure") public get $closure(): PolyBool.Segments {
+	@shape("closure") public get $closure(): PolyBool.Shape {
 		this.$disposeEvent();
-		return PolyBool.union(this._components.map(c => c.$contour))
+		let contours = this._components.map(c => c.$contour);
+		// 這段程式碼是用來產生測試案利用的
+		// if(contours.length > 10) {
+		// 	let json = JSON.stringify(contours);
+		// 	let union = JSON.stringify(PolyBool.union(contours));
+		// 	debugger;
+		// }
+		return PolyBool.union(contours);
 	}
 
 	/** 當前河的內部輪廓 */
-	@segment("interior") private get $interior(): PolyBool.Segments {
+	@shape("interior") private get $interior(): PolyBool.Shape {
 		this.$disposeEvent();
 		return PolyBool.union(this.$info.inner.map(c => c.$closure))
 	}
 
 	@shrewd private get _closurePath(): paper.CompoundPath {
 		return new paper.CompoundPath({
-			children: PaperUtil.$fromSegments(this.$closure)
+			children: PaperUtil.$fromShape(this.$closure)
 		});
 	}
 
@@ -104,7 +111,7 @@
 	@shrewd private get _actualPath(): paper.CompoundPath {
 		this.$disposeEvent();
 		let closure = this._closurePath.children;
-		let interior = PaperUtil.$fromSegments(this.$interior);
+		let interior = PaperUtil.$fromShape(this.$interior);
 		let actual = new paper.CompoundPath({
 			children: closure.concat(interior).map(p => p.clone())
 		})
@@ -191,7 +198,7 @@
 }
 
 interface ClosureView extends View {
-	$closure: PolyBool.Segments;
+	$closure: PolyBool.Shape;
 }
 
 interface RiverInfo {

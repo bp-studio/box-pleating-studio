@@ -61,7 +61,7 @@ interface DisplaySetting {
 		this._project.currentStyle.strokeScaling = false;
 
 		// 下面這段程式碼是用來檢視效能用的。
-		/* this.project.view.onFrame = (event: any) => {
+		/* this.project.view.onFrame = (event: Event) => {
 			this._frameRateCount++;
 			this._frameRateTotal += event.delta;
 			if(this._frameRateTotal > 0.5) {

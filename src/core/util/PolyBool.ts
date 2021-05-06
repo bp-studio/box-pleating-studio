@@ -22,27 +22,27 @@ namespace PolyBool {
 	export type Point = [number, number];
 	export type Path = Point[];
 
-	export function compare(seg1: Segments, seg2: Segments): boolean {
-		if(!seg1 && seg2) return false;
-		let comb = combine(seg1, seg2);
+	export function compare(shape1: Shape, shape2: Shape): boolean {
+		if(!shape1 && shape2) return false;
+		let comb = combine(shape1, shape2);
 		return selectXor(comb).segments.length == 0;
 	}
 
-	export function union(segments: Segments[]): Segments {
-		let seg = segments[0];
-		for(let i = 1; i < segments.length; i++) {
-			let comb = combine(seg, segments[i]);
+	export function union(shapes: Shape[]): Shape {
+		let seg = shapes[0];
+		for(let i = 1; i < shapes.length; i++) {
+			let comb = combine(seg, shapes[i]);
 			seg = selectUnion(comb);
 		}
 		return seg;
 	}
 
-	export function difference(seg1: Segments, seg2: Segments): Segments {
-		let comb = combine(seg1, seg2);
+	export function difference(shape1: Shape, shape2: Shape): Shape {
+		let comb = combine(shape1, shape2);
 		return selectDifference(comb);
 	}
 
-	export interface Segments {
+	export interface Shape {
 		segments: Segment[];
 		inverted: boolean;
 	}
@@ -67,7 +67,7 @@ namespace PolyBool {
 
 	type compare = 0 | 1 | -1;
 
-	export function segments(poly: Polygon): Segments {
+	export function shape(poly: Polygon): Shape {
 		var i = Intersecter(true);
 		poly.regions.forEach(i.addRegion!);
 		return {
@@ -76,26 +76,26 @@ namespace PolyBool {
 		};
 	}
 
-	function combine(segments1: Segments, segments2: Segments) {
+	function combine(shape1: Shape, shape2: Shape) {
 		var i3 = Intersecter(false);
 		return {
 			combined: i3.combine!(
-				segments1.segments, segments1.inverted,
-				segments2.segments, segments2.inverted
+				shape1.segments, shape1.inverted,
+				shape2.segments, shape2.inverted
 			),
-			inverted1: segments1.inverted,
-			inverted2: segments2.inverted
+			inverted1: shape1.inverted,
+			inverted2: shape2.inverted
 		};
 	}
 
-	function selectUnion(combined: Combined): Segments {
+	function selectUnion(combined: Combined): Shape {
 		return {
 			segments: SegmentSelector.union(combined.combined),
 			inverted: combined.inverted1 || combined.inverted2
 		}
 	}
 
-	function selectDifference(combined: Combined): Segments {
+	function selectDifference(combined: Combined): Shape {
 		return {
 			segments: SegmentSelector.difference(combined.combined),
 			inverted: combined.inverted1 && !combined.inverted2
@@ -109,10 +109,10 @@ namespace PolyBool {
 		}
 	}
 
-	export function polygon(segments: Segments): Polygon {
+	export function polygon(shape: Shape): Polygon {
 		return {
-			regions: SegmentChainer(segments.segments),
-			inverted: segments.inverted
+			regions: SegmentChainer(shape.segments),
+			inverted: shape.inverted
 		};
 	}
 

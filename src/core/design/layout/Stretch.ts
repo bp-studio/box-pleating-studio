@@ -124,27 +124,29 @@ interface JStretch {
 	}
 
 	@shrewd public get $structureSignature(): string {
-		return this.$isValid ? JSON.stringify(this.$junctions.map(j => {
-			let result = j.toJSON(), c = result.c;
+		if(!this.$isValid) return "";
+		return JSON.stringify(this.$junctions.map(j => {
+			let result = j.toJSON();
+			let c = result.c;
 			// 把所有的 JJunction 的相位都調整成跟當前的 `Stretch` 一致
 			if(j.fx != this.fx) result.c = [c[2], c[3], c[0], c[1]];
 			return result;
-		})) : "";
+		}));
 	}
 
 	public get $devices(): readonly Device[] {
 		if(!this.$pattern) return [];
-		else return this.$pattern.$devices;
+		return this.$pattern.$devices;
 	}
 
 	public toJSON(): JStretch {
 		return {
 			id: Junction.$createTeamId(this.$junctions),
 
-			configuration: this.$pattern?.$configuration.toJSON() ?? undefined,
+			configuration: this.$pattern?.$configuration.toJSON(),
 
 			// 並不排除找不到任何 Pattern 的可能性
-			pattern: this.$pattern?.toJSON() ?? undefined
+			pattern: this.$pattern?.toJSON()
 		};
 	}
 }

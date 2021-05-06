@@ -48,13 +48,13 @@ function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDe
 	else return shrewd(option);
 }
 
-/** 比較 PolyBool segment 一致 */
-function segment(msg?: string): PropertyDecorator;
-function segment(target: object, prop: string | symbol): void;
-function segment(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
+/** 比較 PolyBool shape 一致 */
+function shape(msg?: string): PropertyDecorator;
+function shape(target: object, prop: string | symbol): void;
+function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
-	let option: Shrewd.IDecoratorOptions<PolyBool.Segments> = {
-		comparer: (ov: PolyBool.Segments, nv: PolyBool.Segments, member) => {
+	let option: Shrewd.IDecoratorOptions<PolyBool.Shape> = {
+		comparer: (ov: PolyBool.Shape, nv: PolyBool.Shape, member) => {
 			if(ov === nv) return true;
 			if(!ov != !nv) return false;
 			if(!ov) return true

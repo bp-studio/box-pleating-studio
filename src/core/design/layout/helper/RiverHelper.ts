@@ -40,14 +40,14 @@
 
 	//@noCompare // segments 和 overridden 都有把關
 	@shrewd({
-		comparer(ov: PolyBool.Segments, nv: PolyBool.Segments, member) {
+		comparer(ov: PolyBool.Shape, nv: PolyBool.Shape, member) {
 			(member as any).ov = ov;
 			return false;
 		}
 	})
-	public get $contour(): PolyBool.Segments {
+	public get $contour(): PolyBool.Shape {
 		this.$disposeEvent();
-		let seg = this.$segment;
+		let seg = this.$shape;
 		for(let q of this._quadrants) {
 			if(q.$overridden) seg = PolyBool.difference(seg, q.$overridden);
 		}

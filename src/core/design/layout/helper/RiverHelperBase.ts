@@ -24,7 +24,7 @@
 	public get $distance(): number { return 0; }
 
 	@noCompare // 已經透過 q.contour 來把關
-	public get $segment(): PolyBool.Segments {
+	public get $shape(): PolyBool.Shape {
 		this.$disposeEvent();
 		let path: Path = [];
 		this._quadrants.forEach(q => path.push(...q.$contour));
