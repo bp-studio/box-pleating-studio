@@ -149,7 +149,7 @@ interface JSheet {
 
 	@unorderedArray private get _viewedControls() {
 		return this.$controls.filter((c: Control): c is LabeledControl =>
-			(c instanceof ViewedControl) && (c.$view instanceof LabeledView)
+			c instanceof ViewedControl && c.$view instanceof LabeledView
 		);
 	}
 

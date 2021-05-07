@@ -9,7 +9,7 @@
 	}
 
 	@shrewd public get $active(): Stretch[] {
-		return [...this.values()].filter(s => s.$isActive && !!s.$pattern);
+		return [...this.values()].filter(s => s.$isActive && Boolean(s.$pattern));
 	}
 
 	@shrewd public get $byQuadrant(): ReadonlyMap<Quadrant, Stretch> {

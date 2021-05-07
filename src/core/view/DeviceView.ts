@@ -25,8 +25,8 @@
 		let path: paper.PathItem | null = null;
 		for(let r of this._control.$regions) {
 			let cPath = this._contourToPath(r.$shape.contour);
-			if(!path) path = cPath;
-			else path = path.unite(cPath, { insert: false });
+			if(path) path = path.unite(cPath, { insert: false });
+			else path = cPath;
 		}
 		PaperUtil.$replaceContent(this._shade, path!, false);
 

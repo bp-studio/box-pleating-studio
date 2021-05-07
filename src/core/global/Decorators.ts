@@ -57,7 +57,7 @@ function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator |
 		comparer: (ov: PolyBool.Shape, nv: PolyBool.Shape, member) => {
 			if(ov === nv) return true;
 			if(!ov != !nv) return false;
-			if(!ov) return true
+			if(!ov) return true;
 			let result = PolyBool.compare(ov, nv);
 			if(diagnose && result && msg) {
 				// if(msg == "staticClosure") {
@@ -80,10 +80,10 @@ function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | 
 	let msg = p.length == 2 ? undefined : p[0];
 	let option: Shrewd.IDecoratorOptions<Path> = {
 		comparer: (ov: Path, nv: Path, member) => {
-			(member as any).ov = ov;
+			member.ov = ov;
 			if(ov === nv) return true;
 			if(!ov != !nv) return false;
-			if(!ov) return true
+			if(!ov) return true;
 			if(ov.length != nv.length) return false;
 			for(let i = 0; i < ov.length; i++) {
 				if(!ov[i].eq(nv[i])) return false;
@@ -114,12 +114,12 @@ function nonEnumerable(target: object, name: string, desc?: PropertyDescriptor):
 	Object.defineProperty(target, name, {
 		set(value) {
 			Object.defineProperty(this, name, {
-				value, writable: true, configurable: false,
+				value, writable: true, configurable: false
 			});
 		},
-		configurable: true,
+		configurable: true
 	});
-};
+}
 
 /** action 的選項不應該有 renderer 存在 */
 type ActionOption = Omit<Shrewd.IDecoratorOptions<unknown>, "renderer">;
@@ -171,5 +171,5 @@ function onDemand(target: object, name: string, desc: PropertyDescriptor): Prope
 		enumerable: false,
 		configurable: false
 	};
-};
+}
 const onDemandMap = new WeakMap<object, Record<string, unknown>>();

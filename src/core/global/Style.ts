@@ -21,12 +21,12 @@ namespace Style {
 
 	export const $dotSelected: StyleDeclaration = {
 		strokeWidth: 3,
-		strokeColor: "red",
+		strokeColor: "red"
 	};
 
 	export const $hinge: StyleDeclaration = {
 		strokeColor: '#69F',
-		strokeWidth: 3,
+		strokeWidth: 3
 	};
 
 	export const $sheet: StyleDeclaration = {
@@ -68,13 +68,13 @@ namespace Style {
 	export const $shade: StyleDeclaration = {
 		fillColor: '#69F',
 		opacity: 0.3,
-		strokeWidth: 0,
+		strokeWidth: 0
 	};
 
 	export const $junction: StyleDeclaration = {
 		strokeColor: "red",
 		fillColor: "red",
-		opacity: 0.3,
+		opacity: 0.3
 	};
 
 	export const $axisParallels: StyleDeclaration = {

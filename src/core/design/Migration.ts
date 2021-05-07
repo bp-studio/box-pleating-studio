@@ -4,7 +4,7 @@ type PseudoValue<T> =
 	T extends object ? Pseudo<T> : T;
 type OtherKeys<T, V> = Record<Exclude<string, keyof T>, V>;
 type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
-type Pseudo<T> = PartialPseudo<T> & OtherKeys<T, any>;
+type Pseudo<T> = (T | PartialPseudo<T>) & OtherKeys<T, unknown>;
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -24,7 +24,7 @@ namespace Migration {
 			layout: {
 				sheet: { width: 16, height: 16 },
 				flaps: [],
-				stretches: [],
+				stretches: []
 			},
 			tree: {
 				sheet: { width: 20, height: 20 },
@@ -38,68 +38,9 @@ namespace Migration {
 
 		let deprecate = false;
 
-		// beta 版把原本的 cp 模式改名為 layout 模式，以預留 cp 模式給未來使用
-		// 同時從 beta 版開始加上檔案版本代碼
-		if(!('version' in design)) {
-			if(design.mode == "cp") design.mode = "layout";
-			if(design.cp) {
-				design.layout = design.cp;
-				delete design.cp;
-				if('stretches' in design.layout!) design.layout!.stretches = [];
-			}
-			design.version = "beta";
-			deprecate = true;
-		}
-
-		// 從 rc0 版本開始要求 intersection 都必須加上 e
-		if(design.version == "beta") {
-			design.version = "rc0";
-			let st = design.layout?.stretches;
-			if(st) for(let s of st.concat()) {
-				let cf = s.configuration;
-				if(cf && (!cf.overlaps || cf.overlaps.some((o: JOverlap) =>
-					o.c.some((c: JCorner) => c.type == CornerType.$intersection && c.e === undefined)
-				))) {
-					st.splice(st.indexOf(s), 1);
-					deprecate = true;
-				}
-			}
-		}
-
-		// rc1 版本中在資料結構上插入了 partition 和 device 的層次
-		if(design.version == "rc0") {
-			design.version = "rc1";
-			let st = design.layout?.stretches;
-			if(st) for(let s of st.concat()) {
-				let cf = s.configuration;
-				if(cf) {
-					s.configuration = {
-						partitions: toPartition(cf.overlaps, cf.strategy)
-					};
-					let pt = s.pattern;
-					if(pt) {
-						let offsets = pt.offsets;
-						// rc0 版本產生出來的 pattern 只有兩種可能：單一 Device，
-						// 或是多個 Device 各自只有一個 Gadget
-						if(cf.partitions!.length == 1) {
-							s.pattern = {
-								devices: [{
-									gadgets: pt.gadgets,
-									offset: offsets?.[0]
-								}]
-							};
-						} else {
-							s.pattern = {
-								devices: pt.gadgets.map((g: JGadget, i: number) => ({
-									gadgets: [g],
-									offset: offsets?.[i]
-								}))
-							};
-						}
-					}
-				}
-			}
-		}
+		deprecate ||= beta_migration(design);
+		deprecate ||= rc0_migration(design);
+		deprecate ||= rc1_migration(design);
 
 		// 版本 0 與 rc1 完全相同，純粹為了紀念發行而改變號碼
 		if(design.version == "rc1") design.version = "0";
@@ -112,15 +53,97 @@ namespace Migration {
 		return design as JDesign;
 	}
 
-	function toPartition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {
+	/**
+	 * beta 版把原本的 cp 模式改名為 layout 模式，以預留 cp 模式給未來使用，
+	 * 同時從 beta 版開始加上檔案版本代碼
+	 */
+	function beta_migration(design: Pseudo<JDesign>): boolean {
+		if('version' in design) return false;
+
+		if(design.mode == "cp") design.mode = "layout";
+		if(design.cp) {
+			design.layout = design.cp as JLayout;
+			delete design.cp;
+			if('stretches' in design.layout!) design.layout!.stretches = [];
+		}
+		design.version = "beta";
+		return true;
+	}
+
+	/** 從 rc0 版本開始要求 intersection 都必須加上 e */
+	function rc0_migration(design: Pseudo<JDesign>): boolean {
+		if(design.version != "beta") return false;
+
+		design.version = "rc0";
+		let st = design.layout?.stretches as Pseudo<JStretch>[];
+		if(st) for(let s of st.concat()) {
+			let cf = s.configuration as Pseudo<JConfiguration>;
+			if(cf && (!cf.overlaps || (cf.overlaps as JOverlap[]).some(rc0_overlapFilter))) {
+				st.splice(st.indexOf(s), 1);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function rc0_overlapFilter(o: JOverlap): boolean {
+		return o.c.some((c: JCorner) => c.type == CornerType.$intersection && c.e === undefined);
+	}
+
+	/** rc1 版本中在資料結構上插入了 partition 和 device 的層次 */
+	function rc1_migration(design: Pseudo<JDesign>): boolean {
+		if(design.version != "rc0") return false;
+
+		design.version = "rc1";
+		let st = design.layout?.stretches as Pseudo<JStretch>[];
+		if(st) for(let s of st.concat()) {
+			let cf = s.configuration as Pseudo<JConfiguration>;
+			if(cf) rc1_pattern(cf, s);
+		}
+		return false;
+	}
+
+	function rc1_pattern(cf: Pseudo<JConfiguration>, s: Pseudo<JStretch>) {
+		s.configuration = {
+			partitions: rc1_partition(cf.overlaps as JOverlap[], cf.strategy as Strategy)
+		};
+		let pt = s.pattern as Pseudo<JPattern>;
+		if(pt) {
+			let offsets = pt.offsets as number[] | undefined;
+			// rc0 版本產生出來的 pattern 只有兩種可能：單一 Device，
+			// 或是多個 Device 各自只有一個 Gadget
+			if(cf.partitions!.length == 1) {
+				s.pattern = {
+					devices: [{
+						gadgets: pt.gadgets as JGadget[],
+						offset: offsets?.[0]
+					}]
+				};
+			} else {
+				s.pattern = {
+					devices: (pt.gadgets as JGadget[]).map((g: JGadget, i: number) => ({
+						gadgets: [g],
+						offset: offsets?.[i]
+					}))
+				};
+			}
+		}
+	}
+
+	function rc1_cornerFilter(c: JCorner): boolean {
+		return c.type == CornerType.$coincide;
+	}
+
+	function rc1_partition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {
 		let partitions: JOverlap[][] = [];
 		let partitionMap = new Map<number, number>();
+
 		for(let [i, o] of overlaps.entries()) {
 			// 如果當前的這個已經被加入過了就跳過
 			if(partitionMap.has(i)) continue;
 
 			// 找出所有重合的錨點
-			let coin = o.c.filter(c => c.type == CornerType.$coincide);
+			let coin = o.c.filter(rc1_cornerFilter);
 
 			let c = coin.find(c => partitionMap.has(-c.e! - 1));
 			let j = partitions.length;

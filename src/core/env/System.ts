@@ -41,26 +41,24 @@ class System {
 	private get _canvas(): HTMLCanvasElement { return this._studio.$paper.view.element; }
 
 	private _canvasKeydown(event: paper.KeyEvent): boolean {
-		switch(event.key) {
-			case "space":
-				if(this._studio.$display.$isScrollable()) {
-					this._canvas.style.cursor = "grab";
-				}
-				return false;
-
-			case "delete":
-				let design = this._studio.$design;
-				if(design) {
-					let items = this.$selection.$items
-					let first = items[0];
-					if(isTypedArray(items, Flap)) design.$flaps.$delete(items);
-					if(isTypedArray(items, Vertex)) design.$vertices.$delete(items);
-					if(first instanceof River) first.$delete();
-					return false;
-				}
-
-			default: return this.$drag.$processKey(event.key);
+		if(event.key == "space") {
+			if(this._studio.$display.$isScrollable()) {
+				this._canvas.style.cursor = "grab";
+			}
+			return false;
 		}
+
+		let design = this._studio.$design;
+		if(design && event.key == "delete") {
+			let items = this.$selection.$items;
+			let first = items[0];
+			if(isTypedArray(items, Flap)) design.$flaps.$delete(items);
+			if(isTypedArray(items, Vertex)) design.$vertices.$delete(items);
+			if(first instanceof River) first.$delete();
+			return false;
+		}
+
+		return this.$drag.$processKey(event.key);
 	}
 
 	private _canvasKeyup() {

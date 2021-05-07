@@ -9,7 +9,7 @@
 		super(view);
 		this._view = view;
 		this.$flap = flap;
-		this._quadrants = MakePerQuadrant(q => new QuadrantHelper(this, q));
+		this._quadrants = makePerQuadrant(q => new QuadrantHelper(this, q));
 	}
 
 	protected get $shouldDispose(): boolean {

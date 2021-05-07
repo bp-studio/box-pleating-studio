@@ -61,7 +61,10 @@
 		"**/package*.json",
 		"src/locale/es.json",
 		".vscode",
-		"debug/**/*"
+		".eslintrc*",
+		"debug/**/*",
+		"src/**/paper.d.ts",
+		"src/**/PolyBool.ts"
 	],
 	"cSpell.ignoreWords": [
 		"fbclid",
@@ -71,4 +74,7 @@
 		"tinyurl",
 		"weixin"
 	],
+	"eslint.workingDirectories": [
+		"./src/core/"
+	]
 }

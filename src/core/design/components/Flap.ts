@@ -94,7 +94,7 @@ interface JFlap {
 			Draggable.$relocate(design.$vertices.get(this.node)!, this, true);
 		}
 
-		this.$quadrants = MakePerQuadrant(i => new Quadrant(sheet, this, i));
+		this.$quadrants = makePerQuadrant(i => new Quadrant(sheet, this, i));
 		this.$view = new FlapView(this);
 
 		design.$history.$construct(this.$toMemento());

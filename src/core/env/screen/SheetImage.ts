@@ -14,10 +14,6 @@ abstract class SheetImage extends Viewport {
 		return this._studio.$design;
 	}
 
-	constructor(studio: Studio) {
-		super(studio)
-	}
-
 	@shrewd public get $scale() {
 		if(this._design) {
 			let s = this._getAutoScale(this._design.sheet);
@@ -47,7 +43,7 @@ abstract class SheetImage extends Viewport {
 	/** 因為文字標籤而產生的實際水平邊距 */
 	@shrewd private get _horMargin(): number {
 		return Math.max((this._design?.sheet.$margin ?? 0) + 10, this._MARGIN);
-	};
+	}
 
 	private _getAutoScale(sheet?: Sheet): number {
 		sheet = sheet || this._design?.sheet;

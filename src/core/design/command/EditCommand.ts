@@ -60,7 +60,9 @@ class EditCommand extends Command implements JEditCommand {
 		return false; // EditCommand 不可能疊加
 	}
 
-	public $addTo(command: Command) { }
+	public $addTo(command: Command) {
+		// EditCommand 不可能疊加
+	}
 
 	public get $isVoid(): boolean {
 		return false; // EditCommand 不可能是 void
@@ -68,6 +70,7 @@ class EditCommand extends Command implements JEditCommand {
 
 	private _remove() {
 		let obj = this._design.$query(this.tag);
+		// eslint-disable-next-line no-useless-call
 		if(obj instanceof Disposable) obj.$dispose.call(obj, [true]);
 	}
 

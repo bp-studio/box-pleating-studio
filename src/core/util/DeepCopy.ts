@@ -8,19 +8,17 @@ type RecursivePartial<T> = {
  */
 function deepCopy<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 	for(let s of sources) if(s instanceof Object) {
-
 		// 這種寫法也一樣適用於 s 是陣列的情況；此時取出來的 keys 就自動會是陣列的各個索引
 		let keys = Object.keys(s) as (keyof T)[];
 
 		for(let k of keys) {
-			let v = s[k] as T[typeof k]
-			if(v instanceof Object) {
-				if(target[k] instanceof Object &&
-					target[k] != v) { // 確定參照不同
-					target[k] = deepCopy(target[k], v);
-				} else target[k] = clone(v);
-			} else {
+			let v = s[k] as T[typeof k];
+			if(!(v instanceof Object)) {
 				target[k] = v; // 純量類別可以直接複製
+			} else if(target[k] instanceof Object && target[k] != v) { // 確定參照不同
+				target[k] = deepCopy(target[k], v);
+			} else {
+				target[k] = clone(v);
 			}
 		}
 	}

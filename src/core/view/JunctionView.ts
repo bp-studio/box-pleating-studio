@@ -11,7 +11,8 @@
 	}
 
 	protected $render() {
-		if(this._shade.visible = this._junction.$status == JunctionStatus.tooClose) {
+		this._shade.visible = this._junction.$status == JunctionStatus.tooClose;
+		if(this._shade.visible) {
 			let f1 = this._junction.f1, f2 = this._junction.f2;
 			let v1 = f1.$view, v2 = f2.$view;
 			let d = this._junction.$treeDistance - (f1.radius + f2.radius);

@@ -115,7 +115,7 @@ class Step implements ISerializable<JStep> {
 			destruct: this._destruct,
 			mode: this._mode,
 			before: this._before,
-			after: this._after,
+			after: this._after
 		};
 		if(!this._construct.length) delete result.construct;
 		if(!this._destruct.length) delete result.destruct;

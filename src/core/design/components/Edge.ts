@@ -53,7 +53,7 @@
 	}
 
 	/** @exports */
-	public get length() { return this.$edge.length; };
+	public get length() { return this.$edge.length; }
 	public set length(v) { this.$edge.length = v; }
 
 	public toJSON(): JEdge {

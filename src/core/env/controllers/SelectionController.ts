@@ -8,7 +8,7 @@
 @shrewd class SelectionController {
 
 	/** 傳回 `Control` 被選取的優先順位（當 `Control` 重疊於點擊位置時判斷用），數字越小越優先 */
-	private static _controlPriority(c: Control) {
+	private static _controlPriority(c: Control): number {
 		if(c instanceof Device || c instanceof Vertex) return 1;
 		if(c instanceof Flap || c instanceof Edge) return 2;
 		return 3;

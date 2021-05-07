@@ -150,7 +150,7 @@
 		for(let edge of a2) {
 			let n = edge.n(n2);
 			n.$parentId = N.id;
-			EditCommand.$remove(edge)
+			EditCommand.$remove(edge);
 			EditCommand.$add(new TreeEdge(N, n, edge.length));
 		}
 		EditCommand.$remove(n1);

@@ -32,11 +32,14 @@ namespace MathUtil {
 
 		if(a < 0) a = -a;
 		if(b < 0) b = -b;
-		while(a && b) { a %= b; if(a) b %= a; }
+		while(a && b) {
+			a %= b;
+			if(a) b %= a;
+		}
 		return a ? a : b;
 	}
 
-	export function $LCM(list: number[]) {
+	export function $LCM(list: number[]): number {
 		let lcm = list[0];
 		for(let i = 1; i < list.length; i++) {
 			let gcd = $GCD(lcm, list[i]);
@@ -58,7 +61,7 @@ namespace MathUtil {
 	}
 
 	/** 把數值 x 朝著 f 指定的方向取下一個整數 */
-	export function $int(x: number, f: number) {
+	export function $int(x: number, f: number): number {
 		return f > 0 ? Math.ceil(x) : Math.floor(x);
 	}
 }

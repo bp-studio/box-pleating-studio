@@ -79,7 +79,7 @@ interface JRepository {
 	}
 
 	protected $onMove(): void {
-		this.$stretch.$selected = !(this.entry!.entry!.$selected);
+		this.$stretch.$selected = !this.entry!.entry!.$selected;
 	}
 
 	/** 根據 `JOverlap` 組合來產生（或沿用）一個 `Joiner` */

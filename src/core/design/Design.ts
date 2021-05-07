@@ -71,14 +71,14 @@ interface IDesignObject {
 			() => this.$flaps.values(),
 			() => this.$rivers.values(),
 			() => this.$stretches.values(),
-			() => this.$stretches.$devices,
+			() => this.$stretches.$devices
 		);
 		this.$TreeSheet = new Sheet(this, "tree", data.tree.sheet,
 			() => this.$edges.values(),
 			() => this.$vertices.values()
 		);
 
-		this.title = data.title;;
+		this.title = data.title;
 		this.description = data.description;
 		this.mode = data.mode;
 
@@ -113,7 +113,7 @@ interface IDesignObject {
 	@shrewd public $dragging: boolean = false;
 
 	@shrewd public get $isActive(): boolean {
-		return (this instanceof Design) && (this.$mountTarget as Studio).$design == this;
+		return this instanceof Design && (this.$mountTarget as Studio).$design == this;
 	}
 
 	public readonly $vertices = new VertexContainer(this);

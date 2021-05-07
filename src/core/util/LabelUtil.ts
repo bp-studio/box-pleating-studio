@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 
 interface labelCache {
 	dx: number;
@@ -23,7 +24,10 @@ namespace LabelUtil {
 		label.point.set(lx + dx * d, ly - dy * d - oy);
 	}
 
-	export function $setLabel(sheet: Sheet, label: paper.PointText, glow: paper.PointText, pt: IPoint, ...avoid: paper.Path[]) {
+	export function $setLabel(
+		sheet: Sheet, label: paper.PointText, glow: paper.PointText, pt: IPoint,
+		...avoid: paper.Path[]
+	): void {
 
 		glow.content = label.content;
 		if(!label.content) return;
@@ -88,7 +92,7 @@ namespace LabelUtil {
 				let i1 = rec.intersect(c, { insert: false }).isEmpty();
 				let i2 = !rec.intersects(c);
 				return i1 && i2;
-			})
+			});
 			if(ok) break;
 		}
 		cache.set(label, {

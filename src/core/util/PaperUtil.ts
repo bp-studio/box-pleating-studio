@@ -13,7 +13,7 @@ namespace PaperUtil {
 	 * @param source 替換內容的來源
 	 * @param clone 是否要將來源複製一份，還是直接代入
 	 */
-	export function $replaceContent(target: paper.CompoundPath, source: paper.PathItem, clone: boolean) {
+	export function $replaceContent(target: paper.CompoundPath, source: paper.PathItem, clone: boolean): void {
 		target.removeChildren();
 		if(source instanceof paper.CompoundPath) target.copyContent(source);
 		else {
@@ -22,14 +22,14 @@ namespace PaperUtil {
 		}
 	}
 
-	export function $setRectangleSize(rect: paper.Path.Rectangle, width: number, height: number) {
+	export function $setRectangleSize(rect: paper.Path.Rectangle, width: number, height: number): void {
 		rect.segments[1].point.set(width, 0);
 		rect.segments[2].point.set(width, height);
 		rect.segments[3].point.set(0, height);
 	}
 
 	/** 把一個 `paper.CompoundPath` 加入指定兩點定義的線段 */
-	export function $addLine(path: paper.CompoundPath, p1: Point | paper.Point, p2: Point | paper.Point) {
+	export function $addLine(path: paper.CompoundPath, p1: Point | paper.Point, p2: Point | paper.Point): void {
 		if(p1 instanceof Point) p1 = p1.$toPaper();
 		if(p2 instanceof Point) p2 = p2.$toPaper();
 		path.moveTo(p1);
@@ -37,7 +37,7 @@ namespace PaperUtil {
 	}
 
 	/** 把一個 `paper.CompoundPath` 的內容替換成傳入的直線陣列組 */
-	export function $setLines(path: paper.CompoundPath, ...lines: (readonly Line[])[]) {
+	export function $setLines(path: paper.CompoundPath, ...lines: (readonly Line[])[]): void {
 		path.removeChildren();
 		for(let set of lines) for(let l of set) PaperUtil.$addLine(path, l.p1, l.p2);
 	}
@@ -49,8 +49,8 @@ namespace PaperUtil {
 		else return p1.unite(p2, { insert: false });
 	}
 
-	export function $Black() { return (black = black || new paper.Color('black')); }
-	export function $Red() { return (red = red || new paper.Color('red')); }
+	export function $Black(): paper.Color { return black = black || new paper.Color('black'); }
+	export function $Red(): paper.Color { return red = red || new paper.Color('red'); }
 
 	export function $fromShape(shape: PolyBool.Shape): paper.Path[] {
 		let poly = PolyBool.polygon(shape);

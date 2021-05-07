@@ -30,8 +30,8 @@ interface JVertex extends IPoint {
 			if(option.name != undefined) this.$node.name = option.name;
 			this.$location.x = option.x;
 			this.$location.y = option.y;
-			this.$isNew = !!option.isNew;
-			this.$selected = !!option.selected;
+			this.$isNew = Boolean(option.isNew);
+			this.$selected = Boolean(option.selected);
 		}
 
 		this.$view = new VertexView(this);

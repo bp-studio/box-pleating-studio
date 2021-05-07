@@ -33,9 +33,11 @@
 			components = this._toComponents(edge.l1, edge.n1).concat(this._toComponents(edge.l2, edge.n2));
 			adjacent = edge.a1.concat(edge.a2);
 		} else if(edge.$wrapSide == 2) {
-			components = this._toComponents(edge.l2, edge.n2); adjacent = edge.a2;
+			components = this._toComponents(edge.l2, edge.n2);
+			adjacent = edge.a2;
 		} else {
-			components = this._toComponents(edge.l1, edge.n1); adjacent = edge.a1;
+			components = this._toComponents(edge.l1, edge.n1);
+			adjacent = edge.a1;
 		}
 
 		let inner: ClosureView[] = [];
@@ -92,7 +94,7 @@
 	/** 當前河的內部輪廓 */
 	@shape("interior") private get $interior(): PolyBool.Shape {
 		this.$disposeEvent();
-		return PolyBool.union(this.$info.inner.map(c => c.$closure))
+		return PolyBool.union(this.$info.inner.map(c => c.$closure));
 	}
 
 	@shrewd private get _closurePath(): paper.CompoundPath {
@@ -114,7 +116,7 @@
 		let interior = PaperUtil.$fromShape(this.$interior);
 		let actual = new paper.CompoundPath({
 			children: closure.concat(interior).map(p => p.clone())
-		})
+		});
 		actual.reorient(false, true);
 		return actual;
 	}

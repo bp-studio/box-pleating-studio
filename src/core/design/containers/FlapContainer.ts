@@ -32,7 +32,7 @@
 	public $toVertex(flaps: Flap[]) {
 		this._design.$TreeSheet.$clearSelection();
 		for(let f of flaps) {
-			let v = this._design.$vertices.get(f.node)
+			let v = this._design.$vertices.get(f.node);
 			if(v) v.$selected = true;
 		}
 		this._design.mode = "tree";

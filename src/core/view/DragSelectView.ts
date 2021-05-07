@@ -25,7 +25,8 @@
 	}
 
 	protected $render() {
-		if(this._rectangle.visible = this.$visible) {
+		this._rectangle.visible = this.$visible;
+		if(this.$visible) {
 			let r = new paper.Path.Rectangle({
 				from: this.$down,
 				to: this.$now

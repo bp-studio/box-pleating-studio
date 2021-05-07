@@ -40,7 +40,7 @@ interface DisplaySetting {
 		showRidge: true,
 		showLabel: true,
 		showDot: true,
-		includeHiddenElement: false,
+		includeHiddenElement: false
 	}
 
 	constructor(studio: Studio) {
@@ -118,7 +118,7 @@ interface DisplaySetting {
 	}
 
 	@shrewd private _renderSetting() {
-		let notLayout = (this._studio.$design?.mode != "layout" ?? false);
+		let notLayout = this._studio.$design?.mode != "layout" ?? false;
 		this._project.layers[Layer.$hinge].visible = this.$settings.showHinge;
 		this._project.layers[Layer.$ridge].visible = this.$settings.showRidge || notLayout;
 		this._project.layers[Layer.$axisParallels].visible = this.$settings.showAxialParallel;

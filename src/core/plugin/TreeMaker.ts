@@ -1,3 +1,5 @@
+/* eslint-disable no-throw-literal */
+/* eslint-disable max-classes-per-file */
 
 namespace TreeMaker {
 
@@ -22,7 +24,7 @@ namespace TreeMaker {
 		}
 
 		public $next() { return (this._lines.next().value as string).trim(); }
-		public get $int() { return parseInt(this.$next()); }
+		public get $int() { return parseInt(this.$next(), 10); }
 		public get $float() { return parseFloat(this.$next()); }
 		public get $bool() { return this.$next() == "true"; }
 
@@ -81,7 +83,7 @@ namespace TreeMaker {
 				id: v.$int,
 				name: v.$next(),
 				x: v.$float,
-				y: v.$float,
+				y: v.$float
 			};
 
 			v.$skip(2);

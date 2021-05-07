@@ -45,7 +45,7 @@ interface StudioOptions {
 		return this._tryLoad(design);
 	}
 
-	public $create(json: Partial<JDesign>): Design {
+	public $create(json: Pseudo<JDesign>): Design {
 		Object.assign(json, {
 			version: Migration.$current,
 			tree: {

@@ -30,6 +30,7 @@ class JoinerCore {
 		addOns?: JAddOn[];
 	};
 
+	// eslint-disable-next-line max-lines-per-function
 	constructor(joiner: Joiner, p1: Piece, p2: Piece) {
 		let { $oriented, s1, s2, q1, q2, q } = this.joiner = joiner;
 		let a1: JAnchor[] = [], a2: JAnchor[] = [];
@@ -74,12 +75,14 @@ class JoinerCore {
 
 		// 整理所有會用到的重要參數
 		let v1 = new Vector(off1).neg, v2 = new Vector(off2).addBy(o).neg;
-		let pt = (s1 ? p1.$anchors[q]! : p2.$anchors[q]!.add(o)); // p1 觀點
+		let pt = s1 ? p1.$anchors[q]! : p2.$anchors[q]!.add(o); // p1 觀點
 		let pt1 = pt.add(v1).$toIPoint(), pt2 = pt.add(v2).$toIPoint();
 		let e1 = p1.$shape.ridges[q1], e2 = p2.$shape.ridges[q2].$shift(o);
 		let bv = Vector.$bisector(p1.$direction, p2.$direction);
-		let org = $oriented ? Point.ZERO : s1 ? new Point(a1[q].location!) : p1.$anchors[q]!;
 		let f = $oriented ? 1 : -1;
+
+		let org = Point.ZERO;
+		if(!$oriented) org = s1 ? new Point(a1[q].location!) : p1.$anchors[q]!;
 
 		this.data = { p1, p2, v1, v2, a1, a2, off1, off2, offset, size, pt, pt1, pt2, e1, e2, bv, org, f };
 	}
@@ -148,7 +151,10 @@ class JoinerCore {
 		let r!: Point, d: number = Number.POSITIVE_INFINITY;
 		for(let i of e.$gridPoints()) {
 			let dist = i.$dist(p);
-			if(dist < d) { d = dist; r = i; }
+			if(dist < d) {
+				d = dist;
+				r = i;
+			}
 		}
 		return r;
 	}
@@ -177,7 +183,7 @@ class JoinerCore {
 
 		// 若兩個 Gadget 的方向是內聚而非發散的，則鈍角融合不可能成立（至少目前沒有這種變換概念存在）
 		// TODO: 仔細思考這一點
-		if(cw != (p1.$direction.$slope.gt(p2.$direction.$slope))) return;
+		if(cw != p1.$direction.$slope.gt(p2.$direction.$slope)) return;
 
 		if(!this._setupAnchor(D)) return;
 		let P = D.sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
@@ -194,7 +200,7 @@ class JoinerCore {
 		if(R.x * f < pt.x * f) return;
 
 		// 利用線段交叉來檢查變換之後的 R 點有沒有跑到外面去
-		e = this._substituteEnd([e1, e2][1 - i], D)
+		e = this._substituteEnd([e1, e2][1 - i], D);
 		let test = e.$intersection(new Line(T, R));
 		if(test && !test.eq(T) && !test.eq(R)) return;
 
@@ -258,7 +264,7 @@ class JoinerCore {
 	}
 
 	/** 產生要輸出的結果 */
-	private _result(json = false, extraSize?: number): JoinResult {
+	private _result(json?: boolean, extraSize?: number): JoinResult {
 		let { p1, p2, a1, a2, off1, off2, offset, size, addOns } = this.data;
 		this.data.addOns = undefined;
 		if(offset) off2 = { x: off2.x + offset.x, y: off2.y + offset.y };

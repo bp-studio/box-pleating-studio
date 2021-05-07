@@ -45,7 +45,7 @@ interface JHistory {
 			index: this._index,
 			savedIndex: this._savedIndex,
 			steps: this._steps.map(s => s.toJSON())
-		}
+		};
 	}
 
 	public $queue(command: Command): void {
@@ -139,7 +139,7 @@ interface JHistory {
 
 	@shrewd public get $canRedo(): boolean {
 		return this._index < this._steps.length;
-	};
+	}
 
 	public $undo(): void {
 		if(this.$canUndo) {

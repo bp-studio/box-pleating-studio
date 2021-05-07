@@ -42,13 +42,21 @@ class Joiner {
 		this.$oriented = j1.c[0].e == j2.c[0].e;
 		this.cw = o1.ox > o2.ox;
 		this.q = this.$oriented ? 0 : 2;
-		[this.q1, this.q2] = this.$oriented ? (this.cw ? [2, 1] : [1, 2]) : (this.cw ? [0, 3] : [3, 0]);
+		[this.q1, this.q2] = this._getQuadrantCombination();
 		this.$intDist = Partitioner.$getMaxIntersectionDistance(repo.$sheet.$design.$tree, j1, j2, this.$oriented);
 
 		// 計算 Overlap 偏移
 		[this.s1, this.s2] = this.$oriented ?
 			[o1.shift, o2.shift] :
 			[this._getReverseShift(o1, j1), this._getReverseShift(o2, j2)];
+	}
+
+	private _getQuadrantCombination() {
+		if(this.$oriented) {
+			return this.cw ? [2, 1] : [1, 2];
+		} else {
+			return this.cw ? [0, 3] : [3, 0];
+		}
 	}
 
 	private *join(
@@ -85,11 +93,12 @@ class Joiner {
 	}
 
 	public *$standardJoin(): Generator<JDevice> {
-		let { s1, s2 } = this, shift = !!s1 || !!s2;
+		let { s1, s2 } = this, shift = Boolean(s1) || Boolean(s2);
 		let counter = 0;
-		yield* this.join(j => j.$standardJoin(), (P1, P2) => {
-			return shift || counter++ == 0; // 只會傳回第一個
-		});
+		yield* this.join(
+			j => j.$standardJoin(),
+			(P1, P2) => shift || counter++ == 0 // 只會傳回第一個
+		);
 	}
 
 	private _getReverseShift(o: JOverlap, j: JJunction): IPoint | undefined {

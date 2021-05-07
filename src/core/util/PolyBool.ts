@@ -68,7 +68,7 @@ namespace PolyBool {
 	type compare = 0 | 1 | -1;
 
 	export function shape(poly: Polygon): Shape {
-		var i = Intersecter(true);
+		let i = intersecter(true);
 		poly.regions.forEach(i.addRegion!);
 		return {
 			segments: i.calculate!(poly.inverted),
@@ -77,7 +77,7 @@ namespace PolyBool {
 	}
 
 	function combine(shape1: Shape, shape2: Shape) {
-		var i3 = Intersecter(false);
+		let i3 = intersecter(false);
 		return {
 			combined: i3.combine!(
 				shape1.segments, shape1.inverted,
@@ -92,26 +92,26 @@ namespace PolyBool {
 		return {
 			segments: SegmentSelector.union(combined.combined),
 			inverted: combined.inverted1 || combined.inverted2
-		}
+		};
 	}
 
 	function selectDifference(combined: Combined): Shape {
 		return {
 			segments: SegmentSelector.difference(combined.combined),
 			inverted: combined.inverted1 && !combined.inverted2
-		}
+		};
 	}
 
 	function selectXor(combined: Combined) {
 		return {
 			segments: SegmentSelector.xor(combined.combined),
 			inverted: combined.inverted1 !== combined.inverted2
-		}
+		};
 	}
 
 	export function polygon(shape: Shape): Polygon {
 		return {
-			regions: SegmentChainer(shape.segments),
+			regions: segmentChainer(shape.segments),
 			inverted: shape.inverted
 		};
 	}
@@ -133,7 +133,7 @@ namespace PolyBool {
 		ev: Event;
 	}
 
-	function Intersecter(selfIntersection: boolean) {
+	function intersecter(selfIntersection: boolean) {
 		// selfIntersection is true/false depending on the phase of the overall algorithm
 
 		//
@@ -168,14 +168,14 @@ namespace PolyBool {
 		// event logic
 		//
 
-		var event_list = List.create<Event>();
+		let event_list = List.create<Event>();
 
 		function eventCompare(
 			p1_isStart: boolean, p1_1: Point, p1_2: Point,
 			p2_isStart: boolean, p2_1: Point, p2_2: Point
 		): compare {
 			// compare the selected points first
-			var comp = Epsilon.$pointsCompare(p1_1, p2_1);
+			let comp = Epsilon.$pointsCompare(p1_1, p2_1);
 			if(comp !== 0) return comp;	// the selected points are the same
 
 			if(Epsilon.$pointsSame(p1_2, p2_2)) // if the non-selected points are the same too...
@@ -195,7 +195,7 @@ namespace PolyBool {
 			event_list.insertBefore(ev, function(here) {
 				// should ev be inserted before here?
 				if(here === ev) return 0;
-				var comp = eventCompare(
+				let comp = eventCompare(
 					ev.isStart, ev.pt, other_pt,
 					here.isStart, here.pt, here.other!.pt
 				);
@@ -204,7 +204,7 @@ namespace PolyBool {
 		}
 
 		function eventAddSegmentStart(seg: Segment, primary: boolean) {
-			var ev_start = List.node<Event>({
+			let ev_start = List.node<Event>({
 				isStart: true,
 				pt: seg.start,
 				seg: seg,
@@ -217,7 +217,7 @@ namespace PolyBool {
 		}
 
 		function eventAddSegmentEnd(ev_start: Event, seg: Segment, primary: boolean) {
-			var ev_end = List.node<Event>({
+			let ev_end = List.node<Event>({
 				isStart: false,
 				pt: seg.end,
 				seg: seg,
@@ -230,7 +230,7 @@ namespace PolyBool {
 		}
 
 		function eventAddSegment(seg: Segment, primary: boolean) {
-			var ev_start = eventAddSegmentStart(seg, primary);
+			let ev_start = eventAddSegmentStart(seg, primary);
 			eventAddSegmentEnd(ev_start, seg, primary);
 			return ev_start;
 		}
@@ -247,7 +247,7 @@ namespace PolyBool {
 		}
 
 		function eventDivide(ev: Event, pt: Point) {
-			var ns = segmentCopy(pt, ev.seg.end, ev.seg);
+			let ns = segmentCopy(pt, ev.seg.end, ev.seg);
 			eventUpdateEnd(ev, pt);
 			return eventAddSegment(ns, ev.primary);
 		}
@@ -259,13 +259,13 @@ namespace PolyBool {
 			// status logic
 			//
 
-			var status_list = List.create<Status>();
+			let status_list = List.create<Status>();
 
 			function statusCompare(ev1: Event, ev2: Event) {
-				var a1 = ev1.seg.start;
-				var a2 = ev1.seg.end;
-				var b1 = ev2.seg.start;
-				var b2 = ev2.seg.end;
+				let a1 = ev1.seg.start;
+				let a2 = ev1.seg.end;
+				let b1 = ev2.seg.start;
+				let b2 = ev2.seg.end;
 
 				if(Epsilon.$pointsCollinear(a1, b1, b2)) {
 					if(Epsilon.$pointsCollinear(a2, b1, b2))
@@ -278,7 +278,7 @@ namespace PolyBool {
 			function statusFindSurrounding(ev: Event) {
 				return status_list.findTransition({ ev: ev }, function(here) {
 					if(here.ev === ev) return 0;
-					var comp = statusCompare(ev, here.ev);
+					let comp = statusCompare(ev, here.ev);
 					return -comp;
 				});
 			}
@@ -286,14 +286,14 @@ namespace PolyBool {
 			function checkIntersection(ev1: Event, ev2: Event) {
 				// returns the segment equal to ev1, or false if nothing equal
 
-				var seg1 = ev1.seg;
-				var seg2 = ev2.seg;
-				var a1 = seg1.start;
-				var a2 = seg1.end;
-				var b1 = seg2.start;
-				var b2 = seg2.end;
+				let seg1 = ev1.seg;
+				let seg2 = ev2.seg;
+				let a1 = seg1.start;
+				let a2 = seg1.end;
+				let b1 = seg2.start;
+				let b2 = seg2.end;
 
-				var i = Epsilon.$linesIntersect(a1, a2, b1, b2);
+				let i = Epsilon.$linesIntersect(a1, a2, b1, b2);
 
 				if(i === false) {
 					// segments are parallel or coincident
@@ -306,14 +306,14 @@ namespace PolyBool {
 					if(Epsilon.$pointsSame(a1, b2) || Epsilon.$pointsSame(a2, b1))
 						return false; // segments touch at endpoints... no intersection
 
-					var a1_equ_b1 = Epsilon.$pointsSame(a1, b1);
-					var a2_equ_b2 = Epsilon.$pointsSame(a2, b2);
+					let a1_equ_b1 = Epsilon.$pointsSame(a1, b1);
+					let a2_equ_b2 = Epsilon.$pointsSame(a2, b2);
 
 					if(a1_equ_b1 && a2_equ_b2)
 						return ev2; // segments are exactly equal
 
-					var a1_between = !a1_equ_b1 && Epsilon.$pointBetween(a1, b1, b2);
-					var a2_between = !a2_equ_b2 && Epsilon.$pointBetween(a2, b1, b2);
+					let a1_between = !a1_equ_b1 && Epsilon.$pointBetween(a1, b1, b2);
+					let a2_between = !a2_equ_b2 && Epsilon.$pointBetween(a2, b1, b2);
 
 					// handy for debugging:
 					// buildLog.log({
@@ -385,19 +385,19 @@ namespace PolyBool {
 			//
 			// main event loop
 			//
-			var segments: Segment[] = [];
+			let segments: Segment[] = [];
 			while(!event_list.isEmpty()) {
 				var ev = event_list.getHead();
 
 				if(ev.isStart) {
 
-					var surrounding = statusFindSurrounding(ev);
+					let surrounding = statusFindSurrounding(ev);
 					var above = surrounding.before ? surrounding.before.ev : null;
 					var below = surrounding.after ? surrounding.after.ev : null;
 
 					function checkBothIntersections() {
 						if(above) {
-							var eve = checkIntersection(ev, above);
+							let eve = checkIntersection(ev, above);
 							if(eve)
 								return eve;
 						}
@@ -406,7 +406,7 @@ namespace PolyBool {
 						return false;
 					}
 
-					var eve = checkBothIntersections();
+					let eve = checkBothIntersections();
 					if(eve) {
 						// ev and eve are equal
 						// we'll keep eve and throw away ev
@@ -504,7 +504,7 @@ namespace PolyBool {
 					ev.other!.status = surrounding.insert(List.node<Status>({ ev: ev }));
 				}
 				else {
-					var st = ev.status;
+					let st = ev.status;
 
 					if(st === null) {
 						throw new Error('PolyBool: Zero-length segment detected; your epsilon is ' +
@@ -513,9 +513,9 @@ namespace PolyBool {
 
 					// removing the status will create two new adjacent edges, so we'll need to check
 					// for those
-					var i = status_list.getIndex(st);
+					let i = status_list.getIndex(st);
 					if(i > 0 && i < status_list.nodes.length - 1) {
-						var before = status_list.nodes[i - 1], after = status_list.nodes[i + 1];
+						let before = status_list.nodes[i - 1], after = status_list.nodes[i + 1];
 						checkIntersection(before.ev, after.ev);
 					}
 
@@ -526,7 +526,7 @@ namespace PolyBool {
 					// save the segment for reporting
 					if(!ev.primary) {
 						// make sure `seg.myFill` actually points to the primary polygon though
-						var s = ev.seg.myFill;
+						let s = ev.seg.myFill;
 						ev.seg.myFill = ev.seg.otherFill!;
 						ev.seg.otherFill = s;
 					}
@@ -565,13 +565,13 @@ namespace PolyBool {
 				// regions are a list of points:
 				//  [ [0, 0], [100, 0], [50, 100] ]
 				// you can add multiple regions before running calculate
-				var pt1;
-				var pt2 = region[region.length - 1];
-				for(var i = 0; i < region.length; i++) {
+				let pt1;
+				let pt2 = region[region.length - 1];
+				for(let i = 0; i < region.length; i++) {
 					pt1 = pt2;
 					pt2 = region[i];
 
-					var forward = Epsilon.$pointsCompare(pt1, pt2);
+					let forward = Epsilon.$pointsCompare(pt1, pt2);
 					if(forward === 0) // points are equal, so we have a zero-length segment
 						continue; // just skip it
 
@@ -597,30 +597,30 @@ namespace PolyBool {
 		const eps = 0.0000000001;
 
 		export function $pointAboveOrOnLine(pt: Point, left: Point, right: Point): boolean {
-			var Ax = left[0];
-			var Ay = left[1];
-			var Bx = right[0];
-			var By = right[1];
-			var Cx = pt[0];
-			var Cy = pt[1];
+			let Ax = left[0];
+			let Ay = left[1];
+			let Bx = right[0];
+			let By = right[1];
+			let Cx = pt[0];
+			let Cy = pt[1];
 			return (Bx - Ax) * (Cy - Ay) - (By - Ay) * (Cx - Ax) >= -eps;
 		}
 
 		export function $pointBetween(p: Point, left: Point, right: Point) {
 			// p must be collinear with left->right
 			// returns false if p == left, p == right, or left == right
-			var d_py_ly = p[1] - left[1];
-			var d_rx_lx = right[0] - left[0];
-			var d_px_lx = p[0] - left[0];
-			var d_ry_ly = right[1] - left[1];
+			let d_py_ly = p[1] - left[1];
+			let d_rx_lx = right[0] - left[0];
+			let d_px_lx = p[0] - left[0];
+			let d_ry_ly = right[1] - left[1];
 
-			var dot = d_px_lx * d_rx_lx + d_py_ly * d_ry_ly;
+			let dot = d_px_lx * d_rx_lx + d_py_ly * d_ry_ly;
 			// if `dot` is 0, then `p` == `left` or `left` == `right` (reject)
 			// if `dot` is less than 0, then `p` is to the left of `left` (reject)
 			if(dot < eps)
 				return false;
 
-			var sqlen = d_rx_lx * d_rx_lx + d_ry_ly * d_ry_ly;
+			let sqlen = d_rx_lx * d_rx_lx + d_ry_ly * d_ry_ly;
 			// if `dot` > `sqlen`, then `p` is to the right of `right` (reject)
 			// therefore, if `dot - sqlen` is greater than 0, then `p` is to the right of `right` (reject)
 			if(dot - sqlen > -eps)
@@ -652,10 +652,10 @@ namespace PolyBool {
 			// does pt1->pt2->pt3 make a straight line?
 			// essentially this is just checking to see if the slope(pt1->pt2) === slope(pt2->pt3)
 			// if slopes are equal, then they must be collinear, because they share pt2
-			var dx1 = pt1[0] - pt2[0];
-			var dy1 = pt1[1] - pt2[1];
-			var dx2 = pt2[0] - pt3[0];
-			var dy2 = pt2[1] - pt3[1];
+			let dx1 = pt1[0] - pt2[0];
+			let dy1 = pt1[1] - pt2[1];
+			let dx2 = pt2[0] - pt3[0];
+			let dy2 = pt2[1] - pt3[1];
 			return Math.abs(dx1 * dy2 - dx2 * dy1) < eps;
 		}
 
@@ -678,22 +678,22 @@ namespace PolyBool {
 			//     0   intersection point is between segment's first and second points (exclusive)
 			//     1   intersection point is directly on segment's second point
 			//     2   intersection point is after segment's second point
-			var adx = a1[0] - a0[0];
-			var ady = a1[1] - a0[1];
-			var bdx = b1[0] - b0[0];
-			var bdy = b1[1] - b0[1];
+			let adx = a1[0] - a0[0];
+			let ady = a1[1] - a0[1];
+			let bdx = b1[0] - b0[0];
+			let bdy = b1[1] - b0[1];
 
-			var axb = adx * bdy - ady * bdx;
+			let axb = adx * bdy - ady * bdx;
 			if(Math.abs(axb) < eps)
 				return false; // lines are coincident
 
-			var dx = a0[0] - b0[0];
-			var dy = a0[1] - b0[1];
+			let dx = a0[0] - b0[0];
+			let dy = a0[1] - b0[1];
 
-			var A = (bdx * dy - bdy * dx) / axb;
-			var B = (adx * dy - ady * dx) / axb;
+			let A = (bdx * dy - bdy * dx) / axb;
+			let B = (adx * dy - ady * dx) / axb;
 
-			var ret = {
+			let ret = {
 				alongA: 0,
 				alongB: 0,
 				pt: [
@@ -754,9 +754,9 @@ namespace PolyBool {
 
 	namespace SegmentSelector {
 		function select(segments: Segment[], selection: number[]): Segment[] {
-			var result: Segment[] = [];
+			let result: Segment[] = [];
 			segments.forEach(function(seg) {
-				var index =
+				let index =
 					(seg.myFill.above ? 8 : 0) +
 					(seg.myFill.below ? 4 : 0) +
 					((seg.otherFill && seg.otherFill.above) ? 2 : 0) +
@@ -863,13 +863,13 @@ namespace PolyBool {
 		matches_pt1: boolean;
 	}
 
-	function SegmentChainer(segments: Segment[]) {
-		var chains: Path[] = [];
-		var regions: Path[] = [];
+	function segmentChainer(segments: Segment[]) {
+		let chains: Path[] = [];
+		let regions: Path[] = [];
 
 		segments.forEach(function(seg) {
-			var pt1 = seg.start;
-			var pt2 = seg.end;
+			let pt1 = seg.start;
+			let pt2 = seg.end;
 			if(Epsilon.$pointsSame(pt1, pt2)) {
 				console.warn('PolyBool: Warning: Zero-length segment detected; your epsilon is ' +
 					'probably too small or too large');
@@ -877,17 +877,17 @@ namespace PolyBool {
 			}
 
 			// search for two chains that this segment matches
-			var first_match: Match = {
+			let first_match: Match = {
 				index: 0,
 				matches_head: false,
 				matches_pt1: false
 			};
-			var second_match: Match = {
+			let second_match: Match = {
 				index: 0,
 				matches_head: false,
 				matches_pt1: false
 			};
-			var next_match: Match | null = first_match;
+			let next_match: Match | null = first_match;
 			function setMatch(index: number, matches_head: boolean, matches_pt1: boolean) {
 				// return true if we've matched twice
 				next_match!.index = index;
@@ -900,12 +900,12 @@ namespace PolyBool {
 				next_match = null;
 				return true; // we've matched twice, we're done here
 			}
-			for(var i = 0; i < chains.length; i++) {
+			for(let i = 0; i < chains.length; i++) {
 				var chain = chains[i];
-				var head = chain[0];
-				var head2 = chain[1];
-				var tail = chain[chain.length - 1];
-				var tail2 = chain[chain.length - 2];
+				let head = chain[0];
+				let head2 = chain[1];
+				let tail = chain[chain.length - 1];
+				let tail2 = chain[chain.length - 2];
 				if(Epsilon.$pointsSame(head, pt1)) {
 					if(setMatch(i, true, true))
 						break;
@@ -936,15 +936,15 @@ namespace PolyBool {
 				// add the other point to the appropriate end, and check to see if we've closed the
 				// chain into a loop
 
-				var index = first_match.index;
-				var pt = first_match.matches_pt1 ? pt2 : pt1; // if we matched pt1, then we add pt2, etc
-				var addToHead = first_match.matches_head; // if we matched at head, then add to the head
+				let index = first_match.index;
+				let pt = first_match.matches_pt1 ? pt2 : pt1; // if we matched pt1, then we add pt2, etc
+				let addToHead = first_match.matches_head; // if we matched at head, then add to the head
 
 				var chain = chains[index];
-				var grow = addToHead ? chain[0] : chain[chain.length - 1];
-				var grow2 = addToHead ? chain[1] : chain[chain.length - 2];
-				var oppo = addToHead ? chain[chain.length - 1] : chain[0];
-				var oppo2 = addToHead ? chain[chain.length - 2] : chain[1];
+				let grow = addToHead ? chain[0] : chain[chain.length - 1];
+				let grow2 = addToHead ? chain[1] : chain[chain.length - 2];
+				let oppo = addToHead ? chain[chain.length - 1] : chain[0];
+				let oppo2 = addToHead ? chain[chain.length - 2] : chain[1];
 
 				if(Epsilon.$pointsCollinear(grow2, grow, pt)) {
 					// grow isn't needed because it's directly between grow2 and pt:
@@ -996,12 +996,12 @@ namespace PolyBool {
 
 			function appendChain(index1: number, index2: number) {
 				// index1 gets index2 appended to it, and index2 is removed
-				var chain1 = chains[index1];
-				var chain2 = chains[index2];
-				var tail = chain1[chain1.length - 1];
-				var tail2 = chain1[chain1.length - 2];
-				var head = chain2[0];
-				var head2 = chain2[1];
+				let chain1 = chains[index1];
+				let chain2 = chains[index2];
+				let tail = chain1[chain1.length - 1];
+				let tail2 = chain1[chain1.length - 2];
+				let head = chain2[0];
+				let head2 = chain2[1];
 
 				if(Epsilon.$pointsCollinear(tail2, tail, head)) {
 					// tail isn't needed because it's directly between tail2 and head
@@ -1020,10 +1020,10 @@ namespace PolyBool {
 				chains.splice(index2, 1);
 			}
 
-			var F = first_match.index;
-			var S = second_match.index;
+			let F = first_match.index;
+			let S = second_match.index;
 
-			var reverseF = chains[F].length < chains[S].length; // reverse the shorter chain, if needed
+			let reverseF = chains[F].length < chains[S].length; // reverse the shorter chain, if needed
 			if(first_match.matches_head) {
 				if(second_match.matches_head) {
 					if(reverseF) {
@@ -1078,7 +1078,7 @@ namespace PolyBool {
 				if(!lo) lo = 0;
 				if(!hi) hi = a.length;
 				while(lo! < hi!) {
-					var mid: number = lo! + hi! >>> 1;
+					let mid: number = lo! + hi! >>> 1;
 					if(compare(a[mid], x) > 0) hi = mid;
 					else lo = mid + 1;
 				}
@@ -1105,7 +1105,7 @@ namespace PolyBool {
 					my.findTransition(node, check).insert(node);
 				},
 				findTransition: function(node: T, check: (v: T) => number) {
-					var i = bisect(function(a: T, b: T) { return check(b) - check(a); })(my.nodes, node);
+					let i = bisect(function(a: T, b: T) { return check(b) - check(a); })(my.nodes, node);
 					return {
 						before: i === 0 ? null : my.nodes[i - 1],
 						after: my.nodes[i] || null,

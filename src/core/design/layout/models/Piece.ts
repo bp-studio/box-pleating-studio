@@ -58,7 +58,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 			Point.ZERO,
 			new Point(u, ox + u),
 			new Point(oy + u + v, ox + u + v),
-			new Point(oy + v, v),
+			new Point(oy + v, v)
 		];
 		result.forEach(p => p.addBy(this._shift));
 		return result;
@@ -77,46 +77,48 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	@onDemand public get $shape(): IRegionShape {
 		let contour = this._points.concat();
 		let ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
-
-		// 處理繞道
-		(this.detours || []).forEach(d => {
-			// 把資料進行變換
-			let detour = d.map(p => new Point(p.x, p.y).addBy(this._shift));
-			let start = detour[0], end = detour[detour.length - 1];
-			let lines: Line[] = [];
-			for(let i = 0; i < detour.length - 1; i++) {
-				lines.push(new Line(detour[i], detour[i + 1]));
-			}
-
-			// 尋找繞道對應的位置
-			let l = ridges.length;
-			for(let i = 0; i < l; i++) {
-				let eq = ridges[i].p1.eq(start);
-				if(eq || ridges[i].$contains(start)) {
-					for(let j = 1; j < l; j++) {
-						let k = (j + i) % l;
-						// 找到了，進行替換
-						if(ridges[k].p1.eq(end) || ridges[k].$contains(end)) {
-							let tail = k < i ? l - i : j + 1, head = j + 1 - tail;
-							let pts = detour.concat();
-							lines.push(new Line(end, ridges[k].p2));
-							if(!eq) {
-								pts.unshift(ridges[i].p1);
-								lines.unshift(new Line(ridges[i].p1, start));
-							}
-							contour.splice(i, tail, ...pts);
-							ridges.splice(i, tail, ...lines);
-							contour.splice(0, head);
-							ridges.splice(0, head);
-							return;
-						}
-					}
-					// 跑到這裡來的話表示指定的繞道有問題，找到了頭卻找不到尾
-					debugger;
-				}
-			}
-		});
+		(this.detours || []).forEach(d => this._processDetour(ridges, contour, d));
 		return { contour, ridges };
+	}
+
+	/** 處理繞道 */
+	private _processDetour(ridges: Line[], contour: Point[], d: IPoint[]) {
+		let detour = d.map(p => new Point(p.x, p.y).addBy(this._shift));
+		let start = detour[0], end = detour[detour.length - 1];
+
+		let lines: Line[] = [];
+		for(let i = 0; i < detour.length - 1; i++) {
+			lines.push(new Line(detour[i], detour[i + 1]));
+		}
+
+		// 尋找繞道對應的位置
+		let l = ridges.length;
+		for(let i = 0; i < l; i++) {
+			let eq = ridges[i].p1.eq(start);
+			if(!eq && !ridges[i].$contains(start)) continue;
+
+			for(let j = 1; j < l; j++) {
+				let k = (j + i) % l;
+				if(!ridges[k].p1.eq(end) && !ridges[k].$contains(end)) continue;
+
+				// 找到了，進行替換
+				let tail = k < i ? l - i : j + 1, head = j + 1 - tail;
+				let pts = detour.concat();
+				lines.push(new Line(end, ridges[k].p2));
+				if(!eq) {
+					pts.unshift(ridges[i].p1);
+					lines.unshift(new Line(ridges[i].p1, start));
+				}
+				contour.splice(i, tail, ...pts);
+				ridges.splice(i, tail, ...lines);
+				contour.splice(0, head);
+				ridges.splice(0, head);
+				return;
+			}
+
+			// 跑到這裡來的話表示指定的繞道有問題，找到了頭卻找不到尾
+			debugger;
+		}
 	}
 
 	/** 這個 Piece 對應的四個（相位變換後）連接點，若不負責對應的連結點則傳回 null */

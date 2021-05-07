@@ -14,8 +14,8 @@ namespace KeyboardController {
 		_states[e.key.toLowerCase()] = on;
 	}
 
-	export function $isPressed(key: string) {
-		return !!_states[key];
+	export function $isPressed(key: string): boolean {
+		return Boolean(_states[key]);
 	}
 
 	document.body.addEventListener('keydown', e => _set(e, true));

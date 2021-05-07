@@ -46,7 +46,7 @@ interface JNode {
 	}
 
 	@shrewd public get $parentEdge(): TreeEdge | null {
-		if(!this.$parent) return null
+		if(!this.$parent) return null;
 		return this.$tree.$edge.get(this, this.$parent) ?? null;
 	}
 

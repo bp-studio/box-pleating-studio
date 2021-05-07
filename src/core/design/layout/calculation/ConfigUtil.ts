@@ -11,7 +11,11 @@ namespace ConfigUtil {
 	 *
 	 * @returns 連接到別人的那一個 JOverlap
 	 */
-	export function $joinOverlaps(o1: JOverlap, o2: JOverlap, i1: number, i2: number, oriented: boolean, reverse = false) {
+	export function $joinOverlaps(
+		o1: JOverlap, o2: JOverlap,
+		i1: number, i2: number,
+		oriented: boolean, reverse = false
+	): JOverlap {
 		if(reverse) {
 			[o1, o2] = [o2, o1];
 			[i1, i2] = [i2, i1];
@@ -20,7 +24,7 @@ namespace ConfigUtil {
 		let q = ((o2.ox > o1.ox ? 3 : 1) + c) % 4;
 		o2.c[c] = { type: CornerType.$coincide, e: i1, q: c };
 		o2.c[q] = { type: CornerType.$intersection, e: o1.c[opposite(c)].e };
-		o1.c[opposite(q)] = { type: CornerType.$coincide, e: i2, q: q };
+		o1.c[opposite(q)] = { type: CornerType.$coincide, e: i2, q };
 		return o2;
 	}
 

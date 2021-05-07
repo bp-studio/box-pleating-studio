@@ -54,8 +54,7 @@
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: unknown) {
-		if(!thisArg) thisArg = this;
+	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg: unknown = this) {
 		for(let [k1, k2, v] of this.entries()) callbackfn.apply(thisArg, [v, k1, k2, this]);
 	}
 

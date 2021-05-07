@@ -122,7 +122,7 @@ class BPStudio {
 
 	/** 替物件產生 GUID 並且傳回 */
 	public guid(object: unknown): string {
-		if(typeof object != 'object' || object == null) return "";
+		if(typeof object != 'object' || object === null) return "";
 		return MathUtil.$guid(object);
 	}
 
@@ -133,18 +133,18 @@ class BPStudio {
 	public getDesigns(): Design[] { return [...this._studio.$designMap.values()]; }
 	public getDesign(id: unknown): Design | undefined {
 		if(typeof id == 'number') return this._studio.$designMap.get(id);
-		else return undefined;
+		return undefined;
 	}
 	public create(json: unknown): Design {
-		if(json && typeof json == 'object') return this._studio.$create(json);
-		else throw new Error();
+		if(json && typeof json == 'object') return this._studio.$create(json as Pseudo<JDesign>);
+		throw new Error();
 	}
 	public restore(json: unknown): Design {
-		if(json && typeof json == 'object') return this._studio.$restore(json);
-		else throw new Error();
+		if(json && typeof json == 'object') return this._studio.$restore(json as Pseudo<JDesign>);
+		throw new Error();
 	}
 	public select(id: unknown): void {
-		if(typeof id == 'number' || id == null) this._studio.$select(id as number | null);
+		if(typeof id == 'number' || id === null) this._studio.$select(id as number | null);
 	}
 	public close(id: unknown): void {
 		if(typeof id == 'number') this._studio.$close(id);
@@ -154,9 +154,10 @@ class BPStudio {
 
 	public load(json: unknown): Design | undefined {
 		try {
-			if(typeof json == 'string' || typeof json == 'object' && json != null) {
+			if(typeof json == 'string' || typeof json == 'object' && json !== null) {
 				return this._studio.$load(json);
-			} else return undefined;
+			}
+			return undefined;
 		} catch(e) {
 			return undefined;
 		}

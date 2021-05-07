@@ -42,7 +42,7 @@ class Configurator {
 			try {
 				// 如果有存檔，直接先把存檔吐回去為快
 				let c = new Configuration(this._repo, this._seed, this._pattern);
-				if(!c.entry) throw true;
+				if(!c.entry) throw new Error();
 				yield c;
 			} catch(e) {
 				this._seedSignature = undefined;
@@ -67,7 +67,7 @@ class Configurator {
 				this._searchSingleGadget(j),
 				this._searchDoubleRelay(j, 0),
 				this._searchSingleGadget(j, Strategy.$halfIntegral),
-				this._searchSingleGadget(j, Strategy.$universal),
+				this._searchSingleGadget(j, Strategy.$universal)
 			], filter);
 		}
 
@@ -83,7 +83,7 @@ class Configurator {
 				this._searchThreeFlapRelayJoin(layout, Strategy.$baseJoin),
 				this._searchThreeFlapJoin(layout, Strategy.$standardJoin),
 				this._searchThreeFlapRelayJoin(layout, Strategy.$standardJoin),
-				this._searchThreeFlapRelay(layout, Strategy.$halfIntegral),
+				this._searchThreeFlapRelay(layout, Strategy.$halfIntegral)
 			], filter);
 		}
 
@@ -93,16 +93,15 @@ class Configurator {
 	/** 搜尋單一分割 */
 	private *_searchSingleGadget(j: JJunction, strategy?: Strategy): Generator<Configuration> {
 		yield new Configuration(this._repo, {
-			partitions: [{
-				overlaps: [ConfigUtil.$toOverlap(j, 0)],
-				strategy: strategy
-			}]
+			partitions: [
+				{ overlaps: [ConfigUtil.$toOverlap(j, 0)], strategy }
+			]
 		});
 	}
 
 	/** 搜尋雙切割接力 */
 	private *_searchDoubleRelay(j: JJunction, index: number): Generator<Configuration> {
-		if((j.ox * j.oy) % 2) return; // 不考慮奇數面積
+		if(j.ox * j.oy % 2) return; // 不考慮奇數面積
 		if(j.ox < j.oy) {
 			for(let y = 1; y <= j.oy / 2; y++) {
 				let c = new Configuration(this._repo, { partitions: ConfigUtil.$cut(j, index, -1, 0, y) });
@@ -146,14 +145,14 @@ class Configurator {
 
 		yield new Configuration(this._repo, {
 			partitions: [
-				{ overlaps: [o1], strategy: strategy },
-				{ overlaps: [o2p], strategy: strategy }
+				{ overlaps: [o1], strategy },
+				{ overlaps: [o2p], strategy }
 			]
 		});
 		yield new Configuration(this._repo, {
 			partitions: [
-				{ overlaps: [o1p], strategy: strategy },
-				{ overlaps: [o2], strategy: strategy }
+				{ overlaps: [o1p], strategy },
+				{ overlaps: [o2], strategy }
 			]
 		});
 	}
@@ -167,13 +166,16 @@ class Configurator {
 		yield new Configuration(this._repo, {
 			partitions: [{
 				overlaps: [o1, o2],
-				strategy: strategy
+				strategy
 			}]
 		});
 	}
 
 	/** 搜尋 3-Flap Relay Join */
-	private *_searchThreeFlapRelayJoin(junctions: readonly [JJunction, JJunction], strategy?: Strategy): Generator<Configuration> {
+	private *_searchThreeFlapRelayJoin(
+		junctions: readonly [JJunction, JJunction],
+		strategy?: Strategy
+	): Generator<Configuration> {
 		let [o1, o2] = junctions.map((j, i) => ConfigUtil.$toOverlap(j, i));
 		let oriented = o1.c[0].e == o2.c[0].e;
 		let o1x = o2.ox > o1.ox; // o1 寬度比較窄
@@ -187,7 +189,7 @@ class Configurator {
 			yield new Configuration(this._repo, {
 				partitions: [{
 					overlaps: [o1p, o2p],
-					strategy: strategy
+					strategy
 				}]
 			});
 		}
@@ -200,7 +202,7 @@ class Configurator {
 			yield new Configuration(this._repo, {
 				partitions: [{
 					overlaps: [o1p, o2p],
-					strategy: strategy
+					strategy
 				}]
 			});
 		}

@@ -39,7 +39,10 @@ interface JStretch {
 
 	@shrewd private get _flaps(): readonly Flap[] {
 		let s = new Set<Flap>();
-		for(let j of this.$junctions) { s.add(j.f1); s.add(j.f2); }
+		for(let j of this.$junctions) {
+			s.add(j.f1);
+			s.add(j.f2);
+		}
 		return Array.from(s);
 	}
 

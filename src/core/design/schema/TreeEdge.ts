@@ -48,7 +48,10 @@ interface JEdge {
 
 	public $delete(): boolean {
 		let n = [this.n1, this.n2].find(n => n.$degree == 1);
-		if(n) { n.$dispose(); return true; }
+		if(n) {
+			n.$dispose();
+			return true;
+		}
 		return false;
 	}
 
@@ -111,11 +114,11 @@ interface JEdge {
 	// 單側總邊長
 	@shrewd private get t1(): number {
 		this.$disposeEvent();
-		return this.a1.map(e => e.t(this.n1) + e.length).reduce((n, x) => n + x, 0);
+		return sum(this.a1.map(e => e.t(this.n1) + e.length));
 	}
 	@shrewd private get t2(): number {
 		this.$disposeEvent();
-		return this.a2.map(e => e.t(this.n2) + e.length).reduce((n, x) => n + x, 0);
+		return sum(this.a2.map(e => e.t(this.n2) + e.length));
 	}
 	private t(n: TreeNode) { return n == this.n1 ? this.t2 : this.t1; }
 

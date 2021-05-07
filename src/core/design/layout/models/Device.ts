@@ -73,7 +73,7 @@ type GDevice = JDevice<Gadget>;
 		for(let g of this.$gadgets) {
 			result.push(g.$anchorMap.map(m => {
 				if(!m[0]) debugger;
-				return m[0].$transform(fx, fy).add(this.$delta)
+				return m[0].$transform(fx, fy).add(this.$delta);
 			}));
 		}
 		return result;
@@ -95,13 +95,12 @@ type GDevice = JDevice<Gadget>;
 	@onDemand private get _regionRidges(): ReadonlyMap<Region, Line[]> {
 		let map: Map<Region, Line[]> = new Map();
 		for(let r of this.$regions) {
-			let s = this.$regions
-				.filter(q => q != r && q.$direction.$parallel(r.$direction))
-				.reduce((arr, q) => (arr.push(
-					// 垂直於軸平行摺痕的脊線即使重疊也不應該被扣除（meandering 時會產生）
-					...q.$shape.ridges.filter(r => !r.$perpendicular(q.$direction))
-				), arr), [] as Line[]);
-			map.set(r, Line.$subtract(r.$shape.ridges, s));
+			let parallelRegions = this.$regions.filter(q => q != r && q.$direction.$parallel(r.$direction));
+
+			// 垂直於軸平行摺痕的脊線即使重疊也不應該被扣除（meandering 時會產生）
+			let lines = selectMany(parallelRegions, q => q.$shape.ridges.filter(r => !r.$perpendicular(q.$direction)));
+
+			map.set(r, Line.$subtract(r.$shape.ridges, lines));
 		}
 		return map;
 	}
@@ -120,8 +119,8 @@ type GDevice = JDevice<Gadget>;
 	/** 這個 Device 實際上要繪製出來的脊線（扣除掉跟相鄰 Device 重疊部份之後） */
 	@shrewd public get $ridges(): readonly Line[] {
 		let raw = this._rawRidges;
-		let nei = this._neighbors.reduce((arr, g) => (arr.push(...g._rawRidges), arr), [] as Line[]);
-		return Line.$subtract(raw, nei);
+		let neighborLines = selectMany(this._neighbors, g => g._rawRidges);
+		return Line.$subtract(raw, neighborLines);
 	}
 
 	@shrewd public get $axisParallels(): readonly Line[] {
@@ -196,7 +195,7 @@ type GDevice = JDevice<Gadget>;
 	private _fix(dx: number, c: JCorner, o: number, q: number): number {
 		let out = c.type != CornerType.$socket;
 		let f = this.$pattern.$stretch.fx * ((out ? q : opposite(c.q!)) == 0 ? -1 : 1);
-		let target = this.$pattern.$getConnectionTarget(c as JConnection)
+		let target = this.$pattern.$getConnectionTarget(c as JConnection);
 		let slack = out ? this.$gadgets[o].$slacks[q] : this.$pattern.$gadgets[-c.e! - 1].$slacks[c.q!];
 		let bound = target.x - this.$anchors[o][q].x - slack * f;
 		if(dx * f > bound * f) dx = bound;

@@ -44,12 +44,10 @@ abstract class Draggable extends ViewedControl {
 		}
 	}
 
-	/**
-	 * 真的發生拖曳之後的 callback；預設是什麼都不會發生。
-	 *
-	 * 在 `Flap` 和 `Vertex` 中有覆寫此行為。
-	 */
-	protected $onDragged() { }
+	/** 真的發生拖曳之後的 callback。 */
+	protected $onDragged() {
+		// 預設是什麼都不會發生，在 `Flap` 和 `Vertex` 中有覆寫此行為。
+	}
 
 	/**
 	 * 把一個傳入的 `Vector` 進行修正到實際上可以被容許的移動範圍之上，

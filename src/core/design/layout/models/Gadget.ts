@@ -59,7 +59,7 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 
 	/** 傳回 Gadget 的 AnchorMap 陣列（點的位置是相位變換之前） */
 	@onDemand public get $anchorMap(): PerQuadrant<AnchorMap> {
-		return MakePerQuadrant<AnchorMap>(q => {
+		return makePerQuadrant<AnchorMap>(q => {
 			if(this.anchors?.[q]?.location) {
 				let p = new Point(this.anchors[q].location!);
 				if(this.offset) p.addBy(new Vector(this.offset));
@@ -80,7 +80,7 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 	}
 
 	@onDemand public get $slacks(): PerQuadrant<number> {
-		return MakePerQuadrant(q => this._getSlack(q));
+		return makePerQuadrant(q => this._getSlack(q));
 	}
 
 	/** 取得這個 Gadget 的 sx 整數全長 */
@@ -120,7 +120,7 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 		let c1 = this.$contour, c2 = g.$contour;
 		let f = q1 == 0 ? 1 : -1;
 		let step = new Vector(f, f);
-		let slack = new Fraction(this._getSlack(q1))
+		let slack = new Fraction(this._getSlack(q1));
 		let v = g.$anchorMap[q2][0].sub(Point.ZERO).addBy(step.$scale(slack));
 
 		// 下一行中的 Point.ZERO 原本是 this.anchorMap[0][0].add(step.scale(this._getSlack(0)))
@@ -186,7 +186,7 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 				if(a.slack === 0) delete a.slack;
 				if(Object.keys(a).length == 0) delete g.anchors[i];
 			}
-			if(!g.anchors.some(a => !!a)) delete g.anchors;
+			if(!g.anchors.some(a => Boolean(a))) delete g.anchors;
 		}
 		return g;
 	}

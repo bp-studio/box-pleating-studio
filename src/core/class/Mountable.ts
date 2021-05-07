@@ -55,8 +55,12 @@ abstract class Mountable extends Disposable {
 	public static $isActive(m: Mountable) { return m.$isActive; }
 
 	/** 掛載事件 */
-	protected $onMount(studio: Studio) { }
+	protected $onMount(studio: Studio) {
+		// 預設行為為空
+	}
 
 	/** 卸載事件 */
-	protected $onDismount(studio: Studio) { }
+	protected $onDismount(studio: Studio) {
+		// 預設行為為空
+	}
 }

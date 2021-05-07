@@ -29,7 +29,7 @@
 	public $toFlap(vertices: Vertex[]) {
 		this._design.$LayoutSheet.$clearSelection();
 		for(let v of vertices) {
-			let f = this._design.$flaps.get(v.$node)
+			let f = this._design.$flaps.get(v.$node);
 			if(f) f.$selected = true;
 		}
 		this._design.mode = "layout";
