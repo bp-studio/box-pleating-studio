@@ -10,6 +10,6 @@
 @shrewd class Mapping<K, V extends Disposable> extends BaseMapping<K, K, V> {
 
 	constructor(source: IterableFactory<K>, constructor: Func<K, V>) {
-		super(source, k => k, constructor, (k, v) => v.$disposed);
+		super(source, k => k, constructor, (_, v) => v.$disposed);
 	}
 }

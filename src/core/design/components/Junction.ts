@@ -11,7 +11,7 @@ enum JunctionStatus {
 	/** 兩者合法重疊 */
 	overlap,
 	/** 兩者沒有重疊 */
-	tooFar
+	tooFar,
 }
 
 type JunctionDimension = 'ox' | 'oy';
@@ -113,7 +113,7 @@ type JunctionDimension = 'ox' | 'oy';
 				if(ov[i][0] != nv[i][0] || ov[i][1] != nv[i][1]) return false;
 			}
 			return true;
-		}
+		},
 	})
 	private get _coverCandidate(): [Junction, TreeNode][] {
 		let result: [Junction, TreeNode][] = [];
@@ -163,11 +163,11 @@ type JunctionDimension = 'ox' | 'oy';
 				{ type: CornerType.$flap, e: this.f1.node.id, q: this.q1!.q },
 				{ type: CornerType.$side },
 				{ type: CornerType.$flap, e: this.f2.node.id, q: this.q2!.q },
-				{ type: CornerType.$side }
+				{ type: CornerType.$side },
 			],
 			ox: this.ox,
 			oy: this.oy,
-			sx: this.sx < 0 ? -this.sx : this.sx
+			sx: this.sx < 0 ? -this.sx : this.sx,
 		};
 	}
 
@@ -278,7 +278,9 @@ type JunctionDimension = 'ox' | 'oy';
 	 * 找出給定的 `Junction[]` 裡面 ox 或 oy 最大或最小的
 	 * @param f 傳入 1 表示要找最大、-1 表示要找最小
 	 */
-	public static $findMinMax(junctions: readonly Junction[], key: JunctionDimension, f: number): Junction {
+	public static $findMinMax(
+		junctions: readonly Junction[], key: JunctionDimension, f: number
+	): Junction {
 		if(!junctions[0]) debugger;
 		let value = junctions[0][key];
 		let result: Junction = junctions[0];

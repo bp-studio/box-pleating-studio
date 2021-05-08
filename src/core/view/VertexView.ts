@@ -46,7 +46,7 @@
 		let s = 4 * Math.sqrt(this.scale);
 		this._dot.copyContent(new paper.Path.Circle({
 			position: this._dot.position,
-			radius: s
+			radius: s,
 		}));
 	}
 
@@ -58,6 +58,8 @@
 			return edgeView.line;
 		});
 		this._label.content = this._control.$node.name;
-		LabelUtil.$setLabel(this._control.$sheet, this._label, this._glow, { x, y }, this._dot, ...lines);
+		LabelUtil.$setLabel(
+			this._control.$sheet, this._label, this._glow, { x, y }, this._dot, ...lines
+		);
 	}
 }

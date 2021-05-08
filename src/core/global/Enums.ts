@@ -30,7 +30,7 @@ enum CornerType {
 	/** 連至 Flap 的角 */
 	$flap,
 	/** 這個角和另外一個 Overlap 的角落是重合的；這會使得當前的 Overlap 和對方屬於相同的 Partition */
-	$coincide
+	$coincide,
 }
 
 interface ILayerOptions {
@@ -47,5 +47,5 @@ const LayerOptions: { [key: number]: ILayerOptions } = {
 	[Layer.$junction]: { clipped: true, scaled: true },
 	[Layer.$dot]: { clipped: false, scaled: false },
 	[Layer.$label]: { clipped: false, scaled: false },
-	[Layer.$drag]: { clipped: false, scaled: true }
+	[Layer.$drag]: { clipped: false, scaled: true },
 };

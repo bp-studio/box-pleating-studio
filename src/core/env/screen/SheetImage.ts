@@ -36,7 +36,7 @@ abstract class SheetImage extends Viewport {
 	protected _getPadding(scroll: IPoint): IPoint {
 		return {
 			x: (scroll.x - this._imgWidth) / 2 + this._horMargin,
-			y: (scroll.y + this._imgHeight) / 2 - this._MARGIN
+			y: (scroll.y + this._imgHeight) / 2 - this._MARGIN,
 		};
 	}
 

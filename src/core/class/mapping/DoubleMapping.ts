@@ -10,7 +10,8 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DoubleMapping<K extends Disposable, V extends Disposable> implements IDisposable, ReadonlyDoubleMap<K, V> {
+@shrewd class DoubleMapping<K extends Disposable, V extends Disposable>
+implements IDisposable, ReadonlyDoubleMap<K, V> {
 
 	constructor(source: IterableFactory<K>, constructor: (k1: K, k2: K) => V) {
 		this._source = source;
@@ -42,7 +43,7 @@
 				}
 			}
 			return map;
-		}
+		},
 	})
 	private _map: DoubleMap<K, V>;
 
@@ -55,7 +56,7 @@
 	public get(...args: [K] | [K, K]) { return this._map.get.apply(this._map, args); }
 
 	public get size() { return this._map.size; }
-	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: unknown) {
+	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg?: unknown) {
 		return this._map.forEach(callbackfn, thisArg);
 	}
 

@@ -24,7 +24,7 @@ type GPattern = JPattern<Gadget>;
 	}
 
 	public static $getSignature(pattern: JPattern) {
-		let d = pattern.devices;
+		let devices = pattern.devices;
 		pattern.devices = pattern.devices.map(d => {
 			d = clone(d);
 			d.gadgets.forEach(g => Gadget.$simplify(g));
@@ -32,7 +32,7 @@ type GPattern = JPattern<Gadget>;
 			return d;
 		});
 		let result = JSON.stringify(pattern);
-		pattern.devices = d;
+		pattern.devices = devices;
 		return result;
 	}
 
@@ -47,7 +47,9 @@ type GPattern = JPattern<Gadget>;
 	constructor(configuration: Configuration, pattern: JPattern) {
 		super(configuration.$sheet);
 		this.$configuration = configuration;
-		this.$devices = pattern.devices.map((d, i) => new Device(this, configuration.$partitions[i], d));
+		this.$devices = pattern.devices.map(
+			(d, i) => new Device(this, configuration.$partitions[i], d)
+		);
 		this.$gadgets = selectMany(this.$devices, d => d.$gadgets);
 		this.$signature = JSON.stringify(pattern);
 

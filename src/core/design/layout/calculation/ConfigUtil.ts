@@ -34,7 +34,9 @@ namespace ConfigUtil {
 	 * @param index 這個 JJunction 的自身索引
 	 * @param id 下一個可用的 Overlap id；切割結果會從這個數字開始遞減使用。
 	 */
-	export function $cut(j: JJunction, index: number, id: number, x: number, y: number): JPartition[] {
+	export function $cut(
+		j: JJunction, index: number, id: number, x: number, y: number
+	): JPartition[] {
 		let o1 = $toOverlap(j, index), o2 = $toOverlap(j, index);
 		if(x > 0) {
 			o1.c[2] = { type: CornerType.$internal, e: id - 1, q: 3 };
@@ -62,7 +64,7 @@ namespace ConfigUtil {
 			c: clone(j.c),
 			ox: j.ox,
 			oy: j.oy,
-			parent: index
+			parent: index,
 		};
 	}
 }

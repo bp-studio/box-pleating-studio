@@ -16,7 +16,11 @@ namespace LabelUtil {
 
 	let cache: WeakMap<paper.PointText, labelCache> = new WeakMap();
 
-	function offsetLabel(label: paper.PointText, lx: number, ly: number, lh: number, dx: number, dy: number) {
+	function offsetLabel(
+		label: paper.PointText,
+		lx: number, ly: number, lh: number,
+		dx: number, dy: number
+	) {
 		label.justification = dx == 0 ? "center" : dx == 1 ? "left" : "right";
 		let oy = dy == 0 ? -lh / 5 : dy == -1 ? -lh / 2 : 0;
 		let l = Math.sqrt(dx * dx + dy * dy);
@@ -74,7 +78,11 @@ namespace LabelUtil {
 	 * 原本把這部份的程式碼拉出來是為了要做 debounce，
 	 * 不過由於程式碼效能的提昇暫時似乎不用這麼做。
 	 */
-	function slowLabel(label: paper.PointText, lx: number, ly: number, lh: number, avoid: paper.Path[]) {
+	function slowLabel(
+		label: paper.PointText,
+		lx: number, ly: number, lh: number,
+		avoid: paper.Path[]
+	) {
 		let arr = [[0, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [-1, -1], [-1, 1], [1, 1], [1, -1]];
 		let clone = avoid.map(a => {
 			let c = a.clone({ insert: false });
@@ -96,7 +104,7 @@ namespace LabelUtil {
 			if(ok) break;
 		}
 		cache.set(label, {
-			dx, dy, timeout: undefined
+			dx, dy, timeout: undefined,
 		});
 	}
 }

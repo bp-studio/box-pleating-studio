@@ -5,7 +5,12 @@
 		super(
 			design,
 			() => design.$tree.$edge.values(),
-			e => new Edge(design.$TreeSheet, design.$vertices.get(e.n1)!, design.$vertices.get(e.n2)!, e)
+			e => new Edge(
+				design.$TreeSheet,
+				design.$vertices.get(e.n1)!,
+				design.$vertices.get(e.n2)!,
+				e
+			)
 		);
 	}
 

@@ -88,7 +88,7 @@ interface JVertex extends IPoint {
 			name: node.name,
 			x: p.x,
 			y: p.y,
-			isNew: true
+			isNew: true,
 		});
 	}
 
@@ -135,7 +135,7 @@ interface JVertex extends IPoint {
 			id: this.$node.id,
 			name: this.name,
 			x: this.$location.x,
-			y: this.$location.y
+			y: this.$location.y,
 		};
 	}
 

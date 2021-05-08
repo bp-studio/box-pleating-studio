@@ -1,4 +1,6 @@
 
+type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void;
+
 //////////////////////////////////////////////////////////////////
 /**
  * DoubleMap 是將一對的 Key 對應到 Value 上的類別。
@@ -54,7 +56,7 @@
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg: unknown = this) {
+	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: unknown = this) {
 		for(let [k1, k2, v] of this.entries()) callbackfn.apply(thisArg, [v, k1, k2, this]);
 	}
 
@@ -111,7 +113,7 @@ interface ReadonlyDoubleMap<K, V> {
 	get(key: K): ReadonlyMap<K, V> | undefined;
 	get(key1: K, key2: K): V | undefined;
 	size: number;
-	forEach(callbackfn: (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void, thisArg?: unknown): void;
+	forEach(callbackfn: DoubleMapCallback<K, V>, thisArg?: unknown): void;
 
 	[Symbol.iterator](): IterableIterator<[K, K, V]>;
 	entries(): IterableIterator<[K, K, V]>;

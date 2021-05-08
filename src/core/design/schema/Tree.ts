@@ -34,7 +34,7 @@
 		renderer(this: Tree, v: Map<number, TreeNode>) {
 			for(let [id, node] of v) if(node.$disposed) v.delete(id);
 			return v;
-		}
+		},
 	})
 	public $node: Map<number, TreeNode> = new Map();
 
@@ -42,7 +42,7 @@
 		renderer(this: Tree, v: DoubleMap<TreeNode, TreeEdge>) {
 			for(let node of v.firstKeys()) if(node.$disposed) v.delete(node);
 			return v;
-		}
+		},
 	})
 	public $edge: DoubleMap<TreeNode, TreeEdge> = new DoubleMap();
 
@@ -217,7 +217,7 @@
 		return {
 			d1: total - d23,
 			d2: total - d13,
-			d3: total - d12
+			d3: total - d12,
 		};
 	}
 }

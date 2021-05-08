@@ -12,6 +12,6 @@
 @shrewd class GroupMapping<K, V extends Disposable> extends BaseMapping<string, K[], V> {
 
 	constructor(source: IterableFactory<K[]>, keyGen: Func<K[], string>, ctor: Func<K[], V>) {
-		super(source, keyGen, ctor, (k, v) => v.$disposed);
+		super(source, keyGen, ctor, (_, v) => v.$disposed);
 	}
 }

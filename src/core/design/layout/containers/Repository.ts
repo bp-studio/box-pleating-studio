@@ -13,7 +13,8 @@ interface JRepository {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Repository extends Store<Configuration, Configuration> implements ISerializable<JRepository> {
+@shrewd class Repository extends Store<Configuration, Configuration>
+	implements ISerializable<JRepository> {
 
 	public get $tag() {
 		return "r" + this.$stretch.$signature;
@@ -66,7 +67,9 @@ interface JRepository {
 	}
 
 	protected get $shouldDispose(): boolean {
-		return super.$shouldDispose || this.$stretch.$disposed || !this.$isActive && !this.$design.$dragging;
+		return super.$shouldDispose ||
+			this.$stretch.$disposed ||
+			!this.$isActive && !this.$design.$dragging;
 	}
 
 	protected $onDispose() {
@@ -93,7 +96,7 @@ interface JRepository {
 	public toJSON(): JRepository {
 		return {
 			configurations: this.$memento.map(c => c.toJSON(true)),
-			index: this.index
+			index: this.index,
 		};
 	}
 

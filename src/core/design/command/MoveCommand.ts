@@ -20,7 +20,7 @@ class MoveCommand extends Command implements JMoveCommand {
 		let command = new MoveCommand(target.$design, {
 			tag: target.$tag,
 			old: clone(target.$location),
-			new: loc
+			new: loc,
 		});
 		MoveCommand.$assign(target.$location, loc);
 		target.$design.$history.$queue(command);

@@ -1,7 +1,7 @@
 
 type PseudoValue<T> =
 	T extends (infer U)[] ? PseudoValue<U>[] :
-	T extends object ? Pseudo<T> : T;
+		T extends object ? Pseudo<T> : T;
 type OtherKeys<T, V> = Record<Exclude<string, keyof T>, V>;
 type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
 type Pseudo<T> = (T | PartialPseudo<T>) & OtherKeys<T, unknown>;
@@ -24,17 +24,18 @@ namespace Migration {
 			layout: {
 				sheet: { width: 16, height: 16 },
 				flaps: [],
-				stretches: []
+				stretches: [],
 			},
 			tree: {
 				sheet: { width: 20, height: 20 },
 				nodes: [],
-				edges: []
-			}
+				edges: [],
+			},
 		};
 	}
 
-	export function $process(design: Pseudo<JDesign>, onDeprecated?: (title?: string) => void): JDesign {
+	export function $process(
+		design: Pseudo<JDesign>, onDeprecated?: (title?: string) => void): JDesign {
 
 		let deprecate = false;
 
@@ -105,7 +106,7 @@ namespace Migration {
 
 	function rc1_pattern(cf: Pseudo<JConfiguration>, s: Pseudo<JStretch>) {
 		s.configuration = {
-			partitions: rc1_partition(cf.overlaps as JOverlap[], cf.strategy as Strategy)
+			partitions: rc1_partition(cf.overlaps as JOverlap[], cf.strategy as Strategy),
 		};
 		let pt = s.pattern as Pseudo<JPattern>;
 		if(pt) {
@@ -116,15 +117,15 @@ namespace Migration {
 				s.pattern = {
 					devices: [{
 						gadgets: pt.gadgets as JGadget[],
-						offset: offsets?.[0]
-					}]
+						offset: offsets?.[0],
+					}],
 				};
 			} else {
 				s.pattern = {
 					devices: (pt.gadgets as JGadget[]).map((g: JGadget, i: number) => ({
 						gadgets: [g],
-						offset: offsets?.[i]
-					}))
+						offset: offsets?.[i],
+					})),
 				};
 			}
 		}
@@ -143,16 +144,16 @@ namespace Migration {
 			if(partitionMap.has(i)) continue;
 
 			// 找出所有重合的錨點
-			let coin = o.c.filter(rc1_cornerFilter);
+			let coins = o.c.filter(rc1_cornerFilter);
 
-			let c = coin.find(c => partitionMap.has(-c.e! - 1));
+			let coin = coins.find(c => partitionMap.has(-c.e! - 1));
 			let j = partitions.length;
 
-			if(c) {
+			if(coin) {
 				// 如果重合的之中有任何一個已經被加入過了，就把自己加入同一個分組
-				let j = partitionMap.get(-c.e! - 1)!;
-				partitionMap.set(i, j);
-				partitions[j].push(o);
+				let k = partitionMap.get(-coin.e! - 1)!;
+				partitionMap.set(i, k);
+				partitions[k].push(o);
 			} else {
 				// 否則自己成為一個新分組的第一個成員
 				partitionMap.set(i, j);
@@ -160,7 +161,7 @@ namespace Migration {
 			}
 
 			// 把重合的之中所有還沒被加入的也加入到自己的分組之中
-			coin.forEach(c => {
+			coins.forEach(c => {
 				i = -c.e! - 1;
 				if(!partitionMap.has(i)) {
 					partitionMap.set(i, j);

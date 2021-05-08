@@ -149,7 +149,7 @@ interface JStretch {
 			configuration: this.$pattern?.$configuration.toJSON(),
 
 			// 並不排除找不到任何 Pattern 的可能性
-			pattern: this.$pattern?.toJSON()
+			pattern: this.$pattern?.toJSON(),
 		};
 	}
 }

@@ -51,7 +51,10 @@ namespace MathUtil {
 	/** 把一對有理數進行化簡。 */
 	export function $reduce<T extends bigint | number>(a: T, b: T): [T, T, T];
 	export function $reduce(a: number, b: number): [number, number, number] {
-		if(typeof a == 'number' && !Number.isInteger(a) || typeof b == 'number' && !Number.isInteger(b)) {
+		if(
+			typeof a == 'number' &&
+			!Number.isInteger(a) || typeof b == 'number' && !Number.isInteger(b)
+		) {
 			let af = new Fraction(a), bf = new Fraction(b);
 			a = Number(af.$numerator * bf.$denominator);
 			b = Number(af.$denominator * bf.$numerator);

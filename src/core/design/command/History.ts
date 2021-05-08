@@ -44,7 +44,7 @@ interface JHistory {
 		return {
 			index: this._index,
 			savedIndex: this._savedIndex,
-			steps: this._steps.map(s => s.toJSON())
+			steps: this._steps.map(s => s.toJSON()),
 		};
 	}
 
@@ -82,7 +82,7 @@ interface JHistory {
 					destruct: this._destruct,
 					mode: this._design.mode,
 					before: this._selection,
-					after: sel
+					after: sel,
 				});
 				if(!step.$isVoid) this._addStep(step);
 			} else if(s.$isVoid) {
@@ -128,7 +128,10 @@ interface JHistory {
 		return this._steps[this._index - 1];
 	}
 
-	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown): void {
+	public $fieldChange(
+		target: ITagObject, prop: string,
+		oldValue: unknown, newValue: unknown
+	): void {
 		if(this._moving) return;
 		FieldCommand.create(target, prop, oldValue, newValue);
 	}

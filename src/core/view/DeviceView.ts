@@ -12,7 +12,9 @@
 	constructor(device: Device) {
 		super(device);
 
-		this.$addItem(Layer.$axisParallels, this._axisParallels = new paper.CompoundPath(Style.$axisParallels));
+		this.$addItem(Layer.$axisParallels,
+			this._axisParallels = new paper.CompoundPath(Style.$axisParallels)
+		);
 		this.$addItem(Layer.$ridge, this._ridges = new paper.CompoundPath(Style.$ridge));
 		this.$addItem(Layer.$shade, this._shade = new paper.CompoundPath(Style.$shade));
 	}
@@ -43,6 +45,7 @@
 	}
 
 	protected $renderSelection(selected: boolean) {
-		this._shade.visible = selected || this._control.$pattern.$configuration.$repository.$stretch.$selected;
+		this._shade.visible = selected ||
+			this._control.$pattern.$configuration.$repository.$stretch.$selected;
 	}
 }

@@ -122,7 +122,9 @@ interface JSheet {
 	// }
 
 	@unorderedArray public get $independents(): IndependentDraggable[] {
-		return this.$controls.filter((c: Control): c is IndependentDraggable => c instanceof IndependentDraggable);
+		return this.$controls.filter(
+			(c: Control): c is IndependentDraggable => c instanceof IndependentDraggable
+		);
 	}
 
 	/**

@@ -41,9 +41,9 @@
 	//@noCompare // segments 和 overridden 都有把關
 	@shrewd({
 		comparer(ov: PolyBool.Shape, nv: PolyBool.Shape, member) {
-			(member as any).ov = ov;
+			member.ov = ov;
 			return false;
-		}
+		},
 	})
 	public get $contour(): PolyBool.Shape {
 		this.$disposeEvent();

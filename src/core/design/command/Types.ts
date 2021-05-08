@@ -13,5 +13,5 @@ enum CommandType {
 	field = 0,
 	move = 1,
 	add = 2,
-	remove = 3
+	remove = 3,
 }

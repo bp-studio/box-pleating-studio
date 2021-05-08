@@ -23,7 +23,8 @@ class Partitioner extends Disposable {
 	 * 在一個 3-flap 的配置裡面，計算 intersection anchor 離共用角最大可允許的距離
 	 * @param oriented 共用左下角
 	 */
-	public static $getMaxIntersectionDistance(tree: Tree, r1: JRectangle, r2: JRectangle, oriented: boolean) {
+	public static $getMaxIntersectionDistance(
+		tree: Tree, r1: JRectangle, r2: JRectangle, oriented: boolean) {
 		let q = oriented ? 2 : 0;
 		let n1 = tree.$node.get(r1.c[q].e!)!;
 		let n2 = tree.$node.get(r2.c[q].e!)!;
@@ -71,7 +72,7 @@ class Partitioner extends Disposable {
 				let pt1 = { x: 0, y: 0 }, pt2 = { x: oy + u + v, y: ox + u + v };
 				p1.detours = [[pt1, pt2]];
 				p2.detours = [[pt2, pt1]];
-				let sx = p1.oy + p1.u + p1.v, s = Math.ceil(sx) - sx;
+				let x = p1.oy + p1.u + p1.v, s = Math.ceil(x) - x;
 				let g = new Gadget({ pieces: [p1, p2] });
 				let gr = g.$reverseGPS();
 				yield g.$addSlack(2, s);
@@ -106,14 +107,14 @@ class Partitioner extends Disposable {
 				p2 = {
 					ox: sm, oy: sm, u: v, v: u - diff,
 					detours: [[{ x: sm + u + v - diff, y: sm + u + v - diff }, { x: 0, y: 0 }]],
-					shift: { x: diff, y: 3 * diff }
+					shift: { x: diff, y: 3 * diff },
 				};
 			} else if(!v_even && oy >= ox) {
 				p1.detours = [[{ x: oy + u + v, y: ox + u + v }, { x: diff * 3, y: diff }]];
 				p2 = {
 					ox: sm, oy: sm, u: v - diff, v: u,
 					detours: [[{ x: 0, y: 0 }, { x: sm + u + v - diff, y: sm + u + v - diff }]],
-					shift: { x: diff * 3, y: diff }
+					shift: { x: diff * 3, y: diff },
 				};
 			} else continue; // 不合條件者無法構成我們這邊考慮的 Pattern
 

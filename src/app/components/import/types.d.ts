@@ -6,6 +6,11 @@ declare module 'vue-property-decorator' {
 	}
 }
 
+export declare const dropdown: {
+	current: any;
+	skipped: boolean;
+}
+
 export declare const i18n: VueI18n;
 
 export interface FileFactory {

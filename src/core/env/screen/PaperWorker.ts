@@ -31,7 +31,7 @@ namespace PaperWorker {
 		} else {
 			let [r1, r2] = await Promise.all([
 				getIntersection(j[0], j[3]),
-				getIntersection(j[1], j[2])
+				getIntersection(j[1], j[2]),
 			]);
 			let [i1, a1] = r1, [i2, a2] = r2;
 			shade.removeChildren();

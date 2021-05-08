@@ -9,29 +9,29 @@ type StyleDeclaration = Record<string, StyleValue>;
 namespace Style {
 	export const $circle: StyleDeclaration = {
 		strokeWidth: 1,
-		strokeColor: "#69F"
+		strokeColor: "#69F",
 	};
 
 	export const $dot: StyleDeclaration = {
 		fillColor: "#69F",
 		strokeWidth: 1,
 		strokeColor: "#000",
-		radius: 3
+		radius: 3,
 	};
 
 	export const $dotSelected: StyleDeclaration = {
 		strokeWidth: 3,
-		strokeColor: "red"
+		strokeColor: "red",
 	};
 
 	export const $hinge: StyleDeclaration = {
 		strokeColor: '#69F',
-		strokeWidth: 3
+		strokeWidth: 3,
 	};
 
 	export const $sheet: StyleDeclaration = {
 		strokeWidth: 0.25,
-		strokeColor: "#000"
+		strokeColor: "#000",
 	};
 
 	export const $label: StyleDeclaration = {
@@ -39,7 +39,7 @@ namespace Style {
 		fillColor: 'black',
 		fontWeight: 'normal',
 		strokeWidth: 0.5,
-		fontSize: 14
+		fontSize: 14,
 	};
 
 	export const $glow: StyleDeclaration = {
@@ -48,38 +48,38 @@ namespace Style {
 		fillColor: 'white',
 		strokeWidth: 2.5,
 		strokeColor: 'white',
-		fontSize: 14
+		fontSize: 14,
 	};
 
 	export const $edge: StyleDeclaration = {
-		strokeWidth: 2
+		strokeWidth: 2,
 	};
 
 	export const $ridge: StyleDeclaration = {
 		strokeWidth: 1.25,
-		strokeColor: "red"
+		strokeColor: "red",
 	};
 
 	export const $selection: StyleDeclaration = {
 		strokeColor: "#69f",
-		fillColor: "rgba(102, 153, 255, 0.2)"
+		fillColor: "rgba(102, 153, 255, 0.2)",
 	};
 
 	export const $shade: StyleDeclaration = {
 		fillColor: '#69F',
 		opacity: 0.3,
-		strokeWidth: 0
+		strokeWidth: 0,
 	};
 
 	export const $junction: StyleDeclaration = {
 		strokeColor: "red",
 		fillColor: "red",
-		opacity: 0.3
+		opacity: 0.3,
 	};
 
 	export const $axisParallels: StyleDeclaration = {
 		strokeWidth: 1,
-		strokeColor: "green"
+		strokeColor: "green",
 	};
 
 	// export const $top: StyleDeclaration = {};

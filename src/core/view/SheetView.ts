@@ -12,7 +12,7 @@
 		this._border = new paper.Path.Rectangle({
 			point: [0, 0],
 			size: [0, 0],
-			strokeWidth: 3
+			strokeWidth: 3,
 		});
 		this.$addItem(Layer.$sheet, this._border);
 

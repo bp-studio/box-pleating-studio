@@ -40,7 +40,7 @@ interface DisplaySetting {
 		showRidge: true,
 		showLabel: true,
 		showDot: true,
-		includeHiddenElement: false
+		includeHiddenElement: false,
 	}
 
 	constructor(studio: Studio) {
@@ -79,7 +79,7 @@ interface DisplaySetting {
 		// 設置圖層邊界遮罩
 		this.$boundary = new paper.Path.Rectangle({
 			from: [0, 0],
-			to: [0, 0]
+			to: [0, 0],
 		});
 		for(let l of Enum.values(Layer)) {
 			if(LayerOptions[l].clipped) {
@@ -166,7 +166,7 @@ interface DisplaySetting {
 			let layer = this._project.layers[l];
 			if(LayerOptions[l].clipped) {
 				(layer.children[0] as paper.Path).set({
-					segments: this.$boundary.segments
+					segments: this.$boundary.segments,
 				});
 			}
 			if(!LayerOptions[l].scaled) {
@@ -181,7 +181,7 @@ interface DisplaySetting {
 		let rect = this._getBound();
 		let svg = this._project.exportSVG({
 			bounds: rect,
-			matrix: this._project.view.matrix
+			matrix: this._project.view.matrix,
 		}) as SVGElement;
 		if(!this.$settings.includeHiddenElement) this._removeHidden(svg);
 

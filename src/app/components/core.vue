@@ -194,8 +194,6 @@
 			}
 		}
 
-		public dropdown: any = null;
-
 		public create() {
 			let j = { title: this.$t('keyword.untitled') };
 			let d = bp.create(this.checkTitle(j));

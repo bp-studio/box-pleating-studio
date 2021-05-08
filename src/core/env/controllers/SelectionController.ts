@@ -149,7 +149,9 @@
 	/** 當前所有活躍的 `Control` 陣列，依照優先度排序 */
 	@unorderedArray() private get _controls(): Control[] {
 		let c = this._studio.$design ? this._studio.$design.sheet.$activeControls.concat() : [];
-		c.sort((a, b) => SelectionController._controlPriority(a) - SelectionController._controlPriority(b));
+		c.sort((a, b) =>
+			SelectionController._controlPriority(a) - SelectionController._controlPriority(b)
+		);
 		this.$dragSelectables = c.filter(Control.$isDragSelectable);
 		if(!c.length) this._cache = [null, null]; // GC
 		return c;

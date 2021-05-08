@@ -67,9 +67,9 @@ interface JPartition {
 
 	public $getOriginalDisplacement(pattern: Pattern): Vector {
 		// 這邊我隨便挑整個 Partition 裡面一個對外的連接點；是哪一個差別不大
-		let o = this.$overlaps.find(o => o.c[0].type != CornerType.$coincide)!;
+		let overlap = this.$overlaps.find(o => o.c[0].type != CornerType.$coincide)!;
 
-		return pattern.$getConnectionTarget(o.c[0] as JConnection)
+		return pattern.$getConnectionTarget(overlap.c[0] as JConnection)
 			.sub(this.$configuration.$repository.$stretch.origin);
 	}
 
@@ -125,12 +125,20 @@ interface JPartition {
 			let w = result.ox + result.shift.x;
 			let h = result.oy + result.shift.y;
 			if(p.c[0].e == parent.c[0].e) {
-				if(p.ox < parent.ox) result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
-				if(p.oy < parent.oy) result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
+				if(p.ox < parent.ox) {
+					result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
+				}
+				if(p.oy < parent.oy) {
+					result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
+				}
 			}
 			if(p.c[2].e == parent.c[2].e) {
-				if(p.ox < parent.ox) result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
-				if(p.oy < parent.oy) result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
+				if(p.ox < parent.ox) {
+					result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
+				}
+				if(p.oy < parent.oy) {
+					result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
+				}
 			}
 		}
 		return result;
@@ -162,7 +170,7 @@ interface JPartition {
 	public toJSON(): JPartition {
 		let result: JPartition = {
 			overlaps: this.$overlaps,
-			strategy: this._strategy
+			strategy: this._strategy,
 		};
 
 		// 如果啟用 jid（亦即此時為存檔中）則進行修改

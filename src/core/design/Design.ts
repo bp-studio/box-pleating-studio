@@ -139,13 +139,13 @@ interface IDesignObject {
 				layout: {
 					sheet: this.$LayoutSheet.toJSON(session),
 					flaps: this.$flaps.toJSON(),
-					stretches: this.$stretches.toJSON()
+					stretches: this.$stretches.toJSON(),
 				},
 				tree: {
 					sheet: this.$TreeSheet.toJSON(session),
 					nodes: this.$vertices.toJSON(),
-					edges: this.$edges.$sort()
-				}
+					edges: this.$edges.$sort(),
+				},
 			};
 			if(session) result.history = this.$history.toJSON();
 		};

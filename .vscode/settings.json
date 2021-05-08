@@ -76,5 +76,9 @@
 	],
 	"eslint.workingDirectories": [
 		"./src/core/"
-	]
+	],
+	"eslint.format.enable": true,
+	"[typescript]": {
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+	},
 }

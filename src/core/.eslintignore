@@ -1,2 +1,2 @@
-global/paper.d.ts
+global/vendor/**/*.ts
 util/PolyBool.ts

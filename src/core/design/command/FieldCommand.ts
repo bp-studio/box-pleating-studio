@@ -18,7 +18,7 @@ class FieldCommand extends Command implements JFieldCommand {
 			tag: target.$tag,
 			prop,
 			old: oldValue,
-			new: newValue
+			new: newValue,
 		});
 		target.$design.$history.$queue(command);
 	}
@@ -43,7 +43,9 @@ class FieldCommand extends Command implements JFieldCommand {
 	}
 
 	public $canAddTo(command: Command): boolean {
-		return command instanceof FieldCommand && command.tag == this.tag && command.new == this.old;
+		return command instanceof FieldCommand &&
+			command.tag == this.tag &&
+			command.new == this.old;
 	}
 
 	public $addTo(command: Command) {

@@ -83,7 +83,7 @@ namespace TreeMaker {
 				id: v.$int,
 				name: v.$next(),
 				x: v.$float,
-				y: v.$float
+				y: v.$float,
 			};
 
 			v.$skip(2);
@@ -93,7 +93,7 @@ namespace TreeMaker {
 					x: vertex.x,
 					y: vertex.y,
 					height: 0,
-					width: 0
+					width: 0,
 				});
 			}
 			this.$result.tree.nodes.push(vertex);
@@ -114,7 +114,7 @@ namespace TreeMaker {
 			this.$result.tree.edges.push({
 				length: length * (1 + v.$float),
 				n1: (v.$skip(4), v.$int),
-				n2: v.$int
+				n2: v.$int,
 			});
 		}
 	}

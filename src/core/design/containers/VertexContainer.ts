@@ -13,10 +13,10 @@
 		let success = false;
 		let arr = vertices.concat().sort((a, b) => a.$node.$degree - b.$node.$degree);
 		while(this.size > 3) {
-			let v = arr.find(v => v.$node.$degree == 1);
-			if(!v) break;
-			v.$node.$delete();
-			arr.splice(arr.indexOf(v), 1);
+			let vertex = arr.find(v => v.$node.$degree == 1);
+			if(!vertex) break;
+			vertex.$node.$delete();
+			arr.splice(arr.indexOf(vertex), 1);
 			success = true;
 		}
 		return success;
@@ -28,9 +28,9 @@
 
 	public $toFlap(vertices: Vertex[]) {
 		this._design.$LayoutSheet.$clearSelection();
-		for(let v of vertices) {
-			let f = this._design.$flaps.get(v.$node);
-			if(f) f.$selected = true;
+		for(let vertex of vertices) {
+			let flap = this._design.$flaps.get(vertex.$node);
+			if(flap) flap.$selected = true;
 		}
 		this._design.mode = "layout";
 	}

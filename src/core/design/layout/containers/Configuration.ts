@@ -13,7 +13,8 @@ interface JConfiguration {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Configuration extends Store<JPattern, Pattern> implements ISerializable<JConfiguration> {
+@shrewd class Configuration extends Store<JPattern, Pattern>
+	implements ISerializable<JConfiguration> {
 
 	public get $tag() {
 		return this.$repository.$tag + "." + this.$repository.$indexOf(this);
@@ -78,7 +79,8 @@ interface JConfiguration {
 		if(this._seed) yield this._seed;
 
 		// 過濾掉跟存檔一樣的 Pattern
-		let filter = (pattern: JPattern) => !this._seedSignature || this._seedSignature != Pattern.$getSignature(pattern);
+		let filter = (pattern: JPattern) =>
+			!this._seedSignature || this._seedSignature != Pattern.$getSignature(pattern);
 		yield* GeneratorUtil.$filter(this._search([]), filter);
 	}
 
@@ -120,7 +122,9 @@ interface JConfiguration {
 		return null;
 	}
 
-	private _makeSingleRegularDevicePattern(junction: JJunction, devices: GDevice[]): GPattern | null {
+	private _makeSingleRegularDevicePattern(
+		junction: JJunction, devices: GDevice[]
+	): GPattern | null {
 		let sx = junction.sx;
 
 		if(devices.length == 1) {

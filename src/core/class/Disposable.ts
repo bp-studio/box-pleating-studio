@@ -19,7 +19,7 @@ interface IDisposable {
 	@shrewd({
 		renderer(this: Disposable, v: boolean) {
 			return v || this.$shouldDispose;
-		}
+		},
 	})
 	private _disposed: boolean = false;
 

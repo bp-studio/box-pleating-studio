@@ -30,7 +30,10 @@ abstract class Viewport {
 		// 設置事件，在手機版鍵盤開啟時暫時鎖定
 		let isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 		document.addEventListener("focusin", e => {
-			if(isTouch && (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+			if(
+				isTouch &&
+				(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
+			) {
 				this._lockViewport = true;
 			}
 		});

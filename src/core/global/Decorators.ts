@@ -19,7 +19,7 @@ function orderedArray(...p: [object, string | symbol] | [string?]): PropertyDeco
 				console.log(msg);
 			}
 			return result;
-		}
+		},
 	};
 	if(p.length == 2) shrewd(option)(...p);
 	else return shrewd(option);
@@ -42,7 +42,7 @@ function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDe
 				console.log(msg);
 			}
 			return result;
-		}
+		},
 	};
 	if(p.length == 2) shrewd(option)(...p);
 	else return shrewd(option);
@@ -67,7 +67,7 @@ function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator |
 				console.log(msg);
 			}
 			return result;
-		}
+		},
 	};
 	if(p.length == 2) shrewd(option)(...p);
 	else return shrewd(option);
@@ -96,7 +96,7 @@ function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | 
 				console.log(msg);
 			}
 			return true;
-		}
+		},
 	};
 	if(p.length == 2) shrewd(option)(...p);
 	else return shrewd(option);
@@ -105,7 +105,9 @@ function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | 
 /** 宣告一個屬性為非 enumerable */
 function nonEnumerable(target: object, name: string): void;
 function nonEnumerable(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor;
-function nonEnumerable(target: object, name: string, desc?: PropertyDescriptor): PropertyDescriptor | void {
+function nonEnumerable(
+	target: object, name: string, desc?: PropertyDescriptor
+): PropertyDescriptor | void {
 	if(desc) {
 		desc.enumerable = false;
 		return desc;
@@ -114,10 +116,10 @@ function nonEnumerable(target: object, name: string, desc?: PropertyDescriptor):
 	Object.defineProperty(target, name, {
 		set(value) {
 			Object.defineProperty(this, name, {
-				value, writable: true, configurable: false
+				value, writable: true, configurable: false,
 			});
 		},
-		configurable: true
+		configurable: true,
 	});
 }
 
@@ -149,7 +151,7 @@ function actionInner(target: object, name: string, option: ActionOption) {
 				record[name] = v;
 			}
 			return result;
-		}
+		},
 	})(target, name);
 }
 const actionMap = new WeakMap<object, Record<string | symbol, unknown>>();
@@ -169,7 +171,7 @@ function onDemand(target: object, name: string, desc: PropertyDescriptor): Prope
 			else return record[name] = getter.apply(this);
 		},
 		enumerable: false,
-		configurable: false
+		configurable: false,
 	};
 }
 const onDemandMap = new WeakMap<object, Record<string, unknown>>();

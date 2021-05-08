@@ -14,7 +14,8 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Store<P, T extends SheetObject & IQueryable> extends SheetObject implements IQueryable {
+abstract class Store<P, T extends SheetObject & IQueryable>
+	extends SheetObject implements IQueryable {
 
 	public abstract get $tag(): string;
 

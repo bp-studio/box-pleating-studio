@@ -74,7 +74,9 @@ interface JNode {
 	public $dispose(force: boolean = false) {
 		if(force || this.$degree == 1) super.$dispose();
 		else if(this.$degree == 2) return this.$tree.$deleteAndJoin(this);
-		else if(this.$degree != 1) console.warn(`Node [${this.name ? this.name : this.id}] is not a leaf.`);
+		else if(this.$degree != 1) {
+			console.warn(`Node [${this.name ? this.name : this.id}] is not a leaf.`);
+		}
 		return undefined;
 	}
 
@@ -108,7 +110,7 @@ interface JNode {
 	public toJSON() {
 		return {
 			id: this.id,
-			parentId: this.$parentId
+			parentId: this.$parentId,
 		};
 	}
 }

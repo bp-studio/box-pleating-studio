@@ -13,7 +13,8 @@ namespace PaperUtil {
 	 * @param source 替換內容的來源
 	 * @param clone 是否要將來源複製一份，還是直接代入
 	 */
-	export function $replaceContent(target: paper.CompoundPath, source: paper.PathItem, clone: boolean): void {
+	export function $replaceContent(
+		target: paper.CompoundPath, source: paper.PathItem, clone: boolean): void {
 		target.removeChildren();
 		if(source instanceof paper.CompoundPath) target.copyContent(source);
 		else {
@@ -22,14 +23,16 @@ namespace PaperUtil {
 		}
 	}
 
-	export function $setRectangleSize(rect: paper.Path.Rectangle, width: number, height: number): void {
+	export function $setRectangleSize(
+		rect: paper.Path.Rectangle, width: number, height: number): void {
 		rect.segments[1].point.set(width, 0);
 		rect.segments[2].point.set(width, height);
 		rect.segments[3].point.set(0, height);
 	}
 
 	/** 把一個 `paper.CompoundPath` 加入指定兩點定義的線段 */
-	export function $addLine(path: paper.CompoundPath, p1: Point | paper.Point, p2: Point | paper.Point): void {
+	export function $addLine(
+		path: paper.CompoundPath, p1: Point | paper.Point, p2: Point | paper.Point): void {
 		if(p1 instanceof Point) p1 = p1.$toPaper();
 		if(p2 instanceof Point) p2 = p2.$toPaper();
 		path.moveTo(p1);
@@ -56,7 +59,7 @@ namespace PaperUtil {
 		let poly = PolyBool.polygon(shape);
 		return poly.regions.map(r => new paper.Path({
 			segments: r,
-			closed: true
+			closed: true,
 		}));
 	}
 }

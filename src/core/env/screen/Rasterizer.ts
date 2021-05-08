@@ -74,7 +74,7 @@ class Rasterizer {
 	public async $copyPNG(): Promise<void> {
 		const blob = await this._createPNG();
 		return navigator.clipboard.write([
-			new ClipboardItem({ 'image/png': blob })
+			new ClipboardItem({ 'image/png': blob }),
 		]);
 	}
 }

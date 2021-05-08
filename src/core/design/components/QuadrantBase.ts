@@ -12,7 +12,7 @@ abstract class QuadrantBase extends SheetObject {
 		new Vector(1, 1),
 		new Vector(-1, 1),
 		new Vector(-1, -1),
-		new Vector(1, -1)
+		new Vector(1, -1),
 	];
 
 	/** 指著象限追蹤起點方向的向量 */
@@ -20,7 +20,7 @@ abstract class QuadrantBase extends SheetObject {
 		new Vector(1, 0),
 		new Vector(0, 1),
 		new Vector(-1, 0),
-		new Vector(0, -1)
+		new Vector(0, -1),
 	];
 
 	public readonly q: QuadrantDirection;

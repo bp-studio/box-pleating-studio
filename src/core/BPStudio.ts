@@ -66,7 +66,9 @@ class BPStudio {
 	public update(): Promise<void> { return this._studio.$updater.$update(); }
 
 	public get selection(): Control[] { return this._studio.$system.$selection.$items; }
-	public get draggableSelected(): boolean { return this._studio.$system.$selection.$hasDraggable(); }
+	public get draggableSelected(): boolean {
+		return this._studio.$system.$selection.$hasDraggable();
+	}
 	public get isDragging(): boolean { return this._studio.$system.$drag.$on; }
 	public dragByKey(key: unknown): void {
 		if(typeof key != 'string') return;
@@ -179,10 +181,18 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public notifySaveAll() { this._studio.$designMap.forEach(d => this.notifySave(d)); }
-	public notifySave(design: unknown) { if(design instanceof Design) design.$history.$notifySave(); }
-	public isModified(design: unknown): boolean { return design instanceof Design ? design.$history.$modified : false; }
-	public canUndo(design: unknown): boolean { return design instanceof Design ? design.$history.$canUndo : false; }
-	public canRedo(design: unknown): boolean { return design instanceof Design ? design.$history.$canRedo : false; }
+	public notifySave(design: unknown) {
+		if(design instanceof Design) design.$history.$notifySave();
+	}
+	public isModified(design: unknown): boolean {
+		return design instanceof Design ? design.$history.$modified : false;
+	}
+	public canUndo(design: unknown): boolean {
+		return design instanceof Design ? design.$history.$canUndo : false;
+	}
+	public canRedo(design: unknown): boolean {
+		return design instanceof Design ? design.$history.$canRedo : false;
+	}
 	public undo(design: unknown): void { if(design instanceof Design) design.$history.$undo(); }
 	public redo(design: unknown): void { if(design instanceof Design) design.$history.$redo(); }
 }

@@ -19,5 +19,5 @@ gulp.task('shrewd', () => all(
 
 	// 定義檔
 	gulp.src("../shrewd/dist/*.d.ts")
-		.pipe(gulp.dest('src/core/global'))
+		.pipe(gulp.dest('src/core/global/vendor'))
 ));

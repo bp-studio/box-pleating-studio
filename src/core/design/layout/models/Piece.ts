@@ -58,7 +58,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 			Point.ZERO,
 			new Point(u, ox + u),
 			new Point(oy + u + v, ox + u + v),
-			new Point(oy + v, v)
+			new Point(oy + v, v),
 		];
 		result.forEach(p => p.addBy(this._shift));
 		return result;
@@ -129,7 +129,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 			contour.some(c => c.eq(p[0])) ? p[0] : null,
 			contour.includes(p[1]) ? p[1] : null,
 			contour.some(c => c.eq(p[2])) ? p[2] : null,
-			contour.includes(p[3]) ? p[3] : null
+			contour.includes(p[3]) ? p[3] : null,
 		];
 	}
 
@@ -190,7 +190,9 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		detour = clone(detour);
 		// 檢查輸入的繞道
 		for(let i = 0; i < detour.length - 1; i++) {
-			if(detour[i].x == detour[i + 1].x && detour[i].y == detour[i + 1].y) detour.splice(i--, 1);
+			if(detour[i].x == detour[i + 1].x && detour[i].y == detour[i + 1].y) {
+				detour.splice(i--, 1);
+			}
 		}
 		if(detour.length == 1) return;
 

@@ -61,7 +61,7 @@ interface JFlap {
 			new Point(x + w, y + h),
 			new Point(x, y + h),
 			new Point(x, y),
-			new Point(x + w, y)
+			new Point(x + w, y),
 		];
 	}
 
@@ -123,7 +123,7 @@ interface JFlap {
 			width: this.width,
 			height: this.height,
 			x: this.$location.x,
-			y: this.$location.y
+			y: this.$location.y,
 		};
 	}
 
@@ -131,7 +131,7 @@ interface JFlap {
 		this.$sheet.$constraint(v, location);
 		this.$sheet.$constraint(v, {
 			x: location.x + this.width,
-			y: location.y + this.height
+			y: location.y + this.height,
 		});
 		return v;
 	}

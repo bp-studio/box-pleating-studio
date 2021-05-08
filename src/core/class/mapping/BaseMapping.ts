@@ -5,6 +5,8 @@ type Func<A, B> = (a: A) => B;
 
 type Predicate<A, B> = (a: A, b: B) => boolean;
 
+type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
+
 //////////////////////////////////////////////////////////////////
 /**
  * `BaseMapping<K, S, V>` 類別實作了 `ReadonlyMap<K, V>` 介面，
@@ -19,7 +21,8 @@ type Predicate<A, B> = (a: A, b: B) => boolean;
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class BaseMapping<Key, Source, Value extends object> implements ReadonlyMap<Key, Value>, IDisposable {
+abstract class BaseMapping<Key, Source, Value extends object>
+implements ReadonlyMap<Key, Value>, IDisposable {
 
 	constructor(
 		private readonly _source: IterableFactory<Source>,
@@ -50,7 +53,7 @@ abstract class BaseMapping<Key, Source, Value extends object> implements Readonl
 
 	public get(key: Key) { return this.render().get(key); }
 	public has(key: Key) { return this.render().has(key); }
-	public forEach(callbackfn: (value: Value, key: Key, map: ReadonlyMap<Key, Value>) => void, thisArg?: unknown) {
+	public forEach(callbackfn: MapCallback<Key, Value>, thisArg?: unknown) {
 		return this.render().forEach(callbackfn, thisArg);
 	}
 	public get size() { return this.render().size; }

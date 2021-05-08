@@ -51,7 +51,7 @@
 		return new paper.Path.Rectangle({
 			from: [p[2].x - r, p[2].y - r],
 			to: [p[0].x + r, p[0].y + r],
-			radius: r
+			radius: r,
 		});
 	}
 
@@ -87,18 +87,18 @@
 
 		this.$renderHinge();
 
-		let p = makePerQuadrant(i => this._control.$points[i].$toPaper());
+		let points = makePerQuadrant(i => this._control.$points[i].$toPaper());
 
 		// Inner ridges
 		this._innerRidges.removeChildren();
-		this._innerRidges.moveTo(p[3]);
-		p.forEach(p => this._innerRidges.lineTo(p));
+		this._innerRidges.moveTo(points[3]);
+		points.forEach(p => this._innerRidges.lineTo(p));
 		this._innerRidges.visible = w > 0 || h > 0;
 
 		// Outer ridges
 		this._outerRidges.removeChildren();
 		this._control.$quadrants.forEach((q, i) => {
-			if(q.$pattern == null) PaperUtil.$addLine(this._outerRidges, p[i], q.$corner);
+			if(q.$pattern == null) PaperUtil.$addLine(this._outerRidges, points[i], q.$corner);
 		});
 
 		this._shade.copyContent(this.hinge);
@@ -130,7 +130,7 @@
 		makePerQuadrant(i => {
 			this._dots[i].copyContent(new paper.Path.Circle({
 				position: this._dots[i].position,
-				radius: s
+				radius: s,
 			}));
 		});
 	}

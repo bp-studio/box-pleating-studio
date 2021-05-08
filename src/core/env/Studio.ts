@@ -52,13 +52,13 @@ interface StudioOptions {
 				nodes: [
 					{ id: 0, name: "", x: 10, y: 10 },
 					{ id: 1, name: "", x: 10, y: 13 },
-					{ id: 2, name: "", x: 10, y: 7 }
+					{ id: 2, name: "", x: 10, y: 7 },
 				],
 				edges: [
 					{ n1: 0, n2: 1, length: 1 },
-					{ n1: 0, n2: 2, length: 1 }
-				]
-			}
+					{ n1: 0, n2: 2, length: 1 },
+				],
+			},
 		});
 		return this.$restore(json);
 	}

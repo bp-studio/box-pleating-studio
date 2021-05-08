@@ -71,7 +71,7 @@ abstract class Draggable extends ViewedControl {
 		let ss = source.$sheet, ts = target.$sheet;
 		let pt: IPoint = {
 			x: Math.round(source.$location.x / ss.width * ts.width),
-			y: Math.round(source.$location.y / ss.height * ts.height)
+			y: Math.round(source.$location.y / ss.height * ts.height),
 		};
 
 		if(init) MoveCommand.$assign(target.$location, pt);

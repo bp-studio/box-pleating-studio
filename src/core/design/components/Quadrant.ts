@@ -78,7 +78,10 @@ type CoveredInfo = [number, number, Point[]];
 			let inflections = new Set<string>();
 			let lead = this._findLead(junctions, contourRadius, lines, inflections);
 			let start = lead ? this._findNextDelta(junctions, true) : undefined;
-			trace = Trace.$create(lines, lead ?? startPt, endPt, this.pv, inflections, end ?? new Line(endPt, this.pv), start);
+			trace = Trace.$create(
+				lines, lead ?? startPt, endPt,
+				this.pv, inflections, end ?? new Line(endPt, this.pv), start
+			);
 
 			// 下面這一行去掉一些在非法導繪模式中可能產生的無效點；
 			// 那些點會干擾 PolyBool 演算法
@@ -162,7 +165,8 @@ type CoveredInfo = [number, number, Point[]];
 		if(!find) return undefined;
 
 		let { joinQ, nextQ, mode } = find;
-		let { d1, d2 } = this.$design.$tree.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
+		let { d1, d2 } = this.$design.$tree
+			.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
 		let int = mode ? new Point(nextQ.x(d2), this.y(d1)) : new Point(this.x(d1), nextQ.y(d2));
 
 		// 傳回 delta 直線
@@ -199,13 +203,17 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	/** 判定在產生軌跡的時候是否有必要從更遠的地方開始描繪（導繪） */
-	private _findLead(junctions: readonly Junction[], d: number, lines: Line[], inflections: Set<string>): Point | undefined {
+	private _findLead(
+		junctions: readonly Junction[], d: number, lines: Line[], inflections: Set<string>
+	): Point | undefined {
 		let find = this._findJoinNextQ(junctions, true, false);
 		if(!find) return undefined;
 
 		let { joinQ, nextQ } = find;
-		let ok = this.$design.$junctions.get(this._flap, nextQ._flap)!.$status == JunctionStatus.tooFar;
-		let dist = this.$design.$tree.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
+		let junction = this.$design.$junctions.get(this._flap, nextQ._flap)!;
+		let ok = junction.$status == JunctionStatus.tooFar;
+		let dist = this.$design.$tree
+			.$distTriple(this._flap.node, nextQ._flap.node, joinQ._flap.node);
 
 		// 一般來說只有當 d > dist.d1 的時候有必要作導繪，
 		// 但是當 !ok 的時候整個情況會特別奇怪，因此額外開放。
@@ -214,7 +222,9 @@ type CoveredInfo = [number, number, Point[]];
 		let d2 = d - dist.d1 + dist.d2;
 
 		// 加入反曲點
-		let inflection = this.q % 2 ? new Point(nextQ.x(d2), this.y(d)) : new Point(this.x(d), nextQ.y(d2));
+		let inflection = this.q % 2 ?
+			new Point(nextQ.x(d2), this.y(d)) :
+			new Point(this.x(d), nextQ.y(d2));
 		inflections.add(inflection.toString());
 		if(d2 == 0) inflections.add(nextQ.$point.toString());
 
@@ -230,7 +240,8 @@ type CoveredInfo = [number, number, Point[]];
 			}
 		}
 
-		return nextQ._findLead(junctions, d2, lines, inflections) ?? nextQ._getStart(new Fraction(d2));
+		return nextQ._findLead(junctions, d2, lines, inflections) ??
+			nextQ._getStart(new Fraction(d2));
 	}
 
 	/**

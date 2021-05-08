@@ -29,7 +29,7 @@
 		if(this.$visible) {
 			let r = new paper.Path.Rectangle({
 				from: this.$down,
-				to: this.$now
+				to: this.$now,
 			});
 			this._rectangle.set({ segments: r.segments });
 		}

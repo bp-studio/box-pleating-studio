@@ -84,7 +84,10 @@ class JoinerCore {
 		let org = Point.ZERO;
 		if(!$oriented) org = s1 ? new Point(a1[q].location!) : p1.$anchors[q]!;
 
-		this.data = { p1, p2, v1, v2, a1, a2, off1, off2, offset, size, pt, pt1, pt2, e1, e2, bv, org, f };
+		this.data = {
+			p1, p2, v1, v2, a1, a2, off1, off2, offset,
+			size, pt, pt1, pt2, e1, e2, bv, org, f,
+		};
 	}
 
 	/** 嘗試把兩個 GOPS `Piece` 簡單融合成一個 `Device` */
@@ -108,7 +111,10 @@ class JoinerCore {
 	@onDemand private get _deltaPt(): Point {
 		let { org, p1, p2, f } = this.data;
 		let { cw, $intDist } = this.joiner;
-		return new Point(org.x + ($intDist - (cw ? p2 : p1).ox) * f, org.y + ($intDist - (cw ? p1 : p2).oy) * f);
+		return new Point(
+			org.x + ($intDist - (cw ? p2 : p1).ox) * f,
+			org.y + ($intDist - (cw ? p1 : p2).oy) * f
+		);
 	}
 
 	/**
@@ -205,8 +211,8 @@ class JoinerCore {
 		if(test && !test.eq(T) && !test.eq(R)) return;
 
 		this.data.addOns = [{
-			contour: [D, T, R].map(p => p.$toIPoint()),
-			dir: new Line(T, R).$reflect(p.$direction).$toIPoint()
+			contour: [D, T, R].map(point => point.$toIPoint()),
+			dir: new Line(T, R).$reflect(p.$direction).$toIPoint(),
 		}];
 		this._setupDetour([i == 0 ? T : D, R], [i == 0 ? D : T, R]);
 		yield this._result(true, R.$dist(T));
@@ -224,12 +230,13 @@ class JoinerCore {
 		// TODO: 未來改進 river 的演算法以接受這樣的 pattern
 		if(T.eq(e.p1) || T.eq(e.p2)) return;
 
-		let P = D.sub(B).$slope.gt(Fraction.ONE) ? delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
+		let P = D.sub(B).$slope.gt(Fraction.ONE) ?
+			delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
 		let R = PathUtil.$triangleTransform([T, D, P], B);
 		if(!this._setupAnchor(R)) return;
 		this.data.addOns = [{
-			contour: [B, T, R].map(p => p.$toIPoint()),
-			dir: new Line(T, B).$reflect(p.$direction).$toIPoint()
+			contour: [B, T, R].map(point => point.$toIPoint()),
+			dir: new Line(T, B).$reflect(p.$direction).$toIPoint(),
 		}];
 		this._setupDetour(i == 0 ? [T, B] : [B], i == 0 ? [B] : [T, B]);
 		yield this._result(true, B.$dist(T));
@@ -270,10 +277,16 @@ class JoinerCore {
 		if(offset) off2 = { x: off2.x + offset.x, y: off2.y + offset.y };
 		return [{
 			gadgets: [
-				{ pieces: [json ? p1.toJSON() : p1], offset: this._simplifyIPoint(off1), anchors: a1.concat() },
-				{ pieces: [json ? p2.toJSON() : p2], offset: this._simplifyIPoint(off2), anchors: a2.concat() }
+				{
+					pieces: [json ? p1.toJSON() : p1],
+					offset: this._simplifyIPoint(off1), anchors: a1.concat(),
+				},
+				{
+					pieces: [json ? p2.toJSON() : p2],
+					offset: this._simplifyIPoint(off2), anchors: a2.concat(),
+				},
 			],
-			addOns
+			addOns,
 		}, size + (extraSize ?? 0) * 10]; // extraSize 的權重設定為本體大小的十倍強
 	}
 

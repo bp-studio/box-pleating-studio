@@ -30,7 +30,9 @@
 		let components: readonly string[];
 
 		if(edge.$wrapSide == 0) {
-			components = this._toComponents(edge.l1, edge.n1).concat(this._toComponents(edge.l2, edge.n2));
+			components = this
+				._toComponents(edge.l1, edge.n1)
+				.concat(this._toComponents(edge.l2, edge.n2));
 			adjacent = edge.a1.concat(edge.a2);
 		} else if(edge.$wrapSide == 2) {
 			components = this._toComponents(edge.l2, edge.n2);
@@ -55,8 +57,8 @@
 		return { inner, length: edge.length, components };
 	}
 
-	private _toComponents(l: readonly TreeNode[], n: TreeNode): string[] {
-		return l.map(l => l.id + "," + n.id);
+	private _toComponents(leaves: readonly TreeNode[], n: TreeNode): string[] {
+		return leaves.map(l => l.id + "," + n.id);
 	}
 
 	public get $design(): Design {
@@ -99,7 +101,7 @@
 
 	@shrewd private get _closurePath(): paper.CompoundPath {
 		return new paper.CompoundPath({
-			children: PaperUtil.$fromShape(this.$closure)
+			children: PaperUtil.$fromShape(this.$closure),
 		});
 	}
 
@@ -115,7 +117,7 @@
 		let closure = this._closurePath.children;
 		let interior = PaperUtil.$fromShape(this.$interior);
 		let actual = new paper.CompoundPath({
-			children: closure.concat(interior).map(p => p.clone())
+			children: closure.concat(interior).map(p => p.clone()),
 		});
 		actual.reorient(false, true);
 		return actual;
@@ -136,7 +138,7 @@
 		// paper.js 的 Point 類別可能會有計算偏差，因此這邊都轉換成有理數型物件
 		let path = this._actualPath;
 		let p_paths = (path.children ?? [path]) as paper.Path[];
-		let r_paths = p_paths.map(path => path.segments.map(p => new Point(p.point)));
+		let r_paths = p_paths.map(p => p.segments.map(pt => new Point(pt.point)));
 		if(r_paths[0].length == 0) return [];
 
 		let { paths, map } = PathUtil.$collect(r_paths);
@@ -184,9 +186,9 @@
 			let line = new Line(from, to);
 			let f = line.$slope.$value, key = f + "," + (from.x - f * from.y);
 			let arr = oa.get(key) ?? [];
-			let p = arr.find(p => line.$contains(p, true));
+			let point = arr.find(p => line.$contains(p, true));
 
-			if(p) PaperUtil.$addLine(this._ridge, from, p);
+			if(point) PaperUtil.$addLine(this._ridge, from, point);
 			else if(self) {
 				// 如果結果也是自己的一個角就直接連線
 				PaperUtil.$addLine(this._ridge, from, to);

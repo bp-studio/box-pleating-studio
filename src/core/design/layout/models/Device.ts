@@ -42,7 +42,7 @@ type GDevice = JDevice<Gadget>;
 		return {
 			gadgets: this.$gadgets.map(g => g.toJSON()),
 			offset: this.$getOffset(),
-			addOns: this.$addOns.length ? this.$addOns : undefined
+			addOns: this.$addOns.length ? this.$addOns : undefined,
 		};
 	}
 
@@ -95,10 +95,15 @@ type GDevice = JDevice<Gadget>;
 	@onDemand private get _regionRidges(): ReadonlyMap<Region, Line[]> {
 		let map: Map<Region, Line[]> = new Map();
 		for(let r of this.$regions) {
-			let parallelRegions = this.$regions.filter(q => q != r && q.$direction.$parallel(r.$direction));
+			let parallelRegions = this.$regions.filter(
+				q => q != r && q.$direction.$parallel(r.$direction)
+			);
 
 			// 垂直於軸平行摺痕的脊線即使重疊也不應該被扣除（meandering 時會產生）
-			let lines = selectMany(parallelRegions, q => q.$shape.ridges.filter(r => !r.$perpendicular(q.$direction)));
+			let lines = selectMany(
+				parallelRegions,
+				q => q.$shape.ridges.filter(l => !l.$perpendicular(q.$direction))
+			);
 
 			map.set(r, Line.$subtract(r.$shape.ridges, lines));
 		}
@@ -111,7 +116,7 @@ type GDevice = JDevice<Gadget>;
 		let result: Line[] = [];
 		let map = this._regionRidges;
 		for(let r of this.$regions) {
-			result.push(...map.get(r)!.map(r => r.$transform(fx, fy).$shift(this.$delta)));
+			result.push(...map.get(r)!.map(l => l.$transform(fx, fy).$shift(this.$delta)));
 		}
 		return Line.$distinct(result);
 	}
@@ -196,7 +201,9 @@ type GDevice = JDevice<Gadget>;
 		let out = c.type != CornerType.$socket;
 		let f = this.$pattern.$stretch.fx * ((out ? q : opposite(c.q!)) == 0 ? -1 : 1);
 		let target = this.$pattern.$getConnectionTarget(c as JConnection);
-		let slack = out ? this.$gadgets[o].$slacks[q] : this.$pattern.$gadgets[-c.e! - 1].$slacks[c.q!];
+		let slack = out ?
+			this.$gadgets[o].$slacks[q] :
+			this.$pattern.$gadgets[-c.e! - 1].$slacks[c.q!];
 		let bound = target.x - this.$anchors[o][q].x - slack * f;
 		if(dx * f > bound * f) dx = bound;
 		return dx;

@@ -51,7 +51,8 @@ class Configurator {
 		}
 
 		// 過濾掉跟存檔一樣的 `Configuration`
-		let filter = (config: Configuration) => !this._seedSignature || this._seedSignature != JSON.stringify(config);
+		let filter = (config: Configuration) =>
+			!this._seedSignature || this._seedSignature != JSON.stringify(config);
 		yield* GeneratorUtil.$filter(this.$search(), filter);
 		callback();
 	}
@@ -67,7 +68,7 @@ class Configurator {
 				this._searchSingleGadget(j),
 				this._searchDoubleRelay(j, 0),
 				this._searchSingleGadget(j, Strategy.$halfIntegral),
-				this._searchSingleGadget(j, Strategy.$universal)
+				this._searchSingleGadget(j, Strategy.$universal),
 			], filter);
 		}
 
@@ -83,7 +84,7 @@ class Configurator {
 				this._searchThreeFlapRelayJoin(layout, Strategy.$baseJoin),
 				this._searchThreeFlapJoin(layout, Strategy.$standardJoin),
 				this._searchThreeFlapRelayJoin(layout, Strategy.$standardJoin),
-				this._searchThreeFlapRelay(layout, Strategy.$halfIntegral)
+				this._searchThreeFlapRelay(layout, Strategy.$halfIntegral),
 			], filter);
 		}
 
@@ -94,8 +95,8 @@ class Configurator {
 	private *_searchSingleGadget(j: JJunction, strategy?: Strategy): Generator<Configuration> {
 		yield new Configuration(this._repo, {
 			partitions: [
-				{ overlaps: [ConfigUtil.$toOverlap(j, 0)], strategy }
-			]
+				{ overlaps: [ConfigUtil.$toOverlap(j, 0)], strategy },
+			],
 		});
 	}
 
@@ -104,25 +105,39 @@ class Configurator {
 		if(j.ox * j.oy % 2) return; // 不考慮奇數面積
 		if(j.ox < j.oy) {
 			for(let y = 1; y <= j.oy / 2; y++) {
-				let c = new Configuration(this._repo, { partitions: ConfigUtil.$cut(j, index, -1, 0, y) });
+				let c = new Configuration(
+					this._repo,
+					{ partitions: ConfigUtil.$cut(j, index, -1, 0, y) }
+				);
 				if(c.entry) {
 					yield c;
-					yield new Configuration(this._repo, { partitions: ConfigUtil.$cut(j, index, -1, 0, j.oy - y) });
+					yield new Configuration(
+						this._repo,
+						{ partitions: ConfigUtil.$cut(j, index, -1, 0, j.oy - y) }
+					);
 				}
 			}
 		} else {
 			for(let x = 1; x <= j.ox / 2; x++) {
-				let c = new Configuration(this._repo, { partitions: ConfigUtil.$cut(j, index, -1, x, 0) });
+				let c = new Configuration(
+					this._repo,
+					{ partitions: ConfigUtil.$cut(j, index, -1, x, 0) }
+				);
 				if(c.entry) {
 					yield c;
-					yield new Configuration(this._repo, { partitions: ConfigUtil.$cut(j, index, -1, j.ox - x, 0) });
+					yield new Configuration(
+						this._repo,
+						{ partitions: ConfigUtil.$cut(j, index, -1, j.ox - x, 0) }
+					);
 				}
 			}
 		}
 	}
 
 	/** 搜尋 3 Flap 接力 */
-	private *_searchThreeFlapRelay(junctions: readonly [JJunction, JJunction], strategy?: Strategy): Generator<Configuration> {
+	private *_searchThreeFlapRelay(
+		junctions: readonly [JJunction, JJunction], strategy?: Strategy
+	): Generator<Configuration> {
 		let [o1, o2] = junctions.map((j, i) => ConfigUtil.$toOverlap(j, i));
 		let oriented = o1.c[2].e == o2.c[2].e; // 兩者共用左下角
 		if(o1.ox > o2.ox) [o1, o2] = [o2, o1];
@@ -146,19 +161,21 @@ class Configurator {
 		yield new Configuration(this._repo, {
 			partitions: [
 				{ overlaps: [o1], strategy },
-				{ overlaps: [o2p], strategy }
-			]
+				{ overlaps: [o2p], strategy },
+			],
 		});
 		yield new Configuration(this._repo, {
 			partitions: [
 				{ overlaps: [o1p], strategy },
-				{ overlaps: [o2], strategy }
-			]
+				{ overlaps: [o2], strategy },
+			],
 		});
 	}
 
 	/** 搜尋 3-Flap Join */
-	private *_searchThreeFlapJoin(junctions: readonly [JJunction, JJunction], strategy?: Strategy): Generator<Configuration> {
+	private *_searchThreeFlapJoin(
+		junctions: readonly [JJunction, JJunction], strategy?: Strategy
+	): Generator<Configuration> {
 		// 製作一個具有兩個 Overlap 的 Partition
 		let [o1, o2] = junctions.map((j, i) => ConfigUtil.$toOverlap(j, i));
 		ConfigUtil.$joinOverlaps(o1, o2, -1, -2, o1.c[0].e == o2.c[0].e);
@@ -166,8 +183,8 @@ class Configurator {
 		yield new Configuration(this._repo, {
 			partitions: [{
 				overlaps: [o1, o2],
-				strategy
-			}]
+				strategy,
+			}],
 		});
 	}
 
@@ -189,8 +206,8 @@ class Configurator {
 			yield new Configuration(this._repo, {
 				partitions: [{
 					overlaps: [o1p, o2p],
-					strategy
-				}]
+					strategy,
+				}],
 			});
 		}
 
@@ -202,8 +219,8 @@ class Configurator {
 			yield new Configuration(this._repo, {
 				partitions: [{
 					overlaps: [o1p, o2p],
-					strategy
-				}]
+					strategy,
+				}],
 			});
 		}
 	}

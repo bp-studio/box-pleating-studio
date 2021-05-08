@@ -13,7 +13,9 @@
 		this.$disposeEvent();
 		let result: PolyBool.Shape[] = [];
 		let d = this.parent.$distance;
-		let { qv, fx, fy, $point: point, $coveredInfo: coveredInfo, $pattern: pattern } = this._quadrant;
+		let { qv, fx, fy, $point: point, $coveredInfo: coveredInfo, $pattern: pattern } =
+			this._quadrant;
+
 		if(!pattern) {
 			let r = new Fraction(this.parent.$flap.radius + d);
 			let p = point.add(qv.$scale(r));

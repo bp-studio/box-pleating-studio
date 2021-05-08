@@ -21,7 +21,7 @@ class EditCommand extends Command implements JEditCommand {
 		let command = new EditCommand(target.$design, {
 			type: CommandType.add,
 			tag: target.$tag,
-			memento: target.toJSON()
+			memento: target.toJSON(),
 		});
 
 		if(target instanceof TreeNode) {
@@ -38,7 +38,7 @@ class EditCommand extends Command implements JEditCommand {
 		let command = new EditCommand(target.$design, {
 			type: CommandType.remove,
 			tag: target.$tag,
-			memento: target.toJSON()
+			memento: target.toJSON(),
 		});
 		target.$dispose(true);
 		target.$design.$history.$queue(command);

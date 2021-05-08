@@ -4,6 +4,7 @@
 		"torn4dom4n.latex-support",
 		"octref.vetur",
 		"editorconfig.editorconfig",
-		"lokalise.i18n-ally"
+		"lokalise.i18n-ally",
+		"dbaeumer.vscode-eslint"
 	]
 }

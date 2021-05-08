@@ -35,7 +35,7 @@ interface JEdge {
 		return {
 			n1: n1.id,
 			n2: n2.id,
-			length: this.length
+			length: this.length,
 		};
 	}
 
@@ -47,9 +47,9 @@ interface JEdge {
 	}
 
 	public $delete(): boolean {
-		let n = [this.n1, this.n2].find(n => n.$degree == 1);
-		if(n) {
-			n.$dispose();
+		let node = [this.n1, this.n2].find(n => n.$degree == 1);
+		if(node) {
+			node.$dispose();
 			return true;
 		}
 		return false;
