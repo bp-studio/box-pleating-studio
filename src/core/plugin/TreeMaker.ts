@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-throw-literal */
 /* eslint-disable max-classes-per-file */
 

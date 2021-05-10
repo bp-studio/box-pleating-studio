@@ -36,10 +36,17 @@
 		"arrow-spacing": "warn",
 		"block-scoped-var": "warn",
 		"block-spacing": "warn",
-		"brace-style": ["warn", "1tbs", { "allowSingleLine": true }],
+		"brace-style": "off",
+		"@typescript-eslint/brace-style": [
+			"warn",
+			"1tbs",
+			{
+				"allowSingleLine": true
+			}
+		],
 		"camelcase": "off",
 		"capitalized-comments": "off",
-		"class-methods-use-this": "off",
+		"class-methods-use-this": "off", // 本意很好但例外實在太多，沒辦法開啟
 		"comma-dangle": "off",
 		"@typescript-eslint/comma-dangle": [
 			"warn",
@@ -52,13 +59,18 @@
 				"functions": "never"
 			}
 		],
-		"comma-spacing": "warn",
+		"comma-spacing": "off",
+		"@typescript-eslint/comma-spacing": "warn",
 		"comma-style": "warn",
 		"complexity": "warn",
 		"computed-property-spacing": "warn",
 		"consistent-return": "off",
 		"consistent-this": "off",
-		"curly": "off",
+		"curly": [
+			"warn",
+			"multi-line",
+			"consistent"
+		],
 		"default-case": "warn",
 		"default-case-last": "warn",
 		"default-param-last": "warn",
@@ -69,13 +81,23 @@
 		"dot-notation": "warn",
 		"eol-last": "warn",
 		"eqeqeq": "off",
-		"func-call-spacing": "warn",
+		"func-call-spacing": [
+			"warn",
+			"never"
+		],
 		"func-name-matching": "warn",
 		"func-names": "warn",
 		"func-style": "off",
 		"function-call-argument-newline": "off",
 		"function-paren-newline": "off",
-		"generator-star-spacing": "warn",
+		"generator-star-spacing": [
+			"warn",
+			{
+				"before": true,
+				"after": false,
+				"anonymous": "neither"
+			}
+		],
 		"grouped-accessor-pairs": "warn",
 		"guard-for-in": "warn",
 		"id-denylist": "warn",
@@ -100,6 +122,28 @@
 			}
 		],
 		"keyword-spacing": "off",
+		"@typescript-eslint/keyword-spacing": [
+			"warn",
+			{
+				"overrides": {
+					"if": {
+						"after": false
+					},
+					"for": {
+						"after": false
+					},
+					"while": {
+						"after": false
+					},
+					"catch": {
+						"after": false
+					},
+					"switch": {
+						"after": false
+					}
+				}
+			}
+		],
 		"line-comment-position": "off",
 		"linebreak-style": "warn",
 		"lines-around-comment": "off",
@@ -169,7 +213,7 @@
 		"no-invalid-this": "off",
 		"no-iterator": "warn",
 		"no-label-var": "warn",
-		"no-labels": "warn",
+		"no-labels": "error",
 		"no-lone-blocks": "warn",
 		"no-lonely-if": "warn",
 		"no-loop-func": "off",
@@ -178,10 +222,29 @@
 		],
 		"no-loss-of-precision": "warn",
 		"no-magic-numbers": "off",
+		"@typescript-eslint/no-magic-numbers": [
+			"warn",
+			{
+				"ignoreEnums": true,
+				"ignoreReadonlyClassProperties": true,
+				"ignoreDefaultValues": true,
+				"ignoreArrayIndexes": true,
+				"ignore": [
+					-1,
+					0,
+					1,
+					2
+				]
+			}
+		],
 		"no-mixed-operators": "off",
+		"no-mixed-spaces-and-tabs": [
+			"warn",
+			"smart-tabs"
+		],
 		"no-multi-assign": "off",
 		"no-multi-spaces": "warn",
-		"no-multi-str": "warn",
+		"no-multi-str": "error",
 		"no-multiple-empty-lines": "warn",
 		"no-negated-condition": "off",
 		"no-nested-ternary": "warn",
@@ -276,8 +339,15 @@
 		"sort-imports": "warn",
 		"sort-keys": "off",
 		"sort-vars": "off",
-		"space-before-blocks": "off",
-		"space-before-function-paren": "off",
+		"space-before-blocks": "warn",
+		"space-before-function-paren": [
+			"warn",
+			{
+				"anonymous": "never",
+				"named": "never",
+				"asyncArrow": "always"
+			}
+		],
 		"space-in-parens": "warn",
 		"space-infix-ops": "off",
 		"@typescript-eslint/space-infix-ops": [

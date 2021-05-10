@@ -28,7 +28,9 @@
 				result.push(e);
 				nodes.add(e.n1);
 				nodes.add(e.n2);
-			} else edges.push(e);
+			} else {
+				edges.push(e);
+			}
 		}
 		return result;
 	}

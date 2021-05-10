@@ -59,6 +59,7 @@ namespace PaperWorker {
 	}
 
 	/** 當相交面積太小的時候加粗框線以免重疊不明顯 */
+	/* eslint-disable @typescript-eslint/no-magic-numbers */
 	function widthForArea(a: number): number {
 		if(a < 0.25) {
 			return 4;

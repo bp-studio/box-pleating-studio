@@ -77,11 +77,13 @@ namespace Migration {
 
 		design.version = "rc0";
 		let st = design.layout?.stretches as Pseudo<JStretch>[];
-		if(st) for(let s of st.concat()) {
-			let cf = s.configuration as Pseudo<JConfiguration>;
-			if(cf && (!cf.overlaps || (cf.overlaps as JOverlap[]).some(rc0_overlapFilter))) {
-				st.splice(st.indexOf(s), 1);
-				return true;
+		if(st) {
+			for(let s of st.concat()) {
+				let cf = s.configuration as Pseudo<JConfiguration>;
+				if(cf && (!cf.overlaps || (cf.overlaps as JOverlap[]).some(rc0_overlapFilter))) {
+					st.splice(st.indexOf(s), 1);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -97,9 +99,11 @@ namespace Migration {
 
 		design.version = "rc1";
 		let st = design.layout?.stretches as Pseudo<JStretch>[];
-		if(st) for(let s of st.concat()) {
-			let cf = s.configuration as Pseudo<JConfiguration>;
-			if(cf) rc1_pattern(cf, s);
+		if(st) {
+			for(let s of st.concat()) {
+				let cf = s.configuration as Pseudo<JConfiguration>;
+				if(cf) rc1_pattern(cf, s);
+			}
 		}
 		return false;
 	}

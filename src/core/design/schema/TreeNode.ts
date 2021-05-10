@@ -72,9 +72,11 @@ interface JNode {
 	 * @param force 是否要無視頂點度數限制、強制棄置
 	 */
 	public $dispose(force: boolean = false) {
-		if(force || this.$degree == 1) super.$dispose();
-		else if(this.$degree == 2) return this.$tree.$deleteAndJoin(this);
-		else if(this.$degree != 1) {
+		if(force || this.$degree == 1) {
+			super.$dispose();
+		} else if(this.$degree == 2) {
+			return Tree.$deleteAndJoin(this);
+		} else if(this.$degree != 1) {
 			console.warn(`Node [${this.name ? this.name : this.id}] is not a leaf.`);
 		}
 		return undefined;

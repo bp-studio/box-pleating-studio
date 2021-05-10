@@ -29,11 +29,15 @@ interface JStretch {
 	@shrewd public get $junctions(): readonly Junction[] {
 		let result = this.$design.$junctions.$teams.get(this.$signature) ?? [];
 		if(this._junctionCache && this._junctionCache.length == result.length) {
-			for(let i in result) if(result[i] != this._junctionCache[i]) {
-				return this._junctionCache = result;
+			for(let i in result) {
+				if(result[i] != this._junctionCache[i]) {
+					return this._junctionCache = result;
+				}
 			}
 			return this._junctionCache;
-		} else return this._junctionCache = result;
+		} else {
+			return this._junctionCache = result;
+		}
 	}
 	private _junctionCache: readonly Junction[];
 
@@ -76,8 +80,7 @@ interface JStretch {
 		let structure = this.$structureSignature;
 		let result: Repository;
 
-		if(this._repoCache.has(structure)) result = this._repoCache.get(structure)!;
-		else {
+		if(this._repoCache.has(structure)) { result = this._repoCache.get(structure)!; } else {
 			let option = this.$design.$options.get(this);
 			result = new Repository(this, structure, option);
 		}

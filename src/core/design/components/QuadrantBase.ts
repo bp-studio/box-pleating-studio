@@ -45,10 +45,10 @@ abstract class QuadrantBase extends SheetObject {
 
 		this.qv = QuadrantBase.QV[q];
 		this.sv = QuadrantBase.SV[q];
-		this.pv = QuadrantBase.SV[(q + 1) % 4];
+		this.pv = QuadrantBase.SV[(q + nextQuadrantOffset) % quadrantNumber];
 
-		this.fx = this.q == 0 || this.q == 3 ? 1 : -1;
-		this.fy = this.q == 0 || this.q == 1 ? 1 : -1;
+		this.fx = this.q == Direction.UR || this.q == Direction.LR ? 1 : -1;
+		this.fy = this.q == Direction.UR || this.q == Direction.UL ? 1 : -1;
 	}
 
 	protected get $shouldDispose(): boolean {
@@ -83,8 +83,8 @@ abstract class QuadrantBase extends SheetObject {
 		}
 
 		return new Point(
-			this.x(r - (q == 3 ? 0 : ov.ox) - sx),
-			this.y(r - (q == 1 ? 0 : ov.oy) - sy)
+			this.x(r - (q == Direction.LR ? 0 : ov.ox) - sx),
+			this.y(r - (q == Direction.UL ? 0 : ov.oy) - sy)
 		);
 	}
 
@@ -100,8 +100,8 @@ abstract class QuadrantBase extends SheetObject {
 
 	/** 把一個象限方向作相位變換處理 */
 	public static $transform(dir: number, fx: number, fy: number) {
-		if(fx < 0) dir += dir % 2 ? 3 : 1;
-		if(fy < 0) dir += dir % 2 ? 1 : 3;
-		return dir % 4;
+		if(fx < 0) dir += dir % 2 ? previousQuadrantOffset : nextQuadrantOffset;
+		if(fy < 0) dir += dir % 2 ? nextQuadrantOffset : previousQuadrantOffset;
+		return dir % quadrantNumber;
 	}
 }

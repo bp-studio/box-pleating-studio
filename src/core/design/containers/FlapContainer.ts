@@ -18,7 +18,7 @@
 	public $delete(flaps: readonly Flap[]): boolean {
 		let success = false;
 		for(let f of flaps) {
-			if(this._design.$vertices.size == 3) break;
+			if(this._design.$vertices.size == Design.$MIN_NODES) break;
 			f.node.$delete();
 			success = true;
 		}

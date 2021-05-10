@@ -78,7 +78,7 @@ interface JEdge {
 
 	/////////////////////////////////////////////////////////////////
 	// 結點群組
-	private _group(n: TreeNode, edges: ReadonlyArray<TreeEdge>) {
+	private static _group(n: TreeNode, edges: ReadonlyArray<TreeEdge>) {
 		let result = [n];
 		for(let edge of edges) result.push(...edge.g(n));
 		return result;
@@ -87,13 +87,13 @@ interface JEdge {
 	/** 相對於 n1 側的結點群組 */
 	@shrewd public get g1(): readonly TreeNode[] {
 		this.$disposeEvent();
-		return this._group(this.n1, this.a1);
+		return TreeEdge._group(this.n1, this.a1);
 	}
 
 	/** 相對於 n2 側的結點群組 */
 	@shrewd public get g2(): readonly TreeNode[] {
 		this.$disposeEvent();
-		return this._group(this.n2, this.a2);
+		return TreeEdge._group(this.n2, this.a2);
 	}
 
 	/** 相反於輸入的點的那一側的結點群組 */

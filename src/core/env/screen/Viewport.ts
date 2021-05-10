@@ -7,6 +7,8 @@
 
 abstract class Viewport {
 
+	private static readonly _RETRY = 10;
+
 	@shrewd protected _viewWidth: number;
 	@shrewd protected _viewHeight: number;
 
@@ -25,7 +27,7 @@ abstract class Viewport {
 
 		// 重新刷新頁面的時候在手機版上可能會有一瞬間大小判斷錯誤，
 		// 所以在建構的時候額外再多判斷一次
-		setTimeout(() => this._setSize(), 10);
+		setTimeout(() => this._setSize(), Viewport._RETRY);
 
 		// 設置事件，在手機版鍵盤開啟時暫時鎖定
 		let isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;

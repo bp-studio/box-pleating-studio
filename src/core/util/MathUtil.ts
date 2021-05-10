@@ -15,13 +15,6 @@ namespace MathUtil {
 		return id;
 	}
 
-	function _guid(): string {
-		// @ts-ignore
-		return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-		);
-	}
-
 	/** 求出整數的最大公因數。 */
 	export function $GCD<T extends bigint | number>(a: T, b: T): T;
 	export function $GCD(a: number, b: number): number {
@@ -66,5 +59,13 @@ namespace MathUtil {
 	/** 把數值 x 朝著 f 指定的方向取下一個整數 */
 	export function $int(x: number, f: number): number {
 		return f > 0 ? Math.ceil(x) : Math.floor(x);
+	}
+
+	/* eslint-disable @typescript-eslint/no-magic-numbers */
+	function _guid(): string {
+		// @ts-ignore
+		return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+			(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+		);
 	}
 }

@@ -36,6 +36,7 @@
 	protected $renderSelection(selected: boolean) {
 		let color = selected ? PaperUtil.$Red() : PaperUtil.$Black();
 		this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		this.line.strokeWidth = selected ? 3 : 2;
 	}
 

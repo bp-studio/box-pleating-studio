@@ -30,15 +30,15 @@
 		let components: readonly string[];
 
 		if(edge.$wrapSide == 0) {
-			components = this
+			components = RiverView
 				._toComponents(edge.l1, edge.n1)
-				.concat(this._toComponents(edge.l2, edge.n2));
+				.concat(RiverView._toComponents(edge.l2, edge.n2));
 			adjacent = edge.a1.concat(edge.a2);
 		} else if(edge.$wrapSide == 2) {
-			components = this._toComponents(edge.l2, edge.n2);
+			components = RiverView._toComponents(edge.l2, edge.n2);
 			adjacent = edge.a2;
 		} else {
-			components = this._toComponents(edge.l1, edge.n1);
+			components = RiverView._toComponents(edge.l1, edge.n1);
 			adjacent = edge.a1;
 		}
 
@@ -57,7 +57,7 @@
 		return { inner, length: edge.length, components };
 	}
 
-	private _toComponents(leaves: readonly TreeNode[], n: TreeNode): string[] {
+	private static _toComponents(leaves: readonly TreeNode[], n: TreeNode): string[] {
 		return leaves.map(l => l.id + "," + n.id);
 	}
 
@@ -188,8 +188,9 @@
 			let arr = oa.get(key) ?? [];
 			let point = arr.find(p => line.$contains(p, true));
 
-			if(point) PaperUtil.$addLine(this._ridge, from, point);
-			else if(self) {
+			if(point) {
+				PaperUtil.$addLine(this._ridge, from, point);
+			} else if(self) {
 				// 如果結果也是自己的一個角就直接連線
 				PaperUtil.$addLine(this._ridge, from, to);
 			}

@@ -120,24 +120,26 @@ interface JPartition {
 		if(this.$overlaps.length == 1) return ov;
 		let result = clone(ov), parent = this._getParent(ov);
 		result.shift = result.shift ?? { x: 0, y: 0 };
-		for(let o of this.$overlaps) if(o != ov) {
-			let p = this._getParent(o);
-			let w = result.ox + result.shift.x;
-			let h = result.oy + result.shift.y;
-			if(p.c[0].e == parent.c[0].e) {
-				if(p.ox < parent.ox) {
-					result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
+		for(let o of this.$overlaps) {
+			if(o != ov) {
+				let p = this._getParent(o);
+				let w = result.ox + result.shift.x;
+				let h = result.oy + result.shift.y;
+				if(p.c[0].e == parent.c[0].e) {
+					if(p.ox < parent.ox) {
+						result.ox = w - (result.shift.x = Math.max(result.shift.x, p.ox));
+					}
+					if(p.oy < parent.oy) {
+						result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
+					}
 				}
-				if(p.oy < parent.oy) {
-					result.oy = h - (result.shift.y = Math.max(result.shift.y, p.oy));
-				}
-			}
-			if(p.c[2].e == parent.c[2].e) {
-				if(p.ox < parent.ox) {
-					result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
-				}
-				if(p.oy < parent.oy) {
-					result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
+				if(p.c[2].e == parent.c[2].e) {
+					if(p.ox < parent.ox) {
+						result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - result.shift.x;
+					}
+					if(p.oy < parent.oy) {
+						result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - result.shift.y;
+					}
 				}
 			}
 		}
@@ -163,7 +165,7 @@ interface JPartition {
 			if(point._x.ge(p2._x)) return p2;
 			return null;
 		} else {
-			return q == 0 || q == 3 ? p1 : p2;
+			return q == Direction.UR || q == Direction.LR ? p1 : p2;
 		}
 	}
 
@@ -178,8 +180,10 @@ interface JPartition {
 		if(tree.$jid) {
 			result.overlaps = clone(result.overlaps);
 			for(let o of result.overlaps) {
-				for(let c of o.c) if(c.e !== undefined && c.e >= 0) {
-					c.e = tree.$node.get(c.e)!.id;
+				for(let c of o.c) {
+					if(c.e !== undefined && c.e >= 0) {
+						c.e = tree.$node.get(c.e)!.id;
+					}
 				}
 			}
 		}

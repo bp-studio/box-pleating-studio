@@ -95,6 +95,7 @@ interface JVertex extends IPoint {
 	/** 根據所有的頂點集，找出自身附近最近的空白處 */
 	public $findClosestEmptyPoint(vertices: Vertex[]): Point {
 		let { x, y } = this.$location;
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		let ref = new Point(x + 0.125, y + 0.0625);
 		let arr: [Point, number][] = [];
 
@@ -102,10 +103,12 @@ interface JVertex extends IPoint {
 		for(let v of vertices) occupied.add(v.$location.x + "," + v.$location.y);
 
 		let r = 5;
-		for(let i = x - r; i <= x + r; i++) for(let j = y - r; j <= y + r; j++) {
-			if(!occupied.has(i + "," + j)) {
-				let p = new Point(i, j);
-				arr.push([p, p.$dist(ref)]);
+		for(let i = x - r; i <= x + r; i++) {
+			for(let j = y - r; j <= y + r; j++) {
+				if(!occupied.has(i + "," + j)) {
+					let p = new Point(i, j);
+					arr.push([p, p.$dist(ref)]);
+				}
 			}
 		}
 		arr.sort((a, b) => a[1] - b[1]);

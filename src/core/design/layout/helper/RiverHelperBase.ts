@@ -21,7 +21,9 @@
 		delete this.$flap;
 	}
 
-	public get $distance(): number { return 0; }
+	public get $distance(): number {
+		return 0;
+	}
 
 	@noCompare // 已經透過 q.contour 來把關
 	public get $shape(): PolyBool.Shape {

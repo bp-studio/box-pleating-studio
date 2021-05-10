@@ -91,7 +91,7 @@ interface DisplaySetting {
 
 	public $zoom(zoom: number, relativeCenter?: IPoint) {
 		// 檢查
-		if(zoom < 100) zoom = 100;
+		if(zoom < Sheet.$FULL_ZOOM) zoom = Sheet.$FULL_ZOOM;
 		let sheet = this._design?.sheet;
 		if(!sheet || sheet.zoom == zoom) return;
 

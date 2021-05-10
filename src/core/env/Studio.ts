@@ -74,7 +74,9 @@ interface StudioOptions {
 		if(id != null) {
 			let d = this.$designMap.get(id);
 			if(d) this.$design = d;
-		} else this.$design = null;
+		} else {
+			this.$design = null;
+		}
 	}
 
 	/** 此方法有防呆 */
@@ -92,7 +94,7 @@ interface StudioOptions {
 		this.$designMap.clear();
 	}
 
-	public $CreateBpsUrl(): string {
+	public $createBpsUrl(): string {
 		if(!this.$design) return "";
 		let json = this.$design.toJSON();
 		delete json.history; // 存檔的時候不用儲存歷史

@@ -12,6 +12,8 @@
 
 class Animator {
 
+	private static readonly _CANCEL = 300;
+
 	private readonly _action: Action;
 	private readonly _run: (time: number) => void;
 	private readonly _throttle: number;
@@ -32,7 +34,7 @@ class Animator {
 		setInterval(() => {
 			cancelAnimationFrame(this._request);
 			this._next();
-		}, 300);
+		}, Animator._CANCEL);
 	}
 
 	private _next() {

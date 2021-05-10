@@ -16,8 +16,9 @@ namespace PaperUtil {
 	export function $replaceContent(
 		target: paper.CompoundPath, source: paper.PathItem, clone: boolean): void {
 		target.removeChildren();
-		if(source instanceof paper.CompoundPath) target.copyContent(source);
-		else {
+		if(source instanceof paper.CompoundPath) {
+			target.copyContent(source);
+		} else {
 			if(clone) source = source.clone({ insert: false });
 			target.addChild(source);
 		}

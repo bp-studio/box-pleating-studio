@@ -22,6 +22,7 @@ namespace LabelUtil {
 		dx: number, dy: number
 	) {
 		label.justification = dx == 0 ? "center" : dx == 1 ? "left" : "right";
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		let oy = dy == 0 ? -lh / 5 : dy == -1 ? -lh / 2 : 0;
 		let l = Math.sqrt(dx * dx + dy * dy);
 		let d = l == 0 ? 0 : lh / 2 / l;

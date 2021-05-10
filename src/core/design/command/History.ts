@@ -13,6 +13,8 @@ interface JHistory {
 
 @shrewd class HistoryManager extends Disposable implements ISerializable<JHistory> {
 
+	private static readonly _MAX_STEP = 30;
+
 	private readonly _design: Design;
 	@shrewd private readonly _steps: Step[] = [];
 	@shrewd private _index: number = 0;
@@ -116,7 +118,7 @@ interface JHistory {
 		this._steps[this._index++] = step;
 
 		// 最多儲存到 30 步
-		if(this._steps.length > 30) {
+		if(this._steps.length > HistoryManager._MAX_STEP) {
 			this._steps.shift();
 			this._index--;
 			this._savedIndex--;

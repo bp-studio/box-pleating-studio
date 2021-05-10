@@ -10,6 +10,8 @@ interface JStep<T extends JCommand = JCommand> {
 
 class Step implements ISerializable<JStep> {
 
+	private static readonly _AUTO_RESET = 1000;
+
 	public static restore(design: Design, json: JStep): Step {
 		json.commands = json.commands.map(c => Command.$restore(design, c));
 		return new Step(design, json as JStep<Command>);
@@ -54,7 +56,7 @@ class Step implements ISerializable<JStep> {
 	/** 重置自動鎖定 */
 	private _reset() {
 		if(this._timeout) clearTimeout(this._timeout);
-		if(!this._fixed) this._timeout = setTimeout(() => this._fix(), 1000);
+		if(!this._fixed) this._timeout = setTimeout(() => this._fix(), Step._AUTO_RESET);
 	}
 
 	/** 自動鎖定自身 */

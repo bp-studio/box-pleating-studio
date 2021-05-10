@@ -7,6 +7,9 @@
 
 class JoinerCore {
 
+	/** extraSize 的權重設定為本體大小的十倍強 */
+	private static readonly _EXTRA_SIZE_WEIGHT = 10;
+
 	private joiner: Joiner;
 	private data: {
 		size: number;
@@ -39,7 +42,7 @@ class JoinerCore {
 		// 計算接力融合的起點
 		let off1: IPoint = { x: 0, y: 0 }, off2: IPoint = { x: 0, y: 0 };
 		if(s1) {
-			let int = joiner.$getRelayJoinIntersection(p2, s1, (q1 + 2) % 4);
+			let int = joiner.$getRelayJoinIntersection(p2, s1, opposite(q1));
 			if(!int || !int.$isIntegral) return;
 			if($oriented) {
 				p1.$offset(off1 = int.$toIPoint());
@@ -52,7 +55,7 @@ class JoinerCore {
 			}
 		}
 		if(s2) {
-			let int = joiner.$getRelayJoinIntersection(p1, s2, (q2 + 2) % 4);
+			let int = joiner.$getRelayJoinIntersection(p1, s2, opposite(q2));
 			if(!int || !int.$isIntegral) return;
 			if($oriented) {
 				p2.$offset(off2 = int.$toIPoint());
@@ -153,7 +156,7 @@ class JoinerCore {
 		return new Line(p, this.joiner.$oriented ? p2 : p1);
 	}
 
-	private _closestGridPoint(e: Line, p: Point): Point {
+	private static _closestGridPoint(e: Line, p: Point): Point {
 		let r!: Point, d: number = Number.POSITIVE_INFINITY;
 		for(let i of e.$gridPoints()) {
 			let dist = i.$dist(p);
@@ -193,7 +196,7 @@ class JoinerCore {
 
 		if(!this._setupAnchor(D)) return;
 		let P = D.sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
-		let T = this._closestGridPoint(this._substituteEnd(e, B), D);
+		let T = JoinerCore._closestGridPoint(this._substituteEnd(e, B), D);
 
 		// 如果找到的最近整點就是整個 Gadget 的尖端，
 		// 這樣的變形是暫時的 river 演算法無法處理的，暫時不考慮
@@ -223,7 +226,7 @@ class JoinerCore {
 		if(D.$isIntegral) return; // 退化成 base join，不考慮
 		let { e1, e2, p1, p2 } = this.data;
 		let e = [e1, e2][i], p = [p1, p2][i];
-		let T = this._closestGridPoint(this._substituteEnd(e, D), B);
+		let T = JoinerCore._closestGridPoint(this._substituteEnd(e, D), B);
 
 		// 如果找到的最近整點就是整個 Gadget 的尖端，
 		// 這樣的變形是暫時的 river 演算法無法處理的，暫時不考慮
@@ -265,8 +268,8 @@ class JoinerCore {
 		if(a.x * f > this._deltaPt.x * f) return false;
 
 		let left = $oriented == cw;
-		a1[left ? 3 : 1] = { location: a.add(v1).$toIPoint() };
-		a2[left ? 1 : 3] = { location: a.add(v2).$toIPoint() };
+		a1[left ? Direction.LR : Direction.UL] = { location: a.add(v1).$toIPoint() };
+		a2[left ? Direction.UL : Direction.LR] = { location: a.add(v2).$toIPoint() };
 		return true;
 	}
 
@@ -279,18 +282,18 @@ class JoinerCore {
 			gadgets: [
 				{
 					pieces: [json ? p1.toJSON() : p1],
-					offset: this._simplifyIPoint(off1), anchors: a1.concat(),
+					offset: JoinerCore._simplifyIPoint(off1), anchors: a1.concat(),
 				},
 				{
 					pieces: [json ? p2.toJSON() : p2],
-					offset: this._simplifyIPoint(off2), anchors: a2.concat(),
+					offset: JoinerCore._simplifyIPoint(off2), anchors: a2.concat(),
 				},
 			],
 			addOns,
-		}, size + (extraSize ?? 0) * 10]; // extraSize 的權重設定為本體大小的十倍強
+		}, size + (extraSize ?? 0) * JoinerCore._EXTRA_SIZE_WEIGHT];
 	}
 
-	private _simplifyIPoint(p: IPoint | undefined): IPoint | undefined {
+	private static _simplifyIPoint(p: IPoint | undefined): IPoint | undefined {
 		return p && p.x == 0 && p.y == 0 ? undefined : p;
 	}
 }

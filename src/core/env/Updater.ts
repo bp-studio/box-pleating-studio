@@ -1,10 +1,11 @@
 
 class Updater extends Animator {
 
+	private static readonly _PERIOD = 50;
 	private readonly _studio: Studio;
 
 	constructor(studio: Studio) {
-		super(() => this.$update(), 50);
+		super(() => this.$update(), Updater._PERIOD);
 		this._studio = studio;
 	}
 

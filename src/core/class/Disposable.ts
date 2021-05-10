@@ -13,7 +13,7 @@ interface IDisposable {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd abstract class Disposable implements IDisposable{
+@shrewd abstract class Disposable implements IDisposable {
 
 	/** 內部的棄置狀態 */
 	@shrewd({

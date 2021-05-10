@@ -49,14 +49,14 @@ class Joiner {
 		// 計算 Overlap 偏移
 		[this.s1, this.s2] = this.$oriented ?
 			[o1.shift, o2.shift] :
-			[this._getReverseShift(o1, j1), this._getReverseShift(o2, j2)];
+			[Joiner._getReverseShift(o1, j1), Joiner._getReverseShift(o2, j2)];
 	}
 
-	private _getQuadrantCombination() {
+	private _getQuadrantCombination(): QuadrantDirection[] {
 		if(this.$oriented) {
-			return this.cw ? [2, 1] : [1, 2];
+			return this.cw ? [Direction.LL, Direction.UL] : [Direction.UL, Direction.LL];
 		} else {
-			return this.cw ? [0, 3] : [3, 0];
+			return this.cw ? [Direction.UR, Direction.LR] : [Direction.LR, Direction.UR];
 		}
 	}
 
@@ -102,7 +102,7 @@ class Joiner {
 		);
 	}
 
-	private _getReverseShift(o: JOverlap, j: JJunction): IPoint | undefined {
+	private static _getReverseShift(o: JOverlap, j: JJunction): IPoint | undefined {
 		let x = o.ox + (o.shift?.x ?? 0), y = o.oy + (o.shift?.y ?? 0);
 		if(x == j.ox && y == j.oy) return undefined;
 		return { x: x - j.ox, y: y - j.oy }; // 注意到這邊故意傳回負值

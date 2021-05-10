@@ -20,8 +20,9 @@ namespace ConfigUtil {
 			[o1, o2] = [o2, o1];
 			[i1, i2] = [i2, i1];
 		}
-		let c = oriented ? 0 : 2;
-		let q = ((o2.ox > o1.ox ? 3 : 1) + c) % 4;
+		let c = oriented ? Direction.UR : Direction.LL;
+		let offset = o2.ox > o1.ox ? previousQuadrantOffset : nextQuadrantOffset;
+		let q = (offset + c) % quadrantNumber;
 		o2.c[c] = { type: CornerType.$coincide, e: i1, q: c };
 		o2.c[q] = { type: CornerType.$intersection, e: o1.c[opposite(c)].e };
 		o1.c[opposite(q)] = { type: CornerType.$coincide, e: i2, q };

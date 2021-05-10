@@ -7,7 +7,9 @@ type RecursivePartial<T> = {
  * 深層複製物件的巢狀內容；所有深度的物件都會被建立副本，不會複製參照。
  */
 function deepCopy<T>(target: T, ...sources: RecursivePartial<T>[]): T {
-	for(let s of sources) if(s instanceof Object) {
+	for(let s of sources) {
+		if(!(s instanceof Object)) continue;
+
 		// 這種寫法也一樣適用於 s 是陣列的情況；此時取出來的 keys 就自動會是陣列的各個索引
 		let keys = Object.keys(s) as (keyof T)[];
 

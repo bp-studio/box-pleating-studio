@@ -138,12 +138,12 @@ class BPStudio {
 		return undefined;
 	}
 	public create(json: unknown): Design {
-		if(json && typeof json == 'object') return this._studio.$create(json as Pseudo<JDesign>);
-		throw new Error();
+		if(!json || typeof json != 'object') throw new Error();
+		return this._studio.$create(json as Pseudo<JDesign>);
 	}
 	public restore(json: unknown): Design {
-		if(json && typeof json == 'object') return this._studio.$restore(json as Pseudo<JDesign>);
-		throw new Error();
+		if(!json || typeof json != 'object') throw new Error();
+		return this._studio.$restore(json as Pseudo<JDesign>);
 	}
 	public select(id: unknown): void {
 		if(typeof id == 'number' || id === null) this._studio.$select(id as number | null);
@@ -152,7 +152,7 @@ class BPStudio {
 		if(typeof id == 'number') this._studio.$close(id);
 	}
 	public closeAll(): void { this._studio.$closeAll(); }
-	public toBPS(): string { return this._studio.$CreateBpsUrl(); }
+	public toBPS(): string { return this._studio.$createBpsUrl(); }
 
 	public load(json: unknown): Design | undefined {
 		try {
@@ -170,17 +170,27 @@ class BPStudio {
 	// 圖像處理
 	//////////////////////////////////////////////////////////////////
 
-	public onBeforePrint(): void { this._studio.$display.$rasterizer.$beforePrint(); }
-	public toSVG(): string { return this._studio.$display.$createSvgUrl(); }
-	public toPNG(): Promise<string> { return this._studio.$display.$rasterizer.$createPngUrl(); }
-	public copyPNG(): Promise<void> { return this._studio.$display.$rasterizer.$copyPNG(); }
+	public onBeforePrint(): void {
+		this._studio.$display.$rasterizer.$beforePrint();
+	}
+	public toSVG(): string {
+		return this._studio.$display.$createSvgUrl();
+	}
+	public toPNG(): Promise<string> {
+		return this._studio.$display.$rasterizer.$createPngUrl();
+	}
+	public copyPNG(): Promise<void> {
+		return this._studio.$display.$rasterizer.$copyPNG();
+	}
 
 
 	//////////////////////////////////////////////////////////////////
 	// 歷史操作
 	//////////////////////////////////////////////////////////////////
 
-	public notifySaveAll() { this._studio.$designMap.forEach(d => this.notifySave(d)); }
+	public notifySaveAll() {
+		for(let d of this._studio.$designMap.values()) d.$history.$notifySave();
+	}
 	public notifySave(design: unknown) {
 		if(design instanceof Design) design.$history.$notifySave();
 	}
@@ -193,6 +203,10 @@ class BPStudio {
 	public canRedo(design: unknown): boolean {
 		return design instanceof Design ? design.$history.$canRedo : false;
 	}
-	public undo(design: unknown): void { if(design instanceof Design) design.$history.$undo(); }
-	public redo(design: unknown): void { if(design instanceof Design) design.$history.$redo(); }
+	public undo(design: unknown): void {
+		if(design instanceof Design) design.$history.$undo();
+	}
+	public redo(design: unknown): void {
+		if(design instanceof Design) design.$history.$redo();
+	}
 }

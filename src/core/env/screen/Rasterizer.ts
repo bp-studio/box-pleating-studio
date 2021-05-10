@@ -1,6 +1,9 @@
 
 class Rasterizer {
 
+	private static readonly _DEBOUNCE = 1000;
+	private static readonly _GC_TIME = 5000;
+
 	private readonly _display: Display;
 	private readonly _img: HTMLImageElement;
 
@@ -52,7 +55,7 @@ class Rasterizer {
 
 			// 一直到下一次要產生新的圖片時才回收掉上次產生的 ObjectURL，
 			// 而且設置了一個很大的延遲，這是為了解決在手機上透過外部服務列印時可能發生的延遲
-			setTimeout(() => URL.revokeObjectURL(old), 5000);
+			setTimeout(() => URL.revokeObjectURL(old), Rasterizer._GC_TIME);
 
 			this._img.src = this._display.$createSvgUrl();
 			this._printing = true;
@@ -63,7 +66,7 @@ class Rasterizer {
 		this._debounce = setTimeout(() => {
 			this._printing = false;
 			this._debounce = NaN;
-		}, 1000);
+		}, Rasterizer._DEBOUNCE);
 	}
 
 	public async $createPngUrl(): Promise<string> {

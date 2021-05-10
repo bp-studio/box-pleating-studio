@@ -16,7 +16,6 @@ type GDevice = JDevice<Gadget>;
 @shrewd class Device extends Draggable implements ISerializable<JDevice> {
 
 	public get $type() { return "Device"; }
-
 	public get $tag() { return this.$pattern.$tag + "." + this.$pattern.$devices.indexOf(this); }
 
 	public readonly $pattern: Pattern;
@@ -189,9 +188,11 @@ type GDevice = JDevice<Gadget>;
 	@shrewd private get _neighbors(): readonly Device[] {
 		let result = new Set<Device>();
 		for(let o of this.$partition.$overlaps) {
-			for(let c of o.c) if(c.type == CornerType.$socket || c.type == CornerType.$internal) {
-				let [i] = this.$partition.$configuration.$overlapMap.get(c.e!)!;
-				result.add(this.$pattern.$devices[i]);
+			for(let c of o.c) {
+				if(c.type == CornerType.$socket || c.type == CornerType.$internal) {
+					let [i] = this.$partition.$configuration.$overlapMap.get(c.e!)!;
+					result.add(this.$pattern.$devices[i]);
+				}
 			}
 		}
 		return Array.from(result);

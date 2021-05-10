@@ -11,6 +11,7 @@
 	private static _controlPriority(c: Control): number {
 		if(c instanceof Device || c instanceof Vertex) return 1;
 		if(c instanceof Flap || c instanceof Edge) return 2;
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		return 3;
 	}
 

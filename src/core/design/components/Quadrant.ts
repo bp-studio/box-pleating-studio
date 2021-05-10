@@ -147,7 +147,7 @@ type CoveredInfo = [number, number, Point[]];
 	/** 指定的點是否是在非法導繪模式中產生的無效點 */
 	private _isInvalidHead(p: Point, r: number, x: boolean): boolean {
 		if(!p) return false;
-		let prevQ = this._flap.$quadrants[(this.q + 3) % 4];
+		let prevQ = this._flap.$quadrants[(this.q + previousQuadrantOffset) % quadrantNumber];
 		return (x ?
 			(p.y - this.$point.y) * this.fy < 0 && p.x == this.x(r) :
 			(p.x - this.$point.x) * this.fx < 0 && p.y == this.y(r)) &&

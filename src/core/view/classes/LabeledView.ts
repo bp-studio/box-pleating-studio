@@ -5,6 +5,8 @@ interface LabeledControl extends ViewedControl {
 
 abstract class LabeledView<T extends Control> extends ControlView<T> {
 
+	private static readonly _FONT_SIZE = 14;
+
 	protected abstract readonly _label: paper.PointText;
 	protected abstract readonly _glow: paper.PointText;
 
@@ -21,7 +23,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 		this.$studio.$display.$render();
 		this.$renderUnscaled();
 
-		let s = 14 * Math.sqrt(this.scale);
+		let s = LabeledView._FONT_SIZE * Math.sqrt(this.scale);
 		this._label.fontSize = s;
 		this._glow.fontSize = s;
 	}

@@ -1,6 +1,8 @@
 
 @shrewd class VertexView extends LabeledView<Vertex> {
 
+	private static readonly _DOT_SIZE = 4;
+
 	protected _label: paper.PointText;
 	protected _glow: paper.PointText;
 	private _dot: paper.Path.Circle;
@@ -14,9 +16,9 @@
 	constructor(vertex: Vertex) {
 		super(vertex);
 
-		let option = Object.assign({}, Style.$dot, { radius: 4 });
+		let option = Object.assign({}, Style.$dot, { radius: VertexView._DOT_SIZE });
 		this.$addItem(Layer.$dot, this._dot = new paper.Path.Circle(option));
-		option = Object.assign({}, Style.$dotSelected, { radius: 4 });
+		option = Object.assign({}, Style.$dotSelected, { radius: VertexView._DOT_SIZE });
 		this.$addItem(Layer.$dot, this._dotSel = new paper.Path.Circle(option));
 		this.$addItem(Layer.$label, this._glow = new paper.PointText(Style.$glow));
 		this.$addItem(Layer.$label, this._label = new paper.PointText(Style.$label));
@@ -43,7 +45,7 @@
 
 	/** 尺度太小的時候調整頂點繪製 */
 	@shrewd private _renderDot() {
-		let s = 4 * Math.sqrt(this.scale);
+		let s = VertexView._DOT_SIZE * Math.sqrt(this.scale);
 		this._dot.copyContent(new paper.Path.Circle({
 			position: this._dot.position,
 			radius: s,

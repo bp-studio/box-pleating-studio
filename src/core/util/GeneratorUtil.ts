@@ -12,9 +12,11 @@ namespace GeneratorUtil {
 		generators: Generator<T>[], filter: (value: T) => boolean): Generator<T> {
 		for(let generator of generators) {
 			let found = false;
-			for(let value of generator) if(filter(value)) {
-				yield value;
-				found = true;
+			for(let value of generator) {
+				if(filter(value)) {
+					yield value;
+					found = true;
+				}
 			}
 			if(found) return;
 		}

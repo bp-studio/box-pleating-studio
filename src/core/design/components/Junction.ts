@@ -173,7 +173,7 @@ type JunctionDimension = 'ox' | 'oy';
 
 	@shrewd public get $neighbors() {
 		this.$disposeEvent();
-		if(this.$direction > 3) return [];
+		if(this.$direction >= quadrantNumber) return [];
 		let a1 = this.q1!.$activeJunctions.concat();
 		let a2 = this.q2!.$activeJunctions.concat();
 		a1.splice(a1.indexOf(this), 1);
@@ -284,9 +284,11 @@ type JunctionDimension = 'ox' | 'oy';
 		if(!junctions[0]) debugger;
 		let value = junctions[0][key];
 		let result: Junction = junctions[0];
-		for(let j = 1; j < junctions.length; j++) if(junctions[j][key] * f > value * f) {
-			result = junctions[j];
-			value = junctions[j][key];
+		for(let j = 1; j < junctions.length; j++) {
+			if(junctions[j][key] * f > value * f) {
+				result = junctions[j];
+				value = junctions[j][key];
+			}
 		}
 		return result;
 	}

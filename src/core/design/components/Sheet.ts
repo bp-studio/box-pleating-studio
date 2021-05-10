@@ -14,6 +14,9 @@ interface JSheet {
 
 @shrewd class Sheet extends Mountable implements ISerializable<JSheet>, IDesignObject, ITagObject {
 
+	public static readonly $FULL_ZOOM = 100;
+	public static readonly $MIN_SIZE = 8;
+
 	public readonly $tag: string;
 
 	@unorderedArray public get $controls(): Control[] {
@@ -46,10 +49,12 @@ interface JSheet {
 	/** @exports */
 	public get width() { return this.mWidth; }
 	public set width(v) {
-		if(v >= 8 && v >= this._independentRect.width) {
+		if(v >= Sheet.$MIN_SIZE && v >= this._independentRect.width) {
 			let d = v - this._independentRect.right;
-			if(d < 0) for(let i of this.$independents) {
-				MoveCommand.$create(i, { x: d, y: 0 });
+			if(d < 0) {
+				for(let i of this.$independents) {
+					MoveCommand.$create(i, { x: d, y: 0 });
+				}
 			}
 			this.mWidth = v;
 		}
@@ -59,10 +64,12 @@ interface JSheet {
 	/** @exports */
 	public get height() { return this.mHeight; }
 	public set height(v) {
-		if(v >= 8 && v >= this._independentRect.height) {
+		if(v >= Sheet.$MIN_SIZE && v >= this._independentRect.height) {
 			let d = v - this._independentRect.top;
-			if(d < 0) for(let i of this.$independents) {
-				MoveCommand.$create(i, { x: 0, y: d });
+			if(d < 0) {
+				for(let i of this.$independents) {
+					MoveCommand.$create(i, { x: 0, y: d });
+				}
 			}
 			this.mHeight = v;
 		}
@@ -72,7 +79,7 @@ interface JSheet {
 	/** @exports */
 	public get zoom() { return this._zoom; }
 	public set zoom(v) {
-		if(v < 100) return;
+		if(v < Sheet.$FULL_ZOOM) return;
 		this.$studio?.$display.$zoom(v);
 	}
 	@shrewd public _zoom: number;
@@ -82,7 +89,7 @@ interface JSheet {
 		this.$tag = tag;
 		this.width = sheet.width;
 		this.height = sheet.height;
-		this._zoom = sheet.zoom ?? 100;
+		this._zoom = sheet.zoom ?? Sheet.$FULL_ZOOM;
 		this.$scroll = sheet.scroll ?? { x: 0, y: 0 };
 		this._controlMaps = maps;
 		this.$view = new SheetView(this);

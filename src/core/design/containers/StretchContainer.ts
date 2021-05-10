@@ -14,10 +14,12 @@
 
 	@shrewd public get $byQuadrant(): ReadonlyMap<Quadrant, Stretch> {
 		let result = new Map<Quadrant, Stretch>();
-		for(let s of this.values()) if(s.$isActive) {
-			for(let o of s.$junctions) {
-				result.set(o.q1!, s);
-				result.set(o.q2!, s);
+		for(let s of this.values()) {
+			if(s.$isActive) {
+				for(let o of s.$junctions) {
+					result.set(o.q1!, s);
+					result.set(o.q2!, s);
+				}
 			}
 		}
 		return result;

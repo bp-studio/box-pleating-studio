@@ -110,8 +110,9 @@ type GPattern = JPattern<Gadget>;
 			yield new Line(anchor, anchor.add(vector));
 		} else if(c.type == CornerType.$intersection) {
 			let sq = d.$partition.$overlaps[o].c.find(m => m.type == CornerType.$flap)!.q;
-			if(sq != q) yield new Line(anchor, anchor.add(vector));
-			else {
+			if(sq != q) {
+				yield new Line(anchor, anchor.add(vector));
+			} else {
 				let to = d.$partition.$getSideConnectionTarget(anchor, c, sq);
 				if(to && !to.eq(anchor)) yield new Line(anchor, to);
 			}
@@ -135,8 +136,7 @@ type GPattern = JPattern<Gadget>;
 
 	/** 根據指定的 JConnection 資料求出連接目標點的實體 */
 	public $getConnectionTarget(c: JConnection): Point {
-		if(c.e >= 0) return this.$design.$flaps.$byId.get(c.e)!.$points[c.q];
-		else {
+		if(c.e >= 0) { return this.$design.$flaps.$byId.get(c.e)!.$points[c.q]; } else {
 			let [i, j] = this.$configuration.$overlapMap.get(c.e)!;
 			return this.$devices[i].$anchors[j][c.q];
 		}

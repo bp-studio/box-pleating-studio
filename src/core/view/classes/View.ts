@@ -10,6 +10,8 @@
 
 abstract class View extends Mountable {
 
+	private static readonly _MIN_SCALE = 10;
+
 	private _paths: [Layer, paper.Item, number][] = [];
 
 	/**
@@ -61,7 +63,7 @@ abstract class View extends Mountable {
 		this.$mountEvents();
 		if(!this.$studio) return this._scale;
 		let s = this.$studio.$display.$scale;
-		return this._scale = s < 10 ? s / 10 : 1;
+		return this._scale = s < View._MIN_SCALE ? s / View._MIN_SCALE : 1;
 	}
 	private _scale = 1;
 

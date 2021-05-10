@@ -7,6 +7,7 @@
 
 class LongPressController {
 
+	private static readonly _TIMEOUT = 750;
 	private _callback: Action;
 
 	private _timeout?: number;
@@ -20,7 +21,7 @@ class LongPressController {
 
 	/** 長壓設置 */
 	public $init() {
-		this._timeout = window.setTimeout(this._callback, 750);
+		this._timeout = window.setTimeout(this._callback, LongPressController._TIMEOUT);
 	}
 
 	/** 取消長壓；這個除了會在滑鼠或觸控放開時自動執行之外也可以手動呼叫 */

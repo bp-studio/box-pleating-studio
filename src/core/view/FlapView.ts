@@ -126,6 +126,7 @@
 
 	/** 尺度太小的時候調整頂點繪製 */
 	@shrewd private _renderDot() {
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		let s = 3 * this.scale ** 0.75;
 		makePerQuadrant(i => {
 			this._dots[i].copyContent(new paper.Path.Circle({

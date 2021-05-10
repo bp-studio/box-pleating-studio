@@ -27,7 +27,7 @@
 	}
 
 	public get $isMinimal(): boolean {
-		return this.$node.size <= 3;
+		return this.$node.size <= Design.$MIN_NODES;
 	}
 
 	@shrewd({
@@ -110,8 +110,9 @@
 
 	public $getOrAddNode(n: number) {
 		let N: TreeNode;
-		if(this.$node.has(n)) N = this.$node.get(n)!;
-		else {
+		if(this.$node.has(n)) {
+			N = this.$node.get(n)!;
+		} else {
 			EditCommand.$add(N = new TreeNode(this, n));
 			if(n >= this._nextId) this._nextId = n + 1;
 		}
@@ -158,7 +159,7 @@
 		return N;
 	}
 
-	public $deleteAndJoin(n: TreeNode) {
+	public static $deleteAndJoin(n: TreeNode) {
 		let edges = n.edges;
 		if(edges.length != 2) {
 			console.warn(`Incorrectly calling delete-and-join at [${n.id}].`);
