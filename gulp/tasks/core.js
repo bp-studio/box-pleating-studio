@@ -14,7 +14,7 @@ let projTest = ts.createProject('test/tsconfig.json');
 let terserOption = require('../terser.json');
 
 function createTemplate(debugEnabled) {
-	return (`
+	return `
 		(function(root, factory){
 			if(typeof define === 'function' && define.amd) {
 				define([],factory);
@@ -28,14 +28,14 @@ function createTemplate(debugEnabled) {
 			%= body %
 			return BPStudio;
 		}));
-	`);
+	`;
 }
 
 gulp.task('coreDev', () =>
 	projCoreDev.src()
 		.pipe(newer({
 			dest: 'debug/bpstudio.js',
-			extra: [__filename, coreConfig]
+			extra: [__filename, coreConfig],
 		}))
 		.pipe(sourcemaps.init())
 		.pipe(projCoreDev())
@@ -48,13 +48,13 @@ gulp.task('corePub', () =>
 	projCorePub.src()
 		.pipe(newer({
 			dest: 'dist/bpstudio.js',
-			extra: [__filename, coreConfig]
+			extra: [__filename, coreConfig],
 		}))
 		.pipe(projCorePub())
 		.pipe(wrap(createTemplate(false))) // string will all use '' after this step
 		.pipe(replace(/('[$_][a-z0-9]+')/gi, '$$$$$$$$[$1]')) // Prepare decorator mangling
 		.pipe(terser(Object.assign({}, terserOption, {
-			mangle: { properties: { regex: /^[$_]/ } }
+			mangle: { properties: { regex: /^[$_]/ } },
 		})))
 		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest('dist'))
@@ -66,7 +66,7 @@ gulp.task('buildTest', () =>
 	projTest.src()
 		.pipe(sourcemaps.init())
 		.pipe(projTest())
-		.pipe(wrap("let Shrewd=require('../dist/shrewd.min.js');%= body %"))
+		.pipe(wrap("let Shrewd=require('../public/lib/shrewd.min.js');%= body %"))
 		.pipe(sourcemaps.write('.', { includeContent: false }))
 		.pipe(gulp.dest('test'))
 );

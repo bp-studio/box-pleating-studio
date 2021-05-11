@@ -1,4 +1,3 @@
-"use strict";
 const through = require("through2");
 
 // 用來產生偵錯版本建置
@@ -11,7 +10,7 @@ function transform(file, encoding, callback) {
 	}
 	if(file.extname != ".htm") return callback(null, file);
 
-	encoding = encoding || 'utf8'
+	encoding = encoding || 'utf8';
 	let content = file.contents.toString(encoding);
 
 	// 變換基底

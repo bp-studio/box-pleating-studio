@@ -1,33 +1,37 @@
 
 /// <reference path="Import.ts" />
 
+/// <reference path="../../src/core/util/ArrayUtil.ts" />
 /// <reference path="../../src/core/class/disposable.ts" />
-/// <reference path="../../src/core/model/Tree.ts" />
-/// <reference path="../../src/core/model/TreeEdge.ts" />
-/// <reference path="../../src/core/model/TreePair.ts" />
-/// <reference path="../../src/core/model/TreeNode.ts" />
+/// <reference path="../../src/core/design/schema/Tree.ts" />
+/// <reference path="../../src/core/design/schema/TreeEdge.ts" />
+/// <reference path="../../src/core/design/schema/TreeNode.ts" />
 /// <reference path="../../src/core/global/Interface.ts" />
-/// <reference path="../../src/core/mapping/BaseMapping.ts" />
-/// <reference path="../../src/core/model/DoubleMap.ts" />
-/// <reference path="../../src/core/mapping/DoubleMapping.ts" />
+/// <reference path="../../src/core/class/mapping/BaseMapping.ts" />
+/// <reference path="../../src/core/class/mapping/DoubleMap.ts" />
+/// <reference path="../../src/core/class/mapping/DoubleMapping.ts" />
 
 interface Console {
 	// 這其實是合法的呼叫，但 lib.dom.d.ts 少了這個定義，所以在此補上
-	assert(condition?: boolean, ...obj: any[]): void;
+	assert(condition?: boolean, ...obj: unknown[]): void;
 }
 
 class UnitTest {
 
 	public static consoleHack: boolean;
 
-	public static warnings: string[];
+	public static warnings: unknown[];
 
 	public static run(tests: Function[]) {
 		let assert = console.assert;
 		let warn = console.warn;
 		let pass: boolean = true;
-		console.assert = (a: boolean, ...obj: any[]) => { assert(a, ...obj); if(!a) throw true; }
-		console.warn = (m: any) => {
+		console.assert = (a: boolean, ...obj: unknown[]) => {
+			assert(a, ...obj);
+			// eslint-disable-next-line no-throw-literal
+			if(!a) throw true;
+		};
+		console.warn = (m: unknown) => {
 			if(UnitTest.consoleHack) UnitTest.warnings.push(m);
 			else warn(m);
 		};
@@ -51,5 +55,5 @@ class UnitTest {
 UnitTest.run([
 	TreeBasic,
 	DoubleMapBasic,
-	DoubleMapReact
+	DoubleMapReact,
 ]);

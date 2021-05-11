@@ -24,20 +24,21 @@ function makePurge(path) {
 	return gulp.src(`public/lib/${path}`, { base: 'public/lib' })
 		.pipe(newer({
 			dest: `dist/lib/${path}`,
-			extra: compare.concat([__filename])
+			extra: compare.concat([__filename]),
 		}))
 		.pipe(purge({
 			content: compare,
 			safelist: {
 				standard: [/backdrop/], // for Bootstrap Modal
-				variables: ['--bs-primary']
+				variables: ['--bs-primary'],
 			},
 			fontFace: true, // for Font Awesome
-			variables: true // for Bootstrap
+			variables: true, // for Bootstrap
 		}))
-		.pipe(gulp.dest('dist/lib'))
+		.pipe(gulp.dest('dist/lib'));
 }
 
+// eslint-disable-next-line max-lines-per-function
 gulp.task('static', () => all(
 	// 淨化 lib CSS
 	makePurge('bootstrap/bootstrap.min.css'),
@@ -82,7 +83,7 @@ gulp.task('static', () => all(
 		'!public/log/*',
 		'!public/assets/bps/**/*',
 		'!public/lib/**/*.css',
-		'!**/*.js.map'
+		'!**/*.js.map',
 	])
 		.pipe(filter(file => {
 			// 過濾掉具有 min 版本的 .js 檔案

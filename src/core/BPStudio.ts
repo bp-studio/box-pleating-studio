@@ -161,6 +161,7 @@ class BPStudio {
 			}
 			return undefined;
 		} catch(e) {
+			debugger;
 			return undefined;
 		}
 	}

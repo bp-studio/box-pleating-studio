@@ -30,15 +30,15 @@ function ftpFactory(folder, g, p) {
 	return (p ? p(pipe) : pipe)
 		.pipe(conn.newer(base))
 		.pipe(conn.dest(base));
-};
+}
 
 gulp.task('cleanPub', () => seriesIf(
 	async () => {
 		let answers = await inquirer.prompt([{
 			type: 'confirm',
 			message: '確定要清理正式版遠端資料夾？請確定已經執行過正式版發布。',
-			name: 'ok'
-		}])
+			name: 'ok',
+		}]);
 		return answers.ok;
 	},
 	() => cleanFactory('bp')
@@ -46,9 +46,10 @@ gulp.task('cleanPub', () => seriesIf(
 gulp.task('uploadPub', () => ftpFactory('bp', ['dist/.htaccess']));
 
 gulp.task('cleanDev', () => cleanFactory('bp-dev'));
-gulp.task('uploadDev', () => ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pipe.
-	pipe(gulpIf(
+gulp.task('uploadDev', () => ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pipe
+	.pipe(gulpIf(
 		file => file.basename == "index.htm",
-		replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', "")
+		replace('<script async src="https://www.googletagmanager.com' +
+			'/gtag/js?id=G-GG1TEZGBCQ"></script>', "")
 	))
 ));

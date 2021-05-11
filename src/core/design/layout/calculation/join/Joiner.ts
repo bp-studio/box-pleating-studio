@@ -11,6 +11,8 @@ class Joiner {
 
 	private g1: JPiece[];
 	private g2: JPiece[];
+
+	// s 代表 shift，是指 Overlap 的偏移
 	public s1?: IPoint;
 	public s2?: IPoint;
 
@@ -108,9 +110,9 @@ class Joiner {
 		return { x: x - j.ox, y: y - j.oy }; // 注意到這邊故意傳回負值
 	}
 
-	public $getRelayJoinIntersection(p: Piece, s: IPoint, n: number) {
+	public $getRelayJoinIntersection(piece: Piece, shift: IPoint, q: QuadrantDirection) {
 		let testVector = this.$oriented ? new Vector(1, 1) : new Vector(-1, -1);
-		let pt = p.$anchors[this.q]!.sub(new Vector(s));
-		return p.$shape.ridges[n].$intersection(pt, testVector);
+		let pt = piece.$anchors[this.q]!.sub(new Vector(shift));
+		return piece.$shape.ridges[q].$intersection(pt, testVector);
 	}
 }

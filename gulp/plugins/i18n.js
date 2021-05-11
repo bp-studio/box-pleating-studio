@@ -1,4 +1,3 @@
-"use strict";
 const through = require("through2");
 
 // 用來彙整語系檔案

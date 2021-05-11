@@ -18,7 +18,7 @@ gulp.task('html', () => all(
 	gulp.src('public/index.htm')
 		.pipe(newer({
 			dest: 'debug/index.htm',
-			extra: __filename
+			extra: __filename,
 		}))
 		.pipe(debug())
 		.pipe(gulp.dest('debug')),
@@ -27,7 +27,7 @@ gulp.task('html', () => all(
 	gulp.src('public/index.htm')
 		.pipe(newer({
 			dest: 'dist/index.htm',
-			extra: __filename
+			extra: __filename,
 		}))
 		.pipe(htmlMin(htmlMinOption))
 		// 避免 VS Code Linter 出錯

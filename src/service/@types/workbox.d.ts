@@ -14,5 +14,9 @@ import * as routing from 'workbox-routing/index';
 import * as strategies from 'workbox-strategies/index';
 import * as streams from 'workbox-streams/index';
 
-export { backgroundSync, broadcastUpdate, cacheableResponse, core, expiration, googleAnalytics, navigationPreload, precaching, rangeRequests, routing, strategies, streams };
+export {
+	backgroundSync, broadcastUpdate, cacheableResponse, core,
+	expiration, googleAnalytics, navigationPreload, precaching,
+	rangeRequests, routing, strategies, streams
+};
 export as namespace workbox;

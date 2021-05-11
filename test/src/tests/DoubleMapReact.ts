@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 function DoubleMapReact() {
 
 	class A {
@@ -13,14 +15,14 @@ function DoubleMapReact() {
 		}
 	}
 
-	var log = new Set<string>();
+	let log = new Set<string>();
 	function getLog() {
 		let result = [...log].sort().join(",");
 		log.clear();
 		return result;
 	}
 
-	var a = new A();
+	let a = new A();
 	getLog();
 
 	a.map.set("a", "b", 12);

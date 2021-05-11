@@ -1,12 +1,14 @@
-/// <reference path="../core/global/paper.d.ts" />
+/// <reference path="../core/global/vendor/paper.d.ts" />
 
 // 載入並啟動 paper.js
 importScripts("./lib/paper-core.min.js");
 
+const SheetSize = 128;
+
 (function() {
 
 	let scope = new paper.PaperScope();
-	scope.setup([128, 128]); // 這個尺寸隨便都可以，不影響使用
+	scope.setup([SheetSize, SheetSize]); // 這個尺寸隨便都可以，不影響使用
 	let project = scope.project;
 
 	// 關掉自動更新，因為實際上這個 Worker 完全沒有要進行繪製
@@ -29,4 +31,4 @@ importScripts("./lib/paper-core.min.js");
 		}
 	};
 
-})()
+})();

@@ -27,9 +27,9 @@ gulp.task('sw', () => {
 				'manifest.json',
 				'assets/icon/icon-32.png',
 				'assets/icon/icon-192.png',
-				`log/${lastLog}.md` // 只有最後一個 log 會被 precache
+				`log/${lastLog}.md`, // 只有最後一個 log 會被 precache
 			],
-			globIgnores: ['sw.js']
+			globIgnores: ['sw.js'],
 		}))
 		.pipe(terser())
 		.pipe(gulp.dest('dist/'));

@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 function DoubleMapBasic() {
-	
+
 	let m = new DoubleMap<string, number>();
 	m.set("a", "b", 2);
 	console.assert(m.has("a", "b") && m.has("b", "a"));

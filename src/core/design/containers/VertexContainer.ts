@@ -12,7 +12,7 @@
 	public $delete(vertices: readonly Vertex[]): boolean {
 		let success = false;
 		let arr = vertices.concat().sort((a, b) => a.$node.$degree - b.$node.$degree);
-		while(this.size > Design.$MIN_NODES) {
+		while(this.size > Tree.$MIN_NODES) {
 			let vertex = arr.find(v => v.$node.$degree == 1);
 			if(!vertex) break;
 			vertex.$node.$delete();

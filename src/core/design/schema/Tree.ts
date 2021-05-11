@@ -1,6 +1,7 @@
 
 @shrewd class Tree extends Disposable {
 
+	public static readonly $MIN_NODES = 3;
 	public readonly $design: Design;
 
 	constructor(design: Design, edges?: JEdge[]) {
@@ -27,7 +28,7 @@
 	}
 
 	public get $isMinimal(): boolean {
-		return this.$node.size <= Design.$MIN_NODES;
+		return this.$node.size <= Tree.$MIN_NODES;
 	}
 
 	@shrewd({
@@ -113,7 +114,9 @@
 		if(this.$node.has(n)) {
 			N = this.$node.get(n)!;
 		} else {
-			EditCommand.$add(N = new TreeNode(this, n));
+			N = new TreeNode(this, n);
+			this.$node.set(N.id, N);
+			EditCommand.$add(N);
 			if(n >= this._nextId) this._nextId = n + 1;
 		}
 		return N;
@@ -125,8 +128,8 @@
 		if(n1.$parent == n2) [n1, n2] = [n2, n1];
 		N.$parentId = n1.id;
 		n2.$parentId = N.id;
-		EditCommand.$add(new TreeEdge(N, n1, Math.ceil(e.length / 2)));
-		EditCommand.$add(new TreeEdge(N, n2, Math.max(Math.floor(e.length / 2), 1)));
+		this._createEdge(N, n1, Math.ceil(e.length / 2));
+		this._createEdge(N, n2, Math.max(Math.floor(e.length / 2), 1));
 		EditCommand.$remove(e);
 		return N;
 	}
@@ -146,13 +149,13 @@
 			let n = edge.n(n1);
 			if(n != N.$parent) n.$parentId = N.id;
 			EditCommand.$remove(edge);
-			EditCommand.$add(new TreeEdge(N, n, edge.length));
+			this._createEdge(N, n, edge.length);
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
 			n.$parentId = N.id;
 			EditCommand.$remove(edge);
-			EditCommand.$add(new TreeEdge(N, n, edge.length));
+			this._createEdge(N, n, edge.length);
 		}
 		EditCommand.$remove(n1);
 		EditCommand.$remove(n2);
@@ -170,7 +173,7 @@
 		if(n.$parent == n2) [n1, n2] = [n2, n1];
 
 		n2.$parentId = n1.id;
-		let edge = EditCommand.$add(new TreeEdge(n1, n2, e1.length + e2.length));
+		let edge = n1.$tree._createEdge(n1, n2, e1.length + e2.length);
 		EditCommand.$remove(e1);
 		EditCommand.$remove(e2);
 		EditCommand.$remove(n);
@@ -206,7 +209,14 @@
 		else if(has2) N1.$parentId = n2;
 		else N2.$parentId = n1;
 
-		return EditCommand.$add(new TreeEdge(N1, N2, length));
+		return this._createEdge(N1, N2, length);
+	}
+
+	private _createEdge(n1: TreeNode, n2: TreeNode, length: number) {
+		let e = new TreeEdge(n1, n2, length);
+		this.$edge.set(n1, n2, e);
+		EditCommand.$add(e);
+		return e;
 	}
 
 	/** 傳入樹中的三個點，傳回三個點分別到「路口」的距離。 */

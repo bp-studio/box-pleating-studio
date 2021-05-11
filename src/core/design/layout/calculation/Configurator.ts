@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 
 type JStructure = readonly Readonly<JJunction>[];
 

@@ -117,7 +117,7 @@ namespace Migration {
 			let offsets = pt.offsets as number[] | undefined;
 			// rc0 版本產生出來的 pattern 只有兩種可能：單一 Device，
 			// 或是多個 Device 各自只有一個 Gadget
-			if(cf.partitions!.length == 1) {
+			if(s.configuration.partitions!.length == 1) {
 				s.pattern = {
 					devices: [{
 						gadgets: pt.gadgets as JGadget[],

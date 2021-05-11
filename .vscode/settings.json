@@ -44,6 +44,7 @@
 		"osme",
 		"overlappings",
 		"partitioner",
+		"paypal",
 		"precache",
 		"precaching",
 		"queryable",
@@ -74,11 +75,11 @@
 		"tinyurl",
 		"weixin"
 	],
-	"eslint.workingDirectories": [
-		"./src/core/"
-	],
 	"eslint.format.enable": true,
 	"[typescript]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
 	},
+	"[javascript]": {
+		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
+	}
 }

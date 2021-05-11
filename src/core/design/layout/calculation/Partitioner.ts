@@ -39,7 +39,7 @@ class Partitioner extends Disposable {
 			let o = this.$overlaps[0];
 			let j = this.$configuration.$repository.$structure[o.parent];
 			if(strategy == Strategy.$halfIntegral) {
-				for(let g of Kamiya._halfKamiya(o, j.sx)) yield { gadgets: [g] };
+				for(let g of Kamiya._halfIntegral(o, j.sx)) yield { gadgets: [g] };
 			} if(strategy == Strategy.$universal) {
 				for(let g of Partitioner._universalGPS(o, j.sx)) yield { gadgets: [g] };
 			} else {

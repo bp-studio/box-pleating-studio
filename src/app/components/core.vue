@@ -92,7 +92,9 @@
 			if(await this.checkSession()) {
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
-					session.jsons.forEach(j => this.addDesign(bp.restore(j), false));
+					session.jsons.forEach(
+						(j: object) => this.addDesign(bp.restore(j), false)
+					);
 					if(session.open >= 0) this.select(this.designs[session.open]);
 					bp.update();
 				}

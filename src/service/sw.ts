@@ -8,18 +8,18 @@ googleAnalytics.initialize();
 let defaultHandler = new strategies.StaleWhileRevalidate({
 	cacheName: 'assets',
 	plugins: [new broadcastUpdate.BroadcastUpdatePlugin({
-		generatePayload: options => ({ path: new URL(options.request.url).pathname })
-	})]
+		generatePayload: options => ({ path: new URL(options.request.url).pathname }),
+	})],
 });
 routing.setDefaultHandler(defaultHandler);
 
 // 啟動 workbox-precaching
 const precacheController = new precaching.PrecacheController({ cacheName: "assets" });
-precacheController.addToCacheList((self as any).__WB_MANIFEST);
+precacheController.addToCacheList((self as unknown as ServiceWorkerGlobalScope).__WB_MANIFEST);
 const precacheRoute = new precaching.PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],
 	directoryIndex: 'index.htm',
-	cleanURLs: false
+	cleanURLs: false,
 });
 routing.registerRoute(precacheRoute);
 
@@ -31,12 +31,12 @@ routing.registerRoute(
 	({ url }) => url.pathname.endsWith(".md"),
 	new strategies.NetworkFirst({
 		fetchOptions: { cache: 'reload' }, // 請瀏覽器不要使用快取
-		cacheName: 'assets'
+		cacheName: 'assets',
 	})
 );
 
 let netOnly = new strategies.NetworkOnly({
-	fetchOptions: { cache: 'reload' }
+	fetchOptions: { cache: 'reload' },
 });
 
 // TinyURL 一律不要快取（沒有意義）
@@ -62,18 +62,18 @@ self.addEventListener('message', event => {
 async function message(event: ExtendableMessageEvent) {
 	if(event.ports[0] && event.data == "id") {
 		let clients = await self.clients.matchAll({ type: 'window' });
-		let min = Number.POSITIVE_INFINITY;
+		let tasks: Promise<number>[] = [];
 		for(let client of clients) {
 			if(client.id != (event.source as Client).id) {
-				let id = await callClient(client, "id") as number;
-				if(id < min) min = id;
+				tasks.push(callClient(client, "id"));
 			}
 		}
-		event.ports[0].postMessage(min);
+		let result = await Promise.all(tasks);
+		event.ports[0].postMessage(Math.min(...result));
 	}
-};
-function callClient(client: Client, data: any) {
-	return new Promise(resolve => {
+}
+function callClient(client: Client, data: unknown): Promise<number> {
+	return new Promise<number>(resolve => {
 		let channel = new MessageChannel();
 		channel.port1.onmessage = event => resolve(event.data);
 		client.postMessage(data, [channel.port2]);

@@ -1,12 +1,11 @@
-"use strict";
-var through = require('through2');
-var path = require('path');
+let through = require('through2');
+let path = require('path');
 
 // 用來建立 log 檔案目錄
 
-module.exports = function(file) {
-	var latestFile;
-	var concat = [];
+module.exports = function(outFile) {
+	let latestFile;
+	let concat = [];
 
 	function bufferContents(file, enc, cb) {
 		if(file.isNull()) return cb(null, file);
@@ -24,7 +23,7 @@ module.exports = function(file) {
 		if(!latestFile || !concat.length) return cb();
 
 		let joinedFile = latestFile.clone({ contents: false });
-		joinedFile.path = path.join(latestFile.base, file);
+		joinedFile.path = path.join(latestFile.base, outFile);
 		joinedFile.contents = Buffer.from("let logs=[" + concat.join(',') + "]", "utf8");
 		this.push(joinedFile);
 		cb();

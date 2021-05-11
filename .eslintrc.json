@@ -1,6 +1,7 @@
 {
 	"env": {
 		"browser": true,
+		"node": true,
 		"es2021": true
 	},
 	"extends": [
@@ -22,7 +23,20 @@
 		"@typescript-eslint/no-unused-vars": "off",
 		"@typescript-eslint/triple-slash-reference": "off",
 		"@typescript-eslint/no-empty-interface": "off",
+		"@typescript-eslint/no-var-requires": "off",
 		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/type-annotation-spacing": [
+			"warn",
+			{
+				"before": false,
+				"after": true,
+				"overrides": {
+					"arrow": {
+						"before": true
+					}
+				}
+			}
+		],
 		"accessor-pairs": "off",
 		"array-bracket-newline": [
 			"warn",
@@ -86,7 +100,7 @@
 			"never"
 		],
 		"func-name-matching": "warn",
-		"func-names": "warn",
+		"func-names": "off",
 		"func-style": "off",
 		"function-call-argument-newline": "off",
 		"function-paren-newline": "off",
@@ -118,6 +132,7 @@
 		"key-spacing": [
 			"warn",
 			{
+				"afterColon": true,
 				"mode": "strict"
 			}
 		],
@@ -302,7 +317,10 @@
 		"no-whitespace-before-property": "warn",
 		"nonblock-statement-body-position": "warn",
 		"object-curly-newline": "warn",
-		"object-curly-spacing": "off",
+		"object-curly-spacing": [
+			"warn",
+			"always"
+		],
 		"object-property-newline": "off",
 		"object-shorthand": "warn",
 		"one-var": "off",
@@ -340,7 +358,8 @@
 		"sort-keys": "off",
 		"sort-vars": "off",
 		"space-before-blocks": "warn",
-		"space-before-function-paren": [
+		"space-before-function-paren": "off",
+		"@typescript-eslint/space-before-function-paren": [
 			"warn",
 			{
 				"anonymous": "never",
@@ -365,7 +384,10 @@
 		"template-tag-spacing": "warn",
 		"unicode-bom": "warn",
 		"vars-on-top": "warn",
-		"wrap-iife": "warn",
+		"wrap-iife": [
+			"warn",
+			"inside"
+		],
 		"wrap-regex": "warn",
 		"yield-star-spacing": "warn",
 		"yoda": "warn"

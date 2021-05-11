@@ -31,8 +31,6 @@ interface IDesignObject {
 
 @shrewd class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
 
-	public static readonly $MIN_NODES = 3;
-
 	/** @exports */
 	@shrewd public mode: string;
 
@@ -65,7 +63,7 @@ interface IDesignObject {
 		super(studio);
 
 		const data = deepCopy<JDesign>(Migration.$getSample(), design);
-		if(data.tree.nodes.length < Design.$MIN_NODES) throw new Error("Invalid format.");
+		if(data.tree.nodes.length < Tree.$MIN_NODES) throw new Error("Invalid format.");
 
 		this.$options = new OptionManager(data);
 

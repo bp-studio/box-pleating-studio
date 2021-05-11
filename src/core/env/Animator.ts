@@ -37,7 +37,7 @@ class Animator {
 		}, Animator._CANCEL);
 	}
 
-	private _next() {
+	private _next(): void {
 		this._request = requestAnimationFrame(this._run);
 	}
 }

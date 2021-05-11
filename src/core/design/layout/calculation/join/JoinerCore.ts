@@ -1,4 +1,16 @@
 
+interface JoinData {
+	readonly size: number;
+	readonly c1: JoinCandidate;
+	readonly c2: JoinCandidate;
+	readonly offset?: IPoint;
+	readonly pt: Point;
+	readonly bv: Vector; // 軸平行摺痕的角平分線向量
+	readonly org: Point;
+	readonly f: number;
+	addOns?: JAddOn[];
+}
+
 //////////////////////////////////////////////////////////////////
 /**
  * `JoinerCore` 負責執行把兩個給定的 `Gadget` 融合成一個 `Device` 的核心計算。
@@ -11,99 +23,49 @@ class JoinerCore {
 	private static readonly _EXTRA_SIZE_WEIGHT = 10;
 
 	private joiner: Joiner;
-	private data: {
-		size: number;
-		p1: Piece;
-		p2: Piece;
-		v1: Vector;
-		v2: Vector;
-		off1: IPoint;
-		off2: IPoint;
-		a1: JAnchor[];
-		a2: JAnchor[];
-		offset?: IPoint;
-		pt: Point;
-		pt1: IPoint;
-		pt2: IPoint;
-		e1: Line;
-		e2: Line;
-		bv: Vector;
-		org: Point;
-		f: number;
-		addOns?: JAddOn[];
-	};
+	private data: JoinData;
 
-	// eslint-disable-next-line max-lines-per-function
 	constructor(joiner: Joiner, p1: Piece, p2: Piece) {
-		let { $oriented, s1, s2, q1, q2, q } = this.joiner = joiner;
-		let a1: JAnchor[] = [], a2: JAnchor[] = [];
+		let { $oriented, s1, s2, q1, q2 } = this.joiner = joiner;
 		let size = p1.sx + p2.sx;
 
+		let b1 = new JoinCandidateBuilder(p1, q1, joiner);
+		let b2 = new JoinCandidateBuilder(p2, q2, joiner);
+
 		// 計算接力融合的起點
-		let off1: IPoint = { x: 0, y: 0 }, off2: IPoint = { x: 0, y: 0 };
-		if(s1) {
-			let int = joiner.$getRelayJoinIntersection(p2, s1, opposite(q1));
-			if(!int || !int.$isIntegral) return;
-			if($oriented) {
-				p1.$offset(off1 = int.$toIPoint());
-				size += off1.x;
-				a1[q] = { location: { x: -off1.x, y: -off1.y } };
-			} else {
-				p2.$offset(off2 = { x: p2.sx - int.x, y: p2.sy - int.y });
-				size += off2.x;
-				a1[q] = { location: { x: p1.sx + off2.x, y: p1.sy + off2.y } };
-			}
-		}
-		if(s2) {
-			let int = joiner.$getRelayJoinIntersection(p1, s2, opposite(q2));
-			if(!int || !int.$isIntegral) return;
-			if($oriented) {
-				p2.$offset(off2 = int.$toIPoint());
-				size += off2.x;
-				a2[q] = { location: { x: -off2.x, y: -off2.y } };
-			} else {
-				// 特別注意這幾行跟前面 s1 情況中的對應幾行並不是直接對稱
-				p2.$offset(off2 = { x: int.x - p1.sx, y: int.y - p1.sy });
-				size -= off2.x;
-				a2[q] = { location: { x: p2.sx - off2.x, y: p2.sy - off2.y } };
-			}
-		}
+		if(s1) size += b1.$setup(b2, 1, s1);
+		if(s2) size += b2.$setup(b1, -1, s2);
+		if(isNaN(size)) return;
 
 		// 從 p2 觀點變成 p1 觀點時的相對位移和需要加上的向量
-		let offset: IPoint | undefined, o = Vector.ZERO;
-		if(!$oriented) {
-			offset = { x: p1.sx - p2.sx, y: p1.sy - p2.sy };
-			o = new Vector(offset);
-		}
+		let offset: IPoint | undefined;
+		if(!$oriented) b2.$additionalOffset = offset = { x: p1.sx - p2.sx, y: p1.sy - p2.sy };
 
 		// 整理所有會用到的重要參數
-		let v1 = new Vector(off1).neg, v2 = new Vector(off2).addBy(o).neg;
-		let pt = s1 ? p1.$anchors[q]! : p2.$anchors[q]!.add(o); // p1 觀點
-		let pt1 = pt.add(v1).$toIPoint(), pt2 = pt.add(v2).$toIPoint();
-		let e1 = p1.$shape.ridges[q1], e2 = p2.$shape.ridges[q2].$shift(o);
+		let pt = s1 ? b1.$anchor : b2.$anchor;
 		let bv = Vector.$bisector(p1.$direction, p2.$direction);
 		let f = $oriented ? 1 : -1;
 
 		let org = Point.ZERO;
-		if(!$oriented) org = s1 ? new Point(a1[q].location!) : p1.$anchors[q]!;
+		if(!$oriented) org = s1 ? b1.$jAnchor : b1.$anchor;
 
-		this.data = {
-			p1, p2, v1, v2, a1, a2, off1, off2, offset,
-			size, pt, pt1, pt2, e1, e2, bv, org, f,
-		};
+		this.data = { c1: b1.$build(pt), c2: b2.$build(pt), offset, size, pt, bv, org, f };
 	}
 
 	/** 嘗試把兩個 GOPS `Piece` 簡單融合成一個 `Device` */
 	public *$simpleJoin(): Generator<JoinResult> {
 		if(!this.data) return;
-		let { e1, e2, p1, p2, pt, bv } = this.data;
+		let { c1, c2, pt, bv } = this.data;
 
 		// 找出交點
-		let int = e1.$intersection(e2); // p1 觀點
+		let int = c1.e.$intersection(c2.e); // p1 觀點
 		if(!int) return;
 
 		// 檢查簡單融合條件
-		if(!p1.$direction.$parallel(p2.$direction) && !int.sub(pt).$parallel(bv)) return;
+		if(
+			!c1.p.$direction.$parallel(c2.p.$direction) &&
+			!int.sub(pt).$parallel(bv)
+		) return;
 
 		// 完成並輸出
 		if(!this._setupAnchor(int)) return;
@@ -112,11 +74,11 @@ class JoinerCore {
 	}
 
 	@onDemand private get _deltaPt(): Point {
-		let { org, p1, p2, f } = this.data;
+		let { org, c1, c2, f } = this.data;
 		let { cw, $intDist } = this.joiner;
 		return new Point(
-			org.x + ($intDist - (cw ? p2 : p1).ox) * f,
-			org.y + ($intDist - (cw ? p1 : p2).oy) * f
+			org.x + ($intDist - (cw ? c2.p : c1.p).ox) * f,
+			org.y + ($intDist - (cw ? c1.p : c2.p).oy) * f
 		);
 	}
 
@@ -127,10 +89,10 @@ class JoinerCore {
 	 * 如果兩個 Gadget 的角度非常地「直」，可能只有其中一對會有。
 	 */
 	private _baseJoinIntersections() {
-		let { bv, e1, e2, pt } = this.data;
+		let { bv, c1, c2, pt } = this.data;
 		let delta = new Line(this._deltaPt, Quadrant.QV[0]), beta = new Line(pt, bv);
-		let D1 = e1.$intersection(delta)!, D2 = e2.$intersection(delta)!;
-		let B1 = e1.$intersection(beta)!, B2 = e2.$intersection(beta)!;
+		let D1 = c1.e.$intersection(delta)!, D2 = c2.e.$intersection(delta)!;
+		let B1 = c1.e.$intersection(beta)!, B2 = c2.e.$intersection(beta)!;
 		return { D1, D2, B1, B2, delta };
 	}
 
@@ -186,13 +148,12 @@ class JoinerCore {
 	/** 鈍角標準融合 */
 	private *_obtuseStandardJoin(B: Point, D: Point, i: number): Generator<JoinResult> {
 		if(B.$isIntegral) return; // 退化成 base join，不考慮
-		let { e1, e2, p1, p2, pt, f } = this.data;
-		let { cw } = this.joiner;
-		let e = [e1, e2][i], p = [p1, p2][i];
+		let { c1, c2, pt, f } = this.data;
+		let e = [c1.e, c2.e][i], p = [c1.p, c2.p][i];
 
 		// 若兩個 Gadget 的方向是內聚而非發散的，則鈍角融合不可能成立（至少目前沒有這種變換概念存在）
 		// TODO: 仔細思考這一點
-		if(cw != p1.$direction.$slope.gt(p2.$direction.$slope)) return;
+		if(this.joiner.cw != c1.$isSteeperThan(c2)) return;
 
 		if(!this._setupAnchor(D)) return;
 		let P = D.sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
@@ -209,7 +170,7 @@ class JoinerCore {
 		if(R.x * f < pt.x * f) return;
 
 		// 利用線段交叉來檢查變換之後的 R 點有沒有跑到外面去
-		e = this._substituteEnd([e1, e2][1 - i], D);
+		e = this._substituteEnd([c1.e, c2.e][1 - i], D);
 		let test = e.$intersection(new Line(T, R));
 		if(test && !test.eq(T) && !test.eq(R)) return;
 
@@ -224,8 +185,8 @@ class JoinerCore {
 	/** 銳角標準融合 */
 	private *_acuteStandardJoin(B: Point, D: Point, i: number, delta: Line): Generator<JoinResult> {
 		if(D.$isIntegral) return; // 退化成 base join，不考慮
-		let { e1, e2, p1, p2 } = this.data;
-		let e = [e1, e2][i], p = [p1, p2][i];
+		let { c1, c2 } = this.data;
+		let e = [c1.e, c2.e][i], p = [c1.p, c2.p][i];
 		let T = JoinerCore._closestGridPoint(this._substituteEnd(e, D), B);
 
 		// 如果找到的最近整點就是整個 Gadget 的尖端，
@@ -251,49 +212,35 @@ class JoinerCore {
 	 * 傳入的兩個陣列參數是從離融合點最遠的頂點開始列舉（不包含融合點本身）。
 	 */
 	private _setupDetour(dt1: Point[], dt2: Point[]) {
-		let { p1, p2, v1, v2, pt1, pt2 } = this.data;
-		let d1 = dt1.map(p => p.add(v1).$toIPoint()); d1.push(pt1);
-		let d2 = dt2.map(p => p.add(v2).$toIPoint()); d2.push(pt2);
-		(this.joiner.cw ? d2 : d1).reverse();
-		p1.$clearDetour(); p1.$addDetour(d1);
-		p2.$clearDetour(); p2.$addDetour(d2);
+		let { c1, c2 } = this.data;
+		let shouldReverse2 = this.joiner.cw;
+		c1.$setupDetour(dt1, !shouldReverse2);
+		c2.$setupDetour(dt2, shouldReverse2);
 	}
 
 	/** 根據指定的點來設定交叉點的錨點，並傳回是否成功 */
 	private _setupAnchor(a: Point): boolean {
-		let { a1, a2, v1, v2, f } = this.data;
+		let { c1, c2, f } = this.data;
 		let { $oriented, cw } = this.joiner;
 
 		// 交叉錨點超過 delta 點的範圍則失敗
 		if(a.x * f > this._deltaPt.x * f) return false;
 
-		let left = $oriented == cw;
-		a1[left ? Direction.LR : Direction.UL] = { location: a.add(v1).$toIPoint() };
-		a2[left ? Direction.UL : Direction.LR] = { location: a.add(v2).$toIPoint() };
+		c1.$setupAnchor($oriented != cw, a);
+		c2.$setupAnchor($oriented == cw, a);
 		return true;
 	}
 
 	/** 產生要輸出的結果 */
 	private _result(json?: boolean, extraSize?: number): JoinResult {
-		let { p1, p2, a1, a2, off1, off2, offset, size, addOns } = this.data;
+		let { c1, c2, offset, size, addOns } = this.data;
 		this.data.addOns = undefined;
-		if(offset) off2 = { x: off2.x + offset.x, y: off2.y + offset.y };
-		return [{
-			gadgets: [
-				{
-					pieces: [json ? p1.toJSON() : p1],
-					offset: JoinerCore._simplifyIPoint(off1), anchors: a1.concat(),
-				},
-				{
-					pieces: [json ? p2.toJSON() : p2],
-					offset: JoinerCore._simplifyIPoint(off2), anchors: a2.concat(),
-				},
-			],
-			addOns,
-		}, size + (extraSize ?? 0) * JoinerCore._EXTRA_SIZE_WEIGHT];
-	}
-
-	private static _simplifyIPoint(p: IPoint | undefined): IPoint | undefined {
-		return p && p.x == 0 && p.y == 0 ? undefined : p;
+		return [
+			{
+				gadgets: [c1.$toGadget(json), c2.$toGadget(json, offset)],
+				addOns,
+			},
+			size + (extraSize ?? 0) * JoinerCore._EXTRA_SIZE_WEIGHT,
+		];
 	}
 }
