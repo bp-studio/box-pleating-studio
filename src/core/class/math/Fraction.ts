@@ -43,6 +43,7 @@ class Fraction {
 				debugger;
 				throw new Error("Parameters are not valid");
 			} else if(Number.isSafeInteger(Math.floor(n / d))) {
+				// eslint-disable-next-line no-constructor-return
 				return Fraction.$toFraction(n / d);
 			} else {
 				// 最後的 fallback，使用不精確模式
@@ -166,8 +167,10 @@ class Fraction {
 		if(this.$isDangerous) this._smp();
 
 		// Make sure that q is always positive.
-		if(this._q < 0) { this._q = -this._q; this._p = -this._p; }
-		else if(this._q == 0) {
+		if(this._q < 0) {
+			this._q = -this._q;
+			this._p = -this._p;
+		} else if(this._q == 0) {
 			// Infinity occurs only in slope calculation,
 			// and we don't need to distinguish the sign.
 			this._p = 1;

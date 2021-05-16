@@ -507,8 +507,7 @@ namespace PolyBool {
 					let st = ev.status;
 
 					if(st === null) {
-						throw new Error('PolyBool: Zero-length segment detected; your epsilon is ' +
-							'probably too small or too large');
+						throw new Error('PolyBool: Zero-length segment detected; your epsilon is probably too small or too large');
 					}
 
 					// removing the status will create two new adjacent edges, so we'll need to check
@@ -871,8 +870,7 @@ namespace PolyBool {
 			let pt1 = seg.start;
 			let pt2 = seg.end;
 			if(Epsilon.$pointsSame(pt1, pt2)) {
-				console.warn('PolyBool: Warning: Zero-length segment detected; your epsilon is ' +
-					'probably too small or too large');
+				console.warn('PolyBool: Warning: Zero-length segment detected; your epsilon is probably too small or too large');
 				return;
 			}
 

@@ -23,7 +23,10 @@ class Line {
 	public get $isDegenerated() { return this.p1.eq(this.p2); }
 
 	/**Check if two line segments are identical */
-	public eq(l: Line) { return this.p1.eq(l.p1) && this.p2.eq(l.p2) || this.p1.eq(l.p2) && this.p2.eq(l.p1); }
+	public eq(l: Line) {
+		return this.p1.eq(l.p1) && this.p2.eq(l.p2) ||
+			this.p1.eq(l.p2) && this.p2.eq(l.p1);
+	}
 
 	/** 傳回一個點是否落在這個線段的內部（預設不含端點） */
 	public $contains(point: Point | IPoint, includeEndpoints: boolean = false) {
@@ -44,7 +47,7 @@ class Line {
 		if(t.length == 1) return this.$intersection(t[0].p1, t[0].p2.sub(t[0].p1));
 		let [p, v, isRay] = t;
 		let v1 = this.p2.sub(this.p1);
-		let m = (new Matrix(v1._x, v._x, v1._y, v._y)).$inverse;
+		let m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
 		if(m == null) return null;
 
 		let r = m.$multiply(new Point(p.sub(this.p1)));
@@ -116,19 +119,25 @@ class Line {
 		if(c && d) return;
 
 		// 不然如果自己並未包含對方的任何一端點，表示自己和對方完全無交集，傳回自身
-		if(!a && !b) yield this;
-
-		else if(a && b) {
+		if(!a && !b) {
+			yield this;
+		} else if(a && b) {
 			let l11 = new Line(this.p1, l.p1), l12 = new Line(this.p1, l.p2);
 			let l21 = new Line(this.p2, l.p1), l22 = new Line(this.p2, l.p2);
-			if(l11.$isDegenerated) yield l22;
-			else if(l12.$isDegenerated) yield l21;
-			else if(l21.$isDegenerated) yield l12;
-			else if(l22.$isDegenerated) yield l11;
-			else if(l11.$contains(l.p2)) {
-				yield l12; yield l21;
+			if(l11.$isDegenerated) {
+				yield l22;
+			} else if(l12.$isDegenerated) {
+				yield l21;
+			} else if(l21.$isDegenerated) {
+				yield l12;
+			} else if(l22.$isDegenerated) {
+				yield l11;
+			} else if(l11.$contains(l.p2)) {
+				yield l12;
+				yield l21;
 			} else {
-				yield l11; yield l22;
+				yield l11;
+				yield l22;
 			}
 		} else {
 			let p1 = a ? l.p1 : l.p2;

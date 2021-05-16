@@ -15,7 +15,7 @@
 
 	@shrewd public $now: paper.Point;
 
-	constructor(studio:Studio) {
+	constructor(studio: Studio) {
 		super(studio);
 		this.$addItem(Layer.$drag, this._rectangle = new paper.Path.Rectangle(Style.$selection));
 	}

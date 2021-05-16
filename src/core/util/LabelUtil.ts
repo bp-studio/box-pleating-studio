@@ -19,7 +19,7 @@ namespace LabelUtil {
 	function offsetLabel(
 		label: paper.PointText,
 		lx: number, ly: number, lh: number,
-		dx: number, dy: number
+		dx: Sign, dy: Sign
 	) {
 		label.justification = dx == 0 ? "center" : dx == 1 ? "left" : "right";
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -44,27 +44,10 @@ namespace LabelUtil {
 
 		if(x == 0 || y == 0 || x == sw || y == sh) {
 			// 如果要求的位置在邊界上，直接處理
-			let dx = x == 0 ? -1 : x == sw ? 1 : 0;
-			let dy = y == 0 ? -1 : y == sh ? 1 : 0;
+			let dx: Sign = x == 0 ? -1 : x == sw ? 1 : 0;
+			let dy: Sign = y == 0 ? -1 : y == sh ? 1 : 0;
 			offsetLabel(label, lx, ly, lh, dx, dy);
 		} else {
-			// 由於程式碼效能的增加，底下這段程式碼似乎暫時用不到，不過先予以保留以防未來需要。
-			/* if(LabelUtil.cache.has(label)) {
-				let { dx, dy, timeout } = LabelUtil.cache.get(label)!;
-				// 先用之前暫存的 dx dy
-				LabelUtil.offsetLabel(label, lx, ly, lh, dx, dy);
-				// 設置 timeout
-				clearTimeout(timeout);
-				timeout = setTimeout(() => {
-					LabelUtil.slowLabel(label, lx, ly, lh, avoid);
-					LabelUtil.syncLabel(label, glow);
-				}, 10);
-				LabelUtil.cache.set(label, { dx, dy, timeout });
-			} else {
-				// 初次直接執行
-				LabelUtil.slowLabel(label, lx, ly, lh, avoid);
-			} */
-
 			slowLabel(label, lx, ly, lh, avoid);
 		}
 		syncLabel(label, glow);
@@ -84,13 +67,17 @@ namespace LabelUtil {
 		lx: number, ly: number, lh: number,
 		avoid: paper.Path[]
 	) {
-		let arr = [[0, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [-1, -1], [-1, 1], [1, 1], [1, -1]];
+		let arr: [Sign, Sign][] = [
+			[0, 0], [0, -1], [-1, 0],
+			[0, 1], [1, 0], [-1, -1],
+			[-1, 1], [1, 1], [1, -1],
+		];
 		let clone = avoid.map(a => {
 			let c = a.clone({ insert: false });
 			if(a.layer) c.transform(a.layer.matrix);
 			return c;
 		});
-		let dx = 0, dy: number = 0;
+		let dx: Sign = 0, dy: Sign = 0;
 		for([dx, dy] of arr) {
 			offsetLabel(label, lx, ly, lh, dx, dy);
 

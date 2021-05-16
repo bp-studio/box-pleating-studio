@@ -1,6 +1,8 @@
 
 /// <reference path="../core/global/vendor/paper.d.ts" />
 
+const DEFAULT_CPU = 4;
+
 if(typeof Worker == "undefined") {
 
 	// 舊版的 Safari 沒辦法在 Worker 裡面開 Worker，所以 master 得自己負責同樣的工作
@@ -20,8 +22,7 @@ if(typeof Worker == "undefined") {
 		const queue: Function[] = [];
 
 		// 盡量開啟到 CPU 數 - 2 那麼多個 worker，但總之至少開一個（否則根本不能跑）
-		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-		const max = Math.max((navigator.hardwareConcurrency ?? 4) - 2, 1);
+		const max = Math.max((navigator.hardwareConcurrency ?? DEFAULT_CPU) - 2, 1);
 		for(let i = 0; i < max; i++) {
 			workers.push(new Worker("./paper-worker.js"));
 			working.push(false);

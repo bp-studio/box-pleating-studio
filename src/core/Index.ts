@@ -56,7 +56,7 @@
 
 // Level 4
 /// <reference path="class/Control.ts" />
-/// <reference path="design/components/QuadrantBase.ts" />
+/// <reference path="design/components/Quadrant.ts" />
 /// <reference path="design/layout/Stretch.ts" />
 /// <reference path="design/layout/models/Pattern.ts" />
 /// <reference path="design/layout/containers/Store.ts" />
@@ -70,7 +70,6 @@
 /// <reference path="env/controllers/CursorController.ts" />
 
 // Level 5
-/// <reference path="design/components/Quadrant.ts" />
 /// <reference path="class/ViewedControl.ts" />
 /// <reference path="design/layout/containers/Configuration.ts" />
 /// <reference path="view/classes/LabeledView.ts" />

@@ -2,6 +2,11 @@
 type Path = Point[];
 type ReadonlyPath = readonly Point[];
 
+interface PathCollectResult {
+	paths: Path[];
+	map: Map<string, [number, number]>;
+}
+
 namespace PathUtil {
 
 	/** 傳入一個三角形，讓第一個點固定不動，移動第二個點到指定的目標但是維持三角形相似；傳回第三點 */
@@ -13,7 +18,7 @@ namespace PathUtil {
 	}
 
 	/** 把內部路徑中有共用頂點的合併成單一的路徑，並且同時建立頂點索引 */
-	export function $collect(paths: Path[]) {
+	export function $collect(paths: Path[]): PathCollectResult {
 		let result: Path[] = [], map = new Map<string, [number, number]>(), i = 0;
 		for(let path of paths) {
 			let merged = false;
@@ -22,12 +27,15 @@ namespace PathUtil {
 				if(k) {
 					if(!result[k[0]]) continue; // 這個情況表示路徑內部就有重複的點，略過不看
 					result[k[0]].splice(k[1], 0, ...$rotate(path, j));
-					for(let [i, p] of result[k[0]].entries()) map.set(p.toString(), [k[0], i]);
+					for(let [l, q] of result[k[0]].entries()) map.set(q.toString(), [k[0], l]);
 					merged = true;
 					break;
-				} else map.set(s, [i, j]);
+				} else { map.set(s, [i, j]); }
 			}
-			if(!merged) { result.push(path); i++; }
+			if(!merged) {
+				result.push(path);
+				i++;
+			}
 		}
 		return { paths: result, map };
 	}
@@ -37,7 +45,7 @@ namespace PathUtil {
 	 *
 	 * 這個演算法假定了兩個路徑的時鐘方向相同，而且恰共用一條邊。
 	 */
-	export function $join(p1: Path, p2: Path) {
+	export function $join(p1: Path, p2: Path): Path {
 		p1 = p1.concat(); p2 = p2.concat();
 		for(let i = 0; i < p1.length; i++) {
 			for(let j = 0; j < p2.length; j++) {
@@ -65,11 +73,11 @@ namespace PathUtil {
 		return p1.some(p => $pointInPolygon(p, p2)) || p2.some(p => $pointInPolygon(p, p1));
 	}
 
-	export function $lineInsidePath(l: Line, path: Path) {
+	export function $lineInsidePath(l: Line, path: Path): boolean {
 		return $pointInPolygon(l.p1, path, true) && $pointInPolygon(l.p2, path, true);
 	}
 
-	export function $pointInsidePath(p: Point, path: Path) {
+	export function $pointInsidePath(p: Point, path: Path): boolean {
 		return $pointInPolygon(p, path);
 	}
 
@@ -97,7 +105,7 @@ namespace PathUtil {
 			let [xj, yj] = [dx[j], dy[j]];
 			let mx = xi >= 0, nx = xj >= 0;
 			let my = yi >= 0, ny = yj >= 0;
-			if(!((my || ny) && (mx || nx)) || (mx && nx)) continue;
+			if(!((my || ny) && (mx || nx)) || mx && nx) continue;
 			if(!(my && ny && (mx || nx) && !(mx && nx))) {
 				let test = (yi * xj - xi * yj) / (xj - xi);
 				if(test < 0) continue;

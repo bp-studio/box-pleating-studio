@@ -124,7 +124,10 @@
 			"tab",
 			{
 				"SwitchCase": 1,
-				"VariableDeclarator": 1
+				"VariableDeclarator": 1,
+				"CallExpression": {
+					"arguments": 1
+				}
 			}
 		],
 		"init-declarations": "off",
@@ -169,7 +172,9 @@
 			"warn",
 			{
 				"code": 100,
-				"tabWidth": 4
+				"tabWidth": 4,
+				"ignoreStrings": true,
+				"ignoreComments": true
 			}
 		],
 		"max-lines": "warn",
@@ -196,6 +201,7 @@
 		"no-await-in-loop": "warn",
 		"no-bitwise": "off",
 		"no-caller": "warn",
+		"no-cond-assign": "off",
 		"no-confusing-arrow": "off",
 		"no-console": "off",
 		"no-constructor-return": "warn",
@@ -226,6 +232,8 @@
 		"no-inline-comments": "off",
 		"no-inner-declarations": "off",
 		"no-invalid-this": "off",
+		"@typescript-eslint/no-invalid-this": "error",
+		"no-irregular-whitespace": "error",
 		"no-iterator": "warn",
 		"no-label-var": "warn",
 		"no-labels": "error",
@@ -290,11 +298,13 @@
 		"no-tabs": "off",
 		"no-template-curly-in-string": "warn",
 		"no-ternary": "off",
+		"no-this-before-super": "error",
 		"no-throw-literal": "warn",
 		"no-trailing-spaces": "warn",
 		"no-undef-init": "warn",
 		"no-undefined": "off",
 		"no-underscore-dangle": "off",
+		"no-unexpected-multiline": "error",
 		"no-unmodified-loop-condition": "warn",
 		"no-unneeded-ternary": "warn",
 		"no-unreachable-loop": "warn",
@@ -314,6 +324,7 @@
 		"no-var": "warn",
 		"no-void": "warn",
 		"no-warning-comments": "off",
+		"no-with": "error",
 		"no-whitespace-before-property": "warn",
 		"nonblock-statement-body-position": "warn",
 		"object-curly-newline": "warn",

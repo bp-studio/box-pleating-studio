@@ -55,7 +55,7 @@ abstract class Couple {
 		} else {
 			this._x = new Fraction(x);
 			this._y = new Fraction(y);
-		};
+		}
 		return this;
 	}
 
@@ -64,7 +64,8 @@ abstract class Couple {
 	}
 
 	public addBy(v: Vector): this {
-		this._x.a(v._x); this._y.a(v._y); return this;
+		this._x.a(v._x); this._y.a(v._y);
+		return this;
 	}
 
 	/** 把 `Couple` 四捨五入至最接近的位數（預設為個位） */
