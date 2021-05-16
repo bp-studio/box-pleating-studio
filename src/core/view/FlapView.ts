@@ -33,7 +33,8 @@
 	}
 
 	public $contains(point: paper.Point) {
-		return this._control.$sheet.$view.$contains(point) &&
+		let vm = this._control.$design.$viewManager;
+		return vm.$contains(this._control.$sheet, point) &&
 			(this.hinge.contains(point) || this.hinge.hitTest(point) !== null);
 	}
 

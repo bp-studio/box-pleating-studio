@@ -42,15 +42,6 @@ abstract class Control extends SheetObject implements ITagObject {
 	}
 
 	/**
-	 * 傳回這個 `Control` 是否包含了指定的點（用來判斷點擊是否成立）。
-	 *
-	 * 預設行為是永遠傳回 false，也就是說這個 `Control` 無法被點擊。
-	 */
-	public $contains(point: paper.Point): boolean {
-		return false;
-	}
-
-	/**
 	 * 傳回一個 `Control` 是否可以拖曳選取。
 	 *
 	 * 由於 TypeScript 暫時不支援 this 的 type guard，因此把這個方法定義為靜態方法。

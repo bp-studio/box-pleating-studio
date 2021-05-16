@@ -20,10 +20,11 @@
 	}
 
 	public $contains(point: paper.Point) {
+		let vm = this._control.$design.$viewManager;
 		return (this._lineRegion.hitTest(point) != null ||
 			this._glow.hitTest(point.transform(this._glow.layer.matrix.inverted())) != null) &&
-			!this._control.$v1.$view.$contains(point) &&
-			!this._control.$v2.$view.$contains(point);
+			!vm.$contains(this._control.$v1, point) &&
+			!vm.$contains(this._control.$v2, point);
 	}
 
 	protected $render() {

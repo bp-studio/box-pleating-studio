@@ -12,15 +12,13 @@
 
 	public get $tag() { return "r" + this.edge.$tag; }
 
-	public readonly $view: RiverView;
-
 	/** @exports */
 	public readonly edge: TreeEdge;
 
 	constructor(sheet: Sheet, edge: TreeEdge) {
 		super(sheet);
 		this.edge = edge;
-		this.$view = new RiverView(this);
+		this.$design.$viewManager.$createView(this);
 	}
 
 	protected get $shouldDispose(): boolean {

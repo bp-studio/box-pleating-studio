@@ -1,19 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference path="../../src/core/global/vendor/shrewd.d.ts" />
-
-const { shrewd } = Shrewd;
+/// <reference path="../../src/core/index.ts" />
 
 Shrewd.option.autoCommit = false;
 
-// 底下這些是為了要 TypeScript 忽略掉一些 BPStudio 裡面的機制
-type Design = any;
-type IDesignObject = any;
-type ITagObject = any;
-type Action = () => void;
-
-const action = shrewd;
-
-const EditCommand = {
-	$remove(obj: any) { /* */ },
-	$add<T>(obj: T) { return obj; },
-};
+interface Console {
+	// 這其實是合法的呼叫，但 lib.dom.d.ts 少了這個定義，所以在此補上
+	assert(condition?: boolean, ...obj: unknown[]): void;
+}

@@ -25,7 +25,7 @@ interface JSheet {
 		return result;
 	}
 
-	private _activeControlCache: Control[] = [];
+	/** 所有活躍的控制 */
 	@shrewd public get $activeControls(): readonly Control[] {
 		this.$disposeEvent();
 		if(!this.$design.$dragging) {
@@ -35,8 +35,7 @@ interface JSheet {
 		}
 		return this._activeControlCache;
 	}
-
-	public readonly $view: SheetView;
+	private _activeControlCache: Control[] = [];
 
 	/** 考慮一個點進行指定位移之後的結果來修正位移 */
 	public $constraint(v: Vector, p: Readonly<IPoint>): Vector {
@@ -92,7 +91,7 @@ interface JSheet {
 		this._zoom = sheet.zoom ?? Sheet.$FULL_ZOOM;
 		this.$scroll = sheet.scroll ?? { x: 0, y: 0 };
 		this._controlMaps = maps;
-		this.$view = new SheetView(this);
+		design.$viewManager.$createView(this);
 	}
 
 	/** 記載所有這個 `Sheet` 中的 `Control` 來源 */
@@ -156,9 +155,9 @@ interface JSheet {
 		this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
 	}
 
-	@unorderedArray private get _viewedControls() {
-		return this.$controls.filter((c: Control): c is LabeledControl =>
-			c instanceof ViewedControl && c.$view instanceof LabeledView
+	@unorderedArray private get _labeledControls() {
+		return this.$controls.filter((c: Control) =>
+			this.$design.$viewManager.$get(c) instanceof LabeledView
 		);
 	}
 
@@ -167,8 +166,10 @@ interface JSheet {
 
 	@shrewd private _getMargin() {
 		if(!this.$isActive || !this.$design.$isActive) return;
-		let controls = this._viewedControls;
-		let m = controls.length ? Math.max(...controls.map(c => c.$view.$overflow)) : 0;
+		let controls = this._labeledControls;
+		let vm = this.$design.$viewManager;
+		let m = !controls.length ? 0 :
+			Math.max(...controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow));
 		setTimeout(() => this.$margin = m, 0);
 	}
 

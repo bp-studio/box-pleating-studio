@@ -1,6 +1,6 @@
 
 interface StudioOptions {
-	onDeprecate?: (title?: string) => void;
+	onDeprecate?: TitleCallback;
 	onUpdate?: Action;
 	onDrag?: Action;
 	onLongPress?: Action;
@@ -13,11 +13,12 @@ interface StudioOptions {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Studio {
+@shrewd class Studio extends StudioBase {
 
 	public readonly $system: System;
 	public readonly $designMap: Map<number, Design> = new Map();
 	public readonly $display: Display;
+	public readonly $viewManager = new ViewManager();
 	public readonly $el: HTMLElement;
 	public readonly $paper: paper.PaperScope;
 	public readonly $option: StudioOptions;
@@ -26,6 +27,7 @@ interface StudioOptions {
 	@shrewd public $design: Design | null = null;
 
 	constructor(selector: string) {
+		super();
 		let el = document.querySelector(selector);
 		if(el == null || !(el instanceof HTMLElement)) {
 			throw new Error("selector is not valid");
@@ -39,60 +41,7 @@ interface StudioOptions {
 		this.$updater = new Updater(this);
 	}
 
-	public $load(json: string | object): Design {
-		if(typeof json == "string") json = JSON.parse(json);
-		let design = Migration.$process(json as Pseudo<JDesign>, this.$option.onDeprecate);
-		return this._tryLoad(design);
-	}
-
-	public $create(json: Pseudo<JDesign>): Design {
-		Object.assign(json, {
-			version: Migration.$current,
-			tree: {
-				nodes: [
-					{ id: 0, name: "", x: 10, y: 10 },
-					{ id: 1, name: "", x: 10, y: 13 },
-					{ id: 2, name: "", x: 10, y: 7 },
-				],
-				edges: [
-					{ n1: 0, n2: 1, length: 1 },
-					{ n1: 0, n2: 2, length: 1 },
-				],
-			},
-		});
-		return this.$restore(json);
-	}
-
-	public $restore(json: Pseudo<JDesign>): Design {
-		let design = new Design(this, Migration.$process(json, this.$option.onDeprecate));
-		this.$designMap.set(design.id, design);
-		return design;
-	}
-
-	/** 此方法有防呆 */
-	public $select(id: number | null): void {
-		if(id != null) {
-			let d = this.$designMap.get(id);
-			if(d) this.$design = d;
-		} else {
-			this.$design = null;
-		}
-	}
-
-	/** 此方法有防呆 */
-	public $close(id: number): void {
-		let d = this.$designMap.get(id);
-		if(d) {
-			this.$designMap.delete(id);
-			d.$dispose();
-		}
-	}
-
-	public $closeAll(): void {
-		this.$design = null;
-		for(let d of this.$designMap.values()) d.$dispose();
-		this.$designMap.clear();
-	}
+	public onDeprecate(title?: string) { this.$option.onDeprecate?.(title); }
 
 	public $createBpsUrl(): string {
 		if(!this.$design) return "";
@@ -103,13 +52,12 @@ interface StudioOptions {
 		return URL.createObjectURL(blob);
 	}
 
-	private _tryLoad(design: RecursivePartial<JDesign>): Design {
-		this.$design = new Design(this, design);
-		this.$designMap.set(this.$design.id, this.$design);
+	protected _tryLoad(design: RecursivePartial<JDesign>): Design {
+		let result = super._tryLoad(design);
 
 		// 這邊順便直接更新，不然載入大專案的時候會跟 tab 之間有一點時間差
 		this.$updater.$update();
 
-		return this.$design;
+		return result;
 	}
 }

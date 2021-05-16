@@ -19,7 +19,6 @@ interface JVertex extends IPoint {
 	public get $tag() { return "v" + this.$node.id; }
 
 	public readonly $node: TreeNode;
-	public readonly $view: VertexView;
 
 	constructor(sheet: Sheet, node: TreeNode) {
 		super(sheet);
@@ -34,7 +33,7 @@ interface JVertex extends IPoint {
 			this.$selected = Boolean(option.selected);
 		}
 
-		this.$view = new VertexView(this);
+		this.$design.$viewManager.$createView(this);
 
 		sheet.$design.$history.$construct(this.$toMemento());
 	}

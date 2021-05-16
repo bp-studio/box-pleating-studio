@@ -56,7 +56,7 @@ class Step implements ISerializable<JStep> {
 	/** 重置自動鎖定 */
 	private _reset() {
 		if(this._timeout) clearTimeout(this._timeout);
-		if(!this._fixed) this._timeout = setTimeout(() => this._fix(), Step._AUTO_RESET);
+		if(!this._fixed) this._timeout = window.setTimeout(() => this._fix(), Step._AUTO_RESET);
 	}
 
 	/** 自動鎖定自身 */

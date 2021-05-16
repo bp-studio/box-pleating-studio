@@ -12,7 +12,7 @@ namespace PaperWorker {
 		return task;
 	}
 
-	const master = new Worker("./paper-master.js");
+	const master = typeof Worker != 'undefined' ? new Worker("./paper-master.js") : null;
 
 	type Payload = [paper.Item, number];
 
@@ -47,6 +47,7 @@ namespace PaperWorker {
 
 	function getIntersection(s1: string, s2: string): Promise<Payload> {
 		return new Promise<Payload>(resolve => {
+			if(!master) return;
 			let channel = new MessageChannel();
 			channel.port1.onmessage = event => {
 				let [json, area] = event.data;

@@ -1,20 +1,9 @@
-
 /// <reference path="Import.ts" />
 
-/// <reference path="../../src/core/util/ArrayUtil.ts" />
-/// <reference path="../../src/core/class/disposable.ts" />
-/// <reference path="../../src/core/design/schema/Tree.ts" />
-/// <reference path="../../src/core/design/schema/TreeEdge.ts" />
-/// <reference path="../../src/core/design/schema/TreeNode.ts" />
-/// <reference path="../../src/core/global/Interface.ts" />
-/// <reference path="../../src/core/class/mapping/BaseMapping.ts" />
-/// <reference path="../../src/core/class/mapping/DoubleMap.ts" />
-/// <reference path="../../src/core/class/mapping/DoubleMapping.ts" />
 
-interface Console {
-	// 這其實是合法的呼叫，但 lib.dom.d.ts 少了這個定義，所以在此補上
-	assert(condition?: boolean, ...obj: unknown[]): void;
-}
+/// <reference path="mock/MockStudio.ts" />
+
+const studio = new MockStudio();
 
 class UnitTest {
 

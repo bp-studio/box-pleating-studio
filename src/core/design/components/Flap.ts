@@ -43,8 +43,6 @@ interface JFlap {
 	/** @exports */
 	public readonly node: TreeNode;
 
-	public readonly $view: FlapView;
-
 	public readonly $quadrants: PerQuadrant<Quadrant>;
 
 	public $selectableWith(c: Control) { return c instanceof Flap; }
@@ -95,7 +93,7 @@ interface JFlap {
 		}
 
 		this.$quadrants = makePerQuadrant(i => new Quadrant(sheet, this, i));
-		this.$view = new FlapView(this);
+		this.$design.$viewManager.$createView(this);
 
 		design.$history.$construct(this.$toMemento());
 	}

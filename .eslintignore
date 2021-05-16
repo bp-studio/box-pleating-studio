@@ -4,3 +4,4 @@ public/**/*
 src/core/global/vendor/**/*.ts
 src/core/util/PolyBool.ts
 src/service/@types/service-worker.d.ts
+test/*.js

@@ -7,11 +7,11 @@
 
 abstract class Mountable extends Disposable {
 
-	protected readonly $mountTarget: Mountable | Studio;
+	protected readonly $mountTarget: Mountable | IStudio;
 
-	private _oldStudio: Studio | null = null;
+	private _oldStudio: IStudio | null = null;
 
-	constructor(parent: Mountable | Studio) {
+	constructor(parent: Mountable | IStudio) {
 		super();
 		this.$mountTarget = parent;
 	}
@@ -21,7 +21,7 @@ abstract class Mountable extends Disposable {
 			(this.$mountTarget instanceof Mountable ? this.$mountTarget.$disposed : false);
 	}
 
-	@shrewd protected get $studio(): Studio | null {
+	@shrewd protected get $studio(): IStudio | null {
 		if(this.$disposed || !this.$isActive) return null;
 		else if(!(this.$mountTarget instanceof Mountable)) return this.$mountTarget;
 		else return this.$mountTarget.$studio;
@@ -55,12 +55,12 @@ abstract class Mountable extends Disposable {
 	public static $isActive(m: Mountable) { return m.$isActive; }
 
 	/** 掛載事件 */
-	protected $onMount(studio: Studio) {
+	protected $onMount(studio: IStudio) {
 		// 預設行為為空
 	}
 
 	/** 卸載事件 */
-	protected $onDismount(studio: Studio) {
+	protected $onDismount(studio: IStudio) {
 		// 預設行為為空
 	}
 }

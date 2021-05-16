@@ -59,7 +59,7 @@ interface IDesignObject {
 	/** 管理 Design 的編輯歷史 */
 	public readonly $history: HistoryManager;
 
-	constructor(studio: Studio, design: RecursivePartial<JDesign>) {
+	constructor(studio: IStudio, design: RecursivePartial<JDesign>) {
 		super(studio);
 
 		const data = deepCopy<JDesign>(Migration.$getSample(), design);
@@ -103,6 +103,8 @@ interface IDesignObject {
 	}
 
 	public get $design() { return this; }
+
+	public get $viewManager() { return (this.$mountTarget as IStudio).$viewManager; }
 
 	/**
 	 * 目前的 `Design` 是否正在拖曳當中。
@@ -156,7 +158,7 @@ interface IDesignObject {
 
 	/** @exports */
 	public selectAll() {
-		this.$studio?.$system.$selection.$clear();
+		this.sheet.$activeControls.forEach(c => c.$selected = false);
 		if(this.mode == "layout") this.$flaps.$selectAll();
 		if(this.mode == "tree") this.$vertices.$selectAll();
 	}

@@ -19,7 +19,8 @@
 	}
 
 	public $contains(point: paper.Point) {
-		return this._control.$sheet.$view.$contains(point) && this._shade.contains(point);
+		let vm = this._control.$design.$viewManager;
+		return vm.$contains(this._control.$sheet, point) && this._shade.contains(point);
 	}
 
 	/** 跟當前的河有關的基本資訊；這些除非樹的結構有改變，不然不用重新計算 */
@@ -44,13 +45,14 @@
 
 		let inner: ClosureView[] = [];
 		let design = this.$design;
+		let vm = design.$viewManager;
 		for(let e of adjacent) {
 			if(e.$isRiver) {
 				let r = design.$rivers.get(e)!;
-				inner.push(r.$view);
+				inner.push(vm.$get(r) as RiverView);
 			} else {
 				let f = design.$flaps.get(e.n1.$degree == 1 ? e.n1 : e.n2)!;
-				inner.push(f.$view);
+				inner.push(vm.$get(f) as FlapView);
 			}
 		}
 

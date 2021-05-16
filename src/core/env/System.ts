@@ -36,6 +36,7 @@ class System {
 		this.$scroll = new ScrollController(studio);
 		this.$selection = new SelectionController(studio);
 		this.$drag = new DragController(studio);
+		KeyboardController.$init();
 	}
 
 	private get _canvas(): HTMLCanvasElement { return this._studio.$paper.view.element; }

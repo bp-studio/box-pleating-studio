@@ -61,7 +61,7 @@
 		let nextCtrl: Control | null = null;	// 重疊之中下一個尚未被選取的 Control
 
 		// 找出所有點擊位置中的重疊 Control
-		let controls = this._controls.filter(o => o.$contains(point));
+		let controls = this._controls.filter(o => this._studio.$viewManager.$contains(o, point));
 
 		// 找出前述的三個關鍵 Control
 		for(let o of controls) {

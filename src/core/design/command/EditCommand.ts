@@ -22,7 +22,6 @@ class EditCommand extends Command implements JEditCommand {
 			tag: target.$tag,
 			memento: target.toJSON(),
 		});
-
 		target.$design.$history.$queue(command);
 	}
 

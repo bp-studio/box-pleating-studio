@@ -13,14 +13,13 @@
 	public readonly $v2: Vertex;
 
 	public readonly $edge: TreeEdge;
-	public readonly $view: EdgeView;
 
 	constructor(sheet: Sheet, v1: Vertex, v2: Vertex, edge: TreeEdge) {
 		super(sheet);
 		this.$v1 = v1;
 		this.$v2 = v2;
 		this.$edge = edge;
-		this.$view = new EdgeView(this);
+		this.$design.$viewManager.$createView(this);
 		if(sheet.$design.$options.get(edge)?.selected) this.$selected = true;
 	}
 

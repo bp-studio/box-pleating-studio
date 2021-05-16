@@ -1,10 +1,21 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
 function TreeBasic() {
-
-	let t = new Tree(null);
-	t.$addEdge(1, 0, 2);
-	t.$addEdge(0, 2, 1);
+	let design = studio.$create({
+		tree: {
+			nodes: [
+				{ id: 0, name: "", x: 10, y: 10 },
+				{ id: 1, name: "", x: 10, y: 13 },
+				{ id: 2, name: "", x: 10, y: 7 },
+			],
+			edges: [
+				{ n1: 0, n2: 1, length: 2 },
+				{ n1: 0, n2: 2, length: 1 },
+			],
+		},
+	});
+	let t = design.$tree;
 	Shrewd.commit();
 	let A = t.$node.get(1)!, B = t.$node.get(2)!, a = t.$node.get(0)!;
 	let out: unknown;
@@ -45,5 +56,6 @@ function TreeBasic() {
 	console.assert(C.$disposed && E.$disposed, "要正確解構", C.$disposed, E.$disposed);
 	console.assert(t.$node.size == 3 && t.$leaf.size == 2, t);
 
-	t.$dispose();
+	// 回收
+	studio.$close(design.id);
 }

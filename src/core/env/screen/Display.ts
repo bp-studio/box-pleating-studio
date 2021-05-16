@@ -1,4 +1,10 @@
 
+interface IDisplay {
+	$zoom(v: number): void;
+	$scale: number;
+}
+
+
 interface DisplaySetting {
 	showGrid: boolean;
 	showHinge: boolean;
@@ -18,7 +24,7 @@ interface DisplaySetting {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Display extends Workspace {
+@shrewd class Display extends Workspace implements IDisplay {
 
 	public readonly $boundary: paper.Path;
 

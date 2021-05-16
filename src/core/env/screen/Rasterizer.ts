@@ -63,7 +63,7 @@ class Rasterizer {
 	}
 
 	public _afterPrint() {
-		this._debounce = setTimeout(() => {
+		this._debounce = window.setTimeout(() => {
 			this._printing = false;
 			this._debounce = NaN;
 		}, Rasterizer._DEBOUNCE);

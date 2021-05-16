@@ -18,7 +18,9 @@ namespace KeyboardController {
 		return Boolean(_states[key]);
 	}
 
-	document.body.addEventListener('keydown', e => _set(e, true));
-	document.body.addEventListener('keyup', e => _set(e, false));
-	window.addEventListener('blur', () => _states = {});
+	export function $init(): void {
+		document.body.addEventListener('keydown', e => _set(e, true));
+		document.body.addEventListener('keyup', e => _set(e, false));
+		window.addEventListener('blur', () => _states = {});
+	}
 }

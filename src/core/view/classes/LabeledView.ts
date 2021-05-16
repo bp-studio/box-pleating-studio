@@ -1,8 +1,4 @@
 
-interface LabeledControl extends ViewedControl {
-	$view: LabeledView<ViewedControl>;
-}
-
 abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 	private static readonly _FONT_SIZE = 14;

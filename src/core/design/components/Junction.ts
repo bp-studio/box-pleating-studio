@@ -58,7 +58,7 @@ type JunctionDimension = 'ox' | 'oy';
 		this.f2 = f2;
 		f1._junctions.push(this);
 		f2._junctions.push(this);
-		new JunctionView(this);
+		this.$design.$viewManager.$createView(this);
 	}
 
 	protected get $shouldDispose(): boolean {

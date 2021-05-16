@@ -14,6 +14,12 @@ abstract class View extends Mountable {
 
 	private _paths: [Layer, paper.Item, number][] = [];
 
+	public get $studio(): Studio | null {
+		let studio = super.$studio;
+		if(studio instanceof Studio) return studio;
+		return null;
+	}
+
 	/**
 	 * 視圖的自動繪製反應方法；會呼叫子類別實作的 `render()` 方法完成繪製。
 	 *
