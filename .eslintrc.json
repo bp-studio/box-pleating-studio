@@ -95,7 +95,8 @@
 		"dot-notation": "warn",
 		"eol-last": "warn",
 		"eqeqeq": "off",
-		"func-call-spacing": [
+		"func-call-spacing": "off",
+		"@typescript-eslint/func-call-spacing": [
 			"warn",
 			"never"
 		],

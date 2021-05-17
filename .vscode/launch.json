@@ -15,14 +15,13 @@
 			"runtimeArgs": ["--allow-file-access-from-files"]
 		},
 		{
-			"type": "node",
+			"type": "pwa-node",
 			"request": "launch",
 			"name": "Launch Test",
 			"preLaunchTask": "Gulp buildTest",
-			"console": "internalConsole",
-			"internalConsoleOptions": "openOnSessionStart",
-			"program": "${workspaceFolder}/test/test.js",
-			"protocol": "inspector"
+			"console": "integratedTerminal",
+			"program": "${workspaceFolder}/test/dist/test.js",
+			"sourceMaps": true,
 		}
 	]
 }

@@ -26,7 +26,7 @@ class BPStudio {
 
 	public get option(): StudioOptions { return this._studio.$option; }
 	public get settings(): DisplaySetting { return this._studio.$display.$settings; }
-	public get TreeMaker() { return TreeMaker; }
+	public get TreeMaker(): typeof TreeMaker { return TreeMaker; }
 
 
 	//////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ class BPStudio {
 	}
 
 	/** 這是一個偵錯 glitch 用的屬性，正常情況不會用到（參見 Pattern.ts） */
-	public get running() { return this._studio.$updater.$updating; }
+	public get running(): boolean { return this._studio.$updater.$updating; }
 
 
 	//////////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ class BPStudio {
 	public redo(design: unknown): void {
 		this._getHistory(design)?.$redo();
 	}
-	private _getHistory(design: unknown) {
+	private _getHistory(design: unknown): HistoryManager | null {
 		return design instanceof Design && design.$history || null;
 	}
 }

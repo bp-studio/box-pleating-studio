@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 
 function DoubleMapReact() {
 
-	class A {
+	@shrewd class A {
 		public map: DoubleMap<string, number> = new DoubleMap();
-
-		constructor() {
-			this.has();
-		}
 
 		@shrewd private has() {
 			log.add("has");
@@ -22,11 +17,11 @@ function DoubleMapReact() {
 		return result;
 	}
 
-	let a = new A();
-	getLog();
+	let a = new A(), s: string;
+	console.assert((s = getLog()) == "has", s);
 
 	a.map.set("a", "b", 12);
 	Shrewd.commit();
 
-	console.log(getLog());
+	console.assert((s = getLog()) == "has", s);
 }

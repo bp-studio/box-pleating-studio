@@ -1,0 +1,6 @@
+{
+    "rules": {
+        "max-lines-per-function": "off",
+		"@typescript-eslint/no-magic-numbers": "off"
+    }
+}

@@ -1,5 +1,3 @@
-/* eslint-disable max-lines-per-function */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 
 function TreeBasic() {
 	let design = studio.$create({
@@ -38,15 +36,15 @@ function TreeBasic() {
 	console.assert(t.$edge.size == 3);
 	console.assert((out = t.$dist(A, B)) == 6, "AB 長度為 6", out);
 
-	UnitTest.consoleHack = true;
+	TestUtil.consoleHack = true;
 	t.$addEdge(1, 2, 5); // 加入不合法的邊
 	t.$addEdge(4, 5, 1); // 加入不合法的邊
 	a.$dispose();
 	Shrewd.commit();
-	console.assert(UnitTest.warnings.length == 3);
-	console.assert(UnitTest.warnings[0] == "Adding edge (1,2) will cause circuit.");
-	console.assert(UnitTest.warnings[1] == "Adding edge (4,5) disconnects the graph.");
-	console.assert(UnitTest.warnings[2] == "Node [0] is not a leaf.");
+	console.assert(TestUtil.warnings.length == 3);
+	console.assert(TestUtil.warnings[0] == "Adding edge (1,2) will cause circuit.");
+	console.assert(TestUtil.warnings[1] == "Adding edge (4,5) disconnects the graph.");
+	console.assert(TestUtil.warnings[2] == "Node [0] is not a leaf.");
 
 	// 測試刪除點
 	let E = t.$edge.get(C, a)!;
