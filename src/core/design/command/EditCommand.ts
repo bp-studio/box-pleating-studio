@@ -16,23 +16,20 @@ interface JEditCommand extends JCommand {
 
 class EditCommand extends Command implements JEditCommand {
 
-	public static $add(target: TreeElement): void {
-		let command = new EditCommand(target.$design, {
+	public static $add(target: TreeElement): EditCommand {
+		return new EditCommand(target.$design, {
 			type: CommandType.add,
 			tag: target.$tag,
 			memento: target.toJSON(),
 		});
-		target.$design.$history.$queue(command);
 	}
 
-	public static $remove(target: TreeElement) {
-		let command = new EditCommand(target.$design, {
+	public static $remove(target: TreeElement): EditCommand {
+		return new EditCommand(target.$design, {
 			type: CommandType.remove,
 			tag: target.$tag,
 			memento: target.toJSON(),
 		});
-		target.$dispose(true);
-		target.$design.$history.$queue(command);
 	}
 
 	/** @exports */

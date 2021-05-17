@@ -52,7 +52,7 @@ interface JSheet {
 			let d = v - this._independentRect.right;
 			if(d < 0) {
 				for(let i of this.$independents) {
-					MoveCommand.$create(i, { x: d, y: 0 });
+					Draggable.$move(i, { x: d, y: 0 });
 				}
 			}
 			this.mWidth = v;
@@ -67,7 +67,7 @@ interface JSheet {
 			let d = v - this._independentRect.top;
 			if(d < 0) {
 				for(let i of this.$independents) {
-					MoveCommand.$create(i, { x: 0, y: d });
+					Draggable.$move(i, { x: 0, y: d });
 				}
 			}
 			this.mHeight = v;

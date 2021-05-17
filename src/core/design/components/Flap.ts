@@ -23,7 +23,7 @@ interface JFlap {
 	public set width(v: number) {
 		if(v >= 0 && v <= this.$sheet.width) {
 			let d = this.$location.x + v - this.$sheet.width;
-			if(d > 0) MoveCommand.$create(this, { x: -d, y: 0 });
+			if(d > 0) Draggable.$move(this, { x: -d, y: 0 });
 			this.mWidth = v;
 		}
 	}
@@ -34,7 +34,7 @@ interface JFlap {
 	public set height(v: number) {
 		if(v >= 0 && v <= this.$sheet.height) {
 			let d = this.$location.y + v - this.$sheet.height;
-			if(d > 0) MoveCommand.$create(this, { x: 0, y: -d });
+			if(d > 0) Draggable.$move(this, { x: 0, y: -d });
 			this.mHeight = v;
 		}
 	}
@@ -95,7 +95,7 @@ interface JFlap {
 		this.$quadrants = makePerQuadrant(i => new Quadrant(sheet, this, i));
 		this.$design.$viewManager.$createView(this);
 
-		design.$history.$construct(this.$toMemento());
+		design.$history?.$construct(this.$toMemento());
 	}
 
 	protected $onDragged() {
@@ -107,7 +107,7 @@ interface JFlap {
 	}
 
 	protected $onDispose(): void {
-		this.$design.$history.$destruct(this.$toMemento());
+		this.$design.$history?.$destruct(this.$toMemento());
 		super.$onDispose();
 	}
 

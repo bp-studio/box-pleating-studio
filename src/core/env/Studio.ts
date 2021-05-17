@@ -41,6 +41,10 @@ interface StudioOptions {
 		this.$updater = new Updater(this);
 	}
 
+	public $historyManagerFactory(design: Design, data: JDesign) {
+		return new HistoryManager(design, data.history);
+	}
+
 	public onDeprecate(title?: string) { this.$option.onDeprecate?.(title); }
 
 	public $createBpsUrl(): string {

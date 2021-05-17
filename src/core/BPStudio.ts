@@ -190,24 +190,27 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public notifySaveAll() {
-		for(let d of this._studio.$designMap.values()) d.$history.$notifySave();
+		for(let d of this._studio.$designMap.values()) d.$history?.$notifySave();
 	}
 	public notifySave(design: unknown) {
-		if(design instanceof Design) design.$history.$notifySave();
+		this._getHistory(design)?.$notifySave();
 	}
 	public isModified(design: unknown): boolean {
-		return design instanceof Design ? design.$history.$modified : false;
+		return this._getHistory(design)?.$modified ?? false;
 	}
 	public canUndo(design: unknown): boolean {
-		return design instanceof Design ? design.$history.$canUndo : false;
+		return this._getHistory(design)?.$canUndo ?? false;
 	}
 	public canRedo(design: unknown): boolean {
-		return design instanceof Design ? design.$history.$canRedo : false;
+		return this._getHistory(design)?.$canRedo ?? false;
 	}
 	public undo(design: unknown): void {
-		if(design instanceof Design) design.$history.$undo();
+		this._getHistory(design)?.$undo();
 	}
 	public redo(design: unknown): void {
-		if(design instanceof Design) design.$history.$redo();
+		this._getHistory(design)?.$redo();
+	}
+	private _getHistory(design: unknown) {
+		return design instanceof Design && design.$history || null;
 	}
 }

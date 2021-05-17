@@ -22,13 +22,8 @@ class MoveCommand extends Command implements JMoveCommand {
 			old: clone(target.$location),
 			new: loc,
 		});
-		MoveCommand.$assign(target.$location, loc);
-		target.$design.$history.$queue(command);
-	}
-
-	public static $assign(target: IPoint, value: IPoint) {
-		target.x = value.x;
-		target.y = value.y;
+		Draggable.$assign(target.$location, loc);
+		return command;
 	}
 
 	/** @exports */
@@ -52,7 +47,7 @@ class MoveCommand extends Command implements JMoveCommand {
 	}
 
 	public $addTo(command: Command) {
-		MoveCommand.$assign((command as MoveCommand).new, this.new);
+		Draggable.$assign((command as MoveCommand).new, this.new);
 	}
 
 	public get $isVoid(): boolean {
@@ -61,13 +56,13 @@ class MoveCommand extends Command implements JMoveCommand {
 
 	public $undo() {
 		let obj = this._design.$query(this.tag)!;
-		if(obj instanceof Draggable) MoveCommand.$assign(obj.$location, this.old);
+		if(obj instanceof Draggable) Draggable.$assign(obj.$location, this.old);
 		else debugger;
 	}
 
 	public $redo() {
 		let obj = this._design.$query(this.tag)!;
-		if(obj instanceof Draggable) MoveCommand.$assign(obj.$location, this.new);
+		if(obj instanceof Draggable) Draggable.$assign(obj.$location, this.new);
 		else debugger;
 	}
 }

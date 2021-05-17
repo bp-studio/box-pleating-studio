@@ -17,7 +17,7 @@ class Updater extends Animator {
 
 		Shrewd.commit();
 		let design = this._studio.$design;
-		if(design && !design.$dragging) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
+		if(design && !design.$dragging && design.$history) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的
 			design.$history.$flush(this._studio.$system.$selection.$items);
 		}
 

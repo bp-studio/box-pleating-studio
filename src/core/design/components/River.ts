@@ -6,7 +6,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class River extends ViewedControl {
+@shrewd class River extends Control {
 
 	public get $type() { return "River"; }
 

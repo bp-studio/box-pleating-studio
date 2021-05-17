@@ -1141,14 +1141,14 @@ function action(...p) {
 function actionInner(target, name, option) {
     shrewd({
         validator(v) {
-            var _a, _b;
+            var _a, _b, _c;
             let record = actionMap.get(this);
             if (!record)
                 actionMap.set(this, record = {});
             let result = (_b = (_a = option.validator) === null || _a === void 0 ? void 0 : _a.apply(this, [v])) !== null && _b !== void 0 ? _b : true;
             if (result) {
                 if (name in record && record[name] != v) {
-                    this.$design.$history.$fieldChange(this, name, record[name], v);
+                    (_c = this.$design.$history) === null || _c === void 0 ? void 0 : _c.$fieldChange(this, name, record[name], v);
                 }
                 record[name] = v;
             }
@@ -2429,9 +2429,7 @@ class Control extends SheetObject {
     }
 }
 __decorate([shrewd], Control.prototype, '$selected', void 0);
-class ViewedControl extends Control {
-}
-class Draggable extends ViewedControl {
+class Draggable extends Control {
     constructor() {
         super(...arguments);
         this.$location = {
@@ -2457,7 +2455,7 @@ class Draggable extends ViewedControl {
         else
             by = new Point(this.$location).add(by);
         if (!by.eq(this.$location)) {
-            MoveCommand.$create(this, by.$toIPoint(), false);
+            Draggable.$move(this, by.$toIPoint(), false);
             this.$onDragged();
         }
     }
@@ -2475,9 +2473,18 @@ class Draggable extends ViewedControl {
             y: Math.round(source.$location.y / ss.height * ts.height)
         };
         if (init)
-            MoveCommand.$assign(target.$location, pt);
+            Draggable.$assign(target.$location, pt);
         else
-            MoveCommand.$create(target, pt, false);
+            Draggable.$move(target, pt, false);
+    }
+    static $move(target, loc, relative = true) {
+        var _a;
+        (_a = target.$design.$history) === null || _a === void 0 ? void 0 : _a.$move(target, loc, false);
+        Draggable.$assign(target.$location, loc);
+    }
+    static $assign(target, value) {
+        target.x = value.x;
+        target.y = value.y;
     }
 }
 __decorate([shrewd], Draggable.prototype, '$location', void 0);
@@ -2784,28 +2791,29 @@ class BPStudio {
         return this._studio.$display.$rasterizer.$copyPNG();
     }
     notifySaveAll() {
+        var _a;
         for (let d of this._studio.$designMap.values())
-            d.$history.$notifySave();
+            (_a = d.$history) === null || _a === void 0 ? void 0 : _a.$notifySave();
     }
     notifySave(design) {
-        if (design instanceof Design)
+        if (design instanceof Design && design.$history)
             design.$history.$notifySave();
     }
     isModified(design) {
-        return design instanceof Design ? design.$history.$modified : false;
+        return design instanceof Design && design.$history ? design.$history.$modified : false;
     }
     canUndo(design) {
-        return design instanceof Design ? design.$history.$canUndo : false;
+        return design instanceof Design && design.$history ? design.$history.$canUndo : false;
     }
     canRedo(design) {
-        return design instanceof Design ? design.$history.$canRedo : false;
+        return design instanceof Design && design.$history ? design.$history.$canRedo : false;
     }
     undo(design) {
-        if (design instanceof Design)
+        if (design instanceof Design && design.$history)
             design.$history.$undo();
     }
     redo(design) {
-        if (design instanceof Design)
+        if (design instanceof Design && design.$history)
             design.$history.$redo();
     }
 }
@@ -2969,7 +2977,7 @@ let HistoryManager = HistoryManager_1 = class HistoryManager extends Disposable 
             steps: this._steps.map(s => s.toJSON())
         };
     }
-    $queue(command) {
+    _enqueue(command) {
         if (this._moving)
             return;
         for (let q of this._queue) {
@@ -2987,6 +2995,16 @@ let HistoryManager = HistoryManager_1 = class HistoryManager extends Disposable 
         if (this._moving)
             return;
         this._destruct.push(memento);
+    }
+    $move(target, loc, relative = true) {
+        let command = MoveCommand.$create(target, loc, relative);
+        this._enqueue(command);
+    }
+    $add(target) {
+        this._enqueue(EditCommand.$add(target));
+    }
+    $remove(target) {
+        this._enqueue(EditCommand.$remove(target));
     }
     $flush(selection) {
         let sel = selection.map(c => c.$tag);
@@ -3038,7 +3056,7 @@ let HistoryManager = HistoryManager_1 = class HistoryManager extends Disposable 
     $fieldChange(target, prop, oldValue, newValue) {
         if (this._moving)
             return;
-        FieldCommand.create(target, prop, oldValue, newValue);
+        this._enqueue(FieldCommand.create(target, prop, oldValue, newValue));
     }
     get $canUndo() {
         return this._index > 0;
@@ -3074,21 +3092,18 @@ class EditCommand extends Command {
         this.memento = json.memento;
     }
     static $add(target) {
-        let command = new EditCommand(target.$design, {
+        return new EditCommand(target.$design, {
             type: CommandType.add,
             tag: target.$tag,
             memento: target.toJSON()
         });
-        target.$design.$history.$queue(command);
     }
     static $remove(target) {
-        let command = new EditCommand(target.$design, {
+        return new EditCommand(target.$design, {
             type: CommandType.remove,
             tag: target.$tag,
             memento: target.toJSON()
         });
-        target.$dispose(true);
-        target.$design.$history.$queue(command);
     }
     $canAddTo(command) {
         return false;
@@ -3130,13 +3145,12 @@ class FieldCommand extends Command {
         this.new = json.new;
     }
     static create(target, prop, oldValue, newValue) {
-        let command = new FieldCommand(target.$design, {
+        return new FieldCommand(target.$design, {
             tag: target.$tag,
             prop,
             old: oldValue,
             new: newValue
         });
-        target.$design.$history.$queue(command);
     }
     $canAddTo(command) {
         return command instanceof FieldCommand && command.tag == this.tag && command.new == this.old;
@@ -3173,18 +3187,14 @@ class MoveCommand extends Command {
             old: clone(target.$location),
             new: loc
         });
-        MoveCommand.$assign(target.$location, loc);
-        target.$design.$history.$queue(command);
-    }
-    static $assign(target, value) {
-        target.x = value.x;
-        target.y = value.y;
+        Draggable.$assign(target.$location, loc);
+        return command;
     }
     $canAddTo(command) {
         return command instanceof MoveCommand && command.tag == this.tag && command.new.x == this.old.x && command.new.y == this.old.y;
     }
     $addTo(command) {
-        MoveCommand.$assign(command.new, this.new);
+        Draggable.$assign(command.new, this.new);
     }
     get $isVoid() {
         return this.old.x == this.new.x && this.old.y == this.new.y;
@@ -3192,14 +3202,14 @@ class MoveCommand extends Command {
     $undo() {
         let obj = this._design.$query(this.tag);
         if (obj instanceof Draggable)
-            MoveCommand.$assign(obj.$location, this.old);
+            Draggable.$assign(obj.$location, this.old);
         else
             debugger;
     }
     $redo() {
         let obj = this._design.$query(this.tag);
         if (obj instanceof Draggable)
-            MoveCommand.$assign(obj.$location, this.new);
+            Draggable.$assign(obj.$location, this.new);
         else
             debugger;
     }
@@ -5723,17 +5733,19 @@ let Repository = class Repository extends Store {
         return prototype;
     }
     _onSettle() {
+        var _a;
         if (!this._everActive && this.$isActive && !this.$design.$dragging) {
             this._everActive = true;
-            this.$design.$history.$construct(this.$toMemento());
+            (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$construct(this.$toMemento());
         }
     }
     get $shouldDispose() {
         return super.$shouldDispose || this.$stretch.$disposed || !this.$isActive && !this.$design.$dragging;
     }
     $onDispose() {
+        var _a;
         if (this._everActive)
-            this.$design.$history.$destruct(this.$toMemento());
+            (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$destruct(this.$toMemento());
         super.$onDispose();
     }
     get $isActive() {
@@ -6092,7 +6104,7 @@ let Design = Design_1 = class Design extends Mountable {
         this.title = data.title;
         this.description = data.description;
         this.mode = data.mode;
-        this.$history = new HistoryManager(this, data.history);
+        this.$history = studio.$historyManagerFactory(this, data);
         this.$tree = new Tree(this, data.tree.edges);
         this.$junctions = new JunctionContainer(this);
     }
@@ -6107,8 +6119,8 @@ let Design = Design_1 = class Design extends Mountable {
     get $design() {
         return this;
     }
-    get $studio() {
-        return this.$mountTarget;
+    get $viewManager() {
+        return this.$mountTarget.$viewManager;
     }
     get $isActive() {
         return this instanceof Design_1 && this.$mountTarget.$design == this;
@@ -6119,6 +6131,7 @@ let Design = Design_1 = class Design extends Mountable {
     toJSON(session = false) {
         let result;
         let action = () => {
+            var _a;
             result = {
                 title: this.title,
                 description: this.description,
@@ -6136,7 +6149,7 @@ let Design = Design_1 = class Design extends Mountable {
                 }
             };
             if (session)
-                result.history = this.$history.toJSON();
+                result.history = (_a = this.$history) === null || _a === void 0 ? void 0 : _a.toJSON();
         };
         if (session)
             action();
@@ -6233,7 +6246,7 @@ var Migration;
             design.version = '0';
         if (design.version == '0')
             design.version = '0.4';
-        if (deprecate)
+        if (deprecate && studio.onDeprecate)
             studio.onDeprecate(design.title);
         return design;
     }
@@ -6363,14 +6376,14 @@ class OptionManager {
         this._options.set(tag, option);
     }
 }
-let Edge = class Edge extends ViewedControl {
+let Edge = class Edge extends Control {
     constructor(sheet, v1, v2, edge) {
         var _a;
         super(sheet);
         this.$v1 = v1;
         this.$v2 = v2;
         this.$edge = edge;
-        this.$design.$studio.$viewManager.$createView(this);
+        this.$design.$viewManager.$createView(this);
         if ((_a = sheet.$design.$options.get(edge)) === null || _a === void 0 ? void 0 : _a.selected)
             this.$selected = true;
     }
@@ -6421,6 +6434,7 @@ Edge = __decorate([shrewd], Edge);
 var Flap_1;
 let Flap = Flap_1 = class Flap extends IndependentDraggable {
     constructor(sheet, node) {
+        var _a;
         super(sheet);
         this.mWidth = 0;
         this.mHeight = 0;
@@ -6438,8 +6452,8 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
             Draggable.$relocate(design.$vertices.get(this.node), this, true);
         }
         this.$quadrants = makePerQuadrant(i => new Quadrant(sheet, this, i));
-        this.$design.$studio.$viewManager.$createView(this);
-        design.$history.$construct(this.$toMemento());
+        this.$design.$viewManager.$createView(this);
+        (_a = design.$history) === null || _a === void 0 ? void 0 : _a.$construct(this.$toMemento());
     }
     get $type() {
         return 'Flap';
@@ -6454,7 +6468,7 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         if (v >= 0 && v <= this.$sheet.width) {
             let d = this.$location.x + v - this.$sheet.width;
             if (d > 0)
-                MoveCommand.$create(this, {
+                Draggable.$move(this, {
                     x: -d,
                     y: 0
                 });
@@ -6468,7 +6482,7 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         if (v >= 0 && v <= this.$sheet.height) {
             let d = this.$location.y + v - this.$sheet.height;
             if (d > 0)
-                MoveCommand.$create(this, {
+                Draggable.$move(this, {
                     x: 0,
                     y: -d
                 });
@@ -6516,7 +6530,8 @@ let Flap = Flap_1 = class Flap extends IndependentDraggable {
         return super.$shouldDispose || this.node.$disposed || this.node.$degree != 1;
     }
     $onDispose() {
-        this.$design.$history.$destruct(this.$toMemento());
+        var _a;
+        (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$destruct(this.$toMemento());
         super.$onDispose();
     }
     $toMemento() {
@@ -6575,7 +6590,7 @@ let Junction = class Junction extends SheetObject {
         this.f2 = f2;
         f1._junctions.push(this);
         f2._junctions.push(this);
-        this.$design.$studio.$viewManager.$createView(this);
+        this.$design.$viewManager.$createView(this);
     }
     static $createTeamId(arr) {
         let set = new Set();
@@ -6988,11 +7003,11 @@ __decorate([orderedArray('qcj')], Quadrant.prototype, '$coveredJunctions', null)
 __decorate([noCompare], Quadrant.prototype, '$coveredInfo', null);
 __decorate([orderedArray('qaj')], Quadrant.prototype, '$activeJunctions', null);
 Quadrant = Quadrant_1 = __decorate([shrewd], Quadrant);
-let River = class River extends ViewedControl {
+let River = class River extends Control {
     constructor(sheet, edge) {
         super(sheet);
         this.edge = edge;
-        this.$design.$studio.$viewManager.$createView(this);
+        this.$design.$viewManager.$createView(this);
     }
     get $type() {
         return 'River';
@@ -7034,7 +7049,7 @@ let Sheet = Sheet_1 = class Sheet extends Mountable {
             y: 0
         };
         this._controlMaps = maps;
-        design.$studio.$viewManager.$createView(this);
+        design.$viewManager.$createView(this);
     }
     get $controls() {
         let result = [];
@@ -7060,7 +7075,7 @@ let Sheet = Sheet_1 = class Sheet extends Mountable {
             let d = v - this._independentRect.right;
             if (d < 0) {
                 for (let i of this.$independents) {
-                    MoveCommand.$create(i, {
+                    Draggable.$move(i, {
                         x: d,
                         y: 0
                     });
@@ -7077,7 +7092,7 @@ let Sheet = Sheet_1 = class Sheet extends Mountable {
             let d = v - this._independentRect.top;
             if (d < 0) {
                 for (let i of this.$independents) {
-                    MoveCommand.$create(i, {
+                    Draggable.$move(i, {
                         x: 0,
                         y: d
                     });
@@ -7137,14 +7152,15 @@ let Sheet = Sheet_1 = class Sheet extends Mountable {
         }
         this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
     }
-    get _viewedControls() {
-        return this.$controls.filter(c => this.$design.$studio.$viewManager.$get(c) instanceof LabeledView);
+    get _labeledControls() {
+        return this.$controls.filter(c => this.$design.$viewManager.$get(c) instanceof LabeledView);
     }
     _getMargin() {
         if (!this.$isActive || !this.$design.$isActive)
             return;
-        let controls = this._viewedControls;
-        let m = controls.length ? Math.max(...controls.map(c => c.$view.$overflow)) : 0;
+        let controls = this._labeledControls;
+        let vm = this.$design.$viewManager;
+        let m = !controls.length ? 0 : Math.max(...controls.map(c => vm.$get(c).$overflow));
         setTimeout(() => this.$margin = m, 0);
     }
     $clearSelection() {
@@ -7164,7 +7180,7 @@ __decorate([shrewd], Sheet.prototype, '$displayScale', null);
 __decorate([shrewd], Sheet.prototype, 'size', null);
 __decorate([unorderedArray], Sheet.prototype, '$independents', null);
 __decorate([shrewd], Sheet.prototype, '_getIndependentRect', null);
-__decorate([unorderedArray], Sheet.prototype, '_viewedControls', null);
+__decorate([unorderedArray], Sheet.prototype, '_labeledControls', null);
 __decorate([shrewd], Sheet.prototype, '$margin', void 0);
 __decorate([shrewd], Sheet.prototype, '_getMargin', null);
 __decorate([shrewd], Sheet.prototype, '$scroll', void 0);
@@ -7172,6 +7188,7 @@ Sheet = Sheet_1 = __decorate([shrewd], Sheet);
 var Vertex_1;
 let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
     constructor(sheet, node) {
+        var _a;
         super(sheet);
         this.height = 0;
         this.width = 0;
@@ -7185,8 +7202,8 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
             this.$isNew = Boolean(option.isNew);
             this.$selected = Boolean(option.selected);
         }
-        this.$design.$studio.$viewManager.$createView(this);
-        sheet.$design.$history.$construct(this.$toMemento());
+        sheet.$design.$viewManager.$createView(this);
+        (_a = sheet.$design.$history) === null || _a === void 0 ? void 0 : _a.$construct(this.$toMemento());
     }
     get $type() {
         return 'Vertex';
@@ -7198,7 +7215,8 @@ let Vertex = Vertex_1 = class Vertex extends IndependentDraggable {
         return super.$shouldDispose || this.$node.$disposed;
     }
     $onDispose() {
-        this.$design.$history.$destruct(this.$toMemento());
+        var _a;
+        (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$destruct(this.$toMemento());
         super.$onDispose();
     }
     get name() {
@@ -7351,13 +7369,14 @@ let Tree = Tree_1 = class Tree extends Disposable {
         return this.$edge.get(n1, n2);
     }
     $getOrAddNode(n) {
+        var _a;
         let N;
         if (this.$node.has(n)) {
             N = this.$node.get(n);
         } else {
             N = new TreeNode(this, n);
             this.$node.set(N.id, N);
-            EditCommand.$add(N);
+            (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$add(N);
             if (n >= this._nextId)
                 this._nextId = n + 1;
         }
@@ -7375,7 +7394,7 @@ let Tree = Tree_1 = class Tree extends Disposable {
         n2.$parentId = N.id;
         this._createEdge(N, n1, Math.ceil(e.length / 2));
         this._createEdge(N, n2, Math.max(Math.floor(e.length / 2), 1));
-        EditCommand.$remove(e);
+        this._remove(e);
         return N;
     }
     $deleteAndMerge(e) {
@@ -7393,22 +7412,22 @@ let Tree = Tree_1 = class Tree extends Disposable {
             ];
         }
         N.$parentId = (_a = n1.$parent) === null || _a === void 0 ? void 0 : _a.id;
-        EditCommand.$remove(e);
+        this._remove(e);
         for (let edge of a1) {
             let n = edge.n(n1);
             if (n != N.$parent)
                 n.$parentId = N.id;
-            EditCommand.$remove(edge);
+            this._remove(edge);
             this._createEdge(N, n, edge.length);
         }
         for (let edge of a2) {
             let n = edge.n(n2);
             n.$parentId = N.id;
-            EditCommand.$remove(edge);
+            this._remove(edge);
             this._createEdge(N, n, edge.length);
         }
-        EditCommand.$remove(n1);
-        EditCommand.$remove(n2);
+        this._remove(n1);
+        this._remove(n2);
         return N;
     }
     static $deleteAndJoin(n) {
@@ -7426,9 +7445,10 @@ let Tree = Tree_1 = class Tree extends Disposable {
             ];
         n2.$parentId = n1.id;
         let edge = n1.$tree._createEdge(n1, n2, e1.length + e2.length);
-        EditCommand.$remove(e1);
-        EditCommand.$remove(e2);
-        EditCommand.$remove(n);
+        let tree = n1.$tree;
+        tree._remove(e1);
+        tree._remove(e2);
+        tree._remove(n);
         return edge;
     }
     $addLeafAt(n, length) {
@@ -7459,9 +7479,10 @@ let Tree = Tree_1 = class Tree extends Disposable {
         return this._createEdge(N1, N2, length);
     }
     _createEdge(n1, n2, length) {
+        var _a;
         let e = new TreeEdge(n1, n2, length);
         this.$edge.set(n1, n2, e);
-        EditCommand.$add(e);
+        (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$add(e);
         return e;
     }
     $distTriple(n1, n2, n3) {
@@ -7474,6 +7495,11 @@ let Tree = Tree_1 = class Tree extends Disposable {
             d2: total - d13,
             d3: total - d12
         };
+    }
+    _remove(obj) {
+        var _a;
+        (_a = this.$design.$history) === null || _a === void 0 ? void 0 : _a.$remove(obj);
+        obj.$dispose(true);
     }
 };
 Tree.$MIN_NODES = 3;
@@ -7797,35 +7823,35 @@ class ViewManager {
     constructor() {
         this._viewMap = new WeakMap();
     }
-    $contains(object, point) {
-        let view = this._viewMap.get(object);
+    $contains(target, point) {
+        let view = this._viewMap.get(target);
         if (!view)
             return false;
         view.$draw();
         return view.$contains(point);
     }
-    $createView(object) {
+    $createView(target) {
         let view;
-        if (object instanceof Junction)
-            view = new JunctionView(object);
-        else if (object instanceof Flap)
-            view = new FlapView(object);
-        else if (object instanceof Edge)
-            view = new EdgeView(object);
-        else if (object instanceof Vertex)
-            view = new VertexView(object);
-        else if (object instanceof River)
-            view = new RiverView(object);
-        else if (object instanceof Device)
-            view = new DeviceView(object);
-        else if (object instanceof Sheet)
-            view = new SheetView(object);
+        if (target instanceof Junction)
+            view = new JunctionView(target);
+        else if (target instanceof Flap)
+            view = new FlapView(target);
+        else if (target instanceof Edge)
+            view = new EdgeView(target);
+        else if (target instanceof Vertex)
+            view = new VertexView(target);
+        else if (target instanceof River)
+            view = new RiverView(target);
+        else if (target instanceof Device)
+            view = new DeviceView(target);
+        else if (target instanceof Sheet)
+            view = new SheetView(target);
         if (view)
-            this._viewMap.set(object, view);
+            this._viewMap.set(target, view);
     }
-    $get(object) {
+    $get(target) {
         var _a;
-        return (_a = this._viewMap.get(object)) !== null && _a !== void 0 ? _a : null;
+        return (_a = this._viewMap.get(target)) !== null && _a !== void 0 ? _a : null;
     }
 }
 class ControlView extends View {
@@ -7938,7 +7964,7 @@ let JunctionView = class JunctionView extends View {
     $render() {
         this._shade.visible = this._junction.$status == JunctionStatus.tooClose;
         if (this._shade.visible) {
-            let vm = this._junction.$design.$studio.$viewManager;
+            let vm = this._junction.$design.$viewManager;
             let f1 = this._junction.f1, f2 = this._junction.f2;
             let v1 = vm.$get(f1), v2 = vm.$get(f2);
             let d = this._junction.$treeDistance - (f1.radius + f2.radius);
@@ -7965,7 +7991,7 @@ let RiverView = RiverView_1 = class RiverView extends ControlView {
         this.boundary = new paper.CompoundPath({});
     }
     $contains(point) {
-        let vm = this._control.$design.$studio.$viewManager;
+        let vm = this._control.$design.$viewManager;
         return vm.$contains(this._control.$sheet, point) && this._shade.contains(point);
     }
     get $info() {
@@ -7985,7 +8011,7 @@ let RiverView = RiverView_1 = class RiverView extends ControlView {
         }
         let inner = [];
         let design = this.$design;
-        let vm = design.$studio.$viewManager;
+        let vm = design.$viewManager;
         for (let e of adjacent) {
             if (e.$isRiver) {
                 let r = design.$rivers.get(e);
@@ -8162,7 +8188,7 @@ let FlapView = class FlapView extends LabeledView {
         this._component = new RiverHelperBase(this, flap);
     }
     $contains(point) {
-        let vm = this._control.$design.$studio.$viewManager;
+        let vm = this._control.$design.$viewManager;
         return vm.$contains(this._control.$sheet, point) && (this.hinge.contains(point) || this.hinge.hitTest(point) !== null);
     }
     get $circle() {
@@ -8270,7 +8296,7 @@ let EdgeView = class EdgeView extends LabeledView {
         this._lineRegion = new paper.Path.Line({ strokeWidth: 15 });
     }
     $contains(point) {
-        let vm = this._control.$design.$studio.$viewManager;
+        let vm = this._control.$design.$viewManager;
         return (this._lineRegion.hitTest(point) != null || this._glow.hitTest(point.transform(this._glow.layer.matrix.inverted())) != null) && !vm.$contains(this._control.$v1, point) && !vm.$contains(this._control.$v2, point);
     }
     $render() {
@@ -8346,7 +8372,7 @@ let VertexView = VertexView_1 = class VertexView extends LabeledView {
     $renderUnscaled() {
         let x = this._control.$location.x, y = this._control.$location.y;
         let design = this._control.$sheet.$design;
-        let vm = design.$studio.$viewManager;
+        let vm = design.$viewManager;
         let lines = this._control.$node.edges.map(e => {
             let edge = design.$edges.get(e);
             let edgeView = vm.$get(edge);
@@ -9439,7 +9465,7 @@ class Updater extends Animator {
         this.$updating = true;
         Shrewd.commit();
         let design = this._studio.$design;
-        if (design && !design.$dragging) {
+        if (design && !design.$dragging && design.$history) {
             design.$history.$flush(this._studio.$system.$selection.$items);
         }
         await PaperWorker.$done();
@@ -9469,6 +9495,9 @@ let Studio = class Studio extends StudioBase {
         this.$display = new Display(this);
         this.$system = new System(this);
         this.$updater = new Updater(this);
+    }
+    $historyManagerFactory(design, data) {
+        return new HistoryManager(design, data.history);
     }
     onDeprecate(title) {
         var _a, _b;
@@ -9500,12 +9529,12 @@ class MockDisplay {
     }
 }
 class MockViewManager {
-    $contains(object, point) {
+    $contains(target, point) {
         return false;
     }
-    $createView(object) {
+    $createView(target) {
     }
-    $get(object) {
+    $get(target) {
         return null;
     }
 }
@@ -9515,7 +9544,8 @@ let MockStudio = class MockStudio extends StudioBase {
         this.$display = new MockDisplay();
         this.$viewManager = new MockViewManager();
     }
-    onDeprecate(title) {
+    $historyManagerFactory(design, data) {
+        return null;
     }
 };
 MockStudio = __decorate([shrewd], MockStudio);

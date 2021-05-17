@@ -50,7 +50,7 @@ interface JHistory {
 		};
 	}
 
-	public $queue(command: Command): void {
+	private _enqueue(command: Command): void {
 		if(this._moving) return;
 		for(let q of this._queue) {
 			if(command.$canAddTo(q)) return command.$addTo(q);
@@ -66,6 +66,19 @@ interface JHistory {
 	public $destruct(memento: Memento): void {
 		if(this._moving) return;
 		this._destruct.push(memento);
+	}
+
+	public $move(target: Draggable, loc: IPoint, relative: boolean = true) {
+		let command = MoveCommand.$create(target, loc, relative);
+		this._enqueue(command);
+	}
+
+	public $add(target: TreeElement) {
+		this._enqueue(EditCommand.$add(target));
+	}
+
+	public $remove(target: TreeElement) {
+		this._enqueue(EditCommand.$remove(target));
 	}
 
 	/**
@@ -135,7 +148,7 @@ interface JHistory {
 		oldValue: unknown, newValue: unknown
 	): void {
 		if(this._moving) return;
-		FieldCommand.create(target, prop, oldValue, newValue);
+		this._enqueue(FieldCommand.create(target, prop, oldValue, newValue));
 	}
 
 	@shrewd public get $canUndo(): boolean {

@@ -116,7 +116,7 @@
 		} else {
 			N = new TreeNode(this, n);
 			this.$node.set(N.id, N);
-			EditCommand.$add(N);
+			this.$design.$history?.$add(N);
 			if(n >= this._nextId) this._nextId = n + 1;
 		}
 		return N;
@@ -130,7 +130,7 @@
 		n2.$parentId = N.id;
 		this._createEdge(N, n1, Math.ceil(e.length / 2));
 		this._createEdge(N, n2, Math.max(Math.floor(e.length / 2), 1));
-		EditCommand.$remove(e);
+		this.$remove(e);
 		return N;
 	}
 
@@ -143,22 +143,22 @@
 		}
 
 		N.$parentId = n1.$parent?.id;
-		EditCommand.$remove(e);
+		this.$remove(e);
 
 		for(let edge of a1) {
 			let n = edge.n(n1);
 			if(n != N.$parent) n.$parentId = N.id;
-			EditCommand.$remove(edge);
+			this.$remove(edge);
 			this._createEdge(N, n, edge.length);
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
 			n.$parentId = N.id;
-			EditCommand.$remove(edge);
+			this.$remove(edge);
 			this._createEdge(N, n, edge.length);
 		}
-		EditCommand.$remove(n1);
-		EditCommand.$remove(n2);
+		this.$remove(n1);
+		this.$remove(n2);
 		return N;
 	}
 
@@ -174,9 +174,10 @@
 
 		n2.$parentId = n1.id;
 		let edge = n1.$tree._createEdge(n1, n2, e1.length + e2.length);
-		EditCommand.$remove(e1);
-		EditCommand.$remove(e2);
-		EditCommand.$remove(n);
+		let tree = n1.$tree;
+		tree.$remove(e1);
+		tree.$remove(e2);
+		tree.$remove(n);
 		return edge;
 	}
 
@@ -215,7 +216,7 @@
 	private _createEdge(n1: TreeNode, n2: TreeNode, length: number) {
 		let e = new TreeEdge(n1, n2, length);
 		this.$edge.set(n1, n2, e);
-		EditCommand.$add(e);
+		this.$design.$history?.$add(e);
 		return e;
 	}
 
@@ -230,5 +231,10 @@
 			d2: total - d13,
 			d3: total - d12,
 		};
+	}
+
+	public $remove(obj: TreeElement) {
+		this.$design.$history?.$remove(obj);
+		obj.$dispose(true);
 	}
 }

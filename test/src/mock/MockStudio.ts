@@ -3,9 +3,11 @@
 
 @shrewd class MockStudio extends StudioBase {
 
-	public onDeprecate(title?: string) { /* */ }
-
 	public readonly $display: IDisplay = new MockDisplay();
 
 	public readonly $viewManager: IViewManager = new MockViewManager();
+
+	public $historyManagerFactory(design: Design, data: JDesign) {
+		return null;
+	}
 }

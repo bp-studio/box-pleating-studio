@@ -33,9 +33,9 @@ interface JVertex extends IPoint {
 			this.$selected = Boolean(option.selected);
 		}
 
-		this.$design.$viewManager.$createView(this);
+		sheet.$design.$viewManager.$createView(this);
 
-		sheet.$design.$history.$construct(this.$toMemento());
+		sheet.$design.$history?.$construct(this.$toMemento());
 	}
 
 	protected get $shouldDispose(): boolean {
@@ -43,7 +43,7 @@ interface JVertex extends IPoint {
 	}
 
 	protected $onDispose(): void {
-		this.$design.$history.$destruct(this.$toMemento());
+		this.$design.$history?.$destruct(this.$toMemento());
 		super.$onDispose();
 	}
 

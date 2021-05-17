@@ -13,14 +13,15 @@ interface JFieldCommand extends JCommand {
 
 class FieldCommand extends Command implements JFieldCommand {
 
-	public static create(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown) {
-		let command = new FieldCommand(target.$design, {
+	public static create(
+		target: ITagObject, prop: string, oldValue: unknown, newValue: unknown
+	): FieldCommand {
+		return new FieldCommand(target.$design, {
 			tag: target.$tag,
 			prop,
 			old: oldValue,
 			new: newValue,
 		});
-		target.$design.$history.$queue(command);
 	}
 
 	/** @exports */

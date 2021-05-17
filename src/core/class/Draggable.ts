@@ -7,7 +7,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Draggable extends ViewedControl {
+abstract class Draggable extends Control {
 
 	public abstract get $tag(): string;
 
@@ -39,7 +39,7 @@ abstract class Draggable extends ViewedControl {
 		if(by instanceof Point) by = by.sub(this._dragOffset);
 		else by = new Point(this.$location).add(by);
 		if(!by.eq(this.$location)) {
-			MoveCommand.$create(this, by.$toIPoint(), false);
+			Draggable.$move(this, by.$toIPoint(), false);
 			this.$onDragged();
 		}
 	}
@@ -74,7 +74,17 @@ abstract class Draggable extends ViewedControl {
 			y: Math.round(source.$location.y / ss.height * ts.height),
 		};
 
-		if(init) MoveCommand.$assign(target.$location, pt);
-		else MoveCommand.$create(target, pt, false);
+		if(init) Draggable.$assign(target.$location, pt);
+		else Draggable.$move(target, pt, false);
+	}
+
+	public static $move(target: Draggable, loc: IPoint, relative: boolean = true) {
+		target.$design.$history?.$move(target, loc, false);
+		Draggable.$assign(target.$location, loc);
+	}
+
+	public static $assign(target: IPoint, value: IPoint) {
+		target.x = value.x;
+		target.y = value.y;
 	}
 }

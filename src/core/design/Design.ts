@@ -57,7 +57,7 @@ interface IDesignObject {
 	public readonly $tree: Tree;
 
 	/** 管理 Design 的編輯歷史 */
-	public readonly $history: HistoryManager;
+	public readonly $history: HistoryManager | null;
 
 	constructor(studio: IStudio, design: RecursivePartial<JDesign>) {
 		super(studio);
@@ -82,7 +82,7 @@ interface IDesignObject {
 		this.description = data.description;
 		this.mode = data.mode;
 
-		this.$history = new HistoryManager(this, data.history);
+		this.$history = studio.$historyManagerFactory(this, data);
 
 		// Tree 相依於 HistoryManager
 		this.$tree = new Tree(this, data.tree.edges);
@@ -149,7 +149,7 @@ interface IDesignObject {
 					edges: this.$edges.$sort(),
 				},
 			};
-			if(session) result.history = this.$history.toJSON();
+			if(session) result.history = this.$history?.toJSON();
 		};
 		if(session) action();
 		else this.$tree.withJID(action);

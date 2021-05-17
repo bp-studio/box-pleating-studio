@@ -2,7 +2,7 @@
 /// <reference path="Command.ts" />
 /// <reference path="Types.ts" />
 /// <reference path="Step.ts" />
-/// <reference path="History.ts" />
+/// <reference path="HistoryManager.ts" />
 
 // Level 1
 /// <reference path="EditCommand.ts" />

@@ -49,7 +49,7 @@ namespace Migration {
 		// 差別包括多了 history（不存檔）、棄用 fullscreen、scale 改成 zoom（不存檔）
 		if(design.version == "0") design.version = "0.4";
 
-		if(deprecate) studio.onDeprecate(design.title);
+		if(deprecate && studio.onDeprecate) studio.onDeprecate(design.title);
 		return design as JDesign;
 	}
 

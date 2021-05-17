@@ -1,35 +1,35 @@
 
 interface IViewManager {
-	$contains(object: object, point: paper.Point): boolean;
-	$createView(object: object): void;
-	$get(object: object): View | null;
+	$contains(target: Mountable, point: paper.Point): boolean;
+	$createView(target: Mountable): void;
+	$get(target: Mountable): View | null;
 }
 
 class ViewManager implements IViewManager {
 
-	private _viewMap: WeakMap<object, View> = new WeakMap();
+	private _viewMap: WeakMap<Mountable, View> = new WeakMap();
 
-	public $contains(object: object, point: paper.Point): boolean {
-		let view = this._viewMap.get(object);
+	public $contains(target: Mountable, point: paper.Point): boolean {
+		let view = this._viewMap.get(target);
 		if(!view) return false;
 		view.$draw();
 		return view.$contains(point);
 	}
 
-	public $createView(object: object) {
+	public $createView(target: Mountable) {
 		let view: View | undefined;
-		if(object instanceof Junction) view = new JunctionView(object);
-		else if(object instanceof Flap) view = new FlapView(object);
-		else if(object instanceof Edge) view = new EdgeView(object);
-		else if(object instanceof Vertex) view = new VertexView(object);
-		else if(object instanceof River) view = new RiverView(object);
-		else if(object instanceof Device) view = new DeviceView(object);
-		else if(object instanceof Sheet) view = new SheetView(object);
+		if(target instanceof Junction) view = new JunctionView(target);
+		else if(target instanceof Flap) view = new FlapView(target);
+		else if(target instanceof Edge) view = new EdgeView(target);
+		else if(target instanceof Vertex) view = new VertexView(target);
+		else if(target instanceof River) view = new RiverView(target);
+		else if(target instanceof Device) view = new DeviceView(target);
+		else if(target instanceof Sheet) view = new SheetView(target);
 
-		if(view) this._viewMap.set(object, view);
+		if(view) this._viewMap.set(target, view);
 	}
 
-	public $get(object: object) {
-		return this._viewMap.get(object) ?? null;
+	public $get(target: Mountable) {
+		return this._viewMap.get(target) ?? null;
 	}
 }

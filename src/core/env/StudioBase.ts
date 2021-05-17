@@ -1,11 +1,14 @@
 
 interface IStudio {
-	onDeprecate: TitleCallback;
+	onDeprecate?: TitleCallback;
 	readonly $display: IDisplay;
 	readonly $viewManager: IViewManager;
+	$historyManagerFactory: HistoryManagerFactory
 }
 
 type TitleCallback = (title?: string) => void
+
+type HistoryManagerFactory = (design: Design, data: JDesign) => HistoryManager | null;
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -24,7 +27,7 @@ abstract class StudioBase implements IStudio {
 
 	public abstract readonly $viewManager: IViewManager;
 
-	public abstract onDeprecate(title?: string): void;
+	public abstract $historyManagerFactory(design: Design, data: JDesign): HistoryManager | null;
 
 	public $load(json: string | object): Design {
 		if(typeof json == "string") json = JSON.parse(json);

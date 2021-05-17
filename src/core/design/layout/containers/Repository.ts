@@ -62,7 +62,7 @@ interface JRepository {
 			// 但是一方面記錄下來確實在歷史移動的時候會加速、
 			// 另一方面也是考慮到可能未來會隨著版本改變而算出不同的東西，
 			// 此時如果沒有 100% 留下正確的 Memento，歷史移動方面就可能會有瑕疵。
-			this.$design.$history.$construct(this.$toMemento());
+			this.$design.$history?.$construct(this.$toMemento());
 		}
 	}
 
@@ -73,7 +73,7 @@ interface JRepository {
 	}
 
 	protected $onDispose() {
-		if(this._everActive) this.$design.$history.$destruct(this.$toMemento());
+		if(this._everActive) this.$design.$history?.$destruct(this.$toMemento());
 		super.$onDispose();
 	}
 

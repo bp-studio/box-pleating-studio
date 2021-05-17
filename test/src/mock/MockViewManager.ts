@@ -1,11 +1,14 @@
 
 class MockViewManager implements IViewManager {
-	$contains(object: object, point: paper.Point): boolean {
+	$contains(target: Mountable, point: paper.Point): boolean {
 		return false;
 	}
-	$createView(object: object): void { /* */ }
 
-	$get(object: object): View | null {
+	$createView(target: Mountable): void {
+		// 不作任何動作
+	}
+
+	$get(target: Mountable): View | null {
 		return null;
 	}
 }

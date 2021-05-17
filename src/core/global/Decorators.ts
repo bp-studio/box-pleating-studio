@@ -146,7 +146,7 @@ function actionInner(target: object, name: string, option: ActionOption) {
 			let result = option.validator?.apply(this, [v]) ?? true;
 			if(result) {
 				if(name in record && record[name] != v) {
-					this.$design.$history.$fieldChange(this, name, record[name], v);
+					this.$design.$history?.$fieldChange(this, name, record[name], v);
 				}
 				record[name] = v;
 			}

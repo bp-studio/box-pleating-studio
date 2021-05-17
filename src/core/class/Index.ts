@@ -19,10 +19,8 @@
 /// <reference path="Control.ts" />
 
 // Level 5
-/// <reference path="ViewedControl.ts" />
-
-// Level 6
 /// <reference path="Draggable.ts" />
 
-// Level 7
+// Level 6
 /// <reference path="IndependentDraggable.ts" />
+

@@ -34,9 +34,9 @@ interface JNode {
 
 	public $delete() {
 		let e = this.edges[0];
-		EditCommand.$remove(e);
+		this.$tree.$remove(e);
 		if(this.$parentId === undefined) e.n(this).$parentId = undefined;
-		EditCommand.$remove(this);
+		this.$tree.$remove(this);
 	}
 
 	@action public $parentId?: number;
