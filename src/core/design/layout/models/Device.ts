@@ -21,7 +21,6 @@ type GDevice = JDevice<Gadget>;
 	public readonly $pattern: Pattern;
 	public readonly $gadgets: readonly Gadget[];
 	public readonly $addOns: readonly AddOn[];
-	public readonly $view: DeviceView;
 	public readonly $partition: Partition;
 
 	constructor(pattern: Pattern, partition: Partition, data: JDevice) {
@@ -34,7 +33,7 @@ type GDevice = JDevice<Gadget>;
 		this.$addOns = data.addOns?.map(a => AddOn.$instantiate(a)) ?? [];
 		let offset = data.offset ?? 0;
 		this.$location = { x: offset * fx, y: offset * fy };
-		this.$view = new DeviceView(this);
+		this.$design.$viewManager.$createView(this);
 	}
 
 	public toJSON(): JDevice {

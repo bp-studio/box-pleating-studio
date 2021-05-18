@@ -1,7 +1,0 @@
-{
-	"ecma": 2019,
-	"compress": {
-		"drop_console": false,
-		"drop_debugger": false
-	}
-}

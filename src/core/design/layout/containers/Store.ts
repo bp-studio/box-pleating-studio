@@ -93,9 +93,7 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 	 * @exports
 	 */
 	@shrewd public get entry(): T | null {
-		let e = this._prototypes, i = this.index;
-		if(e.length == 0) return null;
-		return this._entries[i] = this._entries[i] || this.$builder(e[i]);
+		return this.$get(this.index) ?? null;
 	}
 
 	/**
@@ -104,8 +102,8 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 	 * @exports
 	 */
 	public move(by: number = 1): void {
-		let from = this.index, l = this._prototypes.length;
-		this.index = (this.index + by + l) % l; // 加上 l 是為了避免 JavaScript 在負數的部份餘數取成負的
+		let l = this._prototypes.length;
+		this.index = (this.index + by % l + l) % l; // 加上 l 是為了避免 JavaScript 在負數的部份餘數取成負的
 		this.$onMove();
 	}
 
@@ -122,8 +120,11 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 		return this._entries.indexOf(entry);
 	}
 
-	public $get(index: number): T | undefined {
-		return this._entries[index];
+	public $get(i: number): T | undefined {
+		let e = this._prototypes;
+		if(e.length == 0) return undefined;
+		i %= e.length;
+		return this._entries[i] = this._entries[i] || this.$builder(e[i]);
 	}
 
 	/** 給 `Store` 的實作類別註冊 entry 切換之後要發生的事情 */

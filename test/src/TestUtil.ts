@@ -74,4 +74,5 @@ TestUtil.run([
 	TreeBasic,
 	DoubleMapBasic,
 	DoubleMapReact,
+	PatternTest,
 ]);

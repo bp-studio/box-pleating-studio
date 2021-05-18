@@ -62,7 +62,7 @@ class Trace {
 		let isInLeadMode = Boolean(this._startLine);
 		let shooting = this.lineShooting(node);
 
-		if(debugEnabled && debug) {
+		if(DEBUG_ENABLED && debug) {
 			console.log("StartPt: " + startPt.toString());
 			console.log("Start: " + this._startLine?.toString());
 			console.log("Inflections: ", [...this._inflections].toString());
@@ -146,7 +146,7 @@ class Trace {
 					!Trace._isSideTouchable(line, point, vector, f, angle)
 				) continue;
 
-				if(debugEnabled && debug) {
+				if(DEBUG_ENABLED && debug) {
 					console.log([JSON.stringify(intersection), line.toString()]);
 				}
 				if(Trace._intersectionCloser(intersection, currentIntersection, f)) {
@@ -186,7 +186,7 @@ class Trace {
 			point: pt,
 		};
 
-		if(debugEnabled && debug) {
+		if(DEBUG_ENABLED && debug) {
 			console.log([
 				pt.toString(), line.toString(),
 				result.vector.toString(), line.$vector.toString(),

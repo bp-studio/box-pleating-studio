@@ -3,7 +3,7 @@ module.exports = {
 		{
 			root: './src/app',
 			package: '../../package.json',
-			tsconfig: './tsconfig.json'
-		}
-	]
-}
+			tsconfig: './tsconfig.json',
+		},
+	],
+};

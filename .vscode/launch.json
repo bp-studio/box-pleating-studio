@@ -20,7 +20,7 @@
 			"name": "Launch Test",
 			"preLaunchTask": "Gulp buildTest",
 			"console": "integratedTerminal",
-			"program": "${workspaceFolder}/test/dist/test.js",
+			"program": "${workspaceFolder}/test/build/test.js",
 			"sourceMaps": true,
 		}
 	]

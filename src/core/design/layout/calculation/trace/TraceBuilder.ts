@@ -27,7 +27,7 @@ class TraceBuilder {
 		this._startVector = quadrant.pv;
 		this._junctions = junctions;
 
-		if(debugEnabled && debug) {
+		if(DEBUG_ENABLED && debug) {
 			console.log(this._lines.map(l => l.toString()));
 		}
 	}

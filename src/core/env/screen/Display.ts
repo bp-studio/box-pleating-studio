@@ -37,8 +37,6 @@ interface DisplaySetting {
 
 	private readonly _project: paper.Project;
 
-	private _canvas: HTMLCanvasElement;
-
 	@shrewd public $settings: DisplaySetting = {
 		showAxialParallel: true,
 		showGrid: true,
@@ -53,13 +51,13 @@ interface DisplaySetting {
 		super(studio);
 
 		// 產生 <canvas>
-		this._canvas = document.createElement("canvas");
-		this._el.appendChild(this._canvas);
+		const canvas = document.createElement("canvas");
+		this._el.appendChild(canvas);
 
 		this.$rasterizer = new Rasterizer(this, this._createImg());
 
 		// 初始化 paper.js 設定
-		studio.$paper.setup(this._canvas);
+		studio.$paper.setup(canvas);
 		studio.$paper.settings.insertItems = false;
 		this._project = studio.$paper.project;
 		this._project.view.autoUpdate = false;
@@ -130,21 +128,6 @@ interface DisplaySetting {
 		this._project.layers[Layer.$axisParallels].visible = this.$settings.showAxialParallel;
 		this._project.layers[Layer.$label].visible = this.$settings.showLabel;
 		this._project.layers[Layer.$dot].visible = this.$settings.showDot || notLayout;
-	}
-
-	@shrewd public get $isXScrollable(): boolean {
-		return this._imgWidth > this._viewWidth + 1; // 加 1 以避免浮點數誤觸
-	}
-
-	@shrewd public get $isYScrollable(): boolean {
-		return this._imgHeight > this._viewHeight + 1; // 加 1 以避免浮點數誤觸
-	}
-
-	/** 設置捲軸的顯示與否、並且傳回當前是否可捲動 */
-	@shrewd public $isScrollable(): boolean {
-		this._studio.$el.classList.toggle("scroll-x", this.$isXScrollable);
-		this._studio.$el.classList.toggle("scroll-y", this.$isYScrollable);
-		return this.$isXScrollable || this.$isYScrollable;
 	}
 
 	@shrewd public $render() {

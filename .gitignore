@@ -2,7 +2,7 @@
 # These files are built from source
 /dist
 /debug
-/test/dist
+/test/build
 
 # You don't really think I'll leave sensitive info in the repo, do you?
 /.vscode/*ftp*

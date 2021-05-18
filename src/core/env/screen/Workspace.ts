@@ -28,21 +28,24 @@ abstract class Workspace extends SheetImage {
 		offset = this._offset;
 		scale = this.$scale;
 
-		this.$scrollTo(
+		this._scrollTo(
 			sheet.$scroll.x + cx * scale + offset.x - center.x,
 			sheet.$scroll.y + offset.y - cy * scale - center.y
 		);
 	}
 
-	public $scrollTo(x: number, y: number) {
-		let w = this._scrollWidth - this._viewWidth;
-		let h = this._scrollHeight - this._viewHeight;
-		if(x < 0) x = 0;
-		if(y < 0) y = 0;
-		if(x > w) x = w;
-		if(y > h) y = h;
-		this._scroll.x = Math.round(x);
-		this._scroll.y = Math.round(y);
+	public $scrollBy(design: Design, diff: Vector) {
+		let { x, y } = design.sheet.$scroll;
+		if(this._isXScrollable) x -= diff.x;
+		if(this._isYScrollable) y -= diff.y;
+		this._scrollTo(x, y);
+	}
+
+	/** 設置捲軸的顯示與否、並且傳回當前是否可捲動 */
+	@shrewd public $isScrollable(): boolean {
+		this._studio.$el.classList.toggle("scroll-x", this._isXScrollable);
+		this._studio.$el.classList.toggle("scroll-y", this._isYScrollable);
+		return this._isXScrollable || this._isYScrollable;
 	}
 
 	/** 傳回全部（包括超出視界範圍的）要輸出的範圍 */
@@ -80,9 +83,28 @@ abstract class Workspace extends SheetImage {
 		return this._design?.sheet.$scroll ?? { x: 0, y: 0 };
 	}
 
+	private _scrollTo(x: number, y: number) {
+		let w = this._scrollWidth - this._viewWidth;
+		let h = this._scrollHeight - this._viewHeight;
+		if(x < 0) x = 0;
+		if(y < 0) y = 0;
+		if(x > w) x = w;
+		if(y > h) y = h;
+		this._scroll.x = Math.round(x);
+		this._scroll.y = Math.round(y);
+	}
+
 	/** 全部的捲動寬度 */
 	@shrewd private get _scrollWidth() { return Math.max(this._imgWidth, this._viewWidth); }
 
 	/** 全部的捲動高度 */
 	@shrewd private get _scrollHeight() { return Math.max(this._imgHeight, this._viewHeight); }
+
+	@shrewd private get _isXScrollable(): boolean {
+		return this._imgWidth > this._viewWidth + 1; // 加 1 以避免浮點數誤觸
+	}
+
+	@shrewd private get _isYScrollable(): boolean {
+		return this._imgHeight > this._viewHeight + 1; // 加 1 以避免浮點數誤觸
+	}
 }

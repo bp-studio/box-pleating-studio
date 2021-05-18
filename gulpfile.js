@@ -34,8 +34,8 @@ gulp.task('deployPub', () => seriesIf(
 		let answers = await inquirer.prompt([{
 			type: 'confirm',
 			message: '請記得在發布之前更新版本號、加入更新 log、並適度修改 README.md。確定發布到正式版？',
-			name: 'ok'
-		}])
+			name: 'ok',
+		}]);
 		return answers.ok;
 	},
 	'build',

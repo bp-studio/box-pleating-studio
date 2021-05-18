@@ -56,14 +56,6 @@ class ScrollController {
 		}
 	}
 
-	public $process(diff: Vector) {
-		let display = this._studio.$display;
-		let { x, y } = this._studio.$design!.sheet.$scroll;
-		if(display.$isXScrollable) x -= diff.x;
-		if(display.$isYScrollable) y -= diff.y;
-		display.$scrollTo(x, y);
-	}
-
 	public to(x: number, y: number) {
 		this._scrollLock = true;
 		this._studio.$el.scrollTo(x, y);
@@ -89,7 +81,7 @@ class ScrollController {
 		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留
 		if(this._scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			let diff = CursorController.$diff(event);
-			this.$process(diff);
+			this._studio.$display.$scrollBy(this._studio.$design, diff);
 			if(System.$isTouch(event)) this._studio.$system.$zoom.$process(event);
 		}
 	}

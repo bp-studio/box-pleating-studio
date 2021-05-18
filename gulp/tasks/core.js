@@ -11,25 +11,20 @@ let projCoreDev = ts.createProject(coreConfig);
 let projCorePub = ts.createProject(coreConfig);
 let projTest = ts.createProject('test/tsconfig.json');
 
-let terserOption = require('../terser.json');
-
-function createTemplate(debugEnabled) {
-	return `
-		(function(root, factory){
-			if(typeof define === 'function' && define.amd) {
-				define([],factory);
-			} else if(typeof exports === 'object') {
-				module.exports = factory();
-			} else {
-				root.BPStudio = factory();
-			}
-		}(this, function(){
-			const debugEnabled = ${debugEnabled};
-			%= body %
-			return BPStudio;
-		}));
-	`;
-}
+const template = `
+	(function(root, factory){
+		if(typeof define === 'function' && define.amd) {
+			define([],factory);
+		} else if(typeof exports === 'object') {
+			module.exports = factory();
+		} else {
+			root.BPStudio = factory();
+		}
+	}(this, function(){
+		%= body %
+		return BPStudio;
+	}));
+`;
 
 gulp.task('coreDev', () =>
 	projCoreDev.src()
@@ -39,7 +34,19 @@ gulp.task('coreDev', () =>
 		}))
 		.pipe(sourcemaps.init())
 		.pipe(projCoreDev())
-		.pipe(wrap(createTemplate(true)))
+		.pipe(wrap(template))
+		.pipe(terser({
+			ecma: 2019,
+			compress: {
+				defaults: false,
+				drop_debugger: false,
+				global_defs: {
+					DEBUG_ENABLED: true,
+				},
+			},
+			mangle: false,
+			format: { beautify: true },
+		}))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
 		.pipe(gulp.dest('debug'))
 );
@@ -51,11 +58,18 @@ gulp.task('corePub', () =>
 			extra: [__filename, coreConfig],
 		}))
 		.pipe(projCorePub())
-		.pipe(wrap(createTemplate(false))) // string will all use '' after this step
+		.pipe(wrap(template)) // string will all use '' after this step
 		.pipe(replace(/('[$_][a-z0-9]+')/gi, '$$$$$$$$[$1]')) // Prepare decorator mangling
-		.pipe(terser(Object.assign({}, terserOption, {
+		.pipe(terser({
+			ecma: 2019,
+			compress: {
+				drop_debugger: false,
+				global_defs: {
+					DEBUG_ENABLED: false,
+				},
+			},
 			mangle: { properties: { regex: /^[$_]/ } },
-		})))
+		}))
 		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest('dist'))
 );
@@ -68,5 +82,5 @@ gulp.task('buildTest', () =>
 		.pipe(projTest())
 		.pipe(wrap("let Shrewd=require('../../public/lib/shrewd.min.js');%= body %"))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../' }))
-		.pipe(gulp.dest('test/dist'))
+		.pipe(gulp.dest('test/build'))
 );

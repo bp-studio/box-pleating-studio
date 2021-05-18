@@ -11,12 +11,15 @@ let i18n = require('../plugins/i18n');
 let order = require('../plugins/order');
 let vue = require('../plugins/vue');
 
-let terserOption = require('../terser.json');
-
 let jsPipe = lazypipe()
 	.pipe(() => wrap("if(!err&&!wErr) { %= body % }"))
 	.pipe(() => gulp.dest('debug/'))
-	.pipe(() => terser(terserOption));
+	.pipe(() => terser({
+		ecma: 2019,
+		compress: {
+			drop_debugger: false,
+		},
+	}));
 
 gulp.task('app', () =>
 	gulp.src([
