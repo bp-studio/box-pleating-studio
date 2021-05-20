@@ -1,5 +1,6 @@
 /// <reference path="Configurator.ts" />
 /// <reference path="ConfigUtil.ts" />
+/// <reference path="GOPS.ts" />
 /// <reference path="Kamiya.ts" />
 /// <reference path="trace/Trace.ts" />
 /// <reference path="trace/TraceBuilder.ts" />

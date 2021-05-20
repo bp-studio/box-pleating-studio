@@ -146,13 +146,6 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		return this.ox + this.u + this.v;
 	}
 
-	/** 計算一個 Piece 的 rank，數字越小越好 */
-	@onDemand public get $rank() {
-		let r1 = MathUtil.$reduce(this.oy + this.v, this.oy)[0];
-		let r2 = MathUtil.$reduce(this.ox + this.u, this.ox)[0];
-		return Math.max(r1, r2);
-	}
-
 	/** 在指定的 SCR 之下反轉自己 */
 	public $reverse(tx: number, ty: number) {
 		let { shift, detours, sx, sy } = this;
@@ -216,34 +209,6 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// 靜態方法
 	//////////////////////////////////////////////////////////////////////////////////////////
-
-	/** 基礎的整數 GOPS 搜尋 */
-	public static *$gops(overlap: Readonly<JOverlap>, sx?: number): Generator<JPiece> {
-		let { ox, oy } = overlap;
-		if([ox, oy].some(n => !Number.isSafeInteger(n))) return;
-		if(ox % 2 && oy % 2) return;
-		if(sx === undefined) sx = Number.POSITIVE_INFINITY;
-		let ha = ox * oy / 2; // half area of the overlap rectangle
-		for(
-			let u = Math.floor(Math.sqrt(ha)), v: number;	// 從靠近根號 ha 的數開始搜尋
-			u > 0 && u + (v = ha / u) + oy <= sx;			// 必須滿足 u + v + oy <= sx 的關係式，不然塞不下
-			u--												// 反向往下搜尋，會盡量優先傳回效率最高的
-		) {
-			if(ha % u == 0) {
-				if(u == v) yield { ox, oy, u, v };
-				if(u != v) {
-					let p1 = new Piece({ ox, oy, u, v });
-					let p2 = new Piece({ ox, oy, u: v, v: u });
-					let r1 = p1.$rank, r2 = p2.$rank;
-					if(r1 > r2) {
-						yield p2; yield p1;
-					} else {
-						yield p1; yield p2;
-					}
-				}
-			}
-		}
-	}
 
 	/** 把一個 JPiece 實體化成 Piece；如果已經實體化過，直接傳回（除非設置 alwaysNew） */
 	public static $instantiate(p: JPiece, alwaysNew = false): Piece {

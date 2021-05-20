@@ -38,7 +38,7 @@ class Joiner {
 		[this.g1, this.g2] = overlaps.map(o => {
 			let j = repo.$structure[o.parent];
 			junctions.push(j);
-			return Array.from(Piece.$gops(o, j.sx));
+			return Array.from(GOPS.$generate(o.ox, o.oy, j.sx));
 		});
 		let [j1, j2] = junctions;
 		this.$oriented = j1.c[0].e == j2.c[0].e;

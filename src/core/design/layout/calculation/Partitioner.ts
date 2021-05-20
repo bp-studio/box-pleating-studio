@@ -43,7 +43,7 @@ class Partitioner extends Disposable {
 			} if(strategy == Strategy.$universal) {
 				for(let g of Partitioner._universalGPS(o, j.sx)) yield { gadgets: [g] };
 			} else {
-				for(let p of Piece.$gops(o, j.sx)) yield { gadgets: [{ pieces: [p] }] };
+				for(let p of GOPS.$generate(o.ox, o.oy, j.sx)) yield { gadgets: [{ pieces: [p] }] };
 			}
 		}
 		if(this.$overlaps.length == 2) {
@@ -64,7 +64,7 @@ class Partitioner extends Disposable {
 		while(!found) {
 			let bigO = clone(o);
 			bigO.ox *= d; bigO.oy *= d;
-			for(let p of Piece.$gops(bigO, sx * d)) {
+			for(let p of GOPS.$generate(bigO.ox, bigO.oy, sx * d)) {
 				let p1 = Piece.$instantiate(p).$shrink(d);
 				if(!Number.isInteger(p1.v)) continue;
 				let { ox, oy, u, v } = p1;

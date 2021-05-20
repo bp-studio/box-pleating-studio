@@ -108,9 +108,13 @@
 		"generator-star-spacing": [
 			"warn",
 			{
-				"before": true,
-				"after": false,
-				"anonymous": "neither"
+				"before": false,
+				"after": true,
+				"anonymous": "neither",
+				"method": {
+					"before": true,
+					"after": false
+				}
 			}
 		],
 		"grouped-accessor-pairs": "warn",

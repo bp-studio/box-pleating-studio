@@ -14,12 +14,16 @@ function PatternTest() {
 	let configuration = stretch.$repository!.$get(0)!;
 	console.assert(configuration.size == 12, "依照現有的演算法應該要找到這麼多的 Pattern");
 
-	// 必須確實移動 Configuration 的選定 Entry，如此一來 Pattern 才會是 active、才會傳回 linesForTracing
 	configuration.move(-1);
 	let pattern = configuration.entry!;
 
-	let test = pattern.$linesForTracing[1].map(l => l.toString()).join(";");
-	let expect = '(0, 27),(1, 25);(1, 25),(8, 21);(26, 15),(8, 21);(24, 19),(26, 15);(0, 27),(24, 19);(10, 4),(15, 2);(15, 2),(27/4, 85/4);(1, 25),(27/4, 85/4);(1, 25),(10, 4);(27/4, 85/4),(8, 21);(-3, 46),(24, 19);(-17, 31),(10, 4);(24, 4),(27/4, 85/4);(-27, 54),(0, 27);(26, 15),(26, 15);(15, 2),(15, 2)';
+	console.assert(pattern.$devices.length == 1, "有一個 Device");
 
-	console.assert(test == expect, "算出來的線條符合已知結果");
+	let device = pattern.$devices[0];
+
+	let ridges = '(0, 27),(1, 25);(0, 27),(24, 19);(1, 25),(10, 4);(1, 25),(27/4, 85/4);(1, 25),(8, 21);(10, 4),(15, 2);(15, 2),(27/4, 85/4);(24, 19),(26, 15);(26, 15),(8, 21);(27/4, 85/4),(8, 21)';
+	let outerRidges = '(0, 27),(0, 27);(12, 16),(27/4, 85/4);(15, 2),(15, 2);(26, 15),(26, 15)';
+
+	console.assert(LineUtil.signature(device.$ridges) == ridges, "檢查脊線");
+	console.assert(LineUtil.signature(device.$outerRidges) == outerRidges, "檢查外連脊線");
 }

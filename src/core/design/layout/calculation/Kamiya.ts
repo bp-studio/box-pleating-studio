@@ -5,13 +5,13 @@ namespace Kamiya {
 	const SLACK = 0.5;
 
 	/** 搜尋兩側都是以神谷模式構成的半整數 `Gadget` */
-	export function *_halfIntegral(o: JOverlap, sx: number): Generator<JGadget> {
+	export function* _halfIntegral(o: JOverlap, sx: number): Generator<JGadget> {
 		if(o.ox % 2 == 0 || o.oy % 2 == 0) return;
 		let doubleO = clone(o);
 		doubleO.ox <<= 1; doubleO.oy <<= 1;
-		for(let p of Piece.$gops(doubleO, sx * 2)) {
+		for(let p of GOPS.$generate(doubleO.ox, doubleO.oy, sx * 2)) {
+			if(GOPS.$rank(p) > SLOPE) continue; // 神谷模式的 Rank 為 3
 			let p1 = Piece.$instantiate(p);
-			if(p1.$rank > SLOPE) continue; // 神谷模式的 Rank 為 3
 			let v_even = p1.v % 2 == 0; // 此時原始的 u,v 一定恰有一個是偶數
 			if(p1.ox == p1.oy && v_even) continue; // ox==oy 的情況只需要取一次
 
