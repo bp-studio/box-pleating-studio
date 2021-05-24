@@ -37,7 +37,7 @@ abstract class StudioBase implements IStudio {
 
 	public $create(json: Pseudo<JDesign>): Design {
 		json = Object.assign({
-			version: Migration.$current,
+			version: Migration.$getCurrentVersion(),
 			tree: {
 				nodes: [
 					{ id: 0, name: "", x: 10, y: 10 },

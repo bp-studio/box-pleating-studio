@@ -2,7 +2,11 @@
 interface JSheet {
 	width: number;
 	height: number;
+
+	/** Current zooming. @session */
 	zoom?: number;
+
+	/** Current scrolling position. @session */
 	scroll?: IPoint;
 }
 

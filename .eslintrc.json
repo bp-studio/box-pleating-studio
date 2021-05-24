@@ -132,7 +132,8 @@
 				"VariableDeclarator": 1,
 				"CallExpression": {
 					"arguments": 1
-				}
+				},
+				"flatTernaryExpressions": true
 			}
 		],
 		"init-declarations": "off",

@@ -1,9 +1,9 @@
 /// <reference path="command/Index.ts" />
 /// <reference path="containers/Index.ts" />
 /// <reference path="layout/Index.ts" />
+/// <reference path="updates/Index.ts" />
 
 /// <reference path="Design.ts" />
-/// <reference path="Migration.ts" />
 /// <reference path="OptionManager.ts" />
 /// <reference path="components/Edge.ts" />
 /// <reference path="components/Flap.ts" />

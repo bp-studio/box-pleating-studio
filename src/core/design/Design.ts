@@ -1,22 +1,45 @@
 
-interface JLayout {
-	sheet: JSheet,
-	flaps: JFlap[],
-	stretches: JStretch[]
-}
-
+/**
+ * "J" stands for JSON, and `JDesign` is the saving format of a Design (a.k.a. "Project").
+ *
+ * Being JSON format, it's easy to incorporate any Unicode characters.
+ *
+ * Entries marked with @session implies that it is for session only, and will not be included in the .bps file.
+ */
 interface JDesign {
+
+	/** Title of the design */
 	title: string;
+
+	/** Design description */
 	description?: string;
-	version: string,
-	mode: string;
+
+	/** File format version. @see Migration.$current for the latest version. */
+	version: string;
+
+	/** The current view of the design. */
+	mode: DesignMode;
+
+	/** Editing history. @session */
 	history?: JHistory;
+
+	/** Layout view; @see JLayout for details. */
 	layout: JLayout;
+
+	/** Tree view */
 	tree: {
 		sheet: JSheet,
 		nodes: JVertex[],
 		edges: JEdge[]
 	};
+}
+
+type DesignMode = "layout" | "tree";
+
+interface JLayout {
+	sheet: JSheet,
+	flaps: JFlap[],
+	stretches: JStretch[]
 }
 
 interface IDesignObject {
@@ -32,7 +55,7 @@ interface IDesignObject {
 @shrewd class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
 
 	/** @exports */
-	@shrewd public mode: string;
+	@shrewd public mode: DesignMode;
 
 	/** @exports */
 	@action public description?: string;
@@ -136,7 +159,7 @@ interface IDesignObject {
 			result = {
 				title: this.title,
 				description: this.description,
-				version: Migration.$current,
+				version: Migration.$getCurrentVersion(),
 				mode: this.mode,
 				layout: {
 					sheet: this.$LayoutSheet.toJSON(session),

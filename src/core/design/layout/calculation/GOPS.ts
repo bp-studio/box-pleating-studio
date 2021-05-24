@@ -1,28 +1,28 @@
 
-interface JPieceCache {
+interface JPieceMemo {
 	p: JPiece
 	sx: number
 }
 
 //////////////////////////////////////////////////////////////////
 /**
- * `GOPS` 靜態類別負責計算並且快取 GOPS Piece 的組合。
+ * `GOPS` 靜態類別負責計算並且記憶 GOPS Piece 的組合。
  */
 //////////////////////////////////////////////////////////////////
 
 namespace GOPS {
 
-	/** 計算結果的快取 */
-	const cache = new Map<string, readonly JPieceCache[]>();
+	/** 計算結果的記憶 */
+	const Memo = new Map<string, readonly JPieceMemo[]>();
 
 	/** 基礎的整數 GOPS 搜尋 */
 	export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiece> {
 		if(ox % 2 && oy % 2) return;
 		if(sx === undefined) sx = Number.POSITIVE_INFINITY;
 
-		let array = getOrCreateCache(ox, oy);
-		for(let c of array) {
-			if(c.sx <= sx) yield c.p;
+		let memo = getOrCreateMemo(ox, oy);
+		for(let m of memo) {
+			if(m.sx <= sx) yield m.p;
 			else break;
 		}
 	}
@@ -34,13 +34,13 @@ namespace GOPS {
 		return Math.max(r1, r2);
 	}
 
-	function getOrCreateCache(ox: number, oy: number): readonly JPieceCache[] {
+	function getOrCreateMemo(ox: number, oy: number): readonly JPieceMemo[] {
 		let key = ox + "," + oy;
-		let c = cache.get(key);
-		if(c) return c;
+		let m = Memo.get(key);
+		if(m) return m;
 
 		let ha = ox * oy / 2; // half area of the overlap rectangle
-		let array: JPieceCache[] = [];
+		let array: JPieceMemo[] = [];
 		for(
 			let u = Math.floor(Math.sqrt(ha));	// 從靠近根號 ha 的數開始搜尋
 			u > 0; u--							// 反向往下搜尋，會盡量優先傳回效率最高的
@@ -48,26 +48,26 @@ namespace GOPS {
 			if(ha % u == 0) {
 				let v = ha / u;
 				if(u == v) {
-					addCache({ ox, oy, u, v }, array);
+					addMemo({ ox, oy, u, v }, array);
 				} else {
 					let p1: JPiece = { ox, oy, u, v };
 					let p2: JPiece = { ox, oy, u: v, v: u };
 					let r1 = $rank(p1), r2 = $rank(p2);
 					if(r1 > r2) {
-						addCache(p2, array);
-						addCache(p1, array);
+						addMemo(p2, array);
+						addMemo(p1, array);
 					} else {
-						addCache(p1, array);
-						addCache(p2, array);
+						addMemo(p1, array);
+						addMemo(p2, array);
 					}
 				}
 			}
 		}
-		cache.set(key, array);
+		Memo.set(key, array);
 		return array;
 	}
 
-	function addCache(p: JPiece, array: JPieceCache[]) {
+	function addMemo(p: JPiece, array: JPieceMemo[]) {
 		array.push({ p, sx: p.u + p.v + p.oy });
 	}
 }

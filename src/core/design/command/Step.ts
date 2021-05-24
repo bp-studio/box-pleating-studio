@@ -3,7 +3,7 @@ interface JStep<T extends JCommand = JCommand> {
 	commands: readonly T[];
 	construct?: Memento[];
 	destruct?: Memento[];
-	mode: string;
+	mode: DesignMode;
 	before: string[];
 	after: string[];
 }
@@ -27,7 +27,7 @@ class Step implements ISerializable<JStep> {
 	private readonly _commands: readonly Command[];
 	private readonly _construct: Memento[];
 	private readonly _destruct: Memento[];
-	private readonly _mode: string;
+	private readonly _mode: DesignMode;
 	private readonly _before: string[];
 	private readonly _after: string[];
 
