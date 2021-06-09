@@ -8,7 +8,7 @@ let projService = ts.createProject('src/service/tsconfig.json');
 
 gulp.task('sw', () => {
 	// 找出最後一個 log
-	let dir = fs.opendirSync("dist/log"), file, lastLog;
+	let dir = fs.opendirSync("build/dist/log"), file, lastLog;
 	while((file = dir.readSync()) && file.isFile()) {
 		let [stem, ext] = file.name.split('.');
 		if(ext == "md" && (!lastLog || stem > lastLog)) lastLog = stem;
@@ -18,7 +18,7 @@ gulp.task('sw', () => {
 	return projService.src()
 		.pipe(projService())
 		.pipe(workbox({
-			globDirectory: 'dist',
+			globDirectory: 'build/dist',
 			globPatterns: [
 				'**/*.htm',
 				'**/*.js',
@@ -32,5 +32,5 @@ gulp.task('sw', () => {
 			globIgnores: ['sw.js'],
 		}))
 		.pipe(terser())
-		.pipe(gulp.dest('dist/'));
+		.pipe(gulp.dest('build/dist/'));
 });

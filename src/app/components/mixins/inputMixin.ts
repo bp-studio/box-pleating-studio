@@ -1,29 +1,33 @@
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component
 export default class InputMixin extends Vue {
 
-	@Prop(null) public value: any;
+	@Prop(null) public value: unknown;
 
 	protected id: string = "field" + this._uid;
-	protected v: any = null;
+	protected v: unknown = null;
 	protected focused: boolean = false;
 
-	protected mounted() { this.v = this.value; }
+	protected mounted(): void {
+		this.v = this.value;
+	}
 
-	@Watch('value') onValueChange(v: any) { if(!this.focused) this.v = v; }
+	@Watch('value') onValueChange(v: unknown): void {
+		if(!this.focused) this.v = v;
+	}
 
-	public blur() {
+	public blur(): void {
 		this.v = this.value;
 		this.focused = false;
 	}
 
-	public focus(event: FocusEvent) {
+	public focus(event: FocusEvent): void {
 		this.focused = true;
 		(event.target as HTMLInputElement).select();
 	}
 
-	public input(event: InputEvent) {
+	public input(event: InputEvent): void {
 		this.v = (event.target as HTMLInputElement).value;
 		this.$emit('input', this.v);
 	}

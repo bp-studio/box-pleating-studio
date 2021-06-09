@@ -1,4 +1,4 @@
-import { Vue, Component } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { bp } from '../import/BPStudio';
 
 /**
@@ -14,14 +14,14 @@ export default class CoreBase extends Vue {
 	public libReady: Promise<void>;
 	public initialized: boolean = false;
 
-	public get design() {
+	public get design(): Design {
 		if(!this.initialized) return null;
 		let t = bp.design ? bp.design.title : null;
 		document.title = "Box Pleating Studio" + (t ? " - " + t : "");
 		return bp.design;
 	}
 
-	public get selections() {
+	public get selections(): Control[] {
 		if(!this.initialized) return [];
 		return bp.selection;
 	}

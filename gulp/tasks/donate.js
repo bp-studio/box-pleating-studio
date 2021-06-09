@@ -11,19 +11,19 @@ gulp.task('donate', () => all(
 	// Vue
 	gulp.src(['src/donate/main.vue', 'src/donate/main.js'])
 		.pipe(newer({
-			dest: 'dist/donate.js',
+			dest: 'build/dist/donate.js',
 			extra: __filename,
 		}))
 		.pipe(vue('donate.js'))
 		.pipe(terser())
-		.pipe(gulp.dest('dist')),
+		.pipe(gulp.dest('build/dist')),
 
 	// Html
-	gulp.src('public/donate.htm')
+	gulp.src('src/public/donate.htm')
 		.pipe(newer({
-			dest: 'dist/donate.htm',
+			dest: 'build/dist/donate.htm',
 			extra: __filename,
 		}))
 		.pipe(htmlMin(htmlMinOption))
-		.pipe(gulp.dest('dist'))
+		.pipe(gulp.dest('build/dist'))
 ));

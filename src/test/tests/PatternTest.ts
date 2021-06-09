@@ -1,6 +1,6 @@
 
 function PatternTest() {
-	let file = require('../samples/PatternTest.json');
+	let file = require('./PatternTest.json');
 	let design = studio.$load(file);
 	Shrewd.commit();
 

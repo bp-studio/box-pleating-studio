@@ -74,7 +74,7 @@
 		},
 		"view": {
 			"tree": "树状结构",
-			"layout": "配置"
+			"layout": "佈局"
 		},
 		"tab": {
 			"clone": "复制",
@@ -97,7 +97,7 @@
 			"titlePH": "(项目标题)",
 			"descriptionPH": "(项目描述)",
 			"tree": "树状结构视图",
-			"layout": "配置视图",
+			"layout": "佈局视图",
 			"width": "宽度",
 			"height": "高度",
 			"zoom": "缩放"

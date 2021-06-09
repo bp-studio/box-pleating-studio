@@ -1,5 +1,4 @@
-/// <reference path="../../src/core/global/vendor/shrewd.d.ts" />
-/// <reference path="../../src/core/index.ts" />
+/// <reference path="../core/index.ts" />
 
 Shrewd.option.autoCommit = false;
 

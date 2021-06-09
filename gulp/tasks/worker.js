@@ -7,8 +7,8 @@ let projWorker = ts.createProject('src/worker/tsconfig.json');
 
 gulp.task('worker', () =>
 	projWorker.src()
-		.pipe(newer({ dest: 'dist', ext: '.js' })) // 1:1 策略
+		.pipe(newer({ dest: 'build/dist', ext: '.js' })) // 1:1 策略
 		.pipe(projWorker())
 		.pipe(terser())
-		.pipe(gulp.dest('dist'))
+		.pipe(gulp.dest('build/dist'))
 );

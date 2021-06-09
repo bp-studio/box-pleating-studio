@@ -9,7 +9,7 @@ let wrap = require('@makeomatic/gulp-wrap-js');
 let coreConfig = 'src/core/tsconfig.json';
 let projCoreDev = ts.createProject(coreConfig);
 let projCorePub = ts.createProject(coreConfig);
-let projTest = ts.createProject('test/tsconfig.json');
+
 
 const template = `
 	(function(root, factory){
@@ -29,7 +29,7 @@ const template = `
 gulp.task('coreDev', () =>
 	projCoreDev.src()
 		.pipe(newer({
-			dest: 'debug/bpstudio.js',
+			dest: 'build/debug/bpstudio.js',
 			extra: [__filename, coreConfig],
 		}))
 		.pipe(sourcemaps.init())
@@ -48,13 +48,13 @@ gulp.task('coreDev', () =>
 			format: { beautify: true },
 		}))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
-		.pipe(gulp.dest('debug'))
+		.pipe(gulp.dest('build/debug'))
 );
 
 gulp.task('corePub', () =>
 	projCorePub.src()
 		.pipe(newer({
-			dest: 'dist/bpstudio.js',
+			dest: 'build/dist/bpstudio.js',
 			extra: [__filename, coreConfig],
 		}))
 		.pipe(projCorePub())
@@ -71,16 +71,7 @@ gulp.task('corePub', () =>
 			mangle: { properties: { regex: /^[$_]/ } },
 		}))
 		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
-		.pipe(gulp.dest('dist'))
+		.pipe(gulp.dest('build/dist'))
 );
 
 gulp.task('core', gulp.parallel('coreDev', 'corePub'));
-
-gulp.task('buildTest', () =>
-	projTest.src()
-		.pipe(sourcemaps.init())
-		.pipe(projTest())
-		.pipe(wrap("let Shrewd=require('../../public/lib/shrewd.min.js');%= body %"))
-		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../' }))
-		.pipe(gulp.dest('test/build'))
-);

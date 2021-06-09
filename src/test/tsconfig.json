@@ -13,6 +13,6 @@
 		"experimentalDecorators": true
 	},
 	"include": [
-		"./src/**/*.ts",
+		"./**/*.ts",
 	]
 }

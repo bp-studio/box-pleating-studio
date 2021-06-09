@@ -15,18 +15,18 @@ function connect() {
 
 function cleanFactory(folder) {
 	let conn = connect();
-	return conn.clean(`/public_html/${folder}/**/*.*`, './dist');
+	return conn.clean(`/public_html/${folder}/**/*.*`, './build/dist');
 }
 
 function ftpFactory(folder, g, p) {
 	let conn = connect();
 	let globs = [
-		'dist/**/*',
+		'build/dist/**/*',
 		'!**/debug.log',
 	].concat(g);
 
 	let base = `/public_html/${folder}`;
-	let pipe = gulp.src(globs, { base: './dist', buffer: false });
+	let pipe = gulp.src(globs, { base: './build/dist', buffer: false });
 	return (p ? p(pipe) : pipe)
 		.pipe(conn.newer(base))
 		.pipe(conn.dest(base));
@@ -43,10 +43,10 @@ gulp.task('cleanPub', () => seriesIf(
 	},
 	() => cleanFactory('bp')
 ));
-gulp.task('uploadPub', () => ftpFactory('bp', ['dist/.htaccess']));
+gulp.task('uploadPub', () => ftpFactory('bp', ['build/dist/.htaccess']));
 
 gulp.task('cleanDev', () => cleanFactory('bp-dev'));
-gulp.task('uploadDev', () => ftpFactory('bp-dev', ['!dist/manifest.json'], pipe => pipe
+gulp.task('uploadDev', () => ftpFactory('bp-dev', ['!build/dist/manifest.json'], pipe => pipe
 	.pipe(gulpIf(
 		file => file.basename == "index.htm",
 		replace('<script async src="https://www.googletagmanager.com' +

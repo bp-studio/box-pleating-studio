@@ -13,7 +13,7 @@ let vue = require('../plugins/vue');
 
 let jsPipe = lazypipe()
 	.pipe(() => wrap("if(!err&&!wErr) { %= body % }"))
-	.pipe(() => gulp.dest('debug/'))
+	.pipe(() => gulp.dest('build/debug/'))
 	.pipe(() => terser({
 		ecma: 2019,
 		compress: {
@@ -30,18 +30,18 @@ gulp.task('app', () =>
 		'src/app/footer.js',
 	])
 		.pipe(newer({
-			dest: 'dist/main.js',
+			dest: 'build/dist/main.js',
 			extra: __filename,
 		}))
 		.pipe(vue('main.js', 'main.css'))
 		.pipe(gulpIf(file => file.extname == ".js", jsPipe(), cleanCss()))
-		.pipe(gulp.dest('dist/'))
+		.pipe(gulp.dest('build/dist/'))
 );
 
 gulp.task('locale', () =>
 	gulp.src('src/locale/*.json')
 		.pipe(newer({
-			dest: 'dist/locale.js',
+			dest: 'build/dist/locale.js',
 			extra: __filename,
 		}))
 		.pipe(order('en.json'))
@@ -50,5 +50,5 @@ gulp.task('locale', () =>
 		.pipe(concat('locale.js'))
 		.pipe(wrap("let locale={};%= body %"))
 		.pipe(terser())
-		.pipe(gulp.dest('dist/'))
+		.pipe(gulp.dest('build/dist/'))
 );

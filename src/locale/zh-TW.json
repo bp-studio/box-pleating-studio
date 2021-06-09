@@ -74,7 +74,7 @@
 		},
 		"view": {
 			"tree": "樹狀結構",
-			"layout": "配置"
+			"layout": "佈局"
 		},
 		"tab": {
 			"clone": "複製",
@@ -97,7 +97,7 @@
 			"titlePH": "(專案標題)",
 			"descriptionPH": "(專案描述)",
 			"tree": "樹狀結構檢視",
-			"layout": "配置檢視",
+			"layout": "佈局檢視",
 			"width": "寬度",
 			"height": "高度",
 			"zoom": "縮放"
