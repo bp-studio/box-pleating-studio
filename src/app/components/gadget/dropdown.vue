@@ -33,10 +33,10 @@
 		private dropdown: bootstrap.Dropdown;
 
 		mounted() {
-			let self = this;
 			core.libReady.then(() => this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {}));
-			this.$el.addEventListener('shown.bs.dropdown', function() { dropdown.current = self });
-			this.$el.addEventListener('hide.bs.dropdown', function() {
+			this.$el.addEventListener('show.bs.dropdown', () => this.$emit('show'));
+			this.$el.addEventListener('shown.bs.dropdown', () => dropdown.current = this);
+			this.$el.addEventListener('hide.bs.dropdown', () => {
 				if(!dropdown.skipped) dropdown.current = null;
 				dropdown.skipped = false;
 			});

@@ -26,24 +26,6 @@ routing.registerRoute(precacheRoute);
 // 這是舊版的 cache；如果找得到就刪除掉以釋放空間
 caches.delete("versioned");
 
-// 註冊下載檔案用的路由
-routing.registerRoute(
-	({ url }) => url.pathname.startsWith("/download"),
-	async ({ url }): Promise<Response> => {
-		let id = url.searchParams.get('id');
-		let type = url.searchParams.get('type');
-		let download = await getFile(id, type);
-		return new Response(download.buffer, {
-			headers: {
-				'Cache-Control': 'no-store',
-				'Content-Disposition': `attachment; filename="${encodeURIComponent(download.filename)}"`,
-				'Content-Type': download.type,
-				'Content-Length': download.buffer.byteLength.toString(),
-			},
-		});
-	}
-);
-
 // 除了 precache 之外的 Markdown 檔案都採用網路優先策略
 routing.registerRoute(
 	({ url }) => url.pathname.endsWith(".md"),
@@ -90,16 +72,6 @@ async function message(event: ExtendableMessageEvent) {
 		event.ports[0].postMessage(Math.min(...result));
 	}
 }
-async function getFile(id: string, type: string) {
-	let clients = await self.clients.matchAll({ type: 'window' });
-	let tasks: Promise<unknown>[] = [];
-	for(let client of clients) {
-		tasks.push(callClient(client, `download:${id}:${type}`));
-	}
-	let result = await Promise.all(tasks);
-	return result.find(r => r != null) as Download;
-}
-
 function callClient(client: Client, data: unknown): Promise<unknown> {
 	return new Promise<unknown>(resolve => {
 		let channel = new MessageChannel();

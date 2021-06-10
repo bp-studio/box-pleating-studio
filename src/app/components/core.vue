@@ -318,15 +318,6 @@
 		// 下載
 		/////////////////////////////////////////////////////////////////////////////////////////
 
-		public async download(id: string, type: string) {
-			if(Number(id) != this.id) return null;
-			let blob = await this.getBlob(type);
-			return {
-				buffer: await blob.arrayBuffer(),
-				type: blob.type,
-				filename: this.getFilename(type)
-			};
-		}
 		public async getBlob(type: string): Promise<Blob | null> {
 			if(!this.design) return null;
 			if(type == 'png') return await bp.toPNG();
@@ -337,8 +328,8 @@
 		}
 		public getFilename(type: string): string {
 			if(!this.design) return "";
-			if(type == "bpz") return this.$t('keyword.workspace') + ".bpz";
-			else return sanitize(this.design.title) + "." + type;
+			if(type == "bpz") return this.$t('keyword.workspace').toString();
+			else return sanitize(this.design.title);
 		}
 	}
 </script>

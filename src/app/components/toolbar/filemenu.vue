@@ -1,5 +1,5 @@
 <template>
-	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset">
+	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset" @show="init">
 		<div class="dropdown-item" @click="newProject">
 			<i class="far fa-file"></i>
 			{{$t('toolbar.file.new')}}
@@ -82,10 +82,10 @@
 			this.bp.notifySaveAll();
 			gtag('event', 'project_bpz');
 		}
-		private svgSaved() {
+		protected svgSaved() {
 			gtag('event', 'project_svg');
 		}
-		private pngSaved() {
+		protected pngSaved() {
 			gtag('event', 'project_png');
 		}
 
@@ -97,12 +97,16 @@
 			gtag('event', 'share', { method: 'copy', content_type: 'image' });
 		}
 
+		private downloads(): Download[] {
+			return [this.$refs.bps, this.$refs.bpz, this.$refs.svg, this.$refs.png] as Download[];
+		}
+		protected init(): void {
+			// 當選單開啟的時候生成 ObjectURL
+			this.downloads().forEach(d => d.getFile());
+		}
 		protected reset(): void {
 			// 當選單關閉的時候把所有 ObjectURL 回收掉
-			(this.$refs.bps as Download).reset();
-			(this.$refs.bpz as Download).reset();
-			(this.$refs.svg as Download).reset();
-			(this.$refs.png as Download).reset();
+			this.downloads().forEach(d => d.reset());
 		}
 
 		public async upload(event: Event) {

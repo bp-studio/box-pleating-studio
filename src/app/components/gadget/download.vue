@@ -4,9 +4,8 @@
 		:class="btn?'btn btn-primary':'dropdown-item'"
 		:href="href"
 		@click="download($event)"
-		@mouseover="getFile"
-		@contextmenu.stop="contextMenu"
-		:download="filename"
+		@contextmenu.stop="download($event)"
+		:download="filename+'.'+type"
 		:title="$t('message.downloadHint')"
 	>
 		<slot></slot>
@@ -23,71 +22,39 @@
 	@Component
 	export default class Download extends Vue {
 		private href: string = "#";
-		private https: boolean = false;
 
-		private downloaded: Function;
-		private downloading: Promise<void>;
-		private creating: Blob | Promise<Blob> = null;
+		private urls: string[] = [];
+		private round: number = 0;
 
 		@Prop(String) public type: string;
 		@Prop(Boolean) public disabled: boolean;
 		@Prop(Boolean) public btn: boolean = false;
 
-		created() {
-			if(location.protocol == "https:") {
-				this.https = true;
-				this.href = `/download?id=${core.id}&type=${this.type}`;
-			}
-		}
-
 		protected get filename(): string | undefined {
-			if(this.https) return undefined;
 			return core.getFilename(this.type);
 		}
 
 		public download(event: Event) {
-			if(this.https) {
-				this.$emit('download');
-			} else if(this.href == "#") {
-				this.downloading = new Promise(resolve => this.downloaded = resolve);
-				if(event) event.preventDefault();
-				this.getFile().then(() => (this.$el as any).click());
-			} else {
-				if(this.downloaded) setTimeout(() => {
-					this.downloaded();
-					this.downloaded = null;
-				}, 50);
-				this.$emit('download');
-			}
-		}
-
-		public contextMenu() {
-			this.getFile();
-			this.$emit('download');
+			if(this.href == "#") event.preventDefault();
 		}
 
 		public async getFile(): Promise<void> {
-			if(this.https) return;
-
-			await this.creating;
-			if(this.href == "#") {
-				this.creating = core.getBlob(this.type);
-				let blob = await this.creating;
-				this.href = blob ? URL.createObjectURL(blob) : "#";
-				this.creating = null;
+			if(this.disabled) return;
+			let round = this.round;
+			this.href = "#";
+			let blob = await core.getBlob(this.type);
+			if(round == this.round && blob) {
+				this.href = URL.createObjectURL(blob);
+				this.urls.push(this.href);
 			}
 		}
 
 		public async reset() {
-			if(this.https) return;
-
-			// 延遲回收以免下載失敗
-			await this.downloading;
-			let href = this.href;
+			this.round++;
 			setTimeout(() => {
-				if(href.startsWith('blob')) URL.revokeObjectURL(href);
-				if(this.href == href) this.href = "#";
-			}, 5000);
+				for(let url of this.urls) URL.revokeObjectURL(url);
+				this.urls = [];
+			}, 1000);
 		}
 	}
 </script>
