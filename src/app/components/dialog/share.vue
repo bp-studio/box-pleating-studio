@@ -5,61 +5,61 @@
 				<div class="modal-header">
 					<div class="h4 modal-title" v-t="'share.title'"></div>
 				</div>
-				<div class="modal-body">
-					<div class="mb-2">
-						<div class="input-group">
-							<input class="form-control" :value="url" :disabled="sending" />
-							<button class="btn btn-primary" v-if="!short" @click="shorten" :disabled="sending">
-								{{$t('share.shorten')}}
-								<i class="bp-spinner fa-spin" v-if="sending"></i>
-							</button>
+				<div class="modal-body p-5 text-center" v-if="sending">
+					<i class="bp-spinner fa-spin display-4"></i>
+				</div>
+				<template v-else>
+					<div class="modal-body p-3 text-center" v-if="error">{{error}}</div>
+					<div class="modal-body" v-else>
+						<div class="mb-2">
+							<div class="input-group">
+								<input class="form-control" :value="url" />
+							</div>
+						</div>
+						<div v-if="ready" class="d-flex">
+							<div>
+								<button class="btn btn-primary" v-clipboard:copy="url" v-clipboard:success="onCopy" ref="bt">
+									<i class="fas fa-copy"></i>
+									{{$t('share.copy')}}
+									<i
+										class="fas fa-check d-inline-block"
+										ref="success"
+										style="transition:width .5s; width:0px; overflow:hidden;"
+									></i>
+								</button>
+								<button v-if="canShare" class="btn btn-primary" @click="share">
+									<i class="fas fa-share"></i>
+									{{$t('share.share')}}
+								</button>
+							</div>
 						</div>
 					</div>
-					<div v-if="ready" class="d-flex">
-						<div>
-							<button class="btn btn-primary" :disabled="sending" v-clipboard:copy="url" v-clipboard:success="onCopy" ref="bt">
-								<i class="fas fa-copy"></i>
-								{{$t('share.copy')}}
-								<i
-									class="fas fa-check d-inline-block"
-									ref="success"
-									style="transition:width .5s; width:0px; overflow:hidden;"
-								></i>
-							</button>
-							<button v-if="canShare" :disabled="sending" class="btn btn-primary" @click="share">
-								<i class="fas fa-share"></i>
-								{{$t('share.share')}}
-							</button>
-						</div>
-						<div class="flex-grow-1 text-end col-form-label">{{error}}</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
-				</div>
+				</template>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
-	import BaseComponent from '../mixins/baseComponent';
-	import { core } from '../core.vue';
 	import * as bootstrap from 'bootstrap';
+	import BaseComponent from '../mixins/baseComponent';
+	import { Component, Vue } from 'vue-property-decorator';
+	import { core } from '../core.vue';
 
 	declare const LZ: any;
 	declare const gtag: any;
 
 	@Component
 	export default class Share extends BaseComponent {
-		private url: string = "";
-		private modal: Bootstrap.Modal;
-		private canShare: boolean = !!navigator.share;
-		private ready: boolean = false;
-		private sending: boolean = false;
-		private short: boolean = false;
-		private error: string = null;
+		protected url: string = "";
+		protected modal: bootstrap.Modal;
+		protected canShare: boolean = !!navigator.share;
+		protected ready: boolean = false;
+		protected sending: boolean = false;
+		protected error: string = null;
 
 		mounted() {
 			core.libReady.then(() => {
@@ -76,21 +76,22 @@
 		public async show() {
 			await core.libReady;
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
-			this.short = false;
 			this.modal.show();
-			var bt = this.$refs.bt as HTMLButtonElement;
-			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
+			this.shorten();
+			this.$el.addEventListener('shown.bs.modal', () => {
+				if(this.$refs.bt) (this.$refs.bt as HTMLButtonElement).focus();
+			}, { once: true });
 			gtag('event', 'screen_view', { screen_name: 'Share' });
 		}
 
-		private onCopy() {
+		protected onCopy() {
 			let s = this.$refs.success as HTMLSpanElement;
 			s.style.width = "20px";
 			setTimeout(() => s.style.width = "0px", 3000);
 			gtag('event', 'share', { method: 'copy', content_type: 'link' });
 		}
 
-		private share() {
+		protected share() {
 			navigator.share({
 				title: "Box Pleating Studio",
 				text: this.$t("share.message", [this.design.title]).toString(),
@@ -102,14 +103,26 @@
 		private async shorten() {
 			this.sending = true;
 			try {
-				let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url));
+				let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url), {
+					cache: "reload"
+				});
 				this.url = await response.text();
-				this.short = true;
+				this.sending = false;
+				if(!this.$refs.bt) {
+					await new Promise<void>(resolve => {
+						let int = setInterval(() => {
+							if(this.$refs.bt) {
+								clearInterval(int);
+								resolve();
+							}
+						}, 10);
+					});
+				}
+				(this.$refs.bt as HTMLButtonElement).focus();
 			} catch(e) {
+				this.sending = false;
 				this.error = this.$t('message.connFail').toString();
-				setTimeout(() => this.error = null, 3000);
 			}
-			this.sending = false;
 		}
 	}
 </script>
