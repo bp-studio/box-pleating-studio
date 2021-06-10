@@ -166,7 +166,7 @@ interface DisplaySetting {
 	}
 
 	/** 產生 SVG 檔案連結 */
-	public $createSvgUrl(): string {
+	public $createSvgBlob(): Blob {
 		let rect = this._getBound();
 		let svg = this._project.exportSVG({
 			bounds: rect,
@@ -174,8 +174,7 @@ interface DisplaySetting {
 		}) as SVGElement;
 		if(!this.$settings.includeHiddenElement) this._removeHidden(svg);
 
-		let blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
-		return URL.createObjectURL(blob);
+		return new Blob([svg.outerHTML], { type: "image/svg+xml" });
 	}
 
 	/** 遞迴移除所有具有 visibility="hidden" 屬性的標籤 */

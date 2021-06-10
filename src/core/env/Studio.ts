@@ -47,13 +47,12 @@ interface StudioOptions {
 
 	public onDeprecate(title?: string) { this.$option.onDeprecate?.(title); }
 
-	public $createBpsUrl(): string {
-		if(!this.$design) return "";
+	public $createBpsBlob(): Blob | null {
+		if(!this.$design) return null;
 		let json = this.$design.toJSON();
 		delete json.history; // 存檔的時候不用儲存歷史
 		let bps = JSON.stringify(json);
-		let blob = new Blob([bps], { type: "application/octet-stream" });
-		return URL.createObjectURL(blob);
+		return new Blob([bps], { type: "application/octet-stream" });
 	}
 
 	protected _tryLoad(design: RecursivePartial<JDesign>): Design {

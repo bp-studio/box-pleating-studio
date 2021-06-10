@@ -8,18 +8,18 @@
 		<uploader accept=".bps, .bpz, .json, .zip" ref="open" multiple @upload="upload($event)">
 			<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 		</uploader>
-		<download :disabled="!design" :file="jsonFile" ref="bps" @download="notify">
+		<download :disabled="!design" type="bps" ref="bps" @download="notify">
 			<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.saveBPS')}}</hotkey>
 		</download>
-		<download :disabled="!design" :file="workspaceFile" ref="bpz" @download="notifyAll">
+		<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
 			<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.saveBPZ')}}</hotkey>
 		</download>
 		<divider></divider>
-		<download :disabled="!design" :file="svgFile" ref="svg" @download="svgSaved">
+		<download :disabled="!design" type="svg" ref="svg" @download="svgSaved">
 			<i class="far fa-file-image"></i>
 			{{$t('toolbar.file.saveSVG')}}
 		</download>
-		<download :disabled="!design" :file="pngFile" ref="png" @download="pngSaved">
+		<download :disabled="!design" type="png" ref="png" @download="pngSaved">
 			<i class="far fa-file-image"></i>
 			{{$t('toolbar.file.savePNG')}}
 		</download>
@@ -40,7 +40,7 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { FileFactory, sanitize, readFile, bufferToText, registerHotkey } from '../import/types';
+	import { readFile, bufferToText, registerHotkey } from '../import/types';
 	import { core } from '../core.vue';
 	import JSZip from 'jszip';
 
@@ -89,26 +89,6 @@
 			gtag('event', 'project_png');
 		}
 
-		public get jsonFile(): FileFactory {
-			return !this.design ?
-				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".bps", content: () => this.bp.toBPS() };
-		}
-		public get svgFile(): FileFactory {
-			return !this.design ?
-				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".svg", content: () => this.bp.toSVG() };
-		}
-		public get pngFile(): FileFactory {
-			return !this.design ?
-				{ name: "", content: () => "" } :
-				{ name: sanitize(this.design.title) + ".png", content: () => this.bp.toPNG() };
-		}
-		public get workspaceFile(): FileFactory {
-			return !core.designs.length ?
-				{ name: "", content: () => "" } :
-				{ name: this.$t('keyword.workspace') + ".bpz", content: () => core.zip() };
-		}
 		public get copyEnabled(): boolean {
 			return navigator.clipboard && 'write' in navigator.clipboard;
 		}
@@ -117,7 +97,7 @@
 			gtag('event', 'share', { method: 'copy', content_type: 'image' });
 		}
 
-		private reset(): void {
+		protected reset(): void {
 			// 當選單關閉的時候把所有 ObjectURL 回收掉
 			(this.$refs.bps as Download).reset();
 			(this.$refs.bpz as Download).reset();

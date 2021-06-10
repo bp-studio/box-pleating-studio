@@ -61,8 +61,14 @@ function callService(data) {
 	});
 }
 if('serviceWorker' in navigator) {
-	navigator.serviceWorker.addEventListener('message', event => {
+	navigator.serviceWorker.addEventListener('message', async event => {
 		if(event.data == "id") event.ports[0].postMessage(core.id);
+		if(event.data.startsWith("download")) {
+			var field = event.data.split(":");
+			var download = await core.download(field[1], field[2]);
+			if(download) event.ports[0].postMessage(download, [download.buffer]);
+			else event.ports[0].postMessage(null);
+		}
 	});
 }
 

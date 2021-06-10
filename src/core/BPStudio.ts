@@ -152,7 +152,7 @@ class BPStudio {
 		if(typeof id == 'number') this._studio.$close(id);
 	}
 	public closeAll(): void { this._studio.$closeAll(); }
-	public toBPS(): string { return this._studio.$createBpsUrl(); }
+	public toBPS(): Blob | null { return this._studio.$createBpsBlob(); }
 
 	public load(json: unknown): Design | undefined {
 		try {
@@ -174,11 +174,11 @@ class BPStudio {
 	public onBeforePrint(): void {
 		this._studio.$display.$rasterizer.$beforePrint();
 	}
-	public toSVG(): string {
-		return this._studio.$display.$createSvgUrl();
+	public toSVG(): Blob {
+		return this._studio.$display.$createSvgBlob();
 	}
-	public toPNG(): Promise<string> {
-		return this._studio.$display.$rasterizer.$createPngUrl();
+	public toPNG(): Promise<Blob> {
+		return this._studio.$display.$rasterizer.$createPngBlob();
 	}
 	public copyPNG(): Promise<void> {
 		return this._studio.$display.$rasterizer.$copyPNG();

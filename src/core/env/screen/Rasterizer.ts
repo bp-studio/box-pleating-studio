@@ -15,7 +15,7 @@ class Rasterizer {
 		window.addEventListener("afterprint", this._afterPrint.bind(this));
 	}
 
-	private _createPNG(): Promise<Blob> {
+	public $createPngBlob(): Promise<Blob> {
 		let canvas = document.createElement("canvas");
 		let ctx = canvas.getContext("2d")!;
 		let img = this._img;
@@ -57,7 +57,7 @@ class Rasterizer {
 			// 而且設置了一個很大的延遲，這是為了解決在手機上透過外部服務列印時可能發生的延遲
 			setTimeout(() => URL.revokeObjectURL(old), Rasterizer._GC_TIME);
 
-			this._img.src = this._display.$createSvgUrl();
+			this._img.src = URL.createObjectURL(this._display.$createSvgBlob());
 			this._printing = true;
 		}
 	}
@@ -69,13 +69,8 @@ class Rasterizer {
 		}, Rasterizer._DEBOUNCE);
 	}
 
-	public async $createPngUrl(): Promise<string> {
-		const blob = await this._createPNG();
-		return URL.createObjectURL(blob);
-	}
-
 	public async $copyPNG(): Promise<void> {
-		const blob = await this._createPNG();
+		const blob = await this.$createPngBlob();
 		return navigator.clipboard.write([
 			new ClipboardItem({ 'image/png': blob }),
 		]);

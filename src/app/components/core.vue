@@ -42,7 +42,7 @@
 		public initReady: Promise<void>;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
-		private id: number = new Date().getTime();
+		public id: number = new Date().getTime();
 
 		public loader: Spinner;
 
@@ -281,7 +281,7 @@
 			return j;
 		}
 
-		public async zip(): Promise<string> {
+		public async zip(): Promise<Blob> {
 			await this.libReady;
 			let zip = new JSZip();
 			let names = new Set<string>();
@@ -300,14 +300,45 @@
 				compression: "DEFLATE",
 				compressionOptions: { level: 9 }
 			});
-			return URL.createObjectURL(blob);
+			return blob.slice(0, blob.size, "application/octet-binary");
 		}
+
+		/////////////////////////////////////////////////////////////////////////////////////////
+		// 對話方塊
+		/////////////////////////////////////////////////////////////////////////////////////////
 
 		public async alert(message: VueI18n.TranslateResult): Promise<void> {
 			await (this.$refs.alert as Alert).show(message.toString());
 		}
 		public async confirm(message: VueI18n.TranslateResult): Promise<boolean> {
 			return await (this.$refs.confirm as Confirm).show(message.toString());
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////////////
+		// 下載
+		/////////////////////////////////////////////////////////////////////////////////////////
+
+		public async download(id: string, type: string) {
+			if(Number(id) != this.id) return null;
+			let blob = await this.getBlob(type);
+			return {
+				buffer: await blob.arrayBuffer(),
+				type: blob.type,
+				filename: this.getFilename(type)
+			};
+		}
+		public async getBlob(type: string): Promise<Blob | null> {
+			if(!this.design) return null;
+			if(type == 'png') return await bp.toPNG();
+			if(type == 'svg') return bp.toSVG();
+			if(type == 'bpz') return await this.zip();
+			if(type == 'bps') return bp.toBPS();
+			return null;
+		}
+		public getFilename(type: string): string {
+			if(!this.design) return "";
+			if(type == "bpz") return this.$t('keyword.workspace') + ".bpz";
+			else return sanitize(this.design.title) + "." + type;
 		}
 	}
 </script>
