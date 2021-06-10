@@ -8,6 +8,9 @@
 			<i18n path="welcome.intro[1]" tag="p">
 				<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio">GitHub</a>
 			</i18n>
+			<i18n path="about.visitBlog" tag="p">
+				<a target="_blank" rel="noopener" href="https://origami.abstreamace.com/" v-t="'about.blog'"></a>
+			</i18n>
 		</div>
 		<div class="browser-only">
 			<div v-if="(bi||ios)&&!install">

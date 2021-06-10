@@ -11,6 +11,9 @@
 					<i18n path="about.visit" tag="p">
 						<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio" v-t="'about.homepage'"></a>
 					</i18n>
+					<i18n path="about.visitBlog" tag="p">
+						<a target="_blank" rel="noopener" href="https://origami.abstreamace.com/" v-t="'about.blog'"></a>
+					</i18n>
 					<i18n path="about.donation" tag="p">
 						<a target="_blank" href="donate.htm">PayPal</a>
 					</i18n>
@@ -34,7 +37,7 @@
 
 	@Component
 	export default class About extends Vue {
-		private modal: Bootstrap.Modal;
+		private modal: bootstrap.Modal;
 		protected get copyright() { return core.copyright; }
 
 		mounted() {

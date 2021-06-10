@@ -7,6 +7,8 @@
 
 Box pleating is arguably the standard framework of modern super-complex origami designs, as the creases are much more predictable and manageable than those found in the traditional 22.5 degree system or circle packing. Although pure box pleating is well-known for not being very efficient in utilizing paper area, with the help of stretching gadgets (such as Kamiya patterns and the more generalized GOPS), it is now possible for box pleating to achieve efficiency nearly as good as the optimal circle packing. This app is created to help origami designers to blueprint their models in such systems.
 
+**New**: Check out [The story of Box Pleating Studio](https://origami.abstreamace.com/2021/06/02/the-story-of-box-pleating-studio/) at the author's blog!
+
 ## Prerequisites
 
 Box Pleating Studio is not for origami beginners. In order to fully understand the pattern it creates and be able to fold it, you must be considerably familiar with the theory of uniaxial box pleating bases. You will find everything you need to know in Chapter 13 and 14 of Robert J. Lang's remarkable book (See [[1]](#b1) in the bibliography section below).
@@ -72,6 +74,8 @@ The author would like to specially thank the following people, in no particular 
 ## About the author
 
 Mu-Tsun Tsai began his studying of origami design theory by reading Robert J. Lang's book. They soon became good friends and together they generalized the notion of Pythagorean Stretch into GOPS, and it was published in 7OSME. Tsai lives in Taiwan and makes a living by doing full-stack developing. He particularly specializes in C# and TypeScript. Tsai is also the author of the reactive framework Shrewd, which is the core powering Box Pleating Studio.
+
+**New**: Visit his new blog [Tsai Origami](https://origami.abstreamace.com/) for more!
 
 <hr>
 

@@ -25,7 +25,7 @@
 
 	@Component
 	export default class Note extends Vue {
-		private modal: Bootstrap.Modal;
+		private modal: bootstrap.Modal;
 		mounted() {
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement));
 		}

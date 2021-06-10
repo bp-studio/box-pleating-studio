@@ -60,7 +60,7 @@
 		public change(by: number) {
 			// 這邊的計算起點採用 this.value 而非 this.v，
 			// 以免高速的滾動導致結果錯誤
-			let v = Math.round((this.value + by) / this.step) * this.step;
+			let v = Math.round((this.value as number + by) / this.step) * this.step;
 			if(v < this.min || v > this.max) return;
 			this.timeout = window.setTimeout(() => this.v = this.value, 50);
 			this.$emit('input', v);

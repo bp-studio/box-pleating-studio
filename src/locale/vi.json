@@ -157,7 +157,9 @@
 		"license": "Được phát hành theo giấy phép MIT.",
 		"visit": "Để biết hướng dẫn sử dụng và phản hồi, hãy truy cập {0} của ứng dụng trên Github.",
 		"homepage": "trang chủ",
-		"donation": "BP Studio hoàn toàn miễn phí để sử dụng. Nếu bạn thấy ứng dụng này hữu ích cho thiết kế của mình và quan tâm đến việc hỗ trợ ứng dụng này, bạn có thể quyên góp bất kỳ số tiền nào với {0}."
+		"donation": "BP Studio hoàn toàn miễn phí để sử dụng. Nếu bạn thấy ứng dụng này hữu ích cho thiết kế của mình và quan tâm đến việc hỗ trợ ứng dụng này, bạn có thể quyên góp bất kỳ số tiền nào với {0}.",
+		"visitBlog": "Cũng truy cập {0} của tác giả để biết thêm thông tin!",
+		"blog": "Blog"
 	},
 	"donate": {
 		"title": "Hỗ trợ Box Pleating Studio",

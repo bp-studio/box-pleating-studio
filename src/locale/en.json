@@ -157,7 +157,9 @@
 		"license": "Released under the MIT license.",
 		"visit": "For user manual and feedback, visit the app's {0} on Github.",
 		"homepage": "homepage",
-		"donation": "BP Studio is completely free to use. If you find this app helpful to your designing and are interested in supporting this app, you can donate any amount with {0}."
+		"donation": "BP Studio is completely free to use. If you find this app helpful to your designing and are interested in supporting this app, you can donate any amount with {0}.",
+		"visitBlog": "Also visit author's {0} for more info!",
+		"blog": "blog"
 	},
 	"donate": {
 		"title": "Supporting Box Pleating Studio",

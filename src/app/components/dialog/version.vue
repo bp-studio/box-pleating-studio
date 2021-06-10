@@ -36,11 +36,11 @@
 	@Component
 	export default class Version extends Vue {
 
-		private record: Record<number, string> = {};
-		private index: number;
-		private max: number;
-		private active: boolean = false;
-		private modal: Bootstrap.Modal;
+		protected record: Record<number, string> = {};
+		protected index: number;
+		protected max: number;
+		protected active: boolean = false;
+		protected modal: bootstrap.Modal;
 
 		@Watch('index') onIndex(index: number) {
 			this.load(index);
