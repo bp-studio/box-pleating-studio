@@ -9,7 +9,7 @@
 					<div class="row mb-2">
 						<label class="col-form-label col-4">{{$t('preference.language')}}</label>
 						<div class="col-8">
-							<select class="form-select" v-model="i18n.locale">
+							<select class="form-select" v-model="i18n.locale" @change="onLocaleChanged">
 								<option v-for="l in i18n.availableLocales" :key="l" :value="l" v-t="{path:'name',locale:l}"></option>
 							</select>
 						</div>
@@ -56,6 +56,10 @@
 			var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'Preference' });
+		}
+
+		protected onLocaleChanged() {
+			localStorage.setItem("locale", i18n.locale);
 		}
 	}
 </script>
