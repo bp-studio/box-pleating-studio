@@ -109,7 +109,7 @@
 		}
 		public getTitle(id: number): string {
 			let title = this.getDesign(id).title;
-			return title ? title : this.$t('toolbar.project.noTitle').toString();
+			return title ? title : this.$t('toolbar.tab.noTitle').toString();
 		}
 	}
 </script>

@@ -6,20 +6,13 @@
 		</div>
 		<div class="mt-3">
 			<button class="btn btn-primary" @click="subject.split()" v-t="'panel.edge.split'"></button>
-			<button
-				class="btn btn-primary"
-				v-if="subject.isRiver"
-				@click="subject.deleteAndMerge()"
-				v-t="'panel.edge.merge'"
-			></button>
+			<button class="btn btn-primary" v-if="subject.isRiver" @click="subject.deleteAndMerge()" v-t="'panel.edge.merge'"></button>
 			<button class="btn btn-primary" v-else @click="bp.delete(subject)" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
-			<button
-				class="btn btn-primary"
-				@click="bp.goToDual(selection)"
-				v-t="subject.isRiver?'panel.edge.goto':'panel.vertex.goto'"
-			></button>
+			<button class="btn btn-primary" @click="bp.goToDual(selection)">
+				{{subject.isRiver?$t('panel.edge.goto'):$t('panel.vertex.goto')}}
+			</button>
 		</div>
 	</div>
 </template>

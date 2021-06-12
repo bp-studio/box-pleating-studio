@@ -50,14 +50,6 @@
 			"dPad": "Hiện D-pad",
 			"preference": "Tùy chọn"
 		},
-		"project": {
-			"title": "Mở các dự án",
-			"empty": "Không có dự án nào đang mở",
-			"noTitle": "(Không tiêu đề)",
-			"clone": "Sao chép dự án hiện tại",
-			"close": "Đóng dự án hiện tại",
-			"closeAll": "Đóng tất cả các dự án"
-		},
 		"tools": {
 			"title": "Công cụ",
 			"TreeMaker": "Nhập tệp TreeMaker"
@@ -81,7 +73,8 @@
 			"close": "Đóng",
 			"closeAll": "Đóng tất cả",
 			"closeOther": "Đóng những cái khác",
-			"closeRight": "Đóng tất cả sang bên phải"
+			"closeRight": "Đóng tất cả sang bên phải",
+			"noTitle": "(Không tiêu đề)"
 		},
 		"panel": "Bảng tùy chọn"
 	},
@@ -149,7 +142,6 @@
 		"title": "Chia sẻ dự án",
 		"copy": "Sao chép",
 		"share": "Chia sẻ",
-		"shorten": "Rút gọn",
 		"message": "Xem dự án của tôi \"{0}\" được thiết kế với Box Pleating Studio!"
 	},
 	"about": {

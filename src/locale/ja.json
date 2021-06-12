@@ -50,14 +50,6 @@
 			"dPad": "十字キーを表示",
 			"preference": "環境設定"
 		},
-		"project": {
-			"title": "オープンプロジェクト",
-			"empty": "開かれたプロジェクトはありません",
-			"noTitle": "(無題)",
-			"clone": "現在のプロジェクトのクローンを作成",
-			"close": "現在のプロジェクトを閉じる",
-			"closeAll": "すべてのプロジェクトを閉じる"
-		},
 		"tools": {
 			"title": "ツール",
 			"TreeMaker": "TreeMaker ファイルをインポートする"
@@ -81,7 +73,8 @@
 			"close": "閉じる",
 			"closeAll": "すべて閉じる",
 			"closeOther": "他のタブを閉じる",
-			"closeRight": "右をすべて閉じる"
+			"closeRight": "右をすべて閉じる",
+			"noTitle": "(無題)"
 		},
 		"panel": "オプションパネル"
 	},
@@ -149,7 +142,6 @@
 		"title": "プロジェクトを共有する",
 		"copy": "コピー",
 		"share": "シェア",
-		"shorten": "短くする",
 		"message": "Box Pleating Studio で設計された私のプロジェクト \"{0}\" をチェックしてください！"
 	},
 	"about": {

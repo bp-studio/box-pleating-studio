@@ -1,5 +1,9 @@
+/* eslint-disable no-undef */
+/* eslint-disable new-cap */
+/* eslint-disable max-lines-per-function */
+
 function initPayPalButton() {
-	var purchase_units = [];
+	let purchase_units = [];
 	purchase_units[0] = {};
 	purchase_units[0].amount = {};
 
@@ -11,56 +15,58 @@ function initPayPalButton() {
 			layout: 'horizontal',
 		},
 
-		onInit: function(data, actions) {
+		onInit(data, actions) {
 			app.init(actions);
 		},
 
-		onClick: function() {
+		onClick() {
 			purchase_units[0].description = "Supporting Box Pleating Studio";
 			purchase_units[0].amount.value = (app.amount + app.extra).toFixed(2);
 		},
 
-		createOrder: function(data, actions) {
+		createOrder(data, actions) {
 			app.processing = true;
-			return actions.order.create({ purchase_units: purchase_units });
+			return actions.order.create({ purchase_units });
 		},
 
-		onApprove: function(data, actions) {
-			return actions.order.capture().then(function(details) {
-				if(gtag) gtag('event', 'purchase', {
-					"transaction_id": details.id,
-					"affiliation": "PayPal",
-					"value": app.amount,
-					"currency": "USD",
-					"shipping": app.extra,
-					"items": [
-						{
-						  "id": "default",
-						  "name": "Supporting Box Pleating Studio",
-						  "category": "Donation",
-						  "quantity": 1,
-						  "price": app.amount
-						}
-					]
-				});
+		onApprove(data, actions) {
+			return actions.order.capture().then((details) => {
+				if(gtag) {
+					gtag('event', 'purchase', {
+						"transaction_id": details.id,
+						"affiliation": "PayPal",
+						"value": app.amount,
+						"currency": "USD",
+						"shipping": app.extra,
+						"items": [
+							{
+								"id": "default",
+								"name": "Supporting Box Pleating Studio",
+								"category": "Donation",
+								"quantity": 1,
+								"price": app.amount,
+							},
+						],
+					});
+				}
 				app.name = details.payer.name.given_name;
 				app.step = 2;
 			});
 		},
 
-		onCancel: function(data) {
+		onCancel(data) {
 			app.processing = false;
-		}
+		},
 	}).render('#paypal-button-container');
 }
 
-var i18n = new VueI18n({
+let i18n = new VueI18n({
 	locale: 'en',
 	fallbackLocale: 'en',
 	silentFallbackWarn: true,
-	messages: locale
+	messages: locale,
 });
-var app = new Vue.options.components['app']({ i18n });
+let app = new Vue.options.components.app({ i18n });
 app.$mount('#app');
 
 i18n.locale = localStorage.getItem("locale") ?? "en";

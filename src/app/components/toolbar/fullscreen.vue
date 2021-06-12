@@ -2,7 +2,7 @@
 	<div class="browser-only" v-show="fullscreenEnabled">
 		<div class="dropdown-item" @click="toggleFullscreen">
 			<i class="fas fa-expand"></i>
-			{{$t('toolbar.setting.fullscreen'+(fullscreen?'Exit':''))}}
+			{{fullscreen?$t('toolbar.setting.fullscreenExit'):$t('toolbar.setting.fullscreen')}}
 		</div>
 		<divider></divider>
 	</div>

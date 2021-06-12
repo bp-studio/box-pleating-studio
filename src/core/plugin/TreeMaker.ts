@@ -13,9 +13,12 @@ namespace TreeMaker {
 			return $result;
 		} catch(e) {
 			if(typeof e == "string") throw new Error(e);
-			else throw new Error("plugin.TreeMaker.invalid");
+			else throw new Error(t("plugin.TreeMaker.invalid"));
 		}
 	}
+
+	/** This dummy function marks the usage of translation */
+	function t(message: string) { return message; }
 
 	class TreeMakerVisitor {
 		private _lines: IterableIterator<string>;
@@ -41,7 +44,7 @@ namespace TreeMaker {
 		constructor(v: TreeMakerVisitor) {
 			this._visitor = v;
 
-			if(v.$next() != "tree" || v.$next() != "5.0") throw "plugin.TreeMaker.not5";
+			if(v.$next() != "tree" || v.$next() != "5.0") throw t("plugin.TreeMaker.not5");
 			let width = v.$float, height = v.$float;
 			let scale = 1 / v.$float;
 
@@ -55,7 +58,7 @@ namespace TreeMaker {
 			let fix = MathUtil.$LCM(Array.from(this._set));
 			let sw = Math.ceil(width * scale * fix - 0.25);
 			let sh = Math.ceil(height * scale * fix - 0.25);
-			if(sw < 8 || sh < 8) throw "plugin.TreeMaker.size8";
+			if(sw < 8 || sh < 8) throw t("plugin.TreeMaker.size8");
 
 			let fx = sw / width;
 			let fy = sh / height;

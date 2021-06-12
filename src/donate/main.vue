@@ -21,7 +21,9 @@
 				<div>{{$t('donate.thank', [name])}}</div>
 			</div>
 			<div class="wait flex-grow-0">
-				<button class="btn btn-primary w-100" onclick="window.close()" v-t="step==1?'donate.nextTime':'keyword.close'"></button>
+				<button class="btn btn-primary w-100" onclick="window.close()">
+					{{step==1?$t('donate.nextTime'):$t('keyword.close')}}
+				</button>
 			</div>
 		</div>
 	</div>

@@ -25,7 +25,7 @@ class Matrix {
 	// get determinant(): number { return this.det.$value; }
 
 	/** 傳回反矩陣作為新的矩陣實體 */
-	get $inverse() {
+	get $inverse(): Matrix | null {
 		if(this._det.eq(Fraction.ZERO)) return null;
 		return new Matrix(
 			this.d.div(this._det), this.b.neg.d(this._det),

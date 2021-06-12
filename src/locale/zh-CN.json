@@ -50,14 +50,6 @@
 			"dPad": "显示方向键",
 			"preference": "首选项"
 		},
-		"project": {
-			"title": "打开的项目",
-			"empty": "目前没有打开的项目",
-			"noTitle": "(无标题)",
-			"clone": "复制目前的项目",
-			"close": "关闭目前的项目",
-			"closeAll": "关闭所有项目"
-		},
 		"tools": {
 			"title": "工具",
 			"TreeMaker": "导入 TreeMaker 文件"
@@ -81,7 +73,8 @@
 			"close": "关闭",
 			"closeAll": "全部关闭",
 			"closeOther": "关闭其它",
-			"closeRight": "关闭右侧"
+			"closeRight": "关闭右侧",
+			"noTitle": "(无标题)"
 		},
 		"panel": "选项面板"
 	},
@@ -149,7 +142,6 @@
 		"title": "分享项目",
 		"copy": "复制",
 		"share": "分享",
-		"shorten": "缩短",
 		"message": "快来看我用 Box Pleating Studio 设计的项目「{0}」！"
 	},
 	"about": {

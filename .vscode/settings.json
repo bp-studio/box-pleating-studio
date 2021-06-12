@@ -30,6 +30,12 @@
 	"i18n-ally.keystyle": "nested",
 	"i18n-ally.indent": 4,
 	"i18n-ally.tabStyle": "tab",
+	"i18n-ally.usage.scanningIgnore": [
+		"src/public/**/*"
+	],
+	"i18n-ally.keysInUse": [
+		"since"
+	],
 	"vetur.experimental.templateInterpolationService": true,
 	"cSpell.words": [
 		"bpstudio",

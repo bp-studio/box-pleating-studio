@@ -50,14 +50,6 @@
 			"dPad": "Mostrar D-pad",
 			"preference": "Preferencias"
 		},
-		"project": {
-			"title": "Proyectos abiertos",
-			"empty": "No hay proyectos abiertos",
-			"noTitle": "(Sin título)",
-			"clone": "Clonar proyecto actual",
-			"close": "Cerrar proyecto actual",
-			"closeAll": "Cerrar todos los proyectos"
-		},
 		"tools": {
 			"title": "Herramientas",
 			"TreeMaker": "Importar archivo TreeMaker"
@@ -81,7 +73,8 @@
 			"close": "Cerrar",
 			"closeAll": "Cerrar todo",
 			"closeOther": "Cerrar otros",
-			"closeRight": "Cerrar todo a la derecha"
+			"closeRight": "Cerrar todo a la derecha",
+			"noTitle": "(Sin título)"
 		},
 		"panel": "Panel de opciones"
 	},
@@ -149,7 +142,6 @@
 		"title": "Compartir proyecto",
 		"copy": "Copiar",
 		"share": "Cuota",
-		"shorten": "Acortar",
 		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!"
 	},
 	"about": {

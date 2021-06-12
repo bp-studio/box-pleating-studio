@@ -50,14 +50,6 @@
 			"dPad": "顯示方向鍵",
 			"preference": "喜好設定"
 		},
-		"project": {
-			"title": "開啟的專案",
-			"empty": "目前沒有開啟的專案",
-			"noTitle": "(無標題)",
-			"clone": "複製目前的專案",
-			"close": "關閉目前的專案",
-			"closeAll": "關閉所有專案"
-		},
 		"tools": {
 			"title": "工具",
 			"TreeMaker": "匯入 TreeMaker 檔案"
@@ -81,7 +73,8 @@
 			"close": "關閉",
 			"closeAll": "全部關閉",
 			"closeOther": "關閉其它",
-			"closeRight": "關閉右側"
+			"closeRight": "關閉右側",
+			"noTitle": "(無標題)"
 		},
 		"panel": "選項面板"
 	},
@@ -149,7 +142,6 @@
 		"title": "分享專案",
 		"copy": "複製",
 		"share": "分享",
-		"shorten": "縮短",
 		"message": "快來看我用 Box Pleating Studio 設計的專案「{0}」！"
 	},
 	"about": {

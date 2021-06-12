@@ -50,14 +50,6 @@
 			"dPad": "Show D-pad",
 			"preference": "Preferences"
 		},
-		"project": {
-			"title": "Open projects",
-			"empty": "No open projects",
-			"noTitle": "(no title)",
-			"clone": "Clone current project",
-			"close": "Close current project",
-			"closeAll": "Close all projects"
-		},
 		"tools": {
 			"title": "Tools",
 			"TreeMaker": "Import TreeMaker file"
@@ -81,7 +73,8 @@
 			"close": "Close",
 			"closeAll": "Close all",
 			"closeOther": "Close others",
-			"closeRight": "Close all to the right"
+			"closeRight": "Close all to the right",
+			"noTitle": "(no title)"
 		},
 		"panel": "Option panel"
 	},
@@ -149,7 +142,6 @@
 		"title": "Share project",
 		"copy": "Copy",
 		"share": "Share",
-		"shorten": "Shorten",
 		"message": "Check out my project \"{0}\" designed with Box Pleating Studio!"
 	},
 	"about": {
