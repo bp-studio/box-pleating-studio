@@ -47,11 +47,11 @@
 
 	@Component
 	export default class Welcome extends Vue {
-		private bi: any;
-		private install: number = 0;
-		private ios: boolean = navigator.standalone === false;
+		protected bi: any;
+		protected install: number = 0;
+		protected ios: boolean = navigator.standalone === false;
 
-		private get core() { return core; }
+		protected get core() { return core; }
 
 		created() {
 			window.addEventListener("beforeinstallprompt", event => {

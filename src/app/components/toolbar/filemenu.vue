@@ -70,7 +70,7 @@
 		}
 
 		protected newProject() {
-			core.create();
+			core.projects.create();
 			gtag('event', 'project_create');
 		}
 
@@ -116,7 +116,7 @@
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
 			gtag('event', 'project_open');
 			core.loader.hide();
-			core.select(core.designs[core.designs.length - 1]);
+			core.projects.select(core.designs[core.designs.length - 1]);
 		}
 		public async openFiles(files: FileList) {
 			if(files.length) for(let i = 0; i < files.length; i++) await this.open(files[i]);
@@ -126,7 +126,7 @@
 				let buffer = await readFile(file);
 				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
 				if(test == "{") { // JSON
-					core.addDesign(this.bp.load(bufferToText(buffer)));
+					core.projects.add(this.bp.load(bufferToText(buffer)));
 				} else if(test == "P") { // PKZip
 					await this.openWorkspace(buffer);
 				} else throw 1;
@@ -142,7 +142,7 @@
 			for(let f of files) {
 				try {
 					let data = await zip.file(f).async("text");
-					core.addDesign(this.bp.load(data));
+					core.projects.add(this.bp.load(data));
 				} catch(e) {
 					debugger;
 					await core.alert(this.$t('message.invalidFormat', [f]));

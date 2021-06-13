@@ -6,13 +6,15 @@
 		</div>
 		<div class="mt-3 d-flex" style="flex-wrap:wrap;">
 			<button class="btn btn-primary flex-shrink-0" @click="subject.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'"></button>
-			<div class="flex-grow-1 d-flex justify-content-end" style="flex-basis:150px; width:0px;">
-				<label class="col-form-label ms-2 flex-shrink-0" style="max-width:calc(100% - 200px); overflow:hidden;">
+			<div class="flex-grow-1 d-flex">
+				<label class="col-form-label ms-2 text-end" style="width: 0; flex-grow: 1000; max-width: calc((100% - 225px) * 46); overflow: hidden;">
 					...&nbsp;
 				</label>
-				<label class="col-form-label me-2 flex-shrink-0" v-t="'panel.vertex.ofLength'"></label>
-				<div class="flex-grow-1" style="max-width:calc(200px - 50%)">
-					<number v-model="newLength" :min="1"></number>
+				<div class="d-flex flex-grow-1">
+					<label class="col-form-label me-2 flex-shrink-0" v-t="'panel.vertex.ofLength'"></label>
+					<div class="flex-grow-1" style="width: 90px;">
+						<number v-model="newLength" :min="1"></number>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<projects ref="mgr" :designs="designs"></projects>
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
 		<note v-if="design&&bp.patternNotFound(design)"></note>
@@ -8,7 +9,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 	import { sanitize, callService } from './import/types';
 
@@ -20,6 +21,7 @@
 	import Confirm from './dialog/confirm.vue';
 	import Alert from './dialog/alert.vue';
 	import Language from './dialog/language.vue';
+	import Designs from './projects.vue';
 
 	declare const setInterval: any;
 	declare const core: Core;
@@ -71,6 +73,10 @@
 			localStorage.setItem("build", app_config.app_version);
 		}
 
+		public get projects() {
+			return this.$refs.mgr as Designs;
+		}
+
 		public async init() {
 			bp.option.onDeprecate = (title: string) => {
 				let t = title || this.$t("keyword.untitled");
@@ -93,9 +99,9 @@
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
 					session.jsons.forEach(
-						(j: object) => this.addDesign(bp.restore(j), false)
+						(j: object) => this.projects.add(bp.restore(j), false)
 					);
-					if(session.open >= 0) this.select(this.designs[session.open]);
+					if(session.open >= 0) this.projects.select(this.designs[session.open]);
 					bp.update();
 				}
 			}
@@ -113,7 +119,7 @@
 				// 寫入 sessionStorage 的值不會因為頁籤 reload 而遺失，
 				// 因此可以用這個來避免重刷頁面的時候再次載入的問題
 				sessionStorage.setItem("project", lz);
-				this.addDesign(bp.load(json));
+				this.projects.add(bp.load(json));
 				gtag('event', 'share_open');
 			}
 
@@ -153,9 +159,9 @@
 
 		public open(d: string | object) {
 			if(typeof d == "string") {
-				this.addDesign(bp.design = bp.load(d));
+				this.projects.add(bp.design = bp.load(d));
 			} else {
-				this.addDesign(bp.design = bp.restore(d));
+				this.projects.add(bp.design = bp.restore(d));
 			}
 		}
 
@@ -196,113 +202,6 @@
 			}
 		}
 
-		public create() {
-			let j = { title: this.$t('keyword.untitled') };
-			let d = bp.create(this.checkTitle(j));
-			this.addDesign(bp.design = d);
-			this.scrollTo(d.id);
-		}
-
-		private scrollTo(id: number) {
-			Vue.nextTick(() => {
-				let el = document.getElementById(`tab${id}`);
-				if(el) el.scrollIntoView({
-					behavior: "smooth",
-					inline: "end"
-				});
-			});
-		}
-
-		public select(id: number) {
-			bp.select(id);
-			let i = this.tabHistory.indexOf(id);
-			if(i >= 0) this.tabHistory.splice(i, 1);
-			this.tabHistory.unshift(id);
-			this.scrollTo(id);
-		}
-
-		public selectLast(): void {
-			bp.select(this.tabHistory.length ? this.tabHistory[0] : null);
-			bp.update();
-		}
-		public async closeCore(id: number): Promise<boolean> {
-			let d = bp.getDesign(id)!;
-			let title = d.title || this.$t("keyword.untitled");
-			if(bp.isModified(d)) {
-				this.select(id);
-				let message = this.$t("message.unsaved", [title]);
-				if(!(await this.confirm(message))) return false;
-			}
-			this.designs.splice(this.designs.indexOf(id), 1);
-			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
-			bp.close(id);
-			return true;
-		}
-		public async close(id?: number) {
-			if(id === undefined) id = bp.design.id;
-			if(await this.closeCore(id)) this.selectLast();
-		}
-		public async closeBy(predicate: (i: number) => boolean) {
-			let promises: Promise<boolean>[] = [];
-			for(let i of this.designs.concat()) if(predicate(i)) promises.push(this.closeCore(i));
-			await Promise.all(promises);
-			this.selectLast();
-		}
-		public async closeOther(id: number) {
-			await this.closeBy(i => i != id);
-		}
-		public async closeRight(id: number) {
-			await this.closeBy(i => i > id);
-		}
-		public async closeAll() {
-			await this.closeBy(i => true);
-		}
-		public clone(id?: number) {
-			if(id === undefined) id = bp.design.id;
-			let i = this.designs.indexOf(id);
-			let d = bp.getDesign(id).toJSON(true);
-			let c = bp.restore(this.checkTitle(d));
-			this.designs.splice(i + 1, 0, c.id);
-			this.select(c.id);
-			gtag('event', 'project_clone');
-		}
-		public addDesign(d: Design, select = true) {
-			this.designs.push(d.id);
-			if(select) this.select(d.id);
-			else this.tabHistory.unshift(d.id);
-		}
-
-		private checkTitle(j: any) {
-			let t = j.title.replace(/ - \d+$/, ""), n = 1;
-			let designs = bp.getDesigns();
-			if(!designs.some(d => d.title == t)) return j;
-			while(designs.some(d => d.title == t + " - " + n)) n++;
-			j.title = t + " - " + n;
-			return j;
-		}
-
-		public async zip(): Promise<Blob> {
-			await this.libReady;
-			let zip = new JSZip();
-			let names = new Set<string>();
-			for(let i = 0; i < this.designs.length; i++) {
-				let design = bp.getDesign(this.designs[i]);
-				let name = sanitize(design.title);
-				if(names.has(name)) {
-					for(var j = 1; names.has(name + " (" + j + ")"); j++);
-					name = name + " (" + j + ")";
-				}
-				names.add(name);
-				zip.file(name + ".bps", JSON.stringify(design));
-			}
-			let blob = await zip.generateAsync({
-				type: 'blob',
-				compression: "DEFLATE",
-				compressionOptions: { level: 9 }
-			});
-			return blob.slice(0, blob.size, "application/octet-binary");
-		}
-
 		/////////////////////////////////////////////////////////////////////////////////////////
 		// 對話方塊
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -326,10 +225,33 @@
 			if(type == 'bps') return bp.toBPS();
 			return null;
 		}
+
 		public getFilename(type: string): string {
 			if(!this.design) return "";
 			if(type == "bpz") return this.$t('keyword.workspace').toString();
 			else return sanitize(this.design.title);
+		}
+
+		private async zip(): Promise<Blob> {
+			await this.libReady;
+			let zip = new JSZip();
+			let names = new Set<string>();
+			for(let i = 0; i < this.designs.length; i++) {
+				let design = bp.getDesign(this.designs[i]);
+				let name = sanitize(design.title);
+				if(names.has(name)) {
+					for(var j = 1; names.has(name + " (" + j + ")"); j++);
+					name = name + " (" + j + ")";
+				}
+				names.add(name);
+				zip.file(name + ".bps", JSON.stringify(design));
+			}
+			let blob = await zip.generateAsync({
+				type: 'blob',
+				compression: "DEFLATE",
+				compressionOptions: { level: 9 }
+			});
+			return blob.slice(0, blob.size, "application/octet-binary");
 		}
 	}
 </script>

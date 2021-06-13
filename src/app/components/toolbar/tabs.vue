@@ -8,14 +8,14 @@
 					v-for="id in core.designs"
 					:key="id"
 					:id="`tab${id}`"
-					@click="core.select(id)"
+					@click="core.projects.select(id)"
 				>
 					<div class="tab-close" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
 						<div>
 							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
 						</div>
-						<div class="px-2" @click.stop="core.close(id)" @pointerdown.stop @mousedown.stop>
+						<div class="px-2" @click.stop="core.projects.close(id)" @pointerdown.stop @mousedown.stop>
 							<i class="fas fa-times"></i>
 						</div>
 					</div>
@@ -34,24 +34,24 @@
 		<div id="divTab" class="flex-grow-1" v-else></div>
 
 		<contextmenu ref="tabMenu">
-			<div class="dropdown-item" @click="core.clone(menuId)">
+			<div class="dropdown-item" @click="core.projects.clone(menuId)">
 				<i class="far fa-clone"></i>
 				{{$t('toolbar.tab.clone')}}
 			</div>
 			<divider></divider>
-			<div class="dropdown-item" @click="core.close(menuId)">
+			<div class="dropdown-item" @click="core.projects.close(menuId)">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.close')}}
 			</div>
-			<div class="dropdown-item" @click="core.closeOther(menuId)">
+			<div class="dropdown-item" @click="core.projects.closeOther(menuId)">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.closeOther')}}
 			</div>
-			<div class="dropdown-item" @click="core.closeRight(menuId)">
+			<div class="dropdown-item" @click="core.projects.closeRight(menuId)">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.closeRight')}}
 			</div>
-			<div class="dropdown-item" @click="core.closeAll()">
+			<div class="dropdown-item" @click="core.projects.closeAll()">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.closeAll')}}
 			</div>
