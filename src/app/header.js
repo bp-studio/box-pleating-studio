@@ -13,7 +13,7 @@ document.addEventListener("wheel", (event) => {
 var isMac = navigator.platform.toLowerCase().startsWith("mac");
 
 // 是否支援原生檔案 API
-var nativeFileEnabled = typeof window.showSaveFilePicker != 'undefined';
+var FileApiEnabled = typeof window.showSaveFilePicker != 'undefined';
 
 ///////////////////////////////////////////////////
 // 檔案處理

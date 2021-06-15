@@ -1,3 +1,4 @@
+import * as IdbKeyval from 'idb-keyval';
 import VueI18n from 'vue-i18n';
 
 declare global {
@@ -11,10 +12,12 @@ declare global {
 		skipped: boolean;
 	};
 
+	// 第三方程式庫全域物件
 	export const i18n: VueI18n;
+	export const idbKeyval: typeof IdbKeyval;
 
 	// 系統狀態常數
-	export const nativeFileEnabled: boolean;
+	export const FileApiEnabled: boolean;
 	export const isMac: boolean;
 
 	// 全域宣告的函數

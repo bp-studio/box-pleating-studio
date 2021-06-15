@@ -104,7 +104,7 @@
 			}
 			this.designs.splice(this.designs.indexOf(id), 1);
 			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
-			core.handles.delete(id);
+			if(core.handles.delete(id)) core.refreshHandle();
 			bp.close(id);
 			return true;
 		}

@@ -39,6 +39,7 @@
 		"gulp-typescript": "^5.0.1",
 		"gulp-workbox": "^1.0.2",
 		"gulp-wrap": "^0.15.0",
+		"idb-keyval": "^5.0.6",
 		"inquirer": "^8.0.0",
 		"jszip": "^3.6.0",
 		"lazypipe": "^1.0.2",

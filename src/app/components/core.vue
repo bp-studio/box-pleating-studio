@@ -74,6 +74,11 @@
 			localStorage.setItem("build", app_config.app_version);
 		}
 
+		public refreshHandle() {
+			// Vue 2 不支援 Map 的反應
+			this.handles = new Map(this.handles);
+		}
+
 		public get projects() {
 			return this.$refs.mgr as Projects;
 		}
@@ -99,9 +104,16 @@
 			if(await this.checkSession()) {
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
-					session.jsons.forEach(
-						(j: object) => this.projects.add(bp.restore(j), false)
-					);
+					let jsons = session.jsons as unknown[];
+					for(let i = 0; i < jsons.length; i++) {
+						let design = bp.restore(jsons[i]);
+						this.projects.add(design, false);
+						if(FileApiEnabled) {
+							let handle = await idbKeyval.get(i) as FileSystemFileHandle;
+							if(handle) this.handles.set(design.id, handle);
+						}
+					}
+					core.refreshHandle();
 					if(session.open >= 0) this.projects.select(this.designs[session.open]);
 					bp.update();
 				}
@@ -191,7 +203,7 @@
 			if(this.autoSave && await this.checkSession()) {
 				// 排程到下一次 BPStudio 更新完畢之後存檔，
 				// 避免在存檔的瞬間製造出 glitch
-				bp.option.onUpdate = () => {
+				bp.option.onUpdate = async () => {
 					let session = {
 						jsons: this.designs.map(
 							id => bp.getDesign(id)!.toJSON(true)
@@ -199,6 +211,13 @@
 						open: bp.design ? this.designs.indexOf(bp.design.id) : -1
 					};
 					localStorage.setItem("session", JSON.stringify(session));
+					if(FileApiEnabled) {
+						await idbKeyval.clear();
+						for(let i = 0; i < this.designs.length; i++) {
+							let handle = this.handles.get(this.designs[i]);
+							if(handle) idbKeyval.set(i, handle);
+						}
+					}
 				};
 			}
 		}

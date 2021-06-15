@@ -10,7 +10,7 @@
 					:id="`tab${id}`"
 					@click="core.projects.select(id)"
 				>
-					<div class="tab-close" :title="getDesign(id).title" @contextmenu="tabMenu($event, id)">
+					<div class="tab-close" :title="getTooltip(id)" @contextmenu="tabMenu($event, id)">
 						<div>
 							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
@@ -19,7 +19,7 @@
 							<i class="fas fa-times"></i>
 						</div>
 					</div>
-					<div class="tab-down" :title="getDesign(id).title">
+					<div class="tab-down" :title="getTooltip(id)">
 						<div>
 							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
@@ -109,6 +109,12 @@
 		public getTitle(id: number): string {
 			let title = this.getDesign(id).title;
 			return title ? title : this.$t('toolbar.tab.noTitle').toString();
+		}
+		public getTooltip(id: number): string {
+			let result = this.getDesign(id).title;
+			let handle = core.handles.get(id);
+			if(handle) result += "\n" + handle.name;
+			return result;
 		}
 	}
 </script>

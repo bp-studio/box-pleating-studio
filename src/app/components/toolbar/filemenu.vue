@@ -6,7 +6,7 @@
 		</div>
 		<divider></divider>
 
-		<template v-if="nativeFileEnabled">
+		<template v-if="FileApiEnabled">
 			<opener ref="open" @open="open($event)">
 				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 			</opener>
@@ -49,7 +49,7 @@
 
 		<divider></divider>
 
-		<template v-if="nativeFileEnabled">
+		<template v-if="FileApiEnabled">
 			<saveas
 				:disabled="!design"
 				type="svg"
@@ -117,16 +117,15 @@
 
 			registerHotkey(() => (this.$refs.open as Executor).execute(), "o");
 			registerHotkey(() => {
-				console.log(core.design)
 				if(!core.design) return;
-				if(nativeFileEnabled) this.save();
+				if(FileApiEnabled) this.save();
 				else(this.$refs.bps as Executor).execute();
 			}, "s");
 			registerHotkey(() => core.design && (this.$refs.bpz as Executor).execute(), "s", true);
 			registerHotkey(() => this.print(), "p");
 		}
 
-		protected get nativeFileEnabled() { return nativeFileEnabled; }
+		protected get FileApiEnabled() { return FileApiEnabled; }
 
 		protected newProject() {
 			core.projects.create();
@@ -136,7 +135,10 @@
 		protected notify(handle?: FileSystemFileHandle) {
 			let design = this.bp.design;
 			this.bp.notifySave(design);
-			if(handle) core.handles.set(design.id, handle);
+			if(handle) {
+				core.handles.set(design.id, handle);
+				core.refreshHandle();
+			}
 			gtag('event', 'project_bps');
 		}
 		protected notifyAll() {
@@ -162,13 +164,13 @@
 			return [this.$refs.bps, this.$refs.bpz, this.$refs.svg, this.$refs.png] as Download[];
 		}
 		protected init(): void {
-			if(!nativeFileEnabled) {
+			if(!FileApiEnabled) {
 				// 當選單開啟的時候生成 ObjectURL
 				this.downloads().forEach(d => d.getFile());
 			}
 		}
 		protected reset(): void {
-			if(!nativeFileEnabled) {
+			if(!FileApiEnabled) {
 				// 當選單關閉的時候把所有 ObjectURL 回收掉
 				this.downloads().forEach(d => d.reset());
 			}
@@ -178,9 +180,15 @@
 			try {
 				let handle = core.handles.get(this.design.id);
 				let writable = await handle.createWritable();
-				await writable.write(await core.getBlob("bps"));
-				await writable.close();
-				this.notify();
+				try {
+					await handle.getFile();
+					await writable.write(await core.getBlob("bps"));
+					await writable.close();
+					this.notify();
+				} catch(e) {
+					await writable.abort();
+					throw e;
+				}
 			} catch(e) {
 				(this.$refs.bps as Executor).execute();
 			}
@@ -217,7 +225,10 @@
 				if(test == "{") { // JSON
 					let design = this.bp.load(bufferToText(buffer));
 					core.projects.add(design);
-					if(handle) core.handles.set(design.id, handle);
+					if(handle) {
+						core.handles.set(design.id, handle);
+						core.refreshHandle();
+					}
 				} else if(test == "P") { // PKZip
 					await this.openWorkspace(buffer);
 				} else throw 1;
