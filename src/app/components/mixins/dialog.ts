@@ -1,6 +1,5 @@
 import * as bootstrap from 'bootstrap';
 import { Component, Vue } from 'vue-property-decorator';
-import { registerHotkeyCore, unregisterHotkeyCore } from '../import/types';
 
 import CoreBase from './coreBase';
 

@@ -23,23 +23,37 @@
 			"title": "檔案",
 			"new": "開新專案",
 			"open": "開啟專案 / 工作區",
-			"copyPNG": "以 PNG 格式複製目前的視圖",
 			"print": "列印目前的視圖",
 			"share": "分享目前的專案",
+			"notFound": "無法開啟檔案「{0}」；找不到檔案。",
+			"recent": {
+				"title": "開啟最近的檔案",
+				"empty": "沒有記錄",
+				"clear": "清除記錄"
+			},
 			"BPF": "BP Studio 格式",
-			"BPS": "BP Studio 專案",
-			"BPZ": "BP Studio 工作區",
-			"PNG": "PNG 圖片",
-			"SVG": "SVG 圖片",
-			"downloadBPS": "下載目前的專案",
-			"downloadBPZ": "下載工作區",
-			"downloadPNG": "以 PNG 格式下載目前的視圖",
-			"downloadSVG": "以 SVG 格式下載目前的視圖",
-			"saveBPS": "儲存專案",
-			"saveBPSas": "另存專案為...",
-			"saveBPZ": "將工作區另存為...",
-			"saveSVG": "將目前的視圖儲存為 SVG",
-			"savePNG": "將目前的視圖儲存為 PNG"
+			"BPS": {
+				"name": "BP Studio 專案",
+				"download": "下載目前的專案",
+				"save": "儲存專案",
+				"saveAs": "另存專案為..."
+			},
+			"BPZ": {
+				"name": "BP Studio 工作區",
+				"download": "下載工作區",
+				"save": "將工作區另存為..."
+			},
+			"PNG": {
+				"name": "PNG 圖片",
+				"download": "以 PNG 格式下載目前的視圖",
+				"save": "將目前的視圖儲存為 PNG",
+				"copy": "以 PNG 格式複製目前的視圖"
+			},
+			"SVG": {
+				"name": "SVG 圖片",
+				"download": "以 SVG 格式下載目前的視圖",
+				"save": "將目前的視圖儲存為 SVG"
+			}
 		},
 		"edit": {
 			"title": "編輯",

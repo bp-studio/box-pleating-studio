@@ -23,23 +23,37 @@
 			"title": "ファイル",
 			"new": "新規プロジェクト作成",
 			"open": "プロジェクト / ワークスペースを開く",
-			"copyPNG": "現在のビューを PNG としてコピー",
 			"print": "現在のビューを印刷",
 			"share": "現在のプロジェクトを共有",
+			"notFound": "ファイル \"{0}\" を開くことができません；ファイルが見つかりません。",
+			"recent": {
+				"title": "最近のファイルを開く",
+				"empty": "記録なし",
+				"clear": "記録を削除する"
+			},
 			"BPF": "BP Studio フォーマット",
-			"BPS": "BP Studio プロジェクト",
-			"BPZ": "BP Studio ワークスペース",
-			"PNG": "PNG 画像",
-			"SVG": "SV G画像",
-			"downloadBPS": "現在のプロジェクトをダウンロード",
-			"downloadBPZ": "ワークスペースをダウンロード",
-			"downloadPNG": "現在のビューを PNG としてダウンロード",
-			"downloadSVG": "現在のビューを SVG としてダウンロード",
-			"saveBPS": "プロジェクトを保存",
-			"saveBPSas": "プロジェクトを名前を付けて保存...",
-			"saveBPZ": "ワークスペースを名前を付けて保存...",
-			"saveSVG": "現在のビューを SVG として保存",
-			"savePNG": "現在のビューを PNG として保存"
+			"BPS": {
+				"name": "BP Studio プロジェクト",
+				"download": "現在のプロジェクトをダウンロード",
+				"save": "プロジェクトを保存",
+				"saveAs": "プロジェクトを名前を付けて保存..."
+			},
+			"BPZ": {
+				"name": "BP Studio ワークスペース",
+				"download": "ワークスペースをダウンロード",
+				"save": "ワークスペースを名前を付けて保存..."
+			},
+			"PNG": {
+				"name": "PNG 画像",
+				"download": "現在のビューを PNG としてダウンロード",
+				"save": "現在のビューを PNG として保存",
+				"copy": "現在のビューを PNG としてコピー"
+			},
+			"SVG": {
+				"name": "SV G画像",
+				"download": "現在のビューを SVG としてダウンロード",
+				"save": "現在のビューを SVG として保存"
+			}
 		},
 		"edit": {
 			"title": "編集",

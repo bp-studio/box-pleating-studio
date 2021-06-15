@@ -23,23 +23,37 @@
 			"title": "Các tập tin",
 			"new": "Dự án mới",
 			"open": "Mở các dự án / không gian làm việc",
-			"copyPNG": "Sao chép chế độ xem hiện tại dưới dạng PNG",
 			"print": "In chế độ xem hiện tại",
 			"share": "Chia sẻ dự án hiện tại",
+			"notFound": "Không thể mở tệp \"{0}\"; \nkhông tìm thấy tệp.",
+			"recent": {
+				"title": "Mở tệp gần đây",
+				"empty": "Không có hồ sơ",
+				"clear": "Xóa hồ sơ"
+			},
 			"BPF": "Định dạng BP Studio",
-			"BPS": "Dự án BP Studio",
-			"BPZ": "Không gian làm việc của BP Studio",
-			"PNG": "Hình ảnh PNG",
-			"SVG": "SVG hình ảnh",
-			"downloadBPS": "Tải xuống dự án hiện tại",
-			"downloadBPZ": "Tải xuống không gian làm việc",
-			"downloadPNG": "Tải xuống chế độ xem hiện tại dưới dạng PNG",
-			"downloadSVG": "Tải xuống chế độ xem hiện tại dưới dạng SVG",
-			"saveBPS": "Lưu dự án",
-			"saveBPSas": "Lưu dự án thành ...",
-			"saveBPZ": "Lưu không gian làm việc thành ...",
-			"saveSVG": "Lưu chế độ xem hiện tại dưới dạng SVG",
-			"savePNG": "Lưu chế độ xem hiện tại dưới dạng PNG"
+			"BPS": {
+				"name": "Dự án BP Studio",
+				"download": "Tải xuống dự án hiện tại",
+				"save": "Lưu dự án",
+				"saveAs": "Lưu dự án thành ..."
+			},
+			"BPZ": {
+				"name": "Không gian làm việc của BP Studio",
+				"download": "Tải xuống không gian làm việc",
+				"save": "Lưu không gian làm việc thành ..."
+			},
+			"PNG": {
+				"name": "Hình ảnh PNG",
+				"download": "Tải xuống chế độ xem hiện tại dưới dạng PNG",
+				"save": "Lưu chế độ xem hiện tại dưới dạng PNG",
+				"copy": "Sao chép chế độ xem hiện tại dưới dạng PNG"
+			},
+			"SVG": {
+				"name": "SVG hình ảnh",
+				"download": "Tải xuống chế độ xem hiện tại dưới dạng SVG",
+				"save": "Lưu chế độ xem hiện tại dưới dạng SVG"
+			}
 		},
 		"edit": {
 			"title": "Biên tập",

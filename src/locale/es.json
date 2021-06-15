@@ -23,23 +23,37 @@
 			"title": "Archivos",
 			"new": "Nuevo proyecto",
 			"open": "Proyectos abiertos / espacios de trabajo",
-			"copyPNG": "Copiar la vista actual como PNG",
 			"print": "Imprimir vista actual",
 			"share": "Compartir proyecto actual",
+			"notFound": "No se puede abrir el archivo \"{0}\"; archivo no encontrado.",
+			"recent": {
+				"title": "Abrir archivo reciente",
+				"empty": "No hay registros",
+				"clear": "Vaciar registros"
+			},
 			"BPF": "Formatos de BP Studio",
-			"BPS": "Proyecto BP Studio",
-			"BPZ": "Espacio de trabajo de BP Studio",
-			"PNG": "Imagen PNG",
-			"SVG": "Imagen SVG",
-			"downloadBPS": "Descargar proyecto actual",
-			"downloadBPZ": "Descargar espacio de trabajo",
-			"downloadPNG": "Descargar la vista actual como PNG",
-			"downloadSVG": "Descargar la vista actual como SVG",
-			"saveBPS": "Guardar proyecto",
-			"saveBPSas": "Guardar proyecto como...",
-			"saveBPZ": "Guardar espacio de trabajo como ...",
-			"saveSVG": "Guardar la vista actual como SVG",
-			"savePNG": "Guardar la vista actual como PNG"
+			"BPS": {
+				"name": "Proyecto BP Studio",
+				"download": "Descargar proyecto actual",
+				"save": "Guardar proyecto",
+				"saveAs": "Guardar proyecto como..."
+			},
+			"BPZ": {
+				"name": "Espacio de trabajo de BP Studio",
+				"download": "Descargar espacio de trabajo",
+				"save": "Guardar espacio de trabajo como ..."
+			},
+			"PNG": {
+				"name": "Imagen PNG",
+				"download": "Descargar la vista actual como PNG",
+				"save": "Guardar la vista actual como PNG",
+				"copy": "Copiar la vista actual como PNG"
+			},
+			"SVG": {
+				"name": "Imagen SVG",
+				"download": "Descargar la vista actual como SVG",
+				"save": "Guardar la vista actual como SVG"
+			}
 		},
 		"edit": {
 			"title": "Editar",

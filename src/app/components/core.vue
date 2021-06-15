@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 
 	import VueI18n from 'vue-i18n';
@@ -35,6 +35,8 @@
 	export default class Core extends CoreBase {
 		public designs: number[] = [];
 		public handles: Map<number, FileSystemFileHandle> = new Map();
+		public recent: FileSystemFileHandle[] = [];
+
 		public tabHistory: number[] = [];
 		public autoSave: boolean = true;
 		public showDPad: boolean = true;
@@ -108,11 +110,16 @@
 					for(let i = 0; i < jsons.length; i++) {
 						let design = bp.restore(jsons[i]);
 						this.projects.add(design, false);
-						if(FileApiEnabled) {
-							let handle = await idbKeyval.get(i) as FileSystemFileHandle;
-							if(handle) this.handles.set(design.id, handle);
+					}
+
+					if(FileApiEnabled) {
+						let entries: [number, FileSystemFileHandle][] = await idbKeyval.entries();
+						for(let [i, handle] of entries) {
+							if(i >= 0) this.handles.set(this.designs[i], handle);
+							else Vue.set(this.recent, -i - 1, handle);
 						}
 					}
+
 					core.refreshHandle();
 					if(session.open >= 0) this.projects.select(this.designs[session.open]);
 					bp.update();
@@ -211,15 +218,31 @@
 						open: bp.design ? this.designs.indexOf(bp.design.id) : -1
 					};
 					localStorage.setItem("session", JSON.stringify(session));
-					if(FileApiEnabled) {
-						await idbKeyval.clear();
-						for(let i = 0; i < this.designs.length; i++) {
-							let handle = this.handles.get(this.designs[i]);
-							if(handle) idbKeyval.set(i, handle);
-						}
-					}
+					if(FileApiEnabled) await this.saveHandle();
 				};
 			}
+		}
+
+		public async saveHandle() {
+			await idbKeyval.clear();
+			for(let i = 0; i < this.designs.length; i++) {
+				let handle = this.handles.get(this.designs[i]);
+				if(handle) await idbKeyval.set(i, handle);
+			}
+			for(let i = 0; i < this.recent.length; i++) {
+				await idbKeyval.set(-i - 1, this.recent[i]);
+			}
+		}
+
+		public async addRecent(handle: FileSystemFileHandle) {
+			for(let i = 0; i < this.recent.length; i++) {
+				if(await this.recent[i].isSameEntry(handle)) {
+					this.recent.splice(i, 1);
+					break;
+				}
+			}
+			this.recent.unshift(handle);
+			if(this.recent.length > 10) this.recent.pop();
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////

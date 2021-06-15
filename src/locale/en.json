@@ -23,23 +23,37 @@
 			"title": "Files",
 			"new": "New project",
 			"open": "Open projects / workspaces",
-			"copyPNG": "Copy current view as PNG",
 			"print": "Print current view",
 			"share": "Share current project",
+			"notFound": "Unable to open file \"{0}\"; file not found.",
+			"recent": {
+				"title": "Open recent file",
+				"empty": "No records",
+				"clear": "Clear records"
+			},
 			"BPF": "BP Studio formats",
-			"BPS": "BP Studio project",
-			"BPZ": "BP Studio workspace",
-			"PNG": "PNG image",
-			"SVG": "SVG image",
-			"downloadBPS": "Download current project",
-			"downloadBPZ": "Download workspace",
-			"downloadPNG": "Download current view as PNG",
-			"downloadSVG": "Download current view as SVG",
-			"saveBPS": "Save project",
-			"saveBPSas": "Save project as...",
-			"saveBPZ": "Save workspace as...",
-			"saveSVG": "Save current view as SVG",
-			"savePNG": "Save current view as PNG"
+			"BPS": {
+				"name": "BP Studio project",
+				"download": "Download current project",
+				"save": "Save project",
+				"saveAs": "Save project as..."
+			},
+			"BPZ": {
+				"name": "BP Studio workspace",
+				"download": "Download workspace",
+				"save": "Save workspace as..."
+			},
+			"PNG": {
+				"name": "PNG image",
+				"download": "Download current view as PNG",
+				"save": "Save current view as PNG",
+				"copy": "Copy current view as PNG"
+			},
+			"SVG": {
+				"name": "SVG image",
+				"download": "Download current view as SVG",
+				"save": "Save current view as SVG"
+			}
 		},
 		"edit": {
 			"title": "Edit",

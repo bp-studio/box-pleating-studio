@@ -10,29 +10,44 @@
 			<opener ref="open" @open="open($event)">
 				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 			</opener>
+			<submenu icon="fas fa-history" :label="$t('toolbar.file.recent.title')">
+				<dropdownitem v-if="recent.length==0" disabled>{{$t('toolbar.file.recent.empty')}}</dropdownitem>
+				<template v-else>
+					<dropdownitem v-for="(h,i) in recent" :key="i" @click="open([h])">
+						<i></i>
+						{{h.name}}
+					</dropdownitem>
+					<divider></divider>
+					<dropdownitem @click="clearRecent">
+						<i class="fas fa-trash-alt"></i>
+						{{$t('toolbar.file.recent.clear')}}
+					</dropdownitem>
+				</template>
+			</submenu>
+			<divider></divider>
 			<dropdownitem :disabled="!design" @click="save()">
-				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.saveBPS')}}</hotkey>
+				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.BPS.save')}}</hotkey>
 			</dropdownitem>
 			<saveas
 				:disabled="!design"
 				type="bps"
 				ref="bps"
 				@save="notify($event)"
-				:desc="$t('toolbar.file.BPS')"
+				:desc="$t('toolbar.file.BPS.name')"
 				mime="application/box-pleating-studio-project"
 			>
 				<i class="fas fa-save"></i>
-				{{$t('toolbar.file.saveBPSas')}}
+				{{$t('toolbar.file.BPS.saveAs')}}
 			</saveas>
 			<saveas
 				:disabled="!design"
 				type="bpz"
 				ref="bpz"
 				@save="notifyAll"
-				:desc="$t('toolbar.file.BPZ')"
+				:desc="$t('toolbar.file.BPZ.name')"
 				mime="application/box-pleating-studio-workspace"
 			>
-				<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.saveBPZ')}}</hotkey>
+				<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.BPZ.save')}}</hotkey>
 			</saveas>
 		</template>
 		<template v-else>
@@ -40,10 +55,10 @@
 				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 			</uploader>
 			<download :disabled="!design" type="bps" ref="bps" @download="notify">
-				<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.downloadBPS')}}</hotkey>
+				<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.BPS.download')}}</hotkey>
 			</download>
 			<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
-				<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.downloadBPZ')}}</hotkey>
+				<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.BPZ.download')}}</hotkey>
 			</download>
 		</template>
 
@@ -55,31 +70,38 @@
 				type="svg"
 				ref="svg"
 				@save="svgSaved"
-				:desc="$t('toolbar.file.SVG')"
+				:desc="$t('toolbar.file.SVG.name')"
 				mime="image/svg+xml"
 			>
 				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.saveSVG')}}
+				{{$t('toolbar.file.SVG.save')}}
 			</saveas>
-			<saveas :disabled="!design" type="png" ref="png" @save="pngSaved" :desc="$t('toolbar.file.PNG')" mime="image/png">
+			<saveas
+				:disabled="!design"
+				type="png"
+				ref="png"
+				@save="pngSaved"
+				:desc="$t('toolbar.file.PNG.name')"
+				mime="image/png"
+			>
 				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.savePNG')}}
+				{{$t('toolbar.file.PNG.save')}}
 			</saveas>
 		</template>
 		<template v-else>
 			<download :disabled="!design" type="svg" ref="svg" @download="svgSaved">
 				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.downloadSVG')}}
+				{{$t('toolbar.file.SVG.download')}}
 			</download>
 			<download :disabled="!design" type="png" ref="png" @download="pngSaved">
 				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.downloadPNG')}}
+				{{$t('toolbar.file.PNG.download')}}
 			</download>
 		</template>
 
 		<dropdownitem @click="copyPNG" :disabled="!design" v-if="copyEnabled">
 			<i class="far fa-copy"></i>
-			{{$t('toolbar.file.copyPNG')}}
+			{{$t('toolbar.file.PNG.copy')}}
 		</dropdownitem>
 		<divider></divider>
 		<dropdownitem @click="print" :disabled="!design">
@@ -126,6 +148,12 @@
 		}
 
 		protected get FileApiEnabled() { return FileApiEnabled; }
+		protected get recent() { return core.recent; }
+
+		protected clearRecent() {
+			core.recent = [];
+			core.saveHandle();
+		}
 
 		protected newProject() {
 			core.projects.create();
@@ -197,8 +225,14 @@
 		protected async open(handles: FileSystemFileHandle[]) {
 			await core.loader.show();
 			for(let handle of handles) {
-				let file = await handle.getFile();
-				await this.openFile(file, handle);
+				if(await handle.requestPermission({ mode: 'read' }) == 'granted') {
+					try {
+						let file = await handle.getFile();
+						await this.openFile(file, handle);
+					} catch(e) {
+						await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
+					}
+				}
 			}
 			gtag('event', 'project_open');
 			core.loader.hide();
@@ -228,9 +262,11 @@
 					if(handle) {
 						core.handles.set(design.id, handle);
 						core.refreshHandle();
+						await core.addRecent(handle);
 					}
 				} else if(test == "P") { // PKZip
 					await this.openWorkspace(buffer);
+					if(handle) await core.addRecent(handle);
 				} else throw 1;
 			} catch(e) {
 				debugger;

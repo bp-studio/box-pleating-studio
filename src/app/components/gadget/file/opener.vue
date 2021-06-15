@@ -25,13 +25,13 @@
 							},
 						},
 						{
-							description: this.$t('toolbar.file.BPS').toString(),
+							description: this.$t('toolbar.file.BPS.name').toString(),
 							accept: {
 								'application/box-pleating-studio-project': ['.bps'],
 							},
 						},
 						{
-							description: this.$t('toolbar.file.BPZ').toString(),
+							description: this.$t('toolbar.file.BPZ.name').toString(),
 							accept: {
 								'application/box-pleating-studio-workspace': ['.bpz'],
 							},
