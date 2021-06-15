@@ -15,7 +15,7 @@
 
 <script lang="ts">
 	import { Component, Prop } from 'vue-property-decorator';
-	import InputMixin from '../mixins/inputMixin';
+	import InputMixin from '../../mixins/inputMixin';
 
 	@Component
 	export default class Field extends InputMixin {

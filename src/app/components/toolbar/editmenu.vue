@@ -16,9 +16,6 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
-	import { registerHotkey } from '../import/types';
-
-	import { core } from '../core.vue';
 
 	@Component
 	export default class EditMenu extends BaseComponent {

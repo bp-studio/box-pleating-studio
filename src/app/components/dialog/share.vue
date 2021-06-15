@@ -46,8 +46,7 @@
 <script lang="ts">
 	import * as bootstrap from 'bootstrap';
 	import BaseComponent from '../mixins/baseComponent';
-	import { Component, Vue } from 'vue-property-decorator';
-	import { core } from '../core.vue';
+	import { Component } from 'vue-property-decorator';
 
 	declare const LZ: any;
 	declare const gtag: any;

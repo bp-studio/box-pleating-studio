@@ -13,17 +13,17 @@
 	@Component
 	export default class Uploader extends Vue {
 
-		private id: string = "file" + this._uid;
+		protected id: string = "file" + this._uid;
 
 		@Prop(String) public accept: string;
 		@Prop(Boolean) public multiple: boolean;
 
-		private get type() {
+		protected get type() {
 			// 已知 Safari 對於 accept 屬性的支援有問題
 			return (navigator.vendor && navigator.vendor.startsWith("Apple")) ? "" : this.accept;
 		}
 
-		public click() {
+		public execute() {
 			(this.$refs.lbl as HTMLLabelElement).click();
 		}
 	}

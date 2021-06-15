@@ -20,8 +20,6 @@
 
 <script lang="ts">
 	import { Vue, Component, Watch } from 'vue-property-decorator';
-	import { core } from '../core.vue';
-	import { i18n } from '../import/types';
 	import * as bootstrap from 'bootstrap';
 
 	declare const locale: any;

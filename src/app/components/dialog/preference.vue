@@ -33,10 +33,8 @@
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator';
 	import { bp } from '../import/BPStudio';
-	import { core } from '../core.vue';
 	import * as bootstrap from 'bootstrap';
 
-	declare const i18n: any;
 	declare const gtag: any;
 
 	@Component

@@ -16,6 +16,7 @@
 		"@makeomatic/gulp-wrap-js": "^1.0.2",
 		"@popperjs/core": "^2.9.2",
 		"@types/bootstrap": "^5.0.13",
+		"@types/wicg-file-system-access": "^2020.9.1",
 		"@typescript-eslint/eslint-plugin": "^4.22.1",
 		"@typescript-eslint/parser": "^4.22.1",
 		"ansi-colors": "^4.1.1",

@@ -54,8 +54,6 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { core } from '../core.vue';
-	import { readFile, bufferToText } from '../import/types';
 
 	import BaseComponent from '../mixins/baseComponent';
 

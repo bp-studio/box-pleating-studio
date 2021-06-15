@@ -21,8 +21,6 @@
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 
-	declare const isMac: boolean;
-
 	@Component
 	export default class HotKey extends Vue {
 		@Prop(String) public icon: string;
@@ -30,6 +28,6 @@
 		@Prop(Boolean) public ctrl: boolean;
 		@Prop(Boolean) public shift: boolean;
 
-		private get isMac() { return isMac; }
+		protected get isMac() { return isMac; }
 	}
 </script>

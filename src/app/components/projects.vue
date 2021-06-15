@@ -6,7 +6,6 @@
 
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
-	import { core } from './core.vue';
 
 	declare const gtag: any;
 
@@ -105,6 +104,7 @@
 			}
 			this.designs.splice(this.designs.indexOf(id), 1);
 			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
+			core.handles.delete(id);
 			bp.close(id);
 			return true;
 		}

@@ -62,10 +62,9 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 	import { Design } from '../import/BPStudio';
-	import { core } from '../core.vue';
 
 	import BaseComponent from '../mixins/baseComponent';
-	import ContextMenu from '../gadget/contextmenu.vue';
+	import ContextMenu from '../gadget/menu/contextmenu.vue';
 
 	@Component
 	export default class Tabs extends BaseComponent {

@@ -11,7 +11,6 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
-	import { sanitize, callService } from './import/types';
 
 	import VueI18n from 'vue-i18n';
 	import JSZip from 'jszip';
@@ -21,19 +20,21 @@
 	import Confirm from './dialog/confirm.vue';
 	import Alert from './dialog/alert.vue';
 	import Language from './dialog/language.vue';
-	import Designs from './projects.vue';
+	import Projects from './projects.vue';
 
 	declare const setInterval: any;
-	declare const core: Core;
 	declare const gtag: any;
 	declare const LZ: any;
 	declare const app_config: any;
 
-	export { core };
+	declare global {
+		export const core: Core;
+	}
 
 	@Component
 	export default class Core extends CoreBase {
 		public designs: number[] = [];
+		public handles: Map<number, FileSystemFileHandle> = new Map();
 		public tabHistory: number[] = [];
 		public autoSave: boolean = true;
 		public showDPad: boolean = true;
@@ -74,7 +75,7 @@
 		}
 
 		public get projects() {
-			return this.$refs.mgr as Designs;
+			return this.$refs.mgr as Projects;
 		}
 
 		public async init() {

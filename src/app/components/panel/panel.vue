@@ -23,7 +23,6 @@
 <script lang="ts">
 	import { Component, Watch, Prop } from 'vue-property-decorator';
 	import BaseComponent from '../mixins/baseComponent';
-	import { core } from '../core.vue';
 
 	@Component
 	export default class Panel extends BaseComponent {

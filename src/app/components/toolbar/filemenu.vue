@@ -5,24 +5,78 @@
 			{{$t('toolbar.file.new')}}
 		</div>
 		<divider></divider>
-		<uploader accept=".bps, .bpz, .json, .zip" ref="open" multiple @upload="upload($event)">
-			<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
-		</uploader>
-		<download :disabled="!design" type="bps" ref="bps" @download="notify">
-			<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.saveBPS')}}</hotkey>
-		</download>
-		<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
-			<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.saveBPZ')}}</hotkey>
-		</download>
+
+		<template v-if="nativeFileEnabled">
+			<opener ref="open" @open="open($event)">
+				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
+			</opener>
+			<dropdownitem :disabled="!design" @click="save()">
+				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.saveBPS')}}</hotkey>
+			</dropdownitem>
+			<saveas
+				:disabled="!design"
+				type="bps"
+				ref="bps"
+				@save="notify($event)"
+				:desc="$t('toolbar.file.BPS')"
+				mime="application/box-pleating-studio-project"
+			>
+				<i class="fas fa-save"></i>
+				{{$t('toolbar.file.saveBPSas')}}
+			</saveas>
+			<saveas
+				:disabled="!design"
+				type="bpz"
+				ref="bpz"
+				@save="notifyAll"
+				:desc="$t('toolbar.file.BPZ')"
+				mime="application/box-pleating-studio-workspace"
+			>
+				<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.saveBPZ')}}</hotkey>
+			</saveas>
+		</template>
+		<template v-else>
+			<uploader accept=".bps, .bpz, .json, .zip" ref="open" multiple @upload="upload($event)">
+				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
+			</uploader>
+			<download :disabled="!design" type="bps" ref="bps" @download="notify">
+				<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.downloadBPS')}}</hotkey>
+			</download>
+			<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
+				<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.downloadBPZ')}}</hotkey>
+			</download>
+		</template>
+
 		<divider></divider>
-		<download :disabled="!design" type="svg" ref="svg" @download="svgSaved">
-			<i class="far fa-file-image"></i>
-			{{$t('toolbar.file.saveSVG')}}
-		</download>
-		<download :disabled="!design" type="png" ref="png" @download="pngSaved">
-			<i class="far fa-file-image"></i>
-			{{$t('toolbar.file.savePNG')}}
-		</download>
+
+		<template v-if="nativeFileEnabled">
+			<saveas
+				:disabled="!design"
+				type="svg"
+				ref="svg"
+				@save="svgSaved"
+				:desc="$t('toolbar.file.SVG')"
+				mime="image/svg+xml"
+			>
+				<i class="far fa-file-image"></i>
+				{{$t('toolbar.file.saveSVG')}}
+			</saveas>
+			<saveas :disabled="!design" type="png" ref="png" @save="pngSaved" :desc="$t('toolbar.file.PNG')" mime="image/png">
+				<i class="far fa-file-image"></i>
+				{{$t('toolbar.file.savePNG')}}
+			</saveas>
+		</template>
+		<template v-else>
+			<download :disabled="!design" type="svg" ref="svg" @download="svgSaved">
+				<i class="far fa-file-image"></i>
+				{{$t('toolbar.file.downloadSVG')}}
+			</download>
+			<download :disabled="!design" type="png" ref="png" @download="pngSaved">
+				<i class="far fa-file-image"></i>
+				{{$t('toolbar.file.downloadPNG')}}
+			</download>
+		</template>
+
 		<dropdownitem @click="copyPNG" :disabled="!design" v-if="copyEnabled">
 			<i class="far fa-copy"></i>
 			{{$t('toolbar.file.copyPNG')}}
@@ -40,13 +94,11 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { readFile, bufferToText, registerHotkey } from '../import/types';
-	import { core } from '../core.vue';
 	import JSZip from 'jszip';
 
 	declare const gtag: any;
 
-	import Download from '../gadget/download.vue';
+	import Download from '../gadget/file/download.vue';
 	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
@@ -63,19 +115,28 @@
 				if(e.dataTransfer) this.openFiles(e.dataTransfer.files);
 			})
 
-			registerHotkey(() => (this.$refs.open as any).click(), "o");
-			registerHotkey(() => core.design && (this.$refs.bps as any).download(), "s");
-			registerHotkey(() => core.design && (this.$refs.bpz as any).download(), "s", true);
+			registerHotkey(() => (this.$refs.open as Executor).execute(), "o");
+			registerHotkey(() => {
+				console.log(core.design)
+				if(!core.design) return;
+				if(nativeFileEnabled) this.save();
+				else(this.$refs.bps as Executor).execute();
+			}, "s");
+			registerHotkey(() => core.design && (this.$refs.bpz as Executor).execute(), "s", true);
 			registerHotkey(() => this.print(), "p");
 		}
+
+		protected get nativeFileEnabled() { return nativeFileEnabled; }
 
 		protected newProject() {
 			core.projects.create();
 			gtag('event', 'project_create');
 		}
 
-		protected notify() {
-			this.bp.notifySave(this.bp.design);
+		protected notify(handle?: FileSystemFileHandle) {
+			let design = this.bp.design;
+			this.bp.notifySave(design);
+			if(handle) core.handles.set(design.id, handle);
 			gtag('event', 'project_bps');
 		}
 		protected notifyAll() {
@@ -101,15 +162,41 @@
 			return [this.$refs.bps, this.$refs.bpz, this.$refs.svg, this.$refs.png] as Download[];
 		}
 		protected init(): void {
-			// 當選單開啟的時候生成 ObjectURL
-			this.downloads().forEach(d => d.getFile());
+			if(!nativeFileEnabled) {
+				// 當選單開啟的時候生成 ObjectURL
+				this.downloads().forEach(d => d.getFile());
+			}
 		}
 		protected reset(): void {
-			// 當選單關閉的時候把所有 ObjectURL 回收掉
-			this.downloads().forEach(d => d.reset());
+			if(!nativeFileEnabled) {
+				// 當選單關閉的時候把所有 ObjectURL 回收掉
+				this.downloads().forEach(d => d.reset());
+			}
 		}
 
-		public async upload(event: Event) {
+		protected async save(): Promise<void> {
+			try {
+				let handle = core.handles.get(this.design.id);
+				let writable = await handle.createWritable();
+				await writable.write(await core.getBlob("bps"));
+				await writable.close();
+				this.notify();
+			} catch(e) {
+				(this.$refs.bps as Executor).execute();
+			}
+		}
+
+		protected async open(handles: FileSystemFileHandle[]) {
+			await core.loader.show();
+			for(let handle of handles) {
+				let file = await handle.getFile();
+				await this.openFile(file, handle);
+			}
+			gtag('event', 'project_open');
+			core.loader.hide();
+			core.projects.select(core.designs[core.designs.length - 1]);
+		}
+		protected async upload(event: Event) {
 			let f = event.target as HTMLInputElement;
 			await core.loader.show();
 			await this.openFiles(f.files)
@@ -118,15 +205,19 @@
 			core.loader.hide();
 			core.projects.select(core.designs[core.designs.length - 1]);
 		}
-		public async openFiles(files: FileList) {
-			if(files.length) for(let i = 0; i < files.length; i++) await this.open(files[i]);
+		private async openFiles(files: FileList) {
+			if(files.length) for(let i = 0; i < files.length; i++) {
+				await this.openFile(files[i]);
+			}
 		}
-		public async open(file: File): Promise<void> {
+		private async openFile(file: File, handle?: FileSystemFileHandle) {
 			try {
 				let buffer = await readFile(file);
 				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
 				if(test == "{") { // JSON
-					core.projects.add(this.bp.load(bufferToText(buffer)));
+					let design = this.bp.load(bufferToText(buffer));
+					core.projects.add(design);
+					if(handle) core.handles.set(design.id, handle);
 				} else if(test == "P") { // PKZip
 					await this.openWorkspace(buffer);
 				} else throw 1;

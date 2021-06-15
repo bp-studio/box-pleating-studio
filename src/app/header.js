@@ -9,8 +9,11 @@ document.addEventListener("wheel", (event) => {
 	if(event.ctrlKey) event.preventDefault();
 }, { passive: false });
 
-// 這邊宣告成 const 或 let 會在 Safari 中出錯，底下其它變數亦同
+// 這邊宣告成 const 或 let 在 Safari 會無法被提升到 if 的 scope 之外，底下其它變數亦同
 var isMac = navigator.platform.toLowerCase().startsWith("mac");
+
+// 是否支援原生檔案 API
+var nativeFileEnabled = typeof window.showSaveFilePicker != 'undefined';
 
 ///////////////////////////////////////////////////
 // 檔案處理
@@ -51,7 +54,7 @@ function callService(data) {
 		if('serviceWorker' in navigator) {
 			navigator.serviceWorker.getRegistration('/').then(reg => {
 				if(!reg.active) return reject(); // Safari 在第一次執行的時候可能會進到這裡
-				let channel = new MessageChannel();
+				var channel = new MessageChannel();
 				channel.port1.onmessage = event => resolve(event.data);
 				reg.active.postMessage(data, [channel.port2]);
 			}, () => reject());
@@ -107,6 +110,10 @@ function unregisterHotkeyCore(handler) {
 document.addEventListener(
 	'keydown',
 	event => {
+		// 設置攔截例外
+		let k = event.key.toLowerCase();
+		if(k == "s" || k == "o" || k == "p") return;
+
 		// 如果正在使用輸入框，把一切的正常事件監聽都阻斷掉
 		let active = document.activeElement;
 		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
@@ -132,4 +139,4 @@ registerHotkeyCore(e => {
 // Dropdown
 ///////////////////////////////////////////////////
 
-const dropdown = {};
+var dropdown = {};

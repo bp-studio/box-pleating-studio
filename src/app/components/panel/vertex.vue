@@ -4,10 +4,10 @@
 		<div class="panel-grid">
 			<field :label="$t('panel.vertex.name')" v-model="subject.name"></field>
 		</div>
-		<div class="mt-3 d-flex" style="flex-wrap:wrap;">
+		<div class="mt-3 d-flex" style="flex-wrap: wrap;">
 			<button class="btn btn-primary flex-shrink-0" @click="subject.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'"></button>
 			<div class="flex-grow-1 d-flex">
-				<label class="col-form-label ms-2 text-end" style="width: 0; flex-grow: 1000; max-width: calc((100% - 225px) * 46); overflow: hidden;">
+				<label class="col-form-label ms-2 text-end" style="width: 0; flex-grow: 1000; max-width: calc((100% - 230px * 0.98) * 50); overflow: hidden;">
 					...&nbsp;
 				</label>
 				<div class="d-flex flex-grow-1">

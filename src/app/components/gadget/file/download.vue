@@ -3,8 +3,8 @@
 		v-if="!disabled"
 		:class="btn?'btn btn-primary':'dropdown-item'"
 		:href="href"
-		@click="download($event)"
-		@contextmenu.stop="download($event)"
+		@click="execute($event)"
+		@contextmenu.stop="execute($event)"
 		:download="filename+'.'+type"
 		:title="$t('message.downloadHint')"
 	>
@@ -17,7 +17,6 @@
 
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
-	import { core } from '../core.vue';
 
 	@Component
 	export default class Download extends Vue {
@@ -34,7 +33,7 @@
 			return core.getFilename(this.type);
 		}
 
-		public download(event: Event) {
+		public execute(event: Event) {
 			if(this.href == "#") event.preventDefault();
 		}
 

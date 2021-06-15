@@ -49,7 +49,6 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { core } from '../core.vue';
 	import BaseComponent from '../mixins/baseComponent';
 
 	declare const gtag: any;

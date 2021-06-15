@@ -29,7 +29,6 @@
 
 <script lang="ts">
 	import { Vue, Component } from 'vue-property-decorator';
-	import { core } from './../core.vue';
 	import * as bootstrap from 'bootstrap';
 
 	declare const gtag: any;

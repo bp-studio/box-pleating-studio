@@ -20,8 +20,6 @@
 
 <script lang="ts">
 	import { Vue, Component, Prop } from 'vue-property-decorator';
-	import { core } from '../core.vue';
-	import { dropdown } from '../import/types';
 	import * as bootstrap from 'bootstrap';
 
 	@Component

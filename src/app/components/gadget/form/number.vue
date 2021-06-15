@@ -26,7 +26,7 @@
 
 <script lang="ts">
 	import { Component, Prop, Watch } from 'vue-property-decorator';
-	import InputMixin from '../mixins/inputMixin';
+	import InputMixin from '../../mixins/inputMixin';
 
 	@Component({ name: "number" })
 	export default class NumberField extends InputMixin {
