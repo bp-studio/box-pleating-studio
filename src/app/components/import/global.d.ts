@@ -19,6 +19,7 @@ declare global {
 	// 系統狀態常數
 	export const FileApiEnabled: boolean;
 	export const isMac: boolean;
+	export const isPWA: boolean;
 
 	// 全域宣告的函數
 	export function sanitize(filename: string): string;
@@ -28,4 +29,5 @@ declare global {
 	export function registerHotkey(action: () => void, key: string, shift?: boolean): void;
 	export function registerHotkeyCore(callback: (e: KeyboardEvent) => void): EventListener;
 	export function unregisterHotkeyCore(handler: EventListener): void;
+	export function checkWithBC(id: number): Promise<boolean>;
 }

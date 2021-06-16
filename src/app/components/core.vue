@@ -103,7 +103,8 @@
 			localStorage.removeItem("sessionTime");
 
 			// 只有擁有存檔權的實體會去讀取 session
-			if(await this.checkSession()) {
+			let haveSession = await this.checkSession();
+			if(haveSession) {
 				let session = JSON.parse(localStorage.getItem("session"));
 				if(session) {
 					let jsons = session.jsons as unknown[];
@@ -111,19 +112,19 @@
 						let design = bp.restore(jsons[i]);
 						this.projects.add(design, false);
 					}
-
-					if(FileApiEnabled) {
-						let entries: [number, FileSystemFileHandle][] = await idbKeyval.entries();
-						for(let [i, handle] of entries) {
-							if(i >= 0) this.handles.set(this.designs[i], handle);
-							else Vue.set(this.recent, -i - 1, handle);
-						}
-					}
-
-					core.refreshHandle();
 					if(session.open >= 0) this.projects.select(this.designs[session.open]);
 					bp.update();
 				}
+			}
+
+			// 讀取 handle
+			if(FileApiEnabled) {
+				let entries: [number, FileSystemFileHandle][] = await idbKeyval.entries();
+				for(let [i, handle] of entries) {
+					if(i < 0) Vue.set(this.recent, -i - 1, handle);
+					else if(haveSession) this.handles.set(this.designs[i], handle);
+				}
+				core.refreshHandle();
 			}
 
 			let url = new URL(location.href);
@@ -187,9 +188,10 @@
 
 		private checkSession(): Promise<boolean> {
 			return new Promise<boolean>(resolve => {
-				// 減少本地偵錯的負擔
-				if(location.protocol != "https:") resolve(true);
-				else {
+				// 如果是本地執行就採用 Broadcast Channel 的 fallback
+				if(location.protocol != "https:") {
+					checkWithBC(this.id).then(ok => resolve(ok));
+				} else {
 					// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
 					let cancel = setTimeout(() => resolve(false), 250);
 					callService("id")
@@ -223,6 +225,10 @@
 			}
 		}
 
+		/////////////////////////////////////////////////////////////////////////////////////////
+		// 檔案系統存取 API
+		/////////////////////////////////////////////////////////////////////////////////////////
+
 		public async saveHandle() {
 			await idbKeyval.clear();
 			for(let i = 0; i < this.designs.length; i++) {
@@ -233,14 +239,16 @@
 				await idbKeyval.set(-i - 1, this.recent[i]);
 			}
 		}
-
-		public async addRecent(handle: FileSystemFileHandle) {
+		public async removeRecent(handle: FileSystemFileHandle) {
 			for(let i = 0; i < this.recent.length; i++) {
 				if(await this.recent[i].isSameEntry(handle)) {
 					this.recent.splice(i, 1);
 					break;
 				}
 			}
+		}
+		public async addRecent(handle: FileSystemFileHandle) {
+			await this.removeRecent(handle);
 			this.recent.unshift(handle);
 			if(this.recent.length > 10) this.recent.pop();
 		}

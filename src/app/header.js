@@ -12,6 +12,9 @@ document.addEventListener("wheel", (event) => {
 // 這邊宣告成 const 或 let 在 Safari 會無法被提升到 if 的 scope 之外，底下其它變數亦同
 var isMac = navigator.platform.toLowerCase().startsWith("mac");
 
+// 是否在 PWA 模式中執行
+var isPWA = matchMedia("(display-mode: standalone)").matches;
+
 // 是否支援原生檔案 API
 var FileApiEnabled = typeof window.showSaveFilePicker != 'undefined';
 

@@ -18,7 +18,7 @@ gulp.task('html', () => all(
 	gulp.src('src/public/index.htm')
 		.pipe(newer({
 			dest: 'build/debug/index.htm',
-			extra: __filename,
+			extra: [__filename, 'gulp/plugins/debug.js'],
 		}))
 		.pipe(debug())
 		.pipe(gulp.dest('build/debug')),

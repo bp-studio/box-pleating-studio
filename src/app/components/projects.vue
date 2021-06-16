@@ -6,6 +6,7 @@
 
 	import { Vue, Component, Prop } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
+	import JSZip from 'jszip';
 
 	declare const gtag: any;
 
@@ -60,6 +61,21 @@
 			this.designs.push(d.id);
 			if(select) this.select(d.id);
 			else this.tabHistory.unshift(d.id);
+		}
+
+		public async openWorkspace(buffer: ArrayBuffer) {
+			let zip = await JSZip.loadAsync(buffer);
+			let files: string[] = [];
+			zip.forEach(path => files.push(path));
+			for(let f of files) {
+				try {
+					let data = await zip.file(f).async("text");
+					core.projects.add(bp.load(data));
+				} catch(e) {
+					debugger;
+					await core.alert(this.$t('message.invalidFormat', [f]));
+				}
+			}
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////

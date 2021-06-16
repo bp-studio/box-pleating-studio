@@ -13,7 +13,7 @@
 			<submenu icon="fas fa-history" :label="$t('toolbar.file.recent.title')">
 				<dropdownitem v-if="recent.length==0" disabled>{{$t('toolbar.file.recent.empty')}}</dropdownitem>
 				<template v-else>
-					<dropdownitem v-for="(h,i) in recent" :key="i" @click="open([h])">
+					<dropdownitem v-for="(h,i) in recent" :key="i" @click="open([h], true)">
 						<i></i>
 						{{h.name}}
 					</dropdownitem>
@@ -43,7 +43,7 @@
 				:disabled="!design"
 				type="bpz"
 				ref="bpz"
-				@save="notifyAll"
+				@save="notifyAll($event)"
 				:desc="$t('toolbar.file.BPZ.name')"
 				mime="application/box-pleating-studio-workspace"
 			>
@@ -166,11 +166,13 @@
 			if(handle) {
 				core.handles.set(design.id, handle);
 				core.refreshHandle();
+				core.addRecent(handle);
 			}
 			gtag('event', 'project_bps');
 		}
-		protected notifyAll() {
+		protected notifyAll(handle?: FileSystemFileHandle) {
 			this.bp.notifySaveAll();
+			if(handle) core.addRecent(handle);
 			gtag('event', 'project_bpz');
 		}
 		protected svgSaved() {
@@ -212,6 +214,7 @@
 					await handle.getFile();
 					await writable.write(await core.getBlob("bps"));
 					await writable.close();
+					core.addRecent(handle);
 					this.notify();
 				} catch(e) {
 					await writable.abort();
@@ -222,37 +225,46 @@
 			}
 		}
 
-		protected async open(handles: FileSystemFileHandle[]) {
+		protected async open(handles: FileSystemFileHandle[], request?: boolean) {
 			await core.loader.show();
+			let open = false;
 			for(let handle of handles) {
-				if(await handle.requestPermission({ mode: 'read' }) == 'granted') {
-					try {
-						let file = await handle.getFile();
-						await this.openFile(file, handle);
-					} catch(e) {
-						await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
-					}
+				if(request) {
+					let mode: FileSystemPermissionMode = handle.name.endsWith(".bpz") ? "read" : "readwrite";
+					if(await handle.requestPermission({ mode }) != 'granted') continue;
+				}
+				try {
+					let file = await handle.getFile();
+					open = await this.openFile(file, handle) || open;
+				} catch(e) {
+					await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
+					await core.removeRecent(handle);
 				}
 			}
-			gtag('event', 'project_open');
 			core.loader.hide();
-			core.projects.select(core.designs[core.designs.length - 1]);
+			if(open) {
+				gtag('event', 'project_open');
+				core.projects.select(core.designs[core.designs.length - 1]);
+			}
 		}
 		protected async upload(event: Event) {
 			let f = event.target as HTMLInputElement;
-			await core.loader.show();
 			await this.openFiles(f.files)
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
-			gtag('event', 'project_open');
-			core.loader.hide();
-			core.projects.select(core.designs[core.designs.length - 1]);
 		}
 		private async openFiles(files: FileList) {
+			await core.loader.show();
+			let open = false;
 			if(files.length) for(let i = 0; i < files.length; i++) {
-				await this.openFile(files[i]);
+				open = await this.openFile(files[i]) || open;
+			}
+			core.loader.hide();
+			if(open) {
+				gtag('event', 'project_open');
+				core.projects.select(core.designs[core.designs.length - 1]);
 			}
 		}
-		private async openFile(file: File, handle?: FileSystemFileHandle) {
+		private async openFile(file: File, handle?: FileSystemFileHandle): Promise<boolean> {
 			try {
 				let buffer = await readFile(file);
 				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
@@ -264,27 +276,16 @@
 						core.refreshHandle();
 						await core.addRecent(handle);
 					}
+					return true;
 				} else if(test == "P") { // PKZip
-					await this.openWorkspace(buffer);
+					await core.projects.openWorkspace(buffer);
 					if(handle) await core.addRecent(handle);
+					return true;
 				} else throw 1;
 			} catch(e) {
 				debugger;
 				await core.alert(this.$t('message.invalidFormat', [file.name]));
-			}
-		}
-		private async openWorkspace(buffer: ArrayBuffer) {
-			let zip = await JSZip.loadAsync(buffer);
-			let files: string[] = [];
-			zip.forEach(path => files.push(path));
-			for(let f of files) {
-				try {
-					let data = await zip.file(f).async("text");
-					core.projects.add(this.bp.load(data));
-				} catch(e) {
-					debugger;
-					await core.alert(this.$t('message.invalidFormat', [f]));
-				}
+				return false;
 			}
 		}
 

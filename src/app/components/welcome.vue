@@ -58,7 +58,7 @@
 				this.bi = event;
 			});
 			window.addEventListener("appinstalled", () => {
-				if(matchMedia("(display-mode: standalone)").matches) return; // 桌機會進入這裡
+				if(isPWA) return; // 桌機會進入這裡
 				this.install = 1;
 				let i = setInterval(() => {
 					if(this.install != 2) this.detectInstallation();
