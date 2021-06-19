@@ -66,7 +66,9 @@
 			if(!this.record[index]) {
 				try {
 					let response = await fetch(`log/${logs[index]}.md`);
-					Vue.set(this.record, this.index, marked(await response.text()));
+					let html = marked(await response.text());
+					html = html.replace(/<a href="http/g, '<a target="_target" rel="noopener" href="http');
+					Vue.set(this.record, this.index, html);
 				} catch(e) {
 					if(this.active) {
 						this.modal.hide();

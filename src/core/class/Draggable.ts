@@ -79,7 +79,7 @@ abstract class Draggable extends Control {
 	}
 
 	public static $move(target: Draggable, loc: IPoint, relative: boolean = true) {
-		target.$design.$history?.$move(target, loc, false);
+		target.$design.$history?.$move(target, loc, relative);
 		Draggable.$assign(target.$location, loc);
 	}
 
