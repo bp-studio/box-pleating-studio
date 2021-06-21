@@ -15,7 +15,7 @@ gulp.task('shrewd', () => all(
 	gulp.src(shrewdDir + "/dist/shrewd.min.js")
 		.pipe(replace(/\/\/#.+?\n/, ""))
 		.pipe(gulp.dest(config.dest.dist + '/lib'))
-		.pipe(gulp.dest(config.src.public + '/lib')),
+		.pipe(gulp.dest(config.src.lib)),
 
 	// 偵錯版
 	gulp.src(shrewdDir + "/dist/shrewd.js")

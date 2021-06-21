@@ -20,6 +20,8 @@ const compare = [
 	config.src.public + '*.htm',
 ];
 
+const libDest = config.dest.dist + '/lib';
+
 /**
  * 個別淨化一個 lib 的 CSS 檔案
  *
@@ -27,9 +29,7 @@ const compare = [
  * 所以針對每一個檔案都要自己產一組 stream。
  */
 function makePurge(path) {
-	const libSrc = config.src.public + '/lib/';
-	const libDest = config.dest.dist + '/lib/';
-	return gulp.src(libSrc + path, { base: libSrc })
+	return gulp.src(config.src.lib + path, { base: config.src.lib })
 		.pipe(newer({
 			dest: libDest + path,
 			extra: compare.concat([__filename]),
@@ -49,8 +49,8 @@ function makePurge(path) {
 // eslint-disable-next-line max-lines-per-function
 gulp.task('static', () => all(
 	// 淨化 lib CSS
-	makePurge('bootstrap/bootstrap.min.css'),
-	makePurge('font-awesome/css/all.min.css'),
+	makePurge('/bootstrap/bootstrap.min.css'),
+	makePurge('/font-awesome/css/all.min.css'),
 
 	// 建置 BPS 圖示集
 	gulp.src(config.src.public + '/assets/bps/**/*')
@@ -60,16 +60,16 @@ gulp.task('static', () => all(
 		.pipe(gulp.dest(config.dest.dist + '/assets/bps')),
 
 	// 建置更新 log
-	gulp.src(config.src.public + '/log/*.md')
-		.pipe(ifAnyNewer('build/dist/log'))
+	gulp.src(config.src.log + '/*.md')
+		.pipe(ifAnyNewer(config.dest.dist + '/log'))
 		.pipe(log2('log.js'))
-		.pipe(gulp.dest('build/dist/log')),
+		.pipe(gulp.dest(config.dest.dist + '/log')),
 
 	// 複製 debug 資源
 	gulp.src([
-		'lib/*.js',
-		'lib/*.js.map',
-	], { cwd: config.src.public })
+		'*.js',
+		'*.js.map',
+	], { cwd: config.src.lib })
 		.pipe(filter(file => {
 			// 選取具有 min 版本的 .js 檔案
 			if(file.extname != ".js") return true;
@@ -83,21 +83,30 @@ gulp.task('static', () => all(
 		'**/*',
 		'.htaccess', // 這種檔案需要另外指定
 
-		// 不包含註解檔案
-		'!**/README.md',
-
 		// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
 		'!index.htm',
 		'!log/*',
 		'!assets/bps/**/*',
-		'!lib/**/*.css',
-		'!**/*.js.map',
 	], { cwd: config.src.public })
+		.pipe(newer(config.dest.dist)) // 採用 1:1 比對目標的策略
+		.pipe(gulp.dest(config.dest.dist)),
+
+	// 複製程式庫
+	gulp.src([
+		'**/*',
+
+		// 不包含註解檔案
+		'!**/README.md',
+
+		// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
+		'!**/*.css',
+		'!**/*.js.map',
+	], { cwd: config.src.lib })
 		.pipe(filter(file => {
 			// 過濾掉具有 min 版本的 .js 檔案
 			if(file.extname != ".js") return true;
 			return !fs.existsSync(file.path.replace(/js$/, "min.js"));
 		}))
-		.pipe(newer(config.dest.dist)) // 採用 1:1 比對目標的策略
-		.pipe(gulp.dest(config.dest.dist))
+		.pipe(newer(libDest)) // 採用 1:1 比對目標的策略
+		.pipe(gulp.dest(libDest))
 ));

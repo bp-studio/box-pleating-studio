@@ -6,10 +6,12 @@
 	},
 	"src": {
 		"app": "src/app",
-		"locale": "src/locale",
 		"core": "src/core",
 		"donate": "src/donate",
 		"icon": "src/icons",
+		"lib": "lib",
+		"log": "src/log",
+		"locale": "src/locale",
 		"public": "src/public",
 		"sw": "src/service",
 		"test": "src/test",
