@@ -1,29 +1,30 @@
-let all = require('gulp-all');
-let gulp = require('gulp');
-let htmlMin = require('gulp-html-minifier-terser');
-let newer = require('gulp-newer');
-let terser = require('gulp-terser');
+const all = require('gulp-all');
+const gulp = require('gulp');
+const htmlMin = require('gulp-html-minifier-terser');
+const newer = require('gulp-newer');
+const terser = require('gulp-terser');
 
-let vue = require('../plugins/vue');
-let htmlMinOption = require('../html.json');
+const config = require('../config.json');
+const vue = require('../plugins/vue');
+const htmlMinOption = require('../html.json');
 
 gulp.task('donate', () => all(
 	// Vue
-	gulp.src(['src/donate/main.vue', 'src/donate/main.js'])
+	gulp.src(['main.vue', 'main.js'], { cwd: config.src.donate })
 		.pipe(newer({
-			dest: 'build/dist/donate.js',
+			dest: config.dest.dist + '/donate.js',
 			extra: __filename,
 		}))
 		.pipe(vue('donate.js'))
 		.pipe(terser())
-		.pipe(gulp.dest('build/dist')),
+		.pipe(gulp.dest(config.dest.dist)),
 
 	// Html
-	gulp.src('src/public/donate.htm')
+	gulp.src(config.src.public + '/donate.htm')
 		.pipe(newer({
-			dest: 'build/dist/donate.htm',
+			dest: config.dest.dist + '/donate.htm',
 			extra: __filename,
 		}))
 		.pipe(htmlMin(htmlMinOption))
-		.pipe(gulp.dest('build/dist'))
+		.pipe(gulp.dest(config.dest.dist))
 ));

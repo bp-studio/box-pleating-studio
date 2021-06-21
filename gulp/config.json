@@ -1,0 +1,18 @@
+{
+	"dest": {
+		"debug": "build/debug",
+		"dist": "build/dist",
+		"test": "build/test"
+	},
+	"src": {
+		"app": "src/app",
+		"locale": "src/locale",
+		"core": "src/core",
+		"donate": "src/donate",
+		"icon": "src/icons",
+		"public": "src/public",
+		"sw": "src/service",
+		"test": "src/test",
+		"worker": "src/worker"
+	}
+}

@@ -1,15 +1,16 @@
-let gulp = require('gulp');
-let newer = require('gulp-newer');
-let replace = require('gulp-replace');
-let sourcemaps = require('gulp-sourcemaps');
-let terser = require('gulp-terser');
-let ts = require('gulp-typescript');
-let wrap = require('@makeomatic/gulp-wrap-js');
+const gulp = require('gulp');
+const newer = require('gulp-newer');
+const path = require('path');
+const replace = require('gulp-replace');
+const sourcemaps = require('gulp-sourcemaps');
+const terser = require('gulp-terser');
+const ts = require('gulp-typescript');
+const wrap = require('@makeomatic/gulp-wrap-js');
 
-let coreConfig = 'src/core/tsconfig.json';
-let projCoreDev = ts.createProject(coreConfig);
-let projCorePub = ts.createProject(coreConfig);
-
+const config = require('../config.json');
+const coreConfig = config.src.core + '/tsconfig.json';
+const projCoreDev = ts.createProject(coreConfig);
+const projCorePub = ts.createProject(coreConfig);
 
 const template = `
 	(function(root, factory){
@@ -29,7 +30,7 @@ const template = `
 gulp.task('coreDev', () =>
 	projCoreDev.src()
 		.pipe(newer({
-			dest: 'build/debug/bpstudio.js',
+			dest: config.dest.debug + '/bpstudio.js',
 			extra: [__filename, coreConfig],
 		}))
 		.pipe(sourcemaps.init())
@@ -47,14 +48,17 @@ gulp.task('coreDev', () =>
 			mangle: false,
 			format: { beautify: true },
 		}))
-		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
-		.pipe(gulp.dest('build/debug'))
+		.pipe(sourcemaps.write('.', {
+			includeContent: false,
+			sourceRoot: path.relative(config.dest.debug, config.src.core),
+		}))
+		.pipe(gulp.dest(config.dest.debug))
 );
 
 gulp.task('corePub', () =>
 	projCorePub.src()
 		.pipe(newer({
-			dest: 'build/dist/bpstudio.js',
+			dest: config.dest.dist + '/bpstudio.js',
 			extra: [__filename, coreConfig],
 		}))
 		.pipe(projCorePub())
@@ -71,7 +75,7 @@ gulp.task('corePub', () =>
 			mangle: { properties: { regex: /^[$_]/ } },
 		}))
 		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
-		.pipe(gulp.dest('build/dist'))
+		.pipe(gulp.dest(config.dest.dist))
 );
 
 gulp.task('core', gulp.parallel('coreDev', 'corePub'));

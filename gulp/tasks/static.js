@@ -1,18 +1,24 @@
-let all = require('gulp-all');
-let cleanCss = require('gulp-clean-css');
-let filter = require('gulp-filter');
-let fs = require('fs');
-let gulp = require('gulp');
-let gulpIf = require('gulp-if');
-let ifAnyNewer = require('gulp-if-any-newer');
-let newer = require('gulp-newer');
-let purge = require('gulp-purgecss');
+const all = require('gulp-all');
+const cleanCss = require('gulp-clean-css');
+const filter = require('gulp-filter');
+const fs = require('fs');
+const gulp = require('gulp');
+const gulpIf = require('gulp-if');
+const ifAnyNewer = require('gulp-if-any-newer');
+const newer = require('gulp-newer');
+const purge = require('gulp-purgecss');
 
-let log2 = require('../plugins/log');
-let woff2 = require('../plugins/woff2');
+const config = require('../config.json');
+const log2 = require('../plugins/log');
+const woff2 = require('../plugins/woff2');
 
 // 這邊必須指定副檔名，否則資料夾也會被比進去
-const compare = ['src/app/**/*.vue', 'src/app/**/*.css', 'src/donate/**/*.vue', 'src/public/*.htm'];
+const compare = [
+	config.src.app + '/**/*.vue',
+	config.src.app + '/**/*.css',
+	config.src.donate + '**/*.vue',
+	config.src.public + '*.htm',
+];
 
 /**
  * 個別淨化一個 lib 的 CSS 檔案
@@ -21,9 +27,11 @@ const compare = ['src/app/**/*.vue', 'src/app/**/*.css', 'src/donate/**/*.vue', 
  * 所以針對每一個檔案都要自己產一組 stream。
  */
 function makePurge(path) {
-	return gulp.src(`src/public/lib/${path}`, { base: 'src/public/lib' })
+	const libSrc = config.src.public + '/lib/';
+	const libDest = config.dest.dist + '/lib/';
+	return gulp.src(libSrc + path, { base: libSrc })
 		.pipe(newer({
-			dest: `build/dist/lib/${path}`,
+			dest: libDest + path,
 			extra: compare.concat([__filename]),
 		}))
 		.pipe(purge({
@@ -35,7 +43,7 @@ function makePurge(path) {
 			fontFace: true, // for Font Awesome
 			variables: true, // for Bootstrap
 		}))
-		.pipe(gulp.dest('build/dist/lib'));
+		.pipe(gulp.dest(libDest));
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -45,51 +53,51 @@ gulp.task('static', () => all(
 	makePurge('font-awesome/css/all.min.css'),
 
 	// 建置 BPS 圖示集
-	gulp.src('src/public/assets/bps/**/*')
-		.pipe(ifAnyNewer("build/dist/assets/bps"))
+	gulp.src(config.src.public + '/assets/bps/**/*')
+		.pipe(ifAnyNewer(config.dest.dist + '/assets/bps'))
 		.pipe(woff2('bps'))
 		.pipe(gulpIf(file => file.extname == ".css", cleanCss()))
-		.pipe(gulp.dest('build/dist/assets/bps')),
+		.pipe(gulp.dest(config.dest.dist + '/assets/bps')),
 
 	// 建置更新 log
-	gulp.src('src/public/log/*.md')
-		.pipe(ifAnyNewer("build/dist/log"))
+	gulp.src(config.src.public + '/log/*.md')
+		.pipe(ifAnyNewer('build/dist/log'))
 		.pipe(log2('log.js'))
 		.pipe(gulp.dest('build/dist/log')),
 
 	// 複製 debug 資源
 	gulp.src([
-		'src/public/lib/*.js',
-		'src/public/lib/*.js.map',
-	])
+		'lib/*.js',
+		'lib/*.js.map',
+	], { cwd: config.src.public })
 		.pipe(filter(file => {
 			// 選取具有 min 版本的 .js 檔案
 			if(file.extname != ".js") return true;
 			return fs.existsSync(file.path.replace(/js$/, "min.js"));
 		}))
-		.pipe(newer("build/debug/lib")) // 採用 1:1 比對目標的策略
-		.pipe(gulp.dest('build/debug/lib')),
+		.pipe(newer(config.dest.debug + '/lib')) // 採用 1:1 比對目標的策略
+		.pipe(gulp.dest(config.dest.debug + '/lib')),
 
 	// 複製靜態資源
 	gulp.src([
-		'src/public/**/*',
-		'src/public/.htaccess', // 這種檔案需要另外指定
+		'**/*',
+		'.htaccess', // 這種檔案需要另外指定
 
 		// 不包含註解檔案
 		'!**/README.md',
 
 		// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
-		'!src/public/index.htm',
-		'!src/public/log/*',
-		'!src/public/assets/bps/**/*',
-		'!src/public/lib/**/*.css',
+		'!index.htm',
+		'!log/*',
+		'!assets/bps/**/*',
+		'!lib/**/*.css',
 		'!**/*.js.map',
-	])
+	], { cwd: config.src.public })
 		.pipe(filter(file => {
 			// 過濾掉具有 min 版本的 .js 檔案
 			if(file.extname != ".js") return true;
 			return !fs.existsSync(file.path.replace(/js$/, "min.js"));
 		}))
-		.pipe(newer("build/dist")) // 採用 1:1 比對目標的策略
-		.pipe(gulp.dest('build/dist'))
+		.pipe(newer(config.dest.dist)) // 採用 1:1 比對目標的策略
+		.pipe(gulp.dest(config.dest.dist))
 ));

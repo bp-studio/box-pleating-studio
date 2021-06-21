@@ -1,14 +1,15 @@
-let gulp = require('gulp');
-let newer = require('gulp-newer');
-let terser = require('gulp-terser');
-let ts = require('gulp-typescript');
+const gulp = require('gulp');
+const newer = require('gulp-newer');
+const terser = require('gulp-terser');
+const ts = require('gulp-typescript');
 
-let projWorker = ts.createProject('src/worker/tsconfig.json');
+const config = require('../config.json');
+const projWorker = ts.createProject(config.src.worker + '/tsconfig.json');
 
 gulp.task('worker', () =>
 	projWorker.src()
-		.pipe(newer({ dest: 'build/dist', ext: '.js' })) // 1:1 策略
+		.pipe(newer({ dest: config.dest.dist, ext: '.js' })) // 1:1 策略
 		.pipe(projWorker())
 		.pipe(terser())
-		.pipe(gulp.dest('build/dist'))
+		.pipe(gulp.dest(config.dest.dist))
 );

@@ -1,19 +1,20 @@
-let cleanCss = require('gulp-clean-css');
-let concat = require('gulp-concat');
-let gulp = require('gulp');
-let gulpIf = require('gulp-if');
-let lazypipe = require('lazypipe');
-let newer = require('gulp-newer');
-let terser = require('gulp-terser');
-let wrap = require('@makeomatic/gulp-wrap-js');
+const cleanCss = require('gulp-clean-css');
+const concat = require('gulp-concat');
+const gulp = require('gulp');
+const gulpIf = require('gulp-if');
+const lazypipe = require('lazypipe');
+const newer = require('gulp-newer');
+const terser = require('gulp-terser');
+const wrap = require('@makeomatic/gulp-wrap-js');
 
-let i18n = require('../plugins/i18n');
-let order = require('../plugins/order');
-let vue = require('../plugins/vue');
+const config = require('../config.json');
+const i18n = require('../plugins/i18n');
+const order = require('../plugins/order');
+const vue = require('../plugins/vue');
 
-let jsPipe = lazypipe()
+const jsPipe = lazypipe()
 	.pipe(() => wrap("if(!err&&!wErr) { %= body % }"))
-	.pipe(() => gulp.dest('build/debug/'))
+	.pipe(() => gulp.dest(config.dest.debug))
 	.pipe(() => terser({
 		ecma: 2019,
 		compress: {
@@ -23,32 +24,32 @@ let jsPipe = lazypipe()
 
 gulp.task('app', () =>
 	gulp.src([
-		'src/app/css/*.css',
-		'src/app/header.js',
-		'src/app/components/mixins/*.ts',
-		'src/app/components/**/*.vue',
-		'src/app/footer.js',
-	])
+		'*.css',
+		'header.js',
+		'components/mixins/*.ts',
+		'components/**/*.vue',
+		'footer.js',
+	], { cwd: config.src.app })
 		.pipe(newer({
-			dest: 'build/dist/main.js',
+			dest: config.dest.dist + '/main.js',
 			extra: __filename,
 		}))
 		.pipe(vue('main.js', 'main.css'))
 		.pipe(gulpIf(file => file.extname == ".js", jsPipe(), cleanCss()))
-		.pipe(gulp.dest('build/dist/'))
+		.pipe(gulp.dest(config.dest.dist))
 );
 
 gulp.task('locale', () =>
-	gulp.src('src/locale/*.json')
+	gulp.src(config.src.locale + '*.json')
 		.pipe(newer({
-			dest: 'build/dist/locale.js',
+			dest: config.dest.dist + '/locale.js',
 			extra: __filename,
 		}))
 		.pipe(order('en.json'))
-		.pipe(gulp.dest('src/locale/'))
+		.pipe(gulp.dest(config.src.locale))
 		.pipe(i18n())
 		.pipe(concat('locale.js'))
-		.pipe(wrap("let locale={};%= body %"))
+		.pipe(wrap("const locale={};%= body %"))
 		.pipe(terser())
-		.pipe(gulp.dest('build/dist/'))
+		.pipe(gulp.dest(config.dest.dist))
 );

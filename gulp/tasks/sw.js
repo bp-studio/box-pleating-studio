@@ -1,14 +1,15 @@
-let fs = require('fs');
-let gulp = require('gulp');
-let terser = require('gulp-terser');
-let ts = require('gulp-typescript');
-let workbox = require('gulp-workbox');
+const fs = require('fs');
+const gulp = require('gulp');
+const terser = require('gulp-terser');
+const ts = require('gulp-typescript');
+const workbox = require('gulp-workbox');
 
-let projService = ts.createProject('src/service/tsconfig.json');
+const config = require('../config.json');
+const projService = ts.createProject(config.src.sw + '/tsconfig.json');
 
 gulp.task('sw', () => {
 	// 找出最後一個 log
-	let dir = fs.opendirSync("build/dist/log"), file, lastLog;
+	let dir = fs.opendirSync(config.dest.dist + '/log'), file, lastLog;
 	while((file = dir.readSync()) && file.isFile()) {
 		let [stem, ext] = file.name.split('.');
 		if(ext == "md" && (!lastLog || stem > lastLog)) lastLog = stem;
@@ -18,7 +19,7 @@ gulp.task('sw', () => {
 	return projService.src()
 		.pipe(projService())
 		.pipe(workbox({
-			globDirectory: 'build/dist',
+			globDirectory: config.dest.dist,
 			globPatterns: [
 				'**/*.htm',
 				'**/*.js',
@@ -32,5 +33,5 @@ gulp.task('sw', () => {
 			globIgnores: ['sw.js'],
 		}))
 		.pipe(terser())
-		.pipe(gulp.dest('build/dist/'));
+		.pipe(gulp.dest(config.dest.dist));
 });
