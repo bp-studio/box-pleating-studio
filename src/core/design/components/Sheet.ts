@@ -171,7 +171,6 @@ interface JSheet {
 		let vm = this.$design.$viewManager;
 		if(controls.length == 0) return 0;
 		let overflows = controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow);
-		console.log(overflows);
 		return Math.max(...overflows);
 	}
 

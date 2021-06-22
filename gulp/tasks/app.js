@@ -24,7 +24,7 @@ const jsPipe = lazypipe()
 
 gulp.task('app', () =>
 	gulp.src([
-		'*.css',
+		'css/*.css',
 		'header.js',
 		'components/mixins/*.ts',
 		'components/**/*.vue',
@@ -40,7 +40,7 @@ gulp.task('app', () =>
 );
 
 gulp.task('locale', () =>
-	gulp.src(config.src.locale + '*.json')
+	gulp.src(config.src.locale + '/*.json')
 		.pipe(newer({
 			dest: config.dest.dist + '/locale.js',
 			extra: __filename,
