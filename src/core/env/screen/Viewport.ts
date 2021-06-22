@@ -43,7 +43,7 @@ abstract class Viewport {
 	}
 
 	/** 視窗大小有變動的時候重設 canvas 大小 */
-	private _setSize() {
+	protected _setSize() {
 		if(this._lockViewport) return;
 		this._viewWidth = this._el.clientWidth;
 		this._viewHeight = this._el.clientHeight;
