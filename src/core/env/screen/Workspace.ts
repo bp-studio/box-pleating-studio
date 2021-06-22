@@ -45,6 +45,7 @@ abstract class Workspace extends SheetImage {
 	@shrewd public $isScrollable(): boolean {
 		this._studio.$el.classList.toggle("scroll-x", this._isXScrollable);
 		this._studio.$el.classList.toggle("scroll-y", this._isYScrollable);
+		setTimeout(() => this._setSize(), 0); // 捲軸有變化的時候也要重新確認 viewport 大小
 		return this._isXScrollable || this._isYScrollable;
 	}
 
