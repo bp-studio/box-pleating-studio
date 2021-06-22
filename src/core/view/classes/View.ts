@@ -10,7 +10,7 @@
 
 abstract class View extends Mountable {
 
-	private static readonly _MIN_SCALE = 10;
+	public static readonly _MIN_SCALE = 10;
 
 	private _paths: [Layer, paper.Item, number][] = [];
 
@@ -65,15 +65,15 @@ abstract class View extends Mountable {
 	protected abstract $render(): void;
 
 	/** 當尺度太小的時候調整線條粗細 */
-	@shrewd protected get scale() {
+	@shrewd protected get _drawScale() {
 		this.$mountEvents();
-		if(!this.$studio) return this._scale;
+		if(!this.$studio) return this._scaleCache;
 		let s = this.$studio.$display.$scale;
-		return this._scale = s < View._MIN_SCALE ? s / View._MIN_SCALE : 1;
+		return this._scaleCache = s < View._MIN_SCALE ? s / View._MIN_SCALE : 1;
 	}
-	private _scale = 1;
+	private _scaleCache = 1;
 
 	@shrewd private _renderScale() {
-		for(let [l, p, w] of this._paths) p.strokeWidth = w * this.scale;
+		for(let [l, p, w] of this._paths) p.strokeWidth = w * this._drawScale;
 	}
 }

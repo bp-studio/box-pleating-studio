@@ -1,8 +1,6 @@
 
 @shrewd class FlapView extends LabeledView<Flap> implements ClosureView {
 
-	protected readonly _label: paper.PointText;
-	protected readonly _glow: paper.PointText;
 	public readonly hinge: paper.Path;
 	private readonly _shade: paper.Path;
 	private readonly _dots: PerQuadrant<paper.Path.Circle>;
@@ -26,8 +24,6 @@
 
 		this.$addItem(Layer.$ridge, this._innerRidges = new paper.CompoundPath(Style.$ridge));
 		this.$addItem(Layer.$ridge, this._outerRidges = new paper.CompoundPath(Style.$ridge));
-		this.$addItem(Layer.$label, this._glow = new paper.PointText(Style.$glow));
-		this.$addItem(Layer.$label, this._label = new paper.PointText(Style.$label));
 
 		this._component = new RiverHelperBase(this, flap);
 	}
@@ -119,16 +115,12 @@
 		this._dots[1].visible = this._dots[3].visible = w > 0 && h > 0;
 
 		this._label.content = this._control.node.name;
-		LabelUtil.$setLabel(
-			this._control.$sheet, this._label, this._glow,
-			this._control.$dragSelectAnchor, this._dots[0]
-		);
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */
 	@shrewd private _renderDot() {
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-		let s = 3 * this.scale ** 0.75;
+		let s = 3 * this._drawScale ** 0.75;
 		makePerQuadrant(i => {
 			this._dots[i].copyContent(new paper.Path.Circle({
 				position: this._dots[i].position,
@@ -139,5 +131,13 @@
 
 	protected $renderSelection(selected: boolean) {
 		this._shade.visible = selected;
+	}
+
+	protected get _labelLocation(): IPoint {
+		return this._control.$dragSelectAnchor;
+	}
+
+	protected get _labelAvoid(): paper.Path[] {
+		return [...this._dots];
 	}
 }
