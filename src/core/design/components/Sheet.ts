@@ -169,8 +169,10 @@ interface JSheet {
 		if(!this.$isActive || !this.$design.$isActive) return 0;
 		let controls = this._labeledControls;
 		let vm = this.$design.$viewManager;
-		return !controls.length ? 0 :
-			Math.max(...controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow));
+		if(controls.length == 0) return 0;
+		let overflows = controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow);
+		console.log(overflows);
+		return Math.max(...overflows);
 	}
 
 	@shrewd public $scroll: IPoint;

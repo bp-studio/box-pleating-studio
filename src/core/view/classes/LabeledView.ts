@@ -60,13 +60,14 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 		let result = 0;
 		let sheetWidth = this._control.$sheet.width;
-		let w = this.$studio.$display.$scale * sheetWidth;
+		let scale = this.$studio.$display.$scale;
+		let w = scale * sheetWidth;
 		let width = this._labelWidth * this._factor;
 		let center = this._labelLocation.x;
 		if(center != 0 && center != sheetWidth) width /= 2;
 
-		let left = center - width;
-		let right = center + width;
+		let left = center * scale - width;
+		let right = center * scale + width;
 		if(left < 0) result = -left;
 		if(right > w) result = Math.max(result, right - w);
 
