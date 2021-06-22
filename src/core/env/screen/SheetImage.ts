@@ -8,7 +8,7 @@
 
 abstract class SheetImage extends Viewport {
 
-	private static readonly _MARGIN_FIX = 10;
+	public static readonly $MARGIN_FIX = 15;
 	private readonly _MARGIN = 30;
 
 	protected get _design(): Design | null {
@@ -43,13 +43,15 @@ abstract class SheetImage extends Viewport {
 
 	/** 因為文字標籤而產生的實際水平邊距 */
 	@shrewd private get _horMargin(): number {
-		return Math.max((this._design?.sheet.$margin ?? 0) + SheetImage._MARGIN_FIX, this._MARGIN);
+		return Math.max((this._design?.sheet.$margin ?? 0) + SheetImage.$MARGIN_FIX, this._MARGIN);
 	}
 
 	private _getAutoScale(sheet?: Sheet): number {
 		sheet = sheet || this._design?.sheet;
-		let ws = (this._viewWidth - this._horMargin * 2) / (sheet?.width ?? 1);
-		let hs = (this._viewHeight - this._MARGIN * 2) / (sheet?.height ?? 1);
-		return Math.min(ws, hs);
+		let horizontalScale = sheet ?
+			sheet.$getHorizontalScale(this._viewWidth, this._MARGIN) :
+			this._viewWidth - this._MARGIN * 2;
+		let verticalScale = (this._viewHeight - this._MARGIN * 2) / (sheet?.height ?? 1);
+		return Math.min(horizontalScale, verticalScale);
 	}
 }

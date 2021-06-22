@@ -1,21 +1,14 @@
 
 @shrewd class EdgeView extends LabeledView<Edge> {
 
-	public line: paper.Path;
-
-	protected _label: paper.PointText;
-	protected _glow: paper.PointText;
+	public readonly line: paper.Path;
 
 	/** 加粗的直線空間，方便判定選取動作 */
-	private _lineRegion: paper.Path;
+	private readonly _lineRegion: paper.Path;
 
 	constructor(edge: Edge) {
 		super(edge);
-
 		this.$addItem(Layer.$ridge, this.line = new paper.Path.Line(Style.$edge));
-		this.$addItem(Layer.$label, this._glow = new paper.PointText(Style.$glow));
-		this.$addItem(Layer.$label, this._label = new paper.PointText(Style.$label));
-
 		this._lineRegion = new paper.Path.Line({ strokeWidth: 15 });
 	}
 
@@ -42,10 +35,16 @@
 	}
 
 	protected $renderUnscaled() {
-		this.$draw();
-		let l1 = this._control.$v1.$location, l2 = this._control.$v2.$location;
-		let center: IPoint = { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
 		this._label.content = this._control.length.toString();
-		LabelUtil.$setLabel(this._control.$sheet, this._label, this._glow, center, this.line);
+	}
+
+	protected get _labelLocation(): IPoint {
+		let l1 = this._control.$v1.$location, l2 = this._control.$v2.$location;
+		return { x: (l1.x + l2.x) / 2, y: (l1.y + l2.y) / 2 };
+	}
+
+	protected get _labelAvoid(): paper.Path[] {
+		this.$draw();
+		return [this.line];
 	}
 }

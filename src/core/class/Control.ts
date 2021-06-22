@@ -13,7 +13,9 @@ abstract class Control extends SheetObject implements ITagObject {
 	public $selectableWith(c: Control): boolean { return false; }
 
 	/**
-	 * 控制項的拖曳選取基準點；傳回 null 表示這個控制項無法被拖曳選取。
+	 * 控制項的拖曳選取基準點；拖曳選取時只要包覆到這個點，就算是選中，
+	 * 因此這個基準點通常會是控制項的中心。
+	 * 傳回 null 表示這個控制項無法被拖曳選取。
 	 */
 	public get $dragSelectAnchor(): IPoint | null {
 		return null;

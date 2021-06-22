@@ -165,16 +165,12 @@ interface JSheet {
 		);
 	}
 
-	// 這個值如果直接做成計算屬性會導致循環參照，所以要用一個反應方法來延遲更新它
-	@shrewd public $margin = 0;
-
-	@shrewd private _getMargin() {
-		if(!this.$isActive || !this.$design.$isActive) return;
+	@shrewd public get $margin() {
+		if(!this.$isActive || !this.$design.$isActive) return 0;
 		let controls = this._labeledControls;
 		let vm = this.$design.$viewManager;
-		let m = !controls.length ? 0 :
+		return !controls.length ? 0 :
 			Math.max(...controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow));
-		setTimeout(() => this.$margin = m, 0);
 	}
 
 	@shrewd public $scroll: IPoint;
@@ -182,5 +178,18 @@ interface JSheet {
 
 	public $clearSelection() {
 		for(let c of this.$controls) c.$selected = false;
+	}
+
+	/** 根據所有的文字標籤來逆推適合的水平尺度 */
+	public $getHorizontalScale(viewWidth: number, margin: number): number {
+		let controls = this._labeledControls;
+		let standard = (viewWidth - 2 * margin) / this.width;
+		if(controls.length == 0) return standard;
+
+		let vm = this.$design.$viewManager;
+		let scales = controls.map(c =>
+			(vm.$get(c) as LabeledView<Control>).$getHorizontalScale(this.width, viewWidth)
+		);
+		return Math.min(standard, ...scales);
 	}
 }

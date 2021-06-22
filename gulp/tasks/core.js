@@ -47,7 +47,7 @@ gulp.task('coreDev', () =>
 			mangle: false,
 			format: { beautify: true },
 		}))
-		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../src/core' }))
+		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '../../src/core' }))
 		.pipe(gulp.dest('build/debug'))
 );
 
