@@ -181,16 +181,19 @@ interface JSheet {
 		for(let c of this.$controls) c.$selected = false;
 	}
 
-	/** 根據所有的文字標籤來逆推適合的水平尺度 */
-	public $getHorizontalScale(viewWidth: number, margin: number): number {
+	/** 根據所有的文字標籤來逆推適合的尺度 */
+	public $getScale(viewWidth: number, viewHeight: number, margin: number): number {
+		let factor = this.zoom / Sheet.$FULL_ZOOM;
 		let controls = this._labeledControls;
-		let standard = (viewWidth - 2 * margin) / this.width;
+		let standard = (viewWidth - 2 * margin) * factor / this.width;
 		if(controls.length == 0) return standard;
 
 		let vm = this.$design.$viewManager;
-		let scales = controls.map(c =>
-			(vm.$get(c) as LabeledView<Control>).$getHorizontalScale(this.width, viewWidth)
-		);
-		return Math.min(standard, ...scales);
+		let views = controls.map(c => vm.$get(c) as LabeledView<Control>);
+		let scales = views.map(v => v.$getHorizontalScale(viewWidth, factor));
+		let horizontalScale = Math.min(standard, ...scales);
+
+		let verticalScale = (viewHeight * factor - margin * 2) / this.height;
+		return Math.min(horizontalScale, verticalScale);
 	}
 }
