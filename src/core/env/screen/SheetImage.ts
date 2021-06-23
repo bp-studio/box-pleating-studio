@@ -17,8 +17,7 @@ abstract class SheetImage extends Viewport {
 
 	@shrewd public get $scale() {
 		if(this._design) {
-			let s = this._getAutoScale(this._design.sheet);
-			return this._design.sheet.zoom * s / Sheet.$FULL_ZOOM;
+			return this._design.sheet?.$getScale(this._viewWidth, this._viewHeight, this._MARGIN) ?? 1;
 		} else {
 			return Sheet.$FULL_ZOOM;
 		}
@@ -44,14 +43,5 @@ abstract class SheetImage extends Viewport {
 	/** 因為文字標籤而產生的實際水平邊距 */
 	@shrewd private get _horMargin(): number {
 		return Math.max((this._design?.sheet.$margin ?? 0) + SheetImage.$MARGIN_FIX, this._MARGIN);
-	}
-
-	private _getAutoScale(sheet?: Sheet): number {
-		sheet = sheet || this._design?.sheet;
-		let horizontalScale = sheet ?
-			sheet.$getHorizontalScale(this._viewWidth, this._MARGIN) :
-			this._viewWidth - this._MARGIN * 2;
-		let verticalScale = (this._viewHeight - this._MARGIN * 2) / (sheet?.height ?? 1);
-		return Math.min(horizontalScale, verticalScale);
 	}
 }

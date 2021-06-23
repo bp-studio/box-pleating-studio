@@ -79,13 +79,14 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 	}
 
 	/** 透過解方程式來逆推考量到當前的標籤之下應該採用何種自動尺度 */
-	public $getHorizontalScale(sheetWidth: number, viewWidth: number): number {
+	public $getHorizontalScale(viewWidth: number, factor: number): number {
+		let sheetWidth = this._control.$sheet.width;
 		let labelWidth = this._labelWidth, c = this._labelLocation.x;
 		if(c != 0 && c != sheetWidth) labelWidth /= 2;
 		let vw = viewWidth - SheetImage.$MARGIN_FIX * 2 - LabeledView._EXTRA_FIX;
 		let size = Math.abs(2 * c - sheetWidth);
-		let result = LabeledView._solveQuadratic(-vw, 2 * labelWidth / LabeledView._SQRT, size);
-		if(result > View._MIN_SCALE && size != 0) result = (vw - 2 * labelWidth) / size;
+		let result = LabeledView._solveQuadratic(-vw * factor, 2 * labelWidth / LabeledView._SQRT, size);
+		if(result > View._MIN_SCALE && size != 0) result = (vw * factor - 2 * labelWidth) / size;
 		return result;
 	}
 
