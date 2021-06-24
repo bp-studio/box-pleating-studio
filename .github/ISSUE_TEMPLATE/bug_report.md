@@ -1,6 +1,6 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: 🐛 Bug report
+about: Create a report to help improving BP Studio
 title: ''
 labels: bug
 assignees: MuTsunTsai
@@ -24,9 +24,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Please complete the following information:**
- - Device: [e.g. iPhone6]
- - Browser [e.g. chrome, safari]
- - BP Studio Version [e.g. 0.4.3 build 978]
+ - Device: [e.g. iPhone6, PC]
+ - Browser: [e.g. Safari 13.0, Chrome 89]
+ - BP Studio Version: [e.g. 0.4.3 build 978]
 
 **Additional context**
 Add any other context about the problem here.

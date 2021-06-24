@@ -1,6 +1,6 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: 💡 Feature request
+about: Suggest an idea for BP Studio
 title: ''
 labels: enhancement
 assignees: MuTsunTsai

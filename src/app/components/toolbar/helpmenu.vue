@@ -20,7 +20,7 @@
 		</a>
 		<a
 			class="dropdown-item"
-			href="https://github.com/MuTsunTsai/box-pleating-studio/issues"
+			href="https://github.com/MuTsunTsai/box-pleating-studio/issues/new/choose"
 			target="_blank"
 			rel="noopener"
 		>
