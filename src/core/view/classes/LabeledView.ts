@@ -86,7 +86,10 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 		let vw = viewWidth - SheetImage.$MARGIN_FIX * 2 - LabeledView._EXTRA_FIX;
 		let size = Math.abs(2 * c - sheetWidth);
 		let result = LabeledView._solveEq(-vw * factor, labelWidth * LabeledView._SQRT, size);
-		if(result > View._MIN_SCALE && size != 0) result = (vw * factor - 2 * labelWidth) / size;
+		if(result > View._MIN_SCALE) {
+			if(size != 0) result = (vw * factor - 2 * labelWidth) / size;
+			else result = vw / sheetWidth;
+		}
 		return result;
 	}
 

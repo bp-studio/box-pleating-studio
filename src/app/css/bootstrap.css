@@ -54,9 +54,6 @@
 		background-color: var(--bs-primary);
 		border-color: var(--bs-primary);
 	}
-	.tab .tab-down i {
-		visibility: visible;
-	}
 	.desktop-only {
 		display: none;
 	}

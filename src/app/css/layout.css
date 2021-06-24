@@ -56,7 +56,7 @@
 	}
 }
 
-@media (min-width: 100.01vh) and (min-width: 996px) {
+@media (min-width: 100.01vh) and (min-width: 700px) {
 	#divWorkspace, .welcome {
 		right: 250px;
 	}
@@ -68,7 +68,7 @@
 	}
 }
 
-@media (max-width: 100vh), (max-width: 995px) {
+@media (max-width: 100vh), (max-width: 699.9px) {
 	#divWorkspace, .welcome, #divPanel.show {
 		right: 0px;
 	}

@@ -15,8 +15,8 @@
 							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
 						</div>
-						<div class="px-2" @click.stop="core.projects.close(id)" @pointerdown.stop @mousedown.stop>
-							<i class="fas fa-times"></i>
+						<div class="ps-2 pt-2" @click.stop="core.projects.close(id)" @pointerdown.stop @mousedown.stop>
+							<div class="close"><i class="fas fa-times"></i></div>
 						</div>
 					</div>
 					<div class="tab-down" :title="getTooltip(id)">
@@ -196,9 +196,35 @@
 		display: flex;
 	}
 
+	.tab-close .close {
+		border-radius: 5px;
+		display: inline-block;
+		height: 20px;
+		width: 20px;
+		padding: 3px;
+		line-height: 1;
+		text-align: center;
+	}
+
+	.tab-close .close:hover {
+		background: #AAA;
+	}
+
 	@media (hover: hover) {
 		.tab:not(:hover):not(.active) {
 			color: #444;
+		}
+	}
+
+	@media (hover: none), (pointer: coarse) {
+		.tab .tab-down i {
+			visibility: visible;
+		}
+		.tab-down {
+			display: flex;
+		}
+		.tab-close {
+			display: none;
 		}
 	}
 
@@ -224,12 +250,6 @@
 		#panelToggle {
 			flex-grow: 1;
 			text-align: right;
-		}
-		.tab-down {
-			display: flex;
-		}
-		.tab-close {
-			display: none;
 		}
 	}
 </style>
