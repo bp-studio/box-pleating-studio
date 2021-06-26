@@ -1,6 +1,6 @@
 
 /**
- * "J" stands for JSON, and `JDesign` is the saving format of a Design (a.k.a. "Project").
+ * "J" stands for JSON, and {@link JDesign} is the saving format of a Design (a.k.a. "Project").
  *
  * Being JSON format, it's easy to incorporate any Unicode characters.
  *
@@ -14,7 +14,7 @@ interface JDesign {
 	/** Design description */
 	description?: string;
 
-	/** File format version. @see Migration.$current for the latest version. */
+	/** File format version. see {@link Migration.$getCurrentVersion}() for the latest version. */
 	version: string;
 
 	/** The current view of the design. */
@@ -23,7 +23,7 @@ interface JDesign {
 	/** Editing history. @session */
 	history?: JHistory;
 
-	/** Layout view; @see JLayout for details. */
+	/** Layout view; see {@link JLayout} for details. */
 	layout: JLayout;
 
 	/** Tree view */
@@ -48,7 +48,7 @@ interface IDesignObject {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Design` 是包含了樹狀結構以及摺痕圖的一個完整專案單位。
+ * {@link Design} 是包含了樹狀結構以及摺痕圖的一個完整專案單位。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -130,14 +130,14 @@ interface IDesignObject {
 	public get $viewManager() { return (this.$mountTarget as IStudio).$viewManager; }
 
 	/**
-	 * 目前的 `Design` 是否正在拖曳當中。
+	 * 目前的 {@link Design} 是否正在拖曳當中。
 	 *
-	 * 跟 `System._dragging` 的小差異是，前者只有真的發生整數拖曳時才會為真，
+	 * 跟 {@link DragController.$on} 的小差異是，前者只有真的發生整數拖曳時才會為真，
 	 * 後者則只要滑鼠有微微拖曳就會為真。
 	 */
 	@shrewd public $dragging: boolean = false;
 
-	@shrewd public get $isActive(): boolean {
+	@shrewd public get _isActive(): boolean {
 		return this instanceof Design && (this.$mountTarget as Studio).$design == this;
 	}
 

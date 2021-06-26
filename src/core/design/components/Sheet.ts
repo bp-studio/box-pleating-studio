@@ -12,7 +12,7 @@ interface JSheet {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Sheet` 是代表一個工作區域。
+ * {@link Sheet} 是代表一個工作區域。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -98,14 +98,14 @@ interface JSheet {
 		design.$viewManager.$createView(this);
 	}
 
-	/** 記載所有這個 `Sheet` 中的 `Control` 來源 */
+	/** 記載所有這個 {@link Sheet} 中的 {@link Control} 來源 */
 	private _controlMaps: IterableFactory<Control>[];
 
 	public get $design() {
 		return this.$mountTarget as Design;
 	}
 
-	@shrewd public get $isActive() {
+	@shrewd public get _isActive() {
 		return this.$design.sheet == this;
 	}
 
@@ -138,14 +138,14 @@ interface JSheet {
 	}
 
 	/**
-	 * 所有的 `IndependentDraggable` 所佔據空間的矩形。
+	 * 所有的 {@link IndependentDraggable} 所佔據空間的矩形。
 	 *
 	 * 這個資料故意不採用計算屬性而是採用一個反應方法來持續更新它，
 	 * 為的是避免導致循環參照。
 	 */
 	private _independentRect: Rectangle = new Rectangle(Point.ZERO, Point.ZERO);
 
-	/** 更新 `_independentRect` 的反應方法 */
+	/** 更新 {@link Sheet._independentRect} 的反應方法 */
 	@shrewd private _getIndependentRect() {
 		let x1 = Number.POSITIVE_INFINITY, y1 = Number.POSITIVE_INFINITY;
 		let x2 = Number.NEGATIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;
@@ -166,7 +166,7 @@ interface JSheet {
 	}
 
 	@shrewd public get $margin() {
-		if(!this.$isActive || !this.$design.$isActive) return 0;
+		if(!this._isActive || !this.$design._isActive) return 0;
 		let controls = this._labeledControls;
 		if(controls.length == 0 || !this.$studio!.$display.$settings.showLabel) return 0;
 

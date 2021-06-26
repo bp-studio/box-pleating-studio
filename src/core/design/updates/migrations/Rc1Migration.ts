@@ -1,5 +1,5 @@
 
-/** rc1 版本中在資料結構上插入了 partition 和 device 的層次 */
+/** rc1 版本中在資料結構上插入了 {@link Partition} 和 {@link Device} 的層次 */
 namespace Rc1Migration {
 
 	export function $process(design: Pseudo<JDesign>): boolean {

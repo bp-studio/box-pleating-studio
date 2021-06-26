@@ -9,13 +9,13 @@
 	}
 
 	@shrewd public get $active(): Stretch[] {
-		return [...this.values()].filter(s => s.$isActive && Boolean(s.$pattern));
+		return [...this.values()].filter(s => s._isActive && Boolean(s.$pattern));
 	}
 
 	@shrewd public get $byQuadrant(): ReadonlyMap<Quadrant, Stretch> {
 		let result = new Map<Quadrant, Stretch>();
 		for(let s of this.values()) {
-			if(s.$isActive) {
+			if(s._isActive) {
 				for(let o of s.$junctions) {
 					result.set(o.q1!, s);
 					result.set(o.q2!, s);
@@ -46,7 +46,7 @@
 	}
 
 	/**
-	 * 當前所有的 `Device`。這個列表是用來提供給 CPSheet 的控制項工廠用的。
+	 * 當前所有的 {@link Device}。這個列表是用來提供給 CPSheet 的控制項工廠用的。
 	 */
 	@shrewd public get $devices(): Device[] {
 		let result: Device[] = [];

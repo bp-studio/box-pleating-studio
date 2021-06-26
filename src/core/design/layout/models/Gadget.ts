@@ -1,10 +1,10 @@
 
 interface JGadget {
 
-	/** 所有組成當前 `Gadget` 的 `Piece` */
+	/** 所有組成當前 {@link Gadget} 的 {@link Piece} */
 	pieces: JPiece[];
 
-	/** 這個 `Gadget` 相對於其第一個 `Piece` 的 p[0] 的位移植 */
+	/** 這個 {@link Gadget} 相對於其第一個 {@link Piece} 的 p[0] 的位移植 */
 	offset?: IPoint;
 
 	anchors?: JAnchor[];
@@ -23,11 +23,11 @@ type AnchorMap = [Point, number | null];
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Gadget` 是一個對應於一個 `Overlap` 的 `Device` 部件。
- * 它總是具有 4 個 `Anchor`。
+ * {@link Gadget} 是一個對應於一個 {@link Overlap} 的 {@link Device} 部件。
+ * 它總是具有 4 個 {@link Anchor}。
  *
  * 這個東西只是抽象的計算類別，且沒有任何反應成份，因此不需要繼承任何東西。
- * `Gadget` 本身實作了 `JGadget` 介面，並且在執行 `setup` 方法之前可以跟普通的 `JGadget` 一樣操作內容。
+ * {@link Gadget} 本身實作了 {@link JGadget} 介面，並且在執行 {@link setup} 方法之前可以跟普通的 {@link JGadget} 一樣操作內容。
  */
 //////////////////////////////////////////////////////////////////
 

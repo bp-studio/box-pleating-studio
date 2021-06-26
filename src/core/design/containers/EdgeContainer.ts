@@ -15,7 +15,7 @@
 	}
 
 	/**
-	 * 把 `this.edges.toJSON()` 產出的 `JEdge[]` 做一個排序，
+	 * 把 {@link EdgeContainer.toJSON this.toJSON()} 產出的 {@link JEdge}[] 做一個排序，
 	 * 使得從第一條邊開始逐一加入邊都能維持連通性，且 parent 的方向正確。
 	 */
 	public $sort(): JEdge[] {

@@ -1,13 +1,13 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `SelectionController` 類別負責管理元件的選取。
+ * {@link SelectionController} 類別負責管理元件的選取。
  */
 //////////////////////////////////////////////////////////////////
 
 @shrewd class SelectionController {
 
-	/** 傳回 `Control` 被選取的優先順位（當 `Control` 重疊於點擊位置時判斷用），數字越小越優先 */
+	/** 傳回 {@link Control} 被選取的優先順位（當 {@link Control} 重疊於點擊位置時判斷用），數字越小越優先 */
 	private static _controlPriority(c: Control): number {
 		if(c instanceof Device || c instanceof Vertex) return 1;
 		if(c instanceof Flap || c instanceof Edge) return 2;
@@ -16,9 +16,9 @@
 	}
 
 	/**
-	 * 當前選取的 `Control` 之中可以被拖曳的子陣列。
+	 * 當前選取的 {@link Control} 之中可以被拖曳的子陣列。
 	 *
-	 * 當然，理論上這個陣列要嘛為空、要嘛就等於全體的 `selections`，
+	 * 當然，理論上這個陣列要嘛為空、要嘛就等於全體的 {@link selections}，
 	 * 但是這邊為了型別檢查上的方便，故意把它獨立成一個屬性。
 	 *
 	 * 這個東西本身不做成反應方法，以避免觸發 glitch。
@@ -40,7 +40,7 @@
 		this._view = new DragSelectView(studio);
 	}
 
-	/** 當前所有被選取的 `Control` */
+	/** 當前所有被選取的 {@link Control} */
 	@unorderedArray() public get $items(): Control[] {
 		return this._controls.filter(c => c.$selected);
 	}
@@ -147,7 +147,7 @@
 		return true;
 	}
 
-	/** 當前所有活躍的 `Control` 陣列，依照優先度排序 */
+	/** 當前所有活躍的 {@link Control} 陣列，依照優先度排序 */
 	@unorderedArray() private get _controls(): Control[] {
 		let c = this._studio.$design ? this._studio.$design.sheet.$activeControls.concat() : [];
 		c.sort((a, b) =>

@@ -8,7 +8,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 	protected readonly _glow: paper.PointText;
 
 	/**
-	 * `LabeledView` 要額外實作這個方法來繪製跟比例尺無關的東西。
+	 * {@link LabeledView} 要額外實作這個方法來繪製跟比例尺無關的東西。
 	 *
 	 * 必要的前置檢查已經在底層裡面完成。
 	 */
@@ -54,7 +54,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 		}
 	}
 
-	/** 一個 View 的標籤的橫向溢出大小 */
+	/** 一個 {@link View} 的標籤的橫向溢出大小 */
 	@shrewd public get $overflow(): number {
 		if(this.$disposed || !this.$studio) return 0;
 

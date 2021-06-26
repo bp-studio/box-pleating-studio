@@ -18,9 +18,7 @@ interface JPiece {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Piece` 是 `Gadget` 裡面的一個 `Region`。
- *
- * `Piece` 本身實作了 `JPiece` 介面，並且在執行 `setup` 方法之前可以跟普通的 `JPiece` 一樣操作數值。
+ * {@link Piece} 是 {@link Gadget} 裡面的一個 {@link Region}。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -167,7 +165,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		return this;
 	}
 
-	/** 根據 `Gadget` 偏移來進行設置；必要時會重設計算快取 */
+	/** 根據 {@link Gadget} 偏移來進行設置；必要時會重設計算快取 */
 	public $offset(o?: IPoint) {
 		if(!o || this._offset && this._offset.x == o.x && this._offset.y == o.y) return;
 		this._offset = o;

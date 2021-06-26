@@ -5,10 +5,10 @@ interface IDisposable {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Disposable` 是所有具有「棄置」這種概念的基底類別。
+ * {@link Disposable} 是所有具有「棄置」這種概念的基底類別。
  * 除了進行垃圾回收之外，具體來說棄置到底要做什麼事是由繼承類別來定義的。
  *
- * `Disposable` 可以藉由覆寫 `shouldDispose` 計算屬性來設定棄置條件，
+ * 可以藉由覆寫 {@link Disposable.$shouldDispose} 計算屬性來設定棄置條件，
  * 以便條件滿足的時候自動棄置。
  */
 //////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ interface IDisposable {
 		}
 	}
 
-	/** 要自動棄置的條件。繼承類別覆寫的時候應記得參考 `super.shouldDispose`。 */
+	/** 要自動棄置的條件。繼承類別覆寫的時候應記得參考 `super.$shouldDispose`。 */
 	protected get $shouldDispose(): boolean {
 		return this._disposeWith ? this._disposeWith._disposed : false;
 	}

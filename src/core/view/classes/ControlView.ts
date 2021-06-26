@@ -10,7 +10,7 @@
 
 abstract class ControlView<T extends Control> extends View {
 
-	/** 這個 `ControlView` 所對應的 `Control` 元件 */
+	/** 這個 {@link ControlView} 所對應的 {@link Control} 元件 */
 	protected readonly _control: T;
 
 	constructor(control: T) {

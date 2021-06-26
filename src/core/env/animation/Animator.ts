@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Animator` 類別負責控制 `requestAnimationFrame` 的呼叫，
+ * {@link Animator} 類別負責控制 {@link requestAnimationFrame} 的呼叫，
  * 並且定時清除呼叫堆疊以利偵錯。
  *
  * 請注意這個類別本身並沒有假定 action 參數的同步性，

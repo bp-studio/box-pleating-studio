@@ -4,7 +4,7 @@ namespace Kamiya {
 	const SLOPE = 3;
 	const SLACK = 0.5;
 
-	/** 搜尋兩側都是以神谷模式構成的半整數 `Gadget` */
+	/** 搜尋兩側都是以神谷模式構成的半整數 {@link Gadget} */
 	export function* _halfIntegral(o: JOverlap, sx: number): Generator<JGadget> {
 		if(o.ox % 2 == 0 || o.oy % 2 == 0) return;
 		let doubleO = clone(o);

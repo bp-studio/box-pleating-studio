@@ -17,7 +17,7 @@ class Step implements ISerializable<JStep> {
 		return new Step(design, json as JStep<Command>);
 	}
 
-	/** 將 Command 陣列依照簽章排序並且傳回整體簽章 */
+	/** 將 {@link Command} 陣列依照簽章排序並且傳回整體簽章 */
 	private static signature(commands: readonly Command[]): string {
 		let arr = commands.concat();
 		arr.sort((a, b) => a.$signature.localeCompare(b.$signature));
@@ -86,7 +86,7 @@ class Step implements ISerializable<JStep> {
 		return true;
 	}
 
-	/** 這整個 `Step` 是否等於什麼都沒做 */
+	/** 這整個 {@link Step} 是否等於什麼都沒做 */
 	public get $isVoid(): boolean {
 		return this._commands.every(c => c.$isVoid);
 	}

@@ -112,7 +112,7 @@
 	 *
 	 * 這邊的一個關鍵在於我們不需要再執行一次多邊形布林運算；
 	 * 由於閉包輪廓和內部輪廓理論上不會相交，
-	 * 我們只要把它們都放入 CompoundPath 之中、然後再重新定向就自動會是對的了。
+	 * 我們只要把它們都放入 {@link paper.CompoundPath} 之中、然後再重新定向就自動會是對的了。
 	 */
 	@shrewd private get _actualPath(): paper.CompoundPath {
 		this.$disposeEvent();

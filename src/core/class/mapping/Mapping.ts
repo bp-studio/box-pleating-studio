@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Mapping<K, V>` 類別是一對一用途的 `BaseMapping` 實作類別。
+ * {@link Mapping<K, V>} 類別是一對一用途的 {@link BaseMapping} 實作類別。
  *
  * 它的 key 就等同於是 source，而 dtor 條件則是值被 disposed。
  */

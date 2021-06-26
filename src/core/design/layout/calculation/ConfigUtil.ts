@@ -30,7 +30,7 @@ namespace ConfigUtil {
 	}
 
 	/**
-	 * 把一個 JJunction 垂直或水平切割為二。
+	 * 把一個 {@link JJunction} 垂直或水平切割為二。
 	 *
 	 * @param index 這個 JJunction 的自身索引
 	 * @param id 下一個可用的 Overlap id；切割結果會從這個數字開始遞減使用。

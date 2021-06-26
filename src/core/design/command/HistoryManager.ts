@@ -24,7 +24,7 @@ interface JHistory {
 	private _construct: Memento[] = [];
 	private _destruct: Memento[] = [];
 
-	/** 最後已知的選取 `Control` 的 tag */
+	/** 最後已知的選取 {@link Control} 的 tag */
 	private _selection: string[] = [];
 
 	/** 是否正在移動歷史 */
@@ -82,7 +82,7 @@ interface JHistory {
 	}
 
 	/**
-	 * 處理累積的操作並且整理成 `Step` 物件。
+	 * 處理累積的操作並且整理成 {@link Step} 物件。
 	 *
 	 * @param selection 當前所有選取的控制項，方便在做歷史移動的時候順便恢復選取
 	 */

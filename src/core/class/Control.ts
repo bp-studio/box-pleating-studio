@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Control` 是一個可以被選取的 `SheetObject`。
+ * {@link Control} 是一個可以被選取的 {@link SheetObject}。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -24,9 +24,9 @@ abstract class Control extends SheetObject implements ITagObject {
 	/**
 	 * 這個物件被選取的狀態。
 	 *
-	 * 注意到這個狀態並不直接反應目前 `System` 中被選取的狀態，
-	 * 因為即使一個 `Control` 被卸載，它的選取狀態仍然會維持著，
-	 * 而且 `selected` 和 `System.$selections` 存在雙向綁定關係。
+	 * 注意到這個狀態並不直接反應目前 {@link SelectionController} 中被選取的狀態，
+	 * 因為即使一個 {@link Control} 被卸載，它的選取狀態仍然會維持著，
+	 * 而且 {@link Control.$selected} 和 {@link SelectionController.$items} 存在雙向綁定關係。
 	 */
 	@shrewd public $selected: boolean = false;
 
@@ -44,7 +44,7 @@ abstract class Control extends SheetObject implements ITagObject {
 	}
 
 	/**
-	 * 傳回一個 `Control` 是否可以拖曳選取。
+	 * 傳回一個 {@link Control} 是否可以拖曳選取。
 	 *
 	 * 由於 TypeScript 暫時不支援 this 的 type guard，因此把這個方法定義為靜態方法。
 	 */

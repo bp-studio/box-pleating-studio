@@ -3,7 +3,7 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 
 //////////////////////////////////////////////////////////////////
 /**
- * DoubleMap 是將一對的 Key 對應到 Value 上的類別。
+ * {@link DoubleMap} 是將一對的 Key 對應到 Value 上的類別。
  *
  * 在我的使用情境中，DoubleMap 的 Value 永遠會是根據 Key 對生成的物件，
  * 一旦生成之後就不會改變實體，因此我沒有必要讓整個 DoubleMap 的 get set 都是可觀測的，

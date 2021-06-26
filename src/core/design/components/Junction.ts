@@ -1,10 +1,10 @@
 
-interface JJunction extends JRectangle {
-	/** 對應的兩個 Flap 之間的最大空間，恆正 */
+interface JJunction extends JQuadrilateral {
+	/** 對應的兩個 {@link Flap} 之間的最大空間，恆正 */
 	sx: number;
 }
 
-/** Junction 的重疊狀態 */
+/** {@link Junction} 的重疊狀態 */
 enum JunctionStatus {
 	/** 兩者重疊過頭 */
 	tooClose,
@@ -18,16 +18,16 @@ type JunctionDimension = 'ox' | 'oy';
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Junction` 是負責管理兩個 `Flap` 之間的相對狀態的抽象物件。
+ * {@link Junction} 是負責管理兩個 {@link Flap} 之間的相對狀態的抽象物件。
  */
 //////////////////////////////////////////////////////////////////
 
 @shrewd class Junction extends SheetObject implements ISerializable<JJunction> {
 
 	/**
-	 * 針對一個 `Junction` 群組產生簽章 id；
-	 * 目前採用的格式是直接依 `Flap` 的 id 照順序以逗點分隔。
-	 * 實務上這樣決定出來的 `Junction` 群組必然是唯一的。
+	 * 針對一個 {@link Junction} 群組產生簽章 id；
+	 * 目前採用的格式是直接依 {@link Flap} 的 {@link TreeNode.id id} 照順序以逗點分隔。
+	 * 實務上這樣決定出來的 {@link Junction} 群組必然是唯一的。
 	 */
 	public static $createTeamId(arr: readonly Junction[]) {
 		let set = new Set<number>();
@@ -38,17 +38,17 @@ type JunctionDimension = 'ox' | 'oy';
 		return Array.from(set).sort((a, b) => a - b).join(",");
 	}
 
-	/** `Junction` 群組用的排序函數 */
+	/** {@link Junction} 群組用的排序函數 */
 	public static $sort(j1: Junction, j2: Junction): number {
 		let d = j1.f1.node.id - j2.f1.node.id;
 		if(d != 0) return d;
 		else return j1.f2.node.id - j2.f2.node.id;
 	}
 
-	/** `Junction` 的兩個 `Flap` 當中 id 較小者 */
+	/** {@link Junction} 的兩個 {@link Flap} 當中 id 較小者 */
 	public readonly f1: Flap;
 
-	/** `Junction` 的兩個 `Flap` 當中 id 較大者 */
+	/** {@link Junction} 的兩個 {@link Flap} 當中 id 較大者 */
 	public readonly f2: Flap;
 
 	constructor(sheet: Sheet, f1: Flap, f2: Flap) {
@@ -88,7 +88,7 @@ type JunctionDimension = 'ox' | 'oy';
 	 * 找出對應路徑上的一個共用點。
 	 *
 	 * 目前的演算法用了 LCA 的原理來尋找，雖然理論上速度 OK，
-	 * 但是會使得 coverCandidate 大量相依於頂點的 path，所以也不能說很理想。
+	 * 但是會使得 {@link Junction._coverCandidate _coverCandidate} 大量相依於頂點的 path，所以也不能說很理想。
 	 * 日後可以再思考改進的方法。
 	 */
 	private _findIntersection(j: Junction): TreeNode | null {
@@ -104,7 +104,7 @@ type JunctionDimension = 'ox' | 'oy';
 		return null;
 	}
 
-	/** 自身有可能被覆蓋的 Junction 列表 */
+	/** 自身有可能被覆蓋的 {@link Junction} 列表 */
 	@shrewd({
 		comparer(ov: [Junction, TreeNode][], nv: [Junction, TreeNode][]) {
 			if(!ov) return false;
@@ -126,7 +126,7 @@ type JunctionDimension = 'ox' | 'oy';
 		return result;
 	}
 
-	/** 判斷自身是否被另外一個 `Junction` 所涵蓋 */
+	/** 判斷自身是否被另外一個 {@link Junction} 所涵蓋 */
 	private _isCoveredBy(o: Junction, n: TreeNode): boolean {
 		// 方向不一樣的話肯定不是覆蓋
 		if(this.$direction % 2 != o.$direction % 2) return false;
@@ -275,7 +275,7 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/**
-	 * 找出給定的 `Junction[]` 裡面 ox 或 oy 最大或最小的
+	 * 找出給定的 {@link Junction} 陣列裡面 ox 或 oy 最大或最小的
 	 * @param f 傳入 1 表示要找最大、-1 表示要找最小
 	 */
 	public static $findMinMax(

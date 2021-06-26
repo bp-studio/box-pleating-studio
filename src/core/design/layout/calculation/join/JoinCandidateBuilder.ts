@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `JoinCandidateBuilder` 類別幫忙完成 `JoinCandidate` 的複雜建構過程。
+ * {@link JoinCandidateBuilder} 類別幫忙完成 {@link JoinCandidate} 的複雜建構過程。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@ class JoinCandidateBuilder {
 		private readonly joiner: Joiner
 	) {}
 
-	/** 這部份的程式碼是 `JoinCandidate` 建構過程中最複雜的一個環節，今重構成這個方法來管理 */
+	/** 這部份的程式碼是 {@link JoinCandidate} 建構過程中最複雜的一個環節，今重構成這個方法來管理 */
 	public $setup(that: JoinCandidateBuilder, f: Sign, shift: IPoint): number {
 		let int = this.joiner.$getRelayJoinIntersection(that.p, shift, opposite(this.q));
 		if(!int || !int.$isIntegral) return NaN;

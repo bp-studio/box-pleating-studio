@@ -12,7 +12,7 @@ type HistoryManagerFactory = (design: Design, data: JDesign) => HistoryManager |
 
 //////////////////////////////////////////////////////////////////
 /**
- * `StudioBase` 類別是 `Studio` 的抽象基底類別，
+ * {@link StudioBase} 類別是 {@link Studio} 的抽象基底類別，
  * 獨立出來以方便注入不同的成員實作以進行測試。
  */
 //////////////////////////////////////////////////////////////////

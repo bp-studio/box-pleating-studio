@@ -18,16 +18,16 @@
 	}
 
 	/**
-	 * 當前所有「活躍」的 `Junction`，亦即實際上會被納入 `Pattern` 計算的那些。
+	 * 當前所有「活躍」的 {@link Junction}，亦即實際上會被納入 {@link Pattern} 計算的那些。
 	 *
-	 * 這會排除掉被覆蓋的 `Junction`。
+	 * 這會排除掉被覆蓋的 {@link Junction}。
 	 */
 	@orderedArray("aj") public get $active(): readonly Junction[] {
 		return this.$valid.filter(j => !j.$isCovered);
 	}
 
 	/**
-	 * 當前所有的 `Junction` 群組（即 `Team`，雖然這不是程式碼中的類別）。
+	 * 當前所有的 {@link Junction} 群組（即 `Team`，雖然這不是程式碼中的類別）。
 	 */
 	@shrewd public get $teams(): Map<string, readonly Junction[]> {
 		let arr: Junction[];

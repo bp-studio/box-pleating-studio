@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Partitioner` 是 `Partition` 的基底類別，
- * 裡面定義了跟搜尋 `Device` 有關的方法。
+ * {@link Partitioner} 是 {@link Partition} 的基底類別，
+ * 裡面定義了跟搜尋 {@link Device} 有關的方法。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -24,7 +24,7 @@ class Partitioner extends Disposable {
 	 * @param oriented 共用左下角
 	 */
 	public static $getMaxIntersectionDistance(
-		tree: Tree, r1: JRectangle, r2: JRectangle, oriented: boolean) {
+		tree: Tree, r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean) {
 		let q = oriented ? 2 : 0;
 		let n1 = tree.$node.get(r1.c[q].e!)!;
 		let n2 = tree.$node.get(r2.c[q].e!)!;

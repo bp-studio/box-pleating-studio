@@ -25,11 +25,11 @@ enum CornerType {
 	$internal,
 	/** 側角，也是連至脊線交點，不過由於位於最側邊的關係，在產生河道輪廓的時候可以無限延伸 */
 	$side,
-	/** 連至脊線交點的角；此時 e 指的是參與交點的另一個 Flap 的 id */
+	/** 連至脊線交點的角；此時 e 指的是參與交點的另一個 {@link Flap} 的 id */
 	$intersection,
-	/** 連至 Flap 的角 */
+	/** 連至 {@link Flap} 的角 */
 	$flap,
-	/** 這個角和另外一個 Overlap 的角落是重合的；這會使得當前的 Overlap 和對方屬於相同的 Partition */
+	/** 這個角和另外一個 Overlap 的角落是重合的；這會使得當前的 Overlap 和對方屬於相同的 {@link Partition} */
 	$coincide,
 }
 

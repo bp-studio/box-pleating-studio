@@ -17,7 +17,7 @@ type QuadrantDirection = Direction.UL | Direction.UR | Direction.LL | Direction.
 
 type PerQuadrantBase<T> = readonly [T, T, T, T];
 
-/** 一個索引只能是 `QuadrantDirection` 的唯讀陣列，可以配合 `MakePerQuadrant` 產生之 */
+/** 一個索引只能是 {@link QuadrantDirection} 的唯讀陣列，可以配合 {@link makePerQuadrant} 產生之 */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface PerQuadrant<T> extends PerQuadrantBase<T> { }
 

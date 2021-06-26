@@ -9,7 +9,7 @@ interface JFlap {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Flap` 是摺痕圖中的角片元件，是決定整個摺痕圖配置的關鍵。
+ * {@link Flap} 是摺痕圖中的角片元件，是決定整個摺痕圖配置的關鍵。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -51,7 +51,7 @@ interface JFlap {
 		return { x: this.$location.x + this.width / 2, y: this.$location.y + this.height / 2 };
 	}
 
-	/** 這個 Flap 的各象限上的頂點 */
+	/** 這個 {@link Flap} 的各象限上的頂點 */
 	@shrewd public get $points(): readonly Point[] {
 		let x = this.$location.x, y = this.$location.y;
 		let w = this.width, h = this.height;
@@ -135,7 +135,7 @@ interface JFlap {
 	}
 
 	////////////////////////////////////////////////////////////
-	/**
+	/*
 	 * 底下這一部份的程式碼負責整理一個 Flap 具有哪些 Junction。
 	 * 因為 Junction 的總數非常多，採用純粹的反應式框架來篩選反而速度慢，
 	 * 因此特別這一部份改用一個主動式架構來通知 Flap.junctions 的更新。

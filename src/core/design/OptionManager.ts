@@ -3,14 +3,14 @@ type Memento = [string, object];
 
 //////////////////////////////////////////////////////////////////
 /**
- * `OptionManager` 是用來管理 `Design` 中元件的初始化設定值。
+ * {@link OptionManager} 是用來管理 {@link Design} 中元件的初始化設定值。
  */
 //////////////////////////////////////////////////////////////////
 
 class OptionManager {
 
 	/**
-	 * 當專案載入進來的時候暫存個別元件屬性的 `Map`，
+	 * 當專案載入進來的時候暫存個別元件屬性的 {@link Map}，
 	 * 當元件被反應框架自動生成的時候會去這裡面尋找對應的設定值來自我初始化。
 	 */
 	private readonly _options: Map<string, object> = new Map();

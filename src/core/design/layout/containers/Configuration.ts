@@ -8,8 +8,8 @@ interface JConfiguration {
 
 //////////////////////////////////////////////////////////////////
 /**
- * 一種 `Configuration` 是一套把 `Junction`
- * 群組構成的重疊區域切割成 `Partition` 的配置。
+ * 一種 {@link Configuration} 是一套把 {@link Junction}
+ * 群組構成的重疊區域切割成 {@link Partition} 的配置。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -66,15 +66,15 @@ interface JConfiguration {
 		return super.$shouldDispose || this.$repository.$disposed;
 	}
 
-	@shrewd public get $isActive() {
-		return this.$repository.$isActive && this.$repository.entry == this;
+	@shrewd public get _isActive() {
+		return this.$repository._isActive && this.$repository.entry == this;
 	}
 
 	protected $builder(prototype: JPattern) {
 		return new Pattern(this, prototype);
 	}
 
-	/** 在當前的 `Configuration` 中尋找 `Pattern` */
+	/** 在當前的 {@link Configuration} 中尋找 {@link Pattern} */
 	private *_generate(): Generator<JPattern> {
 		if(this._seed) yield this._seed;
 
@@ -98,7 +98,7 @@ interface JConfiguration {
 		}
 	}
 
-	/** 安排位置並產生 `Pattern`；如果結果太大，則傳回 null 表示失敗 */
+	/** 安排位置並產生 {@link Pattern}；如果結果太大，則傳回 null 表示失敗 */
 	private _makePattern(prototypes: JDevice[]): GPattern | null {
 		prototypes.forEach(d => d.gadgets = d.gadgets.map(g => Gadget.$instantiate(g)));
 		let devices = prototypes as GDevice[];

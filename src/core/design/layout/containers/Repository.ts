@@ -6,10 +6,10 @@ interface JRepository {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Repository` 是針對 `Stretch` 的特定配置算出的若干套 `Configuration` 的組合。
+ * {@link Repository} 是針對 {@link Stretch} 的特定配置算出的若干套 {@link Configuration} 的組合。
  *
- * `Repository` 物件存在的動機是為了使得當 `Stretch` 的配置暫時發生改變、
- * 或是 `Stretch` 由於拖曳而暫時解除活躍時，可以記住原本的 `Pattern` 組合。
+ * {@link Repository} 物件存在的動機是為了使得當 {@link Stretch} 的配置暫時發生改變、
+ * 或是 {@link Stretch} 由於拖曳而暫時解除活躍時，可以記住原本的 {@link Pattern} 組合。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -55,7 +55,7 @@ interface JRepository {
 
 	/** 一旦安定下來了之後就記錄自己的建構 */
 	@shrewd private _onSettle() {
-		if(!this._everActive && this.$isActive && !this.$design.$dragging) {
+		if(!this._everActive && this._isActive && !this.$design.$dragging) {
 			this._everActive = true;
 
 			// 乍看之下不需要特別記錄 Repository 的建構 Memento（因為重新移動到位的時候必然會計算出一樣的東西），
@@ -69,7 +69,7 @@ interface JRepository {
 	protected get $shouldDispose(): boolean {
 		return super.$shouldDispose ||
 			this.$stretch.$disposed ||
-			!this.$isActive && !this.$design.$dragging;
+			!this._isActive && !this.$design.$dragging;
 	}
 
 	protected $onDispose() {
@@ -77,15 +77,15 @@ interface JRepository {
 		super.$onDispose();
 	}
 
-	@shrewd public get $isActive(): boolean {
-		return this.$stretch.$isActive && this.$stretch.$repository == this;
+	@shrewd public get _isActive(): boolean {
+		return this.$stretch._isActive && this.$stretch.$repository == this;
 	}
 
 	protected $onMove(): void {
 		this.$stretch.$selected = !this.entry!.entry!.$selected;
 	}
 
-	/** 根據 `JOverlap` 組合來產生（或沿用）一個 `Joiner` */
+	/** 根據 {@link JOverlap} 組合來產生（或沿用）一個 {@link Joiner} */
 	public getJoiner(overlaps: readonly JOverlap[]): Joiner {
 		let key = JSON.stringify(overlaps);
 		let j = this.joinerCache.get(key);

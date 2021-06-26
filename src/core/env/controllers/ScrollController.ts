@@ -1,11 +1,13 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `ScrollController` 類別負責管理視圖區域的捲動。
+ * {@link ScrollController} 類別負責管理視圖區域的捲動。
  */
 //////////////////////////////////////////////////////////////////
 
 class ScrollController {
+
+	private static readonly _TIMEOUT = 50;
 
 	private _studio: Studio;
 
@@ -55,19 +57,19 @@ class ScrollController {
 		if(sheet) {
 			sheet.$scroll.x = this._studio.$el.scrollLeft;
 			sheet.$scroll.y = this._studio.$el.scrollTop;
-
-
 		}
 
 		// 有的時候捲動太快會錯過一些事件，用這一段程式碼來檢查之
 		window.clearTimeout(this._timeout);
-		this._timeout = window.setTimeout(() => {
-			let sheet = this._studio.$design?.sheet;
-			if(sheet && (sheet.$scroll.x != this._studio.$el.scrollLeft
-				|| sheet.$scroll.y != this._studio.$el.scrollTop)) {
-				this._onScroll();
-			}
-		}, 50);
+		this._timeout = window.setTimeout(() => this._timeoutHandler(), ScrollController._TIMEOUT);
+	}
+
+	private _timeoutHandler() {
+		let sheet = this._studio.$design?.sheet;
+		if(sheet && (sheet.$scroll.x != this._studio.$el.scrollLeft ||
+			sheet.$scroll.y != this._studio.$el.scrollTop)) {
+			this._onScroll();
+		}
 	}
 
 	public to(x: number, y: number) {

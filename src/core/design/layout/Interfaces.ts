@@ -1,6 +1,6 @@
 
-interface JRectangle {
-	/** 這個 `Rectangle` 的四個象限角；方向是根據相位變換之前 */
+interface JQuadrilateral {
+	/** 這個 {@link JQuadrilateral} 的四個象限角；方向是根據相位變換之前 */
 	c: JCorner[];
 
 	ox: number;
@@ -9,16 +9,17 @@ interface JRectangle {
 
 //////////////////////////////////////////////////////////////////
 /**
- * JOverlap 是 Configuration 的基本構成元素，是一個從 JJunction 中切割得到的區域。
+ * {@link JOverlap} 是 {@link Configuration} 的基本構成元素，
+ * 是一個從 {@link JJunction} 中切割得到的區域。
  *
  * 基本的情況中它代表著一個矩形重疊區域，不過在使用 join 的情況中，
  * 它可能會變形成隨意的四邊形，但是總之它不管怎樣都有四個象限角。
  */
 //////////////////////////////////////////////////////////////////
 
-interface JOverlap extends JRectangle {
+interface JOverlap extends JQuadrilateral {
 
-	/** 這個 JOverlap 是從哪一個 JJunction 切割出來的 */
+	/** 這個 {@link JOverlap} 是從哪一個 {@link JJunction} 切割出來的 */
 	parent: number;
 
 	/** 切割時相對於 parent 的 p[0] 角落（右上角）的正規偏移，省略則等於 (0,0) */
@@ -27,9 +28,9 @@ interface JOverlap extends JRectangle {
 
 //////////////////////////////////////////////////////////////////
 /**
- * JCorner 是 JRectangle 的一個象限角。
+ * {@link JCorner} 是 {@link JRectangle} 的一個象限角。
  *
- * 它同時負責描述這個角落的自身狀態以及連接對象；它繼承了 Partial<JConnection> 介面，
+ * 它同時負責描述這個角落的自身狀態以及連接對象；它繼承了 Partial<{@link JConnection}> 介面，
  * 如果其 e, q 為 undefined 表示它沒有連出。
  */
 //////////////////////////////////////////////////////////////////
@@ -57,10 +58,10 @@ interface JCorner extends Partial<JConnection> {
 
 interface JConnection {
 
-	/** 連接對象，非負數代表 `Flap`，負數代表 `Overlap`（在整個 Configuration 中的 id） */
+	/** 連接對象，非負數代表 {@link Flap}，負數代表 {@link Overlap}（在整個 Configuration 中的 id） */
 	e: number;
 
-	/** 連接至對方的哪一個象限角；`Flap` 的情況是原始的，`Overlap` 的情況是未經變換的 */
+	/** 連接至對方的哪一個象限角；{@link Flap} 的情況是原始的，{@link Overlap} 的情況是未經變換的 */
 	q: QuadrantDirection;
 }
 

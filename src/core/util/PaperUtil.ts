@@ -8,7 +8,7 @@
 namespace PaperUtil {
 
 	/**
-	 * 替換掉一個 `paper.CompoundPath` 的內容。
+	 * 替換掉一個 {@link paper.CompoundPath} 的內容。
 	 * @param target 要替換的目標物件
 	 * @param source 替換內容的來源
 	 * @param clone 是否要將來源複製一份，還是直接代入
@@ -31,7 +31,7 @@ namespace PaperUtil {
 		rect.segments[3].point.set(0, height);
 	}
 
-	/** 把一個 `paper.CompoundPath` 加入指定兩點定義的線段 */
+	/** 把一個 {@link paper.CompoundPath} 加入指定兩點定義的線段 */
 	export function $addLine(
 		path: paper.CompoundPath, p1: Point | paper.Point, p2: Point | paper.Point): void {
 		if(p1 instanceof Point) p1 = p1.$toPaper();
@@ -40,7 +40,7 @@ namespace PaperUtil {
 		path.lineTo(p2);
 	}
 
-	/** 把一個 `paper.CompoundPath` 的內容替換成傳入的直線陣列組 */
+	/** 把一個 {@link paper.CompoundPath} 的內容替換成傳入的直線陣列組 */
 	export function $setLines(path: paper.CompoundPath, ...lines: (readonly Line[])[]): void {
 		path.removeChildren();
 		for(let set of lines) for(let l of set) PaperUtil.$addLine(path, l.p1, l.p2);

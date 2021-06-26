@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `BPStudio` 類別是 `Studio` 類別的對外包裝，
+ * {@link BPStudio} 類別是 {@link Studio} 類別的對外包裝，
  * 終極目標是要將所有的對外介面集中到這個類別裡面來統一管理，
  * 並且隔離這些介面背後對應的實作。
  *
@@ -80,7 +80,7 @@ class BPStudio {
 	// 物件導覽
 	//////////////////////////////////////////////////////////////////
 
-	/** 傳回物件對應的 `Repository`、若有的話 */
+	/** 傳回物件對應的 {@link Repository}、若有的話 */
 	public getRepository(target: unknown): Repository | null {
 		if(target instanceof Device) return target.$pattern.$configuration.$repository;
 		else if(target instanceof Stretch) return target.$repository;

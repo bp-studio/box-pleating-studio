@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * 抽象類別 `Store` 能根據指定的生成器和建造器產生物件陣列，
+ * 抽象類別 {@link Store} 能根據指定的生成器和建造器產生物件陣列，
  * 並且提供方法來在陣列之中瀏覽不同的物件。
  *
  * 基於效能，它的運作模式如下：
@@ -38,7 +38,7 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 	/** 目前選取的 entry 索引 */
 	@action public index: number = 0;
 
-	/** 目前的 `Collection` 所有可用的 prototype */
+	/** 目前的 {@link Collection} 所有可用的 prototype */
 	@shrewd protected get _prototypes(): P[] {
 		if(!this.$generator) return this._cache;
 		if(this.$design.$dragging) {
@@ -89,7 +89,7 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 	/**
 	 * 當前選用的 entry。
 	 *
-	 * 只要當前的 `Store` 非空就會有一個被選中，所以傳回 null 也表示 `Store` 為空。
+	 * 只要當前的 {@link Store} 非空就會有一個被選中，所以傳回 null 也表示 {@link Store} 為空。
 	 * @exports
 	 */
 	@shrewd public get entry(): T | null {
@@ -108,7 +108,7 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 	}
 
 	/**
-	 * 當前 `Store` 的大小
+	 * 當前 {@link Store} 的大小
 	 *
 	 * @exports
 	 */
@@ -127,6 +127,6 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 		return this._entries[i] = this._entries[i] || this.$builder(e[i]);
 	}
 
-	/** 給 `Store` 的實作類別註冊 entry 切換之後要發生的事情 */
+	/** 給 {@link Store} 的實作類別註冊 entry 切換之後要發生的事情 */
 	protected abstract $onMove(): void;
 }

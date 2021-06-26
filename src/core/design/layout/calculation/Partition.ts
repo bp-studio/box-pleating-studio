@@ -1,8 +1,8 @@
 
 /**
- * 第 0 欄位是 `JCorner` 本身，
- * 第 1 位表示它在當前 `Partition` 中的第幾個 `Overlap`，
- * 第 2 位表示在該 `Overlap` 中的哪一個 `Anchor`
+ * 第 0 欄位是 {@link JCorner} 本身，
+ * 第 1 位表示它在當前 {@link Partition} 中的第幾個 {@link Overlap}，
+ * 第 2 位表示在該 {@link Overlap} 中的哪一個 {@link Anchor}
  */
 type CornerMap = [JCorner, number, number];
 
@@ -16,10 +16,10 @@ interface JPartition {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Partition` 是 `Configuration` 底下的單一切割。
+ * {@link Partition} 是 {@link Configuration} 底下的單一切割。
  *
- * `Partition` 只會對應於單一的 `Device`，它負責計算對應切割的相關數值。
- * 尋找 `Device` 部份的程式碼在於其基底類別 `Partitioner` 之中。
+ * {@link Partition} 只會對應於單一的 {@link Device}，它負責計算對應切割的相關數值。
+ * 尋找 {@link Device} 部份的程式碼在於其基底類別 {@link Partitioner} 之中。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -115,7 +115,7 @@ interface JPartition {
 		return result;
 	}
 
-	/** 求出在一個具有 join 的 `Partition` 中，指定的 `JOverlap` 在扣掉其它所有 `JOverlap 之後還剩下什麼區域 */
+	/** 求出在一個具有 join 的 {@link Partition} 中，指定的 {@link JOverlap} 在扣掉其它所有 `JOverlap 之後還剩下什麼區域 */
 	private _getExposedOverlap(ov: JOverlap): JOverlap {
 		if(this.$overlaps.length == 1) return ov;
 		let result = clone(ov), parent = this._getParent(ov);
@@ -146,7 +146,7 @@ interface JPartition {
 		return result;
 	}
 
-	/** 取得一個 `JOverlap` 原本對應的 `JJunction` */
+	/** 取得一個 {@link JOverlap} 原本對應的 {@link JJunction} */
 	private _getParent(ov: JOverlap): Readonly<JJunction> {
 		return this.$configuration.$repository.$structure[ov.parent];
 	}

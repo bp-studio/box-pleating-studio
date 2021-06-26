@@ -1,5 +1,5 @@
 
-/** 從 rc0 版本開始要求 intersection 都必須加上 e */
+/** 從 rc0 版本開始要求 {@link JIntersection} 都必須加上 e */
 namespace Rc0Migration {
 
 	export function $process(design: Pseudo<JDesign>): boolean {

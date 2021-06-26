@@ -9,7 +9,7 @@ type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
 
 //////////////////////////////////////////////////////////////////
 /**
- * `BaseMapping<K, S, V>` 類別實作了 `ReadonlyMap<K, V>` 介面，
+ * {@link BaseMapping BaseMapping<K, S, V>} 類別實作了 {@link ReadonlyMap ReadonlyMap<K, V>} 介面，
  * 會反應市地根據提供的 source 和 keyGen 來產生 key，
  * 再根據 ctor 來建構 source 對應的 V 類別物件實體，
  * 並且根據 dtor 來自動從清單中移除。

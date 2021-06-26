@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Mountable` 是可掛載元件。「掛載」是指載入到當前的 `Studio` 的動作。
+ * {@link Mountable} 是可掛載元件。「掛載」是指載入到當前的 {@link Studio} 的動作。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -22,7 +22,7 @@ abstract class Mountable extends Disposable {
 	}
 
 	@shrewd protected get $studio(): IStudio | null {
-		if(this.$disposed || !this.$isActive) return null;
+		if(this.$disposed || !this._isActive) return null;
 		else if(!(this.$mountTarget instanceof Mountable)) return this.$mountTarget;
 		else return this.$mountTarget.$studio;
 	}
@@ -45,14 +45,14 @@ abstract class Mountable extends Disposable {
 	}
 
 	/**
-	 * 傳回目前這個 `Mountable` 是否為「活躍」，亦即除了其父元件是否有被掛載之外，它自己是否應該要被掛載。
+	 * 傳回目前這個 {@link Mountable} 是否為「活躍」，亦即除了其父元件是否有被掛載之外，它自己是否應該要被掛載。
 	 *
 	 * 預設行為是傳回恆真（亦即其掛載與否永遠和父元件同步），但子元件可以覆寫這個行為，
 	 * 而覆寫的行為通常是根據「父元件是否在某種意義上選取了自己」來決定。
 	 */
-	protected get $isActive() { return true; }
+	protected get _isActive() { return true; }
 
-	public static $isActive(m: Mountable) { return m.$isActive; }
+	public static $isActive(m: Mountable) { return m._isActive; }
 
 	/** 掛載事件 */
 	protected $onMount(studio: IStudio) {

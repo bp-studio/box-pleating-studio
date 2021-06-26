@@ -3,7 +3,7 @@ type CoveredInfo = [number, number, Point[]];
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Quadrant` 是負責管理一個 `Flap` 的其中一個象限的抽象物件。
+ * {@link Quadrant} 是負責管理一個 {@link Flap} 的其中一個象限的抽象物件。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -68,7 +68,7 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	/**
-	 * 在有河的情況下，計算相對於當前 `Quadrant` 的重疊區域的角落
+	 * 在有河的情況下，計算相對於當前 {@link Quadrant} 的重疊區域的角落
 	 *
 	 * @param q 要取得哪一個未經相位變換之前的角
 	 * @param d 額外距離
@@ -126,12 +126,12 @@ type CoveredInfo = [number, number, Point[]];
 		);
 	}
 
-	/** 傳回此向量目前所有的活躍 `Junction` 物件 */
+	/** 傳回此向量目前所有的活躍 {@link Junction} 物件 */
 	@orderedArray("qaj") public get $activeJunctions(): readonly Junction[] {
 		return this._validJunctions.filter(j => !j.$isCovered);
 	}
 
-	/** 將指定的 Junction 移動到指定的基準點上，取得覆蓋比較矩形 */
+	/** 將指定的 {@link Junction} 移動到指定的基準點上，取得覆蓋比較矩形 */
 	public $getBaseRectangle(j: Junction, base: TreeNode): Rectangle {
 		let distance = this.$design.$tree.$dist(base, this._flap.node);
 		let radius = this._flap.radius;

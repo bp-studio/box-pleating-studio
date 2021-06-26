@@ -1,10 +1,10 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `DoubleMapping<K, V>` 類別是反應式地根據 source 的所有可能兩兩配對
- * （不得重複、順序無所謂）來映射至 value 的 `ReadonlyDoubleMap`。
+ * {@link DoubleMapping DoubleMapping<K, V>} 類別是反應式地根據 source 的所有可能兩兩配對
+ * （不得重複、順序無所謂）來映射至 value 的 {@link ReadonlyDoubleMap}。
  *
- * 和 `BaseMapping` 類別類似地，
+ * 和 {@link BaseMapping} 類別類似地，
  * 它移除項目的根據也不是根據 key 是否從 source 中消失，
  * 而在這邊它根據的是 key 是否被 disposed。
  */

@@ -13,7 +13,7 @@ interface JoinData {
 
 //////////////////////////////////////////////////////////////////
 /**
- * `JoinerCore` 負責執行把兩個給定的 `Gadget` 融合成一個 `Device` 的核心計算。
+ * {@link JoinerCore} 負責執行把兩個給定的 {@link Gadget} 融合成一個 {@link Device} 的核心計算。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -52,7 +52,7 @@ class JoinerCore {
 		this.data = { c1: b1.$build(pt), c2: b2.$build(pt), offset, size, pt, bv, org, f };
 	}
 
-	/** 嘗試把兩個 GOPS `Piece` 簡單融合成一個 `Device` */
+	/** 嘗試把兩個 {@link GOPS} {@link Piece} 簡單融合成一個 {@link Device} */
 	public *$simpleJoin(): Generator<JoinResult> {
 		if(!this.data) return;
 		let { c1, c2, pt, bv } = this.data;
@@ -86,7 +86,7 @@ class JoinerCore {
 	 * base join 的四個關鍵交點。
 	 *
 	 * 值得注意的是這四個點不一定總是存在；
-	 * 如果兩個 Gadget 的角度非常地「直」，可能只有其中一對會有。
+	 * 如果兩個 {@link Gadget} 的角度非常地「直」，可能只有其中一對會有。
 	 */
 	private _baseJoinIntersections() {
 		let { bv, c1, c2, pt } = this.data;
@@ -207,7 +207,7 @@ class JoinerCore {
 	}
 
 	/**
-	 * 設定兩個 `Piece` 的繞道。
+	 * 設定兩個 {@link Piece} 的繞道。
 	 *
 	 * 傳入的兩個陣列參數是從離融合點最遠的頂點開始列舉（不包含融合點本身）。
 	 */

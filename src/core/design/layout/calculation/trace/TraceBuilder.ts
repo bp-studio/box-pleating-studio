@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `TraceBuilder` 負責處理建構 `Trace` 之前的複雜前置計算。
+ * {@link TraceBuilder} 負責處理建構 `Trace` 之前的複雜前置計算。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -164,8 +164,9 @@ class TraceBuilder {
 	}
 
 	/**
-	 * 在 Pattern 中找出指定方向中的下一個（或最遠的）Quadrant。
-	 * @param junctions Pattern 對應的全體 Junction
+	 * 在 {@link Pattern} 中找出指定方向中的下一個（或最遠的）{@link Quadrant}。
+	 *
+	 * @param junctions {@link Pattern} 對應的全體 {@link Junction}
 	 * @param cw 是否要找順時鐘方向
 	 * @param next 傳入 true 表示找下一個；否表示找最遠的
 	 */

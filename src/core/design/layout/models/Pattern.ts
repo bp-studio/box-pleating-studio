@@ -7,8 +7,8 @@ type GPattern = JPattern<Gadget>;
 
 //////////////////////////////////////////////////////////////////
 /**
- * `Pattern` 是一整套針對特定 `Configuration` 產生的完整摺式。
- * 一個 `Configuration` 可以導致多套可用的 `Pattern` 可以交換選用。
+ * {@link Pattern} 是一整套針對特定 {@link Configuration} 產生的完整摺式。
+ * 一個 {@link Configuration} 可以導致多套可用的 {@link Pattern} 可以交換選用。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -64,8 +64,8 @@ type GPattern = JPattern<Gadget>;
 		return super.$shouldDispose || this.$configuration.$disposed;
 	}
 
-	@shrewd public get $isActive() {
-		return this.$configuration.$isActive && this.$configuration.entry == this;
+	@shrewd public get _isActive() {
+		return this.$configuration._isActive && this.$configuration.entry == this;
 	}
 
 	/**
@@ -74,7 +74,7 @@ type GPattern = JPattern<Gadget>;
 	 * 這跟一個 Pattern 實際上會繪製出來的 ridge 並不全然一樣。
 	 */
 	@shrewd public get $linesForTracing(): PerQuadrant<readonly Line[]> {
-		if(!this.$isActive) return this._lineCache;
+		if(!this._isActive) return this._lineCache;
 
 		let dir = this.$configuration.$repository.$stretch.$junctions[0].$direction;
 		let size = new Fraction(this.$design.$LayoutSheet.size);
@@ -129,7 +129,7 @@ type GPattern = JPattern<Gadget>;
 		return this.$devices.some(d => d.$selected);
 	}
 
-	/** 提供快速查找 `Stretch` */
+	/** 提供快速查找 {@link Stretch} */
 	public get $stretch(): Stretch {
 		return this.$configuration.$repository.$stretch;
 	}

@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////
 /**
- * `IndependentDraggable` 是一個拖曳行為與其它物件無關的 `Draggable`。
+ * {@link IndependentDraggable} 是一個拖曳行為與其它物件無關的 {@link Draggable}。
  *
- * 這樣的物件會限定住 `Sheet` 所能縮小的程度。
+ * 這樣的物件會限定住 {@link Sheet} 所能縮小的程度。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -11,7 +11,7 @@ abstract class IndependentDraggable extends Draggable {
 
 	private _isNew: boolean = true;
 
-	/** 這個物件自從建構以來，Design 是否尚未切換過 Sheet */
+	/** 這個物件自從建構以來，{@link Design} 是否尚未切換過 {@link Sheet} */
 	protected get $isNew() { return this._isNew; }
 	protected set $isNew(v) { if(!v) this._isNew = v; }
 
@@ -20,14 +20,14 @@ abstract class IndependentDraggable extends Draggable {
 	}
 
 	/**
-	 * 物件在 Sheet 上佔據的高度
+	 * 物件在 {@link Sheet} 上佔據的高度
 	 *
 	 * @exports
 	 */
 	public abstract readonly height: number;
 
 	/**
-	 * 物件在 Sheet 上佔據的寬度
+	 * 物件在 {@link Sheet} 上佔據的寬度
 	 *
 	 * @exports
 	 */

@@ -9,7 +9,7 @@ type GDevice = JDevice<Gadget>;
 
 //////////////////////////////////////////////////////////////////
 /**
- * Device 是一個 Pattern 當中可以被獨立移動的最小元件，它對應於一個 `Partition`。
+ * Device 是一個 Pattern 當中可以被獨立移動的最小元件，它對應於一個 {@link Partition}。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -44,12 +44,12 @@ type GDevice = JDevice<Gadget>;
 		};
 	}
 
-	/** 參考原點跟所屬的 `Stretch` 原點之間的位移；參考原點需要透過這個來計算得到 */
+	/** 參考原點跟所屬的 {@link Stretch} 原點之間的位移；參考原點需要透過這個來計算得到 */
 	@onDemand private get _originalDisplacement(): Vector {
 		return this.$partition.$getOriginalDisplacement(this.$pattern);
 	}
 
-	/** 參考原點；`location` 是相對於這個原點在表示的 */
+	/** 參考原點；{@link location} 是相對於這個原點在表示的 */
 	private get _origin(): Point {
 		return this.$pattern.$stretch.origin.add(this._originalDisplacement);
 	}
@@ -58,7 +58,7 @@ type GDevice = JDevice<Gadget>;
 		return super.$shouldDispose || this.$pattern.$disposed;
 	}
 
-	@shrewd public get $isActive() { return this.$pattern.$isActive; }
+	@shrewd public get _isActive() { return this.$pattern._isActive; }
 
 	/**
 	 * 傳回 Device 的連接點陣列，根據自身的 delta 反應式傳回絕對座標。
@@ -138,7 +138,7 @@ type GDevice = JDevice<Gadget>;
 	}
 
 	@shrewd public get $outerRidges(): readonly Line[] {
-		if(!this.$isActive) return [];
+		if(!this._isActive) return [];
 		let result = this.$getConnectionRidges();
 		for(let [from, to] of this._intersectionMap) if(to) result.push(new Line(from, to));
 		return Line.$distinct(result);
@@ -146,7 +146,7 @@ type GDevice = JDevice<Gadget>;
 
 	@shrewd private get _intersectionMap(): IntersectionMap[] {
 		let result: IntersectionMap[] = [];
-		if(!this.$isActive) return result;
+		if(!this._isActive) return result;
 		for(let [c, o, q] of this.$partition.$intersectionCorners) {
 			let from = this.$anchors[o][q];
 			let to = this.$partition.$getSideConnectionTarget(from, c);
