@@ -2,6 +2,7 @@
 interface IDisplay {
 	$zoom(v: number): void;
 	$scale: number;
+	$settings: DisplaySetting;
 }
 
 

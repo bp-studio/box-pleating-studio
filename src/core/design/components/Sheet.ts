@@ -168,8 +168,9 @@ interface JSheet {
 	@shrewd public get $margin() {
 		if(!this.$isActive || !this.$design.$isActive) return 0;
 		let controls = this._labeledControls;
+		if(controls.length == 0 || !this.$studio!.$display.$settings.showLabel) return 0;
+
 		let vm = this.$design.$viewManager;
-		if(controls.length == 0) return 0;
 		let overflows = controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow);
 		return Math.max(...overflows);
 	}
@@ -182,16 +183,20 @@ interface JSheet {
 	}
 
 	/** 根據所有的文字標籤來逆推適合的尺度 */
-	public $getScale(viewWidth: number, viewHeight: number, margin: number): number {
+	public $getScale(viewWidth: number, viewHeight: number, margin: number, fix: number): number {
 		let factor = this.zoom / Sheet.$FULL_ZOOM;
-		let controls = this._labeledControls;
-		let standard = (viewWidth - 2 * margin) * factor / this.width;
-		if(controls.length == 0) return standard;
+		let controls = this._labeledControls, width = this.width;
+		let horizontalScale = (viewWidth - 2 * margin) * factor / width;
+		if(controls.length == 0) return horizontalScale;
 
-		let vm = this.$design.$viewManager;
-		let views = controls.map(c => vm.$get(c) as LabeledView<Control>);
-		let scales = views.map(v => v.$getHorizontalScale(viewWidth, factor));
-		let horizontalScale = Math.min(standard, ...scales);
+		if(this.$studio?.$display.$settings.showLabel) {
+			let vm = this.$design.$viewManager;
+			let views = controls.map(c => vm.$get(c) as LabeledView<Control>);
+			let scales = views.map(v =>
+				v.$getHorizontalScale(width, viewWidth - 2 * fix, factor)
+			);
+			horizontalScale = Math.min(horizontalScale, ...scales);
+		}
 
 		let verticalScale = (viewHeight * factor - margin * 2) / this.height;
 		return Math.min(horizontalScale, verticalScale);

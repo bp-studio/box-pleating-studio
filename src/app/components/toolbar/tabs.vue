@@ -16,7 +16,9 @@
 							{{getTitle(id)}}
 						</div>
 						<div class="ps-2 pt-2" @click.stop="core.projects.close(id)" @pointerdown.stop @mousedown.stop>
-							<div class="close"><i class="fas fa-times"></i></div>
+							<div class="close">
+								<i class="fas fa-times"></i>
+							</div>
 						</div>
 					</div>
 					<div class="tab-down" :title="getTooltip(id)">
@@ -207,7 +209,7 @@
 	}
 
 	.tab-close .close:hover {
-		background: #AAA;
+		background: rgba(255, 255, 255, 0.2);
 	}
 
 	@media (hover: hover) {
