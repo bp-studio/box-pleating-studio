@@ -12,7 +12,7 @@ class Point extends Couple implements IPoint {
 		return new Point(0, 0);
 	}
 
-	/**Create a Point object */
+	/**Create a {@link Point} object */
 	constructor();
 	constructor(c: Couple);
 	constructor(p: IPoint);
@@ -22,7 +22,7 @@ class Point extends Couple implements IPoint {
 		else super(...p);
 	}
 
-	/**Distance to another Point */
+	/** Distance to another {@link Point} */
 	public $dist(p: Point): number {
 		return this.sub(p).$length;
 	}
@@ -49,7 +49,7 @@ class Point extends Couple implements IPoint {
 		return new paper.Point(this.x, this.y);
 	}
 
-	/** Point 類別的比較允許跟 IPoint 進行 */
+	/** {@link Point} 類別的比較允許跟 {@link IPoint} 進行 */
 	public eq(p: IPoint): boolean;
 	public eq(p?: this | null): boolean;
 	public eq(p?: this | null | IPoint): boolean {

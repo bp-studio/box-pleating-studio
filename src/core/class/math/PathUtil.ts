@@ -84,8 +84,7 @@ namespace PathUtil {
 	/**
 	 * 判斷一個點是否完全落在一個多邊形裡面（預設是不計邊緣）
 	 *
-	 * 參考 W. Randolph Franklin 的 PNPOLY 演算法寫成：
-	 * https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
+	 * 參考 W. Randolph Franklin 的 [PNPOLY](https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html) 演算法寫成。
 	 */
 	function $pointInPolygon(p: Point, path: Path, boundary = false): boolean {
 		// 退化的情況

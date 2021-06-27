@@ -3,9 +3,9 @@
 /**
  * {@link View} 是對應於元件的視圖，負責管理元件的繪製。
  * 它是一個擁有許多 {@link paper.Item} 物件
- * （透過 {@link View.$addItem}() 方法在建構式裡面加入）的 {@link Mountable} 物件。
+ * （透過 {@link View.$addItem $addItem()} 方法在建構式裡面加入）的 {@link Mountable} 物件。
  *
- * 它的抽象方法 {@link View.$render}() 內會進行繪製動作。
+ * 它的抽象方法 {@link View.$render $render()} 內會進行繪製動作。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -61,7 +61,7 @@ abstract class View extends Mountable {
 	}
 
 	/**
-	 * 視圖必須實作抽象的 render 方法以定義繪製的具體行為。
+	 * 視圖必須實作抽象的 {@link View.$render $render()} 方法以定義繪製的具體行為。
 	 */
 	protected abstract $render(): void;
 

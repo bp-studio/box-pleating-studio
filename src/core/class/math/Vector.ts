@@ -106,7 +106,7 @@ class Vector extends Couple {
 	/**
 	 * 計算兩個向量的角平分向量。
 	 *
-	 * 這個演算法有假定一個前提是「傳入的向量都是 GOPS 的軸平行摺痕向量」，
+	 * 這個演算法有假定一個前提是「傳入的向量都是 {@link GOPS} 的軸平行摺痕向量」，
 	 * 因此計算過程中的 z1 和 z2 一定會是整數。
 	 */
 	public static $bisector(v1: Vector, v2: Vector): Vector {

@@ -178,7 +178,7 @@ interface DisplaySetting {
 		return new Blob([svg.outerHTML], { type: "image/svg+xml" });
 	}
 
-	/** 遞迴移除所有具有 visibility="hidden" 屬性的標籤 */
+	/** 遞迴移除所有具有 `visibility="hidden"` 屬性的標籤 */
 	private _removeHidden(node: Element) {
 		let children = Array.from(node.children);
 		for(let c of children) {

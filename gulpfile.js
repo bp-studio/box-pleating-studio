@@ -1,9 +1,17 @@
-let del = require('del');
-let gulp = require('gulp');
-let inquirer = require('inquirer');
-let requireDir = require('require-dir');
+// 修改 path 套件的輸出方式
+const path = require('path');
+let rel = path.relative;
+path.relative = function(from, to) {
+	return rel(from, to).replace(/\\/g, '/');
+};
 
-let seriesIf = require('./gulp/utils/seriesIf');
+// 載入一切相依性
+const del = require('del');
+const gulp = require('gulp');
+const inquirer = require('inquirer');
+const requireDir = require('require-dir');
+
+const seriesIf = require('./gulp/utils/seriesIf');
 
 requireDir('./gulp/tasks');
 

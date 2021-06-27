@@ -87,13 +87,13 @@ class BPStudio {
 		else return null;
 	}
 
-	/** 傳回控制項的類別字串 */
+	/** 傳回 {@link Control} 的類別字串 */
 	public getType(target: unknown): string | null {
 		if(target instanceof Control) return target.$type;
 		return null;
 	}
 
-	/** 導覽至對偶的控制項 */
+	/** 導覽至對偶的 {@link Control} */
 	public goToDual(subject: unknown) {
 		let design = this._studio.$design;
 		if(!design) return;

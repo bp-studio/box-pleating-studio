@@ -11,7 +11,7 @@ declare namespace paper {
 	}
 
 	/**
-	 * @extends IPoint 雖然然這並不必要，但是嚴謹起見我仍舊宣告 paper.Point 介面繼承了我的 IPoint 介面。
+	 * @extends IPoint 雖然然這並不必要，但是嚴謹起見我仍舊宣告 {@link paper.Point} 介面繼承了我的 {@link IPoint} 介面。
 	 */
 	interface Point extends IPoint {}
 }

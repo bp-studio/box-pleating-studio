@@ -3,7 +3,7 @@
 /**
  * {@link Draggable} 是一個可能可以被拖曳移動的 {@link ViewedControl}。
  *
- * 繼承類別必須覆寫 {@link Draggable.$constraint} 方法來定義移動的行為。
+ * 繼承類別必須覆寫 {@link Draggable.$constraint $constraint} 方法來定義移動的行為。
  */
 //////////////////////////////////////////////////////////////////
 
@@ -46,14 +46,14 @@ abstract class Draggable extends Control {
 
 	/** 真的發生拖曳之後的 callback。 */
 	protected $onDragged() {
-		// 預設是什麼都不會發生，在 {@link Flap} 和 {@link Vertex} 中有覆寫此行為。
+		// 預設是什麼都不會發生，在 Flap 和 Vertex 中有覆寫此行為。
 	}
 
 	/**
 	 * 把一個傳入的 {@link Vector} 進行修正到實際上可以被容許的移動範圍之上，
 	 * 預設行為是會一律修正成零向量（換句話說，{@link Control} 將不能動）。
 	 *
-	 * 由於 {@link IndependentDraggable.$location} 會呼叫 {@link Draggable.$constraint} 方法來進行自我修正，
+	 * 由於 {@link IndependentDraggable.$location} 會呼叫 {@link Draggable.$constraint $constraint()} 方法來進行自我修正，
 	 * `constraint` 方法再參考 `this.location` 會發生循環參照，
 	 * 為了避免此問題，所有的呼叫都會傳入當前的位置作為第二個參數。
 	 */

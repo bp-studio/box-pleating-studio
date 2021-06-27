@@ -26,7 +26,7 @@ abstract class Control extends SheetObject implements ITagObject {
 	 *
 	 * 注意到這個狀態並不直接反應目前 {@link SelectionController} 中被選取的狀態，
 	 * 因為即使一個 {@link Control} 被卸載，它的選取狀態仍然會維持著，
-	 * 而且 {@link Control.$selected} 和 {@link SelectionController.$items} 存在雙向綁定關係。
+	 * 而且 {@link Control.$selected $selected} 和 {@link SelectionController.$items} 存在雙向綁定關係。
 	 */
 	@shrewd public $selected: boolean = false;
 
