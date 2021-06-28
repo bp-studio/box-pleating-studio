@@ -229,10 +229,7 @@
 			await core.loader.show();
 			let open = false;
 			for(let handle of handles) {
-				if(request) {
-					let mode: FileSystemPermissionMode = handle.name.endsWith(".bpz") ? "read" : "readwrite";
-					if(await handle.requestPermission({ mode }) != 'granted') continue;
-				}
+				if(request && !(await this.requestPermission(handle))) continue;
 				try {
 					let file = await handle.getFile();
 					open = await this.openFile(file, handle) || open;
@@ -246,6 +243,14 @@
 				gtag('event', 'project_open');
 				core.projects.select(core.designs[core.designs.length - 1]);
 			}
+		}
+		private async requestPermission(handle: FileSystemFileHandle): Promise<boolean> {
+			let mode: FileSystemPermissionMode = handle.name.endsWith(".bpz") ? "read" : "readwrite";
+			while(await handle.requestPermission({ mode }) != 'granted') {
+				let confirm = await core.confirm(this.$t('message.filePermission'));
+				if(!confirm) return false;
+			}
+			return true;
 		}
 		protected async upload(event: Event) {
 			let f = event.target as HTMLInputElement;
@@ -264,6 +269,8 @@
 				core.projects.select(core.designs[core.designs.length - 1]);
 			}
 		}
+
+		/** 讀入已經取得的檔案並且傳回是否成功（檔案格式是否正確） */
 		private async openFile(file: File, handle?: FileSystemFileHandle): Promise<boolean> {
 			try {
 				let buffer = await readFile(file);

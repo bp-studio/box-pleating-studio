@@ -187,16 +187,17 @@
 		"thank": "¡Muchas gracias, {0}, por tu amable donación!"
 	},
 	"message": {
-		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; \nlos datos pueden estar corruptos.",
-		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
+		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
 		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
+		"filePermission": "Por motivos de seguridad, BP Studio necesita su permiso para acceder al archivo. Para cada archivo, solo necesitará otorgar permiso una vez por sesión. ¿Aún desea acceder al archivo?",
+		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
+		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; \nlos datos pueden estar corruptos.",
+		"latest": "Ya tienes la última versión de BP Studio.",
 		"min3vertex": "El árbol debe tener al menos 3 vértices.",
 		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
 		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
-		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
-		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
-		"latest": "Ya tienes la última versión de BP Studio."
+		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?"
 	},
 	"plugin": {
 		"TreeMaker": {
