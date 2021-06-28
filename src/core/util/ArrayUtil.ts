@@ -7,17 +7,20 @@ function isTypedArray<T extends object>(
 	return array.every(item => item instanceof constructor);
 }
 
-function selectMany<From, To>(
-	array: readonly From[],
-	factory: (from: From) => readonly To[]
-): To[] {
-	let aggregate = (arr: To[], next: From) => {
-		arr.push(...factory(next));
-		return arr;
-	};
-	return array.reduce(aggregate, [] as To[]);
-}
-
 function sum(array: readonly number[]): number {
 	return array.reduce((n, x) => n + x, 0);
+}
+
+/* eslint-disable no-extend-native */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+if(typeof Array.prototype.flatMap == "undefined") {
+	Array.prototype.flatMap = function(callback: any, thisArg?: any): any {
+		thisArg ??= this;
+		let aggregate = (agg: unknown[], next: unknown, index: number, arr: readonly unknown[]) => {
+			agg.push(...callback(next, index, arr));
+			return agg;
+		};
+		return thisArg.reduce(aggregate, []);
+	};
 }

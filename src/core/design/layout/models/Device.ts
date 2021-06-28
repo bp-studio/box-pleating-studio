@@ -98,8 +98,7 @@ type GDevice = JDevice<Gadget>;
 			);
 
 			// 垂直於軸平行摺痕的脊線即使重疊也不應該被扣除（meandering 時會產生）
-			let lines = selectMany(
-				parallelRegions,
+			let lines = parallelRegions.flatMap(
 				q => q.$shape.ridges.filter(l => !l.$perpendicular(q.$direction))
 			);
 
@@ -122,7 +121,7 @@ type GDevice = JDevice<Gadget>;
 	/** 這個 Device 實際上要繪製出來的脊線（扣除掉跟相鄰 Device 重疊部份之後） */
 	@shrewd public get $ridges(): readonly Line[] {
 		let raw = this._rawRidges;
-		let neighborLines = selectMany(this._neighbors, g => g._rawRidges);
+		let neighborLines = this._neighbors.flatMap(g => g._rawRidges);
 		return Line.$subtract(raw, neighborLines);
 	}
 

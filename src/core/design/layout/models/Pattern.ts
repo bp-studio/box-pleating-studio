@@ -50,7 +50,7 @@ type GPattern = JPattern<Gadget>;
 		this.$devices = pattern.devices.map(
 			(d, i) => new Device(this, configuration.$partitions[i], d)
 		);
-		this.$gadgets = selectMany(this.$devices, d => d.$gadgets);
+		this.$gadgets = this.$devices.flatMap(d => d.$gadgets);
 		this.$signature = JSON.stringify(pattern);
 
 		// 如果有發生 glitch 的話，把底下這些打開可以偵錯
