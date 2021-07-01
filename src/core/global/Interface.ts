@@ -12,7 +12,7 @@ interface IPoint {
 }
 
 /**
- * {@link ISerializable} 表示一個可以具有 toJSON 方法、可以輸出對應類別的 JSON 物件的類別
+ * {@link ISerializable} 表示一個可以具有 {@link ISerializable.toJSON toJSON()} 方法、可以輸出對應類別的 JSON 物件的類別
  */
 interface ISerializable<T> {
 	toJSON(): T;

@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class HotKey extends Vue {
@@ -28,6 +28,6 @@
 		@Prop(Boolean) public ctrl: boolean;
 		@Prop(Boolean) public shift: boolean;
 
-		protected get isMac() { return isMac; }
+		protected get isMac(): boolean { return isMac; }
 	}
 </script>

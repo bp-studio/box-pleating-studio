@@ -363,7 +363,7 @@
 		"prefer-template": "off",
 		"quote-props": "off",
 		"quotes": "off",
-		"radix": "warn",
+		"radix": "off",
 		"require-atomic-updates": "warn",
 		"require-await": "warn",
 		"require-unicode-regexp": "off",

@@ -9,15 +9,18 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class Spinner extends Vue {
-		private get core() { return core; }
+		protected get core(): typeof core { return core; }
 
-		private loading = false;
+		protected loading = false;
+
+		mounted(): void { core.loader = this; }
 
 		public show(): Promise<void> {
+			const ONE_SECOND = 1000;
 			this.loading = true;
 
 			/**
@@ -28,7 +31,7 @@
 			 */
 			return new Promise<void>(resolve => {
 				// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
-				setTimeout(() => resolve(), 1000);
+				setTimeout(() => resolve(), ONE_SECOND);
 				this.$el.addEventListener("animationstart", () => resolve(), { once: true });
 			});
 		}
@@ -36,7 +39,5 @@
 		public hide(): void {
 			this.loading = false;
 		}
-
-		mounted() { core.loader = this; }
 	}
 </script>

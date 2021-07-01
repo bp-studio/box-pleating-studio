@@ -17,21 +17,25 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
 	import * as bootstrap from 'bootstrap';
 
-	declare const gtag: any;
+	import { Component, Vue } from 'vue-property-decorator';
+
 
 	@Component
 	export default class Note extends Vue {
 		private modal: bootstrap.Modal;
-		mounted() {
-			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement));
+
+		mounted(): void {
+			core.libReady.then(() =>
+				this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement)
+			);
 		}
+
 		private async note() {
 			await core.libReady;
 			this.modal.show();
-			var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'Note' });
 		}

@@ -21,28 +21,39 @@
 </template>
 
 <script lang="ts">
-	import { Component, Watch, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Watch } from 'vue-property-decorator';
+
+	import BP from '../import/BPStudio';
 	import BaseComponent from '../mixins/baseComponent';
+
 
 	@Component
 	export default class Panel extends BaseComponent {
 		@Prop(Boolean) public show: boolean;
 
-		public get repository() { return core.initialized && this.bp.getRepository(this.selection); }
+		public get repository(): BP.Repository {
+			return core.initialized && this.bp.getRepository(this.selection);
+		}
 
-		public get type() { return core.initialized && this.bp.getType(this.selection); }
+		public get type(): string | undefined {
+			return core.initialized && this.bp.getType(this.selection);
+		}
 
-		// 確保 GC
-		@Watch("repository") repo() { }
 
-		@Watch("design.mode") onModeChange() {
+		@Watch("repository") repo(): void {
+			// 確保 GC，不用採取動作
+		}
+
+		@Watch("design.mode") onModeChange(): void {
 			let el = document.activeElement as HTMLElement;
 			if(el && (this.$refs.panel as HTMLDivElement).contains(el)) el.blur();
 		}
 
-		protected onContextMenu(event: Event) {
-			if(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) { }
-			else event.preventDefault();
+		protected onContextMenu(event: Event): void {
+			if(!(event.target instanceof HTMLInputElement ||
+				event.target instanceof HTMLTextAreaElement)) {
+				event.preventDefault();
+			}
 		}
 	}
 </script>

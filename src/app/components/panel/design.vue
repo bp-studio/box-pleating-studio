@@ -26,13 +26,15 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
+
 	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
 	export default class Design extends BaseComponent {
-		private get step() {
+		protected get step(): number {
+			const FULL_ZOOM = 100, ZOOM_STEP = 25;
 			let s: number = this.design.sheet.zoom;
-			return (2 ** Math.floor(Math.log2(s / 100))) * 25;
+			return 2 ** Math.floor(Math.log2(s / FULL_ZOOM)) * ZOOM_STEP;
 		}
 	}
 </script>

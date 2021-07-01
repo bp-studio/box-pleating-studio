@@ -73,11 +73,11 @@
 
 		protected ready: boolean = false;
 
-		mounted() {
+		mounted(): void {
 			core.libReady.then(() => this.ready = true);
 		}
 
-		protected get dragOption() {
+		protected get dragOption(): object {
 			return {
 				delay: 500,
 				delayOnTouchOnly: true,
@@ -85,19 +85,20 @@
 				animation: 200,
 				forceFallback: true,
 				direction: "horizontal",
-				scroll: true
+				scroll: true,
 			};
 		}
-		protected get core() { return core; }
+		protected get core(): typeof core { return core; }
 
-		protected tabWheel(event: WheelEvent) {
+		protected tabWheel(event: WheelEvent): void {
+			const DELTA_UNIT = 5;
 			if(event.deltaX == 0) {
-				(this.$refs.tab as HTMLDivElement).scrollLeft -= event.deltaY / 5;
+				(this.$refs.tab as HTMLDivElement).scrollLeft -= event.deltaY / DELTA_UNIT;
 			}
 		}
 
 		protected menuId: number;
-		protected tabMenu(event: MouseEvent, id: number) {
+		protected tabMenu(event: MouseEvent, id: number): void {
 			this.menuId = id;
 			(this.$refs.tabMenu as ContextMenu).show(event);
 		}

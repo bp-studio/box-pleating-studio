@@ -9,7 +9,7 @@ namespace ConfigUtil {
 	 * @param oriented o1 和 o2 共用角在左上角
 	 * @param reverse 反過來把 o1 接到 o2 上
 	 *
-	 * @returns 連接到別人的那一個 JOverlap
+	 * @returns 連接到別人的那一個 {@link JOverlap}
 	 */
 	export function $joinOverlaps(
 		o1: JOverlap, o2: JOverlap,

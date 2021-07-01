@@ -1,4 +1,3 @@
-import VueI18n from 'vue-i18n';
 
 declare module 'vue-property-decorator' {
 	interface Vue {

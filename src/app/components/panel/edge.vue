@@ -10,9 +10,10 @@
 			<button class="btn btn-primary" v-else @click="bp.delete(subject)" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" @click="bp.goToDual(selection)">
-				{{subject.isRiver?$t('panel.edge.goto'):$t('panel.vertex.goto')}}
-			</button>
+			<button
+				class="btn btn-primary"
+				@click="bp.goToDual(selection)"
+			>{{subject.isRiver?$t('panel.edge.goto'):$t('panel.vertex.goto')}}</button>
 		</div>
 	</div>
 </template>
@@ -20,11 +21,12 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import BaseComponent from '../mixins/baseComponent';
+
 	import BP from '../import/BPStudio';
+	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
 	export default class Edge extends BaseComponent {
-		protected get subject() { return this.selection as BP.Edge; }
+		protected get subject(): BP.Edge { return this.selection as BP.Edge; }
 	}
 </script>

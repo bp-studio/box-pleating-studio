@@ -30,7 +30,7 @@ interface JOverlap extends JQuadrilateral {
 /**
  * {@link JCorner} 是 {@link JRectangle} 的一個象限角。
  *
- * 它同時負責描述這個角落的自身狀態以及連接對象；它繼承了 Partial<{@link JConnection}> 介面，
+ * 它同時負責描述這個角落的自身狀態以及連接對象；它繼承了 {@link Partial}<{@link JConnection}> 介面，
  * 如果其 e, q 為 undefined 表示它沒有連出。
  */
 //////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ interface JCorner extends Partial<JConnection> {
 
 interface JConnection {
 
-	/** 連接對象，非負數代表 {@link Flap}，負數代表 {@link Overlap}（在整個 Configuration 中的 id） */
+	/** 連接對象，非負數代表 {@link Flap}，負數代表 {@link Overlap}（在整個 {@link Configuration} 中的 id） */
 	e: number;
 
 	/** 連接至對方的哪一個象限角；{@link Flap} 的情況是原始的，{@link Overlap} 的情況是未經變換的 */

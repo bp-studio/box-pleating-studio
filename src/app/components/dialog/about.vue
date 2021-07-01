@@ -28,30 +28,30 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
+
 	import * as bootstrap from 'bootstrap';
 
-	declare const gtag: any;
-	declare const app_config: any;
+	declare const app_config: Record<string, unknown>;
 
 	@Component
 	export default class About extends Vue {
 		private modal: bootstrap.Modal;
-		protected get copyright() { return core.copyright; }
+		protected get copyright(): string { return core.copyright; }
 
-		mounted() {
+		mounted(): void {
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 		}
 
-		public async show() {
+		public async show(): Promise<void> {
 			await core.libReady;
 			this.modal.show();
-			var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'About' });
 		}
 
-		public get version() {
+		public get version(): string {
 			let meta = document.querySelector("meta[name=version]") as HTMLMetaElement;
 			return meta.content + " build " + app_config.app_version;
 		}

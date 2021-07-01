@@ -7,6 +7,10 @@ declare global {
 		execute(): void;
 	}
 
+	export interface IShow extends Vue {
+		show(): void;
+	}
+
 	export const dropdown: {
 		current: unknown;
 		skipped: boolean;
@@ -15,6 +19,7 @@ declare global {
 	// 第三方程式庫全域物件
 	export const i18n: VueI18n;
 	export const idbKeyval: typeof IdbKeyval;
+	export const gtag: (...args: unknown[]) => void;
 
 	// 系統狀態常數
 	export const FileApiEnabled: boolean;

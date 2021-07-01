@@ -8,6 +8,7 @@ declare type river = River;
 declare type edge = Edge;
 declare type flap = Flap;
 declare type vertex = Vertex;
+declare type repo = Repository;
 
 export {
 	bp, design as Design,
@@ -15,5 +16,6 @@ export {
 	river as River,
 	edge as Edge,
 	flap as Flap,
-	vertex as Vertex
+	vertex as Vertex,
+	repo as Repository
 };

@@ -20,13 +20,13 @@
 	export default class Confirm extends Dialog<boolean> {
 		private value: boolean = false;
 
-		protected key(e: KeyboardEvent) {
+		protected key(e: KeyboardEvent): void {
 			let key = e.key.toLowerCase();
 			if(key == "y") this.value = true;
 			if(key == "y" || key == "n") this.close();
 		}
 
-		protected resolve(res: (v: boolean) => void) {
+		protected resolve(res: (v: boolean) => void): void {
 			this.value = false;
 			this.$el.addEventListener('hidden.bs.modal', () => res(this.value), { once: true });
 		}

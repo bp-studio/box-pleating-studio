@@ -16,11 +16,12 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import BaseComponent from '../mixins/baseComponent';
+
 	import BP from '../import/BPStudio';
+	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
 	export default class River extends BaseComponent {
-		protected get subject() { return this.selection as BP.River; }
+		protected get subject(): BP.River { return this.selection as BP.River; }
 	}
 </script>

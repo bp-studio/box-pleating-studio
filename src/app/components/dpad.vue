@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 
 	@Component
@@ -23,7 +23,7 @@
 			return !core.initialized || bp.isDragging;
 		}
 
-		protected key(key: string) {
+		protected key(key: string): void {
 			bp.dragByKey(key);
 		}
 	}

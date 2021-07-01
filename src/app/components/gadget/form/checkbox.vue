@@ -15,7 +15,7 @@
 
 	@Component
 	export default class Checkbox extends InputMixin {
-		@Watch('v') onVChange(checked: boolean) {
+		@Watch('v') onVChange(checked: boolean): void {
 			this.$emit('input', checked);
 		}
 

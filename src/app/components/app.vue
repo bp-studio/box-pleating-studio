@@ -27,15 +27,15 @@
 	export default class App extends BaseComponent {
 		protected showPanel = false;
 
-		protected show(el: string) {
-			(this.$refs[el] as any).show();
+		protected show(el: string): void {
+			(this.$refs[el] as IShow).show();
 		}
 
-		@Watch("design") onDesign(v: any) {
+		@Watch("design") onDesign(v: unknown): void {
 			if(!v) this.showPanel = false;
 		}
 
-		mounted() {
+		mounted(): void {
 			// iPhone 6 不支援 CSS 的 touch-action: none
 			if(getComputedStyle(this.$el).touchAction != "none") {
 				this.$el.addEventListener("touchmove", (e: TouchEvent) => {

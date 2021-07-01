@@ -50,7 +50,7 @@ interface IDisposable {
 	/**
 	 * 棄置事件，這個方法的具體內容必須在繼承類別中定義。
 	 *
-	 * 繼承類別覆寫此方法的時候一般來說應呼叫 super 方法，請務必記得。
+	 * 繼承類別覆寫此方法的時候一般來說應呼叫 {@link Disposable.$onDispose super.$onDispose()} 方法，請務必記得。
 	 */
 	protected $onDispose(): void {
 		delete this._disposeWith;

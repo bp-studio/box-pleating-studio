@@ -145,7 +145,7 @@ interface JSheet {
 	 */
 	private _independentRect: Rectangle = new Rectangle(Point.ZERO, Point.ZERO);
 
-	/** 更新 {@link Sheet._independentRect} 的反應方法 */
+	/** 更新 {@link Sheet._independentRect _independentRect} 的反應方法 */
 	@shrewd private _getIndependentRect() {
 		let x1 = Number.POSITIVE_INFINITY, y1 = Number.POSITIVE_INFINITY;
 		let x2 = Number.NEGATIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;

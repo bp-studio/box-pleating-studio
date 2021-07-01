@@ -19,7 +19,8 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
+
 	import * as bootstrap from 'bootstrap';
 
 	@Component
@@ -30,8 +31,10 @@
 
 		private dropdown: bootstrap.Dropdown;
 
-		mounted() {
-			core.libReady.then(() => this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {}));
+		mounted(): void {
+			core.libReady.then(() =>
+				this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {})
+			);
 			this.$el.addEventListener('show.bs.dropdown', () => this.$emit('show'));
 			this.$el.addEventListener('shown.bs.dropdown', () => dropdown.current = this);
 			this.$el.addEventListener('hide.bs.dropdown', () => {
@@ -41,14 +44,14 @@
 			this.$el.addEventListener('hidden.bs.dropdown', () => this.$emit('hide'));
 		}
 
-		protected get ready() { return core.initialized; }
+		protected get ready(): boolean { return core.initialized; }
 
-		protected async hide() {
+		protected async hide(): Promise<void> {
 			await core.libReady;
 			this.dropdown.hide();
 		}
 
-		protected mouseenter() {
+		protected mouseenter(): void {
 			if(dropdown.current && dropdown.current != this) {
 				dropdown.skipped = true;
 				(this.$refs.btn as HTMLButtonElement).click();

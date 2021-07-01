@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 
 	declare global {
 		interface Document {
@@ -32,26 +32,28 @@
 		private fullscreenEnabled = document.fullscreenEnabled ||
 			document.mozFullscreenEnabled || document.webkitFullscreenEnabled;
 
-		created() {
+		created(): void {
 			document.addEventListener('fullscreenchange', () => this.checkFullscreen());
 			document.addEventListener('mozfullscreenchange', () => this.checkFullscreen()); // Firefox < 64
 			document.addEventListener('webkitfullscreenchange', () => this.checkFullscreen()); // Safari
 		}
 
 		private checkFullscreen() {
-			this.fullscreen = window.matchMedia('(display-mode: fullscreen)').matches
-				|| !!document.fullscreenElement
-				|| !!document.mozFullScreenElement
-				|| !!document.webkitCurrentFullScreenElement;
+			this.fullscreen = window.matchMedia('(display-mode: fullscreen)').matches ||
+				Boolean(document.fullscreenElement) ||
+				Boolean(document.mozFullScreenElement) ||
+				Boolean(document.webkitCurrentFullScreenElement);
 		}
 
-		public toggleFullscreen() {
+		public toggleFullscreen(): void {
 			if(this.fullscreen) {
 				let doc = document;
-				(doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen).apply(doc);
+				(doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen)
+					.apply(doc);
 			} else {
 				let el = document.documentElement;
-				(el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).apply(el);
+				(el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen)
+					.apply(el);
 			}
 		}
 	}

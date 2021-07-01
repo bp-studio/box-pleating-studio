@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class Opener extends Vue {
@@ -13,7 +13,7 @@
 		@Prop(String) public accept: string;
 		@Prop(Boolean) public multiple: boolean;
 
-		public async execute() {
+		public async execute(): Promise<void> {
 			try {
 				let handles = await showOpenFilePicker({
 					multiple: true,
@@ -36,11 +36,11 @@
 								'application/box-pleating-studio-workspace': ['.bpz'],
 							},
 						},
-					]
+					],
 				});
 				this.$emit('open', handles);
 			} catch(e) {
-				return;
+				// 失敗就算了
 			}
 		}
 	}

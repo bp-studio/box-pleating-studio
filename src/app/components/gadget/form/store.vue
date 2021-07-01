@@ -13,11 +13,15 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class Store extends Vue {
-		@Prop(Object) public data: any;
+		@Prop(Object) public data: {
+			move(step: number): void;
+			readonly index: number;
+			readonly size: number;
+		};
 		@Prop(String) public label: string;
 	}
 </script>

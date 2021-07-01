@@ -24,11 +24,12 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import BaseComponent from '../mixins/baseComponent';
+
 	import BP from '../import/BPStudio';
+	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
 	export default class Flap extends BaseComponent {
-		protected get subject() { return this.selection as BP.Flap; }
+		protected get subject(): BP.Flap { return this.selection as BP.Flap; }
 	}
 </script>

@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class Uploader extends Vue {
@@ -18,12 +18,12 @@
 		@Prop(String) public accept: string;
 		@Prop(Boolean) public multiple: boolean;
 
-		protected get type() {
+		protected get type(): string {
 			// 已知 Safari 對於 accept 屬性的支援有問題
-			return (navigator.vendor && navigator.vendor.startsWith("Apple")) ? "" : this.accept;
+			return navigator.vendor && navigator.vendor.startsWith("Apple") ? "" : this.accept;
 		}
 
-		public execute() {
+		public execute(): void {
 			(this.$refs.lbl as HTMLLabelElement).click();
 		}
 	}

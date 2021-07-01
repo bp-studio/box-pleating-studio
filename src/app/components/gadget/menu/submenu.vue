@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-	import { Component, Vue, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class Submenu extends Vue {
@@ -23,14 +23,15 @@
 
 		private timeout: number;
 
-		protected enter() {
+		protected enter(): void {
 			clearTimeout(this.timeout);
 			(this.$refs.sub as HTMLDivElement).style.display = "block";
 		}
-		protected leave() {
+		protected leave(): void {
+			const SUBMENU_DELAY = 250;
 			this.timeout = window.setTimeout(() => {
 				(this.$refs.sub as HTMLDivElement).style.display = "none";
-			}, 250);
+			}, SUBMENU_DELAY);
 		}
 	}
 </script>

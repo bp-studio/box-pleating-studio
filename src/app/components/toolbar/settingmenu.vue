@@ -49,20 +49,20 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import BaseComponent from '../mixins/baseComponent';
 
-	declare const gtag: any;
+	import BaseComponent from '../mixins/baseComponent';
+	import { DisplaySetting } from '../import/BPStudio';
 
 	@Component
 	export default class SettingMenu extends BaseComponent {
-		private get settings(): any {
+		private get settings(): Partial<DisplaySetting> {
 			return core.initialized ? this.bp.settings : {};
 		}
 
-		protected get core() { return core; }
+		protected get core(): typeof core { return core; }
 
-		protected toggle(key: string, target: any) {
-			if(!target) target = this.settings;
+		protected toggle(key: string, target?: DisplaySetting | typeof core): void {
+			if(!target) target = this.settings as DisplaySetting;
 			target[key] = !target[key];
 			core.saveSettings();
 

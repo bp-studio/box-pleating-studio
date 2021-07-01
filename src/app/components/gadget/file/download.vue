@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class Download extends Vue {
@@ -33,7 +33,7 @@
 			return core.getFilename(this.type);
 		}
 
-		public execute(event: Event) {
+		public execute(event: Event): void {
 			if(this.href == "#") event.preventDefault();
 		}
 
@@ -48,12 +48,13 @@
 			}
 		}
 
-		public async reset() {
+		public reset(): void {
+			const ONE_SECOND = 1000;
 			this.round++;
 			setTimeout(() => {
 				for(let url of this.urls) URL.revokeObjectURL(url);
 				this.urls = [];
-			}, 1000);
+			}, ONE_SECOND);
 		}
 	}
 </script>

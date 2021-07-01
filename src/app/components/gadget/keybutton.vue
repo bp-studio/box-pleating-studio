@@ -3,18 +3,23 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class KeyButton extends Vue {
-		private to: any;
-		private down(repeat: number, e?: Event) {
+		protected to: number;
+
+		protected down(repeat: number, e?: Event): void {
+			const SENSITIVITY = 150;
 			if(core.shouldShowDPad) {
 				this.$emit('key');
-				this.to = setTimeout(() => this.down(150), repeat);
-			} else this.up();
+				this.to = window.setTimeout(() => this.down(SENSITIVITY), repeat);
+			} else {
+				this.up();
+			}
 		}
-		private up() {
+
+		protected up(): void {
 			clearTimeout(this.to);
 		}
 	}

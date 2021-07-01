@@ -54,7 +54,7 @@ abstract class Draggable extends Control {
 	 * 預設行為是會一律修正成零向量（換句話說，{@link Control} 將不能動）。
 	 *
 	 * 由於 {@link IndependentDraggable.$location} 會呼叫 {@link Draggable.$constraint $constraint()} 方法來進行自我修正，
-	 * `constraint` 方法再參考 `this.location` 會發生循環參照，
+	 * {@link Draggable.$constraint $constraint()} 方法再參考 {@link Draggable.$location this.$location} 會發生循環參照，
 	 * 為了避免此問題，所有的呼叫都會傳入當前的位置作為第二個參數。
 	 */
 	protected $constraint(v: Vector, location: Readonly<IPoint>): Vector {

@@ -1,6 +1,6 @@
-import * as bootstrap from 'bootstrap';
 import { Component, Vue } from 'vue-property-decorator';
 
+import * as bootstrap from 'bootstrap';
 import CoreBase from './coreBase';
 
 declare const core: CoreBase;

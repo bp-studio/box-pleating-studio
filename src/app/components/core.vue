@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<projects ref="mgr" :designs="designs"></projects>
+		<handles ref="handles"></handles>
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
 		<note v-if="design&&bp.patternNotFound(design)"></note>
@@ -12,20 +13,20 @@
 	import { Component, Vue } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 
-	import VueI18n from 'vue-i18n';
 	import JSZip from 'jszip';
+	import VueI18n from 'vue-i18n';
 
-	import CoreBase from './mixins/coreBase';
-	import Spinner from './gadget/spinner.vue';
-	import Confirm from './dialog/confirm.vue';
 	import Alert from './dialog/alert.vue';
+	import Confirm from './dialog/confirm.vue';
+	import CoreBase from './mixins/coreBase';
+	import Handles from './handles.vue';
 	import Language from './dialog/language.vue';
 	import Projects from './projects.vue';
+	import Spinner from './gadget/spinner.vue';
 
-	declare const setInterval: any;
-	declare const gtag: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	declare const LZ: any;
-	declare const app_config: any;
+	declare const app_config: Record<string, string>;
 
 	declare global {
 		export const core: Core;
@@ -34,8 +35,6 @@
 	@Component
 	export default class Core extends CoreBase {
 		public designs: number[] = [];
-		public handles: Map<number, FileSystemFileHandle> = new Map();
-		public recent: FileSystemFileHandle[] = [];
 
 		public tabHistory: number[] = [];
 		public autoSave: boolean = true;
@@ -51,7 +50,8 @@
 
 		public loader: Spinner;
 
-		created() {
+		created(): void {
+			const ONE_SECOND = 1000;
 			this.isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 			this.libReady = new Promise<void>(resolve => {
 				// DOMContentLoaded 事件會在所有延遲函式庫載入完成之後觸發
@@ -59,13 +59,13 @@
 			});
 			this.initReady = new Promise<void>(resolve => {
 				// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
-				setTimeout(() => resolve(), 1000);
+				setTimeout(() => resolve(), ONE_SECOND);
 				// 程式剛載入的時候 Spinner 動畫的啟動用來當作載入的觸發依據
-				document.addEventListener("animationstart", () => resolve(), { once: true })
+				document.addEventListener("animationstart", () => resolve(), { once: true });
 			});
 		}
 
-		mounted() {
+		mounted(): void {
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {
 				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
@@ -76,28 +76,54 @@
 			localStorage.setItem("build", app_config.app_version);
 		}
 
-		public refreshHandle() {
-			// Vue 2 不支援 Map 的反應
-			this.handles = new Map(this.handles);
-		}
-
-		public get projects() {
+		public get projects(): Projects {
 			return this.$refs.mgr as Projects;
 		}
+		public get handles(): Handles {
+			return this.$refs.handles as Handles;
+		}
 
-		public async init() {
+		public async init(): Promise<void> {
+			const SAVE_INTERVAL = 3000;
+
 			bp.option.onDeprecate = (title: string) => {
 				let t = title || this.$t("keyword.untitled");
-				let message = this.$t("message.oldVersion", [t])
+				let message = this.$t("message.oldVersion", [t]);
 				this.alert(message);
 			};
 
 			let settings = JSON.parse(localStorage.getItem("settings"));
 			if(settings) {
 				let d = bp.settings;
+				// eslint-disable-next-line guard-for-in
 				for(let key in d) d[key] = settings[key];
 			}
 
+			await this.loadSession();
+
+			let url = new URL(location.href);
+			let lz = url.searchParams.get("project"), json: unknown;
+			if(lz) {
+				try {
+					json = JSON.parse(LZ.decompress(lz));
+				} catch(e) {
+					await this.alert(this.$t('message.invalidLink'));
+				}
+			}
+			if(lz != sessionStorage.getItem("project") && json) {
+				// 寫入 sessionStorage 的值不會因為頁籤 reload 而遺失，
+				// 因此可以用這個來避免重刷頁面的時候再次載入的問題
+				sessionStorage.setItem("project", lz);
+				this.projects.add(bp.load(json));
+				gtag('event', 'share_open');
+			}
+
+			window.setInterval(() => this.save(), SAVE_INTERVAL);
+			window.addEventListener("beforeunload", () => this.save());
+			this.initialized = true;
+		}
+
+		private async loadSession(): Promise<void> {
 			// 舊資料；過一陣子之後可以拿掉這一段程式碼
 			localStorage.removeItem("sessionId");
 			localStorage.removeItem("sessionTime");
@@ -117,55 +143,27 @@
 				}
 			}
 
-			// 讀取 handle
-			if(FileApiEnabled) {
-				let entries: [number, FileSystemFileHandle][] = await idbKeyval.entries();
-				for(let [i, handle] of entries) {
-					if(i < 0) Vue.set(this.recent, -i - 1, handle);
-					else if(haveSession) this.handles.set(this.designs[i], handle);
-				}
-				core.refreshHandle();
-			}
-
-			let url = new URL(location.href);
-			let lz = url.searchParams.get("project"), json: any;
-			if(lz) {
-				try {
-					json = JSON.parse(LZ.decompress(lz));
-				} catch(e) {
-					await this.alert(this.$t('message.invalidLink'));
-				}
-			}
-			if(lz != sessionStorage.getItem("project") && json) {
-				// 寫入 sessionStorage 的值不會因為頁籤 reload 而遺失，
-				// 因此可以用這個來避免重刷頁面的時候再次載入的問題
-				sessionStorage.setItem("project", lz);
-				this.projects.add(bp.load(json));
-				gtag('event', 'share_open');
-			}
-
-			setInterval(() => this.save(), 3000);
-			window.addEventListener("beforeunload", () => this.save());
-			this.initialized = true;
+			await this.handles.init(haveSession);
 		}
 
-		protected get bp() { return bp; }
+		protected get bp(): BPStudio { return bp; }
 
-		public get copyright() {
+		public get copyright(): string {
 			let y = new Date().getFullYear();
+			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 			let end = y > 2020 ? "-" + y : "";
-			return this.$t('welcome.copyright', [end]);
+			return this.$t('welcome.copyright', [end]).toString();
 		}
 
-		public get shouldShowDPad() {
+		public get shouldShowDPad(): boolean {
 			return this.initialized && this.isTouch && this.showDPad && bp.draggableSelected;
 		}
 
-		public saveSettings() {
+		public saveSettings(): void {
 			if(!this.initialized) return;
 			let {
 				showGrid, showHinge, showRidge, showAxialParallel,
-				showLabel, showDot, includeHiddenElement
+				showLabel, showDot, includeHiddenElement,
 			} = bp.settings;
 			if(this.autoSave) this.save();
 			else localStorage.removeItem("session");
@@ -174,11 +172,11 @@
 				showDPad: this.showDPad,
 				includeHiddenElement,
 				showGrid, showHinge, showRidge,
-				showAxialParallel, showLabel, showDot
+				showAxialParallel, showLabel, showDot,
 			}));
 		}
 
-		public open(d: string | object) {
+		public open(d: string | object): void {
 			if(typeof d == "string") {
 				this.projects.add(bp.design = bp.load(d));
 			} else {
@@ -187,13 +185,14 @@
 		}
 
 		private checkSession(): Promise<boolean> {
+			const SESSION_CHECK_TIMEOUT = 250;
 			return new Promise<boolean>(resolve => {
 				// 如果是本地執行就採用 Broadcast Channel 的 fallback
 				if(location.protocol != "https:") {
 					checkWithBC(this.id).then(ok => resolve(ok));
 				} else {
 					// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
-					let cancel = setTimeout(() => resolve(false), 250);
+					let cancel = setTimeout(() => resolve(false), SESSION_CHECK_TIMEOUT);
 					callService("id")
 						.then(
 							(id: number) => resolve(this.id < id), // 最舊的實體優先
@@ -212,45 +211,18 @@
 			if(this.autoSave && await this.checkSession()) {
 				// 排程到下一次 BPStudio 更新完畢之後存檔，
 				// 避免在存檔的瞬間製造出 glitch
+				// eslint-disable-next-line require-atomic-updates
 				bp.option.onUpdate = async () => {
 					let session = {
 						jsons: this.designs.map(
 							id => bp.getDesign(id)!.toJSON(true)
 						),
-						open: bp.design ? this.designs.indexOf(bp.design.id) : -1
+						open: bp.design ? this.designs.indexOf(bp.design.id) : -1,
 					};
 					localStorage.setItem("session", JSON.stringify(session));
-					if(FileApiEnabled) await this.saveHandle();
+					await this.handles.save();
 				};
 			}
-		}
-
-		/////////////////////////////////////////////////////////////////////////////////////////
-		// 檔案系統存取 API
-		/////////////////////////////////////////////////////////////////////////////////////////
-
-		public async saveHandle() {
-			await idbKeyval.clear();
-			for(let i = 0; i < this.designs.length; i++) {
-				let handle = this.handles.get(this.designs[i]);
-				if(handle) await idbKeyval.set(i, handle);
-			}
-			for(let i = 0; i < this.recent.length; i++) {
-				await idbKeyval.set(-i - 1, this.recent[i]);
-			}
-		}
-		public async removeRecent(handle: FileSystemFileHandle) {
-			for(let i = 0; i < this.recent.length; i++) {
-				if(await this.recent[i].isSameEntry(handle)) {
-					this.recent.splice(i, 1);
-					break;
-				}
-			}
-		}
-		public async addRecent(handle: FileSystemFileHandle) {
-			await this.removeRecent(handle);
-			this.recent.unshift(handle);
-			if(this.recent.length > 10) this.recent.pop();
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -291,7 +263,8 @@
 				let design = bp.getDesign(this.designs[i]);
 				let name = sanitize(design.title);
 				if(names.has(name)) {
-					for(var j = 1; names.has(name + " (" + j + ")"); j++);
+					let j = 1;
+					for(; names.has(name + " (" + j + ")"); j++);
 					name = name + " (" + j + ")";
 				}
 				names.add(name);
@@ -300,7 +273,7 @@
 			let blob = await zip.generateAsync({
 				type: 'blob',
 				compression: "DEFLATE",
-				compressionOptions: { level: 9 }
+				compressionOptions: { level: 9 },
 			});
 			return blob.slice(0, blob.size, "application/octet-binary");
 		}

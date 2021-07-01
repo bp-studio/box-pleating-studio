@@ -25,11 +25,11 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Watch } from 'vue-property-decorator';
+	import { Component, Vue, Watch } from 'vue-property-decorator';
+
 	import * as bootstrap from 'bootstrap';
 
-	declare const gtag: any;
-	declare const marked: any;
+	declare const marked: (s: string) => string;
 	declare const logs: number[];
 
 	@Component
@@ -41,21 +41,23 @@
 		protected active: boolean = false;
 		protected modal: bootstrap.Modal;
 
-		@Watch('index') onIndex(index: number) {
+		@Watch('index') onIndex(index: number): void {
 			this.load(index);
 		}
 
-		mounted() {
-			if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', async (event) => {
-				if(event.data.meta === 'workbox-broadcast-update') {
-					let m = event.data.payload.path.match(/\d+(?=\.md$)/);
-					if(m) {
-						let index = logs.indexOf(Number(m[0]));
-						delete this.record[index];
-						this.load(index);
+		mounted(): void {
+			if('serviceWorker' in navigator) {
+				navigator.serviceWorker.addEventListener('message', event => {
+					if(event.data.meta === 'workbox-broadcast-update') {
+						let m = event.data.payload.path.match(/\d+(?=\.md$)/);
+						if(m) {
+							let index = logs.indexOf(Number(m[0]));
+							delete this.record[index];
+							this.load(index);
+						}
 					}
-				}
-			});
+				});
+			}
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 			this.index = this.max = logs.length - 1;
 		}
@@ -79,12 +81,12 @@
 			return true;
 		}
 
-		public async show() {
+		public async show(): Promise<void> {
 			await core.libReady;
 			this.active = true;
 			if(await this.load(this.index)) {
 				this.modal.show();
-				var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+				let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 				this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 				gtag('event', 'screen_view', { screen_name: 'News' });
 			}

@@ -15,7 +15,7 @@ namespace GOPS {
 	/** 計算結果的記憶 */
 	const Memo = new Map<string, readonly JPieceMemo[]>();
 
-	/** 基礎的整數 GOPS 搜尋 */
+	/** 基礎的整數 {@link GOPS} 搜尋 */
 	export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiece> {
 		if(ox % 2 && oy % 2) return;
 		if(sx === undefined) sx = Number.POSITIVE_INFINITY;
@@ -27,7 +27,7 @@ namespace GOPS {
 		}
 	}
 
-	/** 計算一個 JPiece 的 rank，數字越小越好 */
+	/** 計算一個 {@link JPiece} 的 rank，數字越小越好 */
 	export function $rank(p: JPiece): number {
 		let r1 = MathUtil.$reduce(p.oy + p.v, p.oy)[0];
 		let r2 = MathUtil.$reduce(p.ox + p.u, p.ox)[0];

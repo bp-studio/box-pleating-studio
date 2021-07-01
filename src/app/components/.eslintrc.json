@@ -1,5 +1,41 @@
 {
+	"extends": [
+		"plugin:vue/essential"
+	],
+	"parser": "vue-eslint-parser",
+	"parserOptions": {
+		"parser": "@typescript-eslint/parser"
+	},
 	"rules": {
-		"new-cap": "off"
+		"no-await-in-loop": "off",
+		"no-undef": "off",
+		"new-cap": "off",
+		"sort-imports": [
+			"warn",
+			{
+				"allowSeparatedGroups": true
+			}
+		],
+		"@typescript-eslint/indent": "off",
+		"vue/script-indent": [
+			"warn",
+			"tab",
+			{
+				"baseIndent": 1,
+				"switchCase": 0,
+				"ignores": []
+			}
+		],
+		"max-len": "off",
+		"vue/max-len": [
+			"warn",
+			{
+				"code": 100,
+				"tabWidth": 4,
+				"ignoreStrings": true,
+				"ignoreComments": true,
+				"ignoreHTMLAttributeValues": true
+			}
+		]
 	}
 }

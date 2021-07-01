@@ -62,20 +62,20 @@
 		private notify: boolean;
 		private checking: boolean = false;
 
-		mounted() {
+		mounted(): void {
 			let v = parseInt(localStorage.getItem("last_log") || "0");
 			this.notify = v < logs[logs.length - 1];
 		}
 
-		protected get icon() {
+		protected get icon(): string {
 			return this.checking ? "bp-spinner fa-spin" : "bp-question-circle";
 		}
 
-		protected async update() {
+		protected async update(): Promise<void> {
 			if(await core.confirm(this.$t("message.updateReady"))) location.reload();
 		}
 
-		protected async checkUpdate() {
+		protected async checkUpdate(): Promise<void> {
 			this.checking = true;
 			let reg = await navigator.serviceWorker.ready;
 			await reg.update();
@@ -93,7 +93,7 @@
 			}
 		}
 
-		protected news() {
+		protected news(): void {
 			if(this.notify) {
 				localStorage.setItem("last_log", logs[logs.length - 1].toString());
 				this.notify = false;
@@ -101,7 +101,7 @@
 			this.$emit('news');
 		}
 
-		protected get core() { return core; }
+		protected get core(): typeof core { return core; }
 	}
 </script>
 

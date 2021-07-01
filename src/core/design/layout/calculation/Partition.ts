@@ -153,6 +153,7 @@ interface JPartition {
 
 	/**
 	 * 取得側點連接的目標。
+	 *
 	 * @param point 自身連接點的目前位置
 	 * @param c 對應的角落資訊
 	 * @param q 如果有指定，會強制傳回側點兩個連接目標中落在指定方向上的那一個。

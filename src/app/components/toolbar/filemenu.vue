@@ -10,20 +10,7 @@
 			<opener ref="open" @open="open($event)">
 				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 			</opener>
-			<submenu icon="fas fa-history" :label="$t('toolbar.file.recent.title')">
-				<dropdownitem v-if="recent.length==0" disabled>{{$t('toolbar.file.recent.empty')}}</dropdownitem>
-				<template v-else>
-					<dropdownitem v-for="(h,i) in recent" :key="i" @click="open([h], true)">
-						<i></i>
-						{{h.name}}
-					</dropdownitem>
-					<divider></divider>
-					<dropdownitem @click="clearRecent">
-						<i class="fas fa-trash-alt"></i>
-						{{$t('toolbar.file.recent.clear')}}
-					</dropdownitem>
-				</template>
-			</submenu>
+			<recentmenu @open="open([$event], true)"></recentmenu>
 			<divider></divider>
 			<dropdownitem :disabled="!design" @click="save()">
 				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.BPS.save')}}</hotkey>
@@ -116,17 +103,14 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import JSZip from 'jszip';
 
-	declare const gtag: any;
-
-	import Download from '../gadget/file/download.vue';
 	import BaseComponent from '../mixins/baseComponent';
+	import Download from '../gadget/file/download.vue';
 
 	@Component
 	export default class FileMenu extends BaseComponent {
 
-		mounted() {
+		mounted(): void {
 			document.body.addEventListener('dragover', e => {
 				e.preventDefault();
 				e.stopPropagation();
@@ -135,50 +119,43 @@
 				e.preventDefault();
 				e.stopPropagation();
 				if(e.dataTransfer) this.openFiles(e.dataTransfer.files);
-			})
+			});
 
 			registerHotkey(() => (this.$refs.open as Executor).execute(), "o");
 			registerHotkey(() => {
 				if(!core.design) return;
 				if(FileApiEnabled) this.save();
-				else(this.$refs.bps as Executor).execute();
+				else (this.$refs.bps as Executor).execute();
 			}, "s");
 			registerHotkey(() => core.design && (this.$refs.bpz as Executor).execute(), "s", true);
 			registerHotkey(() => this.print(), "p");
 		}
 
-		protected get FileApiEnabled() { return FileApiEnabled; }
-		protected get recent() { return core.recent; }
+		protected get FileApiEnabled(): boolean { return FileApiEnabled; }
 
-		protected clearRecent() {
-			core.recent = [];
-			core.saveHandle();
-		}
-
-		protected newProject() {
+		protected newProject(): void {
 			core.projects.create();
 			gtag('event', 'project_create');
 		}
 
-		protected notify(handle?: FileSystemFileHandle) {
+		protected notify(handle?: FileSystemFileHandle): void {
 			let design = this.bp.design;
 			this.bp.notifySave(design);
 			if(handle) {
 				core.handles.set(design.id, handle);
-				core.refreshHandle();
-				core.addRecent(handle);
+				core.handles.addRecent(handle);
 			}
 			gtag('event', 'project_bps');
 		}
-		protected notifyAll(handle?: FileSystemFileHandle) {
+		protected notifyAll(handle?: FileSystemFileHandle): void {
 			this.bp.notifySaveAll();
-			if(handle) core.addRecent(handle);
+			if(handle) core.handles.addRecent(handle);
 			gtag('event', 'project_bpz');
 		}
-		protected svgSaved() {
+		protected svgSaved(): void {
 			gtag('event', 'project_svg');
 		}
-		protected pngSaved() {
+		protected pngSaved(): void {
 			gtag('event', 'project_png');
 		}
 
@@ -214,7 +191,7 @@
 					await handle.getFile();
 					await writable.write(await core.getBlob("bps"));
 					await writable.close();
-					core.addRecent(handle);
+					core.handles.addRecent(handle);
 					this.notify();
 				} catch(e) {
 					await writable.abort();
@@ -225,17 +202,17 @@
 			}
 		}
 
-		protected async open(handles: FileSystemFileHandle[], request?: boolean) {
+		protected async open(handles: FileSystemFileHandle[], request?: boolean): Promise<void> {
 			await core.loader.show();
 			let open = false;
 			for(let handle of handles) {
-				if(request && !(await this.requestPermission(handle))) continue;
+				if(request && !await this.requestPermission(handle)) continue;
 				try {
 					let file = await handle.getFile();
 					open = await this.openFile(file, handle) || open;
 				} catch(e) {
 					await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
-					await core.removeRecent(handle);
+					await core.handles.removeRecent(handle);
 				}
 			}
 			core.loader.hide();
@@ -252,16 +229,18 @@
 			}
 			return true;
 		}
-		protected async upload(event: Event) {
+		protected async upload(event: Event): Promise<void> {
 			let f = event.target as HTMLInputElement;
-			await this.openFiles(f.files)
+			await this.openFiles(f.files);
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
 		}
 		private async openFiles(files: FileList) {
 			await core.loader.show();
 			let open = false;
-			if(files.length) for(let i = 0; i < files.length; i++) {
-				open = await this.openFile(files[i]) || open;
+			if(files.length) {
+				for(let i = 0; i < files.length; i++) {
+					open = await this.openFile(files[i]) || open;
+				}
 			}
 			core.loader.hide();
 			if(open) {
@@ -280,15 +259,14 @@
 					core.projects.add(design);
 					if(handle) {
 						core.handles.set(design.id, handle);
-						core.refreshHandle();
-						await core.addRecent(handle);
+						await core.handles.addRecent(handle);
 					}
 					return true;
 				} else if(test == "P") { // PKZip
 					await core.projects.openWorkspace(buffer);
-					if(handle) await core.addRecent(handle);
+					if(handle) await core.handles.addRecent(handle);
 					return true;
-				} else throw 1;
+				} else { throw new Error(); }
 			} catch(e) {
 				debugger;
 				await core.alert(this.$t('message.invalidFormat', [file.name]));
@@ -296,10 +274,11 @@
 			}
 		}
 
-		protected print() {
+		protected print(): void {
+			const PRINT_DELAY = 500;
 			if(!core.design) return;
 			this.bp.onBeforePrint();
-			setTimeout(window.print, 500);
+			setTimeout(window.print, PRINT_DELAY);
 			gtag('event', 'print', {});
 		}
 	}

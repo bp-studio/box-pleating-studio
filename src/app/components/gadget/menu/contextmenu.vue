@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 	import Popper from '@popperjs/core';
 
 	@Component
@@ -13,7 +13,7 @@
 
 		private shown: boolean = false;
 
-		public show(e: MouseEvent) {
+		public show(e: MouseEvent): void {
 			Popper.createPopper(
 				{
 					getBoundingClientRect() {
@@ -23,13 +23,13 @@
 							left: e.pageX,
 							right: e.pageX,
 							width: 0,
-							height: 0
-						}
-					}
+							height: 0,
+						};
+					},
 				} as Popper.VirtualElement,
 				this.$el as HTMLElement,
 				{
-					placement: "bottom-start"
+					placement: "bottom-start",
 				}
 			);
 			this.$el.classList.add('show');
@@ -37,10 +37,11 @@
 		}
 
 		private hide() {
+			// 已知設定延遲為 10 在某些版本的 Safari 上面是不夠的，所以安全起見設成 50
+			const HIDDEN_DELAY = 50;
 			if(this.shown) {
 				// 這邊必須設置一個延遲，否則觸控模式中會不能按
-				// 已知設定延遲為 10 在某些版本的 Safari 上面是不夠的，所以安全起見設成 50
-				setTimeout(() => this.$el.classList.remove('show'), 50);
+				setTimeout(() => this.$el.classList.remove('show'), HIDDEN_DELAY);
 				this.shown = false;
 			}
 		}

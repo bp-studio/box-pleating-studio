@@ -60,10 +60,10 @@
 	@Component
 	export default class Toolbar extends BaseComponent {
 
-		public toLayout() { this.design.mode = "layout"; }
-		public toTree() { this.design.mode = "tree"; }
+		public toLayout(): void { this.design.mode = "layout"; }
+		public toTree(): void { this.design.mode = "tree"; }
 
-		public async TreeMaker(event: Event) {
+		public async TreeMaker(event: Event): Promise<void> {
 			let f = event.target as HTMLInputElement;
 			if(f.files.length == 0) return;
 			let content = bufferToText(await readFile(f.files[0]));

@@ -94,10 +94,10 @@ interface JStretch {
 		return result;
 	}
 
-	/** 整個 {@link Stretch} 所共用的相位參數，一律以第一個 Junction 為準 */
+	/** 整個 {@link Stretch} 所共用的相位參數，一律以第一個 {@link Junction} 為準 */
 	public get fx(): Sign { return this.$junctions[0]?.fx ?? 1; }
 
-	/** 整個 {@link Stretch} 所共用的相位參數，一律以第一個 Junction 為準 */
+	/** 整個 {@link Stretch} 所共用的相位參數，一律以第一個 {@link Junction} 為準 */
 	public get fy(): Sign { return this.$junctions[0]?.fy ?? 1; }
 
 	protected get $shouldDispose(): boolean {
@@ -134,7 +134,7 @@ interface JStretch {
 		return JSON.stringify(this.$junctions.map(j => {
 			let result = j.toJSON();
 			let c = result.c;
-			// 把所有的 JJunction 的相位都調整成跟當前的 `Stretch` 一致
+			// 把所有的 JJunction 的相位都調整成跟當前的 Stretch 一致
 			if(j.fx != this.fx) result.c = [c[2], c[3], c[0], c[1]];
 			return result;
 		}));

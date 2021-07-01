@@ -4,25 +4,24 @@
 
 <script lang="ts">
 
-	import { Vue, Component, Prop } from 'vue-property-decorator';
-	import { bp } from './import/BPStudio';
-	import JSZip from 'jszip';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
-	declare const gtag: any;
+	import JSZip from 'jszip';
+	import { bp } from './import/BPStudio';
 
 	@Component
 	export default class Projects extends Vue {
 
 		@Prop(Array) public designs: number[];
 
-		public create() {
-			let j = { title: this.$t('keyword.untitled') };
+		public create(): void {
+			let j = { title: this.$t('keyword.untitled').toString() };
 			let d = bp.create(this.checkTitle(j));
 			this.add(bp.design = d);
 			this.scrollTo(d.id);
 		}
 
-		public select(id: number) {
+		public select(id: number): void {
 			bp.select(id);
 			let i = this.tabHistory.indexOf(id);
 			if(i >= 0) this.tabHistory.splice(i, 1);
@@ -30,24 +29,24 @@
 			this.scrollTo(id);
 		}
 
-		public async close(id?: number) {
+		public async close(id?: number): Promise<void> {
 			if(id === undefined) id = bp.design.id;
 			if(await this.closeCore(id)) this.selectLast();
 		}
 
-		public async closeOther(id: number) {
+		public async closeOther(id: number): Promise<void> {
 			await this.closeBy(i => i != id);
 		}
 
-		public async closeRight(id: number) {
+		public async closeRight(id: number): Promise<void> {
 			await this.closeBy(i => this.designs.indexOf(i) > this.designs.indexOf(id));
 		}
 
-		public async closeAll() {
+		public async closeAll(): Promise<void> {
 			await this.closeBy(i => true);
 		}
 
-		public clone(id?: number) {
+		public clone(id?: number): void {
 			if(id === undefined) id = bp.design.id;
 			let i = this.designs.indexOf(id);
 			let d = bp.getDesign(id).toJSON(true);
@@ -57,13 +56,13 @@
 			gtag('event', 'project_clone');
 		}
 
-		public add(d: Design, select = true) {
+		public add(d: Design, select = true): void {
 			this.designs.push(d.id);
 			if(select) this.select(d.id);
 			else this.tabHistory.unshift(d.id);
 		}
 
-		public async openWorkspace(buffer: ArrayBuffer) {
+		public async openWorkspace(buffer: ArrayBuffer): Promise<void> {
 			let zip = await JSZip.loadAsync(buffer);
 			let files: string[] = [];
 			zip.forEach(path => files.push(path));
@@ -87,17 +86,20 @@
 		private scrollTo(id: number) {
 			Vue.nextTick(() => {
 				let el = document.getElementById(`tab${id}`);
-				if(el) el.scrollIntoView({
-					behavior: "smooth",
-					inline: "end"
-				});
+				if(el) {
+					el.scrollIntoView({
+						behavior: "smooth",
+						inline: "end",
+					});
+				}
 			});
 		}
 
-		private checkTitle(j: any) {
+		private checkTitle(j: { title: string }) {
 			let t = j.title.replace(/ - \d+$/, ""), n = 1;
 			let designs = bp.getDesigns();
 			if(!designs.some(d => d.title == t)) return j;
+			// eslint-disable-next-line @typescript-eslint/no-loop-func
 			while(designs.some(d => d.title == t + " - " + n)) n++;
 			j.title = t + " - " + n;
 			return j;
@@ -116,11 +118,11 @@
 			if(bp.isModified(d)) {
 				this.select(id);
 				let message = this.$t("message.unsaved", [title]);
-				if(!(await core.confirm(message))) return false;
+				if(!await core.confirm(message)) return false;
 			}
 			this.designs.splice(this.designs.indexOf(id), 1);
 			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);
-			if(core.handles.delete(id)) core.refreshHandle();
+			core.handles.delete(id);
 			bp.close(id);
 			return true;
 		}

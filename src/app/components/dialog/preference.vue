@@ -16,7 +16,7 @@
 					</div>
 					<checkbox :label="$t('preference.autoSave')" v-model="core.autoSave" @input="core.saveSettings()"></checkbox>
 					<checkbox
-						v-if="core.initialized"
+						v-if="display"
 						:label="$t('preference.includeHidden')"
 						v-model="display.includeHiddenElement"
 						@input="core.saveSettings()"
@@ -31,32 +31,33 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
-	import { bp } from '../import/BPStudio';
-	import * as bootstrap from 'bootstrap';
+	import { Component, Vue } from 'vue-property-decorator';
 
-	declare const gtag: any;
+	import * as bootstrap from 'bootstrap';
+	import { DisplaySetting, bp } from '../import/BPStudio';
 
 	@Component
 	export default class Preference extends Vue {
 		private modal: bootstrap.Modal;
-		protected get i18n() { return i18n; }
-		protected get core() { return core; }
-		protected get display(): any { return core.initialized ? bp.settings : {}; }
+		protected get i18n(): typeof i18n { return i18n; }
+		protected get core(): typeof core { return core; }
+		protected get display(): null | DisplaySetting {
+			return core.initialized ? bp.settings : null;
+		}
 
-		mounted() {
+		mounted(): void {
 			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 		}
 
-		public async show() {
+		public async show(): Promise<void> {
 			await core.libReady;
 			this.modal.show();
-			var bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
+			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
 			gtag('event', 'screen_view', { screen_name: 'Preference' });
 		}
 
-		protected onLocaleChanged() {
+		protected onLocaleChanged(): void {
 			localStorage.setItem("locale", i18n.locale);
 		}
 	}

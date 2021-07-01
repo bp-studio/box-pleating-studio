@@ -35,25 +35,30 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 
 	declare global {
 		interface Navigator {
 			getInstalledRelatedApps?(): Promise<string[]>;
 			standalone?: boolean;
 		}
+
+		interface BeforeInstallPromptEvent extends Event {
+			prompt(): Promise<void>;
+		}
 	}
 
 	@Component
 	export default class Welcome extends Vue {
-		protected bi: any;
+		protected bi: BeforeInstallPromptEvent;
 		protected install: number = 0;
 		protected ios: boolean = navigator.standalone === false;
 
-		protected get core() { return core; }
+		protected get core(): typeof core { return core; }
 
-		created() {
-			window.addEventListener("beforeinstallprompt", event => {
+		created(): void {
+			const APP_CHECK_INTERVAL = 2000;
+			window.addEventListener("beforeinstallprompt", (event: BeforeInstallPromptEvent) => {
 				event.preventDefault();
 				this.bi = event;
 			});
@@ -63,7 +68,7 @@
 				let i = setInterval(() => {
 					if(this.install != 2) this.detectInstallation();
 					else clearInterval(i);
-				}, 2000);
+				}, APP_CHECK_INTERVAL);
 			});
 			this.detectInstallation();
 		}

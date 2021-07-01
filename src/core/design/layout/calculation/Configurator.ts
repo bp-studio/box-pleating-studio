@@ -18,16 +18,16 @@ enum Strategy {
 
 class Configurator {
 
-	/** 目前所屬的 Repository */
+	/** 目前所屬的 {@link Repository} */
 	private readonly _repo: Repository;
 
-	/** 從存檔來的種子 Configuration */
+	/** 從存檔來的種子 {@link Configuration} */
 	private readonly _seed?: JConfiguration;
 
-	/** 種子 Configuration 的簽章，用來作為快速檢查 */
+	/** 種子 {@link Configuration} 的簽章，用來作為快速檢查 */
 	private _seedSignature?: string;
 
-	/** 種子的 Pattern */
+	/** 種子的 {@link Pattern} */
 	private readonly _pattern?: JPattern;
 
 	constructor(repo: Repository, option?: JStretch) {
@@ -51,7 +51,7 @@ class Configurator {
 			}
 		}
 
-		// 過濾掉跟存檔一樣的 `Configuration`
+		/** 過濾到跟存檔一樣的 {@link Configuration} */
 		let filter = (config: Configuration) =>
 			!this._seedSignature || this._seedSignature != JSON.stringify(config);
 		yield* GeneratorUtil.$filter(this.$search(), filter);
@@ -135,7 +135,7 @@ class Configurator {
 		}
 	}
 
-	/** 搜尋 3 Flap 接力 */
+	/** 搜尋 3-{@link Flap} 接力 */
 	private *_searchThreeFlapRelay(
 		junctions: readonly [JJunction, JJunction], strategy?: Strategy
 	): Generator<Configuration> {
@@ -173,7 +173,7 @@ class Configurator {
 		});
 	}
 
-	/** 搜尋 3-Flap Join */
+	/** 搜尋 3-{@link Flap} Join */
 	private *_searchThreeFlapJoin(
 		junctions: readonly [JJunction, JJunction], strategy?: Strategy
 	): Generator<Configuration> {
@@ -189,7 +189,7 @@ class Configurator {
 		});
 	}
 
-	/** 搜尋 3-Flap Relay Join */
+	/** 搜尋 3-{@link Flap} Relay Join */
 	private *_searchThreeFlapRelayJoin(
 		junctions: readonly [JJunction, JJunction],
 		strategy?: Strategy

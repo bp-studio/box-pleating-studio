@@ -15,21 +15,26 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
+
 	import BaseComponent from '../mixins/baseComponent';
 
 	@Component
 	export default class EditMenu extends BaseComponent {
-		mounted() {
+		mounted(): void {
 			registerHotkey(() => this.undo(), "z");
 			registerHotkey(() => this.redo(), "y");
 			registerHotkey(() => this.redo(), "z", true);
 			registerHotkey(() => this.selectAll(), "a");
 		}
 
-		protected get canUndo() { return core.initialized && this.bp.canUndo(this.design); }
-		protected get canRedo() { return core.initialized && this.bp.canRedo(this.design); }
-		protected undo() { this.bp.undo(this.design); }
-		protected redo() { this.bp.redo(this.design); }
+		protected get canUndo(): boolean {
+			return core.initialized ? this.bp.canUndo(this.design) : false;
+		}
+		protected get canRedo(): boolean {
+			return core.initialized ? this.bp.canRedo(this.design) : false;
+		}
+		protected undo(): void { this.bp.undo(this.design); }
+		protected redo(): void { this.bp.redo(this.design); }
 
 		private selectAll() {
 			if(this.design) this.design.selectAll();

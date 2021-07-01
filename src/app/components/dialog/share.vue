@@ -44,35 +44,36 @@
 </template>
 
 <script lang="ts">
-	import * as bootstrap from 'bootstrap';
-	import BaseComponent from '../mixins/baseComponent';
 	import { Component } from 'vue-property-decorator';
 
+	import * as bootstrap from 'bootstrap';
+	import BaseComponent from '../mixins/baseComponent';
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	declare const LZ: any;
-	declare const gtag: any;
 
 	@Component
 	export default class Share extends BaseComponent {
 		protected url: string = "";
 		protected modal: bootstrap.Modal;
-		protected canShare: boolean = !!navigator.share;
+		protected canShare: boolean = Boolean(navigator.share);
 		protected ready: boolean = false;
 		protected sending: boolean = false;
 		protected error: string = null;
 
-		mounted() {
+		mounted(): void {
 			core.libReady.then(() => {
 				this.ready = true;
 				this.modal = new bootstrap.Modal(this.$el);
 			});
 		}
 
-		public json() {
+		public json(): string {
 			if(!this.design) return undefined;
 			return JSON.stringify(this.design);
 		}
 
-		public async show() {
+		public async show(): Promise<void> {
 			await core.libReady;
 			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
 			this.modal.show();
@@ -83,27 +84,31 @@
 			gtag('event', 'screen_view', { screen_name: 'Share' });
 		}
 
-		protected onCopy() {
+		protected onCopy(): void {
+			const MESSAGE_DELAY = 3000;
 			let s = this.$refs.success as HTMLSpanElement;
 			s.style.width = "20px";
-			setTimeout(() => s.style.width = "0px", 3000);
+			setTimeout(() => s.style.width = "0px", MESSAGE_DELAY);
 			gtag('event', 'share', { method: 'copy', content_type: 'link' });
 		}
 
-		protected share() {
+		protected share(): void {
 			navigator.share({
 				title: "Box Pleating Studio",
 				text: this.$t("share.message", [this.design.title]).toString(),
-				url: this.url
-			}).catch(() => { }); // 捕捉取消之類的錯誤，不處理
+				url: this.url,
+			}).catch(() => {
+				// 捕捉取消之類的錯誤，不處理
+			});
 			gtag('event', 'share', { method: 'app', content_type: 'link' });
 		}
 
 		private async shorten() {
+			const SHORT_INTERVAL = 10;
 			this.sending = true;
 			try {
 				let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url), {
-					cache: "reload"
+					cache: "reload",
 				});
 				this.url = await response.text();
 				this.sending = false;
@@ -114,7 +119,7 @@
 								clearInterval(int);
 								resolve();
 							}
-						}, 10);
+						}, SHORT_INTERVAL);
 					});
 				}
 				(this.$refs.bt as HTMLButtonElement).focus();

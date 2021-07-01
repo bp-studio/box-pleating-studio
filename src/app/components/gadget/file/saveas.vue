@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Prop } from 'vue-property-decorator';
+	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
 	export default class SaveAs extends Vue {
@@ -18,7 +18,7 @@
 		@Prop(String) public mime: string;
 		@Prop(Boolean) public disabled: boolean;
 
-		public async execute() {
+		public async execute(): Promise<void> {
 			try {
 				let handle = await showSaveFilePicker({
 					suggestedName: core.getFilename(this.type),
@@ -27,7 +27,7 @@
 						accept: {
 							[this.mime]: ['.' + this.type],
 						},
-					}]
+					}],
 				} as SaveFilePickerOptions);
 				let writable = await handle.createWritable();
 				let blob = await core.getBlob(this.type);
@@ -37,7 +37,6 @@
 
 			} catch(e) {
 				// 使用者取消的話會跑到這邊來
-				return;
 			}
 		}
 	}

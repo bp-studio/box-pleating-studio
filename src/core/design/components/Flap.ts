@@ -135,17 +135,17 @@ interface JFlap {
 	}
 
 	////////////////////////////////////////////////////////////
-	/*
-	 * 底下這一部份的程式碼負責整理一個 Flap 具有哪些 Junction。
-	 * 因為 Junction 的總數非常多，採用純粹的反應式框架來篩選反而速度慢，
-	 * 因此特別這一部份改用一個主動式架構來通知 Flap.junctions 的更新。
+	/**
+	 * 底下這一部份的程式碼負責整理一個 {@link Flap} 具有哪些 {@link Junction}。
+	 * 因為 {@link Junction} 的總數非常多，採用純粹的反應式框架來篩選反而速度慢，
+	 * 因此特別這一部份改用一個主動式架構來通知 {@link Flap.$junctions} 的更新。
 	 */
 	////////////////////////////////////////////////////////////
 
 	public readonly _junctions: Junction[] = [];
 
 	@unorderedArray public get $junctions(): readonly Junction[] {
-		// DoubleMapping 本身不是一個反應屬性，它的 size 才是
+		/** {@link DoubleMapping} 本身不是一個反應屬性，它的 size 才是 */
 		this.$design.$junctions.size;
 		// 利用 concat 傳回一個複製的陣列去跟上次已知的值來進行 unorderedArray 比較
 		return this._junctions.concat();

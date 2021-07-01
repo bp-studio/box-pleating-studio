@@ -19,21 +19,22 @@
 </template>
 
 <script lang="ts">
-	import { Vue, Component, Watch } from 'vue-property-decorator';
 	import * as bootstrap from 'bootstrap';
 
-	declare const locale: any;
+	import { Component, Vue, Watch } from 'vue-property-decorator';
+
+	declare const locale: Record<string, unknown>[];
 
 	@Component
 	export default class Language extends Vue {
 
 		protected languages: string[] = [];
 
-		protected setLocale(l: string) { i18n.locale = l; }
+		protected setLocale(l: string): void { i18n.locale = l; }
 
-		@Watch('i18n.locale') watchLocale() { this.onLocaleChanged(); }
+		@Watch('i18n.locale') watchLocale(): void { this.onLocaleChanged(); }
 
-		public init(build: number) {
+		public init(build: number): void {
 			let loc = localStorage.getItem("locale");
 			let languages = this.getLanguages(loc);
 			let newLocale = languages.some(l => locale[l].since > build);
@@ -54,7 +55,7 @@
 			if(!navigator.languages) return locales;
 			let languages = navigator.languages
 				.map(a => locales.find(l => this.format(a).startsWith(l)))
-				.filter(l => !!l);
+				.filter(l => Boolean(l));
 			if(loc) languages.unshift(loc);
 			languages = Array.from(new Set(languages));
 			return languages;
@@ -67,13 +68,18 @@
 		private onLocaleChanged() {
 			if(i18n.locale in locale) {
 				localStorage.setItem("locale", i18n.locale);
-			} else Vue.nextTick(() => {
-				let chain = (i18n as any)._localeChainCache[i18n.locale];
-				for(let l of chain) if(l in locale) {
-					i18n.locale = l;
-					return;
-				}
-			});
+			} else {
+				Vue.nextTick(() => {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					let chain = (i18n as any)._localeChainCache[i18n.locale];
+					for(let l of chain) {
+						if(l in locale) {
+							i18n.locale = l;
+							return;
+						}
+					}
+				});
+			}
 		}
 	}
 </script>
