@@ -1,7 +1,7 @@
 
 interface StudioOptions {
 	onDeprecate?: TitleCallback;
-	onUpdate?: Action;
+	onUpdate?: Action<void | Promise<void>>;
 	onDrag?: Action;
 	onLongPress?: Action;
 }

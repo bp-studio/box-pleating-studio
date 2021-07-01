@@ -66,15 +66,14 @@
 			let zip = await JSZip.loadAsync(buffer);
 			let files: string[] = [];
 			zip.forEach(path => files.push(path));
-			for(let f of files) {
-				try {
-					let data = await zip.file(f).async("text");
-					core.projects.add(bp.load(data));
-				} catch(e) {
-					debugger;
-					await core.alert(this.$t('message.invalidFormat', [f]));
+			let tasks = files.map(f => zip.file(f).async("text").then(
+				data => {
+					let design = bp.load(data);
+					if(design) core.projects.add(design);
+					else core.alert(this.$t('message.invalidFormat', [f]));
 				}
-			}
+			));
+			await Promise.all(tasks);
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +81,7 @@
 		/////////////////////////////////////////////////////////////////////////////////////////
 
 		private tabHistory: number[] = [];
+		private confirming: Promise<unknown> = Promise.resolve();
 
 		private scrollTo(id: number) {
 			Vue.nextTick(() => {
@@ -116,9 +116,13 @@
 			let d = bp.getDesign(id)!;
 			let title = d.title || this.$t("keyword.untitled");
 			if(bp.isModified(d)) {
-				this.select(id);
 				let message = this.$t("message.unsaved", [title]);
-				if(!await core.confirm(message)) return false;
+				let confirm = core.confirm(message);
+				let previous = this.confirming;
+				this.confirming = confirm;
+				await previous;
+				this.select(id);
+				if(!await confirm) return false;
 			}
 			this.designs.splice(this.designs.indexOf(id), 1);
 			this.tabHistory.splice(this.tabHistory.indexOf(id), 1);

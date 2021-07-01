@@ -3,7 +3,7 @@
 // Types
 //////////////////////////////////////////////////////////////////
 
-type Action = () => void;
+type Action<T = void> = () => T;
 
 type Rational = number | Fraction;
 

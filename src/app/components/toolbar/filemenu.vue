@@ -124,8 +124,9 @@
 			registerHotkey(() => (this.$refs.open as Executor).execute(), "o");
 			registerHotkey(() => {
 				if(!core.design) return;
+				let bps = this.$refs.bps as Executor;
 				if(FileApiEnabled) this.save();
-				else (this.$refs.bps as Executor).execute();
+				else bps.execute();
 			}, "s");
 			registerHotkey(() => core.design && (this.$refs.bpz as Executor).execute(), "s", true);
 			registerHotkey(() => this.print(), "p");
@@ -204,30 +205,32 @@
 
 		protected async open(handles: FileSystemFileHandle[], request?: boolean): Promise<void> {
 			await core.loader.show();
-			let open = false;
-			for(let handle of handles) {
-				if(request && !await this.requestPermission(handle)) continue;
-				try {
-					let file = await handle.getFile();
-					open = await this.openFile(file, handle) || open;
-				} catch(e) {
-					await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
-					await core.handles.removeRecent(handle);
-				}
-			}
+			let tasks = handles.map(handle => this.openHandle(handle, request));
+			let success = (await Promise.all(tasks)).includes(true);
 			core.loader.hide();
-			if(open) {
+			if(success) {
 				gtag('event', 'project_open');
 				core.projects.select(core.designs[core.designs.length - 1]);
 			}
 		}
+		private async openHandle(handle: FileSystemFileHandle, request: boolean): Promise<boolean> {
+			if(request && !await this.requestPermission(handle)) return false;
+			try {
+				let file = await handle.getFile();
+				return await this.openFile(file, handle);
+			} catch(e) {
+				await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
+				await core.handles.removeRecent(handle);
+				return false;
+			}
+		}
 		private async requestPermission(handle: FileSystemFileHandle): Promise<boolean> {
 			let mode: FileSystemPermissionMode = handle.name.endsWith(".bpz") ? "read" : "readwrite";
-			while(await handle.requestPermission({ mode }) != 'granted') {
-				let confirm = await core.confirm(this.$t('message.filePermission'));
-				if(!confirm) return false;
+			if(await handle.requestPermission({ mode }) == 'granted') return true;
+			if(await core.confirm(this.$t('message.filePermission'))) {
+				return this.requestPermission(handle);
 			}
-			return true;
+			return false;
 		}
 		protected async upload(event: Event): Promise<void> {
 			let f = event.target as HTMLInputElement;
@@ -236,14 +239,15 @@
 		}
 		private async openFiles(files: FileList) {
 			await core.loader.show();
-			let open = false;
+			let tasks: Promise<boolean>[] = [];
 			if(files.length) {
 				for(let i = 0; i < files.length; i++) {
-					open = await this.openFile(files[i]) || open;
+					tasks.push(this.openFile(files[i]));
 				}
 			}
+			let success = (await Promise.all(tasks)).includes(true);
 			core.loader.hide();
-			if(open) {
+			if(success) {
 				gtag('event', 'project_open');
 				core.projects.select(core.designs[core.designs.length - 1]);
 			}

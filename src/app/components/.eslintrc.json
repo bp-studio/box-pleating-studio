@@ -7,7 +7,6 @@
 		"parser": "@typescript-eslint/parser"
 	},
 	"rules": {
-		"no-await-in-loop": "off",
 		"no-undef": "off",
 		"new-cap": "off",
 		"sort-imports": [

@@ -38,22 +38,22 @@
 		public async save(): Promise<void> {
 			if(!FileApiEnabled) return;
 			await idbKeyval.clear();
+			let tasks: Promise<void>[] = [];
 			for(let i = 0; i < core.designs.length; i++) {
 				let handle = this.handles.get(core.designs[i]);
-				if(handle) await idbKeyval.set(i, handle);
+				if(handle) tasks.push(idbKeyval.set(i, handle));
 			}
 			for(let i = 0; i < this.recent.length; i++) {
-				await idbKeyval.set(-i - 1, this.recent[i]);
+				tasks.push(idbKeyval.set(-i - 1, this.recent[i]));
 			}
+			await Promise.all(tasks);
 		}
 
 		public async removeRecent(handle: FileSystemFileHandle): Promise<void> {
-			for(let i = 0; i < this.recent.length; i++) {
-				if(await this.recent[i].isSameEntry(handle)) {
-					this.recent.splice(i, 1);
-					break;
-				}
-			}
+			let tasks = this.recent.map(recent => recent.isSameEntry(handle));
+			let results = await Promise.all(tasks);
+			let i = results.indexOf(true);
+			if(i != -1) this.recent.splice(i, 1);
 		}
 
 		public async addRecent(handle: FileSystemFileHandle): Promise<void> {

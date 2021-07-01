@@ -5,35 +5,34 @@ import CoreBase from './coreBase';
 
 declare const core: CoreBase;
 
+// @ts-ignore
 @Component
 export default abstract class Dialog<T> extends Vue {
 	private modal: bootstrap.Modal;
-	private promise: Promise<T> = null;
-	protected message: string
+	private last: Promise<unknown> = Promise.resolve();
+	protected message: string;
 
 	mounted(): void {
-		core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el, { backdrop: 'static' }));
+		core.libReady.then(() =>
+			this.modal = new bootstrap.Modal(this.$el, { backdrop: 'static' })
+		);
 	}
 
 	public async show(message?: string): Promise<T> {
 		await core.libReady;
-		// eslint-disable-next-line no-await-in-loop
-		while(this.promise) await this.promise;
-		this.message = message;
-		return await (this.promise = this.run());
-	}
-
-	private run(): Promise<T> {
-		let handler = registerHotkeyCore(this.key.bind(this));
-		let p = new Promise<T>(resolve => {
-			this.resolve((v: T) => {
-				this.promise = null;
-				unregisterHotkeyCore(handler);
-				resolve(v);
+		let current = new Promise<T>(resolve => {
+			this.last.then(() => {
+				this.message = message;
+				let handler = registerHotkeyCore(this.key.bind(this));
+				this.resolve((v: T) => {
+					unregisterHotkeyCore(handler);
+					resolve(v);
+				});
+				this.modal.show();
 			});
 		});
-		this.modal.show();
-		return p;
+		this.last = current;
+		return await current;
 	}
 
 	protected close(): void {

@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-	import { Component, Vue } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
 	import { bp } from './import/BPStudio';
 
 	import JSZip from 'jszip';
@@ -24,8 +24,7 @@
 	import Projects from './projects.vue';
 	import Spinner from './gadget/spinner.vue';
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	declare const LZ: any;
+	declare const LZ: { decompress(s: string): string };
 	declare const app_config: Record<string, string>;
 
 	declare global {
@@ -150,9 +149,7 @@
 
 		public get copyright(): string {
 			let y = new Date().getFullYear();
-			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-			let end = y > 2020 ? "-" + y : "";
-			return this.$t('welcome.copyright', [end]).toString();
+			return this.$t('welcome.copyright', ["-" + y]).toString();
 		}
 
 		public get shouldShowDPad(): boolean {
@@ -211,8 +208,8 @@
 			if(this.autoSave && await this.checkSession()) {
 				// 排程到下一次 BPStudio 更新完畢之後存檔，
 				// 避免在存檔的瞬間製造出 glitch
-				// eslint-disable-next-line require-atomic-updates
-				bp.option.onUpdate = async () => {
+				let option = bp.option;
+				option.onUpdate = async () => {
 					let session = {
 						jsons: this.designs.map(
 							id => bp.getDesign(id)!.toJSON(true)

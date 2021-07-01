@@ -26,7 +26,7 @@ class Updater extends Animator {
 
 		let option = this._studio.$option;
 		if(option.onUpdate) {
-			option.onUpdate();
+			await option.onUpdate();
 			delete option.onUpdate;
 		}
 
