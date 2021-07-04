@@ -110,7 +110,8 @@ class Joiner {
 		return { x: x - j.ox, y: y - j.oy }; // 注意到這邊故意傳回負值
 	}
 
-	public $getRelayJoinIntersection(piece: Piece, shift: IPoint, q: QuadrantDirection) {
+	public $getRelayJoinIntersection(piece: Piece, shift: IPoint,
+		q: QuadrantDirection): Point | null {
 		let testVector = this.$oriented ? new Vector(1, 1) : new Vector(-1, -1);
 		let pt = piece.$anchors[this.q]!.sub(new Vector(shift));
 		return piece.$shape.ridges[q].$intersection(pt, testVector);

@@ -17,7 +17,7 @@ abstract class SheetObject extends Mountable implements IDesignObject {
 		this.$sheet = sheet;
 	}
 
-	public get $design() {
+	public get $design(): Design {
 		return this.$sheet.$design;
 	}
 }

@@ -26,7 +26,7 @@ abstract class View extends Mountable {
 	 *
 	 * 可以透過相依於這個方法來達到確保繪製順序正確的目的。
 	 */
-	@shrewd public $draw() {
+	@shrewd public $draw(): void {
 		this.$mountEvents();
 		if(this.$studio) this.$render();
 	}
@@ -66,7 +66,7 @@ abstract class View extends Mountable {
 	protected abstract $render(): void;
 
 	/** 當尺度太小的時候調整線條粗細 */
-	@shrewd protected get _drawScale() {
+	@shrewd protected get _drawScale(): number {
 		this.$mountEvents();
 		if(!this.$studio) return this._scaleCache;
 		let s = this.$studio.$display.$scale;
@@ -74,7 +74,7 @@ abstract class View extends Mountable {
 	}
 	private _scaleCache = 1;
 
-	@shrewd private _renderScale() {
+	@shrewd private _renderScale(): void {
 		for(let [l, p, w] of this._paths) p.strokeWidth = w * this._drawScale;
 	}
 }

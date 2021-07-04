@@ -25,11 +25,11 @@
 		return success;
 	}
 
-	public $selectAll() {
+	public $selectAll(): void {
 		this.forEach(f => f.$selected = true);
 	}
 
-	public $toVertex(flaps: Flap[]) {
+	public $toVertex(flaps: Flap[]): void {
 		this._design.$TreeSheet.$clearSelection();
 		for(let f of flaps) {
 			let v = this._design.$vertices.get(f.node);

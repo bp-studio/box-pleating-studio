@@ -18,7 +18,7 @@ namespace TreeMaker {
 	}
 
 	/** This dummy function marks the usage of translation */
-	function t(message: string) { return message; }
+	function t(message: string): string { return message; }
 
 	class TreeMakerVisitor {
 		private _lines: IterableIterator<string>;
@@ -27,13 +27,13 @@ namespace TreeMaker {
 			this._lines = data.split('\n').values();
 		}
 
-		public $next() { return (this._lines.next().value as string).trim(); }
-		public get $int() { return parseInt(this.$next(), 10); }
-		public get $float() { return parseFloat(this.$next()); }
-		public get $bool() { return this.$next() == "true"; }
+		public $next(): string { return (this._lines.next().value as string).trim(); }
+		public get $int(): number { return parseInt(this.$next(), 10); }
+		public get $float(): number { return parseFloat(this.$next()); }
+		public get $bool(): boolean { return this.$next() == "true"; }
 
-		public $skip(n: number) { for(let i = 0; i < n; i++) this._lines.next(); }
-		public $skipArray() { this.$skip(this.$int); }
+		public $skip(n: number): void { for(let i = 0; i < n; i++) this._lines.next(); }
+		public $skipArray(): void { this.$skip(this.$int); }
 	}
 
 	class TreeMakerParser {
@@ -80,7 +80,7 @@ namespace TreeMaker {
 			this.$result.tree.sheet = sheet;
 		}
 
-		private _parseNode() {
+		private _parseNode(): void {
 			let v = this._visitor;
 			if(v.$next() != "node") throw new Error();
 			let vertex: JVertex = {
@@ -109,7 +109,7 @@ namespace TreeMaker {
 			if(v.$next() == "1") v.$next;
 		}
 
-		private _parseEdge() {
+		private _parseEdge(): void {
 			let v = this._visitor;
 			if(v.$next() != "edge") throw new Error();
 			v.$skip(2);

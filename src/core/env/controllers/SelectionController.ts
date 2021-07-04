@@ -45,7 +45,7 @@
 		return this._controls.filter(c => c.$selected);
 	}
 
-	public $compare(event: paper.ToolEvent) {
+	public $compare(event: paper.ToolEvent): boolean {
 		let oldSel = this.$draggable.concat();
 		this.$process(event);
 		let newSel = this.$draggable.concat();
@@ -114,7 +114,7 @@
 		for(let control of this.$items) if(control != c) control.$selected = false;
 	}
 
-	public $processDragSelect(event: paper.ToolEvent) {
+	public $processDragSelect(event: paper.ToolEvent): void {
 		if(!this._view.$visible) {
 			// 觸碰的情況中要拖曳至一定距離才開始觸發拖曳選取
 			if(System.$isTouch(event.event) && event.downPoint.getDistance(event.point) < 1) return;
@@ -163,7 +163,7 @@
 	 *
 	 * 這個方法也會在一些場合中被單獨呼叫以便立即更新。
 	 */
-	@shrewd public $hasDraggable() {
+	@shrewd public $hasDraggable(): boolean {
 		// 連裡面的選取邏輯也是乖乖照寫；這是還好啦，不會對效能有真正的影響
 		this.$draggable = this.$items.filter((o): o is Draggable => o instanceof Draggable);
 		return this.$draggable.length > 0;

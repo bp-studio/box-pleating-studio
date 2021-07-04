@@ -29,7 +29,7 @@ type JunctionDimension = 'ox' | 'oy';
 	 * 目前採用的格式是直接依 {@link Flap} 的 {@link TreeNode.id id} 照順序以逗點分隔。
 	 * 實務上這樣決定出來的 {@link Junction} 群組必然是唯一的。
 	 */
-	public static $createTeamId(arr: readonly Junction[]) {
+	public static $createTeamId(arr: readonly Junction[]): string {
 		let set = new Set<number>();
 		arr.forEach(o => {
 			set.add(o.f1.node.id);
@@ -65,7 +65,7 @@ type JunctionDimension = 'ox' | 'oy';
 		return super.$shouldDispose || this.f1.$disposed || this.f2.$disposed;
 	}
 
-	protected $onDispose() {
+	protected $onDispose(): void {
 		this.f1._junctions.splice(this.f1._junctions.indexOf(this), 1);
 		this.f2._junctions.splice(this.f2._junctions.indexOf(this), 1);
 	}
@@ -81,8 +81,8 @@ type JunctionDimension = 'ox' | 'oy';
 		return this.$design.$tree.lca(this.n1, this.n2);
 	}
 
-	private get n1() { return this.f1.node; }
-	private get n2() { return this.f2.node; }
+	private get n1(): TreeNode { return this.f1.node; }
+	private get n2(): TreeNode { return this.f2.node; }
 
 	/**
 	 * 找出對應路徑上的一個共用點。
@@ -171,7 +171,7 @@ type JunctionDimension = 'ox' | 'oy';
 		};
 	}
 
-	@shrewd public get $neighbors() {
+	@shrewd public get $neighbors(): Junction[] {
 		this.$disposeEvent();
 		if(this.$direction >= quadrantNumber) return [];
 		let a1 = this.q1!.$activeJunctions.concat();
@@ -181,21 +181,21 @@ type JunctionDimension = 'ox' | 'oy';
 		return a1.concat(a2);
 	}
 
-	@shrewd public get q1() {
+	@shrewd public get q1(): Quadrant | null {
 		return isQuadrant(this.$direction) ? this.f1.$quadrants[this.$direction] : null;
 	}
 
-	@shrewd public get q2() {
+	@shrewd public get q2(): Quadrant | null {
 		return isQuadrant(this.$direction) ? this.f2.$quadrants[opposite(this.$direction)] : null;
 	}
 
-	@shrewd public get $treeDistance() {
+	@shrewd public get $treeDistance(): number {
 		this.$disposeEvent();
 		let n1 = this.f1.node, n2 = this.f2.node;
 		return n1.$tree.$dist(n1, n2);
 	}
 
-	@shrewd public get $status() {
+	@shrewd public get $status(): JunctionStatus {
 		if(this._flapDistance < this.$treeDistance) return JunctionStatus.tooClose;
 		else if(this.ox && this.oy) return JunctionStatus.overlap;
 		else return JunctionStatus.tooFar;
@@ -212,19 +212,19 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** 「o」是代表重疊區域。 */
-	@shrewd public get ox() {
+	@shrewd public get ox(): number {
 		let x = this.$treeDistance - Math.abs(this.sx);
 		return x > 0 ? x : NaN;
 	}
 
 	/** 「o」是代表重疊區域。 */
-	@shrewd public get oy() {
+	@shrewd public get oy(): number {
 		let y = this.$treeDistance - Math.abs(this.sy);
 		return y > 0 ? y : NaN;
 	}
 
 	/** 「s」是代表角片尖端構成的方框。這個值可能是負值，視 f1 f2 相對位置而定。 */
-	@shrewd public get sx() {
+	@shrewd public get sx(): number {
 		let x1 = this.f1.$location.x, x2 = this.f2.$location.x;
 		let w1 = this.f1.width, w2 = this.f2.width;
 		let sx = x1 - x2 - w2;
@@ -235,7 +235,7 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** 「s」是代表角片尖端構成的方框。這個值可能是負值，視 f1 f2 相對位置而定。 */
-	@shrewd public get sy() {
+	@shrewd public get sy(): number {
 		let y1 = this.f1.$location.y, y2 = this.f2.$location.y;
 		let h1 = this.f1.height, h2 = this.f2.height;
 		let sy = y1 - y2 - h2;
@@ -245,9 +245,9 @@ type JunctionDimension = 'ox' | 'oy';
 		return NaN;
 	}
 
-	@shrewd private get _signX() { return Math.sign(this.sx); }
-	@shrewd private get _signY() { return Math.sign(this.sy); }
-	@shrewd public get $direction() {
+	@shrewd private get _signX(): Sign { return Math.sign(this.sx) as Sign; }
+	@shrewd private get _signY(): Sign { return Math.sign(this.sy) as Sign; }
+	@shrewd public get $direction(): Direction {
 		let x = this._signX, y = this._signY;
 		if(x < 0 && y < 0) return Direction.UR;
 		if(x > 0 && y < 0) return Direction.UL;
@@ -260,7 +260,7 @@ type JunctionDimension = 'ox' | 'oy';
 		return Direction.none;
 	}
 
-	@shrewd private get _flapDistance() {
+	@shrewd private get _flapDistance(): number {
 		let x = this.sx, y = this.sy;
 		let vx = x != 0 && !isNaN(x), vy = y != 0 && !isNaN(y);
 		if(vx && vy) return Math.sqrt(x * x + y * y);

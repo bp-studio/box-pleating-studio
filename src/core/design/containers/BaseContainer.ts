@@ -16,7 +16,7 @@ class BaseContainer<K, V extends Disposable> extends Mapping<K, V> {
 		this._design = design;
 	}
 
-	public $dispose() {
+	public $dispose(): void {
 		super.$dispose();
 		// @ts-ignore
 		delete this._design;

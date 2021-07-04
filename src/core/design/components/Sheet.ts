@@ -50,7 +50,7 @@ interface JSheet {
 	}
 
 	/** @exports */
-	public get width() { return this.mWidth; }
+	public get width(): number { return this.mWidth; }
 	public set width(v) {
 		if(v >= Sheet.$MIN_SIZE && v >= this._independentRect.width) {
 			let d = v - this._independentRect.right;
@@ -65,7 +65,7 @@ interface JSheet {
 	@action private mWidth: number;
 
 	/** @exports */
-	public get height() { return this.mHeight; }
+	public get height(): number { return this.mHeight; }
 	public set height(v) {
 		if(v >= Sheet.$MIN_SIZE && v >= this._independentRect.height) {
 			let d = v - this._independentRect.top;
@@ -80,7 +80,7 @@ interface JSheet {
 	@action private mHeight: number;
 
 	/** @exports */
-	public get zoom() { return this._zoom; }
+	public get zoom(): number { return this._zoom; }
 	public set zoom(v) {
 		if(v < Sheet.$FULL_ZOOM) return;
 		this.$studio?.$display.$zoom(v);
@@ -101,15 +101,15 @@ interface JSheet {
 	/** 記載所有這個 {@link Sheet} 中的 {@link Control} 來源 */
 	private _controlMaps: IterableFactory<Control>[];
 
-	public get $design() {
+	public get $design(): Design {
 		return this.$mountTarget as Design;
 	}
 
-	@shrewd public get _isActive() {
+	@shrewd public get _isActive(): boolean {
 		return this.$design.sheet == this;
 	}
 
-	@shrewd public get $displayScale() {
+	@shrewd public get $displayScale(): number {
 		return this.$studio ? this.$studio.$display.$scale : 1;
 	}
 
@@ -122,7 +122,7 @@ interface JSheet {
 		return result;
 	}
 
-	@shrewd get size() {
+	@shrewd get size(): number {
 		return Math.max(this.width, this.height);
 	}
 
@@ -146,7 +146,7 @@ interface JSheet {
 	private _independentRect: Rectangle = new Rectangle(Point.ZERO, Point.ZERO);
 
 	/** 更新 {@link Sheet._independentRect _independentRect} 的反應方法 */
-	@shrewd private _getIndependentRect() {
+	@shrewd private _getIndependentRect(): void {
 		let x1 = Number.POSITIVE_INFINITY, y1 = Number.POSITIVE_INFINITY;
 		let x2 = Number.NEGATIVE_INFINITY, y2 = Number.NEGATIVE_INFINITY;
 		for(let i of this.$independents) {
@@ -159,13 +159,13 @@ interface JSheet {
 		this._independentRect = new Rectangle(new Point(x1, y1), new Point(x2, y2));
 	}
 
-	@unorderedArray private get _labeledControls() {
+	@unorderedArray private get _labeledControls(): Control[] {
 		return this.$controls.filter((c: Control) =>
 			this.$design.$viewManager.$get(c) instanceof LabeledView
 		);
 	}
 
-	@shrewd public get $margin() {
+	@shrewd public get $margin(): number {
 		if(!this._isActive || !this.$design._isActive) return 0;
 		let controls = this._labeledControls;
 		if(controls.length == 0 || !this.$studio!.$display.$settings.showLabel) return 0;
@@ -178,7 +178,7 @@ interface JSheet {
 	@shrewd public $scroll: IPoint;
 
 
-	public $clearSelection() {
+	public $clearSelection(): void {
 		for(let c of this.$controls) c.$selected = false;
 	}
 

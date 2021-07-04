@@ -125,9 +125,9 @@ interface IDesignObject {
 		this.$junctions.$dispose();
 	}
 
-	public get $design() { return this; }
+	public get $design(): this { return this; }
 
-	public get $viewManager() { return (this.$mountTarget as IStudio).$viewManager; }
+	public get $viewManager(): IViewManager { return (this.$mountTarget as IStudio).$viewManager; }
 
 	/**
 	 * 目前的 {@link Design} 是否正在拖曳當中。
@@ -155,7 +155,7 @@ interface IDesignObject {
 
 	public toJSON(session: boolean = false): JDesign {
 		let result!: JDesign;
-		let action = () => {
+		let action = (): void => {
 			result = {
 				title: this.title,
 				description: this.description,
@@ -180,7 +180,7 @@ interface IDesignObject {
 	}
 
 	/** @exports */
-	public selectAll() {
+	public selectAll(): void {
 		this.sheet.$activeControls.forEach(c => c.$selected = false);
 		if(this.mode == "layout") this.$flaps.$selectAll();
 		if(this.mode == "tree") this.$vertices.$selectAll();

@@ -91,17 +91,17 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	/** 取得象限點沿著象限方線距離 d 的 y 座標 */
-	public y(d: number) {
+	public y(d: number): number {
 		return this.$point.y + this.fy * d;
 	}
 
 	/** 取得象限點沿著象限方線距離 d 的 x 座標 */
-	public x(d: number) {
+	public x(d: number): number {
 		return this.$point.x + this.fx * d;
 	}
 
 	/** 把一個象限方向作相位變換處理 */
-	public static $transform(dir: number, fx: number, fy: number) {
+	public static $transform(dir: number, fx: number, fy: number): Direction {
 		if(fx < 0) dir += dir % 2 ? previousQuadrantOffset : nextQuadrantOffset;
 		if(fy < 0) dir += dir % 2 ? nextQuadrantOffset : previousQuadrantOffset;
 		return dir % quadrantNumber;
@@ -150,7 +150,7 @@ type CoveredInfo = [number, number, Point[]];
 		return j.q1 == this ? j.q2! : j.q1!;
 	}
 
-	public $distTriple(q1: Quadrant, q2: Quadrant) {
+	public $distTriple(q1: Quadrant, q2: Quadrant): { d1: number, d2: number, d3: number } {
 		return this.$design.$tree.$distTriple(this._flap.node, q1._flap.node, q2._flap.node);
 	}
 
@@ -179,7 +179,7 @@ type CoveredInfo = [number, number, Point[]];
 	}
 
 	/** 產生此象限距離 d（含半徑！）的輪廓起點 */
-	public $getStart(d: Fraction) {
+	public $getStart(d: Fraction): Point {
 		return this.$point.add(this.sv.$scale(d));
 	}
 
@@ -208,7 +208,7 @@ type CoveredInfo = [number, number, Point[]];
 	 *
 	 * @exports
 	 */
-	public debug(d: number = 0) {
+	public debug(d: number = 0): void {
 		debug = true;
 		console.log(this.$makeContour(d).map(p => p.toString()));
 		debug = false;

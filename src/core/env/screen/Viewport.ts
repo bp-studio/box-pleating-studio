@@ -43,14 +43,14 @@ abstract class Viewport {
 	}
 
 	/** 視窗大小有變動的時候重設 canvas 大小 */
-	protected _setSize() {
+	protected _setSize(): void {
 		if(this._lockViewport) return;
 		this._viewWidth = this._el.clientWidth;
 		this._viewHeight = this._el.clientHeight;
 	}
 
 	/** 根據自身狀態來幫助設定 paper project 的大小 */
-	protected _setupViewport(size: paper.Size) {
+	protected _setupViewport(size: paper.Size): void {
 		let [w, h] = [this._viewWidth, this._viewHeight];
 		if(this._lockViewport) size.set(w, h);
 		else size.set(this._el.clientWidth, this._el.clientHeight);

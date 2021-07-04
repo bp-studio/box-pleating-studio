@@ -20,11 +20,11 @@
 		this.$addItem(Layer.$drag, this._rectangle = new paper.Path.Rectangle(Style.$selection));
 	}
 
-	public $contains(point: paper.Point) {
+	public $contains(point: paper.Point): boolean {
 		return this._rectangle.contains(point);
 	}
 
-	protected $render() {
+	protected $render(): void {
 		this._rectangle.visible = this.$visible;
 		if(this.$visible) {
 			let r = new paper.Path.Rectangle({

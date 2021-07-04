@@ -15,11 +15,11 @@ interface JFlap {
 
 @shrewd class Flap extends IndependentDraggable implements ISerializable<JFlap> {
 
-	public get $type() { return "Flap"; }
-	public get $tag() { return "f" + this.node.id; }
+	public get $type(): string { return "Flap"; }
+	public get $tag(): string { return "f" + this.node.id; }
 
 	/** @exports */
-	public get width() { return this.mWidth; }
+	public get width(): number { return this.mWidth; }
 	public set width(v: number) {
 		if(v >= 0 && v <= this.$sheet.width) {
 			let d = this.$location.x + v - this.$sheet.width;
@@ -30,7 +30,7 @@ interface JFlap {
 	@action private mWidth: number = 0;
 
 	/** @exports */
-	public get height() { return this.mHeight; }
+	public get height(): number { return this.mHeight; }
 	public set height(v: number) {
 		if(v >= 0 && v <= this.$sheet.height) {
 			let d = this.$location.y + v - this.$sheet.height;
@@ -45,11 +45,13 @@ interface JFlap {
 
 	public readonly $quadrants: PerQuadrant<Quadrant>;
 
-	public $selectableWith(c: Control) { return c instanceof Flap; }
+	public $selectableWith(c: Control): boolean { return c instanceof Flap; }
 
-	@shrewd public get $dragSelectAnchor() {
+	@shrewd public get $center(): IPoint {
 		return { x: this.$location.x + this.width / 2, y: this.$location.y + this.height / 2 };
 	}
+
+	public get $dragSelectAnchor(): IPoint { return this.$center; }
 
 	/** 這個 {@link Flap} 的各象限上的頂點 */
 	@shrewd public get $points(): readonly Point[] {
@@ -64,11 +66,11 @@ interface JFlap {
 	}
 
 	/** @exports */
-	public get name() { return this.node.name; }
+	public get name(): string { return this.node.name; }
 	public set name(n) { this.node.name = n; }
 
 	/** @exports */
-	public get radius() { return this.node.$radius; }
+	public get radius(): number { return this.node.$radius; }
 	public set radius(r) {
 		let e = this.node.$leafEdge;
 		if(e) e.length = r;
@@ -98,7 +100,7 @@ interface JFlap {
 		design.$history?.$construct(this.$toMemento());
 	}
 
-	protected $onDragged() {
+	protected $onDragged(): void {
 		if(this.$isNew) Draggable.$relocate(this, this.$design.$vertices.get(this.node)!);
 	}
 
@@ -125,7 +127,7 @@ interface JFlap {
 		};
 	}
 
-	protected $constraint(v: Vector, location: Readonly<IPoint>) {
+	protected $constraint(v: Vector, location: Readonly<IPoint>): Vector {
 		this.$sheet.$constraint(v, location);
 		this.$sheet.$constraint(v, {
 			x: location.x + this.width,

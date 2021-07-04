@@ -68,16 +68,16 @@ interface JHistory {
 		this._destruct.push(memento);
 	}
 
-	public $move(target: Draggable, loc: IPoint, relative: boolean = true) {
+	public $move(target: Draggable, loc: IPoint, relative: boolean = true): void {
 		let command = MoveCommand.$create(target, loc, relative);
 		this._enqueue(command);
 	}
 
-	public $add(target: TreeElement) {
+	public $add(target: TreeElement): void {
 		this._enqueue(EditCommand.$add(target));
 	}
 
-	public $remove(target: TreeElement) {
+	public $remove(target: TreeElement): void {
 		this._enqueue(EditCommand.$remove(target));
 	}
 

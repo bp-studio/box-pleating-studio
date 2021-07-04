@@ -31,7 +31,7 @@ class ScrollController {
 		return this._scrolling;
 	}
 
-	public $init() {
+	public $init(): void {
 		this._scrolling = true;
 	}
 
@@ -64,7 +64,7 @@ class ScrollController {
 		this._timeout = window.setTimeout(() => this._timeoutHandler(), ScrollController._TIMEOUT);
 	}
 
-	private _timeoutHandler() {
+	private _timeoutHandler(): void {
 		let sheet = this._studio.$design?.sheet;
 		if(sheet && (sheet.$scroll.x != this._studio.$el.scrollLeft ||
 			sheet.$scroll.y != this._studio.$el.scrollTop)) {
@@ -72,26 +72,26 @@ class ScrollController {
 		}
 	}
 
-	public to(x: number, y: number) {
+	public to(x: number, y: number): void {
 		this._scrollLock = true;
 		this._studio.$el.scrollTo(x, y);
 	}
 
-	private _bodyMenu(event: MouseEvent) {
+	private _bodyMenu(event: MouseEvent): void {
 		// 右鍵捲動的情況中，這個事件會比右鍵放開還要早觸發，
 		// 而這個攔截掉也會導致後者不會觸發，所以該做的事情都要在這邊處理
 		event.preventDefault();
 		this._scrolling = false;
 	}
 
-	private _bodyMouseup(event: MouseEvent | TouchEvent) {
+	private _bodyMouseup(event: MouseEvent | TouchEvent): void {
 		if(System.$isTouch(event) && event.touches.length == 0) {
 			// paper.js 的奇怪設計使得多點觸控的第二點放開必須獨立攔截
 			this._scrolling = false;
 		}
 	}
 
-	private _bodyMousemove(event: MouseEvent | TouchEvent) {
+	private _bodyMousemove(event: MouseEvent | TouchEvent): void {
 		if(!this._studio.$design) return;
 
 		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留

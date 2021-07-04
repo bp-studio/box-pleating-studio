@@ -54,18 +54,19 @@ class Step implements ISerializable<JStep> {
 	@nonEnumerable private _timeout: number;
 
 	/** 重置自動鎖定 */
-	private _reset() {
+	private _reset(): void {
 		if(this._timeout) clearTimeout(this._timeout);
 		if(!this._fixed) this._timeout = window.setTimeout(() => this._fix(), Step._AUTO_RESET);
 	}
 
 	/** 自動鎖定自身 */
-	private _fix() {
+	private _fix(): void {
 		if(this._design.$dragging) this._reset(); // 還在拖曳中的話先不鎖定
 		else this._fixed = true;
 	}
 
-	public $tryAdd(commands: readonly Command[], construct: Memento[], destruct: Memento[]) {
+	public $tryAdd(commands: readonly Command[],
+		construct: Memento[], destruct: Memento[]): boolean {
 		// 已經操作過的 Step 是無法被合併的
 		if(this._fixed) return false;
 
@@ -91,7 +92,7 @@ class Step implements ISerializable<JStep> {
 		return this._commands.every(c => c.$isVoid);
 	}
 
-	public $undo() {
+	public $undo(): void {
 		// undo 的時候以相反順序執行
 		let com = this._commands.concat().reverse();
 		for(let c of com) c.$undo();
@@ -102,7 +103,7 @@ class Step implements ISerializable<JStep> {
 		this._fixed = true;
 	}
 
-	public $redo() {
+	public $redo(): void {
 		for(let c of this._commands) c.$redo();
 		for(let memento of this._construct) this._design.$options.set(...memento);
 		this._design.mode = this._mode;
@@ -124,7 +125,7 @@ class Step implements ISerializable<JStep> {
 		return result;
 	}
 
-	private _restoreSelection(tags: string[]) {
+	private _restoreSelection(tags: string[]): void {
 		this._design.sheet.$clearSelection();
 		for(let tag of tags) {
 			let obj = this._design.$query(tag);

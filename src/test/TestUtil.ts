@@ -8,7 +8,7 @@ const studio = new MockStudio();
 // To enable this feature, use `"console": "integratedTerminal"` in launch.json.
 let isTTY = process.stdout.isTTY;
 
-function log(s: string) {
+function log(s: string): void {
 	if(isTTY) {
 		process.stdout.clearLine(-1);
 		process.stdout.cursorTo(0);
@@ -18,7 +18,7 @@ function log(s: string) {
 	}
 }
 
-function sleep(ms: number) {
+function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
@@ -30,7 +30,7 @@ class TestUtil {
 
 	public static warnings: unknown[];
 
-	public static async run(tests: Function[]) {
+	public static async run(tests: Function[]): Promise<void> {
 		let assert = console.assert;
 		let warn = console.warn;
 		let pass: boolean = true;

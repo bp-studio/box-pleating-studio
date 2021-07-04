@@ -22,13 +22,16 @@ class AddOn extends Region implements JAddOn {
 		this.dir = data.dir;
 	}
 
-	@onDemand public get $shape() {
+	@onDemand public get $shape(): {
+		contour: Point[],
+		ridges: Line[]
+	} {
 		let contour = this.contour.map(p => new Point(p));
 		let ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
 		return { contour, ridges };
 	}
 
-	@onDemand public get $direction() {
+	@onDemand public get $direction(): Vector {
 		return new Vector(this.dir).$reduceToInt();
 	}
 

@@ -28,22 +28,22 @@
 		this._component = new RiverHelperBase(this, flap);
 	}
 
-	public $contains(point: paper.Point) {
+	public $contains(point: paper.Point): boolean {
 		let vm = this._control.$design.$viewManager;
 		return vm.$contains(this._control.$sheet, point) &&
 			(this.hinge.contains(point) || this.hinge.hitTest(point) !== null);
 	}
 
-	@shrewd public get $circle() {
+	@shrewd public get $circle(): paper.Path {
 		return this._makeRectangle(0);
 	}
 
-	@shrewd public get $circleJSON() {
+	@shrewd public get $circleJSON(): string {
 		return this.$circle.exportJSON();
 	}
 
 	/** 產生（附加額外距離 d）的矩形，預設會帶有圓角 */
-	private _makeRectangle(d: number) {
+	private _makeRectangle(d: number): paper.Path {
 		let p = this._control.$points, r = this._control.node.$radius + d;
 		return new paper.Path.Rectangle({
 			from: [p[2].x - r, p[2].y - r],
@@ -54,21 +54,21 @@
 
 	private _jsonCache: string[] = [];
 
-	public $makeJSON(d: number) {
+	public $makeJSON(d: number): string {
 		if(this._control.$selected) return this._makeRectangle(d).exportJSON();
 		return this._jsonCache[d] = this._jsonCache[d] || this._makeRectangle(d).exportJSON();
 	}
 
-	@shrewd private _clearCache() {
+	@shrewd private _clearCache(): void {
 		if(!this._control.$design.$dragging && this._jsonCache.length) this._jsonCache = [];
 	}
 
-	public get $closure() {
+	public get $closure(): PolyBool.Shape {
 		return this._component.$shape;
 	}
 
 	/** 這個獨立出來以提供 {@link RiverView} 的相依 */
-	@shrewd public $renderHinge() {
+	@shrewd public $renderHinge(): void {
 		if(this._control.$disposed) return;
 		this._circle.visible = this.$studio?.$display.$settings.showHinge ?? false;
 		let paths = PaperUtil.$fromShape(this.$closure);
@@ -77,7 +77,7 @@
 		else debugger;
 	}
 
-	protected $render() {
+	protected $render(): void {
 		let w = this._control.width, h = this._control.height;
 
 		this._circle.copyContent(this.$circle);
@@ -101,11 +101,11 @@
 		this._shade.copyContent(this.hinge);
 	}
 
-	protected $renderUnscaled() {
+	protected $renderUnscaled(): void {
 		let ds = this._control.$sheet.$displayScale;
 		let w = this._control.width, h = this._control.height;
 
-		let fix = (p: paper.Point) => [p.x * ds, -p.y * ds];
+		let fix = (p: paper.Point): number[] => [p.x * ds, -p.y * ds];
 		makePerQuadrant(i => {
 			let pt = this._control.$points[i].$toPaper();
 			this._dots[i].position.set(fix(pt));
@@ -118,7 +118,7 @@
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */
-	@shrewd private _renderDot() {
+	@shrewd private _renderDot(): void {
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		let s = 3 * this._drawScale ** 0.75;
 		makePerQuadrant(i => {
@@ -129,12 +129,12 @@
 		});
 	}
 
-	protected $renderSelection(selected: boolean) {
+	protected $renderSelection(selected: boolean): void {
 		this._shade.visible = selected;
 	}
 
 	protected get _labelLocation(): IPoint {
-		return this._control.$dragSelectAnchor;
+		return this._control.$center;
 	}
 
 	protected get _labelAvoid(): paper.Path[] {

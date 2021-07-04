@@ -16,7 +16,7 @@
 		return super.$shouldDispose || this.$flap.$disposed;
 	}
 
-	protected $onDispose() {
+	protected $onDispose(): void {
 		// @ts-ignore
 		delete this.$flap;
 	}

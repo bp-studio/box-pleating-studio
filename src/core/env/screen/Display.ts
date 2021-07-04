@@ -94,7 +94,7 @@ interface DisplaySetting {
 		}
 	}
 
-	public $zoom(zoom: number, relativeCenter?: IPoint) {
+	public $zoom(zoom: number, relativeCenter?: IPoint): void {
 		// 檢查
 		if(zoom < Sheet.$FULL_ZOOM) zoom = Sheet.$FULL_ZOOM;
 		let sheet = this._design?.sheet;
@@ -114,15 +114,15 @@ interface DisplaySetting {
 	}
 
 	/** 刷新繪製 */
-	public $update() {
+	public $update(): void {
 		this._project.view.update();
 	}
 
-	public $addToLayer(item: paper.Item, layer: Layer) {
+	public $addToLayer(item: paper.Item, layer: Layer): void {
 		this._project.layers[layer].addChild(item);
 	}
 
-	@shrewd private _renderSetting() {
+	@shrewd private _renderSetting(): void {
 		let notLayout = this._studio.$design?.mode != "layout" ?? false;
 		this._project.layers[Layer.$hinge].visible = this.$settings.showHinge;
 		this._project.layers[Layer.$ridge].visible = this.$settings.showRidge || notLayout;
@@ -131,7 +131,7 @@ interface DisplaySetting {
 		this._project.layers[Layer.$dot].visible = this.$settings.showDot || notLayout;
 	}
 
-	@shrewd public $render() {
+	@shrewd public $render(): void {
 		let width = 0, height = 0, scale = this.$scale;
 
 		// 取得基本的數值
@@ -179,7 +179,7 @@ interface DisplaySetting {
 	}
 
 	/** 遞迴移除所有具有 `visibility="hidden"` 屬性的標籤 */
-	private _removeHidden(node: Element) {
+	private _removeHidden(node: Element): void {
 		let children = Array.from(node.children);
 		for(let c of children) {
 			if(c.getAttribute('visibility') == 'hidden') node.removeChild(c);

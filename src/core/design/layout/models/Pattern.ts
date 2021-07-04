@@ -14,7 +14,7 @@ type GPattern = JPattern<Gadget>;
 
 @shrewd class Pattern extends SheetObject implements ISerializable<JPattern>, IQueryable {
 
-	public get $tag() {
+	public get $tag(): string {
 		return this.$configuration.$tag + "." + this.$configuration.$indexOf(this);
 	}
 
@@ -23,7 +23,7 @@ type GPattern = JPattern<Gadget>;
 		else return this.$devices[Number(tag)];
 	}
 
-	public static $getSignature(pattern: JPattern) {
+	public static $getSignature(pattern: JPattern): string {
 		let devices = pattern.devices;
 		pattern.devices = pattern.devices.map(d => {
 			d = clone(d);
@@ -64,7 +64,7 @@ type GPattern = JPattern<Gadget>;
 		return super.$shouldDispose || this.$configuration.$disposed;
 	}
 
-	@shrewd public get _isActive() {
+	@shrewd public get _isActive(): boolean {
 		return this.$configuration._isActive && this.$configuration.entry == this;
 	}
 

@@ -32,7 +32,7 @@
 			);
 		}
 
-		private async note() {
+		private async note(): Promise<void> {
 			await core.libReady;
 			this.modal.show();
 			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;

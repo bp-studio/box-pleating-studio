@@ -36,7 +36,7 @@
 			this.shown = true;
 		}
 
-		private hide() {
+		private hide(): void {
 			// 已知設定延遲為 10 在某些版本的 Safari 上面是不夠的，所以安全起見設成 50
 			const HIDDEN_DELAY = 50;
 			if(this.shown) {

@@ -19,11 +19,11 @@
 		this.$addItem(Layer.$shade, this._shade = new paper.CompoundPath(Style.$shade));
 	}
 
-	public $contains(point: paper.Point) {
+	public $contains(point: paper.Point): boolean {
 		return this._shade.contains(point);
 	}
 
-	protected $render() {
+	protected $render(): void {
 		let path: paper.PathItem | null = null;
 		for(let r of this._control.$regions) {
 			let cPath = this._contourToPath(r.$shape.contour);
@@ -44,7 +44,7 @@
 		return path;
 	}
 
-	protected $renderSelection(selected: boolean) {
+	protected $renderSelection(selected: boolean): void {
 		this._shade.visible = selected ||
 			this._control.$pattern.$configuration.$repository.$stretch.$selected;
 	}

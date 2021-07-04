@@ -36,7 +36,7 @@ class OptionManager {
 	/**
 	 * 設定一個指定類別和 id 的、預期會被自動生成的元件的初始設定值。
 	 */
-	public set(tag: string, option: object) {
+	public set(tag: string, option: object): void {
 		this._options.set(tag, option);
 	}
 }

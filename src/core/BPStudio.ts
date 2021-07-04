@@ -34,7 +34,7 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public get design(): Design | null { return this._studio.$design; }
-	public set design(d) {
+	public set design(d: unknown) {
 		if(d !== null && !(d instanceof Design)) return;
 		this._studio.$design = d;
 	}
@@ -94,7 +94,7 @@ class BPStudio {
 	}
 
 	/** 導覽至對偶的 {@link Control} */
-	public goToDual(subject: unknown) {
+	public goToDual(subject: unknown): void {
 		let design = this._studio.$design;
 		if(!design) return;
 
@@ -189,10 +189,10 @@ class BPStudio {
 	// 歷史操作
 	//////////////////////////////////////////////////////////////////
 
-	public notifySaveAll() {
+	public notifySaveAll(): void {
 		for(let d of this._studio.$designMap.values()) d.$history?.$notifySave();
 	}
-	public notifySave(design: unknown) {
+	public notifySave(design: unknown): void {
 		this._getHistory(design)?.$notifySave();
 	}
 	public isModified(design: unknown): boolean {

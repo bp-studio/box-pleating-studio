@@ -30,7 +30,7 @@ abstract class LabeledView<T extends Control> extends ControlView<T> {
 		this.$addItem(Layer.$label, this._label = new paper.PointText(Style.$label));
 	}
 
-	@shrewd private _drawUnscaled() {
+	@shrewd private _drawUnscaled(): void {
 		this.$mountEvents();
 		if(!this.$studio) return;
 		this.$studio.$display.$render();

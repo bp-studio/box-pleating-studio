@@ -33,7 +33,7 @@
 		let arr: Junction[];
 		let set = new Set<Junction>(this.$active);
 		let result = new Map<string, Junction[]>();
-		function add(junction: Junction) {
+		function add(junction: Junction): void {
 			if(!set.has(junction)) return;
 			arr.push(junction);
 			set.delete(junction);

@@ -88,7 +88,9 @@ class JoinerCore {
 	 * 值得注意的是這四個點不一定總是存在；
 	 * 如果兩個 {@link Gadget} 的角度非常地「直」，可能只有其中一對會有。
 	 */
-	private _baseJoinIntersections() {
+	private _baseJoinIntersections(): {
+		D1: Point; D2: Point; B1: Point; B2: Point; delta: Line;
+	} {
 		let { bv, c1, c2, pt } = this.data;
 		let delta = new Line(this._deltaPt, Quadrant.QV[0]), beta = new Line(pt, bv);
 		let D1 = c1.e.$intersection(delta)!, D2 = c2.e.$intersection(delta)!;
@@ -211,7 +213,7 @@ class JoinerCore {
 	 *
 	 * 傳入的兩個陣列參數是從離融合點最遠的頂點開始列舉（不包含融合點本身）。
 	 */
-	private _setupDetour(dt1: Point[], dt2: Point[]) {
+	private _setupDetour(dt1: Point[], dt2: Point[]): void {
 		let { c1, c2 } = this.data;
 		let shouldReverse2 = this.joiner.cw;
 		c1.$setupDetour(dt1, !shouldReverse2);

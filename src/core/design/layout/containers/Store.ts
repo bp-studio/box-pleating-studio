@@ -53,7 +53,7 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 		}
 	}
 
-	protected $restore(prototypes: P[], index: number) {
+	protected $restore(prototypes: P[], index: number): void {
 		this._cache = prototypes;
 		this.index = index;
 	}

@@ -16,7 +16,7 @@ interface JConfiguration {
 @shrewd class Configuration extends Store<JPattern, Pattern>
 	implements ISerializable<JConfiguration> {
 
-	public get $tag() {
+	public get $tag(): string {
 		return this.$repository.$tag + "." + this.$repository.$indexOf(this);
 	}
 
@@ -66,11 +66,11 @@ interface JConfiguration {
 		return super.$shouldDispose || this.$repository.$disposed;
 	}
 
-	@shrewd public get _isActive() {
+	@shrewd public get _isActive(): boolean {
 		return this.$repository._isActive && this.$repository.entry == this;
 	}
 
-	protected $builder(prototype: JPattern) {
+	protected $builder(prototype: JPattern): Pattern {
 		return new Pattern(this, prototype);
 	}
 
@@ -79,7 +79,7 @@ interface JConfiguration {
 		if(this._seed) yield this._seed;
 
 		// 過濾掉跟存檔一樣的 Pattern
-		let filter = (pattern: JPattern) =>
+		let filter = (pattern: JPattern): boolean =>
 			!this._seedSignature || this._seedSignature != Pattern.$getSignature(pattern);
 		yield* GeneratorUtil.$filter(this._search([]), filter);
 	}
@@ -190,7 +190,7 @@ interface JConfiguration {
 	}
 
 	/** 取得 delta 點相對於特定 Gadget 的座標 */
-	private _getRelativeDelta(j1: JJunction, j2: JJunction, g: Gadget) {
+	private _getRelativeDelta(j1: JJunction, j2: JJunction, g: Gadget): Point {
 		let oriented = j1.c[0].e == j2.c[0].e;
 		let r = Partitioner.$getMaxIntersectionDistance(this.$design.$tree, j1, j2, oriented);
 		if(j2.ox > j1.ox) [j1, j2] = [j2, j1];
@@ -209,7 +209,7 @@ interface JConfiguration {
 	/** 是否為第一次產生 Memento */
 	private _initMemento = true;
 
-	public $getMemento() {
+	public $getMemento(): JPattern<JGadget>[] {
 		// 第一次產生（即建構）的時候直接使用 this._prototypes 的資料即可，因為還沒有任何移動；
 		// 之後才是真的根據 this.memento 的資料來生。
 		let result = this._initMemento ? this._prototypes :

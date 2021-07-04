@@ -1,5 +1,5 @@
 
-function DoubleMapBasic() {
+function DoubleMapBasic(): void {
 
 	let m = new DoubleMap<string, number>();
 	m.set("a", "b", 2);

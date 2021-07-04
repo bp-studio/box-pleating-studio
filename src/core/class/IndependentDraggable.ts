@@ -12,10 +12,10 @@ abstract class IndependentDraggable extends Draggable {
 	private _isNew: boolean = true;
 
 	/** 這個物件自從建構以來，{@link Design} 是否尚未切換過 {@link Sheet} */
-	protected get $isNew() { return this._isNew; }
+	protected get $isNew(): boolean { return this._isNew; }
 	protected set $isNew(v) { if(!v) this._isNew = v; }
 
-	@shrewd private _watchIsNew() {
+	@shrewd private _watchIsNew(): void {
 		if(this._isNew && this.$sheet != this.$design.sheet) this._isNew = false;
 	}
 

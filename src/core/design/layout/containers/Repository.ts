@@ -16,7 +16,7 @@ interface JRepository {
 @shrewd class Repository extends Store<Configuration, Configuration>
 	implements ISerializable<JRepository> {
 
-	public get $tag() {
+	public get $tag(): string {
 		return "r" + this.$stretch.$signature;
 	}
 
@@ -28,7 +28,7 @@ interface JRepository {
 
 	private readonly joinerCache: Map<string, Joiner> = new Map();
 
-	protected $builder(prototype: Configuration) {
+	protected $builder(prototype: Configuration): Configuration {
 		// Repository 沒辦法使用快速建構機制，
 		// 因為它在生成的時候必須先確定 Configuration 裡面真的有 Pattern，
 		// 所以它當場就必須把 Configuration 的實體建構完畢。
@@ -54,7 +54,7 @@ interface JRepository {
 	private _everActive: boolean = false;
 
 	/** 一旦安定下來了之後就記錄自己的建構 */
-	@shrewd private _onSettle() {
+	@shrewd private _onSettle(): void {
 		if(!this._everActive && this._isActive && !this.$design.$dragging) {
 			this._everActive = true;
 
@@ -72,7 +72,7 @@ interface JRepository {
 			!this._isActive && !this.$design.$dragging;
 	}
 
-	protected $onDispose() {
+	protected $onDispose(): void {
 		if(this._everActive) this.$design.$history?.$destruct(this.$toMemento());
 		super.$onDispose();
 	}

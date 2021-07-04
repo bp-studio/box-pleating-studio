@@ -12,7 +12,7 @@ interface JMoveCommand extends JCommand {
 
 class MoveCommand extends Command implements JMoveCommand {
 
-	public static $create(target: Draggable, loc: IPoint, relative: boolean = true) {
+	public static $create(target: Draggable, loc: IPoint, relative: boolean = true): MoveCommand {
 		if(relative) {
 			loc.x += target.$location.x;
 			loc.y += target.$location.y;
@@ -46,7 +46,7 @@ class MoveCommand extends Command implements JMoveCommand {
 			command.new.x == this.old.x && command.new.y == this.old.y;
 	}
 
-	public $addTo(command: Command) {
+	public $addTo(command: Command): void {
 		Draggable.$assign((command as MoveCommand).new, this.new);
 	}
 
@@ -54,13 +54,13 @@ class MoveCommand extends Command implements JMoveCommand {
 		return this.old.x == this.new.x && this.old.y == this.new.y;
 	}
 
-	public $undo() {
+	public $undo(): void {
 		let obj = this._design.$query(this.tag)!;
 		if(obj instanceof Draggable) Draggable.$assign(obj.$location, this.old);
 		else debugger;
 	}
 
-	public $redo() {
+	public $redo(): void {
 		let obj = this._design.$query(this.tag)!;
 		if(obj instanceof Draggable) Draggable.$assign(obj.$location, this.new);
 		else debugger;

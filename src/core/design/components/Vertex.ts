@@ -15,8 +15,8 @@ interface JVertex extends IPoint {
 
 @shrewd class Vertex extends IndependentDraggable implements ISerializable<JVertex> {
 
-	public get $type() { return "Vertex"; }
-	public get $tag() { return "v" + this.$node.id; }
+	public get $type(): string { return "Vertex"; }
+	public get $tag(): string { return "v" + this.$node.id; }
 
 	public readonly $node: TreeNode;
 
@@ -54,24 +54,24 @@ interface JVertex extends IPoint {
 	public readonly width = 0;
 
 	/** @exports */
-	public get name() { return this.$node.name; }
-	public set name(n) { this.$node.name = n; }
+	public get name(): string { return this.$node.name; }
+	public set name(n: string) { this.$node.name = n; }
 
 	/** @exports */
-	public get degree() { return this.$node.$degree; }
+	public get degree(): number { return this.$node.$degree; }
 
-	public $selectableWith(c: Control) { return c instanceof Vertex; }
+	public $selectableWith(c: Control): boolean { return c instanceof Vertex; }
 
 	public get $dragSelectAnchor(): IPoint {
 		return this.$location;
 	}
 
-	protected $onDragged() {
+	protected $onDragged(): void {
 		if(this.$isNew) Draggable.$relocate(this, this.$design.$flaps.get(this.$node)!);
 	}
 
 	/** @exports */
-	public addLeaf(length = 1) {
+	public addLeaf(length = 1): void {
 		// 在新增 TreeNode 之前先把全體 Vertex 快取起來，
 		// 不然等一下讀取 design.vertices 會觸發新的 Vertex 的自動生成，
 		// 而那會比我設置 option 更早
@@ -115,12 +115,12 @@ interface JVertex extends IPoint {
 	}
 
 	/** @exports */
-	public delete() {
+	public delete(): void {
 		this.$node.$delete();
 	}
 
 	/** @exports */
-	public deleteAndJoin() {
+	public deleteAndJoin(): void {
 		if(this.$node.$degree != 2) return;
 		let edge = this.$node.$dispose()!;
 		let json = edge.toJSON();
@@ -141,7 +141,7 @@ interface JVertex extends IPoint {
 		};
 	}
 
-	protected $constraint(v: Vector, location: Readonly<IPoint>) {
+	protected $constraint(v: Vector, location: Readonly<IPoint>): Vector {
 		this.$sheet.$constraint(v, location);
 		return v;
 	}

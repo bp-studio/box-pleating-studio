@@ -43,7 +43,7 @@ interface IDisposable {
 	}
 
 	/** 手動棄置，繼承類別可以攔截這個操作並決定是否可以棄置。 */
-	public $dispose() {
+	public $dispose(): void {
 		this._disposed = true;
 	}
 
@@ -61,7 +61,7 @@ interface IDisposable {
 	 *
 	 * 提供這個非反應的公開存取子是為了避免在 terminate 的瞬間凍結住結果的值。
 	 */
-	public get $disposed() {
+	public get $disposed(): boolean {
 		return this._disposed;
 	}
 }

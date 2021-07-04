@@ -9,7 +9,7 @@ namespace KeyboardController {
 
 	let _states: Record<string, boolean> = {};
 
-	function _set(e: KeyboardEvent, on: boolean) {
+	function _set(e: KeyboardEvent, on: boolean): void {
 		_states[e.code.toLowerCase()] = on;
 		_states[e.key.toLowerCase()] = on;
 	}

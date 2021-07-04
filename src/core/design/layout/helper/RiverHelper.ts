@@ -25,7 +25,7 @@
 		return super.$shouldDispose || !this._view.$info.components.some(c => c == this._key);
 	}
 
-	protected $onDispose() {
+	protected $onDispose(): void {
 		super.$onDispose();
 		// @ts-ignore
 		delete this._node;

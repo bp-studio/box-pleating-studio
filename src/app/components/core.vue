@@ -200,7 +200,7 @@
 			});
 		}
 
-		private async save() {
+		private async save(): Promise<void> {
 			// 拖曳的時候存檔無意義且浪費效能，跳過
 			if(bp.isDragging) return;
 

@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2020-2021 Mu-Tsun Tsai
+Copyright (c) 2020-PRESENT Mu-Tsun Tsai
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -80,7 +80,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	}
 
 	/** 處理繞道 */
-	private _processDetour(ridges: Line[], contour: Point[], d: IPoint[]) {
+	private _processDetour(ridges: Line[], contour: Point[], d: IPoint[]): void {
 		let detour = d.map(p => new Point(p.x, p.y).addBy(this._shift));
 		let start = detour[0], end = detour[detour.length - 1];
 
@@ -136,16 +136,16 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		return new Vector(oy + v, v).$doubleAngle().$reduceToInt();
 	}
 
-	public get sx() {
+	public get sx(): number {
 		return this.oy + this.u + this.v;
 	}
 
-	public get sy() {
+	public get sy(): number {
 		return this.ox + this.u + this.v;
 	}
 
 	/** 在指定的 SCR 之下反轉自己 */
-	public $reverse(tx: number, ty: number) {
+	public $reverse(tx: number, ty: number): void {
 		let { shift, detours, sx, sy } = this;
 		shift = shift || { x: 0, y: 0 };
 		let s = { x: tx - sx - shift.x, y: ty - sy - shift.y };
@@ -156,7 +156,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	}
 
 	/** 等比例縮小一個 Piece；會重設計算快取 */
-	public $shrink(by: number = 2) {
+	public $shrink(by: number = 2): this {
 		onDemandMap.delete(this);
 		this.ox /= by;
 		this.oy /= by;
@@ -166,7 +166,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	}
 
 	/** 根據 {@link Gadget} 偏移來進行設置；必要時會重設計算快取 */
-	public $offset(o?: IPoint) {
+	public $offset(o?: IPoint): void {
 		if(!o || this._offset && this._offset.x == o.x && this._offset.y == o.y) return;
 		this._offset = o;
 		onDemandMap.delete(this);
@@ -177,7 +177,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	 *
 	 * 加入的繞道會被複製；其座標應該是要不包含 offset。
 	 */
-	public $addDetour(detour: IPoint[]) {
+	public $addDetour(detour: IPoint[]): void {
 		detour = clone(detour);
 		// 檢查輸入的繞道
 		for(let i = 0; i < detour.length - 1; i++) {
@@ -193,7 +193,7 @@ class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		onDemandMap.delete(this);
 	}
 
-	public $clearDetour() {
+	public $clearDetour(): void {
 		if(this.detours?.length) {
 			this.detours = undefined;
 			onDemandMap.delete(this);

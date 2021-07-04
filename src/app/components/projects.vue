@@ -83,7 +83,7 @@
 		private tabHistory: number[] = [];
 		private confirming: Promise<unknown> = Promise.resolve();
 
-		private scrollTo(id: number) {
+		private scrollTo(id: number): void {
 			Vue.nextTick(() => {
 				let el = document.getElementById(`tab${id}`);
 				if(el) {
@@ -95,7 +95,7 @@
 			});
 		}
 
-		private checkTitle(j: { title: string }) {
+		private checkTitle(j: { title: string }): { title: string; } {
 			let t = j.title.replace(/ - \d+$/, ""), n = 1;
 			let designs = bp.getDesigns();
 			if(!designs.some(d => d.title == t)) return j;
@@ -105,7 +105,7 @@
 			return j;
 		}
 
-		private async closeBy(predicate: (i: number) => boolean) {
+		private async closeBy(predicate: (i: number) => boolean): Promise<void> {
 			let promises: Promise<boolean>[] = [];
 			for(let i of this.designs.concat()) if(predicate(i)) promises.push(this.closeCore(i));
 			await Promise.all(promises);

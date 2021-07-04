@@ -44,7 +44,7 @@ class Rasterizer {
 	/** 手機連續觸發的情況中 afterPrint 也會被連續觸發，用這個偵測出最後一次 */
 	private _debounce: number;
 
-	public $beforePrint() {
+	public $beforePrint(): void {
 		clearTimeout(this._debounce);
 		if(!this._printing &&
 			// 手機上如果列印對話方塊中重新設定樣式，beforePrint 會再次觸發，
@@ -62,7 +62,7 @@ class Rasterizer {
 		}
 	}
 
-	public _afterPrint() {
+	public _afterPrint(): void {
 		this._debounce = window.setTimeout(() => {
 			this._printing = false;
 			this._debounce = NaN;

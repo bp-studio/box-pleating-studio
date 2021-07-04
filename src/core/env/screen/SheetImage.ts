@@ -15,7 +15,7 @@ abstract class SheetImage extends Viewport {
 		return this._studio.$design;
 	}
 
-	@shrewd public get $scale() {
+	@shrewd public get $scale(): number {
 		if(this._design) {
 			let sheet = this._design.sheet;
 			if(!sheet) return 1;

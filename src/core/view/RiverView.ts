@@ -18,7 +18,7 @@
 		this.boundary = new paper.CompoundPath({});
 	}
 
-	public $contains(point: paper.Point) {
+	public $contains(point: paper.Point): boolean {
 		let vm = this._control.$design.$viewManager;
 		return vm.$contains(this._control.$sheet, point) && this._shade.contains(point);
 	}
@@ -77,7 +77,7 @@
 		return [...this._componentMap.values()];
 	}
 
-	protected $onDispose() {
+	protected $onDispose(): void {
 		Shrewd.terminate(this._componentMap);
 		super.$onDispose();
 	}
@@ -126,7 +126,7 @@
 	}
 
 	private _rendered = false;
-	protected $render() {
+	protected $render(): void {
 		PaperUtil.$replaceContent(this.boundary, this._closurePath, false);
 		PaperUtil.$replaceContent(this._shade, this._actualPath, false);
 		PaperUtil.$replaceContent(this._hinge, this._actualPath, false);
@@ -172,7 +172,7 @@
 		return result;
 	}
 
-	@shrewd private _renderRidge() {
+	@shrewd private _renderRidge(): void {
 		// 建立相依性
 		let oa = this._control.$sheet.$design.$stretches.$openAnchors;
 
@@ -199,7 +199,7 @@
 		}
 	}
 
-	protected $renderSelection(selected: boolean) {
+	protected $renderSelection(selected: boolean): void {
 		this._shade.visible = selected;
 	}
 }

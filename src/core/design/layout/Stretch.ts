@@ -18,8 +18,8 @@ interface JStretch {
 
 @shrewd class Stretch extends Control implements ISerializable<JStretch> {
 
-	public get $type() { return "Stretch"; }
-	public get $tag() { return "s" + this.$signature; }
+	public get $type(): string { return "Stretch"; }
+	public get $tag(): string { return "s" + this.$signature; }
 
 	/**
 	 * 構成這個 {@link Stretch} 的所有 {@link Junction} 之陣列。
@@ -105,7 +105,7 @@ interface JStretch {
 		return super.$shouldDispose || !this._isActive && !this.$design.$dragging;
 	}
 
-	@shrewd public get _isActive() {
+	@shrewd public get _isActive(): boolean {
 		// 這個涵蓋了任何一個 Flap 被刪除掉的情況
 		return this.$design.$junctions.$teams.has(this.$signature);
 	}
@@ -118,7 +118,7 @@ interface JStretch {
 		return this.$junctions.every(j => j.$status == JunctionStatus.overlap);
 	}
 
-	@shrewd public get $isTotallyValid() {
+	@shrewd public get $isTotallyValid(): boolean {
 		if(!this._isActive) return false;
 		for(let i = 0; i < this._flaps.length; i++) {
 			for(let j = i + 1; j < this._flaps.length; j++) {

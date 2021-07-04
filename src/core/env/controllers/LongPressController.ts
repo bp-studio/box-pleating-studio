@@ -20,12 +20,12 @@ class LongPressController {
 	}
 
 	/** 長壓設置 */
-	public $init() {
+	public $init(): void {
 		this._timeout = window.setTimeout(this._callback, LongPressController._TIMEOUT);
 	}
 
 	/** 取消長壓；這個除了會在滑鼠或觸控放開時自動執行之外也可以手動呼叫 */
-	public $cancel() {
+	public $cancel(): void {
 		if(this._timeout !== undefined) window.clearTimeout(this._timeout);
 		this._timeout = undefined;
 	}

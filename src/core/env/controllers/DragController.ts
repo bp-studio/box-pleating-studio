@@ -13,11 +13,11 @@
 		document.addEventListener("touchend", this._dragEnd.bind(this));
 	}
 
-	private get _draggable() {
+	private get _draggable(): Draggable[] {
 		return this._studio.$system.$selection.$draggable;
 	}
 
-	public $processKey(key: string) {
+	public $processKey(key: string): boolean {
 		let v = new Vector(0, 0);
 		switch(key) {
 			case "up": v.set(0, 1); break;
@@ -72,7 +72,7 @@
 	}
 
 	/** 結束拖曳 */
-	private _dragEnd() {
+	private _dragEnd(): void {
 		this.$on = false;
 		if(this._studio.$design) this._studio.$design.$dragging = false;
 	}

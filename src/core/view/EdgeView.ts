@@ -12,7 +12,7 @@
 		this._lineRegion = new paper.Path.Line({ strokeWidth: 15 });
 	}
 
-	public $contains(point: paper.Point) {
+	public $contains(point: paper.Point): boolean {
 		let vm = this._control.$design.$viewManager;
 		return (this._lineRegion.hitTest(point) != null ||
 			this._glow.hitTest(point.transform(this._glow.layer.matrix.inverted())) != null) &&
@@ -20,21 +20,21 @@
 			!vm.$contains(this._control.$v2, point);
 	}
 
-	protected $render() {
+	protected $render(): void {
 		let l1 = this._control.$v1.$location, l2 = this._control.$v2.$location;
 		this._lineRegion.segments[0].point.set([l1.x, l1.y]);
 		this._lineRegion.segments[1].point.set([l2.x, l2.y]);
 		this.line.copyContent(this._lineRegion);
 	}
 
-	protected $renderSelection(selected: boolean) {
+	protected $renderSelection(selected: boolean): void {
 		let color = selected ? PaperUtil.$Red() : PaperUtil.$Black();
 		this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		this.line.strokeWidth = selected ? 3 : 2;
 	}
 
-	protected $renderUnscaled() {
+	protected $renderUnscaled(): void {
 		this._label.content = this._control.length.toString();
 	}
 

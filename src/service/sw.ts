@@ -59,7 +59,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('message', event => {
 	event.waitUntil(message(event));
 });
-async function message(event: ExtendableMessageEvent) {
+async function message(event: ExtendableMessageEvent): Promise<void> {
 	if(event.ports[0] && event.data == "id") {
 		let clients = await self.clients.matchAll({ type: 'window' });
 		let tasks: Promise<number>[] = [];

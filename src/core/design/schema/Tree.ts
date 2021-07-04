@@ -56,7 +56,7 @@
 	private _nextId = 0;
 
 	/** 在 JID 啟動的模式之下執行指定操作 */
-	public withJID(action: Action) {
+	public withJID(action: Action): void {
 		let arr = Array.from(this.$node.values()).sort((a, b) => a.id - b.id), i = 0;
 		for(let n of arr) TreeNode.$setJID(n, i++);
 		this._jid = true;
@@ -66,7 +66,7 @@
 
 	private _jid = false;
 
-	public get $jid() { return this._jid; }
+	public get $jid(): boolean { return this._jid; }
 
 	/**
 	 * 利用 LCA 來計算任意兩點之間的距離。
@@ -76,7 +76,7 @@
 	 * 最早採用的演算法是暴力儲存 TreePath 以持續追蹤距離，
 	 * 其耗時 O(1) 但空間消耗高達 O(n^3)，非常可怕，更動也因此極慢。
 	 */
-	public $dist(n1: TreeNode, n2: TreeNode) {
+	public $dist(n1: TreeNode, n2: TreeNode): number {
 		this.$disposeEvent();
 		if(n1 == n2) return 0;
 		return n1.$dist + n2.$dist - 2 * this.lca(n1, n2).$dist;
@@ -97,7 +97,7 @@
 	 * 另一方面這個演算法一旦樹有局部更動就要全部預存資料重新計算（雖然理論上耗時仍然是 O(n)），
 	 * 我實務上會遇到的樹大小應該難以讓這種演算法展現優勢，所以我先不考慮。
 	 */
-	public lca(n1: TreeNode, n2: TreeNode) {
+	public lca(n1: TreeNode, n2: TreeNode): TreeNode {
 		let p1 = n1.$path, p2 = n2.$path, lca = p1[0], i = 1;
 		while(i < p1.length && i < p2.length && p1[i] == p2[i]) lca = p1[i++];
 		return lca;
@@ -109,7 +109,7 @@
 		return this.$edge.get(n1, n2);
 	}
 
-	public $getOrAddNode(n: number) {
+	public $getOrAddNode(n: number): TreeNode {
 		let N: TreeNode;
 		if(this.$node.has(n)) {
 			N = this.$node.get(n)!;
@@ -122,7 +122,7 @@
 		return N;
 	}
 
-	public $split(e: TreeEdge) {
+	public $split(e: TreeEdge): TreeNode {
 		let N = this.$getOrAddNode(this._nextId);
 		let { n1, n2 } = e;
 		if(n1.$parent == n2) [n1, n2] = [n2, n1];
@@ -134,7 +134,7 @@
 		return N;
 	}
 
-	public $deleteAndMerge(e: TreeEdge) {
+	public $deleteAndMerge(e: TreeEdge): TreeNode {
 		let N = this.$getOrAddNode(this._nextId);
 		let { n1, n2, a1, a2 } = e;
 		if(n1.$parent == n2) {
@@ -162,7 +162,7 @@
 		return N;
 	}
 
-	public static $deleteAndJoin(n: TreeNode) {
+	public static $deleteAndJoin(n: TreeNode): TreeEdge | undefined {
 		let edges = n.edges;
 		if(edges.length != 2) {
 			console.warn(`Incorrectly calling delete-and-join at [${n.id}].`);
@@ -213,7 +213,7 @@
 		return this._createEdge(N1, N2, length);
 	}
 
-	private _createEdge(n1: TreeNode, n2: TreeNode, length: number) {
+	private _createEdge(n1: TreeNode, n2: TreeNode, length: number): TreeEdge {
 		let e = new TreeEdge(n1, n2, length);
 		this.$edge.set(n1, n2, e);
 		this.$design.$history?.$add(e);
@@ -221,7 +221,9 @@
 	}
 
 	/** 傳入樹中的三個點，傳回三個點分別到「路口」的距離。 */
-	public $distTriple(n1: TreeNode, n2: TreeNode, n3: TreeNode) {
+	public $distTriple(n1: TreeNode, n2: TreeNode, n3: TreeNode): {
+		d1: number; d2: number; d3: number;
+	} {
 		let d12 = this.$dist(n1, n2);
 		let d13 = this.$dist(n1, n3);
 		let d23 = this.$dist(n2, n3);
@@ -233,7 +235,7 @@
 		};
 	}
 
-	public $remove(obj: TreeElement) {
+	public $remove(obj: TreeElement): void {
 		this.$design.$history?.$remove(obj);
 		obj.$dispose(true);
 	}

@@ -8,9 +8,9 @@
 
 @shrewd class River extends Control {
 
-	public get $type() { return "River"; }
+	public get $type(): string { return "River"; }
 
-	public get $tag() { return "r" + this.edge.$tag; }
+	public get $tag(): string { return "r" + this.edge.$tag; }
 
 	/** @exports */
 	public readonly edge: TreeEdge;
@@ -33,6 +33,6 @@
 	}
 
 	/** @exports */
-	public get length() { return this.edge.length; }
+	public get length(): number { return this.edge.length; }
 	public set length(v) { this.edge.length = v; }
 }

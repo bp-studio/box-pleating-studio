@@ -1,7 +1,7 @@
 
 class MockDisplay implements IDisplay {
 
-	public $zoom(v: number) {
+	public $zoom(v: number): void {
 		// 不作任何動作
 	}
 

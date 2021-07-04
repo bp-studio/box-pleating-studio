@@ -54,7 +54,7 @@
 		return result;
 	}
 
-	@shrewd public get $patternNotFound() {
+	@shrewd public get $patternNotFound(): boolean {
 		return [...this.values()].some(s => s.$isTotallyValid && s.$pattern == null);
 	}
 }

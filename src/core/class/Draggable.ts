@@ -15,14 +15,14 @@ abstract class Draggable extends Control {
 	private _dragOffset: Vector;
 
 	/** 初始化拖曳 */
-	public $dragStart() {
+	public $dragStart(): void {
 		this._dragOffset = CursorController.$offset(this.$location);
 	}
 
 	/** 修正拖曳；可以傳入滑鼠位置或位移向量 */
 	public $dragConstraint(point: Point): Point;
 	public $dragConstraint(vector: Vector): Vector;
-	public $dragConstraint(by: Point | Vector) {
+	public $dragConstraint(by: Point | Vector): Vector | Point {
 		if(by instanceof Vector) {
 			return this.$constraint(by, this.$location);
 		} else {
@@ -35,7 +35,7 @@ abstract class Draggable extends Control {
 	/** 進行拖曳；可以傳入滑鼠位置或位移向量 */
 	public $drag(point: Point): void;
 	public $drag(vector: Vector): void;
-	public $drag(by: Point | Vector) {
+	public $drag(by: Point | Vector): void {
 		if(by instanceof Point) by = by.sub(this._dragOffset);
 		else by = new Point(this.$location).add(by);
 		if(!by.eq(this.$location)) {
@@ -45,7 +45,7 @@ abstract class Draggable extends Control {
 	}
 
 	/** 真的發生拖曳之後的 callback。 */
-	protected $onDragged() {
+	protected $onDragged(): void {
 		// 預設是什麼都不會發生，在 Flap 和 Vertex 中有覆寫此行為。
 	}
 
@@ -65,7 +65,7 @@ abstract class Draggable extends Control {
 	@shrewd public $location: IPoint = { x: 0, y: 0 };
 
 	/** 把 target 移動到 source 的相對應位置上 */
-	public static $relocate(source: Draggable, target: Draggable, init = false) {
+	public static $relocate(source: Draggable, target: Draggable, init = false): void {
 		if(!source || !target) return;
 		// TODO: 不同的形狀的 Sheet 要如何處理
 		let ss = source.$sheet, ts = target.$sheet;
@@ -78,12 +78,12 @@ abstract class Draggable extends Control {
 		else Draggable.$move(target, pt, false);
 	}
 
-	public static $move(target: Draggable, loc: IPoint, relative: boolean = true) {
+	public static $move(target: Draggable, loc: IPoint, relative: boolean = true): void {
 		target.$design.$history?.$move(target, loc, relative);
 		Draggable.$assign(target.$location, loc);
 	}
 
-	public static $assign(target: IPoint, value: IPoint) {
+	public static $assign(target: IPoint, value: IPoint): void {
 		target.x = value.x;
 		target.y = value.y;
 	}

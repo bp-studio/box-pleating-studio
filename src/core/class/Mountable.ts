@@ -28,7 +28,7 @@ abstract class Mountable extends Disposable {
 	}
 
 	/** 事件觸發反應方法 */
-	@shrewd public $mountEvents() {
+	@shrewd public $mountEvents(): void {
 		this.$disposeEvent();
 		if(this.$studio !== this._oldStudio) {
 			if(this.$studio) this.$onMount(this.$studio);
@@ -37,7 +37,7 @@ abstract class Mountable extends Disposable {
 		}
 	}
 
-	protected $onDispose() {
+	protected $onDispose(): void {
 		if(this._oldStudio) this.$onDismount(this._oldStudio);
 		super.$onDispose();
 		// 雖然有 GC 上的風險，但是這邊我們不能把 this.mountTarget 刪除掉，
@@ -50,17 +50,17 @@ abstract class Mountable extends Disposable {
 	 * 預設行為是傳回恆真（亦即其掛載與否永遠和父元件同步），但子元件可以覆寫這個行為，
 	 * 而覆寫的行為通常是根據「父元件是否在某種意義上選取了自己」來決定。
 	 */
-	protected get _isActive() { return true; }
+	protected get _isActive(): boolean { return true; }
 
-	public static $isActive(m: Mountable) { return m._isActive; }
+	public static $isActive(m: Mountable): boolean { return m._isActive; }
 
 	/** 掛載事件 */
-	protected $onMount(studio: IStudio) {
+	protected $onMount(studio: IStudio): void {
 		// 預設行為為空
 	}
 
 	/** 卸載事件 */
-	protected $onDismount(studio: IStudio) {
+	protected $onDismount(studio: IStudio): void {
 		// 預設行為為空
 	}
 }

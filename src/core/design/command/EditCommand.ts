@@ -48,7 +48,7 @@ class EditCommand extends Command implements JEditCommand {
 		return false; // EditCommand 不可能疊加
 	}
 
-	public $addTo(command: Command) {
+	public $addTo(command: Command): void {
 		// EditCommand 不可能疊加
 	}
 
@@ -56,13 +56,13 @@ class EditCommand extends Command implements JEditCommand {
 		return false; // EditCommand 不可能是 void
 	}
 
-	private _remove() {
+	private _remove(): void {
 		let obj = this._design.$query(this.tag);
 		// eslint-disable-next-line no-useless-call
 		if(obj instanceof Disposable) obj.$dispose.call(obj, [true]);
 	}
 
-	private _add() {
+	private _add(): void {
 		let tree = this._design.$tree;
 		if(this.tag.startsWith('e')) {
 			let m = this.memento as JEdge;
@@ -74,11 +74,11 @@ class EditCommand extends Command implements JEditCommand {
 		}
 	}
 
-	public $undo() {
+	public $undo(): void {
 		this.type == CommandType.add ? this._remove() : this._add();
 	}
 
-	public $redo() {
+	public $redo(): void {
 		this.type == CommandType.add ? this._add() : this._remove();
 	}
 }

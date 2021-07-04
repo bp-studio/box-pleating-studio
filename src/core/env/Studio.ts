@@ -41,11 +41,11 @@ interface StudioOptions {
 		this.$updater = new Updater(this);
 	}
 
-	public $historyManagerFactory(design: Design, data: JDesign) {
+	public $historyManagerFactory(design: Design, data: JDesign): HistoryManager {
 		return new HistoryManager(design, data.history);
 	}
 
-	public onDeprecate(title?: string) { this.$option.onDeprecate?.(title); }
+	public onDeprecate(title?: string): void { this.$option.onDeprecate?.(title); }
 
 	public $createBpsBlob(): Blob | null {
 		if(!this.$design) return null;

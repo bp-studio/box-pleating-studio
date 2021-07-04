@@ -75,7 +75,7 @@ class Gadget implements JGadget, ISerializable<JGadget> {
 		});
 	}
 
-	private _getSlack(q: QuadrantDirection) {
+	private _getSlack(q: QuadrantDirection): number {
 		return this.anchors?.[q]?.slack ?? 0;
 	}
 

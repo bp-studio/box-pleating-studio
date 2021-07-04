@@ -21,13 +21,13 @@ class ZoomController {
 		canvas.addEventListener("wheel", this._canvasWheel.bind(this));
 	}
 
-	public $init(event: TouchEvent) {
+	public $init(event: TouchEvent): void {
 		let design = this._studio.$design;
 		if(!design) return;
 		this._touchScaling = [ZoomController._getTouchDistance(event), design.sheet.zoom];
 	}
 
-	public $process(event: TouchEvent) {
+	public $process(event: TouchEvent): void {
 		let design = this._studio.$design;
 		if(!design) return;
 
@@ -41,13 +41,13 @@ class ZoomController {
 		this._touchScaling = [touchDistance, newZoom];
 	}
 
-	private static _getTouchDistance(event: TouchEvent) {
+	private static _getTouchDistance(event: TouchEvent): number {
 		let t = event.touches;
 		let dx = t[1].pageX - t[0].pageX, dy = t[1].pageY - t[0].pageY;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
-	private _canvasWheel(event: WheelEvent) {
+	private _canvasWheel(event: WheelEvent): void {
 		if(event.ctrlKey || event.metaKey) {
 			event.preventDefault();
 			let display = this._studio.$display;

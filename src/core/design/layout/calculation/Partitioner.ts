@@ -24,7 +24,8 @@ class Partitioner extends Disposable {
 	 * @param oriented 共用左下角
 	 */
 	public static $getMaxIntersectionDistance(
-		tree: Tree, r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean) {
+		tree: Tree, r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean
+	): number {
 		let q = oriented ? 2 : 0;
 		let n1 = tree.$node.get(r1.c[q].e!)!;
 		let n2 = tree.$node.get(r2.c[q].e!)!;

@@ -73,7 +73,7 @@
 			this.detectInstallation();
 		}
 
-		private detectInstallation() {
+		private detectInstallation(): void {
 			if('getInstalledRelatedApps' in navigator) {
 				navigator.getInstalledRelatedApps().then(apps => {
 					if(apps.length) this.install = 2;

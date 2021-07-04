@@ -103,7 +103,7 @@
 			gtag('event', 'share', { method: 'app', content_type: 'link' });
 		}
 
-		private async shorten() {
+		private async shorten(): Promise<void> {
 			const SHORT_INTERVAL = 10;
 			this.sending = true;
 			try {

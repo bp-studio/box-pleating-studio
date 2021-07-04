@@ -61,11 +61,11 @@
 			return languages;
 		}
 
-		private format(l: string) {
+		private format(l: string): string {
 			return l.replace(/_/g, "-").toLowerCase();
 		}
 
-		private onLocaleChanged() {
+		private onLocaleChanged(): void {
 			if(i18n.locale in locale) {
 				localStorage.setItem("locale", i18n.locale);
 			} else {

@@ -52,7 +52,7 @@ class Configurator {
 		}
 
 		/** 過濾到跟存檔一樣的 {@link Configuration} */
-		let filter = (config: Configuration) =>
+		let filter = (config: Configuration): boolean =>
 			!this._seedSignature || this._seedSignature != JSON.stringify(config);
 		yield* GeneratorUtil.$filter(this.$search(), filter);
 		callback();
@@ -61,7 +61,7 @@ class Configurator {
 	/** 搜尋的主程式 */
 	private *$search(): Generator<Configuration> {
 		const structure = this._repo.$structure;
-		const filter = (config: Configuration) => config.entry != null;
+		const filter = (config: Configuration): boolean => config.entry != null;
 
 		if(structure.length == 1) {
 			let [j] = structure;

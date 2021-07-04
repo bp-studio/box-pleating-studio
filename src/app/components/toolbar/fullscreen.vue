@@ -38,7 +38,7 @@
 			document.addEventListener('webkitfullscreenchange', () => this.checkFullscreen()); // Safari
 		}
 
-		private checkFullscreen() {
+		private checkFullscreen(): void {
 			this.fullscreen = window.matchMedia('(display-mode: fullscreen)').matches ||
 				Boolean(document.fullscreenElement) ||
 				Boolean(document.mozFullScreenElement) ||

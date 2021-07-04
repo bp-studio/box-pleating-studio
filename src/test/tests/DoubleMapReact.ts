@@ -1,17 +1,17 @@
 
-function DoubleMapReact() {
+function DoubleMapReact(): void {
 
 	@shrewd class A {
 		public map: DoubleMap<string, number> = new DoubleMap();
 
-		@shrewd private has() {
+		@shrewd private has(): void {
 			log.add("has");
 			this.map.has("a");
 		}
 	}
 
 	let log = new Set<string>();
-	function getLog() {
+	function getLog(): string {
 		let result = [...log].sort().join(",");
 		log.clear();
 		return result;

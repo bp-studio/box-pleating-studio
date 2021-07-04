@@ -31,7 +31,7 @@ class JoinCandidate {
 		this.e = p.$shape.ridges[q].$shift(additionalOffset);
 	}
 
-	public $setupDetour(rawDetour: Point[], reverse: boolean) {
+	public $setupDetour(rawDetour: Point[], reverse: boolean): void {
 		let detour = rawDetour.map(p => p.add(this.v).$toIPoint());
 		detour.push(this.pt);
 		if(reverse) detour.reverse();
@@ -52,11 +52,11 @@ class JoinCandidate {
 		};
 	}
 
-	public $isSteeperThan(that: JoinCandidate) {
+	public $isSteeperThan(that: JoinCandidate): boolean {
 		return this.p.$direction.$slope.gt(that.p.$direction.$slope);
 	}
 
-	public $setupAnchor(upperLeft: boolean, anchor: Point) {
+	public $setupAnchor(upperLeft: boolean, anchor: Point): void {
 		let q = upperLeft ? Direction.UL : Direction.LR;
 		// 因為每次寫入的位置其實都是一樣的，所以這邊不用擔心垃圾資料惠存活到下一次
 		this.a[q] = { location: anchor.add(this.v).$toIPoint() };

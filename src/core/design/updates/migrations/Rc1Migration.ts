@@ -13,7 +13,7 @@ namespace Rc1Migration {
 		return false;
 	}
 
-	function pattern(cf: Pseudo<JConfiguration>, s: Pseudo<JStretch>) {
+	function pattern(cf: Pseudo<JConfiguration>, s: Pseudo<JStretch>): void {
 		s.configuration = {
 			partitions: partition(cf.overlaps as JOverlap[], cf.strategy as Strategy),
 		};

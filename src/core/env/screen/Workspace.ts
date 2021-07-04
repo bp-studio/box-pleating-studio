@@ -18,7 +18,7 @@ abstract class Workspace extends SheetImage {
 		this._spaceHolder.style.zIndex = "-10"; // 修正 iPhone 6 的問題
 	}
 
-	public $zoom(zoom: number, center: IPoint) {
+	public $zoom(zoom: number, center: IPoint): void {
 		let sheet = this._design!.sheet;
 
 		let offset = this._offset, scale = this.$scale;
@@ -34,7 +34,7 @@ abstract class Workspace extends SheetImage {
 		);
 	}
 
-	public $scrollBy(design: Design, diff: Vector) {
+	public $scrollBy(design: Design, diff: Vector): void {
 		let { x, y } = design.sheet.$scroll;
 		if(this._isXScrollable) x -= diff.x;
 		if(this._isYScrollable) y -= diff.y;
@@ -65,13 +65,13 @@ abstract class Workspace extends SheetImage {
 		return { x: padding.x - this._scroll.x, y: padding.y - this._scroll.y };
 	}
 
-	protected _createImg() {
+	protected _createImg(): HTMLImageElement {
 		let img = new Image();
 		this._spaceHolder.appendChild(img);
 		return img;
 	}
 
-	@shrewd private _onSheetChange() {
+	@shrewd private _onSheetChange(): void {
 		let sheet = this._design?.sheet;
 		if(sheet) {
 			this._spaceHolder.style.width = this._scrollWidth + "px";
@@ -84,7 +84,7 @@ abstract class Workspace extends SheetImage {
 		return this._design?.sheet.$scroll ?? { x: 0, y: 0 };
 	}
 
-	private _scrollTo(x: number, y: number) {
+	private _scrollTo(x: number, y: number): void {
 		let w = this._scrollWidth - this._viewWidth;
 		let h = this._scrollHeight - this._viewHeight;
 		if(x < 0) x = 0;
@@ -96,10 +96,14 @@ abstract class Workspace extends SheetImage {
 	}
 
 	/** 全部的捲動寬度 */
-	@shrewd private get _scrollWidth() { return Math.max(this._imgWidth, this._viewWidth); }
+	@shrewd private get _scrollWidth(): number {
+		return Math.max(this._imgWidth, this._viewWidth);
+	}
 
 	/** 全部的捲動高度 */
-	@shrewd private get _scrollHeight() { return Math.max(this._imgHeight, this._viewHeight); }
+	@shrewd private get _scrollHeight(): number {
+		return Math.max(this._imgHeight, this._viewHeight);
+	}
 
 	@shrewd private get _isXScrollable(): boolean {
 		return this._imgWidth > this._viewWidth + 1; // 加 1 以避免浮點數誤觸

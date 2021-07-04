@@ -6,11 +6,11 @@ interface JNode {
 
 @shrewd class TreeNode extends Disposable implements ITagObject, ISerializable<JNode> {
 
-	public static $setJID(n: TreeNode, id: number) {
+	public static $setJID(n: TreeNode, id: number): void {
 		n._jid = id;
 	}
 
-	public get $tag() { return "n" + this.id; }
+	public get $tag(): string { return "n" + this.id; }
 
 	/** 程式內部參照用的 id，這是唯讀的值，因此由於點有可能被刪除而未必連號 */
 	private readonly _id: number;
@@ -32,7 +32,7 @@ interface JNode {
 		this._id = id;
 	}
 
-	public $delete() {
+	public $delete(): void {
 		let e = this.edges[0];
 		this.$tree.$remove(e);
 		if(this.$parentId === undefined) e.n(this).$parentId = undefined;
@@ -71,7 +71,7 @@ interface JNode {
 	/**
 	 * @param force 是否要無視頂點度數限制、強制棄置
 	 */
-	public $dispose(force: boolean = false) {
+	public $dispose(force: boolean = false): TreeEdge | undefined {
 		if(force || this.$degree == 1) {
 			super.$dispose();
 		} else if(this.$degree == 2) {
@@ -88,7 +88,7 @@ interface JNode {
 
 	public readonly $tree: Tree;
 
-	public get $design() { return this.$tree.$design; }
+	public get $design(): Design { return this.$tree.$design; }
 
 	@shrewd public get edges(): ReadonlyArray<TreeEdge> {
 		this.$disposeEvent();
@@ -97,19 +97,19 @@ interface JNode {
 		return result;
 	}
 
-	@shrewd public get $degree() {
+	@shrewd public get $degree(): number {
 		return this.edges.length;
 	}
 
-	@shrewd public get $leafEdge() {
+	@shrewd public get $leafEdge(): TreeEdge | null {
 		return this.$degree == 1 ? this.edges[0] : null;
 	}
 
-	@shrewd public get $radius() {
+	@shrewd public get $radius(): number {
 		return this.$leafEdge?.length ?? NaN;
 	}
 
-	public toJSON() {
+	public toJSON(): JNode {
 		return {
 			id: this.id,
 			parentId: this.$parentId,

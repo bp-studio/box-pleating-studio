@@ -36,7 +36,7 @@
 		protected undo(): void { this.bp.undo(this.design); }
 		protected redo(): void { this.bp.redo(this.design); }
 
-		private selectAll() {
+		private selectAll(): void {
 			if(this.design) this.design.selectAll();
 		}
 	}

@@ -8,7 +8,7 @@ interface JEdge {
 
 @shrewd class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {
 
-	public get $tag() { return "e" + this.n1.id + "," + this.n2.id; }
+	public get $tag(): string { return "e" + this.n1.id + "," + this.n2.id; }
 
 	public readonly n1: TreeNode;
 	public readonly n2: TreeNode;
@@ -23,7 +23,7 @@ interface JEdge {
 		this.length = length;
 	}
 
-	public $dispose(force: boolean = false) {
+	public $dispose(force: boolean = false): void {
 		if(force) this.$design.$tree.$edge.delete(this.n1, this.n2);
 		super.$dispose();
 	}
@@ -39,8 +39,8 @@ interface JEdge {
 		};
 	}
 
-	public get tree() { return this.n1.$tree; }
-	public get $design() { return this.n1.$design; }
+	public get tree(): Tree { return this.n1.$tree; }
+	public get $design(): Design { return this.n1.$design; }
 
 	protected get $shouldDispose(): boolean {
 		return super.$shouldDispose || this.n1.$disposed || this.n2.$disposed;
@@ -55,14 +55,14 @@ interface JEdge {
 		return false;
 	}
 
-	@shrewd public get $isRiver() {
+	@shrewd public get $isRiver(): boolean {
 		this.$disposeEvent();
 		return this.n1.$degree > 1 && this.n2.$degree > 1;
 	}
 
 	/////////////////////////////////////////////////////////////////
 	// 相鄰邊
-	private _adjacentEdges(n: TreeNode) { return n.edges.filter(e => e != this); }
+	private _adjacentEdges(n: TreeNode): TreeEdge[] { return n.edges.filter(e => e != this); }
 
 	/** 相對於 n1 的所有相鄰邊 */
 	@shrewd public get a1(): readonly TreeEdge[] {
@@ -78,7 +78,7 @@ interface JEdge {
 
 	/////////////////////////////////////////////////////////////////
 	// 結點群組
-	private static _group(n: TreeNode, edges: ReadonlyArray<TreeEdge>) {
+	private static _group(n: TreeNode, edges: ReadonlyArray<TreeEdge>): TreeNode[] {
 		let result = [n];
 		for(let edge of edges) result.push(...edge.g(n));
 		return result;
@@ -97,7 +97,7 @@ interface JEdge {
 	}
 
 	/** 相反於輸入的點的那一側的結點群組 */
-	public g(n: TreeNode) { return n == this.n1 ? this.g2 : this.g1; }
+	public g(n: TreeNode): readonly TreeNode[] { return n == this.n1 ? this.g2 : this.g1; }
 
 	/////////////////////////////////////////////////////////////////
 	// 單側葉點
@@ -120,7 +120,7 @@ interface JEdge {
 		this.$disposeEvent();
 		return sum(this.a2.map(e => e.t(this.n2) + e.length));
 	}
-	private t(n: TreeNode) { return n == this.n1 ? this.t2 : this.t1; }
+	private t(n: TreeNode): number { return n == this.n1 ? this.t2 : this.t1; }
 
 	/////////////////////////////////////////////////////////////////
 	// 單側最長路徑長
@@ -156,5 +156,5 @@ interface JEdge {
 
 	/////////////////////////////////////////////////////////////////
 	// 結點
-	public n(n: TreeNode) { return n == this.n1 ? this.n2 : this.n1; }
+	public n(n: TreeNode): TreeNode { return n == this.n1 ? this.n2 : this.n1; }
 }

@@ -22,11 +22,11 @@
 		return success;
 	}
 
-	public $selectAll() {
+	public $selectAll(): void {
 		this.forEach(f => f.$selected = true);
 	}
 
-	public $toFlap(vertices: Vertex[]) {
+	public $toFlap(vertices: Vertex[]): void {
 		this._design.$LayoutSheet.$clearSelection();
 		for(let vertex of vertices) {
 			let flap = this._design.$flaps.get(vertex.$node);

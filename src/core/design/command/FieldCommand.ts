@@ -49,20 +49,20 @@ class FieldCommand extends Command implements JFieldCommand {
 			command.new == this.old;
 	}
 
-	public $addTo(command: Command) {
+	public $addTo(command: Command): void {
 		(command as FieldCommand).new = this.new;
 	}
 
-	public get $isVoid() {
+	public get $isVoid(): boolean {
 		return this.old == this.new;
 	}
 
-	public $undo() {
+	public $undo(): void {
 		let target = this._design.$query(this.tag)!;
 		Reflect.set(target, this.prop, this.old);
 	}
 
-	public $redo() {
+	public $redo(): void {
 		let target = this._design.$query(this.tag)!;
 		Reflect.set(target, this.prop, this.new);
 	}

@@ -16,7 +16,7 @@ class ViewManager implements IViewManager {
 		return view.$contains(point);
 	}
 
-	public $createView(target: Mountable) {
+	public $createView(target: Mountable): void {
 		let view: View | undefined;
 		if(target instanceof Junction) view = new JunctionView(target);
 		else if(target instanceof Flap) view = new FlapView(target);
@@ -29,7 +29,7 @@ class ViewManager implements IViewManager {
 		if(view) this._viewMap.set(target, view);
 	}
 
-	public $get(target: Mountable) {
+	public $get(target: Mountable): View | null {
 		return this._viewMap.get(target) ?? null;
 	}
 }

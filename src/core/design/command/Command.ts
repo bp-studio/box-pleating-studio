@@ -37,7 +37,7 @@ abstract class Command implements JCommand {
 	/** @exports */
 	public readonly tag: string;
 
-	public get $signature() { return this.type + ":" + this.tag; }
+	public get $signature(): string { return this.type + ":" + this.tag; }
 
 	constructor(design: Design, json: Typeless<JCommand>) {
 		this._design = design;

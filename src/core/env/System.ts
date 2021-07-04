@@ -62,7 +62,7 @@ class System {
 		return this.$drag.$processKey(event.key);
 	}
 
-	private _canvasKeyup() {
+	private _canvasKeyup(): void {
 		this._canvas.style.cursor = "unset";
 	}
 
@@ -115,7 +115,7 @@ class System {
 	}
 
 	/** 處理滑鼠移動 */
-	private _canvasMouseDrag(event: paper.ToolEvent) {
+	private _canvasMouseDrag(event: paper.ToolEvent): void {
 		// 捲動中的話就不用在這邊處理了，交給 body 上註冊的 handler 去處理
 		if(this.$scroll.on) return;
 
@@ -135,7 +135,7 @@ class System {
 		}
 	}
 
-	private _canvasTouch(event: TouchEvent) {
+	private _canvasTouch(event: TouchEvent): void {
 		if(event.touches.length > 1 && !this.$scroll.on && this._studio.$design) {
 			this.$selection.$clear();
 			this._longPress.$cancel();

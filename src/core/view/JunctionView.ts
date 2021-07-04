@@ -10,7 +10,7 @@
 		this.$addItem(Layer.$junction, this._shade = new paper.CompoundPath(Style.$junction));
 	}
 
-	protected $render() {
+	protected $render(): void {
 		this._shade.visible = this._junction.$status == JunctionStatus.tooClose;
 		if(this._shade.visible) {
 			let vm = this._junction.$design.$viewManager;

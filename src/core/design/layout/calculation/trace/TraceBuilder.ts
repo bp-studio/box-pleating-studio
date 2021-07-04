@@ -104,7 +104,7 @@ class TraceBuilder {
 		return this._findLead(nextQ, d2) ?? nextQ.$getStart(new Fraction(d2));
 	}
 
-	private _fixStart(trace: Path, radius: number, startLine?: Line) {
+	private _fixStart(trace: Path, radius: number, startLine?: Line): void {
 		let quad = this._quadrant;
 		if(startLine && quad.$outside(trace[0], radius, quad.q % 2 != 1)) {
 			trace.unshift(
@@ -125,7 +125,7 @@ class TraceBuilder {
 		}
 	}
 
-	private _fixEnd(trace: Path, radius: number, endLine?: Line) {
+	private _fixEnd(trace: Path, radius: number, endLine?: Line): void {
 		if(endLine) {
 			let quad = this._quadrant;
 			if(quad.$outside(trace[trace.length - 1], radius, quad.q % 2 == 1)) {
@@ -170,7 +170,9 @@ class TraceBuilder {
 	 * @param cw 是否要找順時鐘方向
 	 * @param next 傳入 true 表示找下一個；否表示找最遠的
 	 */
-	 private _findJoinNextQ(quad: Quadrant, cw: boolean, next: boolean) {
+	private _findJoinNextQ(quad: Quadrant, cw: boolean, next: boolean): {
+		joinQ: Quadrant; nextQ: Quadrant; mode: boolean;
+	} | undefined {
 		if(this._junctions.length == 1) return undefined;
 
 		let mode = Boolean(quad.q % 2) == cw;

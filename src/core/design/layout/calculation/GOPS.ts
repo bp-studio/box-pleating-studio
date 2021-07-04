@@ -67,7 +67,7 @@ namespace GOPS {
 		return array;
 	}
 
-	function addMemo(p: JPiece, array: JPieceMemo[]) {
+	function addMemo(p: JPiece, array: JPieceMemo[]): void {
 		array.push({ p, sx: p.u + p.v + p.oy });
 	}
 }

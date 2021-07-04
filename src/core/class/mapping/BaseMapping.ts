@@ -22,7 +22,7 @@ type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
 //////////////////////////////////////////////////////////////////
 
 abstract class BaseMapping<Key, Source, Value extends object>
-implements ReadonlyMap<Key, Value>, IDisposable {
+	implements ReadonlyMap<Key, Value>, IDisposable {
 
 	constructor(
 		private readonly _source: IterableFactory<Source>,
@@ -31,7 +31,7 @@ implements ReadonlyMap<Key, Value>, IDisposable {
 		private readonly _dtor: Predicate<Key, Value>
 	) { }
 
-	public $dispose() {
+	public $dispose(): void {
 		Shrewd.terminate(this);
 		this._map.clear();
 		// @ts-ignore
@@ -51,17 +51,25 @@ implements ReadonlyMap<Key, Value>, IDisposable {
 		return new Map(this._map);
 	}
 
-	public get(key: Key) { return this.render().get(key); }
-	public has(key: Key) { return this.render().has(key); }
-	public forEach(callbackfn: MapCallback<Key, Value>, thisArg?: unknown) {
+	public get(key: Key): Value | undefined { return this.render().get(key); }
+	public has(key: Key): boolean { return this.render().has(key); }
+	public forEach(callbackfn: MapCallback<Key, Value>, thisArg?: unknown): void {
 		return this.render().forEach(callbackfn, thisArg);
 	}
-	public get size() { return this.render().size; }
+	public get size(): number { return this.render().size; }
 
-	public [Symbol.iterator]() { return this.render()[Symbol.iterator](); }
-	public entries() { return this.render().entries(); }
-	public keys() { return this.render().keys(); }
-	public values() { return this.render().values(); }
+	public [Symbol.iterator](): IterableIterator<[Key, Value]> {
+		return this.render()[Symbol.iterator]();
+	}
+	public entries(): IterableIterator<[Key, Value]> {
+		return this.render().entries();
+	}
+	public keys(): IterableIterator<Key> {
+		return this.render().keys();
+	}
+	public values(): IterableIterator<Value> {
+		return this.render().values();
+	}
 
 	/** 提供輸出成 JSON 物件陣列的快捷方法。 */
 	public toJSON(): Value extends ISerializable<infer U> ? U[] : never;

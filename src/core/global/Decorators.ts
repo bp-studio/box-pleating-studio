@@ -138,7 +138,7 @@ function action(...p: [ActionOption] | [ITagObject, string]): void | PropertyDec
 	if(p.length == 1) return (obj, name: string) => actionInner(obj, name, p[0]);
 	else actionInner(p[0], p[1], {});
 }
-function actionInner(target: object, name: string, option: ActionOption) {
+function actionInner(target: object, name: string, option: ActionOption): void {
 	shrewd({
 		validator(this: ITagObject, v: unknown) {
 			let record = actionMap.get(this);

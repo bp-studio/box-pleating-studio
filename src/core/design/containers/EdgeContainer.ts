@@ -35,7 +35,7 @@
 		return result;
 	}
 
-	public $toRiver(edge: Edge) {
+	public $toRiver(edge: Edge): void {
 		this._design.$LayoutSheet.$clearSelection();
 		let te = edge.$edge;
 		if(te.$isRiver) {

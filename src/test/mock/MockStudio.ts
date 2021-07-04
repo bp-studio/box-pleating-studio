@@ -7,7 +7,7 @@
 
 	public readonly $viewManager: IViewManager = new MockViewManager();
 
-	public $historyManagerFactory(design: Design, data: JDesign) {
+	public $historyManagerFactory(design: Design, data: JDesign): null {
 		return null;
 	}
 }

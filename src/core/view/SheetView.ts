@@ -20,11 +20,11 @@
 		this.$addItem(Layer.$sheet, this._grid);
 	}
 
-	public $contains(point: paper.Point) {
+	public $contains(point: paper.Point): boolean {
 		return this._border.contains(point);
 	}
 
-	protected $render() {
+	protected $render(): void {
 		let width = this._sheet.width;
 		let height = this._sheet.height;
 

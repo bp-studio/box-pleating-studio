@@ -1,5 +1,5 @@
 
-function TreeBasic() {
+function TreeBasic(): void {
 	let design = studio.$create({
 		tree: {
 			nodes: [

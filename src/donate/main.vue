@@ -43,11 +43,11 @@
 		private amount?: number;
 		private processing: boolean = false;
 
-		mounted() {
+		mounted(): void {
 			initPayPalButton();
 		}
 
-		public init(actions: any) {
+		public init(actions: any): void {
 			actions.disable();
 			this.actions = actions;
 		}
@@ -56,11 +56,11 @@
 			return this.amount * 0.046025 + 0.3138;
 		}
 
-		private get handling() {
+		private get handling(): string {
 			return this.amount > 0 ? ' + $' + this.extra.toFixed(2) : "";
 		}
 
-		private amountChange() {
+		private amountChange(): void{
 			if(this.error = !(this.amount > 0)) this.actions.disable();
 			else this.actions.enable();
 		}

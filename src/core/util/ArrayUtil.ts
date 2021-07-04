@@ -17,7 +17,9 @@ function sum(array: readonly number[]): number {
 if(typeof Array.prototype.flatMap == "undefined") {
 	Array.prototype.flatMap = function(callback: any, thisArg?: any): any {
 		thisArg ??= this;
-		let aggregate = (agg: unknown[], next: unknown, index: number, arr: readonly unknown[]) => {
+		let aggregate = (
+			agg: unknown[], next: unknown, index: number, arr: readonly unknown[]
+		): unknown[] => {
 			agg.push(...callback(next, index, arr));
 			return agg;
 		};

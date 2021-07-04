@@ -15,8 +15,8 @@ type GDevice = JDevice<Gadget>;
 
 @shrewd class Device extends Draggable implements ISerializable<JDevice> {
 
-	public get $type() { return "Device"; }
-	public get $tag() { return this.$pattern.$tag + "." + this.$pattern.$devices.indexOf(this); }
+	public get $type(): string { return "Device"; }
+	public get $tag(): string { return this.$pattern.$tag + "." + this.$pattern.$devices.indexOf(this); }
 
 	public readonly $pattern: Pattern;
 	public readonly $gadgets: readonly Gadget[];
@@ -58,7 +58,7 @@ type GDevice = JDevice<Gadget>;
 		return super.$shouldDispose || this.$pattern.$disposed;
 	}
 
-	@shrewd public get _isActive() { return this.$pattern._isActive; }
+	@shrewd public get _isActive(): boolean { return this.$pattern._isActive; }
 
 	/**
 	 * 傳回 Device 的連接點陣列，根據自身的 delta 反應式傳回絕對座標。

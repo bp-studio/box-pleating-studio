@@ -17,7 +17,7 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 
 	@shrewd private _size: number = 0;
 
-	public set(key1: K, key2: K, value: V) {
+	public set(key1: K, key2: K, value: V): this {
 		if(!this.has(key1, key2)) {
 			if(!this._map.has(key1)) this._map.set(key1, new Map());
 			if(!this._map.has(key2)) this._map.set(key2, new Map());
@@ -28,11 +28,11 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 		return this;
 	}
 
-	public get [Symbol.toStringTag]() { return "DoubleMap"; }
+	public get [Symbol.toStringTag](): string { return "DoubleMap"; }
 
 	public has(key: K): boolean;
 	public has(key1: K, key2: K): boolean;
-	public has(...args: [K] | [K, K]) {
+	public has(...args: [K] | [K, K]): boolean {
 		this._size; // 故意讀取大小以參照變動
 		if(args.length == 1) return this._map.has(args[0]);
 		else return this._map.has(args[0]) && this._map.get(args[0])!.has(args[1]);
@@ -47,22 +47,24 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 		else return this._map.get(args[0])!.get(args[1]);
 	}
 
-	public get size() {
+	public get size(): number {
 		return this._size;
 	}
 
-	public clear() {
+	public clear(): void {
 		this._map.clear();
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: unknown = this) {
-		for(let [k1, k2, v] of this.entries()) callbackfn.apply(thisArg, [v, k1, k2, this]);
+	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: unknown = this): void {
+		for(let [k1, k2, v] of this.entries()) {
+			callbackfn.apply(thisArg, [v, k1, k2, this]);
+		}
 	}
 
 	public delete(key: K): boolean;
 	public delete(key1: K, key2: K): boolean;
-	public delete(...args: [K] | [K, K]) {
+	public delete(...args: [K] | [K, K]): boolean {
 		if(args.length == 1) {
 			if(!this._map.has(args[0])) return false;
 			this._size -= this._map.get(args[0])!.size;
@@ -78,7 +80,9 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 		}
 	}
 
-	[Symbol.iterator]() { return this.entries(); }
+	[Symbol.iterator](): IterableIterator<[K, K, V]> {
+		return this.entries();
+	}
 
 	public *entries(): IterableIterator<[K, K, V]> {
 		for(let [k1, k2] of this.keys()) yield [k1, k2, this.get(k1, k2)!];
@@ -97,7 +101,7 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 		}
 	}
 
-	public firstKeys() {
+	public firstKeys(): IterableIterator<K> {
 		this._size; // 故意讀取大小以參照變動
 		return this._map.keys();
 	}

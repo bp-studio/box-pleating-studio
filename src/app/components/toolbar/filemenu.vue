@@ -237,7 +237,7 @@
 			await this.openFiles(f.files);
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
 		}
-		private async openFiles(files: FileList) {
+		private async openFiles(files: FileList): Promise<void> {
 			await core.loader.show();
 			let tasks: Promise<boolean>[] = [];
 			if(files.length) {

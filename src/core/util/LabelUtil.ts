@@ -20,7 +20,7 @@ namespace LabelUtil {
 		label: paper.PointText,
 		lx: number, ly: number, lh: number,
 		dx: Sign, dy: Sign
-	) {
+	): void {
 		label.justification = dx == 0 ? "center" : dx == 1 ? "left" : "right";
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		let oy = dy == 0 ? -lh / 5 : dy == -1 ? -lh / 2 : 0;
@@ -53,7 +53,7 @@ namespace LabelUtil {
 		syncLabel(label, glow);
 	}
 
-	function syncLabel(label: paper.PointText, glow: paper.PointText) {
+	function syncLabel(label: paper.PointText, glow: paper.PointText): void {
 		glow.point.set(label.point);
 		glow.justification = label.justification;
 	}
@@ -66,7 +66,7 @@ namespace LabelUtil {
 		label: paper.PointText,
 		lx: number, ly: number, lh: number,
 		avoid: paper.Path[]
-	) {
+	): void {
 		let arr: [Sign, Sign][] = [
 			[0, 0], [0, -1], [-1, 0],
 			[0, 1], [1, 0], [-1, -1],

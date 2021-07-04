@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////////////
 
 @shrewd class DoubleMapping<K extends Disposable, V extends Disposable>
-implements IDisposable, ReadonlyDoubleMap<K, V> {
+	implements IDisposable, ReadonlyDoubleMap<K, V> {
 
 	constructor(source: IterableFactory<K>, constructor: (k1: K, k2: K) => V) {
 		this._source = source;
@@ -49,20 +49,22 @@ implements IDisposable, ReadonlyDoubleMap<K, V> {
 
 	public has(key: K): boolean;
 	public has(key1: K, key2: K): boolean;
-	public has(...args: [K] | [K, K]) { return this._map.has.apply(this._map, args); }
+	public has(...args: [K] | [K, K]): boolean { return this._map.has.apply(this._map, args); }
 
 	public get(key: K): ReadonlyMap<K, V> | undefined;
 	public get(key1: K, key2: K): V | undefined;
-	public get(...args: [K] | [K, K]) { return this._map.get.apply(this._map, args); }
+	public get(...args: [K] | [K, K]): V | ReadonlyMap<K, V> | undefined {
+		return this._map.get.apply(this._map, args);
+	}
 
-	public get size() { return this._map.size; }
-	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg?: unknown) {
+	public get size(): number { return this._map.size; }
+	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg?: unknown): void {
 		return this._map.forEach(callbackfn, thisArg);
 	}
 
-	public [Symbol.iterator]() { return this._map[Symbol.iterator](); }
-	public entries() { return this._map.entries(); }
-	public keys() { return this._map.keys(); }
-	public firstKeys() { return this._map.firstKeys(); }
-	public values() { return this._map.values(); }
+	public [Symbol.iterator](): IterableIterator<[K, K, V]> { return this._map[Symbol.iterator](); }
+	public entries(): IterableIterator<[K, K, V]> { return this._map.entries(); }
+	public keys(): IterableIterator<[K, K]> { return this._map.keys(); }
+	public firstKeys(): IterableIterator<K> { return this._map.firstKeys(); }
+	public values(): IterableIterator<V> { return this._map.values(); }
 }

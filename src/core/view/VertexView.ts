@@ -35,12 +35,12 @@
 		this._dotSel.position.set([x * ds, -y * ds]);
 	}
 
-	protected $renderSelection(selected: boolean) {
+	protected $renderSelection(selected: boolean): void {
 		this._dotSel.visible = selected;
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */
-	@shrewd private _renderDot() {
+	@shrewd private _renderDot(): void {
 		let s = VertexView._DOT_SIZE * Math.sqrt(this._drawScale);
 		this._dot.copyContent(new paper.Path.Circle({
 			position: this._dot.position,
@@ -48,7 +48,7 @@
 		}));
 	}
 
-	protected $renderUnscaled() {
+	protected $renderUnscaled(): void {
 		this._label.content = this._control.$node.name;
 	}
 

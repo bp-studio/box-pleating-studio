@@ -7,8 +7,8 @@
 
 @shrewd class Edge extends Control implements ISerializable<JEdge> {
 
-	public get $type() { return "Edge"; }
-	public get $tag() { return "e" + this.$edge.$tag; }
+	public get $type(): string { return "Edge"; }
+	public get $tag(): string { return "e" + this.$edge.$tag; }
 	public readonly $v1: Vertex;
 	public readonly $v2: Vertex;
 
@@ -28,12 +28,12 @@
 	}
 
 	/** @exports */
-	public split() {
+	public split(): void {
 		this._toVertex(Tree.prototype.$split);
 	}
 
 	/** @exports */
-	public deleteAndMerge() {
+	public deleteAndMerge(): boolean {
 		if(!this.$edge.$isRiver) return false;
 		this._toVertex(Tree.prototype.$deleteAndMerge);
 		return true;
@@ -44,7 +44,7 @@
 		return this.$edge.$isRiver;
 	}
 
-	private _toVertex(action: (e: TreeEdge) => TreeNode) {
+	private _toVertex(action: (e: TreeEdge) => TreeNode): void {
 		let l1 = this.$v1.$location, l2 = this.$v2.$location;
 		let x = Math.round((l1.x + l2.x) / 2), y = Math.round((l1.y + l2.y) / 2);
 		let node: TreeNode = action.apply(this.$design.$tree, [this.$edge]);
@@ -60,7 +60,7 @@
 	}
 
 	/** @exports */
-	public get length() { return this.$edge.length; }
+	public get length(): number { return this.$edge.length; }
 	public set length(v) { this.$edge.length = v; }
 
 	public toJSON(): JEdge {

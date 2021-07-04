@@ -112,7 +112,7 @@ class Trace {
 	}
 
 	/** 偵測迴圈；迴圈是只有當有 meandering 的時候才會產生 */
-	private detectLoop(pt: Point) {
+	private detectLoop(pt: Point): void {
 		let sg = pt.toString();
 		if(this._record.has(sg)) {
 			if(!pt.eq(this._full[this._full.length - 1])) this.processLoop(pt);
@@ -164,7 +164,7 @@ class Trace {
 	}
 
 	/** 如果造出軌跡的過程中出現迴圈，排除考慮一切完全落在迴圈裡面的線段 */
-	private processLoop(pt: Point) {
+	private processLoop(pt: Point): void {
 		let path: Path = [], i = this._full.length - 1;
 		do { path.push(this._full[i]); } while(!this._full[i--].eq(pt));
 		for(let l of this._candidates) {
@@ -222,7 +222,7 @@ class Trace {
 		return x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f;
 	}
 
-	private static _getAngle(v1: Vector, v2: Vector) {
+	private static _getAngle(v1: Vector, v2: Vector): number {
 		let ang = v1.$angle - v2.$angle;
 		while(ang < 0) ang += Math.PI;
 		while(ang > Math.PI) ang -= Math.PI;
@@ -251,7 +251,7 @@ class Trace {
 		return result;
 	}
 
-	private static _pushIfNotEqual(array: Point[], pt: Point) {
+	private static _pushIfNotEqual(array: Point[], pt: Point): void {
 		if(!array.length || !array[array.length - 1].eq(pt)) array.push(pt);
 	}
 }
