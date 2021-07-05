@@ -20,7 +20,7 @@
 			</div>
 		</div>
 		<div class="mt-3" v-if="!bp.isMinimal(design)">
-			<button class="btn btn-primary" v-if="subject.degree==1" @click="bp.delete(subject)" v-t="'keyword.delete'"></button>
+			<button class="btn btn-primary" v-if="subject.degree==1" @click="bp.delete([subject])" v-t="'keyword.delete'"></button>
 			<button
 				class="btn btn-primary"
 				v-if="subject.degree==2"
