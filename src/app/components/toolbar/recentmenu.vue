@@ -2,7 +2,7 @@
 	<submenu icon="fas fa-history" :label="$t('toolbar.file.recent.title')">
 		<dropdownitem v-if="recent.length==0" disabled>{{$t('toolbar.file.recent.empty')}}</dropdownitem>
 		<template v-else>
-			<dropdownitem v-for="(h,i) in recent" :key="i" @click="$emit('open', h)">
+			<dropdownitem v-for="(h,i) in recent" :key="i" @click="open(h)">
 				<i></i>
 				{{h.name}}
 			</dropdownitem>
@@ -23,6 +23,10 @@
 
 		protected get recent(): readonly FileSystemFileHandle[] {
 			return core.handles.recent;
+		}
+
+		protected open(handle: FileSystemFileHandle): void {
+			core.files.open([handle], true);
 		}
 
 		protected clearRecent(): void {

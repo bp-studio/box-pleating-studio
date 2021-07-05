@@ -12,7 +12,7 @@
 		private rec: FileSystemFileHandle[] = [];
 		private handles: Map<number, FileSystemFileHandle> = new Map();
 
-		public get(id: number): FileSystemFileHandle { return this.handles.get(id); }
+		public get(id: number): FileSystemFileHandle { return this.handles.get(id)!; }
 		public set(id: number, value: FileSystemFileHandle): void {
 			this.handles.set(id, value);
 			this.refresh();
@@ -20,13 +20,16 @@
 		public delete(id: number): void {
 			if(this.handles.delete(id)) this.refresh();
 		}
-		public async filter(handles: FileHandleList): Promise<FileHandleList> {
-			let opened = [...this.handles.values()];
-			let check = await Promise.all(handles.map(async h => {
-				let tasks = opened.map(o => o.isSameEntry(h));
-				return (await Promise.all(tasks)).includes(true);
-			}));
-			return handles.filter((_, i) => !check[i]);
+
+		/** 根據傳入的 {@link FileSystemFileHandle} 陣列，找出已經開啟的 handle 的對應專案 id；若找不到則填入 undefined */
+		public locate(handles: FileHandleList): Promise<(number | undefined)[]> {
+			let opened = [...this.handles.entries()];
+			let idTasks = handles.map(async h => {
+				let tasks = opened.map(e => e[1].isSameEntry(h).then(yes => yes ? e[0] : undefined));
+				let results = await Promise.all(tasks);
+				return results.find(i => i !== undefined);
+			});
+			return Promise.all(idTasks);
 		}
 
 		public async init(haveSession: boolean): Promise<void> {

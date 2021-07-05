@@ -10,7 +10,7 @@
 			<opener ref="open" @open="core.files.open($event)">
 				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 			</opener>
-			<recentmenu @open="core.files.open([$event], true)"></recentmenu>
+			<recentmenu></recentmenu>
 			<divider></divider>
 			<dropdownitem :disabled="!design" @click="save()">
 				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.BPS.save')}}</hotkey>
@@ -126,7 +126,7 @@
 		protected get core(): typeof core { return core; }
 
 		protected notify(handle?: FileSystemFileHandle): void {
-			let design = this.bp.design;
+			let design = this.bp.design!;
 			this.bp.notifySave(design);
 			if(handle) {
 				core.handles.set(design.id, handle);
@@ -173,7 +173,7 @@
 				let writable = await handle.createWritable();
 				try {
 					await handle.getFile();
-					await writable.write(await core.getBlob("bps"));
+					await writable.write((await core.getBlob("bps"))!);
 					await writable.close();
 					core.handles.addRecent(handle);
 					this.notify();
@@ -188,7 +188,7 @@
 
 		protected async upload(event: Event): Promise<void> {
 			let f = event.target as HTMLInputElement;
-			await core.files.openFiles(f.files);
+			await core.files.openFiles(f.files!);
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
 		}
 

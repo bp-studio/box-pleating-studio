@@ -3,6 +3,7 @@
 		"target": "es2018",
 		"moduleResolution": "node",
 		"experimentalDecorators": true,
+		"strictNullChecks": true,
 		"allowSyntheticDefaultImports": true
 	},
 	"include": [

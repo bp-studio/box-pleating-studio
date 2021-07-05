@@ -67,8 +67,9 @@
 		}
 
 		mounted(): void {
-			let settings = JSON.parse(localStorage.getItem("settings"));
-			if(settings) {
+			let settingString = localStorage.getItem("settings");
+			if(settingString) {
+				let settings = JSON.parse(settingString);
 				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
 			}
@@ -90,8 +91,9 @@
 				this.alert(message);
 			};
 
-			let settings = JSON.parse(localStorage.getItem("settings"));
-			if(settings) {
+			let settingString = localStorage.getItem("settings");
+			if(settingString) {
+				let settings = JSON.parse(settingString);
 				let d = bp.settings;
 				// eslint-disable-next-line guard-for-in
 				for(let key in d) d[key] = settings[key];
@@ -111,9 +113,13 @@
 			if(lz != sessionStorage.getItem("project") && json) {
 				// 寫入 sessionStorage 的值不會因為頁籤 reload 而遺失，
 				// 因此可以用這個來避免重刷頁面的時候再次載入的問題
-				sessionStorage.setItem("project", lz);
-				this.projects.add(bp.load(json));
-				gtag('event', 'share_open');
+				sessionStorage.setItem("project", lz!);
+				try {
+					this.projects.add(bp.load(json)!);
+					gtag('event', 'share_open');
+				} catch(e) {
+					await this.alert(this.$t('message.invalidLink'));
+				}
 			}
 
 			window.setInterval(() => this.save(), SAVE_INTERVAL);
@@ -131,8 +137,9 @@
 			// 只有擁有存檔權的實體會去讀取 session
 			let haveSession = await this.checkSession();
 			if(haveSession) {
-				let session = JSON.parse(localStorage.getItem("session"));
-				if(session) {
+				let sessionString = localStorage.getItem("session");
+				if(sessionString) {
+					let session = JSON.parse(sessionString);
 					let jsons = session.jsons as unknown[];
 					for(let i = 0; i < jsons.length; i++) {
 						let design = bp.restore(jsons[i]);
@@ -176,7 +183,7 @@
 
 		public open(d: string | object): void {
 			if(typeof d == "string") {
-				this.projects.add(bp.design = bp.load(d));
+				this.projects.add(bp.design = bp.load(d)!);
 			} else {
 				this.projects.add(bp.design = bp.restore(d));
 			}
@@ -258,7 +265,7 @@
 			let zip = new JSZip();
 			let names = new Set<string>();
 			for(let i = 0; i < this.designs.length; i++) {
-				let design = bp.getDesign(this.designs[i]);
+				let design = bp.getDesign(this.designs[i])!;
 				let name = sanitize(design.title);
 				if(names.has(name)) {
 					let j = 1;

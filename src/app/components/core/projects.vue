@@ -31,7 +31,7 @@
 		}
 
 		public async close(id?: number): Promise<void> {
-			if(id === undefined) id = bp.design.id;
+			if(id === undefined) id = bp.design!.id;
 			if(await this.closeCore(id)) this.selectLast();
 		}
 
@@ -48,9 +48,9 @@
 		}
 
 		public clone(id?: number): void {
-			if(id === undefined) id = bp.design.id;
+			if(id === undefined) id = bp.design!.id;
 			let i = this.designs.indexOf(id);
-			let d = bp.getDesign(id).toJSON(true);
+			let d = bp.getDesign(id)!.toJSON(true);
 			let c = bp.restore(this.checkTitle(d));
 			this.designs.splice(i + 1, 0, c.id);
 			this.select(c.id);
@@ -63,18 +63,24 @@
 			else this.tabHistory.unshift(d.id);
 		}
 
-		public async openWorkspace(buffer: ArrayBuffer): Promise<void> {
+		public async openWorkspace(buffer: ArrayBuffer): Promise<number | undefined> {
 			let zip = await JSZip.loadAsync(buffer);
 			let files: string[] = [];
 			zip.forEach(path => files.push(path));
-			let tasks = files.map(f => zip.file(f).async("text").then(
-				data => {
-					let design = bp.load(data);
-					if(design) core.projects.add(design);
-					else core.alert(this.$t('message.invalidFormat', [f]));
+			let tasks = files.map(async f => {
+				let data = await zip.file(f)!.async("text");
+				let design = bp.load(data);
+				if(design) {
+					core.projects.add(design);
+					return design.id;
+				} else {
+					core.alert(this.$t('message.invalidFormat', [f]));
+					return undefined;
 				}
-			));
-			await Promise.all(tasks);
+			});
+			let ids = (await Promise.all(tasks)).filter(n => Boolean(n));
+			if(!ids.length) return undefined;
+			else return ids[ids.length - 1];
 		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////

@@ -22,19 +22,29 @@
 			});
 		}
 
-		public async open(
-			handles: readonly FileSystemFileHandle[], request?: boolean
-		): Promise<void> {
-			handles = await core.handles.filter(handles);
-			if(handles.length == 0) return;
+		public async open(handles: readonly FileSystemFileHandle[], request: boolean = false): Promise<void> {
+			let ids = await core.handles.locate(handles);
 
-			await core.loader.show();
-			let tasks = handles.map(handle => this.openHandle(handle, request));
-			let success = (await Promise.all(tasks)).includes(true);
+			// 有任何尚未開啟的 handle 才會觸發真正的開啟，此時需要顯示載入動畫
+			if(ids.some(i => i === undefined)) await core.loader.show();
+
+			let tasks: Promise<void>[] = [];
+			for(let i = 0; i < handles.length; i++) {
+				if(ids[i] === undefined) {
+					tasks.push(
+						this.openHandle(handles[i], request)
+							.then(id => { ids[i] = id; })
+					);
+				}
+			}
+			await Promise.all(tasks);
 			core.loader.hide();
-			if(success) {
+
+			// 找出最後一個開啟（含已開啟）的頁籤
+			let id = ids.reverse().find(n => n !== undefined);
+			if(id) {
 				gtag('event', 'project_open');
-				core.projects.select(core.designs[core.designs.length - 1]);
+				core.projects.select(id);
 			}
 		}
 
@@ -49,29 +59,32 @@
 
 		public async openFiles(files: FileList): Promise<void> {
 			await core.loader.show();
-			let tasks: Promise<boolean>[] = [];
+			let tasks: Promise<number | undefined>[] = [];
 			if(files.length) {
 				for(let i = 0; i < files.length; i++) {
 					tasks.push(this.openFile(files[i]));
 				}
 			}
-			let success = (await Promise.all(tasks)).includes(true);
+			let result = await Promise.all(tasks);
 			core.loader.hide();
+
+			// 這種情況中因為不是用 handle 打開的，最後一個開啟的一定就是最後一個頁籤
+			let success = result.some(id => id !== undefined);
 			if(success) {
 				gtag('event', 'project_open');
 				core.projects.select(core.designs[core.designs.length - 1]);
 			}
 		}
 
-		private async openHandle(handle: FileSystemFileHandle, request: boolean): Promise<boolean> {
-			if(request && !await this.requestPermission(handle)) return false;
+		private async openHandle(handle: FileSystemFileHandle, request: boolean): Promise<number | undefined> {
+			if(request && !await this.requestPermission(handle)) return undefined;
 			try {
 				let file = await handle.getFile();
 				return await this.openFile(file, handle);
 			} catch(e) {
 				await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
 				await core.handles.removeRecent(handle);
-				return false;
+				return undefined;
 			}
 		}
 		private async requestPermission(handle: FileSystemFileHandle): Promise<boolean> {
@@ -83,28 +96,28 @@
 			return false;
 		}
 
-		/** 讀入已經取得的檔案並且傳回是否成功（檔案格式是否正確） */
-		private async openFile(file: File, handle?: FileSystemFileHandle): Promise<boolean> {
+		/** 讀入已經取得的檔案並且傳回檔案的 id（工作區的話傳回最後一個） */
+		private async openFile(file: File, handle?: FileSystemFileHandle): Promise<number | undefined> {
 			try {
 				let buffer = await readFile(file);
 				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
 				if(test == "{") { // JSON
-					let design = bp.load(bufferToText(buffer));
+					let design = bp.load(bufferToText(buffer))!;
 					core.projects.add(design);
 					if(handle) {
 						core.handles.set(design.id, handle);
 						await core.handles.addRecent(handle);
 					}
-					return true;
+					return design.id;
 				} else if(test == "P") { // PKZip
-					await core.projects.openWorkspace(buffer);
+					let id = await core.projects.openWorkspace(buffer);
 					if(handle) await core.handles.addRecent(handle);
-					return true;
+					return id;
 				} else { throw new Error(); }
 			} catch(e) {
 				debugger;
 				await core.alert(this.$t('message.invalidFormat', [file.name]));
-				return false;
+				return undefined;
 			}
 		}
 	}

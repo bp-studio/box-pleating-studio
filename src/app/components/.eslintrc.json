@@ -20,7 +20,7 @@
         "vue/max-len": [
             "warn",
             {
-                "code": 100,
+                "code": 120,
                 "ignoreComments": true,
                 "ignoreHTMLAttributeValues": true,
                 "ignoreStrings": true,
