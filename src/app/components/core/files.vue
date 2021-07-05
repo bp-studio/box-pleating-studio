@@ -22,7 +22,12 @@
 			});
 		}
 
-		public async open(handles: FileSystemFileHandle[], request?: boolean): Promise<void> {
+		public async open(
+			handles: readonly FileSystemFileHandle[], request?: boolean
+		): Promise<void> {
+			handles = await core.handles.filter(handles);
+			if(handles.length == 0) return;
+
 			await core.loader.show();
 			let tasks = handles.map(handle => this.openHandle(handle, request));
 			let success = (await Promise.all(tasks)).includes(true);
@@ -31,6 +36,15 @@
 				gtag('event', 'project_open');
 				core.projects.select(core.designs[core.designs.length - 1]);
 			}
+		}
+
+		/**
+		 * 這是基於一個未來的 API，請參考 https://github.com/WICG/file-handling/blob/main/explainer.md
+		 * 目前在 Chrome 上面已經可以藉由打開 chrome://flags/#file-handling-api 來試用
+		 */
+		public openQueue(): void {
+			if(!('launchQueue' in window)) return;
+			launchQueue.setConsumer(launchParams => this.open(launchParams.files));
 		}
 
 		public async openFiles(files: FileList): Promise<void> {

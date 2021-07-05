@@ -21,7 +21,7 @@
 				ref="bps"
 				@save="notify($event)"
 				:desc="$t('toolbar.file.BPS.name')"
-				mime="application/box-pleating-studio-project"
+				mime="application/bpstudio.project"
 			>
 				<i class="fas fa-save"></i>
 				{{$t('toolbar.file.BPS.saveAs')}}
@@ -32,7 +32,7 @@
 				ref="bpz"
 				@save="notifyAll($event)"
 				:desc="$t('toolbar.file.BPZ.name')"
-				mime="application/box-pleating-studio-workspace"
+				mime="application/bpstudio.workspace"
 			>
 				<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.BPZ.save')}}</hotkey>
 			</saveas>

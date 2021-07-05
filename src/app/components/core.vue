@@ -119,6 +119,8 @@
 			window.setInterval(() => this.save(), SAVE_INTERVAL);
 			window.addEventListener("beforeunload", () => this.save());
 			this.initialized = true;
+
+			this.files.openQueue();
 		}
 
 		private async loadSession(): Promise<void> {
@@ -271,7 +273,7 @@
 				compression: "DEFLATE",
 				compressionOptions: { level: 9 },
 			});
-			return blob.slice(0, blob.size, "application/octet-binary");
+			return blob.slice(0, blob.size, "application/bpstudio.workspace");
 		}
 	}
 </script>

@@ -30,6 +30,16 @@
 				></a>
 			</div>
 		</div>
+		<div v-if="isFileApi" class="container mt-5">
+			<div class="row">
+				<div class="col-6">
+					<h4>Start</h4>
+				</div>
+				<div class="col-6">
+					<h4>Recently used</h4>
+				</div>
+			</div>
+		</div>
 		<div style="position:absolute; bottom:1rem; right:1rem;">{{core.copyright}}</div>
 	</div>
 </template>
@@ -53,6 +63,7 @@
 		protected bi: BeforeInstallPromptEvent;
 		protected install: number = 0;
 		protected ios: boolean = navigator.standalone === false;
+		protected isFileApi: boolean = isFileApiEnabled;
 
 		protected get core(): typeof core { return core; }
 

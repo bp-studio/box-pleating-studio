@@ -3,6 +3,16 @@ import VueI18n from 'vue-i18n';
 
 declare global {
 
+	export const launchQueue: LaunchQueue;
+
+	interface LaunchQueue {
+		setConsumer(consumer: (launchParams: LaunchParams) => void): void;
+	}
+
+	interface LaunchParams {
+		readonly files: readonly FileSystemFileHandle[];
+	}
+
 	export interface Executor extends Vue {
 		execute(): void;
 	}

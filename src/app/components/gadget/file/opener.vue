@@ -21,19 +21,19 @@
 						{
 							description: this.$t('toolbar.file.BPF').toString(),
 							accept: {
-								'application/box-pleating-studio': ['.bps', '.bpz'],
+								'application/bpstudio': ['.bps', '.bpz'],
 							},
 						},
 						{
 							description: this.$t('toolbar.file.BPS.name').toString(),
 							accept: {
-								'application/box-pleating-studio-project': ['.bps'],
+								'application/bpstudio.project': ['.bps'],
 							},
 						},
 						{
 							description: this.$t('toolbar.file.BPZ.name').toString(),
 							accept: {
-								'application/box-pleating-studio-workspace': ['.bpz'],
+								'application/bpstudio.workspace': ['.bpz'],
 							},
 						},
 					],

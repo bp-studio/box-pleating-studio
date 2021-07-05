@@ -52,7 +52,7 @@ interface StudioOptions {
 		let json = this.$design.toJSON();
 		delete json.history; // 存檔的時候不用儲存歷史
 		let bps = JSON.stringify(json);
-		return new Blob([bps], { type: "application/octet-stream" });
+		return new Blob([bps], { type: "application/bpstudio.project" });
 	}
 
 	protected _tryLoad(design: RecursivePartial<JDesign>): Design {

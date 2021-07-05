@@ -168,7 +168,7 @@ interface JSheet {
 	@shrewd public get $margin(): number {
 		if(!this._isActive || !this.$design._isActive) return 0;
 		let controls = this._labeledControls;
-		if(controls.length == 0 || !this.$studio!.$display.$settings.showLabel) return 0;
+		if(controls.length == 0 || !this.$studio || !this.$studio.$display.$settings.showLabel) return 0;
 
 		let vm = this.$design.$viewManager;
 		let overflows = controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow);
