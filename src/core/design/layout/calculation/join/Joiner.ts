@@ -12,8 +12,10 @@ class Joiner {
 	private g1: JPiece[];
 	private g2: JPiece[];
 
-	// s 代表 shift，是指 Overlap 的偏移
+	/** 第一個 Overlap 的偏移 */
 	public s1?: IPoint;
+
+	/** 第二個 Overlap 的偏移 */
 	public s2?: IPoint;
 
 	/** 共用角在左下角 */
