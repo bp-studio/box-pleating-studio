@@ -22,7 +22,7 @@ declare global {
 	export const gtag: (...args: unknown[]) => void;
 
 	// 系統狀態常數
-	export const FileApiEnabled: boolean;
+	export const isFileApiEnabled: boolean;
 	export const isMac: boolean;
 	export const isPWA: boolean;
 

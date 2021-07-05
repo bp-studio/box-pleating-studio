@@ -5,5 +5,10 @@ module.exports = {
 			package: '../../package.json',
 			tsconfig: './tsconfig.json',
 		},
+		{
+			root: './src/donate',
+			package: '../../package.json',
+			tsconfig: './tsconfig.json',
+		},
 	],
 };

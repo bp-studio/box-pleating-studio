@@ -1,16 +1,16 @@
 <template>
 	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset" @show="init">
-		<div class="dropdown-item" @click="newProject">
+		<div class="dropdown-item" @click="core.projects.create()">
 			<i class="far fa-file"></i>
 			{{$t('toolbar.file.new')}}
 		</div>
 		<divider></divider>
 
-		<template v-if="FileApiEnabled">
-			<opener ref="open" @open="open($event)">
+		<template v-if="isFileApiEnabled">
+			<opener ref="open" @open="core.files.open($event)">
 				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 			</opener>
-			<recentmenu @open="open([$event], true)"></recentmenu>
+			<recentmenu @open="core.files.open([$event], true)"></recentmenu>
 			<divider></divider>
 			<dropdownitem :disabled="!design" @click="save()">
 				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.BPS.save')}}</hotkey>
@@ -51,7 +51,7 @@
 
 		<divider></divider>
 
-		<template v-if="FileApiEnabled">
+		<template v-if="isFileApiEnabled">
 			<saveas
 				:disabled="!design"
 				type="svg"
@@ -111,33 +111,19 @@
 	export default class FileMenu extends BaseComponent {
 
 		mounted(): void {
-			document.body.addEventListener('dragover', e => {
-				e.preventDefault();
-				e.stopPropagation();
-			});
-			document.body.addEventListener("drop", e => {
-				e.preventDefault();
-				e.stopPropagation();
-				if(e.dataTransfer) this.openFiles(e.dataTransfer.files);
-			});
-
 			registerHotkey(() => (this.$refs.open as Executor).execute(), "o");
 			registerHotkey(() => {
 				if(!core.design) return;
 				let bps = this.$refs.bps as Executor;
-				if(FileApiEnabled) this.save();
+				if(isFileApiEnabled) this.save();
 				else bps.execute();
 			}, "s");
 			registerHotkey(() => core.design && (this.$refs.bpz as Executor).execute(), "s", true);
 			registerHotkey(() => this.print(), "p");
 		}
 
-		protected get FileApiEnabled(): boolean { return FileApiEnabled; }
-
-		protected newProject(): void {
-			core.projects.create();
-			gtag('event', 'project_create');
-		}
+		protected get isFileApiEnabled(): boolean { return isFileApiEnabled; }
+		protected get core(): typeof core { return core; }
 
 		protected notify(handle?: FileSystemFileHandle): void {
 			let design = this.bp.design;
@@ -169,19 +155,16 @@
 		}
 
 		private downloads(): Download[] {
+			if(isFileApiEnabled) return [];
 			return [this.$refs.bps, this.$refs.bpz, this.$refs.svg, this.$refs.png] as Download[];
 		}
 		protected init(): void {
-			if(!FileApiEnabled) {
-				// 當選單開啟的時候生成 ObjectURL
-				this.downloads().forEach(d => d.getFile());
-			}
+			// 當選單開啟的時候生成 ObjectURL
+			this.downloads().forEach(d => d.getFile());
 		}
 		protected reset(): void {
-			if(!FileApiEnabled) {
-				// 當選單關閉的時候把所有 ObjectURL 回收掉
-				this.downloads().forEach(d => d.reset());
-			}
+			// 當選單關閉的時候把所有 ObjectURL 回收掉
+			this.downloads().forEach(d => d.reset());
 		}
 
 		protected async save(): Promise<void> {
@@ -203,79 +186,10 @@
 			}
 		}
 
-		protected async open(handles: FileSystemFileHandle[], request?: boolean): Promise<void> {
-			await core.loader.show();
-			let tasks = handles.map(handle => this.openHandle(handle, request));
-			let success = (await Promise.all(tasks)).includes(true);
-			core.loader.hide();
-			if(success) {
-				gtag('event', 'project_open');
-				core.projects.select(core.designs[core.designs.length - 1]);
-			}
-		}
-		private async openHandle(handle: FileSystemFileHandle, request: boolean): Promise<boolean> {
-			if(request && !await this.requestPermission(handle)) return false;
-			try {
-				let file = await handle.getFile();
-				return await this.openFile(file, handle);
-			} catch(e) {
-				await core.alert(this.$t('toolbar.file.notFound', [handle.name]));
-				await core.handles.removeRecent(handle);
-				return false;
-			}
-		}
-		private async requestPermission(handle: FileSystemFileHandle): Promise<boolean> {
-			let mode: FileSystemPermissionMode = handle.name.endsWith(".bpz") ? "read" : "readwrite";
-			if(await handle.requestPermission({ mode }) == 'granted') return true;
-			if(await core.confirm(this.$t('message.filePermission'))) {
-				return this.requestPermission(handle);
-			}
-			return false;
-		}
 		protected async upload(event: Event): Promise<void> {
 			let f = event.target as HTMLInputElement;
-			await this.openFiles(f.files);
+			await core.files.openFiles(f.files);
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
-		}
-		private async openFiles(files: FileList): Promise<void> {
-			await core.loader.show();
-			let tasks: Promise<boolean>[] = [];
-			if(files.length) {
-				for(let i = 0; i < files.length; i++) {
-					tasks.push(this.openFile(files[i]));
-				}
-			}
-			let success = (await Promise.all(tasks)).includes(true);
-			core.loader.hide();
-			if(success) {
-				gtag('event', 'project_open');
-				core.projects.select(core.designs[core.designs.length - 1]);
-			}
-		}
-
-		/** 讀入已經取得的檔案並且傳回是否成功（檔案格式是否正確） */
-		private async openFile(file: File, handle?: FileSystemFileHandle): Promise<boolean> {
-			try {
-				let buffer = await readFile(file);
-				let test = String.fromCharCode.apply(null, new Uint8Array(buffer.slice(0, 1)));
-				if(test == "{") { // JSON
-					let design = this.bp.load(bufferToText(buffer));
-					core.projects.add(design);
-					if(handle) {
-						core.handles.set(design.id, handle);
-						await core.handles.addRecent(handle);
-					}
-					return true;
-				} else if(test == "P") { // PKZip
-					await core.projects.openWorkspace(buffer);
-					if(handle) await core.handles.addRecent(handle);
-					return true;
-				} else { throw new Error(); }
-			} catch(e) {
-				debugger;
-				await core.alert(this.$t('message.invalidFormat', [file.name]));
-				return false;
-			}
 		}
 
 		protected print(): void {

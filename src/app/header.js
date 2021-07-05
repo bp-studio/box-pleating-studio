@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable no-undef */
 /* eslint-disable no-var */
@@ -16,7 +17,7 @@ var isMac = navigator.platform.toLowerCase().startsWith("mac");
 var isPWA = matchMedia("(display-mode: standalone)").matches;
 
 // 是否支援原生檔案 API
-var FileApiEnabled = typeof window.showSaveFilePicker != 'undefined';
+var isFileApiEnabled = typeof window.showSaveFilePicker != 'undefined';
 
 ///////////////////////////////////////////////////
 // 檔案處理

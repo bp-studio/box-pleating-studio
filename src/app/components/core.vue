@@ -2,6 +2,7 @@
 	<div>
 		<projects ref="mgr" :designs="designs"></projects>
 		<handles ref="handles"></handles>
+		<files ref="files"></files>
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
 		<note v-if="design&&bp.patternNotFound(design)"></note>
@@ -19,9 +20,10 @@
 	import Alert from './dialog/alert.vue';
 	import Confirm from './dialog/confirm.vue';
 	import CoreBase from './mixins/coreBase';
-	import Handles from './handles.vue';
+	import Files from './core/files.vue';
+	import Handles from './core/handles.vue';
 	import Language from './dialog/language.vue';
-	import Projects from './projects.vue';
+	import Projects from './core/projects.vue';
 	import Spinner from './gadget/spinner.vue';
 
 	declare const LZ: { decompress(s: string): string };
@@ -75,12 +77,9 @@
 			localStorage.setItem("build", app_config.app_version);
 		}
 
-		public get projects(): Projects {
-			return this.$refs.mgr as Projects;
-		}
-		public get handles(): Handles {
-			return this.$refs.handles as Handles;
-		}
+		public get projects(): Projects { return this.$refs.mgr as Projects; }
+		public get handles(): Handles { return this.$refs.handles as Handles; }
+		public get files(): Files { return this.$refs.files as Files; }
 
 		public async init(): Promise<void> {
 			const SAVE_INTERVAL = 3000;

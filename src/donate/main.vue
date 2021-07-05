@@ -21,9 +21,7 @@
 				<div>{{$t('donate.thank', [name])}}</div>
 			</div>
 			<div class="wait flex-grow-0">
-				<button class="btn btn-primary w-100" onclick="window.close()">
-					{{step==1?$t('donate.nextTime'):$t('keyword.close')}}
-				</button>
+				<button class="btn btn-primary w-100" onclick="window.close()">{{step==1?$t('donate.nextTime'):$t('keyword.close')}}</button>
 			</div>
 		</div>
 	</div>
@@ -60,7 +58,7 @@
 			return this.amount > 0 ? ' + $' + this.extra.toFixed(2) : "";
 		}
 
-		private amountChange(): void{
+		private amountChange(): void {
 			if(this.error = !(this.amount > 0)) this.actions.disable();
 			else this.actions.enable();
 		}

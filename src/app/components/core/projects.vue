@@ -7,7 +7,7 @@
 	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	import JSZip from 'jszip';
-	import { bp } from './import/BPStudio';
+	import { bp } from '../import/BPStudio';
 
 	@Component
 	export default class Projects extends Vue {
@@ -19,6 +19,7 @@
 			let d = bp.create(this.checkTitle(j));
 			this.add(bp.design = d);
 			this.scrollTo(d.id);
+			gtag('event', 'project_create');
 		}
 
 		public select(id: number): void {
