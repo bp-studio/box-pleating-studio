@@ -16,7 +16,9 @@
 			"ed": "BP Studio đã được cài đặt trên thiết bị của bạn.",
 			"open": "Mở ứng dụng Studio Pleating Box"
 		},
-		"copyright": "Bản quyền © 2020{0} bởi Thái Mục Thôn (Mu-Tsun Tsai)"
+		"copyright": "Bản quyền © 2020{0} bởi Thái Mục Thôn (Mu-Tsun Tsai)",
+		"recent": "Được sử dụng gần đây",
+		"start": "Khởi đầu"
 	},
 	"toolbar": {
 		"file": {

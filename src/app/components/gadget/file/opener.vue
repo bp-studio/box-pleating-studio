@@ -1,5 +1,5 @@
 <template>
-	<div class="dropdown-item m-0" @click="execute">
+	<div @click="execute">
 		<slot></slot>
 	</div>
 </template>

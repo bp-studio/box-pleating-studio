@@ -16,7 +16,9 @@
 			"ed": "BP Studio is already installed on your device.",
 			"open": "Open Box Pleating Studio App"
 		},
-		"copyright": "Copyright © 2020{0} by Mu-Tsun Tsai"
+		"copyright": "Copyright © 2020{0} by Mu-Tsun Tsai",
+		"recent": "Recently used",
+		"start": "Start"
 	},
 	"toolbar": {
 		"file": {

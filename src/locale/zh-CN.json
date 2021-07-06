@@ -16,7 +16,9 @@
 			"ed": "BP Studio 已经安装到您的装置上了。",
 			"open": "打开 Box Pleating Studio App"
 		},
-		"copyright": "Copyright © 2020{0} 蔡牧村"
+		"copyright": "Copyright © 2020{0} 蔡牧村",
+		"recent": "最近使用",
+		"start": "开始"
 	},
 	"toolbar": {
 		"file": {
