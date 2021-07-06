@@ -6,7 +6,11 @@ declare global {
 	export const launchQueue: LaunchQueue;
 
 	interface LaunchQueue {
-		setConsumer(consumer: (launchParams: LaunchParams) => void): void;
+		setConsumer(consumer: LaunchConsumer): void;
+	}
+
+	interface LaunchConsumer {
+		(launchParams: LaunchParams): void;
 	}
 
 	interface LaunchParams {

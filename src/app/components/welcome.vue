@@ -45,13 +45,15 @@
 						{{$t('toolbar.file.open')}}
 					</opener>
 				</div>
-				<div class="col-6 col-lg-5 col-xl-4" v-if="recent.length">
-					<h4 class="mb-3" v-t="'welcome.recent'"></h4>
-					<div class="link-primary" v-for="(h,i) in recent" :key="i" @click="open(h)">{{h.name}}</div>
-					<div class="link-primary mt-3" @click="clearRecent">
-						<i class="fas fa-trash-alt"></i>
-						{{$t('toolbar.file.recent.clear')}}
-					</div>
+				<div class="col-6 col-lg-5 col-xl-4">
+					<template v-if="recent.length">
+						<h4 class="mb-3" v-t="'welcome.recent'"></h4>
+						<div class="link-primary" v-for="(h,i) in recent" :key="i" @click="open(h)">{{h.name}}</div>
+						<div class="link-primary mt-3" @click="clearRecent">
+							<i class="fas fa-trash-alt"></i>
+							{{$t('toolbar.file.recent.clear')}}
+						</div>
+					</template>
 				</div>
 			</div>
 		</div>
