@@ -18,13 +18,13 @@ class ScrollController {
 	constructor(studio: Studio) {
 		this._studio = studio;
 
-		document.addEventListener("mousemove", this._bodyMousemove.bind(this));
-		document.addEventListener("touchmove", this._bodyMousemove.bind(this));
+		document.addEventListener("mousemove", this._bodyMousemove.bind(this), { passive: true });
+		document.addEventListener("touchmove", this._bodyMousemove.bind(this), { passive: true });
 		document.addEventListener("contextmenu", this._bodyMenu.bind(this));
-		document.addEventListener("mouseup", this._bodyMouseup.bind(this));
-		document.addEventListener("touchend", this._bodyMouseup.bind(this));
+		document.addEventListener("mouseup", this._bodyMouseup.bind(this), { passive: true });
+		document.addEventListener("touchend", this._bodyMouseup.bind(this), { passive: true });
 
-		studio.$el.addEventListener("scroll", this._onScroll.bind(this));
+		studio.$el.addEventListener("scroll", this._onScroll.bind(this), { passive: true });
 	}
 
 	public get on(): boolean {

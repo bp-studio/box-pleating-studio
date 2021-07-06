@@ -40,7 +40,7 @@
 			if(getComputedStyle(this.$el).touchAction != "none") {
 				this.$el.addEventListener("touchmove", (e: TouchEvent) => {
 					if(e.touches.length > 1) e.preventDefault();
-				});
+				}, { passive: false });
 			}
 		}
 	}

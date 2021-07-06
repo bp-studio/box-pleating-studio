@@ -9,8 +9,8 @@
 	constructor(studio: Studio) {
 		this._studio = studio;
 
-		document.addEventListener("mouseup", this._dragEnd.bind(this));
-		document.addEventListener("touchend", this._dragEnd.bind(this));
+		document.addEventListener("mouseup", this._dragEnd.bind(this), { passive: true });
+		document.addEventListener("touchend", this._dragEnd.bind(this), { passive: true });
 	}
 
 	private get _draggable(): Draggable[] {

@@ -30,6 +30,6 @@ window.addEventListener("DOMContentLoaded", () => {
 		bp.option.onLongPress = () => app.showPanel = true;
 		bp.option.onDrag = () => app.showPanel = false;
 		core.init();
-	// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 	}, 10);
-});
+}, { once: true });

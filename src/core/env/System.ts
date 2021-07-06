@@ -29,7 +29,7 @@ class System {
 		tool.onMouseDrag = this._canvasMouseDrag.bind(this);
 		tool.onMouseUp = this._canvasMouseup.bind(this);
 
-		canvas.addEventListener("touchstart", this._canvasTouch.bind(this));
+		canvas.addEventListener("touchstart", this._canvasTouch.bind(this), { passive: true });
 
 		this._longPress = new LongPressController(() => this._studio.$option.onLongPress?.());
 		this.$zoom = new ZoomController(studio, canvas);

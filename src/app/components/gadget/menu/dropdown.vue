@@ -12,7 +12,7 @@
 			<i :class="icon"></i>
 			<div class="notify" v-if="notify"></div>
 		</button>
-		<div ref="menu" class="dropdown-menu" @touchstartout="hide" @mousedownout="hide">
+		<div ref="menu" class="dropdown-menu">
 			<slot></slot>
 		</div>
 	</div>
@@ -29,12 +29,16 @@
 		@Prop(String) public title: string;
 		@Prop(Boolean) public notify: boolean;
 
-		private dropdown: bootstrap.Dropdown;
-
 		mounted(): void {
-			core.libReady.then(() =>
-				this.dropdown = new bootstrap.Dropdown(this.$refs.btn as Element, {})
-			);
+			core.libReady.then(() => {
+				let dd = new bootstrap.Dropdown(this.$refs.btn as Element, {});
+
+				// Bootstrap doesn't support touch cancel
+				document.addEventListener('touchstart', event => {
+					if(!(this.$refs.menu as Element).contains(event.target as Element)) dd.hide();
+				}, { capture: true, passive: true });
+			});
+
 			this.$el.addEventListener('show.bs.dropdown', () => this.$emit('show'));
 			this.$el.addEventListener('shown.bs.dropdown', () => dropdown.current = this);
 			this.$el.addEventListener('hide.bs.dropdown', () => {
@@ -45,11 +49,6 @@
 		}
 
 		protected get ready(): boolean { return core.initialized; }
-
-		protected async hide(): Promise<void> {
-			await core.libReady;
-			this.dropdown.hide();
-		}
 
 		protected mouseenter(): void {
 			if(dropdown.current && dropdown.current != this) {

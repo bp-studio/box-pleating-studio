@@ -59,7 +59,6 @@
 	},
 	"dependencies": {
 		"bootstrap": "^5.0.0",
-		"clickout-event": "^1.1.1",
 		"lzma": "^2.3.2",
 		"marked": "^2.0.3",
 		"paper": "^0.12.15",

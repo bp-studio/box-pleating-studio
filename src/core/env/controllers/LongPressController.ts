@@ -15,8 +15,8 @@ class LongPressController {
 	constructor(callback: Action) {
 		this._callback = callback;
 		let handler = this.$cancel.bind(this);
-		document.addEventListener("mouseup", handler);
-		document.addEventListener("touchend", handler);
+		document.addEventListener("mouseup", handler, { passive: true });
+		document.addEventListener("touchend", handler, { passive: true });
 	}
 
 	/** 長壓設置 */

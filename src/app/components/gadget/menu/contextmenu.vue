@@ -1,5 +1,5 @@
 <template>
-	<div class="dropdown-menu" @touchstartout="hide" @mousedownout="hide" @touchend="hide" @mouseup="hide">
+	<div class="dropdown-menu" @touchend="hide" @mouseup="hide">
 		<slot></slot>
 	</div>
 </template>
@@ -12,6 +12,14 @@
 	export default class ContextMenu extends Vue {
 
 		private shown: boolean = false;
+
+		mounted(): void {
+			let handle = (event: Event): void => {
+				if(this.shown && !this.$el.contains(event.target as Element)) this.hide();
+			};
+			document.addEventListener('touchstart', handle, { capture: true, passive: true });
+			document.addEventListener('mousedown', handle, { capture: true, passive: true });
+		}
 
 		public show(e: MouseEvent): void {
 			Popper.createPopper(
