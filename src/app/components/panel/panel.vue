@@ -31,14 +31,13 @@
 	export default class Panel extends BaseComponent {
 		@Prop(Boolean) public show: boolean;
 
-		public get repository(): BP.Repository {
-			return core.initialized && this.bp.getRepository(this.selection);
+		public get repository(): BP.Repository | null {
+			return core.initialized && this.bp.getRepository(this.selection) || null;
 		}
 
-		public get type(): string | undefined {
-			return core.initialized && this.bp.getType(this.selection);
+		public get type(): string {
+			return core.initialized && this.bp.getType(this.selection) || "";
 		}
-
 
 		@Watch("repository") repo(): void {
 			// 確保 GC，不用採取動作

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="design">
 		<h5 v-t="'panel.design.type'" class="panel-title"></h5>
 		<div class="panel-grid">
 			<field :label="$t('panel.design.title')" v-model="design.title" :placeholder="$t('panel.design.titlePH')"></field>
@@ -33,7 +33,7 @@
 	export default class Design extends BaseComponent {
 		protected get step(): number {
 			const FULL_ZOOM = 100, ZOOM_STEP = 25;
-			let s: number = this.design.sheet.zoom;
+			let s: number = this.design!.sheet.zoom;
 			return 2 ** Math.floor(Math.log2(s / FULL_ZOOM)) * ZOOM_STEP;
 		}
 	}

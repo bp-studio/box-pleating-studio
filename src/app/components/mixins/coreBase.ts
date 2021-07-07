@@ -14,7 +14,7 @@ export default class CoreBase extends Vue {
 	public libReady: Promise<void>;
 	public initialized: boolean = false;
 
-	public get design(): Design {
+	public get design(): Design | null {
 		if(!this.initialized) return null;
 		let t = bp.design ? bp.design.title : null;
 		document.title = "Box Pleating Studio" + (t ? " - " + t : "");

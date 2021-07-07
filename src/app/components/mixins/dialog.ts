@@ -22,7 +22,7 @@ export default abstract class Dialog<T> extends Vue {
 		await core.libReady;
 		let current = new Promise<T>(resolve => {
 			this.last.then(() => {
-				this.message = message;
+				this.message = message || "";
 				let handler = registerHotkeyCore(this.key.bind(this));
 				this.resolve((v: T) => {
 					unregisterHotkeyCore(handler);

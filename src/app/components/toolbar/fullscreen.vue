@@ -48,12 +48,10 @@
 		public toggleFullscreen(): void {
 			if(this.fullscreen) {
 				let doc = document;
-				(doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen)
-					.apply(doc);
+				(doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen).apply(doc);
 			} else {
 				let el = document.documentElement;
-				(el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen)
-					.apply(el);
+				(el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).apply(el);
 			}
 		}
 	}

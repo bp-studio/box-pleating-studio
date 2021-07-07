@@ -60,20 +60,21 @@
 	@Component
 	export default class Toolbar extends BaseComponent {
 
-		public toLayout(): void { this.design.mode = "layout"; }
-		public toTree(): void { this.design.mode = "tree"; }
+		public toLayout(): void { if(this.design) this.design.mode = "layout"; }
+		public toTree(): void { if(this.design) this.design.mode = "tree"; }
 
 		public async TreeMaker(event: Event): Promise<void> {
-			let f = event.target as HTMLInputElement;
-			if(f.files.length == 0) return;
-			let content = bufferToText(await readFile(f.files[0]));
-			let name = f.files[0].name;
+			let input = event.target as HTMLInputElement;
+			let files = input.files!;
+			if(files.length == 0) return;
+			let content = bufferToText(await readFile(files[0]));
+			let name = files[0].name;
 			try {
 				core.open(this.bp.TreeMaker.parse(name.replace(/\.tmd5$/i, ""), content));
 			} catch(e) {
 				core.alert(this.$t(e.message, [name]));
 			}
-			f.value = "";
+			input.value = "";
 		}
 	}
 </script>

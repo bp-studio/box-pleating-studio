@@ -9,6 +9,7 @@ declare type edge = Edge;
 declare type flap = Flap;
 declare type vertex = Vertex;
 declare type repo = Repository;
+declare type config = Configuration;
 
 export {
 	bp, design as Design,
@@ -17,5 +18,6 @@ export {
 	edge as Edge,
 	flap as Flap,
 	vertex as Vertex,
-	repo as Repository
+	repo as Repository,
+	config as Configuration
 };

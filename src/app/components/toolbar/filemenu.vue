@@ -169,7 +169,7 @@
 
 		protected async save(): Promise<void> {
 			try {
-				let handle = core.handles.get(this.design.id);
+				let handle = core.handles.get(this.design!.id);
 				let writable = await handle.createWritable();
 				try {
 					await handle.getFile();

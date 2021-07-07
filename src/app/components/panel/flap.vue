@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="design">
 		<h5 v-t="'panel.flap.type'" class="panel-title"></h5>
 		<div class="panel-grid">
 			<field :label="$t('panel.flap.name')" v-model="subject.name"></field>

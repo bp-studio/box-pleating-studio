@@ -85,7 +85,7 @@
 				await core.alert(this.$t("message.latest"));
 			} else {
 				sw.addEventListener('statechange', e => {
-					if(sw.state == "activated") {
+					if(sw!.state == "activated") {
 						this.checking = false;
 						this.update();
 					}

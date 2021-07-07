@@ -3,7 +3,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 @Component
 export default class InputMixin extends Vue {
 
-	@Prop(null) public value: unknown;
+	@Prop(undefined) public value: unknown;
 
 	protected id: string = "field" + this._uid;
 	protected v: unknown = null;

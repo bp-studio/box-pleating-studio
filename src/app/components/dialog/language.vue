@@ -50,12 +50,12 @@
 		}
 
 		/** 取得當前的候選語言列表 */
-		private getLanguages(loc: string | undefined): string[] {
+		private getLanguages(loc: string | null): string[] {
 			let locales = Object.keys(locale);
 			if(!navigator.languages) return locales;
 			let languages = navigator.languages
 				.map(a => locales.find(l => this.format(a).startsWith(l)))
-				.filter(l => Boolean(l));
+				.filter((l): l is string => Boolean(l));
 			if(loc) languages.unshift(loc);
 			languages = Array.from(new Set(languages));
 			return languages;

@@ -11,7 +11,7 @@ export default class BaseComponent extends Vue {
 	public get bp(): BPStudio { return bp; }
 
 	// 底下兩個計算屬性都是呼叫 core 的代理屬性以避免初始化的問題
-	public get design(): Design { return core.design; }
+	public get design(): Design | null { return core.design; }
 	public get selections(): Control[] { return core.selections; }
 
 	public get selection(): Control { return this.selections[0]; }

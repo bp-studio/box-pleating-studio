@@ -59,7 +59,7 @@
 		protected canShare: boolean = Boolean(navigator.share);
 		protected ready: boolean = false;
 		protected sending: boolean = false;
-		protected error: string = null;
+		protected error: string | null = null;
 
 		mounted(): void {
 			core.libReady.then(() => {
@@ -68,14 +68,11 @@
 			});
 		}
 
-		public json(): string {
-			if(!this.design) return undefined;
-			return JSON.stringify(this.design);
-		}
-
 		public async show(): Promise<void> {
 			await core.libReady;
-			this.url = "https://bpstudio.abstreamace.com/?project=" + LZ.compress(this.json());
+			if(!this.design) return;
+			let data = LZ.compress(JSON.stringify(this.design));
+			this.url = "https://bpstudio.abstreamace.com/?project=" + data;
 			this.modal.show();
 			this.shorten();
 			this.$el.addEventListener('shown.bs.modal', () => {
@@ -95,7 +92,7 @@
 		protected share(): void {
 			navigator.share({
 				title: "Box Pleating Studio",
-				text: this.$t("share.message", [this.design.title]).toString(),
+				text: this.$t("share.message", [this.design!.title]).toString(),
 				url: this.url,
 			}).catch(() => {
 				// 捕捉取消之類的錯誤，不處理

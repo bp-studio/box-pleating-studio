@@ -245,13 +245,13 @@
 		// 下載
 		/////////////////////////////////////////////////////////////////////////////////////////
 
-		public async getBlob(type: string): Promise<Blob | null> {
-			if(!this.design) return null;
+		public async getBlob(type: string): Promise<Blob> {
+			if(!this.design) throw new Error();
 			if(type == 'png') return await bp.toPNG();
 			if(type == 'svg') return bp.toSVG();
 			if(type == 'bpz') return await this.zip();
-			if(type == 'bps') return bp.toBPS();
-			return null;
+			if(type == 'bps') return bp.toBPS()!;
+			throw new Error();
 		}
 
 		public getFilename(type: string): string {

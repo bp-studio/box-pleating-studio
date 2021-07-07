@@ -1,85 +1,85 @@
 {
-	"latex-workshop.latex.recipe.default": "xelatex",
-	"latex-workshop.latex.recipes": [
-		{
-			"name": "xelatex",
-			"tools": [
-				"xelatex",
-			]
-		}
-	],
-	"files.exclude": {
-		"node_modules": true,
-		"**/debug.log": true,
-		"docs/**/*.log": true,
-		"**/*.aux": true,
-		"**/*.nav": true,
-		"**/*.out": true,
-		"**/*.snm": true,
-		"**/*.synctex.gz": true,
-		"**/*.toc": true
-	},
-	"i18n-ally.enabledFrameworks": [
-		"vue"
-	],
-	"i18n-ally.localesPaths": "src/locale",
-	"i18n-ally.enabledParsers": [
-		"json"
-	],
-	"i18n-ally.sourceLanguage": "en",
-	"i18n-ally.keystyle": "nested",
-	"i18n-ally.indent": 4,
-	"i18n-ally.tabStyle": "tab",
-	"i18n-ally.usage.scanningIgnore": [
-		"src/public/**/*"
-	],
-	"i18n-ally.keysInUse": [
-		"since"
-	],
-	"vetur.experimental.templateInterpolationService": true,
-	"cSpell.words": [
-		"bpstudio",
-		"configurator",
-		"fullscreen",
-		"gops",
-		"gtag",
-		"i",
-		"kamiya",
-		"keyval",
-		"mixins",
-		"notranslate",
-		"osme",
-		"overlappings",
-		"partitioner",
-		"paypal",
-		"precache",
-		"precaching",
-		"queryable",
-		"scrollable",
-		"selectables",
-		"serializable",
-		"tsai",
-		"tsun",
-		"typeless"
-	],
-	"cSpell.ignoreRegExpList": [
-		"/[A-Z]+(?![a-z])/g"
-	],
-	"cSpell.ignorePaths": [
-		"**/package*.json",
-		"src/locale/es.json",
-		".vscode",
-		".eslintrc*",
-		"debug/**/*",
-		"src/**/paper.d.ts",
-		"src/**/PolyBool.ts"
-	],
-	"cSpell.ignoreWords": [
-		"fbclid",
-		"lazypipe",
-		"opendir",
-		"purgecss",
-		"tinyurl",
-		"weixin"
-	]
+    "cSpell.ignorePaths": [
+        "**/package*.json",
+        "src/locale/es.json",
+        ".vscode",
+        ".eslintrc*",
+        "debug/**/*",
+        "src/**/paper.d.ts",
+        "src/**/PolyBool.ts"
+    ],
+    "cSpell.ignoreRegExpList": [
+        "/[A-Z]+(?![a-z])/g"
+    ],
+    "cSpell.ignoreWords": [
+        "fbclid",
+        "lazypipe",
+        "opendir",
+        "purgecss",
+        "tinyurl",
+        "weixin"
+    ],
+    "cSpell.words": [
+        "bpstudio",
+        "configurator",
+        "fullscreen",
+        "gops",
+        "gtag",
+        "i",
+        "kamiya",
+        "keyval",
+        "mixins",
+        "notranslate",
+        "osme",
+        "overlappings",
+        "partitioner",
+        "paypal",
+        "precache",
+        "precaching",
+        "queryable",
+        "scrollable",
+        "selectables",
+        "serializable",
+        "tsai",
+        "tsun",
+        "typeless"
+    ],
+    "files.exclude": {
+        "**/*.aux": true,
+        "**/*.nav": true,
+        "**/*.out": true,
+        "**/*.snm": true,
+        "**/*.synctex.gz": true,
+        "**/*.toc": true,
+        "**/debug.log": true,
+        "docs/**/*.log": true,
+        "node_modules": true
+    },
+    "i18n-ally.enabledFrameworks": [
+        "vue"
+    ],
+    "i18n-ally.enabledParsers": [
+        "json"
+    ],
+    "i18n-ally.indent": 4,
+    "i18n-ally.keysInUse": [
+        "since"
+    ],
+    "i18n-ally.keystyle": "nested",
+    "i18n-ally.localesPaths": "src/locale",
+    "i18n-ally.sourceLanguage": "en",
+    "i18n-ally.tabStyle": "tab",
+    "i18n-ally.usage.scanningIgnore": [
+        "src/public/**/*"
+    ],
+    "latex-workshop.latex.recipe.default": "xelatex",
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "xelatex",
+            "tools": [
+                "xelatex"
+            ]
+        }
+    ],
+    "vetur.experimental.templateInterpolationService": true
 }
