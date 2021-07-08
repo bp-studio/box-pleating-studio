@@ -116,7 +116,7 @@ namespace PathUtil {
 	}
 
 	/** 把一個路徑的前面 j 個點移到後面去，並且傳回路徑自身 */
-	function $rotate(p: Path, j: number) {
+	function $rotate(p: Path, j: number): Path {
 		p.push(...p.splice(0, j));
 		return p;
 	}

@@ -34,7 +34,7 @@ class Point extends Couple implements IPoint {
 
 	public sub(v: Vector): Point;
 	public sub(p: IPoint): Vector;
-	public sub(c: Vector | IPoint) {
+	public sub(c: Vector | IPoint): Point | Vector {
 		if(c instanceof Vector) return new Point(this._x.sub(c._x), this._y.sub(c._y));
 		else if(c instanceof Point) return new Vector(this._x.sub(c._x), this._y.sub(c._y));
 		else return new Vector(this._x.sub(new Fraction(c.x)), this._y.sub(new Fraction(c.y)));

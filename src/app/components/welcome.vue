@@ -20,15 +20,13 @@
 						<p v-if="ios" v-t="'welcome.install.ios'"></p>
 						<button v-else-if="bi" class="btn btn-primary" @click="bi.prompt()" v-t="'welcome.install.bt'"></button>
 						<button v-else class="btn btn-primary" disabled>
-							{{$t('welcome.install.prepare')}}
+							{{$t('welcome.install.prepare')}}&nbsp;
 							<i class="bp-spinner fa-spin"></i>
 						</button>
 					</div>
 					<div v-if="install==1">
-						<button class="btn btn-primary" disabled>
-							{{$t('welcome.install.ing')}}
-							<i class="bp-spinner fa-spin"></i>
-						</button>
+						{{$t('welcome.install.ing')}}&nbsp;
+						<i class="bp-spinner fa-spin"></i>
 					</div>
 					<div v-if="install==2">
 						<p v-t="'welcome.install.ed'"></p>

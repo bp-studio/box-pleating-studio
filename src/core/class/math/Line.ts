@@ -18,25 +18,25 @@ class Line {
 	}
 
 	/** 把直線以 `(x1, y1), (x2, y2)` 的格式輸出成字串，頂點會排序，因此可以作為識別簽章使用 */
-	public toString() { return [this.p1, this.p2].sort().toString(); }
+	public toString(): string { return [this.p1, this.p2].sort().toString(); }
 
-	public get $isDegenerated() { return this.p1.eq(this.p2); }
+	public get $isDegenerated(): boolean { return this.p1.eq(this.p2); }
 
 	/**Check if two line segments are identical */
-	public eq(l: Line) {
+	public eq(l: Line): boolean {
 		return this.p1.eq(l.p1) && this.p2.eq(l.p2) ||
 			this.p1.eq(l.p2) && this.p2.eq(l.p1);
 	}
 
 	/** 傳回一個點是否落在這個線段的內部（預設不含端點） */
-	public $contains(point: Point | IPoint, includeEndpoints: boolean = false) {
+	public $contains(point: Point | IPoint, includeEndpoints: boolean = false): boolean {
 		let p = point instanceof Point ? point : new Point(point);
 		if(includeEndpoints && (p.eq(this.p1) || p.eq(this.p2))) return true;
 		let v1 = p.sub(this.p1), v2 = p.sub(this.p2);
 		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
 	}
 
-	public $lineContains(p: Point) {
+	public $lineContains(p: Point): boolean {
 		return this.$vector.$parallel(p.sub(this.p1));
 	}
 
@@ -59,17 +59,17 @@ class Line {
 	}
 
 	/** 根據指定的相位變換並傳回一條新的直線 */
-	public $transform(fx: Sign, fy: Sign) {
+	public $transform(fx: Sign, fy: Sign): Line {
 		return new Line(this.p1.$transform(fx, fy), this.p2.$transform(fx, fy));
 	}
 
 	/** 根據指定的向量移動並傳回一條新的直線 */
-	public $shift(v: Vector) {
+	public $shift(v: Vector): Line {
 		return new Line(this.p1.add(v), this.p2.add(v));
 	}
 
 	/** 過濾掉直線陣列裡面重複的、並且傳回新的陣列 */
-	public static $distinct(lines: Line[]) {
+	public static $distinct(lines: Line[]): Line[] {
 		let signatures = new Set<string>();
 		return lines.filter(l => {
 			let signature = l.toString(), ok = !signatures.has(signature);
@@ -176,13 +176,13 @@ class Line {
 		}
 	}
 
-	public $xIntersection(x: number) {
+	public $xIntersection(x: number): Point {
 		let v = this.p2.sub(this.p1);
 		let f = new Fraction(x);
 		return new Point(f, this.p1._y.sub(v.$slope.mul(this.p1._x.sub(f))));
 	}
 
-	public $yIntersection(y: number) {
+	public $yIntersection(y: number): Point {
 		let v = this.p2.sub(this.p1);
 		let f = new Fraction(y);
 		return new Point(this.p1._x.sub(this.p1._y.sub(f).div(v.$slope)), f);
@@ -203,7 +203,7 @@ class Line {
 		return this.$vector.dot(v) == 0;
 	}
 
-	public get $vector() {
+	public get $vector(): Vector {
 		return this.p1.sub(this.p2);
 	}
 }

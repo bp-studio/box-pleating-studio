@@ -28,10 +28,10 @@ class Rectangle {
 		return this.p1.eq(rec.p1) && this.p2.eq(rec.p2);
 	}
 
-	public get width() { return this.p2._x.sub(this.p1._x).$value; }
-	public get height() { return this.p2._y.sub(this.p1._y).$value; }
-	public get top() { return this.p2.y; }
-	public get right() { return this.p2.x; }
+	public get width(): number { return this.p2._x.sub(this.p1._x).$value; }
+	public get height(): number { return this.p2._y.sub(this.p1._y).$value; }
+	public get top(): number { return this.p2.y; }
+	public get right(): number { return this.p2.x; }
 
 	/** 產生順時鐘的路徑 */
 	public $toPolyBoolPath(): PolyBool.Path {

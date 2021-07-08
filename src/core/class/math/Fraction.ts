@@ -94,7 +94,7 @@ class Fraction {
 	/////////////////////////////////
 
 	/** Simplification in place */
-	private _smp() {
+	private _smp(): void {
 		[this._p, this._q] = MathUtil.$reduce(this._p, this._q);
 	}
 
@@ -156,13 +156,13 @@ class Fraction {
 		return this;
 	}
 
-	public get isIntegral() {
+	public get isIntegral(): boolean {
 		this._smp();
 		return this._q == 1;
 	}
 
 	/** Normalization after each operation */
-	private _check() {
+	private _check(): this {
 		// Try auto simplifying.
 		if(this.$isDangerous) this._smp();
 
@@ -193,32 +193,32 @@ class Fraction {
 	/////////////////////////////////
 
 	/** Negation to new instance */
-	public get neg() { return this.c().n(); }
+	public get neg(): Fraction { return this.c().n(); }
 
 	/** Inversion to new instance */
-	public get inv() { return this.c().i(); }
+	public get inv(): Fraction { return this.c().i(); }
 
 	/** Addition to new instance */
-	public add(v: Fraction) { return this.c().a(v); }
+	public add(v: Fraction): Fraction { return this.c().a(v); }
 
 	/** Subtraction to new instance */
-	public sub(v: Fraction) { return this.c().s(v); }
+	public sub(v: Fraction): Fraction { return this.c().s(v); }
 
 	/** Multiplication to new instance */
-	public mul(v: Fraction) { return this.c().m(v); }
+	public mul(v: Fraction): Fraction { return this.c().m(v); }
 
 	/** Apply factor to new instance */
-	public fac(f: Sign) { return this.c().f(f); }
+	public fac(f: Sign): Fraction { return this.c().f(f); }
 
 	/** Division to new instance */
-	public div(v: Fraction) { return this.c().d(v); }
+	public div(v: Fraction): Fraction { return this.c().d(v); }
 
 	/////////////////////////////////
 	// Compare methods
 	/////////////////////////////////
 
 	/**equal to */
-	public eq(v: Fraction) {
+	public eq(v: Fraction): boolean {
 		return this._p * v._q == this._q * v._p;
 	}
 
@@ -259,7 +259,7 @@ class Fraction {
 		return [new Fraction(n1), new Fraction(n2)];
 	}
 
-	public toJSON() {
+	public toJSON(): string {
 		return this.toString();
 	}
 }

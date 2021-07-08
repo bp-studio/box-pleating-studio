@@ -23,9 +23,9 @@ abstract class Couple {
 		this._y = new Fraction(p[1]);
 	}
 
-	public get x() { return this._x.$value; }
+	public get x(): number { return this._x.$value; }
 	public set x(v: number) { this._x = new Fraction(v); }
-	public get y() { return this._y.$value; }
+	public get y(): number { return this._y.$value; }
 	public set y(v: number) { this._y = new Fraction(v); }
 
 	// Specify `c` as type `this` will block all calling of this method
@@ -40,15 +40,15 @@ abstract class Couple {
 	}
 
 	/** Print out the Couple in the "(x, y)" format */
-	public toString() { return "(" + this._x + ", " + this._y + ")"; }
+	public toString(): string { return "(" + this._x + ", " + this._y + ")"; }
 
-	public toJSON() {
+	public toJSON(): string {
 		return this.toString();
 	}
 
 	public set(c: this): this;
 	public set(x: Rational, y: Rational): this;
-	public set(x: Rational | this, y: Rational = 0) {
+	public set(x: Rational | this, y: Rational = 0): this {
 		if(x instanceof Couple) {
 			this._x = x._x.c();
 			this._y = x._y.c();
@@ -69,14 +69,14 @@ abstract class Couple {
 	}
 
 	/** 把 {@link Couple} 四捨五入至最接近的位數（預設為個位） */
-	public $round(scale = 1) {
+	public $round(scale = 1): this {
 		let s = new Fraction(scale);
 		this._x.d(s).r().m(s); this._y.d(s).r().m(s);
 		return this;
 	}
 
 	/** Restrict the Couple to a certain rectangular range */
-	public $range(min_X: Fraction, max_X: Fraction, min_Y: Fraction, max_Y: Fraction) {
+	public $range(min_X: Fraction, max_X: Fraction, min_Y: Fraction, max_Y: Fraction): this {
 		if(this._x.lt(min_X)) this._x = min_X;
 		if(this._x.gt(max_X)) this._x = max_X;
 		if(this._y.lt(min_Y)) this._y = min_Y;

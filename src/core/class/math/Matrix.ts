@@ -19,7 +19,7 @@ class Matrix {
 		else this._det = this.a.mul(this.d).s(this.b.mul(this.c));
 	}
 
-	toString() { return [this.a, this.b, this.c, this.d].toString(); }
+	public toString(): string { return [this.a, this.b, this.c, this.d].toString(); }
 
 	// /** 矩陣的行列式值轉換成數值 */
 	// get determinant(): number { return this.det.$value; }
@@ -37,7 +37,7 @@ class Matrix {
 	/** 矩陣乘法；暫時因為用不到所以沒有實作矩陣對矩陣的乘法 */
 	public $multiply(p: Point): Point;
 	public $multiply(v: Vector): Vector;
-	public $multiply(that: Point | Vector) {
+	public $multiply(that: Point | Vector): typeof that {
 		return new that.constructor(
 			this.a.mul(that._x).a(this.b.mul(that._y)),
 			this.c.mul(that._x).a(this.d.mul(that._y))
@@ -45,7 +45,7 @@ class Matrix {
 	}
 
 	/** 求出會把 from 變成 to 的旋轉縮放矩陣 */
-	public static $getTransformMatrix(from: Vector, to: Vector) {
+	public static $getTransformMatrix(from: Vector, to: Vector): Matrix {
 		if(from.eq(Vector.ZERO)) throw new Error("Cannot transform zero vector.");
 		let M = new Matrix(from._x, from._y.neg, from._y, from._x);
 		let { _x: a, _y: b } = M.$inverse!.$multiply(to);

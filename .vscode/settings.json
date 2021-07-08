@@ -70,7 +70,8 @@
     "i18n-ally.sourceLanguage": "en",
     "i18n-ally.tabStyle": "tab",
     "i18n-ally.usage.scanningIgnore": [
-        "src/public/**/*"
+        "src/public/**/*",
+		"lib/**/*"
     ],
     "latex-workshop.latex.recipe.default": "xelatex",
     "latex-workshop.latex.recipes": [
