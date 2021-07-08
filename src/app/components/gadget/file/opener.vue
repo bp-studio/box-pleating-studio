@@ -27,13 +27,13 @@
 						{
 							description: this.$t('toolbar.file.BPS.name').toString(),
 							accept: {
-								'application/bpstudio.project': ['.bps'],
+								'application/bpstudio.project+json': ['.bps'],
 							},
 						},
 						{
 							description: this.$t('toolbar.file.BPZ.name').toString(),
 							accept: {
-								'application/bpstudio.workspace': ['.bpz'],
+								'application/bpstudio.workspace+zip': ['.bpz'],
 							},
 						},
 					],

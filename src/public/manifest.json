@@ -45,7 +45,7 @@
 			"action": "/",
 			"name": "BP Studio Project",
 			"accept": {
-				"application/bpstudio.project": ".bps"
+				"application/bpstudio.project+json": ".bps"
 			},
 			"icons": [
 				{
@@ -79,7 +79,7 @@
 			"action": "/",
 			"name": "BP Studio Workspace",
 			"accept": {
-				"application/bpstudio.workspace": ".bpz"
+				"application/bpstudio.workspace+zip": ".bpz"
 			},
 			"icons": [
 				{

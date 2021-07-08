@@ -280,7 +280,7 @@
 				compression: "DEFLATE",
 				compressionOptions: { level: 9 },
 			});
-			return blob.slice(0, blob.size, "application/bpstudio.workspace");
+			return blob.slice(0, blob.size, "application/bpstudio.workspace+zip");
 		}
 	}
 </script>
