@@ -12,6 +12,7 @@
 			"hint": "You can also install BP Studio as a standalone app to your device, and use it offline!",
 			"ios": "How to install on iOS: Open this website in Safari, tap the \"Share\" icon at the bottom of\tyour screen, and then tap \"Add to home screen\".",
 			"bt": "Install Box Pleating Studio App",
+			"prepare": "Preparing for installation, please wait...",
 			"ing": "Installing app, please wait...",
 			"ed": "BP Studio is already installed on your device.",
 			"open": "Open Box Pleating Studio App"

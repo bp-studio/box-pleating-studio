@@ -11,10 +11,11 @@
 		"install": {
 			"hint": "您也可以将 BP Studio 以独立应用的形式安装至您的装置上，并离线使用！",
 			"ios": "iOS 安装方法：在 Safari 中打开本网址，按下屏幕中间下方的分享按钮，并且点选「加入至首页」。",
-			"bt": "安装 Box Pleating Studio App",
-			"ing": "安装 App 中，请稍待……",
+			"bt": "安装 Box Pleating Studio 应用",
+			"prepare": "正在准备安装，请稍候...",
+			"ing": "安装应用中，请稍待……",
 			"ed": "BP Studio 已经安装到您的装置上了。",
-			"open": "打开 Box Pleating Studio App"
+			"open": "打开 Box Pleating Studio 应用"
 		},
 		"copyright": "Copyright © 2020{0} 蔡牧村",
 		"recent": "最近使用",
