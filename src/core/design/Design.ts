@@ -1,6 +1,6 @@
 
 /**
- * "J" stands for JSON, and {@link JDesign} is the saving format of a Design (a.k.a. "Project").
+ * "J" stands for JSON, and {@link JDesign} is the saving format of a {@link Design} (a.k.a. "Project").
  *
  * Being JSON format, it's easy to incorporate any Unicode characters.
  *

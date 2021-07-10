@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link FlapView} 是對應於 {@link Flap} 的 {@link LabeledView}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class FlapView extends LabeledView<Flap> implements ClosureView {
 
 	public readonly hinge: paper.Path;

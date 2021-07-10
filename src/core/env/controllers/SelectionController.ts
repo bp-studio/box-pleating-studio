@@ -159,7 +159,7 @@
 	}
 
 	/**
-	 * 持續更新 this.$draggable 的反應方法，並傳回是否裡面非空。
+	 * 持續更新 {@link SelectionController.$draggable this.$draggable} 的反應方法，並傳回是否裡面非空。
 	 *
 	 * 這個方法也會在一些場合中被單獨呼叫以便立即更新。
 	 */

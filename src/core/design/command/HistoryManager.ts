@@ -11,6 +11,12 @@ interface JHistory {
 	steps: JStep[];
 }
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link HistoryManager} 負責管理使用者的操作歷史紀錄。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class HistoryManager extends Disposable implements ISerializable<JHistory> {
 
 	private static readonly _MAX_STEP = 30;
@@ -128,9 +134,11 @@ interface JHistory {
 	private _addStep(step: Step): void {
 		// 移除所有後面的 Step
 		if(this._steps.length > this._index) this._steps.length = this._index;
+
+		// 加入新的 Step 並且同時移動索引
 		this._steps[this._index++] = step;
 
-		// 最多儲存到 30 步
+		// 最多儲存到 30 步，所以去掉超過的部份
 		if(this._steps.length > HistoryManager._MAX_STEP) {
 			this._steps.shift();
 			this._index--;

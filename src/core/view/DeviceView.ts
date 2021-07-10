@@ -1,12 +1,23 @@
+
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link DeviceView} 是對應於 {@link Device} 的 {@link ControlView}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class DeviceView extends ControlView<Device> {
 
 	private readonly _ridges: paper.CompoundPath;
 
 	private readonly _axisParallels: paper.CompoundPath;
 
-	// 雖然理論上一個 Device 的區域範圍一定是連通的，
-	// 但是有時候 paper.js 的浮點運算會誤把區域範圍理解成好幾塊，
-	// 因此實務上還是必須採用 CompoundPath 來顯示才能保證不出錯。
+	/**
+	 * 對應 {@link Device} 的陰影區域。
+	 *
+	 * 雖然理論上一個 {@link Device} 的區域範圍一定是連通的，
+	 * 但是有時候 paper.js 的浮點運算會誤把區域範圍理解成好幾塊，
+	 * 因此實務上還是必須採用 {@link paper.CompoundPath} 來顯示才能保證不出錯。
+	 */
 	private readonly _shade: paper.CompoundPath;
 
 	constructor(device: Device) {

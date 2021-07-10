@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link RiverContainer} 映射 {@link TreeEdge} 成 {@link River}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class RiverContainer extends BaseContainer<TreeEdge, River> {
 	constructor(design: Design) {
 		super(

@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link JunctionContainer} 映射每一對的 {@link Flap} 成 {@link Junction}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class JunctionContainer extends DoubleMapping<Flap, Junction> {
 
 	constructor(design: Design) {

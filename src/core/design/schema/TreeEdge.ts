@@ -6,6 +6,12 @@ interface JEdge {
 	selected?: boolean;
 }
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link TreeEdge} 代表 {@link Tree} 上的一條邊。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {
 
 	public get $tag(): string { return "e" + this.n1.id + "," + this.n2.id; }

@@ -23,7 +23,11 @@ const precacheRoute = new precaching.PrecacheRoute(precacheController, {
 });
 routing.registerRoute(precacheRoute);
 
-// 這是舊版的 cache；如果找得到就刪除掉以釋放空間
+/**
+ * 這是舊版的 cache；如果找得到就刪除掉以釋放空間
+ * @since 662 (20210110)
+ * @deprecated
+ */
 caches.delete("versioned");
 
 // 除了 precache 之外的 Markdown 檔案都採用網路優先策略

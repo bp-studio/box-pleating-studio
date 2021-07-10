@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link FlapContainer} 映射 {@link TreeNode} 中的葉點成 {@link Flap}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class FlapContainer extends BaseContainer<TreeNode, Flap> {
 
 	constructor(design: Design) {

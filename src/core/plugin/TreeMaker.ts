@@ -20,6 +20,7 @@ namespace TreeMaker {
 	/** This dummy function marks the usage of translation */
 	function t(message: string): string { return message; }
 
+	/** 負責逐列處理 TreeMaker 檔案的內容 */
 	class TreeMakerVisitor {
 		private _lines: IterableIterator<string>;
 
@@ -36,6 +37,7 @@ namespace TreeMaker {
 		public $skipArray(): void { this.$skip(this.$int); }
 	}
 
+	/** 負責解析 TreeMaker 5 的檔案格式 */
 	class TreeMakerParser {
 		public $result: JDesign = Migration.$getSample();
 		private _visitor: TreeMakerVisitor;

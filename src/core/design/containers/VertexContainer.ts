@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link VertexContainer} 映射 {@link TreeEdge} 成 {@link Vertex}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class VertexContainer extends BaseContainer<TreeNode, Vertex> {
 
 	constructor(design: Design) {

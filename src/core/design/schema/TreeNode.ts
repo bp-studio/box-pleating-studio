@@ -4,6 +4,12 @@ interface JNode {
 	parentId?: number;
 }
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link TreeNode} 代表 {@link Tree} 上的一個結點
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class TreeNode extends Disposable implements ITagObject, ISerializable<JNode> {
 
 	public static $setJID(n: TreeNode, id: number): void {

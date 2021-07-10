@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link VertexView} 是對應於 {@link Vertex} 的 {@link LabeledView}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class VertexView extends LabeledView<Vertex> {
 
 	private static readonly _DOT_SIZE = 4;

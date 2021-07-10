@@ -22,7 +22,7 @@ abstract class View extends Mountable {
 	}
 
 	/**
-	 * 視圖的自動繪製反應方法；會呼叫子類別實作的 `render()` 方法完成繪製。
+	 * 視圖的自動繪製反應方法；會呼叫子類別實作的 {@link View.$render $render()} 方法完成繪製。
 	 *
 	 * 可以透過相依於這個方法來達到確保繪製順序正確的目的。
 	 */

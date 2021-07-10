@@ -1,3 +1,10 @@
+
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link LabeledView} 是附帶有文字標籤的 {@link ControlView}。
+ */
+//////////////////////////////////////////////////////////////////
+
 abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 	private static readonly _SQRT = 2 / Math.sqrt(View._MIN_SCALE);

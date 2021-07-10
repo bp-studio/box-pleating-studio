@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link RiverView} 是對應於 {@link River} 的 {@link ControlView}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class RiverView extends ControlView<River> implements ClosureView {
 
 	private _hinge: paper.CompoundPath;

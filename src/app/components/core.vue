@@ -130,7 +130,11 @@
 		}
 
 		private async loadSession(): Promise<void> {
-			// 舊資料；過一陣子之後可以拿掉這一段程式碼
+			/**
+			 * 舊資料；過一陣子之後可以拿掉這一段程式碼
+			 * @since 711 (20210112)
+			 * @deprecated
+			 */
 			localStorage.removeItem("sessionId");
 			localStorage.removeItem("sessionTime");
 

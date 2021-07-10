@@ -1,4 +1,10 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link EdgeContainer} 映射 {@link TreeEdge} 成 {@link Edge}。
+ */
+//////////////////////////////////////////////////////////////////
+
 @shrewd class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
 
 	constructor(design: Design) {

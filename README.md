@@ -1,5 +1,13 @@
 
+![GitHub](https://img.shields.io/github/license/MuTsunTsai/box-pleating-studio)
+![](https://img.shields.io/badge/platform-ALL-lightgrey)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/MuTsunTsai/box-pleating-studio)
+![GitHub top language](https://img.shields.io/github/languages/top/MuTsunTsai/box-pleating-studio)
+![GitHub Repo stars](https://img.shields.io/github/stars/MuTsunTsai/box-pleating-studio?style=social)
+
 # Box Pleating Studio
+
+<div style="text-align:center; margin:1rem;"><img src="https://github.com/MuTsunTsai/box-pleating-studio/raw/main/src/public/assets/mockup.jpg" style="max-width: min(500px, 80%);"></div>
 
 > Super-complex origami design made easy!
 

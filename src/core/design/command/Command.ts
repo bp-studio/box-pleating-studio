@@ -20,6 +20,7 @@ type Typeless<T extends JCommand> = Omit<T, 'type'>;
 
 abstract class Command implements JCommand {
 
+	/** 將一個 {@link JCommand} 還原成 {@link Command} 物件實體 */
 	public static $restore(design: Design, c: JCommand): Command {
 		if(c.type == CommandType.field) return new FieldCommand(design, c as JFieldCommand);
 		if(c.type == CommandType.move) return new MoveCommand(design, c as JMoveCommand);
@@ -44,9 +45,18 @@ abstract class Command implements JCommand {
 		this.tag = json.tag;
 	}
 
-	public abstract $canAddTo(command: Command): boolean;
-	public abstract $addTo(command: Command): void;
+	/** 是否這個 {@link Command} 實際上並沒有改變任何東西、可以被當作沒發生 */
 	public abstract get $isVoid(): boolean;
+
+	/** 判斷這個 {@link Command} 是否可以被整合至另外一個給定的 {@link Command} 當中 */
+	public abstract $canAddTo(command: Command): boolean;
+
+	/** 將這個 {@link Command} 整合至另外一個給定的 {@link Command} 當中 */
+	public abstract $addTo(command: Command): void;
+
+	/** 取消這個 {@link Command} 的效果 */
 	public abstract $undo(): void;
+
+	/** 重做這個 {@link Command} 的效果 */
 	public abstract $redo(): void;
 }

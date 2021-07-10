@@ -1,9 +1,25 @@
 
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link IViewManager} 介面定義了 {@link Mountable} 和 {@link View} 物件之間的抽象轉換關係。
+ */
+//////////////////////////////////////////////////////////////////
+
 interface IViewManager {
 	$contains(target: Mountable, point: paper.Point): boolean;
 	$createView(target: Mountable): void;
 	$get(target: Mountable): View | null;
 }
+
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link ViewManager} 類別是 {@link IViewManager} 介面的預設實作。
+ *
+ * 目前的實作採用了 paper.js 套件來進行繪製，
+ * 這也意味著暫時這個類別跟 {@link Display} 類別的內部實作是高度耦合的，
+ * 這個問題未來有機會的話可以再改善。
+ */
+//////////////////////////////////////////////////////////////////
 
 class ViewManager implements IViewManager {
 

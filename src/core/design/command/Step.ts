@@ -8,6 +8,13 @@ interface JStep<T extends JCommand = JCommand> {
 	after: string[];
 }
 
+
+//////////////////////////////////////////////////////////////////
+/**
+ * {@link Step} 代表 {@link HistoryManager} 中的一個操作步驟。
+ */
+//////////////////////////////////////////////////////////////////
+
 class Step implements ISerializable<JStep> {
 
 	private static readonly _AUTO_RESET = 1000;
