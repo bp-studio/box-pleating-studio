@@ -7,7 +7,9 @@
 
 # Box Pleating Studio
 
-<div style="text-align:center; margin:1rem;"><img src="https://github.com/MuTsunTsai/box-pleating-studio/raw/main/src/public/assets/mockup.jpg" style="max-width: min(500px, 80%);"></div>
+<p align="center">
+  <img width="400" src="https://github.com/MuTsunTsai/box-pleating-studio/raw/main/src/public/assets/mockup.jpg">
+</p>
 
 > Super-complex origami design made easy!
 
