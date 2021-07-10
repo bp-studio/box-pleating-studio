@@ -177,7 +177,8 @@
 
 	.tab i {
 		cursor: pointer;
-		visibility: hidden;
+		transition: opacity 0.1s linear;
+		opacity: 0;
 		width: 1rem;
 		text-align: center;
 	}
@@ -188,7 +189,7 @@
 	}
 
 	.tab:hover i {
-		visibility: visible;
+		opacity: 1;
 	}
 
 	.tab-down {
@@ -207,10 +208,11 @@
 		padding: 3px;
 		line-height: 1;
 		text-align: center;
+		transition: background-color 0.1s linear;
 	}
 
 	.tab-close .close:hover {
-		background: rgba(255, 255, 255, 0.2);
+		background-color: rgba(255, 255, 255, 0.2);
 	}
 
 	@media (hover: hover) {
@@ -221,7 +223,7 @@
 
 	@media (hover: none), (pointer: coarse) {
 		.tab .tab-down i {
-			visibility: visible;
+			opacity: 0;
 		}
 		.tab-down {
 			display: flex;
