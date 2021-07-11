@@ -30,7 +30,7 @@
 		@Prop(Boolean) public notify: boolean;
 
 		mounted(): void {
-			core.libReady.then(() => {
+			libReady.then(() => {
 				let dd = new bootstrap.Dropdown(this.$refs.btn as Element, {});
 
 				// Bootstrap doesn't support touch cancel

@@ -54,10 +54,6 @@
 		created(): void {
 			const ONE_SECOND = 1000;
 			this.isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
-			this.libReady = new Promise<void>(resolve => {
-				// DOMContentLoaded 事件會在所有延遲函式庫載入完成之後觸發
-				window.addEventListener('DOMContentLoaded', () => resolve());
-			});
 			this.initReady = new Promise<void>(resolve => {
 				// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
 				setTimeout(() => resolve(), ONE_SECOND);
@@ -265,7 +261,7 @@
 		}
 
 		private async zip(): Promise<Blob> {
-			await this.libReady;
+			await libReady;
 			let zip = new JSZip();
 			let names = new Set<string>();
 			for(let i = 0; i < this.designs.length; i++) {

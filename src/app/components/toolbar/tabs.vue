@@ -74,7 +74,7 @@
 		protected ready: boolean = false;
 
 		mounted(): void {
-			core.libReady.then(() => this.ready = true);
+			libReady.then(() => this.ready = true);
 		}
 
 		protected get dragOption(): object {

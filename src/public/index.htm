@@ -20,7 +20,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1105"
+			app_version: "1110"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -92,8 +92,8 @@
 				});
 			});
 		}
-		var err, wErr;
-		(function() {
+		var errMgr = new (function() {
+			var self = this;
 			var debug = location.search.toLowerCase().indexOf("debug=startup") >= 0;
 			var display = function(id, v, c) {
 				var el = document.getElementById(id);
@@ -104,23 +104,38 @@
 					"<br>" + navigator.userAgent +
 					"<br>" + c;
 			};
-			var onErr = function(e) { err = e.target.src; }, errorOb;
-			var cb = function() {
-				if(err || wErr) {
-					display('divWorkspace', 'none');
-					display('divWelcome', 'none');
-					display(err ? 'resource' : 'requirement', 'block', wErr);
-					if(wErr &&
-						// Filter out Facebook Clawer; no need to report related errors.
-						!(wErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)
-					) {
-						gtag('event', 'unsupported', {
-							app_version: app_config.app_version,
-							error: wErr
-						});
-					}
+
+			/** Resource Error */
+			self.resErr = null;
+
+			/** Runtime Error */
+			self.runErr = null;
+
+			/** Whether the launching fine so far. */
+			self.ok = function() { return !self.resErr && !self.runErr; }
+
+			/**
+			 * Final processing.
+			 *
+			 * @return Whether the app has launched successfully.
+			 */
+			self.callback = function() {
+				if(self.ok()) return true;
+
+				display('divWorkspace', 'none');
+				display('divWelcome', 'none');
+				display('divSpinner', 'none');
+				display(self.resErr ? 'resource' : 'requirement', 'block', self.runErr);
+				if(self.runErr &&
+					// Filter out Facebook Clawer; no need to report related errors.
+					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)
+				) {
+					gtag('event', 'unsupported', {
+						app_version: app_config.app_version,
+						error: self.runErr
+					});
 				}
-				if(errorOB) errorOB.disconnect();
+				return false;
 			};
 
 			// Some in-app browsers might attempt to call the following functions,
@@ -134,28 +149,40 @@
 				"hackLocationSuccess"
 			];
 
+			/**
+			 * Global error handler;
+			 * handles syntax error and all uncaught sync errors.
+			 */
 			window.onerror = function(a, b, c, d, e) {
 				if(!b && !c && !d) return; // error is caused by injection; ignore.
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(a.match(ignoreError[i])) return;
 				}
-				wErr = [
+				self.runErr = [
 					a.replace(/^.+: (.+)$/, "$1"),							// error message
 					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
 					c,														// line number
 					d,														// column number
 					e && e.stack.replace(/^.+? at/, "")						// stack trace
 				].toString();
-			}
-			if(!window.addEventListener) return wErr = 'IE8', window.onload = cb;
-			window.addEventListener('DOMContentLoaded', cb);
+			};
+
+			// IE fallback
+			if(!window.addEventListener) return self.runErr = 'IE8', window.onload = self.callback;
+
+			// Auto monitor resource loading
 			if(MutationObserver) {
-				errorOB = new MutationObserver(function(mutations) {
+				var onErr = function(e) { self.resErr = e.target.src || e.target.href; };
+				var errorOB = new MutationObserver(function(mutations) {
 					mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
 						(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
 					));
 				});
 				errorOB.observe(document, { childList: true, subtree: true });
+				window.addEventListener("DOMContentLoaded", function() {
+					errorOB.disconnect();
+					self.callback(); // First check point
+				}, { once: true });
 			}
 		})();
 	</script>
@@ -176,16 +203,6 @@
 	<script src="lib/paper-core.min.js" defer></script>
 	<script src="lib/shrewd.min.js" defer></script>
 	<script src="bpstudio.js" defer></script>
-
-	<!-- Non-critical -->
-	<link rel="stylesheet" href="lib/font-awesome/css/all.min.css" media="print" onload="this.media='all'; this.onload=null;">
-	<script src="lib/sortable.min.js" defer></script>
-	<script src="lib/vuedraggable.umd.min.js" defer></script>
-	<script src="lib/bootstrap/popper.min.js" defer></script>
-	<script src="lib/bootstrap/bootstrap.min.js" defer></script>
-	<script src="lib/vue-clipboard.min.js" defer></script>
-	<script src="lib/jszip.min.js" defer></script>
-	<script src="lib/marked.min.js" defer></script>
 </head>
 
 <body>

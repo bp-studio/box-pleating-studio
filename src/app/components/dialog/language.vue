@@ -41,7 +41,7 @@
 
 			if(languages.length > 1 && (!loc || newLocale)) {
 				this.languages = languages;
-				core.libReady.then(() => new bootstrap.Modal(this.$el).show());
+				libReady.then(() => new bootstrap.Modal(this.$el).show());
 			}
 
 			loc = loc || languages[0] || "en";

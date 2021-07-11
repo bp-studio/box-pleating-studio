@@ -91,7 +91,7 @@
 
 			// 如果啟動的瞬間沒有 SW 存在，就表示 SW 正在安裝
 			// 此時顯示等候訊息以改善 UX，因為 beforeinstallprompt 事件必須等到 SW 裝完才會觸發
-			if('onbeforeinstallprompt' in window && !navigator.serviceWorker.controller) {
+			if('onbeforeinstallprompt' in window && location.protocol == "https:" && !navigator.serviceWorker.controller) {
 				this.preparing = true;
 			}
 

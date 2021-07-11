@@ -1,9 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 import * as bootstrap from 'bootstrap';
-import CoreBase from './coreBase';
-
-declare const core: CoreBase;
 
 // @ts-ignore
 @Component
@@ -13,13 +10,13 @@ export default abstract class Dialog<T> extends Vue {
 	protected message: string;
 
 	mounted(): void {
-		core.libReady.then(() =>
+		libReady.then(() =>
 			this.modal = new bootstrap.Modal(this.$el, { backdrop: 'static' })
 		);
 	}
 
 	public async show(message?: string): Promise<T> {
-		await core.libReady;
+		await libReady;
 		let current = new Promise<T>(resolve => {
 			this.last.then(() => {
 				this.message = message || "";

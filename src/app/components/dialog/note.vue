@@ -27,13 +27,13 @@
 		private modal: bootstrap.Modal;
 
 		mounted(): void {
-			core.libReady.then(() =>
+			libReady.then(() =>
 				this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement)
 			);
 		}
 
 		private async note(): Promise<void> {
-			await core.libReady;
+			await libReady;
 			this.modal.show();
 			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });

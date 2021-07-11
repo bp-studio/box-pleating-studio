@@ -62,14 +62,14 @@
 		protected error: string | null = null;
 
 		mounted(): void {
-			core.libReady.then(() => {
+			libReady.then(() => {
 				this.ready = true;
 				this.modal = new bootstrap.Modal(this.$el);
 			});
 		}
 
 		public async show(): Promise<void> {
-			await core.libReady;
+			await libReady;
 			if(!this.design) return;
 			let data = LZ.compress(JSON.stringify(this.design));
 			this.url = "https://bpstudio.abstreamace.com/?project=" + data;

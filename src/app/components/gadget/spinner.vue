@@ -1,6 +1,6 @@
 <template>
-	<div class="welcome fade" :class="{'shift-down':core.designs.length,'show':visible}">
-		<div class="h-100 d-flex text-center align-items-center">
+	<div id="divSpinner" class="welcome" :class="{'shift-down':core.designs.length,'show':visible}">
+		<div class="h-100 d-flex text-center align-items-center" :class="{'show':visible}">
 			<div style="font-size:10rem; font-size:min(15vh,15vw); color:gray; flex-grow:1;">
 				<i class="bp-spinner fa-spin"></i>
 			</div>
@@ -20,10 +20,7 @@
 		mounted(): void { core.loader = this; }
 
 		protected get visible(): boolean {
-			const FADE_TIME = 160;
-			let visible = !core.initialized || this.loading;
-			if(!visible) setTimeout(() => (this.$el as HTMLElement).style.display = "none", FADE_TIME);
-			return visible;
+			return !core.initialized || this.loading;
 		}
 
 		public show(): Promise<void> {
@@ -39,8 +36,7 @@
 			return new Promise<void>(resolve => {
 				// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
 				setTimeout(() => resolve(), ONE_SECOND);
-				this.$el.addEventListener("animationstart", () => resolve(), { once: true });
-				(this.$el as HTMLElement).style.display = "block";
+				this.$el.addEventListener("transitionstart", () => resolve(), { once: true });
 			});
 		}
 
@@ -51,7 +47,17 @@
 </script>
 
 <style>
-	.welcome.fade:not(.show) {
-		pointer-events: none;
+	#divSpinner {
+		visibility: hidden;
+	}
+	#divSpinner.show {
+		visibility: visible;
+	}
+	#divSpinner > div {
+		transition: opacity 0.5s cubic-bezier(1, 0, 0, 0);
+		opacity: 0;
+	}
+	#divSpinner > div.show {
+		opacity: 1;
 	}
 </style>

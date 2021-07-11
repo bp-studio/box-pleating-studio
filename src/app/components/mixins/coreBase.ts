@@ -11,7 +11,6 @@ import { bp } from '../import/BPStudio';
 @Component
 export default class CoreBase extends Vue {
 
-	public libReady: Promise<void>;
 	public initialized: boolean = false;
 
 	public get design(): Design | null {

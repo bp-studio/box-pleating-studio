@@ -13,7 +13,7 @@ const order = require('../plugins/order');
 const vue = require('../plugins/vue');
 
 const jsPipe = lazypipe()
-	.pipe(() => wrap("if(!err&&!wErr) { %= body % }"))
+	.pipe(() => wrap("if(errMgr.ok()) { %= body % }"))
 	.pipe(() => gulp.dest(config.dest.debug))
 	.pipe(() => terser({
 		ecma: 2019,

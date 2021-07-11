@@ -30,10 +30,11 @@ declare global {
 		skipped: boolean;
 	};
 
-	// 第三方程式庫全域物件
+	// 第三方程式庫相關
 	export const i18n: VueI18n;
 	export const idbKeyval: typeof IdbKeyval;
 	export const gtag: (...args: unknown[]) => void;
+	export const libReady: Promise<void>;
 
 	// 系統狀態常數
 	export const isFileApiEnabled: boolean;

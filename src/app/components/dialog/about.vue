@@ -40,11 +40,11 @@
 		protected get copyright(): string { return core.copyright; }
 
 		mounted(): void {
-			core.libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
+			libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 		}
 
 		public async show(): Promise<void> {
-			await core.libReady;
+			await libReady;
 			this.modal.show();
 			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
