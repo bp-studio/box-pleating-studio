@@ -44,8 +44,7 @@
 
 		public async save(): Promise<void> {
 			if(!isFileApiEnabled) return;
-			await idbKeyval.clear();
-			let tasks: Promise<void>[] = [];
+			let tasks: Promise<void>[] = [idbKeyval.clear()];
 			for(let i = 0; i < core.designs.length; i++) {
 				let handle = this.handles.get(core.designs[i]);
 				if(handle) tasks.push(idbKeyval.set(i, handle));

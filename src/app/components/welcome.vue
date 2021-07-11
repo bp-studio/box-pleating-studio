@@ -1,7 +1,7 @@
 <template>
 	<div id="divWelcome" class="welcome p-3 p-md-4 p-lg-5" v-if="!core.design&&core.initialized">
-		<div class="container-fluid">
-			<div class="row justify-content-center">
+		<div class="container-fluid d-flex flex-column" style="height:calc(100% - 50px);">
+			<div class="row justify-content-center flex-grow-0">
 				<div class="col-12 col-lg-10 col-xl-8">
 					<h2 class="d-none d-sm-block" v-t="'welcome.title'"></h2>
 					<h3 class="d-sm-none" v-t="'welcome.title'"></h3>
@@ -34,27 +34,29 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="isFileApi" class="row mt-5 justify-content-center">
-				<div class="col-6 col-lg-5 col-xl-4">
+			<div v-if="isFileApi" class="row mt-4 mt-sm-5 justify-content-center file-api">
+				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 mb-4">
 					<h4 class="mb-3" v-t="'welcome.start'"></h4>
-					<div class="link-primary" @click="core.projects.create()">
-						<i class="far fa-file"></i>
-						{{$t('toolbar.file.new')}}
+					<div @click="core.projects.create()">
+						<div class="link-primary">
+							<i class="far fa-file"></i>
+							{{$t('toolbar.file.new')}}
+						</div>
 					</div>
-					<opener class="link-primary" @open="core.files.open($event)">
-						<i class="far fa-folder-open"></i>
-						{{$t('toolbar.file.open')}}
+					<opener @open="core.files.open($event)">
+						<div class="link-primary">
+							<i class="far fa-folder-open"></i>
+							{{$t('toolbar.file.open')}}
+						</div>
 					</opener>
 				</div>
-				<div class="col-6 col-lg-5 col-xl-4">
-					<template v-if="recent.length">
+				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
+					<div v-if="recent.length">
 						<h4 class="mb-3" v-t="'welcome.recent'"></h4>
-						<div class="link-primary" v-for="(h,i) in recent" :key="i" @click="open(h)">{{h.name}}</div>
-						<div class="link-primary mt-3" @click="clearRecent">
-							<i class="fas fa-trash-alt"></i>
-							{{$t('toolbar.file.recent.clear')}}
+						<div v-for="(h,i) in recent" :key="i" @click="open(h)">
+							<div class="link-primary">{{h.name}}</div>
 						</div>
-					</template>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -135,17 +137,42 @@
 		protected open(handle: FileSystemFileHandle): void {
 			core.files.open([handle], true);
 		}
-
-		protected clearRecent(): void {
-			core.handles.clearRecent();
-		}
 	}
 </script>
 
 <style>
+	@media (max-width: 575.98px) {
+		.file-api {
+			flex-grow: 1;
+			flex-direction: column;
+			justify-content: start !important;
+		}
+
+		.recent {
+			flex-grow: 1;
+			height: 0;
+		}
+
+		.recent > div {
+			display: flex;
+			flex-direction: column;
+			flex-wrap: wrap;
+			overflow: hidden;
+			height: 100%;
+		}
+
+		.recent > div > * {
+			width: 100%;
+		}
+	}
+
 	.welcome .link-primary {
 		cursor: pointer;
-		margin-top: 0.2rem;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		display: inline-block;
+		max-width: 100%;
 	}
 
 	.welcome .link-primary i {
