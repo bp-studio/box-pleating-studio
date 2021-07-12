@@ -15,7 +15,7 @@
 							<span v-if="isModified(id)">*</span>
 							{{getTitle(id)}}
 						</div>
-						<div class="ps-2 pt-2" @click.stop="core.projects.close(id)" @pointerdown.stop @mousedown.stop>
+						<div class="ps-2 pt-1" @click.stop="core.projects.close(id)" @pointerdown.stop @mousedown.stop>
 							<div class="close">
 								<i class="fas fa-times"></i>
 							</div>
@@ -203,9 +203,10 @@
 	.tab-close .close {
 		border-radius: 5px;
 		display: inline-block;
-		height: 20px;
-		width: 20px;
-		padding: 3px;
+		height: 1.75rem;
+		width: 1.75rem;
+		padding: 0.3rem;
+		margin-top: 0.15rem;
 		line-height: 1;
 		text-align: center;
 		transition: background-color 0.1s linear;
@@ -237,8 +238,8 @@
 		#divTab {
 			position: absolute;
 			top: 3.75rem;
-			left: 0px;
-			margin: 0px;
+			left: 0;
+			margin: 0;
 			width: 100vw;
 			height: 2.4rem;
 			background: var(--bg-ui);
@@ -248,6 +249,12 @@
 			line-height: 2rem;
 			font-size: 1rem;
 			padding: 0.2rem 0.5rem;
+		}
+		.tab-close .close {
+			height: 1.5rem;
+			width: 1.5rem;
+			padding: 0.25rem;
+			margin-top: 0;
 		}
 		.tab:first-child {
 			border-left: none;
