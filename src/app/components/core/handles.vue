@@ -34,25 +34,31 @@
 
 		public async init(haveSession: boolean): Promise<void> {
 			if(!isFileApiEnabled) return;
-			let entries: [number, FileSystemFileHandle][] = await idbKeyval.entries();
-			for(let [i, handle] of entries) {
-				if(i < 0) Vue.set(this.rec, -i - 1, handle);
-				else if(haveSession) this.handles.set(core.designs[i], handle);
+			if(haveSession) {
+				let handles: [number, FileSystemFileHandle][] = await idbKeyval.get("handle") || [];
+				for(let [i, handle] of handles) this.handles.set(core.designs[i], handle);
 			}
 			this.refresh();
+			await this.getRecent();
+		}
+
+		public async getRecent(): Promise<void> {
+			if(!isFileApiEnabled) return;
+			this.rec = await idbKeyval.get("recent") || [];
 		}
 
 		public async save(): Promise<void> {
 			if(!isFileApiEnabled) return;
-			let pairs: [number, FileSystemFileHandle][] = [];
+
+			let handles: [number, FileSystemFileHandle][] = [];
 			for(let i = 0; i < core.designs.length; i++) {
 				let handle = this.handles.get(core.designs[i]);
-				if(handle) pairs.push([i, handle]);
+				if(handle) handles.push([i, handle]);
 			}
-			for(let i = 0; i < this.rec.length; i++) {
-				pairs.push([-i - 1, this.rec[i]]);
-			}
-			await Promise.all([idbKeyval.clear(), idbKeyval.setMany(pairs)]);
+			await idbKeyval.setMany([
+				["recent", this.rec.concat()],
+				["handle", handles],
+			]);
 		}
 
 		public get recent(): readonly FileSystemFileHandle[] { return this.rec; }
