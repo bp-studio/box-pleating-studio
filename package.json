@@ -33,7 +33,6 @@
 		"gulp-filter": "^6.0.0",
 		"gulp-html-minifier-terser": "^6.0.1",
 		"gulp-if": "^3.0.0",
-		"gulp-if-any-newer": "^2.0.0",
 		"gulp-newer": "^1.4.0",
 		"gulp-purgecss": "^4.0.3",
 		"gulp-replace": "^1.1.3",

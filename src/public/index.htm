@@ -12,8 +12,13 @@
 	<meta name="version" content="0.4.9">
 
 	<!-- Preload -->
-	<link rel="preload" as="manifest" href="manifest.json">
 	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
+
+	<!--
+	Not implemented by Chrome yet
+	<link rel="preload" as="worker" href="paper-master.js">
+	<link rel="preload" as="worker" href="paper-worker.js">
+	-->
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
@@ -24,7 +29,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1145"
+			app_version: "1149"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);

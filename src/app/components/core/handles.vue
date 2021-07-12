@@ -44,15 +44,15 @@
 
 		public async save(): Promise<void> {
 			if(!isFileApiEnabled) return;
-			let tasks: Promise<void>[] = [idbKeyval.clear()];
+			let pairs: [number, FileSystemFileHandle][] = [];
 			for(let i = 0; i < core.designs.length; i++) {
 				let handle = this.handles.get(core.designs[i]);
-				if(handle) tasks.push(idbKeyval.set(i, handle));
+				if(handle) pairs.push([i, handle]);
 			}
 			for(let i = 0; i < this.rec.length; i++) {
-				tasks.push(idbKeyval.set(-i - 1, this.rec[i]));
+				pairs.push([-i - 1, this.rec[i]]);
 			}
-			await Promise.all(tasks);
+			await Promise.all([idbKeyval.clear(), idbKeyval.setMany(pairs)]);
 		}
 
 		public get recent(): readonly FileSystemFileHandle[] { return this.rec; }

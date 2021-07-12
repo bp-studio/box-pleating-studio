@@ -4,7 +4,6 @@ const filter = require('gulp-filter');
 const fs = require('fs');
 const gulp = require('gulp');
 const gulpIf = require('gulp-if');
-const ifAnyNewer = require('gulp-if-any-newer');
 const newer = require('gulp-newer');
 const purge = require('gulp-purgecss');
 const terser = require('gulp-terser');
@@ -55,14 +54,20 @@ gulp.task('static', () => all(
 
 	// 建置 BPS 圖示集
 	gulp.src(config.src.public + '/assets/bps/**/*')
-		.pipe(ifAnyNewer(config.dest.dist + '/assets/bps'))
+		.pipe(newer({
+			dest: config.dest.dist + '/assets/bps/style.css',
+			extra: [__filename, 'gulp/plugins/woff2.js'],
+		}))
 		.pipe(woff2('bps'))
 		.pipe(gulpIf(file => file.extname == ".css", cleanCss()))
 		.pipe(gulp.dest(config.dest.dist + '/assets/bps')),
 
 	// 建置更新 log
 	gulp.src(config.src.log + '/*.md')
-		.pipe(ifAnyNewer(config.dest.dist + '/log'))
+		.pipe(newer({
+			dest: config.dest.dist + '/log/log.js',
+			extra: [__filename, 'gulp/plugins/log.js'],
+		}))
 		.pipe(log2('log.js'))
 		.pipe(gulpIf(file => file.extname == ".js", terser()))
 		.pipe(gulp.dest(config.dest.dist + '/log')),
