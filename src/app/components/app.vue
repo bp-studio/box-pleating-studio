@@ -7,8 +7,6 @@
 			@news="show('ver')"
 			@pref="show('pref')"
 		></toolbar>
-		<welcome></welcome>
-		<spinner></spinner>
 		<div id="divShade" :class="{'show':showPanel}" @mousedown="showPanel=false" @touchstart="showPanel=false"></div>
 		<panel :show="showPanel"></panel>
 		<dpad :hide="showPanel"></dpad>

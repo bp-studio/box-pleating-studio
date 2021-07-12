@@ -1,5 +1,6 @@
 .welcome {
 	background: white;
+	z-index: 10;
 }
 
 #divShade {

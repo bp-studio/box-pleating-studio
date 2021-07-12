@@ -67,6 +67,7 @@ abstract class Workspace extends SheetImage {
 
 	protected _createImg(): HTMLImageElement {
 		let img = new Image();
+		img.alt = "";
 		this._spaceHolder.appendChild(img);
 		return img;
 	}

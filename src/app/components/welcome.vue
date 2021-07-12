@@ -1,5 +1,5 @@
 <template>
-	<div id="divWelcome" class="welcome p-3 p-md-4 p-lg-5" v-if="!core.design&&core.initialized">
+	<div id="divWelcome" class="welcome p-3 p-md-4 p-lg-5" v-if="!core.design&&core.lcpReady">
 		<div class="container-fluid d-flex flex-column" style="height:calc(100% - 50px);">
 			<div class="row justify-content-center flex-grow-0">
 				<div class="col-12 col-lg-10 col-xl-8">

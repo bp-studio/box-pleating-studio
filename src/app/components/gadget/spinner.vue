@@ -20,7 +20,7 @@
 		mounted(): void { core.loader = this; }
 
 		protected get visible(): boolean {
-			return !core.initialized || this.loading;
+			return !core.lcpReady || this.loading;
 		}
 
 		public show(): Promise<void> {

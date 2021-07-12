@@ -20,8 +20,7 @@ module.exports = function(stem) {
 		if(file.extname == ".ttf") ttf = file;
 		if(file.extname == ".css") {
 			let content = file.contents.toString(encoding || 'utf8');
-			let result = content.replace(reg,
-				"$1url('fonts/" + stem + ".woff2?$4') format('woff2'),\n$2$3");
+			let result = content.replace(reg, "$1url('fonts/" + stem + ".woff2') format('woff2'),\n$2$3");
 			file.contents = Buffer.from(result, encoding);
 		}
 

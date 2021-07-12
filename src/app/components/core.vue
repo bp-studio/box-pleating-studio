@@ -7,6 +7,8 @@
 		<alert ref="alert"></alert>
 		<note v-if="design&&bp.patternNotFound(design)"></note>
 		<language ref="language"></language>
+		<welcome></welcome>
+		<spinner></spinner>
 	</div>
 </template>
 
@@ -45,6 +47,7 @@
 		public isTouch: boolean;
 
 		public initReady: Promise<void>;
+		public lcpReady: boolean = false;
 
 		// 用來區分在瀏覽器裡面多重開啟頁籤的不同實體；理論上不可能同時打開，所以用時間戳記就夠了
 		public id: number = new Date().getTime();
@@ -60,15 +63,21 @@
 				// 程式剛載入的時候 Spinner 動畫的啟動用來當作載入的觸發依據
 				document.addEventListener("animationstart", () => resolve(), { once: true });
 			});
-		}
 
-		mounted(): void {
 			let settingString = localStorage.getItem("settings");
 			if(settingString) {
 				let settings = JSON.parse(settingString);
 				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
+			} else {
+				// 找不到設定就表示這是第一次啟動，此時除非有夾帶 project query，
+				// 不然就不用等候了，可以直接進行 LCP
+				let url = new URL(location.href);
+				if(!url.searchParams.has("project")) this.lcpReady = true;
 			}
+		}
+
+		mounted(): void {
 			let v = Number(localStorage.getItem("build") || 0);
 			(this.$refs.language as Language).init(v);
 			localStorage.setItem("build", app_config.app_version);
@@ -101,6 +110,7 @@
 			let lz = url.searchParams.get("project"), json: unknown;
 			if(lz) {
 				try {
+					await libReady;
 					json = JSON.parse(LZ.decompress(lz));
 				} catch(e) {
 					await this.alert(this.$t('message.invalidLink'));
@@ -121,6 +131,7 @@
 			window.setInterval(() => this.save(), SAVE_INTERVAL);
 			window.addEventListener("beforeunload", () => this.save());
 			this.initialized = true;
+			this.lcpReady = true;
 
 			this.files.openQueue();
 		}

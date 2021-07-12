@@ -11,6 +11,10 @@
 	<meta name="google" content="notranslate">
 	<meta name="version" content="0.4.9">
 
+	<!-- Preload -->
+	<link rel="preload" as="manifest" href="manifest.json">
+	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
+
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
 	<script>
@@ -20,7 +24,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1113"
+			app_version: "1145"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -114,6 +118,8 @@
 			/** Whether the launching fine so far. */
 			self.ok = function() { return !self.resErr && !self.runErr; }
 
+			self.res = function() { self.resErr = true; }
+
 			/**
 			 * Final processing.
 			 *
@@ -167,47 +173,34 @@
 				].toString();
 			};
 
-			// IE fallback
-			if(!window.addEventListener) return self.runErr = 'IE8', window.onload = self.callback;
-
-			// Auto monitor resource loading
-			if(MutationObserver) {
-				var onErr = function(e) { self.resErr = e.target.src || e.target.href; };
-				var errorOB = new MutationObserver(function(mutations) {
-					mutations.forEach(mutation => mutation.addedNodes.forEach(n =>
-						(n instanceof HTMLLinkElement || n instanceof HTMLScriptElement) && (n.onerror = onErr)
-					));
-				});
-				errorOB.observe(document, { childList: true, subtree: true });
-				window.addEventListener("DOMContentLoaded", function() {
-					errorOB.disconnect();
-					self.callback(); // First check point
-				}, { once: true });
+			// Legacy browser fallback
+			if(!window.addEventListener || typeof (Promise) == 'undefined') {
+				self.runErr = 'Legacy browser';
+				self.callback();
 			}
 		})();
 	</script>
 
 	<!-- Critical -->
-	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/bps/style.css">
-	<link rel="stylesheet" href="main.css">
-	<script src="lib/vue.runtime.min.js" defer></script>
-	<script src="lib/vue-i18n.min.js" defer></script>
-	<script src="lib/idb-keyval.min.js" defer></script><!-- 5.0.6 -->
-	<script src="log/log.js" defer></script>
-	<script src="locale.js" defer></script>
-	<script src="main.js" defer></script>
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" onerror="errMgr.res()">
+	<link rel="stylesheet" href="assets/bps/style.css" onerror="errMgr.res()">
+	<link rel="stylesheet" href="main.css" onerror="errMgr.res()">
+	<script src="log/log.js" defer onerror="errMgr.res()"></script>
+	<script src="lib/idb-keyval.min.js" defer onerror="errMgr.res()"></script><!-- 5.0.6 -->
+	<script src="locale.js" defer onerror="errMgr.res()"></script>
+	<script src="lib/vue.runtime.min.js" defer onerror="errMgr.res()"></script>
+	<script src="lib/vue-i18n.min.js" defer onerror="errMgr.res()"></script>
+	<script src="main.js" defer onerror="errMgr.res()"></script>
 
 	<!-- BP Studio setup -->
-	<script src="lib/lzma_worker-min.js" defer></script>
-	<script src="lib/paper-core.min.js" defer></script>
-	<script src="lib/shrewd.min.js" defer></script>
-	<script src="bpstudio.js" defer></script>
+	<script src="lib/shrewd.min.js" defer onerror="errMgr.res()"></script>
+	<script src="lib/paper-core.min.js" defer onerror="errMgr.res()"></script>
+	<script src="bpstudio.js" defer onerror="errMgr.res()"></script>
 </head>
 
 <body>
 	<!-- Error message -->
-	<div class="welcome p-3 scroll-box">
+	<div class="welcome p-3 scroll-box" style="z-index: 0;">
 		<div id="requirement" style="display:none;">
 			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
 			<div class="mt-2">

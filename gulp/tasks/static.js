@@ -7,6 +7,7 @@ const gulpIf = require('gulp-if');
 const ifAnyNewer = require('gulp-if-any-newer');
 const newer = require('gulp-newer');
 const purge = require('gulp-purgecss');
+const terser = require('gulp-terser');
 
 const config = require('../config.json');
 const log2 = require('../plugins/log');
@@ -16,8 +17,8 @@ const woff2 = require('../plugins/woff2');
 const compare = [
 	config.src.app + '/**/*.vue',
 	config.src.app + '/**/*.css',
-	config.src.donate + '**/*.vue',
-	config.src.public + '*.htm',
+	config.src.donate + '/**/*.vue',
+	config.src.public + '/*.htm',
 ];
 
 const libDest = config.dest.dist + '/lib';
@@ -63,6 +64,7 @@ gulp.task('static', () => all(
 	gulp.src(config.src.log + '/*.md')
 		.pipe(ifAnyNewer(config.dest.dist + '/log'))
 		.pipe(log2('log.js'))
+		.pipe(gulpIf(file => file.extname == ".js", terser()))
 		.pipe(gulp.dest(config.dest.dist + '/log')),
 
 	// 複製 debug 資源
