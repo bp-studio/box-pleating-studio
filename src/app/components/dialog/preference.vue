@@ -59,6 +59,7 @@
 
 		protected onLocaleChanged(): void {
 			localStorage.setItem("locale", i18n.locale);
+			document.documentElement.lang = i18n.locale;
 		}
 	}
 </script>

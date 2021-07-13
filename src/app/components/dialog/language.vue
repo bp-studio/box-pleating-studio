@@ -21,7 +21,7 @@
 <script lang="ts">
 	import * as bootstrap from 'bootstrap';
 
-	import { Component, Vue, Watch } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 
 	declare const locale: Record<string, unknown>[];
 
@@ -30,9 +30,10 @@
 
 		protected languages: string[] = [];
 
-		protected setLocale(l: string): void { i18n.locale = l; }
-
-		@Watch('i18n.locale') watchLocale(): void { this.onLocaleChanged(); }
+		protected setLocale(l: string): void {
+			i18n.locale = l;
+			this.onLocaleChanged();
+		}
 
 		public init(build: number): void {
 			let loc = localStorage.getItem("locale");
@@ -80,6 +81,7 @@
 					}
 				});
 			}
+			document.documentElement.lang = i18n.locale;
 		}
 	}
 </script>
