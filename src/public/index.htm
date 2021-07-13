@@ -177,6 +177,11 @@
 					e && e.stack.replace(/^.+? at/, "")						// stack trace
 				].toString();
 			};
+			window.onunhandledrejection = function(e) {
+				e = e.reason;
+				self.runErr = e.stack.replace(/^.+? at/, "");
+				self.callback();
+			}
 
 			// Legacy browser fallback
 			if(!window.addEventListener || typeof (Promise) == 'undefined') {

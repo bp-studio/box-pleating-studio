@@ -64,6 +64,7 @@ var libReady = new Promise(resolve => {
 			errMgr.runErr = e.toString();
 		} finally {
 			if(errMgr.callback()) { // 第二檢查點
+				setTimeout(() => window.onunhandledrejection = null, 100);
 				resolve();
 			} else {
 				// 底下這兩列失敗也無所謂，上面 callback() 已經做完了

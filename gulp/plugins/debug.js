@@ -56,6 +56,7 @@ function transform(file, encoding, callback) {
 
 	// 本地端測試檔案的修改
 	content = content.replace('<link rel="manifest" href="manifest.json">', "");
+	content = content.replace(/<link rel="preload" [^>]+>/g, "");
 	content = content.replace(/<!-- Global site tag .+?<\/script>/s, polyfill);
 
 	// 替換成偵錯版資源
