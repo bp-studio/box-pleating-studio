@@ -28,7 +28,6 @@ gulp.task('app', () =>
 		'header.js',
 		'components/mixins/*.ts',
 		'components/**/*.vue',
-		'footer.js',
 	], { cwd: config.src.app })
 		.pipe(newer({
 			dest: config.dest.dist + '/main.js',

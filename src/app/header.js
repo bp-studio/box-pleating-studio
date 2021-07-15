@@ -4,8 +4,6 @@
 /* eslint-disable no-var */
 /* eslint-disable vars-on-top */
 
-if(typeof TextDecoder == "undefined") throw new Error("TextDecoder is needed");
-
 document.addEventListener("wheel", (event) => {
 	if(event.ctrlKey) event.preventDefault();
 }, { passive: false });

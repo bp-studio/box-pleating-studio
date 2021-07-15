@@ -96,6 +96,11 @@ gulp.task('static', () => all(
 		'!assets/bps/**/*',
 	], { cwd: config.src.public })
 		.pipe(newer(config.dest.dist)) // 採用 1:1 比對目標的策略
+		.pipe(gulpIf(file => file.extname == ".js", terser({
+			compress: {
+				drop_debugger: false,
+			},
+		})))
 		.pipe(gulp.dest(config.dest.dist)),
 
 	// 複製程式庫

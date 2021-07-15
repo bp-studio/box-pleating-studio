@@ -29,6 +29,8 @@ abstract class StudioBase implements IStudio {
 
 	public abstract $historyManagerFactory(design: Design, data: JDesign): HistoryManager | null;
 
+	protected _onDesignCreated: Action | null = null;
+
 	public $load(json: string | object): Design {
 		if(typeof json == "string") json = JSON.parse(json);
 		let design = Migration.$process(json as Pseudo<JDesign>, this);
@@ -56,6 +58,7 @@ abstract class StudioBase implements IStudio {
 	public $restore(json: Pseudo<JDesign>): Design {
 		let design = new Design(this, Migration.$process(json, this));
 		this.$designMap.set(design.id, design);
+		this._onDesignCreated?.();
 		return design;
 	}
 
@@ -87,6 +90,7 @@ abstract class StudioBase implements IStudio {
 	protected _tryLoad(design: RecursivePartial<JDesign>): Design {
 		this.$design = new Design(this, design);
 		this.$designMap.set(this.$design.id, this.$design);
+		this._onDesignCreated?.();
 		return this.$design;
 	}
 }

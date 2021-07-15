@@ -11,7 +11,7 @@ class Updater extends Animator {
 	private readonly _studio: Studio;
 
 	constructor(studio: Studio) {
-		super(() => this.$update(), Updater._PERIOD);
+		super(() => this.$update(), Updater._PERIOD, false);
 		this._studio = studio;
 	}
 
@@ -37,5 +37,7 @@ class Updater extends Animator {
 		}
 
 		this.$updating = false;
+
+		if(this._studio.$designMap.size == 0) this.$active = false;
 	}
 }

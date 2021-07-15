@@ -1,7 +1,7 @@
 <template>
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content mx-4">
+			<div class="modal-content mx-4" v-if="initialized">
 				<div class="modal-header">
 					<div class="h4 modal-title" v-t="'toolbar.setting.preference'"></div>
 				</div>
@@ -39,6 +39,8 @@
 	@Component
 	export default class Preference extends Vue {
 		private modal: bootstrap.Modal;
+		protected initialized: boolean = false;
+
 		protected get i18n(): typeof i18n { return i18n; }
 		protected get core(): typeof core { return core; }
 		protected get display(): null | DisplaySetting {
@@ -51,6 +53,7 @@
 
 		public async show(): Promise<void> {
 			await libReady;
+			this.initialized = true;
 			this.modal.show();
 			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
 			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });

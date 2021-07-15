@@ -19,8 +19,10 @@ class Animator {
 	private readonly _throttle: number;
 	private _request: number;
 	private _last: number = performance.now();
+	private _active: boolean;
+	private _interval: number;
 
-	constructor(action: Action, throttle: number = 0) {
+	constructor(action: Action, throttle: number, startNow: boolean = true) {
 		this._action = action;
 		this._throttle = throttle;
 		this._run = (time: number) => {
@@ -30,14 +32,25 @@ class Animator {
 			}
 			this._next();
 		};
-		this._next();
-		setInterval(() => {
-			cancelAnimationFrame(this._request);
+		this.$active = startNow;
+	}
+
+	public get $active(): boolean { return this._active; }
+	public set $active(active: boolean) {
+		if(active == this._active) return;
+		this._active = active;
+		if(active) {
 			this._next();
-		}, Animator._CANCEL);
+			this._interval = setInterval(() => {
+				cancelAnimationFrame(this._request);
+				this._next();
+			}, Animator._CANCEL);
+		} else {
+			clearInterval(this._interval);
+		}
 	}
 
 	private _next(): void {
-		this._request = requestAnimationFrame(this._run);
+		if(this._active) this._request = requestAnimationFrame(this._run);
 	}
 }

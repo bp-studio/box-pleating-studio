@@ -13,9 +13,12 @@
 
 	<!-- Preload -->
 	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
+	<link rel="preload" as="font" type="font/woff2" crossorigin href="lib/font-awesome/webfonts/fa-regular-400.woff2">
+	<link rel="preload" as="script" href="log/log.js">
 
 	<!--
 	Not implemented by Chrome yet
+	<link rel="preload" as="manifest" href="manifest.json">
 	<link rel="preload" as="worker" href="paper-master.js">
 	<link rel="preload" as="worker" href="paper-worker.js">
 	-->
@@ -29,7 +32,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1153"
+			app_version: "1171"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -184,11 +187,14 @@
 			}
 
 			// Legacy browser fallback
-			if(!window.addEventListener || typeof (Promise) == 'undefined') {
+			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
 				self.runErr = 'Legacy browser';
 				self.callback();
 			}
 		})();
+
+		// Top level objects
+		var bp, core, app, i18n, libReady;
 	</script>
 
 	<!-- Critical -->
@@ -201,6 +207,7 @@
 	<script src="lib/vue.runtime.min.js" defer onerror="errMgr.res()"></script>
 	<script src="lib/vue-i18n.min.js" defer onerror="errMgr.res()"></script>
 	<script src="main.js" defer onerror="errMgr.res()"></script>
+	<script src="launch.js" defer onerror="errMgr.res()"></script>
 
 	<!-- BP Studio setup -->
 	<script src="lib/shrewd.min.js" defer onerror="errMgr.res()"></script>
@@ -257,22 +264,51 @@
 	<div id="app">
 		<div id="divToolbar" class="btn-toolbar p-2">
 			<div class="btn-group me-2">
-				<button type="button" disabled class="btn btn-primary"><i class="bp-file-alt"></i></button>
-				<button type="button" disabled class="btn btn-primary"><i class="bp-pencil-ruler"></i></button>
-				<button type="button" disabled class="btn btn-primary"><i class="bp-tasks"></i></button>
-				<button type="button" disabled class="btn btn-primary"><i class="bp-tools"></i></button>
-				<button type="button" disabled class="btn btn-primary"><i class="bp-question-circle"></i></button>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle">
+						<i class="bp-file-alt"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle">
+						<i class="bp-pencil-ruler"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle">
+						<i class="bp-tasks"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle">
+						<i class="bp-tools"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle">
+						<i class="bp-question-circle"></i>
+					</button>
+				</div>
 			</div>
 			<div class="btn-group me-2">
 				<button type="button" disabled class="btn btn-primary"><i class="bp-tree"></i></button>
 				<button type="button" disabled class="btn btn-primary"><i class="bp-layout"></i></button>
 			</div>
-			<div class="flex-grow-1"></div>
+			<div style="display: contents;">
+				<div id="divTab" class="flex-grow-1"></div>
+				<div class="dropdown-menu"></div>
+			</div>
 			<div id="panelToggle" class="btn-group">
 				<button type="button" disabled class="btn btn-primary"><i class="bp-sliders-h"></i></button>
 			</div>
 		</div>
-		<div id="divPanel"></div>
+		<div id="divShade"></div>
+		<div id="divPanel" class="scroll-shadow"></div>
+		<div id="divDPad"></div>
+		<div class="modal fade"></div>
+		<div class="modal fade"></div>
+		<div class="modal fade"></div>
+		<div class="modal fade"></div>
 	</div>
 
 </body>

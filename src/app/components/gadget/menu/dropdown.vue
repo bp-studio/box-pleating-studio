@@ -12,7 +12,7 @@
 			<i :class="icon"></i>
 			<div class="notify" v-if="notify"></div>
 		</button>
-		<div ref="menu" class="dropdown-menu">
+		<div ref="menu" class="dropdown-menu" v-if="initialized">
 			<slot></slot>
 		</div>
 	</div>
@@ -29,7 +29,18 @@
 		@Prop(String) public title: string;
 		@Prop(Boolean) public notify: boolean;
 
+		private initialized: boolean = false;
+
 		mounted(): void {
+			this.$el.addEventListener('mouseenter', () => this.init(), { once: true });
+			this.$el.addEventListener('touchstart', () => this.init(), { once: true });
+		}
+
+		protected get ready(): boolean { return core.initialized; }
+
+		protected init(): void {
+			if(this.initialized) return;
+			this.initialized = true;
 			libReady.then(() => {
 				let dd = new bootstrap.Dropdown(this.$refs.btn as Element, {});
 
@@ -37,18 +48,16 @@
 				document.addEventListener('touchstart', event => {
 					if(!(this.$refs.menu as Element).contains(event.target as Element)) dd.hide();
 				}, { capture: true, passive: true });
-			});
 
-			this.$el.addEventListener('show.bs.dropdown', () => this.$emit('show'));
-			this.$el.addEventListener('shown.bs.dropdown', () => dropdown.current = this);
-			this.$el.addEventListener('hide.bs.dropdown', () => {
-				if(!dropdown.skipped) dropdown.current = null;
-				dropdown.skipped = false;
+				this.$el.addEventListener('show.bs.dropdown', () => this.$emit('show'));
+				this.$el.addEventListener('shown.bs.dropdown', () => dropdown.current = this);
+				this.$el.addEventListener('hide.bs.dropdown', () => {
+					if(!dropdown.skipped) dropdown.current = null;
+					dropdown.skipped = false;
+				});
+				this.$el.addEventListener('hidden.bs.dropdown', () => this.$emit('hide'));
 			});
-			this.$el.addEventListener('hidden.bs.dropdown', () => this.$emit('hide'));
 		}
-
-		protected get ready(): boolean { return core.initialized; }
 
 		protected mouseenter(): void {
 			if(dropdown.current && dropdown.current != this) {

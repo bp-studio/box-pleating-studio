@@ -1,103 +1,105 @@
 <template>
 	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset" @show="init">
-		<div class="dropdown-item" @click="core.projects.create()">
-			<i class="far fa-file"></i>
-			{{$t('toolbar.file.new')}}
-		</div>
-		<divider></divider>
-
-		<template v-if="isFileApiEnabled">
-			<opener class="dropdown-item m-0" ref="open" @open="core.files.open($event)">
-				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
-			</opener>
-			<recentmenu></recentmenu>
+		<template v-slot>
+			<div class="dropdown-item" @click="core.projects.create()">
+				<i class="far fa-file"></i>
+				{{$t('toolbar.file.new')}}
+			</div>
 			<divider></divider>
-			<dropdownitem :disabled="!design" @click="save()">
-				<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.BPS.save')}}</hotkey>
+
+			<template v-if="isFileApiEnabled">
+				<opener class="dropdown-item m-0" ref="open" @open="core.files.open($event)">
+					<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
+				</opener>
+				<recentmenu></recentmenu>
+				<divider></divider>
+				<dropdownitem :disabled="!design" @click="save()">
+					<hotkey icon="fas fa-save" ctrl hk="S">{{$t('toolbar.file.BPS.save')}}</hotkey>
+				</dropdownitem>
+				<saveas
+					:disabled="!design"
+					type="bps"
+					ref="bps"
+					@save="notify($event)"
+					:desc="$t('toolbar.file.BPS.name')"
+					mime="application/bpstudio.project+json"
+				>
+					<i class="fas fa-save"></i>
+					{{$t('toolbar.file.BPS.saveAs')}}
+				</saveas>
+				<saveas
+					:disabled="!design"
+					type="bpz"
+					ref="bpz"
+					@save="notifyAll($event)"
+					:desc="$t('toolbar.file.BPZ.name')"
+					mime="application/bpstudio.workspace+zip"
+				>
+					<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.BPZ.save')}}</hotkey>
+				</saveas>
+			</template>
+			<template v-else>
+				<uploader accept=".bps, .bpz, .json, .zip" ref="open" multiple @upload="upload($event)">
+					<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
+				</uploader>
+				<download :disabled="!design" type="bps" ref="bps" @download="notify">
+					<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.BPS.download')}}</hotkey>
+				</download>
+				<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
+					<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.BPZ.download')}}</hotkey>
+				</download>
+			</template>
+
+			<divider></divider>
+
+			<template v-if="isFileApiEnabled">
+				<saveas
+					:disabled="!design"
+					type="svg"
+					ref="svg"
+					@save="svgSaved"
+					:desc="$t('toolbar.file.SVG.name')"
+					mime="image/svg+xml"
+				>
+					<i class="far fa-file-image"></i>
+					{{$t('toolbar.file.SVG.save')}}
+				</saveas>
+				<saveas
+					:disabled="!design"
+					type="png"
+					ref="png"
+					@save="pngSaved"
+					:desc="$t('toolbar.file.PNG.name')"
+					mime="image/png"
+				>
+					<i class="far fa-file-image"></i>
+					{{$t('toolbar.file.PNG.save')}}
+				</saveas>
+			</template>
+			<template v-else>
+				<download :disabled="!design" type="svg" ref="svg" @download="svgSaved">
+					<i class="far fa-file-image"></i>
+					{{$t('toolbar.file.SVG.download')}}
+				</download>
+				<download :disabled="!design" type="png" ref="png" @download="pngSaved">
+					<i class="far fa-file-image"></i>
+					{{$t('toolbar.file.PNG.download')}}
+				</download>
+			</template>
+
+			<dropdownitem @click="copyPNG" :disabled="!design" v-if="copyEnabled">
+				<i class="far fa-copy"></i>
+				{{$t('toolbar.file.PNG.copy')}}
 			</dropdownitem>
-			<saveas
-				:disabled="!design"
-				type="bps"
-				ref="bps"
-				@save="notify($event)"
-				:desc="$t('toolbar.file.BPS.name')"
-				mime="application/bpstudio.project+json"
-			>
-				<i class="fas fa-save"></i>
-				{{$t('toolbar.file.BPS.saveAs')}}
-			</saveas>
-			<saveas
-				:disabled="!design"
-				type="bpz"
-				ref="bpz"
-				@save="notifyAll($event)"
-				:desc="$t('toolbar.file.BPZ.name')"
-				mime="application/bpstudio.workspace+zip"
-			>
-				<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.BPZ.save')}}</hotkey>
-			</saveas>
+			<divider></divider>
+			<dropdownitem @click="print" :disabled="!design">
+				<hotkey icon="fas fa-print" ctrl hk="P">{{$t('toolbar.file.print')}}</hotkey>
+			</dropdownitem>
+			<dropdownitem @click="$emit('share')" :disabled="!design">
+				<i class="fas fa-share-alt"></i>
+				{{$t('toolbar.file.share')}}
+			</dropdownitem>
 		</template>
-		<template v-else>
-			<uploader accept=".bps, .bpz, .json, .zip" ref="open" multiple @upload="upload($event)">
-				<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
-			</uploader>
-			<download :disabled="!design" type="bps" ref="bps" @download="notify">
-				<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.BPS.download')}}</hotkey>
-			</download>
-			<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
-				<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.BPZ.download')}}</hotkey>
-			</download>
-		</template>
-
-		<divider></divider>
-
-		<template v-if="isFileApiEnabled">
-			<saveas
-				:disabled="!design"
-				type="svg"
-				ref="svg"
-				@save="svgSaved"
-				:desc="$t('toolbar.file.SVG.name')"
-				mime="image/svg+xml"
-			>
-				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.SVG.save')}}
-			</saveas>
-			<saveas
-				:disabled="!design"
-				type="png"
-				ref="png"
-				@save="pngSaved"
-				:desc="$t('toolbar.file.PNG.name')"
-				mime="image/png"
-			>
-				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.PNG.save')}}
-			</saveas>
-		</template>
-		<template v-else>
-			<download :disabled="!design" type="svg" ref="svg" @download="svgSaved">
-				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.SVG.download')}}
-			</download>
-			<download :disabled="!design" type="png" ref="png" @download="pngSaved">
-				<i class="far fa-file-image"></i>
-				{{$t('toolbar.file.PNG.download')}}
-			</download>
-		</template>
-
-		<dropdownitem @click="copyPNG" :disabled="!design" v-if="copyEnabled">
-			<i class="far fa-copy"></i>
-			{{$t('toolbar.file.PNG.copy')}}
-		</dropdownitem>
-		<divider></divider>
-		<dropdownitem @click="print" :disabled="!design">
-			<hotkey icon="fas fa-print" ctrl hk="P">{{$t('toolbar.file.print')}}</hotkey>
-		</dropdownitem>
-		<dropdownitem @click="$emit('share')" :disabled="!design">
-			<i class="fas fa-share-alt"></i>
-			{{$t('toolbar.file.share')}}
-		</dropdownitem>
 	</dropdown>
 </template>
 

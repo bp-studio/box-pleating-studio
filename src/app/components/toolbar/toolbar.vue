@@ -5,10 +5,12 @@
 			<editmenu></editmenu>
 			<settingmenu @pref="$emit('pref')"></settingmenu>
 			<dropdown icon="bp-tools" :title="$t('toolbar.tools.title')">
-				<uploader accept=".tmd5" @upload="TreeMaker($event)">
-					<i class="fas fa-file-import"></i>
-					{{$t("toolbar.tools.TreeMaker")}}
-				</uploader>
+				<template v-slot>
+					<uploader accept=".tmd5" @upload="TreeMaker($event)">
+						<i class="fas fa-file-import"></i>
+						{{$t("toolbar.tools.TreeMaker")}}
+					</uploader>
+				</template>
 			</dropdown>
 			<helpmenu @about="$emit('about')" @news="$emit('news')"></helpmenu>
 		</div>

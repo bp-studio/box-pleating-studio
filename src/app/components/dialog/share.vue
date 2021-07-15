@@ -1,7 +1,7 @@
 <template>
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content mx-4">
+			<div class="modal-content mx-4" v-if="initialized">
 				<div class="modal-header">
 					<div class="h4 modal-title" v-t="'share.title'"></div>
 				</div>
@@ -16,7 +16,7 @@
 								<input class="form-control" :value="url" />
 							</div>
 						</div>
-						<div v-if="ready" class="d-flex">
+						<div class="d-flex">
 							<div>
 								<button class="btn btn-primary" v-clipboard:copy="url" v-clipboard:success="onCopy" ref="bt">
 									<i class="fas fa-copy"></i>
@@ -57,13 +57,12 @@
 		protected url: string = "";
 		protected modal: bootstrap.Modal;
 		protected canShare: boolean = Boolean(navigator.share);
-		protected ready: boolean = false;
+		protected initialized: boolean = false;
 		protected sending: boolean = false;
 		protected error: string | null = null;
 
 		mounted(): void {
 			libReady.then(() => {
-				this.ready = true;
 				this.modal = new bootstrap.Modal(this.$el);
 			});
 		}
@@ -71,6 +70,7 @@
 		public async show(): Promise<void> {
 			await libReady;
 			if(!this.design) return;
+			this.initialized = true;
 			let data = LZ.compress(JSON.stringify(this.design));
 			this.url = "https://bpstudio.abstreamace.com/?project=" + data;
 			this.modal.show();

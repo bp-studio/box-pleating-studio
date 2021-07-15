@@ -24,8 +24,6 @@ interface StudioOptions {
 	public readonly $option: StudioOptions;
 	public readonly $updater: Updater;
 
-	@shrewd public $design: Design | null = null;
-
 	constructor(selector: string) {
 		super();
 		let el = document.querySelector(selector);
@@ -39,6 +37,8 @@ interface StudioOptions {
 		this.$display = new Display(this);
 		this.$system = new System(this);
 		this.$updater = new Updater(this);
+
+		this._onDesignCreated = () => this.$updater.$active = true;
 	}
 
 	public $historyManagerFactory(design: Design, data: JDesign): HistoryManager {

@@ -1,7 +1,7 @@
 <template>
 	<div style="display:contents">
-		<div id="divTab" class="flex-grow-1" @wheel="tabWheel($event)" ref="tab" v-if="ready">
-			<draggable v-bind="dragOption" v-model="core.designs">
+		<div id="divTab" class="flex-grow-1" @wheel="tabWheel($event)" ref="tab">
+			<draggable v-bind="dragOption" v-model="core.designs" v-if="initialized">
 				<div
 					class="tab"
 					:class="{active:design==getDesign(id)}"
@@ -33,9 +33,8 @@
 				</div>
 			</draggable>
 		</div>
-		<div id="divTab" class="flex-grow-1" v-else></div>
 
-		<contextmenu ref="tabMenu">
+		<contextmenu ref="tabMenu" v-if="initialized">
 			<div class="dropdown-item" @click="core.projects.clone(menuId)">
 				<i class="far fa-clone"></i>
 				{{$t('toolbar.tab.clone')}}
@@ -62,7 +61,7 @@
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
+	import { Component, Watch } from 'vue-property-decorator';
 	import { Design } from '../import/BPStudio';
 
 	import BaseComponent from '../mixins/baseComponent';
@@ -71,10 +70,12 @@
 	@Component
 	export default class Tabs extends BaseComponent {
 
-		protected ready: boolean = false;
+		protected initialized: boolean = false;
 
-		mounted(): void {
-			libReady.then(() => this.ready = true);
+		@Watch('core.designs') onDesigns(v: Design[]): void {
+			if(v.length > 0 && !this.initialized) {
+				libReady.then(() => this.initialized = true);
+			}
 		}
 
 		protected get dragOption(): object {

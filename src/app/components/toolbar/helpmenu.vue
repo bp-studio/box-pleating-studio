@@ -1,51 +1,53 @@
 <template>
 	<dropdown :icon="icon" :title="$t('toolbar.help.title')" :notify="notify||core.updated">
-		<div class="dropdown-item" @click="$emit('about')">
-			<i class="bp-info"></i>
-			{{$t('toolbar.help.about')}}
-		</div>
-		<div class="dropdown-item" @click="news">
-			<i class="fas fa-newspaper"></i>
-			{{$t('toolbar.help.news')}}
-			<div class="notify" v-if="notify"></div>
-		</div>
-		<a
-			class="dropdown-item"
-			href="https://github.com/MuTsunTsai/box-pleating-studio/discussions"
-			target="_blank"
-			rel="noopener"
-		>
-			<i class="far fa-comment-dots"></i>
-			{{$t("toolbar.help.discussions")}}
-		</a>
-		<a
-			class="dropdown-item"
-			href="https://github.com/MuTsunTsai/box-pleating-studio/issues/new/choose"
-			target="_blank"
-			rel="noopener"
-		>
-			<i class="fas fa-bug"></i>
-			{{$t("toolbar.help.issue")}}
-		</a>
-		<divider></divider>
-		<dropdownitem disabled v-if="checking">
-			<i class="bp-spinner fa-spin"></i>
-			{{$t('toolbar.help.checkUpdate')}}
-		</dropdownitem>
-		<div class="dropdown-item" @click="update" v-else-if="core.updated">
-			<i class="far fa-arrow-alt-circle-up"></i>
-			{{$t('toolbar.help.update')}}
-			<div class="notify"></div>
-		</div>
-		<div class="dropdown-item" @click="checkUpdate" v-else>
-			<i class="far fa-arrow-alt-circle-up"></i>
-			{{$t('toolbar.help.checkUpdate')}}
-		</div>
-		<divider></divider>
-		<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
-			<i class="fas fa-hand-holding-usd"></i>
-			{{$t('toolbar.help.donation')}}
-		</a>
+		<template v-slot>
+			<div class="dropdown-item" @click="$emit('about')">
+				<i class="bp-info"></i>
+				{{$t('toolbar.help.about')}}
+			</div>
+			<div class="dropdown-item" @click="news">
+				<i class="fas fa-newspaper"></i>
+				{{$t('toolbar.help.news')}}
+				<div class="notify" v-if="notify"></div>
+			</div>
+			<a
+				class="dropdown-item"
+				href="https://github.com/MuTsunTsai/box-pleating-studio/discussions"
+				target="_blank"
+				rel="noopener"
+			>
+				<i class="far fa-comment-dots"></i>
+				{{$t("toolbar.help.discussions")}}
+			</a>
+			<a
+				class="dropdown-item"
+				href="https://github.com/MuTsunTsai/box-pleating-studio/issues/new/choose"
+				target="_blank"
+				rel="noopener"
+			>
+				<i class="fas fa-bug"></i>
+				{{$t("toolbar.help.issue")}}
+			</a>
+			<divider></divider>
+			<dropdownitem disabled v-if="checking">
+				<i class="bp-spinner fa-spin"></i>
+				{{$t('toolbar.help.checkUpdate')}}
+			</dropdownitem>
+			<div class="dropdown-item" @click="update" v-else-if="core.updated">
+				<i class="far fa-arrow-alt-circle-up"></i>
+				{{$t('toolbar.help.update')}}
+				<div class="notify"></div>
+			</div>
+			<div class="dropdown-item" @click="checkUpdate" v-else>
+				<i class="far fa-arrow-alt-circle-up"></i>
+				{{$t('toolbar.help.checkUpdate')}}
+			</div>
+			<divider></divider>
+			<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
+				<i class="fas fa-hand-holding-usd"></i>
+				{{$t('toolbar.help.donation')}}
+			</a>
+		</template>
 	</dropdown>
 </template>
 

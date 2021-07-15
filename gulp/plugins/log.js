@@ -7,7 +7,7 @@ const preload = `
 let libs = [
 	'lib/font-awesome/css/all.min.css',
 	'lib/sortable.min.js',
-	'lib/vuedraggable.umd.min.js',
+	'lib/vuedraggable.min.js',
 	'lib/bootstrap/popper.min.js',
 	'lib/bootstrap/bootstrap.min.js',
 	'lib/vue-clipboard.min.js',

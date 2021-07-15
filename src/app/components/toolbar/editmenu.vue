@@ -1,15 +1,17 @@
 <template>
 	<dropdown icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
-		<dropdownitem :disabled="!canUndo" @click="undo">
-			<hotkey icon="bp-undo" ctrl hk="Z">{{$t('toolbar.edit.undo')}}</hotkey>
-		</dropdownitem>
-		<dropdownitem :disabled="!canRedo" @click="redo">
-			<hotkey icon="bp-redo" ctrl hk="Y">{{$t('toolbar.edit.redo')}}</hotkey>
-		</dropdownitem>
-		<divider></divider>
-		<dropdownitem :disabled="!design" @click="selectAll">
-			<hotkey icon="fas fa-th" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
-		</dropdownitem>
+		<template v-slot>
+			<dropdownitem :disabled="!canUndo" @click="undo">
+				<hotkey icon="bp-undo" ctrl hk="Z">{{$t('toolbar.edit.undo')}}</hotkey>
+			</dropdownitem>
+			<dropdownitem :disabled="!canRedo" @click="redo">
+				<hotkey icon="bp-redo" ctrl hk="Y">{{$t('toolbar.edit.redo')}}</hotkey>
+			</dropdownitem>
+			<divider></divider>
+			<dropdownitem :disabled="!design" @click="selectAll">
+				<hotkey icon="fas fa-th" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
+			</dropdownitem>
+		</template>
 	</dropdown>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content mx-4">
+			<div class="modal-content mx-4" v-if="initialized">
 				<div class="modal-body scroll-shadow" style="max-height:70vh; border-radius:0.3rem;">
 					<div v-if="record[index]" v-html="record[index]"></div>
 					<div v-else class="m-5 display-2 text-muted text-center">
@@ -38,7 +38,7 @@
 		protected record: Record<number, string> = {};
 		protected index: number;
 		protected max: number;
-		protected active: boolean = false;
+		protected initialized: boolean = false;
 		protected modal: bootstrap.Modal;
 
 		@Watch('index') onIndex(index: number): void {
@@ -71,7 +71,7 @@
 					html = html.replace(/<a href="http/g, '<a target="_target" rel="noopener" href="http');
 					Vue.set(this.record, this.index, html);
 				} catch(e) {
-					if(this.active) {
+					if(this.initialized) {
 						this.modal.hide();
 						core.alert(this.$t("message.connFail"));
 					}
@@ -83,7 +83,7 @@
 
 		public async show(): Promise<void> {
 			await libReady;
-			this.active = true;
+			this.initialized = true;
 			if(await this.load(this.index)) {
 				this.modal.show();
 				let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;

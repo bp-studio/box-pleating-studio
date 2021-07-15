@@ -1,12 +1,18 @@
 <template>
 	<div>
+		<!-- Helper objects -->
+		<session ref="sss"></session>
 		<projects ref="mgr" :designs="designs"></projects>
 		<handles ref="handles"></handles>
 		<files ref="files"></files>
+
+		<!-- Dialog -->
 		<confirm ref="confirm"></confirm>
 		<alert ref="alert"></alert>
 		<note v-if="design&&bp.patternNotFound(design)"></note>
 		<language ref="language"></language>
+
+		<!-- Screen -->
 		<welcome></welcome>
 		<spinner></spinner>
 	</div>
@@ -26,6 +32,7 @@
 	import Handles from './core/handles.vue';
 	import Language from './dialog/language.vue';
 	import Projects from './core/projects.vue';
+	import Session from './core/session.vue';
 	import Spinner from './gadget/spinner.vue';
 
 	declare const LZ: { decompress(s: string): string };
@@ -86,10 +93,9 @@
 		public get projects(): Projects { return this.$refs.mgr as Projects; }
 		public get handles(): Handles { return this.$refs.handles as Handles; }
 		public get files(): Files { return this.$refs.files as Files; }
+		public get session(): Session { return this.$refs.sss as Session; }
 
 		public async init(): Promise<void> {
-			const SAVE_INTERVAL = 3000;
-
 			bp.option.onDeprecate = (title: string) => {
 				let t = title || this.$t("keyword.untitled");
 				let message = this.$t("message.oldVersion", [t]);
@@ -104,8 +110,17 @@
 				for(let key in d) d[key] = settings[key];
 			}
 
-			await this.loadSession();
+			let haveSession = await this.session.init();
+			if(settingString) await this.handles.init(haveSession);
+			await this.loadQuery();
 
+			this.initialized = true;
+			this.lcpReady = true;
+
+			this.files.openQueue();
+		}
+
+		private async loadQuery(): Promise<void> {
 			let url = new URL(location.href);
 			let lz = url.searchParams.get("project"), json: unknown;
 			if(lz) {
@@ -127,41 +142,6 @@
 					await this.alert(this.$t('message.invalidLink'));
 				}
 			}
-
-			window.setInterval(() => this.save(), SAVE_INTERVAL);
-			window.addEventListener("beforeunload", () => this.save());
-			this.initialized = true;
-			this.lcpReady = true;
-
-			this.files.openQueue();
-		}
-
-		private async loadSession(): Promise<void> {
-			/**
-			 * 舊資料；過一陣子之後可以拿掉這一段程式碼
-			 * @since 711 (20210112)
-			 * @deprecated
-			 */
-			localStorage.removeItem("sessionId");
-			localStorage.removeItem("sessionTime");
-
-			// 只有擁有存檔權的實體會去讀取 session
-			let haveSession = await this.checkSession();
-			if(haveSession) {
-				let sessionString = localStorage.getItem("session");
-				if(sessionString) {
-					let session = JSON.parse(sessionString);
-					let jsons = session.jsons as unknown[];
-					for(let i = 0; i < jsons.length; i++) {
-						let design = bp.restore(jsons[i]);
-						this.projects.add(design, false);
-					}
-					if(session.open >= 0) this.projects.select(this.designs[session.open]);
-					bp.update();
-				}
-			}
-
-			await this.handles.init(haveSession);
 		}
 
 		protected get bp(): BPStudio { return bp; }
@@ -181,7 +161,7 @@
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement,
 			} = bp.settings;
-			if(this.autoSave) this.save();
+			if(this.autoSave) this.session.save();
 			else localStorage.removeItem("session");
 			localStorage.setItem("settings", JSON.stringify({
 				autoSave: this.autoSave,
@@ -197,47 +177,6 @@
 				this.projects.add(bp.design = bp.load(d)!);
 			} else {
 				this.projects.add(bp.design = bp.restore(d));
-			}
-		}
-
-		private checkSession(): Promise<boolean> {
-			const SESSION_CHECK_TIMEOUT = 250;
-			return new Promise<boolean>(resolve => {
-				// 如果是本地執行就採用 Broadcast Channel 的 fallback
-				if(location.protocol != "https:") {
-					checkWithBC(this.id).then(ok => resolve(ok));
-				} else {
-					// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
-					let cancel = setTimeout(() => resolve(false), SESSION_CHECK_TIMEOUT);
-					callService("id")
-						.then(
-							(id: number) => resolve(this.id < id), // 最舊的實體優先
-							() => resolve(true) // 沒有 Service Worker 的時候直接視為可以
-						)
-						.finally(() => clearTimeout(cancel));
-				}
-			});
-		}
-
-		private async save(): Promise<void> {
-			// 拖曳的時候存檔無意義且浪費效能，跳過
-			if(bp.isDragging) return;
-
-			// 只有當前的實體取得存檔權的時候才會儲存
-			if(this.autoSave && await this.checkSession()) {
-				// 排程到下一次 BPStudio 更新完畢之後存檔，
-				// 避免在存檔的瞬間製造出 glitch
-				let option = bp.option;
-				option.onUpdate = async () => {
-					let session = {
-						jsons: this.designs.map(
-							id => bp.getDesign(id)!.toJSON(true)
-						),
-						open: bp.design ? this.designs.indexOf(bp.design.id) : -1,
-					};
-					localStorage.setItem("session", JSON.stringify(session));
-					await this.handles.save();
-				};
 			}
 		}
 
