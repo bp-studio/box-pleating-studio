@@ -21,7 +21,7 @@ gulp.task('shrewd', () => all(
 	gulp.src(shrewdDir + "/dist/shrewd.js")
 		.pipe(sourcemaps.init({ loadMaps: true }))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: srcRoot + '/src' }))
-		.pipe(gulp.dest(lib)),
+		.pipe(gulp.dest(config.src.lib)),
 
 	// 定義檔
 	gulp.src(shrewdDir + "/dist/*.d.ts")
