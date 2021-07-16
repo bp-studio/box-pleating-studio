@@ -76,7 +76,7 @@
 				let settings = JSON.parse(settingString);
 				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
-			} else {
+			} else if(!localStorage.getItem("session")) {
 				// 找不到設定就表示這是第一次啟動，此時除非有夾帶 project query，
 				// 不然就不用等候了，可以直接進行 LCP
 				let url = new URL(location.href);
@@ -108,6 +108,9 @@
 				let d = bp.settings;
 				// eslint-disable-next-line guard-for-in
 				for(let key in d) d[key] = settings[key];
+			} else {
+				// 儲存初始設定
+				this.saveSettings();
 			}
 
 			let haveSession = await this.session.init();
@@ -156,13 +159,14 @@
 		}
 
 		public saveSettings(): void {
-			if(!this.initialized) return;
 			let {
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement,
 			} = bp.settings;
-			if(this.autoSave) this.session.save();
-			else localStorage.removeItem("session");
+			if(this.initialized) {
+				if(this.autoSave) this.session.save();
+				else localStorage.removeItem("session");
+			}
 			localStorage.setItem("settings", JSON.stringify({
 				autoSave: this.autoSave,
 				showDPad: this.showDPad,
