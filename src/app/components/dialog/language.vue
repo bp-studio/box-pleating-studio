@@ -1,7 +1,7 @@
 <template>
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
+			<div class="modal-content" v-if="initialized">
 				<div class="modal-body">
 					<div class="row">
 						<div v-for="l in languages" :key="l" class="col text-center">
@@ -28,6 +28,7 @@
 	@Component
 	export default class Language extends Vue {
 
+		protected initialized: boolean = false;
 		protected languages: string[] = [];
 
 		protected setLocale(l: string): void {
@@ -42,6 +43,7 @@
 
 			if(languages.length > 1 && (!loc || newLocale)) {
 				this.languages = languages;
+				this.initialized = true;
 				libReady.then(() => new bootstrap.Modal(this.$el).show());
 			}
 

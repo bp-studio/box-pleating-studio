@@ -25,12 +25,6 @@
 		return super.$shouldDispose || !this._view.$info.components.some(c => c == this._key);
 	}
 
-	protected $onDispose(): void {
-		super.$onDispose();
-		// @ts-ignore
-		delete this._node;
-	}
-
 	@shrewd public get $distance(): number {
 		this.$disposeEvent();
 		let { $design, $info } = this._view, flap = this.$flap;

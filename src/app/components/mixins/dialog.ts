@@ -8,6 +8,7 @@ export default abstract class Dialog<T> extends Vue {
 	private modal: bootstrap.Modal;
 	private last: Promise<unknown> = Promise.resolve();
 	protected message: string;
+	protected initialized: boolean = false;
 
 	mounted(): void {
 		libReady.then(() =>
@@ -17,6 +18,7 @@ export default abstract class Dialog<T> extends Vue {
 
 	public async show(message?: string): Promise<T> {
 		await libReady;
+		this.initialized = true;
 		let current = new Promise<T>(resolve => {
 			this.last.then(() => {
 				this.message = message || "";

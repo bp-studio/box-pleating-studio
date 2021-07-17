@@ -1,7 +1,7 @@
 <template>
 	<div class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
+			<div class="modal-content" v-if="initialized">
 				<div class="modal-body">{{message}}</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" v-t="'keyword.no'"></button>

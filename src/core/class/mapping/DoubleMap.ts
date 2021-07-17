@@ -56,6 +56,11 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 		this._size = 0;
 	}
 
+	public $dispose(): void {
+		this._map.clear();
+		Shrewd.terminate(this);
+	}
+
 	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: unknown = this): void {
 		for(let [k1, k2, v] of this.entries()) {
 			callbackfn.apply(thisArg, [v, k1, k2, this]);

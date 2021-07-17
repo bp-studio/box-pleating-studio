@@ -53,7 +53,12 @@ interface IDisposable {
 	 * 繼承類別覆寫此方法的時候一般來說應呼叫 {@link Disposable.$onDispose super.$onDispose()} 方法，請務必記得。
 	 */
 	protected $onDispose(): void {
-		delete this._disposeWith;
+		// 自動把一切的物件參照都消滅掉
+		for(let key in this) {
+			if(this[key] instanceof Disposable) {
+				delete this[key];
+			}
+		}
 	}
 
 	/**

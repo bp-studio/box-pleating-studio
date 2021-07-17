@@ -109,7 +109,7 @@ interface JFlap {
 	}
 
 	protected $onDispose(): void {
-		this.$design.$history?.$destruct(this.$toMemento());
+		this.$design?.$history?.$destruct(this.$toMemento());
 		super.$onDispose();
 	}
 

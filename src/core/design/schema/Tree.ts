@@ -31,6 +31,7 @@
 
 	protected $onDispose(): void {
 		Shrewd.terminate(this.$edge);
+		super.$onDispose();
 	}
 
 	public get $isMinimal(): boolean {

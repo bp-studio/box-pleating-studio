@@ -22,11 +22,6 @@
 		return super.$shouldDispose || this.$flap.$disposed;
 	}
 
-	protected $onDispose(): void {
-		// @ts-ignore
-		delete this.$flap;
-	}
-
 	public get $distance(): number {
 		return 0;
 	}

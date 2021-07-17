@@ -68,6 +68,7 @@ type JunctionDimension = 'ox' | 'oy';
 	protected $onDispose(): void {
 		this.f1._junctions.splice(this.f1._junctions.indexOf(this), 1);
 		this.f2._junctions.splice(this.f2._junctions.indexOf(this), 1);
+		super.$onDispose();
 	}
 
 	/** 根據指定的基準點來取得覆蓋比較矩形 */

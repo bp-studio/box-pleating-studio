@@ -98,6 +98,12 @@ interface JSheet {
 		design.$viewManager.$createView(this);
 	}
 
+	protected $onDispose(): void {
+		//@ts-ignore
+		delete this._controlMaps;
+		super.$onDispose();
+	}
+
 	/** 記載所有這個 {@link Sheet} 中的 {@link Control} 來源 */
 	private _controlMaps: IterableFactory<Control>[];
 

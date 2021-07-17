@@ -23,8 +23,8 @@
 	private readonly _constructor: (k1: K, k2: K) => V;
 
 	public $dispose(): void {
+		this._map.$dispose();
 		Shrewd.terminate(this);
-		Shrewd.terminate(this._map);
 	}
 
 	@shrewd({

@@ -6,7 +6,7 @@ const sourcemaps = require('gulp-sourcemaps');
 
 const config = require('../config.json');
 const shrewdDir = "../shrewd";
-const lib = config.dest.debug + "lib";
+const lib = config.dest.debug + "/lib";
 const srcRoot = path.relative(lib, path.resolve(process.cwd(), shrewdDir));
 
 // 本地更新 Shrewd 模組

@@ -77,7 +77,7 @@ namespace TreeMaker {
 				e.length = Math.max(Math.round(e.length * fix), 1);
 			}
 
-			let sheet: JSheet = { width: sw, height: sh, zoom: 20 };
+			let sheet: JSheet = { width: sw, height: sh };
 			this.$result.layout.sheet = sheet;
 			this.$result.tree.sheet = sheet;
 		}

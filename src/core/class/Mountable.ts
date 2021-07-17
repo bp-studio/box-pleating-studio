@@ -40,8 +40,6 @@ abstract class Mountable extends Disposable {
 	protected $onDispose(): void {
 		if(this._oldStudio) this.$onDismount(this._oldStudio);
 		super.$onDispose();
-		// 雖然有 GC 上的風險，但是這邊我們不能把 this.mountTarget 刪除掉，
-		// 不然的話在關閉的瞬間會有很多 DesignObject 出現參照上的錯誤
 	}
 
 	/**

@@ -64,7 +64,11 @@ abstract class Draggable extends Control {
 	/** 當前位置 */
 	@shrewd public $location: IPoint = { x: 0, y: 0 };
 
-	/** 把 target 移動到 source 的相對應位置上 */
+	/**
+	 * 把 target 移動到 source 的相對應位置上
+	 *
+	 * @param init 這是否為第一次執行
+	 */
 	public static $relocate(source: Draggable, target: Draggable, init = false): void {
 		if(!source || !target) return;
 		// TODO: 不同的形狀的 Sheet 要如何處理

@@ -73,7 +73,7 @@ interface JRepository {
 	}
 
 	protected $onDispose(): void {
-		if(this._everActive) this.$design.$history?.$destruct(this.$toMemento());
+		if(this._everActive) this.$design?.$history?.$destruct(this.$toMemento());
 		super.$onDispose();
 	}
 

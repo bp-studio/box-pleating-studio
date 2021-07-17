@@ -48,12 +48,12 @@ class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	public patternNotFound(design: unknown): boolean {
-		if(design instanceof Design) return design.$stretches.$patternNotFound;
+		if(design instanceof Design && !design.$disposed) return design.$stretches.$patternNotFound;
 		return false;
 	}
 
 	public isMinimal(design: unknown): boolean {
-		if(design instanceof Design) return design.$tree.$isMinimal;
+		if(design instanceof Design && !design.$disposed) return design.$tree.$isMinimal;
 		return false;
 	}
 

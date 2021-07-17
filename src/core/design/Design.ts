@@ -123,6 +123,7 @@ interface IDesignObject {
 		this.$flaps.$dispose();
 		this.$stretches.$dispose();
 		this.$junctions.$dispose();
+		super.$onDispose();
 	}
 
 	public get $design(): this { return this; }
