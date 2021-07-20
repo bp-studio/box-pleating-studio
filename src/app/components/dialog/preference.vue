@@ -31,33 +31,19 @@
 </template>
 
 <script lang="ts">
-	import { Component, Vue } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
+	import Modal from '../mixins/modal';
 
-	import * as bootstrap from 'bootstrap';
 	import { DisplaySetting, bp } from '../import/BPStudio';
 
 	@Component
-	export default class Preference extends Vue {
-		private modal: bootstrap.Modal;
-		protected initialized: boolean = false;
+	export default class Preference extends Modal {
+		protected getScreenName(): string { return 'Preference'; }
 
 		protected get i18n(): typeof i18n { return i18n; }
 		protected get core(): typeof core { return core; }
 		protected get display(): null | DisplaySetting {
 			return core.initialized ? bp.settings : null;
-		}
-
-		mounted(): void {
-			libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
-		}
-
-		public async show(): Promise<void> {
-			await libReady;
-			this.initialized = true;
-			this.modal.show();
-			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
-			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
-			gtag('event', 'screen_view', { screen_name: 'Preference' });
 		}
 
 		protected onLocaleChanged(): void {

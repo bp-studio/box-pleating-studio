@@ -45,40 +45,30 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-
-	import * as bootstrap from 'bootstrap';
-	import BaseComponent from '../mixins/baseComponent';
+	import Modal from '../mixins/modal';
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	declare const LZ: any;
 
 	@Component
-	export default class Share extends BaseComponent {
+	export default class Share extends Modal {
 		protected url: string = "";
-		protected modal: bootstrap.Modal;
 		protected canShare: boolean = Boolean(navigator.share);
-		protected initialized: boolean = false;
 		protected sending: boolean = false;
 		protected error: string | null = null;
 
-		mounted(): void {
-			libReady.then(() => {
-				this.modal = new bootstrap.Modal(this.$el);
-			});
+		protected getScreenName(): string { return 'Share'; }
+
+		protected onBeforeShow(): boolean {
+			if(!core.design) return false;
+			let data = LZ.compress(JSON.stringify(core.design));
+			this.url = "https://bpstudio.abstreamace.com/?project=" + data;
+			this.shorten();
+			return true;
 		}
 
-		public async show(): Promise<void> {
-			await libReady;
-			if(!this.design) return;
-			this.initialized = true;
-			let data = LZ.compress(JSON.stringify(this.design));
-			this.url = "https://bpstudio.abstreamace.com/?project=" + data;
-			this.modal.show();
-			this.shorten();
-			this.$el.addEventListener('shown.bs.modal', () => {
-				if(this.$refs.bt) (this.$refs.bt as HTMLButtonElement).focus();
-			}, { once: true });
-			gtag('event', 'screen_view', { screen_name: 'Share' });
+		protected getFocusButton(): HTMLButtonElement {
+			return this.$refs.bt as HTMLButtonElement;
 		}
 
 		protected onCopy(): void {
@@ -92,7 +82,7 @@
 		protected share(): void {
 			navigator.share({
 				title: "Box Pleating Studio",
-				text: this.$t("share.message", [this.design!.title]).toString(),
+				text: this.$t("share.message", [core.design!.title]).toString(),
 				url: this.url,
 			}).catch(() => {
 				// 捕捉取消之類的錯誤，不處理

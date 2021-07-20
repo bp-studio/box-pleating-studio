@@ -28,30 +28,15 @@
 </template>
 
 <script lang="ts">
-	import { Component, Vue } from 'vue-property-decorator';
-
-	import * as bootstrap from 'bootstrap';
+	import { Component } from 'vue-property-decorator';
+	import Modal from '../mixins/modal';
 
 	declare const app_config: Record<string, unknown>;
 
 	@Component
-	export default class About extends Vue {
-		private modal: bootstrap.Modal;
+	export default class About extends Modal {
 		protected get copyright(): string { return core.copyright; }
-		protected initialized: boolean = false;
-
-		mounted(): void {
-			libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
-		}
-
-		public async show(): Promise<void> {
-			await libReady;
-			this.initialized = true;
-			this.modal.show();
-			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
-			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
-			gtag('event', 'screen_view', { screen_name: 'About' });
-		}
+		protected getScreenName(): string { return 'About'; }
 
 		public get version(): string {
 			let meta = document.querySelector("meta[name=version]") as HTMLMetaElement;

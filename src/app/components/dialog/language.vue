@@ -19,9 +19,9 @@
 </template>
 
 <script lang="ts">
-	import * as bootstrap from 'bootstrap';
-
 	import { Component, Vue } from 'vue-property-decorator';
+
+	import * as bootstrap from 'bootstrap';
 
 	declare const locale: Record<string, unknown>[];
 

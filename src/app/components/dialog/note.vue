@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<button id="note" class="btn btn-light text-warning" v-on:click="note">
+		<button id="note" class="btn btn-light text-warning" v-on:click="show">
 			<i class="fas fa-exclamation-triangle h1"></i>
 		</button>
 		<div class="modal fade" ref="mdl">
@@ -17,27 +17,17 @@
 </template>
 
 <script lang="ts">
-	import * as bootstrap from 'bootstrap';
-
-	import { Component, Vue } from 'vue-property-decorator';
+	import { Component } from 'vue-property-decorator';
+	import Modal from '../mixins/modal';
 
 
 	@Component
-	export default class Note extends Vue {
-		private modal: bootstrap.Modal;
-
-		mounted(): void {
-			libReady.then(() =>
-				this.modal = new bootstrap.Modal(this.$refs.mdl as HTMLElement)
-			);
+	export default class Note extends Modal {
+		protected getModelElement(): Element {
+			return this.$refs.mdl as Element;
 		}
-
-		private async note(): Promise<void> {
-			await libReady;
-			this.modal.show();
-			let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
-			this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
-			gtag('event', 'screen_view', { screen_name: 'Note' });
+		protected getScreenName(): string {
+			return 'Note';
 		}
 	}
 </script>

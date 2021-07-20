@@ -26,20 +26,18 @@
 
 <script lang="ts">
 	import { Component, Vue, Watch } from 'vue-property-decorator';
-
-	import * as bootstrap from 'bootstrap';
+	import Modal from '../mixins/modal';
 
 	declare const marked: (s: string) => string;
 	declare const logs: number[];
 
 	@Component
-	export default class Version extends Vue {
-
+	export default class Version extends Modal {
 		protected record: Record<number, string> = {};
 		protected index: number;
 		protected max: number;
-		protected initialized: boolean = false;
-		protected modal: bootstrap.Modal;
+
+		protected getScreenName(): string { return 'News'; }
 
 		@Watch('index') onIndex(index: number): void {
 			this.load(index);
@@ -58,7 +56,6 @@
 					}
 				});
 			}
-			libReady.then(() => this.modal = new bootstrap.Modal(this.$el));
 			this.index = this.max = logs.length - 1;
 		}
 
@@ -81,15 +78,8 @@
 			return true;
 		}
 
-		public async show(): Promise<void> {
-			await libReady;
-			this.initialized = true;
-			if(await this.load(this.index)) {
-				this.modal.show();
-				let bt = this.$el.querySelector("[data-bs-dismiss]") as HTMLButtonElement;
-				this.$el.addEventListener('shown.bs.modal', () => bt.focus(), { once: true });
-				gtag('event', 'screen_view', { screen_name: 'News' });
-			}
+		protected onBeforeShow(): Promise<boolean> {
+			return this.load(this.index);
 		}
 	}
 </script>
