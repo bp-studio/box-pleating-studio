@@ -39,5 +39,7 @@ class Updater extends Animator {
 		this.$updating = false;
 
 		if(this._studio.$designMap.size == 0) this.$active = false;
+
+		Disposable.$flush();
 	}
 }

@@ -15,6 +15,17 @@ interface IDisposable {
 
 @shrewd abstract class Disposable implements IDisposable {
 
+	private static _pending: Set<Disposable> = new Set();
+
+	/**
+	 * 清理掉一切棄置物件的交互參照，以利 GC。這個動作必須在認可週期的最後才執行，
+	 * 因為在棄置當下的週期之內仍然有可能繼續需要呼叫相關的參照（例如為了產生 memento）。
+	 */
+	public static $flush(): void {
+		for(let item of Disposable._pending) item._destroy();
+		Disposable._pending.clear();
+	}
+
 	/** 內部的棄置狀態 */
 	@shrewd({
 		renderer(this: Disposable, v: boolean) {
@@ -53,7 +64,11 @@ interface IDisposable {
 	 * 繼承類別覆寫此方法的時候一般來說應呼叫 {@link Disposable.$onDispose super.$onDispose()} 方法，請務必記得。
 	 */
 	protected $onDispose(): void {
-		// 自動把一切的物件參照都消滅掉
+		Disposable._pending.add(this);
+	}
+
+	/** 自動把一切的物件參照都消滅掉，以利 GC */
+	private _destroy(): void {
 		for(let key in this) {
 			if(this[key] instanceof Disposable) {
 				delete this[key];
