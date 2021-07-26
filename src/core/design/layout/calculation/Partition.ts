@@ -39,7 +39,7 @@ interface JPartition {
 		}
 	}
 
-	/** 所有的側角或交角 */
+	/** 所有的{@link CornerType.$side 側角}或{@link CornerType.$intersection 交角} */
 	@onDemand public get $intersectionCorners(): readonly CornerMap[] {
 		return this.$cornerMap.filter(m => {
 			let type = m[0].type;
@@ -48,7 +48,7 @@ interface JPartition {
 		});
 	}
 
-	/** 所有向外連出的角落 */
+	/** 所有向外連出的角落（{@link CornerType.$flap}） */
 	@onDemand public get $outCorners(): readonly CornerMap[] {
 		return this.$intersectionCorners.concat(
 			this.$cornerMap.filter(m => m[0].type == CornerType.$flap)

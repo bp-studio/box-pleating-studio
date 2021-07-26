@@ -144,6 +144,13 @@ type GDevice = JDevice<Gadget>;
 		return Line.$distinct(result);
 	}
 
+	/**
+	 * 這個 {@link Device} 的{@link CornerType.$side 側角}或{@link CornerType.$intersection 交角}對應的連結目標之映射。
+	 *
+	 * 這邊只有當側角或交角是位於 {@link Flap} 內部的時候才能夠算出連接目標，
+	 * 如果是位於 {@link River} 內部就沒有辦法直接求出目標，
+	 * 此時這樣的角落會被列入 {@link Device.$openAnchors $openAnchors} 中以便稍後另外處理。
+	 */
 	@shrewd private get _intersectionMap(): IntersectionMap[] {
 		let result: IntersectionMap[] = [];
 		if(!this.$isActive) return result;
@@ -155,8 +162,13 @@ type GDevice = JDevice<Gadget>;
 		return result;
 	}
 
+	/**
+	 * {@link Device._intersectionMap _intersectionMap} 裡面尚未被連接的錨點，在繪製 {@link River} 的脊線時會用到。
+	 */
 	@shrewd public get $openAnchors(): Point[] {
-		return this._intersectionMap.filter(m => !m[1] || m[0].eq(m[1])).map(m => m[0]);
+		return this._intersectionMap
+			.filter(m => !m[1] || m[0].eq(m[1]))
+			.map(m => m[0]);
 	}
 
 	public $getConnectionRidges(internalOnly = false): Line[] {
