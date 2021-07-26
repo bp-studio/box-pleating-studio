@@ -39,6 +39,7 @@ gulp.task('cleanPub', () => seriesIf(
 			type: 'confirm',
 			message: '確定要清理正式版遠端資料夾？請確定已經執行過正式版發布。',
 			name: 'ok',
+			default: false,
 		}]);
 		return answers.ok;
 	},
