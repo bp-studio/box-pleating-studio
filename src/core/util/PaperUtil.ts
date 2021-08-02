@@ -57,7 +57,7 @@ namespace PaperUtil {
 	export function $Red(): paper.Color { return red = red || new paper.Color('red'); }
 
 	export function $fromShape(shape: PolyBool.Shape): paper.Path[] {
-		let poly = PolyBool.polygon(shape);
+		let poly = PolyBool.toPolygon(shape);
 		return poly.regions.map(r => new paper.Path({
 			segments: r,
 			closed: true,

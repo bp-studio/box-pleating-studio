@@ -1,4 +1,4 @@
-/// <reference path="PolyBool.ts" />
+/// <reference path="polyBool/Index.ts" />
 /// <reference path="ArrayUtil.ts" />
 /// <reference path="DeepCopy.ts" />
 /// <reference path="GeneratorUtil.ts" />

@@ -122,6 +122,6 @@ namespace PathUtil {
 	}
 
 	export function $toSegments(path: Path): PolyBool.Shape {
-		return PolyBool.shape({ regions: [path.map(p => [p.x, p.y])], inverted: false });
+		return PolyBool.toShape({ regions: [path.map(p => [p.x, p.y])], inverted: false });
 	}
 }

@@ -41,7 +41,7 @@
 				let v = new Vector(ox * fx, oy * fy);
 				let rect = new Rectangle(p, p.sub(v));
 				let path = rect.$toPolyBoolPath();
-				let seg = PolyBool.shape({ regions: [path], inverted: false });
+				let seg = PolyBool.toShape({ regions: [path], inverted: false });
 				result.push(seg);
 			}
 		}
