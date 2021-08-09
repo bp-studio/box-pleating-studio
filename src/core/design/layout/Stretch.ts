@@ -101,8 +101,10 @@ interface JStretch {
 	public get fy(): Sign { return this.$junctions[0]?.fy ?? 1; }
 
 	protected get $shouldDispose(): boolean {
+		// 建立靜態參照；預設情況下 Terser 不會讓這邊的 side-effect 消失
+		let active = this._isActive, dragging = this.$design.$dragging;
 		// 正在拖曳中的時候 Stretch 會暫時保留，以免因為單一 Flap 的拖曳經過導致當前的設定全部流失
-		return super.$shouldDispose || !this._isActive && !this.$design.$dragging;
+		return super.$shouldDispose || !active && !dragging;
 	}
 
 	@shrewd public get _isActive(): boolean {

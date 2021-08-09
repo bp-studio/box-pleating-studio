@@ -15,6 +15,7 @@ abstract class IndependentDraggable extends Draggable {
 	protected get $isNew(): boolean { return this._isNew; }
 	protected set $isNew(v) { if(!v) this._isNew = v; }
 
+	/** 這個會在執行之後自我消滅 */
 	@shrewd private _watchIsNew(): void {
 		if(this._isNew && this.$sheet != this.$design.sheet) this._isNew = false;
 	}

@@ -123,7 +123,7 @@ interface JHistory {
 	 *
 	 * 這個必須是反應方法才能在 UI 上頭反應。
 	 */
-	@shrewd public get $modified(): boolean {
+	@shrewdStatic public get $modified(): boolean {
 		return this._savedIndex != this._index;
 	}
 
@@ -159,11 +159,11 @@ interface JHistory {
 		this._enqueue(FieldCommand.create(target, prop, oldValue, newValue));
 	}
 
-	@shrewd public get $canUndo(): boolean {
+	@shrewdStatic public get $canUndo(): boolean {
 		return this._index > 0;
 	}
 
-	@shrewd public get $canRedo(): boolean {
+	@shrewdStatic public get $canRedo(): boolean {
 		return this._index < this._steps.length;
 	}
 

@@ -22,7 +22,12 @@
 	}
 
 	protected get $shouldDispose(): boolean {
-		return super.$shouldDispose || !this._view.$info.components.some(c => c == this._key);
+		return super.$shouldDispose || !this._valid;
+	}
+
+	/** 這個分離出來以維持 {@link RiverHelper.$shouldDispose $shouldDispose} 靜態 */
+	@shrewd private get _valid(): boolean {
+		return this._view.$info.components.some(c => c == this._key);
 	}
 
 	@shrewd public get $distance(): number {
@@ -34,6 +39,7 @@
 
 	//@noCompare // segments 和 overridden 都有把關
 	@shrewd({
+		static: true,
 		comparer(ov: PolyBool.Shape, nv: PolyBool.Shape, member) {
 			member.ov = ov;
 			return false;

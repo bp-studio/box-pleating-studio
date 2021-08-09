@@ -61,7 +61,7 @@ interface JEdge {
 		return false;
 	}
 
-	@shrewd public get $isRiver(): boolean {
+	@shrewdStatic public get $isRiver(): boolean {
 		this.$disposeEvent();
 		return this.n1.$degree > 1 && this.n2.$degree > 1;
 	}
@@ -71,13 +71,13 @@ interface JEdge {
 	private _adjacentEdges(n: TreeNode): TreeEdge[] { return n.edges.filter(e => e != this); }
 
 	/** 相對於 n1 的所有相鄰邊 */
-	@shrewd public get a1(): readonly TreeEdge[] {
+	@shrewdStatic public get a1(): readonly TreeEdge[] {
 		this.$disposeEvent();
 		return this._adjacentEdges(this.n1);
 	}
 
 	/** 相對於 n2 的所有相鄰邊 */
-	@shrewd public get a2(): readonly TreeEdge[] {
+	@shrewdStatic public get a2(): readonly TreeEdge[] {
 		this.$disposeEvent();
 		return this._adjacentEdges(this.n2);
 	}

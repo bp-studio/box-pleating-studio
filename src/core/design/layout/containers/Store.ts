@@ -92,7 +92,7 @@ abstract class Store<P, T extends SheetObject & IQueryable>
 	 * 只要當前的 {@link Store} 非空就會有一個被選中，所以傳回 null 也表示 {@link Store} 為空。
 	 * @exports
 	 */
-	@shrewd public get entry(): T | null {
+	@shrewdStatic public get entry(): T | null {
 		return this.$get(this.index) ?? null;
 	}
 

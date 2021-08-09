@@ -67,9 +67,9 @@ interface JRepository {
 	}
 
 	protected get $shouldDispose(): boolean {
-		return super.$shouldDispose ||
-			this.$stretch.$disposed ||
-			!this._isActive && !this.$design.$dragging;
+		// 建立靜態參照；預設情況下 Terser 不會讓這邊的 side-effect 消失
+		let active = this._isActive, dragging = this.$design.$dragging;
+		return super.$shouldDispose || this.$stretch.$disposed || !active && !dragging;
 	}
 
 	protected $onDispose(): void {

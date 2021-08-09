@@ -50,6 +50,9 @@ interface IDecoratorOptions<T> {
 
 	/** Comparer function */
 	comparer?: (oldValue: T, newValue: T, member?: any) => boolean;
+
+	/** Indicating the references are static. */
+	static?: boolean;
 }
 
 /**

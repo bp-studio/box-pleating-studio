@@ -11,9 +11,44 @@ namespace PolyBool {
 
 	export function compare(shape1: Shape, shape2: Shape): boolean {
 		if(!shape1 && shape2) return false;
-		let combined = combine(shape1, shape2);
-		return SegmentSelector.xor(combined.combined).length == 0;
+		return fastCompare(shape1, shape2);
 	}
+
+	/** 儲存轉換的路徑便重複比較 */
+	const compareCache = new WeakMap<Shape, Path[]>();
+
+	function getCompareRegions(shape: Shape): Path[] {
+		let path = compareCache.get(shape);
+		if(!path) {
+			path = segmentChainer(shape.segments);
+			compareCache.set(shape, path);
+		}
+		return path;
+	}
+
+	/**
+	 * 新版比較是純粹比較化簡過的多邊形是否頂點集相同，
+	 * 這在理論上有可能會出現偽陽結果，但在實務上不可能，
+	 * 因為偽陽結果表示兩個多邊形的頂點集相同但是順序上不同，
+	 * 但是這邊的實務上不可能出現形狀那麼奇怪的多邊形。
+	 *
+	 * 新版的比較比較版的速度快了一倍以上。
+	 */
+	function fastCompare(shape1: Shape, shape2: Shape): boolean {
+		let p1 = getCompareRegions(shape1), p2 = getCompareRegions(shape2);
+		if(p1.length != p2.length) return false;
+		let set = new Set<string>();
+		for(let p of p1) set.add(p.toString());
+		for(let p of p2) if(!set.has(p.toString())) return false;
+		return true;
+	}
+
+	// 這個是舊的比較，其原理是完全確定兩個多邊形抵銷之後結果為空。
+	// function slowCompare(shape1: Shape, shape2: Shape): boolean {
+	// 	let combined = combine(shape1, shape2);
+	// 	let xor = SegmentSelector.xor(combined.combined);
+	// 	return xor.length == 0;
+	// }
 
 	export function union(shapes: Shape[]): Shape {
 		let seg = shapes[0];
@@ -43,19 +78,21 @@ namespace PolyBool {
 	export type compare = 0 | 1 | -1;
 
 	export function toShape(poly: Polygon): Shape {
-		let i = new SegmentCore();
-		poly.regions.forEach(r => i.addRegion(r));
-		return {
-			segments: i.calculate(poly.inverted),
+		const core = new SegmentCore();
+		poly.regions.forEach(r => core.addRegion(r));
+		const result = {
+			segments: core.calculate(poly.inverted),
 			inverted: poly.inverted,
 		};
+		return result;
 	}
 
 	export function toPolygon(shape: Shape): Polygon {
-		return {
-			regions: segmentChainer(shape.segments),
+		const result = {
+			regions: getCompareRegions(shape),
 			inverted: shape.inverted,
 		};
+		return result;
 	}
 
 	interface Combined {

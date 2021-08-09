@@ -66,6 +66,7 @@ interface JConfiguration {
 		return super.$shouldDispose || this.$repository.$disposed;
 	}
 
+	/** @shrewd */
 	@shrewd public get _isActive(): boolean {
 		return this.$repository._isActive && this.$repository.entry == this;
 	}

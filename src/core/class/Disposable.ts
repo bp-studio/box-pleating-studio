@@ -26,8 +26,14 @@ interface IDisposable {
 		Disposable._pending.clear();
 	}
 
-	/** 內部的棄置狀態 */
+	/**
+	 * 內部的棄置狀態。
+	 *
+	 * 這個屬性合理地可以設定成靜態，因為當它第一次被運算的時候它理應會遍歷所有相依的對象，
+	 * 而且基本上這些對象都不會變動。
+	 */
 	@shrewd({
+		static: true,
 		renderer(this: Disposable, v: boolean) {
 			return v || this.$shouldDispose;
 		},
@@ -41,14 +47,19 @@ interface IDisposable {
 
 	private _disposeWith?: Disposable;
 
-	@shrewd protected $disposeEvent(): void {
+	@shrewdStatic protected $disposeEvent(): void {
 		if(this._disposed) {
 			Shrewd.terminate(this);
 			this.$onDispose();
 		}
 	}
 
-	/** 要自動棄置的條件。繼承類別覆寫的時候應記得參考 {@link Disposable.$shouldDispose super.$shouldDispose}。 */
+	/**
+	 * 要自動棄置的條件。
+	 *
+	 * 繼承類別覆寫的時候應記得參考 {@link Disposable.$shouldDispose super.$shouldDispose}，
+	 * 並且確保運算式為靜態參照運算式。
+	 */
 	protected get $shouldDispose(): boolean {
 		return this._disposeWith ? this._disposeWith._disposed : false;
 	}

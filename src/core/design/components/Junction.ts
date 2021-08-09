@@ -174,7 +174,7 @@ type JunctionDimension = 'ox' | 'oy';
 
 	@shrewd public get $neighbors(): Junction[] {
 		this.$disposeEvent();
-		if(this.$direction >= quadrantNumber) return [];
+		if(!isQuadrant(this.$direction)) return [];
 		let a1 = this.q1!.$activeJunctions.concat();
 		let a2 = this.q2!.$activeJunctions.concat();
 		a1.splice(a1.indexOf(this), 1);
@@ -182,12 +182,14 @@ type JunctionDimension = 'ox' | 'oy';
 		return a1.concat(a2);
 	}
 
-	@shrewd public get q1(): Quadrant | null {
-		return isQuadrant(this.$direction) ? this.f1.$quadrants[this.$direction] : null;
+	@shrewdStatic public get q1(): Quadrant | null {
+		let d = this.$direction;
+		return isQuadrant(d) ? this.f1.$quadrants[d] : null;
 	}
 
-	@shrewd public get q2(): Quadrant | null {
-		return isQuadrant(this.$direction) ? this.f2.$quadrants[opposite(this.$direction)] : null;
+	@shrewdStatic public get q2(): Quadrant | null {
+		let d = this.$direction;
+		return isQuadrant(d) ? this.f2.$quadrants[opposite(d)] : null;
 	}
 
 	@shrewd public get $treeDistance(): number {
@@ -203,29 +205,29 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** 「f」在這邊是代表乘法係數。 */
-	@shrewd public get fx(): Sign {
+	@shrewdStatic public get fx(): Sign {
 		return -Math.sign(this.sx) as Sign;
 	}
 
 	/** 「f」在這邊是代表乘法係數。 */
-	@shrewd public get fy(): Sign {
+	@shrewdStatic public get fy(): Sign {
 		return -Math.sign(this.sy) as Sign;
 	}
 
 	/** 「o」是代表重疊區域。 */
-	@shrewd public get ox(): number {
+	@shrewdStatic public get ox(): number {
 		let x = this.$treeDistance - Math.abs(this.sx);
 		return x > 0 ? x : NaN;
 	}
 
 	/** 「o」是代表重疊區域。 */
-	@shrewd public get oy(): number {
+	@shrewdStatic public get oy(): number {
 		let y = this.$treeDistance - Math.abs(this.sy);
 		return y > 0 ? y : NaN;
 	}
 
 	/** 「s」是代表角片尖端構成的方框。這個值可能是負值，視 f1 f2 相對位置而定。 */
-	@shrewd public get sx(): number {
+	@shrewdStatic public get sx(): number {
 		let x1 = this.f1.$location.x, x2 = this.f2.$location.x;
 		let w1 = this.f1.width, w2 = this.f2.width;
 		let sx = x1 - x2 - w2;
@@ -236,7 +238,7 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** 「s」是代表角片尖端構成的方框。這個值可能是負值，視 f1 f2 相對位置而定。 */
-	@shrewd public get sy(): number {
+	@shrewdStatic public get sy(): number {
 		let y1 = this.f1.$location.y, y2 = this.f2.$location.y;
 		let h1 = this.f1.height, h2 = this.f2.height;
 		let sy = y1 - y2 - h2;
@@ -246,9 +248,9 @@ type JunctionDimension = 'ox' | 'oy';
 		return NaN;
 	}
 
-	@shrewd private get _signX(): Sign { return Math.sign(this.sx) as Sign; }
-	@shrewd private get _signY(): Sign { return Math.sign(this.sy) as Sign; }
-	@shrewd public get $direction(): Direction {
+	@shrewdStatic private get _signX(): Sign { return Math.sign(this.sx) as Sign; }
+	@shrewdStatic private get _signY(): Sign { return Math.sign(this.sy) as Sign; }
+	@shrewdStatic public get $direction(): Direction {
 		let x = this._signX, y = this._signY;
 		if(x < 0 && y < 0) return Direction.UR;
 		if(x > 0 && y < 0) return Direction.UL;
@@ -261,7 +263,7 @@ type JunctionDimension = 'ox' | 'oy';
 		return Direction.none;
 	}
 
-	@shrewd private get _flapDistance(): number {
+	@shrewdStatic private get _flapDistance(): number {
 		let x = this.sx, y = this.sy;
 		let vx = x != 0 && !isNaN(x), vy = y != 0 && !isNaN(y);
 		if(vx && vy) return Math.sqrt(x * x + y * y);
@@ -271,7 +273,7 @@ type JunctionDimension = 'ox' | 'oy';
 	}
 
 	/** 目前 isValid 的定義就是 `status == JunctionStatus.overlap` */
-	@shrewd public get $isValid(): boolean {
+	@shrewdStatic public get $isValid(): boolean {
 		return this.$status == JunctionStatus.overlap;
 	}
 

@@ -28,12 +28,13 @@ abstract class Mountable extends Disposable {
 	}
 
 	/** 事件觸發反應方法 */
-	@shrewd public $mountEvents(): void {
+	@shrewdStatic public $mountEvents(): void {
 		this.$disposeEvent();
-		if(this.$studio !== this._oldStudio) {
-			if(this.$studio) this.$onMount(this.$studio);
+		let studio = this.$studio;
+		if(studio !== this._oldStudio) {
+			if(studio) this.$onMount(studio);
 			if(this._oldStudio) this.$onDismount(this._oldStudio);
-			this._oldStudio = this.$studio;
+			this._oldStudio = studio;
 		}
 	}
 

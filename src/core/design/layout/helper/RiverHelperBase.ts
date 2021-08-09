@@ -26,7 +26,7 @@
 		return 0;
 	}
 
-	@noCompare // 已經透過 q.contour 來把關
+	@shrewdStatic // 已經透過 q.contour 來把關
 	public get $shape(): PolyBool.Shape {
 		this.$disposeEvent();
 		let path: Path = [];

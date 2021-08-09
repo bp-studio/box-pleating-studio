@@ -138,8 +138,8 @@ interface IDesignObject {
 	 */
 	@shrewd public $dragging: boolean = false;
 
-	@shrewd public get _isActive(): boolean {
-		return this instanceof Design && (this.$mountTarget as Studio).$design == this;
+	@shrewdStatic public get _isActive(): boolean {
+		return (this.$mountTarget as Studio).$design == this;
 	}
 
 	public readonly $vertices = new VertexContainer(this);
@@ -150,7 +150,7 @@ interface IDesignObject {
 	public readonly $junctions: JunctionContainer;
 
 	/** @exports */
-	@shrewd public get sheet(): Sheet {
+	@shrewdStatic public get sheet(): Sheet {
 		return this.mode == "layout" ? this.$LayoutSheet : this.$TreeSheet;
 	}
 

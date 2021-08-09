@@ -103,7 +103,8 @@ interface JNode {
 		return result;
 	}
 
-	@shrewd public get $degree(): number {
+	/** @shrewd */
+	@shrewdStatic public get $degree(): number {
 		return this.edges.length;
 	}
 

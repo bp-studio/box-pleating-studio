@@ -16,7 +16,7 @@ function orderedArray(...p: [object, string | symbol] | [string?]): PropertyDeco
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
 				// }
-				console.log(msg);
+				Diagnose.count(msg);
 			}
 			return result;
 		},
@@ -39,7 +39,7 @@ function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDe
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
 				// }
-				console.log(msg);
+				Diagnose.count(msg);
 			}
 			return result;
 		},
@@ -64,7 +64,7 @@ function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator |
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
 				// }
-				console.log(msg);
+				Diagnose.count(msg);
 			}
 			return result;
 		},
@@ -93,7 +93,7 @@ function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | 
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
 				// }
-				console.log(msg);
+				Diagnose.count(msg);
 			}
 			return true;
 		},

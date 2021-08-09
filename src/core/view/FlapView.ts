@@ -40,11 +40,11 @@
 			(this.hinge.contains(point) || this.hinge.hitTest(point) !== null);
 	}
 
-	@shrewd public get $circle(): paper.Path {
+	@shrewdStatic public get $circle(): paper.Path {
 		return this._makeRectangle(0);
 	}
 
-	@shrewd public get $circleJSON(): string {
+	@shrewdStatic public get $circleJSON(): string {
 		return this.$circle.exportJSON();
 	}
 
@@ -65,7 +65,7 @@
 		return this._jsonCache[d] = this._jsonCache[d] || this._makeRectangle(d).exportJSON();
 	}
 
-	@shrewd private _clearCache(): void {
+	@shrewdStatic private _clearCache(): void {
 		if(!this._control.$design.$dragging && this._jsonCache.length) this._jsonCache = [];
 	}
 
@@ -74,7 +74,7 @@
 	}
 
 	/** 這個獨立出來以提供 {@link RiverView} 的相依 */
-	@shrewd public $renderHinge(): void {
+	@shrewdStatic public $renderHinge(): void {
 		if(this._control.$disposed) return;
 		this._circle.visible = this.$studio?.$display.$settings.showHinge ?? false;
 		let paths = PaperUtil.$fromShape(this.$closure);
@@ -124,7 +124,7 @@
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */
-	@shrewd private _renderDot(): void {
+	@shrewdStatic private _renderDot(): void {
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		let s = 3 * this._drawScale ** 0.75;
 		makePerQuadrant(i => {

@@ -31,6 +31,7 @@ namespace PolyBool {
 				matches_pt1: false,
 			};
 			let next_match: Match | null = first_match;
+
 			function setMatch(index: number, matches_head: boolean, matches_pt1: boolean) {
 				// return true if we've matched twice
 				next_match!.index = index;
@@ -43,12 +44,17 @@ namespace PolyBool {
 				next_match = null;
 				return true; // we've matched twice, we're done here
 			}
+
+			/**
+			 * 這邊採用線性搜尋的方式檢查所有的 chain，這乍看非常沒效率，
+			 * 但很意外地，實務上 chains 的大小頂多兩三個而已，所以不需要更進一步改進。
+			 */
 			for(let i = 0; i < chains.length; i++) {
 				var chain = chains[i];
 				let head = chain[0];
-				let head2 = chain[1];
+				//let head2 = chain[1];
 				let tail = chain[chain.length - 1];
-				let tail2 = chain[chain.length - 2];
+				//let tail2 = chain[chain.length - 2];
 				if(Epsilon.$pointsSame(head, pt1)) {
 					if(setMatch(i, true, true)) break;
 				} else if(Epsilon.$pointsSame(head, pt2)) {

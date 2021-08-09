@@ -46,7 +46,7 @@
 	}
 
 	/** 尺度太小的時候調整頂點繪製 */
-	@shrewd private _renderDot(): void {
+	@shrewdStatic private _renderDot(): void {
 		let s = VertexView._DOT_SIZE * Math.sqrt(this._drawScale);
 		this._dot.copyContent(new paper.Path.Circle({
 			position: this._dot.position,

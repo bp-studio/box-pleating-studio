@@ -47,14 +47,14 @@ interface JFlap {
 
 	public $selectableWith(c: Control): boolean { return c instanceof Flap; }
 
-	@shrewd public get $center(): IPoint {
+	@shrewdStatic public get $center(): IPoint {
 		return { x: this.$location.x + this.width / 2, y: this.$location.y + this.height / 2 };
 	}
 
 	public get $dragSelectAnchor(): IPoint { return this.$center; }
 
 	/** 這個 {@link Flap} 的各象限上的頂點 */
-	@shrewd public get $points(): readonly Point[] {
+	@shrewdStatic public get $points(): readonly Point[] {
 		let x = this.$location.x, y = this.$location.y;
 		let w = this.width, h = this.height;
 		return [

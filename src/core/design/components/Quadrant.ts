@@ -57,13 +57,13 @@ type CoveredInfo = [number, number, Point[]];
 		return super.$shouldDispose || this._flap.$disposed;
 	}
 
-	@shrewd public get $corner(): Point {
+	@shrewdStatic public get $corner(): Point {
 		this.$disposeEvent();
 		let r = new Fraction(this._flap.radius);
 		return this.$point.add(this.qv.$scale(r));
 	}
 
-	@shrewd public get $point(): Point {
+	@shrewdStatic public get $point(): Point {
 		return this._flap.$points[this.q];
 	}
 
