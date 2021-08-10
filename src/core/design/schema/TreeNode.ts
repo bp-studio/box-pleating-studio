@@ -35,14 +35,14 @@ interface JNode {
 	public $delete() {
 		let e = this.edges[0];
 		this.$tree.$remove(e);
-		if(this.$parentId === undefined) e.n(this).$parentId = undefined;
+		if(this.parentId === undefined) e.n(this).parentId = undefined;
 		this.$tree.$remove(this);
 	}
 
-	@action public $parentId?: number;
+	@action public parentId?: number;
 
 	@shrewd public get $parent(): TreeNode | null {
-		return this.$parentId !== undefined ? this.$tree.$node.get(this.$parentId)! : null;
+		return this.parentId !== undefined ? this.$tree.$node.get(this.parentId)! : null;
 	}
 
 	@shrewd public get $parentEdge(): TreeEdge | null {
@@ -112,7 +112,7 @@ interface JNode {
 	public toJSON() {
 		return {
 			id: this.id,
-			parentId: this.$parentId,
+			parentId: this.parentId,
 		};
 	}
 }

@@ -126,8 +126,8 @@
 		let N = this.$getOrAddNode(this._nextId);
 		let { n1, n2 } = e;
 		if(n1.$parent == n2) [n1, n2] = [n2, n1];
-		N.$parentId = n1.id;
-		n2.$parentId = N.id;
+		N.parentId = n1.id;
+		n2.parentId = N.id;
 		this._createEdge(N, n1, Math.ceil(e.length / 2));
 		this._createEdge(N, n2, Math.max(Math.floor(e.length / 2), 1));
 		this.$remove(e);
@@ -142,18 +142,18 @@
 			[a1, a2] = [a2, a1];
 		}
 
-		N.$parentId = n1.$parent?.id;
+		N.parentId = n1.$parent?.id;
 		this.$remove(e);
 
 		for(let edge of a1) {
 			let n = edge.n(n1);
-			if(n != N.$parent) n.$parentId = N.id;
+			if(n != N.$parent) n.parentId = N.id;
 			this.$remove(edge);
 			this._createEdge(N, n, edge.length);
 		}
 		for(let edge of a2) {
 			let n = edge.n(n2);
-			n.$parentId = N.id;
+			n.parentId = N.id;
 			this.$remove(edge);
 			this._createEdge(N, n, edge.length);
 		}
@@ -172,7 +172,7 @@
 		let n1 = e1.n(n), n2 = e2.n(n);
 		if(n.$parent == n2) [n1, n2] = [n2, n1];
 
-		n2.$parentId = n1.id;
+		n2.parentId = n1.id;
 		let edge = n1.$tree._createEdge(n1, n2, e1.length + e2.length);
 		let tree = n1.$tree;
 		tree.$remove(e1);
@@ -206,9 +206,9 @@
 			return null;
 		}
 
-		if(has1) N2.$parentId = n1;
-		else if(has2) N1.$parentId = n2;
-		else N2.$parentId = n1;
+		if(has1) N2.parentId = n1;
+		else if(has2) N1.parentId = n2;
+		else N2.parentId = n1;
 
 		return this._createEdge(N1, N2, length);
 	}

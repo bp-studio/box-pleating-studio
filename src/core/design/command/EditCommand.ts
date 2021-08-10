@@ -70,7 +70,7 @@ class EditCommand extends Command implements JEditCommand {
 			tree.$edge.set(n1, n2, new TreeEdge(n1, n2, m.length));
 		} else {
 			let m = this.memento as JNode;
-			tree.$getOrAddNode(m.id).$parentId = m.parentId;
+			tree.$getOrAddNode(m.id).parentId = m.parentId;
 		}
 	}
 

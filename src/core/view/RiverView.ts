@@ -139,6 +139,10 @@
 		let path = this._actualPath;
 		let p_paths = (path.children ?? [path]) as paper.Path[];
 		let r_paths = p_paths.map(p => p.segments.map(pt => new Point(pt.point)));
+
+		// 此處曾經偶然觸發錯誤但難以復現；備查
+		if(!r_paths[0]) debugger;
+
 		if(r_paths[0].length == 0) return [];
 
 		let { paths, map } = PathUtil.$collect(r_paths);

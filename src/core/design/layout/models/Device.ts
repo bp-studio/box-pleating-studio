@@ -110,6 +110,7 @@ type GDevice = JDevice<Gadget>;
 
 	/** 這個 Device 本身所有具有的脊線 */
 	@shrewd private get _rawRidges(): readonly Line[] {
+		this.$disposeEvent();
 		let { fx, fy } = this.$pattern.$stretch;
 		let result: Line[] = [];
 		let map = this._regionRidges;
@@ -127,6 +128,7 @@ type GDevice = JDevice<Gadget>;
 	}
 
 	@shrewd public get $axisParallels(): readonly Line[] {
+		this.$disposeEvent();
 		let { fx, fy } = this.$pattern.$stretch;
 		let result: Line[] = [];
 		for(let r of this.$regions) {

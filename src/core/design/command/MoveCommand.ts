@@ -22,7 +22,6 @@ class MoveCommand extends Command implements JMoveCommand {
 			old: clone(target.$location),
 			new: loc,
 		});
-		Draggable.$assign(target.$location, loc);
 		return command;
 	}
 
@@ -43,12 +42,18 @@ class MoveCommand extends Command implements JMoveCommand {
 
 	public $canAddTo(command: Command): boolean {
 		return command instanceof MoveCommand && command.tag == this.tag &&
-			command.new.x == this.old.x && command.new.y == this.old.y;
+			// 對方必須接續在自己之後
+			command.new.x == this.old.x && command.new.y == this.old.y &&
+			// 鍵盤操作的情況必須沿著大致同一方向運行；利用這個條件便可以解決回到原點的問題
+			(this._design.$dragging || this._dx * command._dx >= 0 && this._dy * command._dy >= 0);
 	}
 
 	public $addTo(command: Command) {
 		Draggable.$assign((command as MoveCommand).new, this.new);
 	}
+
+	private get _dx(): number { return this.new.x - this.old.x; }
+	private get _dy(): number { return this.new.y - this.old.y; }
 
 	public get $isVoid(): boolean {
 		return this.old.x == this.new.x && this.old.y == this.new.y;
