@@ -117,7 +117,8 @@ interface JStretch {
 	}
 
 	@shrewd private get $isValid(): boolean {
-		return this.$junctions.every(j => j.$status == JunctionStatus.overlap);
+		this.$disposeEvent();
+		return this.$junctions.length > 0 && this.$junctions.every(j => j.$status == JunctionStatus.overlap);
 	}
 
 	@shrewd public get $isTotallyValid(): boolean {

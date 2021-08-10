@@ -78,7 +78,6 @@ class Step implements ISerializable<JStep> {
 		if(this._fixed) return false;
 
 		// 先確定合併可以執行
-		// TODO：這邊要加入考慮到建構解構的 Command
 		if(Step.signature(commands) != this._signature) return false;
 		for(let i = 0; i < commands.length; i++) {
 			if(!commands[i].$canAddTo(this._commands[i])) return false;
@@ -96,7 +95,7 @@ class Step implements ISerializable<JStep> {
 
 	/** 這整個 {@link Step} 是否等於什麼都沒做 */
 	public get $isVoid(): boolean {
-		return this._commands.every(c => c.$isVoid);
+		return this._commands.every(c => c.$isVoid) && this._construct.length == 0 && this._destruct.length == 0;
 	}
 
 	public $undo(): void {

@@ -80,6 +80,8 @@
 		let paths = PaperUtil.$fromShape(this.$closure);
 		this.hinge.removeSegments();
 		if(paths.length) this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
+
+		// 此處曾經偶然觸發錯誤但難以復現；備查
 		else debugger;
 	}
 
