@@ -1,6 +1,6 @@
 <template>
 	<div style="display:contents">
-		<div id="divTab" class="flex-grow-1" @wheel="tabWheel($event)" ref="tab">
+		<div id="divTab" class="flex-grow-1" :class="{'hide':!core.designs.length}" @wheel="tabWheel($event)" ref="tab">
 			<draggable v-bind="dragOption" v-model="core.designs" v-if="initialized">
 				<div
 					class="tab"
@@ -35,27 +35,27 @@
 		</div>
 
 		<contextmenu ref="tabMenu" v-if="initialized">
-			<div class="dropdown-item" @click="core.projects.clone(menuId)">
+			<dropdownitem delay @click="core.projects.clone(menuId)">
 				<i class="far fa-clone"></i>
 				{{$t('toolbar.tab.clone')}}
-			</div>
+			</dropdownitem>
 			<divider></divider>
-			<div class="dropdown-item" @click="core.projects.close(menuId)">
+			<dropdownitem delay @click="core.projects.close(menuId)">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.close')}}
-			</div>
-			<div class="dropdown-item" @click="core.projects.closeOther(menuId)">
+			</dropdownitem>
+			<dropdownitem delay @click="core.projects.closeOther(menuId)">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.closeOther')}}
-			</div>
-			<div class="dropdown-item" @click="core.projects.closeRight(menuId)">
+			</dropdownitem>
+			<dropdownitem delay @click="core.projects.closeRight(menuId)">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.closeRight')}}
-			</div>
-			<div class="dropdown-item" @click="core.projects.closeAll()">
+			</dropdownitem>
+			<dropdownitem delay @click="core.projects.closeAll()">
 				<i class="far fa-window-close"></i>
 				{{$t('toolbar.tab.closeAll')}}
-			</div>
+			</dropdownitem>
 		</contextmenu>
 	</div>
 </template>
@@ -138,6 +138,10 @@
 		white-space: nowrap;
 	}
 
+	#divTab.hide {
+		visibility: hidden;
+	}
+
 	#divTab,
 	#divTab * {
 		touch-action: pan-x;
@@ -186,6 +190,7 @@
 
 	.tab.active {
 		background-color: #999;
+		background-image: var(--bs-gradient);
 		color: black;
 	}
 
@@ -215,6 +220,7 @@
 
 	.tab-close .close:hover {
 		background-color: rgba(255, 255, 255, 0.2);
+		background-image: var(--bs-gradient);
 	}
 
 	@media (hover: hover) {
@@ -225,7 +231,7 @@
 
 	@media (hover: none), (pointer: coarse) {
 		.tab .tab-down i {
-			opacity: 0;
+			opacity: 1 !important;
 		}
 		.tab-down {
 			display: flex;

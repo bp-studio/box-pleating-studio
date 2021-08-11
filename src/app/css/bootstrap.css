@@ -22,18 +22,8 @@
 	text-align: center;
 }
 
-.dropdown-item:hover:not(.disabled) {
-	color: #fff;
-	text-decoration: none;
-	background-color: #007bff;
-}
-
 .btn-toolbar .dropdown-item.disabled {
 	pointer-events: all;
-}
-
-.btn-group .btn-group .btn.dropdown-toggle::after {
-	display: none;
 }
 
 .error {

@@ -6,6 +6,7 @@ const gulp = require('gulp');
 const gulpIf = require('gulp-if');
 const newer = require('gulp-newer');
 const purge = require('gulp-purgecss');
+const replace = require('gulp-replace');
 const terser = require('gulp-terser');
 
 const config = require('../config.json');
@@ -43,6 +44,7 @@ function makePurge(path) {
 			fontFace: true, // for Font Awesome
 			variables: true, // for Bootstrap
 		}))
+		.pipe(replace(/(\r|\n)*\/\*.+?\*\/$/, '')) // remove sourcemap
 		.pipe(gulp.dest(libDest));
 }
 

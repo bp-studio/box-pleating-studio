@@ -1,6 +1,5 @@
 .welcome {
 	background: white;
-	z-index: 10;
 }
 
 #divShade {
@@ -17,7 +16,6 @@
 	top: 3.75rem;
 	width: 250px;
 	bottom: 0px;
-	z-index: 10;
 	background: var(--bg-ui);
 	cursor: default;
 	padding: 10px;
@@ -28,7 +26,8 @@
 	background: var(--bg-ui);
 	height: 3.75rem;
 	overflow: visible;
-	flex-wrap: nowrap
+	flex-wrap: nowrap;
+	isolation: isolate;
 }
 
 #note {
@@ -75,6 +74,9 @@
 	}
 	#divPanel {
 		right: -250px;
+	}
+	#divPanel.show {
+		box-shadow: 0 0 5px #000a;
 	}
 	#divShade.show {
 		pointer-events: all;

@@ -1,5 +1,7 @@
 <template>
 	<div id="app" v-on:mousedown.stop v-on:touchstart.stop>
+		<div id="divShade" :class="{'show':showPanel}" @mousedown="showPanel=false" @touchstart="showPanel=false"></div>
+		<panel :show="showPanel"></panel>
 		<toolbar
 			@panel="showPanel=!showPanel"
 			@share="show('share')"
@@ -7,8 +9,6 @@
 			@news="show('ver')"
 			@pref="show('pref')"
 		></toolbar>
-		<div id="divShade" :class="{'show':showPanel}" @mousedown="showPanel=false" @touchstart="showPanel=false"></div>
-		<panel :show="showPanel"></panel>
 		<dpad :hide="showPanel"></dpad>
 		<share ref="share"></share>
 		<about ref="about"></about>

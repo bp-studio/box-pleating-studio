@@ -8,6 +8,7 @@
 	border-color: #0d6efd;
 	pointer-events: none;
 	opacity: .65;
+	/* Bootstrap gradient 不會套用在 disabled 的按鈕之上 */
 }
 
 .fa-spin {
