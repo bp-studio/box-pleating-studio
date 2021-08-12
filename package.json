@@ -39,7 +39,7 @@
 		"gulp-workbox": "^1.0.2",
 		"gulp-wrap": "^0.15.0",
 		"inquirer": "^8.0.0",
-		"jszip": "^3.6.0",
+		"jszip": "^3.7.1",
 		"lazypipe": "^1.0.2",
 		"require-dir": "^1.2.0",
 		"ttf2woff2": "^4.0.2",
