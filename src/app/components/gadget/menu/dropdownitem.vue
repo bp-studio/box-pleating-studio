@@ -25,7 +25,7 @@
 
 <style>
 	.dropdown-item:hover:not(.disabled),
-	.dropdown-item:active {
+	.dropdown-item:active:not(.disabled) {
 		color: #fff;
 		text-decoration: none;
 		background-color: var(--bs-primary);

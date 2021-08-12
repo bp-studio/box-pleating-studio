@@ -108,7 +108,7 @@ namespace TreeMaker {
 			v.$skipArray();
 			v.$skipArray();
 			v.$skipArray();
-			if(v.$next() == "1") v.$next;
+			if(v.$next() == "1") v.$next();
 		}
 
 		private _parseEdge(): void {
