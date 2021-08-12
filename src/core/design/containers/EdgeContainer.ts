@@ -28,6 +28,10 @@
 				result.push(e);
 				nodes.add(e.n1);
 				nodes.add(e.n2);
+			} else if(result[0].n1 == e.n2) {
+				// 發生這種情況就表示輸出結果的第一個點還不是真正的根點
+				result.unshift(e);
+				nodes.add(e.n1);
 			} else {
 				edges.push(e);
 			}

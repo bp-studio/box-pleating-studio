@@ -57,7 +57,16 @@
 
 	/** 在 JID 啟動的模式之下執行指定操作 */
 	public withJID(action: Action) {
-		let arr = Array.from(this.$node.values()).sort((a, b) => a.id - b.id), i = 0;
+		let arr = Array.from(this.$node.values())
+			.sort((a, b) => {
+				// 根點一定要排在最前面
+				if(!a.$parent) return -1;
+				if(!b.$parent) return 1;
+
+				// 然後才是正常的情況
+				return a.id - b.id;
+			});
+		let i = 0;
 		for(let n of arr) TreeNode.$setJID(n, i++);
 		this._jid = true;
 		action();
