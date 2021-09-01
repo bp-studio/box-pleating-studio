@@ -1,0 +1,222 @@
+{
+	"name": "한국어",
+	"flag": "s_korea",
+	"since": 1187,
+	"welcome": {
+		"title": "Box Pleating Studio 에 오신 것을 환영합니다!",
+		"intro": [
+			"이 응용 프로그램은 종이 접기 디자이너가 박스 플릿과 GOPS 장치를 사용하여 복잡하고 미친 디자인을 만들 수 있도록 만들어졌습니다.",
+			"시작하려면 왼쪽 상단 메뉴 버튼을 클릭하여 비어 있는 새 프로젝트를 생성하거나 {0} 에 대한 간략한 사용 설명서(영어로만 제공)를 읽으십시오."
+		],
+		"install": {
+			"hint": "BP Studio 를 독립 실행형 앱으로 장치에 설치하고 오프라인에서 사용할 수도 있습니다!",
+			"ios": "iOS 에 설치하는 방법: Safari 에서 이 웹사이트를 열고 화면 하단의 \"공유\" 아이콘을 누른 다음 \"홈 화면에 추가\" 를 누릅니다.",
+			"bt": "Box Pleating Studio 앱 설치",
+			"prepare": "설치를 준비 중입니다. 잠시만 기다려 주십시오...",
+			"ing": "앱을 설치하는 중입니다. 잠시만 기다려 주십시오...",
+			"ed": "BP Studio 는 이미 장치에 설치되어 있습니다.",
+			"open": "Box Pleating Studio 앱 열기"
+		},
+		"copyright": "Copyright © 2020{0} by Mu-Tsun Tsai",
+		"recent": "최근 사용",
+		"start": "시작"
+	},
+	"toolbar": {
+		"file": {
+			"title": "파일",
+			"new": "새로운 프로젝트",
+			"open": "프로젝트/작업 공간 열기",
+			"print": "현재 보기 인쇄",
+			"share": "현재 프로젝트 공유",
+			"notFound": "\"{0}\" 파일을 열 수 없습니다. 파일을 찾을 수 없습니다.",
+			"recent": {
+				"title": "최근 파일 열기",
+				"empty": "기록 없음",
+				"clear": "기록 지우기"
+			},
+			"BPF": "BP Studio 형식",
+			"BPS": {
+				"name": "BP Studio 프로젝트",
+				"download": "현재 프로젝트 다운로드",
+				"save": "프로젝트를 저장",
+				"saveAs": "프로젝트를 다른 이름으로 저장..."
+			},
+			"BPZ": {
+				"name": "BP Studio 작업 공간",
+				"download": "작업 공간 다운로드",
+				"save": "작업공간을 다른 이름으로 저장..."
+			},
+			"PNG": {
+				"name": "PNG 이미지",
+				"download": "현재 보기를 PNG 로 다운로드",
+				"save": "현재 보기를 PNG 로 저장",
+				"copy": "현재 보기를 PNG 로 복사"
+			},
+			"SVG": {
+				"name": "SVG 이미지",
+				"download": "현재 보기를 SVG 로 다운로드",
+				"save": "현재 보기를 SVG 로 저장"
+			}
+		},
+		"edit": {
+			"title": "편집",
+			"undo": "실행 취소",
+			"redo": "다시 하기",
+			"selectAll": "모두 선택"
+		},
+		"setting": {
+			"title": "설정",
+			"fullscreen": "전체화면",
+			"fullscreenExit": "전체화면 종료",
+			"grid": "격자선 표시",
+			"hinge": "경첩 주름 표시",
+			"ridge": "능선 주름 표시",
+			"axial": "가젯에 축 평행 주름 표시",
+			"label": "라벨 표시",
+			"tip": "가지 팁 표시",
+			"dPad": "방향 패드 표시",
+			"preference": "기본 설정"
+		},
+		"tools": {
+			"title": "도구",
+			"TreeMaker": "TreeMaker 파일 가져오기"
+		},
+		"help": {
+			"title": "도움",
+			"about": "정보",
+			"news": "버전 정보",
+			"update": "업데이트 준비 완료",
+			"checkUpdate": "업데이트를 확인",
+			"donation": "기부",
+			"discussions": "토론",
+			"issue": "문제 신고"
+		},
+		"view": {
+			"tree": "트리 구조",
+			"layout": "레이아웃"
+		},
+		"tab": {
+			"clone": "복제",
+			"close": "닫기",
+			"closeAll": "모두 닫기",
+			"closeOther": "다른 탭 모두 닫기",
+			"closeRight": "오른쪽 모두 닫기",
+			"noTitle": "(제목 없음)"
+		},
+		"panel": "옵션 패널"
+	},
+	"preference": {
+		"language": "언어",
+		"autoSave": "자동으로 작업 공간 저장",
+		"includeHidden": "SVG 내보내기에 숨겨진 요소 포함"
+	},
+	"panel": {
+		"design": {
+			"type": "Box Pleating Studio 프로젝트",
+			"title": "제목",
+			"titlePH": "(프로젝트 제목)",
+			"descriptionPH": "(프로젝트 설명)",
+			"tree": "트리 구조 보기",
+			"layout": "레이아웃 보기",
+			"width": "너비",
+			"height": "높이",
+			"zoom": "줌"
+		},
+		"flap": {
+			"type": "가지",
+			"name": "이름",
+			"radius": "반지름",
+			"width": "너비",
+			"height": "높이",
+			"goto": "꼭짓점으로 이동"
+		},
+		"flaps": {
+			"type": "가지",
+			"goto": "꼭짓점으로 이동"
+		},
+		"river": {
+			"type": "리버",
+			"width": "너비",
+			"goto": "가장자리로 이동"
+		},
+		"vertex": {
+			"type": "꼭짓점",
+			"name": "이름",
+			"addLeaf": "잎 추가",
+			"ofLength": "길이의",
+			"delJoin": "삭제 및 연결",
+			"goto": "가지으로 이동"
+		},
+		"vertices": {
+			"type": "꼭짓점",
+			"goto": "가지으로 이동"
+		},
+		"edge": {
+			"type": "가장자리",
+			"length": "길이",
+			"split": "나누기",
+			"merge": "끝 꼭짓점 병합",
+			"goto": "리버로 이동"
+		},
+		"repo": {
+			"type": "스트레치",
+			"config": "구성",
+			"pattern": "패턴",
+			"onlyOne": "하나의 패턴만 발견됩니다."
+		}
+	},
+	"share": {
+		"title": "프로젝트 공유",
+		"copy": "복사",
+		"share": "공유",
+		"message": "Box Pleating Studio 로 디자인한 내 프로젝트 \"{0}\" 를 확인하세요!"
+	},
+	"about": {
+		"title": "Box Pleating Studio 에 대하여",
+		"license": "MIT 라이선스에 따라 출시되었습니다.",
+		"visit": "사용자 설명서 및 피드백을 보려면 Github 에서 앱의 {0} 를 방문하세요.",
+		"homepage": "홈페이지",
+		"donation": "BP Studio 는 완전 무료입니다. 이 앱이 디자인에 도움이 되었다고 생각하고 이 앱을 지원하는 데 관심이 있다면 {0} 에 얼마든지 기부할 수 있습니다.",
+		"visitBlog": "자세한 내용은 작성자의 {0} 도 참조하세요!",
+		"blog": "블로그"
+	},
+	"donate": {
+		"title": "Box Pleating Studio 지원",
+		"intro": "Box Pleating Studio 지원을 고려해주셔서 감사합니다! 기부하고 싶은 금액을 입력하세요. 커피는 1달러로, 저녁은 10달러로 살 수 있습니다. 😄 (PayPal 수수료는 체크아웃 시 추가됩니다.)",
+		"error": "번호를 입력하세요",
+		"then": "그런 다음 아래 버튼을 클릭하고 지침에 따라 완료해주세요.",
+		"wait": "PayPal 이 거래를 완료할 때까지 기다려주세요...",
+		"nextTime": "다음 기회에",
+		"thank": "{0} 님, 친절한 기부에 정말 감사드립니다!"
+	},
+	"message": {
+		"connFail": "인터넷 연결에 실패했습니다. 나중에 다시 시도해주세요.",
+		"downloadHint": "마우스 오른쪽 버튼을 클릭하고 \"다른 이름으로 저장\" 을 사용하여 파일 위치를 선택합니다.",
+		"filePermission": "보안상의 이유로 BP Studio 는 파일에 액세스할 수 있는 권한이 필요합니다. 각 파일에 대해 세션당 한 번만 권한을 부여하면 됩니다. 파일에 계속 액세스하시겠습니까?",
+		"invalidFormat": "파일 \"{0}\" 의 형식이 잘못되었습니다.",
+		"invalidLink": "프로젝트 링크를 열 때 예기치 않은 오류가 발생했습니다. 데이터가 손상되었을 수 있습니다.",
+		"latest": "이미 최신 버전의 BP Studio 가 있습니다.",
+		"min3vertex": "트리에는 최소한 3개의 꼭짓점이 있어야 합니다.",
+		"oldVersion": "프로젝트 \"{0}\" 은 이전 버전의 BP Studio 로 생성되었으며 일부 스트레치 패턴을 다시 선택해야 할 수 있습니다. 다음 저장 시 최신 형식으로 업데이트됩니다.",
+		"patternNotFound": "이 디자인에서 가지의 겹침 중 일부는 유효하지만 현재 BP Studio 는 작동하는 스트레치 패턴을 찾을 수 없습니다. 이 앱의 작성자는 더 많은 사례를 다루기 위해 더 많은 알고리즘을 계속 구현할 것입니다.",
+		"unsaved": "프로젝트 \"{0}\" 에 저장되지 않은 변경 사항이 있습니다. 변경사항을 취소하시겠습니까?",
+		"updateReady": "최신 버전의 BP Studio 가 준비되었으며 다시 시작할 때 자동으로 업데이트됩니다. 지금 다시 시작하시겠습니까?"
+	},
+	"plugin": {
+		"TreeMaker": {
+			"not5": "파일 \"{0}\" 은 TreeMaker 5 형식이 아닙니다.",
+			"size8": "BP Studio 는 시트 크기가 적어도 8 이상이어야 합니다.",
+			"invalid": "파일 \"{0}\" 이 손상되어 성공적으로 로드할 수 없습니다."
+		}
+	},
+	"keyword": {
+		"yes": "예",
+		"no": "아니요",
+		"ok": "좋아요",
+		"close": "닫기",
+		"delete": "삭제",
+		"version": "버전",
+		"untitled": "무제",
+		"workspace": "작업 공간"
+	}
+}
