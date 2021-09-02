@@ -62,7 +62,8 @@
 			"title": "Biên tập",
 			"undo": "Hoàn tác",
 			"redo": "Làm lại",
-			"selectAll": "Chọn tất cả"
+			"selectAll": "Chọn tất cả",
+			"unselectAll": "Bỏ chọn tất cả"
 		},
 		"setting": {
 			"title": "Thiết lập",
@@ -106,7 +107,13 @@
 		"panel": "Bảng tùy chọn"
 	},
 	"preference": {
+		"general": "Tổng quan",
+		"hotkey": "Phím nóng",
+		"command": "Chỉ huy",
 		"language": "Ngôn ngữ",
+		"reset": "Đặt lại tất cả cài đặt về mặc định",
+		"confirmReset": "Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định không?",
+		"confirmKey": "Phím nóng {0} đã được gán cho lệnh \"{1}\"; bạn có muốn thay thế nó không?",
 		"autoSave": "Tự động lưu không gian làm việc",
 		"includeHidden": "Bao gồm các yếu tố ẩn trong xuất SVG"
 	},

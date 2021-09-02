@@ -62,7 +62,8 @@
 			"title": "編集",
 			"undo": "元に戻す",
 			"redo": "やり直し",
-			"selectAll": "すべて選択"
+			"selectAll": "すべて選択",
+			"unselectAll": "すべて選択解除"
 		},
 		"setting": {
 			"title": "設定",
@@ -106,7 +107,13 @@
 		"panel": "オプションパネル"
 	},
 	"preference": {
+		"general": "一般",
+		"hotkey": "ホットキー",
+		"command": "コマンド",
 		"language": "言語",
+		"reset": "すべての設定をリセットします",
+		"confirmReset": "すべての設定をデフォルトにリセットしてもよろしいですか？",
+		"confirmKey": "ホットキー {0} はすでにコマンド「{1}」に割り当てられています。交換しますか？",
 		"autoSave": "ワークスペースを自動的に保存",
 		"includeHidden": "SVG エクスポートに非表示の要素を含める"
 	},

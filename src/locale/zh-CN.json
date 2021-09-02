@@ -62,7 +62,8 @@
 			"title": "编辑",
 			"undo": "撤消",
 			"redo": "恢复",
-			"selectAll": "全选"
+			"selectAll": "全选",
+			"unselectAll": "取消选取"
 		},
 		"setting": {
 			"title": "设置",
@@ -106,7 +107,13 @@
 		"panel": "选项面板"
 	},
 	"preference": {
+		"general": "一般",
+		"hotkey": "热键",
+		"command": "命令",
 		"language": "语言",
+		"reset": "将所有设置重置为默认值",
+		"confirmReset": "您确定要将所有设置重置为默认值吗？",
+		"confirmKey": "热键 {0} 已分配给命令「{1}」；你想更换它吗？",
 		"autoSave": "自动保存工作区",
 		"includeHidden": "在 SVG 输出中包含隐藏元件"
 	},

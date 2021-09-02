@@ -62,7 +62,8 @@
 			"title": "Edit",
 			"undo": "Undo",
 			"redo": "Redo",
-			"selectAll": "Select all"
+			"selectAll": "Select all",
+			"unselectAll": "Unselect all"
 		},
 		"setting": {
 			"title": "Settings",
@@ -106,7 +107,13 @@
 		"panel": "Option panel"
 	},
 	"preference": {
+		"general": "General",
+		"hotkey": "Hotkeys",
+		"command": "Command",
 		"language": "Language",
+		"reset": "Reset all settings to default",
+		"confirmReset": "Are you sure you want to reset all settings to default?",
+		"confirmKey": "Hotkey {0} is already assigned to the command \"{1}\"; would you like to replace it?",
 		"autoSave": "Save workspace automatically",
 		"includeHidden": "Include hidden elements in SVG exports"
 	},

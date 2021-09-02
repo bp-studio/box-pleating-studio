@@ -9,4 +9,3 @@ export interface FileFactory {
 	name: string;
 	content: () => null | Blob | Promise<Blob>;
 }
-

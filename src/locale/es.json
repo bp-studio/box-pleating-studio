@@ -62,7 +62,8 @@
 			"title": "Editar",
 			"undo": "Deshacer",
 			"redo": "Rehacer",
-			"selectAll": "Seleccionar todo"
+			"selectAll": "Seleccionar todo",
+			"unselectAll": "Deselecciona todo"
 		},
 		"setting": {
 			"title": "Ajustes",
@@ -106,7 +107,13 @@
 		"panel": "Panel de opciones"
 	},
 	"preference": {
+		"general": "General",
+		"hotkey": "Acceso rápido",
+		"command": "Mando",
 		"language": "Idioma",
+		"reset": "Restablecer todas las configuraciones",
+		"confirmReset": "¿Está seguro de que desea restablecer todas las configuraciones a las predeterminadas?",
+		"confirmKey": "La tecla de acceso rápido {0} ya está asignada al comando \"{1}\"; ¿te gustaría reemplazarlo?",
 		"autoSave": "Guardar el espacio de trabajo automáticamente",
 		"includeHidden": "Incluir elementos ocultos en las exportaciones SVG"
 	},

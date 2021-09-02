@@ -3,39 +3,31 @@
 		<template v-slot>
 			<fullscreen></fullscreen>
 			<div class="dropdown-item" @click="toggle('showGrid')">
-				<i v-if="!settings.showGrid"></i>
-				<i class="fas fa-grip-lines text-secondary" v-else></i>
-				{{$t('toolbar.setting.grid')}}
+				<hotkey :icon="settings.showGrid?'fas fa-grip-lines text-secondary':''" ctrl hk="1">{{$t('toolbar.setting.grid')}}</hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showHinge')">
-				<i v-if="!settings.showHinge"></i>
-				<i class="fas fa-grip-lines text-primary" v-else></i>
-				{{$t('toolbar.setting.hinge')}}
+				<hotkey :icon="settings.showHinge?'fas fa-grip-lines text-primary':''" ctrl hk="2">{{$t('toolbar.setting.hinge')}}</hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showRidge')">
-				<i v-if="!settings.showRidge"></i>
-				<i class="fas fa-grip-lines text-danger" v-else></i>
-				{{$t('toolbar.setting.ridge')}}
+				<hotkey :icon="settings.showRidge?'fas fa-grip-lines text-danger':''" ctrl hk="3">{{$t('toolbar.setting.ridge')}}</hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showAxialParallel')">
-				<i v-if="!settings.showAxialParallel"></i>
-				<i class="fas fa-grip-lines text-success" v-else></i>
-				{{$t('toolbar.setting.axial')}}
+				<hotkey
+					:icon="settings.showAxialParallel?'fas fa-grip-lines text-success':''"
+					ctrl
+					hk="4"
+				>{{$t('toolbar.setting.axial')}}</hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showLabel')">
-				<i v-if="!settings.showLabel"></i>
-				<i class="fas fa-font" v-else></i>
-				{{$t('toolbar.setting.label')}}
+				<hotkey :icon="settings.showLabel?'fas fa-font':''" ctrl hk="5">{{$t('toolbar.setting.label')}}</hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showDot')">
-				<i v-if="!settings.showDot"></i>
-				<i class="fas fa-genderless" v-else></i>
-				{{$t('toolbar.setting.tip')}}
+				<hotkey :icon="settings.showDot?'fas fa-genderless':''" ctrl hk="6">{{$t('toolbar.setting.tip')}}</hotkey>
 			</div>
 			<div class="touch-only">
 				<divider></divider>
-				<div class="dropdown-item" @click="toggle('showDPad', core)">
-					<i v-if="!core.showDPad"></i>
+				<div class="dropdown-item" @click="toggle('showDPad', core.settings)">
+					<i v-if="!core.settings.showDPad"></i>
 					<i class="fas fa-arrows-alt" v-else></i>
 					{{$t('toolbar.setting.dPad')}}
 				</div>
@@ -54,6 +46,7 @@
 
 	import BaseComponent from '../mixins/baseComponent';
 	import { DisplaySetting } from '../import/BPStudio';
+	import Settings from '../core/settings.vue';
 
 	@Component
 	export default class SettingMenu extends BaseComponent {
@@ -63,10 +56,19 @@
 
 		protected get core(): typeof core { return core; }
 
-		protected toggle(key: string, target?: DisplaySetting | typeof core): void {
+		mounted(): void {
+			registerHotkey(() => this.toggle('showGrid'), "1");
+			registerHotkey(() => this.toggle('showHinge'), "2");
+			registerHotkey(() => this.toggle('showRidge'), "3");
+			registerHotkey(() => this.toggle('showAxialParallel'), "4");
+			registerHotkey(() => this.toggle('showLabel'), "5");
+			registerHotkey(() => this.toggle('showDot'), "6");
+		}
+
+		protected toggle(key: string, target?: DisplaySetting | Settings): void {
 			if(!target) target = this.settings as DisplaySetting;
 			target[key] = !target[key];
-			core.saveSettings();
+			core.settings.save();
 
 			if(key == "showDPad") gtag('event', 'dpad_' + (target[key] ? "on" : "off"));
 		}

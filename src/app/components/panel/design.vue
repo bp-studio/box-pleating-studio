@@ -32,9 +32,7 @@
 	@Component
 	export default class Design extends BaseComponent {
 		protected get step(): number {
-			const FULL_ZOOM = 100, ZOOM_STEP = 25;
-			let s: number = this.design!.sheet.zoom;
-			return 2 ** Math.floor(Math.log2(s / FULL_ZOOM)) * ZOOM_STEP;
+			return zoomStep(this.design!.sheet.zoom);
 		}
 	}
 </script>

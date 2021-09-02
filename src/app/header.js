@@ -18,12 +18,20 @@ var isPWA = matchMedia("(display-mode: standalone)").matches;
 var isFileApiEnabled = typeof window.showSaveFilePicker != 'undefined';
 
 ///////////////////////////////////////////////////
+// 公用函數
+///////////////////////////////////////////////////
+
+function zoomStep(zoom) {
+	const FULL_ZOOM = 100, ZOOM_STEP = 25;
+	return 2 ** Math.floor(Math.log2(zoom / FULL_ZOOM)) * ZOOM_STEP;
+}
+
+///////////////////////////////////////////////////
 // 檔案處理
 ///////////////////////////////////////////////////
 
 function sanitize(filename) {
 	let c = '/\\:*|"<>'.split(''), r = "∕∖∶∗∣″‹›".split('');
-	// eslint-disable-next-line guard-for-in
 	for(let i in c) filename = filename.replace(RegExp("\\" + c[i], "g"), r[i]);
 	return filename
 		.replace(/\?/g, "ʔ̣")
@@ -96,6 +104,50 @@ var LZ = {
 
 var hotkeys = [];
 
+function defaultHotkey() {
+	return {
+		view: {
+			tree: '1',
+			layout: '2',
+			"zoom in": 'X',
+			"zoom out": 'Z',
+		},
+		control: {
+			up: 'W',
+			down: 'S',
+			left: 'A',
+			right: 'D',
+		},
+		action: {
+			"radius/length increase": 'E',
+			"radius/length decrease": 'Q',
+			"height increase": 'sW',
+			"height decrease": 'sS',
+			"width increase": 'sD',
+			"width decrease": 'sA',
+		},
+	};
+}
+
+var _keymap = ['!@#$%^&*()_+{}|:"<>?~', "1234567890-=[]\\;',./`"];
+
+function toKey(e) {
+	let key = e.key.toUpperCase();
+	if(key.match(/^[A-Z]$/) && e.shiftKey) key = 's' + key;
+	return key;
+}
+
+function findKey(key, store) {
+	for(let name in store) {
+		for(let command in store[name]) {
+			if(store[name][command] == key) {
+				return name + '.' + command;
+			}
+		}
+	}
+	return null;
+}
+
 function registerHotkey(action, key, shift) {
 	hotkeys.push([action, key.toLowerCase(), Boolean(shift)]);
 }
@@ -111,22 +163,25 @@ function unregisterHotkeyCore(handler) {
 
 document.addEventListener(
 	'keydown',
-	event => {
+	e => {
 		// 設置攔截例外
-		let k = event.key.toLowerCase();
-		if(k == "s" || k == "o" || k == "p") return;
+		let k = e.key.toLowerCase();
+		if((k == "s" || k == "o" || k == "p") && (e.metaKey || e.ctrlKey)) return;
 
 		// 如果正在使用輸入框，把一切的正常事件監聽都阻斷掉
 		let active = document.activeElement;
 		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
-			event.stopImmediatePropagation();
+			e.stopImmediatePropagation();
 		}
 	},
 	{ capture: true }
 );
 
 registerHotkeyCore(e => {
-	if(e.metaKey || e.ctrlKey) {
+	// 有對話方塊打開的話一律不處理通常的快速鍵
+	if(document.querySelector('.modal-open')) return;
+
+	if(e.metaKey || e.ctrlKey || e.key == "Escape") {
 		e.preventDefault();
 		for(let [action, key, shift] of hotkeys) {
 			if(e.key.toLowerCase() == key && e.shiftKey == shift) {

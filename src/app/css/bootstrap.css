@@ -1,3 +1,16 @@
+.nav-tabs .nav-link:not(.active) {
+	color: unset;
+}
+
+.nav-tabs .nav-link.active {
+	color: var(--bs-primary);
+	font-weight: bolder;
+}
+
+.nav-tabs .nav-link {
+	outline: none !important;
+}
+
 .btn-toolbar .btn {
 	padding: 0.375rem !important;
 	width: 40px;

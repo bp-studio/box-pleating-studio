@@ -62,7 +62,8 @@
 			"title": "編輯",
 			"undo": "復原",
 			"redo": "取消復原",
-			"selectAll": "全選"
+			"selectAll": "全選",
+			"unselectAll": "取消選取"
 		},
 		"setting": {
 			"title": "設定",
@@ -106,7 +107,13 @@
 		"panel": "選項面板"
 	},
 	"preference": {
+		"general": "一般",
+		"hotkey": "快速鍵",
+		"command": "指令",
 		"language": "語言",
+		"reset": "將所有設定重置為預設值",
+		"confirmReset": "您確定要將所有設定重置為預設值嗎？",
+		"confirmKey": "快速鍵 {0} 已分配給指令「{1}」；您想更換它嗎？",
 		"autoSave": "自動儲存工作區",
 		"includeHidden": "在 SVG 輸出中包含隱藏元件"
 	},

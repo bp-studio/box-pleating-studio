@@ -17,6 +17,16 @@ html, body {
 	position: fixed;
 }
 
+kbd {
+	border-radius: 0.2rem;
+	color: black;
+	border: 1px solid #AAA;
+	background-color: #DDD;
+	padding: 0 0.2rem;
+	margin: 0.2rem 0;
+	display: inline-block;
+}
+
 .modal-open .modal {
 	overflow: hidden;
 }

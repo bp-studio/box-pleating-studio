@@ -7,9 +7,12 @@ import * as bootstrap from 'bootstrap';
 export default abstract class Modal extends Vue {
 	protected modal: bootstrap.Modal;
 	protected initialized: boolean = false;
+	protected on: boolean = false;
 
 	mounted(): void {
 		libReady.then(() => this.modal = new bootstrap.Modal(this.getModelElement()));
+		this.$el.addEventListener('show.bs.modal', () => this.on = true);
+		this.$el.addEventListener('hidden.bs.modal', () => this.on = false);
 	}
 
 	public async show(): Promise<void> {

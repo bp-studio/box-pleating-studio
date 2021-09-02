@@ -50,4 +50,7 @@ declare global {
 	export function registerHotkeyCore(callback: (e: KeyboardEvent) => void): EventListener;
 	export function unregisterHotkeyCore(handler: EventListener): void;
 	export function checkWithBC(id: number): Promise<boolean>;
+	export function toKey(e: KeyboardEvent): string;
+	export function findKey(key: string, store: object): string | null;
+	export function zoomStep(zoom: number): number;
 }

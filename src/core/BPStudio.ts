@@ -71,7 +71,7 @@ class BPStudio {
 	}
 	public get isDragging(): boolean { return this._studio.$system.$drag.$on; }
 	public dragByKey(key: unknown): void {
-		if(typeof key != 'string') return;
+		if(typeof key != 'string' || !this.draggableSelected) return;
 		this._studio.$system.$drag.$processKey(key);
 	}
 

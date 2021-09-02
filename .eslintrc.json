@@ -198,7 +198,7 @@
 			}
 		],
 		"grouped-accessor-pairs": "warn",
-		"guard-for-in": "warn",
+		"guard-for-in": "off",
 		"id-denylist": "warn",
 		"id-length": "off",
 		"id-match": "warn",

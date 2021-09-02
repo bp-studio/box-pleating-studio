@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<!-- Helper objects -->
+		<settings ref="settings"></settings>
 		<session ref="sss"></session>
 		<projects ref="mgr" :designs="designs"></projects>
 		<handles ref="handles"></handles>
@@ -33,6 +34,7 @@
 	import Language from './dialog/language.vue';
 	import Projects from './core/projects.vue';
 	import Session from './core/session.vue';
+	import Settings from './core/settings.vue';
 	import Spinner from './gadget/spinner.vue';
 
 	declare const LZ: { decompress(s: string): string };
@@ -47,8 +49,6 @@
 		public designs: number[] = [];
 
 		public tabHistory: number[] = [];
-		public autoSave: boolean = true;
-		public showDPad: boolean = true;
 
 		public updated: boolean = false;
 		public isTouch: boolean;
@@ -71,12 +71,7 @@
 				document.addEventListener("animationstart", () => resolve(), { once: true });
 			});
 
-			let settingString = localStorage.getItem("settings");
-			if(settingString) {
-				let settings = JSON.parse(settingString);
-				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
-				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
-			} else if(!localStorage.getItem("session")) {
+			if(!localStorage.getItem("settings") && !localStorage.getItem("session")) {
 				// 找不到設定就表示這是第一次啟動，此時除非有夾帶 project query，
 				// 不然就不用等候了，可以直接進行 LCP
 				let url = new URL(location.href);
@@ -94,6 +89,7 @@
 		public get handles(): Handles { return this.$refs.handles as Handles; }
 		public get files(): Files { return this.$refs.files as Files; }
 		public get session(): Session { return this.$refs.sss as Session; }
+		public get settings(): Settings { return this.$refs.settings as Settings; }
 
 		public async init(): Promise<void> {
 			bp.option.onDeprecate = (title: string) => {
@@ -103,15 +99,7 @@
 			};
 
 			let settingString = localStorage.getItem("settings");
-			if(settingString) {
-				let settings = JSON.parse(settingString);
-				let d = bp.settings;
-				// eslint-disable-next-line guard-for-in
-				for(let key in d) d[key] = settings[key];
-			} else {
-				// 儲存初始設定
-				this.saveSettings();
-			}
+			this.settings.init(settingString);
 
 			let haveSession = await this.session.init();
 			if(settingString) await this.handles.init(haveSession);
@@ -155,25 +143,7 @@
 		}
 
 		public get shouldShowDPad(): boolean {
-			return this.initialized && this.isTouch && this.showDPad && bp.draggableSelected;
-		}
-
-		public saveSettings(): void {
-			let {
-				showGrid, showHinge, showRidge, showAxialParallel,
-				showLabel, showDot, includeHiddenElement,
-			} = bp.settings;
-			if(this.initialized) {
-				if(this.autoSave) this.session.save();
-				else localStorage.removeItem("session");
-			}
-			localStorage.setItem("settings", JSON.stringify({
-				autoSave: this.autoSave,
-				showDPad: this.showDPad,
-				includeHiddenElement,
-				showGrid, showHinge, showRidge,
-				showAxialParallel, showLabel, showDot,
-			}));
+			return this.initialized && this.isTouch && this.settings.showDPad && bp.draggableSelected;
 		}
 
 		public open(d: string | object): void {

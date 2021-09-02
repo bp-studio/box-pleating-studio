@@ -11,6 +11,9 @@
 			<dropdownitem :disabled="!design" @click="selectAll">
 				<hotkey icon="fas fa-th" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
 			</dropdownitem>
+			<dropdownitem :disabled="!selection" @click="unselectAll">
+				<hotkey icon="fas fa-border-none" hk="Esc">{{$t('toolbar.edit.unselectAll')}}</hotkey>
+			</dropdownitem>
 		</template>
 	</dropdown>
 </template>
@@ -27,6 +30,7 @@
 			registerHotkey(() => this.redo(), "y");
 			registerHotkey(() => this.redo(), "z", true);
 			registerHotkey(() => this.selectAll(), "a");
+			registerHotkey(() => this.unselectAll(), "escape");
 		}
 
 		protected get canUndo(): boolean {
@@ -38,8 +42,11 @@
 		protected undo(): void { this.bp.undo(this.design); }
 		protected redo(): void { this.bp.redo(this.design); }
 
-		private selectAll(): void {
+		protected selectAll(): void {
 			if(this.design) this.design.selectAll();
+		}
+		protected unselectAll(): void {
+			if(this.design) this.design.unselectAll();
 		}
 	}
 </script>

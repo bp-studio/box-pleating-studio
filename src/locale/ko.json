@@ -62,7 +62,8 @@
 			"title": "편집",
 			"undo": "실행 취소",
 			"redo": "다시 하기",
-			"selectAll": "모두 선택"
+			"selectAll": "모두 선택",
+			"unselectAll": "모두 선택 해제"
 		},
 		"setting": {
 			"title": "설정",
@@ -106,7 +107,13 @@
 		"panel": "옵션 패널"
 	},
 	"preference": {
+		"general": "일반적인",
+		"hotkey": "단축키",
+		"command": "명령",
 		"language": "언어",
+		"reset": "모든 설정을 기본값으로 재설정",
+		"confirmReset": "모든 설정을 기본값으로 재설정하시겠습니까?",
+		"confirmKey": "단축키 {0} 은(는) 이미 \"{1}\" 명령에 할당되었습니다. 교체하시겠습니까?",
 		"autoSave": "자동으로 작업 공간 저장",
 		"includeHidden": "SVG 내보내기에 숨겨진 요소 포함"
 	},

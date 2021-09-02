@@ -66,7 +66,7 @@
 			if(bp.isDragging) return;
 
 			// 只有當前的實體取得存檔權的時候才會儲存
-			if(core.autoSave && await this.checkSession()) {
+			if(core.settings.autoSave && await this.checkSession()) {
 				let save = async (): Promise<void> => {
 					let session = {
 						jsons: core.designs.map(

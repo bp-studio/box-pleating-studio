@@ -182,9 +182,14 @@ interface IDesignObject {
 
 	/** @exports */
 	public selectAll(): void {
-		this.sheet.$activeControls.forEach(c => c.$selected = false);
+		this.unselectAll();
 		if(this.mode == "layout") this.$flaps.$selectAll();
 		if(this.mode == "tree") this.$vertices.$selectAll();
+	}
+
+	/** @exports */
+	public unselectAll(): void {
+		this.sheet.$activeControls.forEach(c => c.$selected = false);
 	}
 
 	/** 根據 tag 來找出唯一的對應物件 */
