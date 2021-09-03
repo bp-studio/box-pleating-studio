@@ -2,17 +2,18 @@
 	<div>
 		<h5 v-t="'panel.edge.type'" class="panel-title"></h5>
 		<div class="panel-grid">
-			<number :label="$t('panel.edge.length')" v-model.number="subject.length"></number>
+			<number :label="$t('panel.edge.length')" v-model.number="subject.length" hotkeys="d.rd,d.ri"></number>
 		</div>
 		<div class="mt-3">
 			<button class="btn btn-primary" @click="subject.split()" v-t="'panel.edge.split'"></button>
 			<button class="btn btn-primary" v-if="subject.isRiver" @click="subject.deleteAndMerge()" v-t="'panel.edge.merge'"></button>
-			<button class="btn btn-primary" v-else @click="bp.delete(subject)" v-t="'keyword.delete'"></button>
+			<button class="btn btn-primary" v-else @click="bp.delete()" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
 			<button
 				class="btn btn-primary"
-				@click="bp.goToDual(selection)"
+				@click="bp.goToDual()"
+				:title="hk('n','d')"
 			>{{subject.isRiver?$t('panel.edge.goto'):$t('panel.vertex.goto')}}</button>
 		</div>
 	</div>

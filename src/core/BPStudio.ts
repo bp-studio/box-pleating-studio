@@ -94,31 +94,29 @@ class BPStudio {
 	}
 
 	/** 導覽至對偶的 {@link Control} */
-	public goToDual(subject: unknown): void {
+	public goToDual(subject?: unknown[]): void {
 		let design = this._studio.$design;
 		if(!design) return;
+		if(!subject) subject = this.selection;
+		if(!Array.isArray(subject)) return;
 
-		if(Array.isArray(subject)) {
-			if(isTypedArray(subject, Vertex)) design.$vertices.$toFlap(subject);
-			if(isTypedArray(subject, Flap)) design.$flaps.$toVertex(subject);
-		} else {
-			if(subject instanceof Edge) design.$edges.$toRiver(subject);
-			if(subject instanceof River) design.$rivers.$toEdge(subject);
-		}
+		if(subject[0] instanceof Edge) design.$edges.$toRiver(subject[0]);
+		else if(subject[0] instanceof River) design.$rivers.$toEdge(subject[0]);
+		else if(isTypedArray(subject, Vertex)) design.$vertices.$toFlap(subject);
+		else if(isTypedArray(subject, Flap)) design.$flaps.$toVertex(subject);
 	}
 
-	/** 刪除一個指定的物件，並傳回成功與否 */
-	public delete(subject: unknown): boolean {
+	/** 刪除一些指定的物件，並傳回成功與否 */
+	public delete(subject?: unknown[]): boolean {
 		let design = this._studio.$design;
 		if(!design) return false;
+		if(!subject) subject = this.selection;
+		if(!Array.isArray(subject)) return false;
 
-		if(Array.isArray(subject)) {
-			if(isTypedArray(subject, Vertex)) return design.$vertices.$delete(subject);
-			if(isTypedArray(subject, Flap)) return design.$flaps.$delete(subject);
-		} else {
-			if(subject instanceof Edge) return subject.$edge.$delete();
-			if(subject instanceof River) return subject.$delete();
-		}
+		if(subject[0] instanceof Edge) return subject[0].$edge.$delete();
+		else if(subject[0] instanceof River) return subject[0].$delete();
+		else if(isTypedArray(subject, Vertex)) return design.$vertices.$delete(subject);
+		else if(isTypedArray(subject, Flap)) return design.$flaps.$delete(subject);
 		return false;
 	}
 

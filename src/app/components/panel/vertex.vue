@@ -20,7 +20,7 @@
 			</div>
 		</div>
 		<div class="mt-3" v-if="!bp.isMinimal(design)">
-			<button class="btn btn-primary" v-if="subject.degree==1" @click="bp.delete([subject])" v-t="'keyword.delete'"></button>
+			<button class="btn btn-primary" v-if="subject.degree==1" @click="bp.delete()" v-t="'keyword.delete'"></button>
 			<button
 				class="btn btn-primary"
 				v-if="subject.degree==2"
@@ -29,7 +29,7 @@
 			></button>
 		</div>
 		<div class="mt-3" v-if="subject.degree==1">
-			<button class="btn btn-primary" @click="bp.goToDual(selections)" v-t="'panel.vertex.goto'"></button>
+			<button class="btn btn-primary" @click="bp.goToDual()" v-t="'panel.vertex.goto'" :title="hk('n','d')"></button>
 		</div>
 	</div>
 </template>

@@ -1,7 +1,13 @@
 <template>
 	<row :label="label">
 		<div class="input-group" style="flex-wrap:nowrap">
-			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)">
+			<button
+				class="btn btn-sm btn-primary"
+				:disabled="!canMinus"
+				type="button"
+				@click="change(-step)"
+				:title="tooltips[0]"
+			>
 				<i class="fas fa-minus"></i>
 			</button>
 			<input
@@ -17,7 +23,7 @@
 				@wheel="wheel($event)"
 				style="min-width:30px;"
 			/>
-			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)">
+			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
 				<i class="fas fa-plus"></i>
 			</button>
 		</div>
@@ -35,12 +41,26 @@
 		@Prop(undefined) public min?: number;
 		@Prop(undefined) public max?: number;
 		@Prop(Number) public step: number = 1;
+		@Prop(String) public hotkeys: string = ",";
 
 		private lastWheel: number = performance.now();
 		private timeout: number = 0;
 
 		@Watch("value") onValue(v: number): void {
 			window.clearTimeout(this.timeout);
+		}
+
+		protected get tooltips(): string[] {
+			return this.hotkeys.split(",").map(k => {
+				try {
+					let [name, command] = k.split(".");
+					let key = core.settings.hotkey[name][command];
+					if(!key) return '';
+					return this.$t('preference.hotkey') + ' ' + formatKey(key);
+				} catch(e) {
+					return '';
+				}
+			});
 		}
 
 		protected get canMinus(): boolean {

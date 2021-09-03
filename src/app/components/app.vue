@@ -46,30 +46,41 @@
 			document.body.addEventListener('keydown', e => this.onKey(e), { capture: true });
 		}
 
+		// eslint-disable-next-line complexity
 		private onKey(e: KeyboardEvent): void {
 			// 忽略條件
 			if(document.querySelector('.modal-open') || e.metaKey || e.ctrlKey) return;
 
 			let find = findKey(toKey(e), core.settings.hotkey);
-			if(!find) return;
+			if(!find || !bp.design) return;
+
+			e.preventDefault();
 
 			let [name, command] = find.split('.');
-			if(name == 'move') {
-				bp.dragByKey(command);
-			} else if(name == 'view' && bp.design) {
-				if(command.startsWith('zoom')) {
+			if(name == 'm') {
+				const map = {
+					u: 'up',
+					d: 'down',
+					l: 'left',
+					r: 'right',
+				};
+				bp.dragByKey(map[command]);
+			} else if(name == 'v') {
+				if(command.startsWith('z')) {
 					let sheet = bp.design.sheet, step = zoomStep(sheet.zoom);
-					sheet.zoom += step * (command == 'zoom in' ? 1 : -1);
+					sheet.zoom += step * (command == 'zi' ? 1 : -1);
 				} else {
-					bp.design.mode = command as DesignMode;
+					bp.design.mode = { t: 'tree', l: 'layout' }[command] as DesignMode;
 				}
-			} else if(bp.design) {
-				let f = command.endsWith('increase') ? 1 : -1;
+			} else if(name == 'n') {
+				if(command == 'd') bp.goToDual();
+			} else {
+				let f = command.endsWith('i') ? 1 : -1;
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				let sel: any[] = bp.selection.length ? bp.selection : [bp.design.sheet];
 				for(let target of sel) {
-					if(command.startsWith('width') && 'width' in target) target.width += f;
-					else if(command.startsWith('height') && 'height' in target) target.height += f;
+					if(command.startsWith('w') && 'width' in target) target.width += f;
+					else if(command.startsWith('h') && 'height' in target) target.height += f;
 					else if('radius' in target) target.radius += f;
 					else if('length' in target) target.length += f;
 				}

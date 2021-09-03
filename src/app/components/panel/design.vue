@@ -17,9 +17,15 @@
 					<h6 v-if="design.mode=='layout'" v-t="'panel.design.layout'"></h6>
 				</div>
 			</row>
-			<number :label="$t('panel.design.width')" v-model.number="design.sheet.width" :min="8"></number>
-			<number :label="$t('panel.design.height')" v-model.number="design.sheet.height" :min="8"></number>
-			<number :label="$t('panel.design.zoom')" :step="step" v-model.number="design.sheet.zoom" :min="100"></number>
+			<number :label="$t('panel.design.width')" v-model.number="design.sheet.width" :min="8" hotkeys="d.wd,d.wi"></number>
+			<number :label="$t('panel.design.height')" v-model.number="design.sheet.height" :min="8" hotkeys="d.hd,d.hi"></number>
+			<number
+				:label="$t('panel.design.zoom')"
+				:step="step"
+				v-model.number="design.sheet.zoom"
+				:min="100"
+				hotkeys="v.zo,v.zi"
+			></number>
 		</div>
 	</div>
 </template>

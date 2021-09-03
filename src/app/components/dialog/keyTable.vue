@@ -25,11 +25,11 @@
 						<td colspan="2">
 							<i class="fas fa-fw fa-caret-down" v-if="open[name]"></i>
 							<i class="fas fa-fw fa-caret-right" v-else></i>
-							{{capitalize(name)}}
+							{{labels[name]['_']}}
 						</td>
 					</tr>
 					<tr v-for="(key, command) in list" :key="command" v-show="open[name]">
-						<td class="ps-4">{{capitalize(command)}}</td>
+						<td class="ps-4">{{labels[name][command]}}</td>
 						<td class="p-0">
 							<input
 								type="text"
@@ -51,24 +51,55 @@
 	/* eslint-disable require-atomic-updates */
 	import { Component, Vue } from 'vue-property-decorator';
 
+	type KeyMap = Record<string, Record<string, string>>
+
 	@Component
 	export default class KeyTable extends Vue {
 		protected open: Record<string, boolean> = {};
 		protected pending: boolean = false;
+		protected labels: KeyMap = {
+			v: {
+				_: "View",
+				t: "Tree structure",
+				l: "Layout",
+				zi: "Zoom in",
+				zo: "Zoom out",
+			},
+			m: {
+				_: "Move",
+				u: "Up",
+				d: "Down",
+				l: "Left",
+				r: "Right",
+			},
+			d: {
+				_: "Dimension",
+				ri: "Radius/Length increase",
+				rd: "Radius/Length decrease",
+				hi: "Height increase",
+				hd: "Height decrease",
+				wi: "Width increase",
+				wd: "Width decrease",
+			},
+			n: {
+				_: "Navigation",
+				d: "Go to dual object",
+			},
+		};
 
-		protected get hotkey(): Record<string, Record<string, string>> {
-			return core.settings.hotkey as Record<string, Record<string, string>>;
+		protected get hotkey(): KeyMap {
+			return core.settings.hotkey as KeyMap;
 		}
 
 		protected async setKey(e: KeyboardEvent, name: string, command: string): Promise<void> {
 			if(e.key == 'Escape' || e.key == ' ' || e.key == 'Enter') (e.target as HTMLInputElement).blur();
 			if(e.key == 'Delete' || e.key == 'Backspace') this.hotkey[name][command] = '';
-			if(e.key.length > 1 || e.key == ' ') return;
 			let key = toKey(e);
+			if(!key) return;
 			let find = findKey(key, this.hotkey);
 			if(find) {
 				this.pending = true;
-				let confirm = await core.confirm(this.$t('preference.confirmKey', [this.format(key), find]));
+				let confirm = await core.confirm(this.$t('preference.confirmKey', [formatKey(key), find]));
 				this.pending = false;
 				if(!confirm) return;
 			}
@@ -88,15 +119,11 @@
 		}
 
 		protected format(key: string): string {
-			return key.replace(/^s/, isMac ? '⇧' : 'SHIFT + ');
+			return formatKey(key);
 		}
 
 		protected toggle(name: string): void {
 			Vue.set(this.open, name, !this.open[name]);
-		}
-
-		protected capitalize(str: string): string {
-			return str.charAt(0).toUpperCase() + str.slice(1);
 		}
 	}
 </script>

@@ -2,13 +2,13 @@
 	<div>
 		<h5 v-t="'panel.river.type'" class="panel-title"></h5>
 		<div class="panel-grid">
-			<number :label="$t('panel.river.width')" v-model.number="subject.length" :min="0"></number>
+			<number :label="$t('panel.river.width')" v-model.number="subject.length" :min="0" hotkeys="d.rd,d.ri"></number>
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" @click="bp.delete(subject)" v-t="'keyword.delete'"></button>
+			<button class="btn btn-primary" @click="bp.delete()" v-t="'keyword.delete'"></button>
 		</div>
 		<div class="mt-3">
-			<button class="btn btn-primary" @click="bp.goToDual(subject)" v-t="'panel.river.goto'"></button>
+			<button class="btn btn-primary" @click="bp.goToDual()" v-t="'panel.river.goto'" :title="hk('n','d')"></button>
 		</div>
 	</div>
 </template>

@@ -4,17 +4,7 @@
 			<i :class="icon"></i>
 			<slot></slot>
 		</div>
-		<div class="ms-3 text-end desktop-only">
-			<template v-if="ctrl">
-				<span v-if="isMac">⌘</span>
-				<span v-else>Ctrl+</span>
-			</template>
-			<template v-if="shift">
-				<span v-if="isMac">⇧</span>
-				<span v-else>Shift+</span>
-			</template>
-			{{hk}}
-		</div>
+		<div class="ms-3 text-end desktop-only">{{key}}</div>
 	</div>
 </template>
 
@@ -29,5 +19,12 @@
 		@Prop(Boolean) public shift: boolean;
 
 		protected get isMac(): boolean { return isMac; }
+
+		protected get key(): string {
+			let result = this.hk;
+			if(this.shift) result = (isMac ? '⇧' : 'Shift+') + result;
+			if(this.ctrl) result = (isMac ? '⌘' : 'Ctrl+') + result;
+			return result;
+		}
 	}
 </script>

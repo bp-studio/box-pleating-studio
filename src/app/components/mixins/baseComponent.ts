@@ -20,4 +20,15 @@ export default class BaseComponent extends Vue {
 	@Watch("design") _onDesign(): void {
 		/** */
 	}
+
+	protected hk(name: string, command: string, p: boolean = false): string {
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			let key = (core as any).settings.hotkey[name][command];
+			if(!key) return '';
+			return (p ? ' (' : '') + this.$t('preference.hotkey') + ' ' + formatKey(key) + (p ? ')' : '');
+		} catch(e) {
+			return '';
+		}
+	}
 }

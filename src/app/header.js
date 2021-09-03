@@ -8,14 +8,20 @@ document.addEventListener("wheel", (event) => {
 	if(event.ctrlKey) event.preventDefault();
 }, { passive: false });
 
-// 這邊宣告成 const 或 let 在 Safari 會無法被提升到 if 的 scope 之外，底下其它變數亦同
+// 底下的幾個變數宣告成 const 或 let 在 Safari 會無法被提升到 if 的 scope 之外
+
+/**
+ * 判斷是否當前的環境為桌機版的 Mac
+ *
+ * 這邊採用的判別方法參見 https://stackoverflow.com/questions/10527983/
+ */
 var isMac = navigator.platform.toLowerCase().startsWith("mac");
 if(isMac) document.body.classList.add("mac");
 
-// 是否在 PWA 模式中執行
+/** 是否在 PWA 模式中執行 */
 var isPWA = matchMedia("(display-mode: standalone)").matches;
 
-// 是否支援原生檔案 API
+/** 是否支援原生檔案 API */
 var isFileApiEnabled = typeof window.showSaveFilePicker != 'undefined';
 
 ///////////////////////////////////////////////////
@@ -107,38 +113,47 @@ var hotkeys = [];
 
 function defaultHotkey() {
 	return {
-		view: {
-			tree: '1',
-			layout: '2',
-			"zoom in": 'X',
-			"zoom out": 'Z',
+		v: {
+			t: '1',
+			l: '2',
+			zi: 'X',
+			zo: 'Z',
 		},
-		move: {
-			up: 'W',
-			down: 'S',
-			left: 'A',
-			right: 'D',
+		m: {
+			u: 'W',
+			d: 'S',
+			l: 'A',
+			r: 'D',
 		},
-		dimension: {
-			"radius/length increase": 'E',
-			"radius/length decrease": 'Q',
-			"height increase": 'sW',
-			"height decrease": 'sS',
-			"width increase": 'sD',
-			"width decrease": 'sA',
+		d: {
+			ri: 'E',
+			rd: 'Q',
+			hi: 'sW',
+			hd: 'sS',
+			wi: 'sD',
+			wd: 'sA',
+		},
+		n: {
+			d: '\t',
 		},
 	};
 }
 
-var _keymap = ['!@#$%^&*()_+{}|:"<>?~', "1234567890-=[]\\;',./`"];
+function formatKey(key) {
+	if(key == '\t') return isMac ? '⇥' : 'Tab';
+	return key.replace(/^s/, isMac ? '⇧' : 'Shift + ');
+}
 
 function toKey(e) {
 	let key = e.key.toUpperCase();
+	if(key == "TAB") key = '\t';
+	if(key.length > 1 || key == ' ') return null;
 	if(key.match(/^[A-Z]$/) && e.shiftKey) key = 's' + key;
 	return key;
 }
 
 function findKey(key, store) {
+	if(!key) return null;
 	for(let name in store) {
 		for(let command in store[name]) {
 			if(store[name][command] == key) {

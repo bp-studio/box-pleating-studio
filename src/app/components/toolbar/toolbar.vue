@@ -21,7 +21,7 @@
 				class="btn btn-primary"
 				:class="{active:design&&design.mode=='tree'}"
 				@click="toTree"
-				:title="$t('toolbar.view.tree')"
+				:title="$t('toolbar.view.tree')+hk('v','t',true)"
 				:disabled="!design"
 			>
 				<i class="bp-tree"></i>
@@ -31,7 +31,7 @@
 				class="btn btn-primary"
 				:class="{active:design&&design.mode=='layout'}"
 				@click="toLayout"
-				:title="$t('toolbar.view.layout')"
+				:title="$t('toolbar.view.layout')+hk('v','l',true)"
 				:disabled="!design"
 			>
 				<i class="bp-layout"></i>
