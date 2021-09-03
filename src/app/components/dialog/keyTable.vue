@@ -20,7 +20,7 @@
 				<col width="34%" />
 			</colgroup>
 			<tbody>
-				<template v-for="(list, name) in core.settings.hotkey">
+				<template v-for="(list, name) in hotkey">
 					<tr :key="name" @click="toggle(name)">
 						<td colspan="2">
 							<i class="fas fa-fw fa-caret-down" v-if="open[name]"></i>
@@ -29,12 +29,17 @@
 						</td>
 					</tr>
 					<tr v-for="(key, command) in list" :key="command" v-show="open[name]">
-						<td class="ps-4">{{capitalize(command.toString())}}</td>
-						<td
-							class="ps-1"
-							:class="select==name+'.'+command?'bg-primary text-white':''"
-							@click.stop="select=name+'.'+command"
-						>{{format(key)}}</td>
+						<td class="ps-4">{{capitalize(command)}}</td>
+						<td class="p-0">
+							<input
+								type="text"
+								class="key border-0 w-100"
+								:value="format(key)"
+								@focus="setFocus($event.target)"
+								@input.prevent
+								@keydown.stop.prevent="setKey($event, name, command)"
+							/>
+						</td>
 					</tr>
 				</template>
 			</tbody>
@@ -49,51 +54,41 @@
 	@Component
 	export default class KeyTable extends Vue {
 		protected open: Record<string, boolean> = {};
-		protected select: string | null = null;
-		protected controller = new AbortController();
 		protected pending: boolean = false;
 
-		mounted(): void {
-			document.addEventListener('click', () => {
-				if(!this.pending) this.select = null;
-			}, {
-				signal: this.controller.signal,
-			} as AddEventListenerOptions);
-			document.addEventListener("keydown", e => this.setKey(e), {
-				signal: this.controller.signal,
-				capture: true,
-			} as AddEventListenerOptions);
+		protected get hotkey(): Record<string, Record<string, string>> {
+			return core.settings.hotkey as Record<string, Record<string, string>>;
 		}
 
-		beforeDestroy(): void {
-			this.controller.abort();
-		}
-
-		protected get core(): typeof core { return core; }
-
-		private async setKey(e: KeyboardEvent): Promise<void> {
-			if(!this.select || e.key.length > 1 || e.key == ' ') return;
-			e.stopPropagation();
+		protected async setKey(e: KeyboardEvent, name: string, command: string): Promise<void> {
+			if(e.key == 'Escape' || e.key == ' ' || e.key == 'Enter') (e.target as HTMLInputElement).blur();
+			if(e.key == 'Delete' || e.key == 'Backspace') this.hotkey[name][command] = '';
+			if(e.key.length > 1 || e.key == ' ') return;
 			let key = toKey(e);
-			let [name, command] = this.select.split('.');
-			let find = findKey(key, core.settings.hotkey);
+			let find = findKey(key, this.hotkey);
 			if(find) {
 				this.pending = true;
 				let confirm = await core.confirm(this.$t('preference.confirmKey', [this.format(key), find]));
 				this.pending = false;
 				if(!confirm) return;
 			}
-			core.settings.hotkey[name][command] = key;
-			this.select = null;
+			this.hotkey[name][command] = key;
 			if(find) {
 				[name, command] = find.split('.');
-				core.settings.hotkey[name][command] = '';
+				this.hotkey[name][command] = '';
 			}
 			core.settings.save();
 		}
 
+		protected setFocus(target: HTMLInputElement): void {
+			const SECOND_DELAY = 10;
+			let l = target.value.length;
+			setTimeout(() => target.setSelectionRange(l, l), 0);
+			setTimeout(() => target.setSelectionRange(l, l), SECOND_DELAY);
+		}
+
 		protected format(key: string): string {
-			return key.replace(/^s/, 'SHIFT + ');
+			return key.replace(/^s/, isMac ? '⇧' : 'SHIFT + ');
 		}
 
 		protected toggle(name: string): void {
@@ -105,3 +100,15 @@
 		}
 	}
 </script>
+
+<style>
+	input.key {
+		outline: none;
+		padding: 0.25rem;
+		background: transparent;
+	}
+
+	input.key:focus {
+		box-shadow: inset 0 0 0.25rem var(--bs-primary);
+	}
+</style>

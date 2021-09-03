@@ -12,7 +12,7 @@
 				<hotkey icon="fas fa-th" ctrl hk="A">{{$t('toolbar.edit.selectAll')}}</hotkey>
 			</dropdownitem>
 			<dropdownitem :disabled="!selection" @click="unselectAll">
-				<hotkey icon="fas fa-border-none" hk="Esc">{{$t('toolbar.edit.unselectAll')}}</hotkey>
+				<hotkey icon="fas fa-border-none" :hk="isMac?'⎋':'Esc'">{{$t('toolbar.edit.unselectAll')}}</hotkey>
 			</dropdownitem>
 		</template>
 	</dropdown>
@@ -32,6 +32,8 @@
 			registerHotkey(() => this.selectAll(), "a");
 			registerHotkey(() => this.unselectAll(), "escape");
 		}
+
+		protected get isMac(): boolean { return isMac; }
 
 		protected get canUndo(): boolean {
 			return core.initialized ? this.bp.canUndo(this.design) : false;

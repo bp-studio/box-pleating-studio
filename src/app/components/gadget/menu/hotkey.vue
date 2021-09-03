@@ -6,11 +6,11 @@
 		</div>
 		<div class="ms-3 text-end desktop-only">
 			<template v-if="ctrl">
-				<i v-if="isMac" class="bp-command"></i>
+				<span v-if="isMac">⌘</span>
 				<span v-else>Ctrl+</span>
 			</template>
 			<template v-if="shift">
-				<i v-if="isMac" class="bp-shift"></i>
+				<span v-if="isMac">⇧</span>
 				<span v-else>Shift+</span>
 			</template>
 			{{hk}}

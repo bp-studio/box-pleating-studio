@@ -10,6 +10,7 @@ document.addEventListener("wheel", (event) => {
 
 // 這邊宣告成 const 或 let 在 Safari 會無法被提升到 if 的 scope 之外，底下其它變數亦同
 var isMac = navigator.platform.toLowerCase().startsWith("mac");
+if(isMac) document.body.classList.add("mac");
 
 // 是否在 PWA 模式中執行
 var isPWA = matchMedia("(display-mode: standalone)").matches;
@@ -112,13 +113,13 @@ function defaultHotkey() {
 			"zoom in": 'X',
 			"zoom out": 'Z',
 		},
-		control: {
+		move: {
 			up: 'W',
 			down: 'S',
 			left: 'A',
 			right: 'D',
 		},
-		action: {
+		dimension: {
 			"radius/length increase": 'E',
 			"radius/length decrease": 'Q',
 			"height increase": 'sW',
@@ -170,7 +171,7 @@ document.addEventListener(
 
 		// 如果正在使用輸入框，把一切的正常事件監聽都阻斷掉
 		let active = document.activeElement;
-		if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) {
+		if(active instanceof HTMLInputElement && !active.classList.contains("key") || active instanceof HTMLTextAreaElement) {
 			e.stopImmediatePropagation();
 		}
 	},

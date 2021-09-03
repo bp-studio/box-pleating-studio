@@ -18,12 +18,13 @@ html, body {
 }
 
 kbd {
-	border-radius: 0.2rem;
+	border-radius: .3rem;
 	color: black;
 	border: 1px solid #AAA;
 	background-color: #DDD;
-	padding: 0 0.2rem;
-	margin: 0.2rem 0;
+	padding: .1rem .2rem;
+	margin: .1rem;
+	line-height: 1;
 	display: inline-block;
 }
 
@@ -33,6 +34,18 @@ kbd {
 
 ul {
 	margin-left: 0rem;
+}
+
+/*********************************************
+ * Mac
+ *********************************************/
+
+body:not(.mac) .mac-only {
+	display: none;
+}
+
+body.mac .not-mac {
+	display: none;
 }
 
 /*********************************************

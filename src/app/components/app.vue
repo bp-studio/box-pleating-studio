@@ -54,7 +54,7 @@
 			if(!find) return;
 
 			let [name, command] = find.split('.');
-			if(name == 'control') {
+			if(name == 'move') {
 				bp.dragByKey(command);
 			} else if(name == 'view' && bp.design) {
 				if(command.startsWith('zoom')) {
