@@ -28,7 +28,7 @@
 							{{labels[name]['_']}}
 						</td>
 					</tr>
-					<tr v-for="(key, command) in list" :key="command" v-show="open[name]">
+					<tr v-for="(key, command) in list" :key="name+'.'+command" v-show="open[name]">
 						<td class="ps-4">{{labels[name][command]}}</td>
 						<td class="p-0">
 							<input
@@ -84,6 +84,10 @@
 			n: {
 				_: "Navigation",
 				d: "Go to dual object",
+				cn: "Next configuration",
+				cp: "Previous configuration",
+				pn: "Next pattern",
+				pp: "Previous pattern",
 			},
 		};
 
@@ -93,9 +97,13 @@
 
 		protected async setKey(e: KeyboardEvent, name: string, command: string): Promise<void> {
 			if(e.key == 'Escape' || e.key == ' ' || e.key == 'Enter') (e.target as HTMLInputElement).blur();
-			if(e.key == 'Delete' || e.key == 'Backspace') this.hotkey[name][command] = '';
+			if(e.key == 'Delete' || e.key == 'Backspace') {
+				this.hotkey[name][command] = '';
+				core.settings.save();
+			}
 			let key = toKey(e);
 			if(!key) return;
+
 			let find = findKey(key, this.hotkey);
 			if(find) {
 				this.pending = true;

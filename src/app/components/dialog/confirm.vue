@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" style="z-index:1062 !important;">
+	<div class="modal fade modal-second">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content" v-if="initialized">
 				<div class="modal-body">{{message}}</div>
@@ -36,5 +36,9 @@
 <style scoped>
 	.modal-backdrop.show:nth-of-type(even) {
 		z-index: 1061 !important;
+	}
+
+	.modal-second {
+		z-index: 1062 !important;
 	}
 </style>

@@ -32,11 +32,11 @@
 		@Prop(Boolean) public show: boolean;
 
 		public get repository(): BP.Repository | null {
-			return core.initialized && this.bp.getRepository(this.selection) || null;
+			return core.initialized && this.bp.getRepository() || null;
 		}
 
 		public get type(): string {
-			return core.initialized && this.bp.getType(this.selection) || "";
+			return core.initialized && this.bp.getType() || "";
 		}
 
 		@Watch("repository") repo(): void {

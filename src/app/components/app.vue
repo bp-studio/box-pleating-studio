@@ -21,8 +21,6 @@
 	import { Component, Watch } from 'vue-property-decorator';
 	import BaseComponent from './mixins/baseComponent';
 
-	import { bp } from './import/BPStudio';
-
 	@Component
 	export default class App extends BaseComponent {
 		protected showPanel = false;
@@ -41,49 +39,6 @@
 				this.$el.addEventListener("touchmove", (e: TouchEvent) => {
 					if(e.touches.length > 1) e.preventDefault();
 				}, { passive: false });
-			}
-
-			document.body.addEventListener('keydown', e => this.onKey(e), { capture: true });
-		}
-
-		// eslint-disable-next-line complexity
-		private onKey(e: KeyboardEvent): void {
-			// 忽略條件
-			if(document.querySelector('.modal-open') || e.metaKey || e.ctrlKey) return;
-
-			let find = findKey(toKey(e), core.settings.hotkey);
-			if(!find || !bp.design) return;
-
-			e.preventDefault();
-
-			let [name, command] = find.split('.');
-			if(name == 'm') {
-				const map = {
-					u: 'up',
-					d: 'down',
-					l: 'left',
-					r: 'right',
-				};
-				bp.dragByKey(map[command]);
-			} else if(name == 'v') {
-				if(command.startsWith('z')) {
-					let sheet = bp.design.sheet, step = zoomStep(sheet.zoom);
-					sheet.zoom += step * (command == 'zi' ? 1 : -1);
-				} else {
-					bp.design.mode = { t: 'tree', l: 'layout' }[command] as DesignMode;
-				}
-			} else if(name == 'n') {
-				if(command == 'd') bp.goToDual();
-			} else {
-				let f = command.endsWith('i') ? 1 : -1;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				let sel: any[] = bp.selection.length ? bp.selection : [bp.design.sheet];
-				for(let target of sel) {
-					if(command.startsWith('w') && 'width' in target) target.width += f;
-					else if(command.startsWith('h') && 'height' in target) target.height += f;
-					else if('radius' in target) target.radius += f;
-					else if('length' in target) target.length += f;
-				}
 			}
 		}
 	}

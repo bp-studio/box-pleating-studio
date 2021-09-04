@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade">
+	<div class="modal fade modal-second">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content" v-if="initialized">
 				<div class="modal-body">

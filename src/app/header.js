@@ -135,6 +135,10 @@ function defaultHotkey() {
 		},
 		n: {
 			d: '\t',
+			cn: 'T',
+			cp: 'R',
+			pn: 'G',
+			pp: 'F',
 		},
 	};
 }
@@ -207,6 +211,68 @@ registerHotkeyCore(e => {
 		}
 	}
 });
+
+///////////////////////////////////////////////////
+// 快捷鍵處理
+///////////////////////////////////////////////////
+
+document.body.addEventListener('keydown', e => onKey(e), { capture: true });
+
+function onKey(e) {
+	// 忽略條件
+	if(document.querySelector('.modal-open') || e.metaKey || e.ctrlKey) return;
+
+	let find = findKey(toKey(e), core.settings.hotkey);
+	if(!find || !bp.design) return;
+
+	e.preventDefault();
+
+	let [name, command] = find.split('.');
+	if(name == 'm') handleMoveCommand(command);
+	else if(name == 'v') handleViewCommand(command);
+	else if(name == 'n') handleNavigationCommand(command);
+	else handleDimensionCommand(command);
+}
+
+function handleMoveCommand(command) {
+	const map = {
+		u: 'up',
+		d: 'down',
+		l: 'left',
+		r: 'right',
+	};
+	bp.dragByKey(map[command]);
+}
+
+function handleNavigationCommand(command) {
+	if(command == 'd') return bp.goToDual();
+
+	let repo = bp.getRepository();
+	if(!repo) return;
+	let f = command.endsWith('n') ? 1 : -1;
+	if(command.startsWith('c')) repo.move(f);
+	else repo.entry.move(f);
+}
+
+function handleViewCommand(command) {
+	if(command.startsWith('z')) {
+		let sheet = bp.design.sheet, step = zoomStep(sheet.zoom);
+		sheet.zoom += step * (command == 'zi' ? 1 : -1);
+	} else {
+		bp.design.mode = { t: 'tree', l: 'layout' }[command];
+	}
+}
+
+function handleDimensionCommand(command) {
+	let f = command.endsWith('i') ? 1 : -1;
+	let sel = bp.selection.length ? bp.selection : [bp.design.sheet];
+	for(let target of sel) {
+		if(command.startsWith('w') && 'width' in target) target.width += f;
+		else if(command.startsWith('h') && 'height' in target) target.height += f;
+		else if('radius' in target) target.radius += f;
+		else if('length' in target) target.length += f;
+	}
+}
 
 ///////////////////////////////////////////////////
 // Dropdown

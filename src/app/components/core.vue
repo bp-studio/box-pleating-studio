@@ -81,7 +81,7 @@
 
 		mounted(): void {
 			let v = Number(localStorage.getItem("build") || 0);
-			(this.$refs.language as Language).init(v);
+			this.language.init(v);
 			localStorage.setItem("build", app_config.app_version);
 		}
 
@@ -90,6 +90,7 @@
 		public get files(): Files { return this.$refs.files as Files; }
 		public get session(): Session { return this.$refs.sss as Session; }
 		public get settings(): Settings { return this.$refs.settings as Settings; }
+		public get language(): Language { return this.$refs.language as Language; }
 
 		public async init(): Promise<void> {
 			bp.option.onDeprecate = (title: string) => {

@@ -36,7 +36,7 @@
 			if(!source) return;
 			for(let key in target) {
 				if(target[key] instanceof Object) this.copy(target[key], source[key]);
-				else if(source[key]) target[key] = source[key];
+				else if(key in source) target[key] = source[key];
 			}
 		}
 
@@ -75,7 +75,10 @@
 			});
 			this.hotkey = defaultHotkey();
 			this.save();
-			localStorage.setItem("locale", document.documentElement.lang = i18n.locale = "en");
+
+			localStorage.removeItem("locale");
+			let v = Number(localStorage.getItem("build") || 0);
+			core.language.init(v);
 		}
 	}
 
