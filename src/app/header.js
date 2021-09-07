@@ -225,6 +225,7 @@ function onKey(e) {
 	let find = findKey(toKey(e), core.settings.hotkey);
 	if(!find || !bp.design) return;
 
+	// 防止觸發 Tab 的預設行為
 	e.preventDefault();
 
 	let [name, command] = find.split('.');

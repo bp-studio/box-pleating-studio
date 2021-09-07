@@ -63,7 +63,8 @@ interface JEdge {
 
 	@shrewdStatic public get $isRiver(): boolean {
 		this.$disposeEvent();
-		return this.n1.$degree > 1 && this.n2.$degree > 1;
+		let d1 = this.n1.$degree, d2 = this.n2.$degree; // beware of side-effect
+		return d1 > 1 && d2 > 1;
 	}
 
 	/////////////////////////////////////////////////////////////////
