@@ -46,15 +46,13 @@ namespace PaperUtil {
 		for(let set of lines) for(let l of set) PaperUtil.$addLine(path, l.p1, l.p2);
 	}
 
-	let black: paper.Color, red: paper.Color;
-
 	export function $unite(p1: paper.PathItem, p2: paper.PathItem): paper.PathItem {
 		if(p1.isEmpty()) return p2;
 		else return p1.unite(p2, { insert: false });
 	}
 
-	export function $Black(): paper.Color { return black = black || new paper.Color('black'); }
-	export function $Red(): paper.Color { return red = red || new paper.Color('red'); }
+	export const $black = new paper.Color('black');
+	export const $red = new paper.Color('red');
 
 	export function $fromShape(shape: PolyBool.Shape): paper.Path[] {
 		let poly = PolyBool.toPolygon(shape);

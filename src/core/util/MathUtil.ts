@@ -16,7 +16,6 @@ namespace MathUtil {
 	}
 
 	/** 求出整數的最大公因數。 */
-	export function $GCD<T extends bigint | number>(a: T, b: T): T;
 	export function $GCD(a: number, b: number): number {
 		// 在幾種數值無效的情況中，直接傳回 1 使得相依的程式什麼都不做
 		if(typeof a == 'number' && !Number.isSafeInteger(a)) return 1;
@@ -42,7 +41,6 @@ namespace MathUtil {
 	}
 
 	/** 把一對有理數進行化簡。 */
-	export function $reduce<T extends bigint | number>(a: T, b: T): [T, T, T];
 	export function $reduce(a: number, b: number): [number, number, number] {
 		if(
 			typeof a == 'number' &&

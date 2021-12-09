@@ -77,7 +77,10 @@ class Rasterizer {
 
 	public async $copyPNG(): Promise<void> {
 		const blob = await this.$createPngBlob();
+		// Clipboard 的相關定義自從 TypeScript 4.5 後內建
 		return navigator.clipboard.write([
+			// 直接在這邊使用 Promise<Blob> 要等到 Chrome 97 以上才支援，
+			// 所以目前都是先 await 拿到 Blob 之後再使用
 			new ClipboardItem({ 'image/png': blob }),
 		]);
 	}

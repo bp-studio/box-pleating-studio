@@ -62,7 +62,7 @@ interface DisplaySetting {
 		studio.$paper.settings.insertItems = false;
 		this._project = studio.$paper.project;
 		this._project.view.autoUpdate = false;
-		this._project.currentStyle.strokeColor = PaperUtil.$Black();
+		this._project.currentStyle.strokeColor = PaperUtil.$black;
 		this._project.currentStyle.strokeScaling = false;
 
 		// 下面這段程式碼是用來檢視效能用的。

@@ -137,7 +137,7 @@
 		PaperUtil.$replaceContent(this._hinge, this._actualPath, false);
 	}
 
-	/** 收集所有自身的內直角資訊；這部份與 openAnchors 無關，分開計算以增加效能 */
+	/** 收集所有自身的內直角資訊；這部份與 {@link StretchContainer.$openAnchors $openAnchors} 無關，分開計算以增加效能 */
 	@shrewd private get _corners(): [Point, Point, boolean][] {
 		this.$disposeEvent();
 
@@ -180,21 +180,20 @@
 		return result;
 	}
 
+	/**
+	 * 1065 修正：即使輪廓的形狀沒有發生變化，
+	 * 當 {@link StretchContainer.$openAnchors $openAnchors} 有發生變化的時候也是一樣要重新繪製脊線，
+	 * 否則如果 {@link Pattern} 的錨點剛好在河的內部移動（但又剛好沒有改變到輪廓）的時候就會發生繪製錯誤。
+	 * 這相對來說是比較不容易發生的現象，因此這個錯誤很晚才被發現到。
+	 *
+	 * 確實這樣修改的結果會使得任何 {@link StretchContainer.$openAnchors $openAnchors} 改變的時候、全部的河都會重新繪製脊線，
+	 * 這確實是有一點沒效率沒錯，但是暫時先這樣修正，之後有機會再改進。
+	 * 這部份應該相對來說並不是造成效能不佳的主因，所以應該不是很急迫。
+	 */
 	@shrewd private _renderRidge(): void {
 		// 建立相依性
 		let oa = this._control.$sheet.$design.$stretches.$openAnchors;
 		this.$draw(); // 脊線繪製必須在輪廓繪製之後執行
-
-		/*
-		 * 1065 修正：即使輪廓的形狀沒有發生變化，
-		 * 當 $openAnchors 有發生變化的時候也是一樣要重新繪製脊線，
-		 * 否則如果 Pattern 的錨點剛好在河的內部移動（但又剛好沒有改變到輪廓）的時候就會發生繪製錯誤。
-		 * 這相對來說是比較不容易發生的現象，因此這個錯誤很晚才被發現到。
-		 *
-		 * 確實這樣修改的結果會使得任何 $openAnchor 改變的時候、全部的河都會重新繪製脊線，
-		 * 這確實是有一點沒效率沒錯，但是暫時先這樣修正，之後有機會再改進。
-		 * 這部份應該相對來說並不是造成效能不佳的主因，所以應該不是很急迫。
-		 */
 
 		this._ridge.removeChildren();
 
