@@ -3,18 +3,12 @@ let path = require('path');
 
 // 用來建立 log 檔案目錄和 preload manifest
 
-const preload = `
-let libs = [
-	'lib/font-awesome/css/all.min.css',
-	'lib/sortable.min.js',
-	'lib/vuedraggable.min.js',
-	'lib/bootstrap/popper.min.js',
-	'lib/bootstrap/bootstrap.min.js',
-	'lib/vue-clipboard.min.js',
-	'lib/jszip.min.js',
-	'lib/lzma_worker-min.js',
-	'lib/marked.min.js',
-];
+module.exports = function(outFile, libs) {
+	let latestFile;
+	let concat = [];
+
+	const preload = `
+let libs = ${JSON.stringify(libs)}.map(l => "lib/" + l);
 
 libs.forEach(lib => {
 	let link = document.createElement('link');
@@ -24,10 +18,6 @@ libs.forEach(lib => {
 	document.head.appendChild(link);
 });
 `;
-
-module.exports = function(outFile) {
-	let latestFile;
-	let concat = [];
 
 	function bufferContents(file, enc, cb) {
 		if(file.isNull()) return cb(null, file);

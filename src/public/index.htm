@@ -106,11 +106,10 @@
 		}
 		var errMgr = new (function() {
 			var self = this;
-			var debug = location.search.toLowerCase().indexOf("debug=startup") >= 0;
 			var display = function(id, v, c) {
 				var el = document.getElementById(id);
 				if(!el) return;
-				el.style.display = v;
+				el.style.display = v ? 'block' : 'none';
 				if(c) el.innerHTML +=
 					"<br>Build number: " + app_config.app_version +
 					"<br>" + navigator.userAgent +
@@ -136,10 +135,10 @@
 			self.callback = function() {
 				if(self.ok()) return true;
 
-				display('divWorkspace', 'none');
-				display('divWelcome', 'none');
-				display('divSpinner', 'none');
-				display(self.resErr ? 'resource' : 'requirement', 'block', self.runErr);
+				display('divWorkspace');
+				display('divWelcome');
+				display('divSpinner');
+				display(self.resErr ? 'resource' : 'requirement', true, self.runErr);
 				if(self.runErr &&
 					// Filter out Facebook Clawer; no need to report related errors.
 					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)

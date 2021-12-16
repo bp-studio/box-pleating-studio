@@ -1,6 +1,5 @@
 /// <reference path="vendor/paper.d.ts" />
 /// <reference path="vendor/shrewd.d.ts" />
-/// <reference path="clipboard.d.ts" />
 /// <reference path="paper.patch.d.ts" />
 /// <reference path="import.ts" />
 /// <reference path="Diagnose.ts" />
