@@ -1,8 +1,8 @@
-
-interface JAddOn {
-	contour: IPoint[];
-	dir: IPoint;
-}
+import { Region } from "./Region";
+import { Line, Point, Vector } from "bp/math";
+import { onDemand } from "bp/global";
+import type { JAddOn } from "bp/content/json";
+import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -11,7 +11,7 @@ interface JAddOn {
  */
 //////////////////////////////////////////////////////////////////
 
-class AddOn extends Region implements JAddOn {
+export class AddOn extends Region implements JAddOn {
 
 	public readonly contour: IPoint[];
 	public readonly dir: IPoint;

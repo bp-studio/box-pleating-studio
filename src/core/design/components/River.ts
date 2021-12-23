@@ -1,3 +1,6 @@
+import { Control } from "bp/class";
+import type { Sheet } from "./Sheet";
+import type { TreeEdge } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -6,7 +9,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class River extends Control {
+@shrewd export class River extends Control {
 
 	public get $type(): string { return "River"; }
 
@@ -34,5 +37,5 @@
 
 	/** @exports */
 	public get length(): number { return this.edge.length; }
-	public set length(v) { this.edge.length = v; }
+	public set length(v: number) { this.edge.length = v; }
 }

@@ -1,5 +1,16 @@
+import { StudioBase } from "./StudioBase";
+import { Display } from "./screen";
+import { System } from "./System";
+import { Updater } from "./animation/Updater";
+import { HistoryManager } from "bp/design";
+import { ViewManager } from "bp/view";
+import type { Design } from "bp/design";
+import type { JDesign } from "bp/content/json";
+import type { Action } from "bp/global";
+import type { RecursivePartial } from "bp/util";
+import type { TitleCallback } from "./StudioBase";
 
-interface StudioOptions {
+export interface StudioOptions {
 	onDeprecate?: TitleCallback;
 	onUpdate?: Action<void | Promise<void>>;
 	onDrag?: Action;
@@ -13,7 +24,7 @@ interface StudioOptions {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Studio extends StudioBase {
+@shrewd export class Studio extends StudioBase {
 
 	public readonly $system: System;
 	public readonly $designMap: Map<number, Design> = new Map();

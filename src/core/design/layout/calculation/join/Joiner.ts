@@ -1,5 +1,16 @@
+import { JoinerCore } from "./JoinerCore";
+import { GOPS } from "../GOPS";
+import { Piece } from "../../models/Piece";
+import { Partitioner } from "../Partitioner";
+import { Direction } from "bp/global";
+import { Vector } from "bp/math";
+import { Strategy } from "bp/content/json";
+import type { QuadrantDirection } from "bp/global";
+import type { Repository } from "bp/design";
+import type { JDevice, JJunction, JOverlap, JPiece } from "bp/content/json";
+import type { IPoint, Point } from "bp/math";
 
-type JoinResult = [JDevice, number];
+export type JoinResult = [JDevice, number];
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,7 +18,7 @@ type JoinResult = [JDevice, number];
  */
 //////////////////////////////////////////////////////////////////
 
-class Joiner {
+export class Joiner {
 
 	private g1: JPiece[];
 	private g2: JPiece[];

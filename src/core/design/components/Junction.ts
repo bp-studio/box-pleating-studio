@@ -1,11 +1,14 @@
-
-interface JJunction extends JQuadrilateral {
-	/** 對應的兩個 {@link Flap} 之間的最大空間，恆正 */
-	sx: number;
-}
+import { Direction, isQuadrant, opposite, orderedArray, shrewdStatic } from "bp/global";
+import { SheetObject } from "bp/class";
+import { CornerType } from "bp/content/json";
+import type { JJunction } from "bp/content/json";
+import type { Flap, Quadrant, Sheet } from ".";
+import type { TreeNode } from "..";
+import type { ISerializable } from "bp/global";
+import type { Rectangle, Sign } from "bp/math";
 
 /** {@link Junction} 的重疊狀態 */
-enum JunctionStatus {
+export enum JunctionStatus {
 	/** 兩者重疊過頭 */
 	tooClose,
 	/** 兩者合法重疊 */
@@ -14,7 +17,7 @@ enum JunctionStatus {
 	tooFar,
 }
 
-type JunctionDimension = 'ox' | 'oy';
+export type JunctionDimension = 'ox' | 'oy';
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -22,7 +25,7 @@ type JunctionDimension = 'ox' | 'oy';
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Junction extends SheetObject implements ISerializable<JJunction> {
+@shrewd export class Junction extends SheetObject implements ISerializable<JJunction> {
 
 	/**
 	 * 針對一個 {@link Junction} 群組產生簽章 id；

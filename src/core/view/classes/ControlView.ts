@@ -1,3 +1,5 @@
+import { View } from "./View";
+import type { Control } from "bp/class";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -8,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class ControlView<T extends Control> extends View {
+export abstract class ControlView<T extends Control> extends View {
 
 	/** 這個 {@link ControlView} 所對應的 {@link Control} 元件 */
 	protected readonly _control: T;

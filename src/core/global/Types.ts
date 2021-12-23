@@ -1,42 +1,57 @@
+import type { Direction } from "./Enums";
 
 //////////////////////////////////////////////////////////////////
 // Types
 //////////////////////////////////////////////////////////////////
 
-type Action<T = void> = () => T;
+export type Action<T = void> = () => T;
 
-type Rational = number | Fraction;
-
-type Sign = 0 | 1 | -1;
+export type PseudoValue<T> =
+	T extends (infer U)[] ? PseudoValue<U>[] :
+	T extends object ? Pseudo<T> : T;
+export type OtherKeys<T, V> = Record<Exclude<string, keyof T>, V>;
+export type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
+export type Pseudo<T> = (T | PartialPseudo<T>) & OtherKeys<T, unknown>;
 
 //////////////////////////////////////////////////////////////////
 // QuadrantDirection
 //////////////////////////////////////////////////////////////////
 
-type QuadrantDirection = Direction.UL | Direction.UR | Direction.LL | Direction.LR;
+export type QuadrantDirection = Direction.UL | Direction.UR | Direction.LL | Direction.LR;
 
-type PerQuadrantBase<T> = readonly [T, T, T, T];
+export type PerQuadrantBase<T> = readonly [T, T, T, T];
 
 /** 一個索引只能是 {@link QuadrantDirection} 的唯讀陣列，可以配合 {@link makePerQuadrant} 產生之 */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface PerQuadrant<T> extends PerQuadrantBase<T> { }
+export interface PerQuadrant<T> extends PerQuadrantBase<T> { }
 
-const quadrantNumber = 4;
+export const quadrantNumber = 4;
 
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
 const quadrants: PerQuadrant<QuadrantDirection> = [0, 1, 2, 3];
 
-const previousQuadrantOffset = 3;
-const nextQuadrantOffset = 1;
+export const previousQuadrantOffset = 3;
+export const nextQuadrantOffset = 1;
 
-function makePerQuadrant<T>(factory: (q: QuadrantDirection) => T): PerQuadrant<T> {
+export function makePerQuadrant<T>(factory: (q: QuadrantDirection) => T): PerQuadrant<T> {
 	return quadrants.map(factory) as unknown as PerQuadrant<T>;
 }
 
-function isQuadrant(direction: Direction): direction is QuadrantDirection {
+export function isQuadrant(direction: Direction): direction is QuadrantDirection {
 	return direction < quadrantNumber;
 }
 
-function opposite(direction: QuadrantDirection): QuadrantDirection {
+export function opposite(direction: QuadrantDirection): QuadrantDirection {
 	return (direction + 2) % quadrantNumber;
+}
+
+//////////////////////////////////////////////////////////////////
+// interfaces
+//////////////////////////////////////////////////////////////////
+
+/**
+ * {@link ISerializable} 表示一個可以具有 {@link ISerializable.toJSON toJSON()} 方法、可以輸出對應類別的 JSON 物件的類別
+ */
+export interface ISerializable<T> {
+	toJSON(): T;
 }

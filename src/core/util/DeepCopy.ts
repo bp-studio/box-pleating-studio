@@ -1,12 +1,12 @@
 
-type RecursivePartial<T> = {
+export type RecursivePartial<T> = {
 	[P in keyof T]?: RecursivePartial<T[P]>;
 } | undefined;
 
 /**
  * 深層複製物件的巢狀內容；所有深度的物件都會被建立副本，不會複製參照。
  */
-function deepCopy<T>(target: T, ...sources: RecursivePartial<T>[]): T {
+export function deepCopy<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 	for(let s of sources) {
 		if(!(s instanceof Object)) continue;
 
@@ -28,7 +28,7 @@ function deepCopy<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 }
 
 /** 複製一個物件 */
-function clone<T>(source: T): T {
+export function clone<T>(source: T): T {
 	let r = source instanceof Array ? [] : {};
 	return deepCopy(r as T, source);
 }

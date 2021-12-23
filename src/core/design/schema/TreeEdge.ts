@@ -1,10 +1,12 @@
-
-interface JEdge {
-	n1: number;
-	n2: number;
-	length: number;
-	selected?: boolean;
-}
+import { action } from "../history/action";
+import { shrewdStatic } from "bp/global";
+import { ArrayUtil } from "bp/util";
+import { Disposable } from "bp/class";
+import type { JEdge } from "bp/content/json";
+import type { Tree } from "./Tree";
+import type { TreeNode } from "./TreeNode";
+import type { Design, ITagObject } from "..";
+import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -12,7 +14,7 @@ interface JEdge {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {
+@shrewd export class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {
 
 	public get $tag(): string { return "e" + this.n1.id + "," + this.n2.id; }
 
@@ -30,7 +32,7 @@ interface JEdge {
 	}
 
 	public $dispose(force: boolean = false): void {
-		if(force) this.$design.$tree.$edge.delete(this.n1, this.n2);
+		if(force) this.tree.$edge.delete(this.n1, this.n2);
 		super.$dispose();
 	}
 
@@ -121,11 +123,11 @@ interface JEdge {
 	// 單側總邊長
 	@shrewd private get t1(): number {
 		this.$disposeEvent();
-		return sum(this.a1.map(e => e.t(this.n1) + e.length));
+		return ArrayUtil.sum(this.a1.map(e => e.t(this.n1) + e.length));
 	}
 	@shrewd private get t2(): number {
 		this.$disposeEvent();
-		return sum(this.a2.map(e => e.t(this.n2) + e.length));
+		return ArrayUtil.sum(this.a2.map(e => e.t(this.n2) + e.length));
 	}
 	private t(n: TreeNode): number { return n == this.n1 ? this.t2 : this.t1; }
 

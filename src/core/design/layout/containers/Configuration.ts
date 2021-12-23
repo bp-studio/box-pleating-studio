@@ -1,10 +1,15 @@
-
-interface JConfiguration {
-	/** 這個 Configuration 裡面所有的 Partition */
-	partitions: readonly JPartition[];
-	patterns?: JPattern[];
-	index?: number;
-}
+import { Store } from "./Store";
+import { Partition } from "../calculation/Partition";
+import { Partitioner } from "../calculation/Partitioner";
+import { Gadget, Pattern } from "../models";
+import { GeneratorUtil, clone } from "bp/util";
+import { Point } from "bp/math";
+import { Quadrant } from "bp/design/components";
+import type { IPoint } from "bp/math";
+import type { JJunction, JDevice, JGadget, JOverlap, JPattern, JConfiguration } from "bp/content/json";
+import type { GDevice, GPattern } from "..";
+import type { Repository } from "./Repository";
+import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -13,7 +18,7 @@ interface JConfiguration {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Configuration extends Store<JPattern, Pattern>
+@shrewd export class Configuration extends Store<JPattern, Pattern>
 	implements ISerializable<JConfiguration> {
 
 	public get $tag(): string {

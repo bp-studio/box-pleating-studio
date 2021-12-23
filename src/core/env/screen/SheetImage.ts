@@ -1,3 +1,9 @@
+import { Viewport } from "./Viewport";
+import { Constants } from "bp/content/json";
+import type { SheetView } from "bp/view";
+import type { Studio } from "..";
+import type { Design } from "bp/design";
+import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -6,10 +12,17 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class SheetImage extends Viewport {
+export abstract class SheetImage extends Viewport {
 
 	private static readonly _MARGIN_FIX = 15;
 	private static readonly _MARGIN = 30;
+
+	protected readonly _studio: Studio;
+
+	constructor(studio: Studio) {
+		super(studio.$el);
+		this._studio = studio;
+	}
 
 	protected get _design(): Design | null {
 		return this._studio.$design;
@@ -19,12 +32,13 @@ abstract class SheetImage extends Viewport {
 		if(this._design) {
 			let sheet = this._design.sheet;
 			if(!sheet) return 1;
-			return sheet.$getScale(
+			let view = this._design.$viewManager.$get(sheet) as SheetView;
+			return view.$getScale(
 				this._viewWidth, this._viewHeight,
 				SheetImage._MARGIN, SheetImage._MARGIN_FIX
 			);
 		} else {
-			return Sheet.$FULL_ZOOM;
+			return Constants.$FULL_ZOOM;
 		}
 	}
 
@@ -47,9 +61,11 @@ abstract class SheetImage extends Viewport {
 
 	/** 因為文字標籤而產生的實際水平邊距 */
 	@shrewd private get _horMargin(): number {
-		return Math.max(
-			(this._design?.sheet.$margin ?? 0) + SheetImage._MARGIN_FIX,
-			SheetImage._MARGIN
-		);
+		let margin = 0;
+		if(this._design?.sheet) {
+			let view = this._design!.$viewManager.$get(this._design.sheet) as SheetView;
+			margin = view.$margin;
+		}
+		return Math.max(margin + SheetImage._MARGIN_FIX, SheetImage._MARGIN);
 	}
 }

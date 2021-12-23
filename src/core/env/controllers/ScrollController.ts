@@ -1,3 +1,6 @@
+import { CursorController } from "./CursorController";
+import { $isTouch } from "./Share";
+import type { Studio } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class ScrollController {
+export class ScrollController {
 
 	private static readonly _TIMEOUT = 50;
 
@@ -85,7 +88,7 @@ class ScrollController {
 	}
 
 	private _bodyMouseup(event: MouseEvent | TouchEvent): void {
-		if(System.$isTouch(event) && event.touches.length == 0) {
+		if($isTouch(event) && event.touches.length == 0) {
 			// paper.js 的奇怪設計使得多點觸控的第二點放開必須獨立攔截
 			this._scrolling = false;
 		}
@@ -98,7 +101,7 @@ class ScrollController {
 		if(this._scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			let diff = CursorController.$diff(event);
 			this._studio.$display.$scrollBy(this._studio.$design, diff);
-			if(System.$isTouch(event)) this._studio.$system.$zoom.$process(event);
+			if($isTouch(event)) this._studio.$system.$zoom.$process(event);
 		}
 	}
 }

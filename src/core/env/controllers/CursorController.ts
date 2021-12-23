@@ -1,3 +1,6 @@
+import { $getEventCenter } from "./Share";
+import { Point } from "bp/math";
+import type { IPoint, Vector } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-namespace CursorController {
+export namespace CursorController {
 
 	/** 暫存的游標位置，用來比較以確認是否有新的位移 */
 	let location: Point = Point.ZERO;
@@ -32,6 +35,6 @@ namespace CursorController {
 	}
 
 	function _locate(event: MouseEvent | TouchEvent): Point {
-		return new Point(System.$getEventCenter(event));
+		return new Point($getEventCenter(event));
 	}
 }

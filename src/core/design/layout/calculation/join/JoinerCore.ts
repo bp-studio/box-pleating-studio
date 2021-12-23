@@ -1,3 +1,11 @@
+import { JoinCandidateBuilder } from "./JoinCandidateBuilder";
+import { Fraction, Line, PathUtil, Point, Vector } from "bp/math";
+import { Quadrant } from "bp/design/components";
+import { onDemand } from "bp/global";
+import type { Piece } from "bp/design";
+import type { JAddOn } from "bp/content/json";
+import type { IPoint } from "bp/math";
+import type { JoinCandidate, JoinResult, Joiner } from ".";
 
 interface JoinData {
 	readonly size: number;
@@ -17,7 +25,7 @@ interface JoinData {
  */
 //////////////////////////////////////////////////////////////////
 
-class JoinerCore {
+export class JoinerCore {
 
 	/** extraSize 的權重設定為本體大小的十倍強 */
 	private static readonly _EXTRA_SIZE_WEIGHT = 10;

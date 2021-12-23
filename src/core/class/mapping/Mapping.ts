@@ -1,3 +1,6 @@
+import { BaseMapping } from "./BaseMapping";
+import type { Func, IterableFactory } from "./BaseMapping";
+import type { Disposable } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Mapping<K, V extends Disposable> extends BaseMapping<K, K, V> {
+@shrewd export class Mapping<K, V extends Disposable> extends BaseMapping<K, K, V> {
 
 	constructor(source: IterableFactory<K>, constructor: Func<K, V>) {
 		super(source, k => k, constructor, (_, v) => v.$disposed);

@@ -20,12 +20,6 @@
 			}
 		],
 		"no-undef": "off",
-		"sort-imports": [
-			"warn",
-			{
-				"allowSeparatedGroups": true
-			}
-		],
 		"vue/max-len": [
 			"warn",
 			{

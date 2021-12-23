@@ -1,25 +1,15 @@
+import { Piece } from "./Piece";
+import { Trace } from "../calculation/trace";
+import { Fraction, Line, PathUtil, Point, Vector } from "bp/math";
+import { makePerQuadrant, onDemand } from "bp/global";
+import { clone } from "bp/util";
+import type { JAnchor, JGadget } from "bp/content/json";
+import type { ISerializable, PerQuadrant, QuadrantDirection } from "bp/global";
+import type { IPoint, Path } from "bp/math";
 
-interface JGadget {
-
-	/** 所有組成當前 {@link Gadget} 的 {@link Piece} */
-	pieces: JPiece[];
-
-	/** 這個 {@link Gadget} 相對於其第一個 {@link Piece} 的 p[0] 的位移植 */
-	offset?: IPoint;
-
-	anchors?: JAnchor[];
-}
-
-interface JAnchor {
-	/** 連接時要保留的間隙 */
-	slack?: number;
-
-	/** 自訂這個 Anchor 的位置，如果不指定，會直接根據 Gadget 來推算 */
-	location?: IPoint;
-}
 
 /** 第一個值傳回點，第二個值傳回來自的 Piece（若有的話） */
-type AnchorMap = [Point, number | null];
+export type AnchorMap = [Point, number | null];
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -31,7 +21,7 @@ type AnchorMap = [Point, number | null];
  */
 //////////////////////////////////////////////////////////////////
 
-class Gadget implements JGadget, ISerializable<JGadget> {
+export class Gadget implements JGadget, ISerializable<JGadget> {
 
 	/** @exports */
 	public pieces: Piece[];

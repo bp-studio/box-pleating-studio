@@ -1,16 +1,54 @@
 {
-	"plugins": [
-		"jsdoc"
-	],
-	"rules": {
-		"jsdoc/require-jsdoc": [
-			"warn",
-			{
-				"require": {
-					"ClassDeclaration": true,
-					"FunctionDeclaration": false
-				}
-			}
-		]
-	}
+    "extends": [
+        "plugin:import/typescript"
+    ],
+    "plugins": [
+        "jsdoc",
+        "import"
+    ],
+    "rules": {
+        "@typescript-eslint/consistent-type-imports": [
+            "warn",
+            {
+                "prefer": "type-imports"
+            }
+        ],
+        "@typescript-eslint/no-duplicate-imports": "warn",
+        "import/newline-after-import": "warn",
+        "import/no-cycle": "warn",
+        "import/no-unresolved": "error",
+        "import/order": [
+            "warn",
+            {
+                "groups": [
+                    "index",
+                    "sibling",
+                    "parent",
+                    "internal",
+                    "external",
+                    "builtin",
+                    "object",
+                    "type"
+                ]
+            }
+        ],
+        "jsdoc/require-jsdoc": [
+            "warn",
+            {
+                "require": {
+                    "ClassDeclaration": true,
+                    "FunctionDeclaration": false
+                }
+            }
+        ],
+        "no-duplicate-imports": "off",
+        "sort-imports": "off"
+    },
+    "settings": {
+        "import/resolver": {
+            "typescript": {
+                "project": "src/core"
+            }
+        }
+    }
 }

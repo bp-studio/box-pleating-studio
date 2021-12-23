@@ -1,3 +1,11 @@
+import { Partitioner } from "./Partitioner";
+import { Direction, onDemand, opposite } from "bp/global";
+import { clone } from "bp/util";
+import { CornerType } from "bp/content/json";
+import type { JConnection, JJunction, JCorner, JOverlap, JPartition } from "bp/content/json";
+import type { Configuration, Pattern } from "..";
+import type { ISerializable, QuadrantDirection } from "bp/global";
+import type { Point, Vector } from "bp/math";
 
 /**
  * 第 0 欄位是 {@link JCorner} 本身，
@@ -5,14 +13,6 @@
  * 第 2 位表示在該 {@link Overlap} 中的哪一個 {@link Anchor}
  */
 type CornerMap = [JCorner, number, number];
-
-interface JPartition {
-	/** 這個 Partition 裡面所有的 Overlap */
-	overlaps: readonly JOverlap[];
-
-	/** 這個 Partition 採用的生成策略 */
-	strategy?: Strategy;
-}
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -23,7 +23,7 @@ interface JPartition {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Partition extends Partitioner implements ISerializable<JPartition> {
+@shrewd export class Partition extends Partitioner implements ISerializable<JPartition> {
 
 	/** 這個 Partition 所有的角落，檢索得到所屬的 Overlap 以及相位索引 */
 	public readonly $cornerMap: CornerMap[] = [];

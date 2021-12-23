@@ -1,3 +1,12 @@
+import { Kamiya } from "./Kamiya";
+import { GOPS } from "./GOPS";
+import { Gadget, Piece } from "../models";
+import { Strategy } from "bp/content/json";
+import { Disposable } from "bp/class";
+import { clone } from "bp/util";
+import type { JPartition, JDevice, JGadget, JOverlap, JPiece, JQuadrilateral } from "bp/content/json";
+import type { Tree } from "bp/design";
+import type { Configuration } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -6,7 +15,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class Partitioner extends Disposable {
+export class Partitioner extends Disposable {
 
 	public readonly $configuration: Configuration;
 	public readonly $overlaps: readonly JOverlap[];

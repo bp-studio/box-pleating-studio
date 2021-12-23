@@ -1,3 +1,10 @@
+import { Tree } from "../schema";
+import { Control } from "bp/class";
+import type { Sheet } from "./Sheet";
+import type { Vertex } from "./Vertex";
+import type { TreeEdge, TreeNode } from "..";
+import type { JEdge } from "bp/content/json";
+import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +12,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Edge extends Control implements ISerializable<JEdge> {
+@shrewd export class Edge extends Control implements ISerializable<JEdge> {
 
 	public get $type(): string { return "Edge"; }
 	public get $tag(): string { return "e" + this.$edge.$tag; }
@@ -61,7 +68,7 @@
 
 	/** @exports */
 	public get length(): number { return this.$edge.length; }
-	public set length(v) { this.$edge.length = v; }
+	public set length(v: number) { this.$edge.length = v; }
 
 	public toJSON(): JEdge {
 		return this.$edge.toJSON();

@@ -1,3 +1,7 @@
+import { DoubleMap } from "./DoubleMap";
+import type { DoubleMapCallback, ReadonlyDoubleMap } from "./DoubleMap";
+import type { IterableFactory } from "./BaseMapping";
+import type { Disposable, IDisposable } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -10,7 +14,8 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DoubleMapping<K extends Disposable, V extends Disposable>
+
+@shrewd export class DoubleMapping<K extends Disposable, V extends Disposable>
 	implements IDisposable, ReadonlyDoubleMap<K, V> {
 
 	constructor(source: IterableFactory<K>, constructor: (k1: K, k2: K) => V) {
@@ -24,7 +29,7 @@
 
 	public $dispose(): void {
 		this._map.$dispose();
-		Shrewd.terminate(this);
+		terminate(this);
 	}
 
 	@shrewd({

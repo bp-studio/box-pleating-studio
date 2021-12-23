@@ -1,20 +1,11 @@
-
-interface JPiece {
-	ox: number;
-	oy: number;
-	u: number;
-	v: number;
-
-	/** 繞道，沿著順時鐘方向運行；其座標都是沒有加上 shift 之前的 */
-	detours?: IPoint[][];
-
-	/**
-	 * 這個 Piece 相對於 Partition 的參考原點的（相位變換前）偏移。
-	 *
-	 * 這包括了非整數解的偏移，或是較複雜的 join 中的偏移
-	 */
-	shift?: IPoint;
-}
+import { Region } from "./Region";
+import { Line, Point, Vector } from "bp/math";
+import { nonEnumerable, onDemand, onDemandMap } from "bp/global";
+import { clone, deepCopy } from "bp/util";
+import type { JPiece } from "bp/content/json";
+import type { IPoint } from "bp/math";
+import type { ISerializable } from "bp/global";
+import type { IRegionShape } from "./Region";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -22,7 +13,7 @@ interface JPiece {
  */
 //////////////////////////////////////////////////////////////////
 
-class Piece extends Region implements JPiece, ISerializable<JPiece> {
+export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 
 	/** @exports */
 	public ox: number;

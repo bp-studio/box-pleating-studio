@@ -1,3 +1,7 @@
+import { BaseContainer } from "./BaseContainer";
+import { Tree } from "../schema";
+import { Vertex } from "../components";
+import type { Design, TreeNode } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +9,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class VertexContainer extends BaseContainer<TreeNode, Vertex> {
+@shrewd export class VertexContainer extends BaseContainer<TreeNode, Vertex> {
 
 	constructor(design: Design) {
 		super(

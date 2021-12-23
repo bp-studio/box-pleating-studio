@@ -1,5 +1,7 @@
+import { MathUtil } from "bp/math";
+import type { JPiece } from "bp/content/json";
 
-interface JPieceMemo {
+export interface JPieceMemo {
 	p: JPiece
 	sx: number
 }
@@ -10,7 +12,7 @@ interface JPieceMemo {
  */
 //////////////////////////////////////////////////////////////////
 
-namespace GOPS {
+export namespace GOPS {
 
 	/** 計算結果的記憶 */
 	const Memo = new Map<string, readonly JPieceMemo[]>();

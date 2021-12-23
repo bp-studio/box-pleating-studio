@@ -1,3 +1,7 @@
+import { SheetImage } from "./SheetImage";
+import type { Studio } from "..";
+import type { IPoint, Vector } from "bp/math";
+import type { Design } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -6,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Workspace extends SheetImage {
+export abstract class Workspace extends SheetImage {
 
 	private _spaceHolder: HTMLDivElement;
 

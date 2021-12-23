@@ -1,3 +1,6 @@
+import { Disposable } from "./Disposable";
+import { shrewdStatic } from "bp/global";
+import type { IStudio } from "bp/env";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Mountable extends Disposable {
+export abstract class Mountable extends Disposable {
 
 	protected readonly $mountTarget: Mountable | IStudio;
 

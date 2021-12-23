@@ -1,12 +1,20 @@
+import { Design } from "bp/design";
+import { Migration } from "bp/content/update";
+import type { JDesign } from "bp/content/json";
+import type { Action, Pseudo } from "bp/global";
+import type { HistoryManager } from "bp/design";
+import type { IDisplay } from "./screen";
+import type { IViewManager } from "bp/view";
+import type { RecursivePartial } from "bp/util";
 
-interface IStudio {
+export interface IStudio {
 	onDeprecate?: TitleCallback;
 	readonly $display: IDisplay;
 	readonly $viewManager: IViewManager;
 	$historyManagerFactory: HistoryManagerFactory
 }
 
-type TitleCallback = (title?: string) => void
+export type TitleCallback = (title?: string) => void
 
 type HistoryManagerFactory = (design: Design, data: JDesign) => HistoryManager | null;
 
@@ -17,7 +25,7 @@ type HistoryManagerFactory = (design: Design, data: JDesign) => HistoryManager |
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class StudioBase implements IStudio {
+export abstract class StudioBase implements IStudio {
 
 	public readonly $designMap: Map<number, Design> = new Map();
 

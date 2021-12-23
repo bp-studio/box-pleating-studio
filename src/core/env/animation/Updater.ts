@@ -1,3 +1,8 @@
+import { Animator } from "./Animator";
+import { PaperWorker } from "./PaperWorker";
+import { Diagnose, Settings } from "bp/global";
+import { Disposable } from "bp/class";
+import type { Studio } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class Updater extends Animator {
+export class Updater extends Animator {
 
 	private static readonly _PERIOD = 50;
 	private readonly _studio: Studio;
@@ -21,9 +26,9 @@ class Updater extends Animator {
 		if(this.$updating) return;
 		this.$updating = true;
 
-		if(DEBUG_ENABLED && diagnose) Diagnose.init();
-		Shrewd.commit();
-		if(DEBUG_ENABLED && diagnose) Diagnose.flush();
+		if(DEBUG_ENABLED && Settings.diagnose) Diagnose.init();
+		window.Shrewd.commit();
+		if(DEBUG_ENABLED && Settings.diagnose) Diagnose.flush();
 
 		let design = this._studio.$design;
 		if(design && !design.$dragging && design.$history) { // dragging 狀態必須在 await 之前進行判讀才會是可靠的

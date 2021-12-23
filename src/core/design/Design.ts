@@ -1,48 +1,20 @@
+import { action } from "./history/action";
+import { EdgeContainer, FlapContainer, JunctionContainer, RiverContainer, StretchContainer, VertexContainer } from "./containers";
+import { Sheet } from "./components";
+import { Tree } from "./schema";
+import { OptionManager } from "./OptionManager";
+import { shrewdStatic } from "bp/global";
+import { deepCopy } from "bp/util";
+import { Mountable } from "bp/class";
+import { Migration } from "bp/content/update";
+import type { ISerializable } from "bp/global";
+import type { IStudio, Studio } from "bp/env";
+import type { RecursivePartial } from "bp/util";
+import type { DesignMode, JDesign } from "bp/content/json";
+import type { HistoryManager, IQueryable, ITagObject } from "./history";
+import type { IViewManager } from "bp/view";
 
-/**
- * "J" stands for JSON, and {@link JDesign} is the saving format of a {@link Design} (a.k.a. "Project").
- *
- * Being JSON format, it's easy to incorporate any Unicode characters.
- *
- * Entries marked with @session implies that it is for session only, and will not be included in the .bps file.
- */
-interface JDesign {
-
-	/** Title of the design */
-	title: string;
-
-	/** Design description */
-	description?: string;
-
-	/** File format version. see {@link Migration.$getCurrentVersion}() for the latest version. */
-	version: string;
-
-	/** The current view of the design. */
-	mode: DesignMode;
-
-	/** Editing history. @session */
-	history?: JHistory;
-
-	/** Layout view; see {@link JLayout} for details. */
-	layout: JLayout;
-
-	/** Tree view */
-	tree: {
-		sheet: JSheet,
-		nodes: JVertex[],
-		edges: JEdge[]
-	};
-}
-
-type DesignMode = "layout" | "tree";
-
-interface JLayout {
-	sheet: JSheet,
-	flaps: JFlap[],
-	stretches: JStretch[]
-}
-
-interface IDesignObject {
+export interface IDesignObject {
 	readonly $design: Design;
 }
 
@@ -52,7 +24,7 @@ interface IDesignObject {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
+@shrewd export class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
 
 	/** @exports */
 	@shrewd public mode: DesignMode;
@@ -156,7 +128,7 @@ interface IDesignObject {
 
 	public toJSON(session: boolean = false): JDesign {
 		let result!: JDesign;
-		let action = (): void => {
+		let process = (): void => {
 			result = {
 				title: this.title,
 				description: this.description,
@@ -175,8 +147,8 @@ interface IDesignObject {
 			};
 			if(session) result.history = this.$history?.toJSON();
 		};
-		if(session) action();
-		else this.$tree.withJID(action);
+		if(session) process();
+		else this.$tree.withJID(process);
 		return result;
 	}
 

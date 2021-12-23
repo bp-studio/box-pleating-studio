@@ -1,3 +1,8 @@
+import { ControlView } from "./classes";
+import { PaperUtil } from "./util/PaperUtil";
+import { Layer, Style } from "bp/global";
+import type { Device } from "bp/design";
+import type { ReadonlyPath } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DeviceView extends ControlView<Device> {
+@shrewd export class DeviceView extends ControlView<Device> {
 
 	private readonly _ridges: paper.CompoundPath;
 

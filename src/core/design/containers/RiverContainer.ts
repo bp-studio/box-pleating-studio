@@ -1,3 +1,6 @@
+import { BaseContainer } from "./BaseContainer";
+import { River } from "../components";
+import type { Design, TreeEdge } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class RiverContainer extends BaseContainer<TreeEdge, River> {
+@shrewd export class RiverContainer extends BaseContainer<TreeEdge, River> {
 	constructor(design: Design) {
 		super(
 			design,

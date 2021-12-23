@@ -1,3 +1,14 @@
+import { TraceBuilder } from "../layout/calculation/trace";
+import { Direction, Settings, nextQuadrantOffset, noCompare, orderedArray, previousQuadrantOffset, quadrantNumber, shrewdStatic } from "bp/global";
+import { Fraction, Point, Rectangle, Vector } from "bp/math";
+import { SheetObject } from "bp/class";
+import type { Flap } from "./Flap";
+import type { Junction } from "./Junction";
+import type { Sheet } from "./Sheet";
+import type { Pattern, TreeNode } from "..";
+import type { JOverlap, JJunction } from "bp/content/json";
+import type { QuadrantDirection } from "bp/global";
+import type { Path } from "bp/math";
 
 type CoveredInfo = [number, number, Point[]];
 
@@ -7,7 +18,7 @@ type CoveredInfo = [number, number, Point[]];
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Quadrant extends SheetObject {
+@shrewd export class Quadrant extends SheetObject {
 
 	/** 指著象限斜方向的向量 */
 	public static readonly QV: readonly Vector[] = [
@@ -209,8 +220,8 @@ type CoveredInfo = [number, number, Point[]];
 	 * @exports
 	 */
 	public debug(d: number = 0): void {
-		debug = true;
+		Settings.debug = true;
 		console.log(this.$makeContour(d).map(p => p.toString()));
-		debug = false;
+		Settings.debug = false;
 	}
 }

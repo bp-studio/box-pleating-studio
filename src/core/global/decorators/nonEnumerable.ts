@@ -1,7 +1,7 @@
 /** 宣告一個屬性為非 enumerable */
-function nonEnumerable(target: object, name: string): void;
-function nonEnumerable(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor;
-function nonEnumerable(
+export function nonEnumerable(target: object, name: string): void;
+export function nonEnumerable(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor;
+export function nonEnumerable(
 	target: object, name: string, desc?: PropertyDescriptor
 ): PropertyDescriptor | void {
 	if(desc) {

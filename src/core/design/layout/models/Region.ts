@@ -1,5 +1,8 @@
+import { Fraction, Line } from "bp/math";
+import { onDemand } from "bp/global";
+import type { Path, Point, Vector } from "bp/math";
 
-interface IRegionShape {
+export interface IRegionShape {
 
 	/** Region 輪廓頂點 */
 	contour: Path;
@@ -16,7 +19,7 @@ interface IRegionShape {
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Region {
+export abstract class Region {
 
 	public abstract get $shape(): IRegionShape;
 

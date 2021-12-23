@@ -5,7 +5,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-namespace KeyboardController {
+export namespace KeyboardController {
 
 	let _states: Record<string, boolean> = {};
 

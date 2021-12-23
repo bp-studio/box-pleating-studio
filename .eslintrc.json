@@ -229,7 +229,13 @@
 				"tabWidth": 4
 			}
 		],
-		"max-lines": "warn",
+		"max-lines": [
+			"warn",
+			{
+				"skipBlankLines": true,
+				"skipComments": true
+			}
+		],
 		"max-lines-per-function": "warn",
 		"max-nested-callbacks": "warn",
 		"max-params": [
@@ -390,7 +396,12 @@
 		"semi": "warn",
 		"semi-spacing": "warn",
 		"semi-style": "warn",
-		"sort-imports": "warn",
+		"sort-imports": [
+			"warn",
+			{
+				"allowSeparatedGroups": true
+			}
+		],
 		"sort-keys": "off",
 		"sort-vars": "off",
 		"space-before-blocks": "warn",

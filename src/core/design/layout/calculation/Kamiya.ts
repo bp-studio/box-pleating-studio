@@ -1,5 +1,9 @@
+import { GOPS } from "./GOPS";
+import { Gadget, Piece } from "../models";
+import { clone } from "bp/util";
+import type { JGadget, JOverlap, JPiece } from "bp/content/json";
 
-namespace Kamiya {
+export namespace Kamiya {
 
 	const SLOPE = 3;
 	const SLACK = 0.5;

@@ -1,3 +1,4 @@
+import type { Display } from "./Display";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +6,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class Rasterizer {
+export class Rasterizer {
 
 	private static readonly _DEBOUNCE = 1000;
 	private static readonly _GC_TIME = 5000;

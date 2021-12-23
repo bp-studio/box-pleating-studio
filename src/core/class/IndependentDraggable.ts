@@ -1,3 +1,4 @@
+import { Draggable } from "./Draggable";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,13 +8,13 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class IndependentDraggable extends Draggable {
+export abstract class IndependentDraggable extends Draggable {
 
 	private _isNew: boolean = true;
 
 	/** 這個物件自從建構以來，{@link Design} 是否尚未切換過 {@link Sheet} */
 	protected get $isNew(): boolean { return this._isNew; }
-	protected set $isNew(v) { if(!v) this._isNew = v; }
+	protected set $isNew(v: boolean) { if(!v) this._isNew = v; }
 
 	/** 這個會在執行之後自我消滅 */
 	@shrewd private _watchIsNew(): void {

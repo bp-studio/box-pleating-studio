@@ -1,3 +1,6 @@
+import { Mountable } from "bp/class";
+import type { Studio } from "bp/env/Studio";
+import type { Layer } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -9,17 +12,11 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class View extends Mountable {
+export abstract class View extends Mountable {
 
 	public static readonly _MIN_SCALE = 10;
 
 	private _paths: [Layer, paper.Item, number][] = [];
-
-	public get $studio(): Studio | null {
-		let studio = super.$studio;
-		if(studio instanceof Studio) return studio;
-		return null;
-	}
 
 	/**
 	 * 視圖的自動繪製反應方法；會呼叫子類別實作的 {@link View.$render $render()} 方法完成繪製。

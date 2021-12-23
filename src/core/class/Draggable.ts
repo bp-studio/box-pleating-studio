@@ -1,3 +1,7 @@
+import { Control } from "./Control";
+import { Point, Vector } from "bp/math";
+import { CursorController } from "bp/env/controllers/CursorController";
+import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,7 +11,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Draggable extends Control {
+export abstract class Draggable extends Control {
 
 	public abstract get $tag(): string;
 

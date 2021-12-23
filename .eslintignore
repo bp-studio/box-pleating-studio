@@ -1,5 +1,4 @@
 build/**/*
 lib/**/*
 src/core/global/vendor/**/*.ts
-src/core/util/polyBool/**/*.ts
 src/service/@types/service-worker.d.ts

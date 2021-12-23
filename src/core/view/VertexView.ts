@@ -1,3 +1,8 @@
+import { LabeledView } from "./classes";
+import { Layer, Style, shrewdStatic } from "bp/global";
+import type { EdgeView } from "./EdgeView";
+import type { IPoint } from "bp/math";
+import type { Vertex } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class VertexView extends LabeledView<Vertex> {
+@shrewd export class VertexView extends LabeledView<Vertex> {
 
 	private static readonly _DOT_SIZE = 4;
 

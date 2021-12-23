@@ -1,11 +1,13 @@
+import type { IDisposable } from "..";
+import type { ISerializable } from "bp/global";
 
-type IterableFactory<K> = () => Iterable<K>;
+export type IterableFactory<K> = () => Iterable<K>;
 
-type Func<A, B> = (a: A) => B;
+export type Func<A, B> = (a: A) => B;
 
-type Predicate<A, B> = (a: A, b: B) => boolean;
+export type Predicate<A, B> = (a: A, b: B) => boolean;
 
-type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
+export type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -21,7 +23,7 @@ type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class BaseMapping<Key, Source, Value extends object>
+export abstract class BaseMapping<Key, Source, Value extends object>
 	implements ReadonlyMap<Key, Value>, IDisposable {
 
 	constructor(
@@ -32,7 +34,7 @@ abstract class BaseMapping<Key, Source, Value extends object>
 	) { }
 
 	public $dispose(): void {
-		Shrewd.terminate(this);
+		terminate(this);
 		this._map.clear();
 		// @ts-ignore
 		delete this._map;

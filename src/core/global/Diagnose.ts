@@ -1,5 +1,5 @@
 
-namespace Diagnose {
+export namespace Diagnose {
 
 	let data: Map<string, number> = new Map();
 

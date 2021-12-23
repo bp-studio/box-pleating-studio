@@ -1,3 +1,6 @@
+import { $getEventCenter } from "./Share";
+import { Constants } from "bp/content/json";
+import type { Studio } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class ZoomController {
+export class ZoomController {
 
 	private static readonly _DELTA_SCALE = 10000;
 	private static readonly _STEP = 5;
@@ -35,9 +38,9 @@ class ZoomController {
 		let touchDistance = ZoomController._getTouchDistance(event);
 		let delta = touchDistance - this._touchScaling[0];
 		let dpi = window.devicePixelRatio ?? 1;
-		let newZoom = sheet.zoom * delta / dpi / Sheet.$FULL_ZOOM;
+		let newZoom = sheet.zoom * delta / dpi / Constants.$FULL_ZOOM;
 		newZoom = Math.round(newZoom + this._touchScaling[1]);
-		this._studio.$display.$zoom(newZoom, System.$getEventCenter(event));
+		this._studio.$display.$zoom(newZoom, $getEventCenter(event));
 		this._touchScaling = [touchDistance, newZoom];
 	}
 

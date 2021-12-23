@@ -1,3 +1,9 @@
+import { View } from "./View";
+import { ControlView } from "./ControlView";
+import { LabelUtil } from "../util/LabelUtil";
+import { Layer, Style } from "bp/global";
+import type { Control } from "bp/class";
+import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +11,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class LabeledView<T extends Control> extends ControlView<T> {
+export abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 	private static readonly _SQRT = 2 / Math.sqrt(View._MIN_SCALE);
 	private static readonly _FONT_SIZE = 14;

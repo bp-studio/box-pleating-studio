@@ -1,3 +1,7 @@
+import { BaseContainer } from "./BaseContainer";
+import { Edge } from "../components";
+import type { Design, TreeEdge } from "..";
+import type { JEdge } from "bp/content/json";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +9,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
+@shrewd export class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
 
 	constructor(design: Design) {
 		super(

@@ -1,3 +1,7 @@
+import { Stretch } from "../layout";
+import { Mapping } from "bp/class";
+import type { Design, Device, Quadrant } from "..";
+import type { Point } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +9,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class StretchContainer extends Mapping<string, Stretch> {
+@shrewd export class StretchContainer extends Mapping<string, Stretch> {
 
 	constructor(design: Design) {
 		super(

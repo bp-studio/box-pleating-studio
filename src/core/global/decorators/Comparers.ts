@@ -1,17 +1,21 @@
+import { Diagnose } from "../Diagnose";
+import * as Settings from "../Import";
+import { PolyBool } from "bp/math";
+import type { Path } from "bp/math";
 
 /** 特別用來標注某一項計算屬性經過實驗顯示不用進行比較檢查 */
-const noCompare = shrewd;
+export const noCompare = shrewd;
 
 /** 比較有分順序的陣列 */
-function orderedArray(msg?: string): PropertyDecorator;
-function orderedArray(target: object, prop: string | symbol): void;
-function orderedArray(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
+export function orderedArray(msg?: string): PropertyDecorator;
+export function orderedArray(target: object, prop: string | symbol): void;
+export function orderedArray(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
 	let option: Shrewd.IDecoratorOptions<unknown> = {
 		comparer: (ov: unknown[], nv: unknown[], member) => {
 			if(ov === nv) return true;
-			let result = Shrewd.comparer.array(ov, nv);
-			if(diagnose && result && msg) {
+			let result = window.Shrewd.comparer.array(ov, nv);
+			if(Settings.diagnose && result && msg) {
 				// if(msg=="sheet.independents") {
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
@@ -26,15 +30,15 @@ function orderedArray(...p: [object, string | symbol] | [string?]): PropertyDeco
 }
 
 /** 比較不分順序的陣列 */
-function unorderedArray(msg?: string): PropertyDecorator;
-function unorderedArray(target: object, prop: string | symbol): void;
-function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
+export function unorderedArray(msg?: string): PropertyDecorator;
+export function unorderedArray(target: object, prop: string | symbol): void;
+export function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
 	let option: Shrewd.IDecoratorOptions<unknown> = {
 		comparer: (ov: unknown[], nv: unknown[], member) => {
 			if(ov === nv) return true;
-			let result = Shrewd.comparer.unorderedArray(ov, nv);
-			if(diagnose && result && msg) {
+			let result = window.Shrewd.comparer.unorderedArray(ov, nv);
+			if(Settings.diagnose && result && msg) {
 				// if(msg=="sheet.independents") {
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
@@ -49,9 +53,9 @@ function unorderedArray(...p: [object, string | symbol] | [string?]): PropertyDe
 }
 
 /** 比較 {@link PolyBool} shape 一致 */
-function shape(msg?: string): PropertyDecorator;
-function shape(target: object, prop: string | symbol): void;
-function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
+export function shape(msg?: string): PropertyDecorator;
+export function shape(target: object, prop: string | symbol): void;
+export function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
 	let option: Shrewd.IDecoratorOptions<PolyBool.Shape> = {
 		comparer: (ov: PolyBool.Shape, nv: PolyBool.Shape, member) => {
@@ -59,7 +63,7 @@ function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator |
 			if(!ov != !nv) return false;
 			if(!ov) return true;
 			let result = PolyBool.compare(ov, nv);
-			if(diagnose && result && msg) {
+			if(Settings.diagnose && result && msg) {
 				// if(msg == "staticClosure") {
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;
@@ -74,9 +78,9 @@ function shape(...p: [object, string | symbol] | [string?]): PropertyDecorator |
 }
 
 /** 比較路徑一致 */
-function path(msg?: string): PropertyDecorator;
-function path(target: object, prop: string | symbol): void;
-function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
+export function path(msg?: string): PropertyDecorator;
+export function path(target: object, prop: string | symbol): void;
+export function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | void {
 	let msg = p.length == 2 ? undefined : p[0];
 	let option: Shrewd.IDecoratorOptions<Path> = {
 		comparer: (ov: Path, nv: Path, member) => {
@@ -88,7 +92,7 @@ function path(...p: [object, string | symbol] | [string?]): PropertyDecorator | 
 			for(let i = 0; i < ov.length; i++) {
 				if(!ov[i].eq(nv[i])) return false;
 			}
-			if(diagnose && msg) {
+			if(Settings.diagnose && msg) {
 				// if(msg == "qc") {
 				// 	Shrewd.debug.trigger(member);
 				// 	debugger;

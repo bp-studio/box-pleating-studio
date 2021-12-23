@@ -1,6 +1,7 @@
-
-// 有一些環境不支援這個類別
-const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
+import { $isTouch, CursorController, DragController, KeyboardController, LongPressController, ScrollController, SelectionController, ZoomController } from "./controllers";
+import { Flap, River, Vertex } from "bp/design";
+import { ArrayUtil } from "bp/util";
+import type { Studio } from "./Studio";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -8,7 +9,7 @@ const TOUCH_SUPPORT = typeof TouchEvent != 'undefined';
  */
 //////////////////////////////////////////////////////////////////
 
-class System {
+export class System {
 
 	private _studio: Studio;
 
@@ -53,8 +54,8 @@ class System {
 		if(design && event.key == "delete") {
 			let items = this.$selection.$items;
 			let first = items[0];
-			if(isTypedArray(items, Flap)) design.$flaps.$delete(items);
-			if(isTypedArray(items, Vertex)) design.$vertices.$delete(items);
+			if(ArrayUtil.$isTypedArray(items, Flap)) design.$flaps.$delete(items);
+			if(ArrayUtil.$isTypedArray(items, Vertex)) design.$vertices.$delete(items);
 			if(first instanceof River) first.$delete();
 			return false;
 		}
@@ -84,7 +85,7 @@ class System {
 
 		if(!System._isSelectEvent(ev) || this.$scroll.on) return;
 
-		if(System.$isTouch(ev)) this._canvasTouchDown(event);
+		if($isTouch(ev)) this._canvasTouchDown(event);
 		else this._canvasMouseDown(event);
 	}
 
@@ -147,21 +148,8 @@ class System {
 
 	/** 檢查事件是否符合「選取」的前提（單點觸控或者滑鼠左鍵操作） */
 	private static _isSelectEvent(event: MouseEvent | TouchEvent): boolean {
-		if(System.$isTouch(event) && event.touches.length > 1) return false;
+		if($isTouch(event) && event.touches.length > 1) return false;
 		if(event instanceof MouseEvent && event.button != 0) return false;
 		return true;
-	}
-
-	public static $isTouch(event: Event): event is TouchEvent {
-		return TOUCH_SUPPORT && event instanceof TouchEvent;
-	}
-
-	public static $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
-		if(System.$isTouch(event)) {
-			let t = event.touches;
-			return { x: (t[1].pageX + t[0].pageX) / 2, y: (t[1].pageY + t[0].pageY) / 2 };
-		} else {
-			return { x: event.pageX, y: event.pageY };
-		}
 	}
 }

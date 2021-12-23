@@ -1,3 +1,12 @@
+import { PaperUtil } from "./util/PaperUtil";
+import { ControlView } from "./classes";
+import { RiverHelper } from "./helper";
+import { Fraction, Line, PathUtil, Point, PolyBool, Vector } from "bp/math";
+import { Layer, Style, shape } from "bp/global";
+import { Mapping } from "bp/class";
+import type { Design, River, TreeEdge, TreeNode } from "bp/design";
+import type { View } from "./classes";
+import type { FlapView } from "./FlapView";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +14,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class RiverView extends ControlView<River> implements ClosureView {
+@shrewd export class RiverView extends ControlView<River> implements ClosureView {
 
 	private _hinge: paper.CompoundPath;
 	private _shade: paper.CompoundPath;
@@ -84,7 +93,7 @@
 	}
 
 	protected $onDispose(): void {
-		Shrewd.terminate(this._componentMap);
+		terminate(this._componentMap);
 		super.$onDispose();
 	}
 
@@ -218,11 +227,11 @@
 	}
 }
 
-interface ClosureView extends View {
+export interface ClosureView extends View {
 	$closure: PolyBool.Shape;
 }
 
-interface RiverInfo {
+export interface RiverInfo {
 	readonly inner: readonly ClosureView[];
 	readonly length: number;
 	readonly components: readonly string[];

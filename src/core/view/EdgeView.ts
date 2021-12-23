@@ -1,3 +1,8 @@
+import { LabeledView } from "./classes";
+import { PaperUtil } from "./util/PaperUtil";
+import { Layer, Style } from "bp/global";
+import type { Edge } from "bp/design";
+import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class EdgeView extends LabeledView<Edge> {
+@shrewd export class EdgeView extends LabeledView<Edge> {
 
 	public readonly line: paper.Path;
 

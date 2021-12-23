@@ -1,3 +1,4 @@
+import type { Action } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +6,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class LongPressController {
+export class LongPressController {
 
 	private static readonly _TIMEOUT = 750;
 	private _callback: Action;

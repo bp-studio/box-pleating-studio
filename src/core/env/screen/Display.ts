@@ -1,12 +1,19 @@
+import { Rasterizer } from "./Rasterizer";
+import { Workspace } from "./Workspace";
+import { Enum, Layer, LayerOptions } from "bp/global";
+import { PaperUtil } from "bp/view/util/PaperUtil";
+import { Constants } from "bp/content/json";
+import type { IPoint } from "bp/math";
+import type { Studio } from "..";
 
-interface IDisplay {
+export interface IDisplay {
 	$zoom(v: number): void;
 	$scale: number;
 	$settings: DisplaySetting;
+	$render(): void;
 }
 
-
-interface DisplaySetting {
+export interface DisplaySetting {
 	showGrid: boolean;
 	showHinge: boolean;
 	showRidge: boolean;
@@ -25,7 +32,7 @@ interface DisplaySetting {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Display extends Workspace implements IDisplay {
+@shrewd export class Display extends Workspace implements IDisplay {
 
 	public readonly $boundary: paper.Path;
 
@@ -96,7 +103,7 @@ interface DisplaySetting {
 
 	public $zoom(zoom: number, relativeCenter?: IPoint): void {
 		// 檢查
-		if(zoom < Sheet.$FULL_ZOOM) zoom = Sheet.$FULL_ZOOM;
+		if(zoom < Constants.$FULL_ZOOM) zoom = Constants.$FULL_ZOOM;
 		let sheet = this._design?.sheet;
 		if(!sheet || sheet.zoom == zoom) return;
 

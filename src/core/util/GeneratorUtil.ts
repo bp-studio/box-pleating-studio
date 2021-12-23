@@ -5,7 +5,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-namespace GeneratorUtil {
+export namespace GeneratorUtil {
 
 	/** 逐一執行傳入的生成器，一旦其中一個有傳回東西就會停止使用後面的 */
 	export function* $first<T>(

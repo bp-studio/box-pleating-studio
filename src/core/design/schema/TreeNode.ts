@@ -1,8 +1,11 @@
-
-interface JNode {
-	id: number;
-	parentId?: number;
-}
+import { action } from "../history/action";
+import { shrewdStatic } from "bp/global";
+import { Disposable } from "bp/class";
+import type { JNode } from "bp/content/json";
+import type { Tree } from "./Tree";
+import type { ISerializable } from "bp/global";
+import type { Design, ITagObject } from "..";
+import type { TreeEdge } from "./TreeEdge";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -10,7 +13,7 @@ interface JNode {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class TreeNode extends Disposable implements ITagObject, ISerializable<JNode> {
+@shrewd export class TreeNode extends Disposable implements ITagObject, ISerializable<JNode> {
 
 	public static $setJID(n: TreeNode, id: number): void {
 		n._jid = id;
@@ -81,7 +84,7 @@ interface JNode {
 		if(force || this.$degree == 1) {
 			super.$dispose();
 		} else if(this.$degree == 2) {
-			return Tree.$deleteAndJoin(this);
+			return this.$tree.$deleteAndJoin(this);
 		} else if(this.$degree != 1) {
 			console.warn(`Node [${this.name ? this.name : this.id}] is not a leaf.`);
 		}

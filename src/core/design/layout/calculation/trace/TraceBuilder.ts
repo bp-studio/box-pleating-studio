@@ -1,3 +1,9 @@
+import { Trace } from "./Trace";
+import { Fraction, Line, Point } from "bp/math";
+import { Junction, JunctionStatus } from "bp/design/components/Junction";
+import { Settings } from "bp/global";
+import type { JunctionDimension, Quadrant } from "bp/design";
+import type { Path, Vector } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +11,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class TraceBuilder {
+export class TraceBuilder {
 
 	private readonly _junctions: readonly Junction[];
 	private readonly _lines: Line[];
@@ -27,7 +33,7 @@ class TraceBuilder {
 		this._startVector = quadrant.pv;
 		this._junctions = junctions;
 
-		if(DEBUG_ENABLED && debug) {
+		if(DEBUG_ENABLED && Settings.debug) {
 			console.log(this._lines.map(l => l.toString()));
 		}
 	}

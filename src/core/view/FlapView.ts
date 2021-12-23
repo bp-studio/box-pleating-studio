@@ -1,3 +1,11 @@
+import { PaperUtil } from "./util/PaperUtil";
+import { RiverHelperBase } from "./helper";
+import { LabeledView } from "./classes";
+import { Layer, Style, makePerQuadrant, shrewdStatic } from "bp/global";
+import type { IPoint, PolyBool } from "bp/math";
+import type { PerQuadrant } from "bp/global";
+import type { Flap } from "bp/design";
+import type { ClosureView } from "./RiverView";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +13,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class FlapView extends LabeledView<Flap> implements ClosureView {
+@shrewd export class FlapView extends LabeledView<Flap> implements ClosureView {
 
 	public readonly hinge: paper.Path;
 	private readonly _shade: paper.Path;

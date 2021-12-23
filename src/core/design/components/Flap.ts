@@ -1,11 +1,15 @@
-
-interface JFlap {
-	id: number;
-	width: number;
-	height: number;
-	x: number;
-	y: number;
-}
+import { Quadrant } from "./Quadrant";
+import { action } from "../history/action";
+import { Draggable, IndependentDraggable } from "bp/class";
+import { Point } from "bp/math";
+import { makePerQuadrant, noCompare, shrewdStatic, unorderedArray } from "bp/global";
+import type { Junction } from "./Junction";
+import type { Sheet } from "./Sheet";
+import type { TreeNode } from "..";
+import type { Memento, JFlap } from "bp/content/json";
+import type { Control } from "bp/class";
+import type { IPoint, Vector } from "bp/math";
+import type { ISerializable, PerQuadrant } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -13,7 +17,7 @@ interface JFlap {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Flap extends IndependentDraggable implements ISerializable<JFlap> {
+@shrewd export class Flap extends IndependentDraggable implements ISerializable<JFlap> {
 
 	public get $type(): string { return "Flap"; }
 	public get $tag(): string { return "f" + this.node.id; }
@@ -67,11 +71,11 @@ interface JFlap {
 
 	/** @exports */
 	public get name(): string { return this.node.name; }
-	public set name(n) { this.node.name = n; }
+	public set name(n: string) { this.node.name = n; }
 
 	/** @exports */
 	public get radius(): number { return this.node.$radius; }
-	public set radius(r) {
+	public set radius(r: number) {
 		let e = this.node.$leafEdge;
 		if(e) e.length = r;
 	}

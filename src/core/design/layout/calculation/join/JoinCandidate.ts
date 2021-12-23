@@ -1,3 +1,10 @@
+import { Direction } from "bp/global";
+import { Vector } from "bp/math";
+import { clone } from "bp/util";
+import type { JAnchor, JGadget } from "bp/content/json";
+import type { QuadrantDirection } from "bp/global";
+import type { IPoint, Line, Point } from "bp/math";
+import type { Piece } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -6,7 +13,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class JoinCandidate {
+export class JoinCandidate {
 
 	public readonly p: Piece;
 	public readonly o: IPoint;

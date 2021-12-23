@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 
-type JStructure = readonly Readonly<JJunction>[];
-
-enum Strategy {
-	$halfIntegral = "HALFINTEGRAL",
-	$universal = "UNIVERSAL",
-	$baseJoin = "BASE_JOIN",
-	$standardJoin = "STANDARD_JOIN",
-	$perfect = "PERFECT",
-}
+import { ConfigUtil } from "./ConfigUtil";
+import { Configuration } from "../containers/Configuration";
+import { GeneratorUtil, clone } from "bp/util";
+import { CornerType, Strategy } from "bp/content/json";
+import type { JConfiguration, JPattern, JStretch, JJunction } from "bp/content/json";
+import type { Action } from "bp/global";
+import type { Repository } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -16,7 +14,7 @@ enum Strategy {
  */
 //////////////////////////////////////////////////////////////////
 
-class Configurator {
+export class Configurator {
 
 	/** 目前所屬的 {@link Repository} */
 	private readonly _repo: Repository;

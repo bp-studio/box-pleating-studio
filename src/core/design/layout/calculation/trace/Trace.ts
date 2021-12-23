@@ -1,3 +1,6 @@
+import { Fraction, Line, Matrix, PathUtil } from "bp/math";
+import { Settings } from "bp/global";
+import type { Path, Point, Sign, Vector } from "bp/math";
 
 interface JIntersection {
 	point: Point;
@@ -25,7 +28,7 @@ interface ShootingNode {
  */
 //////////////////////////////////////////////////////////////////
 
-class Trace {
+export class Trace {
 
 	private readonly _full: Path = [];
 	private readonly _trace: Path = [];
@@ -62,7 +65,7 @@ class Trace {
 		let isInLeadMode = Boolean(this._startLine);
 		let shooting = this.lineShooting(node);
 
-		if(DEBUG_ENABLED && debug) {
+		if(DEBUG_ENABLED && Settings.debug) {
 			console.log("StartPt: " + startPt.toString());
 			console.log("Start: " + this._startLine?.toString());
 			console.log("Inflections: ", [...this._inflections].toString());
@@ -146,7 +149,7 @@ class Trace {
 					!Trace._isSideTouchable(line, point, vector, f, angle)
 				) continue;
 
-				if(DEBUG_ENABLED && debug) {
+				if(DEBUG_ENABLED && Settings.debug) {
 					console.log([JSON.stringify(intersection), line.toString()]);
 				}
 				if(Trace._intersectionCloser(intersection, currentIntersection, f)) {
@@ -186,7 +189,7 @@ class Trace {
 			point: pt,
 		};
 
-		if(DEBUG_ENABLED && debug) {
+		if(DEBUG_ENABLED && Settings.debug) {
 			console.log([
 				pt.toString(), line.toString(),
 				result.vector.toString(), line.$vector.toString(),

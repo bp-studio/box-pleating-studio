@@ -1,3 +1,6 @@
+import { SheetObject } from "./SheetObject";
+import type { IPoint } from "bp/math";
+import type { ITagObject } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Control extends SheetObject implements ITagObject {
+export abstract class Control extends SheetObject implements ITagObject {
 
 	public abstract get $tag(): string;
 
@@ -53,6 +56,6 @@ abstract class Control extends SheetObject implements ITagObject {
 	}
 }
 
-interface DragSelectableControl extends Control {
+export interface DragSelectableControl extends Control {
 	$dragSelectAnchor: IPoint;
 }

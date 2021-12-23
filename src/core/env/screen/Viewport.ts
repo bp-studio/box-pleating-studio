@@ -5,22 +5,20 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Viewport {
+export abstract class Viewport {
 
 	private static readonly _RETRY = 10;
 
 	@shrewd protected _viewWidth: number;
 	@shrewd protected _viewHeight: number;
 
-	protected readonly _studio: Studio;
 	protected readonly _el: HTMLElement;
 
 	/** 暫時鎖定顯示區域大小 */
 	private _lockViewport: boolean = false;
 
-	constructor(studio: Studio) {
-		this._studio = studio;
-		this._el = studio.$el;
+	constructor(el: HTMLElement) {
+		this._el = el;
 
 		window.addEventListener("resize", this._setSize.bind(this));
 		this._setSize();

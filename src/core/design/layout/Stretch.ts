@@ -1,13 +1,11 @@
-
-interface JStretch {
-	id: string;
-
-	/** 如果找不到 {@link Pattern} 就會是 undefined */
-	configuration?: JConfiguration;
-
-	/** 如果找不到 {@link Pattern} 就會是 undefined */
-	pattern?: JPattern;
-}
+import { Repository } from "./containers";
+import { Junction, JunctionStatus } from "../components";
+import { Point } from "bp/math";
+import { Control } from "bp/class";
+import type { JStretch } from "bp/content/json";
+import type { Sign } from "bp/math";
+import type { Device, Flap, Pattern, Sheet } from "..";
+import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -16,7 +14,7 @@ interface JStretch {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Stretch extends Control implements ISerializable<JStretch> {
+@shrewd export class Stretch extends Control implements ISerializable<JStretch> {
 
 	public get $type(): string { return "Stretch"; }
 	public get $tag(): string { return "s" + this.$signature; }

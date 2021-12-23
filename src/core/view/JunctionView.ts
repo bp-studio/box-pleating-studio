@@ -1,3 +1,9 @@
+import { View } from "./classes";
+import { JunctionStatus } from "bp/design";
+import { Layer, Style } from "bp/global";
+import { PaperWorker } from "bp/env/animation/PaperWorker";
+import type { FlapView } from "./FlapView";
+import type { Junction } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,7 +13,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class JunctionView extends View {
+@shrewd export class JunctionView extends View {
 
 	private _junction: Junction;
 	private _shade: paper.CompoundPath;

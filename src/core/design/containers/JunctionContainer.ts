@@ -1,3 +1,7 @@
+import { Junction } from "../components";
+import { orderedArray, unorderedArray } from "bp/global";
+import { DoubleMapping } from "bp/class";
+import type { Design, Flap } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +9,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class JunctionContainer extends DoubleMapping<Flap, Junction> {
+@shrewd export class JunctionContainer extends DoubleMapping<Flap, Junction> {
 
 	constructor(design: Design) {
 		super(

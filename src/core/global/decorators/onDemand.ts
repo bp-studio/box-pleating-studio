@@ -3,7 +3,7 @@
  *
  * 這個會是非 enumerable 的。
  */
-function onDemand(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor {
+export function onDemand(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor {
 	let getter = desc.get!;
 	return {
 		get() {
@@ -20,4 +20,4 @@ function onDemand(target: object, name: string, desc: PropertyDescriptor): Prope
 /**
  * 從每個物件實體到對應的值 {@link Record} 的映射
  */
-const onDemandMap = new WeakMap<object, Record<string, unknown>>();
+export const onDemandMap = new WeakMap<object, Record<string, unknown>>();

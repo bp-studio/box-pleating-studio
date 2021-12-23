@@ -9,8 +9,15 @@
 		"noImplicitReturns": true,
 		"noImplicitAny": true,
 		"preserveConstEnums": true,
-		"outFile": "bpstudio.js",
 		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"isolatedModules": true,
+		"baseUrl": ".",
+		"paths": {
+			"bp/*": [
+				"./*"
+			]
+		},
 	},
 	"include": [
 		"./**/*.ts"

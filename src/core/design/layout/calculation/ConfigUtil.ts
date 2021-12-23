@@ -1,5 +1,9 @@
+import { CornerType } from "bp/content/json";
+import { Direction, nextQuadrantOffset, opposite, previousQuadrantOffset, quadrantNumber } from "bp/global";
+import { clone } from "bp/util";
+import type { JJunction, JOverlap, JPartition } from "bp/content/json";
 
-namespace ConfigUtil {
+export namespace ConfigUtil {
 
 	/**
 	 * 設置參數使得 o2 接到 o1 上面

@@ -1,3 +1,7 @@
+import { BaseContainer } from "./BaseContainer";
+import { Flap } from "../components";
+import { Tree } from "../schema";
+import type { Design, TreeNode } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +9,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class FlapContainer extends BaseContainer<TreeNode, Flap> {
+@shrewd export class FlapContainer extends BaseContainer<TreeNode, Flap> {
 
 	constructor(design: Design) {
 		super(

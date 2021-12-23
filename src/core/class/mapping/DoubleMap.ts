@@ -1,5 +1,5 @@
 
-type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void;
+export type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void;
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -11,7 +11,7 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DoubleMap<K, V> implements ReadonlyDoubleMap<K, V> {
+@shrewd export class DoubleMap<K, V> implements ReadonlyDoubleMap<K, V> {
 
 	private _map: Map<K, Map<K, V>> = new Map();
 
@@ -58,7 +58,7 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 
 	public $dispose(): void {
 		this._map.clear();
-		Shrewd.terminate(this);
+		terminate(this);
 	}
 
 	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: unknown = this): void {
@@ -116,7 +116,7 @@ type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>
 	}
 }
 
-interface ReadonlyDoubleMap<K, V> {
+export interface ReadonlyDoubleMap<K, V> {
 	has(key: K): boolean;
 	has(key1: K, key2: K): boolean;
 	get(key: K): ReadonlyMap<K, V> | undefined;

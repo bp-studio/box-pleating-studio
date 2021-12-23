@@ -1,5 +1,6 @@
+import { shrewdStatic } from "bp/global";
 
-interface IDisposable {
+export interface IDisposable {
 	$dispose(): void;
 }
 
@@ -13,7 +14,7 @@ interface IDisposable {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd abstract class Disposable implements IDisposable {
+@shrewd export abstract class Disposable implements IDisposable {
 
 	private static _pending: Set<Disposable> = new Set();
 
@@ -49,7 +50,7 @@ interface IDisposable {
 
 	@shrewdStatic protected $disposeEvent(): void {
 		if(this._disposed) {
-			Shrewd.terminate(this);
+			terminate(this);
 			this.$onDispose();
 		}
 	}

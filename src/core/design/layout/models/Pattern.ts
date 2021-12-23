@@ -1,9 +1,18 @@
+import { Device } from "./Device";
+import { Gadget } from "./Gadget";
+import { makePerQuadrant } from "bp/global";
+import { Fraction, Line } from "bp/math";
+import { Quadrant } from "bp/design/components";
+import { SheetObject } from "bp/class";
+import { clone } from "bp/util";
+import { CornerType } from "bp/content/json";
+import type { JConnection, JCorner, JPattern } from "bp/content/json";
+import type { IQueryable, ITagObject } from "bp/design";
+import type { Point, Vector } from "bp/math";
+import type { ISerializable, PerQuadrant, QuadrantDirection } from "bp/global";
+import type { Configuration, Stretch } from "..";
 
-interface JPattern<T extends JGadget = JGadget> {
-	devices: readonly JDevice<T>[];
-}
-
-type GPattern = JPattern<Gadget>;
+export type GPattern = JPattern<Gadget>;
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -12,7 +21,7 @@ type GPattern = JPattern<Gadget>;
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Pattern extends SheetObject implements ISerializable<JPattern>, IQueryable {
+@shrewd export class Pattern extends SheetObject implements ISerializable<JPattern>, IQueryable {
 
 	public get $tag(): string {
 		return this.$configuration.$tag + "." + this.$configuration.$indexOf(this);
@@ -136,7 +145,9 @@ type GPattern = JPattern<Gadget>;
 
 	/** 根據指定的 JConnection 資料求出連接目標點的實體 */
 	public $getConnectionTarget(c: JConnection): Point {
-		if(c.e >= 0) { return this.$design.$flaps.$byId.get(c.e)!.$points[c.q]; } else {
+		if(c.e >= 0) {
+			return this.$design.$flaps.$byId.get(c.e)!.$points[c.q];
+		} else {
 			let [i, j] = this.$configuration.$overlapMap.get(c.e)!;
 			return this.$devices[i].$anchors[j][c.q];
 		}

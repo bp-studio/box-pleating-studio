@@ -1,3 +1,10 @@
+import { $isTouch } from "./Share";
+import { Control, Draggable } from "bp/class";
+import { Device, Edge, Flap, Vertex } from "bp/design";
+import { DragSelectView } from "bp/view";
+import { unorderedArray } from "bp/global";
+import type { DragSelectableControl } from "bp/class";
+import type { Studio } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +12,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class SelectionController {
+@shrewd export class SelectionController {
 
 	/** 傳回 {@link Control} 被選取的優先順位（當 {@link Control} 重疊於點擊位置時判斷用），數字越小越優先 */
 	private static _controlPriority(c: Control): number {
@@ -49,7 +56,7 @@
 		let oldSel = this.$draggable.concat();
 		this.$process(event);
 		let newSel = this.$draggable.concat();
-		return Shrewd.comparer.unorderedArray(oldSel, newSel);
+		return window.Shrewd.comparer.unorderedArray(oldSel, newSel);
 	}
 
 	public $process(event: paper.ToolEvent, ctrlKey?: boolean): void {
@@ -117,7 +124,7 @@
 	public $processDragSelect(event: paper.ToolEvent): void {
 		if(!this._view.$visible) {
 			// 觸碰的情況中要拖曳至一定距離才開始觸發拖曳選取
-			if(System.$isTouch(event.event) && event.downPoint.getDistance(event.point) < 1) return;
+			if($isTouch(event.event) && event.downPoint.getDistance(event.point) < 1) return;
 			this.$clear();
 			this._view.$visible = true;
 			this._view.$down = event.downPoint;

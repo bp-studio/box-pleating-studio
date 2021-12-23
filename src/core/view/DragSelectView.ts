@@ -1,3 +1,6 @@
+import { View } from "./classes";
+import { Layer, Style } from "bp/global";
+import type { Studio } from "bp/env";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +8,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DragSelectView extends View {
+@shrewd export class DragSelectView extends View {
 
 	private _rectangle: paper.Path;
 

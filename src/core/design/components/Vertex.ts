@@ -1,11 +1,11 @@
-
-interface JVertex extends IPoint {
-	id: number;
-	name: string;
-	isNew?: boolean;
-	selected?: boolean;
-}
-
+import { Draggable, IndependentDraggable } from "bp/class";
+import { Point } from "bp/math";
+import type { Memento, JVertex } from "bp/content/json";
+import type { Sheet } from "./Sheet";
+import type { TreeNode } from "..";
+import type { Control } from "bp/class";
+import type { IPoint, Vector } from "bp/math";
+import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -13,7 +13,7 @@ interface JVertex extends IPoint {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Vertex extends IndependentDraggable implements ISerializable<JVertex> {
+@shrewd export class Vertex extends IndependentDraggable implements ISerializable<JVertex> {
 
 	public get $type(): string { return "Vertex"; }
 	public get $tag(): string { return "v" + this.$node.id; }

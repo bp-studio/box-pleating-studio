@@ -1,3 +1,8 @@
+import { CursorController } from "./CursorController";
+import { Fraction, Point, Vector } from "bp/math";
+import { Device } from "bp/design";
+import type { Studio } from "..";
+import type { Draggable } from "bp/class";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class DragController {
+@shrewd export class DragController {
 
 	private _studio: Studio;
 

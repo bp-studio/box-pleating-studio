@@ -1,3 +1,13 @@
+import { ArrayUtil } from "bp/util";
+import { Control } from "bp/class";
+import { Design, Device, Edge, Flap, River, Stretch, Vertex } from "bp/design";
+import { Studio } from "bp/env";
+import { MathUtil } from "bp/math";
+import { TreeMaker } from "bp/plugin";
+import type { Pseudo } from "bp/global";
+import type { DisplaySetting, StudioOptions } from "bp/env";
+import type { HistoryManager, Repository } from "bp/design";
+import type { JDesign } from "bp/content/json";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -11,7 +21,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class BPStudio {
+export class BPStudio {
 
 	private readonly _studio: Studio;
 
@@ -104,8 +114,8 @@ class BPStudio {
 
 		if(subject[0] instanceof Edge) design.$edges.$toRiver(subject[0]);
 		else if(subject[0] instanceof River) design.$rivers.$toEdge(subject[0]);
-		else if(isTypedArray(subject, Vertex)) design.$vertices.$toFlap(subject);
-		else if(isTypedArray(subject, Flap)) design.$flaps.$toVertex(subject);
+		else if(ArrayUtil.$isTypedArray(subject, Vertex)) design.$vertices.$toFlap(subject);
+		else if(ArrayUtil.$isTypedArray(subject, Flap)) design.$flaps.$toVertex(subject);
 	}
 
 	/** 刪除一些指定的物件，並傳回成功與否 */
@@ -117,8 +127,8 @@ class BPStudio {
 
 		if(subject[0] instanceof Edge) return subject[0].$edge.$delete();
 		else if(subject[0] instanceof River) return subject[0].$delete();
-		else if(isTypedArray(subject, Vertex)) return design.$vertices.$delete(subject);
-		else if(isTypedArray(subject, Flap)) return design.$flaps.$delete(subject);
+		else if(ArrayUtil.$isTypedArray(subject, Vertex)) return design.$vertices.$delete(subject);
+		else if(ArrayUtil.$isTypedArray(subject, Flap)) return design.$flaps.$delete(subject);
 		return false;
 	}
 

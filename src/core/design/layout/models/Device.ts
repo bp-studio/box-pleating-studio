@@ -1,11 +1,19 @@
+import { AddOn } from "./AddOn";
+import { Gadget } from "./Gadget";
+import { onDemand, opposite } from "bp/global";
+import { Line, Point, Vector } from "bp/math";
+import { Draggable } from "bp/class";
+import { CornerType } from "bp/content/json";
+import type { JConnection, JCorner, JDevice } from "bp/content/json";
+import type { Region } from "./Region";
+import type { Partition } from "..";
+import type { ISerializable } from "bp/global";
+import type { IPoint } from "bp/math";
+import type { Pattern } from "./Pattern";
 
-interface JDevice<T extends JGadget = JGadget> {
-	gadgets: T[];
-	offset?: number;
-	addOns?: readonly JAddOn[];
-}
+export type GDevice = JDevice<Gadget>;
 
-type GDevice = JDevice<Gadget>;
+export type IntersectionMap = [Point, Point | null];
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -13,7 +21,7 @@ type GDevice = JDevice<Gadget>;
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Device extends Draggable implements ISerializable<JDevice> {
+@shrewd export class Device extends Draggable implements ISerializable<JDevice> {
 
 	public get $type(): string { return "Device"; }
 	public get $tag(): string { return this.$pattern.$tag + "." + this.$pattern.$devices.indexOf(this); }

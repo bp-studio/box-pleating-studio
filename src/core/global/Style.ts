@@ -6,7 +6,7 @@ type StyleDeclaration = Record<string, StyleValue>;
 // Style
 //////////////////////////////////////////////////////////////////
 
-namespace Style {
+export namespace Style {
 	export const $circle: StyleDeclaration = {
 		strokeWidth: 1,
 		strokeColor: "#69F",

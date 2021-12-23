@@ -1,3 +1,7 @@
+import { shrewdStatic } from "bp/global";
+import { SheetObject } from "bp/class";
+import { action } from "bp/design/history/action";
+import type { IQueryable, ITagObject } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -14,7 +18,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-abstract class Store<P, T extends SheetObject & IQueryable>
+export abstract class Store<P, T extends SheetObject & IQueryable>
 	extends SheetObject implements IQueryable {
 
 	public abstract get $tag(): string;

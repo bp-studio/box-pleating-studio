@@ -1,20 +1,20 @@
 
 type constructor<T extends object> = new (...args: unknown[]) => T;
 
-function isTypedArray<T extends object>(
+export function $isTypedArray<T extends object>(
 	array: unknown[], constructor: constructor<T>
 ): array is T[] {
 	return array.every(item => item instanceof constructor);
 }
 
-function sum(array: readonly number[]): number {
+export function sum(array: readonly number[]): number {
 	return array.reduce((n, x) => n + x, 0);
 }
 
 /* eslint-disable no-extend-native */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 if(typeof Array.prototype.flatMap == "undefined") {
+	// polyfill for Safari 11
 	Array.prototype.flatMap = function(callback: any, thisArg?: any): any {
 		thisArg ??= this;
 		let aggregate = (

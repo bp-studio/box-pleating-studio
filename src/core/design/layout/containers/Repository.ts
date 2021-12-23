@@ -1,3 +1,9 @@
+import { Configuration } from "./Configuration";
+import { Store } from "./Store";
+import { Configurator, Joiner } from "../calculation";
+import type { JConfiguration, JOverlap, JStretch, JStructure, Memento } from "bp/content/json";
+import type { ISerializable } from "bp/global";
+import type { Stretch } from "..";
 
 interface JRepository {
 	configurations: JConfiguration[];
@@ -13,7 +19,7 @@ interface JRepository {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Repository extends Store<Configuration, Configuration>
+@shrewd export class Repository extends Store<Configuration, Configuration>
 	implements ISerializable<JRepository> {
 
 	public get $tag(): string {

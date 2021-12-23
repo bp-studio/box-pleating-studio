@@ -1,3 +1,6 @@
+import { Mapping } from "bp/class";
+import type { Design } from "..";
+import type { Disposable, Func, IterableFactory } from "bp/class";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,7 +10,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class BaseContainer<K, V extends Disposable> extends Mapping<K, V> {
+export class BaseContainer<K, V extends Disposable> extends Mapping<K, V> {
 
 	protected readonly _design: Design;
 

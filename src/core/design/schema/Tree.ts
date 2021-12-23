@@ -1,3 +1,10 @@
+import { TreeNode } from "./TreeNode";
+import { TreeEdge } from "./TreeEdge";
+import { Disposable, DoubleMap } from "bp/class";
+import type { JEdge } from "bp/content/json";
+import type { TreeElement } from ".";
+import type { Design } from "..";
+import type { Action } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +12,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd class Tree extends Disposable {
+@shrewd export class Tree extends Disposable {
 
 	public static readonly $MIN_NODES = 3;
 	public readonly $design: Design;
@@ -30,7 +37,7 @@
 	}
 
 	protected $onDispose(): void {
-		Shrewd.terminate(this.$edge);
+		terminate(this.$edge);
 		super.$onDispose();
 	}
 
@@ -178,7 +185,7 @@
 		return N;
 	}
 
-	public static $deleteAndJoin(n: TreeNode): TreeEdge | undefined {
+	public $deleteAndJoin(n: TreeNode): TreeEdge | undefined {
 		let edges = n.edges;
 		if(edges.length != 2) {
 			console.warn(`Incorrectly calling delete-and-join at [${n.id}].`);
@@ -189,11 +196,10 @@
 		if(n.$parent == n2) [n1, n2] = [n2, n1];
 
 		n2.parentId = n1.id;
-		let edge = n1.$tree._createEdge(n1, n2, e1.length + e2.length);
-		let tree = n1.$tree;
-		tree.$remove(e1);
-		tree.$remove(e2);
-		tree.$remove(n);
+		let edge = this._createEdge(n1, n2, e1.length + e2.length);
+		this.$remove(e1);
+		this.$remove(e2);
+		this.$remove(n);
 		return edge;
 	}
 

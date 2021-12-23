@@ -1,3 +1,11 @@
+import { JoinCandidate } from "./JoinCandidate";
+import { Point, Vector } from "bp/math";
+import { opposite } from "bp/global";
+import type { Joiner } from "./Joiner";
+import type { IPoint, Sign } from "bp/math";
+import type { Piece } from "bp/design";
+import type { QuadrantDirection } from "bp/global";
+import type { JAnchor } from "bp/content/json";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -5,7 +13,7 @@
  */
 //////////////////////////////////////////////////////////////////
 
-class JoinCandidateBuilder {
+export class JoinCandidateBuilder {
 
 	public a: JAnchor[] = [];
 	private offset: IPoint = { x: 0, y: 0 };

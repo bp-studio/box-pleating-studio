@@ -1,5 +1,6 @@
-
-type Memento = [string, object];
+import type { JDesign } from "bp/content/json";
+import type { ITagObject } from "./history";
+import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -7,7 +8,7 @@ type Memento = [string, object];
  */
 //////////////////////////////////////////////////////////////////
 
-class OptionManager {
+export class OptionManager {
 
 	/**
 	 * 當專案載入進來的時候暫存個別元件屬性的 {@link Map}，
