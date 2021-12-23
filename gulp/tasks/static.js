@@ -95,6 +95,9 @@ const copyLib = () => gulp.src([
 		if(file.extname != ".js") return true;
 		return !fs.existsSync(file.path.replace(/js$/, "min.js"));
 	}))
+	.pipe(gulpIf(file => file.extname == ".js",
+		replace(/\s+\/\/# sourceMappingURL=.+?$/ms, '') // 刪除 sourcemap
+	))
 	.pipe(newer(libDest)) // 採用 1:1 比對目標的策略
 	.pipe(gulp.dest(libDest));
 
