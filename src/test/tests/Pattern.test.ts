@@ -1,4 +1,4 @@
-import * as file from "../samples/PatternTest.json";
+import * as file from "../samples/Pattern.test.json";
 import { expect } from "chai";
 import { MockStudio } from "mock/MockStudio";
 import { Stretch } from "bp/design/layout/Stretch";
