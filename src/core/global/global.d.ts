@@ -1,5 +1,6 @@
 /// <reference path="vendor/shrewd.d.ts" />
 
+declare const Shrewd: typeof Shrewd;
 declare const shrewd: typeof Shrewd.shrewd;
 declare const terminate: typeof Shrewd.terminate;
 

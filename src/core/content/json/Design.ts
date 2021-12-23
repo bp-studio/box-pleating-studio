@@ -40,7 +40,7 @@ export interface JDesign {
 
 export type DesignMode = "layout" | "tree";
 
-interface JLayout {
+export interface JLayout {
 	sheet: JSheet,
 	flaps: JFlap[],
 	stretches: JStretch[]

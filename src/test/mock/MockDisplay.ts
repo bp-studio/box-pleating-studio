@@ -1,5 +1,6 @@
+import { DisplaySetting, IDisplay } from "bp/env";
 
-class MockDisplay implements IDisplay {
+export class MockDisplay implements IDisplay {
 
 	public $zoom(v: number): void {
 		// 不作任何動作
@@ -16,4 +17,8 @@ class MockDisplay implements IDisplay {
 		showDot: true,
 		includeHiddenElement: false,
 	};
+
+	public $render(): void {
+		// 不作任何動作
+	}
 }

@@ -27,7 +27,7 @@ export class Updater extends Animator {
 		this.$updating = true;
 
 		if(DEBUG_ENABLED && Settings.diagnose) Diagnose.init();
-		window.Shrewd.commit();
+		Shrewd.commit();
 		if(DEBUG_ENABLED && Settings.diagnose) Diagnose.flush();
 
 		let design = this._studio.$design;

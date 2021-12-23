@@ -1,6 +1,25 @@
 {
+    "plugins": [
+        "import"
+    ],
     "rules": {
+        "@typescript-eslint/no-magic-numbers": "off",
+        "import/order": [
+            "warn",
+            {
+                "groups": [
+                    "index",
+                    "sibling",
+                    "parent",
+                    "internal",
+                    "external",
+                    "builtin",
+                    "object",
+                    "type"
+                ]
+            }
+        ],
         "max-lines-per-function": "off",
-		"@typescript-eslint/no-magic-numbers": "off"
+        "sort-imports": "off"
     }
 }

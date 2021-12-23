@@ -36,19 +36,6 @@
 				"kind": "build",
 				"isDefault": true
 			}
-		},
-		{
-			"label": "Gulp buildTest",
-			"type": "gulp",
-			"task": "buildTest",
-			"presentation": {
-				"echo": true,
-				"reveal": "never",
-				"revealProblems": "onProblem",
-				"focus": false,
-				"panel": "dedicated",
-				"showReuseMessage": true
-			}
 		}
 	]
 }

@@ -1,5 +1,7 @@
+import { Mountable } from "bp/class";
+import { IViewManager, View } from "bp/view";
 
-class MockViewManager implements IViewManager {
+export class MockViewManager implements IViewManager {
 	$contains(target: Mountable, point: paper.Point): boolean {
 		return false;
 	}

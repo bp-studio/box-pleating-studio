@@ -56,7 +56,7 @@ import type { Studio } from "..";
 		let oldSel = this.$draggable.concat();
 		this.$process(event);
 		let newSel = this.$draggable.concat();
-		return window.Shrewd.comparer.unorderedArray(oldSel, newSel);
+		return Shrewd.comparer.unorderedArray(oldSel, newSel);
 	}
 
 	public $process(event: paper.ToolEvent, ctrlKey?: boolean): void {

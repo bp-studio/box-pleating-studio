@@ -13,15 +13,6 @@
 			"file": "${workspaceFolder}/build/debug/index.htm",
 			"sourceMaps": true,
 			"runtimeArgs": ["--allow-file-access-from-files"]
-		},
-		{
-			"type": "pwa-node",
-			"request": "launch",
-			"name": "Launch Test",
-			"preLaunchTask": "Gulp buildTest",
-			"console": "integratedTerminal",
-			"program": "${workspaceFolder}/build/test/test.js",
-			"sourceMaps": true,
 		}
 	]
 }

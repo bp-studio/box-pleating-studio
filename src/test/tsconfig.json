@@ -2,17 +2,32 @@
 	"compileOnSave": true,
 	"compilerOptions": {
 		"target": "es2019",
-		"module": "amd",
 		"removeComments": true,
 		"strictNullChecks": true,
 		"noImplicitReturns": true,
 		"noImplicitAny": true,
 		"preserveConstEnums": true,
-		"outFile": "test.js",
 		"skipLibCheck": true,
-		"experimentalDecorators": true
+		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"preserveSymlinks": true,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"types": [
+			"mocha"
+		],
+		"baseUrl": ".",
+		"paths": {
+			"bp/*": [
+				"../core/*"
+			]
+		},
 	},
 	"include": [
 		"./**/*.ts",
-	]
+		"../core/**/*.d.ts"
+	],
+	"ts-node": {
+		"files": true
+	}
 }

@@ -1,5 +1,5 @@
 import { Diagnose } from "../Diagnose";
-import * as Settings from "../Import";
+import * as Settings from "../Settings";
 import { PolyBool } from "bp/math";
 import type { Path } from "bp/math";
 
@@ -14,7 +14,7 @@ export function orderedArray(...p: [object, string | symbol] | [string?]): Prope
 	let option: Shrewd.IDecoratorOptions<unknown> = {
 		comparer: (ov: unknown[], nv: unknown[], member) => {
 			if(ov === nv) return true;
-			let result = window.Shrewd.comparer.array(ov, nv);
+			let result = Shrewd.comparer.array(ov, nv);
 			if(Settings.diagnose && result && msg) {
 				// if(msg=="sheet.independents") {
 				// 	Shrewd.debug.trigger(member);
@@ -37,7 +37,7 @@ export function unorderedArray(...p: [object, string | symbol] | [string?]): Pro
 	let option: Shrewd.IDecoratorOptions<unknown> = {
 		comparer: (ov: unknown[], nv: unknown[], member) => {
 			if(ov === nv) return true;
-			let result = window.Shrewd.comparer.unorderedArray(ov, nv);
+			let result = Shrewd.comparer.unorderedArray(ov, nv);
 			if(Settings.diagnose && result && msg) {
 				// if(msg=="sheet.independents") {
 				// 	Shrewd.debug.trigger(member);
