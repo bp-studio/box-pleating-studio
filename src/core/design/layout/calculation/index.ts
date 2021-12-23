@@ -8,6 +8,4 @@ export * from "./join/JoinCandidate";
 export * from "./join/JoinCandidateBuilder";
 export * from "./join/Joiner";
 export * from "./join/JoinerCore";
-
-// Level 1
 export * from "./Partition";

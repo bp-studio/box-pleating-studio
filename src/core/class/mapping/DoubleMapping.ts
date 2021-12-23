@@ -14,7 +14,6 @@ import type { Disposable, IDisposable } from "..";
  */
 //////////////////////////////////////////////////////////////////
 
-
 @shrewd export class DoubleMapping<K extends Disposable, V extends Disposable>
 	implements IDisposable, ReadonlyDoubleMap<K, V> {
 

@@ -1,5 +1,5 @@
 import { CursorController } from "./CursorController";
-import { $isTouch } from "./Share";
+import { $isTouch, $MIDDLE } from "./Share";
 import type { Studio } from "..";
 
 //////////////////////////////////////////////////////////////////
@@ -88,8 +88,10 @@ export class ScrollController {
 	}
 
 	private _bodyMouseup(event: MouseEvent | TouchEvent): void {
-		if($isTouch(event) && event.touches.length == 0) {
-			// paper.js 的奇怪設計使得多點觸控的第二點放開必須獨立攔截
+		if(
+			$isTouch(event) && event.touches.length == 0 || // paper.js 的奇怪設計使得多點觸控的第二點放開必須獨立攔截
+			event instanceof MouseEvent && event.button == $MIDDLE // 新增滑鼠中鍵拖曳支援
+		) {
 			this._scrolling = false;
 		}
 	}

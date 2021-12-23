@@ -1,5 +1,5 @@
 import { action } from "./history/action";
-import { EdgeContainer, FlapContainer, JunctionContainer, RiverContainer, StretchContainer, VertexContainer } from "./containers";
+import * as CT from "./containers";
 import { Sheet } from "./components";
 import { Tree } from "./schema";
 import { OptionManager } from "./OptionManager";
@@ -83,7 +83,7 @@ export interface IDesignObject {
 		this.$tree = new Tree(this, data.tree.edges);
 
 		// Junctions 相依於 Tree
-		this.$junctions = new JunctionContainer(this);
+		this.$junctions = new CT.JunctionContainer(this);
 	}
 
 	public readonly $tag = "design";
@@ -114,12 +114,12 @@ export interface IDesignObject {
 		return (this.$mountTarget as Studio).$design == this;
 	}
 
-	public readonly $vertices = new VertexContainer(this);
-	public readonly $edges = new EdgeContainer(this);
-	public readonly $rivers = new RiverContainer(this);
-	public readonly $flaps = new FlapContainer(this);
-	public readonly $stretches = new StretchContainer(this);
-	public readonly $junctions: JunctionContainer;
+	public readonly $vertices = new CT.VertexContainer(this);
+	public readonly $edges = new CT.EdgeContainer(this);
+	public readonly $rivers = new CT.RiverContainer(this);
+	public readonly $flaps = new CT.FlapContainer(this);
+	public readonly $stretches = new CT.StretchContainer(this);
+	public readonly $junctions: CT.JunctionContainer;
 
 	/** @exports */
 	@shrewdStatic public get sheet(): Sheet {

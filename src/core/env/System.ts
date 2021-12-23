@@ -1,4 +1,4 @@
-import { $isTouch, CursorController, DragController, KeyboardController, LongPressController, ScrollController, SelectionController, ZoomController } from "./controllers";
+import * as CT from "./controllers";
 import { Flap, River, Vertex } from "bp/design";
 import { ArrayUtil } from "bp/util";
 import type { Studio } from "./Studio";
@@ -13,11 +13,11 @@ export class System {
 
 	private _studio: Studio;
 
-	public readonly $selection: SelectionController;
-	public readonly $drag: DragController;
-	public readonly $scroll: ScrollController;
-	public readonly $zoom: ZoomController;
-	private readonly _longPress: LongPressController;
+	public readonly $selection: CT.SelectionController;
+	public readonly $drag: CT.DragController;
+	public readonly $scroll: CT.ScrollController;
+	public readonly $zoom: CT.ZoomController;
+	private readonly _longPress: CT.LongPressController;
 
 	constructor(studio: Studio) {
 		this._studio = studio;
@@ -32,12 +32,12 @@ export class System {
 
 		canvas.addEventListener("touchstart", this._canvasTouch.bind(this), { passive: true });
 
-		this._longPress = new LongPressController(() => this._studio.$option.onLongPress?.());
-		this.$zoom = new ZoomController(studio, canvas);
-		this.$scroll = new ScrollController(studio);
-		this.$selection = new SelectionController(studio);
-		this.$drag = new DragController(studio);
-		KeyboardController.$init();
+		this._longPress = new CT.LongPressController(() => this._studio.$option.onLongPress?.());
+		this.$zoom = new CT.ZoomController(studio, canvas);
+		this.$scroll = new CT.ScrollController(studio);
+		this.$selection = new CT.SelectionController(studio);
+		this.$drag = new CT.DragController(studio);
+		CT.KeyboardController.$init();
 	}
 
 	private get _canvas(): HTMLCanvasElement { return this._studio.$paper.view.element; }
@@ -73,19 +73,22 @@ export class System {
 		let el = document.activeElement;
 		if(el instanceof HTMLElement) el.blur();
 
-		// 執行捲動，支援空白鍵捲動和右鍵捲動兩種操作方法
-		let space = KeyboardController.$isPressed("space");
-		if(event.event instanceof MouseEvent && (space || event.event.button == 2)) {
-			console.log(event.point.round().toString());
-			this._longPress.$cancel();
-			this.$scroll.$init();
-			CursorController.$tryUpdate(event.event);
-			return;
+		// 執行捲動，支援空白鍵捲動、中鍵和右鍵捲動三種操作方法
+		let space = CT.KeyboardController.$isPressed("space");
+		if(event.event instanceof MouseEvent) {
+			let bt = event.event.button;
+			if(space || bt == CT.$RIGHT || bt == CT.$MIDDLE) {
+				console.log(event.point.round().toString());
+				this._longPress.$cancel();
+				this.$scroll.$init();
+				CT.CursorController.$tryUpdate(event.event);
+				return;
+			}
 		}
 
 		if(!System._isSelectEvent(ev) || this.$scroll.on) return;
 
-		if($isTouch(ev)) this._canvasTouchDown(event);
+		if(CT.$isTouch(ev)) this._canvasTouchDown(event);
 		else this._canvasMouseDown(event);
 	}
 
@@ -142,14 +145,14 @@ export class System {
 			this._longPress.$cancel();
 			this.$scroll.$init();
 			this.$zoom.$init(event);
-			CursorController.$tryUpdate(event);
+			CT.CursorController.$tryUpdate(event);
 		}
 	}
 
 	/** 檢查事件是否符合「選取」的前提（單點觸控或者滑鼠左鍵操作） */
 	private static _isSelectEvent(event: MouseEvent | TouchEvent): boolean {
-		if($isTouch(event) && event.touches.length > 1) return false;
-		if(event instanceof MouseEvent && event.button != 0) return false;
+		if(CT.$isTouch(event) && event.touches.length > 1) return false;
+		if(event instanceof MouseEvent && event.button != CT.$LEFT) return false;
 		return true;
 	}
 }

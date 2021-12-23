@@ -15,3 +15,7 @@ export function $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
 export function $isTouch(event: Event): event is TouchEvent {
 	return TOUCH_SUPPORT && event instanceof TouchEvent;
 }
+
+export const $LEFT = 0;
+export const $MIDDLE = 1;
+export const $RIGHT = 2;

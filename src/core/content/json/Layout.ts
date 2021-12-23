@@ -31,7 +31,7 @@ export interface JOverlap extends JQuadrilateral {
 
 //////////////////////////////////////////////////////////////////
 /**
- * {@link JCorner} 是 {@link JRectangle} 的一個象限角。
+ * {@link JCorner} 是 {@link JQuadrilateral} 的一個象限角。
  *
  * 它同時負責描述這個角落的自身狀態以及連接對象；它繼承了 {@link Partial}<{@link JConnection}> 介面，
  * 如果其 e, q 為 undefined 表示它沒有連出。
