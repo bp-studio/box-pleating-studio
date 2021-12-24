@@ -47,7 +47,7 @@ export class JoinCandidate {
 	}
 
 	public $toGadget(json?: boolean, offset?: IPoint): JGadget {
-		let off: IPoint|undefined = clone(this.o);
+		let off: IPoint | undefined = clone(this.o);
 		if(offset) {
 			off.x += offset.x; off.y += offset.y;
 		}

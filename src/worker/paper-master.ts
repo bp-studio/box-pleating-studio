@@ -1,6 +1,4 @@
 
-/// <reference path="../core/global/vendor/paper.d.ts" />
-
 const DEFAULT_CPU = 4;
 
 if(typeof Worker == "undefined") {

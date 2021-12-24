@@ -6,10 +6,10 @@
 		"skipLibCheck": true,
 		"allowJs": true,
 		"outDir": "../../dist",
-		"baseUrl": "../../node_modules/"
+		"baseUrl": "../../node_modules/",
+		"types": ["paper"]
 	},
 	"include": [
-		"./**/*.ts",
-		"./**/*.js"
+		"./**/*.ts"
 	]
 }
