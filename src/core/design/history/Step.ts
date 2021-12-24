@@ -4,8 +4,6 @@ import { Control } from "bp/design/class";
 import type { Command } from "./commands";
 import type { Design } from "..";
 import type { DesignMode, JStep, Memento } from "bp/content/json";
-import type { ISerializable } from "bp/global";
-
 
 //////////////////////////////////////////////////////////////////
 /**

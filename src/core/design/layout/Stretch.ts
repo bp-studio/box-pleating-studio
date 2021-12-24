@@ -5,7 +5,6 @@ import { Control } from "bp/design/class";
 import type { JStretch } from "bp/content/json";
 import type { Sign } from "bp/math";
 import type { Device, Flap, Pattern, Sheet } from "..";
-import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**

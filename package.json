@@ -85,7 +85,7 @@
 		"lzma": "^2.3.2",
 		"marked": "^2.0.3",
 		"paper": "^0.12.15",
-		"shrewd": "0.0.13",
+		"shrewd": "0.0.14",
 		"sortable": "^2.0.0",
 		"vue-clipboard": "^0.0.1",
 		"vue-i18n": "^8.26.7",

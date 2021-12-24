@@ -1,5 +1,4 @@
 import type { IDisposable } from "..";
-import type { ISerializable } from "bp/global";
 
 type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
 

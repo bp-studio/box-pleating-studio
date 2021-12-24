@@ -9,7 +9,7 @@ import { CornerType } from "bp/content/json";
 import type { JConnection, JCorner, JPattern } from "bp/content/json";
 import type { IQueryable, ITagObject } from "bp/design";
 import type { Point, Vector } from "bp/math";
-import type { ISerializable, PerQuadrant, QuadrantDirection } from "bp/global";
+import type { PerQuadrant, QuadrantDirection } from "bp/global";
 import type { Configuration, Stretch } from "..";
 
 export type GPattern = JPattern<Gadget>;

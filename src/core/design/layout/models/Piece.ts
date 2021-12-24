@@ -4,7 +4,6 @@ import { nonEnumerable, onDemand, onDemandMap } from "bp/global";
 import { clone, deepCopy } from "bp/util";
 import type { JPiece } from "bp/content/json";
 import type { IPoint } from "bp/math";
-import type { ISerializable } from "bp/global";
 import type { IRegionShape } from "./Region";
 
 //////////////////////////////////////////////////////////////////

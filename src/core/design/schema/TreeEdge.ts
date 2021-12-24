@@ -6,7 +6,6 @@ import type { JEdge } from "bp/content/json";
 import type { Tree } from "./Tree";
 import type { TreeNode } from "./TreeNode";
 import type { Design, ITagObject } from "..";
-import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**

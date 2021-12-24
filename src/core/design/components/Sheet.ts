@@ -8,7 +8,6 @@ import type { JSheet } from "bp/content/json";
 import type { Design, ITagObject } from "..";
 import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
-import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**

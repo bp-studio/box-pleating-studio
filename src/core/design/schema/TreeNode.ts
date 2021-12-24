@@ -3,7 +3,6 @@ import { shrewdStatic } from "bp/global";
 import { Disposable } from "bp/class";
 import type { JNode } from "bp/content/json";
 import type { Tree } from "./Tree";
-import type { ISerializable } from "bp/global";
 import type { Design, ITagObject } from "..";
 import type { TreeEdge } from "./TreeEdge";
 

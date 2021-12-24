@@ -9,7 +9,6 @@ import type { IPoint } from "bp/math";
 import type { JJunction, JDevice, JGadget, JOverlap, JPattern, JConfiguration } from "bp/content/json";
 import type { GDevice, GPattern } from "..";
 import type { Repository } from "./Repository";
-import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**

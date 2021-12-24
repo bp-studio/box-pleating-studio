@@ -7,7 +7,6 @@ import { CornerType } from "bp/content/json";
 import type { JConnection, JCorner, JDevice } from "bp/content/json";
 import type { Region } from "./Region";
 import type { Partition } from "..";
-import type { ISerializable } from "bp/global";
 import type { IPoint } from "bp/math";
 import type { Pattern } from "./Pattern";
 

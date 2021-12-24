@@ -4,7 +4,7 @@ import { clone } from "bp/util";
 import { CornerType } from "bp/content/json";
 import type { JConnection, JJunction, JCorner, JOverlap, JPartition } from "bp/content/json";
 import type { Configuration, Pattern } from "..";
-import type { ISerializable, QuadrantDirection } from "bp/global";
+import type { QuadrantDirection } from "bp/global";
 import type { Point, Vector } from "bp/math";
 
 /**

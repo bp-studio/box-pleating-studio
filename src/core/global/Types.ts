@@ -31,14 +31,3 @@ export function isQuadrant(direction: Direction): direction is QuadrantDirection
 export function opposite(direction: QuadrantDirection): QuadrantDirection {
 	return (direction + 2) % quadrantNumber;
 }
-
-//////////////////////////////////////////////////////////////////
-// interfaces
-//////////////////////////////////////////////////////////////////
-
-/**
- * {@link ISerializable} 表示一個可以具有 {@link ISerializable.toJSON toJSON()} 方法、可以輸出對應類別的 JSON 物件的類別
- */
-export interface ISerializable<T> {
-	toJSON(): T;
-}

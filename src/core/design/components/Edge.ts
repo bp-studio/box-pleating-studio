@@ -4,7 +4,6 @@ import type { Sheet } from "./Sheet";
 import type { Vertex } from "./Vertex";
 import type { TreeEdge, TreeNode } from "bp/design/schema";
 import type { JEdge } from "bp/content/json";
-import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**

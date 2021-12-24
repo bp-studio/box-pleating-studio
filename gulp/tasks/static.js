@@ -83,8 +83,9 @@ const copyStatic = () => gulp.src([
 const copyLib = () => gulp.src([
 	'**/*',
 
-	// 不包含註解檔案
+	// 不包含下列檔案
 	'!**/README.md',
+	'!**/*.ts',
 
 	// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
 	'!**/*.css',

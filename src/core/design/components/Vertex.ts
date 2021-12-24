@@ -5,7 +5,6 @@ import type { Sheet } from "./Sheet";
 import type { TreeNode } from "..";
 import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
-import type { ISerializable } from "bp/global";
 
 //////////////////////////////////////////////////////////////////
 /**

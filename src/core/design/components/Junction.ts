@@ -4,7 +4,6 @@ import { CornerType } from "bp/content/json";
 import type { JJunction } from "bp/content/json";
 import type { Flap, Quadrant, Sheet } from ".";
 import type { TreeNode } from "bp/design/schema";
-import type { ISerializable } from "bp/global";
 import type { Rectangle, Sign } from "bp/math";
 
 /** {@link Junction} 的重疊狀態 */

@@ -8,7 +8,6 @@ import { ArrayUtil, deepCopy } from "bp/util";
 import { Mountable } from "bp/class";
 import { Migration } from "bp/content/update";
 import type { Control } from "./class";
-import type { ISerializable } from "bp/global";
 import type { IStudio, Studio } from "bp/env";
 import type { DesignMode, JDesign } from "bp/content/json";
 import type { HistoryManager, IQueryable, ITagObject } from "./history";

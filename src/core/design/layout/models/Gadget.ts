@@ -4,7 +4,7 @@ import { Fraction, Line, PathUtil, Point, Vector } from "bp/math";
 import { makePerQuadrant, onDemand } from "bp/global";
 import { clone } from "bp/util";
 import type { JAnchor, JGadget } from "bp/content/json";
-import type { ISerializable, PerQuadrant, QuadrantDirection } from "bp/global";
+import type { PerQuadrant, QuadrantDirection } from "bp/global";
 import type { IPoint, Path } from "bp/math";
 
 

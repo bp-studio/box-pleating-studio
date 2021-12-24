@@ -2,7 +2,6 @@ import { Configuration } from "./Configuration";
 import { Store } from "./Store";
 import { Configurator, Joiner } from "../calculation";
 import type { JConfiguration, JOverlap, JStretch, JStructure, Memento } from "bp/content/json";
-import type { ISerializable } from "bp/global";
 import type { Stretch } from "..";
 
 interface JRepository {
