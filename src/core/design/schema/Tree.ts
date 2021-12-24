@@ -3,7 +3,6 @@ import { TreeEdge } from "./TreeEdge";
 import { Disposable, DoubleMap } from "bp/class";
 import type { JEdge } from "bp/content/json";
 import type { Design } from "..";
-import type { Action } from "bp/global";
 
 export type TreeElement = TreeNode | TreeEdge;
 

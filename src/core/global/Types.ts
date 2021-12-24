@@ -1,25 +1,12 @@
 import type { Direction } from "./Enums";
 
 //////////////////////////////////////////////////////////////////
-// Types
-//////////////////////////////////////////////////////////////////
-
-export type Action<T = void> = () => T;
-
-export type PseudoValue<T> =
-	T extends (infer U)[] ? PseudoValue<U>[] :
-	T extends object ? Pseudo<T> : T;
-export type OtherKeys<T, V> = Record<Exclude<string, keyof T>, V>;
-export type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
-export type Pseudo<T> = (T | PartialPseudo<T>) & OtherKeys<T, unknown>;
-
-//////////////////////////////////////////////////////////////////
 // QuadrantDirection
 //////////////////////////////////////////////////////////////////
 
 export type QuadrantDirection = Direction.UL | Direction.UR | Direction.LL | Direction.LR;
 
-export type PerQuadrantBase<T> = readonly [T, T, T, T];
+type PerQuadrantBase<T> = readonly [T, T, T, T];
 
 /** 一個索引只能是 {@link QuadrantDirection} 的唯讀陣列，可以配合 {@link makePerQuadrant} 產生之 */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

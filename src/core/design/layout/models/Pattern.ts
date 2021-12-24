@@ -3,7 +3,7 @@ import { Gadget } from "./Gadget";
 import { makePerQuadrant } from "bp/global";
 import { Fraction, Line } from "bp/math";
 import { Quadrant } from "bp/design/components";
-import { SheetObject } from "bp/class";
+import { SheetObject } from "bp/design/class";
 import { clone } from "bp/util";
 import { CornerType } from "bp/content/json";
 import type { JConnection, JCorner, JPattern } from "bp/content/json";

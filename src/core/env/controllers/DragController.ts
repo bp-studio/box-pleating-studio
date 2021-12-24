@@ -2,7 +2,7 @@ import { CursorController } from "./CursorController";
 import { Fraction, Point, Vector } from "bp/math";
 import { Device } from "bp/design";
 import type { Studio } from "..";
-import type { Draggable } from "bp/class";
+import type { Draggable } from "bp/design/class";
 
 //////////////////////////////////////////////////////////////////
 /**

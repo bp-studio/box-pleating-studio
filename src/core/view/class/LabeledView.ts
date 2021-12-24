@@ -2,7 +2,7 @@ import { View } from "./View";
 import { ControlView } from "./ControlView";
 import { LabelUtil } from "../util/LabelUtil";
 import { Layer, Style } from "bp/global";
-import type { Control } from "bp/class";
+import type { Control } from "bp/design/class";
 import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////

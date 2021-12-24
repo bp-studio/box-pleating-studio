@@ -1,5 +1,5 @@
 import { Command } from "./Command";
-import { Draggable } from "bp/class";
+import { Draggable } from "bp/design/class";
 import { clone } from "bp/util";
 import { CommandType } from "bp/content/json";
 import type { JCommand } from "bp/content/json";

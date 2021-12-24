@@ -1,5 +1,5 @@
 import { View } from "./View";
-import type { Control } from "bp/class";
+import type { Control } from "bp/design/class";
 
 //////////////////////////////////////////////////////////////////
 /**

@@ -7,7 +7,7 @@ import { DeviceView } from "./DeviceView";
 import { SheetView } from "./SheetView";
 import { Device, Edge, Flap, Junction, River, Sheet, Vertex } from "bp/design";
 import type { Mountable } from "bp/class";
-import type { View } from "./classes/View";
+import type { View } from "./class/View";
 
 //////////////////////////////////////////////////////////////////
 /**

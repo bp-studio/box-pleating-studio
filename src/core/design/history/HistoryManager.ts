@@ -10,7 +10,7 @@ import type { Command } from "./commands/Command";
 import type { Design, TreeElement } from "..";
 import type { IPoint } from "bp/math";
 import type { ISerializable } from "bp/global";
-import type { Control, Draggable } from "bp/class";
+import type { Control, Draggable } from "bp/design/class";
 
 //////////////////////////////////////////////////////////////////
 /**

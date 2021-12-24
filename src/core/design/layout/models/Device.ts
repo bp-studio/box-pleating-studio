@@ -2,7 +2,7 @@ import { AddOn } from "./AddOn";
 import { Gadget } from "./Gadget";
 import { onDemand, opposite } from "bp/global";
 import { Line, Point, Vector } from "bp/math";
-import { Draggable } from "bp/class";
+import { Draggable } from "bp/design/class";
 import { CornerType } from "bp/content/json";
 import type { JConnection, JCorner, JDevice } from "bp/content/json";
 import type { Region } from "./Region";

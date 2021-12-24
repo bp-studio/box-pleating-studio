@@ -1,5 +1,4 @@
 import { CornerType } from "bp/content/json";
-import type { Pseudo } from "bp/global";
 import type { JConfiguration, JCorner, JDesign, JGadget, JOverlap, JPartition, JPattern, JStretch, Strategy } from "bp/content/json";
 
 /** rc1 版本中在資料結構上插入了 {@link Partition} 和 {@link Device} 的層次 */

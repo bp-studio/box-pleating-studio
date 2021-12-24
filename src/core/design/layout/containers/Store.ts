@@ -1,5 +1,5 @@
 import { shrewdStatic } from "bp/global";
-import { SheetObject } from "bp/class";
+import { SheetObject } from "bp/design/class";
 import { action } from "bp/design/history/action";
 import type { IQueryable, ITagObject } from "bp/design";
 

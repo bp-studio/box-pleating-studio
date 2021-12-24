@@ -1,11 +1,10 @@
 import { ArrayUtil } from "bp/util";
-import { Control } from "bp/class";
+import { Control } from "bp/design/class";
 import { Design, Device, Edge, Flap, River, Stretch, Vertex } from "bp/design";
 import { Studio } from "bp/env";
 import { MathUtil } from "bp/math";
 import { TreeMaker } from "bp/plugin";
 import { Settings } from "bp/global";
-import type { Pseudo } from "bp/global";
 import type { DisplaySetting, StudioOptions } from "bp/env";
 import type { HistoryManager, Repository } from "bp/design";
 import type { JDesign } from "bp/content/json";

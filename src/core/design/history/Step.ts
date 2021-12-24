@@ -1,6 +1,6 @@
 import { $resolve } from "./commands";
 import { nonEnumerable } from "bp/global";
-import { Control } from "bp/class";
+import { Control } from "bp/design/class";
 import type { Command } from "./commands";
 import type { Design } from "..";
 import type { DesignMode, JStep, Memento } from "bp/content/json";

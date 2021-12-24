@@ -1,8 +1,4 @@
 
-export type RecursivePartial<T> = {
-	[P in keyof T]?: RecursivePartial<T[P]>;
-} | undefined;
-
 /**
  * 深層複製物件的巢狀內容；所有深度的物件都會被建立副本，不會複製參照。
  */

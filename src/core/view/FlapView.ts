@@ -1,6 +1,6 @@
 import { PaperUtil } from "./util/PaperUtil";
 import { RiverHelperBase } from "./helper";
-import { LabeledView } from "./classes";
+import { LabeledView } from "./class";
 import { Layer, Style, makePerQuadrant, shrewdStatic } from "bp/global";
 import type { IPoint, PolyBool } from "bp/math";
 import type { PerQuadrant } from "bp/global";

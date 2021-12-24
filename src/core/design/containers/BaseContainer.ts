@@ -1,6 +1,6 @@
 import { Mapping } from "bp/class";
 import type { Design } from "..";
-import type { Disposable, Func, IterableFactory } from "bp/class";
+import type { Disposable } from "bp/class";
 
 //////////////////////////////////////////////////////////////////
 /**

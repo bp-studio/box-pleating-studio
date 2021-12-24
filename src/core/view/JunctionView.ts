@@ -1,4 +1,4 @@
-import { View } from "./classes";
+import { View } from "./class";
 import { JunctionStatus } from "bp/design";
 import { Layer, Style } from "bp/global";
 import { PaperWorker } from "bp/env/animation/PaperWorker";

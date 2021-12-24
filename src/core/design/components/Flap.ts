@@ -1,13 +1,13 @@
 import { Quadrant } from "./Quadrant";
-import { action } from "../history/action";
-import { Draggable, IndependentDraggable } from "bp/class";
+import { action } from "bp/design/history/action";
+import { Draggable, IndependentDraggable } from "bp/design/class";
 import { Point } from "bp/math";
 import { makePerQuadrant, noCompare, shrewdStatic, unorderedArray } from "bp/global";
 import type { Junction } from "./Junction";
 import type { Sheet } from "./Sheet";
-import type { TreeNode } from "..";
+import type { TreeNode } from "bp/design/schema";
 import type { Memento, JFlap } from "bp/content/json";
-import type { Control } from "bp/class";
+import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
 import type { ISerializable, PerQuadrant } from "bp/global";
 

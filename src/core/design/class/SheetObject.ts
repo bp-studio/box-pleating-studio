@@ -1,4 +1,4 @@
-import { Mountable } from "./Mountable";
+import { Mountable } from "bp/class";
 import type { Design, IDesignObject, Sheet } from "bp/design";
 
 //////////////////////////////////////////////////////////////////

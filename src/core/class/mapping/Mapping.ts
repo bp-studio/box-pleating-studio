@@ -1,5 +1,4 @@
 import { BaseMapping } from "./BaseMapping";
-import type { Func, IterableFactory } from "./BaseMapping";
 import type { Disposable } from "..";
 
 //////////////////////////////////////////////////////////////////

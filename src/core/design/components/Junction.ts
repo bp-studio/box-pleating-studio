@@ -1,9 +1,9 @@
 import { Direction, isQuadrant, opposite, orderedArray, shrewdStatic } from "bp/global";
-import { SheetObject } from "bp/class";
+import { SheetObject } from "bp/design/class";
 import { CornerType } from "bp/content/json";
 import type { JJunction } from "bp/content/json";
 import type { Flap, Quadrant, Sheet } from ".";
-import type { TreeNode } from "..";
+import type { TreeNode } from "bp/design/schema";
 import type { ISerializable } from "bp/global";
 import type { Rectangle, Sign } from "bp/math";
 

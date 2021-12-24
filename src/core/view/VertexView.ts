@@ -1,4 +1,4 @@
-import { LabeledView } from "./classes";
+import { LabeledView } from "./class";
 import { Layer, Style, shrewdStatic } from "bp/global";
 import type { EdgeView } from "./EdgeView";
 import type { IPoint } from "bp/math";

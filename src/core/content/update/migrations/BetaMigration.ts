@@ -1,5 +1,4 @@
 import type { JDesign, JLayout } from "bp/content/json";
-import type { Pseudo } from "bp/global";
 
 /**
  * beta 版把原本的 cp 模式改名為 layout 模式，以預留 cp 模式給未來使用，

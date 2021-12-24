@@ -1,4 +1,4 @@
-import { View } from "./classes";
+import { View } from "./class";
 import { Layer, Style } from "bp/global";
 import type { Studio } from "bp/env";
 

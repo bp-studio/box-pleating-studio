@@ -1,4 +1,4 @@
-import { Control } from "bp/class";
+import { Control } from "bp/design/class";
 import type { Sheet } from "./Sheet";
 import type { TreeEdge } from "..";
 

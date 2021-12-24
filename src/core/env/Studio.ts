@@ -6,8 +6,6 @@ import { HistoryManager } from "bp/design";
 import { ViewManager } from "bp/view";
 import type { Design } from "bp/design";
 import type { JDesign } from "bp/content/json";
-import type { Action } from "bp/global";
-import type { RecursivePartial } from "bp/util";
 import type { TitleCallback } from "./StudioBase";
 
 export interface StudioOptions {

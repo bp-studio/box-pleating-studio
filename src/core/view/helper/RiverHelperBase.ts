@@ -4,7 +4,7 @@ import { makePerQuadrant, shrewdStatic } from "bp/global";
 import { Disposable } from "bp/class";
 import type { Path, PolyBool } from "bp/math";
 import type { Flap } from "bp/design";
-import type { View } from "../classes";
+import type { View } from "../class";
 
 //////////////////////////////////////////////////////////////////
 /**

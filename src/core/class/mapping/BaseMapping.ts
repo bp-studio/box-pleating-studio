@@ -1,18 +1,12 @@
 import type { IDisposable } from "..";
 import type { ISerializable } from "bp/global";
 
-export type IterableFactory<K> = () => Iterable<K>;
-
-export type Func<A, B> = (a: A) => B;
-
-export type Predicate<A, B> = (a: A, b: B) => boolean;
-
-export type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
+type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
 
 //////////////////////////////////////////////////////////////////
 /**
  * {@link BaseMapping BaseMapping<K, S, V>} 類別實作了 {@link ReadonlyMap ReadonlyMap<K, V>} 介面，
- * 會反應市地根據提供的 source 和 keyGen 來產生 key，
+ * 會反應式地根據提供的 source 和 keyGen 來產生 key，
  * 再根據 ctor 來建構 source 對應的 V 類別物件實體，
  * 並且根據 dtor 來自動從清單中移除。
  *
@@ -42,7 +36,7 @@ export abstract class BaseMapping<Key, Source, Value extends object>
 
 	private readonly _map: Map<Key, Value> = new Map();
 
-	@shrewd private render(): ReadonlyMap<Key, Value> {
+	@shrewd private _render(): ReadonlyMap<Key, Value> {
 		for(let [key, value] of this._map) {
 			if(this._dtor(key, value)) this._map.delete(key);
 		}
@@ -53,24 +47,24 @@ export abstract class BaseMapping<Key, Source, Value extends object>
 		return new Map(this._map);
 	}
 
-	public get(key: Key): Value | undefined { return this.render().get(key); }
-	public has(key: Key): boolean { return this.render().has(key); }
+	public get(key: Key): Value | undefined { return this._render().get(key); }
+	public has(key: Key): boolean { return this._render().has(key); }
 	public forEach(callbackfn: MapCallback<Key, Value>, thisArg?: unknown): void {
-		return this.render().forEach(callbackfn, thisArg);
+		return this._render().forEach(callbackfn, thisArg);
 	}
-	public get size(): number { return this.render().size; }
+	public get size(): number { return this._render().size; }
 
 	public [Symbol.iterator](): IterableIterator<[Key, Value]> {
-		return this.render()[Symbol.iterator]();
+		return this._render()[Symbol.iterator]();
 	}
 	public entries(): IterableIterator<[Key, Value]> {
-		return this.render().entries();
+		return this._render().entries();
 	}
 	public keys(): IterableIterator<Key> {
-		return this.render().keys();
+		return this._render().keys();
 	}
 	public values(): IterableIterator<Value> {
-		return this.render().values();
+		return this._render().values();
 	}
 
 	/** 提供輸出成 JSON 物件陣列的快捷方法。 */

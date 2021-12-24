@@ -1,15 +1,15 @@
 import { action } from "./history/action";
 import * as CT from "./containers";
-import { Sheet } from "./components";
+import { Flap, River, Sheet, Vertex } from "./components";
 import { Tree } from "./schema";
 import { OptionManager } from "./OptionManager";
 import { shrewdStatic } from "bp/global";
-import { deepCopy } from "bp/util";
+import { ArrayUtil, deepCopy } from "bp/util";
 import { Mountable } from "bp/class";
 import { Migration } from "bp/content/update";
+import type { Control } from "./class";
 import type { ISerializable } from "bp/global";
 import type { IStudio, Studio } from "bp/env";
-import type { RecursivePartial } from "bp/util";
 import type { DesignMode, JDesign } from "bp/content/json";
 import type { HistoryManager, IQueryable, ITagObject } from "./history";
 import type { IViewManager } from "bp/view";
@@ -190,5 +190,13 @@ export interface IDesignObject {
 			if(init == "v") return this.$vertices.get(n);
 		}
 		return undefined;
+	}
+
+	/** 處理來自 UI 的物件刪除請求 */
+	public $delete(items: Control[]): void {
+		let first = items[0];
+		if(ArrayUtil.$isTypedArray(items, Flap)) this.$flaps.$delete(items);
+		if(ArrayUtil.$isTypedArray(items, Vertex)) this.$vertices.$delete(items);
+		if(first instanceof River) first.$delete();
 	}
 }

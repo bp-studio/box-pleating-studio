@@ -1,11 +1,11 @@
 import { PaperUtil } from "./util/PaperUtil";
-import { ControlView } from "./classes";
+import { ControlView } from "./class";
 import { RiverHelper } from "./helper";
 import { Fraction, Line, PathUtil, Point, PolyBool, Vector } from "bp/math";
 import { Layer, Style, shape } from "bp/global";
 import { Mapping } from "bp/class";
 import type { Design, River, TreeEdge, TreeNode } from "bp/design";
-import type { View } from "./classes";
+import type { View } from "./class";
 import type { FlapView } from "./FlapView";
 
 //////////////////////////////////////////////////////////////////

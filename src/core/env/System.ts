@@ -1,6 +1,4 @@
 import * as CT from "./controllers";
-import { Flap, River, Vertex } from "bp/design";
-import { ArrayUtil } from "bp/util";
 import type { Studio } from "./Studio";
 
 //////////////////////////////////////////////////////////////////
@@ -52,11 +50,7 @@ export class System {
 
 		let design = this._studio.$design;
 		if(design && event.key == "delete") {
-			let items = this.$selection.$items;
-			let first = items[0];
-			if(ArrayUtil.$isTypedArray(items, Flap)) design.$flaps.$delete(items);
-			if(ArrayUtil.$isTypedArray(items, Vertex)) design.$vertices.$delete(items);
-			if(first instanceof River) first.$delete();
+			design.$delete(this.$selection.$items);
 			return false;
 		}
 

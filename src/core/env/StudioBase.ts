@@ -1,11 +1,9 @@
 import { Design } from "bp/design";
 import { Migration } from "bp/content/update";
 import type { JDesign } from "bp/content/json";
-import type { Action, Pseudo } from "bp/global";
 import type { HistoryManager } from "bp/design";
 import type { IDisplay } from "./screen";
 import type { IViewManager } from "bp/view";
-import type { RecursivePartial } from "bp/util";
 
 export interface IStudio {
 	onDeprecate?: TitleCallback;

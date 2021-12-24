@@ -1,9 +1,9 @@
 import { $isTouch } from "./Share";
-import { Control, Draggable } from "bp/class";
+import { Control, Draggable } from "bp/design/class";
 import { Device, Edge, Flap, Vertex } from "bp/design";
 import { DragSelectView } from "bp/view";
 import { unorderedArray } from "bp/global";
-import type { DragSelectableControl } from "bp/class";
+import type { DragSelectableControl } from "bp/design/class";
 import type { Studio } from "..";
 
 //////////////////////////////////////////////////////////////////

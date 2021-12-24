@@ -1,7 +1,7 @@
 import { TraceBuilder } from "../layout/calculation/trace";
 import { Direction, Settings, nextQuadrantOffset, noCompare, orderedArray, previousQuadrantOffset, quadrantNumber, shrewdStatic } from "bp/global";
 import { Fraction, Point, Rectangle, Vector } from "bp/math";
-import { SheetObject } from "bp/class";
+import { SheetObject } from "bp/design/class";
 import type { Flap } from "./Flap";
 import type { Junction } from "./Junction";
 import type { Sheet } from "./Sheet";

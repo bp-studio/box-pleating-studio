@@ -1,6 +1,5 @@
 import type { JDesign } from "bp/content/json";
 import type { IStudio } from "bp/env";
-import type { Pseudo } from "bp/global";
 
 interface IMigration {
 	(design: Pseudo<JDesign>): boolean;

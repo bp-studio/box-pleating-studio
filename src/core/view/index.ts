@@ -1,5 +1,5 @@
 export * from "./ViewManager";
-export * from "./classes";
+export * from "./class";
 export * from "./helper";
 export * from "./DragSelectView";
 export * from "./SheetView";

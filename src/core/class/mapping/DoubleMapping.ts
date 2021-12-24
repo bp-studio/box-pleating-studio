@@ -1,6 +1,5 @@
 import { DoubleMap } from "./DoubleMap";
 import type { DoubleMapCallback, ReadonlyDoubleMap } from "./DoubleMap";
-import type { IterableFactory } from "./BaseMapping";
 import type { Disposable, IDisposable } from "..";
 
 //////////////////////////////////////////////////////////////////

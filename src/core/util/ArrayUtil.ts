@@ -1,6 +1,4 @@
 
-type constructor<T extends object> = new (...args: unknown[]) => T;
-
 export function $isTypedArray<T extends object>(
 	array: unknown[], constructor: constructor<T>
 ): array is T[] {

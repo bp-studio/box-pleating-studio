@@ -1,5 +1,4 @@
 import { CornerType } from "bp/content/json";
-import type { Pseudo } from "bp/global";
 import type { JConfiguration, JCorner, JDesign, JOverlap, JStretch } from "bp/content/json";
 
 /** 從 rc0 版本開始要求 {@link JIntersection} 都必須加上 e */

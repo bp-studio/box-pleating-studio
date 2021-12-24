@@ -5,7 +5,6 @@ import { Configuration } from "../containers/Configuration";
 import { GeneratorUtil, clone } from "bp/util";
 import { CornerType, Strategy } from "bp/content/json";
 import type { JConfiguration, JPattern, JStretch, JJunction } from "bp/content/json";
-import type { Action } from "bp/global";
 import type { Repository } from "..";
 
 //////////////////////////////////////////////////////////////////

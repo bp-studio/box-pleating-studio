@@ -1,9 +1,9 @@
-import { LabeledView, View } from "./classes";
+import { LabeledView, View } from "./class";
 import { PaperUtil } from "./util/PaperUtil";
 import { Layer, Style, unorderedArray } from "bp/global";
 import { Constants } from "bp/content/json";
 import type { Sheet } from "bp/design";
-import type { Control } from "bp/class";
+import type { Control } from "bp/design/class";
 
 //////////////////////////////////////////////////////////////////
 /**

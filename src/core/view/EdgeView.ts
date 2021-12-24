@@ -1,4 +1,4 @@
-import { LabeledView } from "./classes";
+import { LabeledView } from "./class";
 import { PaperUtil } from "./util/PaperUtil";
 import { Layer, Style } from "bp/global";
 import type { Edge } from "bp/design";
