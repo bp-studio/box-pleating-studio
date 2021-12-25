@@ -33,7 +33,7 @@ export namespace LabelUtil {
 	}
 
 	export function $setLabel(
-		sheet: Sheet, label: paper.PointText, glow: paper.PointText, pt: IPoint,
+		sheet: Sheet, displayScale: number, label: paper.PointText, glow: paper.PointText, pt: IPoint,
 		...avoid: paper.Path[]
 	): void {
 
@@ -41,9 +41,9 @@ export namespace LabelUtil {
 		if(!label.content) return;
 
 		let x = pt.x, y = pt.y;
-		let ss = sheet.$displayScale, sw = sheet.width, sh = sheet.height;
+		let sw = sheet.width, sh = sheet.height;
 		let lh = label.bounds.height;
-		let lx = x * ss, ly = -y * ss;
+		let lx = x * displayScale, ly = -y * displayScale;
 
 		if(x == 0 || y == 0 || x == sw || y == sh) {
 			// 如果要求的位置在邊界上，直接處理

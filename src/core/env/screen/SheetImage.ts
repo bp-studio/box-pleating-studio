@@ -63,7 +63,7 @@ export abstract class SheetImage extends Viewport {
 	@shrewd private get _horMargin(): number {
 		let margin = 0;
 		if(this._design?.sheet) {
-			let view = this._design!.$viewManager.$get(this._design.sheet) as SheetView;
+			let view = this._design.$viewManager.$get(this._design.sheet) as SheetView;
 			margin = view.$margin;
 		}
 		return Math.max(margin + SheetImage._MARGIN_FIX, SheetImage._MARGIN);

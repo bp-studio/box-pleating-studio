@@ -37,12 +37,13 @@ import type { Control } from "bp/design/class";
 	}
 
 	protected $render(): void {
+		if(!this.$display) return;
 		let width = this._sheet.width;
 		let height = this._sheet.height;
 
 		PaperUtil.$setRectangleSize(this._border, width, height);
 
-		this._grid.visible = this.$studio!.$display.$settings.showGrid;
+		this._grid.visible = this.$display.$settings.showGrid;
 		this._grid.removeChildren();
 		for(let i = 1; i < height; i++) {
 			PaperUtil.$addLine(this._grid, new paper.Point(0, i), new paper.Point(width, i));
@@ -61,7 +62,7 @@ import type { Control } from "bp/design/class";
 	@shrewd public get $margin(): number {
 		if(!this._isActive || !this._sheet.$design._isActive) return 0;
 		let controls = this._labeledControls;
-		if(controls.length == 0 || !this.$studio || !this.$studio.$display.$settings.showLabel) return 0;
+		if(controls.length == 0 || !this.$display || !this.$display.$settings.showLabel) return 0;
 
 		let vm = this._sheet.$design.$viewManager;
 		let overflows = controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow);
@@ -75,7 +76,7 @@ import type { Control } from "bp/design/class";
 		let horizontalScale = (viewWidth - 2 * margin) * factor / width;
 		if(controls.length == 0) return horizontalScale;
 
-		if(this.$studio?.$display.$settings.showLabel) {
+		if(this.$display?.$settings.showLabel) {
 			let vm = this._sheet.$design.$viewManager;
 			let views = controls.map(c => vm.$get(c) as LabeledView<Control>);
 			let scales = views.map(v =>

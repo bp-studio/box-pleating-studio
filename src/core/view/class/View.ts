@@ -1,4 +1,5 @@
 import { Mountable } from "bp/class";
+import { Display } from "bp/env/screen";
 import type { Studio } from "bp/env/Studio";
 import type { Layer } from "bp/global";
 
@@ -48,6 +49,16 @@ export abstract class View extends Mountable {
 		for(let [l, p] of this._paths) p.remove();
 	}
 
+	protected get $display(): Display | null {
+		// 這邊用了比較迂迴的方法來檢查以避免模組的循環相依
+		let display = (this.$studio as Studio)?.$display;
+		return display instanceof Display ? display : null;
+	}
+
+	protected get $displayScale(): number {
+		return this.$display?.$scale ?? 1;
+	}
+
 	/**
 	 * 當前的視圖是否「包含」指定的點，用於偵測點擊。
 	 *
@@ -65,8 +76,8 @@ export abstract class View extends Mountable {
 	/** 當尺度太小的時候調整線條粗細 */
 	@shrewd protected get _drawScale(): number {
 		this.$mountEvents();
-		if(!this.$studio) return this._scaleCache;
-		let s = this.$studio.$display.$scale;
+		if(!this.$display) return this._scaleCache;
+		let s = this.$display.$scale;
 		return this._scaleCache = s < View._MIN_SCALE ? s / View._MIN_SCALE : 1;
 	}
 	private _scaleCache = 1;

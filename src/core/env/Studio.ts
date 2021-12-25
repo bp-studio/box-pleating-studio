@@ -3,7 +3,7 @@ import { Display } from "./screen";
 import { System } from "./System";
 import { Updater } from "./animation/Updater";
 import { HistoryManager } from "bp/content/changes";
-import { ViewManager } from "bp/view";
+import { ViewManager } from "bp/view/ViewManager";
 import type { Design } from "bp/design";
 import type { JDesign } from "bp/content/json";
 import type { TitleCallback } from "./StudioBase";
@@ -70,6 +70,12 @@ export interface StudioOptions {
 		// 這邊順便直接更新，不然載入大專案的時候會跟 tab 之間有一點時間差
 		this.$updater.$update();
 
+		return result;
+	}
+
+	protected _designFactory(design: RecursivePartial<JDesign>): Design {
+		let result = super._designFactory(design);
+		result.$LayoutSheet.onZoom = result.$TreeSheet.onZoom = (zoom: number) => this.$display.$zoom(zoom);
 		return result;
 	}
 }

@@ -2,12 +2,10 @@ import { Design } from "bp/design";
 import { Migration } from "bp/content/patches";
 import type { JDesign } from "bp/content/json";
 import type { HistoryManager } from "bp/content/changes";
-import type { IDisplay } from "./screen";
 import type { IViewManager } from "bp/view";
 
 export interface IStudio {
 	onDeprecate?: TitleCallback;
-	readonly $display: IDisplay;
 	readonly $viewManager: IViewManager;
 	$historyManagerFactory: HistoryManagerFactory;
 }
@@ -28,8 +26,6 @@ export abstract class StudioBase implements IStudio {
 	public readonly $designMap: Map<number, Design> = new Map();
 
 	@shrewd public $design: Design | null = null;
-
-	public abstract readonly $display: IDisplay;
 
 	public abstract readonly $viewManager: IViewManager;
 
@@ -62,7 +58,7 @@ export abstract class StudioBase implements IStudio {
 	}
 
 	public $restore(json: Pseudo<JDesign>): Design {
-		let design = new Design(this, Migration.$process(json, this));
+		let design = this._designFactory(Migration.$process(json, this));
 		this.$designMap.set(design.id, design);
 		this._onDesignCreated?.();
 		return design;
@@ -94,9 +90,13 @@ export abstract class StudioBase implements IStudio {
 	}
 
 	protected _tryLoad(design: RecursivePartial<JDesign>): Design {
-		this.$design = new Design(this, design);
+		this.$design = this._designFactory(design);
 		this.$designMap.set(this.$design.id, this.$design);
 		this._onDesignCreated?.();
 		return this.$design;
+	}
+
+	protected _designFactory(design: RecursivePartial<JDesign>): Design {
+		return new Design(this, design);
 	}
 }

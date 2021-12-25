@@ -45,12 +45,12 @@ export abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 	@shrewd private _drawUnscaled(): void {
 		this.$mountEvents();
-		if(!this.$studio) return;
-		this.$studio.$display.$render();
+		if(!this.$display) return;
+		this.$display.$render();
 		this.$renderUnscaled();
 
 		LabelUtil.$setLabel(
-			this._control.$sheet, this._label, this._glow, this._labelLocation, ...this._labelAvoid
+			this._control.$sheet, this.$displayScale, this._label, this._glow, this._labelLocation, ...this._labelAvoid
 		);
 
 		let factor = this._factor;
@@ -69,11 +69,11 @@ export abstract class LabeledView<T extends Control> extends ControlView<T> {
 
 	/** 一個 {@link View} 的標籤的橫向溢出大小 */
 	@shrewd public get $overflow(): number {
-		if(this.$disposed || !this.$studio) return 0;
+		if(this.$disposed || !this.$display) return 0;
 
 		let result = 0;
 		let sheetWidth = this._control.$sheet.width;
-		let scale = this.$studio.$display.$scale;
+		let scale = this.$display.$scale;
 		let w = scale * sheetWidth;
 		let width = this._labelWidth * this._factor;
 		let center = this._labelLocation.x;

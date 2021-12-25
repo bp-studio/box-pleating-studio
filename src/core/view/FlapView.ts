@@ -84,7 +84,7 @@ import type { ClosureView } from "./RiverView";
 	/** 這個獨立出來以提供 {@link RiverView} 的相依 */
 	@shrewdStatic public $renderHinge(): void {
 		if(this._control.$disposed) return;
-		this._circle.visible = this.$studio?.$display.$settings.showHinge ?? false;
+		this._circle.visible = this.$display?.$settings.showHinge ?? false;
 		let paths = PaperUtil.$fromShape(this.$closure);
 		this.hinge.removeSegments();
 		if(paths.length) this.hinge.add(...paths[0].segments); // 這邊頂多只有一個
@@ -118,7 +118,7 @@ import type { ClosureView } from "./RiverView";
 	}
 
 	protected $renderUnscaled(): void {
-		let ds = this._control.$sheet.$displayScale;
+		let ds = this.$displayScale;
 		let w = this._control.width, h = this._control.height;
 
 		let fix = (p: paper.Point): number[] => [p.x * ds, -p.y * ds];

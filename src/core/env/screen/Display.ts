@@ -6,13 +6,6 @@ import { Constants } from "bp/content/json";
 import type { IPoint } from "bp/math";
 import type { Studio } from "..";
 
-export interface IDisplay {
-	$zoom(v: number): void;
-	$scale: number;
-	$settings: DisplaySetting;
-	$render(): void;
-}
-
 export interface DisplaySetting {
 	showGrid: boolean;
 	showHinge: boolean;
@@ -32,7 +25,7 @@ export interface DisplaySetting {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd export class Display extends Workspace implements IDisplay {
+@shrewd export class Display extends Workspace {
 
 	public readonly $boundary: paper.Path;
 

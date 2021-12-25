@@ -80,7 +80,7 @@ import type { IPoint, Vector } from "bp/math";
 	public get zoom(): number { return this._zoom; }
 	public set zoom(v: number) {
 		if(v < Constants.$FULL_ZOOM) return;
-		this.$studio?.$display.$zoom(v);
+		this.onZoom?.(v);
 	}
 	@shrewd public _zoom: number;
 
@@ -101,6 +101,9 @@ import type { IPoint, Vector } from "bp/math";
 		super.$onDispose();
 	}
 
+	/** 提供 Zoom 改變的時候的 callback */
+	public onZoom?: (zoom: number) => void;
+
 	/** 記載所有這個 {@link Sheet} 中的 {@link Control} 來源 */
 	private _controlMaps: IterableFactory<Control>[];
 
@@ -110,10 +113,6 @@ import type { IPoint, Vector } from "bp/math";
 
 	@shrewd public get _isActive(): boolean {
 		return this.$design.sheet == this;
-	}
-
-	@shrewd public get $displayScale(): number {
-		return this.$studio ? this.$studio.$display.$scale : 1;
 	}
 
 	public toJSON(session: boolean = false): JSheet {

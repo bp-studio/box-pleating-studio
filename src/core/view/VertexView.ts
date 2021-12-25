@@ -39,7 +39,7 @@ import type { Vertex } from "bp/design";
 	}
 
 	protected $render(): void {
-		let ds = this._control.$sheet.$displayScale;
+		let ds = this.$displayScale;
 		let x = this._control.$location.x, y = this._control.$location.y;
 		this._circle.position.set([x, y]);
 		this._dot.position.set([x * ds, -y * ds]);
