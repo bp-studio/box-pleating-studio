@@ -53,7 +53,7 @@ export interface DisplaySetting {
 		showLabel: true,
 		showDot: true,
 		includeHiddenElement: false,
-	}
+	};
 
 	constructor(studio: Studio) {
 		super(studio);

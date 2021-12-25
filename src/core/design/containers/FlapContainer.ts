@@ -1,7 +1,8 @@
 import { BaseContainer } from "./BaseContainer";
 import { Flap } from "../components";
-import { Tree } from "../schema";
-import type { Design, TreeNode } from "..";
+import { Tree } from "bp/content/context";
+import type { TreeNode } from "bp/content/context";
+import type { Design } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**

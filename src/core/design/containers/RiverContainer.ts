@@ -1,6 +1,7 @@
 import { BaseContainer } from "./BaseContainer";
 import { River } from "../components";
-import type { Design, TreeEdge } from "..";
+import type { TreeEdge } from "bp/content/context";
+import type { Design } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**

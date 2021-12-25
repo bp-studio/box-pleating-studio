@@ -7,10 +7,10 @@ import type { Command } from "./Command";
 import type { JEditCommand } from "./EditCommand";
 import type { JFieldCommand } from "./FieldCommand";
 import type { JMoveCommand } from "./MoveCommand";
-import type { Design } from "bp/design";
+import type { IDesignLike } from "bp/content/interface";
 
 /** 將一個 {@link JCommand} 還原成 {@link Command} 物件實體 */
-export function $resolve(design: Design, c: JCommand): Command {
+export function $resolve(design: IDesignLike, c: JCommand): Command {
 	if(c.type == CommandType.field) return new FieldCommand(design, c as JFieldCommand);
 	if(c.type == CommandType.move) return new MoveCommand(design, c as JMoveCommand);
 	if(c.type == CommandType.add || c.type == CommandType.remove) {

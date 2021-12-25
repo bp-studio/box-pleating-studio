@@ -1,5 +1,5 @@
 import type { JDesign } from "bp/content/json";
-import type { ITagObject } from "./history";
+import type { ITagObject } from "bp/content/interface";
 
 //////////////////////////////////////////////////////////////////
 /**

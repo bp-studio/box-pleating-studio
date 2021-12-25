@@ -1,8 +1,8 @@
-import { Tree } from "bp/design/schema";
+import { Tree } from "bp/content/context";
 import { Control } from "bp/design/class";
 import type { Sheet } from "./Sheet";
 import type { Vertex } from "./Vertex";
-import type { TreeEdge, TreeNode } from "bp/design/schema";
+import type { TreeEdge, TreeNode } from "bp/content/context";
 import type { JEdge } from "bp/content/json";
 
 //////////////////////////////////////////////////////////////////

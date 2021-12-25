@@ -1,4 +1,4 @@
-import type { ITagObject } from "./Types";
+import type { ITagObject } from "bp/content/interface";
 
 /** {@link action @action} 的選項不應該有 renderer 存在 */
 type ActionOption = Omit<Shrewd.IDecoratorOptions<unknown>, "renderer">;

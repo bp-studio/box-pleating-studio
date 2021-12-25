@@ -1,2 +1,2 @@
-export * from "./Types";
 export * from "./HistoryManager";
+export * from "./action";

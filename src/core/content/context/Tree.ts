@@ -2,7 +2,7 @@ import { TreeNode } from "./TreeNode";
 import { TreeEdge } from "./TreeEdge";
 import { Disposable, DoubleMap } from "bp/class";
 import type { JEdge } from "bp/content/json";
-import type { Design } from "..";
+import type { IDesignLike } from "bp/content/interface";
 
 export type TreeElement = TreeNode | TreeEdge;
 
@@ -15,10 +15,10 @@ export type TreeElement = TreeNode | TreeEdge;
 @shrewd export class Tree extends Disposable {
 
 	public static readonly $MIN_NODES = 3;
-	public readonly $design: Design;
+	public readonly $design: IDesignLike;
 
-	constructor(design: Design, edges?: JEdge[]) {
-		super(design);
+	constructor(design: IDesignLike, edges?: JEdge[]) {
+		super(design instanceof Disposable ? design : undefined);
 		this.$design = design;
 
 		// 防呆載入所有的邊；傳入資料的順序無所謂

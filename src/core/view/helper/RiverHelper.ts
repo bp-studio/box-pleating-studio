@@ -1,6 +1,6 @@
 import { RiverHelperBase } from "./RiverHelperBase";
 import { PolyBool } from "bp/math";
-import type { TreeNode } from "bp/design";
+import type { TreeNode } from "bp/content/context";
 import type { RiverView } from "../RiverView";
 
 //////////////////////////////////////////////////////////////////

@@ -4,10 +4,10 @@ import { FieldCommand } from "./commands/FieldCommand";
 import { MoveCommand } from "./commands/MoveCommand";
 import { shrewdStatic } from "bp/global";
 import { Disposable } from "bp/class";
-import type { ITagObject } from "./Types";
+import type { IDesignLike, ITagObject } from "bp/content/interface";
 import type { JHistory, Memento } from "bp/content/json";
 import type { Command } from "./commands/Command";
-import type { Design, TreeElement } from "..";
+import type { TreeElement } from "bp/content/context";
 import type { IPoint } from "bp/math";
 import type { Control, Draggable } from "bp/design/class";
 
@@ -21,7 +21,7 @@ import type { Control, Draggable } from "bp/design/class";
 
 	private static readonly _MAX_STEP = 30;
 
-	private readonly _design: Design;
+	private readonly _design: IDesignLike;
 	@shrewd private readonly _steps: Step[] = [];
 	@shrewd private _index: number = 0;
 	@shrewd private _savedIndex: number = 0;
@@ -36,8 +36,8 @@ import type { Control, Draggable } from "bp/design/class";
 	/** 是否正在移動歷史 */
 	private _moving: boolean = true;
 
-	constructor(design: Design, json?: JHistory) {
-		super(design);
+	constructor(design: IDesignLike, json?: JHistory) {
+		super(design instanceof Disposable ? design : undefined);
 		this._design = design;
 		if(json) {
 			try {
@@ -101,7 +101,7 @@ import type { Control, Draggable } from "bp/design/class";
 					commands: this._queue,
 					construct: this._construct,
 					destruct: this._destruct,
-					mode: this._design.mode,
+					mode: this._design.mode ?? "layout",
 					before: this._selection,
 					after: sel,
 				});

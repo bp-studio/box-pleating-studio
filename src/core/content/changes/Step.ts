@@ -1,8 +1,8 @@
-import { $resolve } from "./commands";
+import { $resolve } from "./commands/Resolve";
 import { nonEnumerable } from "bp/global";
 import { Control } from "bp/design/class";
+import type { IDesignLike } from "bp/content/interface";
 import type { Command } from "./commands";
-import type { Design } from "..";
 import type { DesignMode, JStep, Memento } from "bp/content/json";
 
 //////////////////////////////////////////////////////////////////
@@ -15,7 +15,7 @@ export class Step implements ISerializable<JStep> {
 
 	private static readonly _AUTO_RESET = 1000;
 
-	public static restore(design: Design, json: JStep): Step {
+	public static restore(design: IDesignLike, json: JStep): Step {
 		json.commands = json.commands.map(c => $resolve(design, c));
 		return new Step(design, json as JStep<Command>);
 	}
@@ -34,7 +34,7 @@ export class Step implements ISerializable<JStep> {
 	private readonly _before: string[];
 	private readonly _after: string[];
 
-	constructor(design: Design, json: JStep<Command>) {
+	constructor(design: IDesignLike, json: JStep<Command>) {
 		this._design = design;
 		this._signature = Step.signature(json.commands);
 
@@ -48,7 +48,7 @@ export class Step implements ISerializable<JStep> {
 		this._reset();
 	}
 
-	@nonEnumerable private readonly _design: Design;
+	@nonEnumerable private readonly _design: IDesignLike;
 	@nonEnumerable private readonly _signature: string;
 
 	/** 已經不允許合併 */
@@ -99,7 +99,7 @@ export class Step implements ISerializable<JStep> {
 		let com = this._commands.concat().reverse();
 		for(let c of com) c.$undo();
 		let des = this._destruct.concat().reverse();
-		for(let memento of des) this._design.$options.set(...memento);
+		for(let memento of des) this._design.$options?.set(...memento);
 		this._design.mode = this._mode;
 		this._restoreSelection(this._before);
 		this._fixed = true;
@@ -107,7 +107,7 @@ export class Step implements ISerializable<JStep> {
 
 	public $redo(): void {
 		for(let c of this._commands) c.$redo();
-		for(let memento of this._construct) this._design.$options.set(...memento);
+		for(let memento of this._construct) this._design.$options?.set(...memento);
 		this._design.mode = this._mode;
 		this._restoreSelection(this._after);
 		this._fixed = true;
@@ -128,9 +128,9 @@ export class Step implements ISerializable<JStep> {
 	}
 
 	private _restoreSelection(tags: string[]): void {
-		this._design.sheet.$clearSelection();
+		this._design.$clearSelection?.();
 		for(let tag of tags) {
-			let obj = this._design.$query(tag);
+			let obj = this._design.$query?.(tag);
 			if(obj instanceof Control) obj.$selected = true;
 		}
 	}

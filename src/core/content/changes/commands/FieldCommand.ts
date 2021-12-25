@@ -2,8 +2,7 @@ import { Command } from "./Command";
 import { CommandType } from "bp/content/json";
 import type { JCommand } from "bp/content/json";
 import type { Typeless } from "./Command";
-import type { ITagObject } from "..";
-import type { Design } from "bp/design";
+import type { IDesignLike, ITagObject } from "bp/content/interface";
 
 export interface JFieldCommand extends JCommand {
 	readonly prop: string;
@@ -42,7 +41,7 @@ export class FieldCommand extends Command implements JFieldCommand {
 	/** @exports */
 	public new: unknown;
 
-	constructor(design: Design, json: Typeless<JFieldCommand>) {
+	constructor(design: IDesignLike, json: Typeless<JFieldCommand>) {
 		super(design, json);
 		this.prop = json.prop;
 		this.old = json.old;
@@ -64,12 +63,12 @@ export class FieldCommand extends Command implements JFieldCommand {
 	}
 
 	public $undo(): void {
-		let target = this._design.$query(this.tag)!;
-		Reflect.set(target, this.prop, this.old);
+		let target = this._design.$query?.(this.tag);
+		if(target) Reflect.set(target, this.prop, this.old);
 	}
 
 	public $redo(): void {
-		let target = this._design.$query(this.tag)!;
-		Reflect.set(target, this.prop, this.new);
+		let target = this._design.$query?.(this.tag);
+		if(target) Reflect.set(target, this.prop, this.new);
 	}
 }

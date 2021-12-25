@@ -6,7 +6,8 @@ import { MathUtil } from "bp/math";
 import { TreeMaker } from "bp/plugin";
 import { Settings } from "bp/global";
 import type { DisplaySetting, StudioOptions } from "bp/env";
-import type { HistoryManager, Repository } from "bp/design";
+import type { Repository } from "bp/design";
+import type { HistoryManager } from "bp/content/changes";
 import type { JDesign } from "bp/content/json";
 
 if(typeof Shrewd != "object") throw new Error("BPStudio requires Shrewd.");

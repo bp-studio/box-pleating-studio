@@ -1,7 +1,8 @@
 import { BaseContainer } from "./BaseContainer";
-import { Tree } from "../schema";
 import { Vertex } from "../components";
-import type { Design, TreeNode } from "..";
+import { Tree } from "bp/content/context";
+import type { TreeNode } from "bp/content/context";
+import type { Design } from "..";
 
 //////////////////////////////////////////////////////////////////
 /**

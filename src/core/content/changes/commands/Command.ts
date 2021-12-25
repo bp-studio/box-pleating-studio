@@ -1,6 +1,6 @@
 import { nonEnumerable } from "bp/global";
 import type { CommandType, JCommand } from "bp/content/json";
-import type { Design } from "bp/design";
+import type { IDesignLike } from "bp/content/interface";
 
 export type Typeless<T extends JCommand> = Omit<T, 'type'>;
 
@@ -12,7 +12,7 @@ export type Typeless<T extends JCommand> = Omit<T, 'type'>;
 
 export abstract class Command implements JCommand {
 
-	@nonEnumerable protected readonly _design: Design;
+	@nonEnumerable protected readonly _design: IDesignLike;
 
 	/** @exports */
 	public abstract readonly type: CommandType;
@@ -22,7 +22,7 @@ export abstract class Command implements JCommand {
 
 	public get $signature(): string { return this.type + ":" + this.tag; }
 
-	constructor(design: Design, json: Typeless<JCommand>) {
+	constructor(design: IDesignLike, json: Typeless<JCommand>) {
 		this._design = design;
 		this.tag = json.tag;
 	}

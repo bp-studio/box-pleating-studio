@@ -1,34 +1,16 @@
 import { assert, expect } from "chai";
 
-import { Tree } from "bp/design";
-import { StudioBase } from "bp/env";
-import { MockStudio } from "mock/MockStudio";
+import { Tree } from "bp/content/context";
 
 describe('Tree', () => {
-
-	let studio: StudioBase;
 	let t: Tree;
 
-	before(() => studio = new MockStudio());
-
 	beforeEach(() => {
-		let design = studio.$create({
-			tree: {
-				nodes: [
-					{ id: 0, name: "", x: 10, y: 10 },
-					{ id: 1, name: "", x: 10, y: 13 },
-					{ id: 2, name: "", x: 10, y: 7 },
-				],
-				edges: [
-					{ n1: 0, n2: 1, length: 2 },
-					{ n1: 0, n2: 2, length: 1 },
-				],
-			},
-		});
-		t = design.$tree;
+		t = new Tree({}, [
+			{ n1: 0, n2: 1, length: 2 },
+			{ n1: 0, n2: 2, length: 1 },
+		]);
 	});
-
-	after(() => studio.$design?.$dispose());
 
 	context('after initialize', () => {
 		it('has the right number of nodes', () => {

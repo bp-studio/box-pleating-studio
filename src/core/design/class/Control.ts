@@ -1,6 +1,6 @@
 import { SheetObject } from "./SheetObject";
 import type { IPoint } from "bp/math";
-import type { ITagObject } from "bp/design";
+import type { ITagObject } from "bp/content/interface";
 
 //////////////////////////////////////////////////////////////////
 /**

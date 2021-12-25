@@ -5,7 +5,7 @@ import { Strategy } from "bp/content/json";
 import { Disposable } from "bp/class";
 import { clone } from "bp/util";
 import type { JPartition, JDevice, JGadget, JOverlap, JPiece, JQuadrilateral } from "bp/content/json";
-import type { Tree } from "bp/design";
+import type { Tree } from "bp/content/context";
 import type { Configuration } from "..";
 
 //////////////////////////////////////////////////////////////////

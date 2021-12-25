@@ -4,7 +4,8 @@ import { RiverHelper } from "./helper";
 import { Fraction, Line, PathUtil, Point, PolyBool, Vector } from "bp/math";
 import { Layer, Style, shape } from "bp/global";
 import { Mapping } from "bp/class";
-import type { Design, River, TreeEdge, TreeNode } from "bp/design";
+import type { Design, River } from "bp/design";
+import type { TreeEdge, TreeNode } from "bp/content/context";
 import type { View } from "./class";
 import type { FlapView } from "./FlapView";
 

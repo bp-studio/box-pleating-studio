@@ -2,7 +2,7 @@ import { Draggable, IndependentDraggable } from "bp/design/class";
 import { Point } from "bp/math";
 import type { Memento, JVertex } from "bp/content/json";
 import type { Sheet } from "./Sheet";
-import type { TreeNode } from "..";
+import type { TreeNode } from "bp/content/context";
 import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
 

@@ -1,9 +1,9 @@
-import { action } from "../history/action";
+import { action } from "bp/content/changes/action";
 import { shrewdStatic } from "bp/global";
 import { Disposable } from "bp/class";
 import type { JNode } from "bp/content/json";
 import type { Tree } from "./Tree";
-import type { Design, ITagObject } from "..";
+import type { IDesignLike, ITagObject } from "bp/content/interface";
 import type { TreeEdge } from "./TreeEdge";
 
 //////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ import type { TreeEdge } from "./TreeEdge";
 
 	public readonly $tree: Tree;
 
-	public get $design(): Design { return this.$tree.$design; }
+	public get $design(): IDesignLike { return this.$tree.$design; }
 
 	@shrewd public get edges(): ReadonlyArray<TreeEdge> {
 		this.$disposeEvent();

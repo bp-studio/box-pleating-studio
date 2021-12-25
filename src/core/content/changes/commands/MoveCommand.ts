@@ -4,7 +4,7 @@ import { clone } from "bp/util";
 import { CommandType } from "bp/content/json";
 import type { JCommand } from "bp/content/json";
 import type { Typeless } from "./Command";
-import type { Design } from "bp/design";
+import type { IDesignLike } from "bp/content/interface";
 import type { IPoint } from "bp/math";
 
 export interface JMoveCommand extends JCommand {
@@ -42,7 +42,7 @@ export class MoveCommand extends Command implements JMoveCommand {
 	/** @exports */
 	public new: IPoint;
 
-	constructor(design: Design, json: Typeless<JMoveCommand>) {
+	constructor(design: IDesignLike, json: Typeless<JMoveCommand>) {
 		super(design, json);
 		this.old = json.old;
 		this.new = json.new;
@@ -68,14 +68,12 @@ export class MoveCommand extends Command implements JMoveCommand {
 	}
 
 	public $undo(): void {
-		let obj = this._design.$query(this.tag)!;
+		let obj = this._design.$query?.(this.tag);
 		if(obj instanceof Draggable) Draggable.$assign(obj.$location, this.old);
-		else debugger;
 	}
 
 	public $redo(): void {
-		let obj = this._design.$query(this.tag)!;
+		let obj = this._design.$query?.(this.tag);
 		if(obj instanceof Draggable) Draggable.$assign(obj.$location, this.new);
-		else debugger;
 	}
 }

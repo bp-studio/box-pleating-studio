@@ -1,11 +1,11 @@
-import { action } from "../history/action";
+import { action } from "bp/content/changes/action";
 import { shrewdStatic } from "bp/global";
 import { ArrayUtil } from "bp/util";
 import { Disposable } from "bp/class";
 import type { JEdge } from "bp/content/json";
 import type { Tree } from "./Tree";
 import type { TreeNode } from "./TreeNode";
-import type { Design, ITagObject } from "..";
+import type { IDesignLike, ITagObject } from "bp/content/interface";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -47,7 +47,7 @@ import type { Design, ITagObject } from "..";
 	}
 
 	public get tree(): Tree { return this.n1.$tree; }
-	public get $design(): Design { return this.n1.$design; }
+	public get $design(): IDesignLike { return this.n1.$design; }
 
 	protected get $shouldDispose(): boolean {
 		return super.$shouldDispose || this.n1.$disposed || this.n2.$disposed;

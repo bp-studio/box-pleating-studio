@@ -1,6 +1,6 @@
 import { Control } from "bp/design/class";
 import type { Sheet } from "./Sheet";
-import type { TreeEdge } from "..";
+import type { TreeEdge } from "bp/content/context";
 
 //////////////////////////////////////////////////////////////////
 /**

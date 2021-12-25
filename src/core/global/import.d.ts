@@ -1,8 +1,13 @@
 import type { IPoint } from "bp/math";
+import "shrewd";
 
 declare global {
+	const Shrewd: typeof Shrewd;
+	const shrewd: typeof Shrewd.shrewd;
+	const terminate: typeof Shrewd.terminate;
+
 	/**
-	 * 修正官方的 d.ts 缺少或是我自訂的定義
+	 * 修正 paper.js 官方的 d.ts 缺少或是我自訂的定義
 	 *
 	 * 為了方便管理，一切的 patch 都寫在這個檔案裡面，而不去動官方的定義檔
 	 */

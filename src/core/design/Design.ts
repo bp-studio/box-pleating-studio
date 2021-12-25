@@ -1,21 +1,18 @@
-import { action } from "./history/action";
 import * as CT from "./containers";
 import { Flap, River, Sheet, Vertex } from "./components";
-import { Tree } from "./schema";
-import { OptionManager } from "./OptionManager";
+import { Tree } from "bp/content/context";
+import { action } from "bp/content/changes";
+import { OptionManager } from "bp/content/OptionManager";
 import { shrewdStatic } from "bp/global";
 import { ArrayUtil, deepCopy } from "bp/util";
 import { Mountable } from "bp/class";
-import { Migration } from "bp/content/update";
+import { Migration } from "bp/content/patches";
 import type { Control } from "./class";
 import type { IStudio, Studio } from "bp/env";
 import type { DesignMode, JDesign } from "bp/content/json";
-import type { HistoryManager, IQueryable, ITagObject } from "./history";
+import type { HistoryManager } from "bp/content/changes";
+import type { IDesign, ITagObject } from "bp/content/interface";
 import type { IViewManager } from "bp/view";
-
-export interface IDesignObject {
-	readonly $design: Design;
-}
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -23,7 +20,7 @@ export interface IDesignObject {
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd export class Design extends Mountable implements ISerializable<JDesign>, IQueryable {
+@shrewd export class Design extends Mountable implements ISerializable<JDesign>, IDesign {
 
 	/** @exports */
 	@shrewd public mode: DesignMode;
@@ -197,5 +194,9 @@ export interface IDesignObject {
 		if(ArrayUtil.$isTypedArray(items, Flap)) this.$flaps.$delete(items);
 		if(ArrayUtil.$isTypedArray(items, Vertex)) this.$vertices.$delete(items);
 		if(first instanceof River) first.$delete();
+	}
+
+	public $clearSelection(): void {
+		this.sheet.$clearSelection();
 	}
 }

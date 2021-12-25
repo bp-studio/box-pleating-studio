@@ -3,7 +3,7 @@
 /* eslint-disable max-classes-per-file */
 
 import { Fraction, MathUtil } from "bp/math";
-import { Migration } from "bp/content/update";
+import { Migration } from "bp/content/patches";
 import type { JDesign, JSheet, JVertex } from "bp/content/json";
 
 /** @exports */

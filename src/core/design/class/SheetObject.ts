@@ -1,5 +1,5 @@
 import { Mountable } from "bp/class";
-import type { Design, IDesignObject, Sheet } from "bp/design";
+import type { Design, Sheet } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -10,7 +10,7 @@ import type { Design, IDesignObject, Sheet } from "bp/design";
  */
 //////////////////////////////////////////////////////////////////
 
-export abstract class SheetObject extends Mountable implements IDesignObject {
+export abstract class SheetObject extends Mountable {
 
 	public readonly $sheet: Sheet;
 

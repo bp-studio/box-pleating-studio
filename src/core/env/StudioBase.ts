@@ -1,7 +1,7 @@
 import { Design } from "bp/design";
-import { Migration } from "bp/content/update";
+import { Migration } from "bp/content/patches";
 import type { JDesign } from "bp/content/json";
-import type { HistoryManager } from "bp/design";
+import type { HistoryManager } from "bp/content/changes";
 import type { IDisplay } from "./screen";
 import type { IViewManager } from "bp/view";
 
@@ -9,10 +9,10 @@ export interface IStudio {
 	onDeprecate?: TitleCallback;
 	readonly $display: IDisplay;
 	readonly $viewManager: IViewManager;
-	$historyManagerFactory: HistoryManagerFactory
+	$historyManagerFactory: HistoryManagerFactory;
 }
 
-export type TitleCallback = (title?: string) => void
+export type TitleCallback = (title?: string) => void;
 
 type HistoryManagerFactory = (design: Design, data: JDesign) => HistoryManager | null;
 

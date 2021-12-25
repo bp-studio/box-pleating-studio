@@ -2,7 +2,7 @@ import { StudioBase } from "./StudioBase";
 import { Display } from "./screen";
 import { System } from "./System";
 import { Updater } from "./animation/Updater";
-import { HistoryManager } from "bp/design";
+import { HistoryManager } from "bp/content/changes";
 import { ViewManager } from "bp/view";
 import type { Design } from "bp/design";
 import type { JDesign } from "bp/content/json";

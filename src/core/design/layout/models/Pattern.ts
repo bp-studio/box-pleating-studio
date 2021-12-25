@@ -7,7 +7,7 @@ import { SheetObject } from "bp/design/class";
 import { clone } from "bp/util";
 import { CornerType } from "bp/content/json";
 import type { JConnection, JCorner, JPattern } from "bp/content/json";
-import type { IQueryable, ITagObject } from "bp/design";
+import type { IQueryableTagObject, ITagObject } from "bp/content/interface";
 import type { Point, Vector } from "bp/math";
 import type { PerQuadrant, QuadrantDirection } from "bp/global";
 import type { Configuration, Stretch } from "..";
@@ -21,7 +21,7 @@ export type GPattern = JPattern<Gadget>;
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd export class Pattern extends SheetObject implements ISerializable<JPattern>, IQueryable {
+@shrewd export class Pattern extends SheetObject implements ISerializable<JPattern>, IQueryableTagObject {
 
 	public get $tag(): string {
 		return this.$configuration.$tag + "." + this.$configuration.$indexOf(this);

@@ -37,7 +37,7 @@ It is recommended that you read about Shrewd in order to fully understand the so
 
 All paths below are relative to `src/core`.
 Roughly speaking, a BP Studio project begins with a `Design` object (`design/Design.ts`),
-which contains a `Tree` object (`design/schema/Tree.ts`) that describes the tree structure of our design.
+which contains a `Tree` object (`content/tree/Tree.ts`) that describes the tree structure of our design.
 Then `Flap` objects (`design/components/Flap.ts`) are generated in correspondence to the leaf nodes in the tree,
 and `Junction` objects (`design/components/Junction.ts`), which monitors the overlapping status between two flaps,
 are generated for each pair of flaps.
