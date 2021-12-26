@@ -1,6 +1,7 @@
 import { Viewport } from "./Viewport";
 import { Constants } from "bp/content/json";
-import type { SheetView } from "bp/view";
+import { ViewService } from "bp/env/service/ViewService";
+import type { SheetView } from "bp/view/design/SheetView";
 import type { Studio } from "..";
 import type { Design } from "bp/design";
 import type { IPoint } from "bp/math";
@@ -17,7 +18,7 @@ export abstract class SheetImage extends Viewport {
 	private static readonly _MARGIN_FIX = 15;
 	private static readonly _MARGIN = 30;
 
-	protected readonly _studio: Studio;
+	private readonly _studio: Studio;
 
 	constructor(studio: Studio) {
 		super(studio.$el);
@@ -32,7 +33,7 @@ export abstract class SheetImage extends Viewport {
 		if(this._design) {
 			let sheet = this._design.sheet;
 			if(!sheet) return 1;
-			let view = this._design.$viewManager.$get(sheet) as SheetView;
+			let view = ViewService.$get(sheet) as SheetView;
 			return view.$getScale(
 				this._viewWidth, this._viewHeight,
 				SheetImage._MARGIN, SheetImage._MARGIN_FIX
@@ -63,7 +64,7 @@ export abstract class SheetImage extends Viewport {
 	@shrewd private get _horMargin(): number {
 		let margin = 0;
 		if(this._design?.sheet) {
-			let view = this._design.$viewManager.$get(this._design.sheet) as SheetView;
+			let view = ViewService.$get(this._design.sheet) as SheetView;
 			margin = view.$margin;
 		}
 		return Math.max(margin + SheetImage._MARGIN_FIX, SheetImage._MARGIN);

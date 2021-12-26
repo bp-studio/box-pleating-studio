@@ -1,7 +1,7 @@
 import { CursorController } from "./CursorController";
 import { Fraction, Point, Vector } from "bp/math";
 import { Device } from "bp/design";
-import type { Studio } from "..";
+import type { Studio } from "bp/env";
 import type { Draggable } from "bp/design/class";
 
 //////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ import type { Draggable } from "bp/design/class";
 		let selections = this._draggable;
 		if(selections.length) {
 			CursorController.$tryUpdate(new Point(event.downPoint).$round());
-			for(let o of selections) o.$dragStart();
+			for(let o of selections) o.$dragStart(CursorController.$offset);
 			this.$on = true;
 		}
 	}

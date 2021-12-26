@@ -1,5 +1,6 @@
 import { Tree } from "bp/content/context";
 import { Control } from "bp/design/class";
+import { ViewService } from "bp/env/service";
 import type { Sheet } from "./Sheet";
 import type { Vertex } from "./Vertex";
 import type { TreeEdge, TreeNode } from "bp/content/context";
@@ -25,7 +26,7 @@ import type { JEdge } from "bp/content/json";
 		this.$v1 = v1;
 		this.$v2 = v2;
 		this.$edge = edge;
-		this.$design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 		if(sheet.$design.$options.get(edge)?.selected) this.$selected = true;
 	}
 

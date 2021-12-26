@@ -1,6 +1,6 @@
 import { CursorController } from "./CursorController";
 import { $isTouch, $MIDDLE } from "./Share";
-import type { Studio } from "..";
+import type { Studio } from "bp/env";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -28,6 +28,8 @@ export class ScrollController {
 		document.addEventListener("touchend", this._bodyMouseup.bind(this), { passive: true });
 
 		studio.$el.addEventListener("scroll", this._onScroll.bind(this), { passive: true });
+
+		studio.$display.$onSheetChange = (x, y) => this.to(x, y);
 	}
 
 	public get on(): boolean {

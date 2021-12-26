@@ -1,18 +1,16 @@
 import * as CT from "./containers";
 import { Flap, River, Sheet, Vertex } from "./components";
 import { Tree } from "bp/content/context";
-import { action } from "bp/content/changes";
-import { OptionManager } from "bp/content/OptionManager";
+import { HistoryService, action } from "bp/content/changes";
+import { OptionService } from "bp/env/service";
 import { shrewdStatic } from "bp/global";
 import { ArrayUtil, deepCopy } from "bp/util";
 import { Mountable } from "bp/class";
 import { Migration } from "bp/content/patches";
 import type { Control } from "./class";
-import type { IStudio, Studio } from "bp/env";
+import type { Studio, StudioBase } from "bp/env";
 import type { DesignMode, JDesign } from "bp/content/json";
-import type { HistoryManager } from "bp/content/changes";
 import type { IDesign, ITagObject } from "bp/content/interface";
-import type { IViewManager } from "bp/view";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -34,7 +32,7 @@ import type { IViewManager } from "bp/view";
 	private static _id = 0;
 
 	/** 物件初始設定值 */
-	public readonly $options: OptionManager;
+	public readonly $options: OptionService;
 
 	/**
 	 * 給 Vue 排序用的 id
@@ -48,15 +46,15 @@ import type { IViewManager } from "bp/view";
 	public readonly $tree: Tree;
 
 	/** 管理 Design 的編輯歷史 */
-	public readonly $history: HistoryManager | null;
+	public readonly $history: HistoryService | null;
 
-	constructor(studio: IStudio, design: RecursivePartial<JDesign>) {
+	constructor(studio: StudioBase, design: RecursivePartial<JDesign>) {
 		super(studio);
 
 		const data = deepCopy<JDesign>(Migration.$getSample(), design);
 		if(data.tree.nodes.length < Tree.$MIN_NODES) throw new Error("Invalid format.");
 
-		this.$options = new OptionManager(data);
+		this.$options = new OptionService(data);
 
 		this.$LayoutSheet = new Sheet(this, "layout", data.layout.sheet,
 			() => this.$flaps.values(),
@@ -73,7 +71,7 @@ import type { IViewManager } from "bp/view";
 		this.description = data.description;
 		this.mode = data.mode;
 
-		this.$history = studio.$historyManagerFactory(this, data);
+		this.$history = HistoryService.$create(this, data.history);
 
 		// Tree 相依於 HistoryManager
 		this.$tree = new Tree(this, data.tree.edges);
@@ -95,8 +93,6 @@ import type { IViewManager } from "bp/view";
 	}
 
 	public get $design(): this { return this; }
-
-	public get $viewManager(): IViewManager { return (this.$mountTarget as IStudio).$viewManager; }
 
 	/**
 	 * 目前的 {@link Design} 是否正在拖曳當中。

@@ -1,10 +1,12 @@
 import { $isTouch } from "./Share";
+import { CursorController } from "./CursorController";
 import { Control, Draggable } from "bp/design/class";
 import { Device, Edge, Flap, Vertex } from "bp/design";
 import { DragSelectView } from "bp/view";
 import { unorderedArray } from "bp/global";
+import { ViewService } from "bp/env/service";
 import type { DragSelectableControl } from "bp/design/class";
-import type { Studio } from "..";
+import type { Studio } from "bp/env";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -68,7 +70,7 @@ import type { Studio } from "..";
 		let nextCtrl: Control | null = null;	// 重疊之中下一個尚未被選取的 Control
 
 		// 找出所有點擊位置中的重疊 Control
-		let controls = this._controls.filter(o => this._studio.$viewManager.$contains(o, point));
+		let controls = this._controls.filter(o => ViewService.$contains(o, point));
 
 		// 找出前述的三個關鍵 Control
 		for(let o of controls) {
@@ -149,7 +151,7 @@ import type { Studio } from "..";
 		this.$clear();
 		this.$process(event, false);
 		this.$hasDraggable();
-		for(let o of this.$draggable) o.$dragStart();
+		for(let o of this.$draggable) o.$dragStart(CursorController.$offset);
 		this._possiblyReselect = false;
 		return true;
 	}

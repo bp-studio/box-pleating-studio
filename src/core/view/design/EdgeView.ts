@@ -1,5 +1,6 @@
-import { LabeledView } from "./class";
-import { PaperUtil } from "./util/PaperUtil";
+import { LabeledView } from "../class";
+import { PaperUtil } from "../util/PaperUtil";
+import { ViewService } from "bp/env/service";
 import { Layer, Style } from "bp/global";
 import type { Edge } from "bp/design";
 import type { IPoint } from "bp/math";
@@ -24,11 +25,10 @@ import type { IPoint } from "bp/math";
 	}
 
 	public $contains(point: paper.Point): boolean {
-		let vm = this._control.$design.$viewManager;
 		return (this._lineRegion.hitTest(point) != null ||
 			this._glow.hitTest(point.transform(this._glow.layer.matrix.inverted())) != null) &&
-			!vm.$contains(this._control.$v1, point) &&
-			!vm.$contains(this._control.$v2, point);
+			!ViewService.$contains(this._control.$v1, point) &&
+			!ViewService.$contains(this._control.$v2, point);
 	}
 
 	protected $render(): void {

@@ -3,6 +3,7 @@ import { action } from "bp/content/changes/action";
 import { Draggable, IndependentDraggable } from "bp/design/class";
 import { Point } from "bp/math";
 import { makePerQuadrant, noCompare, shrewdStatic, unorderedArray } from "bp/global";
+import { ViewService } from "bp/env/service";
 import type { PerQuadrant } from "bp/global";
 import type { Junction } from "./Junction";
 import type { Sheet } from "./Sheet";
@@ -99,7 +100,7 @@ import type { IPoint, Vector } from "bp/math";
 		}
 
 		this.$quadrants = makePerQuadrant(i => new Quadrant(sheet, this, i));
-		this.$design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 
 		design.$history?.$construct(this.$toMemento());
 	}

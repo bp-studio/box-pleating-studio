@@ -1,6 +1,6 @@
 import { $getEventCenter } from "./Share";
 import { Constants } from "bp/content/json";
-import type { Studio } from "..";
+import type { Studio } from "bp/env";
 
 //////////////////////////////////////////////////////////////////
 /**

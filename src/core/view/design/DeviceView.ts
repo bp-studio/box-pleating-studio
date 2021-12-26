@@ -1,5 +1,5 @@
-import { ControlView } from "./class";
-import { PaperUtil } from "./util/PaperUtil";
+import { ControlView } from "../class";
+import { PaperUtil } from "../util/PaperUtil";
 import { Layer, Style } from "bp/global";
 import type { Device } from "bp/design";
 import type { ReadonlyPath } from "bp/math";

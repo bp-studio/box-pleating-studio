@@ -1,5 +1,7 @@
-import { LabeledView, View } from "./class";
-import { PaperUtil } from "./util/PaperUtil";
+import { LabeledView } from "../class/LabeledView";
+import { PaperUtil } from "../util/PaperUtil";
+import { View } from "../class/View";
+import { ViewService } from "bp/env/service";
 import { Layer, Style, unorderedArray } from "bp/global";
 import { Constants } from "bp/content/json";
 import type { Sheet } from "bp/design";
@@ -55,7 +57,7 @@ import type { Control } from "bp/design/class";
 
 	@unorderedArray private get _labeledControls(): Control[] {
 		return this._sheet.$controls.filter((c: Control) =>
-			this._sheet.$design.$viewManager.$get(c) instanceof LabeledView
+			ViewService.$get(c) instanceof LabeledView
 		);
 	}
 
@@ -64,8 +66,7 @@ import type { Control } from "bp/design/class";
 		let controls = this._labeledControls;
 		if(controls.length == 0 || !this.$display || !this.$display.$settings.showLabel) return 0;
 
-		let vm = this._sheet.$design.$viewManager;
-		let overflows = controls.map(c => (vm.$get(c) as LabeledView<Control>).$overflow);
+		let overflows = controls.map(c => (ViewService.$get(c) as LabeledView<Control>).$overflow);
 		return Math.max(...overflows);
 	}
 
@@ -77,8 +78,7 @@ import type { Control } from "bp/design/class";
 		if(controls.length == 0) return horizontalScale;
 
 		if(this.$display?.$settings.showLabel) {
-			let vm = this._sheet.$design.$viewManager;
-			let views = controls.map(c => vm.$get(c) as LabeledView<Control>);
+			let views = controls.map(c => ViewService.$get(c) as LabeledView<Control>);
 			let scales = views.map(v =>
 				v.$getHorizontalScale(width, viewWidth - 2 * fix, factor)
 			);

@@ -1,10 +1,11 @@
-import { PaperUtil } from "./util/PaperUtil";
-import { RiverHelperBase } from "./helper";
-import { LabeledView } from "./class";
+import { PaperUtil } from "../util/PaperUtil";
+import { RiverHelperBase } from "../helper";
+import { LabeledView } from "../class";
+import { ViewService } from "bp/env/service";
 import { Layer, Style, makePerQuadrant, shrewdStatic } from "bp/global";
+import type { Flap } from "bp/design";
 import type { IPoint, PolyBool } from "bp/math";
 import type { PerQuadrant } from "bp/global";
-import type { Flap } from "bp/design";
 import type { ClosureView } from "./RiverView";
 
 //////////////////////////////////////////////////////////////////
@@ -43,8 +44,7 @@ import type { ClosureView } from "./RiverView";
 	}
 
 	public $contains(point: paper.Point): boolean {
-		let vm = this._control.$design.$viewManager;
-		return vm.$contains(this._control.$sheet, point) &&
+		return ViewService.$contains(this._control.$sheet, point) &&
 			(this.hinge.contains(point) || this.hinge.hitTest(point) !== null);
 	}
 

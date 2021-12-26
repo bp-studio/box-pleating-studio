@@ -1,41 +1,23 @@
 import { Design } from "bp/design";
 import { Migration } from "bp/content/patches";
 import type { JDesign } from "bp/content/json";
-import type { HistoryManager } from "bp/content/changes";
-import type { IViewManager } from "bp/view";
-
-export interface IStudio {
-	onDeprecate?: TitleCallback;
-	readonly $viewManager: IViewManager;
-	$historyManagerFactory: HistoryManagerFactory;
-}
-
-export type TitleCallback = (title?: string) => void;
-
-type HistoryManagerFactory = (design: Design, data: JDesign) => HistoryManager | null;
 
 //////////////////////////////////////////////////////////////////
 /**
- * {@link StudioBase} 類別是 {@link Studio} 的抽象基底類別，
+ * {@link StudioBase} 類別是 {@link Studio} 的基底類別，
  * 獨立出來以方便注入不同的成員實作以進行測試。
  */
 //////////////////////////////////////////////////////////////////
 
-export abstract class StudioBase implements IStudio {
+export class StudioBase {
 
 	public readonly $designMap: Map<number, Design> = new Map();
 
 	@shrewd public $design: Design | null = null;
 
-	public abstract readonly $viewManager: IViewManager;
-
-	public abstract $historyManagerFactory(design: Design, data: JDesign): HistoryManager | null;
-
-	protected _onDesignCreated: Action | null = null;
-
 	public $load(json: string | object): Design {
 		if(typeof json == "string") json = JSON.parse(json);
-		let design = Migration.$process(json as Pseudo<JDesign>, this);
+		let design = Migration.$process(json as Pseudo<JDesign>);
 		return this._tryLoad(design);
 	}
 
@@ -58,9 +40,8 @@ export abstract class StudioBase implements IStudio {
 	}
 
 	public $restore(json: Pseudo<JDesign>): Design {
-		let design = this._designFactory(Migration.$process(json, this));
+		let design = this._designFactory(Migration.$process(json));
 		this.$designMap.set(design.id, design);
-		this._onDesignCreated?.();
 		return design;
 	}
 
@@ -92,7 +73,6 @@ export abstract class StudioBase implements IStudio {
 	protected _tryLoad(design: RecursivePartial<JDesign>): Design {
 		this.$design = this._designFactory(design);
 		this.$designMap.set(this.$design.id, this.$design);
-		this._onDesignCreated?.();
 		return this.$design;
 	}
 

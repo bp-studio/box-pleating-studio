@@ -1,4 +1,5 @@
 import { Control } from "bp/design/class";
+import { ViewService } from "bp/env/service";
 import type { Sheet } from "./Sheet";
 import type { TreeEdge } from "bp/content/context";
 
@@ -21,7 +22,7 @@ import type { TreeEdge } from "bp/content/context";
 	constructor(sheet: Sheet, edge: TreeEdge) {
 		super(sheet);
 		this.edge = edge;
-		this.$design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 	}
 
 	protected get $shouldDispose(): boolean {

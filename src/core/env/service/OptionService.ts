@@ -3,11 +3,11 @@ import type { ITagObject } from "bp/content/interface";
 
 //////////////////////////////////////////////////////////////////
 /**
- * {@link OptionManager} 是用來管理 {@link Design} 中元件的初始化設定值。
+ * {@link OptionService} 服務是用來管理 {@link Design} 中元件的初始化設定值。
  */
 //////////////////////////////////////////////////////////////////
 
-export class OptionManager {
+export class OptionService {
 
 	/**
 	 * 當專案載入進來的時候暫存個別元件屬性的 {@link Map}，

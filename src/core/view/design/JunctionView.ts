@@ -1,4 +1,5 @@
-import { View } from "./class";
+import { View } from "../class";
+import { ViewService } from "bp/env/service";
 import { JunctionStatus } from "bp/design";
 import { Layer, Style } from "bp/global";
 import { PaperWorker } from "bp/env/animation/PaperWorker";
@@ -28,9 +29,8 @@ import type { Junction } from "bp/design";
 		this._shade.visible = this._junction.$status == JunctionStatus.tooClose;
 		if(!this._shade.visible) return;
 
-		let vm = this._junction.$design.$viewManager;
 		let f1 = this._junction.f1, f2 = this._junction.f2;
-		let v1 = vm.$get(f1) as FlapView, v2 = vm.$get(f2) as FlapView;
+		let v1 = ViewService.$get(f1) as FlapView, v2 = ViewService.$get(f2) as FlapView;
 		let d = this._junction.$treeDistance - (f1.radius + f2.radius);
 		let json = [v1.$circleJSON, v2.$circleJSON];
 		if(d != 0) json.push(v1.$makeJSON(d), v2.$makeJSON(d));

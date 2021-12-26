@@ -4,6 +4,7 @@ import { onDemand, opposite } from "bp/global";
 import { Line, Point, Vector } from "bp/math";
 import { Draggable } from "bp/design/class";
 import { CornerType } from "bp/content/json";
+import { ViewService } from "bp/env/service";
 import type { JConnection, JCorner, JDevice } from "bp/content/json";
 import type { Region } from "./Region";
 import type { Partition } from "..";
@@ -40,7 +41,7 @@ export type IntersectionMap = [Point, Point | null];
 		this.$addOns = data.addOns?.map(a => AddOn.$instantiate(a)) ?? [];
 		let offset = data.offset ?? 0;
 		this.$location = { x: offset * fx, y: offset * fy };
-		this.$design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 	}
 
 	public toJSON(): JDevice {

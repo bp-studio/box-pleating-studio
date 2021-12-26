@@ -1,5 +1,5 @@
 import { Mountable } from "bp/class";
-import { Display } from "bp/env/screen";
+import type { Display } from "bp/env";
 import type { Studio } from "bp/env/Studio";
 import type { Layer } from "bp/global";
 
@@ -50,9 +50,7 @@ export abstract class View extends Mountable {
 	}
 
 	protected get $display(): Display | null {
-		// 這邊用了比較迂迴的方法來檢查以避免模組的循環相依
-		let display = (this.$studio as Studio)?.$display;
-		return display instanceof Display ? display : null;
+		return (this.$studio as Studio)?.$display ?? null;
 	}
 
 	protected get $displayScale(): number {

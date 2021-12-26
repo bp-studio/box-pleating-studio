@@ -7,7 +7,7 @@ import { TreeMaker } from "bp/plugin";
 import { Settings } from "bp/global";
 import type { DisplaySetting, StudioOptions } from "bp/env";
 import type { Repository } from "bp/design";
-import type { HistoryManager } from "bp/content/changes";
+import type { HistoryService } from "bp/content/changes";
 import type { JDesign } from "bp/content/json";
 
 if(typeof Shrewd != "object") throw new Error("BPStudio requires Shrewd.");
@@ -225,7 +225,7 @@ export class BPStudio {
 	public redo(design: unknown): void {
 		this._getHistory(design)?.$redo();
 	}
-	private _getHistory(design: unknown): HistoryManager | null {
+	private _getHistory(design: unknown): HistoryService | null {
 		return design instanceof Design && design.$history || null;
 	}
 }

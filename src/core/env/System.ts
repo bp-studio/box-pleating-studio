@@ -20,8 +20,8 @@ export class System {
 	constructor(studio: Studio) {
 		this._studio = studio;
 
-		let canvas = studio.$paper.view.element;
-		let tool = studio.$paper.tool = new paper.Tool();
+		let canvas = studio.$display.$paper.view.element;
+		let tool = studio.$display.$paper.tool = new paper.Tool();
 		tool.onKeyDown = this._canvasKeydown.bind(this);
 		tool.onKeyUp = this._canvasKeyup.bind(this);
 		tool.onMouseDown = this._canvasPointerDown.bind(this);
@@ -38,7 +38,7 @@ export class System {
 		CT.KeyboardController.$init();
 	}
 
-	private get _canvas(): HTMLCanvasElement { return this._studio.$paper.view.element; }
+	private get _canvas(): HTMLCanvasElement { return this._studio.$display.$paper.view.element; }
 
 	private _canvasKeydown(event: paper.KeyEvent): boolean {
 		if(event.key == "space") {

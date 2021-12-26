@@ -1,19 +1,13 @@
 import { StudioBase } from "./StudioBase";
 import { Display } from "./screen";
-import { System } from "./System";
 import { Updater } from "./animation/Updater";
-import { HistoryManager } from "bp/content/changes";
-import { ViewManager } from "bp/view/ViewManager";
+import { System } from "./System";
+import { HistoryService } from "bp/content/changes";
+import { Migration } from "bp/content/patches";
+import { ViewService } from "bp/env/service";
+import type { StudioOptions } from "./StudioOptions";
 import type { Design } from "bp/design";
 import type { JDesign } from "bp/content/json";
-import type { TitleCallback } from "./StudioBase";
-
-export interface StudioOptions {
-	onDeprecate?: TitleCallback;
-	onUpdate?: Action<void | Promise<void>>;
-	onDrag?: Action;
-	onLongPress?: Action;
-}
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -26,10 +20,8 @@ export interface StudioOptions {
 
 	public readonly $system: System;
 	public readonly $designMap: Map<number, Design> = new Map();
-	public readonly $display: Display;
-	public readonly $viewManager = new ViewManager();
 	public readonly $el: HTMLElement;
-	public readonly $paper: paper.PaperScope;
+	public readonly $display: Display;
 	public readonly $option: StudioOptions;
 	public readonly $updater: Updater;
 
@@ -40,21 +32,17 @@ export interface StudioOptions {
 			throw new Error("selector is not valid");
 		}
 
+		// 這幾列有順序關係
 		this.$option = {};
 		this.$el = el;
-		this.$paper = new paper.PaperScope();
 		this.$display = new Display(this);
 		this.$system = new System(this);
 		this.$updater = new Updater(this);
 
-		this._onDesignCreated = () => this.$updater.$active = true;
+		Migration.$onDeprecate = (title?: string) => this.$option.onDeprecate?.(title);
+		ViewService.$initialize();
+		HistoryService.$initialize();
 	}
-
-	public $historyManagerFactory(design: Design, data: JDesign): HistoryManager {
-		return new HistoryManager(design, data.history);
-	}
-
-	public onDeprecate(title?: string): void { this.$option.onDeprecate?.(title); }
 
 	public $createBpsBlob(): Blob | null {
 		if(!this.$design) return null;
@@ -76,6 +64,7 @@ export interface StudioOptions {
 	protected _designFactory(design: RecursivePartial<JDesign>): Design {
 		let result = super._designFactory(design);
 		result.$LayoutSheet.onZoom = result.$TreeSheet.onZoom = (zoom: number) => this.$display.$zoom(zoom);
+		this.$updater.$active = true;
 		return result;
 	}
 }

@@ -1,5 +1,4 @@
 import type { JDesign } from "bp/content/json";
-import type { IStudio } from "bp/env";
 
 interface IMigration {
 	(design: Pseudo<JDesign>): boolean;
@@ -41,7 +40,7 @@ export namespace Migration {
 		};
 	}
 
-	export function $process(design: Pseudo<JDesign>, studio: IStudio): JDesign {
+	export function $process(design: Pseudo<JDesign>): JDesign {
 		// 判斷移轉的起點
 		let i = 0;
 		if('version' in design) {
@@ -56,7 +55,10 @@ export namespace Migration {
 		}
 		design.version = $getCurrentVersion();
 
-		if(deprecate && studio.onDeprecate) studio.onDeprecate(design.title);
+		if(deprecate) $onDeprecate?.(design.title);
 		return design as JDesign;
 	}
+
+	/** 偵測到棄用格式的事件 callback */
+	export let $onDeprecate: (title?: string) => void;
 }

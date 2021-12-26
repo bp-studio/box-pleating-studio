@@ -1,2 +1,2 @@
-export * from "./HistoryManager";
+export * from "./HistoryService";
 export * from "./action";

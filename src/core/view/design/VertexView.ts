@@ -1,8 +1,9 @@
-import { LabeledView } from "./class";
+import { LabeledView } from "../class";
+import { ViewService } from "bp/env/service";
 import { Layer, Style, shrewdStatic } from "bp/global";
+import type { Vertex } from "bp/design";
 import type { EdgeView } from "./EdgeView";
 import type { IPoint } from "bp/math";
-import type { Vertex } from "bp/design";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -69,10 +70,9 @@ import type { Vertex } from "bp/design";
 
 	protected get _labelAvoid(): paper.Path[] {
 		let design = this._control.$sheet.$design;
-		let vm = design.$viewManager;
 		let lines = this._control.$node.edges.map(e => {
 			let edge = design.$edges.get(e)!;
-			let edgeView = vm.$get(edge) as EdgeView;
+			let edgeView = ViewService.$get(edge) as EdgeView;
 			edgeView.$draw();
 			return edgeView.line;
 		});

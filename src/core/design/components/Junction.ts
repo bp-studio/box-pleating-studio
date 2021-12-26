@@ -1,6 +1,7 @@
 import { Direction, isQuadrant, opposite, orderedArray, shrewdStatic } from "bp/global";
 import { SheetObject } from "bp/design/class";
 import { CornerType } from "bp/content/json";
+import { ViewService } from "bp/env/service";
 import type { JJunction } from "bp/content/json";
 import type { Flap, Quadrant, Sheet } from ".";
 import type { TreeNode } from "bp/content/context";
@@ -60,7 +61,7 @@ export type JunctionDimension = 'ox' | 'oy';
 		this.f2 = f2;
 		f1._junctions.push(this);
 		f2._junctions.push(this);
-		this.$design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 	}
 
 	protected get $shouldDispose(): boolean {

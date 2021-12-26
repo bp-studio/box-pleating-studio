@@ -1,12 +1,13 @@
-import { PaperUtil } from "./util/PaperUtil";
-import { ControlView } from "./class";
-import { RiverHelper } from "./helper";
+import { PaperUtil } from "../util/PaperUtil";
+import { ControlView } from "../class";
+import { RiverHelper } from "../helper";
+import { ViewService } from "bp/env/service";
 import { Fraction, Line, PathUtil, Point, PolyBool, Vector } from "bp/math";
 import { Layer, Style, shape } from "bp/global";
 import { Mapping } from "bp/class";
 import type { Design, River } from "bp/design";
 import type { TreeEdge, TreeNode } from "bp/content/context";
-import type { View } from "./class";
+import type { View } from "../class";
 import type { FlapView } from "./FlapView";
 
 //////////////////////////////////////////////////////////////////
@@ -35,8 +36,7 @@ import type { FlapView } from "./FlapView";
 	}
 
 	public $contains(point: paper.Point): boolean {
-		let vm = this._control.$design.$viewManager;
-		return vm.$contains(this._control.$sheet, point) && this._shade.contains(point);
+		return ViewService.$contains(this._control.$sheet, point) && this._shade.contains(point);
 	}
 
 	/** 跟當前的河有關的基本資訊；這些除非樹的結構有改變，不然不用重新計算 */
@@ -61,14 +61,13 @@ import type { FlapView } from "./FlapView";
 
 		let inner: ClosureView[] = [];
 		let design = this.$design;
-		let vm = design.$viewManager;
 		for(let e of adjacent) {
 			if(e.$isRiver) {
 				let r = design.$rivers.get(e)!;
-				inner.push(vm.$get(r) as RiverView);
+				inner.push(ViewService.$get(r) as RiverView);
 			} else {
 				let f = design.$flaps.get(e.n1.$degree == 1 ? e.n1 : e.n2)!;
-				inner.push(vm.$get(f) as FlapView);
+				inner.push(ViewService.$get(f) as FlapView);
 			}
 		}
 

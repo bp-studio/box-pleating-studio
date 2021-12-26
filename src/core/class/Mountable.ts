@@ -1,6 +1,6 @@
 import { Disposable } from "./Disposable";
 import { shrewdStatic } from "bp/global";
-import type { IStudio } from "bp/env";
+import type { StudioBase } from "bp/env";
 
 //////////////////////////////////////////////////////////////////
 /**
@@ -10,11 +10,11 @@ import type { IStudio } from "bp/env";
 
 export abstract class Mountable extends Disposable {
 
-	protected readonly $mountTarget: Mountable | IStudio;
+	protected readonly $mountTarget: Mountable | StudioBase;
 
-	private _oldStudio: IStudio | null = null;
+	private _oldStudio: StudioBase | null = null;
 
-	constructor(parent: Mountable | IStudio) {
+	constructor(parent: Mountable | StudioBase) {
 		super();
 		this.$mountTarget = parent;
 	}
@@ -24,7 +24,7 @@ export abstract class Mountable extends Disposable {
 			(this.$mountTarget instanceof Mountable ? this.$mountTarget.$disposed : false);
 	}
 
-	@shrewd protected get $studio(): IStudio | null {
+	@shrewd protected get $studio(): StudioBase | null {
 		if(this.$disposed || !this._isActive) return null;
 		else if(!(this.$mountTarget instanceof Mountable)) return this.$mountTarget;
 		else return this.$mountTarget.$studio;
@@ -57,12 +57,12 @@ export abstract class Mountable extends Disposable {
 	public static $isActive(m: Mountable): boolean { return m._isActive; }
 
 	/** 掛載事件 */
-	protected $onMount(studio: IStudio): void {
+	protected $onMount(studio: StudioBase): void {
 		// 預設行為為空
 	}
 
 	/** 卸載事件 */
-	protected $onDismount(studio: IStudio): void {
+	protected $onDismount(studio: StudioBase): void {
 		// 預設行為為空
 	}
 }

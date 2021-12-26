@@ -4,6 +4,7 @@ import { Draggable, IndependentDraggable } from "bp/design/class";
 import { Fraction, Point, Rectangle } from "bp/math";
 import { unorderedArray } from "bp/global";
 import { Constants } from "bp/content/json";
+import { ViewService } from "bp/env/service";
 import type { JSheet } from "bp/content/json";
 import type { Design } from "..";
 import type { ITagObject } from "bp/content/interface";
@@ -92,7 +93,7 @@ import type { IPoint, Vector } from "bp/math";
 		this._zoom = sheet.zoom ?? Constants.$FULL_ZOOM;
 		this.$scroll = sheet.scroll ?? { x: 0, y: 0 };
 		this._controlMaps = maps;
-		design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 	}
 
 	protected $onDispose(): void {

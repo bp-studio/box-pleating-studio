@@ -1,5 +1,6 @@
 import { Draggable, IndependentDraggable } from "bp/design/class";
 import { Point } from "bp/math";
+import { ViewService } from "bp/env/service";
 import type { Memento, JVertex } from "bp/content/json";
 import type { Sheet } from "./Sheet";
 import type { TreeNode } from "bp/content/context";
@@ -32,7 +33,7 @@ import type { IPoint, Vector } from "bp/math";
 			this.$selected = Boolean(option.selected);
 		}
 
-		sheet.$design.$viewManager.$createView(this);
+		ViewService.$createView(this);
 
 		sheet.$design.$history?.$construct(this.$toMemento());
 	}

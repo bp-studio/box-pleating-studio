@@ -1,11 +1,11 @@
 import * as file from "../samples/Pattern.test.json";
 import { expect } from "chai";
-import { MockStudio } from "mock/MockStudio";
 import { Stretch } from "bp/design/layout/Stretch";
 import { LineUtil } from "utils/LineUtil";
+import { StudioBase } from "bp/env";
 
 it("Pattern Test", () => {
-	let studio = new MockStudio();
+	let studio = new StudioBase();
 	let design = studio.$load(file);
 	Shrewd.commit();
 

@@ -1,6 +1,6 @@
-import type { OptionManager } from "bp/content/OptionManager";
+import type { OptionService } from "bp/env/service/OptionService";
 import type { DesignMode } from "bp/content/json";
-import type { HistoryManager } from "bp/content/changes/HistoryManager";
+import type { HistoryService } from "bp/content/changes/HistoryService";
 import type { Tree } from "bp/content/context";
 
 interface IQueryable {
@@ -17,13 +17,13 @@ export interface ITagObject {
 export type IQueryableTagObject = ITagObject & IQueryable;
 
 export interface IDesign extends IQueryableTagObject {
-	readonly $history: HistoryManager | null;
+	readonly $history: HistoryService | null;
 	readonly $tree: Tree;
 	readonly $dragging: boolean;
 	mode: DesignMode;
-	$options: OptionManager;
+	$options: OptionService;
 	$clearSelection(): void;
 }
 
-/** 抽象化的 Design 介面，所有的欄位都是選填，所以直接代入空物件也可以 */
+/** 選填的 {@link IDesign} 介面，所以直接代入空物件也可以 */
 export type IDesignLike = Partial<IDesign>;

@@ -14,6 +14,8 @@ export abstract class Workspace extends SheetImage {
 
 	private _spaceHolder: HTMLDivElement;
 
+	public $onSheetChange?: (x: number, y: number) => void;
+
 	constructor(studio: Studio) {
 		super(studio);
 
@@ -47,8 +49,8 @@ export abstract class Workspace extends SheetImage {
 
 	/** 設置捲軸的顯示與否、並且傳回當前是否可捲動 */
 	@shrewd public $isScrollable(): boolean {
-		this._studio.$el.classList.toggle("scroll-x", this._isXScrollable);
-		this._studio.$el.classList.toggle("scroll-y", this._isYScrollable);
+		this._el.classList.toggle("scroll-x", this._isXScrollable);
+		this._el.classList.toggle("scroll-y", this._isYScrollable);
 		setTimeout(() => this._setSize(), 0); // 捲軸有變化的時候也要重新確認 viewport 大小
 		return this._isXScrollable || this._isYScrollable;
 	}
@@ -81,7 +83,7 @@ export abstract class Workspace extends SheetImage {
 		if(sheet) {
 			this._spaceHolder.style.width = this._scrollWidth + "px";
 			this._spaceHolder.style.height = this._scrollHeight + "px";
-			this._studio.$system.$scroll.to(sheet.$scroll.x, sheet.$scroll.y);
+			this.$onSheetChange?.(sheet.$scroll.x, sheet.$scroll.y);
 		}
 	}
 

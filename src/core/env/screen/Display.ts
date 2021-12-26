@@ -37,6 +37,7 @@ export interface DisplaySetting {
 	// private _frameRateTotal: number = 0;
 
 	private readonly _project: paper.Project;
+	public readonly $paper: paper.PaperScope;
 
 	@shrewd public $settings: DisplaySetting = {
 		showAxialParallel: true,
@@ -57,10 +58,12 @@ export interface DisplaySetting {
 
 		this.$rasterizer = new Rasterizer(this, this._createImg());
 
+		this.$paper = new paper.PaperScope();
+
 		// 初始化 paper.js 設定
-		studio.$paper.setup(canvas);
-		studio.$paper.settings.insertItems = false;
-		this._project = studio.$paper.project;
+		this.$paper.setup(canvas);
+		this.$paper.settings.insertItems = false;
+		this._project = this.$paper.project;
 		this._project.view.autoUpdate = false;
 		this._project.currentStyle.strokeColor = PaperUtil.$black;
 		this._project.currentStyle.strokeScaling = false;
@@ -123,7 +126,7 @@ export interface DisplaySetting {
 	}
 
 	@shrewd private _renderSetting(): void {
-		let notLayout = this._studio.$design?.mode != "layout" ?? false;
+		let notLayout = this._design?.mode != "layout" ?? false;
 		this._project.layers[Layer.$hinge].visible = this.$settings.showHinge;
 		this._project.layers[Layer.$ridge].visible = this.$settings.showRidge || notLayout;
 		this._project.layers[Layer.$axisParallels].visible = this.$settings.showAxialParallel;
@@ -135,8 +138,8 @@ export interface DisplaySetting {
 		let width = 0, height = 0, scale = this.$scale;
 
 		// 取得基本的數值
-		if(this._studio.$design && this._studio.$design.sheet) {
-			({ width, height } = this._studio.$design.sheet);
+		if(this._design && this._design.sheet) {
+			({ width, height } = this._design.sheet);
 		}
 
 		// 更新目前的邊界繪製

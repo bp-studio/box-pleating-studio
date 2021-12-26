@@ -1,6 +1,5 @@
 import { Control } from "./Control";
 import { Point, Vector } from "bp/math";
-import { CursorController } from "bp/env/controllers/CursorController";
 import type { IPoint } from "bp/math";
 
 //////////////////////////////////////////////////////////////////
@@ -19,8 +18,8 @@ export abstract class Draggable extends Control {
 	private _dragOffset: Vector;
 
 	/** 初始化拖曳 */
-	public $dragStart(): void {
-		this._dragOffset = CursorController.$offset(this.$location);
+	public $dragStart(offsetFactory: Func<IPoint, Vector>): void {
+		this._dragOffset = offsetFactory(this.$location);
 	}
 
 	/** 修正拖曳；可以傳入滑鼠位置或位移向量 */

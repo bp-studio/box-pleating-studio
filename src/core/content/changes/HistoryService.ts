@@ -13,11 +13,22 @@ import type { Control, Draggable } from "bp/design/class";
 
 //////////////////////////////////////////////////////////////////
 /**
- * {@link HistoryManager} 負責管理使用者的操作歷史紀錄。
+ * {@link HistoryService} 負責管理使用者的操作歷史紀錄。
  */
 //////////////////////////////////////////////////////////////////
 
-@shrewd export class HistoryManager extends Disposable implements ISerializable<JHistory> {
+@shrewd export class HistoryService extends Disposable implements ISerializable<JHistory> {
+
+	public static $create(design: IDesignLike, json?: JHistory): HistoryService | null {
+		if(!HistoryService._init) return null;
+		return new HistoryService(design, json);
+	}
+
+	public static $initialize(): void {
+		HistoryService._init = true;
+	}
+
+	private static _init: boolean = false;
 
 	private static readonly _MAX_STEP = 30;
 
@@ -36,7 +47,7 @@ import type { Control, Draggable } from "bp/design/class";
 	/** 是否正在移動歷史 */
 	private _moving: boolean = true;
 
-	constructor(design: IDesignLike, json?: JHistory) {
+	private constructor(design: IDesignLike, json?: JHistory) {
 		super(design instanceof Disposable ? design : undefined);
 		this._design = design;
 		if(json) {
@@ -139,7 +150,7 @@ import type { Control, Draggable } from "bp/design/class";
 		this._steps[this._index++] = step;
 
 		// 最多儲存到 30 步，所以去掉超過的部份
-		if(this._steps.length > HistoryManager._MAX_STEP) {
+		if(this._steps.length > HistoryService._MAX_STEP) {
 			this._steps.shift();
 			this._index--;
 			this._savedIndex--;
