@@ -21,7 +21,8 @@
 
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
-	import { bp } from './import/BPStudio';
+
+	import { BPStudio, bp } from './import/BPStudio';
 
 	import JSZip from 'jszip';
 	import VueI18n from 'vue-i18n';

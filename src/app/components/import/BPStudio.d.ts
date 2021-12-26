@@ -1,23 +1,8 @@
-// 原則上只要引入這個檔案就可以取得 BP Studio 的全體類別
-/// <reference path="../../../core/Index.ts" />
+import type { BPStudio } from "bp/BPStudio";
 
 declare const bp: BPStudio;
-declare type design = Design;
-declare type settings = DisplaySetting;
-declare type river = River;
-declare type edge = Edge;
-declare type flap = Flap;
-declare type vertex = Vertex;
-declare type repo = Repository;
-declare type config = Configuration;
 
-export {
-	bp, design as Design,
-	settings as DisplaySetting,
-	river as River,
-	edge as Edge,
-	flap as Flap,
-	vertex as Vertex,
-	repo as Repository,
-	config as Configuration
-};
+export { bp, BPStudio };
+export { Control } from "bp/design/class";
+export { Design, River, Edge, Flap, Vertex, Repository, Configuration } from "bp/design";
+export { DisplaySetting } from "bp/env/screen";

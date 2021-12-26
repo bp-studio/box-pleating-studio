@@ -17,7 +17,7 @@ import type { RiverView } from "../design/RiverView";
 
 	private readonly _node: TreeNode;
 	private readonly _key: string;
-	protected readonly _view: RiverView;
+	declare protected readonly _view: RiverView;
 
 	constructor(view: RiverView, ids: number[]) {
 		super(view, view.$design.$flaps.$byId.get(ids[0])!);

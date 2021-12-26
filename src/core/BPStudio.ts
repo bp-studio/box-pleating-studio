@@ -96,7 +96,7 @@ export class BPStudio {
 	//////////////////////////////////////////////////////////////////
 
 	/** 傳回物件對應的 {@link Repository}、若有的話 */
-	public getRepository(target: unknown): Repository | null {
+	public getRepository(target?: unknown): Repository | null {
 		if(!target) target = this.selection[0];
 		if(target instanceof Device) return target.$pattern.$configuration.$repository;
 		else if(target instanceof Stretch) return target.$repository;
@@ -104,7 +104,7 @@ export class BPStudio {
 	}
 
 	/** 傳回 {@link Control} 的類別字串 */
-	public getType(target: unknown): string | null {
+	public getType(target?: unknown): string | null {
 		if(!target) target = this.selection[0];
 		if(target instanceof Control) return target.$type;
 		return null;

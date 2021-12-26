@@ -1,6 +1,6 @@
+import { BPStudio, Control, Design, bp } from '../import/BPStudio';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import CoreBase from './coreBase';
-import { bp } from '../import/BPStudio';
 
 declare const core: CoreBase;
 

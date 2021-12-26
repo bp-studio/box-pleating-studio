@@ -1,12 +1,21 @@
 {
 	"compilerOptions": {
-		"target": "es2018",
+		"target": "es2019",
+		"types": ["@types/wicg-file-system-access"],
+		"lib": ["DOM", "ESNext"],
 		"moduleResolution": "node",
 		"experimentalDecorators": true,
 		"strictNullChecks": true,
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": ".",
+		"paths": {
+			"bp/*": [
+				"../core/*"
+			],
+		}
 	},
 	"include": [
-		"./**/*"
+		"./**/*",
+		"../core/global/*.d.ts"
 	]
 }

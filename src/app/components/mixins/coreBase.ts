@@ -1,5 +1,5 @@
 import { Component, Vue } from 'vue-property-decorator';
-import { bp } from '../import/BPStudio';
+import { Control, Design, bp } from '../import/BPStudio';
 
 /**
  * 宣告這個類別是為了幫助 TypeScript 的型別檢查，
