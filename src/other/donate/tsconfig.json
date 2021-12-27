@@ -3,7 +3,7 @@
 		"target": "es2018",
 		"moduleResolution": "node",
 		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true,
+		"allowSyntheticDefaultImports": true
 	},
 	"include": [
 		"./**/*"

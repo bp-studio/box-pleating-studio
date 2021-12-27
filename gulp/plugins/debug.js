@@ -5,22 +5,22 @@ const through = require("through2");
 // 要注入到偵錯版的 polyfill
 const polyfill = `<!-- Local polyfill -->
 	<script>
-		// fetch
-		let org_fetch = fetch;
-		fetch = function(url) {
-			if(url.startsWith("h")) return org_fetch(url);
-			else return new Promise(resolve => {
-				let oReq = new XMLHttpRequest();
-				oReq.addEventListener("load", e =>
-					resolve({ text: () => e.target.responseText })
-				);
-				oReq.open("GET", url);
-				oReq.send();
-			})
-		};
-
-		// broadcast channel
 		(function() {
+			// fetch
+			let org_fetch = fetch;
+			fetch = function(url) {
+				if(url.startsWith("h")) return org_fetch(url);
+				else return new Promise(resolve => {
+					let oReq = new XMLHttpRequest();
+					oReq.addEventListener("load", e =>
+						resolve({ text: () => e.target.responseText })
+					);
+					oReq.open("GET", url);
+					oReq.send();
+				})
+			};
+
+			// broadcast channel
 			const bc = new BroadcastChannel('bp_channel');
 			let res;
 			bc.onmessage = function(event) {

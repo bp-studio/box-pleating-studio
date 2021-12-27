@@ -16,7 +16,9 @@ function transform(file, encoding, callback) {
 	file.contents = Buffer.from(result, encoding);
 	return callback(null, file);
 }
+
 function crc() {
 	return through.obj(transform);
 }
+
 module.exports = crc;

@@ -35,7 +35,7 @@ gulp.task('coreDev', () =>
 		.pipe(esb({
 			outfile: 'bpstudio.js',
 			bundle: true,
-			sourcemap: 'inline',
+			sourcemap: 'inline', // for continuing with gulp-sourcemaps
 			globalName: 'BPStudio',
 			external: ['paper'],
 			resolveExtensions: ['.ts', '.d.ts'],

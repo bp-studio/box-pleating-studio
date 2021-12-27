@@ -19,13 +19,13 @@
 		"baseUrl": ".",
 		"paths": {
 			"bp/*": [
-				"../core/*"
+				"../src/core/*"
 			]
 		},
 	},
 	"include": [
 		"./**/*.ts",
-		"../core/**/*.d.ts"
+		"../src/core/**/*.d.ts"
 	],
 	"ts-node": {
 		"files": true

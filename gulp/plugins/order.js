@@ -9,6 +9,7 @@ function copyInOrderOf(source, order) {
 	for(let key in order) result[key] = copyInOrderOf(source[key], order[key]);
 	return result;
 }
+
 function toJSON(file) {
 	if(!file.contents) debugger;
 	let content = file.contents.toString('utf8');
@@ -17,7 +18,6 @@ function toJSON(file) {
 	} catch(e) {
 		debugger;
 	}
-
 }
 
 module.exports = function(sourceName) {
