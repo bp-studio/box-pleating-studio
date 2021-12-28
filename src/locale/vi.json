@@ -40,7 +40,8 @@
 				"name": "Dự án BP Studio",
 				"download": "Tải xuống dự án hiện tại",
 				"save": "Lưu dự án",
-				"saveAs": "Lưu dự án thành ..."
+				"saveAs": "Lưu dự án thành ...",
+				"saveAll": "Lưu tất cả các dự án"
 			},
 			"BPZ": {
 				"name": "Không gian làm việc của BP Studio",

@@ -56,12 +56,14 @@ import type { Control } from "bp/design/class";
 	}
 
 	@unorderedArray private get _labeledControls(): Control[] {
+		this.$disposeEvent();
 		return this._sheet.$controls.filter((c: Control) =>
 			ViewService.$get(c) instanceof LabeledView
 		);
 	}
 
 	@shrewd public get $margin(): number {
+		this.$disposeEvent();
 		if(!this._isActive || !this._sheet.$design._isActive) return 0;
 		let controls = this._labeledControls;
 		if(controls.length == 0 || !this.$display || !this.$display.$settings.showLabel) return 0;

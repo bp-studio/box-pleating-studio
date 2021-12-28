@@ -22,7 +22,7 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 
-	import { BPStudio, bp } from './import/BPStudio';
+	import { BPStudio, Design, bp } from './import/BPStudio';
 
 	import JSZip from 'jszip';
 	import VueI18n from 'vue-i18n';
@@ -171,19 +171,20 @@
 		// 下載
 		/////////////////////////////////////////////////////////////////////////////////////////
 
-		public async getBlob(type: string): Promise<Blob> {
+		public async getBlob(type: string, design?: Design): Promise<Blob> {
 			if(!this.design) throw new Error();
 			if(type == 'png') return await bp.toPNG();
 			if(type == 'svg') return bp.toSVG();
 			if(type == 'bpz') return await this.zip();
-			if(type == 'bps') return bp.toBPS()!;
+			if(type == 'bps') return bp.toBPS(design ? design.id : undefined)!;
 			throw new Error();
 		}
 
-		public getFilename(type: string): string {
-			if(!this.design) return "";
+		public getFilename(type: string, design?: Design): string {
+			if(!design) design = this.design || undefined;
+			if(!design) return "";
 			if(type == "bpz") return this.$t('keyword.workspace').toString();
-			else return sanitize(this.design.title);
+			else return sanitize(design.title);
 		}
 
 		private async zip(): Promise<Blob> {

@@ -167,7 +167,9 @@ export class BPStudio {
 		if(typeof id == 'number') this._studio.$close(id);
 	}
 	public closeAll(): void { this._studio.$closeAll(); }
-	public toBPS(): Blob | null { return this._studio.$createBpsBlob(); }
+	public toBPS(id?: unknown): Blob | null {
+		return this._studio.$createBpsBlob(typeof id == 'number' ? id : undefined);
+	}
 
 	public load(json: unknown): Design | undefined {
 		try {

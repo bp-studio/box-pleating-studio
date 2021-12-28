@@ -22,6 +22,7 @@ import type { IPoint, Vector } from "bp/math";
 	public readonly $tag: string;
 
 	@unorderedArray public get $controls(): Control[] {
+		this.$disposeEvent();
 		let result: Control[] = [];
 		for(let map of this._controlMaps) result.push(...map());
 		return result;

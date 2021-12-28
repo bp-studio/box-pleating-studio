@@ -40,7 +40,8 @@
 				"name": "Proyecto BP Studio",
 				"download": "Descargar proyecto actual",
 				"save": "Guardar proyecto",
-				"saveAs": "Guardar proyecto como..."
+				"saveAs": "Guardar proyecto como...",
+				"saveAll": "Guardar todos los proyectos"
 			},
 			"BPZ": {
 				"name": "Espacio de trabajo de BP Studio",

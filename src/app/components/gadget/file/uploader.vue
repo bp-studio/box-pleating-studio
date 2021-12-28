@@ -11,7 +11,7 @@
 	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
-	export default class Uploader extends Vue {
+	export default class Uploader extends Vue implements Executor {
 
 		protected id: string = "file" + this._uid;
 

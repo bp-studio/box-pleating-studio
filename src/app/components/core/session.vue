@@ -6,6 +6,7 @@
 	import { Component, Vue } from 'vue-property-decorator';
 	import { bp } from '../import/BPStudio';
 
+	/** 管理工作階段的自動儲存 */
 	@Component
 	export default class Session extends Vue {
 
@@ -42,6 +43,7 @@
 			return haveSession;
 		}
 
+		/** 檢查當前的 App 實體是否具有工作階段儲存權 */
 		private checkSession(): Promise<boolean> {
 			const SESSION_CHECK_TIMEOUT = 250;
 			return new Promise<boolean>(resolve => {
@@ -61,6 +63,7 @@
 			});
 		}
 
+		/** 儲存工作階段 */
 		public async save(): Promise<void> {
 			// 拖曳的時候存檔無意義且浪費效能，跳過
 			if(bp.isDragging) return;

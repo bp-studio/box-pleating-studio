@@ -10,18 +10,20 @@
 <script lang="ts">
 	import { Component, Prop, Vue } from 'vue-property-decorator';
 
+	import { Design } from "../../import/BPStudio";
+
 	@Component
-	export default class SaveAs extends Vue {
+	export default class SaveAs extends Vue implements Executor {
 
 		@Prop(String) public type: string;
 		@Prop(String) public desc: string;
 		@Prop(String) public mime: string;
 		@Prop(Boolean) public disabled: boolean;
 
-		public async execute(): Promise<void> {
+		public async execute(design?: Design, callback?: (handle: FileSystemFileHandle) => void): Promise<boolean> {
 			try {
 				let handle = await showSaveFilePicker({
-					suggestedName: core.getFilename(this.type),
+					suggestedName: core.getFilename(this.type, design),
 					types: [{
 						description: this.desc,
 						accept: {
@@ -30,13 +32,15 @@
 					}],
 				} as SaveFilePickerOptions);
 				let writable = await handle.createWritable();
-				let blob = await core.getBlob(this.type);
+				let blob = await core.getBlob(this.type, design);
 				await writable.write(blob);
 				await writable.close();
-				this.$emit('save', handle);
-
+				if(callback) callback(handle);
+				else this.$emit('save', handle);
+				return true;
 			} catch(e) {
 				// 使用者取消的話會跑到這邊來
+				return false;
 			}
 		}
 	}

@@ -8,6 +8,7 @@
 
 	declare const defaultHotkey: () => object;
 
+	/** 管理 App 的設定值 */
 	@Component
 	export default class Settings extends Vue {
 
@@ -32,6 +33,7 @@
 			}
 		}
 
+		/** 把 source 物件中的屬性遞迴地複製到 target 中（忽略 target 中沒有的屬性） */
 		public copy(target: object, source: object): void {
 			if(!source) return;
 			for(let key in target) {
@@ -40,6 +42,7 @@
 			}
 		}
 
+		/** 儲存設定值 */
 		public save(): void {
 			let {
 				showGrid, showHinge, showRidge, showAxialParallel,
@@ -59,6 +62,7 @@
 			}));
 		}
 
+		/** 重設設定值回到預設值 */
 		public async reset(): Promise<void> {
 			if(!await core.confirm(this.$t("preference.confirmReset"))) return;
 

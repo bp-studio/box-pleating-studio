@@ -34,25 +34,19 @@
 			<div v-if="isFileApi" class="row mt-4 mt-sm-5 justify-content-center file-api">
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 mb-4">
 					<h4 class="mb-3" v-t="'welcome.start'"></h4>
-					<div @click="core.projects.create()">
-						<div class="link-primary">
-							<i class="far fa-file"></i>
-							{{$t('toolbar.file.new')}}
-						</div>
+					<div @click="core.projects.create()" class="link-primary">
+						<i class="far fa-file fa-fw me-2"></i>
+						{{$t('toolbar.file.new')}}
 					</div>
-					<opener @open="core.files.open($event)">
-						<div class="link-primary">
-							<i class="far fa-folder-open"></i>
-							{{$t('toolbar.file.open')}}
-						</div>
+					<opener @open="core.files.open($event)" class="link-primary">
+						<i class="far fa-folder-open fa-fw me-2"></i>
+						{{$t('toolbar.file.open')}}
 					</opener>
 				</div>
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
 					<div v-if="recent.length">
 						<h4 class="mb-3" v-t="'welcome.recent'"></h4>
-						<div v-for="(h,i) in recent" :key="i" @click="open(h)">
-							<div class="link-primary">{{h.name}}</div>
-						</div>
+						<div v-for="(h,i) in recent" :key="i" @click="open(h)" class="link-primary">{{h.name}}</div>
 					</div>
 				</div>
 			</div>
@@ -168,14 +162,11 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
-		display: inline-block;
 		max-width: 100%;
+		line-height: 1.75;
 	}
 
-	.welcome .link-primary i {
-		display: inline-block;
-		width: 1.5rem;
-		margin-right: 0.5rem;
-		text-align: center;
+	.welcome .link-primary:hover {
+		background: #eee;
 	}
 </style>

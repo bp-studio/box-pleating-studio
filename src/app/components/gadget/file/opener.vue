@@ -8,7 +8,7 @@
 	import { Component, Prop, Vue } from 'vue-property-decorator';
 
 	@Component
-	export default class Opener extends Vue {
+	export default class Opener extends Vue implements Executor {
 
 		@Prop(String) public accept: string;
 		@Prop(Boolean) public multiple: boolean;

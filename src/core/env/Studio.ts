@@ -44,11 +44,10 @@ import type { JDesign } from "bp/content/json";
 		HistoryService.$initialize();
 	}
 
-	public $createBpsBlob(): Blob | null {
-		if(!this.$design) return null;
-		let json = this.$design.toJSON();
-		delete json.history; // 存檔的時候不用儲存歷史
-		let bps = JSON.stringify(json);
+	public $createBpsBlob(id?: number): Blob | null {
+		let design = id === undefined ? this.$design : this.$designMap.get(id);
+		if(!design) return null;
+		let bps = JSON.stringify(design);
 		return new Blob([bps], { type: "application/bpstudio.project+json" });
 	}
 

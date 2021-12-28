@@ -24,9 +24,11 @@
 					:desc="$t('toolbar.file.BPS.name')"
 					mime="application/bpstudio.project+json"
 				>
-					<i class="fas fa-save"></i>
-					{{$t('toolbar.file.BPS.saveAs')}}
+					<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.BPS.saveAs')}}</hotkey>
 				</saveas>
+				<dropdownitem :disabled="!design" @click="saveAll()">
+					<hotkey icon="fas fa-save" ctrl hk="K">{{$t('toolbar.file.BPS.saveAll')}}</hotkey>
+				</dropdownitem>
 				<saveas
 					:disabled="!design"
 					type="bpz"
@@ -35,7 +37,7 @@
 					:desc="$t('toolbar.file.BPZ.name')"
 					mime="application/bpstudio.workspace+zip"
 				>
-					<hotkey icon="fas fa-save" ctrl shift hk="S">{{$t('toolbar.file.BPZ.save')}}</hotkey>
+					<hotkey icon="fas fa-save">{{$t('toolbar.file.BPZ.save')}}</hotkey>
 				</saveas>
 			</template>
 			<template v-else>
@@ -46,7 +48,7 @@
 					<hotkey icon="fas fa-download" ctrl hk="S">{{$t('toolbar.file.BPS.download')}}</hotkey>
 				</download>
 				<download :disabled="!design" type="bpz" ref="bpz" @download="notifyAll">
-					<hotkey icon="fas fa-download" ctrl shift hk="S">{{$t('toolbar.file.BPZ.download')}}</hotkey>
+					<hotkey icon="fas fa-download">{{$t('toolbar.file.BPZ.download')}}</hotkey>
 				</download>
 			</template>
 
@@ -108,6 +110,7 @@
 
 	import BaseComponent from '../mixins/baseComponent';
 	import Download from '../gadget/file/download.vue';
+	import SaveAs from '../gadget/file/saveas.vue';
 
 	@Component
 	export default class FileMenu extends BaseComponent {
@@ -120,20 +123,19 @@
 				if(isFileApiEnabled) this.save();
 				else bps.execute();
 			}, "s");
-			registerHotkey(() => core.design && (this.$refs.bpz as Executor).execute(), "s", true);
+			registerHotkey(() => core.design && (this.$refs.bps as Executor).execute(), "s", true);
+			registerHotkey(() => this.saveAll(), "k");
 			registerHotkey(() => this.print(), "p");
 		}
 
 		protected get isFileApiEnabled(): boolean { return isFileApiEnabled; }
 		protected get core(): typeof core { return core; }
 
-		protected notify(handle?: FileSystemFileHandle): void {
+		protected notify(handle: FileSystemFileHandle): void {
 			let design = this.bp.design!;
 			this.bp.notifySave(design);
-			if(handle) {
-				core.handles.set(design.id, handle);
-				core.handles.addRecent(handle);
-			}
+			core.handles.set(design.id, handle);
+			core.handles.addRecent(handle);
 			gtag('event', 'project_bps');
 		}
 		protected notifyAll(handle?: FileSystemFileHandle): void {
@@ -169,23 +171,39 @@
 			this.downloads().forEach(d => d.reset());
 		}
 
-		protected async save(): Promise<void> {
+		protected async save(id?: number): Promise<boolean> {
+			if(id === undefined) id = this.design!.id;
+			let design = this.bp.getDesign(id);
 			try {
-				let handle = core.handles.get(this.design!.id);
+				let handle = core.handles.get(id);
 				let writable = await handle.createWritable();
 				try {
 					await handle.getFile();
-					await writable.write(await core.getBlob("bps"));
+					await writable.write(this.bp.toBPS(id)!);
 					await writable.close();
 					core.handles.addRecent(handle);
-					this.notify();
+					this.bp.notifySave(design);
+					return true;
 				} catch(e) {
 					await writable.abort();
 					throw e;
 				}
 			} catch(e) {
-				(this.$refs.bps as Executor).execute();
+				return (this.$refs.bps as SaveAs).execute(design, handle => {
+					core.handles.set(id!, handle);
+					core.handles.addRecent(handle);
+					this.bp.notifySave(design);
+				});
 			}
+		}
+
+		protected async saveAll(): Promise<void> {
+			for(let id of this.bp.getDesigns().map(d => d.id)) {
+				console.log(id);
+				// eslint-disable-next-line no-await-in-loop
+				if(!await this.save(id)) return;
+			}
+			gtag('event', 'project_bps');
 		}
 
 		protected async upload(event: Event): Promise<void> {

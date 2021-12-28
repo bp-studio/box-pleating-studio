@@ -40,7 +40,8 @@
 				"name": "BP Studio 專案",
 				"download": "下載目前的專案",
 				"save": "儲存專案",
-				"saveAs": "另存專案為..."
+				"saveAs": "另存專案為...",
+				"saveAll": "儲存所有專案"
 			},
 			"BPZ": {
 				"name": "BP Studio 工作區",
