@@ -1,6 +1,6 @@
 <template>
 	<div class="h-100 scroll-shadow" style="border:1px solid lightgray;">
-		<div style="position:sticky; top:0; background:lightgray;">
+		<div style="position:sticky; z-index:10; top:0; background:lightgray;">
 			<table class="w-100 table table-sm table-bordered m-0">
 				<colgroup>
 					<col width="66%" />

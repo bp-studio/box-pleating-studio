@@ -80,7 +80,7 @@ import type { IPoint, Vector } from "bp/math";
 	/** @exports */
 	public get zoom(): number { return this._zoom; }
 	public set zoom(v: number) {
-		if(v < Constants.$FULL_ZOOM) return;
+		if(v < Constants.$FULL_ZOOM) v = Constants.$FULL_ZOOM;
 		this.onZoom?.(v);
 	}
 	@shrewd public _zoom: number;
