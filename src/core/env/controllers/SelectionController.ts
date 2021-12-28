@@ -8,6 +8,9 @@ import { ViewService } from "bp/env/service";
 import type { DragSelectableControl } from "bp/design/class";
 import type { Studio } from "bp/env";
 
+const TOUCH_THRESHOLD = 1;
+const MOUSE_THRESHOLD = 0.2;
+
 //////////////////////////////////////////////////////////////////
 /**
  * {@link SelectionController} 類別負責管理元件的選取。
@@ -125,8 +128,9 @@ import type { Studio } from "bp/env";
 
 	public $processDragSelect(event: paper.ToolEvent): void {
 		if(!this._view.$visible) {
-			// 觸碰的情況中要拖曳至一定距離才開始觸發拖曳選取
-			if($isTouch(event.event) && event.downPoint.getDistance(event.point) < 1) return;
+			// 要拖曳至一定距離才開始觸發拖曳選取
+			let dist = event.downPoint.getDistance(event.point);
+			if(dist < ($isTouch(event.event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
 			this.$clear();
 			this._view.$visible = true;
 			this._view.$down = event.downPoint;
