@@ -10,6 +10,10 @@
 				{{$t('toolbar.help.news')}}
 				<div class="notify" v-if="notify"></div>
 			</div>
+			<a class="dropdown-item" href="https://bp-studio.github.io" target="_blank" rel="noopener">
+				<i class="fas fa-globe"></i>
+				{{$t("keyword.homepage")}}
+			</a>
 			<a
 				class="dropdown-item"
 				href="https://github.com/MuTsunTsai/box-pleating-studio/discussions"

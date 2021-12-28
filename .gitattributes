@@ -4,3 +4,4 @@
 
 # Set GitHub linguist exclusion
 lib/**/* linguist-vendored
+src/log/*.md linguist-detectable=true

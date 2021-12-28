@@ -19,7 +19,8 @@
 		},
 		"copyright": "Copyright © 2020{0} by Mu-Tsun Tsai",
 		"recent": "Recently used",
-		"start": "Start"
+		"start": "Start",
+		"website": "BP Studio website"
 	},
 	"toolbar": {
 		"file": {
@@ -181,8 +182,9 @@
 	"about": {
 		"title": "About Box Pleating Studio",
 		"license": "Released under the MIT license.",
-		"visit": "For user manual and feedback, visit the app's {0} on Github.",
-		"homepage": "homepage",
+		"manual": "For user manual, visit the app's {0}.",
+		"feedback": "For feedback, visit the app's {0}.",
+		"repo": "Github repository",
 		"donation": "BP Studio is completely free to use. If you find this app helpful to your designing and are interested in supporting this app, you can donate any amount with {0}.",
 		"visitBlog": "Also visit author's {0} for more info!",
 		"blog": "blog"
@@ -223,6 +225,7 @@
 		"close": "Close",
 		"delete": "Delete",
 		"version": "Version",
+		"homepage": "homepage",
 		"untitled": "Untitled",
 		"workspace": "workspace"
 	}

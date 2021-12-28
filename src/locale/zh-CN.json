@@ -19,7 +19,8 @@
 		},
 		"copyright": "Copyright © 2020{0} 蔡牧村",
 		"recent": "最近使用",
-		"start": "开始"
+		"start": "开始",
+		"website": "BP Studio 网站"
 	},
 	"toolbar": {
 		"file": {
@@ -181,8 +182,9 @@
 	"about": {
 		"title": "关于 Box Pleating Studio",
 		"license": "依 MIT 授权条款发行",
-		"visit": "欲参阅指南或提供意见回馈，请前往本 App 在 GitHub 上的{0}。",
-		"homepage": "首页",
+		"manual": "欲参阅指南，请前往本 App 的 {0}。",
+		"feedback": "欲提供意见回馈，请前往本 App 的 {0}。",
+		"repo": "Github 存储库",
 		"donation": "BP Studio 的使用是完全免费的。若您觉得本 App 对您的折纸设计有帮助并有兴趣提供支持，欢迎您透过 {0} 任意捐款。",
 		"visitBlog": "您还可以访问作者的{0}以了解更多信息！",
 		"blog": "博客"
@@ -223,6 +225,7 @@
 		"close": "关闭",
 		"delete": "删除",
 		"version": "版本",
+		"homepage": "首页",
 		"untitled": "未命名",
 		"workspace": "工作区"
 	}

@@ -19,7 +19,8 @@
 		},
 		"copyright": "Copyright © 2020{0} 蔡 牧村",
 		"recent": "最近使用された",
-		"start": "開始"
+		"start": "開始",
+		"website": "BP Studio のウェブサイト"
 	},
 	"toolbar": {
 		"file": {
@@ -181,8 +182,9 @@
 	"about": {
 		"title": "Box Pleating Studio について",
 		"license": "MIT ライセンスの下でリリースされました。",
-		"visit": "ユーザーマニュアルとフィードバックについては、Github でアプリの{0}にアクセスしてください。",
-		"homepage": "ホームページ",
+		"manual": "ユーザーマニュアルについては、アプリの s{0}にアクセスしてください。",
+		"feedback": "フィードバックについては、アプリの{0}にアクセスしてください。",
+		"repo": "Github リポジトリ",
 		"donation": "BP Studio は完全に無料で使用できます。このアプリがデザインに役立ち、このアプリのサポートに関心がある場合は、{0} を使用して任意の金額を寄付できます。",
 		"visitBlog": "詳細については、著者の{0}にもアクセスしてください！",
 		"blog": "ブログ"
@@ -223,6 +225,7 @@
 		"close": "閉じる",
 		"delete": "削除",
 		"version": "バージョン",
+		"homepage": "ホームページ",
 		"untitled": "無題",
 		"workspace": "ワークスペース"
 	}

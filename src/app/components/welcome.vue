@@ -8,10 +8,7 @@
 
 					<p class="mt-4" v-t="'welcome.intro[0]'"></p>
 					<i18n path="welcome.intro[1]" tag="p">
-						<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio">GitHub</a>
-					</i18n>
-					<i18n path="about.visitBlog" tag="p">
-						<a target="_blank" rel="noopener" href="https://origami.abstreamace.com/" v-t="'about.blog'"></a>
+						<a target="_blank" rel="noopener" href="https://bp-studio.github.io/" v-t="'welcome.website'"></a>
 					</i18n>
 				</div>
 				<div class="browser-only col-12 col-lg-10 col-xl-8">

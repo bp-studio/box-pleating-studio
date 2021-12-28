@@ -8,8 +8,11 @@
 				<div class="modal-body">
 					<p>{{copyright}}</p>
 					<p v-t="'about.license'"></p>
-					<i18n path="about.visit" tag="p">
-						<a target="_blank" rel="noopener" href="https://github.com/MuTsunTsai/box-pleating-studio" v-t="'about.homepage'"></a>
+					<i18n path="about.manual" tag="p">
+						<a target="_blank" rel="noopener" href="https://bp-studio.github.io" v-t="'keyword.homepage'"></a>
+					</i18n>
+					<i18n path="about.feedback" tag="p">
+						<a target="_blank" rel="noopener" href="https://github.com/bp-studio/box-pleating-studio" v-t="'about.repo'"></a>
 					</i18n>
 					<i18n path="about.visitBlog" tag="p">
 						<a target="_blank" rel="noopener" href="https://origami.abstreamace.com/" v-t="'about.blog'"></a>

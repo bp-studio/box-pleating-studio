@@ -19,7 +19,8 @@
 		},
 		"copyright": "Bản quyền © 2020{0} bởi Thái Mục Thôn (Mu-Tsun Tsai)",
 		"recent": "Được sử dụng gần đây",
-		"start": "Khởi đầu"
+		"start": "Khởi đầu",
+		"website": "Trang web BP Studio"
 	},
 	"toolbar": {
 		"file": {
@@ -181,8 +182,9 @@
 	"about": {
 		"title": "Giới thiệu về Box Pleating Studio",
 		"license": "Được phát hành theo giấy phép MIT.",
-		"visit": "Để biết hướng dẫn sử dụng và phản hồi, hãy truy cập {0} của ứng dụng trên Github.",
-		"homepage": "trang chủ",
+		"manual": "Để biết hướng dẫn sử dụng, hãy truy cập {0} của ứng dụng.",
+		"feedback": "Để có phản hồi, hãy truy cập {0} của ứng dụng.",
+		"repo": "Kho lưu trữ Github",
 		"donation": "BP Studio hoàn toàn miễn phí để sử dụng. Nếu bạn thấy ứng dụng này hữu ích cho thiết kế của mình và quan tâm đến việc hỗ trợ ứng dụng này, bạn có thể quyên góp bất kỳ số tiền nào với {0}.",
 		"visitBlog": "Cũng truy cập {0} của tác giả để biết thêm thông tin!",
 		"blog": "Blog"
@@ -223,6 +225,7 @@
 		"close": "Đóng",
 		"delete": "Xóa bỏ",
 		"version": "Phiên bản",
+		"homepage": "trang chủ",
 		"untitled": "Không có tiêu đề",
 		"workspace": "không gian làm việc"
 	}
