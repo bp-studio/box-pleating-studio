@@ -1,4 +1,4 @@
-<template >
+<template>
 	<div>
 		<h5 v-t="'panel.repo.type'" class="panel-title"></h5>
 		<div class="row" v-if="repository.size==1&&entry.size==1">

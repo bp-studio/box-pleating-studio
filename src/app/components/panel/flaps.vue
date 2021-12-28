@@ -1,4 +1,4 @@
-<template >
+<template>
 	<div>
 		<h5 v-t="'panel.flaps.type'" class="panel-title"></h5>
 		<div class="mt-3">

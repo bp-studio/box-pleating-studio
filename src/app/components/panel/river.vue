@@ -1,4 +1,4 @@
-<template >
+<template>
 	<div>
 		<h5 v-t="'panel.river.type'" class="panel-title"></h5>
 		<div class="panel-grid">

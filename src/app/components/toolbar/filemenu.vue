@@ -175,7 +175,7 @@
 				let writable = await handle.createWritable();
 				try {
 					await handle.getFile();
-					await writable.write((await core.getBlob("bps"))!);
+					await writable.write(await core.getBlob("bps"));
 					await writable.close();
 					core.handles.addRecent(handle);
 					this.notify();

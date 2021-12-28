@@ -19,8 +19,8 @@ export class JoinCandidate {
 	public readonly o: IPoint;
 	public readonly a: JAnchor[];
 	public readonly v: Vector;
-	public readonly pt: IPoint
-	public readonly e: Line
+	public readonly pt: IPoint;
+	public readonly e: Line;
 
 	constructor(
 		p: Piece,
@@ -65,7 +65,7 @@ export class JoinCandidate {
 
 	public $setupAnchor(upperLeft: boolean, anchor: Point): void {
 		let q = upperLeft ? Direction.UL : Direction.LR;
-		// 因為每次寫入的位置其實都是一樣的，所以這邊不用擔心垃圾資料惠存活到下一次
+		// 因為每次寫入的位置其實都是一樣的，所以這邊不用擔心垃圾資料會存活到下一次
 		this.a[q] = { location: anchor.add(this.v).$toIPoint() };
 	}
 }
