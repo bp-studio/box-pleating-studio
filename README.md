@@ -7,7 +7,7 @@
 # Box Pleating Studio
 
 <p align="center">
-  <a href="http://bp-studio.github.io" target="_blank"><img width="400" src="https://github.com/MuTsunTsai/box-pleating-studio/raw/main/src/public/assets/mockup.jpg"></a>
+  <a href="http://bp-studio.github.io"><img width="400" src="https://github.com/MuTsunTsai/box-pleating-studio/raw/main/src/public/assets/mockup.jpg"></a>
 </p>
 
 > Super-complex origami design made easy!

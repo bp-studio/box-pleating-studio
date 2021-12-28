@@ -18,13 +18,23 @@ To build BP Studio, first you need the following:
 2. Install [Gulp](https://www.npmjs.com/package/gulp) globally by the command `npm install --global gulp-cli`.
 
 And then you can simply press `F5` in VS Code to build and launch the app automatically.
+This is the preferred way to launch as it adds additional parameters for launching Chrome to ensure all functionalities work properly in local environment.
+
 Alternatively, run `gulp` (or `gulp default`) to build the entire project manually,
 and use any browser to open `debug/index.htm` (or `dist/index.htm` if debug is not needed) to run it.
+Some of the features may not work with this approach though.
 
 Typically the default task is sufficient for developing purpose,
 and you won't need to execute individual subtask,
 as all subtasks will skip themselves if the source files are not changed.
 If something goes wrong, you can run `gulp clean` to cleanup built files and then rebuild everything.
+
+## Unit testing
+
+BP Studio specs and tests use [Mocha](https://mochajs.org/).
+The preferred way to run them is by using the
+[Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter) extension of VS Code.
+Alternatively, run `npm test` in the console to run all tests.
 
 ## About BP Studio Core
 
@@ -37,12 +47,13 @@ It is recommended that you read about Shrewd in order to fully understand the so
 
 All paths below are relative to `src/core`.
 Roughly speaking, a BP Studio project begins with a `Design` object (`design/Design.ts`),
-which contains a `Tree` object (`content/tree/Tree.ts`) that describes the tree structure of our design.
+which contains a `Tree` object (`content/context/Tree.ts`) that describes the tree structure of our design.
 Then `Flap` objects (`design/components/Flap.ts`) are generated in correspondence to the leaf nodes in the tree,
 and `Junction` objects (`design/components/Junction.ts`), which monitors the overlapping status between two flaps,
 are generated for each pair of flaps.
 Junctions are then grouped into `Stretch` objects (`design/layout/Stretch.ts`),
-and it will create a `Repository` object (`design/layout/Repository.ts`) which is the starting point of searching for `Pattern` objects (`design/layout/Pattern.ts`).
+and it will create a `Repository` object (`design/layout/Repository.ts`)
+which is the starting point of searching for `Pattern` objects (`design/layout/Pattern.ts`).
 After patterns are found, everything will then be rendered by the various `View` objects in the `view` folder,
 onto a canvas prepared by `env/screen/Display.ts` using paper.js.
 User interactions are handled in `env/System.ts` and the controller classes (in `env/controllers`).
