@@ -117,7 +117,8 @@
 		"confirmReset": "Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định không?",
 		"confirmKey": "Phím nóng {0} đã được gán cho lệnh \"{1}\"; bạn có muốn thay thế nó không?",
 		"autoSave": "Tự động lưu không gian làm việc",
-		"includeHidden": "Bao gồm các yếu tố ẩn trong xuất SVG"
+		"includeHidden": "Bao gồm các yếu tố ẩn trong xuất SVG",
+		"loadSessionOnQueue": "Tải phiên trước khi mở trực tiếp tệp dự án"
 	},
 	"panel": {
 		"design": {

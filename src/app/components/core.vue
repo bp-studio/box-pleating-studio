@@ -103,16 +103,16 @@
 			let settingString = localStorage.getItem("settings");
 			this.settings.init(settingString);
 
-			let haveSession = await this.session.init();
+			let hasQueue = await this.files.openQueue();
+			let haveSession = await this.session.init(this.settings.loadSessionOnQueue || !hasQueue);
 			if(settingString) await this.handles.init(haveSession);
 			await this.loadQuery();
 
 			this.initialized = true;
 			this.lcpReady = true;
-
-			this.files.openQueue();
 		}
 
+		/** 載入從網址傳入的專案 */
 		private async loadQuery(): Promise<void> {
 			let url = new URL(location.href);
 			let lz = url.searchParams.get("project"), json: unknown;

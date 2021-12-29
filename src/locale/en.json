@@ -117,7 +117,8 @@
 		"confirmReset": "Are you sure you want to reset all settings to default?",
 		"confirmKey": "Hotkey {0} is already assigned to the command \"{1}\"; would you like to replace it?",
 		"autoSave": "Save workspace automatically",
-		"includeHidden": "Include hidden elements in SVG exports"
+		"includeHidden": "Include hidden elements in SVG exports",
+		"loadSessionOnQueue": "Load previous session when directly open a project file"
 	},
 	"panel": {
 		"design": {

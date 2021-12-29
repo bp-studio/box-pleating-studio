@@ -23,6 +23,12 @@
 						</div>
 						<checkbox :label="$t('preference.autoSave')" v-model="core.settings.autoSave" @input="core.settings.save()"></checkbox>
 						<checkbox
+							v-if="isFileApiEnabled"
+							:label="$t('preference.loadSessionOnQueue')"
+							v-model="core.settings.loadSessionOnQueue"
+							@input="core.settings.save()"
+						></checkbox>
+						<checkbox
 							v-if="display"
 							:label="$t('preference.includeHidden')"
 							v-model="display.includeHiddenElement"
@@ -56,6 +62,8 @@
 		protected getScreenName(): string { return 'Preference'; }
 
 		protected tab: number = 0;
+
+		protected get isFileApiEnabled(): boolean { return isFileApiEnabled; }
 
 		@Watch('on') onShown(v: boolean): void {
 			if(!v) this.tab = 0;

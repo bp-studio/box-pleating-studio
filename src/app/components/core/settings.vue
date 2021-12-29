@@ -14,6 +14,7 @@
 
 		public autoSave: boolean = true;
 		public showDPad: boolean = true;
+		public loadSessionOnQueue: boolean = false;
 		public hotkey = defaultHotkey();
 
 		public init(settingString: string | null): void {
@@ -21,6 +22,7 @@
 				let settings = JSON.parse(settingString);
 				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
+				if(settings.loadSessionOnQueue !== undefined) this.loadSessionOnQueue = settings.loadSessionOnQueue;
 
 				let d = bp.settings;
 				for(let key in d) d[key] = settings[key];
@@ -33,7 +35,7 @@
 			}
 		}
 
-		/** 把 source 物件中的屬性遞迴地複製到 target 中（忽略 target 中沒有的屬性） */
+		/** 把 source 物件中的屬性遞迴地複製到 target 中（忽略任一者沒有的屬性） */
 		public copy(target: object, source: object): void {
 			if(!source) return;
 			for(let key in target) {
@@ -48,14 +50,13 @@
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement,
 			} = bp.settings;
+			let { autoSave, showDPad, hotkey, loadSessionOnQueue } = this;
 			if(core.initialized) {
 				if(this.autoSave) core.session.save();
 				else localStorage.removeItem("session");
 			}
 			localStorage.setItem("settings", JSON.stringify({
-				autoSave: this.autoSave,
-				showDPad: this.showDPad,
-				hotkey: this.hotkey,
+				autoSave, showDPad, hotkey, loadSessionOnQueue,
 				includeHiddenElement,
 				showGrid, showHinge, showRidge,
 				showAxialParallel, showLabel, showDot,
@@ -68,6 +69,8 @@
 
 			this.autoSave = true;
 			this.showDPad = true;
+			this.loadSessionOnQueue = false;
+			this.hotkey = defaultHotkey();
 			this.copy(bp.settings, {
 				showAxialParallel: true,
 				showGrid: true,
@@ -77,7 +80,6 @@
 				showDot: true,
 				includeHiddenElement: false,
 			});
-			this.hotkey = defaultHotkey();
 			this.save();
 
 			localStorage.removeItem("locale");

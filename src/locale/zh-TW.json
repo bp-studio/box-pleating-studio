@@ -117,7 +117,8 @@
 		"confirmReset": "您確定要將所有設定重置為預設值嗎？",
 		"confirmKey": "快速鍵 {0} 已分配給指令「{1}」；您想更換它嗎？",
 		"autoSave": "自動儲存工作區",
-		"includeHidden": "在 SVG 輸出中包含隱藏元件"
+		"includeHidden": "在 SVG 輸出中包含隱藏元件",
+		"loadSessionOnQueue": "直接打開專案檔案時載入之前的工作階段"
 	},
 	"panel": {
 		"design": {

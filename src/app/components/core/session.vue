@@ -10,7 +10,7 @@
 	@Component
 	export default class Session extends Vue {
 
-		public async init(): Promise<boolean> {
+		public async init(loadSession: boolean): Promise<boolean> {
 			const SAVE_INTERVAL = 3000;
 
 			/**
@@ -23,7 +23,7 @@
 
 			// 只有擁有存檔權的實體會去讀取 session
 			let haveSession = await this.checkSession();
-			if(haveSession) {
+			if(haveSession && loadSession) {
 				let sessionString = localStorage.getItem("session");
 				if(sessionString) {
 					let session = JSON.parse(sessionString);

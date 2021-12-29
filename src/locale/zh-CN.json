@@ -117,7 +117,8 @@
 		"confirmReset": "您确定要将所有设置重置为默认值吗？",
 		"confirmKey": "热键 {0} 已分配给命令「{1}」；你想更换它吗？",
 		"autoSave": "自动保存工作区",
-		"includeHidden": "在 SVG 输出中包含隐藏元件"
+		"includeHidden": "在 SVG 输出中包含隐藏元件",
+		"loadSessionOnQueue": "直接打开项目文件时加载先前的会话"
 	},
 	"panel": {
 		"design": {

@@ -52,9 +52,15 @@
 		 * 這是基於一個未來的 API，請參考 https://github.com/WICG/file-handling/blob/main/explainer.md
 		 * 目前在 Chrome 上面已經可以藉由打開 chrome://flags/#file-handling-api 來試用
 		 */
-		public openQueue(): void {
-			if(!('launchQueue' in window)) return;
-			launchQueue.setConsumer(launchParams => this.open(launchParams.files));
+		public async openQueue(): Promise<boolean> {
+			if(!('launchQueue' in window)) return false;
+			return await new Promise<boolean>(resolve => {
+				launchQueue.setConsumer(launchParams => {
+					this.open(launchParams.files);
+					resolve(true);
+				});
+				setTimeout(() => resolve(false), 0);
+			});
 		}
 
 		public async openFiles(files: FileList): Promise<void> {

@@ -117,7 +117,8 @@
 		"confirmReset": "모든 설정을 기본값으로 재설정하시겠습니까?",
 		"confirmKey": "단축키 {0} 은(는) 이미 \"{1}\" 명령에 할당되었습니다. 교체하시겠습니까?",
 		"autoSave": "자동으로 작업 공간 저장",
-		"includeHidden": "SVG 내보내기에 숨겨진 요소 포함"
+		"includeHidden": "SVG 내보내기에 숨겨진 요소 포함",
+		"loadSessionOnQueue": "프로젝트 파일을 직접 열 때 이전 세션 로드"
 	},
 	"panel": {
 		"design": {

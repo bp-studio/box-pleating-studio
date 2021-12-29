@@ -117,7 +117,8 @@
 		"confirmReset": "すべての設定をデフォルトにリセットしてもよろしいですか？",
 		"confirmKey": "ホットキー {0} はすでにコマンド「{1}」に割り当てられています。交換しますか？",
 		"autoSave": "ワークスペースを自動的に保存",
-		"includeHidden": "SVG エクスポートに非表示の要素を含める"
+		"includeHidden": "SVG エクスポートに非表示の要素を含める",
+		"loadSessionOnQueue": "プロジェクトファイルを直接開くときに前のセッションをロードする"
 	},
 	"panel": {
 		"design": {
