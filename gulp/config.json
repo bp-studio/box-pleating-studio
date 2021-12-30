@@ -12,7 +12,7 @@
 		"log": "src/log",
 		"locale": "src/locale",
 		"public": "src/public",
-		"sw": "src/service",
+		"sw": "src/other/service",
 		"worker": "src/other/worker"
 	}
 }

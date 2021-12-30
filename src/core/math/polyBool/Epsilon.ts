@@ -86,7 +86,7 @@ export namespace Epsilon {
 	 *     2   intersection point is after segment's second point
 	 */
 	export function $linesIntersect(a0: Point, a1: Point, b0: Point, b1: Point): false |
-	{ alongA: number; alongB: number; pt: Point; } {
+	{ alongA: number, alongB: number, pt: Point } {
 		let adx = a1[0] - a0[0];
 		let ady = a1[1] - a0[1];
 		let bdx = b1[0] - b0[0];

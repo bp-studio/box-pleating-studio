@@ -1,7 +1,7 @@
 /** 管理工作階段的自動儲存 */
-class Session {
+namespace Session {
 
-	public async init(loadSession: boolean): Promise<boolean> {
+	export async function init(loadSession: boolean): Promise<boolean> {
 		const SAVE_INTERVAL = 3000;
 
 		/**
@@ -13,7 +13,7 @@ class Session {
 		localStorage.removeItem("sessionTime");
 
 		// 只有擁有存檔權的實體會去讀取 session
-		let haveSession = await this.checkSession();
+		let haveSession = await checkSession();
 		if(haveSession && loadSession) {
 			let sessionString = localStorage.getItem("session");
 			if(sessionString) {
@@ -28,14 +28,14 @@ class Session {
 			}
 		}
 
-		window.setInterval(() => this.save(), SAVE_INTERVAL);
-		window.addEventListener("beforeunload", () => this.save());
+		window.setInterval(save, SAVE_INTERVAL);
+		window.addEventListener("beforeunload", save);
 
 		return haveSession;
 	}
 
 	/** 檢查當前的 App 實體是否具有工作階段儲存權 */
-	private checkSession(): Promise<boolean> {
+	function checkSession(): Promise<boolean> {
 		const SESSION_CHECK_TIMEOUT = 250;
 		return new Promise<boolean>(resolve => {
 			// 如果是本地執行就採用 Broadcast Channel 的 fallback
@@ -55,13 +55,13 @@ class Session {
 	}
 
 	/** 儲存工作階段 */
-	public async save(): Promise<void> {
+	export async function save(): Promise<void> {
 		// 拖曳的時候存檔無意義且浪費效能，跳過
 		if(bp.isDragging) return;
 
 		// 只有當前的實體取得存檔權的時候才會儲存
-		if(core.settings.autoSave && await this.checkSession()) {
-			let save = async (): Promise<void> => {
+		if(core.settings.autoSave && await checkSession()) {
+			let action = async (): Promise<void> => {
 				let session = {
 					jsons: core.designs.map(
 						id => bp.getDesign(id)!.toJSON(true)
@@ -77,10 +77,10 @@ class Session {
 				 * 如果 bp 正在運作中，則排程到下一次 BPStudio 更新完畢之後存檔，
 				 * 避免在存檔的瞬間製造出 glitch
 				 */
-				bp.option.onUpdate = save;
+				bp.option.onUpdate = action;
 			} else {
 				// 不然直接儲存就好了
-				save();
+				action();
 			}
 		}
 	}

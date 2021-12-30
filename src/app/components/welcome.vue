@@ -38,7 +38,7 @@
 						<i class="far fa-file fa-fw me-2"></i>
 						{{$t('toolbar.file.new')}}
 					</div>
-					<opener @open="core.files.open($event)" class="link-primary">
+					<opener @open="open($event, false)" class="link-primary">
 						<i class="far fa-folder-open fa-fw me-2"></i>
 						{{$t('toolbar.file.open')}}
 					</opener>
@@ -46,7 +46,7 @@
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
 					<div v-if="recent.length">
 						<h4 class="mb-3" v-t="'welcome.recent'"></h4>
-						<div v-for="(h,i) in recent" :key="i" @click="open(h)" class="link-primary">{{h.name}}</div>
+						<div v-for="(h,i) in recent" :key="i" @click="open(h, true)" class="link-primary">{{h.name}}</div>
 					</div>
 				</div>
 			</div>
@@ -121,12 +121,12 @@
 			return location.origin;
 		}
 
-		protected get recent(): readonly FileSystemFileHandle[] {
+		protected get recent(): FileHandleList {
 			return core.handles.recent;
 		}
 
-		protected open(handle: FileSystemFileHandle): void {
-			core.files.open([handle], true);
+		protected open(handle: FileSystemFileHandle, request: boolean): void {
+			Files.open([handle], request);
 		}
 	}
 </script>

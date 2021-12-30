@@ -5,7 +5,4 @@ declare module 'vue-property-decorator' {
 	}
 }
 
-export interface FileFactory {
-	name: string;
-	content: () => null | Blob | Promise<Blob>;
-}
+export {};

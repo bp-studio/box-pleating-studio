@@ -18,9 +18,6 @@ export default class CoreBase extends Vue {
 	public designs: number[] = [];
 	public initialized: boolean = false;
 
-	public get files(): Files { return new Files(); }
-	public get session(): Session { return new Session(); }
-
 	public get design(): Design | null {
 		if(!this.initialized) return null;
 		let t = bp.design ? bp.design.title : null;

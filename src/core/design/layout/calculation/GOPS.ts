@@ -2,8 +2,8 @@ import { MathUtil } from "bp/math";
 import type { JPiece } from "bp/content/json";
 
 export interface JPieceMemo {
-	p: JPiece
-	sx: number
+	p: JPiece;
+	sx: number;
 }
 
 //////////////////////////////////////////////////////////////////

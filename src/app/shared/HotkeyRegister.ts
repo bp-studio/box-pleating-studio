@@ -6,7 +6,7 @@ type Hotkey = [Action, string, boolean];
 interface KeyStore {
 	[name: string]: {
 		[command: string]: string;
-	}
+	};
 }
 
 const hotkeys: Hotkey[] = [];

@@ -15,8 +15,10 @@ declare global {
 		(launchParams: LaunchParams): void;
 	}
 
+	type FileHandleList = readonly FileSystemFileHandle[];
+
 	interface LaunchParams {
-		readonly files: readonly FileSystemFileHandle[];
+		readonly files: FileHandleList;
 	}
 
 	export interface Executor extends Vue {
@@ -31,8 +33,6 @@ declare global {
 		current: unknown;
 		skipped: boolean;
 	};
-
-	type FileHandleList = readonly FileSystemFileHandle[];
 
 	// 第三方程式庫相關
 	export const i18n: VueI18n;
@@ -60,37 +60,41 @@ declare global {
 		loader: {
 			show(): Promise<void>;
 			hide(): void;
-		}
+		};
 		alert(message: VueI18n.TranslateResult): Promise<void>;
 		confirm(message: VueI18n.TranslateResult): Promise<boolean>;
 		open(d: string | object): void;
-		readonly projects: {
-			openWorkspace(buffer: ArrayBuffer): Promise<number | undefined>;
-			select(id: number): void;
-			add(d: Design, select?: boolean): void;
-			create(): void;
-			close(id?: number): Promise<void>;
-			closeOther(id: number): Promise<void>;
-			closeRight(id: number): Promise<void>;
-			closeAll(): Promise<void>;
-			clone(id?: number): void;
-			designs: number[];
-		}
-		readonly handles: {
-			get(id: number): FileSystemFileHandle;
-			set(id: number, value: FileSystemFileHandle): void;
-			locate(handles: FileHandleList): Promise<(number | undefined)[]>;
-			addRecent(handle: FileSystemFileHandle): Promise<void>;
-			removeRecent(handle: FileSystemFileHandle): Promise<void>;
-			delete(id: number): void;
-			save(): void;
-			clearRecent(): void;
-			readonly recent: FileHandleList;
-		}
-		readonly settings: ISettings
+		readonly projects: IProjects;
+		readonly handles: IHandles;
+		readonly settings: ISettings;
 		readonly language: {
-			init(build: number): void
-		}
+			init(build: number): void;
+		};
+	}
+
+	interface IProjects {
+		openWorkspace(buffer: ArrayBuffer): Promise<number | undefined>;
+		select(id: number): void;
+		add(d: Design, select?: boolean): void;
+		create(): void;
+		close(id?: number): Promise<void>;
+		closeOther(id: number): Promise<void>;
+		closeRight(id: number): Promise<void>;
+		closeAll(): Promise<void>;
+		clone(id?: number): void;
+		designs: number[];
+	}
+
+	interface IHandles {
+		get(id: number): FileSystemFileHandle;
+		set(id: number, value: FileSystemFileHandle): void;
+		locate(handles: FileHandleList): Promise<(number | undefined)[]>;
+		addRecent(handle: FileSystemFileHandle): Promise<void>;
+		removeRecent(handle: FileSystemFileHandle): Promise<void>;
+		delete(id: number): void;
+		save(): Promise<void>;
+		clearRecent(): void;
+		readonly recent: FileHandleList;
 	}
 
 	interface ISettings {

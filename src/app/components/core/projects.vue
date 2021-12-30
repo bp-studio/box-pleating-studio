@@ -9,7 +9,7 @@
 	import JSZip from 'jszip';
 
 	@Component
-	export default class Projects extends Vue {
+	export default class Projects extends Vue implements IProjects {
 
 		@Prop(Array) public designs: number[];
 
@@ -101,7 +101,7 @@
 			});
 		}
 
-		private checkTitle(j: { title: string }): { title: string; } {
+		private checkTitle(j: { title: string }): { title: string } {
 			let t = j.title.replace(/ - \d+$/, ""), n = 1;
 			let designs = bp.getDesigns();
 			if(!designs.some(d => d.title == t)) return j;

@@ -20,7 +20,7 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 
-	import { BPStudio, Design } from './import/BPStudio';
+	import { BPStudio } from './import/BPStudio';
 
 
 	import VueI18n from 'vue-i18n';
@@ -91,8 +91,8 @@
 			let settingString = localStorage.getItem("settings");
 			this.settings.init(settingString);
 
-			let hasQueue = await this.files.openQueue();
-			let haveSession = await this.session.init(this.settings.loadSessionOnQueue || !hasQueue);
+			let hasQueue = await Files.openQueue();
+			let haveSession = await Session.init(this.settings.loadSessionOnQueue || !hasQueue);
 			if(settingString) await this.handles.init(haveSession);
 			await this.loadQuery();
 

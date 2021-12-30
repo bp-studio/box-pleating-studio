@@ -48,7 +48,7 @@ export class Line {
 	}
 
 	/** 取得這條線段（含端點）與給定動向（視為直線，除非指定 isRay）的交點 */
-	public $intersection(l: Line): Point | null
+	public $intersection(l: Line): Point | null;
 	public $intersection(p: Point, v: Vector, isRay?: boolean): Point | null;
 	public $intersection(...t: [Point, Vector, boolean?] | [Line]): Point | null {
 		if(t.length == 1) return this.$intersection(t[0].p1, t[0].p2.sub(t[0].p1));

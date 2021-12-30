@@ -8,7 +8,7 @@
 			<divider></divider>
 
 			<template v-if="isFileApiEnabled">
-				<opener class="dropdown-item m-0" ref="open" @open="core.files.open($event)">
+				<opener class="dropdown-item m-0" ref="open" @open="open($event)">
 					<hotkey icon="far fa-folder-open" ctrl hk="O">{{$t('toolbar.file.open')}}</hotkey>
 				</opener>
 				<recentmenu></recentmenu>
@@ -208,8 +208,12 @@
 
 		protected async upload(event: Event): Promise<void> {
 			let f = event.target as HTMLInputElement;
-			await core.files.openFiles(f.files!);
+			await Files.openFiles(f.files!);
 			f.value = ""; // 重新設定；否則再次開啟相同檔案時會沒有反應
+		}
+
+		protected open(handles: FileHandleList): void {
+			Files.open(handles);
 		}
 
 		protected print(): void {

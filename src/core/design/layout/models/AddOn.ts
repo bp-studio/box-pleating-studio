@@ -4,6 +4,11 @@ import { onDemand } from "bp/global";
 import type { JAddOn } from "bp/content/json";
 import type { IPoint } from "bp/math";
 
+interface IShape {
+	contour: Point[];
+	ridges: Line[];
+}
+
 //////////////////////////////////////////////////////////////////
 /**
  * {@link AddOn} 是 {@link Device} 裡面的一個不屬於任何 {@link Gadget} 的 {@link Region}，
@@ -22,10 +27,7 @@ export class AddOn extends Region implements JAddOn {
 		this.dir = data.dir;
 	}
 
-	@onDemand public get $shape(): {
-		contour: Point[],
-		ridges: Line[]
-	} {
+	@onDemand public get $shape(): IShape {
 		let contour = this.contour.map(p => new Point(p));
 		let ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
 		return { contour, ridges };

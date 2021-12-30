@@ -1,8 +1,8 @@
 {
 	"env": {
 		"browser": true,
-		"node": true,
-		"es2021": true
+		"es2021": true,
+		"node": true
 	},
 	"extends": [
 		"eslint:recommended",
@@ -51,11 +51,11 @@
 			"warn",
 			"tab",
 			{
+				"SwitchCase": 1,
+				"flatTernaryExpressions": true,
 				"ignoredNodes": [
 					"ClassDeclaration" // 暫時沒有正解，參見 https://github.com/typescript-eslint/typescript-eslint/issues/1824
-				],
-				"SwitchCase": 1,
-				"flatTernaryExpressions": true
+				]
 			}
 		],
 		"@typescript-eslint/keyword-spacing": [
@@ -77,6 +77,15 @@
 					"while": {
 						"after": false
 					}
+				}
+			}
+		],
+		"@typescript-eslint/member-delimiter-style": [
+			"warn",
+			{
+				"singleline": {
+					"delimiter": "comma",
+					"requireLast": false
 				}
 			}
 		],
@@ -113,6 +122,9 @@
 			"warn"
 		],
 		"@typescript-eslint/no-var-requires": "off",
+		"@typescript-eslint/semi": [
+			"warn"
+		],
 		"@typescript-eslint/space-before-function-paren": [
 			"warn",
 			{
@@ -393,7 +405,7 @@
 		"require-await": "warn",
 		"require-unicode-regexp": "off",
 		"rest-spread-spacing": "warn",
-		"semi": "warn",
+		"semi": "off",
 		"semi-spacing": "warn",
 		"semi-style": "warn",
 		"sort-imports": [

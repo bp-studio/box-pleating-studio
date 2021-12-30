@@ -32,16 +32,16 @@ export interface JDesign {
 
 	/** Tree view */
 	tree: {
-		sheet: JSheet,
-		nodes: JVertex[],
-		edges: JEdge[]
+		sheet: JSheet;
+		nodes: JVertex[];
+		edges: JEdge[];
 	};
 }
 
 export type DesignMode = "layout" | "tree";
 
 export interface JLayout {
-	sheet: JSheet,
-	flaps: JFlap[],
-	stretches: JStretch[]
+	sheet: JSheet;
+	flaps: JFlap[];
+	stretches: JStretch[];
 }

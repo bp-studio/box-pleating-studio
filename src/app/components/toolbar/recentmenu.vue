@@ -21,12 +21,12 @@
 	@Component
 	export default class RecentMenu extends Vue {
 
-		protected get recent(): readonly FileSystemFileHandle[] {
+		protected get recent(): FileHandleList {
 			return core.handles.recent;
 		}
 
 		protected open(handle: FileSystemFileHandle): void {
-			core.files.open([handle], true);
+			Files.open([handle], true);
 		}
 
 		protected clearRecent(): void {

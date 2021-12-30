@@ -49,7 +49,7 @@
 			} = bp.settings;
 			let { autoSave, showDPad, hotkey, loadSessionOnQueue } = this;
 			if(core.initialized) {
-				if(this.autoSave) core.session.save();
+				if(this.autoSave) Session.save();
 				else localStorage.removeItem("session");
 			}
 			localStorage.setItem("settings", JSON.stringify({

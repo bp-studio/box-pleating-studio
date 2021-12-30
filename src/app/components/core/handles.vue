@@ -6,7 +6,7 @@
 	import { Component, Vue } from 'vue-property-decorator';
 
 	@Component
-	export default class Handles extends Vue {
+	export default class Handles extends Vue implements IHandles {
 		private rec: FileSystemFileHandle[] = [];
 		private handles: Map<number, FileSystemFileHandle> = new Map();
 
@@ -59,7 +59,7 @@
 			]);
 		}
 
-		public get recent(): readonly FileSystemFileHandle[] { return this.rec; }
+		public get recent(): FileHandleList { return this.rec; }
 
 		public async removeRecent(handle: FileSystemFileHandle): Promise<void> {
 			let tasks = this.rec.map(rec => rec.isSameEntry(handle));
