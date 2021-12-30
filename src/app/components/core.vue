@@ -2,10 +2,8 @@
 	<div>
 		<!-- Helper objects -->
 		<settings ref="settings"></settings>
-		<session ref="sss"></session>
 		<projects ref="mgr" :designs="designs"></projects>
 		<handles ref="handles"></handles>
-		<files ref="files"></files>
 
 		<!-- Dialog -->
 		<confirm ref="confirm"></confirm>
@@ -22,33 +20,25 @@
 <script lang="ts">
 	import { Component } from 'vue-property-decorator';
 
-	import { BPStudio, Design, bp } from './import/BPStudio';
+	import { BPStudio, Design } from './import/BPStudio';
 
-	import JSZip from 'jszip';
+
 	import VueI18n from 'vue-i18n';
 
 	import Alert from './dialog/alert.vue';
 	import Confirm from './dialog/confirm.vue';
 	import CoreBase from './mixins/coreBase';
-	import Files from './core/files.vue';
 	import Handles from './core/handles.vue';
 	import Language from './dialog/language.vue';
 	import Projects from './core/projects.vue';
-	import Session from './core/session.vue';
 	import Settings from './core/settings.vue';
 	import Spinner from './gadget/spinner.vue';
 
 	declare const LZ: { decompress(s: string): string };
 	declare const app_config: Record<string, string>;
 
-	declare global {
-		export const core: Core;
-	}
-
 	@Component
-	export default class Core extends CoreBase {
-		public designs: number[] = [];
-
+	export default class Core extends CoreBase implements Core {
 		public tabHistory: number[] = [];
 
 		public updated: boolean = false;
@@ -88,8 +78,6 @@
 
 		public get projects(): Projects { return this.$refs.mgr as Projects; }
 		public get handles(): Handles { return this.$refs.handles as Handles; }
-		public get files(): Files { return this.$refs.files as Files; }
-		public get session(): Session { return this.$refs.sss as Session; }
 		public get settings(): Settings { return this.$refs.settings as Settings; }
 		public get language(): Language { return this.$refs.language as Language; }
 
@@ -165,49 +153,6 @@
 		}
 		public async confirm(message: VueI18n.TranslateResult): Promise<boolean> {
 			return await (this.$refs.confirm as Confirm).show(message.toString());
-		}
-
-		/////////////////////////////////////////////////////////////////////////////////////////
-		// 下載
-		/////////////////////////////////////////////////////////////////////////////////////////
-
-		public async getBlob(type: string, design?: Design): Promise<Blob> {
-			if(!this.design) throw new Error();
-			if(type == 'png') return await bp.toPNG();
-			if(type == 'svg') return bp.toSVG();
-			if(type == 'bpz') return await this.zip();
-			if(type == 'bps') return bp.toBPS(design ? design.id : undefined)!;
-			throw new Error();
-		}
-
-		public getFilename(type: string, design?: Design): string {
-			if(!design) design = this.design || undefined;
-			if(!design) return "";
-			if(type == "bpz") return this.$t('keyword.workspace').toString();
-			else return sanitize(design.title);
-		}
-
-		private async zip(): Promise<Blob> {
-			await libReady;
-			let zip = new JSZip();
-			let names = new Set<string>();
-			for(let i = 0; i < this.designs.length; i++) {
-				let design = bp.getDesign(this.designs[i])!;
-				let name = sanitize(design.title);
-				if(names.has(name)) {
-					let j = 1;
-					for(; names.has(name + " (" + j + ")"); j++);
-					name = name + " (" + j + ")";
-				}
-				names.add(name);
-				zip.file(name + ".bps", JSON.stringify(design));
-			}
-			let blob = await zip.generateAsync({
-				type: 'blob',
-				compression: "DEFLATE",
-				compressionOptions: { level: 9 },
-			});
-			return blob.slice(0, blob.size, "application/bpstudio.workspace+zip");
 		}
 	}
 </script>

@@ -41,7 +41,7 @@ export class Animator {
 		this._active = active;
 		if(active) {
 			this._next();
-			this._interval = setInterval(() => {
+			this._interval = window.setInterval(() => {
 				cancelAnimationFrame(this._request);
 				this._next();
 			}, Animator._CANCEL);

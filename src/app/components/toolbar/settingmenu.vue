@@ -65,7 +65,7 @@
 			registerHotkey(() => this.toggle('showDot'), "6");
 		}
 
-		protected toggle(key: string, target?: DisplaySetting | Settings): void {
+		protected toggle(key: string, target?: DisplaySetting | ISettings): void {
 			if(!target) target = this.settings as DisplaySetting;
 			target[key] = !target[key];
 			core.settings.save();

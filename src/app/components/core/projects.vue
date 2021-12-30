@@ -5,7 +5,7 @@
 <script lang="ts">
 
 	import { Component, Prop, Vue } from 'vue-property-decorator';
-	import { Design, bp } from '../import/BPStudio';
+	import { Design } from '../import/BPStudio';
 	import JSZip from 'jszip';
 
 	@Component

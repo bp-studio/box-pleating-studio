@@ -55,7 +55,7 @@
 	import { Component, Watch } from 'vue-property-decorator';
 	import Modal from '../mixins/modal';
 
-	import { DisplaySetting, bp } from '../import/BPStudio';
+	import { DisplaySetting } from '../import/BPStudio';
 
 	@Component
 	export default class Preference extends Modal {

@@ -1,4 +1,4 @@
-import { BPStudio, Control, Design, bp } from '../import/BPStudio';
+import { BPStudio, Control, Design } from '../import/BPStudio';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import CoreBase from './coreBase';
 

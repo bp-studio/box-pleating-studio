@@ -26,8 +26,9 @@ gulp.task('app', () =>
 	gulp.src([
 		'css/*.css',
 		'header.js',
-		'components/mixins/*.ts',
+		'**/*.ts',
 		'components/**/*.vue',
+		'!**/*.d.ts',
 	], { cwd: config.src.app })
 		.pipe(newer({
 			dest: config.dest.dist + '/main.js',

@@ -4,13 +4,10 @@
 
 <script lang="ts">
 	import { Component, Vue } from 'vue-property-decorator';
-	import { bp } from '../import/BPStudio';
-
-	declare const defaultHotkey: () => object;
 
 	/** 管理 App 的設定值 */
 	@Component
-	export default class Settings extends Vue {
+	export default class Settings extends Vue implements ISettings {
 
 		public autoSave: boolean = true;
 		public showDPad: boolean = true;

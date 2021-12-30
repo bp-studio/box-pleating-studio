@@ -1,6 +1,7 @@
 
 const through = require("through2");
 const transpiler = require("vue-property-decorator-transpiler");
+const ts = require("typescript");
 const compile = require('vue-template-compiler');
 
 // 用來編譯 Vue SFC 專案
@@ -25,8 +26,12 @@ module.exports = function(jsName, cssName) {
 
 		let content = file.contents.toString(encoding || 'utf8');
 		if(file.extname == ".ts") {
-			// ts 檔案編譯成 mixin
-			js.push(transpiler(content, undefined, true));
+			if(content.includes("@Component")) {
+				// 元件檔案編譯成 mixin
+				js.push(transpiler(content, undefined, true));
+			} else {
+				js.push(ts.transpile(content, { target: ts.ScriptTarget.ESNext }));
+			}
 		} else if(file.extname == ".js") {
 			js.push(content);
 		} else if(file.extname == ".css") {

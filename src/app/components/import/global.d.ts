@@ -1,4 +1,6 @@
 import * as IdbKeyval from 'idb-keyval';
+import CoreBase from 'components/mixins/coreBase';
+import { Design } from './BPStudio';
 import VueI18n from 'vue-i18n';
 
 declare global {
@@ -30,6 +32,8 @@ declare global {
 		skipped: boolean;
 	};
 
+	type FileHandleList = readonly FileSystemFileHandle[];
+
 	// 第三方程式庫相關
 	export const i18n: VueI18n;
 	export const idbKeyval: typeof IdbKeyval;
@@ -41,17 +45,60 @@ declare global {
 	export const isMac: boolean;
 	export const isPWA: boolean;
 
-	// 全域宣告的函數
-	export function sanitize(filename: string): string;
-	export function readFile(f: File): Promise<ArrayBuffer>;
-	export function bufferToText(buffer: ArrayBuffer): string;
-	export function callService(data: unknown): Promise<unknown>;
-	export function registerHotkey(action: () => void, key: string, shift?: boolean): void;
-	export function registerHotkeyCore(callback: (e: KeyboardEvent) => void): EventListener;
-	export function unregisterHotkeyCore(handler: EventListener): void;
+	// 這個的宣告在本地 polyfill 裡面
 	export function checkWithBC(id: number): Promise<boolean>;
-	export function toKey(e: KeyboardEvent): string | null;
-	export function findKey(key: string | null, store: object): string | null;
-	export function formatKey(key: string): string;
-	export function zoomStep(zoom: number): number;
+
+	// Core
+	interface Core extends CoreBase {
+		readonly id: number;
+		readonly designs: number[];
+		readonly session: Session;
+		readonly lcpReady: boolean;
+		readonly copyright: string;
+		readonly shouldShowDPad: boolean;
+		readonly updated: boolean;
+		loader: {
+			show(): Promise<void>;
+			hide(): void;
+		}
+		alert(message: VueI18n.TranslateResult): Promise<void>;
+		confirm(message: VueI18n.TranslateResult): Promise<boolean>;
+		open(d: string | object): void;
+		readonly projects: {
+			openWorkspace(buffer: ArrayBuffer): Promise<number | undefined>;
+			select(id: number): void;
+			add(d: Design, select?: boolean): void;
+			create(): void;
+			close(id?: number): Promise<void>;
+			closeOther(id: number): Promise<void>;
+			closeRight(id: number): Promise<void>;
+			closeAll(): Promise<void>;
+			clone(id?: number): void;
+			designs: number[];
+		}
+		readonly handles: {
+			get(id: number): FileSystemFileHandle;
+			set(id: number, value: FileSystemFileHandle): void;
+			locate(handles: FileHandleList): Promise<(number | undefined)[]>;
+			addRecent(handle: FileSystemFileHandle): Promise<void>;
+			removeRecent(handle: FileSystemFileHandle): Promise<void>;
+			delete(id: number): void;
+			save(): void;
+			clearRecent(): void;
+			readonly recent: FileHandleList;
+		}
+		readonly settings: ISettings
+		readonly language: {
+			init(build: number): void
+		}
+	}
+
+	interface ISettings {
+		save(): void;
+		reset(): void;
+		loadSessionOnQueue: boolean;
+		showDPad: boolean;
+		autoSave: boolean;
+		hotkey: KeyStore;
+	}
 }

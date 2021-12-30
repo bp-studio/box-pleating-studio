@@ -1,11 +1,12 @@
 {
 	"compilerOptions": {
 		"target": "es2019",
-		"types": ["@types/wicg-file-system-access"],
+		"types": ["wicg-file-system-access"],
 		"lib": ["DOM", "ESNext"],
 		"moduleResolution": "node",
 		"experimentalDecorators": true,
 		"strictNullChecks": true,
+		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
 		"paths": {

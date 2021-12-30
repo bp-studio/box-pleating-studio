@@ -5,8 +5,6 @@
 <script lang="ts">
 	import { Component, Vue } from 'vue-property-decorator';
 
-	type FileHandleList = readonly FileSystemFileHandle[];
-
 	@Component
 	export default class Handles extends Vue {
 		private rec: FileSystemFileHandle[] = [];

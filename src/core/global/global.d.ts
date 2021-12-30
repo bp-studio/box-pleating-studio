@@ -29,6 +29,8 @@ type constructor<T extends object> = new (...args: unknown[]) => T;
 
 type Func<A, B> = (a: A) => B;
 
+type Consumer<A> = Func<A, void>;
+
 type Predicate<A, B> = (a: A, b: B) => boolean;
 
 type IterableFactory<K> = () => Iterable<K>;
