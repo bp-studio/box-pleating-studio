@@ -9,7 +9,6 @@
 
 <script lang="ts">
 	import { Component, Prop, Vue } from 'vue-property-decorator';
-	import { bp } from './import/BPStudio';
 
 	@Component
 	export default class DPad extends Vue {
