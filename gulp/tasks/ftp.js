@@ -2,6 +2,7 @@ const ftp = require('vinyl-ftp');
 const gulp = require('gulp');
 const gulpIf = require('gulp-if');
 const inquirer = require('inquirer');
+const lazypipe = require('lazypipe');
 const log = require('fancy-log');
 const replace = require('gulp-replace');
 
@@ -47,11 +48,13 @@ gulp.task('cleanPub', () => seriesIf(
 ));
 gulp.task('uploadPub', () => ftpFactory('bp', [config.dest.dist + '/.htaccess']));
 
+const devPipe = lazypipe()
+	.pipe(() => replace('<script async src="https://www.googletagmanager.com' +
+		'/gtag/js?id=G-GG1TEZGBCQ"></script>', ""))
+	// 在 Chrome PWA 當中，預設標題最好是跟 manifest 當中的一致，否則顯示的時候會出現額外的前綴
+	.pipe(() => replace('<title>Box Pleating Studio</title>', '<title>BP Studio DEV</title>'));
+
 gulp.task('cleanDev', () => cleanFactory('bp-dev'));
 gulp.task('uploadDev', () => ftpFactory('bp-dev', [`!${config.dest.dist}/manifest.json`], pipe => pipe
-	.pipe(gulpIf(
-		file => file.basename == "index.htm",
-		replace('<script async src="https://www.googletagmanager.com' +
-			'/gtag/js?id=G-GG1TEZGBCQ"></script>', "")
-	))
+	.pipe(gulpIf(file => file.basename == "index.htm", devPipe()))
 ));

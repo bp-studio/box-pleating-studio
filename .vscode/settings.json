@@ -48,14 +48,7 @@
 		"typeless"
 	],
     "files.exclude": {
-        "**/*.aux": true,
-        "**/*.nav": true,
-        "**/*.out": true,
-        "**/*.snm": true,
-        "**/*.synctex.gz": true,
-        "**/*.toc": true,
         "**/debug.log": true,
-        "docs/**/*.log": true,
         "node_modules": true
     },
     "i18n-ally.enabledFrameworks": [

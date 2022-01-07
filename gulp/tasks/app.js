@@ -25,7 +25,6 @@ const jsPipe = lazypipe()
 gulp.task('app', () =>
 	gulp.src([
 		'css/*.css',
-		'header.js',
 		'**/*.ts',
 		'components/**/*.vue',
 		'!**/*.d.ts',

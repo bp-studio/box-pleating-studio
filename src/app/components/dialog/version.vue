@@ -28,7 +28,9 @@
 	import { Component, Vue, Watch } from 'vue-property-decorator';
 	import Modal from '../mixins/modal';
 
-	declare const marked: (s: string) => string;
+	declare const marked: {
+		parse(s: string): string;
+	}
 	declare const logs: number[];
 
 	@Component
@@ -64,7 +66,7 @@
 			if(!this.record[index]) {
 				try {
 					let response = await fetch(`log/${logs[index]}.md`);
-					let html = marked(await response.text());
+					let html = marked.parse(await response.text());
 					html = html.replace(/<a href="http/g, '<a target="_target" rel="noopener" href="http');
 					Vue.set(this.record, this.index, html);
 				} catch(e) {

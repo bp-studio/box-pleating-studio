@@ -47,9 +47,6 @@
 	import { Component } from 'vue-property-decorator';
 	import Modal from '../mixins/modal';
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	declare const LZ: any;
-
 	@Component
 	export default class Share extends Modal {
 		protected url: string = "";

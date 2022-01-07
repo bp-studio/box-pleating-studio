@@ -29,21 +29,16 @@ declare global {
 		show(): void;
 	}
 
-	export const dropdown: {
-		current: unknown;
-		skipped: boolean;
-	};
-
 	// 第三方程式庫相關
 	export const i18n: VueI18n;
 	export const idbKeyval: typeof IdbKeyval;
 	export const gtag: (...args: unknown[]) => void;
 	export const libReady: Promise<void>;
 
-	// 系統狀態常數
-	export const isFileApiEnabled: boolean;
-	export const isMac: boolean;
-	export const isPWA: boolean;
+	export const LZMA: {
+		compress(s: string, level: number): Uint8Array;
+		decompress(bytes: Uint8Array): string;
+	};
 
 	// 這個的宣告在本地 polyfill 裡面
 	export function checkWithBC(id: number): Promise<boolean>;
