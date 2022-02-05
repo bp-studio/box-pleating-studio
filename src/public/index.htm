@@ -9,7 +9,7 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.5.0 alpha">
+	<meta name="version" content="0.5.0">
 
 	<!-- Preload -->
 	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
@@ -32,7 +32,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1207"
+			app_version: "1210"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -90,8 +90,9 @@
 		  media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
 		  rel="apple-touch-startup-image" />
 
-	<!-- Written in ES3 for maximal compatibility -->
+	<!-- Written in ES3 for maximal compatibility, so `var` instead of `let`, etc. -->
 	<script>
+		// Register service worker
 		if(location.protocol == 'https:' && 'serviceWorker' in navigator) {
 			navigator.serviceWorker.register('sw.js').then(function(reg) {
 				// Safari may have stronger caching for service worker,
@@ -104,6 +105,8 @@
 				});
 			});
 		}
+
+		/** Launching Error Manager */
 		var errMgr = new (function() {
 			var self = this;
 			var display = function(id, v, c) {
