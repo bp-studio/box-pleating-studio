@@ -1,5 +1,5 @@
 :root {
-	--bg-ui: #AAA;
+	--bg-ui: #aaa;
 }
 
 * {
@@ -10,7 +10,8 @@ html {
 	font-size: 9pt;
 }
 
-html, body {
+html,
+body {
 	height: 100%;
 	width: 100%;
 	overflow: hidden;
@@ -18,12 +19,12 @@ html, body {
 }
 
 kbd {
-	border-radius: .3rem;
+	border-radius: 0.3rem;
 	color: black;
-	border: 1px solid #AAA;
-	background-color: #DDD;
-	padding: .1rem .2rem;
-	margin: .1rem;
+	border: 1px solid #aaa;
+	background-color: #ddd;
+	padding: 0.1rem 0.2rem;
+	margin: 0.1rem;
 	line-height: 1;
 	display: inline-block;
 }
@@ -63,13 +64,14 @@ body.mac .not-mac {
  * 表單元件設定
  *********************************************/
 
-::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
 	/* Chrome, Safari, Edge, Opera 中隱藏 spinner */
 	-webkit-appearance: none;
 	display: none;
 }
 
-input[type=number] {
+input[type="number"] {
 	/* Firefox 中隱藏 spinner */
 	-moz-appearance: textfield;
 }
@@ -82,6 +84,9 @@ textarea {
 	resize: none;
 }
 
-::placeholder, ::-webkit-input-placeholder, ::-moz-placeholder, ::-ms-input-placeholder {
+::placeholder,
+::-webkit-input-placeholder,
+::-moz-placeholder,
+::-ms-input-placeholder {
 	opacity: 0.5 !important;
 }
