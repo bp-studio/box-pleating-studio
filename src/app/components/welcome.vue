@@ -10,6 +10,12 @@
 					<i18n path="welcome.intro[1]" tag="p">
 						<a target="_blank" rel="noopener" href="https://bp-studio.github.io/" v-t="'welcome.website'"></a>
 					</i18n>
+					<p>
+						💥
+						<i18n path="welcome.discord" tag="span">
+							<a target="_balnk" rel="noopener" href="https://discord.gg/HkcdTDS4zZ" v-t="'keyword.here'"></a>
+						</i18n>
+					</p>
 				</div>
 				<div class="browser-only col-12 col-lg-10 col-xl-8">
 					<div v-if="(preparing||bi||ios)&&!install">

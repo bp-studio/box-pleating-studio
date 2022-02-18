@@ -20,7 +20,8 @@
 		"copyright": "Copyright © 2020{0} by Mu-Tsun Tsai",
 		"recent": "최근 사용",
 		"start": "시작",
-		"website": "BP Studio 웹사이트"
+		"website": "BP Studio 웹사이트",
+		"discord": "BP Studio에 Discord 서버가 생겼습니다! \n{0}에서 우리와 함께 해주세요!"
 	},
 	"toolbar": {
 		"file": {
@@ -224,6 +225,7 @@
 		"yes": "예",
 		"no": "아니요",
 		"ok": "좋아요",
+		"here": "여기",
 		"close": "닫기",
 		"delete": "삭제",
 		"version": "버전",

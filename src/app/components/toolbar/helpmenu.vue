@@ -16,6 +16,15 @@
 			</a>
 			<a
 				class="dropdown-item"
+				href="https://discord.gg/HkcdTDS4zZ"
+				target="_blank"
+				rel="noopener"
+			>
+				<i class="fab fa-discord"></i>
+				Discord
+			</a>
+			<a
+				class="dropdown-item"
 				href="https://github.com/MuTsunTsai/box-pleating-studio/discussions"
 				target="_blank"
 				rel="noopener"
