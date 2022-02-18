@@ -6,12 +6,12 @@ import type { JStretch } from "bp/content/json";
 import type { Sign } from "bp/math";
 import type { Device, Flap, Pattern, Sheet } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Stretch} 對應於一個 {@link Junction} 群組。
  * 這樣的一個群組上面所使用的摺式必須整體一起決定。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Stretch extends Control implements ISerializable<JStretch> {
 

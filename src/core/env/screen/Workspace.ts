@@ -3,12 +3,12 @@ import type { Studio } from "..";
 import type { IPoint, Vector } from "bp/math";
 import type { Design } from "bp/design";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Workspace} 物件負責管理介於 {@link Viewport} 和 {@link Sheet} 之間的配置計算；
  * 我們把這個部份稱為工作區域，是一個可以被捲動的空間。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class Workspace extends SheetImage {
 

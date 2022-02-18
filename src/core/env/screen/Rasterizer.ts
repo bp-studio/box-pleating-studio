@@ -1,10 +1,11 @@
+import { DarkController } from "../controllers";
 import type { Display } from "./Display";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Rasterizer} 負責處理圖像的點陣化轉換。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class Rasterizer {
 
@@ -30,8 +31,8 @@ export class Rasterizer {
 			img.addEventListener("load", () => {
 				canvas.width = img.clientWidth;
 				canvas.height = img.clientHeight;
-				// 繪製一層白色背景
-				ctx.fillStyle = 'white';
+				// 繪製一層背景
+				ctx.fillStyle = DarkController.$dark ? 'black' : 'white';
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				// 把 img 的影像內容縮放繪製到 canvas 上；img 的最大大小是透過 CSS 指定的
 				ctx.drawImage(img,

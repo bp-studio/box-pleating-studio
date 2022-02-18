@@ -2,7 +2,7 @@ import type { IDisposable } from "..";
 
 type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link BaseMapping BaseMapping<K, S, V>} 類別實作了 {@link ReadonlyMap ReadonlyMap<K, V>} 介面，
  * 會反應式地根據提供的 source 和 keyGen 來產生 key，
@@ -14,7 +14,7 @@ type MapCallback<K, V> = (value: V, key: K, map: ReadonlyMap<K, V>) => void;
  * 這個設計是考慮到有一些應用情境 key 有可能暫時性消失、
  * 但是我們希望當同樣的 key 再次出現時，對應的實體仍舊存在著。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class BaseMapping<Key, Source, Value extends object>
 	implements ReadonlyMap<Key, Value>, IDisposable {

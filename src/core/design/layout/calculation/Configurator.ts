@@ -7,11 +7,11 @@ import { CornerType, Strategy } from "bp/content/json";
 import type { JConfiguration, JPattern, JStretch, JJunction } from "bp/content/json";
 import type { Repository } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Configurator} 負責針對一個 {@link Repository} 搜尋 {@link Configuration}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class Configurator {
 

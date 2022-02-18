@@ -113,6 +113,12 @@
 		"hotkey": "Phím nóng",
 		"command": "Chỉ huy",
 		"language": "Ngôn ngữ",
+		"theme": {
+			"_": "Chủ đề",
+			"dark": "Chủ đề tối",
+			"light": "Chủ đề sáng",
+			"system": "Sử dụng cài đặt hệ thống"
+		},
 		"reset": "Đặt lại tất cả cài đặt về mặc định",
 		"confirmReset": "Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định không?",
 		"confirmKey": "Phím nóng {0} đã được gán cho lệnh \"{1}\"; bạn có muốn thay thế nó không?",

@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-	import { Component, Vue } from 'vue-property-decorator';
+	import { Component, Vue, Watch } from 'vue-property-decorator';
 
 	/** 管理 App 的設定值 */
 	@Component
@@ -11,8 +11,11 @@
 
 		public autoSave: boolean = true;
 		public showDPad: boolean = true;
+		public theme: Theme = 'system';
 		public loadSessionOnQueue: boolean = false;
 		public hotkey = defaultHotkey();
+
+		private preferDark: boolean = false;
 
 		public init(settingString: string | null): void {
 			if(settingString) {
@@ -20,6 +23,7 @@
 				if(settings.autoSave !== undefined) this.autoSave = settings.autoSave;
 				if(settings.showDPad !== undefined) this.showDPad = settings.showDPad;
 				if(settings.loadSessionOnQueue !== undefined) this.loadSessionOnQueue = settings.loadSessionOnQueue;
+				if(settings.theme !== undefined) this.theme = settings.theme;
 
 				let d = bp.settings;
 				for(let key in d) d[key] = settings[key];
@@ -30,6 +34,24 @@
 				// 儲存初始設定
 				this.save();
 			}
+
+			const mm = matchMedia('(prefers-color-scheme: dark)');
+			this.preferDark = mm.matches;
+			mm.onchange = () => {
+				this.preferDark = mm.matches;
+				this.setTheme();
+			};
+			this.setTheme();
+		}
+
+		@Watch('theme') onTheme(): void {
+			this.setTheme();
+			this.save();
+		}
+
+		private setTheme(): void {
+			const dark = this.theme == 'dark' || this.theme == 'system' && this.preferDark;
+			document.documentElement.classList.toggle('dark', dark);
 		}
 
 		/** 把 source 物件中的屬性遞迴地複製到 target 中（忽略任一者沒有的屬性） */
@@ -47,13 +69,13 @@
 				showGrid, showHinge, showRidge, showAxialParallel,
 				showLabel, showDot, includeHiddenElement,
 			} = bp.settings;
-			let { autoSave, showDPad, hotkey, loadSessionOnQueue } = this;
+			let { autoSave, showDPad, hotkey, loadSessionOnQueue, theme } = this;
 			if(core.initialized) {
 				if(this.autoSave) Session.save();
 				else localStorage.removeItem("session");
 			}
 			localStorage.setItem("settings", JSON.stringify({
-				autoSave, showDPad, hotkey, loadSessionOnQueue,
+				autoSave, showDPad, hotkey, loadSessionOnQueue, theme,
 				includeHiddenElement,
 				showGrid, showHinge, showRidge,
 				showAxialParallel, showLabel, showDot,
@@ -67,6 +89,7 @@
 			this.autoSave = true;
 			this.showDPad = true;
 			this.loadSessionOnQueue = false;
+			this.theme = 'system';
 			this.hotkey = defaultHotkey();
 			this.copy(bp.settings, {
 				showAxialParallel: true,

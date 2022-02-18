@@ -15,11 +15,11 @@ export type GDevice = JDevice<Gadget>;
 
 export type IntersectionMap = [Point, Point | null];
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Device} 是一個 {@link Pattern} 當中可以被獨立移動的最小元件，它對應於一個 {@link Partition}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Device extends Draggable implements ISerializable<JDevice> {
 

@@ -18,6 +18,7 @@ requireDir('./gulp/tasks');
 // 執行一切建置（除了 HTML 和 ServiceWorker 以外）
 gulp.task('build', gulp.parallel(
 	'static',
+	'theme',
 	'donate',
 	'core',
 	'worker',

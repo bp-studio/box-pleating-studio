@@ -113,6 +113,12 @@
 		"hotkey": "Acceso rápido",
 		"command": "Mando",
 		"language": "Idioma",
+		"theme": {
+			"_": "Tema",
+			"dark": "Tema oscuro",
+			"light": "Tema claro",
+			"system": "Usar la configuración del sistema"
+		},
 		"reset": "Restablecer todas las configuraciones",
 		"confirmReset": "¿Está seguro de que desea restablecer todas las configuraciones a las predeterminadas?",
 		"confirmKey": "La tecla de acceso rápido {0} ya está asignada al comando \"{1}\"; ¿te gustaría reemplazarlo?",

@@ -11,11 +11,11 @@ import type { ITagObject } from "bp/content/interface";
 import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Sheet} 是代表一個工作區域。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Sheet extends Mountable implements ISerializable<JSheet>, ITagObject {
 

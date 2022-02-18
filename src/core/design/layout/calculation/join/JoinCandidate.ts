@@ -6,12 +6,12 @@ import type { QuadrantDirection } from "bp/global";
 import type { IPoint, Line, Point } from "bp/math";
 import type { Piece } from "bp/design";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link JoinCandidate} 是融合過程當中其中一個參與者的抽象化物件；
  * 這裡面分攤了 {@link JoinerCore} 的部份程式碼。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class JoinCandidate {
 

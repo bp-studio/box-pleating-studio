@@ -1,5 +1,7 @@
 :root {
 	--bg-ui: #aaa;
+	--tab-border: gray;
+	--tab-active: #999;
 }
 
 * {

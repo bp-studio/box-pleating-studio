@@ -6,11 +6,11 @@ import type { JPiece } from "bp/content/json";
 import type { IPoint } from "bp/math";
 import type { IRegionShape } from "./Region";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Piece} 是 {@link Gadget} 裡面的一個 {@link Region}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 
@@ -194,9 +194,9 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		return clone<JPiece>(this);
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////
+	//=================================================================////////////////////////
 	// 靜態方法
-	//////////////////////////////////////////////////////////////////////////////////////////
+	//=================================================================////////////////////////
 
 	/** 把一個 JPiece 實體化成 Piece；如果已經實體化過，直接傳回（除非設置 alwaysNew） */
 	public static $instantiate(p: JPiece, alwaysNew = false): Piece {

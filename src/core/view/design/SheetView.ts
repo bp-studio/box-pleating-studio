@@ -2,16 +2,16 @@ import { LabeledView } from "../class/LabeledView";
 import { PaperUtil } from "../util/PaperUtil";
 import { View } from "../class/View";
 import { ViewService } from "bp/env/service";
-import { Layer, Style, unorderedArray } from "bp/global";
+import { Layer, shrewdStatic, Style, unorderedArray } from "bp/global";
 import { Constants } from "bp/content/json";
 import type { Sheet } from "bp/design";
 import type { Control } from "bp/design/class";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link SheetView} 是對應於 {@link Sheet} 的 {@link View}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class SheetView extends View {
 
@@ -36,6 +36,16 @@ import type { Control } from "bp/design/class";
 
 	public $contains(point: paper.Point): boolean {
 		return this._border.contains(point);
+	}
+
+	@shrewdStatic private _renderDark(): void {
+		if(this.$dark) {
+			this._border.strokeColor = PaperUtil.$gray;
+			this._grid.strokeColor = PaperUtil.$white;
+		} else {
+			this._border.strokeColor = PaperUtil.$black;
+			this._grid.strokeColor = PaperUtil.$black;
+		}
 	}
 
 	protected $render(): void {

@@ -7,11 +7,11 @@ import type { TreeNode } from "bp/content/context";
 import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Vertex} 是對應於樹狀結構中的 {@link TreeNode} 的元件。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Vertex extends IndependentDraggable implements ISerializable<JVertex> {
 

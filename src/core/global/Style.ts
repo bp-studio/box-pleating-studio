@@ -15,7 +15,6 @@ export namespace Style {
 	export const $dot: StyleDeclaration = {
 		fillColor: "#69F",
 		strokeWidth: 1,
-		strokeColor: "#000",
 		radius: 3,
 	};
 
@@ -31,7 +30,7 @@ export namespace Style {
 
 	export const $sheet: StyleDeclaration = {
 		strokeWidth: 0.25,
-		strokeColor: "#000",
+		strokeColor: "#FFF",
 	};
 
 	export const $label: StyleDeclaration = {

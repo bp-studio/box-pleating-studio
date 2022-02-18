@@ -193,6 +193,16 @@
 				self.runErr = 'Legacy browser';
 				self.callback();
 			}
+
+			var theme;
+			try {
+				theme = JSON.parse(localStorage.getItem('settings')).theme;
+			} catch(e) {
+				theme = 'system';
+			}
+			if(theme == 'dark' || theme == 'system' && matchMedia('(prefers-color-scheme: dark)').matches) {
+				document.documentElement.classList.add('dark');
+			}
 		})();
 
 		// Top level objects
@@ -203,6 +213,7 @@
 	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" onerror="errMgr.res()">
 	<link rel="stylesheet" href="assets/bps/style.css" onerror="errMgr.res()">
 	<link rel="stylesheet" href="main.css" onerror="errMgr.res()">
+	<link rel="stylesheet" href="darkmode.css" onerror="errMgr.res()">
 	<script src="log/log.js" defer onerror="errMgr.res()"></script>
 	<script src="lib/idb-keyval.min.js" defer onerror="errMgr.res()"></script><!-- 5.0.6 -->
 	<script src="locale.js" defer onerror="errMgr.res()"></script>

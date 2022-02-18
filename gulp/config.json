@@ -13,6 +13,7 @@
 		"locale": "src/locale",
 		"public": "src/public",
 		"sw": "src/other/service",
+		"theme": "src/theme",
 		"worker": "src/other/worker"
 	}
 }

@@ -10,11 +10,11 @@ import type { TreeEdge, TreeNode } from "bp/content/context";
 import type { View } from "../class";
 import type { FlapView } from "./FlapView";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link RiverView} 是對應於 {@link River} 的 {@link ControlView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class RiverView extends ControlView<River> implements ClosureView {
 

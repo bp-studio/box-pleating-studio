@@ -6,13 +6,13 @@ import { PaperWorker } from "bp/env/animation/PaperWorker";
 import type { FlapView } from "./FlapView";
 import type { Junction } from "bp/design";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link JunctionView} 是對應於 {@link Junction} 的 {@link View}。
  *
  * 它只有當 {@link Junction} 的狀態為 {@link JunctionStatus.tooClose} 的時候會繪製出紅色陰影。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class JunctionView extends View {
 

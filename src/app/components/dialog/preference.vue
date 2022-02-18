@@ -14,10 +14,20 @@
 				<div class="modal-body" style="height:min(40vh, 400px);">
 					<div v-show="tab==0" class="p-2">
 						<div class="row mb-2">
-							<label class="col-form-label col-4">{{$t('preference.language')}}</label>
+							<label class="col-form-label col-4" v-t="'preference.language'"></label>
 							<div class="col-8">
 								<select class="form-select" v-model="i18n.locale" @change="onLocaleChanged">
 									<option v-for="l in i18n.availableLocales" :key="l" :value="l" v-t="{path:'name',locale:l}"></option>
+								</select>
+							</div>
+						</div>
+						<div class="row mb-2">
+							<label class="col-form-label col-4" v-t="'preference.theme._'"></label>
+							<div class="col-8">
+								<select class="form-select" v-model="core.settings.theme">
+									<option value="system" v-t="'preference.theme.system'"></option>
+									<option value="light" v-t="'preference.theme.light'"></option>
+									<option value="dark" v-t="'preference.theme.dark'"></option>
 								</select>
 							</div>
 						</div>

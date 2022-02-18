@@ -3,7 +3,7 @@ import { PolyBool } from "bp/math";
 import type { TreeNode } from "bp/content/context";
 import type { RiverView } from "../design/RiverView";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link RiverHelper} 是負責監視針對特定的 {@link Flap} 在對應於特定 {@link River}
  * 的距離之下產生的輪廓的物件。
@@ -11,7 +11,7 @@ import type { RiverView } from "../design/RiverView";
  * 由於這些東西只要 Flap 本身以及相關的 Pattern 沒有發生變更就不需要重新計算，
  * 特別利用一個反應式物件來監視，以增進效能。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class RiverHelper extends RiverHelperBase {
 

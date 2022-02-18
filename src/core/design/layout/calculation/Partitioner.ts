@@ -8,12 +8,12 @@ import type { JPartition, JDevice, JGadget, JOverlap, JPiece, JQuadrilateral } f
 import type { Tree } from "bp/content/context";
 import type { Configuration } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Partitioner} 是 {@link Partition} 的基底類別，
  * 裡面定義了跟搜尋 {@link Device} 有關的方法。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class Partitioner extends Disposable {
 

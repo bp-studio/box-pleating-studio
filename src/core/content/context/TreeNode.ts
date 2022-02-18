@@ -6,11 +6,11 @@ import type { Tree } from "./Tree";
 import type { IDesignLike, ITagObject } from "bp/content/interface";
 import type { TreeEdge } from "./TreeEdge";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link TreeNode} 代表 {@link Tree} 上的一個結點
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class TreeNode extends Disposable implements ITagObject, ISerializable<JNode> {
 

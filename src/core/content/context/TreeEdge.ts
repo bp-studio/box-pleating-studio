@@ -7,11 +7,11 @@ import type { Tree } from "./Tree";
 import type { TreeNode } from "./TreeNode";
 import type { IDesignLike, ITagObject } from "bp/content/interface";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link TreeEdge} 代表 {@link Tree} 上的一條邊。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class TreeEdge extends Disposable implements ITagObject, ISerializable<JEdge> {
 

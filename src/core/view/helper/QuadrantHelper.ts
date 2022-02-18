@@ -5,11 +5,11 @@ import type { Path } from "bp/math";
 import type { Quadrant } from "bp/design";
 import type { RiverHelperBase } from "./RiverHelperBase";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link QuadrantHelper} 負責輔助管理 {@link Quadrant} 的輪廓。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class QuadrantHelper extends Disposable {
 

@@ -5,11 +5,11 @@ import type { IDesignLike } from "bp/content/interface";
 import type { Command } from "./commands";
 import type { DesignMode, JStep, Memento } from "bp/content/json";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Step} 代表 {@link HistoryManager} 中的一個操作步驟。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class Step implements ISerializable<JStep> {
 

@@ -6,11 +6,11 @@ import type { Vertex } from "./Vertex";
 import type { TreeEdge, TreeNode } from "bp/content/context";
 import type { JEdge } from "bp/content/json";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Edge} 是對應於樹狀結構中的 {@link TreeEdge} 的元件。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Edge extends Control implements ISerializable<JEdge> {
 

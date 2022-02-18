@@ -4,11 +4,11 @@ import { Layer, Style } from "bp/global";
 import type { Device } from "bp/design";
 import type { ReadonlyPath } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link DeviceView} 是對應於 {@link Device} 的 {@link ControlView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class DeviceView extends ControlView<Device> {
 

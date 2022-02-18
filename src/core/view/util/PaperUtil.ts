@@ -2,11 +2,11 @@ import { Point, PolyBool } from "bp/math";
 import * as paper from "paper";
 import type { Line } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * 這個靜態類別提供了一些 paper.js 相關的工具。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export namespace PaperUtil {
 
@@ -55,7 +55,9 @@ export namespace PaperUtil {
 	}
 
 	export const $black = new paper.Color('black');
+	export const $white = new paper.Color('white');
 	export const $red = new paper.Color('red');
+	export const $gray = new paper.Color('#aaa');
 
 	export function $fromShape(shape: PolyBool.Shape): paper.Path[] {
 		let poly = PolyBool.toPolygon(shape);

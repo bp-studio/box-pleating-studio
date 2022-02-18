@@ -19,11 +19,11 @@ export enum JunctionStatus {
 
 export type JunctionDimension = 'ox' | 'oy';
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Junction} 是負責管理兩個 {@link Flap} 之間的相對狀態的抽象物件。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Junction extends SheetObject implements ISerializable<JJunction> {
 

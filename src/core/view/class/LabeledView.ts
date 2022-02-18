@@ -1,15 +1,16 @@
 import { View } from "./View";
 import { ControlView } from "./ControlView";
 import { LabelUtil } from "../util/LabelUtil";
-import { Layer, Style } from "bp/global";
+import { PaperUtil } from "../util/PaperUtil";
+import { Layer, shrewdStatic, Style } from "bp/global";
 import type { Control } from "bp/design/class";
 import type { IPoint } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link LabeledView} 是附帶有文字標籤的 {@link ControlView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class LabeledView<T extends Control> extends ControlView<T> {
 
@@ -41,6 +42,18 @@ export abstract class LabeledView<T extends Control> extends ControlView<T> {
 		super(control);
 		this.$addItem(Layer.$label, this._glow = new paper.PointText(Style.$glow));
 		this.$addItem(Layer.$label, this._label = new paper.PointText(Style.$label));
+	}
+
+	@shrewdStatic private _renderDark(): void {
+		if(this.$dark) {
+			this._glow.strokeColor = PaperUtil.$black;
+			this._glow.fillColor = PaperUtil.$black;
+			this._label.fillColor = PaperUtil.$white;
+		} else {
+			this._glow.strokeColor = PaperUtil.$white;
+			this._glow.fillColor = PaperUtil.$white;
+			this._label.fillColor = PaperUtil.$black;
+		}
 	}
 
 	@shrewd private _drawUnscaled(): void {

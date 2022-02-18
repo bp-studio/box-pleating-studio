@@ -157,7 +157,7 @@
 		flex-shrink: 0;
 		font-size: 1.25rem;
 		line-height: 2.5rem;
-		border-right: 1px solid gray;
+		border-right: 1px solid var(--tab-border);
 		cursor: default;
 		max-width: 150px;
 		height: 100%;
@@ -166,7 +166,7 @@
 	}
 
 	.tab:first-child {
-		border-left: 1px solid gray;
+		border-left: 1px solid var(--tab-border);
 	}
 
 	.tab :first-child {
@@ -189,7 +189,7 @@
 	}
 
 	.tab.active {
-		background-color: #999;
+		background-color: var(--tab-active);
 		background-image: var(--bs-gradient);
 		color: black;
 	}

@@ -3,7 +3,7 @@ import { SheetObject } from "bp/design/class";
 import { action } from "bp/content/changes/action";
 import type { IQueryableTagObject, ITagObject } from "bp/content/interface";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * 抽象類別 {@link Store} 能根據指定的生成器和建造器產生物件陣列，
  * 並且提供方法來在陣列之中瀏覽不同的物件。
@@ -16,7 +16,7 @@ import type { IQueryableTagObject, ITagObject } from "bp/content/interface";
  * @typedef P 原型資料類別
  * @typedef T 實體物件類別
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class Store<P, T extends SheetObject & IQueryableTagObject>
 	extends SheetObject implements IQueryableTagObject {

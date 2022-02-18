@@ -4,11 +4,11 @@ import { Device } from "bp/design";
 import type { Studio } from "bp/env";
 import type { Draggable } from "bp/design/class";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link DragController} 負責管理使用者拖曳 {@link Control} 的行為。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class DragController {
 
