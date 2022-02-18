@@ -2,6 +2,7 @@
 ![](https://img.shields.io/badge/platform-ALL-brightgreen)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/MuTsunTsai/box-pleating-studio)
 ![GitHub top language](https://img.shields.io/github/languages/top/MuTsunTsai/box-pleating-studio)
+![Discord](https://img.shields.io/discord/943493491378507807?color=blue&label=Discord&logo=discord)
 ![GitHub Repo stars](https://img.shields.io/github/stars/MuTsunTsai/box-pleating-studio?style=social)
 
 # Box Pleating Studio
@@ -27,6 +28,8 @@ For instruction, user manual and all other general info, pleas visit [BP Studio 
 
 If you notice any bugs, or have any suggestions, feel free to drop an issue [here](https://github.com/bp-studio/box-pleating-studio/issues).\
 If you use BP Studio to create new designs, please share your work with us [here](https://github.com/bp-studio/box-pleating-studio/discussions).
+
+**New**: Join our new [Discord server](https://discord.gg/HkcdTDS4zZ)!
 
 ## For contributors
 
