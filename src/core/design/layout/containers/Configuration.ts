@@ -10,12 +10,12 @@ import type { JJunction, JDevice, JGadget, JOverlap, JPattern, JConfiguration } 
 import type { GDevice, GPattern } from "..";
 import type { Repository } from "./Repository";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * 一種 {@link Configuration} 是一套把 {@link Junction}
  * 群組構成的重疊區域切割成 {@link Partition} 的配置。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Configuration extends Store<JPattern, Pattern>
 	implements ISerializable<JConfiguration> {

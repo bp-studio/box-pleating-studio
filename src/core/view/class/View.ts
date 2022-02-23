@@ -1,9 +1,10 @@
 import { Mountable } from "bp/class";
+import { DarkController } from "bp/env/controllers/DarkController";
 import type { Display } from "bp/env";
 import type { Studio } from "bp/env/Studio";
 import type { Layer } from "bp/global";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link View} 是對應於元件的視圖，負責管理元件的繪製。
  * 它是一個擁有許多 {@link paper.Item} 物件
@@ -11,7 +12,7 @@ import type { Layer } from "bp/global";
  *
  * 它的抽象方法 {@link View.$render $render()} 內會進行繪製動作。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class View extends Mountable {
 
@@ -55,6 +56,10 @@ export abstract class View extends Mountable {
 
 	protected get $displayScale(): number {
 		return this.$display?.$scale ?? 1;
+	}
+
+	protected get $dark(): boolean {
+		return DarkController.$dark;
 	}
 
 	/**

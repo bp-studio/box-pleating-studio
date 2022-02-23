@@ -4,11 +4,11 @@ import { Layer, Style } from "bp/global";
 import type { Device } from "bp/design";
 import type { ReadonlyPath } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link DeviceView} 是對應於 {@link Device} 的 {@link ControlView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class DeviceView extends ControlView<Device> {
 
@@ -37,6 +37,14 @@ import type { ReadonlyPath } from "bp/math";
 
 	public $contains(point: paper.Point): boolean {
 		return this._shade.contains(point);
+	}
+
+	@shrewd private _renderDark(): void {
+		if(this.$dark) {
+			this._axisParallels.strokeColor = PaperUtil.$lightGreen;
+		} else {
+			this._axisParallels.strokeColor = PaperUtil.$green;
+		}
 	}
 
 	protected $render(): void {

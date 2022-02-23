@@ -11,11 +11,11 @@ import type { TreeElement } from "bp/content/context";
 import type { IPoint } from "bp/math";
 import type { Control, Draggable } from "bp/design/class";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link HistoryService} 負責管理使用者的操作歷史紀錄。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class HistoryService extends Disposable implements ISerializable<JHistory> {
 

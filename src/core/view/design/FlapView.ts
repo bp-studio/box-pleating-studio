@@ -8,11 +8,11 @@ import type { IPoint, PolyBool } from "bp/math";
 import type { PerQuadrant } from "bp/global";
 import type { ClosureView } from "./RiverView";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link FlapView} 是對應於 {@link Flap} 的 {@link LabeledView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class FlapView extends LabeledView<Flap> implements ClosureView {
 
@@ -91,6 +91,11 @@ import type { ClosureView } from "./RiverView";
 
 		// 此處曾經偶然觸發錯誤但難以復現；備查
 		else debugger;
+	}
+
+	@shrewdStatic private _renderDotsDark(): void {
+		const color = this.$dark ? PaperUtil.$light : PaperUtil.$black;
+		this._dots.forEach(d => d.strokeColor = color);
 	}
 
 	protected $render(): void {

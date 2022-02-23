@@ -2,13 +2,13 @@ import { Control } from "./Control";
 import { Point, Vector } from "bp/math";
 import type { IPoint } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Draggable} 是一個可能可以被拖曳移動的 {@link Control}。
  *
  * 繼承類別必須覆寫 {@link Draggable.$constraint $constraint} 方法來定義移動的行為。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class Draggable extends Control {
 

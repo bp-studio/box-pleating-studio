@@ -3,11 +3,11 @@ import { River } from "../components";
 import type { TreeEdge } from "bp/content/context";
 import type { Design } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link RiverContainer} 映射 {@link TreeEdge} 成 {@link River}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class RiverContainer extends BaseContainer<TreeEdge, River> {
 	constructor(design: Design) {

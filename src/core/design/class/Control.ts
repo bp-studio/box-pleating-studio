@@ -2,11 +2,11 @@ import { SheetObject } from "./SheetObject";
 import type { IPoint } from "bp/math";
 import type { ITagObject } from "bp/content/interface";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Control} 是一個可以被選取的 {@link SheetObject}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class Control extends SheetObject implements ITagObject {
 

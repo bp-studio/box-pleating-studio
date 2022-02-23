@@ -6,11 +6,11 @@ import type { Path, PolyBool } from "bp/math";
 import type { Flap } from "bp/design";
 import type { View } from "../class";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link RiverHelperBase} 是輔助輪廓管理的類別。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class RiverHelperBase extends Disposable {
 

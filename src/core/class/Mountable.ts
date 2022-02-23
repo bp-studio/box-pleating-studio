@@ -2,11 +2,11 @@ import { Disposable } from "./Disposable";
 import { shrewdStatic } from "bp/global";
 import type { StudioBase } from "bp/env";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Mountable} 是可掛載元件。「掛載」是指載入到當前的 {@link Studio} 的動作。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class Mountable extends Disposable {
 

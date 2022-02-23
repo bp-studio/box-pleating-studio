@@ -5,11 +5,11 @@ import { Settings } from "bp/global";
 import type { JunctionDimension, Quadrant } from "bp/design";
 import type { Path, Vector } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link TraceBuilder} 負責處理建構 {@link Trace} 之前的複雜前置計算。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class TraceBuilder {
 

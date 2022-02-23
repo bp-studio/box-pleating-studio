@@ -12,11 +12,11 @@ import type { Memento, JFlap } from "bp/content/json";
 import type { Control } from "bp/design/class";
 import type { IPoint, Vector } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Flap} 是摺痕圖中的角片元件，是決定整個摺痕圖配置的關鍵。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Flap extends IndependentDraggable implements ISerializable<JFlap> {
 

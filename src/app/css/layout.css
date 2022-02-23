@@ -43,7 +43,9 @@
 }
 
 @media screen {
-	#divWorkspace, #divShade, .welcome {
+	#divWorkspace,
+	#divShade,
+	.welcome {
 		position: absolute;
 		top: 3.75rem;
 		left: 0px;
@@ -52,13 +54,17 @@
 }
 
 @media screen and (max-width: 650px) {
-	#divWorkspace, #divShade, #divPanel, .shift-down {
+	#divWorkspace,
+	#divShade,
+	#divPanel,
+	.shift-down {
 		top: 6.15rem;
 	}
 }
 
 @media (min-width: 100.01vh) and (min-width: 700px) {
-	#divWorkspace, .welcome {
+	#divWorkspace,
+	.welcome {
 		right: 250px;
 	}
 	#panelToggle {
@@ -70,7 +76,9 @@
 }
 
 @media (max-width: 100vh), (max-width: 699.9px) {
-	#divWorkspace, .welcome, #divPanel.show {
+	#divWorkspace,
+	.welcome,
+	#divPanel.show {
 		right: 0px;
 	}
 	#divPanel {

@@ -4,11 +4,11 @@ import { Tree } from "bp/content/context";
 import type { TreeNode } from "bp/content/context";
 import type { Design } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link FlapContainer} 映射 {@link TreeNode} 中的葉點成 {@link Flap}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class FlapContainer extends BaseContainer<TreeNode, Flap> {
 

@@ -5,11 +5,11 @@ import { Layer, Style } from "bp/global";
 import type { Edge } from "bp/design";
 import type { IPoint } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link EdgeView} 是對應於 {@link Edge} 的 {@link LabeledView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class EdgeView extends LabeledView<Edge> {
 
@@ -39,7 +39,10 @@ import type { IPoint } from "bp/math";
 	}
 
 	protected $renderSelection(selected: boolean): void {
-		let color = selected ? PaperUtil.$red : PaperUtil.$black;
+		let color: paper.Color;
+		if(selected) color = PaperUtil.$red;
+		else if(this.$dark) color = PaperUtil.$light;
+		else color = PaperUtil.$black;
 		this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		this.line.strokeWidth = selected ? 3 : 2;

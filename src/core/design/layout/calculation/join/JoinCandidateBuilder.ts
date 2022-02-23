@@ -7,11 +7,11 @@ import type { Piece } from "bp/design";
 import type { QuadrantDirection } from "bp/global";
 import type { JAnchor } from "bp/content/json";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link JoinCandidateBuilder} 類別幫忙完成 {@link JoinCandidate} 的複雜建構過程。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export class JoinCandidateBuilder {
 

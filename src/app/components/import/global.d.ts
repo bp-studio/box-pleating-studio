@@ -21,11 +21,11 @@ declare global {
 		readonly files: FileHandleList;
 	}
 
-	export interface Executor extends Vue {
+	interface Executor extends Vue {
 		execute(): void;
 	}
 
-	export interface IShow extends Vue {
+	interface IShow extends Vue {
 		show(): void;
 	}
 
@@ -98,6 +98,9 @@ declare global {
 		loadSessionOnQueue: boolean;
 		showDPad: boolean;
 		autoSave: boolean;
+		theme: Theme;
 		hotkey: KeyStore;
 	}
+
+	type Theme = 'system' | 'dark' | 'light';
 }

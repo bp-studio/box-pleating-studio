@@ -14,14 +14,14 @@ import type { Point, Vector } from "bp/math";
  */
 type CornerMap = [JCorner, number, number];
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Partition} 是 {@link Configuration} 底下的單一切割。
  *
  * {@link Partition} 只會對應於單一的 {@link Device}，它負責計算對應切割的相關數值。
  * 尋找 {@link Device} 部份的程式碼在於其基底類別 {@link Partitioner} 之中。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Partition extends Partitioner implements ISerializable<JPartition> {
 

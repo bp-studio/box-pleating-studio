@@ -12,11 +12,11 @@ import type { Studio, StudioBase } from "bp/env";
 import type { DesignMode, JDesign } from "bp/content/json";
 import type { IDesign, ITagObject } from "bp/content/interface";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Design} 是包含了樹狀結構以及摺痕圖的一個完整專案單位。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class Design extends Mountable implements ISerializable<JDesign>, IDesign {
 

@@ -1,7 +1,7 @@
 
 export type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMap<K, V>) => void;
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link DoubleMap} 是將一對的 Key 對應到 Value 上的類別。
  *
@@ -9,7 +9,7 @@ export type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: DoubleMa
  * 一旦生成之後就不會改變實體，因此我沒有必要讓整個 {@link DoubleMap} 的 get set 都是可觀測的，
  * 唯一需要開放的可觀測性質就只有 {@link DoubleMap} 的大小而已。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class DoubleMap<K, V> implements ReadonlyDoubleMap<K, V> {
 

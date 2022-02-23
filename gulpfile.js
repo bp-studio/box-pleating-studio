@@ -18,6 +18,7 @@ requireDir('./gulp/tasks');
 // 執行一切建置（除了 HTML 和 ServiceWorker 以外）
 gulp.task('build', gulp.parallel(
 	'static',
+	'theme',
 	'donate',
 	'core',
 	'worker',
@@ -53,7 +54,7 @@ gulp.task('deployPub', () => seriesIf(
 ));
 
 // 清除一切建置檔案
-gulp.task('clean', () => del(['dist', 'debug']));
+gulp.task('clean', () => del('build'));
 
 // 預設建置，會建置到可以在本地執行的程度；
 // 在 VS Code 裡面按下 F5 預設就會執行這個建置動作

@@ -114,6 +114,12 @@
 		"hotkey": "Hotkeys",
 		"command": "Command",
 		"language": "Language",
+		"theme": {
+			"_": "Theme",
+			"dark": "Dark theme",
+			"light": "Light theme",
+			"system": "Use system settings"
+		},
 		"reset": "Reset all settings to default",
 		"confirmReset": "Are you sure you want to reset all settings to default?",
 		"confirmKey": "Hotkey {0} is already assigned to the command \"{1}\"; would you like to replace it?",

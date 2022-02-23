@@ -4,11 +4,11 @@ import type { IDesignLike } from "bp/content/interface";
 
 export type Typeless<T extends JCommand> = Omit<T, 'type'>;
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link Command} 類別是使用者編輯操作的基底類別。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 export abstract class Command implements JCommand {
 

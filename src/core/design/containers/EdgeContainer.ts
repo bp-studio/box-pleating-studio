@@ -4,11 +4,11 @@ import type { TreeEdge } from "bp/content/context";
 import type { Design } from "..";
 import type { JEdge } from "bp/content/json";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link EdgeContainer} 映射 {@link TreeEdge} 成 {@link Edge}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class EdgeContainer extends BaseContainer<TreeEdge, Edge> {
 

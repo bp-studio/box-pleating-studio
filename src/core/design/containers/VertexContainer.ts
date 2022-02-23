@@ -4,11 +4,11 @@ import { Tree } from "bp/content/context";
 import type { TreeNode } from "bp/content/context";
 import type { Design } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link VertexContainer} 映射 {@link TreeEdge} 成 {@link Vertex}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class VertexContainer extends BaseContainer<TreeNode, Vertex> {
 

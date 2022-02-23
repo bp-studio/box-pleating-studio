@@ -1,15 +1,16 @@
 import { LabeledView } from "../class";
+import { PaperUtil } from "../util/PaperUtil";
 import { ViewService } from "bp/env/service";
 import { Layer, Style, shrewdStatic } from "bp/global";
 import type { Vertex } from "bp/design";
 import type { EdgeView } from "./EdgeView";
 import type { IPoint } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link VertexView} 是對應於 {@link Vertex} 的 {@link LabeledView}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class VertexView extends LabeledView<Vertex> {
 
@@ -32,6 +33,10 @@ import type { IPoint } from "bp/math";
 		this.$addItem(Layer.$dot, this._dotSel = new paper.Path.Circle(option));
 
 		this._circle = new paper.Path.Circle({ radius: 0.4 });
+	}
+
+	@shrewdStatic private _renderDotDark(): void {
+		this._dot.strokeColor = this.$dark ? PaperUtil.$light : PaperUtil.$black;
 	}
 
 	public $contains(point: paper.Point): boolean {

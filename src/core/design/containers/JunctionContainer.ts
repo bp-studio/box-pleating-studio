@@ -3,11 +3,11 @@ import { orderedArray, unorderedArray } from "bp/global";
 import { DoubleMapping } from "bp/class";
 import type { Design, Flap } from "..";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link JunctionContainer} 映射每一對的 {@link Flap} 成 {@link Junction}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class JunctionContainer extends DoubleMapping<Flap, Junction> {
 

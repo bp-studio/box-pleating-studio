@@ -3,11 +3,11 @@ import { Mapping } from "bp/class";
 import type { Design, Device, Quadrant } from "..";
 import type { Point } from "bp/math";
 
-//////////////////////////////////////////////////////////////////
+//=================================================================
 /**
  * {@link StretchContainer} 映射 Team 成 {@link Stretch}。
  */
-//////////////////////////////////////////////////////////////////
+//=================================================================
 
 @shrewd export class StretchContainer extends Mapping<string, Stretch> {
 
