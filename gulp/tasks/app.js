@@ -4,6 +4,7 @@ const gulp = require('gulp');
 const gulpIf = require('gulp-if');
 const lazypipe = require('lazypipe');
 const newer = require('gulp-newer');
+const replace = require('gulp-replace');
 const terser = require('gulp-terser');
 const wrap = require('@makeomatic/gulp-wrap-js');
 
@@ -14,6 +15,7 @@ const vue = require('../plugins/vue');
 
 const jsPipe = lazypipe()
 	.pipe(() => wrap("if(errMgr.ok()) { %= body % }"))
+	.pipe(() => replace(/\bconst\b/g, 'var')) // 修正 Safari 的問題
 	.pipe(() => gulp.dest(config.dest.debug))
 	.pipe(() => terser({
 		ecma: 2019,

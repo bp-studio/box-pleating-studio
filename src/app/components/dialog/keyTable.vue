@@ -14,7 +14,7 @@
 				</thead>
 			</table>
 		</div>
-		<table class="w-100 table table-sm table-bordered m-0">
+		<table class="w-100 table table-sm table-bordered m-0 key">
 			<colgroup>
 				<col width="66%" />
 				<col width="34%" />
@@ -29,9 +29,12 @@
 						</td>
 					</tr>
 					<tr v-for="(key, command) in list" :key="name+'.'+command" v-show="open[name]">
-						<td class="ps-4">{{labels[name][command]}}</td>
+						<td class="ps-4">
+							<label :for="name+'.'+command">{{labels[name][command]}}</label>
+						</td>
 						<td class="p-0 position-relative">
 							<input
+								:id="name+'.'+command"
 								type="text"
 								class="key border-0 w-100"
 								:value="format(key)"
@@ -53,7 +56,7 @@
 	/* eslint-disable require-atomic-updates */
 	import { Component, Vue } from 'vue-property-decorator';
 
-	type KeyMap = Record<string, Record<string, string>>
+	type KeyMap = Record<string, Record<string, string>>;
 
 	@Component
 	export default class KeyTable extends Vue {
@@ -150,6 +153,10 @@
 </script>
 
 <style>
+	table.key td:first-child {
+		cursor: pointer;
+	}
+
 	input.key {
 		outline: none;
 		padding: 0.25rem;
