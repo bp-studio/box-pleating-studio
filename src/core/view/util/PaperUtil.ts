@@ -57,7 +57,10 @@ export namespace PaperUtil {
 	export const $black = new paper.Color('black');
 	export const $white = new paper.Color('white');
 	export const $red = new paper.Color('red');
-	export const $gray = new paper.Color('#aaa');
+	export const $dark = new paper.Color('#888');
+	export const $light = new paper.Color('#bbb');
+	export const $green = new paper.Color('green');
+	export const $lightGreen = new paper.Color('#6d6');
 
 	export function $fromShape(shape: PolyBool.Shape): paper.Path[] {
 		let poly = PolyBool.toPolygon(shape);

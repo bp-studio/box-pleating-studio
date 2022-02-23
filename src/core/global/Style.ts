@@ -78,7 +78,6 @@ export namespace Style {
 
 	export const $axisParallels: StyleDeclaration = {
 		strokeWidth: 1,
-		strokeColor: "green",
 	};
 
 	// export const $top: StyleDeclaration = {};

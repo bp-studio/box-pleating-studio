@@ -94,7 +94,7 @@ import type { ClosureView } from "./RiverView";
 	}
 
 	@shrewdStatic private _renderDotsDark(): void {
-		const color = this.$dark ? PaperUtil.$white : PaperUtil.$black;
+		const color = this.$dark ? PaperUtil.$light : PaperUtil.$black;
 		this._dots.forEach(d => d.strokeColor = color);
 	}
 

@@ -39,6 +39,14 @@ import type { ReadonlyPath } from "bp/math";
 		return this._shade.contains(point);
 	}
 
+	@shrewd private _renderDark(): void {
+		if(this.$dark) {
+			this._axisParallels.strokeColor = PaperUtil.$lightGreen;
+		} else {
+			this._axisParallels.strokeColor = PaperUtil.$green;
+		}
+	}
+
 	protected $render(): void {
 		let path: paper.PathItem | null = null;
 		for(let r of this._control.$regions) {

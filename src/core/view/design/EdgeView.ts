@@ -41,7 +41,7 @@ import type { IPoint } from "bp/math";
 	protected $renderSelection(selected: boolean): void {
 		let color: paper.Color;
 		if(selected) color = PaperUtil.$red;
-		else if(this.$dark) color = PaperUtil.$gray;
+		else if(this.$dark) color = PaperUtil.$light;
 		else color = PaperUtil.$black;
 		this._label.fillColor = this._label.strokeColor = this.line.strokeColor = color;
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers

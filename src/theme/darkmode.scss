@@ -26,22 +26,17 @@ html.dark {
 	}
 
 	.scroll-shadow {
-		background:
-		/* Shadow covers */ linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
-			linear-gradient(rgba(255, 255, 255, 0), $modal 70%) 0 100%,
-			/* Shadows */ radial-gradient(50% 0, farthest-side, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)),
-			radial-gradient(50% 100%, farthest-side, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)) 0 100%;
+		background-image: linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
+			linear-gradient(rgba(255, 255, 255, 0), $modal 70%),
+			radial-gradient(50% 0, farthest-side, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)),
+			radial-gradient(50% 100%, farthest-side, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
 
-		background:
-		/* Shadow covers */ linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
-			linear-gradient(rgba(255, 255, 255, 0), $modal 70%) 0 100%,
-			/* Shadows */ radial-gradient(farthest-side at 50% 0, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)),
-			radial-gradient(farthest-side at 50% 100%, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)) 0 100%;
+		background-image: linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
+			linear-gradient(rgba(255, 255, 255, 0), $modal 70%),
+			radial-gradient(farthest-side at 50% 0, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)),
+			radial-gradient(farthest-side at 50% 100%, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
 
-		background-repeat: no-repeat;
 		background-color: $modal;
-		background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
-		background-attachment: local, local, scroll, scroll;
 	}
 
 	.form-check-input:not(:checked) {

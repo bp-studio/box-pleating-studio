@@ -36,7 +36,7 @@ import type { IPoint } from "bp/math";
 	}
 
 	@shrewdStatic private _renderDotDark(): void {
-		this._dot.strokeColor = this.$dark ? PaperUtil.$white : PaperUtil.$black;
+		this._dot.strokeColor = this.$dark ? PaperUtil.$light : PaperUtil.$black;
 	}
 
 	public $contains(point: paper.Point): boolean {

@@ -40,8 +40,8 @@ import type { Control } from "bp/design/class";
 
 	@shrewdStatic private _renderDark(): void {
 		if(this.$dark) {
-			this._border.strokeColor = PaperUtil.$gray;
-			this._grid.strokeColor = PaperUtil.$white;
+			this._border.strokeColor = PaperUtil.$dark;
+			this._grid.strokeColor = PaperUtil.$dark;
 		} else {
 			this._border.strokeColor = PaperUtil.$black;
 			this._grid.strokeColor = PaperUtil.$black;
