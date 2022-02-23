@@ -20,7 +20,8 @@
 		"copyright": "Copyright © 2020{0} 蔡牧村",
 		"recent": "最近使用",
 		"start": "開始",
-		"website": "BP Studio 網站"
+		"website": "BP Studio 網站",
+		"discord": "BP Studio 現在有了 Discord 伺服器！請到{0}加入我們！"
 	},
 	"toolbar": {
 		"file": {
@@ -230,6 +231,7 @@
 		"yes": "是",
 		"no": "否",
 		"ok": "確定",
+		"here": "這裡",
 		"close": "關閉",
 		"delete": "刪除",
 		"version": "版本",

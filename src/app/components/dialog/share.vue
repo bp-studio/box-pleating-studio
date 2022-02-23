@@ -68,7 +68,12 @@
 			return this.$refs.bt as HTMLButtonElement;
 		}
 
-		protected onCopy(): void {
+		protected async onCopy(): Promise<void> {
+			try {
+				// 這個理論上才是現代瀏覽器採用的文字複製方法，
+				// 但是我仍然引用 vue-clipboard 來使功能適用於舊版的 Safari
+				await navigator.clipboard.writeText(this.url);
+			} catch(e) { }
 			const MESSAGE_DELAY = 3000;
 			let s = this.$refs.success as HTMLSpanElement;
 			s.style.width = "20px";

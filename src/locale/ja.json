@@ -20,7 +20,8 @@
 		"copyright": "Copyright © 2020{0} 蔡 牧村",
 		"recent": "最近使用された",
 		"start": "開始",
-		"website": "BP Studio のウェブサイト"
+		"website": "BP Studio のウェブサイト",
+		"discord": "BP Studio に Discord サーバーが追加されました！{0}からご参加ください！"
 	},
 	"toolbar": {
 		"file": {
@@ -230,6 +231,7 @@
 		"yes": "はい",
 		"no": "いいえ",
 		"ok": "OK",
+		"here": "こちら",
 		"close": "閉じる",
 		"delete": "削除",
 		"version": "バージョン",

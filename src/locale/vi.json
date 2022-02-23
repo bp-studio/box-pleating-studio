@@ -20,7 +20,8 @@
 		"copyright": "Bản quyền © 2020{0} bởi Thái Mục Thôn (Mu-Tsun Tsai)",
 		"recent": "Được sử dụng gần đây",
 		"start": "Khởi đầu",
-		"website": "Trang web BP Studio"
+		"website": "Trang web BP Studio",
+		"discord": "BP Studio hiện có một máy chủ Discord! Hãy tham gia với chúng tôi ở {0}!"
 	},
 	"toolbar": {
 		"file": {
@@ -230,6 +231,7 @@
 		"yes": "Đúng",
 		"no": "Không",
 		"ok": "OK",
+		"here": "đây",
 		"close": "Đóng",
 		"delete": "Xóa bỏ",
 		"version": "Phiên bản",

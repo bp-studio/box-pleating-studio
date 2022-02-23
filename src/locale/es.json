@@ -20,7 +20,8 @@
 		"copyright": "Copyright © 2020{0} por Mu-Tsun Tsai",
 		"recent": "Recientemente usado",
 		"start": "Comienzo",
-		"website": "Sitio web de BP Studio"
+		"website": "Sitio web de BP Studio",
+		"discord": "¡BP Studio ahora tiene un servidor Discord! ¡Por favor únete a nosotros {0}!"
 	},
 	"toolbar": {
 		"file": {
@@ -230,6 +231,7 @@
 		"yes": "Sí",
 		"no": "No",
 		"ok": "OK",
+		"here": "aquí",
 		"close": "Cerrar",
 		"delete": "Borrar",
 		"version": "Versión",
