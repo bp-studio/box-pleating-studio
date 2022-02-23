@@ -6,7 +6,8 @@
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch; /* Safari 上啟用動能捲動 */
 
-	background-image:
+	/* Safari 13+ 不支援 local，先棄用這一段 */
+	/* background-image:
 		linear-gradient(white 30%, rgba(255, 255, 255, 0)),
 		linear-gradient(rgba(255, 255, 255, 0), white 70%),
 		radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)),
@@ -19,10 +20,10 @@
 		radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
 
 	background-repeat: no-repeat;
-	background-color: white;
 	background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
 	background-position: 0 0, 0 100%, 0 0, 0 100%;
-	background-attachment: local, local, scroll, scroll;
+	background-attachment: local, local, scroll, scroll; */
+	background-color: white;
 }
 
 .scroll-shadow,
