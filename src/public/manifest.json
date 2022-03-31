@@ -1,6 +1,7 @@
 {
 	"name": "Box Pleating Studio",
 	"short_name": "Box Pleating Studio",
+	"id": "/",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",
@@ -49,6 +50,11 @@
 		{
 			"platform": "webapp",
 			"url": "https://bpstudio.abstreamace.com/manifest.json"
+		}
+	],
+	"url_handlers": [
+		{
+			"origin": "https://bpstudio.abstreamace.com"
 		}
 	],
 	"file_handlers": [
