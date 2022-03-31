@@ -6,6 +6,7 @@
 	"display": "standalone",
 	"theme_color": "#007bff",
 	"background_color": "#fff",
+	"orientation": "any",
 	"description": "Super-complex origami design made easy!",
 	"icons": [
 		{
@@ -34,6 +35,16 @@
 			"sizes": "16x16"
 		}
 	],
+	"user_preferences": {
+		"color_scheme_dark": {
+			"theme_color": "#007bff",
+			"background_color": "#1e1e1e"
+		},
+		"color_scheme_light": {
+			"theme_color": "#007bff",
+			"background_color": "#fff"
+		}
+	},
 	"related_applications": [
 		{
 			"platform": "webapp",
