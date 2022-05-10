@@ -1,25 +1,25 @@
 {
-    "cSpell.ignorePaths": [
-        "**/package*.json",
-        "src/locale/es.json",
-        ".vscode",
-        ".eslintrc*",
-        "debug/**/*",
-        "src/**/paper.d.ts",
-        "src/**/PolyBool.ts"
-    ],
-    "cSpell.ignoreRegExpList": [
-        "/[A-Z]+(?![a-z])/g"
-    ],
-    "cSpell.ignoreWords": [
-        "fbclid",
-        "lazypipe",
-        "opendir",
-        "purgecss",
-        "tinyurl",
-        "weixin"
-    ],
-    "cSpell.words": [
+	"cSpell.ignorePaths": [
+		"**/package*.json",
+		"src/locale/es.json",
+		".vscode",
+		".eslintrc*",
+		"debug/**/*",
+		"src/**/paper.d.ts",
+		"src/**/PolyBool.ts"
+	],
+	"cSpell.ignoreRegExpList": [
+		"/[A-Z]+(?![a-z])/g"
+	],
+	"cSpell.ignoreWords": [
+		"fbclid",
+		"lazypipe",
+		"opendir",
+		"purgecss",
+		"tinyurl",
+		"weixin"
+	],
+	"cSpell.words": [
 		"bpstudio",
 		"configurator",
 		"esbuild",
@@ -47,37 +47,42 @@
 		"tsun",
 		"typeless"
 	],
-    "files.exclude": {
-        "**/debug.log": true,
-        "node_modules": true
-    },
-    "i18n-ally.enabledFrameworks": [
-        "vue"
-    ],
-    "i18n-ally.enabledParsers": [
-        "json"
-    ],
-    "i18n-ally.indent": 4,
-    "i18n-ally.keysInUse": [
-        "since"
-    ],
-    "i18n-ally.keystyle": "nested",
-    "i18n-ally.localesPaths": "src/locale",
-    "i18n-ally.sourceLanguage": "en",
-    "i18n-ally.tabStyle": "tab",
-    "i18n-ally.usage.scanningIgnore": [
-        "src/public/**/*",
-        "lib/**/*"
-    ],
-    "latex-workshop.latex.recipe.default": "xelatex",
-    "latex-workshop.latex.recipes": [
-        {
-            "name": "xelatex",
-            "tools": [
-                "xelatex"
-            ]
-        }
-    ],
-    "typescript.tsdk": "node_modules\\typescript\\lib",
-    "vetur.experimental.templateInterpolationService": true
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.expand": false,
+	"explorer.fileNesting.patterns": {
+		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff"
+	},
+	"files.exclude": {
+		"**/debug.log": true,
+		"node_modules": true
+	},
+	"i18n-ally.enabledFrameworks": [
+		"vue"
+	],
+	"i18n-ally.enabledParsers": [
+		"json"
+	],
+	"i18n-ally.indent": 4,
+	"i18n-ally.keysInUse": [
+		"since"
+	],
+	"i18n-ally.keystyle": "nested",
+	"i18n-ally.localesPaths": "src/locale",
+	"i18n-ally.sourceLanguage": "en",
+	"i18n-ally.tabStyle": "tab",
+	"i18n-ally.usage.scanningIgnore": [
+		"src/public/**/*",
+		"lib/**/*"
+	],
+	"latex-workshop.latex.recipe.default": "xelatex",
+	"latex-workshop.latex.recipes": [
+		{
+			"name": "xelatex",
+			"tools": [
+				"xelatex"
+			]
+		}
+	],
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+	"vetur.experimental.templateInterpolationService": true
 }
