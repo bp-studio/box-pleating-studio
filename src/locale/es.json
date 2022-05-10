@@ -93,7 +93,8 @@
 			"checkUpdate": "Buscar actualizaciones",
 			"donation": "Donación",
 			"discussions": "Discusiones",
-			"issue": "Reportar error"
+			"issue": "Reportar error",
+			"homepage": "Página principal"
 		},
 		"view": {
 			"tree": "Estructura de árbol",

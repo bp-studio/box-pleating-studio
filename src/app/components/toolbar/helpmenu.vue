@@ -12,7 +12,7 @@
 			</div>
 			<a class="dropdown-item" href="https://bp-studio.github.io" target="_blank" rel="noopener">
 				<i class="fas fa-globe"></i>
-				{{$t("keyword.homepage")}}
+				{{$t("toolbar.help.homepage")}}
 			</a>
 			<a
 				class="dropdown-item"

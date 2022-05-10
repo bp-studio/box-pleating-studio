@@ -93,7 +93,8 @@
 			"checkUpdate": "Check for update",
 			"donation": "Donation",
 			"discussions": "Discussions",
-			"issue": "Report issue"
+			"issue": "Report issue",
+			"homepage": "Homepage"
 		},
 		"view": {
 			"tree": "Tree structure",
