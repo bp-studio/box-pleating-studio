@@ -1,0 +1,13 @@
+{
+	"web_apps": [
+		{
+			"manifest": "https://bpstudio.abstreamace.com/manifest.json",
+			"details": {
+				"paths": [
+					"/*"
+				],
+				"exclude_paths": ["/donate.htm"]
+			}
+		}
+	]
+}

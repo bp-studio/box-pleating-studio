@@ -1,11 +1,13 @@
 {
 	"name": "Box Pleating Studio",
 	"short_name": "Box Pleating Studio",
+	"id": "/",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",
 	"theme_color": "#007bff",
 	"background_color": "#fff",
+	"orientation": "any",
 	"description": "Super-complex origami design made easy!",
 	"icons": [
 		{
@@ -34,10 +36,25 @@
 			"sizes": "16x16"
 		}
 	],
+	"user_preferences": {
+		"color_scheme_dark": {
+			"theme_color": "#007bff",
+			"background_color": "#1e1e1e"
+		},
+		"color_scheme_light": {
+			"theme_color": "#007bff",
+			"background_color": "#fff"
+		}
+	},
 	"related_applications": [
 		{
 			"platform": "webapp",
 			"url": "https://bpstudio.abstreamace.com/manifest.json"
+		}
+	],
+	"url_handlers": [
+		{
+			"origin": "https://bpstudio.abstreamace.com"
 		}
 	],
 	"file_handlers": [
