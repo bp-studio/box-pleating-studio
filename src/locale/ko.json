@@ -93,7 +93,8 @@
 			"checkUpdate": "업데이트를 확인",
 			"donation": "기부",
 			"discussions": "토론",
-			"issue": "문제 신고"
+			"issue": "문제 신고",
+			"homepage": "홈페이지"
 		},
 		"view": {
 			"tree": "트리 구조",

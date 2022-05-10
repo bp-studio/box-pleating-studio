@@ -93,7 +93,8 @@
 			"checkUpdate": "检查更新",
 			"donation": "捐款",
 			"discussions": "讨论区",
-			"issue": "问题反馈"
+			"issue": "问题反馈",
+			"homepage": "主页"
 		},
 		"view": {
 			"tree": "树状结构",
@@ -235,7 +236,7 @@
 		"close": "关闭",
 		"delete": "删除",
 		"version": "版本",
-		"homepage": "首页",
+		"homepage": "主页",
 		"untitled": "未命名",
 		"workspace": "工作区"
 	}
