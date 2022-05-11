@@ -109,6 +109,12 @@
 		/** Launching Error Manager */
 		var errMgr = new (function() {
 			var self = this;
+			var resourceErrorHandler = function(e) {
+				if(document.head.contains(e.target) && !self.resErr) {
+					self.resErr = true;
+					setTimeout(self.callback, 0);
+				}
+			};
 			var display = function(id, v, c) {
 				var el = document.getElementById(id);
 				if(!el) return;
@@ -126,9 +132,10 @@
 			self.runErr = null;
 
 			/** Whether the launching fine so far. */
-			self.ok = function() { return !self.resErr && !self.runErr; }
-
-			self.res = function() { self.resErr = true; }
+			self.ok = function() {
+				window.removeEventListener('error', resourceErrorHandler, true);
+				return !self.resErr && !self.runErr;
+			}
 
 			/**
 			 * Final processing.
@@ -188,20 +195,25 @@
 				self.callback();
 			}
 
-			// Legacy browser fallback
-			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
-				self.runErr = 'Legacy browser';
-				self.callback();
-			}
-
+			// Switch to dark theme immediately if necessary to avoid white flash
 			var theme;
 			try {
 				theme = JSON.parse(localStorage.getItem('settings')).theme;
 			} catch(e) {
 				theme = 'system';
 			}
-			if(theme == 'dark' || theme == 'system' && matchMedia('(prefers-color-scheme: dark)').matches) {
+			var dark = matchMedia('(prefers-color-scheme: dark)').matches; // Even IE 10 supports matchMedia
+			if(theme == 'dark' || theme == 'system' && dark) {
 				document.documentElement.classList.add('dark');
+			}
+
+			// Legacy browser fallback
+			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
+				self.runErr = 'Legacy browser';
+				self.callback();
+			} else {
+				// Capture <script> or <link> loading error
+				window.addEventListener('error', resourceErrorHandler, true);
 			}
 		})();
 
@@ -210,22 +222,23 @@
 	</script>
 
 	<!-- Critical -->
-	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" onerror="errMgr.res()">
-	<link rel="stylesheet" href="assets/bps/style.css" onerror="errMgr.res()">
-	<link rel="stylesheet" href="main.css" onerror="errMgr.res()">
-	<link rel="stylesheet" href="darkmode.css" onerror="errMgr.res()">
-	<script src="log/log.js" defer onerror="errMgr.res()"></script>
-	<script src="lib/idb-keyval.min.js" defer onerror="errMgr.res()"></script><!-- 5.0.6 -->
-	<script src="locale.js" defer onerror="errMgr.res()"></script>
-	<script src="lib/vue.runtime.min.js" defer onerror="errMgr.res()"></script>
-	<script src="lib/vue-i18n.min.js" defer onerror="errMgr.res()"></script>
-	<script src="main.js" defer onerror="errMgr.res()"></script>
-	<script src="launch.js" defer onerror="errMgr.res()"></script>
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/bps/style.css">
+	<link rel="stylesheet" href="main.css">
+	<link rel="stylesheet" href="darkmode.css">
+	<script src="log/log.js" defer></script>
+	<script src="lib/idb-keyval.min.js" defer></script><!-- 5.0.6 -->
+	<script src="locale.js" defer></script>
+
+	<!-- <script src="lib/vue.runtime.min.js" defer></script>
+	<script src="lib/vue-i18n.min.js" defer></script>
+	<script src="main.js" defer></script> -->
+	<script src="launch.js" defer></script>
 
 	<!-- BP Studio setup -->
-	<script src="lib/shrewd.min.js" defer onerror="errMgr.res()"></script>
-	<script src="lib/paper-core.min.js" defer onerror="errMgr.res()"></script>
-	<script src="bpstudio.js" defer onerror="errMgr.res()"></script>
+	<!-- <script src="lib/shrewd.min.js" defer></script>
+	<script src="lib/paper-core.min.js" defer></script>
+	<script src="bpstudio.js" defer></script> -->
 </head>
 
 <body>

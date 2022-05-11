@@ -14,27 +14,27 @@ if(errMgr.ok()) {
 			if(lib.endsWith('js')) loading.push(loadScript(lib));
 			else loading.push(loadStylesheet(lib));
 		}
-		return Promise.all(loading).then(results => results.every(result => result == true));
+		return Promise.all(loading).then(() => true, () => false);
 	}
 
 	function loadStylesheet(href) {
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			let link = document.createElement('link');
 			link.rel = 'stylesheet';
 			link.href = href;
-			link.onload = () => resolve(true);
-			link.onerror = () => resolve(false);
+			link.onload = resolve;
+			link.onerror = reject;
 			document.head.appendChild(link);
 		});
 	}
 
 	function loadScript(src) {
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			let script = document.createElement('script');
 			script.src = src;
 			script.async = false;
-			script.onload = () => resolve(true);
-			script.onerror = () => resolve(false);
+			script.onload = resolve;
+			script.onerror = reject;
 			document.head.appendChild(script);
 		});
 	}
@@ -47,18 +47,18 @@ if(errMgr.ok()) {
 
 		window.addEventListener("DOMContentLoaded", async () => {
 			// 初始化 app
-			app = new Vue.options.components['app']({ i18n });
-			app.$mount('#app');
+			// app = new Vue.options.components['app']({ i18n });
+			// app.$mount('#app');
 
 			// 製造執行緒的斷點，讓 Android PWA 偵測到以結束 splash screen
 			await sleep(10);
 
 			try {
-				await core.initReady;
-				bp = new BPStudio("#divWorkspace");
-				bp.option.onLongPress = () => app.showPanel = true;
-				bp.option.onDrag = () => app.showPanel = false;
-				core.init();
+				// await core.initReady;
+				// bp = new BPStudio("#divWorkspace");
+				// bp.option.onLongPress = () => app.showPanel = true;
+				// bp.option.onDrag = () => app.showPanel = false;
+				// core.init();
 
 				// 載入所有非關鍵資源
 				errMgr.resErr = !await loadLibrary();
@@ -70,19 +70,19 @@ if(errMgr.ok()) {
 					resolve();
 				} else {
 					// 底下這兩列失敗也無所謂，上面 callback() 已經做完了
-					core.$destroy();
-					app.$destroy();
+					// core.$destroy();
+					// app.$destroy();
 				}
 			}
 		}, { once: true });
 	});
 
-	i18n = new VueI18n({
-		locale: 'en',
-		fallbackLocale: 'en',
-		silentFallbackWarn: true,
-		messages: locale,
-	});
-	core = new Vue.options.components['core']({ i18n });
-	core.$mount('#core');
+	// i18n = new VueI18n({
+	// 	locale: 'en',
+	// 	fallbackLocale: 'en',
+	// 	silentFallbackWarn: true,
+	// 	messages: locale,
+	// });
+	// core = new Vue.options.components['core']({ i18n });
+	// core.$mount('#core');
 }
