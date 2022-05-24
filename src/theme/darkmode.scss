@@ -25,6 +25,11 @@ html.dark {
 		color: #ccc;
 	}
 
+	.welcome .link-primary:hover {
+		color: #fff;
+		background-color: var(--bs-primary);
+	}
+
 	.scroll-shadow {
 		// background-image: linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
 		// 	linear-gradient(rgba(255, 255, 255, 0), $modal 70%),
@@ -92,11 +97,20 @@ html.dark {
 	}
 
 	.dropdown-menu {
-		background: #252525;
+		background: #333;
+		border-color: #444;
 	}
 
 	.dropdown-item {
 		color: #ccc;
+
+		&.disabled {
+			color: #777;
+		}
+	}
+
+	.dropdown-divider {
+		border-top-color: #555;
 	}
 
 	.tab.active {
