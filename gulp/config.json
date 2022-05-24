@@ -5,6 +5,7 @@
 	},
 	"src": {
 		"app": "src/app",
+		"client": "src/client",
 		"core": "src/core",
 		"donate": "src/other/donate",
 		"icon": "src/other/icons",
@@ -13,7 +14,7 @@
 		"locale": "src/locale",
 		"public": "src/public",
 		"sw": "src/other/service",
-		"theme": "src/theme",
-		"worker": "src/other/worker"
+		"worker": "src/other/worker",
+		"shared": "src/shared"
 	}
 }

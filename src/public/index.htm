@@ -9,30 +9,32 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.5.3">
+	<meta name="version" content="0.6.0-alpha">
 
-	<!-- Preload -->
-	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
-	<link rel="preload" as="font" type="font/woff2" crossorigin href="lib/font-awesome/webfonts/fa-regular-400.woff2">
+	<!-- Preload; also works locally since Chrome 102 -->
+	<link rel="preload" as="font" type="font/woff2" href="assets/bps/fonts/bps.woff2">
+	<link rel="preload" as="font" type="font/woff2" href="lib/font-awesome/webfonts/fa-regular-400.woff2">
 	<link rel="preload" as="script" href="log/log.js">
+	<link rel="preload" as="script" href="locale.js">
+	<link rel="preload" as="script" href="lib/vue.runtime.global.prod.js">
+	<link rel="preload" as="script" href="lib/vue-i18n.global.prod.js">
+	<link rel="preload" as="script" href="main.js">
 
-	<!--
-	Not implemented by Chrome yet
+	<!-- Not implemented in Chrome yet, but are supported in Firefox and Opera -->
 	<link rel="preload" as="manifest" href="manifest.json">
-	<link rel="preload" as="worker" href="paper-master.js">
-	<link rel="preload" as="worker" href="paper-worker.js">
-	-->
+	<link rel="preload" as="worker" href="bpstudio.js">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
 	<script>
+		// This part is kept in debug because app_config is also used elsewhere
 		window.dataLayer = window.dataLayer || [];
 		function gtag() { dataLayer.push(arguments); }
 		var app_config = {
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1225"
+			app_version: "1262"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -94,16 +96,7 @@
 	<script>
 		// Register service worker
 		if(location.protocol == 'https:' && 'serviceWorker' in navigator) {
-			navigator.serviceWorker.register('sw.js').then(function(reg) {
-				// Safari may have stronger caching for service worker,
-				// and onupdatefound event may not work on older version of Safari,
-				// but eventually the service worker and the app it will update.
-				reg.addEventListener('updatefound', function() {
-					if(reg.active) reg.installing.addEventListener('statechange', function(e) {
-						if(e.target.state == "activated") setTimeout(function() { core.updated = true; }, 0);
-					});
-				});
-			});
+			navigator.serviceWorker.register('sw.js');
 		}
 
 		/** Launching Error Manager */
@@ -111,7 +104,7 @@
 			var self = this;
 			var resourceErrorHandler = function(e) {
 				if(document.head.contains(e.target) && !self.resErr) {
-					self.resErr = true;
+					self.resErr = e.target.src || e.target.href;
 					setTimeout(self.callback, 0);
 				}
 			};
@@ -119,10 +112,7 @@
 				var el = document.getElementById(id);
 				if(!el) return;
 				el.style.display = v ? 'block' : 'none';
-				if(c) el.innerHTML +=
-					"<br>Build number: " + app_config.app_version +
-					"<br>" + navigator.userAgent +
-					"<br>" + c;
+				if(c) el.innerHTML += c;
 			};
 
 			/** Resource Error */
@@ -137,6 +127,16 @@
 				return !self.resErr && !self.runErr;
 			}
 
+			/** GA parameter has a 100-character limit, so we split the message into chunks. */
+			function splitString(str) {
+				var chunks = [];
+				while (str.length > 0) {
+					chunks.push(str.substring(0, 100));
+					str = str.substring(100);
+				}
+				return chunks;
+			}
+
 			/**
 			 * Final processing.
 			 *
@@ -148,15 +148,28 @@
 				display('divWorkspace');
 				display('divWelcome');
 				display('divSpinner');
-				display(self.resErr ? 'resource' : 'requirement', true, self.runErr);
+				display(
+					self.resErr ? 'resource' : 'requirement',
+					true,
+					self.resErr ? self.resErr : "<br>Build number: " + app_config.app_version +
+						"<br>" + navigator.userAgent +
+						"<br>" + self.runErr
+				);
 				if(self.runErr &&
-					// Filter out Facebook Clawer; no need to report related errors.
-					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)
+					// Filter clawers; no need to report related errors.
+					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
+					!(/bot|crawl|spider/i.test(navigator.userAgent))
 				) {
-					gtag('event', 'unsupported', {
+					var chunks = splitString(self.runErr);
+					var data = {
 						app_version: app_config.app_version,
-						error: self.runErr
-					});
+						user_agent: navigator.userAgent,
+						error: chunks[0]
+					};
+					for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
+						data["error" + i] = chunks[i];
+					}
+					gtag('event', 'unsupported', data);
 				}
 				return false;
 			};
@@ -175,34 +188,41 @@
 			/**
 			 * Global error handler;
 			 * handles syntax error and all uncaught sync errors.
+			 *
+			 * `window.onerror` is a special event handler that it takes 5 arguments. See:
+			 * https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
 			 */
-			window.onerror = function(a, b, c, d, e) {
-				if(!b && !c && !d) return; // error is caused by injection; ignore.
+			window.onerror = function(msg, source, line, column, error) {
+				if(!source && !line && !column) return; // error is caused by injection; ignore.
 				for(var i = 0; i < ignoreError.length; i++) {
-					if(a.match(ignoreError[i])) return;
+					if(msg.match(ignoreError[i])) return;
 				}
 				self.runErr = [
-					a.replace(/^.+: (.+)$/, "$1"),							// error message
-					b.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
-					c,														// line number
-					d,														// column number
-					e && e.stack.replace(/^.+? at/, "")						// stack trace
+					msg.replace(/^.+: (.+)$/, "$1"),							// error message
+					source.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
+					line,														// line number
+					column,														// column number
+					stack(error)												// stack trace
 				].toString();
 			};
 			window.onunhandledrejection = function(e) {
-				e = e.reason;
-				self.runErr = e.stack.replace(/^.+? at/, "");
+				e = e.reason || "Unknown error";
+				self.runErr = stack(e);
 				self.callback();
 			}
 
-			// Switch to dark theme immediately if necessary to avoid white flash
-			var theme;
-			try {
-				theme = JSON.parse(localStorage.getItem('settings')).theme;
-			} catch(e) {
-				theme = 'system';
+			function stack(e) {
+				if(!e) return "";
+				return typeof e.stack == "string" ? e.stack.replace(/^.+? at/, "") : e.toString();
 			}
-			var dark = matchMedia('(prefers-color-scheme: dark)').matches; // Even IE 10 supports matchMedia
+
+			// Switch to dark theme immediately if necessary to avoid white flash
+			var theme = 'system', dark = false;
+			try {
+				// eslint-disable-next-line compat/compat
+				theme = JSON.parse(localStorage.getItem('settings')).theme;
+				dark = matchMedia('(prefers-color-scheme: dark)').matches;
+			} catch(e) { }
 			if(theme == 'dark' || theme == 'system' && dark) {
 				document.documentElement.classList.add('dark');
 			}
@@ -218,41 +238,60 @@
 		})();
 
 		// Top level objects
-		var bp, core, app, i18n, libReady;
+		var i18n, bp;
 	</script>
 
 	<!-- Critical -->
 	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/bps/style.css">
 	<link rel="stylesheet" href="main.css">
-	<link rel="stylesheet" href="darkmode.css">
-	<script src="log/log.js" defer></script>
-	<script src="lib/idb-keyval.min.js" defer></script><!-- 5.0.6 -->
-	<script src="locale.js" defer></script>
 
-	<!-- <script src="lib/vue.runtime.min.js" defer></script>
-	<script src="lib/vue-i18n.min.js" defer></script>
-	<script src="main.js" defer></script> -->
-	<script src="launch.js" defer></script>
+	<!-- eslint-disable -->
+	<!-- Launcher -->
+	<script>
+		// Top level objects
+		const __worker_src = 'core.js';
+		const bpLibs = ['client.js'];
+		let __worker = new Worker(__worker_src);
 
-	<!-- BP Studio setup -->
-	<!-- <script src="lib/shrewd.min.js" defer></script>
-	<script src="lib/paper-core.min.js" defer></script>
-	<script src="bpstudio.js" defer></script> -->
+		function loadScript(src) {
+			let script = document.createElement('script');
+			script.src = src;
+			script.async = false;
+			document.head.appendChild(script);
+		}
+		window.addEventListener("DOMContentLoaded",
+			() => setTimeout(	// 利用延遲來製造執行緒斷點、使得 FCP 可以提早發生
+				() => {
+					const scripts = [
+						'log/log.js',
+						'locale.js',
+						'lib/vue.runtime.global.prod.js',
+						'lib/vue-i18n.global.prod.js',
+						'main.js'
+					];
+					scripts.forEach(loadScript);
+				}, 1
+			),
+			{ once: true }
+		);
+	</script>
 </head>
 
 <body>
 	<!-- Error message -->
-	<div class="welcome p-3 scroll-box" style="z-index: 0;">
+	<div class="viewport p-3 scroll-box" style="z-index: 0;">
 		<div id="requirement" style="display:none;">
 			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
 			<div class="mt-2">
 				Possible causes include:
 				<ol>
 					<li>
-						Outdated browser<br>
+						Outdated browser or operating system<br>
 						If you haven't done so, please upgrade your browser or use the latest version of Chrome,
 						which is the recommended browser.
+						It is also known that earlier versions of Windows 7 may cause issues with SSL certificates.
+						Please try updating Windows if the website is marked "insecure".
 					</li>
 					<li>
 						Temporary bug<br>
@@ -274,9 +313,10 @@
 		<div id="resource" style="display:none;">
 			<h3>Some of the required resources cannot be loaded successfully.</h3>
 			<div class="mt-2">
-				As a result, Box Pleating Studio cannot be started.
+				As a result, Box Pleating Studio cannot be started.<br>
 				This is probably due to internet connection problem and/or missing cached resources.
-				Please check you network and try again.
+				Please check you network and try again.<br><br>
+				Resource failed to load:
 			</div>
 		</div>
 		<noscript>
@@ -286,56 +326,7 @@
 
 	<!-- Actual app -->
 	<div id="divWorkspace"></div>
-	<div id="core"></div>
-	<div id="app">
-		<div id="divShade"></div>
-		<div id="divPanel" class="scroll-shadow"></div>
-		<div id="divToolbar" class="btn-toolbar p-2">
-			<div class="btn-group me-2">
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle">
-						<i class="bp-file-alt"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle">
-						<i class="bp-pencil-ruler"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle">
-						<i class="bp-tasks"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle">
-						<i class="bp-tools"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle">
-						<i class="bp-question-circle"></i>
-					</button>
-				</div>
-			</div>
-			<div class="btn-group me-2">
-				<button type="button" disabled class="btn btn-primary"><i class="bp-tree"></i></button>
-				<button type="button" disabled class="btn btn-primary"><i class="bp-layout"></i></button>
-			</div>
-			<div style="display: contents;">
-				<div id="divTab" class="flex-grow-1"></div>
-				<div class="dropdown-menu"></div>
-			</div>
-			<div id="panelToggle" class="btn-group">
-				<button type="button" disabled class="btn btn-primary"><i class="bp-sliders-h"></i></button>
-			</div>
-		</div>
-		<div id="divDPad"></div>
-		<div class="modal fade"></div>
-		<div class="modal fade"></div>
-		<div class="modal fade"></div>
-		<div class="modal fade"></div>
-	</div>
+	<div id="app">__VUE_SSG__</div>
 
 </body>
 

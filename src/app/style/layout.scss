@@ -1,0 +1,105 @@
+.viewport {
+	background: var(--bs-body-bg);
+}
+
+#divShade {
+	pointer-events: none;
+	right: 0;
+	background: black;
+	opacity: 0;
+	transition: opacity 500ms;
+}
+
+aside {
+	position: fixed;
+	right: 0;
+	top: 3.75rem;
+	width: 250px;
+	bottom: 0;
+	background: var(--bg-ui) !important;
+	color: #000; /* AAA 考量起見 */
+	cursor: default;
+	padding: 10px;
+	transition: right 500ms;
+}
+
+#note {
+	position: absolute;
+	bottom: 20px;
+}
+
+@media print {
+	#app {
+		display: none;
+	}
+}
+
+@media screen {
+	#divWorkspace,
+	#divShade,
+	.viewport {
+		position: absolute;
+		top: 3.75rem;
+		left: 0;
+		bottom: 0;
+	}
+}
+
+@media screen and (max-width: 650px) {
+	#divWorkspace,
+	#divShade,
+	aside,
+	.shift-down {
+		top: 6.15rem;
+	}
+}
+
+@media (min-width: 100.01vh) and (min-width: 700px) {
+	#divWorkspace,
+	.viewport {
+		right: 250px;
+	}
+
+	#panelToggle {
+		display: none;
+	}
+
+	#note {
+		right: 270px;
+	}
+}
+
+@media (max-width: 100vh), (max-width: 699.9px) {
+	#divWorkspace,
+	.viewport,
+	aside.show {
+		right: 0;
+	}
+
+	aside {
+		right: -250px;
+
+		&.show {
+			box-shadow: 0 0 5px #000a;
+		}
+	}
+
+	#divShade.show {
+		pointer-events: all;
+		opacity: 0.2;
+	}
+
+	#panelToggle {
+		display: block;
+	}
+
+	#note {
+		right: 20px;
+	}
+}
+
+@media (display-mode: standalone) {
+	.browser-only {
+		display: none;
+	}
+}

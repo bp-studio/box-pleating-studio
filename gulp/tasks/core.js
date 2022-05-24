@@ -1,59 +1,40 @@
-const esb = require('gulp-esbuild');
-const exg = require('esbuild-plugin-external-global');
-const gulp = require('gulp');
-const newer = require('gulp-newer');
-const path = require('path');
-const replace = require('gulp-replace');
-const sourcemaps = require('gulp-sourcemaps');
-const terser = require('gulp-terser');
-const wrap = require('@makeomatic/gulp-wrap-js');
+const esbuild = require("gulp-esbuild");
+const gulp = require("gulp");
+const replace = require("gulp-replace");
+const terser = require("gulp-terser");
 
-const config = require('../config.json');
+const newer = require("../utils/newer");
+const config = require("../config.json");
+const { target, extra: ext, sourceMap } = require("../utils/esbuild");
+const extra = [__filename, ext, config.src.core + "/**/*", config.src.shared + "/**/*"];
 
-const template = `
-	(function(root, factory){
-		if(typeof define === 'function' && define.amd) {
-			define([],factory);
-		} else if(typeof exports === 'object') {
-			module.exports = factory();
-		} else {
-			root.BPStudio = factory();
-		}
-	}(this, function(){
-		const { shrewd, terminate } = Shrewd;
-		%= body %
-		return BPStudio.BPStudio;
-	}));
-`;
+function esb(options) {
+	return esbuild(Object.assign({}, {
+		outfile: "core.js",
+		bundle: true,
+		target,
+		treeShaking: true,
+		tsconfig: config.src.core + "/tsconfig.json",
+		globalName: "bp",
+	}, options || {}));
+}
 
-gulp.task('coreDev', () =>
-	gulp.src(config.src.core + '/BPStudio.ts')
+gulp.task("coreDebug", () =>
+	gulp.src(config.src.core + "/main.ts")
 		.pipe(newer({
-			dest: config.dest.debug + '/bpstudio.js',
-			extra: [__filename, config.src.core + '/**/*'],
+			dest: config.dest.debug + "/core.js",
+			extra,
 		}))
-		.pipe(esb({
-			outfile: 'bpstudio.js',
-			bundle: true,
-			sourcemap: 'inline', // for continuing with gulp-sourcemaps
-			globalName: 'BPStudio',
-			external: ['paper'],
-			resolveExtensions: ['.ts', '.d.ts'],
-			plugins: [
-				exg.externalGlobalPlugin({
-					'paper': 'paper',
-				}),
-			],
-		}))
-		.pipe(sourcemaps.init({ loadMaps: true }))
-		.pipe(wrap(template))
+		.pipe(esb({ sourcemap: "external", sourcesContent: false, sourceRoot: "../../" }))
+		.pipe(sourceMap())
 		.pipe(terser({
-			ecma: 2019,
+			ecma: 2018,
 			compress: {
 				defaults: false,
 				drop_debugger: false,
 				global_defs: {
 					DEBUG_ENABLED: true,
+					TEST_MODE: false,
 				},
 			},
 			mangle: false,
@@ -62,40 +43,24 @@ gulp.task('coreDev', () =>
 				comments: true,
 			},
 		}))
-		.pipe(sourcemaps.write('.', {
-			includeContent: false,
-			sourceRoot: path.relative(config.dest.debug, "."),
-		}))
-		.pipe(gulp.dest(config.dest.debug))
+		.pipe(gulp.dest(config.dest.debug, { sourcemaps: "." }))
 );
 
-gulp.task('corePub', () =>
-	gulp.src(config.src.core + '/BPStudio.ts')
+gulp.task("coreDist", () =>
+	gulp.src(config.src.core + "/main.ts")
 		.pipe(newer({
-			dest: config.dest.dist + '/bpstudio.js',
-			extra: [__filename, config.src.core + '/**/*'],
+			dest: config.dest.dist + "/core.js",
+			extra,
 		}))
-		.pipe(esb({
-			outfile: 'bpstudio.js',
-			bundle: true,
-			// no sourcemap
-			globalName: 'BPStudio',
-			external: ['paper'],
-			resolveExtensions: ['.ts', '.d.ts'],
-			plugins: [
-				exg.externalGlobalPlugin({
-					'paper': 'paper',
-				}),
-			],
-		}))
-		.pipe(wrap(template))
-		.pipe(replace(/('[$_][a-z0-9]+')/gi, '$$$$$$$$[$1]')) // Prepare decorator mangling
+		.pipe(esb())
+		.pipe(replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
 		.pipe(terser({
-			ecma: 2019,
+			ecma: 2018,
 			compress: {
 				drop_debugger: false,
 				global_defs: {
 					DEBUG_ENABLED: false,
+					TEST_MODE: false,
 				},
 			},
 			mangle: { properties: { regex: /^[$_]/ } },
@@ -104,4 +69,4 @@ gulp.task('corePub', () =>
 		.pipe(gulp.dest(config.dest.dist))
 );
 
-gulp.task('core', gulp.parallel('coreDev', 'corePub'));
+gulp.task("core", gulp.parallel("coreDebug", "coreDist"));

@@ -1,20 +1,21 @@
 {
-	"env": {
-		"browser": true,
-		"es2021": true,
-		"node": true
-	},
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended"
 	],
+	"globals": {
+		"globalThis": false
+	},
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
-		"ecmaVersion": 12
+		"ecmaVersion": "latest"
 	},
 	"plugins": [
 		"@typescript-eslint"
 	],
+	"env": {
+		"node": true
+	},
 	"rules": {
 		"@typescript-eslint/ban-ts-comment": "off",
 		"@typescript-eslint/ban-types": "off",
@@ -37,12 +38,6 @@
 			}
 		],
 		"@typescript-eslint/comma-spacing": "warn",
-		"@typescript-eslint/explicit-function-return-type": [
-			"warn",
-			{
-				"allowExpressions": true
-			}
-		],
 		"@typescript-eslint/func-call-spacing": [
 			"warn",
 			"never"
@@ -91,6 +86,12 @@
 		],
 		"@typescript-eslint/no-empty-function": "warn",
 		"@typescript-eslint/no-empty-interface": "off",
+		"@typescript-eslint/no-explicit-any": [
+			"warn",
+			{
+				"ignoreRestArgs": true
+			}
+		],
 		"@typescript-eslint/no-extra-parens": "warn",
 		"@typescript-eslint/no-inferrable-types": "off",
 		"@typescript-eslint/no-invalid-this": "error",
@@ -109,6 +110,7 @@
 				"ignoreArrayIndexes": true,
 				"ignoreDefaultValues": true,
 				"ignoreEnums": true,
+				"ignoreNumericLiteralTypes": true,
 				"ignoreReadonlyClassProperties": true
 			}
 		],
@@ -116,6 +118,15 @@
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-shadow": [
 			"warn"
+		],
+		"@typescript-eslint/no-this-alias": [
+			"warn",
+			{
+				"allowDestructuring": true,
+				"allowedNames": [
+					"cursor"
+				]
+			}
 		],
 		"@typescript-eslint/no-unused-vars": "off",
 		"@typescript-eslint/no-useless-constructor": [
@@ -248,7 +259,12 @@
 				"skipComments": true
 			}
 		],
-		"max-lines-per-function": "warn",
+		"max-lines-per-function": [
+			"warn",
+			{
+				"skipComments": true
+			}
+		],
 		"max-nested-callbacks": "warn",
 		"max-params": [
 			"warn",
@@ -387,19 +403,26 @@
 		"padded-blocks": "off",
 		"padding-line-between-statements": "warn",
 		"prefer-arrow-callback": "warn",
-		"prefer-const": "off",
+		"prefer-const": "warn",
 		"prefer-destructuring": "off",
 		"prefer-exponentiation-operator": "warn",
 		"prefer-named-capture-group": "off",
 		"prefer-numeric-literals": "warn",
 		"prefer-object-spread": "off",
-		"prefer-promise-reject-errors": "warn",
+		"prefer-promise-reject-errors": "off",
 		"prefer-regex-literals": "warn",
 		"prefer-rest-params": "warn",
 		"prefer-spread": "off",
 		"prefer-template": "off",
 		"quote-props": "off",
-		"quotes": "off",
+		"quotes": [
+			"warn",
+			"double",
+			{
+				"allowTemplateLiterals": true,
+				"avoidEscape": true
+			}
+		],
 		"radix": "off",
 		"require-atomic-updates": "warn",
 		"require-await": "warn",
@@ -436,5 +459,21 @@
 		"wrap-regex": "warn",
 		"yield-star-spacing": "warn",
 		"yoda": "warn"
-	}
+	},
+	"overrides": [
+		{
+			"files": [
+				"*.ts",
+				"*.vue"
+			],
+			"rules": {
+				"@typescript-eslint/explicit-function-return-type": [
+					"warn",
+					{
+						"allowExpressions": true
+					}
+				]
+			}
+		}
+	]
 }

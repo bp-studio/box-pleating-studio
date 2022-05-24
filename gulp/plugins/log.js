@@ -1,12 +1,9 @@
-let through = require('through2');
-let path = require('path');
+const through2 = require("gulp-through2");
+const path = require("path");
 
 // 用來建立 log 檔案目錄和 preload manifest
 
 module.exports = function(outFile, libs) {
-	let latestFile;
-	let concat = [];
-
 	const preload = `
 let libs = ${JSON.stringify(libs)}.map(l => "lib/" + l);
 
@@ -19,27 +16,16 @@ libs.forEach(lib => {
 });
 `;
 
-	function bufferContents(file, enc, cb) {
-		if(file.isNull()) return cb(null, file);
-		if(file.isStream()) {
-			this.emit('error', new Error('log: Streaming not supported'));
-			return cb();
-		}
-
-		latestFile = file;
-		concat.push(file.stem);
-		cb(null, file);
-	}
-
-	function endStream(cb) {
-		if(!latestFile || !concat.length) return cb();
-
-		let joinedFile = latestFile.clone({ contents: false });
-		joinedFile.path = path.join(latestFile.base, outFile);
-		joinedFile.contents = Buffer.from("let logs=[" + concat.join(',') + "];" + preload, "utf8");
-		this.push(joinedFile);
-		cb();
-	}
-
-	return through.obj(bufferContents, endStream);
+	return through2({
+		name: "log",
+		flush(files) {
+			if(!files.length) return;
+			const lastFile = files[files.length - 1];
+			const stems = files.map(f => f.stem).join(",");
+			const joinedFile = lastFile.clone({ contents: false });
+			joinedFile.path = path.join(lastFile.base, outFile);
+			through2.write(joinedFile, "let logs=[" + stems + "];" + preload);
+			files.push(joinedFile);
+		},
+	});
 };

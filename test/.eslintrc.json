@@ -1,25 +1,54 @@
 {
-    "plugins": [
-        "import"
-    ],
-    "rules": {
-        "@typescript-eslint/no-magic-numbers": "off",
-        "import/order": [
-            "warn",
-            {
-                "groups": [
-                    "index",
-                    "sibling",
-                    "parent",
-                    "internal",
-                    "external",
-                    "builtin",
-                    "object",
-                    "type"
-                ]
-            }
-        ],
-        "max-lines-per-function": "off",
-        "sort-imports": "off"
-    }
+	"extends": [
+		"plugin:import/typescript",
+		"plugin:mocha/recommended"
+	],
+	"plugins": [
+		"import",
+		"mocha"
+	],
+	"rules": {
+		"@typescript-eslint/consistent-type-imports": [
+			"warn",
+			{
+				"prefer": "type-imports"
+			}
+		],
+		"@typescript-eslint/no-duplicate-imports": "warn",
+		"@typescript-eslint/no-invalid-this": "off",
+		"@typescript-eslint/no-magic-numbers": "off",
+		"import/order": [
+			"warn",
+			{
+				"groups": [
+					[
+						"builtin",
+						"external"
+					],
+					[
+						"internal",
+						"parent",
+						"sibling",
+						"index",
+						"object"
+					],
+					"type"
+				],
+				"newlines-between": "always"
+			}
+		],
+		"max-classes-per-file": "off",
+		"max-lines-per-function": "off",
+		"mocha/prefer-arrow-callback": "warn",
+		"no-duplicate-imports": "off",
+		"prefer-arrow-callback": "off",
+		"sort-imports": "off"
+	},
+	"settings": {
+		"import/resolver": {
+			"typescript": {
+				"project": "test"
+			}
+		}
+	}
 }

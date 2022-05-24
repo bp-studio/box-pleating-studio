@@ -3,8 +3,7 @@
 		"ts"
 	],
 	"spec": [
-		"test/tests/*.ts",
-		"test/specs/*.ts"
+		"test/specs/**/*.ts"
 	],
 	"timeout": "0",
 	"require": [

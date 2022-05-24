@@ -1,0 +1,175 @@
+import { Container, Graphics, Rectangle } from "pixi.js";
+import { shallowReactive } from "vue";
+import { SmoothGraphics } from "@pixi/graphics-smooth";
+
+import { shallowRef } from "client/shared/decorators";
+import { View } from "client/base/view";
+import { FULL_ZOOM, CHARCOAL, LIGHT } from "client/shared/constant";
+import ProjectService from "client/services/projectService";
+import { viewport } from "client/screen/display";
+import { Enum } from "client/types/enum";
+import { Layer, LayerOptions } from "client/types/layers";
+import { GridType } from "shared/json";
+import { createGrid } from "./grid";
+
+import type { Control } from "client/base/control";
+import type { JSheet } from "shared/json";
+import type { IGrid } from "./grid";
+
+const BORDER_THICKNESS = 3;
+const GRID_THICKNESS = 0.25;
+
+const LAYERS = Enum.values(Layer);
+
+//=================================================================
+/**
+ * {@link Sheet} 是代表一個工作區域。
+ */
+//=================================================================
+export class Sheet extends View implements ISerializable<JSheet> {
+
+	@shallowRef((v: number) => v >= FULL_ZOOM) public zoom: number = FULL_ZOOM;
+
+	@shallowRef private _type: GridType;
+
+	/** 最上層容器 */
+	public readonly $view: Container = new Container();
+
+	/** 圖層 */
+	private _layers: Container[] = [];
+
+	/** 紙邊 */
+	private _borderGraphics: SmoothGraphics = new SmoothGraphics();
+
+	/** 格線 */
+	private _gridGraphics: SmoothGraphics = new SmoothGraphics();
+
+	/** 圖層遮罩 */
+	private _mask: Graphics = new Graphics();
+
+	@shallowRef private _grid: IGrid;
+
+	private readonly _controls: Control[] = shallowReactive([]);
+
+	constructor(json?: Partial<JSheet>, parentView?: Container) {
+		super();
+
+		this.$addRootObject(this.$view, parentView);
+		for(const layer of LAYERS) {
+			const container = new Container();
+			this._layers[layer] = container;
+			if(!LayerOptions[layer].interactive) container.interactiveChildren = false;
+			if(LayerOptions[layer].clipped) container.mask = this._mask;
+		}
+		this.$view.addChild(this._mask, ...this._layers);
+
+		this._layers[Layer.$sheet].addChild(this._borderGraphics, this._gridGraphics);
+
+		this._type = json?.type ?? GridType.rectangular;
+		this._grid = createGrid(this._type, json?.width, json?.height);
+
+		this.$reactDraw(this._draw, this._scroll, this._layerVisibility);
+
+		if(DEBUG_ENABLED) {
+			for(const layer of LAYERS) {
+				this._layers[layer].name = "Layer " + Layer[layer];
+			}
+			this._borderGraphics.name = "Border";
+			this._gridGraphics.name = "Grid";
+			this._mask.name = "Mask";
+		}
+	}
+
+	public toJSON(): JSheet {
+		return this._grid.toJSON();
+	}
+
+	public get type(): GridType {
+		return this._type;
+	}
+
+	public set type(v: GridType) {
+		if(v == this._type) return;
+		this._grid = createGrid(v, this._grid.$height, this._grid.$width);
+		this._type = v;
+	}
+
+	public get grid(): IGrid {
+		return this._grid;
+	}
+
+	public get $controls(): readonly Control[] {
+		return this._controls;
+	}
+
+	public get $layers(): readonly Container[] {
+		return this._layers;
+	}
+
+	public $getScale(viewWidth: number, viewHeight: number, margin: number, fix: number): number {
+		//TODO
+		const factor = this.zoom / FULL_ZOOM;
+		// const controls = this._labeledControls, width = ;
+		const horizontalScale = (viewWidth - 2 * margin) * factor / this._grid.$width;
+		// if(controls.length == 0) return horizontalScale;
+
+		if(app.settings.showLabel) {
+			// const views = controls.map(c => ViewService.$get(c) as LabeledView<Control>);
+			// const scales = views.map(v =>
+			// 	v.$getHorizontalScale(width, viewWidth - 2 * fix, factor)
+			// );
+			// horizontalScale = Math.min(horizontalScale, ...scales);
+		}
+
+		const verticalScale = (viewHeight * factor - margin * 2) / this._grid.$height;
+		return Math.min(horizontalScale, verticalScale);
+	}
+
+	/** 根據使用者設定來更新圖層的可見性 */
+	private _layerVisibility(): void {
+		this._layers[Layer.$axisParallels].visible = app.settings.showAxialParallel;
+		this._layers[Layer.$dot].visible = app.settings.showDot;
+		this._layers[Layer.$hinge].visible = app.settings.showHinge;
+		this._layers[Layer.$label].visible = app.settings.showLabel;
+		this._layers[Layer.$ridge].visible = app.settings.showRidge;
+	}
+
+	private _scroll(): void {
+		const s = ProjectService.scale.value;
+		const { x, y } = this._grid.$offset;
+		const [width, height] = [this._grid.$width, this._grid.$height];
+		this.$view.x = (viewport.width - (width + x * 2) * s) / 2;
+		this.$view.y = (viewport.height + (height + y * 2) * s) / 2;
+		this.$view.hitArea = new Rectangle(x, y, width + x, height + y);
+	}
+
+	private _draw(): void {
+		const s = ProjectService.scale.value;
+		this.$view.scale.set(s, -s);
+
+		// 繪製邊框
+		const color = app.isDark.value ? LIGHT : CHARCOAL;
+		this._borderGraphics.clear()
+			.lineStyle(
+				BORDER_THICKNESS * ProjectService.shrink.value,
+				app.settings.colorScheme.border ?? color
+			);
+		this._grid.$drawBorder(this._borderGraphics);
+
+		// 繪製圖層遮罩
+		this._mask.clear().beginFill(0);
+		this._grid.$drawBorder(this._mask);
+		this._mask.endFill();
+
+		// 繪製格線
+		this._gridGraphics.visible = app.settings.showGrid;
+		if(this._gridGraphics.visible) {
+			this._gridGraphics.clear()
+				.lineStyle(
+					GRID_THICKNESS,
+					app.settings.colorScheme.grid ?? color
+				);
+			this._grid.$drawGrid(this._gridGraphics);
+		}
+	}
+}

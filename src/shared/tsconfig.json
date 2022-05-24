@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": "..",
+		"esModuleInterop": true,
+		"experimentalDecorators": true,
+		"module": "esnext",
+		"moduleResolution": "node",
+		"noImplicitOverride": true,
+		"removeComments": true,
+		"resolveJsonModule": true, // 用來解析 Locale 的類型
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "es2018"
+	}
+}

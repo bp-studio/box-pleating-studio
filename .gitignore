@@ -6,8 +6,9 @@
 /.vscode/*ftp*
 
 # Non-essential files
-/node_modules
+node_modules/
 debug.log
+.VSCodeCounter/
 
 # LaTeX aux files
 /docs/*.aux

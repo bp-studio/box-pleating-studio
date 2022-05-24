@@ -1,0 +1,36 @@
+<template>
+	<i v-on:touchstart.passive="down(750, $event)" v-on:touchend="up" v-on:touchcancel="up" />
+</template>
+
+<script lang="ts">
+	export default { name: "KeyButton" };
+</script>
+
+<script setup lang="ts">
+
+	import Core from "app/core";
+	import Studio from "app/services/studioService";
+
+	import type { DirectionKey } from "shared/types/types";
+
+	let to: number;
+
+	const props = defineProps<{
+		dir: DirectionKey;
+	}>();
+
+	function down(repeat: number, e?: Event): void {
+		const SENSITIVITY = 150;
+		if(Core.shouldShowDPad) {
+			Studio.dragByKey(props.dir);
+			to = window.setTimeout(() => down(SENSITIVITY), repeat);
+		} else {
+			up();
+		}
+	}
+
+	function up(): void {
+		clearTimeout(to);
+	}
+
+</script>

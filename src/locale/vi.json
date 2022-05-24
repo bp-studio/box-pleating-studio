@@ -138,7 +138,13 @@
 			"layout": "Chế độ xem bố cục",
 			"width": "Chiều rộng",
 			"height": "Chiều cao",
-			"zoom": "Thu phóng"
+			"size": "Kích thước",
+			"zoom": "Thu phóng",
+			"grid": {
+				"_": "Loại",
+				"rect": "Lưới hình chữ nhật",
+				"diag": "Lưới đường chéo"
+			}
 		},
 		"flap": {
 			"type": "Nhánh",

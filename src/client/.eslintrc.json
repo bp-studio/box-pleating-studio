@@ -1,0 +1,19 @@
+{
+	"plugins": [
+		"jsdoc"
+	],
+	"parserOptions": {
+		"project": "./src/client/tsconfig.json"
+	},
+	"rules": {
+		"jsdoc/require-jsdoc": [
+			"warn",
+			{
+				"require": {
+					"ClassDeclaration": true,
+					"FunctionDeclaration": false
+				}
+			}
+		]
+	}
+}

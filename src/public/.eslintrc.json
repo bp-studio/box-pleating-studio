@@ -1,0 +1,12 @@
+{
+	"root": true,
+	"env": {
+		"browser": true
+	},
+	"extends": [
+		"plugin:compat/recommended"
+	],
+	"plugins": [
+		"html"
+	]
+}

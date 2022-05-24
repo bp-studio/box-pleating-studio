@@ -138,7 +138,13 @@
 			"layout": "Layout view",
 			"width": "Width",
 			"height": "Height",
-			"zoom": "Zoom"
+			"size": "Size",
+			"zoom": "Zoom",
+			"grid": {
+				"_": "Type",
+				"rect": "Rectangular grid",
+				"diag": "Diagonal grid"
+			}
 		},
 		"flap": {
 			"type": "Flap",

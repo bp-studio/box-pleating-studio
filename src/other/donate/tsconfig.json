@@ -1,11 +1,16 @@
 {
 	"compilerOptions": {
-		"target": "es2018",
-		"moduleResolution": "node",
-		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true
+		"jsx": "preserve",
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable"
+		]
 	},
+	"extends": "../../shared/tsconfig",
 	"include": [
-		"./**/*"
+		"./**/*.ts",
+		"./**/*.vue",
+		"../../shared/frontend/**/*.d.ts"
 	]
 }

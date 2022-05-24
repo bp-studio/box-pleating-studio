@@ -1,10 +1,11 @@
 {
-    "recommendations": [
-        "octref.vetur",
-        "editorconfig.editorconfig",
-        "lokalise.i18n-ally",
-        "dbaeumer.vscode-eslint",
-        "mutsuntsai.jsdoc-link",
-        "hbenl.vscode-mocha-test-adapter"
-    ]
+	"recommendations": [
+		"vue.volar",
+		"dbaeumer.vscode-eslint",
+		"editorconfig.editorconfig",
+		"hbenl.vscode-mocha-test-adapter",
+		"lokalise.i18n-ally",
+		"mutsuntsai.jsdoc-link",
+		"stylelint.vscode-stylelint"
+	]
 }

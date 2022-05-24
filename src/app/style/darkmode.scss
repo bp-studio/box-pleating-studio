@@ -1,0 +1,142 @@
+html {
+	color-scheme: light;
+}
+
+html.dark {
+	color-scheme: dark;
+
+	$line: #666;
+	$modal: #444;
+
+	--bg-ui: #333;
+
+	--bs-body-bg: #1e1e1e;
+	--bs-body-color: #ccc;
+	--bs-gradient: linear-gradient(180deg, rgba(255 255 255 / 2%), rgba(255 255 255 / 0%));
+
+	--tab-border: #222;
+	--tab-active: var(--bs-body-bg);
+
+	.nav-tabs {
+		--bs-nav-tabs-link-hover-border-color: #555 #555 #{$line};
+		--bs-nav-tabs-link-active-bg: #{$modal};
+		--bs-nav-tabs-link-active-border-color: #{$line} #{$line} #{$modal};
+
+		.nav-link.active {
+			color: white;
+		}
+	}
+
+	table {
+		border-color: $line;
+		color: var(--bs-body-color);
+	}
+
+	th {
+		background-color: #777;
+		color: #fff;
+	}
+
+	.viewport .quick-item:hover {
+		color: #fff;
+		background-color: var(--bs-primary);
+	}
+
+	.scroll-shadow {
+		/* background-image: linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
+			linear-gradient(rgba(255, 255, 255, 0), $modal 70%),
+			radial-gradient(50% 0, farthest-side, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)),
+			radial-gradient(50% 100%, farthest-side, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0));
+
+		background-image: linear-gradient($modal 30%, rgba(255, 255, 255, 0)),
+			linear-gradient(rgba(255, 255, 255, 0), $modal 70%),
+			radial-gradient(farthest-side at 50% 0, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)),
+			radial-gradient(farthest-side at 50% 100%, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0)); */
+
+		background-color: $modal;
+	}
+
+	.form-check-input:not(:checked) {
+		background-color: #999;
+	}
+
+	.form-control,
+	.form-select {
+		background-color: #555;
+		color: #eee;
+		border: #222;
+	}
+
+	.form-select {
+		background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+	}
+
+	.form-control::placeholder {
+		color: #999;
+	}
+
+	.welcome a:not(.btn),
+	.quick-item {
+		color: #4d95ff;
+	}
+
+	.modal-header,
+	.nav-tabs {
+		border-bottom-color: $line;
+	}
+
+	.modal-footer {
+		border-top-color: $line;
+	}
+
+	.modal-content {
+		background-color: $modal;
+	}
+
+	aside {
+		color: var(--bs-body-color);
+	}
+
+	.dropdown-menu {
+		background: #333;
+		border-color: #444;
+	}
+
+	.dropdown-item {
+		color: var(--bs-body-color);
+
+		&.disabled {
+			color: #777;
+		}
+	}
+
+	.dropdown-divider {
+		border-top-color: #555;
+	}
+
+	.tab.active {
+		color: #fff;
+	}
+
+	.btn-light {
+		background-color: #555;
+		border-color: #555;
+		color: var(--bs-body-color);
+
+		&:hover {
+			background-color: #666;
+		}
+	}
+
+	@media (hover: hover) {
+		.tab:not(:hover, .active) {
+			color: #777;
+		}
+	}
+
+	@media (max-width: 100vh), (max-width: 699.9px) {
+		#divShade.show {
+			opacity: 0.4;
+		}
+	}
+}

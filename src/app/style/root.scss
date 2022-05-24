@@ -1,0 +1,97 @@
+:root {
+	--bg-ui: #aaa;
+	--tab-border: gray;
+	--tab-active: #999;
+}
+
+* {
+	/* 這個不相容性在 app.vue 裡面有加上對策 */
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	touch-action: none;
+}
+
+html {
+	font-size: 9pt;
+}
+
+html,
+body {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	position: fixed;
+}
+
+kbd {
+	border-radius: 0.3rem;
+	color: black;
+	border: 1px solid #aaa;
+	background-color: #ddd;
+	padding: 0.1rem 0.2rem;
+	margin: 0.1rem;
+	line-height: 1;
+	display: inline-block;
+}
+
+ul {
+	margin-left: 0;
+}
+
+/*********************************************
+ * Mac
+ *********************************************/
+
+body:not(.mac) .mac-only {
+	display: none;
+}
+
+body.mac .not-mac {
+	display: none;
+}
+
+/*********************************************
+ * 禁止長按選取
+ *********************************************/
+
+*:not(input, textarea, .requirement) {
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+/*********************************************
+ * 表單元件設定
+ *********************************************/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+	/* Chrome, Safari, Edge, Opera 中隱藏 spinner */
+	-webkit-appearance: none;
+	display: none;
+}
+
+input {
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	touch-action: manipulation;
+
+	&[type="number"] {
+		/* Firefox 中隱藏 spinner */
+		-moz-appearance: textfield;
+	}
+
+	&:invalid {
+		outline: 2px solid red;
+	}
+}
+
+textarea {
+	resize: none;
+}
+
+::placeholder,
+::-webkit-input-placeholder,
+::-moz-placeholder,
+::-ms-input-placeholder {
+	opacity: 0.5 !important;
+}

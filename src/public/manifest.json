@@ -57,6 +57,9 @@
 			"origin": "https://bpstudio.abstreamace.com"
 		}
 	],
+	"launch_handler": {
+		"route_to": "existing-client-retain"
+	},
 	"file_handlers": [
 		{
 			"action": "/",

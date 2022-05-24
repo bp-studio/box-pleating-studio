@@ -1,4 +1,12 @@
 {
+	"VSCodeCounter.include": [
+		"src/**/*.ts",
+		"src/**/*.vue",
+		"src/**/*.htm"
+	],
+	"[jsonc]": {
+		"editor.formatOnSave": true
+	},
 	"cSpell.ignorePaths": [
 		"**/package*.json",
 		"src/locale/es.json",
@@ -20,41 +28,65 @@
 		"weixin"
 	],
 	"cSpell.words": [
+		"aabb",
+		"appinstalled",
+		"beforeinstallprompt",
 		"bpstudio",
 		"configurator",
+		"dpad",
+		"draggables",
 		"esbuild",
 		"fullscreen",
 		"gops",
 		"gtag",
 		"i",
+		"jsons",
+		"jszip",
 		"kamiya",
 		"keyval",
+		"lzma",
 		"makeomatic",
 		"mixins",
+		"mozfullscreenchange",
+		"nocheck",
 		"notranslate",
+		"onbeforeinstallprompt",
 		"osme",
 		"outfile",
 		"overlappings",
 		"partitioner",
 		"paypal",
+		"pixi",
+		"popperjs",
 		"precache",
 		"precaching",
 		"queryable",
+		"Ravl",
+		"Rebalancing",
+		"Renderable",
 		"scrollable",
 		"selectables",
 		"serializable",
 		"tsai",
 		"tsun",
-		"typeless"
+		"typeless",
+		"vuedraggable",
+		"wicg"
 	],
+	"css.validate": false,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.expand": false,
 	"explorer.fileNesting.patterns": {
+		"*.css": "$(capture).css.map",
+		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff"
 	},
 	"files.exclude": {
 		"**/debug.log": true,
-		"node_modules": true
+		"**/node_modules": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"
@@ -74,15 +106,11 @@
 		"src/public/**/*",
 		"lib/**/*"
 	],
-	"latex-workshop.latex.recipe.default": "xelatex",
-	"latex-workshop.latex.recipes": [
-		{
-			"name": "xelatex",
-			"tools": [
-				"xelatex"
-			]
-		}
+	"scss.validate": false,
+	"stylelint.validate": [
+		"css",
+		"scss",
+		"vue"
 	],
-	"typescript.tsdk": "node_modules\\typescript\\lib",
-	"vetur.experimental.templateInterpolationService": true
+	"typescript.tsdk": "node_modules\\typescript\\lib"
 }

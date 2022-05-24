@@ -1,56 +1,59 @@
-const cleanCss = require('gulp-clean-css');
-const concat = require('gulp-concat');
-const gulp = require('gulp');
-const gulpIf = require('gulp-if');
-const lazypipe = require('lazypipe');
-const newer = require('gulp-newer');
-const replace = require('gulp-replace');
-const terser = require('gulp-terser');
-const wrap = require('@makeomatic/gulp-wrap-js');
+const gulp = require("gulp");
+const iff = require("gulp-if");
+const through2 = require("gulp-through2");
 
-const config = require('../config.json');
-const i18n = require('../plugins/i18n');
-const order = require('../plugins/order');
-const vue = require('../plugins/vue');
+const newer = require("../utils/newer");
+const { esbuild, extra: ext } = require("../utils/esbuild");
+const config = require("../config.json");
+const path = require("path");
 
-const jsPipe = lazypipe()
-	.pipe(() => wrap("if(errMgr.ok()) { %= body % }"))
-	.pipe(() => replace(/\bconst\b/g, 'var')) // 修正 Safari 的問題
-	.pipe(() => gulp.dest(config.dest.debug))
-	.pipe(() => terser({
-		ecma: 2019,
-		compress: {
-			drop_debugger: false,
-		},
-	}));
+const extra = [__filename, ext, "gulp/utils/esbuild.js", config.src.app + "/**/*", config.src.shared + "/**/*"];
 
-gulp.task('app', () =>
-	gulp.src([
-		'css/*.css',
-		'**/*.ts',
-		'components/**/*.vue',
-		'!**/*.d.ts',
-	], { cwd: config.src.app })
+function esb(options) {
+	return esbuild(Object.assign({}, {
+		outfile: "main.js",
+		globalName: "app",
+		tsconfig: config.src.app + "/tsconfig.json",
+	}, options || {}));
+}
+
+gulp.task("appDebug", () =>
+	gulp.src(config.src.app + "/main.ts")
 		.pipe(newer({
-			dest: config.dest.dist + '/main.js',
-			extra: __filename,
+			dest: config.dest.debug + "/main.js",
+			extra,
 		}))
-		.pipe(vue('main.js', 'main.css'))
-		.pipe(gulpIf(file => file.extname == ".js", jsPipe(), cleanCss()))
+		.pipe(esb({
+			define: {
+				"__VUE_OPTIONS_API__": "false",
+				"__VUE_PROD_DEVTOOLS__": "false",
+			},
+			sourcemap: true,
+			sourcesContent: false,
+			sourceRoot: "../../",
+		}))
+		.pipe(iff(f => f.basename == "main.js.map" || f.basename == "main.css.map", through2(content => {
+			// 修正 Vue plugin 的 sourcemap 相對路徑輸出
+			const json = JSON.parse(content);
+			const root = path.resolve(".").replace(/\\/g, "/") + "/";
+			for(const i in json.sources) {
+				json.sources[i] = json.sources[i].replace(/\\/g, "/").replace(root, "");
+			}
+			return JSON.stringify(json);
+		})))
+		.pipe(gulp.dest(config.dest.debug))
+);
+
+gulp.task("appDist", () =>
+	gulp.src(config.src.app + "/main.ts")
+		.pipe(newer({
+			dest: config.dest.dist + "/main.js",
+			extra,
+		}))
+		.pipe(esb({
+			minify: true,
+		}))
 		.pipe(gulp.dest(config.dest.dist))
 );
 
-gulp.task('locale', () =>
-	gulp.src(config.src.locale + '/*.json')
-		.pipe(newer({
-			dest: config.dest.dist + '/locale.js',
-			extra: __filename,
-		}))
-		.pipe(order('en.json'))
-		.pipe(gulp.dest(config.src.locale))
-		.pipe(i18n())
-		.pipe(concat('locale.js'))
-		.pipe(wrap("const locale={};%= body %"))
-		.pipe(terser())
-		.pipe(gulp.dest(config.dest.dist))
-);
+gulp.task("app", gulp.parallel("appDebug", "appDist"));

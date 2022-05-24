@@ -1,33 +1,25 @@
 {
-	"compileOnSave": true,
 	"compilerOptions": {
-		"target": "es2019",
-		"removeComments": true,
-		"strictNullChecks": true,
-		"noImplicitReturns": true,
-		"noImplicitAny": true,
-		"preserveConstEnums": true,
-		"skipLibCheck": true,
+		"baseUrl": "../src",
 		"experimentalDecorators": true,
+		"isolatedModules": true,
 		"moduleResolution": "node",
 		"preserveSymlinks": true,
-		"isolatedModules": true,
 		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "esnext",
 		"types": [
-			"mocha"
-		],
-		"baseUrl": ".",
-		"paths": {
-			"bp/*": [
-				"../src/core/*"
-			]
-		},
+			"mocha",
+			"wicg-file-system-access"
+		]
 	},
 	"include": [
 		"./**/*.ts",
-		"../src/core/**/*.d.ts"
+		"../src/shared/types/**/*.ts"
 	],
 	"ts-node": {
-		"files": true
+		"files": true,
+		"swc": true,
 	}
 }

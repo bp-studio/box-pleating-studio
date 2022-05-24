@@ -34,4 +34,4 @@ If you use BP Studio to create new designs, please share your work with us [here
 ## For contributors
 
 If you would like to contribute, checkout our
-[Contributing Guidelines](https://github.com/MuTsunTsai/box-pleating-studio/blob/main/CONTRIBUTING.md) for more details.
+[Contributing Guidelines](CONTRIBUTING.md) for more details.
