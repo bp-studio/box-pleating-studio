@@ -59,7 +59,7 @@ html.dark {
 		color: #999;
 	}
 
-	a,
+	.welcome a:not(.btn),
 	.link-primary {
 		color: #4d95ff;
 	}

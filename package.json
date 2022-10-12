@@ -63,6 +63,7 @@
     "mocha": "^9.1.4",
     "require-dir": "^1.2.0",
     "sass": "^1.49.8",
+    "through2": "^4.0.2",
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.12.0",
     "ttf2woff2": "^4.0.4",

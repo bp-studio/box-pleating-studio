@@ -9,7 +9,7 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.5.4">
+	<meta name="version" content="0.5.5">
 
 	<!-- Preload -->
 	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
@@ -32,7 +32,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1226"
+			app_version: "1229"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -183,8 +183,8 @@
 				].toString();
 			};
 			window.onunhandledrejection = function(e) {
-				e = e.reason;
-				self.runErr = e.stack.replace(/^.+? at/, "");
+				e = e.reason || "Unknown error";
+				self.runErr = e.stack ? e.stack.replace(/^.+? at/, "") : e.toString();
 				self.callback();
 			}
 
@@ -237,9 +237,11 @@
 				Possible causes include:
 				<ol>
 					<li>
-						Outdated browser<br>
+						Outdated browser or operating system<br>
 						If you haven't done so, please upgrade your browser or use the latest version of Chrome,
 						which is the recommended browser.
+						It is also known that earlier versions of Windows 7 may cause issues with SSL certificates.
+						Please try updating Windows if the website is marked "insecure".
 					</li>
 					<li>
 						Temporary bug<br>

@@ -15,7 +15,8 @@ routing.setDefaultHandler(defaultHandler);
 
 // 啟動 workbox-precaching
 const precacheController = new precaching.PrecacheController({ cacheName: "assets" });
-precacheController.addToCacheList((self as unknown as ServiceWorkerGlobalScope).__WB_MANIFEST);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+precacheController.addToCacheList((self as any).__WB_MANIFEST);
 const precacheRoute = new precaching.PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],
 	directoryIndex: 'index.htm',
