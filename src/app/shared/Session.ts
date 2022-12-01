@@ -19,10 +19,7 @@ namespace Session {
 			if(sessionString) {
 				let session = JSON.parse(sessionString);
 				let jsons = session.jsons as unknown[];
-				for(let i = 0; i < jsons.length; i++) {
-					let design = bp.restore(jsons[i]);
-					core.projects.add(design, false);
-				}
+				for(let i = 0; i < jsons.length; i++) tryRestore(jsons[i]);
 				if(session.open >= 0) core.projects.select(core.designs[session.open]);
 				bp.update();
 			}
@@ -32,6 +29,20 @@ namespace Session {
 		window.addEventListener("beforeunload", save);
 
 		return haveSession;
+	}
+
+	function tryRestore(json: unknown): void {
+		try {
+			let design = bp.restore(json);
+			core.projects.add(design, false);
+		} catch(e) {
+			// 如果專案載入失敗的話，也只好忽略這個 session 存檔
+			// 因為是 session 的關係，就不顯示任何錯誤了。
+			if(e instanceof Error) {
+				// 但是還是送出一個紀錄來備考
+				gtag('event', 'session_error', { error: e.message });
+			}
+		}
 	}
 
 	/** 檢查當前的 App 實體是否具有工作階段儲存權 */

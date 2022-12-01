@@ -76,8 +76,17 @@ import type { IDesign, ITagObject } from "bp/content/interface";
 		// Tree 相依於 HistoryManager
 		this.$tree = new Tree(this, data.tree.edges);
 
-		// Junctions 相依於 Tree
+		// 所有的容器都要等到 Tree 有了之後才能建立
+		this.$vertices = new CT.VertexContainer(this);
+		this.$edges = new CT.EdgeContainer(this);
+		this.$rivers = new CT.RiverContainer(this);
+		this.$flaps = new CT.FlapContainer(this);
+
+		// Junction 相依於 Flap
 		this.$junctions = new CT.JunctionContainer(this);
+
+		// Stretch 相依於 Junction
+		this.$stretches = new CT.StretchContainer(this);
 	}
 
 	public readonly $tag = "design";
@@ -106,11 +115,11 @@ import type { IDesign, ITagObject } from "bp/content/interface";
 		return (this.$mountTarget as Studio).$design == this;
 	}
 
-	public readonly $vertices = new CT.VertexContainer(this);
-	public readonly $edges = new CT.EdgeContainer(this);
-	public readonly $rivers = new CT.RiverContainer(this);
-	public readonly $flaps = new CT.FlapContainer(this);
-	public readonly $stretches = new CT.StretchContainer(this);
+	public readonly $vertices: CT.VertexContainer;
+	public readonly $edges: CT.EdgeContainer;
+	public readonly $rivers: CT.RiverContainer;
+	public readonly $flaps: CT.FlapContainer;
+	public readonly $stretches: CT.StretchContainer;
 	public readonly $junctions: CT.JunctionContainer;
 
 	/** @exports */

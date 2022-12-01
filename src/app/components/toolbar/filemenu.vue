@@ -1,5 +1,5 @@
 <template>
-	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset" @show="init">
+	<dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset" @show="init" ref="menu">
 		<template v-slot>
 			<div class="dropdown-item" @click="core.projects.create()">
 				<i class="far fa-file"></i>
@@ -106,17 +106,31 @@
 </template>
 
 <script lang="ts">
-	import { Component } from 'vue-property-decorator';
+	import { Component, Vue } from 'vue-property-decorator';
 
 	import BaseComponent from '../mixins/baseComponent';
 	import Download from '../gadget/file/download.vue';
 	import SaveAs from '../gadget/file/saveas.vue';
 
+	import type Dropdown from 'components/gadget/menu/dropdown.vue';
+
 	@Component
 	export default class FileMenu extends BaseComponent {
 
 		mounted(): void {
-			registerHotkey(() => (this.$refs.open as Executor).execute(), "o");
+			registerHotkey(() => {
+				// 一般來說 Dropdown 元件只有在第一次被按下的時候才會初始化，
+				// 但 opn 元件是一個例外，因為它要提供快速鍵 Ctrl + O 的功能，
+				// 而這個快速鍵有可能在第一次開啟選單之前就被按下，
+				// 此時我們需要手動進行選單的初始化，以便使用該元件的功能。
+				const opn = this.$refs.open as Executor;
+				if(opn) {
+					opn.execute();
+				} else {
+					(this.$refs.menu as Dropdown).init();
+					Vue.nextTick(() => (this.$refs.open as Executor).execute());
+				}
+			}, "o");
 			registerHotkey(() => {
 				if(!core.design) return;
 				let bps = this.$refs.bps as Executor;

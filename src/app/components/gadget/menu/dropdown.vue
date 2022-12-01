@@ -38,7 +38,7 @@
 
 		protected get ready(): boolean { return core.initialized; }
 
-		protected init(): void {
+		public init(): void {
 			if(this.initialized) return;
 			this.initialized = true;
 			libReady.then(() => {

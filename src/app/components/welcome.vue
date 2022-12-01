@@ -52,7 +52,7 @@
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
 					<div v-if="recent.length">
 						<h4 class="mb-3" v-t="'welcome.recent'"></h4>
-						<div v-for="(h,i) in recent" :key="i" @click="open(h, true)" class="link-primary">{{h.name}}</div>
+						<div v-for="(h,i) in recent" :key="i" @click="open([h], true)" class="link-primary">{{h.name}}</div>
 					</div>
 				</div>
 			</div>
@@ -131,8 +131,8 @@
 			return core.handles.recent;
 		}
 
-		protected open(handle: FileSystemFileHandle, request: boolean): void {
-			Files.open([handle], request);
+		protected open(handles: FileHandleList, request: boolean): void {
+			Files.open(handles, request);
 		}
 	}
 </script>
