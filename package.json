@@ -1,6 +1,6 @@
 {
   "name": "box-pleating-studio",
-  "version": "0.5.0",
+  "version": "0.5.7",
   "description": "Super-complex origami design made easy!",
   "main": "./build/dist/bpstudio.js",
   "scripts": {

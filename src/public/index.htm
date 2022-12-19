@@ -9,7 +9,7 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.5.6">
+	<meta name="version" content="0.5.7">
 
 	<!-- Preload -->
 	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
@@ -32,7 +32,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1231"
+			app_version: "1232"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -130,6 +130,16 @@
 
 			self.res = function() { self.resErr = true; }
 
+			/** GA parameter has a 100-character limit, so we split the message into chunks. */
+			function splitString(str) {
+				var chunks = [];
+				while (str.length > 0) {
+					chunks.push(str.substring(0, 100));
+					str = str.substring(100);
+				}
+				return chunks;
+			}
+
 			/**
 			 * Final processing.
 			 *
@@ -146,10 +156,15 @@
 					// Filter out Facebook Clawer; no need to report related errors.
 					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)
 				) {
-					gtag('event', 'unsupported', {
+					var chunks = splitString(self.runErr);
+					var data = {
 						app_version: app_config.app_version,
-						error: self.runErr
-					});
+						error: chunks[0]
+					};
+					for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
+						data["error" + i] = chunks[i];
+					}
+					gtag('event', 'unsupported', data);
 				}
 				return false;
 			};
