@@ -32,7 +32,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1232"
+			app_version: "1233"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -153,12 +153,14 @@
 				display('divSpinner');
 				display(self.resErr ? 'resource' : 'requirement', true, self.runErr);
 				if(self.runErr &&
-					// Filter out Facebook Clawer; no need to report related errors.
-					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0)
+					// Filter clawers; no need to report related errors.
+					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
+					!(/bot|crawl|spider/i.test(navigator.userAgent))
 				) {
 					var chunks = splitString(self.runErr);
 					var data = {
 						app_version: app_config.app_version,
+						user_agent: navigator.userAgent,
 						error: chunks[0]
 					};
 					for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
