@@ -4,24 +4,14 @@ import type { Contour, Path } from "shared/types/geometry";
 
 export type GraphicsLike = Graphics | SmoothGraphics;
 
+/** 繪製輪廓組的線條（不填色） */
 export function drawContours(graphics: GraphicsLike, contours: Contour[]): void {
-	for(const contour of contours) drawContour(graphics, contour);
-}
-
-export function drawContour(graphics: GraphicsLike, contour: Contour): void {
-	drawPath(graphics, contour.outer);
-	if(contour.inner) {
-		for(const inner of contour.inner) drawPath(graphics, inner);
+	for(const contour of contours) {
+		drawPath(graphics, contour.outer);
+		if(contour.inner) {
+			for(const inner of contour.inner) drawPath(graphics, inner);
+		}
 	}
-}
-
-export function drawPath(graphics: GraphicsLike, path: Path): void {
-	if(!path.length) return;
-	graphics.moveTo(path[0].x, path[0].y);
-	for(let i = 1; i < path.length; i++) {
-		graphics.lineTo(path[i].x, path[i].y);
-	}
-	graphics.closePath();
 }
 
 /**
@@ -54,4 +44,14 @@ export function fillContours(graphics: GraphicsLike, contours: Contour[], color:
 			graphics.endHole();
 		}
 	}
+}
+
+/** 繪製路徑 */
+function drawPath(graphics: GraphicsLike, path: Path): void {
+	if(!path.length) return;
+	graphics.moveTo(path[0].x, path[0].y);
+	for(let i = 1; i < path.length; i++) {
+		graphics.lineTo(path[i].x, path[i].y);
+	}
+	graphics.closePath();
 }

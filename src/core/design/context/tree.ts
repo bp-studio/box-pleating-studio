@@ -1,7 +1,7 @@
 import Processor from "core/service/processor";
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
-import { AAUnion } from "core/math/union/aaUnion";
-import { expand } from "core/math/union/expansion";
+import { AAUnion } from "core/math/polyBool/union/aaUnion";
+import { expand } from "core/math/polyBool/expansion";
 import { TreeNode } from "./treeNode";
 import { Side } from "./aabb/aabb";
 

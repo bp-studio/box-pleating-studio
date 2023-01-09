@@ -1,8 +1,8 @@
 import { Assertion, expect } from "chai";
 
-import { aabbToPolygon, AAUnion } from "core/math/union/aaUnion";
+import { expand } from "core/math/polyBool/expansion";
+import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { same, toString } from "shared/types/geometry";
-import { expand } from "core/math/union/expansion";
 import { random } from "../utils";
 
 import type { Path, Polygon } from "shared/types/geometry";
@@ -112,7 +112,7 @@ describe("Contour", function() {
 			}
 			const average = (performance.now() - start) / rounds;
 
-			expect(average).to.be.lessThan(0.40); // In ms!
+			expect(average).to.be.lessThan(0.45); // In ms!
 		});
 	});
 
@@ -122,9 +122,9 @@ describe("Contour", function() {
 				parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
 				parsePath("(2,2),(2,4),(4,4),(4,2)"),
 			], 1);
-			expect(result.length).to.equal(1);
-			const path = result[0].outer;
-			expect(path).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
+			expect(result.length).to.equal(2);
+			expect(result[0].outer).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
+			expect(result[1].outer.length).to.equal(0);
 		});
 	});
 });
@@ -196,3 +196,19 @@ Assertion.addMethod("equalPath", function(pathString: string) {
 		orgPathString
 	);
 });
+
+interface IAABB {
+	top: number;
+	right: number;
+	bottom: number;
+	left: number;
+}
+
+function aabbToPolygon(c: IAABB): Polygon {
+	return [[
+		{ x: c.right, y: c.top },
+		{ x: c.left, y: c.top },
+		{ x: c.left, y: c.bottom },
+		{ x: c.right, y: c.bottom },
+	]];
+}

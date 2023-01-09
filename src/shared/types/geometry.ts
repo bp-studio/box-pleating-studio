@@ -4,9 +4,6 @@ export type Path = IPoint[] & {
 	/** 在聯集的場合當中，紀錄這個路徑是從哪幾個多邊形合成出來的 */
 	from?: number[];
 
-	/** 暫時紀錄 {@link Path.from} */
-	temp?: Set<number>;
-
 	/** 表示這個路徑是一個洞 */
 	isHole?: boolean;
 };
