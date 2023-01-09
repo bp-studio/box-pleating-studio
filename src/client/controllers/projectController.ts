@@ -35,6 +35,14 @@ namespace ProjectController {
 	export function create(json: RecursivePartial<JProject>): Promise<Project> {
 		json = deepAssign<RecursivePartial<JProject>>({
 			design: {
+				layout: {
+					// 在舊的架構當中這部份會被自行決定出來，但新架構傳遞資料的順序不同，
+					// 所以這部份一開始就要加上去
+					flaps: [
+						{ id: 1, x: 8, y: 10, width: 0, height: 0 },
+						{ id: 2, x: 8, y: 6, width: 0, height: 0 },
+					],
+				},
 				tree: {
 					nodes: [
 						{ id: 0, name: "", x: 10, y: 10 },

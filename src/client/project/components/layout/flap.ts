@@ -20,6 +20,7 @@ const DOT_FACTOR = 0.75;
 const FILL_COLOR = 0x6699FF;
 const HINGE_WIDTH = 3;
 const HINGE_COLOR = 0x6699FF;
+const RIDGE_WIDTH = 1.25;
 const SHADE_ALPHA = 0.3;
 const SHADE_HOVER = 0.15;
 
@@ -115,9 +116,8 @@ export class Flap extends Draggable {
 		this._hinge.clear().lineStyle(HINGE_WIDTH * sh, hingeColor);
 		drawContours(this._hinge, this._contours);
 
-
 		const ridgeColor = app.settings.colorScheme.ridge ?? DANGER;
-		this._ridge.clear().lineStyle(sh, ridgeColor);
+		this._ridge.clear().lineStyle(RIDGE_WIDTH * sh, ridgeColor);
 		if(w || h) {
 			this._ridge.moveTo(x, y)
 				.lineTo(x + w, y)

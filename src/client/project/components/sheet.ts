@@ -16,8 +16,8 @@ import type { Control } from "client/base/control";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./grid";
 
-const BORDER_THICKNESS = 3;
-const GRID_THICKNESS = 0.25;
+const BORDER_WIDTH = 3;
+const GRID_WIDTH = 0.25;
 
 const LAYERS = Enum.values(Layer);
 
@@ -145,13 +145,14 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	private _draw(): void {
 		const s = ProjectService.scale.value;
+		const sh = ProjectService.shrink.value;
 		this.$view.scale.set(s, -s);
 
 		// 繪製邊框
 		const color = app.isDark.value ? LIGHT : CHARCOAL;
 		this._borderGraphics.clear()
 			.lineStyle(
-				BORDER_THICKNESS * ProjectService.shrink.value,
+				BORDER_WIDTH * sh,
 				app.settings.colorScheme.border ?? color
 			);
 		this._grid.$drawBorder(this._borderGraphics);
@@ -166,7 +167,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()
 				.lineStyle(
-					GRID_THICKNESS,
+					GRID_WIDTH * sh,
 					app.settings.colorScheme.grid ?? color
 				);
 			this._grid.$drawGrid(this._gridGraphics);

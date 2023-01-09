@@ -53,6 +53,7 @@ abstract class Mountable extends Disposable {
 	/** 加入子物件；子物件的意義在於會跟著一起解構 */
 	public $addChild(child: Mountable): void {
 		child._parentIsNullOrMounted = this.$mounted;
+		child._updateMountedState();
 		this._children.push(child);
 	}
 
