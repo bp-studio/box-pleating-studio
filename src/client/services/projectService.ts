@@ -1,11 +1,8 @@
 import { computed, shallowRef, watch } from "vue";
 
-import { toggleDisplay, viewport } from "client/screen/display";
-
 import type { Project } from "client/project/project";
+import type { Sheet } from "client/project/components/sheet";
 
-const MARGIN = 30;
-const MARGIN_FIX = 15;
 const MIN_SCALE = 10;
 
 //=================================================================
@@ -20,17 +17,19 @@ namespace ProjectService {
 	/** 當前選取的專案。 */
 	export const project = shallowRef<Project | null>(null);
 
+	/** 當前的 {@link Sheet}；因為這個太常用了統一放在這裡 */
+	export const sheet = computed(() => project.value?.design.sheet);
+
 	watch(project, (newProject, oldProject) => {
 		newProject?.$toggle(true);
 		oldProject?.$toggle(false);
-		toggleDisplay(newProject != null);
 	});
 
 	/** 當前工作區域的尺度 */
 	export const scale = computed(() => {
-		const proj = project.value;
-		if(!proj) return 1; // 這個情況中傳回什麼並不重要
-		return proj.design.sheet.$getScale(viewport.width, viewport.height, MARGIN, MARGIN_FIX);
+		const s = sheet.value;
+		if(!s) return 1; // 這個情況中傳回什麼並不重要
+		return s.$getScale();
 	});
 
 	/** 當尺度太小的時候調整線條粗細等等 */

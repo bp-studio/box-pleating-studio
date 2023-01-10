@@ -17,7 +17,7 @@ export interface IGrid extends ISerializable<JSheet> {
 	/** 繪製格線的方法 */
 	$drawGrid(grid: GraphicsLike): void;
 
-	/** 在繪製的時候要偏移的座標 */
+	/** 在繪製的時候要偏移的座標，原則上會是負值 */
 	readonly $offset: IPoint;
 
 	/** 繪製的高度 */

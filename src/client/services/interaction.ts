@@ -19,18 +19,18 @@ namespace Interaction {
 	);
 
 	stage.on("mousemove", e => {
-		const project = ProjectService.project.value;
-		if(!project) return;
-		const local = project.design.sheet.$view.toLocal(e.global);
+		const sheet = ProjectService.sheet.value;
+		if(!sheet) return;
+		const local = sheet.$view.toLocal(e.global);
 		// console.log([Math.round(local.x), Math.round(local.y)]);
 	});
 	stage.on("touchstart", pointerDown);
 	stage.on("mousedown", pointerDown);
 
 	function pointerDown(e: FederatedPointerEvent): void {
-		const project = ProjectService.project.value;
-		if(!project) return;
-		const controls = boundary.$hitTestAll(project.design.sheet, e.global);
+		const sheet = ProjectService.sheet.value;
+		if(!sheet) return;
+		const controls = boundary.$hitTestAll(sheet, e.global);
 
 		selections.forEach(c => c.$selected = false);
 		if(controls.length == 0) {

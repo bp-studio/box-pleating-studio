@@ -1,8 +1,8 @@
 import { Container, Graphics, Rectangle } from "pixi.js";
-import { shallowReactive } from "vue";
+import { computed, shallowReactive } from "vue";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
-import { shallowRef } from "client/shared/decorators";
+import { ref, shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { FULL_ZOOM, CHARCOAL, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
@@ -11,6 +11,8 @@ import { Enum } from "client/types/enum";
 import { Layer, LayerOptions } from "client/types/layers";
 import { GridType } from "shared/json";
 import { createGrid } from "./grid";
+import { MARGIN } from "client/screen/constants";
+import { ZoomController } from "client/controllers/zoomController";
 
 import type { Control } from "client/base/control";
 import type { JSheet } from "shared/json";
@@ -28,7 +30,10 @@ const LAYERS = Enum.values(Layer);
 //=================================================================
 export class Sheet extends View implements ISerializable<JSheet> {
 
-	@shallowRef((v: number) => v >= FULL_ZOOM) public zoom: number = FULL_ZOOM;
+	/** 這個工作區域目前捲動的位置，單位是像素 */
+	@ref public $scroll: IPoint = { x: 0, y: 0 };
+
+	@shallowRef public $zoom: number = FULL_ZOOM;
 
 	@shallowRef private _type: GridType;
 
@@ -98,6 +103,14 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return this._grid;
 	}
 
+	public get zoom(): number {
+		return this.$zoom;
+	}
+	public set zoom(v: number) {
+		if(v < FULL_ZOOM) v = FULL_ZOOM;
+		ZoomController.$zoom(v);
+	}
+
 	public get $controls(): readonly Control[] {
 		return this._controls;
 	}
@@ -106,11 +119,13 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return this._layers;
 	}
 
-	public $getScale(viewWidth: number, viewHeight: number, margin: number, fix: number): number {
+	public $getScale(): number {
+		const viewWidth = viewport.width, viewHeight = viewport.height;
+
 		//TODO
-		const factor = this.zoom / FULL_ZOOM;
+		const factor = this.$zoom / FULL_ZOOM;
 		// const controls = this._labeledControls, width = ;
-		const horizontalScale = (viewWidth - 2 * margin) * factor / this._grid.$width;
+		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.$width;
 		// if(controls.length == 0) return horizontalScale;
 
 		if(app.settings.showLabel) {
@@ -121,9 +136,29 @@ export class Sheet extends View implements ISerializable<JSheet> {
 			// horizontalScale = Math.min(horizontalScale, ...scales);
 		}
 
-		const verticalScale = (viewHeight * factor - margin * 2) / this._grid.$height;
+		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$height;
 		return Math.min(horizontalScale, verticalScale);
 	}
+
+	public get $horizontalMargin(): number {
+		// TODO
+		return MARGIN;
+	}
+
+	public readonly $imageDimension = computed<IDimension>(() => {
+		const s = ProjectService.scale.value;
+		const { x, y } = this._grid.$offset;
+		const [width, height] = [this._grid.$width, this._grid.$height];
+		this.$view.hitArea = new Rectangle(x, y, width + x, height + y);
+		return {
+			width: (width + x * 2) * s + MARGIN * 2,
+			height: (height + y * 2) * s + MARGIN * 2,
+		};
+	});
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 私有方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** 根據使用者設定來更新圖層的可見性 */
 	private _layerVisibility(): void {
@@ -135,12 +170,9 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	}
 
 	private _scroll(): void {
-		const s = ProjectService.scale.value;
-		const { x, y } = this._grid.$offset;
-		const [width, height] = [this._grid.$width, this._grid.$height];
-		this.$view.x = (viewport.width - (width + x * 2) * s) / 2;
-		this.$view.y = (viewport.height + (height + y * 2) * s) / 2;
-		this.$view.hitArea = new Rectangle(x, y, width + x, height + y);
+		const image = this.$imageDimension.value;
+		this.$view.x = Math.max((viewport.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
+		this.$view.y = Math.max((viewport.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
 	private _draw(): void {

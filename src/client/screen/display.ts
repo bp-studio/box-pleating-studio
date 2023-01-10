@@ -1,11 +1,14 @@
-import { nextTick, watchEffect } from "vue";
+import { nextTick, watch } from "vue";
 import { Application, Container } from "pixi.js";
-import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
+import { LINE_SCALE_MODE, settings, SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { useBackground } from "./background";
 import { useViewport } from "./viewport";
 import { ControlEventBoundary } from "./controlEventBoundary";
-import { setupInspector } from "./inspector";
+import { PIXI, setupInspector } from "./inspector";
+import { Workspace } from "./workspace";
+import ProjectService from "client/services/projectService";
+import { ZoomController } from "client/controllers/zoomController";
 
 import type { Renderer, EventSystem } from "pixi.js";
 
@@ -27,7 +30,7 @@ const pixiApp = new Application({
 useBackground(pixiApp);
 
 // 設定 Renderer
-export const renderer = pixiApp.renderer as Renderer;
+const renderer = pixiApp.renderer as Renderer;
 export const boundary = new ControlEventBoundary(pixiApp.stage);
 (renderer.events as Writeable<EventSystem>).rootBoundary = boundary;
 
@@ -53,15 +56,19 @@ if(DEBUG_ENABLED) {
 	ui.name = "UI";
 
 	// 啟用檢閱器
+	PIXI.SmoothGraphics = SmoothGraphics;
 	setupInspector();
 }
 
-watchEffect(() => {
-	pixiApp.renderer.resize(viewport.width, viewport.height);
-	pixiApp.stage.hitArea = pixiApp.screen;
+// 設置捲軸區域
+const workspace = new Workspace(el, viewport, (width, height) => {
+	renderer.resize(width, height);
+	stage.hitArea = pixiApp.screen;
 });
+ZoomController.$setup(canvas, workspace);
 
-export async function toggleDisplay(on: boolean): Promise<void> {
+// 根據專案的開啟與否自動開關 Pixi
+async function toggleDisplay(on: boolean): Promise<void> {
 	if(on && !pixiApp.ticker.started) pixiApp.start();
 	if(!on && pixiApp.ticker.started) {
 		await nextTick(); // 先等候 Vue 的反應運算完成
@@ -69,6 +76,7 @@ export async function toggleDisplay(on: boolean): Promise<void> {
 		pixiApp.stop();
 	}
 }
+watch(ProjectService.project, project => toggleDisplay(project != null));
 
 function appNextTick(): Promise<void> {
 	return new Promise(resolve => {
