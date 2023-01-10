@@ -32,11 +32,12 @@ describe("Contour", function() {
 		});
 
 		it("Results can be taken union again", function() {
-			const result1 = new AAUnion().$get(
+			const union = new AAUnion();
+			const result1 = union.$get(
 				aabbToPolygon({ top: 4, bottom: 1, left: 1, right: 5 }),
 				aabbToPolygon({ top: 3, bottom: 0, left: 0, right: 4 })
 			);
-			const result2 = new AAUnion().$get(
+			const result2 = union.$get(
 				result1,
 				aabbToPolygon({ top: 5, bottom: 4, left: 2, right: 4 })
 			);

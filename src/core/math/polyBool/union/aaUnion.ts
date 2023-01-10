@@ -1,10 +1,8 @@
-import { BinaryHeap } from "shared/data/heap/binaryHeap";
-import { RavlTree } from "shared/data/bst/ravlTree";
 import { xyComparator } from "shared/types/geometry";
 import { Chainer } from "../chainer/chainer";
 import { AALineSegment } from "../segment/aaLineSegment";
-import { Intersector } from "./intersector";
-import { eventComparator, EventFactory, statusComparator } from "./eventFactory";
+import { AAIntersector } from "./aaIntersector";
+import { AAEventProvider } from "./aaEventProvider";
 import { PolyBool } from "../polyBool";
 
 import type { EndEvent } from "../event";
@@ -23,17 +21,8 @@ import type { Polygon } from "shared/types/geometry";
 export class AAUnion extends PolyBool {
 
 	constructor(checkSelfIntersection: boolean = false, chainer: Chainer | undefined = undefined) {
-		//這邊採用二元或三元堆疊基本上沒有效能上的差異
-		const queue = new BinaryHeap(eventComparator);
-		const factory = new EventFactory();
-		super(
-			new EventFactory(),
-			queue,
-			// 經過比較之後，RavlTree 的效能最佳
-			new RavlTree(statusComparator),
-			new Intersector(queue, factory, checkSelfIntersection),
-			chainer || new Chainer()
-		);
+		super(new AAEventProvider(), AAIntersector, chainer || new Chainer());
+		(this._intersector as AAIntersector).$checkSelfIntersection = checkSelfIntersection;
 	}
 
 	/** 產生聯集的多邊形 */
@@ -48,12 +37,9 @@ export class AAUnion extends PolyBool {
 
 	/** 處理一個終點事件 */
 	protected _processEnd(event: EndEvent): void {
-		const start = event.other;
-		if(!start.isInside) this._collectedSegments.push(start.segment);
+		const start = event.$other;
+		if(!start.$isInside) this._collectedSegments.push(start.$segment);
 		this._status.$delete(start);
-
-		// 在原本的 MRF 演算法當中，此處會檢查 status 的前後項是否出現了新的交點，
-		// 但是對於 AABB 的聯集來說所有的交點一定會在起點事件的時候就被匡列，所以這邊不用做這個檢查。
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

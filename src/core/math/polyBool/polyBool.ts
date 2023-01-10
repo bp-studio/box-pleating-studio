@@ -1,6 +1,8 @@
 import { same } from "shared/types/geometry";
+import { BinaryHeap } from "shared/data/heap/binaryHeap";
+import { RavlTree } from "shared/data/bst/ravlTree";
 
-import type { IEventFactory, IIntersector } from "./interfaces";
+import type { IEventProvider, Intersector, IntersectorConstructor } from "./intersector";
 import type { Chainer } from "./chainer/chainer";
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 import type { IHeap } from "shared/data/heap/heap";
@@ -17,7 +19,7 @@ import type { Polygon } from "shared/types/geometry";
 export abstract class PolyBool {
 
 	/** 事件產生邏輯 */
-	protected readonly _eventFactory: IEventFactory;
+	protected readonly _provider: IEventProvider;
 
 	/** 事件佇列 */
 	protected readonly _eventQueue: IHeap<SweepEvent>;
@@ -26,7 +28,7 @@ export abstract class PolyBool {
 	protected readonly _status: IBinarySearchTree<StartEvent>;
 
 	/** 交點判斷邏輯 */
-	protected readonly _intersector: IIntersector;
+	protected readonly _intersector: Intersector;
 
 	/** 最後組合邏輯 */
 	protected readonly _chainer: Chainer;
@@ -35,16 +37,14 @@ export abstract class PolyBool {
 	protected readonly _collectedSegments: ISegment[] = [];
 
 	constructor(
-		eventFactory: IEventFactory,
-		eventQueue: IHeap<SweepEvent>,
-		status: IBinarySearchTree<StartEvent>,
-		intersector: IIntersector,
+		provider: IEventProvider,
+		Intersector: IntersectorConstructor,
 		chainer: Chainer
 	) {
-		this._eventFactory = eventFactory;
-		this._eventQueue = eventQueue;
-		this._status = status;
-		this._intersector = intersector;
+		this._provider = provider;
+		this._eventQueue = new BinaryHeap(provider.$eventComparator);
+		this._status = new RavlTree(provider.$statusComparator);
+		this._intersector = new Intersector(provider, this._eventQueue);
 		this._chainer = chainer;
 	}
 
@@ -52,8 +52,8 @@ export abstract class PolyBool {
 	public $get(): Polygon {
 		while(!this._eventQueue.$isEmpty) {
 			const event = this._eventQueue.$pop()!;
-			if(!event.isStart) this._processEnd(event);
-			else if(event.visited) this._processRevisit(event);
+			if(!event.$isStart) this._processEnd(event);
+			else if(event.$visited) this._processRevisit(event);
 			else this._processStart(event);
 		}
 		return this._chainer.$chain(this._collectedSegments);
@@ -77,10 +77,10 @@ export abstract class PolyBool {
 		if(same(segment.$start, segment.$end)) return; // 退化邊不採用
 
 		// 產生掃描事件
-		const startEvent = this._eventFactory.$createStart(startPoint, segment, delta);
-		const endEvent = this._eventFactory.$createEnd(endPoint, segment);
-		endEvent.other = startEvent;
-		startEvent.other = endEvent;
+		const startEvent = this._provider.$createStart(startPoint, segment, delta);
+		const endEvent = this._provider.$createEnd(endPoint, segment);
+		endEvent.$other = startEvent;
+		startEvent.$other = endEvent;
 
 		// 加入事件
 		this._eventQueue.$insert(startEvent);
@@ -102,7 +102,7 @@ export abstract class PolyBool {
 		if(!inserted) {
 			this._setInsideFlag(event, prev);
 		} else {
-			event.visited = true;
+			event.$visited = true;
 			this._eventQueue.$insert(event);
 		}
 	}
@@ -116,9 +116,9 @@ export abstract class PolyBool {
 
 	private _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
 		// 如果前一條線剛剛才離開，那自己就應該要是外圍
-		if(prev && prev.wrapCount != 0) {
-			event.wrapCount += prev.wrapCount;
-			event.isInside = event.wrapCount != 0;
+		if(prev && prev.$wrapCount != 0) {
+			event.$wrapCount += prev.$wrapCount;
+			event.$isInside = event.$wrapCount != 0;
 		}
 	}
 }

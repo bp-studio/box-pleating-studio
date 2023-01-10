@@ -3,11 +3,15 @@ import { same } from "shared/types/geometry";
 import type { ISegment } from "../segment/segment";
 import type { Path, Polygon } from "shared/types/geometry";
 
+/** 實務上 chain 的數目不會太多，初始陣列大小給 10 已經非常足夠 */
 const INITIAL_CHAIN_SIZE = 10;
 
 //=================================================================
 /**
  * {@link Chainer} 類別負責把收集到的邊串連成最終輸出的多邊形。
+ * 如果最終路徑有一些共用的頂點，則輸出的路徑可能會在該處拆開、也可能不會，
+ * 這部份的行為是沒有辦法有效預測的，在撰寫測試的時候需要注意。
+ *
  * 這邊我們運用了一些指標的技巧來省去 JavaScript 建立新陣列等等的成本。
  */
 //=================================================================
@@ -108,6 +112,8 @@ export class Chainer {
 		 * 但實務上 chains 的大小頂多兩三個而已，所以不需要更進一步改進。
 		 */
 		for(let i = 1; i <= this.chains; i++) {
+			// 這邊通常並不會共用 IPoint 的實體，所以要用座標檢查；
+			// 所幸的是這邊並不會需要使用 epsilon 檢查。
 			if(same(this.points[indices[i]], p)) return i;
 		}
 		return 0;

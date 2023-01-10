@@ -15,6 +15,6 @@ export class EndEvent extends EventBase {
 }
 
 export interface EndEvent extends EventBase {
-	other: StartEvent;
-	readonly isStart: false;
+	$other: StartEvent;
+	readonly $isStart: false;
 }

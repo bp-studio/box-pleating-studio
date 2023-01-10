@@ -12,6 +12,7 @@ import type { Path } from "shared/types/geometry";
 
 export class ExChainer extends Chainer {
 
+	/** 每一條 chain 已知的來源索引之集合 */
 	private _temp: Set<number>[] = [];
 
 	protected override _chainToPath(id: number): Path {

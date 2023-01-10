@@ -1,3 +1,4 @@
+import type { StartEvent } from "../event";
 import type { ISegment } from "./segment";
 
 //=================================================================
@@ -8,12 +9,12 @@ import type { ISegment } from "./segment";
 
 export class ArcSegment implements ISegment {
 	public readonly $polygon: number;
-	public $center: IPoint;
-	public $radius: number;
-	private _start: IPoint;
-	private _end: IPoint;
-	private _out!: IPoint;
-	private _delta!: IPoint;
+	public readonly $center: Readonly<IPoint>;
+	public readonly $radius: number;
+	private _start: Readonly<IPoint>;
+	private _end: Readonly<IPoint>;
+	private _out!: Readonly<IPoint>;
+	private _delta!: Readonly<IPoint>;
 
 	public constructor(c: IPoint, r: number, s: IPoint, e: IPoint, polygon: number) {
 		this.$polygon = polygon;
@@ -24,10 +25,10 @@ export class ArcSegment implements ISegment {
 		this._updateVectors();
 	}
 
-	public get $start(): IPoint {
+	public get $start(): Readonly<IPoint> {
 		return this._start;
 	}
-	public set $start(p: IPoint) {
+	public set $start(p: Readonly<IPoint>) {
 		this._start = p;
 		this._updateVectors();
 	}
@@ -40,6 +41,19 @@ export class ArcSegment implements ISegment {
 		this._updateVectors();
 	}
 
+	public $subdivide(point: IPoint, oriented: boolean): ISegment {
+		let newSegment: ISegment;
+		if(oriented) {
+			newSegment = new ArcSegment(this.$center, this.$radius, point, this.$end, this.$polygon);
+			this.$end = point;
+		} else {
+			newSegment = new ArcSegment(this.$center, this.$radius, this.$start, point, this.$polygon);
+			this.$start = point;
+		}
+		this._updateVectors();
+		return newSegment;
+	}
+
 	public $contains(p: IPoint): boolean {
 		const dx = p.x - this.$center.x;
 		const dy = p.y - this.$center.y;
@@ -50,6 +64,10 @@ export class ArcSegment implements ISegment {
 	public $intersection(that: ArcSegment): IPoint[] {
 		return this._intersection(that).filter(p => this._inArcRange(p));
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 私有方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _intersection(that: ArcSegment): IPoint[] {
 		// https://math.stackexchange.com/a/1033561

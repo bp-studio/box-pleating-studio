@@ -1,6 +1,6 @@
 import { EndEvent, StartEvent } from "../event";
 
-import type { IEventFactory } from "../interfaces";
+import type { IEventProvider } from "../intersector";
 import type { Comparator } from "shared/types/types";
 import type { SweepEvent } from "../event";
 import type { AALineSegment } from "../segment/aaLineSegment";
@@ -13,11 +13,11 @@ const SHIFT_DELTA = 14;
 
 //=================================================================
 /**
- * {@link EventFactory} 類別負責生成事件。
+ * {@link AAEventProvider} 類別負責生成事件。
  */
 //=================================================================
 
-export class EventFactory implements IEventFactory {
+export class AAEventProvider implements IEventProvider {
 
 	/** 事件的下一個可用 id */
 	private _nextId: number = 0;
@@ -31,19 +31,18 @@ export class EventFactory implements IEventFactory {
 		const key = getKey(endPoint, false, segment, 1, this._nextId++);
 		return new EndEvent(endPoint, key);
 	}
+
+	public readonly $eventComparator: Comparator<SweepEvent> = eventComparator;
+	public readonly $statusComparator: Comparator<StartEvent> = statusComparator;
 }
 
-//=================================================================
-// 雖然有點難以解釋，但是實驗顯示底下的幾個函數獨立開來寫會有比較好的效能。
-//=================================================================
-
-export const eventComparator: Comparator<SweepEvent> = (a, b) => {
-	const dx = a.point.x - b.point.x;
+const eventComparator: Comparator<SweepEvent> = (a, b) => {
+	const dx = a.$point.x - b.$point.x;
 	if(dx !== 0) return dx;
-	return a.key - b.key;
+	return a.$key - b.$key;
 };
 
-export const statusComparator: Comparator<StartEvent> = (a, b) => a.key - b.key;
+const statusComparator: Comparator<StartEvent> = (a, b) => a.$key - b.$key;
 
 /**
  * 為了加速比較，把若干的比較邏輯加以編碼成 32 位元整數，
