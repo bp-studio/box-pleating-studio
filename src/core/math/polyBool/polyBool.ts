@@ -68,13 +68,13 @@ export abstract class PolyBool {
 
 	/**
 	 * 在初始化過程中加入一條邊
-	 * @param p1 邊的起點（跟線段的定向未必相同）
-	 * @param p2 邊的終點（跟線段的定向未必相同）
 	 * @param segment 線段本身
 	 * @param isEntering 這條邊是否正在進入其對應的多邊形
 	 */
-	protected _addSegment(startPoint: IPoint, endPoint: IPoint, segment: ISegment, delta: -1 | 1): void {
+	protected _addSegment(segment: ISegment, delta: -1 | 1): void {
 		if(same(segment.$start, segment.$end)) return; // 退化邊不採用
+		const [startPoint, endPoint] = delta === 1 ?
+			[segment.$start, segment.$end] : [segment.$end, segment.$start];
 
 		// 產生掃描事件
 		const startEvent = this._provider.$createStart(startPoint, segment, delta);
@@ -120,5 +120,15 @@ export abstract class PolyBool {
 			event.$wrapCount += prev.$wrapCount;
 			event.$isInside = event.$wrapCount != 0;
 		}
+
+		// console.log(
+		// 	event.$isInside,
+		// 	event.$wrapCount,
+		// 	event.$point, event.$other.$point,
+		// 	event.$segment.$type === 2 ? (event.$segment as ArcSegment).$radius : 0,
+		// 	event.$segment.$type === 2 ? getSlope(event) : NaN,
+		// 	prev?.$point, prev?.$other.$point,
+		// 	prev?.$segment.$type === 2 ? getSlope(prev) : NaN,
+		// 	prev?.$wrapCount);
 	}
 }

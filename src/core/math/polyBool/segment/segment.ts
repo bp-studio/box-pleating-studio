@@ -1,5 +1,13 @@
 
+export enum SegmentType {
+	AALine = 1,
+	Arc = 2,
+}
+
 export interface ISegment {
+	/** 線段類別 */
+	$type: SegmentType;
+
 	/** 線段的起點 */
 	$start: Readonly<IPoint>;
 

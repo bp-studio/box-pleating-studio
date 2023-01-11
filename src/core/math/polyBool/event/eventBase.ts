@@ -27,10 +27,11 @@ export abstract class EventBase {
 
 	/**
 	 * 這個事件是否為邊的起點事件。
+	 * 為了加快比較，故意設定為整數型態。
 	 */
-	readonly $isStart: boolean;
+	readonly $isStart: 1 | 0;
 
-	constructor(point: IPoint, isStart: boolean, key: number) {
+	constructor(point: IPoint, isStart: 1 | 0, key: number) {
 		this.$point = point;
 		this.$isStart = isStart;
 		this.$key = key;

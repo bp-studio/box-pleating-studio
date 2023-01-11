@@ -1,5 +1,10 @@
 
-export type Path = IPoint[] & {
+export interface IPointEx extends IPoint {
+	arc?: IPoint;
+	r?: number;
+}
+
+export type Path = IPointEx[] & {
 
 	/** 在聯集的場合當中，紀錄這個路徑是從哪幾個多邊形合成出來的 */
 	from?: number[];
@@ -9,8 +14,6 @@ export type Path = IPoint[] & {
 };
 
 export type Polygon = Path[];
-
-export type Line = [IPoint, IPoint];
 
 export function same(p1: IPoint, p2: IPoint): boolean {
 	return p1.x === p2.x && p1.y === p2.y;
@@ -31,12 +34,11 @@ export type Contour = {
 
 /** 先依 x 座標排序、再依 y 座標排序 */
 export function xyComparator(p1: IPoint, p2: IPoint): number {
-	const dx = p1.x - p2.x;
-	if(dx !== 0) return dx;
-	return p1.y - p2.y;
+	return p1.x - p2.x || p1.y - p2.y;
 }
 
-export function toString(p: IPoint): string {
+export function toString(p: IPointEx): string {
+	if(p.arc) return `(${p.x},${p.y},${p.arc.x},${p.arc.y},${p.r!})`;
 	return `(${p.x},${p.y})`;
 }
 

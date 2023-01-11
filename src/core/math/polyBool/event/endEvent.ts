@@ -10,11 +10,11 @@ import type { StartEvent } from "./startEvent";
 //=================================================================
 export class EndEvent extends EventBase {
 	constructor(point: IPoint, key: number) {
-		super(point, false, key);
+		super(point, 0, key);
 	}
 }
 
 export interface EndEvent extends EventBase {
 	$other: StartEvent;
-	readonly $isStart: false;
+	readonly $isStart: 0;
 }

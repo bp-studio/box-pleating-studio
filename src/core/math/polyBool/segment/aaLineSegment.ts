@@ -1,4 +1,5 @@
-import type { StartEvent } from "../event";
+import { SegmentType } from "./segment";
+
 import type { ISegment } from "./segment";
 
 //=================================================================
@@ -9,6 +10,7 @@ import type { ISegment } from "./segment";
 
 export class AALineSegment implements ISegment {
 
+	public readonly $type = SegmentType.AALine;
 	public readonly $isHorizontal: boolean;
 	public readonly $polygon: number;
 	public $start: Readonly<IPoint>;

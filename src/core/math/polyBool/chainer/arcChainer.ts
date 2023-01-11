@@ -1,44 +1,48 @@
 import { Chainer } from "./chainer";
+import { SegmentType } from "../segment/segment";
 
+import type { IPointEx, Path } from "shared/types/geometry";
 import type { ISegment } from "../segment/segment";
-import type { Path } from "shared/types/geometry";
+import type { ArcSegment } from "../segment/arcSegment";
 
 //=================================================================
 /**
- * {@link ExChainer} 是膨脹操作專用的 {@link Chainer}，
- * 它同時追蹤產生的每一個多邊形跟原有的多邊形之間的關係。
+ * {@link ArcChainer} 類別負責串接可能有 {@link ArcSegment} 的多邊形。
  */
 //=================================================================
 
-export class ExChainer extends Chainer {
-
-	/** 每一條 chain 已知的來源索引之集合 */
-	private _temp: Set<number>[] = [];
+export class ArcChainer extends Chainer {
 
 	protected override _chainToPath(id: number, segment: ISegment): Path {
 		const path = super._chainToPath(id, segment);
-		path.from = [...this._temp[id]];
+		this._trySetArcSegment(path[0], segment);
 		return path;
 	}
 
 	protected override _connectChain(head: number, tail: number, segment: ISegment): void {
+		this._trySetArcSegment(this.points[this.chainHeads[tail]], segment);
 		super._connectChain(head, tail, segment);
-		for(const n of this._temp[tail]) this._temp[head].add(n);
 	}
 
 	protected override _append(segment: ISegment, id: number): void {
 		super._append(segment, id);
-		this._temp[id].add(segment.$polygon);
+		this._trySetArcSegment(this.points[this.chainTails[id]], segment);
 	}
 
 	protected override _prepend(segment: ISegment, id: number): void {
+		this._trySetArcSegment(this.points[this.chainHeads[id]], segment);
 		super._prepend(segment, id);
-		this._temp[id].add(segment.$polygon);
 	}
 
 	protected override _createChain(segment: ISegment): void {
 		super._createChain(segment);
-		this._temp[this.chains] = new Set();
-		this._temp[this.chains].add(segment.$polygon);
+		this._trySetArcSegment(this.points[this.length], segment);
+	}
+
+	private _trySetArcSegment(p: IPointEx, segment: ISegment): void {
+		if(segment.$type === SegmentType.Arc) {
+			p.arc = (segment as ArcSegment).$anchor;
+			p.r = (segment as ArcSegment).$radius;
+		}
 	}
 }

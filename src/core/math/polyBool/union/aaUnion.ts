@@ -46,7 +46,7 @@ export class AAUnion extends PolyBool {
 	// 私有方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 初始化；重設一些變數並且載入所有初始的事件 */
+	/** 載入所有初始的事件 */
 	private _initialize(components: Polygon[]): void {
 		this._collectedSegments.length = 0;
 		for(let i = 0; i < components.length; i++) {
@@ -56,8 +56,8 @@ export class AAUnion extends PolyBool {
 					const p1 = path[j], p2 = path[(j + 1) % path.length];
 					const segment = new AALineSegment(p1, p2, i);
 					const entering = xyComparator(p1, p2) < 0;
-					if(entering) this._addSegment(p1, p2, segment, 1);
-					else this._addSegment(p2, p1, segment, -1);
+					if(entering) this._addSegment(segment, 1);
+					else this._addSegment(segment, -1);
 				}
 			}
 		}

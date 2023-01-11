@@ -32,7 +32,7 @@ export class StartEvent extends EventBase {
 	public $wrapCount: number;
 
 	constructor(point: IPoint, segment: ISegment, delta: -1 | 1, key: number) {
-		super(point, true, key);
+		super(point, 1, key);
 		this.$segment = segment;
 		this.$wrapDelta = delta;
 		this.$wrapCount = delta;
@@ -41,5 +41,5 @@ export class StartEvent extends EventBase {
 
 export interface StartEvent extends EventBase {
 	$other: EndEvent;
-	readonly $isStart: true;
+	readonly $isStart: 1;
 }

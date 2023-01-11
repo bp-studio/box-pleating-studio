@@ -1,7 +1,7 @@
 import { same } from "shared/types/geometry";
 
 import type { ISegment } from "../segment/segment";
-import type { Path, Polygon } from "shared/types/geometry";
+import type { Path, Polygon, IPointEx } from "shared/types/geometry";
 
 /** 實務上 chain 的數目不會太多，初始陣列大小給 10 已經非常足夠 */
 const INITIAL_CHAIN_SIZE = 10;
@@ -19,7 +19,7 @@ export class Chainer {
 
 	protected chainHeads!: number[];
 	protected chainTails!: number[];
-	protected points!: IPoint[];
+	protected points!: IPointEx[];
 	protected next!: number[];
 	protected length: number = 0;
 	protected chains: number = 0;
@@ -39,11 +39,11 @@ export class Chainer {
 			if(head && tail) {
 				if(head === tail) {
 					// 一個 chain 頭尾銜接起來了，加入到輸出結果當中
-					result.push(this._chainToPath(head));
+					result.push(this._chainToPath(head, segment));
 					this._removeChain(head);
 				} else {
 					// 串接兩個本來獨立的 chain
-					this._connectChain(head, tail);
+					this._connectChain(head, tail, segment);
 				}
 			} else if(head) {
 				this._append(segment, head);
@@ -56,7 +56,7 @@ export class Chainer {
 		return result;
 	}
 
-	protected _chainToPath(id: number): Path {
+	protected _chainToPath(id: number, segment: ISegment): Path {
 		const path: Path = [];
 		let i = this.chainHeads[id];
 		while(i) {
@@ -66,7 +66,7 @@ export class Chainer {
 		return path;
 	}
 
-	protected _connectChain(head: number, tail: number): void {
+	protected _connectChain(head: number, tail: number, segment: ISegment): void {
 		this.next[this.chainTails[head]] = this.chainHeads[tail];
 		this.chainTails[head] = this.chainTails[tail];
 		this._removeChain(tail);

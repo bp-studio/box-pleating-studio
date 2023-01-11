@@ -4,6 +4,7 @@
 		"experimentalDecorators": true,
 		"isolatedModules": true,
 		"moduleResolution": "node",
+		"noImplicitOverride": true,
 		"preserveSymlinks": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
@@ -20,6 +21,6 @@
 	],
 	"ts-node": {
 		"files": true,
-		"swc": true,
+		"swc": true
 	}
 }

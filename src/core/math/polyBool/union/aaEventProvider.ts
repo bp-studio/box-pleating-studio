@@ -13,7 +13,7 @@ const SHIFT_DELTA = 14;
 
 //=================================================================
 /**
- * {@link AAEventProvider} 類別負責生成事件。
+ * {@link AAEventProvider} 類別負責生成與比較 AA 直線的事件。
  */
 //=================================================================
 
@@ -23,12 +23,12 @@ export class AAEventProvider implements IEventProvider {
 	private _nextId: number = 0;
 
 	public $createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent {
-		const key = getKey(startPoint, true, segment, delta, this._nextId++);
+		const key = getKey(startPoint, 1, segment, delta, this._nextId++);
 		return new StartEvent(startPoint, segment, delta, key);
 	}
 
 	public $createEnd(endPoint: IPoint, segment: ISegment): EndEvent {
-		const key = getKey(endPoint, false, segment, 1, this._nextId++);
+		const key = getKey(endPoint, 0, segment, 1, this._nextId++);
 		return new EndEvent(endPoint, key);
 	}
 
@@ -55,7 +55,7 @@ const statusComparator: Comparator<StartEvent> = (a, b) => a.$key - b.$key;
  * 1 bit	wrapDelta
  * 14 bit	id
  */
-function getKey(point: IPoint, isStart: boolean, segment: ISegment, delta: -1 | 1, id: number): number {
+function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1, id: number): number {
 	let hor = (segment as AALineSegment).$isHorizontal ? 1 : 0;
 	if(isStart) hor ^= 1;
 	return (
@@ -63,7 +63,7 @@ function getKey(point: IPoint, isStart: boolean, segment: ISegment, delta: -1 | 
 		point.y << SHIFT_Y |
 
 		// 同樣位置的事件中，終點事件優先
-		(isStart ? 1 : 0) << SHIFT_START |
+		isStart << SHIFT_START |
 
 		// 同位置類型的事件中，起點事件的水平邊優先於垂直邊、終點的情況則相反
 		hor << SHIFT_HOR |

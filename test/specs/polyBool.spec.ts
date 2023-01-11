@@ -4,10 +4,11 @@ import { expand } from "core/math/polyBool/expansion";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { same, toString } from "shared/types/geometry";
 import { random } from "../utils";
+import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
 
 import type { Path, Polygon } from "shared/types/geometry";
 
-describe("Contour", function() {
+describe("PolyBool", function() {
 	describe("AAUnion operation", function() {
 
 		it("Finds union of AABBs", function() {
@@ -128,6 +129,45 @@ describe("Contour", function() {
 			expect(result[1].outer.length).to.equal(0);
 		});
 	});
+
+	describe("Rounded rectangle intersection", function() {
+		it("Finds intersection", function() {
+			const result = new RRIntersection().$get(
+				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
+				{ x: 3, y: 3, width: 0, height: 0, radius: 1 }
+			);
+			expect(result.length).to.equal(1);
+			expect(result[0]).to.equalPath("(2,3),(3,2,2,2,1),(3.8660254037844384,2.5,3.5773502691896257,2,1),(3,3,3.5773502691896257,3,1)");
+		});
+
+		it("Handles complete overlapping", function() {
+			const result = new RRIntersection().$get(
+				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
+				{ x: 2, y: 2, width: 0, height: 0, radius: 1 } // completely contained in the previous one
+			);
+			expect(result.length).to.equal(1);
+			expect(result[0]).to.equalPath("(1,2,1,3,1),(2,1,1,1,1),(3,2,3,1,1),(2,3,3,3,1)");
+		});
+
+		it("Handles arc trisection", function() {
+			const result = new RRIntersection().$get(
+				{ x: 1, y: 1, width: 0, height: 0, radius: 1 },
+				{ x: 3, y: 3, width: 0, height: 0, radius: 3 }
+			);
+			expect(result.length).to.equal(1);
+			expect(result[0]).to.equalPath("(1,2,2,2,1),(0.29289321881345254,1.7071067811865475,0.5857864376269049,2,1),(1.7071067811865475,0.29289321881345254,0.75,0.75,3),(2,1,2,0.585786437626905,1)");
+		});
+
+		it("Handles epsilon errors", function() {
+			// This examples creates an epsilon error in the intersection
+			const result = new RRIntersection().$get(
+				{ x: 1, y: 5, width: 0, height: 0, radius: 1 },
+				{ x: 3, y: 3, width: 0, height: 0, radius: 3 }
+			);
+			expect(result.length).to.equal(1);
+			expect(result[0]).to.equalPath("(2,5,2,4,1),(1.7071067811865483,5.707106781186548,2.0000000000000004,5.414213562373095,1),(0.2928932188134521,4.292893218813452,0.75,5.25,3),(1,4,0.585786437626905,4,1)");
+		});
+	});
 });
 
 
@@ -178,7 +218,7 @@ Assertion.addMethod("equalPath", function(pathString: string) {
 	const path = (this._obj as Path).concat();
 	const orgPathString = pathToString(path);
 
-	const match = pathString.match(/\((\d+),(\d+)\)/)!;
+	const match = pathString.match(/\((\d*\.?\d+),(\d*\.?\d+)(?:,\d*\.?\d+){0,3}\)/)!;
 	const point = { x: Number(match[1]), y: Number(match[2]) };
 	const rotateResult = rotatePath(path, point);
 
@@ -189,6 +229,7 @@ Assertion.addMethod("equalPath", function(pathString: string) {
 		match[0],
 		orgPathString
 	);
+	debugger;
 	this.assert(
 		pathToString(path) == pathString,
 		"expect #{act} to equal #{exp}",

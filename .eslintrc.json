@@ -321,7 +321,7 @@
 		"no-label-var": "warn",
 		"no-labels": "error",
 		"no-lone-blocks": "warn",
-		"no-lonely-if": "warn",
+		"no-lonely-if": "off",
 		"no-loop-func": "off", // see ts
 		"no-loss-of-precision": "warn",
 		"no-magic-numbers": "off", // see ts

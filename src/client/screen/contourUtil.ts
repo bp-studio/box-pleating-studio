@@ -1,6 +1,6 @@
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
 import type { Graphics } from "pixi.js";
-import type { Contour, Path } from "shared/types/geometry";
+import type { Contour, Path, Polygon } from "shared/types/geometry";
 
 export type GraphicsLike = Graphics | SmoothGraphics;
 
@@ -54,4 +54,22 @@ function drawPath(graphics: GraphicsLike, path: Path): void {
 		graphics.lineTo(path[i].x, path[i].y);
 	}
 	graphics.closePath();
+}
+
+/** 填滿可能有弧線的多邊形 */
+export function drawArcPolygon(graphics: GraphicsLike, polygon: Polygon, color: number): void {
+	for(const path of polygon) {
+		graphics.beginFill(color);
+		if(!path.length) return;
+		graphics.moveTo(path[0].x, path[0].y);
+		for(let i = 1; i < path.length; i++) {
+			const p = path[i];
+			if(p.arc) graphics.arcTo(p.arc.x, p.arc.y, p.x, p.y, p.r!);
+			else graphics.lineTo(p.x, p.y);
+		}
+		const p = path[0];
+		if(p.arc) graphics.arcTo(p.arc.x, p.arc.y, p.x, p.y, p.r!);
+		graphics.closePath();
+		graphics.endFill();
+	}
 }
