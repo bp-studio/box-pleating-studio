@@ -1,11 +1,16 @@
 import { Container, Text } from "pixi.js";
 
 import { BLACK, DARK, LIGHT, WHITE } from "client/shared/constant";
-import ProjectService from "client/services/projectService";
+import ProjectService, { MIN_SCALE } from "client/services/projectService";
 import { Direction } from "client/types/enum";
 import { PIXI } from "./inspector";
+import { shallowRef } from "client/shared/decorators";
 
+import type { IDestroyOptions } from "pixi.js";
 import type { Sheet } from "client/project/components/sheet";
+
+const SQRT = 2 / Math.sqrt(MIN_SCALE);
+const EXTRA_FIX = 5; // 這是實驗得到的數字
 
 const SMOOTHNESS = 2;
 const FONT_SIZE = 14;
@@ -21,6 +26,9 @@ export class Label extends Container {
 	private readonly _sheet: Sheet;
 	private readonly _label: Text = new Text();
 	private readonly _glow: Text = new Text();
+	@shallowRef private _labelWidth: number = 0;
+	private _contentCache: string = "";
+	private _directionCache: Direction = Direction.none;
 
 	public $color?: number;
 	public $distance: number = 1;
@@ -28,6 +36,7 @@ export class Label extends Container {
 	constructor(sheet: Sheet) {
 		super();
 		this._sheet = sheet;
+		sheet.$labels.add(this);
 
 		this.addChild(this._glow);
 		this.addChild(this._label);
@@ -38,6 +47,11 @@ export class Label extends Container {
 			this._label.name = "Label";
 			this._glow.name = "Glow";
 		}
+	}
+
+	public override destroy(options?: boolean | IDestroyOptions | undefined): void {
+		this._sheet.$labels.delete(this);
+		super.destroy(options);
 	}
 
 	/**
@@ -51,7 +65,19 @@ export class Label extends Container {
 		// 設定文字
 		text = text.trim();
 		this.visible = Boolean(text);
-		if(!this.visible) return;
+		if(this.visible) direction = this._draw(text, x, y, direction);
+
+		if(this._contentCache != text || this._directionCache != direction) {
+			this._contentCache = text;
+			let width = text == "" ? 0 : Math.ceil(this._label.width) / 2;
+			if(direction != Direction.L && direction != Direction.R) width /= 2;
+
+			// 延遲設定以避免循環參照
+			setTimeout(() => this._labelWidth = width, 0);
+		}
+	}
+
+	private _draw(text: string, x: number, y: number, direction?: Direction): Direction {
 		this._label.text = text;
 		this._glow.text = text;
 
@@ -95,6 +121,30 @@ export class Label extends Container {
 			strokeThickness: 6,
 			lineJoin: "bevel",
 		};
+
+		return direction;
+	}
+
+	/** 透過解方程式來逆推考量到當前的標籤之下應該採用何種自動尺度 */
+	public $getHorizontalScale(sheetWidth: number, viewWidth: number, factor: number): number {
+		const labelWidth = this._labelWidth;
+		if(this._labelWidth == 0) return NaN;
+		const vw = (viewWidth - EXTRA_FIX) * factor;
+		const size = Math.abs(2 * this.x - sheetWidth);
+		let result = Label._solveEq(-vw, labelWidth * SQRT, size);
+		if(result > MIN_SCALE) {
+			if(size != 0) result = (vw - 2 * labelWidth) / size;
+			else result = vw / sheetWidth;
+		}
+		return result;
+	}
+
+	/** 解型如 o * x + s * Math.sqrt(x) + z == 0 的二次方程 */
+	private static _solveEq(z: number, s: number, o: number): number {
+		if(o == 0) return z * z / (s * s); // 退化情況
+		const f = 2 * o * z, b = s * s - f;
+		const inner = b * b - f * f;
+		return (b - Math.sqrt(inner)) / (2 * o * o);
 	}
 }
 

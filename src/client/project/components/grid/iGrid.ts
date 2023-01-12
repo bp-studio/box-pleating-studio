@@ -20,9 +20,9 @@ export interface IGrid extends ISerializable<JSheet> {
 	/** 在繪製的時候要偏移的座標，原則上會是負值 */
 	readonly $offset: IPoint;
 
-	/** 繪製的高度 */
+	/** 繪製的高度，單位是格線 */
 	readonly $height: number;
 
-	/** 繪製的寬度 */
+	/** 繪製的寬度，單位是格線 */
 	readonly $width: number;
 }

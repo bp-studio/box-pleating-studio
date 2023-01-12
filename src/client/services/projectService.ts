@@ -3,7 +3,7 @@ import { computed, shallowRef, watch } from "vue";
 import type { Project } from "client/project/project";
 import type { Sheet } from "client/project/components/sheet";
 
-const MIN_SCALE = 10;
+export const MIN_SCALE = 10;
 
 //=================================================================
 /**

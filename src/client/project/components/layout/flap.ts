@@ -9,6 +9,7 @@ import { Direction } from "client/types/enum";
 import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
+import { Label } from "client/screen/label";
 
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
@@ -44,6 +45,7 @@ export class Flap extends Draggable {
 	private readonly _ridge: SmoothGraphics;
 	private readonly _circle: SmoothGraphics;
 	private readonly _hinge: SmoothGraphics;
+	public readonly $label: Label;
 
 
 	constructor(json: JFlap, vertex: Vertex, edge: Edge, sheet: Sheet) {
@@ -66,6 +68,7 @@ export class Flap extends Draggable {
 		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
 		this._circle = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
 		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
+		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade, this._drawDot);
