@@ -1,17 +1,14 @@
 import DragController from "./controllers/dragController";
 import ProjectController from "./controllers/projectController";
-import Interaction from "./services/interaction";
 import ProjectService from "./services/projectService";
-
-import "./screen/display";
+import { SelectionController } from "./controllers/selectionController";
+import "./services/interaction";
 
 import type HistoryManager from "./project/changes/history";
 
 export const projects = ProjectController;
-
 export const drag = DragController;
-
-export const interaction = Interaction;
+export const selection = SelectionController;
 
 export { nextTick } from "./screen/display";
 

@@ -1,5 +1,6 @@
 import { Intersector } from "../intersector";
 import { SegmentType } from "../segment/segment";
+import { EPSILON } from "../segment/arcSegment";
 
 import type { ArcSegment } from "../segment/arcSegment";
 import type { AALineSegment } from "../segment/aaLineSegment";
@@ -41,9 +42,13 @@ export class RRIntersector extends Intersector {
 		let seg2 = ev2.$segment as ArcSegment;
 		const intersections = seg1.$intersection(seg2);
 		for(const p of intersections) { // 已經排序好了
-			if(seg1.$inArcRange(p) && seg2.$inArcRange(p)) {
+			const in1 = seg1.$inArcRange(p), in2 = seg2.$inArcRange(p);
+			// 交叉條件為：對自身來說在內部、對另外一個來說至少在端點上
+			if(in1 < -EPSILON && in2 < EPSILON) {
 				ev1 = this._subdivide(ev1, p);
 				seg1 = ev1.$segment as ArcSegment;
+			}
+			if(in1 < EPSILON && in2 < -EPSILON) {
 				ev2 = this._subdivide(ev2, p);
 				seg2 = ev2.$segment as ArcSegment;
 			}
@@ -56,23 +61,25 @@ export class RRIntersector extends Intersector {
 		const line = eLine.$segment as AALineSegment;
 		if(line.$isHorizontal) {
 			const y = line.$start.y;
-			const d = (y - arc.$start.y) * (y - arc.$end.y);
-			if(d > 0) return;
+			const da = (y - arc.$start.y) * (y - arc.$end.y);
+			if(da > EPSILON) return;
 			const r = arc.$radius;
 			const dy = y - arc.$center.y;
 			const dx = Math.sqrt(r * r - dy * dy);
 			const x = arc.$center.x + (arc.$start.y > arc.$end.y ? -dx : dx);
 			const p = { x, y };
-			if(d < 0) this._subdivide(eArc, p);
-			if(eLine.$point.x < x && x < eLine.$other.$point.x) this._subdivide(eLine, p);
+			const dl = (x - eLine.$point.x) * (x - eLine.$other.$point.x);
+			if(da < -EPSILON && dl < EPSILON) this._subdivide(eArc, p);
+			if(da < EPSILON && dl < -EPSILON) this._subdivide(eLine, p);
 		} else {
 			const x = line.$start.x;
-			const d = (x - arc.$start.x) * (x - arc.$end.x);
-			if(d > 0) return;
+			const da = (x - arc.$start.x) * (x - arc.$end.x);
+			if(da > EPSILON) return;
 			const y = yIntercept(arc, x);
 			const p = { x, y };
-			if(d < 0) this._subdivide(eArc, p);
-			if(eLine.$point.y < y && y < eLine.$other.$point.y) this._subdivide(eLine, p);
+			const dl = (y - eLine.$point.y) * (y - eLine.$other.$point.y);
+			if(da < -EPSILON && dl < EPSILON) this._subdivide(eArc, p);
+			if(da < EPSILON && dl < -EPSILON) this._subdivide(eLine, p);
 		}
 	}
 }

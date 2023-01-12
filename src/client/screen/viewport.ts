@@ -2,16 +2,12 @@ import { readonly, shallowRef } from "vue";
 
 const RETRY = 10;
 
-export type Viewport = Readonly<IDimension> & {
-	update(): void;
-};
-
 //=================================================================
 /**
  * 提供指定的 Viewport 元件的反應式大小（無視手機上的鍵盤開啟影響）
  */
 //=================================================================
-export function useViewport(el: HTMLElement): Viewport {
+export function useViewport(el: HTMLElement): Readonly<IDimension> {
 
 	const width = shallowRef<number>(0);
 	const height = shallowRef<number>(0);
@@ -44,5 +40,5 @@ export function useViewport(el: HTMLElement): Viewport {
 		document.addEventListener("focusout", () => lockViewport = false);
 	}
 
-	return readonly({ width, height, update });
+	return readonly({ width, height });
 }

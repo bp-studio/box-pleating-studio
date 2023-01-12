@@ -20,23 +20,23 @@ export class ArcChainer extends Chainer {
 	}
 
 	protected override _connectChain(head: number, tail: number, segment: ISegment): void {
-		this._trySetArcSegment(this.points[this.chainHeads[tail]], segment);
+		this._trySetArcSegment(this._points[this._chainHeads[tail]], segment);
 		super._connectChain(head, tail, segment);
 	}
 
 	protected override _append(segment: ISegment, id: number): void {
 		super._append(segment, id);
-		this._trySetArcSegment(this.points[this.chainTails[id]], segment);
+		this._trySetArcSegment(this._points[this._chainTails[id]], segment);
 	}
 
 	protected override _prepend(segment: ISegment, id: number): void {
-		this._trySetArcSegment(this.points[this.chainHeads[id]], segment);
+		this._trySetArcSegment(this._points[this._chainHeads[id]], segment);
 		super._prepend(segment, id);
 	}
 
 	protected override _createChain(segment: ISegment): void {
 		super._createChain(segment);
-		this._trySetArcSegment(this.points[this.length], segment);
+		this._trySetArcSegment(this._points[this._length], segment);
 	}
 
 	private _trySetArcSegment(p: IPointEx, segment: ISegment): void {

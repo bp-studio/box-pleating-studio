@@ -46,9 +46,15 @@ const eventComparator: Comparator<SweepEvent> = (a, b) =>
 
 const statusComparator: Comparator<StartEvent> = (a, b) =>
 	statusYComparator(a, b) ||
+	// 如果剛好一條新開始的線段起點相交在一條既有線段的內部，
+	// 這會使得上一個計算的結果為 0、而接下來的計算結果跟理論上想要的順序不合，
+	// 不過這無所謂，因為那條既有的線段會被分割，
+	// 而分割出來的新線段再次拿來比較的時候就會被安插在正確的順序上。
+	// 我們只需要確保這樣的相交第一次發生的時候、既有的線段總是有被正確地分割到即可。
 	segmentComparator(a, b) ||
 	a.$key - b.$key;
 
+/** 比較兩個起點相同的開始事件 */
 const segmentComparator: Comparator<StartEvent> = (a, b) =>
 	// 切線斜率小的優先
 	getSlope(a) - getSlope(b) ||
@@ -57,7 +63,8 @@ const segmentComparator: Comparator<StartEvent> = (a, b) =>
 	// 重疊的情況中，離開邊優先（這跟交集的情況相反）
 	a.$wrapDelta - b.$wrapDelta;
 
-function statusYComparator(a: StartEvent, b: StartEvent): number {
+/** 比較開始事件的 y 座標 */
+const statusYComparator: Comparator<StartEvent> = (a, b) => {
 	// 有圓弧的情況中不能只是簡單地比較開始事件的 y 座標，
 	// 而需要正確地選取開始結束的座標點來比較
 	if(a.$point.x < b.$point.x && a.$segment.$type === SegmentType.Arc) {
@@ -67,8 +74,9 @@ function statusYComparator(a: StartEvent, b: StartEvent): number {
 	} else {
 		return a.$point.y - b.$point.y;
 	}
-}
+};
 
+/** 計算斜率 */
 export function getSlope(e: StartEvent): number {
 	const seg = e.$segment as Segment;
 	if(seg.$type === SegmentType.AALine) {
@@ -76,15 +84,15 @@ export function getSlope(e: StartEvent): number {
 	} else {
 		const dx = seg.$anchor.x - e.$point.x;
 		const dy = seg.$anchor.y - e.$point.y;
-		// anchor 的座標未必是精確值，所以這邊需要 epsilon 比較
 		if(dx > EPSILON) return dy / dx;
 		return dy > 0 ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
 	}
 }
 
+/** 計算曲率 */
 export function getCurvature(e: StartEvent): number {
 	const seg = e.$segment as Segment;
 	if(seg.$type === SegmentType.AALine) return 0;
-	const sgn = e.$point === seg.$start ? 1 : -1;
+	const sgn = e.$point === seg.$start ? 1 : -1; // 上曲還是下曲
 	return sgn / seg.$radius;
 }

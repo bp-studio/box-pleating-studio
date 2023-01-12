@@ -73,7 +73,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		this._type = json?.type ?? GridType.rectangular;
 		this._grid = createGrid(this._type, json?.width, json?.height);
 
-		this.$reactDraw(this._draw, this._scroll, this._layerVisibility);
+		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
 
 		if(DEBUG_ENABLED) {
 			for(const layer of LAYERS) {
@@ -145,6 +145,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return MARGIN;
 	}
 
+	/** 整個視圖像素化之後的尺寸 */
 	public readonly $imageDimension = computed<IDimension>(() => {
 		const s = ProjectService.scale.value;
 		const { x, y } = this._grid.$offset;
@@ -169,13 +170,15 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		this._layers[Layer.$ridge].visible = app.settings.showRidge;
 	}
 
-	private _scroll(): void {
+	/** 根據當前的捲動位置來調整容器的位置 */
+	private _positioning(): void {
 		const image = this.$imageDimension.value;
 		this.$view.x = Math.max((viewport.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
 		this.$view.y = Math.max((viewport.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
-	private _draw(): void {
+	/** 繪製框線和格線 */
+	private _drawSheet(): void {
 		const s = ProjectService.scale.value;
 		const sh = ProjectService.shrink.value;
 		this.$view.scale.set(s, -s);

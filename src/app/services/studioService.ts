@@ -40,11 +40,11 @@ namespace StudioService {
 		if(!errMgr.runErr) initialized.value = true;
 	}
 
-	export const selections = proxy(() => bp.interaction.selections, []);
+	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);
 
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
-	export const draggableSelected = proxy(() => bp.interaction.draggables.value.length > 0, false);
+	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
 
 	export function dragByKey(key: DirectionKey): void {
 		bp.drag.dragByKey(key);

@@ -17,24 +17,24 @@ const INITIAL_CHAIN_SIZE = 10;
 //=================================================================
 export class Chainer {
 
-	protected chainHeads!: number[];
-	protected chainTails!: number[];
-	protected points!: IPointEx[];
-	protected next!: number[];
-	protected length: number = 0;
-	protected chains: number = 0;
+	protected _chainHeads!: number[];
+	protected _chainTails!: number[];
+	protected _points!: IPointEx[];
+	protected _next!: number[];
+	protected _length: number = 0;
+	protected _chains: number = 0;
 
 	public $chain(segments: ISegment[]): Polygon {
 		const size = segments.length + 1;
-		this.chainHeads = Array.from({ length: INITIAL_CHAIN_SIZE });
-		this.chainTails = Array.from({ length: INITIAL_CHAIN_SIZE });
-		this.points = Array.from({ length: size });
-		this.next = Array.from({ length: size });
+		this._chainHeads = Array.from({ length: INITIAL_CHAIN_SIZE });
+		this._chainTails = Array.from({ length: INITIAL_CHAIN_SIZE });
+		this._points = Array.from({ length: size });
+		this._next = Array.from({ length: size });
 
 		const result: Polygon = [];
 		for(const segment of segments) {
-			const tail = this._findChain(this.chainHeads, segment.$end);
-			const head = this._findChain(this.chainTails, segment.$start);
+			const tail = this._findChain(this._chainHeads, segment.$end);
+			const head = this._findChain(this._chainTails, segment.$start);
 
 			if(head && tail) {
 				if(head === tail) {
@@ -58,52 +58,52 @@ export class Chainer {
 
 	protected _chainToPath(id: number, segment: ISegment): Path {
 		const path: Path = [];
-		let i = this.chainHeads[id];
+		let i = this._chainHeads[id];
 		while(i) {
-			path.push(this.points[i]);
-			i = this.next[i];
+			path.push(this._points[i]);
+			i = this._next[i];
 		}
 		return path;
 	}
 
 	protected _connectChain(head: number, tail: number, segment: ISegment): void {
-		this.next[this.chainTails[head]] = this.chainHeads[tail];
-		this.chainTails[head] = this.chainTails[tail];
+		this._next[this._chainTails[head]] = this._chainHeads[tail];
+		this._chainTails[head] = this._chainTails[tail];
 		this._removeChain(tail);
 	}
 
 	protected _removeChain(id: number): void {
-		if(id < this.chains) {
-			this.chainHeads[id] = this.chainHeads[this.chains];
-			this.chainTails[id] = this.chainTails[this.chains];
+		if(id < this._chains) {
+			this._chainHeads[id] = this._chainHeads[this._chains];
+			this._chainTails[id] = this._chainTails[this._chains];
 		}
-		this.chains--;
+		this._chains--;
 	}
 
 	protected _createChain(segment: ISegment): void {
-		const i = ++this.length;
-		this.points[i] = segment.$start;
-		this.points[i + 1] = segment.$end;
-		this.chainHeads[++this.chains] = i;
-		this.chainTails[this.chains] = i + 1;
-		this.next[i] = i + 1;
-		this.next[i + 1] = 0;
-		++this.length;
+		const i = ++this._length;
+		this._points[i] = segment.$start;
+		this._points[i + 1] = segment.$end;
+		this._chainHeads[++this._chains] = i;
+		this._chainTails[this._chains] = i + 1;
+		this._next[i] = i + 1;
+		this._next[i + 1] = 0;
+		++this._length;
 	}
 
 	protected _append(segment: ISegment, id: number): void {
-		const i = ++this.length;
-		this.points[i] = segment.$end;
-		this.next[this.chainTails[id]] = i;
-		this.chainTails[id] = i;
-		this.next[i] = 0;
+		const i = ++this._length;
+		this._points[i] = segment.$end;
+		this._next[this._chainTails[id]] = i;
+		this._chainTails[id] = i;
+		this._next[i] = 0;
 	}
 
 	protected _prepend(segment: ISegment, id: number): void {
-		const i = ++this.length;
-		this.points[i] = segment.$start;
-		this.next[i] = this.chainHeads[id];
-		this.chainHeads[id] = i;
+		const i = ++this._length;
+		this._points[i] = segment.$start;
+		this._next[i] = this._chainHeads[id];
+		this._chainHeads[id] = i;
 	}
 
 	protected _findChain(indices: number[], p: IPoint): number {
@@ -111,10 +111,10 @@ export class Chainer {
 		 * 這邊採用線性搜尋的方式檢查所有的 chain，這乍看非常沒效率，
 		 * 但實務上 chains 的大小頂多兩三個而已，所以不需要更進一步改進。
 		 */
-		for(let i = 1; i <= this.chains; i++) {
+		for(let i = 1; i <= this._chains; i++) {
 			// 這邊通常並不會共用 IPoint 的實體，所以要用座標檢查；
 			// 所幸的是這邊並不會需要使用 epsilon 檢查。
-			if(same(this.points[indices[i]], p)) return i;
+			if(same(this._points[indices[i]], p)) return i;
 		}
 		return 0;
 	}

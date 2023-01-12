@@ -6,9 +6,8 @@ import { useBackground } from "./background";
 import { useViewport } from "./viewport";
 import { ControlEventBoundary } from "./controlEventBoundary";
 import { PIXI, setupInspector } from "./inspector";
-import { Workspace } from "./workspace";
+import { ScrollView } from "./scrollView";
 import ProjectService from "client/services/projectService";
-import { ZoomController } from "client/controllers/zoomController";
 
 import type { Renderer, EventSystem } from "pixi.js";
 
@@ -47,6 +46,10 @@ export const ui = new Container();
 pixiApp.stage.addChild(designs, ui);
 pixiApp.stage.interactive = true;
 export const stage = pixiApp.stage;
+watch(viewport, vp => {
+	renderer.resize(vp.width, vp.height);
+	stage.hitArea = pixiApp.screen;
+});
 
 // 偵錯模式
 if(DEBUG_ENABLED) {
@@ -61,11 +64,7 @@ if(DEBUG_ENABLED) {
 }
 
 // 設置捲軸區域
-const workspace = new Workspace(el, viewport, (width, height) => {
-	renderer.resize(width, height);
-	stage.hitArea = pixiApp.screen;
-});
-ZoomController.$setup(canvas, workspace);
+export const scrollView = new ScrollView(el);
 
 // 根據專案的開啟與否自動開關 Pixi
 async function toggleDisplay(on: boolean): Promise<void> {

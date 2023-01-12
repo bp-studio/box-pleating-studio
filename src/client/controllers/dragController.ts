@@ -1,13 +1,11 @@
 import { shallowRef } from "vue";
 
-import Interaction from "client/services/interaction";
-
-import type { DirectionKey } from "shared/types/types";
+import { SelectionController } from "./selectionController";
 
 namespace DragController {
 	export const isDragging = shallowRef(false);
 
-	export function dragByKey(key: DirectionKey): void {
+	export function dragByKey(key: string): void {
 		let v: IPoint;
 		switch(key) {
 			case "up": v = { x: 0, y: 1 }; break;
@@ -17,7 +15,7 @@ namespace DragController {
 			default: return;
 		}
 
-		const selections = Interaction.draggables.value;
+		const selections = SelectionController.draggables.value;
 
 		for(const d of selections) {
 			d.$location.x += v.x;

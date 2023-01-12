@@ -38,7 +38,7 @@ export class ExChainer extends Chainer {
 
 	protected override _createChain(segment: ISegment): void {
 		super._createChain(segment);
-		this._temp[this.chains] = new Set();
-		this._temp[this.chains].add(segment.$polygon);
+		this._temp[this._chains] = new Set();
+		this._temp[this._chains].add(segment.$polygon);
 	}
 }
