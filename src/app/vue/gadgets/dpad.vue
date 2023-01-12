@@ -16,8 +16,7 @@
 	import { computed } from "vue";
 
 	import Core from "app/core";
-	import Studio from "app/services/studioService";
-	import { showPanel } from "../panel/panel.vue";
+	import Studio, { showPanel } from "app/services/studioService";
 	import KeyButton from "./keyButton.vue";
 
 	const show = computed(() => Core.shouldShowDPad && !showPanel.value);

@@ -2,7 +2,7 @@ import { Container, Graphics, Rectangle } from "pixi.js";
 import { computed, shallowReactive } from "vue";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
-import { ref, shallowRef } from "client/shared/decorators";
+import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { FULL_ZOOM, CHARCOAL, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
@@ -30,8 +30,13 @@ const LAYERS = Enum.values(Layer);
 //=================================================================
 export class Sheet extends View implements ISerializable<JSheet> {
 
-	/** 這個工作區域目前捲動的位置，單位是像素 */
-	@ref public $scroll: IPoint = { x: 0, y: 0 };
+	/**
+	 * 這個工作區域目前捲動的位置，單位是像素。
+	 *
+	 * 效能起見，我們將它宣告成 {@link shallowRef}，
+	 * 並且利用 {@link Readonly} 來強迫每次都要更換實體。
+	 */
+	@shallowRef public $scroll: Readonly<IPoint> = { x: 0, y: 0 };
 
 	@shallowRef public $zoom: number = FULL_ZOOM;
 

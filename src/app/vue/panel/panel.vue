@@ -1,7 +1,6 @@
 <template>
 	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.passive="hide"></div>
-	<aside class="scroll-shadow" :class="{ 'show': showPanel }" ref="panel"
-		 v-on:contextmenu.stop="onContextMenu($event)">
+	<aside class="scroll-shadow" :class="{ 'show': showPanel }" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
 		<template v-if="Studio.project">
 			<Design v-if="Studio.selections.length == 0" />
 			<div v-else-if="Studio.selections.length == 1">
@@ -17,7 +16,6 @@
 </template>
 
 <script lang="ts">
-	export const showPanel = shallowRef(false);
 	export function show(): void { showPanel.value = true; }
 	export function hide(): void { showPanel.value = false; }
 	export function toggle(): void { showPanel.value = !showPanel.value; }
@@ -29,10 +27,9 @@
 </script>
 
 <script setup lang="ts">
-
 	import { computed, shallowRef, watch } from "vue";
 
-	import Studio from "app/services/studioService";
+	import Studio, { showPanel } from "app/services/studioService";
 	import Repository from "./repository.vue";
 	import Vertex from "./vertex.vue";
 	import Edge from "./edge.vue";

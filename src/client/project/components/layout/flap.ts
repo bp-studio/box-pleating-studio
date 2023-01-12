@@ -8,6 +8,7 @@ import { drawContours, fillContours } from "client/screen/contourUtil";
 import { Direction } from "client/types/enum";
 import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
+import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
 
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
@@ -17,12 +18,7 @@ import type { Vertex } from "../tree/vertex";
 
 const SIZE = 3;
 const DOT_FACTOR = 0.75;
-const FILL_COLOR = 0x6699FF;
-const HINGE_WIDTH = 3;
-const HINGE_COLOR = 0x6699FF;
-const RIDGE_WIDTH = 1.25;
-const SHADE_ALPHA = 0.3;
-const SHADE_HOVER = 0.15;
+const DOT_FILL = 0x6699FF;
 
 //=================================================================
 /**
@@ -91,7 +87,7 @@ export class Flap extends Draggable {
 			d.scale.set(1 / s);
 			d.clear()
 				.lineStyle(1, app.isDark.value ? LIGHT : BLACK)
-				.beginFill(FILL_COLOR)
+				.beginFill(DOT_FILL)
 				.drawCircle(0, 0, size)
 				.endFill();
 		});

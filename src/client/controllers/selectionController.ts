@@ -4,6 +4,12 @@ import { Draggable } from "client/base/draggable";
 
 import type { Control } from "client/base/control";
 
+//=================================================================
+/**
+ * {@link SelectionController} 負責 {@link Control} 的選取邏輯。
+ */
+//=================================================================
+
 export namespace SelectionController {
 
 	/** @exports */

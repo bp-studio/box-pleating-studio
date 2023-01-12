@@ -2,6 +2,7 @@ import { computed, reactive, shallowReadonly, shallowRef } from "vue";
 
 import { defaultTitle } from "app/shared/constants";
 import Lib from "./libService";
+import dialogService from "./dialogService";
 
 import type { ComputedRef } from "vue";
 import type * as Client from "client/main";
@@ -37,6 +38,16 @@ namespace StudioService {
 
 	export async function init(): Promise<void> {
 		await Promise.all(bpLibs.map(l => Lib.loadScript(l)));
+
+		// 設置串接
+		bp.options.onLongPress = () => showPanel.value = true;
+		bp.options.onDrag = () => showPanel.value = false;
+		bp.options.onDeprecate = (title?: string) => {
+			const t = title || i18n.t("keyword.untitled");
+			const message = i18n.t("message.oldVersion", [t]);
+			dialogService.alert(message);
+		};
+
 		if(!errMgr.runErr) initialized.value = true;
 	}
 
@@ -57,5 +68,7 @@ namespace StudioService {
 		redo() { /* */ },
 	});
 }
+
+export const showPanel = shallowRef(false);
 
 export default shallowReadonly(reactive(StudioService));

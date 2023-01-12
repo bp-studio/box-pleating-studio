@@ -1,8 +1,8 @@
-import DragController from "./controllers/dragController";
-import ProjectController from "./controllers/projectController";
-import ProjectService from "./services/projectService";
-import { SelectionController } from "./controllers/selectionController";
 import "./services/interaction";
+import ProjectService from "./services/projectService";
+import { DragController } from "./controllers/dragController";
+import { ProjectController } from "./controllers/projectController";
+import { SelectionController } from "./controllers/selectionController";
 
 import type HistoryManager from "./project/changes/history";
 
@@ -12,6 +12,7 @@ export const selection = SelectionController;
 
 export { nextTick } from "./screen/display";
 
+export { options } from "./options";
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // 歷史操作

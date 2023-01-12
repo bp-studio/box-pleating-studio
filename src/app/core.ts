@@ -64,6 +64,7 @@ namespace Core {
 		}
 	}
 
+
 	export const shouldShowDPad = computed(() =>
 		isTouch && Settings.showDPad && StudioService.draggableSelected
 	);

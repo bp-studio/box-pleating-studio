@@ -9,11 +9,9 @@ export namespace KeyboardController {
 
 	let _states: Record<string, boolean> = {};
 
-	document.body.addEventListener("keydown", e => _set(e, true));
-	document.body.addEventListener("keyup", e => _set(e, false));
 	window.addEventListener("blur", () => _states = {});
 
-	function _set(e: KeyboardEvent, on: boolean): void {
+	export function $set(e: KeyboardEvent, on: boolean): void {
 		_states[e.code.toLowerCase()] = on;
 		_states[e.key.toLowerCase()] = on;
 	}

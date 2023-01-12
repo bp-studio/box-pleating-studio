@@ -2,7 +2,16 @@ import { shallowRef } from "vue";
 
 import { SelectionController } from "./selectionController";
 
-namespace DragController {
+import type { Draggable } from "client/base/draggable";
+
+//=================================================================
+/**
+ * {@link DragController} 負責管理 {@link Draggable} 的拖曳行為。
+ */
+//=================================================================
+
+export namespace DragController {
+
 	export const isDragging = shallowRef(false);
 
 	export function dragByKey(key: string): void {
@@ -23,5 +32,3 @@ namespace DragController {
 		}
 	}
 }
-
-export default DragController;

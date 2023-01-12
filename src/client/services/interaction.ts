@@ -1,21 +1,34 @@
+import { Point } from "pixi.js";
 
-import { stage, boundary, canvas, scrollView } from "client/screen/display";
 import ProjectService from "./projectService";
+import { stage, boundary, canvas } from "client/screen/display";
 import { SelectionController } from "client/controllers/selectionController";
 import { ScrollController } from "client/controllers/scrollController";
 import { CursorController } from "client/controllers/cursorController";
 import { KeyboardController } from "client/controllers/keyboardController";
-import { MouseButton } from "client/controllers/share";
+import { $getEventCenter, MouseButton } from "client/controllers/share";
 import { ZoomController } from "client/controllers/zoomController";
-import DragController from "client/controllers/dragController";
+import { DragController } from "client/controllers/dragController";
+import { LongPressController } from "client/controllers/longPressController";
 
-import type { FederatedPointerEvent } from "pixi.js";
+//=================================================================
+/**
+ * {@link Interaction} 是使用者事件的進入點。它負責較為宏觀的邏輯、
+ * 決定要把事件交給那一個控制器去處理，而細節則在各個控制器內部完成。
+ *
+ * 原則上使用者事件除非是控制器專門監聽的、否則都應該要在這邊進行監聽，
+ * 以便確保執行順序。
+ */
+//=================================================================
 
 export namespace Interaction {
 
-	canvas.addEventListener("touchstart", touchStart, { passive: true });
-	canvas.addEventListener("mousedown", mouseDown);
+	canvas.addEventListener("touchstart", pointerDown, { passive: true });
+	canvas.addEventListener("mousedown", pointerDown);
 	canvas.addEventListener("mouseup", mouseUp);
+	canvas.addEventListener("touchend", touchEnd);
+	canvas.addEventListener("wheel", wheel);
+
 	document.addEventListener("keydown", keyDown);
 	document.addEventListener("keyup", keyUp);
 
@@ -25,55 +38,57 @@ export namespace Interaction {
 		const local = sheet.$view.toLocal(e.global);
 		// console.log([Math.round(local.x), Math.round(local.y)]);
 	});
-	stage.on("touchstart", pointerDown);
-	stage.on("mousedown", pointerDown);
 
 	function keyDown(event: KeyboardEvent): void {
+		KeyboardController.$set(event, true);
 		if(document.activeElement != document.body) return;
-
-		if(event.key == " ") {
-			event.preventDefault();
-			if(scrollView.$isScrollable) canvas.style.cursor = "grab";
-			return;
-		}
-
+		if(ScrollController.$tryKeyStart(event)) return;
 		DragController.dragByKey(event.key);
 	}
 
-	function keyUp(): void {
-		if(document.activeElement != document.body) return;
-
-		// 空白鍵拖曳的情況，看滑鼠和鍵盤誰先放開而有不同的行為
-		canvas.style.cursor = ScrollController.$isScrolling() ? "move" : "unset";
+	function keyUp(event: KeyboardEvent): void {
+		KeyboardController.$set(event, false);
+		ScrollController.$keyUp();
 	}
 
 	function mouseUp(event: MouseEvent): void {
 		ScrollController.$tryEnd(event);
 	}
 
-	function mouseDown(event: MouseEvent | TouchEvent): void {
-		const el = document.activeElement;
-		if(el instanceof HTMLElement) el.blur();
-
-		// 執行捲動，支援空白鍵捲動、中鍵和右鍵捲動三種操作方法
-		const space = KeyboardController.$isPressed("space");
-		if(event instanceof MouseEvent) {
-			const bt = event.button;
-			if(space || bt == MouseButton.right || bt == MouseButton.middle) {
-				// this._longPress.$cancel();
-				event.preventDefault();
-				event.stopImmediatePropagation();
-				ScrollController.$init();
-				CursorController.$tryUpdate(event);
-			}
-		}
+	function touchEnd(event: TouchEvent): void {
+		LongPressController.$cancel();
 	}
 
-	function pointerDown(e: FederatedPointerEvent): void {
+	function pointerDown(event: MouseEvent | TouchEvent): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
 
-		const controls = boundary.$hitTestAll(sheet, e.global);
+		const el = document.activeElement;
+		if(el instanceof HTMLElement) el.blur();
+
+		if(event instanceof MouseEvent) {
+			const space = KeyboardController.$isPressed("space");
+			const bt = event.button;
+			// 執行捲動，支援空白鍵捲動、中鍵和右鍵捲動三種操作方法
+			if(space || bt == MouseButton.right || bt == MouseButton.middle) {
+				event.preventDefault();
+				initScroll(event);
+				return;
+			}
+		} else if(event.touches.length > 1) {
+			if(!ScrollController.$isScrolling()) {
+				LongPressController.$cancel();
+				SelectionController.$clear();
+				ZoomController.$init(event);
+				initScroll(event);
+			}
+			// 總而言之都中止後續處理
+			return;
+		} else {
+			LongPressController.$init();
+		}
+
+		const controls = boundary.$hitTestAll(sheet, toGlobal(event));
 
 		SelectionController.$clear();
 		if(controls.length > 0) {
@@ -82,13 +97,21 @@ export namespace Interaction {
 		}
 	}
 
-	function touchStart(event: TouchEvent): void {
-		if(event.touches.length > 1 && !ScrollController.$isScrolling() && ProjectService.project.value) {
-			SelectionController.$clear();
-			// this._longPress.$cancel();
-			ScrollController.$init();
-			ZoomController.$init(event);
-			CursorController.$tryUpdate(event);
+	function wheel(event: WheelEvent): void {
+		if(event.ctrlKey || event.metaKey) {
+			event.preventDefault();
+			ZoomController.$wheel(event);
 		}
+	}
+
+	function initScroll(event: MouseEvent | TouchEvent): void {
+		ScrollController.$init();
+		CursorController.$tryUpdate(event);
+	}
+
+	function toGlobal(event: MouseEvent | TouchEvent): Point {
+		const { x, y } = $getEventCenter(event);
+		const rect = canvas.getBoundingClientRect();
+		return new Point(x - rect.left, y - rect.y);
 	}
 }

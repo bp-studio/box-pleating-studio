@@ -79,7 +79,8 @@ export class ScrollView extends EventTarget {
 		if(x > w) x = w;
 		if(y > h) y = h;
 		this._lock = true;
-		this._el.scrollTo({ top: y, left: x, behavior: "auto" });
+		this._el.scrollLeft = x;
+		this._el.scrollTop = y;
 		return { x, y };
 	}
 }

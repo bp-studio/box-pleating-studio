@@ -11,7 +11,13 @@ declare let __worker: Worker | undefined;
 /** 統一的 worker 路徑，在 HTML 中宣告 */
 declare const __worker_src: string;
 
-namespace ProjectController {
+//=================================================================
+/**
+ * {@link ProjectController} 負責管理專案的生成以及對應的 Core worker。
+ */
+//=================================================================
+
+export namespace ProjectController {
 
 	const projectMap = new Map<number, Project>();
 
@@ -82,5 +88,3 @@ namespace ProjectController {
 		if(projectMap.size == 0) __worker = new Worker(__worker_src);
 	}
 }
-
-export default ProjectController;

@@ -1,13 +1,13 @@
-import { nextTick, watch } from "vue";
+import { nextTick, watch, watchEffect } from "vue";
 import { Application, Container } from "pixi.js";
 import { LINE_SCALE_MODE, settings, SmoothGraphics } from "@pixi/graphics-smooth";
 
+import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
 import { useViewport } from "./viewport";
 import { ControlEventBoundary } from "./controlEventBoundary";
 import { PIXI, setupInspector } from "./inspector";
 import { ScrollView } from "./scrollView";
-import ProjectService from "client/services/projectService";
 
 import type { Renderer, EventSystem } from "pixi.js";
 
@@ -46,8 +46,8 @@ export const ui = new Container();
 pixiApp.stage.addChild(designs, ui);
 pixiApp.stage.interactive = true;
 export const stage = pixiApp.stage;
-watch(viewport, vp => {
-	renderer.resize(vp.width, vp.height);
+watchEffect(() => {
+	renderer.resize(viewport.width, viewport.height);
 	stage.hitArea = pixiApp.screen;
 });
 

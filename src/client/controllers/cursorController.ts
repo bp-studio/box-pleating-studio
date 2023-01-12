@@ -1,5 +1,5 @@
 import { same } from "shared/types/geometry";
-import { getEventCenter } from "./share";
+import { $getEventCenter } from "./share";
 
 //=================================================================
 /**
@@ -14,7 +14,7 @@ export namespace CursorController {
 
 	/** 嘗試更新游標位置並且傳回是否真的有更動 */
 	export function $tryUpdate(data: MouseEvent | TouchEvent | IPoint): boolean {
-		if(data instanceof Event) data = getEventCenter(data);
+		if(data instanceof Event) data = $getEventCenter(data);
 		if(same(location, data)) return false;
 		location = data;
 		return true;
@@ -22,7 +22,7 @@ export namespace CursorController {
 
 	/** 傳回跟上次位置的差距、並且同時更新位置 */
 	export function $diff(event: MouseEvent | TouchEvent): IPoint {
-		const pt = getEventCenter(event);
+		const pt = $getEventCenter(event);
 		const diff = { x: pt.x - location.x, y: pt.y - location.y };
 		location = pt;
 		return diff;

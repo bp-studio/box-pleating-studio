@@ -1,22 +1,29 @@
 import ProjectService from "client/services/projectService";
 import { FULL_ZOOM } from "client/shared/constant";
 import { MARGIN } from "client/screen/constants";
-import { getEventCenter } from "./share";
+import { $getEventCenter } from "./share";
 import { canvas, scrollView } from "client/screen/display";
 
 const DELTA_SCALE = 10000;
 const STEP = 5;
 
+//=================================================================
+/**
+ * {@link ZoomController} 負責控制縮放，包括滑鼠滾輪縮放、二指觸控縮放、
+ * 以及單純輸入縮放數值。
+ */
+//=================================================================
+
 export namespace ZoomController {
 
-	let _touchScaling = [0, 0];
-
-	canvas.addEventListener("wheel", wheel);
+	let _lastTouchDistance = 0;
+	let _lastTouchZoom = 0;
 
 	export function $init(event: TouchEvent): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
-		_touchScaling = [_getTouchDistance(event), sheet.zoom];
+		_lastTouchDistance = _getTouchDistance(event);
+		_lastTouchZoom = sheet.zoom;
 	}
 
 	export function $process(event: TouchEvent): void {
@@ -24,12 +31,13 @@ export namespace ZoomController {
 		if(!sheet) return;
 
 		const touchDistance = _getTouchDistance(event);
-		const delta = touchDistance - _touchScaling[0];
+		const distDelta = touchDistance - _lastTouchDistance;
 		const dpi = window.devicePixelRatio ?? 1;
-		let newZoom = sheet.zoom * delta / dpi / FULL_ZOOM;
-		newZoom = Math.round(newZoom + _touchScaling[1]);
-		$zoom(newZoom, getEventCenter(event));
-		_touchScaling = [touchDistance, newZoom];
+		const zoomDelta = sheet.zoom * distDelta / dpi / FULL_ZOOM;
+		const newZoom = Math.round(zoomDelta + _lastTouchZoom);
+		$zoom(newZoom, $getEventCenter(event));
+		_lastTouchDistance = touchDistance;
+		_lastTouchZoom = newZoom;
 	}
 
 	export function $zoom(zoom: number, center?: IPoint): void {
@@ -55,24 +63,19 @@ export namespace ZoomController {
 		scrollView.$updateScrollbar();
 
 		// 根據座標逆算出捲動的位置，並完成捲動
-		const result = scrollView.$scrollTo(
+		sheet.$scroll = scrollView.$scrollTo(
 			point.x * newScale / oldScale + sheet.$horizontalMargin - center.x,
 			point.y * newScale / oldScale + MARGIN - center.y
 		);
-		sheet.$scroll.x = result.x;
-		sheet.$scroll.y = result.y;
 	}
 
-	function wheel(event: WheelEvent): void {
-		if(event.ctrlKey || event.metaKey) {
-			event.preventDefault();
-			const sheet = ProjectService.sheet.value;
-			if(!sheet) return;
-			$zoom(
-				sheet.zoom - Math.round(sheet.zoom * event.deltaY / DELTA_SCALE) * STEP,
-				{ x: event.offsetX, y: event.offsetY }
-			);
-		}
+	export function $wheel(event: WheelEvent): void {
+		const sheet = ProjectService.sheet.value;
+		if(!sheet) return;
+		$zoom(
+			sheet.zoom - Math.round(sheet.zoom * event.deltaY / DELTA_SCALE) * STEP,
+			{ x: event.offsetX, y: event.offsetY }
+		);
 	}
 
 	function _getTouchDistance(event: TouchEvent): number {

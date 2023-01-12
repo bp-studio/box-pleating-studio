@@ -10,10 +10,11 @@ import ProjectService from "client/services/projectService";
 import type { Contour } from "shared/types/geometry";
 import type { Sheet } from "../sheet";
 
-const HINGE_WIDTH = 3;
-const HINGE_COLOR = 0x6699FF;
-const SHADE_ALPHA = 0.3;
-const SHADE_HOVER = 0.15;
+export const HINGE_WIDTH = 2.5;
+export const HINGE_COLOR = 0x6699FF;
+export const SHADE_ALPHA = 0.3;
+export const SHADE_HOVER = 0.15;
+export const RIDGE_WIDTH = 1.25;
 
 //=================================================================
 /**
