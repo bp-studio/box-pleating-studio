@@ -4,7 +4,6 @@ import { LINE_SCALE_MODE, settings, SmoothGraphics } from "@pixi/graphics-smooth
 
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
-import { useViewport } from "./viewport";
 import { ControlEventBoundary } from "./controlEventBoundary";
 import { PIXI, setupInspector } from "./inspector";
 import { ScrollView } from "./scrollView";
@@ -12,7 +11,8 @@ import { ScrollView } from "./scrollView";
 import type { Renderer, EventSystem } from "pixi.js";
 
 const el = document.getElementById("divWorkspace")!;
-export const viewport = useViewport(el);
+export const scrollView = new ScrollView(el);
+export const viewport: Readonly<IDimension> = scrollView.$viewport;
 
 // 建構 pixi.js 應用程式
 const pixiApp = new Application({
@@ -62,9 +62,6 @@ if(DEBUG_ENABLED) {
 	PIXI.SmoothGraphics = SmoothGraphics;
 	setupInspector();
 }
-
-// 設置捲軸區域
-export const scrollView = new ScrollView(el);
 
 // 根據專案的開啟與否自動開關 Pixi
 async function toggleDisplay(on: boolean): Promise<void> {

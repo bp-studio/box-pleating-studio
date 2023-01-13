@@ -52,7 +52,7 @@ export namespace ZoomController {
 		// 求出縮放中心對應的座標
 		const oldScale = ProjectService.scale.value; // 舊值
 		const point = {
-			x: sheet.$scroll.x + center.x - sheet.$horizontalMargin,
+			x: sheet.$scroll.x + center.x - sheet.$horizontalMargin.value,
 			y: sheet.$scroll.y + center.y - MARGIN,
 		};
 
@@ -64,7 +64,7 @@ export namespace ZoomController {
 
 		// 根據座標逆算出捲動的位置，並完成捲動
 		sheet.$scroll = scrollView.$scrollTo(
-			point.x * newScale / oldScale + sheet.$horizontalMargin - center.x,
+			point.x * newScale / oldScale + sheet.$horizontalMargin.value - center.x,
 			point.y * newScale / oldScale + MARGIN - center.y
 		);
 	}

@@ -1,7 +1,9 @@
 import { computed } from "vue";
 
 import ProjectService from "client/services/projectService";
+import { useViewport } from "./viewport";
 
+import type { Viewport } from "./viewport";
 import type { ScrollController } from "client/controllers/scrollController";
 
 const imageDimension = computed<IDimension>(() => {
@@ -19,6 +21,7 @@ const imageDimension = computed<IDimension>(() => {
 
 export class ScrollView extends EventTarget {
 
+	public readonly $viewport: Viewport;
 	private readonly _el: HTMLElement;
 	private readonly _spaceHolder: HTMLDivElement = document.createElement("div");
 
@@ -28,6 +31,7 @@ export class ScrollView extends EventTarget {
 	constructor(el: HTMLElement) {
 		super();
 		this._el = el;
+		this.$viewport = useViewport(el);
 
 		el.appendChild(this._spaceHolder);
 		this._spaceHolder.style.zIndex = "-10"; // 修正 iPhone 6 的問題
@@ -54,6 +58,9 @@ export class ScrollView extends EventTarget {
 
 	/** 視情況更新捲軸的顯示與否 */
 	public $updateScrollbar(): void {
+		// 先更新一次 Viewport 大小，以便正確計算 image 的大小
+		this.$viewport.$update();
+
 		const image = imageDimension.value;
 		this._spaceHolder.style.width = image.width + "px";
 		this._spaceHolder.style.height = image.height + "px";
@@ -67,6 +74,9 @@ export class ScrollView extends EventTarget {
 		// 再檢測一次，以因應某一個捲軸因為另外一個捲軸而跑出來的情況
 		this._el.classList.toggle("scroll-x", scrollX || image.width > this._el.clientWidth + 1);
 		this._el.classList.toggle("scroll-y", scrollY || image.height > this._el.clientHeight + 1);
+
+		// 捲軸變動可能會導致 Viewport 改變，此時設置延遲然後重刷一次
+		setTimeout(this.$viewport.$update, 0);
 	}
 
 	/** 檢查指定的捲動座標並且完成捲動，然後傳回修正後的捲動座標 */

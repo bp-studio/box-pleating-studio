@@ -5,13 +5,15 @@ import ProjectService, { MIN_SCALE } from "client/services/projectService";
 import { Direction } from "client/types/enum";
 import { PIXI } from "./inspector";
 import { shallowRef } from "client/shared/decorators";
+import { MARGIN_FIX } from "./constants";
 
-import type { IDestroyOptions } from "pixi.js";
+import type { IDestroyOptions, Rectangle } from "pixi.js";
 import type { Sheet } from "client/project/components/sheet";
 
 const SQRT = 2 / Math.sqrt(MIN_SCALE);
-const EXTRA_FIX = 5; // 這是實驗得到的數字
+const EXTRA_FIX = 20; // 這是實驗得到的數字
 
+const TEXT_WIDTH_LIMIT = 50;
 const SMOOTHNESS = 2;
 const FONT_SIZE = 14;
 const HALF = 0.5;
@@ -27,6 +29,7 @@ export class Label extends Container {
 	private readonly _label: Text = new Text();
 	private readonly _glow: Text = new Text();
 	@shallowRef private _labelWidth: number = 0;
+	@shallowRef private _labelBounds!: Rectangle;
 	private _contentCache: string = "";
 	private _directionCache: Direction = Direction.none;
 
@@ -69,11 +72,15 @@ export class Label extends Container {
 
 		if(this._contentCache != text || this._directionCache != direction) {
 			this._contentCache = text;
-			let width = text == "" ? 0 : Math.ceil(this._label.width) / 2;
-			if(direction != Direction.L && direction != Direction.R) width /= 2;
+			let width = text == "" ? 0 : Math.ceil(this._label.width) / SMOOTHNESS;
+			if(direction == Direction.T || direction == Direction.B) width /= 2;
+			const bounds = this.getLocalBounds();
 
 			// 延遲設定以避免循環參照
-			setTimeout(() => this._labelWidth = width, 0);
+			setTimeout(() => {
+				this._labelWidth = width;
+				this._labelBounds = bounds;
+			}, 0);
 		}
 	}
 
@@ -86,22 +93,29 @@ export class Label extends Container {
 		this.scale = { x: 1 / s / SMOOTHNESS, y: -1 / s / SMOOTHNESS };
 		this.x = x;
 		this.y = y;
-		const fontSize = FONT_SIZE * Math.sqrt(ProjectService.shrink.value);
+		const factor = Math.sqrt(ProjectService.shrink.value);
+		this._label.scale.set(factor);
+		this._glow.scale.set(factor);
 
 		// 這邊 Label 本身是一個讓 _glow 和 _label 可以對齊中心的外部容器，
 		// 但是在定位的時候我們要的是對齊 _label 而不是較大的外框，
 		// 因此這邊我們需要計算修正的大小
 		const outerBounds = this.getLocalBounds();
 		const innerBounds = this._label.getLocalBounds();
-		const xFix = (outerBounds.width - innerBounds.width) / 2;
-		const yFix = (outerBounds.height - innerBounds.height) / 2;
+		const innerWidth = innerBounds.width * factor;
+		const xFix = (outerBounds.width - innerWidth) / 2;
+		const yFix = (outerBounds.height - innerBounds.height * factor) / 2;
 
 		// 決定位置
 		direction ??= this._sheet.grid.$getLabelDirection(x, y);
+		if(direction != Direction.T && innerWidth > TEXT_WIDTH_LIMIT) {
+			// 實在太長的文字不允許往兩邊擺放
+			direction = Direction.B;
+		}
 		const offset = directionalOffsets[direction];
 		this.pivot.set(
-			-(Math.sign(offset.x) * (innerBounds.width / 2 - xFix) + offset.x * this.$distance),
-			Math.sign(offset.y) * (fontSize * SMOOTHNESS - yFix) + offset.y * this.$distance
+			-(Math.sign(offset.x) * (innerWidth / 2 - xFix) + offset.x * this.$distance),
+			Math.sign(offset.y) * (FONT_SIZE * SMOOTHNESS - yFix) + offset.y * this.$distance
 		);
 
 		// 決定繪製的顏色
@@ -110,13 +124,13 @@ export class Label extends Container {
 		const stroke = dark ? DARK : WHITE;
 		this._label.style = {
 			fill,
-			fontSize: fontSize * SMOOTHNESS,
+			fontSize: FONT_SIZE * SMOOTHNESS,
 			stroke: fill,
 			strokeThickness: 1,
 		};
 		this._glow.style = {
 			fill: stroke,
-			fontSize: fontSize * SMOOTHNESS,
+			fontSize: FONT_SIZE * SMOOTHNESS,
 			stroke,
 			strokeThickness: 6,
 			lineJoin: "bevel",
@@ -125,10 +139,26 @@ export class Label extends Container {
 		return direction;
 	}
 
+	/** 一個標籤的橫向溢出大小 */
+	public get $overflow(): number {
+		if(!this._labelBounds || !this.visible) return 0;
+
+		let result = 0;
+		const sheetWidth = this._sheet.grid.$width;
+		const scale = ProjectService.scale.value;
+		const left = this.x * scale + (this._labelBounds.left - this.pivot.x) / SMOOTHNESS;
+		const right = (this.x - sheetWidth) * scale + (this._labelBounds.right - this.pivot.x) / SMOOTHNESS;
+
+		if(left < 0) result = -left;
+		if(right > 0) result = Math.max(result, right);
+
+		return Math.ceil(result) + MARGIN_FIX;
+	}
+
 	/** 透過解方程式來逆推考量到當前的標籤之下應該採用何種自動尺度 */
 	public $getHorizontalScale(sheetWidth: number, viewWidth: number, factor: number): number {
 		const labelWidth = this._labelWidth;
-		if(this._labelWidth == 0) return NaN;
+		if(labelWidth == 0) return NaN;
 		const vw = (viewWidth - EXTRA_FIX) * factor;
 		const size = Math.abs(2 * this.x - sheetWidth);
 		let result = Label._solveEq(-vw, labelWidth * SQRT, size);

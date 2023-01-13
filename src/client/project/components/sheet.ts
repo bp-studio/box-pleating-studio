@@ -143,10 +143,11 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return Math.min(horizontalScale, verticalScale);
 	}
 
-	public get $horizontalMargin(): number {
-		// TODO
-		return MARGIN;
-	}
+	public readonly $horizontalMargin = computed(() => {
+		const overflows = [...this.$labels].map(l => l.$overflow);
+		const result = Math.max(MARGIN, ...overflows);
+		return result;
+	});
 
 	/** 整個視圖像素化之後的尺寸 */
 	public readonly $imageDimension = computed<IDimension>(() => {
@@ -158,7 +159,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
 		);
 		return {
-			width: (width + x * 2) * s + MARGIN * 2,
+			width: (width + x * 2) * s + this.$horizontalMargin.value * 2,
 			height: (height + y * 2) * s + MARGIN * 2,
 		};
 	});
@@ -179,7 +180,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	/** 根據當前的捲動位置來調整容器的位置 */
 	private _positioning(): void {
 		const image = this.$imageDimension.value;
-		this.$view.x = Math.max((viewport.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
+		this.$view.x = Math.max((viewport.width - image.width) / 2, 0) - this.$scroll.x + this.$horizontalMargin.value;
 		this.$view.y = Math.max((viewport.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
