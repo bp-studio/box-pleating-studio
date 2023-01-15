@@ -64,7 +64,7 @@ export namespace ProjectController {
 		}, json);
 		const p = new Project(json, getOrCreateWorker());
 		projectMap.set(p.id, p);
-		return p.$initialized;
+		return p.$initialize();
 	}
 
 	/**
@@ -73,7 +73,7 @@ export namespace ProjectController {
 	export function open(json: Pseudo<JProject>): Promise<Project> {
 		const p = new Project(Migration.$process(json), getOrCreateWorker());
 		projectMap.set(p.id, p);
-		return p.$initialized;
+		return p.$initialize();
 	}
 
 	/**

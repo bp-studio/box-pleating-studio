@@ -11,7 +11,7 @@ import type { IDestroyOptions, Rectangle } from "pixi.js";
 import type { Sheet } from "client/project/components/sheet";
 
 const SQRT = 2 / Math.sqrt(MIN_SCALE);
-const EXTRA_FIX = 20; // 這是實驗得到的數字
+const EXTRA_FIX = 10; // 這是實驗得到的數字
 
 const TEXT_WIDTH_LIMIT = 50;
 const SMOOTHNESS = 2;
@@ -29,9 +29,11 @@ export class Label extends Container {
 	private readonly _label: Text = new Text();
 	private readonly _glow: Text = new Text();
 	@shallowRef private _labelWidth: number = 0;
-	@shallowRef private _labelBounds!: Rectangle;
+	@shallowRef private _labelBounds: Rectangle = null!;
+
 	private _contentCache: string = "";
 	private _directionCache: Direction = Direction.none;
+	@shallowRef private _xCache: number = 0;
 
 	public $color?: number;
 	public $distance: number = 1;
@@ -70,7 +72,7 @@ export class Label extends Container {
 		this.visible = Boolean(text);
 		if(this.visible) direction = this._draw(text, x, y, direction);
 
-		if(this._contentCache != text || this._directionCache != direction) {
+		if(this._contentCache != text || this._directionCache != direction || this._xCache != x) {
 			this._contentCache = text;
 			let width = text == "" ? 0 : Math.ceil(this._label.width) / SMOOTHNESS;
 			if(direction == Direction.T || direction == Direction.B) width /= 2;
@@ -80,6 +82,7 @@ export class Label extends Container {
 			setTimeout(() => {
 				this._labelWidth = width;
 				this._labelBounds = bounds;
+				this._xCache = x;
 			}, 0);
 		}
 	}
@@ -160,7 +163,7 @@ export class Label extends Container {
 		const labelWidth = this._labelWidth;
 		if(labelWidth == 0) return NaN;
 		const vw = (viewWidth - EXTRA_FIX) * factor;
-		const size = Math.abs(2 * this.x - sheetWidth);
+		const size = Math.abs(2 * this._xCache - sheetWidth);
 		let result = Label._solveEq(-vw, labelWidth * SQRT, size);
 		if(result > MIN_SCALE) {
 			if(size != 0) result = (vw - 2 * labelWidth) / size;

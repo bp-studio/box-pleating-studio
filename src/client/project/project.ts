@@ -28,21 +28,13 @@ export class Project extends Mountable {
 	public readonly design: Design;
 	public readonly history: HistoryManager;
 
-	/** 代表這個專案已經載入完成 */
-	public readonly $initialized: Promise<Project>;
-
 	private readonly _worker: Worker;
 	private _pendingDesign?: JDesign;
-	private _initResolver?: Consumer<Project>;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Project 剛建構出來的時候都是非活躍的，
 		// 稍後會在選取的時候才變成活躍（參見 ProjectService）
 		super(false);
-
-		this.$initialized = new Promise(resolve => {
-			this._initResolver = resolve;
-		});
 
 		this.id = nextId++;
 
@@ -53,12 +45,17 @@ export class Project extends Mountable {
 		this.$addChild(this.design);
 
 		this._worker = worker;
-		this._worker.onmessage = event => this._update(event.data);
-		this._callStudio("design", "init", jProject.design);
 
 		this.history = new HistoryManager();
 
 		this._onDispose(() => this._worker.terminate());
+	}
+
+	/** 初始化處理 */
+	public async $initialize(): Promise<Project> {
+		await this._callStudio("design", "init", this._pendingDesign!);
+		await Vue.nextTick();
+		return this;
 	}
 
 	public async toJSON(session: boolean = false): Promise<JProject> {
@@ -81,12 +78,18 @@ export class Project extends Mountable {
 	): Promise<Routes.ActionResult<C, A>> {
 		const request: Routes.IStudioRequest<C, A> = { controller, action, value: args };
 		const response = await app.callWorker<Routes.StudioResponse>(this._worker, request);
-		if("error" in response) throw new Error(response.error);
-		return response.value as Routes.ActionResult<C, A>;
+		if("error" in response) {
+			throw new Error(response.error);
+		} else if("update" in response) {
+			this._update(response.update);
+			return undefined as Routes.ActionResult<C, A>;
+		} else {
+			return response.value as Routes.ActionResult<C, A>;
+		}
 	}
 
 	private _update(model: UpdateModel): void {
-		if(DEBUG_ENABLED && this._initResolver) console.time("First render");
+		if(DEBUG_ENABLED) console.time("First render");
 
 		// TODO
 		if(this._pendingDesign) {
@@ -127,12 +130,8 @@ export class Project extends Mountable {
 			delete this._pendingDesign;
 		}
 
-		if(this._initResolver) {
-			Vue.nextTick().then(() => {
-				if(DEBUG_ENABLED) console.timeEnd("First render");
-				this._initResolver!(this);
-				delete this._initResolver;
-			});
+		if(DEBUG_ENABLED) {
+			Vue.nextTick(() => console.timeEnd("First render"));
 		}
 	}
 }

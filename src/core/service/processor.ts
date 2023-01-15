@@ -4,23 +4,7 @@ import type { UpdateModel } from "./updateModel";
 
 namespace Processor {
 
-	let currentProcess: Action | null;
-
 	let updateResult: UpdateModel;
-
-	export function registerTask(action: Action): void {
-		currentProcess = action;
-	}
-
-	// eslint-disable-next-line require-await
-	export async function $runTask(): Promise<UpdateModel | null> {
-		if(!currentProcess) return null;
-
-		resetUpdateResult();
-		currentProcess();
-		currentProcess = null;
-		return updateResult;
-	}
 
 	export function $addEdge(edge: JEdge): void {
 		updateResult.add.edges.push(edge);
@@ -34,7 +18,7 @@ namespace Processor {
 		updateResult.graphics[tag] = { contours };
 	}
 
-	function resetUpdateResult(): void {
+	export function $reset(): void {
 		updateResult = {
 			add: {
 				edges: [],
@@ -46,6 +30,10 @@ namespace Processor {
 			},
 			graphics: {},
 		};
+	}
+
+	export function $getResult(): UpdateModel {
+		return updateResult;
 	}
 }
 
