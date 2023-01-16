@@ -30,7 +30,7 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 
 	public $insert(key: K, value: V): Node<K, V> {
 		this._root = this._insert(this._root, key, value);
-		return this._tempNode;
+		return this._lastQueriedNode = this._tempNode;
 	}
 
 	public $delete(key: K): void {
@@ -80,16 +80,21 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 			} else if(compare < 0) {
 				n.$right = this._delete(n.$right, key);
 				return this._balance(n);
-			} else if(n.$left === this._nil) {
-				return n.$right;
-			} else if(n.$right === this._nil) {
-				return n.$left;
 			} else {
-				const newRight = this._pop(n.$right);
-				const pop = this._tempNode;
-				pop.$left = n.$left;
-				pop.$right = newRight;
-				return this._balance(pop);
+				if(this._lastQueriedNode === n) {
+					this._lastQueriedNode = this._nil; // 小心
+				}
+				if(n.$left === this._nil) {
+					return n.$right;
+				} else if(n.$right === this._nil) {
+					return n.$left;
+				} else {
+					const newRight = this._pop(n.$right);
+					const pop = this._tempNode;
+					pop.$left = n.$left;
+					pop.$right = newRight;
+					return this._balance(pop);
+				}
 			}
 		}
 	}

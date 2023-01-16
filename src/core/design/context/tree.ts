@@ -212,6 +212,7 @@ export class Tree implements ITree {
 			this._root = newRoot;
 			newRoot = this._root.$balance();
 		}
+		this._root.$setAsRoot();
 	}
 
 	/** 取得下一個可用的節點 id */

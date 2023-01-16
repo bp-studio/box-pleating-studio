@@ -93,9 +93,9 @@ export abstract class PolyBool {
 
 	/** 處理一個起點事件 */
 	private _processStart(event: StartEvent): void {
-		const node = this._status.$insert(event, event);
-		const prev = this._status.$getPrevNode(node).$value;
-		const next = this._status.$getNextNode(node).$value;
+		this._status.$insert(event, event);
+		const prev = this._status.$getPrev(event);
+		const next = this._status.$getNext(event);
 		const inserted = this._intersector.$process(prev, event, next);
 
 		// 只有當沒有事件被插入的時候才能處理內部旗標
@@ -109,8 +109,7 @@ export abstract class PolyBool {
 
 	/** 再次處理曾經處理過的起點事件 */
 	private _processRevisit(event: StartEvent): void {
-		const node = this._status.$getNode(event);
-		const prev = this._status.$getPrevNode(node).$value;
+		const prev = this._status.$getPrev(event);
 		this._setInsideFlag(event, prev);
 	}
 

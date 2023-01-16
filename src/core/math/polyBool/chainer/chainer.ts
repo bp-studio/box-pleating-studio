@@ -25,11 +25,14 @@ export class Chainer {
 	protected _chains: number = 0;
 
 	public $chain(segments: ISegment[]): Polygon {
+		// Chainer 的實體會被重複使用，所以要進行歸零
 		const size = segments.length + 1;
 		this._chainHeads = Array.from({ length: INITIAL_CHAIN_SIZE });
 		this._chainTails = Array.from({ length: INITIAL_CHAIN_SIZE });
 		this._points = Array.from({ length: size });
 		this._next = Array.from({ length: size });
+		this._chains = 0; // 理論上這個不用歸零，但安全起見還是照做
+		this._length = 0;
 
 		const result: Polygon = [];
 		for(const segment of segments) {
@@ -53,6 +56,8 @@ export class Chainer {
 				this._createChain(segment);
 			}
 		}
+
+		if(DEBUG_ENABLED && this._chains > 0) debugger; // 理論上不應該發生
 		return result;
 	}
 

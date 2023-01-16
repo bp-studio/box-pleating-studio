@@ -7,13 +7,23 @@ export interface Node<K, V> {
 	$right: this;
 }
 
-export interface IBinarySearchTree<K, V = K, N extends Node<K, V> = Node<K, V>> {
-	$insert(key: K, value: V): N;
+export interface IBinarySearchTree<K, V = K> {
+	/** 插入指定的鍵值 */
+	$insert(key: K, value: V): void;
+
+	/** 刪除特定鍵以及對應的值 */
 	$delete(key: K): void;
+
+	/** 取得特定鍵對應的值 */
 	$get(key: K): V | undefined;
-	$getNode(key: K): N;
-	$getPrevNode(node: N): N;
-	$getNextNode(node: N): N;
+
+	/** 取得特定鍵之前的上一個值 */
+	$getPrev(key: K): V | undefined;
+
+	/** 取得特定鍵之後的下一個值 */
+	$getNext(key: K): V | undefined;
+
+	/** 這個二元樹是否為空 */
 	readonly $isEmpty: boolean;
 }
 
@@ -27,46 +37,46 @@ export interface IBinarySearchTree<K, V = K, N extends Node<K, V> = Node<K, V>> 
  */
 //=================================================================
 
-export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IBinarySearchTree<K, V, N> {
+export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IBinarySearchTree<K, V> {
 
+	/** NIL 節點的實體 */
 	protected readonly _nil: N;
-	protected _root: N;
+
+	/** 鍵的全序比較器 */
 	protected readonly _comparator: Comparator<K>;
+
+	/** 根節點 */
+	protected _root: N;
+
+	/**
+	 * 快取最後一次被查找的節點。
+	 * 這個機制可以簡化 prev/next 的 API、加速刪除的效能、並改進封裝。
+	 *
+	 * 實作的時候必須要小心處理 {@link $delete} 以及 {@link _replaceKeyValue} 的情況，
+	 * 這個機制才會正確運作。
+	 */
+	protected _lastQueriedNode: N;
 
 	constructor(comparator: Comparator<K>, nil: N) {
 		this._comparator = comparator;
-		this._root = this._nil = nil;
+		this._root = this._lastQueriedNode = this._nil = nil;
 	}
 
-	public abstract $insert(key: K, value: V): N;
+	public abstract $insert(key: K, value: V): void;
 
 	public abstract $delete(key: K): void;
 
 	public $get(key: K): V | undefined {
-		return this.$getNode(key)?.$value;
-	}
-
-	public $getNode(key: K): N {
-		let n = this._root;
-		while(n !== this._nil) {
-			const compare = this._comparator(n.$key, key);
-			if(compare === 0) {
-				return n;
-			} else if(compare < 0) {
-				n = n.$right;
-			} else {
-				n = n.$left;
-			}
-		}
-		return this._nil;
+		return this._getNode(key)?.$value;
 	}
 
 	public get $isEmpty(): boolean {
 		return this._root === this._nil;
 	}
 
-	public $getPrevNode(node: N): N {
-		if(node.$left !== this._nil) return this._max(node.$left);
+	public $getPrev(key: K): V | undefined {
+		const node = this._getNode(key);
+		if(node.$left !== this._nil) return this._max(node.$left).$value;
 		let cursor = this._root;
 		let result: N = this._nil;
 		while(cursor !== this._nil) {
@@ -77,11 +87,12 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 				cursor = cursor.$left;
 			}
 		}
-		return result;
+		return result.$value;
 	}
 
-	public $getNextNode(node: N): N {
-		if(node.$right !== this._nil) return this._min(node.$right);
+	public $getNext(key: K): V | undefined {
+		const node = this._getNode(key);
+		if(node.$right !== this._nil) return this._min(node.$right).$value;
 		let cursor = this._root;
 		let result: N = this._nil;
 		while(cursor !== this._nil) {
@@ -92,12 +103,33 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 				cursor = cursor.$right;
 			}
 		}
-		return result;
+		return result.$value;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 保護方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected _getNode(key: K): N {
+		// 可以的話就直接傳回快取節點
+		if(this._lastQueriedNode.$key === key) return this._lastQueriedNode;
+		return this._lastQueriedNode = this._getNodeCore(key);
+	}
+
+	protected _getNodeCore(key: K): N {
+		let n = this._root;
+		while(n !== this._nil) {
+			const compare = this._comparator(n.$key, key);
+			if(compare === 0) {
+				break;
+			} else if(compare < 0) {
+				n = n.$right;
+			} else {
+				n = n.$left;
+			}
+		}
+		return n;
+	}
 
 	/**
 	 * 二元樹的右旋轉：
@@ -139,5 +171,13 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	protected _max(n: N): N {
 		while(n.$right !== this._nil) n = n.$right;
 		return n;
+	}
+
+	/** 把一個節點的鍵值替換成另一個節點的鍵值，並傳回後者 */
+	protected _replaceKeyValue(n: N, by: N): N {
+		n.$value = by.$value;
+		(n as Writeable<Node<K, V>>).$key = by.$key;
+		if(this._lastQueriedNode === by) this._lastQueriedNode = n; // 這邊要小心！
+		return by;
 	}
 }

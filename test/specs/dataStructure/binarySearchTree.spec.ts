@@ -82,9 +82,8 @@ function testAdjacency(tree: IBinarySearchTree<number>): void {
 	for(let i = 0; i < 20; i++) {
 		const index = random(sorted.length);
 		const el = sorted[index];
-		const node = tree.$getNode(el);
-		const prev = tree.$getPrevNode(node).$key;
-		const next = tree.$getNextNode(node).$key;
+		const prev = tree.$getPrev(el);
+		const next = tree.$getNext(el);
 		expect(prev).to.equal(sorted[index - 1]);
 		expect(next).to.equal(sorted[index + 1]);
 	}

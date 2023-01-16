@@ -28,7 +28,7 @@ export class TreeNode implements ITreeNode {
 	private _firstChild?: TreeNode;
 
 	/** 節點往下的分支高度（葉點為 0） */
-	private _branchHeight: number = 0;
+	private _height: number = 0;
 
 	/** 節點的深度（根點為 0） */
 	private _depth: number = 0;
@@ -88,11 +88,11 @@ export class TreeNode implements ITreeNode {
 		if(this.$parent) return null;
 		const first = this._firstChild;
 		if(!first) return null;
-		const height = first._next ? first._next._branchHeight + 1 : 0;
-		if(first._branchHeight <= height) return null;
+		const height = first._next ? first._next._height + 1 : 0;
+		if(first._height <= height) return null;
 
 		// 進行平衡
-		this._branchHeight = height;
+		this._height = height;
 		first.$cut();
 		if(this._length == 0) {
 			// 首次成為子點的話必須進行這個設定
@@ -101,9 +101,13 @@ export class TreeNode implements ITreeNode {
 		this._length = first._length;
 		this.$pasteTo(first);
 		first._length = 0;
-		first._updateDepthRecursive(0);
-		first._updateDistRecursive(0);
 		return first;
+	}
+
+	/** 當自身成為新的根點的時候完整刷新整個樹的 depth 與 dist 值 */
+	public $setAsRoot(): void {
+		this._updateDepthRecursive(0);
+		this._updateDistRecursive(0);
 	}
 
 	public $pasteTo(parent: TreeNode): void {
@@ -120,7 +124,7 @@ export class TreeNode implements ITreeNode {
 	 */
 	public $cut(): void {
 		this._unlink();
-		if(this.$parent?._AABB.$removeChild(this._AABB)) {
+		if(this.$parent && this.$parent._AABB.$removeChild(this._AABB)) {
 			this.$parent._updateAABBRecursive();
 		}
 		this.$parent = undefined;
@@ -129,7 +133,7 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public get $branchHeight(): number {
-		return this._branchHeight;
+		return this._height;
 	}
 
 	/** 設定或讀取這個節點往上的邊之長度 */
@@ -174,7 +178,12 @@ export class TreeNode implements ITreeNode {
 		else return `re${pid},${this.id}`;
 	}
 
-	/** 列出所有與自身有所重疊的角片（只會跟樹狀結構中往後的進行比對） */
+	/**
+	 * 列出所有與自身有所重疊的角片（只會跟樹狀結構中右側的進行比對）。
+	 *
+	 * 理論上如果改成「只跟樹狀結構左側的比較」在我們這邊的子點順序設計之下應該會減少比較次數，
+	 * 但是那種比較方式的實作會比較複雜，而且這邊遠遠不是效能瓶頸所在，所以先不考慮這個優化。
+	 */
 	public $findOverlapping(tree: Tree): TreeNode[] {
 		const result: TreeNode[] = [];
 		let cursor: TreeNode | undefined = this;
@@ -190,31 +199,31 @@ export class TreeNode implements ITreeNode {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _increaseBranchHeightRecursive(proposedHeight: number): void {
-		if(this._branchHeight < proposedHeight) {
-			this._branchHeight = proposedHeight;
-			if(this._prev && this._prev._branchHeight < this._branchHeight) {
+		if(this._height < proposedHeight) {
+			this._height = proposedHeight;
+			if(this._prev && this._prev._height < this._height) {
 				this._unlink();
 				this._backwardInsert(this._prev, this._next);
 			}
-			this.$parent?._increaseBranchHeightRecursive(proposedHeight + 1);
+			if(this.$parent) this.$parent._increaseBranchHeightRecursive(proposedHeight + 1);
 		}
 	}
 
 	private _decreaseBranchHeightRecursive(deprecatedHeight: number): void {
-		if(this._branchHeight == deprecatedHeight) {
-			const newHeight = this._firstChild ? this._firstChild._branchHeight + 1 : 0;
-			if(newHeight == this._branchHeight) return;
-			if(this._next && this._next._branchHeight > this._branchHeight) {
+		if(this._height == deprecatedHeight) {
+			const newHeight = this._firstChild ? this._firstChild._height + 1 : 0;
+			if(newHeight == this._height) return;
+			if(this._next && this._next._height > this._height) {
 				this._unlink();
 				this._forwardInsert(this._prev, this._next);
 			}
-			this.$parent?._decreaseBranchHeightRecursive(newHeight + 1);
+			if(this.$parent) this.$parent._decreaseBranchHeightRecursive(newHeight + 1);
 		}
 	}
 
 	/** 往後尋找適合的插入點並插入 */
 	private _forwardInsert(prev?: TreeNode, next?: TreeNode): void {
-		while(next && next._branchHeight > this._branchHeight) {
+		while(next && next._height > this._height) {
 			prev = next;
 			next = next._next;
 		}
@@ -223,7 +232,7 @@ export class TreeNode implements ITreeNode {
 
 	/** 往前尋找適合的插入點並插入 */
 	private _backwardInsert(prev?: TreeNode, next?: TreeNode): void {
-		while(prev && prev._branchHeight < this._branchHeight) {
+		while(prev && prev._height < this._height) {
 			next = prev;
 			prev = prev._prev;
 		}
@@ -247,21 +256,23 @@ export class TreeNode implements ITreeNode {
 
 	/** 更新自身的深度，並且遞迴地更新自己所有的子點 */
 	private _updateDepthRecursive(v: number): void {
-		if(this._depth == v) return;
 		this._depth = v++;
-		for(const child of this.$getChildren()) child._updateDepthRecursive(v);
+		for(const child of this.$getChildren()) {
+			child._updateDepthRecursive(v);
+		}
 	}
 
 	/** 更新自身的距離，並且遞迴地更新自己所有的子點 */
 	private _updateDistRecursive(v: number): void {
-		if(this._dist == v) return;
 		this._dist = v;
-		for(const child of this.$getChildren()) child._updateDistRecursive(v + child._length);
+		for(const child of this.$getChildren()) {
+			child._updateDistRecursive(v + child._length);
+		}
 	}
 
 	/** 遞迴地更新父點的 AABB */
 	private _updateAABBRecursive(): void {
-		if(this.$parent?._AABB.$updateChild(this._AABB)) {
+		if(this.$parent && this.$parent._AABB.$updateChild(this._AABB)) {
 			this.$parent._updateAABBRecursive();
 		}
 	}

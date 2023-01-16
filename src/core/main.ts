@@ -23,6 +23,7 @@ onmessage = async function(event: MessageEvent): Promise<void> {
 		if(result) response = { value: result };
 		else response = { update: Processor.$getResult() };
 	} catch(e: unknown) {
+		debugger;
 		response = { error: e instanceof Error ? e.message : "unknown error" };
 	}
 

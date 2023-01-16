@@ -35,7 +35,7 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 			compare = this._comparator(n.$key, key);
 			if(compare === 0) {
 				n.$value = value;
-				return n;
+				return this._lastQueriedNode = n;
 			} else if(compare < 0) {
 				n = n.$right;
 			} else {
@@ -60,28 +60,22 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		}
 
 		this._fixInsert(newNode);
-		return newNode;
+		return this._lastQueriedNode = newNode;
 	}
 
 	public $delete(key: K): void {
 		let n = this._root;
-		while(n !== this._nil) {
-			const compare = this._comparator(n.$key, key);
-			if(compare === 0) {
-				break;
-			} else if(compare < 0) {
-				n = n.$right;
-			} else {
-				n = n.$left;
-			}
+		if(this._lastQueriedNode.$key === key) {
+			n = this._lastQueriedNode;
+			this._lastQueriedNode = this._nil;
+		} else {
+			n = this._getNodeCore(key);
+			if(n === this._nil) return;
 		}
-		if(n === this._nil) return;
 
 		if(n.$left !== this._nil && n.$right !== this._nil) {
 			const next = this._min(n.$right);
-			n.$value = next.$value;
-			(n as Writeable<Node<K, V>>).$key = next.$key;
-			n = next;
+			n = this._replaceKeyValue(n, next);
 		}
 		const moveUp = n.$left === this._nil ? n.$right : n.$left;
 		this._replaceChild(n.$parent, n, moveUp);
