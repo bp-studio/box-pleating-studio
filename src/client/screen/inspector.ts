@@ -1,23 +1,32 @@
-import * as _PIXI from "pixi.js";
+import { Renderer } from "@pixi/core";
+
+import * as _PIXI from "./pixi";
 
 export const PIXI = _PIXI as Record<string, unknown>;
+
+declare global {
+	interface Window {
+		PIXI: typeof _PIXI;
+		__PIXI_INSPECTOR_GLOBAL_HOOK__: {
+			register(options: unknown): void;
+		};
+	}
+}
 
 /**
  * 這個函數在偵錯環境之中向 PIXI 檢閱工具進行註冊。
  */
 export function setupInspector(): void {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const win = window as any;
-	if(!win.__PIXI_INSPECTOR_GLOBAL_HOOK__) return;
+	if(!window.__PIXI_INSPECTOR_GLOBAL_HOOK__) return;
 
 	// A hack for dealing with the "redundant root node issue"
 	// See https://github.com/bfanger/pixi-inspector/issues/92
-	const renderMethod = _PIXI.Renderer.prototype.render;
+	const renderMethod = Renderer.prototype.render;
 	let _render = renderMethod;
-	Object.defineProperty(_PIXI.Renderer.prototype, "render", {
+	Object.defineProperty(Renderer.prototype, "render", {
 		get() { return _render; },
 		set(v) {
-			_render = function(this: unknown, object, options) {
+			_render = function(this: Renderer, object, options) {
 				if(object.parent) renderMethod.call(this, object, options);
 				else v.call(this, object, options);
 			};
@@ -25,6 +34,6 @@ export function setupInspector(): void {
 	});
 
 	// Register inspector
-	win.PIXI = PIXI;
-	win.__PIXI_INSPECTOR_GLOBAL_HOOK__.register({ PIXI });
+	window.PIXI = _PIXI;
+	window.__PIXI_INSPECTOR_GLOBAL_HOOK__.register({ PIXI });
 }

@@ -1,4 +1,4 @@
-import { Circle } from "pixi.js";
+import { Circle } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Layer } from "client/types/layers";

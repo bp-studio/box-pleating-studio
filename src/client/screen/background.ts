@@ -1,9 +1,9 @@
 import { watch } from "vue";
-import { Renderer } from "pixi.js";
+import { Renderer } from "@pixi/core";
 
 import { DARK, WHITE } from "client/shared/constant";
 
-import type { Application } from "pixi.js";
+import type { Application } from "@pixi/app";
 
 function setBackgroundColor(pixiApp: Application, dark: boolean): void {
 	if(pixiApp.renderer instanceof Renderer) {

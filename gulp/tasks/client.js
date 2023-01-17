@@ -70,7 +70,6 @@ gulp.task("clientDist", () =>
 			ecma: 2018,
 			compress: {
 				drop_debugger: false,
-				drop_console: false,
 				global_defs: {
 					DEBUG_ENABLED: false,
 					TEST_MODE: false,

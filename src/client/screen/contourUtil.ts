@@ -1,5 +1,5 @@
+import type { Graphics } from "@pixi/graphics";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
-import type { Graphics } from "pixi.js";
 import type { Contour, Path, Polygon } from "shared/types/geometry";
 
 export type GraphicsLike = Graphics | SmoothGraphics;

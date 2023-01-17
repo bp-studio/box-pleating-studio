@@ -1,5 +1,6 @@
 import { nextTick, watch, watchEffect } from "vue";
-import { Application, Container } from "pixi.js";
+import { Application } from "@pixi/app";
+import { Container } from "@pixi/display";
 import { LINE_SCALE_MODE, settings, SmoothGraphics } from "@pixi/graphics-smooth";
 
 import ProjectService from "client/services/projectService";
@@ -8,7 +9,8 @@ import { ControlEventBoundary } from "./controlEventBoundary";
 import { PIXI, setupInspector } from "./inspector";
 import { ScrollView } from "./scrollView";
 
-import type { Renderer, EventSystem } from "pixi.js";
+import type { Renderer } from "@pixi/core";
+import type { EventSystem } from "@pixi/events";
 
 const el = document.getElementById("divWorkspace")!;
 export const scrollView = new ScrollView(el);

@@ -1,5 +1,5 @@
 import { SmoothGraphics } from "@pixi/graphics-smooth";
-import { Graphics } from "pixi.js";
+import { Graphics } from "@pixi/graphics";
 
 import { Layer } from "client/types/layers";
 import { shallowRef } from "client/shared/decorators";

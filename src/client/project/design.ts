@@ -1,4 +1,4 @@
-import { Container } from "pixi.js";
+import { Container } from "@pixi/display";
 
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";

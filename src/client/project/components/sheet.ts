@@ -1,4 +1,6 @@
-import { Container, Graphics, Rectangle } from "pixi.js";
+import { Container } from "@pixi/display";
+import { Graphics } from "@pixi/graphics";
+import { Rectangle } from "@pixi/math";
 import { computed, shallowReactive } from "vue";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 

@@ -1,4 +1,4 @@
-import { Polygon } from "pixi.js";
+import { Polygon } from "@pixi/math";
 import { computed } from "vue";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 

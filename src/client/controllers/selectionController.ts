@@ -1,5 +1,5 @@
 import { computed, shallowReactive } from "vue";
-import { Point } from "pixi.js";
+import { Point } from "@pixi/math";
 
 import { Draggable } from "client/base/draggable";
 import { $getEventCenter } from "./share";

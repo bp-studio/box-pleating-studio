@@ -1,7 +1,8 @@
 import { shallowRef } from "client/shared/decorators";
 import { View } from "./view";
 
-import type { Container, DisplayObject, IHitArea } from "pixi.js";
+import type { Container, DisplayObject } from "@pixi/display";
+import type { IHitArea } from "@pixi/events";
 
 //=================================================================
 /**

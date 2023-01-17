@@ -1,4 +1,5 @@
-import { Container, Text } from "pixi.js";
+import { Container } from "@pixi/display";
+import { Text } from "@pixi/text";
 
 import { BLACK, DARK, LIGHT, WHITE } from "client/shared/constant";
 import ProjectService, { MIN_SCALE } from "client/services/projectService";
@@ -7,7 +8,8 @@ import { PIXI } from "./inspector";
 import { shallowRef } from "client/shared/decorators";
 import { MARGIN_FIX } from "./constants";
 
-import type { IDestroyOptions, Rectangle } from "pixi.js";
+import type { IDestroyOptions } from "@pixi/display";
+import type { Rectangle } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
 
 const SQRT = 2 / Math.sqrt(MIN_SCALE);

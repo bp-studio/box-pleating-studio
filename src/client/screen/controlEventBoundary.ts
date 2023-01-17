@@ -1,8 +1,9 @@
-import { EventBoundary } from "pixi.js";
+import { EventBoundary } from "@pixi/events";
 
 import { Control } from "client/base/control";
 
-import type { DisplayObject, Point } from "pixi.js";
+import type { DisplayObject } from "@pixi/display";
+import type { Point } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
 
 //=================================================================
