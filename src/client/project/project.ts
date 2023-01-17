@@ -7,6 +7,7 @@ import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
 import { Flap } from "./components/layout/flap";
 import { River } from "./components/layout/river";
+import { shallowRef } from "client/shared/decorators";
 
 import type * as Routes from "core/routes";
 import type { JDesign, JProject, JTree } from "shared/json";
@@ -30,6 +31,8 @@ export class Project extends Mountable {
 
 	private readonly _worker: Worker;
 	private _pendingDesign?: JDesign;
+
+	@shallowRef public $isDragging: boolean = false;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Project 剛建構出來的時候都是非活躍的，

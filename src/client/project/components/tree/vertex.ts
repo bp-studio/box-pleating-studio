@@ -8,6 +8,7 @@ import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
 import { Draggable } from "client/base/draggable";
 
+import type { Control } from "client/base/control";
 import type { JVertex } from "shared/json";
 import type { Sheet } from "../sheet";
 
@@ -49,6 +50,10 @@ export class Vertex extends Draggable {
 		this.$reactDraw(this._draw, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._dot.name = "Vertex";
+	}
+
+	public override $selectableWith(c: Control): boolean {
+		return c instanceof Vertex;
 	}
 
 	private _draw(): void {

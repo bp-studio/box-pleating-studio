@@ -13,6 +13,13 @@ export function $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
 	}
 }
 
+export function $round(p: IPoint): IPoint {
+	return {
+		x: Math.round(p.x),
+		y: Math.round(p.y),
+	};
+}
+
 /** 檢查一個事件是否為觸控事件 */
 export function $isTouch(event: Event): event is TouchEvent {
 	return TOUCH_SUPPORT && event instanceof TouchEvent;

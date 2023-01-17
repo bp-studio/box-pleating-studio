@@ -1,8 +1,10 @@
+
 import { Project } from "client/project/project";
 import { Migration } from "client/patches";
 import { deepAssign } from "client/utils/deepAssign";
 import ProjectService from "client/services/projectService";
 
+import type { ShallowRef } from "vue";
 import type { JProject } from "shared/json";
 
 /** 預先產生的待命 worker 實體，在 HTML 中宣告 */
@@ -10,6 +12,14 @@ declare let __worker: Worker | undefined;
 
 /** 統一的 worker 路徑，在 HTML 中宣告 */
 declare const __worker_src: string;
+
+export interface IProjectController {
+	readonly current: ShallowRef<Project | null>;
+	get(id: number): Project | undefined;
+	create(json: RecursivePartial<JProject>): Promise<Project>;
+	open(json: Pseudo<JProject>): Promise<Project>;
+	close(proj: Project): void;
+}
 
 //=================================================================
 /**

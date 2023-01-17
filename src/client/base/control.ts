@@ -27,6 +27,9 @@ export abstract class Control extends View {
 	@shallowRef public $selected: boolean = false;
 	@shallowRef private _hovered: boolean = false;
 
+	/** 是否可以跟另外一個物件一起被多重選取 */
+	public $selectableWith(c: Control): boolean { return false; }
+
 	protected $setupHit(object: Container, hitArea?: IHitArea): void {
 		Control._hitMap.set(object, this);
 		object.interactive = true;

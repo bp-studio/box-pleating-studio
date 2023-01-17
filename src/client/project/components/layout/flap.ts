@@ -11,6 +11,7 @@ import ProjectService from "client/services/projectService";
 import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
 import { Label } from "client/screen/label";
 
+import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
 import type { JFlap } from "shared/json";
@@ -74,6 +75,10 @@ export class Flap extends Draggable {
 		this.$reactDraw(this._draw, this._drawShade, this._drawDot);
 
 		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
+	}
+
+	public override $selectableWith(c: Control): boolean {
+		return c instanceof Flap;
 	}
 
 	private _drawShade(): void {

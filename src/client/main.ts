@@ -4,11 +4,14 @@ import { DragController } from "./controllers/dragController";
 import { ProjectController } from "./controllers/projectController";
 import { SelectionController } from "./controllers/selectionController";
 
+import type { IProjectController } from "./controllers/projectController";
+import type { IDragController } from "./controllers/dragController";
+import type { ISelectionController } from "./controllers/selectionController";
 import type HistoryManager from "./project/changes/history";
 
-export const projects = ProjectController;
-export const drag = DragController;
-export const selection = SelectionController;
+export const projects: IProjectController = ProjectController;
+export const drag: IDragController = DragController;
+export const selection: ISelectionController = SelectionController;
 
 export { nextTick } from "./screen/display";
 

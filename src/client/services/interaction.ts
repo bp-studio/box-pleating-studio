@@ -1,15 +1,15 @@
-import { Point } from "pixi.js";
 
 import ProjectService from "./projectService";
-import { stage, boundary, canvas } from "client/screen/display";
+import { stage, canvas } from "client/screen/display";
 import { SelectionController } from "client/controllers/selectionController";
 import { ScrollController } from "client/controllers/scrollController";
 import { CursorController } from "client/controllers/cursorController";
 import { KeyboardController } from "client/controllers/keyboardController";
-import { $getEventCenter, MouseButton } from "client/controllers/share";
+import { MouseButton } from "client/controllers/share";
 import { ZoomController } from "client/controllers/zoomController";
 import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
+import { options } from "client/options";
 
 //=================================================================
 /**
@@ -27,6 +27,8 @@ export namespace Interaction {
 	canvas.addEventListener("mousedown", pointerDown);
 	canvas.addEventListener("mouseup", mouseUp);
 	canvas.addEventListener("touchend", touchEnd);
+	canvas.addEventListener("mousemove", drag);
+	canvas.addEventListener("touchmove", drag);
 	canvas.addEventListener("wheel", wheel);
 
 	document.addEventListener("keydown", keyDown);
@@ -52,7 +54,11 @@ export namespace Interaction {
 	}
 
 	function mouseUp(event: MouseEvent): void {
+		const dragging = SelectionController.$endDrag();
 		ScrollController.$tryEnd(event);
+		if(!dragging && !event.ctrlKey && !event.metaKey) {
+			SelectionController.$processNext();
+		}
 	}
 
 	function touchEnd(event: TouchEvent): void {
@@ -88,12 +94,26 @@ export namespace Interaction {
 			LongPressController.$init();
 		}
 
-		const controls = boundary.$hitTestAll(sheet, toGlobal(event));
+		SelectionController.$process(event);
+	}
 
-		SelectionController.$clear();
-		if(controls.length > 0) {
-			SelectionController.selections[0] = controls[0];
-			SelectionController.selections[0].$selected = true;
+	function drag(event: MouseEvent | TouchEvent): void {
+		// 捲動中的話就不用在這邊處理了，交給 body 上註冊的 handler 去處理
+		if(ScrollController.$isScrolling()) return;
+
+		if(SelectionController.$tryReselect(event)) {
+			DragController.isDragging.value = true;
+		}
+
+		if(DragController.isDragging.value) {
+			if(DragController.$process(event)) {
+				LongPressController.$cancel();
+				options.onDrag?.();
+			}
+		} else {
+			LongPressController.$cancel();
+			SelectionController.$processDragSelect(event);
+			options.onDrag?.();
 		}
 	}
 
@@ -107,11 +127,5 @@ export namespace Interaction {
 	function initScroll(event: MouseEvent | TouchEvent): void {
 		ScrollController.$init();
 		CursorController.$tryUpdate(event);
-	}
-
-	function toGlobal(event: MouseEvent | TouchEvent): Point {
-		const { x, y } = $getEventCenter(event);
-		const rect = canvas.getBoundingClientRect();
-		return new Point(x - rect.left, y - rect.y);
 	}
 }

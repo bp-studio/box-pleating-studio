@@ -82,7 +82,11 @@ export class TreeNode implements ITreeNode {
 		return true;
 	}
 
-	/** 試著對根點進行平衡，若成功的話傳回新的根點 */
+	/**
+	 * 試著對根點進行平衡，若成功的話傳回新的根點。
+	 *
+	 * 這個方法在平衡過程中可能會被多次呼叫。
+	 */
 	public $balance(): TreeNode | null {
 		// 前置條件檢查
 		if(this.$parent) return null;
@@ -104,7 +108,11 @@ export class TreeNode implements ITreeNode {
 		return first;
 	}
 
-	/** 當自身成為新的根點的時候完整刷新整個樹的 depth 與 dist 值 */
+	/**
+	 * 當自身成為新的根點的時候完整刷新整個樹的 depth 與 dist 值。
+	 *
+	 * 這個方法會在全部的平衡完成了之後才進行，以增進效能。
+	 */
 	public $setAsRoot(): void {
 		this._updateDepthRecursive(0);
 		this._updateDistRecursive(0);
