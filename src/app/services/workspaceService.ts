@@ -46,6 +46,7 @@ namespace WorkspaceService {
 	export async function open(data: Pseudo<JProject>): Promise<Project> {
 		const proj = await bp.projects.open(data);
 		projects.push(proj);
+		tabHistory.unshift(proj);
 		return proj;
 	}
 

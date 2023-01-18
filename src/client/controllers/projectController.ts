@@ -92,9 +92,11 @@ export namespace ProjectController {
 	 * 如果專案全部關閉，會自動開啟一個待命的 worker。
 	 */
 	export function close(proj: Project): void {
+		if(DEBUG_ENABLED) console.time("Close project");
 		proj.$dispose(); // 解構必須優先執行
 		if(current.value == proj) current.value = null;
 		projectMap.delete(proj.id);
 		if(projectMap.size == 0) __worker = new Worker(__worker_src);
+		if(DEBUG_ENABLED) console.timeEnd("Close project");
 	}
 }
