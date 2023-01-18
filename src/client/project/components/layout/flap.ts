@@ -3,13 +3,13 @@ import { Graphics } from "@pixi/graphics";
 
 import { Layer } from "client/types/layers";
 import { shallowRef } from "client/shared/decorators";
-import { Draggable } from "client/base/draggable";
 import { drawContours, fillContours } from "client/screen/contourUtil";
 import { Direction } from "client/types/enum";
 import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
 import { Label } from "client/screen/label";
+import { Independent } from "client/base/independent";
 
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -28,7 +28,7 @@ const DOT_FILL = 0x6699FF;
  * {@link Flap} 是角片矩形的控制項。
  */
 //=================================================================
-export class Flap extends Draggable implements DragSelectable {
+export class Flap extends Independent implements DragSelectable {
 
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;

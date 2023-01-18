@@ -1,6 +1,5 @@
 import { shallowReactive } from "vue";
 
-import { same } from "shared/types/geometry";
 import { Control } from "./control";
 
 export interface DragSelectable extends Draggable {
@@ -37,24 +36,31 @@ export abstract class Draggable extends Control {
 		};
 	}
 
-	/** 以滑鼠座標進行拖曳 */
-	public $moveTo(p: IPoint): void {
-		this.$location.x = p.x - this._dragOffset.x;
-		this.$location.y = p.y - this._dragOffset.y;
-	}
-
-	/** 以向量進行拖曳 */
-	public $moveBy(v: IPoint): void {
-		if(!v.x && !v.y) return;
-		this.$location.x += v.x;
-		this.$location.y += v.y;
-	}
-
 	/**
 	 * 把一個傳入的向量進行修正到實際上可以被容許的移動範圍之上，
 	 * 預設行為是會一律修正成零向量（換句話說，{@link Draggable} 將不能動）。
 	 */
 	public $constrainBy(v: IPoint): IPoint {
-		return v;
+		return { x: 0, y: 0 };
+	}
+
+	/** 以滑鼠座標進行拖曳 */
+	public $moveTo(p: IPoint): void {
+		this._move(p.x - this._dragOffset.x, p.y - this._dragOffset.y);
+	}
+
+	/** 以向量進行拖曳 */
+	public $moveBy(v: IPoint): void {
+		if(!v.x && !v.y) return;
+		this._move(this.$location.x + v.x, this.$location.y + v.y);
+	}
+
+	/** 觸發移動 */
+	protected _move(x: number, y: number): void {
+		this.$location.x = x;
+		this.$location.y = y;
+
+		//TODO: 部份繼承類別必須通知 core 有移動發生
+		//TODO: 產生 MoveCommand
 	}
 }

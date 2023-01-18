@@ -35,6 +35,16 @@ export class RectangularGrid implements IGrid {
 		};
 	}
 
+	public $constrain(p: IPoint): IPoint {
+		let { x, y } = p;
+		const w = this.width, h = this.height;
+		if(x < 0) x = 0;
+		if(x > w) x = w;
+		if(y < 0) y = 0;
+		if(y > h) y = h;
+		return { x, y };
+	}
+
 	public $getLabelDirection(x: number, y: number): Direction {
 		const w = this.width, h = this.height;
 		if(x == 0) {

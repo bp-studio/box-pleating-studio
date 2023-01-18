@@ -17,6 +17,9 @@ export interface IGrid extends ISerializable<JSheet> {
 	/** 繪製格線的方法 */
 	$drawGrid(grid: GraphicsLike): void;
 
+	/** 找出指定的點在這個格線上面最靠近的點 */
+	$constrain(p: IPoint): IPoint;
+
 	/** 在繪製的時候要偏移的座標，原則上會是負值 */
 	readonly $offset: IPoint;
 

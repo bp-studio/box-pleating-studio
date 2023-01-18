@@ -35,6 +35,42 @@ export class DiagonalGrid implements IGrid {
 		};
 	}
 
+	public $constrain(p: IPoint): IPoint {
+		let { x, y } = p;
+		const s = this.size, h = s % 2;
+		const f = (s - h) / 2;
+		const c = (s + h) / 2;
+
+		if(x + y < f) {
+			const d = f - x - y;
+			x += Math.floor(d / 2);
+			y += Math.ceil(d / 2);
+		}
+
+		if(y - x > c) {
+			const d = y - x - c;
+			x += Math.floor(d / 2);
+			y -= Math.ceil(d / 2);
+		}
+
+		if(x - y > c) {
+			const d = x - y - c;
+			x -= Math.floor(d / 2);
+			y += Math.ceil(d / 2);
+		}
+
+		if(x + y > c + s) {
+			const d = x + y - c - s;
+			x -= Math.floor(d / 2);
+			y -= Math.ceil(d / 2);
+		}
+
+		if(x < 0) x = 0;
+		if(x > s) x = s;
+
+		return { x, y };
+	}
+
 	public $getLabelDirection(x: number, y: number): Direction {
 		const shift = this.size % 2, s = this.size + shift, h = s / 2;
 		if(shift == 0) {

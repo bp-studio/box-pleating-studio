@@ -6,7 +6,7 @@ import { shallowRef } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
 import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
-import { Draggable } from "client/base/draggable";
+import { Independent } from "client/base/independent";
 
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -23,12 +23,14 @@ const FILL_COLOR = 0x6699FF;
  * {@link Vertex} 是樹狀節點的控制項。
  */
 //=================================================================
-export class Vertex extends Draggable implements DragSelectable {
+export class Vertex extends Independent implements DragSelectable {
 
 	public readonly type = "Vertex";
 	public readonly $priority: number = Infinity;
 
 	public readonly id: number;
+	public readonly height = 0;
+	public readonly width = 0;
 
 	@shallowRef public name: string;
 
@@ -55,6 +57,13 @@ export class Vertex extends Draggable implements DragSelectable {
 
 	public get $anchor(): IPoint {
 		return this.$location;
+	}
+
+	public override $constrainBy(v: IPoint): IPoint {
+		const l = this.$location;
+		const target = { x: l.x + v.x, y: l.y + v.y };
+		const fix = this._sheet.grid.$constrain(target);
+		return { x: fix.x - l.x, y: fix.y - l.y };
 	}
 
 	public override $selectableWith(c: Control): boolean {
