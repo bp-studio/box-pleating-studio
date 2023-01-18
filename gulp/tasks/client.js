@@ -77,6 +77,9 @@ gulp.task("clientDist", () =>
 			},
 			// 這三個例外是 PIXI 內部會用字串參照的私有變數
 			mangle: { properties: { regex: /^[$_](?!view|plugin|multisample)/ } },
+			format: {
+				comments: false,
+			},
 		}))
 		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest(config.dest.dist))

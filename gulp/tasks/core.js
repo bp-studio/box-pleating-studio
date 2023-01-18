@@ -64,6 +64,9 @@ gulp.task("coreDist", () =>
 				},
 			},
 			mangle: { properties: { regex: /^[$_]/ } },
+			format: {
+				comments: false,
+			},
 		}))
 		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest(config.dest.dist))

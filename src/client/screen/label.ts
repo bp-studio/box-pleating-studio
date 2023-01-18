@@ -113,7 +113,7 @@ export class Label extends Container {
 
 		// 決定位置
 		direction ??= this._sheet.grid.$getLabelDirection(x, y);
-		if(direction != Direction.T && innerWidth > TEXT_WIDTH_LIMIT) {
+		if(direction != Direction.T && direction != Direction.none && innerWidth > TEXT_WIDTH_LIMIT) {
 			// 實在太長的文字不允許往兩邊擺放
 			direction = Direction.B;
 		}

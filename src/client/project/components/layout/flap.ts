@@ -47,7 +47,7 @@ export class Flap extends Draggable implements DragSelectable {
 	private readonly _ridge: SmoothGraphics;
 	private readonly _circle: SmoothGraphics;
 	private readonly _hinge: SmoothGraphics;
-	public readonly $label: Label;
+	private readonly _label: Label;
 
 	public $anchor: IPoint = { x: 0, y: 0 };
 
@@ -74,10 +74,10 @@ export class Flap extends Draggable implements DragSelectable {
 		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
 		this._circle = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
 		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
+		this._label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
 		this.$setupHit(this._shade);
 
-		this.$reactDraw(this._draw, this._drawShade, this._drawDot);
+		this.$reactDraw(this._draw, this._drawShade, this._drawDot, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
 	}
@@ -106,6 +106,14 @@ export class Flap extends Draggable implements DragSelectable {
 		});
 	}
 
+	private _drawLabel(): void {
+		const w = this.width, h = this.height;
+		const { x, y } = this.$location;
+		const dir = w || h ? Direction.none : undefined;
+		this.$anchor = { x: x + w / 2, y: y + h / 2 };
+		this._label.$draw(this._vertex.name, this.$anchor.x, this.$anchor.y, dir);
+	}
+
 	private _draw(): void {
 		const sh = ProjectService.shrink.value;
 		const w = this.width, h = this.height;
@@ -113,8 +121,6 @@ export class Flap extends Draggable implements DragSelectable {
 		const hingeColor = app.settings.colorScheme.hinge ?? HINGE_COLOR;
 		this._shade.clear();
 		fillContours(this._shade, this._contours, HINGE_COLOR);
-
-		this.$anchor = { x: x + w / 2, y: y + h / 2 };
 
 		this._dots[Direction.LL].position.set(x, y);
 		this._dots[Direction.UR].visible = w > 0 && h > 0;
