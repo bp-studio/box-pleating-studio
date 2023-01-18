@@ -25,8 +25,11 @@ interface HitStatus {
 	next: Control | null;
 }
 
-const TOUCH_THRESHOLD = 1;
-const MOUSE_THRESHOLD = 0.2;
+/** 太窄的矩形 pixi 繪製會出問題，因此設定一個下限 */
+const MIN_WIDTH = 0.5;
+
+const TOUCH_THRESHOLD = 20;
+const MOUSE_THRESHOLD = 5;
 const COLOR = 0x6699ff;
 const ALPHA = 0.2;
 
@@ -153,14 +156,17 @@ export namespace SelectionController {
 		}
 
 		// 繪製拖曳選取矩形
+		let w = Math.abs(downPoint.x - point.x);
+		let h = Math.abs(downPoint.y - point.y);
+		if(w < MIN_WIDTH) w = MIN_WIDTH;
+		if(h < MIN_WIDTH) h = MIN_WIDTH;
 		view.clear()
 			.lineStyle({ width: 1, color: COLOR })
 			.beginFill(COLOR, ALPHA)
 			.drawRect(
 				Math.min(downPoint.x, point.x),
 				Math.min(downPoint.y, point.y),
-				Math.abs(downPoint.x - point.x),
-				Math.abs(downPoint.y - point.y)
+				w, h
 			)
 			.endFill();
 
