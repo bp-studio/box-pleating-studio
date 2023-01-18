@@ -11,6 +11,7 @@ import ProjectService from "client/services/projectService";
 import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
 import { Label } from "client/screen/label";
 
+import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
@@ -27,7 +28,7 @@ const DOT_FILL = 0x6699FF;
  * {@link Flap} 是角片矩形的控制項。
  */
 //=================================================================
-export class Flap extends Draggable {
+export class Flap extends Draggable implements DragSelectable {
 
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;
@@ -48,9 +49,13 @@ export class Flap extends Draggable {
 	private readonly _hinge: SmoothGraphics;
 	public readonly $label: Label;
 
+	public $anchor: IPoint = { x: 0, y: 0 };
 
 	constructor(json: JFlap, vertex: Vertex, edge: Edge, sheet: Sheet) {
 		super();
+
+		sheet.$dragSelectables.add(this);
+		this._onDispose(() => sheet.$dragSelectables.delete(this));
 
 		this.id = json.id;
 		this.$location.x = json.x;
@@ -108,6 +113,8 @@ export class Flap extends Draggable {
 		const hingeColor = app.settings.colorScheme.hinge ?? HINGE_COLOR;
 		this._shade.clear();
 		fillContours(this._shade, this._contours, HINGE_COLOR);
+
+		this.$anchor = { x: x + w / 2, y: y + h / 2 };
 
 		this._dots[Direction.LL].position.set(x, y);
 		this._dots[Direction.UR].visible = w > 0 && h > 0;

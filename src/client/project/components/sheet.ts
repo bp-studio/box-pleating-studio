@@ -16,8 +16,8 @@ import { createGrid } from "./grid";
 import { MARGIN, MARGIN_FIX } from "client/screen/constants";
 import { ZoomController } from "client/controllers/zoomController";
 
+import type { DragSelectable } from "client/base/draggable";
 import type { Label } from "client/screen/label";
-import type { Control } from "client/base/control";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./grid";
 
@@ -62,7 +62,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	@shallowRef private _grid: IGrid;
 
-	private readonly _controls: Control[] = shallowReactive([]);
+	public readonly $dragSelectables: Set<DragSelectable> = new Set();
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
@@ -119,10 +119,6 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	public set zoom(v: number) {
 		if(v < FULL_ZOOM) v = FULL_ZOOM;
 		ZoomController.$zoom(v);
-	}
-
-	public get $controls(): readonly Control[] {
-		return this._controls;
 	}
 
 	public get $layers(): readonly Container[] {

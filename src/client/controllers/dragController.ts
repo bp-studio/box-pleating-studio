@@ -1,9 +1,6 @@
 import { shallowRef } from "vue";
 
 import { SelectionController } from "./selectionController";
-import { CursorController } from "./cursorController";
-import { $getEventCenter, $round } from "./share";
-import ProjectService from "client/services/projectService";
 
 import type { ShallowRef } from "vue";
 import type { Draggable } from "client/base/draggable";

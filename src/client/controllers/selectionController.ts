@@ -1,11 +1,13 @@
 import { computed, shallowReactive } from "vue";
-import { Point } from "@pixi/math";
+import { Graphics } from "@pixi/graphics";
+import { Rectangle, Transform } from "@pixi/math";
 
 import { Draggable } from "client/base/draggable";
-import { $getEventCenter } from "./share";
-import { boundary, canvas } from "client/screen/display";
+import { $getEventCenter, $isTouch } from "./share";
+import { boundary, stage, ui } from "client/screen/display";
 import ProjectService from "client/services/projectService";
 
+import type { DragSelectable } from "client/base/draggable";
 import type { ComputedRef } from "vue";
 import type { Control } from "client/base/control";
 
@@ -22,6 +24,11 @@ interface HitStatus {
 	next: Control | null;
 }
 
+const TOUCH_THRESHOLD = 1;
+const MOUSE_THRESHOLD = 0.2;
+const COLOR = 0x6699ff;
+const ALPHA = 0.2;
+
 //=================================================================
 /**
  * {@link SelectionController} 負責 {@link Control} 的選取邏輯。
@@ -30,9 +37,19 @@ interface HitStatus {
 
 export namespace SelectionController {
 
-	let _possiblyReselect: boolean = false;
+	let possiblyReselect: boolean = false;
 
-	let _statusCache: HitStatus;
+	let statusCache: HitStatus;
+
+	let downPoint: IPoint;
+
+	let dragSelectables: DragSelectable[];
+
+	// 建立拖曳選取視圖
+	// 這邊因為是矩形，不需要用 SmoothGraphics，效能也會較好
+	const view = new Graphics();
+	view.visible = false;
+	ui.addChild(view);
 
 	export const selections: Control[] = shallowReactive([]);
 
@@ -52,20 +69,21 @@ export namespace SelectionController {
 
 	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): void {
 		if(event instanceof MouseEvent) ctrlKey ??= event.ctrlKey || event.metaKey;
-		const { current, next } = getStatus(event);
+		downPoint = $getEventCenter(event);
+		const { current, next } = getStatus();
 
 		// 滑鼠按下時的選取邏輯
 		if(!ctrlKey) {
 			if(!current) $clear();
 			if(!current && next) select(next);
 		} else {
-			if(current && !next) toggle(current);
+			if(current && !next) toggle(current, !current.$selected);
 			if(next) select(next);
 		}
 	}
 
 	export function $processNext(): void {
-		const { current, next } = _statusCache;
+		const { current, next } = statusCache;
 		const project = ProjectService.project.value;
 		if(project && !project.$isDragging) {
 			if(current && next) $clear();
@@ -75,40 +93,69 @@ export namespace SelectionController {
 	}
 
 	export function $tryReselect(event: MouseEvent | TouchEvent): boolean {
-		if(!_possiblyReselect) return false;
+		if(!possiblyReselect) return false;
 
 		$clear();
 		$process(event, false);
 		// for(const o of this.$draggable) o.$dragStart(CursorController.$offset);
-		_possiblyReselect = false;
+		possiblyReselect = false;
 		return true;
 	}
 
-	/** 終止並且傳回是否正在進行拖曳選取 */
-	export function $endDrag(): boolean {
-		// let result = this._view.$visible;
-		// this._view.$visible = false;
-		// return result;
-		return false;
+	/**
+	 * 終止並且傳回是否正在進行拖曳選取。
+	 *
+	 * @param cancel 是否取消掉過程中已經形成的拖曳選取物件
+	 */
+	export function $endDrag(cancel?: boolean): boolean {
+		const result = view.visible;
+		if(result && cancel) $clear();
+		view.visible = false;
+		stage.interactiveChildren = true;
+		dragSelectables = [];
+		return result;
 	}
 
 	export function $processDragSelect(event: MouseEvent | TouchEvent): void {
-		// if(!this._view.$visible) {
-		// 	// 要拖曳至一定距離才開始觸發拖曳選取
-		// 	const dist = event.downPoint.getDistance(event.point);
-		// 	if(dist < ($isTouch(event.event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
-		// 	this.$clear();
-		// 	this._view.$visible = true;
-		// 	this._view.$down = event.downPoint;
-		// }
+		const point = $getEventCenter(event);
+		const sheet = ProjectService.sheet.value!;
 
-		// this._view.$now = event.point;
-		// for(const c of this.$dragSelectables) {
-		// 	c.$selected = this._view.$contains(new paper.Point(c.$dragSelectAnchor));
-		// }
+		// 初始化
+		if(!view.visible) {
+			// 要拖曳至一定距離才開始觸發拖曳選取
+			const dist = getDistance(downPoint, point);
+			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
+			$clear();
+			view.visible = true;
+			stage.interactiveChildren = false;
+			dragSelectables = [...sheet.$dragSelectables];
+		}
+
+		// 繪製拖曳選取矩形
+		view.clear()
+			.lineStyle({ width: 1, color: COLOR })
+			.beginFill(COLOR, ALPHA)
+			.drawRect(
+				Math.min(downPoint.x, point.x),
+				Math.min(downPoint.y, point.y),
+				Math.abs(downPoint.x - point.x),
+				Math.abs(downPoint.y - point.y)
+			)
+			.endFill();
+
+		// 逆算出選取範圍對應的座標矩形
+		const bounds = view.getBounds();
+		const matrix = sheet.$view.localTransform;
+		const pt = matrix.applyInverse({ x: bounds.left, y: bounds.bottom });
+		const rect = new Rectangle(pt.x, pt.y, bounds.width / matrix.a, bounds.height / matrix.a);
+
+		// 檢查被選中的物件（線性搜尋夠快，暫時不用優化）
+		for(const ds of dragSelectables) {
+			toggle(ds, rect.contains(ds.$anchor.x, ds.$anchor.y));
+		}
 	}
 
-	function getStatus(event: MouseEvent | TouchEvent): HitStatus {
+	function getStatus(): HitStatus {
 
 		let first: Control | null = null;	// 重疊之中的第一個 Control
 		let current: Control | null = null;
@@ -116,7 +163,7 @@ export namespace SelectionController {
 
 		// 找出所有點擊位置中的重疊 Control
 		const sheet = ProjectService.sheet.value!;
-		const controls = boundary.$hitTestAll(sheet, toGlobal(event));
+		const controls = boundary.$hitTestAll(sheet, downPoint);
 
 		// 找出前述的三個關鍵 Control
 		for(const o of controls) {
@@ -129,11 +176,11 @@ export namespace SelectionController {
 		if(current) {
 			const p = current.$priority;
 			if(controls.some(c => c.$priority > p)) {
-				_possiblyReselect = true;
+				possiblyReselect = true;
 			}
 		}
 
-		return _statusCache = { current, next };
+		return statusCache = { current, next };
 	}
 
 	function select(c: Control): void {
@@ -143,15 +190,15 @@ export namespace SelectionController {
 		}
 	}
 
-	function toggle(c: Control): void {
-		c.$selected = !c.$selected;
-		if(c.$selected) selections.push(c);
+	function toggle(c: Control, selected: boolean): void {
+		if(c.$selected == selected) return;
+		c.$selected = selected;
+		if(selected) selections.push(c);
 		else selections.splice(selections.indexOf(c), 1);
 	}
 
-	function toGlobal(event: MouseEvent | TouchEvent): Point {
-		const { x, y } = $getEventCenter(event);
-		const rect = canvas.getBoundingClientRect();
-		return new Point(x - rect.left, y - rect.y);
+	function getDistance(p1: IPoint, p2: IPoint): number {
+		const dx = p1.x - p2.x, dy = p1.y - p2.y;
+		return Math.sqrt(dx * dx + dy * dy);
 	}
 }

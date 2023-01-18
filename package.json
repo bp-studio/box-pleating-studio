@@ -43,7 +43,7 @@
 		"@vue/eslint-config-typescript": "11.0.2",
 		"chai": "^4.3.7",
 		"del": "7.0.0",
-		"esbuild": "^0.17.1",
+		"esbuild": "^0.17.2",
 		"esbuild-plugin-external-global": "^1.0.1",
 		"esbuild-plugin-vue-next": "npm:@wfrog/esbuild-plugin-vue-next@^0.1.5",
 		"esbuild-sass-plugin": "^2.4.5",

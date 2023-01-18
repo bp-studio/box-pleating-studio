@@ -23,16 +23,21 @@ import { options } from "client/options";
 
 export namespace Interaction {
 
+	/** 記住游標按壓的狀態，以判斷目前是否正在拖曳 */
+	let pointerHeld = false;
+
 	canvas.addEventListener("touchstart", pointerDown, { passive: true });
 	canvas.addEventListener("mousedown", pointerDown);
 	canvas.addEventListener("mouseup", mouseUp);
 	canvas.addEventListener("touchend", touchEnd);
-	canvas.addEventListener("mousemove", drag);
-	canvas.addEventListener("touchmove", drag);
 	canvas.addEventListener("wheel", wheel);
 
+	document.addEventListener("mousemove", drag);
+	document.addEventListener("touchmove", drag);
 	document.addEventListener("keydown", keyDown);
 	document.addEventListener("keyup", keyUp);
+
+	window.addEventListener("blur", blur);
 
 	stage.on("mousemove", e => {
 		const sheet = ProjectService.sheet.value;
@@ -40,6 +45,12 @@ export namespace Interaction {
 		const local = sheet.$view.toLocal(e.global);
 		// console.log([Math.round(local.x), Math.round(local.y)]);
 	});
+
+	function blur(): void {
+		// 切換視窗或頁籤的情況中會直接取消掉進行中的拖曳選取
+		pointerHeld = false;
+		SelectionController.$endDrag(true);
+	}
 
 	function keyDown(event: KeyboardEvent): void {
 		KeyboardController.$set(event, true);
@@ -54,6 +65,7 @@ export namespace Interaction {
 	}
 
 	function mouseUp(event: MouseEvent): void {
+		pointerHeld = false;
 		const dragging = SelectionController.$endDrag();
 		ScrollController.$tryEnd(event);
 		if(!dragging && !event.ctrlKey && !event.metaKey) {
@@ -62,7 +74,9 @@ export namespace Interaction {
 	}
 
 	function touchEnd(event: TouchEvent): void {
+		if(event.touches.length == 0) pointerHeld = false;
 		LongPressController.$cancel();
+		SelectionController.$endDrag();
 	}
 
 	function pointerDown(event: MouseEvent | TouchEvent): void {
@@ -84,7 +98,7 @@ export namespace Interaction {
 		} else if(event.touches.length > 1) {
 			if(!ScrollController.$isScrolling()) {
 				LongPressController.$cancel();
-				SelectionController.$clear();
+				SelectionController.$endDrag(true);
 				ZoomController.$init(event);
 				initScroll(event);
 			}
@@ -94,10 +108,15 @@ export namespace Interaction {
 			LongPressController.$init();
 		}
 
+		// 會進入到這邊必然是滑鼠左鍵按壓、或是單點觸控
+		pointerHeld = true;
+
 		SelectionController.$process(event);
 	}
 
 	function drag(event: MouseEvent | TouchEvent): void {
+		if(!pointerHeld) return;
+
 		// 捲動中的話就不用在這邊處理了，交給 body 上註冊的 handler 去處理
 		if(ScrollController.$isScrolling()) return;
 

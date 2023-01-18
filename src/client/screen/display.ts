@@ -43,11 +43,11 @@ el.appendChild(canvas);
 settings.LINE_SCALE_MODE = LINE_SCALE_MODE.NONE;
 
 // 建立最上層容器
+export const stage = pixiApp.stage;
 export const designs = new Container();
 export const ui = new Container();
-pixiApp.stage.addChild(designs, ui);
-pixiApp.stage.interactive = true;
-export const stage = pixiApp.stage;
+stage.addChild(designs, ui);
+stage.interactive = true;
 watchEffect(() => {
 	renderer.resize(viewport.width, viewport.height);
 	stage.hitArea = pixiApp.screen;

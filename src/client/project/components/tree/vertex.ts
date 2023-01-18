@@ -8,6 +8,7 @@ import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
 import { Draggable } from "client/base/draggable";
 
+import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { JVertex } from "shared/json";
 import type { Sheet } from "../sheet";
@@ -22,7 +23,7 @@ const FILL_COLOR = 0x6699FF;
  * {@link Vertex} 是樹狀節點的控制項。
  */
 //=================================================================
-export class Vertex extends Draggable {
+export class Vertex extends Draggable implements DragSelectable {
 
 	public readonly type = "Vertex";
 	public readonly $priority: number = Infinity;
@@ -37,6 +38,9 @@ export class Vertex extends Draggable {
 	constructor(json: JVertex, sheet: Sheet) {
 		super();
 
+		sheet.$dragSelectables.add(this);
+		this._onDispose(() => sheet.$dragSelectables.delete(this));
+
 		this.id = json.id;
 		this.$location.x = json.x;
 		this.$location.y = json.y;
@@ -50,6 +54,10 @@ export class Vertex extends Draggable {
 		this.$reactDraw(this._draw, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._dot.name = "Vertex";
+	}
+
+	public get $anchor(): IPoint {
+		return this.$location;
 	}
 
 	public override $selectableWith(c: Control): boolean {

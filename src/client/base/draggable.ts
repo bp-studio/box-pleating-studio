@@ -2,6 +2,10 @@ import { shallowReactive } from "vue";
 
 import { Control } from "./control";
 
+export interface DragSelectable extends Draggable {
+	readonly $anchor: Readonly<IPoint>;
+}
+
 //=================================================================
 /**
  * {@link Draggable} 是可以被拖曳的 {@link Control}。

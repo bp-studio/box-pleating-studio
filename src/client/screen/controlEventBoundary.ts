@@ -20,7 +20,7 @@ export class ControlEventBoundary extends EventBoundary {
 	 * Pixi 本身提供的 {@link EventBoundary.hitTest} 方法只會傳回點擊位置最上層的物件，
 	 * 這個方法則會搜尋該位置上全部的可互動物件、並且反查出那些物件對應的 {@link Control}。
 	 */
-	public $hitTestAll(sheet: Sheet, location: Point): Control[] {
+	public $hitTestAll(sheet: Sheet, location: IPoint): Control[] {
 		let result: Control[] = [];
 		this._hitTestAllRecursive(sheet.$view, false, location, result);
 		if(result.length) {
@@ -33,10 +33,13 @@ export class ControlEventBoundary extends EventBoundary {
 	}
 
 	private _hitTestAllRecursive(
-		target: DisplayObject, interactive: boolean, location: Point, result: Control[]): void {
+		target: DisplayObject, interactive: boolean, location: IPoint, result: Control[]): void {
 
 		if(!target || !target.visible) return;
-		if(this.hitPruneFn(target, location)) return;
+
+		// 其實這裡面並沒有用到 pixi.js 的 Point 類別的任何實體特性，
+		// 所以傳入任何的 IPoint 介面都一樣可以；後同
+		if(this.hitPruneFn(target, location as Point)) return;
 
 		if(target.interactiveChildren && target.children) {
 			for(const child of target.children) {
@@ -44,7 +47,7 @@ export class ControlEventBoundary extends EventBoundary {
 					child as DisplayObject, interactive || child.interactive, location, result);
 			}
 		}
-		if(interactive && this.hitTestFn(target, location)) {
+		if(interactive && this.hitTestFn(target, location as Point)) {
 			const control = Control.$getHitControl(target);
 			if(control) result.push(control);
 		}
