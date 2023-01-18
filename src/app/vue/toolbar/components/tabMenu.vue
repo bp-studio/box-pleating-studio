@@ -1,23 +1,23 @@
 <template>
 	<ContextMenu ref="tabMenu">
-		<DropdownItem delay @click="Workspace.clone(menuId)">
+		<DropdownItem @click="Workspace.clone(menuId)">
 			<i class="far fa-clone" />
 			{{ $t('toolbar.tab.clone') }}
 		</DropdownItem>
 		<Divider />
-		<DropdownItem delay @click="Workspace.close(menuId)">
+		<DropdownItem @click="Workspace.close(menuId)">
 			<i class="far fa-window-close" />
 			{{ $t('toolbar.tab.close') }}
 		</DropdownItem>
-		<DropdownItem delay @click="Workspace.closeOther(menuId)">
+		<DropdownItem @click="Workspace.closeOther(menuId)">
 			<i class="far fa-window-close" />
 			{{ $t('toolbar.tab.closeOther') }}
 		</DropdownItem>
-		<DropdownItem delay @click="Workspace.closeRight(menuId)">
+		<DropdownItem @click="Workspace.closeRight(menuId)">
 			<i class="far fa-window-close" />
 			{{ $t('toolbar.tab.closeRight') }}
 		</DropdownItem>
-		<DropdownItem delay @click="Workspace.closeAll()">
+		<DropdownItem @click="Workspace.closeAll()">
 			<i class="far fa-window-close" />
 			{{ $t('toolbar.tab.closeAll') }}
 		</DropdownItem>
