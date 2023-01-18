@@ -5,7 +5,7 @@ import { SelectionController } from "client/controllers/selectionController";
 import { ScrollController } from "client/controllers/scrollController";
 import { CursorController } from "client/controllers/cursorController";
 import { KeyboardController } from "client/controllers/keyboardController";
-import { MouseButton } from "client/controllers/share";
+import { $isTouch, MouseButton } from "client/controllers/share";
 import { ZoomController } from "client/controllers/zoomController";
 import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
@@ -28,10 +28,10 @@ export namespace Interaction {
 
 	canvas.addEventListener("touchstart", pointerDown, { passive: true });
 	canvas.addEventListener("mousedown", pointerDown);
-	canvas.addEventListener("mouseup", mouseUp);
-	canvas.addEventListener("touchend", touchEnd);
 	canvas.addEventListener("wheel", wheel);
 
+	document.addEventListener("mouseup", mouseUp);
+	document.addEventListener("touchend", touchEnd);
 	document.addEventListener("mousemove", drag);
 	document.addEventListener("touchmove", drag);
 	document.addEventListener("keydown", keyDown);
@@ -65,15 +65,19 @@ export namespace Interaction {
 	}
 
 	function mouseUp(event: MouseEvent): void {
-		pointerHeld = false;
+		if(!pointerHeld) return;
+		DragController.$dragEnd();
 		const dragging = SelectionController.$endDrag();
 		ScrollController.$tryEnd(event);
 		if(!dragging && !event.ctrlKey && !event.metaKey) {
 			SelectionController.$processNext();
 		}
+		pointerHeld = false;
 	}
 
 	function touchEnd(event: TouchEvent): void {
+		if(!pointerHeld) return;
+		DragController.$dragEnd();
 		if(event.touches.length == 0) pointerHeld = false;
 		LongPressController.$cancel();
 		SelectionController.$endDrag();
@@ -104,14 +108,28 @@ export namespace Interaction {
 			}
 			// 總而言之都中止後續處理
 			return;
-		} else {
-			LongPressController.$init();
 		}
 
 		// 會進入到這邊必然是滑鼠左鍵按壓、或是單點觸控
 		pointerHeld = true;
 
+		if($isTouch(event)) touchStart(event);
+		else mouseDown(event);
+	}
+
+	function mouseDown(event: MouseEvent): void {
 		SelectionController.$process(event);
+
+		// 滑鼠操作時可以直接點擊拖曳
+		DragController.$init(event);
+	}
+
+	function touchStart(event: TouchEvent): void {
+		const ok = SelectionController.$compare(event);
+		LongPressController.$init();
+
+		// 觸控的情況中，規定一定要先選取才能拖曳，不能直接拖（不然太容易誤觸）
+		if(ok) DragController.$init(event);
 	}
 
 	function drag(event: MouseEvent | TouchEvent): void {

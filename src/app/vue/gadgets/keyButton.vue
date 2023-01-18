@@ -13,7 +13,7 @@
 
 	import type { DirectionKey } from "shared/types/types";
 
-	let to: number;
+	let to: Timeout;
 
 	const props = defineProps<{
 		dir: DirectionKey;
@@ -23,7 +23,7 @@
 		const SENSITIVITY = 150;
 		if(Core.shouldShowDPad) {
 			Studio.dragByKey(props.dir);
-			to = window.setTimeout(() => down(SENSITIVITY), repeat);
+			to = setTimeout(() => down(SENSITIVITY), repeat);
 		} else {
 			up();
 		}

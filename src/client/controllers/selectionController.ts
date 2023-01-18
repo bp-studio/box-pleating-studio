@@ -1,4 +1,4 @@
-import { computed, shallowReactive } from "vue";
+import { computed, shallowReactive, watch } from "vue";
 import { Graphics } from "@pixi/graphics";
 import { Rectangle, Transform } from "@pixi/math";
 
@@ -6,6 +6,7 @@ import { Draggable } from "client/base/draggable";
 import { $getEventCenter, $isTouch } from "./share";
 import { boundary, stage, ui } from "client/screen/display";
 import ProjectService from "client/services/projectService";
+import { CursorController } from "./cursorController";
 
 import type { DragSelectable } from "client/base/draggable";
 import type { ComputedRef } from "vue";
@@ -53,6 +54,14 @@ export namespace SelectionController {
 
 	export const selections: Control[] = shallowReactive([]);
 
+	watch(ProjectService.sheet, sheet => {
+		selections.length = 0;
+		if(!sheet) return;
+		for(const c of sheet.$controls) {
+			if(c.$selected) selections.push(c);
+		}
+	});
+
 	export const draggables = computed(() =>
 		selections.filter(
 			(c: Control): c is Draggable => c instanceof Draggable
@@ -65,6 +74,16 @@ export namespace SelectionController {
 		});
 		selections.length = 0;
 		if(ctrl?.$selected) selections.push(ctrl);
+	}
+
+	/** 處理點擊、並且比較看看先後的選取狀態是否一樣 */
+	export function $compare(event: TouchEvent): boolean {
+		const oldSel = draggables.value.concat();
+		$process(event);
+		const newSel = draggables.value.concat();
+		if(oldSel.length != newSel.length) return false;
+		for(const o of oldSel) if(!newSel.includes(o)) return false;
+		return true;
 	}
 
 	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): void {
@@ -97,7 +116,7 @@ export namespace SelectionController {
 
 		$clear();
 		$process(event, false);
-		// for(const o of this.$draggable) o.$dragStart(CursorController.$offset);
+		for(const o of draggables.value) o.$dragStart(CursorController.$offset);
 		possiblyReselect = false;
 		return true;
 	}
@@ -128,7 +147,9 @@ export namespace SelectionController {
 			$clear();
 			view.visible = true;
 			stage.interactiveChildren = false;
-			dragSelectables = [...sheet.$dragSelectables];
+			dragSelectables = [...sheet.$controls].filter(
+				(c: Control): c is DragSelectable => Boolean((c as DragSelectable).$anchor)
+			);
 		}
 
 		// 繪製拖曳選取矩形

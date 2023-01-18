@@ -10,16 +10,16 @@ const TIMEOUT = 750;
 
 export namespace LongPressController {
 
-	let _timeout: number | undefined;
+	let _timeout: Timeout | undefined;
 
 	/** 長壓設置 */
 	export function $init(): void {
-		if(options.onLongPress) _timeout = window.setTimeout(options.onLongPress, TIMEOUT);
+		if(options.onLongPress) _timeout = setTimeout(options.onLongPress, TIMEOUT);
 	}
 
 	/** 取消長壓；這個除了會在滑鼠或觸控放開時自動執行之外也可以手動呼叫 */
 	export function $cancel(): void {
-		if(_timeout !== undefined) window.clearTimeout(_timeout);
+		if(_timeout !== undefined) clearTimeout(_timeout);
 		_timeout = undefined;
 	}
 }

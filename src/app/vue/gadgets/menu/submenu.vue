@@ -23,7 +23,7 @@
 	const sub = shallowRef<HTMLDivElement>();
 	const SUBMENU_DELAY = 250;
 
-	let timeout: number;
+	let timeout: Timeout;
 
 	defineProps({
 		icon: String,
@@ -35,7 +35,7 @@
 		sub.value!.style.display = "block";
 	}
 	function leave(): void {
-		timeout = window.setTimeout(() => {
+		timeout = setTimeout(() => {
 			sub.value!.style.display = "none";
 		}, SUBMENU_DELAY);
 	}

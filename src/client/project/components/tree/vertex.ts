@@ -36,10 +36,7 @@ export class Vertex extends Draggable implements DragSelectable {
 	private readonly _label: Label;
 
 	constructor(json: JVertex, sheet: Sheet) {
-		super();
-
-		sheet.$dragSelectables.add(this);
-		this._onDispose(() => sheet.$dragSelectables.delete(this));
+		super(sheet);
 
 		this.id = json.id;
 		this.$location.x = json.x;

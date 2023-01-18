@@ -49,13 +49,10 @@ export class Flap extends Draggable implements DragSelectable {
 	private readonly _hinge: SmoothGraphics;
 	private readonly _label: Label;
 
-	public $anchor: IPoint = { x: 0, y: 0 };
+	public $anchor: Readonly<IPoint> = { x: 0, y: 0 };
 
 	constructor(json: JFlap, vertex: Vertex, edge: Edge, sheet: Sheet) {
-		super();
-
-		sheet.$dragSelectables.add(this);
-		this._onDispose(() => sheet.$dragSelectables.delete(this));
+		super(sheet);
 
 		this.id = json.id;
 		this.$location.x = json.x;

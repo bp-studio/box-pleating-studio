@@ -41,4 +41,6 @@ declare global {
 
 	/** Global app instance, created in main.js. */
 	declare const app: typeof appInstance;
+
+	type Timeout = ReturnType<typeof setTimeout>;
 }

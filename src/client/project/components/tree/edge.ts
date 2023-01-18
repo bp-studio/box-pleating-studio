@@ -37,7 +37,7 @@ export class Edge extends Control {
 	private readonly _label: Label;
 
 	constructor(v1: Vertex, v2: Vertex, length: number, sheet: Sheet) {
-		super();
+		super(sheet);
 
 		this._v1 = v1;
 		this._v2 = v2;

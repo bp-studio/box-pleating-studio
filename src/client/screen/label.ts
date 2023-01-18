@@ -12,8 +12,9 @@ import type { IDestroyOptions } from "@pixi/display";
 import type { Rectangle } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
 
+const TIMEOUT = 10;
 const SQRT = 2 / Math.sqrt(MIN_SCALE);
-const EXTRA_FIX = 10; // 這是實驗得到的數字
+const EXTRA_FIX = 25; // 這是實驗得到的數字
 
 const TEXT_WIDTH_LIMIT = 50;
 const SMOOTHNESS = 2;
@@ -39,6 +40,8 @@ export class Label extends Container {
 
 	public $color?: number;
 	public $distance: number = 1;
+
+	private _timeout!: Timeout;
 
 	constructor(sheet: Sheet) {
 		super();
@@ -81,11 +84,12 @@ export class Label extends Container {
 			const bounds = this.getLocalBounds();
 
 			// 延遲設定以避免循環參照
-			setTimeout(() => {
+			clearTimeout(this._timeout);
+			this._timeout = setTimeout(() => {
 				this._labelWidth = width;
 				this._labelBounds = bounds;
 				this._xCache = x;
-			}, 0);
+			}, TIMEOUT);
 		}
 	}
 

@@ -35,7 +35,7 @@ export class River extends Control {
 
 
 	constructor(tag: string, contour: Contour[], sheet: Sheet) {
-		super();
+		super(sheet);
 
 		this.tag = tag;
 		this._contours = contour;

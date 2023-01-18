@@ -1,9 +1,12 @@
 import { shallowRef } from "vue";
 
 import { SelectionController } from "./selectionController";
+import { $getEventCenter, $round } from "./share";
+import { CursorController } from "./cursorController";
+import ProjectService from "client/services/projectService";
 
-import type { ShallowRef } from "vue";
 import type { Draggable } from "client/base/draggable";
+import type { ShallowRef } from "vue";
 
 export interface IDragController {
 	readonly isDragging: ShallowRef<boolean>;
@@ -31,10 +34,18 @@ export namespace DragController {
 		}
 
 		const selections = SelectionController.draggables.value;
+		for(const d of selections) v = d.$constrainBy(v);
+		for(const d of selections) d.$moveBy(v);
+	}
 
-		for(const d of selections) {
-			d.$location.x += v.x;
-			d.$location.y += v.y;
+	/** 點擊時進行拖曳初始化 */
+	export function $init(event: MouseEvent | TouchEvent): void {
+		const selections = SelectionController.draggables.value;
+		if(selections.length) {
+			const pt = getCoordinate(event);
+			CursorController.$tryUpdate(pt);
+			for(const o of selections) o.$dragStart(CursorController.$offset);
+			isDragging.value = true;
 		}
 	}
 
@@ -44,24 +55,33 @@ export namespace DragController {
 	 * 拖曳行為因為是離散的，永遠只能跟拖曳初始位置去做比較而不能跟上次游標位置進行比較。
 	 */
 	export function $process(event: MouseEvent | TouchEvent): boolean {
-		return false;
+		// 檢查滑鼠位置是否有發生變化
+		let pt = getCoordinate(event);
+		if(!CursorController.$tryUpdate(pt)) return false;
 
-		//TODO
+		// 請求拖曳中的 Draggable 去檢查並修正位置
+		const selections = SelectionController.draggables.value;
+		for(const o of selections) pt = o.$constrainTo(pt);
 
-		// // 檢查滑鼠位置是否有發生變化
-		// let pt = $round($getEventCenter(event));
-		// if(!CursorController.$tryUpdate(pt)) return false;
+		// 修正完成之後進行真正的拖曳
+		for(const o of selections) o.$moveTo(pt);
 
-		// // 請求拖曳中的 Draggable 去檢查並修正位置
-		// const selections = SelectionController.draggables.value;
-		// for(const o of selections) pt = o.$dragConstraint(pt);
+		// 通知 Project 現在正在進行拖曳
+		ProjectService.project.value!.$isDragging = true;
 
-		// // 修正完成之後進行真正的拖曳
-		// for(const o of selections) o.$drag(pt);
+		return true;
+	}
 
-		// // 通知 Project 現在正在進行拖曳
-		// ProjectService.project.value!.$isDragging = true;
+	function getCoordinate(event: MouseEvent | TouchEvent): IPoint {
+		const pt = $getEventCenter(event);
+		const local = ProjectService.sheet.value!.$view.toLocal(pt);
+		return $round(local);
+	}
 
-		// return true;
+	/** 結束拖曳 */
+	export function $dragEnd(): void {
+		isDragging.value = false;
+		const project = ProjectService.project.value;
+		if(project) project.$isDragging = false;
 	}
 }

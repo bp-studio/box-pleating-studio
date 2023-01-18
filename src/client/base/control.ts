@@ -1,6 +1,7 @@
 import { shallowRef } from "client/shared/decorators";
 import { View } from "./view";
 
+import type { Sheet } from "client/project/components/sheet";
 import type { Container, DisplayObject } from "@pixi/display";
 import type { IHitArea } from "@pixi/events";
 
@@ -27,6 +28,13 @@ export abstract class Control extends View {
 
 	@shallowRef public $selected: boolean = false;
 	@shallowRef private _hovered: boolean = false;
+
+	constructor(sheet: Sheet) {
+		super();
+
+		sheet.$controls.add(this);
+		this._onDispose(() => sheet.$controls.delete(this));
+	}
 
 	/** 是否可以跟另外一個物件一起被多重選取 */
 	public $selectableWith(c: Control): boolean { return false; }
