@@ -44,6 +44,19 @@ BP Studio consists mainly of three parts:
 the [App](src/app/README.md),
 the [Client](src/client/README.md),
 and the [Core](src/core/README.md).
+Their relations can be roughly depicted as follows:
+
+```mermaid
+graph LR
+	a("App\n(user interface)")
+	b("Client\n(workspace)")
+	c("Core\n(worker thread)")
+	a -->|controls| b
+	b -->|data| a
+	b -->|manipulation| c
+	c -->|graphics| b
+```
+
 Refer to each of them for more details.
 
 Almost all comments in the source code are written in Chinese,

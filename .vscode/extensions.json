@@ -6,6 +6,7 @@
 		"hbenl.vscode-mocha-test-adapter",
 		"lokalise.i18n-ally",
 		"mutsuntsai.jsdoc-link",
-		"stylelint.vscode-stylelint"
+		"stylelint.vscode-stylelint",
+		"bierner.markdown-mermaid"
 	]
 }
