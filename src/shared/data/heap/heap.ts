@@ -11,6 +11,8 @@ export interface IHeap<T> {
 	$pop(): T | undefined;
 }
 
+export const minComparator: Comparator<number> = (a, b) => a - b;
+
 //=================================================================
 /**
  * {@link Heap} 是 {@link IHeap} 的底層類別，提供了共通的功能。

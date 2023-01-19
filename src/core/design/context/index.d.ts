@@ -1,7 +1,8 @@
+import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
 
 export interface ITree extends ISerializable<JEdge[]> {
-	readonly $nodes: ReadonlyMap<number, ITreeNode>;
+	readonly $nodes: readonly (ITreeNode | undefined)[];
 
 	/** 增加一個新的葉點並且傳回新節點的 {@link ITreeNode.id id} */
 	$addLeaf(at: number, length: number): number;

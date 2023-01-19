@@ -4,6 +4,8 @@ import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { expand } from "core/math/polyBool/expansion";
 import { TreeNode } from "./treeNode";
 import { Side } from "./aabb/aabb";
+import { BinaryHeap } from "shared/data/heap/binaryHeap";
+import { minComparator } from "shared/data/heap/heap";
 
 import type { Path } from "shared/types/geometry";
 import type { IValuedDoubleMap } from "shared/data/doubleMap/iDoubleMap";
@@ -16,12 +18,28 @@ import type { JEdge, JFlap } from "shared/json";
  *
  * 這邊基於效能最佳化上的考量，並不將不同層面的樹狀功能分開來實作，
  * 而是全部時做在同一個類別裡面。
+ *
+ * 裡面有部份公開成員的型別比 {@link ITree} 介面宣告得要更加具體，
+ * 這是為了測試的方便。
  */
 //=================================================================
 
 export class Tree implements ITree {
 
-	private readonly _nodes: Map<number, TreeNode> = new Map();
+	/**
+	 * 所有節點的陣列。
+	 * 請注意裡面可能有一些索引是被跳過的。
+	 */
+	private readonly _nodes: (TreeNode | undefined)[];
+
+	/** 節點的數目 */
+	private _nodeCount: number = 0;
+
+	/**
+	 * 目前在 {@link _nodes} 當中被跳過的索引，以便快速查找出可用編號。
+	 * 也許這邊用堆積有點太炫炮了，但何不呢？
+	 */
+	private _skippedIdHeap = new BinaryHeap<number>(minComparator);
 
 	/**
 	 * 任兩個節點的 Lowest Common Ancestor（LCA）之快取。
@@ -30,11 +48,14 @@ export class Tree implements ITree {
 	 * 而用 O(n^2) 的空間直接取得 O(1) 的查找。
 	 * 樹狀結構的更新在實務上並不會很頻繁，而即使更新，需要更新的部份也不多。
 	 */
-	private readonly _lca: IValuedDoubleMap<number, TreeNode> = new ValuedIntDoubleMap();
+	private readonly _lcaCache: IValuedDoubleMap<number, TreeNode> = new ValuedIntDoubleMap();
 
+	/** 樹的根點 */
 	private _root!: TreeNode;
 
 	constructor(edges: JEdge[], flaps?: JFlap[]) {
+		this._nodes = new Array(edges.length + 1);
+
 		// 防呆載入所有的邊；傳入資料的順序無所謂
 		while(edges.length) {
 			const remain: JEdge[] = [];
@@ -50,12 +71,20 @@ export class Tree implements ITree {
 			edges = remain;
 		}
 
+		// 建立跳號清單
+		if(this._nodes.length > this._nodeCount) {
+			for(let i = 0; i < this._nodes.length; i++) {
+				if(!this._nodes[i]) this._skippedIdHeap.$insert(i);
+			}
+		}
+
+		// 首次平衡
 		this._balance();
 
 		// 處理 AABB 結構
 		if(flaps) {
 			for(const flap of flaps) {
-				const node = this.$nodes.get(flap.id);
+				const node = this._nodes[flap.id];
 				if(node) node.$setFlap(flap);
 			}
 		}
@@ -66,7 +95,7 @@ export class Tree implements ITree {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $findAllOverlapping(): [TreeNode, TreeNode][] {
-		const flaps = [...this.$nodes.values()].filter(n => n.$isLeaf);
+		const flaps = this._nodes.filter(n => n && n.$isLeaf) as TreeNode[];
 		const result: [TreeNode, TreeNode][] = [];
 		for(const flap of flaps) {
 			result.push(...flap.$findOverlapping(this).map(n => [flap, n] as [TreeNode, TreeNode]));
@@ -104,8 +133,11 @@ export class Tree implements ITree {
 
 	public toJSON(): JEdge[] {
 		const result: JEdge[] = [];
+
+		// 這個佇列的實作未來可以考慮優化
 		const queue: TreeNode[] = [this._root];
-		// 根據當前的樹狀結構以 BFS 的方式輸出，如此一來下次載入的時候就無須經過平衡
+
+		// 根據當前的樹狀結構以 BFS 的方式輸出
 		while(queue.length) {
 			const node = queue.shift()!;
 			for(const child of node.$getChildren()) {
@@ -116,7 +148,8 @@ export class Tree implements ITree {
 		return result;
 	}
 
-	public get $nodes(): ReadonlyMap<number, TreeNode> {
+	/** 公開的節點陣列 */
+	public get $nodes(): readonly (TreeNode | undefined)[] {
 		return this._nodes;
 	}
 
@@ -125,7 +158,7 @@ export class Tree implements ITree {
 	}
 
 	public get $height(): number {
-		return this._root.$branchHeight;
+		return this._root.$height;
 	}
 
 	public $addLeaf(at: number, length: number): number {
@@ -136,12 +169,14 @@ export class Tree implements ITree {
 	}
 
 	public $removeLeaf(id: number): boolean {
-		const node = this._nodes.get(id);
+		const node = this._nodes[id];
 		if(!node) return false;
 		const result = node.$remove();
 		if(result) {
-			this._nodes.delete(node.id);
-			this._lca.delete(node.id);
+			delete this._nodes[node.id];
+			this._nodeCount--;
+			if(node.id < this._nodeCount) this._skippedIdHeap.$insert(node.id);
+			this._lcaCache.delete(node.id);
 			this._balance();
 		}
 		return result;
@@ -149,10 +184,10 @@ export class Tree implements ITree {
 
 	/** 設定一條邊並且傳回是否有加入新邊 */
 	public $setEdge(n1: number, n2: number, length: number): boolean {
-		let N1 = this._nodes.get(n1), N2 = this._nodes.get(n2);
+		let N1 = this._nodes[n1], N2 = this._nodes[n2];
 
 		// 如果圖非空，那加入的邊一定至少要有一點已經存在
-		if(this._nodes.size != 0 && !N1 && !N2) {
+		if(this._nodeCount != 0 && !N1 && !N2) {
 			console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
 			return false;
 		}
@@ -176,19 +211,25 @@ export class Tree implements ITree {
 		return true;
 	}
 
-	public lca(n1: TreeNode, n2: TreeNode): TreeNode {
-		if(n1 == n2) return n1;
-		let result = this._lca.get(n1.id, n2.id);
+	/**
+	 * 傳回兩個節點的 LCA。
+	 *
+	 * 這個方法會對請求建立快取並且在可用的時候直接傳回快取。
+	 * 實務上，我們真正關切的請求點對當中都會至少有一個是葉點，
+	 * 所以我們只需要對那些請求建立快取即可，
+	 * 其餘的都由 {@link _lca} 的非快取方法來計算。
+	 */
+	public $lca(n1: TreeNode, n2: TreeNode): TreeNode {
+		let result = this._lcaCache.get(n1.id, n2.id);
 		if(result) return result;
-		else if(n1.$depth > n2.$depth) result = this.lca(n1.$parent!, n2);
-		else if(n2.$depth > n1.$depth) result = this.lca(n1, n2.$parent!);
-		else result = this.lca(n1.$parent!, n2.$parent!);
-		this._lca.set(n1.id, n2.id, result);
+		result = this._lca(n1, n2);
+		this._lcaCache.set(n1.id, n2.id, result);
 		return result;
 	}
 
+	/** 傳回兩個節點在樹上的距離 */
 	public $dist(n1: TreeNode, n2: TreeNode): number {
-		return n1.$dist + n2.$dist - 2 * this.lca(n1, n2).$dist;
+		return n1.$dist + n2.$dist - 2 * this.$lca(n1, n2).$dist;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +238,8 @@ export class Tree implements ITree {
 
 	private _addLeaf(id: number, at?: TreeNode, length?: number): TreeNode {
 		const newNode = new TreeNode(id, at, length);
-		this._nodes.set(id, newNode);
+		this._nodes[id] = newNode;
+		this._nodeCount++;
 		if(!TEST_MODE) Processor.$addNode(id);
 		return newNode;
 	}
@@ -207,7 +249,7 @@ export class Tree implements ITree {
 		let newRoot = this._root.$balance();
 		while(newRoot) {
 			// 簡單起見，所有以原本根點為 LCA 的點對都要重新計算
-			this._lca.$deleteValue(this._root);
+			this._lcaCache.$deleteValue(this._root);
 
 			this._root = newRoot;
 			newRoot = this._root.$balance();
@@ -217,18 +259,38 @@ export class Tree implements ITree {
 
 	/** 取得下一個可用的節點 id */
 	private get _nextAvailableId(): number {
-		let id = 0;
-		while(this._nodes.has(id)) id++;
-		return id;
+		if(this._skippedIdHeap.$isEmpty) return this._nodeCount;
+		return this._skippedIdHeap.$pop()!;
 	}
 
 	/** 把樹的所有節點按照分支高度整理好 */
 	private _getLevels(): TreeNode[][] {
 		const levels: TreeNode[][] = [];
-		for(const node of this.$nodes.values()) {
-			const h = node.$branchHeight;
+		for(const node of this._nodes) {
+			if(!node) continue;
+			const h = node.$height;
 			(levels[h] ??= []).push(node);
 		}
 		return levels;
+	}
+
+	/**
+	 * 找出 LCA 的核心遞迴方法。
+	 *
+	 * 這個方法不會在每一個步驟上建立快取，因為那樣反而比較慢。
+	 *
+	 * 這邊不太確定迴圈寫法跟遞迴寫法之間的優略關係，
+	 * 理論上迴圈應該會比較快、但是實務上卻幾乎感受不到，
+	 * 似乎引擎對於這種遞迴呼叫有做了優化。
+	 */
+	private _lca(n1: TreeNode, n2: TreeNode): TreeNode {
+		// 基底情況
+		if(n1 == n2) return n1;
+
+		// 遞迴情況；這一段原本比較的是節點的深度，
+		// 但是其實比較節點的距離也是一樣的效果，而且可以少維護一個欄位。
+		if(n1.$dist > n2.$dist) return this._lca(n1.$parent!, n2);
+		if(n2.$dist > n1.$dist) return this._lca(n1, n2.$parent!);
+		return this._lca(n1.$parent!, n2.$parent!);
 	}
 }

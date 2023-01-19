@@ -30,9 +30,6 @@ export class TreeNode implements ITreeNode {
 	/** 節點往下的分支高度（葉點為 0） */
 	private _height: number = 0;
 
-	/** 節點的深度（根點為 0） */
-	private _depth: number = 0;
-
 	/** 節點到根點的距離 */
 	private _dist: number = 0;
 
@@ -49,9 +46,8 @@ export class TreeNode implements ITreeNode {
 			this._length = length;
 			this._AABB.$setMargin(length);
 			this.$pasteTo(parent);
-			this._depth = parent._depth + 1;
 			this._dist = parent._dist + length;
-			parent._increaseBranchHeightRecursive(1);
+			parent._increaseHeightRecursive(1);
 		}
 	}
 
@@ -78,7 +74,7 @@ export class TreeNode implements ITreeNode {
 		const parent = this.$parent;
 		if(this._firstChild || !parent) return false;
 		this.$cut();
-		parent._decreaseBranchHeightRecursive(1);
+		parent._decreaseHeightRecursive(1);
 		return true;
 	}
 
@@ -109,12 +105,11 @@ export class TreeNode implements ITreeNode {
 	}
 
 	/**
-	 * 當自身成為新的根點的時候完整刷新整個樹的 depth 與 dist 值。
+	 * 當自身成為新的根點的時候完整刷新整個樹的 dist 值。
 	 *
 	 * 這個方法會在全部的平衡完成了之後才進行，以增進效能。
 	 */
 	public $setAsRoot(): void {
-		this._updateDepthRecursive(0);
 		this._updateDistRecursive(0);
 	}
 
@@ -140,7 +135,7 @@ export class TreeNode implements ITreeNode {
 		this._prev = undefined;
 	}
 
-	public get $branchHeight(): number {
+	public get $height(): number {
 		return this._height;
 	}
 
@@ -158,10 +153,6 @@ export class TreeNode implements ITreeNode {
 
 	public get $AABB(): number[] {
 		return this._AABB.$get();
-	}
-
-	public get $depth(): number {
-		return this._depth;
 	}
 
 	public get $dist(): number {
@@ -206,18 +197,18 @@ export class TreeNode implements ITreeNode {
 	// 私有方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _increaseBranchHeightRecursive(proposedHeight: number): void {
+	private _increaseHeightRecursive(proposedHeight: number): void {
 		if(this._height < proposedHeight) {
 			this._height = proposedHeight;
 			if(this._prev && this._prev._height < this._height) {
 				this._unlink();
 				this._backwardInsert(this._prev, this._next);
 			}
-			if(this.$parent) this.$parent._increaseBranchHeightRecursive(proposedHeight + 1);
+			if(this.$parent) this.$parent._increaseHeightRecursive(proposedHeight + 1);
 		}
 	}
 
-	private _decreaseBranchHeightRecursive(deprecatedHeight: number): void {
+	private _decreaseHeightRecursive(deprecatedHeight: number): void {
 		if(this._height == deprecatedHeight) {
 			const newHeight = this._firstChild ? this._firstChild._height + 1 : 0;
 			if(newHeight == this._height) return;
@@ -225,7 +216,7 @@ export class TreeNode implements ITreeNode {
 				this._unlink();
 				this._forwardInsert(this._prev, this._next);
 			}
-			if(this.$parent) this.$parent._decreaseBranchHeightRecursive(newHeight + 1);
+			if(this.$parent) this.$parent._decreaseHeightRecursive(newHeight + 1);
 		}
 	}
 
@@ -260,14 +251,6 @@ export class TreeNode implements ITreeNode {
 	 */
 	private _unlink(): void {
 		DoubleLink.unlink(this, next => this.$parent && (this.$parent._firstChild = next));
-	}
-
-	/** 更新自身的深度，並且遞迴地更新自己所有的子點 */
-	private _updateDepthRecursive(v: number): void {
-		this._depth = v++;
-		for(const child of this.$getChildren()) {
-			child._updateDepthRecursive(v);
-		}
 	}
 
 	/** 更新自身的距離，並且遞迴地更新自己所有的子點 */

@@ -6,13 +6,13 @@ import type { AABB } from "./aabb";
 
 //=================================================================
 /**
- * {@link AabbSide} 負責管理 {@link AABB} 四面的其中一面。
+ * {@link AABBSide} 負責管理 {@link AABB} 四面的其中一面。
  *
  * 它使用了堆積的資料結構來高效率地維護自身的當前值。
  */
 //=================================================================
 
-export class AabbSide implements IMutableHeapNode {
+export class AABBSide implements IMutableHeapNode {
 
 	/** 自身在堆積當中的索引，反查用 */
 	public $index: number = 0;
@@ -37,15 +37,15 @@ export class AabbSide implements IMutableHeapNode {
 		this._value = v;
 	}
 
-	public $addChild(child: AabbSide): boolean {
+	public $addChild(child: AABBSide): boolean {
 		return this._heap.$insert(child);
 	}
 
-	public $removeChild(child: AabbSide): boolean {
+	public $removeChild(child: AABBSide): boolean {
 		return this._heap.$remove(child);
 	}
 
-	public $updateChild(child: AabbSide): boolean {
+	public $updateChild(child: AABBSide): boolean {
 		return this._heap.$update(child);
 	}
 }
