@@ -15,22 +15,7 @@ const buildIcon = require("./static/icon");
 const libDest = config.dest.dist + "/lib";
 
 const { purge, extra } = require("../utils/purge");
-
-/**
- * 個別淨化一個 lib 的 CSS 檔案
- *
- * 當 lib 自己有更新、或者比較對象有更新的時候都要重新執行淨化，
- * 所以針對每一個檔案都要自己產一組 stream。
- */
-function makePurge(path) {
-	let stream = gulp.src(config.src.lib + path, { base: config.src.lib })
-		.pipe(newer({
-			dest: libDest + path,
-			extra,
-		}));
-	stream = purge(stream);
-	return stream.pipe(gulp.dest(libDest));
-}
+const fontAwesome = require("../plugins/fontAwesome");
 
 /** 一個給定的 js 檔案是否有 min 或者 prod 的版本 */
 function hasMin(file) {
@@ -99,8 +84,34 @@ const copyLib = () => gulp.src([
 	.pipe(newer(libDest)) // 採用 1:1 比對目標的策略
 	.pipe(gulp.dest(libDest));
 
+/** 建置精簡的 FontAwesome 字型 */
+const faPath = "node_modules/@fortawesome/fontawesome-free";
+const faFontTarget = config.dest.dist + "/lib/font-awesome/webfonts";
+const subsetFontAwesome = () =>
+	gulp.src(config.src.app + "/vue/**/*.vue")
+		.pipe(newer({
+			dest: faFontTarget + "/fa-solid-900.woff2",
+			extra: [__filename, faPath + "/webfonts/*"],
+		}))
+		.pipe(fontAwesome())
+		.pipe(gulp.dest(faFontTarget));
+
+/** 淨化 FontAwesome 的 css */
+const purgeFontAwesome = () => {
+	const dest = libDest + "/font-awesome";
+	let stream = gulp.src(faPath + "/css/all.min.css", { base: faPath })
+		.pipe(newer({ dest, extra: [...extra, __filename] }));
+	stream = purge(stream);
+	return stream
+		.pipe(replace(/src:url\([^)]+eot\);/g, ""))
+		.pipe(replace(/url\([^)]+(iefix|woff|fontawesome)\) format\([^)]+\),?/g, ""))
+		.pipe(replace(/,\}/g, "}"))
+		.pipe(gulp.dest(dest));
+};
+
 gulp.task("static", () => all(
-	makePurge("/font-awesome/css/all.min.css"),
+	purgeFontAwesome(),
+	subsetFontAwesome(),
 	buildIcon(),
 	buildLog(),
 	copyDebugStatic(),

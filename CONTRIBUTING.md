@@ -53,7 +53,7 @@ graph LR
 	c("Core\n(worker thread)")
 	a -->|controls| b
 	b -->|data| a
-	b -->|manipulation| c
+	b -->|manipulates| c
 	c -->|graphics| b
 ```
 

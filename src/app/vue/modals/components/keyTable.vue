@@ -16,8 +16,8 @@
 				<template v-for="(list, name) in Settings.hotkey" :key="name">
 					<tr @click="toggle(name as string)">
 						<td colspan="2">
-							<i class="fas fa-fw fa-caret-down" v-if="open[name]" />
-							<i class="fas fa-fw fa-caret-right" v-else />
+							<i class="fas fa-caret-down fa-fw" v-if="open[name]" />
+							<i class="fas fa-caret-right fa-fw" v-else />
 							{{ labels[name]['_'] }}
 						</td>
 					</tr>
