@@ -10,7 +10,7 @@ const TERNARY = 3;
 
 export class TernaryHeap<T> extends Heap<T> {
 
-	/** 儲存所有的值。多元堆疊的索引從 0 開始。 */
+	/** 儲存所有的元素。多元堆疊的索引從 0 開始。 */
 	protected readonly _data: T[] = [];
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,6 +37,10 @@ export class TernaryHeap<T> extends Heap<T> {
 			this._data.pop();
 		}
 		return result;
+	}
+
+	public $get(): T | undefined {
+		return this._data[0];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

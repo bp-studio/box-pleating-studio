@@ -1,6 +1,5 @@
 import { BinaryHeap } from "./binaryHeap";
 
-import type { Comparator } from "shared/types/types";
 import type { IHeap } from "./heap";
 
 //=================================================================
@@ -8,29 +7,13 @@ import type { IHeap } from "./heap";
  * {@link IMutableHeap} 是可變動的堆積資料結構，支援對已經加入的資料進行更新或移除。
  */
 //=================================================================
-export interface IMutableHeap extends IHeap<IMutableHeapNode> {
+export interface IMutableHeap<T> extends IHeap<T> {
 
-	/** 插入一個節點並且傳回是否有發生改變 */
-	$insert(node: IMutableHeapNode): boolean;
+	/** 移除一個節點 */
+	$remove(value: T): void;
 
-	/** 移除一個節點並且傳回是否有發生改變 */
-	$remove(node: IMutableHeapNode): boolean;
-
-	/** 更新一個節點並且傳回是否有發生改變 */
-	$update(node: IMutableHeapNode): boolean;
-
-	/** 傳回當前的堆積值 */
-	$get(): number | undefined;
-}
-
-/** 可變動堆積節點的抽象介面 */
-export interface IMutableHeapNode {
-
-	/** 自身儲存的數值 */
-	readonly $value: number;
-
-	/** 用來反查自己所在的索引 */
-	$index: number;
+	/** 通知堆積一個元素的值有發生更新 */
+	$notifyUpdate(value: T): void;
 }
 
 //=================================================================
@@ -39,50 +22,43 @@ export interface IMutableHeapNode {
  */
 //=================================================================
 
-export class MutableHeap extends BinaryHeap<IMutableHeapNode> {
+export class MutableHeap<T extends object> extends BinaryHeap<T> {
 
-	/** 快取上一次的值，以便在操作之後檢查是否值有發生改變 */
-	private _cache?: number;
+	/**
+	 * 索引 map，對於傳入的元素進行索引位置的反查。
+	 *
+	 * 這邊採用 {@link WeakMap} 看似效能不佳，但其實 JavaScript 引擎在這部份有很強的優化，
+	 * 就算直接在元素上利用 {@link Symbol} 來儲存反查索引其實也幾乎是一樣的效能。
+	 */
+	private readonly _indices = new WeakMap<T, number>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public override $insert(node: IMutableHeapNode): boolean {
+	public override $insert(value: T): void {
 		const index = this._data.length;
-		this._data.push(node);
-		node.$index = index;
+		this._data.push(value);
+		this._indices.set(value, index);
 		this._moveBackwardRecursive(index);
-		return this._compareAndUpdateCache();
 	}
 
-	public $remove(node: IMutableHeapNode): boolean {
-		const index = node.$index;
-		if(index >= this._data.length) return false;
+	public $remove(value: T): void {
+		const index = this._indices.get(value);
+		if(index === undefined || index >= this._data.length) return;
 		const last = this._data.pop()!;
-		if(index === this._data.length) return index === 1;
-		last.$index = index;
+		if(index === this._data.length) return;
+		this._indices.set(last, index);
 		this._data[index] = last;
 		this._moveForwardRecursive(index);
-		return this._compareAndUpdateCache();
 	}
 
-	public $update(node: IMutableHeapNode): boolean {
-		const index = node.$index;
+	public $notifyUpdate(value: T): void {
+		const index = this._indices.get(value);
+		if(index === undefined) return;
 		if(!this._moveBackwardRecursive(index)) {
 			this._moveForwardRecursive(index);
 		}
-		return this._compareAndUpdateCache();
-	}
-
-	public $get(): number | undefined {
-		return this._data[1]?.$value;
-	}
-
-	public override $pop(): IMutableHeapNode | undefined {
-		const result = super.$pop();
-		this._cache = this.$get();
-		return result;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,23 +67,7 @@ export class MutableHeap extends BinaryHeap<IMutableHeapNode> {
 
 	protected override _swap(a: number, b: number): void {
 		super._swap(a, b);
-		this._data[a].$index = a;
-		this._data[b].$index = b;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _compareAndUpdateCache(): boolean {
-		const currentValue = this.$get();
-		const result = currentValue !== this._cache;
-		this._cache = currentValue;
-		return result;
+		this._indices.set(this._data[a], a);
+		this._indices.set(this._data[b], b);
 	}
 }
-
-
-export const minComparator: Comparator<IMutableHeapNode> = (a, b) => a.$value - b.$value;
-
-export const maxComparator: Comparator<IMutableHeapNode> = (a, b) => b.$value - a.$value;

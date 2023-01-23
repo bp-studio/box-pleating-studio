@@ -1,14 +1,17 @@
 import type { Comparator } from "shared/types/types";
 
 export interface IHeap<T> {
-	/** 插入一個值 */
+	/** 插入一個元素 */
 	$insert(value: T): void;
 
 	/** 堆積是否為空 */
 	readonly $isEmpty: boolean;
 
-	/** 傳回並刪除堆積中的最小值 */
+	/** 傳回並刪除堆積中的第一個元素 */
 	$pop(): T | undefined;
+
+	/** 傳回當前的堆積中的第一個元素 */
+	$get(): T | undefined;
 }
 
 export const minComparator: Comparator<number> = (a, b) => a - b;
@@ -34,6 +37,8 @@ export abstract class Heap<T> implements IHeap<T> {
 	public abstract get $isEmpty(): boolean;
 
 	public abstract $pop(): T | undefined;
+
+	public abstract $get(): T | undefined;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 保護方法

@@ -1,6 +1,6 @@
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 
-import type { IMutableHeap, IMutableHeapNode } from "shared/data/heap/mutableHeap";
+import type { IMutableHeap } from "shared/data/heap/mutableHeap";
 import type { Comparator } from "shared/types/types";
 import type { AABB } from "./aabb";
 
@@ -12,10 +12,7 @@ import type { AABB } from "./aabb";
  */
 //=================================================================
 
-export class AABBSide implements IMutableHeapNode {
-
-	/** 自身在堆積當中的索引，反查用 */
-	public $index: number = 0;
+export class AABBSide {
 
 	/** 額外的間距（對應於佈局當中的河寬） */
 	public $margin: number = 0;
@@ -24,28 +21,41 @@ export class AABBSide implements IMutableHeapNode {
 	private _value: number = 0;
 
 	/** 儲存子節點的堆積 */
-	private _heap: IMutableHeap;
+	private _heap: IMutableHeap<AABBSide>;
 
-	constructor(comparator: Comparator<IMutableHeapNode>) {
+	/** 快取上一次的值，以便在操作之後檢查是否值有發生改變 */
+	private _cache?: number;
+
+	constructor(comparator: Comparator<AABBSide>) {
 		this._heap = new MutableHeap(comparator);
 	}
 
 	public get $value(): number {
-		return (this._heap.$isEmpty ? this._value : this._heap.$get()!) + this.$margin;
+		return (this._heap.$isEmpty ? this._value : this._heap.$get()!.$value) + this.$margin;
 	}
 	public set $value(v: number) {
 		this._value = v;
 	}
 
 	public $addChild(child: AABBSide): boolean {
-		return this._heap.$insert(child);
+		this._heap.$insert(child);
+		return this._compareAndUpdateCache();
 	}
 
 	public $removeChild(child: AABBSide): boolean {
-		return this._heap.$remove(child);
+		this._heap.$remove(child);
+		return this._compareAndUpdateCache();
 	}
 
 	public $updateChild(child: AABBSide): boolean {
-		return this._heap.$update(child);
+		this._heap.$notifyUpdate(child);
+		return this._compareAndUpdateCache();
+	}
+
+	private _compareAndUpdateCache(): boolean {
+		const currentValue = this._heap.$get()?.$value;
+		const result = currentValue !== this._cache;
+		this._cache = currentValue;
+		return result;
 	}
 }

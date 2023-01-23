@@ -8,7 +8,7 @@ import { Heap } from "./heap";
 
 export class BinaryHeap<T> extends Heap<T> {
 
-	/** 儲存所有的值。跟一般的二元堆疊慣例一樣，這個陣列的索引故意從 1 開始。 */
+	/** 儲存所有的元素。跟一般的二元堆疊慣例一樣，這個陣列的索引故意從 1 開始。 */
 	protected readonly _data: T[] = [null!];
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,6 +35,10 @@ export class BinaryHeap<T> extends Heap<T> {
 			this._data.pop();
 		}
 		return result;
+	}
+
+	public $get(): T | undefined {
+		return this._data[1];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,6 @@
-import { minComparator, maxComparator } from "shared/data/heap/mutableHeap";
 import { AABBSide } from "./aabbSide";
+
+import type { Comparator } from "shared/types/types";
 
 /** 這個的順序是參考 CSS 當中的順序 */
 export enum Side {
@@ -10,6 +11,10 @@ export enum Side {
 }
 
 const SIDES = [Side._top, Side._right, Side._bottom, Side._left];
+
+const minComparator: Comparator<AABBSide> = (a, b) => a.$value - b.$value;
+const maxComparator: Comparator<AABBSide> = (a, b) => b.$value - a.$value;
+
 
 //=================================================================
 /**
