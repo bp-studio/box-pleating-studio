@@ -1,6 +1,8 @@
 import { expect } from "chai";
 
 import { Tree } from "core/design/context/tree";
+import { heightTask } from "core/design/tasks/height";
+import { Processor } from "core/service/processor";
 
 describe("Tree", function() {
 
@@ -9,6 +11,7 @@ describe("Tree", function() {
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
 		]);
+		Processor.$run(heightTask);
 
 		expect(tree.$nodes.filter(n => n).length).to.equal(3);
 		expect(tree.$root.id).to.equal(0);
@@ -20,6 +23,7 @@ describe("Tree", function() {
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
 		]);
+		Processor.$run(heightTask);
 
 		const n0 = tree.$nodes[0]!;
 		const n1 = tree.$nodes[1]!;
@@ -28,6 +32,7 @@ describe("Tree", function() {
 		// Add two more edges, causing unbalancing
 		const id = tree.$addLeaf(1, 2);
 		tree.$addLeaf(id, 2);
+		Processor.$run(heightTask);
 
 		expect(id).to.equal(3);
 		expect(tree.$root).to.equal(n1);
@@ -41,6 +46,7 @@ describe("Tree", function() {
 			{ n1: 2, n2: 3, length: 2 },
 			{ n1: 3, n2: 4, length: 2 },
 		]);
+		Processor.$run(heightTask);
 
 		const n2 = tree.$nodes[2]!;
 		const n3 = tree.$nodes[3]!;
@@ -53,27 +59,10 @@ describe("Tree", function() {
 		expect(tree.$nodes[1]).to.be.undefined;
 		expect(tree.$removeLeaf(0)).to.be.true;
 		expect(tree.$nodes[0]).to.be.undefined;
+
+		Processor.$run(heightTask);
 		expect(tree.$root).to.equal(n3);
 		expect(tree.$height).to.equal(1);
-	});
-
-	it("Keeps a record of LCA", function() {
-		const tree = new Tree([
-			{ n1: 0, n2: 1, length: 2 },
-			{ n1: 0, n2: 2, length: 2 },
-			{ n1: 2, n2: 3, length: 2 },
-		]);
-
-		const n0 = tree.$nodes[0]!;
-		const n1 = tree.$nodes[1]!;
-		const n2 = tree.$nodes[2]!;
-		const n3 = tree.$nodes[3]!;
-		expect(tree.$lca(n2, n3)).to.equal(n2);
-		expect(tree.$lca(n1, n3)).to.equal(n0);
-
-		tree.$addLeaf(3, 2); // re-balancing
-
-		expect(tree.$lca(n1, n3)).to.equal(n2);
 	});
 
 	it("Keeps a record of distances", function() {
@@ -83,6 +72,7 @@ describe("Tree", function() {
 			{ n1: 2, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
 		]);
+		Processor.$run(heightTask);
 
 		const n0 = tree.$nodes[0]!;
 		const n1 = tree.$nodes[1]!;
@@ -95,6 +85,7 @@ describe("Tree", function() {
 		expect(tree.$dist(n1, n4)).to.equal(10);
 
 		tree.$setEdge(2, 0, 5);
+		Processor.$run(heightTask);
 		expect(tree.$dist(n1, n4)).to.equal(13);
 	});
 
@@ -105,8 +96,9 @@ describe("Tree", function() {
 			{ n1: 2, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
 		]);
+		Processor.$run(heightTask);
 
-		const json = '[{"n1":2,"n2":0,"length":2},{"n1":2,"n2":3,"length":3},{"n1":0,"n2":1,"length":1},{"n1":3,"n2":4,"length":4}]';
+		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
 		expect(JSON.stringify(tree)).to.equal(json);
 	});
 
@@ -126,13 +118,16 @@ describe("Tree", function() {
 
 		n2.$setAABB(8, 8, 8, 8);
 		n4.$setAABB(2, 5, 2, 5);
-		expect(n2.$AABB).to.eql([10, 10, 6, 6]);
-		expect(n1.$AABB).to.eql([11, 11, 5, 5]);
-		expect(n4.$AABB).to.eql([6, 9, -2, 1]);
-		expect(n3.$AABB).to.eql([9, 12, -5, -2]);
-		expect(n0.$AABB).to.eql([11, 12, -5, -2]);
+		Processor.$run(heightTask);
+
+		expect(n2.$AABB.$toArray()).to.eql([10, 10, 6, 6]);
+		expect(n1.$AABB.$toArray()).to.eql([11, 11, 5, 5]);
+		expect(n4.$AABB.$toArray()).to.eql([6, 9, -2, 1]);
+		expect(n3.$AABB.$toArray()).to.eql([9, 12, -5, -2]);
+		expect(n0.$AABB.$toArray()).to.eql([11, 12, -5, -2]);
 
 		n2.$setAABB(0, 0, 0, 0);
-		expect(n0.$AABB).to.eql([9, 12, -5, -3]);
+		Processor.$run(heightTask);
+		expect(n0.$AABB.$toArray()).to.eql([9, 12, -5, -3]);
 	});
 });

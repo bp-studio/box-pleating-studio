@@ -1,6 +1,5 @@
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 
-import type { IMutableHeap } from "shared/data/heap/mutableHeap";
 import type { Comparator } from "shared/types/types";
 import type { AABB } from "./aabb";
 
@@ -18,10 +17,10 @@ export class AABBSide {
 	public $margin: number = 0;
 
 	/** 自變數情況下的自身值 */
-	private _value: number = 0;
+	public $value: number = 0;
 
 	/** 儲存子節點的堆積 */
-	private _heap: IMutableHeap<AABBSide>;
+	private _heap: MutableHeap<AABBSide>;
 
 	/** 快取上一次的值，以便在操作之後檢查是否值有發生改變 */
 	private _cache?: number;
@@ -30,11 +29,9 @@ export class AABBSide {
 		this._heap = new MutableHeap(comparator);
 	}
 
-	public get $value(): number {
-		return (this._heap.$isEmpty ? this._value : this._heap.$get()!.$value) + this.$margin;
-	}
-	public set $value(v: number) {
-		this._value = v;
+	/** 自身在父點堆積中的鍵，這等於自身的值再加上間距 */
+	public get $key(): number {
+		return (this._heap.$isEmpty ? this.$value : this._heap.$get()!.$key) + this.$margin;
 	}
 
 	public $addChild(child: AABBSide): boolean {

@@ -1,24 +1,8 @@
 import { BinaryHeap } from "./binaryHeap";
 
-import type { IHeap } from "./heap";
-
 //=================================================================
 /**
- * {@link IMutableHeap} 是可變動的堆積資料結構，支援對已經加入的資料進行更新或移除。
- */
-//=================================================================
-export interface IMutableHeap<T> extends IHeap<T> {
-
-	/** 移除一個節點 */
-	$remove(value: T): void;
-
-	/** 通知堆積一個元素的值有發生更新 */
-	$notifyUpdate(value: T): void;
-}
-
-//=================================================================
-/**
- * {@link MutableHeap} 是 {@link IMutableHeap} 的實作。
+ * {@link MutableHeap} 是可變動的堆積資料結構，支援對已經加入的資料進行更新或移除。
  */
 //=================================================================
 
@@ -27,8 +11,9 @@ export class MutableHeap<T extends object> extends BinaryHeap<T> {
 	/**
 	 * 索引 map，對於傳入的元素進行索引位置的反查。
 	 *
-	 * 這邊採用 {@link WeakMap} 看似效能不佳，但其實 JavaScript 引擎在這部份有很強的優化，
+	 * 這邊採用 {@link WeakMap} 看似牛刀，但其實 JavaScript 引擎在這部份有很強的優化，
 	 * 就算直接在元素上利用 {@link Symbol} 來儲存反查索引其實也幾乎是一樣的效能。
+	 * 另外，此處因為只在乎映射關係，用 {@link WeakMap} 的效能會比 {@link Map} 要好。
 	 */
 	private readonly _indices = new WeakMap<T, number>();
 

@@ -1,4 +1,6 @@
 import { Design } from "core/design/design";
+import { heightTask } from "core/design/tasks/height";
+import { Processor } from "core/service/processor";
 
 //=================================================================
 /**
@@ -7,13 +9,14 @@ import { Design } from "core/design/design";
 //=================================================================
 namespace TreeController {
 
-	/** 根據給定的資料初始化專案 */
 	export function addLeaf(at: number, length: number): void {
 		Design.$instance.$tree.$addLeaf(at, length);
+		Processor.$run(heightTask);
 	}
 
 	export function removeLeaf(id: number): void {
 		Design.$instance.$tree.$removeLeaf(id);
+		Processor.$run(heightTask);
 	}
 }
 

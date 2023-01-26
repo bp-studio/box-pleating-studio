@@ -26,6 +26,11 @@ export class TernaryHeap<T> extends Heap<T> {
 		return this._data.length === 0;
 	}
 
+	public get $size(): number {
+		return this._data.length;
+	}
+
+
 	public $pop(): T | undefined {
 		if(this.$isEmpty) return undefined;
 		const result = this._data[0];
@@ -41,6 +46,18 @@ export class TernaryHeap<T> extends Heap<T> {
 
 	public $get(): T | undefined {
 		return this._data[0];
+	}
+
+	public $getSecond(): T | undefined {
+		if(this._data.length <= 1) return undefined;
+		let cursor = 1, index = 1;
+		if(this._shouldSwap(index, ++cursor)) index = cursor;
+		if(this._shouldSwap(index, ++cursor)) index = cursor;
+		return this._data[index];
+	}
+
+	public [Symbol.iterator](): IterableIterator<T> {
+		return this._data.values();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

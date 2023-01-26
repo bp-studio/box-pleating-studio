@@ -1,8 +1,12 @@
+import type { AABB } from "./aabb/aabb";
+import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
 
 export interface ITree extends ISerializable<JEdge[]> {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
+
+	readonly $root: ITreeNode;
 
 	/** 增加一個新的葉點並且傳回新節點的 {@link ITreeNode.id id} */
 	$addLeaf(at: number, length: number): number;
@@ -19,5 +23,10 @@ export interface ITree extends ISerializable<JEdge[]> {
 
 export interface ITreeNode extends ISerializable<JEdge> {
 	readonly id: number;
+	readonly $parent: ITreeNode | undefined;
 	readonly $length: number;
+	readonly $children: IReadonlyHeap<ITreeNode>;
+	readonly $dist: number;
+	readonly $isLeaf: boolean;
+	readonly $AABB: AABB;
 }

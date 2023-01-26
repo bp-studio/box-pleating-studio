@@ -24,6 +24,10 @@ export class BinaryHeap<T> extends Heap<T> {
 		return this._data.length === 1;
 	}
 
+	public get $size(): number {
+		return this._data.length - 1;
+	}
+
 	public $pop(): T | undefined {
 		if(this.$isEmpty) return undefined;
 		const result = this._data[1];
@@ -39,6 +43,20 @@ export class BinaryHeap<T> extends Heap<T> {
 
 	public $get(): T | undefined {
 		return this._data[1];
+	}
+
+	public $getSecond(): T | undefined {
+		if(this._data.length <= 2) return undefined;
+		let index = 2;
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+		if(this._shouldSwap(index, 3)) index = 3;
+		return this._data[index];
+	}
+
+	public [Symbol.iterator](): IterableIterator<T> {
+		const result = this._data.values();
+		result.next();
+		return result;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

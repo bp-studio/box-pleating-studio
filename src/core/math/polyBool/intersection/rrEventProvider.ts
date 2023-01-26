@@ -60,7 +60,7 @@ const segmentComparator: Comparator<StartEvent> = (a, b) =>
 	getSlope(a) - getSlope(b) ||
 	// 如果切線斜率還是一樣就比較曲率
 	getCurvature(a) - getCurvature(b) ||
-	// 重疊的情況中，離開邊優先（這跟交集的情況相反）
+	// 重疊的情況中，離開邊優先（這跟聯集的情況相反）
 	a.$wrapDelta - b.$wrapDelta;
 
 /** 比較開始事件的 y 座標 */

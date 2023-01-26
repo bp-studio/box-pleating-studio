@@ -1,4 +1,6 @@
+import { heightTask } from "core/design/tasks/height";
 import { Design } from "core/design/design";
+import { Processor } from "core/service/processor";
 
 import type { JDesign } from "shared/json";
 
@@ -13,6 +15,7 @@ namespace DesignController {
 	/** 根據給定的資料初始化專案 */
 	export function init(data: JDesign): void {
 		Design.$create(data);
+		Processor.$run(heightTask);
 	}
 
 	export function json(): RecursivePartial<JDesign> {
