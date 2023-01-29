@@ -62,7 +62,7 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public $setAABB(top: number, right: number, bottom: number, left: number): void {
-		State.$AABBChanged.add(this);
+		State.$flapAABBChanged.add(this);
 		this.$AABB.$update(top, right, bottom, left);
 	}
 

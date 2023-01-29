@@ -18,15 +18,15 @@
 						</div>
 						<div class="d-flex">
 							<div>
+								<button v-if="canShare" class="btn btn-primary me-2" @click="share">
+									<i class="fas fa-share" />
+									{{ $t('share.share') }}
+								</button>
 								<button class="btn btn-primary" @click="copy" ref="bt">
 									<i class="fas fa-copy" />
 									{{ $t('share.copy') }}
 									<i class="fas fa-check d-inline-block" ref="success"
 									   style="transition: width 0.5s; width: 0; overflow: hidden;" />
-								</button>
-								<button v-if="canShare" class="btn btn-primary" @click="share">
-									<i class="fas fa-share" />
-									{{ $t('share.share') }}
 								</button>
 							</div>
 						</div>

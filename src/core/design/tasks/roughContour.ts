@@ -1,25 +1,24 @@
 import { Task } from "./task";
 import { climb } from "./climb";
 import { State } from "core/service/state";
-import { AABBTask } from "./aabb";
 import { Processor } from "core/service/processor";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { expand } from "core/math/polyBool/expansion";
-import { distanceTask } from "./distance";
 
 import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
- * {@link RoughContourTask} 負責更新 {@link TreeNode.$outerRoughContour} 和 {@link TreeNode.$innerRoughContour}。
+ * {@link roughContourTask} 負責更新 {@link TreeNode.$outerRoughContour}
+ * 和 {@link TreeNode.$innerRoughContour}。
  */
 //=================================================================
-export const RoughContourTask = new Task(process, AABBTask, distanceTask);
+export const roughContourTask = new Task(process);
 
 const union = new AAUnion();
 
 function process(): void {
-	climb(updater, State.$AABBChanged as Set<TreeNode>);
+	climb(updater, State.$flapAABBChanged as Set<TreeNode>);
 }
 
 function updater(node: TreeNode): boolean {

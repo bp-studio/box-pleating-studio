@@ -14,8 +14,10 @@ namespace DesignController {
 
 	/** 根據給定的資料初始化專案 */
 	export function init(data: JDesign): void {
+		if(DEBUG_ENABLED) console.time("Design initializing");
 		Design.$create(data);
 		Processor.$run(heightTask);
+		if(DEBUG_ENABLED) console.timeEnd("Design initializing");
 	}
 
 	export function json(): RecursivePartial<JDesign> {

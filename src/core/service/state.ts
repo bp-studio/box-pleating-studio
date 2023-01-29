@@ -12,11 +12,29 @@ import type { TreeNode } from "core/design/context/treeNode";
 
 export namespace State {
 
+	/** 當前回合結束之後重設所有的暫時性狀態（持久狀態會被保留） */
+	export function $reset(): void {
+		$childrenChanged.clear();
+		$parentChanged.clear();
+		$lengthChanged.clear();
+		$subtreeAABBChanged.clear();
+		$flapAABBChanged.clear();
+		$rootChanged = false;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 持久狀態
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	/** 當前的樹 */
 	export let $tree: Tree;
 
 	/** 所有的重疊組合、以及對應的兩點之間的樹狀距離 */
 	export const $collisions = new IntDoubleMap<number>();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 暫時狀態
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** 當前回合當中，子點曾經改變過（包括初始化）的點 */
 	export const $childrenChanged = new Set<TreeNode>();
@@ -24,22 +42,17 @@ export namespace State {
 	/** 當前回合當中，父點曾經改變過（包括初始化）的點 */
 	export const $parentChanged = new Set<ITreeNode>();
 
-	/** 當前回合中根點有發生改變 */
+	/** 當前回合當中，根點有發生過改變 */
 	export let $rootChanged: boolean;
 
-	/** 當前回合當中，所有上連邊長曾經改變過的節點 */
+	/** 當前回合當中，所有上連邊長曾經改變過的節點（已經列入 {@link $parentChanged} 者除外） */
 	export const $lengthChanged = new Set<ITreeNode>();
 
-	/** 當前回合當中，所有 {@link TreeNode.$AABB AABB} 曾經發生過改變的節點 */
-	export const $AABBChanged = new Set<ITreeNode>();
+	/** 當前回合當中，所有子樹的 {@link TreeNode.$AABB AABB} 曾經發生過改變的節點，用來判斷是否需要重新搜尋碰撞 */
+	export const $subtreeAABBChanged = new Set<ITreeNode>();
 
-	export function $reset(): void {
-		$childrenChanged.clear();
-		$parentChanged.clear();
-		$lengthChanged.clear();
-		$AABBChanged.clear();
-		$rootChanged = false;
-	}
-
-	$reset();
+	/** 當前回合當中，{@link TreeNode.$AABB AABB} 曾經改變的角片 */
+	export const $flapAABBChanged = new Set<ITreeNode>();
 }
+
+State.$reset();

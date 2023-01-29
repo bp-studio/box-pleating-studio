@@ -1,16 +1,22 @@
 import { State } from "core/service/state";
-import { heightTask } from "./height";
 import { Task } from "./task";
+import { distanceTask } from "./distance";
 
+import type { heightTask } from "./height";
 import type { TreeNode } from "../context/treeNode";
 import type { Tree } from "../context/tree";
 
 //=================================================================
 /**
  * {@link balanceTask} 負責更新 {@link Tree.$root}。
+ *
+ * 它的依賴為 {@link heightTask}，
+ * 因為它是根據根點底下的各個子點之高度來決定是否需要進行平衡。
+ * 雖然它在平衡的過程當中也會動到 {@link TreeNode.$height}，
+ * 但是這邊並不會出現實際上的循環相依。
  */
 //=================================================================
-export const balanceTask = new Task(process, heightTask);
+export const balanceTask = new Task(process, distanceTask);
 
 function process(): void {
 	const tree = State.$tree;

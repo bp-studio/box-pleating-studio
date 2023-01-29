@@ -17,32 +17,38 @@ The data flow of the Core is depicted in the following chart.
 flowchart TB
 subgraph User input
 	direction LR
-	A([Tree structure])
-	B([Edge lengths])
-	C([Flap positions and sizes])
-	D([Stretch pattern choices])
+	T([Tree structure])
+	L([Edge lengths])
+	F([Flap positions and sizes])
+	S([Flap selection])
+	P([Stretch pattern choices])
 end
 subgraph Tree
 	h{{node heights}}
-	o(tree balancing)
+	b(tree balancing)
 	d{{node distances}}
 	a{{AABB hierarchy}}
-	k(collision)
 end
+s{{selected subtrees}}
+k(collision)
 subgraph Stretch
 	g(overlap groups)
 	c(configurations)
 	p(patterns)
 end
+e[[Error indicators]]
 subgraph Contour
+	cc[[cached contours]]
 	rc(rough contours)
 	pc{{pattern contours}}
-	fc([final contours])
+	fc[[final contours]]
 end
 
-A --> h --> o
-o & B --> d -.-> rc
-o & B & C --> a --> rc --> fc
-d & a --> k --> g --> c --> p
-p & D --> pc --> fc
+T --> h --> b
+b & L --> d --> a
+L & F --> a --> rc --> fc
+a --> k --> e & g
+g --> c --> p
+S --> s ---------> cc -.-> rc
+p & P --> pc --> fc
 ```

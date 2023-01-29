@@ -1,19 +1,21 @@
 import { climb } from "./climb";
 import { Task } from "./task";
 import { State } from "core/service/state";
+import { balanceTask } from "./balance";
 
 import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
  * {@link heightTask} 負責更新 {@link TreeNode.$height}。
+ *
+ * 這個工作是所有更新工作的最起點。
  */
 //=================================================================
-export const heightTask = new Task(process);
+export const heightTask = new Task(process, balanceTask);
 
 function process(): void {
-	const init = State.$childrenChanged;
-	climb(updater, init);
+	climb(updater, State.$childrenChanged);
 }
 
 function updater(node: TreeNode): boolean {

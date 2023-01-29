@@ -21,7 +21,7 @@ const pixiApp = new Application({
 	width: viewport.width,
 	height: viewport.height,
 	antialias: true,
-	autoStart: false, // 等 UI 初始化之後再開始
+	autoStart: true, // 不管一開始有沒有專案都先啟動，這可以加快第一個專案的顯示速度
 
 	// 這邊如果採用浮點數的 devicePixelRatio 會造成格線的繪製有 glitch 的感覺，
 	// 所以向下取整數繪製就好。這樣的設置無論是在桌機還是在手機上都可以有好的表現。

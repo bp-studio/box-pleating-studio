@@ -10,7 +10,7 @@ export namespace Processor {
 
 	let updateResult: UpdateModel;
 
-	const taskHeap = new HeapSet<Task>((a, b) => a.$level - b.$level);
+	const taskHeap = new HeapSet<Task>((a, b) => b.$priority - a.$priority);
 
 	export function $run(...tasks: readonly Task[]): void {
 		queue(tasks);
@@ -20,10 +20,6 @@ export namespace Processor {
 			queue(task.$dependant);
 		}
 		State.$reset();
-	}
-
-	function queue(tasks: readonly Task[]): void {
-		for(const task of tasks) taskHeap.$insert(task);
 	}
 
 	export function $addEdge(edge: JEdge): void {
@@ -38,7 +34,17 @@ export namespace Processor {
 		updateResult.graphics[tag] = { contours };
 	}
 
-	export function $reset(): void {
+	export function $getResult(): UpdateModel {
+		const result = updateResult;
+		reset();
+		return result;
+	}
+
+	function queue(tasks: readonly Task[]): void {
+		for(const task of tasks) taskHeap.$insert(task);
+	}
+
+	function reset(): void {
 		updateResult = {
 			add: {
 				edges: [],
@@ -52,7 +58,5 @@ export namespace Processor {
 		};
 	}
 
-	export function $getResult(): UpdateModel {
-		return updateResult;
-	}
+	reset();
 }

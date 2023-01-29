@@ -2,14 +2,10 @@ import { Processor } from "core/service/processor";
 import { getAction } from "./routes/routes";
 import { Design } from "./design/design";
 
-import "core/design/tasks/roughContour";
-
 import type { StudioResponse, IStudioRequestBase } from "core/routes";
 
 onmessage = async function(event: MessageEvent): Promise<void> {
 	if(!event.ports[0]) return;
-
-	Processor.$reset();
 
 	const request = event.data as IStudioRequestBase;
 	let response: StudioResponse;
@@ -31,6 +27,5 @@ onmessage = async function(event: MessageEvent): Promise<void> {
 
 	event.ports[0].postMessage(response);
 };
-
 
 export { Design };

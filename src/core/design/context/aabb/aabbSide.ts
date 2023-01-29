@@ -31,11 +31,12 @@ export class AABBSide {
 
 	/** 自身在父點堆積中的鍵，這等於自身的值再加上間距 */
 	public get $key(): number {
-		return (this._heap.$isEmpty ? this.$value : this._heap.$get()!.$key) + this.$margin;
+		return (this._heap.$isEmpty ? this.$value : this._cache!) + this.$margin;
 	}
 
 	public $addChild(child: AABBSide): boolean {
 		this._heap.$insert(child);
+		if(child === this) debugger;
 		return this._compareAndUpdateCache();
 	}
 
@@ -50,7 +51,7 @@ export class AABBSide {
 	}
 
 	private _compareAndUpdateCache(): boolean {
-		const currentValue = this._heap.$get()?.$value;
+		const currentValue = this._heap.$get()?.$key;
 		const result = currentValue !== this._cache;
 		this._cache = currentValue;
 		return result;
