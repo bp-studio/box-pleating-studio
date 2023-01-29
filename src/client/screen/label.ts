@@ -14,7 +14,6 @@ import type { Sheet } from "client/project/components/sheet";
 
 const TIMEOUT = 10;
 const SQRT = 2 / Math.sqrt(MIN_SCALE);
-const EXTRA_FIX = 25; // 這是實驗得到的數字
 
 const TEXT_WIDTH_LIMIT = 50;
 const SMOOTHNESS = 2;
@@ -35,7 +34,7 @@ export class Label extends Container {
 	@shallowRef private _labelBounds: Rectangle = null!;
 
 	private _contentCache: string = "";
-	private _directionCache: Direction = Direction.none;
+	@shallowRef private _directionCache: Direction = Direction.none;
 	@shallowRef private _xCache: number = 0;
 
 	public $color?: number;
@@ -75,17 +74,18 @@ export class Label extends Container {
 		// 設定文字
 		text = text.trim();
 		this.visible = Boolean(text);
-		if(this.visible) direction = this._draw(text, x, y, direction);
+		const dir = this.visible ? this._draw(text, x, y, direction) : Direction.none;
 
-		if(this._contentCache != text || this._directionCache != direction || this._xCache != x) {
+		if(this._contentCache != text || this._directionCache != dir || this._xCache != x) {
 			this._contentCache = text;
 			let width = text == "" ? 0 : Math.ceil(this._label.width) / SMOOTHNESS;
-			if(direction == Direction.T || direction == Direction.B) width /= 2;
-			const bounds = this.getLocalBounds();
+			if(directionalOffsets[dir].x === 0) width /= 2;
+			const bounds = this._label.getLocalBounds().clone();
 
 			// 延遲設定以避免循環參照
 			clearTimeout(this._timeout);
 			this._timeout = setTimeout(() => {
+				this._directionCache = dir;
 				this._labelWidth = width;
 				this._labelBounds = bounds;
 				this._xCache = x;
@@ -93,6 +93,7 @@ export class Label extends Container {
 		}
 	}
 
+	/** 繪製文字標籤的核心方法 */
 	private _draw(text: string, x: number, y: number, direction?: Direction): Direction {
 		this._label.text = text;
 		this._glow.text = text;
@@ -148,15 +149,18 @@ export class Label extends Container {
 		return direction;
 	}
 
-	/** 一個標籤的橫向溢出大小 */
+	/** 一個標籤的橫向溢出大小，單位是像素；由實際渲染結果決定 */
 	public get $overflow(): number {
-		if(!this._labelBounds || !this.visible) return 0;
+		const bounds = this._labelBounds;
+		if(!bounds || !this.visible) return 0;
 
 		let result = 0;
+		const x = this._xCache;
 		const sheetWidth = this._sheet.grid.$width;
 		const scale = ProjectService.scale.value;
-		const left = this.x * scale + (this._labelBounds.left - this.pivot.x) / SMOOTHNESS;
-		const right = (this.x - sheetWidth) * scale + (this._labelBounds.right - this.pivot.x) / SMOOTHNESS;
+		const factor = Math.sqrt(ProjectService.shrink.value);
+		const left = x * scale + (bounds.left * factor - this.pivot.x) / SMOOTHNESS;
+		const right = (x - sheetWidth) * scale + (bounds.right * factor - this.pivot.x) / SMOOTHNESS;
 
 		if(left < 0) result = -left;
 		if(right > 0) result = Math.max(result, right);
@@ -165,26 +169,26 @@ export class Label extends Container {
 	}
 
 	/** 透過解方程式來逆推考量到當前的標籤之下應該採用何種自動尺度 */
-	public $getHorizontalScale(sheetWidth: number, viewWidth: number, factor: number): number {
+	public $inferHorizontalScale(sheetWidth: number, fullWidth: number): number {
 		const labelWidth = this._labelWidth;
 		if(labelWidth == 0) return NaN;
-		const vw = (viewWidth - EXTRA_FIX) * factor;
+		fullWidth -= Math.abs(directionalOffsets[this._directionCache].x) * 2 / SMOOTHNESS;
 		const size = Math.abs(2 * this._xCache - sheetWidth);
-		let result = Label._solveEq(-vw, labelWidth * SQRT, size);
+		let result = solveEq(-fullWidth, labelWidth * SQRT, size);
 		if(result > MIN_SCALE) {
-			if(size != 0) result = (vw - 2 * labelWidth) / size;
-			else result = vw / sheetWidth;
+			if(size != 0) result = (fullWidth - 2 * labelWidth) / size;
+			else result = fullWidth / sheetWidth;
 		}
 		return result;
 	}
+}
 
-	/** 解型如 o * x + s * Math.sqrt(x) + z == 0 的二次方程 */
-	private static _solveEq(z: number, s: number, o: number): number {
-		if(o == 0) return z * z / (s * s); // 退化情況
-		const f = 2 * o * z, b = s * s - f;
-		const inner = b * b - f * f;
-		return (b - Math.sqrt(inner)) / (2 * o * o);
-	}
+/** 解型如 o * x + s * Math.sqrt(x) + z == 0 的二次方程 */
+function solveEq(z: number, s: number, o: number): number {
+	if(o == 0) return z * z / (s * s); // 退化情況
+	const f = 2 * o * z, b = s * s - f;
+	const det = b * b - f * f;
+	return (b - Math.sqrt(det)) / (2 * o * o);
 }
 
 /**

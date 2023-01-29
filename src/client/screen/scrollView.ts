@@ -6,6 +6,14 @@ import { useViewport } from "./viewport";
 import type { Viewport } from "./viewport";
 import type { ScrollController } from "client/controllers/scrollController";
 
+/**
+ * 提供全域的圖像尺寸。
+ *
+ * 特別注意到我們在此並未設置監看這個值並且在改變的時候呼叫
+ * {@link ScrollView.$updateScrollbar} 方法，
+ * 這是因為如果文字標籤的計算邏輯沒有錯誤的話，除了縮放之類的情況之外，
+ * 圖像尺寸理論上並不會出現除了細微誤差之外的變化。
+ */
 const imageDimension = computed<IDimension>(() => {
 	const sheet = ProjectService.sheet.value;
 	if(!sheet) return { width: 0, height: 0 };
@@ -65,15 +73,15 @@ export class ScrollView extends EventTarget {
 		this._spaceHolder.style.width = image.width + "px";
 		this._spaceHolder.style.height = image.height + "px";
 
-		// 加 1 以避免浮點數誤觸
-		const scrollX = image.width > this._el.clientWidth + 1;
-		const scrollY = image.height > this._el.clientHeight + 1;
+		// 加 2 以避免浮點數誤觸
+		const scrollX = image.width > this._el.clientWidth + 2;
+		const scrollY = image.height > this._el.clientHeight + 2;
 		this._el.classList.toggle("scroll-x", scrollX);
 		this._el.classList.toggle("scroll-y", scrollY);
 
 		// 再檢測一次，以因應某一個捲軸因為另外一個捲軸而跑出來的情況
-		this._el.classList.toggle("scroll-x", scrollX || image.width > this._el.clientWidth + 1);
-		this._el.classList.toggle("scroll-y", scrollY || image.height > this._el.clientHeight + 1);
+		this._el.classList.toggle("scroll-x", scrollX || image.width > this._el.clientWidth + 2);
+		this._el.classList.toggle("scroll-y", scrollY || image.height > this._el.clientHeight + 2);
 
 		// 捲軸變動可能會導致 Viewport 改變，此時設置延遲然後重刷一次
 		setTimeout(this.$viewport.$update, 0);

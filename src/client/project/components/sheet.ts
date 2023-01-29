@@ -132,8 +132,9 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$width;
 		let horizontalScale = (viewWidth - 2 * MARGIN) * factor / width;
 		if(app.settings.showLabel) {
+			const vw = viewWidth * factor - 2 * MARGIN_FIX;
 			const scales = [...this.$labels].map(label =>
-				label.$getHorizontalScale(width, viewWidth - 2 * MARGIN_FIX, factor)
+				label.$inferHorizontalScale(width, vw)
 			).filter(s => !isNaN(s));
 			horizontalScale = Math.min(horizontalScale, ...scales);
 		}
@@ -142,6 +143,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return Math.min(horizontalScale, verticalScale);
 	}
 
+	/** 根據渲染結果確定出來的水平邊距 */
 	public readonly $horizontalMargin = computed(() => {
 		const overflows = [...this.$labels].map(l => l.$overflow);
 		const result = Math.max(MARGIN, ...overflows);
