@@ -1,3 +1,5 @@
+$statusbar-height: 25px;
+
 .viewport {
 	background: var(--bs-body-bg);
 }
@@ -16,16 +18,48 @@ aside {
 	top: 3.75rem;
 	width: 250px;
 	bottom: 0;
-	background: var(--bg-ui) !important;
 	color: #000; /* AAA 考量起見 */
 	cursor: default;
-	padding: 10px;
 	transition: right 500ms;
+	display: flex;
+	flex-direction: column;
+	background: var(--bg-ui) !important;
+}
+
+footer {
+	display: none;
+	position: absolute;
+	width: 100vw;
+	height: $statusbar-height;
+	bottom: 0;
+	left: 0;
+	background: var(--bg-ui);
 }
 
 #note {
 	position: absolute;
 	bottom: 20px;
+}
+
+.show-status {
+	#divWorkspace,
+	#divShade,
+	aside,
+	.viewport {
+		bottom: $statusbar-height;
+	}
+
+	#divDPad {
+		bottom: calc($statusbar-height + 1rem);
+	}
+
+	footer {
+		display: block;
+	}
+
+	#note {
+		bottom: $statusbar-height + 20px;
+	}
 }
 
 @media print {

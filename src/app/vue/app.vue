@@ -5,6 +5,7 @@
 
 		<Panel />
 		<Toolbar />
+		<Status />
 
 		<ModalFragment />
 		<DialogFragment />
@@ -23,6 +24,7 @@
 	import Toolbar from "@/toolbar/toolbar.vue";
 	import DPad from "@/gadgets/dpad.vue";
 	import Welcome from "@/welcome.vue";
+	import Status from "@/status.vue";
 	import DialogFragment from "@/dialogs/dialogFragment.vue";
 	import ModalFragment from "@/modals/modalFragment.vue";
 

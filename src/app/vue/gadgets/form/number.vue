@@ -29,7 +29,7 @@
 	import Row from "./row.vue";
 
 	const props = withDefaults(defineProps<{
-		label: string;
+		label?: string;
 		type?: string;
 		min?: number;
 		max?: number;

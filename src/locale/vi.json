@@ -79,6 +79,7 @@
 			"label": "Hiện nhãn",
 			"tip": "Hiện mẹo nhánh",
 			"dPad": "Hiện D-pad",
+			"status": "Thanh trạng thái chương trình",
 			"preference": "Tùy chọn"
 		},
 		"tools": {
@@ -162,6 +163,9 @@
 			"type": "Sông",
 			"width": "Chiều rộng",
 			"goto": "Đi tới cạnh"
+		},
+		"rivers": {
+			"type": "Sông"
 		},
 		"vertex": {
 			"type": "Đỉnh",

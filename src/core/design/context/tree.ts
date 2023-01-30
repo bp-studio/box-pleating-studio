@@ -83,28 +83,6 @@ export class Tree implements ITree {
 	// 公開方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public $buildContour(): void {
-		// const levels = this._getLevels();
-
-		// for(const leaf of levels[0]) {
-		// 	const path = leaf.$AABB.$toPath();
-		// 	leaf.$outerRoughContour = [path];
-		// 	Processor.$addContour("f" + leaf.id, [{ outer: path }]);
-		// }
-
-		// const union = new AAUnion();
-		// for(let h = 1; h < levels.length - 1; h++) {
-		// 	for(const node of levels[h]) {
-		// 		const components = [...node.$children].map(n => n.$outerRoughContour);
-		// 		const inner = union.$get(...components);
-		// 		node.$innerRoughContour = inner;
-		// 		const contours = expand(inner, node.$length);
-		// 		node.$outerRoughContour = contours.map(c => c.outer);
-		// 		Processor.$addContour(node.$riverTag, contours);
-		// 	}
-		// }
-	}
-
 	public toJSON(): JEdge[] {
 		const result: JEdge[] = [];
 

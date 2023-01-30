@@ -22,6 +22,7 @@ const defaultSettings = {
 	showRidge: true,
 	showLabel: true,
 	showDot: true,
+	showStatus: true,
 	colorScheme: {
 		border: undefined as number | undefined,
 		grid: undefined as number | undefined,
@@ -87,6 +88,8 @@ if(settingString) {
 export const hadSettings = settingString !== null;
 
 watch(settings, save, { deep: true });
+
+watch(() => settings.showStatus, s => document.body.classList.toggle("show-status", s), { immediate: true });
 
 /** 把 source 物件中的屬性遞迴地複製到 target 中（忽略任一者沒有的屬性） */
 function copy(target: Store, source: Store): void {

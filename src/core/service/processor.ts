@@ -6,6 +6,12 @@ import type { Contour } from "shared/types/geometry";
 import type { JEdge } from "shared/json/tree";
 import type { UpdateModel } from "./updateModel";
 
+//=================================================================
+/**
+ * {@link Processor} 負責管理更新作業的運行，以及收集更新的結果。
+ */
+//=================================================================
+
 export namespace Processor {
 
 	let updateResult: UpdateModel;

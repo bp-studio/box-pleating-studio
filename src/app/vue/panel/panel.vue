@@ -1,11 +1,11 @@
 <template>
 	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.passive="hide"></div>
-	<aside class="scroll-shadow" :class="{ 'show': showPanel }" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
+	<aside class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
 		<template v-if="Studio.project">
 			<Design v-if="Studio.selections.length == 0" />
 			<div v-else-if="Studio.selections.length == 1">
 				<Repository v-if="repository" :repository="repository" />
-				<component v-else :is="componentType" :subject="Studio.selection" />
+				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
 				<!-- <flaps v-if="type=='Flap'"></flaps>
@@ -33,7 +33,9 @@
 	import Repository from "./repository.vue";
 	import Vertex from "./vertex.vue";
 	import Edge from "./edge.vue";
+	import Flap from "./flap.vue";
 	import Design from "./design.vue";
+	import { isTouch } from "app/shared/constants";
 
 	import type { Component } from "vue";
 
@@ -46,9 +48,20 @@
 	// 			return core.initialized && this.bp.getRepository() || null;
 	// 		}
 
-	const componentMap: Record<string, Component> = { Vertex, Edge };
+	const componentMap: Record<string, Component> = { Vertex, Edge, Flap };
 	const type = computed(() => Studio.selections[0]?.type ?? "");
-	const componentType = computed(() => componentMap[type.value]);
+
+	const flapCount = computed(() => {
+		if(!Studio.project) return "";
+		const selected = type.value == "Flap" ? Studio.selections.length + "/" : "";
+		return selected + Studio.project.design.flapCount;
+	});
+
+	const vertexCount = computed(() => {
+		if(!Studio.project) return "";
+		const selected = type.value == "Vertex" ? Studio.selections.length + "/" : "";
+		return selected + Studio.project.design.vertexCount;
+	});
 
 	watch(() => Studio.project?.design.mode, () => {
 		// 切換檢視的時候，如果有任何文字輸入框正在使用，則讓它失去焦點

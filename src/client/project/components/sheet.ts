@@ -100,10 +100,13 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return this._grid.toJSON();
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 代理屬性
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public get type(): GridType {
 		return this._type;
 	}
-
 	public set type(v: GridType) {
 		if(v == this._type) return;
 		this._grid = createGrid(v, this._grid.$height, this._grid.$width);
@@ -125,6 +128,10 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	public get $layers(): readonly Container[] {
 		return this._layers;
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 計算邏輯
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getScale(): number {
 		const viewWidth = viewport.width, viewHeight = viewport.height;

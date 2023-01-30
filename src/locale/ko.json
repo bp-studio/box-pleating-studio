@@ -79,6 +79,7 @@
 			"label": "라벨 표시",
 			"tip": "가지 팁 표시",
 			"dPad": "방향 패드 표시",
+			"status": "상태 표시줄 표시",
 			"preference": "기본 설정"
 		},
 		"tools": {
@@ -162,6 +163,9 @@
 			"type": "리버",
 			"width": "너비",
 			"goto": "가장자리로 이동"
+		},
+		"rivers": {
+			"type": "리버"
 		},
 		"vertex": {
 			"type": "꼭짓점",

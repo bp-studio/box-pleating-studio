@@ -32,12 +32,13 @@
 					{{ $t('toolbar.setting.tip') }}
 				</Hotkey>
 			</div>
+			<Divider />
+			<div class="dropdown-item" @click="toggle('showStatus')">
+				<i v-if="!Settings.showStatus" /><i class="fas fa-compass" v-else />{{ $t('toolbar.setting.status') }}
+			</div>
 			<div class="touch-only">
-				<Divider />
 				<div class="dropdown-item" @click="toggle('showDPad')">
-					<i v-if="!Settings.showDPad" />
-					<i class="fas fa-arrows-alt" v-else />
-					{{ $t('toolbar.setting.dPad') }}
+					<i v-if="!Settings.showDPad" /><i class="fas fa-arrows-alt" v-else />{{ $t('toolbar.setting.dPad') }}
 				</div>
 			</div>
 			<Divider />

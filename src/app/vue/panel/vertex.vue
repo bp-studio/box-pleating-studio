@@ -3,8 +3,8 @@
 	<div class="panel-grid">
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 	</div>
-	<!-- <div class="mt-3 d-flex" style="flex-wrap: wrap;">
-		<button class="btn btn-primary flex-shrink-0" @click="subject.addLeaf(newLength)"
+	<div class="mt-3 d-flex" style="flex-wrap: wrap;">
+		<!-- <button class="btn btn-primary flex-shrink-0" @click="subject.addLeaf(newLength)"
 				v-t="'panel.vertex.addLeaf'"></button>
 		<div class="flex-grow-1 d-flex">
 			<label class="col-form-label ms-2 text-end"
@@ -12,12 +12,12 @@
 			<div class="d-flex flex-grow-1">
 				<label class="col-form-label me-2 flex-shrink-0" v-t="'panel.vertex.ofLength'"></label>
 				<div class="flex-grow-1" style="width: 90px;">
-					<number v-model="newLength" :min="1"></number>
+					<Number v-model="newLength" :min="1" />
 				</div>
 			</div>
-		</div>
+		</div> -->
 	</div>
-	<div class="mt-3" v-if="!bp.isMinimal(design)">
+	<!-- <div class="mt-3" v-if="!bp.isMinimal(design)">
 		<button class="btn btn-primary" v-if="subject.degree == 1" @click="bp.delete()" v-t="'keyword.delete'"></button>
 		<button class="btn btn-primary" v-if="subject.degree == 2" @click="subject.deleteAndJoin()"
 				v-t="'panel.vertex.delJoin'"></button>
@@ -32,9 +32,14 @@
 </script>
 
 <script setup lang="ts">
+	import { shallowRef } from "vue";
+
 	import Field from "@/gadgets/form/field.vue";
+	import Number from "@/gadgets/form/number.vue";
 
 	import type { Vertex } from "client/project/components/tree/vertex";
 
 	defineProps<{ subject: Vertex }>();
+
+	const newLength = shallowRef<number>(1);
 </script>

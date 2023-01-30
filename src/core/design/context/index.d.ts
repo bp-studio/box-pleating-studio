@@ -16,9 +16,6 @@ export interface ITree extends ISerializable<JEdge[]> {
 
 	/** 傳回兩個節點在樹上的距離 */
 	$dist(n1: ITreeNode, n2: ITreeNode): number;
-
-	/** 建構所有的輪廓 */
-	$buildContour(): void;
 }
 
 export interface ITreeNode extends ISerializable<JEdge> {

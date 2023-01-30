@@ -1,4 +1,6 @@
 
+import { shallowRef } from "vue";
+
 import ProjectService from "./projectService";
 import { stage, canvas } from "client/screen/display";
 import { SelectionController } from "client/controllers/selectionController";
@@ -10,6 +12,8 @@ import { ZoomController } from "client/controllers/zoomController";
 import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
 import { options } from "client/options";
+
+export const mouseCoordinates = shallowRef<Readonly<IPoint> | null>(null);
 
 //=================================================================
 /**
@@ -43,7 +47,11 @@ export namespace Interaction {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
 		const local = sheet.$view.toLocal(e.global);
-		// console.log([Math.round(local.x), Math.round(local.y)]);
+		mouseCoordinates.value = { x: Math.round(local.x), y: Math.round(local.y) };
+	});
+
+	stage.on("mouseleave", e => {
+		mouseCoordinates.value = null;
 	});
 
 	function blur(): void {

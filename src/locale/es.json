@@ -79,6 +79,7 @@
 			"label": "Mostrar etiquetas",
 			"tip": "Mostrar puntas",
 			"dPad": "Mostrar D-pad",
+			"status": "Mostrar barra de estado",
 			"preference": "Preferencias"
 		},
 		"tools": {
@@ -159,9 +160,12 @@
 			"goto": "Ir a vértices"
 		},
 		"river": {
-			"type": "río",
+			"type": "Río",
 			"width": "Ancho",
 			"goto": "Ir al borde"
+		},
+		"rivers": {
+			"type": "Ríos"
 		},
 		"vertex": {
 			"type": "Vértice",

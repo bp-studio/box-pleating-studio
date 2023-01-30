@@ -23,7 +23,7 @@ export const RIDGE_WIDTH = 1.25;
 //=================================================================
 export class River extends Control {
 
-	public readonly type = "Flap";
+	public readonly type = "River";
 	public readonly $priority: number = 1;
 
 	public readonly tag: string;
@@ -48,6 +48,10 @@ export class River extends Control {
 
 		if(DEBUG_ENABLED) this._hinge.name = "River Hinge";
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 繪製方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _drawShade(): void {
 		if(this.$selected) this._shade.alpha = SHADE_ALPHA;

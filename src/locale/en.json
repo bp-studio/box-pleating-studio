@@ -79,6 +79,7 @@
 			"label": "Show labels",
 			"tip": "Show flap tips",
 			"dPad": "Show D-pad",
+			"status": "Show status bar",
 			"preference": "Preferences"
 		},
 		"tools": {
@@ -162,6 +163,9 @@
 			"type": "River",
 			"width": "Width",
 			"goto": "Go to edge"
+		},
+		"rivers": {
+			"type": "Rivers"
 		},
 		"vertex": {
 			"type": "Vertex",

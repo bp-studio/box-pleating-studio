@@ -28,15 +28,15 @@ subgraph Tree
 	b(tree balancing)
 	d{{node distances}}
 	a{{AABB hierarchy}}
+	s{{selected subtrees}}
 end
-s{{selected subtrees}}
 k(collision)
+e[[Error indicators]]
 subgraph Stretch
 	g(overlap groups)
 	c(configurations)
 	p(patterns)
 end
-e[[Error indicators]]
 subgraph Contour
 	cc[[cached contours]]
 	rc(rough contours)

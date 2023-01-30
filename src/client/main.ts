@@ -13,8 +13,8 @@ export const projects: IProjectController = ProjectController;
 export const drag: IDragController = DragController;
 export const selection: ISelectionController = SelectionController;
 
+export { mouseCoordinates } from "./services/interaction";
 export { nextTick } from "./screen/display";
-
 export { options } from "./options";
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
