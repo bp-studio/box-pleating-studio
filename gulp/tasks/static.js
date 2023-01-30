@@ -14,7 +14,7 @@ const buildIcon = require("./static/icon");
 
 const libDest = config.dest.dist + "/lib";
 
-const { purge, extra } = require("../utils/purge");
+const { purge } = require("../utils/purge");
 const fontAwesome = require("../plugins/fontAwesome");
 
 /** 一個給定的 js 檔案是否有 min 或者 prod 的版本 */
@@ -85,36 +85,44 @@ const copyLib = () => gulp.src([
 	.pipe(gulp.dest(libDest));
 
 /** 建置精簡的 FontAwesome 字型 */
-const faPath = "node_modules/@fortawesome/fontawesome-free";
-const faFontTarget = config.dest.dist + "/lib/font-awesome/webfonts";
+const faSrc = "node_modules/@fortawesome/fontawesome-free";
+const faTarget = libDest + "/font-awesome";
 const subsetFontAwesome = () =>
 	gulp.src(config.src.app + "/vue/**/*.vue")
-		.pipe(newer({
-			dest: faFontTarget + "/fa-solid-900.woff2",
-			extra: [__filename, faPath + "/webfonts/*"],
-		}))
 		.pipe(fontAwesome())
-		.pipe(gulp.dest(faFontTarget));
+		.pipe(gulp.dest(faTarget + "/webfonts"));
 
 /** 淨化 FontAwesome 的 css */
 const purgeFontAwesome = () => {
-	const dest = libDest + "/font-awesome";
-	let stream = gulp.src(faPath + "/css/all.min.css", { base: faPath })
-		.pipe(newer({ dest, extra: [...extra, __filename] }));
+	let stream = gulp.src(faSrc + "/css/all.min.css", { base: faSrc });
 	stream = purge(stream);
 	return stream
 		.pipe(replace(/src:url\([^)]+eot\);/g, ""))
 		.pipe(replace(/url\([^)]+(iefix|woff|fontawesome)\) format\([^)]+\),?/g, ""))
 		.pipe(replace(/,\}/g, "}"))
-		.pipe(gulp.dest(dest));
+		.pipe(gulp.dest(faTarget));
 };
 
-gulp.task("static", () => all(
+gulp.task("static", () => {
+	const tasks = [
+		buildIcon(),
+		buildLog(),
+		copyDebugStatic(),
+		copyStatic(),
+		copyLib(),
+	];
+	// 只有初次的時候會自動執行 FontAwesome 建置，
+	// 其餘在必要的時候再手動執行 fa 工作，以增進效能。
+	if(!fs.existsSync(faTarget)) {
+		tasks.push(
+			purgeFontAwesome(),
+			subsetFontAwesome()
+		);
+	}
+	return all(tasks);
+});
+
+gulp.task("fa", () => all(
 	purgeFontAwesome(),
-	subsetFontAwesome(),
-	buildIcon(),
-	buildLog(),
-	copyDebugStatic(),
-	copyStatic(),
-	copyLib()
+	subsetFontAwesome()
 ));

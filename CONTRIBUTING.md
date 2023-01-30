@@ -6,8 +6,7 @@ and the project folder is already configured for it.
 
 ## Contributing new languages
 
-If you would like to contribute a new language, start with `src/locale/en.json` and translate it.
-You will find the VS Code extension [i18n Ally](https://marketplace.visualstudio.com/items?itemName=antfu.i18n-ally) very helpful.
+Please refer to the readme of the [Locale](src/locale/README.md) section.
 
 ## Environment and build instructions
 
