@@ -25,10 +25,6 @@
 </template>
 
 <script lang="ts">
-	// marked 沒有提供 ts 定義，而 @types/marked 截至 4.0.3 版為止又寫得不好，所以這邊簡單定義一下就好
-	declare const marked: {
-		parse(s: string): string;
-	};
 	export default { name: "Version" };
 </script>
 
@@ -51,7 +47,7 @@
 		if(!record[id]) {
 			try {
 				const response = await fetch(`log/${logs[id]}.md`);
-				let html = marked.parse(await response.text());
+				let html = await response.text();
 				html = html.replace(/<a href="http/g, "<a target=\"_target\" rel=\"noopener\" href=\"http");
 				if(!record[id]) record[id] = html;
 			} catch(e) {

@@ -1,5 +1,6 @@
 const through2 = require("gulp-through2");
 const path = require("path");
+const { marked } = require("marked");
 
 // 用來建立 log 檔案目錄和 preload manifest
 
@@ -18,6 +19,11 @@ libs.forEach(lib => {
 
 	return through2({
 		name: "log",
+		transform(content) {
+			return marked.parse(content, {
+				headerIds: false,
+			});
+		},
 		flush(files) {
 			if(!files.length) return;
 			const lastFile = files[files.length - 1];

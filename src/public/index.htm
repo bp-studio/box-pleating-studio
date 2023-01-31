@@ -19,10 +19,11 @@
 	<link rel="preload" as="script" href="lib/vue.runtime.global.prod.js">
 	<link rel="preload" as="script" href="lib/vue-i18n.global.prod.js">
 	<link rel="preload" as="script" href="main.js">
+	<link rel="preload" as="script" href="client.js">
 
 	<!-- Not implemented in Chrome yet, but are supported in Firefox and Opera -->
 	<link rel="preload" as="manifest" href="manifest.json">
-	<link rel="preload" as="worker" href="bpstudio.js">
+	<link rel="preload" as="worker" href="core.js">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
@@ -34,7 +35,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1316"
+			app_version: "1318"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);

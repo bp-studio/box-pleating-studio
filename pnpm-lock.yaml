@@ -28,6 +28,7 @@ specifiers:
   '@types/bootstrap': ^5.2.6
   '@types/chai': ^4.3.4
   '@types/gtag.js': ^0.0.12
+  '@types/marked': ^4.0.8
   '@types/mocha': ^10.0.1
   '@types/node': ^18.11.18
   '@types/wicg-file-system-access': ^2020.9.5
@@ -123,7 +124,6 @@ dependencies:
   idb-keyval: 6.2.0
   jszip: 3.10.1
   lzma: 2.3.2
-  marked: 4.2.12
   vue: 3.2.45
   vue-i18n: 9.2.2_vue@3.2.45
   vuedraggable: 4.1.0_vue@3.2.45
@@ -140,6 +140,7 @@ devDependencies:
   '@types/bootstrap': 5.2.6
   '@types/chai': 4.3.4
   '@types/gtag.js': 0.0.12
+  '@types/marked': 4.0.8
   '@types/mocha': 10.0.1
   '@types/node': 18.11.18
   '@types/wicg-file-system-access': 2020.9.5
@@ -184,6 +185,7 @@ devDependencies:
   inquirer: 9.1.4
   jsdom: 21.1.0
   lazypipe: 1.0.2
+  marked: 4.2.12
   mocha: 10.2.0
   postcss: 8.4.21
   postcss-html: 1.5.0
@@ -2034,7 +2036,6 @@ packages:
 
   /@pixi/graphics-smooth/1.0.0_wndybjrwtm2nlasdylfwx2w2lu:
     resolution: {integrity: sha512-iKeCo3sYYR5R9mf5+RcZBnLlrT/2Wr1Oi2O6EOs3mKB/IaoWDdEsxlmKyia3qnle9+B6XC4uzwvNJwJ4pgcw6w==}
-    engines: {node: '>=16', npm: '>=8'}
     peerDependencies:
       '@pixi/constants': ^7.0.0
       '@pixi/core': ^7.0.0
@@ -2339,6 +2340,10 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/marked/4.0.8:
+    resolution: {integrity: sha512-HVNzMT5QlWCOdeuBsgXP8EZzKUf0+AXzN+sLmjvaB3ZlLqO+e4u0uXrdw9ub69wBKFs+c6/pA4r9sy6cCDvImw==}
     dev: true
 
   /@types/minimatch/3.0.5:
@@ -3178,7 +3183,7 @@ packages:
     dependencies:
       caniuse-lite: 1.0.30001449
       electron-to-chromium: 1.4.284
-      node-releases: 2.0.8
+      node-releases: 2.0.9
       update-browserslist-db: 1.0.10_browserslist@4.21.5
     dev: true
 
@@ -6608,7 +6613,7 @@ packages:
     resolution: {integrity: sha512-yr8hSKa3Fv4D3jdZmtMMPghgVt6TWbk86WQaWhDloQjRSQhMMYCAro7jP7VDJrjjdV8pxVxMssXS8B8Y5DZ5aw==}
     engines: {node: '>= 12'}
     hasBin: true
-    dev: false
+    dev: true
 
   /matchdep/2.0.0:
     resolution: {integrity: sha512-LFgVbaHIHMqCRuCZyfCtUOq9/Lnzhi7Z0KFUE2fhD54+JN2jLh3hC02RLkqauJ3U4soU6H1J3tfj/Byk7GoEjA==}
@@ -6894,8 +6899,8 @@ packages:
       - supports-color
     dev: true
 
-  /node-releases/2.0.8:
-    resolution: {integrity: sha512-dFSmB8fFHEH/s81Xi+Y/15DQY6VHW81nXRj86EMSL3lmuTmK1e+aT4wrFCkTbm+gSwkw4KpX+rT/pMM2c1mF+A==}
+  /node-releases/2.0.9:
+    resolution: {integrity: sha512-2xfmOrRkGogbTK9R6Leda0DGiXeY3p2NJpy4+gNCffdUvV6mdEJnaDEic1i3Ec2djAo8jWYoJMR5PB0MSMpxUA==}
     dev: true
 
   /nopt/6.0.0:
