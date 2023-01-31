@@ -20,6 +20,9 @@ export interface IGrid extends ISerializable<JSheet> {
 	/** 找出指定的點在這個格線上面最靠近的點 */
 	$constrain(p: IPoint): IPoint;
 
+	/** 給定的點是否在紙張範圍內 */
+	$contains(p: IPoint): boolean;
+
 	/** 在繪製的時候要偏移的座標，原則上會是負值 */
 	readonly $offset: IPoint;
 

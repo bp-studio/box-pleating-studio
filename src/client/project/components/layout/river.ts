@@ -7,8 +7,8 @@ import { Control } from "client/base/control";
 import { drawContours, fillContours } from "client/screen/contourUtil";
 import ProjectService from "client/services/projectService";
 
-import type { Contour } from "shared/types/geometry";
 import type { Sheet } from "../sheet";
+import type { Contour } from "shared/types/geometry";
 
 export const HINGE_WIDTH = 2.5;
 export const HINGE_COLOR = 0x6699FF;
@@ -34,7 +34,7 @@ export class River extends Control {
 	private readonly _hinge: SmoothGraphics;
 
 
-	constructor(tag: string, contour: Contour[], sheet: Sheet) {
+	constructor(sheet: Sheet, tag: string, contour: Contour[]) {
 		super(sheet);
 
 		this.tag = tag;

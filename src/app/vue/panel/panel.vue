@@ -35,7 +35,6 @@
 	import Edge from "./edge.vue";
 	import Flap from "./flap.vue";
 	import Design from "./design.vue";
-	import { isTouch } from "app/shared/constants";
 
 	import type { Component } from "vue";
 
@@ -50,18 +49,6 @@
 
 	const componentMap: Record<string, Component> = { Vertex, Edge, Flap };
 	const type = computed(() => Studio.selections[0]?.type ?? "");
-
-	const flapCount = computed(() => {
-		if(!Studio.project) return "";
-		const selected = type.value == "Flap" ? Studio.selections.length + "/" : "";
-		return selected + Studio.project.design.flapCount;
-	});
-
-	const vertexCount = computed(() => {
-		if(!Studio.project) return "";
-		const selected = type.value == "Vertex" ? Studio.selections.length + "/" : "";
-		return selected + Studio.project.design.vertexCount;
-	});
 
 	watch(() => Studio.project?.design.mode, () => {
 		// 切換檢視的時候，如果有任何文字輸入框正在使用，則讓它失去焦點

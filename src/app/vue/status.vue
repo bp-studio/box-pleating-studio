@@ -12,7 +12,7 @@
 					{{ $t("panel.flaps.type") }}: {{ flapCount }}
 				</div>
 				<div style="width: 90px;">
-					{{ $t("panel.rivers.type") }}: {{ Studio.project.design.riverCount }}
+					{{ $t("panel.rivers.type") }}: {{ Studio.project.design.layout.riverCount }}
 				</div>
 			</template>
 			<div v-else style="width: 180px;">
@@ -37,13 +37,13 @@
 	const flapCount = computed(() => {
 		if(!Studio.project) return "";
 		const selected = type.value == "Flap" ? Studio.selections.length + " / " : "";
-		return selected + Studio.project.design.flapCount;
+		return selected + Studio.project.design.layout.flapCount;
 	});
 
 	const vertexCount = computed(() => {
 		if(!Studio.project) return "";
 		const selected = type.value == "Vertex" ? Studio.selections.length + " / " : "";
-		return selected + Studio.project.design.vertexCount;
+		return selected + Studio.project.design.tree.vertexCount;
 	});
 
 </script>

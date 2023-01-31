@@ -8,10 +8,11 @@ import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 
+import type { Sheet } from "../sheet";
+import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { JVertex } from "shared/json";
-import type { Sheet } from "../sheet";
 
 const SIZE = 4;
 const BORDER_WIDTH = 1;
@@ -34,11 +35,13 @@ export class Vertex extends Independent implements DragSelectable {
 
 	@shallowRef public name: string;
 
+	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
 	private readonly _label: Label;
 
-	constructor(json: JVertex, sheet: Sheet) {
+	constructor(tree: Tree, sheet: Sheet, json: JVertex) {
 		super(sheet);
+		this._tree = tree;
 
 		this.id = json.id;
 		this.$location.x = json.x;
@@ -53,6 +56,14 @@ export class Vertex extends Independent implements DragSelectable {
 		this.$reactDraw(this._draw, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._dot.name = "Vertex";
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 編輯方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public addLeaf(length: number): Promise<void> {
+		return this._tree.$addLeaf(this, length);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

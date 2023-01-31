@@ -40,7 +40,7 @@ export class Project extends Mountable {
 
 		const jProject = deepAssign(Migration.$getSample(), json);
 
-		this.design = new Design(jProject.design, this.id);
+		this.design = new Design(this, jProject.design);
 		this.$addChild(this.design);
 
 		this._worker = worker;
@@ -56,7 +56,7 @@ export class Project extends Mountable {
 			console.time("First render");
 		}
 
-		await this._callStudio("design", "init", this.design.$prototype);
+		await this.$callStudio("design", "init", this.design.$prototype);
 		await Vue.nextTick();
 
 		if(DEBUG_ENABLED && !this._initialized) {
@@ -68,7 +68,7 @@ export class Project extends Mountable {
 
 	public async toJSON(session: boolean = false): Promise<JProject> {
 		// TODO
-		const json = await this._callStudio("design", "json");
+		const json = await this.$callStudio("design", "json");
 		const design = this.design.toJSON();
 		design.tree = json!.tree as JTree;
 		return {
@@ -77,11 +77,7 @@ export class Project extends Mountable {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private async _callStudio<C extends Routes.ControllerKeys, A extends Routes.ActionKeys<C>>(
+	public async $callStudio<C extends Routes.ControllerKeys, A extends Routes.ActionKeys<C>>(
 		controller: C, action: A, ...args: Routes.ActionArguments<C, A>
 	): Promise<Routes.ActionResult<C, A>> {
 		const request: Routes.IStudioRequest<C, A> = { controller, action, value: args };

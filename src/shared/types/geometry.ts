@@ -19,6 +19,12 @@ export function same(p1: IPoint, p2: IPoint): boolean {
 	return p1.x === p2.x && p1.y === p2.y;
 }
 
+export function dist(p1: IPoint, p2: IPoint): number {
+	const dx = p1.x - p2.x;
+	const dy = p1.y - p2.y;
+	return Math.sqrt(dx * dx + dy * dy);
+}
+
 /** 輪廓格式，一組輪廓由一個外圍路徑加上若干的內部洞組成 */
 export type Contour = {
 

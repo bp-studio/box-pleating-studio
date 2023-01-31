@@ -1,6 +1,7 @@
 import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "client/types/enum";
+import { same } from "shared/types/geometry";
 
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { JSheet } from "shared/json/components";
@@ -69,6 +70,10 @@ export class DiagonalGrid implements IGrid {
 		if(x > s) x = s;
 
 		return { x, y };
+	}
+
+	public $contains(p: IPoint): boolean {
+		return same(this.$constrain(p), p);
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {

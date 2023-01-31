@@ -10,8 +10,8 @@ import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/screen/label";
 import { Direction } from "client/types/enum";
 
-import type { Vertex } from "./vertex";
 import type { Sheet } from "../sheet";
+import type { Vertex } from "./vertex";
 
 const HIT_WIDTH = 5;
 const WIDTH = 2;
@@ -36,7 +36,7 @@ export class Edge extends Control {
 	private readonly _line: SmoothGraphics = new SmoothGraphics();
 	private readonly _label: Label;
 
-	constructor(v1: Vertex, v2: Vertex, length: number, sheet: Sheet) {
+	constructor(sheet: Sheet, v1: Vertex, v2: Vertex, length: number) {
 		super(sheet);
 
 		this._v1 = v1;

@@ -5,7 +5,7 @@
 					:title="tooltips[0]">
 				<i class="fas fa-minus" />
 			</button>
-			<input class="form-control" :class="{'error':value!=modelValue}" type="number" v-model="value" @focus="focus($event)"
+			<input class="form-control" :class="{ 'error': value != modelValue }" type="number" v-model="value" @focus="focus($event)"
 				   @blur="blur" @input="input($event as InputEvent)" :min="min" :max="max" @wheel.passive="wheel($event)"
 				   style="min-width: 30px;" />
 			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
@@ -34,7 +34,7 @@
 		min?: number;
 		max?: number;
 		step?: number;
-		hotkeys: string;
+		hotkeys?: string;
 		modelValue: number;
 	}>(), {
 		step: 1,
@@ -45,7 +45,7 @@
 
 	let lastWheel = performance.now();
 
-	const tooltips = computed(() => props.hotkeys.split(",").map(k => {
+	const tooltips = computed(() => !props.hotkeys ? "" : props.hotkeys.split(",").map(k => {
 		try {
 			const [name, command] = k.split(".");
 			const key = Settings.hotkey[name][command];

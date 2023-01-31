@@ -11,12 +11,12 @@ import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from 
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 
+import type { Sheet } from "../sheet";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
 import type { JFlap } from "shared/json";
-import type { Sheet } from "../sheet";
 import type { Vertex } from "../tree/vertex";
 
 const SIZE = 3;
@@ -51,7 +51,7 @@ export class Flap extends Independent implements DragSelectable {
 
 	public $anchor: Readonly<IPoint> = { x: 0, y: 0 };
 
-	constructor(json: JFlap, vertex: Vertex, edge: Edge, sheet: Sheet) {
+	constructor(sheet: Sheet, json: JFlap, vertex: Vertex, edge: Edge) {
 		super(sheet);
 
 		this.id = json.id;

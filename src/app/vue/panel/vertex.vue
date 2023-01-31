@@ -4,18 +4,17 @@
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 	</div>
 	<div class="mt-3 d-flex" style="flex-wrap: wrap;">
-		<!-- <button class="btn btn-primary flex-shrink-0" @click="subject.addLeaf(newLength)"
-				v-t="'panel.vertex.addLeaf'"></button>
+		<button class="btn btn-primary flex-shrink-0" @click="subject.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'"></button>
 		<div class="flex-grow-1 d-flex">
 			<label class="col-form-label ms-2 text-end"
-					style="width: 0; flex-grow: 1000; max-width: calc((100% - 230px * 0.98) * 50); overflow: hidden;">...&nbsp;</label>
+				   style="width: 0; flex-grow: 1000; max-width: calc((100% - 230px * 0.98) * 50); overflow: hidden;">...&nbsp;</label>
 			<div class="d-flex flex-grow-1">
 				<label class="col-form-label me-2 flex-shrink-0" v-t="'panel.vertex.ofLength'"></label>
 				<div class="flex-grow-1" style="width: 90px;">
 					<Number v-model="newLength" :min="1" />
 				</div>
 			</div>
-		</div> -->
+		</div>
 	</div>
 	<!-- <div class="mt-3" v-if="!bp.isMinimal(design)">
 		<button class="btn btn-primary" v-if="subject.degree == 1" @click="bp.delete()" v-t="'keyword.delete'"></button>

@@ -45,6 +45,12 @@ export class RectangularGrid implements IGrid {
 		return { x, y };
 	}
 
+	public $contains(p: IPoint): boolean {
+		const { x, y } = p;
+		const w = this.width, h = this.height;
+		return 0 <= x && x <= w && 0 <= y && y <= h;
+	}
+
 	public $getLabelDirection(x: number, y: number): Direction {
 		const w = this.width, h = this.height;
 		if(x == 0) {

@@ -458,7 +458,13 @@
 		],
 		"wrap-regex": "warn",
 		"yield-star-spacing": "warn",
-		"yoda": "warn"
+		"yoda": [
+			"warn",
+			"never",
+			{
+				"onlyEquality": true
+			}
+		]
 	},
 	"overrides": [
 		{

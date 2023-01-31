@@ -8,8 +8,8 @@ export interface ITree extends ISerializable<JEdge[]> {
 
 	readonly $root: ITreeNode;
 
-	/** 增加一個新的葉點並且傳回新節點的 {@link ITreeNode.id id} */
-	$addLeaf(at: number, length: number): number;
+	/** 增加一個新的葉點 */
+	$addLeaf(id: number, at: number, length: number): void;
 
 	/** 刪除一個指定 {@link ITreeNode.id id} 的葉點，並傳回成功與否 */
 	$removeLeaf(id: number): boolean;

@@ -16,8 +16,8 @@ import { createGrid } from "./grid";
 import { MARGIN, MARGIN_FIX } from "client/screen/constants";
 import { ZoomController } from "client/controllers/zoomController";
 
+import type { Project } from "../project";
 import type { Control } from "client/base/control";
-import type { DragSelectable } from "client/base/draggable";
 import type { Label } from "client/screen/label";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./grid";
@@ -49,6 +49,9 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	/** 最上層容器 */
 	public readonly $view: Container = new Container();
 
+	/** 自身所屬的專案 */
+	protected readonly $project: Project;
+
 	/** 圖層 */
 	private _layers: Container[] = [];
 
@@ -67,8 +70,9 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
-	constructor(json?: Partial<JSheet>, parentView?: Container) {
+	constructor(project: Project, parentView: Container, json: JSheet) {
 		super();
+		this.$project = project;
 
 		this.$addRootObject(this.$view, parentView);
 		for(const layer of LAYERS) {

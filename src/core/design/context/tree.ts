@@ -30,15 +30,6 @@ export class Tree implements ITree {
 	/** 所有的葉點 */
 	private readonly _leaves = new Set<TreeNode>();
 
-	/** 節點的數目 */
-	private _nodeCount: number = 0;
-
-	/**
-	 * 目前在 {@link _nodes} 當中被跳過的索引，以便快速查找出可用編號。
-	 * 也許這邊用堆積有點太炫炮了，但何不呢？
-	 */
-	private _skippedIdHeap = new BinaryHeap<number>(minComparator);
-
 	/** 樹的根點 */
 	public $root!: TreeNode;
 
@@ -58,13 +49,6 @@ export class Tree implements ITree {
 			}
 			if(!newEdgeAdded) break; // 防呆
 			edges = remain;
-		}
-
-		// 建立跳號清單
-		if(this._nodes.length > this._nodeCount) {
-			for(let i = 0; i < this._nodes.length; i++) {
-				if(!this._nodes[i]) this._skippedIdHeap.$insert(i);
-			}
 		}
 
 		// 處理 AABB 結構
@@ -109,10 +93,8 @@ export class Tree implements ITree {
 		return this.$root.$height;
 	}
 
-	public $addLeaf(at: number, length: number): number {
-		const id = this._nextAvailableId;
+	public $addLeaf(id: number, at: number, length: number): void {
 		this.$setEdge(at, id, length);
-		return id;
 	}
 
 	public $removeLeaf(id: number): boolean {
@@ -128,8 +110,6 @@ export class Tree implements ITree {
 			if(parent.$isLeaf) this._leaves.add(parent);
 
 			delete this._nodes[id];
-			this._nodeCount--;
-			if(id < this._nodeCount) this._skippedIdHeap.$insert(id);
 
 			State.$childrenChanged.add(parent);
 		}
@@ -141,7 +121,7 @@ export class Tree implements ITree {
 		let N1 = this._nodes[n1], N2 = this._nodes[n2];
 
 		// 如果圖非空，那加入的邊一定至少要有一點已經存在
-		if(this._nodeCount != 0 && !N1 && !N2) {
+		if(this.$root && !N1 && !N2) {
 			console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
 			return false;
 		}
@@ -180,15 +160,8 @@ export class Tree implements ITree {
 		if(atLeaf) this._leaves.delete(at);
 		this._leaves.add(newNode);
 		this._nodes[id] = newNode;
-		this._nodeCount++;
 		if(!TEST_MODE) Processor.$addNode(id);
 		return newNode;
-	}
-
-	/** 取得下一個可用的節點 id */
-	private get _nextAvailableId(): number {
-		if(this._skippedIdHeap.$isEmpty) return this._nodeCount;
-		return this._skippedIdHeap.$pop()!;
 	}
 
 	/** 傳回兩個節點的 LCA */

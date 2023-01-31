@@ -9,8 +9,8 @@ import { Processor } from "core/service/processor";
 //=================================================================
 namespace TreeController {
 
-	export function addLeaf(at: number, length: number): void {
-		Design.$instance.$tree.$addLeaf(at, length);
+	export function addLeaf(id: number, at: number, length: number): void {
+		Design.$instance.$tree.$addLeaf(id, at, length);
 		Processor.$run(heightTask);
 	}
 
