@@ -11,7 +11,7 @@ import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from 
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 
-import type { Sheet } from "../sheet";
+import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
@@ -39,7 +39,8 @@ export class Flap extends Independent implements DragSelectable {
 	@shallowRef public height: number = 0;
 	@shallowRef private _contours: Contour[];
 
-	private readonly _vertex: Vertex;
+	public readonly $vertex: Vertex;
+	private readonly _layout: Layout;
 	private readonly _edge: Edge;
 
 	private readonly _dots: SmoothGraphics[];
@@ -51,8 +52,10 @@ export class Flap extends Independent implements DragSelectable {
 
 	public $anchor: Readonly<IPoint> = { x: 0, y: 0 };
 
-	constructor(sheet: Sheet, json: JFlap, vertex: Vertex, edge: Edge) {
+	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge) {
+		const sheet = layout.$sheet;
 		super(sheet);
+		this._layout = layout;
 
 		this.id = json.id;
 		this.$location.x = json.x;
@@ -60,7 +63,7 @@ export class Flap extends Independent implements DragSelectable {
 		this.width = json.width;
 		this.height = json.height;
 		this._contours = json.contour!;
-		this._vertex = vertex;
+		this.$vertex = vertex;
 		this._edge = edge;
 
 		this._dots = Array.from({ length: 4 }, () =>
@@ -84,10 +87,10 @@ export class Flap extends Independent implements DragSelectable {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get name(): string {
-		return this._vertex.name;
+		return this.$vertex.name;
 	}
 	public set name(v: string) {
-		this._vertex.name = v;
+		this.$vertex.name = v;
 	}
 
 	public get radius(): number {
@@ -95,6 +98,22 @@ export class Flap extends Independent implements DragSelectable {
 	}
 	public set radius(v: number) {
 		this._edge.length = v;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 介面方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get isDeletable(): boolean {
+		return this.$vertex.isDeletable;
+	}
+
+	public delete(): void {
+		this.$vertex.delete();
+	}
+
+	public goToDual(): void {
+		this._layout.$goToDual([this]);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +153,7 @@ export class Flap extends Independent implements DragSelectable {
 		const { x, y } = this.$location;
 		const dir = w || h ? Direction.none : undefined;
 		this.$anchor = { x: x + w / 2, y: y + h / 2 };
-		this._label.$draw(this._vertex.name, this.$anchor.x, this.$anchor.y, dir);
+		this._label.$draw(this.$vertex.name, this.$anchor.x, this.$anchor.y, dir);
 	}
 
 	private _draw(): void {

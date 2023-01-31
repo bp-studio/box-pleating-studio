@@ -6,6 +6,12 @@ import { designs } from "client/screen/display";
 import { MOUNTED } from "client/base/mountable";
 import { Tree } from "./components/tree/tree";
 import { Layout } from "./components/layout/layout";
+import { SelectionController } from "client/controllers/selectionController";
+import { Flap } from "./components/layout/flap";
+import { isTypedArray } from "client/utils/array";
+import { River } from "./components/layout/river";
+import { Vertex } from "./components/tree/vertex";
+import { Edge } from "./components/tree/edge";
 
 import type { Sheet } from "./components/sheet";
 import type { Project } from "./project";
@@ -70,6 +76,21 @@ export class Design extends View implements ISerializable<JDesign> {
 	public $update(model: UpdateModel): void {
 		this.tree.$update(model);
 		this.layout.$update(model);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 介面方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public goToDual(): void {
+		const selections = SelectionController.selections;
+		if(this.mode == "layout") {
+			if(isTypedArray(selections, Flap)) this.layout.$goToDual(selections);
+			else if(selections[0] instanceof River) this.layout.$goToDual(selections[0]);
+		} else {
+			if(isTypedArray(selections, Vertex)) this.tree.$goToDual(selections);
+			else if(selections[0] instanceof Edge) this.tree.$goToDual(selections[0]);
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

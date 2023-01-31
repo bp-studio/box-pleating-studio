@@ -8,12 +8,12 @@
 		<Number :label="$t('panel.flap.height')" v-model.number="subject.height" :max="design.sheet.grid.height" :min="0"
 				hotkeys="d.hd,d.hi" /> -->
 	</div>
-	<!-- <div class="mt-3">
-		<button class="btn btn-primary" v-if="!bp.isMinimal(design)" @click="bp.delete()" v-t="'keyword.delete'">Delete</button>
+	<div class="mt-3">
+		<button class="btn btn-primary" v-if="subject.isDeletable" @click="subject.delete()" v-t="'keyword.delete'"></button>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="bp.goToDual()" v-t="'panel.flap.goto'" :title="hk('n', 'd')"></button>
-	</div> -->
+		<button class="btn btn-primary" @click="subject.goToDual()" v-t="'panel.flap.goto'" :title="hk('n', 'd')"></button>
+	</div>
 </template>
 
 <script lang="ts">
@@ -25,6 +25,7 @@
 	import Field from "@/gadgets/form/field.vue";
 	import Number from "@/gadgets/form/number.vue";
 	import { gcComputed } from "app/utils/vueUtility";
+	import { hk } from "app/services/customHotkeyService";
 
 	import type { Flap } from "client/project/components/layout/flap";
 

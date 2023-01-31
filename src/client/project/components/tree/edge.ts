@@ -10,7 +10,7 @@ import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/screen/label";
 import { Direction } from "client/types/enum";
 
-import type { Sheet } from "../sheet";
+import type { Tree } from "./tree";
 import type { Vertex } from "./vertex";
 
 const HIT_WIDTH = 5;
@@ -30,17 +30,20 @@ export class Edge extends Control {
 
 	@shallowRef public length: number;
 
-	private readonly _v1: Vertex;
-	private readonly _v2: Vertex;
+	public readonly $v1: Vertex;
+	public readonly $v2: Vertex;
 
+	private readonly _tree: Tree;
 	private readonly _line: SmoothGraphics = new SmoothGraphics();
 	private readonly _label: Label;
 
-	constructor(sheet: Sheet, v1: Vertex, v2: Vertex, length: number) {
+	constructor(tree: Tree, v1: Vertex, v2: Vertex, length: number) {
+		const sheet = tree.$sheet;
 		super(sheet);
+		this._tree = tree;
 
-		this._v1 = v1;
-		this._v2 = v2;
+		this.$v1 = v1;
+		this.$v2 = v2;
 		this.length = length;
 
 		this.$setupHit(this._line);
@@ -52,6 +55,18 @@ export class Edge extends Control {
 		this.$reactDraw(this._draw, this._hitArea, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._line.name = "Edge";
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 介面方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get isRiver(): boolean {
+		return this.$v1.degree > 1 && this.$v2.degree > 1;
+	}
+
+	public goToDual(): void {
+		this._tree.$goToDual(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,8 +118,8 @@ export class Edge extends Control {
 	}
 
 	private readonly _coordinates = computed(() => {
-		const { x: x1, y: y1 } = this._v1.$location;
-		const { x: x2, y: y2 } = this._v2.$location;
+		const { x: x1, y: y1 } = this.$v1.$location;
+		const { x: x2, y: y2 } = this.$v2.$location;
 		return { x1, x2, y1, y2 };
 	});
 }

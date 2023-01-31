@@ -6,6 +6,7 @@ import { shallowRef } from "client/shared/decorators";
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { minComparator } from "shared/data/heap/heap";
 import { dist } from "shared/types/geometry";
+import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
@@ -13,6 +14,7 @@ import type { JTree } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
+const MIN_VERTICES = 3;
 const SIDES = 4;
 const SHIFT = 16;
 const X_DISPLACEMENT = 0.125;
@@ -63,30 +65,55 @@ export class Tree implements ISerializable<JTree> {
 	public $update(model: UpdateModel): void {
 		const prototype = this.$project.design.$prototype.tree;
 
+		// 節點
 		let vertexCount = this.vertexCount;
-		for(const node of model.add.nodes) {
-			const json = prototype.nodes.find(n => n.id == node) ??
-				{ id: node, name: "", x: 0, y: 0 }; // 防呆
+		for(const id of model.add.nodes) {
+			const json = prototype.nodes.find(n => n.id == id) ??
+				{ id, name: "", x: 0, y: 0 }; // 防呆
 
-			const vertex = new Vertex(this, this.$sheet, json);
+			const vertex = new Vertex(this, json);
 			this.$sheet.$addChild(vertex);
-			this.$vertices[json.id] = vertex;
+			this.$vertices[id] = vertex;
 			vertexCount++;
+		}
+		for(const id of model.remove.nodes) {
+			const vertex = this.$vertices[id]!;
+			this.$sheet.$removeChild(vertex);
+			vertex.$dispose();
+			delete this.$vertices[id];
+			vertexCount--;
 		}
 		this.vertexCount = vertexCount;
 
+		// 邊
 		for(const e of model.add.edges) {
 			const v1 = this.$vertices[e.n1];
 			const v2 = this.$vertices[e.n2];
 			if(!v1 || !v2) continue;
-			const edge = new Edge(this.$sheet, v1, v2, e.length);
+			v1.degree++;
+			v2.degree++;
+			const edge = new Edge(this, v1, v2, e.length);
 			this.$sheet.$addChild(edge);
 			this.$edges.set(v1.id, v2.id, edge);
 		}
+		for(const e of model.remove.edges) {
+			const v1 = this.$vertices[e.n1];
+			const v2 = this.$vertices[e.n2];
+			if(v1) v1.degree--;
+			if(v2) v2.degree--;
+			const edge = this.$edges.get(e.n1, e.n2)!;
+			this.$sheet.$removeChild(edge);
+			edge.$dispose();
+			this.$edges.delete(e.n1, e.n2);
+		}
+	}
+
+	public get isMinimal(): boolean {
+		return this.vertexCount === MIN_VERTICES;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 編輯方法
+	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public async $addLeaf(at: Vertex, length: number): Promise<void> {
@@ -94,6 +121,25 @@ export class Tree implements ISerializable<JTree> {
 		const { x, y } = this._findClosestEmptyPoint(at);
 		this.$project.design.$prototype.tree.nodes.push({ id, name: "", x, y });
 		await this.$project.$callStudio("tree", "addLeaf", id, at.id, length);
+	}
+
+	public $goToDual(subject: Edge | Vertex[]): void {
+		const layout = this.$project.design.layout;
+		layout.$sheet.$clearSelection();
+		if(Array.isArray(subject)) {
+			for(const v of subject) {
+				const flap = layout.$flaps.get(v.id);
+				if(flap) flap.$selected = true;
+			}
+		} else if(subject.isRiver) {
+			const edge = layout.$rivers.get(subject.$v1.id, subject.$v2.id);
+			if(edge) edge.$selected = true;
+		} else {
+			const v = subject.$v1.degree == 1 ? subject.$v1 : subject.$v2;
+			const flap = layout.$flaps.get(v.id);
+			if(flap) flap.$selected = true;
+		}
+		this.$project.design.mode = "layout";
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,10 +9,12 @@
 				v-t="'panel.edge.merge'"></button>
 		<button class="btn btn-primary" v-else @click="bp.delete()" v-t="'keyword.delete'"></button>
 	</div>
+	 -->
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="bp.goToDual()"
-				:title="hk('n', 'd')">{{ subject.isRiver ? $t('panel.edge.goto') : $t('panel.vertex.goto') }}</button>
-	</div> -->
+		<button class="btn btn-primary" @click="subject.goToDual()" :title="hk('n', 'd')">
+			{{ subject.isRiver ? $t('panel.edge.goto') : $t('panel.vertex.goto') }}
+		</button>
+	</div>
 </template>
 
 <script lang="ts">
@@ -21,6 +23,7 @@
 
 <script setup lang="ts">
 	import Number from "@/gadgets/form/number.vue";
+	import { hk } from "app/services/customHotkeyService";
 
 	import type { Edge } from "client/project/components/tree/edge";
 

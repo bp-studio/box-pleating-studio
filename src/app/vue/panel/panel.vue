@@ -34,6 +34,7 @@
 	import Vertex from "./vertex.vue";
 	import Edge from "./edge.vue";
 	import Flap from "./flap.vue";
+	import River from "./river.vue";
 	import Design from "./design.vue";
 
 	import type { Component } from "vue";
@@ -47,7 +48,7 @@
 	// 			return core.initialized && this.bp.getRepository() || null;
 	// 		}
 
-	const componentMap: Record<string, Component> = { Vertex, Edge, Flap };
+	const componentMap: Record<string, Component> = { Vertex, Edge, Flap, River };
 	const type = computed(() => Studio.selections[0]?.type ?? "");
 
 	watch(() => Studio.project?.design.mode, () => {

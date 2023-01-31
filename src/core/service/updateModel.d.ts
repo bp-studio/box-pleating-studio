@@ -1,5 +1,5 @@
 import type { Polygon } from "shared/types/geometry";
-import type { JEdge } from "shared/json";
+import type { JEdge, JEdgeBase } from "shared/json";
 
 export interface UpdateModel {
 
@@ -10,7 +10,7 @@ export interface UpdateModel {
 
 	remove: {
 		nodes: number[];
-		edges: number[];
+		edges: JEdgeBase[];
 	};
 
 	graphics: Record<string, GraphicsData>;

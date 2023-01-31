@@ -57,7 +57,7 @@ abstract class Mountable extends Disposable {
 		this._children.push(child);
 	}
 
-	protected $removeChild(child: Mountable): void {
+	public $removeChild(child: Mountable): void {
 		const index = this._children.indexOf(child);
 		if(index < 0) return;
 		const length = this._children.length - 1;

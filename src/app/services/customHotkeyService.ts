@@ -76,7 +76,8 @@ namespace CustomHotkeyService {
 
 	/** 處理元件的導覽 */
 	function handleNavigationCommand(command: string): void {
-		// if(command == "d") return bp.goToDual();
+		if(!Studio.project) return;
+		if(command == "d") return Studio.project.design.goToDual();
 
 		// const repo = bp.getRepository();
 		// if(!repo) return;

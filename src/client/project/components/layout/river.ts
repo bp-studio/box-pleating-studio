@@ -7,7 +7,8 @@ import { Control } from "client/base/control";
 import { drawContours, fillContours } from "client/screen/contourUtil";
 import ProjectService from "client/services/projectService";
 
-import type { Sheet } from "../sheet";
+import type { Layout } from "./layout";
+import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
 
 export const HINGE_WIDTH = 2.5;
@@ -30,14 +31,20 @@ export class River extends Control {
 
 	@shallowRef private _contours: Contour[];
 
+	public readonly $edge: Edge;
+	private readonly _layout: Layout;
+
 	private readonly _shade: Graphics;
 	private readonly _hinge: SmoothGraphics;
 
 
-	constructor(sheet: Sheet, tag: string, contour: Contour[]) {
+	constructor(layout: Layout, tag: string, edge: Edge, contour: Contour[]) {
+		const sheet = layout.$sheet;
 		super(sheet);
+		this._layout = layout;
 
 		this.tag = tag;
+		this.$edge = edge;
 		this._contours = contour;
 
 		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$shade]);
@@ -47,6 +54,25 @@ export class River extends Control {
 		this.$reactDraw(this._draw, this._drawShade);
 
 		if(DEBUG_ENABLED) this._hinge.name = "River Hinge";
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 代理屬性
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get length(): number {
+		return this.$edge.length;
+	}
+	public set length(v: number) {
+		this.$edge.length = v;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 介面方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public goToDual(): void {
+		this._layout.$goToDual(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

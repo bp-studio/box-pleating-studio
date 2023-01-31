@@ -48,7 +48,7 @@ export class Layout implements ISerializable<JLayout> {
 			f.contour = model.graphics["f" + f.id].contours!;
 			const vertex = tree.$vertices[f.id]!;
 			const edge = tree.$edges.get(f.id)!.values().next().value;
-			const flap = new Flap(this.$sheet, f, vertex, edge);
+			const flap = new Flap(this, f, vertex, edge);
 			this.$flaps.set(f.id, flap);
 			this.$sheet.$addChild(flap);
 		}
@@ -58,12 +58,27 @@ export class Layout implements ISerializable<JLayout> {
 		for(const e of prototype.tree.edges) {
 			const { n1, n2 } = e;
 			const tag = n1 < n2 ? `re${n1},${n2}` : `re${n2},${n1}`;
-			if(!model.graphics[tag]) continue;
-			const river = new River(this.$sheet, tag, model.graphics[tag].contours!);
+			const edge = tree.$edges.get(n1, n2);
+			if(!model.graphics[tag] || !edge) continue;
+			const river = new River(this, tag, edge, model.graphics[tag].contours!);
 			this.$rivers.set(n1, n2, river);
 			this.$sheet.$addChild(river);
 		}
 		prototype.tree.edges.length = 0;
 		this.riverCount = this.$rivers.size;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 介面方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public $goToDual(subject: River | Flap[]): void {
+		this.$project.design.tree.$sheet.$clearSelection();
+		if(Array.isArray(subject)) {
+			for(const f of subject) f.$vertex.$selected = true;
+		} else {
+			subject.$edge.$selected = true;
+		}
+		this.$project.design.mode = "tree";
 	}
 }

@@ -33,13 +33,15 @@ export class Vertex extends Independent implements DragSelectable {
 	public readonly height = 0;
 	public readonly width = 0;
 
+	@shallowRef public degree: number = 0;
 	@shallowRef public name: string;
 
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
 	private readonly _label: Label;
 
-	constructor(tree: Tree, sheet: Sheet, json: JVertex) {
+	constructor(tree: Tree, json: JVertex) {
+		const sheet = tree.$sheet;
 		super(sheet);
 		this._tree = tree;
 
@@ -59,11 +61,27 @@ export class Vertex extends Independent implements DragSelectable {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 編輯方法
+	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public addLeaf(length: number): Promise<void> {
 		return this._tree.$addLeaf(this, length);
+	}
+
+	public get isDeletable(): boolean {
+		return !this._tree.isMinimal && this.degree <= 2;
+	}
+
+	public delete(): void {
+		//
+	}
+
+	public deleteAndJoin(): void {
+		//
+	}
+
+	public goToDual(): void {
+		this._tree.$goToDual([this]);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
