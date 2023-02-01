@@ -8,8 +8,8 @@
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
-				<!-- <flaps v-if="type=='Flap'"></flaps>
-				<vertices v-if="type=='Vertex'"></vertices> -->
+				<Flaps v-if="type == 'Flap'" />
+				<Vertices v-if="type == 'Vertex'" />
 			</div>
 		</template>
 	</aside>
@@ -36,6 +36,8 @@
 	import Flap from "./flap.vue";
 	import River from "./river.vue";
 	import Design from "./design.vue";
+	import Flaps from "./flaps.vue";
+	import Vertices from "./vertices.vue";
 
 	import type { Component } from "vue";
 

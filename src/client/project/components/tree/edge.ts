@@ -70,6 +70,18 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public split(): void {
+		//
+	}
+
+	public deleteAndMerge(): void {
+		//
+	}
+
+	public delete(): void {
+		//
+	}
+
 	public get isRiver(): boolean {
 		return this.$v1.degree > 1 && this.$v2.degree > 1;
 	}
