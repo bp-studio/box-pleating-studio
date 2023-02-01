@@ -6,11 +6,10 @@ import { shallowRef } from "client/shared/decorators";
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { minComparator } from "shared/data/heap/heap";
 import { dist } from "shared/types/geometry";
-import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
-import type { JTree } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap, JTree, JVertex } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
@@ -25,7 +24,7 @@ const Y_DISPLACEMENT = 0.0625;
  * {@link Tree} 負責提供樹狀結構檢視當中可用的操作與相關邏輯
  */
 //=================================================================
-export class Tree implements ISerializable<JTree> {
+export class Tree implements IAsyncSerializable<JTree> {
 
 	@shallowRef public vertexCount: number = 0;
 
@@ -56,10 +55,14 @@ export class Tree implements ISerializable<JTree> {
 		}
 	}
 
-	public toJSON(): JTree {
+	public async toJSON(): Promise<JTree> {
+		// 邊的集合跟 Core 進行請求，因為只有 Core 知道樹的樹根之所在、
+		// 從而能根據樹的定向來輸出最佳化的結果
 		return {
 			sheet: this.$sheet.toJSON(),
-		} as JTree;
+			nodes: this.$vertices.filter(v => v).map(v => v!.toJSON()),
+			edges: await this.$project.$callStudio("tree", "json"),
+		};
 	}
 
 	public $update(model: UpdateModel): void {
@@ -70,42 +73,18 @@ export class Tree implements ISerializable<JTree> {
 		for(const id of model.add.nodes) {
 			const json = prototype.nodes.find(n => n.id == id) ??
 				{ id, name: "", x: 0, y: 0 }; // 防呆
-
-			const vertex = new Vertex(this, json);
-			this.$sheet.$addChild(vertex);
-			this.$vertices[id] = vertex;
+			this._addVertex(json);
 			vertexCount++;
 		}
 		for(const id of model.remove.nodes) {
-			const vertex = this.$vertices[id]!;
-			this.$sheet.$removeChild(vertex);
-			vertex.$dispose();
-			delete this.$vertices[id];
+			this._removeVertex(id);
 			vertexCount--;
 		}
 		this.vertexCount = vertexCount;
 
 		// 邊
-		for(const e of model.add.edges) {
-			const v1 = this.$vertices[e.n1];
-			const v2 = this.$vertices[e.n2];
-			if(!v1 || !v2) continue;
-			v1.degree++;
-			v2.degree++;
-			const edge = new Edge(this, v1, v2, e.length);
-			this.$sheet.$addChild(edge);
-			this.$edges.set(v1.id, v2.id, edge);
-		}
-		for(const e of model.remove.edges) {
-			const v1 = this.$vertices[e.n1];
-			const v2 = this.$vertices[e.n2];
-			if(v1) v1.degree--;
-			if(v2) v2.degree--;
-			const edge = this.$edges.get(e.n1, e.n2)!;
-			this.$sheet.$removeChild(edge);
-			edge.$dispose();
-			this.$edges.delete(e.n1, e.n2);
-		}
+		for(const e of model.add.edges) this._addEdge(e);
+		for(const e of model.remove.edges) this._removeEdge(e);
 	}
 
 	public get isMinimal(): boolean {
@@ -119,8 +98,17 @@ export class Tree implements ISerializable<JTree> {
 	public async $addLeaf(at: Vertex, length: number): Promise<void> {
 		const id = this._nextAvailableId;
 		const { x, y } = this._findClosestEmptyPoint(at);
-		this.$project.design.$prototype.tree.nodes.push({ id, name: "", x, y });
-		await this.$project.$callStudio("tree", "addLeaf", id, at.id, length);
+		const design = this.$project.design;
+		const prototype = design.$prototype;
+		if(at.degree == 1) {
+			// 角片會變成河
+			const edge = design.layout.$flaps.get(at.id)!.$edge;
+			prototype.tree.edges.push(edge.toJSON());
+		}
+		prototype.tree.nodes.push({ id, name: "", x, y });
+		const flap: JFlap = { id, x: 0, y: 0, width: 0, height: 0 };
+		prototype.layout.flaps.push(flap);
+		await this.$project.$callStudio("tree", "addLeaf", id, at.id, length, flap);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {
@@ -153,7 +141,7 @@ export class Tree implements ISerializable<JTree> {
 	}
 
 	/** 根據所有的頂點集，找出自身附近最近的空白處 */
-	public _findClosestEmptyPoint(at: Vertex): IPoint {
+	private _findClosestEmptyPoint(at: Vertex): IPoint {
 		const { x, y } = at.$location;
 		const ref: IPoint = { x: x + X_DISPLACEMENT, y: y + Y_DISPLACEMENT };
 
@@ -183,5 +171,40 @@ export class Tree implements ISerializable<JTree> {
 			r++; // r 遞增直到找到可放置處為止
 		}
 		return heap.$get()![0];
+	}
+
+	private _addVertex(json: JVertex): void {
+		const vertex = new Vertex(this, json);
+		this.$sheet.$addChild(vertex);
+		this.$vertices[json.id] = vertex;
+	}
+
+	private _removeVertex(id: number): void {
+		const vertex = this.$vertices[id]!;
+		this.$sheet.$removeChild(vertex);
+		vertex.$dispose();
+		delete this.$vertices[id];
+	}
+
+	private _addEdge(e: JEdge): void {
+		const v1 = this.$vertices[e.n1];
+		const v2 = this.$vertices[e.n2];
+		if(!v1 || !v2) return;
+		v1.degree++;
+		v2.degree++;
+		const edge = new Edge(this, v1, v2, e.length);
+		this.$sheet.$addChild(edge);
+		this.$edges.set(v1.id, v2.id, edge);
+	}
+
+	private _removeEdge(e: JEdgeBase): void {
+		const v1 = this.$vertices[e.n1];
+		const v2 = this.$vertices[e.n2];
+		if(v1) v1.degree--;
+		if(v2) v2.degree--;
+		const edge = this.$edges.get(e.n1, e.n2)!;
+		this.$sheet.$removeChild(edge);
+		edge.$dispose();
+		this.$edges.delete(e.n1, e.n2);
 	}
 }

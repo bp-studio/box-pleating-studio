@@ -10,20 +10,12 @@ import type { JDesign } from "shared/json";
  */
 //=================================================================
 
-export class Design implements ISerializable<RecursivePartial<JDesign>> {
+export class Design {
 
 	public $tree: ITree;
 
 	private constructor(data: JDesign) {
 		this.$tree = new Tree(data.tree.edges, data.layout.flaps);
-	}
-
-	public toJSON(): RecursivePartial<JDesign> {
-		return {
-			tree: {
-				edges: this.$tree.toJSON(),
-			},
-		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

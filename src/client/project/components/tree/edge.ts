@@ -10,6 +10,7 @@ import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/screen/label";
 import { Direction } from "client/types/enum";
 
+import type { JEdge } from "shared/json";
 import type { Tree } from "./tree";
 import type { Vertex } from "./vertex";
 
@@ -23,7 +24,7 @@ const LABEL_DISTANCE = 0.5;
  * {@link Edge} 是樹狀邊的控制項。
  */
 //=================================================================
-export class Edge extends Control {
+export class Edge extends Control implements ISerializable<JEdge> {
 
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
@@ -55,6 +56,14 @@ export class Edge extends Control {
 		this.$reactDraw(this._draw, this._hitArea, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._line.name = "Edge";
+	}
+
+	public toJSON(): JEdge {
+		return {
+			n1: this.$v1.id,
+			n2: this.$v2.id,
+			length: this.length,
+		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

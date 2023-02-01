@@ -28,7 +28,7 @@ const DOT_FILL = 0x6699FF;
  * {@link Flap} 是角片矩形的控制項。
  */
 //=================================================================
-export class Flap extends Independent implements DragSelectable {
+export class Flap extends Independent implements DragSelectable, ISerializable<JFlap> {
 
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;
@@ -37,11 +37,11 @@ export class Flap extends Independent implements DragSelectable {
 
 	@shallowRef public width: number = 0;
 	@shallowRef public height: number = 0;
-	@shallowRef private _contours: Contour[];
+	@shallowRef public $contours: Contour[];
 
 	public readonly $vertex: Vertex;
+	public readonly $edge: Edge;
 	private readonly _layout: Layout;
-	private readonly _edge: Edge;
 
 	private readonly _dots: SmoothGraphics[];
 	private readonly _shade: Graphics;
@@ -52,7 +52,7 @@ export class Flap extends Independent implements DragSelectable {
 
 	public $anchor: Readonly<IPoint> = { x: 0, y: 0 };
 
-	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge) {
+	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge, contours: Contour[]) {
 		const sheet = layout.$sheet;
 		super(sheet);
 		this._layout = layout;
@@ -62,9 +62,9 @@ export class Flap extends Independent implements DragSelectable {
 		this.$location.y = json.y;
 		this.width = json.width;
 		this.height = json.height;
-		this._contours = json.contour!;
+		this.$contours = contours;
 		this.$vertex = vertex;
-		this._edge = edge;
+		this.$edge = edge;
 
 		this._dots = Array.from({ length: 4 }, () =>
 			this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$dot])
@@ -82,6 +82,16 @@ export class Flap extends Independent implements DragSelectable {
 		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
 	}
 
+	public toJSON(): JFlap {
+		return {
+			id: this.id,
+			x: this.$location.x,
+			y: this.$location.y,
+			width: this.width,
+			height: this.height,
+		};
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 代理屬性
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,10 +104,10 @@ export class Flap extends Independent implements DragSelectable {
 	}
 
 	public get radius(): number {
-		return this._edge.length;
+		return this.$edge.length;
 	}
 	public set radius(v: number) {
-		this._edge.length = v;
+		this.$edge.length = v;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +172,7 @@ export class Flap extends Independent implements DragSelectable {
 		const { x, y } = this.$location;
 		const hingeColor = app.settings.colorScheme.hinge ?? HINGE_COLOR;
 		this._shade.clear();
-		fillContours(this._shade, this._contours, HINGE_COLOR);
+		fillContours(this._shade, this.$contours, HINGE_COLOR);
 
 		this._dots[Direction.LL].position.set(x, y);
 		this._dots[Direction.UR].visible = w > 0 && h > 0;
@@ -173,7 +183,7 @@ export class Flap extends Independent implements DragSelectable {
 		this._dots[Direction.LR].position.set(x + w, y);
 
 		this._hinge.clear().lineStyle(HINGE_WIDTH * sh, hingeColor);
-		drawContours(this._hinge, this._contours);
+		drawContours(this._hinge, this.$contours);
 
 		const ridgeColor = app.settings.colorScheme.ridge ?? DANGER;
 		this._ridge.clear().lineStyle(RIDGE_WIDTH * sh, ridgeColor);
@@ -187,7 +197,7 @@ export class Flap extends Independent implements DragSelectable {
 
 		// 把座標放大 s 倍以增進圓弧繪製品質
 		const s = ProjectService.scale.value;
-		const r = this._edge.length * s;
+		const r = this.$edge.length * s;
 		this._circle.scale.set(1 / s);
 		this._circle.clear()
 			.lineStyle(sh, hingeColor)

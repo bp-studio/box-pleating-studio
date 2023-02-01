@@ -8,8 +8,8 @@ export interface ITree extends ISerializable<JEdge[]> {
 
 	readonly $root: ITreeNode;
 
-	/** 增加一個新的葉點 */
-	$addLeaf(id: number, at: number, length: number): void;
+	/** 增加一個新的葉點並傳回 */
+	$addLeaf(id: number, at: number, length: number): ITreeNode;
 
 	/** 刪除一個指定 {@link ITreeNode.id id} 的葉點，並傳回成功與否 */
 	$removeLeaf(id: number): boolean;
@@ -26,4 +26,7 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	readonly $dist: number;
 	readonly $isLeaf: boolean;
 	readonly $AABB: AABB;
+
+	/** 根據傳入的 {@link JFlap} 設定位置 */
+	$setFlap(flap: JFlap): void;
 }

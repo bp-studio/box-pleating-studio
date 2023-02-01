@@ -1,10 +1,8 @@
 import { Processor } from "core/service/processor";
 import { TreeNode } from "./treeNode";
-import { BinaryHeap } from "shared/data/heap/binaryHeap";
-import { minComparator } from "shared/data/heap/heap";
 import { State } from "core/service/state";
 
-import type { ITree } from ".";
+import type { ITree, ITreeNode } from ".";
 import type { JEdge, JFlap } from "shared/json";
 
 //=================================================================
@@ -93,8 +91,9 @@ export class Tree implements ITree {
 		return this.$root.$height;
 	}
 
-	public $addLeaf(id: number, at: number, length: number): void {
+	public $addLeaf(id: number, at: number, length: number): ITreeNode {
 		this.$setEdge(at, id, length);
+		return this.$nodes[id]!;
 	}
 
 	public $removeLeaf(id: number): boolean {

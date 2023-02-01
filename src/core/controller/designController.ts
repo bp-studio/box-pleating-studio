@@ -19,10 +19,6 @@ namespace DesignController {
 		Processor.$run(heightTask);
 		if(DEBUG_ENABLED) console.timeEnd("Design initializing");
 	}
-
-	export function json(): RecursivePartial<JDesign> {
-		return Design.$instance.toJSON();
-	}
 }
 
 export default DesignController;

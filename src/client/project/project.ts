@@ -6,7 +6,7 @@ import HistoryManager from "./changes/history";
 import { shallowRef } from "client/shared/decorators";
 
 import type * as Routes from "core/routes";
-import type { JProject, JTree } from "shared/json";
+import type { JProject } from "shared/json";
 
 /**
  * 號碼從 1 號開始，以確保真值。
@@ -18,7 +18,7 @@ let nextId = 1;
  * {@link Project} 是一個開啟的專案。
  */
 //=================================================================
-export class Project extends Mountable {
+export class Project extends Mountable implements IAsyncSerializable<JProject> {
 
 	public readonly id: number;
 	public readonly design: Design;
@@ -67,13 +67,9 @@ export class Project extends Mountable {
 	}
 
 	public async toJSON(session: boolean = false): Promise<JProject> {
-		// TODO
-		const json = await this.$callStudio("design", "json");
-		const design = this.design.toJSON();
-		design.tree = json!.tree as JTree;
 		return {
 			version: Migration.$getCurrentVersion(),
-			design,
+			design: await this.design.toJSON(),
 		};
 	}
 

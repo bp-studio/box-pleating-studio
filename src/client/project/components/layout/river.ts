@@ -27,9 +27,7 @@ export class River extends Control {
 	public readonly type = "River";
 	public readonly $priority: number = 1;
 
-	public readonly tag: string;
-
-	@shallowRef private _contours: Contour[];
+	@shallowRef public $contours: Contour[];
 
 	public readonly $edge: Edge;
 	private readonly _layout: Layout;
@@ -38,14 +36,13 @@ export class River extends Control {
 	private readonly _hinge: SmoothGraphics;
 
 
-	constructor(layout: Layout, tag: string, edge: Edge, contour: Contour[]) {
+	constructor(layout: Layout, edge: Edge, contours: Contour[]) {
 		const sheet = layout.$sheet;
 		super(sheet);
 		this._layout = layout;
 
-		this.tag = tag;
 		this.$edge = edge;
-		this._contours = contour;
+		this.$contours = contours;
 
 		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$shade]);
 		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
@@ -88,10 +85,10 @@ export class River extends Control {
 	private _draw(): void {
 		const color = app.settings.colorScheme.hinge ?? HINGE_COLOR;
 		this._shade.clear();
-		fillContours(this._shade, this._contours, HINGE_COLOR);
+		fillContours(this._shade, this.$contours, HINGE_COLOR);
 
 		const sh = ProjectService.shrink.value;
 		this._hinge.clear().lineStyle(HINGE_WIDTH * sh, color);
-		drawContours(this._hinge, this._contours);
+		drawContours(this._hinge, this.$contours);
 	}
 }

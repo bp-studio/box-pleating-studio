@@ -8,7 +8,6 @@ import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 
-import type { Sheet } from "../sheet";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -24,7 +23,7 @@ const FILL_COLOR = 0x6699FF;
  * {@link Vertex} 是樹狀節點的控制項。
  */
 //=================================================================
-export class Vertex extends Independent implements DragSelectable {
+export class Vertex extends Independent implements DragSelectable, ISerializable<JVertex> {
 
 	public readonly type = "Vertex";
 	public readonly $priority: number = Infinity;
@@ -58,6 +57,15 @@ export class Vertex extends Independent implements DragSelectable {
 		this.$reactDraw(this._draw, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._dot.name = "Vertex";
+	}
+
+	public toJSON(): JVertex {
+		return {
+			id: this.id,
+			name: this.name,
+			x: this.$location.x,
+			y: this.$location.y,
+		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
