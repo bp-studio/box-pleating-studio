@@ -6,6 +6,7 @@ import { shallowRef } from "client/shared/decorators";
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { minComparator } from "shared/data/heap/heap";
 import { dist } from "shared/types/geometry";
+import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
@@ -68,6 +69,9 @@ export class Tree implements IAsyncSerializable<JTree> {
 	public $update(model: UpdateModel): void {
 		const prototype = this.$project.design.$prototype.tree;
 
+		// 邊的刪除；因為順序上的緣故，這必須先處理
+		for(const e of model.remove.edges) this._removeEdge(e);
+
 		// 節點
 		let vertexCount = this.vertexCount;
 		for(const id of model.add.nodes) {
@@ -82,9 +86,8 @@ export class Tree implements IAsyncSerializable<JTree> {
 		}
 		this.vertexCount = vertexCount;
 
-		// 邊
+		// 邊新增
 		for(const e of model.add.edges) this._addEdge(e);
-		for(const e of model.remove.edges) this._removeEdge(e);
 	}
 
 	public get isMinimal(): boolean {
@@ -95,20 +98,40 @@ export class Tree implements IAsyncSerializable<JTree> {
 	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public async $addLeaf(at: Vertex, length: number): Promise<void> {
+	public $addLeaf(at: Vertex, length: number): Promise<void> {
 		const id = this._nextAvailableId;
-		const { x, y } = this._findClosestEmptyPoint(at);
+		const p = this._findClosestEmptyPoint(at);
 		const design = this.$project.design;
 		const prototype = design.$prototype;
-		if(at.degree == 1) {
-			// 角片會變成河
-			const edge = design.layout.$flaps.get(at.id)!.$edge;
-			prototype.tree.edges.push(edge.toJSON());
-		}
-		prototype.tree.nodes.push({ id, name: "", x, y });
-		const flap: JFlap = { id, x: 0, y: 0, width: 0, height: 0 };
+		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y });
+		const flap = design.layout.$createFlapPrototype(id, p);
 		prototype.layout.flaps.push(flap);
-		await this.$project.$callStudio("tree", "addLeaf", id, at.id, length, flap);
+		return this.$project.$callStudio("tree", "addLeaf", id, at.id, length, flap);
+	}
+
+	public async $delete(vertex: Vertex): Promise<void> {
+		const d = vertex.degree, id = vertex.id;
+		SelectionController.$clear();
+		if(d === 1) await this.$project.$callStudio("tree", "removeLeaf", [id]);
+		if(d === 2) await this.$project.$callStudio("tree", "join", id);
+	}
+
+	public $split(edge: Edge): void {
+		SelectionController.$clear();
+		const id = this._nextAvailableId;
+		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
+		this.$project.design.$prototype.tree.nodes.push({
+			id,
+			name: "",
+			x: Math.round((l1.x + l2.x) / 2),
+			y: Math.round((l1.y + l2.y) / 2),
+		});
+		this.$project.$callStudio("tree", "split", edge.toJSON(), id);
+	}
+
+	public $merge(edge: Edge): void {
+		SelectionController.$clear();
+		this.$project.$callStudio("tree", "merge", edge.toJSON());
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {
@@ -183,6 +206,7 @@ export class Tree implements IAsyncSerializable<JTree> {
 		const vertex = this.$vertices[id]!;
 		this.$sheet.$removeChild(vertex);
 		vertex.$dispose();
+		this._skippedIdHeap.$insert(id);
 		delete this.$vertices[id];
 	}
 

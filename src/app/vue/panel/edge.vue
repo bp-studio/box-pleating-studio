@@ -4,10 +4,12 @@
 		<Number :label="$t('panel.edge.length')" v-model="subject.length" hotkeys="d.rd,d.ri" />
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="subject.split()" v-t="'panel.edge.split'"></button>
-		<button class="btn btn-primary" v-if="subject.isRiver" @click="subject.deleteAndMerge()"
-				v-t="'panel.edge.merge'"></button>
-		<button class="btn btn-primary" v-else @click="subject.delete()" v-t="'keyword.delete'"></button>
+		<button class="btn btn-primary me-2" @click="subject.split()" v-t="'panel.edge.split'"></button>
+		<template v-if="subject.isDeletable">
+			<button class="btn btn-primary" v-if="subject.isRiver" @click="subject.deleteAndMerge()"
+					v-t="'panel.edge.merge'"></button>
+			<button class="btn btn-primary" v-else @click="subject.delete()" v-t="'keyword.delete'"></button>
+		</template>
 	</div>
 	<div class="mt-3">
 		<button class="btn btn-primary" @click="subject.goToDual()" :title="hk('n', 'd')">

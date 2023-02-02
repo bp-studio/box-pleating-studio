@@ -1,5 +1,5 @@
 import type { Polygon } from "shared/types/geometry";
-import type { JEdge, JEdgeBase } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap } from "shared/json";
 
 export interface UpdateModel {
 
@@ -17,5 +17,6 @@ export interface UpdateModel {
 }
 
 interface GraphicsData {
+	flap?: JFlap;
 	contours?: Contour[];
 }

@@ -40,9 +40,9 @@ function balance(root: TreeNode): TreeNode | null {
 
 	// 進行平衡
 	root.$height = height;
-	first.$cut();
+	first.$cut(true);
 	root.$length = first.$length;
-	root.$pasteTo(first);
+	root.$pasteTo(first, true);
 	first.$length = 0;
 	return first;
 }

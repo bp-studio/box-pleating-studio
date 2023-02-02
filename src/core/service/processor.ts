@@ -3,8 +3,8 @@ import { State } from "./state";
 
 import type { Task } from "core/design/tasks/task";
 import type { Contour } from "shared/types/geometry";
-import type { JEdge } from "shared/json/tree";
-import type { UpdateModel } from "./updateModel";
+import type { JEdge, JEdgeBase } from "shared/json/tree";
+import type { GraphicsData, UpdateModel } from "./updateModel";
 
 //=================================================================
 /**
@@ -32,12 +32,20 @@ export namespace Processor {
 		updateResult.add.edges.push(edge);
 	}
 
+	export function $removeEdge(edge: JEdgeBase): void {
+		updateResult.remove.edges.push(edge);
+	}
+
 	export function $addNode(id: number): void {
 		updateResult.add.nodes.push(id);
 	}
 
-	export function $addContour(tag: string, contours: Contour[]): void {
-		updateResult.graphics[tag] = { contours };
+	export function $removeNode(id: number): void {
+		updateResult.remove.nodes.push(id);
+	}
+
+	export function $addGraphics(tag: string, graphics: GraphicsData): void {
+		updateResult.graphics[tag] = graphics;
 	}
 
 	export function $getResult(): UpdateModel {

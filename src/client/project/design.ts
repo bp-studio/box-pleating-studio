@@ -74,6 +74,7 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 
 	/** 根據 Core 傳回的更新模型來進行更新 */
 	public $update(model: UpdateModel): void {
+		this.layout.$cleanUp(model);
 		this.tree.$update(model);
 		this.layout.$update(model);
 	}

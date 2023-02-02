@@ -18,7 +18,7 @@ export const roughContourTask = new Task(process);
 const union = new AAUnion();
 
 function process(): void {
-	climb(updater, State.$flapAABBChanged as Set<TreeNode>);
+	climb(updater, State.$flapAABBChanged as Set<TreeNode>, State.$parentChanged as Set<TreeNode>);
 }
 
 function updater(node: TreeNode): boolean {
@@ -26,14 +26,17 @@ function updater(node: TreeNode): boolean {
 	if(node.$isLeaf) {
 		const path = node.$AABB.$toPath();
 		node.$outerRoughContour = [path];
-		Processor.$addContour("f" + node.id, [{ outer: path }]);
+		Processor.$addGraphics("f" + node.id, {
+			flap: node.$toFlap(),
+			contours: [{ outer: path }],
+		});
 	} else {
 		const components = [...node.$children].map(n => n.$outerRoughContour);
 		const inner = union.$get(...components);
 		node.$innerRoughContour = inner;
 		const contours = expand(inner, node.$length);
 		node.$outerRoughContour = contours.map(c => c.outer);
-		Processor.$addContour(node.$riverTag, contours);
+		Processor.$addGraphics(node.$riverTag, { contours });
 	}
 	return true;
 }

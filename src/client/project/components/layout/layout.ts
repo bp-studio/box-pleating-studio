@@ -53,27 +53,64 @@ export class Layout implements ISerializable<JLayout> {
 			if(target) target.$contours = model.graphics[tag].contours!;
 		}
 
-		// 角片增減
 		for(const f of this.$flaps.values()) {
-			if(tree.$vertices[f.id]?.degree != 1) this._removeFlap(f.id);
+			const vertex = tree.$vertices[f.id];
+			const edgeDisposed = !f.$edge.$v1; // 原本的角片被分割了
+			if(!vertex || vertex.degree != 1 || edgeDisposed) {
+				if(vertex) {
+					if(edgeDisposed) {
+						prototype.layout.flaps.push(f.toJSON());
+						model.graphics["f" + f.id] ||= { contours: f.$contours };
+					} else {
+						// 角片變成河
+						model.add.edges.push(f.$edge.toJSON());
+					}
+				}
+				this._removeFlap(f.id);
+			}
 		}
+		for(const r of this.$rivers.values()) {
+			const v = r.$edge.$getLeaf();
+			if(v) {
+				// 河變成角片
+				const f = model.graphics["f" + v.id].flap!;
+				prototype.layout.flaps.push(f);
+				this._removeRiver(r);
+			}
+		}
+
 		for(const f of prototype.layout.flaps) {
 			this._addFlap(f, model.graphics["f" + f.id].contours!);
 		}
 		prototype.layout.flaps.length = 0;
 		this.flapCount = this.$flaps.size;
 
-		// 河增減
-		for(const r of this.$rivers.values()) {
-			if(r.$edge.$v1.degree == 1 || r.$edge.$v2.degree == 1) this._removeRiver(r);
-		}
-		for(const e of prototype.tree.edges) {
+		for(const e of model.add.edges) {
+			const edge = tree.$edges.get(e.n1, e.n2)!;
+			if(edge.$v1.degree == 1 || edge.$v2.degree == 1) continue;
 			const tag = this._getEdgeTag(e);
 			if(!model.graphics[tag]) continue;
 			this._addRiver(e, model.graphics[tag].contours!);
 		}
-		prototype.tree.edges.length = 0;
 		this.riverCount = this.$rivers.size;
+	}
+
+	/** 因為刪除順序上的緣故，這個方法必須獨立出來 */
+	public $cleanUp(model: UpdateModel): void {
+		for(const e of model.remove.edges) {
+			const river = this.$rivers.get(e.n1, e.n2);
+			if(river) this._removeRiver(river);
+		}
+	}
+
+	public $createFlapPrototype(id: number, p: IPoint): JFlap {
+		return {
+			id,
+			x: p.x,
+			y: p.y,
+			width: 0,
+			height: 0,
+		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,8 +159,8 @@ export class Layout implements ISerializable<JLayout> {
 
 	private _removeRiver(river: River): void {
 		this.$sheet.$removeChild(river);
-		river.$dispose();
 		this.$rivers.delete(river.$edge.$v1.id, river.$edge.$v2.id);
+		river.$dispose();
 	}
 
 	private _getEdgeTag(e: JEdgeBase): string {
@@ -134,8 +171,11 @@ export class Layout implements ISerializable<JLayout> {
 	private _parseTag(tag: string): Flap | River | void {
 		const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
 		if(!m) return;
-		const init = m[1], id = Number(m[2]), then = Number(m[3]);
-		if(init == "f") return this.$flaps.get(id);
-		if(init == "re") return this.$rivers.get(id, then);
+		const init = m[1];
+		if(init == "f") return this.$flaps.get(Number(m[2]));
+		if(init == "re") {
+			const [n1, n2] = m[2].split(",").map(n => Number(n));
+			return this.$rivers.get(n1, n2);
+		}
 	}
 }

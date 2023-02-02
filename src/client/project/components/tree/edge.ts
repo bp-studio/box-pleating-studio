@@ -71,23 +71,37 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public split(): void {
-		//
+		this._tree.$split(this);
 	}
 
 	public deleteAndMerge(): void {
-		//
+		this._tree.$merge(this);
 	}
 
 	public delete(): void {
-		//
+		const v = this.$getLeaf();
+		if(v) this._tree.$delete(v);
 	}
 
 	public get isRiver(): boolean {
-		return this.$v1.degree > 1 && this.$v2.degree > 1;
+		return !this.$getLeaf();
+	}
+
+	public get isDeletable(): boolean {
+		return !this._tree.isMinimal;
 	}
 
 	public goToDual(): void {
 		this._tree.$goToDual(this);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 公開方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public $getLeaf(): Vertex | undefined {
+		if(this.$v1.degree == 1) return this.$v1;
+		if(this.$v2.degree == 1) return this.$v2;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

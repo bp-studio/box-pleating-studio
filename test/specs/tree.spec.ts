@@ -30,11 +30,10 @@ describe("Tree", function() {
 		expect(tree.$root).to.equal(n0);
 
 		// Add two more edges, causing unbalancing
-		const id = tree.$addLeaf(1, 2);
-		tree.$addLeaf(id, 2);
+		tree.$addLeaf(3, 1, 2);
+		tree.$addLeaf(4, 3, 2);
 		Processor.$run(heightTask);
 
-		expect(id).to.equal(3);
 		expect(tree.$root).to.equal(n1);
 		expect(tree.$height).to.equal(2);
 	});
@@ -54,10 +53,11 @@ describe("Tree", function() {
 		expect(tree.$nodes[1]).to.be.not.undefined;
 		expect(tree.$nodes[0]).to.be.not.undefined;
 
-		expect(tree.$removeLeaf(0)).to.be.false;
-		expect(tree.$removeLeaf(1)).to.be.true;
+		tree.$removeLeaf(0);
+		expect(tree.$nodes[0]).to.be.not.undefined;
+		tree.$removeLeaf(1);
 		expect(tree.$nodes[1]).to.be.undefined;
-		expect(tree.$removeLeaf(0)).to.be.true;
+		tree.$removeLeaf(0);
 		expect(tree.$nodes[0]).to.be.undefined;
 
 		Processor.$run(heightTask);

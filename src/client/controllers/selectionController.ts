@@ -1,6 +1,6 @@
 import { computed, shallowReactive, watch } from "vue";
 import { Graphics } from "@pixi/graphics";
-import { Rectangle, Transform } from "@pixi/math";
+import { Rectangle } from "@pixi/math";
 
 import { Draggable } from "client/base/draggable";
 import { $getEventCenter, $isTouch } from "./share";

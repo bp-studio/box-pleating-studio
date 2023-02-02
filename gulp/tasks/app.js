@@ -50,9 +50,7 @@ gulp.task("appDist", () =>
 			dest: config.dest.dist + "/main.js",
 			extra,
 		}))
-		.pipe(esb({
-			minify: true,
-		}))
+		.pipe(esb({ minify: true }))
 		.pipe(gulp.dest(config.dest.dist))
 );
 

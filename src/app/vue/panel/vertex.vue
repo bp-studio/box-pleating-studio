@@ -17,9 +17,9 @@
 		</div>
 	</div>
 	<div class="mt-3" v-if="subject.isDeletable">
-		<button class="btn btn-primary" v-if="subject.degree == 1" @click="subject.delete()" v-t="'keyword.delete'"></button>
-		<button class="btn btn-primary" v-if="subject.degree == 2" @click="subject.deleteAndJoin()"
-				v-t="'panel.vertex.delJoin'"></button>
+		<button class="btn btn-primary"	@click="subject.delete()">
+			{{ subject.degree == 1 ? $t('keyword.delete') : $t('panel.vertex.delJoin') }}
+		</button>
 	</div>
 	<div class="mt-3" v-if="subject.degree == 1">
 		<button class="btn btn-primary" @click="subject.goToDual()" v-t="'panel.vertex.goto'" :title="hk('n', 'd')"></button>

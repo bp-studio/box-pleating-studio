@@ -96,23 +96,64 @@ export class Tree implements ITree {
 		return this.$nodes[id]!;
 	}
 
-	public $removeLeaf(id: number): boolean {
+	public $removeLeaf(id: number): void {
 		const node = this._nodes[id];
-		if(!node) return false;
+		if(!node || !node.$isLeaf) return;
 
 		const parent = node.$parent!;
-		const result = node.$remove();
-
-		if(result) {
-			this._leaves.delete(node);
-			State.$childrenChanged.delete(node);
-			if(parent.$isLeaf) this._leaves.add(parent);
-
-			delete this._nodes[id];
-
-			State.$childrenChanged.add(parent);
+		node.$cut();
+		this._leaves.delete(node);
+		if(parent.$isLeaf) {
+			this._leaves.add(parent);
+			State.$flapAABBChanged.add(parent);
 		}
-		return result;
+		this._removeNode(id);
+	}
+
+	public $join(id: number): void {
+		const node = this._nodes[id]!;
+		const parent = node.$parent;
+		const child = node.$children.$get()!;
+		const second = node.$children.$getSecond()!;
+		child.$cut();
+		if(parent) {
+			node.$cut();
+			child.$length += node.$length;
+			child.$pasteTo(parent);
+		} else {
+			second.$length += child.$length;
+			second.$cut();
+			second.$pasteTo(child);
+			this.$root = child;
+			State.$rootChanged = true;
+		}
+		this._removeNode(id);
+	}
+
+	public $split(id: number, n: number): void {
+		const node = this._nodes[n]!;
+		const parent = node.$parent!;
+		const l = node.$length;
+		node.$cut();
+		this.$setEdge(parent.id, id, Math.ceil(l / 2));
+		node.$length = Math.max(Math.floor(l / 2), 1);
+		node.$pasteTo(this._nodes[id]!);
+	}
+
+	public $merge(id: number): void {
+		const node = this._nodes[id]!;
+		if(node.$isLeaf) {
+			this.$removeLeaf(id);
+			return;
+		}
+
+		const parent = node.$parent!;
+		node.$cut();
+		for(const child of node.$children) {
+			child.$cut();
+			child.$pasteTo(parent);
+		}
+		this._removeNode(id);
 	}
 
 	/** 設定一條邊並且傳回是否有加入新邊 */
@@ -140,7 +181,6 @@ export class Tree implements ITree {
 			N2 = this._addLeaf(n2, N1, length);
 		}
 
-		if(!TEST_MODE) Processor.$addEdge({ n1, n2, length });
 		return true;
 	}
 
@@ -159,8 +199,14 @@ export class Tree implements ITree {
 		if(atLeaf) this._leaves.delete(at);
 		this._leaves.add(newNode);
 		this._nodes[id] = newNode;
-		if(!TEST_MODE) Processor.$addNode(id);
 		return newNode;
+	}
+
+	private _removeNode(id: number): void {
+		const node = this._nodes[id]!;
+		State.$childrenChanged.delete(node);
+		delete this._nodes[id];
+		Processor.$removeNode(id);
 	}
 
 	/** 傳回兩個節點的 LCA */

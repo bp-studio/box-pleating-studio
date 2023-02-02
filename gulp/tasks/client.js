@@ -64,7 +64,7 @@ gulp.task("clientDist", () =>
 			dest: config.dest.dist + "/client.js",
 			extra,
 		}))
-		.pipe(esb())
+		.pipe(esb({ minify: true })) // 即使有 terser，設置這個還是會再改進一點點
 		.pipe(replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
 		.pipe(terser({
 			ecma: 2018,
