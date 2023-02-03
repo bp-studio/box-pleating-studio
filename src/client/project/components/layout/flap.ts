@@ -35,9 +35,9 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	public readonly id: number;
 
-	@shallowRef public $width: number = 0;
-	@shallowRef public $height: number = 0;
 	@shallowRef public $contours: Contour[];
+	@shallowRef private _width: number = 0;
+	@shallowRef private _height: number = 0;
 
 	public readonly $vertex: Vertex;
 	public readonly $edge: Edge;
@@ -60,8 +60,8 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.id = json.id;
 		this.$location.x = json.x;
 		this.$location.y = json.y;
-		this.$width = json.width;
-		this.$height = json.height;
+		this._width = json.width;
+		this._height = json.height;
 		this.$contours = contours;
 		this.$vertex = vertex;
 		this.$edge = edge;
@@ -111,18 +111,20 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	public get height(): number {
-		return this.$height;
+		return this._height;
 	}
 	public set height(v: number) {
-		this.$height = v;
+		if(v < 0) return;
+		this._height = v;
 		this._layout.$updateFlap([this]);
 	}
 
 	public get width(): number {
-		return this.$width;
+		return this._width;
 	}
 	public set width(v: number) {
-		this.$width = v;
+		if(v < 0) return;
+		this._width = v;
 		this._layout.$updateFlap([this]);
 	}
 

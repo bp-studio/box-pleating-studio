@@ -29,7 +29,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
 
-	@shallowRef public length: number;
+	@shallowRef private _length: number;
 
 	public readonly $v1: Vertex;
 	public readonly $v2: Vertex;
@@ -45,7 +45,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 
 		this.$v1 = v1;
 		this.$v2 = v2;
-		this.length = length;
+		this._length = length;
 
 		this.$setupHit(this._line);
 		this.$addRootObject(this._line, sheet.$layers[Layer.$edge]);
@@ -62,8 +62,21 @@ export class Edge extends Control implements ISerializable<JEdge> {
 		return {
 			n1: this.$v1.id,
 			n2: this.$v2.id,
-			length: this.length,
+			length: this._length,
 		};
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 代理屬性
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get length(): number {
+		return this._length;
+	}
+	public set length(v: number) {
+		if(v < 1) return;
+		this._length = v;
+		this._tree.$updateLength([this.toJSON()]);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -103,8 +103,7 @@ namespace CustomHotkeyService {
 	function handleDimensionCommand(command: string): void {
 		if(!Studio.project) return;
 		const f = command.endsWith("i") ? 1 : -1;
-		//const sel = bp.selection.length ? bp.selection : [bp.design.sheet];
-		const sel = [Studio.project.design.sheet.grid];
+		const sel = Studio.selections.length ? Studio.selections : [Studio.project.design.sheet.grid];
 		for(const target of sel) {
 			if(command.startsWith("w")) {
 				tryChange(target, f, "width", "size");

@@ -50,8 +50,6 @@ export class TreeNode implements ITreeNode {
 		State.$childrenChanged.add(this);
 		Processor.$addNode(id);
 		if(parent) {
-			State.$lengthChanged.add(this);
-			State.$parentChanged.add(this);
 			this.$length = length;
 			this.$AABB.$setMargin(length);
 			this.$pasteTo(parent);

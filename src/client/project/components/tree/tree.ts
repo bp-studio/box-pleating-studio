@@ -102,7 +102,6 @@ export class Tree implements IAsyncSerializable<JTree> {
 		for(const e of model.add.edges) this._addEdge(e);
 	}
 
-
 	public $addLeaf(at: Vertex, length: number): Promise<void> {
 		const id = this._nextAvailableId;
 		const p = this._findClosestEmptyPoint(at);
@@ -147,6 +146,10 @@ export class Tree implements IAsyncSerializable<JTree> {
 	public $merge(edge: Edge): void {
 		SelectionController.$clear();
 		this.$project.$callStudio("tree", "merge", edge.toJSON());
+	}
+
+	public $updateLength(edges: JEdge[]): void {
+		this.$project.$callStudio("tree", "update", edges);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {

@@ -45,8 +45,8 @@ subgraph Contour
 end
 
 T --> h --> b
-b & L --> d --> a
-L & F --> a --> rc --> fc
+b & L --> d
+d & F --> a --> rc --> fc
 a --> k --> e & g
 g --> c --> p
 S --> s ---------> cc -.-> rc

@@ -1,4 +1,5 @@
 import { Design } from "core/design/design";
+import { distanceTask } from "core/design/tasks/distance";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 
@@ -11,6 +12,7 @@ import type { JEdge, JEdgeBase, JFlap } from "shared/json";
 //=================================================================
 namespace TreeController {
 
+	/** 新增一個葉點 */
 	export function addLeaf(id: number, at: number, length: number, flap: JFlap): void {
 		const tree = Design.$instance.$tree;
 		const node = tree.$addLeaf(id, at, length);
@@ -18,6 +20,11 @@ namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
+	/**
+	 * 逐一刪除葉點
+	 * @param ids 要刪除的節點 id
+	 * @param prototypes 刪除完之後產生的新葉點對應的 {@link JFlap}
+	 */
 	export function removeLeaf(ids: number[], prototypes: JFlap[]): void {
 		const tree = Design.$instance.$tree;
 		while(ids.length) {
@@ -39,6 +46,14 @@ namespace TreeController {
 
 		tree.$setFlaps(prototypes);
 		Processor.$run(heightTask);
+	}
+
+	export function update(edges: JEdge[]): void {
+		const tree = Design.$instance.$tree;
+		for(const e of edges) {
+			tree.$setLength(getChildId(e), e.length);
+		}
+		Processor.$run(distanceTask);
 	}
 
 	export function join(id: number): void {

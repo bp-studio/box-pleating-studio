@@ -162,6 +162,14 @@ export class Tree implements ITree {
 		this._removeNode(id);
 	}
 
+	public $setLength(id: number, length: number): void {
+		const node = this._nodes[id]!;
+		node.$length = length;
+		node.$AABB.$setMargin(length);
+		State.$lengthChanged.add(node);
+		if(node.$isLeaf) State.$flapAABBChanged.add(node);
+	}
+
 	/** 設定一條邊並且傳回是否有加入新邊 */
 	public $setEdge(n1: number, n2: number, length: number): boolean {
 		let N1 = this._nodes[n1], N2 = this._nodes[n2];

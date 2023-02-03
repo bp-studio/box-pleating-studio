@@ -19,11 +19,14 @@ export interface ITree extends ISerializable<JEdge[]> {
 	/** 刪除指定的節點並且把它兩側的邊合為一 */
 	$join(id: number): void;
 
-	/**  */
+	/** 將一個節點往上的邊分割成兩條邊並且插入一個新的節點 */
 	$split(id: number, at: number): void;
 
 	/** 把指定的節點往上跟它的父點合併 */
 	$merge(id: number): void;
+
+	/** 更新指定節點往上的邊的長度 */
+	$setLength(id: number, length: number): void;
 
 	/** 傳回兩個節點在樹上的距離 */
 	$dist(n1: ITreeNode, n2: ITreeNode): number;
