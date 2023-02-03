@@ -1,11 +1,13 @@
 import TreeController from "core/controller/treeController";
 import DesignController from "core/controller/designController";
+import LayoutController from "core/controller/layoutController";
 
 import type { IStudioRequestBase } from ".";
 
 const Routes = {
 	design: DesignController,
 	tree: TreeController,
+	layout: LayoutController,
 };
 
 export type RouteMap = typeof Routes;

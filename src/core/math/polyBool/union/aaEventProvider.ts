@@ -19,8 +19,17 @@ const SHIFT_DELTA = 14;
 
 export class AAEventProvider implements IEventProvider {
 
-	/** 事件的下一個可用 id */
+	/**
+	 * 事件的下一個可用 id。
+	 *
+	 * 值得注意的是根據這邊的編碼，id 最大只能是 2^14 = 16384，
+	 * 所以 {@link $reset} 在此格外重要，否則實體重複用個幾次就會爆掉了。
+	 */
 	private _nextId: number = 0;
+
+	public $reset(): void {
+		this._nextId = 0;
+	}
 
 	public $createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent {
 		const key = getKey(startPoint, 1, segment, delta, this._nextId++);

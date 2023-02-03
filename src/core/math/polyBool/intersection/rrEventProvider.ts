@@ -25,6 +25,10 @@ export class RREventProvider implements IEventProvider {
 	/** 事件的下一個可用 id */
 	private _nextId: number = 0;
 
+	public $reset(): void {
+		this._nextId = 0;
+	}
+
 	public $createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent {
 		return new StartEvent(startPoint, segment, delta, this._nextId++);
 	}

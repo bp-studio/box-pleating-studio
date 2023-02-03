@@ -27,6 +27,9 @@ export class Layout implements ISerializable<JLayout> {
 	public readonly $flaps: Map<number, Flap> = new Map();
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
 
+	private _updating: Promise<void> | undefined = undefined;
+	private _pending: boolean = false;
+
 	constructor(project: Project, parentView: Container, json: JSheet) {
 		this.$project = project;
 		this.$sheet = new Sheet(project, parentView, json);
@@ -41,6 +44,10 @@ export class Layout implements ISerializable<JLayout> {
 			stretches: [],
 		};
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 公開方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $update(model: UpdateModel): void {
 		const design = this.$project.design;
@@ -98,20 +105,6 @@ export class Layout implements ISerializable<JLayout> {
 		}
 	}
 
-	public $createFlapPrototype(id: number, p: IPoint): JFlap {
-		return {
-			id,
-			x: p.x,
-			y: p.y,
-			width: 0,
-			height: 0,
-		};
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	public $goToDual(subject: River | Flap[]): void {
 		this.$project.design.tree.$sheet.$clearSelection();
 		if(Array.isArray(subject)) {
@@ -120,6 +113,33 @@ export class Layout implements ISerializable<JLayout> {
 			subject.$edge.$selected = true;
 		}
 		this.$project.design.mode = "tree";
+	}
+
+	public async $updateFlap(flaps: Flap[]): Promise<void> {
+		if(this._updating) {
+			console.log("updating");
+			if(this._pending) {
+				console.log("pending");
+				return;
+			}
+			this._pending = true;
+			await this._updating;
+			this.$updateFlap(flaps);
+			this._pending = false;
+		}
+		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps.map(f => f.toJSON()));
+		await this._updating;
+		this._updating = undefined;
+	}
+
+	public $createFlapPrototype(id: number, p: IPoint): JFlap {
+		return {
+			id,
+			x: p.x,
+			y: p.y,
+			width: 0,
+			height: 0,
+		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

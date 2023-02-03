@@ -10,6 +10,7 @@ import type { EndEvent, StartEvent, SweepEvent } from "./event";
  */
 //=================================================================
 export interface IEventProvider {
+	$reset(): void;
 	$createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent;
 	$createEnd(endPoint: IPoint, segment: ISegment): EndEvent;
 	readonly $eventComparator: Comparator<SweepEvent>;

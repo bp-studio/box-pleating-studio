@@ -48,6 +48,7 @@ export class AAUnion extends PolyBool {
 
 	/** 載入所有初始的事件 */
 	private _initialize(components: Polygon[]): void {
+		this._provider.$reset();
 		this._collectedSegments.length = 0;
 		for(let i = 0; i < components.length; i++) {
 			const c = components[i];

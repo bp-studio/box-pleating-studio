@@ -44,6 +44,7 @@ export class RRIntersection extends PolyBool {
 
 	/** 載入所有初始的事件 */
 	private _initialize(components: IRoundedRect[]): void {
+		this._provider.$reset();
 		this._collectedSegments.length = 0;
 		for(let i = 0; i < components.length; i++) {
 			const { x, y, width: w, height: h, radius: r } = components[i];

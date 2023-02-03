@@ -3,10 +3,9 @@
 	<div class="panel-grid" v-if="design">
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 		<Number :label="$t('panel.flap.radius')" v-model="subject.radius" :min="1" hotkeys="d.rd,d.ri" />
-		<!-- <Number :label="$t('panel.flap.width')" v-model.number="subject.width" :max="design.sheet.grid.width" :min="0"
-				hotkeys="d.wd,d.wi" />
-		<Number :label="$t('panel.flap.height')" v-model.number="subject.height" :max="design.sheet.grid.height" :min="0"
-				hotkeys="d.hd,d.hi" /> -->
+		<!-- TODO: max -->
+		<Number :label="$t('panel.flap.width')" v-model="subject.width" :min="0" hotkeys="d.wd,d.wi" />
+		<Number :label="$t('panel.flap.height')" v-model="subject.height" :min="0" hotkeys="d.hd,d.hi" />
 	</div>
 	<div class="mt-3">
 		<button class="btn btn-primary" v-if="subject.isDeletable" @click="subject.delete()" v-t="'keyword.delete'"></button>

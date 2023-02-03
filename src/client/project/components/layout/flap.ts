@@ -35,8 +35,8 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	public readonly id: number;
 
-	@shallowRef public width: number = 0;
-	@shallowRef public height: number = 0;
+	@shallowRef public $width: number = 0;
+	@shallowRef public $height: number = 0;
 	@shallowRef public $contours: Contour[];
 
 	public readonly $vertex: Vertex;
@@ -60,8 +60,8 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.id = json.id;
 		this.$location.x = json.x;
 		this.$location.y = json.y;
-		this.width = json.width;
-		this.height = json.height;
+		this.$width = json.width;
+		this.$height = json.height;
 		this.$contours = contours;
 		this.$vertex = vertex;
 		this.$edge = edge;
@@ -110,6 +110,22 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$edge.length = v;
 	}
 
+	public get height(): number {
+		return this.$height;
+	}
+	public set height(v: number) {
+		this.$height = v;
+		this._layout.$updateFlap([this]);
+	}
+
+	public get width(): number {
+		return this.$width;
+	}
+	public set width(v: number) {
+		this.$width = v;
+		this._layout.$updateFlap([this]);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +148,19 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	public override $selectableWith(c: Control): boolean {
 		return c instanceof Flap;
+	}
+
+	public override $constrainBy(v: IPoint): IPoint {
+		return v;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 保護方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected override _move(x: number, y: number): void {
+		super._move(x, y);
+		this._layout.$updateFlap([this]);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -3,6 +3,8 @@ import { ExChainer } from "./chainer/exChainer";
 
 import type { Path, Polygon, Contour } from "shared/types/geometry";
 
+const expander = new AAUnion(true, new ExChainer());
+
 /**
  * 將輸入的 AA 多邊形膨脹指定的單位，並且產生內外配對的輪廓。
  */
@@ -10,7 +12,7 @@ export function expand(polygon: Polygon, units: number): Contour[] {
 	const polygons: Polygon[] = polygon.map(path => [expandPath(path, units)]);
 	const pathRemain = new Set(Array.from({ length: polygons.length }, (_, i) => i));
 
-	const result = new AAUnion(true, new ExChainer()).$get(...polygons);
+	const result = expander.$get(...polygons);
 	const contours = result.map(path => {
 		const from = path.from!;
 		return {
