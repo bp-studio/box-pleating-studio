@@ -81,7 +81,8 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	}
 
 	public delete(): void {
-		this._tree.$delete(this);
+		if(this.degree === 1) this._tree.$delete([this]);
+		if(this.degree === 2) this._tree.$join(this);
 	}
 
 	public goToDual(): void {

@@ -71,12 +71,7 @@ export class Layout implements ISerializable<JLayout> {
 		}
 		for(const r of this.$rivers.values()) {
 			const v = r.$edge.$getLeaf();
-			if(v) {
-				// 河變成角片
-				const f = model.graphics["f" + v.id].flap!;
-				prototype.layout.flaps.push(f);
-				this._removeRiver(r);
-			}
+			if(v) this._removeRiver(r); // 河變成角片
 		}
 
 		for(const f of prototype.layout.flaps) {
@@ -134,7 +129,7 @@ export class Layout implements ISerializable<JLayout> {
 	private _addFlap(f: JFlap, contours: Contour[]): void {
 		const tree = this.$project.design.tree;
 		const vertex = tree.$vertices[f.id]!;
-		const edge = tree.$edges.get(f.id)!.values().next().value;
+		const edge = tree.$getFirstEdge(vertex);
 		const flap = new Flap(this, f, vertex, edge, contours);
 		this.$flaps.set(f.id, flap);
 		this.$sheet.$addChild(flap);

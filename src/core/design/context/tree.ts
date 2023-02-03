@@ -96,9 +96,9 @@ export class Tree implements ITree {
 		return this.$nodes[id]!;
 	}
 
-	public $removeLeaf(id: number): void {
+	public $removeLeaf(id: number): boolean {
 		const node = this._nodes[id];
-		if(!node || !node.$isLeaf) return;
+		if(!node || !node.$isLeaf) return false;
 
 		const parent = node.$parent!;
 		node.$cut();
@@ -108,6 +108,17 @@ export class Tree implements ITree {
 			State.$flapAABBChanged.add(parent);
 		}
 		this._removeNode(id);
+		return true;
+	}
+
+	public $setFlaps(flaps: JFlap[]): void {
+		for(const flap of flaps) {
+			const node = this._nodes[flap.id];
+			const isLeaf = node && node.$isLeaf ||
+				// 這邊有一個小小的可能是刪除完點的瞬間、根點也是葉點
+				node === this.$root && node.$children.$size === 1;
+			if(isLeaf) node.$setFlap(flap);
+		}
 	}
 
 	public $join(id: number): void {
@@ -142,11 +153,6 @@ export class Tree implements ITree {
 
 	public $merge(id: number): void {
 		const node = this._nodes[id]!;
-		if(node.$isLeaf) {
-			this.$removeLeaf(id);
-			return;
-		}
-
 		const parent = node.$parent!;
 		node.$cut();
 		for(const child of node.$children) {

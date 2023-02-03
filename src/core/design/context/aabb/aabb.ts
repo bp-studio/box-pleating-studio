@@ -68,10 +68,6 @@ export class AABB {
 		return this._sides.map(s => s.$key);
 	}
 
-	public $values(): number[] {
-		return this._sides.map(s => s.$value);
-	}
-
 	public $toPath(): Path {
 		const [t, r, b, l] = this._sides.map(s => s.$value + s.$margin);
 		return [

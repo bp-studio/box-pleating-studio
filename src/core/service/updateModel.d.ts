@@ -13,10 +13,15 @@ export interface UpdateModel {
 		edges: JEdgeBase[];
 	};
 
+	/**
+	 * 物件的圖形資料。
+	 *
+	 * 須注意的是，**這裡面有可能會出現已經被刪除掉的物件**，
+	 * 因此 Client 在使用這個資料的時候需要加以檢查。
+	 */
 	graphics: Record<string, GraphicsData>;
 }
 
 interface GraphicsData {
-	flap?: JFlap;
 	contours?: Contour[];
 }

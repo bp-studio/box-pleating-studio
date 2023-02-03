@@ -10,7 +10,7 @@ import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
-import type { JEdge, JEdgeBase, JFlap, JTree, JVertex } from "shared/json";
+import type { JEdge, JEdgeBase, JTree, JVertex } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
@@ -90,12 +90,16 @@ export class Tree implements IAsyncSerializable<JTree> {
 		for(const e of model.add.edges) this._addEdge(e);
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 介面方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public get isMinimal(): boolean {
 		return this.vertexCount === MIN_VERTICES;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// 公開方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $addLeaf(at: Vertex, length: number): Promise<void> {
@@ -109,11 +113,21 @@ export class Tree implements IAsyncSerializable<JTree> {
 		return this.$project.$callStudio("tree", "addLeaf", id, at.id, length, flap);
 	}
 
-	public async $delete(vertex: Vertex): Promise<void> {
-		const d = vertex.degree, id = vertex.id;
+	public $delete(vertices: Vertex[]): Promise<void> {
+		const [ids, parentIds] = this._simulateDelete(vertices);
+		const design = this.$project.design;
+		const prototypes = parentIds.map(n =>
+			design.layout.$createFlapPrototype(n, this.$vertices[n]!.$location)
+		);
+		design.$prototype.layout.flaps.push(...prototypes);
+
+		for(const id of ids) SelectionController.$toggle(this.$vertices[id]!, false);
+		return this.$project.$callStudio("tree", "removeLeaf", ids, prototypes);
+	}
+
+	public $join(vertex: Vertex): Promise<void> {
 		SelectionController.$clear();
-		if(d === 1) await this.$project.$callStudio("tree", "removeLeaf", [id]);
-		if(d === 2) await this.$project.$callStudio("tree", "join", id);
+		return this.$project.$callStudio("tree", "join", vertex.id);
 	}
 
 	public $split(edge: Edge): void {
@@ -151,6 +165,10 @@ export class Tree implements IAsyncSerializable<JTree> {
 			if(flap) flap.$selected = true;
 		}
 		this.$project.design.mode = "layout";
+	}
+
+	public $getFirstEdge(v: Vertex): Edge {
+		return this.$edges.get(v.id)!.values().next().value;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +212,52 @@ export class Tree implements IAsyncSerializable<JTree> {
 			r++; // r 遞增直到找到可放置處為止
 		}
 		return heap.$get()![0];
+	}
+
+	private _createNeighborMap(): Map<Vertex, Set<number>> {
+		const map = new Map<Vertex, Set<number>>();
+		for(const v of this.$vertices) {
+			if(v) {
+				const neighbors = new Set<number>();
+				for(const n of this.$edges.get(v.id)!.keys()) neighbors.add(n);
+				map.set(v, neighbors);
+			}
+		}
+		return map;
+	}
+
+	/**
+	 * 模擬一次刪除的過程，傳回實際會被刪除的點、以及刪除之後變成了新葉點的父點。
+	 *
+	 * 如果使用者故意選取全部的節點來進行刪除，最後會是哪三個點被保留下來是無法預測的。
+	 */
+	private _simulateDelete(vertices: Vertex[]): [number[], number[]] {
+		const result: number[] = [];
+		const map = this._createNeighborMap();
+		const parents = new Set<Vertex>();
+		let found = true;
+		while(found && map.size > MIN_VERTICES) {
+			const nextRound: Vertex[] = [];
+			found = false;
+			for(const v of vertices) {
+				const set = map.get(v)!;
+				if(set.size === 1) {
+					map.delete(v);
+					parents.delete(v);
+					result.push(v.id);
+					const parent = this.$vertices[set.values().next().value]!;
+					parents.add(parent);
+					map.get(parent)!.delete(v.id);
+					found = true;
+				} else {
+					nextRound.push(v);
+				}
+				if(map.size === MIN_VERTICES) break;
+			}
+			vertices = nextRound;
+		}
+		const parentIds = [...parents].filter(v => map.get(v)!.size === 1).map(v => v.id);
+		return [result, parentIds];
 	}
 
 	private _addVertex(json: JVertex): void {

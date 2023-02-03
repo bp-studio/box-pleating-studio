@@ -99,7 +99,7 @@ export namespace SelectionController {
 			if(!current) $clear();
 			if(!current && next) select(next);
 		} else {
-			if(current && !next) toggle(current, !current.$selected);
+			if(current && !next) $toggle(current, !current.$selected);
 			if(next) select(next);
 		}
 	}
@@ -178,8 +178,15 @@ export namespace SelectionController {
 
 		// 檢查被選中的物件（線性搜尋夠快，暫時不用優化）
 		for(const ds of dragSelectables) {
-			toggle(ds, rect.contains(ds.$anchor.x, ds.$anchor.y));
+			$toggle(ds, rect.contains(ds.$anchor.x, ds.$anchor.y));
 		}
+	}
+
+	export function $toggle(c: Control, selected: boolean): void {
+		if(c.$selected == selected) return;
+		c.$selected = selected;
+		if(selected) selections.push(c);
+		else selections.splice(selections.indexOf(c), 1);
 	}
 
 	function getStatus(): HitStatus {
@@ -215,13 +222,6 @@ export namespace SelectionController {
 			c.$selected = true;
 			selections.push(c);
 		}
-	}
-
-	function toggle(c: Control, selected: boolean): void {
-		if(c.$selected == selected) return;
-		c.$selected = selected;
-		if(selected) selections.push(c);
-		else selections.splice(selections.indexOf(c), 1);
 	}
 
 	function getDistance(p1: IPoint, p2: IPoint): number {

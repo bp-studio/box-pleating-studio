@@ -95,7 +95,12 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 	}
 
 	public delete(): void {
-		//
+		const selections = SelectionController.selections;
+		if(this.mode == "layout") {
+			if(isTypedArray(selections, Flap)) this.tree.$delete(selections.map(f => f.$vertex));
+		} else {
+			if(isTypedArray(selections, Vertex)) this.tree.$delete(selections);
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

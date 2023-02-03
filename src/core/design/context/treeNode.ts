@@ -78,17 +78,6 @@ export class TreeNode implements ITreeNode {
 		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}
 
-	public $toFlap(): JFlap {
-		const [t, r, b, l] = this.$AABB.$values();
-		return {
-			id: this.id,
-			x: l,
-			y: b,
-			width: r - l,
-			height: t - b,
-		};
-	}
-
 	/** 如果自身為葉點則將自己從連結關係上斷開，並傳回成功與否 */
 	public $remove(): boolean {
 		const parent = this.$parent;

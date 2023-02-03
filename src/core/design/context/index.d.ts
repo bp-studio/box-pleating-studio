@@ -11,8 +11,10 @@ export interface ITree extends ISerializable<JEdge[]> {
 	/** 增加一個新的葉點並傳回 */
 	$addLeaf(id: number, at: number, length: number): ITreeNode;
 
-	/** 刪除一個指定的葉點 */
-	$removeLeaf(id: number): void;
+	/** 刪除一個指定的葉點，並傳回成功與否 */
+	$removeLeaf(id: number): boolean;
+
+	$setFlaps(flaps: JFlap[]): void;
 
 	/** 刪除指定的節點並且把它兩側的邊合為一 */
 	$join(id: number): void;
