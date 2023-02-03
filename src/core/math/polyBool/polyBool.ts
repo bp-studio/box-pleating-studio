@@ -53,7 +53,6 @@ export abstract class PolyBool {
 		while(!this._eventQueue.$isEmpty) {
 			const event = this._eventQueue.$pop()!;
 			if(!event.$isStart) this._processEnd(event);
-			else if(event.$visited) this._processRevisit(event);
 			else this._processStart(event);
 		}
 		return this._chainer.$chain(this._collectedSegments);
@@ -98,19 +97,15 @@ export abstract class PolyBool {
 		const next = this._status.$getNext(event);
 		const inserted = this._intersector.$process(prev, event, next);
 
-		// 只有當沒有事件被插入的時候才能處理內部旗標
 		if(!inserted) {
+			// 只有當沒有事件被插入的時候才能處理內部旗標
 			this._setInsideFlag(event, prev);
 		} else {
-			event.$visited = true;
+			// 否則就把事件重新放回佇列，並且待會再次處理。
+			// 注意再次處理的時候還是一樣要把上面的流程再走一次而不能偷懶，
+			// 因為少數情況中它有可能會跟新的 prev next 也有交點。
 			this._eventQueue.$insert(event);
 		}
-	}
-
-	/** 再次處理曾經處理過的起點事件 */
-	private _processRevisit(event: StartEvent): void {
-		const prev = this._status.$getPrev(event);
-		this._setInsideFlag(event, prev);
 	}
 
 	private _setInsideFlag(event: StartEvent, prev?: StartEvent): void {

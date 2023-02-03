@@ -4,6 +4,7 @@ import { SelectionController } from "./selectionController";
 import { $getEventCenter, $round } from "./share";
 import { CursorController } from "./cursorController";
 import ProjectService from "client/services/projectService";
+import { stage } from "client/screen/display";
 
 import type { Draggable } from "client/base/draggable";
 import type { ShallowRef } from "vue";
@@ -46,6 +47,7 @@ export namespace DragController {
 			CursorController.$tryUpdate(pt);
 			for(const o of selections) o.$dragStart(CursorController.$offset);
 			isDragging.value = true;
+			stage.interactiveChildren = false;
 		}
 	}
 
@@ -83,5 +85,6 @@ export namespace DragController {
 		isDragging.value = false;
 		const project = ProjectService.project.value;
 		if(project) project.$isDragging = false;
+		stage.interactiveChildren = true;
 	}
 }

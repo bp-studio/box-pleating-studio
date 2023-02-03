@@ -117,15 +117,12 @@ export class Layout implements ISerializable<JLayout> {
 
 	public async $updateFlap(flaps: Flap[]): Promise<void> {
 		if(this._updating) {
-			console.log("updating");
-			if(this._pending) {
-				console.log("pending");
-				return;
-			}
+			if(this._pending) return;
 			this._pending = true;
 			await this._updating;
 			this.$updateFlap(flaps);
 			this._pending = false;
+			return;
 		}
 		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps.map(f => f.toJSON()));
 		await this._updating;

@@ -13,9 +13,6 @@ export class StartEvent extends EventBase {
 	/** 對應的線段 */
 	public readonly $segment: ISegment;
 
-	/** 這個邊是否之前已經被處理過一次了 */
-	public $visited: boolean = false;
-
 	/**
 	 * 這條邊是否在整個聯集的內部。
 	 * 初始為 `false`，實際值在演算法過程當中會被決定出來。
