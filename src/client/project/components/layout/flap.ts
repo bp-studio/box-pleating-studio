@@ -116,7 +116,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	public set height(v: number) {
 		if(v < 0) return;
 		this._height = v;
-		this._layout.$updateFlap([this]);
+		this._layout.$updateFlap(this);
 	}
 
 	public get width(): number {
@@ -125,7 +125,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	public set width(v: number) {
 		if(v < 0) return;
 		this._width = v;
-		this._layout.$updateFlap([this]);
+		this._layout.$updateFlap(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	protected override _move(x: number, y: number): void {
 		super._move(x, y);
-		this._layout.$updateFlap([this]);
+		this._layout.$updateFlap(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

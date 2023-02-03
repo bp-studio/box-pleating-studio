@@ -27,8 +27,11 @@ export class Layout implements ISerializable<JLayout> {
 	public readonly $flaps: Map<number, Flap> = new Map();
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
 
-	private _updating: Promise<void> | undefined = undefined;
-	private _pending: boolean = false;
+	/** 即將被更新的角片 */
+	private readonly _pendingUpdate = new Set<Flap>();
+
+	/** 正在進行中的更新工作 */
+	private _updating: Promise<void> = Promise.resolve();
 
 	constructor(project: Project, parentView: Container, json: JSheet) {
 		this.$project = project;
@@ -115,18 +118,11 @@ export class Layout implements ISerializable<JLayout> {
 		this.$project.design.mode = "tree";
 	}
 
-	public async $updateFlap(flaps: Flap[]): Promise<void> {
-		if(this._updating) {
-			if(this._pending) return;
-			this._pending = true;
-			await this._updating;
-			this.$updateFlap(flaps);
-			this._pending = false;
-			return;
+	public $updateFlap(flap: Flap): void {
+		if(this._pendingUpdate.size === 0) {
+			Promise.resolve().then(this._flushUpdate);
 		}
-		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps.map(f => f.toJSON()));
-		await this._updating;
-		this._updating = undefined;
+		this._pendingUpdate.add(flap);
 	}
 
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {
@@ -142,6 +138,14 @@ export class Layout implements ISerializable<JLayout> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 私有方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private readonly _flushUpdate = async (): Promise<void> => {
+		await this._updating; // 等候上一次更新完成
+		const flaps: JFlap[] = [];
+		for(const f of this._pendingUpdate) flaps.push(f.toJSON());
+		this._pendingUpdate.clear();
+		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps);
+	};
 
 	private _addFlap(f: JFlap, contours: Contour[]): void {
 		const tree = this.$project.design.tree;

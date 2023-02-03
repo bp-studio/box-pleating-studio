@@ -20,7 +20,6 @@ subgraph User input
 	T([Tree structure])
 	L([Edge lengths])
 	F([Flap positions and sizes])
-	S([Flap selection])
 	P([Stretch pattern choices])
 end
 subgraph Tree
@@ -28,7 +27,6 @@ subgraph Tree
 	b(tree balancing)
 	d{{node distances}}
 	a{{AABB hierarchy}}
-	s{{selected subtrees}}
 end
 k(collision)
 e[[Error indicators]]
@@ -38,7 +36,6 @@ subgraph Stretch
 	p(patterns)
 end
 subgraph Contour
-	cc[[cached contours]]
 	rc(rough contours)
 	pc{{pattern contours}}
 	fc[[final contours]]
@@ -49,6 +46,5 @@ b & L --> d
 d & F --> a --> rc --> fc
 a --> k --> e & g
 g --> c --> p
-S --> s ---------> cc -.-> rc
 p & P --> pc --> fc
 ```
