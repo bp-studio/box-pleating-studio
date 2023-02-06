@@ -18,10 +18,10 @@
 	</div>
 	<div class="mt-3" v-if="subject.isDeletable">
 		<button class="btn btn-primary"	@click="subject.delete()">
-			{{ subject.degree == 1 ? $t('keyword.delete') : $t('panel.vertex.delJoin') }}
+			{{ subject.isLeaf ? $t('keyword.delete') : $t('panel.vertex.delJoin') }}
 		</button>
 	</div>
-	<div class="mt-3" v-if="subject.degree == 1">
+	<div class="mt-3" v-if="subject.isLeaf">
 		<button class="btn btn-primary" @click="subject.goToDual()" v-t="'panel.vertex.goto'" :title="hk('n', 'd')"></button>
 	</div>
 </template>

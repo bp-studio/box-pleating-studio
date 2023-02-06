@@ -11,6 +11,7 @@ import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from 
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 
+import type { IGrid } from "../grid";
 import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -96,6 +97,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	// 代理屬性
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/** 角片名稱，等同於節點名稱 */
 	public get name(): string {
 		return this.$vertex.name;
 	}
@@ -103,6 +105,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$vertex.name = v;
 	}
 
+	/** 角片圓角半徑 */
 	public get radius(): number {
 		return this.$edge.length;
 	}
@@ -110,20 +113,22 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$edge.length = v;
 	}
 
+	/** 角片高度 */
 	public get height(): number {
 		return this._height;
 	}
 	public set height(v: number) {
-		if(v < 0) return;
+		if(v < 0 || !this._testResize(this.width, v)) return;
 		this._height = v;
 		this._layout.$updateFlap(this);
 	}
 
+	/** 角片寬度 */
 	public get width(): number {
 		return this._width;
 	}
 	public set width(v: number) {
-		if(v < 0) return;
+		if(v < 0 || !this._testResize(v, this.height)) return;
 		this._width = v;
 		this._layout.$updateFlap(this);
 	}
@@ -153,7 +158,41 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		return v;
+		const w = this.width, h = this.height;
+		const zeroWidth = w === 0;
+		const zeroHeight = h === 0;
+		const { x, y } = this.$location;
+		if(zeroWidth && zeroHeight) {
+			return this._fixVector(this.$location, v);
+		} else if(zeroWidth || zeroHeight) {
+			v = this._fixVector(this.$location, v);
+			const p = zeroWidth ? { x, y: y + h } : { x: x + w, y };
+			return this._fixVector(p, v);
+		} else {
+			// 允許其中至多一個尖點超出紙張範圍
+			const data = this._getDots(w, h)
+				.map(p => {
+					const fix = this._fixVector(p, v);
+					const dx = fix.x - v.x;
+					const dy = fix.y - v.y;
+					const d = dx * dx + dy * dy;
+					return { p, d, fix };
+				})
+				.filter(e => e.d > 0)
+				.sort((a, b) => b.d - a.d);
+			if(data.length <= 1) return v;
+			let result = data[1].fix;
+			result = this._fixVector(data[2].p, result);
+			return this._fixVector(data[3].p, result);
+		}
+	}
+
+	public $testGrid(grid: IGrid): boolean {
+		return this._testResize(this._width, this._height, grid);
+	}
+
+	public $sync(p: IPoint): void {
+		this._move(p.x, p.y);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -205,13 +244,11 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this._shade.clear();
 		fillContours(this._shade, this.$contours, HINGE_COLOR);
 
-		this._dots[Direction.LL].position.set(x, y);
-		this._dots[Direction.UR].visible = w > 0 && h > 0;
-		this._dots[Direction.UR].position.set(x + w, y + h);
-		this._dots[Direction.UL].visible = h > 0;
-		this._dots[Direction.UL].position.set(x, y + h);
-		this._dots[Direction.LR].visible = w > 0;
-		this._dots[Direction.LR].position.set(x + w, y);
+		const pts = this._getDots(w, h);
+		for(let i = 0; i <= Direction.LR; i++) {
+			this._dots[i].visible = this._sheet.grid.$contains(pts[i]);
+			this._dots[i].position.set(pts[i].x, pts[i].y);
+		}
 
 		this._hinge.clear().lineStyle(HINGE_WIDTH * sh, hingeColor);
 		drawContours(this._hinge, this.$contours);
@@ -233,5 +270,27 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this._circle.clear()
 			.lineStyle(sh, hingeColor)
 			.drawRoundedRect(x * s - r, y * s - r, w * s + r + r, h * s + r + r, r);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 私有方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** 依照象限順序排列的尖點位置 */
+	private _getDots(w: number, h: number): IPoint[] {
+		const { x, y } = this.$location;
+		return [
+			{ x: x + w, y: y + h },
+			{ x, y: y + h },
+			this.$location,
+			{ x: x + w, y },
+		];
+	}
+
+	/** 測試看看變更後的大小是否可以接受 */
+	private _testResize(w: number, h: number, grid: IGrid = this._sheet.grid): boolean {
+		return this._getDots(w, h)
+			.filter(p => !grid.$contains(p))
+			.length <= 1; // 至多只能有一個尖點超出紙張範圍
 	}
 }

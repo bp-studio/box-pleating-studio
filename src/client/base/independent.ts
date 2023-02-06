@@ -1,5 +1,6 @@
 import { Draggable } from "./draggable";
 
+import type { IGrid } from "client/project/components/grid";
 import type { Sheet } from "client/project/components/sheet";
 
 //=================================================================
@@ -14,24 +15,24 @@ export abstract class Independent extends Draggable {
 
 	protected _sheet: Sheet;
 
-	private _isNew: boolean = true;
-
-	/** 這個物件自從建構以來，{@link Design} 是否尚未切換過 {@link Sheet} */
-	protected get $isNew(): boolean { return this._isNew; }
-	protected set $isNew(v: boolean) { if(!v) this._isNew = v; }
-
 	constructor(sheet: Sheet) {
 		super(sheet);
 		this._sheet = sheet;
+
+		sheet.$independents.add(this);
+		this._onDispose(() => sheet.$independents.delete(this));
 	}
 
-	/**
-	 * 物件在 {@link Sheet} 上佔據的高度
-	 */
-	public abstract readonly height: number;
+	/** 測試指定的格線是否能夠容納這個物件。 */
+	public abstract $testGrid(grid: IGrid): boolean;
 
-	/**
-	 * 物件在 {@link Sheet} 上佔據的寬度
-	 */
-	public abstract readonly width: number;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 保護方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected _fixVector(pt: IPoint, v: IPoint): IPoint {
+		const target = { x: pt.x + v.x, y: pt.y + v.y };
+		const fix = this._sheet.grid.$constrain(target);
+		return { x: fix.x - pt.x, y: fix.y - pt.y };
+	}
 }

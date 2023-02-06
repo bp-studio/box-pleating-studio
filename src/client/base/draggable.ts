@@ -2,6 +2,8 @@ import { shallowReactive } from "vue";
 
 import { Control } from "./control";
 
+import type { Sheet } from "client/project/components/sheet";
+
 export interface DragSelectable extends Draggable {
 	readonly $anchor: Readonly<IPoint>;
 }
@@ -55,12 +57,14 @@ export abstract class Draggable extends Control {
 		this._move(this.$location.x + v.x, this.$location.y + v.y);
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 保護方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	/** 觸發移動 */
 	protected _move(x: number, y: number): void {
 		this.$location.x = x;
 		this.$location.y = y;
-
-		//TODO: 部份繼承類別必須通知 core 有移動發生
 		//TODO: 產生 MoveCommand
 	}
 }

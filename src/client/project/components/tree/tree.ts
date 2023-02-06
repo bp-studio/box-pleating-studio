@@ -126,12 +126,12 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	public $join(vertex: Vertex): Promise<void> {
-		SelectionController.$clear();
+		SelectionController.clear();
 		return this.$project.$callStudio("tree", "join", vertex.id);
 	}
 
 	public $split(edge: Edge): void {
-		SelectionController.$clear();
+		SelectionController.clear();
 		const id = this._nextAvailableId;
 		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
 		this.$project.design.$prototype.tree.nodes.push({
@@ -144,7 +144,7 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	public $merge(edge: Edge): void {
-		SelectionController.$clear();
+		SelectionController.clear();
 		this.$project.$callStudio("tree", "merge", edge.toJSON());
 	}
 
@@ -164,7 +164,7 @@ export class Tree implements IAsyncSerializable<JTree> {
 			const edge = layout.$rivers.get(subject.$v1.id, subject.$v2.id);
 			if(edge) edge.$selected = true;
 		} else {
-			const v = subject.$v1.degree == 1 ? subject.$v1 : subject.$v2;
+			const v = subject.$v1.isLeaf ? subject.$v1 : subject.$v2;
 			const flap = layout.$flaps.get(v.id);
 			if(flap) flap.$selected = true;
 		}
@@ -282,8 +282,8 @@ export class Tree implements IAsyncSerializable<JTree> {
 		const v1 = this.$vertices[e.n1];
 		const v2 = this.$vertices[e.n2];
 		if(!v1 || !v2) return;
-		v1.degree++;
-		v2.degree++;
+		v1.$degree++;
+		v2.$degree++;
 		const edge = new Edge(this, v1, v2, e.length);
 		this.$sheet.$addChild(edge);
 		this.$edges.set(v1.id, v2.id, edge);
@@ -292,8 +292,8 @@ export class Tree implements IAsyncSerializable<JTree> {
 	private _removeEdge(e: JEdgeBase): void {
 		const v1 = this.$vertices[e.n1];
 		const v2 = this.$vertices[e.n2];
-		if(v1) v1.degree--;
-		if(v2) v2.degree--;
+		if(v1) v1.$degree--;
+		if(v2) v2.$degree--;
 		const edge = this.$edges.get(e.n1, e.n2)!;
 		this.$sheet.$removeChild(edge);
 		edge.$dispose();

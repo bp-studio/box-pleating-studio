@@ -156,7 +156,7 @@ export class Label extends Container {
 
 		let result = 0;
 		const x = this._xCache;
-		const sheetWidth = this._sheet.grid.$width;
+		const sheetWidth = this._sheet.grid.$renderWidth;
 		const scale = ProjectService.scale.value;
 		const factor = Math.sqrt(ProjectService.shrink.value);
 		const left = x * scale + (bounds.left * factor - this.pivot.x) / SMOOTHNESS;

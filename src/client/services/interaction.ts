@@ -85,10 +85,13 @@ export namespace Interaction {
 
 	function touchEnd(event: TouchEvent): void {
 		if(!pointerHeld) return;
-		DragController.$dragEnd();
-		if(event.touches.length == 0) pointerHeld = false;
+		const dragging = SelectionController.$endDrag();
 		LongPressController.$cancel();
-		SelectionController.$endDrag();
+		if(event.touches.length == 0) {
+			pointerHeld = false;
+			if(!dragging && !LongPressController.$triggered) SelectionController.$processNext();
+		}
+		DragController.$dragEnd();
 	}
 
 	function pointerDown(event: MouseEvent | TouchEvent): void {

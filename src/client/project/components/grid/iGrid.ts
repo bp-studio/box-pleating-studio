@@ -27,8 +27,8 @@ export interface IGrid extends ISerializable<JSheet> {
 	readonly $offset: IPoint;
 
 	/** 繪製的高度，單位是格線 */
-	readonly $height: number;
+	readonly $renderHeight: number;
 
 	/** 繪製的寬度，單位是格線 */
-	readonly $width: number;
+	readonly $renderWidth: number;
 }

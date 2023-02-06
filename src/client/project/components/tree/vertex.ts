@@ -8,6 +8,7 @@ import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 
+import type { IGrid } from "../grid";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -32,12 +33,12 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	public readonly height = 0;
 	public readonly width = 0;
 
-	@shallowRef public degree: number = 0;
-	@shallowRef public name: string;
+	@shallowRef public $degree: number = 0;
 
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
 	private readonly _label: Label;
+	public $isNew: boolean;
 
 	constructor(tree: Tree, json: JVertex) {
 		const sheet = tree.$sheet;
@@ -45,6 +46,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 		this._tree = tree;
 
 		this.id = json.id;
+		this.$isNew = json.isNew ?? true;
 		this.$location.x = json.x;
 		this.$location.y = json.y;
 		this.name = json.name;
@@ -72,17 +74,23 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	// 介面方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	@shallowRef public name: string;
+
 	public addLeaf(length: number): Promise<void> {
 		return this._tree.$addLeaf(this, length);
 	}
 
+	public get isLeaf(): boolean {
+		return this.$degree === 1;
+	}
+
 	public get isDeletable(): boolean {
-		return !this._tree.isMinimal && this.degree <= 2;
+		return !this._tree.isMinimal && this.$degree <= 2;
 	}
 
 	public delete(): void {
-		if(this.degree === 1) this._tree.$delete([this]);
-		if(this.degree === 2) this._tree.$join(this);
+		if(this.$degree === 1) this._tree.$delete([this]);
+		if(this.$degree === 2) this._tree.$join(this);
 	}
 
 	public goToDual(): void {
@@ -98,14 +106,36 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		const l = this.$location;
-		const target = { x: l.x + v.x, y: l.y + v.y };
-		const fix = this._sheet.grid.$constrain(target);
-		return { x: fix.x - l.x, y: fix.y - l.y };
+		return this._fixVector(this.$location, v);
 	}
 
 	public override $selectableWith(c: Control): boolean {
 		return c instanceof Vertex;
+	}
+
+	public $testGrid(grid: IGrid): boolean {
+		return grid.$contains(this.$location);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 保護方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected override _move(x: number, y: number): void {
+		super._move(x, y);
+		if(this.$isNew) {
+			const layout = this._tree.$project.design.layout;
+			const flap = layout.$syncFlaps.get(this.id);
+			if(!flap) {
+				this.$isNew = false;
+			} else {
+				const grid = layout.$sheet.grid;
+				const xFactor = grid.$renderWidth / this._sheet.grid.$renderWidth;
+				const yFactor = grid.$renderHeight / this._sheet.grid.$renderHeight;
+				const p: IPoint = { x: this.$location.x * xFactor, y: this.$location.y * yFactor };
+				flap.$sync(grid.$constrain(p));
+			}
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,6 @@
 <template>
 	<h5 v-t="'panel.vertices.type'" class="panel-title"></h5>
-	<div v-if="selections.some(s => s.degree == 1)">
+	<div v-if="selections.some(s => s.isLeaf)">
 		<button class="btn btn-primary" v-if="!design.tree.isMinimal" @click="design.delete()" v-t="'keyword.delete'"></button>
 		<span v-else v-t="'message.min3vertex'"></span>
 	</div>

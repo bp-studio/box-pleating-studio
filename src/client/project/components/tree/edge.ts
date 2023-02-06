@@ -113,8 +113,8 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getLeaf(): Vertex | undefined {
-		if(this.$v1.degree == 1) return this.$v1;
-		if(this.$v2.degree == 1) return this.$v2;
+		if(this.$v1.isLeaf) return this.$v1;
+		if(this.$v2.isLeaf) return this.$v2;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

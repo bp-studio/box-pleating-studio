@@ -48,10 +48,10 @@
 		Studio.history.redo();
 	}
 	function selectAll(): void {
-		// if(Studio.design) this.design.selectAll();
+		Studio.selectAll();
 	}
 	function unselectAll(): void {
-		// if(Studio.design) this.design.unselectAll();
+		Studio.unselectAll();
 	}
 
 </script>

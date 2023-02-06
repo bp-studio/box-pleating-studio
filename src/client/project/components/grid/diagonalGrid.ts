@@ -1,11 +1,11 @@
 import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "client/types/enum";
-import { same } from "shared/types/geometry";
 
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { JSheet } from "shared/json/components";
 import type { IGrid } from "./iGrid";
+import type { Sheet } from "../sheet";
 
 const DEFAULT_SIZE = 16;
 const MIN_SIZE = 6;
@@ -20,25 +20,52 @@ export class DiagonalGrid implements IGrid {
 
 	public readonly type = GridType.diagonal;
 
-	@shallowRef((v: number) => v >= MIN_SIZE) public size: number;
+	private readonly _sheet: Sheet;
 
-	constructor(width?: number, height?: number) {
+	private _testSize: number;
+	@shallowRef private _size: number;
+
+	constructor(sheet: Sheet, width?: number, height?: number) {
+		this._sheet = sheet;
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
-		this.size = Math.round((width + height) / 2);
+		this._testSize = this._size = Math.round((width + height) / 2);
 	}
 
 	public toJSON(): JSheet {
 		return {
 			type: GridType.diagonal,
-			height: this.size,
-			width: this.size,
+			height: this._size,
+			width: this._size,
 		};
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 代理屬性
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get size(): number {
+		return this._size;
+	}
+	public set size(v: number) {
+		if(v < MIN_SIZE) return;
+		this._testSize = v;
+		for(const c of this._sheet.$independents) {
+			if(!c.$testGrid(this)) {
+				this._testSize = this._size;
+				return;
+			}
+		}
+		this._size = v;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 公開方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public $constrain(p: IPoint): IPoint {
 		let { x, y } = p;
-		const s = this.size, h = s % 2;
+		const s = this._size, h = s % 2;
 		const f = (s - h) / 2;
 		const c = (s + h) / 2;
 
@@ -73,11 +100,15 @@ export class DiagonalGrid implements IGrid {
 	}
 
 	public $contains(p: IPoint): boolean {
-		return same(this.$constrain(p), p);
+		const { x, y } = p;
+		const s = this._testSize, h = s % 2;
+		const f = (s - h) / 2;
+		const c = (s + h) / 2;
+		return x + y >= f && y - x <= c && x - y <= c && x + y <= c + s;
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {
-		const shift = this.size % 2, s = this.size + shift, h = s / 2;
+		const shift = this._size % 2, s = this._size + shift, h = s / 2;
 		if(shift == 0) {
 			if(x == 0 && y == h) return Direction.L;
 			if(x == h && y == 0) return Direction.B;
@@ -93,8 +124,8 @@ export class DiagonalGrid implements IGrid {
 	}
 
 	public $drawBorder(border: GraphicsLike): void {
-		let full = this.$height, half = full / 2;
-		const shift = this.size % 2 / 2;
+		let full = this.$renderHeight, half = full / 2;
+		const shift = this._size % 2 / 2;
 		full -= shift;
 		half -= shift;
 		border.moveTo(half, -shift);
@@ -105,8 +136,8 @@ export class DiagonalGrid implements IGrid {
 	}
 
 	public $drawGrid(grid: GraphicsLike): void {
-		const size = this.size;
-		const shift = this.size % 2;
+		const size = this._size;
+		const shift = this._size % 2;
 		for(let i = 1 - shift; i < size + shift; i++) {
 			const offset = Math.abs(i - size / 2) - shift / 2;
 			grid.moveTo(offset, i);
@@ -117,15 +148,15 @@ export class DiagonalGrid implements IGrid {
 	}
 
 	public get $offset(): IPoint {
-		const shift = this.size % 2 / 2;
+		const shift = this._size % 2 / 2;
 		return { x: -shift, y: -shift };
 	}
 
-	public get $height(): number {
-		return this.size + this.size % 2;
+	public get $renderHeight(): number {
+		return this._size + this._size % 2;
 	}
 
-	public get $width(): number {
-		return this.size + this.size % 2;
+	public get $renderWidth(): number {
+		return this._size + this._size % 2;
 	}
 }

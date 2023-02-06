@@ -111,5 +111,6 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 		const mode = this.mode;
 		this.layout.$sheet.$toggle(mode === "layout");
 		this.tree.$sheet.$toggle(mode === "tree");
+		if(mode === "layout") this.layout.$syncFlaps.clear();
 	}
 }

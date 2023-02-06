@@ -16,6 +16,7 @@ import { createGrid } from "./grid";
 import { MARGIN, MARGIN_FIX } from "client/screen/constants";
 import { ZoomController } from "client/controllers/zoomController";
 
+import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
 import type { Label } from "client/screen/label";
@@ -68,6 +69,8 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	public readonly $controls: Set<Control> = new Set();
 
+	public readonly $independents: Set<Independent> = new Set();
+
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
 	constructor(project: Project, parentView: Container, json: JSheet) {
@@ -86,7 +89,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		this._layers[Layer.$sheet].addChild(this._borderGraphics, this._gridGraphics);
 
 		this._type = json?.type ?? GridType.rectangular;
-		this._grid = createGrid(this._type, json?.width, json?.height);
+		this._grid = createGrid(this, this._type, json?.width, json?.height);
 
 		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
 
@@ -117,7 +120,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	}
 	public set type(v: GridType) {
 		if(v == this._type) return;
-		this._grid = createGrid(v, this._grid.$height, this._grid.$width);
+		this._grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
 		this._type = v;
 	}
 
@@ -144,7 +147,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	public $getScale(): number {
 		const viewWidth = viewport.width, viewHeight = viewport.height;
 
-		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$width;
+		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$renderWidth;
 		let horizontalScale = (viewWidth - 2 * MARGIN) * factor / width;
 		if(app.settings.showLabel) {
 			const vw = viewWidth * factor - 2 * MARGIN_FIX;
@@ -154,7 +157,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 			horizontalScale = Math.min(horizontalScale, ...scales);
 		}
 
-		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$height;
+		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$renderHeight;
 		return Math.min(horizontalScale, verticalScale);
 	}
 
@@ -170,7 +173,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		const s = ProjectService.scale.value;
 		const { x, y } = this._grid.$offset;
 		const hitMargin = 0.5; // 需要增加一點 margin，否則邊緣上的頂點很難按
-		const [width, height] = [this._grid.$width, this._grid.$height];
+		const [width, height] = [this._grid.$renderWidth, this._grid.$renderHeight];
 		this.$view.hitArea = new Rectangle(
 			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
 		);

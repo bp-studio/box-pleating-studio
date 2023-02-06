@@ -1,4 +1,6 @@
 
+import { watch } from "vue";
+
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 import { shallowRef } from "client/shared/decorators";
 import { Flap } from "./flap";
@@ -10,7 +12,7 @@ import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
-import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
+import type { DesignMode, JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
 
 //=================================================================
 /**
@@ -29,6 +31,9 @@ export class Layout implements ISerializable<JLayout> {
 
 	/** 即將被更新的角片 */
 	private readonly _pendingUpdate = new Set<Flap>();
+
+	/** 需要連動的新建立角片 */
+	public readonly $syncFlaps = new Map<number, Flap>();
 
 	/** 正在進行中的更新工作 */
 	private _updating: Promise<void> = Promise.resolve();
@@ -66,7 +71,7 @@ export class Layout implements ISerializable<JLayout> {
 		for(const f of this.$flaps.values()) {
 			const vertex = tree.$vertices[f.id];
 			const edgeDisposed = !f.$edge.$v1; // 原本的角片被分割了
-			if(!vertex || vertex.degree != 1 || edgeDisposed) {
+			if(!vertex || !vertex.isLeaf || edgeDisposed) {
 				if(vertex) {
 					if(edgeDisposed) {
 						prototype.layout.flaps.push(f.toJSON());
@@ -92,7 +97,7 @@ export class Layout implements ISerializable<JLayout> {
 
 		for(const e of model.add.edges) {
 			const edge = tree.$edges.get(e.n1, e.n2)!;
-			if(edge.$v1.degree == 1 || edge.$v2.degree == 1) continue;
+			if(edge.$v1.isLeaf || edge.$v2.isLeaf) continue;
 			const tag = this._getEdgeTag(e);
 			if(!model.graphics[tag]) continue;
 			this._addRiver(e, model.graphics[tag].contours!);
@@ -153,6 +158,7 @@ export class Layout implements ISerializable<JLayout> {
 		const edge = tree.$getFirstEdge(vertex);
 		const flap = new Flap(this, f, vertex, edge, contours);
 		this.$flaps.set(f.id, flap);
+		if(vertex.$isNew) this.$syncFlaps.set(f.id, flap);
 		this.$sheet.$addChild(flap);
 	}
 

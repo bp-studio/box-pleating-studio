@@ -15,6 +15,8 @@ import type { Control } from "client/base/control";
 export interface ISelectionController {
 	readonly selections: readonly Control[];
 	readonly draggables: ComputedRef<Draggable[]>;
+	selectAll(): void;
+	clear(): void;
 }
 
 interface HitStatus {
@@ -71,12 +73,18 @@ export namespace SelectionController {
 		)
 	);
 
-	export function $clear(ctrl: Control | null = null): void {
+	export function clear(ctrl: Control | null = null): void {
 		selections.forEach(c => {
 			if(c !== ctrl) c.$selected = false;
 		});
 		selections.length = 0;
 		if(ctrl?.$selected) selections.push(ctrl);
+	}
+
+	export function selectAll(): void {
+		const sheet = ProjectService.sheet.value;
+		if(!sheet) return;
+		for(const c of sheet.$controls) $toggle(c, true);
 	}
 
 	/** 處理點擊、並且比較看看先後的選取狀態是否一樣 */
@@ -96,7 +104,7 @@ export namespace SelectionController {
 
 		// 滑鼠按下時的選取邏輯
 		if(!ctrlKey) {
-			if(!current) $clear();
+			if(!current) clear();
 			if(!current && next) select(next);
 		} else {
 			if(current && !next) $toggle(current, !current.$selected);
@@ -108,8 +116,8 @@ export namespace SelectionController {
 		const { current, next } = statusCache;
 		const project = ProjectService.project.value;
 		if(project && !project.$isDragging) {
-			if(current && next) $clear();
-			if(current && !next) $clear(current);
+			if(current && next) clear();
+			if(current && !next) clear(current);
 			if(next) select(next);
 		}
 	}
@@ -117,7 +125,7 @@ export namespace SelectionController {
 	export function $tryReselect(event: MouseEvent | TouchEvent): boolean {
 		if(!possiblyReselect) return false;
 
-		$clear();
+		clear();
 		$process(event, false);
 		for(const o of draggables.value) o.$dragStart(CursorController.$offset);
 		possiblyReselect = false;
@@ -131,7 +139,7 @@ export namespace SelectionController {
 	 */
 	export function $endDrag(cancel?: boolean): boolean {
 		const result = view.visible;
-		if(result && cancel) $clear();
+		if(result && cancel) clear();
 		view.visible = false;
 		stage.interactiveChildren = true;
 		dragSelectables = [];
@@ -147,7 +155,7 @@ export namespace SelectionController {
 			// 要拖曳至一定距離才開始觸發拖曳選取
 			const dist = getDistance(downPoint, point);
 			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
-			$clear();
+			clear();
 			view.visible = true;
 			stage.interactiveChildren = false;
 			dragSelectables = [...sheet.$controls].filter(

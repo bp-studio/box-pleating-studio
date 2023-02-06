@@ -55,6 +55,13 @@ namespace StudioService {
 	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);
 
+	export function selectAll(): void {
+		bp.selection.selectAll();
+	}
+	export function unselectAll(): void {
+		bp.selection.clear();
+	}
+
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
 	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
 

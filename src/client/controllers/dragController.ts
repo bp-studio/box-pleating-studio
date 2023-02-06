@@ -26,6 +26,7 @@ export namespace DragController {
 
 	export function dragByKey(key: string): void {
 		let v: IPoint;
+		key = key.toLowerCase().replace(/^arrow/, "");
 		switch(key) {
 			case "up": v = { x: 0, y: 1 }; break;
 			case "down": v = { x: 0, y: -1 }; break;

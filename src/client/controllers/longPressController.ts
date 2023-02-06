@@ -12,9 +12,17 @@ export namespace LongPressController {
 
 	let _timeout: Timeout | undefined;
 
+	export let $triggered: boolean = false;
+
 	/** 長壓設置 */
 	export function $init(): void {
-		if(options.onLongPress) _timeout = setTimeout(options.onLongPress, TIMEOUT);
+		$triggered = false;
+		const callback = options.onLongPress;
+		if(!callback) return;
+		_timeout = setTimeout(() => {
+			$triggered = true;
+			callback();
+		}, TIMEOUT);
 	}
 
 	/** 取消長壓；這個除了會在滑鼠或觸控放開時自動執行之外也可以手動呼叫 */
