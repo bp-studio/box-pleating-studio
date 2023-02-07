@@ -60,8 +60,8 @@ const statusComparator: Comparator<StartEvent> = (a, b) =>
 
 /** 比較兩個起點相同的開始事件 */
 const segmentComparator: Comparator<StartEvent> = (a, b) =>
-	// 切線斜率小的優先
-	getSlope(a) - getSlope(b) ||
+	// 切線斜率小的優先（這邊要小心浮點誤差）
+	fix(getSlope(a) - getSlope(b)) ||
 	// 如果切線斜率還是一樣就比較曲率
 	getCurvature(a) - getCurvature(b) ||
 	// 重疊的情況中，離開邊優先（這跟聯集的情況相反）
@@ -99,4 +99,9 @@ export function getCurvature(e: StartEvent): number {
 	if(seg.$type === SegmentType.AALine) return 0;
 	const sgn = e.$point === seg.$start ? 1 : -1; // 上曲還是下曲
 	return sgn / seg.$radius;
+}
+
+function fix(x: number): number {
+	if(Math.abs(x) < EPSILON) return 0;
+	return x;
 }

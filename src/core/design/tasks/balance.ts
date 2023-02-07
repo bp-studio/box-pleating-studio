@@ -16,21 +16,21 @@ import type { Tree } from "../context/tree";
  * 但是這邊並不會出現實際上的循環相依。
  */
 //=================================================================
-export const balanceTask = new Task(process, distanceTask);
+export const balanceTask = new Task(balance, distanceTask);
 
-function process(): void {
+function balance(): void {
 	const tree = State.$tree;
 	const oldRoot = tree.$root;
-	let newRoot = balance(oldRoot);
+	let newRoot = tryBalance(oldRoot);
 	while(newRoot) {
 		State.$parentChanged.add(tree.$root);
 		tree.$root = newRoot;
-		newRoot = balance(tree.$root);
+		newRoot = tryBalance(tree.$root);
 	}
 	if(tree.$root != oldRoot) State.$rootChanged = true;
 }
 
-function balance(root: TreeNode): TreeNode | null {
+function tryBalance(root: TreeNode): TreeNode | null {
 	// 前置條件檢查
 	const first = root.$children.$get();
 	if(!first) return null;

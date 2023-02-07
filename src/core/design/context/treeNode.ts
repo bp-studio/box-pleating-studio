@@ -57,6 +57,11 @@ export class TreeNode implements ITreeNode {
 		}
 	}
 
+	public toJSON(): JEdge {
+		if(!this.$parent) throw new Error("Cannot export root node");
+		return { n1: this.$parent.id, n2: this.id, length: this.$length };
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 公開方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,11 +74,6 @@ export class TreeNode implements ITreeNode {
 	public $setAABB(top: number, right: number, bottom: number, left: number): void {
 		State.$flapAABBChanged.add(this);
 		this.$AABB.$update(top, right, bottom, left);
-	}
-
-	public toJSON(): JEdge {
-		if(!this.$parent) throw new Error("Cannot export root node");
-		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}
 
 	/** 如果自身為葉點則將自己從連結關係上斷開，並傳回成功與否 */

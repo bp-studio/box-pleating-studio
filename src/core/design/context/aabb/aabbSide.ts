@@ -31,7 +31,11 @@ export class AABBSide {
 
 	/** 自身在父點堆積中的鍵，這等於自身的值再加上間距 */
 	public get $key(): number {
-		return (this._heap.$isEmpty ? this.$value : this._cache!) + this.$margin;
+		return this.$base + this.$margin;
+	}
+
+	public get $base(): number {
+		return this._heap.$isEmpty ? this.$value : this._cache!;
 	}
 
 	public $addChild(child: AABBSide): boolean {

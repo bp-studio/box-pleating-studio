@@ -28,8 +28,8 @@ subgraph Tree
 	d{{node distances}}
 	a{{AABB hierarchy}}
 end
-k(collision)
-e[[Error indicators]]
+o(overlap)
+j[[junctions]]
 subgraph Stretch
 	g(overlap groups)
 	c(configurations)
@@ -44,7 +44,7 @@ end
 T --> h --> b
 b & L --> d
 d & F --> a --> rc --> fc
-a --> k --> e & g
+a --> o --> j & g
 g --> c --> p
 p & P --> pc --> fc
 ```

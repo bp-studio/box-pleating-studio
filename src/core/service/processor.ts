@@ -2,7 +2,7 @@ import { HeapSet } from "shared/data/heap/heapSet";
 import { State } from "./state";
 
 import type { Task } from "core/design/tasks/task";
-import type { Contour } from "shared/types/geometry";
+import type { Contour, Path, Polygon } from "shared/types/geometry";
 import type { JEdge, JEdgeBase } from "shared/json/tree";
 import type { GraphicsData, UpdateModel } from "./updateModel";
 
@@ -48,6 +48,14 @@ export namespace Processor {
 		updateResult.graphics[tag] = graphics;
 	}
 
+	export function $addJunction(tag: string, path: Polygon): void {
+		updateResult.add.junctions[tag] = path;
+	}
+
+	export function $removeJunction(tag: string): void {
+		updateResult.remove.junctions.push(tag);
+	}
+
 	export function $getResult(): UpdateModel {
 		const result = updateResult;
 		reset();
@@ -63,10 +71,12 @@ export namespace Processor {
 			add: {
 				edges: [],
 				nodes: [],
+				junctions: {},
 			},
 			remove: {
 				edges: [],
 				nodes: [],
+				junctions: [],
 			},
 			graphics: {},
 		};

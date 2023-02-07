@@ -41,7 +41,8 @@ export class RRIntersector extends Intersector {
 		let seg1 = ev1.$segment as ArcSegment;
 		let seg2 = ev2.$segment as ArcSegment;
 		const intersections = seg1.$intersection(seg2);
-		for(const p of intersections) { // 已經排序好了
+		for(let p of intersections) { // 已經排序好了
+			p = fix(fix(p, seg1), seg2);
 			const in1 = seg1.$inArcRange(p), in2 = seg2.$inArcRange(p);
 			// 交叉條件為：對自身來說在內部、對另外一個來說至少在端點上
 			if(in1 < -EPSILON && in2 < EPSILON) {
@@ -67,7 +68,7 @@ export class RRIntersector extends Intersector {
 			const dy = y - arc.$center.y;
 			const dx = Math.sqrt(r * r - dy * dy);
 			const x = arc.$center.x + (arc.$start.y > arc.$end.y ? -dx : dx);
-			const p = { x, y };
+			const p = fix(fix({ x, y }, line), arc);
 			const dl = (x - eLine.$point.x) * (x - eLine.$other.$point.x);
 			if(da < -EPSILON && dl < EPSILON) this._subdivide(eArc, p);
 			if(da < EPSILON && dl < -EPSILON) this._subdivide(eLine, p);
@@ -76,7 +77,7 @@ export class RRIntersector extends Intersector {
 			const da = (x - arc.$start.x) * (x - arc.$end.x);
 			if(da > EPSILON) return;
 			const y = yIntercept(arc, x);
-			const p = { x, y };
+			const p = fix(fix({ x, y }, line), arc);
 			const dl = (y - eLine.$point.y) * (y - eLine.$other.$point.y);
 			if(da < -EPSILON && dl < EPSILON) this._subdivide(eArc, p);
 			if(da < EPSILON && dl < -EPSILON) this._subdivide(eLine, p);
@@ -93,4 +94,16 @@ export function yIntercept(arc: ArcSegment, x: number): number {
 	const dx = x - arc.$center.x;
 	const dy = Math.sqrt(r * r - dx * dx);
 	return arc.$center.y + (arc.$start.x > arc.$end.x ? dy : -dy);
+}
+
+/** 在 {@link EPSILON} 比較之下檢查兩點是否相等 */
+export function same(p1: IPoint, p2: IPoint): boolean {
+	return Math.abs(p1.x - p2.x) < EPSILON && Math.abs(p1.y - p2.y) < EPSILON;
+}
+
+/** 如果交點實質上就是線段的端點，那麼就傳回原本的端點，以免事件排序出錯 */
+export function fix(p: IPoint, seg: Segment): IPoint {
+	if(same(p, seg.$start)) return seg.$start;
+	if(same(p, seg.$end)) return seg.$end;
+	return p;
 }

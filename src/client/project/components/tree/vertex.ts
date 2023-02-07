@@ -132,7 +132,10 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 				const grid = layout.$sheet.grid;
 				const xFactor = grid.$renderWidth / this._sheet.grid.$renderWidth;
 				const yFactor = grid.$renderHeight / this._sheet.grid.$renderHeight;
-				const p: IPoint = { x: this.$location.x * xFactor, y: this.$location.y * yFactor };
+				const p: IPoint = {
+					x: Math.round(this.$location.x * xFactor),
+					y: Math.round(this.$location.y * yFactor),
+				};
 				flap.$sync(grid.$constrain(p));
 			}
 		}

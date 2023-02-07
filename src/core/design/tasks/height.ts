@@ -12,9 +12,9 @@ import type { TreeNode } from "../context/treeNode";
  * 這個工作是所有更新工作的最起點。
  */
 //=================================================================
-export const heightTask = new Task(process, balanceTask);
+export const heightTask = new Task(height, balanceTask);
 
-function process(): void {
+function height(): void {
 	climb(updater, State.$childrenChanged);
 }
 

@@ -1,26 +1,42 @@
 import { Task } from "./task";
 import { State } from "core/service/state";
+import { Overlap } from "../layout/overlap";
+import { junctionTask } from "./junction";
+import { getKey, getPair } from "shared/data/doubleMap/intDoubleMap";
 
 import type { ITreeNode } from "../context";
 
 //=================================================================
 /**
- * {@link collisionTask} 負責維護 {@link State.$collisions}。
+ * {@link overlapTask} 負責維護 {@link State.$overlaps}。
  *
  * 這個全新演算法的一大突破在於再也不需要維護整個樹的 LCA，
  * 因為在演算的過程當中 LCA 會自動被提供出來。
  */
 //=================================================================
-export const collisionTask = new Task(process);
+export const overlapTask = new Task(collision, junctionTask);
 
-function process(): void {
-	if(State.$collisions.size > 0) {
-		// 清除掉有變化的角片碰撞紀錄
-		for(const flap of State.$flapAABBChanged) {
-			State.$collisions.delete(flap.id);
+/** 本回合當中要被刪除的 {@link Overlap} 之鍵 */
+const pendingDelete = new Set<number>();
+
+function collision(): void {
+	if(State.$overlaps.size > 0) {
+		// 把所有其中一個角片有變動的 Overlap 列為待刪除
+		for(const flap of State.$flapChanged) {
+			for(const id of State.$overlaps.get(flap.id)!.keys()) {
+				pendingDelete.add(getKey(id, flap.id));
+			}
 		}
 	}
+
+	// 找出所有的重疊
 	getCollisionOfLCA(State.$tree.$root);
+
+	// 刪除掉所有待刪除的 Overlap
+	for(const key of pendingDelete) {
+		State.$overlaps.delete(...getPair(key));
+	}
+	pendingDelete.clear();
 }
 
 function getNontrivialDescendant(node: ITreeNode): ITreeNode {
@@ -56,7 +72,11 @@ function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
 	const m = b.$children.$size;
 	if(n === 0 && m === 0) {
 		// 找到葉點了，加入到輸出之中
-		State.$collisions.set(a.id, b.id, dist(a, b, lca));
+		const d = dist(a, b, lca);
+		State.$overlaps.set(a.id, b.id, new Overlap(a, b, d));
+
+		// 取消對應鍵的待刪除
+		pendingDelete.delete(getKey(a.id, b.id));
 	} else {
 		// 選擇子點比較少的一邊往下繼續比較，以節省比較次數
 		if(m === 0 || n !== 0 && n < m) {

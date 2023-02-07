@@ -14,11 +14,11 @@ import type { TreeNode } from "../context/treeNode";
  * 和 {@link TreeNode.$innerRoughContour}。
  */
 //=================================================================
-export const roughContourTask = new Task(process);
+export const roughContourTask = new Task(roughContour);
 
 const union = new AAUnion();
 
-function process(): void {
+function roughContour(): void {
 	climb(updater,
 		State.$flapAABBChanged,
 		State.$parentChanged,

@@ -1,5 +1,5 @@
 import { unlink } from "../base/doubleLink";
-import { IntDoubleMap } from "./intDoubleMap";
+import { getKey, IntDoubleMap } from "./intDoubleMap";
 
 import type { IValuedDoubleMap } from "./iDoubleMap";
 import type { Node } from "./intDoubleMap";
@@ -19,7 +19,7 @@ export class ValuedIntDoubleMap<V> extends IntDoubleMap<V> implements IValuedDou
 		if(!cursor) return false;
 		while(cursor) {
 			const key1 = cursor.n1.key, key2 = cursor.n2.key;
-			const key = this._getKey(key1, key2);
+			const key = getKey(key1, key2);
 			this._deleteKeyNode(key1, cursor.n1);
 			if(key1 !== key2) this._deleteKeyNode(key2, cursor.n2);
 			this._deleteNode(key, cursor);

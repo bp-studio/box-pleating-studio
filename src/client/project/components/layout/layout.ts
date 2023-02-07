@@ -1,18 +1,24 @@
 
-import { watch } from "vue";
+import { AlphaFilter } from "@pixi/filter-alpha";
+import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 import { shallowRef } from "client/shared/decorators";
 import { Flap } from "./flap";
 import { River } from "./river";
 import { Sheet } from "../sheet";
+import { Layer } from "client/types/layers";
+import { drawArcPolygon } from "client/screen/contourUtil";
+import { RED } from "client/shared/constant";
 
 import type { Contour } from "shared/types/geometry";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
-import type { DesignMode, JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
+
+const JUNCTION_ALPHA = 0.5;
 
 //=================================================================
 /**
@@ -28,6 +34,7 @@ export class Layout implements ISerializable<JLayout> {
 	public readonly $sheet: Sheet;
 	public readonly $flaps: Map<number, Flap> = new Map();
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
+	public readonly $junctions: Map<string, SmoothGraphics> = new Map();
 
 	/** 即將被更新的角片 */
 	private readonly _pendingUpdate = new Set<Flap>();
@@ -41,6 +48,9 @@ export class Layout implements ISerializable<JLayout> {
 	constructor(project: Project, parentView: Container, json: JSheet) {
 		this.$project = project;
 		this.$sheet = new Sheet(project, parentView, json);
+
+		const filter = new AlphaFilter(JUNCTION_ALPHA);
+		this.$sheet.$layers[Layer.$junction].filters = [filter];
 
 		if(DEBUG_ENABLED) this.$sheet.$view.name = "LayoutSheet";
 	}
@@ -61,6 +71,8 @@ export class Layout implements ISerializable<JLayout> {
 		const design = this.$project.design;
 		const prototype = design.$prototype;
 		const tree = design.tree;
+
+		this._updateJunctions(model);
 
 		// 更新輪廓
 		for(const tag in model.graphics) {
@@ -198,6 +210,31 @@ export class Layout implements ISerializable<JLayout> {
 		if(init == "re") {
 			const [n1, n2] = m[2].split(",").map(n => Number(n));
 			return this.$rivers.get(n1, n2);
+		}
+	}
+
+	private _updateJunctions(model: UpdateModel): void {
+		const junctionLayer = this.$sheet.$layers[Layer.$junction];
+		for(const tag in model.add.junctions) {
+			let sg = this.$junctions.get(tag);
+			if(!sg) {
+				sg = new SmoothGraphics();
+				sg.alpha = JUNCTION_ALPHA;
+				this.$junctions.set(tag, sg);
+				junctionLayer.addChild(sg);
+			}
+			sg.clear();
+			drawArcPolygon(sg, model.add.junctions[tag], RED);
+		}
+		for(const tag of model.remove.junctions) {
+			const sg = this.$junctions.get(tag);
+			if(!sg) {
+				debugger;
+				continue;
+			}
+			this.$junctions.delete(tag);
+			junctionLayer.removeChild(sg);
+			sg.destroy();
 		}
 	}
 }

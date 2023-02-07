@@ -1,5 +1,7 @@
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
+import { DiffDoubleSet } from "shared/data/doubleMap/diffDoubleSet";
 
+import type { Overlap } from "core/design/layout/overlap";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
 import type { TreeNode } from "core/design/context/treeNode";
@@ -19,6 +21,7 @@ export namespace State {
 		$lengthChanged.clear();
 		$subtreeAABBChanged.clear();
 		$flapAABBChanged.clear();
+		$flapChanged.clear();
 		$rootChanged = false;
 	}
 
@@ -29,8 +32,10 @@ export namespace State {
 	/** 當前的樹 */
 	export let $tree: Tree;
 
-	/** 所有的重疊組合、以及對應的兩點之間的樹狀距離 */
-	export const $collisions = new IntDoubleMap<number>();
+	/** 所有的重疊組合 */
+	export const $overlaps = new IntDoubleMap<Overlap>();
+
+	export const $junctionDiff = new DiffDoubleSet();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 暫時狀態
@@ -53,6 +58,9 @@ export namespace State {
 
 	/** 當前回合當中，{@link TreeNode.$AABB AABB} 曾經改變的角片 */
 	export const $flapAABBChanged = new Set<ITreeNode>();
+
+	/** 當前回合當中有發生過任何改變的角片，等於 {@link $subtreeAABBChanged} 當中的角片 */
+	export const $flapChanged = new Set<ITreeNode>();
 }
 
 State.$reset();

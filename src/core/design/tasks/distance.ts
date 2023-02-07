@@ -10,9 +10,9 @@ import type { TreeNode } from "../context/treeNode";
  * {@link distanceTask} 負責在樹有重新平衡發生的時候更新 {@link TreeNode.$dist}。
  */
 //=================================================================
-export const distanceTask = new Task(process, AABBTask);
+export const distanceTask = new Task(distance, AABBTask);
 
-function process(): void {
+function distance(): void {
 	if(State.$rootChanged) {
 		// 樹根有變化的情況就完整全部更新
 		updateDistRecursive(State.$tree.$root, 0);

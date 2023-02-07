@@ -1,5 +1,6 @@
 import { AABBSide } from "./aabbSide";
 
+import type { IRoundedRect } from "core/math/polyBool/intersection/roundedRect";
 import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 
@@ -44,10 +45,10 @@ export class AABB {
 	}
 
 	public $intersects(that: AABB, gap: number): boolean {
-		return this._sides[Side._left].$value - gap < that._sides[Side._right].$value &&
-			this._sides[Side._right].$value + gap > that._sides[Side._left].$value &&
-			this._sides[Side._top].$value + gap > that._sides[Side._bottom].$value &&
-			this._sides[Side._bottom].$value - gap < that._sides[Side._top].$value;
+		return this._sides[Side._left].$base - gap < that._sides[Side._right].$base &&
+			this._sides[Side._right].$base + gap > that._sides[Side._left].$base &&
+			this._sides[Side._top].$base + gap > that._sides[Side._bottom].$base &&
+			this._sides[Side._bottom].$base - gap < that._sides[Side._top].$base;
 	}
 
 	public $update(top: number, right: number, bottom: number, left: number): void {
@@ -64,8 +65,25 @@ export class AABB {
 		this._sides[Side._left].$margin = -m;
 	}
 
+	/** 測試用 */
 	public $toArray(): number[] {
 		return this._sides.map(s => s.$key);
+	}
+
+	public $toValues(): number[] {
+		return this._sides.map(s => s.$value);
+	}
+
+	public $toRoundedRect(extra: number): IRoundedRect {
+		const radius = this._sides[Side._top].$margin + extra;
+		const [t, r, b, l] = this._sides.map(s => s.$value);
+		return {
+			x: l,
+			y: b,
+			width: r - l,
+			height: t - b,
+			radius,
+		};
 	}
 
 	public $toPath(): Path {

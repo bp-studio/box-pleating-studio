@@ -33,8 +33,8 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	protected _size: number = 0;
 
 	public set(key1: number, key2: number, value: V): this {
-		if(!this._checkKey(key1) || !this._checkKey(key2)) throw new Error("Invalid index");
-		const key = this._getKey(key1, key2);
+		if(!checkKey(key1) || !checkKey(key2)) throw new Error("Invalid index");
+		const key = getKey(key1, key2);
 		let node = this._map.get(key);
 		if(!node) {
 			node = this._createNode(key1, key2, value);
@@ -56,7 +56,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		if(args.length === 1) {
 			return this._keyMap.has(key1);
 		} else {
-			return this._map.has(this._getKey(key1, args[1]));
+			return this._map.has(getKey(key1, args[1]));
 		}
 	}
 
@@ -74,7 +74,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 			}
 			return temp;
 		} else {
-			return this._map.get(this._getKey(key1, args[1]))?.value;
+			return this._map.get(getKey(key1, args[1]))?.value;
 		}
 	}
 
@@ -107,7 +107,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 			if(!cursor) return false;
 			while(cursor) {
 				const key2 = cursor.key;
-				const key = this._getKey(key1, key2);
+				const key = getKey(key1, key2);
 				const node = this._map.get(key)!;
 				if(key1 !== key2) {
 					const n = node.n1.key === key1 ? node.n1 : node.n2;
@@ -120,7 +120,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 			return true;
 		} else {
 			const key2 = args[1];
-			const key = this._getKey(key1, key2);
+			const key = getKey(key1, key2);
 			const node = this._map.get(key);
 			if(!node) return false;
 			this._deleteKeyNode(key1, node.n1);
@@ -139,7 +139,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	}
 
 	public *keys(): IterableIterator<[number, number]> {
-		for(const key of this._map.keys()) yield [key & MAX, key >> SHIFT];
+		for(const key of this._map.keys()) yield getPair(key);
 	}
 
 	public firstKeys(): IterableIterator<number> {
@@ -177,17 +177,9 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		node.value = value;
 	}
 
-	protected _getKey(key1: number, key2: number): number {
-		return key1 < key2 ? key1 << SHIFT | key2 : key2 << SHIFT | key1;
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 私有方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _checkKey(key: number): boolean {
-		return Number.isInteger(key) && key >= 0 && key <= MAX;
-	}
 
 	private _insertKeyNode(key: number, n: KeyNode): void {
 		const old = this._keyMap.get(key);
@@ -197,6 +189,18 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		}
 		this._keyMap.set(key, n);
 	}
+}
+
+export function getKey(key1: number, key2: number): number {
+	return key1 < key2 ? key1 << SHIFT | key2 : key2 << SHIFT | key1;
+}
+
+export function getPair(key: number): [number, number] {
+	return [key >> SHIFT, key & MAX];
+}
+
+function checkKey(key: number): boolean {
+	return Number.isInteger(key) && key >= 0 && key <= MAX;
 }
 
 export interface Node<V> extends IDoubleLinkedNode<Node<V>> { }
