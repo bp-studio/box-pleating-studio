@@ -200,7 +200,7 @@ export class Tree implements ITree {
 
 	/** 傳回兩個節點在樹上的距離 */
 	public $dist(n1: TreeNode, n2: TreeNode): number {
-		return n1.$dist + n2.$dist - 2 * this._lca(n1, n2).$dist;
+		return dist(n1, n2, this._lca(n1, n2));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,4 +234,8 @@ export class Tree implements ITree {
 		if(n2.$dist > n1.$dist) return this._lca(n1, n2.$parent!);
 		return this._lca(n1.$parent!, n2.$parent!);
 	}
+}
+
+export function dist(a: ITreeNode, b: ITreeNode, lca: ITreeNode): number {
+	return a.$dist + b.$dist - 2 * lca.$dist;
 }

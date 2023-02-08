@@ -3,10 +3,10 @@ import { Text } from "@pixi/text";
 
 import { BLACK, DARK, LIGHT, WHITE } from "client/shared/constant";
 import ProjectService, { MIN_SCALE } from "client/services/projectService";
-import { Direction } from "client/types/enum";
 import { PIXI } from "./inspector";
 import { shallowRef } from "client/shared/decorators";
 import { MARGIN_FIX } from "./constants";
+import { Direction } from "shared/types/direction";
 
 import type { IDestroyOptions } from "@pixi/display";
 import type { Rectangle } from "@pixi/math";

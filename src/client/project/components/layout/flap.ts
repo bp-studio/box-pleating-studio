@@ -4,12 +4,12 @@ import { Graphics } from "@pixi/graphics";
 import { Layer } from "client/types/layers";
 import { shallowRef } from "client/shared/decorators";
 import { drawContours, fillContours } from "client/screen/contourUtil";
-import { Direction } from "client/types/enum";
 import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
+import { Direction } from "shared/types/direction";
 
 import type { IGrid } from "../grid";
 import type { Layout } from "./layout";

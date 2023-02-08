@@ -1,4 +1,4 @@
-import type { QuadrantDirection } from "client/types/quadrant";
+import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerType } from "./enum";
 
 export interface JQuadrilateral {

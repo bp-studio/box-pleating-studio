@@ -1,5 +1,5 @@
+import type { Direction } from "shared/types/direction";
 import type { GraphicsLike } from "client/screen/contourUtil";
-import type { Direction } from "client/types/enum";
 import type { JSheet } from "shared/json/components";
 import type { GridType } from "shared/json/enum";
 

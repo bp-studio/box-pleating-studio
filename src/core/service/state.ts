@@ -1,7 +1,7 @@
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/doubleMap/diffDoubleSet";
 
-import type { Overlap } from "core/design/layout/overlap";
+import type { Junction } from "core/design/layout/junction";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
 import type { TreeNode } from "core/design/context/treeNode";
@@ -33,9 +33,10 @@ export namespace State {
 	export let $tree: Tree;
 
 	/** 所有的重疊組合 */
-	export const $overlaps = new IntDoubleMap<Overlap>();
+	export const $junctions = new IntDoubleMap<Junction>();
 
-	export const $junctionDiff = new DiffDoubleSet();
+	/** 用來求出應該要被刪除掉的非法重疊 */
+	export const $invalidJunctionDiff = new DiffDoubleSet();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 暫時狀態

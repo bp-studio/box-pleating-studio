@@ -2,7 +2,7 @@ import { Task } from "./task";
 import { climb } from "./climb";
 import { State } from "core/service/state";
 import { roughContourTask } from "./roughContour";
-import { overlapTask } from "./overlap";
+import { junctionTask } from "./junction";
 
 import type { ITreeNode } from "../context";
 
@@ -11,7 +11,7 @@ import type { ITreeNode } from "../context";
  * {@link AABBTask} 負責更新 {@link TreeNode.$AABB}。
  */
 //=================================================================
-export const AABBTask = new Task(aabb, overlapTask, roughContourTask);
+export const AABBTask = new Task(aabb, junctionTask, roughContourTask);
 
 function aabb(): void {
 	climb(updater, State.$lengthChanged, State.$flapAABBChanged, State.$parentChanged);

@@ -28,10 +28,10 @@ subgraph Tree
 	d{{node distances}}
 	a{{AABB hierarchy}}
 end
-o(overlap)
-j[[junctions]]
+j(junctions)
+i[[invalid junctions]]
 subgraph Stretch
-	g(overlap groups)
+	g(junction groups)
 	c(configurations)
 	p(patterns)
 end
@@ -44,7 +44,7 @@ end
 T --> h --> b
 b & L --> d
 d & F --> a --> rc --> fc
-a --> o --> j & g
+a --> j --> i & g
 g --> c --> p
 p & P --> pc --> fc
 ```

@@ -1,6 +1,6 @@
 import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
-import { Direction } from "client/types/enum";
+import { Direction } from "shared/types/direction";
 
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { JSheet } from "shared/json/components";

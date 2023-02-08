@@ -7,6 +7,3 @@ export namespace Enum {
 			.filter(a => !isNaN(Number(a))) as (E[keyof E])[];
 	}
 }
-
-export enum Direction { UR, UL, LL, LR, R, T, L, B, none }
-

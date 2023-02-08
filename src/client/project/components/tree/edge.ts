@@ -8,7 +8,7 @@ import { BLACK, LIGHT, DANGER } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/screen/label";
-import { Direction } from "client/types/enum";
+import { Direction } from "shared/types/direction";
 
 import type { JEdge } from "shared/json";
 import type { Tree } from "./tree";
