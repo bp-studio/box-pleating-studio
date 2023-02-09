@@ -1,5 +1,5 @@
 import { dist } from "../context/tree";
-import { Direction } from "shared/types/direction";
+import { Direction, opposite } from "shared/types/direction";
 import { Rectangle } from "core/math/rectangle";
 
 import type { QuadrantDirection, SlashDirection } from "shared/types/direction";
@@ -25,6 +25,8 @@ export class Junction {
 	public readonly $fx!: number;
 	public readonly $fy!: number;
 	public readonly $base!: IPoint;
+	public readonly $q1!: number;
+	public readonly $q2!: number;
 
 	/** {@link $b} 相對於 {@link $a} 的方向  */
 	public readonly $direction!: QuadrantDirection;
@@ -35,8 +37,8 @@ export class Junction {
 	/** 同樣的非法重疊是否已經被繪製過了 */
 	public $processed: boolean = false;
 
-	/** 自身是否有被另外一個 {@link Junction} 覆蓋 */
-	public $isCovered: boolean = false;
+	/** 所有在幾何上覆蓋自身的 {@link Junction} */
+	private readonly _coveredBy: Junction[] = [];
 
 	constructor(a: ITreeNode, b: ITreeNode, lca: ITreeNode) {
 		if(a.id > b.id) [a, b] = [b, a];
@@ -67,11 +69,40 @@ export class Junction {
 		const dir: QuadrantDirection = (this.$fx == this.$fy ? 0 : 1) + (y > 0 ? 0 : 2);
 		this.$direction = dir;
 		this.$slash = dir % 2;
+		this.$q1 = a.id << 2 | dir;
+		this.$q2 = b.id << 2 | opposite(dir);
 
 		if(dir == Direction.UR) this.$base = { x: r1, y: t1 };
 		else if(dir == Direction.UL) this.$base = { x: l1, y: t1 };
 		else if(dir == Direction.LL) this.$base = { x: l1, y: b1 };
 		else this.$base = { x: r1, y: b1 };
+	}
+
+	/**
+	 * 自身是否被另外一個 {@link Junction}「實質上」覆蓋。
+	 *
+	 * 實質覆蓋是比幾何覆蓋進一步的概念：
+	 * 如果 A 覆蓋了 B、B 覆蓋了 C，可是 C 了 B 之外並沒有被其它 {@link Junction} 覆蓋，
+	 * 那麼此時由於 B 會被 A 無效化，這麼一來 B 對 C 的覆蓋也是無效的，
+	 * 所以 C 實質上其實是沒有被覆蓋。依此類推。
+	 */
+	public get $isCovered(): boolean {
+		if(this._isCovered === undefined) {
+			this._isCovered = this._coveredBy.some(j => !j.$isCovered);
+		}
+		return this._isCovered;
+	}
+	private _isCovered: boolean | undefined;
+
+	/** 設置一個覆蓋 */
+	public $setCoveredBy(that: Junction): void {
+		this._coveredBy.push(that);
+	}
+
+	/** 清除覆蓋的資訊 */
+	public $resetCovering(): void {
+		this._coveredBy.length = 0;
+		this._isCovered = undefined;
 	}
 
 	/** 根據指定的距離基準來取得覆蓋比較矩形 */

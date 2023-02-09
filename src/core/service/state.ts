@@ -1,6 +1,7 @@
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/doubleMap/diffDoubleSet";
 
+import type { Team } from "core/design/layout/team";
 import type { Junction } from "core/design/layout/junction";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
@@ -22,6 +23,7 @@ export namespace State {
 		$subtreeAABBChanged.clear();
 		$flapAABBChanged.clear();
 		$flapChanged.clear();
+		$teams.clear();
 		$rootChanged = false;
 	}
 
@@ -62,6 +64,9 @@ export namespace State {
 
 	/** 當前回合當中有發生過任何改變的角片，等於 {@link $subtreeAABBChanged} 當中的角片 */
 	export const $flapChanged = new Set<ITreeNode>();
+
+	/** 當前回合當中分組出來的 {@link Team} */
+	export const $teams = new Set<Team>();
 }
 
 State.$reset();
