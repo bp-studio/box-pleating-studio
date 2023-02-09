@@ -1,20 +1,20 @@
+import type { ValidJunction } from "./junction/validJunction";
 import type { TreeNode } from "../context/treeNode";
-import type { Junction } from "./junction";
 
 //=================================================================
 /**
- * {@link Team} 是經過分組的 {@link Junction}。
+ * {@link Team} 是經過分組的 {@link ValidJunction}。
  */
 //=================================================================
 
 export class Team {
 
-	private readonly _junctions: readonly Junction[];
+	private readonly _junctions: readonly ValidJunction[];
 	private readonly _flaps: readonly TreeNode[];
 
-	constructor(junctions: Junction[], flaps: TreeNode[]) {
+	constructor(junctions: ValidJunction[], flaps: TreeNode[]) {
 		this._junctions = junctions;
-		this._flaps = flaps.sort((a, b) => a.id - b.id);
+		this._flaps = flaps;
 	}
 
 	public get $signature(): string {

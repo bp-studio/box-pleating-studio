@@ -1,6 +1,6 @@
 import { Task } from "./task";
 import { State } from "core/service/state";
-import { Junction } from "../layout/junction";
+import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
 import { getKey, getPair } from "shared/data/doubleMap/intDoubleMap";
 import { groupTask } from "./group";
@@ -74,7 +74,7 @@ function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
 	const m = b.$children.$size;
 	if(n === 0 && m === 0) {
 		// 找到葉點了，加入到輸出之中
-		State.$junctions.set(a.id, b.id, new Junction(a, b, lca));
+		State.$junctions.set(a.id, b.id, createJunction(a, b, lca));
 
 		// 取消對應鍵的待刪除
 		pendingDelete.delete(getKey(a.id, b.id));

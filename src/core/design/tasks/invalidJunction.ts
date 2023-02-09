@@ -1,10 +1,6 @@
-
-import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { Task } from "./task";
-
-import type { Polygon } from "shared/types/geometry";
 
 //=================================================================
 /**
@@ -13,24 +9,17 @@ import type { Polygon } from "shared/types/geometry";
 //=================================================================
 export const invalidJunctionTask = new Task(invalid);
 
-const intersection = new RRIntersection();
-
 function invalid(): void {
-	for(const overlap of State.$junctions.values()) {
-		if(overlap.$valid) continue;
-		const A = overlap.$a, B = overlap.$b;
-		State.$invalidJunctionDiff.$add(A.id, B.id);
+	for(const junction of State.$junctions.values()) {
+		if(junction.$valid) continue;
+		const a = junction.$a.id, b = junction.$b.id;
+		State.$invalidJunctionDiff.$add(a, b);
 
 		// 如果同樣的 Overlap 已經繪製過了，那就不用繼續
-		if(overlap.$processed) continue;
+		if(junction.$processed) continue;
 
 		// 計算交集形狀
-		const dist = overlap.$dist - A.$length - B.$length;
-		const result: Polygon = [];
-		result.push(intersection.$get(A.$AABB.$toRoundedRect(0), B.$AABB.$toRoundedRect(dist))[0]);
-		if(dist > 0) result.push(intersection.$get(A.$AABB.$toRoundedRect(dist), B.$AABB.$toRoundedRect(0))[0]);
-		Processor.$addJunction(`${A.id},${B.id}`, result);
-		overlap.$processed = true;
+		Processor.$addJunction(`${a},${b}`, junction.$getPolygon());
 	}
 
 	// 經過上述的操作之後，剩下沒有被遍歷過的就是應該要被刪除的

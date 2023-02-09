@@ -29,6 +29,7 @@ export interface IHeap<T> extends IReadonlyHeap<T> {
 	$pop(): T | undefined;
 }
 
+/** 由小到大的數值比較器 */
 export const minComparator: Comparator<number> = (a, b) => a - b;
 
 //=================================================================

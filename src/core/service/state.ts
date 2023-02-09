@@ -2,7 +2,7 @@ import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/doubleMap/diffDoubleSet";
 
 import type { Team } from "core/design/layout/team";
-import type { Junction } from "core/design/layout/junction";
+import type { Junction } from "core/design/layout/junction/junction";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
 import type { TreeNode } from "core/design/context/treeNode";
