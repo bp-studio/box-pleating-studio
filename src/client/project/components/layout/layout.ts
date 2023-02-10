@@ -161,7 +161,8 @@ export class Layout implements ISerializable<JLayout> {
 		const flaps: JFlap[] = [];
 		for(const f of this._pendingUpdate) flaps.push(f.toJSON());
 		this._pendingUpdate.clear();
-		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps);
+		const dragging = this.$project.$isDragging;
+		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps, dragging);
 	};
 
 	private _addFlap(f: JFlap, contours: Contour[]): void {

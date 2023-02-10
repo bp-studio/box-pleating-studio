@@ -3,9 +3,10 @@ import { State } from "core/service/state";
 import { dist } from "../context/tree";
 import { ListUnionFind } from "shared/data/unionFind/listUnionFind";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
-import { Team } from "../layout/team";
 import { foreachPair } from "shared/utils/array";
 import { minComparator } from "shared/data/heap/heap";
+import { configurationTask } from "./configuration";
+import { Stretch } from "../layout/stretch";
 
 import type { ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
@@ -13,17 +14,31 @@ import type { Junction } from "../layout/junction/junction";
 
 //=================================================================
 /**
- * {@link groupTask} 負責將合法的 {@link Junction} 進行分組。
+ * {@link stretchTask} 負責將合法的 {@link Junction} 進行分組並維護 {@link Stretch} 的集合。
  */
 //=================================================================
-export const groupTask = new Task(grouping);
+export const stretchTask = new Task(stretch, configurationTask);
 
-function grouping(): void {
+function stretch(): void {
 	const validJunctions = getValidJunctions();
 	checkAllCovering(validJunctions);
 
-	// 分組演算法主體
 	const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
+	grouping(uncoveredJunctions);
+
+	for(const signature of State.$stretchDiff.$diff()) {
+		if(State.$isDragging) {
+			// 放到暫存區當中
+			const s = State.$stretches.get(signature)!;
+			State.$stretchCache.set(signature, s);
+		}
+		State.$stretches.delete(signature);
+		State.$updateResult.remove.stretches.push(signature);
+	}
+}
+
+/** 分組演算法的主體 */
+function grouping(uncoveredJunctions: ValidJunction[]): void {
 	const unionFind = new ListUnionFind<number>(
 		// 參與的 Quadrant 的數目最多就是 Junction 數目乘以二
 		uncoveredJunctions.length * 2
@@ -34,7 +49,6 @@ function grouping(): void {
 		unionFind.$union(j.$q1, j.$q2);
 	}
 	const groups = unionFind.$list();
-	const nodes = State.$tree.$nodes;
 	for(const group of groups) {
 		const junctions: ValidJunction[] = [];
 		const ids = group.map(q => q >>> 2).sort(minComparator);
@@ -42,9 +56,24 @@ function grouping(): void {
 			const junction = quadrantMap.get(i, j);
 			if(junction) junctions.push(junction);
 		});
-		State.$teams.add(new Team(junctions, ids.map(id => nodes[id]!)));
+
+		const signature = ids.join(",");
+		State.$stretchDiff.$add(signature);
+		const oldStretch = tryGetStretch(signature);
+		if(oldStretch) oldStretch.$update(junctions);
+		else State.$stretches.set(signature, new Stretch(junctions));
 	}
-	console.log("team", State.$teams.size);
+}
+
+/** 根據簽章試著找出既有的 {@link Stretch}（包括暫存的） */
+function tryGetStretch(signature: string): Stretch | undefined {
+	let result = State.$stretches.get(signature);
+	if(!result && State.$isDragging) {
+		result = State.$stretchCache.get(signature);
+		// 記得要把暫存的物件放回去
+		if(result) State.$stretches.set(signature, result);
+	}
+	return result;
 }
 
 /**
@@ -101,7 +130,11 @@ function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [nu
 	return undefined;
 }
 
-/** 第一個點是否為第二個點的祖先 */
+/**
+ * 第一個點是否為第二個點的祖先。
+ *
+ * 實務上這兩個點並不會在樹上相差太遠，所以這個動作的執行是夠快的。
+ */
 function isAncestor(p: ITreeNode, n: ITreeNode): boolean {
 	while(n.$dist > p.$dist) n = n.$parent!;
 	return n === p;

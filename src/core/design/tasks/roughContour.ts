@@ -1,7 +1,6 @@
 import { Task } from "./task";
 import { climb } from "./climb";
 import { State } from "core/service/state";
-import { Processor } from "core/service/processor";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { expand } from "core/math/polyBool/expansion";
 
@@ -34,14 +33,14 @@ function updater(tn: ITreeNode): boolean {
 		const path = node.$AABB.$toPath();
 		node.$outerRoughContour = [path];
 		const contours = [{ outer: path }];
-		Processor.$addGraphics("f" + node.id, { contours });
+		State.$updateResult.graphics["f" + node.id] = { contours };
 	} else {
 		const components = [...node.$children].map(n => n.$outerRoughContour);
 		const inner = union.$get(...components);
 		node.$innerRoughContour = inner;
 		const contours = expand(inner, node.$length);
 		node.$outerRoughContour = contours.map(c => c.outer);
-		Processor.$addGraphics(node.$riverTag, { contours });
+		State.$updateResult.graphics[node.$riverTag] = { contours };
 	}
 	return true;
 }

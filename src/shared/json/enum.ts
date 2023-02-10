@@ -24,9 +24,9 @@ export enum CornerType {
 	$socket,
 	/** 內部連出到另一個 Overlap */
 	$internal,
-	/** 側角，也是連至脊線交點，不過由於位於最側邊的關係，在產生河道輪廓的時候可以無限延伸 */
+	/** 側角，也是連至樞紐線交點，不過由於位於最側邊的關係，在產生河道輪廓的時候可以無限延伸 */
 	$side,
-	/** 連至脊線交點的角；此時 e 指的是參與交點的另一個 {@link Flap} 的 id */
+	/** 連至樞紐線交點的角；此時 e 指的是參與交點的另一個 {@link Flap} 的 id */
 	$intersection,
 	/** 連至 {@link Flap} 的角 */
 	$flap,

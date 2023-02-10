@@ -1,5 +1,5 @@
 import type { Polygon, Contour, Path } from "shared/types/geometry";
-import type { JEdge, JEdgeBase, JFlap } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap, JStretch } from "shared/json";
 
 export interface UpdateModel {
 
@@ -7,12 +7,14 @@ export interface UpdateModel {
 		nodes: number[];
 		edges: JEdge[];
 		junctions: Record<string, Polygon>;
+		stretches: Record<string, JStretch>;
 	};
 
 	remove: {
 		nodes: number[];
 		edges: JEdgeBase[];
 		junctions: string[];
+		stretches: string[];
 	};
 
 	/**

@@ -34,7 +34,7 @@ export class DiagonalGrid implements IGrid {
 
 	public toJSON(): JSheet {
 		return {
-			type: GridType.diagonal,
+			type: this.type,
 			height: this._size,
 			width: this._size,
 		};

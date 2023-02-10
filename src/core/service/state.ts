@@ -1,7 +1,10 @@
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
-import { DiffDoubleSet } from "shared/data/doubleMap/diffDoubleSet";
+import { DiffDoubleSet } from "shared/data/diff/diffDoubleSet";
+import { DiffSet } from "shared/data/diff/diffSet";
 
-import type { Team } from "core/design/layout/team";
+import type { Repository } from "core/design/layout/repository";
+import type { UpdateModel } from "./updateModel";
+import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
@@ -15,6 +18,8 @@ import type { TreeNode } from "core/design/context/treeNode";
 
 export namespace State {
 
+	export let $updateResult: UpdateModel;
+
 	/** 當前回合結束之後重設所有的暫時性狀態（持久狀態會被保留） */
 	export function $reset(): void {
 		$childrenChanged.clear();
@@ -23,8 +28,26 @@ export namespace State {
 		$subtreeAABBChanged.clear();
 		$flapAABBChanged.clear();
 		$flapChanged.clear();
-		$teams.clear();
+		$newRepositories.clear();
 		$rootChanged = false;
+	}
+
+	export function $resetResult(): void {
+		$updateResult = {
+			add: {
+				edges: [],
+				nodes: [],
+				junctions: {},
+				stretches: {},
+			},
+			remove: {
+				edges: [],
+				nodes: [],
+				junctions: [],
+				stretches: [],
+			},
+			graphics: {},
+		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +60,24 @@ export namespace State {
 	/** 所有的重疊組合 */
 	export const $junctions = new IntDoubleMap<Junction>();
 
+	/** 所有的伸展模式 */
+	export const $stretches = new Map<string, Stretch>();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 半持久狀態
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** Client 端是否正在進行拖曳；部份工作在這種情況下會先採用快捷的作法 */
+	export let $isDragging: boolean;
+
 	/** 用來求出應該要被刪除掉的非法重疊 */
 	export const $invalidJunctionDiff = new DiffDoubleSet();
+
+	/** 用來求出應該要被刪除掉的伸展模式 */
+	export const $stretchDiff = new DiffSet<string>();
+
+	/** 拖曳期間暫時存放的 {@link Stretch} */
+	export const $stretchCache = new Map<string, Stretch>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 暫時狀態
@@ -65,8 +104,9 @@ export namespace State {
 	/** 當前回合當中有發生過任何改變的角片，等於 {@link $subtreeAABBChanged} 當中的角片 */
 	export const $flapChanged = new Set<ITreeNode>();
 
-	/** 當前回合當中分組出來的 {@link Team} */
-	export const $teams = new Set<Team>();
+	/** 當前回合當中，新產生的 {@link Repository} */
+	export const $newRepositories = new Set<Repository>();
 }
 
 State.$reset();
+State.$resetResult();

@@ -1,6 +1,9 @@
 import { Rectangle } from "core/math/rectangle";
 import { opposite } from "shared/types/direction";
+import { $generate } from "core/math/gops";
+import { CornerType } from "shared/json/enum";
 
+import type { JJunction } from "shared/json";
 import type { ITreeNode } from "core/design/context";
 import type { QuadrantDirection, SlashDirection } from "shared/types/direction";
 
@@ -13,13 +16,15 @@ interface ValidJunctionData {
 	tip: IPoint;
 }
 
+const MASK = 3;
+
 //=================================================================
 /**
  * {@link ValidJunction} 代表一個合法的重疊。
  */
 //=================================================================
 
-export class ValidJunction {
+export class ValidJunction implements ISerializable<JJunction> {
 
 	/** 第一個角片 */
 	public readonly $a: ITreeNode;
@@ -50,7 +55,7 @@ export class ValidJunction {
 	/** {@link $a} 對應的尖點之所在 */
 	private readonly _tip: Readonly<IPoint>;
 
-	/** 對應於 {@link _dir} 的係數 */
+	/** 相位係數 */
 	private readonly _f: Readonly<IPoint>;
 
 	/** 所有在幾何上覆蓋自身的 {@link ValidJunction} */
@@ -71,6 +76,24 @@ export class ValidJunction {
 		this.$q1 = a.id << 2 | dir;
 		this.$q2 = b.id << 2 | opposite(dir);
 	}
+
+	toJSON(): JJunction {
+		return {
+			c: [
+				{ type: CornerType.$flap, e: this.$a.id, q: this.$q1 & MASK },
+				{ type: CornerType.$side },
+				{ type: CornerType.$flap, e: this.$b.id, q: this.$q2 & MASK },
+				{ type: CornerType.$side },
+			],
+			ox: this._o.x,
+			oy: this._o.y,
+			sx: this._s.x,
+		};
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 公開方法
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 自身是否被另外一個 {@link ValidJunction}「實質上」覆蓋。
@@ -110,4 +133,17 @@ export class ValidJunction {
 		const y = this._tip.y + distanceToA * this._f.y;
 		return new Rectangle({ x, y }, { x: x - this._o.x * this._f.x, y: y - this._o.y * this._f.y });
 	}
+
+	/**
+	 * 在不考慮其它 {@link ValidJunction} 的情況下，
+	 * 先找出自己可能使用的伸展模式，然後才是看看這些模式之間能否融合。
+	 */
+	public $findStretch(): void {
+		const pieces = [...$generate(this._o.x, this._o.y, this._s.x)];
+		if(pieces.length == 0) console.log("no single");
+	}
+}
+
+export function getStructureSignature(junctions: ValidJunction[]): string {
+	return JSON.stringify(junctions.map(j => j.toJSON()));
 }

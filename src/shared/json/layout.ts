@@ -63,6 +63,6 @@ export interface JConnection {
 	/** 連接對象，非負數代表 {@link Flap}，負數代表 {@link Overlap}（在整個 {@link Configuration} 中的 id） */
 	e: number;
 
-	/** 連接至對方的哪一個象限角；{@link Flap} 的情況是原始的，{@link Overlap} 的情況是未經變換的 */
+	/** 連接至對方的哪一個象限角；{@link Flap} 的情況是原始的，{@link Overlap} 的情況是未經相位變換的 */
 	q: QuadrantDirection;
 }

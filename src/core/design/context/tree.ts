@@ -1,4 +1,3 @@
-import { Processor } from "core/service/processor";
 import { TreeNode } from "./treeNode";
 import { State } from "core/service/state";
 
@@ -220,7 +219,7 @@ export class Tree implements ITree {
 		const node = this._nodes[id]!;
 		State.$childrenChanged.delete(node);
 		delete this._nodes[id];
-		Processor.$removeNode(id);
+		State.$updateResult.remove.nodes.push(id);
 	}
 
 	/** 傳回兩個節點的 LCA */

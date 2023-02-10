@@ -1,4 +1,4 @@
-import { getKey, getPair } from "./intDoubleMap";
+import { getKey, getPair } from "../doubleMap/intDoubleMap";
 
 //=================================================================
 /**

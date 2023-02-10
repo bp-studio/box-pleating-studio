@@ -195,6 +195,10 @@ export function getKey(key1: number, key2: number): number {
 	return key1 < key2 ? key1 << SHIFT | key2 : key2 << SHIFT | key1;
 }
 
+export function getOrderedKey(key1: number, key2: number): number {
+	return key1 << SHIFT | key2;
+}
+
 export function getPair(key: number): [number, number] {
 	return [key >> SHIFT, key & MAX];
 }

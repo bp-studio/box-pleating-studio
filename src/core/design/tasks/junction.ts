@@ -3,7 +3,7 @@ import { State } from "core/service/state";
 import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
 import { getKey, getPair } from "shared/data/doubleMap/intDoubleMap";
-import { groupTask } from "./group";
+import { stretchTask } from "./stretch";
 import { dist } from "../context/tree";
 
 import type { ITreeNode } from "../context";
@@ -16,7 +16,7 @@ import type { ITreeNode } from "../context";
  * 因為在演算的過程當中 LCA 會自動被提供出來。
  */
 //=================================================================
-export const junctionTask = new Task(junction, invalidJunctionTask, groupTask);
+export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask);
 
 /** 本回合當中要被刪除的 {@link Junction} 之鍵 */
 const pendingDelete = new Set<number>();

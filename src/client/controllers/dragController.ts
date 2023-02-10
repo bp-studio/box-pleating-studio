@@ -85,7 +85,10 @@ export namespace DragController {
 	export function $dragEnd(): void {
 		isDragging.value = false;
 		const project = ProjectService.project.value;
-		if(project) project.$isDragging = false;
+		if(project) {
+			project.$isDragging = false;
+			project.$callStudio("layout", "dragEnd");
+		}
 		stage.interactiveChildren = true;
 	}
 }

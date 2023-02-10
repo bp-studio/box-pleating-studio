@@ -17,34 +17,37 @@ The data flow of the Core is depicted in the following chart.
 flowchart TB
 subgraph User input
 	direction LR
-	T([Tree structure])
-	L([Edge lengths])
-	F([Flap positions and sizes])
-	P([Stretch pattern choices])
+	T{{Tree\nstructure}}
+	L{{Edge\nlengths}}
+	F{{Flap positions\nand sizes}}
+	D{{Dragging\nend}}
+	P{{Stretch pattern\nchoices}}
 end
 subgraph Tree
-	h{{node heights}}
+	h([node heights])
 	b(tree balancing)
-	d{{node distances}}
-	a{{AABB hierarchy}}
+	d([node distances])
+	a([AABB hierarchy])
 end
 j(junctions)
-i[[invalid junctions]]
-subgraph Stretch
-	g(junction groups)
+i[[invalid\njunctions]]
+subgraph Stretch pattern
+	s(stretches)
+	sc[[stretch/repo\nclean up]]
 	c(configurations)
 	p(patterns)
 end
 subgraph Contour
 	rc(rough contours)
-	pc{{pattern contours}}
+	pc([pattern contours])
 	fc[[final contours]]
 end
 
 T --> h --> b
 b & L --> d
 d & F --> a --> rc --> fc
-a --> j --> i & g
-g --> c --> p
+a --> j --> i & s
+D --------> sc
+s --> c --> p
 p & P --> pc --> fc
 ```

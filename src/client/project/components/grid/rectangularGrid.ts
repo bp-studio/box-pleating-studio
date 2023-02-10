@@ -35,7 +35,7 @@ export class RectangularGrid implements IGrid {
 
 	public toJSON(): JSheet {
 		return {
-			type: GridType.rectangular,
+			type: this.type,
 			height: this._height,
 			width: this._width,
 		};

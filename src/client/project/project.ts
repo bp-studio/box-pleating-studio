@@ -29,7 +29,7 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 	/** 是否已經初始化；僅在偵錯模式中使用 */
 	private _initialized?: boolean;
 
-	@shallowRef public $isDragging: boolean = false;
+	public $isDragging: boolean = false;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Project 剛建構出來的時候都是非活躍的，

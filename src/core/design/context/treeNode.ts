@@ -1,7 +1,6 @@
 import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
-import { Processor } from "core/service/processor";
 
 import type { Polygon } from "shared/types/geometry";
 import type { JEdge, JFlap } from "shared/json";
@@ -48,7 +47,7 @@ export class TreeNode implements ITreeNode {
 	constructor(id: number, parent?: TreeNode, length: number = 0) {
 		this.id = id;
 		State.$childrenChanged.add(this);
-		Processor.$addNode(id);
+		State.$updateResult.add.nodes.push(id);
 		if(parent) {
 			this.$length = length;
 			this.$AABB.$setMargin(length);
@@ -89,7 +88,7 @@ export class TreeNode implements ITreeNode {
 		parent.$children.$insert(this);
 		State.$parentChanged.add(this);
 		if(!skipProcess) {
-			Processor.$addEdge({ n1: this.id, n2: parent.id, length: this.$length });
+			State.$updateResult.add.edges.push({ n1: this.id, n2: parent.id, length: this.$length });
 		}
 	}
 
@@ -98,7 +97,7 @@ export class TreeNode implements ITreeNode {
 		if(this.$parent) {
 			this.$parent.$children.$remove(this);
 			State.$childrenChanged.add(this.$parent);
-			if(!skipProcess) Processor.$removeEdge({ n1: this.id, n2: this.$parent.id });
+			if(!skipProcess) State.$updateResult.remove.edges.push({ n1: this.id, n2: this.$parent.id });
 		}
 		this.$parent = undefined;
 	}
