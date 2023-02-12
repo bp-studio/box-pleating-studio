@@ -27,7 +27,7 @@ export class Repository {
 		for(const j of this._junctions) j.$findStretch();
 	}
 
-	public $cleanup(): void {
+	public $complete(): void {
 		//TODO
 	}
 }

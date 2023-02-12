@@ -42,6 +42,6 @@ export class Stretch {
 	/** 清除 {@link Repository} 快取，並且完成尚未完成的伸展模式計算 */
 	public $cleanup(): void {
 		this._repoCache.clear();
-		this._repo.$cleanup();
+		this._repo.$complete();
 	}
 }

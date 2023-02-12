@@ -2,29 +2,41 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { dist } from "../context/tree";
 import { ListUnionFind } from "shared/data/unionFind/listUnionFind";
-import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
-import { foreachPair } from "shared/utils/array";
+import { getKey, IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
+import { distinct, foreachPair } from "shared/utils/array";
 import { minComparator } from "shared/data/heap/heap";
-import { configurationTask } from "./configuration";
+import { patternTask } from "./pattern";
 import { Stretch } from "../layout/stretch";
 
 import type { ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
 import type { Junction } from "../layout/junction/junction";
 
+/** 一些彼此相連的 {@link ValidJunction} 所構成的群組 */
+interface Team {
+	$junctions: ValidJunction[];
+	$flaps: number[];
+}
+
 //=================================================================
 /**
  * {@link stretchTask} 負責將合法的 {@link Junction} 進行分組並維護 {@link Stretch} 的集合。
+ *
+ * 這是一般性的伸展結構理論當中特別複雜且深奧的一段，
+ * 我自己也不敢說我已經完全參透了這一段，歷年來幾度我覺得我已經搞清楚了、
+ * 但之後又會發現一些奇特的 edge cases 打破了那些想法。
+ * 無論如何，這邊呈現的演算法是目前為止的理解之累積，實務上應該足以應付絕大多數的情境。
  */
 //=================================================================
-export const stretchTask = new Task(stretch, configurationTask);
+export const stretchTask = new Task(stretch, patternTask);
 
 function stretch(): void {
 	const validJunctions = getValidJunctions();
-	checkAllCovering(validJunctions);
 
-	const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
-	grouping(uncoveredJunctions);
+	// 第一次分組；先分組有助於加快覆蓋檢查
+	const teams = grouping(validJunctions);
+
+	for(const team of teams) processTeam(team.$junctions);
 
 	for(const signature of State.$stretchDiff.$diff()) {
 		if(State.$isDragging) {
@@ -35,34 +47,72 @@ function stretch(): void {
 		State.$stretches.delete(signature);
 		State.$updateResult.remove.stretches.push(signature);
 	}
+
+	console.log(State.$stretches);
 }
 
-/** 分組演算法的主體 */
-function grouping(uncoveredJunctions: ValidJunction[]): void {
+/** 分組演算法 */
+function grouping(junctions: ValidJunction[]): Team[] {
 	const unionFind = new ListUnionFind<number>(
 		// 參與的 Quadrant 的數目最多就是 Junction 數目乘以二
-		uncoveredJunctions.length * 2
+		junctions.length * 2
 	);
 	const quadrantMap = new IntDoubleMap<ValidJunction>();
-	for(const j of uncoveredJunctions) {
+	for(const j of junctions) {
 		quadrantMap.set(j.$a.id, j.$b.id, j);
 		unionFind.$union(j.$q1, j.$q2);
 	}
 	const groups = unionFind.$list();
+	const result: Team[] = [];
 	for(const group of groups) {
-		const junctions: ValidJunction[] = [];
-		const ids = group.map(q => q >>> 2).sort(minComparator);
-		foreachPair(ids, (i, j) => {
-			const junction = quadrantMap.get(i, j);
-			if(junction) junctions.push(junction);
-		});
+		const $junctions: ValidJunction[] = [];
 
-		const signature = ids.join(",");
-		State.$stretchDiff.$add(signature);
-		const oldStretch = tryGetStretch(signature);
-		if(oldStretch) oldStretch.$update(junctions);
-		else State.$stretches.set(signature, new Stretch(junctions));
+		// 在一些少見的情況中，單一個角片可能會兩個相對的象限都出現在同一個群組中，
+		// 所以有可能角片的 id 會重複，基於正確性這邊還是必須加以檢查。
+		const $flaps = distinct(group.map(q => q >>> 2).sort(minComparator));
+
+		foreachPair($flaps, (i, j) => {
+			const junction = quadrantMap.get(i, j);
+			if(junction) $junctions.push(junction);
+		});
+		result.push({ $junctions, $flaps });
 	}
+	return result;
+}
+
+/** 處理第一分組階段整理出來的 {@link Team} */
+function processTeam(junctions: ValidJunction[]): void {
+	// 檢查覆蓋
+	const uncoveredJunctions = getUncoveredJunctions(junctions);
+	if(uncoveredJunctions.length === 1) {
+		const { $a, $b } = uncoveredJunctions[0];
+		createOrUpdateStretch({
+			$flaps: [$a.id, $b.id],
+			$junctions: uncoveredJunctions,
+		});
+	} else {
+		// 第二次進行分組
+		const teams = grouping(uncoveredJunctions);
+		for(const team of teams) createOrUpdateStretch(team);
+	}
+}
+
+/** 篩選出沒有被覆蓋的 {@link ValidJunction}；這些是真的會被用來計算伸展模式的 */
+function getUncoveredJunctions(junctions: ValidJunction[]): ValidJunction[] {
+	if(junctions.length === 1) return junctions;
+	const keys = new Set<number>();
+	junctions.forEach(j => keys.add(getKey(j.$a.id, j.$b.id)));
+	foreachPair(junctions, (j1, j2) => checkCovering(j1, j2, keys));
+	return junctions.filter(j => !j.$isCovered);
+}
+
+/** 根據 {@link Team} 的角片結構來適度更新或創造新的 {@link Stretch} */
+function createOrUpdateStretch(team: Team): void {
+	const signature = team.$flaps.join(",");
+	State.$stretchDiff.$add(signature);
+	const oldStretch = tryGetStretch(signature);
+	if(oldStretch) oldStretch.$update(team.$junctions);
+	else State.$stretches.set(signature, new Stretch(team.$junctions));
 }
 
 /** 根據簽章試著找出既有的 {@link Stretch}（包括暫存的） */
@@ -74,14 +124,6 @@ function tryGetStretch(signature: string): Stretch | undefined {
 		if(result) State.$stretches.set(signature, result);
 	}
 	return result;
-}
-
-/**
- * 檢查覆蓋。這邊並沒有採用太高級的動態演算法，而是每一個回合都全部重新計算，
- * 這個固然可能有改進空間，但此處遠遠不是效能瓶頸所在，所以先不管那麼多。
- */
-function checkAllCovering(junctions: ValidJunction[]): void {
-	foreachPair(junctions, (j1, j2) => checkCovering(j1, j2));
 }
 
 /** 收集所有合法的 {@link Junction}，並且重設它們的覆蓋狀態 */
@@ -97,9 +139,7 @@ function getValidJunctions(): ValidJunction[] {
 }
 
 /** 檢查兩個 {@link Junction} 之間是否有覆蓋關係 */
-function checkCovering(j1: ValidJunction, j2: ValidJunction): void {
-	if(j1.$slash !== j2.$slash) return;
-
+function checkCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): void {
 	const n = getPathIntersectionDistances(j1, j2);
 	if(!n) return;
 	const r1 = j1.$getBaseRectangle(n[0]);
@@ -110,10 +150,22 @@ function checkCovering(j1: ValidJunction, j2: ValidJunction): void {
 		if(j1.$isCloserThan(j2)) j2.$setCoveredBy(j1);
 		else j1.$setCoveredBy(j2);
 	} else if(r1.$contains(r2)) {
-		j2.$setCoveredBy(j1);
+		if(!checkCoveringException(j1, j2, keys)) j2.$setCoveredBy(j1);
 	} else if(r2.$contains(r1)) {
-		j1.$setCoveredBy(j2);
+		if(!checkCoveringException(j1, j2, keys)) j1.$setCoveredBy(j2);
 	}
+}
+
+/**
+ * 這是實務上很罕見、但基於理論正確性必須做的一個例外檢查；
+ * 當兩個可能互相覆蓋的 {@link ValidJunction} 左右其中一側參與的兩個角片之間再度又有 {@link ValidJunction} 的時候，
+ * 此時不應該視為覆蓋。
+ */
+function checkCoveringException(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): boolean {
+	const [a1, b1] = j1.$orientedIds;
+	const [a2, b2] = j2.$orientedIds;
+	return a1 !== a2 && keys.has(getKey(a1, a2)) ||
+		b1 !== b2 && keys.has(getKey(b1, b2));
 }
 
 /** 找出對應路徑上的一個共用點，並且傳回兩個 {@link Junction.$a} 到該點的距離（基準距離） */

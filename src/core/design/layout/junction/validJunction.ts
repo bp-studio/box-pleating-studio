@@ -5,7 +5,7 @@ import { CornerType } from "shared/json/enum";
 
 import type { JJunction } from "shared/json";
 import type { ITreeNode } from "core/design/context";
-import type { QuadrantDirection, SlashDirection } from "shared/types/direction";
+import type { QuadrantDirection } from "shared/types/direction";
 
 interface ValidJunctionData {
 	lca: ITreeNode;
@@ -36,9 +36,6 @@ export class ValidJunction implements ISerializable<JJunction> {
 
 	/** 兩個角片的 LCA */
 	public readonly $lca: ITreeNode;
-
-	/** 斜向 */
-	public readonly $slash: SlashDirection;
 
 	/** {@link $a} 對應的象限代碼 */
 	public readonly $q1: number;
@@ -71,10 +68,8 @@ export class ValidJunction implements ISerializable<JJunction> {
 		this._f = data.f;
 		this._tip = data.tip;
 
-		const { dir } = data;
-		this.$slash = dir % 2;
-		this.$q1 = a.id << 2 | dir;
-		this.$q2 = b.id << 2 | opposite(dir);
+		this.$q1 = a.id << 2 | data.dir;
+		this.$q2 = b.id << 2 | opposite(data.dir);
 	}
 
 	toJSON(): JJunction {
@@ -94,6 +89,11 @@ export class ValidJunction implements ISerializable<JJunction> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 公開方法
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get $orientedIds(): [number, number] {
+		const [a, b] = [this.$a.id, this.$b.id];
+		return this._f.x > 0 ? [a, b] : [b, a];
+	}
 
 	/**
 	 * 自身是否被另外一個 {@link ValidJunction}「實質上」覆蓋。

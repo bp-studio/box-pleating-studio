@@ -34,7 +34,6 @@ i[[invalid\njunctions]]
 subgraph Stretch pattern
 	s(stretches)
 	sc[[stretch/repo\nclean up]]
-	c(configurations)
 	p(patterns)
 end
 subgraph Contour
@@ -48,6 +47,6 @@ b & L --> d
 d & F --> a --> rc --> fc
 a --> j --> i & s
 D --------> sc
-s --> c --> p
+s --> p
 p & P --> pc --> fc
 ```

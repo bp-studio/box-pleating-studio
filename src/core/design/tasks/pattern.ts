@@ -3,11 +3,11 @@ import { Task } from "./task";
 
 //=================================================================
 /**
- * {@link configurationTask} 負責尋找出可能的組態。
+ * {@link patternTask} 負責尋找出可能的組態。
  */
 //=================================================================
-export const configurationTask = new Task(configuration);
+export const patternTask = new Task(pattern);
 
-function configuration(): void {
+function pattern(): void {
 	for(const repo of State.$newRepositories.values()) repo.$init();
 }
