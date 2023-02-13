@@ -193,6 +193,9 @@
 			"onlyOne": "只找到了一种折痕模式"
 		}
 	},
+	"status": {
+		"invalid": "无效重叠"
+	},
 	"share": {
 		"title": "分享项目",
 		"copy": "复制",

@@ -1,6 +1,10 @@
+import { dist } from "shared/types/geometry";
+
+import type { Contour, Path, Polygon } from "shared/types/geometry";
 import type { Graphics } from "@pixi/graphics";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
-import type { Contour, Path, Polygon } from "shared/types/geometry";
+
+const THRESHOLD = 0.4;
 
 export type GraphicsLike = Graphics | SmoothGraphics;
 
@@ -57,10 +61,16 @@ function drawPath(graphics: GraphicsLike, path: Path): void {
 }
 
 /** 填滿可能有弧線的多邊形 */
-export function drawArcPolygon(graphics: GraphicsLike, polygon: Polygon, color: number): void {
+export function drawArcPolygon(graphics: SmoothGraphics, polygon: Polygon, color: number): void {
 	for(const path of polygon) {
-		graphics.beginFill(color);
 		if(!path.length) return;
+
+		// 根據形狀的狹窄程度來決定繪製的線條粗度
+		const narrowness = getNarrowness(path);
+		if(narrowness < THRESHOLD) graphics.lineStyle(2 / narrowness, color);
+		else graphics.lineStyle(0);
+
+		graphics.beginFill(color);
 		graphics.moveTo(path[0].x, path[0].y);
 		for(let i = 1; i < path.length; i++) {
 			const p = path[i];
@@ -72,4 +82,11 @@ export function drawArcPolygon(graphics: GraphicsLike, polygon: Polygon, color: 
 		graphics.closePath();
 		graphics.endFill();
 	}
+}
+
+/** 對於兩個弧線組成的路徑，傳回形狀的狹窄程度 */
+function getNarrowness(path: Path): number {
+	if(path.length > 2) return NaN;
+	const [p1, p2] = path;
+	return dist(p1.arc!, p2.arc!) / dist(p1, p2);
 }

@@ -193,6 +193,9 @@
 			"onlyOne": "Chỉ có một mẫu được tìm thấy."
 		}
 	},
+	"status": {
+		"invalid": "chồng chéo không hợp lệ"
+	},
 	"share": {
 		"title": "Chia sẻ dự án",
 		"copy": "Sao chép",

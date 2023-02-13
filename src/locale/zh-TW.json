@@ -193,6 +193,9 @@
 			"onlyOne": "只找到了一種摺痕模式"
 		}
 	},
+	"status": {
+		"invalid": "無效重疊"
+	},
 	"share": {
 		"title": "分享專案",
 		"copy": "複製",

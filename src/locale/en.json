@@ -193,6 +193,9 @@
 			"onlyOne": "Only one pattern is found."
 		}
 	},
+	"status": {
+		"invalid": "Invalid overlaps"
+	},
 	"share": {
 		"title": "Share project",
 		"copy": "Copy",

@@ -8,14 +8,17 @@
 				</span>
 			</div>
 			<template v-if="Studio.project.design.mode == 'layout'">
-				<div style="width: 90px;">
+				<div style="width: 100px;">
 					{{ $t("panel.flaps.type") }}: {{ flapCount }}
 				</div>
-				<div style="width: 90px;">
+				<div style="width: 100px;">
 					{{ $t("panel.rivers.type") }}: {{ Studio.project.design.layout.riverCount }}
 				</div>
+				<div style="width: 200px;" v-if="Studio.project.design.layout.invalidCount">
+					{{ $t("status.invalid") }}: {{ Studio.project.design.layout.invalidCount }}
+				</div>
 			</template>
-			<div v-else style="width: 180px;">
+			<div v-else style="width: 200px;">
 				{{ $t("panel.vertices.type") }}: {{ vertexCount }}
 			</div>
 		</div>

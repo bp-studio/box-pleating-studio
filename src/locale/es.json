@@ -193,6 +193,9 @@
 			"onlyOne": "Solo se encuentra un patrón."
 		}
 	},
+	"status": {
+		"invalid": "Superposiciones no válidas"
+	},
 	"share": {
 		"title": "Compartir proyecto",
 		"copy": "Copiar",

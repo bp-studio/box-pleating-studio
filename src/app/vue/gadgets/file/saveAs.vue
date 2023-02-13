@@ -46,11 +46,13 @@
 			else emit("save", handle);
 			return true;
 		} catch(e) {
-			// 使用者取消的話會跑到這邊來
-			// if(handle && "remove" in handle && typeof handle.remove == "function") {
-			// 	// 新的 API，預定 Chrome 110 會加入
-			// 	handle.remove();
-			// }
+			// 使用者取消或者儲存過程出錯的話會跑到這邊來
+			try {
+				// 新的 API，Chrome 110 加入
+				if(handle && "remove" in handle && typeof handle.remove == "function") {
+					handle.remove();
+				}
+			} catch(e) { }
 			return false;
 		}
 	}

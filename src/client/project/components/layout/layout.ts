@@ -29,6 +29,7 @@ export class Layout implements ISerializable<JLayout> {
 
 	@shallowRef public flapCount: number = 0;
 	@shallowRef public riverCount: number = 0;
+	@shallowRef public invalidCount: number = 0;
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
@@ -223,16 +224,14 @@ export class Layout implements ISerializable<JLayout> {
 				sg.alpha = JUNCTION_ALPHA;
 				this.$junctions.set(tag, sg);
 				junctionLayer.addChild(sg);
+				this.invalidCount++;
 			}
 			sg.clear();
 			drawArcPolygon(sg, model.add.junctions[tag], RED);
 		}
 		for(const tag of model.remove.junctions) {
-			const sg = this.$junctions.get(tag);
-			if(!sg) {
-				debugger;
-				continue;
-			}
+			const sg = this.$junctions.get(tag)!;
+			this.invalidCount--;
 			this.$junctions.delete(tag);
 			junctionLayer.removeChild(sg);
 			sg.destroy();
