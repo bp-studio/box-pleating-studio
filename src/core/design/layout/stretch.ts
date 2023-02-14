@@ -2,6 +2,7 @@ import { Repository } from "./repository";
 import { getStructureSignature } from "./junction/validJunction";
 import { State } from "core/service/state";
 
+import type { JStretch } from "shared/json";
 import type { ValidJunction } from "./junction/validJunction";
 
 //=================================================================
@@ -19,7 +20,7 @@ export class Stretch {
 	/** 當前的 {@link Repository} */
 	private _repo: Repository;
 
-	constructor(junctions: ValidJunction[]) {
+	constructor(junctions: ValidJunction[], prototype?: JStretch) {
 		const signature = getStructureSignature(junctions);
 		this._repo = new Repository(junctions, signature);
 	}

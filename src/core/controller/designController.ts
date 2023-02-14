@@ -1,6 +1,7 @@
 import { heightTask } from "core/design/tasks/height";
 import { Design } from "core/design/design";
 import { Processor } from "core/service/processor";
+import { State } from "core/service/state";
 
 import type { JDesign } from "shared/json";
 
@@ -16,6 +17,9 @@ namespace DesignController {
 	export function init(data: JDesign): void {
 		if(DEBUG_ENABLED) console.time("Design initializing");
 		Design.$create(data);
+		for(const s of data.layout.stretches) {
+			State.$stretchPrototypes.set(s.id, s);
+		}
 		Processor.$run(heightTask);
 		if(DEBUG_ENABLED) console.timeEnd("Design initializing");
 	}

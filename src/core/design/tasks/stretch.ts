@@ -28,9 +28,9 @@ interface Team {
  * 無論如何，這邊呈現的演算法是目前為止的理解之累積，實務上應該足以應付絕大多數的情境。
  */
 //=================================================================
-export const stretchTask = new Task(stretch, patternTask);
+export const stretchTask = new Task(stretches, patternTask);
 
-function stretch(): void {
+function stretches(): void {
 	const validJunctions = getValidJunctions();
 
 	// 第一次分組；先分組有助於加快覆蓋檢查
@@ -47,8 +47,6 @@ function stretch(): void {
 		State.$stretches.delete(signature);
 		State.$updateResult.remove.stretches.push(signature);
 	}
-
-	console.log(State.$stretches);
 }
 
 /** 分組演算法 */
@@ -111,8 +109,13 @@ function createOrUpdateStretch(team: Team): void {
 	const signature = team.$flaps.join(",");
 	State.$stretchDiff.$add(signature);
 	const oldStretch = tryGetStretch(signature);
-	if(oldStretch) oldStretch.$update(team.$junctions);
-	else State.$stretches.set(signature, new Stretch(team.$junctions));
+	if(oldStretch) {
+		oldStretch.$update(team.$junctions);
+	} else {
+		const prototype = State.$stretchPrototypes.get(signature);
+		const stretch = new Stretch(team.$junctions, prototype);
+		State.$stretches.set(signature, stretch);
+	}
 }
 
 /** 根據簽章試著找出既有的 {@link Stretch}（包括暫存的） */

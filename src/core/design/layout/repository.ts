@@ -1,5 +1,10 @@
 import { State } from "core/service/state";
+import { Store } from "./store";
+import { generalGenerator } from "./generators/generalGenerator";
+import { singleGenerator } from "./generators/singleGenerator";
 
+import type { JStretch } from "shared/json";
+import type { Configuration } from "./configuration";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
 
@@ -15,19 +20,26 @@ export class Repository {
 
 	public readonly $signature: string;
 
-	private _junctions: ValidJunction[];
+	private readonly _configurations: Store<Configuration>;
 
-	constructor(junctions: ValidJunction[], signature: string) {
-		this._junctions = junctions;
+	constructor(junctions: ValidJunction[], signature: string, prototype?: JStretch) {
 		this.$signature = signature;
 		State.$newRepositories.add(this);
+
+		if(junctions.length === 1) {
+			this._configurations = new Store(singleGenerator(junctions[0], prototype));
+		} else {
+			this._configurations = new Store(generalGenerator(junctions, prototype));
+		}
 	}
 
+	/** 找出第一個 {@link Pattern} 就停止 */
 	public $init(): void {
-		for(const j of this._junctions) j.$findStretch();
+		this._configurations.$next();
 	}
 
+	/** 在空檔時間當中把全部的 {@link Pattern} 都找出來 */
 	public $complete(): void {
-		//TODO
+		this._configurations.$rest();
 	}
 }

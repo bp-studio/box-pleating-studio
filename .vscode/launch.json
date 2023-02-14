@@ -12,6 +12,9 @@
 			"internalConsoleOptions": "neverOpen",
 			"file": "${workspaceFolder}/build/debug/index.htm",
 			"sourceMaps": true,
+			"skipFiles": [
+				"${workspaceFolder}/build/dist/lib/**"
+			],
 			"runtimeArgs": [
 				"--allow-file-access-from-files"
 			]

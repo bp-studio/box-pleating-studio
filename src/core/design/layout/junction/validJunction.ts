@@ -1,6 +1,5 @@
 import { Rectangle } from "core/math/rectangle";
 import { opposite } from "shared/types/direction";
-import { $generate } from "core/math/gops";
 import { CornerType } from "shared/json/enum";
 
 import type { JJunction } from "shared/json";
@@ -44,10 +43,10 @@ export class ValidJunction implements ISerializable<JJunction> {
 	public readonly $q2: number;
 
 	/** 角片尖點矩形的尺寸 */
-	private readonly _s: Readonly<IPoint>;
+	public readonly $s: Readonly<IPoint>;
 
 	/** 重疊區域的尺寸 */
-	private readonly _o: Readonly<IPoint>;
+	public readonly $o: Readonly<IPoint>;
 
 	/** {@link $a} 對應的尖點之所在 */
 	private readonly _tip: Readonly<IPoint>;
@@ -63,8 +62,8 @@ export class ValidJunction implements ISerializable<JJunction> {
 		this.$b = b;
 
 		this.$lca = data.lca;
-		this._s = data.s;
-		this._o = data.o;
+		this.$s = data.s;
+		this.$o = data.o;
 		this._f = data.f;
 		this._tip = data.tip;
 
@@ -80,9 +79,9 @@ export class ValidJunction implements ISerializable<JJunction> {
 				{ type: CornerType.$flap, e: this.$b.id, q: this.$q2 & MASK },
 				{ type: CornerType.$side },
 			],
-			ox: this._o.x,
-			oy: this._o.y,
-			sx: this._s.x,
+			ox: this.$o.x,
+			oy: this.$o.y,
+			sx: this.$s.x,
 		};
 	}
 
@@ -124,23 +123,14 @@ export class ValidJunction implements ISerializable<JJunction> {
 
 	/** 當比較矩形完全一樣大的時候，比較兩者的遠近 */
 	public $isCloserThan(that: ValidJunction): boolean {
-		return this._s.x < that._s.x || this._s.y < that._s.y;
+		return this.$s.x < that.$s.x || this.$s.y < that.$s.y;
 	}
 
 	/** 根據指定的距離基準來取得覆蓋比較矩形 */
 	public $getBaseRectangle(distanceToA: number): Rectangle {
 		const x = this._tip.x + distanceToA * this._f.x;
 		const y = this._tip.y + distanceToA * this._f.y;
-		return new Rectangle({ x, y }, { x: x - this._o.x * this._f.x, y: y - this._o.y * this._f.y });
-	}
-
-	/**
-	 * 在不考慮其它 {@link ValidJunction} 的情況下，
-	 * 先找出自己可能使用的伸展模式，然後才是看看這些模式之間能否融合。
-	 */
-	public $findStretch(): void {
-		const pieces = [...$generate(this._o.x, this._o.y, this._s.x)];
-		if(pieces.length == 0) console.log("no single");
+		return new Rectangle({ x, y }, { x: x - this.$o.x * this._f.x, y: y - this.$o.y * this._f.y });
 	}
 }
 

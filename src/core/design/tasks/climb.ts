@@ -14,7 +14,7 @@ import type { heightTask } from "./height";
  * @param set 更新起點的集合。
  * @param updater 節點更新器，傳回真值表示要繼續處理其父點。
  */
-export function climb<T extends ITreeNode>(updater: Func<T, boolean>, ...sets: ReadonlySet<T>[]): void {
+export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: ReadonlySet<T>[]): void {
 	const total = sets.reduce((v, s) => v + s.size, 0);
 	if(total === 0) return;
 	if(total === 1) {

@@ -2,6 +2,7 @@ import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/diff/diffDoubleSet";
 import { DiffSet } from "shared/data/diff/diffSet";
 
+import type { JStretch } from "shared/json";
 import type { Repository } from "core/design/layout/repository";
 import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";
@@ -29,6 +30,7 @@ export namespace State {
 		$flapAABBChanged.clear();
 		$flapChanged.clear();
 		$newRepositories.clear();
+		$stretchPrototypes.clear();
 		$rootChanged = false;
 	}
 
@@ -106,6 +108,9 @@ export namespace State {
 
 	/** 當前回合當中，新產生的 {@link Repository} */
 	export const $newRepositories = new Set<Repository>();
+
+	/** 當前回合當中，預期會產生的 {@link Stretch} 之原型 */
+	export const $stretchPrototypes = new Map<string, JStretch>();
 }
 
 State.$reset();

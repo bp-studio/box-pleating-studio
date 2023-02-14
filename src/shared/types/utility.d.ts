@@ -15,6 +15,11 @@ type Action<T = void> = (...args: any[]) => T;
 type Func<A, B> = (a: A) => B;
 
 /**
+ * 一個接受 `T` 並傳回真偽值的函數。
+ */
+type Predicate<T> = Func<T, boolean>;
+
+/**
  * 一個接受 `A` 的函數。
  */
 type Consumer<A> = Func<A, void>;
