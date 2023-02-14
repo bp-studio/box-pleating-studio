@@ -37,7 +37,17 @@ gulp.task("appDebug", () =>
 			const json = JSON.parse(content);
 			const root = path.resolve(".").replace(/\\/g, "/") + "/";
 			for(const i in json.sources) {
-				json.sources[i] = json.sources[i].replace(/\\/g, "/").replace(root, "");
+				json.sources[i] = json.sources[i]
+					.replace(/^vue-style:(.+)\?.+$/, "$1")
+					.replace(/\\/g, "/")
+					.replace(root, "");
+			}
+			for(let i = 0; i < json.sources.length; i++) {
+				if(json.sources[i - 1]?.endsWith(json.sources[i])) {
+					json.sources[i] = json.sources[i - 1];
+				} else if(json.sources[i + 1]?.endsWith(json.sources[i])) {
+					json.sources[i] = json.sources[i + 1];
+				}
 			}
 			return JSON.stringify(json);
 		})))
