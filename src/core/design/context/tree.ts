@@ -6,34 +6,28 @@ import type { JEdge, JFlap } from "shared/json";
 
 //=================================================================
 /**
- * {@link Tree} 是一個 {@link Design} 中最底層的資料結構。
+ * {@link Tree} is the foundation of a {@link Design}.
  *
- * 這邊基於效能最佳化上的考量，並不將不同層面的樹狀功能分開來實作，
- * 而是全部時做在同一個類別裡面。
- *
- * 裡面有部份公開成員的型別比 {@link ITree} 介面宣告得要更加具體，
- * 這是為了測試的方便。
+ * Some of the public members have a type more specific than those
+ * declared in {@link ITree} for the sake of testing.
  */
 //=================================================================
 
 export class Tree implements ITree {
 
-	/**
-	 * 所有節點的陣列。
-	 * 請注意裡面可能有一些索引是被跳過的。
-	 */
+	/** The array of all nodes. Some indices are skipped. */
 	private readonly _nodes: (TreeNode | undefined)[];
 
-	/** 所有的葉點 */
+	/** All leaves. */
 	private readonly _leaves = new Set<TreeNode>();
 
-	/** 樹的根點 */
+	/** The root node of the tree. */
 	public $root!: TreeNode;
 
 	constructor(edges: JEdge[], flaps?: JFlap[]) {
 		this._nodes = new Array(edges.length + 1);
 
-		// 防呆載入所有的邊；傳入資料的順序無所謂
+		// Load all edges in a way that doesn't concern the ordering.
 		while(edges.length) {
 			const remain: JEdge[] = [];
 			let newEdgeAdded = false;
@@ -44,11 +38,11 @@ export class Tree implements ITree {
 					remain.push(e);
 				}
 			}
-			if(!newEdgeAdded) break; // 防呆
+			if(!newEdgeAdded) break; // fool-proof
 			edges = remain;
 		}
 
-		// 處理 AABB 結構
+		// Handles AABB
 		if(flaps) {
 			for(const flap of flaps) {
 				const node = this._nodes[flap.id];
@@ -61,16 +55,16 @@ export class Tree implements ITree {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public toJSON(): JEdge[] {
 		const result: JEdge[] = [];
 
-		// 這個佇列的實作未來可以考慮優化
+		// We could consider optimize this implementation in the future.
 		const queue: TreeNode[] = [this.$root];
 
-		// 根據當前的樹狀結構以 BFS 的方式輸出
+		// Output the tree by BFS
 		while(queue.length) {
 			const node = queue.shift()!;
 			for(const child of node.$children) {
@@ -81,7 +75,7 @@ export class Tree implements ITree {
 		return result;
 	}
 
-	/** 公開的節點陣列 */
+	/** Public node array. */
 	public get $nodes(): readonly (TreeNode | undefined)[] {
 		return this._nodes;
 	}
@@ -114,7 +108,7 @@ export class Tree implements ITree {
 		for(const flap of flaps) {
 			const node = this._nodes[flap.id];
 			const isLeaf = node && node.$isLeaf ||
-				// 這邊有一個小小的可能是刪除完點的瞬間、根點也是葉點
+				// It is possible that the root also becomes a leaf after deletion
 				node === this.$root && node.$children.$size === 1;
 			if(isLeaf) node.$setFlap(flap);
 		}
@@ -169,18 +163,18 @@ export class Tree implements ITree {
 		if(node.$isLeaf) State.$flapAABBChanged.add(node);
 	}
 
-	/** 設定一條邊並且傳回是否有加入新邊 */
+	/** Setup an edge and returns if a new edge is created. */
 	public $setEdge(n1: number, n2: number, length: number): boolean {
 		let N1 = this._nodes[n1], N2 = this._nodes[n2];
 
-		// 如果圖非空，那加入的邊一定至少要有一點已經存在
+		// If the tree is non-empty, one of the vertices must be present.
 		if(this.$root && !N1 && !N2) {
 			console.warn(`Adding edge (${n1},${n2}) disconnects the graph.`);
 			return false;
 		}
 
 		if(N1 && N2) {
-			// 如果邊已經存在，純粹更新長度
+			// If the edge already exists, update its length
 			if(N1.$parent == N2) N1.$length = length;
 			else if(N2.$parent == N1) N2.$length = length;
 			else console.warn(`Adding edge (${n1},${n2}) will cause circuit.`);
@@ -197,13 +191,13 @@ export class Tree implements ITree {
 		return true;
 	}
 
-	/** 傳回兩個節點在樹上的距離 */
+	/** Returns the distance between two nodes on the tree. */
 	public $dist(n1: TreeNode, n2: TreeNode): number {
 		return dist(n1, n2, this._lca(n1, n2));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _addLeaf(id: number, at?: TreeNode, length?: number): TreeNode {
@@ -222,13 +216,14 @@ export class Tree implements ITree {
 		State.$updateResult.remove.nodes.push(id);
 	}
 
-	/** 傳回兩個節點的 LCA */
+	/** Returns the LCA of two nodes. */
 	private _lca(n1: TreeNode, n2: TreeNode): TreeNode {
-		// 基底情況
+		// Base case
 		if(n1 == n2) return n1;
 
-		// 遞迴情況；這一段原本比較的是節點的深度，
-		// 但是其實比較節點的距離也是一樣的效果，而且可以少維護一個欄位。
+		// Recursive case. Originally this part compares the depths
+		// of the nodes, but in fact comparing the distance results the same,
+		// and we save ourselves the overhead of maintaining one extra field.
 		if(n1.$dist > n2.$dist) return this._lca(n1.$parent!, n2);
 		if(n2.$dist > n1.$dist) return this._lca(n1, n2.$parent!);
 		return this._lca(n1.$parent!, n2.$parent!);

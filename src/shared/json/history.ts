@@ -3,13 +3,13 @@ import type { DesignMode } from "./project";
 
 export interface JHistory {
 
-	/** 現在所在的位置 */
+	/** Current position */
 	index: number;
 
-	/** 上次存檔時的位置 */
+	/** Position on last saving */
 	savedIndex: number;
 
-	/** 所有的歷史記錄 */
+	/** All history records */
 	steps: JStep[];
 }
 
@@ -28,9 +28,9 @@ export interface JCommand {
 	readonly type: CommandType;
 
 	/**
-	 * 受影響的物件的 tag。
+	 * The tag of the effected object。
 	 *
-	 * 考量到 GC 的需求，{@link JCommand} 介面並不保留物件的參照。
+	 * Considering GC, {@link JCommand} doesn't keep the reference of the object.
 	 */
 	readonly tag: string;
 }

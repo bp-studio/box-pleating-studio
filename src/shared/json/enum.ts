@@ -18,18 +18,26 @@ export enum CommandType {
 	remove = 3,
 }
 
-/** 角落的連接型態 */
+/** The connection type of a corner */
 export enum CornerType {
-	/** 被其它 Overlap 內部連入 */
+	/** It is the connection target of another Overlap. */
 	$socket,
-	/** 內部連出到另一個 Overlap */
+	/** It connects to another Overlap. */
 	$internal,
-	/** 側角，也是連至樞紐線交點，不過由於位於最側邊的關係，在產生河道輪廓的時候可以無限延伸 */
+	/**
+	 * The side corner, which also connects to a hinge intersection.
+	 * However it could extend indefinitely since its on the very side.
+	 */
 	$side,
-	/** 連至樞紐線交點的角；此時 e 指的是參與交點的另一個 {@link Flap} 的 id */
+	/**
+	 * A corner that connects to a hinge intersection.
+	 * In this case, `e` refers to the id of the other flap involved.= */
 	$intersection,
-	/** 連至 {@link Flap} 的角 */
+	/** A conner that connects to a flap. */
 	$flap,
-	/** 這個角和另外一個 Overlap 的角落是重合的；這會使得當前的 Overlap 和對方屬於相同的 {@link Partition} */
+	/**
+	 * This corner coincides with another corner of another Overlap,
+	 * which makes the current overlap belong to the same Partition as the former.
+	 */
 	$coincide,
 }

@@ -12,28 +12,28 @@ import type { Polygon } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link PolyBool} 類別是多邊形布林運算的底層抽象形式。
+ * {@link PolyBool} is the base class of boolean operations on polygons.
  */
 //=================================================================
 
 export abstract class PolyBool {
 
-	/** 事件產生邏輯 */
+	/** Logic for event construction and comparison. */
 	protected readonly _provider: IEventProvider;
 
-	/** 事件佇列 */
+	/** Event queue. */
 	protected readonly _eventQueue: IHeap<SweepEvent>;
 
-	/** 當前掃描的狀態 */
+	/** The current state of sweeping. */
 	protected readonly _status: IBinarySearchTree<StartEvent>;
 
-	/** 交點判斷邏輯 */
+	/** Logic for finding intersections. */
 	protected readonly _intersector: Intersector;
 
-	/** 最後組合邏輯 */
+	/** Logic for final assembling. */
 	protected readonly _chainer: Chainer;
 
-	/** 收集到的線段 */
+	/** The segments we collected during the course. */
 	protected readonly _collectedSegments: ISegment[] = [];
 
 	constructor(
@@ -59,38 +59,38 @@ export abstract class PolyBool {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 處理一個終點事件 */
+	/** Process an {@link EndEvent} */
 	protected abstract _processEnd(event: EndEvent): void;
 
 	/**
-	 * 在初始化過程中加入一條邊
-	 * @param segment 線段本身
-	 * @param isEntering 這條邊是否正在進入其對應的多邊形
+	 * Add a segment during initialization.
+	 * @param segment The segment itself.
+	 * @param isEntering Whether this segment is entering its corresponding polygon.
 	 */
 	protected _addSegment(segment: ISegment, delta: -1 | 1): void {
-		if(same(segment.$start, segment.$end)) return; // 退化邊不採用
+		if(same(segment.$start, segment.$end)) return; // Skip degenerated segments
 		const [startPoint, endPoint] = delta === 1 ?
 			[segment.$start, segment.$end] : [segment.$end, segment.$start];
 
-		// 產生掃描事件
+		// Create sweep events
 		const startEvent = this._provider.$createStart(startPoint, segment, delta);
 		const endEvent = this._provider.$createEnd(endPoint, segment);
 		endEvent.$other = startEvent;
 		startEvent.$other = endEvent;
 
-		// 加入事件
+		// Add events
 		this._eventQueue.$insert(startEvent);
 		this._eventQueue.$insert(endEvent);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 處理一個起點事件 */
+	/** Process a {@link StartEvent}. */
 	private _processStart(event: StartEvent): void {
 		this._status.$insert(event, event);
 		const prev = this._status.$getPrev(event);
@@ -98,18 +98,20 @@ export abstract class PolyBool {
 		const inserted = this._intersector.$process(prev, event, next);
 
 		if(!inserted) {
-			// 只有當沒有事件被插入的時候才能處理內部旗標
+			// Process inside flag only when there's no event being inserted.
 			this._setInsideFlag(event, prev);
 		} else {
-			// 否則就把事件重新放回佇列，並且待會再次處理。
-			// 注意再次處理的時候還是一樣要把上面的流程再走一次而不能偷懶，
-			// 因為少數情況中它有可能會跟新的 prev next 也有交點。
+			// Otherwise we put the event back into the queue,
+			// and process it again later. Note that in edge cases,
+			// we will still have to repeat the same process above without cheating,
+			// since it is possible that it also have intersections with the
+			// new prev/next events.
 			this._eventQueue.$insert(event);
 		}
 	}
 
 	private _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
-		// 如果前一條線剛剛才離開，那自己就應該要是外圍
+		// If the previous segment just exited, then the current segment should be on the boundary.
 		if(prev && prev.$wrapCount != 0) {
 			event.$wrapCount += prev.$wrapCount;
 			event.$isInside = event.$wrapCount != 0;

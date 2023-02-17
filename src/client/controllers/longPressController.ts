@@ -4,7 +4,7 @@ const TIMEOUT = 750;
 
 //=================================================================
 /**
- * {@link LongPressController} 負責管理觸控長壓的行為。
+ * {@link LongPressController} manages the long press behavior on touch devices.
  */
 //=================================================================
 
@@ -14,7 +14,7 @@ export namespace LongPressController {
 
 	export let $triggered: boolean = false;
 
-	/** 長壓設置 */
+	/** Setup long press. */
 	export function $init(): void {
 		$triggered = false;
 		const callback = options.onLongPress;
@@ -25,7 +25,7 @@ export namespace LongPressController {
 		}, TIMEOUT);
 	}
 
-	/** 取消長壓；這個除了會在滑鼠或觸控放開時自動執行之外也可以手動呼叫 */
+	/** Cancel long press. */
 	export function $cancel(): void {
 		if(_timeout !== undefined) clearTimeout(_timeout);
 		_timeout = undefined;

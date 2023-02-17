@@ -5,7 +5,7 @@ import type { Ref } from "vue";
 
 type Setter<T> = (v: T) => boolean;
 
-/** 把一個欄位自動實作成 Vue 的 {@link shallowRef} */
+/** Make a field into {@link shallowRef} in Vue */
 function shallowRefDecorator<T>(setter: Setter<T>): PropertyDecorator;
 function shallowRefDecorator(target: object, name: string | symbol): void;
 function shallowRefDecorator(...p: [object, string | symbol] | [Setter<unknown>]): PropertyDecorator | void {
@@ -13,7 +13,7 @@ function shallowRefDecorator(...p: [object, string | symbol] | [Setter<unknown>]
 	else return (target: object, name: string | symbol) => refDecoratorCore(shallowRef, target, name, p[0]);
 }
 
-/** 把一個欄位自動實作成 Vue 的 {@link ref} */
+/** Make a field into {@link ref} in Vue */
 function refDecorator<T>(setter: Setter<T>): PropertyDecorator;
 function refDecorator(target: object, name: string | symbol): void;
 function refDecorator(...p: [object, string | symbol] | [Setter<unknown>]): PropertyDecorator | void {

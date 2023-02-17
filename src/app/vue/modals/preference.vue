@@ -41,7 +41,7 @@
 						</Toggle>
 						<Toggle v-model="Settings.includeHiddenElement">{{ $t('preference.includeHidden') }}</Toggle>
 					</div>
-					<!-- 利用 v-if 來每次都重置狀態 -->
+					<!-- Use v-if to reset its state every time -->
 					<div v-if="tab == 1" class="p-2 h-100">
 						<KeyTable />
 					</div>

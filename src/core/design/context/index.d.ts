@@ -8,27 +8,27 @@ export interface ITree extends ISerializable<JEdge[]> {
 
 	readonly $root: ITreeNode;
 
-	/** 增加一個新的葉點並傳回 */
+	/** Adds a new leaf and returns it */
 	$addLeaf(id: number, at: number, length: number): ITreeNode;
 
-	/** 刪除一個指定的葉點，並傳回成功與否 */
+	/** Deletes an leaf, and returns if the operation is successful */
 	$removeLeaf(id: number): boolean;
 
 	$setFlaps(flaps: JFlap[]): void;
 
-	/** 刪除指定的節點並且把它兩側的邊合為一 */
+	/** Delete a given node and join the two adjacent edges into one */
 	$join(id: number): void;
 
-	/** 將一個節點往上的邊分割成兩條邊並且插入一個新的節點 */
+	/** Split the parent edge of a node into two, and insert a new node*/
 	$split(id: number, at: number): void;
 
-	/** 把指定的節點往上跟它的父點合併 */
+	/** Merge the node with its parent */
 	$merge(id: number): void;
 
-	/** 更新指定節點往上的邊的長度 */
+	/** Update the length of the parent edge */
 	$setLength(id: number, length: number): void;
 
-	/** 傳回兩個節點在樹上的距離 */
+	/** Returns the distance of two nodes on the tree */
 	$dist(n1: ITreeNode, n2: ITreeNode): number;
 }
 
@@ -41,6 +41,6 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	readonly $isLeaf: boolean;
 	readonly $AABB: AABB;
 
-	/** 根據傳入的 {@link JFlap} 設定位置 */
+	/** Set the position by a given {@link JFlap} */
 	$setFlap(flap: JFlap): void;
 }

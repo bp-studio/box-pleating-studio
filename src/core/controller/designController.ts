@@ -7,13 +7,13 @@ import type { JDesign } from "shared/json";
 
 //=================================================================
 /**
- * {@link DesignController} 模組是管理專案的生成的控制器。
- * 專案的棄置無須煩惱，因為是整個 worker 一起直接棄置。
+ * {@link DesignController} manages the creation of a {@link Design}.
+ * There's no need for disposing, as everything will be disposed with the worker.
  */
 //=================================================================
 namespace DesignController {
 
-	/** 根據給定的資料初始化專案 */
+	/** Initialize a design by the given data. */
 	export function init(data: JDesign): void {
 		if(DEBUG_ENABLED) console.time("Design initializing");
 		Design.$create(data);

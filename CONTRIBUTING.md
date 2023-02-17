@@ -58,5 +58,5 @@ graph LR
 
 Refer to each of them for more details.
 
-Almost all comments in the source code are written in Chinese,
-which is slightly more intuitive for the author's train of thoughts; sorry about that 😅
+**All comments are now in English!**
+Feel free to contact me in any part of the code is unclear to you.

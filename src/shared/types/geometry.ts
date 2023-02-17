@@ -6,10 +6,10 @@ export interface IPointEx extends IPoint {
 
 export type Path = IPointEx[] & {
 
-	/** 在聯集的場合當中，紀錄這個路徑是從哪幾個多邊形合成出來的 */
+	/** In the use case of union, indicating from which polygons this path forms */
 	from?: number[];
 
-	/** 表示這個路徑是一個洞 */
+	/** Whether this path is a hole. */
 	isHole?: boolean;
 };
 
@@ -25,20 +25,20 @@ export function dist(p1: IPoint, p2: IPoint): number {
 	return Math.sqrt(dx * dx + dy * dy);
 }
 
-/** 輪廓格式，一組輪廓由一個外圍路徑加上若干的內部洞組成 */
+/** Contour format. a set of contours consists of an outer path plus a number of inner holes. */
 export type Contour = {
 
-	/** 輪廓的外圍路徑 */
+	/** Outer path of the contour. */
 	outer: Path;
 
-	/** 輪廓的內圍路徑，如果有的話 */
+	/** Inner holes of the contour, if any. */
 	inner?: Path[];
 
-	/** 表示這個輪廓是一個洞 */
+	/** Whether this contour is a hole itself. */
 	isHole?: boolean;
 };
 
-/** 先依 x 座標排序、再依 y 座標排序 */
+/** Sort first by x-coordinate, then by y-coordinate */
 export function xyComparator(p1: IPoint, p2: IPoint): number {
 	return p1.x - p2.x || p1.y - p2.y;
 }
@@ -48,7 +48,7 @@ export function toString(p: IPointEx): string {
 	return `(${p.x},${p.y})`;
 }
 
-/** 把一個多邊形的所有路徑方向顛倒並傳回新的多邊形 */
+/** Reverses the direction of all paths in a polygon and returns the new polygon */
 export function reverse(polygon: Polygon): Polygon {
 	return polygon.map(path => path.concat().reverse());
 }

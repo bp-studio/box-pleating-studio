@@ -4,9 +4,9 @@
 
 .scroll-shadow {
 	overflow-y: auto;
-	-webkit-overflow-scrolling: touch; /* Safari 上啟用動能捲動 */
+	-webkit-overflow-scrolling: touch; /* Use momentum-based scrolling on Safari */
 
-	/* Safari 13+ 不支援 local，先棄用這一段
+	/* local is not supported in Safari 13+, so we give up this part for now.
 	background-image:
 		linear-gradient(white 30%, rgba(255, 255, 255, 0)),
 		linear-gradient(rgba(255, 255, 255, 0), white 70%),

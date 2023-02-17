@@ -13,7 +13,7 @@ export interface KeyStore {
 
 //=================================================================
 /**
- * {@link CustomHotkeyService} 服務負責管理可以被自訂的快速鍵
+ * {@link CustomHotkeyService} is responsible for managing hotkeys that can be customized
  */
 //=================================================================
 namespace CustomHotkeyService {
@@ -46,13 +46,13 @@ namespace CustomHotkeyService {
 	document.body.addEventListener("keydown", e => onKey(e), { capture: true });
 
 	function onKey(e: KeyboardEvent): void {
-		// 忽略條件
+		// Condition for ignoring
 		if(document.querySelector(".modal-open") || e.metaKey || e.ctrlKey) return;
 
 		const find = findKey(toKey(e));
 		if(!find || !Studio.project) return;
 
-		// 防止觸發 Tab 的預設行為
+		// Prevent triggering the native behavior of the Tab key
 		e.preventDefault();
 
 		const [name, command] = find.split(".");
@@ -63,7 +63,7 @@ namespace CustomHotkeyService {
 	}
 
 	//TODO
-	/** 處理元件的移動 */
+	/** Processing control movement */
 	function handleMoveCommand(command: string): void {
 		const map: Record<string, DirectionKey> = {
 			u: "up",
@@ -74,7 +74,7 @@ namespace CustomHotkeyService {
 		Studio.dragByKey(map[command]);
 	}
 
-	/** 處理元件的導覽 */
+	/** Processing component navigation */
 	function handleNavigationCommand(command: string): void {
 		if(!Studio.project) return;
 		if(command == "d") return Studio.project.design.goToDual();
@@ -86,7 +86,7 @@ namespace CustomHotkeyService {
 		// else if(repo.entry) repo.entry.move(f);
 	}
 
-	/** 處理視圖的切換與縮放 */
+	/** Processing toggling and zooming of views */
 	function handleViewCommand(command: string): void {
 		if(!Studio.project) return;
 		const design = Studio.project.design;
@@ -99,7 +99,7 @@ namespace CustomHotkeyService {
 		}
 	}
 
-	/** 處理元件的尺寸變更 */
+	/** Processing size changes of components */
 	function handleDimensionCommand(command: string): void {
 		if(!Studio.project) return;
 		const f = command.endsWith("i") ? 1 : -1;

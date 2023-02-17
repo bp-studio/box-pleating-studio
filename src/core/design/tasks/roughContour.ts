@@ -9,8 +9,8 @@ import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
- * {@link roughContourTask} 負責更新 {@link TreeNode.$outerRoughContour}
- * 和 {@link TreeNode.$innerRoughContour}。
+ * {@link roughContourTask} updates {@link TreeNode.$outerRoughContour}
+ * and {@link TreeNode.$innerRoughContour}。
  */
 //=================================================================
 export const roughContourTask = new Task(roughContour);

@@ -7,20 +7,20 @@ import "app/style/main.scss";
 
 const TIME_TERMINATE = 100;
 
-// 禁用預設滾輪縮放功能
+// Disable native mouse wheel zooming
 document.addEventListener(
 	"wheel",
 	(event: WheelEvent) => {
 		if(event.ctrlKey || event.metaKey) event.preventDefault();
 	},
 	{
-		passive: false, // 明確指定以消除 console 警告
-		capture: true, // 全域優先捕獲事件
+		passive: false, // To silence console warning
+		capture: true, // To prioritize the handler
 	}
 );
 
 if(errMgr.ok()) {
-	// 初始化 app
+	// Initialize the app
 	const app = Vue.createSSRApp(App);
 	if(plugin) app.use(plugin);
 
@@ -29,12 +29,12 @@ if(errMgr.ok()) {
 			app.mount("#app");
 			await Core.init();
 
-			// 載入所有非關鍵資源
+			// Load all non-critical resources
 			await Lib.load();
 		} catch(e: unknown) {
 			if(e instanceof Error) errMgr.runErr = e.toString();
 		} finally {
-			if(errMgr.callback()) { // 第二檢查點
+			if(errMgr.callback()) { // Second checkpoint
 				setTimeout(() => window.onunhandledrejection = null, TIME_TERMINATE);
 			}
 		}

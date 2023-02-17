@@ -33,7 +33,7 @@ gulp.task("appDebug", () =>
 			sourceRoot: "../../",
 		}))
 		.pipe(iff(f => f.basename == "main.js.map" || f.basename == "main.css.map", through2(content => {
-			// 修正 Vue plugin 的 sourcemap 相對路徑輸出
+			// Fix the sourcemap relative path by Vue plugin
 			const json = JSON.parse(content);
 			const root = path.resolve(".").replace(/\\/g, "/") + "/";
 			for(const i in json.sources) {

@@ -13,17 +13,18 @@ const SHIFT_DELTA = 14;
 
 //=================================================================
 /**
- * {@link AAEventProvider} 類別負責生成與比較 AA 直線的事件。
+ * {@link AAEventProvider} generates and compares {@link SweepEvent}s for AA line segments.
  */
 //=================================================================
 
 export class AAEventProvider implements IEventProvider {
 
 	/**
-	 * 事件的下一個可用 id。
+	 * The next available id for the events.
 	 *
-	 * 值得注意的是根據這邊的編碼，id 最大只能是 2^14 = 16384，
-	 * 所以 {@link $reset} 在此格外重要，否則實體重複用個幾次就會爆掉了。
+	 * Note that by our encoding, the maximal value for id can only be 2^14 = 16384,
+	 * so {@link $reset} is exceptionally important here; otherwise things overflows
+	 * quickly after this instance gets reused for just a few times.
 	 */
 	private _nextId: number = 0;
 
@@ -54,10 +55,11 @@ const eventComparator: Comparator<SweepEvent> = (a, b) => {
 const statusComparator: Comparator<StartEvent> = (a, b) => a.$key - b.$key;
 
 /**
- * 為了加速比較，把若干的比較邏輯加以編碼成 32 位元整數，
- * 使得一次比較數字即可。這樣做大概可以增進 5% 的效能。
+ * To speed up comparison we encode the comparison logic into a 32-bit integer,
+ * so that a single comparison of numbers handles everything.
+ * Doing so can improve the performance for about 5%.
  *
- * 其位元組成由高到低為：
+ * The bits consist of, from high to low:
  * 15 bit	point.y
  * 1 bit	isStart
  * 1 bit	isHorizontal
@@ -68,21 +70,23 @@ function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1,
 	let hor = (segment as AALineSegment).$isHorizontal ? 1 : 0;
 	if(isStart) hor ^= 1;
 	return (
-		// 先依 y 座標排序
+		// Sort by y-coordinate first
 		point.y << SHIFT_Y |
 
-		// 同樣位置的事件中，終點事件優先
+		// for the events at the same location, end events goes first
 		isStart << SHIFT_START |
 
-		// 同位置類型的事件中，起點事件的水平邊優先於垂直邊、終點的情況則相反
+		// for the events at the same location and type,
+		// horizontal edges goes first for start events,
+		// and it will be the other way for end events.
 		hor << SHIFT_HOR |
 
-		// 同位置方向（亦即重疊）的起點事件中，進入邊優先於離開邊
-		// 如此一來 wrapCount 就不會一度變成零而導致誤判為外圍邊
+		// For overlapping start events, entering segment goes before exiting segment,
+		// so that wrapCount will not be temporarily zero and causes misjudgment.
 		(delta === 1 ? 0 : 1) << SHIFT_DELTA |
 
-		// 同類型的重疊事件就不用特別排序了；
-		// 特別注意到整體而言的排序不會受到邊細分的影響
+		// There's no need to sort in any particular ways for overlapping events of the same type;
+		// especially notice that the overall sorting is not effected by subdivision of segments.
 		id
 	);
 }

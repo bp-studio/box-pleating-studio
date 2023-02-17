@@ -8,52 +8,54 @@ export interface Node<K, V> {
 }
 
 export interface IBinarySearchTree<K, V = K> {
-	/** 插入指定的鍵值 */
+	/** Insert a key/value */
 	$insert(key: K, value: V): void;
 
-	/** 刪除特定鍵以及對應的值 */
+	/** Delete the given key and its corresponding value */
 	$delete(key: K): void;
 
-	/** 取得特定鍵對應的值 */
+	/** Returns the value of a given key */
 	$get(key: K): V | undefined;
 
-	/** 取得特定鍵之前的上一個值 */
+	/** Returns the previous value before the given key */
 	$getPrev(key: K): V | undefined;
 
-	/** 取得特定鍵之後的下一個值 */
+	/** Returns the next value after the given key */
 	$getNext(key: K): V | undefined;
 
-	/** 這個二元樹是否為空 */
+	/** If the binary tree is empty */
 	readonly $isEmpty: boolean;
 }
 
 //=================================================================
 /**
- * {@link BinarySearchTree} 是 {@link IBinarySearchTree} 的底層實作，
- * 提供了一些所有 BST 所共有的功能。
+ * {@link BinarySearchTree} is the underlying implementation of {@link IBinarySearchTree}
+ * and provides some common functionalities of all BSTs.
  *
- * 所有空的節點都有一個實體的節點 {@link _nil} 來代表，
- * 藉此節省一些判別的成本。
+ * All empty nodes are represented by a physical node {@link _nil},
+ * which saves some costs in decision-making.
  */
 //=================================================================
 
 export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IBinarySearchTree<K, V> {
 
-	/** NIL 節點的實體 */
+	/** Instance of the NIL node */
 	protected readonly _nil: N;
 
-	/** 鍵的全序比較器 */
+	/** Total-order comparator of the keys */
 	protected readonly _comparator: Comparator<K>;
 
-	/** 根節點 */
+	/** Root node */
 	protected _root: N;
 
 	/**
-	 * 快取最後一次被查找的節點。
-	 * 這個機制可以簡化 prev/next 的 API、加速刪除的效能、並改進封裝。
+	 * Cache the last node that was searched.
+	 * This mechanism can simplify the API for prev/next,
+	 * improve deletion performance, and improve encapsulation.
 	 *
-	 * 實作的時候必須要小心處理 {@link $delete} 以及 {@link _replaceKeyValue} 的情況，
-	 * 這個機制才會正確運作。
+	 * When implementing this, it is important to handle the cases of
+	 * {@link $delete} and {@link _replaceKeyValue} with care,
+	 * so that this mechanism can function correctly.
 	 */
 	protected _lastQueriedNode: N;
 
@@ -107,11 +109,11 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _getNode(key: K): N {
-		// 可以的話就直接傳回快取節點
+		// If possible, return the cached node directly.
 		if(this._lastQueriedNode.$key === key) return this._lastQueriedNode;
 		return this._lastQueriedNode = this._getNodeCore(key);
 	}
@@ -132,7 +134,7 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	}
 
 	/**
-	 * 二元樹的右旋轉：
+	 * Right rotation:
 	 *     4        2
 	 *    / \      / \
 	 *   2   5 => 1   4
@@ -147,7 +149,7 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	}
 
 	/**
-	 * 二元樹的左旋轉：
+	 * Left rotation:
 	 *   2          4
 	 *  / \        / \
 	 * 1   4  =>  2   5
@@ -161,23 +163,23 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 		return x;
 	}
 
-	/** 找出最小子孫 */
+	/** Find the minimal descendant */
 	protected _min(n: N): N {
 		while(n.$left !== this._nil) n = n.$left;
 		return n;
 	}
 
-	/** 找出最大子孫 */
+	/** Find the maximal descendant */
 	protected _max(n: N): N {
 		while(n.$right !== this._nil) n = n.$right;
 		return n;
 	}
 
-	/** 把一個節點的鍵值替換成另一個節點的鍵值，並傳回後者 */
+	/** Replace key/value of a node by those of another node, and return the latter */
 	protected _replaceKeyValue(n: N, by: N): N {
 		n.$value = by.$value;
 		(n as Writeable<Node<K, V>>).$key = by.$key;
-		if(this._lastQueriedNode === by) this._lastQueriedNode = n; // 這邊要小心！
+		if(this._lastQueriedNode === by) this._lastQueriedNode = n; // Be careful!
 		return by;
 	}
 }

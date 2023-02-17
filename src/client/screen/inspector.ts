@@ -14,7 +14,7 @@ declare global {
 }
 
 /**
- * 這個函數在偵錯環境之中向 PIXI 檢閱工具進行註冊。
+ * Register Pixi inspection tool in the debug environment.
  */
 export function setupInspector(): void {
 	if(!window.__PIXI_INSPECTOR_GLOBAL_HOOK__) return;

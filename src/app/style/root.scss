@@ -5,7 +5,7 @@
 }
 
 * {
-	/* 這個不相容性在 app.vue 裡面有加上對策 */
+	/* We handle incompatibility in app.vue */
 	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 	touch-action: none;
 }
@@ -50,7 +50,7 @@ body.mac .not-mac {
 }
 
 /*********************************************
- * 禁止長按選取
+ * Disable long-press selecting
  *********************************************/
 
 *:not(input, textarea, .requirement) {
@@ -61,12 +61,12 @@ body.mac .not-mac {
 }
 
 /*********************************************
- * 表單元件設定
+ * Setup form components
  *********************************************/
 
 ::-webkit-inner-spin-button,
 ::-webkit-outer-spin-button {
-	/* Chrome, Safari, Edge, Opera 中隱藏 spinner */
+	/* hide spinner in Chrome, Safari, Edge, Opera */
 	-webkit-appearance: none;
 	display: none;
 }
@@ -76,7 +76,7 @@ input {
 	touch-action: manipulation;
 
 	&[type="number"] {
-		/* Firefox 中隱藏 spinner */
+		/* hide spinner in Firefox */
 		-moz-appearance: textfield;
 	}
 

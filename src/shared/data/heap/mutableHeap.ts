@@ -2,23 +2,26 @@ import { BinaryHeap } from "./binaryHeap";
 
 //=================================================================
 /**
- * {@link MutableHeap} 是可變動的堆積資料結構，支援對已經加入的資料進行更新或移除。
+ * {@link MutableHeap} is a heap that allows updating or removing of elements.
  */
 //=================================================================
 
 export class MutableHeap<T extends object> extends BinaryHeap<T> {
 
 	/**
-	 * 索引 map，對於傳入的元素進行索引位置的反查。
+	 * Index map, which performs a reverse lookup of the index position of the incoming element.
 	 *
-	 * 這邊採用 {@link WeakMap} 看似牛刀，但其實 JavaScript 引擎在這部份有很強的優化，
-	 * 就算直接在元素上利用 {@link Symbol} 來儲存反查索引其實也幾乎是一樣的效能。
-	 * 另外，此處因為只在乎映射關係，用 {@link WeakMap} 的效能會比 {@link Map} 要好。
+	 * The use of {@link WeakMap} here seems to be overkill,
+	 * but in fact the JavaScript engine has a strong optimization in this part,
+	 * and using {@link Symbol} directly on the element to store the reverse lookup
+	 * index is actually almost of the same performance.
+	 * In addition, because we only care about the mapping relationship here,
+	 * the performance of using {@link WeakMap} will be better than {@link Map}.
 	 */
 	private readonly _indices = new WeakMap<T, number>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public override $insert(value: T): void {
@@ -47,7 +50,7 @@ export class MutableHeap<T extends object> extends BinaryHeap<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _swap(a: number, b: number): void {

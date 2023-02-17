@@ -5,24 +5,29 @@ import type { DisposableEventMap } from "shared/classes/disposable";
 
 //=================================================================
 /**
- * {@link Mountable} 是可掛載元件。「掛載」是指載入到當前的 {@link Studio} 的動作。
+ * {@link Mountable} is a component that can be mounted.
+ * "Mounting" refers to the action of loading it into view.
  *
- * 舉例來說，一個 Stretch 可能會計算出很多不同的 Pattern，
- * 但是同時只有一個 Pattern 會被掛載，其它的 Pattern 雖然暫時存在於記憶體中，
- * 並不會在畫面上建立控制項或是進行繪製。
+ * For example, a stretch may contain many different patterns,
+ * but only one pattern will be mounted at the same time.
+ * Although the other pattern exists in memory for the time being,
+ * they will not establish control items or draw on the screen.
  */
 //=================================================================
 abstract class Mountable extends Disposable {
 
 	private readonly _children: Mountable[] = [];
 
-	/** 自身相對於父物件是否為活躍。 */
+	/** Whether self is active relative to the parent object. */
 	private _active: boolean;
 
-	/** 父物件是否為空、或正在掛載中； */
+	/** Whether parent is `null` or is mounted. */
 	private _parentIsNullOrMounted: boolean;
 
-	/** 自身是否掛載中；這個值應等於 `this._active && this._parentIsNullOrMounted` */
+	/**
+	 * Whether self is mounted.
+	 * It should equal to `this._active && this._parentIsNullOrMounted`.
+	 */
 	private _mounted: boolean;
 
 	constructor(active: boolean = true) {
@@ -31,7 +36,10 @@ abstract class Mountable extends Disposable {
 		this._parentIsNullOrMounted = true;
 		this._mounted = this.$mounted;
 
-		/** {@link Mountable} 解構時預設就會把所有的子物件解構，不用另外呼叫。 */
+		/**
+		 * {@link Mountable} will dispose all children on disposing,
+		 * so there's no need to call disposing separately.
+		 */
 		this._onDispose(() => {
 			for(const child of this._children) {
 				child.$dispose();
@@ -50,7 +58,7 @@ abstract class Mountable extends Disposable {
 		return this._active;
 	}
 
-	/** 加入子物件；子物件的意義在於會跟著一起解構 */
+	/** Add child objects; the significance of child objects is that they will be disposed together. */
 	public $addChild(child: Mountable): void {
 		child._parentIsNullOrMounted = this.$mounted;
 		child._updateMountedState();
@@ -70,7 +78,9 @@ abstract class Mountable extends Disposable {
 	}
 
 	/**
-	 * 切換活躍狀態。這個動作並不會改變子物件的相對活躍狀態。
+	 * Toggle active state.
+	 *
+	 * This action does not change the relatively active state of child objects.
 	 */
 	public $toggle(active: boolean): void {
 		if(this.$disposed || this._active == active) return;
@@ -98,12 +108,12 @@ interface Mountable extends Disposable {
 export { Mountable };
 
 /**
- * 掛載狀態變更的事件，這個事件會往下連鎖觸發。
+ * The event for mounting state change. This event propagates downwards.
  */
 export const MOUNTED = "stateChanged:mounted";
 
 /**
- * 活躍狀態變更的事件；這個事件不會往下傳遞。
+ * The event for active state change. This event does not propagate downwards.
  */
 export const ACTIVE = "stateChanged:active";
 
@@ -112,7 +122,7 @@ interface MountableEventMap extends DisposableEventMap {
 	[ACTIVE]: StateChangedEvent;
 }
 
-/** 代表狀態改變的事件 */
+/** A state change event. */
 class StateChangedEvent extends Event {
 	constructor(type: string, public readonly state: boolean) {
 		super(type);

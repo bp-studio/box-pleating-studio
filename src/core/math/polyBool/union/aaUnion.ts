@@ -10,11 +10,11 @@ import type { Polygon } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link AAUnion} 類別負責計算一些 {@link Polygon} 的聯集，
- * 其前提是邊全都是 axis-aligned、且其 subpath 都有正確定向。
+ * {@link AAUnion} computes the union of certain {@link Polygon}s,
+ * with the premise that all edges are axis-aligned and all subpaths have been oriented.
  *
- * 基於效能考量，這個類別並不會針對這些條件進行檢查，
- * 所以如果輸入條件不符合要求將會產生無法預期的結果。
+ * For performance reasons, it does not check for these conditions,
+ * so unexpected results may occur if the input does not meet these conditions.
  */
 //=================================================================
 
@@ -25,17 +25,17 @@ export class AAUnion extends PolyBool {
 		(this._intersector as AAIntersector).$checkSelfIntersection = checkSelfIntersection;
 	}
 
-	/** 產生聯集的多邊形 */
+	/** Generates the polygon of the union. */
 	public override $get(...components: Polygon[]): Polygon {
 		this._initialize(components);
 		return super.$get();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 處理一個終點事件 */
+	/** Process an {@link EndEvent}. */
 	protected _processEnd(event: EndEvent): void {
 		const start = event.$other;
 		if(!start.$isInside) this._collectedSegments.push(start.$segment);
@@ -43,10 +43,10 @@ export class AAUnion extends PolyBool {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 載入所有初始的事件 */
+	/** Load all initial events. */
 	private _initialize(components: Polygon[]): void {
 		this._provider.$reset();
 		this._collectedSegments.length = 0;

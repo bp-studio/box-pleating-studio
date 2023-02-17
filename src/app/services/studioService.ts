@@ -9,26 +9,27 @@ import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
 
 /**
- * 將 Client 封裝在這個服務裡面，不暴露到 app 的其它部份。在 HTML 當中宣告。
+ * We encapsule the Client in this service so that it is not exposed in other parts of the app.
+ * Declared in HTML.
  */
 declare const bp: typeof Client;
 
-/** 在 Studio 尚未完成初始化之前先提供一個預設值頂著 */
+/** Before the Studio is initialized, use a default value as placeholder. */
 export function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
 	return computed(() => StudioService.initialized.value ? target() : defaultValue);
 }
 
 //=================================================================
 /**
- * {@link StudioService} 服務負責管理 BP Studio 的啟動與橋接
+ * {@link StudioService} manages the initialization of BP Studio and bridging.
  */
 //=================================================================
 namespace StudioService {
 
-	/** 是否已經完成了 Studio 初始化 */
+	/** If the Studio has been initialized. */
 	export const initialized = shallowRef(false);
 
-	/** 目前被選定的 {@link Project} */
+	/** The {@link Project} that is currently selected. */
 	export const project = proxy(() => {
 		const proj = bp.projects.current.value;
 		const title = proj?.design.title;
@@ -39,7 +40,7 @@ namespace StudioService {
 	export async function init(): Promise<void> {
 		await Promise.all(bpLibs.map(l => Lib.loadScript(l)));
 
-		// 設置串接
+		// Setup the bridges
 		bp.options.onLongPress = () => showPanel.value = true;
 		bp.options.onDrag = () => showPanel.value = false;
 		bp.options.onDeprecate = (title?: string) => {

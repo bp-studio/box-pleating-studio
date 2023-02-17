@@ -1,8 +1,9 @@
 import type { JProject, JLayout } from "shared/json";
 
 /**
- * beta 版把原本的 cp 模式改名為 layout 模式，以預留 cp 模式給未來使用，
- * 同時從 beta 版開始加上檔案版本代碼
+ * Version beta renamed "cp" mode to "layout" mode,
+ * so that "cp" mode could be used in the future.
+ * Also version code is included since version beta.
  */
 export default function $process(proj: Pseudo<JProject>): boolean {
 	if(proj.mode == "cp") proj.mode = "layout";

@@ -1,20 +1,22 @@
 import { Heap } from "./heap";
 
+import type { BinaryHeap } from "./binaryHeap";
+
 const TERNARY = 3;
 
 //=================================================================
 /**
- * {@link TernaryHeap} 是三元堆疊，其插入比二元堆疊快，但 pop 比較慢。
+ * {@link TernaryHeap} has faster insertion than {@link BinaryHeap}, but slower popping.
  */
 //=================================================================
 
 export class TernaryHeap<T> extends Heap<T> {
 
-	/** 儲存所有的元素。多元堆疊的索引從 0 開始。 */
+	/** All elements. The index starts from zero. */
 	protected readonly _data: T[] = [];
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $insert(value: T): void {
@@ -61,7 +63,7 @@ export class TernaryHeap<T> extends Heap<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _moveForwardRecursive(index: number): void {

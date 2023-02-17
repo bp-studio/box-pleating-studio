@@ -2,17 +2,17 @@ import { Heap } from "./heap";
 
 //=================================================================
 /**
- * {@link BinaryHeap} 是最常見的二元堆疊。
+ * {@link BinaryHeap} is the most common heap implementation.
  */
 //=================================================================
 
 export class BinaryHeap<T> extends Heap<T> {
 
-	/** 儲存所有的元素。跟一般的二元堆疊慣例一樣，這個陣列的索引故意從 1 開始。 */
+	/** All elements. The index starts at 1. */
 	protected readonly _data: T[] = [null!];
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $insert(value: T): void {
@@ -60,7 +60,7 @@ export class BinaryHeap<T> extends Heap<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _moveForwardRecursive(index: number): boolean {

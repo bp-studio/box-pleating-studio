@@ -22,7 +22,7 @@ const Y_DISPLACEMENT = 0.0625;
 
 //=================================================================
 /**
- * {@link Tree} 負責提供樹狀結構檢視當中可用的操作與相關邏輯
+ * {@link Tree} manges the operations and logics in the tree view.
  */
 //=================================================================
 export class Tree implements IAsyncSerializable<JTree> {
@@ -35,8 +35,9 @@ export class Tree implements IAsyncSerializable<JTree> {
 	public readonly $edges: IDoubleMap<number, Edge> = new ValuedIntDoubleMap();
 
 	/**
-	 * 目前在 {@link $vertices} 當中被跳過的索引，以便快速查找出可用編號。
-	 * 也許這邊用堆積有點太炫炮了，但何不呢？
+	 * Those indices that are skipped in the {@link $vertices}.
+	 * Used for obtaining available id quickly.
+	 * Maybe it's too fancy to use a heap here, but why not?
 	 */
 	private _skippedIdHeap: BinaryHeap<number> = new BinaryHeap<number>(minComparator);
 
@@ -46,7 +47,7 @@ export class Tree implements IAsyncSerializable<JTree> {
 
 		if(DEBUG_ENABLED) this.$sheet.$view.name = "TreeSheet";
 
-		// 建立跳號清單
+		// Create the list of skipped ids.
 		const ids: boolean[] = [];
 		for(const node of json.nodes) ids[node.id] = true;
 		if(ids.length > json.nodes.length) {
@@ -57,8 +58,9 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	public async toJSON(): Promise<JTree> {
-		// 邊的集合跟 Core 進行請求，因為只有 Core 知道樹的樹根之所在、
-		// 從而能根據樹的定向來輸出最佳化的結果
+		// We request the Core for the edges,
+		// since only the Core knows the orientation of the tree,
+		// and is able to generate the optimized result.
 		return {
 			sheet: this.$sheet.toJSON(),
 			nodes: this.$vertices.filter(v => v).map(v => v!.toJSON()),
@@ -67,7 +69,7 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get isMinimal(): boolean {
@@ -75,20 +77,20 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $update(model: UpdateModel): void {
 		const prototype = this.$project.design.$prototype.tree;
 
-		// 邊的刪除；因為順序上的緣故，這必須先處理
+		// Deleting edges. We have to handle it first.
 		for(const e of model.remove.edges) this._removeEdge(e);
 
-		// 節點
+		// Nodes
 		let vertexCount = this.vertexCount;
 		for(const id of model.add.nodes) {
 			const json = prototype.nodes.find(n => n.id == id) ??
-				{ id, name: "", x: 0, y: 0 }; // 防呆
+				{ id, name: "", x: 0, y: 0 }; // fool-proof
 			this._addVertex(json);
 			vertexCount++;
 		}
@@ -98,13 +100,13 @@ export class Tree implements IAsyncSerializable<JTree> {
 		}
 		this.vertexCount = vertexCount;
 
-		// 邊新增
+		// Adding edges.
 		for(const e of model.add.edges) this._addEdge(e);
 	}
 
 	public $addLeaf(at: Vertex, length: number): Promise<void> {
 		const id = this._nextAvailableId;
-		const p = this._findClosestEmptyPoint(at);
+		const p = this._findClosestEmptySpot(at);
 		const design = this.$project.design;
 		const prototype = design.$prototype;
 		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y });
@@ -176,31 +178,31 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 取得下一個可用的節點 id */
+	/** Get the next available id for {@link Vertex}. */
 	private get _nextAvailableId(): number {
 		if(this._skippedIdHeap.$isEmpty) return this.$vertices.length;
 		return this._skippedIdHeap.$pop()!;
 	}
 
-	/** 根據所有的頂點集，找出自身附近最近的空白處 */
-	private _findClosestEmptyPoint(at: Vertex): IPoint {
+	/** Find the close empty spot around the given {@link Vertex}. */
+	private _findClosestEmptySpot(at: Vertex): IPoint {
 		const { x, y } = at.$location;
 		const ref: IPoint = { x: x + X_DISPLACEMENT, y: y + Y_DISPLACEMENT };
 
-		// 建立既有頂點位置的索引
+		// Create an index for the position of all vertices
 		const occupied = new Set<number>();
 		for(const v of this.$vertices) {
 			if(v) occupied.add(v.$location.x << SHIFT | v.$location.y);
 		}
 
-		// 尋找空位
+		// Search for empty spot
 		const heap = new BinaryHeap<[IPoint, number]>((a, b) => a[1] - b[1]);
 		let r = 1;
 		while(heap.$isEmpty) {
-			// 這邊的迴圈設計是恰好遍歷所有 Chebyshev distance 為 r 的點
+			// The design of these loops make us traverse all points of Chebyshev distance r
 			for(let i = 0; i < SIDES; i++) {
 				for(let j = 0; j < 2 * r; j++) {
 					const f = i % 2 ? 1 : -1;
@@ -213,7 +215,11 @@ export class Tree implements IAsyncSerializable<JTree> {
 					}
 				}
 			}
-			r++; // r 遞增直到找到可放置處為止
+
+			// Increase r until we find one.
+			// Yes, in theory it is possible that the entire sheet is full...
+			// but come on, give me a break would you, Mr. QA?
+			r++;
 		}
 		return heap.$get()![0];
 	}
@@ -231,9 +237,12 @@ export class Tree implements IAsyncSerializable<JTree> {
 	}
 
 	/**
-	 * 模擬一次刪除的過程，傳回實際會被刪除的點、以及刪除之後變成了新葉點的父點。
+	 * Simulate the process of a round of deleting,
+	 * and returns those {@link Vertex Vertices} that are actually deleted,
+	 * and those parent Vertices that becomes new leaves.
 	 *
-	 * 如果使用者故意選取全部的節點來進行刪除，最後會是哪三個點被保留下來是無法預測的。
+	 * If the user deliberately select all vertices and hit delete,
+	 * there's no way to tell which three vertices will survive ahead of time.
 	 */
 	private _simulateDelete(vertices: Vertex[]): [number[], number[]] {
 		const result: number[] = [];

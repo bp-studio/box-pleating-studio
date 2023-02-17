@@ -2,7 +2,7 @@ import { reactive, readonly, watch } from "vue";
 
 import type { BpsLocale } from "shared/frontend/locale";
 
-// 建立 i18n；這邊的寫法考慮到 SSG
+// Create i18n instance. We also consider SSG here.
 export const plugin = typeof VueI18n !== "undefined" ?
 	VueI18n.createI18n<[BpsLocale], string>({
 		locale: "en",
@@ -11,12 +11,12 @@ export const plugin = typeof VueI18n !== "undefined" ?
 		messages: locale,
 	}) : null;
 
-// SSG 的情況中 i18n 會另外注入
+// In case of SSG, i18n instance will be injected separately.
 if(plugin) i18n = plugin.global;
 
 //=================================================================
 /**
- * {@link LanguageService} 服務負責管理初始執行時的語系判別以及相關設定之讀寫
+ * {@link LanguageService} determines locale on startup and manages related settings.
  */
 //=================================================================
 namespace LanguageService {

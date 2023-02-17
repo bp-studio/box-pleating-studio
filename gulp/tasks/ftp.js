@@ -38,7 +38,7 @@ gulp.task("cleanPub", () => seriesIf(
 		const inquirer = (await import("inquirer")).default;
 		const answers = await inquirer.prompt([{
 			type: "confirm",
-			message: "確定要清理正式版遠端資料夾？請確定已經執行過正式版發布。",
+			message: "Are you sure you want to cleanup the remote distribution folder? Be certain that the deploying is done.",
 			name: "ok",
 			default: false,
 		}]);
@@ -51,7 +51,8 @@ gulp.task("uploadPub", () => ftpFactory("bp", [config.dest.dist + "/.htaccess"])
 const devPipe = lazypipe()
 	.pipe(() => replace('<script async src="https://www.googletagmanager.com' +
 		'/gtag/js?id=G-GG1TEZGBCQ"></script>', ""))
-	// 在 Chrome PWA 當中，預設標題最好是跟 manifest 當中的一致，否則顯示的時候會出現額外的前綴
+	// It is better to make the default title the same as in the manifest for Chrome PWA,
+	// or there will be additional prefix on display.
 	.pipe(() => replace("<title>Box Pleating Studio</title>", "<title>BP Studio DEV</title>"));
 
 gulp.task("cleanDev", () => cleanFactory("bp-dev"));

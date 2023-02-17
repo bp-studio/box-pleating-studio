@@ -1,7 +1,7 @@
 
 //=================================================================
 /**
- * {@link Store} 類別負責管理一個給定的生成器的生成進度。
+ * {@link Store} manages the progress of a given {@link Generator}.
  */
 //=================================================================
 export class Store<T extends object> {

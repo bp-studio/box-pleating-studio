@@ -7,15 +7,15 @@ import type { Container } from "@pixi/display";
 
 //=================================================================
 /**
- * {@link View} 是具有視圖的元件。
+ * {@link View} is a component that draws on the screen.
  */
 //=================================================================
 export abstract class View extends Mountable {
 
-	/** 元件所包含的所有最上層容器 */
+	/** The top-level {@link Container}s of this component. */
 	private readonly _rootContainers: Container[] = [];
 
-	/** 視圖反應作用域 */
+	/** {@link ResumableEffectScope} of this {@link View}. */
 	private _drawScope?: ResumableEffectScope;
 
 	constructor(active: boolean = true) {
@@ -27,7 +27,7 @@ export abstract class View extends Mountable {
 		});
 
 		this.addEventListener(ACTIVE, event => {
-			// 各個最上層容器的可見與否取決於活躍狀態。
+			// Visibilities of the top-level containers depend on the active state.
 			this._rootContainers.forEach(view => view.visible = event.state);
 		});
 
@@ -38,9 +38,10 @@ export abstract class View extends Mountable {
 	}
 
 	/**
-	 * 新增最上層物件；這邊的實作隱約假定對於同一個物件只會呼叫一次。
+	 * Add a top-level object.
+	 * The implementation here assumes that the method is called only once for the same object.
 	 *
-	 * 所有的最上層物件都會在 {@link View} 解構的時候跟著自動解構。
+	 * All top-level objects gets disposed as the {@link View} disposes.
 	 */
 	protected $addRootObject<T extends Container>(object: T, target?: Container): T {
 		this._rootContainers.push(object);
@@ -49,9 +50,11 @@ export abstract class View extends Mountable {
 	}
 
 	/**
-	 * 註冊一些方法為反應式繪製方法；傳入的方法都會跟 this 綁定。
+	 * Register a reactive drawing method.
+	 * All passed-in methods will be bound to `this`.
 	 *
-	 * 請注意此方法只能呼叫一次。若再次呼叫，會覆寫掉前一次的設置。
+	 * Note that this method should be called only once.
+	 * If it is recalled, it overwrites the previous setups.
 	 */
 	protected $reactDraw(...actions: Action[]): void {
 		this._drawScope ??= new ResumableEffectScope();

@@ -2,16 +2,16 @@ import { same } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link Rectangle} 代表的是平面幾何上的一個位置明確的矩形。
+ * {@link Rectangle} represents a rectangle of a specific location on the plane.
  */
 //=================================================================
 
 export class Rectangle {
 
-	/** 矩形左下角的點 */
+	/** The lower left corner. */
 	private readonly p1: Readonly<IPoint>;
 
-	/** 矩形右上角的點 */
+	/** The upper right corner. */
 	private readonly p2: Readonly<IPoint>;
 
 	constructor(p1: IPoint, p2: IPoint) {

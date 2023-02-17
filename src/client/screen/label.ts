@@ -22,7 +22,8 @@ const HALF = 0.5;
 
 //=================================================================
 /**
- * {@link Label} 類別繼承自 PIXI 的 {@link Container} 類別，是繪製文字標籤的基準。
+ * {@link Label} derives from {@link Container} in Pixi.
+ * It is the standard of drawing text labels.
  */
 //=================================================================
 export class Label extends Container {
@@ -64,14 +65,14 @@ export class Label extends Container {
 	}
 
 	/**
-	 * 繪製文字標籤
-	 * @param text 要繪製的文字字串內容
-	 * @param x 繪製的參考座標
-	 * @param y 繪製的參考座標
-	 * @param direction 繪製的方向（不指定的話則由格線決定）
+	 * Draw a text label.
+	 * @param text The string content of the text
+	 * @param x The reference coordinate.
+	 * @param y The reference coordinate.
+	 * @param direction Drawing direction (if omitted, it will be decided by the grid)
 	 */
 	public $draw(text: string, x: number, y: number, direction?: Direction): void {
-		// 設定文字
+		// Setup text
 		text = text.trim();
 		this.visible = Boolean(text);
 		const dir = this.visible ? this._draw(text, x, y, direction) : Direction.none;
@@ -82,7 +83,7 @@ export class Label extends Container {
 			if(directionalOffsets[dir].x === 0) width /= 2;
 			const bounds = this._label.getLocalBounds().clone();
 
-			// 延遲設定以避免循環參照
+			// Delay the following to avoid circular references.
 			clearTimeout(this._timeout);
 			this._timeout = setTimeout(() => {
 				this._directionCache = dir;
@@ -93,12 +94,12 @@ export class Label extends Container {
 		}
 	}
 
-	/** 繪製文字標籤的核心方法 */
+	/** The core method of drawing text. */
 	private _draw(text: string, x: number, y: number, direction?: Direction): Direction {
 		this._label.text = text;
 		this._glow.text = text;
 
-		// 粗略定位
+		// Rough positioning
 		const s = ProjectService.scale.value;
 		this.scale = { x: 1 / s / SMOOTHNESS, y: -1 / s / SMOOTHNESS };
 		this.x = x;
@@ -107,19 +108,19 @@ export class Label extends Container {
 		this._label.scale.set(factor);
 		this._glow.scale.set(factor);
 
-		// 這邊 Label 本身是一個讓 _glow 和 _label 可以對齊中心的外部容器，
-		// 但是在定位的時候我們要的是對齊 _label 而不是較大的外框，
-		// 因此這邊我們需要計算修正的大小
+		// Label is an outer container that aligns _glow and _label at the center.
+		// However upon positioning we need to align by the _label instead of the larger outer frame,
+		// so we need to fix the calculated sizes.
 		const outerBounds = this.getLocalBounds();
 		const innerBounds = this._label.getLocalBounds();
 		const innerWidth = innerBounds.width * factor;
 		const xFix = (outerBounds.width - innerWidth) / 2;
 		const yFix = (outerBounds.height - innerBounds.height * factor) / 2;
 
-		// 決定位置
+		// Decide position
 		direction ??= this._sheet.grid.$getLabelDirection(x, y);
 		if(direction != Direction.T && direction != Direction.none && innerWidth > TEXT_WIDTH_LIMIT) {
-			// 實在太長的文字不允許往兩邊擺放
+			// We don't allow texts that are too long to be placed sidewise.
 			direction = Direction.B;
 		}
 		const offset = directionalOffsets[direction];
@@ -128,7 +129,7 @@ export class Label extends Container {
 			Math.sign(offset.y) * (FONT_SIZE * SMOOTHNESS - yFix) + offset.y * this.$distance
 		);
 
-		// 決定繪製的顏色
+		// Decide colors
 		const dark = app.isDark.value;
 		const fill = this.$color ?? (dark ? LIGHT : BLACK);
 		const stroke = dark ? DARK : WHITE;
@@ -149,7 +150,7 @@ export class Label extends Container {
 		return direction;
 	}
 
-	/** 一個標籤的橫向溢出大小，單位是像素；由實際渲染結果決定 */
+	/** The horizontal overflow of a label, in pixels. This is determined by the actual rendering. */
 	public get $overflow(): number {
 		const bounds = this._labelBounds;
 		if(!bounds || !this.visible) return 0;
@@ -168,7 +169,7 @@ export class Label extends Container {
 		return Math.ceil(result) + MARGIN_FIX;
 	}
 
-	/** 透過解方程式來逆推考量到當前的標籤之下應該採用何種自動尺度 */
+	/** Infer the proper scale under the current label by solving equations. */
 	public $inferHorizontalScale(sheetWidth: number, fullWidth: number): number {
 		const labelWidth = this._labelWidth;
 		if(labelWidth == 0) return NaN;
@@ -183,7 +184,7 @@ export class Label extends Container {
 	}
 }
 
-/** 解型如 o * x + s * Math.sqrt(x) + z == 0 的二次方程 */
+/** Solve quadratic equations of the form o * x + s * Math.sqrt(x) + z == 0 */
 function solveEq(z: number, s: number, o: number): number {
 	if(o == 0) return z * z / (s * s); // 退化情況
 	const f = 2 * o * z, b = s * s - f;
@@ -192,7 +193,7 @@ function solveEq(z: number, s: number, o: number): number {
 }
 
 /**
- * 各種方位上的文字偏移量；這是透過經驗法則決定出來的。
+ * Text offsets on each direction. Based on experience.
  */
 const directionalOffsets: Record<Direction, IPoint> = {
 	[Direction.UR]: { x: 12, y: 5 },

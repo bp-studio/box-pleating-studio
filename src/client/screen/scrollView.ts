@@ -7,12 +7,11 @@ import type { Viewport } from "./viewport";
 import type { ScrollController } from "client/controllers/scrollController";
 
 /**
- * 提供全域的圖像尺寸。
+ * The global image size.
  *
- * 特別注意到我們在此並未設置監看這個值並且在改變的時候呼叫
- * {@link ScrollView.$updateScrollbar} 方法，
- * 這是因為如果文字標籤的計算邏輯沒有錯誤的話，除了縮放之類的情況之外，
- * 圖像尺寸理論上並不會出現除了細微誤差之外的變化。
+ * Note that we don't setup a watcher for this value and call {@link ScrollView.$updateScrollbar} when it changes,
+ * because as long as the label calculation logic is correct,
+ * the size of the image is not supposed to have significant changes except for the case of zooming.
  */
 const imageDimension = computed<IDimension>(() => {
 	const sheet = ProjectService.sheet.value;
@@ -22,8 +21,10 @@ const imageDimension = computed<IDimension>(() => {
 
 //=================================================================
 /**
- * {@link ScrollView} 物件負責管理捲動區域，包括捲軸是否顯示、以及捲動時的低階操作。
- * 它並不包含捲動的 UI 邏輯；這部份是 {@link ScrollController} 在處理的。
+ * {@link ScrollView} manages the scrollable area, including whether to show the scrollbars,
+ * the the low-level operations upon scrolling.
+ * It doesn't include the UI logic of scrolling though;
+ * that part is handled by {@link ScrollController}.
  */
 //=================================================================
 
@@ -33,7 +34,7 @@ export class ScrollView extends EventTarget {
 	private readonly _el: HTMLElement;
 	private readonly _spaceHolder: HTMLDivElement = document.createElement("div");
 
-	/** 由程式主動操作捲軸的時候暫時鎖住事件的反饋行為 */
+	/** Lock the event feedback behavior when we scroll programmatically. */
 	private _lock: boolean = false;
 
 	constructor(el: HTMLElement) {
@@ -42,15 +43,15 @@ export class ScrollView extends EventTarget {
 		this.$viewport = useViewport(el);
 
 		el.appendChild(this._spaceHolder);
-		this._spaceHolder.style.zIndex = "-10"; // 修正 iPhone 6 的問題
+		this._spaceHolder.style.zIndex = "-10"; // Fix issue in iPhone 6
 
-		// 使用者主動進行捲動
+		// Proactive scrolling by the user
 		el.addEventListener("scroll", () => {
 			if(this._lock) this._lock = false;
 			else this.dispatchEvent(new Event("scroll"));
 		});
 
-		// 捲動區域大小改變
+		// Scroll area size change
 		window.addEventListener("resize", () => this.$updateScrollbar());
 
 		watch(() => app.settings.showStatus, () => this.$updateScrollbar());
@@ -66,26 +67,28 @@ export class ScrollView extends EventTarget {
 		);
 	}
 
-	/** 視情況更新捲軸的顯示與否 */
+	/** Decide whether to show scrollbar. */
 	public $updateScrollbar(): void {
-		// 先更新一次 Viewport 大小，以便正確計算 image 的大小
+		// First we update the size of the Viewport,
+		// so that we can calculate the size of the image.
 		this.$viewport.$update();
 
 		const image = imageDimension.value;
 		this._spaceHolder.style.width = image.width + "px";
 		this._spaceHolder.style.height = image.height + "px";
 
-		// 加 2 以避免浮點數誤觸
+		// Add 2 to avoid floating errors.
 		const scrollX = image.width > this._el.clientWidth + 2;
 		const scrollY = image.height > this._el.clientHeight + 2;
 		this._el.classList.toggle("scroll-x", scrollX);
 		this._el.classList.toggle("scroll-y", scrollY);
 
-		// 再檢測一次，以因應某一個捲軸因為另外一個捲軸而跑出來的情況
+		// Double check, to handle the case where on scrollbar is needed only because of the other scrollbar.
 		this._el.classList.toggle("scroll-x", scrollX || image.width > this._el.clientWidth + 2);
 		this._el.classList.toggle("scroll-y", scrollY || image.height > this._el.clientHeight + 2);
 
-		// 捲軸變動可能會導致 Viewport 改變，此時設置延遲然後重刷一次
+		// The toggling of scrollbars could result in changes of the Viewport,
+		// so we setup a delay and update it again.
 		setTimeout(this.$viewport.$update, 0);
 	}
 

@@ -6,16 +6,16 @@ declare const LZMA: {
 
 //=================================================================
 /**
- * {@link LZ} 是 LZMA 程式庫的一個封裝
+ * {@link LZ} is a wrapper for LZMA library.
  *
- * 這個類別中的方法都假定了 LZMA 程式庫已經載入了。
+ * The methods assumes that the library is loaded.
  */
 //=================================================================
 namespace LZ {
 
-	// atob 和 btoa 方法在 Node.js 當中是棄用的，但在前端環境中則否，
-	// 因此底下的程式碼使用了 window.atob 等寫法來消音警告。
-	// 參考：https://stackoverflow.com/a/70851350/9953396
+	// `atob` and `btoa` methods are deprecated in Node.js but not in frontend,
+	// so we use window.atob etc. to silence warnings.
+	// See https://stackoverflow.com/a/70851350/9953396
 
 	export function compress(s: string): string {
 		const arr = LZMA.compress(s, 1); // Experiments showed that 1 is good enough

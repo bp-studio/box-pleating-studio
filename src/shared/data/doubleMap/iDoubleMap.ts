@@ -3,7 +3,7 @@ export type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: Readonly
 
 //=================================================================
 /**
- * {@link ReadonlyDoubleMap} 是將一對的 Key（未必相異）對應到 Value 上的介面。
+ * {@link ReadonlyDoubleMap} maps a pair of keys (not necessarily distinct) to corresponding value.
  */
 //=================================================================
 
@@ -24,7 +24,7 @@ export interface ReadonlyDoubleMap<K, V> {
 
 //=================================================================
 /**
- * {@link IDoubleMap} 是可以寫入的 {@link ReadonlyDoubleMap}。
+ * {@link IDoubleMap} is a {@link ReadonlyDoubleMap} with writing functionalities.
  */
 //=================================================================
 
@@ -38,7 +38,7 @@ export interface IDoubleMap<K, V> extends ReadonlyDoubleMap<K, V> {
 
 //=================================================================
 /**
- * {@link IValuedDoubleMap} 是值也有加上索引的 {@link IDoubleMap}。
+ * {@link IValuedDoubleMap} is an {@link IDoubleMap} with indices on values.
  */
 //=================================================================
 

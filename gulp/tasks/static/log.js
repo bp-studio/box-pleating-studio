@@ -16,7 +16,7 @@ const libs = [
 	"lzma_worker-min.js",
 ];
 
-/** 建置更新 log */
+/** Build update logs */
 module.exports = () =>
 	gulp.src([
 		config.src.log + "/*.md",

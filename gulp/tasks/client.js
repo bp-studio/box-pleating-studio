@@ -64,7 +64,7 @@ gulp.task("clientDist", () =>
 			dest: config.dest.dist + "/client.js",
 			extra,
 		}))
-		.pipe(esb({ minify: true })) // 即使有 terser，設置這個還是會再改進一點點
+		.pipe(esb({ minify: true })) // This will still make a slight difference even we've used terser
 		.pipe(replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
 		.pipe(terser({
 			ecma: 2018,
@@ -75,7 +75,7 @@ gulp.task("clientDist", () =>
 					TEST_MODE: false,
 				},
 			},
-			// 這三個例外是 PIXI 內部會用字串參照的私有變數
+			// These three exceptions are the private variables that PIXI will internally referred to by strings.
 			mangle: { properties: { regex: /^[$_](?!view|plugin|multisample)/ } },
 			format: {
 				comments: false,

@@ -21,7 +21,7 @@ const LABEL_DISTANCE = 0.5;
 
 //=================================================================
 /**
- * {@link Edge} 是樹狀邊的控制項。
+ * {@link Edge} is the control of an edge in the tree.
  */
 //=================================================================
 export class Edge extends Control implements ISerializable<JEdge> {
@@ -67,7 +67,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 代理屬性
+	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get length(): number {
@@ -80,7 +80,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public split(): void {
@@ -109,7 +109,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getLeaf(): Vertex | undefined {
@@ -118,7 +118,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 繪製方法
+	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _draw(): void {
@@ -126,7 +126,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const sh = ProjectService.shrink.value;
 
-		// 繪製線條
+		// Draw the line
 		this._line.clear()
 			.lineStyle(
 				(this.$hovered || this.$selected ? WIDTH_HOVER : WIDTH) * sh,
@@ -146,7 +146,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	private _hitArea(): void {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 
-		// 更新點擊範圍
+		// Update hit area
 		let x = x2 - x1;
 		let y = y2 - y1;
 		const length = Math.sqrt(x * x + y * y);

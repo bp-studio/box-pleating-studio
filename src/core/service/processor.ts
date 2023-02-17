@@ -5,7 +5,7 @@ import type { Task } from "core/design/tasks/task";
 
 //=================================================================
 /**
- * {@link Processor} 負責管理更新作業的運行，以及收集更新的結果。
+ * {@link Processor} manages the execution of updating tasks.
  */
 //=================================================================
 

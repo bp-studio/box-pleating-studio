@@ -26,7 +26,7 @@ const DOT_FILL = 0x6699FF;
 
 //=================================================================
 /**
- * {@link Flap} 是角片矩形的控制項。
+ * {@link Flap} is the control for the flap.
  */
 //=================================================================
 export class Flap extends Independent implements DragSelectable, ISerializable<JFlap> {
@@ -94,10 +94,10 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 代理屬性
+	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 角片名稱，等同於節點名稱 */
+	/** The name of the flap, which is the same as that of the vertex. */
 	public get name(): string {
 		return this.$vertex.name;
 	}
@@ -105,7 +105,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$vertex.name = v;
 	}
 
-	/** 角片圓角半徑 */
+	/** The radius of the flap. */
 	public get radius(): number {
 		return this.$edge.length;
 	}
@@ -113,7 +113,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$edge.length = v;
 	}
 
-	/** 角片高度 */
+	/** The height of the flap. */
 	public get height(): number {
 		return this._height;
 	}
@@ -123,7 +123,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this._layout.$updateFlap(this);
 	}
 
-	/** 角片寬度 */
+	/** The width of the flap. */
 	public get width(): number {
 		return this._width;
 	}
@@ -134,7 +134,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get isDeletable(): boolean {
@@ -150,7 +150,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 控制項方法
+	// Control methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public override $selectableWith(c: Control): boolean {
@@ -169,7 +169,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 			const p = zeroWidth ? { x, y: y + h } : { x: x + w, y };
 			return this._fixVector(p, v);
 		} else {
-			// 允許其中至多一個尖點超出紙張範圍
+			// We allow at most one tip to go beyond the range of the sheet.
 			const data = this._getDots(w, h)
 				.map(p => {
 					const fix = this._fixVector(p, v);
@@ -196,7 +196,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _move(x: number, y: number): void {
@@ -205,7 +205,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 繪製方法
+	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _drawShade(): void {
@@ -218,7 +218,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		const s = ProjectService.scale.value;
 		const size = SIZE * ProjectService.shrink.value ** DOT_FACTOR;
 		this._dots.forEach(d => {
-			// 把座標放大 s 倍以增進圓弧繪製品質
+			// Scale the coordinates s times to improve the quality of the arcs.
 			d.scale.set(1 / s);
 			d.clear()
 				.lineStyle(1, app.isDark.value ? LIGHT : BLACK)
@@ -263,7 +263,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 				.closePath();
 		}
 
-		// 把座標放大 s 倍以增進圓弧繪製品質
+		// Scale the coordinates s times to improve the quality of the arcs.
 		const s = ProjectService.scale.value;
 		const r = this.$edge.length * s;
 		this._circle.scale.set(1 / s);
@@ -273,10 +273,10 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 依照象限順序排列的尖點位置 */
+	/** Tip positions, ordered by quadrants. */
 	private _getDots(w: number, h: number): IPoint[] {
 		const { x, y } = this.$location;
 		return [
@@ -287,10 +287,10 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		];
 	}
 
-	/** 測試看看變更後的大小是否可以接受 */
+	/** Test if the new size is acceptable. */
 	private _testResize(w: number, h: number, grid: IGrid = this._sheet.grid): boolean {
 		return this._getDots(w, h)
 			.filter(p => !grid.$contains(p))
-			.length <= 1; // 至多只能有一個尖點超出紙張範圍
+			.length <= 1; // At most one tip may go beyond the range of the sheet.
 	}
 }

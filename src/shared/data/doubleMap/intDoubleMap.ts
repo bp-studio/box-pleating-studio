@@ -10,26 +10,34 @@ export const MAX = (1 << SHIFT) - 1;
 
 //=================================================================
 /**
- * {@link IntDoubleMap} 是索引為整數的 {@link IDoubleMap}。
+ * {@link IntDoubleMap} is an {@link IDoubleMap} with integer indices.
  *
- * 這邊我們利用位元的原理來編碼以增加效能，
- * 不過代價是索引值最大只能夠是 {@link MAX} = `2 ** 16 - 1` = 65535，
- * 實務上這是很夠用的。這個實作中會檢查 {@link set} 方法傳入的參數有效性。
+ * Here we use bit operations to improve performance,
+ * with the price of maximal index being only {@link MAX} = `2 ** 16 - 1` = 65535.
+ * In practice with is quite sufficient. In the implementation here,
+ * we will check the validity of the parameters in the {@link set} method.
  *
- * 如果利用 Cantor 配對函數來編碼的話是可以讓最大索引值增加一倍，
- * 但效能會降低，所以意義不大。
+ * If we use instead the Cantor function to encode the index,
+ * we could double the maximal index, but the performance won't be as good,
+ * so it's a bit pointless.
  */
 //=================================================================
 
 export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 
-	/** 鍵值鏈，儲存的是「對於一個鍵值，有哪些鍵值與它有配對」，用來增進單鍵操作之效能 */
+	/**
+	 * Key chains, storing "the keys coupling the given key",
+	 * for improving the performance of single key operations.
+	 */
 	protected readonly _keyMap: Map<number, KeyNode> = new Map();
 
-	/** 主表，將雙鍵合併成單一整數（參見 {@link _getKey _getKey()} 方法）之後儲存對應的節點 */
+	/**
+	 * The main map, combines the double key into a single integer
+	 * (see {@link _getKey _getKey()} method) and stores the corresponding node.
+	 */
 	protected readonly _map: Map<number, Node<V>> = new Map();
 
-	/** 目前的大小 */
+	/** Current size */
 	protected _size: number = 0;
 
 	public set(key1: number, key2: number, value: V): this {
@@ -151,7 +159,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _createNode(key1: number, key2: number, value: V): Node<V> {
@@ -178,7 +186,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _insertKeyNode(key: number, n: KeyNode): void {
@@ -223,6 +231,6 @@ export class Node<V> {
 
 interface KeyNode extends IDoubleLinkedNode<KeyNode> {
 
-	/** 相對應的鍵值（而非這個節點本身所屬的鍵值） */
+	/** The key of the coupling node (not the key of self) */
 	readonly key: number;
 }

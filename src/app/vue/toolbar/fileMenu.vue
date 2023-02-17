@@ -107,10 +107,10 @@
 
 	onMounted(() => {
 		HotKeyService.register(() => {
-			// 一般來說 Dropdown 元件只有在第一次被按下的時候才會初始化，
-			// 但 opn 元件是一個例外，因為它要提供快速鍵 Ctrl + O 的功能，
-			// 而這個快速鍵有可能在第一次開啟選單之前就被按下，
-			// 此時我們需要手動進行選單的初始化，以便使用該元件的功能。
+			// Generally speaking, the Dropdown component will only be initialized when it is pressed for the first time,
+			// but the opn element is an exception, because it provides the function of the shortcut key Ctrl + O,
+			// and this shortcut key may be pressed before opening the menu for the first time.
+			// At this point we need to manually initialize the menu in order to use the function of this component.
 			if(opn.value) {
 				opn.value.execute();
 			} else {
@@ -123,7 +123,7 @@
 			if(isFileApiEnabled) save();
 			else bps.value!.execute();
 		}, "s");
-		HotKeyService.register(() => Studio.project && bps.value!.execute(), "s", true); // 另存新檔
+		HotKeyService.register(() => Studio.project && bps.value!.execute(), "s", true); // Save as
 		HotKeyService.register(saveAll, "k");
 		HotKeyService.register(print, "p");
 	});
@@ -157,11 +157,11 @@
 		return [bps.value!, bpz.value!, svg.value!, png.value!] as DownloadInstance[];
 	}
 	function init(): void {
-		// 當選單開啟的時候生成 ObjectURL
+		// Generate ObjectURL when the menu is opened
 		downloads().forEach(d => d.getFile());
 	}
 	function reset(): void {
-		// 當選單關閉的時候把所有 ObjectURL 回收掉
+		// Recycle all ObjectURLs when the menu is closed
 		downloads().forEach(d => d.reset());
 	}
 
@@ -183,7 +183,7 @@
 				throw e;
 			}
 		} catch(e) {
-			// 發生任何形式的失敗（找不到 handle、沒有寫入權……）就改用另存新檔處理
+			// If any form of failure occurs (handle not found, no write permission...), then save it as a new file
 			return (bps.value! as SaveAsInstance).execute(proj, handle => {
 				Handles.set(id!, handle);
 				Handles.addRecent(handle);
@@ -195,7 +195,7 @@
 	async function saveAll(): Promise<void> {
 		const tasks: Promise<boolean>[] = [];
 		for(const id of Workspace.ids) tasks.push(save(id));
-		await Promise.all(tasks); // 個別檔案的儲存失敗不會影響到其它檔案的儲存
+		await Promise.all(tasks); // The failure to save individual files will not affect the saving of other files
 		gtag("event", "project_bps");
 	}
 

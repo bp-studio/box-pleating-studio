@@ -5,30 +5,30 @@ import type { GridType } from "shared/json/enum";
 
 export interface IGrid extends ISerializable<JSheet> {
 
-	/** 格線的類型 */
+	/** The type of the grid. */
 	readonly type: GridType;
 
-	/** 根據指定的座標，傳回文字標籤應該要繪製在哪一個方向 */
+	/** Decide the label direction by coordinates. */
 	$getLabelDirection(x: number, y: number): Direction;
 
-	/** 繪製邊框的方法 */
+	/** The method of drawing the border. */
 	$drawBorder(border: GraphicsLike): void;
 
-	/** 繪製格線的方法 */
+	/** The method of drawing the grid lines. */
 	$drawGrid(grid: GraphicsLike): void;
 
-	/** 找出指定的點在這個格線上面最靠近的點 */
+	/** Find the point on the grid that is closest to the given point. */
 	$constrain(p: IPoint): IPoint;
 
-	/** 給定的點是否在紙張範圍內 */
+	/** Whether the given point is on the grid. */
 	$contains(p: IPoint): boolean;
 
-	/** 在繪製的時候要偏移的座標，原則上會是負值 */
+	/** Offset for drawing. Should be non-positive. */
 	readonly $offset: IPoint;
 
-	/** 繪製的高度，單位是格線 */
+	/** Rendered width, in number of grids. */
 	readonly $renderHeight: number;
 
-	/** 繪製的寬度，單位是格線 */
+	/** Rendered height, in number of grids. */
 	readonly $renderWidth: number;
 }

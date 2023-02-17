@@ -13,11 +13,12 @@ const NIL = { isRed: false };
 
 //=================================================================
 /**
- * {@link RedBlackTree} 是會自我平衡的 {@link IBinarySearchTree}，
- * 它的設計是犧牲些許的平衡（其分支高度最差可能相差一倍）來換取較少的旋轉次數，
- * 使得插入與刪除的操作加快。雖然查找速度略遜於 {@link AvlTree}，
- * 但對於插入刪除頻繁的情境來說會有較好的效能。
- * 事實上絕大多數的演算法程式庫都會選用紅黑樹當作 BST 的實作。
+ * {@link RedBlackTree} is a self-balancing {@link IBinarySearchTree}
+ * that sacrifices a little balance (its branch heights may differ by up to a factor of 2)
+ * to reduce the number of rotations and speed up insertion and deletion operations.
+ * Although its search speed is slightly slower than that of {@link AvlTree},
+ * it performs better in scenarios where frequent insertions and deletions are required.
+ * In fact, the vast majority of algorithm libraries use red-black trees as their implementation of BST.
  */
 //=================================================================
 
@@ -84,7 +85,7 @@ export class RedBlackTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _fixInsert(node: Node<K, V>): void {

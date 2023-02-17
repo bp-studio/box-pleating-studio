@@ -1,6 +1,6 @@
 import type { JProject } from "shared/json";
 
-/** 實際上沒有做任何事情的 {@link Migration} */
+/** A {@link Migration} that does nothing. */
 export default function $process(proj: Pseudo<JProject>): boolean {
 	return false;
 }

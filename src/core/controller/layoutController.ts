@@ -8,7 +8,7 @@ import type { JFlap } from "shared/json";
 
 //=================================================================
 /**
- * {@link LayoutController} 模組是管理佈局的操作。
+ * {@link LayoutController} manages the operations on the layout.
  */
 //=================================================================
 namespace LayoutController {

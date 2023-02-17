@@ -6,8 +6,8 @@ import type { Repository } from "../layout/repository";
 
 //=================================================================
 /**
- * {@link cleanupTask} 負責在拖曳完成之後清理暫存的 {@link Stretch} 和 {@link Repository}，
- * 並且計算剩下的伸展模式。
+ * {@link cleanupTask} clears the cached {@link Stretch}es and {@link Repository Repositories}
+ * after dragging, and finish searching for remaining patterns.
  */
 //=================================================================
 export const cleanupTask = new Task(cleanup);

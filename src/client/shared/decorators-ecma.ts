@@ -3,7 +3,7 @@ import { shallowRef } from "vue";
 
 type Setter<T> = (v: T) => boolean;
 
-/** 把一個欄位自動實作成 Vue 的 {@link shallowRef} */
+/** Make a field into {@link shallowRef} in Vue */
 function shallowRefDecorator<T>(setter: Setter<T>): ClassFieldDecorator;
 function shallowRefDecorator(value: undefined, context: ClassFieldDecoratorContext): ClassFieldInitializer;
 function shallowRefDecorator(
@@ -32,7 +32,7 @@ function shallowRefDecoratorCore<T = unknown>(
 			set,
 			get() { return ref.value; },
 		});
-		return initialValue; // 這會立刻觸發上面的 set 方法
+		return initialValue; // This will trigger the set method above
 	};
 }
 

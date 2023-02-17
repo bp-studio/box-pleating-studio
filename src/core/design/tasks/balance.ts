@@ -8,12 +8,12 @@ import type { Tree } from "../context/tree";
 
 //=================================================================
 /**
- * {@link balanceTask} 負責更新 {@link Tree.$root}。
+ * {@link balanceTask} updates {@link Tree.$root}。
  *
- * 它的依賴為 {@link heightTask}，
- * 因為它是根據根點底下的各個子點之高度來決定是否需要進行平衡。
- * 雖然它在平衡的過程當中也會動到 {@link TreeNode.$height}，
- * 但是這邊並不會出現實際上的循環相依。
+ * It depends on {@link heightTask} as it decides whether to re-balance
+ * based on the height of each subtrees under the root.
+ * Although it also modifies {@link TreeNode.$height} as it re-balances,
+ * there's no real cyclic dependency here.
  */
 //=================================================================
 export const balanceTask = new Task(balance, distanceTask);
@@ -31,14 +31,14 @@ function balance(): void {
 }
 
 function tryBalance(root: TreeNode): TreeNode | null {
-	// 前置條件檢查
+	// Precondition check
 	const first = root.$children.$get();
 	if(!first) return null;
 	const second = root.$children.$getSecond();
 	const height = second ? second.$height + 1 : 0;
 	if(first.$height <= height) return null;
 
-	// 進行平衡
+	// Balancing
 	root.$height = height;
 	first.$cut(true);
 	root.$length = first.$length;

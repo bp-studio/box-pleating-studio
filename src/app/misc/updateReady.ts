@@ -2,7 +2,8 @@ import { readonly, shallowRef } from "vue";
 
 //=================================================================
 /**
- * 這個模組負責關注 Service Worker 的更新（同時也意味著整個 App 的版本更新）
+ * This module is responsible for paying attention to the updating
+ * of Service Worker (which also means the version update of the whole App)
  */
 //=================================================================
 

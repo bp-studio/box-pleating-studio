@@ -5,7 +5,7 @@ import type { StartEvent } from "./startEvent";
 
 //=================================================================
 /**
- * {@link EndEvent} 是一個線段的結束事件。
+ * {@link EndEvent} represents the end of a segment.
  */
 //=================================================================
 export class EndEvent extends EventBase {

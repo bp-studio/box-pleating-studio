@@ -16,7 +16,7 @@ namespace ImportService {
 	});
 
 	/**
-	 * 處理 File Handling API（從檔案直接開啟 PWA）
+	 * Processing File Handling API (open files directly in PWA)
 	 */
 	export async function openQueue(): Promise<boolean> {
 		if(!("launchQueue" in window)) return false;
@@ -30,12 +30,13 @@ namespace ImportService {
 	}
 
 	/**
-	 * 處理透過 File Access API 打開的檔案
+	 * Processing files opened with File Access API
 	 */
 	export async function open(list: FileHandleList, request: boolean = false): Promise<void> {
 		const ids = await Handles.locate(list);
 
-		// 有任何尚未開啟的 handle 才會觸發真正的開啟，此時需要顯示載入動畫
+		// We perform actual opening only when there's a handle that is not yet opened.
+		// In that case we show the spinner animation.
 		if(ids.some(i => i === undefined)) await dialogs.loader.show();
 
 		const tasks: Promise<void>[] = [];
@@ -49,7 +50,7 @@ namespace ImportService {
 		await Promise.all(tasks);
 		dialogs.loader.hide();
 
-		// 找出最後一個開啟（含已開啟）的頁籤
+		// Find the last opened tab
 		const id = ids.reverse().find(n => n !== undefined);
 		if(id !== undefined) {
 			gtag("event", "project_open");
@@ -58,7 +59,7 @@ namespace ImportService {
 	}
 
 	/**
-	 * 處理透過 `<input type="file">` 打開的檔案
+	 * Process files opened by `<input type="file">`
 	 */
 	export async function openFiles(files: FileList): Promise<void> {
 		await dialogs.loader.show();
@@ -70,14 +71,15 @@ namespace ImportService {
 		}
 		const result = await Promise.all(tasks);
 
-		// 這種情況中因為不是用 handle 打開的，最後一個開啟的一定就是最後一個頁籤
+		// In this case the file is not opened with a handle,
+		// so the last opened file must be the last tab.
 		const success = result.some(id => id !== undefined);
 		if(success) {
 			gtag("event", "project_open");
 			Workspace.select(Workspace.projects[Workspace.projects.length - 1].id);
 		}
 
-		// 等待繪製完成，再讓 spinner 消失
+		// Hide the spinner after the rendering is completed
 		await nextTick();
 		dialogs.loader.hide();
 	}
@@ -104,7 +106,8 @@ namespace ImportService {
 	}
 
 	/**
-	 * 讀入已經取得的檔案並且傳回檔案的 id（工作區的話傳回最後一個）
+	 * Load the obtained file handle and returns the file id
+	 * (or the last id for workspace files).
 	 */
 	async function openFile(file: File, handle?: FileSystemFileHandle): Promise<number | undefined> {
 		try {

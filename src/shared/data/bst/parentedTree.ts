@@ -8,9 +8,10 @@ export interface ParentedNode<K, V> extends NodeBase<K, V> {
 
 //=================================================================
 /**
- * {@link ParentedTree} 是若干高速 {@link IBinarySearchTree} 實作的基底類別，
- * 其特色是有維持記錄節點的父點。這除了部份衍生類別的演算法實作起來比較容易之外，
- * 一個額外的好處就是它可以讓 prev/next 的查找變快。
+ * {@link ParentedTree} is a base class for several high-speed {@link IBinarySearchTree} implementations.
+ * Its feature is that it maintains a record of each node's parent.
+ * In addition to making algorithm implementation easier for some derived classes,
+ * it can speed up the search for prev/next.
  */
 //=================================================================
 
@@ -31,7 +32,7 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _rotateRight(n: N): N {

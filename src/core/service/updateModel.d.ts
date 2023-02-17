@@ -18,10 +18,10 @@ export interface UpdateModel {
 	};
 
 	/**
-	 * 物件的圖形資料。
+	 * Graphics data of objects.
 	 *
-	 * 須注意的是，**這裡面有可能會出現已經被刪除掉的物件**，
-	 * 因此 Client 在使用這個資料的時候需要加以檢查。
+	 * Note that **there could be objects that are deleted later**,
+	 * so the Client will need to check before using the data.
 	 */
 	graphics: Record<string, GraphicsData>;
 }

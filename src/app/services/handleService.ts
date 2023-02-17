@@ -1,5 +1,5 @@
 import { reactive, readonly, watch } from "vue";
-import * as idbKeyval from "idb-keyval"; // 這個程式庫非常小，打包進來也無妨
+import * as idbKeyval from "idb-keyval"; // This library is really tiny, so it's OK to bundle
 
 import { isFileApiEnabled } from "app/shared/constants";
 import Workspace from "./workspaceService";
@@ -26,7 +26,10 @@ namespace HandleService {
 		}
 	}, { deep: true });
 
-	/** 根據傳入的 {@link FileSystemFileHandle} 陣列，找出已經開啟的 handle 的對應專案 id；若找不到則填入 undefined */
+	/**
+	 * Find the id of existing handle in the given {@link FileSystemFileHandle} array.
+	 * It returns `undefined` if not found.
+	 */
 	export function locate(list: FileHandleList): Promise<(number | undefined)[]> {
 		const opened = [...handles.entries()];
 		const idTasks = list.map(async h => {

@@ -1,21 +1,20 @@
-import { deepAssign } from "client/utils/deepAssign";
+import { deepAssign } from "shared/utils/clone";
 import { Mountable } from "client/base/mountable";
 import { Migration } from "client/patches";
 import { Design } from "./design";
 import HistoryManager from "./changes/history";
-import { shallowRef } from "client/shared/decorators";
 
 import type * as Routes from "core/routes";
 import type { JProject } from "shared/json";
 
 /**
- * 號碼從 1 號開始，以確保真值。
+ * Id starts from 1 to ensure true values.
  */
 let nextId = 1;
 
 //=================================================================
 /**
- * {@link Project} 是一個開啟的專案。
+ * {@link Project} manages {@link Design} and other objects associated with it.
  */
 //=================================================================
 export class Project extends Mountable implements IAsyncSerializable<JProject> {
@@ -26,14 +25,14 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 
 	private readonly _worker: Worker;
 
-	/** 是否已經初始化；僅在偵錯模式中使用 */
+	/** Whether self has been initialized. Used only in debug mode. */
 	private _initialized?: boolean;
 
 	public $isDragging: boolean = false;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
-		// Project 剛建構出來的時候都是非活躍的，
-		// 稍後會在選取的時候才變成活躍（參見 ProjectService）
+		// Projects are all inactive on construction.
+		// It will become active when selected later (see ProjectService)
 		super(false);
 
 		this.id = nextId++;
@@ -50,7 +49,7 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 		this._onDispose(() => this._worker.terminate());
 	}
 
-	/** 初始化處理 */
+	/** Initialization. */
 	public async $initialize(): Promise<Project> {
 		if(DEBUG_ENABLED && !this._initialized) {
 			console.time("First render");

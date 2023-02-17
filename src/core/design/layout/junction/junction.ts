@@ -8,7 +8,7 @@ import type { ITreeNode } from "../../context";
 
 //=================================================================
 /**
- * {@link Junction} 負責計算兩個角片之間的重疊狀態。
+ * {@link Junction} manages the overlapping state between two flaps.
  */
 //=================================================================
 export type Junction = InvalidJunction | ValidJunction;

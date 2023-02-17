@@ -21,7 +21,7 @@ const FILL_COLOR = 0x6699FF;
 
 //=================================================================
 /**
- * {@link Vertex} 是樹狀節點的控制項。
+ * {@link Vertex} is the control for the tree vertices.
  */
 //=================================================================
 export class Vertex extends Independent implements DragSelectable, ISerializable<JVertex> {
@@ -71,7 +71,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@shallowRef public name: string;
@@ -98,7 +98,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 控制項方法
+	// Control methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get $anchor(): IPoint {
@@ -118,7 +118,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _move(x: number, y: number): void {
@@ -142,14 +142,14 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 繪製方法
+	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _draw(): void {
 		const s = ProjectService.scale.value;
 		this._dot.x = this.$location.x;
 		this._dot.y = this.$location.y;
-		this._dot.scale.set(1 / s); // 把座標放大 s 倍以增進圓弧繪製品質
+		this._dot.scale.set(1 / s); // Scale the coordinates by s times to improve the quality of arcs
 
 		const color = app.isDark.value ? LIGHT : BLACK;
 		const width = this.$selected || this.$hovered ? BORDER_WIDTH_HOVER : BORDER_WIDTH;

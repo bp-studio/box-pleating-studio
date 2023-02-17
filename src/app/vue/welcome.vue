@@ -93,7 +93,7 @@
 	const preparing = shallowRef(false);
 	const install = shallowRef(0);
 
-	/** 是否在 PWA 模式中執行 */
+	/** If we are running in PWA mode */
 	const isPWA = matchMedia("(display-mode: standalone)").matches;
 
 	const ios = computed(() => navigator.standalone === false);
@@ -106,27 +106,29 @@
 	function detectInstallation(): void {
 		if("getInstalledRelatedApps" in navigator) {
 			navigator.getInstalledRelatedApps!().then(apps => {
-				// 請注意這段程式碼只有在 Android 上面有效，
-				// 桌機上面會傳回空陣列，所以無法以此法偵測 PWA 是否已安裝；
-				// 不過這無所謂，因為開啟 PWA 的連結本來也就只有在 Android 中有效
+				// The part only works on Android,
+				// and it will return an empty array on Desktops,
+				// so we cannot use it to detect if PWA is already installed.
+				// But that's OK, since the PWA link works also only in Android anyway.
 				if(apps.length) install.value = 2;
 			});
 		}
 	}
 
-	// 如果啟動的瞬間沒有 SW 存在，就表示 SW 正在安裝
-	// 此時顯示等候訊息以改善 UX，因為 beforeinstallprompt 事件必須等到 SW 裝完才會觸發
+	// If service worker is not available on startup, that means it is still installing.
+	// When that happens we show a message to improve UX,
+	// as beforeinstallprompt event won't fire until service worker is installed.
 	if("onbeforeinstallprompt" in window && location.protocol == "https:" && !navigator.serviceWorker.controller) {
 		preparing.value = true;
 	}
 
-	// 監聽事件
+	// Event listening
 	window.addEventListener("beforeinstallprompt", (event: Event) => {
 		event.preventDefault();
 		bip = event as BeforeInstallPromptEvent;
 	});
 	window.addEventListener("appinstalled", () => {
-		if(isPWA) return; // 桌機會進入這裡
+		if(isPWA) return; // Desktop goes here
 		install.value = 1;
 		const int = setInterval(() => {
 			if(install.value != 2) detectInstallation();
@@ -134,7 +136,7 @@
 		}, APP_CHECK_INTERVAL);
 	});
 
-	// 立刻檢查安裝狀態
+	// Check installation immediately
 	detectInstallation();
 
 </script>

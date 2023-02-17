@@ -4,7 +4,7 @@ const path = require("path");
 const fas = require("fontawesome-subset");
 const through2 = require("gulp-through2");
 
-// 用來收集 FontAwesome 的使用例
+// For collecting the usage of FontAwesome
 
 module.exports = () => {
 	const subset = {

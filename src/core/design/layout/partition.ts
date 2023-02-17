@@ -1,9 +1,10 @@
 import type { JOverlap, JPartition } from "shared/json";
+import type { Configuration } from "./configuration";
 
 //=================================================================
 /**
- * {@link Partition} 是 {@link Configuration} 底下的單一切割。
- * {@link Partition} 只會對應於單一的 {@link Device}。
+ * {@link Partition} is a single unit under {@link Configuration}.
+ * {@link Partition} corresponds to a single {@link Device}.
  */
 //=================================================================
 

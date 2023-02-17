@@ -2,8 +2,8 @@
 export type DirectionKey = "up" | "down" | "left" | "right";
 
 /**
- * 比較器是廣義用來決定全序的函數。
+ * {@link Comparator} is a function that defines a total-order.
  *
- * 它傳回正值表示 `a > b`，負值表示 `a < b`，零值表示 `a == b`。
+ * It returns a positive value if `a > b`, a negative value if `a < b`, and zero if `a == b`.
  */
 export type Comparator<T> = (a: T, b: T) => number;

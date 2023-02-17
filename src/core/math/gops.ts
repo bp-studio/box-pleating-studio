@@ -8,10 +8,10 @@ export interface JPieceMemo {
 	sx: number;
 }
 
-/** 計算結果的記憶 */
+/** Cache for the calculation results. */
 const Memo = new Map<number, readonly JPieceMemo[]>();
 
-/** 基礎的整數 {@link GOPS} 搜尋 */
+/** The basic integral {@link GOPS} search */
 export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiece> {
 	if(ox % 2 && oy % 2) return;
 	if(sx === undefined) sx = Number.POSITIVE_INFINITY;
@@ -23,7 +23,7 @@ export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiec
 	}
 }
 
-/** 計算一個 {@link JPiece} 的 rank，數字越小越好 */
+/** Calculates the rand of a {@link JPiece}. The lower the better. */
 export function $rank(p: JPiece): number {
 	const r1 = $reduceInt(p.oy + p.v, p.oy)[0];
 	const r2 = $reduceInt(p.ox + p.u, p.ox)[0];
@@ -38,8 +38,8 @@ function getOrCreateMemo(ox: number, oy: number): readonly JPieceMemo[] {
 	const ha = ox * oy / 2; // half area of the overlap rectangle
 	const array: JPieceMemo[] = [];
 	for(
-		let u = Math.floor(Math.sqrt(ha));	// 從靠近根號 ha 的數開始搜尋
-		u > 0; u--							// 反向往下搜尋，會盡量優先傳回效率最高的
+		let u = Math.floor(Math.sqrt(ha));	// Start from the number close to sqrt(ha)
+		u > 0; u--							// and search downwards. This will prioritize the most efficient gadget.
 	) {
 		if(ha % u == 0) {
 			const v = ha / u;

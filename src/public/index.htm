@@ -35,7 +35,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1339"
+			app_version: "1340"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -262,7 +262,7 @@
 			document.head.appendChild(script);
 		}
 		window.addEventListener("DOMContentLoaded",
-			() => setTimeout(	// 利用延遲來製造執行緒斷點、使得 FCP 可以提早發生
+			() => setTimeout(	// Use a delay to create a breakpoint, so that FCP may occur earlier.
 				() => {
 					const scripts = [
 						'log/log.js',

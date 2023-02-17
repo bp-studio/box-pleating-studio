@@ -4,30 +4,30 @@ import type { JOverlap, JQuadrilateral } from "./layout";
 export interface JStretch {
 	id: string;
 
-	/** 如果找不到 {@link Pattern} 就會是 undefined */
+	/** `undefined` if there's no {@link Pattern} */
 	configuration?: JConfiguration;
 
-	/** 如果找不到 {@link Pattern} 就會是 undefined */
+	/** `undefined` if there's no {@link Pattern} */
 	pattern?: JPattern;
 }
 
 export interface JConfiguration {
-	/** 這個 Configuration 裡面所有的 Partition */
+	/** All Partitions in this Configuration */
 	partitions: readonly JPartition[];
 	patterns?: JPattern[];
 	index?: number;
 }
 
 export interface JJunction extends JQuadrilateral {
-	/** 對應的兩個 {@link Flap} 之間的最大空間，恆正 */
+	/** The maximal space between the {@link Flap}s; always positive. */
 	sx: number;
 }
 
 export interface JPartition {
-	/** 這個 Partition 裡面所有的 Overlap */
+	/** All Overlaps in this Partition */
 	overlaps: readonly JOverlap[];
 
-	/** 這個 Partition 採用的生成策略 */
+	/** The generating {@link Strategy} used by this Partition */
 	strategy?: Strategy;
 }
 
@@ -50,20 +50,20 @@ export interface JAddOn {
 
 export interface JGadget {
 
-	/** 所有組成當前 {@link Gadget} 的 {@link Piece} */
+	/** All {@link Piece}s that form the current {@link Gadget} */
 	pieces: JPiece[];
 
-	/** 這個 {@link Gadget} 相對於其第一個 {@link Piece} 的 p[0] 的位移植 */
+	/** The relative offset of the {@link Gadget} to the `p[0]` of its first {@link Piece} */
 	offset?: IPoint;
 
 	anchors?: JAnchor[];
 }
 
 export interface JAnchor {
-	/** 連接時要保留的間隙 */
+	/** The slack that needs to be kept when connecting */
 	slack?: number;
 
-	/** 自訂這個 Anchor 的位置，如果不指定，會直接根據 Gadget 來推算 */
+	/** Customize Anchor position. If not assigned, it will be inferred from the Gadget. */
 	location?: IPoint;
 }
 
@@ -73,13 +73,13 @@ export interface JPiece {
 	u: number;
 	v: number;
 
-	/** 繞道，沿著順時鐘方向運行；其座標都是沒有加上 shift 之前的 */
+	/** Detour in clockwise direction. The coordinates are before adding the shift. */
 	detours?: IPoint[][];
 
 	/**
-	 * 這個 Piece 相對於 Partition 的參考原點的（相位變換前）偏移。
+	 * The relative shifting of this Piece to the reference point (before transformation) of the Partition.
 	 *
-	 * 這包括了非整數解的偏移，或是較複雜的 join 中的偏移
+	 * This includes the shifting of non-integral solutions, or the shifting in complex joins.
 	 */
 	shift?: IPoint;
 }

@@ -1,6 +1,6 @@
 const through2 = require("gulp-through2");
 
-// 用來把 locale 檔案的順序排列得跟來源語系檔按的順序一樣
+// For sorting the locale file entries to the same ordering as the source locale
 
 function copyInOrderOf(source, order) {
 	if(typeof source != "object" || Array.isArray(source)) return source;

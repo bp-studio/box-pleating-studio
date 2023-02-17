@@ -2,39 +2,39 @@ import type { Comparator } from "shared/types/types";
 
 export interface IReadonlyHeap<T> {
 	/**
-	 * 傳回所有元素的迭代器。
+	 * An iterator that returns all elements.
 	 *
-	 * 請注意元素傳回的順序僅為它們在堆積中的順序。
+	 * Note that the returned order only represents the order within the heap.
 	 */
 	[Symbol.iterator](): IterableIterator<T>;
 
-	/** 傳回當前的堆積中的第一個元素 */
+	/** Returns the first element in the heap. */
 	$get(): T | undefined;
 
-	/** 傳回當前的堆積中的第二個元素 */
+	/** Returns the second element in the heap. */
 	$getSecond(): T | undefined;
 
-	/** 堆積是否為空 */
+	/** Whether the heap is empty */
 	readonly $isEmpty: boolean;
 
-	/** 目前堆積中的元素數目 */
+	/** The number of elements in the heap */
 	readonly $size: number;
 }
 
 export interface IHeap<T> extends IReadonlyHeap<T> {
-	/** 插入一個元素 */
+	/** Inserts an element */
 	$insert(value: T): void;
 
-	/** 傳回並刪除堆積中的第一個元素 */
+	/** Removes and returns the first element in the heap */
 	$pop(): T | undefined;
 }
 
-/** 由小到大的數值比較器 */
+/** Number comparator that sorts from min to max. */
 export const minComparator: Comparator<number> = (a, b) => a - b;
 
 //=================================================================
 /**
- * {@link Heap} 是 {@link IHeap} 的底層類別，提供了共通的功能。
+ * {@link Heap} is the base class for {@link IHeap}, and provide common methods.
  */
 //=================================================================
 
@@ -63,7 +63,7 @@ export abstract class Heap<T> implements IHeap<T> {
 	public abstract [Symbol.iterator](): IterableIterator<T>;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _swap(a: number, b: number): void {

@@ -44,7 +44,7 @@
 			});
 			emit("open", handles);
 		} catch(e) {
-			// 失敗就算了
+			// If it fails then so be it
 		}
 	}
 

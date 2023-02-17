@@ -7,9 +7,9 @@ import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
- * {@link heightTask} 負責更新 {@link TreeNode.$height}。
+ * {@link heightTask} updates {@link TreeNode.$height}.
  *
- * 這個工作是所有更新工作的最起點。
+ * This task is the foremost task of all.
  */
 //=================================================================
 export const heightTask = new Task(height, balanceTask);

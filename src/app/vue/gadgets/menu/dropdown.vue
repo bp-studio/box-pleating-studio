@@ -5,9 +5,9 @@
 			<i :class="icon" />
 			<div class="notify" v-if="notify"></div>
 		</button>
-		<!--下拉選單的內容唯有等到初始化完成之後才會顯示。
-			這樣做的最大好處在於 SSG 的時候不會受到語系的影響。
-			上面的 title 那邊則是另外加上處理。-->
+		<!--We display the content of the dropdown menu only after initialization.
+			The best benefit of doing so is that SSG won't be interfered by locales.
+			We handle the title separately above. -->
 		<div ref="menu" class="dropdown-menu" v-if="initialized">
 			<slot></slot>
 		</div>
@@ -73,7 +73,7 @@
 		}
 	}
 
-	// 也允許手動觸發初始化
+	// We also allow manual triggering initialization
 	defineExpose({ init });
 
 </script>

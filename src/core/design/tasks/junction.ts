@@ -10,20 +10,21 @@ import type { ITreeNode } from "../context";
 
 //=================================================================
 /**
- * {@link junctionTask} 負責維護 {@link State.$junctions}。
+ * {@link junctionTask} maintains {@link State.$junctions}。
  *
- * 這個全新演算法的一大突破在於再也不需要維護整個樹的 LCA，
- * 因為在演算的過程當中 LCA 會自動被提供出來。
+ * The major breakthrough of this new algorithm is that there's no
+ * need to maintain LCA for the entire tree anymore, as LCA will
+ * be provided automatically during the course of the algorithm.
  */
 //=================================================================
 export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask);
 
-/** 本回合當中要被刪除的 {@link Junction} 之鍵 */
+/** The keys of those {@link Junction}s that should be deleted in the current round. */
 const pendingDelete = new Set<number>();
 
 function junction(): void {
 	if(State.$junctions.size > 0) {
-		// 把所有其中一個角片有變動的 Overlap 列為待刪除
+		// If one of the flaps changes, list it as pending delete.
 		for(const flap of State.$flapChanged) {
 			for(const id of State.$junctions.get(flap.id)!.keys()) {
 				pendingDelete.add(getKey(id, flap.id));
@@ -31,10 +32,10 @@ function junction(): void {
 		}
 	}
 
-	// 找出所有的重疊
+	// Find all overlapping
 	getCollisionOfLCA(State.$tree.$root);
 
-	// 刪除掉所有待刪除的 Overlap
+	// Delete the pending junctions
 	for(const key of pendingDelete) {
 		State.$junctions.delete(...getPair(key));
 	}
@@ -61,25 +62,24 @@ function getCollisionOfLCA(lca: ITreeNode): void {
 }
 
 function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
-	// 如果兩個節點的子樹都沒有任何改變，那就不用重新比較了
+	// If both subtrees haven't changed, there's no need to re-compare.
 	if(!State.$subtreeAABBChanged.has(a) && !State.$subtreeAABBChanged.has(b)) return;
 
-	// 碰撞測試
+	// Test for collision
 	if(!a.$AABB.$intersects(b.$AABB, dist(a, b, lca))) return;
 
-	// 繼續往下比較
 	a = getNontrivialDescendant(a);
 	b = getNontrivialDescendant(b);
 	const n = a.$children.$size;
 	const m = b.$children.$size;
 	if(n === 0 && m === 0) {
-		// 找到葉點了，加入到輸出之中
+		// Leaves found; add it to the output
 		State.$junctions.set(a.id, b.id, createJunction(a, b, lca));
 
-		// 取消對應鍵的待刪除
+		// Cancel the pending delete
 		pendingDelete.delete(getKey(a.id, b.id));
 	} else {
-		// 選擇子點比較少的一邊往下繼續比較，以節省比較次數
+		// Choose the one with fewer children, to minimize comparisons.
 		if(m === 0 || n !== 0 && n < m) {
 			for(const c of a.$children) compare(c, b, lca);
 		} else {

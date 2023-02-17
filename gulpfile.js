@@ -1,12 +1,11 @@
-// 修改 path 套件的輸出方式
+// modify the way `path` outputs
 const path = require("path");
 const rel = path.relative;
 path.relative = function(from, to) {
 	return rel(from, to).replace(/\\/g, "/");
 };
 
-// 載入一切相依性
-
+// Load all dependencies
 const gulp = require("gulp");
 const requireDir = require("require-dir");
 const seriesIf = require("./gulp/utils/seriesIf");
@@ -20,7 +19,7 @@ gulp.task("share", gulp.parallel(
 	"locale"
 ));
 
-// 執行一切建置（除了 HTML 和 ServiceWorker 以外）
+// Run all builds (except HTML and ServiceWorker)
 gulp.task("build", gulp.parallel(
 	"share",
 	"client",
@@ -59,7 +58,7 @@ gulp.task("deployPub", () => seriesIf(
 		const inquirer = (await import("inquirer")).default;
 		const answers = await inquirer.prompt([{
 			type: "confirm",
-			message: "請記得在發布之前更新版本號、加入更新 log、並適度修改 README.md。確定發布到正式版？",
+			message: "Before releasing, please update the version number, add update logs, and edit README.md if needed. Are you sure you want to deploy?",
 			name: "ok",
 			default: false,
 		}]);
@@ -70,12 +69,12 @@ gulp.task("deployPub", () => seriesIf(
 	"uploadPub"
 ));
 
-// 清除一切建置檔案
+// Clear all built files
 gulp.task("clean", async () => {
 	const del = (await import("del")).deleteAsync;
 	del("build");
 });
 
-// 預設建置，會建置到可以在本地執行的程度；
-// 在 VS Code 裡面按下 F5 預設就會執行這個建置動作
+// The default build. It will build to the point that it can be run locally.
+// Press F5 in VS Code will execute this task by default.
 gulp.task("default", gulp.parallel("html", "buildDebug"));

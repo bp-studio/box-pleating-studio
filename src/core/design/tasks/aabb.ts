@@ -8,7 +8,7 @@ import type { ITreeNode } from "../context";
 
 //=================================================================
 /**
- * {@link AABBTask} 負責更新 {@link TreeNode.$AABB}。
+ * {@link AABBTask} updates {@link TreeNode.$AABB}。
  */
 //=================================================================
 export const AABBTask = new Task(aabb, junctionTask, roughContourTask);
@@ -31,7 +31,8 @@ function updater(node: ITreeNode): boolean {
 	}
 
 	if(!result) {
-		// 如果父點不用繼續更新，記得把祖先都加入 $SubtreeAABBChanged
+		// If there's no need to further update the parent,
+		// make sure that we add all ancestors to $subtreeAABBChanged
 		while(node.$parent) {
 			State.$subtreeAABBChanged.add(node.$parent);
 			node = node.$parent;

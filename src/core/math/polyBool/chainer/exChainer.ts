@@ -5,40 +5,41 @@ import type { Path } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link ExChainer} 是膨脹操作專用的 {@link Chainer}，
- * 它同時追蹤產生的每一個多邊形跟原有的多邊形之間的關係。
+ * {@link ExChainer} is the {@link Chainer} specialized for expansion.
+ * It tracks the relation between the generated polygon and
+ * the original polygon from which it forms.
  */
 //=================================================================
 
 export class ExChainer extends Chainer {
 
-	/** 每一條 chain 已知的來源索引之集合 */
-	private _temp: Set<number>[] = [];
+	/** The set of known source indices of each chain */
+	private _sources: Set<number>[] = [];
 
 	protected override _chainToPath(id: number, segment: ISegment): Path {
 		const path = super._chainToPath(id, segment);
-		path.from = [...this._temp[id]];
+		path.from = [...this._sources[id]];
 		return path;
 	}
 
 	protected override _connectChain(head: number, tail: number, segment: ISegment): void {
 		super._connectChain(head, tail, segment);
-		for(const n of this._temp[tail]) this._temp[head].add(n);
+		for(const n of this._sources[tail]) this._sources[head].add(n);
 	}
 
 	protected override _append(segment: ISegment, id: number): void {
 		super._append(segment, id);
-		this._temp[id].add(segment.$polygon);
+		this._sources[id].add(segment.$polygon);
 	}
 
 	protected override _prepend(segment: ISegment, id: number): void {
 		super._prepend(segment, id);
-		this._temp[id].add(segment.$polygon);
+		this._sources[id].add(segment.$polygon);
 	}
 
 	protected override _createChain(segment: ISegment): void {
 		super._createChain(segment);
-		this._temp[this._chains] = new Set();
-		this._temp[this._chains].add(segment.$polygon);
+		this._sources[this._chains] = new Set();
+		this._sources[this._chains].add(segment.$polygon);
 	}
 }

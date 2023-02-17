@@ -32,7 +32,7 @@
 
 	onMounted(() => {
 		if(!el.value) return;
-		// iPhone 6 不支援 CSS 的 touch-action: none
+		// iPhone 6 does not support touch-action: none
 		if(getComputedStyle(el.value).touchAction != "none") {
 			el.value.addEventListener("touchmove", (e: TouchEvent) => {
 				if(e.touches.length > 1) e.preventDefault();

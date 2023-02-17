@@ -53,13 +53,13 @@
 			};
 			HotkeyService.registerCore(handler);
 
-			// 在開始隱藏的瞬間就直接進行 resolve，以提昇內部執行的效能
+			// Resolve directly at the moment of hiding to improve the performance of internal execution
 			el.value!.addEventListener("hide.bs.modal", () => {
 				HotkeyService.unregisterCore(handler);
 				resolve();
 			}, { once: true });
 
-			// 然而等到隱藏動畫結束之後才允許下一個排程的 dialog 出現
+			// The next scheduled dialog is not allowed to appear until the hidden animation ends
 			el.value!.addEventListener("hidden.bs.modal", hidden, { once: true });
 
 			reset?.();

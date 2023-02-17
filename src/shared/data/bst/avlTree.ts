@@ -12,16 +12,17 @@ const NIL = { $height: -1 };
 
 //=================================================================
 /**
- * {@link AvlTree} 是會自我平衡的 {@link IBinarySearchTree}，
- * 它的特性是會維持完全的平衡（分支的高度差至多為 1），所以查找的效率最高，
- * 但是代價是其插入和刪除會比 {@link RedBlackTree} 要慢，
- * 所以適用於查找量遠大於變動的情境。
+ * {@link AvlTree} is a self-balancing {@link IBinarySearchTree},
+ * Its characteristic is to maintain complete balance
+ * (the height difference of branches is at most 1), so the search performance is the greatest,
+ * but at the cost of slower insertion and deletion than {@link RedBlackTree},
+ * Therefore, it is suitable for situations where the search demand is much greater than the changes.
  */
 //=================================================================
 
 export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 
-	/** 用來暫存 insert 或 pop 遞迴過程中找到的節點 */
+	/** To store the node found in {@link $insert} 或 {@link $pop} */
 	private _tempNode!: Node<K, V>;
 
 	constructor(comparator: Comparator<K>) {
@@ -44,7 +45,7 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _rotateRight(n: Node<K, V>): Node<K, V> {
@@ -62,12 +63,12 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 從節點 n 開始往下刪除指定的鍵值對應的節點
-	 * @returns 取代掉 n 在樹中所在的位置的節點
+	 * Delete the node of the given key under node `n`.
+	 * @returns The node that replaces `n` in the tree.
 	 */
 	private _delete(n: Node<K, V>, key: K): Node<K, V> {
 		if(n === this._nil) {
@@ -121,9 +122,9 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	}
 
 	/**
-	 * 從節點 n 開始往下找出並刪除最小值。
-	 * 這個方法跟 {@link _delete} 類似，但是不需要執行比較，所以速度較快。
-	 * @returns 取代掉 n 在樹中所在的位置的節點
+	 * Find and remove the minimum value under node `n`.
+	 * This method is similar to {@link _delete}, but does not require comparisons, so it is faster.
+	 * @returns The node that replaces `n` in the tree.
 	 */
 	private _pop(n: Node<K, V>): Node<K, V> {
 		if(n.$left === this._nil) {

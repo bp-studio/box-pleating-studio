@@ -5,22 +5,22 @@ export enum SegmentType {
 }
 
 export interface ISegment {
-	/** 線段類別 */
+	/** Segment type */
 	$type: SegmentType;
 
-	/** 線段的起點 */
+	/** Start point of the segment */
 	$start: Readonly<IPoint>;
 
-	/** 線段的終點 */
+	/** End point of the segment */
 	$end: Readonly<IPoint>;
 
-	/** 線段所屬的多邊形索引 */
+	/** The index of the polygon to which the segment belongs */
 	readonly $polygon: number;
 
 	/**
-	 * 在指定的點上細分一個線段，然後傳回切出的新線段
-	 * @param point 細分的位置
-	 * @param oriented 切出的方向是否跟線段本身的定向一致
+	 * Subdivides a segment at the given point and returns the newly created segment.
+	 * @param point The position where the segment will be subdivided.
+	 * @param oriented Whether the new segment have the same orientation as the original segment.
 	 */
 	$subdivide(point: IPoint, oriented: boolean): ISegment;
 }

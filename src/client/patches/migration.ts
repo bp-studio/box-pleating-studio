@@ -1,18 +1,20 @@
 import { GridType } from "shared/json";
+import { options } from "client/options";
 
 import type { JProject } from "shared/json";
 
 interface IMigration {
 	/**
-	 * 執行 Migration 的動作（原地修改傳入的 project）。
-	 * 傳回 true 表示有 deprecated 的格式發生。
+	 * The action of migration (modifies project in place).
+	 * Returns true when there is a deprecated format.
 	 */
 	(project: Pseudo<JProject>): boolean;
 }
 
 //=================================================================
 /**
- * {@link Migration} 負責處理不同版本的檔案格式的遷移，以求向下相容。
+ * {@link Migration} manages changes in file format versions,
+ * in order to have downward compatibility.
  */
 //=================================================================
 
@@ -49,14 +51,14 @@ export namespace Migration {
 	}
 
 	export function $process(proj: Pseudo<JProject>): JProject {
-		// 判斷移轉的起點
+		// Decide the starting point of migration
 		let i = 0;
 		if("version" in proj) {
 			i = migrations.findIndex(m => m[1] == proj.version) + 1;
 			if(i == 0) throw new Error("Unrecognized version");
 		}
 
-		// 進行移轉
+		// Run migration
 		let deprecate = false;
 		while(i < migrations.length) {
 			console.info("Applying migration " + migrations[i][1]);
@@ -65,10 +67,7 @@ export namespace Migration {
 		}
 		proj.version = $getCurrentVersion();
 
-		if(deprecate) $onDeprecate?.(proj.design!.title);
+		if(deprecate) options.onDeprecate?.(proj.design!.title);
 		return proj as JProject;
 	}
-
-	/** 偵測到棄用格式的事件 callback */
-	export let $onDeprecate: (title?: string) => void;
 }

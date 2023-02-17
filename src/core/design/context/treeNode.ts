@@ -9,39 +9,39 @@ import type { Tree } from "./tree";
 
 //=================================================================
 /**
- * {@link TreeNode} 代表 {@link Tree} 上的一個節點。
- * 對於非根點來說，它同時也紀錄著其父邊的相關資訊。
+ * {@link TreeNode} is a node on the {@link Tree}.
+ * For a non-root, it also stores information about its parent edge.
  */
 //=================================================================
 
 export class TreeNode implements ITreeNode {
 
-	/** 節點的 id */
+	/** The id of the node. */
 	public readonly id: number;
 
 	public $parent: TreeNode | undefined;
 
-	/** 節點到根點的距離 */
+	/** The distance from the node to the root. */
 	public $dist: number = 0;
 
 	/**
-	 * 節點往下的分支高度（葉點為 0）。
+	 * The branch height under the node (0 for a leaf).
 	 *
-	 * 初始值故意設置為 -1，以便第一次的時候也會觸發變更。
+	 * We set the initial value to -1, so that changing is triggered on construction.
 	 */
 	public $height: number = -1;
 
-	/** 節點（以及其往上的邊）所對應的 AABB */
+	/** The AABB corresponding to the node and its parent edge. */
 	public readonly $AABB: AABB = new AABB();
 
-	/** 所有的子點，利用最大高度堆積來實作 */
+	/** All child nodes. Implemented using maximal heap. */
 	public $children = new MutableHeap<TreeNode>((a, b) => b.$height - a.$height);
 
 	public $outerRoughContour!: Polygon;
 
 	public $innerRoughContour!: Polygon;
 
-	/** 節點往上的邊的長度 */
+	/** The length of its parent edge. */
 	public $length: number = 0;
 
 	constructor(id: number, parent?: TreeNode, length: number = 0) {
@@ -62,20 +62,20 @@ export class TreeNode implements ITreeNode {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $setFlap(flap: JFlap): void {
 		this.$setAABB(flap.y + flap.height, flap.x + flap.width, flap.y, flap.x);
 	}
 
-	/** 這個方法順便是測試用的 */
+	/** For testing purpose. */
 	public $setAABB(top: number, right: number, bottom: number, left: number): void {
 		State.$flapAABBChanged.add(this);
 		this.$AABB.$update(top, right, bottom, left);
 	}
 
-	/** 如果自身為葉點則將自己從連結關係上斷開，並傳回成功與否 */
+	/** Removes self if self is leaf, and returns whether the operation is successful. */
 	public $remove(): boolean {
 		const parent = this.$parent;
 		if(this.$children.$get() || !parent) return false;
@@ -92,7 +92,7 @@ export class TreeNode implements ITreeNode {
 		}
 	}
 
-	/** 把一個節點從樹狀結構上面暫時剪下。其子分支的狀態不會改變。 */
+	/** Temporarily disconnects a node from the tree, without changing its subtree. */
 	public $cut(skipProcess?: boolean): void {
 		if(this.$parent) {
 			this.$parent.$children.$remove(this);

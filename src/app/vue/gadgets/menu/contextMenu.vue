@@ -56,10 +56,11 @@
 	}
 
 	function hide(): void {
-		// 已知設定延遲為 10 在某些版本的 Safari 上面是不夠的，所以安全起見設成 50
+		// A delay of 10 is known to be insufficient on some versions of Safari,
+		// so we set it to 50 to be on the safe side
 		const HIDDEN_DELAY = 50;
 		if(shown) {
-			// 這邊必須設置一個延遲，否則觸控模式中會不能按
+			// A delay is required here, or it won't be clickable in touch mode.
 			setTimeout(() => el.value!.classList.remove("show"), HIDDEN_DELAY);
 			shown = false;
 		}

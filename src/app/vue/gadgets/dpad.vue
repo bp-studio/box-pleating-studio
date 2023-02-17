@@ -36,14 +36,14 @@
 		pointer-events: none;
 		transition-property: opacity;
 
-		/* 消失速度比較快 */
+		/* Vanishing is faster */
 		transition-duration: 0.1s;
 		z-index: 100;
 
 		&.show {
 			pointer-events: all;
 
-			/* 稍微延遲顯示，以避免兩指觸控的時候閃現 */
+			/* Slightly delay displaying to avoid glitches in multiple touches */
 			transition-delay: 60ms;
 			transition-duration: 0.2s;
 			opacity: 0.8;

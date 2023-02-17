@@ -41,7 +41,7 @@
 		itemKey: "id",
 	};
 
-	// 延遲載入 VueDraggable 程式庫，以增進啟動效能
+	// Lazy loading of VueDraggable to improve startup performance
 	const Draggable = defineAsyncComponent(() => Lib.ready.then(() => VueDraggable));
 
 	const tab = shallowRef<HTMLDivElement>();

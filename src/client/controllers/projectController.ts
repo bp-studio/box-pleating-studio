@@ -1,16 +1,16 @@
 
 import { Project } from "client/project/project";
 import { Migration } from "client/patches";
-import { deepAssign } from "client/utils/deepAssign";
+import { deepAssign } from "shared/utils/clone";
 import ProjectService from "client/services/projectService";
 
 import type { ShallowRef } from "vue";
 import type { JProject } from "shared/json";
 
-/** 預先產生的待命 worker 實體，在 HTML 中宣告 */
+/** The worker instance that is pre-generated and is standing-by; declared in HTML. */
 declare let __worker: Worker | undefined;
 
-/** 統一的 worker 路徑，在 HTML 中宣告 */
+/** The URL of the worker. Declared in HTML. */
 declare const __worker_src: string;
 
 export interface IProjectController {
@@ -23,7 +23,7 @@ export interface IProjectController {
 
 //=================================================================
 /**
- * {@link ProjectController} 負責管理專案的生成以及對應的 Core worker。
+ * {@link ProjectController} manages the creation of {@link Project} and the corresponding Core worker.
  */
 //=================================================================
 
@@ -33,12 +33,12 @@ export namespace ProjectController {
 
 	export const current = ProjectService.project;
 
-	/** 根據 id 取得專案。 */
+	/** Return the {@link Project} by id. */
 	export function get(id: number): Project | undefined {
 		return projectMap.get(id);
 	}
 
-	/** 取得待命 worker，或者產生一個新的 worker。 */
+	/** Returns the standing-by worker, or create a new worker. */
 	function getOrCreateWorker(): Worker {
 		const worker = __worker ? __worker : new Worker(__worker_src);
 		__worker = undefined;
@@ -46,14 +46,16 @@ export namespace ProjectController {
 	}
 
 	/**
-	 * 創建新的專案。傳入的資料會被 deeply assign 在範本專案之上，而不會經過 migration。
+	 * Creates a new {@link Project}.
+	 * The passed-in data will be deeply assigned on the template project instead of passing through migration.
 	 */
 	export function create(json: RecursivePartial<JProject>): Promise<Project> {
 		json = deepAssign<RecursivePartial<JProject>>({
 			design: {
 				layout: {
-					// 在舊的架構當中這部份會被自行決定出來，但新架構傳遞資料的順序不同，
-					// 所以這部份一開始就要加上去
+					// In the old architecture, this part will be determined automatically,
+					// but the new architecture has a different order of passing data,
+					// so this part is needed from the beginning.
 					flaps: [
 						{ id: 1, x: 8, y: 10, width: 0, height: 0 },
 						{ id: 2, x: 8, y: 6, width: 0, height: 0 },
@@ -78,7 +80,7 @@ export namespace ProjectController {
 	}
 
 	/**
-	 * 開啟舊的專案。傳入的資料會經過 {@link Migration} 升級到最新的格式。
+	 * Opens an old project. Passed-in data will go through {@link Migration} and updated to the latest format.
 	 */
 	export function open(json: Pseudo<JProject>): Promise<Project> {
 		const p = new Project(Migration.$process(json), getOrCreateWorker());
@@ -87,13 +89,13 @@ export namespace ProjectController {
 	}
 
 	/**
-	 * 關閉一個已經被開啟的專案，釋放對應的 worker 與其中所有記憶體。
+	 * Close an opened project, releasing the corresponding worker and all its memory.
 	 *
-	 * 如果專案全部關閉，會自動開啟一個待命的 worker。
+	 * If all projects are closed, it creates a new standing-by worker.
 	 */
 	export function close(proj: Project): void {
 		if(DEBUG_ENABLED) console.time("Close project");
-		proj.$dispose(); // 解構必須優先執行
+		proj.$dispose(); // Disposing must go first
 		if(current.value == proj) current.value = null;
 		projectMap.delete(proj.id);
 		if(projectMap.size == 0) __worker = new Worker(__worker_src);

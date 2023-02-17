@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	/**
-	 * 這個元件負責把各種強制性的對話方塊註冊到 dialogService 之上。
+	 * This component is responsible for registering various mandatory dialogs on the dialogService.
 	 */
 	export default { name: "DialogFragment" };
 </script>

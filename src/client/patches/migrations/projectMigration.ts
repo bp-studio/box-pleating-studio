@@ -1,6 +1,6 @@
 import type { DesignMode, JDesign, JProject } from "shared/json";
 
-/** 分離出 {@link JDesign} 的層次 */
+/** Separates {@link JDesign} */
 export default function $process(proj: Pseudo<JProject>): boolean {
 	proj.design = {
 		title: proj.title,

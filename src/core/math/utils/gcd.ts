@@ -1,4 +1,4 @@
-/** 求出整數的最大公因數。 */
+/** Find the greatest common divider of two numbers. */
 export function $GCD(a: number, b: number): number {
 	if(a == 0 && b == 0) return 1;
 
@@ -11,7 +11,7 @@ export function $GCD(a: number, b: number): number {
 	return a ? a : b;
 }
 
-/** 求出整數的最小公倍數 */
+/** Find the least common multiple of two numbers. */
 export function $LCM(list: number[]): number {
 	let lcm = list[0];
 	for(let i = 1; i < list.length; i++) {
@@ -21,7 +21,7 @@ export function $LCM(list: number[]): number {
 	return lcm;
 }
 
-/** 化簡一對整數 */
+/** Reduce a pair of integers. */
 export function $reduceInt(a: number, b: number): [number, number, number] {
 	const gcd = $GCD(a, b);
 	return [a / gcd, b / gcd, gcd];

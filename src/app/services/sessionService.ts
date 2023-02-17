@@ -14,7 +14,7 @@ const SAVE_INTERVAL = 3000;
 
 //=================================================================
 /**
- * {@link SessionService} 管理工作階段的自動儲存
+ * {@link SessionService} manages the saving of session.
  */
 //=================================================================
 namespace SessionService {
@@ -22,7 +22,7 @@ namespace SessionService {
 	let initialized = false;
 
 	export async function init(loadSession: boolean): Promise<boolean> {
-		// 只有擁有存檔權的實體會去讀取 session
+		// Only the instance with saving rights will read the session
 		const hasSession = await checkSessionRight();
 		if(hasSession && loadSession) {
 			const sessionString = localStorage.getItem("session");
@@ -44,32 +44,33 @@ namespace SessionService {
 		return hasSession;
 	}
 
-	/** 檢查當前的 App 實體是否具有工作階段儲存權 */
+	/** Check if the current App instance has the saving right of session */
 	function checkSessionRight(): Promise<boolean> {
 		const SESSION_CHECK_TIMEOUT = 250;
 		return new Promise<boolean>(resolve => {
-			// 如果是本地執行就採用 Broadcast Channel 的 fallback
+			// If it's running locally, use Broadcast Channel
 			if(location.protocol != "https:") {
 				checkWithBC(Id).then(ok => resolve(ok));
 			} else {
-				// 理論上整個檢查瞬間就能做完，所以過了 1/4 秒仍然沒有結果就視為失敗
+				// In theory the checking can be done instantly,
+				// so if there's no result in 1/4 seconds we consider that failure
 				const cancel = setTimeout(() => resolve(false), SESSION_CHECK_TIMEOUT);
 				callService<number>("id")
 					.then(
-						(id: number) => resolve(Id < id), // 最舊的實體優先
-						() => resolve(true) // 沒有 Service Worker 的時候直接視為可以
+						(id: number) => resolve(Id < id), // The oldest instance goes first
+						() => resolve(true) // If there's no service worker, returns true
 					)
 					.finally(() => clearTimeout(cancel));
 			}
 		});
 	}
 
-	/** 儲存工作階段 */
+	/** Save session */
 	export async function save(): Promise<void> {
-		// 拖曳的時候存檔無意義且浪費效能，跳過
+		// There's no point saving the session during dragging.
 		if(Studio.isDragging) return;
 
-		// 只有當前的實體取得存檔權的時候才會儲存
+		// The session is saved only when the current instance obtains the saving rights.
 		if(Settings.autoSave && await checkSessionRight()) {
 			const session = {
 				jsons: await Promise.all(Workspace.projects.map(proj => proj.toJSON(true))),

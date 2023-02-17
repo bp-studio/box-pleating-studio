@@ -16,34 +16,37 @@ const el = document.getElementById("divWorkspace")!;
 export const scrollView = new ScrollView(el);
 export const viewport: Readonly<IDimension> = scrollView.$viewport;
 
-// 建構 pixi.js 應用程式
+// Create Pixi app
 const pixiApp = new Application({
 	width: viewport.width,
 	height: viewport.height,
-	antialias: true, // 文字的繪製仍舊需要開啟這個
-	autoStart: true, // 不管一開始有沒有專案都先啟動，這可以加快第一個專案的顯示速度
+	antialias: true, // We still need this for drawing texts
+	// Start the app regardless whether there's an opened project.
+	// This improves the displaying speed of the first open project.
+	autoStart: true,
 	premultipliedAlpha: false,
 
-	// 這邊如果採用浮點數的 devicePixelRatio 會造成格線的繪製有 glitch 的感覺，
-	// 所以向下取整數繪製就好。這樣的設置無論是在桌機還是在手機上都可以有好的表現。
+	// Floating number devicePixelRatio could cause the grid to appear glitchy,
+	// so taking the floor of it is good enough. This approach results in good visuals
+	// in both desktops and mobiles.
 	resolution: Math.floor(devicePixelRatio),
 	autoDensity: true,
 });
 useBackground(pixiApp);
 
-// 設定 Renderer
+// Setup renderer
 const renderer = pixiApp.renderer as Renderer;
 export const boundary = new ControlEventBoundary(pixiApp.stage);
 (renderer.events as Writeable<EventSystem>).rootBoundary = boundary;
 
-// 設定 Canvas
+// Setup canvas
 export const canvas = pixiApp.view as HTMLCanvasElement;
 el.appendChild(canvas);
 
-// SmoothGraphics 設定
+// Setup SmoothGraphics
 settings.LINE_SCALE_MODE = LINE_SCALE_MODE.NONE;
 
-// 建立最上層容器
+// Create top-level containers
 export const stage = pixiApp.stage;
 export const designs = new Container();
 export const ui = new Container();
@@ -54,24 +57,24 @@ watchEffect(() => {
 	stage.hitArea = pixiApp.screen;
 });
 
-// 偵錯模式
+// Debug mode
 if(DEBUG_ENABLED) {
-	// 設定名稱
+	// Setup names
 	pixiApp.stage.name = "Workspace";
 	designs.name = "Designs";
 	ui.name = "UI";
 
-	// 啟用檢閱器
+	// Activate inspector
 	PIXI.SmoothGraphics = SmoothGraphics;
 	setupInspector();
 }
 
-// 根據專案的開啟與否自動開關 Pixi
+// Automatically switch Pixi on or off by the opening of projects
 async function toggleDisplay(on: boolean): Promise<void> {
 	if(on && !pixiApp.ticker.started) pixiApp.start();
 	if(!on && pixiApp.ticker.started) {
-		await nextTick(); // 先等候 Vue 的反應運算完成
-		pixiApp.render(); // 結束之前讓 PIXI 再渲染一次，以免下次啟動的時候出現 glitch
+		await nextTick(); // First wait for the updating of Vue.
+		pixiApp.render(); // Then let Pixi to render one more time, to avoid glitches on the next activation
 		pixiApp.stop();
 	}
 }

@@ -56,7 +56,7 @@ const bootstrapCSS = () => {
 	return stream.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
 };
 
-// 這個套件的官方建置方法太爛，自己重新建置的檔案可以精緻得多
+// The building method of this package sucks, we can do a lot better ourselves.
 const vueDraggable = () => {
 	const path = fs.realpathSync(root + "vuedraggable");
 	return gulp.src(path + "/src/vuedraggable.js")
@@ -85,7 +85,7 @@ const vueDraggable = () => {
 };
 
 /**
- * 從 node_modules 進行部份程式庫的自訂建置或者直接複製檔案
+ * Directly copy or custom build files from node_modules for some of the libraries
  */
 gulp.task("lib", () => all(
 	bootstrapJS(),

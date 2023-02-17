@@ -3,7 +3,7 @@ const replace = require("gulp-replace");
 
 const config = require("../config.json");
 
-// 這邊必須指定副檔名，否則資料夾也會被比進去
+// The file extension must be specified here, otherwise the folder will also be included
 const compare = [
 	config.src.app + "/**/*.vue",
 	config.src.app + "/**/*.scss",
@@ -12,10 +12,10 @@ const compare = [
 ];
 
 /**
- * 個別淨化一個 lib 的 CSS 檔案
+ * Purge a CSS file for a library.
  *
- * 當 lib 自己有更新、或者比較對象有更新的時候都要重新執行淨化，
- * 所以針對每一個檔案都要自己產一組 stream。
+ * We need to re-perform the purge whenever a library updates or the comparing target updates,
+ * so each file needs its only stream.
  */
 module.exports.purge = function(stream) {
 	return stream

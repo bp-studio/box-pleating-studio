@@ -7,17 +7,18 @@ import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
- * {@link distanceTask} 負責在樹有重新平衡發生的時候更新 {@link TreeNode.$dist}。
+ * {@link distanceTask} updates {@link TreeNode.$dist} after the tree re-balances.
  */
 //=================================================================
 export const distanceTask = new Task(distance, AABBTask);
 
 function distance(): void {
 	if(State.$rootChanged) {
-		// 樹根有變化的情況就完整全部更新
+		// Perform a full update if the root changed.
 		updateDistRecursive(State.$tree.$root, 0);
 	} else {
-		// 否則只更新那些邊長有變動的節點以及其子樹即可
+		// Otherwise it suffices to update the subtrees
+		// under nodes with the lengths of their parent edges changed.
 		const heap = new HeapSet<TreeNode>((a, b) => a.$dist - b.$dist);
 		for(const node of State.$lengthChanged) heap.$insert(node as TreeNode);
 		while(!heap.$isEmpty) {

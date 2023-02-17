@@ -1,7 +1,7 @@
 const through2 = require("gulp-through2");
 const ttf2woff2 = require("ttf2woff2");
 
-// 用來把 IcoMoon 輸出的 ttf 轉換成 woff2 並且修改對應的 CSS
+// Convert the ttf by IcoMoon to woff2, and modify the CSS file
 
 module.exports = function(stem) {
 	if(!stem) throw new Error("Woff2 error: must specify filename.");

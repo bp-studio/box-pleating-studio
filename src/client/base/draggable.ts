@@ -10,22 +10,22 @@ export interface DragSelectable extends Draggable {
 
 //=================================================================
 /**
- * {@link Draggable} 是可以被拖曳的 {@link Control}。
+ * {@link Draggable} is a {@link Control} that can be dragged.
  */
 //=================================================================
 export abstract class Draggable extends Control {
 
 	public readonly $location: IPoint = shallowReactive({ x: 0, y: 0 });
 
-	/** 拖曳剛開始的時候，滑鼠位置與物件位置之間的差異向量 */
+	/** The offset vector between mouse location and the object location when the dragging started. */
 	private _dragOffset!: IPoint;
 
-	/** 初始化拖曳 */
+	/** Initialize dragging. */
 	public $dragStart(offsetFactory: Func<IPoint, IPoint>): void {
 		this._dragOffset = offsetFactory(this.$location);
 	}
 
-	/** 用滑鼠位置修正拖曳 */
+	/** Fix the dragging by mouse location. */
 	public $constrainTo(p: IPoint): IPoint {
 		const l = this.$location;
 		const v = this.$constrainBy({
@@ -39,32 +39,33 @@ export abstract class Draggable extends Control {
 	}
 
 	/**
-	 * 把一個傳入的向量進行修正到實際上可以被容許的移動範圍之上，
-	 * 預設行為是會一律修正成零向量（換句話說，{@link Draggable} 將不能動）。
+	 * Fix the given vector to the range of allowing movements.
+	 * The default behavior is fix it to the zero vector
+	 * (in other words, this {@link Draggable} cannot be moved).
 	 */
 	public $constrainBy(v: IPoint): IPoint {
 		return { x: 0, y: 0 };
 	}
 
-	/** 以滑鼠座標進行拖曳 */
+	/** Drag by mouse coordinates. */
 	public $moveTo(p: IPoint): void {
 		this._move(p.x - this._dragOffset.x, p.y - this._dragOffset.y);
 	}
 
-	/** 以向量進行拖曳 */
+	/** Drag by a vector. */
 	public $moveBy(v: IPoint): void {
 		if(!v.x && !v.y) return;
 		this._move(this.$location.x + v.x, this.$location.y + v.y);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 觸發移動 */
+	/** Trigger movement */
 	protected _move(x: number, y: number): void {
 		this.$location.x = x;
 		this.$location.y = y;
-		//TODO: 產生 MoveCommand
+		//TODO: crete MoveCommand
 	}
 }

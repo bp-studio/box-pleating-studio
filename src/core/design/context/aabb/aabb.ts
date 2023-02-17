@@ -4,7 +4,7 @@ import type { IRoundedRect } from "core/math/polyBool/intersection/roundedRect";
 import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 
-/** 這個的順序是參考 CSS 當中的順序 */
+/** The order is inspired by CSS */
 export enum Side {
 	_top,
 	_right,
@@ -20,14 +20,18 @@ const maxComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
 
 //=================================================================
 /**
- * {@link AABB}（Axis-Aligned Bounding Box）是一個正交矩形範圍。
- * 它是由四個 {@link AABBSide} 所構成，而其方法大多都是封裝這四個元件的對應方法。
+ * {@link AABB} (Axis-Aligned Bounding Box) is an orthogonal rectangular range.
+ * It is composed of four {@link AABBSide}s, and most of its methods
+ * encapsulate corresponding methods for these four components.
  *
- * 嚴格來說它有兩種情況：自身為最下層 {@link AABB}，此時它的邊界為自變數（角片的四個頂點）；
- * 又或者它非最下層 {@link AABB}，此時它的邊界為所有下層 {@link AABB}（加上它們的間距）聯集之結果。
+ * Strictly speaking, there are two cases: when it is the bottom-level {@link AABB},
+ * its boundaries are the variables themselves (the four tips of the flap);
+ * or when it is not the bottom-level {@link AABB},
+ * its boundaries are the union of all lower-level {@link AABB} (plus their margins).
  *
- * 由於 {@link AABBSide} 裡面使用了堆積結構來進行動態更新，
- * 無論下層的 {@link AABB} 如何變更，它都能快速地確保自己更新到了正確的邊界。
+ * As {@link AABBSide} uses a heap for dynamic updates,
+ * it can quickly ensure that it updates to the correct boundary regardless
+ * of how the lower-level {@link AABB} changes.
  */
 //=================================================================
 
@@ -65,7 +69,7 @@ export class AABB {
 		this._sides[Side._left].$margin = -m;
 	}
 
-	/** 測試用 */
+	/** For testing purpose */
 	public $toArray(): number[] {
 		return this._sides.map(s => s.$key);
 	}

@@ -50,7 +50,7 @@
 		"esbuild-sass-plugin": "^2.5.0",
 		"eslint": "^8.34.0",
 		"eslint-import-resolver-typescript": "^3.5.3",
-		"eslint-plugin-compat": "^4.1.1",
+		"eslint-plugin-compat": "^4.1.2",
 		"eslint-plugin-html": "^7.1.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-jsdoc": "^40.0.0",
@@ -84,7 +84,7 @@
 		"postcss": "^8.4.21",
 		"postcss-html": "^1.5.0",
 		"require-dir": "^1.2.0",
-		"sass": "^1.58.1",
+		"sass": "^1.58.2",
 		"stylelint": "^15.1.0",
 		"stylelint-config-recommended-vue": "^1.4.0",
 		"stylelint-config-standard-scss": "^7.0.1",
@@ -97,7 +97,7 @@
 		"vinyl-ftp": "^0.6.1",
 		"vue-eslint-parser": "^9.1.0",
 		"workbox-build": "^6.5.4",
-		"yargs": "^17.6.2"
+		"yargs": "^17.7.0"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "5.15.4",

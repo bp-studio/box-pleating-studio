@@ -6,25 +6,30 @@ import type { ISegment } from "../segment/segment";
 
 //=================================================================
 /**
- * {@link StartEvent} 是一個線段的開始事件。
+ * {@link StartEvent} represents the start of a segment.
  */
 //=================================================================
 export class StartEvent extends EventBase {
-	/** 對應的線段 */
+	/** Corresponding segment. */
 	public readonly $segment: ISegment;
 
 	/**
-	 * 這條邊是否在整個聯集的內部。
-	 * 初始為 `false`，實際值在演算法過程當中會被決定出來。
+	 * Whether this segment is in the interior of the union.
+	 *
+	 * Its initial value is `false`, while its actual value
+	 * will de determined during the course of the algorithm.
 	 */
 	public $isInside: boolean = false;
 
-	/** 由下往上穿過這條邊的時候，{@link $wrapCount} 會如何改變。 */
+	/** How would {@link $wrapCount} change when we go through this segment from bottom to top. */
 	public readonly $wrapDelta: -1 | 1;
 
 	/**
-	 * 由下往上穿過這條邊之後，所處的位置會被幾個 AABB 所包圍。
-	 * 初始值等同 {@link $wrapDelta}，實際值在演算法過程當中會被決定出來。
+	 * As we go through this segment from bottom to top,
+	 * how many AABBs will wrap around our location.
+	 *
+	 * Its initial value equals {@link $wrapDelta}, while its actual value
+	 * will de determined during the course of the algorithm.
 	 */
 	public $wrapCount: number;
 

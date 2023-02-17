@@ -1,9 +1,11 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
 
+import type { InvalidJunction } from "../layout/junction/invalidJunction";
+
 //=================================================================
 /**
- * {@link invalidJunctionTask} 負責非法重疊的計算與維護。
+ * {@link invalidJunctionTask} calculates and maintains {@link InvalidJunction}s.
  */
 //=================================================================
 export const invalidJunctionTask = new Task(invalid);
@@ -14,14 +16,14 @@ function invalid(): void {
 		const a = junction.$a.id, b = junction.$b.id;
 		State.$invalidJunctionDiff.$add(a, b);
 
-		// 如果同樣的 Overlap 已經繪製過了，那就不用繼續
+		// If the same InvalidJunction has been drawn, there's no need to continue.
 		if(junction.$processed) continue;
 
-		// 計算交集形狀
+		// Calculate the shape of intersection.
 		State.$updateResult.add.junctions[`${a},${b}`] = junction.$getPolygon();
 	}
 
-	// 經過上述的操作之後，剩下沒有被遍歷過的就是應該要被刪除的
+	// After the process above, the remaining ones are those that should be deleted.
 	for(const [a, b] of State.$invalidJunctionDiff.$diff()) {
 		State.$updateResult.remove.junctions.push(`${a},${b}`);
 	}

@@ -20,14 +20,17 @@ export interface ISelectionController {
 }
 
 interface HitStatus {
-	/** 重疊之中目前被選取的 Control 中的最後一個 */
+	/** The last {@link Control} in the stacking. */
 	current: Control | null;
 
-	/** 重疊之中下一個尚未被選取的 Control */
+	/** The next unselected {@link Control} in the stacking. */
 	next: Control | null;
 }
 
-/** 太窄的矩形 pixi 繪製會出問題，因此設定一個下限 */
+/**
+ * Overly narrowed rectangle can cause trouble in Pixi,
+ * so we put a lower limit.
+ */
 const MIN_WIDTH = 0.5;
 
 const TOUCH_THRESHOLD = 20;
@@ -37,7 +40,7 @@ const ALPHA = 0.2;
 
 //=================================================================
 /**
- * {@link SelectionController} 負責 {@link Control} 的選取邏輯。
+ * {@link SelectionController} manages the selection logics of {@link Control}s.
  */
 //=================================================================
 
@@ -51,8 +54,8 @@ export namespace SelectionController {
 
 	let dragSelectables: DragSelectable[];
 
-	// 建立拖曳選取視圖
-	// 這邊因為是矩形，不需要用 SmoothGraphics，效能也會較好
+	// Creates the drag selection view.
+	// Since it is just a rectangle, there's no need for SmoothGraphics
 	const view = new Graphics();
 	view.visible = false;
 	ui.addChild(view);
@@ -87,7 +90,7 @@ export namespace SelectionController {
 		for(const c of sheet.$controls) $toggle(c, true);
 	}
 
-	/** 處理點擊、並且比較看看先後的選取狀態是否一樣 */
+	/** Handles hit, and compares if the selection state remains the same. */
 	export function $compare(event: TouchEvent): boolean {
 		const oldSel = draggables.value.concat();
 		$process(event);
@@ -102,7 +105,7 @@ export namespace SelectionController {
 		downPoint = $getEventCenter(event);
 		const { current, next } = getStatus();
 
-		// 滑鼠按下時的選取邏輯
+		// Selection logic for mouse click
 		if(!ctrlKey) {
 			if(!current) clear();
 			if(!current && next) select(next);
@@ -133,9 +136,9 @@ export namespace SelectionController {
 	}
 
 	/**
-	 * 終止並且傳回是否正在進行拖曳選取。
+	 * End drag-selection and returns in drag-selection was in progress.
 	 *
-	 * @param cancel 是否取消掉過程中已經形成的拖曳選取物件
+	 * @param cancel Should we cancel the selection already made
 	 */
 	export function $endDrag(cancel?: boolean): boolean {
 		const result = view.visible;
@@ -150,9 +153,9 @@ export namespace SelectionController {
 		const point = $getEventCenter(event);
 		const sheet = ProjectService.sheet.value!;
 
-		// 初始化
+		// Initialization
 		if(!view.visible) {
-			// 要拖曳至一定距離才開始觸發拖曳選取
+			// Must drag to a certain distance to trigger drag-selection.
 			const dist = getDistance(downPoint, point);
 			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
 			clear();
@@ -163,7 +166,7 @@ export namespace SelectionController {
 			);
 		}
 
-		// 繪製拖曳選取矩形
+		// Draws the rectangle
 		let w = Math.abs(downPoint.x - point.x);
 		let h = Math.abs(downPoint.y - point.y);
 		if(w < MIN_WIDTH) w = MIN_WIDTH;
@@ -178,13 +181,13 @@ export namespace SelectionController {
 			)
 			.endFill();
 
-		// 逆算出選取範圍對應的座標矩形
+		// Calculate the corresponding coordinates of the rectangle.
 		const bounds = view.getBounds();
 		const matrix = sheet.$view.localTransform;
 		const pt = matrix.applyInverse({ x: bounds.left, y: bounds.bottom });
 		const rect = new Rectangle(pt.x, pt.y, bounds.width / matrix.a, bounds.height / matrix.a);
 
-		// 檢查被選中的物件（線性搜尋夠快，暫時不用優化）
+		// Check selected objects (linear search is good enough for the moment).
 		for(const ds of dragSelectables) {
 			$toggle(ds, rect.contains(ds.$anchor.x, ds.$anchor.y));
 		}
@@ -199,15 +202,15 @@ export namespace SelectionController {
 
 	function getStatus(): HitStatus {
 
-		let first: Control | null = null;	// 重疊之中的第一個 Control
+		let first: Control | null = null;	// The first Control in the stacking
 		let current: Control | null = null;
 		let next: Control | null = null;
 
-		// 找出所有點擊位置中的重疊 Control
+		// Find all Controls at the hit position
 		const sheet = ProjectService.sheet.value!;
 		const controls = boundary.$hitTestAll(sheet, downPoint);
 
-		// 找出前述的三個關鍵 Control
+		// Find the three critical Controls
 		for(const o of controls) {
 			if(!first) first = o;
 			if(o.$selected) current = o;

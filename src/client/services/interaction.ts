@@ -17,17 +17,19 @@ export const mouseCoordinates = shallowRef<Readonly<IPoint> | null>(null);
 
 //=================================================================
 /**
- * {@link Interaction} 是使用者事件的進入點。它負責較為宏觀的邏輯、
- * 決定要把事件交給那一個控制器去處理，而細節則在各個控制器內部完成。
+ * {@link Interaction} is the entry point of user interactions.
+ * It handles higher level logics, decide which controller should take
+ * care of the event, and the details are done within the controllers.
  *
- * 原則上使用者事件除非是控制器專門監聽的、否則都應該要在這邊進行監聽，
- * 以便確保執行順序。
+ * In principle, unless an event is listened only by a single controller,
+ * the event listener should be placed here, in order to manage the
+ * order of execution.
  */
 //=================================================================
 
 export namespace Interaction {
 
-	/** 記住游標按壓的狀態，以判斷目前是否正在拖曳 */
+	/** Used to determine if we're dragging. */
 	let pointerHeld = false;
 
 	canvas.addEventListener("touchstart", pointerDown, { passive: true });
@@ -55,7 +57,7 @@ export namespace Interaction {
 	});
 
 	function blur(): void {
-		// 切換視窗或頁籤的情況中會直接取消掉進行中的拖曳選取
+		// Switching window or tab will cancel drag-selecting.
 		pointerHeld = false;
 		SelectionController.$endDrag(true);
 	}
@@ -104,7 +106,8 @@ export namespace Interaction {
 		if(event instanceof MouseEvent) {
 			const space = KeyboardController.$isPressed("space");
 			const bt = event.button;
-			// 執行捲動，支援空白鍵捲動、中鍵和右鍵捲動三種操作方法
+			// Perform scrolling. Supported methods are
+			// space key scrolling and middle or right mouse button scrolling.
 			if(space || bt == MouseButton.right || bt == MouseButton.middle) {
 				event.preventDefault();
 				initScroll(event);
@@ -117,11 +120,11 @@ export namespace Interaction {
 				ZoomController.$init(event);
 				initScroll(event);
 			}
-			// 總而言之都中止後續處理
+			// Stop further processing in any case
 			return;
 		}
 
-		// 會進入到這邊必然是滑鼠左鍵按壓、或是單點觸控
+		// As we get here, it must be a left click of the mouse or a single touch
 		pointerHeld = true;
 
 		if($isTouch(event)) touchStart(event);
@@ -131,7 +134,7 @@ export namespace Interaction {
 	function mouseDown(event: MouseEvent): void {
 		SelectionController.$process(event);
 
-		// 滑鼠操作時可以直接點擊拖曳
+		// Click-dragging is OK for mouse
 		DragController.$init(event);
 	}
 
@@ -139,14 +142,16 @@ export namespace Interaction {
 		const ok = SelectionController.$compare(event);
 		LongPressController.$init();
 
-		// 觸控的情況中，規定一定要先選取才能拖曳，不能直接拖（不然太容易誤觸）
+		// In case of touching, selection must be made before one can drag,
+		// otherwise it is too easy to trigger unwanted dragging.
 		if(ok) DragController.$init(event);
 	}
 
 	function drag(event: MouseEvent | TouchEvent): void {
 		if(!pointerHeld) return;
 
-		// 捲動中的話就不用在這邊處理了，交給 body 上註冊的 handler 去處理
+		// No need to handle the event during scrolling;
+		// let the event listener on the body to take care of it.
 		if(ScrollController.$isScrolling()) return;
 
 		if(SelectionController.$tryReselect(event)) {

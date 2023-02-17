@@ -1,4 +1,4 @@
-// 匯入外部程式庫的類型
+// Third-party library types
 import type vue from "vue";
 import type bootstrap from "bootstrap";
 import type vueI18n from "vue-i18n";

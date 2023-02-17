@@ -13,7 +13,7 @@ function setBackgroundColor(pixiApp: Application, dark: boolean): void {
 
 //=================================================================
 /**
- * 設定 pixi 應用程式使用反應式的背景顏色
+ * Setup the reactive background color of the Pixi app
  */
 //=================================================================
 export function useBackground(pixiApp: Application): void {

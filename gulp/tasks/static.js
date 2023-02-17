@@ -17,41 +17,41 @@ const libDest = config.dest.dist + "/lib";
 const { purge } = require("../utils/purge");
 const fontAwesome = require("../plugins/fontAwesome");
 
-/** 一個給定的 js 檔案是否有 min 或者 prod 的版本 */
+/** If a given js file has a `min` or `prod` version */
 function hasMin(file) {
 	return fs.existsSync(file.path.replace(/js$/, "min.js")) || fs.existsSync(file.path.replace(/js$/, "prod.js"));
 }
 
-/** 複製 debug 資源 */
+/** Copying debug assets */
 const copyDebugStatic = () => gulp.src([
 	"*.js",
 	"*.js.map",
 ], { cwd: config.src.lib })
 	.pipe(filter(file => {
-		// 選取具有 min 版本的 .js 檔案
+		// include those .js files with a `min` version
 		if(file.extname != ".js") return true;
 		return hasMin(file);
 	}))
-	.pipe(newer(config.dest.debug + "/lib")) // 採用 1:1 比對目標的策略
+	.pipe(newer(config.dest.debug + "/lib")) // Use 1:1 comparison
 	.pipe(gulp.dest(config.dest.debug + "/lib"));
 
-/** 複製靜態資源 */
+/** Copying static assets */
 const copyStatic = () => gulp.src([
 	"**/*",
 
-	// 「.」開頭的檔案需要另外指定
+	// We need to make specific about the filenames starting with "."
 	".htaccess",
 	".well-known/**/*",
 
-	// 不包含下列檔案
+	// These will not be included
 	"!**/README.md",
 
-	// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
+	// These files will be built separately, so we don't treat them as static assets.
 	"!index.htm",
 	"!log/*",
 	"!assets/bps/**/*",
 ], { cwd: config.src.public, base: config.src.public })
-	.pipe(newer(config.dest.dist)) // 採用 1:1 比對目標的策略
+	.pipe(newer(config.dest.dist)) // Use 1:1 comparison
 	.pipe(gulpIf(file => file.extname == ".js", terser({
 		compress: {
 			drop_debugger: false,
@@ -59,32 +59,32 @@ const copyStatic = () => gulp.src([
 	})))
 	.pipe(gulp.dest(config.dest.dist));
 
-/** 複製程式庫 */
+/** Copy libraries */
 const copyLib = () => gulp.src([
 	"**/*",
 
-	// 不包含下列檔案
+	// These will not be included
 	"!**/README.md",
 	"!**/tsconfig.json",
 
-	// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
+	// These files will be built separately, so we don't treat them as static assets.
 	"!**/*.ts",
 	"!**/*.scss",
 	"!**/*.css",
 	"!**/*.js.map",
 ], { cwd: config.src.lib })
 	.pipe(filter(file => {
-		// 過濾掉具有 min 版本的 .js 檔案
+		// exclude those .js files with a `min` version
 		if(file.extname != ".js") return true;
 		return !hasMin(file);
 	}))
 	.pipe(gulpIf(file => file.extname == ".js",
-		replace(/\s+\/\/# sourceMappingURL=.+?$/ms, "") // 刪除 sourcemap
+		replace(/\s+\/\/# sourceMappingURL=.+?$/ms, "") // remove sourcemap
 	))
-	.pipe(newer(libDest)) // 採用 1:1 比對目標的策略
+	.pipe(newer(libDest)) // Use 1:1 comparison
 	.pipe(gulp.dest(libDest));
 
-/** 建置精簡的 FontAwesome 字型 */
+/** Build minified FontAwesome font */
 const faSrc = "node_modules/@fortawesome/fontawesome-free";
 const faTarget = libDest + "/font-awesome";
 const subsetFontAwesome = () =>
@@ -92,7 +92,7 @@ const subsetFontAwesome = () =>
 		.pipe(fontAwesome())
 		.pipe(gulp.dest(faTarget + "/webfonts"));
 
-/** 淨化 FontAwesome 的 css */
+/** Purge CSS for FontAwesome */
 const purgeFontAwesome = () => {
 	let stream = gulp.src(faSrc + "/css/all.min.css", { base: faSrc });
 	stream = purge(stream);
@@ -111,8 +111,8 @@ gulp.task("static", () => {
 		copyStatic(),
 		copyLib(),
 	];
-	// 只有初次的時候會自動執行 FontAwesome 建置，
-	// 其餘在必要的時候再手動執行 fa 工作，以增進效能。
+	// Only the first time the FontAwesome build will be executed automatically.
+	// In other cases we call the `fa` task manually to improve performance.
 	if(!fs.existsSync(faTarget)) {
 		tasks.push(
 			purgeFontAwesome(),

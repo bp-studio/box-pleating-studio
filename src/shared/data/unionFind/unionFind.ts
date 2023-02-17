@@ -2,23 +2,24 @@ import { createArray } from "shared/utils/array";
 
 //=================================================================
 /**
- * {@link UnionFind} 是聯集尋找演算法的基本實作。
+ * {@link UnionFind} is the basic implementation of the union-find algorithm.
  */
 //=================================================================
 
 export class UnionFind<T> {
 
-	// 元素相關屬性
+	// Properties related to elements
 	protected readonly _element: T[];
 	protected _length: number = 0;
 	private readonly _map: Map<T, number> = new Map();
 
-	// 聯集尋找相關屬性
+	// Properties related to union-find
 	protected readonly _parent: number[];
 	private readonly _size: number[];
 
 	/**
-	 * @param size 預定的元素數上限。如果之後加入的元素數超過這個數目，將會導致錯誤，務必注意。
+	 * @param size The projected element number limit.
+	 * Pay attention that an error will occur if the number of elements exceed this limit later on.
 	 */
 	constructor(size: number) {
 		// 所有的陣列都預先初始化至預定的大小，以節省 push 的成本
@@ -27,7 +28,10 @@ export class UnionFind<T> {
 		this._size = createArray(size, 1);
 	}
 
-	/** 指定兩個元素屬於同一個集合（必要的時候會將元素新增至清單中） */
+	/**
+	 * Signal that the two elements are in the same set.
+	 * The elements will be added to the list when in need.
+	 */
 	public $union(a: T, b: T): void {
 		const i = this._findRecursive(this._add(a));
 		const j = this._findRecursive(this._add(b));
@@ -37,7 +41,7 @@ export class UnionFind<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _pointTo(i: number, j: number): void {
@@ -46,7 +50,7 @@ export class UnionFind<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _add(element: T): number {
@@ -63,10 +67,11 @@ export class UnionFind<T> {
 		if(parent === -1) return cursor;
 		const result = this._findRecursive(parent);
 
-		// 路徑壓縮。注意到這樣的作法會導致任何情況下、
-		// 都會多做了一次其實是多餘的指派（即原本就位於 result 之下的那個點），
-		// 但是為了避免這種多餘指派，無論如何都得多做一個判別，
-		// 而判別的成本反而比指派更高，所以多做反而快。
+		// Path compression. Note that such an approach would result in
+		// one redundant assignment (that is, the point that was originally located under result)
+		// in all cases. However, to avoid this redundant assignment,
+		// one more decision must be made anyway, and the cost of decision is in fact higher than assignment.
+		// So the current approach is in fact faster.
 		this._parent[cursor] = result;
 
 		return result;

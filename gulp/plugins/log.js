@@ -2,7 +2,7 @@ const through2 = require("gulp-through2");
 const path = require("path");
 const { marked } = require("marked");
 
-// 用來建立 log 檔案目錄和 preload manifest
+// For building the log indices and preload manifest
 
 module.exports = function(outFile, libs) {
 	const preload = `

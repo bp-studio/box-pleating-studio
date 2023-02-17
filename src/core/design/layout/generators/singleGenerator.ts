@@ -1,6 +1,6 @@
 import { GeneratorUtil } from "core/utils/generator";
 import { Configuration } from "../configuration";
-import { clone } from "core/utils/clone";
+import { clone } from "shared/utils/clone";
 
 import type { JJunction, JOverlap, JStretch } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";

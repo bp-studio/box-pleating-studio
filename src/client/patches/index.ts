@@ -9,14 +9,18 @@ Migration.$add(BetaMigration, "beta");
 Migration.$add(Rc0Migration, "rc0");
 Migration.$add(Rc1Migration, "rc1");
 
-// 版本 0 與 rc1 完全相同，純粹為了紀念發行而改變號碼
+/** Version 0 is identical as rc1. We change the version code just for the record. */
 Migration.$add(TrivialMigration, "0");
 
-// 版本 0.4 完全向下相容於版本 0，並不需要作任何修改；所有不同的地方都會自動被忽略
-// 差別包括多了 history（不存檔）、棄用 fullscreen、scale 改成 zoom（不存檔）
+/**
+ * Version 0.4 is completely downward compatible to version 0,
+ * so we don't need to modify anything. All difference will be ignored.
+ * The differences include there's an additional `history` (not included in file saving),
+ * deprecate `fullscreen`, change `scale` to `zoom` (not included in file saving)
+ */
 Migration.$add(TrivialMigration, "0.4");
 
-// 版本 0.6 將 design 的層次分離出來
+/** Version 0.6 separates `design` from the rest. */
 Migration.$add(ProjectMigration, "0.6");
 
 export { Migration };

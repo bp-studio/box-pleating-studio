@@ -1,9 +1,12 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
 
+import type { Configuration } from "../layout/configuration";
+import type { Pattern } from "../layout/pattern";
+
 //=================================================================
 /**
- * {@link patternTask} 負責尋找出可能的組態。
+ * {@link patternTask} find all possible {@link Configuration}s and {@link Pattern}s.
  */
 //=================================================================
 export const patternTask = new Task(pattern);

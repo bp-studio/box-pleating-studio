@@ -4,10 +4,10 @@ import type { IntDoubleMap } from "./intDoubleMap";
 
 //=================================================================
 /**
- * {@link DoubleMap} 是通用性的 {@link IDoubleMap} 實作。
+ * {@link DoubleMap} is a general-purpose implementation of {@link IDoubleMap}。
  *
- * 它可以接受任何的物件當作索引，但是記憶體的消耗較大，
- * 雙鍵的操作也不如 {@link IntDoubleMap} 來得快速。
+ * It accepts any object as keys, but uses more memory,
+ * and not as efficient as {@link IntDoubleMap} on double-key operations.
  */
 //=================================================================
 

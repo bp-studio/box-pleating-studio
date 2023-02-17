@@ -7,7 +7,7 @@ import type { ArcSegment } from "../segment/arcSegment";
 
 //=================================================================
 /**
- * {@link ArcChainer} 類別負責串接可能有 {@link ArcSegment} 的多邊形。
+ * {@link ArcChainer} chains those polygons that might contain {@link ArcSegment}s.
  */
 //=================================================================
 

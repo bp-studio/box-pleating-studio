@@ -12,7 +12,7 @@ import type { ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
 import type { Junction } from "../layout/junction/junction";
 
-/** 一些彼此相連的 {@link ValidJunction} 所構成的群組 */
+/** A group of connected {@link ValidJunction}s */
 interface Team {
 	$junctions: ValidJunction[];
 	$flaps: number[];
@@ -20,12 +20,14 @@ interface Team {
 
 //=================================================================
 /**
- * {@link stretchTask} 負責將合法的 {@link Junction} 進行分組並維護 {@link Stretch} 的集合。
+ * {@link stretchTask} arranges {@link Junction} into groups and maintain the set of {@link Stretch}es.
  *
- * 這是一般性的伸展結構理論當中特別複雜且深奧的一段，
- * 我自己也不敢說我已經完全參透了這一段，歷年來幾度我覺得我已經搞清楚了、
- * 但之後又會發現一些奇特的 edge cases 打破了那些想法。
- * 無論如何，這邊呈現的演算法是目前為止的理解之累積，實務上應該足以應付絕大多數的情境。
+ * This is one exceptionally complicated part in the theory of general
+ * stretch patterns, and even I can't say that I've figured it all out.
+ * For several times throughout the years I thought that I've figured it all out,
+ * but then came some bizarre edge cases that proved me wrong.
+ * Anyway, the algorithm presented here is the accumulation of my understandings
+ * so far, which should at least be able to handle vast majority of cases.
  */
 //=================================================================
 export const stretchTask = new Task(stretches, patternTask);
@@ -33,14 +35,14 @@ export const stretchTask = new Task(stretches, patternTask);
 function stretches(): void {
 	const validJunctions = getValidJunctions();
 
-	// 第一次分組；先分組有助於加快覆蓋檢查
+	// First round of grouping, which helps speed up covering checks.
 	const teams = grouping(validJunctions);
 
 	for(const team of teams) processTeam(team.$junctions);
 
 	for(const signature of State.$stretchDiff.$diff()) {
 		if(State.$isDragging) {
-			// 放到暫存區當中
+			// Put into cache
 			const s = State.$stretches.get(signature)!;
 			State.$stretchCache.set(signature, s);
 		}
@@ -49,10 +51,10 @@ function stretches(): void {
 	}
 }
 
-/** 分組演算法 */
+/** Grouping algorithm */
 function grouping(junctions: ValidJunction[]): Team[] {
 	const unionFind = new ListUnionFind<number>(
-		// 參與的 Quadrant 的數目最多就是 Junction 數目乘以二
+		// Involved Junctions are at most Quadrant times 2
 		junctions.length * 2
 	);
 	const quadrantMap = new IntDoubleMap<ValidJunction>();
@@ -65,8 +67,9 @@ function grouping(junctions: ValidJunction[]): Team[] {
 	for(const group of groups) {
 		const $junctions: ValidJunction[] = [];
 
-		// 在一些少見的情況中，單一個角片可能會兩個相對的象限都出現在同一個群組中，
-		// 所以有可能角片的 id 會重複，基於正確性這邊還是必須加以檢查。
+		// In some really rare cases, a single flap could have two opposite
+		// quadrants showing up in the same group, so the ids of the flaps
+		// may contain duplicates. We still have to make the check.
 		const $flaps = distinct(group.map(q => q >>> 2).sort(minComparator));
 
 		foreachPair($flaps, (i, j) => {
@@ -78,9 +81,9 @@ function grouping(junctions: ValidJunction[]): Team[] {
 	return result;
 }
 
-/** 處理第一分組階段整理出來的 {@link Team} */
+/** Processes the {@link Team}s resulting from the first round of grouping. */
 function processTeam(junctions: ValidJunction[]): void {
-	// 檢查覆蓋
+	// Covering check
 	const uncoveredJunctions = getUncoveredJunctions(junctions);
 	if(uncoveredJunctions.length === 1) {
 		const { $a, $b } = uncoveredJunctions[0];
@@ -89,13 +92,16 @@ function processTeam(junctions: ValidJunction[]): void {
 			$junctions: uncoveredJunctions,
 		});
 	} else {
-		// 第二次進行分組
+		// Second round of grouping
 		const teams = grouping(uncoveredJunctions);
 		for(const team of teams) createOrUpdateStretch(team);
 	}
 }
 
-/** 篩選出沒有被覆蓋的 {@link ValidJunction}；這些是真的會被用來計算伸展模式的 */
+/**
+ * Filter those {@link ValidJunction} that are not covered.
+ * Those are the ones that will actually be used for {@link Stretch}es.
+ */
 function getUncoveredJunctions(junctions: ValidJunction[]): ValidJunction[] {
 	if(junctions.length === 1) return junctions;
 	const keys = new Set<number>();
@@ -104,7 +110,7 @@ function getUncoveredJunctions(junctions: ValidJunction[]): ValidJunction[] {
 	return junctions.filter(j => !j.$isCovered);
 }
 
-/** 根據 {@link Team} 的角片結構來適度更新或創造新的 {@link Stretch} */
+/** Update or create {@link Stretch} based on the flap structure of the {@link Team}. */
 function createOrUpdateStretch(team: Team): void {
 	const signature = team.$flaps.join(",");
 	State.$stretchDiff.$add(signature);
@@ -118,18 +124,18 @@ function createOrUpdateStretch(team: Team): void {
 	}
 }
 
-/** 根據簽章試著找出既有的 {@link Stretch}（包括暫存的） */
+/** Try to get an existing (including cached) {@link Stretch} by signature. */
 function tryGetStretch(signature: string): Stretch | undefined {
 	let result = State.$stretches.get(signature);
 	if(!result && State.$isDragging) {
 		result = State.$stretchCache.get(signature);
-		// 記得要把暫存的物件放回去
+		// Don't forget to put the cached object back
 		if(result) State.$stretches.set(signature, result);
 	}
 	return result;
 }
 
-/** 收集所有合法的 {@link Junction}，並且重設它們的覆蓋狀態 */
+/** Collect all {@link ValidJunction}s and reset their covering states. */
 function getValidJunctions(): ValidJunction[] {
 	const result: ValidJunction[] = [];
 	for(const j of State.$junctions.values()) {
@@ -141,7 +147,7 @@ function getValidJunctions(): ValidJunction[] {
 	return result;
 }
 
-/** 檢查兩個 {@link Junction} 之間是否有覆蓋關係 */
+/** Check if two {@link Junction}s have a covering relation. */
 function checkCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): void {
 	const n = getPathIntersectionDistances(j1, j2);
 	if(!n) return;
@@ -149,7 +155,7 @@ function checkCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>):
 	const r2 = j2.$getBaseRectangle(n[1]);
 
 	if(r1.eq(r2)) {
-		// 一樣大的情況中，近的覆蓋遠的
+		// If they are the same size, the near one covers the far one.
 		if(j1.$isCloserThan(j2)) j2.$setCoveredBy(j1);
 		else j1.$setCoveredBy(j2);
 	} else if(r1.$contains(r2)) {
@@ -160,9 +166,10 @@ function checkCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>):
 }
 
 /**
- * 這是實務上很罕見、但基於理論正確性必須做的一個例外檢查；
- * 當兩個可能互相覆蓋的 {@link ValidJunction} 左右其中一側參與的兩個角片之間再度又有 {@link ValidJunction} 的時候，
- * 此時不應該視為覆蓋。
+ * This is rare in practice, but still needed for correctness.
+ * For two {@link ValidJunction}s that might have a covering relation,
+ * if there is again a {@link ValidJunction} between the two flaps on one side,
+ * we should not treat that as covering.
  */
 function checkCoveringException(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): boolean {
 	const [a1, b1] = j1.$orientedIds;
@@ -171,7 +178,11 @@ function checkCoveringException(j1: ValidJunction, j2: ValidJunction, keys: Set<
 		b1 !== b2 && keys.has(getKey(b1, b2));
 }
 
-/** 找出對應路徑上的一個共用點，並且傳回兩個 {@link Junction.$a} 到該點的距離（基準距離） */
+/**
+ * Find a common node on the two corresponding paths,
+ * and return the distance of the two {@link Junction.$a}s to that node
+ * (the canonical distances).
+ */
 function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [number, number] | undefined {
 	const a1 = j1.$lca, a2 = j2.$lca;
 	if(a1 === a2) return [j1.$a.$dist - a1.$dist, j2.$a.$dist - a1.$dist];
@@ -186,9 +197,10 @@ function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [nu
 }
 
 /**
- * 第一個點是否為第二個點的祖先。
+ * Whether the first node is an ancestor of the second node.
  *
- * 實務上這兩個點並不會在樹上相差太遠，所以這個動作的執行是夠快的。
+ * In practice these two nodes won't be too far apart on the tree,
+ * so the process here is fast enough.
  */
 function isAncestor(p: ITreeNode, n: ITreeNode): boolean {
 	while(n.$dist > p.$dist) n = n.$parent!;

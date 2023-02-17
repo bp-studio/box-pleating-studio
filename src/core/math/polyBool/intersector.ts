@@ -6,7 +6,7 @@ import type { EndEvent, StartEvent, SweepEvent } from "./event";
 
 //=================================================================
 /**
- * {@link IEventProvider} 介面負責生成與比較事件。
+ * {@link IEventProvider} generates and compares {@link SweepEvent}.
  */
 //=================================================================
 export interface IEventProvider {
@@ -25,16 +25,16 @@ export interface IntersectorConstructor {
 
 //=================================================================
 /**
- * {@link Intersector} 是交點處理邏輯的基底類別。
+ * {@link Intersector} is the base class for segment intersection logic.
  */
 //=================================================================
 
 export abstract class Intersector {
 
-	/** 當前處理起點當中的事件 */
+	/** The {@link StartEvent} that is being processed */
 	protected _currentStart!: StartEvent;
 
-	/** 有新的事件被插入到事件佇列的前面 */
+	/** Whether there is a new event being inserted to the front of the event queue. */
 	protected _eventInserted: boolean = false;
 
 	private readonly _provider: IEventProvider;
@@ -45,7 +45,7 @@ export abstract class Intersector {
 		this._queue = queue;
 	}
 
-	/** 處理可能的交點，並且傳回是否有插入事件發生 */
+	/** Process possible intersections, and returns if there is an insertion. */
 	public $process(prev: StartEvent | undefined, ev: StartEvent, next: StartEvent | undefined): boolean {
 		this._currentStart = ev;
 		this._eventInserted = false;
@@ -55,17 +55,18 @@ export abstract class Intersector {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 這是衍生類別需要實作的主要方法，即考慮各種情況來找出線段可能的交點、
-	 * 並且適時呼叫 {@link _subdivide} 方法來細分線段。
-	 * 衍生類別可以在這裡面針對需求做最高度的效能優化。
+	 * This is the main method that the derived classes need to implement,
+	 * which considers various situations to find possible intersection points of the segments,
+	 * and calls the {@link _subdivide} method properly to subdivide the segments.
+	 * The derived classes can make highly optimized performance tuning for specific requirements in this method.
 	 */
 	protected abstract _possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void;
 
-	/** 在指定的位置上細分一條邊，並傳回第二段的開始事件 */
+	/** Subdivide a segment at the given point, and returns the {@link StartEvent} of the second segment. */
 	protected _subdivide(event: StartEvent, point: IPoint): StartEvent {
 		const provider = this._provider;
 		const segment = event.$segment;
@@ -82,9 +83,9 @@ export abstract class Intersector {
 		event.$other = newEnd;
 		this._queue.$insert(newEnd);
 
-		// 如果被細分的邊不是當前處理起點中的邊……
+		// If the edge being subdivided is not the edge being processed...
 		if(event != this._currentStart && !this._eventInserted) {
-			// 檢查看看是否有新的事件被插入到事件佇列的前面
+			// ...check if there is a new event being inserted to the front of the event queue
 			this._eventInserted ||=
 				provider.$eventComparator(this._currentStart, newStart) > 0 ||
 				provider.$eventComparator(this._currentStart, newEnd) > 0;
@@ -93,12 +94,12 @@ export abstract class Intersector {
 		return newStart;
 	}
 
-	/** 處理 AA 線段；這在衍生類別中都會用到 */
+	/** Processing AA segments. This is used in derived classes. */
 	protected _processAALineSegments(ev1: StartEvent, ev2: StartEvent): void {
 		const seg1 = ev1.$segment as AALineSegment;
 		const seg2 = ev2.$segment as AALineSegment;
 		if(seg1.$isHorizontal != seg2.$isHorizontal) {
-			// 十字交叉
+			// Cross intersecting
 			const h = seg1.$isHorizontal ? ev1 : ev2;
 			const v = seg1.$isHorizontal ? ev2 : ev1;
 			const x = v.$point.x, y = h.$point.y;
@@ -112,24 +113,24 @@ export abstract class Intersector {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 處理兩個線段重疊的情況 */
+	/** Process the case where the two line segment overlaps. */
 	private _processOverlap(ev1: StartEvent, ev2: StartEvent, isHorizontal: boolean): void {
-		// 我們已知 ev1 和 ev2 已經照順序排好了
+		// We know that ev1 and ev2 are sorted
 		const { x: x1, y: y1 } = ev1.$point;
 		const p2 = ev1.$other.$point, { x: x2, y: y2 } = p2;
 		const p3 = ev2.$point, { x: x3, y: y3 } = p3;
 		const p4 = ev2.$other.$point, { x: x4, y: y4 } = p4;
 
 		if(isHorizontal && y1 === y3) {
-			// 水平重疊
+			// horizontal overlapping
 			if(x1 < x3 && x3 < x2) ev1 = this._subdivide(ev1, p3);
 			if(x1 < x4 && x4 < x2) this._subdivide(ev1, p4);
 			else if(x3 < x2 && x2 < x4) this._subdivide(ev2, p2);
 		} else if(!isHorizontal && x1 === x3) {
-			// 垂直重疊
+			// vertical overlapping
 			if(y1 < y3 && y3 < y2) ev1 = this._subdivide(ev1, p3);
 			if(y1 < y4 && y4 < y2) this._subdivide(ev1, p4);
 			else if(y3 < y2 && y2 < y4) this._subdivide(ev2, p2);

@@ -6,7 +6,7 @@ import type { Node } from "./intDoubleMap";
 
 //=================================================================
 /**
- * {@link ValuedIntDoubleMap} 是除了 {@link IntDoubleMap} 的功能之外還對值做了索引的實作。
+ * {@link ValuedIntDoubleMap} is an {@link IntDoubleMap} plus the indexing on the values.
  */
 //=================================================================
 
@@ -47,7 +47,7 @@ export class ValuedIntDoubleMap<V> extends IntDoubleMap<V> implements IValuedDou
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _createNode(key1: number, key2: number, value: V): Node<V> {
@@ -70,7 +70,7 @@ export class ValuedIntDoubleMap<V> extends IntDoubleMap<V> implements IValuedDou
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _cutNode(node: Node<V>): void {

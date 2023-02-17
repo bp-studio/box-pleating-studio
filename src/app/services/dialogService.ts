@@ -7,7 +7,7 @@ export function setup(d: typeof DialogService): void {
 
 //=================================================================
 /**
- * {@link DialogService} 服務負責管理各種對話方塊
+ * {@link DialogService} manages dialogs.
  */
 //=================================================================
 namespace DialogService {

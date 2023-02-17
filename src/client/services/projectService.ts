@@ -7,17 +7,17 @@ export const MIN_SCALE = 10;
 
 //=================================================================
 /**
- * 這個服務負責管理任何跟「當前被選定的 {@link Project}」有關的反應。
+ * {@link ProjectService} manages reactivity related to "currently selected {@link Project}".
  *
- * 獨立出這個服務類別是為了消除各種循環相依性。
+ * We made this a standalone service to eliminate cyclic importing of modules.
  */
 //=================================================================
 namespace ProjectService {
 
-	/** 當前選取的專案。 */
+	/** Currently selected {@link Project}. */
 	export const project = shallowRef<Project | null>(null);
 
-	/** 當前的 {@link Sheet}；因為這個太常用了統一放在這裡 */
+	/** Currently selected {@link Sheet}. */
 	export const sheet = computed(() => project.value?.design.sheet);
 
 	watch(project, (newProject, oldProject) => {
@@ -25,14 +25,14 @@ namespace ProjectService {
 		oldProject?.$toggle(false);
 	});
 
-	/** 當前工作區域的尺度 */
+	/** Scale of the current workspace. */
 	export const scale = computed(() => {
 		const s = sheet.value;
-		if(!s) return 1; // 這個情況中傳回什麼並不重要
+		if(!s) return 1; // Doesn't matter
 		return s.$getScale();
 	});
 
-	/** 當尺度太小的時候調整線條粗細等等 */
+	/** Adjust the stroke width etc. when the scale is too small. */
 	export const shrink = computed(() => {
 		const s = scale.value;
 		return s < MIN_SCALE ? s / MIN_SCALE : 1;

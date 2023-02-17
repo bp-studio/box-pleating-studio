@@ -10,16 +10,17 @@ export type Segment = AALineSegment | ArcSegment;
 
 //=================================================================
 /**
- * {@link RRIntersector} 類別負責處理線段的交點。
+ * {@link RRIntersector} manages the intersection of segments.
  */
 //=================================================================
 
 export class RRIntersector extends Intersector {
 
 	/**
-	 * 找出邊可能的交點，並且在必要的時候對既有的邊進行細分、加入新的事件。
-	 * @param ev1 第一條邊（根據在 {@link _status} 中的順序）
-	 * @param ev2 第二條邊（根據在 {@link _status} 中的順序）
+	 * Find possible intersection between segments and
+	 * subdivides existing segments, adding new events if necessary.
+	 * @param ev1 The first segment (in the order of {@link _status}).
+	 * @param ev2 The second segment (in the order of {@link _status}).
 	 */
 	protected _possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
 		if(!ev1 || !ev2) return;
@@ -36,15 +37,16 @@ export class RRIntersector extends Intersector {
 		}
 	}
 
-	/** 處理圓弧之間的交點 */
+	/** Process the intersection between two arcs. */
 	private _processArcSegments(ev1: StartEvent, ev2: StartEvent): void {
 		let seg1 = ev1.$segment as ArcSegment;
 		let seg2 = ev2.$segment as ArcSegment;
 		const intersections = seg1.$intersection(seg2);
-		for(let p of intersections) { // 已經排序好了
+		for(let p of intersections) { // Already sorted
 			p = fix(fix(p, seg1), seg2);
 			const in1 = seg1.$inArcRange(p), in2 = seg2.$inArcRange(p);
-			// 交叉條件為：對自身來說在內部、對另外一個來說至少在端點上
+			// The condition for intersection is:
+			// it in the interior of self, and at least at the endpoint of the other.
 			if(in1 < -EPSILON && in2 < EPSILON) {
 				ev1 = this._subdivide(ev1, p);
 				seg1 = ev1.$segment as ArcSegment;
@@ -56,7 +58,7 @@ export class RRIntersector extends Intersector {
 		}
 	}
 
-	/** 處理圓弧對直線的交點 */
+	/** Process the intersection of an arc and an AA line segment. */
 	private _processArcVsAALine(eArc: StartEvent, eLine: StartEvent): void {
 		const arc = eArc.$segment as ArcSegment;
 		const line = eLine.$segment as AALineSegment;
@@ -86,8 +88,8 @@ export class RRIntersector extends Intersector {
 }
 
 /**
- * 一個弧線在指定的 x 座標上的 y 截點。
- * 事件比較的時候也會用到，所以獨立寫成一個函數。
+ * The y-intercept of an arc at the given x-coordinate.
+ * This is also used in event comparison.
  */
 export function yIntercept(arc: ArcSegment, x: number): number {
 	const r = arc.$radius;
@@ -96,12 +98,15 @@ export function yIntercept(arc: ArcSegment, x: number): number {
 	return arc.$center.y + (arc.$start.x > arc.$end.x ? dy : -dy);
 }
 
-/** 在 {@link EPSILON} 比較之下檢查兩點是否相等 */
+/** Check if the two points are essentially equal under {@link EPSILON}-comparison. */
 export function same(p1: IPoint, p2: IPoint): boolean {
 	return Math.abs(p1.x - p2.x) < EPSILON && Math.abs(p1.y - p2.y) < EPSILON;
 }
 
-/** 如果交點實質上就是線段的端點，那麼就傳回原本的端點，以免事件排序出錯 */
+/**
+ * If the intersection is essentially an endpoint of the segment,
+ * returns the original endpoint to avoid sorting error.
+ */
 export function fix(p: IPoint, seg: Segment): IPoint {
 	if(same(p, seg.$start)) return seg.$start;
 	if(same(p, seg.$end)) return seg.$end;

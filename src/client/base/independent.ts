@@ -5,9 +5,9 @@ import type { Sheet } from "client/project/components/sheet";
 
 //=================================================================
 /**
- * {@link Independent} 是一個拖曳行為與其它物件無關的 {@link Draggable}。
+ * {@link Independent} is a {@link Draggable} of which dragging behavior is independent of other objects.
  *
- * 這樣的物件會限定住 {@link Sheet} 所能縮小的程度。
+ * Such object will limit the extend to which {@link Sheet} may shrink.
  */
 //=================================================================
 
@@ -23,11 +23,11 @@ export abstract class Independent extends Draggable {
 		this._onDispose(() => sheet.$independents.delete(this));
 	}
 
-	/** 測試指定的格線是否能夠容納這個物件。 */
+	/** Test whether the given grid contains this object. */
 	public abstract $testGrid(grid: IGrid): boolean;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected _fixVector(pt: IPoint, v: IPoint): IPoint {

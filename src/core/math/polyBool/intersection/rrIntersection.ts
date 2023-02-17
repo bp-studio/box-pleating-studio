@@ -11,7 +11,7 @@ import type { EndEvent } from "../event";
 
 //=================================================================
 /**
- * {@link RRIntersection} 類別負責計算兩個 rounded rectangle 的交集。
+ * {@link RRIntersection} calculates the intersection of two rounded rectangles.
  */
 //=================================================================
 
@@ -21,17 +21,17 @@ export class RRIntersection extends PolyBool {
 		super(new RREventProvider(), RRIntersector, new ArcChainer());
 	}
 
-	/** 產生圓角矩形的交集 */
+	/** Generates the intersection of rounded rectangles. */
 	public override $get(...components: IRoundedRect[]): Polygon {
 		this._initialize(components);
 		return super.$get();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 處理一個終點事件 */
+	/** Process an {@link EndEvent}. */
 	protected _processEnd(event: EndEvent): void {
 		const start = event.$other;
 		if(start.$isInside) this._collectedSegments.push(start.$segment);
@@ -39,17 +39,17 @@ export class RRIntersection extends PolyBool {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 載入所有初始的事件 */
+	/** Load all initial events. */
 	private _initialize(components: IRoundedRect[]): void {
 		this._provider.$reset();
 		this._collectedSegments.length = 0;
 		for(let i = 0; i < components.length; i++) {
 			const { x, y, width: w, height: h, radius: r } = components[i];
 
-			// 加入圓弧
+			// Add arcs.
 			this._addSegment(new ArcSegment({ x, y }, r,
 				{ x: x - r, y }, { x, y: y - r }, i), 1);
 			this._addSegment(new ArcSegment({ x: x + w, y }, r,
@@ -59,7 +59,7 @@ export class RRIntersection extends PolyBool {
 			this._addSegment(new ArcSegment({ x, y: y + h }, r,
 				{ x, y: y + h + r }, { x: x - r, y: y + h }, i), -1);
 
-			// 加入線段
+			// Add line segments.
 			if(w) {
 				this._addSegment(new AALineSegment({ x, y: y - r }, { x: x + w, y: y - r }, i), 1);
 				this._addSegment(new AALineSegment({ x: x + w, y: y + h + r }, { x, y: y + h + r }, i), -1);

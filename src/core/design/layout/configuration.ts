@@ -1,13 +1,14 @@
 import { Partition } from "./partition";
 import { Store } from "./store";
 
+import type { ValidJunction } from "./junction/validJunction";
 import type { JPartition } from "shared/json";
 import type { Pattern } from "./pattern";
 
 //=================================================================
 /**
- * 一種 {@link Configuration} 是一套把 {@link Junction}
- * 群組構成的重疊區域切割成 {@link Partition} 的配置。
+ * {@link Configuration} is a set of {@link Partition}s resulting
+ * from cutting the overlapping regions of a group of {@link ValidJunction}s.
  */
 //=================================================================
 

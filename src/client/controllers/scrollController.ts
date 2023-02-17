@@ -9,9 +9,8 @@ import { KeyboardController } from "./keyboardController";
 
 //=================================================================
 /**
- * {@link ScrollController} 負責控制工作區域的捲動，
- * 包括滑鼠捲動（搭配空白鍵、中鍵或右鍵）和二指觸控捲動。
- * 它同時也管理跟捲動有關的滑鼠游標圖示切換。
+ * {@link ScrollController} controls the scrolling of the workspace.
+ * It also manages related cursor icon changes.
  */
 //=================================================================
 
@@ -19,7 +18,7 @@ export namespace ScrollController {
 
 	let _scrolling = false;
 
-	// 這些事件必須註冊在 document 而非 canvas 上，以便全面攔截
+	// These events must be add to the document instead of the canvas, so that we can capture it all.
 	document.addEventListener("mousemove", pointerMove);
 	document.addEventListener("touchmove", pointerMove);
 	document.addEventListener("mouseup", pointerUp);
@@ -32,7 +31,7 @@ export namespace ScrollController {
 		sheet.$scroll = p;
 	});
 
-	// 切換檢視的時候還原捲軸位置
+	// Restore the scroll position as we switch the view
 	watch(ProjectService.sheet, sheet => {
 		if(!sheet) return;
 		scrollView.$updateScrollbar();
@@ -47,7 +46,7 @@ export namespace ScrollController {
 		_scrolling = true;
 		canvas.style.cursor = "move";
 
-		// 暫時關閉元件互動性，以免游標被 Pixi 改掉
+		// Temporarily disable interactivity, avoiding the cursor being changed by Pixi
 		stage.interactiveChildren = false;
 	}
 
@@ -60,7 +59,8 @@ export namespace ScrollController {
 
 	export function $tryEnd(event: Event): boolean {
 		if(_scrolling) {
-			// 空白鍵捲動放開的攔截必須寫在這裡，因為事件會被取消掉
+			// We have to intercept space key releasing here,
+			// since the event will be cancelled.
 			if(event instanceof MouseEvent) end();
 			return true;
 		}
@@ -71,13 +71,14 @@ export namespace ScrollController {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
 
-		// 處理捲動；後面的條件考慮到可能放開的時候會有短暫瞬間尚有一點殘留
+		// Handles the scrolling. The last conditions takes care of the possibility that
+		// touches remain very shortly as one release the fingers.
 		if(_scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			const diff = CursorController.$diff(event);
 			sheet.$scroll = scrollView.$scrollTo(sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y);
 			if($isTouch(event)) ZoomController.$process(event);
 
-			// 基於不明原因，這邊還是得再加上這句話
+			// This is still needed for unknown reasons
 			canvas.style.cursor = "move";
 		}
 	}
@@ -100,12 +101,14 @@ export namespace ScrollController {
 		_scrolling = false;
 		stage.interactiveChildren = true;
 
-		// 空白鍵拖曳的情況，看滑鼠和鍵盤誰先放開而有不同的行為
+		// In the case of space key dragging, there will be different behavior
+		// depending on which is release first.
 		if(!KeyboardController.$isPressed("space")) canvas.style.cursor = "unset";
 	}
 
 	export function $keyUp(): void {
-		// 空白鍵拖曳的情況，看滑鼠和鍵盤誰先放開而有不同的行為
+		// In the case of space key dragging, there will be different behavior
+		// depending on which is release first.
 		canvas.style.cursor = ScrollController.$isScrolling() ? "move" : "unset";
 	}
 }

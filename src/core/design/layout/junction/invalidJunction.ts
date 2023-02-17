@@ -8,24 +8,24 @@ const intersection = new RRIntersection();
 
 //=================================================================
 /**
- * {@link InvalidJunction} 代表一個非法的重疊。
+ * {@link InvalidJunction} represents an invalid overlapping of flaps.
  */
 //=================================================================
 
 export class InvalidJunction {
 
-	/** 第一個角片 */
+	/** The first flap. */
 	public readonly $a: ITreeNode;
 
-	/** 第二個角片 */
+	/** The second flap. */
 	public readonly $b: ITreeNode;
 
 	public readonly $valid = false;
 
-	/** 同樣的非法重疊是否已經被繪製過了 */
+	/** If the same {@link InvalidJunction} has already been drawn. */
 	public $processed: boolean = false;
 
-	/** 兩個角片之間的距離 */
+	/** Distance between two flaps. */
 	private readonly _dist: number;
 
 	constructor(a: ITreeNode, b: ITreeNode, d: number) {
@@ -35,11 +35,11 @@ export class InvalidJunction {
 	}
 
 	/**
-	 * 計算並傳回非法重疊的多邊弧形區域。
+	 * Calculates and returns the arc-polygon region of the invalid overlapping.
 	 *
-	 * 當然這一段的計算也可以在建構式裡面直接算完，
-	 * 但是這邊故意設計成在 {@link invalidJunctionTask} 裡面統一進行，
-	 * 以方便觀察這一段的效能。
+	 * Of course we could also perform this calculation in the constructor,
+	 * but we deliberately perform this in {@link invalidJunctionTask},
+	 * so that we may observe its performance.
 	 */
 	public $getPolygon(): Polygon {
 		const A = this.$a.$AABB, B = this.$b.$AABB;

@@ -3,8 +3,8 @@ import { UnionFind } from "./unionFind";
 
 //=================================================================
 /**
- * {@link ListUnionFind} 比 {@link UnionFind} 多出了 {@link $list} 的機能，
- * 亦即可以列出最後所有的聯集之結果。
+ * {@link ListUnionFind} has an additional {@link $list} functionality comparing to {@link UnionFind}.
+ * It lists the result of all unions in the end.
  */
 //=================================================================
 
@@ -14,7 +14,8 @@ export class ListUnionFind<T> extends UnionFind<T> {
 	private readonly _nextSibling: number[];
 
 	/**
-	 * @param size 預定的元素數上限。如果之後加入的元素數超過這個數目，將會導致錯誤，務必注意。
+	 * @param size The projected element number limit.
+	 * Pay attention that an error will occur if the number of elements exceed this limit later on.
 	 */
 	constructor(size: number) {
 		super(size);
@@ -22,7 +23,7 @@ export class ListUnionFind<T> extends UnionFind<T> {
 		this._nextSibling = createArray(size, -1);
 	}
 
-	/** 列出所有的集合 */
+	/** List all sets. */
 	public $list(): T[][] {
 		const result: T[][] = [];
 		for(let i = 0; i < this._length; i++) {
@@ -35,7 +36,7 @@ export class ListUnionFind<T> extends UnionFind<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 保護方法
+	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected override _pointTo(i: number, j: number): void {
@@ -45,7 +46,7 @@ export class ListUnionFind<T> extends UnionFind<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _collectRecursive(i: number, result: T[]): T[] {

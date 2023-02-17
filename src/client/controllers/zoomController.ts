@@ -9,8 +9,9 @@ const STEP = 5;
 
 //=================================================================
 /**
- * {@link ZoomController} 負責控制縮放，包括滑鼠滾輪縮放、二指觸控縮放、
- * 以及單純輸入縮放數值。
+ * {@link ZoomController} manages zooming in/out of the view,
+ * including ctrl + mouse wheel zooming, two finger touch zooming,
+ * and simply entering a new scale value.
  */
 //=================================================================
 
@@ -41,28 +42,28 @@ export namespace ZoomController {
 	}
 
 	export function $zoom(zoom: number, center?: IPoint): void {
-		// 檢查
+		// Precondition checks
 		if(zoom < FULL_ZOOM) zoom = FULL_ZOOM;
 		const sheet = ProjectService.sheet.value;
 		if(!sheet || sheet.zoom == zoom) return;
 
-		// 如果沒有指定縮放中心，預設為畫布的中心
+		// If the zooming center is not given, use the center of the canvas.
 		center ||= { x: canvas.clientWidth / 2, y: canvas.clientHeight / 2 };
 
-		// 求出縮放中心對應的座標
-		const oldScale = ProjectService.scale.value; // 舊值
+		// Find the coordinates of the zooming center
+		const oldScale = ProjectService.scale.value;
 		const point = {
 			x: sheet.$scroll.x + center.x - sheet.$horizontalMargin.value,
 			y: sheet.$scroll.y + center.y - MARGIN,
 		};
 
-		sheet.$zoom = zoom; // 會使得 scale 改變
-		const newScale = ProjectService.scale.value; // 新值
+		sheet.$zoom = zoom; // This will cause the scale to change
+		const newScale = ProjectService.scale.value;
 
-		// 必須先進行下面這一步，否則可能根本沒有捲軸可以捲
+		// We have to do this first, or there might not be scrollbars to scroll at all.
 		scrollView.$updateScrollbar();
 
-		// 根據座標逆算出捲動的位置，並完成捲動
+		// Calculate the scrolling position and complete the scrolling
 		sheet.$scroll = scrollView.$scrollTo(
 			point.x * newScale / oldScale + sheet.$horizontalMargin.value - center.x,
 			point.y * newScale / oldScale + MARGIN - center.y

@@ -8,23 +8,24 @@ import type { Project } from "client/project/project";
 import type { JProject } from "shared/json";
 
 /**
- * 將 Client 封裝在這個服務裡面，不暴露到 app 的其它部份。在 HTML 當中宣告。
+ * We encapsule the Client in this service so that it is not exposed in other parts of the app.
+ * Declared in HTML.
  */
 declare const bp: typeof Client;
 
 //=================================================================
 /**
- * {@link WorkspaceService} 服務負責管理頁籤
+ * {@link WorkspaceService} manages opened tabs.
  */
 //=================================================================
 namespace WorkspaceService {
 
-	/** 目前所有已經開啟的 {@link Project} 之排序 */
+	/** All opened {@link Project}s in the order of tabs */
 	export const projects = shallowReactive<Project[]>([]);
 
 	const tabHistory: Project[] = [];
 
-	/** 目前所有已經開啟的 {@link Project} 之 id 的排序 */
+	/** The ids of all opened {@link Project}s in the order of tabs */
 	export const ids = computed(() => projects.map(d => d.id));
 
 	export function getProject(id: number): Project | undefined {

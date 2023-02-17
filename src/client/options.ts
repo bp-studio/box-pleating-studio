@@ -1,15 +1,15 @@
 
 interface StudioOptions {
-	/** 如果載入的檔案裡面有棄用的格式時要做的事情 */
+	/** Callback for deprecated formats in the file */
 	onDeprecate?: (title?: string) => void;
 
-	/** 當工作區域刷新的時候要做的事情 */
+	/** Callback for workspace refreshing */
 	onUpdate?: Action<void | Promise<void>>;
 
-	/** 當拖曳發生的時候要做的事情 */
+	/** Callback for dragging */
 	onDrag?: Action;
 
-	/** 當長壓的時候要做的事情 */
+	/** Callback for long pressing */
 	onLongPress?: Action;
 }
 

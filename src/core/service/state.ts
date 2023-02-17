@@ -7,21 +7,101 @@ import type { Repository } from "core/design/layout/repository";
 import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
+import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
 import type { TreeNode } from "core/design/context/treeNode";
 
 //=================================================================
 /**
- * {@link State} 負責管理在更新的過程當中要被傳遞的各種資料。
+ * {@link State} manages the data that are passed around during the updating process.
  */
 //=================================================================
 
 export namespace State {
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Persistent states
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** Current {@link Tree}. */
+	export let $tree: Tree;
+
+	/** All {@link Junction}s. */
+	export const $junctions = new IntDoubleMap<Junction>();
+
+	/** All {@link Stretch}es. */
+	export const $stretches = new Map<string, Stretch>();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Semi-persistent states
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** If the Client is performing dragging. Some of the tasks could take a shortcut in that case. */
+	export let $isDragging: boolean;
+
+	/** Used for finding those {@link InvalidJunction}s that needs to be deleted. */
+	export const $invalidJunctionDiff = new DiffDoubleSet();
+
+	/** Used for finding those {@link Stretch}es that need to be deleted. */
+	export const $stretchDiff = new DiffSet<string>();
+
+	/** {@link Stretch} cache during dragging. */
+	export const $stretchCache = new Map<string, Stretch>();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Temporary states
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Those nodes that have children changed (including initialization) in the current round,
+	 * except for those that are deleted later.
+	 */
+	export const $childrenChanged = new Set<TreeNode>();
+
+	/**
+	 * Those nodes that have parent changed (including initialization) in the current round,
+	 * except for the final root node.
+	 */
+	export const $parentChanged = new Set<ITreeNode>();
+
+	/** Root have changed in the current round. */
+	export let $rootChanged: boolean;
+
+	/**
+	 * Those nodes that have the length of their parent edges changed in the current round,
+	 * except for those that are already in {@link $parentChanged}.
+	 */
+	export const $lengthChanged = new Set<ITreeNode>();
+
+	/**
+	 * Those nodes that have any {@link AABB} changed in its subtree in the current round,
+	 * for determining if re-scanning for collision is necessary.
+	 */
+	export const $subtreeAABBChanged = new Set<ITreeNode>();
+
+	/** Those flaps that have their {@link TreeNode.$AABB AABB} changed in the current round. */
+	export const $flapAABBChanged = new Set<ITreeNode>();
+
+	/**
+	 * Those flaps that have any type of changes in the current round,
+	 * that is, those flaps that are in {@link $subtreeAABBChanged}.
+	 */
+	export const $flapChanged = new Set<ITreeNode>();
+
+	/** The new {@link Repository Repositories} formed in the current round. */
+	export const $newRepositories = new Set<Repository>();
+
+	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
+	export const $stretchPrototypes = new Map<string, JStretch>();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	export let $updateResult: UpdateModel;
 
-	/** 當前回合結束之後重設所有的暫時性狀態（持久狀態會被保留） */
+	/** Reset the temporary states after each round. */
 	export function $reset(): void {
 		$childrenChanged.clear();
 		$parentChanged.clear();
@@ -52,66 +132,6 @@ export namespace State {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 持久狀態
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** 當前的樹 */
-	export let $tree: Tree;
-
-	/** 所有的重疊組合 */
-	export const $junctions = new IntDoubleMap<Junction>();
-
-	/** 所有的伸展模式 */
-	export const $stretches = new Map<string, Stretch>();
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 半持久狀態
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** Client 端是否正在進行拖曳；部份工作在這種情況下會先採用快捷的作法 */
-	export let $isDragging: boolean;
-
-	/** 用來求出應該要被刪除掉的非法重疊 */
-	export const $invalidJunctionDiff = new DiffDoubleSet();
-
-	/** 用來求出應該要被刪除掉的伸展模式 */
-	export const $stretchDiff = new DiffSet<string>();
-
-	/** 拖曳期間暫時存放的 {@link Stretch} */
-	export const $stretchCache = new Map<string, Stretch>();
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 暫時狀態
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** 當前回合當中，子點曾經改變過（包括初始化）的點（隨後被刪除的點除外） */
-	export const $childrenChanged = new Set<TreeNode>();
-
-	/** 當前回合當中，父點曾經改變過（包括初始化）的點（最後的根點除外） */
-	export const $parentChanged = new Set<ITreeNode>();
-
-	/** 當前回合當中，根點有發生過改變 */
-	export let $rootChanged: boolean;
-
-	/** 當前回合當中，所有上連邊長曾經改變過的節點（已經列入 {@link $parentChanged} 者除外） */
-	export const $lengthChanged = new Set<ITreeNode>();
-
-	/** 當前回合當中，所有子樹的 {@link TreeNode.$AABB AABB} 曾經發生過改變的節點，用來判斷是否需要重新搜尋碰撞 */
-	export const $subtreeAABBChanged = new Set<ITreeNode>();
-
-	/** 當前回合當中，{@link TreeNode.$AABB AABB} 曾經改變的角片 */
-	export const $flapAABBChanged = new Set<ITreeNode>();
-
-	/** 當前回合當中有發生過任何改變的角片，等於 {@link $subtreeAABBChanged} 當中的角片 */
-	export const $flapChanged = new Set<ITreeNode>();
-
-	/** 當前回合當中，新產生的 {@link Repository} */
-	export const $newRepositories = new Set<Repository>();
-
-	/** 當前回合當中，預期會產生的 {@link Stretch} 之原型 */
-	export const $stretchPrototypes = new Map<string, JStretch>();
+	$reset();
+	$resetResult();
 }
-
-State.$reset();
-State.$resetResult();

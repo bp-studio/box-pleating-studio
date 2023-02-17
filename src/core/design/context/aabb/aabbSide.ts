@@ -5,31 +5,31 @@ import type { AABB } from "./aabb";
 
 //=================================================================
 /**
- * {@link AABBSide} 負責管理 {@link AABB} 四面的其中一面。
+ * {@link AABBSide} manages of the four sides of a {@link AABB}.
  *
- * 它使用了堆積的資料結構來高效率地維護自身的當前值。
+ * It uses heap to efficiently maintains its current value.
  */
 //=================================================================
 
 export class AABBSide {
 
-	/** 額外的間距（對應於佈局當中的河寬） */
+	/** Additional spacing (corresponding to the width of the river) */
 	public $margin: number = 0;
 
-	/** 自變數情況下的自身值 */
+	/** The value of self as free variable */
 	public $value: number = 0;
 
-	/** 儲存子節點的堆積 */
+	/** The heap for storing child nodes */
 	private _heap: MutableHeap<AABBSide>;
 
-	/** 快取上一次的值，以便在操作之後檢查是否值有發生改變 */
+	/** The last known value, for comparing changes */
 	private _cache?: number;
 
 	constructor(comparator: Comparator<AABBSide>) {
 		this._heap = new MutableHeap(comparator);
 	}
 
-	/** 自身在父點堆積中的鍵，這等於自身的值再加上間距 */
+	/** The key of self in the heap of the parent node. */
 	public get $key(): number {
 		return this.$base + this.$margin;
 	}

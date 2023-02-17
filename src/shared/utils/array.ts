@@ -1,4 +1,10 @@
 
+export function isTypedArray<T extends object>(
+	array: unknown[], constructor: Constructor<T>
+): array is T[] {
+	return array.every(item => item instanceof constructor);
+}
+
 export function createArray<T>(length: number, value: T): T[] {
 	return Array.from({ length }, _ => value);
 }
@@ -12,7 +18,7 @@ export function foreachPair<T>(array: T[], action: (a: T, b: T) => void): void {
 	}
 }
 
-/** 移除掉重複元素（這邊假定傳入的陣列已經經過排序） */
+/** Remove duplicate elements (assuming the array is sorted) */
 export function distinct<T>(array: T[]): T[] {
 	const result: T[] = [];
 	for(const item of array) {

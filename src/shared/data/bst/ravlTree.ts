@@ -1,5 +1,6 @@
 import { ParentedTree } from "./parentedTree";
 
+import type { RedBlackTree } from "./redBlackTree";
 import type { Comparator } from "shared/types/types";
 import type { ParentedNode } from "./parentedTree";
 
@@ -11,12 +12,14 @@ const NIL = { $rank: -1 };
 
 //=================================================================
 /**
- * {@link RavlTree} 是 2016 年的論文
- * [Deletion Without Rebalancing in Binary Search Trees](http://sidsen.azurewebsites.net/papers/ravl-trees-journal.pdf)
- * 中發表的 BST 新品種，它的特性是在刪除點的時候完全不需要進行重新平衡，
- * 插入時則跟紅黑樹一樣至多兩次旋轉，所以操作的速度非常地快，
- * 而實務上它的樹高並不會比紅黑樹多出太多（其樹高理論上的上界為操作次數的 log），
- * 於是如果 comparator 的速度夠快的話，它的效能就能勝過紅黑樹。
+ * {@link RavlTree} is a new breed of BST published in the 2016 paper
+ * [Deletion Without Rebalancing in Binary Search Trees](http://sidsen.azurewebsites.net/papers/ravl-trees-journal.pdf).
+ * Its characteristic is that it does not require any rebalancing when deleting a node,
+ * and like {@link RedBlackTree}, it requires at most two rotations when inserting a node,
+ * making its operation very fast. In practice, its tree height is not much higher
+ * than that of a red-black tree (the theoretical upper bound of its tree height is
+ * the logarithm of the number of operations), so if the comparator is fast enough,
+ * its performance can surpass that of a red-black tree.
  */
 //=================================================================
 
@@ -84,7 +87,7 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _fixInsert(x: Node<K, V>): void {

@@ -8,7 +8,7 @@ import { Tree } from "./components/tree/tree";
 import { Layout } from "./components/layout/layout";
 import { SelectionController } from "client/controllers/selectionController";
 import { Flap } from "./components/layout/flap";
-import { isTypedArray } from "client/utils/array";
+import { isTypedArray } from "shared/utils/array";
 import { River } from "./components/layout/river";
 import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
@@ -20,7 +20,7 @@ import type { DesignMode, JDesign } from "shared/json";
 
 //=================================================================
 /**
- * {@link Design} 是專案當中的主角。
+ * {@link Design} is the main object of a {@link Project}.
  */
 //=================================================================
 export class Design extends View implements IAsyncSerializable<JDesign> {
@@ -32,7 +32,7 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 	public readonly layout: Layout;
 	public readonly tree: Tree;
 
-	/** 在物件尚未建立之前，用來暫存各種物件的原型資料 */
+	/** Prototypes of various objects before they are constructed. */
 	public readonly $prototype: JDesign;
 
 	constructor(project: Project, json: JDesign) {
@@ -72,7 +72,7 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 		return false;
 	}
 
-	/** 根據 Core 傳回的更新模型來進行更新 */
+	/** Update using the model returned from the Core. */
 	public $update(model: UpdateModel): void {
 		this.layout.$cleanUp(model);
 		this.tree.$update(model);
@@ -80,7 +80,7 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public goToDual(): void {
@@ -104,7 +104,7 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _onModeChanged(): void {

@@ -91,7 +91,7 @@
 			text: i18n.t("share.message", [Studio.project!.design.title]).toString(),
 			url: url.value,
 		}).catch(() => {
-			// 捕捉取消之類的錯誤，不處理
+			// No need to handle cancelling
 		});
 		gtag("event", "share", { method: "app", content_type: "link" });
 	}

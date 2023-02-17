@@ -1,8 +1,9 @@
 import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerType } from "./enum";
+import type { JConfiguration } from "./pattern";
 
 export interface JQuadrilateral {
-	/** 這個 {@link JQuadrilateral} 的四個象限角；方向是根據相位變換之前 */
+	/** The for quadrant corners of this {@link JQuadrilateral}, in the direction before the transformation. */
 	c: JCorner[];
 
 	ox: number;
@@ -11,58 +12,73 @@ export interface JQuadrilateral {
 
 //=================================================================
 /**
- * {@link JOverlap} 是 {@link Configuration} 的基本構成元素，
- * 是一個從 {@link JJunction} 中切割得到的區域。
+ * {@link JOverlap} is the basic component of a {@link Configuration}.
+ * It is a region that is cut off from a {@link JJunction}.
  *
- * 基本的情況中它代表著一個矩形重疊區域，不過在使用 join 的情況中，
- * 它可能會變形成隨意的四邊形，但是總之它不管怎樣都有四個象限角。
+ * In the basic cases it represents a rectangular overlapping region,
+ * but in the case of joins, it could become an arbitrary quadrilateral,
+ * yet in any case it has four quadrant corners.
  */
 //=================================================================
 
 export interface JOverlap extends JQuadrilateral {
 
-	/** 這個 {@link JOverlap} 是從哪一個 {@link JJunction} 切割出來的 */
+	/** From which {@link JJunction} this {@link JOverlap} is cut off. */
 	parent: number;
 
-	/** 切割時相對於 parent 的 p[0] 角落（右上角）的正規偏移，省略則等於 (0,0) */
+	/**
+	 * The regular shift of self relative to the `p[0]` corner (upper right) of parent.
+	 * If omitted, it would be (0, 0). */
 	shift?: IPoint;
 }
 
 //=================================================================
 /**
- * {@link JCorner} 是 {@link JQuadrilateral} 的一個象限角。
+ * {@link JCorner} is a quadrant corner of a {@link JQuadrilateral}.
  *
- * 它同時負責描述這個角落的自身狀態以及連接對象；它繼承了 {@link Partial}<{@link JConnection}> 介面，
- * 如果其 e, q 為 undefined 表示它沒有連出。
+ * It describes the state of itself and the target it connects to.
+ * It extends {@link Partial}<{@link JConnection}> interface,
+ * and if `e` and `q` are `undefined` then it means it does not connect to anything.
  */
 //=================================================================
 
 export interface JCorner extends Partial<JConnection> {
 
-	/** 角落型態 */
+	/** The type of the corner */
 	type: CornerType;
 
 	/**
-	 * 這是預備未來複雜分割使用。
-	 * 當有三個或四個 Overlap 的頂點重合於一處時，其中的側點會呈現機動式的行為；
-	 * 為了讓這樣的狀態比較容易表示，我們將那兩個側點設定 type 為 none，
-	 * 然後在連出的頂點上註記上該兩個側點。
-	 * 實際繪製的時候會根據哪一個側點比較接近來實現機動行為
+	 * This is for future use in complex joins.
+	 *
+	 * When three or four vertices of Overlaps coincides at one point,
+	 * the side vertices will exhibit dynamic behaviors.
+	 * To make such a state easier to represent, we set the type of those two side vertices to none,
+	 * and then annotate the two side vertices on the connecting vertex.
+	 * When actually drawing, the dynamic behavior will be implemented based on which side vertex is closer.
 	 */
 	joint?: [JConnection, JConnection];
 }
 
 //=================================================================
 /**
- * {@link JConnection} 介面表示一個連接關係
+ * {@link JConnection} represents a connection.
  */
 //=================================================================
 
 export interface JConnection {
 
-	/** 連接對象，非負數代表 {@link Flap}，負數代表 {@link Overlap}（在整個 {@link Configuration} 中的 id） */
+	/**
+	 * The target it connects to.
+	 * Non-negative integer represents flap,
+	 * while negative integer represents Overlap (the id of it in the {@link JConfiguration}).
+	 */
 	e: number;
 
-	/** 連接至對方的哪一個象限角；{@link Flap} 的情況是原始的，{@link Overlap} 的情況是未經相位變換的 */
+	/**
+	 * To which quadrant corner it connects.
+	 *
+	 * In the case of flaps its the original quadrant direction,
+	 * and in the case of Overlaps its the untransformed direction.
+	 */
 	q: QuadrantDirection;
 }

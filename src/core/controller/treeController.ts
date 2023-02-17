@@ -7,12 +7,12 @@ import type { JEdge, JEdgeBase, JFlap } from "shared/json";
 
 //=================================================================
 /**
- * {@link TreeController} 模組是管理樹狀結構的操作。
+ * {@link TreeController} manages the operations on the tree structure.
  */
 //=================================================================
 namespace TreeController {
 
-	/** 新增一個葉點 */
+	/** Add a new leaf */
 	export function addLeaf(id: number, at: number, length: number, flap: JFlap): void {
 		const tree = Design.$instance.$tree;
 		const node = tree.$addLeaf(id, at, length);
@@ -21,9 +21,9 @@ namespace TreeController {
 	}
 
 	/**
-	 * 逐一刪除葉點
-	 * @param ids 要刪除的節點 id
-	 * @param prototypes 刪除完之後產生的新葉點對應的 {@link JFlap}
+	 * Delete leaves one by one
+	 * @param ids The node ids that should be deleted.
+	 * @param prototypes The {@link JFlap}s corresponding to the new leaves after deletion.
 	 */
 	export function removeLeaf(ids: number[], prototypes: JFlap[]): void {
 		const tree = Design.$instance.$tree;
@@ -36,10 +36,13 @@ namespace TreeController {
 			}
 
 			if(ids.length) {
-				// 如果進入到這邊的話，那就表示請求的刪除涵蓋到了當前的樹根了，因此只能先更新一輪然後再繼續。
-				// 這雖然在效能上並非極致最佳，但是實務上這樣的請求幾乎是不會出現的，
-				// 這段程式碼主要只是理論上為了正確性而必須加上去的。
-				// 此外這個過程可能導致更新模型中被插入了一些垃圾資料，這是 Client 必須留意的。
+				// If we enter here, it means that the requested deletion covers the current tree root,
+				// and we can only perform the full update and then continue.
+				// Although this is not the optimal solution in terms of performance,
+				// such requests are almost never encountered in practice.
+				// This block of code is mainly added for correctness in theory.
+				// Additionally, this process may cause some garbage data to be inserted into the updated model,
+				// which the Client needs to be aware of.
 				Processor.$run(heightTask);
 			}
 		}
@@ -75,7 +78,7 @@ namespace TreeController {
 		return Design.$instance.$tree.toJSON();
 	}
 
-	/** 對於傳入的邊，傳回其中是子點的那一個的 {@link ITreeNode.id id} */
+	/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
 	function getChildId(edge: JEdgeBase): number {
 		const tree = Design.$instance.$tree;
 		const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;

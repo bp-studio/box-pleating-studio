@@ -3,16 +3,22 @@ import { same } from "shared/types/geometry";
 import type { ISegment } from "../segment/segment";
 import type { Path, Polygon, IPointEx } from "shared/types/geometry";
 
-/** 實務上 chain 的數目不會太多，初始陣列大小給 10 已經非常足夠 */
+/**
+ * In practice there wonk't be too many chains,
+ * so an initial array size of 10 is highly sufficient.
+ */
 const INITIAL_CHAIN_SIZE = 10;
 
 //=================================================================
 /**
- * {@link Chainer} 類別負責把收集到的邊串連成最終輸出的多邊形。
- * 如果最終路徑有一些共用的頂點，則輸出的路徑可能會在該處拆開、也可能不會，
- * 這部份的行為是沒有辦法有效預測的，在撰寫測試的時候需要注意。
+ * The {@link Chainer} class is responsible for connecting the collected
+ * edges into the final output polygon. If there are some shared
+ * vertices in the final path, the output path may or may not be
+ * split at that point, and this behavior cannot be predicted
+ * effectively, so care should be taken when writing tests.
  *
- * 這邊我們運用了一些指標的技巧來省去 JavaScript 建立新陣列等等的成本。
+ * Here, we use some pointer tricks to eliminate the cost of
+ * creating new arrays in JavaScript.
  */
 //=================================================================
 export class Chainer {
@@ -25,13 +31,13 @@ export class Chainer {
 	protected _chains: number = 0;
 
 	public $chain(segments: ISegment[]): Polygon {
-		// Chainer 的實體會被重複使用，所以要進行歸零
+		// We will reuse the Chainer instance, so we need to reset the states.
 		const size = segments.length + 1;
 		this._chainHeads = Array.from({ length: INITIAL_CHAIN_SIZE });
 		this._chainTails = Array.from({ length: INITIAL_CHAIN_SIZE });
 		this._points = Array.from({ length: size });
 		this._next = Array.from({ length: size });
-		this._chains = 0; // 理論上這個不用歸零，但安全起見還是照做
+		this._chains = 0; // We don't need to reset this in theory, but just to be sure.
 		this._length = 0;
 
 		const result: Polygon = [];
@@ -41,11 +47,11 @@ export class Chainer {
 
 			if(head && tail) {
 				if(head === tail) {
-					// 一個 chain 頭尾銜接起來了，加入到輸出結果當中
+					// A chain is connected on the two ends. Add it to the result.
 					result.push(this._chainToPath(head, segment));
 					this._removeChain(head);
 				} else {
-					// 串接兩個本來獨立的 chain
+					// Connect two independent chains
 					this._connectChain(head, tail, segment);
 				}
 			} else if(head) {
@@ -57,7 +63,7 @@ export class Chainer {
 			}
 		}
 
-		if(DEBUG_ENABLED && this._chains > 0) debugger; // 理論上不應該發生
+		if(DEBUG_ENABLED && this._chains > 0) debugger; // Shouldn't happen in theory
 		return result;
 	}
 
@@ -113,12 +119,15 @@ export class Chainer {
 
 	protected _findChain(indices: number[], p: IPoint): number {
 		/**
-		 * 這邊採用線性搜尋的方式檢查所有的 chain，這乍看非常沒效率，
-		 * 但實務上 chains 的大小頂多兩三個而已，所以不需要更進一步改進。
+		 * We use linear search here to check all chains,
+		 * which appears to be inefficient,
+		 * but in practice there will only be at most two or three chains,
+		 * so there is no need for optimizations.
 		 */
 		for(let i = 1; i <= this._chains; i++) {
-			// 這邊通常並不會共用 IPoint 的實體，所以要用座標檢查；
-			// 所幸的是這邊並不會需要使用 epsilon 檢查。
+			// Typically the instances of IPoints is not shared here,
+			// so we need to check by coordinates. Fortunately,
+			// we don't need to perform epsilon checks here.
 			if(same(this._points[indices[i]], p)) return i;
 		}
 		return 0;

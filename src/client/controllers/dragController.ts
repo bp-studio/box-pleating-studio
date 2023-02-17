@@ -16,7 +16,7 @@ export interface IDragController {
 
 //=================================================================
 /**
- * {@link DragController} 負責管理 {@link Draggable} 的拖曳行為。
+ * {@link DragController} manages the dragging behavior of {@link Draggable}s.
  */
 //=================================================================
 
@@ -40,7 +40,7 @@ export namespace DragController {
 		for(const d of selections) d.$moveBy(v);
 	}
 
-	/** 點擊時進行拖曳初始化 */
+	/** Initialize dragging on clicking. */
 	export function $init(event: MouseEvent | TouchEvent): void {
 		const selections = SelectionController.draggables.value;
 		if(selections.length) {
@@ -53,23 +53,24 @@ export namespace DragController {
 	}
 
 	/**
-	 * 處理拖曳並且傳回是否真的有拖曳發生。
+	 * Handles the dragging and returns whether the dragging actually happened.
 	 *
-	 * 拖曳行為因為是離散的，永遠只能跟拖曳初始位置去做比較而不能跟上次游標位置進行比較。
+	 * Since the dragging behavior is discrete, we always have to compare with
+	 * the initial cursor location instead of comparing with the last cursor position.
 	 */
 	export function $process(event: MouseEvent | TouchEvent): boolean {
-		// 檢查滑鼠位置是否有發生變化
+		// Check if the mouse location changed.
 		let pt = getCoordinate(event);
 		if(!CursorController.$tryUpdate(pt)) return false;
 
-		// 請求拖曳中的 Draggable 去檢查並修正位置
+		// Ask for those Draggables to check and fix the location
 		const selections = SelectionController.draggables.value;
 		for(const o of selections) pt = o.$constrainTo(pt);
 
-		// 修正完成之後進行真正的拖曳
+		// After fixing, perform the dragging for real
 		for(const o of selections) o.$moveTo(pt);
 
-		// 通知 Project 現在正在進行拖曳
+		// Notifies the Project that we're dragging.
 		ProjectService.project.value!.$isDragging = true;
 
 		return true;
@@ -81,7 +82,7 @@ export namespace DragController {
 		return $round(local);
 	}
 
-	/** 結束拖曳 */
+	/** End dragging. */
 	export function $dragEnd(): void {
 		isDragging.value = false;
 		const project = ProjectService.project.value;

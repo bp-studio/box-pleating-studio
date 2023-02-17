@@ -31,7 +31,7 @@ gulp.task("version", () =>
 
 /** Main HTML task */
 gulp.task("html", () => all(
-	// 偵錯版
+	// Debug
 	gulp.src(config.src.public + "/index.htm")
 		.pipe(newer({
 			dest: config.dest.debug + "/index.htm",
@@ -41,14 +41,14 @@ gulp.task("html", () => all(
 		.pipe(ssg())
 		.pipe(gulp.dest(config.dest.debug)),
 
-	// 正式版
+	// Dist
 	gulp.src(config.src.public + "/index.htm")
 		.pipe(newer({
 			dest: config.dest.dist + "/index.htm",
 			extra: [__filename, config.src.app + "/**/*"],
 		}))
 		.pipe(htmlMin(htmlMinOption))
-		// 避免 VS Code Linter 出錯
+		// Avoid VS Code Linter warnings
 		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
 		.pipe(ssg())
 		.pipe(gulp.dest(config.dest.dist))

@@ -1,11 +1,11 @@
 /*********************************************
- * 這些是為了加速初始 rendering 而放在這裡的重複定義
+ * We repeat the rules here for speeding up rendering
  *********************************************/
 
 .fa-spin {
 	display: inline-block;
 
-	/* 這是額外加的 */
+	/* There's are additional */
 	-webkit-animation: fa-spin 2s linear infinite;
 	animation: fa-spin 2s linear infinite;
 }

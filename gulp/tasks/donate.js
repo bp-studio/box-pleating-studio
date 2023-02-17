@@ -29,7 +29,7 @@ gulp.task("donate", () => all(
 			extra: [__filename, extra],
 		}))
 		.pipe(htmlMin(htmlMinOption))
-		// 避免 VS Code Linter 出錯
+		// Avoid VS Code Linter warnings
 		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
 		.pipe(ssgI18n({
 			appRoot: config.src.donate + "/app.vue",

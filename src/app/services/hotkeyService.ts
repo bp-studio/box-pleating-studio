@@ -20,11 +20,11 @@ namespace HotkeyService {
 	document.addEventListener(
 		"keydown",
 		e => {
-			// 設置攔截例外
+			// Capturing exceptions
 			const k = e.key.toLowerCase();
 			if((k == "s" || k == "o" || k == "p") && (e.metaKey || e.ctrlKey)) return;
 
-			// 如果正在使用輸入框，把一切的正常事件監聽都阻斷掉
+			// If input field is in use, block all regular event listeners.
 			const active = document.activeElement;
 			if(active instanceof HTMLInputElement && !active.classList.contains("key") || active instanceof HTMLTextAreaElement) {
 				e.stopImmediatePropagation();
@@ -34,7 +34,7 @@ namespace HotkeyService {
 	);
 
 	registerCore(e => {
-		// 有對話方塊打開的話一律不處理通常的快速鍵
+		// Skip processing hotkeys when there's opened dialogs
 		if(document.querySelector(".modal-open")) return;
 
 		if(e.metaKey || e.ctrlKey || e.key == "Escape") {

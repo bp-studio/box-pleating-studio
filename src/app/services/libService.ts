@@ -1,19 +1,19 @@
 
 //=================================================================
 /**
- * {@link LibService} 服務負責管理非關鍵程式庫的載入
+ * {@link LibService} manages the loading of non-critical libraries.
  */
 //=================================================================
 namespace LibService {
 
 	let libResolve: Action;
 
-	/** 等候所有非關鍵程式庫成功載入完畢 */
+	/** Wait for all non-critical libraries to load */
 	export const ready: Promise<void> = new Promise<void>(resolve => {
 		libResolve = resolve;
 	});
 
-	/** 載入非關鍵程式庫 */
+	/** Load non-critical libraries */
 	export function load(): Promise<void> {
 		const loading = [];
 		for(const lib of libs) {
@@ -42,7 +42,7 @@ namespace LibService {
 			const script = document.createElement("script");
 			script.src = src;
 			script.async = false;
-			script.onload = () => resolve(); // 此時 script 內部的程式碼也已經執行完畢了
+			script.onload = () => resolve(); // At this moment the script will have been executed
 			script.onerror = () => {
 				errMgr.resErr ??= src;
 				reject();

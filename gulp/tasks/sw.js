@@ -8,7 +8,7 @@ const config = require("../config.json");
 const { target } = require("../utils/esbuild");
 
 gulp.task("sw", () => {
-	// 找出最後一個 log
+	// Find the last log
 	const dir = fs.opendirSync(config.dest.dist + "/log");
 	let file, lastLog;
 	while((file = dir.readSync()) && file.isFile()) {
@@ -35,7 +35,7 @@ gulp.task("sw", () => {
 				"manifest.json",
 				"assets/icon/icon-32.png",
 				"assets/icon/icon-192.png",
-				`log/${lastLog}.md`, // 只有最後一個 log 會被 precache
+				`log/${lastLog}.md`, // Only the last log will be included in precache
 			],
 			globIgnores: ["sw.js"],
 		}))

@@ -27,13 +27,13 @@
 		loading.value = true;
 
 		/**
-		 * 在 Safari 裡面，如果沒有等候到動畫開始就繼續執行 JavaScript，
-		 * 結果就是動畫永遠不會出現。用 setTimeout 來延遲當然是一個辦法，
-		 * 但是我們並無法精確知道要延遲多久才夠，而且對其它瀏覽器來說也是不必要的等候，
-		 * 因此這邊我設置一個 Promise 來確定動畫開始，然後才繼續下一個步驟。
+		 * In Safari, if you continue to execute JavaScript without waiting for the animation to start,
+		 * The result is that the animation never appears. Using setTimeout to delay is of course one option,
+		 * but we don't know exactly how long the delay is enough, and it's unnecessary waiting for other browsers,
+		 * so here I set a Promise to make sure the animation starts before moving on to the next step.
 		 */
 		return new Promise<void>(resolve => {
-			// 安全起見還是設置一個一秒鐘的 timeout，以免 Promise 永遠擱置
+			// Just to be sure we set a one second timeout to avoid Promise hanging forever
 			setTimeout(() => resolve(), ONE_SECOND);
 			const el = document.getElementById("divSpinner")!;
 			el.addEventListener("transitionstart", () => resolve(), { once: true });
@@ -55,7 +55,7 @@
 	#divSpinner {
 		visibility: hidden;
 
-		/* 這段 CSS 的組合使得 Spinner 的出現是漸進的、但是消失是瞬間的 */
+		/* The combination of this CSS makes Spinner to appear gradually, but vanishes instantly */
 		> div {
 			transition: opacity 0.5s cubic-bezier(1, 0, 0, 0);
 			opacity: 0;

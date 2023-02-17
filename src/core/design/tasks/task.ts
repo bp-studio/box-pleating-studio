@@ -1,28 +1,30 @@
 
 //=================================================================
 /**
- * {@link Task} 是執行週期當中的單位工作。
+ * {@link Task} represents a single updating task in the updating process.
  */
 //=================================================================
 
 export class Task {
 
-	/** 工作的層級，用來決定執行順序 */
+	/** Used for deciding execution order. */
 	public readonly $priority: number;
 
-	/** 這個工作的內容 */
+	/** What the task does. */
 	public readonly $action: Action;
 
-	/** 相依於這個工作的其它工作 */
+	/** Other tasks depending on self. */
 	public readonly $dependant: readonly Task[];
 
 	/**
-	 * 注意傳入的參數是「相依於這個工作的其它工作」，而非「這個工作所相依的工作」。
+	 * Note that the parameters are "the tasks depending on this task",
+	 * rather than "the tasks on which this task depends".
 	 *
-	 * 會這樣看似違反直覺的故意設計之理由在於，
-	 * 如此一來 JavaScript 模組的相互引用會自動把所有下游的模組引入進來；
-	 * 如果改採用後者的設計，那麼就需要另外設法把最下游的工作在某個地方引入，
-	 * 這反而不方便。
+	 * The reason for this counter-intuitive design is that,
+	 * the importing mechanism of JavaScript will then automatically
+	 * import the downstream modules. If we use the other approach,
+	 * then we will have to import the last downstream module somewhere ourselves,
+	 * which is even more inconvenient.
 	 */
 	constructor(action: Action, ...deps: Task[]) {
 		this.$action = action;

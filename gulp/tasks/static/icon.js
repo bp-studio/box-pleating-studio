@@ -6,7 +6,7 @@ const newer = require("../../utils/newer");
 const config = require("../../config.json");
 const woff2 = require("../../plugins/woff2");
 
-/** 建置 BPS 圖示集 */
+/** Build BPS icon set */
 module.exports = () => gulp.src(config.src.public + "/assets/bps/**/*")
 	.pipe(newer({
 		dest: config.dest.dist + "/assets/bps/style.css",

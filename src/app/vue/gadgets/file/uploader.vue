@@ -39,7 +39,7 @@
 		const result: File[] = [];
 		for(let i = 0; i < files.length; i++) result.push(files[i]);
 		emit("upload", result);
-		input.value = ""; // 使得下一次選取也是有效
+		input.value = ""; // So that re-selecting also works.
 	}
 
 	function execute(): void {

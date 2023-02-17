@@ -9,21 +9,24 @@ const MAX_STEP = 30;
 
 //=================================================================
 /**
- * {@link HistoryManager} 負責管理使用者的操作歷史紀錄。
+ * {@link HistoryManager} manages history record of editing operations.
  */
 //=================================================================
 
 export default class HistoryManager {
 
-	/** 當前所在的歷史索引位置 */
+	/** Current history location. */
 	@shallowRef private _index: number = 0;
 
-	/** 最後一次存檔時所在的歷史索引位置 */
+	/** History location during last file saving. */
 	@shallowRef private _savedIndex: number = 0;
 
 	private readonly _steps: Step[] = shallowReactive([]);
 
-	/** 是否正在移動歷史；正在移動的時候不會紀錄任何的變更 */
+	/**
+	 * Whether we're navigating the history.
+	 * In that case the changes are not recorded.
+	 */
 	private _moving: boolean = true;
 
 	public get isModified(): boolean {
@@ -35,10 +38,10 @@ export default class HistoryManager {
 	}
 
 	/**
- * 處理累積的操作並且整理成 {@link Step} 物件。
- *
- * @param selection 當前所有選取的控制項，方便在做歷史移動的時候順便恢復選取
- */
+	 * Handles accumulating operations and gather them into a {@link Step} object.
+	 *
+	 * @param selection Currently selected controls, used for recovering selections on navigating.
+	 */
 	public $flush(selection: Control[]): void {
 		// let sel = selection.map(c => c.$tag);
 		// if(this._queue.length) {
@@ -88,17 +91,17 @@ export default class HistoryManager {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _addStep(step: Step): void {
-		// 移除所有後面的 Step
+		// Remove all Steps afterwards
 		if(this._steps.length > this._index) this._steps.length = this._index;
 
-		// 加入新的 Step 並且同時移動索引
+		// Add a new Step and move the index
 		this._steps[this._index++] = step;
 
-		// 最多儲存到 30 步，所以去掉超過的部份
+		// We keep at most 30 Steps, so get rid of the extras.
 		if(this._steps.length > MAX_STEP) {
 			this._steps.shift();
 			this._index--;

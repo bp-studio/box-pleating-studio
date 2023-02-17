@@ -10,10 +10,12 @@ import type { Stretch } from "./stretch";
 
 //=================================================================
 /**
- * {@link Repository} 是針對 {@link Stretch} 的特定配置算出的若干套 {@link Configuration} 的組合。
+ * {@link Repository} consists of several {@link Configuration}s for a {@link Stretch}.
  *
- * {@link Repository} 物件存在的動機是為了使得當 {@link Stretch} 的配置暫時發生改變、
- * 或是 {@link Stretch} 由於拖曳而暫時解除活躍時，可以記住原本的 {@link Pattern} 組合。
+ * The motivation behind {@link Repository} is that when the structure of
+ * a {@link Stretch} changes temporarily, or the {@link Stretch}
+ * become temporarily inactive due to dragging,
+ * a {@link Repository} helps memorizing the original combinations of {@link Pattern}s.
  */
 //=================================================================
 export class Repository {
@@ -33,12 +35,12 @@ export class Repository {
 		}
 	}
 
-	/** 找出第一個 {@link Pattern} 就停止 */
+	/** Stop when the first {@link Pattern} is found. */
 	public $init(): void {
 		this._configurations.$next();
 	}
 
-	/** 在空檔時間當中把全部的 {@link Pattern} 都找出來 */
+	/** Find all {@link Pattern}s when there's free time. */
 	public $complete(): void {
 		this._configurations.$rest();
 	}

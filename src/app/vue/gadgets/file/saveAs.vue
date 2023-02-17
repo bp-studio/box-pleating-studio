@@ -46,9 +46,9 @@
 			else emit("save", handle);
 			return true;
 		} catch(e) {
-			// 使用者取消或者儲存過程出錯的話會跑到這邊來
+			// It goes here on user cancelling or on errors during saving
 			try {
-				// 新的 API，Chrome 110 加入
+				// New API, added in Chrome 110
 				if(handle && "remove" in handle && typeof handle.remove == "function") {
 					handle.remove();
 				}

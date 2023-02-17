@@ -7,22 +7,24 @@ import type { IHitArea } from "@pixi/events";
 
 //=================================================================
 /**
- * {@link Control} 是可以被選取的視圖元件。
+ * {@link Control} is a {@link View} that can be selected.
  */
 //=================================================================
 export abstract class Control extends View {
 
 	/**
-	 * 傳回物件類別名稱字串。
+	 * Return the type string of this object.
 	 *
-	 * 考慮到程式碼最後被 mangle 的可能性，這邊不直接抓取建構子的 name，
-	 * 而要求實體繼承類別實作這個值。
+	 * Consider the possibility of mangling the code,
+	 * we don't use the name of the constructor here,
+	 * and instead ask for the derived classes to implement this field.
 	 */
 	public abstract readonly type: string;
 
 	/**
-	 * 選取的優先順序，越大越優先；
-	 * 如果設定為無限大，會強迫使得其它有限優先度的控制項無法被選取。
+	 * The priority of selection. Larger ones go first.
+	 * If it is set to infinity, it will force all other {@link Control}s
+	 * with finite priority to be unselectable.
 	 */
 	public abstract readonly $priority: number;
 
@@ -36,7 +38,7 @@ export abstract class Control extends View {
 		this._onDispose(() => sheet.$controls.delete(this));
 	}
 
-	/** 是否可以跟另外一個物件一起被多重選取 */
+	/** Whether self can be selected together with another {@link Control}. */
 	public $selectableWith(c: Control): boolean { return false; }
 
 	protected $setupHit(object: Container, hitArea?: IHitArea): void {
@@ -53,7 +55,7 @@ export abstract class Control extends View {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 靜態成員
+	// Static members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static _hitMap: WeakMap<DisplayObject, Control> = new WeakMap();

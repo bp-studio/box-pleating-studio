@@ -22,7 +22,7 @@ const JUNCTION_ALPHA = 0.5;
 
 //=================================================================
 /**
- * {@link Layout} 負責提供佈局檢視當中可用的操作與相關邏輯
+ * {@link Layout} manages the operations and logics in the layout view.
  */
 //=================================================================
 export class Layout implements ISerializable<JLayout> {
@@ -37,13 +37,13 @@ export class Layout implements ISerializable<JLayout> {
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, SmoothGraphics> = new Map();
 
-	/** 即將被更新的角片 */
+	/** The flaps that are about to be updated. */
 	private readonly _pendingUpdate = new Set<Flap>();
 
-	/** 需要連動的新建立角片 */
+	/** The new flaps that should be synced. */
 	public readonly $syncFlaps = new Map<number, Flap>();
 
-	/** 正在進行中的更新工作 */
+	/** The updating task in progress. */
 	private _updating: Promise<void> = Promise.resolve();
 
 	constructor(project: Project, parentView: Container, json: JSheet) {
@@ -65,7 +65,7 @@ export class Layout implements ISerializable<JLayout> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $update(model: UpdateModel): void {
@@ -75,7 +75,7 @@ export class Layout implements ISerializable<JLayout> {
 
 		this._updateJunctions(model);
 
-		// 更新輪廓
+		// Update contours
 		for(const tag in model.graphics) {
 			const target = this._parseTag(tag);
 			if(target) target.$contours = model.graphics[tag].contours!;
@@ -83,14 +83,14 @@ export class Layout implements ISerializable<JLayout> {
 
 		for(const f of this.$flaps.values()) {
 			const vertex = tree.$vertices[f.id];
-			const edgeDisposed = !f.$edge.$v1; // 原本的角片被分割了
+			const edgeDisposed = !f.$edge.$v1; // The original flap is split
 			if(!vertex || !vertex.isLeaf || edgeDisposed) {
 				if(vertex) {
 					if(edgeDisposed) {
 						prototype.layout.flaps.push(f.toJSON());
 						model.graphics["f" + f.id] ||= { contours: f.$contours };
 					} else {
-						// 角片變成河
+						// A flap turns into a river
 						model.add.edges.push(f.$edge.toJSON());
 					}
 				}
@@ -99,7 +99,7 @@ export class Layout implements ISerializable<JLayout> {
 		}
 		for(const r of this.$rivers.values()) {
 			const v = r.$edge.$getLeaf();
-			if(v) this._removeRiver(r); // 河變成角片
+			if(v) this._removeRiver(r); // A river turns into a flap
 		}
 
 		for(const f of prototype.layout.flaps) {
@@ -118,7 +118,7 @@ export class Layout implements ISerializable<JLayout> {
 		this.riverCount = this.$rivers.size;
 	}
 
-	/** 因為刪除順序上的緣故，這個方法必須獨立出來 */
+	/** We separate this method for the execution order. */
 	public $cleanUp(model: UpdateModel): void {
 		for(const e of model.remove.edges) {
 			const river = this.$rivers.get(e.n1, e.n2);
@@ -154,11 +154,11 @@ export class Layout implements ISerializable<JLayout> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private readonly _flushUpdate = async (): Promise<void> => {
-		await this._updating; // 等候上一次更新完成
+		await this._updating; // Wait until the last update to complete
 		const flaps: JFlap[] = [];
 		for(const f of this._pendingUpdate) flaps.push(f.toJSON());
 		this._pendingUpdate.clear();

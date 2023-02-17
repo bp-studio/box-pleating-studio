@@ -4,7 +4,8 @@ import type { EffectScope } from "vue";
 
 //=================================================================
 /**
- * {@link ResumableEffectScope} 是 Vue 的 {@link EffectScope} 的一個封裝，提供了暫停和恢復的能力。
+ * {@link ResumableEffectScope} is a wrapper of the {@link EffectScope} in Vue.
+ * It provides the functionality to pause and resume.
  */
 //=================================================================
 export default class ResumableEffectScope {
@@ -13,9 +14,9 @@ export default class ResumableEffectScope {
 	private _action?: Action;
 
 	/**
-	 * 設定反應方法並且開始執行。
+	 * Setup a reactive method and start running.
 	 *
-	 * 如果重複呼叫這個方法，新的反應方法會取代掉舊的。
+	 * If called again, new method will overwrite the old one.
 	 */
 	public run(action: Action): void {
 		this._action = action;
@@ -23,7 +24,7 @@ export default class ResumableEffectScope {
 		this.resume();
 	}
 
-	/** 暫停（或停止）反應方法 */
+	/** Pause (or stop) reactivity. */
 	public stop(): void {
 		if(this._scope) {
 			this._scope.stop();
@@ -31,7 +32,7 @@ export default class ResumableEffectScope {
 		}
 	}
 
-	/** 恢復執行之前用 {@link run run()} 方法設定的方法 */
+	/** Resume those methods previously set by {@link run run()}. */
 	public resume(): void {
 		if(!this._scope && this._action) {
 			this._scope = effectScope();
@@ -39,7 +40,7 @@ export default class ResumableEffectScope {
 		}
 	}
 
-	/** 根據參數的狀態決定啟動與否 */
+	/** Decide to run or not based on the parameter. */
 	public toggle(run: boolean): void {
 		if(run) this.resume();
 		else this.stop();

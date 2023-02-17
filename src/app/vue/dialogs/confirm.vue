@@ -29,9 +29,9 @@
 	}
 
 	function yes(): void {
-		// 這邊沒辦法簡單地使用 data-bs-dismiss，
-		// 因為那樣一來 hide.bs.modal 事件會比 click 事件更早觸發，
-		// 我將會來不及更改 value 的值。
+		// We can't simply use data-bs-dismiss here,
+		// as it will result in the hide.bs.modal event triggered earlier than the click event,
+		// and I won't have time to change the value.
 		value = true;
 		dialog.value!.hide();
 	}

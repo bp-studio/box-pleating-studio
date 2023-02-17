@@ -6,7 +6,7 @@ import type { JStretch } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";
 
 export function* generalGenerator(junctions: ValidJunction[], prototype?: JStretch): Generator<Configuration> {
-	// 先把個別 Junction 可能的組態都找出來
+	// First find all possible configurations for each Junction
 	const junctionConfigs = junctions.map(j => [...singleGenerator(j)]);
 
 	const filter = (config: Configuration): boolean => config.$entry != null;

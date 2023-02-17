@@ -1,6 +1,6 @@
 /**
- * 這個模組仿照 pixi.js 的主要套件、匯出一個簡略版的 PIXI 全域物件，
- * 以便跟 pixi inspector 串接。
+ * We mimic the main package of Pixi.js to export a simplified global PIXI object,
+ * in order to work with the Pixi inspector.
  */
 
 import "@pixi/mixin-get-child-by-name";

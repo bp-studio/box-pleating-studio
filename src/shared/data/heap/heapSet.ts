@@ -2,22 +2,23 @@ import { BinaryHeap } from "./binaryHeap";
 
 //=================================================================
 /**
- * {@link HeapSet} 是 {@link BinaryHeap} 再加上 {@link Set} 的機能；
- * 它會確保同樣的元素不會被重複加入。
+ * {@link HeapSet} is a {@link BinaryHeap} with the functionality of {@link Set}.
+ * It makes sure that the same element is not added twice.
  */
 //=================================================================
 
 export class HeapSet<T extends object> extends BinaryHeap<T> {
 
 	/**
-	 * 目前堆積內的物件集合。
+	 * The set of elements currently in the heap.
 	 *
-	 * 這邊我們只在乎元素的有無，此時 {@link WeakSet} 的效能會比 {@link Set} 要好。
+	 * Here we only care about the presence or absence of elements,
+	 * and the performance of {@link WeakSet} will be better than {@link Set} in this case.
 	 */
 	private readonly _set = new WeakSet<T>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 介面方法
+	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public override $insert(value: T): void {
@@ -33,7 +34,7 @@ export class HeapSet<T extends object> extends BinaryHeap<T> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $has(value: T): boolean {

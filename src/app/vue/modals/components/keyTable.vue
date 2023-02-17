@@ -10,7 +10,8 @@
 				</thead>
 			</table>
 		</div>
-		<!-- 這邊拆成兩個 <table> 是因為在 <thead> 上面套用 position:sticky 的執行效果並不是很好，捲動時仍然會有些為跳動 -->
+		<!-- We break it into two <table>s here since the result of applying position:sticky to <thead>
+			isn't all that great; there will still be glitches on scrolling. -->
 		<table class="w-100 table table-sm table-bordered m-0">
 			<tbody>
 				<template v-for="(list, name) in Settings.hotkey" :key="name">
@@ -30,7 +31,7 @@
 								   :value="CustomHotkeyService.formatKey(key)"
 								   @focus="setFocus($event.target as HTMLInputElement)" @input.prevent
 								   @keydown.prevent="setKey($event, name as string, command as string)" />
-							<!-- input 獲得焦點之後用來阻斷一切滑鼠動作的遮罩 -->
+							<!-- A mask for blocking mouse actions after the input getting focus -->
 							<div class="mask" @mousedown.capture.prevent></div>
 						</td>
 					</tr>
@@ -89,14 +90,15 @@
 		},
 	};
 
-	/** 開啟中的項目 */
+	/** Opened items */
 	const open = reactive<Record<string, boolean>>({});
 
-	/** 是否處於需要確認而未決的狀態 */
+	/** If we're in a state that requires confirming and not yet decided. */
 	let pending = false;
 
 	async function setKey(e: KeyboardEvent, name: string, command: string): Promise<void> {
-		// 這個情況中不阻止事件擴散，以便使用者可以用鍵盤操作 confirm 對話方塊
+		// We don't stop the propagation in this case,
+		// so that users can continue to operate the confirm dialog with keyboard.
 		if(pending) return;
 
 		e.stopPropagation();
@@ -148,8 +150,8 @@
 			cursor: pointer;
 		}
 
-		// <col width> 作廢了，所以只好改用 CSS 來定義。
-		// 這件事似乎沒有什麼太好的解法，參見 https://stackoverflow.com/questions/67487357
+		// <col width> is deprecated, so we use CSS to define instead.
+		// There's perhaps no satisfying solutions. See https://stackoverflow.com/questions/67487357
 		th,
 		td {
 			&:first-child {

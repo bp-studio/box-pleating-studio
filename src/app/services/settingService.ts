@@ -7,7 +7,8 @@ import type { KeyStore } from "./customHotkeyService";
 
 type Theme = "system" | "dark" | "light";
 
-// 這邊採用 Record 的話會發生循環參照，所以只好寫開來
+// Self-reference will happen if we use Record here,
+// so we have to write it out explicitly.
 type Store = { [key: string]: string | Store };
 
 const defaultSettings = {
@@ -78,10 +79,11 @@ if(settingString) {
 		if(savedSettings[key] !== undefined) settings[key] = savedSettings[key];
 	}
 
-	// 採用 deepCopy 讀取快速鍵設定，以免未來增加新的設定值時被舊設定覆寫掉
+	// Use deepCopy to read the hotkey settings,
+	// so that old setting will not be overwritten as we add more settings in the future.
 	if(savedSettings.hotkey !== undefined) copy(settings.hotkey, savedSettings.hotkey);
 } else {
-	// 儲存初始設定
+	// Save initial settings
 	save();
 }
 
@@ -91,7 +93,10 @@ watch(settings, save, { deep: true });
 
 watch(() => settings.showStatus, s => document.body.classList.toggle("show-status", s), { immediate: true });
 
-/** 把 source 物件中的屬性遞迴地複製到 target 中（忽略任一者沒有的屬性） */
+/**
+ * Copy the properties in the source object to the target object,
+ * ignoring the properties absent in either of them.
+ */
 function copy(target: Store, source: Store): void {
 	if(!source) return;
 	for(const key in target) {
@@ -101,12 +106,12 @@ function copy(target: Store, source: Store): void {
 	}
 }
 
-/** 儲存設定值 */
+/** Save settings */
 function save(): void {
 	localStorage.setItem("settings", JSON.stringify(settings));
 }
 
-/** 重設設定值回到預設值 */
+/** Reset to default settings */
 export async function reset(): Promise<void> {
 	if(!await dialogs.confirm(i18n.t("preference.confirmReset"))) return;
 	Object.assign(settings, JSON.parse(JSON.stringify(defaultSettings)));

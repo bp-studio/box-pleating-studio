@@ -19,42 +19,42 @@ const MASK = 3;
 
 //=================================================================
 /**
- * {@link ValidJunction} 代表一個合法的重疊。
+ * {@link ValidJunction} represents a valid overlapping between flaps.
  */
 //=================================================================
 
 export class ValidJunction implements ISerializable<JJunction> {
 
-	/** 第一個角片 */
+	/** The first flap. */
 	public readonly $a: ITreeNode;
 
-	/** 第二個角片 */
+	/** The second flap. */
 	public readonly $b: ITreeNode;
 
 	public readonly $valid = true;
 
-	/** 兩個角片的 LCA */
+	/** LCA of the two flaps. */
 	public readonly $lca: ITreeNode;
 
-	/** {@link $a} 對應的象限代碼 */
+	/** The quadrant code of {@link $a}. */
 	public readonly $q1: number;
 
-	/** {@link $b} 對應的象限代碼 */
+	/** The quadrant code of {@link $b}. */
 	public readonly $q2: number;
 
-	/** 角片尖點矩形的尺寸 */
+	/** The dimension of the tip rectangle. */
 	public readonly $s: Readonly<IPoint>;
 
-	/** 重疊區域的尺寸 */
+	/** The dimension of the overlapping region. */
 	public readonly $o: Readonly<IPoint>;
 
-	/** {@link $a} 對應的尖點之所在 */
+	/** The tip corresponding to {@link $a}. */
 	private readonly _tip: Readonly<IPoint>;
 
-	/** 相位係數 */
+	/** Coefficient of transformation. */
 	private readonly _f: Readonly<IPoint>;
 
-	/** 所有在幾何上覆蓋自身的 {@link ValidJunction} */
+	/** All {@link ValidJunction}s that covers self geometrically. */
 	private readonly _coveredBy: ValidJunction[] = [];
 
 	constructor(a: ITreeNode, b: ITreeNode, data: ValidJunctionData) {
@@ -86,7 +86,7 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 公開方法
+	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get $orientedIds(): [number, number] {
@@ -95,12 +95,12 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 
 	/**
-	 * 自身是否被另外一個 {@link ValidJunction}「實質上」覆蓋。
+	 * Whether self is "practically" covered by another {@link ValidJunction}.
 	 *
-	 * 實質覆蓋是比幾何覆蓋進一步的概念：
-	 * 如果 A 覆蓋了 B、B 覆蓋了 C，可是 C 了 B 之外並沒有被其它 {@link ValidJunction} 覆蓋，
-	 * 那麼此時由於 B 會被 A 無效化，這麼一來 B 對 C 的覆蓋也是無效的，
-	 * 所以 C 實質上其實是沒有被覆蓋。依此類推。
+	 * The notion of practical covering is one step further of geometrical covering.
+	 * If A covers B, B covers C, and C is not covered by any other {@link ValidJunction}s other than B,
+	 * then since B will be invalidated by A, the covering of B over C also doesn't count,
+	 * so practically C is not really covered. And so on.
 	 */
 	public get $isCovered(): boolean {
 		if(this._isCovered === undefined) {
@@ -110,23 +110,23 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 	private _isCovered: boolean | undefined;
 
-	/** 設置一個覆蓋 */
+	/** Signal a covering. */
 	public $setCoveredBy(that: ValidJunction): void {
 		this._coveredBy.push(that);
 	}
 
-	/** 清除覆蓋的資訊 */
+	/** Clear covering data. */
 	public $resetCovering(): void {
 		this._coveredBy.length = 0;
 		this._isCovered = undefined;
 	}
 
-	/** 當比較矩形完全一樣大的時候，比較兩者的遠近 */
+	/** When the comparison rectangle is of the same size, the closer one goes first. */
 	public $isCloserThan(that: ValidJunction): boolean {
 		return this.$s.x < that.$s.x || this.$s.y < that.$s.y;
 	}
 
-	/** 根據指定的距離基準來取得覆蓋比較矩形 */
+	/** Based on the given canonical distance to get the comparison rectangle. */
 	public $getBaseRectangle(distanceToA: number): Rectangle {
 		const x = this._tip.x + distanceToA * this._f.x;
 		const y = this._tip.y + distanceToA * this._f.y;

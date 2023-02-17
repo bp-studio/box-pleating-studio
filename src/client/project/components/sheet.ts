@@ -30,16 +30,16 @@ const LAYERS = Enum.values(Layer);
 
 //=================================================================
 /**
- * {@link Sheet} 是代表一個工作區域。
+ * {@link Sheet} represents a working area.
  */
 //=================================================================
 export class Sheet extends View implements ISerializable<JSheet> {
 
 	/**
-	 * 這個工作區域目前捲動的位置，單位是像素。
+	 * The current scrolling position of this working area, in pixels.
 	 *
-	 * 效能起見，我們將它宣告成 {@link shallowRef}，
-	 * 並且利用 {@link Readonly} 來強迫每次都要更換實體。
+	 * We made it {@link shallowRef} for better performance,
+	 * and use {@link Readonly} to ensure that we use different instances each time.
 	 */
 	@shallowRef public $scroll: Readonly<IPoint> = { x: 0, y: 0 };
 
@@ -47,22 +47,22 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	@shallowRef private _type: GridType;
 
-	/** 最上層容器 */
+	/** Top-level container */
 	public readonly $view: Container = new Container();
 
-	/** 自身所屬的專案 */
+	/** The project to which it belongs. */
 	protected readonly $project: Project;
 
-	/** 圖層 */
+	/** The layers. */
 	private _layers: Container[] = [];
 
-	/** 紙邊 */
+	/** The border of the sheet. */
 	private _borderGraphics: SmoothGraphics = new SmoothGraphics();
 
-	/** 格線 */
+	/** The grid lines. */
 	private _gridGraphics: SmoothGraphics = new SmoothGraphics();
 
-	/** 圖層遮罩 */
+	/** The mask for the clipped layers. */
 	private _mask: Graphics = new Graphics();
 
 	@shallowRef private _grid: IGrid;
@@ -112,7 +112,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 代理屬性
+	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get type(): GridType {
@@ -141,7 +141,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 計算邏輯
+	// Logics
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getScale(): number {
@@ -161,18 +161,18 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return Math.min(horizontalScale, verticalScale);
 	}
 
-	/** 根據渲染結果確定出來的水平邊距 */
+	/** Horizontal margin by the actual rendered result. */
 	public readonly $horizontalMargin = computed(() => {
 		const overflows = [...this.$labels].map(l => l.$overflow);
 		const result = Math.max(MARGIN, ...overflows);
 		return result;
 	});
 
-	/** 整個視圖像素化之後的尺寸 */
+	/** The dimension of the sheet after rasterization. */
 	public readonly $imageDimension = computed<IDimension>(() => {
 		const s = ProjectService.scale.value;
 		const { x, y } = this._grid.$offset;
-		const hitMargin = 0.5; // 需要增加一點 margin，否則邊緣上的頂點很難按
+		const hitMargin = 0.5; // Extra margin is needed, or the vertices on the boundary will be difficult to click
 		const [width, height] = [this._grid.$renderWidth, this._grid.$renderHeight];
 		this.$view.hitArea = new Rectangle(
 			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
@@ -184,10 +184,10 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	});
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// 私有方法
+	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** 根據使用者設定來更新圖層的可見性 */
+	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {
 		this._layers[Layer.$axisParallels].visible = app.settings.showAxialParallel;
 		this._layers[Layer.$dot].visible = app.settings.showDot;
@@ -196,20 +196,20 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		this._layers[Layer.$ridge].visible = app.settings.showRidge;
 	}
 
-	/** 根據當前的捲動位置來調整容器的位置 */
+	/** Adjust the position of the container by the scrolling position. */
 	private _positioning(): void {
 		const image = this.$imageDimension.value;
 		this.$view.x = Math.max((viewport.width - image.width) / 2, 0) - this.$scroll.x + this.$horizontalMargin.value;
 		this.$view.y = Math.max((viewport.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
-	/** 繪製框線和格線 */
+	/** Draw the border and grid lines. */
 	private _drawSheet(): void {
 		const s = ProjectService.scale.value;
 		const sh = ProjectService.shrink.value;
 		this.$view.scale.set(s, -s);
 
-		// 繪製邊框
+		// Draw border
 		const color = app.isDark.value ? LIGHT : CHARCOAL;
 		this._borderGraphics.clear()
 			.lineStyle(
@@ -218,12 +218,12 @@ export class Sheet extends View implements ISerializable<JSheet> {
 			);
 		this._grid.$drawBorder(this._borderGraphics);
 
-		// 繪製圖層遮罩
+		// Draw layer mask
 		this._mask.clear().beginFill(0);
 		this._grid.$drawBorder(this._mask);
 		this._mask.endFill();
 
-		// 繪製格線
+		// Draw grid lines
 		this._gridGraphics.visible = app.settings.showGrid;
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()

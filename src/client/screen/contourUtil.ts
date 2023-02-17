@@ -8,7 +8,7 @@ const THRESHOLD = 0.4;
 
 export type GraphicsLike = Graphics | SmoothGraphics;
 
-/** 繪製輪廓組的線條（不填色） */
+/** Draw the lines of a contour (no filling) */
 export function drawContours(graphics: GraphicsLike, contours: Contour[]): void {
 	for(const contour of contours) {
 		drawPath(graphics, contour.outer);
@@ -19,14 +19,14 @@ export function drawContours(graphics: GraphicsLike, contours: Contour[]): void 
 }
 
 /**
- * 將輪廓組加以填色。
+ * Fill a contour.
  *
- * Pixi 採用的填色 API 是由比較低階的 {@link Graphics.beginFill} 和 {@link Graphics.beginHole} 等方法組成的，
- * 這些方法的使用有個前提是我們必須正確地多邊形的外圍其內部的洞配對好
- * （定向倒是不需要，Pixi 自己會做一次）。
- * 有做到這點之後，Pixi 會利用 earcut 程式庫把多邊形加以三角化，
- * 以便把一般的填色問題化簡成對三角形的填色。
- * 該程式庫據稱有極高的效能，所以應該不太需要幫它進一步優化。
+ * The filling API of Pixi consists of low-level methods such as {@link Graphics.beginFill} and {@link Graphics.beginHole}.
+ * The premise of these methods is that we have to pair up the outer and inner paths of the polygons explicitly.
+ * (There's no need for orientation though, as Pixi will do it itself)
+ * Once this premise is met, Pixi will use the library earcut to triangulate the polygon,
+ * thereby reducing the general filling to triangle filling.
+ * Accordingly, the library is super efficient, so probably there's no need to further optimize it.
  */
 export function fillContours(graphics: GraphicsLike, contours: Contour[], color: number): void {
 	for(const contour of contours) {
@@ -50,7 +50,7 @@ export function fillContours(graphics: GraphicsLike, contours: Contour[], color:
 	}
 }
 
-/** 繪製路徑 */
+/** Draw a path. */
 function drawPath(graphics: GraphicsLike, path: Path): void {
 	if(!path.length) return;
 	graphics.moveTo(path[0].x, path[0].y);
@@ -60,12 +60,12 @@ function drawPath(graphics: GraphicsLike, path: Path): void {
 	graphics.closePath();
 }
 
-/** 填滿可能有弧線的多邊形 */
+/** Fill an arc-polygon. */
 export function drawArcPolygon(graphics: SmoothGraphics, polygon: Polygon, color: number): void {
 	for(const path of polygon) {
 		if(!path.length) return;
 
-		// 根據形狀的狹窄程度來決定繪製的線條粗度
+		// Decide the stroke width based on the narrowness of the shape.
 		const narrowness = getNarrowness(path);
 		if(narrowness < THRESHOLD) graphics.lineStyle(2 / narrowness, color);
 		else graphics.lineStyle(0);
@@ -84,7 +84,7 @@ export function drawArcPolygon(graphics: SmoothGraphics, polygon: Polygon, color
 	}
 }
 
-/** 對於兩個弧線組成的路徑，傳回形狀的狹窄程度 */
+/** Returns the narrowness of the shape for a path consists of two arcs. */
 function getNarrowness(path: Path): number {
 	if(path.length > 2) return NaN;
 	const [p1, p2] = path;

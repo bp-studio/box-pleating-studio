@@ -2,7 +2,7 @@
 
 //=================================================================
 /**
- * {@link Disposable} 是所有具有「棄置」這種概念的基底類別。
+ * {@link Disposable} is the base class for all classes with the notion of "disposing".
  */
 //=================================================================
 export abstract class Disposable extends EventTarget {
@@ -14,14 +14,15 @@ export abstract class Disposable extends EventTarget {
 	}
 
 	/**
-	 * 執行棄置的動作。
+	 * Perform the action of disposing.
 	 */
 	public $dispose(): void {
 		if(this._disposed) return;
 		this.dispatchEvent(new DisposeEvent());
 
-		// 解除掉所有參照
-		// 這一段要等到所有棄置動作都完成後才做，不然一堆參照會有問題
+		// Remove all object references to improve GC.
+		// We have to wait until all disposing actions are done to do this,
+		// or we'll end up in a lot of trouble.
 		const self = this as Record<string, unknown>;
 		const keys = Object.keys(this);
 		for(const key of keys) {
@@ -32,8 +33,8 @@ export abstract class Disposable extends EventTarget {
 	}
 
 	/**
-	 * 提供快捷的方法註冊棄置的行為。
-	 * 因為棄置只會被行一次，所以註冊的事件全部都會加上 once。
+	 * Provide the quick method to register disposing action.
+	 * Since disposing is a one-time thing, all these event listener has "once" on them.
 	 */
 	protected _onDispose(action: Consumer<DisposeEvent>): void {
 		this.addEventListener(DISPOSE, action, { once: true });
