@@ -36,6 +36,7 @@ const bootstrapJS = () => gulp.src(config.src.lib + "/bootstrap/bootstrap.ts")
 		legalComments: "none",
 		outfile: "bootstrap.min.js",
 		minify: true,
+		target: "es2016", // for maximal compatibility
 	}))
 	.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
 

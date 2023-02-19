@@ -103,15 +103,18 @@
 
 	const APP_CHECK_INTERVAL = 2000;
 
-	function detectInstallation(): void {
+	async function detectInstallation(): Promise<void> {
 		if("getInstalledRelatedApps" in navigator) {
-			navigator.getInstalledRelatedApps!().then(apps => {
+			try {
+				const apps = await navigator.getInstalledRelatedApps!();
 				// The part only works on Android,
 				// and it will return an empty array on Desktops,
 				// so we cannot use it to detect if PWA is already installed.
 				// But that's OK, since the PWA link works also only in Android anyway.
 				if(apps.length) install.value = 2;
-			});
+			} catch(e) {
+				// Ignore any errors here.
+			}
 		}
 	}
 
@@ -153,13 +156,13 @@
 			flex-grow: 1;
 			height: 0;
 
-			>div {
+			> div {
 				display: flex;
 				flex-flow: column wrap;
 				overflow: hidden;
 				height: 100%;
 
-				>* {
+				> * {
 					width: 100%;
 				}
 			}
