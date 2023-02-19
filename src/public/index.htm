@@ -35,7 +35,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1352"
+			app_version: "1364"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -104,7 +104,10 @@
 		var errMgr = new (function() {
 			var self = this;
 			var resourceErrorHandler = function(e) {
-				if(document.head.contains(e.target) && !self.resErr) {
+				if(e.filename) {
+					self.runErr = e.filename + ": " + e.message;
+					setTimeout(self.callback, 0);
+				} else if(document.head.contains(e.target) && !self.resErr) {
 					self.resErr = e.target.src || e.target.href;
 					setTimeout(self.callback, 0);
 				}
@@ -124,7 +127,9 @@
 
 			/** Whether the launching fine so far. */
 			self.ok = function() {
-				window.removeEventListener('error', resourceErrorHandler, true);
+				try {
+					window.removeEventListener('error', resourceErrorHandler, true);
+				} catch(e) {}
 				return !self.resErr && !self.runErr;
 			}
 
@@ -147,8 +152,7 @@
 				if(self.ok()) return true;
 
 				display('divWorkspace');
-				display('divWelcome');
-				display('divSpinner');
+				display('app');
 				display(
 					self.resErr ? 'resource' : 'requirement',
 					true,
@@ -156,6 +160,7 @@
 						"<br>" + navigator.userAgent +
 						"<br>" + self.runErr
 				);
+
 				if(self.runErr &&
 					// Filter clawers; no need to report related errors.
 					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
@@ -231,7 +236,7 @@
 			// Legacy browser fallback
 			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
 				self.runErr = 'Legacy browser';
-				self.callback();
+				window.onload = self.callback;
 			} else {
 				// Capture <script> or <link> loading error
 				window.addEventListener('error', resourceErrorHandler, true);
