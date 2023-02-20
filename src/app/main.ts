@@ -24,6 +24,7 @@ document.addEventListener(
 	}
 );
 
+errMgr.end();
 if(errMgr.ok()) {
 	// Initialize the app
 	const app = Vue.createSSRApp(App);
@@ -37,7 +38,7 @@ if(errMgr.ok()) {
 			// Load all non-critical resources
 			await Lib.load();
 		} catch(e: unknown) {
-			if(e instanceof Error) errMgr.runErr = e.toString();
+			if(e instanceof Error) errMgr.setRunErr(e.message);
 		} finally {
 			if(errMgr.callback()) { // Second checkpoint
 				setTimeout(() => window.onunhandledrejection = null, TIME_TERMINATE);

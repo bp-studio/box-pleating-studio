@@ -76,6 +76,7 @@ const vueDraggable = () => {
 			treeShaking: true,
 			outfile: "vuedraggable.min.js",
 			minify: true,
+			target: "es2016", // for maximal compatibility
 			plugins: [
 				exg({
 					"vue": "window.Vue",

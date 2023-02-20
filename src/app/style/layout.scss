@@ -73,6 +73,7 @@ footer {
 	#divShade,
 	.viewport {
 		position: absolute;
+		top: 0; /* IE 8 fallback */
 		top: 3.75rem;
 		left: 0;
 		bottom: 0;

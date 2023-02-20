@@ -12,10 +12,11 @@ declare global {
 
 	/** Launching error manager, defined in HTML. */
 	declare const errMgr: {
+		end(): void;
 		ok(): boolean;
 		callback(): boolean;
-		resErr: string | null;
-		runErr: string | null;
+		setRunErr(error: string): void;
+		setResErr(error: string): void;
 	};
 
 	/** Google Analytics. */

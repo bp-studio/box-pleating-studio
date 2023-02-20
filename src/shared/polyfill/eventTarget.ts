@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+// For Safari < 14
 
 import "./globalThis";
 
@@ -11,12 +11,13 @@ function testEventTarget(): boolean {
 	}
 }
 
-type ListenerMap = Map<EventListenerOrEventListenerObject, AddEventListenerOptions>;
+type Listener = EventListenerOrEventListenerObject;
+type ListenerMap = Map<Listener, AddEventListenerOptions>;
 
 class EventTargetPolyfill {
 	private __listeners = new Map<string, ListenerMap>();
 
-	public addEventListener(type: string, listener: EventListenerOrEventListenerObject, options: AddEventListenerOptions): void {
+	public addEventListener(type: string, listener: Listener, options: AddEventListenerOptions): void {
 		if(arguments.length < 2) {
 			throw new TypeError(
 				`TypeError: Failed to execute 'addEventListener' on 'EventTarget': 2 arguments required, but only ${arguments.length} present.`
@@ -34,7 +35,7 @@ class EventTargetPolyfill {
 		}
 	}
 
-	public removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options: EventListenerOptions): void {
+	public removeEventListener(type: string, listener: Listener, options: EventListenerOptions): void {
 		if(arguments.length < 2) {
 			throw new TypeError(
 				`TypeError: Failed to execute 'addEventListener' on 'EventTarget': 2 arguments required, but only ${arguments.length} present.`
@@ -94,7 +95,6 @@ class EventTargetPolyfill {
 
 interface EventTargetPolyfill extends EventTarget { }
 
-// For Safari < 14
 if(typeof globalThis.EventTarget === "undefined" || !testEventTarget()) {
 	globalThis.EventTarget = EventTargetPolyfill;
 }

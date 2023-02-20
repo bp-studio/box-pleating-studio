@@ -22,9 +22,9 @@
 	},
 	"browserslist": [
 		"Safari >= 11",
-		"Chrome >= 80",
-		"Firefox >= 70",
-		"Opera >= 60",
+		"Chrome >= 66",
+		"Firefox >= 78",
+		"Opera >= 53",
 		"not dead"
 	],
 	"devDependencies": {
@@ -85,7 +85,7 @@
 		"postcss-html": "^1.5.0",
 		"require-dir": "^1.2.0",
 		"sass": "^1.58.3",
-		"stylelint": "^15.1.0",
+		"stylelint": "^15.2.0",
 		"stylelint-config-recommended-vue": "^1.4.0",
 		"stylelint-config-standard-scss": "^7.0.1",
 		"stylelint-no-unsupported-browser-features": "^6.1.0",

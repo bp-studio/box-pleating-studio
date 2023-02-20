@@ -35,7 +35,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1364"
+			app_version: "1379"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -105,11 +105,9 @@
 			var self = this;
 			var resourceErrorHandler = function(e) {
 				if(e.filename) {
-					self.runErr = e.filename + ": " + e.message;
-					setTimeout(self.callback, 0);
-				} else if(document.head.contains(e.target) && !self.resErr) {
-					self.resErr = e.target.src || e.target.href;
-					setTimeout(self.callback, 0);
+					setRunErr(e.filename + ": " + e.message);
+				} else if(document.head.contains(e.target) && !resErr) {
+					setResErr(e.target.src || e.target.href);
 				}
 			};
 			var display = function(id, v, c) {
@@ -120,23 +118,45 @@
 			};
 
 			/** Resource Error */
-			self.resErr = null;
+			var resErr = null;
 
 			/** Runtime Error */
-			self.runErr = null;
+			var runErr = null;
+
+			/** Whether error has already been shown */
+			var errShown = false;
+
+			function setRunErr(error) {
+				if(!runErr) {
+					runErr = error;
+					setTimeout(self.callback, 0);
+				}
+			}
+
+			function setResErr(error) {
+				if(!resErr) {
+					resErr = error;
+					setTimeout(self.callback, 0);
+				}
+			}
+
+			self.setRunErr = setRunErr;
+			self.setResErr = setResErr;
+
+			/** Finish listening to global errors */
+			self.end = function() {
+				window.removeEventListener('error', resourceErrorHandler, true);
+			}
 
 			/** Whether the launching fine so far. */
 			self.ok = function() {
-				try {
-					window.removeEventListener('error', resourceErrorHandler, true);
-				} catch(e) {}
-				return !self.resErr && !self.runErr;
+				return !resErr && !runErr;
 			}
 
 			/** GA parameter has a 100-character limit, so we split the message into chunks. */
 			function splitString(str) {
 				var chunks = [];
-				while (str.length > 0) {
+				while(str.length > 0) {
 					chunks.push(str.substring(0, 100));
 					str = str.substring(100);
 				}
@@ -150,23 +170,25 @@
 			 */
 			self.callback = function() {
 				if(self.ok()) return true;
+				if(errShown) return false;
+				errShown = true;
 
 				display('divWorkspace');
 				display('app');
 				display(
-					self.resErr ? 'resource' : 'requirement',
+					resErr ? 'resource' : 'requirement',
 					true,
-					self.resErr ? self.resErr : "<br>Build number: " + app_config.app_version +
+					resErr ? resErr : "<br>Build number: " + app_config.app_version +
 						"<br>" + navigator.userAgent +
-						"<br>" + self.runErr
+						"<br>" + runErr
 				);
 
-				if(self.runErr &&
+				if(runErr &&
 					// Filter clawers; no need to report related errors.
-					!(self.runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
+					!(runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
 					!(/bot|crawl|spider/i.test(navigator.userAgent))
 				) {
-					var chunks = splitString(self.runErr);
+					var chunks = splitString(runErr);
 					var data = {
 						app_version: app_config.app_version,
 						user_agent: navigator.userAgent,
@@ -197,24 +219,25 @@
 			 *
 			 * `window.onerror` is a special event handler that it takes 5 arguments. See:
 			 * https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
+			 *
+			 * Note that IE 8 does not support this event, so fallback is needed.
 			 */
 			window.onerror = function(msg, source, line, column, error) {
 				if(!source && !line && !column) return; // error is caused by injection; ignore.
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(msg.match(ignoreError[i])) return;
 				}
-				self.runErr = [
+				setRunErr([
 					msg.replace(/^.+: (.+)$/, "$1"),							// error message
 					source.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
 					line,														// line number
 					column,														// column number
 					stack(error)												// stack trace
-				].toString();
+				].toString());
 			};
 			window.onunhandledrejection = function(e) {
 				e = e.reason || "Unknown error";
-				self.runErr = stack(e);
-				self.callback();
+				setRunErr(stack(e));
 			}
 
 			function stack(e) {
@@ -235,8 +258,8 @@
 
 			// Legacy browser fallback
 			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
-				self.runErr = 'Legacy browser';
-				window.onload = self.callback;
+				runErr = 'Legacy browser';
+				window.onload = self.callback; // This covers the case for IE < 9 as well.
 			} else {
 				// Capture <script> or <link> loading error
 				window.addEventListener('error', resourceErrorHandler, true);
@@ -286,7 +309,7 @@
 
 <body>
 	<!-- Error message -->
-	<div class="viewport p-3 scroll-shadow" style="z-index: 0;">
+	<div class="viewport p-3 scroll-shadow" style="z-index: 0; padding: 20px;">
 		<div id="requirement" style="display:none;">
 			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
 			<div class="mt-2">
@@ -294,8 +317,10 @@
 				<ol>
 					<li>
 						Outdated browser or operating system<br>
+						Minimal requirement for BP Studio is Chrome &ge; 66, Edge &ge; 79, Firefox &ge; 78, Opera &ge; 53, and Safari
+						&ge; 11.<br>
 						If you haven't done so, please upgrade your browser or use the latest version of Chrome,
-						which is the recommended browser.
+						which is the recommended browser.<br>
 						It is also known that earlier versions of Windows 7 may cause issues with SSL certificates.
 						Please try updating Windows if the website is marked "insecure".
 					</li>
@@ -307,12 +332,13 @@
 					</li>
 				</ol>
 				In all cases, the error has been reported to the author,
-				and he will try his best to fix the issue.
+				and he will try his best to fix the issue when applicable.<br>
 				If none of the above solved the problem,
 				please come back later in a few days and see if the error has been solved.
 				The author apologize for the inconvenience.<br>
 				You could also submit an issue on
 				<a href="https://github.com/MuTsunTsai/box-pleating-studio/issues" target="_blank" rel="noopener">GitHub</a>
+				or through <a href="https://discord.gg/zS4FPxHwHX" target="_blank" rel="noopener">Discord</a>
 				to report this issue; please include the following diagnosis information in your submission.
 			</div>
 		</div>

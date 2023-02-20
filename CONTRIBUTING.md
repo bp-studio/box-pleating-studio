@@ -30,6 +30,26 @@ and you won't need to execute individual subtask,
 as all subtasks will skip themselves if the source files are not changed.
 If something goes wrong, you can run `gulp clean` to cleanup built files and then rebuild everything.
 
+## Browser compatibility
+
+BP Studio have tried to support as much browser versions as possible,
+but there are some essential barriers that cannot be compromised.
+First of all, IE is obviously not supported as there're way too many modern
+features that cannot be used. And then:
+
+- Firefox < 78 and Safari < 11 does not support the `s` flag of regular expressions.
+See [caniuse](https://caniuse.com/mdn-javascript_builtins_regexp_dotall).
+- Chrome < 66 and Opera < 53 does not support `Array.prototype.values`.
+See [caniuse](https://caniuse.com/mdn-api_headers_values).
+
+Both these features are used in Vue 3, which is a critical dependency of BP Studio.
+The second issue could be polyfilled,
+but I see less point in doing so as those versions are old enough already,
+while the first issue is impossible to polyfill.
+
+There's currently no plans for officially supporting any browsers other than the major 5
+(Chrome, Edge, Safari, Firefox and Opera).
+
 ## Unit testing
 
 BP Studio specs and tests use [Mocha](https://mochajs.org/).

@@ -24,28 +24,28 @@ namespace LibService {
 	}
 
 	function loadStylesheet(href: string): Promise<void> {
-		return new Promise((resolve, reject) => {
+		return new Promise(resolve => {
 			const link = document.createElement("link");
 			link.rel = "stylesheet";
 			link.href = href;
 			link.onload = () => resolve();
 			link.onerror = () => {
-				errMgr.resErr ??= href;
-				reject();
+				errMgr.setResErr(href);
+				resolve(); // Resolve normally
 			};
 			document.head.appendChild(link);
 		});
 	}
 
 	export function loadScript(src: string): Promise<void> {
-		return new Promise((resolve, reject) => {
+		return new Promise(resolve => {
 			const script = document.createElement("script");
 			script.src = src;
 			script.async = false;
 			script.onload = () => resolve(); // At this moment the script will have been executed
 			script.onerror = () => {
-				errMgr.resErr ??= src;
-				reject();
+				errMgr.setResErr(src);
+				resolve(); // Resolve normally
 			};
 			document.head.appendChild(script);
 		});

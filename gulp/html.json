@@ -1,5 +1,7 @@
 {
 	"collapseWhitespace": true,
 	"removeComments": true,
-	"minifyJS": true
+	"minifyJS": {
+		"ie8": true
+	}
 }

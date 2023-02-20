@@ -49,7 +49,7 @@ namespace StudioService {
 			dialogService.alert(message);
 		};
 
-		if(!errMgr.runErr) initialized.value = true;
+		if(errMgr.ok()) initialized.value = true;
 	}
 
 	export const mouseCoordinates = proxy(() => bp.mouseCoordinates.value, null);
