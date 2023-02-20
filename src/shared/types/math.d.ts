@@ -11,3 +11,5 @@ interface IDimension {
 	width: number;
 	height: number;
 }
+
+type Sign = 0 | 1 | -1;

@@ -1,4 +1,4 @@
-import { Rectangle } from "core/math/rectangle";
+import { Rectangle } from "core/math/geometry/rectangle";
 import { opposite } from "shared/types/direction";
 import { CornerType } from "shared/json/enum";
 

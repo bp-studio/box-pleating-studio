@@ -1,3 +1,5 @@
+import type { Fraction } from "../fraction";
+
 /** Find the greatest common divider of two numbers. */
 export function $GCD(a: number, b: number): number {
 	if(a == 0 && b == 0) return 1;
@@ -23,6 +25,14 @@ export function $LCM(list: number[]): number {
 
 /** Reduce a pair of integers. */
 export function $reduceInt(a: number, b: number): [number, number, number] {
+	const gcd = $GCD(a, b);
+	return [a / gcd, b / gcd, gcd];
+}
+
+/** Reduce a pair of fractions. */
+export function $reduce(af: Fraction, bf: Fraction): [number, number, number] {
+	const a = Number(af.$numerator * bf.$denominator);
+	const b = Number(af.$denominator * bf.$numerator);
 	const gcd = $GCD(a, b);
 	return [a / gcd, b / gcd, gcd];
 }
