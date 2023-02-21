@@ -2,6 +2,11 @@
 
 type flatMapCallback<T, U, This> = (this: This, value: T, index: number, array: unknown[]) => U | U[];
 
+//=================================================================
+/**
+ * Polyfill for the native {@link Array.flatMap} in ES2019.
+ */
+//=================================================================
 export function flatMap<T, U, This = undefined>(
 	array: T[],
 	callback: flatMapCallback<T, U, This>,

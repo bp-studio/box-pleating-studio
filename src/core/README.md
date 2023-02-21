@@ -9,7 +9,9 @@ In order to simplify the protocol between the Client and the Core,
 the Core will always assume that the command it receives is valid without checking.
 Therefore it is the Client's responsibility to ensure the validity of the command.
 
-In the future, Core might be rewritten as WebAssembly for better performance.
+In the far future, the Core may be rewritten as WebAssembly for better performance,
+but for foreseeable future this seems unnecessary as the runtime of the Client
+exceeds that of the Core anyway.
 
 The data flow of the Core is depicted in the following chart.
 
