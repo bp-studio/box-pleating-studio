@@ -47,8 +47,8 @@ The second issue could be polyfilled,
 but I see less point in doing so as those versions are old enough already,
 while the first issue is impossible to polyfill.
 
-There's currently no plans for officially supporting any browsers other than the major 5
-(Chrome, Edge, Safari, Firefox and Opera).
+There's currently no plans for officially supporting browsers other than
+Chrome, Edge, Safari, Firefox, Opera, and Samsung Internet.
 
 ## Unit testing
 

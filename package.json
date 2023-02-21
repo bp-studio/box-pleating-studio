@@ -21,11 +21,15 @@
 		"yarn": "please-use-pnpm"
 	},
 	"browserslist": [
-		"Safari >= 11",
 		"Chrome >= 66",
+		"Edge >= 79",
 		"Firefox >= 78",
 		"Opera >= 53",
-		"not dead"
+		"Safari >= 11",
+		"and_chr >= 66",
+		"and_ff >= 78",
+		"Samsung >= 9",
+		"ios_saf >= 11"
 	],
 	"devDependencies": {
 		"@intlify/vue-i18n-extensions": "^5.0.1",
@@ -38,13 +42,13 @@
 		"@types/mocha": "^10.0.1",
 		"@types/node": "^18.14.0",
 		"@types/wicg-file-system-access": "^2020.9.5",
-		"@typescript-eslint/eslint-plugin": "^5.52.0",
-		"@typescript-eslint/parser": "^5.52.0",
+		"@typescript-eslint/eslint-plugin": "^5.53.0",
+		"@typescript-eslint/parser": "^5.53.0",
 		"@vue/compiler-sfc": "^3.2.47",
 		"@vue/eslint-config-typescript": "11.0.2",
 		"chai": "^4.3.7",
 		"del": "7.0.0",
-		"esbuild": "^0.17.8",
+		"esbuild": "^0.17.10",
 		"esbuild-plugin-external-global": "^1.0.1",
 		"esbuild-plugin-vue-next": "npm:@wfrog/esbuild-plugin-vue-next@^0.1.5",
 		"esbuild-sass-plugin": "^2.5.0",

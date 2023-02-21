@@ -18,7 +18,7 @@ function esVueOption(options) {
 }
 
 // Setting ECMAScript building target
-const target = ["chrome80", "firefox70", "safari11", "opera60"];
+const target = ["chrome66", "firefox78", "safari11", "opera53"];
 
 const option = {
 	bundle: true,

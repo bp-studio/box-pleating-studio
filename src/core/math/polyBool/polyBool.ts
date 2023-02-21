@@ -48,7 +48,7 @@ export abstract class PolyBool {
 		this._chainer = chainer;
 	}
 
-	/** 產生聯集的多邊形 */
+	/** Generate the union of polygons. */
 	public $get(): Polygon {
 		while(!this._eventQueue.$isEmpty) {
 			const event = this._eventQueue.$pop()!;
