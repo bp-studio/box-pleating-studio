@@ -82,8 +82,9 @@ export namespace DragController {
 		return $round(local);
 	}
 
-	/** End dragging. */
-	export function $dragEnd(): void {
+	/** End dragging, and return if we were indeed dragging. */
+	export function $dragEnd(): boolean {
+		const dragging = isDragging.value;
 		isDragging.value = false;
 		const project = ProjectService.project.value;
 		if(project) {
@@ -91,5 +92,6 @@ export namespace DragController {
 			project.$callStudio("layout", "dragEnd");
 		}
 		stage.interactiveChildren = true;
+		return dragging;
 	}
 }

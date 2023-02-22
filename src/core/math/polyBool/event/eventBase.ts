@@ -25,7 +25,7 @@ export abstract class EventBase {
 	 * the instance stored here is the same instance as the
 	 * endpoint of the segment.
 	 */
-	readonly $point: Readonly<IPoint>;
+	readonly $point: IPoint;
 
 	/**
 	 * The corresponding {@link StartEvent} or {@link EndEvent}.

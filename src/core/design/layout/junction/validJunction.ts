@@ -43,16 +43,16 @@ export class ValidJunction implements ISerializable<JJunction> {
 	public readonly $q2: number;
 
 	/** The dimension of the tip rectangle. */
-	public readonly $s: Readonly<IPoint>;
+	public readonly $s: IPoint;
 
 	/** The dimension of the overlapping region. */
-	public readonly $o: Readonly<IPoint>;
+	public readonly $o: IPoint;
 
 	/** The tip corresponding to {@link $a}. */
-	private readonly _tip: Readonly<IPoint>;
+	private readonly _tip: IPoint;
 
 	/** Coefficient of transformation. */
-	private readonly _f: Readonly<IPoint>;
+	private readonly _f: IPoint;
 
 	/** All {@link ValidJunction}s that covers self geometrically. */
 	private readonly _coveredBy: ValidJunction[] = [];

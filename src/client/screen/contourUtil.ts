@@ -1,10 +1,6 @@
-import { dist } from "shared/types/geometry";
-
-import type { Contour, Path, Polygon } from "shared/types/geometry";
 import type { Graphics } from "@pixi/graphics";
+import type { Contour, Path } from "shared/types/geometry";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
-
-const THRESHOLD = 0.4;
 
 export type GraphicsLike = Graphics | SmoothGraphics;
 
@@ -60,33 +56,3 @@ function drawPath(graphics: GraphicsLike, path: Path): void {
 	graphics.closePath();
 }
 
-/** Fill an arc-polygon. */
-export function drawArcPolygon(graphics: SmoothGraphics, polygon: Polygon, color: number): void {
-	for(const path of polygon) {
-		if(!path.length) return;
-
-		// Decide the stroke width based on the narrowness of the shape.
-		const narrowness = getNarrowness(path);
-		if(narrowness < THRESHOLD) graphics.lineStyle(2 / narrowness, color);
-		else graphics.lineStyle(0);
-
-		graphics.beginFill(color);
-		graphics.moveTo(path[0].x, path[0].y);
-		for(let i = 1; i < path.length; i++) {
-			const p = path[i];
-			if(p.arc) graphics.arcTo(p.arc.x, p.arc.y, p.x, p.y, p.r!);
-			else graphics.lineTo(p.x, p.y);
-		}
-		const p = path[0];
-		if(p.arc) graphics.arcTo(p.arc.x, p.arc.y, p.x, p.y, p.r!);
-		graphics.closePath();
-		graphics.endFill();
-	}
-}
-
-/** Returns the narrowness of the shape for a path consists of two arcs. */
-function getNarrowness(path: Path): number {
-	if(path.length > 2) return NaN;
-	const [p1, p2] = path;
-	return dist(p1.arc!, p2.arc!) / dist(p1, p2);
-}

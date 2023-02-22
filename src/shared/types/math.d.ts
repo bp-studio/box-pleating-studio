@@ -1,10 +1,13 @@
 
 /**
  * {@link IPoint} is an abstraction of a two dimensional point, without any implementation.
+ *
+ * For all of our use cases, it is more convenient to have them immutable,
+ * so from now the coordinates are both readonly.
  */
 interface IPoint {
-	x: number;
-	y: number;
+	readonly x: number;
+	readonly y: number;
 }
 
 interface IDimension {

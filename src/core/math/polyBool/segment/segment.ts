@@ -9,10 +9,10 @@ export interface ISegment {
 	$type: SegmentType;
 
 	/** Start point of the segment */
-	$start: Readonly<IPoint>;
+	$start: IPoint;
 
 	/** End point of the segment */
-	$end: Readonly<IPoint>;
+	$end: IPoint;
 
 	/** The index of the polygon to which the segment belongs */
 	readonly $polygon: number;

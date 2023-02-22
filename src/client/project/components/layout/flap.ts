@@ -37,8 +37,18 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	public readonly id: number;
 
 	@shallowRef public $contours: Contour[];
-	@shallowRef private _width: number = 0;
-	@shallowRef private _height: number = 0;
+	private _width: number = 0;
+	private _height: number = 0;
+
+	// We put separate fields for the reactive values
+	// that are used in the process of drawing.
+	// If we draw according to the source of truth,
+	// the drawing will happen before the contour is updated,
+	// and in some cases the delay is noticeable,
+	// causing a weird experience to the users.
+	@shallowRef private _drawLocation: IPoint = { x: 0, y: 0 };
+	@shallowRef private _drawWidth: number = 0;
+	@shallowRef private _drawHeight: number = 0;
 
 	public readonly $vertex: Vertex;
 	public readonly $edge: Edge;
@@ -51,7 +61,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	private readonly _hinge: SmoothGraphics;
 	private readonly _label: Label;
 
-	public $anchor: Readonly<IPoint> = { x: 0, y: 0 };
+	public $anchor: IPoint = { x: 0, y: 0 };
 
 	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge, contours: Contour[]) {
 		const sheet = layout.$sheet;
@@ -59,13 +69,13 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this._layout = layout;
 
 		this.id = json.id;
-		this.$location.x = json.x;
-		this.$location.y = json.y;
+		this.$location = { x: json.x, y: json.y };
 		this._width = json.width;
 		this._height = json.height;
 		this.$contours = contours;
 		this.$vertex = vertex;
 		this.$edge = edge;
+		this.$updateDrawParameters();
 
 		this._dots = Array.from({ length: 4 }, () =>
 			this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$dot])
@@ -81,6 +91,12 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$reactDraw(this._draw, this._drawShade, this._drawDot, this._drawLabel);
 
 		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
+	}
+
+	public $updateDrawParameters(): void {
+		this._drawHeight = this.height;
+		this._drawWidth = this.width;
+		this._drawLocation = { x: this.$location.x, y: this.$location.y };
 	}
 
 	public toJSON(): JFlap {
@@ -170,7 +186,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 			return this._fixVector(p, v);
 		} else {
 			// We allow at most one tip to go beyond the range of the sheet.
-			const data = this._getDots(w, h)
+			const data = this._getDots(this.$location, w, h)
 				.map(p => {
 					const fix = this._fixVector(p, v);
 					const dx = fix.x - v.x;
@@ -229,8 +245,8 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	private _drawLabel(): void {
-		const w = this.width, h = this.height;
-		const { x, y } = this.$location;
+		const w = this._drawWidth, h = this._drawHeight;
+		const { x, y } = this._drawLocation;
 		const dir = w || h ? Direction.none : undefined;
 		this.$anchor = { x: x + w / 2, y: y + h / 2 };
 		this._label.$draw(this.$vertex.name, this.$anchor.x, this.$anchor.y, dir);
@@ -238,13 +254,13 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	private _draw(): void {
 		const sh = ProjectService.shrink.value;
-		const w = this.width, h = this.height;
-		const { x, y } = this.$location;
+		const w = this._drawWidth, h = this._drawHeight;
+		const { x, y } = this._drawLocation;
 		const hingeColor = app.settings.colorScheme.hinge ?? HINGE_COLOR;
 		this._shade.clear();
 		fillContours(this._shade, this.$contours, HINGE_COLOR);
 
-		const pts = this._getDots(w, h);
+		const pts = this._getDots(this._drawLocation, w, h);
 		for(let i = 0; i <= Direction.LR; i++) {
 			this._dots[i].visible = this._sheet.grid.$contains(pts[i]);
 			this._dots[i].position.set(pts[i].x, pts[i].y);
@@ -277,19 +293,19 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** Tip positions, ordered by quadrants. */
-	private _getDots(w: number, h: number): IPoint[] {
-		const { x, y } = this.$location;
+	private _getDots(location: IPoint, w: number, h: number): IPoint[] {
+		const { x, y } = location;
 		return [
 			{ x: x + w, y: y + h },
 			{ x, y: y + h },
-			this.$location,
+			location,
 			{ x: x + w, y },
 		];
 	}
 
 	/** Test if the new size is acceptable. */
 	private _testResize(w: number, h: number, grid: IGrid = this._sheet.grid): boolean {
-		return this._getDots(w, h)
+		return this._getDots(this.$location, w, h)
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.
 	}

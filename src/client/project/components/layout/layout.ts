@@ -1,6 +1,5 @@
 
 import { AlphaFilter } from "@pixi/filter-alpha";
-import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 import { shallowRef } from "client/shared/decorators";
@@ -8,8 +7,9 @@ import { Flap } from "./flap";
 import { River } from "./river";
 import { Sheet } from "../sheet";
 import { Layer } from "client/types/layers";
-import { drawArcPolygon } from "client/screen/contourUtil";
-import { RED } from "client/shared/constant";
+import { Junction, JUNCTION_ALPHA } from "./junction";
+import ProjectService from "client/services/projectService";
+import { View } from "client/base/view";
 
 import type { Contour } from "shared/types/geometry";
 import type { Container } from "@pixi/display";
@@ -18,14 +18,15 @@ import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
 
-const JUNCTION_ALPHA = 0.5;
-
 //=================================================================
 /**
  * {@link Layout} manages the operations and logics in the layout view.
+ *
+ * Itself is also derived from {@link View},
+ * as it handles the drawing of invalid junctions.
  */
 //=================================================================
-export class Layout implements ISerializable<JLayout> {
+export class Layout extends View implements ISerializable<JLayout> {
 
 	@shallowRef public flapCount: number = 0;
 	@shallowRef public riverCount: number = 0;
@@ -35,7 +36,7 @@ export class Layout implements ISerializable<JLayout> {
 	public readonly $sheet: Sheet;
 	public readonly $flaps: Map<number, Flap> = new Map();
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
-	public readonly $junctions: Map<string, SmoothGraphics> = new Map();
+	public readonly $junctions: Map<string, Junction> = new Map();
 
 	/** The flaps that are about to be updated. */
 	private readonly _pendingUpdate = new Set<Flap>();
@@ -46,12 +47,19 @@ export class Layout implements ISerializable<JLayout> {
 	/** The updating task in progress. */
 	private _updating: Promise<void> = Promise.resolve();
 
+	/** Cached value of scale. */
+	private _scale: number = 0;
+
 	constructor(project: Project, parentView: Container, json: JSheet) {
+		super();
 		this.$project = project;
 		this.$sheet = new Sheet(project, parentView, json);
+		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(JUNCTION_ALPHA);
 		this.$sheet.$layers[Layer.$junction].filters = [filter];
+
+		this.$reactDraw(this._redrawJunctions);
 
 		if(DEBUG_ENABLED) this.$sheet.$view.name = "LayoutSheet";
 	}
@@ -78,7 +86,10 @@ export class Layout implements ISerializable<JLayout> {
 		// Update contours
 		for(const tag in model.graphics) {
 			const target = this._parseTag(tag);
-			if(target) target.$contours = model.graphics[tag].contours!;
+			if(target) {
+				target.$contours = model.graphics[tag].contours!;
+				if(target instanceof Flap) target.$updateDrawParameters();
+			}
 		}
 
 		for(const f of this.$flaps.values()) {
@@ -217,24 +228,34 @@ export class Layout implements ISerializable<JLayout> {
 
 	private _updateJunctions(model: UpdateModel): void {
 		const junctionLayer = this.$sheet.$layers[Layer.$junction];
+		const max = ProjectService.scale.value;
+		this._scale = max;
 		for(const tag in model.add.junctions) {
-			let sg = this.$junctions.get(tag);
-			if(!sg) {
-				sg = new SmoothGraphics();
-				sg.alpha = JUNCTION_ALPHA;
-				this.$junctions.set(tag, sg);
-				junctionLayer.addChild(sg);
+			let junction = this.$junctions.get(tag);
+			if(!junction) {
+				junction = new Junction(model.add.junctions[tag]);
+				this.$junctions.set(tag, junction);
+				junctionLayer.addChild(junction);
 				this.invalidCount++;
+			} else {
+				junction.$polygon = model.add.junctions[tag];
 			}
-			sg.clear();
-			drawArcPolygon(sg, model.add.junctions[tag], RED);
+			junction.$draw(max);
 		}
 		for(const tag of model.remove.junctions) {
-			const sg = this.$junctions.get(tag)!;
+			const junction = this.$junctions.get(tag)!;
 			this.invalidCount--;
 			this.$junctions.delete(tag);
-			junctionLayer.removeChild(sg);
-			sg.destroy();
+			junctionLayer.removeChild(junction);
+			junction.destroy();
 		}
+	}
+
+	/** Redraw the junctions when scale changes */
+	private _redrawJunctions(): void {
+		const max = ProjectService.scale.value;
+		if(this._scale == max) return;
+		this._scale = max;
+		for(const junction of this.$junctions.values()) junction.$draw(max);
 	}
 }

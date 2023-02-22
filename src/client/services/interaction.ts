@@ -13,7 +13,7 @@ import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
 import { options } from "client/options";
 
-export const mouseCoordinates = shallowRef<Readonly<IPoint> | null>(null);
+export const mouseCoordinates = shallowRef<IPoint | null>(null);
 
 //=================================================================
 /**
@@ -76,10 +76,10 @@ export namespace Interaction {
 
 	function mouseUp(event: MouseEvent): void {
 		if(!pointerHeld) return;
-		DragController.$dragEnd();
-		const dragging = SelectionController.$endDrag();
+		const dragging = DragController.$dragEnd();
+		const dragSelecting = SelectionController.$endDrag();
 		ScrollController.$tryEnd(event);
-		if(!dragging && !event.ctrlKey && !event.metaKey) {
+		if(!dragging && !dragSelecting && !event.ctrlKey && !event.metaKey) {
 			SelectionController.$processNext();
 		}
 		pointerHeld = false;

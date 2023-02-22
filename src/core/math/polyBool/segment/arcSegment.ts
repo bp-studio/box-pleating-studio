@@ -29,12 +29,12 @@ export const EPSILON = 1e-10;
 export class ArcSegment implements ISegment {
 	public readonly $type = SegmentType.Arc;
 	public readonly $polygon: number;
-	public readonly $center: Readonly<IPoint>;
+	public readonly $center: IPoint;
 	public readonly $radius: number;
-	private _start: Readonly<IPoint>;
-	private _end: Readonly<IPoint>;
-	private _out!: Readonly<IPoint>;
-	private _delta!: Readonly<IPoint>;
+	private _start: IPoint;
+	private _end: IPoint;
+	private _out!: IPoint;
+	private _delta!: IPoint;
 
 	/** The control point of the arc (intersection of two tangents) */
 	public $anchor!: IPoint;
@@ -48,10 +48,10 @@ export class ArcSegment implements ISegment {
 		this._update();
 	}
 
-	public get $start(): Readonly<IPoint> {
+	public get $start(): IPoint {
 		return this._start;
 	}
-	public set $start(p: Readonly<IPoint>) {
+	public set $start(p: IPoint) {
 		this._start = p;
 		this._update();
 	}

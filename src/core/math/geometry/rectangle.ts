@@ -9,10 +9,10 @@ import { same } from "shared/types/geometry";
 export class Rectangle {
 
 	/** The lower left corner. */
-	private readonly p1: Readonly<IPoint>;
+	private readonly p1: IPoint;
 
 	/** The upper right corner. */
-	private readonly p2: Readonly<IPoint>;
+	private readonly p2: IPoint;
 
 	constructor(p1: IPoint, p2: IPoint) {
 		if(p1.x > p2.x) [p1, p2] = [p2, p1];

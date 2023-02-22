@@ -47,8 +47,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 
 		this.id = json.id;
 		this.$isNew = json.isNew ?? true;
-		this.$location.x = json.x;
-		this.$location.y = json.y;
+		this.$location = { x: json.x, y: json.y };
 		this.name = json.name;
 
 		this._dot = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$vertex]);

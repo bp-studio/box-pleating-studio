@@ -1,11 +1,10 @@
-import { shallowReactive } from "vue";
-
 import { Control } from "./control";
+import { shallowRef } from "client/shared/decorators";
 
 import type { Sheet } from "client/project/components/sheet";
 
 export interface DragSelectable extends Draggable {
-	readonly $anchor: Readonly<IPoint>;
+	readonly $anchor: IPoint;
 }
 
 //=================================================================
@@ -15,7 +14,7 @@ export interface DragSelectable extends Draggable {
 //=================================================================
 export abstract class Draggable extends Control {
 
-	public readonly $location: IPoint = shallowReactive({ x: 0, y: 0 });
+	@shallowRef public $location: IPoint = { x: 0, y: 0 };
 
 	/** The offset vector between mouse location and the object location when the dragging started. */
 	private _dragOffset!: IPoint;
@@ -64,8 +63,7 @@ export abstract class Draggable extends Control {
 
 	/** Trigger movement */
 	protected _move(x: number, y: number): void {
-		this.$location.x = x;
-		this.$location.y = y;
+		this.$location = { x, y };
 		//TODO: crete MoveCommand
 	}
 }

@@ -13,8 +13,8 @@ export class AALineSegment implements ISegment {
 	public readonly $type = SegmentType.AALine;
 	public readonly $isHorizontal: boolean;
 	public readonly $polygon: number;
-	public $start: Readonly<IPoint>;
-	public $end: Readonly<IPoint>;
+	public $start: IPoint;
+	public $end: IPoint;
 
 	constructor(start: IPoint, end: IPoint, polygon: number) {
 		this.$start = start;
