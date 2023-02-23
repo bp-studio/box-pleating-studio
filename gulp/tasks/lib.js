@@ -4,6 +4,8 @@ const exg = require("esbuild-plugin-external-global").externalGlobalPlugin;
 const fs = require("fs");
 const gulp = require("gulp");
 const gulpSass = require("gulp-sass");
+const postcss = require("gulp-postcss");
+const postcssPresetEnv = require("postcss-preset-env");
 const replace = require("gulp-replace");
 const sass = require("sass");
 
@@ -46,6 +48,7 @@ const bootstrapCSS = () => {
 			dest: config.dest.dist + "/lib/bootstrap/bootstrap.min.css",
 			extra: [
 				__filename,
+				".browserslistrc",
 				root + "bootstrap/package.json",
 				...extra,
 			],
@@ -54,7 +57,9 @@ const bootstrapCSS = () => {
 			outputStyle: "compressed",
 		}));
 	stream = purge(stream);
-	return stream.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
+	return stream
+		.pipe(postcss([postcssPresetEnv()])) // will use browserslist config
+		.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
 };
 
 // The building method of this package sucks, we can do a lot better ourselves.

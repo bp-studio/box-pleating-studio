@@ -1,5 +1,7 @@
 const gulp = require("gulp");
 const iff = require("gulp-if");
+const postcss = require("gulp-postcss");
+const postcssPresetEnv = require("postcss-preset-env");
 const through2 = require("gulp-through2");
 
 const newer = require("../utils/newer");
@@ -58,9 +60,12 @@ gulp.task("appDist", () =>
 	gulp.src(config.src.app + "/main.ts")
 		.pipe(newer({
 			dest: config.dest.dist + "/main.js",
-			extra,
+			extra: [".browserslistrc", ...extra],
 		}))
 		.pipe(esb({ minify: true }))
+		.pipe(iff(f => f.extname == ".css",
+			postcss([postcssPresetEnv()]) // will use browserslist config
+		))
 		.pipe(gulp.dest(config.dest.dist))
 );
 

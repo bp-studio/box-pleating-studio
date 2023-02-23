@@ -28,6 +28,7 @@
 
 .scroll-shadow,
 .scroll-shadow * {
+	/* It's OK if this is not supported */
 	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 	touch-action: pan-y;
 }

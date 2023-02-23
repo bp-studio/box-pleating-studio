@@ -58,6 +58,9 @@
 					"src/other/service"
 				]
 			}
-		}
+		},
+		"polyfills": [
+			"globalThis"
+		]
 	}
 }
