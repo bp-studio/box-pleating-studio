@@ -1,12 +1,17 @@
 {
 	"recommendations": [
-		"vue.volar",
+		"bierner.markdown-mermaid",
+		"bpruitt-goddard.mermaid-markdown-syntax-highlighting",
 		"dbaeumer.vscode-eslint",
 		"editorconfig.editorconfig",
 		"hbenl.vscode-mocha-test-adapter",
+		"hbenl.vscode-test-explorer",
 		"lokalise.i18n-ally",
+		"ms-vscode.test-adapter-converter",
 		"mutsuntsai.jsdoc-link",
+		"sibiraj-s.vscode-scss-formatter",
 		"stylelint.vscode-stylelint",
-		"bierner.markdown-mermaid"
+		"vue.volar",
+		"vue.vscode-typescript-vue-plugin"
 	]
 }

@@ -33,9 +33,13 @@ gulp.task("sw", () => {
 				"**/*.css",
 				"**/*.woff2",
 				"manifest.json",
+
+				// Only precache the two most common resolution; see https://tinyurl.com/7rxv5f97
 				"assets/icon/icon-32.png",
 				"assets/icon/icon-192.png",
-				`log/${lastLog}.md`, // Only the last log will be included in precache
+
+				// Only the last log will be included in precache
+				`log/${lastLog}.md`,
 			],
 			globIgnores: ["sw.js"],
 		}))

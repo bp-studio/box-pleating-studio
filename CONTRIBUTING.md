@@ -12,30 +12,29 @@ Please refer to the readme of the [Locale](src/locale/README.md) section.
 
 To build BP Studio, first you need the following:
 
-1. Install [Node.js](https://nodejs.org/).
-1. BP Studio had migrated from NPM to PNPM for package managing, so install [PNPM](https://pnpm.io/) by the command `npm install -g pnpm`.
-1. Install [TypeScript](https://www.typescriptlang.org/) globally by the command `pnpm add -g typescript`.
-1. Install [Gulp](https://www.npmjs.com/package/gulp) globally by the command `pnpm add -g gulp-cli`.
+1. Install or upgrade [Node.js](https://nodejs.org/) to v18+.
+1. BP Studio had migrated from NPM to [PNPM](https://pnpm.io/) for package managing,
+   so install PNPM by the command `npm install -g pnpm`.
 1. Use the command `pnpm install` under the project root folder to install all dependencies.
 
 And then you can simply press `F5` in VS Code to build and launch the app automatically.
 This is the preferred way to launch as it adds additional parameters for launching Chrome to ensure all functionalities work properly in local environment.
 
-Alternatively, run `gulp` (or `gulp default`) to build the entire project manually,
+Alternatively, run `pnpm build` to build the entire project manually,
 and use any browser to open `debug/index.htm` (or `dist/index.htm` if debug is not needed) to run it.
 Some of the features may not work with this approach though.
 
-Typically the default task is sufficient for developing purpose,
-and you won't need to execute individual subtask,
+Typically the default build task is sufficient for developing purpose,
+and you won't need to execute individual Gulp subtasks,
 as all subtasks will skip themselves if the source files are not changed.
-If something goes wrong, you can run `gulp clean` to cleanup built files and then rebuild everything.
+If something goes wrong, you can run `pnpm build clean` to cleanup built files and then rebuild everything.
 
 ## Browser compatibility
 
 BP Studio have tried to support as much browser versions as possible,
 but there are some essential barriers that cannot be compromised.
 First of all, IE is obviously not supported as there're way too many modern
-features that cannot be used. And then:
+features that cannot be used, plus it's REALLY dead by now. And then:
 
 - Firefox < 78 and Safari < 11 does not support the `s` flag of regular expressions.
 See [caniuse](https://caniuse.com/mdn-javascript_builtins_regexp_dotall).
