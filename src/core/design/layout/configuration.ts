@@ -2,7 +2,7 @@ import { Partition } from "./partition";
 import { Store } from "./store";
 
 import type { ValidJunction } from "./junction/validJunction";
-import type { JPartition } from "shared/json";
+import type { JJunction, JPartition } from "shared/json";
 import type { Pattern } from "./pattern";
 
 //=================================================================
@@ -17,8 +17,8 @@ export class Configuration {
 	private readonly _partitions: readonly Partition[];
 	// private readonly _patterns: Store<Pattern>;
 
-	constructor(partitions: JPartition[]) {
-		this._partitions = partitions.map(p => new Partition(p));
+	constructor(junctions: JJunction[], partitions: JPartition[]) {
+		this._partitions = partitions.map(p => new Partition(junctions, p));
 		// this._patterns = new Store();
 	}
 

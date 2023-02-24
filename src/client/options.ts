@@ -1,5 +1,5 @@
 
-interface StudioOptions {
+export interface StudioOptions {
 	/** Callback for deprecated formats in the file */
 	onDeprecate?: (title?: string) => void;
 
@@ -11,6 +11,9 @@ interface StudioOptions {
 
 	/** Callback for long pressing */
 	onLongPress?: Action;
+
+	/** Callback for fatal error. */
+	onError?: (id: number, error: string) => Promise<void>;
 }
 
 export const options: StudioOptions = {};

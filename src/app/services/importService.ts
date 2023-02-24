@@ -42,9 +42,8 @@ namespace ImportService {
 		const tasks: Promise<void>[] = [];
 		for(let i = 0; i < list.length; i++) {
 			if(ids[i] === undefined) {
-				tasks.push(
-					openHandle(list[i], request).then(id => { ids[i] = id; })
-				);
+				const task = openHandle(list[i], request).then(id => { ids[i] = id; });
+				tasks.push(task);
 			}
 		}
 		await Promise.all(tasks);

@@ -1,10 +1,11 @@
 import { Design } from "core/design/design";
 import { AABBTask } from "core/design/tasks/aabb";
-import { cleanupTask } from "core/design/tasks/cleanup";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 
 import type { JFlap } from "shared/json";
+import type { Stretch } from "core/design/layout/stretch";
+import type { Repository } from "core/design/layout/repository";
 
 //=================================================================
 /**
@@ -19,9 +20,17 @@ namespace LayoutController {
 		Processor.$run(AABBTask);
 	}
 
-	export function dragEnd(): void {
+	/**
+	 * Clears the cached {@link Stretch}es and {@link Repository Repositories} after dragging.
+	 *
+	 * If we are not in dragging mode, those are never cached in the first place,
+	 * so there is no need to clear the cache.
+	 */
+	export function dragEnd(): boolean {
 		State.$isDragging = false;
-		Processor.$run(cleanupTask);
+		State.$stretchCache.clear();
+		for(const stretch of State.$stretches.values()) stretch.$cleanup();
+		return true; // So that updateModel is not processed.
 	}
 }
 

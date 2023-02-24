@@ -5,6 +5,8 @@ import type { Sheet } from "client/project/components/sheet";
 import type { Container, DisplayObject } from "@pixi/display";
 import type { IHitArea } from "@pixi/events";
 
+type ControlType = "Flap" | "Vertex" | "River" | "Edge" | "Stretch" | "Device";
+
 //=================================================================
 /**
  * {@link Control} is a {@link View} that can be selected.
@@ -19,7 +21,7 @@ export abstract class Control extends View {
 	 * we don't use the name of the constructor here,
 	 * and instead ask for the derived classes to implement this field.
 	 */
-	public abstract readonly type: string;
+	public abstract readonly type: ControlType;
 
 	/**
 	 * The priority of selection. Larger ones go first.

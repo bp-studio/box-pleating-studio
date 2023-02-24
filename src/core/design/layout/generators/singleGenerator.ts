@@ -1,21 +1,27 @@
 import { GeneratorUtil } from "core/utils/generator";
 import { Configuration } from "../configuration";
 import { clone } from "shared/utils/clone";
+import { configFilter } from "./filters";
 
 import type { JJunction, JOverlap, JStretch } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";
 
+//=================================================================
+/**
+ * {@link singleGenerator} is a {@link Configuration} {@link Generator}
+ * that works for a single {@link ValidJunction}.
+ */
+//=================================================================
 export function* singleGenerator(junction: ValidJunction, prototype?: JStretch): Generator<Configuration> {
-	const filter = (config: Configuration): boolean => config.$entry != null;
 	const j = junction.toJSON();
 
 	yield* GeneratorUtil.$first([
 		singleGOPS(j),
-	], filter);
+	], configFilter);
 }
 
 function* singleGOPS(j: JJunction): Generator<Configuration> {
-	yield new Configuration([{
+	yield new Configuration([j], [{
 		overlaps: [toOverlap(j, 0)],
 	}]);
 }

@@ -34,14 +34,19 @@ namespace WorkspaceService {
 	}
 
 	export async function create(): Promise<void> {
-		const json = {
-			design: {
-				title: i18n.t("keyword.untitled").toString(),
-			},
-		};
-		const proj = await bp.projects.create(json);
-		projects.push(proj);
-		select(proj.id);
+		try {
+			const json = {
+				design: {
+					title: i18n.t("keyword.untitled").toString(),
+				},
+			};
+			const proj = await bp.projects.create(json);
+			projects.push(proj);
+			select(proj.id);
+		} catch(e) {
+			const msg = e instanceof Error ? e.message : "Unknown error";
+			Dialogs.alert(i18n.t("message.fatal", [msg]));
+		}
 	}
 
 	export async function open(data: Pseudo<JProject>): Promise<Project> {
@@ -116,6 +121,13 @@ namespace WorkspaceService {
 		// this.select(c.id);
 		// gtag('event', 'project_clone');
 	}
+
+	Studio.$onSetupOptions.push(options =>
+		options.onError = async (id: number, error: string) => {
+			await Dialogs.alert(i18n.t("message.fatal", [error]));
+			await close(id);
+		}
+	);
 }
 
 export default shallowReadonly(reactive(WorkspaceService));

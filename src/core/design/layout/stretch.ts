@@ -43,9 +43,18 @@ export class Stretch {
 		this._repo = new Repository(junctions, signature);
 	}
 
-	/** Clear {@link Repository} cache, and finish searching for patterns. */
+	/** Clear {@link Repository} cache. */
 	public $cleanup(): void {
 		this._repoCache.clear();
+	}
+
+	/**
+	 * Finish searching for patterns, called when the {@link Stretch} is first selected.
+	 *
+	 * Before that happens, a {@link Stretch} will always only yield the first pattern it finds,
+	 * to save the computation time.
+	 */
+	public $complete(): void {
 		this._repo.$complete();
 	}
 }

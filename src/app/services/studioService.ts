@@ -2,11 +2,12 @@ import { computed, reactive, shallowReadonly, shallowRef } from "vue";
 
 import { defaultTitle } from "app/shared/constants";
 import Lib from "./libService";
-import dialogService from "./dialogService";
+import Dialogs from "./dialogService";
 
 import type { ComputedRef } from "vue";
 import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
+import type { StudioOptions } from "client/options";
 
 /**
  * We encapsule the Client in this service so that it is not exposed in other parts of the app.
@@ -29,6 +30,9 @@ namespace StudioService {
 	/** If the Studio has been initialized. */
 	export const initialized = shallowRef(false);
 
+	/** Hooks for setup options. */
+	export const $onSetupOptions: Consumer<StudioOptions>[] = [];
+
 	/** The {@link Project} that is currently selected. */
 	export const project = proxy(() => {
 		const proj = bp.projects.current.value;
@@ -46,8 +50,9 @@ namespace StudioService {
 		bp.options.onDeprecate = (title?: string) => {
 			const t = title || i18n.t("keyword.untitled");
 			const message = i18n.t("message.oldVersion", [t]);
-			dialogService.alert(message);
+			Dialogs.alert(message);
 		};
+		for(const setup of $onSetupOptions) setup(bp.options);
 
 		if(errMgr.ok()) initialized.value = true;
 	}

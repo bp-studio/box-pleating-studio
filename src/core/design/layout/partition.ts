@@ -1,4 +1,8 @@
-import type { JOverlap, JPartition } from "shared/json";
+import { Store } from "./store";
+import { $generate } from "core/math/gops";
+
+import type { Pattern } from "./pattern";
+import type { JDevice, JGadget, JJunction, JOverlap, JPartition } from "shared/json";
 import type { Configuration } from "./configuration";
 
 //=================================================================
@@ -12,7 +16,26 @@ export class Partition {
 
 	public readonly $overlaps: readonly JOverlap[];
 
-	constructor(data: JPartition) {
+	/**
+	 * Available {@link JDevice} for this {@link Partition}.
+	 * They will be assembled into {@link Pattern}.
+	 */
+	public readonly $devices: Store<JDevice>;
+
+	constructor(junctions: JJunction[], data: JPartition) {
 		this.$overlaps = data.overlaps;
+		this.$devices = new Store(this._deviceGenerator(junctions));
+	}
+
+	private *_deviceGenerator(junctions: JJunction[]): Generator<JDevice> {
+		if(this.$overlaps.length == 1) {
+			const overlap = this.$overlaps[0];
+			const { ox, oy } = overlap;
+			const sx = junctions[overlap.parent].sx;
+			for(const piece of $generate(ox, oy, sx)) {
+				const gadget: JGadget = { pieces: [piece] };
+				yield { gadgets: [gadget] };
+			}
+		}
 	}
 }

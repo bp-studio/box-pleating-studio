@@ -22,7 +22,6 @@ subgraph User input
 	T{{Tree\nstructure}}
 	L{{Edge\nlengths}}
 	F{{Flap positions\nand sizes}}
-	D{{Dragging\nend}}
 	P{{Stretch pattern\nchoices}}
 end
 subgraph Tree
@@ -35,12 +34,11 @@ j(junctions)
 i[[invalid\njunctions]]
 subgraph Stretch pattern
 	s(stretches)
-	sc[[stretch/repo\nclean up]]
-	p(patterns)
+	p([patterns])
 end
 subgraph Contour
 	rc(rough contours)
-	pc([pattern contours])
+	pc(pattern contours)
 	fc[[final contours]]
 end
 
@@ -48,7 +46,5 @@ T --> h --> b
 b & L --> d
 d & F --> a --> rc --> fc
 a --> j --> i & s
-D --------> sc
-s --> p
-p & P --> pc --> fc
+s & P --> p --> pc --> fc
 ```

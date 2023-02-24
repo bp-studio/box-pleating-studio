@@ -87,9 +87,11 @@ export namespace DragController {
 		const dragging = isDragging.value;
 		isDragging.value = false;
 		const project = ProjectService.project.value;
-		if(project) {
+		if(dragging && project) {
 			project.$isDragging = false;
-			project.$callStudio("layout", "dragEnd");
+			if(SelectionController.draggables.value[0].type === "Flap") {
+				project.$callStudio("layout", "dragEnd");
+			}
 		}
 		stage.interactiveChildren = true;
 		return dragging;

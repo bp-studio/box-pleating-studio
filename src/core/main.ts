@@ -16,7 +16,7 @@ onmessage = async function(event: MessageEvent): Promise<void> {
 		// 執行請求；結果可能是 Promise 也可能不是
 		const result = await action(...request.value);
 
-		if(result) {
+		if(result !== undefined) {
 			// 如果請求本身具有特定的傳回結果就加以傳回
 			response = { value: result };
 		} else {
@@ -27,7 +27,7 @@ onmessage = async function(event: MessageEvent): Promise<void> {
 		}
 	} catch(e: unknown) {
 		debugger;
-		response = { error: e instanceof Error ? e.message : "unknown error" };
+		response = { error: e instanceof Error ? e.message : "Unknown error" };
 	}
 
 	event.ports[0].postMessage(response);

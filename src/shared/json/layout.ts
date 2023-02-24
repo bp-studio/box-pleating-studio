@@ -1,6 +1,6 @@
 import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerType } from "./enum";
-import type { JConfiguration } from "./pattern";
+import type { JConfiguration, JJunction } from "./pattern";
 
 export interface JQuadrilateral {
 	/** The for quadrant corners of this {@link JQuadrilateral}, in the direction before the transformation. */

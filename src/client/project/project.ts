@@ -3,6 +3,7 @@ import { Mountable } from "client/base/mountable";
 import { Migration } from "client/patches";
 import { Design } from "./design";
 import HistoryManager from "./changes/history";
+import { options } from "client/options";
 
 import type * as Routes from "core/routes";
 import type { JProject } from "shared/json";
@@ -25,8 +26,8 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 
 	private readonly _worker: Worker;
 
-	/** Whether self has been initialized. Used only in debug mode. */
-	private _initialized?: boolean;
+	/** Whether self has been initialized. */
+	private _initialized: boolean = false;
 
 	public $isDragging: boolean = false;
 
@@ -59,9 +60,10 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 		await Vue.nextTick();
 
 		if(DEBUG_ENABLED && !this._initialized) {
-			this._initialized = true;
 			console.timeEnd("First render");
 		}
+
+		this._initialized = true;
 		return this;
 	}
 
@@ -78,7 +80,13 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 		const request: Routes.IStudioRequest<C, A> = { controller, action, value: args };
 		const response = await app.callWorker<Routes.StudioResponse>(this._worker, request);
 		if("error" in response) {
-			throw new Error(response.error);
+			this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
+			if(this._initialized) {
+				// Display a fatal message and close self, if the project has already been initialized.
+				// If not, the error thrown below will be caught by the App.
+				await options.onError?.(this.id, response.error);
+			}
+			throw new Error(response.error); // Stop all further actions.
 		} else if("update" in response) {
 			this.design.$update(response.update);
 			return undefined as Routes.ActionResult<C, A>;
