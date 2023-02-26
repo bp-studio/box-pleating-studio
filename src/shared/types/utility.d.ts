@@ -47,7 +47,7 @@ type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> } | undefin
 type PseudoValue<T> =
 	T extends (infer U)[] ? PseudoValue<U>[] :
 	T extends object ? Pseudo<T> : T;
-type OtherKeys<T, V> = Record<Exclude<string, keyof T>, V>;
+type OtherKeys<T, V> = Partial<Record<Exclude<string, keyof T>, V>>;
 type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
 
 /**

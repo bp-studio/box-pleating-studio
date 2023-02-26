@@ -1,6 +1,6 @@
 import type { GridType } from "./enum";
 
-export interface JFlap extends IDimension, IPoint {
+export interface JFlap extends IDimension, Writeable<IPoint> {
 	id: number;
 }
 
@@ -8,7 +8,7 @@ export interface JSheet extends IDimension {
 	type: GridType;
 }
 
-export interface JVertex extends IPoint {
+export interface JVertex extends Writeable<IPoint> {
 	id: number;
 	name: string;
 	isNew?: boolean;

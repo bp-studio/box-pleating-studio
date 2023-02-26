@@ -68,7 +68,7 @@ namespace WorkspaceService {
 		if(await closeCore(id)) selectLast();
 	}
 
-	function selectLast(): void {
+	export function selectLast(): void {
 		if(tabHistory.length) select(tabHistory[0].id);
 	}
 

@@ -52,12 +52,12 @@
 			</SaveAs>
 		</template>
 		<template v-else>
-			<download :disabled="!Studio.project" type="svg" ref="svg" @download="svgSaved">
+			<Download :disabled="!Studio.project" type="svg" ref="svg" @download="svgSaved">
 				<i class="far fa-file-image" />{{ $t('toolbar.file.SVG.download') }}
-			</download>
-			<download :disabled="!Studio.project" type="png" ref="png" @download="pngSaved">
+			</Download>
+			<Download :disabled="!Studio.project" type="png" ref="png" @download="pngSaved">
 				<i class="far fa-file-image" />{{ $t('toolbar.file.PNG.download') }}
-			</download>
+			</Download>
 		</template>
 
 		<DropdownItem @click="copyPNG" :disabled="!Studio.project" v-if="copyEnabled">

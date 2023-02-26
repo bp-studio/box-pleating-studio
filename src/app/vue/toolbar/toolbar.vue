@@ -4,12 +4,7 @@
 			<FileMenu />
 			<EditMenu />
 			<SettingMenu />
-			<Dropdown icon="bp-tools" :title="$t('toolbar.tools.title')">
-				<Uploader accept=".tmd5" @upload="TreeMaker($event)">
-					<i class="fas fa-file-import" />
-					{{ $t("toolbar.tools.TreeMaker") }}
-				</Uploader>
-			</Dropdown>
+			<ToolMenu />
 			<HelpMenu />
 		</div>
 
@@ -45,16 +40,13 @@
 
 	import Studio from "app/services/studioService";
 	import { hk } from "app/services/customHotkeyService";
-	import FileUtil from "app/utils/fileUtility";
-	import Dialogs from "app/services/dialogService";
-	import { Dropdown } from "@/gadgets/menu";
 	import { toggle } from "@/panel/panel.vue";
-	import Uploader from "@/gadgets/file/uploader.vue";
 	import TabBar from "./components/tabBar.vue";
 	import FileMenu from "./fileMenu.vue";
 	import SettingMenu from "./settingMenu.vue";
 	import HelpMenu from "./helpMenu.vue";
 	import EditMenu from "./editMenu.vue";
+	import ToolMenu from "./toolMenu.vue";
 
 	function toLayout(): void {
 		if(Studio.project) Studio.project.design.mode = "layout";
@@ -63,17 +55,6 @@
 		if(Studio.project) Studio.project.design.mode = "tree";
 	}
 
-	async function TreeMaker(file: File): Promise<void> {
-		const content = FileUtil.bufferToText(await FileUtil.readFile(file));
-		const name = file.name;
-		console.log(name);
-		try {
-			//TODO
-			// core.open(this.bp.TreeMaker.parse(name.replace(/\.tmd5$/i, ""), content));
-		} catch(e) {
-			if(e instanceof Error) Dialogs.alert(i18n.t(e.message, [name]));
-		}
-	}
 
 </script>
 

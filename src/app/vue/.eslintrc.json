@@ -1,0 +1,40 @@
+{
+	"extends": [
+		"plugin:vue/vue3-essential"
+	],
+	"parser": "vue-eslint-parser",
+	"parserOptions": {
+		"parser": "@typescript-eslint/parser",
+		"extraFileExtensions": [
+			".vue"
+		],
+		"sourceType": "module",
+		"project": "./src/app/tsconfig.json"
+	},
+	"rules": {
+		"@typescript-eslint/indent": "off", // see vue
+		"max-len": "off", // see vue
+		"no-undef": "off", // 這是多餘的，反正真的未宣告的東西會被 TypeScript 抓出來
+		"vue/no-mutating-props": "off", // see https://github.com/vuejs/eslint-plugin-vue/issues/1371
+		"vue/max-len": [
+			"warn",
+			{
+				"code": 200,
+				"ignoreComments": true,
+				"ignoreHTMLAttributeValues": true,
+				"ignoreStrings": true,
+				"tabWidth": 4
+			}
+		],
+		"vue/multi-word-component-names": "off",
+		"vue/script-indent": [
+			"warn",
+			"tab",
+			{
+				"baseIndent": 1,
+				"ignores": [],
+				"switchCase": 1
+			}
+		]
+	}
+}

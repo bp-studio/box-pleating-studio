@@ -3,7 +3,7 @@
 		"jsdoc"
 	],
 	"parserOptions": {
-		"project": "./src/client/tsconfig.json"
+		"project": true
 	},
 	"rules": {
 		"jsdoc/require-jsdoc": [

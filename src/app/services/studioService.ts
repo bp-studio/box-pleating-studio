@@ -68,6 +68,8 @@ namespace StudioService {
 		bp.selection.clear();
 	}
 
+	export const plugins = proxy(() => bp.plugins, null!);
+
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
 	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
 

@@ -16,6 +16,7 @@ export const selection: ISelectionController = SelectionController;
 export { mouseCoordinates } from "./services/interaction";
 export { nextTick } from "./screen/display";
 export { options } from "./options";
+export { plugins } from "./plugins";
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // History operations

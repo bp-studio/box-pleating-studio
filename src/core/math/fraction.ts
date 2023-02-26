@@ -11,7 +11,7 @@ export function toFraction(v: number, err: number): Fraction {
 	return toFractionRecursive(v, 1, 0, err);
 }
 
-function toFractionRecursive(v: number, k2: number, k1: number, err: number): Fraction {
+export function toFractionRecursive(v: number, k2: number, k1: number, err: number): Fraction {
 	const n = Math.floor(v), r = v - n, k0 = n * k1 + k2;
 	const f = new Fraction(n);
 	if(r / k0 / ((1 - r) * k0 + k1) < err) return f;
