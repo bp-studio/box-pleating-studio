@@ -1,3 +1,4 @@
+import type { Path } from "shared/types/geometry";
 import type { Direction } from "shared/types/direction";
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { JSheet } from "shared/json/components";
@@ -13,6 +14,9 @@ export interface IGrid extends ISerializable<JSheet> {
 
 	/** The method of drawing the border. */
 	$drawBorder(border: GraphicsLike): void;
+
+	/** Returns the border path. */
+	$getBorderPath(): Path;
 
 	/** The method of drawing the grid lines. */
 	$drawGrid(grid: GraphicsLike): void;

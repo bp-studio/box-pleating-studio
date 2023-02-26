@@ -18,38 +18,19 @@ import type { Polygon } from "shared/types/geometry";
  */
 //=================================================================
 
-export class AAUnion extends PolyBool {
+export class AAUnion extends PolyBool<Polygon> {
 
 	constructor(checkSelfIntersection: boolean = false, chainer: Chainer | undefined = undefined) {
 		super(new AAEventProvider(), AAIntersector, chainer || new Chainer());
 		(this._intersector as AAIntersector).$checkSelfIntersection = checkSelfIntersection;
 	}
 
-	/** Generates the polygon of the union. */
-	public override $get(...components: Polygon[]): Polygon {
-		this._initialize(components);
-		return super.$get();
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Process an {@link EndEvent}. */
-	protected _processEnd(event: EndEvent): void {
-		const start = event.$other;
-		if(!start.$isInside) this._collectedSegments.push(start.$segment);
-		this._status.$delete(start);
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	/** Load all initial events. */
-	private _initialize(components: Polygon[]): void {
-		this._provider.$reset();
-		this._collectedSegments.length = 0;
+	protected _initialize(components: Polygon[]): void {
 		for(let i = 0; i < components.length; i++) {
 			const c = components[i];
 			for(const path of c) {
@@ -62,5 +43,12 @@ export class AAUnion extends PolyBool {
 				}
 			}
 		}
+	}
+
+	/** Process an {@link EndEvent}. */
+	protected _processEnd(event: EndEvent): void {
+		const start = event.$other;
+		if(!start.$isInside) this._collectedSegments.push(start.$segment);
+		this._status.$delete(start);
 	}
 }

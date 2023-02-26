@@ -1,26 +1,12 @@
+import type { EventProvider } from "./eventProvider";
 import type { AALineSegment } from "./segment/aaLineSegment";
-import type { Comparator } from "shared/types/types";
 import type { IHeap } from "shared/data/heap/heap";
-import type { ISegment } from "./segment/segment";
-import type { EndEvent, StartEvent, SweepEvent } from "./event";
-
-//=================================================================
-/**
- * {@link IEventProvider} generates and compares {@link SweepEvent}.
- */
-//=================================================================
-export interface IEventProvider {
-	$reset(): void;
-	$createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent;
-	$createEnd(endPoint: IPoint, segment: ISegment): EndEvent;
-	readonly $eventComparator: Comparator<SweepEvent>;
-	readonly $statusComparator: Comparator<StartEvent>;
-}
+import type { StartEvent, SweepEvent } from "./event";
 
 export type EventQueue = IHeap<SweepEvent>;
 
 export interface IntersectorConstructor {
-	new(provider: IEventProvider, queue: EventQueue): Intersector;
+	new(provider: EventProvider, queue: EventQueue): Intersector;
 }
 
 //=================================================================
@@ -37,10 +23,10 @@ export abstract class Intersector {
 	/** Whether there is a new event being inserted to the front of the event queue. */
 	protected _eventInserted: boolean = false;
 
-	private readonly _provider: IEventProvider;
+	private readonly _provider: EventProvider;
 	private readonly _queue: EventQueue;
 
-	constructor(provider: IEventProvider, queue: EventQueue) {
+	constructor(provider: EventProvider, queue: EventQueue) {
 		this._provider = provider;
 		this._queue = queue;
 	}
@@ -49,14 +35,10 @@ export abstract class Intersector {
 	public $process(prev: StartEvent | undefined, ev: StartEvent, next: StartEvent | undefined): boolean {
 		this._currentStart = ev;
 		this._eventInserted = false;
-		this._possibleIntersection(prev, ev);
-		this._possibleIntersection(ev, next);
+		this.$possibleIntersection(prev, ev);
+		this.$possibleIntersection(ev, next);
 		return this._eventInserted;
 	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * This is the main method that the derived classes need to implement,
@@ -64,7 +46,11 @@ export abstract class Intersector {
 	 * and calls the {@link _subdivide} method properly to subdivide the segments.
 	 * The derived classes can make highly optimized performance tuning for specific requirements in this method.
 	 */
-	protected abstract _possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void;
+	public abstract $possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Protected methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** Subdivide a segment at the given point, and returns the {@link StartEvent} of the second segment. */
 	protected _subdivide(event: StartEvent, point: IPoint): StartEvent {

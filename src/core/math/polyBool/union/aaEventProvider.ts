@@ -1,6 +1,6 @@
 import { EndEvent, StartEvent } from "../event";
+import { EventProvider } from "../eventProvider";
 
-import type { IEventProvider } from "../intersector";
 import type { Comparator } from "shared/types/types";
 import type { SweepEvent } from "../event";
 import type { AALineSegment } from "../segment/aaLineSegment";
@@ -17,20 +17,7 @@ const SHIFT_DELTA = 14;
  */
 //=================================================================
 
-export class AAEventProvider implements IEventProvider {
-
-	/**
-	 * The next available id for the events.
-	 *
-	 * Note that by our encoding, the maximal value for id can only be 2^14 = 16384,
-	 * so {@link $reset} is exceptionally important here; otherwise things overflows
-	 * quickly after this instance gets reused for just a few times.
-	 */
-	private _nextId: number = 0;
-
-	public $reset(): void {
-		this._nextId = 0;
-	}
+export class AAEventProvider extends EventProvider {
 
 	public $createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent {
 		const key = getKey(startPoint, 1, segment, delta, this._nextId++);

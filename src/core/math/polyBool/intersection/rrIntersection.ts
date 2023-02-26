@@ -6,7 +6,6 @@ import { ArcSegment } from "../segment/arcSegment";
 import { AALineSegment } from "../segment/aaLineSegment";
 
 import type { IRoundedRect } from "./roundedRect";
-import type { Polygon } from "shared/types/geometry";
 import type { EndEvent } from "../event";
 
 //=================================================================
@@ -15,37 +14,18 @@ import type { EndEvent } from "../event";
  */
 //=================================================================
 
-export class RRIntersection extends PolyBool {
+export class RRIntersection extends PolyBool<IRoundedRect> {
 
 	constructor() {
 		super(new RREventProvider(), RRIntersector, new ArcChainer());
-	}
-
-	/** Generates the intersection of rounded rectangles. */
-	public override $get(...components: IRoundedRect[]): Polygon {
-		this._initialize(components);
-		return super.$get();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Process an {@link EndEvent}. */
-	protected _processEnd(event: EndEvent): void {
-		const start = event.$other;
-		if(start.$isInside) this._collectedSegments.push(start.$segment);
-		this._status.$delete(start);
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	/** Load all initial events. */
-	private _initialize(components: IRoundedRect[]): void {
-		this._provider.$reset();
-		this._collectedSegments.length = 0;
+	protected _initialize(components: IRoundedRect[]): void {
 		for(let i = 0; i < components.length; i++) {
 			const { x, y, width: w, height: h, radius: r } = components[i];
 
@@ -69,5 +49,12 @@ export class RRIntersection extends PolyBool {
 				this._addSegment(new AALineSegment({ x: x - r, y: y + h }, { x: x - r, y }, i), -1);
 			}
 		}
+	}
+
+	/** Process an {@link EndEvent}. */
+	protected _processEnd(event: EndEvent): void {
+		const start = event.$other;
+		if(start.$isInside) this._collectedSegments.push(start.$segment);
+		this._status.$delete(start);
 	}
 }

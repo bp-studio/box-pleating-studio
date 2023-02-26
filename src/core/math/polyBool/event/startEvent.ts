@@ -22,7 +22,7 @@ export class StartEvent extends EventBase {
 	public $isInside: boolean = false;
 
 	/** How would {@link $wrapCount} change when we go through this segment from bottom to top. */
-	public readonly $wrapDelta: -1 | 1;
+	public readonly $wrapDelta: Sign;
 
 	/**
 	 * As we go through this segment from bottom to top,
@@ -33,7 +33,7 @@ export class StartEvent extends EventBase {
 	 */
 	public $wrapCount: number;
 
-	constructor(point: IPoint, segment: ISegment, delta: -1 | 1, key: number) {
+	constructor(point: IPoint, segment: ISegment, delta: Sign, key: number) {
 		super(point, 1, key);
 		this.$segment = segment;
 		this.$wrapDelta = delta;

@@ -47,7 +47,7 @@ export function fillContours(graphics: GraphicsLike, contours: Contour[], color:
 }
 
 /** Draw a path. */
-function drawPath(graphics: GraphicsLike, path: Path): void {
+export function drawPath(graphics: GraphicsLike, path: Path): void {
 	if(!path.length) return;
 	graphics.moveTo(path[0].x, path[0].y);
 	for(let i = 1; i < path.length; i++) {

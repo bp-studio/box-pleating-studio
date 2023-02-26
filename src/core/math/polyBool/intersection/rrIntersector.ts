@@ -22,7 +22,7 @@ export class RRIntersector extends Intersector {
 	 * @param ev1 The first segment (in the order of {@link _status}).
 	 * @param ev2 The second segment (in the order of {@link _status}).
 	 */
-	protected _possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
+	public $possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
 		if(!ev1 || !ev2) return;
 		const seg1 = ev1.$segment as Segment;
 		const seg2 = ev2.$segment as Segment;

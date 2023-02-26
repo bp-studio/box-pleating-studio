@@ -40,6 +40,8 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	readonly $dist: number;
 	readonly $isLeaf: boolean;
 	readonly $AABB: AABB;
+	readonly $outerRoughContour: Polygon;
+	readonly $innerRoughContour: Polygon;
 
 	/** Set the position by a given {@link JFlap} */
 	$setFlap(flap: JFlap): void;

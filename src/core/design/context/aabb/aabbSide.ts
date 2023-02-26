@@ -40,7 +40,6 @@ export class AABBSide {
 
 	public $addChild(child: AABBSide): boolean {
 		this._heap.$insert(child);
-		if(child === this) debugger;
 		return this._compareAndUpdateCache();
 	}
 

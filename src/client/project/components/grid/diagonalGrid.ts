@@ -1,8 +1,10 @@
 import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
+import { drawPath } from "client/screen/contourUtil";
 
 import type { GraphicsLike } from "client/screen/contourUtil";
+import type { Path } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";
 import type { IGrid } from "./iGrid";
 import type { Sheet } from "../sheet";
@@ -124,15 +126,20 @@ export class DiagonalGrid implements IGrid {
 	}
 
 	public $drawBorder(border: GraphicsLike): void {
+		drawPath(border, this.$getBorderPath());
+	}
+
+	public $getBorderPath(): Path {
 		let full = this.$renderHeight, half = full / 2;
 		const shift = this._size % 2 / 2;
 		full -= shift;
 		half -= shift;
-		border.moveTo(half, -shift);
-		border.lineTo(full, half);
-		border.lineTo(half, full);
-		border.lineTo(-shift, half);
-		border.closePath();
+		return [
+			{ x: half, y: -shift },
+			{ x: full, y: half },
+			{ x: half, y: full },
+			{ x: -shift, y: half },
+		];
 	}
 
 	public $drawGrid(grid: GraphicsLike): void {

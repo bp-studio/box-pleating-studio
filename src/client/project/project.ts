@@ -5,6 +5,7 @@ import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
 
+import type { CPLine } from "shared/types/cp";
 import type * as Routes from "core/routes";
 import type { JProject } from "shared/json";
 
@@ -72,6 +73,11 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 			version: Migration.$getCurrentVersion(),
 			design: await this.design.toJSON(),
 		};
+	}
+
+	public async $getCP(): Promise<CPLine[]> {
+		const borders = this.design.layout.$sheet.grid.$getBorderPath();
+		return await this.$callStudio("layout", "getCP", borders);
 	}
 
 	public async $callStudio<C extends Routes.ControllerKeys, A extends Routes.ActionKeys<C>>(

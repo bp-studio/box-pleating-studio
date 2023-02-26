@@ -1,3 +1,4 @@
+import type { CreaseType } from "shared/types/cp";
 
 export enum SegmentType {
 	AALine = 1,
@@ -6,7 +7,7 @@ export enum SegmentType {
 
 export interface ISegment {
 	/** Segment type */
-	$type: SegmentType;
+	$type: SegmentType | CreaseType;
 
 	/** Start point of the segment */
 	$start: IPoint;

@@ -3,11 +3,11 @@ import { xyComparator } from "shared/types/geometry";
 import { SegmentType } from "../segment/segment";
 import { yIntercept } from "./rrIntersector";
 import { EPSILON } from "../segment/arcSegment";
+import { EventProvider } from "../eventProvider";
 
 import type { ArcSegment } from "../segment/arcSegment";
 import type { Segment } from "./rrIntersector";
 import type { ISegment } from "../segment/segment";
-import type { IEventProvider } from "../intersector";
 import type { Comparator } from "shared/types/types";
 import type { SweepEvent } from "../event";
 
@@ -21,16 +21,9 @@ import type { SweepEvent } from "../event";
  */
 //=================================================================
 
-export class RREventProvider implements IEventProvider {
+export class RREventProvider extends EventProvider {
 
-	/** The next available id for the events. */
-	private _nextId: number = 0;
-
-	public $reset(): void {
-		this._nextId = 0;
-	}
-
-	public $createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent {
+	public $createStart(startPoint: IPoint, segment: ISegment, delta: Sign): StartEvent {
 		return new StartEvent(startPoint, segment, delta, this._nextId++);
 	}
 
@@ -103,7 +96,7 @@ export function getCurvature(e: StartEvent): number {
 	return sgn / seg.$radius;
 }
 
-function fix(x: number): number {
+export function fix(x: number): number {
 	if(Math.abs(x) < EPSILON) return 0;
 	return x;
 }

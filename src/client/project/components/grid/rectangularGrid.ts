@@ -2,6 +2,7 @@ import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 
+import type { Path } from "shared/types/geometry";
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./iGrid";
@@ -113,6 +114,16 @@ export class RectangularGrid implements IGrid {
 
 	public $drawBorder(border: GraphicsLike): void {
 		border.drawRect(0, 0, this._width, this._height);
+	}
+
+	public $getBorderPath(): Path {
+		const w = this._width, h = this._height;
+		return [
+			{ x: 0, y: 0 },
+			{ x: w, y: 0 },
+			{ x: w, y: h },
+			{ x: 0, y: h },
+		];
 	}
 
 	public $drawGrid(grid: GraphicsLike): void {

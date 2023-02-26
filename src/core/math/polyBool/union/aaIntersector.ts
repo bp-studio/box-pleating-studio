@@ -19,7 +19,7 @@ export class AAIntersector extends Intersector {
 	 * @param ev1 The first segment (in the order of {@link _status}).
 	 * @param ev2 The second segment (in the order of {@link _status}).
 	 */
-	protected _possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
+	public $possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
 		if(!ev1 || !ev2) return;
 		if(!this.$checkSelfIntersection && ev1.$segment.$polygon === ev2.$segment.$polygon) return;
 		this._processAALineSegments(ev1, ev2);

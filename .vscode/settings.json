@@ -87,7 +87,10 @@
 	"explorer.fileNesting.patterns": {
 		"*.css": "$(capture).css.map",
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
-		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff"
+		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
+		".*rc.json": ".$(capture)ignore",
+		"package.json": "pnpm-lock.yaml, .npmrc",
+		".gitignore": ".gitattributes"
 	},
 	"files.exclude": {
 		"**/debug.log": true,
