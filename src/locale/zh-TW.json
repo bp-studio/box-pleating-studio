@@ -84,7 +84,11 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "匯入 TreeMaker 檔案"
+			"TreeMaker": "匯入 TreeMaker 檔案",
+			"CP": {
+				"_": "匯出 CP 檔案",
+				"reorient": "若適用的話重新定向紙張"
+			}
 		},
 		"help": {
 			"title": "說明",
@@ -248,8 +252,10 @@
 		"ok": "確定",
 		"here": "這裡",
 		"close": "關閉",
+		"export": "匯出",
 		"delete": "刪除",
 		"version": "版本",
+		"download": "下載",
 		"homepage": "首頁",
 		"untitled": "未命名",
 		"workspace": "工作區"

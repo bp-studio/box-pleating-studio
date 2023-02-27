@@ -39,9 +39,10 @@ export class LineSegment implements ISegment {
 	 * If the given point (already known to be on the line)
 	 * is in the interior of this line segment.
 	 */
-	public $containsPtOnLine(point: IPoint): boolean {
-		return (point.x - this.$start.x) * (point.x - this.$end.x) < -EPSILON ||
-			(point.y - this.$start.y) * (point.y - this.$end.y) < -EPSILON;
+	public $containsPtOnLine(point: IPoint, endPoints: boolean): boolean {
+		const threshold = endPoints ? EPSILON : -EPSILON;
+		return (point.x - this.$start.x) * (point.x - this.$end.x) < threshold ||
+			(point.y - this.$start.y) * (point.y - this.$end.y) < threshold;
 	}
 
 	public $subdivide(point: IPoint, oriented: boolean): ISegment {

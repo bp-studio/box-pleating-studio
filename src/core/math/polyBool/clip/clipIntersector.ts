@@ -29,14 +29,14 @@ export class ClipIntersector extends Intersector {
 			// We know that ev1 and ev2 are sorted
 			const p2 = ev1.$other.$point;
 			const p3 = ev2.$point, p4 = ev2.$other.$point;
-			if(seg1.$containsPtOnLine(p3)) ev1 = this._subdivide(ev1, p3);
-			if(seg1.$containsPtOnLine(p4)) this._subdivide(ev1, p4);
-			if(seg2.$containsPtOnLine(p2)) this._subdivide(ev2, p2);
+			if(seg1.$containsPtOnLine(p3, false)) ev1 = this._subdivide(ev1, p3);
+			if(seg1.$containsPtOnLine(p4, false)) this._subdivide(ev1, p4);
+			if(seg2.$containsPtOnLine(p2, false)) this._subdivide(ev2, p2);
 		} else {
 			// Crossing case
 			const pt: IPoint = { x: detBC / detAB, y: (a2 * c1 - a1 * c2) / detAB };
-			if(seg1.$containsPtOnLine(pt)) this._subdivide(ev1, pt);
-			if(seg2.$containsPtOnLine(pt)) this._subdivide(ev2, pt);
+			if(seg1.$containsPtOnLine(pt, false) && seg2.$containsPtOnLine(pt, true)) this._subdivide(ev1, pt);
+			if(seg2.$containsPtOnLine(pt, false) && seg1.$containsPtOnLine(pt, true)) this._subdivide(ev2, pt);
 		}
 	}
 }

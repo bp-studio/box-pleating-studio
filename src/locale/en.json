@@ -84,7 +84,11 @@
 		},
 		"tools": {
 			"title": "Tools",
-			"TreeMaker": "Import TreeMaker file"
+			"TreeMaker": "Import TreeMaker file",
+			"CP": {
+				"_": "Export CP file",
+				"reorient": "Reorient the sheet if applicable"
+			}
 		},
 		"help": {
 			"title": "Help",
@@ -248,8 +252,10 @@
 		"ok": "OK",
 		"here": "here",
 		"close": "Close",
+		"export": "Export",
 		"delete": "Delete",
 		"version": "Version",
+		"download": "Download",
 		"homepage": "homepage",
 		"untitled": "Untitled",
 		"workspace": "workspace"

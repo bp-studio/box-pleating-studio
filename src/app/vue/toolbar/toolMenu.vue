@@ -4,8 +4,9 @@
 			<i class="fas fa-file-import" />
 			{{ $t("toolbar.tools.TreeMaker") }}
 		</Uploader>
-		<DropdownItem>
+		<DropdownItem :disabled="!Studio.project" @click="show('cp')">
 			<i class="fas fa-file-export" />
+			{{ $t("toolbar.tools.CP._") }}
 		</DropdownItem>
 	</Dropdown>
 </template>
@@ -23,6 +24,7 @@
 	import Studio from "app/services/studioService";
 	import { Uploader } from "@/gadgets/file";
 	import Workspace from "app/services/workspaceService";
+	import { show } from "@/modals/modalFragment.vue";
 
 	async function TreeMaker(files: File[]): Promise<void> {
 		const file = files[0];

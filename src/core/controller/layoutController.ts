@@ -44,8 +44,7 @@ namespace LayoutController {
 		addPolygon(lines, [borders], CreaseType.Border);
 		for(const node of tree.$nodes) {
 			if(!node || !node.$parent) continue;
-			addPolygon(lines, node.$outerRoughContour, CreaseType.Mountains);
-			addPolygon(lines, node.$innerRoughContour, CreaseType.Mountains);
+			addPolygon(lines, node.$outerRoughContour, CreaseType.Valley);
 		}
 		return clip.$get(lines);
 	}

@@ -4,6 +4,7 @@
 		<About :ref="mdlRef('about')" />
 		<Version :ref="mdlRef('ver')" />
 		<Preference :ref="mdlRef('pref')" />
+		<CP :ref="mdlRef('cp')" />
 		<Note />
 		<Language />
 	</template>
@@ -28,6 +29,7 @@
 	import Preference from "./preference.vue";
 	import Language from "./language.vue";
 	import Note from "./note.vue";
+	import CP from "./cp.vue";
 
 	const initialized = shallowRef(false);
 	Lib.ready.then(() => initialized.value = true);

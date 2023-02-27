@@ -22,12 +22,10 @@
 									<i class="fas fa-share" />
 									{{ $t('share.share') }}
 								</button>
-								<button class="btn btn-primary" @click="copy" ref="bt">
+								<CheckButton class="btn btn-primary" @click="copy" ref="bt">
 									<i class="fas fa-copy" />
 									{{ $t('share.copy') }}
-									<i class="fas fa-check d-inline-block" ref="success"
-									   style="transition: width 0.5s; width: 0; overflow: hidden;" />
-								</button>
+								</CheckButton>
 							</div>
 						</div>
 					</div>
@@ -52,14 +50,15 @@
 	import LZ from "app/utils/lz";
 	import { copyEnabled } from "app/shared/constants";
 	import useModal from "./modal";
+	import { compRef } from "app/inject";
+	import CheckButton from "@/gadgets/form/checkButton.vue";
 
 	const url = shallowRef("");
 	const canShare = Boolean(navigator.share);
 	const sending = shallowRef(false);
 	const error = shallowRef<string | null>(null);
 
-	const bt = shallowRef<HTMLButtonElement>();
-	const success = shallowRef<HTMLSpanElement>();
+	const bt = compRef(CheckButton);
 	const input = shallowRef<HTMLInputElement>();
 
 	const { el, show } = useModal("Share", () => {
@@ -78,10 +77,7 @@
 			ipt.select();
 			document.execCommand("copy");
 		}
-		const MESSAGE_DELAY = 3000;
-		const s = success.value!;
-		s.style.width = "20px";
-		setTimeout(() => s.style.width = "0px", MESSAGE_DELAY);
+		bt.value!.check();
 		gtag("event", "share", { method: "copy", content_type: "link" });
 	}
 

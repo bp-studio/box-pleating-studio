@@ -33,6 +33,36 @@ namespace FileUtility {
 	export function bufferToText(buffer: ArrayBuffer): string {
 		return new TextDecoder().decode(new Uint8Array(buffer));
 	}
+
+	export async function saveAs(
+		options: SaveFilePickerOptions,
+		blobFactory: Action<Awaitable<Blob>>,
+		callback?: Consumer<FileSystemFileHandle>
+	): Promise<boolean> {
+		let handle: FileSystemFileHandle | undefined;
+		try {
+			// Run the two in parallel to save time
+			const [writable, blob] = await Promise.all([
+				showSaveFilePicker(options)
+					.then(h => handle = h)
+					.then(h => h.createWritable()),
+				blobFactory(),
+			]);
+			await writable.write(blob);
+			await writable.close();
+			if(callback) callback(handle!);
+			return true;
+		} catch(e) {
+			// It goes here on user cancelling or on errors during saving
+			try {
+				// New API, added in Chrome 110
+				if(handle && "remove" in handle && typeof handle.remove == "function") {
+					handle.remove();
+				}
+			} catch(_) { }
+			return false;
+		}
+	}
 }
 
 export default FileUtility;

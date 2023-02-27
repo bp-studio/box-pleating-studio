@@ -84,7 +84,11 @@
 		},
 		"tools": {
 			"title": "Công cụ",
-			"TreeMaker": "Nhập tệp TreeMaker"
+			"TreeMaker": "Nhập tệp TreeMaker",
+			"CP": {
+				"_": "Xuất tệp CP",
+				"reorient": "Định hướng lại trang tính nếu có"
+			}
 		},
 		"help": {
 			"title": "Cứu giúp",
@@ -248,8 +252,10 @@
 		"ok": "OK",
 		"here": "đây",
 		"close": "Đóng",
+		"export": "Xuất tệp",
 		"delete": "Xóa bỏ",
 		"version": "Phiên bản",
+		"download": "Tải xuống",
 		"homepage": "trang chủ",
 		"untitled": "Không có tiêu đề",
 		"workspace": "không gian làm việc"

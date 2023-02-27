@@ -154,6 +154,19 @@ export class DiagonalGrid implements IGrid {
 		}
 	}
 
+	public $getTransformMatrix(size: number, reorient: boolean): number[] {
+		const full = this.$renderWidth;
+		const s = size / full;
+		const shift = this._size % 2 / 2;
+		if(reorient) {
+			const offset = full - 2 * shift;
+			return [s, s, s, -s, -s * offset, 0];
+		} else {
+			const offset = full / 2 - shift;
+			return [s, 0, 0, -s, -s * offset, s * offset];
+		}
+	}
+
 	public get $offset(): IPoint {
 		const shift = this._size % 2 / 2;
 		return { x: -shift, y: -shift };

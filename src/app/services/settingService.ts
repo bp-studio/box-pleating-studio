@@ -32,6 +32,9 @@ const defaultSettings = {
 		edge: undefined as number | undefined,
 		axialParallel: undefined as number | undefined,
 	},
+	CP: {
+		reorient: true,
+	},
 	includeHiddenElement: false,
 };
 

@@ -27,6 +27,9 @@ export interface IGrid extends ISerializable<JSheet> {
 	/** Whether the given point is on the grid. */
 	$contains(p: IPoint): boolean;
 
+	/** Transformation matrix for a given point for CP exporting. */
+	$getTransformMatrix(size: number, reorient: boolean): number[];
+
 	/** Offset for drawing. Should be non-positive. */
 	readonly $offset: IPoint;
 

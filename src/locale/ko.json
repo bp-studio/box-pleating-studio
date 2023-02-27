@@ -84,7 +84,11 @@
 		},
 		"tools": {
 			"title": "도구",
-			"TreeMaker": "TreeMaker 파일 가져오기"
+			"TreeMaker": "TreeMaker 파일 가져오기",
+			"CP": {
+				"_": "CP 파일 내보내기",
+				"reorient": "해당하는 경우 시트 방향 변경"
+			}
 		},
 		"help": {
 			"title": "도움",
@@ -248,8 +252,10 @@
 		"ok": "좋아요",
 		"here": "여기",
 		"close": "닫기",
+		"export": "내보내기",
 		"delete": "삭제",
 		"version": "버전",
+		"download": "다운로드",
 		"homepage": "홈페이지",
 		"untitled": "무제",
 		"workspace": "작업 공간"

@@ -1,5 +1,4 @@
 import { EventProvider } from "../eventProvider";
-import { xyComparator } from "shared/types/geometry";
 import { EndEvent, StartEvent } from "../event";
 import { fix } from "../intersection/rrEventProvider";
 import { EPSILON } from "../segment/arcSegment";
@@ -8,7 +7,6 @@ import type { SweepEvent } from "../event";
 import type { ISegment } from "../segment/segment";
 import type { Comparator } from "shared/types/types";
 import type { Clip } from "./clip";
-import type { LineSegment } from "../segment/lineSegment";
 
 //=================================================================
 /**
@@ -37,27 +35,38 @@ export class ClipEventProvider extends EventProvider {
 }
 
 const eventComparator: Comparator<SweepEvent> = (a, b) =>
-	xyComparator(a.$point, b.$point) ||
+	fix(a.$point.x - b.$point.x) ||
+	fix(a.$point.y - b.$point.y) ||
 	// End events are prioritized for the events at the same location.
 	a.$isStart - b.$isStart ||
 	a.$isStart && segmentComparator(a, b as StartEvent) ||
 	a.$key - b.$key;
 
 const statusComparator: Comparator<StartEvent> = (a, b) =>
-	a.$point.y - b.$point.y ||
+	compareUpDown(a, b) ||
 	segmentComparator(a, b) ||
 	a.$key - b.$key;
 
 /** Compare two {@link StartEvent}s with the same start point. */
 const segmentComparator: Comparator<StartEvent> = (a, b) =>
 	// The one with the smaller tangent slope goes first (be aware of floating error)
-	fix(getSlope(a) - getSlope(b)) ||
+	fix(getEventSlope(a) - getEventSlope(b)) ||
 	// Borders go before creases
 	a.$segment.$type - b.$segment.$type;
 
-function getSlope(e: StartEvent): number {
-	const seg = e.$segment as LineSegment;
-	const dx = seg.$start.x - seg.$end.x;
+function compareUpDown(a: StartEvent, b: StartEvent): number {
+	const ax = a.$point.x, bx = b.$point.x;
+	if(Math.abs(ax - bx) < EPSILON) return fix(a.$point.y - b.$point.y);
+	if(ax < bx) return fix(getEventSlope(a) - getSlope(a.$point, b.$point));
+	return fix(getSlope(a.$point, b.$point) - getEventSlope(b));
+}
+
+function getEventSlope(e: StartEvent): number {
+	return getSlope(e.$point, e.$other.$point);
+}
+
+function getSlope(p1: IPoint, p2: IPoint): number {
+	const dx = p1.x - p2.x;
 	if(Math.abs(dx) < EPSILON) return Number.POSITIVE_INFINITY;
-	return (seg.$start.y - seg.$end.y) / dx;
+	return (p1.y - p2.y) / dx;
 }

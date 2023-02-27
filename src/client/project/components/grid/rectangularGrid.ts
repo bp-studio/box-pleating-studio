@@ -137,6 +137,13 @@ export class RectangularGrid implements IGrid {
 		}
 	}
 
+	public $getTransformMatrix(size: number, reorient: boolean): number[] {
+		const w = this._width, h = this._height;
+		const max = Math.max(w, h);
+		const s = size / max;
+		return [s, 0, 0, -s, -s * w / 2, s * h / 2];
+	}
+
 	public readonly $offset: IPoint = { x: 0, y: 0 };
 
 	public get $renderHeight(): number {
