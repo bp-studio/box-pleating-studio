@@ -9,7 +9,7 @@ import type { IGrid } from "./iGrid";
 import type { Sheet } from "../sheet";
 
 const DEFAULT_SIZE = 16;
-const MIN_SIZE = 4;
+const MIN_SIZE = 4; // Used to be 8, now 4.
 
 //=================================================================
 /**

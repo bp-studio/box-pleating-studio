@@ -7,9 +7,10 @@ import { Flap } from "./flap";
 import { River } from "./river";
 import { Sheet } from "../sheet";
 import { Layer } from "client/types/layers";
-import { Junction, JUNCTION_ALPHA } from "./junction";
+import { Junction } from "./junction";
 import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
+import { style } from "client/services/styleService";
 
 import type { Contour } from "shared/types/geometry";
 import type { Container } from "@pixi/display";
@@ -56,7 +57,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$sheet = new Sheet(project, parentView, json);
 		this.$sheet.$addChild(this);
 
-		const filter = new AlphaFilter(JUNCTION_ALPHA);
+		const filter = new AlphaFilter(style.junction.alpha);
 		this.$sheet.$layers[Layer.$junction].filters = [filter];
 
 		this.$reactDraw(this._redrawJunctions);

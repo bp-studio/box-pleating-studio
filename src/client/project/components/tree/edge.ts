@@ -4,19 +4,17 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Control } from "client/base/control";
 import { Layer } from "client/types/layers";
-import { BLACK, LIGHT, DANGER } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/screen/label";
 import { Direction } from "shared/types/direction";
+import { style } from "client/services/styleService";
 
 import type { JEdge } from "shared/json";
 import type { Tree } from "./tree";
 import type { Vertex } from "./vertex";
 
 const HIT_WIDTH = 5;
-const WIDTH = 2;
-const WIDTH_HOVER = 3;
 const LABEL_DISTANCE = 0.5;
 
 //=================================================================
@@ -122,15 +120,14 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _draw(): void {
-		const color = app.settings.colorScheme.edge ?? app.isDark.value ? LIGHT : BLACK;
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const sh = ProjectService.shrink.value;
 
 		// Draw the line
 		this._line.clear()
 			.lineStyle(
-				(this.$hovered || this.$selected ? WIDTH_HOVER : WIDTH) * sh,
-				this.$selected ? DANGER : color
+				(this.$hovered || this.$selected ? style.edge.hover : style.edge.width) * sh,
+				this.$selected ? style.edge.selected : style.edge.color
 			)
 			.moveTo(x1, y1)
 			.lineTo(x2, y2);
@@ -139,7 +136,7 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	private _drawLabel(): void {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const dir = getDirectionOfSlope((y2 - y1) / (x2 - x1));
-		this._label.$color = this.$selected ? DANGER : undefined;
+		this._label.$color = this.$selected ? style.edge.selected : undefined;
 		this._label.$draw(this.length.toString(), (x1 + x2) / 2, (y1 + y2) / 2, dir);
 	}
 

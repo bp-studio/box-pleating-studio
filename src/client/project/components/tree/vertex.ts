@@ -4,20 +4,15 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 import { Layer } from "client/types/layers";
 import { shallowRef } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
-import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
+import { style } from "client/services/styleService";
 
 import type { IGrid } from "../grid";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { JVertex } from "shared/json";
-
-const SIZE = 4;
-const BORDER_WIDTH = 1;
-const BORDER_WIDTH_HOVER = 3;
-const FILL_COLOR = 0x6699FF;
 
 //=================================================================
 /**
@@ -52,7 +47,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 		this.name = json.name;
 
 		this._dot = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$vertex]);
-		this.$setupHit(this._dot, new Circle(0, 0, SIZE * 2));
+		this.$setupHit(this._dot, new Circle(0, 0, style.vertex.size * 2));
 
 		this._label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
 
@@ -151,18 +146,17 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 		this._dot.y = this.$location.y;
 		this._dot.scale.set(1 / s); // Scale the coordinates by s times to improve the quality of arcs
 
-		const color = app.isDark.value ? LIGHT : BLACK;
-		const width = this.$selected || this.$hovered ? BORDER_WIDTH_HOVER : BORDER_WIDTH;
-		const size = SIZE * Math.sqrt(ProjectService.shrink.value);
+		const width = this.$selected || this.$hovered ? style.vertex.hover : style.vertex.width;
+		const size = style.vertex.size * Math.sqrt(ProjectService.shrink.value);
 		this._dot.clear()
-			.lineStyle(width, this.$selected ? DANGER : color)
-			.beginFill(FILL_COLOR)
+			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
+			.beginFill(style.vertex.fill)
 			.drawCircle(0, 0, size)
 			.endFill();
 	}
 
 	private _drawLabel(): void {
-		this._label.$color = this.$selected ? DANGER : undefined;
+		this._label.$color = this.$selected ? style.vertex.selected : undefined;
 		this._label.$draw(this.name, this.$location.x, this.$location.y);
 	}
 }

@@ -5,17 +5,12 @@ import { Layer } from "client/types/layers";
 import { Control } from "client/base/control";
 import { drawContours, fillContours } from "client/screen/contourUtil";
 import ProjectService from "client/services/projectService";
+import { style } from "client/services/styleService";
 
 import type { GraphicsData } from "core/service/updateModel";
 import type { Layout } from "./layout";
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
-
-export const HINGE_WIDTH = 2.5;
-export const HINGE_COLOR = 0x6699FF;
-export const SHADE_ALPHA = 0.3;
-export const SHADE_HOVER = 0.15;
-export const RIDGE_WIDTH = 1.25;
 
 //=================================================================
 /**
@@ -82,18 +77,18 @@ export class River extends Control {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _drawShade(): void {
-		if(this.$selected) this._shade.alpha = SHADE_ALPHA;
-		else if(this.$hovered) this._shade.alpha = SHADE_HOVER;
+		if(this.$selected) this._shade.alpha = style.shade.alpha;
+		else if(this.$hovered) this._shade.alpha = style.shade.hover;
 		else this._shade.alpha = 0;
 	}
 
 	private _draw(): void {
-		const color = app.settings.colorScheme.hinge ?? HINGE_COLOR;
+		const { width, color } = style.hinge;
 		this._shade.clear();
-		fillContours(this._shade, this.$contours, HINGE_COLOR);
+		fillContours(this._shade, this.$contours, color);
 
 		const sh = ProjectService.shrink.value;
-		this._hinge.clear().lineStyle(HINGE_WIDTH * sh, color);
+		this._hinge.clear().lineStyle(width * sh, color);
 		drawContours(this._hinge, this.$contours);
 	}
 }

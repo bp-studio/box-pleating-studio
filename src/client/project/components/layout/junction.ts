@@ -1,14 +1,13 @@
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { dist } from "shared/types/geometry";
-import { RED } from "client/shared/constant";
 import { PIXI } from "client/screen/inspector";
+import { style } from "client/services/styleService";
 
 import type { LINE_JOIN } from "@pixi/graphics/lib/const";
 import type { Path, Polygon } from "shared/types/geometry";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 
-export const JUNCTION_ALPHA = 0.5;
 const THRESHOLD = 0.4;
 
 //=================================================================
@@ -23,7 +22,7 @@ export class Junction extends SmoothGraphics {
 	constructor(polygon: Polygon) {
 		super();
 		this.$polygon = polygon;
-		this.alpha = JUNCTION_ALPHA;
+		this.alpha = style.junction.alpha;
 	}
 
 	public $draw(maxWidth: number): void {
@@ -36,14 +35,14 @@ export class Junction extends SmoothGraphics {
 			if(narrowness < THRESHOLD) {
 				this.lineStyle({
 					width: Math.min(2 / narrowness, maxWidth),
-					color: RED,
+					color: style.junction.color,
 					join: "bevel" as LINE_JOIN,
 				});
 			} else {
 				this.lineStyle(0);
 			}
 
-			this.beginFill(RED);
+			this.beginFill(style.junction.color);
 			this.moveTo(path[0].x, path[0].y);
 			for(let i = 1; i < path.length; i++) {
 				const p = path[i];

@@ -6,7 +6,7 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
-import { FULL_ZOOM, CHARCOAL, LIGHT } from "client/shared/constant";
+import { FULL_ZOOM } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { viewport } from "client/screen/display";
 import { Enum } from "client/types/enum";
@@ -15,6 +15,7 @@ import { GridType } from "shared/json";
 import { createGrid } from "./grid";
 import { MARGIN, MARGIN_FIX } from "client/screen/constants";
 import { ZoomController } from "client/controllers/zoomController";
+import { style } from "client/services/styleService";
 
 import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
@@ -22,9 +23,6 @@ import type { Control } from "client/base/control";
 import type { Label } from "client/screen/label";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./grid";
-
-const BORDER_WIDTH = 3;
-const GRID_WIDTH = 0.25;
 
 const LAYERS = Enum.values(Layer);
 
@@ -210,12 +208,8 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		this.$view.scale.set(s, -s);
 
 		// Draw border
-		const color = app.isDark.value ? LIGHT : CHARCOAL;
 		this._borderGraphics.clear()
-			.lineStyle(
-				BORDER_WIDTH * sh,
-				app.settings.colorScheme.border ?? color
-			);
+			.lineStyle(style.border.width * sh, style.border.color);
 		this._grid.$drawBorder(this._borderGraphics);
 
 		// Draw layer mask
@@ -227,10 +221,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		this._gridGraphics.visible = app.settings.showGrid;
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()
-				.lineStyle(
-					GRID_WIDTH * sh,
-					app.settings.colorScheme.grid ?? color
-				);
+				.lineStyle(style.grid.width * sh, style.grid.color);
 			this._grid.$drawGrid(this._gridGraphics);
 		}
 	}

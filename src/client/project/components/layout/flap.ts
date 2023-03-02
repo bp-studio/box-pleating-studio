@@ -3,12 +3,11 @@ import { Graphics } from "@pixi/graphics";
 
 import { Layer } from "client/types/layers";
 import { drawContours, fillContours } from "client/screen/contourUtil";
-import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
-import { HINGE_COLOR, HINGE_WIDTH, RIDGE_WIDTH, SHADE_ALPHA, SHADE_HOVER } from "./river";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 import { Direction } from "shared/types/direction";
+import { style } from "client/services/styleService";
 
 import type { GraphicsData } from "core/service/updateModel";
 import type { IGrid } from "../grid";
@@ -19,10 +18,6 @@ import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
 import type { JFlap } from "shared/json";
 import type { Vertex } from "../tree/vertex";
-
-const SIZE = 3;
-const DOT_FACTOR = 0.75;
-const DOT_FILL = 0x6699FF;
 
 //=================================================================
 /**
@@ -47,7 +42,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	 * by the sources could cause a noticeable glitch on
 	 * slower devices.
 	 */
-	private _drawParams: JFlap;
+	private _drawParams: Readonly<JFlap>;
 
 	public readonly $vertex: Vertex;
 	public readonly $edge: Edge;
@@ -234,20 +229,20 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _drawShade(): void {
-		if(this.$selected) this._shade.alpha = SHADE_ALPHA;
-		else if(this.$hovered) this._shade.alpha = SHADE_HOVER;
+		if(this.$selected) this._shade.alpha = style.shade.alpha;
+		else if(this.$hovered) this._shade.alpha = style.shade.hover;
 		else this._shade.alpha = 0;
 	}
 
 	private _drawDot(): void {
 		const s = ProjectService.scale.value;
-		const size = SIZE * ProjectService.shrink.value ** DOT_FACTOR;
+		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
 		this._dots.forEach(d => {
 			// Scale the coordinates s times to improve the quality of the arcs.
 			d.scale.set(1 / s);
 			d.clear()
-				.lineStyle(1, app.isDark.value ? LIGHT : BLACK)
-				.beginFill(DOT_FILL)
+				.lineStyle(style.dot.width, style.dot.color)
+				.beginFill(style.dot.fill)
 				.drawCircle(0, 0, size)
 				.endFill();
 		});
@@ -263,9 +258,9 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	private _draw(): void {
 		const sh = ProjectService.shrink.value;
 		const { x, y, width: w, height: h } = this._drawParams;
-		const hingeColor = app.settings.colorScheme.hinge ?? HINGE_COLOR;
+		const hingeColor = style.hinge.color;
 		this._shade.clear();
-		fillContours(this._shade, this.$contours, HINGE_COLOR);
+		fillContours(this._shade, this.$contours, hingeColor);
 
 		const pts = this._getDots(this._drawParams, w, h);
 		for(let i = 0; i <= Direction.LR; i++) {
@@ -273,11 +268,10 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 			this._dots[i].position.set(pts[i].x, pts[i].y);
 		}
 
-		this._hinge.clear().lineStyle(HINGE_WIDTH * sh, hingeColor);
+		this._hinge.clear().lineStyle(style.hinge.width * sh, hingeColor);
 		drawContours(this._hinge, this.$contours);
 
-		const ridgeColor = app.settings.colorScheme.ridge ?? DANGER;
-		this._ridge.clear().lineStyle(RIDGE_WIDTH * sh, ridgeColor);
+		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
 		if(w || h) {
 			this._ridge.moveTo(x, y)
 				.lineTo(x + w, y)

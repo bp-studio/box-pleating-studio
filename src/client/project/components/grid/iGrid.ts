@@ -4,6 +4,11 @@ import type { GraphicsLike } from "client/screen/contourUtil";
 import type { JSheet } from "shared/json/components";
 import type { GridType } from "shared/json/enum";
 
+//=================================================================
+/**
+ * {@link IGrid} is the abstraction of grids.
+ */
+//=================================================================
 export interface IGrid extends ISerializable<JSheet> {
 
 	/** The type of the grid. */
