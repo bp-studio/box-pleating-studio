@@ -1,7 +1,8 @@
 {
 	"dest": {
 		"debug": "build/debug",
-		"dist": "build/dist"
+		"dist": "build/dist",
+		"test": "build/test"
 	},
 	"src": {
 		"app": "src/app",
@@ -15,6 +16,7 @@
 		"public": "src/public",
 		"sw": "src/other/service",
 		"worker": "src/other/worker",
-		"shared": "src/shared"
+		"shared": "src/shared",
+		"test": "test/tests"
 	}
 }

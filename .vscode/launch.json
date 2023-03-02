@@ -16,6 +16,17 @@
 			"runtimeArgs": [
 				"--allow-file-access-from-files"
 			]
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Test PolyBool",
+			"internalConsoleOptions": "neverOpen",
+			"file": "${workspaceFolder}/build/test/index.htm",
+			"sourceMaps": true,
+			"skipFiles": [
+				"${workspaceFolder}/build/dist/lib/**"
+			]
 		}
 	]
 }
