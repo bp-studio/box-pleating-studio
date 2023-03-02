@@ -2,7 +2,6 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 import { Graphics } from "@pixi/graphics";
 
 import { Layer } from "client/types/layers";
-import { shallowRef } from "client/shared/decorators";
 import { drawContours, fillContours } from "client/screen/contourUtil";
 import { BLACK, DANGER, LIGHT } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
@@ -11,6 +10,7 @@ import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
 import { Direction } from "shared/types/direction";
 
+import type { GraphicsData } from "core/service/updateModel";
 import type { IGrid } from "../grid";
 import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
@@ -36,19 +36,18 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	public readonly id: number;
 
-	@shallowRef public $contours: Contour[];
+	public $contours: Contour[];
 	private _width: number = 0;
 	private _height: number = 0;
 
-	// We put separate fields for the reactive values
-	// that are used in the process of drawing.
-	// If we draw according to the source of truth,
-	// the drawing will happen before the contour is updated,
-	// and in some cases the delay is noticeable,
-	// causing a weird experience to the users.
-	@shallowRef private _drawLocation: IPoint = { x: 0, y: 0 };
-	@shallowRef private _drawWidth: number = 0;
-	@shallowRef private _drawHeight: number = 0;
+	/**
+	 * The parameters used for the drawing process.
+	 * It could happen that the sources of truth are updated
+	 * before the core processes the contours, so drawing
+	 * by the sources could cause a noticeable glitch on
+	 * slower devices.
+	 */
+	private _drawParams: JFlap;
 
 	public readonly $vertex: Vertex;
 	public readonly $edge: Edge;
@@ -75,7 +74,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this.$contours = contours;
 		this.$vertex = vertex;
 		this.$edge = edge;
-		this.$updateDrawParameters();
+		this._drawParams = this.toJSON();
 
 		this._dots = Array.from({ length: 4 }, () =>
 			this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$dot])
@@ -93,10 +92,20 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
 	}
 
-	public $updateDrawParameters(): void {
-		this._drawHeight = this.height;
-		this._drawWidth = this.width;
-		this._drawLocation = { x: this.$location.x, y: this.$location.y };
+	/**
+	 * Update {@link _drawParams}.
+	 *
+	 * The moment of calling this method is critical;
+	 * it needs to be exactly at the moment data is sent to the Core.
+	 */
+	public $updateDrawParams(): JFlap {
+		return this._drawParams = this.toJSON();
+	}
+
+	public $redraw(data: GraphicsData): void {
+		this.$contours = data.contours!;
+		this._drawLabel();
+		this._draw();
 	}
 
 	public toJSON(): JFlap {
@@ -245,8 +254,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	}
 
 	private _drawLabel(): void {
-		const w = this._drawWidth, h = this._drawHeight;
-		const { x, y } = this._drawLocation;
+		const { x, y, width: w, height: h } = this._drawParams;
 		const dir = w || h ? Direction.none : undefined;
 		this.$anchor = { x: x + w / 2, y: y + h / 2 };
 		this._label.$draw(this.$vertex.name, this.$anchor.x, this.$anchor.y, dir);
@@ -254,13 +262,12 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 	private _draw(): void {
 		const sh = ProjectService.shrink.value;
-		const w = this._drawWidth, h = this._drawHeight;
-		const { x, y } = this._drawLocation;
+		const { x, y, width: w, height: h } = this._drawParams;
 		const hingeColor = app.settings.colorScheme.hinge ?? HINGE_COLOR;
 		this._shade.clear();
 		fillContours(this._shade, this.$contours, HINGE_COLOR);
 
-		const pts = this._getDots(this._drawLocation, w, h);
+		const pts = this._getDots(this._drawParams, w, h);
 		for(let i = 0; i <= Direction.LR; i++) {
 			this._dots[i].visible = this._sheet.grid.$contains(pts[i]);
 			this._dots[i].position.set(pts[i].x, pts[i].y);

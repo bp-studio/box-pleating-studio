@@ -2,11 +2,11 @@ import { Graphics } from "@pixi/graphics";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Layer } from "client/types/layers";
-import { shallowRef } from "client/shared/decorators";
 import { Control } from "client/base/control";
 import { drawContours, fillContours } from "client/screen/contourUtil";
 import ProjectService from "client/services/projectService";
 
+import type { GraphicsData } from "core/service/updateModel";
 import type { Layout } from "./layout";
 import type { Edge } from "../tree/edge";
 import type { Contour } from "shared/types/geometry";
@@ -27,7 +27,7 @@ export class River extends Control {
 	public readonly type = "River";
 	public readonly $priority: number = 1;
 
-	@shallowRef public $contours: Contour[];
+	public $contours: Contour[];
 
 	public readonly $edge: Edge;
 	private readonly _layout: Layout;
@@ -51,6 +51,11 @@ export class River extends Control {
 		this.$reactDraw(this._draw, this._drawShade);
 
 		if(DEBUG_ENABLED) this._hinge.name = "River Hinge";
+	}
+
+	public $redraw(data: GraphicsData): void {
+		this.$contours = data.contours!;
+		this._draw();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

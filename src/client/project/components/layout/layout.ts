@@ -87,8 +87,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		for(const tag in model.graphics) {
 			const target = this._parseTag(tag);
 			if(target) {
-				target.$contours = model.graphics[tag].contours!;
-				if(target instanceof Flap) target.$updateDrawParameters();
+				target.$redraw(model.graphics[tag]);
 			}
 		}
 
@@ -171,7 +170,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	private readonly _flushUpdate = async (): Promise<void> => {
 		await this._updating; // Wait until the last update to complete
 		const flaps: JFlap[] = [];
-		for(const f of this._pendingUpdate) flaps.push(f.toJSON());
+		for(const f of this._pendingUpdate) flaps.push(f.$updateDrawParams());
 		this._pendingUpdate.clear();
 		const dragging = this.$project.$isDragging;
 		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps, dragging);

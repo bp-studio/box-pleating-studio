@@ -33,6 +33,7 @@ export class Vertex extends Independent implements DragSelectable, ISerializable
 	public readonly height = 0;
 	public readonly width = 0;
 
+	@shallowRef public override $location: IPoint;
 	@shallowRef public $degree: number = 0;
 
 	private readonly _tree: Tree;

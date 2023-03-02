@@ -1,7 +1,4 @@
 import { Control } from "./control";
-import { shallowRef } from "client/shared/decorators";
-
-import type { Sheet } from "client/project/components/sheet";
 
 export interface DragSelectable extends Draggable {
 	readonly $anchor: IPoint;
@@ -14,7 +11,7 @@ export interface DragSelectable extends Draggable {
 //=================================================================
 export abstract class Draggable extends Control {
 
-	@shallowRef public $location: IPoint = { x: 0, y: 0 };
+	public $location: IPoint = { x: 0, y: 0 };
 
 	/** The offset vector between mouse location and the object location when the dragging started. */
 	private _dragOffset!: IPoint;
