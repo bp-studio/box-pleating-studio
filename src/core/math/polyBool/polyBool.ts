@@ -29,6 +29,7 @@ export abstract class PolyBool<ComponentType> extends SweepLine {
 
 	/** Generates the polygons of interest. */
 	public $get(...components: ComponentType[]): Polygon {
+		this._reset();
 		this._initialize(components);
 		this._collect();
 		return this._chainer.$chain(this._collectedSegments);
@@ -53,6 +54,8 @@ export abstract class PolyBool<ComponentType> extends SweepLine {
 
 		// console.log(
 		// 	event.$isInside,
+		// 	event.$key & 0xfff,
+		// 	event.$wrapDelta,
 		// 	event.$wrapCount,
 		// 	event.$point, event.$other.$point,
 		// 	event.$segment.$type === 2 ? (event.$segment as ArcSegment).$radius : 0,

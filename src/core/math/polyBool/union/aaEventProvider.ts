@@ -33,11 +33,9 @@ export class AAEventProvider extends EventProvider {
 	public readonly $statusComparator: Comparator<StartEvent> = statusComparator;
 }
 
-const eventComparator: Comparator<SweepEvent> = (a, b) => {
-	const dx = a.$point.x - b.$point.x;
-	if(dx !== 0) return dx;
-	return a.$key - b.$key;
-};
+const eventComparator: Comparator<SweepEvent> = (a, b) =>
+	a.$point.x - b.$point.x ||
+	a.$key - b.$key;
 
 const statusComparator: Comparator<StartEvent> = (a, b) => a.$key - b.$key;
 

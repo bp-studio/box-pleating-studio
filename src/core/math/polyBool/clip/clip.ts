@@ -34,6 +34,8 @@ export class Clip extends SweepLine {
 
 	/** Process the set of crease pattern lines. */
 	public $get(creases: CPLine[]): CPLine[] {
+		this._reset();
+
 		for(const c of creases) {
 			const p1 = { x: c[1], y: c[2] };
 			const p2 = { x: c[3], y: c[4] };

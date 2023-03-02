@@ -56,10 +56,14 @@ export abstract class SweepLine {
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** The main routine of the sweep line algorithm. */
-	protected _collect(): void {
+	/** Reset the state of self (for reusing instance). */
+	protected _reset(): void {
 		this._provider.$reset();
 		this._collectedSegments.length = 0;
+	}
+
+	/** The main routine of the sweep line algorithm. */
+	protected _collect(): void {
 		while(!this._eventQueue.$isEmpty) {
 			const event = this._eventQueue.$pop()!;
 			if(!event.$isStart) this._processEnd(event);
