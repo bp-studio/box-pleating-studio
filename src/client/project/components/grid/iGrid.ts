@@ -1,3 +1,4 @@
+import type { SvgGraphics } from "client/svg/svgGraphics";
 import type { Path } from "shared/types/geometry";
 import type { Direction } from "shared/types/direction";
 import type { GraphicsLike } from "client/screen/contourUtil";

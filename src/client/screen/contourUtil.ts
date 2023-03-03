@@ -1,8 +1,9 @@
+import type { SvgGraphics } from "client/svg/svgGraphics";
 import type { Graphics } from "@pixi/graphics";
 import type { Contour, Path } from "shared/types/geometry";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
 
-export type GraphicsLike = Graphics | SmoothGraphics;
+export type GraphicsLike = Graphics | SmoothGraphics | SvgGraphics;
 
 /** Draw the lines of a contour (no filling) */
 export function drawContours(graphics: GraphicsLike, contours: Contour[]): void {

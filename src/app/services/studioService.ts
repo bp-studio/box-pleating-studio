@@ -4,6 +4,7 @@ import { defaultTitle } from "app/shared/constants";
 import Lib from "./libService";
 import Dialogs from "./dialogService";
 
+import type { Project } from "client/project/project";
 import type { ComputedRef } from "vue";
 import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
@@ -66,6 +67,10 @@ namespace StudioService {
 	}
 	export function unselectAll(): void {
 		bp.selection.clear();
+	}
+
+	export function svg(proj: Project): Blob {
+		return bp.svg(proj);
 	}
 
 	export const plugins = proxy(() => bp.plugins, null!);

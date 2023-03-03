@@ -15,7 +15,7 @@ namespace ExportService {
 	}
 
 	export function toSVG(proj: Project): Promise<Blob> {
-		throw new Error("Method not implemented.");
+		return Promise.resolve(Studio.svg(proj));
 	}
 
 	export function toPNG(proj: Project): Promise<Blob> {

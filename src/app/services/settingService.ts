@@ -33,7 +33,7 @@ const defaultSettings = {
 		axialParallel: undefined as number | undefined,
 	},
 	CP: {
-		reorient: true,
+		reorient: false,
 	},
 	includeHiddenElement: false,
 };
@@ -94,7 +94,11 @@ export const hadSettings = settingString !== null;
 
 watch(settings, save, { deep: true });
 
-watch(() => settings.showStatus, s => document.body.classList.toggle("show-status", s), { immediate: true });
+watch(
+	() => settings.showStatus,
+	s => document.body.classList.toggle("show-status", s),
+	{ immediate: true }
+);
 
 /**
  * Copy the properties in the source object to the target object,

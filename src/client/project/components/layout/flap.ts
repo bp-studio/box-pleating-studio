@@ -9,6 +9,7 @@ import { Independent } from "client/base/independent";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 
+import type { GraphicsLike } from "client/screen/contourUtil";
 import type { GraphicsData } from "core/service/updateModel";
 import type { IGrid } from "../grid";
 import type { Layout } from "./layout";
@@ -215,6 +216,12 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this._move(p.x, p.y);
 	}
 
+	public $drawCircle(graphics: GraphicsLike, s: number = 1): void {
+		const { x, y, width: w, height: h } = this._drawParams;
+		const r = this.$edge.length * s;
+		graphics.drawRoundedRect(x * s - r, y * s - r, w * s + r + r, h * s + r + r, r);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -282,11 +289,9 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 
 		// Scale the coordinates s times to improve the quality of the arcs.
 		const s = ProjectService.scale.value;
-		const r = this.$edge.length * s;
 		this._circle.scale.set(1 / s);
-		this._circle.clear()
-			.lineStyle(sh, hingeColor)
-			.drawRoundedRect(x * s - r, y * s - r, w * s + r + r, h * s + r + r, r);
+		this._circle.clear().lineStyle(sh, hingeColor);
+		this.$drawCircle(this._circle, s);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
