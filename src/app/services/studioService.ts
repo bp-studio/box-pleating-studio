@@ -69,8 +69,14 @@ namespace StudioService {
 		bp.selection.clear();
 	}
 
-	export function svg(proj: Project): Blob {
-		return bp.svg(proj);
+	export function svg(proj: Project): Promise<Blob> {
+		return Promise.resolve(bp.svg(proj));
+	}
+	export function png(proj: Project): Promise<Blob> {
+		return bp.png(proj);
+	}
+	export function copyPNG(): Promise<void> {
+		return bp.copyPNG();
 	}
 
 	export const plugins = proxy(() => bp.plugins, null!);

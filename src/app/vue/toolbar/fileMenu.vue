@@ -148,7 +148,7 @@
 	}
 
 	function copyPNG(): void {
-		// this.bp.copyPNG();
+		Studio.copyPNG();
 		gtag("event", "share", { method: "copy", content_type: "image" });
 	}
 

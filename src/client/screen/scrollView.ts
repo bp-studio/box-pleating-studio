@@ -31,8 +31,9 @@ const imageDimension = computed<IDimension>(() => {
 export class ScrollView extends EventTarget {
 
 	public readonly $viewport: Viewport;
+	public readonly $img: HTMLImageElement;
 	private readonly _el: HTMLElement;
-	private readonly _spaceHolder: HTMLDivElement = document.createElement("div");
+	private readonly _spaceHolder: HTMLDivElement;
 
 	/** Lock the event feedback behavior when we scroll programmatically. */
 	private _lock: boolean = false;
@@ -42,8 +43,15 @@ export class ScrollView extends EventTarget {
 		this._el = el;
 		this.$viewport = useViewport(el);
 
+		// SpaceHolder
+		this._spaceHolder = document.createElement("div");
 		el.appendChild(this._spaceHolder);
 		this._spaceHolder.style.zIndex = "-10"; // Fix issue in iPhone 6
+
+		// Image for rasterizer
+		this.$img = document.createElement("img");
+		this.$img.alt = ""; // To silence LightHouse warnings
+		this._spaceHolder.appendChild(this.$img);
 
 		// Proactive scrolling by the user
 		el.addEventListener("scroll", () => {

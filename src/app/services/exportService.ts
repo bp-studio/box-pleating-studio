@@ -11,15 +11,16 @@ declare const JSZip: typeof jsZip;
 namespace ExportService {
 
 	export function toBPS(proj: Project): Promise<Blob> {
-		throw new Error("Method not implemented.");
+		//TODO
+		return Promise.resolve(new Blob([""], { type: "application/json+bps" }));
 	}
 
 	export function toSVG(proj: Project): Promise<Blob> {
-		return Promise.resolve(Studio.svg(proj));
+		return Studio.svg(proj);
 	}
 
 	export function toPNG(proj: Project): Promise<Blob> {
-		throw new Error("Method not implemented.");
+		return Studio.png(proj);
 	}
 
 	export function getBlob(type: string, proj?: Project): Promise<Blob> {
