@@ -1,9 +1,11 @@
 <template>
-	<div id="divTab" class="flex-grow-1" :class="{ 'hide': !Workspace.projects.length }" @wheel.passive="tabWheel($event)"
+	<div id="divTab" class="flex-grow-1" :class="{ 'hide': !Workspace.ids.length }" @wheel.passive="tabWheel($event)"
 		 ref="tab">
-		<Draggable v-bind="dragOption" :list="Workspace.projects" v-if="Studio.initialized">
-			<template #item="{ element }: { element: Project }">
-				<Tab :id="element.id" @menu="contextMenu($event, element.id)" />
+		<!-- It is VERY important to use only the id numbers in Draggable,
+			not the actual Project instances. Otherwise GC will fail. -->
+		<Draggable v-bind="dragOption" :list="Workspace.ids" v-if="Studio.initialized">
+			<template #item="{ element }: { element: number }">
+				<Tab :id="element" @menu="contextMenu($event, element)" />
 			</template>
 		</Draggable>
 	</div>
@@ -27,7 +29,6 @@
 	import TabMenu from "./tabMenu.vue";
 
 	import type draggable from "vuedraggable";
-	import type { Project } from "client/project/project";
 
 	const dragOption = {
 		delay: 500,

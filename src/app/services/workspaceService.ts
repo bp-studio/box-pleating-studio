@@ -20,13 +20,13 @@ declare const bp: typeof Client;
 //=================================================================
 namespace WorkspaceService {
 
+	/** The ids of all opened {@link Project}s in the order of tabs */
+	export const ids = shallowReactive<number[]>([]);
+
 	/** All opened {@link Project}s in the order of tabs */
-	export const projects = shallowReactive<Project[]>([]);
+	export const projects = computed(() => ids.map(id => bp.projects.get(id)!));
 
 	const tabHistory: Project[] = [];
-
-	/** The ids of all opened {@link Project}s in the order of tabs */
-	export const ids = computed(() => projects.map(d => d.id));
 
 	export function getProject(id: number): Project | undefined {
 		if(!Studio.initialized) return undefined;
@@ -41,7 +41,7 @@ namespace WorkspaceService {
 				},
 			};
 			const proj = await bp.projects.create(json);
-			projects.push(proj);
+			ids.push(proj.id);
 			select(proj.id);
 		} catch(e) {
 			const msg = e instanceof Error ? e.message : "Unknown error";
@@ -51,7 +51,7 @@ namespace WorkspaceService {
 
 	export async function open(data: Pseudo<JProject>): Promise<Project> {
 		const proj = await bp.projects.open(data);
-		projects.push(proj);
+		ids.push(proj.id);
 		tabHistory.unshift(proj);
 		return proj;
 	}
@@ -77,7 +77,7 @@ namespace WorkspaceService {
 	}
 
 	export async function closeRight(id: number): Promise<void> {
-		await closeBy(i => ids.value.indexOf(i) > ids.value.indexOf(id));
+		await closeBy(i => ids.indexOf(i) > ids.indexOf(id));
 	}
 
 	export async function closeAll(): Promise<void> {
@@ -86,7 +86,7 @@ namespace WorkspaceService {
 
 	async function closeBy(predicate: (i: number) => boolean): Promise<void> {
 		const promises: Promise<boolean>[] = [];
-		for(const i of ids.value.concat()) if(predicate(i)) promises.push(closeCore(i));
+		for(const i of ids.concat()) if(predicate(i)) promises.push(closeCore(i));
 		await Promise.all(promises);
 		selectLast();
 	}
@@ -105,7 +105,7 @@ namespace WorkspaceService {
 			select(id);
 			if(!await confirm) return false;
 		}
-		projects.splice(projects.indexOf(proj), 1);
+		ids.splice(ids.indexOf(proj.id), 1);
 		tabHistory.splice(tabHistory.indexOf(proj), 1);
 		bp.projects.close(proj);
 		return true;

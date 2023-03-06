@@ -57,7 +57,13 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 		}
 
 		await this.$callStudio("design", "init", this.design.$prototype);
-		await Vue.nextTick();
+
+		// Wait for rendering to complete.
+		// Originally `Vue.nextTick()` was used here, but it is later
+		// discovered that such an approach will lead to memory leaks.
+		await new Promise(resolve => {
+			setTimeout(resolve, 0);
+		});
 
 		if(DEBUG_ENABLED && !this._initialized) {
 			console.timeEnd("First render");

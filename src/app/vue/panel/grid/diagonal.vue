@@ -7,14 +7,11 @@
 </script>
 
 <script setup lang="ts">
-	import { computed } from "vue";
-
+	import Studio from "app/services/studioService";
 	import Number from "@/gadgets/form/number.vue";
+	import { gcComputed } from "app/utils/vueUtility";
 
 	import type { DiagonalGrid } from "client/project/components/grid/diagonalGrid";
-	import type { Sheet } from "client/project/components/sheet";
 
-	const props = defineProps<{ sheet: Sheet }>();
-
-	const grid = computed(() => props.sheet.grid as DiagonalGrid);
+	const grid = gcComputed(() => Studio.project!.design.sheet.grid as DiagonalGrid);
 </script>

@@ -91,6 +91,12 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
 
+		this._onDispose(() => {
+			this.$horizontalMargin.effect.stop();
+			this.$imageDimension.effect.stop();
+			this._grid = null!; // GC
+		});
+
 		if(DEBUG_ENABLED) {
 			for(const layer of LAYERS) {
 				this._layers[layer].name = "Layer " + Layer[layer];

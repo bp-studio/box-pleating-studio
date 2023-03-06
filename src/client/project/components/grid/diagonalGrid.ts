@@ -3,7 +3,6 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { drawPath } from "client/screen/contourUtil";
 
-import type { SvgGraphics } from "client/svg/svgGraphics";
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { Path } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";

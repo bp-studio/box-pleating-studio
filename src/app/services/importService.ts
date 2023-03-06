@@ -75,7 +75,7 @@ namespace ImportService {
 		const success = result.some(id => id !== undefined);
 		if(success) {
 			gtag("event", "project_open");
-			Workspace.select(Workspace.projects[Workspace.projects.length - 1].id);
+			Workspace.select(Workspace.ids[Workspace.ids.length - 1]);
 		}
 
 		// Hide the spinner after the rendering is completed

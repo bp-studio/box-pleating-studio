@@ -21,6 +21,14 @@ export interface IProjectController {
 	close(proj: Project): void;
 }
 
+/**
+ * For debugging memory leaks.
+ */
+let registry: FinalizationRegistry<number>;
+if(DEBUG_ENABLED) {
+	registry = new FinalizationRegistry(id => console.log(`Project #${id} GC.`));
+}
+
 //=================================================================
 /**
  * {@link ProjectController} manages the creation of {@link Project} and the corresponding Core worker.
@@ -74,16 +82,19 @@ export namespace ProjectController {
 				},
 			},
 		}, json);
-		const p = new Project(json, getOrCreateWorker());
-		projectMap.set(p.id, p);
-		return p.$initialize();
+		return createCore(json);
 	}
 
 	/**
 	 * Opens an old project. Passed-in data will go through {@link Migration} and updated to the latest format.
 	 */
 	export function open(json: Pseudo<JProject>): Promise<Project> {
-		const p = new Project(Migration.$process(json), getOrCreateWorker());
+		return createCore(Migration.$process(json));
+	}
+
+	function createCore(json: RecursivePartial<JProject>): Promise<Project> {
+		const p = new Project(json, getOrCreateWorker());
+		if(DEBUG_ENABLED) registry.register(p, p.id);
 		projectMap.set(p.id, p);
 		return p.$initialize();
 	}

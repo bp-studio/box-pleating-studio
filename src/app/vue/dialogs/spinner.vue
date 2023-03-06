@@ -1,5 +1,5 @@
 <template>
-	<div id="divSpinner" class="viewport" :class="{ 'shift-down': Workspace.projects.length, 'show': visible }">
+	<div id="divSpinner" class="viewport" :class="{ 'shift-down': Workspace.ids.length, 'show': visible }">
 		<div class="h-100 d-flex text-center align-items-center">
 			<div style="font-size: 10rem; font-size: min(15vh, 15vw); color: gray; flex-grow: 1;">
 				<i class="bp-spinner fa-spin" />

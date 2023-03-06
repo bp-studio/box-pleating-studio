@@ -18,8 +18,8 @@
 				<option :value="GridType.diagonal" v-t="'panel.design.grid.diag'"></option>
 			</select>
 		</Row>
-		<Rectangular v-if="(design.sheet.grid.type == GridType.rectangular)" :sheet="design.sheet" />
-		<Diagonal v-if="(design.sheet.grid.type == GridType.diagonal)" :sheet="design.sheet" />
+		<Rectangular v-if="(design.sheet.grid.type == GridType.rectangular)" />
+		<Diagonal v-if="(design.sheet.grid.type == GridType.diagonal)" />
 		<Number :label="$t('panel.design.zoom')" :step="step" v-model="design.sheet.zoom" :min="100" hotkeys="v.zo,v.zi" />
 	</div>
 </template>
