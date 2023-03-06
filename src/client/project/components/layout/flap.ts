@@ -9,6 +9,7 @@ import { Independent } from "client/base/independent";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 
+import type { LabelView } from "client/screen/label";
 import type { GraphicsLike } from "client/screen/contourUtil";
 import type { GraphicsData } from "core/service/updateModel";
 import type { IGrid } from "../grid";
@@ -25,7 +26,7 @@ import type { Vertex } from "../tree/vertex";
  * {@link Flap} is the control for the flap.
  */
 //=================================================================
-export class Flap extends Independent implements DragSelectable, ISerializable<JFlap> {
+export class Flap extends Independent implements DragSelectable, LabelView, ISerializable<JFlap> {
 
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;
@@ -49,12 +50,12 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 	public readonly $edge: Edge;
 	private readonly _layout: Layout;
 
+	public readonly $label: Label;
 	private readonly _dots: SmoothGraphics[];
 	private readonly _shade: Graphics;
 	private readonly _ridge: SmoothGraphics;
 	private readonly _circle: SmoothGraphics;
 	private readonly _hinge: SmoothGraphics;
-	private readonly _label: Label;
 
 	public $anchor: IPoint = { x: 0, y: 0 };
 
@@ -80,7 +81,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
 		this._circle = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
 		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
-		this._label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
+		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade, this._drawDot, this._drawLabel);
@@ -222,6 +223,12 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		graphics.drawRoundedRect(x * s - r, y * s - r, w * s + r + r, h * s + r + r, r);
 	}
 
+	public $drawDot(graphics: GraphicsLike): void {
+		const s = ProjectService.scale.value;
+		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
+		this._dots.forEach(d => graphics.drawCircle(d.x, d.y, size / s));
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +266,7 @@ export class Flap extends Independent implements DragSelectable, ISerializable<J
 		const { x, y, width: w, height: h } = this._drawParams;
 		const dir = w || h ? Direction.none : undefined;
 		this.$anchor = { x: x + w / 2, y: y + h / 2 };
-		this._label.$draw(this.$vertex.name, this.$anchor.x, this.$anchor.y, dir);
+		this.$label.$draw(this.$vertex.name, this.$anchor.x, this.$anchor.y, dir);
 	}
 
 	private _draw(): void {

@@ -42,7 +42,7 @@ function beforePrint(proj: Project | null): void {
 		// printing service on mobile devices.
 		setTimeout(() => URL.revokeObjectURL(old), GC_TIME);
 
-		img.src = URL.createObjectURL(svg(proj));
+		img.src = URL.createObjectURL(svg(proj, false));
 		printing = true;
 	}
 }

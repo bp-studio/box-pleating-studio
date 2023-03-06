@@ -1,13 +1,14 @@
 import { Container } from "@pixi/display";
 import { Text } from "@pixi/text";
 
-import { BLACK, DARK, LIGHT, WHITE } from "client/shared/constant";
 import ProjectService, { MIN_SCALE } from "client/services/projectService";
 import { PIXI } from "./inspector";
 import { shallowRef } from "client/shared/decorators";
 import { MARGIN_FIX } from "./constants";
 import { Direction } from "shared/types/direction";
+import { style } from "client/services/styleService";
 
+import type { Control } from "client/base/control";
 import type { IDestroyOptions } from "@pixi/display";
 import type { Rectangle } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
@@ -17,8 +18,11 @@ const SQRT = 2 / Math.sqrt(MIN_SCALE);
 
 const TEXT_WIDTH_LIMIT = 50;
 const SMOOTHNESS = 2;
-const FONT_SIZE = 14;
 const HALF = 0.5;
+
+export interface LabelView extends Control {
+	$label: Label;
+}
 
 //=================================================================
 /**
@@ -124,15 +128,15 @@ export class Label extends Container {
 			direction = Direction.B;
 		}
 		const offset = directionalOffsets[direction];
+		const FONT_SIZE = style.label.size;
 		this.pivot.set(
 			-(Math.sign(offset.x) * (innerWidth / 2 - xFix) + offset.x * this.$distance),
 			Math.sign(offset.y) * (FONT_SIZE * SMOOTHNESS - yFix) + offset.y * this.$distance
 		);
 
 		// Decide colors
-		const dark = app.isDark.value;
-		const fill = this.$color ?? (dark ? LIGHT : BLACK);
-		const stroke = dark ? DARK : WHITE;
+		const fill = this.$color ?? style.label.color;
+		const stroke = style.label.border;
 		this._label.style = {
 			fill,
 			fontSize: FONT_SIZE * SMOOTHNESS,
@@ -143,11 +147,19 @@ export class Label extends Container {
 			fill: stroke,
 			fontSize: FONT_SIZE * SMOOTHNESS,
 			stroke,
-			strokeThickness: 6,
+			strokeThickness: style.label.glow * SMOOTHNESS,
 			lineJoin: "bevel",
 		};
 
 		return direction;
+	}
+
+	public get $text(): string {
+		return this._label.text;
+	}
+
+	public get $offset(): IPoint {
+		return { x: this.pivot.x / 2, y: this.pivot.y / 2 };
 	}
 
 	/** The horizontal overflow of a label, in pixels. This is determined by the actual rendering. */

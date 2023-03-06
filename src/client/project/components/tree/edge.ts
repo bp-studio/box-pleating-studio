@@ -10,6 +10,8 @@ import { Label } from "client/screen/label";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 
+import type { SvgGraphics } from "client/svg/svgGraphics";
+import type { LabelView } from "client/screen/label";
 import type { JEdge } from "shared/json";
 import type { Tree } from "./tree";
 import type { Vertex } from "./vertex";
@@ -22,7 +24,7 @@ const LABEL_DISTANCE = 0.5;
  * {@link Edge} is the control of an edge in the tree.
  */
 //=================================================================
-export class Edge extends Control implements ISerializable<JEdge> {
+export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
@@ -32,9 +34,9 @@ export class Edge extends Control implements ISerializable<JEdge> {
 	public readonly $v1: Vertex;
 	public readonly $v2: Vertex;
 
+	public readonly $label: Label;
 	private readonly _tree: Tree;
 	private readonly _line: SmoothGraphics = new SmoothGraphics();
-	private readonly _label: Label;
 
 	constructor(tree: Tree, v1: Vertex, v2: Vertex, length: number) {
 		const sheet = tree.$sheet;
@@ -48,8 +50,8 @@ export class Edge extends Control implements ISerializable<JEdge> {
 		this.$setupHit(this._line);
 		this.$addRootObject(this._line, sheet.$layers[Layer.$edge]);
 
-		this._label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
-		this._label.$distance = LABEL_DISTANCE;
+		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
+		this.$label.$distance = LABEL_DISTANCE;
 
 		this.$reactDraw(this._draw, this._hitArea, this._drawLabel);
 
@@ -115,16 +117,10 @@ export class Edge extends Control implements ISerializable<JEdge> {
 		if(this.$v2.isLeaf) return this.$v2;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _draw(): void {
+	public $drawLine(graphics: SmoothGraphics | SvgGraphics): void {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const sh = ProjectService.shrink.value;
-
-		// Draw the line
-		this._line.clear()
+		graphics.clear()
 			.lineStyle(
 				(this.$hovered || this.$selected ? style.edge.hover : style.edge.width) * sh,
 				this.$selected ? style.edge.selected : style.edge.color
@@ -133,11 +129,19 @@ export class Edge extends Control implements ISerializable<JEdge> {
 			.lineTo(x2, y2);
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Drawing methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _draw(): void {
+		this.$drawLine(this._line);
+	}
+
 	private _drawLabel(): void {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const dir = getDirectionOfSlope((y2 - y1) / (x2 - x1));
-		this._label.$color = this.$selected ? style.edge.selected : undefined;
-		this._label.$draw(this.length.toString(), (x1 + x2) / 2, (y1 + y2) / 2, dir);
+		this.$label.$color = this.$selected ? style.edge.selected : undefined;
+		this.$label.$draw(this.length.toString(), (x1 + x2) / 2, (y1 + y2) / 2, dir);
 	}
 
 	private _hitArea(): void {

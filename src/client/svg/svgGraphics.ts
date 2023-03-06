@@ -25,8 +25,18 @@ export class SvgGraphics {
 	private _path: string = "";
 
 	public $get(): string {
-		this._addPath();
+		this.$addPath();
 		return this._svg;
+	}
+
+	public $addPath(): void {
+		if(this._path) {
+			const style = this._width === undefined ? "" : ` style="stroke-width:${this._width}"`;
+			this._svg += `<path class="${this.$class}"${style} d="${this._path}" />`;
+			this._path = "";
+			this._width = undefined;
+			this._compoundMode = false;
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +45,7 @@ export class SvgGraphics {
 
 	public closePath(): this {
 		this._path += "Z";
-		if(!this._compoundMode) this._addPath();
+		if(!this._compoundMode) this.$addPath();
 		return this;
 	}
 
@@ -50,8 +60,14 @@ export class SvgGraphics {
 	}
 
 	public drawRoundedRect(x: number, y: number, width: number, height: number, radius: number): this {
-		this._addPath();
+		this.$addPath();
 		this._svg += `<rect class="${this.$class}" x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" />`;
+		return this;
+	}
+
+	public drawCircle(x: number, y: number, radius: number): this {
+		this.$addPath();
+		this._svg += `<circle class="${this.$class}" cx="${x}" cy="${y}" r="${radius}" />`;
 		return this;
 	}
 
@@ -74,7 +90,7 @@ export class SvgGraphics {
 	}
 
 	public beginFill(color?: number, alpha?: number, smooth?: boolean): this {
-		this._addPath();
+		this.$addPath();
 		this._compoundMode = true;
 		return this;
 	}
@@ -87,20 +103,6 @@ export class SvgGraphics {
 	public endFill(): this { return this; }
 	public beginHole(): this { return this; }
 	public endHole(): this { return this; }
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _addPath(): void {
-		if(this._path) {
-			const style = this._width === undefined ? "" : ` style="stroke-width:${this._width}"`;
-			this._svg += `<path class="${this.$class}"${style} d="${this._path}" />`;
-			this._path = "";
-			this._width = undefined;
-			this._compoundMode = false;
-		}
-	}
 }
 
 // These methods are never used, so we don't actually implement them.

@@ -3,6 +3,7 @@ import { computed, reactive, shallowReadonly, shallowRef } from "vue";
 import { defaultTitle } from "app/shared/constants";
 import Lib from "./libService";
 import Dialogs from "./dialogService";
+import settings from "./settingService";
 
 import type { Project } from "client/project/project";
 import type { ComputedRef } from "vue";
@@ -70,7 +71,7 @@ namespace StudioService {
 	}
 
 	export function svg(proj: Project): Promise<Blob> {
-		return Promise.resolve(bp.svg(proj));
+		return Promise.resolve(bp.svg(proj, settings.includeHiddenElement));
 	}
 	export function png(proj: Project): Promise<Blob> {
 		return bp.png(proj);

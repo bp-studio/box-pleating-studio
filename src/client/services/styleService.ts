@@ -1,6 +1,6 @@
 import { computed, reactive, readonly } from "vue";
 
-import { BLACK, CHARCOAL, DANGER, LIGHT, RED } from "client/shared/constant";
+import { BLACK, CHARCOAL, DANGER, DARK, LIGHT, RED, WHITE } from "client/shared/constant";
 
 export const BLUE = 0x6699FF;
 
@@ -63,6 +63,14 @@ namespace Style {
 		selected: DANGER,
 		width: 1,
 		hover: 3,
+	};
+
+	export const label = {
+		size: 14,
+		glow: 3,
+		weight: 0.2,
+		color: computed(() => app.isDark.value ? LIGHT : BLACK),
+		border: computed(() => app.isDark.value ? DARK : WHITE),
 	};
 }
 
