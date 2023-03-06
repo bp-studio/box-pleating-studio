@@ -255,6 +255,7 @@
 		"export": "Export",
 		"delete": "Delete",
 		"version": "Version",
+		"filename": "Filename",
 		"download": "Download",
 		"homepage": "homepage",
 		"untitled": "Untitled",

@@ -12,7 +12,7 @@ namespace ExportService {
 
 	export function toBPS(proj: Project): Promise<Blob> {
 		//TODO
-		return Promise.resolve(new Blob([""], { type: "application/json+bps" }));
+		return Promise.resolve(new Blob([""], { type: "application/bpstudio.project+json" }));
 	}
 
 	export function toSVG(proj: Project): Promise<Blob> {

@@ -1,5 +1,5 @@
 <template>
-	<Dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" @hide="reset" @show="init" ref="menu">
+	<Dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" ref="menu">
 		<div class="dropdown-item" @click="Workspace.create()">
 			<i class="far fa-file" />{{ $t('toolbar.file.new') }}
 		</div>
@@ -30,12 +30,12 @@
 			<Uploader accept=".bps, .bpz, .json, .zip" ref="opn" multiple @upload="upload($event)">
 				<Hotkey icon="far fa-folder-open" ctrl hk="O">{{ $t('toolbar.file.open') }}</Hotkey>
 			</Uploader>
-			<Download :disabled="!Studio.project" type="bps" ref="bps" @download="notify">
+			<DropdownItem :disabled="!Studio.project" ref="bps" @click="show('bps')">
 				<Hotkey icon="fas fa-download" ctrl hk="S">{{ $t('toolbar.file.BPS.download') }}</Hotkey>
-			</Download>
-			<Download :disabled="!Studio.project" type="bpz" ref="bpz" @download="notifyAll">
+			</DropdownItem>
+			<DropdownItem :disabled="!Studio.project" ref="bpz" @click="show('bpz')">
 				<Hotkey icon="fas fa-download">{{ $t('toolbar.file.BPZ.download') }}</Hotkey>
-			</Download>
+			</DropdownItem>
 		</template>
 
 		<Divider />
@@ -52,12 +52,12 @@
 			</SaveAs>
 		</template>
 		<template v-else>
-			<Download :disabled="!Studio.project" type="svg" ref="svg" @download="svgSaved">
+			<DropdownItem :disabled="!Studio.project" @click="show('svg')">
 				<i class="far fa-file-image" />{{ $t('toolbar.file.SVG.download') }}
-			</Download>
-			<Download :disabled="!Studio.project" type="png" ref="png" @download="pngSaved">
+			</DropdownItem>
+			<DropdownItem :disabled="!Studio.project" @click="show('png')">
 				<i class="far fa-file-image" />{{ $t('toolbar.file.PNG.download') }}
-			</Download>
+			</DropdownItem>
 		</template>
 
 		<DropdownItem @click="copyPNG" :disabled="!Studio.project" v-if="copyEnabled">
@@ -91,18 +91,15 @@
 	import Export from "app/services/exportService";
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
 	import Hotkey from "@/gadgets/menu/hotkey.vue";
-	import { Download, Uploader, Opener, SaveAs } from "@/gadgets/file";
+	import { Uploader, Opener, SaveAs } from "@/gadgets/file";
 	import { show } from "@/modals/modalFragment.vue";
 	import RecentMenu from "./recentMenu.vue";
 
-	type DownloadInstance = InstanceType<typeof Download>;
 	type SaveAsInstance = InstanceType<typeof SaveAs>;
 
 	const opn = shallowRef<Executor>();
 	const bps = shallowRef<Executor>();
 	const bpz = shallowRef<Executor>();
-	const svg = compRef(Download);
-	const png = compRef(Download);
 	const menu = compRef(Dropdown);
 
 	onMounted(() => {
@@ -150,19 +147,6 @@
 	function copyPNG(): void {
 		Studio.copyPNG();
 		gtag("event", "share", { method: "copy", content_type: "image" });
-	}
-
-	function downloads(): DownloadInstance[] {
-		if(isFileApiEnabled) return [];
-		return [bps.value!, bpz.value!, svg.value!, png.value!] as DownloadInstance[];
-	}
-	function init(): void {
-		// Generate ObjectURL when the menu is opened
-		downloads().forEach(d => d.getFile());
-	}
-	function reset(): void {
-		// Recycle all ObjectURLs when the menu is closed
-		downloads().forEach(d => d.reset());
 	}
 
 	async function save(id?: number): Promise<boolean> {

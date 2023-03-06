@@ -13,10 +13,16 @@
 
 <script setup lang="ts">
 
-	defineProps({
+	const props = defineProps({
 		disabled: Boolean,
 	});
 	const emit = defineEmits(["click"]);
+
+	function execute(): void {
+		if(!props.disabled) emit("click");
+	}
+
+	defineExpose({ execute });
 
 </script>
 

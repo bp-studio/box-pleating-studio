@@ -5,6 +5,10 @@
 		<Version :ref="mdlRef('ver')" />
 		<Preference :ref="mdlRef('pref')" />
 		<CP :ref="mdlRef('cp')" />
+		<SVG_ :ref="mdlRef('svg')" />
+		<PNG :ref="mdlRef('png')" />
+		<BPS :ref="mdlRef('bps')" />
+		<BPZ :ref="mdlRef('bpz')" />
 		<Note />
 		<Language />
 	</template>
@@ -30,6 +34,10 @@
 	import Language from "./language.vue";
 	import Note from "./note.vue";
 	import CP from "./cp.vue";
+	import SVG_ from "./svg.vue"; // To avoid conflicting with native <svg> tag
+	import PNG from "./png.vue";
+	import BPS from "./bps.vue";
+	import BPZ from "./bpz.vue";
 
 	const initialized = shallowRef(false);
 	Lib.ready.then(() => initialized.value = true);
