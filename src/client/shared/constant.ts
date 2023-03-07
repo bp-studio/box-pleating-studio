@@ -21,3 +21,9 @@ export const CHARCOAL = 0x444444;
 export const DARK = 0x1e1e1e;
 
 export const BLACK = 0;
+
+export const BLUE = 0x6699FF;
+
+export const GREEN = 0x00ff00;
+
+export const LIGHT_GREEN = 0x66dd66;

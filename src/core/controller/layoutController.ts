@@ -37,6 +37,9 @@ namespace LayoutController {
 		return true; // So that updateModel is not processed.
 	}
 
+	/**
+	 * Generate the set of {@link CPLine}s clipped to the given boundary.
+	 */
 	export function getCP(borders: Path): CPLine[] {
 		const clip = new Clip();
 		const tree = Design.$instance.$tree;
@@ -44,7 +47,8 @@ namespace LayoutController {
 		addPolygon(lines, [borders], CreaseType.Border);
 		for(const node of tree.$nodes) {
 			if(!node || !node.$parent) continue;
-			addPolygon(lines, node.$outerRoughContour, CreaseType.Valley);
+			// It suffices to include only the outer contours in CP exporting.
+			addPolygon(lines, node.$contours.map(c => c.outer), CreaseType.Valley);
 		}
 		return clip.$get(lines);
 	}

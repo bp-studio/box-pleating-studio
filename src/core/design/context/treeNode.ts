@@ -2,7 +2,7 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 
-import type { Polygon } from "shared/types/geometry";
+import type { Contour, Polygon } from "shared/types/geometry";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode } from ".";
 import type { Tree } from "./tree";
@@ -37,9 +37,11 @@ export class TreeNode implements ITreeNode {
 	/** All child nodes. Implemented using maximal heap. */
 	public $children = new MutableHeap<TreeNode>((a, b) => b.$height - a.$height);
 
-	public $outerRoughContour!: Polygon;
+	/** The contours without considering patterns. */
+	public $roughContours!: Contour[];
 
-	public $innerRoughContour!: Polygon;
+	/** The final contours. */
+	public $contours!: Contour[];
 
 	/** The length of its parent edge. */
 	public $length: number = 0;
@@ -106,7 +108,9 @@ export class TreeNode implements ITreeNode {
 		return this.$children.$isEmpty;
 	}
 
-	public get $riverTag(): string {
+	/** The tag used for identifying objects in API. */
+	public get $tag(): string {
+		if(this.$isLeaf) return "f" + this.id;
 		const pid = this.$parent!.id;
 		if(this.id < pid) return `re${this.id},${pid}`;
 		else return `re${pid},${this.id}`;

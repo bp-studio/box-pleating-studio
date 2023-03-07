@@ -2,7 +2,7 @@ import ProjectService from "client/services/projectService";
 import { style } from "client/services/styleService";
 import { MARGIN } from "client/screen/constants";
 import { SvgGraphics } from "./svgGraphics";
-import { drawContours, fillContours } from "client/screen/contourUtil";
+import { drawContours, drawLines, fillContours } from "client/screen/contourUtil";
 import { SelectionController } from "client/controllers/selectionController";
 
 import type { LabelView } from "client/screen/label";
@@ -51,7 +51,7 @@ export function svg(proj: Project, includeHidden: boolean): Blob {
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function getStyle(): string {
-	const { border, hinge, ridge, junction, grid, shade, label, edge, vertex, dot } = style;
+	const { border, hinge, ridge, junction, grid, shade, label, edge, vertex, dot, axisParallel } = style;
 	const s = ProjectService.scale.value;
 	const fontSize = label.size * Math.sqrt(ProjectService.shrink.value) / s;
 	const text = `dominant-baseline:middle;text-anchor:middle;font-size:${fontSize}px;font-family:Arial`;
@@ -63,6 +63,7 @@ function getStyle(): string {
 		`.grid{${lineStyle(grid.color, grid.width)}}` +
 		`.hinge{${lineStyle(hinge.color, hinge.width)}}` +
 		`.ridge{${lineStyle(ridge.color, ridge.width)}}` +
+		`.axis-parallel{${lineStyle(axisParallel.color, axisParallel.width)}}` +
 		`.circle{${lineStyle(hinge.color, 1)}}` +
 		`.vertex{${lineStyle(vertex.color, vertex.width, vertex.fill)}}` +
 		`.vertex.selected{${lineStyle(vertex.selected, vertex.hover, vertex.fill)}}` +
@@ -107,7 +108,7 @@ function getShadeLayer(design: Design): string {
 	const graphics = new SvgGraphics();
 	graphics.$class = "shade";
 	for(const control of SelectionController.selections as (River | Flap)[]) {
-		fillContours(graphics, control.$contours, 0);
+		fillContours(graphics, control.$graphics.contours!, 0);
 	}
 	return layer(graphics.$get(), true);
 }
@@ -130,7 +131,7 @@ function getHingeLayer(design: Design): string {
 	const graphics = new SvgGraphics();
 	for(const obj of objects) {
 		graphics.$class = "hinge";
-		drawContours(graphics, obj.$contours);
+		drawContours(graphics, obj.$graphics.contours!);
 		if(obj.type == "Flap") {
 			graphics.$class = "circle";
 			obj.$drawCircle(graphics);
@@ -142,13 +143,22 @@ function getHingeLayer(design: Design): string {
 function getRidgeLayer(design: Design): string {
 	const hidden = !app.settings.showRidge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
-	return layer("", true, hidden);
+	const objects = [...design.layout.$flaps.values(), ...design.layout.$rivers.values()];
+	const graphics = new SvgGraphics();
+	graphics.$class = "ridge";
+	for(const obj of objects) {
+		drawLines(graphics, obj.$graphics.ridges!);
+	}
+	return layer(graphics.$get(), true, hidden);
 }
 
 function getAxisParallelLayer(design: Design): string {
 	const hidden = !app.settings.showAxialParallel;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
-	return layer("", true, hidden);
+	const graphics = new SvgGraphics();
+	graphics.$class = "axis-parallel";
+	//TODO
+	return layer(graphics.$get(), true, hidden);
 }
 
 function getJunctionLayer(design: Design): string {

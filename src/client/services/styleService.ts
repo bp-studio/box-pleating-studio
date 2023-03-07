@@ -1,8 +1,6 @@
 import { computed, reactive, readonly } from "vue";
 
-import { BLACK, CHARCOAL, DANGER, DARK, LIGHT, RED, WHITE } from "client/shared/constant";
-
-export const BLUE = 0x6699FF;
+import { BLACK, BLUE, CHARCOAL, DANGER, DARK, GREEN, LIGHT, LIGHT_GREEN, RED, WHITE } from "client/shared/constant";
 
 //=================================================================
 /**
@@ -71,6 +69,11 @@ namespace Style {
 		weight: 0.2,
 		color: computed(() => app.isDark.value ? LIGHT : BLACK),
 		border: computed(() => app.isDark.value ? DARK : WHITE),
+	};
+
+	export const axisParallel = {
+		color: computed(() => app.settings.colorScheme.axialParallel ?? app.isDark.value ? LIGHT_GREEN : GREEN),
+		width: 1,
 	};
 }
 

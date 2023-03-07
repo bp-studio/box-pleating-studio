@@ -39,12 +39,12 @@ end
 subgraph Contour
 	rc(rough contours)
 	pc(pattern contours)
-	fc[[final contours]]
+	g[[graphics]]
 end
 
 T --> h --> b
 b & L --> d
-d & F --> a --> rc --> fc
+d & F --> a --> rc --> g
 a --> j --> i & s
-s & P --> p --> pc --> fc
+s & P --> p --> pc --> g
 ```

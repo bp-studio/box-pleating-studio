@@ -2,6 +2,11 @@
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "..",
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable"
+		],
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"module": "esnext",

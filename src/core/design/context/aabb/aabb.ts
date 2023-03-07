@@ -74,6 +74,7 @@ export class AABB {
 		return this._sides.map(s => s.$key);
 	}
 
+	/** Returns the values (without margin) of the four sides. */
 	public $toValues(): number[] {
 		return this._sides.map(s => s.$value);
 	}
@@ -90,14 +91,9 @@ export class AABB {
 		};
 	}
 
+	/** Return the hinge path. */
 	public $toPath(): Path {
-		const [t, r, b, l] = this._sides.map(s => s.$value + s.$margin);
-		return [
-			{ x: l, y: b },
-			{ x: r, y: b },
-			{ x: r, y: t },
-			{ x: l, y: t },
-		];
+		return toCorners(this._sides.map(s => s.$value + s.$margin));
 	}
 
 	public $addChild(child: AABB): boolean {
@@ -129,4 +125,13 @@ export class AABB {
 		}
 		return updated;
 	}
+}
+
+export function toCorners([t, r, b, l]: number[]): Path {
+	return [
+		{ x: l, y: b },
+		{ x: r, y: b },
+		{ x: r, y: t },
+		{ x: l, y: t },
+	];
 }

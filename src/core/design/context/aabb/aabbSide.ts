@@ -34,6 +34,7 @@ export class AABBSide {
 		return this.$base + this.$margin;
 	}
 
+	/** The value of self, without margin. */
 	public get $base(): number {
 		return this._heap.$isEmpty ? this.$value : this._cache!;
 	}

@@ -1,6 +1,6 @@
 import type { SvgGraphics } from "client/svg/svgGraphics";
 import type { Graphics } from "@pixi/graphics";
-import type { Contour, Path } from "shared/types/geometry";
+import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
 
 export type GraphicsLike = Graphics | SmoothGraphics | SvgGraphics;
@@ -57,3 +57,8 @@ export function drawPath(graphics: GraphicsLike, path: Path): void {
 	graphics.closePath();
 }
 
+export function drawLines(graphics: GraphicsLike, lines: ILine[]): void {
+	for(const l of lines) {
+		graphics.moveTo(l[0].x, l[0].y).lineTo(l[1].x, l[1].y);
+	}
+}

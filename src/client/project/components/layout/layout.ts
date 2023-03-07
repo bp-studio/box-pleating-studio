@@ -12,10 +12,9 @@ import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 
-import type { Contour } from "shared/types/geometry";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
-import type { UpdateModel } from "core/service/updateModel";
+import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
 
@@ -99,7 +98,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 				if(vertex) {
 					if(edgeDisposed) {
 						prototype.layout.flaps.push(f.toJSON());
-						model.graphics["f" + f.id] ||= { contours: f.$contours };
+						model.graphics["f" + f.id] ||= f.$graphics;
 					} else {
 						// A flap turns into a river
 						model.add.edges.push(f.$edge.toJSON());
@@ -114,7 +113,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		}
 
 		for(const f of prototype.layout.flaps) {
-			this._addFlap(f, model.graphics["f" + f.id].contours!);
+			this._addFlap(f, model.graphics["f" + f.id]);
 		}
 		prototype.layout.flaps.length = 0;
 		this.flapCount = this.$flaps.size;
@@ -124,7 +123,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 			if(edge.$v1.isLeaf || edge.$v2.isLeaf) continue;
 			const tag = this._getEdgeTag(e);
 			if(!model.graphics[tag]) continue;
-			this._addRiver(e, model.graphics[tag].contours!);
+			this._addRiver(e, model.graphics[tag]);
 		}
 		this.riverCount = this.$rivers.size;
 	}
@@ -177,11 +176,11 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps, dragging);
 	};
 
-	private _addFlap(f: JFlap, contours: Contour[]): void {
+	private _addFlap(f: JFlap, graphics: GraphicsData): void {
 		const tree = this.$project.design.tree;
 		const vertex = tree.$vertices[f.id]!;
 		const edge = tree.$getFirstEdge(vertex);
-		const flap = new Flap(this, f, vertex, edge, contours);
+		const flap = new Flap(this, f, vertex, edge, graphics);
 		this.$flaps.set(f.id, flap);
 		if(vertex.$isNew) this.$syncFlaps.set(f.id, flap);
 		this.$sheet.$addChild(flap);
@@ -194,12 +193,12 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$flaps.delete(id);
 	}
 
-	private _addRiver(e: JEdge, contours: Contour[]): void {
+	private _addRiver(e: JEdge, graphics: GraphicsData): void {
 		const tree = this.$project.design.tree;
 		const { n1, n2 } = e;
 		const edge = tree.$edges.get(n1, n2);
 		if(!edge) return;
-		const river = new River(this, edge, contours);
+		const river = new River(this, edge, graphics);
 		this.$rivers.set(n1, n2, river);
 		this.$sheet.$addChild(river);
 	}

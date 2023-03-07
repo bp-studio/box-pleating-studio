@@ -1,4 +1,4 @@
-import type { Polygon, Contour, Path } from "shared/types/geometry";
+import type { Polygon, Contour, Path, ILine } from "shared/types/geometry";
 import type { JEdge, JEdgeBase, JFlap, JStretch } from "shared/json";
 
 export interface UpdateModel {
@@ -28,4 +28,5 @@ export interface UpdateModel {
 
 interface GraphicsData {
 	contours?: Contour[];
+	ridges?: ILine[];
 }

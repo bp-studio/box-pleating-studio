@@ -2,7 +2,7 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 import { Graphics } from "@pixi/graphics";
 
 import { Layer } from "client/types/layers";
-import { drawContours, fillContours } from "client/screen/contourUtil";
+import { drawContours, drawLines, fillContours } from "client/screen/contourUtil";
 import ProjectService from "client/services/projectService";
 import { Label } from "client/screen/label";
 import { Independent } from "client/base/independent";
@@ -17,7 +17,6 @@ import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
-import type { Contour } from "shared/types/geometry";
 import type { JFlap } from "shared/json";
 import type { Vertex } from "../tree/vertex";
 
@@ -33,7 +32,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	public readonly id: number;
 
-	public $contours: Contour[];
+	public $graphics: GraphicsData;
 	private _width: number = 0;
 	private _height: number = 0;
 
@@ -59,7 +58,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	public $anchor: IPoint = { x: 0, y: 0 };
 
-	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge, contours: Contour[]) {
+	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge, graphics: GraphicsData) {
 		const sheet = layout.$sheet;
 		super(sheet);
 		this._layout = layout;
@@ -68,7 +67,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this.$location = { x: json.x, y: json.y };
 		this._width = json.width;
 		this._height = json.height;
-		this.$contours = contours;
+		this.$graphics = graphics;
 		this.$vertex = vertex;
 		this.$edge = edge;
 		this._drawParams = this.toJSON();
@@ -100,7 +99,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public $redraw(data: GraphicsData): void {
-		this.$contours = data.contours!;
+		this.$graphics = data;
 		this._drawLabel();
 		this._draw();
 	}
@@ -204,8 +203,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 				.sort((a, b) => b.d - a.d);
 			if(data.length <= 1) return v;
 			let result = data[1].fix;
-			result = this._fixVector(data[2].p, result);
-			return this._fixVector(data[3].p, result);
+			if(data[2]) result = this._fixVector(data[2].p, result);
+			if(data[3]) result = this._fixVector(data[3].p, result);
+			return result;
 		}
 	}
 
@@ -274,7 +274,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const { x, y, width: w, height: h } = this._drawParams;
 		const hingeColor = style.hinge.color;
 		this._shade.clear();
-		fillContours(this._shade, this.$contours, hingeColor);
+		fillContours(this._shade, this.$graphics.contours!, hingeColor);
 
 		const pts = this._getDots(this._drawParams, w, h);
 		for(let i = 0; i <= Direction.LR; i++) {
@@ -283,16 +283,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		}
 
 		this._hinge.clear().lineStyle(style.hinge.width * sh, hingeColor);
-		drawContours(this._hinge, this.$contours);
+		drawContours(this._hinge, this.$graphics.contours!);
 
 		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
-		if(w || h) {
-			this._ridge.moveTo(x, y)
-				.lineTo(x + w, y)
-				.lineTo(x + w, y + h)
-				.lineTo(x, y + h)
-				.closePath();
-		}
+		drawLines(this._ridge, this.$graphics.ridges!);
 
 		// Scale the coordinates s times to improve the quality of the arcs.
 		const s = ProjectService.scale.value;

@@ -13,6 +13,8 @@ export type Path = IPointEx[] & {
 	isHole?: boolean;
 };
 
+export type ILine = [IPoint, IPoint];
+
 export type Polygon = Path[];
 
 export function same(p1: IPoint, p2: IPoint): boolean {

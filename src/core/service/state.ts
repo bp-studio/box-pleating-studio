@@ -95,6 +95,9 @@ export namespace State {
 	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
 	export const $stretchPrototypes = new Map<string, JStretch>();
 
+	/** Those flaps or rivers that will change their contours in the current round. */
+	export const $contourWillChange = new Set<ITreeNode>();
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +114,7 @@ export namespace State {
 		$flapChanged.clear();
 		$newRepositories.clear();
 		$stretchPrototypes.clear();
+		$contourWillChange.clear();
 		$rootChanged = false;
 	}
 
