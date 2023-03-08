@@ -14,13 +14,13 @@
 </script>
 
 <script setup lang="ts">
-	import { computed } from "vue";
-
 	import { hk } from "app/services/customHotkeyService";
 	import Studio from "app/services/studioService";
 
 	import type { Vertex } from "client/project/components/tree/vertex";
+	import type { Design } from "client/project/design";
 
-	const design = computed(() => Studio.project!.design);
+	defineProps<{ design: Design }>();
+
 	const selections = Studio.selections as readonly Vertex[];
 </script>

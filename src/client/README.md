@@ -1,9 +1,12 @@
 
 # Client
 
-BP Studio Client is in charge of the interactions inside the workspace area.
+BP Studio Client is in charge of the workspace area.
 It creates a [Core](../core/README.md) worker for each opened project,
 handles user interactions and render the graphics using [PIXI.js](https://pixijs.com/).
+
+As the Client bundles PIXI, it is much larger in bundled size.
+Therefore, it is built separately from the App so that the App can be initialized faster.
 
 Notice that we do not install the entire `pixi.js` NPM package,
 and instead we install individual packages that are actually used in this project.

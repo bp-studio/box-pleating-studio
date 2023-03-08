@@ -2,14 +2,14 @@
 	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.passive="hide"></div>
 	<aside class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
 		<template v-if="Studio.project">
-			<Design v-if="Studio.selections.length == 0" />
+			<Design v-if="Studio.selections.length == 0" :design="Studio.project.design" />
 			<div v-else-if="Studio.selections.length == 1">
 				<Repository v-if="repository" :repository="repository" />
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
-				<Flaps v-if="type == 'Flap'" />
-				<Vertices v-if="type == 'Vertex'" />
+				<Flaps v-if="type == 'Flap'" :design="Studio.project.design" />
+				<Vertices v-if="type == 'Vertex'" :design="Studio.project.design" />
 			</div>
 		</template>
 	</aside>

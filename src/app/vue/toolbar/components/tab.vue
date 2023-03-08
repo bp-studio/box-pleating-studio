@@ -1,21 +1,21 @@
 <template>
-	<div class="tab" :class="{ active: isActive() }" :id="`tab${project.id}`" @mousedown="Workspace.select(project.id)"
-		 @touchstart.passive="Workspace.select(project.id)">
-		<div class="tab-close" :title="getTooltip()" @contextmenu="$emit('menu', $event)">
+	<div class="tab" :class="{ active: isActive() }" :id="`tab${id}`" @mousedown="Workspace.select(id)"
+		 @touchstart.passive="Workspace.select(id)">
+		<div class="tab-close" :title="toolTip" @contextmenu="$emit('menu', $event)">
 			<div>
-				<span v-if="isModified()">*</span>
-				{{ getTitle() }}
+				<span v-if="isModified">*</span>
+				{{ title }}
 			</div>
-			<div class="ps-2 pt-1" @click.stop="Workspace.close(project.id)" @pointerdown.stop @mousedown.stop>
+			<div class="ps-2 pt-1" @click.stop="Workspace.close(id)" @pointerdown.stop @mousedown.stop>
 				<div class="close">
 					<i class="fas fa-times" />
 				</div>
 			</div>
 		</div>
-		<div class="tab-down" :title="getTooltip()">
+		<div class="tab-down" :title="toolTip">
 			<div>
-				<span v-if="isModified()">*</span>
-				{{ getTitle() }}
+				<span v-if="isModified">*</span>
+				{{ title }}
 			</div>
 			<div class="px-2" @click.stop="$emit('menu', $event)" @pointerdown.stop @touchstart.stop.passive>
 				<i class="fas fa-caret-down" />
@@ -30,36 +30,37 @@
 
 <script setup lang="ts">
 
+	import { computed } from "vue";
+
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
 	import Handle from "app/services/handleService";
-	import { gcComputed } from "app/utils/vueUtility";
+
+	import type { Project } from "client/project/project";
 
 	const props = defineProps<{ id: number }>();
 
-	const project = gcComputed(() => Workspace.getProject(props.id)!);
+	function project(): Project {
+		return Workspace.getProject(props.id)!;
+	}
 
 	defineEmits(["menu"]);
 
 	function isActive(): boolean {
-		return Studio.project?.id == project.value.id;
+		return Studio.project?.id == props.id;
 	}
 
-	function isModified(): boolean {
-		return project.value.history.isModified;
-	}
-
-	function getTitle(): string {
-		const title = project.value.design.title;
+	const isModified = computed(() => project().history.isModified);
+	const title = computed(() => {
+		const title = project().design.title;
 		return title ? title : i18n.t("toolbar.tab.noTitle").toString();
-	}
-
-	function getTooltip(): string {
-		let result = project.value.design.title;
-		const handle = Handle.get(project.value.id);
+	});
+	const toolTip = computed(() => {
+		let result = project().design.title;
+		const handle = Handle.get(props.id);
 		if(handle) result += "\n" + handle.name;
 		return result;
-	}
+	});
 
 </script>
 

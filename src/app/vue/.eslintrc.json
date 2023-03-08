@@ -14,7 +14,7 @@
 	"rules": {
 		"@typescript-eslint/indent": "off", // see vue
 		"max-len": "off", // see vue
-		"no-undef": "off", // 這是多餘的，反正真的未宣告的東西會被 TypeScript 抓出來
+		"no-undef": "off", // This is redudant as TypeScript catches things that are really undefined
 		"vue/no-mutating-props": "off", // see https://github.com/vuejs/eslint-plugin-vue/issues/1371
 		"vue/max-len": [
 			"warn",

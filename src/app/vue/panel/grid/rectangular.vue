@@ -8,11 +8,11 @@
 </script>
 
 <script setup lang="ts">
-	import Studio from "app/services/studioService";
 	import Number from "@/gadgets/form/number.vue";
-	import { gcComputed } from "app/utils/vueUtility";
 
 	import type { RectangularGrid } from "client/project/components/grid/rectangularGrid";
+	import type { IGrid } from "client/project/components/grid";
 
-	const grid = gcComputed(() => Studio.project!.design.sheet.grid as RectangularGrid);
+	const props = defineProps<{ target: IGrid }>();
+	const grid = props.target as RectangularGrid;
 </script>

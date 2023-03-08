@@ -3,9 +3,9 @@
 	<div class="panel-grid">
 		<Number :label="$t('panel.river.width')" v-model="subject.length" hotkeys="d.rd,d.ri" />
 	</div>
-	<!-- <div class="mt-3">
-		<button class="btn btn-primary" @click="bp.delete()" v-t="'keyword.delete'"></button>
-	</div> -->
+	<div class="mt-3">
+		<button class="btn btn-primary" @click="subject.delete()" v-t="'keyword.delete'"></button>
+	</div>
 	<div class="mt-3">
 		<button class="btn btn-primary" @click="subject.goToDual()" v-t="'panel.river.goto'" :title="hk('n', 'd')"></button>
 	</div>

@@ -1,6 +1,6 @@
 <template>
 	<h5 v-t="'panel.flap.type'" class="panel-title"></h5>
-	<div class="panel-grid" v-if="design">
+	<div class="panel-grid">
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 		<Number :label="$t('panel.flap.radius')" v-model="subject.radius" :min="1" hotkeys="d.rd,d.ri" />
 		<!-- TODO: max -->
@@ -20,15 +20,11 @@
 </script>
 
 <script setup lang="ts">
-	import Studio from "app/services/studioService";
 	import Field from "@/gadgets/form/field.vue";
 	import Number from "@/gadgets/form/number.vue";
-	import { gcComputed } from "app/utils/vueUtility";
 	import { hk } from "app/services/customHotkeyService";
 
 	import type { Flap } from "client/project/components/layout/flap";
 
 	defineProps<{ subject: Flap }>();
-
-	const design = gcComputed(() => Studio.project?.design);
 </script>

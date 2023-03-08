@@ -13,12 +13,9 @@
 </script>
 
 <script setup lang="ts">
-	import { computed } from "vue";
-
 	import { hk } from "app/services/customHotkeyService";
-	import Studio from "app/services/studioService";
 
-	import type { Flap } from "client/project/components/layout/flap";
+	import type { Design } from "client/project/design";
 
-	const design = computed(() => Studio.project!.design);
+	defineProps<{ design: Design }>();
 </script>

@@ -1,6 +1,6 @@
 <template>
 	<h5 v-t="'panel.design.type'" class="panel-title"></h5>
-	<div class="panel-grid" v-if="design">
+	<div class="panel-grid">
 		<Field :label="$t('panel.design.title')" v-model="design.title" :placeholder="$t('panel.design.titlePH')" />
 		<Row>
 			<div class="mt-1 mb-4">
@@ -18,8 +18,8 @@
 				<option :value="GridType.diagonal" v-t="'panel.design.grid.diag'"></option>
 			</select>
 		</Row>
-		<Rectangular v-if="(design.sheet.grid.type == GridType.rectangular)" />
-		<Diagonal v-if="(design.sheet.grid.type == GridType.diagonal)" />
+		<Rectangular v-if="(design.sheet.grid.type == GridType.rectangular)" :target="design.sheet.grid" />
+		<Diagonal v-if="(design.sheet.grid.type == GridType.diagonal)" :target="design.sheet.grid" />
 		<Number :label="$t('panel.design.zoom')" :step="step" v-model="design.sheet.zoom" :min="100" hotkeys="v.zo,v.zi" />
 	</div>
 </template>
@@ -29,9 +29,9 @@
 </script>
 
 <script setup lang="ts">
-	import Studio from "app/services/studioService";
+	import { computed } from "vue";
+
 	import { zoomStep } from "app/utils/viewUtility";
-	import { gcComputed } from "app/utils/vueUtility";
 	import Field from "@/gadgets/form/field.vue";
 	import Number from "@/gadgets/form/number.vue";
 	import Row from "@/gadgets/form/row.vue";
@@ -39,6 +39,9 @@
 	import Rectangular from "./grid/rectangular.vue";
 	import Diagonal from "./grid/diagonal.vue";
 
-	const design = gcComputed(() => Studio.project?.design);
-	const step = gcComputed(() => zoomStep(design.value?.sheet.zoom ?? 0));
+	import type { Design } from "client/project/design";
+
+	const props = defineProps<{ design: Design }>();
+
+	const step = computed(() => zoomStep(props.design.sheet.zoom ?? 0));
 </script>
