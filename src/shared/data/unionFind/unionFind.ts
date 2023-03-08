@@ -22,7 +22,7 @@ export class UnionFind<T> {
 	 * Pay attention that an error will occur if the number of elements exceed this limit later on.
 	 */
 	constructor(size: number) {
-		// 所有的陣列都預先初始化至預定的大小，以節省 push 的成本
+		// Initialize all arrays to the projected size, saving the overhead of pushing
 		this._element = Array.from({ length: size });
 		this._parent = createArray(size, -1);
 		this._size = createArray(size, 1);
@@ -35,7 +35,7 @@ export class UnionFind<T> {
 	public $union(a: T, b: T): void {
 		const i = this._findRecursive(this._add(a));
 		const j = this._findRecursive(this._add(b));
-		if(i === j) return; // 兩者已經在同一個集合中了
+		if(i === j) return; // Already in the same set
 		if(this._size[i] < this._size[j]) this._pointTo(i, j);
 		else this._pointTo(j, i);
 	}

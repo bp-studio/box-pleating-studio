@@ -198,7 +198,7 @@ export class Label extends Container {
 
 /** Solve quadratic equations of the form o * x + s * Math.sqrt(x) + z == 0 */
 function solveEq(z: number, s: number, o: number): number {
-	if(o == 0) return z * z / (s * s); // 退化情況
+	if(o == 0) return z * z / (s * s); // Degenerated case
 	const f = 2 * o * z, b = s * s - f;
 	const det = b * b - f * f;
 	return (b - Math.sqrt(det)) / (2 * o * o);

@@ -32,7 +32,7 @@ export abstract class View extends Mountable {
 		});
 
 		this.addEventListener(MOUNTED, event => {
-			// 反應作用域的啟用與否取決於掛載狀態。
+			// Whether the scope is activated depends on the mounted state.
 			this._drawScope?.toggle(event.state);
 		});
 	}

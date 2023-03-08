@@ -40,7 +40,7 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 		this.$prototype = json;
 		this.title = json.title ?? "";
 		this.description = json.description ?? "";
-		this.mode = json.mode ?? "layout";
+		this.mode = json.mode ?? "tree";
 
 		const view = this.$addRootObject(new Container(), designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);

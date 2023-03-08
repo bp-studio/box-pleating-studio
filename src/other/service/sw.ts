@@ -32,7 +32,7 @@ const defaultHandler = new strategies.StaleWhileRevalidate({
 });
 routing.setDefaultHandler(defaultHandler);
 
-// 啟動 workbox-precaching
+// Activates workbox-precaching
 const precacheController = new precaching.PrecacheController({ cacheName: "assets" });
 precacheController.addToCacheList(self.__WB_MANIFEST);
 const precacheRoute = new precaching.PrecacheRoute(precacheController, {

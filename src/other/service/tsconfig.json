@@ -7,7 +7,6 @@
 		"module": "esnext",
 		"moduleResolution": "node",
 		"removeComments": true,
-		// 因為這邊我們沒有載入 lib.dom，很多宣告檔會出錯，這邊指定跳過檢查以避免錯誤
 		"skipLibCheck": true,
 		"target": "es2017",
 		"types": []

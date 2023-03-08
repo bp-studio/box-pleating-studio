@@ -1,11 +1,6 @@
 {
 	"compilerOptions": {
 		"baseUrl": "..",
-		"lib": [
-			"esnext",
-			"dom",
-			"dom.iterable"
-		]
 	},
 	"extends": "../shared/tsconfig",
 	"include": [

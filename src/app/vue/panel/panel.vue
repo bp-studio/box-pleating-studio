@@ -54,13 +54,13 @@
 	const type = computed(() => Studio.selections[0]?.type ?? "");
 
 	watch(() => Studio.project?.design.mode, () => {
-		// 切換檢視的時候，如果有任何文字輸入框正在使用，則讓它失去焦點
+		// If any text fields are in used during view switching, unfocus it.
 		const el = document.activeElement as HTMLElement;
 		if(el && panel.value?.contains(el)) el.blur();
 	});
 
 	function onContextMenu(event: Event): void {
-		// 不允許文字框以外的部份使用系統右鍵選單
+		// Disable context menu outside text fields.
 		if(!(event.target instanceof HTMLInputElement ||
 			event.target instanceof HTMLTextAreaElement)) {
 			event.preventDefault();

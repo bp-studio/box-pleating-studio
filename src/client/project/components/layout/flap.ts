@@ -88,21 +88,6 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
 	}
 
-	/**
-	 * Update {@link _drawParams}.
-	 *
-	 * The moment of calling this method is critical;
-	 * it needs to be exactly at the moment data is sent to the Core.
-	 */
-	public $updateDrawParams(): JFlap {
-		return this._drawParams = this.toJSON();
-	}
-
-	public $redraw(data: GraphicsData): void {
-		this.$graphics = data;
-		this._drawLabel();
-		this._draw();
-	}
 
 	public toJSON(): JFlap {
 		return {
@@ -217,6 +202,31 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._move(p.x, p.y);
 	}
 
+	protected override _move(x: number, y: number): void {
+		super._move(x, y);
+		this._layout.$updateFlap(this);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Drawing methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Update {@link _drawParams}.
+	 *
+	 * The moment of calling this method is critical;
+	 * it needs to be exactly at the moment data is sent to the Core.
+	 */
+	public $updateDrawParams(): JFlap {
+		return this._drawParams = this.toJSON();
+	}
+
+	public $redraw(data: GraphicsData): void {
+		this.$graphics = data;
+		this._drawLabel();
+		this._draw();
+	}
+
 	public $drawCircle(graphics: GraphicsLike, s: number = 1): void {
 		const { x, y, width: w, height: h } = this._drawParams;
 		const r = this.$edge.length * s;
@@ -228,19 +238,6 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
 		this._dots.forEach(d => graphics.drawCircle(d.x, d.y, size / s));
 	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected override _move(x: number, y: number): void {
-		super._move(x, y);
-		this._layout.$updateFlap(this);
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _drawShade(): void {
 		if(this.$selected) this._shade.alpha = style.shade.alpha;

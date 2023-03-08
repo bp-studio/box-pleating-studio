@@ -1,11 +1,7 @@
 {
 	"compilerOptions": {
 		"jsx": "preserve",
-		"lib": [
-			"esnext",
-			"dom",
-			"dom.iterable"
-		]
+		"types": []
 	},
 	"extends": "../../shared/tsconfig",
 	"include": [

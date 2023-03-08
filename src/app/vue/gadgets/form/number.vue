@@ -74,8 +74,8 @@
 	}
 
 	function change(by: number): void {
-		// 這邊的計算起點採用 this.value 而非 this.v，
-		// 以免高速的滾動導致結果錯誤
+		// The calculation here uses this.value instead of this.v,
+		// to avoid errors in the case of speedy wheeling
 		const v = Math.round((value.value as number + by) / props.step) * props.step;
 		if(v < props.min! || v > props.max!) return;
 		emit("update:modelValue", v);
@@ -86,7 +86,7 @@
 	function wheel(event: WheelEvent): void {
 		event.stopPropagation();
 
-		// 做一個 throttle 以免過度觸發
+		// Throttle to avoid overreacting
 		const now = performance.now();
 		if(now - lastWheel < WHEEL_THROTTLE) return;
 		lastWheel = now;

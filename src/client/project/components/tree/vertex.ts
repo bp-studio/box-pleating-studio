@@ -30,7 +30,15 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	public readonly height = 0;
 	public readonly width = 0;
 
+	/**
+	 * The movement of {@link Vertex Vertices} does not concerns the Core,
+	 * so we directly made it a {@link shallowRef}.
+	 */
 	@shallowRef public override $location: IPoint;
+
+	/**
+	 * Several UI depends on this value, so it is reactive.
+	 */
 	@shallowRef public $degree: number = 0;
 
 	private readonly _tree: Tree;
@@ -114,20 +122,6 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return grid.$contains(this.$location);
 	}
 
-	public $drawDot(graphics: SmoothGraphics | SvgGraphics, x: number, y: number, factor: number): void {
-		const width = this.$selected || this.$hovered ? style.vertex.hover : style.vertex.width;
-		const size = style.vertex.size * Math.sqrt(ProjectService.shrink.value) / factor;
-		graphics.clear()
-			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
-			.beginFill(style.vertex.fill)
-			.drawCircle(x, y, size)
-			.endFill();
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	protected override _move(x: number, y: number): void {
 		super._move(x, y);
 		if(this.$isNew) {
@@ -151,6 +145,16 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public $drawDot(graphics: SmoothGraphics | SvgGraphics, x: number, y: number, factor: number): void {
+		const width = this.$selected || this.$hovered ? style.vertex.hover : style.vertex.width;
+		const size = style.vertex.size * Math.sqrt(ProjectService.shrink.value) / factor;
+		graphics.clear()
+			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
+			.beginFill(style.vertex.fill)
+			.drawCircle(x, y, size)
+			.endFill();
+	}
 
 	private _draw(): void {
 		const s = ProjectService.scale.value;

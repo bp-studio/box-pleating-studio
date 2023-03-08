@@ -2,19 +2,11 @@
 	"compilerOptions": {
 		"baseUrl": "..",
 		"jsx": "preserve",
-		"lib": [
-			"esnext",
-			"dom",
-			"dom.iterable"
-		],
 		"paths": {
 			"@/*": [
 				"app/vue/*"
 			]
-		},
-		"types": [
-			"wicg-file-system-access"
-		]
+		}
 	},
 	"extends": "../shared/tsconfig",
 	"include": [

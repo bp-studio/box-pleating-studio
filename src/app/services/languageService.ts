@@ -37,7 +37,7 @@ namespace LanguageService {
 		i18n.locale = format(localeSetting || langs[0] || "en");
 	}
 
-	/** 取得當前的候選語言列表 */
+	/** Obtain the list of candidate languages. */
 	function getLanguages(loc: string | null): string[] {
 		const locales = Object.keys(locale);
 		if(!navigator.languages) return locales;
@@ -81,7 +81,7 @@ namespace LanguageService {
 		onReset?.();
 	}
 
-	// 自動執行初始化
+	// Automatically initializes
 	init();
 }
 

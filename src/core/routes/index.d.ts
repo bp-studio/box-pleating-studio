@@ -29,8 +29,8 @@ interface UpdateResponse {
 	update: UpdateModel;
 }
 
+/** Represents an unknown error had occurred. */
 interface ErrorResponse {
-	/** 這種情況總是代表發生未知的錯誤 */
 	error: string;
 }
 

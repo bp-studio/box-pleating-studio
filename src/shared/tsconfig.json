@@ -7,13 +7,16 @@
 			"dom",
 			"dom.iterable"
 		],
+		"types": [
+			"wicg-file-system-access"
+		],
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"module": "esnext",
 		"moduleResolution": "node",
 		"noImplicitOverride": true,
 		"removeComments": true,
-		"resolveJsonModule": true, // 用來解析 Locale 的類型
+		"resolveJsonModule": true, // For resolving the type of `Locale`
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "es2018"

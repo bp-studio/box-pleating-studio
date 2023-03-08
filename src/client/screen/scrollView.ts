@@ -100,7 +100,10 @@ export class ScrollView extends EventTarget {
 		setTimeout(this.$viewport.$update, 0);
 	}
 
-	/** 檢查指定的捲動座標並且完成捲動，然後傳回修正後的捲動座標 */
+	/**
+	 * Check the given scroll coordinates and complete the scrolling,
+	 * and returns the scroll coordinates after fixing.
+	 */
 	public $scrollTo(x: number, y: number): IPoint {
 		const image = imageDimension.value;
 		const w = Math.max(image.width - this._el.clientWidth, 0);

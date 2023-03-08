@@ -22,7 +22,7 @@ const NIL = { $height: -1 };
 
 export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 
-	/** To store the node found in {@link $insert} 或 {@link $pop} */
+	/** To store the node found in {@link $insert} or {@link $pop}. */
 	private _tempNode!: Node<K, V>;
 
 	constructor(comparator: Comparator<K>) {
@@ -83,7 +83,7 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 				return this._balance(n);
 			} else {
 				if(this._lastQueriedNode === n) {
-					this._lastQueriedNode = this._nil; // 小心
+					this._lastQueriedNode = this._nil; // Lookout
 				}
 				if(n.$left === this._nil) {
 					return n.$right;
