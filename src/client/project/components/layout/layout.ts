@@ -173,7 +173,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		for(const f of this._pendingUpdate) flaps.push(f.$updateDrawParams());
 		this._pendingUpdate.clear();
 		const dragging = this.$project.$isDragging;
-		this._updating = this.$project.$callStudio("layout", "updateFlap", flaps, dragging);
+		this._updating = this.$project.$callCore("layout", "updateFlap", flaps, dragging);
 	};
 
 	private _addFlap(f: JFlap, graphics: GraphicsData): void {

@@ -1,9 +1,10 @@
 import { Partition } from "./partition";
 import { Store } from "./store";
+import { patternGenerator } from "./generators/patternGenerator";
 
 import type { ValidJunction } from "./junction/validJunction";
-import type { JJunction, JPartition } from "shared/json";
-import type { Pattern } from "./pattern";
+import type { JConfiguration, JJunction, JPartition } from "shared/json";
+import type { Pattern } from "./pattern/pattern";
 
 //=================================================================
 /**
@@ -12,17 +13,35 @@ import type { Pattern } from "./pattern";
  */
 //=================================================================
 
-export class Configuration {
+export class Configuration implements ISerializable<JConfiguration> {
 
-	private readonly _partitions: readonly Partition[];
-	// private readonly _patterns: Store<Pattern>;
+	public readonly $partitions: readonly Partition[];
+	private readonly _patterns: Store<Pattern>;
+	public $index: number = 0;
 
 	constructor(junctions: JJunction[], partitions: JPartition[]) {
-		this._partitions = partitions.map(p => new Partition(junctions, p));
-		// this._patterns = new Store();
+		this.$partitions = partitions.map(p => new Partition(junctions, p));
+		this._patterns = new Store(patternGenerator(this.$partitions));
+		this._patterns.$next();
 	}
 
-	public get $entry(): Pattern | null {
-		return null;
+	public toJSON(): JConfiguration {
+		return {
+			partitions: this.$partitions.map(p => p.toJSON()),
+		};
+	}
+
+	public get $length(): number | undefined {
+		return this._patterns.$length;
+	}
+
+	public get $pattern(): Pattern | null {
+		const patterns = this._patterns.$entries;
+		if(patterns.length === 0) return null;
+		return patterns[this.$index];
+	}
+
+	public $complete(): void {
+		this._patterns.$rest();
 	}
 }

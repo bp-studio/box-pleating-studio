@@ -25,7 +25,7 @@ const Y_DISPLACEMENT = 0.0625;
  * {@link Tree} manges the operations and logics in the tree view.
  */
 //=================================================================
-export class Tree implements IAsyncSerializable<JTree> {
+export class Tree implements ISerializable<JTree> {
 
 	@shallowRef public vertexCount: number = 0;
 
@@ -33,6 +33,9 @@ export class Tree implements IAsyncSerializable<JTree> {
 	public readonly $sheet: Sheet;
 	public readonly $vertices: (Vertex | undefined)[] = [];
 	public readonly $edges: IDoubleMap<number, Edge> = new ValuedIntDoubleMap();
+
+	/** Cache the {@link JEdge}s in the order determined by the Core. */
+	private _edges: JEdge[] = [];
 
 	/**
 	 * Those indices that are skipped in the {@link $vertices}.
@@ -57,14 +60,11 @@ export class Tree implements IAsyncSerializable<JTree> {
 		}
 	}
 
-	public async toJSON(): Promise<JTree> {
-		// We request the Core for the edges,
-		// since only the Core knows the orientation of the tree,
-		// and is able to generate the optimized result.
+	public toJSON(): JTree {
 		return {
 			sheet: this.$sheet.toJSON(),
 			nodes: this.$vertices.filter(v => v).map(v => v!.toJSON()),
-			edges: await this.$project.$callStudio("tree", "json"),
+			edges: this._edges,
 		};
 	}
 
@@ -81,6 +81,9 @@ export class Tree implements IAsyncSerializable<JTree> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $update(model: UpdateModel): void {
+		// update JEdges if needed
+		if(model.tree) this._edges = model.tree;
+
 		const prototype = this.$project.design.$prototype.tree;
 
 		// Deleting edges. We have to handle it first.
@@ -112,7 +115,7 @@ export class Tree implements IAsyncSerializable<JTree> {
 		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y });
 		const flap = design.layout.$createFlapPrototype(id, p);
 		prototype.layout.flaps.push(flap);
-		return this.$project.$callStudio("tree", "addLeaf", id, at.id, length, flap);
+		return this.$project.$callCore("tree", "addLeaf", id, at.id, length, flap);
 	}
 
 	public $delete(vertices: Vertex[]): Promise<void> {
@@ -124,12 +127,12 @@ export class Tree implements IAsyncSerializable<JTree> {
 		design.$prototype.layout.flaps.push(...prototypes);
 
 		for(const id of ids) SelectionController.$toggle(this.$vertices[id]!, false);
-		return this.$project.$callStudio("tree", "removeLeaf", ids, prototypes);
+		return this.$project.$callCore("tree", "removeLeaf", ids, prototypes);
 	}
 
 	public $join(vertex: Vertex): Promise<void> {
 		SelectionController.clear();
-		return this.$project.$callStudio("tree", "join", vertex.id);
+		return this.$project.$callCore("tree", "join", vertex.id);
 	}
 
 	public $split(edge: Edge): void {
@@ -142,16 +145,16 @@ export class Tree implements IAsyncSerializable<JTree> {
 			x: Math.round((l1.x + l2.x) / 2),
 			y: Math.round((l1.y + l2.y) / 2),
 		});
-		this.$project.$callStudio("tree", "split", edge.toJSON(), id);
+		this.$project.$callCore("tree", "split", edge.toJSON(), id);
 	}
 
 	public $merge(edge: Edge): void {
 		SelectionController.clear();
-		this.$project.$callStudio("tree", "merge", edge.toJSON());
+		this.$project.$callCore("tree", "merge", edge.toJSON());
 	}
 
 	public $updateLength(edges: JEdge[]): void {
-		this.$project.$callStudio("tree", "update", edges);
+		this.$project.$callCore("tree", "update", edges);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {

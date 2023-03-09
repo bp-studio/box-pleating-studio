@@ -7,6 +7,7 @@ import { options } from "client/options";
 
 import type * as Routes from "core/routes";
 import type { JProject } from "shared/json";
+import type { UpdateModel } from "core/service/updateModel";
 
 /**
  * Id starts from 1 to ensure true values.
@@ -18,7 +19,7 @@ let nextId = 1;
  * {@link Project} manages {@link Design} and other objects associated with it.
  */
 //=================================================================
-export class Project extends Mountable implements IAsyncSerializable<JProject> {
+export class Project extends Mountable implements ISerializable<JProject> {
 
 	public readonly id: number;
 	public readonly design: Design;
@@ -56,7 +57,7 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 			console.time("First render");
 		}
 
-		await this.$callStudio("design", "init", this.design.$prototype);
+		await this.$callCore("design", "init", this.design.$prototype);
 
 		// Wait for rendering to complete.
 		// Originally `Vue.nextTick()` was used here, but it is later
@@ -73,14 +74,21 @@ export class Project extends Mountable implements IAsyncSerializable<JProject> {
 		return this;
 	}
 
-	public async toJSON(session: boolean = false): Promise<JProject> {
-		return {
+	public toJSON(session: boolean = false): JProject {
+		const result: JProject = {
 			version: Migration.$getCurrentVersion(),
-			design: await this.design.toJSON(),
+			design: this.design.toJSON(),
 		};
+		if(session) {
+			// TODO
+		}
+		return result;
 	}
 
-	public async $callStudio<C extends Routes.ControllerKeys, A extends Routes.ActionKeys<C>>(
+	/**
+	 * Send a request to the Core worker and obtain a direct result or an {@link UpdateModel}.
+	 */
+	public async $callCore<C extends Routes.ControllerKeys, A extends Routes.ActionKeys<C>>(
 		controller: C, action: A, ...args: Routes.ActionArguments<C, A>
 	): Promise<Routes.ActionResult<C, A>> {
 		const request: Routes.IStudioRequest<C, A> = { controller, action, value: args };

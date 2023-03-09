@@ -63,13 +63,28 @@ namespace StudioService {
 	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);
 
+	export const plugins = proxy(() => bp.plugins, null!);
+
+	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
+	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
+
+	export const history = proxy(() => bp.history, {
+		canUndo: false,
+		canRedo: false,
+		undo() { /* */ },
+		redo() { /* */ },
+	});
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Delegate methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	export function selectAll(): void {
 		bp.selection.selectAll();
 	}
 	export function unselectAll(): void {
 		bp.selection.clear();
 	}
-
 	export function svg(proj: Project): Promise<Blob> {
 		return Promise.resolve(bp.svg(proj, settings.includeHiddenElement));
 	}
@@ -79,22 +94,9 @@ namespace StudioService {
 	export function copyPNG(): Promise<void> {
 		return bp.copyPNG();
 	}
-
-	export const plugins = proxy(() => bp.plugins, null!);
-
-	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
-	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
-
 	export function dragByKey(key: DirectionKey): void {
 		bp.drag.dragByKey(key);
 	}
-
-	export const history = proxy(() => bp.history, {
-		canUndo: false,
-		canRedo: false,
-		undo() { /* */ },
-		redo() { /* */ },
-	});
 }
 
 export const showPanel = shallowRef(false);

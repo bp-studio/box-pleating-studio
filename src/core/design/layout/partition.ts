@@ -1,7 +1,7 @@
 import { Store } from "./store";
 import { $generate } from "core/math/gops";
 
-import type { Pattern } from "./pattern";
+import type { Pattern } from "./pattern/pattern";
 import type { JDevice, JGadget, JJunction, JOverlap, JPartition } from "shared/json";
 import type { Configuration } from "./configuration";
 
@@ -12,7 +12,7 @@ import type { Configuration } from "./configuration";
  */
 //=================================================================
 
-export class Partition {
+export class Partition implements ISerializable<JPartition> {
 
 	public readonly $overlaps: readonly JOverlap[];
 
@@ -25,6 +25,10 @@ export class Partition {
 	constructor(junctions: JJunction[], data: JPartition) {
 		this.$overlaps = data.overlaps;
 		this.$devices = new Store(this._deviceGenerator(junctions));
+	}
+
+	public toJSON(): JPartition {
+		return { overlaps: this.$overlaps };
 	}
 
 	private *_deviceGenerator(junctions: JJunction[]): Generator<JDevice> {

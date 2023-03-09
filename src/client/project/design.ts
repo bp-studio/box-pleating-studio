@@ -23,7 +23,7 @@ import type { DesignMode, JDesign } from "shared/json";
  * {@link Design} is the main object of a {@link Project}.
  */
 //=================================================================
-export class Design extends View implements IAsyncSerializable<JDesign> {
+export class Design extends View implements ISerializable<JDesign> {
 
 	@shallowRef public title: string;
 	@shallowRef public description: string;
@@ -59,12 +59,12 @@ export class Design extends View implements IAsyncSerializable<JDesign> {
 		return this.mode == "layout" ? this.layout.$sheet : this.tree.$sheet;
 	}
 
-	public async toJSON(): Promise<JDesign> {
+	public toJSON(): JDesign {
 		return {
 			title: this.title,
 			mode: this.mode,
 			layout: this.layout.toJSON(),
-			tree: await this.tree.toJSON(),
+			tree: this.tree.toJSON(),
 		};
 	}
 

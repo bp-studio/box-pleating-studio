@@ -2,7 +2,7 @@ import { State } from "core/service/state";
 import { Task } from "./task";
 
 import type { Configuration } from "../layout/configuration";
-import type { Pattern } from "../layout/pattern";
+import type { Pattern } from "../layout/pattern/pattern";
 
 //=================================================================
 /**

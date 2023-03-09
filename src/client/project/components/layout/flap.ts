@@ -268,10 +268,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	private _draw(): void {
 		const sh = ProjectService.shrink.value;
-		const { x, y, width: w, height: h } = this._drawParams;
+		const { width: w, height: h } = this._drawParams;
 		const hingeColor = style.hinge.color;
 		this._shade.clear();
-		fillContours(this._shade, this.$graphics.contours!, hingeColor);
+		fillContours(this._shade, this.$graphics.contours, hingeColor);
 
 		const pts = this._getDots(this._drawParams, w, h);
 		for(let i = 0; i <= Direction.LR; i++) {
@@ -280,10 +280,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		}
 
 		this._hinge.clear().lineStyle(style.hinge.width * sh, hingeColor);
-		drawContours(this._hinge, this.$graphics.contours!);
+		drawContours(this._hinge, this.$graphics.contours);
 
 		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
-		drawLines(this._ridge, this.$graphics.ridges!);
+		drawLines(this._ridge, this.$graphics.ridges);
 
 		// Scale the coordinates s times to improve the quality of the arcs.
 		const s = ProjectService.scale.value;

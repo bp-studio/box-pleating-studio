@@ -33,10 +33,10 @@ export class Chainer {
 	public $chain(segments: ISegment[]): Polygon {
 		// We will reuse the Chainer instance, so we need to reset the states.
 		const size = segments.length + 1;
-		this._chainHeads = Array.from({ length: INITIAL_CHAIN_SIZE });
-		this._chainTails = Array.from({ length: INITIAL_CHAIN_SIZE });
-		this._points = Array.from({ length: size });
-		this._next = Array.from({ length: size });
+		this._chainHeads = new Array(INITIAL_CHAIN_SIZE);
+		this._chainTails = new Array(INITIAL_CHAIN_SIZE);
+		this._points = new Array(size);
+		this._next = new Array(size);
 		this._chains = 0; // We don't need to reset this in theory, but just to be sure.
 		this._length = 0;
 

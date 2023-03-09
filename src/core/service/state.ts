@@ -68,6 +68,9 @@ export namespace State {
 	/** Root have changed in the current round. */
 	export let $rootChanged: boolean;
 
+	/** The structure of the tree (not the edge lengths) have changed. */
+	export let $treeStructureChanged: boolean;
+
 	/**
 	 * Those nodes that have the length of their parent edges changed in the current round,
 	 * except for those that are already in {@link $parentChanged}.
@@ -115,6 +118,7 @@ export namespace State {
 		$newRepositories.clear();
 		$stretchPrototypes.clear();
 		$contourWillChange.clear();
+		$treeStructureChanged = false;
 		$rootChanged = false;
 	}
 

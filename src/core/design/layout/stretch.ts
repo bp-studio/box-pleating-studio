@@ -2,6 +2,7 @@ import { Repository } from "./repository";
 import { getStructureSignature } from "./junction/validJunction";
 import { State } from "core/service/state";
 
+import type { StretchData } from "core/service/updateModel";
 import type { JStretch } from "shared/json";
 import type { ValidJunction } from "./junction/validJunction";
 
@@ -12,7 +13,9 @@ import type { ValidJunction } from "./junction/validJunction";
  */
 //=================================================================
 
-export class Stretch {
+export class Stretch implements ISerializable<JStretch> {
+
+	private readonly _id: string;
 
 	/** {@link Repository} cache during dragging. */
 	private readonly _repoCache = new Map<string, Repository>();
@@ -20,9 +23,19 @@ export class Stretch {
 	/** Current {@link Repository} in used. */
 	private _repo: Repository;
 
-	constructor(junctions: ValidJunction[], prototype?: JStretch) {
+	constructor(junctions: ValidJunction[], prototype: JStretch) {
 		const signature = getStructureSignature(junctions);
+		this._id = prototype.id;
 		this._repo = new Repository(junctions, signature);
+	}
+
+	public toJSON(): JStretch {
+		const configuration = this._repo.$configuration;
+		return {
+			id: this._id,
+			configuration: configuration?.toJSON(),
+			pattern: configuration?.$pattern?.toJSON(),
+		};
 	}
 
 	/**
@@ -54,7 +67,11 @@ export class Stretch {
 	 * Before that happens, a {@link Stretch} will always only yield the first pattern it finds,
 	 * to save the computation time.
 	 */
-	public $complete(): void {
+	public $complete(): StretchData {
 		this._repo.$complete();
+		return {
+			data: this.toJSON(),
+			patternCounts: this._repo.$configurations.map(c => c.$length!),
+		};
 	}
 }

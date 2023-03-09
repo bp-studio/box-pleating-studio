@@ -2,6 +2,7 @@ import type { Strategy } from "./enum";
 import type { JOverlap, JQuadrilateral } from "./layout";
 
 export interface JStretch {
+	/** Comma-separated ids of flaps involved. */
 	id: string;
 
 	/** `undefined` if there's no {@link Pattern} */
@@ -33,12 +34,12 @@ export interface JPartition {
 
 export type JStructure = readonly Readonly<JJunction>[];
 
-export interface JPattern<T extends JGadget = JGadget> {
-	devices: readonly JDevice<T>[];
+export interface JPattern {
+	devices: readonly JDevice[];
 }
 
-export interface JDevice<T extends JGadget = JGadget> {
-	gadgets: T[];
+export interface JDevice {
+	gadgets: readonly JGadget[];
 	offset?: number;
 	addOns?: readonly JAddOn[];
 }
@@ -51,7 +52,7 @@ export interface JAddOn {
 export interface JGadget {
 
 	/** All {@link Piece}s that form the current {@link Gadget} */
-	pieces: JPiece[];
+	pieces: readonly JPiece[];
 
 	/** The relative offset of the {@link Gadget} to the `p[0]` of its first {@link Piece} */
 	offset?: IPoint;

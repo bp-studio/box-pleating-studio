@@ -13,7 +13,7 @@ import type { JEdge, JFlap } from "shared/json";
  */
 //=================================================================
 
-export class Tree implements ITree {
+export class Tree implements ITree, ISerializable<JEdge[]> {
 
 	/** The array of all nodes. Some indices are skipped. */
 	private readonly _nodes: (TreeNode | undefined)[];
@@ -191,6 +191,7 @@ export class Tree implements ITree {
 		return true;
 	}
 
+	//TODO: Do we need this?
 	/** Returns the distance between two nodes on the tree. */
 	public $dist(n1: TreeNode, n2: TreeNode): number {
 		return dist(n1, n2, this._lca(n1, n2));
@@ -206,6 +207,7 @@ export class Tree implements ITree {
 		if(atLeaf) this._leaves.delete(at);
 		this._leaves.add(newNode);
 		this._nodes[id] = newNode;
+		State.$treeStructureChanged = true;
 		return newNode;
 	}
 
@@ -214,8 +216,10 @@ export class Tree implements ITree {
 		State.$childrenChanged.delete(node);
 		delete this._nodes[id];
 		State.$updateResult.remove.nodes.push(id);
+		State.$treeStructureChanged = true;
 	}
 
+	//TODO: Do we need this?
 	/** Returns the LCA of two nodes. */
 	private _lca(n1: TreeNode, n2: TreeNode): TreeNode {
 		// Base case

@@ -90,13 +90,13 @@ export class River extends Control {
 	private _draw(): void {
 		const { width, color } = style.hinge;
 		this._shade.clear();
-		fillContours(this._shade, this.$graphics.contours!, color);
+		fillContours(this._shade, this.$graphics.contours, color);
 
 		const sh = ProjectService.shrink.value;
 		this._hinge.clear().lineStyle(width * sh, color);
-		drawContours(this._hinge, this.$graphics.contours!);
+		drawContours(this._hinge, this.$graphics.contours);
 
 		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
-		drawLines(this._ridge, this.$graphics.ridges!);
+		drawLines(this._ridge, this.$graphics.ridges);
 	}
 }

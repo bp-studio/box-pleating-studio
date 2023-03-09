@@ -4,7 +4,7 @@ import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
 
-export interface ITree extends ISerializable<JEdge[]> {
+export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
 
 	readonly $root: ITreeNode;

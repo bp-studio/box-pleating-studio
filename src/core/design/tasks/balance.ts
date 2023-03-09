@@ -28,6 +28,9 @@ function balance(): void {
 		newRoot = tryBalance(tree.$root);
 	}
 	if(tree.$root != oldRoot) State.$rootChanged = true;
+
+	// Pass the updated structure to the client.
+	if(State.$treeStructureChanged) State.$updateResult.tree = tree.toJSON();
 }
 
 function tryBalance(root: TreeNode): TreeNode | null {

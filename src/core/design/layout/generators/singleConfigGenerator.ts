@@ -8,11 +8,11 @@ import type { ValidJunction } from "../junction/validJunction";
 
 //=================================================================
 /**
- * {@link singleGenerator} is a {@link Configuration} {@link Generator}
+ * {@link singleConfigGenerator} is a {@link Configuration} {@link Generator}
  * that works for a single {@link ValidJunction}.
  */
 //=================================================================
-export function* singleGenerator(junction: ValidJunction, prototype?: JStretch): Generator<Configuration> {
+export function* singleConfigGenerator(junction: ValidJunction, prototype?: JStretch): Generator<Configuration> {
 	const j = junction.toJSON();
 
 	yield* GeneratorUtil.$first([
@@ -26,11 +26,11 @@ function* singleGOPS(j: JJunction): Generator<Configuration> {
 	}]);
 }
 
-function toOverlap(j: JJunction, index: number): JOverlap {
+function toOverlap(j: JJunction, parentIndex: number): JOverlap {
 	return {
 		c: clone(j.c),
 		ox: j.ox,
 		oy: j.oy,
-		parent: index,
+		parent: parentIndex,
 	};
 }

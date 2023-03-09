@@ -23,7 +23,7 @@ export class UnionFind<T> {
 	 */
 	constructor(size: number) {
 		// Initialize all arrays to the projected size, saving the overhead of pushing
-		this._element = Array.from({ length: size });
+		this._element = new Array(size);
 		this._parent = createArray(size, -1);
 		this._size = createArray(size, 1);
 	}

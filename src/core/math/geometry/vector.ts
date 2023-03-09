@@ -2,7 +2,7 @@ import { Fraction } from "../fraction";
 import { $reduce } from "../utils/gcd";
 import { Couple } from "./couple";
 
-import type { Pattern } from "core/design/layout/pattern";
+import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Rational } from "../fraction";
 
 //=================================================================

@@ -131,7 +131,7 @@ function getHingeLayer(design: Design): string {
 	const graphics = new SvgGraphics();
 	for(const obj of objects) {
 		graphics.$class = "hinge";
-		drawContours(graphics, obj.$graphics.contours!);
+		drawContours(graphics, obj.$graphics.contours);
 		if(obj.type == "Flap") {
 			graphics.$class = "circle";
 			obj.$drawCircle(graphics);
@@ -147,7 +147,7 @@ function getRidgeLayer(design: Design): string {
 	const graphics = new SvgGraphics();
 	graphics.$class = "ridge";
 	for(const obj of objects) {
-		drawLines(graphics, obj.$graphics.ridges!);
+		drawLines(graphics, obj.$graphics.ridges);
 	}
 	return layer(graphics.$get(), true, hidden);
 }

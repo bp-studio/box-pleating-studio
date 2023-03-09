@@ -1,5 +1,8 @@
 import type { Polygon, Contour, Path, ILine } from "shared/types/geometry";
 import type { JEdge, JEdgeBase, JFlap, JStretch } from "shared/json";
+import type { Configuration } from "core/design/layout/configuration";
+import type { Pattern } from "core/design/layout/pattern/pattern";
+import type { Device } from "core/design/layout/pattern/device";
 
 export interface UpdateModel {
 
@@ -7,8 +10,10 @@ export interface UpdateModel {
 		nodes: number[];
 		edges: JEdge[];
 		junctions: Record<string, Polygon>;
-		stretches: Record<string, JStretch>;
+		stretches: Record<string, StretchData>;
 	};
+
+	tree?: JEdge[];
 
 	remove: {
 		nodes: number[];
@@ -27,6 +32,27 @@ export interface UpdateModel {
 }
 
 interface GraphicsData {
-	contours?: Contour[];
-	ridges?: ILine[];
+	/**
+	 * Shaded region upon selection.
+	 * For flaps and rivers, this also defines the hinges.
+	 */
+	contours: Contour[];
+
+	/**
+	 * All ridges that should be drawn.
+	 */
+	ridges: ILine[];
+
+	/**
+	 * All axis-parallel creases. Only for {@link Device}s.
+	 */
+	axisParallel?: ILine[];
+}
+
+interface StretchData {
+	/** JSON data to store in the Client. */
+	data: JStretch;
+
+	/** Array of {@link Pattern} count for each {@link Configuration}s. */
+	patternCounts?: number[];
 }

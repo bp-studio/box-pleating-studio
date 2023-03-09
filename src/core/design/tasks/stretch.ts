@@ -40,14 +40,14 @@ function stretches(): void {
 
 	for(const team of teams) processTeam(team.$junctions);
 
-	for(const signature of State.$stretchDiff.$diff()) {
+	for(const id of State.$stretchDiff.$diff()) {
 		if(State.$isDragging) {
 			// Put into cache
-			const s = State.$stretches.get(signature)!;
-			State.$stretchCache.set(signature, s);
+			const s = State.$stretches.get(id)!;
+			State.$stretchCache.set(id, s);
 		}
-		State.$stretches.delete(signature);
-		State.$updateResult.remove.stretches.push(signature);
+		State.$stretches.delete(id);
+		State.$updateResult.remove.stretches.push(id);
 	}
 }
 
@@ -112,25 +112,25 @@ function getUncoveredJunctions(junctions: ValidJunction[]): ValidJunction[] {
 
 /** Update or create {@link Stretch} based on the flap structure of the {@link Team}. */
 function createOrUpdateStretch(team: Team): void {
-	const signature = team.$flaps.join(",");
-	State.$stretchDiff.$add(signature);
-	const oldStretch = tryGetStretch(signature);
+	const stretchId = team.$flaps.join(",");
+	State.$stretchDiff.$add(stretchId);
+	const oldStretch = tryGetStretch(stretchId);
 	if(oldStretch) {
 		oldStretch.$update(team.$junctions);
 	} else {
-		const prototype = State.$stretchPrototypes.get(signature);
+		const prototype = State.$stretchPrototypes.get(stretchId) || { id: stretchId };
 		const stretch = new Stretch(team.$junctions, prototype);
-		State.$stretches.set(signature, stretch);
+		State.$stretches.set(stretchId, stretch);
 	}
 }
 
-/** Try to get an existing (including cached) {@link Stretch} by signature. */
-function tryGetStretch(signature: string): Stretch | undefined {
-	let result = State.$stretches.get(signature);
+/** Try to get an existing (including cached) {@link Stretch} by id. */
+function tryGetStretch(id: string): Stretch | undefined {
+	let result = State.$stretches.get(id);
 	if(!result && State.$isDragging) {
-		result = State.$stretchCache.get(signature);
+		result = State.$stretchCache.get(id);
 		// Don't forget to put the cached object back
-		if(result) State.$stretches.set(signature, result);
+		if(result) State.$stretches.set(id, result);
 	}
 	return result;
 }

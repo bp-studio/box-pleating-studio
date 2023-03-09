@@ -74,10 +74,6 @@ namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	export function json(): JEdge[] {
-		return Design.$instance.$tree.toJSON();
-	}
-
 	/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
 	function getChildId(edge: JEdgeBase): number {
 		const tree = Design.$instance.$tree;

@@ -1,4 +1,4 @@
-import { singleGenerator } from "./singleGenerator";
+import { singleConfigGenerator } from "./singleConfigGenerator";
 import { GeneratorUtil } from "core/utils/generator";
 import { configFilter } from "./filters";
 
@@ -8,13 +8,13 @@ import type { ValidJunction } from "../junction/validJunction";
 
 //=================================================================
 /**
- * {@link generalGenerator} is a {@link Configuration} {@link Generator}
+ * {@link generalConfigGenerator} is a {@link Configuration} {@link Generator}
  * that works for multiple {@link ValidJunction}s in general.
  */
 //=================================================================
-export function* generalGenerator(junctions: ValidJunction[], prototype?: JStretch): Generator<Configuration> {
+export function* generalConfigGenerator(junctions: ValidJunction[], prototype?: JStretch): Generator<Configuration> {
 	// First find all possible configurations for each Junction
-	const junctionConfigs = junctions.map(j => [...singleGenerator(j)]);
+	const junctionConfigs = junctions.map(j => [...singleConfigGenerator(j)]);
 
 	yield* GeneratorUtil.$first([
 
