@@ -3,15 +3,15 @@ import { computed } from "vue";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Control } from "client/base/control";
-import { Layer } from "client/types/layers";
+import { Layer } from "client/shared/layers";
 import ProjectService from "client/services/projectService";
 import { shallowRef } from "client/shared/decorators";
-import { Label } from "client/screen/label";
+import { Label } from "client/utils/label";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 
-import type { SvgGraphics } from "client/svg/svgGraphics";
-import type { LabelView } from "client/screen/label";
+import type { SmoothGraphicsLike } from "client/utils/contourUtil";
+import type { LabelView } from "client/utils/label";
 import type { JEdge } from "shared/json";
 import type { Tree } from "./tree";
 import type { Vertex } from "./vertex";
@@ -54,8 +54,6 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		this.$label.$distance = LABEL_DISTANCE;
 
 		this.$reactDraw(this._draw, this._hitArea, this._drawLabel);
-
-		if(DEBUG_ENABLED) this._line.name = "Edge";
 	}
 
 	public toJSON(): JEdge {
@@ -121,7 +119,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public $drawLine(graphics: SmoothGraphics | SvgGraphics): void {
+	public $drawLine(graphics: SmoothGraphicsLike): void {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const sh = ProjectService.shrink.value;
 		graphics.clear()

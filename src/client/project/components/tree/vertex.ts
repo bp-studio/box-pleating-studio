@@ -1,15 +1,17 @@
 import { Circle } from "@pixi/math";
-import { SmoothGraphics } from "@pixi/graphics-smooth";
 
-import { Layer } from "client/types/layers";
+
+import { Layer } from "client/shared/layers";
 import { shallowRef } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
-import { Label } from "client/screen/label";
+import { Label } from "client/utils/label";
 import { Independent } from "client/base/independent";
 import { style } from "client/services/styleService";
+import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 
-import type { SvgGraphics } from "client/svg/svgGraphics";
-import type { LabelView } from "client/screen/label";
+import type { SmoothGraphicsLike } from "client/utils/contourUtil";
+import type { SmoothGraphics } from "@pixi/graphics-smooth";
+import type { LabelView } from "client/utils/label";
 import type { IGrid } from "../grid";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
@@ -56,14 +58,12 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this.$location = { x: json.x, y: json.y };
 		this.name = json.name;
 
-		this._dot = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$vertex]);
+		this._dot = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.$vertex]);
 		this.$setupHit(this._dot, new Circle(0, 0, style.vertex.size * 2));
 
 		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
 
 		this.$reactDraw(this._draw, this._drawLabel);
-
-		if(DEBUG_ENABLED) this._dot.name = "Vertex";
 	}
 
 	public toJSON(): JVertex {
@@ -146,22 +146,19 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public $drawDot(graphics: SmoothGraphics | SvgGraphics, x: number, y: number, factor: number): void {
+	public $drawDot(graphics: SmoothGraphicsLike): void {
+		const s = ProjectService.scale.value;
 		const width = this.$selected || this.$hovered ? style.vertex.hover : style.vertex.width;
-		const size = style.vertex.size * Math.sqrt(ProjectService.shrink.value) / factor;
+		const size = style.vertex.size * Math.sqrt(ProjectService.shrink.value);
 		graphics.clear()
 			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
 			.beginFill(style.vertex.fill)
-			.drawCircle(x, y, size)
+			.drawCircle(this.$location.x, this.$location.y, size / s)
 			.endFill();
 	}
 
 	private _draw(): void {
-		const s = ProjectService.scale.value;
-		this._dot.x = this.$location.x;
-		this._dot.y = this.$location.y;
-		this._dot.scale.set(1 / s); // Scale the coordinates by s times to improve the quality of arcs
-		this.$drawDot(this._dot, 0, 0, 1);
+		this.$drawDot(this._dot);
 	}
 
 	private _drawLabel(): void {

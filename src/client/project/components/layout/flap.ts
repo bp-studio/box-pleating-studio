@@ -1,16 +1,17 @@
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 import { Graphics } from "@pixi/graphics";
 
-import { Layer } from "client/types/layers";
-import { drawContours, drawLines, fillContours } from "client/screen/contourUtil";
+import { Layer } from "client/shared/layers";
+import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
 import ProjectService from "client/services/projectService";
-import { Label } from "client/screen/label";
+import { Label } from "client/utils/label";
 import { Independent } from "client/base/independent";
-import { Direction } from "shared/types/direction";
+import { Direction, quadrantNumber } from "shared/types/direction";
 import { style } from "client/services/styleService";
+import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 
-import type { LabelView } from "client/screen/label";
-import type { GraphicsLike } from "client/screen/contourUtil";
+import type { LabelView } from "client/utils/label";
+import type { GraphicsLike, SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { GraphicsData } from "core/service/updateModel";
 import type { IGrid } from "../grid";
 import type { Layout } from "./layout";
@@ -50,7 +51,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	private readonly _layout: Layout;
 
 	public readonly $label: Label;
-	private readonly _dots: SmoothGraphics[];
+	private readonly _dots: SmoothGraphics;
 	private readonly _shade: Graphics;
 	private readonly _ridge: SmoothGraphics;
 	private readonly _circle: SmoothGraphics;
@@ -72,20 +73,16 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this.$edge = edge;
 		this._drawParams = this.toJSON();
 
-		this._dots = Array.from({ length: 4 }, () =>
-			this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$dot])
-		);
+		this._dots = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.$dot]);
 
 		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$shade]);
 		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
-		this._circle = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
+		this._circle = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.$hinge]);
 		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
 		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
 		this.$setupHit(this._shade);
 
-		this.$reactDraw(this._draw, this._drawShade, this._drawDot, this._drawLabel);
-
-		if(DEBUG_ENABLED) this._hinge.name = "Flap Hinge";
+		this.$reactDraw(this._draw, this._drawShade, this._drawLabel);
 	}
 
 
@@ -227,36 +224,32 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._draw();
 	}
 
-	public $drawCircle(graphics: GraphicsLike, s: number = 1): void {
+	public $drawCircle(graphics: GraphicsLike): void {
 		const { x, y, width: w, height: h } = this._drawParams;
-		const r = this.$edge.length * s;
-		graphics.drawRoundedRect(x * s - r, y * s - r, w * s + r + r, h * s + r + r, r);
+		const r = this.$edge.length;
+		graphics.drawRoundedRect(x - r, y - r, w + r + r, h + r + r, r);
 	}
 
-	public $drawDot(graphics: GraphicsLike): void {
+	public $drawDot(graphics: SmoothGraphicsLike): void {
 		const s = ProjectService.scale.value;
 		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
-		this._dots.forEach(d => graphics.drawCircle(d.x, d.y, size / s));
+		const { width: w, height: h } = this._drawParams;
+		const pts = this._getDots(this._drawParams, w, h);
+		graphics.clear().lineStyle(style.dot.width, style.dot.color);
+		for(let i = 0; i < quadrantNumber; i++) {
+			if(this._sheet.grid.$contains(pts[i])) {
+				graphics
+					.beginFill(style.dot.fill)
+					.drawCircle(pts[i].x, pts[i].y, size / s)
+					.endFill();
+			}
+		}
 	}
 
 	private _drawShade(): void {
 		if(this.$selected) this._shade.alpha = style.shade.alpha;
 		else if(this.$hovered) this._shade.alpha = style.shade.hover;
 		else this._shade.alpha = 0;
-	}
-
-	private _drawDot(): void {
-		const s = ProjectService.scale.value;
-		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
-		this._dots.forEach(d => {
-			// Scale the coordinates s times to improve the quality of the arcs.
-			d.scale.set(1 / s);
-			d.clear()
-				.lineStyle(style.dot.width, style.dot.color)
-				.beginFill(style.dot.fill)
-				.drawCircle(0, 0, size)
-				.endFill();
-		});
 	}
 
 	private _drawLabel(): void {
@@ -268,16 +261,11 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	private _draw(): void {
 		const sh = ProjectService.shrink.value;
-		const { width: w, height: h } = this._drawParams;
 		const hingeColor = style.hinge.color;
 		this._shade.clear();
 		fillContours(this._shade, this.$graphics.contours, hingeColor);
 
-		const pts = this._getDots(this._drawParams, w, h);
-		for(let i = 0; i <= Direction.LR; i++) {
-			this._dots[i].visible = this._sheet.grid.$contains(pts[i]);
-			this._dots[i].position.set(pts[i].x, pts[i].y);
-		}
+		this.$drawDot(this._dots);
 
 		this._hinge.clear().lineStyle(style.hinge.width * sh, hingeColor);
 		drawContours(this._hinge, this.$graphics.contours);
@@ -285,11 +273,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
 		drawLines(this._ridge, this.$graphics.ridges);
 
-		// Scale the coordinates s times to improve the quality of the arcs.
-		const s = ProjectService.scale.value;
-		this._circle.scale.set(1 / s);
 		this._circle.clear().lineStyle(sh, hingeColor);
-		this.$drawCircle(this._circle, s);
+		this.$drawCircle(this._circle);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

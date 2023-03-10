@@ -6,21 +6,20 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
-import { FULL_ZOOM } from "client/shared/constant";
+import { FULL_ZOOM, MARGIN, MARGIN_FIX } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { viewport } from "client/screen/display";
-import { Enum } from "client/types/enum";
-import { Layer, LayerOptions } from "client/types/layers";
+import { Enum } from "client/shared/enum";
+import { Layer, LayerOptions } from "client/shared/layers";
 import { GridType } from "shared/json";
 import { createGrid } from "./grid";
-import { MARGIN, MARGIN_FIX } from "client/screen/constants";
 import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 
 import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
-import type { Label } from "client/screen/label";
+import type { Label } from "client/utils/label";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./grid";
 
@@ -96,15 +95,6 @@ export class Sheet extends View implements ISerializable<JSheet> {
 			this.$imageDimension.effect.stop();
 			this._grid = null!; // GC
 		});
-
-		if(DEBUG_ENABLED) {
-			for(const layer of LAYERS) {
-				this._layers[layer].name = "Layer " + Layer[layer];
-			}
-			this._borderGraphics.name = "Border";
-			this._gridGraphics.name = "Grid";
-			this._mask.name = "Mask";
-		}
 	}
 
 	public toJSON(): JSheet {

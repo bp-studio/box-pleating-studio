@@ -1,11 +1,11 @@
 import ProjectService from "client/services/projectService";
 import { style } from "client/services/styleService";
-import { MARGIN } from "client/screen/constants";
+import { MARGIN } from "client/shared/constant";
 import { SvgGraphics } from "./svgGraphics";
-import { drawContours, drawLines, fillContours } from "client/screen/contourUtil";
+import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
 import { SelectionController } from "client/controllers/selectionController";
 
-import type { LabelView } from "client/screen/label";
+import type { LabelView } from "client/utils/label";
 import type { Project } from "client/project/project";
 import type { Design } from "client/project/design";
 import type { Sheet } from "client/project/components/sheet";
@@ -186,11 +186,10 @@ function getDotLayer(design: Design): string {
 function getVertexLayer(design: Design): string {
 	if(design.mode != "tree") return "";
 	const graphics = new SvgGraphics();
-	const s = ProjectService.scale.value;
 	for(const v of design.tree.$vertices) {
 		if(v) {
 			graphics.$class = "vertex" + (v.$selected ? " selected" : "");
-			v.$drawDot(graphics, v.$location.x, v.$location.y, s);
+			v.$drawDot(graphics);
 		}
 	}
 	return layer(graphics.$get(), false);

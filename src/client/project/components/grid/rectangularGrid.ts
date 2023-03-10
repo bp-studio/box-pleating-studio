@@ -3,7 +3,7 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 
 import type { Path } from "shared/types/geometry";
-import type { GraphicsLike } from "client/screen/contourUtil";
+import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./iGrid";
 import type { Sheet } from "../sheet";

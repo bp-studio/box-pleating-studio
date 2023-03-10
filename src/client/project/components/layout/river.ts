@@ -1,9 +1,9 @@
 import { Graphics } from "@pixi/graphics";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
-import { Layer } from "client/types/layers";
+import { Layer } from "client/shared/layers";
 import { Control } from "client/base/control";
-import { drawContours, drawLines, fillContours } from "client/screen/contourUtil";
+import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
 import ProjectService from "client/services/projectService";
 import { style } from "client/services/styleService";
 
@@ -45,8 +45,6 @@ export class River extends Control {
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade);
-
-		if(DEBUG_ENABLED) this._hinge.name = "River Hinge";
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

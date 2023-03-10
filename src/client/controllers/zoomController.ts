@@ -1,6 +1,5 @@
 import ProjectService from "client/services/projectService";
-import { FULL_ZOOM } from "client/shared/constant";
-import { MARGIN } from "client/screen/constants";
+import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import { $getEventCenter } from "./share";
 import { canvas, scrollView } from "client/screen/display";
 

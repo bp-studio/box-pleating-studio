@@ -48,8 +48,6 @@ export class Tree implements ISerializable<JTree> {
 		this.$project = project;
 		this.$sheet = new Sheet(project, parentView, json.sheet);
 
-		if(DEBUG_ENABLED) this.$sheet.$view.name = "TreeSheet";
-
 		// Create the list of skipped ids.
 		const ids: boolean[] = [];
 		for(const node of json.nodes) ids[node.id] = true;

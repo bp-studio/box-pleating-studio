@@ -1,7 +1,7 @@
 import type { SvgGraphics } from "client/svg/svgGraphics";
 import type { Path } from "shared/types/geometry";
 import type { Direction } from "shared/types/direction";
-import type { GraphicsLike } from "client/screen/contourUtil";
+import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json/components";
 import type { GridType } from "shared/json/enum";
 

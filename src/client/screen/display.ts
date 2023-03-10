@@ -1,12 +1,11 @@
 import { nextTick, watch, watchEffect } from "vue";
 import { Application } from "@pixi/app";
 import { Container } from "@pixi/display";
-import { LINE_SCALE_MODE, settings, SmoothGraphics } from "@pixi/graphics-smooth";
+import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
 
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
-import { ControlEventBoundary } from "./controlEventBoundary";
-import { PIXI, setupInspector } from "./inspector";
+import { ControlEventBoundary } from "../utils/controlEventBoundary";
 import { ScrollView } from "./scrollView";
 
 import type { Renderer } from "@pixi/core";
@@ -56,18 +55,6 @@ watchEffect(() => {
 	renderer.resize(viewport.width, viewport.height);
 	stage.hitArea = pixiApp.screen;
 });
-
-// Debug mode
-if(DEBUG_ENABLED) {
-	// Setup names
-	pixiApp.stage.name = "Workspace";
-	designs.name = "Designs";
-	ui.name = "UI";
-
-	// Activate inspector
-	PIXI.SmoothGraphics = SmoothGraphics;
-	setupInspector();
-}
 
 // Automatically switch Pixi on or off by the opening of projects
 async function toggleDisplay(on: boolean): Promise<void> {

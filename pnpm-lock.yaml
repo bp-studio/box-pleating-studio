@@ -21,7 +21,6 @@ specifiers:
   '@pixi/graphics': ^7.1.4
   '@pixi/graphics-smooth': ^1.0.0
   '@pixi/math': ^7.1.4
-  '@pixi/mixin-get-child-by-name': ^7.1.4
   '@pixi/sprite': ^7.1.4
   '@pixi/text': ^7.1.4
   '@popperjs/core': ^2.11.6
@@ -121,7 +120,6 @@ dependencies:
   '@pixi/graphics': 7.1.4
   '@pixi/graphics-smooth': 1.0.0_hzpw7tysq4cxalskh2q2dtkzge
   '@pixi/math': 7.1.4
-  '@pixi/mixin-get-child-by-name': 7.1.4
   '@pixi/sprite': 7.1.4
   '@pixi/text': 7.1.4
   '@popperjs/core': 2.11.6
@@ -2099,7 +2097,6 @@ packages:
 
   /@pixi/graphics-smooth/1.0.0_hzpw7tysq4cxalskh2q2dtkzge:
     resolution: {integrity: sha512-iKeCo3sYYR5R9mf5+RcZBnLlrT/2Wr1Oi2O6EOs3mKB/IaoWDdEsxlmKyia3qnle9+B6XC4uzwvNJwJ4pgcw6w==}
-    engines: {node: '>=16', npm: '>=8'}
     peerDependencies:
       '@pixi/constants': ^7.0.0
       '@pixi/core': ^7.0.0
@@ -2118,10 +2115,6 @@ packages:
 
   /@pixi/math/7.1.4:
     resolution: {integrity: sha512-BK5aT5HfMw1WPoIl46hX0eWf3jBVUYExOj5JGmGDbpdA/RLyz2YBR3Ueegrl4H+iFY7d7He/hUq3a6vLpu0hMA==}
-    dev: false
-
-  /@pixi/mixin-get-child-by-name/7.1.4:
-    resolution: {integrity: sha512-XroDBm/KqC8rPUBsD/5wlkibJcjBPSqag1rXmJr6SKPStHrGD3BPcVDJCC8sBbMlOYOp/vxPNzf2qF1JJhaL/w==}
     dev: false
 
   /@pixi/runner/7.1.4:

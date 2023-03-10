@@ -37,7 +37,15 @@ gulp.task("clientDebug", () =>
 			dest: config.dest.debug + "/client.js",
 			extra,
 		}))
-		.pipe(esb({ sourcemap: "external", sourcesContent: false, sourceRoot: "../../" }))
+		.pipe(esb({
+			sourcemap: "external",
+			// We set this to true so that PIXI can be debugged,
+			// as PIXI put source codes in its sourcemaps.
+			// We can now setup breakpoints within the browser console.
+			// Breakpoints setup within VS Code will still work.
+			sourcesContent: true,
+			sourceRoot: "../../",
+		}))
 		.pipe(sourceMap())
 		.pipe(terser({
 			ecma: 2018,

@@ -51,8 +51,6 @@ export class Design extends View implements ISerializable<JDesign> {
 		this.$addChild(this.tree.$sheet);
 
 		this.$reactDraw(this._onModeChanged);
-
-		if(DEBUG_ENABLED) view.name = "Design #" + project.id;
 	}
 
 	public get sheet(): Sheet {

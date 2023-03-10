@@ -2,9 +2,8 @@ import { Container } from "@pixi/display";
 import { Text } from "@pixi/text";
 
 import ProjectService, { MIN_SCALE } from "client/services/projectService";
-import { PIXI } from "./inspector";
 import { shallowRef } from "client/shared/decorators";
-import { MARGIN_FIX } from "./constants";
+import { MARGIN_FIX } from "client/shared/constant";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 
@@ -56,11 +55,6 @@ export class Label extends Container {
 		this.addChild(this._label);
 		this._label.anchor.set(HALF);
 		this._glow.anchor.set(HALF);
-
-		if(DEBUG_ENABLED) {
-			this._label.name = "Label";
-			this._glow.name = "Glow";
-		}
 	}
 
 	public override destroy(options?: boolean | IDestroyOptions | undefined): void {
@@ -218,5 +212,3 @@ const directionalOffsets: Record<Direction, IPoint> = {
 	[Direction.R]: { x: 20, y: 0 },
 	[Direction.none]: { x: 0, y: 0 },
 };
-
-if(DEBUG_ENABLED) PIXI.Label = Label;

@@ -107,7 +107,6 @@
 		"@pixi/graphics": "^7.1.4",
 		"@pixi/graphics-smooth": "^1.0.0",
 		"@pixi/math": "^7.1.4",
-		"@pixi/mixin-get-child-by-name": "^7.1.4",
 		"@pixi/sprite": "^7.1.4",
 		"@pixi/text": "^7.1.4",
 		"@popperjs/core": "^2.11.6",

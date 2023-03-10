@@ -1,9 +1,9 @@
 import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
-import { drawPath } from "client/screen/contourUtil";
+import { drawPath } from "client/utils/contourUtil";
 
-import type { GraphicsLike } from "client/screen/contourUtil";
+import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";
 import type { IGrid } from "./iGrid";

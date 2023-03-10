@@ -6,7 +6,7 @@ import { shallowRef } from "client/shared/decorators";
 import { Flap } from "./flap";
 import { River } from "./river";
 import { Sheet } from "../sheet";
-import { Layer } from "client/types/layers";
+import { Layer } from "client/shared/layers";
 import { Junction } from "./junction";
 import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
@@ -60,8 +60,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$sheet.$layers[Layer.$junction].filters = [filter];
 
 		this.$reactDraw(this._redrawJunctions);
-
-		if(DEBUG_ENABLED) this.$sheet.$view.name = "LayoutSheet";
 	}
 
 	public toJSON(): JLayout {

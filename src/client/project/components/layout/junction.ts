@@ -1,10 +1,9 @@
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { dist } from "shared/types/geometry";
-import { PIXI } from "client/screen/inspector";
 import { style } from "client/services/styleService";
 
-import type { SvgGraphics } from "client/svg/svgGraphics";
+import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LINE_JOIN } from "@pixi/graphics/lib/const";
 import type { Path, Polygon } from "shared/types/geometry";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
@@ -26,7 +25,7 @@ export class Junction extends SmoothGraphics {
 		this.alpha = style.junction.alpha;
 	}
 
-	public $draw(maxWidth: number, target: SmoothGraphics | SvgGraphics = this): void {
+	public $draw(maxWidth: number, target: SmoothGraphicsLike = this): void {
 		target.clear();
 		for(const path of this.$polygon) {
 			if(!path.length) return;
@@ -64,5 +63,3 @@ function getNarrowness(path: Path): number {
 	const [p1, p2] = path;
 	return dist(p1.arc!, p2.arc!) / dist(p1, p2);
 }
-
-if(DEBUG_ENABLED) PIXI.Junction = Junction;

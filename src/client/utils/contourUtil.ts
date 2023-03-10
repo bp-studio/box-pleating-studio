@@ -3,7 +3,8 @@ import type { Graphics } from "@pixi/graphics";
 import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
 
-export type GraphicsLike = Graphics | SmoothGraphics | SvgGraphics;
+export type SmoothGraphicsLike = SmoothGraphics | SvgGraphics;
+export type GraphicsLike = Graphics | SmoothGraphicsLike;
 
 /** Draw the lines of a contour (no filling) */
 export function drawContours(graphics: GraphicsLike, contours: Contour[]): void {
