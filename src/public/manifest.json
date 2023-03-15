@@ -58,7 +58,8 @@
 		}
 	],
 	"launch_handler": {
-		"route_to": "existing-client-retain"
+		"route_to": "existing-client-retain",
+		"client_mode": "focus-existing"
 	},
 	"file_handlers": [
 		{

@@ -45,7 +45,7 @@ export abstract class Control extends View {
 
 	protected $setupHit(object: Container, hitArea?: IHitArea): void {
 		Control._hitMap.set(object, this);
-		object.interactive = true;
+		object.eventMode = "static";
 		object.cursor = "pointer";
 		if(hitArea) object.hitArea = hitArea;
 		object.on("mouseenter", () => this._hovered = true);

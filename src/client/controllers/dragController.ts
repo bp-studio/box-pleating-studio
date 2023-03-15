@@ -22,6 +22,8 @@ export interface IDragController {
 
 export namespace DragController {
 
+	let dragged: boolean = false;
+
 	export const isDragging = shallowRef(false);
 
 	export function dragByKey(key: string): void {
@@ -62,6 +64,7 @@ export namespace DragController {
 		// Check if the mouse location changed.
 		let pt = getCoordinate(event);
 		if(!CursorController.$tryUpdate(pt)) return false;
+		dragged = true;
 
 		// Ask for those Draggables to check and fix the location
 		const selections = SelectionController.draggables.value;
@@ -84,16 +87,18 @@ export namespace DragController {
 
 	/** End dragging, and return if we were indeed dragging. */
 	export function $dragEnd(): boolean {
-		const dragging = isDragging.value;
+		const wasDragging = dragged;
 		isDragging.value = false;
+		dragged = false;
+
 		const project = ProjectService.project.value;
-		if(dragging && project) {
+		if(wasDragging && project) {
 			project.$isDragging = false;
 			if(SelectionController.draggables.value[0].type === "Flap") {
 				project.$callCore("layout", "dragEnd");
 			}
 		}
 		stage.interactiveChildren = true;
-		return dragging;
+		return wasDragging;
 	}
 }

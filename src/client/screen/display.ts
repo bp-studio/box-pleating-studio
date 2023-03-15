@@ -50,7 +50,7 @@ export const stage = pixiApp.stage;
 export const designs = new Container();
 export const ui = new Container();
 stage.addChild(designs, ui);
-stage.interactive = true;
+stage.eventMode = "static";
 watchEffect(() => {
 	renderer.resize(viewport.width, viewport.height);
 	stage.hitArea = pixiApp.screen;

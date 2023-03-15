@@ -48,9 +48,13 @@ function riverRidge(node: ITreeNode): ILine[] {
 	const ridges: ILine[] = [];
 	const width = node.$length;
 	for(const contour of node.$contours) {
+		// It is possible that a contour of a river has no holes in invalid layouts.
+		// In that case adding ridges doesn't make sense either, so skip the rest.
+		if(!contour.inner) continue;
+
 		// Create a record for all the vertices in inner contour.
 		const innerVertices = new Set<number>();
-		for(const path of contour.inner!) {
+		for(const path of contour.inner) {
 			for(const [p] of pathRightCorners(path)) {
 				innerVertices.add(getOrderedKey(p.x, p.y));
 			}

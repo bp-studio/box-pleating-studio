@@ -4,7 +4,15 @@ import { State } from "./service/state";
 
 import type { StudioResponse, IStudioRequestBase } from "core/routes";
 
-onmessage = async function(event: MessageEvent): Promise<void> {
+//=================================================================
+/**
+ * Handles the requests coming from the Client.
+ *
+ * For the moment all controller/action runs synchronously,
+ * but asynchronous actions can be easily supported if needed.
+ */
+//=================================================================
+onmessage = function(event: MessageEvent): void {
 	if(!event.ports[0]) return;
 
 	const request = event.data as IStudioRequestBase;
@@ -13,8 +21,8 @@ onmessage = async function(event: MessageEvent): Promise<void> {
 		// Get the route corresponding the the request.
 		const action = getAction(request);
 
-		// Execute the request. Result could be a Promise or not.
-		const result = await action(...request.value);
+		// Execute the request.
+		const result = action(...request.value);
 
 		if(result !== undefined) {
 			// If the request has a specific returned value, return it.

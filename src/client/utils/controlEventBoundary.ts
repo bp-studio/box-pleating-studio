@@ -2,6 +2,7 @@ import { EventBoundary } from "@pixi/events";
 
 import { Control } from "client/base/control";
 
+import type { EventMode } from "@pixi/events";
 import type { DisplayObject } from "@pixi/display";
 import type { Point } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
@@ -24,7 +25,7 @@ export class ControlEventBoundary extends EventBoundary {
 	 */
 	public $hitTestAll(sheet: Sheet, location: IPoint): Control[] {
 		let result: Control[] = [];
-		this._hitTestAllRecursive(sheet.$view, false, location, result);
+		this._hitTestAllRecursive(sheet.$view, this.rootTarget.eventMode, location, result);
 		if(result.length) {
 			result.sort((a, b) => b.$priority - a.$priority);
 			if(result[0].$priority == Infinity) {
@@ -35,7 +36,7 @@ export class ControlEventBoundary extends EventBoundary {
 	}
 
 	private _hitTestAllRecursive(
-		target: DisplayObject, interactive: boolean, location: IPoint, result: Control[]): void {
+		target: DisplayObject, eventMode: EventMode, location: IPoint, result: Control[]): void {
 
 		if(!target || !target.visible) return;
 
@@ -43,10 +44,11 @@ export class ControlEventBoundary extends EventBoundary {
 		// so we can pass in any IPoint instead. Same later.
 		if(this.hitPruneFn(target, location as Point)) return;
 
+		const interactive = eventMode === "static" || eventMode === "dynamic";
 		if(target.interactiveChildren && target.children) {
 			for(const child of target.children) {
 				this._hitTestAllRecursive(
-					child as DisplayObject, interactive || child.interactive, location, result);
+					child as DisplayObject, interactive ? eventMode : child.eventMode, location, result);
 			}
 		}
 		if(interactive && this.hitTestFn(target, location as Point)) {
