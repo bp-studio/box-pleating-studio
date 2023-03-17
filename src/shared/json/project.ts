@@ -49,7 +49,7 @@ export interface JTree {
 	edges: JEdge[];
 }
 
-interface JState {
+export interface JState {
 	layout: JViewport;
 	tree: JViewport;
 }

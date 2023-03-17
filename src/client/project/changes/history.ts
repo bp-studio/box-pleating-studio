@@ -2,6 +2,7 @@ import { shallowReactive } from "vue";
 
 import { shallowRef } from "client/shared/decorators";
 
+import type { JHistory } from "shared/json";
 import type { Step } from "./step";
 import type { Control } from "client/base/control";
 
@@ -13,7 +14,7 @@ const MAX_STEP = 30;
  */
 //=================================================================
 
-export default class HistoryManager {
+export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** Current history location. */
 	@shallowRef private _index: number = 0;
@@ -29,12 +30,20 @@ export default class HistoryManager {
 	 */
 	private _moving: boolean = true;
 
+	public toJSON(): JHistory {
+		return {
+			index: this._index,
+			savedIndex: this._savedIndex,
+			steps: this._steps.map(s => s.toJSON()),
+		};
+	}
+
 	public get isModified(): boolean {
 		return this._savedIndex != this._index;
 	}
 
 	public notifySave(): void {
-		//
+		this._savedIndex = this._index;
 	}
 
 	/**

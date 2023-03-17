@@ -9,7 +9,12 @@ import type { JCommand, JStep } from "shared/json/history";
 
 export class Step implements ISerializable<JStep> {
 
-	toJSON(): JStep<JCommand> {
-		throw new Error("Method not implemented.");
+	public toJSON(): JStep<JCommand> {
+		return {
+			commands: [],
+			mode: "layout",
+			before: [],
+			after: [],
+		};
 	}
 }

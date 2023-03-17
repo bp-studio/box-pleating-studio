@@ -62,7 +62,6 @@ namespace CustomHotkeyService {
 		else handleDimensionCommand(command);
 	}
 
-	//TODO
 	/** Processing control movement */
 	function handleMoveCommand(command: string): void {
 		const map: Record<string, DirectionKey> = {
@@ -79,6 +78,7 @@ namespace CustomHotkeyService {
 		if(!Studio.project) return;
 		if(command == "d") return Studio.project.design.goToDual();
 
+		//TODO
 		// const repo = bp.getRepository();
 		// if(!repo) return;
 		// const f = command.endsWith("n") ? 1 : -1;

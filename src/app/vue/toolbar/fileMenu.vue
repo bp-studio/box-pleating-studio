@@ -160,7 +160,7 @@
 				await writable.write(await Export.toBPS(proj));
 				await writable.close();
 				Handles.addRecent(handle);
-				proj.history.notifySave();
+				Studio.history.notify();
 				return true;
 			} catch(e) {
 				await writable.abort();
@@ -171,7 +171,7 @@
 			return (bps.value! as SaveAsInstance).execute(proj, handle => {
 				Handles.set(id!, handle);
 				Handles.addRecent(handle);
-				proj.history.notifySave();
+				Studio.history.notify();
 			});
 		}
 	}

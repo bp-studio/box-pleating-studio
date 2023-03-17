@@ -13,6 +13,8 @@ import type { JProject } from "shared/json";
  */
 declare const bp: typeof Client;
 
+type ProjectProto = { design: { title: string } };
+
 //=================================================================
 /**
  * {@link WorkspaceService} manages opened tabs.
@@ -33,13 +35,23 @@ namespace WorkspaceService {
 		return bp.projects.get(id);
 	}
 
+	function checkTitle(j: ProjectProto): ProjectProto {
+		const title = j.design.title.replace(/ - \d+$/, "");
+		let n = 1;
+		const titles = new Set(projects.value.map(p => p.design.title));
+		if(!titles.has(title)) return j;
+		while(titles.has(title + " - " + n)) n++;
+		j.design.title = title + " - " + n;
+		return j;
+	}
+
 	export async function create(): Promise<void> {
 		try {
-			const json = {
+			const json = checkTitle({
 				design: {
 					title: i18n.t("keyword.untitled").toString(),
 				},
-			};
+			});
 			const proj = await bp.projects.create(json);
 			ids.push(proj.id);
 			select(proj.id);
@@ -111,15 +123,13 @@ namespace WorkspaceService {
 		return true;
 	}
 
-	export function clone(id?: number): void {
-		//TODO
-		// if(id === undefined) id = bp.design!.id;
-		// let i = this.designs.indexOf(id);
-		// let d = bp.getDesign(id)!.toJSON(true);
-		// let c = bp.restore(this.checkTitle(d));
-		// this.designs.splice(i + 1, 0, c.id);
-		// this.select(c.id);
-		// gtag('event', 'project_clone');
+	export async function clone(id: number): Promise<void> {
+		const i = ids.indexOf(id);
+		const proj = projects.value[i].toJSON(true);
+		const c = await bp.projects.open(checkTitle(proj));
+		ids.splice(i + 1, 0, c.id);
+		select(c.id);
+		gtag("event", "project_clone");
 	}
 
 	Studio.$onSetupOptions.push(options =>

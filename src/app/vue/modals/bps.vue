@@ -11,6 +11,7 @@
 
 	import ExportService from "app/services/exportService";
 	import { compRef } from "app/inject";
+	import Studio from "app/services/studioService";
 	import Export from "./components/export.vue";
 
 	const exp = compRef(Export);
@@ -25,8 +26,7 @@
 
 	function save(): void {
 		gtag("event", "project_bps");
-		//TODO
-		//notify();
+		Studio.history.notify();
 	}
 
 	defineExpose({ show });

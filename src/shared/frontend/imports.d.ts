@@ -2,6 +2,7 @@
 import type vue from "vue";
 import type bootstrap from "bootstrap";
 import type vueI18n from "vue-i18n";
+import type jszip from "jszip";
 import type { BpsLocale } from "./locale";
 import type * as appInstance from "../../app/main";
 
@@ -9,6 +10,7 @@ declare global {
 	declare const VueI18n: typeof vueI18n;
 	declare const Vue: typeof vue;
 	declare const Bootstrap: typeof bootstrap;
+	declare const JSZip: typeof jszip;
 
 	/** Launching error manager, defined in HTML. */
 	declare const errMgr: {

@@ -8,6 +8,8 @@ import Settings from "./settingService";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
 
+import type { Project } from "client/project/project";
+
 declare function checkWithBC(id: number): Promise<boolean>;
 
 const SAVE_INTERVAL = 3000;
@@ -28,13 +30,11 @@ namespace SessionService {
 			const sessionString = localStorage.getItem("session");
 			if(sessionString) {
 				const session = JSON.parse(sessionString);
-				const jsons = session.jsons as unknown[];
-				// TODO
-				for(let i = 0; i < jsons.length; i++) {
-					// let design = bp.restore(jsons[i]);
-					// core.projects.add(design, false);
-				}
-				// if(session.open >= 0) core.projects.select(core.designs[session.open]);
+				const jsons = session.jsons;
+				const tasks: Promise<Project>[] = [];
+				for(let i = 0; i < jsons.length; i++) tasks.push(Workspace.open(jsons[i]));
+				await Promise.all(tasks);
+				if(session.open >= 0) Workspace.select(Workspace.ids[session.open]);
 			}
 		}
 

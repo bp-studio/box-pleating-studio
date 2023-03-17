@@ -11,8 +11,8 @@ declare const JSZip: typeof jsZip;
 namespace ExportService {
 
 	export function toBPS(proj: Project): Promise<Blob> {
-		//TODO
-		return Promise.resolve(new Blob([""], { type: "application/bpstudio.project+json" }));
+		const json = JSON.stringify(proj.toJSON());
+		return Promise.resolve(new Blob([json], { type: "application/bpstudio.project+json" }));
 	}
 
 	export function toSVG(proj: Project): Promise<Blob> {

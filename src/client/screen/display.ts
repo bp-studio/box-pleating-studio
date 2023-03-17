@@ -8,7 +8,6 @@ import { useBackground } from "./background";
 import { ControlEventBoundary } from "../utils/controlEventBoundary";
 import { ScrollView } from "./scrollView";
 
-import type { Renderer } from "@pixi/core";
 import type { EventSystem } from "@pixi/events";
 
 const el = document.getElementById("divWorkspace")!;
@@ -34,7 +33,7 @@ const pixiApp = new Application({
 useBackground(pixiApp);
 
 // Setup renderer
-const renderer = pixiApp.renderer as Renderer;
+const renderer = pixiApp.renderer;
 export const boundary = new ControlEventBoundary(pixiApp.stage);
 (renderer.events as Writeable<EventSystem>).rootBoundary = boundary;
 

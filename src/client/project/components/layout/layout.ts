@@ -16,7 +16,7 @@ import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
-import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JViewport } from "shared/json";
 
 //=================================================================
 /**
@@ -50,10 +50,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 	/** Cached value of scale. */
 	private _scale: number = 0;
 
-	constructor(project: Project, parentView: Container, json: JSheet) {
+	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
-		this.$sheet = new Sheet(project, parentView, json);
+		this.$sheet = new Sheet(project, parentView, json, state);
 		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(style.junction.alpha);

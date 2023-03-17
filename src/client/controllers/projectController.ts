@@ -46,6 +46,11 @@ export namespace ProjectController {
 		return projectMap.get(id);
 	}
 
+	/** Return all {@link Project}s. */
+	export function all(): Project[] {
+		return [...projectMap.values()];
+	}
+
 	/** Returns the standing-by worker, or create a new worker. */
 	function getOrCreateWorker(): Worker {
 		const worker = __worker ? __worker : new Worker(__worker_src);

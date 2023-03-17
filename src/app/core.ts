@@ -70,15 +70,6 @@ namespace Core {
 	export const shouldShowDPad = computed(() =>
 		isTouch && Settings.showDPad && StudioService.draggableSelected
 	);
-
-	function open(d: string | object): void {
-		//TODO
-		if(typeof d == "string") {
-			// projects.add(bp.design = bp.load(d)!);
-		} else {
-			// projects.add(bp.design = bp.restore(d));
-		}
-	}
 }
 
 export default readonly(Core);

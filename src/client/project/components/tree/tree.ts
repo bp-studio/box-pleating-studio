@@ -10,7 +10,7 @@ import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
-import type { JEdge, JEdgeBase, JTree, JVertex } from "shared/json";
+import type { JEdge, JEdgeBase, JTree, JVertex, JViewport } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
@@ -44,9 +44,9 @@ export class Tree implements ISerializable<JTree> {
 	 */
 	private _skippedIdHeap: BinaryHeap<number> = new BinaryHeap<number>(minComparator);
 
-	constructor(project: Project, parentView: Container, json: JTree) {
+	constructor(project: Project, parentView: Container, json: JTree, state?: JViewport) {
 		this.$project = project;
-		this.$sheet = new Sheet(project, parentView, json.sheet);
+		this.$sheet = new Sheet(project, parentView, json.sheet, state);
 
 		// Create the list of skipped ids.
 		const ids: boolean[] = [];

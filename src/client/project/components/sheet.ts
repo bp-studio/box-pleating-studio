@@ -20,7 +20,7 @@ import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
 import type { Label } from "client/utils/label";
-import type { JSheet } from "shared/json";
+import type { JSheet, JViewport } from "shared/json";
 import type { IGrid } from "./grid";
 
 const LAYERS = Enum.values(Layer);
@@ -70,9 +70,14 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
-	constructor(project: Project, parentView: Container, json: JSheet) {
+	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
+
+		if(state) {
+			this.$zoom = state.zoom;
+			this.$scroll = state.scroll;
+		}
 
 		this.$addRootObject(this.$view, parentView);
 		for(const layer of LAYERS) {
@@ -99,6 +104,13 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	public toJSON(): JSheet {
 		return this._grid.toJSON();
+	}
+
+	public $getViewport(): JViewport {
+		return {
+			zoom: this.$zoom,
+			scroll: this.$scroll,
+		};
 	}
 
 	public $clearSelection(): void {

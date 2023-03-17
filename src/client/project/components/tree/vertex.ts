@@ -1,6 +1,5 @@
 import { Circle } from "@pixi/math";
 
-
 import { Layer } from "client/shared/layers";
 import { shallowRef } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
@@ -159,6 +158,8 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 
 	private _draw(): void {
 		this.$drawDot(this._dot);
+		const s = ProjectService.scale.value;
+		this._dot.hitArea = new Circle(this.$location.x * s, this.$location.y * s, style.vertex.size * 2);
 	}
 
 	private _drawLabel(): void {

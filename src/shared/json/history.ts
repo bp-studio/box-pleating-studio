@@ -18,7 +18,11 @@ export interface JStep<T extends JCommand = JCommand> {
 	construct?: Memento[];
 	destruct?: Memento[];
 	mode: DesignMode;
+
+	/** Tags of selected objects before the step. */
 	before: string[];
+
+	/** Tags of selected objects after the step. */
 	after: string[];
 }
 

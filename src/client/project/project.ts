@@ -41,7 +41,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 		const jProject = deepAssign(Migration.$getSample(), json);
 
-		this.design = new Design(this, jProject.design);
+		this.design = new Design(this, jProject.design, jProject.state);
 		this.$addChild(this.design);
 
 		this._worker = worker;
@@ -74,13 +74,17 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		return this;
 	}
 
-	public toJSON(session: boolean = false): JProject {
+	public toJSON(session?: boolean): JProject {
 		const result: JProject = {
 			version: Migration.$getCurrentVersion(),
 			design: this.design.toJSON(),
 		};
 		if(session) {
-			// TODO
+			result.history = this.history.toJSON();
+			result.state = {
+				tree: this.design.tree.$sheet.$getViewport(),
+				layout: this.design.layout.$sheet.$getViewport(),
+			};
 		}
 		return result;
 	}

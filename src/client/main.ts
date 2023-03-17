@@ -42,4 +42,10 @@ export const history = {
 	redo() {
 		getHistory()?.$redo();
 	},
+	notify() {
+		getHistory()?.notifySave();
+	},
+	notifyAll() {
+		ProjectController.all().forEach(p => p.history.notifySave());
+	},
 };

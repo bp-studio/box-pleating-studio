@@ -16,7 +16,7 @@ import { Edge } from "./components/tree/edge";
 import type { Sheet } from "./components/sheet";
 import type { Project } from "./project";
 import type { UpdateModel } from "core/service/updateModel";
-import type { DesignMode, JDesign } from "shared/json";
+import type { DesignMode, JDesign, JState } from "shared/json";
 
 //=================================================================
 /**
@@ -35,7 +35,7 @@ export class Design extends View implements ISerializable<JDesign> {
 	/** Prototypes of various objects before they are constructed. */
 	public readonly $prototype: JDesign;
 
-	constructor(project: Project, json: JDesign) {
+	constructor(project: Project, json: JDesign, state?: JState) {
 		super();
 		this.$prototype = json;
 		this.title = json.title ?? "";
@@ -45,8 +45,8 @@ export class Design extends View implements ISerializable<JDesign> {
 		const view = this.$addRootObject(new Container(), designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);
 
-		this.layout = new Layout(project, view, json.layout.sheet);
-		this.tree = new Tree(project, view, json.tree);
+		this.layout = new Layout(project, view, json.layout.sheet, state?.layout);
+		this.tree = new Tree(project, view, json.tree, state?.tree);
 		this.$addChild(this.layout.$sheet);
 		this.$addChild(this.tree.$sheet);
 
