@@ -8,7 +8,7 @@ import type { ITreeNode } from "../context";
 
 //=================================================================
 /**
- * {@link AABBTask} updates {@link TreeNode.$AABB}。
+ * {@link AABBTask} updates {@link TreeNode.$AABB}.
  */
 //=================================================================
 export const AABBTask = new Task(aabb, junctionTask, roughContourTask);

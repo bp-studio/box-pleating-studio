@@ -19,7 +19,7 @@ namespace FileUtility {
 	}
 
 	/**
-	 * Read the {@link File} object and returns {@link ArrayBuffer}。
+	 * Read the {@link File} object and returns {@link ArrayBuffer}.
 	 */
 	export function readFile(file: File): Promise<ArrayBuffer> {
 		return new Promise((resolve, reject) => {

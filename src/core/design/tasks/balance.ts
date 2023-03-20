@@ -8,7 +8,7 @@ import type { Tree } from "../context/tree";
 
 //=================================================================
 /**
- * {@link balanceTask} updates {@link Tree.$root}。
+ * {@link balanceTask} updates {@link Tree.$root}.
  *
  * It depends on {@link heightTask} as it decides whether to re-balance
  * based on the height of each subtrees under the root.

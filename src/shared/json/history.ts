@@ -32,7 +32,7 @@ export interface JCommand {
 	readonly type: CommandType;
 
 	/**
-	 * The tag of the effected object。
+	 * The tag of the effected object.
 	 *
 	 * Considering GC, {@link JCommand} doesn't keep the reference of the object.
 	 */

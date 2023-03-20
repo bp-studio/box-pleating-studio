@@ -13,7 +13,7 @@ import LZ from "app/utils/lz";
 
 namespace Core {
 
-	/** If we are ready to perform LCP（largest contentful paint) */
+	/** If we are ready to perform LCP (largest contentful paint) */
 	export const lcpReady = shallowRef(false);
 
 	if(!localStorage.getItem("settings") && !localStorage.getItem("session")) {

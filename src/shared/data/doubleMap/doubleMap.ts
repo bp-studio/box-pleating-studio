@@ -4,7 +4,7 @@ import type { IntDoubleMap } from "./intDoubleMap";
 
 //=================================================================
 /**
- * {@link DoubleMap} is a general-purpose implementation of {@link IDoubleMap}。
+ * {@link DoubleMap} is a general-purpose implementation of {@link IDoubleMap}.
  *
  * It accepts any object as keys, but uses more memory,
  * and not as efficient as {@link IntDoubleMap} on double-key operations.

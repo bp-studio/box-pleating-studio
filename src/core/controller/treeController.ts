@@ -21,7 +21,7 @@ namespace TreeController {
 	}
 
 	/**
-	 * Delete leaves one by one
+	 * Delete leaves one by one.
 	 * @param ids The node ids that should be deleted.
 	 * @param prototypes The {@link JFlap}s corresponding to the new leaves after deletion.
 	 */

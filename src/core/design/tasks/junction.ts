@@ -10,7 +10,7 @@ import type { ITreeNode } from "../context";
 
 //=================================================================
 /**
- * {@link junctionTask} maintains {@link State.$junctions}。
+ * {@link junctionTask} maintains {@link State.$junctions}.
  *
  * The major breakthrough of this new algorithm is that there's no
  * need to maintain LCA for the entire tree anymore, as LCA will

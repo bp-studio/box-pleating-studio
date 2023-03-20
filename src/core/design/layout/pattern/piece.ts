@@ -4,12 +4,13 @@ import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
 
+import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
 import type { JPiece } from "shared/json";
 
 //=================================================================
 /**
- *
+ * {@link Piece} is a {@link Region} in a {@link Gadget}.
  */
 //=================================================================
 export class Piece extends Region implements JPiece, ISerializable<JPiece> {
@@ -74,7 +75,8 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	private get _points(): Point[] {
 		const { ox, oy, u, v } = this;
 
-		// 因為 GOPS 跟 Overlap 區域之間是一個顛倒的關係，頂點的對應會是從左下角開始的順時鐘排列
+		// a GOPS is like the reverse of the Overlap region,
+		// therefore the corners are arranged in clockwise direction, starting from the lower left.
 		const result = [
 			Point.ZERO,
 			new Point(u, ox + u),

@@ -50,8 +50,9 @@ specifiers:
   eslint-plugin-html: ^7.1.0
   eslint-plugin-import: ^2.27.5
   eslint-plugin-jsdoc: ^40.1.0
+  eslint-plugin-local-rules: ^1.3.2
   eslint-plugin-mocha: ^10.1.0
-  eslint-plugin-typescript-compat: ^1.0.0
+  eslint-plugin-typescript-compat: ^1.0.1
   eslint-plugin-vue: ^9.9.0
   fancy-log: ^2.0.0
   fontawesome-subset: ^4.3.1
@@ -165,8 +166,9 @@ devDependencies:
   eslint-plugin-html: 7.1.0
   eslint-plugin-import: 2.27.5_v7jo3sddp7aqau7pajjy572cju
   eslint-plugin-jsdoc: 40.1.0_eslint@8.36.0
+  eslint-plugin-local-rules: 1.3.2
   eslint-plugin-mocha: 10.1.0_eslint@8.36.0
-  eslint-plugin-typescript-compat: 1.0.0_j4766f7ecgqbon3u7zlxn5zszu
+  eslint-plugin-typescript-compat: 1.0.1_j4766f7ecgqbon3u7zlxn5zszu
   eslint-plugin-vue: 9.9.0_eslint@8.36.0
   fancy-log: 2.0.0
   fontawesome-subset: 4.3.1_y5fjl7dfkn6p7h5uy4ms6o3xui
@@ -2139,7 +2141,6 @@ packages:
 
   /@pixi/graphics-smooth/1.0.0_5kdphuphh47yvvajdhxmkqbppi:
     resolution: {integrity: sha512-iKeCo3sYYR5R9mf5+RcZBnLlrT/2Wr1Oi2O6EOs3mKB/IaoWDdEsxlmKyia3qnle9+B6XC4uzwvNJwJ4pgcw6w==}
-    engines: {node: '>=16', npm: '>=8'}
     peerDependencies:
       '@pixi/constants': ^7.0.0
       '@pixi/core': ^7.0.0
@@ -4506,6 +4507,10 @@ packages:
       - supports-color
     dev: true
 
+  /eslint-plugin-local-rules/1.3.2:
+    resolution: {integrity: sha512-X4ziX+cjlCYnZa+GB1ly3mmj44v2PeIld3tQVAxelY6AMrhHSjz6zsgsT6nt0+X5b7eZnvL/O7Q3pSSK2kF/+Q==}
+    dev: true
+
   /eslint-plugin-mocha/10.1.0_eslint@8.36.0:
     resolution: {integrity: sha512-xLqqWUF17llsogVOC+8C6/jvQ+4IoOREbN7ZCHuOHuD6cT5cDD4h7f2LgsZuzMAiwswWE21tO7ExaknHVDrSkw==}
     engines: {node: '>=14.0.0'}
@@ -4517,10 +4522,10 @@ packages:
       rambda: 7.5.0
     dev: true
 
-  /eslint-plugin-typescript-compat/1.0.0_j4766f7ecgqbon3u7zlxn5zszu:
-    resolution: {integrity: sha512-PytfAIrnX56fHm11TTjyZ0DVWzPaKAN6JEHeoVMDj5BIUW0CejdmuuQWkLKpMuF4DfaJTQo0jUXoC7ZHXCavwg==}
+  /eslint-plugin-typescript-compat/1.0.1_j4766f7ecgqbon3u7zlxn5zszu:
+    resolution: {integrity: sha512-trhNmJN43QxgERYKtvgn5FUaMQ+P6yAbQYK6Zd02l1Evt9hWjGaU2lwrqURno6n6HJ/Z6T6gTJsCecNCNNRoyQ==}
     peerDependencies:
-      typescript: ^3.9.7 || ^4.0.0
+      typescript: ^3.9.7 || ^4.0.0 || ^5.0.0
     dependencies:
       '@mdn/browser-compat-data': 5.2.43
       '@typescript-eslint/experimental-utils': 5.55.0_j4766f7ecgqbon3u7zlxn5zszu

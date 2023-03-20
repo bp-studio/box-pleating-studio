@@ -90,7 +90,8 @@
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
 		".*rc.json": ".$(capture)ignore",
 		"package.json": "pnpm-lock.yaml, .npmrc",
-		".gitignore": ".gitattributes"
+		".gitignore": ".gitattributes",
+		".eslintrc.json": "eslint-local-rules.js"
 	},
 	"files.exclude": {
 		"**/debug.log": true,

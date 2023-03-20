@@ -5,7 +5,7 @@ import type { ISegment } from "./segment";
 
 //=================================================================
 /**
- * {@link LineSegment} represents an arbitrary line segment。
+ * {@link LineSegment} represents an arbitrary line segment.
  */
 //=================================================================
 
