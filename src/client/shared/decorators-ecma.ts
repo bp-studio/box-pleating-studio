@@ -1,35 +1,28 @@
 
+//=================================================================
+/**
+ * This file is for preparing the future support for ECMAScript
+ * decorators, which is supported in TypeScript 5+,
+ * but not yet supported by ESBuild
+ * (see issue https://github.com/evanw/esbuild/issues/104).
+ *
+ * Once ESBuild begin to support this, this file will replace
+ * `decorators.ts`.
+ */
+//=================================================================
+
 import { shallowRef } from "vue";
 
-type Setter<T> = (v: T) => boolean;
+type ClassFieldInitializer<This = object, T = unknown> = (this: This, initialValue: T) => T;
 
 /** Make a field into {@link shallowRef} in Vue */
-function shallowRefDecorator<T>(setter: Setter<T>): ClassFieldDecorator;
-function shallowRefDecorator(value: undefined, context: ClassFieldDecoratorContext): ClassFieldInitializer;
-function shallowRefDecorator(
-	...p: [undefined, ClassFieldDecoratorContext] | [Setter<unknown>]
-): ClassFieldDecorator | ClassFieldInitializer {
-	if(p.length != 1) {
-		return shallowRefDecoratorCore(...p);
-	} else {
-		return (value: undefined, context: ClassFieldDecoratorContext) =>
-			shallowRefDecoratorCore(value, context, p[0]);
-	}
-}
-
-function shallowRefDecoratorCore<T = unknown>(
-	value: undefined,
-	context: ClassFieldDecoratorContext,
-	setter?: Setter<T>
-): ClassFieldInitializer<T> {
-	return function(this: object, initialValue: T) {
-		const ref = shallowRef<T>();
-		const set = setter ?
-			(v: T) => setter(v) && (ref.value = v) :
-			(v: T) => ref.value = v;
+function shallowRefDecorator<This, V>(
+	value: undefined, context: ClassFieldDecoratorContext<This, V>): ClassFieldInitializer<This, V> {
+	return function(this: This, initialValue: V) {
+		const ref = shallowRef<V>();
 		Object.defineProperty(this, context.name, {
 			configurable: false,
-			set,
+			set(v: V) { ref.value = v; },
 			get() { return ref.value; },
 		});
 		return initialValue; // This will trigger the set method above
@@ -37,15 +30,3 @@ function shallowRefDecoratorCore<T = unknown>(
 }
 
 export { shallowRefDecorator as shallowRef };
-
-type ClassFieldDecoratorContext = {
-	kind: "field";
-	name: string | symbol;
-	static: boolean;
-	private: boolean;
-};
-
-type ClassFieldInitializer<T = unknown> = (this: object, initialValue: T) => T;
-
-type ClassFieldDecorator<T = unknown> =
-	(value: undefined, context: ClassFieldDecoratorContext) => ClassFieldInitializer<T> | void;

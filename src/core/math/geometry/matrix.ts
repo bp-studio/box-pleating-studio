@@ -1,7 +1,7 @@
 import { Fraction } from "../fraction";
 import { Vector } from "./vector";
 
-import type { Point } from "./Point";
+import type { Point } from "./point";
 
 //=================================================================
 /**
