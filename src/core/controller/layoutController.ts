@@ -6,7 +6,7 @@ import { Clip } from "core/math/polyBool/clip/clip";
 import { CreaseType } from "shared/types/cp";
 
 import type { CPLine } from "shared/types/cp";
-import type { Path, Polygon } from "shared/types/geometry";
+import type { ILine, Path, Polygon } from "shared/types/geometry";
 import type { JFlap } from "shared/json";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Repository } from "core/design/layout/repository";
@@ -48,18 +48,26 @@ namespace LayoutController {
 		for(const node of tree.$nodes) {
 			if(!node || !node.$parent) continue;
 			// It suffices to include only the outer contours in CP exporting.
-			addPolygon(lines, node.$contours.map(c => c.outer), CreaseType.Valley);
+			addPolygon(lines, node.$graphics.$contours.map(c => c.outer), CreaseType.Auxiliary);
+			addLines(lines, node.$graphics.$ridges, CreaseType.Mountains);
 		}
 		return clip.$get(lines);
 	}
 
-	function addPolygon(lines: CPLine[], polygon: Polygon, type: CreaseType): void {
+	function addPolygon(set: CPLine[], polygon: Polygon, type: CreaseType): void {
 		if(!polygon) return;
 		for(const path of polygon) {
 			for(let i = 0; i < path.length; i++) {
 				const p1 = path[i], p2 = path[(i + 1) % path.length];
-				lines.push([type, p1.x, p1.y, p2.x, p2.y]);
+				set.push([type, p1.x, p1.y, p2.x, p2.y]);
 			}
+		}
+	}
+
+	function addLines(set: CPLine[], lines: ILine[], type: CreaseType): void {
+		for(const line of lines) {
+			const [p1, p2] = line;
+			set.push([type, p1.x, p1.y, p2.x, p2.y]);
 		}
 	}
 }

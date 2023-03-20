@@ -79,7 +79,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		const prototype = design.$prototype;
 		const tree = design.tree;
 
-		this._updateJunctions(model);
+		this.invalidCount += this._updateJunctions(model);
 
 		// Update contours
 		for(const tag in model.graphics) {
@@ -223,17 +223,18 @@ export class Layout extends View implements ISerializable<JLayout> {
 		}
 	}
 
-	private _updateJunctions(model: UpdateModel): void {
+	private _updateJunctions(model: UpdateModel): number {
 		const junctionLayer = this.$sheet.$layers[Layer.$junction];
 		const max = ProjectService.scale.value;
 		this._scale = max;
+		let delta = 0;
 		for(const tag in model.add.junctions) {
 			let junction = this.$junctions.get(tag);
 			if(!junction) {
 				junction = new Junction(model.add.junctions[tag]);
 				this.$junctions.set(tag, junction);
 				junctionLayer.addChild(junction);
-				this.invalidCount++;
+				delta++;
 			} else {
 				junction.$polygon = model.add.junctions[tag];
 			}
@@ -241,11 +242,12 @@ export class Layout extends View implements ISerializable<JLayout> {
 		}
 		for(const tag of model.remove.junctions) {
 			const junction = this.$junctions.get(tag)!;
-			this.invalidCount--;
+			delta--;
 			this.$junctions.delete(tag);
 			junctionLayer.removeChild(junction);
 			junction.destroy();
 		}
+		return delta;
 	}
 
 	/** Redraw the junctions when scale changes */

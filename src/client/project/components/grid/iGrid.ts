@@ -15,6 +15,9 @@ export interface IGrid extends ISerializable<JSheet> {
 	/** The type of the grid. */
 	readonly type: GridType;
 
+	/** The maximal size allowed inside the grid. */
+	readonly diameter: number;
+
 	/** Decide the label direction by coordinates. */
 	$getLabelDirection(x: number, y: number): Direction;
 

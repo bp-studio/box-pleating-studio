@@ -52,12 +52,12 @@ export abstract class Region {
 			for(const r of this.$shape.ridges) {
 				const j = r.$intersection(p, dir);
 				if(j && !j.eq(intersections[0])) intersections.push(j);
-				if(intersections.length == 2) break;
-			}
 
-			// An axis parallel crease would not intersect a region more than twice.
-			if(intersections.length == 2) {
-				ap.push(new Line(...intersections as [Point, Point]));
+				// An axis parallel crease would not intersect a region more than twice.
+				if(intersections.length == 2) {
+					ap.push(new Line(...intersections as [Point, Point]));
+					break;
+				}
 			}
 		}
 		return ap;

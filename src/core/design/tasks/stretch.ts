@@ -106,7 +106,7 @@ function getUncoveredJunctions(junctions: ValidJunction[]): ValidJunction[] {
 	if(junctions.length === 1) return junctions;
 	const keys = new Set<number>();
 	junctions.forEach(j => keys.add(getKey(j.$a.id, j.$b.id)));
-	foreachPair(junctions, (j1, j2) => checkCovering(j1, j2, keys));
+	foreachPair(junctions, (j1, j2) => checkGeometricalCovering(j1, j2, keys));
 	return junctions.filter(j => !j.$isCovered);
 }
 
@@ -148,7 +148,7 @@ function getValidJunctions(): ValidJunction[] {
 }
 
 /** Check if two {@link Junction}s have a covering relation. */
-function checkCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): void {
+function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): void {
 	const n = getPathIntersectionDistances(j1, j2);
 	if(!n) return;
 	const r1 = j1.$getBaseRectangle(n[0]);
@@ -156,12 +156,12 @@ function checkCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>):
 
 	if(r1.eq(r2)) {
 		// If they are the same size, the near one covers the far one.
-		if(j1.$isCloserThan(j2)) j2.$setCoveredBy(j1);
-		else j1.$setCoveredBy(j2);
+		if(j1.$isCloserThan(j2)) j2.$setGeometricallyCoveredBy(j1);
+		else j1.$setGeometricallyCoveredBy(j2);
 	} else if(r1.$contains(r2)) {
-		if(!checkCoveringException(j1, j2, keys)) j2.$setCoveredBy(j1);
+		if(!checkCoveringException(j1, j2, keys)) j2.$setGeometricallyCoveredBy(j1);
 	} else if(r2.$contains(r1)) {
-		if(!checkCoveringException(j1, j2, keys)) j1.$setCoveredBy(j2);
+		if(!checkCoveringException(j1, j2, keys)) j1.$setGeometricallyCoveredBy(j2);
 	}
 }
 

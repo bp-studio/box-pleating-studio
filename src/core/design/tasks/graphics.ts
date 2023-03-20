@@ -19,11 +19,13 @@ export const graphicsTask = new Task(graphics);
 function graphics(): void {
 	for(const node of State.$contourWillChange) {
 		//TODO: combine rough contours and pattern contours
-		node.$contours = node.$roughContours;
+		node.$graphics.$contours = node.$graphics.$roughContours;
+
+		node.$graphics.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node);
 
 		State.$updateResult.graphics[node.$tag] = {
-			contours: node.$contours,
-			ridges: node.$isLeaf ? flapRidge(node) : riverRidge(node),
+			contours: node.$graphics.$contours,
+			ridges: node.$graphics.$ridges,
 		};
 	}
 }
@@ -33,6 +35,8 @@ function flapRidge(node: ITreeNode): ILine[] {
 	const c = node.$AABB.$toPath();
 	const ridges: ILine[] = [];
 	for(let i = 0; i < quadrantNumber; i++) {
+		//TODO: skip quadrants with patterns.
+
 		const p1 = p[i], p2 = p[(i + 1) % quadrantNumber], c1 = c[i];
 		if(!same(p1, p2)) ridges.push([p1, p2]);
 		ridges.push([p1, c1]);
@@ -47,7 +51,7 @@ function flapRidge(node: ITreeNode): ILine[] {
 function riverRidge(node: ITreeNode): ILine[] {
 	const ridges: ILine[] = [];
 	const width = node.$length;
-	for(const contour of node.$contours) {
+	for(const contour of node.$graphics.$contours) {
 		// It is possible that a contour of a river has no holes in invalid layouts.
 		// In that case adding ridges doesn't make sense either, so skip the rest.
 		if(!contour.inner) continue;

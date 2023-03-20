@@ -50,6 +50,7 @@ export function svg(proj: Project, includeHidden: boolean): Blob {
 // Headers
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/** Generate the CSS rules. */
 function getStyle(): string {
 	const { border, hinge, ridge, junction, grid, shade, label, edge, vertex, dot, axisParallel } = style;
 	const s = ProjectService.scale.value;
@@ -77,10 +78,12 @@ function getStyle(): string {
 	return `<style>${result}</style>`;
 }
 
+/** Generate the border clipping. */
 function getClip(clipPath: string): string {
 	return `<defs><clipPath id="clip"><path d="${clipPath}" /></clipPath></defs>`;
 }
 
+/** The global transformation. */
 function getTransform(sheet: Sheet, height: number): string {
 	const s = ProjectService.scale.value;
 	const horOffset = sheet.$horizontalMargin.value;
@@ -157,7 +160,7 @@ function getAxisParallelLayer(design: Design): string {
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "axis-parallel";
-	//TODO
+	//TODO: Add axis-parallel creases.
 	return layer(graphics.$get(), true, hidden);
 }
 

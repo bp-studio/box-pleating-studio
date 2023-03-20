@@ -9,6 +9,7 @@ import { Independent } from "client/base/independent";
 import { Direction, quadrantNumber } from "shared/types/direction";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
+import { shallowRef } from "client/shared/decorators";
 
 import type { LabelView } from "client/utils/label";
 import type { GraphicsLike, SmoothGraphicsLike } from "client/utils/contourUtil";
@@ -34,8 +35,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public readonly id: number;
 
 	public $graphics: GraphicsData;
-	private _width: number = 0;
-	private _height: number = 0;
+	@shallowRef private _width: number = 0;
+	@shallowRef private _height: number = 0;
 
 	/**
 	 * The parameters used for the drawing process.
@@ -91,8 +92,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 			id: this.id,
 			x: this.$location.x,
 			y: this.$location.y,
-			width: this.width,
-			height: this.height,
+			width: this._width,
+			height: this._height,
 		};
 	}
 
@@ -121,7 +122,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return this._height;
 	}
 	public set height(v: number) {
-		if(v < 0 || !this._testResize(this.width, v)) return;
+		if(v < 0 || !this._testResize(this._width, v)) return;
 		this._height = v;
 		this._layout.$updateFlap(this);
 	}
@@ -131,7 +132,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return this._width;
 	}
 	public set width(v: number) {
-		if(v < 0 || !this._testResize(v, this.height)) return;
+		if(v < 0 || !this._testResize(v, this._height)) return;
 		this._width = v;
 		this._layout.$updateFlap(this);
 	}
@@ -161,7 +162,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		const w = this.width, h = this.height;
+		const w = this._width, h = this._height;
 		const zeroWidth = w === 0;
 		const zeroHeight = h === 0;
 		const { x, y } = this.$location;
@@ -209,7 +210,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Update {@link _drawParams}.
+	 * Update {@link _drawParams} and return it.
 	 *
 	 * The moment of calling this method is critical;
 	 * it needs to be exactly at the moment data is sent to the Core.

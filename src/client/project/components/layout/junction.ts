@@ -26,6 +26,7 @@ export class Junction extends SmoothGraphics {
 	}
 
 	public $draw(maxWidth: number, target: SmoothGraphicsLike = this): void {
+		const color = style.junction.color;
 		target.clear();
 		for(const path of this.$polygon) {
 			if(!path.length) return;
@@ -35,14 +36,14 @@ export class Junction extends SmoothGraphics {
 			if(narrowness < THRESHOLD) {
 				target.lineStyle({
 					width: Math.min(2 / narrowness, maxWidth),
-					color: style.junction.color,
 					join: "bevel" as LINE_JOIN,
+					color,
 				});
 			} else {
 				target.lineStyle(0);
 			}
 
-			target.beginFill(style.junction.color);
+			target.beginFill(color);
 			target.moveTo(path[0].x, path[0].y);
 			for(let i = 1; i < path.length; i++) {
 				const p = path[i];

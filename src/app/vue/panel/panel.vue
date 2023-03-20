@@ -1,15 +1,16 @@
 <template>
 	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.passive="hide"></div>
 	<aside class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
-		<template v-if="Studio.project">
-			<Design v-if="Studio.selections.length == 0" :design="Studio.project.design" />
+		<template v-if="design">
+			<Design v-if="Studio.selections.length == 0" :design="design" />
 			<div v-else-if="Studio.selections.length == 1">
 				<Repository v-if="repository" :repository="repository" />
+				<component v-else-if="type == 'Flap'" :is="Flap" :subject="Studio.selection" :max="design.sheet.grid.diameter" />
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
-				<Flaps v-if="type == 'Flap'" :design="Studio.project.design" />
-				<Vertices v-if="type == 'Vertex'" :design="Studio.project.design" />
+				<Flaps v-if="type == 'Flap'" :design="design" />
+				<Vertices v-if="type == 'Vertex'" :design="design" />
 			</div>
 		</template>
 	</aside>
@@ -45,6 +46,7 @@
 
 	const panel = shallowRef<HTMLDivElement>();
 
+	//TODO: repository
 	const repository = null;
 	//		public get repository(): BP.Repository | null {
 	// 			return core.initialized && this.bp.getRepository() || null;
@@ -52,8 +54,9 @@
 
 	const componentMap: Record<string, Component> = { Vertex, Edge, Flap, River };
 	const type = computed(() => Studio.selections[0]?.type ?? "");
+	const design = computed(() => Studio.project?.design);
 
-	watch(() => Studio.project?.design.mode, () => {
+	watch(() => design.value?.mode, () => {
 		// If any text fields are in used during view switching, unfocus it.
 		const el = document.activeElement as HTMLElement;
 		if(el && panel.value?.contains(el)) el.blur();

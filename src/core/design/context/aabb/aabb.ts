@@ -79,8 +79,8 @@ export class AABB {
 		return this._sides.map(s => s.$value);
 	}
 
-	public $toRoundedRect(extra: number): IRoundedRect {
-		const radius = this._sides[Side._top].$margin + extra;
+	public $toRoundedRect(extraUnits: number): IRoundedRect {
+		const radius = this._sides[Side._top].$margin + extraUnits;
 		const [t, r, b, l] = this._sides.map(s => s.$value);
 		return {
 			x: l,

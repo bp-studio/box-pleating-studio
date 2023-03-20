@@ -12,7 +12,7 @@ import type { Configuration } from "../configuration";
 //=================================================================
 export class Pattern implements ISerializable<JPattern> {
 
-	//TODO
+	//TODO: Complete the logic of deciding validity of a pattern (whether it actually fits the layout)
 	public $valid: boolean = true;
 
 	private _devices: readonly Device[];

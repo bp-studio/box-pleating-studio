@@ -55,7 +55,7 @@ export class ValidJunction implements ISerializable<JJunction> {
 	private readonly _f: IPoint;
 
 	/** All {@link ValidJunction}s that covers self geometrically. */
-	private readonly _coveredBy: ValidJunction[] = [];
+	private readonly _geometricallyCoveredBy: ValidJunction[] = [];
 
 	constructor(a: ITreeNode, b: ITreeNode, data: ValidJunctionData) {
 		this.$a = a;
@@ -104,20 +104,20 @@ export class ValidJunction implements ISerializable<JJunction> {
 	 */
 	public get $isCovered(): boolean {
 		if(this._isCovered === undefined) {
-			this._isCovered = this._coveredBy.some(j => !j.$isCovered);
+			this._isCovered = this._geometricallyCoveredBy.some(j => !j.$isCovered);
 		}
 		return this._isCovered;
 	}
 	private _isCovered: boolean | undefined;
 
-	/** Signal a covering. */
-	public $setCoveredBy(that: ValidJunction): void {
-		this._coveredBy.push(that);
+	/** Signal a geometrical covering. */
+	public $setGeometricallyCoveredBy(that: ValidJunction): void {
+		this._geometricallyCoveredBy.push(that);
 	}
 
 	/** Clear covering data. */
 	public $resetCovering(): void {
-		this._coveredBy.length = 0;
+		this._geometricallyCoveredBy.length = 0;
 		this._isCovered = undefined;
 	}
 

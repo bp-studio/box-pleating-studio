@@ -46,6 +46,10 @@ export class RectangularGrid implements IGrid {
 	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public get diameter(): number {
+		return Math.max(this._height, this._width);
+	}
+
 	public get height(): number {
 		return this._height;
 	}

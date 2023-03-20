@@ -1,4 +1,4 @@
-import { computed, reactive, readonly } from "vue";
+import { computed, readonly } from "vue";
 
 import { BLACK, BLUE, CHARCOAL, DANGER, DARK, GREEN, LIGHT, LIGHT_GREEN, RED, WHITE } from "client/shared/constant";
 
@@ -77,4 +77,4 @@ namespace Style {
 	};
 }
 
-export const style = readonly(reactive(Style));
+export const style = readonly(Style);

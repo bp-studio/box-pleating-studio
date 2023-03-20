@@ -46,6 +46,10 @@ export class DiagonalGrid implements IGrid {
 	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public get diameter(): number {
+		return this._size;
+	}
+
 	public get size(): number {
 		return this._size;
 	}

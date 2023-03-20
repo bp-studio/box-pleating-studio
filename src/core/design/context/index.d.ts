@@ -1,4 +1,4 @@
-import type { Contour } from "shared/types/geometry";
+import type { Contour, ILine } from "shared/types/geometry";
 import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
@@ -42,9 +42,21 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	readonly $isLeaf: boolean;
 	readonly $AABB: AABB;
 	readonly $tag: string;
-	$roughContours: Contour[];
-	$contours: Contour[];
+	readonly $graphics: NodeGraphics;
 
 	/** Set the position by a given {@link JFlap} */
 	$setFlap(flap: JFlap): void;
+}
+
+export interface NodeGraphics {
+	/** The contours without considering patterns. */
+	$roughContours: Contour[];
+
+	$patternContours: unknown[];
+
+	/** The final contours. */
+	$contours: Contour[];
+
+	/** All ridge creases. */
+	$ridges: ILine[];
 }

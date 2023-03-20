@@ -2,9 +2,8 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 
-import type { Contour, Polygon } from "shared/types/geometry";
 import type { JEdge, JFlap } from "shared/json";
-import type { ITreeNode } from ".";
+import type { ITreeNode, NodeGraphics } from ".";
 import type { Tree } from "./tree";
 
 //=================================================================
@@ -37,11 +36,7 @@ export class TreeNode implements ITreeNode {
 	/** All child nodes. Implemented using maximal heap. */
 	public $children = new MutableHeap<TreeNode>((a, b) => b.$height - a.$height);
 
-	/** The contours without considering patterns. */
-	public $roughContours!: Contour[];
-
-	/** The final contours. */
-	public $contours!: Contour[];
+	public readonly $graphics: NodeGraphics = {} as NodeGraphics;
 
 	/** The length of its parent edge. */
 	public $length: number = 0;
