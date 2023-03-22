@@ -51,6 +51,14 @@ namespace LayoutController {
 			addPolygon(lines, node.$graphics.$contours.map(c => c.outer), CreaseType.Auxiliary);
 			addLines(lines, node.$graphics.$ridges, CreaseType.Mountains);
 		}
+		for(const stretch of State.$stretches.values()) {
+			const pattern = stretch.$repo.$pattern;
+			if(!pattern) continue;
+			for(const device of pattern.$devices) {
+				addLines(lines, device.$ridges, CreaseType.Mountains);
+				addLines(lines, device.$axisParallels, CreaseType.Valley);
+			}
+		}
 		return clip.$get(lines);
 	}
 
@@ -64,7 +72,7 @@ namespace LayoutController {
 		}
 	}
 
-	function addLines(set: CPLine[], lines: ILine[], type: CreaseType): void {
+	function addLines(set: CPLine[], lines: readonly ILine[], type: CreaseType): void {
 		for(const line of lines) {
 			const [p1, p2] = line;
 			set.push([type, p1.x, p1.y, p2.x, p2.y]);

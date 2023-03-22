@@ -30,7 +30,6 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 
 	constructor(data: JPiece) {
 		super();
-		console.log(data);
 		this.ox = data.ox;
 		this.oy = data.oy;
 		this.u = data.u;

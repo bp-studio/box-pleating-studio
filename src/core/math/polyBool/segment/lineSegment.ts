@@ -16,6 +16,8 @@ export class LineSegment implements ISegment {
 	public readonly $polygon: number = 0; // Doesn't matter
 	public $start: IPoint;
 	public $end: IPoint;
+	private readonly _isHorizontal: boolean;
+	private readonly _isVertical: boolean;
 
 	/**
 	 * The equation of the line in the form `ax + by + c = 0`.
@@ -33,6 +35,8 @@ export class LineSegment implements ISegment {
 			start.x - end.x,
 			start.y * end.x - start.x * end.y,
 		];
+		this._isHorizontal = Math.abs(this.$coefficients[0]) < EPSILON;
+		this._isVertical = Math.abs(this.$coefficients[1]) < EPSILON;
 	}
 
 	/**
@@ -41,8 +45,8 @@ export class LineSegment implements ISegment {
 	 */
 	public $containsPtOnLine(point: IPoint, endPoints: boolean): boolean {
 		const threshold = endPoints ? EPSILON : -EPSILON;
-		return (point.x - this.$start.x) * (point.x - this.$end.x) < threshold ||
-			(point.y - this.$start.y) * (point.y - this.$end.y) < threshold;
+		return !this._isVertical && (point.x - this.$start.x) * (point.x - this.$end.x) < threshold ||
+			!this._isHorizontal && (point.y - this.$start.y) * (point.y - this.$end.y) < threshold;
 	}
 
 	public $subdivide(point: IPoint, oriented: boolean): ISegment {
