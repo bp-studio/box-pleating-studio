@@ -11,6 +11,7 @@ import { Junction } from "./junction";
 import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
 import { style } from "client/services/styleService";
+import { Stretch } from "./stretch";
 
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
@@ -37,6 +38,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public readonly $flaps: Map<number, Flap> = new Map();
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
+	public readonly $stretches: Map<string, Stretch> = new Map();
 
 	/** The flaps that are about to be updated. */
 	private readonly _pendingUpdate = new Set<Flap>();
@@ -66,7 +68,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		return {
 			sheet: this.$sheet.toJSON(),
 			flaps: [...this.$flaps.values()].map(f => f.toJSON()),
-			stretches: [],
+			stretches: [...this.$stretches.values()].map(s => s.toJSON()),
 		};
 	}
 
@@ -89,22 +91,8 @@ export class Layout extends View implements ISerializable<JLayout> {
 			}
 		}
 
-		for(const f of this.$flaps.values()) {
-			const vertex = tree.$vertices[f.id];
-			const edgeDisposed = !f.$edge.$v1; // The original flap is split
-			if(!vertex || !vertex.isLeaf || edgeDisposed) {
-				if(vertex) {
-					if(edgeDisposed) {
-						prototype.layout.flaps.push(f.toJSON());
-						model.graphics["f" + f.id] ||= f.$graphics;
-					} else {
-						// A flap turns into a river
-						model.add.edges.push(f.$edge.toJSON());
-					}
-				}
-				this._removeFlap(f.id);
-			}
-		}
+		this._updateStretches(model);
+		this._removeFlaps(model);
 		for(const r of this.$rivers.values()) {
 			const v = r.$edge.$getLeaf();
 			if(v) this._removeRiver(r); // A river turns into a flap
@@ -184,6 +172,28 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$sheet.$addChild(flap);
 	}
 
+	private _removeFlaps(model: UpdateModel): void {
+		const design = this.$project.design;
+		const prototype = design.$prototype;
+		const tree = design.tree;
+		for(const f of this.$flaps.values()) {
+			const vertex = tree.$vertices[f.id];
+			const edgeDisposed = !f.$edge.$v1; // The original flap is split
+			if(!vertex || !vertex.isLeaf || edgeDisposed) {
+				if(vertex) {
+					if(edgeDisposed) {
+						prototype.layout.flaps.push(f.toJSON());
+						model.graphics["f" + f.id] ||= f.$graphics;
+					} else {
+						// A flap turns into a river
+						model.add.edges.push(f.$edge.toJSON());
+					}
+				}
+				this._removeFlap(f.id);
+			}
+		}
+	}
+
 	private _removeFlap(id: number): void {
 		const flap = this.$flaps.get(id)!;
 		this.$sheet.$removeChild(flap);
@@ -205,6 +215,27 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$sheet.$removeChild(river);
 		this.$rivers.delete(river.$edge.$v1.id, river.$edge.$v2.id);
 		river.$dispose();
+	}
+
+	private _updateStretches(model: UpdateModel): void {
+		for(const tag in model.add.stretches) {
+			const data = model.add.stretches[tag];
+			let stretch = this.$stretches.get(tag);
+			if(stretch) {
+				stretch.$update(data, model);
+			} else {
+				stretch = new Stretch(this, data, model);
+				this.$stretches.set(tag, stretch);
+				this.$sheet.$addChild(stretch);
+			}
+		}
+		for(const tag of model.remove.stretches) {
+			const stretch = this.$stretches.get(tag);
+			if(!stretch) continue;
+			this.$stretches.delete(tag);
+			this.$sheet.$removeChild(stretch);
+			stretch.$dispose();
+		}
 	}
 
 	private _getEdgeTag(e: JEdgeBase): string {

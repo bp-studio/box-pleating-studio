@@ -2,6 +2,7 @@ import { Partition } from "./partition";
 import { Store } from "./store";
 import { patternGenerator } from "./generators/patternGenerator";
 
+import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { JConfiguration, JJunction, JPartition } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
@@ -15,13 +16,15 @@ import type { Pattern } from "./pattern/pattern";
 
 export class Configuration implements ISerializable<JConfiguration> {
 
+	public readonly $repo: Repository;
 	public readonly $partitions: readonly Partition[];
 	private readonly _patterns: Store<Pattern>;
 	public $index: number = 0;
 
-	constructor(junctions: JJunction[], partitions: JPartition[]) {
+	constructor(repo: Repository, junctions: JJunction[], partitions: JPartition[]) {
+		this.$repo = repo;
 		this.$partitions = partitions.map(p => new Partition(junctions, p));
-		this._patterns = new Store(patternGenerator(this.$partitions));
+		this._patterns = new Store(patternGenerator(this));
 		this._patterns.$next();
 	}
 

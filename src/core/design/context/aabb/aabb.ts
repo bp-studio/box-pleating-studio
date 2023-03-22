@@ -127,11 +127,12 @@ export class AABB {
 	}
 }
 
+/** Four corners in the order of quadrants. */
 export function toCorners([t, r, b, l]: number[]): Path {
 	return [
-		{ x: l, y: b },
-		{ x: r, y: b },
 		{ x: r, y: t },
 		{ x: l, y: t },
+		{ x: l, y: b },
+		{ x: r, y: b },
 	];
 }

@@ -12,18 +12,21 @@ import type { Configuration } from "../configuration";
 //=================================================================
 export class Pattern implements ISerializable<JPattern> {
 
+	public readonly $config: Configuration;
+
 	//TODO: Complete the logic of deciding validity of a pattern (whether it actually fits the layout)
 	public $valid: boolean = true;
 
-	private _devices: readonly Device[];
+	public $devices: readonly Device[];
 
-	constructor(devices: JDevice[]) {
-		this._devices = devices.map(d => new Device(d));
+	constructor(config: Configuration, devices: JDevice[]) {
+		this.$config = config;
+		this.$devices = devices.map(d => new Device(this, d));
 	}
 
 	public toJSON(): JPattern {
 		return {
-			devices: this._devices.map(d => d.toJSON()),
+			devices: this.$devices.map(d => d.toJSON()),
 		};
 	}
 }

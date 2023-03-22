@@ -15,7 +15,7 @@ import type { ValidJunction } from "./junction/validJunction";
 
 export class Stretch implements ISerializable<JStretch> {
 
-	private readonly _id: string;
+	public readonly $id: string;
 
 	/** {@link Repository} cache during dragging. */
 	private readonly _repoCache = new Map<string, Repository>();
@@ -25,17 +25,21 @@ export class Stretch implements ISerializable<JStretch> {
 
 	constructor(junctions: ValidJunction[], prototype: JStretch) {
 		const signature = getStructureSignature(junctions);
-		this._id = prototype.id;
-		this._repo = new Repository(junctions, signature);
+		this.$id = prototype.id;
+		this._repo = new Repository(this, junctions, signature);
 	}
 
 	public toJSON(): JStretch {
 		const configuration = this._repo.$configuration;
 		return {
-			id: this._id,
+			id: this.$id,
 			configuration: configuration?.toJSON(),
 			pattern: configuration?.$pattern?.toJSON(),
 		};
+	}
+
+	public get $repo(): Repository {
+		return this._repo;
 	}
 
 	/**
@@ -50,10 +54,11 @@ export class Stretch implements ISerializable<JStretch> {
 			const repo = this._repoCache.get(signature);
 			if(repo) {
 				this._repo = repo;
+				State.$repoUpdated.add(repo);
 				return;
 			}
 		}
-		this._repo = new Repository(junctions, signature);
+		this._repo = new Repository(this, junctions, signature);
 	}
 
 	/** Clear {@link Repository} cache. */

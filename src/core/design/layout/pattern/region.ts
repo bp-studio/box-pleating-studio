@@ -1,5 +1,6 @@
 import { Fraction } from "core/math/fraction";
 import { Line } from "core/math/geometry/line";
+import { cache } from "core/utils/cache";
 
 import type { Point } from "core/math/geometry/point";
 import type { Vector } from "core/math/geometry/vector";
@@ -29,7 +30,7 @@ export abstract class Region {
 	/** The direction {@link Vector} of axis-parallel creases. */
 	public abstract get $direction(): Vector;
 
-	public get $axisParallels(): readonly Line[] {
+	@cache public get $axisParallels(): readonly Line[] {
 		const ref = this.$shape.contour.find(p => p.$isIntegral)!;
 
 		// find the range of axis-parallel creases

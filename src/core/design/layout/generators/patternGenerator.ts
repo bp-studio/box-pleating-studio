@@ -1,5 +1,6 @@
 import { Pattern } from "../pattern/pattern";
 
+import type { Configuration } from "../configuration";
 import type { JDevice } from "shared/json";
 import type { Partition } from "../partition";
 
@@ -9,10 +10,10 @@ import type { Partition } from "../partition";
  * and combine them into {@link Pattern}s.
  */
 //=================================================================
-export function* patternGenerator(partitions: readonly Partition[]): Generator<Pattern> {
-	const buffer: JDevice[] = new Array(partitions.length);
-	for(const devices of recursiveDeviceGenerator(partitions, 0, buffer)) {
-		const pattern = new Pattern(devices);
+export function* patternGenerator(config: Configuration): Generator<Pattern> {
+	const buffer: JDevice[] = new Array(config.$partitions.length);
+	for(const devices of recursiveDeviceGenerator(config.$partitions, 0, buffer)) {
+		const pattern = new Pattern(config, devices);
 		if(pattern.$valid) yield pattern;
 	}
 }

@@ -160,6 +160,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		node.$length = length;
 		node.$AABB.$setMargin(length);
 		State.$lengthChanged.add(node);
+		State.$treeStructureChanged = true;
 		if(node.$isLeaf) State.$flapAABBChanged.add(node);
 	}
 

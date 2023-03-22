@@ -15,4 +15,9 @@ interface IDimension {
 	height: number;
 }
 
+interface ISignPoint {
+	readonly x: Sign;
+	readonly y: Sign;
+}
+
 type Sign = 0 | 1 | -1;

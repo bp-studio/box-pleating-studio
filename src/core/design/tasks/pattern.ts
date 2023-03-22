@@ -13,5 +13,39 @@ import type { Pattern } from "../layout/pattern/pattern";
 export const patternTask = new Task(pattern, patternContourTask);
 
 function pattern(): void {
-	for(const repo of State.$newRepositories.values()) repo.$init();
+	for(const repo of State.$newRepositories) repo.$init();
+	for(const repo of State.$repoUpdated) {
+		const id = repo.$stretch.$id;
+		if(repo.$pattern) {
+			State.$updateResult.add.stretches[id] = {
+				data: repo.$stretch.toJSON(),
+			};
+			for(const [i, device] of repo.$pattern.$devices.entries()) {
+				State.$updateResult.graphics["s" + id + "." + i] = {
+					contours: [],
+					ridges: device.$ridges,
+					axisParallel: device.$axisParallels,
+				};
+			}
+			for(const n of repo.$nodes) {
+				State.$contourWillChange.add(State.$tree.$nodes[n]!);
+			}
+		} else {
+			State.$updateResult.remove.stretches.push(id);
+		}
+	}
+
+	for(const s of State.$stretches.values()) {
+		if(!s.$repo.$pattern) continue;
+		for(const id of s.$repo.$nodes) State.$patternDiff.$add(id);
+
+		// Collect patterned quadrants
+		for(const q of s.$repo.$quadrants) {
+			State.$patternedQuadrants.add(q);
+		}
+	}
+
+	for(const id of State.$patternDiff.$diff()) {
+		State.$contourWillChange.add(State.$tree.$nodes[id]!);
+	}
 }

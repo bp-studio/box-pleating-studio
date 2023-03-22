@@ -28,6 +28,9 @@ function graphics(): void {
 			ridges: node.$graphics.$ridges,
 		};
 	}
+
+	// Pass the updated structure to the client.
+	if(State.$treeStructureChanged) State.$updateResult.tree = State.$tree.toJSON();
 }
 
 function flapRidge(node: ITreeNode): ILine[] {
@@ -35,11 +38,12 @@ function flapRidge(node: ITreeNode): ILine[] {
 	const c = node.$AABB.$toPath();
 	const ridges: ILine[] = [];
 	for(let i = 0; i < quadrantNumber; i++) {
-		//TODO: skip quadrants with patterns.
-
 		const p1 = p[i], p2 = p[(i + 1) % quadrantNumber], c1 = c[i];
 		if(!same(p1, p2)) ridges.push([p1, p2]);
-		ridges.push([p1, c1]);
+
+		// Skip quadrants with patterns.
+		const q = node.id << 2 | i;
+		if(!State.$patternedQuadrants.has(q)) ridges.push([p1, c1]);
 	}
 	return ridges;
 }

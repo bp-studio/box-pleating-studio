@@ -29,7 +29,7 @@ export function createJunction(a: ITreeNode, b: ITreeNode, lca: ITreeNode): Junc
 
 	const s = { x: sx, y: sy };
 	const o = { x: d - sx, y: d - sy };
-	const f = { x: Math.sign(x), y: Math.sign(y) };
+	const f = { x: Math.sign(x), y: Math.sign(y) } as ISignPoint;
 	const dir: QuadrantDirection = (f.x == f.y ? 0 : 1) + (y > 0 ? 0 : 2);
 
 	let tip: IPoint;

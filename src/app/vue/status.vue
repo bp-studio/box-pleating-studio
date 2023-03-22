@@ -15,6 +15,7 @@
 					{{ $t("panel.rivers.type") }}: {{ Studio.project.design.layout.riverCount }}
 				</div>
 				<div style="width: 200px;" v-if="Studio.project.design.layout.invalidCount">
+					<span class="text-danger"><i class="fas fa-exclamation-triangle" /></span>
 					{{ $t("status.invalid") }}: {{ Studio.project.design.layout.invalidCount }}
 				</div>
 			</template>

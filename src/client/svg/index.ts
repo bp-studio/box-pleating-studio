@@ -152,6 +152,11 @@ function getRidgeLayer(design: Design): string {
 	for(const obj of objects) {
 		drawLines(graphics, obj.$graphics.ridges);
 	}
+	for(const stretch of design.layout.$stretches.values()) {
+		for(const device of stretch.$devices) {
+			drawLines(graphics, device.$graphics.ridges);
+		}
+	}
 	return layer(graphics.$get(), true, hidden);
 }
 
@@ -160,7 +165,11 @@ function getAxisParallelLayer(design: Design): string {
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "axis-parallel";
-	//TODO: Add axis-parallel creases.
+	for(const stretch of design.layout.$stretches.values()) {
+		for(const device of stretch.$devices) {
+			drawLines(graphics, device.$graphics.axisParallel!);
+		}
+	}
 	return layer(graphics.$get(), true, hidden);
 }
 

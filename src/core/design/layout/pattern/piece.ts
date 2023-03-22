@@ -3,6 +3,7 @@ import { Region } from "./region";
 import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
+import { cache } from "core/utils/cache";
 
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
@@ -29,6 +30,7 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 
 	constructor(data: JPiece) {
 		super();
+		console.log(data);
 		this.ox = data.ox;
 		this.oy = data.oy;
 		this.u = data.u;
@@ -56,12 +58,12 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		];
 	}
 
-	public get $direction(): Vector {
+	@cache public get $direction(): Vector {
 		const { oy, v } = this;
 		return new Vector(oy + v, v).$doubleAngle().$reduceToInt();
 	}
 
-	public get $shape(): IRegionShape {
+	@cache public get $shape(): IRegionShape {
 		const contour = this._points.concat();
 		const ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
 		// (this.detours || []).forEach(d => this._processDetour(ridges, contour, d));

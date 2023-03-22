@@ -3,6 +3,8 @@ import { Fraction } from "../fraction";
 import { Matrix } from "./matrix";
 import { Vector } from "./vector";
 
+import type { ILine } from "shared/types/geometry";
+
 /** Take the next integer of `x` in the direction of `f`. */
 function int(x: number, f: number): number {
 	return f > 0 ? Math.ceil(x) : Math.floor(x);
@@ -31,6 +33,10 @@ export class Line {
 	 * Could be used as a signature.
 	 */
 	public toString(): string { return [this.p1, this.p2].sort().toString(); }
+
+	public $toILine(): ILine {
+		return [this.p1.$toIPoint(), this.p2.$toIPoint()];
+	}
 
 	public get $isDegenerated(): boolean { return this.p1.eq(this.p2); }
 

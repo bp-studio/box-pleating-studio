@@ -1,6 +1,7 @@
 import { Rectangle } from "core/math/geometry/rectangle";
 import { opposite } from "shared/types/direction";
 import { CornerType } from "shared/json/enum";
+import { cache } from "core/utils/cache";
 
 import type { JJunction } from "shared/json";
 import type { ITreeNode } from "core/design/context";
@@ -10,7 +11,7 @@ interface ValidJunctionData {
 	lca: ITreeNode;
 	s: IPoint;
 	o: IPoint;
-	f: IPoint;
+	f: ISignPoint;
 	dir: QuadrantDirection;
 	tip: IPoint;
 }
@@ -48,11 +49,11 @@ export class ValidJunction implements ISerializable<JJunction> {
 	/** The dimension of the overlapping region. */
 	public readonly $o: IPoint;
 
-	/** The tip corresponding to {@link $a}. */
-	private readonly _tip: IPoint;
-
 	/** Coefficient of transformation. */
-	private readonly _f: IPoint;
+	public readonly $f: ISignPoint;
+
+	/** The tip corresponding to {@link $a}. */
+	public readonly $tip: IPoint;
 
 	/** All {@link ValidJunction}s that covers self geometrically. */
 	private readonly _geometricallyCoveredBy: ValidJunction[] = [];
@@ -64,8 +65,8 @@ export class ValidJunction implements ISerializable<JJunction> {
 		this.$lca = data.lca;
 		this.$s = data.s;
 		this.$o = data.o;
-		this._f = data.f;
-		this._tip = data.tip;
+		this.$f = data.f;
+		this.$tip = data.tip;
 
 		this.$q1 = a.id << 2 | data.dir;
 		this.$q2 = b.id << 2 | opposite(data.dir);
@@ -91,7 +92,7 @@ export class ValidJunction implements ISerializable<JJunction> {
 
 	public get $orientedIds(): [number, number] {
 		const [a, b] = [this.$a.id, this.$b.id];
-		return this._f.x > 0 ? [a, b] : [b, a];
+		return this.$f.x > 0 ? [a, b] : [b, a];
 	}
 
 	/**
@@ -128,9 +129,24 @@ export class ValidJunction implements ISerializable<JJunction> {
 
 	/** Based on the given canonical distance to get the comparison rectangle. */
 	public $getBaseRectangle(distanceToA: number): Rectangle {
-		const x = this._tip.x + distanceToA * this._f.x;
-		const y = this._tip.y + distanceToA * this._f.y;
-		return new Rectangle({ x, y }, { x: x - this.$o.x * this._f.x, y: y - this.$o.y * this._f.y });
+		const x = this.$tip.x + distanceToA * this.$f.x;
+		const y = this.$tip.y + distanceToA * this.$f.y;
+		return new Rectangle({ x, y }, { x: x - this.$o.x * this.$f.x, y: y - this.$o.y * this.$f.y });
+	}
+
+	@cache public get $path(): number[] {
+		let a = this.$a, b = this.$b;
+		const result = [a.id, b.id];
+		while(a !== b) {
+			if(a.$dist >= b.$dist) {
+				a = a.$parent!;
+				if(a.$parent) result.push(a.id);
+			} else {
+				b = b.$parent!;
+				if(b.$parent) result.push(b.id);
+			}
+		}
+		return result;
 	}
 }
 

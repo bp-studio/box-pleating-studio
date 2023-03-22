@@ -36,17 +36,17 @@ interface GraphicsData {
 	 * Shaded region upon selection.
 	 * For flaps and rivers, this also defines the hinges.
 	 */
-	contours: Contour[];
+	contours: readonly Contour[];
 
 	/**
 	 * All ridges that should be drawn.
 	 */
-	ridges: ILine[];
+	ridges: readonly ILine[];
 
 	/**
 	 * All axis-parallel creases. Only for {@link Device}s.
 	 */
-	axisParallel?: ILine[];
+	axisParallel?: readonly ILine[];
 }
 
 interface StretchData {

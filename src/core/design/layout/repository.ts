@@ -2,7 +2,11 @@ import { State } from "core/service/state";
 import { Store } from "./store";
 import { generalConfigGenerator } from "./generators/generalConfigGenerator";
 import { singleConfigGenerator } from "./generators/singleConfigGenerator";
+import { Point } from "core/math/geometry/point";
+import { distinct } from "shared/utils/array";
+import { minComparator } from "shared/data/heap/heap";
 
+import type { Pattern } from "./pattern/pattern";
 import type { JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction } from "./junction/validJunction";
@@ -20,19 +24,47 @@ import type { Stretch } from "./stretch";
 //=================================================================
 export class Repository {
 
+	public readonly $stretch: Stretch;
 	public readonly $signature: string;
+
+	/** Coefficient of transformation; same as the {@link ValidJunction.$f $f} of the first junction. */
+	public readonly $f: ISignPoint;
+
+	/** The reference point of the stretch. */
+	public readonly $origin: Point;
+
+	/** Quadrant codes involved (possibly duplicated). */
+	public readonly $quadrants: number[];
+
+	/** Node ids involved. */
+	public readonly $nodes: number[];
+
 	public $index: number = 0;
 
 	private readonly _configurations: Store<Configuration>;
 
-	constructor(junctions: ValidJunction[], signature: string, prototype?: JStretch) {
+	constructor(stretch: Stretch, junctions: ValidJunction[], signature: string, prototype?: JStretch) {
+		this.$stretch = stretch;
 		this.$signature = signature;
+		this.$f = junctions[0].$f;
+		this.$origin = new Point(junctions[0].$tip);
+
+		const quadrants: number[] = [];
+		const ids = new Set<number>();
+		for(const j of junctions) {
+			quadrants.push(j.$q1, j.$q2);
+			j.$path.forEach(id => ids.add(id));
+		}
+		this.$quadrants = quadrants;
+		this.$nodes = Array.from(ids);
+
 		State.$newRepositories.add(this);
+		State.$repoUpdated.add(this);
 
 		if(junctions.length === 1) {
-			this._configurations = new Store(singleConfigGenerator(junctions[0], prototype));
+			this._configurations = new Store(singleConfigGenerator(this, junctions[0], prototype));
 		} else {
-			this._configurations = new Store(generalConfigGenerator(junctions, prototype));
+			this._configurations = new Store(generalConfigGenerator(this, junctions, prototype));
 		}
 	}
 
@@ -44,6 +76,10 @@ export class Repository {
 
 	public get $configurations(): readonly Configuration[] {
 		return this._configurations.$entries;
+	}
+
+	public get $pattern(): Pattern | null {
+		return this.$configuration?.$pattern ?? null;
 	}
 
 	/** Stop when the first {@link Pattern} is found. */

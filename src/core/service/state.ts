@@ -2,8 +2,8 @@ import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/diff/diffDoubleSet";
 import { DiffSet } from "shared/data/diff/diffSet";
 
-import type { JStretch } from "shared/json";
 import type { Repository } from "core/design/layout/repository";
+import type { JStretch } from "shared/json";
 import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
@@ -45,6 +45,9 @@ export namespace State {
 
 	/** Used for finding those {@link Stretch}es that need to be deleted. */
 	export const $stretchDiff = new DiffSet<string>();
+
+	/** Used for finding flaps or rivers that no longer have patterns. */
+	export const $patternDiff = new DiffSet<number>();
 
 	/** {@link Stretch} cache during dragging. */
 	export const $stretchCache = new Map<string, Stretch>();
@@ -95,11 +98,16 @@ export namespace State {
 	/** The new {@link Repository Repositories} formed in the current round. */
 	export const $newRepositories = new Set<Repository>();
 
+	/** The {@link Repository Repositories} that are updated in the current round. */
+	export const $repoUpdated = new Set<Repository>();
+
 	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
 	export const $stretchPrototypes = new Map<string, JStretch>();
 
 	/** Those flaps or rivers that will change their contours in the current round. */
 	export const $contourWillChange = new Set<ITreeNode>();
+
+	export const $patternedQuadrants = new Set<number>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public methods
@@ -116,8 +124,10 @@ export namespace State {
 		$flapAABBChanged.clear();
 		$flapChanged.clear();
 		$newRepositories.clear();
+		$repoUpdated.clear();
 		$stretchPrototypes.clear();
 		$contourWillChange.clear();
+		$patternedQuadrants.clear();
 		$treeStructureChanged = false;
 		$rootChanged = false;
 	}
