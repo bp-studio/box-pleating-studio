@@ -2,10 +2,18 @@ import { EventBoundary } from "@pixi/events";
 
 import { Control } from "client/base/control";
 
-import type { EventMode } from "@pixi/events";
+import type { Application } from "@pixi/app";
+import type { EventMode, EventSystem } from "@pixi/events";
 import type { DisplayObject } from "@pixi/display";
 import type { Point } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
+
+export function useControlEventBoundary(app: Application): ControlEventBoundary {
+	const renderer = app.renderer;
+	const boundary = new ControlEventBoundary(app.stage);
+	(renderer.events as Writeable<EventSystem>).rootBoundary = boundary;
+	return boundary;
+}
 
 //=================================================================
 /**
@@ -16,7 +24,7 @@ import type { Sheet } from "client/project/components/sheet";
  * We might consider optimizing this part in the future.
  */
 //=================================================================
-export class ControlEventBoundary extends EventBoundary {
+class ControlEventBoundary extends EventBoundary {
 
 	/**
 	 * The {@link EventBoundary.hitTest} provided by Pixi returns only the top-most object,

@@ -50,7 +50,7 @@
 		"eslint-plugin-local-rules": "^1.3.2",
 		"eslint-plugin-mocha": "^10.1.0",
 		"eslint-plugin-typescript-compat": "^1.0.1",
-		"eslint-plugin-vue": "^9.9.0",
+		"eslint-plugin-vue": "^9.10.0",
 		"fancy-log": "^2.0.0",
 		"fontawesome-subset": "^4.3.1",
 		"global-jsdom": "^8.8.0",

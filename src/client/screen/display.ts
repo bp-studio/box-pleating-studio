@@ -1,49 +1,21 @@
 import { nextTick, watch, watchEffect } from "vue";
-import { Application } from "@pixi/app";
 import { Container } from "@pixi/display";
 import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
 
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
-import { ControlEventBoundary } from "../utils/controlEventBoundary";
+import { useControlEventBoundary } from "./controlEventBoundary";
 import { ScrollView } from "./scrollView";
-
-import type { EventSystem } from "@pixi/events";
+import { usePixiApp } from "./app";
 
 const el = document.getElementById("divWorkspace")!;
 export const scrollView = new ScrollView(el);
 export const viewport: Readonly<IDimension> = scrollView.$viewport;
 
 // Create Pixi app
-let app: Application;
-try {
-	app = new Application({
-		width: viewport.width,
-		height: viewport.height,
-		antialias: true, // We still need this for drawing texts
-		// Start the app regardless whether there's an opened project.
-		// This improves the displaying speed of the first open project.
-		autoStart: true,
-		premultipliedAlpha: false,
-
-		// Floating number devicePixelRatio could cause the grid to appear glitchy,
-		// so taking the floor of it is good enough. This approach results in good visuals
-		// in both desktops and mobiles.
-		resolution: Math.floor(devicePixelRatio),
-		autoDensity: true,
-	});
-} catch(e) {
-	errMgr.setCustomError(i18n.t("message.webGL.title"), i18n.t("message.webGL.body"));
-}
-const pixiApp = app;
+const pixiApp = usePixiApp(viewport.width, viewport.height);
 useBackground(pixiApp);
-
-// Setup renderer
-const renderer = pixiApp.renderer;
-export const boundary = new ControlEventBoundary(pixiApp.stage);
-(renderer.events as Writeable<EventSystem>).rootBoundary = boundary;
-
-// Setup canvas
+export const boundary = useControlEventBoundary(pixiApp);
 export const canvas = pixiApp.view as HTMLCanvasElement;
 el.appendChild(canvas);
 
@@ -57,7 +29,7 @@ export const ui = new Container();
 stage.addChild(designs, ui);
 stage.eventMode = "static";
 watchEffect(() => {
-	renderer.resize(viewport.width, viewport.height);
+	pixiApp.renderer.resize(viewport.width, viewport.height);
 	stage.hitArea = pixiApp.screen;
 });
 
