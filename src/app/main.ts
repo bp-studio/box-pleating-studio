@@ -33,7 +33,7 @@ if(errMgr.ok()) {
 	async function init(): Promise<void> {
 		try {
 			app.mount("#app");
-			await Core.init();
+			if(!await Core.init()) return;
 
 			// Load all non-critical resources
 			await Lib.load();
@@ -41,7 +41,10 @@ if(errMgr.ok()) {
 			if(e instanceof Error) errMgr.setRunErr(e.message);
 		} finally {
 			if(errMgr.callback()) { // Second checkpoint
-				setTimeout(() => window.onunhandledrejection = null, TIME_TERMINATE);
+				setTimeout(() => {
+					window.onerror = null;
+					window.onunhandledrejection = null;
+				}, TIME_TERMINATE);
 			}
 		}
 	}

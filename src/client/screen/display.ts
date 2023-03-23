@@ -15,21 +15,27 @@ export const scrollView = new ScrollView(el);
 export const viewport: Readonly<IDimension> = scrollView.$viewport;
 
 // Create Pixi app
-const pixiApp = new Application({
-	width: viewport.width,
-	height: viewport.height,
-	antialias: true, // We still need this for drawing texts
-	// Start the app regardless whether there's an opened project.
-	// This improves the displaying speed of the first open project.
-	autoStart: true,
-	premultipliedAlpha: false,
+let app: Application;
+try {
+	app = new Application({
+		width: viewport.width,
+		height: viewport.height,
+		antialias: true, // We still need this for drawing texts
+		// Start the app regardless whether there's an opened project.
+		// This improves the displaying speed of the first open project.
+		autoStart: true,
+		premultipliedAlpha: false,
 
-	// Floating number devicePixelRatio could cause the grid to appear glitchy,
-	// so taking the floor of it is good enough. This approach results in good visuals
-	// in both desktops and mobiles.
-	resolution: Math.floor(devicePixelRatio),
-	autoDensity: true,
-});
+		// Floating number devicePixelRatio could cause the grid to appear glitchy,
+		// so taking the floor of it is good enough. This approach results in good visuals
+		// in both desktops and mobiles.
+		resolution: Math.floor(devicePixelRatio),
+		autoDensity: true,
+	});
+} catch(e) {
+	errMgr.setCustomError(i18n.t("message.webGL.title"), i18n.t("message.webGL.body"));
+}
+const pixiApp = app;
 useBackground(pixiApp);
 
 // Setup renderer

@@ -17,6 +17,7 @@ declare global {
 		end(): void;
 		ok(): boolean;
 		callback(): boolean;
+		setCustomError(title: string, body: string): never;
 		setRunErr(error: string): void;
 		setResErr(error: string): void;
 	};

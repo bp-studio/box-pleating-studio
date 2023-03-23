@@ -35,7 +35,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1398"
+			app_version: "1399"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -115,6 +115,7 @@
 				if(!el) return;
 				el.style.display = v ? 'block' : 'none';
 				if(c) el.innerHTML += c;
+				return el;
 			};
 
 			/** Resource Error */
@@ -142,6 +143,14 @@
 
 			self.setRunErr = setRunErr;
 			self.setResErr = setResErr;
+			self.setCustomError = function(title, message) {
+				display('divWorkspace');
+				display('divSpinner')
+				display('resource', true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
+				errShown = true;
+				// eslint-disable-next-line compat/compat
+				throw new Error(); // stops all further processing
+			}
 
 			/** Finish listening to global errors */
 			self.end = function() {
@@ -150,7 +159,7 @@
 
 			/** Whether the launching fine so far. */
 			self.ok = function() {
-				return !resErr && !runErr;
+				return !resErr && !runErr && !errShown;
 			}
 
 			/** GA parameter has a 100-character limit, so we split the message into chunks. */

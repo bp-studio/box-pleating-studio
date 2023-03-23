@@ -43,8 +43,10 @@ namespace StudioService {
 		return proj;
 	}, null);
 
-	export async function init(): Promise<void> {
+	/** Initialize the Client, and return whether it was successful. */
+	export async function init(): Promise<boolean> {
 		await Promise.all(bpLibs.map(l => Lib.loadScript(l)));
+		if(typeof bp === "undefined") return false;
 
 		// Setup the bridges
 		bp.options.onLongPress = () => showPanel.value = true;
@@ -57,6 +59,7 @@ namespace StudioService {
 		for(const setup of $onSetupOptions) setup(bp.options);
 
 		if(errMgr.ok()) initialized.value = true;
+		return true;
 	}
 
 	export const mouseCoordinates = proxy(() => bp.mouseCoordinates.value, null);

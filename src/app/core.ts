@@ -30,14 +30,15 @@ namespace Core {
 	 * Specifically, it starts the view of the Studio,
 	 * and loads the files in the Session and Query.
 	 */
-	export async function init(): Promise<void> {
+	export async function init(): Promise<boolean> {
 		localStorage.setItem("build", app_config.app_version);
-		StudioService.init();
+		if(!await StudioService.init()) return false;
 		const hasQueue = await File.openQueue();
 		const hasSession = await SessionService.init(Settings.loadSessionOnQueue || !hasQueue);
 		if(hadSettings) await HandleService.init(hasSession);
 		await loadQuery();
 		lcpReady.value = true;
+		return true;
 	}
 
 	/** Load the project passed in from the URL */
