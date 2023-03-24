@@ -2,8 +2,13 @@ import { reactive, watch } from "vue";
 
 import dialogs from "./dialogService";
 import Language from "./languageService";
+import { callbacks } from "app/misc/sw";
+import { callService } from "app/utils/workerUtility";
+import { isHttps } from "app/shared/constants";
 
 import type { KeyStore } from "./customHotkeyService";
+
+const KEY = "settings";
 
 type Theme = "system" | "dark" | "light";
 
@@ -72,25 +77,34 @@ function defaultHotkey(): KeyStore {
 
 const settings = reactive(Object.assign({}, defaultSettings));
 
-const settingString = localStorage.getItem("settings");
-if(settingString) {
-	const savedSettings = JSON.parse(settingString);
+function loadSettings(): boolean {
+	const settingString = localStorage.getItem(KEY);
+	if(settingString) {
+		const savedSettings = JSON.parse(settingString);
 
-	for(const key in settings) {
-		if(key == "hotkey") continue;
-		// @ts-ignore
-		if(savedSettings[key] !== undefined) settings[key] = savedSettings[key];
+		for(const key in settings) {
+			if(key == "hotkey") continue;
+			// @ts-ignore
+			if(savedSettings[key] !== undefined) settings[key] = savedSettings[key];
+		}
+
+		// Use deepCopy to read the hotkey settings,
+		// so that old setting will not be overwritten as we add more settings in the future.
+		if(savedSettings.hotkey !== undefined) copy(settings.hotkey, savedSettings.hotkey);
+	} else {
+		// Save initial settings
+		save();
 	}
-
-	// Use deepCopy to read the hotkey settings,
-	// so that old setting will not be overwritten as we add more settings in the future.
-	if(savedSettings.hotkey !== undefined) copy(settings.hotkey, savedSettings.hotkey);
-} else {
-	// Save initial settings
-	save();
+	return settingString !== null;
 }
 
-export const hadSettings = settingString !== null;
+let reloading: boolean = false;
+callbacks[KEY] = () => {
+	reloading = true;
+	loadSettings();
+};
+
+export const hadSettings = loadSettings();
 
 watch(settings, save, { deep: true });
 
@@ -115,7 +129,13 @@ function copy(target: Store, source: Store): void {
 
 /** Save settings */
 function save(): void {
-	localStorage.setItem("settings", JSON.stringify(settings));
+	if(!reloading) {
+		localStorage.setItem(KEY, JSON.stringify(settings));
+
+		// Notify other instances
+		if(isHttps) callService(KEY);
+	}
+	reloading = false;
 }
 
 /** Reset to default settings */

@@ -124,8 +124,6 @@ namespace ImportService {
 				const id = await openWorkspace(buffer);
 				if(handle) await Handles.addRecent(handle);
 				return id;
-
-
 			} else { throw new Error(); }
 		} catch(e) {
 			debugger;

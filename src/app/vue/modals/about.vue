@@ -39,7 +39,7 @@
 
 	import { computed } from "vue";
 
-	import { copyright } from "app/misc";
+	import { copyright } from "app/misc/copyright";
 	import useModal from "./modal";
 
 	const { el, show } = useModal("About");

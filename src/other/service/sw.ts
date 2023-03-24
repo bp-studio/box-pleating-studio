@@ -83,21 +83,34 @@ self.addEventListener("activate", event => {
 self.addEventListener("message", event => {
 	event.waitUntil(message(event));
 });
+
 async function message(event: ExtendableMessageEvent): Promise<void> {
-	if(event.ports[0] && event.data == "id") {
-		const clients = await self.clients.matchAll({ type: "window" });
-		const tasks: Promise<number>[] = [];
-		for(const client of clients) {
-			if(client.id != (event.source as Client).id) {
-				tasks.push(callClient(client, "id") as Promise<number>);
-			}
+	if(event.ports[0]) {
+		const sourceId = (event.source as Client).id;
+		if(event.data == "id") {
+			const result = await callAllClients<number>(sourceId, "id");
+			event.ports[0].postMessage(Math.min(...result));
+		} else {
+			// In all other cases, simply broadcast the data to all instances.
+			await callAllClients<void>(sourceId, event.data);
+			event.ports[0].postMessage(undefined);
 		}
-		const result = await Promise.all(tasks);
-		event.ports[0].postMessage(Math.min(...result));
 	}
 }
-function callClient(client: Client, data: unknown): Promise<unknown> {
-	return new Promise<unknown>(resolve => {
+
+async function callAllClients<T>(sourceId: string, data: unknown): Promise<T[]> {
+	const clients = await self.clients.matchAll({ type: "window" });
+	const tasks: Promise<T>[] = [];
+	for(const client of clients) {
+		if(client.id != sourceId) {
+			tasks.push(callClient<T>(client, data));
+		}
+	}
+	return await Promise.all(tasks);
+}
+
+function callClient<T>(client: Client, data: unknown): Promise<T> {
+	return new Promise<T>(resolve => {
 		const channel = new MessageChannel();
 		channel.port1.onmessage = event => resolve(event.data);
 		client.postMessage(data, [channel.port2]);

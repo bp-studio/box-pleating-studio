@@ -29,3 +29,6 @@ export const defaultTitle = document.title;
 /** Whether Clipboard API is supported (Safari supports in only since 13.1) */
 // eslint-disable-next-line compat/compat
 export const copyEnabled = "clipboard" in navigator && "write" in navigator.clipboard;
+
+/** Whether the current instance is running online. */
+export const isHttps = location.protocol === "https:";

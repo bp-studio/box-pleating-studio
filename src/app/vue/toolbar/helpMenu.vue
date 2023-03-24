@@ -52,7 +52,7 @@
 
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
 	import Dialogs from "app/services/dialogService";
-	import { updateReady } from "app/misc";
+	import { updateReady } from "app/misc/updateReady";
 	import { show } from "../modals/modalFragment.vue";
 
 	const notify = shallowRef(false);

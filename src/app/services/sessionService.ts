@@ -2,17 +2,19 @@
 import { watch } from "vue";
 
 import { callService } from "app/utils/workerUtility";
-import { id as Id } from "../misc/id";
+import { id as Id } from "../misc/sw";
 import Handles from "./handleService";
 import Settings from "./settingService";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
+import { isHttps } from "app/shared/constants";
 
 import type { Project } from "client/project/project";
 
 declare function checkWithBC(id: number): Promise<boolean>;
 
 const SAVE_INTERVAL = 3000;
+const SESSION_CHECK_TIMEOUT = 250;
 
 //=================================================================
 /**
@@ -46,10 +48,9 @@ namespace SessionService {
 
 	/** Check if the current App instance has the saving right of session */
 	function checkSessionRight(): Promise<boolean> {
-		const SESSION_CHECK_TIMEOUT = 250;
 		return new Promise<boolean>(resolve => {
 			// If it's running locally, use Broadcast Channel
-			if(location.protocol != "https:") {
+			if(!isHttps) {
 				checkWithBC(Id).then(ok => resolve(ok));
 			} else {
 				// In theory the checking can be done instantly,

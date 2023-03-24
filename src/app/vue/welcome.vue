@@ -81,6 +81,7 @@
 
 	import { computed, shallowRef } from "vue";
 
+	import { copyright } from "app/misc/copyright";
 	import Core from "app/core";
 	import handles from "app/services/handleService";
 	import { isFileApiEnabled } from "app/shared/constants";
@@ -88,7 +89,6 @@
 	import Studio from "app/services/studioService";
 	import Workspace from "app/services/workspaceService";
 	import Import from "app/services/importService";
-	import { copyright } from "app/misc";
 
 	const preparing = shallowRef(false);
 	const install = shallowRef(0);

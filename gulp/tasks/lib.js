@@ -67,7 +67,7 @@ const vueDraggable = () => {
 	const path = fs.realpathSync(root + "vuedraggable");
 	return gulp.src(path + "/src/vuedraggable.js")
 		.pipe(newer({
-			dest: config.dest.dist + "/lib/bootstrap/vuedraggable.min.js",
+			dest: config.dest.dist + "/lib/vuedraggable.min.js",
 			extra: [
 				__filename,
 				path + "/package.json",

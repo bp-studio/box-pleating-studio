@@ -1,12 +1,20 @@
 import { reactive, readonly, watch } from "vue";
 
+import { callService } from "app/utils/workerUtility";
+import { callbacks } from "app/misc/sw";
+import { isHttps } from "app/shared/constants";
+
 import type { BpsLocale } from "shared/frontend/locale";
+import type Settings from "./settingService";
+
+const KEY = "locale";
+const DEFAULT_LOCALE = "en";
 
 // Create i18n instance. We also consider SSG here.
 export const plugin = typeof VueI18n !== "undefined" ?
 	VueI18n.createI18n<[BpsLocale], string>({
-		locale: "en",
-		fallbackLocale: "en",
+		locale: DEFAULT_LOCALE,
+		fallbackLocale: DEFAULT_LOCALE,
 		silentFallbackWarn: true,
 		messages: locale,
 	}) : null;
@@ -17,6 +25,9 @@ if(plugin) i18n = plugin.global;
 //=================================================================
 /**
  * {@link LanguageService} determines locale on startup and manages related settings.
+ *
+ * For historical reasons, language setting is store separately,
+ * and is not part of the {@link Settings}.
  */
 //=================================================================
 namespace LanguageService {
@@ -27,14 +38,14 @@ namespace LanguageService {
 	function init(): void {
 		_options.length = 0;
 		const build = Number(localStorage.getItem("build") || 0);
-		const localeSetting = localStorage.getItem("locale");
+		const localeSetting = localStorage.getItem(KEY);
 		const langs = getLanguages(localeSetting);
 		const newLocale = langs.some(l => Number(locale[l].since) > build);
 
 		if(langs.length > 1 && (!localeSetting || newLocale)) {
 			_options.push(...langs);
 		}
-		i18n.locale = format(localeSetting || langs[0] || "en");
+		i18n.locale = format(localeSetting || langs[0] || DEFAULT_LOCALE);
 	}
 
 	/** Obtain the list of candidate languages. */
@@ -49,9 +60,24 @@ namespace LanguageService {
 		return languages;
 	}
 
+	let reloading: boolean = false;
+	callbacks[KEY] = () => {
+		const loc = localStorage.getItem(KEY)!;
+		if(loc != i18n.locale) {
+			reloading = true;
+			i18n.locale = loc;
+		}
+	};
+
 	watch(() => i18n.locale, loc => {
 		if(loc in locale) {
-			localStorage.setItem("locale", loc);
+			if(!reloading) {
+				localStorage.setItem(KEY, loc);
+
+				// Notify other instances
+				if(isHttps) callService(KEY);
+			}
+			reloading = false;
 		} else {
 			loc = findFallbackLocale(loc);
 			Vue.nextTick(() => i18n.locale = loc);
@@ -66,7 +92,7 @@ namespace LanguageService {
 			const l = tokens.join("-");
 			if(l in locale) return l;
 		}
-		return "en";
+		return DEFAULT_LOCALE;
 	}
 
 	function format(l: string): string {
@@ -76,7 +102,7 @@ namespace LanguageService {
 	export let onReset: Action;
 
 	export function reset(): void {
-		localStorage.removeItem("locale");
+		localStorage.removeItem(KEY);
 		init();
 		onReset?.();
 	}
