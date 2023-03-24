@@ -2,7 +2,7 @@
 import { watch } from "vue";
 
 import { callService } from "app/utils/workerUtility";
-import { id as Id } from "../misc/sw";
+import { id as Id } from "../misc/id";
 import Handles from "./handleService";
 import Settings from "./settingService";
 import Studio from "./studioService";
@@ -40,8 +40,14 @@ namespace SessionService {
 			}
 		}
 
+		// The following is the best we can do to ensure session is saved before exiting.
+		// See https://developer.chrome.com/blog/page-lifecycle-api/
 		window.setInterval(save, SAVE_INTERVAL);
-		window.addEventListener("beforeunload", save);
+		window.addEventListener("pagehide", save);
+		document.addEventListener("visibilitychange", () => {
+			if(document.visibilityState == "hidden") save();
+		});
+
 		initialized = true;
 		return hasSession;
 	}

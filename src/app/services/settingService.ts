@@ -2,9 +2,6 @@ import { reactive, watch } from "vue";
 
 import dialogs from "./dialogService";
 import Language from "./languageService";
-import { callbacks } from "app/misc/sw";
-import { callService } from "app/utils/workerUtility";
-import { isHttps } from "app/shared/constants";
 
 import type { KeyStore } from "./customHotkeyService";
 
@@ -77,8 +74,7 @@ function defaultHotkey(): KeyStore {
 
 const settings = reactive(Object.assign({}, defaultSettings));
 
-function loadSettings(): boolean {
-	const settingString = localStorage.getItem(KEY);
+function loadSettings(settingString: string | null): boolean {
 	if(settingString) {
 		const savedSettings = JSON.parse(settingString);
 
@@ -98,13 +94,16 @@ function loadSettings(): boolean {
 	return settingString !== null;
 }
 
-let reloading: boolean = false;
-callbacks[KEY] = () => {
-	reloading = true;
-	loadSettings();
-};
+// Sync settings
+let syncing: boolean = false;
+window.addEventListener("storage", e => {
+	if(e.key == KEY) {
+		syncing = true;
+		loadSettings(e.newValue);
+	}
+});
 
-export const hadSettings = loadSettings();
+export const hadSettings = loadSettings(localStorage.getItem(KEY));
 
 watch(settings, save, { deep: true });
 
@@ -129,13 +128,8 @@ function copy(target: Store, source: Store): void {
 
 /** Save settings */
 function save(): void {
-	if(!reloading) {
-		localStorage.setItem(KEY, JSON.stringify(settings));
-
-		// Notify other instances
-		if(isHttps) callService(KEY);
-	}
-	reloading = false;
+	if(!syncing) localStorage.setItem(KEY, JSON.stringify(settings));
+	syncing = false;
 }
 
 /** Reset to default settings */

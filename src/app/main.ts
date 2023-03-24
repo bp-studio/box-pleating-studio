@@ -52,7 +52,7 @@ if(errMgr.ok()) {
 }
 
 export { isTouch } from "app/shared/constants";
-export { id } from "app/misc/sw";
+export { id } from "app/misc/id";
 export { isDark } from "app/misc/isDark";
 export { callWorker } from "app/utils/workerUtility";
 export { default as settings } from "app/services/settingService";

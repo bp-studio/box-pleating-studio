@@ -1,9 +1,5 @@
 import { reactive, readonly, watch } from "vue";
 
-import { callService } from "app/utils/workerUtility";
-import { callbacks } from "app/misc/sw";
-import { isHttps } from "app/shared/constants";
-
 import type { BpsLocale } from "shared/frontend/locale";
 import type Settings from "./settingService";
 
@@ -60,24 +56,19 @@ namespace LanguageService {
 		return languages;
 	}
 
-	let reloading: boolean = false;
-	callbacks[KEY] = () => {
-		const loc = localStorage.getItem(KEY)!;
-		if(loc != i18n.locale) {
-			reloading = true;
-			i18n.locale = loc;
+	// Sync locale
+	let syncing: boolean = false;
+	window.addEventListener("storage", e => {
+		if(e.key == KEY) {
+			syncing = true;
+			i18n.locale = e.newValue!;
 		}
-	};
+	});
 
 	watch(() => i18n.locale, loc => {
 		if(loc in locale) {
-			if(!reloading) {
-				localStorage.setItem(KEY, loc);
-
-				// Notify other instances
-				if(isHttps) callService(KEY);
-			}
-			reloading = false;
+			if(!syncing) localStorage.setItem(KEY, loc);
+			syncing = false;
 		} else {
 			loc = findFallbackLocale(loc);
 			Vue.nextTick(() => i18n.locale = loc);
