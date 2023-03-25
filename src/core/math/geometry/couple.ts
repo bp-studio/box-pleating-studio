@@ -62,7 +62,7 @@ export abstract class Couple {
 		return this;
 	}
 
-	public add(v: Vector): this {
+	public $add(v: Vector): this {
 		return new this.constructor(this._x.add(v._x), this._y.add(v._y));
 	}
 

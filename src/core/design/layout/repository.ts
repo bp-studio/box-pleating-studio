@@ -3,9 +3,8 @@ import { Store } from "./store";
 import { generalConfigGenerator } from "./generators/generalConfigGenerator";
 import { singleConfigGenerator } from "./generators/singleConfigGenerator";
 import { Point } from "core/math/geometry/point";
-import { distinct } from "shared/utils/array";
-import { minComparator } from "shared/data/heap/heap";
 
+import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
 import type { JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
@@ -22,7 +21,7 @@ import type { Stretch } from "./stretch";
  * a {@link Repository} helps memorizing the original combinations of {@link Pattern}s.
  */
 //=================================================================
-export class Repository {
+export class Repository implements ISerializable<JRepository | undefined> {
 
 	public readonly $stretch: Stretch;
 	public readonly $signature: string;
@@ -66,6 +65,16 @@ export class Repository {
 		} else {
 			this._configurations = new Store(generalConfigGenerator(this, junctions, prototype));
 		}
+	}
+
+	public toJSON(): JRepository | undefined {
+		if(!this._configurations.$done) return undefined;
+		return {
+			configCount: this.$configurations.length,
+			configIndex: this.$index,
+			patternCount: this.$configuration!.$length!,
+			patternIndex: this.$configuration!.$index,
+		};
 	}
 
 	public get $configuration(): Configuration | null {

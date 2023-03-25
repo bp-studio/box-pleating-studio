@@ -1,8 +1,9 @@
 import { Control } from "client/base/control";
 import { Device } from "./device";
+import { shallowRef } from "client/shared/decorators";
 
 import type { JStretch } from "shared/json";
-import type { StretchData, UpdateModel } from "core/service/updateModel";
+import type { JRepository, StretchData, UpdateModel } from "core/service/updateModel";
 import type { Layout } from "./layout";
 
 //=================================================================
@@ -14,18 +15,38 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	public readonly type = "Stretch";
 	public readonly $priority: number = 0;
 	private readonly _devices: Device[] = [];
-	private _data!: StretchData;
-	private _layout: Layout;
+	@shallowRef private _data!: StretchData;
+	public readonly $layout: Layout;
 
 	constructor(layout: Layout, data: StretchData, model: UpdateModel) {
 		super(layout.$sheet);
-		this._layout = layout;
+		this.$layout = layout;
 		this.$update(data, model);
 	}
 
 	public toJSON(): JStretch {
 		return this._data.data;
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Interface methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public get repo(): JRepository | undefined {
+		return this._data.repo;
+	}
+
+	public moveConfig(by: number): void {
+		//
+	}
+
+	public movePattern(by: number): void {
+		//
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Public methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get $devices(): readonly Device[] {
 		return this._devices;
@@ -36,7 +57,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		const deviceCount = data.data.pattern!.devices.length;
 		while(deviceCount < this._devices.length) {
 			const device = this._devices.pop()!;
-			this._layout.$sheet.$removeChild(device);
+			this.$layout.$sheet.$removeChild(device);
 			this.$removeChild(device);
 			device.$dispose();
 		}
@@ -46,8 +67,8 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 			if(device) {
 				device.$redraw(graphics);
 			} else {
-				this._devices[i] = new Device(this._layout, graphics);
-				this._layout.$sheet.$addChild(this._devices[i]);
+				this._devices[i] = new Device(this, graphics);
+				this.$layout.$sheet.$addChild(this._devices[i]);
 				this.$addChild(this._devices[i]);
 			}
 		}

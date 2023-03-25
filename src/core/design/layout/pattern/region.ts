@@ -46,7 +46,7 @@ export abstract class Region {
 		// Calculate all creases
 		const ap: Line[] = [];
 		for(let i = Math.ceil(min); i <= Math.floor(max); i++) {
-			const p = ref.add(step.$scale(new Fraction(i)));
+			const p = ref.$add(step.$scale(new Fraction(i)));
 			const intersections: Point[] = [];
 
 			// TODO: improve this part

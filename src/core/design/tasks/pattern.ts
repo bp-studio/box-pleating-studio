@@ -13,16 +13,20 @@ import type { Pattern } from "../layout/pattern/pattern";
 export const patternTask = new Task(pattern, patternContourTask);
 
 function pattern(): void {
-	for(const repo of State.$newRepositories) repo.$init();
+	for(const repo of State.$newRepositories) {
+		if(State.$isDragging) repo.$init();
+		else repo.$complete();
+	}
 	for(const repo of State.$repoUpdated) {
 		const id = repo.$stretch.$id;
 		if(repo.$pattern) {
 			State.$updateResult.add.stretches[id] = {
 				data: repo.$stretch.toJSON(),
+				repo: repo.toJSON(),
 			};
 			for(const [i, device] of repo.$pattern.$devices.entries()) {
 				State.$updateResult.graphics["s" + id + "." + i] = {
-					contours: [],
+					contours: device.$contour,
 					ridges: device.$ridges,
 					axisParallel: device.$axisParallels,
 				};

@@ -5,7 +5,7 @@ import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 
 import type { Vector } from "core/math/geometry/vector";
-import type { ILine } from "shared/types/geometry";
+import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
 import type { JDevice } from "shared/json";
 import type { Pattern } from "./pattern";
@@ -52,19 +52,29 @@ export class Device implements ISerializable<JDevice> {
 	}
 
 	public get $axisParallels(): readonly ILine[] {
-		const f = this.$pattern.$config.$repo.$f;
 		const result: Line[] = [];
 		for(const r of this._regions) {
 			for(const l of r.$axisParallels) {
-				result.push(l.$transform(f.x, f.y).$shift(this._delta));
+				result.push(this._transform(l));
 			}
 		}
 		return result.map(l => l.$toILine());
 	}
 
+	public get $contour(): readonly Contour[] {
+		return this._regions.map(r => ({
+			outer: r.$shape.contour.map(p => this._transform(p).$toIPoint()),
+		}));
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _transform<T extends Point | Line>(obj: T): T {
+		const f = this.$pattern.$config.$repo.$f;
+		return obj.$transform(f.x, f.y).$add(this._delta) as T;
+	}
 
 	private get _delta(): Vector {
 		//TODO: originalDisplacement and location
@@ -72,8 +82,7 @@ export class Device implements ISerializable<JDevice> {
 	}
 
 	private get _transformedRidges(): readonly Line[] {
-		const f = this.$pattern.$config.$repo.$f;
-		return this._rawRidges.map(l => l.$transform(f.x, f.y).$shift(this._delta));
+		return this._rawRidges.map(l => this._transform(l));
 	}
 
 	@cache private get _rawRidges(): readonly Line[] {

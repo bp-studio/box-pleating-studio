@@ -78,12 +78,11 @@ namespace CustomHotkeyService {
 		if(!Studio.project) return;
 		if(command == "d") return Studio.project.design.goToDual();
 
-		//TODO
-		// const repo = bp.getRepository();
-		// if(!repo) return;
-		// const f = command.endsWith("n") ? 1 : -1;
-		// if(command.startsWith("c")) repo.move(f);
-		// else if(repo.entry) repo.entry.move(f);
+		const stretch = Studio.stretch;
+		if(!stretch) return;
+		const f = command.endsWith("n") ? 1 : -1;
+		if(command.startsWith("c")) stretch.moveConfig(f);
+		else stretch.movePattern(f);
 	}
 
 	/** Processing toggling and zooming of views */

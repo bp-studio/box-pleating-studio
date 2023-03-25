@@ -52,7 +52,12 @@ interface GraphicsData {
 interface StretchData {
 	/** JSON data to store in the Client. */
 	data: JStretch;
+	repo?: JRepository;
+}
 
-	/** Array of {@link Pattern} count for each {@link Configuration}s. */
-	patternCounts?: number[];
+interface JRepository {
+	configCount: number;
+	configIndex: number;
+	patternCount: number;
+	patternIndex: number;
 }

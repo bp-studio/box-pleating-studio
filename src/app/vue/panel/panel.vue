@@ -4,7 +4,7 @@
 		<template v-if="design">
 			<Design v-if="Studio.selections.length == 0" :design="design" />
 			<div v-else-if="Studio.selections.length == 1">
-				<Repository v-if="repository" :repository="repository" />
+				<StretchVue v-if="Studio.stretch" :stretch="Studio.stretch" />
 				<component v-else-if="type == 'Flap'" :is="Flap" :subject="Studio.selection" :max="design.sheet.grid.diameter" />
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
@@ -31,7 +31,7 @@
 	import { computed, shallowRef, watch } from "vue";
 
 	import Studio, { showPanel } from "app/services/studioService";
-	import Repository from "./repository.vue";
+	import StretchVue from "./stretch.vue";
 	import Vertex from "./vertex.vue";
 	import Edge from "./edge.vue";
 	import Flap from "./flap.vue";
@@ -45,12 +45,6 @@
 	defineEmits(["hide"]);
 
 	const panel = shallowRef<HTMLDivElement>();
-
-	//TODO: repository
-	const repository = null;
-	//		public get repository(): BP.Repository | null {
-	// 			return core.initialized && this.bp.getRepository() || null;
-	// 		}
 
 	const componentMap: Record<string, Component> = { Vertex, Edge, Flap, River };
 	const type = computed(() => Studio.selections[0]?.type ?? "");

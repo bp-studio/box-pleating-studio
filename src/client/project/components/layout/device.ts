@@ -3,42 +3,43 @@ import { Graphics } from "@pixi/graphics";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Layer } from "client/shared/layers";
-import { Control } from "client/base/control";
 import { drawLines, fillContours } from "client/utils/contourUtil";
 import ProjectService from "client/services/projectService";
 import { style } from "client/services/styleService";
+import { Draggable } from "client/base/draggable";
 
+import type { Stretch } from "./stretch";
 import type { GraphicsData } from "core/service/updateModel";
-import type { Layout } from "./layout";
-import type { Edge } from "../tree/edge";
 
 //=================================================================
 /**
  * {@link Device} is the control for a single device in a stretch pattern.
  */
 //=================================================================
-export class Device extends Control {
+export class Device extends Draggable {
 
 	public readonly type = "Device";
 	public readonly $priority: number = 2;
 
 	public $graphics: GraphicsData;
 
-	private readonly _layout: Layout;
+	public readonly stretch: Stretch;
 
 	private readonly _shade: Graphics;
 	private readonly _ridge: SmoothGraphics;
 	private readonly _axisParallels: SmoothGraphics;
 
 
-	constructor(layout: Layout, graphics: GraphicsData) {
-		const sheet = layout.$sheet;
+	constructor(stretch: Stretch, graphics: GraphicsData) {
+		const sheet = stretch.$layout.$sheet;
 		super(sheet);
-		this._layout = layout;
+		this.stretch = stretch;
 
 		this.$graphics = graphics;
 
-		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$shade]);
+		// We deliberately put the shade on a higher layer,
+		// so that its hovering effect can be prioritized.
+		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$edge]);
 		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
 		this._axisParallels = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$axisParallels]);
 		this.$setupHit(this._shade);
@@ -56,6 +57,7 @@ export class Device extends Control {
 	}
 
 	private _drawShade(): void {
+		this._shade.alpha = style.shade.alpha;
 		if(this.$selected) this._shade.alpha = style.shade.alpha;
 		else if(this.$hovered) this._shade.alpha = style.shade.hover;
 		else this._shade.alpha = 0;

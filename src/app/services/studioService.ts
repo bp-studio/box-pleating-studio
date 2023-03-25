@@ -5,11 +5,13 @@ import Lib from "./libService";
 import Dialogs from "./dialogService";
 import settings from "./settingService";
 
+import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
 import type { ComputedRef } from "vue";
 import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
 import type { StudioOptions } from "client/options";
+import type { Device } from "client/project/components/layout/device";
 
 /**
  * We encapsule the Client in this service so that it is not exposed in other parts of the app.
@@ -65,6 +67,12 @@ namespace StudioService {
 	export const mouseCoordinates = proxy(() => bp.mouseCoordinates.value, null);
 	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);
+	export const stretch = computed(() => {
+		const type = selection.value.type;
+		if(type == "Stretch") return selection.value as Stretch;
+		if(type == "Device") return (selection.value as Device).stretch;
+		return null;
+	});
 
 	export const plugins = proxy(() => bp.plugins, null!);
 

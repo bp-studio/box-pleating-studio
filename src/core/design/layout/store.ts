@@ -17,6 +17,10 @@ export class Store<T extends object> {
 		this._generator = generator;
 	}
 
+	public get $done(): boolean {
+		return this._done;
+	}
+
 	/** The number of entries, or `undefined` if not completed yet. */
 	public get $length(): number | undefined {
 		return this._done ? this.$entries.length : undefined;

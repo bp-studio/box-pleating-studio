@@ -76,7 +76,7 @@ export class Stretch implements ISerializable<JStretch> {
 		this._repo.$complete();
 		return {
 			data: this.toJSON(),
-			patternCounts: this._repo.$configurations.map(c => c.$length!),
+			repo: this._repo.toJSON(),
 		};
 	}
 }

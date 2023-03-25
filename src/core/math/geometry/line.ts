@@ -24,7 +24,7 @@ export class Line {
 	constructor(p: Point, v: Vector);
 	constructor(p1: Point, p2: Point);
 	constructor(p: Point, c: Point | Vector) {
-		if(c instanceof Vector) c = p.add(c);
+		if(c instanceof Vector) c = p.$add(c);
 		this.p1 = p; this.p2 = c;
 	}
 
@@ -78,7 +78,7 @@ export class Line {
 		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
 		if(isRay && b.lt(Fraction.ZERO)) return null;
 
-		return p.add(v.$scale(b));
+		return p.$add(v.$scale(b));
 	}
 
 	/** Transform the line by the given orientation and return a new line. */
@@ -87,8 +87,8 @@ export class Line {
 	}
 
 	/** Move the line by the given {@link Vector} and return a new line. */
-	public $shift(v: Vector): Line {
-		return new Line(this.p1.add(v), this.p2.add(v));
+	public $add(v: Vector): Line {
+		return new Line(this.p1.$add(v), this.p2.$add(v));
 	}
 
 	/** Remove duplicates and return a new array of lines. */
