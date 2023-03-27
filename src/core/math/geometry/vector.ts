@@ -73,8 +73,7 @@ export class Vector extends Couple {
 		return new Vector(this._x.neg, this._y.neg);
 	}
 
-	// eslint-disable-next-line local-rules/ascii-comments
-	/** Returns the principal argument of the vector in radians. In the range of ±π/2. */
+	/** Returns the principal argument of the vector in radians, in the range of (-PI/2, PI/2). */
 	public get $angle(): number {
 		return Math.atan2(this.y, this.x);
 	}

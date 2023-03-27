@@ -243,6 +243,7 @@
 		"lines-around-comment": "off",
 		"lines-between-class-members": "off",
 		"local-rules/ascii-comments": "error",
+		"local-rules/single-line-control-statement-spacing": "warn",
 		"max-classes-per-file": "warn",
 		"max-depth": "warn",
 		"max-len": [

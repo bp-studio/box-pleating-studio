@@ -8,6 +8,11 @@ import type { Project } from "client/project/project";
 
 declare const JSZip: typeof jsZip;
 
+//=================================================================
+/**
+ * {@link ExportService} generates the {@link Blob}s for exporting.
+ */
+//=================================================================
 namespace ExportService {
 
 	export function toBPS(proj: Project): Promise<Blob> {
@@ -48,7 +53,7 @@ namespace ExportService {
 			let name = FileUtility.sanitize(project.design.title);
 			if(names.has(name)) {
 				let j = 1;
-				for(; names.has(name + " (" + j + ")"); j++);
+				while(names.has(name + " (" + j + ")")) j++;
 				name = name + " (" + j + ")";
 			}
 			names.add(name);
