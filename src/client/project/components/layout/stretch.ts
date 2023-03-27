@@ -37,11 +37,19 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public moveConfig(by: number): void {
-		//
+		const repo = this._data.repo;
+		if(!repo) return;
+		const i = repo.configIndex;
+		const l = repo.configCount;
+		this.$layout.$moveConfig(this._data.data.id, (i + by + l) % l);
 	}
 
 	public movePattern(by: number): void {
-		//
+		const repo = this._data.repo;
+		if(!repo) return;
+		const i = repo.patternIndex;
+		const l = repo.patternCount;
+		this.$layout.$movePattern(this._data.data.id, (i + by + l) % l);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

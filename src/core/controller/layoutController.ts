@@ -4,6 +4,7 @@ import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { Clip } from "core/math/polyBool/clip/clip";
 import { CreaseType } from "shared/types/cp";
+import { patternTask } from "core/design/tasks/pattern";
 
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
@@ -60,6 +61,20 @@ namespace LayoutController {
 			}
 		}
 		return clip.$get(lines);
+	}
+
+	export function moveConfig(stretchId: string, to: number): void {
+		const stretch = State.$stretches.get(stretchId)!;
+		stretch.$repo.$index = to;
+		State.$repoUpdated.add(stretch.$repo);
+		Processor.$run(patternTask);
+	}
+
+	export function movePattern(stretchId: string, to: number): void {
+		const stretch = State.$stretches.get(stretchId)!;
+		stretch.$repo.$configuration!.$index = to;
+		State.$repoUpdated.add(stretch.$repo);
+		Processor.$run(patternTask);
 	}
 
 	function addPolygon(set: CPLine[], polygon: Polygon, type: CreaseType): void {

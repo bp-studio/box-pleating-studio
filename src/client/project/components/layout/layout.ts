@@ -139,6 +139,14 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._pendingUpdate.add(flap);
 	}
 
+	public $moveConfig(stretchId: string, to: number): void {
+		this.$project.$callCore("layout", "moveConfig", stretchId, to);
+	}
+
+	public $movePattern(stretchId: string, to: number): void {
+		this.$project.$callCore("layout", "movePattern", stretchId, to);
+	}
+
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {
 		return {
 			id,
