@@ -4,7 +4,7 @@ import { patternGenerator } from "./generators/patternGenerator";
 
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
-import type { JConfiguration, JJunction, JPartition } from "shared/json";
+import type { JConfiguration, JJunction, JOverlap, JPartition } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 
 //=================================================================
@@ -18,14 +18,39 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	public readonly $repo: Repository;
 	public readonly $partitions: readonly Partition[];
+	public readonly $overlaps!: readonly JOverlap[];
+
+	/**
+	 * Given the id (a negative number) of a {@link JOverlap},
+	 * return the indices of its {@link Partition} and itself.
+	 */
+	public readonly $overlapMap!: ReadonlyMap<number, [number, number]>;
+
 	private readonly _patterns: Store<Pattern>;
 	public $index: number = 0;
 
 	constructor(repo: Repository, junctions: JJunction[], partitions: JPartition[]) {
 		this.$repo = repo;
 		this.$partitions = partitions.map(p => new Partition(junctions, p));
+
 		this._patterns = new Store(patternGenerator(this));
 		this._patterns.$next();
+
+		if(this._patterns.$entries.length) {
+			const overlaps: JOverlap[] = [];
+			const overlapMap: Map<number, [number, number]> = new Map();
+			let k = -1;
+			for(const [i, p] of partitions.entries()) {
+				for(const [j, o] of p.overlaps.entries()) {
+					overlaps.push(o);
+					overlapMap.set(k--, [i, j]);
+				}
+			}
+
+			// These are needed only if there's a pattern.
+			this.$overlaps = overlaps;
+			this.$overlapMap = overlapMap;
+		}
 	}
 
 	public toJSON(): JConfiguration {

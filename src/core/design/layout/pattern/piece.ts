@@ -46,7 +46,7 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public get $anchors(): (Point | null)[] {
+	@cache public get $anchors(): (Point | null)[] {
 		const p = this._points;
 		const { contour } = this.$shape;
 		return [
@@ -73,7 +73,7 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	// Private members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private get _points(): Point[] {
+	@cache private get _points(): Point[] {
 		const { ox, oy, u, v } = this;
 
 		// a GOPS is like the reverse of the Overlap region,

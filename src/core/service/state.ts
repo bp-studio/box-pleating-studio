@@ -2,6 +2,7 @@ import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/diff/diffDoubleSet";
 import { DiffSet } from "shared/data/diff/diffSet";
 
+import type { Device } from "core/design/layout/pattern/device";
 import type { Repository } from "core/design/layout/repository";
 import type { JStretch } from "shared/json";
 import type { UpdateModel } from "./updateModel";
@@ -107,7 +108,11 @@ export namespace State {
 	/** Those flaps or rivers that will change their contours in the current round. */
 	export const $contourWillChange = new Set<ITreeNode>();
 
+	/** The quadrants that have patterns. */
 	export const $patternedQuadrants = new Set<number>();
+
+	/** The {@link Device}s moved in the current round. */
+	export const $movedDevices = new Set<Device>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public methods
@@ -128,6 +133,7 @@ export namespace State {
 		$stretchPrototypes.clear();
 		$contourWillChange.clear();
 		$patternedQuadrants.clear();
+		$movedDevices.clear();
 		$treeStructureChanged = false;
 		$rootChanged = false;
 	}

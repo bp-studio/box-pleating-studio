@@ -20,6 +20,12 @@ export class Stretch implements ISerializable<JStretch> {
 	/** {@link Repository} cache during dragging. */
 	private readonly _repoCache = new Map<string, Repository>();
 
+	/**
+	 * Whether self is currently active.
+	 * A {@link Stretch} could temporarily become inactive during dragging.
+	 */
+	public $isActive: boolean = true;
+
 	/** Current {@link Repository} in used. */
 	private _repo: Repository;
 
@@ -48,7 +54,15 @@ export class Stretch implements ISerializable<JStretch> {
 	 */
 	public $update(junctions: ValidJunction[]): void {
 		const signature = getStructureSignature(junctions);
-		if(signature === this._repo.$signature) return;
+		if(signature === this._repo.$signature) {
+			if(!this.$isActive) {
+				State.$repoUpdated.add(this._repo);
+				this.$isActive = true;
+			}
+			return;
+		}
+
+		this.$isActive = true;
 		if(State.$isDragging) {
 			this._repoCache.set(this._repo.$signature, this._repo);
 			const repo = this._repoCache.get(signature);

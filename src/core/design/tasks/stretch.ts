@@ -44,6 +44,7 @@ function stretches(): void {
 		if(State.$isDragging) {
 			// Put into cache
 			const s = State.$stretches.get(id)!;
+			s.$isActive = false;
 			State.$stretchCache.set(id, s);
 		}
 		State.$stretches.delete(id);

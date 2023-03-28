@@ -1,7 +1,9 @@
 
 import { Device } from "./device";
+import { Point } from "core/math/geometry/point";
+import { State } from "core/service/state";
 
-import type { JDevice, JPattern } from "shared/json";
+import type { JConnection, JDevice, JPattern } from "shared/json";
 import type { Configuration } from "../configuration";
 
 //=================================================================
@@ -21,12 +23,22 @@ export class Pattern implements ISerializable<JPattern> {
 
 	constructor(config: Configuration, devices: JDevice[]) {
 		this.$config = config;
-		this.$devices = devices.map(d => new Device(this, d));
+		this.$devices = devices.map((d, i) => new Device(this, config.$partitions[i], d));
 	}
 
 	public toJSON(): JPattern {
 		return {
 			devices: this.$devices.map(d => d.toJSON()),
 		};
+	}
+
+	/** Return the {@link Point} by the given {@link JConnection}. */
+	public $getConnectionTarget(c: JConnection): Point {
+		if(c.e >= 0) {
+			return new Point(State.$tree.$nodes[c.e]!.$AABB.$points[c.q]);
+		} else {
+			const [i, j] = this.$config.$overlapMap.get(c.e)!;
+			return this.$devices[i].$anchors[j][c.q];
+		}
 	}
 }

@@ -1,5 +1,4 @@
 import { dist } from "../../context/tree";
-import { Direction } from "shared/types/direction";
 import { InvalidJunction } from "./invalidJunction";
 import { ValidJunction } from "./validJunction";
 
@@ -31,12 +30,7 @@ export function createJunction(a: ITreeNode, b: ITreeNode, lca: ITreeNode): Junc
 	const o = { x: d - sx, y: d - sy };
 	const f = { x: Math.sign(x), y: Math.sign(y) } as ISignPoint;
 	const dir: QuadrantDirection = (f.x == f.y ? 0 : 1) + (y > 0 ? 0 : 2);
-
-	let tip: IPoint;
-	if(dir == Direction.UR) tip = { x: r1, y: t1 };
-	else if(dir == Direction.UL) tip = { x: l1, y: t1 };
-	else if(dir == Direction.LL) tip = { x: l1, y: b1 };
-	else tip = { x: r1, y: b1 };
+	const tip = a.$AABB.$points[dir];
 
 	return new ValidJunction(a, b, { lca, s, o, f, dir, tip });
 }

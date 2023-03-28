@@ -1,5 +1,6 @@
 import { AABBSide } from "./aabbSide";
 
+import type { PerQuadrant } from "shared/types/direction";
 import type { IRoundedRect } from "core/math/polyBool/intersection/roundedRect";
 import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
@@ -39,6 +40,9 @@ export class AABB {
 
 	private readonly _sides: Record<Side, AABBSide> & AABBSide[];
 
+	/** Four tips of the flap. */
+	public $points!: PerQuadrant<IPoint>;
+
 	constructor() {
 		this._sides = [
 			new AABBSide(maxComparator), // top
@@ -60,6 +64,7 @@ export class AABB {
 		this._sides[Side._right].$value = right;
 		this._sides[Side._bottom].$value = bottom;
 		this._sides[Side._left].$value = left;
+		this.$points = toCorners([top, right, bottom, left]);
 	}
 
 	public $setMargin(m: number): void {
@@ -128,7 +133,7 @@ export class AABB {
 }
 
 /** Four corners in the order of quadrants. */
-export function toCorners([t, r, b, l]: number[]): Path {
+export function toCorners([t, r, b, l]: number[]): [IPoint, IPoint, IPoint, IPoint] {
 	return [
 		{ x: r, y: t },
 		{ x: l, y: t },
