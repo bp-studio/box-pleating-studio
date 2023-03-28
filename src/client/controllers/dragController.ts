@@ -95,7 +95,7 @@ export namespace DragController {
 		if(wasDragging && project) {
 			project.$isDragging = false;
 			if(SelectionController.draggables.value[0].type === "Flap") {
-				project.$callCore("layout", "dragEnd");
+				project.$core.layout.dragEnd();
 			}
 		}
 		stage.interactiveChildren = true;

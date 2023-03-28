@@ -49,9 +49,6 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 				if(node) node.$setFlap(flap);
 			}
 		}
-
-		State.$tree = this;
-		State.$rootChanged = true;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

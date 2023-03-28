@@ -16,7 +16,7 @@ export async function cp(options: CPOptions): Promise<string> {
 	const project = ProjectService.project.value!;
 	const grid = project.design.layout.$sheet.grid;
 	const borders = grid.$getBorderPath();
-	const lines = await project.$callCore("layout", "getCP", borders);
+	const lines = await project.$core.layout.getCP(borders);
 
 	const matrix = grid.$getTransformMatrix(400, options.reorient);
 	for(const l of lines) {

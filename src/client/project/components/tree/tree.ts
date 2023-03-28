@@ -113,7 +113,7 @@ export class Tree implements ISerializable<JTree> {
 		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y });
 		const flap = design.layout.$createFlapPrototype(id, p);
 		prototype.layout.flaps.push(flap);
-		return this.$project.$callCore("tree", "addLeaf", id, at.id, length, flap);
+		return this.$project.$core.tree.addLeaf(id, at.id, length, flap);
 	}
 
 	public $delete(vertices: Vertex[]): Promise<void> {
@@ -125,12 +125,12 @@ export class Tree implements ISerializable<JTree> {
 		design.$prototype.layout.flaps.push(...prototypes);
 
 		for(const id of ids) SelectionController.$toggle(this.$vertices[id]!, false);
-		return this.$project.$callCore("tree", "removeLeaf", ids, prototypes);
+		return this.$project.$core.tree.removeLeaf(ids, prototypes);
 	}
 
 	public $join(vertex: Vertex): Promise<void> {
 		SelectionController.clear();
-		return this.$project.$callCore("tree", "join", vertex.id);
+		return this.$project.$core.tree.join(vertex.id);
 	}
 
 	public $split(edge: Edge): void {
@@ -143,16 +143,16 @@ export class Tree implements ISerializable<JTree> {
 			x: Math.round((l1.x + l2.x) / 2),
 			y: Math.round((l1.y + l2.y) / 2),
 		});
-		this.$project.$callCore("tree", "split", edge.toJSON(), id);
+		this.$project.$core.tree.split(edge.toJSON(), id);
 	}
 
 	public $merge(edge: Edge): void {
 		SelectionController.clear();
-		this.$project.$callCore("tree", "merge", edge.toJSON());
+		this.$project.$core.tree.merge(edge.toJSON());
 	}
 
 	public $updateLength(edges: JEdge[]): void {
-		this.$project.$callCore("tree", "update", edges);
+		this.$project.$core.tree.update(edges);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {

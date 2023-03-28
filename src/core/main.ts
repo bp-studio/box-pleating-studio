@@ -1,8 +1,7 @@
 import { getAction } from "./routes/routes";
-import { Design } from "./design/design";
 import { State } from "./service/state";
 
-import type { StudioResponse, IStudioRequestBase } from "core/routes";
+import type { StudioResponse, IStudioRequest } from "core/routes";
 
 //=================================================================
 /**
@@ -15,7 +14,7 @@ import type { StudioResponse, IStudioRequestBase } from "core/routes";
 onmessage = function(event: MessageEvent): void {
 	if(!event.ports[0]) return;
 
-	const request = event.data as IStudioRequestBase;
+	const request = event.data as IStudioRequest;
 	let response: StudioResponse;
 	try {
 		// Get the route corresponding the the request.
@@ -41,4 +40,4 @@ onmessage = function(event: MessageEvent): void {
 	event.ports[0].postMessage(response);
 };
 
-export { Design };
+export { State };

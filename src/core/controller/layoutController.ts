@@ -1,4 +1,3 @@
-import { Design } from "core/design/design";
 import { AABBTask } from "core/design/tasks/aabb";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
@@ -21,7 +20,7 @@ namespace LayoutController {
 
 	export function updateFlap(flaps: JFlap[], dragging: boolean): void {
 		State.$isDragging = dragging;
-		Design.$instance.$tree.$setFlaps(flaps);
+		State.$tree.$setFlaps(flaps);
 		Processor.$run(AABBTask);
 	}
 
@@ -43,7 +42,7 @@ namespace LayoutController {
 	 */
 	export function getCP(borders: Path): CPLine[] {
 		const clip = new Clip();
-		const tree = Design.$instance.$tree;
+		const tree = State.$tree;
 		const lines: CPLine[] = [];
 		addPolygon(lines, [borders], CreaseType.Border);
 		for(const node of tree.$nodes) {

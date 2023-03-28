@@ -1,24 +1,19 @@
 import type { UpdateModel } from "core/service/updateModel";
 import type { RouteMap } from "./routes";
 
-export type ControllerKeys = keyof RouteMap;
+type ToPromise<T> = (...args: Parameters<T>) => Promise<ReturnType<T>>;
+type Controller<C extends keyof RouteMap> = {
+	readonly [A in keyof RouteMap[C]]: ToPromise<RouteMap[C][A]>;
+};
 
-export type ActionKeys<T extends ControllerKeys> = keyof RouteMap[T];
+export type Route = {
+	readonly [C in keyof RouteMap]: Controller<C>;
+};
 
-export type ActionArguments<T extends ControllerKeys, U extends ActionKeys<T>> = Parameters<RouteMap[T][U]>;
-
-export type ActionResult<T extends ControllerKeys, U extends ActionKeys<T>> = Awaited<ReturnType<RouteMap[T][U]>>;
-
-export interface IStudioRequestBase {
-	controller: ControllerKeys;
+export interface IStudioRequest {
+	controller: keyof RouteMap;
 	action: string;
 	value: unknown[];
-}
-
-export interface IStudioRequest<C extends ControllerKeys, A extends ActionKeys<C>> extends IStudioRequestBase {
-	controller: C;
-	action: A;
-	value: ActionArguments<C, A>;
 }
 
 interface ValueResponse {

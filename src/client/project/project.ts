@@ -5,7 +5,7 @@ import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
 
-import type * as Routes from "core/routes";
+import type { Route, StudioResponse } from "core/routes";
 import type { JProject } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
@@ -24,6 +24,12 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	public readonly id: number;
 	public readonly design: Design;
 	public readonly history: HistoryManager;
+
+	/**
+	 * A {@link Proxy} object that represents the controllers and actions of the Core.
+	 * This greatly improves the typing and code navigating for the Core APIs.
+	 */
+	public readonly $core: Route;
 
 	private readonly _worker: Worker;
 
@@ -45,6 +51,13 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this.$addChild(this.design);
 
 		this._worker = worker;
+		this.$core = new Proxy({}, {
+			get: (controllers: Record<string, object>, controller: string) =>
+				controllers[controller] ||= new Proxy({}, {
+					get: (actions: Record<string, Action>, action: string) =>
+						actions[action] ||= (...args: unknown[]) => this._callCore(controller, action, args),
+				}),
+		}) as Route;
 
 		this.history = new HistoryManager();
 
@@ -57,7 +70,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			console.time("First render");
 		}
 
-		await this.$callCore("design", "init", this.design.$prototype);
+		await this.$core.design.init(this.design.$prototype);
 
 		// Wait for rendering to complete.
 		// Originally `Vue.nextTick()` was used here, but it is later
@@ -92,11 +105,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	/**
 	 * Send a request to the Core worker and obtain a direct result or an {@link UpdateModel}.
 	 */
-	public async $callCore<C extends Routes.ControllerKeys, A extends Routes.ActionKeys<C>>(
-		controller: C, action: A, ...args: Routes.ActionArguments<C, A>
-	): Promise<Routes.ActionResult<C, A>> {
-		const request: Routes.IStudioRequest<C, A> = { controller, action, value: args };
-		const response = await app.callWorker<Routes.StudioResponse>(this._worker, request);
+	private async _callCore(controller: string, action: string, args: unknown[]): Promise<unknown> {
+		const request = { controller, action, value: args };
+		const response = await app.callWorker<StudioResponse>(this._worker, request);
 		if("error" in response) {
 			this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
 			if(this._initialized) {
@@ -107,9 +118,8 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			throw new Error(response.error); // Stop all further actions.
 		} else if("update" in response) {
 			this.design.$update(response.update);
-			return undefined as Routes.ActionResult<C, A>;
 		} else {
-			return response.value as Routes.ActionResult<C, A>;
+			return response.value;
 		}
 	}
 }
