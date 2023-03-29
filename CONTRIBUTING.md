@@ -48,6 +48,7 @@ while the first issue is impossible to polyfill.
 
 There's currently no plans for officially supporting browsers other than
 Chrome, Edge, Safari, Firefox, Opera, and Samsung Internet.
+Not that I don't want to, but that I don't have the resource to do so.
 
 ## Unit testing
 

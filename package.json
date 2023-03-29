@@ -52,7 +52,7 @@
 		"eslint-plugin-typescript-compat": "^1.0.1",
 		"eslint-plugin-vue": "^9.10.0",
 		"fancy-log": "^2.0.0",
-		"fontawesome-subset": "^4.3.1",
+		"fontawesome-subset": "^4.4.0",
 		"global-jsdom": "^8.8.0",
 		"gulp": "^4.0.2",
 		"gulp-all": "^1.1.0",
@@ -97,7 +97,7 @@
 		"yargs": "^17.7.1"
 	},
 	"dependencies": {
-		"@fortawesome/fontawesome-free": "5.15.4",
+		"@fortawesome/fontawesome-free": "^6.4.0",
 		"@paypal/paypal-js": "^5.1.6",
 		"@pixi/app": "^7.2.3",
 		"@pixi/constants": "^7.2.3",

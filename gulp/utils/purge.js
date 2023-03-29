@@ -29,8 +29,12 @@ module.exports.purge = function(stream) {
 					/^--bs-nav-tabs/,
 				],
 			},
-			fontFace: false, // for Font Awesome
-			variables: true, // for Bootstrap
+			// for Font Awesome
+			keyframes: true,
+			fontFace: true,
+
+			// for Bootstrap
+			variables: true,
 		}))
 		.pipe(replace(/(\r|\n)*\/\*.+?\*\/$/, "")); // remove sourcemap
 };
