@@ -12,7 +12,7 @@ type Action<T = void> = (...args: any[]) => T;
 /**
  * A function that accepts `A` and returns `B`.
  */
-type Func<A, B> = (a: A) => B;
+type Func<A, B> = (param: A) => B;
 
 /**
  * A function that accepts `T` and returns boolean value.

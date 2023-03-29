@@ -10,6 +10,7 @@ import { isTouch } from "app/shared/constants";
 import Dialogs from "app/services/dialogService";
 import Lib from "app/services/libService";
 import LZ from "app/utils/lz";
+import Workspace from "./services/workspaceService";
 
 namespace Core {
 
@@ -58,9 +59,9 @@ namespace Core {
 			// The value written to sessionStorage will not be lost due to tab reload,
 			// so we can use this to avoid the problem of reloading when one refreshes the page
 			sessionStorage.setItem("project", lz!);
+			gtag("event", "share_open");
 			try {
-				// this.projects.add(bp.load(json)!);
-				gtag("event", "share_open");
+				await Workspace.open(json);
 			} catch(e) {
 				await Dialogs.alert(i18n.t("message.invalidLink"));
 			}

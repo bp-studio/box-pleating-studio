@@ -11,7 +11,7 @@ import type { JDesign } from "shared/json";
  * There's no need for disposing, as everything will be disposed with the worker.
  */
 //=================================================================
-namespace DesignController {
+export namespace DesignController {
 
 	/** Initialize a design by the given data. */
 	export function init(data: JDesign): void {
@@ -27,5 +27,3 @@ namespace DesignController {
 		if(DEBUG_ENABLED) console.timeEnd("Design initializing");
 	}
 }
-
-export default DesignController;

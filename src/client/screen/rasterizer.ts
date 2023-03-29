@@ -25,7 +25,7 @@ let debounce: Timeout;
 window.addEventListener("beforeprint", () => beforePrint(ProjectService.project.value));
 window.addEventListener("afterprint", afterPrint);
 
-function beforePrint(proj: Project | null): void {
+export function beforePrint(proj: Project | null): void {
 	if(!proj) return;
 	clearTimeout(debounce);
 	if(!printing &&

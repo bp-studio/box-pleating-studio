@@ -92,6 +92,9 @@ namespace StudioService {
 	// Delegate methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	export function beforePrint(): void {
+		bp.beforePrint(null);
+	}
 	export function selectAll(): void {
 		bp.selection.selectAll();
 	}

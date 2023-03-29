@@ -1,16 +1,17 @@
 import type { UpdateModel } from "core/service/updateModel";
 import type { RouteMap } from "./routes";
 
-type ToPromise<T> = (...args: Parameters<T>) => Promise<ReturnType<T>>;
-type Controller<C extends keyof RouteMap> = {
-	readonly [A in keyof RouteMap[C]]: ToPromise<RouteMap[C][A]>;
+type ToPromise<T> = T extends (...args: infer U) => infer R ? (...args: U) => Promise<R> : never;
+
+type Controller<C> = {
+	readonly [A in keyof C]: ToPromise<C[A]>;
 };
 
 export type Route = {
-	readonly [C in keyof RouteMap]: Controller<C>;
+	readonly [C in keyof RouteMap]: Controller<RouteMap[C]>;
 };
 
-export interface IStudioRequest {
+export interface CoreRequest {
 	controller: keyof RouteMap;
 	action: string;
 	value: unknown[];
@@ -29,4 +30,4 @@ interface ErrorResponse {
 	error: string;
 }
 
-export type StudioResponse = ValueResponse | UpdateResponse | ErrorResponse;
+export type CoreResponse = ValueResponse | UpdateResponse | ErrorResponse;

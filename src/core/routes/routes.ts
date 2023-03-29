@@ -1,8 +1,8 @@
-import TreeController from "core/controller/treeController";
-import DesignController from "core/controller/designController";
-import LayoutController from "core/controller/layoutController";
+import { TreeController } from "core/controller/treeController";
+import { DesignController } from "core/controller/designController";
+import { LayoutController } from "core/controller/layoutController";
 
-import type { IStudioRequest } from ".";
+import type { CoreRequest } from ".";
 
 const Routes = {
 	design: DesignController,
@@ -12,7 +12,7 @@ const Routes = {
 
 export type RouteMap = typeof Routes;
 
-export function getAction(request: IStudioRequest): Action<unknown> {
+export function getAction(request: CoreRequest): Action<unknown> {
 	if(!(request.controller in Routes)) {
 		throw new Error(`Unknown controller: ${request.controller}`);
 	}
@@ -25,4 +25,3 @@ export function getAction(request: IStudioRequest): Action<unknown> {
 
 	return action;
 }
-

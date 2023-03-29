@@ -1,11 +1,7 @@
 
 import { shallowRef } from "vue";
 
-import type { InjectionKey, Ref, Component } from "vue";
-
-function key<T>(): InjectionKey<T> {
-	return Symbol("injectionKey");
-}
+import type { Ref, Component } from "vue";
 
 type UnwrapComponent<C> = C extends Constructor ? InstanceType<C> : C;
 

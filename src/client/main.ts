@@ -14,7 +14,7 @@ export const drag: IDragController = DragController;
 export const selection: ISelectionController = SelectionController;
 
 export { svg } from "./svg";
-export { png, copyPNG } from "./screen/rasterizer";
+export { png, copyPNG, beforePrint } from "./screen/rasterizer";
 
 export { mouseCoordinates } from "./services/interaction";
 export { nextTick } from "./screen/display";

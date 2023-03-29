@@ -22,7 +22,10 @@ export interface IProjectController {
 }
 
 /**
- * For debugging memory leaks.
+ * For debugging memory leaks. When in debug mode,
+ * it prints a message in the console after the {@link Project} has been garbage collected.
+ * If the message fails to appear after closing the project and hitting the GC button,
+ * we will then have to figure out what is keeping the reference of the project.
  */
 let registry: FinalizationRegistry<number>;
 if(DEBUG_ENABLED) {
@@ -87,17 +90,17 @@ export namespace ProjectController {
 				},
 			},
 		}, json);
-		return createCore(json);
+		return makeProject(json);
 	}
 
 	/**
 	 * Opens an old project. Passed-in data will go through {@link Migration} and updated to the latest format.
 	 */
 	export function open(json: Pseudo<JProject>): Promise<Project> {
-		return createCore(Migration.$process(json));
+		return makeProject(Migration.$process(json));
 	}
 
-	function createCore(json: RecursivePartial<JProject>): Promise<Project> {
+	function makeProject(json: RecursivePartial<JProject>): Promise<Project> {
 		const p = new Project(json, getOrCreateWorker());
 		if(DEBUG_ENABLED) registry.register(p, p.id);
 		projectMap.set(p.id, p);

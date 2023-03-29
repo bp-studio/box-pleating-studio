@@ -10,7 +10,7 @@ import type { JEdge, JEdgeBase, JFlap } from "shared/json";
  * {@link TreeController} manages the operations on the tree structure.
  */
 //=================================================================
-namespace TreeController {
+export namespace TreeController {
 
 	/** Add a new leaf */
 	export function addLeaf(id: number, at: number, length: number, flap: JFlap): void {
@@ -80,5 +80,3 @@ namespace TreeController {
 		return n1.$parent === n2 ? edge.n1 : edge.n2;
 	}
 }
-
-export default TreeController;

@@ -32,28 +32,30 @@
 
 	import Divider from "@/gadgets/menu/divider.vue";
 
+	// Safari < 16.4 & on iPad still requires "webkit" prefix,
+	// see https://caniuse.com/mdn-api_element_fullscreenchange_event
+	// As of today iPhone still has no support for fullscreen.
+	// Since the targeted Firefox version is >= 78, we don't need "moz" prefix support here.
+
 	const fullscreen = shallowRef(false);
-	const fullscreenEnabled = document.fullscreenEnabled ||
-		document.mozFullscreenEnabled || document.webkitFullscreenEnabled;
+	const fullscreenEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
 
 	document.addEventListener("fullscreenchange", checkFullscreen);
-	document.addEventListener("mozfullscreenchange", checkFullscreen); // Firefox < 64
-	document.addEventListener("webkitfullscreenchange", checkFullscreen); // Safari
+	document.addEventListener("webkitfullscreenchange", checkFullscreen);
 
 	function checkFullscreen(): void {
 		fullscreen.value = window.matchMedia("(display-mode: fullscreen)").matches ||
 			Boolean(document.fullscreenElement) ||
-			Boolean(document.mozFullScreenElement) ||
 			Boolean(document.webkitCurrentFullScreenElement);
 	}
 
 	function toggleFullscreen(): void {
 		if(fullscreen.value) {
 			const doc = document;
-			(doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen).apply(doc);
+			(doc.exitFullscreen || doc.webkitExitFullscreen).apply(doc);
 		} else {
 			const el = document.documentElement;
-			(el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).apply(el);
+			(el.requestFullscreen || el.webkitRequestFullscreen).apply(el);
 		}
 	}
 

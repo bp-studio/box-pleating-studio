@@ -1,14 +1,19 @@
 import { Control } from "client/base/control";
-import { Device } from "./device";
 import { shallowRef } from "client/shared/decorators";
+import { SelectionController } from "client/controllers/selectionController";
+import { Device } from "./device";
 
 import type { JStretch } from "shared/json";
+import type { View } from "client/base/view";
 import type { JRepository, StretchData, UpdateModel } from "core/service/updateModel";
 import type { Layout } from "./layout";
 
 //=================================================================
 /**
  * {@link Stretch} represents a stretch pattern.
+ *
+ * It inherits {@link Control} which in turns inherits {@link View},
+ * but it does not have its own graphics rendering.
  */
 //=================================================================
 export class Stretch extends Control implements ISerializable<JStretch> {
@@ -41,6 +46,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		if(!repo) return;
 		const i = repo.configIndex;
 		const l = repo.configCount;
+		//TODO: need to consider history here
+		SelectionController.clear();
+		SelectionController.$toggle(this, true);
 		this.$layout.$moveConfig(this._data.data.id, (i + by + l) % l);
 	}
 
@@ -49,6 +57,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		if(!repo) return;
 		const i = repo.patternIndex;
 		const l = repo.patternCount;
+		//TODO: need to consider history here
+		SelectionController.clear();
+		SelectionController.$toggle(this, true);
 		this.$layout.$movePattern(this._data.data.id, (i + by + l) % l);
 	}
 

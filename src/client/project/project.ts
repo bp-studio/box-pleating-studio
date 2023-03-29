@@ -5,7 +5,7 @@ import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
 
-import type { Route, StudioResponse } from "core/routes";
+import type { Route, CoreResponse } from "core/routes";
 import type { JProject } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
@@ -107,7 +107,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 */
 	private async _callCore(controller: string, action: string, args: unknown[]): Promise<unknown> {
 		const request = { controller, action, value: args };
-		const response = await app.callWorker<StudioResponse>(this._worker, request);
+		const response = await app.callWorker<CoreResponse>(this._worker, request);
 		if("error" in response) {
 			this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
 			if(this._initialized) {

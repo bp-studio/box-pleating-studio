@@ -9,7 +9,6 @@
 </script>
 
 <script setup lang="ts">
-	/// <reference types="@types/wicg-file-system-access" />
 
 	const props = defineProps({
 		multiple: Boolean,

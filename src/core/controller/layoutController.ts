@@ -16,7 +16,7 @@ import type { Repository } from "core/design/layout/repository";
  * {@link LayoutController} manages the operations on the layout.
  */
 //=================================================================
-namespace LayoutController {
+export namespace LayoutController {
 
 	export function updateFlap(flaps: JFlap[], dragging: boolean): void {
 		State.$isDragging = dragging;
@@ -93,5 +93,3 @@ namespace LayoutController {
 		}
 	}
 }
-
-export default LayoutController;

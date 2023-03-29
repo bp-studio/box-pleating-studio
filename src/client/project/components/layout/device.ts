@@ -58,7 +58,7 @@ export class Device extends Draggable {
 
 	private _drawShade(): void {
 		this._shade.alpha = style.shade.alpha;
-		if(this.$selected) this._shade.alpha = style.shade.alpha;
+		if(this.$selected || this.stretch.$selected) this._shade.alpha = style.shade.alpha;
 		else if(this.$hovered) this._shade.alpha = style.shade.hover;
 		else this._shade.alpha = 0;
 	}

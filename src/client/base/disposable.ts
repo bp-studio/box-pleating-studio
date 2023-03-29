@@ -23,10 +23,8 @@ export abstract class Disposable extends EventTarget {
 		// Remove all object references to improve GC.
 		// We have to wait until all disposing actions are done to do this,
 		// or we'll end up in a lot of trouble.
-		const self = this as Record<string, unknown>;
-		const keys = Object.keys(this);
-		for(const key of keys) {
-			if(typeof self[key] == "object") delete self[key];
+		for(const key of Object.keys(this)) {
+			if(typeof this[key] === "object") delete this[key];
 		}
 
 		this._disposed = true;
@@ -54,8 +52,8 @@ export interface DisposableEventMap {
 	[DISPOSE]: DisposeEvent;
 }
 
+/** Disposing Event */
 class DisposeEvent extends Event {
 	constructor() { super(DISPOSE); }
 }
 
-export default Disposable;

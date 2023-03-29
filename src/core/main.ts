@@ -1,7 +1,7 @@
 import { getAction } from "./routes/routes";
 import { State } from "./service/state";
 
-import type { StudioResponse, IStudioRequest } from "core/routes";
+import type { CoreResponse, CoreRequest } from "core/routes";
 
 //=================================================================
 /**
@@ -14,8 +14,8 @@ import type { StudioResponse, IStudioRequest } from "core/routes";
 onmessage = function(event: MessageEvent): void {
 	if(!event.ports[0]) return;
 
-	const request = event.data as IStudioRequest;
-	let response: StudioResponse;
+	const request = event.data as CoreRequest;
+	let response: CoreResponse;
 	try {
 		// Get the route corresponding the the request.
 		const action = getAction(request);

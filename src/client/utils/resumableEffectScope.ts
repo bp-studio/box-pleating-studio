@@ -8,7 +8,7 @@ import type { EffectScope } from "vue";
  * It provides the functionality to pause and resume.
  */
 //=================================================================
-export default class ResumableEffectScope {
+export class ResumableEffectScope {
 
 	private _scope?: EffectScope;
 	private _action?: Action;

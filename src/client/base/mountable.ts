@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
-import { Disposable } from "shared/classes/disposable";
+import { Disposable } from "./disposable";
 
-import type { DisposableEventMap } from "shared/classes/disposable";
+import type { DisposableEventMap } from "./disposable";
 
 //=================================================================
 /**
@@ -14,7 +14,7 @@ import type { DisposableEventMap } from "shared/classes/disposable";
  * they will not establish control items or draw on the screen.
  */
 //=================================================================
-abstract class Mountable extends Disposable {
+export abstract class Mountable extends Disposable {
 
 	private readonly _children: Mountable[] = [];
 
@@ -24,10 +24,7 @@ abstract class Mountable extends Disposable {
 	/** Whether parent is `null` or is mounted. */
 	private _parentIsNullOrMounted: boolean;
 
-	/**
-	 * Whether self is mounted.
-	 * It should equal to `this._active && this._parentIsNullOrMounted`.
-	 */
+	/** The cached value of {@link $mounted}, used for comparing changes. */
 	private _mounted: boolean;
 
 	constructor(active: boolean = true) {
@@ -98,14 +95,12 @@ abstract class Mountable extends Disposable {
 	}
 }
 
-interface Mountable extends Disposable {
+export interface Mountable extends Disposable {
 	addEventListener<T extends keyof MountableEventMap>(
 		type: T,
 		callback: Consumer<MountableEventMap[T]>,
 		options?: boolean | AddEventListenerOptions): void;
 }
-
-export { Mountable };
 
 /**
  * The event for mounting state change. This event propagates downwards.

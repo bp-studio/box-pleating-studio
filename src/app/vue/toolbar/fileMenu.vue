@@ -126,15 +126,14 @@
 	});
 
 	function notify(handle: FileSystemFileHandle): void {
-		// let design = this.bp.design!;
-		// this.bp.notifySave(design);
-		// core.handles.set(design.id, handle);
-		// core.handles.addRecent(handle);
+		Studio.history.notify();
+		Handles.set(Studio.project!.id, handle);
+		Handles.addRecent(handle);
 		gtag("event", "project_bps");
 	}
 	function notifyAll(handle?: FileSystemFileHandle): void {
-		// this.bp.notifySaveAll();
-		// if(handle) core.handles.addRecent(handle);
+		Studio.history.notifyAll();
+		if(handle) Handles.addRecent(handle);
 		gtag("event", "project_bpz");
 	}
 	function svgSaved(): void {
@@ -194,7 +193,7 @@
 	function print(): void {
 		const PRINT_DELAY = 500;
 		if(!Studio.project) return;
-		// this.bp.onBeforePrint();
+		Studio.beforePrint();
 		setTimeout(window.print, PRINT_DELAY);
 		gtag("event", "print", {});
 	}

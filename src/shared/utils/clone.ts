@@ -9,7 +9,7 @@ export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 
 		// This also applies to the case where s is an array.
 		// In that case, the keys will automatically be the indices of the array.
-		const keys = Object.keys(s) as (keyof T)[];
+		const keys = Object.keys(s);
 
 		for(const k of keys) {
 			const v = s[k] as T[typeof k];
