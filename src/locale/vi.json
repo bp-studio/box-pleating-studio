@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "Tổng quan",
+		"color": {
+			"_": "Màu sắc",
+			"default": "Mặc định",
+			"border": "Đường biên giới",
+			"grid": "Đường lưới",
+			"hinge": "Nếp gấp bản lề",
+			"ridge": "Nếp gấp ở sườn",
+			"axisParallel": "Nếp gấp trục song song"
+		},
 		"hotkey": "Phím nóng",
 		"command": "Chỉ huy",
 		"language": "Ngôn ngữ",

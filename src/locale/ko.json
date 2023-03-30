@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "일반적인",
+		"color": {
+			"_": "그림 물감",
+			"default": "기본",
+			"border": "경계선",
+			"grid": "격자선",
+			"hinge": "경첩 주름",
+			"ridge": "능선 주름",
+			"axisParallel": "축 평행 주름"
+		},
 		"hotkey": "단축키",
 		"command": "명령",
 		"language": "언어",

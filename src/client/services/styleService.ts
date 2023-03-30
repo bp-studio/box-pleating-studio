@@ -11,12 +11,12 @@ namespace Style {
 
 	export const border = {
 		width: 3,
-		color: computed(() => app.settings.colorScheme.border ?? app.isDark.value ? LIGHT : CHARCOAL),
+		color: computed(() => app.settings.colorScheme.border ?? (app.isDark.value ? LIGHT : CHARCOAL)),
 	};
 
 	export const grid = {
 		width: 0.25,
-		color: computed(() => app.settings.colorScheme.grid ?? app.isDark.value ? LIGHT : CHARCOAL),
+		color: computed(() => app.settings.colorScheme.grid ?? (app.isDark.value ? LIGHT : CHARCOAL)),
 	};
 
 	export const hinge = {
@@ -50,7 +50,7 @@ namespace Style {
 	export const edge = {
 		width: 2,
 		hover: 3,
-		color: computed(() => app.settings.colorScheme.edge ?? app.isDark.value ? LIGHT : BLACK),
+		color: computed(() => app.settings.colorScheme.edge ?? (app.isDark.value ? LIGHT : BLACK)),
 		selected: DANGER,
 	};
 
@@ -72,7 +72,7 @@ namespace Style {
 	};
 
 	export const axisParallel = {
-		color: computed(() => app.settings.colorScheme.axialParallel ?? app.isDark.value ? LIGHT_GREEN : GREEN),
+		color: computed(() => app.settings.colorScheme.axialParallel ?? (app.isDark.value ? LIGHT_GREEN : GREEN)),
 		width: 1,
 	};
 }

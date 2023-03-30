@@ -16,6 +16,7 @@ export const selection: ISelectionController = SelectionController;
 export { svg } from "./svg";
 export { png, copyPNG, beforePrint } from "./screen/rasterizer";
 
+export { style } from "./services/styleService";
 export { mouseCoordinates } from "./services/interaction";
 export { nextTick } from "./screen/display";
 export { options } from "./options";

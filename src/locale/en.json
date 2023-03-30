@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "General",
+		"color": {
+			"_": "Colors",
+			"default": "Default",
+			"border": "Border lines",
+			"grid": "Grid lines",
+			"hinge": "Hinge creases",
+			"ridge": "Ridge creases",
+			"axisParallel": "Axis-parallel creases"
+		},
 		"hotkey": "Hotkeys",
 		"command": "Command",
 		"language": "Language",

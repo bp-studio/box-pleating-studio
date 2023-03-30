@@ -74,7 +74,7 @@
 			"fullscreenExit": "退出全屏模式",
 			"grid": "显示格线",
 			"hinge": "显示枢纽折痕",
-			"ridge": "显示脊折痕",
+			"ridge": "显示脊线折痕",
 			"axial": "显示装置中的轴平行折痕",
 			"label": "显示标签",
 			"tip": "显示角片顶点",
@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "一般",
+		"color": {
+			"_": "配色",
+			"default": "默认",
+			"border": "边线",
+			"grid": "格线",
+			"hinge": "枢纽折痕",
+			"ridge": "脊线折痕",
+			"axisParallel": "轴平行折痕"
+		},
 		"hotkey": "热键",
 		"command": "命令",
 		"language": "语言",

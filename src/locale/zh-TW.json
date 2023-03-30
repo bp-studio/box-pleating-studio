@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "一般",
+		"color": {
+			"_": "配色",
+			"default": "預設",
+			"border": "邊線",
+			"grid": "格線",
+			"hinge": "樞紐摺痕",
+			"ridge": "脊線摺痕",
+			"axisParallel": "軸平行摺痕"
+		},
 		"hotkey": "快速鍵",
 		"command": "指令",
 		"language": "語言",

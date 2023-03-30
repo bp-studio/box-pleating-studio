@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "General",
+		"color": {
+			"_": "Colores",
+			"default": "Por defecto",
+			"border": "Líneas fronterizas",
+			"grid": "Líneas de cuadrícula",
+			"hinge": "Pliegues de bisagra",
+			"ridge": "Pliegues de cresta",
+			"axisParallel": "Pliegues axiales-paralelos"
+		},
 		"hotkey": "Acceso rápido",
 		"command": "Mando",
 		"language": "Idioma",

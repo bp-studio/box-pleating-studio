@@ -3,16 +3,21 @@
 	border-top-color: inherit;
 }
 
-.nav-tabs .nav-link {
-	outline: none !important;
+.nav-tabs {
+	border: none;
 
-	&.active {
-		color: var(--bs-primary);
-		font-weight: bolder;
-	}
+	.nav-link {
+		outline: none !important;
+		border-bottom: none !important;
 
-	&:not(.active) {
-		color: unset;
+		&.active {
+			color: var(--bs-primary);
+			font-weight: bolder;
+		}
+
+		&:not(.active) {
+			color: unset;
+		}
 	}
 }
 

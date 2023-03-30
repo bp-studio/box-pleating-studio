@@ -64,6 +64,7 @@ namespace StudioService {
 		return true;
 	}
 
+	export const style = proxy(() => bp.style, null!);
 	export const mouseCoordinates = proxy(() => bp.mouseCoordinates.value, null);
 	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);

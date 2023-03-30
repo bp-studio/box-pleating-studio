@@ -117,6 +117,15 @@
 	},
 	"preference": {
 		"general": "一般",
+		"color": {
+			"_": "色",
+			"default": "デフォルト",
+			"border": "境界線",
+			"grid": "グリッド線",
+			"hinge": "ヒンジ折り線",
+			"ridge": "リッジ折り線",
+			"axisParallel": "軸平行折り線"
+		},
 		"hotkey": "ホットキー",
 		"command": "コマンド",
 		"language": "言語",
