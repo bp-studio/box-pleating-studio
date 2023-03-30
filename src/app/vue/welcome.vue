@@ -18,20 +18,20 @@
 					</p>
 				</div>
 				<div class="browser-only col-12 col-lg-10 col-xl-8">
-					<div v-if="(preparing || bip || ios) && !install">
+					<div v-if="(installAvailable || prompt || ios) && state == installState.uninstalled">
 						<p v-t="'welcome.install.hint'"></p>
 						<p v-if="ios" v-t="'welcome.install.ios'"></p>
-						<button v-else-if="bip" class="btn btn-primary" @click="bip.prompt()" v-t="'welcome.install.bt'"></button>
+						<button v-else-if="!nativeMode" class="btn btn-primary" @click="install" v-t="'welcome.install.bt'"></button>
 						<button v-else class="btn btn-primary" disabled>
 							{{ $t('welcome.install.prepare') }}&nbsp;
 							<i class="bp-spinner fa-spin" />
 						</button>
 					</div>
-					<div v-if="install == 1">
+					<div v-if="state == installState.installing">
 						{{ $t('welcome.install.ing') }}&nbsp;
 						<i class="bp-spinner fa-spin" />
 					</div>
-					<div v-if="install == 2">
+					<div v-if="state == installState.installed">
 						<p v-t="'welcome.install.ed'"></p>
 						<a class="btn btn-primary" rel="noopener" :href="origin" target="_blank" v-t="'welcome.install.open'"></a>
 					</div>
@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 
-	import { computed, shallowRef } from "vue";
+	import { shallowRef } from "vue";
 
 	import { copyright } from "app/misc/copyright";
 	import Core from "app/core";
@@ -90,16 +90,36 @@
 	import Workspace from "app/services/workspaceService";
 	import Import from "app/services/importService";
 
-	const preparing = shallowRef(false);
-	const install = shallowRef(0);
+	enum installState {
+		uninstalled = 0,
+		installing = 1,
+		installed = 2,
+	}
+
+	// If service worker is not available on startup, that means it is still installing.
+	// When that happens we show a message to improve UX,
+	// as beforeinstallprompt event won't fire until service worker is installed.
+	// Notice that the value will be `false` after the service worker is available,
+	// but that's OK since in that case we will have the prompt available immediately.
+	const installAvailable =
+		"onbeforeinstallprompt" in window &&
+		location.protocol == "https:" &&
+		"serviceWorker" in navigator &&
+		// eslint-disable-next-line compat/compat
+		!navigator.serviceWorker.controller;
+
+	const state = shallowRef<installState>(installState.uninstalled);
 
 	/** If we are running in PWA mode */
 	const isPWA = matchMedia("(display-mode: standalone)").matches;
 
-	const ios = computed(() => navigator.standalone === false);
-	const origin = computed(() => location.origin);
+	/** If we are in iOS Safari and that we're not running in PWA mode. */
+	const ios = navigator.standalone === false;
 
-	let bip: BeforeInstallPromptEvent;
+	const origin = location.origin;
+
+	const prompt = shallowRef<BeforeInstallPromptEvent | undefined>(undefined);
+	const nativeMode = shallowRef(false);
 
 	const APP_CHECK_INTERVAL = 2000;
 
@@ -111,30 +131,32 @@
 				// and it will return an empty array on Desktops,
 				// so we cannot use it to detect if PWA is already installed.
 				// But that's OK, since the PWA link works also only in Android anyway.
-				if(apps.length) install.value = 2;
+				if(apps.length) state.value = installState.installed;
 			} catch(e) {
 				// Ignore any errors here.
 			}
 		}
 	}
 
-	// If service worker is not available on startup, that means it is still installing.
-	// When that happens we show a message to improve UX,
-	// as beforeinstallprompt event won't fire until service worker is installed.
-	if("onbeforeinstallprompt" in window && location.protocol == "https:" && !navigator.serviceWorker.controller) {
-		preparing.value = true;
+	function install(): void {
+		if(prompt.value) prompt.value.prompt();
+
+		// For better user experience, if prompt is not ready yet upon clicking,
+		// we show the spinner and let the native prompt to show.
+		else nativeMode.value = true;
 	}
 
 	// Event listening
 	window.addEventListener("beforeinstallprompt", (event: Event) => {
-		event.preventDefault();
-		bip = event as BeforeInstallPromptEvent;
+		if(!nativeMode.value) event.preventDefault();
+		prompt.value = event as BeforeInstallPromptEvent;
+		nativeMode.value = false;
 	});
 	window.addEventListener("appinstalled", () => {
 		if(isPWA) return; // Desktop goes here
-		install.value = 1;
+		state.value = installState.installing;
 		const int = setInterval(() => {
-			if(install.value != 2) detectInstallation();
+			if(state.value != installState.installed) detectInstallation();
 			else clearInterval(int);
 		}, APP_CHECK_INTERVAL);
 	});
