@@ -1,5 +1,5 @@
 <template>
-	<h5 v-t="'panel.flaps.type'" class="panel-title"></h5>
+	<div v-t="'panel.flaps.type'" class="h5 panel-title"></div>
 	<div class="mt-3">
 		<button class="btn btn-primary" v-if="!design.tree.isMinimal" @click="design.delete()" v-t="'keyword.delete'"></button>
 	</div>

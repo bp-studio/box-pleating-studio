@@ -61,9 +61,9 @@
 	const bt = compRef(CheckButton);
 	const input = shallowRef<HTMLInputElement>();
 
-	const { el, show } = useModal("Share", () => {
+	const { el, show } = useModal("Share", async () => {
 		if(!Studio.project) return false;
-		const data = LZ.compress(JSON.stringify(Studio.project));
+		const data = await LZ.compress(JSON.stringify(Studio.project));
 		shorten("https://bpstudio.abstreamace.com/?project=" + data);
 		return true;
 	});

@@ -21,7 +21,7 @@
 		"recent": "최근 사용",
 		"start": "시작",
 		"website": "BP Studio 웹사이트",
-		"discord": "BP Studio에 Discord 서버가 생겼습니다! \n{0}에서 우리와 함께 해주세요!"
+		"discord": "{0} 에 가입하세요!"
 	},
 	"toolbar": {
 		"file": {
@@ -267,6 +267,7 @@
 		"close": "닫기",
 		"export": "내보내기",
 		"delete": "삭제",
+		"discord": "BP Studio 디스코드 서버",
 		"version": "버전",
 		"filename": "파일 이름",
 		"download": "다운로드",

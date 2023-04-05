@@ -2,11 +2,9 @@ import FileUtility from "app/utils/fileUtility";
 import Lib from "./libService";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
+import { save } from "app/utils/jszip";
 
-import type jsZip from "jszip";
 import type { Project } from "client/project/project";
-
-declare const JSZip: typeof jsZip;
 
 //=================================================================
 /**
@@ -45,10 +43,9 @@ namespace ExportService {
 		else return FileUtility.sanitize(project.design.title);
 	}
 
-	async function zip(): Promise<Blob> {
-		await Lib.ready;
-		const jsZip = new JSZip();
+	function zip(): Promise<Blob> {
 		const names = new Set<string>();
+		const files: Record<string, string> = {};
 		for(const project of Workspace.projects) {
 			let name = FileUtility.sanitize(project.design.title);
 			if(names.has(name)) {
@@ -57,14 +54,9 @@ namespace ExportService {
 				name = name + " (" + j + ")";
 			}
 			names.add(name);
-			jsZip.file(name + ".bps", JSON.stringify(project));
+			files[name + ".bps"] = JSON.stringify(project);
 		}
-		const blob = await jsZip.generateAsync({
-			type: "blob",
-			compression: "DEFLATE",
-			compressionOptions: { level: 9 },
-		});
-		return blob.slice(0, blob.size, "application/bpstudio.workspace+zip");
+		return save(files);
 	}
 }
 

@@ -20,9 +20,6 @@
 	export function show(): void { showPanel.value = true; }
 	export function hide(): void { showPanel.value = false; }
 	export function toggle(): void { showPanel.value = !showPanel.value; }
-	watch(() => Studio.project, v => {
-		if(!v) hide();
-	});
 
 	export default { name: "Panel" };
 </script>
@@ -49,6 +46,10 @@
 	const componentMap: Record<string, Component> = { Vertex, Edge, Flap, River };
 	const type = computed(() => Studio.selections[0]?.type ?? "");
 	const design = computed(() => Studio.project?.design);
+
+	watch(() => Studio.project, v => {
+		if(!v) hide();
+	});
 
 	watch(() => design.value?.mode, () => {
 		// If any text fields are in used during view switching, unfocus it.

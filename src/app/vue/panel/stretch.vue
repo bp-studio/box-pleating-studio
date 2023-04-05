@@ -1,5 +1,5 @@
 <template>
-	<h5 v-t="'panel.repo.type'" class="panel-title"></h5>
+	<div v-t="'panel.repo.type'" class="h5 panel-title"></div>
 	<template v-if="stretch.repo">
 		<div class="row" v-if="stretch.repo.configCount == 1 && stretch.repo.patternCount == 1">
 			<label class="col-form-label col" v-t="'panel.repo.onlyOne'"></label>

@@ -21,7 +21,7 @@
 		"recent": "Được sử dụng gần đây",
 		"start": "Khởi đầu",
 		"website": "Trang web BP Studio",
-		"discord": "BP Studio hiện có một máy chủ Discord! Hãy tham gia với chúng tôi ở {0}!"
+		"discord": "Hãy tham gia {0} của chúng tôi!"
 	},
 	"toolbar": {
 		"file": {
@@ -267,6 +267,7 @@
 		"close": "Đóng",
 		"export": "Xuất tệp",
 		"delete": "Xóa bỏ",
+		"discord": "Máy chủ BP Studio Discord",
 		"version": "Phiên bản",
 		"filename": "tên tệp",
 		"download": "Tải xuống",

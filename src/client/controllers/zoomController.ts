@@ -1,7 +1,7 @@
 import ProjectService from "client/services/projectService";
 import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import { $getEventCenter } from "./share";
-import { canvas, scrollView } from "client/screen/display";
+import { display } from "client/screen/display";
 
 const DELTA_SCALE = 10000;
 const STEP = 5;
@@ -47,7 +47,7 @@ export namespace ZoomController {
 		if(!sheet || sheet.zoom == zoom) return;
 
 		// If the zooming center is not given, use the center of the canvas.
-		center ||= { x: canvas.clientWidth / 2, y: canvas.clientHeight / 2 };
+		center ||= { x: display.canvas.clientWidth / 2, y: display.canvas.clientHeight / 2 };
 
 		// Find the coordinates of the zooming center
 		const oldScale = ProjectService.scale.value;
@@ -60,10 +60,10 @@ export namespace ZoomController {
 		const newScale = ProjectService.scale.value;
 
 		// We have to do this first, or there might not be scrollbars to scroll at all.
-		scrollView.$updateScrollbar();
+		display.scrollView.$updateScrollbar();
 
 		// Calculate the scrolling position and complete the scrolling
-		sheet.$scroll = scrollView.$scrollTo(
+		sheet.$scroll = display.scrollView.$scrollTo(
 			point.x * newScale / oldScale + sheet.$horizontalMargin.value - center.x,
 			point.y * newScale / oldScale + MARGIN - center.y
 		);

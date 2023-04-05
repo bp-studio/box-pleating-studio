@@ -1,22 +1,23 @@
-import { reactive, readonly, watch } from "vue";
+import { watch } from "vue";
 
+import type { I18n } from "vue-i18n";
 import type { BpsLocale } from "shared/frontend/locale";
 import type Settings from "./settingService";
 
 const KEY = "locale";
 const DEFAULT_LOCALE = "en";
 
-// Create i18n instance. We also consider SSG here.
-export const plugin = typeof VueI18n !== "undefined" ?
-	VueI18n.createI18n<[BpsLocale], string>({
+/** Create i18n instance. */
+export function createPlugin(): I18n {
+	const plugin = VueI18n.createI18n<[BpsLocale], string>({
 		locale: DEFAULT_LOCALE,
 		fallbackLocale: DEFAULT_LOCALE,
 		silentFallbackWarn: true,
 		messages: locale,
-	}) : null;
-
-// In case of SSG, i18n instance will be injected separately.
-if(plugin) i18n = plugin.global;
+	});
+	i18n = plugin.global;
+	return plugin;
+}
 
 //=================================================================
 /**
@@ -27,12 +28,11 @@ if(plugin) i18n = plugin.global;
  */
 //=================================================================
 namespace LanguageService {
-	const _options = reactive<string[]>([]);
+	const _options: string[] = [];
 
-	export const options = readonly(_options);
+	export const options = _options as readonly string[];
 
-	function init(): void {
-		_options.length = 0;
+	export function init(): void {
 		const build = Number(localStorage.getItem("build") || 0);
 		const localeSetting = localStorage.getItem(KEY);
 		const langs = getLanguages(localeSetting);
@@ -42,6 +42,28 @@ namespace LanguageService {
 			_options.push(...langs);
 		}
 		i18n.locale = format(localeSetting || langs[0] || DEFAULT_LOCALE);
+	}
+
+	export function setup(): void {
+		// Sync locale
+		let syncing: boolean = false;
+		window.addEventListener("storage", e => {
+			if(e.key == KEY) {
+				syncing = true;
+				i18n.locale = e.newValue!;
+			}
+		});
+
+		watch(() => i18n.locale, loc => {
+			if(loc in locale) {
+				if(!syncing) localStorage.setItem(KEY, loc);
+				syncing = false;
+			} else {
+				loc = findFallbackLocale(loc);
+				Vue.nextTick(() => i18n.locale = loc);
+			}
+			document.documentElement.lang = loc;
+		});
 	}
 
 	/** Obtain the list of candidate languages. */
@@ -55,26 +77,6 @@ namespace LanguageService {
 		languages = Array.from(new Set(languages));
 		return languages;
 	}
-
-	// Sync locale
-	let syncing: boolean = false;
-	window.addEventListener("storage", e => {
-		if(e.key == KEY) {
-			syncing = true;
-			i18n.locale = e.newValue!;
-		}
-	});
-
-	watch(() => i18n.locale, loc => {
-		if(loc in locale) {
-			if(!syncing) localStorage.setItem(KEY, loc);
-			syncing = false;
-		} else {
-			loc = findFallbackLocale(loc);
-			Vue.nextTick(() => i18n.locale = loc);
-		}
-		document.documentElement.lang = loc;
-	});
 
 	function findFallbackLocale(loc: string): string {
 		const tokens = loc.split("-");
@@ -97,9 +99,6 @@ namespace LanguageService {
 		init();
 		onReset?.();
 	}
-
-	// Automatically initializes
-	init();
 }
 
 export default LanguageService;

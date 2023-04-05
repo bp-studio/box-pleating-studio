@@ -4,6 +4,7 @@ import { defaultTitle } from "app/shared/constants";
 import Lib from "./libService";
 import Dialogs from "./dialogService";
 import settings from "./settingService";
+import { doEvents } from "shared/utils/async";
 
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
@@ -49,6 +50,9 @@ namespace StudioService {
 	export async function init(): Promise<boolean> {
 		await Promise.all(bpLibs.map(l => Lib.loadScript(l)));
 		if(typeof bp === "undefined") return false;
+
+		await doEvents();
+		await bp.init();
 
 		// Setup the bridges
 		bp.options.onLongPress = () => showPanel.value = true;

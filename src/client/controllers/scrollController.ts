@@ -4,7 +4,7 @@ import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
 import { $isTouch, MouseButton } from "./share";
 import { ZoomController } from "./zoomController";
-import { canvas, scrollView, stage } from "client/screen/display";
+import { display } from "client/screen/display";
 import { KeyboardController } from "./keyboardController";
 
 //=================================================================
@@ -25,35 +25,37 @@ export namespace ScrollController {
 	document.addEventListener("touchend", pointerUp);
 	document.addEventListener("contextmenu", menu);
 
-	scrollView.$onScroll(p => {
-		if(_scrolling) return;
-		const sheet = ProjectService.sheet.value!;
-		sheet.$scroll = p;
-	});
+	export function $init(): void {
+		display.scrollView.$onScroll(p => {
+			if(_scrolling) return;
+			const sheet = ProjectService.sheet.value!;
+			sheet.$scroll = p;
+		});
 
-	// Restore the scroll position as we switch the view
-	watch(ProjectService.sheet, sheet => {
-		if(!sheet) return;
-		scrollView.$updateScrollbar();
-		scrollView.$scrollTo(sheet.$scroll.x, sheet.$scroll.y);
-	});
+		// Restore the scroll position as we switch the view
+		watch(ProjectService.sheet, sheet => {
+			if(!sheet) return;
+			display.scrollView.$updateScrollbar();
+			display.scrollView.$scrollTo(sheet.$scroll.x, sheet.$scroll.y);
+		});
+	}
 
 	export function $isScrolling(): boolean {
 		return _scrolling;
 	}
 
-	export function $init(): void {
+	export function $start(): void {
 		_scrolling = true;
-		canvas.style.cursor = "move";
+		display.canvas.style.cursor = "move";
 
 		// Temporarily disable interactivity, avoiding the cursor being changed by Pixi
-		stage.interactiveChildren = false;
+		display.stage.interactiveChildren = false;
 	}
 
 	export function $tryKeyStart(event: KeyboardEvent): boolean {
 		if(event.key != " ") return false;
 		event.preventDefault();
-		if(scrollView.$isScrollable) canvas.style.cursor = "move";
+		if(display.scrollView.$isScrollable) display.canvas.style.cursor = "move";
 		return true;
 	}
 
@@ -75,11 +77,11 @@ export namespace ScrollController {
 		// touches remain very shortly as one release the fingers.
 		if(_scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			const diff = CursorController.$diff(event);
-			sheet.$scroll = scrollView.$scrollTo(sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y);
+			sheet.$scroll = display.scrollView.$scrollTo(sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y);
 			if($isTouch(event)) ZoomController.$process(event);
 
 			// This is still needed for unknown reasons
-			canvas.style.cursor = "move";
+			display.canvas.style.cursor = "move";
 		}
 	}
 
@@ -99,16 +101,16 @@ export namespace ScrollController {
 
 	function end(): void {
 		_scrolling = false;
-		stage.interactiveChildren = true;
+		display.stage.interactiveChildren = true;
 
 		// In the case of space key dragging, there will be different behavior
 		// depending on which is release first.
-		if(!KeyboardController.$isPressed("space")) canvas.style.cursor = "unset";
+		if(!KeyboardController.$isPressed("space")) display.canvas.style.cursor = "unset";
 	}
 
 	export function $keyUp(): void {
 		// In the case of space key dragging, there will be different behavior
 		// depending on which is release first.
-		canvas.style.cursor = ScrollController.$isScrolling() ? "move" : "unset";
+		display.canvas.style.cursor = ScrollController.$isScrolling() ? "move" : "unset";
 	}
 }

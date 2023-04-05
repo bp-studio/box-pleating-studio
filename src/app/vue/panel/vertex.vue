@@ -1,5 +1,5 @@
 <template>
-	<h5 v-t="'panel.vertex.type'" class="panel-title"></h5>
+	<div v-t="'panel.vertex.type'" class="h5 panel-title"></div>
 	<div class="panel-grid">
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 	</div>

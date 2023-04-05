@@ -6,15 +6,14 @@ const gulp = require("gulp");
 const gulpSass = require("gulp-sass");
 const postcss = require("gulp-postcss");
 const postcssPresetEnv = require("postcss-preset-env");
-const replace = require("gulp-replace");
 const sass = require("sass");
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
 const { purge, extra } = require("../utils/purge");
+const { pixiCore, pixi } = require("./pixi");
 
 const root = "node_modules/";
-const removeSourceMaps = () => replace(/\/\/# sourceMappingURL=.*/g, "");
 
 function quickCopy(path, debug, ...additionalSteps) {
 	const target = debug ? config.dest.debug : config.dest.dist;
@@ -91,6 +90,20 @@ const vueDraggable = () => {
 		.pipe(gulp.dest(config.dest.dist + "/lib"));
 };
 
+const jsZip = () => gulp.src(config.src.lib + "/jszip/jszip.ts")
+	.pipe(newer({
+		dest: config.dest.dist + "/lib/jszip.js",
+		extra: [__filename, root + "jszip/package.json"],
+	}))
+	.pipe(esbuild({
+		bundle: true,
+		legalComments: "none",
+		outfile: "jszip.js",
+		minify: true,
+		target: "es2016", // for maximal compatibility
+	}))
+	.pipe(gulp.dest(config.dest.dist + "/lib"));
+
 /**
  * Directly copy or custom build files from node_modules for some of the libraries
  */
@@ -98,9 +111,11 @@ gulp.task("lib", () => all(
 	bootstrapJS(),
 	bootstrapCSS(),
 	vueDraggable(),
+	jsZip(),
+	pixiCore(),
+	pixi(),
 	quickCopy("vue/dist/vue.runtime.global.js", true),
 	quickCopy("vue/dist/vue.runtime.global.prod.js"),
 	quickCopy("vue-i18n/dist/vue-i18n.global.prod.js"),
-	quickCopy("lzma/src/lzma_worker-min.js"),
-	quickCopy("jszip/dist/jszip.min.js")
+	quickCopy("../lib/lzma/lzma_worker-min.js")
 ));

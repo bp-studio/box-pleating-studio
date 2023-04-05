@@ -2,7 +2,7 @@
 import { shallowRef } from "vue";
 
 import ProjectService from "./projectService";
-import { stage, canvas } from "client/screen/display";
+import { display } from "client/screen/display";
 import { SelectionController } from "client/controllers/selectionController";
 import { ScrollController } from "client/controllers/scrollController";
 import { CursorController } from "client/controllers/cursorController";
@@ -32,29 +32,31 @@ export namespace Interaction {
 	/** Used to determine if we're dragging. */
 	let pointerHeld = false;
 
-	canvas.addEventListener("touchstart", pointerDown, { passive: true });
-	canvas.addEventListener("mousedown", pointerDown);
-	canvas.addEventListener("wheel", wheel);
+	export function $init(): void {
+		display.canvas.addEventListener("touchstart", pointerDown, { passive: true });
+		display.canvas.addEventListener("mousedown", pointerDown);
+		display.canvas.addEventListener("wheel", wheel);
 
-	document.addEventListener("mouseup", mouseUp);
-	document.addEventListener("touchend", touchEnd);
-	document.addEventListener("mousemove", drag);
-	document.addEventListener("touchmove", drag);
-	document.addEventListener("keydown", keyDown);
-	document.addEventListener("keyup", keyUp);
+		document.addEventListener("mouseup", mouseUp);
+		document.addEventListener("touchend", touchEnd);
+		document.addEventListener("mousemove", drag);
+		document.addEventListener("touchmove", drag);
+		document.addEventListener("keydown", keyDown);
+		document.addEventListener("keyup", keyUp);
 
-	window.addEventListener("blur", blur);
+		window.addEventListener("blur", blur);
 
-	stage.on("mousemove", e => {
-		const sheet = ProjectService.sheet.value;
-		if(!sheet) return;
-		const local = sheet.$view.toLocal(e.global);
-		mouseCoordinates.value = { x: Math.round(local.x), y: Math.round(local.y) };
-	});
+		display.stage.on("mousemove", e => {
+			const sheet = ProjectService.sheet.value;
+			if(!sheet) return;
+			const local = sheet.$view.toLocal(e.global);
+			mouseCoordinates.value = { x: Math.round(local.x), y: Math.round(local.y) };
+		});
 
-	stage.on("mouseleave", e => {
-		mouseCoordinates.value = null;
-	});
+		display.stage.on("mouseleave", e => {
+			mouseCoordinates.value = null;
+		});
+	}
 
 	function blur(): void {
 		// Switching window or tab will cancel drag-selecting.
@@ -178,7 +180,7 @@ export namespace Interaction {
 	}
 
 	function initScroll(event: MouseEvent | TouchEvent): void {
-		ScrollController.$init();
+		ScrollController.$start();
 		CursorController.$tryUpdate(event);
 	}
 }

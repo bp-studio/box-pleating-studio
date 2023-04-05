@@ -1,13 +1,54 @@
 <template>
 	<div ref="el" v-on:mousedown.stop v-on:touchstart.stop.passive>
 		<Welcome />
-		<DPad />
+		<DPad v-if="phase == 1" />
 
-		<Panel />
-		<Toolbar />
-		<Status />
+		<Panel v-if="phase == 1" />
 
-		<ModalFragment />
+		<Toolbar v-if="phase == 1" />
+		<nav class="btn-toolbar p-2" v-else>
+			<div class="btn-group me-2">
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="File">
+						<i class="bp-file-alt"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Edit">
+						<i class="bp-pencil-ruler"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Settings">
+						<i class="bp-tasks"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Tools">
+						<i class="bp-tools"></i>
+					</button>
+				</div>
+				<div class="btn-group">
+					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Help">
+						<i class="bp-info"></i>
+					</button>
+				</div>
+			</div>
+
+			<div class="btn-group me-2">
+				<button type="button" class="btn btn-primary" disabled>
+					<i class="bp-tree" />
+				</button>
+				<button type="button" class="btn btn-primary" disabled>
+					<i class="bp-layout" />
+				</button>
+			</div>
+		</nav>
+
+		<Status v-if="phase == 1" />
+		<footer class="py-1 px-3" v-else></footer>
+
+		<ModalFragment v-if="phase == 1" />
 		<DialogFragment />
 	</div>
 </template>
@@ -20,6 +61,7 @@
 
 	import { onMounted, shallowRef } from "vue";
 
+	import { phase } from "app/misc/lcpReady"; // This must be loaded before anything else.
 	import Panel from "@/panel/panel.vue";
 	import Toolbar from "@/toolbar/toolbar.vue";
 	import DPad from "@/gadgets/dpad.vue";

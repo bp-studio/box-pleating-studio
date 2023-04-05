@@ -1,8 +1,11 @@
-import "./services/interaction";
 import ProjectService from "./services/projectService";
 import { DragController } from "./controllers/dragController";
 import { ProjectController } from "./controllers/projectController";
 import { SelectionController } from "./controllers/selectionController";
+import { display } from "./screen/display";
+import { Interaction } from "./services/interaction";
+import { ScrollController } from "./controllers/scrollController";
+import { doEvents } from "shared/utils/async";
 
 import type { IProjectController } from "./controllers/projectController";
 import type { IDragController } from "./controllers/dragController";
@@ -18,9 +21,18 @@ export { png, copyPNG, beforePrint } from "./screen/rasterizer";
 
 export { style } from "./services/styleService";
 export { mouseCoordinates } from "./services/interaction";
-export { nextTick } from "./screen/display";
 export { options } from "./options";
 export { plugins } from "./plugins";
+
+export async function init(): Promise<void> {
+	await display.$init();
+	await doEvents();
+	Interaction.$init();
+	SelectionController.$init();
+	ScrollController.$init;
+}
+
+export const nextTick = display.appNextTick;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // History operations

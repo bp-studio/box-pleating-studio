@@ -2,7 +2,7 @@
 	// fetch
 	const org_fetch = fetch;
 	fetch = function(url) {
-		if(url.startsWith("h")) {
+		if(url.startsWith("h") || url.startsWith("blob")) {
 			return org_fetch(url);
 		} else {
 			return new Promise(resolve => {

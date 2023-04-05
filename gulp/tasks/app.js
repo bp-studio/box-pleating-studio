@@ -2,6 +2,8 @@ const gulp = require("gulp");
 const iff = require("gulp-if");
 const postcss = require("gulp-postcss");
 const postcssPresetEnv = require("postcss-preset-env");
+const replace = require("gulp-replace");
+const terser = require("gulp-terser");
 const through2 = require("gulp-through2");
 
 const newer = require("../utils/newer");

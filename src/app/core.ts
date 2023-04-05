@@ -1,29 +1,19 @@
 
-import { computed, readonly, shallowRef } from "vue";
+import { computed, readonly } from "vue";
 
 import File from "app/services/importService";
 import SessionService from "app/services/sessionService";
 import HandleService from "app/services/handleService";
-import Settings, { hadSettings } from "app/services/settingService";
+import Settings, { getHadSettings } from "app/services/settingService";
 import StudioService from "app/services/studioService";
 import { isTouch } from "app/shared/constants";
 import Dialogs from "app/services/dialogService";
-import Lib from "app/services/libService";
 import LZ from "app/utils/lz";
 import Workspace from "./services/workspaceService";
+import { lcpReady } from "app/misc/lcpReady";
+import HotkeyService from "./services/hotkeyService";
 
 namespace Core {
-
-	/** If we are ready to perform LCP (largest contentful paint) */
-	export const lcpReady = shallowRef(false);
-
-	if(!localStorage.getItem("settings") && !localStorage.getItem("session")) {
-		// If the setting cannot be found, it means that this is the first startup.
-		// In that case, there is no need to wait (unless there is a project query),
-		// and we may perform LCP directly.
-		const url = new URL(location.href);
-		if(!url.searchParams.has("project")) lcpReady.value = true;
-	}
 
 	/**
 	 * Initializing the Studio.
@@ -32,11 +22,14 @@ namespace Core {
 	 * and loads the files in the Session and Query.
 	 */
 	export async function init(): Promise<boolean> {
+		Workspace.init();
+		HandleService.init();
+		HotkeyService.init();
 		localStorage.setItem("build", app_config.app_version);
 		if(!await StudioService.init()) return false;
 		const hasQueue = await File.openQueue();
 		const hasSession = await SessionService.init(Settings.loadSessionOnQueue || !hasQueue);
-		if(hadSettings) await HandleService.init(hasSession);
+		if(getHadSettings()) await HandleService.load(hasSession);
 		await loadQuery();
 		lcpReady.value = true;
 		return true;
@@ -49,8 +42,7 @@ namespace Core {
 		let json: unknown;
 		if(lz) {
 			try {
-				await Lib.ready;
-				json = JSON.parse(LZ.decompress(lz));
+				json = JSON.parse(await LZ.decompress(lz));
 			} catch(e) {
 				await Dialogs.alert(i18n.t("message.invalidLink"));
 			}

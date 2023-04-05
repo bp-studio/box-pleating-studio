@@ -6,10 +6,15 @@
 	<title>Box Pleating Studio</title>
 
 	<!-- Core info -->
-	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=5.0, width=device-width">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
 	<meta name="version" content="0.6.0-alpha">
+
+	<!-- Critical -->
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/bps/style.css">
+	<link rel="stylesheet" href="main.css">
 
 	<!-- Preload; also works locally since Chrome 102 -->
 	<link rel="preload" as="font" type="font/woff2" href="assets/bps/fonts/bps.woff2">
@@ -35,10 +40,15 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1420"
+			app_version: "1492"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
+
+		// Setup dark mode if needed immediately on first visit, to avoid flashing
+		if(!localStorage.getItem("settings") && matchMedia("(prefers-color-scheme: dark)").matches) {
+			document.documentElement.classList.add("dark");
+		}
 	</script>
 
 	<!-- SEO -->
@@ -279,17 +289,12 @@
 		var i18n, bp;
 	</script>
 
-	<!-- Critical -->
-	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/bps/style.css">
-	<link rel="stylesheet" href="main.css">
-
 	<!-- eslint-disable -->
 	<!-- Launcher -->
 	<script>
 		// Top level objects
 		const __worker_src = 'core.js';
-		const bpLibs = ['client.js'];
+		const bpLibs = ["lib/pixi.core.js", "lib/pixi.js", 'client.js'];
 		let __worker = new Worker(__worker_src);
 
 		function loadScript(src) {
@@ -316,7 +321,7 @@
 	</script>
 </head>
 
-<body>
+<body class="show-status">
 	<!-- Error message -->
 	<div class="viewport p-3 scroll-shadow" style="z-index: 0; padding: 20px;">
 		<div id="requirement" style="display:none;">
@@ -330,7 +335,8 @@
 						Safari &ge; 11, or Samsung Internet &ge; 9.<br>
 						Other browsers (especially those that are Chromium-based) might also work,
 						but are not officially supported and there's no guarantee that all functionality will operate.<br>
-						If you haven't done so, please upgrade your browser (note that upgrading Safari requires upgrading the system)
+						If you haven't done so, please upgrade your browser (note that upgrading Safari requires upgrading the
+						system)
 						or use the latest version of Chrome, which is the recommended browser.<br>
 						It is also known that earlier versions of Windows 7 may cause issues with SSL certificates.
 						Please try updating Windows if the website is marked "insecure".

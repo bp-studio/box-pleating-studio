@@ -59,31 +59,6 @@ const copyStatic = () => gulp.src([
 	})))
 	.pipe(gulp.dest(config.dest.dist));
 
-/** Copy libraries */
-const copyLib = () => gulp.src([
-	"**/*",
-
-	// These will not be included
-	"!**/README.md",
-	"!**/tsconfig.json",
-
-	// These files will be built separately, so we don't treat them as static assets.
-	"!**/*.ts",
-	"!**/*.scss",
-	"!**/*.css",
-	"!**/*.js.map",
-], { cwd: config.src.lib })
-	.pipe(filter(file => {
-		// exclude those .js files with a `min` version
-		if(file.extname != ".js") return true;
-		return !hasMin(file);
-	}))
-	.pipe(gulpIf(file => file.extname == ".js",
-		replace(/\s+\/\/# sourceMappingURL=.+?$/ms, "") // remove sourcemap
-	))
-	.pipe(newer(libDest)) // Use 1:1 comparison
-	.pipe(gulp.dest(libDest));
-
 /** Build minified FontAwesome font */
 const faSrc = "node_modules/@fortawesome/fontawesome-free";
 const faTarget = libDest + "/font-awesome";
@@ -109,7 +84,6 @@ gulp.task("static", () => {
 		buildLog(),
 		copyDebugStatic(),
 		copyStatic(),
-		copyLib(),
 	];
 	// Only the first time the FontAwesome build will be executed automatically.
 	// In other cases we call the `fa` task manually to improve performance.

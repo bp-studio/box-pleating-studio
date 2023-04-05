@@ -21,7 +21,7 @@
 		"recent": "最近使用された",
 		"start": "開始",
 		"website": "BP Studio のウェブサイト",
-		"discord": "BP Studio に Discord サーバーが追加されました！{0}からご参加ください！"
+		"discord": "{0}に参加してください！"
 	},
 	"toolbar": {
 		"file": {
@@ -267,6 +267,7 @@
 		"close": "閉じる",
 		"export": "エクスポート",
 		"delete": "削除",
+		"discord": "BP Studio Discord サーバー",
 		"version": "バージョン",
 		"filename": "ファイル名",
 		"download": "ダウンロード",

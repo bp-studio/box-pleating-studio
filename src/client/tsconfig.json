@@ -5,6 +5,8 @@
 	"extends": "../shared/tsconfig",
 	"include": [
 		"./**/*.ts",
-		"../shared/**/*.ts"
+		"../shared/**/*.ts",
+		"../../lib/pixi/pixi.ts",
+		"../../lib/pixi/pixi.ts"
 	]
 }

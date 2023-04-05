@@ -1,10 +1,10 @@
 import { computed, shallowReactive, watch } from "vue";
 import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/math";
+import { Rectangle } from "@pixi/core";
 
 import { Draggable } from "client/base/draggable";
 import { $getEventCenter, $isTouch } from "./share";
-import { boundary, stage, ui } from "client/screen/display";
+import { display } from "client/screen/display";
 import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
 
@@ -54,21 +54,25 @@ export namespace SelectionController {
 
 	let dragSelectables: DragSelectable[];
 
-	// Creates the drag selection view.
-	// Since it is just a rectangle, there's no need for SmoothGraphics
-	const view = new Graphics();
-	view.visible = false;
-	ui.addChild(view);
+	let view: Graphics;
+
+	export function $init(): void {
+		// Creates the drag selection view.
+		// Since it is just a rectangle, there's no need for SmoothGraphics
+		view = new Graphics();
+		view.visible = false;
+		display.ui.addChild(view);
+
+		watch(ProjectService.sheet, sheet => {
+			selections.length = 0;
+			if(!sheet) return;
+			for(const c of sheet.$controls) {
+				if(c.$selected) selections.push(c);
+			}
+		});
+	}
 
 	export const selections: Control[] = shallowReactive([]);
-
-	watch(ProjectService.sheet, sheet => {
-		selections.length = 0;
-		if(!sheet) return;
-		for(const c of sheet.$controls) {
-			if(c.$selected) selections.push(c);
-		}
-	});
 
 	export const draggables = computed(() =>
 		selections.filter(
@@ -144,7 +148,7 @@ export namespace SelectionController {
 		const result = view.visible;
 		if(result && cancel) clear();
 		view.visible = false;
-		stage.interactiveChildren = true;
+		display.stage.interactiveChildren = true;
 		dragSelectables = [];
 		return result;
 	}
@@ -160,7 +164,7 @@ export namespace SelectionController {
 			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
 			clear();
 			view.visible = true;
-			stage.interactiveChildren = false;
+			display.stage.interactiveChildren = false;
 			dragSelectables = [...sheet.$controls].filter(
 				(c: Control): c is DragSelectable => Boolean((c as DragSelectable).$anchor)
 			);
@@ -208,7 +212,7 @@ export namespace SelectionController {
 
 		// Find all Controls at the hit position
 		const sheet = ProjectService.sheet.value!;
-		const controls = boundary.$hitTestAll(sheet, downPoint);
+		const controls = display.boundary.$hitTestAll(sheet, downPoint);
 
 		// Find the three critical Controls
 		for(const o of controls) {

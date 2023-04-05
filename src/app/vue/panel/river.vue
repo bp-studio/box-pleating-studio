@@ -1,5 +1,5 @@
 <template>
-	<h5 v-t="'panel.river.type'" class="panel-title"></h5>
+	<div v-t="'panel.river.type'" class="h5 panel-title"></div>
 	<div class="panel-grid">
 		<Number :label="$t('panel.river.width')" v-model="subject.length" hotkeys="d.rd,d.ri" />
 	</div>

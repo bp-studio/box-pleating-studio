@@ -1,7 +1,7 @@
 <template>
 	<div class="btn-group" ref="el" @mouseenter.once="init" @touchstart.once.passive="init">
-		<button ref="btn" type="button" @mouseenter="mouseenter" :title="initialized ? title : ''" :disabled="!Studio.initialized"
-				class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+		<button ref="btn" type="button" @mouseenter="mouseenter" :title="title" :disabled="!Studio.initialized"
+				class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label">
 			<i :class="icon" />
 			<div class="notify" v-if="notify"></div>
 		</button>
@@ -29,11 +29,12 @@
 	import Studio from "app/services/studioService";
 	import Lib from "app/services/libService";
 
-	defineProps({
-		icon: String,
-		title: String,
-		notify: Boolean,
-	});
+	defineProps<{
+		icon: string;
+		title: string;
+		notify?: boolean;
+		label?: string;
+	}>();
 
 	const emit = defineEmits(["show", "hide"]);
 

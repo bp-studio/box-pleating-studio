@@ -12,8 +12,6 @@ const libs = [
 	"font-awesome/css/all.min.css",
 	"bootstrap/bootstrap.min.js",
 	"vuedraggable.min.js",
-	"jszip.min.js",
-	"lzma_worker-min.js",
 ];
 
 /** Build update logs */

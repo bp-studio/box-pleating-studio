@@ -18,13 +18,15 @@ namespace HandleService {
 		handles.set(id, value);
 	}
 
-	watch(() => Workspace.ids, ids => {
-		for(const key of handles.keys()) {
-			if(!ids.includes(key)) {
-				handles.delete(key);
+	export function init(): void {
+		watch(() => Workspace.ids, ids => {
+			for(const key of handles.keys()) {
+				if(!ids.includes(key)) {
+					handles.delete(key);
+				}
 			}
-		}
-	}, { deep: true });
+		}, { deep: true });
+	}
 
 	/**
 	 * Find the id of existing handle in the given {@link FileSystemFileHandle} array.
@@ -40,7 +42,7 @@ namespace HandleService {
 		return Promise.all(idTasks);
 	}
 
-	export async function init(haveSession: boolean): Promise<void> {
+	export async function load(haveSession: boolean): Promise<void> {
 		if(!isFileApiEnabled) return;
 		if(haveSession) {
 			const entries: [number, FileSystemFileHandle][] = await idbKeyval.get("handle") || [];

@@ -1,5 +1,5 @@
 <template>
-	<Dropdown icon="bp-file-alt" :title="$t('toolbar.file.title')" ref="menu">
+	<Dropdown label="File" icon="bp-file-alt" :title="$t('toolbar.file.title')" ref="menu">
 		<div class="dropdown-item" @click="Workspace.create()">
 			<i class="far fa-file" />{{ $t('toolbar.file.new') }}
 		</div>

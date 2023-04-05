@@ -1,5 +1,5 @@
 <template>
-	<Dropdown icon="bp-tasks" :title="$t('toolbar.setting.title')">
+	<Dropdown label="Settings" icon="bp-tasks" :title="$t('toolbar.setting.title')">
 		<template v-slot>
 			<Fullscreen />
 			<div class="dropdown-item" @click="toggle('showGrid')">

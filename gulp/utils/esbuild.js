@@ -1,7 +1,7 @@
 const esbuild = require("gulp-esbuild");
 const esSass = require("esbuild-sass-plugin").sassPlugin;
 const esVue = require("esbuild-plugin-vue-next");
-const exg = require("esbuild-plugin-external-global").externalGlobalPlugin;
+const exg = require("@fal-works/esbuild-plugin-global-externals").globalExternals;
 const ssg = require("gulp-vue-ssg");
 const through2 = require("gulp-through2");
 const vt = require("@intlify/vue-i18n-extensions").transformVTDirective;
@@ -28,8 +28,18 @@ const option = {
 	target,
 	plugins: [
 		exg({
-			"vue": "window.Vue",
-			"vue-i18n": "window.VueI18n",
+			"vue": {
+				varName: "Vue",
+				namedExports: ["shallowRef", "watch", "computed", "reactive", "readonly",
+					"shallowReadonly", "shallowReactive", "getCurrentInstance", "onMounted", "defineComponent",
+					"createVNode", "unref", "openBlock", "createBlock", "createCommentVNode", "withModifiers",
+					"createElementBlock", "resolveDirective", "createElementVNode", "withDirectives",
+					"withCtx", "pushScopeId", "popScopeId", "toDisplayString", "renderSlot", "Fragment",
+					"normalizeClass", "isRef", "vModelDynamic", "vModelText", "nextTick", "createTextVNode",
+					"resolveComponent", "renderList", "vShow", "vModelSelect", "resolveDynamicComponent",
+					"mergeProps", "createStaticVNode", "defineAsyncComponent"],
+				defaultExport: false,
+			},
 		}),
 		esVue(esVueOption()),
 		esSass(),
@@ -43,9 +53,14 @@ function ssgOption(options) {
 		messages: options.messages,
 	});
 	globalThis.i18n = i18n.global;
+	globalThis.Worker = class { };
 	return {
 		appRoot: options.appRoot,
-		appOptions: app => app.use(i18n),
+		appOptions: app => {
+			// Avoiding data pollution between builds
+			globalThis.localStorage?.clear();
+			app.use(i18n);
+		},
 		plugins: [
 			esVue(esVueOption({
 				directiveTransforms: { t: vt(i18n) }, // So that v-t directives will be processed

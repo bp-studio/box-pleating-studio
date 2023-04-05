@@ -1,5 +1,5 @@
 <template>
-	<h5 v-t="'panel.design.type'" class="panel-title"></h5>
+	<div v-t="'panel.design.type'" class="h5 panel-title"></div>
 	<div class="panel-grid">
 		<Field :label="$t('panel.design.title')" v-model="design.title" :placeholder="$t('panel.design.titlePH')" />
 		<Row>
@@ -8,8 +8,8 @@
 						  :placeholder="$t('panel.design.descriptionPH')"></textarea>
 			</div>
 			<div class="my-2">
-				<h6 v-if="design.mode == 'tree'" v-t="'panel.design.tree'"></h6>
-				<h6 v-if="design.mode == 'layout'" v-t="'panel.design.layout'"></h6>
+				<div class="h5" v-if="design.mode == 'tree'" v-t="'panel.design.tree'"></div>
+				<div class="h6" v-if="design.mode == 'layout'" v-t="'panel.design.layout'"></div>
 			</div>
 		</Row>
 		<Row v-if="design.mode == 'layout'" :label="$t('panel.design.grid._')">

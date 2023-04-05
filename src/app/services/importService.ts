@@ -2,6 +2,7 @@ import FileUtility from "app/utils/fileUtility";
 import Handles from "./handleService";
 import Workspace, { nextTick } from "./workspaceService";
 import Dialogs from "./dialogService";
+import { load } from "app/utils/jszip";
 
 namespace ImportService {
 
@@ -133,13 +134,11 @@ namespace ImportService {
 	}
 
 	async function openWorkspace(buffer: ArrayBuffer): Promise<number | undefined> {
-		const zip = await JSZip.loadAsync(buffer);
-		const files: string[] = [];
-		zip.forEach(path => files.push(path));
+		const list = await load(buffer);
+		const files = Object.keys(list);
 		const tasks = files.map(async f => {
-			const data = await zip.file(f)!.async("text");
 			try {
-				const proj = await Workspace.open(JSON.parse(data));
+				const proj = await Workspace.open(JSON.parse(list[f]));
 				return proj.id;
 			} catch(_) {
 				Dialogs.alert(i18n.t("message.invalidFormat", [f]));

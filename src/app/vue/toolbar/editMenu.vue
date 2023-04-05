@@ -1,5 +1,5 @@
 <template>
-	<Dropdown icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
+	<Dropdown label="Edit" icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
 		<template v-slot>
 			<DropdownItem :disabled="!Studio.history.canUndo" @click="undo">
 				<Hotkey icon="bp-undo" ctrl hk="Z">{{ $t('toolbar.edit.undo') }}</Hotkey>

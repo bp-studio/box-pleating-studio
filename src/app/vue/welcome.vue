@@ -1,10 +1,10 @@
 <template>
-	<div id="divWelcome" class="viewport p-3 p-md-4 p-lg-5" v-if="!Studio.project && Core.lcpReady">
+	<div id="divWelcome" class="viewport p-3 p-md-4 p-lg-5" v-show="!Studio.project">
 		<div class="container-fluid d-flex flex-column" style="height: calc(100% - 50px);">
 			<div class="row justify-content-center flex-grow-0">
 				<div class="col-12 col-lg-10 col-xl-8">
-					<h2 class="d-none d-sm-block" v-t="'welcome.title'"></h2>
-					<h3 class="d-sm-none" v-t="'welcome.title'"></h3>
+					<div class="h2 d-none d-sm-block" v-t="'welcome.title'"></div>
+					<div class="h3 d-sm-none" v-t="'welcome.title'"></div>
 
 					<p class="mt-4" v-t="'welcome.intro[0]'"></p>
 					<i18n-t keypath="welcome.intro[1]" tag="p">
@@ -13,12 +13,12 @@
 					<p>
 						💥
 						<i18n-t keypath="welcome.discord" tag="span">
-							<a target="_blank" rel="noopener" href="https://discord.gg/HkcdTDS4zZ" v-t="'keyword.here'"></a>
+							<a target="_blank" rel="noopener" href="https://discord.gg/HkcdTDS4zZ" v-t="'keyword.discord'"></a>
 						</i18n-t>
 					</p>
 				</div>
 				<div class="browser-only col-12 col-lg-10 col-xl-8">
-					<div v-if="(installAvailable || prompt || ios) && state == installState.uninstalled">
+					<div v-if="(installAvailable || prompt || ios) && lcpReady && state == installState.uninstalled">
 						<p v-t="'welcome.install.hint'"></p>
 						<p v-if="ios" v-t="'welcome.install.ios'"></p>
 						<button v-else-if="!nativeMode" class="btn btn-primary" @click="install" v-t="'welcome.install.bt'"></button>
@@ -39,7 +39,7 @@
 			</div>
 			<div v-if="Studio.initialized && isFileApiEnabled" class="row mt-4 mt-sm-5 justify-content-center file-api">
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 mb-4">
-					<h4 class="mb-3" v-t="'welcome.start'"></h4>
+					<div class="h4 mb-3" v-t="'welcome.start'"></div>
 					<div @click="Workspace.create()" class="quick-item">
 						<i class="far fa-file fa-fw me-2" />
 						{{ $t('toolbar.file.new') }}
@@ -51,15 +51,15 @@
 				</div>
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
 					<div v-if="handles.recent.length">
-						<h4 class="mb-3" v-t="'welcome.recent'"></h4>
+						<div class="h4 mb-3" v-t="'welcome.recent'"></div>
 						<div v-for="(h, i) in handles.recent" :key="i" @click="Import.open([h], true)" class="quick-item">
 							{{ h.name }}
 						</div>
 					</div>
 				</div>
 			</div>
+			<div style="position: absolute; bottom: 1rem; right: 1rem;">{{ copyright }}</div>
 		</div>
-		<div style="position: absolute; bottom: 1rem; right: 1rem;">{{ copyright }}</div>
 	</div>
 </template>
 
@@ -79,10 +79,10 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { onMounted, shallowRef } from "vue";
 
 	import { copyright } from "app/misc/copyright";
-	import Core from "app/core";
+	import { lcpReady } from "app/misc/lcpReady";
 	import handles from "app/services/handleService";
 	import { isFileApiEnabled } from "app/shared/constants";
 	import Opener from "@/gadgets/file/opener.vue";
@@ -146,23 +146,25 @@
 		else nativeMode.value = true;
 	}
 
-	// Event listening
-	window.addEventListener("beforeinstallprompt", (event: Event) => {
-		if(!nativeMode.value) event.preventDefault();
-		prompt.value = event as BeforeInstallPromptEvent;
-		nativeMode.value = false;
-	});
-	window.addEventListener("appinstalled", () => {
-		if(isPWA) return; // Desktop goes here
-		state.value = installState.installing;
-		const int = setInterval(() => {
-			if(state.value != installState.installed) detectInstallation();
-			else clearInterval(int);
-		}, APP_CHECK_INTERVAL);
-	});
+	onMounted(() => {
+		// Event listening
+		window.addEventListener("beforeinstallprompt", (event: Event) => {
+			if(!nativeMode.value) event.preventDefault();
+			prompt.value = event as BeforeInstallPromptEvent;
+			nativeMode.value = false;
+		});
+		window.addEventListener("appinstalled", () => {
+			if(isPWA) return; // Desktop goes here
+			state.value = installState.installing;
+			const int = setInterval(() => {
+				if(state.value != installState.installed) detectInstallation();
+				else clearInterval(int);
+			}, APP_CHECK_INTERVAL);
+		});
 
-	// Check installation immediately
-	detectInstallation();
+		// Check installation immediately
+		detectInstallation();
+	});
 
 </script>
 

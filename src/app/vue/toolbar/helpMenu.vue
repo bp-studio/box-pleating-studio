@@ -1,5 +1,5 @@
 <template>
-	<Dropdown :icon="icon" :title="$t('toolbar.help.title')" :notify="notify || updateReady">
+	<Dropdown label="Help" :icon="icon" :title="$t('toolbar.help.title')" :notify="notify || updateReady">
 		<div class="dropdown-item" @click="show('about')">
 			<i class="bp-info" />{{ $t('toolbar.help.about') }}
 		</div>

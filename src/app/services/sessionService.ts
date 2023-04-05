@@ -26,6 +26,10 @@ namespace SessionService {
 	let initialized = false;
 
 	export async function init(loadSession: boolean): Promise<boolean> {
+		watch(() => Settings.autoSave, shouldAutoSave => {
+			if(!shouldAutoSave && initialized) localStorage.removeItem("session");
+		});
+
 		// Only the instance with saving rights will read the session
 		const hasSession = await checkSessionRight();
 		if(hasSession && loadSession) {
@@ -87,10 +91,6 @@ namespace SessionService {
 			await Handles.save();
 		}
 	}
-
-	watch(() => Settings.autoSave, shouldAutoSave => {
-		if(!shouldAutoSave && initialized) localStorage.removeItem("session");
-	});
 }
 
 export default SessionService;

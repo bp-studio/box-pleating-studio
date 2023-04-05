@@ -1,14 +1,14 @@
+import { computed, shallowReactive } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/math";
-import { computed, shallowReactive } from "vue";
+import { Rectangle } from "@pixi/core";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { FULL_ZOOM, MARGIN, MARGIN_FIX } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
-import { viewport } from "client/screen/display";
+import { display } from "client/screen/display";
 import { Enum } from "client/shared/enum";
 import { Layer, LayerOptions } from "client/shared/layers";
 import { GridType } from "shared/json";
@@ -151,7 +151,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getScale(): number {
-		const viewWidth = viewport.width, viewHeight = viewport.height;
+		const viewWidth = display.viewport.width, viewHeight = display.viewport.height;
 
 		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$renderWidth;
 		let horizontalScale = (viewWidth - 2 * MARGIN) * factor / width;
@@ -205,8 +205,9 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	/** Adjust the position of the container by the scrolling position. */
 	private _positioning(): void {
 		const image = this.$imageDimension.value;
-		this.$view.x = Math.max((viewport.width - image.width) / 2, 0) - this.$scroll.x + this.$horizontalMargin.value;
-		this.$view.y = Math.max((viewport.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
+		const vp = display.viewport;
+		this.$view.x = Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + this.$horizontalMargin.value;
+		this.$view.y = Math.max((vp.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
 	/** Draw the border and grid lines. */

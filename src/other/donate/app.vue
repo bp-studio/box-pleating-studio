@@ -2,7 +2,7 @@
 	<div class="container h-100">
 		<div class="h-100 d-flex flex-column">
 			<div class="flex-grow-1" v-if="step == 1">
-				<h4 v-t="'donate.title'"></h4>
+				<div class="h4" v-t="'donate.title'"></div>
 				<div v-t="'donate.intro'"></div>
 				<div class="form-row mt-3">
 					<div class="input-group">
@@ -17,7 +17,7 @@
 				<div v-if="processing" v-t="'donate.wait'"></div>
 			</div>
 			<div class="flex-grow-1" v-if="step == 2">
-				<h4 v-t="'donate.title'"></h4>
+				<div class="h4" v-t="'donate.title'"></div>
 				<div>{{ $t('donate.thank', [name]) }}</div>
 			</div>
 			<div class="wait flex-grow-0">

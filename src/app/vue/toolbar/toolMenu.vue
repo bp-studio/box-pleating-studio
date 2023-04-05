@@ -1,5 +1,5 @@
 <template>
-	<Dropdown icon="bp-tools" :title="$t('toolbar.tools.title')">
+	<Dropdown label="Tools" icon="bp-tools" :title="$t('toolbar.tools.title')">
 		<Uploader accept=".tmd5" @upload="TreeMaker($event)">
 			<i class="fas fa-file-import" />
 			{{ $t("toolbar.tools.TreeMaker") }}

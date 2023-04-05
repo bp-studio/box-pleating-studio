@@ -1,10 +1,8 @@
 import ProjectService from "client/services/projectService";
 import { svg } from "client/svg";
-import { scrollView } from "./display";
+import { display } from "./display";
 
 import type { Project } from "client/project/project";
-
-const img = scrollView.$img;
 
 const DEBOUNCE = 1000;
 const GC_TIME = 5000;
@@ -28,6 +26,7 @@ window.addEventListener("afterprint", afterPrint);
 export function beforePrint(proj: Project | null): void {
 	if(!proj) return;
 	clearTimeout(debounce);
+	const img = display.scrollView.$img;
 	if(!printing &&
 		// Resetting printing format on mobile devices will
 		// trigger beforePrint again, but we can use the
@@ -57,6 +56,7 @@ function afterPrint(): void {
 export function png(proj: Project): Promise<Blob> {
 	const canvas = document.createElement("canvas");
 	const ctx = canvas.getContext("2d")!;
+	const img = display.scrollView.$img;
 	return new Promise<Blob>(resolve => {
 		img.addEventListener("load", () => {
 			// Improves image quality on mobile devices

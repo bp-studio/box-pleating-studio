@@ -21,7 +21,7 @@
 		"recent": "最近使用",
 		"start": "開始",
 		"website": "BP Studio 網站",
-		"discord": "BP Studio 現在有了 Discord 伺服器！請到{0}加入我們！"
+		"discord": "請加入我們的 {0}！"
 	},
 	"toolbar": {
 		"file": {
@@ -267,6 +267,7 @@
 		"close": "關閉",
 		"export": "匯出",
 		"delete": "刪除",
+		"discord": "BP Studio Discord 伺服器",
 		"version": "版本",
 		"filename": "檔名",
 		"download": "下載",

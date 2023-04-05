@@ -1,5 +1,5 @@
 <template>
-	<h5 v-t="'panel.flap.type'" class="panel-title"></h5>
+	<div v-t="'panel.flap.type'" class="h5 panel-title"></div>
 	<div class="panel-grid">
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 		<NumberVue :label="$t('panel.flap.radius')" v-model="subject.radius" :min="1" :max="max" hotkeys="d.rd,d.ri" />

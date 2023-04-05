@@ -144,26 +144,28 @@ namespace WorkspaceService {
 	// Exiting warning
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** If the user is in risk of losing progress on closing the app. */
-	export const anyUnsaved = computed(() =>
-		!settings.autoSave && // No need to warn if autoSave is on
+	export function init(): void {
+		/** If the user is in risk of losing progress on closing the app. */
+		const anyUnsaved = computed(() =>
+			!settings.autoSave && // No need to warn if autoSave is on
 		projects.value.some(p => p.history.isModified)
-	);
+		);
 
-	const unloadHandler = (e: BeforeUnloadEvent): string => {
-		e.preventDefault();
+		const unloadHandler = (e: BeforeUnloadEvent): string => {
+			e.preventDefault();
 
-		// Triggers exiting warning. The message is not actually shown,
-		// see https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent
-		return e.returnValue = "unsaved";
-	};
+			// Triggers exiting warning. The message is not actually shown,
+			// see https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent
+			return e.returnValue = "unsaved";
+		};
 
-	watch(anyUnsaved, v => {
+		watch(anyUnsaved, v => {
 		// So that we don't listen to the event unconditionally.
 		// See https://developer.chrome.com/blog/page-lifecycle-api/#the-beforeunload-event
-		if(v) window.addEventListener("beforeunload", unloadHandler);
-		else window.removeEventListener("beforeunload", unloadHandler);
-	});
+			if(v) window.addEventListener("beforeunload", unloadHandler);
+			else window.removeEventListener("beforeunload", unloadHandler);
+		});
+	}
 }
 
 export default shallowReadonly(reactive(WorkspaceService));

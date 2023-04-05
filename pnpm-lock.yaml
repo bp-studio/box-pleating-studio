@@ -14,9 +14,6 @@ dependencies:
   '@paypal/paypal-js':
     specifier: ^5.1.6
     version: 5.1.6
-  '@pixi/app':
-    specifier: ^7.2.3
-    version: 7.2.3(@pixi/core@7.2.3)(@pixi/display@7.2.3)
   '@pixi/constants':
     specifier: ^7.2.3
     version: 7.2.3
@@ -91,6 +88,9 @@ dependencies:
     version: 6.5.4
 
 devDependencies:
+  '@fal-works/esbuild-plugin-global-externals':
+    specifier: ^2.1.2
+    version: 2.1.2
   '@intlify/vue-i18n-extensions':
     specifier: ^5.0.1
     version: 5.0.1(vue-i18n@9.2.2)(vue@3.2.47)
@@ -2040,6 +2040,10 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
+  /@fal-works/esbuild-plugin-global-externals@2.1.2:
+    resolution: {integrity: sha512-cEee/Z+I12mZcFJshKcCqC8tuX5hG3s+d+9nZ3LabqKF1vKdF41B92pJVCBggjAGORAeOzyyDDKrZwIkLffeOQ==}
+    dev: true
+
   /@fortawesome/fontawesome-free@6.4.0:
     resolution: {integrity: sha512-0NyytTlPJwB/BF5LtRV8rrABDbe3TdTXqNB3PdZ+UUUZAEIrdOJdmABqKjt4AXwIoJNaRVVZEXxpNrqvE1GAYQ==}
     engines: {node: '>=6'}
@@ -2217,16 +2221,6 @@ packages:
     resolution: {integrity: sha512-1upF06pv0AUtTftRVSra44p8ibqGa3ruKLArvdhpZla25zcrND7R+nDUIMrJ0iteVYZowhujZStFs6NoruExfg==}
     dependencies:
       promise-polyfill: 8.3.0
-    dev: false
-
-  /@pixi/app@7.2.3(@pixi/core@7.2.3)(@pixi/display@7.2.3):
-    resolution: {integrity: sha512-KK2KDozY987VPaMuXuL2q9vfJLZInxgITFi9QxEzcGxD4WWvVIdLBPOv3m18sB8i3HTafJb/b6x3n6/7RNhzEA==}
-    peerDependencies:
-      '@pixi/core': 7.2.3
-      '@pixi/display': 7.2.3
-    dependencies:
-      '@pixi/core': 7.2.3
-      '@pixi/display': 7.2.3(@pixi/core@7.2.3)
     dev: false
 
   /@pixi/color@7.2.3:

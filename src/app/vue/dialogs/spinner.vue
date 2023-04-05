@@ -16,11 +16,12 @@
 
 	import { computed, shallowRef } from "vue";
 
-	import Core from "app/core";
+	import { lcpReady } from "app/misc/lcpReady";
 	import Workspace from "app/services/workspaceService";
 
 	const loading = shallowRef(false);
-	const visible = computed(() => !Core.lcpReady || loading.value);
+	const visible = computed(() => !lcpReady.value || loading.value);
+
 	const ONE_SECOND = 1000;
 
 	function show(): Promise<void> {

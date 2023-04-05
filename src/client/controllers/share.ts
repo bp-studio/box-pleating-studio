@@ -1,4 +1,4 @@
-import { canvas } from "client/screen/display";
+import { display } from "client/screen/display";
 
 // Some environments does not support this class
 const TOUCH_SUPPORT = typeof TouchEvent != "undefined";
@@ -24,7 +24,7 @@ export function $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
 	} else {
 		pagePoint = { x: event.pageX, y: event.pageY };
 	}
-	const rect = canvas.getBoundingClientRect();
+	const rect = display.canvas.getBoundingClientRect();
 	return { x: pagePoint.x - rect.left, y: pagePoint.y - rect.y };
 }
 

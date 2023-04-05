@@ -1,5 +1,5 @@
 const esbuild = require("gulp-esbuild");
-const exg = require("esbuild-plugin-external-global").externalGlobalPlugin;
+const exg = require("@fal-works/esbuild-plugin-global-externals").globalExternals;
 const gulp = require("gulp");
 const replace = require("gulp-replace");
 const terser = require("gulp-terser");
@@ -15,6 +15,49 @@ const extra = [
 	"node_modules/pixi.js/package.json",
 ];
 
+const exgConfig = {
+	"vue": {
+		varName: "Vue",
+		namedExports: ["shallowRef", "watchEffect", "watch", "computed", "shallowReactive", "readonly", "nextTick", "effectScope"],
+		defaultExport: false,
+	},
+	"@pixi/core": {
+		varName: "Pixi",
+		namedExports: ["Renderer", "Ticker", "getTestContext", "ContextSystem", "StartupSystem", "Rectangle", "Polygon", "Circle"],
+		defaultExport: false,
+	},
+	"@pixi/graphics": {
+		varName: "Pixi",
+		namedExports: ["Graphics"],
+		defaultExport: false,
+	},
+	"@pixi/graphics-smooth": {
+		varName: "Pixi",
+		namedExports: ["SmoothGraphics", "LINE_SCALE_MODE", "settings"],
+		defaultExport: false,
+	},
+	"@pixi/filter-alpha": {
+		varName: "Pixi",
+		namedExports: ["AlphaFilter"],
+		defaultExport: false,
+	},
+	"@pixi/display": {
+		varName: "Pixi",
+		namedExports: ["Container"],
+		defaultExport: false,
+	},
+	"@pixi/events": {
+		varName: "Pixi",
+		namedExports: ["EventBoundary"],
+		defaultExport: false,
+	},
+	"@pixi/text": {
+		varName: "Pixi",
+		namedExports: ["Text"],
+		defaultExport: false,
+	},
+};
+
 function esb(options) {
 	return esbuild(Object.assign({}, {
 		outfile: "client.js",
@@ -23,11 +66,7 @@ function esb(options) {
 		target,
 		treeShaking: true,
 		tsconfig: config.src.client + "/tsconfig.json",
-		plugins: [
-			exg({
-				"vue": "window.Vue",
-			}),
-		],
+		plugins: [exg(exgConfig)],
 	}, options || {}));
 }
 

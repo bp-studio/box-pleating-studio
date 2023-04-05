@@ -2,7 +2,7 @@ import { Container } from "@pixi/display";
 
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
-import { designs } from "client/screen/display";
+import { display } from "client/screen/display";
 import { MOUNTED } from "client/base/mountable";
 import { Tree } from "./components/tree/tree";
 import { Layout } from "./components/layout/layout";
@@ -42,7 +42,7 @@ export class Design extends View implements ISerializable<JDesign> {
 		this.description = json.description ?? "";
 		this.mode = json.mode ?? "tree";
 
-		const view = this.$addRootObject(new Container(), designs);
+		const view = this.$addRootObject(new Container(), display.designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);
 
 		this.layout = new Layout(project, view, json.layout.sheet, state?.layout);

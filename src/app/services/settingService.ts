@@ -96,22 +96,31 @@ function loadSettings(settingString: string | null): boolean {
 
 // Sync settings
 let syncing: boolean = false;
-window.addEventListener("storage", e => {
-	if(e.key == KEY) {
-		syncing = true;
-		loadSettings(e.newValue);
-	}
-});
 
-export const hadSettings = loadSettings(localStorage.getItem(KEY));
+let hadSettings: boolean = false;
 
-watch(settings, save, { deep: true });
+export function init(): void {
+	window.addEventListener("storage", e => {
+		if(e.key == KEY) {
+			syncing = true;
+			loadSettings(e.newValue);
+		}
+	});
 
-watch(
-	() => settings.showStatus,
-	s => document.body.classList.toggle("show-status", s),
-	{ immediate: true }
-);
+	hadSettings = loadSettings(localStorage.getItem(KEY));
+
+	watch(settings, save, { deep: true });
+
+	watch(
+		() => settings.showStatus,
+		s => document.body.classList.toggle("show-status", s),
+		{ immediate: true }
+	);
+}
+
+export function getHadSettings(): boolean {
+	return hadSettings;
+}
 
 /**
  * Copy the properties in the source object to the target object,

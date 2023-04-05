@@ -9,9 +9,8 @@
 		</div>
 
 		<div class="btn-group me-2">
-			<button type="button" class="btn btn-primary"
-					:class="{ active: Studio.project && Studio.project.design.mode == 'tree' }" @click="toTree"
-					:title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
+			<button type="button" class="btn btn-primary" :class="{ active: Studio.project && Studio.project.design.mode == 'tree' }"
+					@click="toTree" :title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
 				<i class="bp-tree" />
 			</button>
 			<button type="button" class="btn btn-primary"
@@ -24,19 +23,22 @@
 		<TabBar />
 
 		<div class="btn-group" id="panelToggle">
-			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')"
-					:disabled="!Studio.project">
+			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')" :disabled="!Studio.project">
 				<i class="bp-sliders-h" />
 			</button>
 		</div>
+
 	</nav>
 </template>
 
 <script lang="ts">
+	export const tick = shallowRef(0);
 	export default { name: "Toolbar" };
 </script>
 
 <script setup lang="ts">
+
+	import { shallowRef } from "vue";
 
 	import Studio from "app/services/studioService";
 	import { hk } from "app/services/customHotkeyService";
@@ -54,7 +56,6 @@
 	function toTree(): void {
 		if(Studio.project) Studio.project.design.mode = "tree";
 	}
-
 
 </script>
 

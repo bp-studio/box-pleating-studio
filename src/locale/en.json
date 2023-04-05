@@ -21,7 +21,7 @@
 		"recent": "Recently used",
 		"start": "Start",
 		"website": "BP Studio website",
-		"discord": "BP Studio now has a Discord server! Please join us {0}!"
+		"discord": "Please join our {0}!"
 	},
 	"toolbar": {
 		"file": {
@@ -267,6 +267,7 @@
 		"close": "Close",
 		"export": "Export",
 		"delete": "Delete",
+		"discord": "BP Studio Discord server",
 		"version": "Version",
 		"filename": "Filename",
 		"download": "Download",

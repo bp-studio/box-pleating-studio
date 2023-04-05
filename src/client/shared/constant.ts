@@ -27,6 +27,6 @@ export const BLACK = 0;
 
 export const BLUE = 0x6699FF;
 
-export const GREEN = 0x00ff00;
+export const GREEN = 0x008000;
 
 export const LIGHT_GREEN = 0x66dd66;

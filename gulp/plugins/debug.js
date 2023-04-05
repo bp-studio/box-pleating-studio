@@ -21,7 +21,7 @@ module.exports = () => through2({
 		// Use debug assets instead. `replaceAll` is new in es2021.
 		content = content.replaceAll("main.css", "../debug/main.css");
 		content = content.replaceAll("main.js", "../debug/main.js");
-		content = content.replaceAll("core.js", "../debug/core.js");
+		content = content.replaceAll(/(?<!\.)core.js/g, "../debug/core.js");
 		content = content.replaceAll("client.js", "../debug/client.js");
 		content = content.replaceAll("lib/vue.runtime.global.prod.js", "../debug/lib/vue.runtime.global.js");
 
