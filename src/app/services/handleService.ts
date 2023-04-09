@@ -25,7 +25,7 @@ namespace HandleService {
 					handles.delete(key);
 				}
 			}
-		}, { deep: true });
+		}, { deep: true, immediate: true });
 	}
 
 	/**

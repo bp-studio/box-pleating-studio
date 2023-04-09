@@ -10,9 +10,9 @@
 
 <script setup lang="ts">
 
-	const props = defineProps({
-		multiple: Boolean,
-	});
+	const props = defineProps<{
+		multiple?: boolean;
+	}>();
 
 	const emit = defineEmits(["open"]);
 

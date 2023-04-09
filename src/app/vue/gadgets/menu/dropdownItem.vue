@@ -13,9 +13,9 @@
 
 <script setup lang="ts">
 
-	const props = defineProps({
-		disabled: Boolean,
-	});
+	const props = defineProps<{
+		disabled?: boolean;
+	}>();
 	const emit = defineEmits(["click"]);
 
 	function execute(): void {

@@ -8,7 +8,7 @@ import { doEvents } from "shared/utils/async";
 import App from "@/app.vue";
 import Core from "app/core";
 import Lib from "app/services/libService";
-import LanguageService, { createPlugin } from "app/services/languageService";
+import LanguageService from "app/services/languageService";
 import { init as settingInit } from "app/services/settingService";
 
 import "app/style/main.scss";
@@ -33,17 +33,24 @@ async function init(): Promise<void> {
 		await doEvents();
 		settingInit();
 		const app = Vue.createSSRApp(App);
-		app.use(createPlugin());
+		app.use(LanguageService.createPlugin());
 		await doEvents();
 		app.mount("#app");
 
+		// LCP
 		await doEvents();
 		LanguageService.init();
 		if(lcpReady.value === undefined) lcpReady.value = true;
+
+		// Phase 1
 		await doEvents();
 		phase.value++;
 
-		// Initialize the app
+		// Phase 2
+		await doEvents();
+		phase.value++;
+
+		// Initialize services and Client
 		await doEvents();
 		if(!await Core.init()) return;
 

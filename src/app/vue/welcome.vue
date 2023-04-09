@@ -41,12 +41,12 @@
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 mb-4">
 					<div class="h4 mb-3" v-t="'welcome.start'"></div>
 					<div @click="Workspace.create()" class="quick-item">
-						<i class="far fa-file fa-fw me-2" />
-						{{ $t('toolbar.file.new') }}
+						<i class="bp-file fa-fw me-2" />
+						<span v-t="'toolbar.file.new'" />
 					</div>
 					<Opener @open="Import.open($event, false)" class="quick-item">
-						<i class="far fa-folder-open fa-fw me-2" />
-						{{ $t('toolbar.file.open') }}
+						<i class="bp-folder-open fa-fw me-2" />
+						<span v-t="'toolbar.file.open'" />
 					</Opener>
 				</div>
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
@@ -58,8 +58,8 @@
 					</div>
 				</div>
 			</div>
-			<div style="position: absolute; bottom: 1rem; right: 1rem;">{{ copyright }}</div>
 		</div>
+		<div style="position: absolute; bottom: 1rem; right: 1rem;">{{ copyright }}</div>
 	</div>
 </template>
 
@@ -84,7 +84,7 @@
 	import { copyright } from "app/misc/copyright";
 	import { lcpReady } from "app/misc/lcpReady";
 	import handles from "app/services/handleService";
-	import { isFileApiEnabled } from "app/shared/constants";
+	import { isFileApiEnabled, isServiceWorker } from "app/shared/constants";
 	import Opener from "@/gadgets/file/opener.vue";
 	import Studio from "app/services/studioService";
 	import Workspace from "app/services/workspaceService";
@@ -103,8 +103,7 @@
 	// but that's OK since in that case we will have the prompt available immediately.
 	const installAvailable =
 		"onbeforeinstallprompt" in window &&
-		location.protocol == "https:" &&
-		"serviceWorker" in navigator &&
+		isServiceWorker &&
 		// eslint-disable-next-line compat/compat
 		!navigator.serviceWorker.controller;
 

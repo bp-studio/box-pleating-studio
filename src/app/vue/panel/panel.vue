@@ -25,7 +25,7 @@
 </script>
 
 <script setup lang="ts">
-	import { computed, shallowRef, watch } from "vue";
+	import { computed, onMounted, shallowRef, watch } from "vue";
 
 	import Studio, { showPanel } from "app/services/studioService";
 	import StretchVue from "./stretch.vue";
@@ -47,14 +47,16 @@
 	const type = computed(() => Studio.selections[0]?.type ?? "");
 	const design = computed(() => Studio.project?.design);
 
-	watch(() => Studio.project, v => {
-		if(!v) hide();
-	});
+	onMounted(() => {
+		watch(() => Studio.project, v => {
+			if(!v) hide();
+		});
 
-	watch(() => design.value?.mode, () => {
-		// If any text fields are in used during view switching, unfocus it.
-		const el = document.activeElement as HTMLElement;
-		if(el && panel.value?.contains(el)) el.blur();
+		watch(() => design.value?.mode, () => {
+			// If any text fields are in used during view switching, unfocus it.
+			const el = document.activeElement as HTMLElement;
+			if(el && panel.value?.contains(el)) el.blur();
+		});
 	});
 
 	function onContextMenu(event: Event): void {

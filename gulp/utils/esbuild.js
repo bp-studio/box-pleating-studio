@@ -26,6 +26,7 @@ const option = {
 	legalComments: "none",
 	charset: "utf8",
 	target,
+	external: ["*.woff2"],
 	plugins: [
 		exg({
 			"vue": {

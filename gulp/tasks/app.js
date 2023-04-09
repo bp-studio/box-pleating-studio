@@ -36,6 +36,7 @@ gulp.task("appDebug", () =>
 			sourcesContent: false,
 			sourceRoot: "../../",
 		}))
+		.pipe(iff(f => f.basename == "main.css", replace("assets/flags", "../dist/assets/flags")))
 		.pipe(iff(f => f.basename == "main.js.map" || f.basename == "main.css.map", through2(content => {
 			// Fix the sourcemap relative path by Vue plugin
 			const json = JSON.parse(content);

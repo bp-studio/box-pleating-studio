@@ -2,6 +2,12 @@
  * We repeat the rules here for speeding up rendering
  *********************************************/
 
+.fa-fw {
+	display: inline-block;
+	text-align: center;
+	width: 1.25em;
+}
+
 .fa-spin {
 	display: inline-block;
 

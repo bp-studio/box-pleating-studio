@@ -22,8 +22,8 @@
 
 	const id = useFieldId();
 
-	defineProps({
-		modelValue: Boolean,
-	});
+	defineProps<{
+		modelValue: boolean;
+	}>();
 
 </script>

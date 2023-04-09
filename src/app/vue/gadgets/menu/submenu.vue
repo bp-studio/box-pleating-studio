@@ -25,10 +25,10 @@
 
 	let timeout: Timeout;
 
-	defineProps({
-		icon: String,
-		label: String,
-	});
+	defineProps<{
+		icon: string;
+		label: string;
+	}>();
 
 	function enter(): void {
 		clearTimeout(timeout);

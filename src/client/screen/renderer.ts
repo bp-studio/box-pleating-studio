@@ -34,7 +34,10 @@ export async function useRenderer(options: Partial<IRendererOptions>): Promise<R
 	getTestContext();
 	await doEvents();
 
-	// Create renderer
+	// Create renderer. When context is given in the options,
+	// For some reason it won't run the getExtensions() method,
+	// so we use the AsyncContextSystem to capture the extensions
+	// earlier, and inject them back here.
 	const renderer = new Renderer(options);
 	renderer.context.extensions = contextSystem.extensions;
 	await StartupPromise;

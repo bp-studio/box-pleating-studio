@@ -18,12 +18,12 @@
 
 	import { isMac } from "app/shared/constants";
 
-	const props = defineProps({
-		icon: String,
-		hk: String,
-		ctrl: Boolean,
-		shift: Boolean,
-	});
+	const props = defineProps<{
+		icon: string;
+		hk?: string;
+		ctrl?: boolean;
+		shift?: boolean;
+	}>();
 
 	const key = computed(() => {
 		let result = props.hk;

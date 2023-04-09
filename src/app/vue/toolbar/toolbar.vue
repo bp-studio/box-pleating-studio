@@ -20,7 +20,7 @@
 			</button>
 		</div>
 
-		<TabBar />
+		<TabBar v-if="phase >= 2" />
 
 		<div class="btn-group" id="panelToggle">
 			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')" :disabled="!Studio.project">
@@ -40,6 +40,7 @@
 
 	import { shallowRef } from "vue";
 
+	import { phase } from "app/misc/lcpReady";
 	import Studio from "app/services/studioService";
 	import { hk } from "app/services/customHotkeyService";
 	import { toggle } from "@/panel/panel.vue";

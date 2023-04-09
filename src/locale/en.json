@@ -1,6 +1,7 @@
 {
 	"name": "English",
 	"flag": "usa",
+	"emoji": "🇺🇸",
 	"since": 0,
 	"welcome": {
 		"title": "Welcome to Box Pleating Studio!",

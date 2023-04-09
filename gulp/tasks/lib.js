@@ -116,6 +116,6 @@ gulp.task("lib", () => all(
 	pixi(),
 	quickCopy("vue/dist/vue.runtime.global.js", true),
 	quickCopy("vue/dist/vue.runtime.global.prod.js"),
-	quickCopy("vue-i18n/dist/vue-i18n.global.prod.js"),
+	quickCopy("vue-i18n/dist/vue-i18n.runtime.global.prod.js"),
 	quickCopy("../lib/lzma/lzma_worker-min.js")
 ));

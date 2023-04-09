@@ -35,10 +35,15 @@ function onApprove(details: PayPal.OrderResponseBody, store: Store): void {
 }
 
 export function initPayPalButton(init: (action: PayPal.OnInitActions) => void, store: Store): void {
+	if(typeof paypal === "undefined") {
+		setTimeout(() => initPayPalButton(init, store), 0);
+		return;
+	}
+
 	const purchase_units: PayPal.PurchaseUnit[] = [];
 	purchase_units[0] = { amount: { value: "" } };
 
-	if(!paypal.Buttons) return;
+	if(!paypal.Buttons) return; // type guard
 	paypal.Buttons({
 		style: {
 			color: "gold",

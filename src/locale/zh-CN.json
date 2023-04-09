@@ -1,6 +1,7 @@
 {
 	"name": "简体中文",
 	"flag": "china",
+	"emoji": "🇨🇳",
 	"since": 900,
 	"welcome": {
 		"title": "欢迎使用 Box Pleating Studio！",

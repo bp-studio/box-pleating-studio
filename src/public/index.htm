@@ -11,19 +11,19 @@
 	<meta name="google" content="notranslate">
 	<meta name="version" content="0.6.0-alpha">
 
-	<!-- Critical -->
-	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/bps/style.css">
-	<link rel="stylesheet" href="main.css">
-
 	<!-- Preload; also works locally since Chrome 102 -->
+	<link rel="preload" as="style" href="lib/bootstrap/bootstrap.min.css">
+	<link rel="preload" as="style" href="assets/bps/style.css">
+	<link rel="preload" as="style" href="main.css">
 	<link rel="preload" as="font" type="font/woff2" href="assets/bps/fonts/bps.woff2">
 	<link rel="preload" as="font" type="font/woff2" href="lib/font-awesome/webfonts/fa-regular-400.woff2">
 	<link rel="preload" as="script" href="log/log.js">
 	<link rel="preload" as="script" href="locale.js">
 	<link rel="preload" as="script" href="lib/vue.runtime.global.prod.js">
-	<link rel="preload" as="script" href="lib/vue-i18n.global.prod.js">
+	<link rel="preload" as="script" href="lib/vue-i18n.runtime.global.prod.js">
 	<link rel="preload" as="script" href="main.js">
+	<link rel="preload" as="script" href="lib/pixi.core.js">
+	<link rel="preload" as="script" href="lib/pixi.js">
 	<link rel="preload" as="script" href="client.js">
 
 	<!-- Not implemented in Chrome yet, but are supported in Firefox and Opera -->
@@ -40,7 +40,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1492"
+			app_version: "1511"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -289,6 +289,11 @@
 		var i18n, bp;
 	</script>
 
+	<!-- Critical -->
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/bps/style.css">
+	<link rel="stylesheet" href="main.css">
+
 	<!-- eslint-disable -->
 	<!-- Launcher -->
 	<script>
@@ -310,7 +315,7 @@
 						'log/log.js',
 						'locale.js',
 						'lib/vue.runtime.global.prod.js',
-						'lib/vue-i18n.global.prod.js',
+						'lib/vue-i18n.runtime.global.prod.js',
 						'main.js'
 					];
 					scripts.forEach(loadScript);

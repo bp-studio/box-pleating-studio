@@ -30,7 +30,7 @@
 		return new Promise(resolve => {
 			res = resolve;
 			bc.postMessage(app.id);
-			setTimeout(() => res(true), 50);
+			setTimeout(() => res(true), 0);
 		});
 	};
 })();

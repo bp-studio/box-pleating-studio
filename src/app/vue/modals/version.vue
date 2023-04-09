@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 
-	import { reactive, shallowRef, watch } from "vue";
+	import { onMounted, reactive, shallowRef, watch } from "vue";
 
 	import Dialogs from "app/services/dialogService";
 	import useModal from "./modal";
@@ -41,7 +41,7 @@
 
 	const { el, show, hide, on } = useModal("News", () => load(index.value));
 
-	watch(index, id => load(id));
+	onMounted(() => watch(index, id => load(id)));
 
 	async function load(id: number): Promise<boolean> {
 		if(!record[id]) {

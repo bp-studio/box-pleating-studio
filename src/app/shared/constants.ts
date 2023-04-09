@@ -23,6 +23,9 @@ export const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 export const isMac = navigator.platform?.toLowerCase().startsWith("mac");
 if(isMac) document.body.classList.add("mac");
 
+/** If the current execution is under SSG. */
+export const isSSG = navigator.userAgent.includes("jsdom");
+
 /** Store the original page title (this will vary from build to build) */
 export const defaultTitle = document.title;
 
@@ -32,3 +35,12 @@ export const copyEnabled = "clipboard" in navigator && "write" in navigator.clip
 
 /** Whether the current instance is running online. */
 export const isHttps = location.protocol === "https:";
+
+/** Whether service worker is supported */
+export const isServiceWorker = "serviceWorker" in navigator && isHttps;
+
+/** A lucky guess that we're probably in China. */
+const isChina = navigator.language == "zh-CN" || navigator.languages.includes("zh-CN");
+
+// If we're in China, replace the flag to avoid unnecessary trouble.
+if(isChina) locale["zh-tw"].emoji = () => "🇭🇰";

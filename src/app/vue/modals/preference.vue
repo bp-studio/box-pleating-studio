@@ -31,8 +31,9 @@
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
 							<div class="col-8">
-								<select class="form-select" v-model="I18n.locale">
-									<option v-for="l in I18n.availableLocales" :key="l" :value="l" v-t="{ path: 'name', locale: l }">
+								<select class="form-select flag" v-model="I18n.locale">
+									<option v-for="l in I18n.availableLocales" :key="l" :value="l">
+										{{ $t('emoji', l) }}&ensp;{{ $t('name', l) }}
 									</option>
 								</select>
 							</div>
@@ -47,11 +48,15 @@
 								</select>
 							</div>
 						</div>
-						<Toggle v-model="Settings.autoSave">{{ $t('preference.autoSave') }}</Toggle>
+						<Toggle v-model="Settings.autoSave">
+							{{ $t('preference.autoSave') }}
+						</Toggle>
 						<Toggle v-if="isFileApiEnabled" v-model="Settings.loadSessionOnQueue">
 							{{ $t('preference.loadSessionOnQueue') }}
 						</Toggle>
-						<Toggle v-model="Settings.includeHiddenElement">{{ $t('preference.includeHidden') }}</Toggle>
+						<Toggle v-model="Settings.includeHiddenElement">
+							{{ $t('preference.includeHidden') }}
+						</Toggle>
 					</div>
 					<div v-show="tab == 1" class="p-2 h-100">
 						<div class="color-grid">
@@ -74,7 +79,7 @@
 				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1">
-						<button class="btn btn-secondary" @click="reset()">{{ $t('preference.reset') }}</button>
+						<button class="btn btn-secondary" @click="reset()"><span v-t="'preference.reset'" /></button>
 					</div>
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 				</div>
@@ -89,7 +94,7 @@
 
 <script setup lang="ts">
 
-	import { shallowRef, watch } from "vue";
+	import { onMounted, shallowRef, watch } from "vue";
 
 	import { isFileApiEnabled } from "app/shared/constants";
 	import Studio from "app/services/studioService";
@@ -104,8 +109,10 @@
 	const tab = shallowRef(0);
 	const I18n = i18n;
 
-	watch(on, v => {
-		if(!v) tab.value = 0;
+	onMounted(() => {
+		watch(on, v => {
+			if(!v) tab.value = 0;
+		});
 	});
 
 	defineExpose({ show });

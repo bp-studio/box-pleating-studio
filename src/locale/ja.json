@@ -1,6 +1,7 @@
 {
 	"name": "日本語",
 	"flag": "japan",
+	"emoji": "🇯🇵",
 	"since": 0,
 	"welcome": {
 		"title": "Box Pleating Studio へようこそ！",

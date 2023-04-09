@@ -23,7 +23,7 @@
 					</i18n-t>
 				</div>
 				<div class="modal-footer">
-					<div class="flex-grow-1">{{ $t('keyword.version') }} {{ version }}</div>
+					<div class="flex-grow-1"><span v-t="'keyword.version'" /> {{ version }}</div>
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
 				</div>
 			</div>

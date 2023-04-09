@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { onMounted, shallowRef } from "vue";
 
 	import Divider from "@/gadgets/menu/divider.vue";
 
@@ -40,8 +40,10 @@
 	const fullscreen = shallowRef(false);
 	const fullscreenEnabled = document.fullscreenEnabled || document.webkitFullscreenEnabled;
 
-	document.addEventListener("fullscreenchange", checkFullscreen);
-	document.addEventListener("webkitfullscreenchange", checkFullscreen);
+	onMounted(() => {
+		document.addEventListener("fullscreenchange", checkFullscreen);
+		document.addEventListener("webkitfullscreenchange", checkFullscreen);
+	});
 
 	function checkFullscreen(): void {
 		fullscreen.value = window.matchMedia("(display-mode: fullscreen)").matches ||

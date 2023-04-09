@@ -7,7 +7,6 @@ import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
 import { useControlEventBoundary } from "./controlEventBoundary";
 import { ScrollView } from "./scrollView";
-import { doEvents } from "shared/utils/async";
 import { useRenderer } from "./renderer";
 
 import type { Renderer } from "@pixi/core";

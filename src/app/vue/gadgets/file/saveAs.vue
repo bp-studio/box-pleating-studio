@@ -18,12 +18,12 @@
 
 	import type { Project } from "client/project/project";
 
-	const props = defineProps({
-		type: String,
-		desc: String,
-		mime: String,
-		disabled: Boolean,
-	});
+	const props = defineProps<{
+		type: string;
+		desc: string;
+		mime: string;
+		disabled: boolean;
+	}>();
 
 	const emit = defineEmits(["save"]);
 

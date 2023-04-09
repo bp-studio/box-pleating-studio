@@ -1,23 +1,13 @@
 import { watch } from "vue";
 
+import { copyright } from "app/misc/copyright";
+
 import type { I18n } from "vue-i18n";
 import type { BpsLocale } from "shared/frontend/locale";
 import type Settings from "./settingService";
 
 const KEY = "locale";
 const DEFAULT_LOCALE = "en";
-
-/** Create i18n instance. */
-export function createPlugin(): I18n {
-	const plugin = VueI18n.createI18n<[BpsLocale], string>({
-		locale: DEFAULT_LOCALE,
-		fallbackLocale: DEFAULT_LOCALE,
-		silentFallbackWarn: true,
-		messages: locale,
-	});
-	i18n = plugin.global;
-	return plugin;
-}
 
 //=================================================================
 /**
@@ -31,6 +21,19 @@ namespace LanguageService {
 	const _options: string[] = [];
 
 	export const options = _options as readonly string[];
+
+	/** Create i18n instance. */
+	export function createPlugin(): I18n {
+		const plugin = VueI18n.createI18n<[BpsLocale], string>({
+			locale: DEFAULT_LOCALE,
+			fallbackLocale: DEFAULT_LOCALE,
+			silentFallbackWarn: true,
+			messages: locale,
+		});
+		i18n = plugin.global;
+		copyright.value; // warm-up
+		return plugin;
+	}
 
 	export function init(): void {
 		const build = Number(localStorage.getItem("build") || 0);
@@ -63,7 +66,7 @@ namespace LanguageService {
 				Vue.nextTick(() => i18n.locale = loc);
 			}
 			document.documentElement.lang = loc;
-		});
+		}, { immediate: true });
 	}
 
 	/** Obtain the list of candidate languages. */

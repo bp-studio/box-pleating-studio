@@ -15,9 +15,9 @@
 </script>
 
 <script setup lang="ts">
-	defineProps({
-		label: String,
-	});
+	defineProps<{
+		label?: string;
+	}>();
 </script>
 
 <style>

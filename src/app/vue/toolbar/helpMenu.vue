@@ -11,8 +11,7 @@
 			<i class="fas fa-globe" />{{ $t("toolbar.help.homepage") }}
 		</a>
 		<a class="dropdown-item" href="https://discord.gg/HkcdTDS4zZ" target="_blank" rel="noopener">
-			<i class="fab fa-discord" />
-			Discord
+			<i class="fab fa-discord" />Discord
 		</a>
 		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank"
 		   rel="noopener">
@@ -23,7 +22,7 @@
 			<i class="fas fa-bug" />{{ $t("toolbar.help.issue") }}
 		</a>
 		<Divider />
-		<template v-if="serviceWorkerEnabled">
+		<template v-if="isServiceWorker">
 			<DropdownItem disabled v-if="checking">
 				<i class="bp-spinner fa-spin" />{{ $t('toolbar.help.checkUpdate') }}
 			</DropdownItem>
@@ -54,11 +53,10 @@
 	import Dialogs from "app/services/dialogService";
 	import { updateReady } from "app/misc/updateReady";
 	import { show } from "../modals/modalFragment.vue";
+	import { isServiceWorker } from "app/shared/constants";
 
 	const notify = shallowRef(false);
 	const checking = shallowRef(false);
-
-	const serviceWorkerEnabled = "serviceWorker" in navigator;
 
 	onMounted(() => {
 		const v = parseInt(localStorage.getItem("last_log") || "0");

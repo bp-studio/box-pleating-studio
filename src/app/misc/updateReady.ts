@@ -1,4 +1,6 @@
-import { readonly, shallowRef } from "vue";
+import { shallowRef } from "vue";
+
+import { isServiceWorker } from "app/shared/constants";
 
 //=================================================================
 /**
@@ -9,7 +11,7 @@ import { readonly, shallowRef } from "vue";
 
 const ready = shallowRef(false);
 
-if("serviceWorker" in navigator) {
+if(isServiceWorker) {
 	// Safari may have stronger caching for service worker,
 	// and onupdatefound event may not work on older version of Safari,
 	// but eventually the service worker and the app it will update.
@@ -31,4 +33,4 @@ function watchInstalling(reg: ServiceWorkerRegistration): void {
 	});
 }
 
-export const updateReady = readonly(ready);
+export const updateReady = ready as Readonly<typeof ready>;

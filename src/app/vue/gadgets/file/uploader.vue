@@ -20,10 +20,10 @@
 	const id: string = "file" + getCurrentInstance()?.uid;
 	const lbl = shallowRef<HTMLLabelElement>();
 
-	const props = defineProps({
-		accept: String,
-		multiple: Boolean,
-	});
+	const props = defineProps<{
+		accept: string;
+		multiple?: boolean;
+	}>();
 
 	const type = computed(() =>
 		!Studio.initialized || navigator.vendor && navigator.vendor.startsWith("Apple") ?

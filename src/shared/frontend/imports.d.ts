@@ -3,7 +3,6 @@ import type vue from "vue";
 import type bootstrap from "bootstrap";
 import type vueI18n from "vue-i18n";
 import type { BpsLocale } from "./locale";
-import type * as appInstance from "../../app/main";
 
 declare global {
 	declare const VueI18n: typeof vueI18n;
@@ -40,9 +39,6 @@ declare global {
 
 	/** Global VueI18n instance. Either injected by SSG or created in LanguageService.ts. */
 	declare let i18n: vueI18n.VueI18n;
-
-	/** Global app instance, created in main.js. */
-	declare const app: typeof appInstance;
 
 	type Timeout = ReturnType<typeof setTimeout> | number;
 }

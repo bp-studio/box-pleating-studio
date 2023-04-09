@@ -1,6 +1,7 @@
 {
 	"name": "한국어",
 	"flag": "s_korea",
+	"emoji": "🇰🇷",
 	"since": 1187,
 	"welcome": {
 		"title": "Box Pleating Studio 에 오신 것을 환영합니다!",

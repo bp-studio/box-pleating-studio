@@ -1,6 +1,7 @@
 {
 	"name": "Español",
 	"flag": "spain",
+	"emoji": "🇪🇸",
 	"since": 900,
 	"welcome": {
 		"title": "¡Bienvenido a Box Pleating Studio!",

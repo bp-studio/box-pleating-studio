@@ -24,6 +24,7 @@ module.exports = () => through2({
 		content = content.replaceAll(/(?<!\.)core.js/g, "../debug/core.js");
 		content = content.replaceAll("client.js", "../debug/client.js");
 		content = content.replaceAll("lib/vue.runtime.global.prod.js", "../debug/lib/vue.runtime.global.js");
+		// content = content.replaceAll("lib/vue-i18n.global.prod.js", "../debug/lib/vue-i18n.global.js");
 
 		return content;
 	},

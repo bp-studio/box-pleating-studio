@@ -14,10 +14,10 @@ export function useInput(
 
 	onMounted(() => {
 		value.value = props.modelValue;
-	});
 
-	watch(() => props.modelValue, v => {
-		if(!focused) value.value = v;
+		watch(() => props.modelValue, v => {
+			if(!focused) value.value = v;
+		});
 	});
 
 	function blur(): void {
