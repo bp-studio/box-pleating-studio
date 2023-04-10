@@ -19,7 +19,7 @@ namespace HandleService {
 	}
 
 	export function init(): void {
-		watch(() => Workspace.ids, ids => {
+		watch(Workspace.ids, ids => {
 			for(const key of handles.keys()) {
 				if(!ids.includes(key)) {
 					handles.delete(key);
@@ -46,7 +46,7 @@ namespace HandleService {
 		if(!isFileApiEnabled) return;
 		if(haveSession) {
 			const entries: [number, FileSystemFileHandle][] = await idbKeyval.get("handle") || [];
-			for(const [i, handle] of entries) handles.set(Workspace.ids[i], handle);
+			for(const [i, handle] of entries) handles.set(Workspace.ids.value[i], handle);
 		}
 		await getRecent();
 	}
@@ -61,8 +61,9 @@ namespace HandleService {
 		if(!isFileApiEnabled) return;
 
 		const entries: [number, FileSystemFileHandle][] = [];
-		for(let i = 0; i < Workspace.ids.length; i++) {
-			const handle = handles.get(Workspace.ids[i]);
+		const ids = Workspace.ids.value;
+		for(let i = 0; i < ids.length; i++) {
+			const handle = handles.get(ids[i]);
 			if(handle) entries.push([i, handle]);
 		}
 		await idbKeyval.setMany([

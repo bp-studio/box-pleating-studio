@@ -71,11 +71,11 @@
 		"scrollable",
 		"selectables",
 		"serializable",
+		"slicksort",
 		"stylelint",
 		"tsai",
 		"tsun",
 		"typeless",
-		"vuedraggable",
 		"wicg"
 	],
 	"css.validate": false,

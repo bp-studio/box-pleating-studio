@@ -76,7 +76,8 @@ namespace ImportService {
 		const success = result.some(id => id !== undefined);
 		if(success) {
 			gtag("event", "project_open");
-			Workspace.select(Workspace.ids[Workspace.ids.length - 1]);
+			const ids = Workspace.ids.value;
+			Workspace.select(ids[ids.length - 1]);
 		}
 
 		// Hide the spinner after the rendering is completed
@@ -133,19 +134,16 @@ namespace ImportService {
 		}
 	}
 
+	/**
+	 * Open a workspace file and return the last opened project id, if any.
+	 */
 	async function openWorkspace(buffer: ArrayBuffer): Promise<number | undefined> {
 		const list = await load(buffer);
 		const files = Object.keys(list);
-		const tasks = files.map(async f => {
-			try {
-				const proj = await Workspace.open(JSON.parse(list[f]));
-				return proj.id;
-			} catch(_) {
-				Dialogs.alert(i18n.t("message.invalidFormat", [f]));
-				return undefined;
-			}
-		});
-		const ids = (await Promise.all(tasks)).filter(n => Boolean(n));
+		const ids = await Workspace.openMultiple(
+			files.map(f => JSON.parse(list[f])),
+			files.map(f => () => Dialogs.alert(i18n.t("message.invalidFormat", [f])))
+		);
 		if(!ids.length) return undefined;
 		else return ids[ids.length - 1];
 	}

@@ -46,7 +46,7 @@ namespace ExportService {
 	function zip(): Promise<Blob> {
 		const names = new Set<string>();
 		const files: Record<string, string> = {};
-		for(const project of Workspace.projects) {
+		for(const project of Workspace.projects.value) {
 			let name = FileUtility.sanitize(project.design.title);
 			if(names.has(name)) {
 				let j = 1;

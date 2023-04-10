@@ -1,4 +1,4 @@
-import { computed, reactive, shallowReactive, shallowReadonly, watch } from "vue";
+import { computed, reactive, shallowRef, watch } from "vue";
 
 import Dialogs from "./dialogService";
 import Studio from "./studioService";
@@ -23,11 +23,15 @@ type ProjectProto = { design: { title: string } };
 //=================================================================
 namespace WorkspaceService {
 
-	/** The ids of all opened {@link Project}s in the order of tabs */
-	export const ids = shallowReactive<number[]>([]);
+	/**
+	 * The ids of all opened {@link Project}s in the order of tabs.
+	 * By making it a {@link shallowRef} instead of {@link reactive},
+	 * we have better compatibilities over libraries.
+	 */
+	export const ids = shallowRef<readonly number[]>([]);
 
 	/** All opened {@link Project}s in the order of tabs */
-	export const projects = computed(() => ids.map(id => bp.projects.get(id)!));
+	export const projects = computed(() => ids.value.map(id => bp.projects.get(id)!));
 
 	const tabHistory: Project[] = [];
 
@@ -54,7 +58,7 @@ namespace WorkspaceService {
 				},
 			});
 			const proj = await bp.projects.create(json);
-			ids.push(proj.id);
+			manipulateIds(arr => arr.push(proj.id));
 			select(proj.id);
 		} catch(e) {
 			const msg = e instanceof Error ? e.message : "Unknown error";
@@ -64,9 +68,37 @@ namespace WorkspaceService {
 
 	export async function open(data: Pseudo<JProject>): Promise<Project> {
 		const proj = await bp.projects.open(data);
-		ids.push(proj.id);
+		manipulateIds(arr => arr.push(proj.id));
 		tabHistory.unshift(proj);
 		return proj;
+	}
+
+	/**
+	 * Open multiple files in parallel,
+	 * but ensure that the tab is opened in the correct order.
+	 */
+	export async function openMultiple(jsons: Pseudo<JProject>[], failCallback?: Action[]): Promise<number[]> {
+		const tasks: Promise<Project | null>[] = [];
+		for(let i = 0; i < jsons.length; i++) {
+			const task: Promise<Project | null> = bp.projects
+				.open(jsons[i])
+				.catch(() => {
+					if(failCallback) failCallback[i]();
+					return null;
+				});
+			tasks.push(task);
+		}
+		const results = await Promise.all(tasks);
+		const successIds: number[] = [];
+		manipulateIds((arr: number[]) => {
+			for(const proj of results) {
+				if(!proj) continue;
+				successIds.push(proj.id);
+				arr.push(proj.id);
+				tabHistory.unshift(proj);
+			}
+		});
+		return successIds;
 	}
 
 	export function select(id: number): void {
@@ -90,7 +122,7 @@ namespace WorkspaceService {
 	}
 
 	export async function closeRight(id: number): Promise<void> {
-		await closeBy(i => ids.indexOf(i) > ids.indexOf(id));
+		await closeBy(i => ids.value.indexOf(i) > ids.value.indexOf(id));
 	}
 
 	export async function closeAll(): Promise<void> {
@@ -99,7 +131,7 @@ namespace WorkspaceService {
 
 	async function closeBy(predicate: (i: number) => boolean): Promise<void> {
 		const promises: Promise<boolean>[] = [];
-		for(const i of ids.concat()) if(predicate(i)) promises.push(closeCore(i));
+		for(const i of ids.value.concat()) if(predicate(i)) promises.push(closeCore(i));
 		await Promise.all(promises);
 		selectLast();
 	}
@@ -118,19 +150,25 @@ namespace WorkspaceService {
 			select(id);
 			if(!await confirm) return false;
 		}
-		ids.splice(ids.indexOf(proj.id), 1);
+		manipulateIds(arr => arr.splice(ids.value.indexOf(proj.id), 1));
 		tabHistory.splice(tabHistory.indexOf(proj), 1);
 		bp.projects.close(proj);
 		return true;
 	}
 
 	export async function clone(id: number): Promise<void> {
-		const i = ids.indexOf(id);
+		const i = ids.value.indexOf(id);
 		const proj = projects.value[i].toJSON(true);
 		const c = await bp.projects.open(checkTitle(proj));
-		ids.splice(i + 1, 0, c.id);
+		manipulateIds(arr => arr.splice(i + 1, 0, c.id));
 		select(c.id);
 		gtag("event", "project_clone");
+	}
+
+	function manipulateIds(action: Consumer<number[]>): void {
+		const arr = ids.value.concat();
+		action(arr);
+		ids.value = arr;
 	}
 
 	Studio.$onSetupOptions.push(options =>
@@ -148,7 +186,7 @@ namespace WorkspaceService {
 		/** If the user is in risk of losing progress on closing the app. */
 		const anyUnsaved = computed(() =>
 			!settings.autoSave && // No need to warn if autoSave is on
-		projects.value.some(p => p.history.isModified)
+			projects.value.some(p => p.history.isModified)
 		);
 
 		const unloadHandler = (e: BeforeUnloadEvent): string => {
@@ -160,13 +198,13 @@ namespace WorkspaceService {
 		};
 
 		watch(anyUnsaved, v => {
-		// So that we don't listen to the event unconditionally.
-		// See https://developer.chrome.com/blog/page-lifecycle-api/#the-beforeunload-event
+			// So that we don't listen to the event unconditionally.
+			// See https://developer.chrome.com/blog/page-lifecycle-api/#the-beforeunload-event
 			if(v) window.addEventListener("beforeunload", unloadHandler);
 			else window.removeEventListener("beforeunload", unloadHandler);
 		});
 	}
 }
 
-export default shallowReadonly(reactive(WorkspaceService));
+export default WorkspaceService;
 export const nextTick = (): Promise<void> => bp.nextTick();

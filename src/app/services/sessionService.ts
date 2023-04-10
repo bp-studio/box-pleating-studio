@@ -37,10 +37,8 @@ namespace SessionService {
 			if(sessionString) {
 				const session = JSON.parse(sessionString);
 				const jsons = session.jsons;
-				const tasks: Promise<Project>[] = [];
-				for(let i = 0; i < jsons.length; i++) tasks.push(Workspace.open(jsons[i]));
-				await Promise.all(tasks);
-				if(session.open >= 0) Workspace.select(Workspace.ids[session.open]);
+				await Workspace.openMultiple(jsons);
+				if(session.open >= 0) Workspace.select(Workspace.ids.value[session.open]);
 			}
 		}
 
@@ -84,8 +82,8 @@ namespace SessionService {
 		// The session is saved only when the current instance obtains the saving rights.
 		if(Settings.autoSave && await checkSessionRight()) {
 			const session = {
-				jsons: await Promise.all(Workspace.projects.map(proj => proj.toJSON(true))),
-				open: Studio.project ? Workspace.projects.indexOf(Studio.project) : -1,
+				jsons: await Promise.all(Workspace.projects.value.map(proj => proj.toJSON(true))),
+				open: Studio.project ? Workspace.projects.value.indexOf(Studio.project) : -1,
 			};
 			localStorage.setItem("session", JSON.stringify(session));
 			await Handles.save();

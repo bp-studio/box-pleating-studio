@@ -38,7 +38,7 @@ const option = {
 					"withCtx", "pushScopeId", "popScopeId", "toDisplayString", "renderSlot", "Fragment",
 					"normalizeClass", "isRef", "vModelDynamic", "vModelText", "nextTick", "createTextVNode",
 					"resolveComponent", "renderList", "vShow", "vModelSelect", "resolveDynamicComponent",
-					"mergeProps", "createStaticVNode", "defineAsyncComponent"],
+					"mergeProps", "createStaticVNode", "h"],
 				defaultExport: false,
 			},
 		}),

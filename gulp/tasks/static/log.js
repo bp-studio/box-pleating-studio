@@ -11,7 +11,6 @@ const htmlMinOption = require("../../html.json");
 const libs = [
 	"font-awesome/css/all.min.css",
 	"bootstrap/bootstrap.min.js",
-	"vuedraggable.min.js",
 ];
 
 /** Build update logs */

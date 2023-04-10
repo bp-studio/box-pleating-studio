@@ -61,35 +61,6 @@ const bootstrapCSS = () => {
 		.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
 };
 
-// The building method of this package sucks, we can do a lot better ourselves.
-const vueDraggable = () => {
-	const path = fs.realpathSync(root + "vuedraggable");
-	return gulp.src(path + "/src/vuedraggable.js")
-		.pipe(newer({
-			dest: config.dest.dist + "/lib/vuedraggable.min.js",
-			extra: [
-				__filename,
-				path + "/package.json",
-				path + "/../sortablejs/package.json",
-			],
-		}))
-		.pipe(esbuild({
-			bundle: true,
-			globalName: "VueDraggable",
-			legalComments: "none",
-			treeShaking: true,
-			outfile: "vuedraggable.min.js",
-			minify: true,
-			target: "es2016", // for maximal compatibility
-			plugins: [
-				exg({
-					"vue": "window.Vue",
-				}),
-			],
-		}))
-		.pipe(gulp.dest(config.dest.dist + "/lib"));
-};
-
 const jsZip = () => gulp.src(config.src.lib + "/jszip/jszip.ts")
 	.pipe(newer({
 		dest: config.dest.dist + "/lib/jszip.js",
@@ -110,7 +81,6 @@ const jsZip = () => gulp.src(config.src.lib + "/jszip/jszip.ts")
 gulp.task("lib", () => all(
 	bootstrapJS(),
 	bootstrapCSS(),
-	vueDraggable(),
 	jsZip(),
 	pixiCore(),
 	pixi(),

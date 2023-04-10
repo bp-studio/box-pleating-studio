@@ -1,57 +1,35 @@
 <template>
-	<div id="divTab" class="flex-grow-1" :class="{ 'hide': !Workspace.ids.length }" @wheel.passive="tabWheel($event)"
-		 ref="tab">
-		<!-- It is VERY important to use only the id numbers in Draggable,
-			not the actual Project instances. Otherwise GC will fail. -->
-		<Draggable v-bind="dragOption" :list="Workspace.ids" v-if="Studio.initialized">
-			<template #item="{ element }: { element: number }">
-				<Tab :id="element" @menu="contextMenu($event, element)" />
-			</template>
-		</Draggable>
+	<div class="flex-grow-1 tab-container" @wheel.passive="tabWheel($event)">
+		<SlickList lockAxis="x" axis="x" v-model:list="Workspace.ids.value" :distance="10" id="divTab"
+				   :class="{ 'hide': !Workspace.ids.value.length }">
+			<SlickItem v-for="(id, i) in Workspace.ids.value" :key="id" :index="i" class="tab"
+					   :class="{ active: Studio.project?.id == id }">
+				<Tab :id="id" @menu="contextMenu($event, id)" />
+			</SlickItem>
+		</SlickList>
 	</div>
 	<TabMenu ref="tabMenu" />
 </template>
 
 <script lang="ts">
-	declare const VueDraggable: typeof draggable;
 	export default { name: "TabBar" };
 </script>
 
 <script setup lang="ts">
-
-	import { defineAsyncComponent, shallowRef } from "vue";
+	import { SlickList, SlickItem } from "vue-slicksort/dist/vue-slicksort.esm.js";
 
 	import { compRef } from "app/inject";
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
-	import Lib from "app/services/libService";
 	import Tab from "./tab.vue";
 	import TabMenu from "./tabMenu.vue";
 
-	import type draggable from "vuedraggable";
-
-	const dragOption = {
-		delay: 500,
-		delayOnTouchOnly: true,
-		touchStartThreshold: 20,
-		animation: 200,
-		forceFallback: true,
-		fallbackTolerance: 5,
-		direction: "horizontal",
-		scroll: true,
-		itemKey: "id",
-	};
-
-	// Lazy loading of VueDraggable to improve startup performance
-	const Draggable = defineAsyncComponent(() => Lib.ready.then(() => VueDraggable));
-
-	const tab = shallowRef<HTMLDivElement>();
 	const tabMenu = compRef(TabMenu);
 
 	function tabWheel(event: WheelEvent): void {
 		const DELTA_UNIT = 5;
 		if(event.deltaX == 0) {
-			tab.value!.scrollLeft -= event.deltaY / DELTA_UNIT;
+			document.getElementById("divTab")!.scrollLeft -= event.deltaY / DELTA_UNIT;
 		}
 	}
 
@@ -63,12 +41,17 @@
 </script>
 
 <style lang="scss">
+	.tab-container {
+		width: 0;
+		margin: -0.5rem 0.5rem;
+	}
+
 	#divTab {
 		overflow-x: scroll;
 		overflow-y: hidden;
 		-ms-overflow-style: none;
 		scrollbar-width: none;
-		margin: -0.5rem 0.5rem;
+		width: 100%;
 		height: 3.75rem;
 		white-space: nowrap;
 
