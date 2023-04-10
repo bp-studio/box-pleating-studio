@@ -248,6 +248,7 @@
 		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
 		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?",
 		"updateReady": "A newer version of BP Studio is ready and will update automatically on restart. Would you like to restart now?",
+		"restartFail": "Unable to restart. Please close all instances of BP Studio.",
 		"webGL": {
 			"title": "WebGL initialization failed",
 			"body": "BP Studio requires WebGL to run, but is unable to initialize WebGL context. Please check your browser's settings."

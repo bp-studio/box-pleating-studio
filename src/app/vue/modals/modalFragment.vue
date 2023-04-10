@@ -1,13 +1,13 @@
 <template>
-	<template v-if="stage >= 1">
+	<template v-if="phase >= 3">
 		<Note />
 		<Language />
 	</template>
-	<template v-if="stage >= 2">
+	<template v-if="phase >= 4">
 		<About :ref="mdlRef('about')" />
 		<Version :ref="mdlRef('ver')" />
 	</template>
-	<template v-if="stage >= 3">
+	<template v-if="phase >= 5">
 		<Share :ref="mdlRef('share')" />
 		<CP :ref="mdlRef('cp')" />
 		<template v-if="!isFileApiEnabled">
@@ -17,7 +17,7 @@
 			<BPZ :ref="mdlRef('bpz')" />
 		</template>
 	</template>
-	<template v-if="stage == 4">
+	<template v-if="phase >= 6">
 		<Preference :ref="mdlRef('pref')" />
 	</template>
 </template>
@@ -46,11 +46,8 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
-
-	import { doEvents } from "shared/utils/async";
 	import { isFileApiEnabled } from "app/shared/constants";
-	import Lib from "app/services/libService";
+	import { phase } from "app/misc/lcpReady";
 	import Share from "./share.vue";
 	import About from "./about.vue";
 	import Version from "./version.vue";
@@ -62,17 +59,6 @@
 	import PNG from "./png.vue";
 	import BPS from "./bps.vue";
 	import BPZ from "./bpz.vue";
-
-	const stage = shallowRef(0); // To prevent long task
-	Lib.ready.then(async () => {
-		stage.value = 1;
-		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-		while(stage.value < 4) {
-			// eslint-disable-next-line no-await-in-loop
-			await doEvents();
-			stage.value++;
-		}
-	});
 
 	function mdlRef(key: string): (el: object | null) => void {
 		return obj => modals[key] = obj as IShow;

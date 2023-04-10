@@ -52,13 +52,10 @@ export async function useRenderer(options: Partial<IRendererOptions>): Promise<R
 let StartupPromise: Promise<void>;
 const oldRun = StartupSystem.prototype.run;
 const oldResize = Renderer.prototype.resize;
-StartupSystem.prototype.run = function(options: StartupSystemOptions) {
-	StartupPromise = new Promise(resolve => {
-		doEvents().then(() => {
-			oldRun.call(this, options);
-			Renderer.prototype.resize = oldResize; // Restore resize functionality.
-			resolve();
-		});
+StartupSystem.prototype.run = function(options: StartupSystemOptions): void {
+	StartupPromise = doEvents().then(() => {
+		oldRun.call(this, options);
+		Renderer.prototype.resize = oldResize; // Restore resize functionality.
 	});
 };
 Renderer.prototype.resize = () => {
@@ -79,7 +76,7 @@ class AsyncContextSystem extends ContextSystem {
 		});
 	}
 
-	override initFromContext(gl: IRenderingContext): void {
+	public override initFromContext(gl: IRenderingContext): void {
 		// Do nothing
 	}
 }

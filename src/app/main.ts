@@ -14,6 +14,7 @@ import { init as settingInit } from "app/services/settingService";
 import "app/style/main.scss";
 
 const TIME_TERMINATE = 100;
+const TOTAL_PHASES = 6;
 
 // Disable native mouse wheel zooming
 document.addEventListener(
@@ -26,6 +27,14 @@ document.addEventListener(
 		capture: true, // To prioritize the handler
 	}
 );
+
+async function runPhase(to: number): Promise<void> {
+	while(phase.value < to) {
+		// eslint-disable-next-line no-await-in-loop
+		await doEvents();
+		phase.value++;
+	}
+}
 
 async function init(): Promise<void> {
 	try {
@@ -42,13 +51,8 @@ async function init(): Promise<void> {
 		LanguageService.init();
 		if(lcpReady.value === undefined) lcpReady.value = true;
 
-		// Phase 1
-		await doEvents();
-		phase.value++;
-
-		// Phase 2
-		await doEvents();
-		phase.value++;
+		// Phase 1 to 2
+		await runPhase(2);
 
 		// Initialize services and Client
 		await doEvents();
@@ -58,6 +62,10 @@ async function init(): Promise<void> {
 		await doEvents();
 		LanguageService.setup();
 		await Lib.load();
+
+		// Phase 3 to 6
+		await runPhase(TOTAL_PHASES);
+
 	} catch(e: unknown) {
 		if(e instanceof Error) errMgr.setRunErr(e.message);
 	} finally {

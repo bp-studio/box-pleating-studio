@@ -39,27 +39,21 @@ namespace Core {
 	async function loadQuery(): Promise<void> {
 		const url = new URL(location.href);
 		const lz = url.searchParams.get("project");
-		let json: unknown;
-		if(lz) {
-			try {
-				json = JSON.parse(await LZ.decompress(lz));
-			} catch(e) {
-				await Dialogs.alert(i18n.t("message.invalidLink"));
-			}
-		}
-		if(lz != sessionStorage.getItem("project") && json) {
-			// The value written to sessionStorage will not be lost due to tab reload,
-			// so we can use this to avoid the problem of reloading when one refreshes the page
-			sessionStorage.setItem("project", lz!);
+
+		// The value written to sessionStorage will not be lost due to tab reload,
+		// so we can use this to avoid the problem of reloading when one refreshes the page
+		if(!lz || lz == sessionStorage.getItem("project")) return;
+		else sessionStorage.setItem("project", lz);
+
+		try {
+			const json = JSON.parse(await LZ.decompress(lz));
+			await Workspace.open(json);
+			Workspace.selectLast();
 			gtag("event", "share_open");
-			try {
-				await Workspace.open(json);
-			} catch(e) {
-				await Dialogs.alert(i18n.t("message.invalidLink"));
-			}
+		} catch(e) {
+			await Dialogs.alert(i18n.t("message.invalidLink"));
 		}
 	}
-
 
 	export const shouldShowDPad = computed(() =>
 		isTouch && Settings.showDPad && StudioService.draggableSelected

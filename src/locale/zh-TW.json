@@ -248,6 +248,7 @@
 		"patternNotFound": "在當前的設計中，存在一些角片重疊是雖然有效、但目前的 BP Studio 卻無法找到可行的伸展摺痕模式的。本應用程式的作者將會持續實作更多演算法以涵蓋更多情況。",
 		"unsaved": "專案「{0}」有尚未儲存的變更，確定要捨棄？",
 		"updateReady": "更新版本的 BP Studio 已準備就緒，並將在重新啟動時自動更新。您想要現在立刻重新啟動嗎？",
+		"restartFail": "無法重新啟動。請關閉 BP Studio 的所有實體。",
 		"webGL": {
 			"title": "WebGL 初始化失敗",
 			"body": "BP Studio 運行需要 WebGL，但無法初始化 WebGL 環境。請檢查您的瀏覽器設置。"

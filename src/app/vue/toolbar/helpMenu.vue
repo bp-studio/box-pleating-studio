@@ -13,8 +13,7 @@
 		<a class="dropdown-item" href="https://discord.gg/HkcdTDS4zZ" target="_blank" rel="noopener">
 			<i class="fab fa-discord" />Discord
 		</a>
-		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank"
-		   rel="noopener">
+		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank" rel="noopener">
 			<i class="far fa-comment-dots" />{{ $t("toolbar.help.discussions") }}
 		</a>
 		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/issues/new/choose" target="_blank"
@@ -58,6 +57,9 @@
 	const notify = shallowRef(false);
 	const checking = shallowRef(false);
 
+	// eslint-disable-next-line compat/compat
+	const serviceWorker = navigator.serviceWorker;
+
 	onMounted(() => {
 		const v = parseInt(localStorage.getItem("last_log") || "0");
 		notify.value = v < logs[logs.length - 1];
@@ -66,13 +68,17 @@
 	const icon = computed(() => checking.value ? "bp-spinner fa-spin" : "bp-info");
 
 	async function update(): Promise<void> {
-		if(await Dialogs.confirm(i18n.t("message.updateReady"))) location.reload();
+		if(!await Dialogs.confirm(i18n.t("message.updateReady"))) return;
+
+		// Make sure that we close the old service worker before continue.
+		const registration = await serviceWorker.ready;
+		if(await registration.unregister()) location.reload();
+		else Dialogs.alert(i18n.t("message.restartFail"));
 	}
 
 	async function checkUpdate(): Promise<void> {
 		checking.value = true;
-		// eslint-disable-next-line compat/compat
-		const reg = await navigator.serviceWorker.ready;
+		const reg = await serviceWorker.ready;
 		await reg.update();
 		const sw = reg.installing || reg.waiting;
 		if(!sw) {

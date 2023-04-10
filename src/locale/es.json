@@ -248,6 +248,7 @@
 		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
 		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
+		"restartFail": "No se puede reiniciar. Cierre todas las instancias de BP Studio.",
 		"webGL": {
 			"title": "La inicialización de WebGL falló",
 			"body": "BP Studio requiere que se ejecute WebGL, pero no puede inicializar el contexto de WebGL. Por favor, compruebe la configuración de su navegador."

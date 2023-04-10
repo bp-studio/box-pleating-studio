@@ -1,9 +1,9 @@
 <template>
 	<div ref="el" v-on:mousedown.stop v-on:touchstart.stop.passive>
 		<Welcome />
-		<DPad v-if="phase == 2" />
+		<DPad v-if="phase >= 2" />
 
-		<Panel v-if="phase == 2" />
+		<Panel v-if="phase >= 2" />
 		<template v-else>
 			<div id="divShade"></div>
 			<aside class="scroll-shadow p-3"></aside>
@@ -49,7 +49,7 @@
 			</div>
 		</nav>
 
-		<Status v-if="phase == 2" />
+		<Status v-if="phase >= 2" />
 		<footer class="py-1 px-3" v-else></footer>
 
 		<ModalFragment v-if="phase >= 1" />
