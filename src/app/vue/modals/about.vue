@@ -21,6 +21,19 @@
 					<i18n-t keypath="about.donation" tag="p">
 						<a target="_blank" href="donate.htm">PayPal</a>
 					</i18n-t>
+
+					<!--
+						For now there isn't too many sponsors, so we put a fixed list here.
+						Dynamic approach may be considered in the future if needed.
+					-->
+					<p>
+						{{ $t('about.sponsor') }}
+						<a target="_blank" rel="noopener" href="https://www.obb.design/">Boice Wong</a>,
+						<a target="_blank" rel="noopener" href="https://cexplr.github.io/">Lucas Tay Kiat Loong</a>,
+						<a target="_blank" rel="noopener" href="https://wg-origami.blogspot.com/">William Gozali</a>,
+						<a target="_blank" rel="noopener" href="https://chrisconradart.com/">Christopher Conrad</a>,
+						Daniele Fusco
+					</p>
 				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1"><span v-t="'keyword.version'" /> {{ version }}</div>

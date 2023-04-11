@@ -224,7 +224,8 @@
 		"repo": "Github 儲存庫",
 		"donation": "BP Studio 的使用是完全免費的。若您覺得本 App 對您的摺紙設計有幫助並有興趣提供支持，歡迎您透過 {0} 任意捐款。",
 		"visitBlog": "您還可以參觀作者的{0}以了解更多資訊！",
-		"blog": "部落格"
+		"blog": "部落格",
+		"sponsor": "BP Studio 榮幸地獲得以下贊助："
 	},
 	"donate": {
 		"title": "贊助 Box Pleating Studio",
