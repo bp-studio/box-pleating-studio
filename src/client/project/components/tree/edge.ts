@@ -42,6 +42,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		const sheet = tree.$sheet;
 		super(sheet);
 		this._tree = tree;
+		this.$selectedCursor = "pointer";
 
 		this.$v1 = v1;
 		this.$v2 = v2;

@@ -35,6 +35,7 @@ export class River extends Control {
 		const sheet = layout.$sheet;
 		super(sheet);
 		this._layout = layout;
+		this.$selectedCursor = "pointer";
 
 		this.$edge = edge;
 		this.$graphics = graphics;

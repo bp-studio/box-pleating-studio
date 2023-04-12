@@ -41,14 +41,16 @@ export abstract class Mountable extends Disposable {
 			for(const child of this._children) {
 				child.$dispose();
 			}
+			this.removeEventListener(MOUNTED, handler);
 		});
 
-		this.addEventListener(MOUNTED, () => {
+		const handler = (): void => {
 			for(const child of this._children) {
 				child._parentIsNullOrMounted = this.$mounted;
 				child._updateMountedState();
 			}
-		});
+		};
+		this.addEventListener(MOUNTED, handler);
 	}
 
 	protected get $isActive(): boolean {
@@ -88,6 +90,7 @@ export abstract class Mountable extends Disposable {
 	}
 
 	private _updateMountedState(): void {
+		if(this.$disposed) return;
 		const mounted = this.$mounted;
 		if(this._mounted == mounted) return;
 		this.dispatchEvent(new StateChangedEvent(MOUNTED, mounted));

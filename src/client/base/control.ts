@@ -1,8 +1,10 @@
 import { shallowRef } from "client/shared/decorators";
 import { View } from "./view";
+import { hitMap } from "client/screen/controlEventBoundary";
+import { display } from "client/screen/display";
 
 import type { Sheet } from "client/project/components/sheet";
-import type { Container, DisplayObject } from "@pixi/display";
+import type { Container } from "@pixi/display";
 import type { IHitArea } from "@pixi/events";
 
 type ControlType = "Flap" | "Vertex" | "River" | "Edge" | "Stretch" | "Device";
@@ -30,8 +32,14 @@ export abstract class Control extends View {
 	 */
 	public abstract readonly $priority: number;
 
-	@shallowRef public $selected: boolean = false;
+	@shallowRef private _selected: boolean = false;
 	@shallowRef private _hovered: boolean = false;
+
+	/** The cursor style to use when the object is selected. */
+	public $selectedCursor: string = "move";
+
+	/** The {@link Container} for hit testing. */
+	private _hitObject?: Container;
 
 	constructor(sheet: Sheet) {
 		super();
@@ -40,29 +48,29 @@ export abstract class Control extends View {
 		this._onDispose(() => sheet.$controls.delete(this));
 	}
 
+	public get $selected(): boolean {
+		return this._selected;
+	}
+	public set $selected(v: boolean) {
+		if(this._hitObject) this._hitObject.cursor = v ? this.$selectedCursor : "pointer";
+		this._selected = v;
+	}
+
 	/** Whether self can be selected together with another {@link Control}. */
 	public $selectableWith(c: Control): boolean { return false; }
 
 	protected $setupHit(object: Container, hitArea?: IHitArea): void {
-		Control._hitMap.set(object, this);
+		this._hitObject = object;
+		hitMap.set(object, this);
 		object.eventMode = "static";
 		object.cursor = "pointer";
 		if(hitArea) object.hitArea = hitArea;
 		object.on("mouseenter", () => this._hovered = true);
 		object.on("mouseleave", () => this._hovered = false);
+		object.on("mousedown", () => display.canvas.style.cursor = this.$selectedCursor);
 	}
 
 	protected get $hovered(): boolean {
 		return this._hovered;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Static members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private static _hitMap: WeakMap<DisplayObject, Control> = new WeakMap();
-
-	public static $getHitControl(object: DisplayObject): Control | undefined {
-		return Control._hitMap.get(object);
 	}
 }

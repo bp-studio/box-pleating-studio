@@ -47,6 +47,11 @@ interface GraphicsData {
 	 * All axis-parallel creases. Only for {@link Device}s.
 	 */
 	axisParallel?: readonly ILine[];
+
+	/**
+	 * For stretch patterns only; whether the overall direction is like a forward slash.
+	 */
+	forward?: boolean;
 }
 
 interface StretchData {

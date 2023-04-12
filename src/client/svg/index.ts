@@ -4,6 +4,7 @@ import { MARGIN } from "client/shared/constant";
 import { SvgGraphics } from "./svgGraphics";
 import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
 import { SelectionController } from "client/controllers/selectionController";
+import { toHex } from "shared/utils/color";
 
 import type { LabelView } from "client/utils/label";
 import type { Project } from "client/project/project";
@@ -253,9 +254,4 @@ function lineStyle(color: number, width: number, fill?: number): string {
 	const sh = ProjectService.shrink.value;
 	return `stroke:${toHex(color)};stroke-width:${width * sh};` +
 		`fill:${fill === undefined ? "none" : toHex(fill)};vector-effect:non-scaling-stroke`;
-}
-
-function toHex(color: number): string {
-	// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-	return "#" + color.toString(16).padStart(6, "0");
 }

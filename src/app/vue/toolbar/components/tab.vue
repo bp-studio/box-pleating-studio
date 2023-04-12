@@ -71,7 +71,7 @@
 		font-size: 1.25rem;
 		line-height: 2.5rem;
 		border-right: 1px solid var(--tab-border);
-		cursor: default;
+		cursor: pointer;
 		max-width: 150px;
 		height: 100%;
 		background-color: var(--bg-ui);
@@ -99,7 +99,6 @@
 		}
 
 		i {
-			cursor: pointer;
 			transition: opacity 0.1s linear;
 			opacity: 0;
 			width: 1rem;

@@ -1,7 +1,8 @@
 <template>
 	<div class="flex-grow-1 tab-container" @wheel.passive="tabWheel($event)">
 		<SlickList lockAxis="x" axis="x" v-model:list="Workspace.ids.value" :distance="10" id="divTab"
-				   :class="{ 'hide': !Workspace.ids.value.length }">
+				   :class="{ 'hide': !Workspace.ids.value.length }" @sort-start="setCursor('ew-resize')"
+				   @sort-end="setCursor('default')">
 			<SlickItem v-for="(id, i) in Workspace.ids.value" :key="id" :index="i" class="tab"
 					   :class="{ active: Studio.project?.id == id }">
 				<Tab :id="id" @menu="contextMenu($event, id)" />
@@ -25,12 +26,16 @@
 	import TabMenu from "./tabMenu.vue";
 
 	const tabMenu = compRef(TabMenu);
+	const DELTA_UNIT = 5;
 
 	function tabWheel(event: WheelEvent): void {
-		const DELTA_UNIT = 5;
 		if(event.deltaX == 0) {
 			document.getElementById("divTab")!.scrollLeft -= event.deltaY / DELTA_UNIT;
 		}
+	}
+
+	function setCursor(cursor: string): void {
+		document.getElementById("divTab")!.style.cursor = cursor;
 	}
 
 	function contextMenu(event: MouseEvent, id: number): void {

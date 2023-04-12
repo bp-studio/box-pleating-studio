@@ -3,22 +3,22 @@
 		<template v-slot>
 			<Fullscreen />
 			<div class="dropdown-item" @click="toggle('showGrid')">
-				<Hotkey :icon="Settings.showGrid ? 'fas fa-grip-lines text-secondary' : ''" ctrl hk="1">
+				<Hotkey :icon="Settings.showGrid ? 'fas fa-grip-lines' : ''" :color="Studio.style.grid.color" ctrl hk="1">
 					{{ $t('toolbar.setting.grid') }}
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showHinge')">
-				<Hotkey :icon="Settings.showHinge ? 'fas fa-grip-lines text-primary' : ''" ctrl hk="2">
+				<Hotkey :icon="Settings.showHinge ? 'fas fa-grip-lines' : ''" :color="Studio.style.hinge.color" ctrl hk="2">
 					{{ $t('toolbar.setting.hinge') }}
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showRidge')">
-				<Hotkey :icon="Settings.showRidge ? 'fas fa-grip-lines text-danger' : ''" ctrl hk="3">
+				<Hotkey :icon="Settings.showRidge ? 'fas fa-grip-lines' : ''" :color="Studio.style.ridge.color" ctrl hk="3">
 					{{ $t('toolbar.setting.ridge') }}
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showAxialParallel')">
-				<Hotkey :icon="Settings.showAxialParallel ? 'fas fa-grip-lines text-success' : ''" ctrl hk="4">
+				<Hotkey :icon="Settings.showAxialParallel ? 'fas fa-grip-lines' : ''" :color="Studio.style.axisParallel.color" ctrl hk="4">
 					{{ $t('toolbar.setting.axial') }}
 				</Hotkey>
 			</div>
@@ -28,7 +28,7 @@
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showDot')">
-				<Hotkey :icon="Settings.showDot ? 'fas fa-genderless' : ''" ctrl hk="6">
+				<Hotkey :icon="Settings.showDot ? 'fas fa-genderless' : ''"  :color="Studio.style.hinge.color" ctrl hk="6">
 					{{ $t('toolbar.setting.tip') }}
 				</Hotkey>
 			</div>
@@ -61,6 +61,7 @@
 	import { show } from "@/modals/modalFragment.vue";
 	import Settings from "app/services/settingService";
 	import HotkeyService from "app/services/hotkeyService";
+	import Studio from "app/services/studioService";
 	import Fullscreen from "./components/fullscreen.vue";
 
 	onMounted(() => {

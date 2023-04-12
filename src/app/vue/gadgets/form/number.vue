@@ -1,13 +1,12 @@
 <template>
 	<Row :label="label">
 		<div class="input-group" style="flex-wrap: nowrap;">
-			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)"
-					:title="tooltips[0]">
+			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)" :title="tooltips[0]">
 				<i class="fas fa-minus" />
 			</button>
 			<input class="form-control" :class="{ 'error': value != modelValue }" type="number" v-model="value" @focus="focus($event)"
 				   @blur="blur" @input="input($event as InputEvent)" :min="min" :max="max" @wheel.passive="wheel($event)"
-				   style="min-width: 30px;" />
+				   style="min-width: 30px; cursor: ns-resize;" />
 			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
 				<i class="fas fa-plus" />
 			</button>
@@ -16,7 +15,6 @@
 </template>
 
 <script lang="ts">
-	const DELTA_UNIT = 100, WHEEL_THROTTLE = 50;
 	export default { name: "Number" };
 </script>
 
@@ -27,33 +25,28 @@
 	import Hotkey from "app/services/customHotkeyService";
 	import { useInput } from "./input";
 	import Row from "./row.vue";
+	import { useWheel } from "./useWheel";
 
 	const props = withDefaults(defineProps<{
 		label?: string;
 		type?: string;
 		min?: number;
 		max?: number;
-		step?: number;
-		hotkeys?: string;
+		step: number;
+		hotkeys: string;
 		modelValue: number;
 	}>(), {
 		step: 1,
-		hotkeys: ",",
+		hotkeys: "",
 	});
 	const emit = defineEmits(["update:modelValue"]);
 	const { blur, focus, value } = useInput(props, emit);
 
-	let lastWheel = performance.now();
-
-	const tooltips = computed(() => !props.hotkeys ? "" : props.hotkeys.split(",").map(k => {
-		try {
-			const [name, command] = k.split(".");
-			const key = Settings.hotkey[name][command];
-			if(!key) return "";
-			return i18n.t("preference.hotkey") + " " + Hotkey.formatKey(key);
-		} catch(e) {
-			return "";
-		}
+	const tooltips = computed(() => props.hotkeys.split(",").map(k => {
+		const [name, command] = k.split(".");
+		const key = Settings.hotkey[name]?.[command];
+		if(!key) return "";
+		return i18n.t("preference.hotkey") + " " + Hotkey.formatKey(key);
 	}));
 
 	const canMinus = computed(() => {
@@ -83,15 +76,5 @@
 		nextTick(blur);
 	}
 
-	function wheel(event: WheelEvent): void {
-		event.stopPropagation();
-
-		// Throttle to avoid overreacting
-		const now = performance.now();
-		if(now - lastWheel < WHEEL_THROTTLE) return;
-		lastWheel = now;
-
-		const by = Math.round(-event.deltaY / DELTA_UNIT);
-		change(by * props.step);
-	}
+	const wheel = useWheel(by => change(by * props.step));
 </script>

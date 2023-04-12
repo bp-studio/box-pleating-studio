@@ -1,7 +1,6 @@
 import { EventBoundary } from "@pixi/events";
 
-import { Control } from "client/base/control";
-
+import type { Control } from "client/base/control";
 import type { Point, Renderer } from "@pixi/core";
 import type { EventMode, EventSystem } from "@pixi/events";
 import type { Container, DisplayObject } from "@pixi/display";
@@ -58,8 +57,11 @@ export class ControlEventBoundary extends EventBoundary {
 			}
 		}
 		if(interactive && this.hitTestFn(target, location as Point)) {
-			const control = Control.$getHitControl(target);
+			const control = hitMap.get(target);
 			if(control) result.push(control);
 		}
 	}
 }
+
+/** Maps {@link DisplayObject}s back to corresponding {@link Control}s. */
+export const hitMap: WeakMap<DisplayObject, Control> = new WeakMap();

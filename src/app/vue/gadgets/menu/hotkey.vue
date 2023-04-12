@@ -1,7 +1,7 @@
 <template>
 	<div class="d-flex">
 		<div class="flex-grow-1">
-			<i :class="icon" />
+			<i :class="icon" :style="color !== undefined ? `color: ${toHex(color)}` : ''" />
 			<slot></slot>
 		</div>
 		<div class="ms-3 text-end desktop-only">{{ key }}</div>
@@ -17,9 +17,11 @@
 	import { computed } from "vue";
 
 	import { isMac } from "app/shared/constants";
+	import { toHex } from "shared/utils/color";
 
 	const props = defineProps<{
 		icon: string;
+		color?: number;
 		hk?: string;
 		ctrl?: boolean;
 		shift?: boolean;

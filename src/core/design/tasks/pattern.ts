@@ -29,6 +29,7 @@ function pattern(): void {
 					contours: device.$contour,
 					ridges: device.$ridges,
 					axisParallel: device.$axisParallels,
+					forward: repo.$f.x == repo.$f.y,
 				};
 			}
 			for(const n of repo.$nodes) {

@@ -78,6 +78,12 @@
 	display: none;
 }
 
+.form-select, .form-check {
+	&, * {
+		cursor: pointer;
+	}
+}
+
 @media (hover: none), (pointer: coarse) {
 	.btn-toolbar .dropdown-item {
 		padding: 0.4rem 2rem 0.4rem 0.5rem;

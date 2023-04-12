@@ -51,6 +51,7 @@ export namespace DragController {
 			for(const o of selections) o.$dragStart(CursorController.$offset);
 			isDragging.value = true;
 			display.stage.interactiveChildren = false;
+			display.stage.cursor = selections[0].$selectedCursor;
 		}
 	}
 
@@ -94,11 +95,13 @@ export namespace DragController {
 		const project = ProjectService.project.value;
 		if(wasDragging && project) {
 			project.$isDragging = false;
-			if(SelectionController.draggables.value[0].type === "Flap") {
+			const draggable = SelectionController.draggables.value[0];
+			if(draggable && draggable.type === "Flap") {
 				project.$core.layout.dragEnd();
 			}
 		}
 		display.stage.interactiveChildren = true;
+		display.stage.cursor = "default";
 		return wasDragging;
 	}
 }

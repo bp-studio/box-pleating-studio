@@ -36,6 +36,7 @@ export class Device extends Draggable {
 		this.stretch = stretch;
 
 		this.$graphics = graphics;
+		this.$selectedCursor = graphics.forward ? "nesw-resize" : "nwse-resize"; // Should be a one-time setup in theory.
 
 		// We deliberately put the shade on a higher layer,
 		// so that its hovering effect can be prioritized.

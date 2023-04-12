@@ -101,7 +101,7 @@ let hadSettings: boolean = false;
 
 export function init(): void {
 	window.addEventListener("storage", e => {
-		if(e.key == KEY) {
+		if(e.storageArea === localStorage && e.key === KEY) {
 			syncing = true;
 			loadSettings(e.newValue);
 		}
