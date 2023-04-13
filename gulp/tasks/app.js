@@ -67,7 +67,9 @@ gulp.task("appDist", () =>
 		}))
 		.pipe(esb({ minify: true }))
 		.pipe(iff(f => f.extname == ".css",
-			postcss([postcssPresetEnv()]) // will use browserslist config
+			// This will use browserslist config, includes Autoprefixer.
+			// This step is not included in debug build
+			postcss([postcssPresetEnv()])
 		))
 		.pipe(gulp.dest(config.dest.dist))
 );

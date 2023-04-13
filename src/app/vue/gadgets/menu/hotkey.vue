@@ -1,7 +1,9 @@
 <template>
 	<div class="d-flex">
 		<div class="flex-grow-1">
-			<i :class="icon" :style="color !== undefined ? `color: ${toHex(color)}` : ''" />
+			<!-- Fully customized icon is possible with icon slot -->
+			<slot name="icon" v-if="slots.icon" />
+			<i v-else :class="icon" :style="color !== undefined ? `color: ${toHex(color)}` : ''" />
 			<slot></slot>
 		</div>
 		<div class="ms-3 text-end desktop-only">{{ key }}</div>
@@ -14,13 +16,14 @@
 
 <script setup lang="ts">
 
-	import { computed } from "vue";
+	import { computed, useSlots } from "vue";
 
 	import { isMac } from "app/shared/constants";
 	import { toHex } from "shared/utils/color";
 
+	const slots = useSlots();
 	const props = defineProps<{
-		icon: string;
+		icon?: string;
 		color?: number;
 		hk?: string;
 		ctrl?: boolean;

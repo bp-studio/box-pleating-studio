@@ -141,3 +141,10 @@ html.dark {
 		}
 	}
 }
+
+html:not(.dark) {
+	/* A utility class for improving contrast  */
+	.darken {
+		filter: brightness(0.8) saturate(2);
+	}
+}

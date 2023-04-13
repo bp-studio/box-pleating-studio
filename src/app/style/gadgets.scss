@@ -4,7 +4,7 @@
 
 .scroll-shadow {
 	overflow-y: auto;
-	-webkit-overflow-scrolling: touch; /* Use momentum-based scrolling on Safari */
+	-webkit-overflow-scrolling: touch; /* Use momentum-based scrolling on Safari, only works on Safari 5-12.5 */
 
 	/* local is not supported in Safari 13+, so we give up this part for now.
 	background-image:

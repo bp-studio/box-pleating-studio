@@ -1,4 +1,4 @@
-import { reactive, readonly, watch } from "vue";
+import { reactive, watch } from "vue";
 import * as idbKeyval from "idb-keyval"; // This library is really tiny, so it's OK to bundle
 
 import { isFileApiEnabled } from "app/shared/constants";
@@ -92,4 +92,4 @@ namespace HandleService {
 	}
 }
 
-export default readonly(HandleService);
+export default HandleService;

@@ -36,4 +36,9 @@
 			background-image: var(--bs-gradient);
 		}
 	}
+
+	.dropdown-item:hover i {
+		/* Disable all custom icon color on hover */
+		color: unset !important;
+	}
 </style>

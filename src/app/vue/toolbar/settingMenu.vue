@@ -18,7 +18,8 @@
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showAxialParallel')">
-				<Hotkey :icon="Settings.showAxialParallel ? 'fas fa-grip-lines' : ''" :color="Studio.style.axisParallel.color" ctrl hk="4">
+				<Hotkey :icon="Settings.showAxialParallel ? 'fas fa-grip-lines' : ''" ctrl hk="4"
+						:color="Studio.style.axisParallel.color">
 					{{ $t('toolbar.setting.axial') }}
 				</Hotkey>
 			</div>
@@ -28,8 +29,15 @@
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showDot')">
-				<Hotkey :icon="Settings.showDot ? 'fas fa-genderless' : ''"  :color="Studio.style.hinge.color" ctrl hk="6">
-					{{ $t('toolbar.setting.tip') }}
+				<Hotkey ctrl hk="6">
+					<template v-slot:icon>
+						<span class="dot-stack" v-if="Settings.showDot">
+							<i class="fas fa-circle" :style="'color:' + toHex(Studio.style.hinge.color)"></i>
+							<i class="far fa-circle"></i>
+						</span>
+						<i v-else />
+					</template>
+					<span>{{ $t('toolbar.setting.tip') }}</span>
 				</Hotkey>
 			</div>
 			<Divider />
@@ -63,6 +71,7 @@
 	import HotkeyService from "app/services/hotkeyService";
 	import Studio from "app/services/studioService";
 	import Fullscreen from "./components/fullscreen.vue";
+	import { toHex } from "shared/utils/color";
 
 	onMounted(() => {
 		HotkeyService.register(() => toggle("showGrid"), "1");
@@ -79,3 +88,19 @@
 	}
 
 </script>
+
+<style scoped lang="scss">
+	.dot-stack {
+		position: relative;
+		height: 1rem;
+
+		> * {
+			position: absolute;
+			top: 0.25rem;
+			left: 0.5rem;
+
+			/* Simply setting font size won't work on desktops. */
+			transform: scale(0.5);
+		}
+	}
+</style>

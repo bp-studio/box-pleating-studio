@@ -1,5 +1,4 @@
 import FileUtility from "app/utils/fileUtility";
-import Lib from "./libService";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
 import { save } from "app/utils/jszip";

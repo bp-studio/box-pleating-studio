@@ -55,7 +55,7 @@
 		}
 
 		> i,
-		.flex-grow-1 > i {
+		.flex-grow-1 > :first-child {
 			display: inline-block;
 			width: 2rem;
 			margin-right: 0.5rem;

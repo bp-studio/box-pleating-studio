@@ -1,7 +1,7 @@
 <template>
 	<Dropdown label="Help" :icon="icon" :title="$t('toolbar.help.title')" :notify="notify || updateReady">
 		<div class="dropdown-item" @click="show('about')">
-			<i class="bp-info" />{{ $t('toolbar.help.about') }}
+			<i class="bp-info text-info darken" />{{ $t('toolbar.help.about') }}
 		</div>
 		<div class="dropdown-item" @click="news">
 			<i class="fas fa-newspaper" />{{ $t('toolbar.help.news') }}
@@ -11,7 +11,8 @@
 			<i class="fas fa-globe" />{{ $t("toolbar.help.homepage") }}
 		</a>
 		<a class="dropdown-item" href="https://discord.gg/HkcdTDS4zZ" target="_blank" rel="noopener">
-			<i class="fab fa-discord" />Discord
+			<!-- Use official color -->
+			<i class="fab fa-discord" style="color: #5865F2;" />Discord
 		</a>
 		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank" rel="noopener">
 			<i class="far fa-comment-dots" />{{ $t("toolbar.help.discussions") }}
@@ -35,7 +36,7 @@
 			<Divider />
 		</template>
 		<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
-			<i class="fas fa-hand-holding-usd" />{{ $t('toolbar.help.donation') }}
+			<i class="fas fa-hand-holding-usd text-warning darken" />{{ $t('toolbar.help.donation') }}
 		</a>
 	</Dropdown>
 </template>

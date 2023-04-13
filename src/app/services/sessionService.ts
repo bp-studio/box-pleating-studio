@@ -9,8 +9,6 @@ import Studio from "./studioService";
 import Workspace from "./workspaceService";
 import { isHttps } from "app/shared/constants";
 
-import type { Project } from "client/project/project";
-
 declare function checkWithBC(id: number): Promise<boolean>;
 
 const SAVE_INTERVAL = 3000;

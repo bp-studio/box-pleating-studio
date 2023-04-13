@@ -1,14 +1,14 @@
-import { computed, reactive, shallowReadonly, shallowRef } from "vue";
+import { computed, reactive, shallowRef } from "vue";
 
-import { defaultTitle } from "app/shared/constants";
+import { defaultTitle, isTouch } from "app/shared/constants";
 import Lib from "./libService";
 import Dialogs from "./dialogService";
-import settings from "./settingService";
+import Settings from "./settingService";
 import { doEvents } from "shared/utils/async";
 
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
-import type { ComputedRef } from "vue";
+import type { ComputedRef, UnwrapNestedRefs } from "vue";
 import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
 import type { StudioOptions } from "client/options";
@@ -93,6 +93,10 @@ namespace StudioService {
 		notifyAll() { /* */ },
 	});
 
+	export const shouldShowDPad = computed(() =>
+		isTouch && Settings.showDPad && draggableSelected.value
+	);
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Delegate methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +111,7 @@ namespace StudioService {
 		bp.selection.clear();
 	}
 	export function svg(proj: Project): Promise<Blob> {
-		return Promise.resolve(bp.svg(proj, settings.includeHiddenElement));
+		return Promise.resolve(bp.svg(proj, Settings.includeHiddenElement));
 	}
 	export function png(proj: Project): Promise<Blob> {
 		return bp.png(proj);
@@ -122,4 +126,4 @@ namespace StudioService {
 
 export const showPanel = shallowRef(false);
 
-export default shallowReadonly(reactive(StudioService));
+export default <Readonly<UnwrapNestedRefs<typeof StudioService>>>reactive(StudioService);

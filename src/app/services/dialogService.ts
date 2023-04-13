@@ -1,6 +1,4 @@
 
-import { readonly } from "vue";
-
 export function setup(d: typeof DialogService): void {
 	Object.assign(DialogService, d);
 }
@@ -19,4 +17,4 @@ namespace DialogService {
 	};
 }
 
-export default readonly(DialogService);
+export default <Readonly<typeof DialogService>>DialogService;

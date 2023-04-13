@@ -1,12 +1,9 @@
 
-import { computed, readonly } from "vue";
-
 import File from "app/services/importService";
 import SessionService from "app/services/sessionService";
 import HandleService from "app/services/handleService";
 import Settings, { getHadSettings } from "app/services/settingService";
 import StudioService from "app/services/studioService";
-import { isTouch } from "app/shared/constants";
 import Dialogs from "app/services/dialogService";
 import LZ from "app/utils/lz";
 import Workspace from "./services/workspaceService";
@@ -54,10 +51,6 @@ namespace Core {
 			await Dialogs.alert(i18n.t("message.invalidLink"));
 		}
 	}
-
-	export const shouldShowDPad = computed(() =>
-		isTouch && Settings.showDPad && StudioService.draggableSelected
-	);
 }
 
-export default readonly(Core);
+export default Core;

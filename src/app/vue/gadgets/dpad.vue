@@ -15,11 +15,10 @@
 
 	import { computed } from "vue";
 
-	import Core from "app/core";
 	import Studio, { showPanel } from "app/services/studioService";
 	import KeyButton from "./keyButton.vue";
 
-	const show = computed(() => Core.shouldShowDPad && !showPanel.value);
+	const show = computed(() => Studio.shouldShowDPad && !showPanel.value);
 
 </script>
 

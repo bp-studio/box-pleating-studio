@@ -75,9 +75,6 @@ body.mac .not-mac {
 
 *:not(input, textarea, .requirement) {
 	user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
-	-ms-user-select: none;
 }
 
 /*********************************************
@@ -87,7 +84,7 @@ body.mac .not-mac {
 ::-webkit-inner-spin-button,
 ::-webkit-outer-spin-button {
 	/* hide spinner in Chrome, Safari, Edge, Opera */
-	-webkit-appearance: none;
+	appearance: none;
 	display: none;
 }
 
@@ -97,7 +94,7 @@ input {
 
 	&[type="number"] {
 		/* hide spinner in Firefox */
-		-moz-appearance: textfield;
+		appearance: textfield;
 	}
 
 	&:invalid {
@@ -106,13 +103,11 @@ input {
 }
 
 textarea {
+	// The data in stylelint seems wrong. See https://caniuse.com/css-resize
 	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 	resize: none;
 }
 
-::placeholder,
-::-webkit-input-placeholder,
-::-moz-placeholder,
-::-ms-input-placeholder {
+::placeholder {
 	opacity: 0.5 !important;
 }

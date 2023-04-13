@@ -20,7 +20,7 @@
 			</button>
 		</div>
 
-		<TabBar v-if="phase >= 2" />
+		<TabBar v-if="phase >= 4" />
 
 		<div class="btn-group" id="panelToggle">
 			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')" :disabled="!Studio.project">
@@ -32,13 +32,10 @@
 </template>
 
 <script lang="ts">
-	export const tick = shallowRef(0);
 	export default { name: "Toolbar" };
 </script>
 
 <script setup lang="ts">
-
-	import { shallowRef } from "vue";
 
 	import { phase } from "app/misc/lcpReady";
 	import Studio from "app/services/studioService";

@@ -18,6 +18,7 @@
 				]
 			}
 		],
+		"media-feature-range-notation": null,
 		"no-descending-specificity": null,
 		"plugin/no-unsupported-browser-features": [
 			true,
@@ -26,7 +27,6 @@
 				"severity": "warning"
 			}
 		],
-		"property-no-vendor-prefix": null,
 		"scss/at-import-partial-extension": null,
 		"selector-id-pattern": null,
 		"selector-no-vendor-prefix": null,

@@ -9,7 +9,7 @@
 			<aside class="scroll-shadow p-3"></aside>
 		</template>
 
-		<Toolbar v-if="phase >= 1" />
+		<Toolbar v-if="phase >= 3" />
 		<nav class="btn-toolbar p-2" v-else>
 			<div class="btn-group me-2">
 				<div class="btn-group">

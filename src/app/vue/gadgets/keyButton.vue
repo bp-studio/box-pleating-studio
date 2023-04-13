@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 
-	import Core from "app/core";
 	import Studio from "app/services/studioService";
 
 	import type { DirectionKey } from "shared/types/types";
@@ -21,7 +20,7 @@
 
 	function down(repeat: number, e?: Event): void {
 		const SENSITIVITY = 150;
-		if(Core.shouldShowDPad) {
+		if(Studio.shouldShowDPad) {
 			Studio.dragByKey(props.dir);
 			to = setTimeout(() => down(SENSITIVITY), repeat);
 		} else {

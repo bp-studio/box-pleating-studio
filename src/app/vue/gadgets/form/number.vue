@@ -32,7 +32,7 @@
 		type?: string;
 		min?: number;
 		max?: number;
-		step: number;
+		step?: number;
 		hotkeys: string;
 		modelValue: number;
 	}>(), {

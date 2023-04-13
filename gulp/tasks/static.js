@@ -96,6 +96,13 @@ gulp.task("static", () => {
 	return all(tasks);
 });
 
+/**
+ * This is the task for rebuilding FontAwesome.
+ * Needs to be called manually.
+ *
+ * Note: For unknown reason, it appears that in local environment,
+ * restarting the browser is needed for the new font to take effect.
+ */
 gulp.task("fa", () => all(
 	purgeFontAwesome(),
 	subsetFontAwesome()
