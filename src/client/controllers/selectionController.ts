@@ -8,9 +8,9 @@ import { display } from "client/screen/display";
 import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
 
+import type { Control } from "client/base/control";
 import type { DragSelectable } from "client/base/draggable";
 import type { ComputedRef } from "vue";
-import type { Control } from "client/base/control";
 
 export interface ISelectionController {
 	readonly selections: readonly Control[];
@@ -80,12 +80,13 @@ export namespace SelectionController {
 		)
 	);
 
-	export function clear(ctrl: Control | null = null): void {
+	/** Clear all selections (with perhaps one exception). */
+	export function clear(except?: Control): void {
 		selections.forEach(c => {
-			if(c !== ctrl) c.$selected = false;
+			if(c !== except) c.$selected = false;
 		});
 		selections.length = 0;
-		if(ctrl?.$selected) selections.push(ctrl);
+		if(except?.$selected) selections.push(except);
 	}
 
 	export function selectAll(): void {

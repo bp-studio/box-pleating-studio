@@ -55,7 +55,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
-		this.$sheet = new Sheet(project, parentView, json, state);
+		this.$sheet = new Sheet(project, parentView, "layout", json, state);
 		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(style.junction.alpha);

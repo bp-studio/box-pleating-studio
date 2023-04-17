@@ -18,6 +18,7 @@ import type { Edge } from "../tree/edge";
 //=================================================================
 export class River extends Control {
 
+	public readonly $tag: string = "r"; // doesn't matter
 	public readonly type = "River";
 	public readonly $priority: number = 1;
 

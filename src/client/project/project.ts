@@ -4,6 +4,7 @@ import { Migration } from "client/patches";
 import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
+import { doEvents } from "shared/utils/async";
 
 import type { Route, CoreResponse } from "core/routes";
 import type { JProject } from "shared/json";
@@ -59,7 +60,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 				}),
 		}) as Route;
 
-		this.history = new HistoryManager();
+		this.history = new HistoryManager(this, jProject.history);
 
 		this._onDispose(() => this._worker.terminate());
 	}
@@ -75,9 +76,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		// Wait for rendering to complete.
 		// Originally `Vue.nextTick()` was used here, but it is later
 		// discovered that such an approach will lead to memory leaks.
-		await new Promise(resolve => {
-			setTimeout(resolve, 0);
-		});
+		await doEvents();
 
 		if(DEBUG_ENABLED && !this._initialized) {
 			console.timeEnd("First render");

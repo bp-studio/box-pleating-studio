@@ -16,6 +16,7 @@ import { createGrid } from "./grid";
 import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 
+import type { ITagObject } from "client/shared/interface";
 import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
@@ -30,7 +31,9 @@ const LAYERS = Enum.values(Layer);
  * {@link Sheet} represents a working area.
  */
 //=================================================================
-export class Sheet extends View implements ISerializable<JSheet> {
+export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
+
+	public readonly $tag: string;
 
 	/**
 	 * The current scrolling position of this working area, in pixels.
@@ -48,7 +51,7 @@ export class Sheet extends View implements ISerializable<JSheet> {
 	public readonly $view: Container = new Container();
 
 	/** The project to which it belongs. */
-	protected readonly $project: Project;
+	public readonly $project: Project;
 
 	/** The layers. */
 	private _layers: Container[] = [];
@@ -70,9 +73,10 @@ export class Sheet extends View implements ISerializable<JSheet> {
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
-	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
+	constructor(project: Project, parentView: Container, tag: string, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
+		this.$tag = tag;
 
 		if(state) {
 			this.$zoom = state.zoom;
@@ -117,6 +121,12 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		for(const c of this.$controls) c.$selected = false;
 	}
 
+	public $getSelectedTags(): string[] {
+		const result: string[] = [];
+		for(const c of this.$controls) if(c.$selected) result.push(c.$tag);
+		return result;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,9 +135,11 @@ export class Sheet extends View implements ISerializable<JSheet> {
 		return this._type;
 	}
 	public set type(v: GridType) {
-		if(v == this._type) return;
+		const oldValue = this._type;
+		if(v == oldValue) return;
 		this._grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
 		this._type = v;
+		this.$project.history.$fieldChange(this, "type", oldValue, v);
 	}
 
 	public get grid(): IGrid {

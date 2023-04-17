@@ -18,6 +18,7 @@ import type { GraphicsData } from "core/service/updateModel";
 //=================================================================
 export class Device extends Draggable {
 
+	public readonly $tag: string;
 	public readonly type = "Device";
 	public readonly $priority: number = 2;
 
@@ -30,9 +31,10 @@ export class Device extends Draggable {
 	private readonly _axisParallels: SmoothGraphics;
 
 
-	constructor(stretch: Stretch, graphics: GraphicsData) {
+	constructor(stretch: Stretch, tag: string, graphics: GraphicsData) {
 		const sheet = stretch.$layout.$sheet;
 		super(sheet);
+		this.$tag = tag;
 		this.stretch = stretch;
 
 		this.$graphics = graphics;

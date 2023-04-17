@@ -1,6 +1,6 @@
 import { Container } from "@pixi/display";
 
-import { shallowRef } from "client/shared/decorators";
+import { field, shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { display } from "client/screen/display";
 import { MOUNTED } from "client/base/mountable";
@@ -13,20 +13,24 @@ import { River } from "./components/layout/river";
 import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
 
+import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
 import type { Project } from "./project";
 import type { UpdateModel } from "core/service/updateModel";
-import type { DesignMode, JDesign, JState } from "shared/json";
+import type { DesignMode, JDesign, JFlap, JState, JStretch, JVertex, Memento } from "shared/json";
 
 //=================================================================
 /**
  * {@link Design} is the main object of a {@link Project}.
  */
 //=================================================================
-export class Design extends View implements ISerializable<JDesign> {
+export class Design extends View implements ISerializable<JDesign>, ITagObject {
 
-	@shallowRef public title: string;
-	@shallowRef public description: string;
+	public readonly $tag = "design";
+	public readonly $project: Project;
+
+	@field public title: string;
+	@field public description: string;
 	@shallowRef public mode: DesignMode;
 
 	public readonly layout: Layout;
@@ -41,6 +45,7 @@ export class Design extends View implements ISerializable<JDesign> {
 		this.title = json.title ?? "";
 		this.description = json.description ?? "";
 		this.mode = json.mode ?? "tree";
+		this.$project = project;
 
 		const view = this.$addRootObject(new Container(), display.designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);
@@ -75,6 +80,45 @@ export class Design extends View implements ISerializable<JDesign> {
 		this.layout.$cleanUp(model);
 		this.tree.$update(model);
 		this.layout.$update(model);
+		this.$project.history.$flush();
+	}
+
+	/** Find the unique object corresponding to the given tag. */
+	public $query(tag: string): ITagObject | undefined {
+		if(tag == "design") return this;
+		// if(tag == "layout") return this.layout.$sheet;
+		// if(tag == "tree") return this.tree.$sheet;
+		// const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
+		// if(m) {
+		// 	const init = m[1], id = m[2], then = m[3];
+		// 	if(init == "s") return this.$stretches.get(id);
+		// 	if(init == "r") return this.$stretches.get(id)!.$repository?.$query(then);
+
+		// 	const t = this.$tree;
+		// 	if(init == "e" || init == "re" || init == "ee") {
+		// 		const edge = t.$find(id);
+		// 		if(!edge) return undefined;
+		// 		if(init == "e") return edge;
+		// 		if(init == "re") return this.$rivers.get(edge);
+		// 		if(init == "ee") return this.$edges.get(edge);
+		// 	}
+
+		// 	const n = t.$node.get(Number(id))!;
+		// 	if(init == "n") return n;
+		// 	if(init == "f") return this.$flaps.get(n);
+		// 	if(init == "v") return this.$vertices.get(n);
+		// }
+		return undefined;
+	}
+
+	public $addMementos(mementos: Memento[]): void {
+		const { layout, tree } = this.$prototype;
+		for(const [tag, json] of mementos) {
+			const init = tag.substring(0, 1);
+			if(init === "f") layout.flaps.push(json as JFlap);
+			if(init === "v") tree.nodes.push(json as JVertex);
+			if(init === "s") layout.stretches.push(json as JStretch);
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

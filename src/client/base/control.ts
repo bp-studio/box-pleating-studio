@@ -3,6 +3,9 @@ import { View } from "./view";
 import { hitMap } from "client/screen/controlEventBoundary";
 import { display } from "client/screen/display";
 
+import type { SelectionController } from "client/controllers/selectionController";
+import type { Project } from "client/project/project";
+import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "client/project/components/sheet";
 import type { Container } from "@pixi/display";
 import type { IHitArea } from "@pixi/events";
@@ -14,7 +17,10 @@ type ControlType = "Flap" | "Vertex" | "River" | "Edge" | "Stretch" | "Device";
  * {@link Control} is a {@link View} that can be selected.
  */
 //=================================================================
-export abstract class Control extends View {
+export abstract class Control extends View implements ITagObject {
+
+	public abstract readonly $tag: string;
+	public readonly $project: Project;
 
 	/**
 	 * Return the type string of this object.
@@ -43,11 +49,19 @@ export abstract class Control extends View {
 
 	constructor(sheet: Sheet) {
 		super();
+		this.$project = sheet.$project;
 
 		sheet.$controls.add(this);
 		this._onDispose(() => sheet.$controls.delete(this));
 	}
 
+	/**
+	 * Whether the {@link Control} is selected.
+	 *
+	 * Note that in most cases this property should not be manipulated directly,
+	 * but instead use {@link SelectionController} to toggle it.
+	 * The only exceptions are the "goToDual" methods.
+	 */
 	public get $selected(): boolean {
 		return this._selected;
 	}

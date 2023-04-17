@@ -1,7 +1,7 @@
 import { Circle } from "@pixi/core";
 
 import { Layer } from "client/shared/layers";
-import { shallowRef } from "client/shared/decorators";
+import { field, shallowRef } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
 import { Label } from "client/utils/label";
 import { Independent } from "client/base/independent";
@@ -24,6 +24,7 @@ import type { JVertex } from "shared/json";
 //=================================================================
 export class Vertex extends Independent implements DragSelectable, LabelView, ISerializable<JVertex> {
 
+	public readonly $tag: string;
 	public readonly type = "Vertex";
 	public readonly $priority: number = Infinity;
 
@@ -52,6 +53,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		super(sheet);
 		this._tree = tree;
 
+		this.$tag = "v" + json.id;
 		this.id = json.id;
 		this.$isNew = json.isNew ?? true;
 		this.$location = { x: json.x, y: json.y };
@@ -78,7 +80,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@shallowRef public name: string;
+	@field public name: string;
 
 	public addLeaf(length: number): Promise<void> {
 		return this._tree.$addLeaf(this, length);

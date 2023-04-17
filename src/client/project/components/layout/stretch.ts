@@ -17,6 +17,7 @@ import type { Layout } from "./layout";
  */
 //=================================================================
 export class Stretch extends Control implements ISerializable<JStretch> {
+	public readonly $tag: string;
 	public readonly type = "Stretch";
 	public readonly $priority: number = 0;
 	private readonly _devices: Device[] = [];
@@ -25,6 +26,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 
 	constructor(layout: Layout, data: StretchData, model: UpdateModel) {
 		super(layout.$sheet);
+		this.$tag = "s" + data.data.id;
 		this.$layout = layout;
 		this.$update(data, model);
 	}
@@ -82,11 +84,12 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		}
 		for(let i = 0; i < deviceCount; i++) {
 			const device = this._devices[i];
-			const graphics = model.graphics["s" + data.data.id + "." + i];
+			const deviceTag = this.$tag + "." + i;
+			const graphics = model.graphics[deviceTag];
 			if(device) {
 				device.$redraw(graphics);
 			} else {
-				this._devices[i] = new Device(this, graphics);
+				this._devices[i] = new Device(this, deviceTag, graphics);
 				this.$layout.$sheet.$addChild(this._devices[i]);
 				this.$addChild(this._devices[i]);
 			}

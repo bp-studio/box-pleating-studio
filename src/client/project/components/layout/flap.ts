@@ -29,6 +29,7 @@ import type { Vertex } from "../tree/vertex";
 //=================================================================
 export class Flap extends Independent implements DragSelectable, LabelView, ISerializable<JFlap> {
 
+	public readonly $tag: string;
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;
 
@@ -65,6 +66,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		super(sheet);
 		this._layout = layout;
 
+		this.$tag = "f" + json.id;
 		this.id = json.id;
 		this.$location = { x: json.x, y: json.y };
 		this._width = json.width;

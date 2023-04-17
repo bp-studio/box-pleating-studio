@@ -33,6 +33,7 @@ export class Tree implements ISerializable<JTree> {
 	public readonly $sheet: Sheet;
 	public readonly $vertices: (Vertex | undefined)[] = [];
 	public readonly $edges: IDoubleMap<number, Edge> = new ValuedIntDoubleMap();
+	public $updateCallback?: Action;
 
 	/** Cache the {@link JEdge}s in the order determined by the Core. */
 	private _edges: JEdge[] = [];
@@ -46,7 +47,7 @@ export class Tree implements ISerializable<JTree> {
 
 	constructor(project: Project, parentView: Container, json: JTree, state?: JViewport) {
 		this.$project = project;
-		this.$sheet = new Sheet(project, parentView, json.sheet, state);
+		this.$sheet = new Sheet(project, parentView, "tree", json.sheet, state);
 
 		// Create the list of skipped ids.
 		const ids: boolean[] = [];
@@ -103,6 +104,10 @@ export class Tree implements ISerializable<JTree> {
 
 		// Adding edges.
 		for(const e of model.add.edges) this._addEdge(e);
+
+		// Callback
+		if(this.$updateCallback) this.$updateCallback();
+		this.$updateCallback = undefined;
 	}
 
 	public $addLeaf(at: Vertex, length: number): Promise<void> {
@@ -124,16 +129,21 @@ export class Tree implements ISerializable<JTree> {
 		);
 		design.$prototype.layout.flaps.push(...prototypes);
 
+		this.$project.history.$cacheSelection();
 		for(const id of ids) SelectionController.$toggle(this.$vertices[id]!, false);
 		return this.$project.$core.tree.removeLeaf(ids, prototypes);
 	}
 
 	public $join(vertex: Vertex): Promise<void> {
+		this.$project.history.$cacheSelection();
 		SelectionController.clear();
+		const [v1, v2] = Array.from(this.$edges.get(vertex.id)!.keys());
+		this.$updateCallback = () => SelectionController.$toggle(this.$edges.get(v1, v2)!, true);
 		return this.$project.$core.tree.join(vertex.id);
 	}
 
 	public $split(edge: Edge): void {
+		this.$project.history.$cacheSelection();
 		SelectionController.clear();
 		const id = this._nextAvailableId;
 		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
@@ -143,11 +153,23 @@ export class Tree implements ISerializable<JTree> {
 			x: Math.round((l1.x + l2.x) / 2),
 			y: Math.round((l1.y + l2.y) / 2),
 		});
+		this.$updateCallback = () => SelectionController.$toggle(this.$vertices[id]!, true);
 		this.$project.$core.tree.split(edge.toJSON(), id);
 	}
 
 	public $merge(edge: Edge): void {
+		this.$project.history.$cacheSelection();
 		SelectionController.clear();
+		const v1 = edge.$v1.id, v2 = edge.$v2.id;
+		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
+		const x = Math.round((l1.x + l2.x) / 2);
+		const y = Math.round((l1.y + l2.y) / 2);
+		this.$updateCallback = () => {
+			// We know that one of them will survive
+			const v = this.$vertices[v1] || this.$vertices[v2]!;
+			v.$location = { x, y };
+			SelectionController.$toggle(v, true);
+		};
 		this.$project.$core.tree.merge(edge.toJSON());
 	}
 

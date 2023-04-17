@@ -26,6 +26,7 @@ const LABEL_DISTANCE = 0.5;
 //=================================================================
 export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 
+	public readonly $tag: string;
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
 
@@ -44,6 +45,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		this._tree = tree;
 		this.$selectedCursor = "pointer";
 
+		this.$tag = `e${v1.id},${v2.id}`;
 		this.$v1 = v1;
 		this.$v2 = v2;
 		this._length = length;
