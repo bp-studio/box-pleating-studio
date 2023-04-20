@@ -60,7 +60,8 @@
 			}
 		},
 		"polyfills": [
-			"globalThis"
+			"globalThis",
+			"navigator.locks"
 		]
 	}
 }

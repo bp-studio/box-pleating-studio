@@ -56,9 +56,9 @@ export const history = {
 		getHistory()?.$redo();
 	},
 	notify() {
-		getHistory()?.notifySave();
+		getHistory()?.$notifySave();
 	},
 	notifyAll() {
-		ProjectController.all().forEach(p => p.history.notifySave());
+		ProjectController.all().forEach(p => p.history.$notifySave());
 	},
 };

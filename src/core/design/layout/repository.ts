@@ -36,7 +36,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	public readonly $quadrants: number[];
 
 	/** Node ids involved. */
-	public readonly $nodes: number[];
+	public readonly $nodeIds: number[];
 
 	public $index: number = 0;
 
@@ -55,7 +55,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 			j.$path.forEach(id => ids.add(id));
 		}
 		this.$quadrants = quadrants;
-		this.$nodes = Array.from(ids);
+		this.$nodeIds = Array.from(ids);
 
 		State.$newRepositories.add(this);
 		State.$repoUpdated.add(this);

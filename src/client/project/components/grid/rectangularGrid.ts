@@ -2,11 +2,13 @@ import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 
+import type { ITagObject } from "client/shared/interface";
 import type { Path } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json";
 import type { IGrid } from "./iGrid";
 import type { Sheet } from "../sheet";
+import type { Project } from "client/project/project";
 
 const DEFAULT_SIZE = 16;
 const MIN_SIZE = 4; // Used to be 8, now 4.
@@ -19,6 +21,8 @@ const MIN_SIZE = 4; // Used to be 8, now 4.
 
 export class RectangularGrid implements IGrid {
 
+	public readonly $tag: string;
+	public readonly $project: Project;
 	public readonly type = GridType.rectangular;
 
 	private readonly _sheet: Sheet;
@@ -30,6 +34,8 @@ export class RectangularGrid implements IGrid {
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		this._sheet = sheet;
+		this.$project = sheet.$project;
+		this.$tag = sheet.$tag + ".g";
 		this._testHeight = this._height = height ?? DEFAULT_SIZE;
 		this._testWidth = this._width = width ?? DEFAULT_SIZE;
 	}
@@ -54,30 +60,34 @@ export class RectangularGrid implements IGrid {
 		return this._height;
 	}
 	public set height(v: number) {
-		if(v < MIN_SIZE) return;
+		const oldValue = this._height;
+		if(v < MIN_SIZE || oldValue === v) return;
 		this._testHeight = v;
 		for(const c of this._sheet.$independents) {
 			if(!c.$testGrid(this)) {
-				this._testHeight = this._height;
+				this._testHeight = oldValue;
 				return;
 			}
 		}
 		this._height = v;
+		this.$project.history.$fieldChange(this, "height", oldValue, v);
 	}
 
 	public get width(): number {
 		return this._width;
 	}
 	public set width(v: number) {
-		if(v < MIN_SIZE) return;
+		const oldValue = this._width;
+		if(v < MIN_SIZE || oldValue === v) return;
 		this._testWidth = v;
 		for(const c of this._sheet.$independents) {
 			if(!c.$testGrid(this)) {
-				this._testWidth = this._width;
+				this._testWidth = oldValue;
 				return;
 			}
 		}
 		this._width = v;
+		this.$project.history.$fieldChange(this, "width", oldValue, v);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

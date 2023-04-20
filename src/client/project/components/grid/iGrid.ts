@@ -1,4 +1,4 @@
-import type { SvgGraphics } from "client/svg/svgGraphics";
+import type { ITagObject } from "client/shared/interface";
 import type { Path } from "shared/types/geometry";
 import type { Direction } from "shared/types/direction";
 import type { GraphicsLike } from "client/utils/contourUtil";
@@ -10,7 +10,7 @@ import type { GridType } from "shared/json/enum";
  * {@link IGrid} is the abstraction of grids.
  */
 //=================================================================
-export interface IGrid extends ISerializable<JSheet> {
+export interface IGrid extends ISerializable<JSheet>, ITagObject {
 
 	/** The type of the grid. */
 	readonly type: GridType;

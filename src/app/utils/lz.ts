@@ -39,8 +39,6 @@ function callWorker<T>(action: Act, data: unknown, mode: unknown): Promise<T> {
 //=================================================================
 /**
  * {@link LZ} is a wrapper for LZMA library.
- *
- * The methods assumes that the library is loaded.
  */
 //=================================================================
 namespace LZ {

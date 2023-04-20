@@ -3,7 +3,9 @@ import { shallowReactive } from "vue";
 import { shallowRef } from "client/shared/decorators";
 import { FieldCommand } from "./commands/fieldCommand";
 import { Step, restore } from "./step";
+import { MoveCommand } from "./commands/moveCommand";
 
+import type { Draggable } from "client/base/draggable";
 import type { Project } from "../project";
 import type { ITagObject } from "client/shared/interface";
 import type { Command } from "./commands/command";
@@ -65,10 +67,11 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	public get isModified(): boolean {
-		return this._savedIndex != this._index;
+		// Always display as modified during dragging to reduce UI flashes.
+		return this._project.$isDragging || this._savedIndex != this._index;
 	}
 
-	public notifySave(): void {
+	public $notifySave(): void {
 		this._savedIndex = this._index;
 	}
 
@@ -105,10 +108,22 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		this._selection = this._project.design.sheet.$getSelectedTags();
 	}
 
-	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown): void {
+	/** Move an object. */
+	public $move(target: Draggable, loc: IPoint): void {
+		if(this._moving) return;
+		const command = MoveCommand.$create(target, loc);
+		this._enqueue(command);
+	}
+
+	/**
+	 * Change a field.
+	 * @param flush Whether to flush immediately. The default value is true.
+	 */
+	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
+		flush: boolean = true): void {
 		if(this._moving) return;
 		this._enqueue(FieldCommand.create(target, prop, oldValue, newValue));
-		this.$flush();
+		if(flush) this.$flush();
 	}
 
 	public get $canUndo(): boolean {
@@ -160,7 +175,6 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	private _enqueue(command: Command): void {
-		if(this._moving) return;
 		for(const q of this._queue) {
 			if(command.$canAddTo(q)) return command.$addTo(q);
 		}

@@ -89,18 +89,39 @@ export class TreeNode implements ITreeNode {
 		}
 	}
 
-	/** Temporarily disconnects a node from the tree, without changing its subtree. */
-	public $cut(skipProcess?: boolean): void {
+	/**
+	 * Temporarily disconnects a node from the tree, without changing its subtree.
+	 *
+	 * The disconnection will be reported to {@link State.$updateResult} by default.
+	 * The only case when this behavior is disabled is during balancing,
+	 * where the connection will be re-established in the opposite direction.
+	 */
+	public $cut(skipReport?: boolean): void {
 		if(this.$parent) {
 			this.$parent.$children.$remove(this);
+			this.$parent.$AABB.$removeChild(this.$AABB);
 			State.$childrenChanged.add(this.$parent);
-			if(!skipProcess) State.$updateResult.remove.edges.push({ n1: this.id, n2: this.$parent.id });
+			if(!skipReport) State.$updateResult.remove.edges.push({ n1: this.id, n2: this.$parent.id });
 		}
 		this.$parent = undefined;
 	}
 
+	/** Whether this {@link TreeNode} is a directed leaf. */
 	public get $isLeaf(): boolean {
 		return this.$children.$isEmpty;
+	}
+
+	/**
+	 * Whether this {@link TreeNode} is a directed leaf,
+	 * or is a root node with only one child.
+	 *
+	 * This is used only before balancing,
+	 * when the root can temporarily become a leaf.
+	 * After that, the more efficient {@link $isLeaf} should be used instead.
+	 */
+	public get $isLeafLike(): boolean {
+		const childCount = this.$children.$size;
+		return !this.$parent && childCount === 1 || childCount === 0;
 	}
 
 	/** The tag used for identifying objects in API. */

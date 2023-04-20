@@ -22,19 +22,17 @@
 			<i class="fas fa-bug" />{{ $t("toolbar.help.issue") }}
 		</a>
 		<Divider />
-		<template v-if="isServiceWorker">
-			<DropdownItem disabled v-if="checking">
-				<i class="bp-spinner fa-spin" />{{ $t('toolbar.help.checkUpdate') }}
-			</DropdownItem>
-			<div class="dropdown-item" @click="update" v-else-if="updateReady">
-				<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.update') }}
-				<div class="notify"></div>
-			</div>
-			<div class="dropdown-item" @click="checkUpdate" v-else>
-				<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.checkUpdate') }}
-			</div>
-			<Divider />
-		</template>
+		<DropdownItem disabled v-if="checking">
+			<i class="bp-spinner fa-spin" />{{ $t('toolbar.help.checkUpdate') }}
+		</DropdownItem>
+		<div class="dropdown-item" @click="update" v-else-if="updateReady">
+			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.update') }}
+			<div class="notify"></div>
+		</div>
+		<div class="dropdown-item" @click="checkUpdate" v-else>
+			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.checkUpdate') }}
+		</div>
+		<Divider />
 		<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
 			<i class="fas fa-hand-holding-usd text-warning darken" />{{ $t('toolbar.help.donation') }}
 		</a>
@@ -53,7 +51,6 @@
 	import Dialogs from "app/services/dialogService";
 	import { updateReady } from "app/misc/updateReady";
 	import { show } from "../modals/modalFragment.vue";
-	import { isServiceWorker } from "app/shared/constants";
 
 	const notify = shallowRef(false);
 	const checking = shallowRef(false);

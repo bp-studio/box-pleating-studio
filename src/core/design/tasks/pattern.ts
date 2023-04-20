@@ -32,7 +32,7 @@ function pattern(): void {
 					forward: repo.$f.x == repo.$f.y,
 				};
 			}
-			for(const n of repo.$nodes) {
+			for(const n of repo.$nodeIds) {
 				State.$contourWillChange.add(State.$tree.$nodes[n]!);
 			}
 		} else {
@@ -42,7 +42,7 @@ function pattern(): void {
 
 	for(const s of State.$stretches.values()) {
 		if(!s.$repo.$pattern) continue;
-		for(const id of s.$repo.$nodes) State.$patternDiff.$add(id);
+		for(const id of s.$repo.$nodeIds) State.$patternDiff.$add(id);
 
 		// Collect patterned quadrants
 		for(const q of s.$repo.$quadrants) {
@@ -51,6 +51,11 @@ function pattern(): void {
 	}
 
 	for(const id of State.$patternDiff.$diff()) {
-		State.$contourWillChange.add(State.$tree.$nodes[id]!);
+		const node = State.$tree.$nodes[id];
+		// It could be that the node is deleted, or become the root;
+		// only if that's not the case will we add it to the set.
+		if(node && node.$parent) {
+			State.$contourWillChange.add(node);
+		}
 	}
 }

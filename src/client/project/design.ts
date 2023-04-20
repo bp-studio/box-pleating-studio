@@ -85,29 +85,26 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 
 	/** Find the unique object corresponding to the given tag. */
 	public $query(tag: string): ITagObject | undefined {
+		const { layout, tree } = this;
 		if(tag == "design") return this;
-		// if(tag == "layout") return this.layout.$sheet;
-		// if(tag == "tree") return this.tree.$sheet;
-		// const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
-		// if(m) {
-		// 	const init = m[1], id = m[2], then = m[3];
-		// 	if(init == "s") return this.$stretches.get(id);
-		// 	if(init == "r") return this.$stretches.get(id)!.$repository?.$query(then);
+		if(tag == "layout") return layout.$sheet;
+		if(tag == "layout.g") return layout.$sheet.grid;
+		if(tag == "tree") return tree.$sheet;
+		if(tag == "tree.g") return tree.$sheet.grid;
 
-		// 	const t = this.$tree;
-		// 	if(init == "e" || init == "re" || init == "ee") {
-		// 		const edge = t.$find(id);
-		// 		if(!edge) return undefined;
-		// 		if(init == "e") return edge;
-		// 		if(init == "re") return this.$rivers.get(edge);
-		// 		if(init == "ee") return this.$edges.get(edge);
-		// 	}
+		const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)?(?:\.(.+))?$/);
+		if(m) {
+			const init = m[1], id = m[2], then = m[3];
+			if(init == "s") return layout.$stretches.get(id)!.$query(then);
+			if(init == "e") {
+				const [a, b] = id.split(",").map(n => Number(n));
+				return tree.$edges.get(a, b);
+			}
 
-		// 	const n = t.$node.get(Number(id))!;
-		// 	if(init == "n") return n;
-		// 	if(init == "f") return this.$flaps.get(n);
-		// 	if(init == "v") return this.$vertices.get(n);
-		// }
+			const n = Number(id);
+			if(init == "f") return layout.$flaps.get(n);
+			if(init == "v") return tree.$vertices[n];
+		}
 		return undefined;
 	}
 

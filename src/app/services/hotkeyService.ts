@@ -1,11 +1,17 @@
 
 namespace HotkeyService {
 
-	type HotkeyEntry = [Action, string, boolean];
+	type HotkeyEntry = [Action, string, boolean, boolean];
 	const hotkeys: HotkeyEntry[] = [];
 
-	export function register(action: Action, key: string, shift?: boolean): void {
-		hotkeys.push([action, key.toLowerCase(), Boolean(shift)]);
+	/**
+	 * Register a global hotkey.
+	 *
+	 * @param key Case-insensitive. For the full list of keys, see
+	 * https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
+	 */
+	export function register(action: Action, key: string, ctrl: boolean = true, shift: boolean = false): void {
+		hotkeys.push([action, key.toLowerCase(), ctrl, shift]);
 	}
 
 	export function registerCore(handler: Consumer<KeyboardEvent>): EventListener {
@@ -38,13 +44,11 @@ namespace HotkeyService {
 			// Skip processing hotkeys when there's opened dialogs
 			if(document.querySelector(".modal-open")) return;
 
-			if(e.metaKey || e.ctrlKey || e.key == "Escape") {
-				e.preventDefault();
-				for(const [action, key, shift] of hotkeys) {
-					if(e.key.toLowerCase() == key && e.shiftKey == shift) {
-						action();
-						return;
-					}
+			for(const [action, key, ctrl, shift] of hotkeys) {
+				if(e.key.toLowerCase() == key && (e.metaKey || e.ctrlKey) == ctrl && e.shiftKey == shift) {
+					e.preventDefault();
+					action();
+					return;
 				}
 			}
 		});

@@ -36,7 +36,7 @@ but there are some essential barriers that cannot be compromised.
 First of all, IE is obviously not supported as there're way too many modern
 features that cannot be used, plus it's REALLY dead by now. And then:
 
-- Firefox < 78 and Safari < 11 does not support the `s` flag of regular expressions.
+- Firefox < 78 and Safari < 11.1 (or iOS < 11.3) does not support the `s` flag of regular expressions.
 See [caniuse](https://caniuse.com/mdn-javascript_builtins_regexp_dotall).
 - Chrome < 66 and Opera < 53 does not support `Array.prototype.values`.
 See [caniuse](https://caniuse.com/mdn-api_headers_values).

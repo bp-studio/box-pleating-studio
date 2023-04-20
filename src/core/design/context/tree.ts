@@ -18,9 +18,6 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	/** The array of all nodes. Some indices are skipped. */
 	private readonly _nodes: (TreeNode | undefined)[];
 
-	/** All leaves. */
-	private readonly _leaves = new Set<TreeNode>();
-
 	/** The root node of the tree. */
 	public $root!: TreeNode;
 
@@ -88,15 +85,24 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 
 	public $removeLeaf(id: number): boolean {
 		const node = this._nodes[id];
-		if(!node || !node.$isLeaf) return false;
+		if(!node || !node.$isLeafLike) return false;
 
-		const parent = node.$parent!;
-		node.$cut();
-		this._leaves.delete(node);
-		if(parent.$isLeaf) {
-			this._leaves.add(parent);
-			State.$flapAABBChanged.add(parent);
+		const parent = node.$parent;
+		if(parent) {
+			node.$cut();
+			if(parent.$isLeafLike) {
+				State.$flapAABBChanged.add(parent);
+			}
+		} else {
+			const child = node.$children.$get()!;
+			child.$cut();
+			if(child.$isLeafLike) {
+				State.$flapAABBChanged.add(child);
+			}
+			this.$root = child;
+			State.$rootChanged = true;
 		}
+
 		this._removeNode(id);
 		return true;
 	}
@@ -104,9 +110,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	public $setFlaps(flaps: JFlap[]): void {
 		for(const flap of flaps) {
 			const node = this._nodes[flap.id];
-			const isLeaf = node && node.$isLeaf ||
-				// It is possible that the root also becomes a leaf after deletion
-				node === this.$root && node.$children.$size === 1;
+			const isLeaf = node && node.$isLeafLike;
 			if(isLeaf) node.$setFlap(flap);
 		}
 	}
@@ -200,10 +204,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _addLeaf(id: number, at?: TreeNode, length?: number): TreeNode {
-		const atLeaf = at && at.$isLeaf;
 		const newNode = new TreeNode(id, at, length);
-		if(atLeaf) this._leaves.delete(at);
-		this._leaves.add(newNode);
 		this._nodes[id] = newNode;
 		State.$treeStructureChanged = true;
 		return newNode;
@@ -212,6 +213,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	private _removeNode(id: number): void {
 		const node = this._nodes[id]!;
 		State.$childrenChanged.delete(node);
+		State.$flapAABBChanged.delete(node);
 		delete this._nodes[id];
 		State.$updateResult.remove.nodes.push(id);
 		State.$treeStructureChanged = true;

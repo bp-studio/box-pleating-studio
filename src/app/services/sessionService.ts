@@ -1,18 +1,17 @@
-
 import { watch } from "vue";
 
-import { callService } from "app/utils/workerUtility";
-import { id as Id } from "../misc/id";
 import Handles from "./handleService";
 import Settings from "./settingService";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
-import { isHttps } from "app/shared/constants";
-
-declare function checkWithBC(id: number): Promise<boolean>;
+import { callService } from "app/utils/workerUtility";
+import { isReload } from "app/shared/constants";
 
 const SAVE_INTERVAL = 3000;
-const SESSION_CHECK_TIMEOUT = 250;
+const RESET_TIME = 1000;
+const LOCK_KEY = "bps_session";
+
+if(isReload) sessionStorage.clear();
 
 //=================================================================
 /**
@@ -22,6 +21,7 @@ const SESSION_CHECK_TIMEOUT = 250;
 namespace SessionService {
 
 	let initialized = false;
+	let hasSession = false;
 
 	export async function init(loadSession: boolean): Promise<boolean> {
 		watch(() => Settings.autoSave, shouldAutoSave => {
@@ -29,9 +29,10 @@ namespace SessionService {
 		});
 
 		// Only the instance with saving rights will read the session
-		const hasSession = await checkSessionRight();
+		const sessionReload = Boolean(sessionStorage.getItem("hasSession"));
+		hasSession = sessionReload || await query();
 		if(hasSession && loadSession) {
-			const sessionString = localStorage.getItem("session");
+			const sessionString = sessionStorage.getItem("session") || localStorage.getItem("session");
 			if(sessionString) {
 				const session = JSON.parse(sessionString);
 				const jsons = session.jsons;
@@ -39,6 +40,8 @@ namespace SessionService {
 				if(session.open >= 0) Workspace.select(Workspace.ids.value[session.open]);
 			}
 		}
+
+		request(sessionReload);
 
 		// The following is the best we can do to ensure session is saved before exiting.
 		// See https://developer.chrome.com/blog/page-lifecycle-api/
@@ -52,41 +55,81 @@ namespace SessionService {
 		return hasSession;
 	}
 
-	/** Check if the current App instance has the saving right of session */
-	function checkSessionRight(): Promise<boolean> {
-		return new Promise<boolean>(resolve => {
-			// If it's running locally, use Broadcast Channel
-			if(!isHttps) {
-				checkWithBC(Id).then(ok => resolve(ok));
-			} else {
-				// In theory the checking can be done instantly,
-				// so if there's no result in 1/4 seconds we consider that failure
-				const cancel = setTimeout(() => resolve(false), SESSION_CHECK_TIMEOUT);
-				callService<number>("id")
-					.then(
-						(id: number) => resolve(Id < id), // The oldest instance goes first
-						() => resolve(true) // If there's no service worker, returns true
-					)
-					.finally(() => clearTimeout(cancel));
-			}
+	function request(steal: boolean = false): void {
+		navigator.locks.request(LOCK_KEY, { steal },
+			() => new Promise<void>(_ => {
+				hasSession = true;
+				sessionStorage.setItem("hasSession", "true");
+			})
+		).catch(() => {
+			hasSession = false;
+			sessionStorage.clear();
+			setTimeout(request, RESET_TIME);
 		});
 	}
 
-	/** Save session */
-	export async function save(): Promise<void> {
-		// There's no point saving the session during dragging.
-		if(Studio.isDragging) return;
-
-		// The session is saved only when the current instance obtains the saving rights.
-		if(Settings.autoSave && await checkSessionRight()) {
-			const session = {
-				jsons: await Promise.all(Workspace.projects.value.map(proj => proj.toJSON(true))),
-				open: Studio.project ? Workspace.projects.value.indexOf(Studio.project) : -1,
-			};
-			localStorage.setItem("session", JSON.stringify(session));
-			await Handles.save();
-		}
+	async function query(): Promise<boolean> {
+		const snapshot = await navigator.locks.query();
+		if(!snapshot.held) return true;
+		return !snapshot.held.some(l => l.name === LOCK_KEY);
 	}
+
+	/** Save session */
+	async function save(): Promise<void> {
+		// There's no point saving the session during dragging.
+		if(Studio.isDragging || !Settings.autoSave || !hasSession) return;
+
+		const session = {
+			jsons: await Promise.all(Workspace.projects.value.map(proj => proj.toJSON(true))),
+			open: Studio.project ? Workspace.projects.value.indexOf(Studio.project) : -1,
+		};
+		const sessionString = JSON.stringify(session);
+		localStorage.setItem("session", sessionString);
+		sessionStorage.setItem("session", sessionString);
+		await Handles.save();
+	}
+}
+
+// Web Locks polyfill
+if(!("locks" in navigator)) {
+	const SESSION_CHECK_TIMEOUT = 250;
+	const CHECK_INTERVAL = 500;
+	const nav = navigator as Writeable<Navigator>;
+
+	function check(): Promise<void> {
+		return new Promise(resolve => {
+			const interval = setInterval(async () => {
+				const success = await callService("check");
+				if(success) {
+					clearInterval(interval);
+					resolve();
+				}
+			}, CHECK_INTERVAL);
+		});
+	}
+
+	nav.locks = {
+		async request(_: string, options: LockOptions, callback: Action<Promise<void>>): Promise<void> {
+			const success = await callService<boolean>(options.steal ? "steal" : "request");
+			if(!success) await check();
+			callback();
+			return new Promise((__, reject) => {
+				nav.serviceWorker.onmessage = event => {
+					if(event.data == "steal") reject();
+				};
+			});
+		},
+		async query() {
+			const count = await new Promise<number>(resolve => {
+				// During the first launch, service worker will take more time to react,
+				// causing timeout. In that case we return falsy result.
+				// It's OK to do so since we won't need to load session on first launch anyway.
+				setTimeout(() => resolve(1), SESSION_CHECK_TIMEOUT);
+				callService<number>("query").then(n => resolve(n));
+			});
+			return { held: count ? [{ name: LOCK_KEY }] : [] };
+		},
+	} as LockManager;
 }
 
 export default SessionService;

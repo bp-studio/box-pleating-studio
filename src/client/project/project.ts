@@ -5,6 +5,7 @@ import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
 import { doEvents } from "shared/utils/async";
+import { shallowRef } from "client/shared/decorators";
 
 import type { Route, CoreResponse } from "core/routes";
 import type { JProject } from "shared/json";
@@ -37,7 +38,11 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	/** Whether self has been initialized. */
 	private _initialized: boolean = false;
 
-	public $isDragging: boolean = false;
+	/**
+	 * Whether the user is performing dragging on the current {@link Project}.
+	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
+	 */
+	@shallowRef public $isDragging: boolean = false;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Projects are all inactive on construction.
@@ -68,7 +73,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	/** Initialization. */
 	public async $initialize(): Promise<Project> {
 		if(DEBUG_ENABLED && !this._initialized) {
-			console.time("First render");
+			console.time("First render #" + this.id);
 		}
 
 		await this.$core.design.init(this.design.$prototype);
@@ -79,7 +84,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		await doEvents();
 
 		if(DEBUG_ENABLED && !this._initialized) {
-			console.timeEnd("First render");
+			console.timeEnd("First render #" + this.id);
 		}
 
 		this._initialized = true;

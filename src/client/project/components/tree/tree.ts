@@ -261,8 +261,8 @@ export class Tree implements ISerializable<JTree> {
 
 	/**
 	 * Simulate the process of a round of deleting,
-	 * and returns those {@link Vertex Vertices} that are actually deleted,
-	 * and those parent Vertices that becomes new leaves.
+	 * and returns those {@link Vertex Vertices} that are actually deleted
+	 * (in the order of deletion), and those parent vertices that becomes new leaves.
 	 *
 	 * If the user deliberately select all vertices and hit delete,
 	 * there's no way to tell which three vertices will survive ahead of time.

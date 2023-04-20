@@ -34,9 +34,16 @@
 	onMounted(() => {
 		HotkeyService.register(undo, "z");
 		HotkeyService.register(redo, "y");
-		HotkeyService.register(redo, "z", true);
+		HotkeyService.register(redo, "z", true, true);
 		HotkeyService.register(selectAll, "a");
-		HotkeyService.register(unselectAll, "escape");
+		HotkeyService.register(unselectAll, "escape", false);
+		HotkeyService.register(Studio.del, "delete", false);
+		HotkeyService.register(Studio.del, "backspace", false);
+
+		// on certain keyboards
+		HotkeyService.register(undo, "undo", false);
+		HotkeyService.register(redo, "redo", false);
+		HotkeyService.register(unselectAll, "clear", false);
 	});
 
 	const selection = Studio.selection;

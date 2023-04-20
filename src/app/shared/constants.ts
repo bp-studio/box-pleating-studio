@@ -17,8 +17,10 @@ export const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
 /**
  * Determine whether the current environment is a desktop version of Mac.
+ * Used for displaying Mac-style keyboard symbols.
  *
  * See https://stackoverflow.com/questions/10527983/ for the method used here.
+ * Even MDN is good with this method: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
  */
 export const isMac = navigator.platform?.toLowerCase().startsWith("mac");
 if(isMac) document.body.classList.add("mac");
@@ -36,11 +38,23 @@ export const copyEnabled = "clipboard" in navigator && "write" in navigator.clip
 /** Whether the current instance is running online. */
 export const isHttps = location.protocol === "https:";
 
-/** Whether service worker is supported */
-export const isServiceWorker = "serviceWorker" in navigator && isHttps;
+/** Whether the current page is reloaded. */
+export const isReload =
+	(performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)?.type == "reload" ??
+	performance.navigation.type == 1;
 
-/** A lucky guess that we're probably in China. */
-const isChina = navigator.language == "zh-CN" || navigator.languages.includes("zh-CN");
-
-// If we're in China, replace the flag to avoid unnecessary trouble.
+/**
+* A lucky guess that we are probably in China.
+* If we are, replace the flag to avoid unnecessary trouble.
+*
+* For the list of timeZone to country, see:
+* https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json
+*/
+const detectChinaLanguage = ["zh-CN", "zh-CHS", "zh-Hans", "zh-HK", "zh-MO"];
+const detectChinaTimeZone = ["Asia/Shanghai", "Asia/Urumqi"];
+const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+const isChina =
+	detectChinaTimeZone.includes(timeZone) ||
+	detectChinaLanguage.includes(navigator.language) ||
+	navigator.languages.some(l => detectChinaLanguage.includes(l));
 if(isChina) locale["zh-tw"].emoji = () => "🇭🇰";

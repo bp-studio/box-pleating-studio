@@ -18,6 +18,9 @@ import type { Repository } from "core/design/layout/repository";
 //=================================================================
 export namespace LayoutController {
 
+	/**
+	 * Moving or resizing of flaps.
+	 */
 	export function updateFlap(flaps: JFlap[], dragging: boolean): void {
 		State.$isDragging = dragging;
 		State.$tree.$setFlaps(flaps);

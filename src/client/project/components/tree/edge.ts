@@ -75,8 +75,10 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		return this._length;
 	}
 	public set length(v: number) {
-		if(v < 1) return;
+		const oldValue = this._length;
+		if(v < 1 || oldValue === v) return;
 		this._length = v;
+		this.$project.history.$fieldChange(this, "length", oldValue, v, false);
 		this._tree.$updateLength([this.toJSON()]);
 	}
 

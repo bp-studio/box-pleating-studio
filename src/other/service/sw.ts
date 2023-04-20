@@ -16,6 +16,7 @@ import * as googleAnalytics from "workbox-google-analytics";
 import * as precaching from "workbox-precaching";
 import * as routing from "workbox-routing";
 import * as strategies from "workbox-strategies";
+import * as idbKeyval from "idb-keyval";
 
 // Declare that we're in ServiceWorker environment
 declare const self: ServiceWorkerGlobalScope & typeof globalThis;
@@ -77,7 +78,7 @@ self.addEventListener("activate", event => {
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-// Communication with service worker clients
+// Web Lock polyfill
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 self.addEventListener("message", event => {
@@ -85,34 +86,37 @@ self.addEventListener("message", event => {
 });
 
 async function message(event: ExtendableMessageEvent): Promise<void> {
-	if(event.ports[0]) {
+	const port = event.ports[0];
+	if(port) {
+		const clientList = await idbKeyval.get<string[]>("clients") || [];
 		const sourceId = (event.source as Client).id;
-		if(event.data == "id") {
-			const result = await callAllClients<number>(sourceId, "id");
-			event.ports[0].postMessage(Math.min(...result));
-		} else {
-			// In all other cases, simply broadcast the data to all instances.
-			await callAllClients<void>(sourceId, event.data);
-			event.ports[0].postMessage(undefined);
+		if(event.data == "request") {
+			clientList.push(sourceId);
+			port.postMessage(await check(clientList, sourceId));
+		} else if(event.data == "check") {
+			port.postMessage(await check(clientList, sourceId));
+		} else if(event.data == "query") {
+			port.postMessage(clientList.length);
+			return;
+		} else if(event.data == "steal") {
+			if(clientList.length) {
+				const client = await self.clients.get(clientList[0]);
+				if(client) client.postMessage("steal");
+				clientList.shift();
+			}
+			clientList.unshift(sourceId);
+			port.postMessage(true);
 		}
+		await idbKeyval.set("clients", clientList);
 	}
 }
 
-async function callAllClients<T>(sourceId: string, data: unknown): Promise<T[]> {
-	const clients = await self.clients.matchAll({ type: "window" });
-	const tasks: Promise<T>[] = [];
-	for(const client of clients) {
-		if(client.id != sourceId) {
-			tasks.push(callClient<T>(client, data));
-		}
+async function check(clientList: string[], id: string): Promise<boolean> {
+	let client: Client | undefined;
+	while(clientList[0] !== id && !client) {
+		// eslint-disable-next-line no-await-in-loop
+		client = await self.clients.get(clientList[0]);
+		if(!client) clientList.shift();
 	}
-	return await Promise.all(tasks);
-}
-
-function callClient<T>(client: Client, data: unknown): Promise<T> {
-	return new Promise<T>(resolve => {
-		const channel = new MessageChannel();
-		channel.port1.onmessage = event => resolve(event.data);
-		client.postMessage(data, [channel.port2]);
-	});
+	return clientList[0] === id;
 }

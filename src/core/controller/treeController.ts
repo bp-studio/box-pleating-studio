@@ -21,31 +21,12 @@ export namespace TreeController {
 
 	/**
 	 * Delete leaves one by one.
-	 * @param ids The node ids that should be deleted.
+	 * @param ids The node ids that should be deleted. Must be in correct ordering.
 	 * @param prototypes The {@link JFlap}s corresponding to the new leaves after deletion.
 	 */
 	export function removeLeaf(ids: number[], prototypes: JFlap[]): void {
 		const tree = State.$tree;
-		while(ids.length) {
-			const nodes = ids.map(id => tree.$nodes[id]!);
-			ids.length = 0;
-			nodes.sort((a, b) => b.$dist - a.$dist);
-			for(const node of nodes) {
-				if(!tree.$removeLeaf(node.id)) ids.push(node.id);
-			}
-
-			if(ids.length) {
-				// If we enter here, it means that the requested deletion covers the current tree root,
-				// and we can only perform the full update and then continue.
-				// Although this is not the optimal solution in terms of performance,
-				// such requests are almost never encountered in practice.
-				// This block of code is mainly added for correctness in theory.
-				// Additionally, this process may cause some garbage data to be inserted into the updated model,
-				// which the Client needs to be aware of.
-				Processor.$run(heightTask);
-			}
-		}
-
+		for(const id of ids) tree.$removeLeaf(id);
 		tree.$setFlaps(prototypes);
 		Processor.$run(heightTask);
 	}

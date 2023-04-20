@@ -140,6 +140,11 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 				};
 				flap.$sync(grid.$constrain(p));
 			}
+		} else if(!pendingFlush) {
+			pendingFlush = Promise.resolve().then(() => {
+				pendingFlush = undefined;
+				this.$project.history.$flush();
+			});
 		}
 	}
 
@@ -169,3 +174,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this.$label.$draw(this.name, this.$location.x, this.$location.y);
 	}
 }
+
+/**
+ * If only established vertices are moving, the Core is not invoked,
+ * and the history can be flushed right away. We use this {@link Promise}
+ * to control the flushing.
+ */
+let pendingFlush: Promise<void> | undefined;

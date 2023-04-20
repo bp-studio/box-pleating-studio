@@ -1,6 +1,6 @@
 import { shallowRef } from "vue";
 
-import { isServiceWorker } from "app/shared/constants";
+import { isHttps } from "app/shared/constants";
 
 //=================================================================
 /**
@@ -11,7 +11,7 @@ import { isServiceWorker } from "app/shared/constants";
 
 const ready = shallowRef(false);
 
-if(isServiceWorker) {
+if(isHttps) {
 	// Safari may have stronger caching for service worker,
 	// and onupdatefound event may not work on older version of Safari,
 	// but eventually the service worker and the app it will update.

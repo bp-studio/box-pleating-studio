@@ -23,6 +23,11 @@ export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask)
 const pendingDelete = new Set<number>();
 
 function junction(): void {
+	// Delete junctions related to deleted nodes
+	for(const id of State.$updateResult.remove.nodes) {
+		State.$junctions.delete(id);
+	}
+
 	if(State.$junctions.size > 0) {
 		// If one of the flaps changes, list it as pending delete.
 		for(const flap of State.$flapChanged) {
@@ -40,13 +45,6 @@ function junction(): void {
 		State.$junctions.delete(...getPair(key));
 	}
 	pendingDelete.clear();
-}
-
-function getNontrivialDescendant(node: ITreeNode): ITreeNode {
-	while(node.$children.$size === 1) {
-		node = node.$children.$get()!;
-	}
-	return node;
 }
 
 function getCollisionOfLCA(lca: ITreeNode): void {
@@ -86,4 +84,11 @@ function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
 			for(const c of b.$children) compare(a, c, lca);
 		}
 	}
+}
+
+function getNontrivialDescendant(node: ITreeNode): ITreeNode {
+	while(node.$children.$size === 1) {
+		node = node.$children.$get()!;
+	}
+	return node;
 }

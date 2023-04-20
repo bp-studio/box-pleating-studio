@@ -6,7 +6,6 @@ import type { Typeless } from "./command";
 import type { ITagObject } from "client/shared/interface";
 import type { JCommand } from "shared/json/history";
 
-
 export interface JFieldCommand extends JCommand {
 	readonly prop: string;
 	readonly old: unknown;

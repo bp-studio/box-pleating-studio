@@ -3,6 +3,7 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { drawPath } from "client/utils/contourUtil";
 
+import type { Project } from "client/project/project";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";
@@ -20,6 +21,8 @@ const MIN_SIZE = 6;
 
 export class DiagonalGrid implements IGrid {
 
+	public readonly $tag: string;
+	public readonly $project: Project;
 	public readonly type = GridType.diagonal;
 
 	private readonly _sheet: Sheet;
@@ -29,6 +32,8 @@ export class DiagonalGrid implements IGrid {
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		this._sheet = sheet;
+		this.$project = sheet.$project;
+		this.$tag = sheet.$tag + ".g";
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
 		this._testSize = this._size = Math.round((width + height) / 2);

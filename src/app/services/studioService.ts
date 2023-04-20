@@ -110,6 +110,9 @@ namespace StudioService {
 	export function unselectAll(): void {
 		bp.selection.clear();
 	}
+	export function del(): void {
+		project.value?.design.delete();
+	}
 	export function svg(proj: Project): Promise<Blob> {
 		return Promise.resolve(bp.svg(proj, Settings.includeHiddenElement));
 	}

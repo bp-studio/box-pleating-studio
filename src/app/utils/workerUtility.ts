@@ -1,4 +1,3 @@
-import { isServiceWorker } from "app/shared/constants";
 
 //=================================================================
 /**
@@ -13,14 +12,10 @@ import { isServiceWorker } from "app/shared/constants";
  */
 export function callService<T = unknown>(data: unknown): Promise<T> {
 	return new Promise((resolve, reject) => {
-		if(isServiceWorker) {
-			navigator.serviceWorker.ready.then(reg => {
-				if(!reg || !reg.active) return reject(); // Safari might get here on first usage
-				callWorker<T>(reg.active, data).then(resolve, reject);
-			}, reject);
-		} else {
-			reject();
-		}
+		navigator.serviceWorker.ready.then(reg => {
+			if(!reg || !reg.active) return reject(); // Safari might get here on first usage
+			callWorker<T>(reg.active, data).then(resolve, reject);
+		}, reject);
 	});
 }
 

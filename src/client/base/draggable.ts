@@ -54,13 +54,19 @@ export abstract class Draggable extends Control {
 		this._move(this.$location.x + v.x, this.$location.y + v.y);
 	}
 
+	/** Directly assign a new location. Used only in history navigation. */
+	public $assign(v: IPoint): void {
+		this._move(v.x, v.y);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** Trigger movement */
 	protected _move(x: number, y: number): void {
-		this.$location = { x, y };
-		//TODO: crete MoveCommand
+		const location = { x, y };
+		this.$project.history.$move(this, location);
+		this.$location = location;
 	}
 }
