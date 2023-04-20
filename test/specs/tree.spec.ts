@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { Tree } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
+import { State } from "core/service/state";
 
 describe("Tree", function() {
 
@@ -11,6 +12,7 @@ describe("Tree", function() {
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
 		]);
+		State.$tree = tree;
 		Processor.$run(heightTask);
 
 		expect(tree.$nodes.filter(n => n).length).to.equal(3);
@@ -23,6 +25,7 @@ describe("Tree", function() {
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
 		]);
+		State.$tree = tree;
 		Processor.$run(heightTask);
 
 		const n0 = tree.$nodes[0]!;
@@ -45,6 +48,7 @@ describe("Tree", function() {
 			{ n1: 2, n2: 3, length: 2 },
 			{ n1: 3, n2: 4, length: 2 },
 		]);
+		State.$tree = tree;
 		Processor.$run(heightTask);
 
 		const n2 = tree.$nodes[2]!;
@@ -72,6 +76,7 @@ describe("Tree", function() {
 			{ n1: 2, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
 		]);
+		State.$tree = tree;
 		Processor.$run(heightTask);
 
 		const n0 = tree.$nodes[0]!;
@@ -96,6 +101,7 @@ describe("Tree", function() {
 			{ n1: 2, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
 		]);
+		State.$tree = tree;
 		Processor.$run(heightTask);
 
 		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
@@ -109,6 +115,7 @@ describe("Tree", function() {
 			{ n1: 0, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
 		]);
+		State.$tree = tree;
 
 		const n0 = tree.$nodes[0]!;
 		const n1 = tree.$nodes[1]!;
