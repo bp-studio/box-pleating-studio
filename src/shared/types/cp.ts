@@ -14,5 +14,8 @@ export enum CreaseType {
 	Auxiliary = 4,
 }
 
-/** This follows ORIPA's format.*/
+/**
+ * This follows ORIPA's format.
+ * It goes like `[type, x1, y1, x2, y2]`.
+ */
 export type CPLine = [CreaseType, number, number, number, number];

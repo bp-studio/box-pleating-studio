@@ -1,7 +1,5 @@
 const all = require("gulp-all");
 const esbuild = require("gulp-esbuild");
-const exg = require("esbuild-plugin-external-global").externalGlobalPlugin;
-const fs = require("fs");
 const gulp = require("gulp");
 const gulpSass = require("gulp-sass");
 const postcss = require("gulp-postcss");

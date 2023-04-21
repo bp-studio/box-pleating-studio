@@ -90,6 +90,9 @@
 	import Workspace from "app/services/workspaceService";
 	import Import from "app/services/importService";
 
+	// See https://caniuse.com/web-app-manifest
+	// for browser support for standalone installation.
+
 	enum installState {
 		uninstalled = 0,
 		installing = 1,

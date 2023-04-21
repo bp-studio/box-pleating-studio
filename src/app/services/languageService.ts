@@ -91,8 +91,17 @@ namespace LanguageService {
 		return DEFAULT_LOCALE;
 	}
 
+	/**
+	 * Normalize the language codes returned by browsers.
+	 *
+	 * See https://datatracker.ietf.org/doc/html/rfc5646 for docs.
+	 */
 	function format(l: string): string {
-		return l.replace(/_/g, "-").toLowerCase();
+		return l.replace(/_/g, "-")
+			.toLowerCase()
+			// Firefox Android returns "zh-Hant-TW" instead of "zh-TW"
+			.replace(/^zh(-\w+)?-hant.*$/, "zh-tw")
+			.replace(/^zh(-\w+)?-hans.*$/, "zh-cn");
 	}
 
 	export let onReset: Action;
