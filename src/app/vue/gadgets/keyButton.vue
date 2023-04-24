@@ -1,5 +1,7 @@
 <template>
-	<i v-on:touchstart.passive="down(750, $event)" v-on:touchend="up" v-on:touchcancel="up" />
+	<div v-on:touchstart.passive="down(750, $event)" v-on:touchend="up" v-on:touchcancel="up">
+		<i :class="icon" />
+	</div>
 </template>
 
 <script lang="ts">
@@ -16,6 +18,7 @@
 
 	const props = defineProps<{
 		dir: DirectionKey;
+		icon: string;
 	}>();
 
 	function down(repeat: number, e?: Event): void {

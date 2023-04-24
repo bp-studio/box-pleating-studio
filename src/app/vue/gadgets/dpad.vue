@@ -1,9 +1,9 @@
 <template>
 	<div id="divDPad" v-bind:class="{ 'show': show, 'disabled': Studio.isDragging }">
-		<KeyButton class="bp-up" style="top: 0; left: 2.5rem;" dir="up" />
-		<KeyButton class="bp-left" style="top: 2.5rem;left: 0;" dir="left" />
-		<KeyButton class="bp-right" style="top: 2.5rem;left: 5rem;" dir="right" />
-		<KeyButton class="bp-down" style="top: 5rem; left: 2.5rem;" dir="down" />
+		<KeyButton icon="bp-up" style="top: -0.5rem; left: 2rem;" dir="up" />
+		<KeyButton icon="bp-left" style="top: 2rem; left: -0.5rem;" dir="left" />
+		<KeyButton icon="bp-right" style="top: 2rem; left: 4.5rem;" dir="right" />
+		<KeyButton icon="bp-down" style="top: 4.5rem; left: 2rem;" dir="down" />
 	</div>
 </template>
 
@@ -32,6 +32,7 @@
 		border-radius: 3.75rem;
 		background-color: var(--bs-primary);
 		opacity: 0;
+		overflow: hidden;
 		pointer-events: none;
 		transition-property: opacity;
 
@@ -53,13 +54,22 @@
 			}
 		}
 
-		i {
-			padding: 0.25rem;
-			height: 2.5rem;
-			width: 2.5rem;
-			font-size: 2rem;
+		div {
+			padding: 0.75rem;
 			color: white;
 			position: absolute;
+			line-height: 1;
+
+			/* Create diamond shaped clicking area. */
+			transform: rotate(45deg);
+		}
+
+		i {
+			display: inline-block;
+			height: 2rem;
+			width: 2rem;
+			font-size: 2rem;
+			transform: rotate(-45deg);
 		}
 	}
 </style>
