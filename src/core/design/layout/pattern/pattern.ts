@@ -21,6 +21,8 @@ export class Pattern implements ISerializable<JPattern> {
 
 	public $devices: readonly Device[];
 
+	public $originDirty: boolean = false;
+
 	constructor(config: Configuration, devices: JDevice[]) {
 		this.$config = config;
 		this.$devices = devices.map((d, i) => new Device(this, config.$partitions[i], d));
@@ -40,5 +42,11 @@ export class Pattern implements ISerializable<JPattern> {
 			const [i, j] = this.$config.$overlapMap.get(c.e)!;
 			return this.$devices[i].$anchors[j][c.q];
 		}
+	}
+
+	public $tryUpdateOrigin(): void {
+		if(!this.$originDirty) return;
+		this.$devices.forEach(d => State.$movedDevices.add(d));
+		this.$originDirty = false;
 	}
 }

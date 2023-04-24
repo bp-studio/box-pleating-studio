@@ -4,10 +4,10 @@ import { cache } from "core/utils/cache";
 import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
+import { Vector } from "core/math/geometry/vector";
 
 import type { Partition } from "../partition";
 import type { JDevice, JConnection } from "shared/json";
-import type { Vector } from "core/math/geometry/vector";
 import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
 import type { Pattern } from "./pattern";
@@ -28,11 +28,17 @@ export class Device implements ISerializable<JDevice> {
 
 	public $anchors!: readonly Point[][];
 
+	private _delta!: Vector;
+	private _location: IPoint;
+	private readonly _originalDisplacement: Vector;
+
 	constructor(pattern: Pattern, partition: Partition, data: JDevice) {
 		this.$pattern = pattern;
 		this.$partition = partition;
 		this.$gadgets = data.gadgets.map(g => new Gadget(g));
 		this.$addOns = data.addOns?.map(a => new AddOn(a)) ?? [];
+		this._originalDisplacement = partition.$getOriginalDisplacement(pattern);
+		this._location = { x: 0, y: 0 };
 
 		// Collect regions
 		const regions: Region[] = [];
@@ -40,7 +46,7 @@ export class Device implements ISerializable<JDevice> {
 		regions.push(...this.$addOns);
 		this._regions = regions;
 
-		this.$updateAnchors();
+		this.$updatePosition();
 	}
 
 	public toJSON(): JDevice {
@@ -54,7 +60,13 @@ export class Device implements ISerializable<JDevice> {
 	// Public members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public $updateAnchors(): void {
+	/** Update parameters after the {@link Device} have moved. */
+	public $updatePosition(): void {
+		// Update delta
+		const origin = this.$pattern.$config.$repo.$origin.$add(this._originalDisplacement);
+		this._delta = origin.$add(new Vector(this._location)).sub(Point.ZERO);
+
+		// Update anchors
 		const result: Point[][] = [];
 		for(const g of this.$gadgets) {
 			result.push(g.$anchorMap.map(m => this._transform(m[0])));
@@ -110,11 +122,6 @@ export class Device implements ISerializable<JDevice> {
 	private _transform<T extends Point | Line>(obj: T): T {
 		const f = this.$pattern.$config.$repo.$f;
 		return obj.$transform(f.x, f.y).$add(this._delta) as T;
-	}
-
-	private get _delta(): Vector {
-		//TODO: originalDisplacement and location
-		return this.$pattern.$config.$repo.$origin.sub(Point.ZERO);
 	}
 
 	/**

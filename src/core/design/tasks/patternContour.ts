@@ -12,8 +12,5 @@ import type { NodeGraphics } from "../context";
 export const patternContourTask = new Task(patternContour, graphicsTask);
 
 function patternContour(): void {
-
-	for(const device of State.$movedDevices) device.$updateAnchors();
-
 	//TODO: generate pattern contours based on selected patterns and locations.
 }

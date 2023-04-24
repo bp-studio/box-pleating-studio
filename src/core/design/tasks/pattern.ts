@@ -17,6 +17,9 @@ function pattern(): void {
 		if(State.$isDragging) repo.$init();
 		else repo.$complete();
 	}
+
+	for(const device of State.$movedDevices) device.$updatePosition();
+
 	for(const repo of State.$repoUpdated) {
 		const id = repo.$stretch.$id;
 		if(repo.$pattern) {
@@ -24,14 +27,6 @@ function pattern(): void {
 				data: repo.$stretch.toJSON(),
 				repo: repo.toJSON(),
 			};
-			for(const [i, device] of repo.$pattern.$devices.entries()) {
-				State.$updateResult.graphics["s" + id + "." + i] = {
-					contours: device.$contour,
-					ridges: device.$ridges,
-					axisParallel: device.$axisParallels,
-					forward: repo.$f.x == repo.$f.y,
-				};
-			}
 			for(const n of repo.$nodeIds) {
 				State.$contourWillChange.add(State.$tree.$nodes[n]!);
 			}

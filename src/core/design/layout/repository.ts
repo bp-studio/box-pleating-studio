@@ -29,8 +29,14 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** Coefficient of transformation; same as the {@link ValidJunction.$f $f} of the first junction. */
 	public readonly $f: ISignPoint;
 
-	/** The reference point of the stretch. */
-	public readonly $origin: Point;
+	/**
+	 * The reference point of the stretch,
+	 * which is the {@link ValidJunction.$tip} of the first junction.
+	 *
+	 * When all flaps involved moved simultaneously,
+	 * we can use this to move the {@link Pattern}.
+	 */
+	public $origin: Point;
 
 	/** Quadrant codes involved (possibly duplicated). */
 	public readonly $quadrants: number[];
@@ -38,9 +44,8 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** Node ids involved. */
 	public readonly $nodeIds: number[];
 
-	public $index: number = 0;
-
 	private readonly _configurations: Store<Configuration>;
+	private _index: number = 0;
 
 	constructor(stretch: Stretch, junctions: ValidJunction[], signature: string, prototype?: JStretch) {
 		this.$stretch = stretch;
@@ -71,16 +76,21 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		if(!this._configurations.$done) return undefined;
 		return {
 			configCount: this.$configurations.length,
-			configIndex: this.$index,
+			configIndex: this._index,
 			patternCount: this.$configuration!.$length!,
 			patternIndex: this.$configuration!.$index,
 		};
 	}
 
+	public set $index(v: number) {
+		this._index = v;
+		this.$configuration?.$tryUpdateOrigin();
+	}
+
 	public get $configuration(): Configuration | null {
 		const configurations = this._configurations.$entries;
 		if(configurations.length === 0) return null;
-		return configurations[this.$index];
+		return configurations[this._index];
 	}
 
 	public get $configurations(): readonly Configuration[] {
@@ -102,5 +112,15 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		for(const config of this._configurations.$entries) {
 			config.$complete();
 		}
+	}
+
+	/** Try to update {@link $origin}, and return if changes has been made. */
+	public $tryUpdateOrigin(origin: IPoint): boolean {
+		if(this.$origin.eq(origin)) return false;
+
+		this.$origin = new Point(origin);
+		this.$configurations.forEach(c => c.$originDirty = true);
+		this.$configuration?.$tryUpdateOrigin();
+		return true;
 	}
 }

@@ -11,12 +11,28 @@ import type { ITreeNode } from "../context";
 
 //=================================================================
 /**
- * {@link graphicsTask} generates the final {@link GraphicsData} for flaps and rivers.
+ * {@link graphicsTask} generates the final {@link GraphicsData}.
  */
 //=================================================================
 export const graphicsTask = new Task(graphics);
 
 function graphics(): void {
+	// Devices
+	for(const repo of State.$repoUpdated) {
+		const id = repo.$stretch.$id;
+		if(repo.$pattern) {
+			for(const [i, device] of repo.$pattern.$devices.entries()) {
+				State.$updateResult.graphics["s" + id + "." + i] = {
+					contours: device.$contour,
+					ridges: device.$ridges,
+					axisParallel: device.$axisParallels,
+					forward: repo.$f.x == repo.$f.y,
+				};
+			}
+		}
+	}
+
+	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
 		//TODO: combine rough contours and pattern contours
 		node.$graphics.$contours = node.$graphics.$roughContours;

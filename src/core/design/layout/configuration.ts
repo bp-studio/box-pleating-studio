@@ -27,7 +27,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 	public readonly $overlapMap!: ReadonlyMap<number, [number, number]>;
 
 	private readonly _patterns: Store<Pattern>;
-	public $index: number = 0;
+	private _index: number = 0;
+
+	public $originDirty: boolean = false;
 
 	constructor(repo: Repository, junctions: JJunction[], partitions: JPartition[]) {
 		this.$repo = repo;
@@ -58,6 +60,11 @@ export class Configuration implements ISerializable<JConfiguration> {
 		};
 	}
 
+	public set $index(v: number) {
+		this._index = v;
+		this.$pattern?.$tryUpdateOrigin();
+	}
+
 	public get $length(): number | undefined {
 		return this._patterns.$length;
 	}
@@ -65,10 +72,17 @@ export class Configuration implements ISerializable<JConfiguration> {
 	public get $pattern(): Pattern | null {
 		const patterns = this._patterns.$entries;
 		if(patterns.length === 0) return null;
-		return patterns[this.$index];
+		return patterns[this._index];
 	}
 
 	public $complete(): void {
 		this._patterns.$rest();
+	}
+
+	public $tryUpdateOrigin(): void {
+		if(!this.$originDirty) return;
+		this._patterns.$entries.forEach(p => p.$originDirty = true);
+		this.$pattern?.$tryUpdateOrigin();
+		this.$originDirty = false;
 	}
 }
