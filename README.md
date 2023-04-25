@@ -13,6 +13,8 @@
 
 > Super-complex origami design made easy!
 
+**NOTE: The next version of BP Studio is currently under heavy development, so you won't be seeing recent activities on the main branch. Check out the [DEV](https://github.com/bp-studio/box-pleating-studio/tree/DEV) branch for more details.**
+
 ## Introduction
 
 Box pleating is arguably the standard framework of modern super-complex origami designs,
@@ -29,7 +31,7 @@ For instruction, user manual and all other general info, pleas visit [BP Studio 
 If you notice any bugs, or have any suggestions, feel free to drop an issue [here](https://github.com/bp-studio/box-pleating-studio/issues).\
 If you use BP Studio to create new designs, please share your work with us [here](https://github.com/bp-studio/box-pleating-studio/discussions).
 
-**New**: Join our new [Discord server](https://discord.gg/HkcdTDS4zZ)!
+Also, please join our [Discord server](https://discord.gg/HkcdTDS4zZ) for all discussions!
 
 ## For contributors
 
