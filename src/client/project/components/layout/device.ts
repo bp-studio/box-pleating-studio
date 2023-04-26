@@ -25,16 +25,18 @@ export class Device extends Draggable {
 	public $graphics: GraphicsData;
 
 	public readonly stretch: Stretch;
+	public readonly $index: number;
 
 	private readonly _shade: Graphics;
 	private readonly _ridge: SmoothGraphics;
 	private readonly _axisParallels: SmoothGraphics;
 
 
-	constructor(stretch: Stretch, tag: string, graphics: GraphicsData) {
+	constructor(stretch: Stretch, index: number, graphics: GraphicsData) {
 		const sheet = stretch.$layout.$sheet;
 		super(sheet);
-		this.$tag = tag;
+		this.$tag = stretch.$tag + "." + index;
+		this.$index = index;
 		this.stretch = stretch;
 
 		this.$graphics = graphics;
@@ -48,6 +50,22 @@ export class Device extends Draggable {
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Control methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public override $constrainBy(v: IPoint): IPoint {
+		const f = this.$graphics.forward ? 1 : -1;
+		const d = Math.round((v.x + f * v.y) / 2);
+		return { x: d, y: f * d };
+	}
+
+	protected override _move(x: number, y: number): void {
+		super._move(x, y);
+		console.log(x, y);
+		this.stretch.$layout.$moveDevice(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@ export abstract class Draggable extends Control {
 	}
 
 	/**
-	 * Fix the given vector to the range of allowing movements.
+	 * Fix the given movement vector to the allowing range.
 	 * The default behavior is fix it to the zero vector
 	 * (in other words, this {@link Draggable} cannot be moved).
 	 */

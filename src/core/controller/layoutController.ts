@@ -65,16 +65,25 @@ export namespace LayoutController {
 		return clip.$get(lines);
 	}
 
-	export function moveConfig(stretchId: string, to: number): void {
+	export function switchConfig(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		stretch.$repo.$index = to;
 		State.$repoUpdated.add(stretch.$repo);
 		Processor.$run(patternTask);
 	}
 
-	export function movePattern(stretchId: string, to: number): void {
+	export function switchPattern(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		stretch.$repo.$configuration!.$index = to;
+		State.$repoUpdated.add(stretch.$repo);
+		Processor.$run(patternTask);
+	}
+
+	export function moveDevice(stretchId: string, index: number, location: IPoint): void {
+		const stretch = State.$stretches.get(stretchId)!;
+		const device = stretch.$repo.$pattern!.$devices[index];
+		device.$location = location;
+		State.$movedDevices.add(device);
 		State.$repoUpdated.add(stretch.$repo);
 		Processor.$run(patternTask);
 	}

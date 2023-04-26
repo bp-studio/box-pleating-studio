@@ -26,10 +26,9 @@ For instruction, user manual and all other general info, pleas visit [BP Studio 
 
 ## Feedbacks are greatly appreciated!
 
-If you notice any bugs, or have any suggestions, feel free to drop an issue [here](https://github.com/bp-studio/box-pleating-studio/issues).\
-If you use BP Studio to create new designs, please share your work with us [here](https://github.com/bp-studio/box-pleating-studio/discussions).
-
-**New**: Join our new [Discord server](https://discord.gg/HkcdTDS4zZ)!
+Our [Discord server](https://discord.gg/HkcdTDS4zZ) will be our main channel for all sorts of discussions,
+but of course you could also use GitHub [Issues](https://github.com/bp-studio/box-pleating-studio/issues)
+and [Discussions](https://github.com/bp-studio/box-pleating-studio/discussions) as well.
 
 ## For contributors
 

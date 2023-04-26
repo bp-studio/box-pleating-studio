@@ -5,9 +5,9 @@
 			<label class="col-form-label col" v-t="'panel.repo.onlyOne'"></label>
 		</div>
 		<div class="panel-grid" v-else>
-			<Store :size="stretch.repo.configCount" :index="stretch.repo.configIndex" @move="stretch.moveConfig($event)"
+			<Store :size="stretch.repo.configCount" :index="stretch.repo.configIndex" @move="stretch.switchConfig($event)"
 				   :label="$t('panel.repo.config')"></store>
-			<Store :size="stretch.repo.patternCount" :index="stretch.repo.patternIndex" @move="stretch.movePattern($event)"
+			<Store :size="stretch.repo.patternCount" :index="stretch.repo.patternIndex" @move="stretch.switchPattern($event)"
 				   :label="$t('panel.repo.pattern')"></Store>
 		</div>
 	</template>

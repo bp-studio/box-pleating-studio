@@ -81,8 +81,8 @@ namespace CustomHotkeyService {
 		const stretch = Studio.stretch;
 		if(!stretch) return;
 		const f = command.endsWith("n") ? 1 : -1;
-		if(command.startsWith("c")) stretch.moveConfig(f);
-		else stretch.movePattern(f);
+		if(command.startsWith("c")) stretch.switchConfig(f);
+		else stretch.switchPattern(f);
 	}
 
 	/** Processing toggling and zooming of views */

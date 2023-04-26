@@ -44,7 +44,11 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		return this._data.repo;
 	}
 
-	public moveConfig(by: number): void {
+	public get id(): string {
+		return this._data.data.id;
+	}
+
+	public switchConfig(by: number): void {
 		const repo = this._data.repo;
 		if(!repo) return;
 		const i = repo.configIndex;
@@ -52,10 +56,10 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		//TODO: need to consider history here
 		SelectionController.clear();
 		SelectionController.$toggle(this, true);
-		this.$layout.$moveConfig(this._data.data.id, (i + by + l) % l);
+		this.$layout.$switchConfig(this.id, (i + by + l) % l);
 	}
 
-	public movePattern(by: number): void {
+	public switchPattern(by: number): void {
 		const repo = this._data.repo;
 		if(!repo) return;
 		const i = repo.patternIndex;
@@ -63,7 +67,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		//TODO: need to consider history here
 		SelectionController.clear();
 		SelectionController.$toggle(this, true);
-		this.$layout.$movePattern(this._data.data.id, (i + by + l) % l);
+		this.$layout.$switchPattern(this.id, (i + by + l) % l);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +94,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 			if(device) {
 				device.$redraw(graphics);
 			} else {
-				this._devices[i] = new Device(this, deviceTag, graphics);
+				this._devices[i] = new Device(this, i, graphics);
 				this.$layout.$sheet.$addChild(this._devices[i]);
 				this.$addChild(this._devices[i]);
 			}

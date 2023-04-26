@@ -27,9 +27,9 @@ export class Device implements ISerializable<JDevice> {
 	private readonly _regions: readonly Region[];
 
 	public $anchors!: readonly Point[][];
+	public $location: IPoint;
 
 	private _delta!: Vector;
-	private _location: IPoint;
 	private readonly _originalDisplacement: Vector;
 
 	constructor(pattern: Pattern, partition: Partition, data: JDevice) {
@@ -38,7 +38,7 @@ export class Device implements ISerializable<JDevice> {
 		this.$gadgets = data.gadgets.map(g => new Gadget(g));
 		this.$addOns = data.addOns?.map(a => new AddOn(a)) ?? [];
 		this._originalDisplacement = partition.$getOriginalDisplacement(pattern);
-		this._location = { x: 0, y: 0 };
+		this.$location = { x: 0, y: 0 };
 
 		// Collect regions
 		const regions: Region[] = [];
@@ -64,7 +64,7 @@ export class Device implements ISerializable<JDevice> {
 	public $updatePosition(): void {
 		// Update delta
 		const origin = this.$pattern.$config.$repo.$origin.$add(this._originalDisplacement);
-		this._delta = origin.$add(new Vector(this._location)).sub(Point.ZERO);
+		this._delta = origin.$add(new Vector(this.$location)).sub(Point.ZERO);
 
 		// Update anchors
 		const result: Point[][] = [];

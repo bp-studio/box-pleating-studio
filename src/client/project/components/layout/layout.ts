@@ -13,6 +13,7 @@ import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 
+import type { Device } from "./device";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
@@ -139,12 +140,16 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._pendingUpdate.add(flap);
 	}
 
-	public $moveConfig(stretchId: string, to: number): void {
-		this.$project.$core.layout.moveConfig(stretchId, to);
+	public $switchConfig(stretchId: string, to: number): void {
+		this.$project.$core.layout.switchConfig(stretchId, to);
 	}
 
-	public $movePattern(stretchId: string, to: number): void {
-		this.$project.$core.layout.movePattern(stretchId, to);
+	public $switchPattern(stretchId: string, to: number): void {
+		this.$project.$core.layout.switchPattern(stretchId, to);
+	}
+
+	public $moveDevice(device: Device): void {
+		this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location);
 	}
 
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {

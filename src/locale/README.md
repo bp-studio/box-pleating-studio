@@ -13,7 +13,7 @@ You will find the VS Code extension [i18n Ally](https://marketplace.visualstudio
 The author would like to thank the following people for reviewing the locales,
 in the order of appearance.
 They are not responsible for any uncaught translation mistakes,
-especially those that are done after their reviewing.
+especially those that were added after their reviewing.
 
 - Prof. Jun Mitani and Prof. Tachi Tomohiro for Japanese.
 - Sr. "Picaruelo" Fernando Sánchez&#8209;Biezma for Spanish.
