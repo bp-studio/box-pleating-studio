@@ -5,6 +5,8 @@ import { $getEventCenter, $round } from "./share";
 import { CursorController } from "./cursorController";
 import ProjectService from "client/services/projectService";
 import { display } from "client/screen/display";
+import { isTypedArray } from "shared/utils/array";
+import { Device } from "client/project/components/layout/device";
 
 import type { Draggable } from "client/base/draggable";
 import type { ShallowRef } from "vue";
@@ -38,6 +40,10 @@ export namespace DragController {
 		}
 
 		const selections = SelectionController.draggables.value;
+
+		// For devices, the vector needs to be doubled.
+		if(isTypedArray(selections, Device)) v = { x: 2 * v.x, y: 2 * v.y };
+
 		for(const d of selections) v = d.$constrainBy(v);
 		for(const d of selections) d.$moveBy(v);
 	}
