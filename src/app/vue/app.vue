@@ -34,7 +34,7 @@
 				</div>
 				<div class="btn-group">
 					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Help">
-						<i class="bp-info"></i>
+						<i class="bp-question-circle"></i>
 					</button>
 				</div>
 			</div>

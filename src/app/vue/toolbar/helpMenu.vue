@@ -63,7 +63,7 @@
 		notify.value = v < logs[logs.length - 1];
 	});
 
-	const icon = computed(() => checking.value ? "bp-spinner fa-spin" : "bp-info");
+	const icon = computed(() => checking.value ? "bp-spinner fa-spin" : "bp-question-circle");
 
 	async function update(): Promise<void> {
 		if(!await Dialogs.confirm(i18n.t("message.updateReady"))) return;

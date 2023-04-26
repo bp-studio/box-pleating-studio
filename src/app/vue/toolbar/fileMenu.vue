@@ -19,11 +19,11 @@
 				<Hotkey icon="fas fa-save" ctrl shift hk="S">{{ $t('toolbar.file.BPS.saveAs') }}</Hotkey>
 			</SaveAs>
 			<DropdownItem :disabled="!Studio.project" @click="saveAll()">
-				<Hotkey icon="fas fa-save" ctrl hk="K">{{ $t('toolbar.file.BPS.saveAll') }}</Hotkey>
+				<Hotkey icon="bp-save-all" ctrl hk="K">{{ $t('toolbar.file.BPS.saveAll') }}</Hotkey>
 			</DropdownItem>
 			<SaveAs :disabled="!Studio.project" type="bpz" ref="bpz" @save="notifyAll($event)" :desc="$t('toolbar.file.BPZ.name')"
 					mime="application/bpstudio.workspace+zip">
-				<Hotkey icon="fas fa-save">{{ $t('toolbar.file.BPZ.save') }}</Hotkey>
+				<Hotkey icon="bp-save-all">{{ $t('toolbar.file.BPZ.save') }}</Hotkey>
 			</SaveAs>
 		</template>
 		<template v-else>
@@ -34,7 +34,7 @@
 				<Hotkey icon="fas fa-download" ctrl hk="S">{{ $t('toolbar.file.BPS.download') }}</Hotkey>
 			</DropdownItem>
 			<DropdownItem :disabled="!Studio.project" ref="bpz" @click="show('bpz')">
-				<Hotkey icon="fas fa-download">{{ $t('toolbar.file.BPZ.download') }}</Hotkey>
+				<Hotkey icon="bp-save-all">{{ $t('toolbar.file.BPZ.download') }}</Hotkey>
 			</DropdownItem>
 		</template>
 
@@ -177,7 +177,7 @@
 
 	async function saveAll(): Promise<void> {
 		const tasks: Promise<boolean>[] = [];
-		for(const id of Workspace.ids) tasks.push(save(id));
+		for(const id of Workspace.ids.value) tasks.push(save(id));
 		await Promise.all(tasks); // The failure to save individual files will not affect the saving of other files
 		gtag("event", "project_bps");
 	}

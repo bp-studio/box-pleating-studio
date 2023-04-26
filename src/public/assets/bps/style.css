@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'bps';
   src:
-    url('fonts/bps.ttf?3tgtqv') format('truetype'),
-    url('fonts/bps.woff?3tgtqv') format('woff'),
-    url('fonts/bps.svg?3tgtqv#bps') format('svg');
+    url('fonts/bps.ttf?3xnetu') format('truetype'),
+    url('fonts/bps.woff?3xnetu') format('woff'),
+    url('fonts/bps.svg?3xnetu#bps') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -47,6 +47,9 @@
 }
 .bp-file-alt:before {
   content: "\e90b";
+}
+.bp-save-all:before {
+  content: "\e912";
 }
 .bp-layout:before {
   content: "\e900";
