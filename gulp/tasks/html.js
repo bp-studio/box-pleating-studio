@@ -1,7 +1,5 @@
-const all = require("gulp-all");
+const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const htmlMin = require("gulp-html-minifier-terser");
-const replace = require("gulp-replace");
 
 const newer = require("../utils/newer");
 const { ssgI18n } = require("../utils/esbuild");
@@ -22,15 +20,25 @@ function ssg() {
 	});
 }
 
+gulp.task("syncVersion", () => {
+	const package = require("../../package.json");
+	return gulp.src(config.src.public + "/index.htm")
+		.pipe($.replace(
+			/<meta name="version" content="[^"]+">/,
+			`<meta name="version" content="${package.version}">`
+		))
+		.pipe(gulp.dest(config.src.public));
+});
+
 /** Bump version of HTML file */
 gulp.task("version", () =>
 	gulp.src(config.src.public + "/index.htm")
-		.pipe(replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`))
+		.pipe($.replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`))
 		.pipe(gulp.dest(config.src.public))
 );
 
 /** Main HTML task */
-gulp.task("html", () => all(
+gulp.task("html", () => $.all(
 	// Debug
 	gulp.src(config.src.public + "/index.htm")
 		.pipe(newer({
@@ -47,9 +55,9 @@ gulp.task("html", () => all(
 			dest: config.dest.dist + "/index.htm",
 			extra: [__filename, config.src.app + "/**/*"],
 		}))
-		.pipe(htmlMin(htmlMinOption))
+		.pipe($.htmlMinifierTerser(htmlMinOption))
 		// Avoid VS Code Linter warnings
-		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+		.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
 		.pipe(ssg())
 		.pipe(gulp.dest(config.dest.dist))
 ));

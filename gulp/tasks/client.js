@@ -1,8 +1,6 @@
-const esbuild = require("gulp-esbuild");
+const $ = require("../utils/proxy");
 const exg = require("@fal-works/esbuild-plugin-global-externals").globalExternals;
 const gulp = require("gulp");
-const replace = require("gulp-replace");
-const terser = require("gulp-terser");
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
@@ -59,7 +57,7 @@ const exgConfig = {
 };
 
 function esb(options) {
-	return esbuild(Object.assign({}, {
+	return $.esbuild(Object.assign({}, {
 		outfile: "client.js",
 		bundle: true,
 		globalName: "bp",
@@ -86,7 +84,7 @@ gulp.task("clientDebug", () =>
 			sourceRoot: "../../",
 		}))
 		.pipe(sourceMap())
-		.pipe(terser({
+		.pipe($.terser({
 			ecma: 2018,
 			compress: {
 				defaults: false,
@@ -112,8 +110,8 @@ gulp.task("clientDist", () =>
 			extra,
 		}))
 		.pipe(esb({ minify: true })) // This will still make a slight difference even we've used terser
-		.pipe(replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
-		.pipe(terser({
+		.pipe($.replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
+		.pipe($.terser({
 			ecma: 2018,
 			compress: {
 				drop_debugger: false,
@@ -128,7 +126,7 @@ gulp.task("clientDist", () =>
 				comments: false,
 			},
 		}))
-		.pipe(replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
+		.pipe($.replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest(config.dest.dist))
 );
 

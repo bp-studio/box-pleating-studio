@@ -1,5 +1,4 @@
-const purge = require("gulp-purgecss");
-const replace = require("gulp-replace");
+const $ = require("./proxy");
 
 const config = require("../config.json");
 
@@ -19,7 +18,7 @@ const compare = [
  */
 module.exports.purge = function(stream) {
 	return stream
-		.pipe(purge({
+		.pipe($.purgecss({
 			content: compare,
 			safelist: {
 				standard: [/backdrop/], // for Bootstrap Modal
@@ -36,7 +35,7 @@ module.exports.purge = function(stream) {
 			// for Bootstrap
 			variables: true,
 		}))
-		.pipe(replace(/(\r|\n)*\/\*.+?\*\/$/, "")); // remove sourcemap
+		.pipe($.replace(/(\r|\n)*\/\*.+?\*\/$/, "")); // remove sourcemap
 };
 
 module.exports.extra = compare.concat([__filename]);

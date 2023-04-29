@@ -1,10 +1,10 @@
 const through2 = require("gulp-through2");
 const path = require("path");
-const { marked } = require("marked");
 
 // For building the log indices and preload manifest
 
 module.exports = function(outFile, libs) {
+	let marked;
 	const preload = `
 let libs = ${JSON.stringify(libs)}.map(l => "lib/" + l);
 
@@ -19,7 +19,9 @@ libs.forEach(lib => {
 
 	return through2({
 		name: "log",
-		transform(content) {
+		async transform(content) {
+			// eslint-disable-next-line require-atomic-updates
+			marked = marked || (await import("marked")).marked;
 			return marked.parse(content, {
 				headerIds: false,
 			});

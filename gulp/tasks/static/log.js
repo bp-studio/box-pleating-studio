@@ -1,7 +1,5 @@
+const $ = require("../../utils/proxy");
 const gulp = require("gulp");
-const gulpIf = require("gulp-if");
-const htmlMin = require("gulp-html-minifier-terser");
-const terser = require("gulp-terser");
 
 const newer = require("../../utils/newer");
 const config = require("../../config.json");
@@ -24,5 +22,5 @@ module.exports = () =>
 			extra: [__filename, "gulp/plugins/log.js"],
 		}))
 		.pipe(log("log.js", libs))
-		.pipe(gulpIf(file => file.extname == ".js", terser(), htmlMin(htmlMinOption)))
+		.pipe($.if(file => file.extname == ".js", $.terser(), $.htmlMinifierTerser(htmlMinOption)))
 		.pipe(gulp.dest(config.dest.dist + "/log"));

@@ -1,4 +1,4 @@
-const esbuild = require("gulp-esbuild");
+const $ = require("../utils/proxy");
 const gulp = require("gulp");
 
 const config = require("../config.json");
@@ -10,7 +10,7 @@ gulp.task("testPolyBoolHTML", () =>
 
 gulp.task("testPolyBoolJS", () =>
 	gulp.src(config.src.test + "/polyBool/index.ts")
-		.pipe(esbuild({
+		.pipe($.esbuild({
 			outfile: "index.js",
 			bundle: true,
 			treeShaking: true,

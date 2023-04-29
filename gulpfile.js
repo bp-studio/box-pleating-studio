@@ -1,3 +1,13 @@
+/* Uncomment the following to diagnose startup performance. */
+// let requireCount = 0;
+// const Module = require("module");
+// const oldRequire = Module.prototype.require;
+// Module.prototype.require = function(...args) {
+// 	requireCount++;
+// 	return oldRequire.apply(this, args);
+// };
+// console.time("startup");
+
 // modify the way `path` outputs
 const path = require("path");
 const rel = path.relative;
@@ -42,6 +52,7 @@ gulp.task("buildDist", gulp.parallel(
 ));
 
 gulp.task("update", gulp.series(
+	"syncVersion",
 	"version",
 	"html",
 	"sw"
@@ -78,3 +89,6 @@ gulp.task("clean", async () => {
 // The default build. It will build to the point that it can be run locally.
 // Press F5 in VS Code will execute this task by default.
 gulp.task("default", gulp.parallel("html", "buildDebug"));
+
+// console.log("Require count", requireCount);
+// console.timeEnd("startup");

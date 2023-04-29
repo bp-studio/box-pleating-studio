@@ -1,10 +1,5 @@
+const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const iff = require("gulp-if");
-const postcss = require("gulp-postcss");
-const postcssPresetEnv = require("postcss-preset-env");
-const replace = require("gulp-replace");
-const terser = require("gulp-terser");
-const through2 = require("gulp-through2");
 
 const newer = require("../utils/newer");
 const { esbuild, extra: ext } = require("../utils/esbuild");
@@ -36,8 +31,8 @@ gulp.task("appDebug", () =>
 			sourcesContent: false,
 			sourceRoot: "../../",
 		}))
-		.pipe(iff(f => f.basename == "main.css", replace("assets/flags", "../dist/assets/flags")))
-		.pipe(iff(f => f.basename == "main.js.map" || f.basename == "main.css.map", through2(content => {
+		.pipe($.if(f => f.basename == "main.css", $.replace("assets/flags", "../dist/assets/flags")))
+		.pipe($.if(f => f.basename == "main.js.map" || f.basename == "main.css.map", $.through2(content => {
 			// Fix the sourcemap relative path by Vue plugin
 			const json = JSON.parse(content);
 			const root = path.resolve(".").replace(/\\/g, "/") + "/";
@@ -59,19 +54,20 @@ gulp.task("appDebug", () =>
 		.pipe(gulp.dest(config.dest.debug))
 );
 
-gulp.task("appDist", () =>
-	gulp.src(config.src.app + "/main.ts")
+gulp.task("appDist", () => {
+	const postcssPresetEnv = require("postcss-preset-env");
+	return gulp.src(config.src.app + "/main.ts")
 		.pipe(newer({
 			dest: config.dest.dist + "/main.js",
 			extra: [".browserslistrc", ...extra],
 		}))
 		.pipe(esb({ minify: true }))
-		.pipe(iff(f => f.extname == ".css",
+		.pipe($.if(f => f.extname == ".css",
 			// This will use browserslist config, includes Autoprefixer.
 			// This step is not included in debug build
-			postcss([postcssPresetEnv()])
+			$.postcss([postcssPresetEnv()])
 		))
-		.pipe(gulp.dest(config.dest.dist))
-);
+		.pipe(gulp.dest(config.dest.dist));
+});
 
 gulp.task("app", gulp.parallel("appDebug", "appDist"));

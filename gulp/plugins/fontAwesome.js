@@ -1,7 +1,6 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const fas = require("fontawesome-subset");
 const through2 = require("gulp-through2");
 
 // For collecting the usage of FontAwesome
@@ -26,6 +25,7 @@ module.exports = () => {
 		},
 		async flush(files) {
 			if(!files.length) return;
+			const fas = await import("fontawesome-subset");
 			subset.regular = [...subset.regular];
 			subset.solid = [...subset.solid];
 			subset.brands = [...subset.brands];

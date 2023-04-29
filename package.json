@@ -1,6 +1,6 @@
 {
 	"name": "box-pleating-studio",
-	"version": "0.6.0",
+	"version": "0.6.0-alpha",
 	"description": "Super-complex origami design made easy!",
 	"main": "./build/dist/bpstudio.js",
 	"scripts": {
@@ -28,9 +28,10 @@
 		"@types/bootstrap": "^5.2.6",
 		"@types/chai": "^4.3.4",
 		"@types/gtag.js": "^0.0.12",
+		"@types/gulp-load-plugins": "^0.0.33",
 		"@types/marked": "^4.0.8",
 		"@types/mocha": "^10.0.1",
-		"@types/node": "^18.16.1",
+		"@types/node": "^18.16.2",
 		"@types/wicg-file-system-access": "^2020.9.6",
 		"@typescript-eslint/eslint-plugin": "^5.59.1",
 		"@typescript-eslint/parser": "^5.59.1",
@@ -62,6 +63,7 @@
 		"gulp-filter": "^7.0.0",
 		"gulp-html-minifier-terser": "7.1.0",
 		"gulp-if": "^3.0.0",
+		"gulp-load-plugins": "^2.0.8",
 		"gulp-newer": "^1.4.0",
 		"gulp-postcss": "^9.0.1",
 		"gulp-purgecss": "5.0.0",
@@ -94,7 +96,7 @@
 		"vinyl-ftp": "^0.6.1",
 		"vue-eslint-parser": "^9.1.1",
 		"workbox-build": "^6.5.4",
-		"yargs": "^17.7.1"
+		"yargs": "^17.7.2"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^6.4.0",

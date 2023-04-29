@@ -1,10 +1,6 @@
-const all = require("gulp-all");
-const filter = require("gulp-filter");
+const $ = require("../utils/proxy");
 const fs = require("fs");
 const gulp = require("gulp");
-const gulpIf = require("gulp-if");
-const replace = require("gulp-replace");
-const terser = require("gulp-terser");
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
@@ -13,9 +9,6 @@ const buildLog = require("./static/log");
 const buildIcon = require("./static/icon");
 
 const libDest = config.dest.dist + "/lib";
-
-const { purge } = require("../utils/purge");
-const fontAwesome = require("../plugins/fontAwesome");
 
 /** If a given js file has a `min` or `prod` version */
 function hasMin(file) {
@@ -27,7 +20,7 @@ const copyDebugStatic = () => gulp.src([
 	"*.js",
 	"*.js.map",
 ], { cwd: config.src.lib })
-	.pipe(filter(file => {
+	.pipe($.filter(file => {
 		// include those .js files with a `min` version
 		if(file.extname != ".js") return true;
 		return hasMin(file);
@@ -52,7 +45,7 @@ const copyStatic = () => gulp.src([
 	"!assets/bps/**/*",
 ], { cwd: config.src.public, base: config.src.public })
 	.pipe(newer(config.dest.dist)) // Use 1:1 comparison
-	.pipe(gulpIf(file => file.extname == ".js", terser({
+	.pipe($.if(file => file.extname == ".js", $.terser({
 		compress: {
 			drop_debugger: false,
 		},
@@ -62,19 +55,22 @@ const copyStatic = () => gulp.src([
 /** Build minified FontAwesome font */
 const faSrc = "node_modules/@fortawesome/fontawesome-free";
 const faTarget = libDest + "/font-awesome";
-const subsetFontAwesome = () =>
-	gulp.src(config.src.app + "/vue/**/*.vue")
+const subsetFontAwesome = () => {
+	const fontAwesome = require("../plugins/fontAwesome");
+	return gulp.src(config.src.app + "/vue/**/*.vue")
 		.pipe(fontAwesome())
 		.pipe(gulp.dest(faTarget + "/webfonts"));
+};
 
 /** Purge CSS for FontAwesome */
 const purgeFontAwesome = () => {
 	let stream = gulp.src(faSrc + "/css/all.min.css", { base: faSrc });
+	const { purge } = require("../utils/purge");
 	stream = purge(stream);
 	return stream
-		.pipe(replace(/src:url\([^)]+eot\);/g, ""))
-		.pipe(replace(/url\([^)]+(iefix|woff|fontawesome)\) format\([^)]+\),?/g, ""))
-		.pipe(replace(/,\}/g, "}"))
+		.pipe($.replace(/src:url\([^)]+eot\);/g, ""))
+		.pipe($.replace(/url\([^)]+(iefix|woff|fontawesome)\) format\([^)]+\),?/g, ""))
+		.pipe($.replace(/,\}/g, "}"))
 		.pipe(gulp.dest(faTarget));
 };
 
@@ -93,7 +89,7 @@ gulp.task("static", () => {
 			subsetFontAwesome()
 		);
 	}
-	return all(tasks);
+	return $.all(tasks);
 });
 
 /**
@@ -103,7 +99,7 @@ gulp.task("static", () => {
  * Note: For unknown reason, it appears that in local environment,
  * restarting the browser is needed for the new font to take effect.
  */
-gulp.task("fa", () => all(
+gulp.task("fa", () => $.all(
 	purgeFontAwesome(),
 	subsetFontAwesome()
 ));

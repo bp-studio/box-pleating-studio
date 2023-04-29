@@ -1,14 +1,12 @@
-const ftp = require("vinyl-ftp");
+const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const gulpIf = require("gulp-if");
-const lazypipe = require("lazypipe");
-const log = require("fancy-log");
-const replace = require("gulp-replace");
 
 const config = require("../config.json");
 const seriesIf = require("../utils/seriesIf");
 
 function connect() {
+	const ftp = require("vinyl-ftp");
+	const log = require("fancy-log");
 	const options = require(process.cwd() + "/.vscode/ftp.json"); // This file is not in the repo, of course
 	options.log = log;
 	return ftp.create(options);
@@ -48,14 +46,14 @@ gulp.task("cleanPub", () => seriesIf(
 ));
 gulp.task("uploadPub", () => ftpFactory("bp", [config.dest.dist + "/.htaccess"]));
 
-const devPipe = lazypipe()
-	.pipe(() => replace('<script async src="https://www.googletagmanager.com' +
+const devPipe = require("lazypipe")()
+	.pipe(() => $.replace('<script async src="https://www.googletagmanager.com' +
 		'/gtag/js?id=G-GG1TEZGBCQ"></script>', ""))
 	// It is better to make the default title the same as in the manifest for Chrome PWA,
 	// or there will be additional prefix on display.
-	.pipe(() => replace("<title>Box Pleating Studio</title>", "<title>BP Studio DEV</title>"));
+	.pipe(() => $.replace("<title>Box Pleating Studio</title>", "<title>BP Studio DEV</title>"));
 
 gulp.task("cleanDev", () => cleanFactory("bp-dev"));
 gulp.task("uploadDev", () => ftpFactory("bp-dev", [`!${config.dest.dist}/manifest.json`], pipe => pipe
-	.pipe(gulpIf(file => file.basename == "index.htm", devPipe()))
+	.pipe($.if(file => file.basename == "index.htm", devPipe()))
 ));

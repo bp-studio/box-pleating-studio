@@ -1,5 +1,4 @@
 const through2 = require("gulp-through2");
-const ttf2woff2 = require("ttf2woff2");
 
 // Convert the ttf by IcoMoon to woff2, and modify the CSS file
 
@@ -17,8 +16,9 @@ module.exports = function(stem) {
 				return content.replace(reg, "$1url('fonts/" + stem + ".woff2') format('woff2'),\n$2$3");
 			}
 		},
-		flush(files) {
+		async flush(files) {
 			if(ttf) {
+				const ttf2woff2 = (await import("ttf2woff2")).default;
 				const woff2 = ttf.clone({ contents: false });
 				woff2.extname = ".woff2";
 				woff2.contents = ttf2woff2(ttf.contents);

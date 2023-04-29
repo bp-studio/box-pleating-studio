@@ -1,10 +1,5 @@
-const all = require("gulp-all");
-const esbuild = require("gulp-esbuild");
+const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const gulpSass = require("gulp-sass");
-const postcss = require("gulp-postcss");
-const postcssPresetEnv = require("postcss-preset-env");
-const sass = require("sass");
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
@@ -29,7 +24,7 @@ const bootstrapJS = () => gulp.src(config.src.lib + "/bootstrap/bootstrap.ts")
 		dest: config.dest.dist + "/lib/bootstrap/bootstrap.min.js",
 		extra: [__filename, root + "bootstrap/package.json"],
 	}))
-	.pipe(esbuild({
+	.pipe($.esbuild({
 		bundle: true,
 		globalName: "Bootstrap",
 		legalComments: "none",
@@ -40,6 +35,9 @@ const bootstrapJS = () => gulp.src(config.src.lib + "/bootstrap/bootstrap.ts")
 	.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
 
 const bootstrapCSS = () => {
+	const sass = require("sass");
+	const gulpSass = require("gulp-sass");
+	const postcssPresetEnv = require("postcss-preset-env");
 	let stream = gulp.src(config.src.lib + "/bootstrap/bootstrap.min.scss")
 		.pipe(newer({
 			dest: config.dest.dist + "/lib/bootstrap/bootstrap.min.css",
@@ -55,7 +53,7 @@ const bootstrapCSS = () => {
 		}));
 	stream = purge(stream);
 	return stream
-		.pipe(postcss([postcssPresetEnv()])) // will use browserslist config
+		.pipe($.postcss([postcssPresetEnv()])) // will use browserslist config
 		.pipe(gulp.dest(config.dest.dist + "/lib/bootstrap"));
 };
 
@@ -64,7 +62,7 @@ const jsZip = () => gulp.src(config.src.lib + "/jszip/jszip.ts")
 		dest: config.dest.dist + "/lib/jszip.js",
 		extra: [__filename, root + "jszip/package.json"],
 	}))
-	.pipe(esbuild({
+	.pipe($.esbuild({
 		bundle: true,
 		legalComments: "none",
 		outfile: "jszip.js",
@@ -76,7 +74,7 @@ const jsZip = () => gulp.src(config.src.lib + "/jszip/jszip.ts")
 /**
  * Directly copy or custom build files from node_modules for some of the libraries
  */
-gulp.task("lib", () => all(
+gulp.task("lib", () => $.all(
 	bootstrapJS(),
 	bootstrapCSS(),
 	jsZip(),

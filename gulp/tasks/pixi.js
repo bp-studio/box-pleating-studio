@@ -1,4 +1,4 @@
-const esbuild = require("gulp-esbuild");
+const $ = require("../utils/proxy");
 const exg = require("@fal-works/esbuild-plugin-global-externals").globalExternals;
 const gulp = require("gulp");
 
@@ -36,7 +36,7 @@ function esb(options) {
 		sourcesContent: minify ? undefined : true,
 		target: "es2016", // for maximal compatibility
 	}, options);
-	return esbuild(options);
+	return $.esbuild(options);
 }
 
 module.exports.pixiCore = () =>
