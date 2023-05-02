@@ -20,21 +20,18 @@ function ssg() {
 	});
 }
 
-gulp.task("syncVersion", () => {
+const insertVersion = () => $.through2(content => {
 	const package = require("../../package.json");
-	return gulp.src(config.src.public + "/index.htm")
-		.pipe($.replace(
-			/<meta name="version" content="[^"]+">/,
-			`<meta name="version" content="${package.version}">`
-		))
-		.pipe(gulp.dest(config.src.public));
+	return content
+		.replace("__VERSION__", package.version)
+		.replace("__APP_VERSION__", package.app_version);
 });
 
-/** Bump version of HTML file */
+/** Bump build version */
 gulp.task("version", () =>
-	gulp.src(config.src.public + "/index.htm")
-		.pipe($.replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`))
-		.pipe(gulp.dest(config.src.public))
+	gulp.src("package.json")
+		.pipe($.replace(/"app_version": "(\d+)"/, (a, b) => `"app_version": "${Number(b) + 1}"`))
+		.pipe(gulp.dest("."))
 );
 
 /** Main HTML task */
@@ -43,8 +40,9 @@ gulp.task("html", () => $.all(
 	gulp.src(config.src.public + "/index.htm")
 		.pipe(newer({
 			dest: config.dest.debug + "/index.htm",
-			extra: [__filename, config.src.app + "/**/*", "gulp/plugins/debug.js"],
+			extra: [__filename, "package.json", config.src.app + "/**/*", "gulp/plugins/debug.js"],
 		}))
+		.pipe(insertVersion())
 		.pipe(debug())
 		.pipe(ssg())
 		.pipe(gulp.dest(config.dest.debug)),
@@ -53,8 +51,9 @@ gulp.task("html", () => $.all(
 	gulp.src(config.src.public + "/index.htm")
 		.pipe(newer({
 			dest: config.dest.dist + "/index.htm",
-			extra: [__filename, config.src.app + "/**/*"],
+			extra: [__filename, "package.json", config.src.app + "/**/*"],
 		}))
+		.pipe(insertVersion())
 		.pipe($.htmlMinifierTerser(htmlMinOption))
 		// Avoid VS Code Linter warnings
 		.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))

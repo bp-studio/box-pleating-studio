@@ -52,7 +52,6 @@ gulp.task("buildDist", gulp.parallel(
 ));
 
 gulp.task("update", gulp.series(
-	"syncVersion",
 	"version",
 	"html",
 	"sw"

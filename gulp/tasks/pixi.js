@@ -32,6 +32,7 @@ function esb(options) {
 		bundle: true,
 		legalComments: "none",
 		minify,
+		treeShaking: true,
 		sourcemap: minify ? undefined : "inline",
 		sourcesContent: minify ? undefined : true,
 		target: "es2016", // for maximal compatibility

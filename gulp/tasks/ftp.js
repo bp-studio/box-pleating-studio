@@ -4,10 +4,13 @@ const gulp = require("gulp");
 const config = require("../config.json");
 const seriesIf = require("../utils/seriesIf");
 
+// This file is not in the repo, of course
+const ftpConfig = require(process.cwd() + "/.vscode/ftp.json");
+
 function connect() {
 	const ftp = require("vinyl-ftp");
 	const log = require("fancy-log");
-	const options = require(process.cwd() + "/.vscode/ftp.json"); // This file is not in the repo, of course
+	const options = ftpConfig.ftp;
 	options.log = log;
 	return ftp.create(options);
 }
@@ -46,14 +49,22 @@ gulp.task("cleanPub", () => seriesIf(
 ));
 gulp.task("uploadPub", () => ftpFactory("bp", [config.dest.dist + "/.htaccess"]));
 
-const devPipe = require("lazypipe")()
-	.pipe(() => $.replace('<script async src="https://www.googletagmanager.com' +
-		'/gtag/js?id=G-GG1TEZGBCQ"></script>', ""))
-	// It is better to make the default title the same as in the manifest for Chrome PWA,
-	// or there will be additional prefix on display.
-	.pipe(() => $.replace("<title>Box Pleating Studio</title>", "<title>BP Studio DEV</title>"));
+gulp.task("cleanDev", () => cleanFactory(ftpConfig.dev.folder));
+gulp.task("uploadDev", () => {
+	const lazypipe = require("lazypipe");
+	const devHtmlPipe = lazypipe()
+		.pipe(() => $.replace('<script async src="https://www.googletagmanager.com' +
+			'/gtag/js?id=G-GG1TEZGBCQ"></script>', ""))
+		// It is better to make the default title the same as in the manifest for Chrome PWA,
+		// or there will be additional prefix on display.
+		.pipe(() => $.replace("<title>Box Pleating Studio</title>", "<title>BP Studio DEV</title>"));
 
-gulp.task("cleanDev", () => cleanFactory("bp-dev"));
-gulp.task("uploadDev", () => ftpFactory("bp-dev", [`!${config.dest.dist}/manifest.json`], pipe => pipe
-	.pipe($.if(file => file.basename == "index.htm", devPipe()))
-));
+	const devManifestPipe = lazypipe()
+		.pipe(() => $.replace(/\/\/bpstudio\./g, `//${ftpConfig.dev.subdomain}.`))
+		.pipe(() => $.replace(/Box Pleating Studio/g, "BP Studio DEV"));
+
+	return ftpFactory(ftpConfig.dev.folder, [], pipe => pipe
+		.pipe($.if(file => file.basename == "index.htm", devHtmlPipe()))
+		.pipe($.if(file => file.basename == "manifest.json", devManifestPipe()))
+	);
+});
