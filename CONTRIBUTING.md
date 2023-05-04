@@ -46,6 +46,10 @@ The second issue could be polyfilled,
 but I see less point in doing so as those versions are old enough already,
 while the first issue is impossible to polyfill.
 
+Note that the targeted version almost coincide with the support for
+[optional catch binding](https://caniuse.com/mdn-javascript_statements_try_catch_optional_catch_binding),
+with Firefox being the only exception.
+
 There's currently no plans for officially supporting browsers other than
 Chrome, Edge, Safari, Firefox, Opera, and Samsung Internet.
 Not that I don't want to, but that I don't have the resource to do so.

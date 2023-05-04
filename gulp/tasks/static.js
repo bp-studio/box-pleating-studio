@@ -74,6 +74,8 @@ const purgeFontAwesome = () => {
 		.pipe(gulp.dest(faTarget));
 };
 
+gulp.task("log", () => buildLog());
+
 gulp.task("static", () => {
 	const tasks = [
 		buildIcon(),

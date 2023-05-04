@@ -49,8 +49,9 @@
 				const response = await fetch(`log/${logs[id]}.md`);
 				let html = await response.text();
 				html = html.replace(/<a href="http/g, "<a target=\"_target\" rel=\"noopener\" href=\"http");
+				// Double-check to avoid race condition
 				if(!record[id]) record[id] = html;
-			} catch(e) {
+			} catch {
 				if(on.value) {
 					hide();
 					Dialogs.alert(i18n.t("message.connFail"));

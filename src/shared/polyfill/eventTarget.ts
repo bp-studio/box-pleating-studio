@@ -33,7 +33,7 @@ interface EventTargetPolyfill extends EventTarget { }
 
 try {
 	new EventTarget();
-} catch(e) {
+} catch {
 	// If `EventTarget` is undefined or is not a constructor, use polyfill
 	globalThis.EventTarget = EventTargetPolyfill;
 }

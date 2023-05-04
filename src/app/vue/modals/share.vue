@@ -101,7 +101,7 @@
 			sending.value = false;
 			await waitButton();
 			bt.value!.focus();
-		} catch(e) {
+		} catch {
 			sending.value = false;
 			url.value = rawUrl;
 			error.value = i18n.t("message.connFail").toString();

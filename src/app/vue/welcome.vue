@@ -134,7 +134,7 @@
 				// so we cannot use it to detect if PWA is already installed.
 				// But that's OK, since the PWA link works also only in Android anyway.
 				if(apps.length) state.value = installState.installed;
-			} catch(e) {
+			} catch {
 				// Ignore any errors here.
 			}
 		}

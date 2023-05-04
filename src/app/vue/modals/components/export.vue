@@ -65,12 +65,15 @@
 	const { el, show, on } = useModal(props.screen, () => Boolean(Studio.project));
 
 	async function update(): Promise<void> {
+		tryClearURL();
+		url.value = URL.createObjectURL(await props.blob());
+	}
+
+	function tryClearURL(): void {
 		if(url.value) {
 			URL.revokeObjectURL(url.value);
 			url.value = null;
 		}
-		// eslint-disable-next-line require-atomic-updates
-		url.value = URL.createObjectURL(await props.blob());
 	}
 
 	if(props.watch) {

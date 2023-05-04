@@ -165,7 +165,7 @@
 				await writable.abort();
 				throw e;
 			}
-		} catch(e) {
+		} catch {
 			// If any form of failure occurs (handle not found, no write permission...), then save it as a new file
 			return (bps.value! as SaveAsInstance).execute(proj, handle => {
 				Handles.set(id!, handle);

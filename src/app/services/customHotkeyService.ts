@@ -126,13 +126,9 @@ namespace CustomHotkeyService {
 }
 
 export function hk(name: string, command: string, p: boolean = false): string {
-	try {
-		const key = Settings.hotkey[name][command];
-		if(!key) return "";
-		return (p ? " (" : "") + i18n.t("preference.hotkey") + " " + CustomHotkeyService.formatKey(key) + (p ? ")" : "");
-	} catch(e) {
-		return "";
-	}
+	const key = Settings.hotkey[name]?.[command];
+	if(!key) return "";
+	return (p ? " (" : "") + i18n.t("preference.hotkey") + " " + CustomHotkeyService.formatKey(key) + (p ? ")" : "");
 }
 
 export default CustomHotkeyService;

@@ -4,7 +4,6 @@ const path = require("path");
 // For building the log indices and preload manifest
 
 module.exports = function(outFile, libs) {
-	let marked;
 	const preload = `
 let libs = ${JSON.stringify(libs)}.map(l => "lib/" + l);
 
@@ -20,10 +19,10 @@ libs.forEach(lib => {
 	return through2({
 		name: "log",
 		async transform(content) {
-			// eslint-disable-next-line require-atomic-updates
-			marked = marked || (await import("marked")).marked;
-			return marked.parse(content, {
+			return (await import("marked")).marked.parse(content, {
 				headerIds: false,
+				mangle: false,
+				langPrefix: "",
 			});
 		},
 		flush(files) {

@@ -22,7 +22,7 @@
 			</div>
 			<div class="wait flex-grow-0">
 				<button class="btn btn-primary w-100" onclick="window.close()">{{ step == 1 ? $t('donate.nextTime') :
-						$t('keyword.close')
+					$t('keyword.close')
 				}}</button>
 			</div>
 		</div>
@@ -49,8 +49,11 @@
 		actions = action;
 	}, { step, name, amount, extra, processing }));
 
-	// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-	const extra = computed(() => amount.value ? amount.value * 0.046025 + 0.3138 : 0);
+	const extra = computed(() =>
+		// This formula computes Paypal fee
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+		amount.value ? amount.value * 0.046025 + 0.3138 : 0
+	);
 	const handling = computed(() => amount.value ? " + $" + extra.value.toFixed(2) : "");
 
 	function amountChange(): void {

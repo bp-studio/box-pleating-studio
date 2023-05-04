@@ -54,7 +54,12 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				this._steps.push(...json.steps.map(s => restore(project, s)));
 				this._index = json.index;
 				this._savedIndex = json.savedIndex;
-			} catch(e) { }
+			} catch {
+				// If anything goes wrong, reset everything.
+				this._steps.length = 0;
+				this._index = 0;
+				this._savedIndex = 0;
+			}
 		}
 	}
 

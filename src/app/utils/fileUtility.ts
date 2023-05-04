@@ -52,14 +52,14 @@ namespace FileUtility {
 			await writable.close();
 			if(callback) callback(handle!);
 			return true;
-		} catch(e) {
+		} catch {
 			// It goes here on user cancelling or on errors during saving
 			try {
 				// New API, added in Chrome 110
 				if(handle && "remove" in handle && typeof handle.remove == "function") {
 					handle.remove();
 				}
-			} catch(_) { }
+			} catch { }
 			return false;
 		}
 	}

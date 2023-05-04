@@ -22,6 +22,8 @@
 
 	import { computed, getCurrentInstance } from "vue";
 
+	import { toHex } from "shared/utils/color";
+
 	const id: string = "color" + getCurrentInstance()?.uid;
 
 	const props = defineProps<{
@@ -31,8 +33,7 @@
 	}>();
 	const emit = defineEmits(["update:modelValue"]);
 
-	// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-	const hex = computed(() => "#" + (props.modelValue ?? props.default).toString(16).padStart(6, "0"));
+	const hex = computed(() => toHex(props.modelValue ?? props.default));
 
 	function toDefault(): void {
 		emit("update:modelValue", undefined);
@@ -58,6 +59,6 @@
 
 		/* This is needed to override Safari's terrible default style */
 		border-radius: 0.25rem;
-		-webkit-appearance: none;
+		appearance: none;
 	}
 </style>

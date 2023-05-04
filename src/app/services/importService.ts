@@ -90,7 +90,7 @@ namespace ImportService {
 		try {
 			const file = await handle.getFile();
 			return await openFile(file, handle);
-		} catch(e) {
+		} catch {
 			await Dialogs.alert(i18n.t("toolbar.file.notFound", [handle.name]));
 			await Handles.removeRecent(handle);
 			return undefined;
@@ -127,7 +127,7 @@ namespace ImportService {
 				if(handle) await Handles.addRecent(handle);
 				return id;
 			} else { throw new Error(); }
-		} catch(e) {
+		} catch {
 			debugger;
 			await Dialogs.alert(i18n.t("message.invalidFormat", [file.name]));
 			return undefined;

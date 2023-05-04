@@ -8,7 +8,6 @@ const loadPlugins = require("gulp-load-plugins");
  */
 const lazyExceptions = ["all", "if"];
 
-// eslint-disable-next-line no-undef
 module.exports = new Proxy(loadPlugins(), {
 	get(target, name) {
 		if(lazyExceptions.includes(name)) return target[name];

@@ -28,9 +28,8 @@
 						</td>
 						<td class="p-0 position-relative">
 							<input :id="name + '.' + command" type="text" class="border-0 w-100"
-								   :value="CustomHotkeyService.formatKey(key)"
-								   @focus="setFocus($event.target as HTMLInputElement)" @input.prevent
-								   @keydown.prevent="setKey($event, name as string, command as string)" />
+								   :value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target as HTMLInputElement)"
+								   @input.prevent @keydown.prevent="setKey($event, name as string, command as string)" />
 							<!-- A mask for blocking mouse actions after the input getting focus -->
 							<div class="mask" @mousedown.capture.prevent></div>
 						</td>
@@ -46,7 +45,6 @@
 </script>
 
 <script setup lang="ts">
-	/* eslint-disable require-atomic-updates */
 
 	import { reactive } from "vue";
 
@@ -111,18 +109,21 @@
 		if(!key) return;
 
 		const find = CustomHotkeyService.findKey(key);
-		if(find) {
-			pending = true;
-			const message = i18n.t("preference.confirmKey", [CustomHotkeyService.formatKey(key), getName(find)]);
-			const confirm = await Dialogs.confirm(message);
-			pending = false;
-			if(!confirm) return;
-		}
+		if(find && !await confirmKey(key, find)) return;
 		Settings.hotkey[name][command] = key;
 		if(find) {
 			[name, command] = find.split(".");
 			Settings.hotkey[name][command] = "";
 		}
+	}
+
+	/** Confirm overwriting an existing key. */
+	async function confirmKey(key: string, find: string): Promise<boolean> {
+		pending = true;
+		const message = i18n.t("preference.confirmKey", [CustomHotkeyService.formatKey(key), getName(find)]);
+		const confirm = await Dialogs.confirm(message);
+		pending = false;
+		return confirm;
 	}
 
 	function setFocus(target: HTMLInputElement): void {
@@ -177,7 +178,7 @@
 		&:focus {
 			box-shadow: inset 0 0 0.25rem var(--bs-primary);
 
-			+.mask {
+			+ .mask {
 				display: block;
 				position: absolute;
 				top: 0;

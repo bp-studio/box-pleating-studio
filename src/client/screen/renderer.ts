@@ -23,7 +23,7 @@ export async function useRenderer(options: Partial<IRendererOptions>): Promise<R
 		contextSystem.init(options as ContextSystemOptions);
 		// eslint-disable-next-line require-atomic-updates
 		options.context = await contextSystem.$context;
-	} catch(_) {
+	} catch {
 		errMgr.setCustomError(
 			i18n.t("message.webGL.title"),
 			i18n.t("message.webGL.body")

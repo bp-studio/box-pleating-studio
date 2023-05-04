@@ -15,7 +15,8 @@
 		"eslint-plugin-local-rules"
 	],
 	"env": {
-		"node": true
+		"node": true,
+		"es2022": true
 	},
 	"rules": {
 		"@typescript-eslint/ban-ts-comment": "off",
@@ -52,28 +53,6 @@
 				"ignoredNodes": [
 					"ClassDeclaration" // There's no good solution for the moment. See https://github.com/typescript-eslint/typescript-eslint/issues/1824
 				]
-			}
-		],
-		"@typescript-eslint/keyword-spacing": [
-			"warn",
-			{
-				"overrides": {
-					"catch": {
-						"after": false
-					},
-					"for": {
-						"after": false
-					},
-					"if": {
-						"after": false
-					},
-					"switch": {
-						"after": false
-					},
-					"while": {
-						"after": false
-					}
-				}
 			}
 		],
 		"@typescript-eslint/member-delimiter-style": [
@@ -327,7 +306,7 @@
 		"no-lone-blocks": "warn",
 		"no-lonely-if": "off",
 		"no-loop-func": "off", // see ts
-		"no-loss-of-precision": "warn",
+		"no-loss-of-precision": "off",
 		"no-magic-numbers": "off", // see ts
 		"no-mixed-operators": "off",
 		"no-mixed-spaces-and-tabs": [

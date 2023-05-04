@@ -42,7 +42,7 @@
 				],
 			});
 			emit("open", handles);
-		} catch(e) {
+		} catch {
 			// If it fails then so be it
 		}
 	}
