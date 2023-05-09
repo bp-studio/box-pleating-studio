@@ -5,6 +5,7 @@ type flatMapCallback<T, U, This> = (this: This, value: T, index: number, array: 
 //=================================================================
 /**
  * Polyfill for the native {@link Array.flatMap} in ES2019.
+ * https://caniuse.com/array-flat
  */
 //=================================================================
 export function flatMap<T, U, This = undefined>(

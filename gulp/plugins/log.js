@@ -22,7 +22,6 @@ libs.forEach(lib => {
 			return (await import("marked")).marked.parse(content, {
 				headerIds: false,
 				mangle: false,
-				langPrefix: "",
 			});
 		},
 		flush(files) {

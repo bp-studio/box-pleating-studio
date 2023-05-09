@@ -3,6 +3,7 @@
 //=================================================================
 /**
  * Polyfill for {@link globalThis}.
+ * https://caniuse.com/mdn-javascript_builtins_globalthis
  */
 //=================================================================
 if(typeof globalThis === "undefined") {

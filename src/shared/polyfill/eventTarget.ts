@@ -7,6 +7,7 @@ type Listener = EventListenerOrEventListenerObject;
 //=================================================================
 /**
  * Polyfill for the {@link EventTarget} constructor (so that it can be extended).
+ * https://caniuse.com/mdn-api_eventtarget_eventtarget
  *
  * The idea is simply to wrap around a native {@link EventTarget}, such as an {@link HTMLElement}.
  * This way we directly have the all the details currently implemented.
