@@ -168,7 +168,7 @@ function getAxisParallelLayer(design: Design): string {
 	graphics.$class = "axis-parallel";
 	for(const stretch of design.layout.$stretches.values()) {
 		for(const device of stretch.$devices) {
-			drawLines(graphics, device.$graphics.axisParallel!);
+			drawLines(graphics, device.$graphics.axisParallel);
 		}
 	}
 	return layer(graphics.$get(), true, hidden);

@@ -9,7 +9,7 @@ import { style } from "client/services/styleService";
 import { Draggable } from "client/base/draggable";
 
 import type { Stretch } from "./stretch";
-import type { GraphicsData } from "core/service/updateModel";
+import type { DeviceData } from "core/service/updateModel";
 
 //=================================================================
 /**
@@ -22,7 +22,7 @@ export class Device extends Draggable {
 	public readonly type = "Device";
 	public readonly $priority: number = 2;
 
-	public $graphics: GraphicsData;
+	public $graphics: DeviceData;
 
 	public readonly stretch: Stretch;
 	public readonly $index: number;
@@ -32,7 +32,7 @@ export class Device extends Draggable {
 	private readonly _axisParallels: SmoothGraphics;
 
 
-	constructor(stretch: Stretch, index: number, graphics: GraphicsData) {
+	constructor(stretch: Stretch, index: number, graphics: DeviceData) {
 		const sheet = stretch.$layout.$sheet;
 		super(sheet);
 		this.$tag = stretch.$tag + "." + index;
@@ -58,13 +58,15 @@ export class Device extends Draggable {
 
 	public override $constrainBy(v: IPoint): IPoint {
 		const f = this.$graphics.forward ? 1 : -1;
-		const d = Math.round((v.x + f * v.y) / 2);
-		return { x: d, y: f * d };
+		let dx = Math.round((v.x + f * v.y) / 2);
+		const range = this.$graphics.range;
+		if(dx < range[0]) dx = range[0];
+		if(dx > range[1]) dx = range[1];
+		return { x: dx, y: f * dx };
 	}
 
 	protected override _move(x: number, y: number): void {
 		super._move(x, y);
-		console.log(x, y);
 		this.stretch.$layout.$moveDevice(this);
 	}
 
@@ -72,7 +74,7 @@ export class Device extends Draggable {
 	// Drawing methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public $redraw(data: GraphicsData): void {
+	public $redraw(data: DeviceData): void {
 		this.$graphics = data;
 		this._draw();
 	}
@@ -90,7 +92,7 @@ export class Device extends Draggable {
 
 		const sh = ProjectService.shrink.value;
 		this._axisParallels.clear().lineStyle(style.axisParallel.width * sh, style.axisParallel.color);
-		drawLines(this._axisParallels, this.$graphics.axisParallel!);
+		drawLines(this._axisParallels, this.$graphics.axisParallel);
 
 		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
 		drawLines(this._ridge, this.$graphics.ridges);

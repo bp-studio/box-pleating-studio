@@ -42,14 +42,25 @@ interface GraphicsData {
 	 * All ridges that should be drawn.
 	 */
 	ridges: readonly ILine[];
+}
 
+/**
+ * Additional data only for {@link Device}s.
+ */
+interface DeviceData extends GraphicsData {
 	/**
-	 * All axis-parallel creases. Only for {@link Device}s.
+	 * All axis-parallel creases.
 	 */
-	axisParallel?: readonly ILine[];
+	axisParallel: readonly ILine[];
 
 	/**
-	 * For stretch patterns only; whether the overall direction is like a forward slash.
+	 * Dragging range, represented by the lower/upper limit of
+	 * deltaX after transformation.
+	 */
+	range: readonly [number, number];
+
+	/**
+	 * Whether the overall direction is like a forward slash.
 	 */
 	forward?: boolean;
 }

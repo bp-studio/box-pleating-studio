@@ -6,7 +6,7 @@ import { quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 
 import type { ILine, Path } from "shared/types/geometry";
-import type { GraphicsData } from "core/service/updateModel";
+import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
 
 //=================================================================
@@ -21,13 +21,16 @@ function graphics(): void {
 	for(const repo of State.$repoUpdated) {
 		const id = repo.$stretch.$id;
 		if(repo.$pattern) {
+			const forward = repo.$f.x == repo.$f.y;
 			for(const [i, device] of repo.$pattern.$devices.entries()) {
 				State.$updateResult.graphics["s" + id + "." + i] = {
 					contours: device.$contour,
 					ridges: device.$ridges,
 					axisParallel: device.$axisParallels,
-					forward: repo.$f.x == repo.$f.y,
-				};
+					// Note that the range of all devices in the pattern will be updated.
+					range: device.$getDraggingRange(),
+					forward,
+				} as DeviceData;
 			}
 		}
 	}

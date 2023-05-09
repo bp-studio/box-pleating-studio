@@ -3,6 +3,7 @@ import { Device } from "./device";
 import { Point } from "core/math/geometry/point";
 import { State } from "core/service/state";
 
+import type { Gadget } from "./gadget";
 import type { JConnection, JDevice, JPattern } from "shared/json";
 import type { Configuration } from "../configuration";
 
@@ -19,13 +20,15 @@ export class Pattern implements ISerializable<JPattern> {
 	//TODO: Complete the logic of deciding validity of a pattern (whether it actually fits the layout)
 	public $valid: boolean = true;
 
-	public $devices: readonly Device[];
+	public readonly $devices: readonly Device[];
+	public readonly $gadgets: readonly Gadget[];
 
 	public $originDirty: boolean = false;
 
 	constructor(config: Configuration, devices: JDevice[]) {
 		this.$config = config;
 		this.$devices = devices.map((d, i) => new Device(this, config.$partitions[i], d));
+		this.$gadgets = this.$devices.flatMap(d => d.$gadgets);
 	}
 
 	public toJSON(): JPattern {

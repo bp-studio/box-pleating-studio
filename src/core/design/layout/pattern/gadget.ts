@@ -4,7 +4,7 @@ import { makePerQuadrant } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
 import { cache } from "core/utils/cache";
 
-import type { PerQuadrant } from "shared/types/direction";
+import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { JAnchor, JGadget, JOverlap } from "shared/json";
 import type { Device } from "./device";
 
@@ -29,6 +29,7 @@ export class Gadget implements JGadget, ISerializable<JGadget> {
 	constructor(data: JGadget) {
 		this.pieces = data.pieces.map(p => new Piece(p));
 		this.offset = data.offset;
+		//TODO
 		//this.pieces.forEach(p => p.$offset(this.offset));
 		this.anchors = data.anchors;
 	}
@@ -54,5 +55,17 @@ export class Gadget implements JGadget, ISerializable<JGadget> {
 				throw new Error();
 			}
 		});
+	}
+
+	@cache public get $slack(): PerQuadrant<number> {
+		return makePerQuadrant(q => this._getSlack(q));
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _getSlack(q: QuadrantDirection): number {
+		return this.anchors?.[q]?.slack ?? 0;
 	}
 }
