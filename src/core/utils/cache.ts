@@ -1,3 +1,14 @@
+
+/**
+ * Accordingly, `Symbol` property is slightly faster than `WeakMap`. See
+ * https://www.measurethat.net/Benchmarks/Show/7142/0/weakmap-vs-symbol-property
+ */
+const symbol = Symbol("cache");
+
+interface CacheTarget {
+	[symbol]: Record<string, unknown>;
+}
+
 /**
  * Create a getter that will only execute once, and return cached result afterwards.
  *
@@ -5,13 +16,20 @@
  */
 export function cache(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor {
 	const getter = desc.get!;
-	const symbol = Symbol.for(name);
 	return {
-		get(this: Record<symbol, unknown>) {
-			if(symbol in this) return this[symbol];
-			else return this[symbol] = getter.apply(this);
+		get(this: CacheTarget) {
+			const record = this[symbol] ||= {};
+			if(name in record) return record[name];
+			else return record[name] = getter.apply(this);
 		},
 		enumerable: false,
 		configurable: false,
 	};
+}
+
+/**
+ * Clear all cached values created by {@link cache @cache} decorator.
+ */
+export function clearCache(target: object): void {
+	(target as CacheTarget)[symbol] = {};
 }

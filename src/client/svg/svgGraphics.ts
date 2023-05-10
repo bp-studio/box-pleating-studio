@@ -4,6 +4,7 @@ import type { LINE_SCALE_MODE } from "@pixi/graphics-smooth/lib/core/LineStyle";
 //=================================================================
 /**
  * {@link SvgGraphics} creates SVG path syntax.
+ * It is compatible to {@link SmoothGraphics} in method signatures.
  */
 //=================================================================
 

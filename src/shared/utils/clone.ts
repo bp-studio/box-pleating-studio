@@ -25,11 +25,18 @@ export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 	return target;
 }
 
-/** Clone an object */
-function clonePolyfill<T>(source: T): T {
-	const r = source instanceof Array ? [] : {};
-	return deepAssign(r as T, source);
+/** Clone an object. */
+function clonePolyfill<T extends object>(source: T): T {
+	// `isArray` is more reliable than `instanceof Array`,
+	// See https://stackoverflow.com/a/22289869/9953396
+	const target = Array.isArray(source) ? [] : {};
+	return deepAssign(target as T, source);
 }
 
+/**
+ * Use native {@link structuredClone} whenever possible
+ * (see [CanIUse](https://caniuse.com/?search=structuredClone)),
+ * otherwise fallback to polyfill.
+ */
 export const clone: typeof clonePolyfill =
 	typeof structuredClone === "function" ? structuredClone : clonePolyfill;

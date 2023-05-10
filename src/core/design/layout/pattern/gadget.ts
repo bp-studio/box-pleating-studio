@@ -20,7 +20,7 @@ export type AnchorMap = [Point, number | null];
  * It always have four {@link JAnchor}s.
  */
 //=================================================================
-export class Gadget implements JGadget, ISerializable<JGadget> {
+export class Gadget implements JGadget {
 
 	public pieces: readonly Piece[];
 	public offset?: IPoint;
@@ -29,13 +29,8 @@ export class Gadget implements JGadget, ISerializable<JGadget> {
 	constructor(data: JGadget) {
 		this.pieces = data.pieces.map(p => new Piece(p));
 		this.offset = data.offset;
-		//TODO
-		//this.pieces.forEach(p => p.$offset(this.offset));
+		this.pieces.forEach(p => p.$offset(this.offset));
 		this.anchors = data.anchors;
-	}
-
-	public toJSON(): JGadget {
-		return this;
 	}
 
 	@cache public get $anchorMap(): PerQuadrant<AnchorMap> {

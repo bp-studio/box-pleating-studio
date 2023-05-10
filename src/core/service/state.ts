@@ -58,13 +58,13 @@ export namespace State {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Those nodes that have children changed (including initialization) in the current round,
+	 * Those nodes that have children changed (or initialized) in the current round,
 	 * except for those that are deleted later.
 	 */
 	export const $childrenChanged = new Set<TreeNode>();
 
 	/**
-	 * Those nodes that have parent changed (including initialization) in the current round,
+	 * Those nodes that have parent changed (or initialized) in the current round,
 	 * except for the final root node.
 	 */
 	export const $parentChanged = new Set<ITreeNode>();
@@ -111,7 +111,7 @@ export namespace State {
 	/** The quadrants that have patterns. */
 	export const $patternedQuadrants = new Set<number>();
 
-	/** The {@link Device}s moved in the current round. */
+	/** The {@link Device}s moved (or initialized) in the current round. */
 	export const $movedDevices = new Set<Device>();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

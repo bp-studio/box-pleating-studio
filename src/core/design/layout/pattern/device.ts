@@ -5,6 +5,8 @@ import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
+import { State } from "core/service/state";
+import { clone } from "shared/utils/clone";
 
 import type { Partition } from "../partition";
 import type { JDevice, JConnection } from "shared/json";
@@ -46,12 +48,12 @@ export class Device implements ISerializable<JDevice> {
 		regions.push(...this.$addOns);
 		this._regions = regions;
 
-		this.$updatePosition();
+		State.$movedDevices.add(this);
 	}
 
 	public toJSON(): JDevice {
 		return {
-			gadgets: this.$gadgets,
+			gadgets: clone(this.$gadgets),
 			addOns: this.$addOns.length ? this.$addOns : undefined,
 		};
 	}

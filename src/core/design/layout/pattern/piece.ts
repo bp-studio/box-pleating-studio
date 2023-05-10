@@ -1,9 +1,9 @@
-import { clone } from "shared/utils/clone";
 import { Region } from "./region";
 import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
-import { cache } from "core/utils/cache";
+import { cache, clearCache } from "core/utils/cache";
+import { nonEnumerable } from "core/utils/nonEnumerable";
 
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
@@ -14,7 +14,7 @@ import type { JPiece } from "shared/json";
  * {@link Piece} is a {@link Region} in a {@link Gadget}.
  */
 //=================================================================
-export class Piece extends Region implements JPiece, ISerializable<JPiece> {
+export class Piece extends Region implements JPiece {
 
 	public ox: number;
 
@@ -28,6 +28,8 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 
 	public shift?: IPoint;
 
+	@nonEnumerable private _offset?: IPoint = { x: 0, y: 0 };
+
 	constructor(data: JPiece) {
 		super();
 		this.ox = data.ox;
@@ -38,8 +40,10 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 		this.shift = data.shift;
 	}
 
-	public toJSON(): JPiece {
-		return clone<JPiece>(this);
+	public $offset(o?: IPoint): void {
+		if(!o || this._offset && this._offset.x == o.x && this._offset.y == o.y) return;
+		this._offset = o;
+		clearCache(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +69,7 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 	@cache public get $shape(): IRegionShape {
 		const contour = this._points.concat();
 		const ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
-		// (this.detours || []).forEach(d => this._processDetour(ridges, contour, d));
+		(this.detours || []).forEach(d => this._processDetour(ridges, contour, d));
 		return { contour, ridges };
 	}
 
@@ -84,7 +88,53 @@ export class Piece extends Region implements JPiece, ISerializable<JPiece> {
 			new Point(oy + u + v, ox + u + v),
 			new Point(oy + v, v),
 		];
-		//result.forEach(p => p.addBy(this._shift));
+		result.forEach(p => p.addBy(this._shift));
 		return result;
+	}
+
+	@cache private get _shift(): Vector {
+		return new Vector(
+			(this.shift?.x ?? 0) + (this._offset?.x ?? 0),
+			(this.shift?.y ?? 0) + (this._offset?.y ?? 0)
+		);
+	}
+
+	private _processDetour(ridges: Line[], contour: Point[], d: IPoint[]): void {
+		const detour = d.map(p => new Point(p.x, p.y).addBy(this._shift));
+		const start = detour[0], end = detour[detour.length - 1];
+
+		const lines: Line[] = [];
+		for(let i = 0; i < detour.length - 1; i++) {
+			lines.push(new Line(detour[i], detour[i + 1]));
+		}
+
+		// Find corresponding position of the detour
+		const l = ridges.length;
+		for(let i = 0; i < l; i++) {
+			const eq = ridges[i].p1.eq(start);
+			if(!eq && !ridges[i].$contains(start)) continue;
+
+			for(let j = 1; j < l; j++) {
+				const k = (j + i) % l;
+				if(!ridges[k].p1.eq(end) && !ridges[k].$contains(end)) continue;
+
+				// Found matching, perform substitution
+				const tail = k < i ? l - i : j + 1, head = j + 1 - tail;
+				const pts = detour.concat();
+				lines.push(new Line(end, ridges[k].p2));
+				if(!eq) {
+					pts.unshift(ridges[i].p1);
+					lines.unshift(new Line(ridges[i].p1, start));
+				}
+				contour.splice(i, tail, ...pts);
+				ridges.splice(i, tail, ...lines);
+				contour.splice(0, head);
+				ridges.splice(0, head);
+				return;
+			}
+
+			// Something is wrong with the given detour if we get here.
+			debugger;
+		}
 	}
 }
