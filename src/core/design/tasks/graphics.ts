@@ -27,6 +27,7 @@ function graphics(): void {
 					contours: device.$contour,
 					ridges: device.$ridges,
 					axisParallel: device.$axisParallels,
+					location: device.$location,
 					// Note that the range of all devices in the pattern will be updated.
 					range: device.$getDraggingRange(),
 					forward,

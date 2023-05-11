@@ -60,9 +60,14 @@ interface DeviceData extends GraphicsData {
 	range: readonly [number, number];
 
 	/**
+	 * Current location of the {@link Device}.
+	 */
+	location: IPoint;
+
+	/**
 	 * Whether the overall direction is like a forward slash.
 	 */
-	forward?: boolean;
+	forward: boolean;
 }
 
 interface StretchData {

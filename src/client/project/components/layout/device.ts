@@ -41,6 +41,7 @@ export class Device extends Draggable {
 
 		this.$graphics = graphics;
 		this.$selectedCursor = graphics.forward ? "nesw-resize" : "nwse-resize"; // Should be a one-time setup in theory.
+		this.$location = graphics.location;
 
 		// We deliberately put the shade on a higher layer,
 		// so that its hovering effect can be prioritized.
@@ -66,7 +67,13 @@ export class Device extends Draggable {
 	}
 
 	protected override _move(x: number, y: number): void {
+		const dx = x - this.$location.x;
 		super._move(x, y);
+
+		// Update range, so that subsequent dragging can be constraint correctly even before redraw.
+		const r = this.$graphics.range;
+		this.$graphics.range = [r[0] - dx, r[1] - dx];
+
 		this.stretch.$layout.$moveDevice(this);
 	}
 
