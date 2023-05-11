@@ -4,7 +4,6 @@ import { configFilter } from "./filters";
 
 import type { Repository } from "../repository";
 import type { Configuration } from "../configuration";
-import type { JStretch } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";
 
 //=================================================================
@@ -14,12 +13,12 @@ import type { ValidJunction } from "../junction/validJunction";
  */
 //=================================================================
 export function* generalConfigGenerator(
-	repo: Repository, junctions: ValidJunction[], prototype?: JStretch
+	repo: Repository, junctions: ValidJunction[], seedSignature?: string
 ): Generator<Configuration> {
 	// First find all possible configurations for each Junction
 	const junctionConfigs = junctions.map(j => [...singleConfigGenerator(repo, j)]);
 
 	yield* GeneratorUtil.$first([
 
-	], configFilter);
+	], configFilter(undefined));
 }

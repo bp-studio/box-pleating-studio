@@ -1,8 +1,7 @@
 import { State } from "core/service/state";
 import { Store } from "./store";
-import { generalConfigGenerator } from "./generators/generalConfigGenerator";
-import { singleConfigGenerator } from "./generators/singleConfigGenerator";
 import { Point } from "core/math/geometry/point";
+import { configGenerator } from "./generators/configGenerator";
 
 import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
@@ -65,11 +64,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		State.$newRepositories.add(this);
 		State.$repoUpdated.add(this);
 
-		if(junctions.length === 1) {
-			this._configurations = new Store(singleConfigGenerator(this, junctions[0], prototype));
-		} else {
-			this._configurations = new Store(generalConfigGenerator(this, junctions, prototype));
-		}
+		this._configurations = new Store(configGenerator(this, junctions, prototype));
 	}
 
 	public toJSON(): JRepository | undefined {

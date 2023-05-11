@@ -29,7 +29,7 @@ export class Device implements ISerializable<JDevice> {
 	private readonly _regions: readonly Region[];
 
 	public $anchors!: readonly Point[][];
-	public $location: IPoint;
+	public $location!: IPoint;
 
 	private _delta!: Vector;
 	private readonly _originalDisplacement: Vector;
@@ -40,7 +40,7 @@ export class Device implements ISerializable<JDevice> {
 		this.$gadgets = data.gadgets.map(g => new Gadget(g));
 		this.$addOns = data.addOns?.map(a => new AddOn(a)) ?? [];
 		this._originalDisplacement = partition.$getOriginalDisplacement(pattern);
-		this.$location = { x: 0, y: 0 };
+		this.$offset = data.offset ?? 0;
 
 		// Collect regions
 		const regions: Region[] = [];
@@ -54,8 +54,19 @@ export class Device implements ISerializable<JDevice> {
 	public toJSON(): JDevice {
 		return {
 			gadgets: clone(this.$gadgets),
+			offset: this.$offset,
 			addOns: this.$addOns.length ? this.$addOns : undefined,
 		};
+	}
+
+	public get $offset(): number {
+		let dx = this.$partition.$getOriginalDisplacement(this.$pattern).x;
+		dx -= this._originalDisplacement.x;
+		return (this.$location.x - dx) * this.$pattern.$config.$repo.$f.x;
+	}
+	public set $offset(v: number) {
+		const { x, y } = this.$pattern.$config.$repo.$f;
+		this.$location = { x: v * x, y: v * y };
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,5 +181,21 @@ export class Device implements ISerializable<JDevice> {
 		const result = this.$getConnectionRidges(false);
 		//TODO: IntersectionMap
 		return result;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Static methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Generate a signature for a given list of {@link JDevice},
+	 * disregarding positional information.
+	 */
+	public static $getSignature(devices: readonly JDevice[]): string {
+		return JSON.stringify(devices.map(d => {
+			d.gadgets.forEach(g => Gadget.$simplify(g));
+			delete d.offset;
+			return d;
+		}));
 	}
 }

@@ -4,7 +4,7 @@ import { clone } from "shared/utils/clone";
 import { configFilter } from "./filters";
 
 import type { Repository } from "../repository";
-import type { JJunction, JOverlap, JStretch } from "shared/json";
+import type { JJunction, JOverlap } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";
 
 //=================================================================
@@ -14,13 +14,12 @@ import type { ValidJunction } from "../junction/validJunction";
  */
 //=================================================================
 export function* singleConfigGenerator(
-	repo: Repository, junction: ValidJunction, prototype?: JStretch
+	repo: Repository, junction: ValidJunction, protoSignature?: string
 ): Generator<Configuration> {
 	const j = junction.toJSON();
-
 	yield* GeneratorUtil.$first([
 		singleGOPS(repo, j),
-	], configFilter);
+	], configFilter(protoSignature));
 }
 
 function* singleGOPS(repo: Repository, j: JJunction): Generator<Configuration> {

@@ -4,7 +4,7 @@ import { patternGenerator } from "./generators/patternGenerator";
 
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
-import type { JConfiguration, JJunction, JOverlap, JPartition } from "shared/json";
+import type { JConfiguration, JJunction, JOverlap, JPartition, JPattern } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 
 //=================================================================
@@ -17,6 +17,7 @@ import type { Pattern } from "./pattern/pattern";
 export class Configuration implements ISerializable<JConfiguration> {
 
 	public readonly $repo: Repository;
+	public readonly $junctions: readonly JJunction[];
 	public readonly $partitions: readonly Partition[];
 	public readonly $overlaps!: readonly JOverlap[];
 
@@ -31,11 +32,12 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	public $originDirty: boolean = false;
 
-	constructor(repo: Repository, junctions: JJunction[], partitions: JPartition[]) {
+	constructor(repo: Repository, junctions: JJunction[], partitions: readonly JPartition[], proto?: JPattern) {
 		this.$repo = repo;
+		this.$junctions = junctions;
 		this.$partitions = partitions.map(p => new Partition(junctions, p));
 
-		this._patterns = new Store(patternGenerator(this));
+		this._patterns = new Store(patternGenerator(this, proto));
 		this._patterns.$next();
 
 		// The rest of the calculations are not needed if there's no pattern.

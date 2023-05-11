@@ -33,6 +33,14 @@ export class Gadget implements JGadget {
 		this.anchors = data.anchors;
 	}
 
+	@cache public get sx(): number {
+		return Math.ceil(this.$anchorMap[2][0].x - this.$anchorMap[0][0].x);
+	}
+
+	@cache public get sy(): number {
+		return Math.ceil(this.$anchorMap[2][0].y - this.$anchorMap[0][0].y);
+	}
+
 	@cache public get $anchorMap(): PerQuadrant<AnchorMap> {
 		return makePerQuadrant<AnchorMap>(q => {
 			if(this.anchors?.[q]?.location) {
@@ -62,5 +70,23 @@ export class Gadget implements JGadget {
 
 	private _getSlack(q: QuadrantDirection): number {
 		return this.anchors?.[q]?.slack ?? 0;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Static methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** Simplify JSON data representation. */
+	public static $simplify(g: JGadget): JGadget {
+		if(g.offset && g.offset.x == 0 && g.offset.y == 0) delete g.offset;
+		if(g.anchors) {
+			for(const [i, a] of g.anchors.entries()) {
+				if(!a) continue;
+				if(a.slack === 0) delete a.slack;
+				if(Object.keys(a).length == 0) delete g.anchors[i];
+			}
+			if(!g.anchors.some(a => Boolean(a))) delete g.anchors;
+		}
+		return g;
 	}
 }

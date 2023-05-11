@@ -32,7 +32,7 @@ export class Stretch implements ISerializable<JStretch> {
 	constructor(junctions: ValidJunction[], prototype: JStretch) {
 		const signature = getStructureSignature(junctions);
 		this.$id = prototype.id;
-		this._repo = new Repository(this, junctions, signature);
+		this._repo = new Repository(this, junctions, signature, prototype);
 	}
 
 	public toJSON(): JStretch {

@@ -1,7 +1,8 @@
 import { Pattern } from "../pattern/pattern";
+import { Device } from "../pattern/device";
 
 import type { Configuration } from "../configuration";
-import type { JDevice } from "shared/json";
+import type { JDevice, JPattern } from "shared/json";
 import type { Partition } from "../partition";
 
 //=================================================================
@@ -10,14 +11,33 @@ import type { Partition } from "../partition";
  * and combine them into {@link Pattern}s.
  */
 //=================================================================
-export function* patternGenerator(config: Configuration): Generator<Pattern> {
+export function* patternGenerator(config: Configuration, proto?: JPattern): Generator<Pattern> {
+	// Process prototype pattern
+	let protoSignature: string | undefined;
+	if(proto) {
+		const pattern = new Pattern(config, proto.devices, true);
+		if(pattern.$valid) {
+			const devices = pattern.$devices.map(d => d.toJSON());
+			protoSignature = Device.$getSignature(devices);
+			yield pattern;
+		}
+	}
+
+	// Search for patterns
 	const buffer: JDevice[] = new Array(config.$partitions.length);
 	for(const devices of recursiveDeviceGenerator(config.$partitions, 0, buffer)) {
+		// Compare and skip prototype pattern
+		if(protoSignature) {
+			const signature = Device.$getSignature(devices);
+			if(signature == protoSignature) {
+				protoSignature = undefined; // No need to compare further
+				continue;
+			}
+		}
 		const pattern = new Pattern(config, devices);
 		if(pattern.$valid) yield pattern;
 	}
 }
-
 
 function* recursiveDeviceGenerator(
 	partitions: readonly Partition[], depth: number, buffer: JDevice[]
