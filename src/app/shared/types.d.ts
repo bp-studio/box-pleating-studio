@@ -1,12 +1,12 @@
 
-import type	Vue from "vue";
+import type { ComponentPublicInstance } from "vue";
 
 declare global {
-	interface IShow extends Vue.ComponentPublicInstance {
+	interface IShow extends ComponentPublicInstance {
 		show(): void;
 	}
 
-	interface Executor extends Vue.ComponentPublicInstance {
+	interface Executor extends ComponentPublicInstance {
 		execute(): void;
 	}
 }

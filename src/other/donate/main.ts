@@ -1,14 +1,17 @@
+import { createSSRApp } from "vue";
+import { createI18n } from "vue-i18n";
+
 import App from "./app.vue";
 
 import type { BpsLocale } from "shared/frontend/locale";
 
-const i18n = VueI18n.createI18n<[BpsLocale], string>({
+const i18n = createI18n<[BpsLocale], string>({
 	locale: "en",
 	fallbackLocale: "en",
 	silentFallbackWarn: true,
 	messages: locale,
 });
-const app = Vue.createSSRApp(App);
+const app = createSSRApp(App);
 app.use(i18n);
 app.mount("#app");
 

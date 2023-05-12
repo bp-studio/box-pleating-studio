@@ -46,6 +46,8 @@ namespace LZ {
 	// `atob` and `btoa` methods are deprecated in Node.js but not in frontend,
 	// so we use window.atob etc. to silence warnings.
 	// See https://stackoverflow.com/a/70851350/9953396
+	//
+	// 20230512 update: This issue seems fixed somehow now. Keep observing.
 
 	export async function compress(s: string): Promise<string> {
 		const arr = await callWorker<Uint8Array>(Act.compress, s, 1); // Experiments showed that 1 is good enough

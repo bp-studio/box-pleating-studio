@@ -41,8 +41,7 @@
 		<Divider />
 
 		<template v-if="isFileApiEnabled">
-			<SaveAs :disabled="!Studio.project" type="svg" @save="svgSaved" :desc="$t('toolbar.file.SVG.name')"
-					mime="image/svg+xml">
+			<SaveAs :disabled="!Studio.project" type="svg" @save="svgSaved" :desc="$t('toolbar.file.SVG.name')" mime="image/svg+xml">
 				<i class="far fa-file-image" />
 				{{ $t('toolbar.file.SVG.save') }}
 			</SaveAs>
@@ -75,7 +74,7 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, shallowRef, nextTick } from "vue";
 
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
@@ -110,7 +109,7 @@
 				opn.value.execute();
 			} else {
 				menu.value!.init();
-				Vue.nextTick(() => opn.value!.execute());
+				nextTick(() => opn.value!.execute());
 			}
 		}, "o");
 		HotKeyService.register(() => {

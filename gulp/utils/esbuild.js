@@ -30,7 +30,12 @@ function getDefaultPlugins() {
 					"withCtx", "pushScopeId", "popScopeId", "toDisplayString", "renderSlot", "Fragment",
 					"normalizeClass", "isRef", "vModelDynamic", "vModelText", "nextTick", "createTextVNode",
 					"resolveComponent", "renderList", "vShow", "vModelSelect", "resolveDynamicComponent",
-					"createStaticVNode", "h", "normalizeStyle"],
+					"createStaticVNode", "h", "normalizeStyle", "createSSRApp"],
+				defaultExport: false,
+			},
+			"vue-i18n": {
+				varName: "VueI18n",
+				namedExports: ["createI18n"],
 				defaultExport: false,
 			},
 		}),

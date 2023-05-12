@@ -1,12 +1,10 @@
 // Third-party library types
-import type vue from "vue";
+import type { VueI18n } from "vue-i18n";
 import type bootstrap from "bootstrap";
-import type vueI18n from "vue-i18n";
 import type { BpsLocale } from "./locale";
 
 declare global {
-	declare const VueI18n: typeof vueI18n;
-	declare const Vue: typeof vue;
+	// This one is needed since Bootstrap package is lazily loaded.
 	declare const Bootstrap: typeof bootstrap;
 
 	/** Launching error manager, defined in HTML. */
@@ -38,7 +36,8 @@ declare global {
 	declare const locale: Record<string, BpsLocale>;
 
 	/** Global VueI18n instance. Either injected by SSG or created in LanguageService.ts. */
-	declare let i18n: vueI18n.VueI18n;
+	declare let i18n: VueI18n;
 
+	// 20230512 update: This issue seems fixed somehow now. Keep observing.
 	type Timeout = ReturnType<typeof setTimeout> | number;
 }

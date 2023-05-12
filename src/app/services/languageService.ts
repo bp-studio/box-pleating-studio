@@ -1,4 +1,5 @@
-import { watch } from "vue";
+import { watch, nextTick } from "vue";
+import { createI18n } from "vue-i18n";
 
 import { copyright } from "app/misc/copyright";
 
@@ -24,7 +25,7 @@ namespace LanguageService {
 
 	/** Create i18n instance. */
 	export function createPlugin(): I18n {
-		const plugin = VueI18n.createI18n<[BpsLocale], string>({
+		const plugin = createI18n<[BpsLocale], string>({
 			locale: DEFAULT_LOCALE,
 			fallbackLocale: DEFAULT_LOCALE,
 			silentFallbackWarn: true,
@@ -63,7 +64,7 @@ namespace LanguageService {
 				syncing = false;
 			} else {
 				loc = findFallbackLocale(loc);
-				Vue.nextTick(() => i18n.locale = loc);
+				nextTick(() => i18n.locale = loc);
 			}
 			document.documentElement.lang = loc;
 		}, { immediate: true });

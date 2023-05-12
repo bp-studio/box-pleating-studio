@@ -18,6 +18,12 @@ gulp.task("donate", () => $.all(
 			minify: true,
 			tsconfig: config.src.donate + "/tsconfig.json",
 		}))
+		.pipe($.terser({
+			compress: {
+				// This removes unused imports
+				pure_getters: true,
+			},
+		}))
 		.pipe(gulp.dest(config.dest.dist)),
 
 	// Html
