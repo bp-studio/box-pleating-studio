@@ -13,14 +13,14 @@
 	</template>
 </template>
 
-<script lang="ts">
-	export default { name: "Stretch" };
-</script>
-
 <script setup lang="ts">
+
 	import Store from "@/gadgets/form/store.vue";
 
 	import type { Stretch } from "client/project/components/layout/stretch";
 
+	defineOptions({ name: "Stretch" });
+
 	defineProps<{ stretch: Stretch }>();
+
 </script>

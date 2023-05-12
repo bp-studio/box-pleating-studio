@@ -14,16 +14,16 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Flap" };
-</script>
-
 <script setup lang="ts">
+
 	import Field from "@/gadgets/form/field.vue";
 	import NumberVue from "@/gadgets/form/number.vue";
 	import { hk } from "app/services/customHotkeyService";
 
 	import type { Flap } from "client/project/components/layout/flap";
 
+	defineOptions({ name: "Flap" });
+
 	defineProps<{ subject: Flap, max: number }>();
+
 </script>

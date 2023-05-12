@@ -5,10 +5,6 @@
 	</Export>
 </template>
 
-<script lang="ts">
-	export default { name: "CP" };
-</script>
-
 <script setup lang="ts">
 
 	import Studio from "app/services/studioService";
@@ -17,6 +13,8 @@
 	import ExportService from "app/services/exportService";
 	import { compRef } from "app/inject";
 	import Export from "./components/export.vue";
+
+	defineOptions({ name: "CP" });
 
 	const exp = compRef(Export);
 

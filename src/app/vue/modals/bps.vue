@@ -3,16 +3,14 @@
 			:description="$t('toolbar.file.BPS.name')" extension=".bps" screen="BPS" @save="save" />
 </template>
 
-<script lang="ts">
-	export default { name: "BPS" };
-</script>
-
 <script setup lang="ts">
 
 	import ExportService from "app/services/exportService";
 	import { compRef } from "app/inject";
 	import Studio from "app/services/studioService";
 	import Export from "./components/export.vue";
+
+	defineOptions({ name: "BPS" });
 
 	const exp = compRef(Export);
 

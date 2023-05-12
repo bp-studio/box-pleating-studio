@@ -7,11 +7,9 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "DropdownItem" };
-</script>
-
 <script setup lang="ts">
+
+	defineOptions({ name: "DropdownItem" });
 
 	const props = defineProps<{
 		disabled?: boolean;

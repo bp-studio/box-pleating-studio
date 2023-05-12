@@ -40,10 +40,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "KeyTable" };
-</script>
-
 <script setup lang="ts">
 
 	import { reactive } from "vue";
@@ -51,6 +47,8 @@
 	import Settings from "app/services/settingService";
 	import Dialogs from "app/services/dialogService";
 	import CustomHotkeyService from "app/services/customHotkeyService";
+
+	defineOptions({ name: "KeyTable" });
 
 	type KeyMap = Record<string, Record<string, string>>;
 

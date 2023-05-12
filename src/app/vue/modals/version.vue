@@ -24,16 +24,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Version" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted, reactive, shallowRef, watch } from "vue";
 
 	import Dialogs from "app/services/dialogService";
 	import useModal from "./modal";
+
+	defineOptions({ name: "Version" });
 
 	const max = logs.length - 1;
 	const index = shallowRef<number>(max);

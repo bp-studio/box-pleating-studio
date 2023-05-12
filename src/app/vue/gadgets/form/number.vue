@@ -14,10 +14,6 @@
 	</Row>
 </template>
 
-<script lang="ts">
-	export default { name: "Number" };
-</script>
-
 <script setup lang="ts">
 	import { computed, nextTick } from "vue";
 
@@ -26,6 +22,8 @@
 	import { useInput } from "./input";
 	import Row from "./row.vue";
 	import { useWheel } from "./useWheel";
+
+	defineOptions({ name: "Number" });
 
 	const props = withDefaults(defineProps<{
 		label?: string;

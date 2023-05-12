@@ -15,16 +15,14 @@
 	</SubMenu>
 </template>
 
-<script lang="ts">
-	export default { name: "RecentMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { Divider, DropdownItem } from "@/gadgets/menu";
 	import SubMenu from "@/gadgets/menu/submenu.vue";
 	import Handles from "app/services/handleService";
 	import Import from "app/services/importService";
+
+	defineOptions({ name: "RecentMenu" });
 
 	function open(handle: FileSystemFileHandle): void {
 		Import.open([handle], true);

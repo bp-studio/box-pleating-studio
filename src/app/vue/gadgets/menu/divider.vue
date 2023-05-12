@@ -4,6 +4,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Divider" };
+<script setup lang="ts">
+	defineOptions({ name: "Divider" });
 </script>

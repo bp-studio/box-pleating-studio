@@ -9,18 +9,18 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Vertices" };
-</script>
-
 <script setup lang="ts">
+
 	import { hk } from "app/services/customHotkeyService";
 	import Studio from "app/services/studioService";
 
 	import type { Vertex } from "client/project/components/tree/vertex";
 	import type { Design } from "client/project/design";
 
+	defineOptions({ name: "Vertices" });
+
 	defineProps<{ design: Design }>();
 
 	const selections = Studio.selections as readonly Vertex[];
+
 </script>

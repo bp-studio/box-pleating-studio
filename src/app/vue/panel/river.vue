@@ -11,15 +11,15 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "River" };
-</script>
-
 <script setup lang="ts">
+
 	import Number from "@/gadgets/form/number.vue";
 	import { hk } from "app/services/customHotkeyService";
 
 	import type { River } from "client/project/components/layout/river";
 
+	defineOptions({ name: "River" });
+
 	defineProps<{ subject: River }>();
+
 </script>

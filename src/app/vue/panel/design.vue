@@ -24,11 +24,8 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Design" };
-</script>
-
 <script setup lang="ts">
+
 	import { computed } from "vue";
 
 	import { zoomStep } from "app/utils/viewUtility";
@@ -41,7 +38,10 @@
 
 	import type { Design } from "client/project/design";
 
+	defineOptions({ name: "Design" });
+
 	const props = defineProps<{ design: Design }>();
 
 	const step = computed(() => zoomStep(props.design.sheet.zoom ?? 0));
+
 </script>

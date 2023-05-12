@@ -24,10 +24,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Tab" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed } from "vue";
@@ -38,6 +34,8 @@
 
 	import type { Project } from "client/project/project";
 
+	defineOptions({ name: "Tab" });
+
 	const props = defineProps<{ id: number }>();
 
 	function project(): Project {
@@ -46,14 +44,10 @@
 
 	defineEmits(["menu"]);
 
-	function isActive(): boolean {
-		return Studio.project?.id == props.id;
-	}
-
 	const isModified = computed(() => project().history.isModified);
 	const title = computed(() => {
-		const title = project().design.title;
-		return title ? title : i18n.t("toolbar.tab.noTitle").toString();
+		const designTitle = project().design.title;
+		return designTitle ? designTitle : i18n.t("toolbar.tab.noTitle").toString();
 	});
 	const toolTip = computed(() => {
 		let result = project().design.title;

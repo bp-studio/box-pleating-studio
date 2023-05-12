@@ -4,14 +4,12 @@
 	</Dialog>
 </template>
 
-<script lang="ts">
-	export default { name: "Alert" };
-</script>
-
 <script setup lang="ts">
 
 	import { compRef } from "app/inject";
 	import Dialog from "./dialog.vue";
+
+	defineOptions({ name: "Alert" });
 
 	const dialog = compRef(Dialog);
 

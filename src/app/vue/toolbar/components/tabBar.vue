@@ -12,11 +12,8 @@
 	<TabMenu ref="tabMenu" />
 </template>
 
-<script lang="ts">
-	export default { name: "TabBar" };
-</script>
-
 <script setup lang="ts">
+
 	import { SlickList, SlickItem } from "vue-slicksort/dist/vue-slicksort.esm.js";
 
 	import { compRef } from "app/inject";
@@ -24,6 +21,8 @@
 	import Studio from "app/services/studioService";
 	import Tab from "./tab.vue";
 	import TabMenu from "./tabMenu.vue";
+
+	defineOptions({ name: "TabBar" });
 
 	const tabMenu = compRef(TabMenu);
 	const DELTA_UNIT = 5;

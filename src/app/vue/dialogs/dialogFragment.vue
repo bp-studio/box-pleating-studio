@@ -6,13 +6,6 @@
 	</template>
 </template>
 
-<script lang="ts">
-	/**
-	 * This component is responsible for registering various mandatory dialogs on the dialogService.
-	 */
-	export default { name: "DialogFragment" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
@@ -23,6 +16,11 @@
 	import Spinner from "./spinner.vue";
 	import Alert from "./alert.vue";
 	import Confirm from "./confirm.vue";
+
+	/**
+	 * This component is responsible for registering various mandatory dialogs on the dialogService.
+	 */
+	defineOptions({ name: "DialogFragment" });
 
 	const spinner = compRef(Spinner);
 	const confirm = compRef(Confirm);

@@ -24,15 +24,13 @@
 	</ContextMenu>
 </template>
 
-<script lang="ts">
-	export default { name: "TabMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { compRef } from "app/inject";
 	import Workspace from "app/services/workspaceService";
 	import { ContextMenu, DropdownItem, Divider } from "@/gadgets/menu";
+
+	defineOptions({ name: "TabMenu" });
 
 	const tabMenu = compRef(ContextMenu);
 

@@ -18,10 +18,6 @@
 	</Dropdown>
 </template>
 
-<script lang="ts">
-	export default { name: "EditMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted } from "vue";
@@ -30,6 +26,8 @@
 	import HotkeyService from "app/services/hotkeyService";
 	import { isMac } from "app/shared/constants";
 	import Studio from "app/services/studioService";
+
+	defineOptions({ name: "EditMenu" });
 
 	onMounted(() => {
 		HotkeyService.register(undo, "z");

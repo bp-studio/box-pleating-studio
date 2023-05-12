@@ -5,14 +5,12 @@
 	</DialogVue>
 </template>
 
-<script lang="ts">
-	export default { name: "Confirm" };
-</script>
-
 <script setup lang="ts">
 
 	import { compRef } from "app/inject";
 	import DialogVue from "./dialog.vue";
+
+	defineOptions({ name: "Confirm" });
 
 	let value: boolean = false;
 	const dialog = compRef(DialogVue);

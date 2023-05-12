@@ -3,15 +3,13 @@
 			:description="$t('toolbar.file.PNG.name')" extension=".png" screen="PNG" @save="save" />
 </template>
 
-<script lang="ts">
-	export default { name: "PNG" };
-</script>
-
 <script setup lang="ts">
 
 	import ExportService from "app/services/exportService";
 	import { compRef } from "app/inject";
 	import Export from "./components/export.vue";
+
+	defineOptions({ name: "PNG" });
 
 	const exp = compRef(Export);
 

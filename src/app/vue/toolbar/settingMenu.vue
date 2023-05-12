@@ -57,10 +57,6 @@
 	</Dropdown>
 </template>
 
-<script lang="ts">
-	export default { name: "SettingMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted } from "vue";
@@ -72,6 +68,8 @@
 	import Studio from "app/services/studioService";
 	import Fullscreen from "./components/fullscreen.vue";
 	import { toHex } from "shared/utils/color";
+
+	defineOptions({ name: "SettingMenu" });
 
 	onMounted(() => {
 		HotkeyService.register(() => toggle("showGrid"), "1");

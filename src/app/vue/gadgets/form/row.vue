@@ -10,14 +10,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Row" };
-</script>
-
 <script setup lang="ts">
+
+	defineOptions({ name: "Row" });
+
 	defineProps<{
 		label?: string;
 	}>();
+
 </script>
 
 <style>

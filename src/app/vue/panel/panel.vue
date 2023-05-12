@@ -5,7 +5,7 @@
 			<Design v-if="Studio.selections.length == 0" :design="design" />
 			<div v-else-if="Studio.selections.length == 1">
 				<StretchVue v-if="Studio.stretch" :stretch="Studio.stretch" />
-				<component v-else-if="type == 'Flap'" :is="Flap" :subject="Studio.selection" :max="design.sheet.grid.diameter" />
+				<component v-else-if="type == 'Flap'" :is="Flap" :subject="<F>Studio.selection" :max="design.sheet.grid.diameter" />
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
@@ -20,11 +20,10 @@
 	export function show(): void { showPanel.value = true; }
 	export function hide(): void { showPanel.value = false; }
 	export function toggle(): void { showPanel.value = !showPanel.value; }
-
-	export default { name: "Panel" };
 </script>
 
 <script setup lang="ts">
+
 	import { computed, onMounted, shallowRef, watch } from "vue";
 
 	import Studio, { showPanel } from "app/services/studioService";
@@ -37,7 +36,10 @@
 	import Flaps from "./flaps.vue";
 	import Vertices from "./vertices.vue";
 
+	import type { Flap as F } from "client/project/components/layout/flap";
 	import type { Component } from "vue";
+
+	defineOptions({ name: "Panel" });
 
 	defineEmits(["hide"]);
 

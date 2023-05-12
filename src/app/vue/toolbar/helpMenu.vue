@@ -39,10 +39,6 @@
 	</Dropdown>
 </template>
 
-<script lang="ts">
-	export default { name: "HelpMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed, onMounted, shallowRef } from "vue";
@@ -51,6 +47,8 @@
 	import Dialogs from "app/services/dialogService";
 	import { updateReady } from "app/misc/updateReady";
 	import { show } from "../modals/modalFragment.vue";
+
+	defineOptions({ name: "HelpMenu" });
 
 	const notify = shallowRef(false);
 	const checking = shallowRef(false);

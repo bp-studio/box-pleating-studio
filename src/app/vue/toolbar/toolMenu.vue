@@ -11,10 +11,6 @@
 	</Dropdown>
 </template>
 
-<script lang="ts">
-	export default { name: "SettingMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { Dropdown } from "@/gadgets/menu";
@@ -25,6 +21,8 @@
 	import { Uploader } from "@/gadgets/file";
 	import Workspace from "app/services/workspaceService";
 	import { show } from "@/modals/modalFragment.vue";
+
+	defineOptions({ name: "ToolMenu" });
 
 	async function TreeMaker(files: File[]): Promise<void> {
 		const file = files[0];

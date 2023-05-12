@@ -32,10 +32,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Export" };
-</script>
-
 <script setup lang="ts">
 
 	import { shallowRef, watch } from "vue";
@@ -46,6 +42,8 @@
 	import FileUtility from "app/utils/fileUtility";
 	import { compRef } from "app/inject";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
+
+	defineOptions({ name: "Export" });
 
 	const bt = compRef(CheckButton);
 	const url = shallowRef<string | null>(null);

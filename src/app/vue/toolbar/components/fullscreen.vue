@@ -23,7 +23,6 @@
 			webkitRequestFullscreen?: () => void;
 		}
 	}
-	export default { name: "Fullscreen" };
 </script>
 
 <script setup lang="ts">
@@ -31,6 +30,8 @@
 	import { onMounted, shallowRef } from "vue";
 
 	import Divider from "@/gadgets/menu/divider.vue";
+
+	defineOptions({ name: "Fullscreen" });
 
 	// Safari < 16.4 & on iPad still requires "webkit" prefix,
 	// see https://caniuse.com/mdn-api_element_fullscreenchange_event

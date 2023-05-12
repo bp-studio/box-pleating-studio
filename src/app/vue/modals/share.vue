@@ -38,10 +38,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Share" };
-</script>
-
 <script setup lang="ts">
 
 	import { shallowRef } from "vue";
@@ -52,6 +48,8 @@
 	import useModal from "./modal";
 	import { compRef } from "app/inject";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
+
+	defineOptions({ name: "Share" });
 
 	const url = shallowRef("");
 	const canShare = Boolean(navigator.share);

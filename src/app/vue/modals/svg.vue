@@ -5,10 +5,6 @@
 	</Export>
 </template>
 
-<script lang="ts">
-	export default { name: "SVG" };
-</script>
-
 <script setup lang="ts">
 
 	import ExportService from "app/services/exportService";
@@ -16,6 +12,8 @@
 	import Toggle from "@/gadgets/form/toggle.vue";
 	import { compRef } from "app/inject";
 	import Export from "./components/export.vue";
+
+	defineOptions({ name: "SVG" });
 
 	const exp = compRef(Export);
 

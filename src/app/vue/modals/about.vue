@@ -44,16 +44,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "About" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed } from "vue";
 
 	import { copyright } from "app/misc/copyright";
 	import useModal from "./modal";
+
+	defineOptions({ name: "About" });
 
 	const { el, show } = useModal("About");
 

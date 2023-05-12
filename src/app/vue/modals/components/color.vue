@@ -14,15 +14,13 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Color" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed, getCurrentInstance } from "vue";
 
 	import { toHex } from "shared/utils/color";
+
+	defineOptions({ name: "Color" });
 
 	const id: string = "color" + getCurrentInstance()?.uid;
 

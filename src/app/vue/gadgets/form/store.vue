@@ -13,13 +13,12 @@
 	</row>
 </template>
 
-<script lang="ts">
-	export default { name: "Store" };
-</script>
-
 <script setup lang="ts">
+
 	import row from "./row.vue";
 	import { useWheel } from "./useWheel";
+
+	defineOptions({ name: "Store" });
 
 	defineProps<{
 		size: number;
@@ -29,4 +28,5 @@
 	const emit = defineEmits(["move"]);
 
 	const wheel = useWheel(by => emit("move", by));
+
 </script>

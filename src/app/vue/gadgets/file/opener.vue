@@ -4,11 +4,9 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Opener" };
-</script>
-
 <script setup lang="ts">
+
+	defineOptions({ name: "Opener" });
 
 	const props = defineProps<{
 		multiple?: boolean;

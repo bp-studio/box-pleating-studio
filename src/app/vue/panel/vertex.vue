@@ -26,11 +26,8 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Vertex" };
-</script>
-
 <script setup lang="ts">
+
 	import { shallowRef } from "vue";
 
 	import { hk } from "app/services/customHotkeyService";
@@ -39,7 +36,10 @@
 
 	import type { Vertex } from "client/project/components/tree/vertex";
 
+	defineOptions({ name: "Vertex" });
+
 	defineProps<{ subject: Vertex }>();
 
 	const newLength = shallowRef<number>(1);
+
 </script>

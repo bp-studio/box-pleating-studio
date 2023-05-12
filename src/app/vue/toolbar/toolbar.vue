@@ -31,10 +31,6 @@
 	</nav>
 </template>
 
-<script lang="ts">
-	export default { name: "Toolbar" };
-</script>
-
 <script setup lang="ts">
 
 	import { phase } from "app/misc/lcpReady";
@@ -47,6 +43,8 @@
 	import HelpMenu from "./helpMenu.vue";
 	import EditMenu from "./editMenu.vue";
 	import ToolMenu from "./toolMenu.vue";
+
+	defineOptions({ name: "Toolbar" });
 
 	function toLayout(): void {
 		if(Studio.project) Studio.project.design.mode = "layout";

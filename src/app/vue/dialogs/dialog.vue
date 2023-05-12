@@ -13,7 +13,6 @@
 
 <script lang="ts">
 	let lastHidden: Promise<void> = Promise.resolve();
-	export default { name: "DialogModal" };
 </script>
 
 <script setup lang="ts">
@@ -22,6 +21,8 @@
 
 	import HotkeyService from "app/services/hotkeyService";
 	import Lib from "app/services/libService";
+
+	defineOptions({ name: "DialogModal" });
 
 	let modal: bootstrap.Modal;
 	const el = shallowRef<HTMLElement>();

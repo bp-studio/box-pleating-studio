@@ -14,14 +14,12 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Note" };
-</script>
-
 <script setup lang="ts">
 
 	import Studio from "app/services/studioService";
 	import useModal from "./modal";
+
+	defineOptions({ name: "Note" });
 
 	const { el, show } = useModal("Note");
 

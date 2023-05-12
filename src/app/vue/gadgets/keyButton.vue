@@ -4,15 +4,13 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "KeyButton" };
-</script>
-
 <script setup lang="ts">
 
 	import Studio from "app/services/studioService";
 
 	import type { DirectionKey } from "shared/types/types";
+
+	defineOptions({ name: "KeyButton" });
 
 	let to: Timeout;
 

@@ -5,13 +5,12 @@
 	</Row>
 </template>
 
-<script lang="ts">
-	export default { name: "Field" };
-</script>
-
 <script setup lang="ts">
+
 	import { useInput } from "./input";
 	import Row from "./row.vue";
+
+	defineOptions({ name: "Field" });
 
 	const props = defineProps<{
 		label: string;

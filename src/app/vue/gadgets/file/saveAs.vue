@@ -7,16 +7,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "SaveAs" };
-</script>
-
 <script setup lang="ts">
 
 	import Export from "app/services/exportService";
 	import FileUtility from "app/utils/fileUtility";
 
 	import type { Project } from "client/project/project";
+
+	defineOptions({ name: "SaveAs" });
 
 	const props = defineProps<{
 		type: string;

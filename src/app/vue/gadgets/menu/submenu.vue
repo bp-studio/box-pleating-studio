@@ -12,13 +12,11 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "SubMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { shallowRef } from "vue";
+
+	defineOptions({ name: "SubMenu" });
 
 	const sub = shallowRef<HTMLDivElement>();
 	const SUBMENU_DELAY = 250;

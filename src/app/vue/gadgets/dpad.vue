@@ -7,16 +7,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "DPad" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed } from "vue";
 
 	import Studio, { showPanel } from "app/services/studioService";
 	import KeyButton from "./keyButton.vue";
+
+	defineOptions({ name: "DPad" });
 
 	const show = computed(() => Studio.shouldShowDPad && !showPanel.value);
 

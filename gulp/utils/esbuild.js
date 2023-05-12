@@ -30,7 +30,7 @@ function getDefaultPlugins() {
 					"withCtx", "pushScopeId", "popScopeId", "toDisplayString", "renderSlot", "Fragment",
 					"normalizeClass", "isRef", "vModelDynamic", "vModelText", "nextTick", "createTextVNode",
 					"resolveComponent", "renderList", "vShow", "vModelSelect", "resolveDynamicComponent",
-					"createStaticVNode", "h", "normalizeStyle", "useSlots"],
+					"createStaticVNode", "h", "normalizeStyle"],
 				defaultExport: false,
 			},
 		}),

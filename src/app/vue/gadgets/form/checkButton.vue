@@ -5,13 +5,11 @@
 	</button>
 </template>
 
-<script lang="ts">
-	export default { name: "CheckButton" };
-</script>
-
 <script setup lang="ts">
 
 	import { shallowRef } from "vue";
+
+	defineOptions({ name: "CheckButton" });
 
 	const MESSAGE_DELAY = 3000;
 

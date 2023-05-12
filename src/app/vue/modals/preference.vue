@@ -88,10 +88,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Preference" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted, shallowRef, watch } from "vue";
@@ -103,6 +99,8 @@
 	import useModal from "./modal";
 	import KeyTable from "./components/keyTable.vue";
 	import Color from "./components/color.vue";
+
+	defineOptions({ name: "Preference" });
 
 	const { el, on, show } = useModal("Preference");
 

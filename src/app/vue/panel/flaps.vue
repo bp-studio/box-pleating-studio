@@ -8,14 +8,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Vertices" };
-</script>
-
 <script setup lang="ts">
+
 	import { hk } from "app/services/customHotkeyService";
 
 	import type { Design } from "client/project/design";
 
+	defineOptions({ name: "Vertices" });
+
 	defineProps<{ design: Design }>();
+
 </script>

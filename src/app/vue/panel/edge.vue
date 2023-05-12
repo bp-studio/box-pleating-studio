@@ -18,15 +18,15 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Edge" };
-</script>
-
 <script setup lang="ts">
+
 	import Number from "@/gadgets/form/number.vue";
 	import { hk } from "app/services/customHotkeyService";
 
 	import type { Edge } from "client/project/components/tree/edge";
 
+	defineOptions({ name: "Edge" });
+
 	defineProps<{ subject: Edge }>();
+
 </script>

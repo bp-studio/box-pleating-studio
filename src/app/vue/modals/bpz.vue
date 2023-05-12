@@ -3,16 +3,14 @@
 			:description="$t('toolbar.file.BPZ.name')" extension=".bpz" screen="BPZ" @save="save" />
 </template>
 
-<script lang="ts">
-	export default { name: "BPZ" };
-</script>
-
 <script setup lang="ts">
 
 	import ExportService from "app/services/exportService";
 	import { compRef } from "app/inject";
 	import Studio from "app/services/studioService";
 	import Export from "./components/export.vue";
+
+	defineOptions({ name: "BPZ" });
 
 	const exp = compRef(Export);
 

@@ -7,15 +7,13 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Uploader" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed, getCurrentInstance, shallowRef } from "vue";
 
 	import Studio from "app/services/studioService";
+
+	defineOptions({ name: "Uploader" });
 
 	const id: string = "file" + getCurrentInstance()?.uid;
 	const lbl = shallowRef<HTMLLabelElement>();

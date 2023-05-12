@@ -57,10 +57,6 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "App" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
@@ -73,6 +69,8 @@
 	import Status from "@/status.vue";
 	import DialogFragment from "@/dialogs/dialogFragment.vue";
 	import ModalFragment from "@/modals/modalFragment.vue";
+
+	defineOptions({ name: "App" });
 
 	const el = shallowRef<HTMLDivElement>();
 

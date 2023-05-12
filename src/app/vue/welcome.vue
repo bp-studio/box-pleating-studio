@@ -74,7 +74,6 @@
 			prompt(): Promise<void>;
 		}
 	}
-	export default { name: "Welcome" };
 </script>
 
 <script setup lang="ts">
@@ -89,6 +88,8 @@
 	import Studio from "app/services/studioService";
 	import Workspace from "app/services/workspaceService";
 	import Import from "app/services/importService";
+
+	defineOptions({ name: "Welcome" });
 
 	// See https://caniuse.com/web-app-manifest
 	// for browser support for standalone installation.

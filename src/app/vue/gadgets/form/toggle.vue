@@ -12,13 +12,11 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Toggle" };
-</script>
-
 <script setup lang="ts">
 
 	import { useFieldId } from "./input";
+
+	defineOptions({ name: "Toggle" });
 
 	const id = useFieldId();
 

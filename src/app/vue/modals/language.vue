@@ -19,15 +19,13 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Language" };
-</script>
-
 <script  setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
 
 	import Language from "app/services/languageService";
+
+	defineOptions({ name: "Language" });
 
 	const el = shallowRef<HTMLDivElement>();
 

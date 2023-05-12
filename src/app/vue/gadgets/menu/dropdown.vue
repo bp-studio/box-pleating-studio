@@ -19,7 +19,6 @@
 		current: null as symbol | null,
 		skipped: false,
 	};
-	export default { name: "Dropdown" };
 </script>
 
 <script setup lang="ts">
@@ -28,6 +27,8 @@
 
 	import Studio from "app/services/studioService";
 	import Lib from "app/services/libService";
+
+	defineOptions({ name: "Dropdown" });
 
 	defineProps<{
 		icon: string;

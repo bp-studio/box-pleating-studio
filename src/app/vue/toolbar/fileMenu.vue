@@ -73,10 +73,6 @@
 	</Dropdown>
 </template>
 
-<script lang="ts">
-	export default { name: "FileMenu" };
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
@@ -94,6 +90,8 @@
 	import { Uploader, Opener, SaveAs } from "@/gadgets/file";
 	import { show } from "@/modals/modalFragment.vue";
 	import RecentMenu from "./recentMenu.vue";
+
+	defineOptions({ name: "FileMenu" });
 
 	type SaveAsInstance = InstanceType<typeof SaveAs>;
 

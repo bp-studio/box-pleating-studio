@@ -26,15 +26,13 @@
 	</footer>
 </template>
 
-<script lang="ts">
-	export default { name: "Statusbar" };
-</script>
-
 <script setup lang="ts">
 	import { computed } from "vue";
 
 	import Studio from "app/services/studioService";
 	import { isTouch } from "app/shared/constants";
+
+	defineOptions({ name: "Statusbar" });
 
 	const type = computed(() => Studio.selections[0]?.type ?? "");
 

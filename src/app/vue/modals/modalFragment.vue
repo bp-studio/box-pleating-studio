@@ -40,8 +40,6 @@
 			}, 1);
 		});
 	}
-
-	export default { name: "ModalFragment" };
 </script>
 
 <script setup lang="ts">
@@ -59,6 +57,8 @@
 	import PNG from "./png.vue";
 	import BPS from "./bps.vue";
 	import BPZ from "./bpz.vue";
+
+	defineOptions({ name: "ModalFragment" });
 
 	function mdlRef(key: string): (el: object | null) => void {
 		return obj => modals[key] = obj as IShow;

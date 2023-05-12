@@ -8,16 +8,14 @@
 	</div>
 </template>
 
-<script lang="ts">
-	export default { name: "Spinner" };
-</script>
-
 <script setup lang="ts">
 
 	import { computed, shallowRef } from "vue";
 
 	import { lcpReady } from "app/misc/lcpReady";
 	import Workspace from "app/services/workspaceService";
+
+	defineOptions({ name: "Spinner" });
 
 	const loading = shallowRef(false);
 	const visible = computed(() => !lcpReady.value || loading.value);
