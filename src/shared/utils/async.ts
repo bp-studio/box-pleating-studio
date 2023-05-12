@@ -10,14 +10,22 @@ export function sleep(ms?: number): Promise<void> {
 }
 
 const channel = new MessageChannel();
+let promise: Promise<void> | undefined;
 
 /**
  * Creates a new macro-task using {@link MessageChannel}-trick.
  * This can break the 4ms-limitation of {@link sleep}.
  */
 export function doEvents(): Promise<void> {
-	return new Promise(resolve => {
-		channel.port1.onmessage = () => resolve();
+	// Return existing Promise if available.
+	// This helps resolving consecutive callings of this method.
+	if(promise) return promise;
+
+	return promise = new Promise(resolve => {
+		channel.port1.onmessage = () => {
+			promise = undefined;
+			resolve();
+		};
 		channel.port2.postMessage(null);
 	});
 }
