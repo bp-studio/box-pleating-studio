@@ -10,7 +10,7 @@
 
 	import { onMounted, shallowRef } from "vue";
 
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import { setup } from "app/services/dialogService";
 	import Lib from "app/services/libService";
 	import Spinner from "./spinner.vue";

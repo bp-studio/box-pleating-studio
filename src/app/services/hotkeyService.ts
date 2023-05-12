@@ -9,6 +9,8 @@ namespace HotkeyService {
 	 *
 	 * @param key Case-insensitive. For the full list of keys, see
 	 * https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
+	 * @param ctrl Default value is `true`.
+	 * @param shift Default value is `false`.
 	 */
 	export function register(action: Action, key: string, ctrl: boolean = true, shift: boolean = false): void {
 		hotkeys.push([action, key.toLowerCase(), ctrl, shift]);

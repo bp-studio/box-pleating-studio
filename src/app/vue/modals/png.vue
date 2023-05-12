@@ -6,7 +6,7 @@
 <script setup lang="ts">
 
 	import ExportService from "app/services/exportService";
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import Export from "./components/export.vue";
 
 	defineOptions({ name: "PNG" });

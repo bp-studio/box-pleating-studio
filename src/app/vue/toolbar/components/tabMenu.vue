@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import Workspace from "app/services/workspaceService";
 	import { ContextMenu, DropdownItem, Divider } from "@/gadgets/menu";
 

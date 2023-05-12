@@ -5,6 +5,10 @@ import { isSSG } from "app/shared/constants";
 /** If we are ready to perform LCP (largest contentful paint) */
 export const lcpReady = shallowRef<boolean | undefined>(false);
 
+/**
+ * We use this to breakdown component initializations into multiple macrotasks,
+ * to improve LightHouse TBT scores.
+ */
 export const phase = shallowRef(0);
 
 // The following must be executed before anything else access the localStorage.

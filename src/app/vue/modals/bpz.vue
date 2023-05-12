@@ -6,7 +6,7 @@
 <script setup lang="ts">
 
 	import ExportService from "app/services/exportService";
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import Studio from "app/services/studioService";
 	import Export from "./components/export.vue";
 

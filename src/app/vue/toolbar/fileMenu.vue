@@ -82,7 +82,7 @@
 	import HotKeyService from "app/services/hotkeyService";
 	import { isFileApiEnabled, copyEnabled } from "app/shared/constants";
 	import Import from "app/services/importService";
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import Handles from "app/services/handleService";
 	import Export from "app/services/exportService";
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";

@@ -40,7 +40,7 @@
 	import useModal from "../modal";
 	import { isFileApiEnabled } from "app/shared/constants";
 	import FileUtility from "app/utils/fileUtility";
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
 
 	defineOptions({ name: "Export" });

@@ -5,9 +5,8 @@
 			<i :class="icon" />
 			<div class="notify" v-if="notify"></div>
 		</button>
-		<!--We display the content of the dropdown menu only after initialization.
-			The best benefit of doing so is that SSG won't be interfered by locales.
-			We handle the title separately above. -->
+		<!--We display the content of the dropdown menu only
+			after initialization to improve startup performance. -->
 		<div ref="menu" class="dropdown-menu" v-if="initialized">
 			<slot></slot>
 		</div>

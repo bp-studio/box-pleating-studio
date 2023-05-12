@@ -16,7 +16,7 @@
 
 	import { SlickList, SlickItem } from "vue-slicksort/dist/vue-slicksort.esm.js";
 
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
 	import Tab from "./tab.vue";

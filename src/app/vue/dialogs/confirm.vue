@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import DialogVue from "./dialog.vue";
 
 	defineOptions({ name: "Confirm" });

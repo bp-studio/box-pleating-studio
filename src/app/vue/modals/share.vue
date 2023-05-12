@@ -46,7 +46,7 @@
 	import LZ from "app/utils/lz";
 	import { copyEnabled } from "app/shared/constants";
 	import useModal from "./modal";
-	import { compRef } from "app/inject";
+	import { compRef } from "app/utils/compRef";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
 
 	defineOptions({ name: "Share" });
