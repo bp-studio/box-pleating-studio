@@ -172,7 +172,7 @@
 </script>
 
 <style lang="scss">
-	@media (max-width: 575.98px) {
+	@media (width < 576px) {
 		.file-api {
 			flex-grow: 1;
 			flex-direction: column;

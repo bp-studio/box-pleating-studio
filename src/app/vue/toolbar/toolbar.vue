@@ -64,7 +64,7 @@
 		isolation: isolate;
 	}
 
-	@media (max-width: 650px) {
+	@media (width <= 650px) {
 		#panelToggle {
 			flex-grow: 1;
 			text-align: right;

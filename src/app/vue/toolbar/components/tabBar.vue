@@ -78,7 +78,7 @@
 		}
 	}
 
-	@media (max-width: 650px) {
+	@media (width <= 650px) {
 		#divTab {
 			position: absolute;
 			top: 3.75rem;

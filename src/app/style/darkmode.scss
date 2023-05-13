@@ -135,7 +135,7 @@ html.dark {
 		}
 	}
 
-	@media (max-width: 100vh), (max-width: 699.9px) {
+	@media (width <= 100vh), (width < 700px) {
 		#divShade.show {
 			opacity: 0.4;
 		}

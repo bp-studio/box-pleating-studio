@@ -103,7 +103,9 @@ input {
 }
 
 textarea {
-	// The data in stylelint seems wrong. See https://caniuse.com/css-resize
+	// iOS Safari doesn't support resize at all,
+	// but that's exactly the desired behavior, so no need to worry.
+	// See https://caniuse.com/css-resize and https://stackoverflow.com/questions/8443209
 	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 	resize: none;
 }

@@ -155,7 +155,7 @@
 		}
 	}
 
-	@media (max-width: 650px) {
+	@media (width <= 650px) {
 		.tab {
 			line-height: 2rem;
 			font-size: 1rem;
