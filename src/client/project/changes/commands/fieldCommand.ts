@@ -20,6 +20,12 @@ export interface JFieldCommand extends JCommand {
 
 export class FieldCommand extends Command implements JFieldCommand {
 
+	/**
+	 * Since class property setter doesn't allow returning value,
+	 * we use this static field to capture {@link Promise} returned by setters.
+	 */
+	public static $setterPromise: Promise<void> | undefined;
+
 	public static create(
 		target: ITagObject, prop: string, oldValue: unknown, newValue: unknown
 	): FieldCommand {
@@ -64,13 +70,22 @@ export class FieldCommand extends Command implements JFieldCommand {
 		return this.old == this.new;
 	}
 
-	public $undo(): void {
-		const target = this._project.design.$query(this.tag);
-		if(target) Reflect.set(target, this.prop, this.old);
+	public $undo(): Promise<void> {
+		return this._process(this.old);
 	}
 
-	public $redo(): void {
+	public $redo(): Promise<void> {
+		return this._process(this.new);
+	}
+
+	private _process(value: unknown): Promise<void> {
 		const target = this._project.design.$query(this.tag);
-		if(target) Reflect.set(target, this.prop, this.new);
+		if(target) {
+			Reflect.set(target, this.prop, value);
+			const promise = FieldCommand.$setterPromise;
+			FieldCommand.$setterPromise = undefined;
+			if(promise) return promise;
+		}
+		return Promise.resolve();
 	}
 }

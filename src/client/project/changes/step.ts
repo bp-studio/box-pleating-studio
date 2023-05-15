@@ -47,10 +47,12 @@ export class Step implements ISerializable<JStep> {
 
 	public toJSON(): JStep<JCommand> {
 		return {
-			commands: [],
-			mode: "layout",
-			before: [],
-			after: [],
+			commands: this._commands,
+			mode: this._mode,
+			before: this._before,
+			after: this._after,
+			construct: this._construct,
+			destruct: this._destruct,
 		};
 	}
 
@@ -83,20 +85,23 @@ export class Step implements ISerializable<JStep> {
 		return true;
 	}
 
-	public $redo(): void {
-		for(const c of this._commands) c.$redo();
+	public async $redo(): Promise<void> {
 		this._project.design.$addMementos(this._construct);
+		await Promise.all(this._commands.map(c => c.$redo()));
+
 		this._project.design.mode = this._mode;
 		this._restoreSelection(this._after);
 		this._sealed = true;
 	}
 
-	public $undo(): void {
+	public async $undo(): Promise<void> {
+		// TODO: replace by ES2023 toReversed() methods
 		// undo is performed in opposite ordering
+		const memos = this._destruct.concat().reverse();
+		this._project.design.$addMementos(memos);
 		const com = this._commands.concat().reverse();
-		for(const c of com) c.$undo();
+		await Promise.all(com.map(c => c.$undo()));
 
-		this._project.design.$addMementos(this._destruct);
 		this._project.design.mode = this._mode;
 		this._restoreSelection(this._before);
 		this._sealed = true;

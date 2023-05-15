@@ -3,7 +3,7 @@ import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
 import { cache, clearCache } from "core/utils/cache";
-import { nonEnumerable } from "core/utils/nonEnumerable";
+import { nonEnumerable } from "shared/utils/nonEnumerable";
 
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
@@ -80,8 +80,9 @@ export class Piece extends Region implements JPiece {
 	@cache private get _points(): Point[] {
 		const { ox, oy, u, v } = this;
 
-		// a GOPS is like the reverse of the Overlap region,
-		// therefore the corners are arranged in clockwise direction, starting from the lower left.
+		// A GOPS is like the reverse of the Overlap region,
+		// therefore the corners are arranged in clockwise direction,
+		// starting from the lower left.
 		const result = [
 			Point.ZERO,
 			new Point(u, ox + u),

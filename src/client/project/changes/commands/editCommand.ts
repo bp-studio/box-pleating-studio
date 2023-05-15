@@ -4,7 +4,7 @@ import { Command } from "./command";
 import type { Vertex } from "client/project/components/tree/vertex";
 import type { Project } from "client/project/project";
 import type { JCommand } from "shared/json/history";
-import type { JEdge, JNode, JTreeElement } from "shared/json/tree";
+import type { JTreeElement } from "shared/json/tree";
 import type { Edge } from "client/project/components/tree/edge";
 
 type TreeElement = Vertex | Edge;
@@ -64,13 +64,13 @@ export class EditCommand extends Command implements JEditCommand {
 		return false; // EditCommand cannot be void
 	}
 
-	private _remove(): void {
+	private async _remove(): Promise<void> {
 		const obj = this._project.design.$query(this.tag);
 		// eslint-disable-next-line no-useless-call
 		// if(obj instanceof Disposable) obj.$dispose.call(obj, [true]);
 	}
 
-	private _add(): void {
+	private async _add(): Promise<void> {
 		const tree = this._project.design.tree;
 		// if(this.tag.startsWith("e")) {
 		// 	const m = this.memento as JEdge;
@@ -84,11 +84,11 @@ export class EditCommand extends Command implements JEditCommand {
 		// }
 	}
 
-	public $undo(): void {
-		this.type == CommandType.add ? this._remove() : this._add();
+	public $undo(): Promise<void> {
+		return this.type == CommandType.add ? this._remove() : this._add();
 	}
 
-	public $redo(): void {
-		this.type == CommandType.add ? this._add() : this._remove();
+	public $redo(): Promise<void> {
+		return this.type == CommandType.add ? this._add() : this._remove();
 	}
 }

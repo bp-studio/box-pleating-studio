@@ -133,23 +133,21 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$project.design.mode = "tree";
 	}
 
-	public $updateFlap(flap: Flap): void {
-		if(this._pendingUpdate.size === 0) {
-			Promise.resolve().then(this._flushUpdate);
-		}
+	public $updateFlap(flap: Flap): Promise<void> {
 		this._pendingUpdate.add(flap);
+		return flapUpdatePromise ||= Promise.resolve().then(this._flushUpdate);
 	}
 
-	public $switchConfig(stretchId: string, to: number): void {
-		this.$project.$core.layout.switchConfig(stretchId, to);
+	public $switchConfig(stretchId: string, to: number): Promise<void> {
+		return this.$project.$core.layout.switchConfig(stretchId, to);
 	}
 
-	public $switchPattern(stretchId: string, to: number): void {
-		this.$project.$core.layout.switchPattern(stretchId, to);
+	public $switchPattern(stretchId: string, to: number): Promise<void> {
+		return this.$project.$core.layout.switchPattern(stretchId, to);
 	}
 
-	public $moveDevice(device: Device): void {
-		this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location);
+	public $moveDevice(device: Device): Promise<void> {
+		return this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location);
 	}
 
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {
@@ -168,11 +166,14 @@ export class Layout extends View implements ISerializable<JLayout> {
 
 	private readonly _flushUpdate = async (): Promise<void> => {
 		await this._updating; // Wait until the last update to complete
+		flapUpdatePromise = undefined;
 		const flaps: JFlap[] = [];
 		for(const f of this._pendingUpdate) flaps.push(f.$updateDrawParams());
 		this._pendingUpdate.clear();
 		const dragging = this.$project.$isDragging;
-		this._updating = this.$project.$core.layout.updateFlap(flaps, dragging);
+		const prototypes = this.$project.design.$prototype.layout.stretches;
+		this._updating = this.$project.$core.layout.updateFlap(flaps, dragging, prototypes);
+		await this._updating;
 	};
 
 	private _addFlap(f: JFlap, graphics: GraphicsData): void {
@@ -235,16 +236,19 @@ export class Layout extends View implements ISerializable<JLayout> {
 			const data = model.add.stretches[tag];
 			let stretch = this.$stretches.get(tag);
 			if(stretch) {
+				this.$project.history.$destruct(stretch.$toMemento());
 				stretch.$update(data, model);
 			} else {
 				stretch = new Stretch(this, data, model);
 				this.$stretches.set(tag, stretch);
 				this.$sheet.$addChild(stretch);
 			}
+			this.$project.history.$construct(stretch.$toMemento());
 		}
 		for(const tag of model.remove.stretches) {
 			const stretch = this.$stretches.get(tag);
 			if(!stretch) continue;
+			this.$project.history.$destruct(stretch.$toMemento());
 			this.$stretches.delete(tag);
 			this.$sheet.$removeChild(stretch);
 			stretch.$dispose();
@@ -302,3 +306,8 @@ export class Layout extends View implements ISerializable<JLayout> {
 		for(const junction of this.$junctions.values()) junction.$draw(max);
 	}
 }
+
+/**
+ * The current {@link Promise} for flap updating process.
+ */
+let flapUpdatePromise: Promise<void> | undefined;

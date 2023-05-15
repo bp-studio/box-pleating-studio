@@ -52,7 +52,7 @@ export class Stretch implements ISerializable<JStretch> {
 	 * Update the combinations of {@link ValidJunction}s, and create
 	 * or reuse {@link Repository} as needed.
 	 */
-	public $update(junctions: ValidJunction[]): void {
+	public $update(junctions: ValidJunction[], prototype: JStretch): void {
 		const signature = getStructureSignature(junctions);
 		const origin = junctions[0].$tip;
 		if(signature === this._repo.$signature) {
@@ -74,7 +74,7 @@ export class Stretch implements ISerializable<JStretch> {
 				return;
 			}
 		}
-		this._repo = new Repository(this, junctions, signature);
+		this._repo = new Repository(this, junctions, signature, prototype);
 	}
 
 	/** Clear {@link Repository} cache. */

@@ -123,8 +123,8 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return grid.$contains(this.$location);
 	}
 
-	protected override _move(x: number, y: number): void {
-		super._move(x, y);
+	protected override async _move(x: number, y: number): Promise<void> {
+		await super._move(x, y);
 		if(this.$isNew) {
 			const layout = this._tree.$project.design.layout;
 			const flap = layout.$syncFlaps.get(this.id);
@@ -141,11 +141,12 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 				flap.$sync(grid.$constrain(p));
 			}
 		} else if(!pendingFlush) {
-			pendingFlush = Promise.resolve().then(() => {
+			return pendingFlush = Promise.resolve().then(() => {
 				pendingFlush = undefined;
 				this.$project.history.$flush();
 			});
 		}
+		return Promise.resolve();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

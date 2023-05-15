@@ -66,15 +66,15 @@ export class Device extends Draggable {
 		return { x: dx, y: f * dx };
 	}
 
-	protected override _move(x: number, y: number): void {
+	protected override async _move(x: number, y: number): Promise<void> {
 		const dx = x - this.$location.x;
-		super._move(x, y);
+		await super._move(x, y);
 
 		// Update range, so that subsequent dragging can be constraint correctly even before redraw.
 		const r = this.$graphics.range;
 		this.$graphics.range = [r[0] - dx, r[1] - dx];
 
-		this.stretch.$layout.$moveDevice(this);
+		await this.stretch.$layout.$moveDevice(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

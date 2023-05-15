@@ -1,4 +1,4 @@
-import { nonEnumerable } from "client/shared/decorators";
+import { nonEnumerable } from "shared/utils/nonEnumerable";
 
 import type { Project } from "client/project/project";
 import type { CommandType } from "shared/json/enum";
@@ -36,10 +36,10 @@ export abstract class Command implements JCommand {
 	public abstract $addTo(command: Command): void;
 
 	/** Undo this {@link Command}. */
-	public abstract $undo(): void;
+	public abstract $undo(): Promise<void>;
 
 	/** Redo this {@link Command}. */
-	public abstract $redo(): void;
+	public abstract $redo(): Promise<void>;
 }
 
 /** Return the signature of a {@link Command} array. */

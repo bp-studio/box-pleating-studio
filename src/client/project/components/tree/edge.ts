@@ -9,6 +9,7 @@ import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/utils/label";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
+import { FieldCommand } from "client/project/changes/commands/fieldCommand";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LabelView } from "client/utils/label";
@@ -79,7 +80,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		if(v < 1 || oldValue === v) return;
 		this._length = v;
 		this.$project.history.$fieldChange(this, "length", oldValue, v, false);
-		this._tree.$updateLength([this.toJSON()]);
+		FieldCommand.$setterPromise = this._tree.$updateLength([this.toJSON()]);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

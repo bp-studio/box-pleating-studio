@@ -55,18 +55,23 @@ export abstract class Draggable extends Control {
 	}
 
 	/** Directly assign a new location. Used only in history navigation. */
-	public $assign(v: IPoint): void {
-		this._move(v.x, v.y);
+	public $assign(v: IPoint): Promise<void> {
+		return this._move(v.x, v.y);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Trigger movement */
-	protected _move(x: number, y: number): void {
+	/**
+	 * Trigger movement.
+	 *
+	 * Must be overwritten in derived classes.
+	 */
+	protected _move(x: number, y: number): Promise<void> {
 		const location = { x, y };
 		this.$project.history.$move(this, location);
 		this.$location = location;
+		return Promise.resolve();
 	}
 }

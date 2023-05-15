@@ -30,6 +30,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	/**
 	 * A {@link Proxy} object that represents the controllers and actions of the Core.
 	 * This greatly improves the typing and code navigating for the Core APIs.
+	 *
+	 * Typical route will return a {@link Promise} that resolves after
+	 * {@link Design.$update Design.$update()} is completed.
 	 */
 	public readonly $core: Route;
 
@@ -57,13 +60,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this.$addChild(this.design);
 
 		this._worker = worker;
-		this.$core = new Proxy({}, {
-			get: (controllers: Record<string, object>, controller: string) =>
-				controllers[controller] ||= new Proxy({}, {
-					get: (actions: Record<string, Action>, action: string) =>
-						actions[action] ||= (...args: unknown[]) => this._callCore(controller, action, args),
-				}),
-		}) as Route;
+		this.$core = this._createCoreProxy();
 
 		this.history = new HistoryManager(this, jProject.history);
 
@@ -104,6 +101,24 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			};
 		}
 		return result;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _createCoreProxy(): Route {
+		return new Proxy({}, {
+			get: (controllers: Record<string, object>, controller: string) =>
+				controllers[controller] ||= this._createControllerProxy(controller),
+		}) as Route;
+	}
+
+	private _createControllerProxy(controller: string): Record<string, Action> {
+		return new Proxy({}, {
+			get: (actions: Record<string, Action>, action: string) =>
+				actions[action] ||= (...args: unknown[]) => this._callCore(controller, action, args),
+		});
 	}
 
 	/**

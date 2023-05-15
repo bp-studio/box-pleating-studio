@@ -19,6 +19,11 @@ function shallowRefDecorator(target: object, name: string | symbol): void {
 
 export { shallowRefDecorator as shallowRef };
 
+/**
+ * Automatically implement {@link HistoryManager.$fieldChange} on this field.
+ *
+ * Field setter must be purely synchronous.
+ */
 export function field(target: ITagObject, name: string): void {
 	Object.defineProperty(target, name, {
 		configurable: true,
@@ -35,24 +40,5 @@ export function field(target: ITagObject, name: string): void {
 				get: () => refInstance.value,
 			});
 		},
-	});
-}
-
-export function nonEnumerable(target: object, name: string): void;
-export function nonEnumerable(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor;
-export function nonEnumerable(
-	target: object, name: string, desc?: PropertyDescriptor
-): PropertyDescriptor | void {
-	if(desc) {
-		desc.enumerable = false;
-		return desc;
-	}
-	Object.defineProperty(target, name, {
-		set(value) {
-			Object.defineProperty(this, name, {
-				value, writable: true, configurable: false,
-			});
-		},
-		configurable: true,
 	});
 }

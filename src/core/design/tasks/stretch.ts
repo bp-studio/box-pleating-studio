@@ -116,10 +116,10 @@ function createOrUpdateStretch(team: Team): void {
 	const stretchId = team.$flaps.join(",");
 	State.$stretchDiff.$add(stretchId);
 	const oldStretch = tryGetStretch(stretchId);
+	const prototype = State.$stretchPrototypes.get(stretchId) || { id: stretchId };
 	if(oldStretch) {
-		oldStretch.$update(team.$junctions);
+		oldStretch.$update(team.$junctions, prototype);
 	} else {
-		const prototype = State.$stretchPrototypes.get(stretchId) || { id: stretchId };
 		const stretch = new Stretch(team.$junctions, prototype);
 		State.$stretches.set(stretchId, stretch);
 	}

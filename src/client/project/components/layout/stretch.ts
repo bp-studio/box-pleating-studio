@@ -4,7 +4,7 @@ import { SelectionController } from "client/controllers/selectionController";
 import { Device } from "./device";
 
 import type { ITagObject } from "client/shared/interface";
-import type { JStretch } from "shared/json";
+import type { JStretch, Memento } from "shared/json";
 import type { View } from "client/base/view";
 import type { DeviceData, JRepository, StretchData, UpdateModel } from "core/service/updateModel";
 import type { Layout } from "./layout";
@@ -34,6 +34,10 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 
 	public toJSON(): JStretch {
 		return this._data.data;
+	}
+
+	public $toMemento(): Memento {
+		return [this.$tag, this.toJSON()];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -131,6 +131,16 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(flush) this.$flush();
 	}
 
+	public $construct(memento: Memento): void {
+		if(this._moving) return;
+		this._construct.push(memento);
+	}
+
+	public $destruct(memento: Memento): void {
+		if(this._moving) return;
+		this._destruct.push(memento);
+	}
+
 	public get $canUndo(): boolean {
 		return this._index > 0;
 	}
@@ -139,18 +149,18 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		return this._index < this._steps.length;
 	}
 
-	public $undo(): void {
+	public async $undo(): Promise<void> {
 		if(this.$canUndo) {
 			this._moving = true;
-			this._steps[--this._index].$undo();
+			await this._steps[--this._index].$undo();
 			this.$flush();
 		}
 	}
 
-	public $redo(): void {
+	public async $redo(): Promise<void> {
 		if(this.$canRedo) {
 			this._moving = true;
-			this._steps[this._index++].$redo();
+			await this._steps[this._index++].$redo();
 			this.$flush();
 		}
 	}

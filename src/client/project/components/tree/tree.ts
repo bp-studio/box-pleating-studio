@@ -142,7 +142,7 @@ export class Tree implements ISerializable<JTree> {
 		return this.$project.$core.tree.join(vertex.id);
 	}
 
-	public $split(edge: Edge): void {
+	public $split(edge: Edge): Promise<void> {
 		this.$project.history.$cacheSelection();
 		SelectionController.clear();
 		const id = this._nextAvailableId;
@@ -154,10 +154,10 @@ export class Tree implements ISerializable<JTree> {
 			y: Math.round((l1.y + l2.y) / 2),
 		});
 		this.$updateCallback = () => SelectionController.$toggle(this.$vertices[id]!, true);
-		this.$project.$core.tree.split(edge.toJSON(), id);
+		return this.$project.$core.tree.split(edge.toJSON(), id);
 	}
 
-	public $merge(edge: Edge): void {
+	public $merge(edge: Edge): Promise<void> {
 		this.$project.history.$cacheSelection();
 		SelectionController.clear();
 		const v1 = edge.$v1.id, v2 = edge.$v2.id;
@@ -170,11 +170,11 @@ export class Tree implements ISerializable<JTree> {
 			v.$location = { x, y };
 			SelectionController.$toggle(v, true);
 		};
-		this.$project.$core.tree.merge(edge.toJSON());
+		return this.$project.$core.tree.merge(edge.toJSON());
 	}
 
-	public $updateLength(edges: JEdge[]): void {
-		this.$project.$core.tree.update(edges);
+	public $updateLength(edges: JEdge[]): Promise<void> {
+		return this.$project.$core.tree.update(edges);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {

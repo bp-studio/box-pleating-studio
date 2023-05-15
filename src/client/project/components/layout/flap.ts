@@ -202,9 +202,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._move(p.x, p.y);
 	}
 
-	protected override _move(x: number, y: number): void {
-		super._move(x, y);
-		this._layout.$updateFlap(this);
+	protected override async _move(x: number, y: number): Promise<void> {
+		await super._move(x, y);
+		await this._layout.$updateFlap(this);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -63,13 +63,13 @@ export class MoveCommand extends Command implements JMoveCommand {
 		return this.old.x == this.new.x && this.old.y == this.new.y;
 	}
 
-	public $undo(): void {
+	public async $undo(): Promise<void> {
 		const obj = this._project.design.$query(this.tag);
-		if(obj instanceof Draggable) obj.$assign(this.old);
+		if(obj instanceof Draggable) await obj.$assign(this.old);
 	}
 
-	public $redo(): void {
+	public async $redo(): Promise<void> {
 		const obj = this._project.design.$query(this.tag);
-		if(obj instanceof Draggable) obj.$assign(this.new);
+		if(obj instanceof Draggable) await obj.$assign(this.new);
 	}
 }

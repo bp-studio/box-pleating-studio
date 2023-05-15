@@ -81,6 +81,12 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		this.tree.$update(model);
 		this.layout.$update(model);
 		this.$project.history.$flush();
+
+		// Clear prototypes
+		const { layout, tree } = this.$prototype;
+		layout.flaps = [];
+		layout.stretches = [];
+		tree.nodes = [];
 	}
 
 	/** Find the unique object corresponding to the given tag. */

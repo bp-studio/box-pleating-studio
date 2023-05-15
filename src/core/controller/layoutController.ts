@@ -7,7 +7,7 @@ import { patternTask } from "core/design/tasks/pattern";
 
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
-import type { JFlap } from "shared/json";
+import type { JFlap, JStretch } from "shared/json";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Repository } from "core/design/layout/repository";
 
@@ -21,9 +21,12 @@ export namespace LayoutController {
 	/**
 	 * Moving or resizing of flaps.
 	 */
-	export function updateFlap(flaps: JFlap[], dragging: boolean): void {
+	export function updateFlap(flaps: JFlap[], dragging: boolean, prototypes: JStretch[]): void {
 		State.$isDragging = dragging;
 		State.$tree.$setFlaps(flaps);
+		for(const json of prototypes) {
+			State.$stretchPrototypes.set(json.id, json);
+		}
 		Processor.$run(AABBTask);
 	}
 
