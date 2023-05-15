@@ -3,7 +3,7 @@ import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 
-import type { JEdge, JEdgeBase, JFlap } from "shared/json";
+import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch } from "shared/json";
 
 //=================================================================
 /**
@@ -12,9 +12,28 @@ import type { JEdge, JEdgeBase, JFlap } from "shared/json";
 //=================================================================
 export namespace TreeController {
 
+	/**
+	 * Batch perform tree editing. Used in history navigation.
+	 * @param flaps Prototypes {@link JFlap}s for newly created leaves.
+	 * @param stretches Prototype {@link JStretch}s for newly created stretches.
+	 */
+	export function edit(edits: JEdit[], flaps: JFlap[], stretches: JStretch[]): void {
+		const tree = State.$tree;
+		for(const e of edits) {
+			if(e[0]) tree.$addEdge(e[1].n1, e[1].n2, e[1].length);
+			else tree.$removeEdge(e[1].n1, e[1].n2);
+		}
+		tree.$flushRemove();
+		tree.$setFlaps(flaps);
+		for(const json of stretches) {
+			State.$stretchPrototypes.set(json.id, json);
+		}
+		Processor.$run(heightTask);
+	}
+
 	/** Add a new leaf */
 	export function addLeaf(id: number, at: number, length: number, flap: JFlap): void {
-		const node = State.$tree.$addLeaf(id, at, length);
+		const node = State.$tree.$addEdge(id, at, length);
 		node.$setFlap(flap);
 		Processor.$run(heightTask);
 	}
@@ -27,6 +46,7 @@ export namespace TreeController {
 	export function removeLeaf(ids: number[], prototypes: JFlap[]): void {
 		const tree = State.$tree;
 		for(const id of ids) tree.$removeLeaf(id);
+		tree.$flushRemove();
 		tree.$setFlaps(prototypes);
 		Processor.$run(heightTask);
 	}

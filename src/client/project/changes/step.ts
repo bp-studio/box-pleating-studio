@@ -24,11 +24,28 @@ export class Step implements ISerializable<JStep> {
 	private readonly _project: Project;
 	private readonly _signature: string;
 	private readonly _commands: readonly Command[];
+
+	/**
+	 * {@link Memento}s that represented objects constructed in this {@link Step}
+	 * (possibly contains outdated records).
+	 */
 	private readonly _construct: Memento[];
+
+	/**
+	 * {@link Memento}s that represented objects destructed in this {@link Step}
+	 * (possibly contains outdated records).
+	 */
 	private readonly _destruct: Memento[];
+
+	/** The {@link DesignMode} when the operation took place. */
 	private readonly _mode: DesignMode;
+
+	/** Tags of objects selected before this {@link Step}. */
 	private readonly _before: string[];
+
+	/** Tags of objects selected after this {@link Step}. */
 	private readonly _after: string[];
+
 	private _timeout!: Timeout;
 
 	constructor(project: Project, json: JStep<Command>) {
@@ -51,8 +68,8 @@ export class Step implements ISerializable<JStep> {
 			mode: this._mode,
 			before: this._before,
 			after: this._after,
-			construct: this._construct,
-			destruct: this._destruct,
+			construct: this._construct.length ? this._construct : undefined,
+			destruct: this._destruct.length ? this._destruct : undefined,
 		};
 	}
 

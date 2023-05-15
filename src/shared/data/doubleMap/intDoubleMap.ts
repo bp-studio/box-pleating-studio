@@ -131,8 +131,9 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 			const key = getKey(key1, key2);
 			const node = this._map.get(key);
 			if(!node) return false;
-			this._deleteKeyNode(key1, node.n1);
-			if(key1 !== key2) this._deleteKeyNode(key2, node.n2);
+			const oriented = node.n1.key !== key1;
+			this._deleteKeyNode(key1, oriented ? node.n1 : node.n2);
+			if(key1 !== key2) this._deleteKeyNode(key2, oriented ? node.n2 : node.n1);
 			this._deleteNode(key, node);
 			return true;
 		}

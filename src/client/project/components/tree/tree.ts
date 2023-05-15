@@ -10,7 +10,7 @@ import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
-import type { JEdge, JEdgeBase, JTree, JVertex, JViewport } from "shared/json";
+import type { JEdge, JEdgeBase, JTree, JVertex, JViewport, Memento } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
@@ -82,11 +82,12 @@ export class Tree implements ISerializable<JTree> {
 	public $update(model: UpdateModel): void {
 		// update JEdges if needed
 		if(model.tree) this._edges = model.tree;
+		if(model.edit.length) this.$project.history.$edit(model.edit);
 
 		const prototype = this.$project.design.$prototype.tree;
 
 		// Deleting edges. We have to handle it first.
-		for(const e of model.remove.edges) this._removeEdge(e);
+		for(const edit of model.edit.filter(e => !e[0])) this._removeEdge(edit[1]);
 
 		// Nodes
 		let vertexCount = this.vertexCount;
@@ -103,7 +104,7 @@ export class Tree implements ISerializable<JTree> {
 		this.vertexCount = vertexCount;
 
 		// Adding edges.
-		for(const e of model.add.edges) this._addEdge(e);
+		for(const edit of model.edit.filter(e => e[0])) this._addEdge(edit[1]);
 
 		// Callback
 		if(this.$updateCallback) this.$updateCallback();
@@ -300,14 +301,17 @@ export class Tree implements ISerializable<JTree> {
 		const vertex = new Vertex(this, json);
 		this.$sheet.$addChild(vertex);
 		this.$vertices[json.id] = vertex;
+		this.$project.history.$construct(vertex.$toMemento());
 	}
 
 	private _removeVertex(id: number): void {
 		const vertex = this.$vertices[id]!;
+		const memento = vertex.$toMemento();
 		this.$sheet.$removeChild(vertex);
 		vertex.$dispose();
 		this._skippedIdHeap.$insert(id);
 		delete this.$vertices[id];
+		this.$project.history.$destruct(memento);
 	}
 
 	private _addEdge(e: JEdge): void {

@@ -18,7 +18,7 @@ export class TreeNode implements ITreeNode {
 	/** The id of the node. */
 	public readonly id: number;
 
-	public $parent: TreeNode | undefined;
+	public $parent: this | undefined;
 
 	/** The distance from the node to the root. */
 	public $dist: number = 0;
@@ -48,7 +48,7 @@ export class TreeNode implements ITreeNode {
 		if(parent) {
 			this.$length = length;
 			this.$AABB.$setMargin(length);
-			this.$pasteTo(parent);
+			this.$pasteTo(parent as this);
 			this.$dist = parent.$dist + length;
 		}
 	}
@@ -80,28 +80,21 @@ export class TreeNode implements ITreeNode {
 		return true;
 	}
 
-	public $pasteTo(parent: TreeNode, skipProcess?: boolean): void {
+	public $pasteTo(parent: this): void {
 		this.$parent = parent;
 		parent.$children.$insert(this);
 		State.$parentChanged.add(this);
-		if(!skipProcess) {
-			State.$updateResult.add.edges.push({ n1: this.id, n2: parent.id, length: this.$length });
-		}
+		State.$childrenChanged.add(parent);
 	}
 
 	/**
 	 * Temporarily disconnects a node from the tree, without changing its subtree.
-	 *
-	 * The disconnection will be reported to {@link State.$updateResult} by default.
-	 * The only case when this behavior is disabled is during balancing,
-	 * where the connection will be re-established in the opposite direction.
 	 */
-	public $cut(skipReport?: boolean): void {
+	public $cut(): void {
 		if(this.$parent) {
 			this.$parent.$children.$remove(this);
 			this.$parent.$AABB.$removeChild(this.$AABB);
 			State.$childrenChanged.add(this.$parent);
-			if(!skipReport) State.$updateResult.remove.edges.push({ n1: this.id, n2: this.$parent.id });
 		}
 		this.$parent = undefined;
 	}

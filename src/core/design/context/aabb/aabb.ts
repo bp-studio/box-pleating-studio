@@ -1,5 +1,6 @@
 import { AABBSide } from "./aabbSide";
 
+import type { JFlap } from "shared/json";
 import type { PerQuadrant } from "shared/types/direction";
 import type { IRoundedRect } from "core/math/polyBool/intersection/roundedRect";
 import type { Path } from "shared/types/geometry";

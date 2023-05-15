@@ -9,9 +9,6 @@ export interface ITree {
 
 	readonly $root: ITreeNode;
 
-	/** Adds a new leaf and returns it */
-	$addLeaf(id: number, at: number, length: number): ITreeNode;
-
 	/** Deletes an leaf, and returns if the operation is successful */
 	$removeLeaf(id: number): boolean;
 
@@ -35,7 +32,7 @@ export interface ITree {
 
 export interface ITreeNode extends ISerializable<JEdge> {
 	readonly id: number;
-	readonly $parent: ITreeNode | undefined;
+	readonly $parent: this | undefined;
 	readonly $length: number;
 	readonly $children: IReadonlyHeap<ITreeNode>;
 	readonly $dist: number;

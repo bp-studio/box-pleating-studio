@@ -141,17 +141,16 @@ export namespace State {
 	export function $resetResult(): void {
 		$updateResult = {
 			add: {
-				edges: [],
 				nodes: [],
 				junctions: {},
 				stretches: {},
 			},
 			remove: {
-				edges: [],
 				nodes: [],
 				junctions: [],
 				stretches: [],
 			},
+			edit: [],
 			graphics: {},
 		};
 	}

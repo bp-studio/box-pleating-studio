@@ -142,7 +142,10 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	public delete(): void {
 		const selections = SelectionController.selections;
 		if(this.mode == "layout") {
-			if(isTypedArray(selections, Flap)) this.tree.$delete(selections.map(f => f.$vertex));
+			if(isTypedArray(selections, Flap)) {
+				this.tree.$delete(selections.map(f => f.$vertex));
+				SelectionController.clear();
+			}
 		} else {
 			if(isTypedArray(selections, Vertex)) this.tree.$delete(selections);
 		}

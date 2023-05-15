@@ -1,5 +1,5 @@
 import type { Polygon, Contour, Path, ILine } from "shared/types/geometry";
-import type { JEdge, JEdgeBase, JFlap, JStretch } from "shared/json";
+import type { CommandType, JEdge, JEdgeBase, JEdit, JFlap, JStretch } from "shared/json";
 import type { Configuration } from "core/design/layout/configuration";
 import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Device } from "core/design/layout/pattern/device";
@@ -8,7 +8,6 @@ export interface UpdateModel {
 
 	add: {
 		nodes: number[];
-		edges: JEdge[];
 		junctions: Record<string, Polygon>;
 		stretches: Record<string, StretchData>;
 	};
@@ -17,10 +16,11 @@ export interface UpdateModel {
 
 	remove: {
 		nodes: number[];
-		edges: JEdgeBase[];
 		junctions: string[];
 		stretches: string[];
 	};
+
+	edit: JEdit[];
 
 	/**
 	 * Graphics data of objects.

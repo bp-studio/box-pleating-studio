@@ -15,7 +15,7 @@ import type { IGrid } from "../grid";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
-import type { JVertex } from "shared/json";
+import type { JVertex, Memento } from "shared/json";
 
 //=================================================================
 /**
@@ -74,6 +74,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 			x: this.$location.x,
 			y: this.$location.y,
 		};
+	}
+
+	public $toMemento(): Memento {
+		return [this.$tag, this.toJSON()];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

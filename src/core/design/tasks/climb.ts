@@ -21,8 +21,9 @@ export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: Reado
 	if(total === 0) return;
 	if(total === 1) {
 		// Single thread updating
-		let n = sets.find(s => s.size === 1)!.values().next().value;
-		while(updater(n) && n.$parent) n = n.$parent as T;
+		// See https://github.com/microsoft/TypeScript/issues/52998
+		let n = sets.find(s => s.size === 1)!.values().next().value as T;
+		while(updater(n) && n.$parent) n = n.$parent;
 	} else {
 		// Initializing
 		const heap = new HeapSet<T>((a, b) => b.$dist - a.$dist);
@@ -33,7 +34,7 @@ export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: Reado
 		// Climb the tree
 		while(!heap.$isEmpty) {
 			const n = heap.$pop()!;
-			if(updater(n) && n.$parent) heap.$insert(n.$parent as T);
+			if(updater(n) && n.$parent) heap.$insert(n.$parent);
 		}
 	}
 }

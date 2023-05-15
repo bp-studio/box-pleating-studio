@@ -26,6 +26,7 @@ export namespace DragController {
 
 	let dragged: boolean = false;
 
+	/** This is reactive as the displaying of DPad depends on it. */
 	export const isDragging = shallowRef(false);
 
 	export function dragByKey(key: string): void {

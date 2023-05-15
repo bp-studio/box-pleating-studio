@@ -14,8 +14,7 @@ export enum GridType {
 export enum CommandType {
 	field = 0,
 	move = 1,
-	add = 2,
-	remove = 3,
+	edit = 2,
 }
 
 /** The connection type of a corner */

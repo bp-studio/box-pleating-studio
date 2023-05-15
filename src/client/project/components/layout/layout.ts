@@ -92,8 +92,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 			}
 		}
 
+		const newRivers = model.edit.filter(e => e[0]).map(e => e[1]);
+
 		this._updateStretches(model);
-		this._removeFlaps(model);
+		this._removeFlaps(model, newRivers);
 		for(const r of this.$rivers.values()) {
 			const v = r.$edge.$getLeaf();
 			if(v) this._removeRiver(r); // A river turns into a flap
@@ -105,20 +107,20 @@ export class Layout extends View implements ISerializable<JLayout> {
 		prototype.layout.flaps.length = 0;
 		this.flapCount = this.$flaps.size;
 
-		for(const e of model.add.edges) {
-			const edge = tree.$edges.get(e.n1, e.n2)!;
+		for(const r of newRivers) {
+			const edge = tree.$edges.get(r.n1, r.n2)!;
 			if(edge.$v1.isLeaf || edge.$v2.isLeaf) continue;
-			const tag = this._getEdgeTag(e);
+			const tag = this._getEdgeTag(r);
 			if(!model.graphics[tag]) continue;
-			this._addRiver(e, model.graphics[tag]);
+			this._addRiver(r, model.graphics[tag]);
 		}
 		this.riverCount = this.$rivers.size;
 	}
 
 	/** We separate this method for the execution order. */
 	public $cleanUp(model: UpdateModel): void {
-		for(const e of model.remove.edges) {
-			const river = this.$rivers.get(e.n1, e.n2);
+		for(const edit of model.edit.filter(e => !e[0])) {
+			const river = this.$rivers.get(edit[1].n1, edit[1].n2);
 			if(river) this._removeRiver(river);
 		}
 	}
@@ -180,13 +182,15 @@ export class Layout extends View implements ISerializable<JLayout> {
 		const tree = this.$project.design.tree;
 		const vertex = tree.$vertices[f.id]!;
 		const edge = tree.$getFirstEdge(vertex);
+		if(!edge) debugger;
 		const flap = new Flap(this, f, vertex, edge, graphics);
 		this.$flaps.set(f.id, flap);
 		if(vertex.$isNew) this.$syncFlaps.set(f.id, flap);
 		this.$sheet.$addChild(flap);
+		this.$project.history.$construct(flap.$toMemento());
 	}
 
-	private _removeFlaps(model: UpdateModel): void {
+	private _removeFlaps(model: UpdateModel, newRivers: JEdge[]): void {
 		const design = this.$project.design;
 		const prototype = design.$prototype;
 		const tree = design.tree;
@@ -200,7 +204,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 						model.graphics["f" + f.id] ||= f.$graphics;
 					} else {
 						// A flap turns into a river
-						model.add.edges.push(f.$edge.toJSON());
+						newRivers.push(f.$edge.toJSON());
 					}
 				}
 				this._removeFlap(f.id);
@@ -210,9 +214,11 @@ export class Layout extends View implements ISerializable<JLayout> {
 
 	private _removeFlap(id: number): void {
 		const flap = this.$flaps.get(id)!;
+		const memento = flap.$toMemento();
 		this.$sheet.$removeChild(flap);
 		flap.$dispose();
 		this.$flaps.delete(id);
+		this.$project.history.$destruct(memento);
 	}
 
 	private _addRiver(e: JEdge, graphics: GraphicsData): void {

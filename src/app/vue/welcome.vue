@@ -203,6 +203,7 @@
 		overflow: hidden;
 		max-width: 100%;
 		line-height: 1.75;
+		padding-left: 0.33rem;
 
 		&:hover {
 			background: #eee;

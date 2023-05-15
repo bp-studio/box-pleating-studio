@@ -26,7 +26,7 @@ export class FieldCommand extends Command implements JFieldCommand {
 	 */
 	public static $setterPromise: Promise<void> | undefined;
 
-	public static create(
+	public static $create(
 		target: ITagObject, prop: string, oldValue: unknown, newValue: unknown
 	): FieldCommand {
 		return new FieldCommand(target.$project, {

@@ -18,6 +18,7 @@ export namespace DesignController {
 		if(DEBUG_ENABLED) console.time("Design initializing");
 
 		State.$tree = new Tree(data.tree.edges, data.layout.flaps);
+		State.$treeStructureChanged = true;
 		State.$rootChanged = true;
 		for(const s of data.layout.stretches) {
 			State.$stretchPrototypes.set(s.id, s);

@@ -10,6 +10,7 @@ import { Direction, quadrantNumber } from "shared/types/direction";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { shallowRef } from "client/shared/decorators";
+import { SelectionController } from "client/controllers/selectionController";
 
 import type { LabelView } from "client/utils/label";
 import type { GraphicsLike, SmoothGraphicsLike } from "client/utils/contourUtil";
@@ -19,7 +20,7 @@ import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
-import type { JFlap } from "shared/json";
+import type { JFlap, Memento } from "shared/json";
 import type { Vertex } from "../tree/vertex";
 
 //=================================================================
@@ -88,7 +89,6 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this.$reactDraw(this._draw, this._drawShade, this._drawLabel);
 	}
 
-
 	public toJSON(): JFlap {
 		return {
 			id: this.id,
@@ -97,6 +97,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 			width: this._width,
 			height: this._height,
 		};
+	}
+
+	public $toMemento(): Memento {
+		return [this.$tag, this.toJSON()];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,6 +153,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	public delete(): void {
 		this.$vertex.delete();
+		SelectionController.$toggle(this, false);
 	}
 
 	public goToDual(): void {

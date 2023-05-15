@@ -4,7 +4,7 @@ export interface JEdgeBase {
 	n2: number;
 }
 
-export interface JEdge extends JEdgeBase{
+export interface JEdge extends JEdgeBase {
 	length: number;
 	selected?: boolean;
 }
@@ -14,4 +14,5 @@ export interface JNode {
 	parentId?: number;
 }
 
-export type JTreeElement = JNode | JEdge;
+/** First entry represents whether this is adding edges. */
+export type JEdit = [boolean, JEdge];

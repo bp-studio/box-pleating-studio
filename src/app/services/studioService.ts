@@ -81,7 +81,9 @@ namespace StudioService {
 
 	export const plugins = proxy(() => bp.plugins, null!);
 
-	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
+	/** There's no point saving the session during dragging. */
+	export const shouldSkipSaving = proxy(() => bp.drag.isDragging.value, false);
+
 	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
 
 	export const history = proxy(() => bp.history, {

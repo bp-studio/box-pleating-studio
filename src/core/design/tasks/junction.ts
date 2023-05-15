@@ -23,9 +23,12 @@ export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask)
 const pendingDelete = new Set<number>();
 
 function junction(): void {
-	// Delete junctions related to deleted nodes
+	// Delete junctions related to deleted nodes or nodes that are no longer leaves
 	for(const id of State.$updateResult.remove.nodes) {
 		State.$junctions.delete(id);
+	}
+	for(const node of State.$childrenChanged) {
+		if(node.$children.$size > 0) State.$junctions.delete(node.id);
 	}
 
 	if(State.$junctions.size > 0) {

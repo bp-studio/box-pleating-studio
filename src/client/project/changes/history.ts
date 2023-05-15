@@ -4,13 +4,16 @@ import { shallowRef } from "client/shared/decorators";
 import { FieldCommand } from "./commands/fieldCommand";
 import { Step, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";
+import { EditCommand } from "./commands/editCommand";
 
+import type { JEdit } from "shared/json/tree";
 import type { Draggable } from "client/base/draggable";
 import type { Project } from "../project";
 import type { ITagObject } from "client/shared/interface";
 import type { Command } from "./commands/command";
 import type { JHistory, Memento } from "shared/json/history";
 import type { Control } from "client/base/control";
+import type { JVertex } from "shared/json/components";
 
 const MAX_STEP = 30;
 
@@ -127,8 +130,13 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
 		flush: boolean = true): void {
 		if(this._moving) return;
-		this._enqueue(FieldCommand.create(target, prop, oldValue, newValue));
+		this._enqueue(FieldCommand.$create(target, prop, oldValue, newValue));
 		if(flush) this.$flush();
+	}
+
+	public $edit(edits: JEdit[]): void {
+		if(this._moving) return;
+		this._enqueue(EditCommand.$create(this._project, edits));
 	}
 
 	public $construct(memento: Memento): void {

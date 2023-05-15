@@ -1,8 +1,8 @@
 import { TreeNode } from "./treeNode";
 import { State } from "core/service/state";
 
-import type { ITree, ITreeNode } from ".";
 import type { JEdge, JFlap } from "shared/json";
+import type { ITree, ITreeNode } from ".";
 
 //=================================================================
 /**
@@ -21,6 +21,13 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	/** The root node of the tree. */
 	public $root!: TreeNode;
 
+	/**
+	 * The ids of those {@link TreeNode} that might be deleted in current round.
+	 * Some of them might get added back to the tree,
+	 * so we need to double-check in {@link $flushRemove $flushRemove()}.
+	 */
+	private readonly _pendingRemove: Set<number> = new Set();
+
 	constructor(edges: JEdge[], flaps?: JFlap[]) {
 		this._nodes = new Array(edges.length + 1);
 
@@ -29,7 +36,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 			const remain: JEdge[] = [];
 			let newEdgeAdded = false;
 			for(const e of edges) {
-				if(this.$setEdge(e.n1, e.n2, e.length)) {
+				if(this._setEdge(e.n1, e.n2, e.length)) {
 					newEdgeAdded = true;
 				} else {
 					remain.push(e);
@@ -74,36 +81,19 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		return this._nodes;
 	}
 
-	public get $height(): number {
-		return this.$root.$height;
-	}
-
-	public $addLeaf(id: number, at: number, length: number): ITreeNode {
-		this.$setEdge(at, id, length);
-		return this.$nodes[id]!;
-	}
-
 	public $removeLeaf(id: number): boolean {
 		const node = this._nodes[id];
 		if(!node || !node.$isLeafLike) return false;
 
 		const parent = node.$parent;
 		if(parent) {
-			node.$cut();
-			if(parent.$isLeafLike) {
-				State.$flapAABBChanged.add(parent);
-			}
+			this._removeEdgeAndCheckNewFlap(node, parent);
 		} else {
 			const child = node.$children.$get()!;
-			child.$cut();
-			if(child.$isLeafLike) {
-				State.$flapAABBChanged.add(child);
-			}
+			this._removeEdgeAndCheckNewFlap(node, child);
 			this.$root = child;
 			State.$rootChanged = true;
 		}
-
-		this._removeNode(id);
 		return true;
 	}
 
@@ -120,40 +110,41 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		const parent = node.$parent;
 		const child = node.$children.$get()!;
 		const second = node.$children.$getSecond()!;
-		child.$cut();
+		this.$removeEdge(child.id, id);
 		if(parent) {
-			node.$cut();
-			child.$length += node.$length;
-			child.$pasteTo(parent);
+			const length = child.$length + node.$length;
+			this.$removeEdge(id, parent.id);
+			this.$addEdge(child.id, parent.id, length);
 		} else {
-			second.$length += child.$length;
-			second.$cut();
-			second.$pasteTo(child);
+			const length = child.$length + second.$length;
+			this.$removeEdge(second.id, id);
 			this.$root = child;
 			State.$rootChanged = true;
+			this.$addEdge(second.id, child.id, length);
 		}
-		this._removeNode(id);
+		this.$flushRemove();
 	}
 
 	public $split(id: number, n: number): void {
 		const node = this._nodes[n]!;
 		const parent = node.$parent!;
 		const l = node.$length;
-		node.$cut();
-		this.$setEdge(parent.id, id, Math.ceil(l / 2));
-		node.$length = Math.max(Math.floor(l / 2), 1);
-		node.$pasteTo(this._nodes[id]!);
+		this.$removeEdge(n, parent.id);
+		this.$addEdge(parent.id, id, Math.ceil(l / 2));
+		this.$addEdge(id, n, Math.max(Math.floor(l / 2), 1));
+		this.$flushRemove();
 	}
 
 	public $merge(id: number): void {
 		const node = this._nodes[id]!;
 		const parent = node.$parent!;
-		node.$cut();
+		this.$removeEdge(id, parent.id);
 		for(const child of node.$children) {
-			child.$cut();
-			child.$pasteTo(parent);
+			const length = child.$length;
+			this.$removeEdge(id, child.id);
+			this.$addEdge(child.id, parent.id, length);
 		}
-		this._removeNode(id);
+		this.$flushRemove();
 	}
 
 	public $setLength(id: number, length: number): void {
@@ -162,11 +153,101 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		node.$AABB.$setMargin(length);
 		State.$lengthChanged.add(node);
 		State.$treeStructureChanged = true;
-		if(node.$isLeaf) State.$flapAABBChanged.add(node);
+		if(node.$isLeaf) {
+			State.$flapAABBChanged.add(node);
+		}
 	}
 
-	/** Setup an edge and returns if a new edge is created. */
-	public $setEdge(n1: number, n2: number, length: number): boolean {
+	/**
+	 * Connect two nodes. Node will be created if absent.
+	 * This is one of the two fundamental operations.
+	 *
+	 * @returns The first node.
+	 */
+	public $addEdge(n1: number, n2: number, length: number): TreeNode {
+		const N1 = this._nodes[n1] || this._addNode(n1);
+		const N2 = this._nodes[n2] || this._addNode(n2);
+
+		if(!N1.$parent && N1 !== this.$root) {
+			N1.$pasteTo(N2);
+			this.$setLength(n1, length);
+		} else {
+			N2.$pasteTo(N1);
+			this.$setLength(n2, length);
+		}
+
+		State.$updateResult.edit.push([true, { n1, n2, length }]);
+		return N1;
+	}
+
+	/**
+	 * Disconnect two nodes.
+	 * This is one of the two fundamental operations.
+	 *
+	 * This doesn't actually remove any node yet.
+	 * Must call {@link $flushRemove $flushRemove()} to perform the actual removal.
+	 */
+	public $removeEdge(n1: number, n2: number): void {
+		const N1 = this._nodes[n1]!, N2 = this._nodes[n2]!;
+		const child = N1.$parent == N2 ? N1 : N2;
+		State.$updateResult.edit.push([false, { n1, n2, length: child.$length }]);
+		State.$treeStructureChanged = true;
+		child.$cut();
+
+		// Add both of them to the pending list, as it is unclear
+		// at this point which one will actually be removed, if any.
+		this._pendingRemove.add(n1);
+		this._pendingRemove.add(n2);
+	}
+
+	/**
+	 * Check all {@link TreeNode}s in {@link _pendingRemove} and perform the actual removal.
+	 */
+	public $flushRemove(): void {
+		for(const id of this._pendingRemove) {
+			const node = this._nodes[id]!;
+			// Double-check if the node actually needs to be removed.
+			if(node.$parent || node === this.$root) continue;
+
+			// It suffices to clear the record in these four sets,
+			// as these are the ones that get modified before all tasks.
+			State.$lengthChanged.delete(node);
+			State.$parentChanged.delete(node);
+			State.$childrenChanged.delete(node);
+			State.$flapAABBChanged.delete(node);
+
+			delete this._nodes[id];
+			State.$updateResult.remove.nodes.push(id);
+		}
+		this._pendingRemove.clear();
+	}
+
+	//TODO: Do we need this?
+	/** Returns the distance between two nodes on the tree. */
+	public $dist(n1: TreeNode, n2: TreeNode): number {
+		return dist(n1, n2, this._lca(n1, n2));
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _addNode(id: number, at?: TreeNode, length?: number): TreeNode {
+		return this._nodes[id] = new TreeNode(id, at, length);
+	}
+
+	private _removeEdgeAndCheckNewFlap(node: TreeNode, partner: TreeNode): void {
+		this.$removeEdge(node.id, partner.id);
+		if(partner.$isLeafLike) {
+			State.$flapAABBChanged.add(partner);
+		}
+	}
+
+	/**
+	 * Setup an edge and returns if a new edge is created.
+	 * Used only during initialization.
+	 */
+	private _setEdge(n1: number, n2: number, length: number): boolean {
 		let N1 = this._nodes[n1], N2 = this._nodes[n2];
 
 		// If the tree is non-empty, one of the vertices must be present.
@@ -184,39 +265,13 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		}
 
 		if(N2) {
-			N1 = this._addLeaf(n1, N2, length);
+			N1 = this._addNode(n1, N2, length);
 		} else {
-			if(!N1) this.$root = N1 = this._addLeaf(n1);
-			N2 = this._addLeaf(n2, N1, length);
+			if(!N1) this.$root = N1 = this._addNode(n1);
+			N2 = this._addNode(n2, N1, length);
 		}
-
+		State.$updateResult.edit.push([true, { n1, n2, length }]);
 		return true;
-	}
-
-	//TODO: Do we need this?
-	/** Returns the distance between two nodes on the tree. */
-	public $dist(n1: TreeNode, n2: TreeNode): number {
-		return dist(n1, n2, this._lca(n1, n2));
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _addLeaf(id: number, at?: TreeNode, length?: number): TreeNode {
-		const newNode = new TreeNode(id, at, length);
-		this._nodes[id] = newNode;
-		State.$treeStructureChanged = true;
-		return newNode;
-	}
-
-	private _removeNode(id: number): void {
-		const node = this._nodes[id]!;
-		State.$childrenChanged.delete(node);
-		State.$flapAABBChanged.delete(node);
-		delete this._nodes[id];
-		State.$updateResult.remove.nodes.push(id);
-		State.$treeStructureChanged = true;
 	}
 
 	//TODO: Do we need this?

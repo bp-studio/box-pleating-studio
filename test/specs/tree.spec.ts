@@ -17,7 +17,7 @@ describe("Tree", function() {
 
 		expect(tree.$nodes.filter(n => n).length).to.equal(3);
 		expect(tree.$root.id).to.equal(0);
-		expect(tree.$height).to.equal(1);
+		expect(tree.$root.$height).to.equal(1);
 	});
 
 	it("Balances itself", function() {
@@ -33,12 +33,12 @@ describe("Tree", function() {
 		expect(tree.$root).to.equal(n0);
 
 		// Add two more edges, causing unbalancing
-		tree.$addLeaf(3, 1, 2);
-		tree.$addLeaf(4, 3, 2);
+		tree.$addEdge(3, 1, 2);
+		tree.$addEdge(4, 3, 2);
 		Processor.$run(heightTask);
 
 		expect(tree.$root).to.equal(n1);
-		expect(tree.$height).to.equal(2);
+		expect(tree.$root.$height).to.equal(2);
 	});
 
 	it("Can remove leaf nodes", function() {
@@ -57,16 +57,21 @@ describe("Tree", function() {
 		expect(tree.$nodes[1]).to.be.not.undefined;
 		expect(tree.$nodes[0]).to.be.not.undefined;
 
-		tree.$removeLeaf(0);
+		// Test invalid removal.
+		expect(tree.$removeLeaf(0)).to.be.false;
+		tree.$flushRemove();
 		expect(tree.$nodes[0]).to.be.not.undefined;
-		tree.$removeLeaf(1);
+
+		// Test removal.
+		expect(tree.$removeLeaf(1)).to.be.true;
+		expect(tree.$removeLeaf(0)).to.be.true;
+		tree.$flushRemove();
 		expect(tree.$nodes[1]).to.be.undefined;
-		tree.$removeLeaf(0);
 		expect(tree.$nodes[0]).to.be.undefined;
 
 		Processor.$run(heightTask);
 		expect(tree.$root).to.equal(n3);
-		expect(tree.$height).to.equal(1);
+		expect(tree.$root.$height).to.equal(1);
 	});
 
 	it("Keeps a record of distances", function() {
@@ -86,10 +91,11 @@ describe("Tree", function() {
 		const n4 = tree.$nodes[4]!;
 		expect(n0.$dist).to.equal(2);
 		expect(n2.$dist).to.equal(0);
+		expect(n0.$parent).to.equal(n2);
 		expect(tree.$dist(n0, n3)).to.equal(5);
 		expect(tree.$dist(n1, n4)).to.equal(10);
 
-		tree.$setEdge(2, 0, 5);
+		tree.$setLength(0, 5);
 		Processor.$run(heightTask);
 		expect(tree.$dist(n1, n4)).to.equal(13);
 	});
