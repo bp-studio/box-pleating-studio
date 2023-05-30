@@ -52,27 +52,12 @@ const copyStatic = () => gulp.src([
 	})))
 	.pipe(gulp.dest(config.dest.dist));
 
-/** Build minified FontAwesome font */
-const faSrc = "node_modules/@fortawesome/fontawesome-free";
+/** FontAwesome */
 const faTarget = libDest + "/font-awesome";
-const subsetFontAwesome = () => {
-	const fontAwesome = require("../plugins/fontAwesome");
-	return gulp.src(config.src.app + "/vue/**/*.vue")
-		.pipe(fontAwesome())
-		.pipe(gulp.dest(faTarget + "/webfonts"));
-};
-
-/** Purge CSS for FontAwesome */
-const purgeFontAwesome = () => {
-	let stream = gulp.src(faSrc + "/css/all.min.css", { base: faSrc });
-	const { purge } = require("../utils/purge");
-	stream = purge(stream);
-	return stream
-		.pipe($.replace(/src:url\([^)]+eot\);/g, ""))
-		.pipe($.replace(/url\([^)]+(iefix|woff|fontawesome)\) format\([^)]+\),?/g, ""))
-		.pipe($.replace(/,\}/g, "}"))
-		.pipe(gulp.dest(faTarget));
-};
+const fontAwesome = () =>
+	gulp.src(config.src.app + "/vue/**/*.vue")
+		.pipe($.fontawesome())
+		.pipe(gulp.dest(libDest + "/font-awesome"));
 
 gulp.task("log", () => buildLog());
 
@@ -86,10 +71,7 @@ gulp.task("static", () => {
 	// Only the first time the FontAwesome build will be executed automatically.
 	// In other cases we call the `fa` task manually to improve performance.
 	if(!fs.existsSync(faTarget)) {
-		tasks.push(
-			purgeFontAwesome(),
-			subsetFontAwesome()
-		);
+		tasks.push(fontAwesome());
 	}
 	return $.all(tasks);
 });
@@ -101,7 +83,4 @@ gulp.task("static", () => {
  * Note: For unknown reason, it appears that in local environment,
  * restarting the browser is needed for the new font to take effect.
  */
-gulp.task("fa", () => $.all(
-	purgeFontAwesome(),
-	subsetFontAwesome()
-));
+gulp.task("fa", fontAwesome);

@@ -28,9 +28,6 @@ module.exports.purge = function(stream) {
 					/^--bs-nav-tabs/,
 				],
 			},
-			// for Font Awesome
-			keyframes: true,
-			fontFace: true,
 
 			// for Bootstrap
 			variables: true,
