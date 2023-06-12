@@ -96,9 +96,9 @@
 			const SHORT_INTERVAL = 10;
 			this.sending = true;
 			try {
-				let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url), {
-					cache: "reload",
-				});
+				// For unknown reason, using `{ cache: "reload" }`
+				// option here will lead to no-response error in Safari.
+				let response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(this.url));
 				this.url = await response.text();
 				this.sending = false;
 				if(!this.$refs.bt) {
