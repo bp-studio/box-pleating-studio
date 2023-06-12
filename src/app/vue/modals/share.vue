@@ -94,7 +94,9 @@
 		sending.value = true;
 		try {
 			const api = "https://tinyurl.com/api-create.php?url=" + encodeURIComponent(rawUrl);
-			const response = await fetch(api, { cache: "reload" });
+			// For unknown reason, using `{ cache: "reload" }`
+			// option here will lead to no-response error in Safari.
+			const response = await fetch(api);
 			url.value = await response.text();
 			sending.value = false;
 			await waitButton();
