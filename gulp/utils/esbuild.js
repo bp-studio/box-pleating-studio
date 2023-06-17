@@ -12,7 +12,7 @@ function esVueOption(options) {
 }
 
 // Setting ECMAScript building target
-const target = ["chrome66", "edge79", "firefox78", "opera53", "safari11.1", "ios11.3"];
+const target = ["es2018", "chrome66", "edge79", "firefox78", "opera53", "safari11.1", "ios11.3"];
 
 let plugins;
 function getDefaultPlugins() {
@@ -70,11 +70,14 @@ function ssgOption(options) {
 			globalThis.localStorage?.clear();
 			app.use(i18n);
 		},
-		plugins: [
-			esVue(esVueOption({
-				directiveTransforms: { t: vt(i18n) }, // So that v-t directives will be processed
-			})),
-		],
+		esbuildOptions: {
+			plugins: [
+				esVue(esVueOption({
+					directiveTransforms: { t: vt(i18n) }, // So that v-t directives will be processed
+				})),
+			],
+			target,
+		}
 	};
 }
 
