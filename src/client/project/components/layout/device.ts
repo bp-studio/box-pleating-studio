@@ -45,9 +45,9 @@ export class Device extends Draggable {
 
 		// We deliberately put the shade on a higher layer,
 		// so that its hovering effect can be prioritized.
-		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$edge]);
-		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
-		this._axisParallels = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$axisParallels]);
+		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.edge]);
+		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.ridge]);
+		this._axisParallels = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.axisParallels]);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade);

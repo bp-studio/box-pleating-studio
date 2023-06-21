@@ -92,7 +92,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		}
 		this.$view.addChild(this._mask, ...this._layers);
 
-		this._layers[Layer.$sheet].addChild(this._borderGraphics, this._gridGraphics);
+		this._layers[Layer.sheet].addChild(this._borderGraphics, this._gridGraphics);
 
 		this._type = json?.type ?? GridType.rectangular;
 		this._grid = createGrid(this, this._type, json?.width, json?.height);
@@ -207,11 +207,11 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {
-		this._layers[Layer.$axisParallels].visible = app.settings.showAxialParallel;
-		this._layers[Layer.$dot].visible = app.settings.showDot;
-		this._layers[Layer.$hinge].visible = app.settings.showHinge;
-		this._layers[Layer.$label].visible = app.settings.showLabel;
-		this._layers[Layer.$ridge].visible = app.settings.showRidge;
+		this._layers[Layer.axisParallels].visible = app.settings.showAxialParallel;
+		this._layers[Layer.dot].visible = app.settings.showDot;
+		this._layers[Layer.hinge].visible = app.settings.showHinge;
+		this._layers[Layer.label].visible = app.settings.showLabel;
+		this._layers[Layer.ridge].visible = app.settings.showRidge;
 	}
 
 	/** Adjust the position of the container by the scrolling position. */

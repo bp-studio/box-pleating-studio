@@ -1,6 +1,5 @@
 import { AABBSide } from "./aabbSide";
 
-import type { JFlap } from "shared/json";
 import type { PerQuadrant } from "shared/types/direction";
 import type { IRoundedRect } from "core/math/polyBool/intersection/roundedRect";
 import type { Path } from "shared/types/geometry";
@@ -8,13 +7,13 @@ import type { Comparator } from "shared/types/types";
 
 /** The order is inspired by CSS */
 export enum Side {
-	_top,
-	_right,
-	_bottom,
-	_left,
+	top,
+	right,
+	bottom,
+	left,
 }
 
-const SIDES = [Side._top, Side._right, Side._bottom, Side._left];
+const SIDES = [Side.top, Side.right, Side.bottom, Side.left];
 
 const minComparator: Comparator<AABBSide> = (a, b) => a.$key - b.$key;
 const maxComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
@@ -54,25 +53,25 @@ export class AABB {
 	}
 
 	public $intersects(that: AABB, gap: number): boolean {
-		return this._sides[Side._left].$base - gap < that._sides[Side._right].$base &&
-			this._sides[Side._right].$base + gap > that._sides[Side._left].$base &&
-			this._sides[Side._top].$base + gap > that._sides[Side._bottom].$base &&
-			this._sides[Side._bottom].$base - gap < that._sides[Side._top].$base;
+		return this._sides[Side.left].$base - gap < that._sides[Side.right].$base &&
+			this._sides[Side.right].$base + gap > that._sides[Side.left].$base &&
+			this._sides[Side.top].$base + gap > that._sides[Side.bottom].$base &&
+			this._sides[Side.bottom].$base - gap < that._sides[Side.top].$base;
 	}
 
 	public $update(top: number, right: number, bottom: number, left: number): void {
-		this._sides[Side._top].$value = top;
-		this._sides[Side._right].$value = right;
-		this._sides[Side._bottom].$value = bottom;
-		this._sides[Side._left].$value = left;
+		this._sides[Side.top].$value = top;
+		this._sides[Side.right].$value = right;
+		this._sides[Side.bottom].$value = bottom;
+		this._sides[Side.left].$value = left;
 		this.$points = toCorners([top, right, bottom, left]);
 	}
 
 	public $setMargin(m: number): void {
-		this._sides[Side._top].$margin = m;
-		this._sides[Side._right].$margin = m;
-		this._sides[Side._bottom].$margin = -m;
-		this._sides[Side._left].$margin = -m;
+		this._sides[Side.top].$margin = m;
+		this._sides[Side.right].$margin = m;
+		this._sides[Side.bottom].$margin = -m;
+		this._sides[Side.left].$margin = -m;
 	}
 
 	/** For testing purpose */
@@ -86,7 +85,7 @@ export class AABB {
 	}
 
 	public $toRoundedRect(extraUnits: number): IRoundedRect {
-		const radius = this._sides[Side._top].$margin + extraUnits;
+		const radius = this._sides[Side.top].$margin + extraUnits;
 		const [t, r, b, l] = this._sides.map(s => s.$value);
 		return {
 			x: l,

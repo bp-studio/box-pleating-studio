@@ -77,13 +77,13 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this.$edge = edge;
 		this._drawParams = this.toJSON();
 
-		this._dots = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.$dot]);
+		this._dots = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.dot]);
 
-		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$shade]);
-		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
-		this._circle = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.$hinge]);
-		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
+		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.shade]);
+		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.ridge]);
+		this._circle = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.hinge]);
+		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.hinge]);
+		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade, this._drawLabel);

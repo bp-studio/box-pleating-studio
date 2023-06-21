@@ -52,9 +52,9 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		this._length = length;
 
 		this.$setupHit(this._line);
-		this.$addRootObject(this._line, sheet.$layers[Layer.$edge]);
+		this.$addRootObject(this._line, sheet.$layers[Layer.edge]);
 
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
+		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
 		this.$label.$distance = LABEL_DISTANCE;
 
 		this.$reactDraw(this._draw, this._hitArea, this._drawLabel);

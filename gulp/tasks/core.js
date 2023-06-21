@@ -23,24 +23,16 @@ gulp.task("coreDebug", () =>
 			dest: config.dest.debug + "/core.js",
 			extra,
 		}))
-		.pipe(esb({ sourcemap: "external", sourcesContent: false, sourceRoot: "../../" }))
-		.pipe(sourceMap())
-		.pipe($.terser({
-			ecma: 2018,
-			compress: {
-				defaults: false,
-				drop_debugger: false,
-				global_defs: {
-					DEBUG_ENABLED: true,
-					TEST_MODE: false,
-				},
+		.pipe(esb({
+			define: {
+				DEBUG_ENABLED: "true",
+				TEST_MODE: "false",
 			},
-			mangle: false,
-			format: {
-				beautify: true,
-				comments: true,
-			},
+			sourcemap: "external",
+			sourcesContent: false,
+			sourceRoot: "../../",
 		}))
+		.pipe(sourceMap())
 		.pipe(gulp.dest(config.dest.debug, { sourcemaps: "." }))
 );
 
@@ -50,23 +42,14 @@ gulp.task("coreDist", () =>
 			dest: config.dest.dist + "/core.js",
 			extra,
 		}))
-		.pipe(esb({ minify: true })) // This will still make a slight difference even we've used terser
-		.pipe($.replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
-		.pipe($.terser({
-			ecma: 2018,
-			compress: {
-				drop_debugger: false,
-				global_defs: {
-					DEBUG_ENABLED: false,
-					TEST_MODE: false,
-				},
+		.pipe(esb({
+			define: {
+				DEBUG_ENABLED: "false",
+				TEST_MODE: "false",
 			},
-			mangle: { properties: { regex: /^[$_]/ } },
-			format: {
-				comments: false,
-			},
+			minify: true,
+			mangleProps: /^[$_]/,
 		}))
-		.pipe($.replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest(config.dest.dist))
 );
 

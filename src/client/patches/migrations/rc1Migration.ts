@@ -42,7 +42,7 @@ function pattern(cf: Pseudo<JConfiguration>, s: Pseudo<JStretch>): void {
 }
 
 function cornerFilter(c: JCorner): boolean {
-	return c.type == CornerType.$coincide;
+	return c.type == CornerType.coincide;
 }
 
 function partition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {

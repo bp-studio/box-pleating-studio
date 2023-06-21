@@ -59,10 +59,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this.$location = { x: json.x, y: json.y };
 		this.name = json.name;
 
-		this._dot = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.$vertex]);
+		this._dot = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.vertex]);
 		this.$setupHit(this._dot, new Circle(0, 0, style.vertex.size * 2));
 
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.$label]);
+		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
 
 		this.$reactDraw(this._draw, this._drawLabel);
 	}

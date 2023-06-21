@@ -1,9 +1,9 @@
 export enum Strategy {
-	$halfIntegral = "HALFINTEGRAL",
-	$universal = "UNIVERSAL",
-	$baseJoin = "BASE_JOIN",
-	$standardJoin = "STANDARD_JOIN",
-	$perfect = "PERFECT",
+	halfIntegral = "HALFINTEGRAL",
+	universal = "UNIVERSAL",
+	baseJoin = "BASE_JOIN",
+	standardJoin = "STANDARD_JOIN",
+	perfect = "PERFECT",
 }
 
 export enum GridType {
@@ -20,23 +20,23 @@ export enum CommandType {
 /** The connection type of a corner */
 export enum CornerType {
 	/** It is the connection target of another Overlap. */
-	$socket,
+	socket,
 	/** It connects to another Overlap. */
-	$internal,
+	internal,
 	/**
 	 * The side corner, which also connects to a hinge intersection.
 	 * However it could extend indefinitely since its on the very side.
 	 */
-	$side,
+	side,
 	/**
 	 * A corner that connects to a hinge intersection.
 	 * In this case, `e` refers to the id of the other flap involved.= */
-	$intersection,
+	intersection,
 	/** A conner that connects to a flap. */
-	$flap,
+	flap,
 	/**
 	 * This corner coincides with another corner of another Overlap,
 	 * which makes the current overlap belong to the same Partition as the former.
 	 */
-	$coincide,
+	coincide,
 }

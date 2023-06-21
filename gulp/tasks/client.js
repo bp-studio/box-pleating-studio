@@ -75,6 +75,10 @@ gulp.task("clientDebug", () =>
 			extra,
 		}))
 		.pipe(esb({
+			define: {
+				DEBUG_ENABLED: "true",
+				TEST_MODE: "false",
+			},
 			sourcemap: "external",
 			// We set this to true so that PIXI can be debugged,
 			// as PIXI put source codes in its sourcemaps.
@@ -84,22 +88,6 @@ gulp.task("clientDebug", () =>
 			sourceRoot: "../../",
 		}))
 		.pipe(sourceMap())
-		.pipe($.terser({
-			ecma: 2018,
-			compress: {
-				defaults: false,
-				drop_debugger: false,
-				global_defs: {
-					DEBUG_ENABLED: true,
-					TEST_MODE: false,
-				},
-			},
-			mangle: false,
-			format: {
-				beautify: true,
-				comments: true,
-			},
-		}))
 		.pipe(gulp.dest(config.dest.debug, { sourcemaps: "." }))
 );
 
@@ -109,24 +97,16 @@ gulp.task("clientDist", () =>
 			dest: config.dest.dist + "/client.js",
 			extra,
 		}))
-		.pipe(esb({ minify: true })) // This will still make a slight difference even we've used terser
-		.pipe($.replace(/(["'])[$_][a-z_0-9]+\1/gi, "$$$$$$$$[$&]")) // Prepare decorator mangling
-		.pipe($.terser({
-			ecma: 2018,
-			compress: {
-				drop_debugger: false,
-				global_defs: {
-					DEBUG_ENABLED: false,
-					TEST_MODE: false,
-				},
+		.pipe(esb({
+			define: {
+				DEBUG_ENABLED: "false",
+				TEST_MODE: "false",
 			},
+			minify: true,
+			mangleProps: /^[$_]/,
 			// These three exceptions are the private variables that PIXI will internally referred to by strings.
-			mangle: { properties: { regex: /^[$_](?!view|plugin|multisample)/ } },
-			format: {
-				comments: false,
-			},
+			reserveProps: /^_(view|plugin|multisample)/,
 		}))
-		.pipe($.replace(/\$\$\$\$\.([a-z$_][a-z$_0-9]*)/gi, "'$1'")) // Restore
 		.pipe(gulp.dest(config.dest.dist))
 );
 

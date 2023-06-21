@@ -41,9 +41,9 @@ export class River extends Control {
 		this.$edge = edge;
 		this.$graphics = graphics;
 
-		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.$shade]);
-		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$hinge]);
-		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.$ridge]);
+		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.shade]);
+		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.hinge]);
+		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.ridge]);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade);

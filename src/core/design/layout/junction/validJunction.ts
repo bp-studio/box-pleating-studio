@@ -75,10 +75,10 @@ export class ValidJunction implements ISerializable<JJunction> {
 	toJSON(): JJunction {
 		return {
 			c: [
-				{ type: CornerType.$flap, e: this.$a.id, q: this.$q1 & MASK },
-				{ type: CornerType.$side },
-				{ type: CornerType.$flap, e: this.$b.id, q: this.$q2 & MASK },
-				{ type: CornerType.$side },
+				{ type: CornerType.flap, e: this.$a.id, q: this.$q1 & MASK },
+				{ type: CornerType.side },
+				{ type: CornerType.flap, e: this.$b.id, q: this.$q2 & MASK },
+				{ type: CornerType.side },
 			],
 			ox: this.$o.x,
 			oy: this.$o.y,

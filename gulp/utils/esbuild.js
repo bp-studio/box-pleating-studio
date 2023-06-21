@@ -77,7 +77,7 @@ function ssgOption(options) {
 				})),
 			],
 			target,
-		}
+		},
 	};
 }
 

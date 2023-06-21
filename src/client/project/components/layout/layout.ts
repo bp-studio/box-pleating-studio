@@ -60,7 +60,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(style.junction.alpha);
-		this.$sheet.$layers[Layer.$junction].filters = [filter];
+		this.$sheet.$layers[Layer.junction].filters = [filter];
 
 		this.$reactDraw(this._redrawJunctions);
 	}
@@ -278,7 +278,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	}
 
 	private _updateJunctions(model: UpdateModel): number {
-		const junctionLayer = this.$sheet.$layers[Layer.$junction];
+		const junctionLayer = this.$sheet.$layers[Layer.junction];
 		const max = ProjectService.scale.value;
 		this._scale = max;
 		let delta = 0;

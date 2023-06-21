@@ -1,16 +1,16 @@
 
 /** All layers and their ordering. */
 export enum Layer {
-	$sheet,
-	$shade,
-	$edge,
-	$hinge,
-	$ridge,
-	$axisParallels,
-	$junction,
-	$dot,
-	$vertex,
-	$label,
+	sheet,
+	shade,
+	edge,
+	hinge,
+	ridge,
+	axisParallels,
+	junction,
+	dot,
+	vertex,
+	label,
 }
 
 export interface ILayerOptions {
@@ -23,14 +23,14 @@ export interface ILayerOptions {
 
 /** Settings for each layer. */
 export const LayerOptions: Record<Layer, ILayerOptions> = {
-	[Layer.$sheet]: {},
-	[Layer.$shade]: { clipped: true, interactive: true },
-	[Layer.$edge]: { clipped: true, interactive: true },
-	[Layer.$hinge]: { clipped: true },
-	[Layer.$ridge]: { clipped: true },
-	[Layer.$axisParallels]: { clipped: true },
-	[Layer.$junction]: { clipped: true },
-	[Layer.$dot]: {},
-	[Layer.$vertex]: { interactive: true },
-	[Layer.$label]: {},
+	[Layer.sheet]: {},
+	[Layer.shade]: { clipped: true, interactive: true },
+	[Layer.edge]: { clipped: true, interactive: true },
+	[Layer.hinge]: { clipped: true },
+	[Layer.ridge]: { clipped: true },
+	[Layer.axisParallels]: { clipped: true },
+	[Layer.junction]: { clipped: true },
+	[Layer.dot]: {},
+	[Layer.vertex]: { interactive: true },
+	[Layer.label]: {},
 };

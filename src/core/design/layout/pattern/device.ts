@@ -117,7 +117,7 @@ export class Device implements ISerializable<JDevice> {
 		const fx = this.$pattern.$config.$repo.$f.x;
 		const result = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY] as [number, number];
 		for(const c of this.$partition.$constraints) {
-			const isOut = c.corner.type != CornerType.$socket;
+			const isOut = c.corner.type != CornerType.socket;
 			const q = isOut ? c.anchorIndex : c.corner.q!;
 			const f = fx * (q == 0 ? -1 : 1);
 			const target = this.$pattern.$getConnectionTarget(c.corner as JConnection);
@@ -135,7 +135,7 @@ export class Device implements ISerializable<JDevice> {
 		const result: Line[] = [];
 		for(const [i, ov] of this.$partition.$overlaps.entries()) {
 			for(const [q, c] of ov.c.entries()) {
-				if(c.type == CornerType.$flap && !internalOnly || c.type == CornerType.$internal) {
+				if(c.type == CornerType.flap && !internalOnly || c.type == CornerType.internal) {
 					result.push(new Line(
 						this.$anchors[i][q],
 						this.$pattern.$getConnectionTarget(c as JConnection)

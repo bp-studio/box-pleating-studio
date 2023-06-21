@@ -19,6 +19,6 @@ export default function $process(proj: Pseudo<JProject>): boolean {
 
 function overlapFilter(o: JOverlap): boolean {
 	return o.c.some(
-		(c: JCorner) => c.type == CornerType.$intersection && c.e === undefined
+		(c: JCorner) => c.type == CornerType.intersection && c.e === undefined
 	);
 }

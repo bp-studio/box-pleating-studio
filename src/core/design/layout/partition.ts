@@ -57,7 +57,7 @@ export class Partition implements ISerializable<JPartition> {
 
 	public $getOriginalDisplacement(pattern: Pattern): Vector {
 		// Arbitrarily choose an outward connection point in this Partition; doesn't matter which.
-		const overlap = this.$overlaps.find(o => o.c[0].type != CornerType.$coincide)!;
+		const overlap = this.$overlaps.find(o => o.c[0].type != CornerType.coincide)!;
 		return pattern.$getConnectionTarget(overlap.c[0] as JConnection)
 			.sub(pattern.$config.$repo.$origin);
 	}
@@ -66,9 +66,9 @@ export class Partition implements ISerializable<JPartition> {
 	@cache public get $constraints(): readonly CornerMap[] {
 		return this.$cornerMap.filter(m => {
 			const type = m.corner.type;
-			return type == CornerType.$socket ||
-				type == CornerType.$internal ||
-				type == CornerType.$flap;
+			return type == CornerType.socket ||
+				type == CornerType.internal ||
+				type == CornerType.flap;
 		});
 	}
 
