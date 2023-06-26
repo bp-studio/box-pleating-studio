@@ -1,6 +1,6 @@
 <template>
 	<Export :title="$t('toolbar.tools.CP._')" :blob="getBlob" ref="exp" mime="text/cp+plain" description="ORIPA CP" extension=".cp"
-			screen="CP" :watch="() => Settings.CP" @save="save">
+			screen="CP" :observe="() => Settings.CP" @save="save">
 		<Toggle v-model="Settings.CP.reorient">{{ $t('toolbar.tools.CP.reorient') }}</Toggle>
 	</Export>
 </template>

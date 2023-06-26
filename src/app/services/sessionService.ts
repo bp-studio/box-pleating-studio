@@ -76,7 +76,8 @@ namespace SessionService {
 
 	/** Save session */
 	async function save(): Promise<void> {
-		if(Studio.shouldSkipSaving || !Settings.autoSave || !hasSession) return;
+		// There's no point saving the session during dragging.
+		if(Studio.isDragging || !Settings.autoSave || !hasSession) return;
 
 		const session = {
 			jsons: await Promise.all(Workspace.projects.value.map(proj => proj.toJSON(true))),

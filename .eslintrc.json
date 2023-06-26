@@ -108,6 +108,7 @@
 				]
 			}
 		],
+		"@typescript-eslint/no-unused-expressions": "warn",
 		"@typescript-eslint/no-unused-vars": "off",
 		"@typescript-eslint/no-useless-constructor": [
 			"warn"

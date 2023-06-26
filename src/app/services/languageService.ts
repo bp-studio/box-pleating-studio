@@ -32,7 +32,7 @@ namespace LanguageService {
 			messages: locale,
 		});
 		i18n = plugin.global;
-		copyright.value; // warm-up
+		const _ = copyright.value; // warm-up
 		return plugin;
 	}
 

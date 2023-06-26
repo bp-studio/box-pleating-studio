@@ -29,7 +29,7 @@ export async function init(): Promise<void> {
 	await doEvents();
 	Interaction.$init();
 	SelectionController.$init();
-	ScrollController.$init;
+	ScrollController.$init();
 }
 
 export const nextTick = display.appNextTick;

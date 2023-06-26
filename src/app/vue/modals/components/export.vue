@@ -56,7 +56,7 @@
 		description: string;
 		extension: string;
 		screen: string;
-		watch?: Action<object>;
+		observe?: Action<object>;
 		blob: Action<Promise<Blob>>;
 	}>();
 
@@ -74,9 +74,9 @@
 		}
 	}
 
-	if(props.watch) {
+	if(props.observe) {
 		watch(
-			props.watch,
+			props.observe,
 			() => {
 				if(!on || !Studio.project) return;
 				update();
