@@ -1,5 +1,6 @@
 const $ = require("../utils/proxy");
 const gulp = require("gulp");
+const fs = require("fs");
 
 const newer = require("../utils/newer");
 const { ssgI18n } = require("../utils/esbuild");
@@ -20,12 +21,11 @@ function ssg() {
 	});
 }
 
-const insertVersion = () => $.through2(content => {
-	const package = require("../../package.json");
-	return content
+const insertVersion = (package) => $.through2(
+	content => content
 		.replace("__VERSION__", package.version)
-		.replace("__APP_VERSION__", package.app_version);
-});
+		.replace("__APP_VERSION__", package.app_version)
+);
 
 /** Bump build version */
 gulp.task("version", () =>
@@ -35,28 +35,33 @@ gulp.task("version", () =>
 );
 
 /** Main HTML task */
-gulp.task("html", () => $.all(
-	// Debug
-	gulp.src(config.src.public + "/index.htm")
-		.pipe(newer({
-			dest: config.dest.debug + "/index.htm",
-			extra: [__filename, "package.json", config.src.app + "/**/*", "gulp/plugins/debug.js"],
-		}))
-		.pipe(insertVersion())
-		.pipe(debug())
-		.pipe(ssg())
-		.pipe(gulp.dest(config.dest.debug)),
+gulp.task("html", () => {
+	// We cannot directly use `require` here,
+	// as that will likely get the outdated content.
+	const package = JSON.parse(fs.readFileSync("package.json").toString("utf8"));
+	return $.all(
+		// Debug
+		gulp.src(config.src.public + "/index.htm")
+			.pipe(newer({
+				dest: config.dest.debug + "/index.htm",
+				extra: [__filename, "package.json", config.src.app + "/**/*", "gulp/plugins/debug.js"],
+			}))
+			.pipe(insertVersion(package))
+			.pipe(debug())
+			.pipe(ssg())
+			.pipe(gulp.dest(config.dest.debug)),
 
-	// Dist
-	gulp.src(config.src.public + "/index.htm")
-		.pipe(newer({
-			dest: config.dest.dist + "/index.htm",
-			extra: [__filename, "package.json", config.src.app + "/**/*"],
-		}))
-		.pipe(insertVersion())
-		.pipe($.htmlMinifierTerser(htmlMinOption))
-		// Avoid VS Code Linter warnings
-		.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
-		.pipe(ssg())
-		.pipe(gulp.dest(config.dest.dist))
-));
+		// Dist
+		gulp.src(config.src.public + "/index.htm")
+			.pipe(newer({
+				dest: config.dest.dist + "/index.htm",
+				extra: [__filename, "package.json", config.src.app + "/**/*"],
+			}))
+			.pipe(insertVersion(package))
+			.pipe($.htmlMinifierTerser(htmlMinOption))
+			// Avoid VS Code Linter warnings
+			.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+			.pipe(ssg())
+			.pipe(gulp.dest(config.dest.dist))
+	);
+});

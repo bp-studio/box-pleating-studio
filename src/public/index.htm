@@ -15,8 +15,8 @@
 	<link rel="preload" as="style" href="lib/bootstrap/bootstrap.min.css">
 	<link rel="preload" as="style" href="assets/bps/style.css">
 	<link rel="preload" as="style" href="main.css">
-	<link rel="preload" as="font" type="font/woff2" href="assets/bps/fonts/bps.woff2">
-	<link rel="preload" as="font" type="font/woff2" href="lib/font-awesome/webfonts/fa-regular-400.woff2">
+	<link rel="preload" as="font" type="font/woff2" href="assets/bps/fonts/bps.woff2" crossorigin>
+	<link rel="preload" as="font" type="font/woff2" href="lib/font-awesome/webfonts/fa-regular-400.woff2" crossorigin>
 	<link rel="preload" as="script" href="log/log.js">
 	<link rel="preload" as="script" href="locale.js">
 	<link rel="preload" as="script" href="lib/vue.runtime.global.prod.js">
@@ -26,7 +26,10 @@
 	<link rel="preload" as="script" href="lib/pixi.js">
 	<link rel="preload" as="script" href="client.js">
 
-	<!-- Not implemented in Chrome yet, but are supported in Firefox and Opera -->
+	<!--
+		Not implemented in Chrome yet, but are supported in Firefox and Opera.
+		See https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload#browser_compatibility
+	-->
 	<link rel="preload" as="manifest" href="manifest.json">
 	<link rel="preload" as="worker" href="core.js">
 
