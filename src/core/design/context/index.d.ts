@@ -1,4 +1,4 @@
-import type { Contour, ILine } from "shared/types/geometry";
+import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
@@ -49,7 +49,7 @@ export interface NodeGraphics {
 	/** The contours without considering patterns. */
 	$roughContours: Contour[];
 
-	$patternContours: unknown[];
+	$patternContours: Path[];
 
 	/** The final contours. */
 	$contours: Contour[];

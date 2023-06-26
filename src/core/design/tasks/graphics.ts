@@ -4,8 +4,11 @@ import { toCorners } from "../context/aabb/aabb";
 import { same } from "shared/types/geometry";
 import { quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
+import { clone } from "shared/utils/clone";
+import { Line } from "core/math/geometry/line";
+import { Point } from "core/math/geometry/point";
 
-import type { ILine, Path } from "shared/types/geometry";
+import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
 
@@ -38,19 +41,53 @@ function graphics(): void {
 
 	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
-		//TODO: combine rough contours and pattern contours
-		node.$graphics.$contours = node.$graphics.$roughContours;
-
-		node.$graphics.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node);
+		const g = node.$graphics;
+		g.$contours = combine(g.$roughContours, g.$patternContours);
+		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node);
 
 		State.$updateResult.graphics[node.$tag] = {
-			contours: node.$graphics.$contours,
-			ridges: node.$graphics.$ridges,
+			contours: g.$contours,
+			ridges: g.$ridges,
 		};
 	}
 
 	// Pass the updated structure to the client.
 	if(State.$treeStructureChanged) State.$updateResult.tree = State.$tree.toJSON();
+}
+
+function combine(roughContours: Contour[], patternContours: Path[]): Contour[] {
+	const result: Contour[] = roughContours.map(c => clone(c));
+	for(const path of patternContours) {
+		for(const contour of result) {
+			if(tryInsert(contour.outer, path)) break;
+		}
+	}
+	return result;
+}
+
+function tryInsert(path: Path, insert: Path): boolean {
+	const l = path.length;
+	let start: number | undefined, end: number | undefined;
+	for(let i = 0; i < l; i++) {
+		const line = new Line(new Point(path[i]), new Point(path[(i + 1) % l]));
+		if(start === undefined && line.$contains(insert[0])) {
+			start = i;
+		}
+		if(end === undefined && line.$contains(insert[insert.length - 1])) {
+			end = i;
+		}
+		if(start !== undefined && end !== undefined) {
+			if(end > start) {
+				path.splice(start + 1, end - start, ...insert);
+			} else {
+				path.splice(start + 1);
+				path.splice(0, end);
+				path.push(...insert);
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 function flapRidge(node: ITreeNode): ILine[] {

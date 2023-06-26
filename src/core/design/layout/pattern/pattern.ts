@@ -21,6 +21,7 @@ export class Pattern implements ISerializable<JPattern> {
 	public readonly $devices: readonly Device[];
 	public readonly $gadgets: readonly Gadget[];
 
+	/** A flag indicating the origin needs to be updated. */
 	public $originDirty: boolean = false;
 
 	constructor(config: Configuration, devices: readonly JDevice[], seeded?: boolean) {

@@ -16,7 +16,7 @@ interface ValidJunctionData {
 	tip: IPoint;
 }
 
-const MASK = 3;
+export const MASK = 3;
 
 //=================================================================
 /**
