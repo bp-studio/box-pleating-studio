@@ -179,7 +179,11 @@ export class Device implements ISerializable<JDevice> {
 
 	private _getOuterRidges(): readonly Line[] {
 		const result = this.$getConnectionRidges(false);
-		//TODO: IntersectionMap
+		for(const map of this.$partition.$externalCornerMaps) {
+			const from = this.$anchors[map.overlapIndex][map.anchorIndex];
+			const to = this.$partition.$getExternalConnectionTarget(from, map.corner);
+			if(to) result.push(new Line(from, to));
+		}
 		return result;
 	}
 

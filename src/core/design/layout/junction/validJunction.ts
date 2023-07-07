@@ -134,17 +134,20 @@ export class ValidJunction implements ISerializable<JJunction> {
 		return new Rectangle({ x, y }, { x: x - this.$o.x * this.$f.x, y: y - this.$o.y * this.$f.y });
 	}
 
+	/**
+	 * The {@link ITreeNode.id id}s of the nodes on the path between {@link $a} and {@link $b},
+	 * excluding {@link $lca}. Not necessarily in order.
+	 */
 	@cache public get $path(): number[] {
 		let a = this.$a, b = this.$b;
-		const result = [a.id, b.id];
-		while(a !== b) {
-			if(a.$dist >= b.$dist) {
-				a = a.$parent!;
-				if(a.$parent) result.push(a.id);
-			} else {
-				b = b.$parent!;
-				if(b.$parent) result.push(b.id);
-			}
+		const result = [];
+		while(a !== this.$lca) {
+			result.push(a.id);
+			a = a.$parent!;
+		}
+		while(b !== this.$lca) {
+			result.push(b.id);
+			b = b.$parent!;
 		}
 		return result;
 	}

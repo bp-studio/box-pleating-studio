@@ -40,4 +40,4 @@ onmessage = function(event: MessageEvent): void {
 	event.ports[0].postMessage(response);
 };
 
-export { State };
+export { State as Data };

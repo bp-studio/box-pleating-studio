@@ -225,7 +225,24 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	//TODO: Do we need this?
 	/** Returns the distance between two nodes on the tree. */
 	public $dist(n1: TreeNode, n2: TreeNode): number {
-		return dist(n1, n2, this._lca(n1, n2));
+		return dist(n1, n2, this.$lca(n1, n2));
+	}
+
+	/**
+	 * Returns the LCA of two nodes.
+	 *
+	 * This method is used only occasionally,
+	 * so there's no need for fancy algorithms or data structures.
+	 */
+	public $lca(n1: TreeNode, n2: TreeNode): TreeNode {
+		while(n1 !== n2) {
+			// Originally this part compares the depths of the nodes,
+			// but in fact comparing the distance results the same,
+			// and we save ourselves the overhead of maintaining one extra field.
+			if(n1.$dist >= n2.$dist) n1 = n1.$parent!;
+			if(n2.$dist > n1.$dist) n2 = n2.$parent!;
+		}
+		return n1;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,20 +289,6 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		}
 		State.$updateResult.edit.push([true, { n1, n2, length }]);
 		return true;
-	}
-
-	//TODO: Do we need this?
-	/** Returns the LCA of two nodes. */
-	private _lca(n1: TreeNode, n2: TreeNode): TreeNode {
-		// Base case
-		if(n1 == n2) return n1;
-
-		// Recursive case. Originally this part compares the depths
-		// of the nodes, but in fact comparing the distance results the same,
-		// and we save ourselves the overhead of maintaining one extra field.
-		if(n1.$dist > n2.$dist) return this._lca(n1.$parent!, n2);
-		if(n2.$dist > n1.$dist) return this._lca(n1, n2.$parent!);
-		return this._lca(n1.$parent!, n2.$parent!);
 	}
 }
 

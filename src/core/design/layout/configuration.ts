@@ -35,7 +35,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 	constructor(repo: Repository, junctions: JJunction[], partitions: readonly JPartition[], proto?: JPattern) {
 		this.$repo = repo;
 		this.$junctions = junctions;
-		this.$partitions = partitions.map(p => new Partition(junctions, p));
+		this.$partitions = partitions.map(p => new Partition(this, junctions, p));
 
 		this._patterns = new Store(patternGenerator(this, proto));
 		this._patterns.$next();

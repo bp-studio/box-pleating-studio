@@ -40,7 +40,7 @@ function pattern(): void {
 		for(const id of s.$repo.$nodeIds) State.$patternDiff.$add(id);
 
 		// Collect patterned quadrants
-		for(const q of s.$repo.$quadrants) {
+		for(const q of s.$repo.$quadrants.keys()) {
 			State.$patternedQuadrants.add(q);
 		}
 	}

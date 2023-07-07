@@ -2,9 +2,12 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 
+import type { Comparator } from "shared/types/types";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode, NodeGraphics } from ".";
 import type { Tree } from "./tree";
+
+export const comparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist;
 
 //=================================================================
 /**
