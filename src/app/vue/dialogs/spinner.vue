@@ -1,7 +1,7 @@
 <template>
 	<div id="divSpinner" class="viewport" :class="{ 'shift-down': Workspace.ids.value.length, 'show': visible }">
 		<div class="h-100 d-flex text-center align-items-center">
-			<div style="font-size: 10rem; font-size: min(15vh, 15vw); color: gray; flex-grow: 1;">
+			<div class="spinner-container">
 				<i class="bp-spinner fa-spin" />
 			</div>
 		</div>
@@ -67,5 +67,13 @@
 				opacity: 1;
 			}
 		}
+	}
+
+	.spinner-container {
+		font-size: 10rem;
+		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+		font-size: min(15vh, 15vw);
+		color: gray;
+		flex-grow: 1;
 	}
 </style>

@@ -54,6 +54,7 @@
 		overflow-x: scroll;
 		overflow-y: hidden;
 		-ms-overflow-style: none;
+		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 		scrollbar-width: none;
 		width: 100%;
 		height: 3.75rem;

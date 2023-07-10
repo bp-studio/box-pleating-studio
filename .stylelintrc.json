@@ -15,6 +15,7 @@
 		"plugin/no-unsupported-browser-features": [
 			true,
 			{
+				"ignore": ["css-nesting", "css-media-range-syntax", "css-not-sel-list"],
 				"ignorePartialSupport": true,
 				"severity": "warning"
 			}

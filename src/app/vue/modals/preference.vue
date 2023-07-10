@@ -26,7 +26,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal-body" style="height: min(40vh, 400px);">
+				<div class="modal-body">
 					<div v-show="tab == 0" class="p-2">
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
@@ -122,5 +122,10 @@
 		display: grid;
 		grid-template-columns: auto auto auto;
 		gap: 0.5rem 1rem;
+	}
+
+	.modal-body {
+		height: 400px;
+		max-height: 40vh;
 	}
 </style>

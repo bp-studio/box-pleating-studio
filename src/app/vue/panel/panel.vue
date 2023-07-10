@@ -79,6 +79,9 @@
 
 	.panel-grid {
 		display: grid;
+
+		/* DoIUse data seems wrong here, see https://caniuse.com/mdn-css_properties_grid-template-columns_minmax */
+		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 		grid-template-columns: minmax(4rem, max-content) 1fr;
 		grid-gap: 0.5rem 1rem;
 	}
