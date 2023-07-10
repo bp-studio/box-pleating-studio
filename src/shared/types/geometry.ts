@@ -11,6 +11,8 @@ export type Path = IPointEx[] & {
 
 	/** Whether this path is a hole. */
 	isHole?: boolean;
+
+	repo?: string;
 };
 
 export type ILine = [IPoint, IPoint];
@@ -52,5 +54,5 @@ export function toString(p: IPointEx): string {
 
 /** Reverses the direction of all paths in a polygon and returns the new polygon */
 export function reverse(polygon: Polygon): Polygon {
-	return polygon.map(path => path.concat().reverse());
+	return polygon.map(path => path.toReversed());
 }

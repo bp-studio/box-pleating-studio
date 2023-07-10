@@ -30,6 +30,9 @@ export interface ITree {
 	$dist(n1: ITreeNode, n2: ITreeNode): number;
 }
 
+/**
+ * This is the readonly interface for {@link TreeNode}.
+ */
 export interface ITreeNode extends ISerializable<JEdge> {
 	readonly id: number;
 	readonly $parent: this | undefined;

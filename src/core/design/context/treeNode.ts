@@ -2,6 +2,7 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 
+import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode, NodeGraphics } from ".";
@@ -13,6 +14,9 @@ export const comparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist;
 /**
  * {@link TreeNode} is a node on the {@link Tree}.
  * For a non-root, it also stores information about its parent edge.
+ *
+ * Whenever possible, do not use this type directly,
+ * and use the readonly {@link ITreeNode} interface instead.
  */
 //=================================================================
 
@@ -39,7 +43,12 @@ export class TreeNode implements ITreeNode {
 	/** All child nodes. Implemented using maximal heap. */
 	public $children = new MutableHeap<TreeNode>((a, b) => b.$height - a.$height);
 
-	public readonly $graphics: NodeGraphics = {} as NodeGraphics;
+	public readonly $graphics: NodeGraphics = {
+		$contours: [],
+		$patternContours: [],
+		$roughContours: [],
+		$ridges: [],
+	};
 
 	/** The length of its parent edge. */
 	public $length: number = 0;

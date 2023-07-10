@@ -7,7 +7,7 @@ import { foreachPair } from "shared/utils/array";
 import { dist } from "../context/tree";
 import { Quadrant } from "./pattern/quadrant";
 
-import type { TreeNode } from "../context/treeNode";
+import type { ITreeNode } from "../context";
 import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
 import type { JStretch } from "shared/json";
@@ -45,8 +45,10 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** Mapping quadrant codes to {@link Quadrant}s. */
 	public readonly $quadrants: ReadonlyMap<number, Quadrant>;
 
-	/** Node ids involved. */
+	/** The ids of all nodes (not just leaves) involved. */
 	public readonly $nodeIds: number[];
+
+	public readonly $leaves: number[];
 
 	private readonly _configurations: Store<Configuration>;
 	private _index: number = 0;
@@ -55,7 +57,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	 * A {@link IntDoubleMap} mapping pairs of flap ids to their LCA.
 	 * Used in {@link $distTriple} and only when there are at least three flaps.
 	 */
-	private readonly _lcaMap: IntDoubleMap<TreeNode> | undefined;
+	private readonly _lcaMap: IntDoubleMap<ITreeNode> | undefined;
 
 	constructor(stretch: Stretch, junctions: ValidJunction[], signature: string, prototype?: JStretch) {
 		this.$stretch = stretch;
@@ -64,21 +66,25 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		this.$origin = new Point(junctions[0].$tip);
 
 		const quadrants = new Set<number>();
-		const ids = new Set<number>();
+		const nodeIds = new Set<number>();
+		const leaves = new Set<number>();
 		if(junctions.length > 1) this._lcaMap = new IntDoubleMap();
 		const lcaMap = this._lcaMap;
 		for(const j of junctions) {
 			quadrants.add(j.$q1);
 			quadrants.add(j.$q2);
-			if(lcaMap) lcaMap.set(j.$a.id, j.$b.id, j.$lca as TreeNode);
-			j.$path.forEach(id => ids.add(id));
+			if(lcaMap) lcaMap.set(j.$a.id, j.$b.id, j.$lca);
+			j.$path.forEach(id => nodeIds.add(id));
+			leaves.add(j.$a.id);
+			leaves.add(j.$b.id);
 		}
 
 		const qMap = new Map<number, Quadrant>();
 		for(const code of quadrants) qMap.set(code, new Quadrant(code));
 		this.$quadrants = qMap;
 
-		this.$nodeIds = Array.from(ids);
+		this.$nodeIds = Array.from(nodeIds);
+		this.$leaves = Array.from(leaves);
 
 		if(lcaMap) {
 			const tree = State.$tree;

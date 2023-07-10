@@ -2,6 +2,7 @@ import { Point } from "./point";
 import { Fraction } from "../fraction";
 import { Matrix } from "./matrix";
 import { Vector } from "./vector";
+import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { ILine } from "shared/types/geometry";
 
@@ -109,8 +110,7 @@ export class Line {
 		const slopeMap = new Map<string, Line[]>();
 		for(const l of l2) {
 			const slope = l.$slope.toString();
-			let arr = slopeMap.get(slope);
-			if(!arr) slopeMap.set(slope, arr = []);
+			const arr = getOrSetEmptyArray(slopeMap, slope);
 			arr.push(l);
 		}
 

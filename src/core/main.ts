@@ -1,3 +1,8 @@
+
+// Polyfills
+import "shared/polyfill/toReversed";
+import "shared/polyfill/flatMap";
+
 import { getAction } from "./routes/routes";
 import { State } from "./service/state";
 

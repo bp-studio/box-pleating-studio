@@ -25,7 +25,7 @@ export function expand(polygon: Polygon, units: number): Contour[] {
 			// In this case a hole was over-shrunk and ended up even bigger.
 			// We need to treat it as a simple filling.
 			contours.push({
-				outer: inner[0].concat().reverse(),
+				outer: inner[0].toReversed(),
 				isHole: false,
 			});
 		} else {

@@ -1,13 +1,16 @@
 import { Task } from "./task";
 import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
-import { MASK } from "../layout/junction/validJunction";
 import { comparator } from "../context/treeNode";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
+import { getOrSetEmptyArray } from "shared/utils/map";
+import { dist } from "../context/tree";
+import { Fraction } from "core/math/fraction";
 
-import type { TreeNode } from "../context/treeNode";
+import type { Path } from "shared/types/geometry";
+import type { Quadrant } from "../layout/pattern/quadrant";
 import type { Repository } from "../layout/repository";
-import type { NodeGraphics } from "../context";
+import type { ITreeNode, NodeGraphics } from "../context";
 
 //=================================================================
 /**
@@ -17,12 +20,8 @@ import type { NodeGraphics } from "../context";
 export const patternContourTask = new Task(patternContour, graphicsTask);
 
 function patternContour(): void {
-	// Reset
-	for(const node of State.$contourWillChange) {
-		node.$graphics.$patternContours = [];
-	}
-
 	for(const repo of State.$repoUpdated) {
+		clearPatternContourForRepo(repo); // Reset
 		processRepo(repo);
 	}
 }
@@ -31,70 +30,63 @@ function processRepo(repo: Repository): void {
 	const pattern = repo.$pattern;
 	if(!pattern) return;
 
-	poc(repo); // POC
-
-	// const heap = new MutableHeap<TreeNode>(comparator);
-	// const coverages = new Map<number, number[]>();
-	// const numLeaves = repo.$nodeIds.length;
-	// for(const id of repo.$nodeIds) {
-	// 	const leaf = State.$tree.$nodes[id]!;
-	// 	heap.$insert(leaf);
-	// 	coverages.set(id, [id]);
-	// }
-
-	// while(!heap.$isEmpty) {
-	// 	const node = heap.$pop()!;
-	// 	const coverage = coverages.get(node.id)!;
-	// 	if(coverage.length == numLeaves) continue;
-	// 	const parent = node.$parent!;
-	// 	let parentCoverage = coverages.get(parent.id);
-	// 	if(!parentCoverage) {
-	// 		heap.$insert(parent);
-	// 		coverages.set(parent.id, parentCoverage = []);
-	// 	}
-	// 	parentCoverage.push(...coverage);
-	// }
-
-	// const result: Record<number, number[]> = {};
-	// for(const [id, arr] of coverages.entries()) result[id] = arr;
-	// console.log(repo.$nodeIds, result);
-}
-
-function poc(repo: Repository): void {
+	const quadrantMap = new Map<ITreeNode, Quadrant[]>();
 	for(const quadrant of repo.$quadrants.values()) {
-		const node = quadrant.$flap;
-		const q = quadrant.q;
+		getOrSetEmptyArray(quadrantMap, quadrant.$flap).push(quadrant);
+	}
 
-		const corner = node.$AABB.$toPath()[q];
-		if(q == 0) {
-			node.$graphics.$patternContours.push([
-				{ x: corner.x, y: corner.y - 1 },
-				{ x: corner.x - 1, y: corner.y },
-			]);
-		}
-		if(q == 1) {
-			node.$graphics.$patternContours.push([
-				{ x: corner.x + 1, y: corner.y },
-				{ x: corner.x, y: corner.y - 1 },
-			]);
-		}
-		if(q == 2) {
-			node.$graphics.$patternContours.push([
-				{ x: corner.x, y: corner.y + 1 },
-				{ x: corner.x + 1, y: corner.y },
-			]);
-		}
-		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-		if(q == 3) {
-			node.$graphics.$patternContours.push([
-				{ x: corner.x - 1, y: corner.y },
-				{ x: corner.x, y: corner.y + 1 },
-			]);
+	const coverageMap = getNodeCoverageMap(repo);
+
+	for(const [node, leaves] of coverageMap.entries()) {
+		// POC
+		if(leaves.length != 1) continue;
+		const quadrants = quadrantMap.get(leaves[0])!;
+		for(const quadrant of quadrants) {
+			const d = new Fraction(dist(node, quadrant.$flap, node) + node.$length);
+			const start = quadrant.$getStart(d);
+			const end = quadrant.$getEnd(d);
+			const path: Path = [start, end].map(p => p.$toIPoint());
+			path.repo = repo.$signature;
+			node.$graphics.$patternContours.push(path);
 		}
 	}
 }
 
-interface Bundle {
-	$node: TreeNode;
-	$coverage: TreeNode[];
+function clearPatternContourForRepo(repo: Repository): void {
+	for(const id of repo.$nodeIds) {
+		const g = State.$tree.$nodes[id]!.$graphics;
+		g.$patternContours = g.$patternContours.filter(p => p.repo != repo.$signature);
+	}
+}
+
+/**
+ * Mapping all nodes (except for the branch root) involved in a
+ * {@link Repository} to an array of leaf nodes under it.
+ */
+function getNodeCoverageMap(repo: Repository): Map<ITreeNode, ITreeNode[]> {
+	const heap = new MutableHeap<ITreeNode>(comparator);
+	const result = new Map<ITreeNode, ITreeNode[]>();
+	const numLeaves = repo.$leaves.length;
+	for(const id of repo.$leaves) {
+		const leaf = State.$tree.$nodes[id]!;
+		heap.$insert(leaf);
+		result.set(leaf, [leaf]);
+	}
+
+	while(!heap.$isEmpty) {
+		const node = heap.$pop()!;
+		const coverage = result.get(node)!;
+
+		// Stop processing if we've reached the branch root
+		if(coverage.length == numLeaves) {
+			result.delete(node);
+			continue;
+		}
+
+		const parent = node.$parent!;
+		const parentCoverage = getOrSetEmptyArray(result, parent, () => heap.$insert(parent));
+		parentCoverage.push(...coverage);
+	}
+
+	return result;
 }

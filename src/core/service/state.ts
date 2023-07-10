@@ -11,7 +11,6 @@ import type { Junction } from "core/design/layout/junction/junction";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 import type { ITreeNode } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
-import type { TreeNode } from "core/design/context/treeNode";
 
 //=================================================================
 /**
@@ -61,7 +60,7 @@ export namespace State {
 	 * Those nodes that have children changed (or initialized) in the current round,
 	 * except for those that are deleted later.
 	 */
-	export const $childrenChanged = new Set<TreeNode>();
+	export const $childrenChanged = new Set<ITreeNode>();
 
 	/**
 	 * Those nodes that have parent changed (or initialized) in the current round,
@@ -87,7 +86,7 @@ export namespace State {
 	 */
 	export const $subtreeAABBChanged = new Set<ITreeNode>();
 
-	/** Those flaps that have their {@link TreeNode.$AABB AABB} changed in the current round. */
+	/** Those flaps that have their {@link ITreeNode.$AABB AABB} changed in the current round. */
 	export const $flapAABBChanged = new Set<ITreeNode>();
 
 	/**

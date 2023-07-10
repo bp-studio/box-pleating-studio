@@ -112,11 +112,10 @@ export class Step implements ISerializable<JStep> {
 	}
 
 	public async $undo(): Promise<void> {
-		// TODO: replace by ES2023 toReversed() methods
 		// undo is performed in opposite ordering
-		const memos = this._destruct.concat().reverse();
+		const memos = this._destruct.toReversed();
 		this._project.design.$addMementos(memos);
-		const com = this._commands.concat().reverse();
+		const com = this._commands.toReversed();
 		await Promise.all(com.map(c => c.$undo()));
 
 		this._project.design.mode = this._mode;

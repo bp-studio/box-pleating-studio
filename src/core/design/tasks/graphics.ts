@@ -8,9 +8,12 @@ import { clone } from "shared/utils/clone";
 import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 
+import type { TreeNode } from "../context/treeNode";
+import type { Repository } from "../layout/repository";
 import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
+import type { Pattern } from "../layout/pattern/pattern";
 
 //=================================================================
 /**
@@ -22,27 +25,13 @@ export const graphicsTask = new Task(graphics);
 function graphics(): void {
 	// Devices
 	for(const repo of State.$repoUpdated) {
-		const id = repo.$stretch.$id;
-		if(repo.$pattern) {
-			const forward = repo.$f.x == repo.$f.y;
-			for(const [i, device] of repo.$pattern.$devices.entries()) {
-				State.$updateResult.graphics["s" + id + "." + i] = {
-					contours: device.$contour,
-					ridges: device.$ridges,
-					axisParallel: device.$axisParallels,
-					location: device.$location,
-					// Note that the range of all devices in the pattern will be updated.
-					range: device.$getDraggingRange(),
-					forward,
-				} as DeviceData;
-			}
-		}
+		if(repo.$pattern) addRepo(repo);
 	}
 
 	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
 		const g = node.$graphics;
-		g.$contours = combine(g.$roughContours, g.$patternContours);
+		combineContour(node);
 		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node);
 
 		State.$updateResult.graphics[node.$tag] = {
@@ -55,25 +44,63 @@ function graphics(): void {
 	if(State.$treeStructureChanged) State.$updateResult.tree = State.$tree.toJSON();
 }
 
-function combine(roughContours: Contour[], patternContours: Path[]): Contour[] {
-	const result: Contour[] = roughContours.map(c => clone(c));
-	for(const path of patternContours) {
-		for(const contour of result) {
-			if(tryInsert(contour.outer, path)) break;
+function addRepo(repo: Repository): void {
+	if(!repo.$pattern) return;
+	const forward = repo.$f.x == repo.$f.y;
+	for(const [i, device] of repo.$pattern.$devices.entries()) {
+		State.$updateResult.graphics["s" + repo.$stretch.$id + "." + i] = {
+			contours: device.$contour,
+			ridges: device.$ridges,
+			axisParallel: device.$axisParallels,
+			location: device.$location,
+			// Note that the range of all devices in the pattern will be updated.
+			range: device.$getDraggingRange(),
+			forward,
+		} as DeviceData;
+	}
+}
+
+function combineContour(node: ITreeNode): void {
+	const g = node.$graphics;
+	const childrenPatternContours: Path[] = [];
+	for(const child of node.$children) {
+		childrenPatternContours.push(...child.$graphics.$patternContours);
+	}
+	const result: Contour[] = g.$roughContours.map(c => clone(c));
+	// TODO: This part could be made more efficient
+	for(const path of g.$patternContours) tryInsertOuter(path, result);
+	for(const path of childrenPatternContours) tryInsertInner(path, result);
+	g.$contours = result;
+}
+
+function tryInsertOuter(path: Path, result: Contour[]): void {
+	for(const contour of result) {
+		if(tryInsert(contour.outer, path)) return;
+	}
+}
+
+function tryInsertInner(path: Path, result: Contour[]): void {
+	for(const contour of result) {
+		if(!contour.inner) continue;
+		for(const inner of contour.inner) {
+			if(tryInsert(inner, path)) return;
 		}
 	}
-	return result;
 }
 
 function tryInsert(path: Path, insert: Path): boolean {
 	const l = path.length;
+	const first = insert[0];
+	const last = insert[insert.length - 1];
 	let start: number | undefined, end: number | undefined;
 	for(let i = 0; i < l; i++) {
-		const line = new Line(new Point(path[i]), new Point(path[(i + 1) % l]));
-		if(start === undefined && line.$contains(insert[0])) {
+		const startPt = new Point(path[i]);
+		const endPt = new Point(path[(i + 1) % l]);
+		const line = new Line(startPt, endPt);
+		if(start === undefined && (line.$contains(first) || startPt.eq(first))) {
 			start = i;
 		}
-		if(end === undefined && line.$contains(insert[insert.length - 1])) {
+		if(end === undefined && (line.$contains(last) || endPt.eq(last))) {
 			end = i;
 		}
 		if(start !== undefined && end !== undefined) {

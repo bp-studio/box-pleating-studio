@@ -3,6 +3,7 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { balanceTask } from "./balance";
 
+import type { ITreeNode } from "../context";
 import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
@@ -18,10 +19,11 @@ function height(): void {
 	climb(updater, State.$childrenChanged);
 }
 
-function updater(node: TreeNode): boolean {
-	const newHeight = 1 + (node.$children.$get()?.$height ?? -1);
-	if(newHeight === node.$height) return false;
-	node.$height = newHeight;
-	node.$parent?.$children.$notifyUpdate(node);
+function updater(node: ITreeNode): boolean {
+	const n = node as TreeNode;
+	const newHeight = 1 + (n.$children.$get()?.$height ?? -1);
+	if(newHeight === n.$height) return false;
+	n.$height = newHeight;
+	n.$parent?.$children.$notifyUpdate(n);
 	return true;
 }

@@ -61,7 +61,8 @@
 		},
 		"polyfills": [
 			"globalThis",
-			"navigator.locks"
+			"navigator.locks",
+			"Array.toReversed"
 		]
 	}
 }
