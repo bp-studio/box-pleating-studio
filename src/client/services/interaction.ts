@@ -68,7 +68,9 @@ export namespace Interaction {
 		KeyboardController.$set(event, true);
 		if(document.activeElement != document.body) return;
 		if(ScrollController.$tryKeyStart(event)) return;
-		DragController.dragByKey(event.key);
+		if(DragController.dragByKey(event.key)) {
+			event.preventDefault(); // Prevent viewport scrolling
+		}
 	}
 
 	function keyUp(event: KeyboardEvent): void {

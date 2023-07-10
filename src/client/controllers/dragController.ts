@@ -13,7 +13,7 @@ import type { ShallowRef } from "vue";
 
 export interface IDragController {
 	readonly isDragging: ShallowRef<boolean>;
-	dragByKey(key: string): void;
+	dragByKey(key: string): boolean;
 }
 
 //=================================================================
@@ -29,7 +29,11 @@ export namespace DragController {
 	/** This is reactive as the displaying of DPad depends on it. */
 	export const isDragging = shallowRef(false);
 
-	export function dragByKey(key: string): void {
+	/**
+	 * Drag by keyboard.
+	 * @returns Whether the action is successful.
+	 */
+	export function dragByKey(key: string): boolean {
 		let v: IPoint;
 		key = key.toLowerCase().replace(/^arrow/, "");
 		switch(key) {
@@ -37,7 +41,7 @@ export namespace DragController {
 			case "down": v = { x: 0, y: -1 }; break;
 			case "left": v = { x: -1, y: 0 }; break;
 			case "right": v = { x: 1, y: 0 }; break;
-			default: return;
+			default: return false;
 		}
 
 		const selections = SelectionController.draggables.value;
@@ -47,6 +51,8 @@ export namespace DragController {
 
 		for(const d of selections) v = d.$constrainBy(v);
 		for(const d of selections) d.$moveBy(v);
+
+		return selections.length > 0;
 	}
 
 	/** Initialize dragging on clicking. */
