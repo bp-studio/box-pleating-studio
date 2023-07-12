@@ -20,7 +20,7 @@ export interface ISelectionController {
 }
 
 interface HitStatus {
-	/** The last {@link Control} in the stacking. */
+	/** The current selected {@link Control} (last one if multiple are selected). */
 	current: Control | null;
 
 	/** The next unselected {@link Control} in the stacking. */
@@ -41,6 +41,14 @@ const ALPHA = 0.2;
 //=================================================================
 /**
  * {@link SelectionController} manages the selection logics of {@link Control}s.
+ *
+ * The selection logic of BP Studio is slightly more complicated
+ * than most graphical editors. In most of them, selectable objects are
+ * stacked in layers, and clicking will only select the top most object.
+ * In contrast, BP Studio doesn't have the notion of stacking ordering
+ * from the UI perspective, so instead it allows the user to click at
+ * overlapping objects in such a way that the selection moves from one
+ * to the next as the clicking repeats (see {@link $processNext}).
  */
 //=================================================================
 
@@ -105,6 +113,7 @@ export namespace SelectionController {
 		return true;
 	}
 
+	/** Process a clicking event. */
 	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): void {
 		if(event instanceof MouseEvent) ctrlKey ??= event.ctrlKey || event.metaKey;
 		downPoint = $getEventCenter(event);
@@ -115,11 +124,12 @@ export namespace SelectionController {
 			if(!current) clear();
 			if(!current && next) select(next);
 		} else {
-			if(current && !next) $toggle(current, !current.$selected);
 			if(next) select(next);
+			else if(current) $toggle(current, !current.$selected);
 		}
 	}
 
+	/** After repeated click, select the next overlapping {@link Control}. */
 	export function $processNext(): void {
 		const { current, next } = statusCache;
 		const project = ProjectService.project.value;
@@ -206,8 +216,6 @@ export namespace SelectionController {
 	}
 
 	function getStatus(): HitStatus {
-
-		let first: Control | null = null;	// The first Control in the stacking
 		let current: Control | null = null;
 		let next: Control | null = null;
 
@@ -216,8 +224,8 @@ export namespace SelectionController {
 		const controls = display.boundary.$hitTestAll(sheet, downPoint);
 
 		// Find the three critical Controls
+		const first = controls[0];
 		for(const o of controls) {
-			if(!first) first = o;
 			if(o.$selected) current = o;
 			else if(current && !next) next = o;
 		}

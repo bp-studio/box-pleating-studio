@@ -7,6 +7,7 @@ import { distinct, foreachPair } from "shared/utils/array";
 import { minComparator } from "shared/data/heap/heap";
 import { patternTask } from "./pattern";
 import { Stretch } from "../layout/stretch";
+import { clearPatternContourForRepo } from "./patternContour";
 
 import type { ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
@@ -41,9 +42,10 @@ function stretches(): void {
 	for(const team of teams) processTeam(team.$junctions);
 
 	for(const id of State.$stretchDiff.$diff()) {
+		const s = State.$stretches.get(id)!;
+		clearPatternContourForRepo(s.$repo);
 		if(State.$isDragging) {
 			// Put into cache
-			const s = State.$stretches.get(id)!;
 			s.$isActive = false;
 			State.$stretchCache.set(id, s);
 		}

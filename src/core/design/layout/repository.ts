@@ -12,7 +12,7 @@ import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
 import type { JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
-import type { ValidJunction } from "./junction/validJunction";
+import type { ValidJunction, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
 
 //=================================================================
@@ -28,6 +28,8 @@ import type { Stretch } from "./stretch";
 export class Repository implements ISerializable<JRepository | undefined> {
 
 	public readonly $stretch: Stretch;
+
+	/** Signature string created by {@link getStructureSignature}. */
 	public readonly $signature: string;
 
 	/** Coefficient of transformation; same as the {@link ValidJunction.$f $f} of the first junction. */

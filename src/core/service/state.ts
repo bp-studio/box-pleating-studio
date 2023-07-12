@@ -98,7 +98,10 @@ export namespace State {
 	/** The new {@link Repository Repositories} formed in the current round. */
 	export const $newRepositories = new Set<Repository>();
 
-	/** The {@link Repository Repositories} that are updated in the current round. */
+	/**
+	 * The {@link Repository Repositories} that are updated in the current round,
+	 * not including the ones of {@link Stretch}es to be removed.
+	 */
 	export const $repoUpdated = new Set<Repository>();
 
 	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */

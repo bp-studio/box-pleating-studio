@@ -1,6 +1,6 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
-import { patternContourTask } from "./patternContour";
+import { clearPatternContourForRepo, patternContourTask } from "./patternContour";
 
 import type { Configuration } from "../layout/configuration";
 import type { Pattern } from "../layout/pattern/pattern";
@@ -31,6 +31,7 @@ function pattern(): void {
 				State.$contourWillChange.add(State.$tree.$nodes[n]!);
 			}
 		} else {
+			clearPatternContourForRepo(repo);
 			State.$updateResult.remove.stretches.push(id);
 		}
 	}
