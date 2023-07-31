@@ -321,6 +321,8 @@
 			 */
 			window.onerror = function(msg, source, line, column, error) {
 				if(!source && !line && !column) return; // error is caused by injection; ignore.
+				if(source.startsWith("chrome-extension")) return; // ignore errors caused by extensions
+
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(msg.match(ignoreError[i])) return;
 				}
