@@ -14,10 +14,10 @@
 				"prefer": "type-imports"
 			}
 		],
-		"@typescript-eslint/no-duplicate-imports": "warn",
 		"@typescript-eslint/no-invalid-this": "off",
 		"@typescript-eslint/no-magic-numbers": "off",
 		"@typescript-eslint/no-unused-expressions": "off",
+		"import/no-duplicates": "warn",
 		"import/order": [
 			"warn",
 			{

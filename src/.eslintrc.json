@@ -20,9 +20,10 @@
 				"prefer": "type-imports"
 			}
 		],
-		"@typescript-eslint/no-duplicate-imports": "warn",
+		"@typescript-eslint/no-unsafe-declaration-merging": "off",
 		"import/newline-after-import": "warn",
 		"import/no-cycle": "warn",
+		"import/no-duplicates": "warn",
 		"import/no-unresolved": "error",
 		"import/order": [
 			"warn",
@@ -62,7 +63,7 @@
 		"polyfills": [
 			"globalThis",
 			"navigator.locks",
-			"Array.toReversed"
+			"Array.prototype.toReversed"
 		]
 	}
 }

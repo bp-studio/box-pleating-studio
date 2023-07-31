@@ -1,15 +1,4 @@
 
-// Expect to remove this part after TypeScript 5.2
-declare global {
-	interface ReadonlyArray<T> {
-		toReversed(): T[];
-	}
-
-	interface Array<T> {
-		toReversed(): T[];
-	}
-}
-
 //=================================================================
 /**
  * Polyfill for the native {@link Array.toReversed} in ES2023.

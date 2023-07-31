@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 
-	import { shallowRef, watch } from "vue";
+	import { shallowRef, useAttrs, watch } from "vue";
 
 	import Studio from "app/services/studioService";
 	import useModal from "../modal";
@@ -55,12 +55,12 @@
 		mime: string;
 		description: string;
 		extension: string;
-		screen: string;
 		observe?: Action<object>;
 		blob: Action<Promise<Blob>>;
 	}>();
 
-	const { el, show, on } = useModal(props.screen, () => Boolean(Studio.project));
+	const attrs = useAttrs();
+	const { el, show, on } = useModal(attrs.screen as string, () => Boolean(Studio.project));
 
 	async function update(): Promise<void> {
 		tryClearURL();
