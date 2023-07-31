@@ -9,7 +9,7 @@
 	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, width=device-width, user-scalable=no">
 	<meta name="description" content="Super-complex origami design made easy!">
 	<meta name="google" content="notranslate">
-	<meta name="version" content="0.5.8">
+	<meta name="version" content="0.5.9">
 
 	<!-- Preload -->
 	<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/bps/fonts/bps.woff2">
@@ -32,7 +32,7 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "1234"
+			app_version: "1235"
 		};
 		gtag('js', new Date());
 		gtag('config', 'G-GG1TEZGBCQ', app_config);
@@ -188,6 +188,8 @@
 			 */
 			window.onerror = function(a, b, c, d, e) {
 				if(!b && !c && !d) return; // error is caused by injection; ignore.
+				if(b.startsWith("chrome-extension")) return; // ignore errors caused by extensions
+
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(a.match(ignoreError[i])) return;
 				}
