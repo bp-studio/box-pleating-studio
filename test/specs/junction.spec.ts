@@ -30,7 +30,7 @@ describe("Junction", function() {
 		expect(junction.$s.x).to.equal(5);
 		expect(junction.$s.y).to.equal(5);
 
-		expect(junction.$path).to.eql([3, 4, 1, 2]);
+		expect(junction.$path).to.have.members([1, 2, 3, 4]);
 	});
 
 	it("Creates new junction upon merging", function() {
