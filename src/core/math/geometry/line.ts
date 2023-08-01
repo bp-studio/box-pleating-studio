@@ -63,13 +63,20 @@ export class Line {
 	}
 
 	/**
-	 * Return the intersection of this line (as segment, endpoints included)
-	 * with the given direction (as a straight line, unless `isRay` is assigned). */
+	 * Return the intersection of this line segment (endpoints included)
+	 * with the given line segment.
+	 */
 	public $intersection(l: Line): Point | null;
-	public $intersection(p: Point, v: Vector, isRay?: boolean): Point | null;
-	public $intersection(...t: [Point, Vector, boolean?] | [Line]): Point | null {
-		if(t.length == 1) return this.$intersection(t[0].p1, t[0].p2.sub(t[0].p1));
-		const [p, v, isRay] = t;
+
+	/**
+	 * Return the intersection of this line (as segment, endpoints included)
+	 * with the given direction (as a straight line, unless {@link headless} or {@link tailless} is assigned).
+	 */
+	public $intersection(p: Point, v: Vector, headless?: boolean, tailless?: boolean): Point | null;
+
+	public $intersection(...t: [Point, Vector, boolean?, boolean?] | [Line]): Point | null {
+		if(t.length == 1) return this.$intersection(t[0].p1, t[0].p2.sub(t[0].p1), true, true);
+		const [p, v, headless, tailless] = t;
 		const v1 = this.p2.sub(this.p1);
 		const m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
 		if(m == null) return null;
@@ -77,7 +84,8 @@ export class Line {
 		const r = m.$multiply(new Point(p.sub(this.p1)));
 		const a = r._x, b = r._y.neg;
 		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
-		if(isRay && b.lt(Fraction.ZERO)) return null;
+		if(headless && b.lt(Fraction.ZERO)) return null;
+		if(tailless && b.gt(Fraction.ONE)) return null;
 
 		return p.$add(v.$scale(b));
 	}

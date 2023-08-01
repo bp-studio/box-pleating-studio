@@ -48,7 +48,7 @@ export class Pattern implements ISerializable<JPattern> {
 		return JSON.stringify(devices);
 	}
 
-	/** Return the {@link Point} by the given {@link JConnection}. */
+	/** Return the actual {@link Point} to which the given {@link JConnection} connects. */
 	public $getConnectionTarget(c: JConnection): Point {
 		if(c.e >= 0) {
 			return new Point(State.$tree.$nodes[c.e]!.$AABB.$points[c.q]);

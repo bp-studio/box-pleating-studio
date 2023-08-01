@@ -181,7 +181,7 @@ export class Device implements ISerializable<JDevice> {
 		const result = this.$getConnectionRidges(false);
 		for(const map of this.$partition.$externalCornerMaps) {
 			const from = this.$anchors[map.overlapIndex][map.anchorIndex];
-			const to = this.$partition.$getExternalConnectionTarget(from, map.corner);
+			const to = this.$partition.$getExternalConnectionTarget(from, map);
 			if(to) result.push(new Line(from, to));
 		}
 		return result;

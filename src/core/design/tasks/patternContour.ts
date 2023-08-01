@@ -6,6 +6,8 @@ import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { dist } from "../context/tree";
 import { Fraction } from "core/math/fraction";
+import { Line } from "core/math/geometry/line";
+import { Point } from "core/math/geometry/point";
 
 import type { Path } from "shared/types/geometry";
 import type { Quadrant } from "../layout/pattern/quadrant";
@@ -36,16 +38,34 @@ function processRepo(repo: Repository): void {
 	}
 
 	const coverageMap = getNodeCoverageMap(repo);
+	const sideDiagonals = repo.$configuration!.$sideDiagonals;
 
 	for(const [node, leaves] of coverageMap.entries()) {
-		// POC
-		if(leaves.length != 1) continue;
-		const quadrants = quadrantMap.get(leaves[0])!;
-		for(const quadrant of quadrants) {
-			const d = new Fraction(dist(node, quadrant.$flap, node) + node.$length);
-			const start = quadrant.$getStart(d);
-			const end = quadrant.$getEnd(d);
-			const path: Path = [start, end].map(p => p.$toIPoint());
+		processNode(node, repo, sideDiagonals);
+	}
+}
+
+function processNode(node: ITreeNode, repo: Repository, sideDiagonals: Line[]): void {
+	// POC
+	for(const contour of node.$graphics.$roughContours) {
+		const path: Path = [];
+		const indices: number[] = [];
+		const diagonals = new Set(sideDiagonals);
+		for(let i = 0; i < contour.outer.length; i++) {
+			const line = new Line(
+				new Point(contour.outer[i]),
+				new Point(contour.outer[(i + 1) % contour.outer.length])
+			);
+			for(const d of diagonals) {
+				const p = line.$intersection(d);
+				if(!p) continue;
+				path.push(p.$toIPoint());
+				indices.push(i);
+				diagonals.delete(d);
+			}
+		}
+		if(path.length == 2) {
+			if(indices[1] - indices[0] > contour.outer.length / 2) path.reverse();
 			path.repo = repo.$signature;
 			node.$graphics.$patternContours.push(path);
 		}

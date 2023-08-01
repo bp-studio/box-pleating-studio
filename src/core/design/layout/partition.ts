@@ -84,8 +84,8 @@ export class Partition implements ISerializable<JPartition> {
 	 * @param c The corresponding {@link JCorner} info.
 	 * @param q If given, it will force returning the connection target on the given direction.
 	 */
-	public $getExternalConnectionTarget(point: Point, c: JCorner, q?: QuadrantDirection): Point | null {
-		let [p1, p2] = this._externalConnectionTarget.get(c)!;
+	public $getExternalConnectionTarget(point: Point, map: CornerMap, q?: QuadrantDirection): Point | null {
+		let [p1, p2] = this.$getExternalConnectionTargets(map);
 		if(p1._x.gt(p2._x)) [p1, p2] = [p2, p1];
 		if(q === undefined) {
 			if(point._x.le(p1._x)) return p1;
@@ -97,6 +97,49 @@ export class Partition implements ISerializable<JPartition> {
 		} else {
 			return q == Direction.UR || q == Direction.LR ? p1 : p2;
 		}
+	}
+
+	/**
+	 * Mapping the external connection points to the two possible "targets"
+	 * (see {@link $getExternalConnectionTarget} for the meaning of that).
+	 *
+	 * Naively, one might think it suffices to consider the diagonal line
+	 * through the external connection point and locate its intersection with
+	 * the boundary of the two flaps, but such method would not work for
+	 * patterns among multiple flaps. In that case, we need to consult
+	 * {@link _getExposedOverlap} method in order to calculate the location of the target.
+	 */
+	public $getExternalConnectionTargets(map: CornerMap): [Point, Point] {
+		const tree = State.$tree;
+		const repo = this.$configuration.$repo;
+
+		let ov = this.$overlaps[map.overlapIndex];
+
+		const parent = this._getParent(ov);
+		const c1 = parent.c[0], c2 = parent.c[2];
+		const n1 = c1.e!, n2 = c2.e!;
+		const f1 = tree.$nodes[n1]!, f2 = tree.$nodes[n2]!;
+
+		const quad1 = repo.$quadrants.get(n1 << 2 | c1.q!)!;
+		const quad2 = repo.$quadrants.get(n2 << 2 | c2.q!)!;
+		let d1 = 0, d2 = 0;
+
+		// For intersections, the actual overlap to retrieve can be a lot more complicated
+		// because of the rivers around the flaps, so we need a series of additional
+		// calculations here to decide at what distance should we set the overlap.
+		if(map.corner.type == CornerType.intersection) {
+			const oriented = ov.c[0].e! < 0;
+
+			const t = repo.$distTriple(n1, n2, map.corner.e!);
+			if(oriented) d2 = t.d2 - f2.$length;
+			else d1 = t.d1 - f1.$length;
+		}
+
+		ov = this._getExposedOverlap(ov);
+		const p1 = quad1.$getOverlapCorner(ov, parent, map.anchorIndex, d1);
+		const p2 = quad2.$getOverlapCorner(ov, parent, opposite(map.anchorIndex), d2);
+
+		return [p1, p2];
 	}
 
 	/** All {@link JCorner}s that are dragging constraints of the current {@link Partition}. */
@@ -130,55 +173,6 @@ export class Partition implements ISerializable<JPartition> {
 				yield { gadgets: [gadget] };
 			}
 		}
-	}
-
-	/**
-	 * Mapping the external connection points to the two possible "targets"
-	 * (see {@link $getExternalConnectionTarget} for the meaning of that).
-	 *
-	 * Naively, one might think it suffices to consider the diagonal line
-	 * through the external connection point and locate its intersection with
-	 * the boundary of the two flaps, but such method only works with
-	 * stretch patterns between two flaps.
-	 *
-	 * For multiple flap pattern, we need to consult {@link _getExposedOverlap} method
-	 * in order to calculate the location of the target.
-	 */
-	private get _externalConnectionTarget(): ReadonlyMap<JCorner, [Point, Point]> {
-		const result = new Map<JCorner, [Point, Point]>();
-		const tree = State.$tree;
-		const repo = this.$configuration.$repo;
-
-		for(const map of this.$externalCornerMaps) {
-			let ov = this.$overlaps[map.overlapIndex];
-
-			const parent = this._getParent(ov);
-			const c1 = parent.c[0], c2 = parent.c[2];
-			const n1 = c1.e!, n2 = c2.e!;
-			const f1 = tree.$nodes[n1]!, f2 = tree.$nodes[n2]!;
-
-			const quad1 = repo.$quadrants.get(n1 << 2 | c1.q!)!;
-			const quad2 = repo.$quadrants.get(n2 << 2 | c2.q!)!;
-			let d1 = 0, d2 = 0;
-
-			// For intersections, the actual overlap to retrieve can be a lot more complicated
-			// because of the rivers around the flaps, so we need a series of additional
-			// calculations here to decide at what distance should we set the overlap.
-			if(map.corner.type == CornerType.intersection) {
-				const oriented = ov.c[0].e! < 0;
-
-				const t = repo.$distTriple(n1, n2, map.corner.e!);
-				if(oriented) d2 = t.d2 - f2.$length;
-				else d1 = t.d1 - f1.$length;
-			}
-
-			ov = this._getExposedOverlap(ov);
-			const p1 = quad1.$getOverlapCorner(ov, parent, map.anchorIndex, d1);
-			const p2 = quad2.$getOverlapCorner(ov, parent, opposite(map.anchorIndex), d2);
-
-			result.set(map.corner, [p1, p2]);
-		}
-		return result;
 	}
 
 	/**

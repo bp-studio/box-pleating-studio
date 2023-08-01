@@ -1,11 +1,14 @@
 import { Partition } from "./partition";
 import { Store } from "./store";
 import { patternGenerator } from "./generators/patternGenerator";
+import { CornerType, type JConfiguration, type JJunction, type JOverlap, type JPartition, type JPattern } from "shared/json";
+import { cache } from "core/utils/cache";
+import { Line } from "core/math/geometry/line";
 
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
-import type { JConfiguration, JJunction, JOverlap, JPartition, JPattern } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
+
 
 //=================================================================
 /**
@@ -31,6 +34,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 	private _index: number = 0;
 
 	public $originDirty: boolean = false;
+	private _sideDiagonalCache: Line[] | undefined;
 
 	constructor(repo: Repository, junctions: JJunction[], partitions: readonly JPartition[], proto?: JPattern) {
 		this.$repo = repo;
@@ -89,5 +93,20 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this._patterns.$entries.forEach(p => p.$originDirty = true);
 		this.$pattern?.$tryUpdateOrigin();
 		this.$originDirty = false;
+		this._sideDiagonalCache = undefined;
+	}
+
+	public get $sideDiagonals(): Line[] {
+		if(this._sideDiagonalCache) return this._sideDiagonalCache;
+
+		const result: Line[] = [];
+		for(const partition of this.$partitions) {
+			for(const map of partition.$cornerMap) {
+				if(map.corner.type == CornerType.side) {
+					result.push(new Line(...partition.$getExternalConnectionTargets(map)));
+				}
+			}
+		}
+		return this._sideDiagonalCache = result;
 	}
 }
