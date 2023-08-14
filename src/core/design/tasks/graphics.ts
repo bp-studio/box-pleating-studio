@@ -98,16 +98,16 @@ function tryInsert(path: Path, insert: Path): boolean {
 		const endPt = new Point(path[(i + 1) % l]);
 		const line = new Line(startPt, endPt);
 		if(start === undefined && (line.$contains(first) || startPt.eq(first))) {
-			start = i;
+			start = i + 1;
 		}
 		if(end === undefined && (line.$contains(last) || endPt.eq(last))) {
-			end = i;
+			end = i + 1;
 		}
 		if(start !== undefined && end !== undefined) {
 			if(end > start) {
-				path.splice(start + 1, end - start, ...insert);
+				path.splice(start, end - start, ...insert);
 			} else {
-				path.splice(start + 1);
+				path.splice(start);
 				path.splice(0, end);
 				path.push(...insert);
 			}
