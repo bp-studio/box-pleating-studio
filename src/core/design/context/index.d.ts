@@ -1,4 +1,4 @@
-import type { Contour, ILine, Path } from "shared/types/geometry";
+import type { Contour, ILine, Path, RoughContour } from "shared/types/geometry";
 import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
@@ -50,7 +50,7 @@ export interface ITreeNode extends ISerializable<JEdge> {
 
 export interface NodeGraphics {
 	/** The contours without considering patterns. */
-	$roughContours: Contour[];
+	$roughContours: RoughContour[];
 
 	$patternContours: Path[];
 

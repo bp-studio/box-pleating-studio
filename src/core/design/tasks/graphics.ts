@@ -2,7 +2,7 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { toCorners } from "../context/aabb/aabb";
 import { same } from "shared/types/geometry";
-import { quadrantNumber } from "shared/types/direction";
+import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { clone } from "shared/utils/clone";
 import { Line } from "core/math/geometry/line";
@@ -46,7 +46,7 @@ function graphics(): void {
 
 function addRepo(repo: Repository): void {
 	if(!repo.$pattern) return;
-	const forward = repo.$f.x == repo.$f.y;
+	const forward = repo.$direction == SlashDirection.FW;
 	for(const [i, device] of repo.$pattern.$devices.entries()) {
 		State.$updateResult.graphics["s" + repo.$stretch.$id + "." + i] = {
 			contours: device.$contour,

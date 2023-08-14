@@ -96,7 +96,10 @@ export class AABB {
 		};
 	}
 
-	/** Return the hinge path. */
+	/**
+	 * Return the hinge path.
+	 * The points are in quadrant ordering.
+	 */
 	public $toPath(): Path {
 		return toCorners(this._sides.map(s => s.$value + s.$margin));
 	}

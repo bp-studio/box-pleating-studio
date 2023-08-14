@@ -6,6 +6,7 @@ import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { foreachPair } from "shared/utils/array";
 import { dist } from "../context/tree";
 import { Quadrant } from "./pattern/quadrant";
+import { SlashDirection } from "shared/types/direction";
 
 import type { ITreeNode } from "../context";
 import type { JRepository } from "core/service/updateModel";
@@ -116,6 +117,10 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	public set $index(v: number) {
 		this._index = v;
 		this.$configuration?.$tryUpdateOrigin();
+	}
+
+	public get $direction(): SlashDirection {
+		return this.$f.x == this.$f.y ? SlashDirection.FW : SlashDirection.BW;
 	}
 
 	public get $configuration(): Configuration | null {

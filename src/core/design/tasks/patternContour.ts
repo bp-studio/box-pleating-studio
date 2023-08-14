@@ -48,23 +48,30 @@ function processRepo(repo: Repository): void {
 function processNode(node: ITreeNode, repo: Repository, sideDiagonals: Line[]): void {
 	// POC
 	for(const contour of node.$graphics.$roughContours) {
+		const start = contour.startIndices[repo.$direction];
+		if(isNaN(start)) continue;
+
 		const path: Path = [];
+		const l = contour.outer.length;
 		const indices: number[] = [];
 		const diagonals = new Set(sideDiagonals);
-		for(let i = 0; i < contour.outer.length; i++) {
+		for(let i = 0; i < l; i++) {
 			const line = new Line(
-				new Point(contour.outer[i]),
-				new Point(contour.outer[(i + 1) % contour.outer.length])
+				new Point(contour.outer[(start + i) % l]),
+				new Point(contour.outer[(start + i + 1) % l])
 			);
 			for(const d of diagonals) {
 				const p = line.$intersection(d);
 				if(!p) continue;
 				path.push(p.$toIPoint());
-				indices.push(i);
+				let index = (start + i) % l;
+				if(p.eq(line.p1)) index -= 0.5;
+				indices.push(index);
 				diagonals.delete(d);
 			}
 		}
 		if(path.length == 2) {
+			if(indices[1] < indices[0]) indices[1] += l;
 			if(indices[1] - indices[0] > contour.outer.length / 2) path.reverse();
 			path.repo = repo.$signature;
 			node.$graphics.$patternContours.push(path);

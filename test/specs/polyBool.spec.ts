@@ -128,6 +128,7 @@ describe("PolyBool", function() {
 			], 1);
 			expect(result.length).to.equal(2);
 			expect(result[0].outer).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
+			expect(result[0].startIndices.map(i => result[0].outer[i])).to.deep.equal([{ x: 7, y: 0 }, { x: 7, y: 6 }]);
 			expect(result[1].outer.length).to.equal(0);
 		});
 	});

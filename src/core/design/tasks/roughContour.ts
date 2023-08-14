@@ -4,6 +4,7 @@ import { State } from "core/service/state";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { expand } from "core/math/polyBool/expansion";
 import { graphicsTask } from "./graphics";
+import { Direction } from "shared/types/direction";
 
 import type { ITreeNode, NodeGraphics } from "../context";
 
@@ -29,7 +30,10 @@ function updater(node: ITreeNode): boolean {
 	if(!node.$parent) return false;
 	if(node.$isLeaf) {
 		const path = node.$AABB.$toPath();
-		node.$graphics.$roughContours = [{ outer: path }];
+		node.$graphics.$roughContours = [{
+			outer: path,
+			startIndices: [Direction.LR, Direction.UR],
+		}];
 	} else {
 		const components = [...node.$children].map(n => n.$graphics.$roughContours.map(c => c.outer));
 		const inner = union.$get(...components);

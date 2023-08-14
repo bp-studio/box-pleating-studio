@@ -1,3 +1,4 @@
+import type { SlashDirection } from "./direction";
 
 export interface IPointEx extends IPoint {
 	arc?: IPoint;
@@ -41,6 +42,19 @@ export type Contour = {
 	/** Whether this contour is a hole itself. */
 	isHole?: boolean;
 };
+
+/**
+ * Indices of corners in {@link Contour.outer} such that they can
+ * be used as safe starting point for contour processing
+ * (i.e. they are not involved in patterns of the given {@link SlashDirection}).
+ * The value `NaN` implies this contour may be safely skipped.
+ */
+export type StartIndexMap = [number, number] & { [d in SlashDirection]: number };
+
+export interface RoughContour extends Contour {
+	/** See {@link StartIndexMap}. */
+	startIndices: StartIndexMap;
+}
 
 /** Sort first by x-coordinate, then by y-coordinate */
 export function xyComparator(p1: IPoint, p2: IPoint): number {

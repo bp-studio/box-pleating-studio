@@ -1,19 +1,20 @@
 import { AAUnion } from "./union/aaUnion";
 import { ExChainer } from "./chainer/exChainer";
+import { SlashDirection } from "shared/types/direction";
 
-import type { Path, Polygon, Contour } from "shared/types/geometry";
+import type { Path, Polygon, RoughContour, StartIndexMap } from "shared/types/geometry";
 
 const expander = new AAUnion(true, new ExChainer());
 
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
-export function expand(polygon: Polygon, units: number): Contour[] {
+export function expand(polygon: Polygon, units: number): RoughContour[] {
 	const polygons: Polygon[] = polygon.map(path => [expandPath(path, units)]);
 	const pathRemain = new Set(Array.from({ length: polygons.length }, (_, i) => i));
 
 	const result = expander.$get(...polygons);
-	const contours: Contour[] = [];
+	const contours: RoughContour[] = [];
 	for(const path of result) {
 		const from = path.from!;
 		const inner = from.map(n => {
@@ -27,9 +28,15 @@ export function expand(polygon: Polygon, units: number): Contour[] {
 			contours.push({
 				outer: inner[0].toReversed(),
 				isHole: false,
+				startIndices: [NaN, NaN],
 			});
 		} else {
-			contours.push({ outer: path, inner, isHole });
+			contours.push({
+				outer: path,
+				inner,
+				isHole,
+				startIndices: findStartIndices(path),
+			});
 		}
 	}
 
@@ -40,6 +47,7 @@ export function expand(polygon: Polygon, units: number): Contour[] {
 			outer: [],
 			inner: [polygon[n]],
 			isHole: true,
+			startIndices: [NaN, NaN],
 		});
 	}
 
@@ -85,4 +93,28 @@ function span(path: Path): number {
 		if(p.x > maxX) maxX = p.x;
 	}
 	return maxX - minX;
+}
+
+function findStartIndices(path: Path): StartIndexMap {
+	const l = path.length;
+	const result: StartIndexMap = [NaN, NaN];
+	let maxX = Number.NEGATIVE_INFINITY;
+	let minY = Number.POSITIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
+	for(let i = 0; i < l; i++) {
+		const p = path[i];
+		if(p.x > maxX) {
+			maxX = p.x;
+			minY = Number.POSITIVE_INFINITY;
+			maxY = Number.NEGATIVE_INFINITY;
+		}
+		if(p.y < minY) {
+			result[SlashDirection.FW] = i;
+			minY = p.y;
+		}
+		if(p.y > maxY) {
+			result[SlashDirection.BW] = i;
+			maxY = p.y;
+		}
+	}
+	return result;
 }
