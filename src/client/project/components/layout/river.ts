@@ -18,7 +18,7 @@ import type { Edge } from "../tree/edge";
 //=================================================================
 export class River extends Control {
 
-	public readonly $tag: string = "r"; // doesn't matter
+	public readonly $tag: string;
 	public readonly type = "River";
 	public readonly $priority: number = 1;
 
@@ -37,6 +37,7 @@ export class River extends Control {
 		super(sheet);
 		this._layout = layout;
 		this.$selectedCursor = "pointer";
+		this.$tag = edge.$tag.replace("e", "r"); // For debug
 
 		this.$edge = edge;
 		this.$graphics = graphics;
