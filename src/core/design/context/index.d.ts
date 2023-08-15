@@ -3,6 +3,8 @@ import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
+import type { Repository } from "../layout/repository";
+import type { clearPatternContourForRepo } from "../tasks/patternContour";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -48,11 +50,21 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	$setFlap(flap: JFlap): void;
 }
 
+export interface PatternContour extends Path {
+	/**
+	 * The {@link Repository.$signature} of the repo from which this path derives.
+	 *
+	 * Used for removing the path should the corresponding repo change
+	 * (see {@link clearPatternContourForRepo}).
+	 */
+	repo?: string;
+}
+
 export interface NodeGraphics {
 	/** The contours without considering patterns. */
 	$roughContours: RoughContour[];
 
-	$patternContours: Path[];
+	$patternContours: PatternContour[];
 
 	/** The final contours. */
 	$contours: Contour[];

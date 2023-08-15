@@ -8,12 +8,10 @@ import { clone } from "shared/utils/clone";
 import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 
-import type { TreeNode } from "../context/treeNode";
 import type { Repository } from "../layout/repository";
 import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
-import type { Pattern } from "../layout/pattern/pattern";
 
 //=================================================================
 /**
@@ -50,7 +48,7 @@ function addRepo(repo: Repository): void {
 	for(const [i, device] of repo.$pattern.$devices.entries()) {
 		State.$updateResult.graphics["s" + repo.$stretch.$id + "." + i] = {
 			contours: device.$contour,
-			ridges: device.$ridges,
+			ridges: device.$ridges.map(l => l.$toILine()),
 			axisParallel: device.$axisParallels,
 			location: device.$location,
 			// Note that the range of all devices in the pattern will be updated.

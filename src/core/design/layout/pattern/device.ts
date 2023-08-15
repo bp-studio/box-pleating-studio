@@ -31,8 +31,10 @@ export class Device implements ISerializable<JDevice> {
 	public $anchors!: readonly Point[][];
 	public $location!: IPoint;
 
-	private _delta!: Vector;
 	private readonly _originalDisplacement: Vector;
+	private _delta!: Vector;
+	private _ridgeCache: readonly Line[] | undefined;
+	private _rawRidgeCache: readonly Line[] | undefined;
 
 	constructor(pattern: Pattern, partition: Partition, data: JDevice) {
 		this.$pattern = pattern;
@@ -85,14 +87,17 @@ export class Device implements ISerializable<JDevice> {
 			result.push(g.$anchorMap.map(m => this._transform(m[0])));
 		}
 		this.$anchors = result;
+
+		// Clear cache of self and neighbors
+		this._clearCache();
+		this._neighbors.forEach(n => n._clearCache());
 	}
 
 	/** All ridges that should be drawn. */
-	public get $ridges(): readonly ILine[] {
-		//TODO: eliminate overlapping with neighbors
-		const selfRidges = this._rawRidges.map(l => this._transform(l).$toILine());
-		const outerRidges = this._getOuterRidges().map(l => l.$toILine());
-		return selfRidges.concat(outerRidges);
+	public get $ridges(): readonly Line[] {
+		if(this._ridgeCache) return this._ridgeCache;
+		const neighborRidges = this._neighbors.flatMap(g => g._rawRidges);
+		return this._ridgeCache = Line.$subtract(this._rawRidges, neighborRidges);
 	}
 
 	/** All axis-parallel creases that should be drawn. */
@@ -159,7 +164,7 @@ export class Device implements ISerializable<JDevice> {
 	 * Ridges of the {@link Region}s before transformation.
 	 * The result is constant, so it is cached.
 	 */
-	@cache private get _rawRidges(): readonly Line[] {
+	@cache private get _innerRidges(): readonly Line[] {
 		const result: Line[] = [];
 		for(const region of this._regions) {
 			const parallelRegions = this._regions.filter(
@@ -177,6 +182,30 @@ export class Device implements ISerializable<JDevice> {
 		return Line.$distinct(result);
 	}
 
+	/**
+	 * All neighboring {@link Device}s.
+	 */
+	@cache private get _neighbors(): readonly Device[] {
+		const result = new Set<Device>();
+		for(const o of this.$partition.$overlaps) {
+			for(const corner of o.c) {
+				if(corner.type == CornerType.socket || corner.type == CornerType.internal) {
+					const [i] = this.$partition.$configuration.$overlapMap.get(corner.e!)!;
+					result.add(this.$pattern.$devices[i]);
+				}
+			}
+		}
+		return Array.from(result);
+	}
+
+	/** Self-owned ridges. */
+	public get _rawRidges(): readonly Line[] {
+		if(this._rawRidgeCache) return this._rawRidgeCache;
+		const selfRidges = this._innerRidges.map(l => this._transform(l));
+		const outerRidges = this._getOuterRidges();
+		return this._rawRidgeCache = selfRidges.concat(outerRidges);
+	}
+
 	private _getOuterRidges(): readonly Line[] {
 		const result = this.$getConnectionRidges(false);
 		for(const map of this.$partition.$externalCornerMaps) {
@@ -185,6 +214,11 @@ export class Device implements ISerializable<JDevice> {
 			if(to) result.push(new Line(from, to));
 		}
 		return result;
+	}
+
+	private _clearCache(): void {
+		this._ridgeCache = undefined;
+		this._rawRidgeCache = undefined;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

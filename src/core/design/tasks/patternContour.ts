@@ -4,15 +4,11 @@ import { State } from "core/service/state";
 import { comparator } from "../context/treeNode";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { getOrSetEmptyArray } from "shared/utils/map";
-import { dist } from "../context/tree";
-import { Fraction } from "core/math/fraction";
-import { Line } from "core/math/geometry/line";
-import { Point } from "core/math/geometry/point";
+import { Trace } from "../layout/trace";
 
-import type { Path } from "shared/types/geometry";
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { Repository } from "../layout/repository";
-import type { ITreeNode, NodeGraphics } from "../context";
+import type { ITreeNode, NodeGraphics, PatternContour } from "../context";
 
 //=================================================================
 /**
@@ -38,43 +34,16 @@ function processRepo(repo: Repository): void {
 	}
 
 	const coverageMap = getNodeCoverageMap(repo);
-	const sideDiagonals = repo.$configuration!.$sideDiagonals;
+	const trace = new Trace(repo);
 
+	//TODO: Why do we need coverage info here?
 	for(const [node, leaves] of coverageMap.entries()) {
-		processNode(node, repo, sideDiagonals);
-	}
-}
-
-function processNode(node: ITreeNode, repo: Repository, sideDiagonals: Line[]): void {
-	// POC
-	for(const contour of node.$graphics.$roughContours) {
-		const start = contour.startIndices[repo.$direction];
-		if(isNaN(start)) continue;
-
-		const path: Path = [];
-		const l = contour.outer.length;
-		const indices: number[] = [];
-		const diagonals = new Set(sideDiagonals);
-		for(let i = 0; i < l; i++) {
-			const line = new Line(
-				new Point(contour.outer[(start + i) % l]),
-				new Point(contour.outer[(start + i + 1) % l])
-			);
-			for(const d of diagonals) {
-				const p = line.$intersection(d);
-				if(!p) continue;
-				path.push(p.$toIPoint());
-				let index = (start + i) % l;
-				if(p.eq(line.p1)) index -= 0.5;
-				indices.push(index);
-				diagonals.delete(d);
+		for(const contour of node.$graphics.$roughContours) {
+			const path = trace.$generate(contour);
+			if(path) {
+				path.repo = repo.$signature;
+				node.$graphics.$patternContours.push(path);
 			}
-		}
-		if(path.length == 2) {
-			if(indices[1] < indices[0]) indices[1] += l;
-			if(indices[1] - indices[0] > contour.outer.length / 2) path.reverse();
-			path.repo = repo.$signature;
-			node.$graphics.$patternContours.push(path);
 		}
 	}
 }

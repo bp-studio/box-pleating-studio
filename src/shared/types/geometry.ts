@@ -12,8 +12,6 @@ export type Path = IPointEx[] & {
 
 	/** Whether this path is a hole. */
 	isHole?: boolean;
-
-	repo?: string;
 };
 
 export type ILine = [IPoint, IPoint];
