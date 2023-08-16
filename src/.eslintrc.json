@@ -21,6 +21,10 @@
 			}
 		],
 		"@typescript-eslint/no-unsafe-declaration-merging": "off",
+		"import/consistent-type-specifier-style": [
+			"warn",
+			"prefer-top-level"
+		],
 		"import/newline-after-import": "warn",
 		"import/no-cycle": "warn",
 		"import/no-duplicates": "warn",
