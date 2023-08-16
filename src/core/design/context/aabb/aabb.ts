@@ -26,7 +26,7 @@ const maxComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
  * encapsulate corresponding methods for these four components.
  *
  * Strictly speaking, there are two cases: when it is the bottom-level {@link AABB},
- * its boundaries are the variables themselves (the four tips of the flap);
+ * its boundaries are the variables themselves (the four sides of the flap rectangle);
  * or when it is not the bottom-level {@link AABB},
  * its boundaries are the union of all lower-level {@link AABB} (plus their margins).
  *
