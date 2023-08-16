@@ -13,7 +13,7 @@ import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
 
-interface CornerMap {
+export interface CornerMap {
 	/** {@link JCorner} itself. */
 	corner: JCorner;
 

@@ -101,7 +101,7 @@ function tryInsert(path: Path, insert: Path): boolean {
 		if(end === undefined && (line.$contains(last) || endPt.eq(last))) {
 			end = i + 1;
 		}
-		if(start !== undefined && end !== undefined) {
+		if(start !== undefined && end !== undefined && start != end) {
 			if(end > start) {
 				path.splice(start, end - start, ...insert);
 			} else {

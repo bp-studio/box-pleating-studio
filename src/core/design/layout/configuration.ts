@@ -1,13 +1,14 @@
 import { Partition } from "./partition";
 import { Store } from "./store";
 import { patternGenerator } from "./generators/patternGenerator";
-import { CornerType, type JConfiguration, type JJunction, type JOverlap, type JPartition, type JPattern } from "shared/json";
-import { cache } from "core/utils/cache";
+import { CornerType } from "shared/json";
 import { Line } from "core/math/geometry/line";
 
+import type { Point } from "core/math/geometry/point";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
+import type { JConfiguration, JJunction, JOverlap, JPartition, JPattern } from "shared/json";
 
 
 //=================================================================
@@ -34,7 +35,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 	private _index: number = 0;
 
 	public $originDirty: boolean = false;
-	private _sideDiagonalCache: Line[] | undefined;
+	private _sideDiagonalCache: SideDiagonal[] | undefined;
 
 	constructor(repo: Repository, junctions: JJunction[], partitions: readonly JPartition[], proto?: JPattern) {
 		this.$repo = repo;
@@ -96,17 +97,25 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this._sideDiagonalCache = undefined;
 	}
 
-	public get $sideDiagonals(): Line[] {
+	public get $sideDiagonals(): SideDiagonal[] {
 		if(this._sideDiagonalCache) return this._sideDiagonalCache;
 
-		const result: Line[] = [];
-		for(const partition of this.$partitions) {
+		const result: SideDiagonal[] = [];
+		for(const [i, partition] of this.$partitions.entries()) {
 			for(const map of partition.$cornerMap) {
 				if(map.corner.type == CornerType.side) {
-					result.push(new Line(...partition.$getExternalConnectionTargets(map)));
+					const diagonal = new Line(...partition.$getExternalConnectionTargets(map)) as SideDiagonal;
+					if(diagonal.$isDegenerated) continue;
+					(diagonal as Writeable<SideDiagonal>).p0 = this.$pattern!.$devices[i].$resolveCornerMap(map);
+					result.push(diagonal);
 				}
 			}
 		}
 		return this._sideDiagonalCache = result;
 	}
+}
+
+export interface SideDiagonal extends Line {
+	/** The corresponding side corner. */
+	readonly p0: Point;
 }

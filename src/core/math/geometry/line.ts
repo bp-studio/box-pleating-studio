@@ -19,87 +19,6 @@ function int(x: number, f: number): number {
 
 export class Line {
 
-	public readonly p1: Point;
-	public readonly p2: Point;
-
-	constructor(p: Point, v: Vector);
-	constructor(p1: Point, p2: Point);
-	constructor(p: Point, c: Point | Vector) {
-		if(c instanceof Vector) c = p.$add(c);
-		this.p1 = p; this.p2 = c;
-	}
-
-	/**
-	 * Output the line in the form of `(x1, y1), (x2, y2)` with sorted endpoints.
-	 * Could be used as a signature.
-	 */
-	public toString(): string { return [this.p1, this.p2].sort().toString(); }
-
-	public $toILine(): ILine {
-		return [this.p1.$toIPoint(), this.p2.$toIPoint()];
-	}
-
-	public get $isDegenerated(): boolean { return this.p1.eq(this.p2); }
-
-	/** Check if two line segments are identical. */
-	public eq(l: Line): boolean {
-		return this.p1.eq(l.p1) && this.p2.eq(l.p2) ||
-			this.p1.eq(l.p2) && this.p2.eq(l.p1);
-	}
-
-	/**
-	 * Whether a given point is in this line segment
-	 * (endpoints are not included by default).
-	 */
-	public $contains(point: Point | IPoint, includeEndpoints: boolean = false): boolean {
-		const p = point instanceof Point ? point : new Point(point);
-		if(includeEndpoints && (p.eq(this.p1) || p.eq(this.p2))) return true;
-		const v1 = p.sub(this.p1), v2 = p.sub(this.p2);
-		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
-	}
-
-	public $lineContains(p: Point): boolean {
-		return this.$vector.$parallel(p.sub(this.p1));
-	}
-
-	/**
-	 * Return the intersection of this line segment (endpoints included)
-	 * with the given line segment.
-	 */
-	public $intersection(l: Line): Point | null;
-
-	/**
-	 * Return the intersection of this line (as segment, endpoints included)
-	 * with the given direction (as a straight line, unless {@link headless} or {@link tailless} is assigned).
-	 */
-	public $intersection(p: Point, v: Vector, headless?: boolean, tailless?: boolean): Point | null;
-
-	public $intersection(...t: [Point, Vector, boolean?, boolean?] | [Line]): Point | null {
-		if(t.length == 1) return this.$intersection(t[0].p1, t[0].p2.sub(t[0].p1), true, true);
-		const [p, v, headless, tailless] = t;
-		const v1 = this.p2.sub(this.p1);
-		const m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
-		if(m == null) return null;
-
-		const r = m.$multiply(new Point(p.sub(this.p1)));
-		const a = r._x, b = r._y.neg;
-		if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
-		if(headless && b.lt(Fraction.ZERO)) return null;
-		if(tailless && b.gt(Fraction.ONE)) return null;
-
-		return p.$add(v.$scale(b));
-	}
-
-	/** Transform the line by the given orientation and return a new line. */
-	public $transform(fx: Sign, fy: Sign): Line {
-		return new Line(this.p1.$transform(fx, fy), this.p2.$transform(fx, fy));
-	}
-
-	/** Move the line by the given {@link Vector} and return a new line. */
-	public $add(v: Vector): Line {
-		return new Line(this.p1.$add(v), this.p2.$add(v));
-	}
-
 	/** Remove duplicates and return a new array of lines. */
 	public static $distinct(lines: Line[]): Line[] {
 		const signatures = new Set<string>();
@@ -130,60 +49,99 @@ export class Line {
 		return result;
 	}
 
-	/**
-	 * Removes part of the current line that overlaps any passed-in lines,
-	 * and returns the remaining parts.
-	 */
-	private _cancel(set: Line[]): Line[] {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Instance
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		let result: Line[] = [this];
-		for(const l2 of set) {
-			const next: Line[] = [];
-			for(const l1 of result) next.push(...l1._cancelCore(l2));
-			result = next;
-		}
-		return result;
+	public readonly p1: Point;
+	public readonly p2: Point;
+
+	constructor(p: Point, v: Vector);
+	constructor(p1: Point, p2: Point);
+	constructor(p: Point, c: Point | Vector) {
+		if(c instanceof Vector) c = p.$add(c);
+		this.p1 = p; this.p2 = c;
 	}
 
-	private *_cancelCore(l: Line): Generator<Line> {
-		const a = this.$contains(l.p1, true), b = this.$contains(l.p2, true);
-		const c = l.$contains(this.p1, true), d = l.$contains(this.p2, true);
+	public get $isDegenerated(): boolean { return this.p1.eq(this.p2); }
 
-		// If self is completed contained in the other line, self destroys.
-		if(c && d) return;
-
-		// Otherwise if self does not contain any endpoint of the other line,
-		// then there's no overlapping and self is returned.
-		if(!a && !b) {
-			yield this;
-		} else if(a && b) {
-			const l11 = new Line(this.p1, l.p1), l12 = new Line(this.p1, l.p2);
-			const l21 = new Line(this.p2, l.p1), l22 = new Line(this.p2, l.p2);
-			if(l11.$isDegenerated) {
-				yield l22;
-			} else if(l12.$isDegenerated) {
-				yield l21;
-			} else if(l21.$isDegenerated) {
-				yield l12;
-			} else if(l22.$isDegenerated) {
-				yield l11;
-			} else if(l11.$contains(l.p2)) {
-				yield l12;
-				yield l21;
-			} else {
-				yield l11;
-				yield l22;
-			}
-		} else {
-			const p1 = a ? l.p1 : l.p2;
-			const p2 = d ? this.p1 : this.p2;
-			if(!p1.eq(p2)) yield new Line(p1, p2);
-		}
+	public get $vector(): Vector {
+		return this.p2.sub(this.p1);
 	}
 
 	/** Returns the slope in {@link Fraction} (could be 1/0, i.e. infinity). */
 	public get $slope(): Fraction {
 		return this.p1._y.sub(this.p2._y).d(this.p1._x.sub(this.p2._x));
+	}
+
+	/**
+	 * Output the line in the form of `(x1, y1),(x2, y2)` with sorted endpoints.
+	 * Could be used as a signature.
+	 */
+	public toString(): string { return [this.p1, this.p2].sort().toString(); }
+
+	public $toILine(): ILine {
+		return [this.p1.$toIPoint(), this.p2.$toIPoint()];
+	}
+
+	/** Check if two line segments are identical. */
+	public eq(l: Line): boolean {
+		return this.p1.eq(l.p1) && this.p2.eq(l.p2) ||
+			this.p1.eq(l.p2) && this.p2.eq(l.p1);
+	}
+
+	public $isOnRight(point: Point): boolean {
+		const v = point.sub(this.p1).$rotate90();
+		return v.dot(this.$vector) > 0;
+	}
+
+	/**
+	 * Whether a given point is in this line segment
+	 * (endpoints are not included by default).
+	 */
+	public $contains(point: Point | IPoint, includeEndpoints: boolean = false): boolean {
+		const p = point instanceof Point ? point : new Point(point);
+		if(includeEndpoints && (p.eq(this.p1) || p.eq(this.p2))) return true;
+		const v1 = p.sub(this.p1), v2 = p.sub(this.p2);
+		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
+	}
+
+	public $lineContains(p: Point): boolean {
+		return this.$vector.$parallel(p.sub(this.p1));
+	}
+
+	/**
+	 * Return the intersection of this line segment (endpoints included)
+	 * with the given line segment.
+	 */
+	public $intersection(l: Line): Point | null;
+
+	/**
+	 * Return the intersection of this line (as segment, endpoints included)
+	 * with the given direction (as a straight line, unless {@link headless} or {@link tailless} is assigned).
+	 */
+	public $intersection(p: Point, v: Vector, headless?: boolean, tailless?: boolean): Point | null;
+
+	public $intersection(...t: [Point, Vector, boolean?, boolean?] | [Line]): Point | null {
+		let intersection: IIntersection | null;
+		if(t.length == 1) {
+			intersection = getIntersection(this, t[0].p1, t[0].p2.sub(t[0].p1), true, true);
+		} else {
+			const [p, v, headless, tailless] = t;
+			intersection = getIntersection(this, p, v, headless, tailless);
+		}
+		if(!intersection) return null;
+		return intersection.point;
+	}
+
+	/** Transform the line by the given orientation and return a new line. */
+	public $transform(fx: Sign, fy: Sign): Line {
+		return new Line(this.p1.$transform(fx, fy), this.p2.$transform(fx, fy));
+	}
+
+	/** Move the line by the given {@link Vector} and return a new line. */
+	public $add(v: Vector): Line {
+		return new Line(this.p1.$add(v), this.p2.$add(v));
 	}
 
 	/** Sort the endpoints by the x-coordinates and returns. */
@@ -238,7 +196,89 @@ export class Line {
 		return this.$vector.dot(v) == 0;
 	}
 
-	public get $vector(): Vector {
-		return this.p1.sub(this.p2);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Removes part of the current line that overlaps any passed-in lines,
+	 * and returns the remaining parts.
+	 */
+	private _cancel(set: Line[]): Line[] {
+
+		let result: Line[] = [this];
+		for(const l2 of set) {
+			const next: Line[] = [];
+			for(const l1 of result) next.push(...l1._cancelCore(l2));
+			result = next;
+		}
+		return result;
 	}
+
+	private *_cancelCore(l: Line): Generator<Line> {
+		const a = this.$contains(l.p1, true), b = this.$contains(l.p2, true);
+		const c = l.$contains(this.p1, true), d = l.$contains(this.p2, true);
+
+		// If self is completed contained in the other line, self destroys.
+		if(c && d) return;
+
+		// Otherwise if self does not contain any endpoint of the other line,
+		// then there's no overlapping and self is returned.
+		if(!a && !b) {
+			yield this;
+		} else if(a && b) {
+			const l11 = new Line(this.p1, l.p1), l12 = new Line(this.p1, l.p2);
+			const l21 = new Line(this.p2, l.p1), l22 = new Line(this.p2, l.p2);
+			if(l11.$isDegenerated) {
+				yield l22;
+			} else if(l12.$isDegenerated) {
+				yield l21;
+			} else if(l21.$isDegenerated) {
+				yield l12;
+			} else if(l22.$isDegenerated) {
+				yield l11;
+			} else if(l11.$contains(l.p2)) {
+				yield l12;
+				yield l21;
+			} else {
+				yield l11;
+				yield l22;
+			}
+		} else {
+			const p1 = a ? l.p1 : l.p2;
+			const p2 = d ? this.p1 : this.p2;
+			if(!p1.eq(p2)) yield new Line(p1, p2);
+		}
+	}
+}
+
+export interface IIntersection {
+	/** The intersected line. */
+	readonly line: Line;
+	/** The point of intersection. */
+	readonly point: Point;
+	/** Measures in multiple of the given {@link Vector}. */
+	readonly dist: Fraction;
+}
+
+export function getIntersection(
+	line: Line, p: Point, v: Vector,
+	headless?: boolean, tailless?: boolean
+): IIntersection | null {
+	const v1 = line.p2.sub(line.p1);
+	const m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
+	if(m == null) return null;
+
+	const r = m.$multiply(new Point(p.sub(line.p1)));
+	const a = r._x, b = r._y.neg;
+	if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
+	if(headless && b.lt(Fraction.ZERO)) return null;
+	if(tailless && b.gt(Fraction.ONE)) return null;
+
+	return {
+		line,
+		point: p.$add(v.$scale(b)),
+		dist: b,
+	};
 }

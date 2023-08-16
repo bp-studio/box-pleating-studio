@@ -8,7 +8,7 @@ import { Vector } from "core/math/geometry/vector";
 import { State } from "core/service/state";
 import { clone } from "shared/utils/clone";
 
-import type { Partition } from "../partition";
+import type { CornerMap, Partition } from "../partition";
 import type { JDevice, JConnection } from "shared/json";
 import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
@@ -100,6 +100,10 @@ export class Device implements ISerializable<JDevice> {
 		return this._ridgeCache = Line.$subtract(this._rawRidges, neighborRidges);
 	}
 
+	public get $traceRidges(): readonly Line[] {
+		return Line.$subtract(this.$ridges, this._getOuterRidges(CornerType.side));
+	}
+
 	/** All axis-parallel creases that should be drawn. */
 	public get $axisParallels(): readonly ILine[] {
 		const result: Line[] = [];
@@ -129,7 +133,7 @@ export class Device implements ISerializable<JDevice> {
 			const slack = isOut ?
 				this.$gadgets[c.overlapIndex].$slack[c.anchorIndex] :
 				this.$pattern.$gadgets[-c.corner.e! - 1].$slack[c.corner.q!];
-			const bound = target.x - this.$anchors[c.overlapIndex][c.anchorIndex].x - slack * f;
+			const bound = target.x - this.$resolveCornerMap(c).x - slack * f;
 			if(f > 0 && result[1] > bound) result[1] = bound;
 			else if(f < 0 && result[0] < bound) result[0] = bound;
 		}
@@ -149,6 +153,10 @@ export class Device implements ISerializable<JDevice> {
 			}
 		}
 		return result;
+	}
+
+	public $resolveCornerMap(map: CornerMap): Point {
+		return this.$anchors[map.overlapIndex][map.anchorIndex];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,17 +207,18 @@ export class Device implements ISerializable<JDevice> {
 	}
 
 	/** Self-owned ridges. */
-	public get _rawRidges(): readonly Line[] {
+	private get _rawRidges(): readonly Line[] {
 		if(this._rawRidgeCache) return this._rawRidgeCache;
 		const selfRidges = this._innerRidges.map(l => this._transform(l));
 		const outerRidges = this._getOuterRidges();
 		return this._rawRidgeCache = selfRidges.concat(outerRidges);
 	}
 
-	private _getOuterRidges(): readonly Line[] {
+	private _getOuterRidges(type?: CornerType): readonly Line[] {
 		const result = this.$getConnectionRidges(false);
 		for(const map of this.$partition.$externalCornerMaps) {
-			const from = this.$anchors[map.overlapIndex][map.anchorIndex];
+			if(type && map.corner.type != type) continue;
+			const from = this.$resolveCornerMap(map);
 			const to = this.$partition.$getExternalConnectionTarget(from, map);
 			if(to) result.push(new Line(from, to));
 		}
