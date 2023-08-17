@@ -274,6 +274,12 @@
 		"no-cond-assign": "off",
 		"no-confusing-arrow": "off",
 		"no-console": "off",
+		"no-constant-condition": [
+			"warn",
+			{
+				"checkLoops": false
+			}
+		],
 		"no-constructor-return": "warn",
 		"no-continue": "off",
 		"no-debugger": "off",

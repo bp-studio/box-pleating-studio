@@ -97,6 +97,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this._sideDiagonalCache = undefined;
 	}
 
+	/**
+	 * {@link SideDiagonal}s have special significance in the tracing algorithm,
+	 * so we make a special getter for that.
+	 */
 	public get $sideDiagonals(): SideDiagonal[] {
 		if(this._sideDiagonalCache) return this._sideDiagonalCache;
 
@@ -104,10 +108,11 @@ export class Configuration implements ISerializable<JConfiguration> {
 		for(const [i, partition] of this.$partitions.entries()) {
 			for(const map of partition.$cornerMap) {
 				if(map.corner.type == CornerType.side) {
-					const diagonal = new Line(...partition.$getExternalConnectionTargets(map)) as SideDiagonal;
-					if(diagonal.$isDegenerated) continue;
-					(diagonal as Writeable<SideDiagonal>).p0 = this.$pattern!.$devices[i].$resolveCornerMap(map);
-					result.push(diagonal);
+					const corner = this.$pattern!.$devices[i].$resolveCornerMap(map);
+					let diagonal = new Line(...partition.$getExternalConnectionTargets(map));
+					if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
+					(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
+					result.push(diagonal as SideDiagonal);
 				}
 			}
 		}

@@ -14,6 +14,11 @@ interface JIntersection extends IIntersection {
 	angle: number;
 }
 
+interface Ray {
+	point: Point;
+	vector: Vector;
+}
+
 //=================================================================
 /**
  * {@link Trace} is the utility class for generating {@link PatternContour}.
@@ -21,19 +26,19 @@ interface JIntersection extends IIntersection {
 //=================================================================
 export class Trace {
 
-	private readonly _ridges: Line[];
+	private readonly _ridges: readonly Line[];
 	private readonly _direction: SlashDirection;
-	private readonly _sideDiagonals: SideDiagonal[];
+	private readonly _sideDiagonals: readonly SideDiagonal[];
 	private readonly _boundingBox: Rectangle;
 
 	constructor(repo: Repository) {
 		this._ridges = repo.$pattern!.$devices.flatMap(d => d.$traceRidges);
 		this._direction = repo.$direction;
-		this._sideDiagonals = repo.$configuration!.$sideDiagonals;
-		this._boundingBox = getBoundingBox(this._ridges.concat(this._sideDiagonals));
+		const sideDiagonals = repo.$configuration!.$sideDiagonals;
+		this._boundingBox = getBoundingBox(this._ridges.concat(sideDiagonals));
+		this._sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
-	// eslint-disable-next-line max-lines-per-function
 	public $generate(rough: RoughContour): PatternContour | null {
 		const candidates = this._candidateRoughContourLines(rough);
 		if(!candidates) return null;
@@ -42,55 +47,32 @@ export class Trace {
 		const ridges = new Set(this._ridges);
 		const diagonals = new Set(this._sideDiagonals);
 
-		let cursor: Point | undefined;
-		let vector!: Vector;
-
-		let hitDiagonal = false;
-
-		// Step 1: find the first candidate line that intersects the pattern,
-		// and decide the initial vector.
-		while(candidates.length) {
-			const line = candidates.shift()!;
-			const v = line.$vector;
-			for(const diagonal of diagonals) {
-				const p = line.$intersection(diagonal);
-				if(!p) continue;
-				diagonals.delete(diagonal);
-				if(p.eq(diagonal.p0)) break;
-				cursor = p;
-				vector = this._diagonalHitInitialVector(line, v, diagonal);
-				hitDiagonal = true;
-				break;
-			}
-			if(cursor) break;
-			const intersection = getNextIntersection(ridges, line.p1, v, true);
-			if(intersection) {
-				ridges.delete(intersection.line);
-				cursor = intersection.point;
-				vector = intersection.line.$reflect(v);
-				break;
-			}
-		}
+		let cursor = this._findInitialRay(candidates, ridges, diagonals);
 		if(!cursor) return null;
-		path.push(cursor);
+		path.push(cursor.point);
 
-		// POC
-		if(hitDiagonal) {
-			const intersection = getNextIntersection(ridges, cursor, vector);
-			if(intersection) {
-				path.push(intersection.point);
-				cursor = intersection.point;
-				vector = intersection.line.$reflect(vector);
+		for(const diagonal of diagonals) ridges.add(diagonal);
+
+		// Main loop
+		while(true) {
+			const intersection = getNextIntersection(ridges, cursor);
+			if(!intersection) {
+				if(testEnd(candidates, cursor)) break;
+				else return null; // Something went wrong. Output nothing.
 			}
-		}
-		const intersection = getNextIntersection(candidates, cursor, vector);
-		if(intersection) {
-			path.push(intersection.point);
-			console.log(path.toString());
-			return path.map(p => p.$toIPoint());
+			if(diagonals.has(intersection.line as SideDiagonal)) {
+				path.push(intersection.point);
+				break;
+			}
+			ridges.delete(intersection.line);
+			cursor = {
+				point: intersection.point,
+				vector: intersection.line.$reflect(cursor.vector),
+			};
+			path.push(cursor.point);
 		}
 
-		return null;
+		return path.map(p => p.$toIPoint());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,12 +80,50 @@ export class Trace {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * Find the first candidate line that intersects the pattern, and decide the initial ray.
+	 */
+	private _findInitialRay(candidates: Line[], ridges: Set<Line>, diagonals: Set<SideDiagonal>): Ray | null {
+		while(candidates.length) {
+			const line = candidates.shift()!;
+			const v = line.$vector;
+			const ray = { point: line.p1, vector: v };
+
+			// Case 1: side diagonals
+			for(const diagonal of diagonals) {
+				const p = line.$intersection(diagonal);
+				if(!p) continue;
+				diagonals.delete(diagonal);
+				const hv = this._diagonalHitInitialVector(line, v, diagonal);
+				if(!p.eq(diagonal.p0)) {
+					return { point: p, vector: hv };
+				} else {
+					// In this case we modify the ray and go to the case 2.
+					ray.vector = hv;
+					ray.point = p.sub(hv);
+					break;
+				}
+			}
+
+			// Case 2: normal ridges
+			const intersection = getNextIntersection(ridges, ray, true);
+			if(intersection) {
+				ridges.delete(intersection.line);
+				return {
+					point: intersection.point,
+					vector: intersection.line.$reflect(ray.vector),
+				};
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * If the first line hit by a candidate line is a {@link SideDiagonal},
 	 * it may or may not reflect about it, depending on whether the {@link RoughContour}
 	 * wraps around {@link SideDiagonal.p0}.
 	 */
 	private _diagonalHitInitialVector(line: Line, v: Vector, diagonal: SideDiagonal): Vector {
-		const outside = line.$isOnRight(diagonal.p0);
+		const outside = line.$isOnRight(diagonal.p0, true);
 		const forward = this._direction == SlashDirection.FW;
 		const resultIsVertical = forward == outside;
 		const lineIsVertical = v.x == 0;
@@ -152,19 +172,23 @@ function getBoundingBox(lines: Line[]): Rectangle {
 	);
 }
 
-function getNextIntersection(lines: Iterable<Line>, p: Point, v: Vector, lineMode = false): JIntersection | null {
+function getNextIntersection(lines: Iterable<Line>, ray: Ray, lineMode = false): JIntersection | null {
 	let result: JIntersection | null = null;
-	const self = new Line(p, v);
+	const { point, vector } = ray;
+	const self = new Line(point, vector);
 	for(const line of lines) {
-		const intersection = getIntersection(line, p, v, true, lineMode) as JIntersection;
+		const intersection = getIntersection(line, point, vector, true, lineMode) as JIntersection;
 		if(!intersection) continue;
 
-		if(intersection.point.eq(line.p1) && self.$isOnRight(line.p2) ||
-			intersection.point.eq(line.p2) && self.$isOnRight(line.p1)) continue;
+		if(
+			!isSideDiagonal(intersection.line) && (
+				intersection.point.eq(line.p1) && self.$isOnRight(line.p2) ||
+				intersection.point.eq(line.p2) && self.$isOnRight(line.p1)
+			)
+		) continue;
 
-		intersection.angle = getAngle(v, line.$vector);
-		// TODO: inflections
-		if(isCloser(intersection, result, 1)) result = intersection;
+		intersection.angle = getAngle(vector, line.$vector);
+		if(isCloser(intersection, result)) result = intersection;
 	}
 	return result;
 }
@@ -176,6 +200,24 @@ function getAngle(v1: Vector, v2: Vector): number {
 	return ang;
 }
 
-function isCloser(r: JIntersection, x: JIntersection | null, f: Sign): boolean {
-	return x == null || r.dist.lt(x.dist) || r.dist.eq(x.dist) && r.angle * f < x.angle * f;
+function isCloser(r: JIntersection, x: JIntersection | null): boolean {
+	return x == null ||
+		r.dist.lt(x.dist) ||
+		r.dist.eq(x.dist) && (
+			// SideDiagonals should always go first.
+			isSideDiagonal(r.line) ||
+			!isSideDiagonal(x.line) && r.angle < x.angle
+		);
+}
+
+function isSideDiagonal(line: Line): line is SideDiagonal {
+	return "p0" in line;
+}
+
+/** Check if we have successfully connected back to the {@link RoughContour}. */
+function testEnd(candidates: Line[], ray: Ray): boolean {
+	for(const candidate of candidates) {
+		if(candidate.$contains(ray.point) && candidate.$vector.$parallel(ray.vector)) return true;
+	}
+	return false;
 }

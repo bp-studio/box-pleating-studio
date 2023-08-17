@@ -7,12 +7,18 @@ import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
 import { State } from "core/service/state";
 import { clone } from "shared/utils/clone";
+import { MASK } from "../junction/validJunction";
 
+import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerMap, Partition } from "../partition";
-import type { JDevice, JConnection } from "shared/json";
+import type { JDevice, JConnection, JCorner } from "shared/json";
 import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
 import type { Pattern } from "./pattern";
+
+export interface Ridge extends Line {
+	type?: CornerType;
+}
 
 //=================================================================
 /**
@@ -33,8 +39,8 @@ export class Device implements ISerializable<JDevice> {
 
 	private readonly _originalDisplacement: Vector;
 	private _delta!: Vector;
-	private _ridgeCache: readonly Line[] | undefined;
-	private _rawRidgeCache: readonly Line[] | undefined;
+	private _ridgeCache: readonly Ridge[] | undefined;
+	private _rawRidgeCache: readonly Ridge[] | undefined;
 
 	constructor(pattern: Pattern, partition: Partition, data: JDevice) {
 		this.$pattern = pattern;
@@ -94,14 +100,16 @@ export class Device implements ISerializable<JDevice> {
 	}
 
 	/** All ridges that should be drawn. */
-	public get $ridges(): readonly Line[] {
-		if(this._ridgeCache) return this._ridgeCache;
-		const neighborRidges = this._neighbors.flatMap(g => g._rawRidges);
-		return this._ridgeCache = Line.$subtract(this._rawRidges, neighborRidges);
+	public get $drawRidges(): readonly Ridge[] {
+		// Intersection ridges doesn't need to be drawn,
+		// as river ridges will automatically cover that.
+		return this._ridges.filter(r => r.type != CornerType.intersection);
 	}
 
-	public get $traceRidges(): readonly Line[] {
-		return Line.$subtract(this.$ridges, this._getOuterRidges(CornerType.side));
+	/** All ridges used for tracing */
+	public get $traceRidges(): readonly Ridge[] {
+		// Side ridges are handled separately, so are not included.
+		return this._ridges.filter(r => r.type != CornerType.side);
 	}
 
 	/** All axis-parallel creases that should be drawn. */
@@ -140,7 +148,7 @@ export class Device implements ISerializable<JDevice> {
 		return result;
 	}
 
-	public $getConnectionRidges(internalOnly: boolean): Line[] {
+	public $getConnectionRidges(internalOnly: boolean): Ridge[] {
 		const result: Line[] = [];
 		for(const [i, ov] of this.$partition.$overlaps.entries()) {
 			for(const [q, c] of ov.c.entries()) {
@@ -168,11 +176,18 @@ export class Device implements ISerializable<JDevice> {
 		return obj.$transform(f.x, f.y).$add(this._delta) as T;
 	}
 
+	/** All ridges after considering overlapping with neighbors. */
+	private get _ridges(): readonly Ridge[] {
+		if(this._ridgeCache) return this._ridgeCache;
+		const neighborRidges = this._neighbors.flatMap(g => g._rawRidges);
+		return this._ridgeCache = Line.$subtract(this._rawRidges, neighborRidges);
+	}
+
 	/**
 	 * Ridges of the {@link Region}s before transformation.
 	 * The result is constant, so it is cached.
 	 */
-	@cache private get _innerRidges(): readonly Line[] {
+	@cache private get _innerRidges(): readonly Ridge[] {
 		const result: Line[] = [];
 		for(const region of this._regions) {
 			const parallelRegions = this._regions.filter(
@@ -207,22 +222,35 @@ export class Device implements ISerializable<JDevice> {
 	}
 
 	/** Self-owned ridges. */
-	private get _rawRidges(): readonly Line[] {
+	private get _rawRidges(): readonly Ridge[] {
 		if(this._rawRidgeCache) return this._rawRidgeCache;
 		const selfRidges = this._innerRidges.map(l => this._transform(l));
 		const outerRidges = this._getOuterRidges();
 		return this._rawRidgeCache = selfRidges.concat(outerRidges);
 	}
 
-	private _getOuterRidges(type?: CornerType): readonly Line[] {
+	private _getOuterRidges(): readonly Ridge[] {
 		const result = this.$getConnectionRidges(false);
 		for(const map of this.$partition.$externalCornerMaps) {
-			if(type && map.corner.type != type) continue;
 			const from = this.$resolveCornerMap(map);
-			const to = this.$partition.$getExternalConnectionTarget(from, map);
-			if(to) result.push(new Line(from, to));
+			const dir = this._resolveCornerDirection(map.corner);
+			const to = this.$partition.$getExternalConnectionTarget(from, map, dir);
+			if(to) {
+				const ridge = new Line(from, to) as Ridge;
+				ridge.type = map.corner.type; // Mark the ridge type
+				result.push(ridge);
+			}
 		}
 		return result;
+	}
+
+	private _resolveCornerDirection(corner: JCorner): QuadrantDirection | undefined {
+		if(corner.type != CornerType.intersection) return undefined;
+		const codes = this.$partition.$configuration.$repo.$quadrants.keys();
+		for(const code of codes) {
+			if(code >>> 2 == corner.e) return code & MASK;
+		}
+		return undefined;
 	}
 
 	private _clearCache(): void {

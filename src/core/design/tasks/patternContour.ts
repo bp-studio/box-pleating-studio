@@ -8,7 +8,7 @@ import { Trace } from "../layout/trace";
 
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { Repository } from "../layout/repository";
-import type { ITreeNode, NodeGraphics, PatternContour } from "../context";
+import type { ITreeNode, NodeGraphics } from "../context";
 
 //=================================================================
 /**

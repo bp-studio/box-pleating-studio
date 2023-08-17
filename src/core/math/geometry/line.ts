@@ -90,9 +90,10 @@ export class Line {
 			this.p1.eq(l.p2) && this.p2.eq(l.p1);
 	}
 
-	public $isOnRight(point: Point): boolean {
+	public $isOnRight(point: Point, allowEq = false): boolean {
 		const v = point.sub(this.p1).$rotate90();
-		return v.dot(this.$vector) > 0;
+		const dot = v.dot(this.$vector);
+		return dot > 0 || allowEq && dot == 0;
 	}
 
 	/**
