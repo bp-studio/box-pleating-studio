@@ -50,7 +50,9 @@ function processRepo(repo: Repository): void {
 
 export function clearPatternContourForRepo(repo: Repository): void {
 	for(const id of repo.$nodeIds) {
-		const g = State.$tree.$nodes[id]!.$graphics;
+		const node = State.$tree.$nodes[id];
+		if(!node) continue;
+		const g = node.$graphics;
 		g.$patternContours = g.$patternContours.filter(p => p.repo != repo.$signature);
 	}
 }
