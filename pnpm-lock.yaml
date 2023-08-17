@@ -16,8 +16,8 @@ dependencies:
     specifier: ^6.4.2
     version: 6.4.2
   '@paypal/paypal-js':
-    specifier: ^6.0.1
-    version: 6.0.1
+    specifier: ^7.0.0
+    version: 7.0.0
   '@pixi/constants':
     specifier: ^7.2.4
     version: 7.2.4
@@ -2470,8 +2470,8 @@ packages:
       semver: 7.5.4
     dev: true
 
-  /@paypal/paypal-js@6.0.1:
-    resolution: {integrity: sha512-bvYetmkg2GEC6onsUJQx1E9hdAJWff2bS3IPeiZ9Sh9U7h26/fIgMKm240cq/908sbSoDjHys75XXd8at9OpQA==}
+  /@paypal/paypal-js@7.0.0:
+    resolution: {integrity: sha512-j98rdswXu3Avsi+vLzbunwjDXqKVRyPjG5EoutVKXR0lGxGIlbTajl/edOQos3PFeeDikvQgGY3aDLlA5CFPZg==}
     dependencies:
       promise-polyfill: 8.3.0
     dev: false
