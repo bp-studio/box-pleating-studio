@@ -90,6 +90,11 @@ export class Line {
 			this.p1.eq(l.p2) && this.p2.eq(l.p1);
 	}
 
+	/** Return a clone of the current {@link Line}, but in opposite direction. */
+	public $reverse(): Line {
+		return new Line(this.p2, this.p1);
+	}
+
 	public $isOnRight(point: Point, allowEq = false): boolean {
 		const v = point.sub(this.p1).$rotate90();
 		const dot = v.dot(this.$vector);

@@ -3,8 +3,9 @@ import { Store } from "./store";
 import { patternGenerator } from "./generators/patternGenerator";
 import { CornerType } from "shared/json";
 import { Line } from "core/math/geometry/line";
+import { Point } from "core/math/geometry/point";
 
-import type { Point } from "core/math/geometry/point";
+import type { Quadrant } from "./pattern/quadrant";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
@@ -103,6 +104,8 @@ export class Configuration implements ISerializable<JConfiguration> {
 	 */
 	public get $sideDiagonals(): SideDiagonal[] {
 		if(this._sideDiagonalCache) return this._sideDiagonalCache;
+		const q = this.$repo.$quadrants.values().next().value as Quadrant;
+		const p = new Point(q.$point);
 
 		const result: SideDiagonal[] = [];
 		for(const [i, partition] of this.$partitions.entries()) {
@@ -111,6 +114,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 					const corner = this.$pattern!.$devices[i].$resolveCornerMap(map);
 					let diagonal = new Line(...partition.$getExternalConnectionTargets(map));
 					if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
+
+					// Orient the diagonal for determining entering/leaving
+					if(diagonal.$isOnRight(p)) diagonal = diagonal.$reverse();
+
 					(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
 					result.push(diagonal as SideDiagonal);
 				}

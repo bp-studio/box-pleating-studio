@@ -93,6 +93,14 @@ export class Trace {
 				const p = line.$intersection(diagonal);
 				if(!p) continue;
 				diagonals.delete(diagonal);
+
+				// If the intersection is the endpoint of the line,
+				// we need to further check if we're indeed "entering" the pattern.
+				if(
+					p.eq(line.p2) && !diagonal.$isOnRight(line.p1) ||
+					p.eq(line.p1) && !diagonal.$isOnRight(line.p2)
+				) continue;
+
 				const hv = this._diagonalHitInitialVector(line, v, diagonal);
 				if(!p.eq(diagonal.p0)) {
 					return { point: p, vector: hv };
@@ -145,10 +153,9 @@ export class Trace {
 			const p2 = new Point(rough.outer[(start + i + 1) % l]);
 			// This checking is valid as the lines in the RoughContour are all AA lines,
 			// and it is not possible that a single line get across the pattern bounding box.
-			if(!this._boundingBox.$contains(p1) && !this._boundingBox.$contains(p2)) {
-				continue;
+			if(this._boundingBox.$contains(p1) || this._boundingBox.$contains(p2)) {
+				result.push(new Line(p1, p2));
 			}
-			result.push(new Line(p1, p2));
 		}
 		return result.length ? result : null;
 	}
