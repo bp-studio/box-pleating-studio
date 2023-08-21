@@ -57,7 +57,10 @@ export interface PatternContour extends Path {
 	 * Used for removing the path should the corresponding repo change
 	 * (see {@link clearPatternContourForRepo}).
 	 */
-	repo?: string;
+	$repo: string;
+
+	/** Same as {@link Repository.$nodeIds}. */
+	$ids: readonly number[];
 }
 
 export interface NodeGraphics {

@@ -1,8 +1,8 @@
 import { Rectangle } from "core/math/geometry/rectangle";
 import { SlashDirection } from "shared/types/direction";
 import { TraceContext, getNextIntersection } from "./traceContext";
+import { Line } from "core/math/geometry/line";
 
-import type { Line } from "core/math/geometry/line";
 import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "./pattern/device";
 import type { SideDiagonal } from "./configuration";
@@ -59,7 +59,9 @@ export class Trace {
 				else return null; // Something went wrong. Output nothing.
 			}
 			if(diagonals.has(intersection.line as SideDiagonal)) {
-				path.push(intersection.point);
+				const lastLine = new Line(path[path.length - 1], intersection.point);
+				const existingCorner = rough.outer.find(p => lastLine.$contains(p));
+				if(!existingCorner) path.push(intersection.point);
 				break;
 			}
 			ridges.delete(intersection.line);
@@ -74,7 +76,7 @@ export class Trace {
 			if(intersection.endPoint && rough.outer.some(p => intersection.point.eq(p))) break;
 		}
 
-		return path.map(p => p.$toIPoint());
+		return path.map(p => p.$toIPoint()) as PatternContour;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

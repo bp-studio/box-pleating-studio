@@ -62,12 +62,19 @@ function combineContour(node: ITreeNode): void {
 	const g = node.$graphics;
 	const childrenPatternContours: Path[] = [];
 	for(const child of node.$children) {
-		childrenPatternContours.push(...child.$graphics.$patternContours);
+		// There's no need to process a child pattern contour if the
+		// corresponding pattern does not involve the current node
+		const contours = child.$graphics.$patternContours.filter(p => p.$ids.includes(node.id));
+		childrenPatternContours.push(...contours);
 	}
 	const result: Contour[] = g.$roughContours.map(c => clone(c));
 	// TODO: This part could be made more efficient
 	for(const path of g.$patternContours) tryInsertOuter(path, result);
 	for(const path of childrenPatternContours) tryInsertInner(path, result);
+	for(const contour of result) {
+		contour.outer = simplify(contour.outer);
+		if(contour.inner) contour.inner = contour.inner.map(simplify);
+	}
 	g.$contours = result;
 }
 
@@ -174,6 +181,11 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 		const p2 = path[(i + 1) % l];
 
 		// Check for right angle.
-		if((p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y) == 0) yield [p1, p0, p2];
+		const dot = (p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
+		if(dot == 0) yield [p1, p0, p2];
 	}
+}
+
+function simplify(path: Path): Path {
+	return path.filter((p, i, a) => !same(p, a[(i + 1) % a.length]));
 }

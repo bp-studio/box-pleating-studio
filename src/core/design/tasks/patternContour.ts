@@ -41,7 +41,8 @@ function processRepo(repo: Repository): void {
 		for(const contour of node.$graphics.$roughContours) {
 			const path = trace.$generate(contour);
 			if(path) {
-				path.repo = repo.$signature;
+				path.$ids = repo.$nodeIds;
+				path.$repo = repo.$signature;
 				node.$graphics.$patternContours.push(path);
 			}
 		}
@@ -53,7 +54,7 @@ export function clearPatternContourForRepo(repo: Repository): void {
 		const node = State.$tree.$nodes[id];
 		if(!node) continue;
 		const g = node.$graphics;
-		g.$patternContours = g.$patternContours.filter(p => p.repo != repo.$signature);
+		g.$patternContours = g.$patternContours.filter(p => p.$repo != repo.$signature);
 	}
 }
 
