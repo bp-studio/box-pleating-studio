@@ -1,10 +1,15 @@
 const $ = require("../utils/proxy");
 const gulp = require("gulp");
+const esbuildIfdef = require("esbuild-ifdef").default;
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
 const { target, extra: ext, sourceMap } = require("../utils/esbuild");
 const extra = [__filename, ext, config.src.core + "/**/*", config.src.shared + "/**/*"];
+
+function ifdef(debug) {
+	return esbuildIfdef({ variables: { DEBUG: debug } });
+}
 
 function esb(options) {
 	return $.esbuild(Object.assign({}, {
@@ -31,6 +36,7 @@ gulp.task("coreDebug", () =>
 			sourcemap: "external",
 			sourcesContent: false,
 			sourceRoot: "../../",
+			plugins: [ifdef(true)],
 		}))
 		.pipe(sourceMap())
 		.pipe(gulp.dest(config.dest.debug, { sourcemaps: "." }))
@@ -49,6 +55,7 @@ gulp.task("coreDist", () =>
 			},
 			minify: true,
 			mangleProps: /^[$_]/,
+			plugins: [ifdef(false)],
 		}))
 		.pipe(gulp.dest(config.dest.dist))
 );
