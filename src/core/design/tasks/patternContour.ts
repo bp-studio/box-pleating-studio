@@ -54,7 +54,10 @@ export function clearPatternContourForRepo(repo: Repository): void {
 		const node = State.$tree.$nodes[id];
 		if(!node) continue;
 		const g = node.$graphics;
-		g.$patternContours = g.$patternContours.filter(p => p.$repo != repo.$signature);
+		if(g.$patternContours.some(p => p.$repo == repo.$signature)) {
+			State.$contourWillChange.add(node);
+			g.$patternContours = g.$patternContours.filter(p => p.$repo != repo.$signature);
+		}
 	}
 }
 

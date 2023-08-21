@@ -36,7 +36,6 @@ export class Configuration implements ISerializable<JConfiguration> {
 	private _index: number = 0;
 
 	public $originDirty: boolean = false;
-	private _sideDiagonalCache: SideDiagonal[] | undefined;
 
 	constructor(repo: Repository, junctions: JJunction[], partitions: readonly JPartition[], proto?: JPattern) {
 		this.$repo = repo;
@@ -95,7 +94,6 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this._patterns.$entries.forEach(p => p.$originDirty = true);
 		this.$pattern?.$tryUpdateOrigin();
 		this.$originDirty = false;
-		this._sideDiagonalCache = undefined;
 	}
 
 	/**
@@ -103,7 +101,6 @@ export class Configuration implements ISerializable<JConfiguration> {
 	 * so we make a special getter for that.
 	 */
 	public get $sideDiagonals(): SideDiagonal[] {
-		if(this._sideDiagonalCache) return this._sideDiagonalCache;
 		const q = this.$repo.$quadrants.values().next().value as Quadrant;
 		const p = new Point(q.$point);
 
@@ -123,7 +120,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 				}
 			}
 		}
-		return this._sideDiagonalCache = result;
+		return result;
 	}
 }
 

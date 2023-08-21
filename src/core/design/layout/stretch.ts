@@ -1,6 +1,7 @@
 import { Repository } from "./repository";
 import { getStructureSignature } from "./junction/validJunction";
 import { State } from "core/service/state";
+import { clearPatternContourForRepo } from "../tasks/patternContour";
 
 import type { StretchData } from "core/service/updateModel";
 import type { JStretch } from "shared/json";
@@ -63,6 +64,7 @@ export class Stretch implements ISerializable<JStretch> {
 			return;
 		}
 
+		clearPatternContourForRepo(this._repo);
 		this.$isActive = true;
 		if(State.$isDragging) {
 			this._repoCache.set(this._repo.$signature, this._repo);
