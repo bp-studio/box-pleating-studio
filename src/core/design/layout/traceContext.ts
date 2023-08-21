@@ -2,6 +2,7 @@ import { Line, getIntersection } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { SlashDirection } from "shared/types/direction";
 
+import type { Ridge } from "./pattern/device";
 import type { IIntersection } from "core/math/geometry/line";
 import type { Vector } from "core/math/geometry/vector";
 import type { SideDiagonal } from "./configuration";
@@ -10,6 +11,7 @@ import type { Trace } from "./trace";
 
 interface JIntersection extends IIntersection {
 	angle: number;
+	endPoint: boolean;
 }
 
 interface Ray {
@@ -78,21 +80,15 @@ export class TraceContext {
 			}
 
 			// Case 2: normal ridges
-			const intersection = getNextIntersection(ridges, ray, true);
-			if(intersection) {
-				const result = {
-					point: intersection.point,
-					vector: intersection.line.$reflect(ray.vector),
-				};
+			const intersection = getNextIntersection(ridges, ray, line);
+			if(!intersection) continue;
+			const result = {
+				point: intersection.point,
+				vector: intersection.line.$reflect(ray.vector),
+			};
 
-				// Examine if traveling this way would get beyond the rough contour.
-				// If so, we should ignore such intersection and keep going.
-				// const testPoint = result.point.$add(result.vector.$normalize().$scale(new Fraction(1, 1000)));
-				// if(windingNumber(testPoint, rough) == 0) continue;
-
-				ridges.delete(intersection.line);
-				return result;
-			}
+			ridges.delete(intersection.line);
+			return result;
 		}
 		return null;
 	}
@@ -143,22 +139,25 @@ export class TraceContext {
 	}
 }
 
-export function getNextIntersection(lines: Iterable<Line>, ray: Ray, lineMode = false): JIntersection | null {
+export function getNextIntersection(ridges: Iterable<Ridge>, ray: Ray, edge?: Line): JIntersection | null {
 	let result: JIntersection | null = null;
 	const { point, vector } = ray;
 	const self = new Line(point, vector);
-	for(const line of lines) {
-		const intersection = getIntersection(line, point, vector, true, lineMode) as JIntersection;
-		if(!intersection) continue;
+	for(const ridge of ridges) {
+		const intersection = getIntersection(ridge, point, vector, true, Boolean(edge)) as JIntersection;
 
+		// In finding initial vector, the head of the given edge should be ignored.
+		if(!intersection || edge && intersection.point.eq(edge.p1)) continue;
+
+		const isP1 = intersection.point.eq(ridge.p1);
+		const isP2 = intersection.point.eq(ridge.p2);
 		if(
-			!isSideDiagonal(intersection.line) && (
-				intersection.point.eq(line.p1) && self.$isOnRight(line.p2) ||
-				intersection.point.eq(line.p2) && self.$isOnRight(line.p1)
-			)
+			!isSideDiagonal(intersection.line) &&
+			(isP1 && self.$isOnRight(ridge.p2) || isP2 && self.$isOnRight(ridge.p1))
 		) continue;
 
-		intersection.angle = getAngle(vector, line.$vector);
+		intersection.endPoint = isP1 || isP2;
+		intersection.angle = getAngle(vector, ridge.$vector);
 		if(isCloser(intersection, result)) result = intersection;
 	}
 	return result;

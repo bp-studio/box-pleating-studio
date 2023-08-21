@@ -7,6 +7,7 @@ import { foreachPair } from "shared/utils/array";
 import { dist } from "../context/tree";
 import { Quadrant } from "./pattern/quadrant";
 import { SlashDirection } from "shared/types/direction";
+import { minComparator } from "shared/data/heap/heap";
 
 import type { ITreeNode } from "../context";
 import type { JRepository } from "core/service/updateModel";
@@ -88,6 +89,10 @@ export class Repository implements ISerializable<JRepository | undefined> {
 
 		this.$nodeIds = Array.from(nodeIds);
 		this.$leaves = Array.from(leaves);
+
+		///#if DEBUG
+		this.$leaves.sort(minComparator);
+		///#endif
 
 		if(lcaMap) {
 			const tree = State.$tree;

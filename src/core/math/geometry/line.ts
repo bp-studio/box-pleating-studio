@@ -264,14 +264,14 @@ export class Line {
 
 	///#if DEBUG==true
 
-	public static $parseTest(jsons: Record<string, unknown>[]): Line[] {
+	public static $parseTest<T extends Line = Line>(jsons: Record<string, unknown>[]): T[] {
 		return jsons.map(j => {
 			const line = new Line(Point.$parseTest(j.p1), Point.$parseTest(j.p2));
 			const r = line as unknown as Record<string, unknown>;
 			if("type" in j) r.type = j.type;
 			if("p0" in j) r.p0 = Point.$parseTest(j.p0);
 			return line;
-		});
+		}) as T[];
 	}
 
 	///#endif

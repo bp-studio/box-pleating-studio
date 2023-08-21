@@ -68,6 +68,10 @@ export class Trace {
 				vector: intersection.line.$reflect(cursor.vector),
 			};
 			path.push(cursor.point);
+
+			// The current logic is, when it hits a corner of the rough contour, it should end immediately.
+			// This is more an unproven hypothesis.
+			if(intersection.endPoint && rough.outer.some(p => intersection.point.eq(p))) break;
 		}
 
 		return path.map(p => p.$toIPoint());
@@ -83,7 +87,7 @@ export class Trace {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
 		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");
-		const sideDiagonals = `Line.$parseTest(${simp(this.$sideDiagonals)}) as SideDiagonal[]`;
+		const sideDiagonals = `Line.$parseTest<SideDiagonal>(${simp(this.$sideDiagonals)})`;
 		const rough = simp(roughContour);
 		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(${rough});`;
 	}
