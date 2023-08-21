@@ -48,7 +48,7 @@ function addRepo(repo: Repository): void {
 	for(const [i, device] of repo.$pattern.$devices.entries()) {
 		State.$updateResult.graphics["s" + repo.$stretch.$id + "." + i] = {
 			contours: device.$contour,
-			ridges: device.$drawRidges.map(l => l.$toILine()),
+			ridges: device.$drawRidges,
 			axisParallel: device.$axisParallels,
 			location: device.$location,
 			// Note that the range of all devices in the pattern will be updated.

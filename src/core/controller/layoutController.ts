@@ -61,7 +61,7 @@ export namespace LayoutController {
 			const pattern = stretch.$repo.$pattern;
 			if(!pattern) continue;
 			for(const device of pattern.$devices) {
-				addLines(lines, device.$drawRidges.map(l => l.$toILine()), CreaseType.Mountains);
+				addLines(lines, device.$drawRidges, CreaseType.Mountains);
 				addLines(lines, device.$axisParallels, CreaseType.Valley);
 			}
 		}
