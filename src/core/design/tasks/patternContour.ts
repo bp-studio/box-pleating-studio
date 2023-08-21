@@ -34,7 +34,7 @@ function processRepo(repo: Repository): void {
 	}
 
 	const coverageMap = getNodeCoverageMap(repo);
-	const trace = new Trace(repo);
+	const trace = Trace.$fromRepo(repo);
 
 	//TODO: Why do we need coverage info here?
 	for(const [node, leaves] of coverageMap.entries()) {

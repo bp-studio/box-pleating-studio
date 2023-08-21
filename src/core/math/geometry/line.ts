@@ -257,6 +257,24 @@ export class Line {
 			if(!p1.eq(p2)) yield new Line(p1, p2);
 		}
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Debug methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	///#if DEBUG==true
+
+	public static $parseTest(jsons: Record<string, unknown>[]): Line[] {
+		return jsons.map(j => {
+			const line = new Line(Point.$parseTest(j.p1), Point.$parseTest(j.p2));
+			const r = line as unknown as Record<string, unknown>;
+			if("type" in j) r.type = j.type;
+			if("p0" in j) r.p0 = Point.$parseTest(j.p0);
+			return line;
+		});
+	}
+
+	///#endif
 }
 
 export interface IIntersection {
