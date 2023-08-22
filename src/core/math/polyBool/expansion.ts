@@ -1,6 +1,7 @@
 import { AAUnion } from "./union/aaUnion";
 import { ExChainer } from "./chainer/exChainer";
 import { SlashDirection } from "shared/types/direction";
+import { windingNumber } from "../geometry/winding";
 
 import type { Path, Polygon, RoughContour, StartIndexMap } from "shared/types/geometry";
 
@@ -15,6 +16,7 @@ export function expand(polygon: Polygon, units: number): RoughContour[] {
 
 	const result = expander.$get(...polygons);
 	const contours: RoughContour[] = [];
+	const newHoles: Path[] = [];
 	for(const path of result) {
 		const from = path.from!;
 		const inner = from.map(n => {
@@ -22,7 +24,9 @@ export function expand(polygon: Polygon, units: number): RoughContour[] {
 			return polygon[n];
 		});
 		const isHole = polygons[from[0]][0].isHole;
-		if(isHole && span(path) > span(inner[0])) {
+		if(!isHole && expandPath(path, 1).isHole) {
+			newHoles.push(path);
+		} else if(isHole && span(path) > span(inner[0])) {
 			// In this case a hole was over-shrunk and ended up even bigger.
 			// We need to treat it as a simple filling.
 			contours.push({
@@ -38,6 +42,13 @@ export function expand(polygon: Polygon, units: number): RoughContour[] {
 				startIndices: findStartIndices(path),
 			});
 		}
+	}
+
+	// Decide where the newly created holes should go
+	for(const path of newHoles) {
+		path.isHole = false; // Explicitly mark this as not a hole
+		const contour = contours.find(c => windingNumber(path[0], c.outer) != 0);
+		if(contour) (contour.inner ||= []).push(path);
 	}
 
 	// The remaining paths are the holes that vanishes after expansion.

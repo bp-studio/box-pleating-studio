@@ -12,6 +12,7 @@ import type { Repository } from "../layout/repository";
 import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
+import type { expand } from "core/math/polyBool/expansion";
 
 //=================================================================
 /**
@@ -155,24 +156,32 @@ function riverRidge(node: ITreeNode, sideCorners: Point[]): ILine[] {
 		// It is possible that a contour of a river has no holes in invalid layouts.
 		// In that case adding ridges doesn't make sense either, so skip the rest.
 		if(!contour.inner) continue;
+		const outers = [contour.outer];
 
 		// Create a record for all the vertices in inner contour.
 		const innerRightCorners = new Map<number, [IPoint, IPoint, IPoint]>();
 		for(const path of contour.inner) {
-			for(const [p1, p0, p2] of pathRightCorners(path)) {
-				innerRightCorners.set(getOrderedKey(p1.x, p1.y), [p1, p0, p2]);
+			if(path.isHole === false) {
+				/** If it's explicitly marked (see {@link expand}), treat it as outer path. */
+				outers.push(path);
+			} else {
+				for(const [p1, p0, p2] of pathRightCorners(path)) {
+					innerRightCorners.set(getOrderedKey(p1.x, p1.y), [p1, p0, p2]);
+				}
 			}
 		}
 
 		// Check for each vertex on the outer contour.
-		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
-			const p = getCorrespondingPoint(p1, p0, p2, width, 1);
-			const innerKey = getOrderedKey(p.x, p.y);
-			if(innerRightCorners.has(innerKey)) {
-				ridges.push([p1, p]);
-				innerRightCorners.delete(innerKey);
-			} else {
-				tryAddRemainingRidge(p1, p, sideCorners, ridges);
+		for(const outer of outers) {
+			for(const [p1, p0, p2] of pathRightCorners(outer)) {
+				const p = getCorrespondingPoint(p1, p0, p2, width, 1);
+				const innerKey = getOrderedKey(p.x, p.y);
+				if(innerRightCorners.has(innerKey)) {
+					ridges.push([p1, p]);
+					innerRightCorners.delete(innerKey);
+				} else {
+					tryAddRemainingRidge(p1, p, sideCorners, ridges);
+				}
 			}
 		}
 
@@ -214,5 +223,7 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 }
 
 function simplify(path: Path): Path {
-	return path.filter((p, i, a) => !same(p, a[(i + 1) % a.length]));
+	const result: Path = path.filter((p, i, a) => !same(p, a[(i + 1) % a.length]));
+	result.isHole = path.isHole;
+	return result;
 }
