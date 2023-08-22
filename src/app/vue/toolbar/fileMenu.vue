@@ -6,7 +6,7 @@
 		<Divider />
 
 		<template v-if="isFileApiEnabled">
-			<Opener class="dropdown-item m-0" ref="opn" @open="open($event)">
+			<Opener class="dropdown-item m-0" ref="opn" @open="open($event)" multiple>
 				<Hotkey icon="far fa-folder-open" ctrl hk="O">{{ $t('toolbar.file.open') }}</Hotkey>
 			</Opener>
 			<RecentMenu />

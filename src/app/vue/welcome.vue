@@ -44,7 +44,7 @@
 						<i class="bp-file fa-fw me-2" />
 						<span v-t="'toolbar.file.new'" />
 					</div>
-					<Opener @open="Import.open($event, false)" class="quick-item">
+					<Opener @open="Import.open($event, false)" multiple class="quick-item">
 						<i class="bp-folder-open fa-fw me-2" />
 						<span v-t="'toolbar.file.open'" />
 					</Opener>
