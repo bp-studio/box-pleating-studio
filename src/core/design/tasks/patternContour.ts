@@ -18,6 +18,14 @@ import type { ITreeNode, NodeGraphics } from "../context";
 export const patternContourTask = new Task(patternContour, graphicsTask);
 
 function patternContour(): void {
+	const tree = State.$tree;
+	for(const stretch of State.$stretches.values()) {
+		const nodes = stretch.$repo.$nodeIds.map(id => tree.$nodes[id]!);
+		if(nodes.some(n => State.$contourWillChange.has(n))) {
+			State.$repoUpdated.add(stretch.$repo);
+		}
+	}
+
 	for(const repo of State.$repoUpdated) {
 		clearPatternContourForRepo(repo); // Reset
 		processRepo(repo);
