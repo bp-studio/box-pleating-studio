@@ -97,6 +97,9 @@ export class Device implements ISerializable<JDevice> {
 		// Clear cache of self and neighbors
 		this._clearCache();
 		this._neighbors.forEach(n => n._clearCache());
+
+		// Fire event
+		this.$partition.$configuration.$onDeviceMove();
 	}
 
 	/** All ridges that should be drawn. */

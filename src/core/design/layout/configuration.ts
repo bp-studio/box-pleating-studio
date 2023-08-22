@@ -5,6 +5,7 @@ import { CornerType } from "shared/json";
 import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 
+import type { CornerMap } from "./partition";
 import type { Quadrant } from "./pattern/quadrant";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
@@ -34,6 +35,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	private readonly _patterns: Store<Pattern>;
 	private _index: number = 0;
+	private _sideCornerCache: SideCornerInfo[] | undefined;
 
 	public $originDirty: boolean = false;
 
@@ -85,6 +87,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 		return patterns[this._index];
 	}
 
+	public $onDeviceMove(): void {
+		this._sideCornerCache = undefined;
+	}
+
 	public $complete(): void {
 		this._patterns.$rest();
 	}
@@ -94,6 +100,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this._patterns.$entries.forEach(p => p.$originDirty = true);
 		this.$pattern?.$tryUpdateOrigin();
 		this.$originDirty = false;
+		this.$onDeviceMove();
 	}
 
 	/**
@@ -105,26 +112,41 @@ export class Configuration implements ISerializable<JConfiguration> {
 		const p = new Point(q.$point);
 
 		const result: SideDiagonal[] = [];
+		for(const { map, corner, partition } of this.$sideCorners) {
+			let diagonal = new Line(...partition.$getExternalConnectionTargets(map));
+			if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
+
+			// Orient the diagonal for determining entering/leaving
+			if(diagonal.$isOnRight(p)) diagonal = diagonal.$reverse();
+
+			(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
+			result.push(diagonal as SideDiagonal);
+		}
+		return result;
+	}
+
+	public get $sideCorners(): SideCornerInfo[] {
+		if(this._sideCornerCache) return this._sideCornerCache;
+		const result: SideCornerInfo[] = [];
 		for(const [i, partition] of this.$partitions.entries()) {
 			for(const map of partition.$cornerMap) {
 				if(map.corner.type == CornerType.side) {
 					const corner = this.$pattern!.$devices[i].$resolveCornerMap(map);
-					let diagonal = new Line(...partition.$getExternalConnectionTargets(map));
-					if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
-
-					// Orient the diagonal for determining entering/leaving
-					if(diagonal.$isOnRight(p)) diagonal = diagonal.$reverse();
-
-					(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
-					result.push(diagonal as SideDiagonal);
+					result.push({ map, corner, partition });
 				}
 			}
 		}
-		return result;
+		return this._sideCornerCache = result;
 	}
 }
 
 export interface SideDiagonal extends Line {
 	/** The corresponding side corner. */
 	readonly p0: Point;
+}
+
+interface SideCornerInfo {
+	readonly map: CornerMap;
+	readonly corner: Point;
+	readonly partition: Partition;
 }

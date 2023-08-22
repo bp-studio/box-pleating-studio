@@ -6,8 +6,8 @@ import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { clone } from "shared/utils/clone";
 import { Line } from "core/math/geometry/line";
-import { Point } from "core/math/geometry/point";
 
+import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
 import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
@@ -26,11 +26,17 @@ function graphics(): void {
 		if(repo.$pattern) addRepo(repo);
 	}
 
+	const sideCorners: Point[] = [];
+	for(const stretch of State.$stretches.values()) {
+		const config = stretch.$repo.$configuration;
+		if(config) sideCorners.push(...config.$sideCorners.map(s => s.corner));
+	}
+
 	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
 		const g = node.$graphics;
 		combineContour(node);
-		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node);
+		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node, sideCorners);
 
 		State.$updateResult.graphics[node.$tag] = {
 			contours: g.$contours,
@@ -68,9 +74,12 @@ function combineContour(node: ITreeNode): void {
 		childrenPatternContours.push(...contours);
 	}
 	const result: Contour[] = g.$roughContours.map(c => clone(c));
+
 	// TODO: This part could be made more efficient
+	// To temporarily disable pattern contour, comment the following two lines.
 	for(const path of g.$patternContours) tryInsertOuter(path, result);
 	for(const path of childrenPatternContours) tryInsertInner(path, result);
+
 	for(const contour of result) {
 		contour.outer = simplify(contour.outer);
 		if(contour.inner) contour.inner = contour.inner.map(simplify);
@@ -99,13 +108,11 @@ function tryInsert(path: Path, insert: Path): boolean {
 	const last = insert[insert.length - 1];
 	let start: number | undefined, end: number | undefined;
 	for(let i = 0; i < l; i++) {
-		const startPt = new Point(path[i]);
-		const endPt = new Point(path[(i + 1) % l]);
-		const line = new Line(startPt, endPt);
-		if(start === undefined && (line.$contains(first) || startPt.eq(first))) {
+		const line = Line.$fromIPoint(path[i], path[(i + 1) % l]);
+		if(start === undefined && (line.$contains(first) || line.p1.eq(first))) {
 			start = i + 1;
 		}
-		if(end === undefined && (line.$contains(last) || endPt.eq(last))) {
+		if(end === undefined && (line.$contains(last) || line.p2.eq(last))) {
 			end = i + 1;
 		}
 		if(start !== undefined && end !== undefined && start != end) {
@@ -141,7 +148,7 @@ function flapRidge(node: ITreeNode): ILine[] {
  * Add all ridges of the river at right angle corners.
  * The rest are handled by pattern ridges.
  */
-function riverRidge(node: ITreeNode): ILine[] {
+function riverRidge(node: ITreeNode, sideCorners: Point[]): ILine[] {
 	const ridges: ILine[] = [];
 	const width = node.$length;
 	for(const contour of node.$graphics.$contours) {
@@ -150,24 +157,44 @@ function riverRidge(node: ITreeNode): ILine[] {
 		if(!contour.inner) continue;
 
 		// Create a record for all the vertices in inner contour.
-		const innerVertices = new Set<number>();
+		const innerRightCorners = new Map<number, [IPoint, IPoint, IPoint]>();
 		for(const path of contour.inner) {
-			for(const [p] of pathRightCorners(path)) {
-				innerVertices.add(getOrderedKey(p.x, p.y));
+			for(const [p1, p0, p2] of pathRightCorners(path)) {
+				innerRightCorners.set(getOrderedKey(p1.x, p1.y), [p1, p0, p2]);
 			}
 		}
 
 		// Check for each vertex on the outer contour.
 		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
-			const fx = Math.sign(p2.x - p0.x);
-			const fy = Math.sign(p2.y - p0.y);
-			const p = { x: p1.x - fy * width, y: p1.y + fx * width };
-			if(innerVertices.has(getOrderedKey(p.x, p.y))) {
+			const p = getCorrespondingPoint(p1, p0, p2, width, 1);
+			const innerKey = getOrderedKey(p.x, p.y);
+			if(innerRightCorners.has(innerKey)) {
 				ridges.push([p1, p]);
+				innerRightCorners.delete(innerKey);
+			} else {
+				tryAddRemainingRidge(p1, p, sideCorners, ridges);
 			}
+		}
+
+		// Check remaining inner vertices.
+		for(const [p1, p0, p2] of innerRightCorners.values()) {
+			const p = getCorrespondingPoint(p1, p0, p2, width, -1);
+			tryAddRemainingRidge(p1, p, sideCorners, ridges);
 		}
 	}
 	return ridges;
+}
+
+function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number, side: Sign): IPoint {
+	const fx = Math.sign(p2.x - p0.x);
+	const fy = Math.sign(p2.y - p0.y);
+	return { x: p1.x - side * fy * width, y: p1.y + side * fx * width };
+}
+
+function tryAddRemainingRidge(p1: IPoint, p: IPoint, sideCorners: Point[], ridges: ILine[]): void {
+	const line = Line.$fromIPoint(p1, p);
+	const corner = sideCorners.find(c => line.$contains(c, true));
+	if(corner) ridges.push([p1, corner.$toIPoint()]);
 }
 
 /**

@@ -19,6 +19,10 @@ function int(x: number, f: number): number {
 
 export class Line {
 
+	public static $fromIPoint(p1: IPoint, p2: IPoint): Line {
+		return new Line(new Point(p1), new Point(p2));
+	}
+
 	/** Remove duplicates and return a new array of lines. */
 	public static $distinct(lines: Line[]): Line[] {
 		const signatures = new Set<string>();
