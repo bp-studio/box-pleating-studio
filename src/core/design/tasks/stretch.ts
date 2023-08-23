@@ -77,7 +77,7 @@ function grouping(junctions: ValidJunction[]): Team[] {
 
 		foreachPair($flaps, (i, j) => {
 			const junction = quadrantMap.get(i, j);
-			if(junction) $junctions.push(junction);
+			if(junction && group.includes(junction.$q1)) $junctions.push(junction);
 		});
 		result.push({ $junctions, $flaps });
 	}
