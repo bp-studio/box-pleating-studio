@@ -14,7 +14,7 @@ export function expand(polygon: Polygon, units: number): RoughContour[] {
 	const polygons: Polygon[] = polygon.map(path => [expandPath(path, units)]);
 	const pathRemain = new Set(Array.from({ length: polygons.length }, (_, i) => i));
 
-	const result = expander.$get(...polygons);
+	const result = expander.$get(...polygons).map(simplify);
 	const contours: RoughContour[] = [];
 	const newHoles: Path[] = [];
 	for(const path of result) {
@@ -127,5 +127,23 @@ function findStartIndices(path: Path): StartIndexMap {
 			maxY = p.y;
 		}
 	}
+	return result;
+}
+
+/**
+ * In our use cases, it is often implicitly assumed that each vertex of a path
+ * is actually a turning corner. This function removes the non-turning
+ * vertices in the path, to prevent potential bugs in tracing logics.
+ */
+function simplify(path: Path): Path {
+	const l = path.length;
+	const result: Path = path.filter((p, i, a) => {
+		const prev = a[(i + l - 1) % l];
+		const next = a[(i + 1) % l];
+		const dx = next.x - prev.x, dy = next.y - prev.y;
+		// Note that this also removes duplicate vertices
+		return dx != 0 && dy != 0;
+	});
+	result.from = path.from;
 	return result;
 }

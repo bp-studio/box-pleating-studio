@@ -1,9 +1,9 @@
 import { Rectangle } from "core/math/geometry/rectangle";
 import { SlashDirection } from "shared/types/direction";
 import { TraceContext, getNextIntersection } from "./traceContext";
-import { Line } from "core/math/geometry/line";
 
 import type { Point } from "core/math/geometry/point";
+import type { Line } from "core/math/geometry/line";
 import type { Ridge } from "./pattern/device";
 import type { SideDiagonal } from "./configuration";
 import type { RoughContour } from "shared/types/geometry";
@@ -37,10 +37,24 @@ export class Trace {
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
-	public $generate(rough: RoughContour): PatternContour | null {
+	public $generate(rough: RoughContour): PatternContour[] {
+		const result: PatternContour[] = [];
 		const ctx = new TraceContext(this, rough);
-		if(!ctx.$valid) return null;
+		if(!ctx.$valid) return result;
 
+		while(true) {
+			const contour = this._trace(ctx);
+			if(contour) result.push(contour);
+			else break;
+		}
+		return result;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private method
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _trace(ctx: TraceContext): PatternContour | null {
 		const path: Point[] = [];
 		const ridges = new Set(this.$ridges);
 		const diagonals = new Set(this.$sideDiagonals);
@@ -55,27 +69,20 @@ export class Trace {
 		while(true) {
 			const intersection = getNextIntersection(ridges, cursor);
 			if(!intersection) {
-				if(ctx.$testEnd(cursor)) break;
-				else return null; // Something went wrong. Output nothing.
-			}
-			if(diagonals.has(intersection.line as SideDiagonal)) {
-				const lastLine = new Line(path[path.length - 1], intersection.point);
-				const existingCorner = rough.outer.find(p => lastLine.$contains(p));
-				if(!existingCorner) path.push(intersection.point);
+				ctx.$markEnd(cursor.point);
 				break;
 			}
+
 			ridges.delete(intersection.line);
 			cursor = {
 				point: intersection.point,
 				vector: intersection.line.$reflect(cursor.vector),
 			};
-			path.push(cursor.point);
-
-			// The current logic is, when it hits a corner of the rough contour, it should end immediately.
-			// This is more an unproven hypothesis.
-			if(intersection.endPoint && rough.outer.some(p => intersection.point.eq(p))) break;
+			if(!path[path.length - 1].eq(cursor.point)) path.push(cursor.point);
+			if(cursor.vector.$isAxisParallel && ctx.$testEnd(cursor)) break;
 		}
 
+		if(path.length == 1) return null; // Doesn't count
 		return path.map(p => p.$toIPoint()) as PatternContour;
 	}
 

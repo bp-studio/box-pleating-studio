@@ -1,10 +1,11 @@
 import { Line, getIntersection } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { SlashDirection } from "shared/types/direction";
+import { CornerType } from "shared/json";
+import { Vector } from "core/math/geometry/vector";
 
 import type { Ridge } from "./pattern/device";
 import type { IIntersection } from "core/math/geometry/line";
-import type { Vector } from "core/math/geometry/vector";
 import type { SideDiagonal } from "./configuration";
 import type { RoughContour } from "shared/types/geometry";
 import type { Trace } from "./trace";
@@ -21,20 +22,20 @@ interface Ray {
 
 //=================================================================
 /**
- * {@link TraceContext}
+ * {@link TraceContext} holds the states of a tracing operation.
  */
 //=================================================================
 export class TraceContext {
 
+	public readonly $rough: RoughContour;
 	public readonly $valid: boolean = false;
 
 	private readonly _trace: Trace;
-	private readonly _rough: RoughContour;
 	private readonly _candidates!: Line[];
 
 	constructor(trace: Trace, rough: RoughContour) {
 		this._trace = trace;
-		this._rough = rough;
+		this.$rough = rough;
 
 		const start = rough.startIndices[trace.$direction];
 		if(isNaN(start)) return;
@@ -95,16 +96,50 @@ export class TraceContext {
 
 	/** Check if we have successfully connected back to the {@link RoughContour}. */
 	public $testEnd(ray: Ray): boolean {
-		for(const candidate of this._candidates) {
-			if(candidate.$contains(ray.point) && candidate.$vector.$parallel(ray.vector)) return true;
+		for(const [i, candidate] of this._candidates.entries()) {
+			if(candidate.$contains(ray.point) && candidate.$vector.$parallel(ray.vector)) {
+				this._candidates.splice(0, i + 1, new Line(ray.point, candidate.p2));
+				// If the next hinge corner is of a different type, it's safe to end
+				if(this._getNextHingeCornerDirection(candidate.p1) != this._trace.$direction) return true;
+				return !this._testEndException(candidate.p2);
+			}
 		}
 		return false;
 	}
 
+	public $markEnd(p: Point): void {
+		for(const [i, candidate] of this._candidates.entries()) {
+			if(candidate.p1.eq(p)) {
+				this._candidates.splice(0, i);
+				return;
+			}
+		}
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * One exception is when the overlapped edge actually touches the extension of an intersection ridge.
+	 * In that case we should keep going.
+	 */
+	private _testEndException(p: Point): boolean {
+		for(const ridge of this._trace.$ridges) {
+			if(ridge.type != CornerType.intersection) continue;
+			const r = !ridge.$isDegenerated ? ridge :
+				new Line(ridge.p1, Vector.$fromDirection(this._trace.$direction));
+			if(r.$lineContains(p)) return true;
+		}
+		return false;
+	}
+
+	private _getNextHingeCornerDirection(pt: Point): SlashDirection {
+		const hinges = this.$rough.outer;
+		const hingeIndex = hinges.findIndex(p => pt.eq(p));
+		const next = hinges[(hingeIndex + 2) % hinges.length];
+		return getCornerDirection(pt, next);
+	}
 
 	/**
 	 * Find lines in the {@link RoughContour} that might intersect with the pattern,
@@ -182,4 +217,9 @@ function isCloser(r: JIntersection, x: JIntersection | null): boolean {
 
 function isSideDiagonal(line: Line): line is SideDiagonal {
 	return "p0" in line;
+}
+
+function getCornerDirection(prev: IPoint, next: IPoint): SlashDirection {
+	const dx = next.x - prev.x, dy = next.y - prev.y;
+	return dx * dy < 0 ? SlashDirection.FW : SlashDirection.BW;
 }

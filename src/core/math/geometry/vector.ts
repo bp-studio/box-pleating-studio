@@ -1,6 +1,7 @@
 import { Fraction } from "../fraction";
 import { $reduce } from "../utils/gcd";
 import { Couple } from "./couple";
+import { SlashDirection } from "shared/types/direction";
 
 import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Rational } from "../fraction";
@@ -16,6 +17,10 @@ export class Vector extends Couple {
 	/** Returns a new instance of the zero-vector. */
 	public static get ZERO(): Vector {
 		return new Vector(0, 0);
+	}
+
+	public static $fromDirection(dir: SlashDirection): Vector {
+		return new Vector(1, dir == SlashDirection.FW ? 1 : -1);
 	}
 
 	/**Create a Vector object */
@@ -36,6 +41,10 @@ export class Vector extends Couple {
 	/** Returns the slope in {@link Fraction}. */
 	public get $slope(): Fraction {
 		return this._y.div(this._x);
+	}
+
+	public get $isAxisParallel(): boolean {
+		return this._x.eq(Fraction.ZERO) || this._y.eq(Fraction.ZERO);
 	}
 
 	/** Rotate the vector 90-degrees in counter-clockwise direction. */
