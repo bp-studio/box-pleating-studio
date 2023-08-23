@@ -3,9 +3,13 @@ import { expect } from "chai";
 import { Tree } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
-import { State } from "core/service/state";
+import { State, fullReset } from "core/service/state";
 
 describe("Tree", function() {
+
+	beforeEach(function() {
+		fullReset();
+	});
 
 	it("Is constructed from JEdge[]", function() {
 		const tree = new Tree([

@@ -7,7 +7,7 @@ import { Vector } from "core/math/geometry/vector";
 import type { Ridge } from "./pattern/device";
 import type { IIntersection } from "core/math/geometry/line";
 import type { SideDiagonal } from "./configuration";
-import type { RoughContour } from "shared/types/geometry";
+import type { Path } from "shared/types/geometry";
 import type { Trace } from "./trace";
 
 interface JIntersection extends IIntersection {
@@ -27,20 +27,23 @@ interface Ray {
 //=================================================================
 export class TraceContext {
 
-	public readonly $rough: RoughContour;
 	public readonly $valid: boolean = false;
 
 	private readonly _trace: Trace;
 	private readonly _candidates!: Line[];
+	private readonly _hinges!: Path;
 
-	constructor(trace: Trace, rough: RoughContour) {
+	/**
+	 * @param trace The underlying {@link Trace} instance.
+	 * @param hinges The hinge path. It is assumed to be simplified and oriented counterclockwise.
+	 */
+	constructor(trace: Trace, hinges: Path) {
 		this._trace = trace;
-		this.$rough = rough;
+		const path = pickSafeStart(hinges, trace.$direction);
+		if(!path) return;
+		this._hinges = path;
 
-		const start = rough.startIndices[trace.$direction];
-		if(isNaN(start)) return;
-
-		const candidates = this._candidateRoughContourLines(rough, start);
+		const candidates = this._candidateRoughContourLines();
 		if(!candidates) return;
 		this._candidates = candidates;
 
@@ -62,12 +65,8 @@ export class TraceContext {
 				if(!p) continue;
 				diagonals.delete(diagonal);
 
-				// If the intersection is the endpoint of the line,
-				// we need to further check if we're indeed "entering" the pattern.
-				if(
-					p.eq(line.p2) && !diagonal.$isOnRight(line.p1) ||
-					p.eq(line.p1) && !diagonal.$isOnRight(line.p2)
-				) continue;
+				// Check if we're indeed "entering" the pattern.
+				if(!diagonal.$isOnRight(line.p1)) continue;
 
 				const hv = this._diagonalHitInitialVector(line, v, diagonal);
 				if(!p.eq(diagonal.p0)) {
@@ -135,7 +134,7 @@ export class TraceContext {
 	}
 
 	private _getNextHingeCornerDirection(pt: Point): SlashDirection {
-		const hinges = this.$rough.outer;
+		const hinges = this._hinges;
 		const hingeIndex = hinges.findIndex(p => pt.eq(p));
 		const next = hinges[(hingeIndex + 2) % hinges.length];
 		return getCornerDirection(pt, next);
@@ -145,12 +144,12 @@ export class TraceContext {
 	 * Find lines in the {@link RoughContour} that might intersect with the pattern,
 	 * in counter-clockwise ordering.
 	 */
-	private _candidateRoughContourLines(rough: RoughContour, start: number): Line[] | null {
+	private _candidateRoughContourLines(): Line[] | null {
 		const result = [];
-		const l = rough.outer.length;
+		const l = this._hinges.length;
 		for(let i = 0; i < l; i++) {
-			const p1 = new Point(rough.outer[(start + i) % l]);
-			const p2 = new Point(rough.outer[(start + i + 1) % l]);
+			const p1 = new Point(this._hinges[i % l]);
+			const p2 = new Point(this._hinges[(i + 1) % l]);
 			// This checking is valid as the lines in the RoughContour are all AA lines,
 			// and it is not possible that a single line get across the pattern bounding box.
 			if(this._trace.$boundingBox.$contains(p1) || this._trace.$boundingBox.$contains(p2)) {
@@ -222,4 +221,22 @@ function isSideDiagonal(line: Line): line is SideDiagonal {
 function getCornerDirection(prev: IPoint, next: IPoint): SlashDirection {
 	const dx = next.x - prev.x, dy = next.y - prev.y;
 	return dx * dy < 0 ? SlashDirection.FW : SlashDirection.BW;
+}
+
+/**
+ * Re-order the path so that the first point is a safe starting point for tracing
+ * (i.e. it is not involved in the pattern).
+ */
+function pickSafeStart(hinges: Path, dir: SlashDirection): Path | null {
+	const l = hinges.length;
+	for(let i = 0; i < l; i++) {
+		const prev = hinges[(i + l - 1) % l];
+		const next = hinges[(i + 1) % l];
+		if(getCornerDirection(prev, next) != dir) {
+			const path = hinges.concat();
+			path.push(...path.splice(0, i));
+			return path;
+		}
+	}
+	return null;
 }

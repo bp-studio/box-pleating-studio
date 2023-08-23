@@ -59,13 +59,16 @@ export interface PatternContour extends Path {
 	 */
 	$repo: string;
 
+	/** The index in {@link NodeGraphics.$contours} associated with this contour. */
+	$for: number;
+
 	/** Same as {@link Repository.$nodeIds}. */
 	$ids: readonly number[];
 }
 
 export interface NodeGraphics {
 	/** The contours without considering patterns. */
-	$roughContours: RoughContour[];
+	$roughContours: Contour[];
 
 	$patternContours: PatternContour[];
 

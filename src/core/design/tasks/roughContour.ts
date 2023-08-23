@@ -30,10 +30,7 @@ function updater(node: ITreeNode): boolean {
 	if(!node.$parent) return false;
 	if(node.$isLeaf) {
 		const path = node.$AABB.$toPath();
-		node.$graphics.$roughContours = [{
-			outer: path,
-			startIndices: [Direction.LR, Direction.UR],
-		}];
+		node.$graphics.$roughContours = [{ outer: path }];
 	} else {
 		const components = [...node.$children].map(n => n.$graphics.$roughContours.map(c => c.outer));
 		const inner = union.$get(...components);

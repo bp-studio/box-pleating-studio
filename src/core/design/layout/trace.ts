@@ -6,7 +6,7 @@ import type { Point } from "core/math/geometry/point";
 import type { Line } from "core/math/geometry/line";
 import type { Ridge } from "./pattern/device";
 import type { SideDiagonal } from "./configuration";
-import type { RoughContour } from "shared/types/geometry";
+import type { Contour, Path } from "shared/types/geometry";
 import type { Repository } from "./repository";
 import type { PatternContour } from "../context";
 
@@ -37,15 +37,15 @@ export class Trace {
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
-	public $generate(rough: RoughContour): PatternContour[] {
+	public $generate(hinges: Path): PatternContour[] {
 		const result: PatternContour[] = [];
-		const ctx = new TraceContext(this, rough);
+		const ctx = new TraceContext(this, hinges);
 		if(!ctx.$valid) return result;
 
 		while(true) {
 			const contour = this._trace(ctx);
-			if(contour) result.push(contour);
-			else break;
+			if(!contour) break;
+			result.push(contour);
 		}
 		return result;
 	}
@@ -92,7 +92,7 @@ export class Trace {
 
 	///#if DEBUG==true
 
-	public $createTestCase(roughContour: RoughContour): string {
+	public $createTestCase(roughContour: Contour): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
 		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");

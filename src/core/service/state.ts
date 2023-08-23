@@ -160,3 +160,14 @@ export namespace State {
 	$reset();
 	$resetResult();
 }
+
+/** For unit tests only */
+export function fullReset(): void {
+	State.$reset();
+	State.$junctions.clear();
+	State.$stretches.clear();
+	State.$invalidJunctionDiff.clear();
+	State.$stretchDiff.clear();
+	State.$patternDiff.clear();
+	State.$stretchCache.clear();
+}

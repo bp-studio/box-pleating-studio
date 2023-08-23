@@ -76,9 +76,8 @@ function combineContour(node: ITreeNode): void {
 	}
 	const result: Contour[] = g.$roughContours.map(c => clone(c));
 
-	// TODO: This part could be made more efficient
 	// To temporarily disable pattern contour, comment the following two lines.
-	for(const path of g.$patternContours) tryInsertOuter(path, result);
+	for(const path of g.$patternContours) tryInsert(result[path.$for].outer, path);
 	for(const path of childrenPatternContours) tryInsertInner(path, result);
 
 	for(const contour of result) {
@@ -86,12 +85,6 @@ function combineContour(node: ITreeNode): void {
 		if(contour.inner) contour.inner = contour.inner.map(simplify);
 	}
 	g.$contours = result;
-}
-
-function tryInsertOuter(path: Path, result: Contour[]): void {
-	for(const contour of result) {
-		if(tryInsert(contour.outer, path)) return;
-	}
 }
 
 function tryInsertInner(path: Path, result: Contour[]): void {

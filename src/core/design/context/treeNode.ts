@@ -2,7 +2,6 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 
-import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode, NodeGraphics } from ".";
@@ -132,7 +131,8 @@ export class TreeNode implements ITreeNode {
 	/** The tag used for identifying objects in API. */
 	public get $tag(): string {
 		if(this.$isLeaf) return "f" + this.id;
-		const pid = this.$parent!.id;
+		if(!this.$parent) return "root"; // Doesn't matter
+		const pid = this.$parent.id;
 		if(this.id < pid) return `re${this.id},${pid}`;
 		else return `re${pid},${this.id}`;
 	}

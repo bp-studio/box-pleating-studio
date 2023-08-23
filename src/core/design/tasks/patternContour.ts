@@ -46,11 +46,12 @@ function processRepo(repo: Repository): void {
 
 	//TODO: Why do we need coverage info here?
 	for(const [node, leaves] of coverageMap.entries()) {
-		for(const contour of node.$graphics.$roughContours) {
-			const paths = trace.$generate(contour);
+		for(const [i, contour] of node.$graphics.$roughContours.entries()) {
+			const paths = trace.$generate(contour.outer);
 			for(const path of paths) {
 				path.$ids = repo.$nodeIds;
 				path.$repo = repo.$signature;
+				path.$for = i;
 				node.$graphics.$patternContours.push(path);
 			}
 		}
