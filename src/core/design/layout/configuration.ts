@@ -44,12 +44,6 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this.$junctions = junctions;
 		this.$partitions = partitions.map(p => new Partition(this, junctions, p));
 
-		this._patterns = new Store(patternGenerator(this, proto));
-		this._patterns.$next();
-
-		// The rest of the calculations are not needed if there's no pattern.
-		if(!this._patterns.$entries.length) return;
-
 		const overlaps: JOverlap[] = [];
 		const overlapMap: Map<number, [number, number]> = new Map();
 		let k = -1;
@@ -61,6 +55,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 		}
 		this.$overlaps = overlaps;
 		this.$overlapMap = overlapMap;
+
+		this._patterns = new Store(patternGenerator(this, proto));
+		this._patterns.$next();
 	}
 
 	public toJSON(): JConfiguration {

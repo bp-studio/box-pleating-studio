@@ -29,6 +29,18 @@ export class Pattern implements ISerializable<JPattern> {
 		this.$devices = devices.map((d, i) => new Device(this, config.$partitions[i], d));
 		this.$gadgets = this.$devices.flatMap(d => d.$gadgets);
 
+		// Carefully initialize the positioning of devices in a predictable ordering
+		const devicesToInitialize = new Set(this.$devices);
+		while(devicesToInitialize.size > 0) {
+			for(const device of devicesToInitialize) {
+				const c = device.$partition.$getDisplacementReference();
+				if(c.e >= 0 || this._getDeviceOfConnection(c).$initialized) {
+					device.$init();
+					devicesToInitialize.delete(device);
+				}
+			}
+		}
+
 		this.$valid = seeded ? true : this._position();
 	}
 
@@ -76,5 +88,9 @@ export class Pattern implements ISerializable<JPattern> {
 		}
 
 		return false;
+	}
+
+	private _getDeviceOfConnection(c: JConnection): Device {
+		return this.$devices[this.$config.$overlapMap.get(c.e)![0]];
 	}
 }

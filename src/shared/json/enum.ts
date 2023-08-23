@@ -30,7 +30,8 @@ export enum CornerType {
 	side,
 	/**
 	 * A corner that connects to a hinge intersection.
-	 * In this case, `e` refers to the id of the other flap involved.= */
+	 * In this case, `e` refers to the id of the other flap involved.
+	 */
 	intersection,
 	/** A conner that connects to a flap. */
 	flap,

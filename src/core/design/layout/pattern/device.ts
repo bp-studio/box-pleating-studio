@@ -37,7 +37,7 @@ export class Device implements ISerializable<JDevice> {
 	public $anchors!: readonly Point[][];
 	public $location!: IPoint;
 
-	private readonly _originalDisplacement: Vector;
+	private readonly _originalDisplacement!: Vector;
 	private _delta!: Vector;
 	private _ridgeCache: readonly Ridge[] | undefined;
 	private _rawRidgeCache: readonly Ridge[] | undefined;
@@ -47,7 +47,6 @@ export class Device implements ISerializable<JDevice> {
 		this.$partition = partition;
 		this.$gadgets = data.gadgets.map(g => new Gadget(g));
 		this.$addOns = data.addOns?.map(a => new AddOn(a)) ?? [];
-		this._originalDisplacement = partition.$getOriginalDisplacement(pattern);
 		this.$offset = data.offset ?? 0;
 
 		// Collect regions
@@ -55,8 +54,16 @@ export class Device implements ISerializable<JDevice> {
 		for(const g of this.$gadgets) regions.push(...g.pieces);
 		regions.push(...this.$addOns);
 		this._regions = regions;
+	}
 
-		State.$movedDevices.add(this);
+	public $init(): void {
+		(this as Record<string, unknown>)._originalDisplacement =
+			this.$partition.$getDisplacement(this.$pattern);
+		this.$updatePosition();
+	}
+
+	public get $initialized(): boolean {
+		return Boolean(this._originalDisplacement);
 	}
 
 	public toJSON(): JDevice {
@@ -67,8 +74,12 @@ export class Device implements ISerializable<JDevice> {
 		};
 	}
 
+	/**
+	 * The distance between the first out-going anchor point
+	 * of this device to its connection target.
+	 */
 	public get $offset(): number {
-		let dx = this.$partition.$getOriginalDisplacement(this.$pattern).x;
+		let dx = this.$partition.$getDisplacement(this.$pattern).x;
 		dx -= this._originalDisplacement.x;
 		return (this.$location.x - dx) * this.$pattern.$config.$repo.$f.x;
 	}
