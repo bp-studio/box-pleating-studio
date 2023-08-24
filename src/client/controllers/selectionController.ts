@@ -157,7 +157,7 @@ export namespace SelectionController {
 	 */
 	export function $endDrag(cancel?: boolean): boolean {
 		const result = view.visible;
-		if(result && cancel) clear();
+		if(cancel) clear();
 		view.visible = false;
 		display.stage.interactiveChildren = true;
 		dragSelectables = [];
