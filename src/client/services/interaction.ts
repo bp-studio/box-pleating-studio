@@ -141,7 +141,8 @@ export namespace Interaction {
 			pendingTouchStart = undefined;
 			if(!ScrollController.$isScrolling()) {
 				LongPressController.$cancel();
-				SelectionController.$endDrag(true);
+				SelectionController.$endDrag();
+				SelectionController.clear();
 				ZoomController.$init(event);
 				initScroll(event);
 			}
