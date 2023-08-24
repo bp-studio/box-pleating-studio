@@ -117,8 +117,7 @@ export class Partition implements ISerializable<JPartition> {
 		const repo = this.$configuration.$repo;
 
 		let ov = this.$overlaps[map.overlapIndex];
-
-		const parent = this._getParent(ov);
+		const parent = this._getTransformedParent(ov);
 		const c1 = parent.c[0], c2 = parent.c[2];
 		const n1 = c1.e!, n2 = c2.e!;
 		const f1 = tree.$nodes[n1]!, f2 = tree.$nodes[n2]!;
@@ -187,11 +186,11 @@ export class Partition implements ISerializable<JPartition> {
 		if(this.$overlaps.length == 1) return ov;
 
 		const result = clone(ov);
-		const parent = this._getParent(ov);
+		const parent = this._getTransformedParent(ov);
 		let shift = result.shift ?? { x: 0, y: 0 };
 		for(const o of this.$overlaps) {
 			if(o != ov) {
-				const p = this._getParent(o);
+				const p = this._getTransformedParent(o);
 				const w = result.ox + shift.x;
 				const h = result.oy + shift.y;
 				if(p.c[0].e == parent.c[0].e) {
@@ -221,9 +220,18 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	/**
-	 * Find the original {@link JJunction} corresponding to the give {@link JOverlap}.
+	 * Obtain the original {@link JJunction} (transformed if needed) corresponding to the give {@link JOverlap}.
+	 *
+	 * Since version 0.6, {@link JJunction}s are created with respect to the ordering of the flaps
+	 * instead of the actual orientation. So during calculations they need to be transformed
+	 * when their orientation is different from that of the {@link Repository}.
 	 */
-	private _getParent(ov: JOverlap): Readonly<JJunction> {
-		return this.$configuration.$junctions[ov.parent];
+	private _getTransformedParent(ov: JOverlap): Readonly<JJunction> {
+		let parent = this.$configuration.$junctions[ov.parent];
+		if(parent.f.x != this.$configuration.$repo.$f.x) {
+			parent = clone(parent);
+			parent.c.push(...parent.c.splice(0, 2));
+		}
+		return parent;
 	}
 }

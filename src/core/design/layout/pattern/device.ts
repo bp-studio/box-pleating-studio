@@ -115,9 +115,7 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All ridges that should be drawn. */
 	public get $drawRidges(): readonly ILine[] {
-		// Intersection ridges doesn't need to be drawn,
-		// as river ridges will automatically cover that.
-		return this._ridges.filter(r => r.type != CornerType.intersection).map(l => l.$toILine());
+		return this._ridges.map(l => l.$toILine());
 	}
 
 	/** All ridges used for tracing */

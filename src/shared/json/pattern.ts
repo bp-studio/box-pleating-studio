@@ -22,6 +22,9 @@ export interface JConfiguration {
 export interface JJunction extends JQuadrilateral {
 	/** The maximal space between the {@link Flap}s; always positive. */
 	sx: number;
+
+	/** Coefficients of transformation. */
+	f: IPoint;
 }
 
 export interface JPartition {

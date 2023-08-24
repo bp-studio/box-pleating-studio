@@ -80,6 +80,7 @@ export class ValidJunction implements ISerializable<JJunction> {
 				{ type: CornerType.flap, e: this.$b.id, q: this.$q2 & MASK },
 				{ type: CornerType.side },
 			],
+			f: this.$f,
 			ox: this.$o.x,
 			oy: this.$o.y,
 			sx: this.$s.x,
