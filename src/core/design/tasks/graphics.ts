@@ -27,17 +27,17 @@ function graphics(): void {
 		if(repo.$pattern) addRepo(repo);
 	}
 
-	const sideCorners: Point[] = [];
+	const freeCorners: Point[] = [];
 	for(const stretch of State.$stretches.values()) {
 		const config = stretch.$repo.$configuration;
-		if(config) sideCorners.push(...config.$sideCorners.map(s => s.corner));
+		if(config) freeCorners.push(...config.$freeCorners.map(s => s.corner));
 	}
 
 	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
 		const g = node.$graphics;
 		combineContour(node);
-		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node, sideCorners);
+		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node, freeCorners);
 
 		State.$updateResult.graphics[node.$tag] = {
 			contours: g.$contours,
@@ -142,7 +142,7 @@ function flapRidge(node: ITreeNode): ILine[] {
  * Add all ridges of the river at right angle corners.
  * The rest are handled by pattern ridges.
  */
-function riverRidge(node: ITreeNode, sideCorners: Point[]): ILine[] {
+function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 	const ridges: ILine[] = [];
 	const width = node.$length;
 	for(const contour of node.$graphics.$contours) {
@@ -173,7 +173,7 @@ function riverRidge(node: ITreeNode, sideCorners: Point[]): ILine[] {
 					ridges.push([p1, p]);
 					innerRightCorners.delete(innerKey);
 				} else {
-					tryAddRemainingRidge(p1, p, sideCorners, ridges);
+					tryAddRemainingRidge(p1, p, freeCorners, ridges);
 				}
 			}
 		}
@@ -181,7 +181,7 @@ function riverRidge(node: ITreeNode, sideCorners: Point[]): ILine[] {
 		// Check remaining inner vertices.
 		for(const [p1, p0, p2] of innerRightCorners.values()) {
 			const p = getCorrespondingPoint(p1, p0, p2, width, -1);
-			tryAddRemainingRidge(p1, p, sideCorners, ridges);
+			tryAddRemainingRidge(p1, p, freeCorners, ridges);
 		}
 	}
 	return ridges;

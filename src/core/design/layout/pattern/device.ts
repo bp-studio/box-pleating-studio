@@ -114,7 +114,17 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All ridges that should be drawn. */
 	public get $drawRidges(): readonly ILine[] {
-		return this._ridges.map(l => l.$toILine());
+		const ridges = this._ridges.filter(r => r.type != CornerType.intersection);
+		for(const map of this.$partition.$externalCornerMaps) {
+			if(map.corner.type != CornerType.intersection) continue;
+			const from = this.$resolveCornerMap(map);
+			const to = this.$partition.$getExternalConnectionTarget(from, map);
+			if(to) {
+				const ridge = new Line(from, to) as Ridge;
+				ridges.push(ridge);
+			}
+		}
+		return ridges.map(l => l.$toILine());
 	}
 
 	/** All ridges used for tracing */

@@ -12,7 +12,6 @@ import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
 import type { JConfiguration, JJunction, JOverlap, JPartition, JPattern } from "shared/json";
 
-
 //=================================================================
 /**
  * {@link Configuration} is a set of {@link Partition}s resulting
@@ -35,7 +34,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	private readonly _patterns: Store<Pattern>;
 	private _index: number = 0;
-	private _sideCornerCache: SideCornerInfo[] | undefined;
+	private _freeCornerCache: FreeCornerInfo[] | undefined;
 
 	public $originDirty: boolean = false;
 
@@ -85,7 +84,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 	}
 
 	public $onDeviceMove(): void {
-		this._sideCornerCache = undefined;
+		this._freeCornerCache = undefined;
 	}
 
 	public $complete(): void {
@@ -109,7 +108,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 		const p = new Point(q.$point);
 
 		const result: SideDiagonal[] = [];
-		for(const { map, corner, partition } of this.$sideCorners) {
+		for(const { map, corner, partition } of this.$freeCorners) {
+			if(map.corner.type != CornerType.side) continue;
+
 			let diagonal = new Line(...partition.$getExternalConnectionTargets(map));
 			if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
 
@@ -122,18 +123,18 @@ export class Configuration implements ISerializable<JConfiguration> {
 		return result;
 	}
 
-	public get $sideCorners(): SideCornerInfo[] {
-		if(this._sideCornerCache) return this._sideCornerCache;
-		const result: SideCornerInfo[] = [];
+	public get $freeCorners(): FreeCornerInfo[] {
+		if(this._freeCornerCache) return this._freeCornerCache;
+		const result: FreeCornerInfo[] = [];
 		for(const [i, partition] of this.$partitions.entries()) {
 			for(const map of partition.$cornerMap) {
-				if(map.corner.type == CornerType.side) {
+				if(map.corner.type == CornerType.side || map.corner.type == CornerType.intersection) {
 					const corner = this.$pattern!.$devices[i].$resolveCornerMap(map);
 					result.push({ map, corner, partition });
 				}
 			}
 		}
-		return this._sideCornerCache = result;
+		return this._freeCornerCache = result;
 	}
 }
 
@@ -142,7 +143,7 @@ export interface SideDiagonal extends Line {
 	readonly p0: Point;
 }
 
-interface SideCornerInfo {
+interface FreeCornerInfo {
 	readonly map: CornerMap;
 	readonly corner: Point;
 	readonly partition: Partition;

@@ -54,7 +54,7 @@ export class TraceContext {
 	/**
 	 * Find the first candidate line that intersects the pattern, and decide the initial ray.
 	 */
-	public $getInitialNode(ridges: Set<Line>, diagonals: Set<SideDiagonal>): TraceNode | null {
+	public $getInitialNode(ridges: Set<Ridge>, diagonals: Set<SideDiagonal>): TraceNode | null {
 		while(this._candidates.length) {
 			const hinge = this._candidates.shift()!;
 			const prevHinge = this._candidates[this._candidates.length - 1];
