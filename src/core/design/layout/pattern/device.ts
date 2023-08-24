@@ -5,7 +5,6 @@ import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
-import { State } from "core/service/state";
 import { clone } from "shared/utils/clone";
 import { MASK } from "../junction/validJunction";
 
@@ -142,6 +141,7 @@ export class Device implements ISerializable<JDevice> {
 		}));
 	}
 
+	/** The lower and upper bounds of x-coordinate that can be dragged. */
 	public $getDraggingRange(): readonly [number, number] {
 		const fx = this.$pattern.$config.$repo.$f.x;
 		const result = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY] as [number, number];

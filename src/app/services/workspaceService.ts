@@ -1,4 +1,4 @@
-import { computed, reactive, shallowRef, watch } from "vue";
+import { computed, reactive, shallowRef, watch, nextTick as vueNextTick } from "vue";
 
 import Dialogs from "./dialogService";
 import Studio from "./studioService";
@@ -107,6 +107,12 @@ namespace WorkspaceService {
 		const idx = tabHistory.indexOf(proj);
 		if(idx >= 0) tabHistory.splice(idx, 1);
 		tabHistory.unshift(proj);
+
+		// Scroll to the selected tab
+		vueNextTick(() => {
+			const el = document.getElementById(`tab${id}`);
+			if(el) el.scrollIntoView({ behavior: "smooth" });
+		});
 	}
 
 	export async function close(id: number): Promise<void> {
