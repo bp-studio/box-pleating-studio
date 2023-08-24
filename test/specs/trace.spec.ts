@@ -58,7 +58,20 @@ describe("Tracing algorithm", function() {
 			]);
 		});
 
-		it("Should not end tracing if the said hinge hits the extension of an intersection ridge", function() {
+		it("But should not end if the next trace is degenerated", function() {
+			const trace = new Trace(Line.$parseTest([{ p1: "(3, 22)", p2: "(41/2, 9/2)" }, { p1: "(41/2, 9/2)", p2: "(22, 4)" }, { p1: "(22, 4)", p2: "(15, 18)" }, { p1: "(15, 18)", p2: "(3, 22)" }, { p1: "(1, 23)", p2: "(6, 8)" }, { p1: "(6, 8)", p2: "(18, 2)" }, { p1: "(18, 2)", p2: "(17, 5)" }, { p1: "(17, 5)", p2: "(41/2, 9/2)" }, { p1: "(3, 22)", p2: "(1, 23)" }, { p1: "(17, 5)", p2: "(19, 4)" }, { p1: "(19, 4)", p2: "(41/2, 9/2)" }, { p1: "(22, 4)", p2: "(22, 4)" }, { p1: "(1, 23)", p2: "(1, 23)" }, { p1: "(18, 2)", p2: "(19, 1)" }, { p1: "(19, 4)", p2: "(20, 3)", type: 3 }]), SlashDirection.BW, Line.$parseTest<SideDiagonal>([{ p1: "(28, 5)", p2: "(15, 18)", p0: "(15, 18)" }, { p1: "(5, 9)", p2: "(17, -3)", p0: "(6, 8)" }]));
+			const result = trace.$generate([{ x: 18, y: 8 }, { x: 18, y: 5 }, { x: 15, y: 5 }, { x: 15, y: -3 }, { x: 23, y: -3 }, { x: 23, y: 0 }, { x: 26, y: 0 }, { x: 26, y: 8 }]);
+
+			expect(result.length).to.equal(1);
+			expect(result[0]).to.deep.equal([
+				{ x: 20, y: 8 },
+				{ x: 131 / 7, y: 44 / 7 },
+				{ x: 17, y: 5 },
+				{ x: 15, y: 3.5 },
+			]);
+		});
+
+		it("But should not end tracing if the said hinge hits the extension of an intersection ridge", function() {
 			const trace = new Trace(Line.$parseTest([{ p1: "(18, 9)", p2: "(17, 11)" }, { p1: "(17, 11)", p2: "(11, 13)" }, { p1: "(11, 13)", p2: "(12, 11)" }, { p1: "(12, 11)", p2: "(18, 9)" }, { p1: "(18, 9)", p2: "(18, 9)" }, { p1: "(11, 13)", p2: "(11, 13)" }, { p1: "(19, 0)", p2: "(17, 8)" }, { p1: "(17, 8)", p2: "(12, 11)" }, { p1: "(12, 11)", p2: "(14, 3)" }, { p1: "(14, 3)", p2: "(19, 0)" }, { p1: "(19, 0)", p2: "(19, 0)" }, { p1: "(12, 11)", p2: "(12, 11)" }, { p1: "(17, 8)", p2: "(17, 8)", type: 3 }]), SlashDirection.BW, Line.$parseTest<SideDiagonal>([{ p1: "(18, 10)", p2: "(16, 12)", p0: "(17, 11)" }, { p1: "(9, 8)", p2: "(11, 6)", p0: "(14, 3)" }]));
 			const result = trace.$generate([{ x: 28, y: 7 }, { x: 28, y: 9 }, { x: 22, y: 9 }, { x: 22, y: 11 }, { x: 16, y: 11 }, { x: 16, y: 9 }, { x: 10, y: 9 }, { x: 10, y: 7 }, { x: -2, y: 7 }, { x: -2, y: -7 }, { x: 10, y: -7 }, { x: 10, y: -9 }, { x: 28, y: -9 }, { x: 28, y: -7 }, { x: 40, y: -7 }, { x: 40, y: 7 }]);
 

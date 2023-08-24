@@ -80,7 +80,11 @@ export class Trace {
 				vector: intersection.line.$reflect(cursor.vector),
 			};
 			if(!path[path.length - 1].eq(cursor.point)) path.push(cursor.point);
-			if(cursor.vector.$isAxisParallel && ctx.$testEnd(cursor)) break;
+			if(cursor.vector.$isAxisParallel) {
+				const next = getNextIntersection(ridges, cursor);
+				if(next && next.point.eq(cursor.point)) continue;
+				if(ctx.$testEnd(cursor)) break;
+			}
 		}
 
 		if(path.length == 1) return null; // Doesn't count

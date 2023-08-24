@@ -56,20 +56,23 @@ export class TraceContext {
 	 */
 	public $getInitialNode(ridges: Set<Line>, diagonals: Set<SideDiagonal>): TraceNode | null {
 		while(this._candidates.length) {
-			const line = this._candidates.shift()!;
-			const v = line.$vector;
-			const ray = { point: line.p1, vector: v };
+			const hinge = this._candidates.shift()!;
+			const prevHinge = this._candidates[this._candidates.length - 1];
+			const v = hinge.$vector;
+			const ray = { point: hinge.p1, vector: v };
 
 			// Case 1: side diagonals
 			for(const diagonal of diagonals) {
-				const p = line.$intersection(diagonal);
-				if(!p) continue;
+				const p = hinge.$intersection(diagonal);
+				// It doesn't count if the previous hinge also intersects the same diagonal
+				// TODO: we might need more sophisticated rule here
+				if(!p || prevHinge?.$intersection(diagonal)) continue;
 				diagonals.delete(diagonal);
 
 				// Check if we're indeed "entering" the pattern.
-				if(!diagonal.$isOnRight(line.p1)) continue;
+				if(!diagonal.$pointIsOnRight(hinge.p1)) continue;
 
-				const hv = this._diagonalHitInitialVector(line, v, diagonal);
+				const hv = this._diagonalHitInitialVector(hinge, v, diagonal);
 				if(!p.eq(diagonal.p0)) {
 					return { point: p, vector: hv };
 				} else {
@@ -81,7 +84,7 @@ export class TraceContext {
 			}
 
 			// Case 2: normal ridges
-			const intersection = getNextIntersection(ridges, ray, line);
+			const intersection = getNextIntersection(ridges, ray, hinge);
 			if(!intersection) continue;
 			const result = {
 				point: intersection.point,
@@ -121,7 +124,7 @@ export class TraceContext {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * One exception is when the overlapped edge actually touches the extension of an intersection ridge.
+	 * One exception is when the overlapped hinge actually touches the extension of an intersection ridge.
 	 * In that case we should keep going.
 	 */
 	private _testEndException(p: Point): boolean {
@@ -148,14 +151,14 @@ export class TraceContext {
 	private _candidateRoughContourLines(): Line[] | null {
 		const result = [];
 		const l = this._hinges.length;
+		const points = this._hinges.map(p => new Point(p));
 		for(let i = 0; i < l; i++) {
-			const p1 = new Point(this._hinges[i % l]);
-			const p2 = new Point(this._hinges[(i + 1) % l]);
+			const p1 = points[i % l];
+			const p2 = points[(i + 1) % l];
 			// This checking is valid as the lines in the RoughContour are all AA lines,
 			// and it is not possible that a single line get across the pattern bounding box.
-			if(this._trace.$boundingBox.$contains(p1) || this._trace.$boundingBox.$contains(p2)) {
-				result.push(new Line(p1, p2));
-			}
+			const inBox = this._trace.$boundingBox.$contains(p1) || this._trace.$boundingBox.$contains(p2);
+			if(inBox) result.push(new Line(p1, p2));
 		}
 		return result.length ? result : null;
 	}
@@ -165,10 +168,10 @@ export class TraceContext {
 	 * it may or may not reflect about it, depending on whether the {@link RoughContour}
 	 * wraps around {@link SideDiagonal.p0}.
 	 */
-	private _diagonalHitInitialVector(line: Line, v: Vector, diagonal: SideDiagonal): Vector {
-		const outside = line.$isOnRight(diagonal.p0, true);
+	private _diagonalHitInitialVector(hinge: Line, v: Vector, diagonal: SideDiagonal): Vector {
+		const cornerIsOnOutside = hinge.$pointIsOnRight(diagonal.p0, true);
 		const forward = this._trace.$direction == SlashDirection.FW;
-		const resultIsVertical = forward == outside;
+		const resultIsVertical = forward == cornerIsOnOutside;
 		const lineIsVertical = v.x == 0;
 		return resultIsVertical == lineIsVertical ? v : diagonal.$reflect(v);
 	}

@@ -114,7 +114,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 			if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
 
 			// Orient the diagonal for determining entering/leaving
-			if(diagonal.$isOnRight(p)) diagonal = diagonal.$reverse();
+			if(diagonal.$pointIsOnRight(p)) diagonal = diagonal.$reverse();
 
 			(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
 			result.push(diagonal as SideDiagonal);

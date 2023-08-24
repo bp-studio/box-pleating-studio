@@ -99,7 +99,7 @@ export class Line {
 		return new Line(this.p2, this.p1);
 	}
 
-	public $isOnRight(point: Point, allowEq = false): boolean {
+	public $pointIsOnRight(point: Point, allowEq = false): boolean {
 		const v = point.sub(this.p1).$rotate90();
 		const dot = v.dot(this.$vector);
 		return dot > 0 || allowEq && dot == 0;
