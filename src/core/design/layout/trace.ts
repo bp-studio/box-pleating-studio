@@ -45,7 +45,7 @@ export class Trace {
 		while(true) {
 			const contour = this._trace(ctx);
 			if(!contour) break;
-			result.push(contour);
+			if(contour.length > 1) result.push(contour);
 		}
 		return result;
 	}
@@ -87,7 +87,6 @@ export class Trace {
 			}
 		}
 
-		if(path.length == 1) return null; // Doesn't count
 		return path.map(p => p.$toIPoint()) as PatternContour;
 	}
 
