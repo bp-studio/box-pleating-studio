@@ -25,6 +25,25 @@ describe("Tracing algorithm", function() {
 
 	});
 
+	describe("Reflection", function() {
+
+		it("Find the next intersection by shift-touchability", function() {
+			const trace = new Trace(Line.$parseTest([{ p1: "(5, 12)", p2: "(4, 7)" }, { p1: "(4, 7)", p2: "(5, 11/2)" }, { p1: "(5, 11/2)", p2: "(0, 0)" }, { p1: "(0, 0)", p2: "(2, 10)" }, { p1: "(2, 10)", p2: "(5, 12)" }, { p1: "(15, 8)", p2: "(12, 3)" }, { p1: "(12, 3)", p2: "(0, 0)" }, { p1: "(5, 11/2)", p2: "(15, 8)" }, { p1: "(4, 7)", p2: "(5, 6)" }, { p1: "(5, 6)", p2: "(5, 11/2)" }, { p1: "(5, 12)", p2: "(5, 12)" }, { p1: "(0, 0)", p2: "(0, 0)" }, { p1: "(15, 8)", p2: "(15, 8)" }, { p1: "(5, 6)", p2: "(9, 10)", type: 3 }]), SlashDirection.FW, Line.$parseTest<SideDiagonal>([{ p1: "(3, 11)", p2: "(0, 8)", p0: "(2, 10)" }, { p1: "(8, -1)", p2: "(11, 2)", p0: "(12, 3)" }]));
+			const result = trace.$generate([{ x: 8, y: 8 }, { x: -8, y: 8 }, { x: -8, y: -8 }, { x: 8, y: -8 }]);
+
+			expect(result.length).to.equal(1);
+			expect(result[0]).to.deep.equal([
+				{ x: 8, y: -1 },
+				{ x: 8, y: 2 },
+				{ x: 6, y: 5.75 },
+				{ x: 6, y: 7 },
+				{ x: 4, y: 7 },
+				{ x: 1.6, y: 8 },
+			]);
+		});
+
+	});
+
 	describe("Trace ending", function() {
 
 		it("Should end tracing if the next trace overlaps an existing hinge", function() {

@@ -59,7 +59,7 @@ export class Trace {
 		const ridges = new Set(this.$ridges);
 		const diagonals = new Set(this.$sideDiagonals);
 
-		let cursor = ctx.$findInitialRay(ridges, diagonals);
+		let cursor = ctx.$getInitialNode(ridges, diagonals);
 		if(!cursor) return null;
 		path.push(cursor.point);
 
@@ -75,6 +75,7 @@ export class Trace {
 
 			ridges.delete(intersection.line);
 			cursor = {
+				last: intersection.line.$vector,
 				point: intersection.point,
 				vector: intersection.line.$reflect(cursor.vector),
 			};

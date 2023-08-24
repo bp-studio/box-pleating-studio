@@ -4,20 +4,21 @@ import { SlashDirection } from "shared/types/direction";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
 
+import type { Trace } from "./trace";
 import type { Ridge } from "./pattern/device";
 import type { IIntersection } from "core/math/geometry/line";
 import type { SideDiagonal } from "./configuration";
 import type { Path } from "shared/types/geometry";
-import type { Trace } from "./trace";
 
 interface JIntersection extends IIntersection {
 	angle: number;
 	endPoint: boolean;
 }
 
-interface Ray {
+interface TraceNode {
 	point: Point;
 	vector: Vector;
+	last?: Vector;
 }
 
 //=================================================================
@@ -53,7 +54,7 @@ export class TraceContext {
 	/**
 	 * Find the first candidate line that intersects the pattern, and decide the initial ray.
 	 */
-	public $findInitialRay(ridges: Set<Line>, diagonals: Set<SideDiagonal>): Ray | null {
+	public $getInitialNode(ridges: Set<Line>, diagonals: Set<SideDiagonal>): TraceNode | null {
 		while(this._candidates.length) {
 			const line = this._candidates.shift()!;
 			const v = line.$vector;
@@ -94,7 +95,7 @@ export class TraceContext {
 	}
 
 	/** Check if we have successfully connected back to the {@link RoughContour}. */
-	public $testEnd(ray: Ray): boolean {
+	public $testEnd(ray: TraceNode): boolean {
 		for(const [i, candidate] of this._candidates.entries()) {
 			if(candidate.$contains(ray.point) && candidate.$vector.$parallel(ray.vector)) {
 				this._candidates.splice(0, i + 1, new Line(ray.point, candidate.p2));
@@ -173,21 +174,22 @@ export class TraceContext {
 	}
 }
 
-export function getNextIntersection(ridges: Iterable<Ridge>, ray: Ray, edge?: Line): JIntersection | null {
+export function getNextIntersection(ridges: Iterable<Ridge>, node: TraceNode, edge?: Line): JIntersection | null {
 	let result: JIntersection | null = null;
-	const { point, vector } = ray;
-	const self = new Line(point, vector);
+	const { point, vector, last: shift } = node;
 	for(const ridge of ridges) {
 		const intersection = getIntersection(ridge, point, vector, true, Boolean(edge)) as JIntersection;
 
 		// In finding initial vector, the head of the given edge should be ignored.
 		if(!intersection || edge && intersection.point.eq(edge.p1)) continue;
 
+		const angle = shift ? getAngle(vector, shift) : undefined;
+
 		const isP1 = intersection.point.eq(ridge.p1);
 		const isP2 = intersection.point.eq(ridge.p2);
 		if(
 			!isSideDiagonal(intersection.line) &&
-			(isP1 && self.$isOnRight(ridge.p2) || isP2 && self.$isOnRight(ridge.p1))
+			!isShiftTouchable(ridge, point, vector, angle)
 		) continue;
 
 		intersection.endPoint = isP1 || isP2;
@@ -239,4 +241,27 @@ function pickSafeStart(hinges: Path, dir: SlashDirection): Path | null {
 		}
 	}
 	return null;
+}
+
+/**
+ * Given a ridge, imagine that if we slightly shift our tracing contour inwards,
+ * can we still touch the ridge?
+ */
+function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): boolean {
+	const rv = v.$rotate90();
+	const v1 = ridge.p1.sub(from), v2 = ridge.p2.sub(from);
+	const r1 = v1.dot(rv), r2 = v2.dot(rv);
+	const d1 = v1.dot(v), d2 = v2.dot(v);
+	const result =
+		(
+			// One endpoint of the segment lies completely on the side
+			r1 > 0 || r2 > 0
+		) &&
+		(
+			// At least one endpoint is in front
+			d1 > 0 || d2 > 0 ||
+			// or, the angle of the given ridge is further in front of the previously hit ridge
+			Boolean(ang) && getAngle(v, ridge.$vector) > ang!
+		);
+	return result;
 }
