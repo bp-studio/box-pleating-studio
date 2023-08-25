@@ -51,14 +51,15 @@ function processRepo(repo: Repository): void {
 	const trace = Trace.$fromRepo(repo);
 
 	for(const [node, leaves] of coverageMap.entries()) {
-		for(const [i, contour] of node.$graphics.$roughContours.entries()) {
+		const multiContour = node.$graphics.$roughContours.length > 1;
+		for(const [index, contour] of node.$graphics.$roughContours.entries()) {
 			// Create start/end map
 			const outer = contour.outer;
 			const startEndMap = {} as Record<QuadrantDirection, [Point, Point]>;
 			const quadrants = leaves
 				.flatMap(leaf => quadrantMap.get(leaf)!)
 				// Make sure that the current path actually wraps around the quadrant
-				.filter(q => windingNumber(q.$point, outer) != 0);
+				.filter(q => !multiContour || windingNumber(q.$point, outer) != 0);
 			for(let q = 0; q < quadrantNumber; q++) {
 				const filtered = quadrants.filter(quadrant => quadrant.q == q);
 				if(filtered.length) startEndMap[q as QuadrantDirection] = startEndPoints(filtered);
@@ -72,7 +73,7 @@ function processRepo(repo: Repository): void {
 				if(path) {
 					path.$ids = repo.$nodeIds;
 					path.$repo = repo.$signature;
-					path.$for = i;
+					path.$for = index;
 					node.$graphics.$patternContours.push(path);
 				}
 			}

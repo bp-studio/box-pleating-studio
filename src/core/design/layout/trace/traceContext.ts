@@ -65,6 +65,7 @@ export class TraceContext {
 						// In this case we modify the ray and go to the case 2.
 						ray.vector = hv;
 						ray.point = p.sub(hv);
+						startDiagonal = undefined;
 					}
 				}
 			}
@@ -84,11 +85,12 @@ export class TraceContext {
 	}
 
 	public $trim(path: Point[]): PatternContour | null {
-		if(path.length == 1) return null;
+		if(path.length <= 1) return null;
 		const firstLine = new Line(path[0], path[1]);
 		const lastLine = new Line(path[path.length - 2], path[path.length - 1]);
 		if(this._testEndPoints(lastLine, false)) path.pop();
 		if(this._testEndPoints(firstLine, true)) path.shift();
+		if(path.length <= 1) return null;
 		return path.map(p => p.$toIPoint()) as PatternContour;
 	}
 

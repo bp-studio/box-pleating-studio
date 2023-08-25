@@ -57,7 +57,8 @@ export class Stretch implements ISerializable<JStretch> {
 		const signature = getStructureSignature(junctions);
 		const origin = junctions[0].$tip;
 		if(signature === this._repo.$signature) {
-			if(!this.$isActive || this._repo.$tryUpdateOrigin(origin)) {
+			const updated = this._repo.$tryUpdateOrigin(origin);
+			if(!this.$isActive || updated) {
 				State.$repoUpdated.add(this._repo);
 				this.$isActive = true;
 			}
