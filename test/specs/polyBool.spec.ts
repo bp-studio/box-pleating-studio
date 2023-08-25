@@ -1,12 +1,12 @@
-import { Assertion, expect } from "chai";
+import { expect } from "chai";
 
 import { expand } from "core/math/polyBool/expansion";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
-import { same, toString } from "shared/types/geometry";
-import { random } from "../utils";
+import { random } from "../utils/random";
 import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
+import { parsePath } from "../utils/path";
 
-import type { Path, Polygon } from "shared/types/geometry";
+import type { Polygon } from "shared/types/geometry";
 
 describe("PolyBool", function() {
 	describe("AAUnion operation", function() {
@@ -173,74 +173,6 @@ describe("PolyBool", function() {
 	});
 });
 
-
-function parsePath(s: string): Path {
-	const numbers = s.match(/\d+/g)?.map(d => Number(d)) ?? [];
-	const result: Path = [];
-	for(let i = 0; i + 1 < numbers.length; i += 2) {
-		result.push({ x: numbers[i], y: numbers[i + 1] });
-	}
-	return result;
-}
-
-function pathToString(path: Path): string {
-	return path.map(p => toString(p)).join(",");
-}
-
-function rotatePath(path: Path, pt: IPoint): boolean {
-	for(let i = 0; i < path.length; i++) {
-		if(same(path[0], pt)) return true;
-		path.push(path.shift()!);
-	}
-	return false;
-}
-
-function randomAabbPolygon(range: number, size: number): Polygon {
-	const bottom = random(range);
-	const top = bottom + random(size) + 1;
-	const left = random(range);
-	const right = left + random(size) + 1;
-	return aabbToPolygon({ top, bottom, left, right });
-}
-
-declare global {
-	namespace Chai {
-		interface Assertion {
-			equalPath(pathString: string): Chai.Assertion;
-		}
-	}
-}
-
-Assertion.addMethod("equalPath", function(pathString: string) {
-	this.assert(
-		Array.isArray(this._obj),
-		"expect #{this} to be an array",
-		"expect #{this} to not be an array",
-		null
-	);
-	const path = (this._obj as Path).concat();
-	const orgPathString = pathToString(path);
-
-	const match = pathString.match(/\((\d*\.?\d+),(\d*\.?\d+)(?:,\d*\.?\d+){0,3}\)/)!;
-	const point = { x: Number(match[1]), y: Number(match[2]) };
-	const rotateResult = rotatePath(path, point);
-
-	this.assert(
-		rotateResult,
-		"expect #{act} to contain the point #{exp}",
-		"expect #{act} to not contain the point #{exp}",
-		match[0],
-		orgPathString
-	);
-	this.assert(
-		pathToString(path) == pathString,
-		"expect #{act} to equal #{exp}",
-		"expect #{act} to not equal #{exp}",
-		pathString,
-		orgPathString
-	);
-});
-
 interface IAABB {
 	top: number;
 	right: number;
@@ -255,4 +187,12 @@ function aabbToPolygon(c: IAABB): Polygon {
 		{ x: c.left, y: c.bottom },
 		{ x: c.right, y: c.bottom },
 	]];
+}
+
+function randomAabbPolygon(range: number, size: number): Polygon {
+	const bottom = random(range);
+	const top = bottom + random(size) + 1;
+	const left = random(range);
+	const right = left + random(size) + 1;
+	return aabbToPolygon({ top, bottom, left, right });
 }

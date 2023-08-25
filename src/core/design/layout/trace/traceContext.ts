@@ -5,9 +5,9 @@ import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
 
 import type { Trace } from "./trace";
-import type { Ridge } from "./pattern/device";
+import type { Ridge } from "../pattern/device";
 import type { IIntersection } from "core/math/geometry/line";
-import type { SideDiagonal } from "./configuration";
+import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
 
 interface JIntersection extends IIntersection {

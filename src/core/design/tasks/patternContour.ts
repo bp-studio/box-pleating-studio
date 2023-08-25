@@ -4,7 +4,7 @@ import { State } from "core/service/state";
 import { comparator } from "../context/treeNode";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { getOrSetEmptyArray } from "shared/utils/map";
-import { Trace } from "../layout/trace";
+import { Trace } from "../layout/trace/trace";
 
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { Repository } from "../layout/repository";

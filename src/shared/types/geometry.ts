@@ -46,11 +46,6 @@ export function xyComparator(p1: IPoint, p2: IPoint): number {
 	return p1.x - p2.x || p1.y - p2.y;
 }
 
-export function toString(p: IPointEx): string {
-	if(p.arc) return `(${p.x},${p.y},${p.arc.x},${p.arc.y},${p.r!})`;
-	return `(${p.x},${p.y})`;
-}
-
 /** Reverses the direction of all paths in a polygon and returns the new polygon */
 export function reverse(polygon: Polygon): Polygon {
 	return polygon.map(path => path.toReversed());

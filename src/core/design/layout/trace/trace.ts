@@ -1,14 +1,15 @@
 import { Rectangle } from "core/math/geometry/rectangle";
 import { SlashDirection } from "shared/types/direction";
 import { TraceContext, getNextIntersection } from "./traceContext";
+import { pathToString } from "core/math/geometry/path";
 
 import type { Point } from "core/math/geometry/point";
 import type { Line } from "core/math/geometry/line";
-import type { Ridge } from "./pattern/device";
-import type { SideDiagonal } from "./configuration";
-import type { Contour, Path } from "shared/types/geometry";
-import type { Repository } from "./repository";
-import type { PatternContour } from "../context";
+import type { Ridge } from "../pattern/device";
+import type { SideDiagonal } from "../configuration";
+import type { Path } from "shared/types/geometry";
+import type { Repository } from "../repository";
+import type { PatternContour } from "../../context";
 
 //=================================================================
 /**
@@ -96,13 +97,12 @@ export class Trace {
 
 	///#if DEBUG==true
 
-	public $createTestCase(roughContour: Contour): string {
+	public $createTestCase(hinges: Path): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
 		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");
 		const sideDiagonals = `Line.$parseTest<SideDiagonal>(${simp(this.$sideDiagonals)})`;
-		const rough = simp(roughContour);
-		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(${rough});`;
+		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"));`;
 	}
 
 	///#endif

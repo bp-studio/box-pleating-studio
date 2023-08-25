@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { AvlTree } from "shared/data/bst/avlTree";
 import { RedBlackTree } from "shared/data/bst/redBlackTree";
 import { RavlTree } from "shared/data/bst/ravlTree";
-import { random } from "../../utils";
+import { random } from "../../utils/random";
 
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 
