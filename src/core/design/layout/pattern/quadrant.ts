@@ -1,39 +1,61 @@
 import { Point } from "core/math/geometry/point";
-import { Direction, quadrantNumber } from "shared/types/direction";
+import { Direction, SlashDirection } from "shared/types/direction";
 import { MASK } from "../junction/validJunction";
 import { State } from "core/service/state";
-import { Vector } from "core/math/geometry/vector";
 
-import type { Fraction } from "core/math/fraction";
+import type { ValidJunction } from "../junction/validJunction";
+import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
-import type { Pattern } from "./pattern";
 import type { QuadrantDirection } from "shared/types/direction";
 import type { JOverlap } from "shared/json/layout";
 import type { JJunction } from "shared/json/pattern";
 
 //=================================================================
 /**
- * {@link Quadrant} handles the calculations related to a single quadrant of a flap.
+ * {@link Quadrant} handles the calculations related to a single quadrant
+ * of a flap in a specific {@link Repository}.
  */
 //=================================================================
-
 export class Quadrant {
 
 	public readonly $flap: ITreeNode;
 	public readonly q: QuadrantDirection;
 	public readonly f: IPoint;
 
-	constructor(code: number) {
+	/** The starting point of tracing relative to the corner of the flap. */
+	private readonly o: IPoint;
+
+	constructor(code: number, junctions: ValidJunction[]) {
 		this.$flap = State.$tree.$nodes[code >>> 2]!;
 		this.q = code & MASK;
 		this.f = {
 			x: this.q == Direction.UR || this.q == Direction.LR ? 1 : -1,
 			y: this.q == Direction.UR || this.q == Direction.UL ? 1 : -1,
 		};
+
+		const ox: number[] = [], oy: number[] = [];
+		for(const junction of junctions) {
+			ox.push(junction.$o.x);
+			oy.push(junction.$o.y);
+		}
+		this.o = { x: Math.max(...ox), y: Math.max(...oy) };
+	}
+
+	public get $startEndPoints(): [Point, Point] {
+		const r = this.$flap.$length;
+		const { x, y } = this.o;
+		const result: [Point, Point] = [
+			new Point(this.x(r), this.y(r - y)),
+			new Point(this.x(r - x), this.y(r)),
+		];
+		if(this.q % 2 != SlashDirection.FW) result.reverse();
+		return result;
 	}
 
 	/**
 	 * In case there are rivers, calculate the corner of the overlap region.
+	 * @param ov The {@link JOverlap} to calculate.
+	 * @param junction The parent {@link JJunction} from which {@link ov} derives.
 	 * @param q Which corner (before transformation) to get
 	 * @param d Additional distance
 	 */
@@ -56,45 +78,42 @@ export class Quadrant {
 	}
 
 	/**
-	 * Flap tip of this {@link Quadrant}.
+	 * Flap tip (not the corner) of this {@link Quadrant}.
 	 */
 	public get $point(): IPoint {
 		return this.$flap.$AABB.$points[this.q];
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Get the y-coordinate that is `d` units away from the tip.
 	 */
-	public y(d: number): number {
+	private y(d: number): number {
 		return this.$point.y + this.f.y * d;
 	}
 
 	/**
 	 * Get the x-coordinate that is `d` units away from the tip.
 	 */
-	public x(d: number): number {
+	private x(d: number): number {
 		return this.$point.x + this.f.x * d;
-	}
-
-	public $getStart(d: Fraction): Point {
-		return new Point(this.$point).$add(SV[this.q].$scale(d));
-	}
-
-	public $getEnd(d: Fraction): Point {
-		return new Point(this.$point).$add(SV[(this.q + 1) % quadrantNumber].$scale(d));
 	}
 }
 
-const QV: readonly Vector[] = [
-	new Vector(1, 1),
-	new Vector(-1, 1),
-	new Vector(-1, -1),
-	new Vector(1, -1),
-];
-
-const SV: readonly Vector[] = [
-	new Vector(1, 0),
-	new Vector(0, 1),
-	new Vector(-1, 0),
-	new Vector(0, -1),
-];
+/**
+ * Find the start/end {@link Point}s for tracing for a given set of {@link Quadrant}s
+ * (assumed to be of the same {@link QuadrantDirection}).
+ */
+export function startEndPoints(quadrants: Quadrant[]): [Point, Point] {
+	let [start, end] = quadrants[0].$startEndPoints;
+	const f = quadrants[0].f.y;
+	for(let i = 1; i < quadrants.length; i++) {
+		const [newStart, newEnd] = quadrants[i].$startEndPoints;
+		if(newStart.x * f > start.x * f) start = newStart;
+		if(newEnd.x * f < end.x * f) end = newEnd;
+	}
+	return [start, end];
+}

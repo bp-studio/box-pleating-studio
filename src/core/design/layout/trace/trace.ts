@@ -1,10 +1,10 @@
-import { Rectangle } from "core/math/geometry/rectangle";
 import { SlashDirection } from "shared/types/direction";
 import { TraceContext, getNextIntersection } from "./traceContext";
 import { pathToString } from "core/math/geometry/path";
+import { Line } from "core/math/geometry/line";
+import { Vector } from "core/math/geometry/vector";
 
 import type { Point } from "core/math/geometry/point";
-import type { Line } from "core/math/geometry/line";
 import type { Ridge } from "../pattern/device";
 import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
@@ -29,50 +29,44 @@ export class Trace {
 	public readonly $ridges: readonly Ridge[];
 	public readonly $direction: SlashDirection;
 	public readonly $sideDiagonals: readonly SideDiagonal[];
-	public readonly $boundingBox: Rectangle;
 
 	constructor(ridges: readonly Ridge[], dir: SlashDirection, sideDiagonals: readonly SideDiagonal[]) {
 		this.$ridges = ridges;
 		this.$direction = dir;
-		this.$boundingBox = getBoundingBox(this.$ridges.concat(sideDiagonals));
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
-	public $generate(hinges: Path): PatternContour[] {
-		const result: PatternContour[] = [];
+	public $generate(hinges: Path, start: Point, end: Point): PatternContour | null {
 		const ctx = new TraceContext(this, hinges);
-		if(!ctx.$valid) return result;
+		if(!ctx.$valid) return null;
 
-		while(true) {
-			const contour = this._trace(ctx);
-			if(!contour) break;
-			if(contour.length > 1) result.push(contour);
-		}
-		return result;
-	}
+		// Oriented start/end lines
+		const v = new Vector(1, this.$direction == SlashDirection.FW ? 1 : -1);
+		let startLine = new Line(start, v);
+		let endLine = new Line(end, v);
+		if(startLine.$pointIsOnRight(end)) startLine = startLine.$reverse();
+		if(endLine.$pointIsOnRight(start)) endLine = endLine.$reverse();
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private method
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+		const filteredRidges = this.$ridges.filter(r =>
+			(!startLine.$pointIsOnRight(r.p1, true) || !startLine.$pointIsOnRight(r.p2, true)) &&
+			(!endLine.$pointIsOnRight(r.p1, true) || !endLine.$pointIsOnRight(r.p2, true))
+		);
+		const ridges = new Set(filteredRidges);
 
-	private _trace(ctx: TraceContext): PatternContour | null {
+		// Initialize
 		const path: Point[] = [];
-		const ridges = new Set(this.$ridges);
-		const diagonals = new Set(this.$sideDiagonals);
-
-		let cursor = ctx.$getInitialNode(ridges, diagonals);
+		const startDiagonal = this.$sideDiagonals.find(d => d.$lineContains(start));
+		let cursor = ctx.$getInitialNode(ridges, startDiagonal);
 		if(!cursor) return null;
 		path.push(cursor.point);
 
-		for(const diagonal of diagonals) ridges.add(diagonal);
+		const endDiagonal = this.$sideDiagonals.find(d => d.$contains(end, true));
+		if(endDiagonal) ridges.add(endDiagonal);
 
 		// Main loop
 		while(true) {
 			const intersection = getNextIntersection(ridges, cursor);
-			if(!intersection) {
-				ctx.$markEnd(cursor.point);
-				break;
-			}
+			if(!intersection) break;
 
 			ridges.delete(intersection.line);
 			cursor = {
@@ -80,15 +74,15 @@ export class Trace {
 				point: intersection.point,
 				vector: intersection.line.$reflect(cursor.vector),
 			};
-			if(!path[path.length - 1].eq(cursor.point)) path.push(cursor.point);
-			if(cursor.vector.$isAxisParallel) {
-				const next = getNextIntersection(ridges, cursor);
-				if(next && next.point.eq(cursor.point)) continue;
-				if(ctx.$testEnd(cursor)) break;
+			const lastPoint = path[path.length - 1];
+			if(!lastPoint.eq(cursor.point)) {
+				const test = new Line(lastPoint, cursor.point).$intersection(end, v);
+				if(test && !test.eq(cursor.point)) break; // early stop
+				path.push(cursor.point);
 			}
 		}
 
-		return path.map(p => p.$toIPoint()) as PatternContour;
+		return ctx.$trim(path);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,22 +100,4 @@ export class Trace {
 	}
 
 	///#endif
-}
-
-/**
- * Return a bounding box that contains the entire pattern,
- * for quickly skipping intersection checking.
- *
- * It does not suffice to use just the tips of the {@link Quadrant}s involved,
- * as the entire pattern can actually go beyond that.
- * We have to consider the actual lines of the pattern.
- */
-function getBoundingBox(lines: Line[]): Rectangle {
-	const points = lines.map(l => l.p1).concat(lines.map(l => l.p2));
-	const xs = points.map(p => p.x);
-	const ys = points.map(p => p.y);
-	return new Rectangle(
-		{ x: Math.min(...xs), y: Math.min(...ys) },
-		{ x: Math.max(...xs), y: Math.max(...ys) }
-	);
 }

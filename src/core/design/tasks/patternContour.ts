@@ -5,10 +5,16 @@ import { comparator } from "../context/treeNode";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { Trace } from "../layout/trace/trace";
+import { startEndPoints } from "../layout/pattern/quadrant";
+import { quadrantNumber } from "shared/types/direction";
+import { createSegments } from "../layout/trace/hingeSegment";
+import { windingNumber } from "core/math/geometry/winding";
 
+import type { QuadrantDirection } from "shared/types/direction";
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { Repository } from "../layout/repository";
 import type { ITreeNode, NodeGraphics } from "../context";
+import type { Point } from "core/math/geometry/point";
 
 //=================================================================
 /**
@@ -44,15 +50,31 @@ function processRepo(repo: Repository): void {
 	const coverageMap = getNodeCoverageMap(repo);
 	const trace = Trace.$fromRepo(repo);
 
-	//TODO: Why do we need coverage info here?
 	for(const [node, leaves] of coverageMap.entries()) {
 		for(const [i, contour] of node.$graphics.$roughContours.entries()) {
-			const paths = trace.$generate(contour.outer);
-			for(const path of paths) {
-				path.$ids = repo.$nodeIds;
-				path.$repo = repo.$signature;
-				path.$for = i;
-				node.$graphics.$patternContours.push(path);
+			// Create start/end map
+			const outer = contour.outer;
+			const startEndMap = {} as Record<QuadrantDirection, [Point, Point]>;
+			const quadrants = leaves
+				.flatMap(leaf => quadrantMap.get(leaf)!)
+				// Make sure that the current path actually wraps around the quadrant
+				.filter(q => windingNumber(q.$point, outer) != 0);
+			for(let q = 0; q < quadrantNumber; q++) {
+				const filtered = quadrants.filter(quadrant => quadrant.q == q);
+				if(filtered.length) startEndMap[q as QuadrantDirection] = startEndPoints(filtered);
+			}
+
+			const segments = createSegments(outer, repo.$direction);
+			for(const segment of segments) {
+				if(!startEndMap[segment.$dir]) continue;
+				const [start, end] = startEndMap[segment.$dir];
+				const path = trace.$generate(segment, start, end);
+				if(path) {
+					path.$ids = repo.$nodeIds;
+					path.$repo = repo.$signature;
+					path.$for = i;
+					node.$graphics.$patternContours.push(path);
+				}
 			}
 		}
 	}

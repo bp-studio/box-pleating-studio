@@ -281,19 +281,19 @@ export class Line {
 	///#endif
 }
 
-export interface IIntersection {
+export interface IIntersection<T extends Line = Line> {
 	/** The intersected line. */
-	readonly line: Line;
+	readonly line: T;
 	/** The point of intersection. */
 	readonly point: Point;
 	/** Measures in multiple of the given {@link Vector}. */
 	readonly dist: Fraction;
 }
 
-export function getIntersection(
-	line: Line, p: Point, v: Vector,
+export function getIntersection<T extends Line>(
+	line: T, p: Point, v: Vector,
 	headless?: boolean, tailless?: boolean
-): IIntersection | null {
+): IIntersection<T> | null {
 	const v1 = line.p2.sub(line.p1);
 	const m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
 	if(m == null) return null;

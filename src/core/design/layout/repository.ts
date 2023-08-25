@@ -8,11 +8,12 @@ import { dist } from "../context/tree";
 import { Quadrant } from "./pattern/quadrant";
 import { SlashDirection } from "shared/types/direction";
 import { minComparator } from "shared/data/heap/heap";
+import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { ITreeNode } from "../context";
 import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
-import type { JStretch } from "shared/json";
+import type { JOverlap, JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
@@ -69,14 +70,14 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		this.$f = junctions[0].$f;
 		this.$origin = new Point(junctions[0].$tip);
 
-		const quadrants = new Set<number>();
+		const quadrantCodes = new Map<number, ValidJunction[]>();
 		const nodeIds = new Set<number>();
 		const leaves = new Set<number>();
 		if(junctions.length > 1) this._lcaMap = new IntDoubleMap();
 		const lcaMap = this._lcaMap;
 		for(const j of junctions) {
-			quadrants.add(j.$q1);
-			quadrants.add(j.$q2);
+			getOrSetEmptyArray(quadrantCodes, j.$q1).push(j);
+			getOrSetEmptyArray(quadrantCodes, j.$q2).push(j);
 			if(lcaMap) lcaMap.set(j.$a.id, j.$b.id, j.$lca);
 			j.$path.forEach(id => nodeIds.add(id));
 			leaves.add(j.$a.id);
@@ -84,7 +85,9 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		}
 
 		const qMap = new Map<number, Quadrant>();
-		for(const code of quadrants) qMap.set(code, new Quadrant(code));
+		for(const [code, relevantJunctions] of quadrantCodes) {
+			qMap.set(code, new Quadrant(code, relevantJunctions));
+		}
 		this.$quadrants = qMap;
 
 		this.$nodeIds = Array.from(nodeIds);
