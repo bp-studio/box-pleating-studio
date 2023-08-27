@@ -1,5 +1,5 @@
 import { HeapSet } from "shared/data/heap/heapSet";
-import { comparator } from "../context/treeNode";
+import { nodeComparator } from "../context/treeNode";
 
 import type { ITreeNode } from "../context";
 import type { distanceTask } from "./distance";
@@ -27,7 +27,7 @@ export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: Reado
 		while(updater(n) && n.$parent) n = n.$parent;
 	} else {
 		// Initializing
-		const heap = new HeapSet<T>(comparator);
+		const heap = new HeapSet<T>(nodeComparator);
 		for(const set of sets) {
 			for(const n of set) heap.$insert(n);
 		}

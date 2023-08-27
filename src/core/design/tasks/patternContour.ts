@@ -1,8 +1,6 @@
 import { Task } from "./task";
 import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
-import { comparator } from "../context/treeNode";
-import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { Trace } from "../layout/trace/trace";
 import { startEndPoints } from "../layout/pattern/quadrant";
@@ -47,7 +45,7 @@ function processRepo(repo: Repository): void {
 		getOrSetEmptyArray(quadrantMap, quadrant.$flap).push(quadrant);
 	}
 
-	const coverageMap = getNodeCoverageMap(repo);
+	const coverageMap = repo.$coverageMap;
 	const trace = Trace.$fromRepo(repo);
 
 	for(const [node, leaves] of coverageMap.entries()) {
@@ -67,8 +65,8 @@ function processRepo(repo: Repository): void {
 
 			const segments = createSegments(outer, repo.$direction);
 			for(const segment of segments) {
-				if(!startEndMap[segment.$dir]) continue;
-				const [start, end] = startEndMap[segment.$dir];
+				if(!startEndMap[segment.q]) continue;
+				const [start, end] = startEndMap[segment.q];
 				const path = trace.$generate(segment, start, end);
 				if(path) {
 					path.$ids = repo.$nodeIds;
@@ -91,36 +89,4 @@ export function clearPatternContourForRepo(repo: Repository): void {
 			g.$patternContours = g.$patternContours.filter(p => p.$repo != repo.$signature);
 		}
 	}
-}
-
-/**
- * Mapping all nodes (except for the branch root) involved in a
- * {@link Repository} to an array of leaf nodes under it.
- */
-function getNodeCoverageMap(repo: Repository): Map<ITreeNode, ITreeNode[]> {
-	const heap = new MutableHeap<ITreeNode>(comparator);
-	const result = new Map<ITreeNode, ITreeNode[]>();
-	const numLeaves = repo.$leaves.length;
-	for(const id of repo.$leaves) {
-		const leaf = State.$tree.$nodes[id]!;
-		heap.$insert(leaf);
-		result.set(leaf, [leaf]);
-	}
-
-	while(!heap.$isEmpty) {
-		const node = heap.$pop()!;
-		const coverage = result.get(node)!;
-
-		// Stop processing if we've reached the branch root
-		if(coverage.length == numLeaves) {
-			result.delete(node);
-			continue;
-		}
-
-		const parent = node.$parent!;
-		const parentCoverage = getOrSetEmptyArray(result, parent, () => heap.$insert(parent));
-		parentCoverage.push(...coverage);
-	}
-
-	return result;
 }

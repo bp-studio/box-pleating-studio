@@ -84,6 +84,10 @@ export class TraceContext {
 		return null;
 	}
 
+	/**
+	 * Remove the first or last point of the generated path if needed,
+	 * so that the resulting path is irredundant.
+	 */
 	public $trim(path: Point[]): PatternContour | null {
 		if(path.length <= 1) return null;
 		const firstLine = new Line(path[0], path[1]);

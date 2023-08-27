@@ -4,7 +4,7 @@ import type { QuadrantDirection, SlashDirection } from "shared/types/direction";
 import type { Path } from "shared/types/geometry";
 
 export interface HingeSegment extends Path {
-	readonly $dir: QuadrantDirection;
+	readonly q: QuadrantDirection;
 }
 
 /**
@@ -25,7 +25,7 @@ export function createSegments(hinges: Path, dir: SlashDirection): HingeSegment[
 		const p = hinges[index];
 		if(currentSegment) {
 			currentSegment.push(p);
-			if(directions[index] != currentSegment.$dir) {
+			if(directions[index] != currentSegment.q) {
 				results.push(currentSegment);
 				currentSegment = undefined;
 			}
@@ -34,7 +34,7 @@ export function createSegments(hinges: Path, dir: SlashDirection): HingeSegment[
 			const nextDir = directions[(start + i + 1) % l];
 			if(nextDir % 2 == dir) {
 				currentSegment = [p] as HingeSegment;
-				(currentSegment as Writeable<HingeSegment>).$dir = nextDir;
+				(currentSegment as Writeable<HingeSegment>).q = nextDir;
 			}
 		}
 	}

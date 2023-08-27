@@ -40,18 +40,8 @@ export class Trace {
 		const ctx = new TraceContext(this, hinges);
 		if(!ctx.$valid) return null;
 
-		// Oriented start/end lines
-		const v = new Vector(1, this.$direction == SlashDirection.FW ? 1 : -1);
-		let startLine = new Line(start, v);
-		let endLine = new Line(end, v);
-		if(startLine.$pointIsOnRight(end)) startLine = startLine.$reverse();
-		if(endLine.$pointIsOnRight(start)) endLine = endLine.$reverse();
-
-		const filteredRidges = this.$ridges.filter(r =>
-			(!startLine.$pointIsOnRight(r.p1, true) || !startLine.$pointIsOnRight(r.p2, true)) &&
-			(!endLine.$pointIsOnRight(r.p1, true) || !endLine.$pointIsOnRight(r.p2, true))
-		);
-		const ridges = new Set(filteredRidges);
+		const directionalVector = new Vector(1, this.$direction == SlashDirection.FW ? 1 : -1);
+		const ridges = this._createFilteredRidges(start, end, directionalVector);
 
 		// Initialize
 		const path: Point[] = [];
@@ -76,13 +66,29 @@ export class Trace {
 			};
 			const lastPoint = path[path.length - 1];
 			if(!lastPoint.eq(cursor.point)) {
-				const test = new Line(lastPoint, cursor.point).$intersection(end, v);
+				const line = new Line(lastPoint, cursor.point);
+				const test = line.$intersection(end, directionalVector);
 				if(test && !test.eq(cursor.point)) break; // early stop
 				path.push(cursor.point);
 			}
 		}
 
 		return ctx.$trim(path);
+	}
+
+	private _createFilteredRidges(start: Point, end: Point, directionalVector: Vector): Set<Ridge> {
+		let startLine = new Line(start, directionalVector);
+		let endLine = new Line(end, directionalVector);
+
+		// Oriented start/end lines
+		if(startLine.$pointIsOnRight(end)) startLine = startLine.$reverse();
+		if(endLine.$pointIsOnRight(start)) endLine = endLine.$reverse();
+
+		const filteredRidges = this.$ridges.filter(r =>
+			(!startLine.$pointIsOnRight(r.p1, true) || !startLine.$pointIsOnRight(r.p2, true)) &&
+			(!endLine.$pointIsOnRight(r.p1, true) || !endLine.$pointIsOnRight(r.p2, true))
+		);
+		return new Set(filteredRidges);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

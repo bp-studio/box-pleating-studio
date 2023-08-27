@@ -2,7 +2,7 @@ import { State } from "core/service/state";
 import { Task } from "./task";
 import { AABBTask } from "./aabb";
 import { HeapSet } from "shared/data/heap/heapSet";
-import { comparator } from "../context/treeNode";
+import { nodeComparator } from "../context/treeNode";
 
 import type { ITreeNode } from "../context";
 import type { TreeNode } from "../context/treeNode";
@@ -21,7 +21,7 @@ function distance(): void {
 	} else {
 		// Otherwise it suffices to update the subtrees
 		// under nodes with the lengths of their parent edges changed.
-		const heap = new HeapSet<ITreeNode>(comparator);
+		const heap = new HeapSet<ITreeNode>(nodeComparator);
 		for(const node of State.$lengthChanged) heap.$insert(node);
 		while(!heap.$isEmpty) {
 			const node = heap.$pop()!;

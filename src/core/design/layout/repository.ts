@@ -5,15 +5,19 @@ import { configGenerator } from "./generators/configGenerator";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { foreachPair } from "shared/utils/array";
 import { dist } from "../context/tree";
-import { Quadrant } from "./pattern/quadrant";
-import { SlashDirection } from "shared/types/direction";
+import { Quadrant, quadrantComparator } from "./pattern/quadrant";
+import { SlashDirection, makePerQuadrant, quadrantNumber } from "shared/types/direction";
 import { minComparator } from "shared/data/heap/heap";
 import { getOrSetEmptyArray } from "shared/utils/map";
+import { cache } from "core/utils/cache";
+import { MutableHeap } from "shared/data/heap/mutableHeap";
+import { nodeComparator } from "../context/treeNode";
 
+import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { ITreeNode } from "../context";
 import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
-import type { JOverlap, JStretch } from "shared/json";
+import type { JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
@@ -50,6 +54,9 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** Mapping quadrant codes to {@link Quadrant}s. */
 	public readonly $quadrants: ReadonlyMap<number, Quadrant>;
 
+	/** List {@link Quadrant}s by {@link QuadrantDirection} and sorted in tracing ordering. */
+	public readonly $directionalQuadrants: PerQuadrant<Quadrant[]>;
+
 	/** The ids of all nodes (not just leaves) involved. */
 	public readonly $nodeIds: number[];
 
@@ -70,26 +77,11 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		this.$f = junctions[0].$f;
 		this.$origin = new Point(junctions[0].$tip);
 
-		const quadrantCodes = new Map<number, ValidJunction[]>();
-		const nodeIds = new Set<number>();
-		const leaves = new Set<number>();
 		if(junctions.length > 1) this._lcaMap = new IntDoubleMap();
 		const lcaMap = this._lcaMap;
-		for(const j of junctions) {
-			getOrSetEmptyArray(quadrantCodes, j.$q1).push(j);
-			getOrSetEmptyArray(quadrantCodes, j.$q2).push(j);
-			if(lcaMap) lcaMap.set(j.$a.id, j.$b.id, j.$lca);
-			j.$path.forEach(id => nodeIds.add(id));
-			leaves.add(j.$a.id);
-			leaves.add(j.$b.id);
-		}
-
-		const qMap = new Map<number, Quadrant>();
-		for(const [code, relevantJunctions] of quadrantCodes) {
-			qMap.set(code, new Quadrant(code, relevantJunctions));
-		}
-		this.$quadrants = qMap;
-
+		const { map, directional, nodeIds, leaves } = createQuadrants(junctions, this._lcaMap);
+		this.$quadrants = map;
+		this.$directionalQuadrants = directional;
 		this.$nodeIds = Array.from(nodeIds);
 		this.$leaves = Array.from(leaves);
 
@@ -189,4 +181,68 @@ export class Repository implements ISerializable<JRepository | undefined> {
 			d3: total - d12,
 		};
 	}
+
+	/**
+	 * Mapping all nodes (except for the branch root) involved in a
+	 * {@link Repository} to an array of leaf nodes under it.
+	 */
+	@cache public get $coverageMap(): ReadonlyMap<ITreeNode, ITreeNode[]> {
+		const heap = new MutableHeap<ITreeNode>(nodeComparator);
+		const result = new Map<ITreeNode, ITreeNode[]>();
+		const numLeaves = this.$leaves.length;
+		for(const id of this.$leaves) {
+			const leaf = State.$tree.$nodes[id]!;
+			heap.$insert(leaf);
+			result.set(leaf, [leaf]);
+		}
+
+		while(!heap.$isEmpty) {
+			const node = heap.$pop()!;
+			const coverage = result.get(node)!;
+
+			// Stop processing if we've reached the branch root
+			if(coverage.length == numLeaves) {
+				result.delete(node);
+				continue;
+			}
+
+			const parent = node.$parent!;
+			const parentCoverage = getOrSetEmptyArray(result, parent, () => heap.$insert(parent));
+			parentCoverage.push(...coverage);
+		}
+		return result;
+	}
+}
+
+interface CreateQuadrantResult {
+	readonly map: ReadonlyMap<number, Quadrant>;
+	readonly directional: PerQuadrant<Quadrant[]>;
+	readonly nodeIds: ReadonlySet<number>;
+	readonly leaves: ReadonlySet<number>;
+}
+
+function createQuadrants(junctions: ValidJunction[], lcaMap?: IntDoubleMap<ITreeNode>): CreateQuadrantResult {
+	const quadrantCodes = new Map<number, ValidJunction[]>();
+	const nodeIds = new Set<number>();
+	const leaves = new Set<number>();
+	for(const j of junctions) {
+		getOrSetEmptyArray(quadrantCodes, j.$q1).push(j);
+		getOrSetEmptyArray(quadrantCodes, j.$q2).push(j);
+		if(lcaMap) lcaMap.set(j.$a.id, j.$b.id, j.$lca);
+		j.$path.forEach(id => nodeIds.add(id));
+		leaves.add(j.$a.id);
+		leaves.add(j.$b.id);
+	}
+
+	const directional = makePerQuadrant<Quadrant[]>(_ => []);
+	const map = new Map<number, Quadrant>();
+	for(const [code, relevantJunctions] of quadrantCodes) {
+		const quadrant = new Quadrant(code, relevantJunctions);
+		map.set(code, quadrant);
+		directional[quadrant.q].push(quadrant);
+	}
+	for(let q = 0; q < quadrantNumber; q++) {
+		directional[q].sort(quadrantComparator);
+	}
+	return { map, directional, nodeIds, leaves };
 }

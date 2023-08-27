@@ -3,6 +3,7 @@ import { Direction, SlashDirection } from "shared/types/direction";
 import { MASK } from "../junction/validJunction";
 import { State } from "core/service/state";
 
+import type { Comparator } from "shared/types/types";
 import type { ValidJunction } from "../junction/validJunction";
 import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
@@ -22,6 +23,9 @@ export class Quadrant {
 	public readonly q: QuadrantDirection;
 	public readonly f: IPoint;
 
+	/** Weight for sorting {@link Quadrant}s. */
+	public readonly w: number;
+
 	/** The starting point of tracing relative to the corner of the flap. */
 	private readonly o: IPoint;
 
@@ -39,6 +43,11 @@ export class Quadrant {
 			oy.push(junction.$o.y);
 		}
 		this.o = { x: Math.max(...ox), y: Math.max(...oy) };
+
+		// Weight is relatively invariant as the entire repo moves,
+		// so can be calculated as constant.
+		const { x, y } = this.$point;
+		this.w = this.f.x * y - this.f.y * x;
 	}
 
 	public get $startEndPoints(): [Point, Point] {
@@ -102,6 +111,8 @@ export class Quadrant {
 		return this.$point.x + this.f.x * d;
 	}
 }
+
+export const quadrantComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
 
 /**
  * Find the start/end {@link Point}s for tracing for a given set of {@link Quadrant}s

@@ -7,7 +7,7 @@ import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode, NodeGraphics } from ".";
 import type { Tree } from "./tree";
 
-export const comparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist;
+export const nodeComparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist;
 
 //=================================================================
 /**
