@@ -5,6 +5,7 @@ import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
 import type { Repository } from "../layout/repository";
 import type { clearPatternContourForRepo } from "../tasks/patternContour";
+import type { RepoNodeSet } from "../layout/repoNodeSet";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -27,9 +28,6 @@ export interface ITree {
 
 	/** Update the length of the parent edge */
 	$setLength(id: number, length: number): void;
-
-	/** Returns the distance of two nodes on the tree */
-	$dist(n1: ITreeNode, n2: ITreeNode): number;
 }
 
 /**
@@ -62,7 +60,7 @@ export interface PatternContour extends Path {
 	/** The index in {@link NodeGraphics.$contours} associated with this contour. */
 	$for: number;
 
-	/** Same as {@link Repository.$nodeIds}. */
+	/** Same as {@link RepoNodeSet.$nodes}. */
 	$ids: readonly number[];
 }
 

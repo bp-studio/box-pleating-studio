@@ -25,7 +25,7 @@ function patternContour(): void {
 	const tree = State.$tree;
 	for(const stretch of State.$stretches.values()) {
 		if(State.$repoToProcess.has(stretch.$repo)) continue;
-		const nodes = stretch.$repo.$nodeIds.map(id => tree.$nodes[id]!);
+		const nodes = stretch.$repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
 		if(nodes.some(n => State.$contourWillChange.has(n))) {
 			State.$repoToProcess.add(stretch.$repo);
 		}
@@ -46,7 +46,7 @@ function processRepo(repo: Repository): void {
 		getOrSetEmptyArray(quadrantMap, quadrant.$flap).push(quadrant);
 	}
 
-	const coverageMap = repo.$coverageMap;
+	const coverageMap = repo.$nodeSet.$coverage;
 	const trace = Trace.$fromRepo(repo);
 
 	for(const [node, leaves] of coverageMap.entries()) {
@@ -70,7 +70,7 @@ function processRepo(repo: Repository): void {
 				const [start, end] = startEndMap[segment.q];
 				const path = trace.$generate(segment, start, end);
 				if(path) {
-					path.$ids = repo.$nodeIds;
+					path.$ids = repo.$nodeSet.$nodes;
 					path.$repo = repo.$signature;
 					path.$for = index;
 					node.$graphics.$patternContours.push(path);
@@ -81,7 +81,7 @@ function processRepo(repo: Repository): void {
 }
 
 export function clearPatternContourForRepo(repo: Repository): void {
-	for(const id of repo.$nodeIds) {
+	for(const id of repo.$nodeSet.$nodes) {
 		const node = State.$tree.$nodes[id];
 		if(!node) continue;
 		const g = node.$graphics;

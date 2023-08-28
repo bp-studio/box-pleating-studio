@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { Tree } from "core/design/context/tree";
+import { Tree, getDist } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
@@ -96,12 +96,12 @@ describe("Tree", function() {
 		expect(n0.$dist).to.equal(2);
 		expect(n2.$dist).to.equal(0);
 		expect(n0.$parent).to.equal(n2);
-		expect(tree.$dist(n0, n3)).to.equal(5);
-		expect(tree.$dist(n1, n4)).to.equal(10);
+		expect(getDist(n0, n3)).to.equal(5);
+		expect(getDist(n1, n4)).to.equal(10);
 
 		tree.$setLength(0, 5);
 		Processor.$run(heightTask);
-		expect(tree.$dist(n1, n4)).to.equal(13);
+		expect(getDist(n1, n4)).to.equal(13);
 	});
 
 	it("Outputs balanced JSON", function() {

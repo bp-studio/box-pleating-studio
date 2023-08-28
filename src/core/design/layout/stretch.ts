@@ -2,6 +2,7 @@ import { Repository } from "./repository";
 import { getStructureSignature } from "./junction/validJunction";
 import { State } from "core/service/state";
 import { clearPatternContourForRepo } from "../tasks/patternContour";
+import { RepoNodeSet } from "./repoNodeSet";
 
 import type { StretchData } from "core/service/updateModel";
 import type { JStretch } from "shared/json";
@@ -57,6 +58,15 @@ export class Stretch implements ISerializable<JStretch> {
 		const signature = getStructureSignature(junctions);
 		const origin = junctions[0].$tip;
 		if(signature === this._repo.$signature) {
+			/**
+			 * The {@link Repository.$signature} only encodes the structure and not the {@link RepoNodeSet},
+			 * so in case nodes are changed due to splitting/merging,
+			 * we need to update the {@link RepoNodeSet} here.
+			 * Note that to compare the old and new {@link RepoNodeSet}s is no less work
+			 * than to just create and replace the {@link RepoNodeSet} regardlessly.
+			 */
+			this._repo.$nodeSet = new RepoNodeSet(junctions);
+
 			const updated = this._repo.$tryUpdateOrigin(origin);
 			if(!this.$isActive || updated) {
 				State.$repoToProcess.add(this._repo);

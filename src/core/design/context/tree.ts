@@ -222,29 +222,6 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		this._pendingRemove.clear();
 	}
 
-	//TODO: Do we need this?
-	/** Returns the distance between two nodes on the tree. */
-	public $dist(n1: TreeNode, n2: TreeNode): number {
-		return dist(n1, n2, this.$lca(n1, n2));
-	}
-
-	/**
-	 * Returns the LCA of two nodes.
-	 *
-	 * This method is used only occasionally,
-	 * so there's no need for fancy algorithms or data structures.
-	 */
-	public $lca(n1: TreeNode, n2: TreeNode): TreeNode {
-		while(n1 !== n2) {
-			// Originally this part compares the depths of the nodes,
-			// but in fact comparing the distance results the same,
-			// and we save ourselves the overhead of maintaining one extra field.
-			if(n1.$dist >= n2.$dist) n1 = n1.$parent!;
-			if(n2.$dist > n1.$dist) n2 = n2.$parent!;
-		}
-		return n1;
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,4 +271,25 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 
 export function dist(a: ITreeNode, b: ITreeNode, lca: ITreeNode): number {
 	return a.$dist + b.$dist - 2 * lca.$dist;
+}
+
+/**
+ * Returns the distance between two nodes on the tree. Used only in unit tests.
+ */
+export function getDist(n1: TreeNode, n2: TreeNode): number {
+	return dist(n1, n2, getLCA(n1, n2));
+}
+
+/**
+ * Returns the LCA of two nodes. Used only in unit tests.
+ */
+function getLCA(n1: TreeNode, n2: TreeNode): TreeNode {
+	while(n1 !== n2) {
+		// Originally this part compares the depths of the nodes,
+		// but in fact comparing the distance results the same,
+		// and we save ourselves the overhead of maintaining one extra field.
+		if(n1.$dist >= n2.$dist) n1 = n1.$parent!;
+		if(n2.$dist > n1.$dist) n2 = n2.$parent!;
+	}
+	return n1;
 }

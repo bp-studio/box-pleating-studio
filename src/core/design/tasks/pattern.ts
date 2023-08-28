@@ -27,7 +27,7 @@ function pattern(): void {
 				data: repo.$stretch.toJSON(),
 				repo: repo.toJSON(),
 			};
-			for(const n of repo.$nodeIds) {
+			for(const n of repo.$nodeSet.$nodes) {
 				State.$contourWillChange.add(State.$tree.$nodes[n]!);
 			}
 		} else {
@@ -37,7 +37,7 @@ function pattern(): void {
 
 	for(const s of State.$stretches.values()) {
 		if(!s.$repo.$pattern) continue;
-		for(const id of s.$repo.$nodeIds) State.$patternDiff.$add(id);
+		for(const id of s.$repo.$nodeSet.$nodes) State.$patternDiff.$add(id);
 
 		// Collect patterned quadrants
 		for(const q of s.$repo.$quadrants.keys()) {

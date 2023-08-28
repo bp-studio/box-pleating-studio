@@ -1,7 +1,6 @@
 import { Rectangle } from "core/math/geometry/rectangle";
 import { opposite } from "shared/types/direction";
 import { CornerType } from "shared/json/enum";
-import { cache } from "core/utils/cache";
 
 import type { JJunction } from "shared/json";
 import type { ITreeNode } from "core/design/context";
@@ -133,24 +132,6 @@ export class ValidJunction implements ISerializable<JJunction> {
 		const x = this.$tip.x + distanceToA * this.$f.x;
 		const y = this.$tip.y + distanceToA * this.$f.y;
 		return new Rectangle({ x, y }, { x: x - this.$o.x * this.$f.x, y: y - this.$o.y * this.$f.y });
-	}
-
-	/**
-	 * The {@link ITreeNode.id id}s of the nodes on the path between {@link $a} and {@link $b},
-	 * excluding {@link $lca}. Not necessarily in order.
-	 */
-	@cache public get $path(): number[] {
-		let a = this.$a, b = this.$b;
-		const result = [];
-		while(a !== this.$lca) {
-			result.push(a.id);
-			a = a.$parent!;
-		}
-		while(b !== this.$lca) {
-			result.push(b.id);
-			b = b.$parent!;
-		}
-		return result;
 	}
 }
 
