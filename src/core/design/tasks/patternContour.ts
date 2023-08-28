@@ -24,13 +24,14 @@ export const patternContourTask = new Task(patternContour, graphicsTask);
 function patternContour(): void {
 	const tree = State.$tree;
 	for(const stretch of State.$stretches.values()) {
+		if(State.$repoToProcess.has(stretch.$repo)) continue;
 		const nodes = stretch.$repo.$nodeIds.map(id => tree.$nodes[id]!);
 		if(nodes.some(n => State.$contourWillChange.has(n))) {
-			State.$repoUpdated.add(stretch.$repo);
+			State.$repoToProcess.add(stretch.$repo);
 		}
 	}
 
-	for(const repo of State.$repoUpdated) {
+	for(const repo of State.$repoToProcess) {
 		clearPatternContourForRepo(repo); // Reset
 		processRepo(repo);
 	}

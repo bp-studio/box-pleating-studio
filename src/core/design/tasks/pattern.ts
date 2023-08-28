@@ -1,6 +1,6 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
-import { clearPatternContourForRepo, patternContourTask } from "./patternContour";
+import { patternContourTask } from "./patternContour";
 
 import type { Configuration } from "../layout/configuration";
 import type { Pattern } from "../layout/pattern/pattern";
@@ -20,7 +20,7 @@ function pattern(): void {
 
 	for(const device of State.$movedDevices) device.$updatePosition();
 
-	for(const repo of State.$repoUpdated) {
+	for(const repo of State.$repoToProcess) {
 		const id = repo.$stretch.$id;
 		if(repo.$pattern) {
 			State.$updateResult.add.stretches[id] = {
@@ -31,7 +31,6 @@ function pattern(): void {
 				State.$contourWillChange.add(State.$tree.$nodes[n]!);
 			}
 		} else {
-			clearPatternContourForRepo(repo);
 			State.$updateResult.remove.stretches.push(id);
 		}
 	}

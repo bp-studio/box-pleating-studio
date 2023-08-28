@@ -22,9 +22,9 @@ describe("Tracing algorithm", function() {
 			const path = parsePath("(2,3),(1,3),(1,2),(0,2),(0,1),(1,1),(1,0),(2,0),(2,1),(3,1),(3,2),(2,2)");
 			const segments = createSegments(path, SlashDirection.FW);
 			expect(segments.length).to.equal(2);
-			expect(segments[0].$dir).to.equal(Direction.LL);
+			expect(segments[0].q).to.equal(Direction.LL);
 			expect(segments[0]).to.equalPath("(0,2),(0,1),(1,1),(1,0),(2,0)");
-			expect(segments[1].$dir).to.equal(Direction.UR);
+			expect(segments[1].q).to.equal(Direction.UR);
 			expect(segments[1]).to.equalPath("(3,1),(3,2),(2,2),(2,3),(1,3)");
 		});
 
@@ -32,9 +32,9 @@ describe("Tracing algorithm", function() {
 			const path = parsePath("(0,0),(1,0),(1,1),(0,1)");
 			const segments = createSegments(path, SlashDirection.FW);
 			expect(segments.length).to.equal(2);
-			expect(segments[0].$dir).to.equal(Direction.UR);
+			expect(segments[0].q).to.equal(Direction.UR);
 			expect(segments[0]).to.equalPath("(1,0),(1,1),(0,1)");
-			expect(segments[1].$dir).to.equal(Direction.LL);
+			expect(segments[1].q).to.equal(Direction.LL);
 			expect(segments[1]).to.equalPath("(0,1),(0,0),(1,0)");
 		});
 	});

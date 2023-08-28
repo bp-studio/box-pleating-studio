@@ -9,7 +9,7 @@ import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
-import type { ITreeNode } from "core/design/context";
+import type { ITreeNode, PatternContour } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
 
 //=================================================================
@@ -99,10 +99,14 @@ export namespace State {
 	export const $newRepositories = new Set<Repository>();
 
 	/**
-	 * The {@link Repository Repositories} that are updated in the current round,
-	 * not including the ones of {@link Stretch}es to be removed.
+	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} in the current round,
+	 * for one or more of the following reasons:
+	 * 1. Are created, switched over or resumed.
+	 * 2. Have devices that just moved.
+	 * 3. Some of the relevant river contours have changed.
+	 * 4. Some of the relevant river nodes are added/removed due to splitting/merging.
 	 */
-	export const $repoUpdated = new Set<Repository>();
+	export const $repoToProcess = new Set<Repository>();
 
 	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
 	export const $stretchPrototypes = new Map<string, JStretch>();
@@ -131,7 +135,7 @@ export namespace State {
 		$flapAABBChanged.clear();
 		$flapChanged.clear();
 		$newRepositories.clear();
-		$repoUpdated.clear();
+		$repoToProcess.clear();
 		$stretchPrototypes.clear();
 		$contourWillChange.clear();
 		$patternedQuadrants.clear();

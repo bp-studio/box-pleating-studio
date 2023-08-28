@@ -23,7 +23,7 @@ export const graphicsTask = new Task(graphics);
 
 function graphics(): void {
 	// Devices
-	for(const repo of State.$repoUpdated) {
+	for(const repo of State.$repoToProcess) {
 		if(repo.$pattern) addRepo(repo);
 	}
 

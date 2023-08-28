@@ -59,7 +59,7 @@ export class Stretch implements ISerializable<JStretch> {
 		if(signature === this._repo.$signature) {
 			const updated = this._repo.$tryUpdateOrigin(origin);
 			if(!this.$isActive || updated) {
-				State.$repoUpdated.add(this._repo);
+				State.$repoToProcess.add(this._repo);
 				this.$isActive = true;
 			}
 			return;
@@ -73,7 +73,7 @@ export class Stretch implements ISerializable<JStretch> {
 			if(repo) {
 				this._repo = repo;
 				this._repo.$tryUpdateOrigin(origin);
-				State.$repoUpdated.add(repo);
+				State.$repoToProcess.add(repo);
 				return;
 			}
 		}
