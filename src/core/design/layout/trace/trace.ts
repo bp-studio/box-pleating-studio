@@ -119,7 +119,9 @@ export class Trace {
 
 		const filteredRidges = this.$ridges.filter(r =>
 			(!startLine.$pointIsOnRight(r.p1, true) || !startLine.$pointIsOnRight(r.p2, true)) &&
-			(!endLine.$pointIsOnRight(r.p1, true) || !endLine.$pointIsOnRight(r.p2, true))
+			(!endLine.$pointIsOnRight(r.p1, true) || !endLine.$pointIsOnRight(r.p2, true) ||
+				// Include the intersection ridge when applicable
+				endLine.$lineContains(r.p1) && endLine.$lineContains(r.p2))
 		);
 		return new Set(filteredRidges);
 	}
@@ -130,12 +132,12 @@ export class Trace {
 
 	///#if DEBUG==true
 
-	public $createTestCase(hinges: Path): string {
+	public $createTestCase(hinges: Path, start: Point, end: Point): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
 		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");
 		const sideDiagonals = `Line.$parseTest<SideDiagonal>(${simp(this.$sideDiagonals)})`;
-		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"));`;
+		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"), new Point${start.toString()}, new Point${end.toString()});`;
 	}
 
 	///#endif

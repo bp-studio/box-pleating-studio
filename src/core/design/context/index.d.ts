@@ -6,6 +6,7 @@ import type { JEdge, JFlap } from "shared/json";
 import type { Repository } from "../layout/repository";
 import type { clearPatternContourForRepo } from "../tasks/patternContour";
 import type { RepoNodeSet } from "../layout/repoNodeSet";
+import type { Point } from "core/math/geometry/point";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -48,7 +49,7 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	$setFlap(flap: JFlap): void;
 }
 
-export interface PatternContour extends Path {
+export interface PatternContour extends Array<Point> {
 	/**
 	 * The {@link Repository.$signature} of the repo from which this path derives.
 	 *

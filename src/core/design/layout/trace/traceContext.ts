@@ -95,7 +95,7 @@ export class TraceContext {
 		if(this._testEndPoints(lastLine, false)) path.pop();
 		if(this._testEndPoints(firstLine, true)) path.shift();
 		if(path.length <= 1) return null;
-		return path.map(p => p.$toIPoint()) as PatternContour;
+		return path as PatternContour;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -23,8 +23,8 @@ export class ExChainer extends Chainer {
 	}
 
 	protected override _connectChain(head: number, tail: number, segment: ISegment): void {
-		super._connectChain(head, tail, segment);
 		for(const n of this._sources[tail]) this._sources[head].add(n);
+		super._connectChain(head, tail, segment);
 	}
 
 	protected override _append(segment: ISegment, id: number): void {

@@ -11,7 +11,7 @@ import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
 import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
-import type { ITreeNode } from "../context";
+import type { ITreeNode, PatternContour } from "../context";
 import type { expand } from "core/math/polyBool/expansion";
 
 //=================================================================
@@ -67,7 +67,7 @@ function addRepo(repo: Repository): void {
 
 function combineContour(node: ITreeNode): void {
 	const g = node.$graphics;
-	const childrenPatternContours: Path[] = [];
+	const childrenPatternContours: PatternContour[] = [];
 	for(const child of node.$children) {
 		// There's no need to process a child pattern contour if the
 		// corresponding pattern does not involve the current node
@@ -78,7 +78,7 @@ function combineContour(node: ITreeNode): void {
 
 	// To temporarily disable pattern contour, comment the following two lines.
 	for(const path of g.$patternContours) tryInsert(result[path.$for].outer, path);
-	for(const path of childrenPatternContours) tryInsertInner(path, result);
+	for(const contour of childrenPatternContours) tryInsertInner(contour, result);
 
 	for(const contour of result) {
 		contour.outer = simplify(contour.outer);
@@ -87,7 +87,7 @@ function combineContour(node: ITreeNode): void {
 	g.$contours = result;
 }
 
-function tryInsertInner(path: Path, result: Contour[]): void {
+function tryInsertInner(path: PatternContour, result: Contour[]): void {
 	for(const contour of result) {
 		if(!contour.inner) continue;
 		for(const inner of contour.inner) {
@@ -96,7 +96,7 @@ function tryInsertInner(path: Path, result: Contour[]): void {
 	}
 }
 
-function tryInsert(path: Path, insert: Path): boolean {
+function tryInsert(path: Path, insert: PatternContour): boolean {
 	const l = path.length;
 	const first = insert[0];
 	const last = insert[insert.length - 1];
@@ -110,12 +110,13 @@ function tryInsert(path: Path, insert: Path): boolean {
 			end = i + 1;
 		}
 		if(start !== undefined && end !== undefined && start != end) {
+			const slice = insert.map(p => p.$toIPoint());
 			if(end > start) {
-				path.splice(start, end - start, ...insert);
+				path.splice(start, end - start, ...slice);
 			} else {
 				path.splice(start);
 				path.splice(0, end);
-				path.push(...insert);
+				path.push(...slice);
 			}
 			return true;
 		}

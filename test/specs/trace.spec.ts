@@ -7,6 +7,7 @@ import { Direction, SlashDirection } from "shared/types/direction";
 import { parsePath } from "../utils/path";
 import { mapDirections } from "core/math/geometry/path";
 import { createSegments } from "core/design/layout/trace/hingeSegment";
+import { Point } from "core/math/geometry/point";
 
 import type { SideDiagonal } from "core/design/layout/configuration";
 
@@ -36,6 +37,16 @@ describe("Tracing algorithm", function() {
 			expect(segments[0]).to.equalPath("(1,0),(1,1),(0,1)");
 			expect(segments[1].q).to.equal(Direction.LL);
 			expect(segments[1]).to.equalPath("(0,1),(0,0),(1,0)");
+		});
+	});
+
+	describe("Ridge filtering", function() {
+
+		it("Includes the intersection ridge at the end", function() {
+			const trace = new Trace(Line.$parseTest([{ p1: "(8, 61)", p2: "(25, 32)" }, { p1: "(25, 32)", p2: "(48, 26)" }, { p1: "(48, 26)", p2: "(31, 55)" }, { p1: "(31, 55)", p2: "(8, 61)" }, { p1: "(8, 61)", p2: "(8, 61)" }, { p1: "(48, 26)", p2: "(48, 26)" }, { p1: "(25, 32)", p2: "(18, 39)", "$type": 3, "$division": [3, 12] }, { p1: "(11, 32)", p2: "(21, 27)" }, { p1: "(21, 27)", p2: "(13, 51)" }, { p1: "(13, 51)", p2: "(1/2, 127/2)" }, { p1: "(1/2, 127/2)", p2: "(11, 32)" }, { p1: "(13, 51)", p2: "(8, 61)" }, { p1: "(8, 61)", p2: "(1/2, 127/2)" }, { p1: "(1/2, 127/2)", p2: "(0, 64)" }, { p1: "(21, 27)", p2: "(22, 26)" }]), SlashDirection.BW, Line.$parseTest<SideDiagonal>([{ p1: "(23, 63)", p2: "(37, 49)", p0: "(31, 55)" }, { p1: "(2, 41)", p2: "(10, 33)", p0: "(11, 32)" }]));
+			const result = trace.$generate(parsePath("(73,51),(23,51),(23,1)"), new Point(37, 49), new Point(25, 32));
+
+			expect(result).to.equalPath("(33.3448275862069,51),(23.82758620689655,34),(23,34)");
 		});
 	});
 
