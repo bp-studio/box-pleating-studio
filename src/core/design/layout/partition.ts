@@ -12,6 +12,7 @@ import type { JConnection, JDevice, JGadget, JJunction, JOverlap, JPartition, JC
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
+import type { Ridge } from "./pattern/device";
 
 export interface CornerMap {
 	/** {@link JCorner} itself. */
@@ -142,6 +143,27 @@ export class Partition implements ISerializable<JPartition> {
 		const p2 = quad2.$getOverlapCorner(ov, parent, opposite(map.anchorIndex), d2);
 
 		return [p1, p2];
+	}
+
+	/**
+	 * See {@link Ridge.$division}.
+	 * @param q {@link QuadrantDirection} of the intersection ridge.
+	 */
+	public $resolveDivision(map: CornerMap): [number, number] {
+		const ov = this.$overlaps[map.overlapIndex];
+		const parent = this.$configuration.$junctions[ov.parent];
+
+		const n1 = parent.c[0].e!;
+		const n2 = parent.c[2].e!;
+		const n3 = map.corner.e!;
+
+		let [a, b] = [n1, n3];
+		if(a > b) [a, b] = [b, a];
+		const fromN1 = this.$configuration.$junctions.some(j => j.c[0].e == a && j.c[2].e == b);
+
+		[a, b] = [fromN1 ? n2 : n1, n3];
+		if(a > b) [a, b] = [b, a];
+		return [a, b];
 	}
 
 	/** All {@link JCorner}s that are dragging constraints of the current {@link Partition}. */

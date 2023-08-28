@@ -16,7 +16,10 @@ import type { Region } from "./region";
 import type { Pattern } from "./pattern";
 
 export interface Ridge extends Line {
-	type?: CornerType;
+	$type?: CornerType;
+
+	/** The {@link TreeNode.id}s of the the two flaps separated by the intersection ridge. */
+	$division?: [number, number];
 }
 
 //=================================================================
@@ -114,7 +117,7 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All ridges that should be drawn. */
 	public get $drawRidges(): readonly ILine[] {
-		const ridges = this._ridges.filter(r => r.type != CornerType.intersection);
+		const ridges = this._ridges.filter(r => r.$type != CornerType.intersection);
 		for(const map of this.$partition.$externalCornerMaps) {
 			if(map.corner.type != CornerType.intersection) continue;
 			const from = this.$resolveCornerMap(map);
@@ -130,7 +133,7 @@ export class Device implements ISerializable<JDevice> {
 	/** All ridges used for tracing */
 	public get $traceRidges(): readonly Ridge[] {
 		// Side ridges are handled separately, so are not included.
-		return this._ridges.filter(r => r.type != CornerType.side);
+		return this._ridges.filter(r => r.$type != CornerType.side);
 	}
 
 	/** All axis-parallel creases that should be drawn. */
@@ -259,7 +262,10 @@ export class Device implements ISerializable<JDevice> {
 			const to = this.$partition.$getExternalConnectionTarget(from, map, dir);
 			if(to) {
 				const ridge = new Line(from, to) as Ridge;
-				ridge.type = map.corner.type; // Mark the ridge type
+				ridge.$type = map.corner.type; // Mark the ridge type
+				if(map.corner.type == CornerType.intersection) {
+					ridge.$division = this.$partition.$resolveDivision(map);
+				}
 				result.push(ridge);
 			}
 		}

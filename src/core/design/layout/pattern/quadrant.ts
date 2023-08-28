@@ -46,8 +46,7 @@ export class Quadrant {
 
 		// Weight is relatively invariant as the entire repo moves,
 		// so can be calculated as constant.
-		const { x, y } = this.$point;
-		this.w = this.f.x * y - this.f.y * x;
+		this.w = pointWeight(this.$point, this.f);
 	}
 
 	public get $startEndPoints(): [Point, Point] {
@@ -120,11 +119,15 @@ export const quadrantComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
  */
 export function startEndPoints(quadrants: Quadrant[]): [Point, Point] {
 	let [start, end] = quadrants[0].$startEndPoints;
-	const f = quadrants[0].f.y;
+	const f = quadrants[0].f;
 	for(let i = 1; i < quadrants.length; i++) {
 		const [newStart, newEnd] = quadrants[i].$startEndPoints;
-		if(newStart.x * f > start.x * f) start = newStart;
-		if(newEnd.x * f < end.x * f) end = newEnd;
+		if(pointWeight(newStart, f) < pointWeight(start, f)) start = newStart;
+		if(pointWeight(newEnd, f) > pointWeight(end, f)) end = newEnd;
 	}
 	return [start, end];
+}
+
+function pointWeight(p: IPoint, f: IPoint): number {
+	return f.x * p.y - f.y * p.x;
 }

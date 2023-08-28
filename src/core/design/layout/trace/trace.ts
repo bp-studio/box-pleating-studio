@@ -3,7 +3,9 @@ import { TraceContext, getNextIntersection } from "./traceContext";
 import { pathToString } from "core/math/geometry/path";
 import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";
+import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
 
+import type { Quadrant } from "../pattern/quadrant";
 import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
 import type { SideDiagonal } from "../configuration";
@@ -74,6 +76,37 @@ export class Trace {
 		}
 
 		return ctx.$trim(path);
+	}
+
+	/** Determine the starting/ending point of tracing. */
+	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[]): [Point, Point] {
+		let [start, end] = startEndPoints(filtered);
+		if(filtered.length != all.length) {
+			filtered.sort(quadrantComparator);
+			const first = all.indexOf(filtered[0]);
+			const last = all.indexOf(filtered[filtered.length - 1]);
+			if(first > 0) {
+				const a = all[first - 1].$flap.id, b = all[first].$flap.id;
+				const ridge = this._getIntersectionRidge(a, b);
+				// It is possible that the intersection ridge is missing in legacy patterns.
+				if(ridge) start = ridge.p1;
+			}
+			if(last < all.length - 1) {
+				const a = all[last].$flap.id, b = all[last + 1].$flap.id;
+				const ridge = this._getIntersectionRidge(a, b);
+				if(ridge) end = ridge.p1;
+			}
+		}
+		return [start, end];
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _getIntersectionRidge(a: number, b: number): Ridge {
+		if(a > b) [a, b] = [b, a];
+		return this.$ridges.find(r => r.$division && r.$division[0] == a && r.$division[1] == b)!;
 	}
 
 	private _createFilteredRidges(start: Point, end: Point, directionalVector: Vector): Set<Ridge> {

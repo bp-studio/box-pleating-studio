@@ -3,7 +3,6 @@ import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { Trace } from "../layout/trace/trace";
-import { startEndPoints } from "../layout/pattern/quadrant";
 import { quadrantNumber } from "shared/types/direction";
 import { createSegments } from "../layout/trace/hingeSegment";
 import { windingNumber } from "core/math/geometry/winding";
@@ -61,7 +60,8 @@ function processRepo(repo: Repository): void {
 				.filter(q => !multiContour || windingNumber(q.$point, outer) != 0);
 			for(let q = 0; q < quadrantNumber; q++) {
 				const filtered = quadrants.filter(quadrant => quadrant.q == q);
-				if(filtered.length) startEndMap[q as QuadrantDirection] = startEndPoints(filtered);
+				if(!filtered.length) continue;
+				startEndMap[q as QuadrantDirection] = trace.$resolveStartEnd(filtered, repo.$directionalQuadrants[q]);
 			}
 
 			const segments = createSegments(outer, repo.$direction);

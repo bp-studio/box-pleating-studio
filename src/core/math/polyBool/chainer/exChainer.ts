@@ -42,4 +42,11 @@ export class ExChainer extends Chainer {
 		this._sources[this._chains] = new Set();
 		this._sources[this._chains].add(segment.$polygon);
 	}
+
+	protected override _removeChain(id: number): void {
+		if(id < this._chains) {
+			this._sources[id] = this._sources[this._chains];
+		}
+		super._removeChain(id);
+	}
 }
