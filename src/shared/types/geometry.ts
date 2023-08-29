@@ -44,8 +44,10 @@ export type Contour = {
 	isHole?: boolean;
 };
 
-// TODO: Do we need a interface for this?
-export interface RoughContour extends Contour { }
+export interface RoughContour extends Contour {
+	/** Indicating that this contour is in raw mode. */
+	raw?: boolean;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Utility functions

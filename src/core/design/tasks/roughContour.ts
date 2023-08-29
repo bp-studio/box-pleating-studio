@@ -6,6 +6,7 @@ import { expand } from "core/math/polyBool/expansion";
 import { patternContourTask } from "./patternContour";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
+import type { Polygon } from "shared/types/geometry";
 import type { RepoNodeSet } from "../layout/repoNodeSet";
 import type { ITreeNode, NodeGraphics } from "../context";
 
@@ -17,6 +18,7 @@ import type { ITreeNode, NodeGraphics } from "../context";
 export const roughContourTask = new Task(roughContour, patternContourTask);
 
 const union = new AAUnion();
+const rawUnion = new AAUnion(true);
 const nodeSetMap = new Map<number, RepoNodeSet[]>();
 
 function roughContour(): void {
@@ -54,7 +56,19 @@ function updater(node: ITreeNode): boolean {
 			});
 		}) ?? [];
 
-		const components = [...node.$children].map(n => n.$graphics.$roughContours.map(c => c.outer));
+		const components: Polygon[] = [];
+		for(const child of node.$children) {
+			const roughContours = child.$graphics.$roughContours;
+			if(!roughContours.length) continue;
+			if(roughContours[0].raw) {
+				// If child contour is in raw mode, they all need to be treated separately
+				for(const rough of roughContours) {
+					components.push(rawUnion.$get([rough.outer]));
+				}
+			} else {
+				components.push(roughContours.map(c => c.outer));
+			}
+		}
 		const inner = union.$get(...components);
 		node.$graphics.$roughContours = expand(inner, node.$length, corners);
 	}

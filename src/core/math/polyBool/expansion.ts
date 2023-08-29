@@ -79,7 +79,7 @@ function checkCorners(result: Path[], corners: string[]): boolean {
 function createRaw(polygons: Polygon[], polygon: Polygon): RoughContour[] {
 	return polygons.map((p, i) => {
 		const outer = simplify(p[0]);
-		return { outer, inner: [polygon[i]] };
+		return { outer, inner: [polygon[i]], raw: true };
 	});
 }
 
@@ -130,12 +130,20 @@ function span(path: Path): number {
  * vertices in the path, to prevent potential bugs in tracing logics.
  */
 function simplify(path: PathEx): PathEx {
-	const l = path.length;
-	const result: PathEx = path.filter((p, i, a) => {
+	// First we need to remove duplicate vertices,
+	// or the next step won't work correctly.
+	let l = path.length;
+	const deduplicate = path.filter((p, i, a) => {
+		const prev = a[(i + l - 1) % l];
+		return prev.x != p.x || prev.y != p.y;
+	});
+
+	// Then we can check the turning condition.
+	l = deduplicate.length;
+	const result: PathEx = deduplicate.filter((p, i, a) => {
 		const prev = a[(i + l - 1) % l];
 		const next = a[(i + 1) % l];
 		const dx = next.x - prev.x, dy = next.y - prev.y;
-		// Note that this also removes duplicate vertices
 		return dx != 0 && dy != 0;
 	});
 	result.from = path.from;

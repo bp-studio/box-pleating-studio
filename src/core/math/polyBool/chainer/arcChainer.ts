@@ -13,8 +13,6 @@ import type { ArcSegment } from "../segment/arcSegment";
 
 export class ArcChainer extends Chainer<ArcPath> {
 
-	protected override _points!: IArcPoint[];
-
 	protected override _chainToPath(id: number, segment: ISegment): ArcPath {
 		const path = super._chainToPath(id, segment);
 		this._trySetArcSegment(path[0], segment);
