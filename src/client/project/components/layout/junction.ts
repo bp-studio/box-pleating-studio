@@ -5,7 +5,7 @@ import { style } from "client/services/styleService";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LINE_JOIN } from "@pixi/graphics/lib/const";
-import type { Path, Polygon } from "shared/types/geometry";
+import type { ArcPath, ArcPolygon } from "shared/types/geometry";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 
 const THRESHOLD = 0.4;
@@ -17,9 +17,9 @@ const THRESHOLD = 0.4;
 //=================================================================
 export class Junction extends SmoothGraphics {
 
-	public $polygon: Polygon;
+	public $polygon: ArcPolygon;
 
-	constructor(polygon: Polygon) {
+	constructor(polygon: ArcPolygon) {
 		super();
 		this.$polygon = polygon;
 		this.alpha = style.junction.alpha;
@@ -59,7 +59,7 @@ export class Junction extends SmoothGraphics {
 }
 
 /** Returns the narrowness of the shape for a path consists of two arcs. */
-function getNarrowness(path: Path): number {
+function getNarrowness(path: ArcPath): number {
 	if(path.length > 2) return NaN;
 	const [p1, p2] = path;
 	return dist(p1.arc!, p2.arc!) / dist(p1, p2);

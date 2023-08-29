@@ -1,4 +1,4 @@
-import type { IPointEx, Path } from "shared/types/geometry";
+import type { IArcPoint, Path } from "shared/types/geometry";
 import type { QuadrantDirection } from "shared/types/direction";
 
 /**
@@ -22,7 +22,7 @@ export function pathToString(path: Path): string {
 	return path.map(p => toString(p)).join(",");
 }
 
-function toString(p: IPointEx): string {
+function toString(p: IArcPoint): string {
 	if(p.arc) return `(${p.x},${p.y},${p.arc.x},${p.arc.y},${p.r!})`;
 	return `(${p.x},${p.y})`;
 }

@@ -1,6 +1,6 @@
 import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
 
-import type { Polygon } from "shared/types/geometry";
+import type { ArcPolygon } from "shared/types/geometry";
 import type { ITreeNode } from "core/design/context";
 import type { invalidJunctionTask } from "../../tasks/invalidJunction";
 
@@ -35,13 +35,13 @@ export class InvalidJunction {
 	}
 
 	/**
-	 * Calculates and returns the arc-polygon region of the invalid overlapping.
+	 * Calculates and returns the {@link ArcPolygon} region of the invalid overlapping.
 	 *
 	 * Of course we could also perform this calculation in the constructor,
 	 * but we deliberately perform this in {@link invalidJunctionTask},
 	 * so that we may observe its performance.
 	 */
-	public $getPolygon(): Polygon {
+	public $getPolygon(): ArcPolygon {
 		const A = this.$a.$AABB, B = this.$b.$AABB;
 		const result = intersection.$get(A.$toRoundedRect(0), B.$toRoundedRect(this._dist));
 		if(this._dist > 0) result.push(...intersection.$get(A.$toRoundedRect(this._dist), B.$toRoundedRect(0)));

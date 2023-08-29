@@ -1,7 +1,7 @@
 import { Chainer } from "./chainer";
 import { SegmentType } from "../segment/segment";
 
-import type { IPointEx, Path } from "shared/types/geometry";
+import type { ArcPath, IArcPoint } from "shared/types/geometry";
 import type { ISegment } from "../segment/segment";
 import type { ArcSegment } from "../segment/arcSegment";
 
@@ -11,9 +11,11 @@ import type { ArcSegment } from "../segment/arcSegment";
  */
 //=================================================================
 
-export class ArcChainer extends Chainer {
+export class ArcChainer extends Chainer<ArcPath> {
 
-	protected override _chainToPath(id: number, segment: ISegment): Path {
+	protected override _points!: IArcPoint[];
+
+	protected override _chainToPath(id: number, segment: ISegment): ArcPath {
 		const path = super._chainToPath(id, segment);
 		this._trySetArcSegment(path[0], segment);
 		return path;
@@ -39,7 +41,7 @@ export class ArcChainer extends Chainer {
 		this._trySetArcSegment(this._points[this._length], segment);
 	}
 
-	private _trySetArcSegment(p: IPointEx, segment: ISegment): void {
+	private _trySetArcSegment(p: IArcPoint, segment: ISegment): void {
 		if(segment.$type === SegmentType.Arc) {
 			p.arc = (segment as ArcSegment).$anchor;
 			p.r = (segment as ArcSegment).$radius;

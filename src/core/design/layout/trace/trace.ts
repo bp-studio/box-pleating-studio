@@ -131,14 +131,12 @@ export class Trace {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///#if DEBUG==true
-
-	public $createTestCase(hinges: Path, start: Point, end: Point): string {
+	public createTestCase(hinges: Path, start: Point, end: Point): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
 		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");
 		const sideDiagonals = `Line.$parseTest<SideDiagonal>(${simp(this.$sideDiagonals)})`;
 		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"), new Point${start.toString()}, new Point${end.toString()});`;
 	}
-
 	///#endif
 }

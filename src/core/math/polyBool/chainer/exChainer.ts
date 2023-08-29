@@ -1,7 +1,7 @@
 import { Chainer } from "./chainer";
 
 import type { ISegment } from "../segment/segment";
-import type { Path } from "shared/types/geometry";
+import type { PathEx } from "shared/types/geometry";
 
 //=================================================================
 /**
@@ -11,12 +11,12 @@ import type { Path } from "shared/types/geometry";
  */
 //=================================================================
 
-export class ExChainer extends Chainer {
+export class ExChainer extends Chainer<PathEx> {
 
 	/** The set of known source indices of each chain */
 	private _sources: Set<number>[] = [];
 
-	protected override _chainToPath(id: number, segment: ISegment): Path {
+	protected override _chainToPath(id: number, segment: ISegment): PathEx {
 		const path = super._chainToPath(id, segment);
 		path.from = [...this._sources[id]];
 		return path;

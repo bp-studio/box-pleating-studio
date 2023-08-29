@@ -1,4 +1,4 @@
-import type { Polygon, Contour, Path, ILine } from "shared/types/geometry";
+import type { Polygon, Contour, Path, ILine, ArcPolygon } from "shared/types/geometry";
 import type { CommandType, JEdge, JEdgeBase, JEdit, JFlap, JStretch } from "shared/json";
 import type { Configuration } from "core/design/layout/configuration";
 import type { Pattern } from "core/design/layout/pattern/pattern";
@@ -8,7 +8,7 @@ export interface UpdateModel {
 
 	add: {
 		nodes: number[];
-		junctions: Record<string, Polygon>;
+		junctions: Record<string, ArcPolygon>;
 		stretches: Record<string, StretchData>;
 	};
 

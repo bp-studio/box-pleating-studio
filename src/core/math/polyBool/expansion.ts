@@ -3,7 +3,7 @@ import { ExChainer } from "./chainer/exChainer";
 import { windingNumber } from "../geometry/winding";
 import { mapDirections } from "../geometry/path";
 
-import type { Path, Polygon, RoughContour } from "shared/types/geometry";
+import type { Path, PathEx, Polygon, RoughContour } from "shared/types/geometry";
 
 const expander = new AAUnion(true, new ExChainer());
 
@@ -11,14 +11,14 @@ const expander = new AAUnion(true, new ExChainer());
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
 export function expand(polygon: Polygon, units: number, corners: string[]): RoughContour[] {
-	const polygons: Polygon[] = polygon.map(path => [expandPath(path, units)]);
+	const polygons: PathEx[][] = polygon.map(path => [expandPath(path, units)]);
 	const pathRemain = new Set(Array.from({ length: polygons.length }, (_, i) => i));
 
 	const result = expander.$get(...polygons).map(simplify);
 	if(!checkCorners(result, corners)) return createRaw(polygons, polygon);
 
 	const contours: RoughContour[] = [];
-	const newHoles: Path[] = [];
+	const newHoles: PathEx[] = [];
 	for(const path of result) {
 		const from = path.from!;
 		const inner = from.map(n => {
@@ -91,9 +91,9 @@ function createRaw(polygons: Polygon[], polygon: Polygon): RoughContour[] {
  * if the point with the smallest x value shifts towards the right,
  * then then path is a hole.
  */
-function expandPath(path: Path, units: number): Path {
+function expandPath(path: PathEx, units: number): PathEx {
 	const l = path.length;
-	const result: Path = [];
+	const result: PathEx = [];
 	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
 	for(let i = 0; i < l; i++) {
 		// Decide the direction of shifting.
@@ -129,9 +129,9 @@ function span(path: Path): number {
  * is actually a turning corner. This function removes the non-turning
  * vertices in the path, to prevent potential bugs in tracing logics.
  */
-function simplify(path: Path): Path {
+function simplify(path: PathEx): PathEx {
 	const l = path.length;
-	const result: Path = path.filter((p, i, a) => {
+	const result: PathEx = path.filter((p, i, a) => {
 		const prev = a[(i + l - 1) % l];
 		const next = a[(i + 1) % l];
 		const dx = next.x - prev.x, dy = next.y - prev.y;

@@ -6,6 +6,7 @@ import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
 import { RepoNodeSet } from "core/design/layout/repoNodeSet";
 
+import type { Stretch } from "core/design/layout/stretch";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {
@@ -36,8 +37,9 @@ describe("Junction", function() {
 		expect(junction.$s.x).to.equal(5);
 		expect(junction.$s.y).to.equal(5);
 
-		const nodeSet = new RepoNodeSet([junction]);
-		expect(nodeSet.$nodes).to.have.eql([1, 2, 3, 4]);
+		const stretch: Stretch = State.$stretches.values().next().value;
+		expect(stretch).to.be.not.undefined;
+		expect(stretch.$repo.$nodeSet.$nodes).to.eql([1, 2, 3, 4]);
 	});
 
 	it("Creates new junction upon merging", function() {
@@ -64,7 +66,8 @@ describe("Junction", function() {
 		const junction2 = State.$junctions.get(3, 4) as ValidJunction;
 		expect(junction1).to.not.equal(junction2, "Creates a new instance");
 
-		const nodeSet = new RepoNodeSet([junction2]);
-		expect(nodeSet.$nodes).to.eql([2, 3, 4]);
+		const stretch: Stretch = State.$stretches.values().next().value;
+		expect(stretch).to.be.not.undefined;
+		expect(stretch.$repo.$nodeSet.$nodes).to.eql([2, 3, 4]);
 	});
 });

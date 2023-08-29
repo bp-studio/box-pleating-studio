@@ -5,6 +5,7 @@ import { ArcChainer } from "../chainer/arcChainer";
 import { ArcSegment } from "../segment/arcSegment";
 import { AALineSegment } from "../segment/aaLineSegment";
 
+import type { ArcPath } from "shared/types/geometry";
 import type { IRoundedRect } from "./roundedRect";
 import type { EndEvent } from "../event";
 
@@ -14,7 +15,7 @@ import type { EndEvent } from "../event";
  */
 //=================================================================
 
-export class RRIntersection extends PolyBool<IRoundedRect> {
+export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 
 	constructor() {
 		super(new RREventProvider(), RRIntersector, new ArcChainer());

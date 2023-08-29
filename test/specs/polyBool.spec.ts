@@ -7,7 +7,7 @@ import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
 import { parsePath } from "../utils/path";
 import { ExChainer } from "core/math/polyBool/chainer/exChainer";
 
-import type { Polygon } from "shared/types/geometry";
+import type { PathEx, Polygon } from "shared/types/geometry";
 
 describe("PolyBool", function() {
 	describe("AAUnion operation", function() {
@@ -127,7 +127,7 @@ describe("PolyBool", function() {
 			const result = expand([
 				parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
 				parsePath("(2,2),(2,4),(4,4),(4,2)"),
-			], 1);
+			], 1, []);
 			expect(result.length).to.equal(2);
 			expect(result[0].outer).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
 			expect(result[1].outer.length).to.equal(0);
@@ -138,7 +138,7 @@ describe("PolyBool", function() {
 			const result = expander.$get(
 				[parsePath("(9,8),(9,-4),(21,-4),(21,8)")],
 				[parsePath("(20,21),(20,9),(32,9),(32,21)")]
-			);
+			) as PathEx[];
 			expect(result.length).to.equal(2);
 			expect(result[0].from).to.eql([0]);
 			expect(result[1].from).to.eql([1]);

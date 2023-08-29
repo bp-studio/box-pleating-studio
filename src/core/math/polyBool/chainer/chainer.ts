@@ -1,7 +1,7 @@
 import { same } from "shared/types/geometry";
 
 import type { ISegment } from "../segment/segment";
-import type { Path, Polygon, IPointEx } from "shared/types/geometry";
+import type { Path } from "shared/types/geometry";
 
 /**
  * In practice there wonk't be too many chains,
@@ -21,16 +21,16 @@ const INITIAL_CHAIN_SIZE = 10;
  * creating new arrays in JavaScript.
  */
 //=================================================================
-export class Chainer {
+export class Chainer<PathType extends Path = Path> {
 
 	protected _chainHeads!: number[];
 	protected _chainTails!: number[];
-	protected _points!: IPointEx[];
+	protected _points!: IPoint[];
 	protected _next!: number[];
 	protected _length: number = 0;
 	protected _chains: number = 0;
 
-	public $chain(segments: ISegment[]): Polygon {
+	public $chain(segments: ISegment[]): PathType[] {
 		// We will reuse the Chainer instance, so we need to reset the states.
 		const size = segments.length + 1;
 		this._chainHeads = new Array(INITIAL_CHAIN_SIZE);
@@ -40,7 +40,7 @@ export class Chainer {
 		this._chains = 0; // We don't need to reset this in theory, but just to be sure.
 		this._length = 0;
 
-		const result: Polygon = [];
+		const result: PathType[] = [];
 		for(const segment of segments) {
 			const tail = this._findChain(this._chainHeads, segment.$end);
 			const head = this._findChain(this._chainTails, segment.$start);
@@ -67,14 +67,14 @@ export class Chainer {
 		return result;
 	}
 
-	protected _chainToPath(id: number, segment: ISegment): Path {
+	protected _chainToPath(id: number, segment: ISegment): PathType {
 		const path: Path = [];
 		let i = this._chainHeads[id];
 		while(i) {
 			path.push(this._points[i]);
 			i = this._next[i];
 		}
-		return path;
+		return path as PathType;
 	}
 
 	protected _connectChain(head: number, tail: number, segment: ISegment): void {

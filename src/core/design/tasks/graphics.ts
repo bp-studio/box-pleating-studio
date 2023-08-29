@@ -9,7 +9,7 @@ import { Line } from "core/math/geometry/line";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
-import type { Contour, ILine, Path } from "shared/types/geometry";
+import type { Contour, ILine, Path, PathEx } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode, PatternContour } from "../context";
 import type { expand } from "core/math/polyBool/expansion";
@@ -216,8 +216,8 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 	}
 }
 
-function simplify(path: Path): Path {
-	const result: Path = path.filter((p, i, a) => !same(p, a[(i + 1) % a.length]));
+function simplify(path: PathEx): PathEx {
+	const result: PathEx = path.filter((p, i, a) => !same(p, a[(i + 1) % a.length]));
 	result.isHole = path.isHole;
 	return result;
 }
