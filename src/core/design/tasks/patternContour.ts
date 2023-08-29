@@ -1,16 +1,14 @@
 import { Task } from "./task";
 import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
-import { getOrSetEmptyArray } from "shared/utils/map";
 import { Trace } from "../layout/trace/trace";
 import { quadrantNumber } from "shared/types/direction";
 import { createSegments } from "../layout/trace/hingeSegment";
 import { windingNumber } from "core/math/geometry/winding";
 
 import type { QuadrantDirection } from "shared/types/direction";
-import type { Quadrant } from "../layout/pattern/quadrant";
 import type { Repository } from "../layout/repository";
-import type { ITreeNode, NodeGraphics } from "../context";
+import type { NodeGraphics } from "../context";
 import type { Point } from "core/math/geometry/point";
 
 //=================================================================
@@ -40,35 +38,31 @@ function processRepo(repo: Repository): void {
 	const pattern = repo.$pattern;
 	if(!pattern) return;
 
-	const quadrantMap = new Map<ITreeNode, Quadrant[]>();
-	for(const quadrant of repo.$quadrants.values()) {
-		getOrSetEmptyArray(quadrantMap, quadrant.$flap).push(quadrant);
-	}
-
 	const coverageMap = repo.$nodeSet.$coverage;
 	const trace = Trace.$fromRepo(repo);
 
-	for(const [node, leaves] of coverageMap.entries()) {
+	for(const [node, coveredQuadrants] of coverageMap.entries()) {
 		const multiContour = node.$graphics.$roughContours.length > 1;
 		for(const [index, contour] of node.$graphics.$roughContours.entries()) {
 			// Create start/end map
 			const outer = contour.outer;
 			const startEndMap = {} as Record<QuadrantDirection, [Point, Point]>;
-			const quadrants = leaves
-				.flatMap(leaf => quadrantMap.get(leaf)!)
+
+			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps around the quadrant
 				.filter(q => !multiContour || windingNumber(q.$point, outer) != 0);
 			for(let q = 0; q < quadrantNumber; q++) {
 				const filtered = quadrants.filter(quadrant => quadrant.q == q);
 				if(!filtered.length) continue;
-				startEndMap[q as QuadrantDirection] = trace.$resolveStartEnd(filtered, repo.$directionalQuadrants[q]);
+				startEndMap[q as QuadrantDirection] =
+					trace.$resolveStartEnd(filtered, repo.$directionalQuadrants[q]);
 			}
 
 			const segments = createSegments(outer, repo.$direction);
 			for(const segment of segments) {
-				if(!startEndMap[segment.q]) continue;
-				const [start, end] = startEndMap[segment.q];
-				const path = trace.$generate(segment, start, end);
+				const map = startEndMap[segment.q];
+				if(!map) continue;
+				const path = trace.$generate(segment, map[0], map[1]);
 				if(path) {
 					path.$ids = repo.$nodeSet.$nodes;
 					path.$repo = repo.$signature;

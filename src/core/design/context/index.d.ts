@@ -67,7 +67,7 @@ export interface PatternContour extends Array<Point> {
 
 export interface NodeGraphics {
 	/** The contours without considering patterns. */
-	$roughContours: Contour[];
+	$roughContours: RoughContour[];
 
 	$patternContours: PatternContour[];
 

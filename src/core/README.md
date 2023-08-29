@@ -41,11 +41,9 @@ subgraph Tree
 end
 j(junctions)
 i[[invalid\njunctions]]
-subgraph Stretch pattern
+subgraph Pattern
 	s(stretches)
 	p([patterns])
-end
-subgraph Contour
 	rc(rough contours)
 	pc(pattern contours)
 	g[[graphics]]
@@ -53,7 +51,7 @@ end
 
 T --> h --> b
 b & L --> d
-d & F --> a --> rc --> g
-a --> j --> i & s
-s & P --> p --> pc --> g
+d & F --> a --> j --> i & s
+rc --> pc --> g
+s & P --> p --> rc
 ```

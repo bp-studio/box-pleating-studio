@@ -65,7 +65,7 @@ export class Stretch implements ISerializable<JStretch> {
 			 * Note that to compare the old and new {@link RepoNodeSet}s is no less work
 			 * than to just create and replace the {@link RepoNodeSet} regardlessly.
 			 */
-			this._repo.$nodeSet = new RepoNodeSet(junctions);
+			this._repo.$nodeSet = new RepoNodeSet(junctions, this._repo.$quadrants);
 
 			const updated = this._repo.$tryUpdateOrigin(origin);
 			if(!this.$isActive || updated) {

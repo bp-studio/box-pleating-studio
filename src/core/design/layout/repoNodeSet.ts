@@ -4,7 +4,9 @@ import { getOrSetEmptyArray } from "shared/utils/map";
 import { State } from "core/service/state";
 import { minComparator } from "shared/data/heap/heap";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
+import { quadrantNumber } from "shared/types/direction";
 
+import type { Quadrant } from "./pattern/quadrant";
 import type { ITreeNode } from "../context";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Repository } from "./repository";
@@ -18,7 +20,7 @@ export class RepoNodeSet {
 
 	public readonly $leaves: readonly number[];
 	public readonly $nodes: readonly number[];
-	public readonly $coverage: ReadonlyMap<ITreeNode, ITreeNode[]>;
+	public readonly $coverage: ReadonlyMap<ITreeNode, Quadrant[]>;
 
 	/**
 	 * A {@link IntDoubleMap} mapping pairs of flap ids to their LCA.
@@ -31,16 +33,21 @@ export class RepoNodeSet {
 	 */
 	private readonly _lcaMap: IntDoubleMap<ITreeNode> | undefined;
 
-	constructor(junctions: ValidJunction[]) {
+	constructor(junctions: ValidJunction[], quadrants: ReadonlyMap<number, Quadrant>) {
 		this.$leaves = getLeaves(junctions);
 
 		const heap = new MutableHeap<ITreeNode>(nodeComparator);
-		const coverage = new Map<ITreeNode, ITreeNode[]>();
+		const coverage = new Map<ITreeNode, Quadrant[]>();
 		const numLeaves = this.$leaves.length;
 		for(const id of this.$leaves) {
 			const leaf = State.$tree.$nodes[id]!;
 			heap.$insert(leaf);
-			coverage.set(leaf, [leaf]);
+			const covered: Quadrant[] = [];
+			for(let q = 0; q < quadrantNumber; q++) {
+				const quadrant = quadrants.get(leaf.id << 2 | q);
+				if(quadrant) covered.push(quadrant);
+			}
+			coverage.set(leaf, covered);
 		}
 
 		const nodes = [];
@@ -56,11 +63,12 @@ export class RepoNodeSet {
 			}
 
 			nodes.push(node.id);
-			const parent = node.$parent!;
+			const parent = node.$parent;
+			if(!parent) continue;
 			const parentCoverage = getOrSetEmptyArray(coverage, parent, () => heap.$insert(parent));
 			if(this._lcaMap && parentCoverage.length) {
 				for(const A of parentCoverage) {
-					for(const B of coveredLeaves) this._lcaMap.set(A.id, B.id, parent);
+					for(const B of coveredLeaves) this._lcaMap.set(A.$flap.id, B.$flap.id, parent);
 				}
 			}
 			parentCoverage.push(...coveredLeaves);
@@ -81,8 +89,8 @@ export class RepoNodeSet {
 		const tree = State.$tree;
 		const A = tree.$nodes[a]!;
 		const B = tree.$nodes[b]!;
-		const ALeaf = this.$coverage.get(A)![0].id;
-		const BLeaf = this.$coverage.get(B)![0].id;
+		const ALeaf = this.$coverage.get(A)![0].$flap.id;
+		const BLeaf = this.$coverage.get(B)![0].$flap.id;
 		lca = lcaMap.get(ALeaf, BLeaf)!;
 		lcaMap.set(a, b, lca);
 		return lca;

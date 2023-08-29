@@ -68,7 +68,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		const { map, directional } = createQuadrants(junctions);
 		this.$quadrants = map;
 		this.$directionalQuadrants = directional;
-		this.$nodeSet = new RepoNodeSet(junctions);
+		this.$nodeSet = new RepoNodeSet(junctions, map);
 
 		State.$newRepositories.add(this);
 		State.$repoToProcess.add(this);

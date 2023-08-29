@@ -41,6 +41,9 @@ export type Contour = {
 	isHole?: boolean;
 };
 
+// TODO: Do we need a interface for this?
+export interface RoughContour extends Contour { }
+
 /** Sort first by x-coordinate, then by y-coordinate */
 export function xyComparator(p1: IPoint, p2: IPoint): number {
 	return p1.x - p2.x || p1.y - p2.y;

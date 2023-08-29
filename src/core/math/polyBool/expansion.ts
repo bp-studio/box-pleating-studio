@@ -1,20 +1,23 @@
 import { AAUnion } from "./union/aaUnion";
 import { ExChainer } from "./chainer/exChainer";
 import { windingNumber } from "../geometry/winding";
+import { mapDirections } from "../geometry/path";
 
-import type { Contour, Path, Polygon } from "shared/types/geometry";
+import type { Path, Polygon, RoughContour } from "shared/types/geometry";
 
 const expander = new AAUnion(true, new ExChainer());
 
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
-export function expand(polygon: Polygon, units: number): Contour[] {
+export function expand(polygon: Polygon, units: number, corners: string[]): RoughContour[] {
 	const polygons: Polygon[] = polygon.map(path => [expandPath(path, units)]);
 	const pathRemain = new Set(Array.from({ length: polygons.length }, (_, i) => i));
 
 	const result = expander.$get(...polygons).map(simplify);
-	const contours: Contour[] = [];
+	if(!checkCorners(result, corners)) return createRaw(polygons, polygon);
+
+	const contours: RoughContour[] = [];
 	const newHoles: Path[] = [];
 	for(const path of result) {
 		const from = path.from!;
@@ -28,16 +31,9 @@ export function expand(polygon: Polygon, units: number): Contour[] {
 		} else if(isHole && span(path) > span(inner[0])) {
 			// In this case a hole was over-shrunk and ended up even bigger.
 			// We need to treat it as a simple filling.
-			contours.push({
-				outer: inner[0].toReversed(),
-				isHole: false,
-			});
+			contours.push({ outer: inner[0].toReversed(), isHole: false });
 		} else {
-			contours.push({
-				outer: path,
-				inner,
-				isHole,
-			});
+			contours.push({ outer: path, inner, isHole });
 		}
 	}
 
@@ -51,14 +47,40 @@ export function expand(polygon: Polygon, units: number): Contour[] {
 	// The remaining paths are the holes that vanishes after expansion.
 	// We add those back.
 	for(const n of pathRemain) {
-		contours.push({
-			outer: [],
-			inner: [polygon[n]],
-			isHole: true,
-		});
+		contours.push({ outer: [], inner: [polygon[n]], isHole: true });
 	}
 
 	return contours;
+}
+
+/**
+ * Check if all given corners appears in the union path.
+ *
+ * Note that it does not suffice to check just the coordinates,
+ * but also need to consider the turning direction of the corners.
+ */
+function checkCorners(result: Path[], corners: string[]): boolean {
+	const set = new Set(corners);
+	for(const path of result) {
+		const dirs = mapDirections(path);
+		for(const [i, p] of path.entries()) {
+			set.delete(p.x + "," + p.y + "," + dirs[i]);
+		}
+	}
+	return set.size == 0;
+}
+
+/**
+ * If some of the quadrant corners are missing in the union,
+ * our tracing algorithm will likely go wrong,
+ * so the best we can do in this case is not taking the union
+ * but keeping the expanded path as they are.
+ */
+function createRaw(polygons: Polygon[], polygon: Polygon): RoughContour[] {
+	return polygons.map((p, i) => {
+		const outer = simplify(p[0]);
+		return { outer, inner: [polygon[i]] };
+	});
 }
 
 /**
