@@ -69,6 +69,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 	}
 	public set $index(v: number) {
 		this._index = v;
+		this._freeCornerCache = undefined;
 		this.$pattern?.$tryUpdateOrigin();
 	}
 

@@ -57,10 +57,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		if(!repo) return;
 		const i = repo.configIndex;
 		const l = repo.configCount;
-		//TODO: need to consider history here
-		SelectionController.clear();
-		SelectionController.$toggle(this, true);
-		this.$layout.$switchConfig(this.id, (i + by + l) % l);
+		this._navigate(() => this.$layout.$switchConfig(this.id, (i + by + l) % l));
 	}
 
 	public switchPattern(by: number): void {
@@ -68,10 +65,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		if(!repo) return;
 		const i = repo.patternIndex;
 		const l = repo.patternCount;
-		//TODO: need to consider history here
-		SelectionController.clear();
-		SelectionController.$toggle(this, true);
-		this.$layout.$switchPattern(this.id, (i + by + l) % l);
+		this._navigate(() => this.$layout.$switchPattern(this.id, (i + by + l) % l));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,5 +102,20 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	public $query(id: string): ITagObject {
 		if(!id) return this;
 		return this._devices[parseInt(id)];
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private async _navigate(navigateFactory: () => Promise<void>): Promise<void> {
+		//TODO: need to consider history here
+		SelectionController.clear();
+		SelectionController.$toggle(this, true);
+		await navigateFactory();
+		if(this._devices.length == 1) {
+			SelectionController.clear();
+			SelectionController.$toggle(this._devices[0], true);
+		}
 	}
 }

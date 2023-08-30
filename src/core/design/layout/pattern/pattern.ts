@@ -29,6 +29,9 @@ export class Pattern implements ISerializable<JPattern> {
 		this.$devices = devices.map((d, i) => new Device(this, config.$partitions[i], d));
 		this.$gadgets = this.$devices.flatMap(d => d.$gadgets);
 
+		this.$valid = seeded ? true : this._position();
+		if(!this.$valid) return;
+
 		// Carefully initialize the positioning of devices in a predictable ordering
 		const devicesToInitialize = new Set(this.$devices);
 		while(devicesToInitialize.size > 0) {
@@ -40,8 +43,6 @@ export class Pattern implements ISerializable<JPattern> {
 				}
 			}
 		}
-
-		this.$valid = seeded ? true : this._position();
 	}
 
 	public toJSON(): JPattern {
@@ -82,11 +83,10 @@ export class Pattern implements ISerializable<JPattern> {
 
 	private _position(): boolean {
 		const junctions = this.$config.$junctions;
-
+		// TODO
 		if(junctions.length == 1) {
 			return singleJunctionPositioner(junctions[0], this.$devices);
 		}
-
 		return false;
 	}
 

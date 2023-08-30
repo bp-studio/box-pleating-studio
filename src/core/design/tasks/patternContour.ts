@@ -64,6 +64,7 @@ function processRepo(repo: Repository): void {
 				if(!map) continue;
 				const path = trace.$generate(segment, map[0], map[1]);
 				if(path) {
+					State.$contourWillChange.add(node);
 					path.$ids = repo.$nodeSet.$nodes;
 					path.$repo = repo.$signature;
 					path.$for = index;

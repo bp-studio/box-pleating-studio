@@ -83,6 +83,7 @@ export class Device extends Draggable {
 
 	public $redraw(data: DeviceData): void {
 		this.$graphics = data;
+		this.$location = data.location; // This is needed during navigation
 		this._draw();
 	}
 
