@@ -16,7 +16,7 @@ import { Stretch } from "./stretch";
 import type { Device } from "./device";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
-import type { GraphicsData, UpdateModel } from "core/service/updateModel";
+import type { GraphicsData, StretchData, UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JViewport } from "shared/json";
 
@@ -146,6 +146,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 
 	public $switchPattern(stretchId: string, to: number): Promise<void> {
 		return this.$project.$core.layout.switchPattern(stretchId, to);
+	}
+
+	public $completeStretch(stretchId: string): Promise<StretchData> {
+		return this.$project.$core.layout.completeStretch(stretchId);
 	}
 
 	public $moveDevice(device: Device): Promise<void> {

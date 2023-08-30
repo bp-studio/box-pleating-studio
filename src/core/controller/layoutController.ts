@@ -5,6 +5,7 @@ import { Clip } from "core/math/polyBool/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
 
+import type { StretchData } from "core/service/updateModel";
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
 import type { JFlap, JStretch } from "shared/json";
@@ -80,6 +81,11 @@ export namespace LayoutController {
 		stretch.$repo.$configuration!.$index = to;
 		State.$repoToProcess.add(stretch.$repo);
 		Processor.$run(patternTask);
+	}
+
+	export function completeStretch(stretchId: string): StretchData {
+		const stretch = State.$stretches.get(stretchId)!;
+		return stretch.$complete();
 	}
 
 	export function moveDevice(stretchId: string, index: number, location: IPoint): void {
