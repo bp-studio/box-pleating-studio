@@ -1,4 +1,4 @@
-import type { Contour, ILine, Path, RoughContour } from "shared/types/geometry";
+import type { Contour, ILine, Path } from "shared/types/geometry";
 import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
@@ -7,6 +7,7 @@ import type { Repository } from "../layout/repository";
 import type { clearPatternContourForRepo } from "../tasks/patternContour";
 import type { RepoNodeSet } from "../layout/repoNodeSet";
 import type { Point } from "core/math/geometry/point";
+import type { roughContourTask } from "core/design/tasks/roughContour";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -66,7 +67,7 @@ export interface PatternContour extends Array<Point> {
 }
 
 export interface NodeGraphics {
-	/** The contours without considering patterns. */
+	/** See {@link RoughContour}. */
 	$roughContours: RoughContour[];
 
 	$patternContours: PatternContour[];
@@ -76,4 +77,16 @@ export interface NodeGraphics {
 
 	/** All ridge creases. */
 	$ridges: ILine[];
+}
+
+/**
+ * The {@link Contour} of a flap/river without considering the stretch patterns.
+ * Such contour consists of axis-aligned line segments only,
+ * and can speed up the process of taking unions.
+ *
+ * See also {@link roughContourTask}.
+ */
+export interface RoughContour extends Contour {
+	/** Indicating that this contour is in raw mode. */
+	$raw?: boolean;
 }

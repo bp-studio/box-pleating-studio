@@ -3,7 +3,8 @@ import { ExChainer } from "./chainer/exChainer";
 import { windingNumber } from "../geometry/winding";
 import { mapDirections } from "../geometry/path";
 
-import type { Path, PathEx, Polygon, RoughContour } from "shared/types/geometry";
+import type { RoughContour } from "core/design/context";
+import type { Path, PathEx, Polygon } from "shared/types/geometry";
 
 const expander = new AAUnion(true, new ExChainer());
 
@@ -77,9 +78,9 @@ function checkCorners(result: Path[], corners: string[]): boolean {
  * but keeping the expanded path as they are.
  */
 function createRaw(polygons: Polygon[], polygon: Polygon): RoughContour[] {
-	return polygons.map((p, i) => {
+	return polygons.map<RoughContour>((p, i) => {
 		const outer = simplify(p[0]);
-		return { outer, inner: [polygon[i]], raw: true };
+		return { outer, inner: [polygon[i]], $raw: true };
 	});
 }
 
