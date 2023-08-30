@@ -96,8 +96,11 @@ export class Step implements ISerializable<JStep> {
 		for(let i = 0; i < commands.length; i++) {
 			commands[i].$addTo(this._commands[i]);
 		}
-		this._construct.push(...construct);
-		this._destruct.push(...destruct);
+
+		// Pay attention that destruction goes first
+		for(const memento of destruct) this._tryAddDestruct(memento);
+		for(const memento of construct) this._tryAddConstruct(memento);
+
 		this._reset();
 		return true;
 	}
@@ -145,6 +148,32 @@ export class Step implements ISerializable<JStep> {
 			const obj = this._project.design.$query?.(tag);
 			if(obj instanceof Control) SelectionController.$toggle(obj, true);
 		}
+	}
+
+	private _tryAddConstruct(memento: Memento): void {
+		let index = this._construct.findIndex(m => m[0] == memento[0]);
+		if(index >= 0) this._construct.splice(index, 1);
+
+		// Cancelling existing destruction
+		index = this._destruct.findIndex(m =>
+			m[0] == memento[0] &&
+			JSON.stringify(m[1]) == JSON.stringify(memento[1])
+		);
+		if(index >= 0) this._destruct.splice(index, 1);
+		else this._construct.push(memento);
+	}
+
+	private _tryAddDestruct(memento: Memento): void {
+		let index = this._destruct.findIndex(m => m[0] == memento[0]);
+		if(index >= 0) return;
+
+		// Cancelling existing construction
+		index = this._construct.findIndex(m =>
+			m[0] == memento[0] &&
+			JSON.stringify(m[1]) == JSON.stringify(memento[1])
+		);
+		if(index >= 0) this._construct.splice(index, 1);
+		else this._destruct.push(memento);
 	}
 }
 
