@@ -45,9 +45,9 @@ export class EditCommand extends Command implements JEditCommand {
 	}
 
 	public $undo(): Promise<void> {
-		const edits = this.edits.map(e => [!e[0], e[1]]).reverse();
+		const edits = this.edits.map<JEdit>(e => [!e[0], e[1]]).reverse();
 		const layout = this._project.design.$prototype.layout;
-		return this._project.$core.tree.edit(edits as JEdit[], layout.flaps, layout.stretches);
+		return this._project.$core.tree.edit(edits, layout.flaps, layout.stretches);
 	}
 
 	public $redo(): Promise<void> {

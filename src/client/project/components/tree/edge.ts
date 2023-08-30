@@ -105,7 +105,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	}
 
 	public get isDeletable(): boolean {
-		return !this._tree.isMinimal;
+		return !this.$disposed && !this._tree.isMinimal;
 	}
 
 	public goToDual(): void {

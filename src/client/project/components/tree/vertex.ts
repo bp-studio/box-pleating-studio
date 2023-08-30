@@ -95,7 +95,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public get isDeletable(): boolean {
-		return !this._tree.isMinimal && this.$degree <= 2;
+		return !this.$disposed && !this._tree.isMinimal && this.$degree <= 2;
 	}
 
 	public delete(): void {
@@ -143,14 +143,14 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 					y: Math.round(this.$location.y * yFactor),
 				};
 				flap.$sync(grid.$constrain(p));
+				return Promise.resolve();
 			}
-		} else if(!pendingFlush) {
-			return pendingFlush = Promise.resolve().then(() => {
-				pendingFlush = undefined;
-				this.$project.history.$flush();
-			});
 		}
-		return Promise.resolve();
+		// If we get here, the Core will not be invoked, and we need to flush the history manually.
+		return pendingFlush ||= Promise.resolve().then(() => {
+			pendingFlush = undefined;
+			this.$project.history.$flush();
+		});
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

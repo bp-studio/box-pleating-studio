@@ -186,7 +186,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		const tree = this.$project.design.tree;
 		const vertex = tree.$vertices[f.id]!;
 		const edge = tree.$getFirstEdge(vertex);
-		if(!edge) debugger;
+		if(!edge || !graphics) debugger;
 		const flap = new Flap(this, f, vertex, edge, graphics);
 		this.$flaps.set(f.id, flap);
 		if(vertex.$isNew) this.$syncFlaps.set(f.id, flap);
