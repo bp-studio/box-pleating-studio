@@ -8,17 +8,17 @@
 				<div class="modal-body">
 					<p>{{ copyright }}</p>
 					<p v-t="'about.license'"></p>
-					<i18n-t keypath="about.manual" tag="p">
+					<i18n-t keypath="about.manual" tag="p" scope="global">
 						<a target="_blank" rel="noopener" href="https://bp-studio.github.io" v-t="'keyword.homepage'"></a>
 					</i18n-t>
-					<i18n-t keypath="about.feedback" tag="p">
+					<i18n-t keypath="about.feedback" tag="p" scope="global">
 						<a target="_blank" rel="noopener" href="https://github.com/bp-studio/box-pleating-studio"
 						   v-t="'about.repo'"></a>
 					</i18n-t>
-					<i18n-t keypath="about.visitBlog" tag="p">
+					<i18n-t keypath="about.visitBlog" tag="p" scope="global">
 						<a target="_blank" rel="noopener" href="https://origami.abstreamace.com/" v-t="'about.blog'"></a>
 					</i18n-t>
-					<i18n-t keypath="about.donation" tag="p">
+					<i18n-t keypath="about.donation" tag="p" scope="global">
 						<a target="_blank" href="donate.htm">PayPal</a>
 					</i18n-t>
 
