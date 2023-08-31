@@ -77,6 +77,9 @@ export class Device extends Draggable {
 		await this.stretch.$layout.$moveDevice(this);
 	}
 
+	public override get $selected(): boolean {
+		return super.$selected;
+	}
 	public override set $selected(v: boolean) {
 		super.$selected = v;
 		if(v) this.stretch.$complete();

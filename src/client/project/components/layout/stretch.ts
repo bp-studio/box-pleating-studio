@@ -72,6 +72,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	// Control methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override get $selected(): boolean {
+		return super.$selected;
+	}
 	public override set $selected(v: boolean) {
 		super.$selected = v;
 		if(v) this.$complete();
