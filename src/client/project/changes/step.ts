@@ -10,6 +10,15 @@ import type { JCommand, JStep, Memento } from "shared/json/history";
 
 const AUTO_RESET = 1000;
 
+export enum OperationResult {
+	/** The operation completely failed. */
+	Failed,
+	/** The operation successfully carried some of the {@link Command}s, but not all of them. */
+	Partial,
+	/** The operation completely succeeded. */
+	Success,
+}
+
 //=================================================================
 /**
  * {@link Step} represents a single entry in the {@link HistoryManager}.
@@ -105,25 +114,51 @@ export class Step implements ISerializable<JStep> {
 		return true;
 	}
 
-	public async $redo(): Promise<void> {
+	public async $redo(): Promise<OperationResult> {
 		this._project.design.$addMementos(this._construct);
-		await Promise.all(this._commands.map(c => c.$redo()));
+
+		let result = OperationResult.Success;
+		for(const [i, command] of this._commands.entries()) {
+			try {
+				// eslint-disable-next-line no-await-in-loop
+				await command.$redo();
+			} catch {
+				if(i == 0) return OperationResult.Failed;
+				(this._commands as Command[]).splice(i);
+				result = OperationResult.Partial;
+				break;
+			}
+		}
 
 		this._project.design.mode = this._mode;
 		this._restoreSelection(this._after);
 		this._sealed = true;
+		return result;
 	}
 
-	public async $undo(): Promise<void> {
+	public async $undo(): Promise<OperationResult> {
 		// undo is performed in opposite ordering
-		const memos = this._destruct.toReversed();
-		this._project.design.$addMementos(memos);
-		const com = this._commands.toReversed();
-		await Promise.all(com.map(c => c.$undo()));
+		const memosToReconstruct = this._destruct.toReversed();
+		this._project.design.$addMementos(memosToReconstruct);
+		const commands = this._commands.toReversed();
+
+		let result = OperationResult.Success;
+		for(const [i, command] of commands.entries()) {
+			try {
+				// eslint-disable-next-line no-await-in-loop
+				await command.$undo();
+			} catch {
+				if(i == 0) return OperationResult.Failed;
+				(this._commands as Command[]).splice(0, this._commands.length - i);
+				result = OperationResult.Partial;
+				break;
+			}
+		}
 
 		this._project.design.mode = this._mode;
 		this._restoreSelection(this._before);
 		this._sealed = true;
+		return result;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

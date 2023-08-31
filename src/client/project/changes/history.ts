@@ -2,7 +2,7 @@ import { shallowReactive } from "vue";
 
 import { shallowRef } from "client/shared/decorators";
 import { FieldCommand } from "./commands/fieldCommand";
-import { Step, restore } from "./step";
+import { Step, OperationResult, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";
 import { EditCommand } from "./commands/editCommand";
 
@@ -160,7 +160,13 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	public async $undo(): Promise<void> {
 		if(this.$canUndo) {
 			this._moving = true;
-			await this._steps[--this._index].$undo();
+			const result = await this._steps[--this._index].$undo();
+			if(result != OperationResult.Success) {
+				// If something goes wrong, the step in question and everything
+				// before that should be discarded.
+				this._steps.splice(0, this._index + (result == OperationResult.Failed ? 1 : 0));
+				this._index = 0;
+			}
 			this.$flush();
 		}
 	}
@@ -168,7 +174,13 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	public async $redo(): Promise<void> {
 		if(this.$canRedo) {
 			this._moving = true;
-			await this._steps[this._index++].$redo();
+			const result = await this._steps[this._index++].$redo();
+			if(result != OperationResult.Success) {
+				// If something goes wrong, the step in question and everything
+				// after that should be discarded.
+				if(result == OperationResult.Failed) this._index--;
+				this._steps.splice(this._index);
+			}
 			this.$flush();
 		}
 	}
