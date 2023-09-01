@@ -5,9 +5,9 @@
 			<label class="col-form-label col" v-t="'panel.repo.onlyOne'"></label>
 		</div>
 		<div class="panel-grid" v-else>
-			<Store :size="configCount(stretch.repo)" :index="stretch.repo.index" @move="stretch.switchConfig($event)"
+			<Store :size="configCount(stretch.repo)" :index="stretch.configIndex" @move="stretch.switchConfig($event)"
 				   :label="$t('panel.repo.config')"></store>
-			<Store :size="patternCount(stretch.repo)" :index="patternIndex(stretch.repo)" @move="stretch.switchPattern($event)"
+			<Store :size="patternCount(stretch.repo)" :index="stretch.patternIndex" @move="stretch.switchPattern($event)"
 				   :label="$t('panel.repo.pattern')"></Store>
 		</div>
 	</template>
@@ -30,10 +30,6 @@
 
 	function patternCount(repo: JRepository): number {
 		return repo.configurations[repo.index].patterns.length;
-	}
-
-	function patternIndex(repo: JRepository): number {
-		return repo.configurations[repo.index].index;
 	}
 
 </script>

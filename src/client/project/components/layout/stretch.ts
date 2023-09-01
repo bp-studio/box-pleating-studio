@@ -53,12 +53,32 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		return this._data.id;
 	}
 
+	public get configIndex(): number {
+		return this._data.repo?.index ?? 0;
+	}
+	public set configIndex(v: number) {
+		// Since the entire repository is stored in the memo,
+		// it suffices to handling config/pattern navigation as field change.
+		this.$project.history.$fieldChange(this, "configIndex", this.configIndex, v);
+		this._navigate(() => this.$layout.$switchConfig(this.id, v));
+	}
+
+	public get patternIndex(): number {
+		const repo = this._data.repo;
+		if(!repo) return 0;
+		return repo.configurations[repo.index].index;
+	}
+	public set patternIndex(v: number) {
+		this.$project.history.$fieldChange(this, "patternIndex", this.patternIndex, v);
+		this._navigate(() => this.$layout.$switchPattern(this.id, v));
+	}
+
 	public switchConfig(by: number): void {
 		const repo = this._data.repo;
 		if(!repo) return;
 		const i = repo.index;
 		const l = repo.configurations.length;
-		this._navigate(() => this.$layout.$switchConfig(this.id, (i + by + l) % l));
+		this.configIndex = (i + by + l) % l;
 	}
 
 	public switchPattern(by: number): void {
@@ -67,7 +87,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		const config = repo.configurations[repo.index];
 		const i = config.index;
 		const l = config.patterns.length;
-		this._navigate(() => this.$layout.$switchPattern(this.id, (i + by + l) % l));
+		this.patternIndex = (i + by + l) % l;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

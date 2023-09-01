@@ -125,7 +125,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	/**
 	 * Change a field.
-	 * @param flush Whether to flush immediately. The default value is true.
+	 * @param flush Whether to flush immediately. The default value is true.\
+	 * Set the value to `false` if the same field of multiple objects are changed simultaneously.
 	 */
 	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
 		flush: boolean = true): void {
