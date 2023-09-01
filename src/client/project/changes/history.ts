@@ -135,9 +135,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(flush) this.$flush();
 	}
 
-	public $edit(edits: JEdit[]): void {
+	public $edit(edits: JEdit[], oldRoot: number, newRoot: number): void {
 		if(this._moving) return;
-		this._enqueue(EditCommand.$create(this._project, edits));
+		this._enqueue(EditCommand.$create(this._project, edits, oldRoot, newRoot));
 	}
 
 	public $construct(memento: Memento): void {

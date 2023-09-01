@@ -12,6 +12,7 @@ export interface UpdateModel {
 		stretches: Record<string, JStretch>;
 	};
 
+	/** Record the entire tree when any part of it changes. */
 	tree?: JEdge[];
 
 	remove: {

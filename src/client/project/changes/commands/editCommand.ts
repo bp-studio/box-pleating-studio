@@ -6,6 +6,8 @@ import type { JCommand } from "shared/json/history";
 import type { JEdit } from "shared/json/tree";
 
 export interface JEditCommand extends JCommand {
+	readonly old: number;
+	readonly new: number;
 	readonly edits: JEdit[];
 }
 
@@ -17,8 +19,14 @@ export interface JEditCommand extends JCommand {
 
 export class EditCommand extends Command implements JEditCommand {
 
-	public static $create(proj: Project, edits: JEdit[]): EditCommand {
-		return new EditCommand(proj, { type: CommandType.edit, tag: "tree", edits });
+	public static $create(proj: Project, edits: JEdit[], oldRoot: number, newRoot: number): EditCommand {
+		return new EditCommand(proj, {
+			type: CommandType.edit,
+			tag: "tree",
+			edits,
+			old: oldRoot,
+			new: newRoot,
+		});
 	}
 
 	/** @exports */
@@ -27,9 +35,14 @@ export class EditCommand extends Command implements JEditCommand {
 	/** @exports */
 	public readonly edits: JEdit[];
 
+	public readonly old: number;
+	public readonly new: number;
+
 	constructor(project: Project, json: JEditCommand) {
 		super(project, json);
 		this.edits = json.edits;
+		this.old = json.old;
+		this.new = json.new;
 	}
 
 	public $canAddTo(command: Command): boolean {
@@ -47,11 +60,11 @@ export class EditCommand extends Command implements JEditCommand {
 	public $undo(): Promise<void> {
 		const edits = this.edits.map<JEdit>(e => [!e[0], e[1]]).reverse();
 		const layout = this._project.design.$prototype.layout;
-		return this._project.$core.tree.edit(edits, layout.flaps, layout.stretches);
+		return this._project.$core.tree.edit(edits, this.old, layout.flaps, layout.stretches);
 	}
 
 	public $redo(): Promise<void> {
 		const layout = this._project.design.$prototype.layout;
-		return this._project.$core.tree.edit(this.edits, layout.flaps, layout.stretches);
+		return this._project.$core.tree.edit(this.edits, this.new, layout.flaps, layout.stretches);
 	}
 }

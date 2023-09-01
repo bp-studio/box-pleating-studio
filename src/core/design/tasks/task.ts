@@ -5,7 +5,7 @@
  */
 //=================================================================
 
-export class Task {
+export class Task<T = unknown> {
 
 	/** Used for deciding execution order. */
 	public readonly $priority: number;
@@ -15,6 +15,9 @@ export class Task {
 
 	/** Other tasks depending on self. */
 	public readonly $dependant: readonly Task[];
+
+	/** Additional data field. */
+	public data?: T;
 
 	/**
 	 * Note that the parameters are "the tasks depending on this task",

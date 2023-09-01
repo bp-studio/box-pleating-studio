@@ -79,10 +79,18 @@ export class Tree implements ISerializable<JTree> {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public get $rootId(): number {
+		if(!this._edges.length) return NaN; // This is the case during initialization
+		return this._edges[0].n1;
+	}
+
 	public $update(model: UpdateModel): void {
 		// update JEdges if needed
-		if(model.tree) this._edges = model.tree;
-		if(model.edit.length) this.$project.history.$edit(model.edit);
+		if(model.tree) {
+			const oldRoot = this.$rootId;
+			this._edges = model.tree;
+			if(model.edit.length) this.$project.history.$edit(model.edit, oldRoot, this.$rootId);
+		}
 
 		const prototype = this.$project.design.$prototype.tree;
 
