@@ -21,10 +21,12 @@ import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
 import type { Label } from "client/utils/label";
-import type { JSheet, JViewport } from "shared/json";
+import type { JSheet, JViewport, Memento } from "shared/json";
 import type { IGrid } from "./grid";
 
 const LAYERS = Enum.values(Layer);
+
+type SheetType = "layout" | "tree";
 
 //=================================================================
 /**
@@ -33,7 +35,7 @@ const LAYERS = Enum.values(Layer);
 //=================================================================
 export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
-	public readonly $tag: string;
+	public readonly $tag: SheetType;
 
 	/**
 	 * The current scrolling position of this working area, in pixels.
@@ -73,7 +75,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
-	constructor(project: Project, parentView: Container, tag: string, json: JSheet, state?: JViewport) {
+	constructor(project: Project, parentView: Container, tag: SheetType, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
 		this.$tag = tag;
@@ -137,9 +139,17 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	public set type(v: GridType) {
 		const oldValue = this._type;
 		if(v == oldValue) return;
-		this._grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
+		const history = this.$project.history;
+		if(history.$moving) {
+			const prototype = this.$project.design.$prototype[this.$tag].sheet;
+			this._grid = createGrid(this, v, prototype.width, prototype.height);
+		} else {
+			history.$destruct(this._toMemento());
+			this._grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
+			history.$construct(this._toMemento());
+			history.$fieldChange(this, "type", oldValue, v);
+		}
 		this._type = v;
-		this.$project.history.$fieldChange(this, "type", oldValue, v);
 	}
 
 	public get grid(): IGrid {
@@ -204,6 +214,10 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _toMemento(): Memento {
+		return [this.$tag, this.toJSON()];
+	}
 
 	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {

@@ -127,6 +127,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return grid.$contains(this.$location);
 	}
 
+	public override $anchors(): IPoint[] {
+		return [this.$location];
+	}
+
 	protected override async _move(x: number, y: number): Promise<void> {
 		await super._move(x, y);
 		if(this.$isNew) {

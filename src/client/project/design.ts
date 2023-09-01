@@ -17,7 +17,7 @@ import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
 import type { Project } from "./project";
 import type { UpdateModel } from "core/service/updateModel";
-import type { DesignMode, JDesign, JFlap, JState, JStretch, JVertex, Memento } from "shared/json";
+import type { DesignMode, JDesign, JFlap, JSheet, JState, JStretch, JVertex, Memento } from "shared/json";
 
 //=================================================================
 /**
@@ -118,6 +118,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const { layout, tree } = this.$prototype;
 		for(const [tag, json] of mementos) {
 			const init = tag.substring(0, 1);
+			if(tag === "layout" || tag === "tree") this.$prototype[tag].sheet = json as JSheet;
 			if(init === "f") layout.flaps.push(json as JFlap);
 			if(init === "v") tree.nodes.push(json as JVertex);
 			if(init === "s") layout.stretches.push(json as JStretch);

@@ -7,6 +7,7 @@ import { $getEventCenter, $isTouch } from "./share";
 import { display } from "client/screen/display";
 import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
+import { Independent } from "client/base/independent";
 
 import type { Control } from "client/base/control";
 import type { DragSelectable } from "client/base/draggable";
@@ -100,7 +101,7 @@ export namespace SelectionController {
 	export function selectAll(): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
-		for(const c of sheet.$controls) $toggle(c, true);
+		for(const c of sheet.$controls) $toggle(c, c instanceof Independent);
 	}
 
 	/** Handles hit, and compares if the selection state remains the same. */

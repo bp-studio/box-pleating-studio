@@ -24,11 +24,10 @@ export class DiagonalGrid implements IGrid {
 	public readonly $tag: string;
 	public readonly $project: Project;
 	public readonly type = GridType.diagonal;
-
 	private readonly _sheet: Sheet;
 
 	private _testSize: number;
-	private _testOffset: number = 0;
+	private _testOffset: IPoint | undefined;
 
 	@shallowRef private _size: number;
 
@@ -39,6 +38,7 @@ export class DiagonalGrid implements IGrid {
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
 		this._testSize = this._size = Math.round((width + height) / 2);
+		if(sheet.$project.history && !sheet.$project.history.$moving) this._initialFit();
 	}
 
 	public toJSON(): JSheet {
@@ -69,24 +69,15 @@ export class DiagonalGrid implements IGrid {
 		if(v < MIN_SIZE) return;
 		const oldValue = this.size;
 		this._testSize = v;
-		this._testOffset = (v % 2 ? Math.floor : Math.ceil)((v - oldValue) / 2);
-		if(v < oldValue) {
-			for(const c of this._sheet.$independents) {
-				if(!c.$testGrid(this)) {
-					this._testSize = this._size;
-					this._testOffset = 0;
-					return;
-				}
-			}
+		const offset = (v % 2 ? Math.floor : Math.ceil)((v - oldValue) / 2);
+		this._testOffset = { x: offset, y: offset };
+		if(v < oldValue && !this._testFit()) {
+			this._testSize = this._size;
+			this._testOffset = undefined;
+			return;
 		}
 
-		if(this._testOffset != 0) {
-			// Resize about the center of the sheet
-			for(const c of this._sheet.$independents) {
-				c.$moveBy({ x: this._testOffset, y: this._testOffset });
-			}
-			this._testOffset = 0;
-		}
+		if(offset != 0) this._applyOffset();
 		this._size = v;
 		this.$project.history.$fieldChange(this, "size", oldValue, v);
 	}
@@ -132,12 +123,14 @@ export class DiagonalGrid implements IGrid {
 	}
 
 	public $contains(p: IPoint): boolean {
-		const { x, y } = p;
+		let { x, y } = p;
 		const s = this._testSize, h = s % 2;
 		const f = (s - h) / 2;
 		const c = (s + h) / 2;
-		return x + y + 2 * this._testOffset >= f && y - x <= c &&
-			x - y <= c && x + y + 2 * this._testOffset <= c + s;
+		const offset = this._testOffset || { x: 0, y: 0 };
+		x += offset.x;
+		y += offset.y;
+		return x + y >= f && y - x <= c && x - y <= c && x + y <= c + s;
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {
@@ -209,5 +202,48 @@ export class DiagonalGrid implements IGrid {
 
 	public get $renderWidth(): number {
 		return this._size + this._size % 2;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _initialFit(): void {
+		if(this._testFit()) return;
+
+		const anchors = [...this._sheet.$independents].flatMap(c => c.$anchors());
+		const xpy = anchors.map(p => p.x + p.y), ymx = anchors.map(p => p.y - p.x);
+		const xpyMax = Math.max(...xpy), xpyMin = Math.min(...xpy);
+		const ymxMax = Math.max(...ymx), ymxMin = Math.min(...ymx);
+		this._testSize = Math.ceil(Math.max(xpyMax - xpyMin, ymxMax - ymxMin) / 2);
+
+		const a = (xpyMax + xpyMin) / 2, b = (ymxMax + ymxMin) / 2;
+		const x = Math.round((this._testSize - a + b) / 2);
+		const y = Math.round((this._testSize - a - b) / 2);
+		this._testOffset = { x, y };
+
+		while(!this._testFit()) {
+			this._testSize++;
+			if(this._testSize % 2 == 0) {
+				this._testOffset = { x: this._testOffset.x + 1, y: this._testOffset.y + 1 };
+			}
+		}
+		this._size = this._testSize;
+		this._applyOffset();
+	}
+
+	private _applyOffset(): void {
+		if(!this._testOffset) return;
+		for(const c of this._sheet.$independents) {
+			c.$moveBy(this._testOffset);
+		}
+		this._testOffset = undefined;
+	}
+
+	private _testFit(): boolean {
+		for(const c of this._sheet.$independents) {
+			if(!c.$testGrid(this)) return false;
+		}
+		return true;
 	}
 }

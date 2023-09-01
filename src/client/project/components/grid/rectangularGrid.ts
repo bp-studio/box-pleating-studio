@@ -2,7 +2,6 @@ import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 
-import type { ITagObject } from "client/shared/interface";
 import type { Path } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json";
@@ -68,13 +67,9 @@ export class RectangularGrid implements IGrid {
 		const oldValue = this._height;
 		if(v < MIN_SIZE || oldValue === v) return;
 		this._testHeight = v;
-		if(v < oldValue) {
-			for(const c of this._sheet.$independents) {
-				if(!c.$testGrid(this)) {
-					this._testHeight = oldValue;
-					return;
-				}
-			}
+		if(v < oldValue && !this._testFit()) {
+			this._testHeight = oldValue;
+			return;
 		}
 		this._height = v;
 		this.$project.history.$fieldChange(this, "height", oldValue, v);
@@ -92,13 +87,9 @@ export class RectangularGrid implements IGrid {
 		const oldValue = this._width;
 		if(v < MIN_SIZE || oldValue === v) return;
 		this._testWidth = v;
-		if(v < oldValue) {
-			for(const c of this._sheet.$independents) {
-				if(!c.$testGrid(this)) {
-					this._testWidth = oldValue;
-					return;
-				}
-			}
+		if(v < oldValue && !this._testFit()) {
+			this._testWidth = oldValue;
+			return;
 		}
 		this._width = v;
 		this.$project.history.$fieldChange(this, "width", oldValue, v);
@@ -180,5 +171,16 @@ export class RectangularGrid implements IGrid {
 
 	public get $renderWidth(): number {
 		return this._width;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _testFit(): boolean {
+		for(const c of this._sheet.$independents) {
+			if(!c.$testGrid(this)) return false;
+		}
+		return true;
 	}
 }

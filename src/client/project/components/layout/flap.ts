@@ -203,6 +203,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return this._testResize(this._width, this._height, grid);
 	}
 
+	public override $anchors(): IPoint[] {
+		return this._getDots(this.$location, this._width, this._height);
+	}
+
 	public $sync(p: IPoint): void {
 		this._move(p.x, p.y);
 	}
