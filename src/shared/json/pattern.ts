@@ -10,6 +10,21 @@ export interface JStretch {
 
 	/** `undefined` if there's no {@link Pattern} */
 	pattern?: JPattern;
+
+	/** `undefined` if the repo is not completely calculated. */
+	repo?: JRepository;
+}
+
+/**
+ * Store all information about the {@link Repository} for session.
+ *
+ * It would not suffice to simply store the config/pattern counts and indices,
+ * since the generated config/pattern could be different across different versions.
+ * We therefore store the entire config/pattern hierarchy just to be sure.
+ */
+export interface JRepository {
+	configurations: Required<JConfiguration>[];
+	index: number;
 }
 
 export interface JConfiguration {

@@ -16,9 +16,9 @@ import { Stretch } from "./stretch";
 import type { Device } from "./device";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
-import type { GraphicsData, StretchData, UpdateModel } from "core/service/updateModel";
+import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
-import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JViewport } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport } from "shared/json";
 
 //=================================================================
 /**
@@ -65,11 +65,11 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$reactDraw(this._redrawJunctions);
 	}
 
-	public toJSON(): JLayout {
+	public toJSON(session?: true): JLayout {
 		return {
 			sheet: this.$sheet.toJSON(),
 			flaps: [...this.$flaps.values()].map(f => f.toJSON()),
-			stretches: [...this.$stretches.values()].map(s => s.toJSON()),
+			stretches: [...this.$stretches.values()].map(s => s.toJSON(session)),
 		};
 	}
 
@@ -148,7 +148,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		return this.$project.$core.layout.switchPattern(stretchId, to);
 	}
 
-	public $completeStretch(stretchId: string): Promise<StretchData> {
+	public $completeStretch(stretchId: string): Promise<JStretch> {
 		return this.$project.$core.layout.completeStretch(stretchId);
 	}
 

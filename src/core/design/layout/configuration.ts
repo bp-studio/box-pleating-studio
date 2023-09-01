@@ -37,15 +37,15 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	public $originDirty: boolean = false;
 
-	constructor(repo: Repository, junctions: JJunction[], partitions: readonly JPartition[], proto?: JPattern) {
+	constructor(repo: Repository, junctions: JJunction[], config: JConfiguration) {
 		this.$repo = repo;
 		this.$junctions = junctions;
-		this.$partitions = partitions.map(p => new Partition(this, junctions, p));
+		this.$partitions = config.partitions.map(p => new Partition(this, junctions, p));
 
 		const overlaps: JOverlap[] = [];
 		const overlapMap: Map<number, [number, number]> = new Map();
 		let k = -1;
-		for(const [i, p] of partitions.entries()) {
+		for(const [i, p] of config.partitions.entries()) {
 			for(const [j, o] of p.overlaps.entries()) {
 				overlaps.push(o);
 				overlapMap.set(k--, [i, j]);
@@ -54,13 +54,22 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this.$overlaps = overlaps;
 		this.$overlapMap = overlapMap;
 
-		this._patterns = new Store(patternGenerator(this, proto));
-		this._patterns.$next();
+		this._patterns = new Store(patternGenerator(this, config));
+		if(typeof config.index == "number") {
+			this._patterns.$rest();
+			this._index = config.index;
+		} else {
+			this._patterns.$next();
+		}
 	}
 
-	public toJSON(): JConfiguration {
+	public toJSON(): JConfiguration;
+	public toJSON(session: true): Required<JConfiguration>;
+	public toJSON(session?: true): JConfiguration {
 		return {
 			partitions: this.$partitions.map(p => p.toJSON()),
+			patterns: session && this._patterns.$entries.map(p => p.toJSON()),
+			index: session && this._index,
 		};
 	}
 

@@ -9,9 +9,8 @@ import { getOrSetEmptyArray } from "shared/utils/map";
 import { RepoNodeSet } from "./repoNodeSet";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
-import type { JRepository } from "core/service/updateModel";
 import type { Pattern } from "./pattern/pattern";
-import type { JStretch } from "shared/json";
+import type { JRepository, JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
@@ -74,15 +73,17 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		State.$repoToProcess.add(this);
 
 		this._configurations = new Store(configGenerator(this, junctions, prototype));
+		if(prototype?.repo) {
+			this._configurations.$rest();
+			this._index = prototype.repo.index;
+		}
 	}
 
 	public toJSON(): JRepository | undefined {
 		if(!this._configurations.$done) return undefined;
 		return {
-			configCount: this.$configurations.length,
-			configIndex: this._index,
-			patternCount: this.$configuration!.$length!,
-			patternIndex: this.$configuration!.$index,
+			configurations: this.$configurations.map(c => c.toJSON(true)),
+			index: this._index,
 		};
 	}
 

@@ -62,11 +62,11 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		return this.mode == "layout" ? this.layout.$sheet : this.tree.$sheet;
 	}
 
-	public toJSON(): JDesign {
+	public toJSON(session?: true): JDesign {
 		return {
 			title: this.title,
 			mode: this.mode,
-			layout: this.layout.toJSON(),
+			layout: this.layout.toJSON(session),
 			tree: this.tree.toJSON(),
 		};
 	}

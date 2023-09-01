@@ -2,7 +2,7 @@ import { Configuration } from "../configuration";
 import { singleConfigGenerator } from "./singleConfigGenerator";
 import { generalConfigGenerator } from "./generalConfigGenerator";
 
-import type { JStretch } from "shared/json/pattern";
+import type { JConfiguration, JStretch } from "shared/json/pattern";
 import type { ValidJunction } from "../junction/validJunction";
 import type { Repository } from "../repository";
 
@@ -10,19 +10,31 @@ export function* configGenerator(
 	repo: Repository, junctions: ValidJunction[], prototype?: JStretch
 ): Generator<Configuration> {
 
-	// Process prototype
-	const proto = prototype?.configuration;
 	let protoSignature: string | undefined;
-	const pattern = prototype?.pattern;
-	if(proto && pattern) {
-		try {
-			const jJunctions = junctions.map(j => j.toJSON());
-			const config = new Configuration(repo, jJunctions, proto.partitions, pattern);
-			if(!config.$pattern) throw new Error();
-			protoSignature = JSON.stringify(config.toJSON());
-			yield config;
-		} catch {
-			console.log("Incompatible old version.");
+	if(prototype) {
+		const jJunctions = junctions.map(j => j.toJSON());
+
+		// Recover entire set of configurations
+		if(prototype.repo) {
+			for(const config of prototype.repo.configurations) {
+				yield new Configuration(repo, jJunctions, config);
+			}
+			return;
+		}
+
+		// Process single prototype
+		const proto = prototype.configuration;
+		const pattern = prototype.pattern;
+		if(proto && pattern) {
+			try {
+				const jConfig: JConfiguration = { partitions: proto.partitions, patterns: [pattern] };
+				const config = new Configuration(repo, jJunctions, jConfig);
+				if(!config.$pattern) throw new Error();
+				protoSignature = JSON.stringify(config.toJSON());
+				yield config;
+			} catch {
+				console.log("Incompatible old version.");
+			}
 		}
 	}
 

@@ -4,7 +4,7 @@ import { clone } from "shared/utils/clone";
 import { configFilter } from "./filters";
 
 import type { Repository } from "../repository";
-import type { JJunction, JOverlap } from "shared/json";
+import type { JJunction, JOverlap, JPartition } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";
 
 //=================================================================
@@ -23,9 +23,10 @@ export function* singleConfigGenerator(
 }
 
 function* singleGOPS(repo: Repository, j: JJunction): Generator<Configuration> {
-	yield new Configuration(repo, [j], [{
+	const partitions: JPartition[] = [{
 		overlaps: [toOverlap(j, 0)],
-	}]);
+	}];
+	yield new Configuration(repo, [j], { partitions });
 }
 
 function toOverlap(j: JJunction, parentIndex: number): JOverlap {

@@ -4,9 +4,9 @@ import { SelectionController } from "client/controllers/selectionController";
 import { Device } from "./device";
 
 import type { ITagObject } from "client/shared/interface";
-import type { JStretch, Memento } from "shared/json";
+import type { JRepository, JStretch, Memento } from "shared/json";
 import type { View } from "client/base/view";
-import type { DeviceData, JRepository, StretchData, UpdateModel } from "core/service/updateModel";
+import type { DeviceData, UpdateModel } from "core/service/updateModel";
 import type { Layout } from "./layout";
 
 //=================================================================
@@ -22,22 +22,23 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	public readonly type = "Stretch";
 	public readonly $priority: number = 0;
 	private readonly _devices: Device[] = [];
-	@shallowRef private _data!: StretchData;
+	@shallowRef private _data!: JStretch;
 	public readonly $layout: Layout;
 
-	constructor(layout: Layout, data: StretchData, model: UpdateModel) {
+	constructor(layout: Layout, data: JStretch, model: UpdateModel) {
 		super(layout.$sheet);
-		this.$tag = "s" + data.data.id;
+		this.$tag = "s" + data.id;
 		this.$layout = layout;
 		this.$update(data, model);
 	}
 
-	public toJSON(): JStretch {
-		return this._data.data;
+	public toJSON(session?: true): JStretch {
+		if(session) return this._data;
+		return Object.assign({}, this._data, { repo: undefined });
 	}
 
 	public $toMemento(): Memento {
-		return [this.$tag, this.toJSON()];
+		return [this.$tag, this.toJSON(true)];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,22 +50,23 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public get id(): string {
-		return this._data.data.id;
+		return this._data.id;
 	}
 
 	public switchConfig(by: number): void {
 		const repo = this._data.repo;
 		if(!repo) return;
-		const i = repo.configIndex;
-		const l = repo.configCount;
+		const i = repo.index;
+		const l = repo.configurations.length;
 		this._navigate(() => this.$layout.$switchConfig(this.id, (i + by + l) % l));
 	}
 
 	public switchPattern(by: number): void {
 		const repo = this._data.repo;
 		if(!repo) return;
-		const i = repo.patternIndex;
-		const l = repo.patternCount;
+		const config = repo.configurations[repo.index];
+		const i = config.index;
+		const l = config.patterns.length;
 		this._navigate(() => this.$layout.$switchPattern(this.id, (i + by + l) % l));
 	}
 
@@ -88,9 +90,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		return this._devices;
 	}
 
-	public $update(data: StretchData, model: UpdateModel): void {
+	public $update(data: JStretch, model: UpdateModel): void {
 		this._data = data;
-		const deviceCount = data.data.pattern!.devices.length;
+		const deviceCount = data.pattern!.devices.length;
 		while(deviceCount < this._devices.length) {
 			const device = this._devices.pop()!;
 			this.$layout.$sheet.$removeChild(device);

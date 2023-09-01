@@ -4,7 +4,6 @@ import { State } from "core/service/state";
 import { clearPatternContourForRepo } from "../tasks/patternContour";
 import { RepoNodeSet } from "./repoNodeSet";
 
-import type { StretchData } from "core/service/updateModel";
 import type { JStretch } from "shared/json";
 import type { ValidJunction } from "./junction/validJunction";
 
@@ -43,6 +42,7 @@ export class Stretch implements ISerializable<JStretch> {
 			id: this.$id,
 			configuration: configuration?.toJSON(),
 			pattern: configuration?.$pattern?.toJSON(),
+			repo: this._repo.toJSON(),
 		};
 	}
 
@@ -101,11 +101,8 @@ export class Stretch implements ISerializable<JStretch> {
 	 * Before that happens, a {@link Stretch} will always only yield the first pattern it finds,
 	 * to save the computation time.
 	 */
-	public $complete(): StretchData {
+	public $complete(): JStretch {
 		this._repo.$complete();
-		return {
-			data: this.toJSON(),
-			repo: this._repo.toJSON(),
-		};
+		return this.toJSON();
 	}
 }

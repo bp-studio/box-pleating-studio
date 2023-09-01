@@ -24,6 +24,9 @@ export class Pattern implements ISerializable<JPattern> {
 	/** A flag indicating the origin needs to be updated. */
 	public $originDirty: boolean = false;
 
+	/**
+	 * @param seeded Signify that this is a seeded pattern, and positioning is not needed.
+	 */
 	constructor(config: Configuration, devices: readonly JDevice[], seeded?: boolean) {
 		this.$config = config;
 		this.$devices = devices.map((d, i) => new Device(this, config.$partitions[i], d));

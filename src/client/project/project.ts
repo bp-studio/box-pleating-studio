@@ -88,19 +88,16 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		return this;
 	}
 
-	public toJSON(session?: boolean): JProject {
-		const result: JProject = {
+	public toJSON(session?: true): JProject {
+		return {
 			version: Migration.$getCurrentVersion(),
-			design: this.design.toJSON(),
-		};
-		if(session) {
-			result.history = this.history.toJSON();
-			result.state = {
+			design: this.design.toJSON(session),
+			history: session && this.history.toJSON(),
+			state: session && {
 				tree: this.design.tree.$sheet.$getViewport(),
 				layout: this.design.layout.$sheet.$getViewport(),
-			};
-		}
-		return result;
+			},
+		};
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,6 @@ import { Clip } from "core/math/polyBool/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
 
-import type { StretchData } from "core/service/updateModel";
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
 import type { JFlap, JStretch } from "shared/json";
@@ -83,7 +82,7 @@ export namespace LayoutController {
 		Processor.$run(patternTask);
 	}
 
-	export function completeStretch(stretchId: string): StretchData {
+	export function completeStretch(stretchId: string): JStretch {
 		const stretch = State.$stretches.get(stretchId)!;
 		return stretch.$complete();
 	}

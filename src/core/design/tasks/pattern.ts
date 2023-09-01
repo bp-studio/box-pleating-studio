@@ -23,10 +23,7 @@ function pattern(): void {
 	for(const repo of State.$repoToProcess) {
 		const id = repo.$stretch.$id;
 		if(repo.$pattern) {
-			State.$updateResult.add.stretches[id] = {
-				data: repo.$stretch.toJSON(),
-				repo: repo.toJSON(),
-			};
+			State.$updateResult.add.stretches[id] = repo.$stretch.toJSON();
 			for(const n of repo.$nodeSet.$nodes) {
 				State.$contourWillChange.add(State.$tree.$nodes[n]!);
 			}

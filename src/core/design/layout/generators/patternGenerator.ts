@@ -2,7 +2,7 @@ import { Pattern } from "../pattern/pattern";
 import { Device } from "../pattern/device";
 
 import type { Configuration } from "../configuration";
-import type { JDevice, JPattern } from "shared/json";
+import type { JConfiguration, JDevice } from "shared/json";
 import type { Partition } from "../partition";
 
 //=================================================================
@@ -11,11 +11,18 @@ import type { Partition } from "../partition";
  * and combine them into {@link Pattern}s.
  */
 //=================================================================
-export function* patternGenerator(config: Configuration, proto?: JPattern): Generator<Pattern> {
-	// Process prototype pattern
+export function* patternGenerator(config: Configuration, proto?: JConfiguration): Generator<Pattern> {
+
 	let protoSignature: string | undefined;
-	if(proto) {
-		const pattern = new Pattern(config, proto.devices, true);
+	if(proto && proto.patterns && proto.patterns.length) {
+		if(typeof proto.index == "number") {
+			for(const pattern of proto.patterns) {
+				yield new Pattern(config, pattern.devices, true);
+			}
+			return;
+		}
+
+		const pattern = new Pattern(config, proto.patterns[0].devices, true);
 		if(pattern.$valid) {
 			const devices = pattern.$devices.map(d => d.toJSON());
 			protoSignature = Device.$getSignature(devices);

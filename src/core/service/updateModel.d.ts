@@ -1,5 +1,5 @@
 import type { Polygon, Contour, Path, ILine, ArcPolygon } from "shared/types/geometry";
-import type { CommandType, JEdge, JEdgeBase, JEdit, JFlap, JStretch } from "shared/json";
+import type { CommandType, JConfiguration, JEdge, JEdgeBase, JEdit, JFlap, JStretch } from "shared/json";
 import type { Configuration } from "core/design/layout/configuration";
 import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Device } from "core/design/layout/pattern/device";
@@ -9,7 +9,7 @@ export interface UpdateModel {
 	add: {
 		nodes: number[];
 		junctions: Record<string, ArcPolygon>;
-		stretches: Record<string, StretchData>;
+		stretches: Record<string, JStretch>;
 	};
 
 	tree?: JEdge[];
@@ -70,15 +70,3 @@ interface DeviceData extends GraphicsData {
 	forward: boolean;
 }
 
-interface StretchData {
-	/** JSON data to store in the Client. */
-	data: JStretch;
-	repo?: JRepository;
-}
-
-interface JRepository {
-	configCount: number;
-	configIndex: number;
-	patternCount: number;
-	patternIndex: number;
-}
