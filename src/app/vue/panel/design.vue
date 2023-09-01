@@ -8,7 +8,7 @@
 						  :placeholder="$t('panel.design.descriptionPH')"></textarea>
 			</div>
 			<div class="my-2">
-				<div class="h5" v-if="design.mode == 'tree'" v-t="'panel.design.tree'"></div>
+				<div class="h6" v-if="design.mode == 'tree'" v-t="'panel.design.tree'"></div>
 				<div class="h6" v-if="design.mode == 'layout'" v-t="'panel.design.layout'"></div>
 			</div>
 		</Row>

@@ -28,6 +28,8 @@ export class DiagonalGrid implements IGrid {
 	private readonly _sheet: Sheet;
 
 	private _testSize: number;
+	private _testOffset: number = 0;
+
 	@shallowRef private _size: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
@@ -59,15 +61,34 @@ export class DiagonalGrid implements IGrid {
 		return this._size;
 	}
 	public set size(v: number) {
+		if(this.$project.history.$moving) {
+			this._testSize = this._size = v; // Skip all checks and effects
+			return;
+		}
+
 		if(v < MIN_SIZE) return;
+		const oldValue = this.size;
 		this._testSize = v;
-		for(const c of this._sheet.$independents) {
-			if(!c.$testGrid(this)) {
-				this._testSize = this._size;
-				return;
+		this._testOffset = (v % 2 ? Math.floor : Math.ceil)((v - oldValue) / 2);
+		if(v < oldValue) {
+			for(const c of this._sheet.$independents) {
+				if(!c.$testGrid(this)) {
+					this._testSize = this._size;
+					this._testOffset = 0;
+					return;
+				}
 			}
 		}
+
+		if(this._testOffset != 0) {
+			// Resize about the center of the sheet
+			for(const c of this._sheet.$independents) {
+				c.$moveBy({ x: this._testOffset, y: this._testOffset });
+			}
+			this._testOffset = 0;
+		}
 		this._size = v;
+		this.$project.history.$fieldChange(this, "size", oldValue, v);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +136,8 @@ export class DiagonalGrid implements IGrid {
 		const s = this._testSize, h = s % 2;
 		const f = (s - h) / 2;
 		const c = (s + h) / 2;
-		return x + y >= f && y - x <= c && x - y <= c && x + y <= c + s;
+		return x + y + 2 * this._testOffset >= f && y - x <= c &&
+			x - y <= c && x + y + 2 * this._testOffset <= c + s;
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {

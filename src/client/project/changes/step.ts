@@ -118,16 +118,11 @@ export class Step implements ISerializable<JStep> {
 		this._project.design.$addMementos(this._construct);
 
 		let result = OperationResult.Success;
-		for(const [i, command] of this._commands.entries()) {
-			try {
-				// eslint-disable-next-line no-await-in-loop
-				await command.$redo();
-			} catch {
-				if(i == 0) return OperationResult.Failed;
-				(this._commands as Command[]).splice(i);
-				result = OperationResult.Partial;
-				break;
-			}
+		const firstReject = await runCommandsAsync(this._commands, c => c.$redo());
+		if(firstReject == 0) return OperationResult.Failed;
+		if(firstReject > 0) {
+			(this._commands as Command[]).splice(firstReject);
+			result = OperationResult.Partial;
 		}
 
 		this._project.design.mode = this._mode;
@@ -143,16 +138,11 @@ export class Step implements ISerializable<JStep> {
 		const commands = this._commands.toReversed();
 
 		let result = OperationResult.Success;
-		for(const [i, command] of commands.entries()) {
-			try {
-				// eslint-disable-next-line no-await-in-loop
-				await command.$undo();
-			} catch {
-				if(i == 0) return OperationResult.Failed;
-				(this._commands as Command[]).splice(0, this._commands.length - i);
-				result = OperationResult.Partial;
-				break;
-			}
+		const firstReject = await runCommandsAsync(commands, c => c.$undo());
+		if(firstReject == 0) return OperationResult.Failed;
+		if(firstReject > 0) {
+			(this._commands as Command[]).splice(0, this._commands.length - firstReject);
+			result = OperationResult.Partial;
 		}
 
 		this._project.design.mode = this._mode;
@@ -215,4 +205,26 @@ export class Step implements ISerializable<JStep> {
 export function restore(project: Project, json: JStep): Step {
 	json.commands = json.commands.map(c => $resolve(project, c));
 	return new Step(project, json as JStep<Command>);
+}
+
+/**
+ * Run {@link Command}s until the first rejection,
+ * and return the index of the rejected command,
+ * or `-1` if all promises resolved.
+ */
+async function runCommandsAsync(
+	commands: readonly Command[],
+	factory: Func<Command, Promise<void>>
+): Promise<number> {
+	let result = -1;
+	async function run(c: Command, i: number): Promise<void> {
+		if(result != -1) return;
+		try {
+			await factory(c);
+		} catch {
+			if(result == -1 || i < result) result = i;
+		}
+	}
+	await Promise.all(commands.map(run));
+	return result;
 }

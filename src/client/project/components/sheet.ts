@@ -47,6 +47,8 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	@shallowRef private _type: GridType;
 
+	@shallowRef private _grid: IGrid;
+
 	/** Top-level container */
 	public readonly $view: Container = new Container();
 
@@ -64,8 +66,6 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	/** The mask for the clipped layers. */
 	private _mask: Graphics = new Graphics();
-
-	@shallowRef private _grid: IGrid;
 
 	public readonly $controls: Set<Control> = new Set();
 

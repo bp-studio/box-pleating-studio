@@ -80,7 +80,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		this.layout.$cleanUp(model);
 		this.tree.$update(model);
 		this.layout.$update(model);
-		this.$project.history.$flush();
+		if(!this.$project.history.$moving) this.$project.history.$flush();
 
 		// Clear prototypes
 		const { layout, tree } = this.$prototype;

@@ -15,6 +15,7 @@ export interface IGrid extends ISerializable<JSheet>, ITagObject {
 	/** The type of the grid. */
 	readonly type: GridType;
 
+	// TODO: do we still need this?
 	/** The maximal size allowed inside the grid. */
 	readonly diameter: number;
 

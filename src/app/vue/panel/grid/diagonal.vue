@@ -1,5 +1,5 @@
 <template>
-	<Number :label="$t('panel.design.size')" v-model="grid.size" :min="6" hotkeys="d.wd,d.wi" />
+	<Number :label="$t('panel.design.size')" v-model="grid().size" :min="6" hotkeys="d.wd,d.wi" />
 </template>
 
 <script setup lang="ts">
@@ -12,6 +12,6 @@
 	defineOptions({ name: "DiagonalGrid" });
 
 	const props = defineProps<{ target: IGrid }>();
-	const grid = props.target as DiagonalGrid;
+	const grid = (): DiagonalGrid => props.target as DiagonalGrid;
 
 </script>

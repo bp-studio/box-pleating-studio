@@ -1,6 +1,6 @@
 <template>
-	<Number :label="$t('panel.design.width')" v-model="grid.width" :min="4" hotkeys="d.wd,d.wi" />
-	<Number :label="$t('panel.design.height')" v-model="grid.height" :min="4" hotkeys="d.hd,d.hi" />
+	<Number :label="$t('panel.design.width')" v-model="grid().width" :min="4" hotkeys="d.wd,d.wi" />
+	<Number :label="$t('panel.design.height')" v-model="grid().height" :min="4" hotkeys="d.hd,d.hi" />
 </template>
 
 <script setup lang="ts">
@@ -13,6 +13,6 @@
 	defineOptions({ name: "RectangularGrid" });
 
 	const props = defineProps<{ target: IGrid }>();
-	const grid = props.target as RectangularGrid;
+	const grid = (): RectangularGrid => props.target as RectangularGrid;
 
 </script>

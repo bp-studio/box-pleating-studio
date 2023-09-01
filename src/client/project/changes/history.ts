@@ -41,14 +41,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	/** Tags of last-known selected {@link Control}s. */
 	private _selection?: string[] = [];
 
-	/**
-	 * Whether we're navigating the history.
-	 * In that case the changes are not recorded.
-	 *
-	 * The initial value is true, so that the initialization of a {@link Project}
-	 * will not create any commands.
-	 */
-	private _moving: boolean = true;
+	/** Whether we're navigating the history. */
+	private _moving: boolean = false;
+
+	private _initializing: boolean = true;
 
 	constructor(project: Project, json?: JHistory) {
 		this._project = project;
@@ -72,6 +68,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			savedIndex: this._savedIndex,
 			steps: this._steps.map(s => s.toJSON()),
 		};
+	}
+
+	public get $moving(): boolean {
+		return this._moving;
 	}
 
 	public get isModified(): boolean {
@@ -109,6 +109,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			this._destruct = [];
 		}
 		this._selection = undefined;
+		this._initializing = false;
 		this._moving = false;
 	}
 
@@ -118,7 +119,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** Move an object. */
 	public $move(target: Draggable, loc: IPoint): void {
-		if(this._moving) return;
+		if(this._shouldNotRecord) return;
 		const command = MoveCommand.$create(target, loc);
 		this._enqueue(command);
 	}
@@ -130,23 +131,23 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	 */
 	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
 		flush: boolean = true): void {
-		if(this._moving) return;
+		if(this._shouldNotRecord) return;
 		this._enqueue(FieldCommand.$create(target, prop, oldValue, newValue));
 		if(flush) this.$flush();
 	}
 
 	public $edit(edits: JEdit[], oldRoot: number, newRoot: number): void {
-		if(this._moving) return;
+		if(this._shouldNotRecord) return;
 		this._enqueue(EditCommand.$create(this._project, edits, oldRoot, newRoot));
 	}
 
 	public $construct(memento: Memento): void {
-		if(this._moving) return;
+		if(this._shouldNotRecord) return;
 		this._construct.push(memento);
 	}
 
 	public $destruct(memento: Memento): void {
-		if(this._moving) return;
+		if(this._shouldNotRecord) return;
 		this._destruct.push(memento);
 	}
 
@@ -189,6 +190,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private get _shouldNotRecord(): boolean {
+		return this._moving || this._initializing;
+	}
 
 	private get _lastStep(): Step | undefined {
 		if(this._index == 0 || this._index < this._steps.length) return undefined;

@@ -60,13 +60,20 @@ export class RectangularGrid implements IGrid {
 		return this._height;
 	}
 	public set height(v: number) {
+		if(this.$project.history.$moving) {
+			this._testHeight = this._height = v;
+			return;
+		}
+
 		const oldValue = this._height;
 		if(v < MIN_SIZE || oldValue === v) return;
 		this._testHeight = v;
-		for(const c of this._sheet.$independents) {
-			if(!c.$testGrid(this)) {
-				this._testHeight = oldValue;
-				return;
+		if(v < oldValue) {
+			for(const c of this._sheet.$independents) {
+				if(!c.$testGrid(this)) {
+					this._testHeight = oldValue;
+					return;
+				}
 			}
 		}
 		this._height = v;
@@ -77,13 +84,20 @@ export class RectangularGrid implements IGrid {
 		return this._width;
 	}
 	public set width(v: number) {
+		if(this.$project.history.$moving) {
+			this._testWidth = this._width = v;
+			return;
+		}
+
 		const oldValue = this._width;
 		if(v < MIN_SIZE || oldValue === v) return;
 		this._testWidth = v;
-		for(const c of this._sheet.$independents) {
-			if(!c.$testGrid(this)) {
-				this._testWidth = oldValue;
-				return;
+		if(v < oldValue) {
+			for(const c of this._sheet.$independents) {
+				if(!c.$testGrid(this)) {
+					this._testWidth = oldValue;
+					return;
+				}
 			}
 		}
 		this._width = v;
