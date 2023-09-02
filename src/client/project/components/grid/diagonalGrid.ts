@@ -38,7 +38,7 @@ export class DiagonalGrid implements IGrid {
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
 		this._testSize = this._size = Math.round((width + height) / 2);
-		if(!sheet.$project.history.$moving) this._initialFit();
+		if(!sheet.$project.history.$isLocked) this._initialFit();
 	}
 
 	public toJSON(): JSheet {
@@ -61,7 +61,7 @@ export class DiagonalGrid implements IGrid {
 		return this._size;
 	}
 	public set size(v: number) {
-		if(this.$project.history.$moving) {
+		if(this.$project.history.$isLocked) {
 			this._testSize = this._size = v; // Skip all checks and effects
 			return;
 		}

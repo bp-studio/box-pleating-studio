@@ -59,7 +59,7 @@ export class RectangularGrid implements IGrid {
 		return this._height;
 	}
 	public set height(v: number) {
-		if(this.$project.history.$moving) {
+		if(this.$project.history.$isLocked) {
 			this._testHeight = this._height = v;
 			return;
 		}
@@ -79,7 +79,7 @@ export class RectangularGrid implements IGrid {
 		return this._width;
 	}
 	public set width(v: number) {
-		if(this.$project.history.$moving) {
+		if(this.$project.history.$isLocked) {
 			this._testWidth = this._width = v;
 			return;
 		}

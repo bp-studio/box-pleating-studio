@@ -83,6 +83,8 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		this.layout.$update(model);
 
 		callback();
+
+		// Note that the flushing is also invoked on initialization
 		if(!this.$project.history.$moving) this.$project.history.$flush();
 
 		// Clear prototypes

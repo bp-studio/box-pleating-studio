@@ -13,7 +13,6 @@ import type { ITagObject } from "client/shared/interface";
 import type { Command } from "./commands/command";
 import type { JHistory, Memento } from "shared/json/history";
 import type { Control } from "client/base/control";
-import type { JVertex } from "shared/json/components";
 
 const MAX_STEP = 30;
 
@@ -70,6 +69,20 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		};
 	}
 
+	/**
+	 * Signify that the current assignment is internal, which implies:
+	 * 1. History should not be recorded.
+	 * 2. Validations of values can be skipped.
+	 * 3. No effect should be executed.
+	 */
+	public get $isLocked(): boolean {
+		return this._moving || this._initializing;
+	}
+
+	/**
+	 * The user is performing a history navigation.
+	 * This is a special case of {@link $isLocked}.
+	 */
 	public get $moving(): boolean {
 		return this._moving;
 	}
@@ -119,7 +132,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** Move an object. */
 	public $move(target: Draggable, loc: IPoint): void {
-		if(this._shouldNotRecord) return;
+		if(this.$isLocked) return;
 		const command = MoveCommand.$create(target, loc);
 		this._enqueue(command);
 	}
@@ -131,23 +144,23 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	 */
 	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
 		flush: boolean = true): void {
-		if(this._shouldNotRecord) return;
+		if(this.$isLocked) return;
 		this._enqueue(FieldCommand.$create(target, prop, oldValue, newValue));
 		if(flush) this.$flush();
 	}
 
 	public $edit(edits: JEdit[], oldRoot: number, newRoot: number): void {
-		if(this._shouldNotRecord) return;
+		if(this.$isLocked) return;
 		this._enqueue(EditCommand.$create(this._project, edits, oldRoot, newRoot));
 	}
 
 	public $construct(memento: Memento): void {
-		if(this._shouldNotRecord) return;
+		if(this.$isLocked) return;
 		this._construct.push(memento);
 	}
 
 	public $destruct(memento: Memento): void {
-		if(this._shouldNotRecord) return;
+		if(this.$isLocked) return;
 		this._destruct.push(memento);
 	}
 
@@ -190,10 +203,6 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private get _shouldNotRecord(): boolean {
-		return this._moving || this._initializing;
-	}
 
 	private get _lastStep(): Step | undefined {
 		if(this._index == 0 || this._index < this._steps.length) return undefined;

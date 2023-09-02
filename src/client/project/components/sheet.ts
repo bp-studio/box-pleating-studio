@@ -139,7 +139,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		if(v == oldValue) return;
 		const history = this.$project.history;
 		let grid: IGrid;
-		if(history.$moving) {
+		if(history.$isLocked) {
 			const prototype = this.$project.design.$prototype[this.$tag].sheet;
 			grid = createGrid(this, v, prototype.width, prototype.height);
 		} else {
