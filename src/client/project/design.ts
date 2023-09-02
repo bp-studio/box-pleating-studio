@@ -39,6 +39,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	/** Prototypes of various objects before they are constructed. */
 	public readonly $prototype: JDesign;
 
+
 	constructor(project: Project, json: JDesign, state?: JState) {
 		super();
 		this.$prototype = json;
@@ -76,10 +77,12 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	}
 
 	/** Update using the model returned from the Core. */
-	public $update(model: UpdateModel): void {
+	public $update(model: UpdateModel, callback: Action): void {
 		this.layout.$cleanUp(model);
 		this.tree.$update(model);
 		this.layout.$update(model);
+
+		callback();
 		if(!this.$project.history.$moving) this.$project.history.$flush();
 
 		// Clear prototypes

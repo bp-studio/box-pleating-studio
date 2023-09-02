@@ -38,7 +38,7 @@ export class DiagonalGrid implements IGrid {
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
 		this._testSize = this._size = Math.round((width + height) / 2);
-		if(sheet.$project.history && !sheet.$project.history.$moving) this._initialFit();
+		if(!sheet.$project.history.$moving) this._initialFit();
 	}
 
 	public toJSON(): JSheet {

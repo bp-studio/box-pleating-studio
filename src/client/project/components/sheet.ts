@@ -21,12 +21,10 @@ import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
 import type { Label } from "client/utils/label";
-import type { JSheet, JViewport, Memento } from "shared/json";
+import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
 import type { IGrid } from "./grid";
 
 const LAYERS = Enum.values(Layer);
-
-type SheetType = "layout" | "tree";
 
 //=================================================================
 /**
@@ -35,7 +33,7 @@ type SheetType = "layout" | "tree";
 //=================================================================
 export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
-	public readonly $tag: SheetType;
+	public readonly $tag: DesignMode;
 
 	/**
 	 * The current scrolling position of this working area, in pixels.
@@ -75,7 +73,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
-	constructor(project: Project, parentView: Container, tag: SheetType, json: JSheet, state?: JViewport) {
+	constructor(project: Project, parentView: Container, tag: DesignMode, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
 		this.$tag = tag;
@@ -140,16 +138,23 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		const oldValue = this._type;
 		if(v == oldValue) return;
 		const history = this.$project.history;
+		let grid: IGrid;
 		if(history.$moving) {
 			const prototype = this.$project.design.$prototype[this.$tag].sheet;
-			this._grid = createGrid(this, v, prototype.width, prototype.height);
+			grid = createGrid(this, v, prototype.width, prototype.height);
 		} else {
 			history.$destruct(this._toMemento());
-			this._grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
+			grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
+		}
+
+		// Due to the possible flap moving, the actual switching of grid will have
+		// to wait until the updates are complete, otherwise there will be glitches.
+		this.$project.$onUpdate(() => {
+			this._grid = grid;
+			this._type = v;
 			history.$construct(this._toMemento());
 			history.$fieldChange(this, "type", oldValue, v);
-		}
-		this._type = v;
+		});
 	}
 
 	public get grid(): IGrid {

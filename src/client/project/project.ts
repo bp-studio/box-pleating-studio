@@ -41,6 +41,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	/** Whether self has been initialized. */
 	private _initialized: boolean = false;
 
+	private readonly _updateCallbacks: Action[] = [];
+	private _updateCallbackTimeout: number | undefined;
+
 	/**
 	 * Whether the user is performing dragging on the current {@link Project}.
 	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
@@ -56,13 +59,12 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 		const jProject = deepAssign(Migration.$getSample(), json);
 
+		this.history = new HistoryManager(this, jProject.history);
 		this.design = new Design(this, jProject.design, jProject.state);
 		this.$addChild(this.design);
 
 		this._worker = worker;
 		this.$core = this._createCoreProxy();
-
-		this.history = new HistoryManager(this, jProject.history);
 
 		this._onDispose(() => this._worker.terminate());
 	}
@@ -100,6 +102,17 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		};
 	}
 
+	/**
+	 * Setup a one-time callback after the update routine
+	 * (and before flushing the history).
+	 * If the Core is not invoked in the current round,
+	 * the callback will be invoked by a zero timeout.
+	 */
+	public $onUpdate(callback: Action): void {
+		this._updateCallbacks.push(callback);
+		this._updateCallbackTimeout ||= setTimeout(() => this._flushUpdateCallback(), 0);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +135,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 * Send a request to the Core worker and obtain a direct result or an {@link UpdateModel}.
 	 */
 	private async _callCore(controller: string, action: string, args: unknown[]): Promise<unknown> {
+		clearTimeout(this._updateCallbackTimeout);
 		const request = { controller, action, value: args };
 		const response = await app.callWorker<CoreResponse>(this._worker, request);
 		if("error" in response) {
@@ -133,9 +147,14 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			}
 			throw new Error(response.error); // Stop all further actions.
 		} else if("update" in response) {
-			this.design.$update(response.update);
+			this.design.$update(response.update, () => this._flushUpdateCallback());
 		} else {
 			return response.value;
 		}
+	}
+
+	private _flushUpdateCallback(): void {
+		for(const callback of this._updateCallbacks) callback();
+		this._updateCallbacks.length = 0;
 	}
 }
