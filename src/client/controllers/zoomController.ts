@@ -2,9 +2,11 @@ import ProjectService from "client/services/projectService";
 import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import { $getEventCenter } from "./share";
 import { display } from "client/screen/display";
+import { TapController } from "./tapController";
 
 const DELTA_SCALE = 10000;
 const STEP = 5;
+const ZOOM_THRESHOLD = 2;
 
 //=================================================================
 /**
@@ -18,6 +20,7 @@ export namespace ZoomController {
 
 	let _lastTouchDistance = 0;
 	let _lastTouchZoom = 0;
+	let _zooming: boolean = false;
 
 	export function $init(event: TouchEvent): void {
 		const sheet = ProjectService.sheet.value;
@@ -31,13 +34,22 @@ export namespace ZoomController {
 		if(!sheet) return;
 
 		const touchDistance = _getTouchDistance(event);
-		const distDelta = touchDistance - _lastTouchDistance;
 		const dpi = window.devicePixelRatio ?? 1;
-		const zoomDelta = sheet.zoom * distDelta / dpi / FULL_ZOOM;
+		const distDelta = (touchDistance - _lastTouchDistance) / dpi;
+		if(!_zooming && Math.abs(distDelta) < ZOOM_THRESHOLD) return;
+		if(!_zooming) console.log("zoom ", distDelta);
+		_zooming = true;
+		TapController.$cancel();
+
+		const zoomDelta = sheet.zoom * distDelta / FULL_ZOOM;
 		const newZoom = Math.round(zoomDelta + _lastTouchZoom);
 		$zoom(newZoom, $getEventCenter(event));
 		_lastTouchDistance = touchDistance;
 		_lastTouchZoom = newZoom;
+	}
+
+	export function $end(): void {
+		_zooming = false;
 	}
 
 	export function $zoom(zoom: number, center?: IPoint): void {

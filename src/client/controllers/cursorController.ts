@@ -21,11 +21,14 @@ export namespace CursorController {
 	}
 
 	/** Returns the displacement since last location, and update location at the same time. */
-	export function $diff(event: MouseEvent | TouchEvent): IPoint {
+	export function $diff(event: MouseEvent | TouchEvent): [IPoint, IPoint] {
 		const pt = $getEventCenter(event);
 		const diff = { x: pt.x - location.x, y: pt.y - location.y };
+		return [pt, diff];
+	}
+
+	export function $update(pt: IPoint): void {
 		location = pt;
-		return diff;
 	}
 
 	/** Obtain the offset from the given point to the cursor location. */

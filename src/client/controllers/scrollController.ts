@@ -6,6 +6,15 @@ import { $isTouch, MouseButton } from "./share";
 import { ZoomController } from "./zoomController";
 import { display } from "client/screen/display";
 import { KeyboardController } from "./keyboardController";
+import { TapController } from "./tapController";
+
+const SCROLL_THRESHOLD = 2;
+
+enum ScrollingState {
+	notScrolling,
+	pending,
+	scrolling,
+}
 
 //=================================================================
 /**
@@ -16,7 +25,7 @@ import { KeyboardController } from "./keyboardController";
 
 export namespace ScrollController {
 
-	let _scrolling = false;
+	let _scrolling: ScrollingState = ScrollingState.notScrolling;
 
 	// These events must be add to the document instead of the canvas, so that we can capture it all.
 	document.addEventListener("mousemove", pointerMove);
@@ -41,11 +50,11 @@ export namespace ScrollController {
 	}
 
 	export function $isScrolling(): boolean {
-		return _scrolling;
+		return Boolean(_scrolling);
 	}
 
-	export function $start(): void {
-		_scrolling = true;
+	export function $start(event: Event): void {
+		_scrolling = $isTouch(event) ? ScrollingState.pending : ScrollingState.scrolling;
 		display.canvas.style.cursor = "move";
 
 		// Temporarily disable interactivity, avoiding the cursor being changed by Pixi
@@ -76,8 +85,15 @@ export namespace ScrollController {
 		// Handles the scrolling. The last conditions takes care of the possibility that
 		// touches remain very shortly as one release the fingers.
 		if(_scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
-			const diff = CursorController.$diff(event);
-			sheet.$scroll = display.scrollView.$scrollTo(sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y);
+			const [pt, diff] = CursorController.$diff(event);
+			const dpi = window.devicePixelRatio ?? 1;
+			if(_scrolling == ScrollingState.scrolling ||
+				Math.sqrt(diff.x * diff.x + diff.y * diff.y) / dpi >= SCROLL_THRESHOLD) {
+				CursorController.$update(pt);
+				_scrolling = ScrollingState.scrolling;
+				TapController.$cancel();
+				sheet.$scroll = display.scrollView.$scrollTo(sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y);
+			}
 			if($isTouch(event)) ZoomController.$process(event);
 
 			// This is still needed for unknown reasons
@@ -100,7 +116,8 @@ export namespace ScrollController {
 	}
 
 	function end(): void {
-		_scrolling = false;
+		_scrolling = ScrollingState.notScrolling;
+		ZoomController.$end();
 		display.stage.interactiveChildren = true;
 
 		// In the case of space key dragging, there will be different behavior

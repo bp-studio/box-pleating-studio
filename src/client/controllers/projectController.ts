@@ -102,6 +102,7 @@ export namespace ProjectController {
 
 	function makeProject(json: RecursivePartial<JProject>): Promise<Project> {
 		const p = new Project(json, getOrCreateWorker());
+		// eslint-disable-next-line typescript-compat/compat
 		if(DEBUG_ENABLED) registry.register(p, p.id);
 		projectMap.set(p.id, p);
 		return p.$initialize();

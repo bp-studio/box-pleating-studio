@@ -12,8 +12,9 @@ import { ZoomController } from "client/controllers/zoomController";
 import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
 import { options } from "client/options";
+import { TapController } from "client/controllers/tapController";
 
-const TOUCH_START = 50;
+const TAP_DURATION = 50;
 
 export const mouseCoordinates = shallowRef<IPoint | null>(null);
 
@@ -38,7 +39,7 @@ export namespace Interaction {
 	 * In case of touching, we don't process the touchStart event immediately,
 	 * because it could be that the user is trying to perform a two-finger zooming,
 	 * and to process immediately will result in flashes. Instead,
-	 * we set a tiny delay by {@link TOUCH_START} before actually process the event
+	 * we set a tiny delay by {@link TAP_DURATION} before actually process the event
 	 * (or if the touch is released before that).
 	 */
 	let pendingTouchStart: TouchEvent | undefined;
@@ -107,6 +108,8 @@ export namespace Interaction {
 			SelectionController.$compare(pendingTouchStart);
 			pendingTouchStart = undefined;
 			return;
+		} else if(TapController.$process()) {
+			return;
 		}
 
 		if(!pointerHeld) return;
@@ -138,6 +141,7 @@ export namespace Interaction {
 				return;
 			}
 		} else if(event.touches.length > 1) {
+			TapController.$record(event.touches.length);
 			pendingTouchStart = undefined;
 			if(!ScrollController.$isScrolling()) {
 				LongPressController.$cancel();
@@ -152,8 +156,9 @@ export namespace Interaction {
 
 		// As we get here, it must be a left click of the mouse or a single touch
 		if($isTouch(event)) {
+			TapController.$start();
 			pendingTouchStart = event;
-			setTimeout(touchStart, TOUCH_START);
+			setTimeout(touchStart, TAP_DURATION);
 		} else {
 			mouseDown(event);
 		}
@@ -210,7 +215,7 @@ export namespace Interaction {
 	}
 
 	function initScroll(event: MouseEvent | TouchEvent): void {
-		ScrollController.$start();
+		ScrollController.$start(event);
 		CursorController.$tryUpdate(event);
 	}
 }
