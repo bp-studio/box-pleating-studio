@@ -41,17 +41,26 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
 
-	/** The flaps that are about to be updated. */
-	private readonly _pendingUpdate = new Set<Flap>();
+	/** The flaps that are about to be updated, and their update actions. */
+	private readonly _pendingUpdate = new Map<Flap, Action>();
 
 	/** The new flaps that should be synced. */
 	public readonly $syncFlaps = new Map<number, Flap>();
 
-	/** The updating task in progress. */
-	private _updating: Promise<void> = Promise.resolve();
-
 	/** Cached value of scale. */
 	private _scale: number = 0;
+
+	/** The current {@link Promise} for flap updating process. */
+	private _flapUpdatePromise: Promise<void> | undefined;
+
+	/** A {@link Promise} that resolves immediately after returning from the Core. */
+	private _lastReturn: Promise<void> = Promise.resolve();
+
+	/** The current updating process. */
+	private _updating: Promise<void> = Promise.resolve();
+
+	/** A counter for the pending update calls. */
+	private _updateState: number = 0;
 
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
@@ -135,9 +144,32 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$project.design.mode = "tree";
 	}
 
-	public $updateFlap(flap: Flap): Promise<void> {
-		this._pendingUpdate.add(flap);
-		return flapUpdatePromise ||= Promise.resolve().then(this._flushUpdate);
+	/**
+	 * Register an update operation for a {@link Flap}.
+	 *
+	 * This is one rather complicated part of the architecture.
+	 * There are two issues we're solving here:
+	 * 1. The user could manipulate multiple flaps in one operation.
+	 * 2. The user could very rapidly trigger changes, say during dragging.
+	 * To handle the first issue, we use {@link _flapUpdatePromise} to wait until
+	 * all flaps are manipulated, and then we process them all in {@link _flushUpdate};
+	 * for the second issue, we use {@link _updateState} and {@link _lastReturn} to control
+	 * the calling to the Core.
+	 */
+	public $updateFlap(flap: Flap, action: Action): Promise<void> {
+		this._pendingUpdate.set(flap, action);
+		if(this._flapUpdatePromise === undefined) {
+			const ready = this.$project.history.$moving || this._updateState == 0 ?
+				Promise.resolve() : this._lastReturn;
+			this._updateState++;
+			this._flapUpdatePromise = ready.then(this._flushUpdate);
+		}
+		return this._flapUpdatePromise;
+	}
+
+	/** Return a {@link Promise} that resolves when all updates are completed. */
+	public get $updateComplete(): Promise<void> {
+		return (this._flapUpdatePromise || Promise.resolve()).then(() => this._updating);
 	}
 
 	public $switchConfig(stretchId: string, to: number): Promise<void> {
@@ -170,16 +202,21 @@ export class Layout extends View implements ISerializable<JLayout> {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private readonly _flushUpdate = async (): Promise<void> => {
-		await this._updating; // Wait until the last update to complete
-		flapUpdatePromise = undefined;
+	private readonly _flushUpdate = (): Promise<void> => {
+		this._flapUpdatePromise = undefined;
 		const flaps: JFlap[] = [];
-		for(const f of this._pendingUpdate) flaps.push(f.$updateDrawParams());
+		for(const [f, action] of this._pendingUpdate) {
+			flaps.push(f.$updateDrawParams());
+			action();
+		}
 		this._pendingUpdate.clear();
 		const dragging = this.$project.$isDragging;
 		const prototypes = this.$project.design.$prototype.layout.stretches;
-		this._updating = this.$project.$core.layout.updateFlap(flaps, dragging, prototypes);
-		await this._updating;
+		this._lastReturn = new Promise(resolve => this.$project.$onReturn(() => {
+			this._updateState--;
+			resolve();
+		}));
+		return this._updating = this.$project.$core.layout.updateFlap(flaps, dragging, prototypes);
 	};
 
 	private _addFlap(f: JFlap, graphics: GraphicsData): void {
@@ -316,8 +353,3 @@ export class Layout extends View implements ISerializable<JLayout> {
 		for(const junction of this.$junctions.values()) junction.$draw(max);
 	}
 }
-
-/**
- * The current {@link Promise} for flap updating process.
- */
-let flapUpdatePromise: Promise<void> | undefined;

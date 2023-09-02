@@ -107,11 +107,12 @@ export namespace DragController {
 
 		const project = ProjectService.project.value;
 		if(wasDragging && project) {
-			project.$isDragging = false;
 			const draggable = SelectionController.draggables.value[0];
-			if(draggable && draggable.type === "Flap") {
-				project.$core.layout.dragEnd();
-			}
+			const shouldSignifyEnd = draggable && draggable.type === "Flap";
+			project.design.layout.$updateComplete.then(() => {
+				project.$isDragging = false;
+				if(shouldSignifyEnd) project.$core.layout.dragEnd();
+			});
 		}
 		display.stage.interactiveChildren = true;
 		display.stage.cursor = "default";

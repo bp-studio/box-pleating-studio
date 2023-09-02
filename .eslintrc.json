@@ -334,7 +334,7 @@
 		"no-octal-escape": "warn",
 		"no-param-reassign": "off",
 		"no-plusplus": "off",
-		"no-promise-executor-return": "warn",
+		"no-promise-executor-return": "off",
 		"no-proto": "warn",
 		"no-restricted-exports": "warn",
 		"no-restricted-globals": "warn",

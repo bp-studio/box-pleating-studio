@@ -44,6 +44,8 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private readonly _updateCallbacks: Action[] = [];
 	private _updateCallbackTimeout: number | undefined;
 
+	private readonly _returnCallbacks: Action[] = [];
+
 	/**
 	 * Whether the user is performing dragging on the current {@link Project}.
 	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
@@ -113,6 +115,13 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this._updateCallbackTimeout ||= setTimeout(() => this._flushUpdateCallback(), 0);
 	}
 
+	/**
+	 * Setup a one-time callback immediately after returning from the Core.
+	 */
+	public $onReturn(callback: Action): void {
+		this._returnCallbacks.push(callback);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +146,10 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private async _callCore(controller: string, action: string, args: unknown[]): Promise<unknown> {
 		clearTimeout(this._updateCallbackTimeout);
 		const request = { controller, action, value: args };
+		const callbacks = this._returnCallbacks.concat();
+		this._returnCallbacks.length = 0;
 		const response = await app.callWorker<CoreResponse>(this._worker, request);
+		for(const callback of callbacks) callback();
 		if("error" in response) {
 			this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
 			if(this._initialized) {

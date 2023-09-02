@@ -20,11 +20,11 @@ export interface JMoveCommand extends JCommand {
 
 export class MoveCommand extends Command implements JMoveCommand {
 
-	public static $create(target: Draggable, loc: IPoint): MoveCommand {
+	public static $create(target: Draggable, newLocation: IPoint, oldLocation?: IPoint): MoveCommand {
 		return new MoveCommand(target.$project, {
 			tag: target.$tag,
-			old: clone(target.$location),
-			new: loc,
+			old: oldLocation || clone(target.$location),
+			new: newLocation,
 		});
 	}
 

@@ -60,6 +60,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	private readonly _circle: SmoothGraphics;
 	private readonly _hinge: SmoothGraphics;
 
+	/** Keep a record of the last updated location during fast dragging. */
+	private _lastLocation: IPoint | undefined;
+
 	public $anchor: IPoint = { x: 0, y: 0 };
 
 	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge, graphics: GraphicsData) {
@@ -129,8 +132,11 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 	public set height(v: number) {
 		if(v < 0 || !this._testResize(this._width, v)) return;
+		const oldValue = this._height;
 		this._height = v;
-		this._layout.$updateFlap(this);
+		this._layout.$updateFlap(this,
+			() => this.$project.history.$fieldChange(this, "height", oldValue, v, false)
+		);
 	}
 
 	/** The width of the flap. */
@@ -139,8 +145,11 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 	public set width(v: number) {
 		if(v < 0 || !this._testResize(v, this._height)) return;
+		const oldValue = this._width;
 		this._width = v;
-		this._layout.$updateFlap(this);
+		this._layout.$updateFlap(this,
+			() => this.$project.history.$fieldChange(this, "width", oldValue, v, false)
+		);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,9 +220,14 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._move(p.x, p.y);
 	}
 
-	protected override async _move(x: number, y: number): Promise<void> {
-		await super._move(x, y);
-		await this._layout.$updateFlap(this);
+	protected override _move(x: number, y: number): Promise<void> {
+		const location = { x, y };
+		this._lastLocation ||= this.$location;
+		this.$location = location;
+		return this._layout.$updateFlap(this, () => {
+			this.$project.history.$move(this, location, this._lastLocation);
+			this._lastLocation = undefined;
+		});
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

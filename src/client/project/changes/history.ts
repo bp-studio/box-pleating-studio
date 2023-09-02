@@ -33,6 +33,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	private readonly _project: Project;
 	private readonly _steps: Step[] = shallowReactive([]);
 
+	// The following three is copied by instances, so we cannot make them readonly.
 	private _queue: Command[] = [];
 	private _construct: Memento[] = [];
 	private _destruct: Memento[] = [];
@@ -118,9 +119,13 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				this._index--;
 			}
 			this._queue = [];
-			this._construct = [];
-			this._destruct = [];
 		}
+
+		// During history navigation, it is possible that these are still enqueued
+		// due to async operations. So we need to clean them in all cases.
+		this._construct = [];
+		this._destruct = [];
+
 		this._selection = undefined;
 		this._initializing = false;
 		this._moving = false;
@@ -131,16 +136,17 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	/** Move an object. */
-	public $move(target: Draggable, loc: IPoint): void {
+	public $move(target: Draggable, newLocation: IPoint, oldLocation?: IPoint): void {
 		if(this.$isLocked) return;
-		const command = MoveCommand.$create(target, loc);
+		const command = MoveCommand.$create(target, newLocation, oldLocation);
 		this._enqueue(command);
 	}
 
 	/**
 	 * Change a field.
 	 * @param flush Whether to flush immediately. The default value is true.\
-	 * Set the value to `false` if the same field of multiple objects are changed simultaneously.
+	 * Set the value to `false` if the same field of multiple objects are changed simultaneously,
+	 * or if the operation might involve construction/destruction of objects.
 	 */
 	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
 		flush: boolean = true): void {
