@@ -7,20 +7,21 @@
 					{{ Studio.mouseCoordinates.x }}, {{ Studio.mouseCoordinates.y }}
 				</span>
 			</div>
+			<!-- In the following, for some reason using v-t directive would not react immediately to local changes. -->
 			<template v-if="Studio.project.design.mode == 'layout'">
 				<div style="width: 100px;">
-					<span v-t="'panel.flaps.type'" />: {{ flapCount }}
+					{{ $t('panel.flaps.type') }}: {{ flapCount }}
 				</div>
 				<div style="width: 100px;">
-					<span v-t="'panel.rivers.type'" />: {{ Studio.project.design.layout.riverCount }}
+					{{ $t('panel.rivers.type') }}: {{ Studio.project.design.layout.riverCount }}
 				</div>
 				<div style="width: 200px;" v-if="Studio.project.design.layout.invalidCount">
 					<span class="text-danger"><i class="fas fa-exclamation-triangle" /></span>
-					<span v-t="'status.invalid'" />: {{ Studio.project.design.layout.invalidCount }}
+					{{ $t('status.invalid') }}: {{ Studio.project.design.layout.invalidCount }}
 				</div>
 			</template>
 			<div v-else style="width: 200px;">
-				<span v-t="'panel.vertices.type'" />: {{ vertexCount }}
+				{{ $t('panel.vertices.type') }}: {{ vertexCount }}
 			</div>
 		</div>
 	</footer>
