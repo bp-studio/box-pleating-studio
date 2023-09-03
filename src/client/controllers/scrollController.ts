@@ -7,6 +7,7 @@ import { ZoomController } from "./zoomController";
 import { display } from "client/screen/display";
 import { KeyboardController } from "./keyboardController";
 import { TapController } from "./tapController";
+import { dist } from "shared/types/geometry";
 
 const SCROLL_THRESHOLD = 2;
 
@@ -91,8 +92,7 @@ export namespace ScrollController {
 		if(_scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			const [pt, diff] = CursorController.$diff(event);
 			const dpi = window.devicePixelRatio ?? 1;
-			if(_scrolling == ScrollingState.scrolling ||
-				Math.sqrt(diff.x * diff.x + diff.y * diff.y) / dpi >= SCROLL_THRESHOLD) {
+			if(_scrolling == ScrollingState.scrolling || dist(diff) / dpi >= SCROLL_THRESHOLD) {
 				CursorController.$update(pt);
 				_scrolling = ScrollingState.scrolling;
 				TapController.$cancel();

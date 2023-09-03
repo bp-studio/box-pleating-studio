@@ -12,6 +12,8 @@ import { Independent } from "client/base/independent";
 import type { Control } from "client/base/control";
 import type { DragSelectable } from "client/base/draggable";
 import type { ComputedRef } from "vue";
+import type { Flap } from "client/project/components/layout/flap";
+import type { Device } from "client/project/components/layout/device";
 
 export interface ISelectionController {
 	readonly selections: readonly Control[];
@@ -55,9 +57,13 @@ const ALPHA = 0.2;
 
 export namespace SelectionController {
 
+	/**
+	 * The flag {@link possiblyReselect} indicates that we are in a situation
+	 * that might qualify as reselection. See {@link $tryReselect}.
+	 */
 	let possiblyReselect: boolean = false;
 
-	let statusCache: HitStatus;
+	let statusCache: HitStatus = { current: null, next: null };
 
 
 	let dragSelectables: DragSelectable[];
@@ -139,12 +145,18 @@ export namespace SelectionController {
 		}
 	}
 
+	/**
+	 * When a {@link Flap} is selected, the if the user immediately drags on
+	 * a region overlapped by the flap and a {@link Device}, such interaction
+	 * is not interpreted as dragging the flap, but as dragging the device.
+	 * Therefore, when such dragging happens, we need to immediately
+	 * select the device instead. Such behavior is known as "reselection".
+	 */
 	export function $tryReselect(event: MouseEvent | TouchEvent): boolean {
 		if(!possiblyReselect) return false;
 
 		clear();
 		$process(event, false);
-		for(const o of draggables.value) o.$dragStart(CursorController.$offset);
 		possiblyReselect = false;
 		return true;
 	}

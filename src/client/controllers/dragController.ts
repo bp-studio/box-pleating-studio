@@ -85,15 +85,18 @@ export namespace DragController {
 		for(const o of selections) pt = o.$constrainTo(pt);
 
 		// After fixing, perform the dragging for real
-		let moved = false;
-		for(const o of selections) moved = o.$moveTo(pt) || moved;
+		for(const o of selections) o.$moveTo(pt);
 
 		// Notifies the Project that we're dragging.
-		if(moved) ProjectService.project.value!.$isDragging = true;
+		ProjectService.project.value!.$isDragging = true;
 
-		return moved;
+		return true;
 	}
 
+	/**
+	 * Return the coordinate of a {@link PointerEvent} relative to the sheet,
+	 * in rounded integers.
+	 */
 	function getCoordinate(event: MouseEvent | TouchEvent): IPoint {
 		const pt = $getEventCenter(event);
 		const local = ProjectService.sheet.value!.$view.toLocal(pt);

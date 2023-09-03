@@ -7,7 +7,7 @@ import { SelectionController } from "client/controllers/selectionController";
 import { ScrollController } from "client/controllers/scrollController";
 import { CursorController } from "client/controllers/cursorController";
 import { KeyboardController } from "client/controllers/keyboardController";
-import { $isTouch, MouseButton } from "client/controllers/share";
+import { $getEventCenter, $isTouch, MouseButton } from "client/controllers/share";
 import { ZoomController } from "client/controllers/zoomController";
 import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
@@ -108,7 +108,7 @@ export namespace Interaction {
 			// In this case we know that the user's intention is tapping.
 			// So we process the selection.
 			pointerHeld = true;
-			SelectionController.$compare(pendingTouchStart);
+			SelectionController.$process(pendingTouchStart);
 			pendingTouchStart = undefined;
 		} else if(TapController.$process()) {
 			return;
@@ -209,8 +209,10 @@ export namespace Interaction {
 		// let the event listener on the body to take care of it.
 		if(ScrollController.$isScrolling()) return;
 
-		if(SelectionController.$tryReselect(event)) {
-			DragController.isDragging.value = true;
+		// In case of touch event, reselection will not trigger dragging immediately.
+		if(SelectionController.$tryReselect(event) && !$isTouch(event)) {
+			// This line is put here to avoid cyclic importing
+			DragController.$init(event);
 		}
 
 		if(DragController.isDragging.value) {
@@ -235,6 +237,6 @@ export namespace Interaction {
 
 	function initScroll(event: MouseEvent | TouchEvent): void {
 		ScrollController.$start(event);
-		CursorController.$tryUpdate(event);
+		CursorController.$update($getEventCenter(event));
 	}
 }

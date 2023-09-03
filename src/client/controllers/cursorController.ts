@@ -18,8 +18,11 @@ export namespace CursorController {
 	/** MouseDown or TouchStart location. */
 	let downPoint: IPoint;
 
-	/** Cached cursor position, used for deciding if there's displacement. */
+	/** Cursor location in floating numbers. */
 	let location: IPoint = { x: 0, y: 0 };
+
+	/** Cursor coordinates in integers. */
+	let coordinate: IPoint = { x: 0, y: 0 };
 
 	export function $setDown(event: MouseEvent | TouchEvent): void {
 		downPoint = $getEventCenter(event);
@@ -38,27 +41,27 @@ export namespace CursorController {
 		};
 	}
 
-	/** Try update the cursor location and return whether it actually moved. */
-	export function $tryUpdate(data: MouseEvent | TouchEvent | IPoint): boolean {
-		if(data instanceof Event) data = $getEventCenter(data);
-		if(same(location, data)) return false;
-		location = data;
-		return true;
+	/** Update {@link location}. */
+	export function $update(pt: IPoint): void {
+		location = pt;
 	}
 
-	/** Returns the displacement since last location, and update location at the same time. */
+	/** Returns the displacement since last {@link location}, and update location at the same time. */
 	export function $diff(event: MouseEvent | TouchEvent): [IPoint, IPoint] {
 		const pt = $getEventCenter(event);
 		const diff = { x: pt.x - location.x, y: pt.y - location.y };
 		return [pt, diff];
 	}
 
-	export function $update(pt: IPoint): void {
-		location = pt;
+	/** Try update the cursor {@link coordinate} and return whether it actually moved. */
+	export function $tryUpdate(pt: IPoint): boolean {
+		if(same(coordinate, pt)) return false;
+		coordinate = pt;
+		return true;
 	}
 
-	/** Obtain the offset from the given point to the cursor location. */
+	/** Obtain the offset from the given point to the cursor {@link coordinate}. */
 	export function $offset(pt: IPoint): IPoint {
-		return { x: location.x - pt.x, y: location.y - pt.y };
+		return { x: coordinate.x - pt.x, y: coordinate.y - pt.y };
 	}
 }

@@ -44,11 +44,9 @@ export abstract class Draggable extends Control {
 	}
 
 	/** Drag by mouse coordinates, and return if there's nonzero movement. */
-	public $moveTo(p: IPoint): boolean {
+	public $moveTo(p: IPoint): void {
 		const x = p.x - this._dragOffset.x, y = p.y - this._dragOffset.y;
-		if(x == this.$location.x && y == this.$location.y) return false;
-		this._move(x, y);
-		return true;
+		if(x != this.$location.x || y != this.$location.y) this._move(x, y);
 	}
 
 	/** Drag by a vector. */

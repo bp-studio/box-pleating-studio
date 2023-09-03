@@ -52,7 +52,7 @@ export function same(p1: IPoint, p2: IPoint): boolean {
 	return p1.x === p2.x && p1.y === p2.y;
 }
 
-export function dist(p1: IPoint, p2: IPoint): number {
+export function dist(p1: IPoint, p2: IPoint = { x: 0, y: 0 }): number {
 	const dx = p1.x - p2.x;
 	const dy = p1.y - p2.y;
 	return Math.sqrt(dx * dx + dy * dy);
