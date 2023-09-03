@@ -15,6 +15,7 @@ import { options } from "client/options";
 import { TapController } from "client/controllers/tapController";
 
 const TAP_DURATION = 50;
+const CANCEL_TAP_THRESHOLD = 3;
 
 export const mouseCoordinates = shallowRef<IPoint | null>(null);
 
@@ -102,12 +103,13 @@ export namespace Interaction {
 	}
 
 	function touchEnd(event: TouchEvent): void {
+		LongPressController.$cancel();
 		if(pendingTouchStart) {
 			// In this case we know that the user's intention is tapping.
 			// So we process the selection.
+			pointerHeld = true;
 			SelectionController.$compare(pendingTouchStart);
 			pendingTouchStart = undefined;
-			return;
 		} else if(TapController.$process()) {
 			return;
 		}
@@ -116,7 +118,6 @@ export namespace Interaction {
 		pointerHeld = false;
 		if(event.touches.length >= 1) return; // End of zooming
 		const dragging = SelectionController.$endDrag();
-		LongPressController.$cancel();
 		if(event.touches.length == 0 && !dragging && !LongPressController.$triggered) {
 			SelectionController.$processNext();
 		}
@@ -140,23 +141,34 @@ export namespace Interaction {
 				initScroll(event);
 				return;
 			}
-		} else if(event.touches.length > 1) {
-			TapController.$record(event.touches.length);
-			pendingTouchStart = undefined;
-			if(!ScrollController.$isScrolling()) {
-				LongPressController.$cancel();
-				SelectionController.$endDrag();
-				SelectionController.clear();
-				ZoomController.$init(event);
-				initScroll(event);
+		} else {
+			const touchCount = event.touches.length;
+			if(touchCount > 1) {
+				TapController.$record(touchCount);
+				pendingTouchStart = undefined;
+				DragController.$dragEnd();
+				if(touchCount > 2) {
+					// When there are three or more touches, it will require sophisticated
+					// method to identify each touches. To make our life easier, we simply
+					// cancel the scrolling and zooming in this case.
+					ScrollController.$cancel();
+				} else if(!ScrollController.$isScrolling()) {
+					LongPressController.$cancel();
+					SelectionController.$endDrag();
+					SelectionController.clear();
+					ZoomController.$init(event);
+					initScroll(event);
+				}
+				// Stop further processing in any case
+				return;
 			}
-			// Stop further processing in any case
-			return;
 		}
 
 		// As we get here, it must be a left click of the mouse or a single touch
+		CursorController.$setDown(event);
 		if($isTouch(event)) {
 			TapController.$start();
+			LongPressController.$init();
 			pendingTouchStart = event;
 			setTimeout(touchStart, TAP_DURATION);
 		} else {
@@ -176,7 +188,6 @@ export namespace Interaction {
 		if(!pendingTouchStart) return;
 		pointerHeld = true;
 		const ok = SelectionController.$compare(pendingTouchStart);
-		LongPressController.$init();
 
 		// In case of touching, selection must be made before one can drag,
 		// otherwise it is too easy to trigger unwanted dragging.
@@ -185,6 +196,13 @@ export namespace Interaction {
 	}
 
 	function drag(event: MouseEvent | TouchEvent): void {
+		if($isTouch(event) && pendingTouchStart) {
+			const { dist } = CursorController.$displacement(event);
+			if(dist > CANCEL_TAP_THRESHOLD) {
+				pointerHeld = true;
+				pendingTouchStart = undefined;
+			}
+		}
 		if(!pointerHeld) return;
 
 		// No need to handle the event during scrolling;
@@ -201,9 +219,10 @@ export namespace Interaction {
 				options.onDrag?.();
 			}
 		} else {
-			LongPressController.$cancel();
-			SelectionController.$processDragSelect(event);
-			options.onDrag?.();
+			if(SelectionController.$processDragSelect(event)) {
+				LongPressController.$cancel();
+				options.onDrag?.();
+			}
 		}
 	}
 

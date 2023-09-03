@@ -37,7 +37,6 @@ export namespace ZoomController {
 		const dpi = window.devicePixelRatio ?? 1;
 		const distDelta = (touchDistance - _lastTouchDistance) / dpi;
 		if(!_zooming && Math.abs(distDelta) < ZOOM_THRESHOLD) return;
-		if(!_zooming) console.log("zoom ", distDelta);
 		_zooming = true;
 		TapController.$cancel();
 

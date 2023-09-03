@@ -3,7 +3,7 @@ import { Graphics } from "@pixi/graphics";
 import { Rectangle } from "@pixi/core";
 
 import { Draggable } from "client/base/draggable";
-import { $getEventCenter, $isTouch } from "./share";
+import { $isTouch } from "./share";
 import { display } from "client/screen/display";
 import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
@@ -59,7 +59,6 @@ export namespace SelectionController {
 
 	let statusCache: HitStatus;
 
-	let downPoint: IPoint;
 
 	let dragSelectables: DragSelectable[];
 
@@ -117,7 +116,6 @@ export namespace SelectionController {
 	/** Process a clicking event. */
 	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): void {
 		if(event instanceof MouseEvent) ctrlKey ??= event.ctrlKey || event.metaKey;
-		downPoint = $getEventCenter(event);
 		const { current, next } = getStatus();
 
 		// Selection logic for mouse click
@@ -165,15 +163,14 @@ export namespace SelectionController {
 		return result;
 	}
 
-	export function $processDragSelect(event: MouseEvent | TouchEvent): void {
-		const point = $getEventCenter(event);
+	export function $processDragSelect(event: MouseEvent | TouchEvent): boolean {
+		const { point, downPoint, dist } = CursorController.$displacement(event);
 		const sheet = ProjectService.sheet.value!;
 
 		// Initialization
 		if(!view.visible) {
 			// Must drag to a certain distance to trigger drag-selection.
-			const dist = getDistance(downPoint, point);
-			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return;
+			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return false;
 			clear();
 			view.visible = true;
 			display.stage.interactiveChildren = false;
@@ -207,6 +204,7 @@ export namespace SelectionController {
 		for(const ds of dragSelectables) {
 			$toggle(ds, rect.contains(ds.$anchor.x, ds.$anchor.y));
 		}
+		return true;
 	}
 
 	export function $toggle(c: Control, selected: boolean): void {
@@ -222,6 +220,7 @@ export namespace SelectionController {
 
 		// Find all Controls at the hit position
 		const sheet = ProjectService.sheet.value!;
+		const downPoint = CursorController.$getDown();
 		const controls = display.boundary.$hitTestAll(sheet, downPoint);
 
 		// Find the three critical Controls
@@ -247,10 +246,5 @@ export namespace SelectionController {
 			c.$selected = true;
 			selections.push(c);
 		}
-	}
-
-	function getDistance(p1: IPoint, p2: IPoint): number {
-		const dx = p1.x - p2.x, dy = p1.y - p2.y;
-		return Math.sqrt(dx * dx + dy * dy);
 	}
 }

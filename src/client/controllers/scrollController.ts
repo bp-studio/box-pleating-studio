@@ -68,6 +68,10 @@ export namespace ScrollController {
 		return true;
 	}
 
+	export function $cancel(): void {
+		_scrolling = ScrollingState.notScrolling;
+	}
+
 	export function $tryEnd(event: Event): boolean {
 		if(_scrolling) {
 			// We have to intercept space key releasing here,

@@ -1,5 +1,11 @@
-import { same } from "shared/types/geometry";
+import { dist, same } from "shared/types/geometry";
 import { $getEventCenter } from "./share";
+
+interface Displacement {
+	downPoint: IPoint;
+	point: IPoint;
+	dist: number;
+}
 
 //=================================================================
 /**
@@ -9,8 +15,28 @@ import { $getEventCenter } from "./share";
 
 export namespace CursorController {
 
+	/** MouseDown or TouchStart location. */
+	let downPoint: IPoint;
+
 	/** Cached cursor position, used for deciding if there's displacement. */
 	let location: IPoint = { x: 0, y: 0 };
+
+	export function $setDown(event: MouseEvent | TouchEvent): void {
+		downPoint = $getEventCenter(event);
+	}
+
+	export function $getDown(): IPoint {
+		return downPoint;
+	}
+
+	export function $displacement(event: MouseEvent | TouchEvent): Displacement {
+		const point = $getEventCenter(event);
+		return {
+			downPoint,
+			point,
+			dist: dist(downPoint, point),
+		};
+	}
 
 	/** Try update the cursor location and return whether it actually moved. */
 	export function $tryUpdate(data: MouseEvent | TouchEvent | IPoint): boolean {

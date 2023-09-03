@@ -1,6 +1,7 @@
 import ProjectService from "client/services/projectService";
 
-const DURATION = 75;
+const TWO = 100;
+const THREE = 150;
 
 //=================================================================
 /**
@@ -10,11 +11,17 @@ const DURATION = 75;
 export namespace TapController {
 
 	let tapCount: number = 0;
-	let tapTimeout: number;
+	let twoTimeout: number;
+	let threeTimeout: number;
 
 	export function $start(): void {
 		tapCount = 1;
-		tapTimeout = setTimeout($cancel, DURATION);
+		twoTimeout = setTimeout(() => {
+			if(tapCount >= 2) return;
+			tapCount = 0;
+			clearTimeout(threeTimeout);
+		}, TWO);
+		threeTimeout = setTimeout($cancel, THREE);
 	}
 
 	export function $record(count: number): void {
@@ -22,22 +29,19 @@ export namespace TapController {
 	}
 
 	export function $cancel(): void {
-		clearTimeout(tapTimeout);
+		clearTimeout(twoTimeout);
+		clearTimeout(threeTimeout);
 		tapCount = 0;
 	}
 
 	export function $process(): boolean {
-		if(tapCount < 2) {
-			tapCount = 0;
-			return false;
-		}
-
+		const tapped = tapCount >= 2;
 		const project = ProjectService.project.value;
-		if(project) {
+		if(tapped && project) {
 			if(tapCount == 2) project.history.$undo();
 			else project.history.$redo();
 		}
-		tapCount = 0;
-		return true;
+		$cancel();
+		return tapped;
 	}
 }

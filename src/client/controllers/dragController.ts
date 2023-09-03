@@ -85,12 +85,13 @@ export namespace DragController {
 		for(const o of selections) pt = o.$constrainTo(pt);
 
 		// After fixing, perform the dragging for real
-		for(const o of selections) o.$moveTo(pt);
+		let moved = false;
+		for(const o of selections) moved = o.$moveTo(pt) || moved;
 
 		// Notifies the Project that we're dragging.
-		ProjectService.project.value!.$isDragging = true;
+		if(moved) ProjectService.project.value!.$isDragging = true;
 
-		return true;
+		return moved;
 	}
 
 	function getCoordinate(event: MouseEvent | TouchEvent): IPoint {
