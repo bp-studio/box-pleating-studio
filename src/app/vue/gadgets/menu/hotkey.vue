@@ -7,6 +7,7 @@
 			<slot></slot>
 		</div>
 		<div class="ms-3 text-end desktop-only">{{ key }}</div>
+		<div v-if="touch" class="ms-4 text-end touch-only" style="margin-right:-1rem"><i :class="touch" /></div>
 	</div>
 </template>
 
@@ -25,6 +26,7 @@
 		hk?: string;
 		ctrl?: boolean;
 		shift?: boolean;
+		touch?: string;
 	}>();
 
 	const key = computed(() => {

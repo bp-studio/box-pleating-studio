@@ -2,10 +2,10 @@
 	<Dropdown label="Edit" icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
 		<template v-slot>
 			<DropdownItem :disabled="!Studio.history.canUndo" @click="undo">
-				<Hotkey icon="bp-undo" ctrl hk="Z">{{ $t('toolbar.edit.undo') }}</Hotkey>
+				<Hotkey icon="bp-undo" ctrl hk="Z" touch="bp-2-finger">{{ $t('toolbar.edit.undo') }}</Hotkey>
 			</DropdownItem>
 			<DropdownItem :disabled="!Studio.history.canRedo" @click="redo">
-				<Hotkey icon="bp-redo" ctrl hk="Y">{{ $t('toolbar.edit.redo') }}</Hotkey>
+				<Hotkey icon="bp-redo" ctrl hk="Y" touch="bp-3-finger">{{ $t('toolbar.edit.redo') }}</Hotkey>
 			</DropdownItem>
 			<Divider />
 			<DropdownItem :disabled="!Studio.project" @click="selectAll">
