@@ -73,6 +73,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 		};
 	}
 
+	public get $signature(): string {
+		return JSON.stringify(this.toJSON());
+	}
+
 	public get $index(): number {
 		return this._index;
 	}

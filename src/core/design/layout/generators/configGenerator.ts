@@ -30,7 +30,7 @@ export function* configGenerator(
 				const jConfig: JConfiguration = { partitions: proto.partitions, patterns: [pattern] };
 				const config = new Configuration(repo, jJunctions, jConfig);
 				if(!config.$pattern) throw new Error();
-				protoSignature = JSON.stringify(config.toJSON());
+				protoSignature = config.$signature;
 				yield config;
 			} catch {
 				console.log("Incompatible old version.");
