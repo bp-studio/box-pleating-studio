@@ -31,7 +31,6 @@ export class Device extends Draggable {
 	private readonly _ridge: SmoothGraphics;
 	private readonly _axisParallels: SmoothGraphics;
 
-
 	constructor(stretch: Stretch, index: number, graphics: DeviceData) {
 		const sheet = stretch.$layout.$sheet;
 		super(sheet);
@@ -68,12 +67,12 @@ export class Device extends Draggable {
 
 	protected override async _move(x: number, y: number): Promise<void> {
 		const dx = x - this.$location.x;
-		await super._move(x, y);
 
 		// Update range, so that subsequent dragging can be constraint correctly even before redraw.
 		const r = this.$graphics.range;
 		this.$graphics.range = [r[0] - dx, r[1] - dx];
 
+		await super._move(x, y);
 		await this.stretch.$layout.$moveDevice(this);
 	}
 
@@ -90,8 +89,15 @@ export class Device extends Draggable {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $redraw(data: DeviceData): void {
+		const range = this.$graphics.range;
 		this.$graphics = data;
-		this.$location = data.location; // This is needed during navigation
+		if(this.stretch.$project.$isDragging) {
+			// During dragging, the range is already updated ahead of time.
+			this.$graphics.range = range;
+		} else {
+			// In other cases, the location needs to be updated.
+			this.$location = data.location;
+		}
 		this._draw();
 	}
 

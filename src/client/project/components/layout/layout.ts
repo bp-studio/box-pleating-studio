@@ -184,8 +184,18 @@ export class Layout extends View implements ISerializable<JLayout> {
 		return this.$project.$core.layout.completeStretch(stretchId);
 	}
 
-	public $moveDevice(device: Device): Promise<void> {
-		return this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location);
+	/**
+	 * Similar to {@link $updateFlap}, dragging of {@link Device} can also fire rapidly,
+	 * and we use the same mechanism to control the callings to the Core.
+	 */
+	public async $moveDevice(device: Device): Promise<void> {
+		const ready = this.$project.history.$moving || this._updateState == 0 ?
+			Promise.resolve() : this._lastReturn;
+		this._updateState++;
+		await ready;
+		this._setupReturn();
+		this._updating = this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location);
+		await this._updating;
 	}
 
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {
@@ -212,12 +222,16 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._pendingUpdate.clear();
 		const dragging = this.$project.$isDragging;
 		const prototypes = this.$project.design.$prototype.layout.stretches;
+		this._setupReturn();
+		return this._updating = this.$project.$core.layout.updateFlap(flaps, dragging, prototypes);
+	};
+
+	private _setupReturn(): void {
 		this._lastReturn = new Promise(resolve => this.$project.$onReturn(() => {
 			this._updateState--;
 			resolve();
 		}));
-		return this._updating = this.$project.$core.layout.updateFlap(flaps, dragging, prototypes);
-	};
+	}
 
 	private _addFlap(f: JFlap, graphics: GraphicsData): void {
 		const tree = this.$project.design.tree;
