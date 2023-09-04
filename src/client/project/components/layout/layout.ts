@@ -12,6 +12,7 @@ import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
+import { CoreManager } from "./coreManager";
 
 import type { Device } from "./device";
 import type { Container } from "@pixi/display";
@@ -53,18 +54,15 @@ export class Layout extends View implements ISerializable<JLayout> {
 	/** The current {@link Promise} for flap updating process. */
 	private _flapUpdatePromise: Promise<void> | undefined;
 
-	/** A {@link Promise} that resolves immediately after returning from the Core. */
-	private _lastReturn: Promise<void> = Promise.resolve();
-
 	/** The current updating process. */
 	private _updating: Promise<void> = Promise.resolve();
 
-	/** A counter for the pending update calls. */
-	private _updateState: number = 0;
+	private readonly _core: CoreManager;
 
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
+		this._core = new CoreManager(project);
 		this.$sheet = new Sheet(project, parentView, "layout", json, state);
 		this.$sheet.$addChild(this);
 
@@ -152,17 +150,13 @@ export class Layout extends View implements ISerializable<JLayout> {
 	 * 1. The user could manipulate multiple flaps in one operation.
 	 * 2. The user could very rapidly trigger changes, say during dragging.
 	 * To handle the first issue, we use {@link _flapUpdatePromise} to wait until
-	 * all flaps are manipulated, and then we process them all in {@link _flushUpdate};
-	 * for the second issue, we use {@link _updateState} and {@link _lastReturn} to control
-	 * the calling to the Core.
+	 * all flaps are manipulated, and then we process them all in {@link _flushUpdate}.
+	 * For the second issue, we use a {@link CoreManager} to control the callings.
 	 */
 	public $updateFlap(flap: Flap, action: Action): Promise<void> {
 		this._pendingUpdate.set(flap, action);
 		if(this._flapUpdatePromise === undefined) {
-			const ready = this.$project.history.$moving || this._updateState == 0 ?
-				Promise.resolve() : this._lastReturn;
-			this._updateState++;
-			this._flapUpdatePromise = ready.then(this._flushUpdate);
+			this._flapUpdatePromise = this._core.$prepare().then(this._flushUpdate);
 		}
 		return this._flapUpdatePromise;
 	}
@@ -189,12 +183,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 	 * and we use the same mechanism to control the callings to the Core.
 	 */
 	public async $moveDevice(device: Device): Promise<void> {
-		const ready = this.$project.history.$moving || this._updateState == 0 ?
-			Promise.resolve() : this._lastReturn;
-		this._updateState++;
-		await ready;
-		this._setupReturn();
-		this._updating = this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location);
+		await this._core.$prepare();
+		this._updating = this._core.$run(() =>
+			this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location)
+		);
 		await this._updating;
 	}
 
@@ -222,16 +214,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._pendingUpdate.clear();
 		const dragging = this.$project.$isDragging;
 		const prototypes = this.$project.design.$prototype.layout.stretches;
-		this._setupReturn();
-		return this._updating = this.$project.$core.layout.updateFlap(flaps, dragging, prototypes);
+		return this._updating = this._core.$run(() =>
+			this.$project.$core.layout.updateFlap(flaps, dragging, prototypes)
+		);
 	};
-
-	private _setupReturn(): void {
-		this._lastReturn = new Promise(resolve => this.$project.$onReturn(() => {
-			this._updateState--;
-			resolve();
-		}));
-	}
 
 	private _addFlap(f: JFlap, graphics: GraphicsData): void {
 		const tree = this.$project.design.tree;
