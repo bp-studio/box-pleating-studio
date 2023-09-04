@@ -3,12 +3,7 @@ import { expect } from "chai";
 import { StartEvent } from "core/math/polyBool/event";
 import { getCurvature } from "core/math/polyBool/intersection/rrEventProvider";
 import { EPSILON, ArcSegment } from "core/math/polyBool/segment/arcSegment";
-
-function dist(p1: IPoint, p2: IPoint): number {
-	const dx = p1.x - p2.x;
-	const dy = p1.y - p2.y;
-	return Math.sqrt(dx * dx + dy * dy);
-}
+import { dist } from "shared/types/geometry";
 
 describe("Arc", function() {
 	it("Computes intersection", function() {

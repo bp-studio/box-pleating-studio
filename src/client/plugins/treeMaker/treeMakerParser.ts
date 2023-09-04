@@ -46,7 +46,6 @@ export class TreeMakerParser {
 			f.y = Math.round(f.y * fy);
 		}
 		for(const n of this.$result.design.tree.nodes) {
-
 			n.x = Math.round(n.x * fx);
 			n.y = Math.round(n.y * fy);
 		}

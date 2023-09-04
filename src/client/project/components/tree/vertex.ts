@@ -7,6 +7,7 @@ import { Label } from "client/utils/label";
 import { Independent } from "client/base/independent";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
+import { $round } from "client/controllers/share";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
@@ -142,10 +143,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 				const grid = layout.$sheet.grid;
 				const xFactor = grid.$renderWidth / this._sheet.grid.$renderWidth;
 				const yFactor = grid.$renderHeight / this._sheet.grid.$renderHeight;
-				const p: IPoint = {
-					x: Math.round(this.$location.x * xFactor),
-					y: Math.round(this.$location.y * yFactor),
-				};
+				const p: IPoint = $round({ x: this.$location.x * xFactor, y: this.$location.y * yFactor });
 				flap.$sync(grid.$constrain(p));
 				return Promise.resolve();
 			}

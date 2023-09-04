@@ -22,7 +22,7 @@ export function drawContours(graphics: GraphicsLike, contours: readonly Contour[
  * The filling API of Pixi consists of low-level methods such as {@link Graphics.beginFill} and {@link Graphics.beginHole}.
  * The premise of these methods is that we have to pair up the outer and inner paths of the polygons explicitly.
  * (There's no need for orientation though, as Pixi will do it itself)
- * Once this premise is met, Pixi will use the library earcut to triangulate the polygon,
+ * Once this premise is met, Pixi will use the library [earcut](https://github.com/mapbox/earcut) to triangulate the polygon,
  * thereby reducing the general filling to triangle filling.
  * Accordingly, the library is super efficient, so probably there's no need to further optimize it.
  */

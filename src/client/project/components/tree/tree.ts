@@ -10,7 +10,7 @@ import { SelectionController } from "client/controllers/selectionController";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
-import type { JEdge, JEdgeBase, JTree, JVertex, JViewport, Memento } from "shared/json";
+import type { JEdge, JEdgeBase, JTree, JVertex, JViewport } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
@@ -233,7 +233,9 @@ export class Tree implements ISerializable<JTree> {
 		// Search for empty spot
 		const heap = new BinaryHeap<[IPoint, number]>((a, b) => a[1] - b[1]);
 		let r = 1;
-		while(heap.$isEmpty) {
+		let offBound = false; // If we've already searched beyond the sheet
+		while(heap.$isEmpty && !offBound) {
+			offBound = true;
 			// The design of these loops make us traverse all points of Chebyshev distance r
 			for(let i = 0; i < SIDES; i++) {
 				for(let j = 0; j < 2 * r; j++) {
@@ -242,18 +244,21 @@ export class Tree implements ISerializable<JTree> {
 						{ x: x + f * (j - r), y: y + f * r } :
 						{ x: x + f * r, y: y + f * (r - j) };
 
-					if(!occupied.has(p.x << SHIFT | p.y) && this.$sheet.grid.$contains(p)) {
+					const inSheet = this.$sheet.grid.$contains(p);
+					if(inSheet) offBound = false;
+					if(!occupied.has(p.x << SHIFT | p.y) && inSheet) {
 						heap.$insert([p, dist(p, ref)]);
 					}
 				}
 			}
 
 			// Increase r until we find one.
-			// Yes, in theory it is possible that the entire sheet is full...
-			// but come on, give me a break would you, Mr. QA?
 			r++;
 		}
-		return heap.$get()![0];
+
+		// In case of off-bound (unlikely, but just in case)
+		// we can do nothing other than returning the same point
+		return offBound ? at.$location : heap.$get()![0];
 	}
 
 	private _createNeighborMap(): Map<Vertex, Set<number>> {

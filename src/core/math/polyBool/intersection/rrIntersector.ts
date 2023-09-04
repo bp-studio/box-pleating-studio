@@ -1,6 +1,7 @@
 import { Intersector } from "../intersector";
 import { SegmentType } from "../segment/segment";
 import { EPSILON } from "../segment/arcSegment";
+import { leg } from "shared/types/geometry";
 
 import type { ArcSegment } from "../segment/arcSegment";
 import type { AALineSegment } from "../segment/aaLineSegment";
@@ -68,7 +69,7 @@ export class RRIntersector extends Intersector {
 			if(da > EPSILON) return;
 			const r = arc.$radius;
 			const dy = y - arc.$center.y;
-			const dx = Math.sqrt(r * r - dy * dy);
+			const dx = leg(r, dy);
 			const x = arc.$center.x + (arc.$start.y > arc.$end.y ? -dx : dx);
 			const p = fix(fix({ x, y }, line), arc);
 			const dl = (x - eLine.$point.x) * (x - eLine.$other.$point.x);
@@ -94,7 +95,7 @@ export class RRIntersector extends Intersector {
 export function yIntercept(arc: ArcSegment, x: number): number {
 	const r = arc.$radius;
 	const dx = x - arc.$center.x;
-	const dy = Math.sqrt(r * r - dx * dx);
+	const dy = leg(r, dx);
 	return arc.$center.y + (arc.$start.x > arc.$end.x ? dy : -dy);
 }
 

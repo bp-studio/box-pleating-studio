@@ -17,6 +17,7 @@ export function* singleConfigGenerator(
 	repo: Repository, junction: ValidJunction, protoSignature?: string
 ): Generator<Configuration> {
 	const j = junction.toJSON();
+	// TODO
 	yield* GeneratorUtil.$first([
 		singleGOPS(repo, j),
 	], configFilter(protoSignature));

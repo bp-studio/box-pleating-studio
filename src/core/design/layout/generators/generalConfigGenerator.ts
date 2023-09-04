@@ -15,6 +15,7 @@ import type { ValidJunction } from "../junction/validJunction";
 export function* generalConfigGenerator(
 	repo: Repository, junctions: ValidJunction[], seedSignature?: string
 ): Generator<Configuration> {
+	// TODO
 	// First find all possible configurations for each Junction
 	const junctionConfigs = junctions.map(j => [...singleConfigGenerator(repo, j)]);
 

@@ -148,7 +148,6 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private async _navigate(navigateFactory: () => Promise<void>): Promise<void> {
-		//TODO: need to consider history here
 		SelectionController.clear();
 		SelectionController.$toggle(this, true);
 		await navigateFactory();

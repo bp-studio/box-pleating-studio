@@ -1,5 +1,5 @@
 import { SegmentType } from "./segment";
-import { xyComparator } from "shared/types/geometry";
+import { leg, xyComparator } from "shared/types/geometry";
 
 import type { ISegment } from "./segment";
 
@@ -93,7 +93,7 @@ export class ArcSegment implements ISegment {
 		const l = (r1 * r1 - r2 * r2 + ds) / d / 2;
 		if(l > r1) return; // Too close
 
-		const h = Math.sqrt(r1 * r1 - l * l);
+		const h = leg(r1, l);
 
 		if(h === 0) {
 			yield { x: x1 - dx * l / d, y: y1 - dy * l / d };

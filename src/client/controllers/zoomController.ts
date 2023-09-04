@@ -3,6 +3,7 @@ import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import { $getEventCenter } from "./share";
 import { display } from "client/screen/display";
 import { TapController } from "./tapController";
+import { norm } from "shared/types/geometry";
 
 const DELTA_SCALE = 10000;
 const STEP = 5;
@@ -92,6 +93,6 @@ export namespace ZoomController {
 	function _getTouchDistance(event: TouchEvent): number {
 		const t = event.touches;
 		const dx = t[1].pageX - t[0].pageX, dy = t[1].pageY - t[0].pageY;
-		return Math.sqrt(dx * dx + dy * dy);
+		return norm(dx, dy);
 	}
 }

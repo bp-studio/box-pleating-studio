@@ -15,8 +15,10 @@ export interface IGrid extends ISerializable<JSheet>, ITagObject {
 	/** The type of the grid. */
 	readonly type: GridType;
 
-	// TODO: do we still need this?
-	/** The maximal size allowed inside the grid. */
+	/**
+	 * The maximal size allowed inside the grid.
+	 * Used as the upper-bound for flap dimensions.
+	 */
 	readonly diameter: number;
 
 	/** Decide the label direction by coordinates. */

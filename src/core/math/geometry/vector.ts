@@ -2,6 +2,7 @@ import { Fraction } from "../fraction";
 import { $reduce } from "../utils/gcd";
 import { Couple } from "./couple";
 import { SlashDirection } from "shared/types/direction";
+import { norm } from "shared/types/geometry";
 
 import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Rational } from "../fraction";
@@ -135,8 +136,8 @@ export class Vector extends Couple {
 	public static $bisector(v1: Vector, v2: Vector): Vector {
 		const [x1, y1] = $reduce(v1._x, v1._y);
 		const [x2, y2] = $reduce(v2._x, v2._y);
-		const z1 = Math.sqrt(x1 * x1 + y1 * y1);
-		const z2 = Math.sqrt(x2 * x2 + y2 * y2);
+		const z1 = norm(x1, y1);
+		const z2 = norm(x2, y2);
 		return new Vector(x1 * z2 + x2 * z1, y1 * z2 + y2 * z1);
 	}
 }

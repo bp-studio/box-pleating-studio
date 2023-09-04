@@ -10,6 +10,7 @@ import { Label } from "client/utils/label";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 import { FieldCommand } from "client/project/changes/commands/fieldCommand";
+import { norm } from "shared/types/geometry";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LabelView } from "client/utils/label";
@@ -154,7 +155,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		// Update hit area
 		let x = x2 - x1;
 		let y = y2 - y1;
-		const length = Math.sqrt(x * x + y * y);
+		const length = norm(x, y);
 		if(length == 0) {
 			this._line.hitArea = null;
 		} else {
@@ -177,8 +178,8 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	});
 }
 
-const T675 = Math.sqrt(2) + 1;
-const T225 = Math.sqrt(2) - 1;
+const T675 = Math.SQRT2 + 1;
+const T225 = Math.SQRT2 - 1;
 
 function getDirectionOfSlope(slope: number): Direction {
 	if(slope == -Infinity) slope = Infinity;

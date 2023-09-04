@@ -52,10 +52,18 @@ export function same(p1: IPoint, p2: IPoint): boolean {
 	return p1.x === p2.x && p1.y === p2.y;
 }
 
-export function dist(p1: IPoint, p2: IPoint = { x: 0, y: 0 }): number {
+export function dist(p1: IPoint, p2: IPoint): number {
 	const dx = p1.x - p2.x;
 	const dy = p1.y - p2.y;
-	return Math.sqrt(dx * dx + dy * dy);
+	return norm(dx, dy);
+}
+
+export function norm(x: number, y: number): number {
+	return Math.sqrt(x * x + y * y);
+}
+
+export function leg(c: number, b: number): number {
+	return Math.sqrt(c * c - b * b);
 }
 
 /** Sort first by x-coordinate, then by y-coordinate */
