@@ -1,10 +1,10 @@
 import { Store } from "./store";
-import { $generate } from "core/math/gops";
 import { CornerType } from "shared/json";
 import { cache } from "core/utils/cache";
 import { Direction, opposite } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { State } from "core/service/state";
+import { deviceGenerator } from "./generators/deviceGenerator";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -47,7 +47,7 @@ export class Partition implements ISerializable<JPartition> {
 	constructor(config: Configuration, junctions: JJunction[], data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
-		this.$devices = new Store(this._deviceGenerator(junctions));
+		this.$devices = new Store(deviceGenerator(this.$overlaps, junctions, data.strategy));
 
 		// Gather all corners
 		const map: CornerMap[] = [];
@@ -186,18 +186,6 @@ export class Partition implements ISerializable<JPartition> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private *_deviceGenerator(junctions: JJunction[]): Generator<JDevice> {
-		if(this.$overlaps.length == 1) {
-			const overlap = this.$overlaps[0];
-			const { ox, oy } = overlap;
-			const sx = junctions[overlap.parent].sx;
-			for(const piece of $generate(ox, oy, sx)) {
-				const gadget: JGadget = { pieces: [piece] };
-				yield { gadgets: [gadget] };
-			}
-		}
-	}
 
 	/**
 	 * Find, in a {@link Partition} containing joins, what is left of a given {@link JOverlap}

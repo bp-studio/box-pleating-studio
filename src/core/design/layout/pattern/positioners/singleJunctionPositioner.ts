@@ -29,5 +29,7 @@ export function singleJunctionPositioner(junction: JJunction, devices: readonly 
 		return true;
 	}
 
+	//TODO: Implement single junction patterns that are integral but require 4 or more devices
+
 	return false;
 }

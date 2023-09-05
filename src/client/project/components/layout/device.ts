@@ -30,6 +30,7 @@ export class Device extends Draggable {
 	private readonly _shade: Graphics;
 	private readonly _ridge: SmoothGraphics;
 	private readonly _axisParallels: SmoothGraphics;
+	private _dragging: boolean = false;
 
 	constructor(stretch: Stretch, index: number, graphics: DeviceData) {
 		const sheet = stretch.$layout.$sheet;
@@ -72,8 +73,10 @@ export class Device extends Draggable {
 		const r = this.$graphics.range;
 		this.$graphics.range = [r[0] - dx, r[1] - dx];
 
+		this._dragging = this.stretch.$project.$isDragging;
 		await super._move(x, y);
 		await this.stretch.$layout.$moveDevice(this);
+		this._dragging = false;
 	}
 
 	public override get $selected(): boolean {
@@ -91,7 +94,7 @@ export class Device extends Draggable {
 	public $redraw(data: DeviceData): void {
 		const range = this.$graphics.range;
 		this.$graphics = data;
-		if(this.stretch.$project.$isDragging) {
+		if(this._dragging) {
 			// During dragging, the range is already updated ahead of time.
 			this.$graphics.range = range;
 		} else {

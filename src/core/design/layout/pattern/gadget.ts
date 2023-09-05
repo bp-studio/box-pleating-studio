@@ -73,6 +73,24 @@ export class Gadget implements JGadget {
 		return Math.abs(this.$anchorMap[q1][0].x - this.$anchorMap[q2][0].x);
 	}
 
+	public $reverseGPS(): Gadget {
+		const g = new Gadget(this);
+		const [p1, p2] = g.pieces;
+		const sx = Math.ceil(Math.max(p1.sx, p2.sx));
+		const sy = Math.ceil(Math.max(p1.sy, p2.sy));
+		p1.$reverse(sx, sy);
+		p2.$reverse(sx, sy);
+		return g;
+	}
+
+	public $addSlack(q: QuadrantDirection, slack: number): Gadget {
+		this.anchors = this.anchors || [];
+		this.anchors[q] = this.anchors[q] || {};
+		this.anchors[q].slack = (this.anchors[q].slack ?? 0) + slack;
+		return this;
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

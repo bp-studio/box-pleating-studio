@@ -46,6 +46,37 @@ export class Piece extends Region implements JPiece {
 		clearCache(this);
 	}
 
+	public get sx(): number {
+		return this.oy + this.u + this.v;
+	}
+
+	public get sy(): number {
+		return this.ox + this.u + this.v;
+	}
+
+	/** Reverse self under the given SCR. */
+	public $reverse(tx: number, ty: number): void {
+		const { detours, sx, sy } = this;
+		let { shift } = this;
+		shift = shift || { x: 0, y: 0 };
+		const s = { x: tx - sx - shift.x, y: ty - sy - shift.y };
+		if(s.x || s.y) this.shift = s;
+		this.detours = detours?.map(c =>
+			c.map(p => ({ x: sx - p.x, y: sy - p.y }))
+		);
+	}
+
+	/** Shrink a {@link Piece} proportionally. This will reset the cache. */
+	public $shrink(by: number = 2): this {
+		clearCache(this);
+		this.ox /= by;
+		this.oy /= by;
+		this.u /= by;
+		this.v /= by;
+		return this;
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

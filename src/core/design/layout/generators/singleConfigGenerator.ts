@@ -3,9 +3,10 @@ import { Configuration } from "../configuration";
 import { clone } from "shared/utils/clone";
 import { configFilter } from "./filters";
 import { ConfigUtil } from "./configUtil";
+import { Strategy } from "shared/json";
 
+import type { JJunction, JOverlap, JPartition } from "shared/json";
 import type { Repository } from "../repository";
-import type { JJunction, JOverlap, JPartition, Strategy } from "shared/json";
 import type { ValidJunction } from "../junction/validJunction";
 
 //=================================================================
@@ -21,6 +22,8 @@ export function* singleConfigGenerator(
 	yield* GeneratorUtil.$first([
 		singleGadget(repo, j),
 		doubleRelay(repo, j),
+		singleGadget(repo, j, Strategy.halfIntegral),
+		singleGadget(repo, j, Strategy.universal),
 	], configFilter(protoSignature));
 }
 
