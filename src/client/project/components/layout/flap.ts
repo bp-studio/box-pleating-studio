@@ -134,7 +134,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(v < 0 || !this._testResize(this._width, v)) return;
 		const oldValue = this._height;
 		this._height = v;
-		this._layout.$updateFlap(this,
+		this._layout.$flaps.$update(this,
 			() => this.$project.history.$fieldChange(this, "height", oldValue, v, false)
 		);
 	}
@@ -147,7 +147,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(v < 0 || !this._testResize(v, this._height)) return;
 		const oldValue = this._width;
 		this._width = v;
-		this._layout.$updateFlap(this,
+		this._layout.$flaps.$update(this,
 			() => this.$project.history.$fieldChange(this, "width", oldValue, v, false)
 		);
 	}
@@ -224,7 +224,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const location = { x, y };
 		this._lastLocation ||= this.$location;
 		this.$location = location;
-		return this._layout.$updateFlap(this, () => {
+		return this._layout.$flaps.$update(this, () => {
 			this.$project.history.$move(this, location, this._lastLocation);
 			this._lastLocation = undefined;
 		});

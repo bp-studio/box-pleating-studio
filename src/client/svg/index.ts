@@ -131,7 +131,7 @@ function getEdgeLayer(design: Design): string {
 function getHingeLayer(design: Design): string {
 	const hidden = !app.settings.showHinge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
-	const objects = [...design.layout.$flaps.values(), ...design.layout.$rivers.values()];
+	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
 	for(const obj of objects) {
 		graphics.$class = "hinge";
@@ -147,7 +147,7 @@ function getHingeLayer(design: Design): string {
 function getRidgeLayer(design: Design): string {
 	const hidden = !app.settings.showRidge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
-	const objects = [...design.layout.$flaps.values(), ...design.layout.$rivers.values()];
+	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
 	graphics.$class = "ridge";
 	for(const obj of objects) {
@@ -190,7 +190,7 @@ function getDotLayer(design: Design): string {
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "dot";
-	for(const f of design.layout.$flaps.values()) {
+	for(const f of design.layout.$flaps) {
 		f.$drawDot(graphics);
 	}
 	return layer(graphics.$get(), false, hidden);
@@ -214,7 +214,7 @@ function getLabelLayer(design: Design): string {
 	let result = "";
 	const s = ProjectService.scale.value;
 	const objects: LabelView[] = [];
-	if(design.mode == "layout") objects.push(...design.layout.$flaps.values());
+	if(design.mode == "layout") objects.push(...design.layout.$flaps);
 	if(design.mode == "tree") {
 		for(const v of design.tree.$vertices) if(v) objects.push(v);
 		objects.push(...design.tree.$edges.values());

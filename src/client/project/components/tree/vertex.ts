@@ -136,7 +136,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		await super._move(x, y);
 		if(this.$isNew) {
 			const layout = this._tree.$project.design.layout;
-			const flap = layout.$syncFlaps.get(this.id);
+			const flap = layout.$flaps.$sync.get(this.id);
 			if(!flap) {
 				this.$isNew = false;
 			} else {

@@ -15,8 +15,15 @@ export class CoreManager {
 	/** A counter for the pending update calls. */
 	private _updateState: number = 0;
 
+	/** The current updating process. */
+	private _updating: Promise<void> = Promise.resolve();
+
 	constructor(project: Project) {
 		this._project = project;
+	}
+
+	public get $updating(): Promise<void> {
+		return this._updating;
 	}
 
 	/** Wait until the Core is free to call. */
@@ -33,6 +40,6 @@ export class CoreManager {
 			this._updateState--;
 			resolve();
 		}));
-		return factory();
+		return this._updating = factory();
 	}
 }

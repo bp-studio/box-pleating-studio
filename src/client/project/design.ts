@@ -165,6 +165,6 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const mode = this.mode;
 		this.layout.$sheet.$toggle(mode === "layout");
 		this.tree.$sheet.$toggle(mode === "tree");
-		if(mode === "layout") this.layout.$syncFlaps.clear();
+		if(mode === "layout") this.layout.$flaps.$sync.clear();
 	}
 }

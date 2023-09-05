@@ -3,7 +3,6 @@ import { AlphaFilter } from "@pixi/filter-alpha";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 import { shallowRef } from "client/shared/decorators";
-import { Flap } from "./flap";
 import { River } from "./river";
 import { Sheet } from "../sheet";
 import { Layer } from "client/shared/layers";
@@ -13,7 +12,9 @@ import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 import { CoreManager } from "./coreManager";
+import { FlapContainer } from "./flapContainer";
 
+import type { Flap } from "./flap";
 import type { Device } from "./device";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
@@ -37,32 +38,21 @@ export class Layout extends View implements ISerializable<JLayout> {
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
-	public readonly $flaps: Map<number, Flap> = new Map();
+	public readonly $flaps: FlapContainer;
+	public readonly $core: CoreManager;
 	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
 
-	/** The flaps that are about to be updated, and their update actions. */
-	private readonly _pendingUpdate = new Map<Flap, Action>();
-
-	/** The new flaps that should be synced. */
-	public readonly $syncFlaps = new Map<number, Flap>();
 
 	/** Cached value of scale. */
 	private _scale: number = 0;
 
-	/** The current {@link Promise} for flap updating process. */
-	private _flapUpdatePromise: Promise<void> | undefined;
-
-	/** The current updating process. */
-	private _updating: Promise<void> = Promise.resolve();
-
-	private readonly _core: CoreManager;
-
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
-		this._core = new CoreManager(project);
+		this.$core = new CoreManager(project);
+		this.$flaps = new FlapContainer(this);
 		this.$sheet = new Sheet(project, parentView, "layout", json, state);
 		this.$sheet.$addChild(this);
 
@@ -75,7 +65,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public toJSON(session?: true): JLayout {
 		return {
 			sheet: this.$sheet.toJSON(),
-			flaps: [...this.$flaps.values()].map(f => f.toJSON()),
+			flaps: [...this.$flaps].map(f => f.toJSON()),
 			stretches: [...this.$stretches.values()].map(s => s.toJSON(session)),
 		};
 	}
@@ -102,14 +92,14 @@ export class Layout extends View implements ISerializable<JLayout> {
 		const newRivers = model.edit.filter(e => e[0]).map(e => e[1]);
 
 		this._updateStretches(model);
-		this._removeFlaps(model, newRivers);
+		this.$flaps.$batchRemove(model, newRivers);
 		for(const r of this.$rivers.values()) {
 			const v = r.$edge.$getLeaf();
 			if(v) this._removeRiver(r); // A river turns into a flap
 		}
 
 		for(const f of prototype.layout.flaps) {
-			this._addFlap(f, model.graphics["f" + f.id]);
+			this.$flaps.$add(f, model.graphics["f" + f.id]);
 		}
 		prototype.layout.flaps.length = 0;
 		this.flapCount = this.$flaps.size;
@@ -142,28 +132,9 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$project.design.mode = "tree";
 	}
 
-	/**
-	 * Register an update operation for a {@link Flap}.
-	 *
-	 * This is one rather complicated part of the architecture.
-	 * There are two issues we're solving here:
-	 * 1. The user could manipulate multiple flaps in one operation.
-	 * 2. The user could very rapidly trigger changes, say during dragging.
-	 * To handle the first issue, we use {@link _flapUpdatePromise} to wait until
-	 * all flaps are manipulated, and then we process them all in {@link _flushUpdate}.
-	 * For the second issue, we use a {@link CoreManager} to control the callings.
-	 */
-	public $updateFlap(flap: Flap, action: Action): Promise<void> {
-		this._pendingUpdate.set(flap, action);
-		if(this._flapUpdatePromise === undefined) {
-			this._flapUpdatePromise = this._core.$prepare().then(this._flushUpdate);
-		}
-		return this._flapUpdatePromise;
-	}
-
 	/** Return a {@link Promise} that resolves when all updates are completed. */
 	public get $updateComplete(): Promise<void> {
-		return (this._flapUpdatePromise || Promise.resolve()).then(() => this._updating);
+		return (this.$flaps.$flapUpdatePromise || Promise.resolve()).then(() => this.$core.$updating);
 	}
 
 	public $switchConfig(stretchId: string, to: number): Promise<void> {
@@ -183,11 +154,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 	 * and we use the same mechanism to control the callings to the Core.
 	 */
 	public async $moveDevice(device: Device): Promise<void> {
-		await this._core.$prepare();
-		this._updating = this._core.$run(() =>
+		await this.$core.$prepare();
+		await this.$core.$run(() =>
 			this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location)
 		);
-		await this._updating;
 	}
 
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {
@@ -203,64 +173,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private readonly _flushUpdate = (): Promise<void> => {
-		this._flapUpdatePromise = undefined;
-		const flaps: JFlap[] = [];
-		for(const [f, action] of this._pendingUpdate) {
-			flaps.push(f.$updateDrawParams());
-			action();
-		}
-		this._pendingUpdate.clear();
-		const dragging = this.$project.$isDragging;
-		const prototypes = this.$project.design.$prototype.layout.stretches;
-		return this._updating = this._core.$run(() =>
-			this.$project.$core.layout.updateFlap(flaps, dragging, prototypes)
-		);
-	};
-
-	private _addFlap(f: JFlap, graphics: GraphicsData): void {
-		const tree = this.$project.design.tree;
-		const vertex = tree.$vertices[f.id]!;
-		const edge = tree.$getFirstEdge(vertex);
-		if(!edge || !graphics) debugger;
-		const flap = new Flap(this, f, vertex, edge, graphics);
-		this.$flaps.set(f.id, flap);
-		if(vertex.$isNew) this.$syncFlaps.set(f.id, flap);
-		this.$sheet.$addChild(flap);
-		this.$project.history.$construct(flap.$toMemento());
-	}
-
-	private _removeFlaps(model: UpdateModel, newRivers: JEdge[]): void {
-		const design = this.$project.design;
-		const prototype = design.$prototype;
-		const tree = design.tree;
-		for(const f of this.$flaps.values()) {
-			const vertex = tree.$vertices[f.id];
-			const edgeDisposed = !f.$edge.$v1; // The original flap is split
-			if(!vertex || !vertex.isLeaf || edgeDisposed) {
-				if(vertex) {
-					if(edgeDisposed) {
-						prototype.layout.flaps.push(f.toJSON());
-						model.graphics["f" + f.id] ||= f.$graphics;
-					} else {
-						// A flap turns into a river
-						newRivers.push(f.$edge.toJSON());
-					}
-				}
-				this._removeFlap(f.id);
-			}
-		}
-	}
-
-	private _removeFlap(id: number): void {
-		const flap = this.$flaps.get(id)!;
-		const memento = flap.$toMemento();
-		this.$sheet.$removeChild(flap);
-		flap.$dispose();
-		this.$flaps.delete(id);
-		this.$project.history.$destruct(memento);
-	}
 
 	private _addRiver(e: JEdge, graphics: GraphicsData): void {
 		const tree = this.$project.design.tree;
