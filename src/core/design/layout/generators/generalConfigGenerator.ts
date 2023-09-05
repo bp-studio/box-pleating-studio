@@ -1,10 +1,10 @@
-import { singleConfigGenerator } from "./singleConfigGenerator";
 import { GeneratorUtil } from "core/utils/generator";
 import { configFilter } from "./filters";
+import { GeneralConfigGeneratorContext } from "./generalConfigGeneratorContext";
 
 import type { Repository } from "../repository";
 import type { Configuration } from "../configuration";
-import type { ValidJunction } from "../junction/validJunction";
+import type { ValidJunction, Junctions } from "../junction/validJunction";
 
 //=================================================================
 /**
@@ -13,13 +13,20 @@ import type { ValidJunction } from "../junction/validJunction";
  */
 //=================================================================
 export function* generalConfigGenerator(
-	repo: Repository, junctions: ValidJunction[], seedSignature?: string
+	repo: Repository, junctions: Junctions, protoSignature?: string
 ): Generator<Configuration> {
-	// TODO
 	// First find all possible configurations for each Junction
-	const junctionConfigs = junctions.map(j => [...singleConfigGenerator(repo, j)]);
+	const context = new GeneralConfigGeneratorContext(repo, junctions);
 
-	yield* GeneratorUtil.$first([
+	const generators: Generator<Configuration>[] = [];
+	for(let rank = 0; rank <= context.$maxRank; rank++) {
+		generators.push(generateConfig(context, rank));
+	}
+	yield* GeneratorUtil.$first(generators, configFilter(protoSignature));
+}
 
-	], configFilter(undefined));
+function* generateConfig(context: GeneralConfigGeneratorContext, targetRank: number): Generator<Configuration> {
+	for(const combination of context.$rankCombination(targetRank)) {
+		yield* context.$search(combination);
+	}
 }

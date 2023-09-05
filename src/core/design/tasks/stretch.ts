@@ -9,13 +9,13 @@ import { patternTask } from "./pattern";
 import { Stretch } from "../layout/stretch";
 import { clearPatternContourForRepo } from "./patternContour";
 
-import type { ValidJunction } from "../layout/junction/validJunction";
+import type { Junctions, ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
 import type { Junction } from "../layout/junction/junction";
 
 /** A group of connected {@link ValidJunction}s */
 interface Team {
-	$junctions: ValidJunction[];
+	$junctions: Junctions;
 	$flaps: number[];
 }
 
@@ -55,7 +55,7 @@ function stretches(): void {
 }
 
 /** Grouping algorithm */
-function grouping(junctions: ValidJunction[]): Team[] {
+function grouping(junctions: Junctions): Team[] {
 	const unionFind = new ListUnionFind<number>(
 		// Involved Junctions are at most Quadrant times 2
 		junctions.length * 2
@@ -85,7 +85,7 @@ function grouping(junctions: ValidJunction[]): Team[] {
 }
 
 /** Processes the {@link Team}s resulting from the first round of grouping. */
-function processTeam(junctions: ValidJunction[]): void {
+function processTeam(junctions: Junctions): void {
 	// Covering check
 	const uncoveredJunctions = getUncoveredJunctions(junctions);
 	if(uncoveredJunctions.length === 1) {
@@ -105,7 +105,7 @@ function processTeam(junctions: ValidJunction[]): void {
  * Filter those {@link ValidJunction} that are not covered.
  * Those are the ones that will actually be used for {@link Stretch}es.
  */
-function getUncoveredJunctions(junctions: ValidJunction[]): ValidJunction[] {
+function getUncoveredJunctions(junctions: Junctions): Junctions {
 	if(junctions.length === 1) return junctions;
 	const keys = new Set<number>();
 	junctions.forEach(j => keys.add(getKey(j.$a.id, j.$b.id)));
@@ -139,7 +139,7 @@ function tryGetStretch(id: string): Stretch | undefined {
 }
 
 /** Collect all {@link ValidJunction}s and reset their covering states. */
-function getValidJunctions(): ValidJunction[] {
+function getValidJunctions(): Junctions {
 	const result: ValidJunction[] = [];
 	for(const j of State.$junctions.values()) {
 		if(j.$valid) {

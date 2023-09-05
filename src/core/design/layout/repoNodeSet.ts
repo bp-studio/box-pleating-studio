@@ -8,7 +8,7 @@ import { quadrantNumber } from "shared/types/direction";
 
 import type { Quadrant } from "./pattern/quadrant";
 import type { ITreeNode } from "../context";
-import type { ValidJunction } from "./junction/validJunction";
+import type { Junctions } from "./junction/validJunction";
 import type { Repository } from "./repository";
 
 //=================================================================
@@ -33,7 +33,7 @@ export class RepoNodeSet {
 	 */
 	private readonly _lcaMap: IntDoubleMap<ITreeNode> | undefined;
 
-	constructor(junctions: ValidJunction[], quadrants: ReadonlyMap<number, Quadrant>) {
+	constructor(junctions: Junctions, quadrants: ReadonlyMap<number, Quadrant>) {
 		this.$leaves = getLeaves(junctions);
 
 		const heap = new MutableHeap<ITreeNode>(nodeComparator);
@@ -97,7 +97,7 @@ export class RepoNodeSet {
 	}
 }
 
-function getLeaves(junctions: ValidJunction[]): number[] {
+function getLeaves(junctions: Junctions): number[] {
 	const leafSet = new Set<number>();
 	for(const j of junctions) {
 		leafSet.add(j.$a.id);

@@ -1,6 +1,6 @@
 <template>
 	<button id="note" class="btn btn-light text-warning" v-on:click="show" v-if="Studio.project?.design.layout.patternNotFound">
-		<i class="fas fa-exclamation-triangle h1" />
+		<i class="fas fa-exclamation-triangle h1 my-1" />
 	</button>
 	<div class="modal fade" ref="el">
 		<div class="modal-dialog modal-dialog-centered">

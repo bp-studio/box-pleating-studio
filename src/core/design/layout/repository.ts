@@ -12,7 +12,7 @@ import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Pattern } from "./pattern/pattern";
 import type { JRepository, JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
-import type { ValidJunction, getStructureSignature } from "./junction/validJunction";
+import type { ValidJunction, Junctions, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
 
 //=================================================================
@@ -58,7 +58,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** The current index of {@link Configuration}. */
 	private _index: number = 0;
 
-	constructor(stretch: Stretch, junctions: ValidJunction[], signature: string, prototype?: JStretch) {
+	constructor(stretch: Stretch, junctions: Junctions, signature: string, prototype?: JStretch) {
 		this.$stretch = stretch;
 		this.$signature = signature;
 		this.$f = junctions[0].$f;
@@ -160,7 +160,7 @@ interface CreateQuadrantResult {
 	readonly directional: PerQuadrant<Quadrant[]>;
 }
 
-function createQuadrants(junctions: ValidJunction[]): CreateQuadrantResult {
+function createQuadrants(junctions: Junctions): CreateQuadrantResult {
 	const quadrantCodes = new Map<number, ValidJunction[]>();
 	for(const j of junctions) {
 		getOrSetEmptyArray(quadrantCodes, j.$q1).push(j);

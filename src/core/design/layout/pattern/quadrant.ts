@@ -4,7 +4,7 @@ import { MASK } from "../junction/validJunction";
 import { State } from "core/service/state";
 
 import type { Comparator } from "shared/types/types";
-import type { ValidJunction } from "../junction/validJunction";
+import type { Junctions } from "../junction/validJunction";
 import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -29,7 +29,7 @@ export class Quadrant {
 	/** The starting point of tracing relative to the corner of the flap. */
 	private readonly o: IPoint;
 
-	constructor(code: number, junctions: ValidJunction[]) {
+	constructor(code: number, junctions: Junctions) {
 		this.$flap = State.$tree.$nodes[code >>> 2]!;
 		this.q = code & MASK;
 		this.f = {

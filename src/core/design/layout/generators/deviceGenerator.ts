@@ -6,13 +6,10 @@ import { Piece } from "../pattern/piece";
 import { Gadget } from "../pattern/gadget";
 import { Direction } from "shared/types/direction";
 
-import type { JDevice, JGadget, JJunction, JOverlap, JPiece } from "shared/json";
+import type { JDevice, JGadget, JJunction, JOverlap, JPartition, JPiece } from "shared/json";
 
-export function* deviceGenerator(
-	overlaps: readonly JOverlap[],
-	junctions: readonly JJunction[],
-	strategy?: Strategy
-): Generator<JDevice> {
+export function* deviceGenerator(data: JPartition, junctions: readonly JJunction[]): Generator<JDevice> {
+	const { overlaps, strategy } = data;
 	if(overlaps.length == 1) {
 		const overlap = overlaps[0];
 		const { ox, oy } = overlap;
@@ -31,6 +28,8 @@ export function* deviceGenerator(
 				yield { gadgets: [gadget] };
 			}
 		}
+	} else {
+		// TODO
 	}
 }
 

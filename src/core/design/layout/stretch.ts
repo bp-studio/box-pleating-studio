@@ -5,7 +5,7 @@ import { clearPatternContourForRepo } from "../tasks/patternContour";
 import { RepoNodeSet } from "./repoNodeSet";
 
 import type { JStretch } from "shared/json";
-import type { ValidJunction } from "./junction/validJunction";
+import type { Junctions, ValidJunction } from "./junction/validJunction";
 
 //=================================================================
 /**
@@ -30,7 +30,7 @@ export class Stretch implements ISerializable<JStretch> {
 	/** Current {@link Repository} in used. */
 	private _repo: Repository;
 
-	constructor(junctions: ValidJunction[], prototype: JStretch) {
+	constructor(junctions: Junctions, prototype: JStretch) {
 		const signature = getStructureSignature(junctions);
 		this.$id = prototype.id;
 		this._repo = new Repository(this, junctions, signature, prototype);
@@ -54,7 +54,7 @@ export class Stretch implements ISerializable<JStretch> {
 	 * Update the combinations of {@link ValidJunction}s, and create
 	 * or reuse {@link Repository} as needed.
 	 */
-	public $update(junctions: ValidJunction[], prototype: JStretch): void {
+	public $update(junctions: Junctions, prototype: JStretch): void {
 		const signature = getStructureSignature(junctions);
 		const origin = junctions[0].$tip;
 		if(signature === this._repo.$signature) {

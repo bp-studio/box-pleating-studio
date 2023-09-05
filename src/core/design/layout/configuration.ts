@@ -9,7 +9,7 @@ import type { CornerMap } from "./partition";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
-import type { JConfiguration, JJunction, JOverlap, JPartition, JPattern } from "shared/json";
+import type { JConfiguration, JJunction, JOverlap } from "shared/json";
 
 //=================================================================
 /**
@@ -37,7 +37,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	public $originDirty: boolean = false;
 
-	constructor(repo: Repository, junctions: JJunction[], config: JConfiguration) {
+	constructor(repo: Repository, junctions: readonly JJunction[], config: JConfiguration) {
 		this.$repo = repo;
 		this.$junctions = junctions;
 		this.$partitions = config.partitions.map(p => new Partition(this, junctions, p));

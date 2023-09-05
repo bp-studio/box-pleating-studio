@@ -15,6 +15,8 @@ interface ValidJunctionData {
 	tip: IPoint;
 }
 
+export type Junctions = readonly ValidJunction[];
+
 export const MASK = 3;
 
 //=================================================================
@@ -135,6 +137,6 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 }
 
-export function getStructureSignature(junctions: ValidJunction[]): string {
+export function getStructureSignature(junctions: Junctions): string {
 	return JSON.stringify(junctions.map(j => j.toJSON()));
 }

@@ -3,11 +3,11 @@ import { singleConfigGenerator } from "./singleConfigGenerator";
 import { generalConfigGenerator } from "./generalConfigGenerator";
 
 import type { JConfiguration, JStretch } from "shared/json/pattern";
-import type { ValidJunction } from "../junction/validJunction";
+import type { Junctions } from "../junction/validJunction";
 import type { Repository } from "../repository";
 
 export function* configGenerator(
-	repo: Repository, junctions: ValidJunction[], prototype?: JStretch
+	repo: Repository, junctions: Junctions, prototype?: JStretch
 ): Generator<Configuration> {
 
 	let protoSignature: string | undefined;
