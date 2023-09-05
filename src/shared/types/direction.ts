@@ -12,6 +12,9 @@ type PerQuadrantBase<T> = readonly [T, T, T, T];
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
 const quadrants: PerQuadrant<QuadrantDirection> = [0, 1, 2, 3];
 
+export const previousQuadrantOffset = 3;
+export const nextQuadrantOffset = 1;
+
 /**
  * A readonly array where indices can only be {@link QuadrantDirection}s.
  * Can be generated using {@link makePerQuadrant}.

@@ -7,6 +7,7 @@ import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
 import { clone } from "shared/utils/clone";
 import { MASK } from "../junction/validJunction";
+import { opposite } from "shared/types/direction";
 
 import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerMap, Partition } from "../partition";
@@ -160,7 +161,7 @@ export class Device implements ISerializable<JDevice> {
 		const result = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY] as [number, number];
 		for(const c of this.$partition.$constraints) {
 			const isOut = c.corner.type != CornerType.socket;
-			const q = isOut ? c.anchorIndex : c.corner.q!;
+			const q = isOut ? c.anchorIndex : opposite(c.corner.q!);
 			const f = fx * (q == 0 ? -1 : 1);
 			const target = this.$pattern.$getConnectionTarget(c.corner as JConnection);
 			const slack = isOut ?

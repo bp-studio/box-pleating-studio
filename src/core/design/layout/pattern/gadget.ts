@@ -64,6 +64,15 @@ export class Gadget implements JGadget {
 		return makePerQuadrant(q => this._getSlack(q));
 	}
 
+	/**
+	 * In case of relay, get the remaining x-component.
+	 * @param q1 {@link QuadrantDirection} of the corner being connected to, which is either 1 or 3.
+	 * @param q2 {@link QuadrantDirection} of the corner by the other {@link Gadget}, which is either 0 or 2.
+	 */
+	public rx(q1: QuadrantDirection, q2: QuadrantDirection): number {
+		return Math.abs(this.$anchorMap[q1][0].x - this.$anchorMap[q2][0].x);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
