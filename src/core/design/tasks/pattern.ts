@@ -33,7 +33,10 @@ function pattern(): void {
 	}
 
 	for(const s of State.$stretches.values()) {
-		if(!s.$repo.$pattern) continue;
+		if(!s.$repo.$pattern) {
+			State.$updateResult.patternNotFound = true;
+			continue;
+		}
 		for(const id of s.$repo.$nodeSet.$nodes) State.$patternDiff.$add(id);
 
 		// Collect patterned quadrants

@@ -72,10 +72,6 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		};
 	}
 
-	public get patternNotFound(): boolean {
-		return false;
-	}
-
 	/** Update using the model returned from the Core. */
 	public $update(model: UpdateModel, callback: Action): void {
 		this.layout.$cleanUp(model);

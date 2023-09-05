@@ -35,6 +35,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	@shallowRef public flapCount: number = 0;
 	@shallowRef public riverCount: number = 0;
 	@shallowRef public invalidCount: number = 0;
+	@shallowRef public patternNotFound: boolean = false;
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
@@ -97,6 +98,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 			const v = r.$edge.$getLeaf();
 			if(v) this._removeRiver(r); // A river turns into a flap
 		}
+		this.patternNotFound = model.patternNotFound;
 
 		for(const f of prototype.layout.flaps) {
 			this.$flaps.$add(f, model.graphics["f" + f.id]);

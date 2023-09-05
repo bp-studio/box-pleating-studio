@@ -21,6 +21,8 @@ export interface UpdateModel {
 		stretches: string[];
 	};
 
+	patternNotFound: boolean;
+
 	edit: JEdit[];
 
 	/**

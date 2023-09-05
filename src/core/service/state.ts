@@ -156,6 +156,7 @@ export namespace State {
 				junctions: [],
 				stretches: [],
 			},
+			patternNotFound: false,
 			edit: [],
 			graphics: {},
 		};

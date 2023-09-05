@@ -1,5 +1,5 @@
 <template>
-	<button id="note" class="btn btn-light text-warning" v-on:click="show" v-if="Studio.project?.design.patternNotFound">
+	<button id="note" class="btn btn-light text-warning" v-on:click="show" v-if="Studio.project?.design.layout.patternNotFound">
 		<i class="fas fa-exclamation-triangle h1" />
 	</button>
 	<div class="modal fade" ref="el">
