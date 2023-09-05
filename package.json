@@ -8,6 +8,7 @@
 		"build": "gulp",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"lint": "eslint src",
+		"loc": "powershell \"(gci src -include *.ts,*.htm,*.scss,*.vue -recurse | select-string .).Count\"",
 		"test": "mocha"
 	},
 	"author": "Mu-Tsun Tsai",
