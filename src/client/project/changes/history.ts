@@ -102,6 +102,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	 */
 	public $flush(): void {
 		const selection = this._project.design.sheet.$getSelectedTags();
+		// const test = (this._construct[0]?.[1] as any)?.pattern.devices[0].offset == 11;
+		// if(test) console.log(this._queue.length);
 		if(this._queue.length) {
 			const s = this._lastStep;
 			if(!s || !s.$tryAdd(this._queue, this._construct, this._destruct)) {

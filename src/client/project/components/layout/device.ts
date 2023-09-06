@@ -32,6 +32,9 @@ export class Device extends Draggable {
 	private readonly _axisParallels: SmoothGraphics;
 	private _dragging: boolean = false;
 
+	/** Keep a record of the last updated location during fast dragging. */
+	private _lastLocation: IPoint | undefined;
+
 	constructor(stretch: Stretch, index: number, graphics: DeviceData) {
 		const sheet = stretch.$layout.$sheet;
 		super(sheet);
@@ -74,9 +77,13 @@ export class Device extends Draggable {
 		this.$graphics.range = [r[0] - dx, r[1] - dx];
 
 		this._dragging = this.stretch.$project.$isDragging;
-		await super._move(x, y);
-		await this.stretch.$layout.$moveDevice(this);
-		this._dragging = false;
+		const location = { x, y };
+		this._lastLocation ||= this.$location;
+		this.$location = location;
+		await this.stretch.$layout.$moveDevice(this, () => {
+			this.$project.history.$move(this, location, this._lastLocation);
+			this._lastLocation = undefined;
+		});
 	}
 
 	public override get $selected(): boolean {
@@ -85,6 +92,10 @@ export class Device extends Draggable {
 	public override set $selected(v: boolean) {
 		super.$selected = v;
 		if(v) this.stretch.$complete();
+	}
+
+	public $dragEnd(): void {
+		this._dragging = false;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

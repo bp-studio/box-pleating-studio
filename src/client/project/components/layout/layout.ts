@@ -45,6 +45,9 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
 
+	private _deviceMovePromise: Promise<void> | undefined;
+	private _draggingDevice: Device | undefined;
+	private _draggingDeviceAction: Action | undefined;
 
 	/** Cached value of scale. */
 	private _scale: number = 0;
@@ -155,11 +158,18 @@ export class Layout extends View implements ISerializable<JLayout> {
 	 * Similar to {@link $updateFlap}, dragging of {@link Device} can also fire rapidly,
 	 * and we use the same mechanism to control the callings to the Core.
 	 */
-	public async $moveDevice(device: Device): Promise<void> {
-		await this.$core.$prepare();
-		await this.$core.$run(() =>
-			this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location)
-		);
+	public $moveDevice(device: Device, action: Action): Promise<void> {
+		this._draggingDeviceAction = action;
+		if(this._deviceMovePromise === undefined) {
+			this._draggingDevice = device;
+			this._deviceMovePromise = this.$core.$prepare().then(this._flushDeviceMove);
+		}
+		return this._deviceMovePromise;
+	}
+
+	public $endDeviceDrag(): void {
+		if(this._draggingDevice) this._draggingDevice.$dragEnd();
+		this._draggingDevice = undefined;
 	}
 
 	public $createFlapPrototype(id: number, p: IPoint): JFlap {
@@ -175,6 +185,16 @@ export class Layout extends View implements ISerializable<JLayout> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private readonly _flushDeviceMove = (): Promise<void> => {
+		this._deviceMovePromise = undefined;
+		this._draggingDeviceAction!();
+		this._draggingDeviceAction = undefined;
+		const device = this._draggingDevice!;
+		return this.$core.$run(() =>
+			this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location)
+		);
+	};
 
 	private _addRiver(e: JEdge, graphics: GraphicsData): void {
 		const tree = this.$project.design.tree;
