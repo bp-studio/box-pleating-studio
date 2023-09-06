@@ -2,6 +2,7 @@ import { Point } from "core/math/geometry/point";
 import { Direction, SlashDirection } from "shared/types/direction";
 import { MASK } from "../junction/validJunction";
 import { State } from "core/service/state";
+import { Vector } from "core/math/geometry/vector";
 
 import type { Comparator } from "shared/types/types";
 import type { Junctions } from "../junction/validJunction";
@@ -138,3 +139,10 @@ export function startEndPoints(quadrants: Quadrant[]): [Point, Point] {
 function pointWeight(p: IPoint, f: IPoint): number {
 	return f.x * p.y - f.y * p.x;
 }
+
+export const QV: readonly Vector[] = [
+	new Vector(1, 1),
+	new Vector(-1, 1),
+	new Vector(-1, -1),
+	new Vector(1, -1),
+];

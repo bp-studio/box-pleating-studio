@@ -3,6 +3,9 @@ import { Point } from "core/math/geometry/point";
 import { makePerQuadrant } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
 import { cache } from "core/utils/cache";
+import { join, polygonIntersect, shift } from "core/math/geometry/path";
+import { Fraction } from "core/math/fraction";
+import { Line, getIntersection } from "core/math/geometry/line";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { JAnchor, JGadget, JOverlap } from "shared/json";
@@ -64,6 +67,13 @@ export class Gadget implements JGadget {
 		return makePerQuadrant(q => this._getSlack(q));
 	}
 
+	@cache public get $contour(): Point[] {
+		const p = this.pieces;
+		let contour = p[0].$shape.contour;
+		for(let i = 1; i < p.length; i++) contour = join(contour, p[i].$shape.contour);
+		return contour;
+	}
+
 	/**
 	 * In case of relay, get the remaining x-component.
 	 * @param q1 {@link QuadrantDirection} of the corner being connected to, which is either 1 or 3.
@@ -88,6 +98,38 @@ export class Gadget implements JGadget {
 		this.anchors[q] = this.anchors[q] || {};
 		this.anchors[q].slack = (this.anchors[q].slack ?? 0) + slack;
 		return this;
+	}
+
+	/**
+	 * Setup the necessary slack towards a connection target.
+	 * @param g Connection target
+	 * @param q1 From which {@link QuadrantDirection} (0 or 2)
+	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
+	 */
+	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): number {
+		let c1 = this.$contour;
+		const c2 = g.$contour;
+		const f = q1 == 0 ? 1 : -1;
+		const step = new Vector(f, f);
+		const slack = new Fraction(this._getSlack(q1));
+		const v = g.$anchorMap[q2][0].sub(Point.ZERO).addBy(step.$scale(slack));
+
+		c1 = shift(c1, q1 == 0 ? v : v.$add(Point.ZERO.sub(this.$anchorMap[2][0])));
+
+		// Perform collision tests
+		let s = 0;
+		while(polygonIntersect(c1, c2)) {
+			c1 = shift(c1, step);
+			s++;
+		}
+		this.$addSlack(q1, s);
+		return s;
+	}
+
+	/** If the current {@link Gadget} contains the given ray. */
+	public $intersects(p: Point, v: Vector): boolean {
+		const test = this.$contour.map((c, i, a) => new Line(c, a[(i + 1) % a.length]));
+		return test.some(l => getIntersection(l, p, v, true));
 	}
 
 

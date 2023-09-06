@@ -17,6 +17,7 @@ export function* generalConfigGenerator(
 ): Generator<Configuration> {
 	// First find all possible configurations for each Junction
 	const context = new GeneralConfigGeneratorContext(repo, junctions);
+	if(!context.$valid) return;
 
 	const generators: Generator<Configuration>[] = [];
 	for(let rank = 0; rank <= context.$maxRank; rank++) {

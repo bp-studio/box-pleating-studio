@@ -6,9 +6,9 @@ import { Piece } from "../pattern/piece";
 import { Gadget } from "../pattern/gadget";
 import { Direction } from "shared/types/direction";
 
-import type { JDevice, JGadget, JJunction, JOverlap, JPartition, JPiece } from "shared/json";
+import type { JDevice, JGadget, JJunctions, JOverlap, JPartition, JPiece } from "shared/json";
 
-export function* deviceGenerator(data: JPartition, junctions: readonly JJunction[]): Generator<JDevice> {
+export function* deviceGenerator(data: JPartition, junctions: JJunctions): Generator<JDevice> {
 	const { overlaps, strategy } = data;
 	if(overlaps.length == 1) {
 		const overlap = overlaps[0];

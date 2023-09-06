@@ -42,6 +42,8 @@ export interface JJunction extends JQuadrilateral {
 	f: IPoint;
 }
 
+export type JJunctions = readonly JJunction[];
+
 export interface JPartition {
 	/** All Overlaps in this Partition */
 	overlaps: readonly JOverlap[];

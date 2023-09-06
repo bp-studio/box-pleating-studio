@@ -1,13 +1,15 @@
+import type { PositioningContext } from "./positioningContext";
 import type { JJunction } from "shared/json";
-import type { Device } from "../device";
 
 //=================================================================
 /**
  * {@link singleJunctionPositioner} is for a single {@link JJunction}.
  */
 //=================================================================
-export function singleJunctionPositioner(junction: JJunction, devices: readonly Device[]): boolean {
+export function singleJunctionPositioner(context: PositioningContext): boolean {
 
+	const { devices } = context;
+	const junction = context.junctions[0];
 	const sx = junction.sx;
 
 	if(devices.length == 1) {

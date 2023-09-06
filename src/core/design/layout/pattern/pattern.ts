@@ -2,9 +2,11 @@
 import { Device } from "./device";
 import { Point } from "core/math/geometry/point";
 import { State } from "core/service/state";
-import { singleJunctionPositioner } from "./positioners/singleJunctionPositioner";
 import { Gadget } from "./gadget";
+import { singleJunctionPositioner } from "./positioners/singleJunctionPositioner";
+import { twoJunctionPositioner } from "./positioners/twoJunctionPositioner";
 
+import type { PositioningContext } from "./positioners/positioningContext";
 import type { JConnection, JDevice, JPattern } from "shared/json";
 import type { Configuration } from "../configuration";
 
@@ -85,10 +87,18 @@ export class Pattern implements ISerializable<JPattern> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _position(): boolean {
-		const junctions = this.$config.$junctions;
+		const context: PositioningContext = {
+			repo: this.$config.$repo,
+			junctions: this.$config.$junctions,
+			devices: this.$devices,
+		};
+
 		// TODO
-		if(junctions.length == 1) {
-			return singleJunctionPositioner(junctions[0], this.$devices);
+		if(context.junctions.length == 1) {
+			return singleJunctionPositioner(context);
+		}
+		if(context.junctions.length == 2) {
+			return twoJunctionPositioner(context);
 		}
 		return false;
 	}

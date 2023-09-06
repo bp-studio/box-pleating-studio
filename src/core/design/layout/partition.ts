@@ -8,7 +8,7 @@ import { deviceGenerator } from "./generators/deviceGenerator";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner } from "shared/json";
+import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JJunctions } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
@@ -44,7 +44,7 @@ export class Partition implements ISerializable<JPartition> {
 	 */
 	public readonly $devices: Store<JDevice>;
 
-	constructor(config: Configuration, junctions: readonly JJunction[], data: JPartition) {
+	constructor(config: Configuration, junctions: JJunctions, data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
 		this.$devices = new Store(deviceGenerator(data, junctions));

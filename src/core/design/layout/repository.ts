@@ -10,7 +10,7 @@ import { RepoNodeSet } from "./repoNodeSet";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Pattern } from "./pattern/pattern";
-import type { JRepository, JStretch } from "shared/json";
+import type { JQuadrilateral, JRepository, JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction, Junctions, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
@@ -152,6 +152,18 @@ export class Repository implements ISerializable<JRepository | undefined> {
 			d2: total - d13,
 			d3: total - d12,
 		};
+	}
+
+	/**
+	 * In a 3-flap layout, calculate the maximal allowing distance from the intersection anchor to the shared corner.
+	 * @param oriented Sharing lower-left corner
+	 */
+	public $getMaxIntersectionDistance(r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean): number {
+		const q = oriented ? 2 : 0;
+		const n1 = r1.c[q].e!;
+		const n2 = r2.c[q].e!;
+		const n3 = r1.c[2 - q].e!;
+		return this.$distTriple(n1, n2, n3).d3;
 	}
 }
 
