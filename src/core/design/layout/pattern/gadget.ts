@@ -120,7 +120,7 @@ export class Gadget implements JGadget {
 		// Perform collision tests
 		let s = 0;
 		const path2 = toPath(c2);
-		while(Overlap.$testOverlap(toPath(c1), path2)) {
+		while(Overlap.$test(toPath(c1), path2)) {
 			c1 = shift(c1, step);
 			s++;
 		}

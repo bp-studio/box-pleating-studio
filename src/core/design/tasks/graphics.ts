@@ -6,6 +6,7 @@ import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { clone } from "shared/utils/clone";
 import { Line } from "core/math/geometry/line";
+import { toPath } from "core/math/geometry/path";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
@@ -110,7 +111,7 @@ function tryInsert(path: Path, insert: PatternContour): boolean {
 			end = i + 1;
 		}
 		if(start !== undefined && end !== undefined && start != end) {
-			const slice = insert.map(p => p.$toIPoint());
+			const slice = toPath(insert);
 			if(end > start) {
 				path.splice(start, end - start, ...slice);
 			} else {

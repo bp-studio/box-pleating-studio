@@ -20,12 +20,12 @@ export class Overlap extends Clip {
 	/**
 	 * Note that the {@link Overlap} instance can be in a dirty state after
 	 * completion, so a new instance must be create on every call
-	 * to the {@link _testOverlap} method. We use this static method
+	 * to the {@link _test} method. We use this static method
 	 * to control this behavior.
 	 */
-	public static $testOverlap(...polygon: Polygon): boolean {
+	public static $test(...polygon: Polygon): boolean {
 		const instance = new Overlap();
-		return instance._testOverlap(polygon);
+		return instance._test(polygon);
 	}
 
 	private constructor() {
@@ -33,7 +33,7 @@ export class Overlap extends Clip {
 	}
 
 	/** Test if two oriented paths overlap. */
-	private _testOverlap(polygon: Polygon): boolean {
+	private _test(polygon: Polygon): boolean {
 		for(const path of polygon) {
 			const l = path.length;
 			for(let i = 0; i < l; i++) {
@@ -44,12 +44,8 @@ export class Overlap extends Clip {
 				const delta = xyComparator(p1, p2) < 0 ? -1 : 1;
 				this._addSegment(segment, delta);
 			}
-
 		}
-		return this._collect();
-	}
 
-	protected override _collect(): boolean {
 		while(!this._eventQueue.$isEmpty) {
 			const event = this._eventQueue.$pop()!;
 			if(event.$isStart) this._processStart(event);

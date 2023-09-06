@@ -4,6 +4,7 @@ import { EPSILON } from "../segment/arcSegment";
 import type { LineSegment } from "../segment/lineSegment";
 import type { StartEvent } from "../event";
 import type { Clip } from "./clip";
+import type { OverlapIntersector } from "../overlap/overlapIntersector";
 
 //=================================================================
 /**
@@ -40,6 +41,7 @@ export class ClipIntersector extends Intersector {
 		}
 	}
 
+	/** This method is overwritten in {@link OverlapIntersector}. */
 	protected _crossSubdivide(event: StartEvent, point: IPoint): void {
 		this._subdivide(event, point);
 	}
