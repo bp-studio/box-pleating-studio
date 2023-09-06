@@ -120,7 +120,7 @@
 		"jszip": "^3.10.1",
 		"lzma": "^2.3.2",
 		"vue": "^3.3.4",
-		"vue-i18n": "^9.2.2",
+		"vue-i18n": "^9.3.0",
 		"vue-slicksort": "^2.0.5",
 		"workbox-broadcast-update": "^7.0.0",
 		"workbox-google-analytics": "^7.0.0",
