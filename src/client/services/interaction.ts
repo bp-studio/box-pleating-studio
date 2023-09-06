@@ -170,7 +170,10 @@ export namespace Interaction {
 			TapController.$start();
 			LongPressController.$init();
 			pendingTouchStart = event;
-			setTimeout(touchStart, TAP_DURATION);
+
+			// Only if we touch again on a selected Draggable will we process the event immediately
+			if(SelectionController.$touchOnSelectedDraggable()) touchStart();
+			else setTimeout(touchStart, TAP_DURATION);
 		} else {
 			mouseDown(event);
 		}

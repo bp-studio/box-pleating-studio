@@ -119,6 +119,11 @@ export namespace SelectionController {
 		return true;
 	}
 
+	export function $touchOnSelectedDraggable(): boolean {
+		const { current } = getStatus();
+		return current instanceof Draggable;
+	}
+
 	/** Process a clicking event. */
 	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): void {
 		if(event instanceof MouseEvent) ctrlKey ??= event.ctrlKey || event.metaKey;
