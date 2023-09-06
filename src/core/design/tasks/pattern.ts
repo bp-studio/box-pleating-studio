@@ -13,10 +13,7 @@ import type { Pattern } from "../layout/pattern/pattern";
 export const patternTask = new Task(pattern, roughContourTask);
 
 function pattern(): void {
-	for(const repo of State.$newRepositories) {
-		if(State.$isDragging) repo.$init();
-		else repo.$complete();
-	}
+	for(const repo of State.$newRepositories) repo.$init();
 
 	for(const device of State.$movedDevices) device.$updatePosition();
 

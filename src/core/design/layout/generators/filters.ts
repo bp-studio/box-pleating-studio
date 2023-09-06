@@ -1,6 +1,9 @@
+import type { GeneratorFilter } from "core/utils/generator";
 import type { Configuration } from "../configuration";
 
-export const configFilter: Func<string | undefined, Predicate<Configuration>> =
-	(signature: string | undefined) =>
-		(config: Configuration): boolean =>
-			config.$pattern != null && (!signature || signature != config.$signature);
+export function createConfigFilter(signature: string | undefined): GeneratorFilter<Configuration> {
+	return (config: Configuration): boolean | undefined => {
+		if(signature === config.$signature) return;
+		return config.$pattern != null;
+	};
+}

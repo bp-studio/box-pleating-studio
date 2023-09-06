@@ -1,4 +1,6 @@
 
+export type GeneratorFilter<T> = Func<T, boolean | undefined>;
+
 //=================================================================
 /**
  * Utility methods for {@link Generator}.
@@ -12,14 +14,13 @@ export namespace GeneratorUtil {
 	 * and once one of them yields something that passes the filter,
 	 * remaining {@link Generator}s will not be execute further.
 	 */
-	export function* $first<T>(generators: Generator<T>[], filter: Predicate<T>): Generator<T> {
+	export function* $first<T>(generators: Generator<T>[], filter: GeneratorFilter<T>): Generator<T> {
 		for(const generator of generators) {
 			let found = false;
 			for(const value of generator) {
-				if(filter(value)) {
-					yield value;
-					found = true;
-				}
+				const check = filter(value);
+				if(check) yield value;
+				if(check !== false) found = true;
 			}
 			if(found) return;
 		}

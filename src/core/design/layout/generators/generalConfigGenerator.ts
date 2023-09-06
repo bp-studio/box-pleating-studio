@@ -1,5 +1,5 @@
 import { GeneratorUtil } from "core/utils/generator";
-import { configFilter } from "./filters";
+import { createConfigFilter } from "./filters";
 import { GeneralConfigGeneratorContext } from "./generalConfigGeneratorContext";
 
 import type { Repository } from "../repository";
@@ -23,7 +23,7 @@ export function* generalConfigGenerator(
 	for(let rank = 0; rank <= context.$maxRank; rank++) {
 		generators.push(generateConfig(context, rank));
 	}
-	yield* GeneratorUtil.$first(generators, configFilter(protoSignature));
+	yield* GeneratorUtil.$first(generators, createConfigFilter(protoSignature));
 }
 
 function* generateConfig(context: GeneralConfigGeneratorContext, targetRank: number): Generator<Configuration> {

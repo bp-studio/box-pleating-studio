@@ -5,7 +5,7 @@ import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
 import type { Repository } from "../layout/repository";
 import type { clearPatternContourForRepo } from "../tasks/patternContour";
-import type { RepoNodeSet } from "../layout/repoNodeSet";
+import type { NodeSet } from "../layout/nodeSet";
 import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
 
@@ -62,7 +62,7 @@ export interface PatternContour extends Array<Point> {
 	/** The index in {@link NodeGraphics.$contours} associated with this contour. */
 	$for: number;
 
-	/** Same as {@link RepoNodeSet.$nodes}. */
+	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly number[];
 }
 

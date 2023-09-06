@@ -7,7 +7,7 @@ import { patternContourTask } from "./patternContour";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { Polygon } from "shared/types/geometry";
-import type { RepoNodeSet } from "../layout/repoNodeSet";
+import type { NodeSet } from "../layout/nodeSet";
 import type { ITreeNode, NodeGraphics, RoughContour, PatternContour } from "../context";
 
 //=================================================================
@@ -32,7 +32,7 @@ export const roughContourTask = new Task(roughContour, patternContourTask);
 
 const union = new AAUnion();
 const rawUnion = new AAUnion(true);
-const nodeSetMap = new Map<number, RepoNodeSet[]>();
+const nodeSetMap = new Map<number, NodeSet[]>();
 
 function roughContour(): void {
 	nodeSetMap.clear();

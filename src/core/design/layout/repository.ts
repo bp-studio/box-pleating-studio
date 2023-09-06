@@ -6,7 +6,7 @@ import { dist } from "../context/tree";
 import { Quadrant, quadrantComparator } from "./pattern/quadrant";
 import { SlashDirection, makePerQuadrant, quadrantNumber } from "shared/types/direction";
 import { getOrSetEmptyArray } from "shared/utils/map";
-import { RepoNodeSet } from "./repoNodeSet";
+import { NodeSet } from "./nodeSet";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Pattern } from "./pattern/pattern";
@@ -50,8 +50,8 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	 */
 	public $origin: Point;
 
-	/** {@link RepoNodeSet} associated with this {@link Repository}. */
-	public $nodeSet: RepoNodeSet;
+	/** {@link NodeSet} associated with this {@link Repository}. */
+	public $nodeSet: NodeSet;
 
 	private readonly _configurations: Store<Configuration>;
 
@@ -67,7 +67,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		const { map, directional } = createQuadrants(junctions);
 		this.$quadrants = map;
 		this.$directionalQuadrants = directional;
-		this.$nodeSet = new RepoNodeSet(junctions, map);
+		this.$nodeSet = new NodeSet(junctions, map);
 
 		State.$newRepositories.add(this);
 		State.$repoToProcess.add(this);
@@ -134,27 +134,6 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	}
 
 	/**
-	 * Given the ids of three flaps, return the distance from each of them to their branching node.
-	 */
-	public $distTriple(i1: number, i2: number, i3: number): {
-		d1: number; d2: number; d3: number;
-	} {
-		const tree = State.$tree;
-		const n1 = tree.$nodes[i1]!;
-		const n2 = tree.$nodes[i2]!;
-		const n3 = tree.$nodes[i3]!;
-		const d12 = dist(n1, n2, this.$nodeSet.$lca(i1, i2));
-		const d13 = dist(n1, n3, this.$nodeSet.$lca(i1, i3));
-		const d23 = dist(n2, n3, this.$nodeSet.$lca(i2, i3));
-		const total = (d12 + d13 + d23) / 2;
-		return {
-			d1: total - d23,
-			d2: total - d13,
-			d3: total - d12,
-		};
-	}
-
-	/**
 	 * In a 3-flap layout, calculate the maximal allowing distance from the intersection anchor to the shared corner.
 	 * @param oriented Sharing lower-left corner
 	 */
@@ -163,7 +142,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		const n1 = r1.c[q].e!;
 		const n2 = r2.c[q].e!;
 		const n3 = r1.c[2 - q].e!;
-		return this.$distTriple(n1, n2, n3).d3;
+		return this.$nodeSet.$distTriple(n1, n2, n3).d3;
 	}
 }
 

@@ -133,7 +133,7 @@ export class Partition implements ISerializable<JPartition> {
 		if(map.corner.type == CornerType.intersection) {
 			const oriented = ov.c[0].e! < 0;
 
-			const t = repo.$distTriple(n1, n2, map.corner.e!);
+			const t = repo.$nodeSet.$distTriple(n1, n2, map.corner.e!);
 			if(oriented) d2 = t.d2 - f2.$length;
 			else d1 = t.d1 - f1.$length;
 		}

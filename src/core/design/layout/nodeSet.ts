@@ -5,6 +5,7 @@ import { State } from "core/service/state";
 import { minComparator } from "shared/data/heap/heap";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { quadrantNumber } from "shared/types/direction";
+import { dist } from "../context/tree";
 
 import type { Quadrant } from "./pattern/quadrant";
 import type { ITreeNode } from "../context";
@@ -13,10 +14,10 @@ import type { Repository } from "./repository";
 
 //=================================================================
 /**
- * {@link RepoNodeSet} keeps a record for the nodes and coverage info in a {@link Repository}.
+ * {@link NodeSet} keeps a record for the nodes and coverage info in a {@link Repository}.
  */
 //=================================================================
-export class RepoNodeSet {
+export class NodeSet {
 
 	public readonly $leaves: readonly number[];
 	public readonly $nodes: readonly number[];
@@ -79,7 +80,37 @@ export class RepoNodeSet {
 		this.$nodes = nodes;
 	}
 
-	public $lca(a: number, b: number): ITreeNode {
+	/**
+	 * Given the ids of three flaps, return the distance from each of them to their branching node.
+	 */
+	public $distTriple(i1: number, i2: number, i3: number): {
+		d1: number; d2: number; d3: number;
+	} {
+		const tree = State.$tree;
+		const n1 = tree.$nodes[i1]!;
+		const n2 = tree.$nodes[i2]!;
+		const n3 = tree.$nodes[i3]!;
+		const d12 = this._dist(n1, n2);
+		const d13 = this._dist(n1, n3);
+		const d23 = this._dist(n2, n3);
+		const total = (d12 + d13 + d23) / 2;
+		return {
+			d1: total - d23,
+			d2: total - d13,
+			d3: total - d12,
+		};
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _dist(a: ITreeNode, b: ITreeNode): number {
+		if(a === b) return 0;
+		return dist(a, b, this._lca(a.id, b.id));
+	}
+
+	private _lca(a: number, b: number): ITreeNode {
 		const lcaMap = this._lcaMap!;
 		let lca = lcaMap.get(a, b);
 		if(lca) return lca;

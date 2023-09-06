@@ -1,7 +1,7 @@
 import { GeneratorUtil } from "core/utils/generator";
 import { Configuration } from "../configuration";
 import { clone } from "shared/utils/clone";
-import { configFilter } from "./filters";
+import { createConfigFilter } from "./filters";
 import { ConfigUtil } from "./configUtil";
 import { Strategy } from "shared/json";
 
@@ -24,7 +24,7 @@ export function* singleConfigGenerator(
 		doubleRelay(repo, j),
 		singleGadget(repo, j, Strategy.halfIntegral),
 		singleGadget(repo, j, Strategy.universal),
-	], configFilter(protoSignature));
+	], createConfigFilter(protoSignature));
 }
 
 function* singleGadget(repo: Repository, j: JJunction, strategy?: Strategy): Generator<Configuration> {
