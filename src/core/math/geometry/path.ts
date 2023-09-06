@@ -1,4 +1,3 @@
-import { same } from "shared/types/geometry";
 import { Line } from "./line";
 
 import type { Vector } from "./vector";
@@ -25,6 +24,10 @@ export function mapDirections(path: Path): QuadrantDirection[] {
 /** For generating test cases. */
 export function pathToString(path: Path): string {
 	return path.map(p => toString(p)).join(",");
+}
+
+export function toPath(path: Point[]): Path {
+	return path.map(p => p.$toIPoint());
 }
 
 function toString(p: IArcPoint): string {
@@ -60,17 +63,6 @@ function rotate(p: Point[], j: number): Point[] {
 
 export function shift(path: Point[], v: Vector): Point[] {
 	return path.map(p => p.$add(v));
-}
-
-/**
- * Determine if two polygons overlap.
- *
- * Note that we only check if the vertices fall into the other region,
- * and do not consider the case where the two polygons penetrate each other.
- * But for now this seem to suffice.
- */
-export function polygonIntersect(p1: Point[], p2: Point[]): boolean {
-	return p1.some(p => pointInPolygon(p, p2)) || p2.some(p => pointInPolygon(p, p1));
 }
 
 /**

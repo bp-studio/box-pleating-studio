@@ -35,8 +35,12 @@ export class ClipIntersector extends Intersector {
 		} else {
 			// Crossing case
 			const pt: IPoint = { x: detBC / detAB, y: (a2 * c1 - a1 * c2) / detAB };
-			if(seg1.$containsPtOnLine(pt, false) && seg2.$containsPtOnLine(pt, true)) this._subdivide(ev1, pt);
-			if(seg2.$containsPtOnLine(pt, false) && seg1.$containsPtOnLine(pt, true)) this._subdivide(ev2, pt);
+			if(seg1.$containsPtOnLine(pt, false) && seg2.$containsPtOnLine(pt, true)) this._crossSubdivide(ev1, pt);
+			if(seg2.$containsPtOnLine(pt, false) && seg1.$containsPtOnLine(pt, true)) this._crossSubdivide(ev2, pt);
 		}
+	}
+
+	protected _crossSubdivide(event: StartEvent, point: IPoint): void {
+		this._subdivide(event, point);
 	}
 }

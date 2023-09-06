@@ -3,9 +3,10 @@ import { Point } from "core/math/geometry/point";
 import { makePerQuadrant } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
 import { cache } from "core/utils/cache";
-import { join, polygonIntersect, shift } from "core/math/geometry/path";
+import { join, shift, toPath } from "core/math/geometry/path";
 import { Fraction } from "core/math/fraction";
 import { Line, getIntersection } from "core/math/geometry/line";
+import { Overlap } from "core/math/polyBool/overlap/overlap";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { JAnchor, JGadget, JOverlap } from "shared/json";
@@ -118,7 +119,8 @@ export class Gadget implements JGadget {
 
 		// Perform collision tests
 		let s = 0;
-		while(polygonIntersect(c1, c2)) {
+		const path2 = toPath(c2);
+		while(Overlap.$testOverlap(toPath(c1), path2)) {
 			c1 = shift(c1, step);
 			s++;
 		}

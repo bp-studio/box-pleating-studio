@@ -6,6 +6,7 @@ import { same } from "../intersection/rrIntersector";
 import { CreaseType } from "shared/types/cp";
 import { xyComparator } from "shared/types/geometry";
 
+import type { IntersectorConstructor } from "../intersector";
 import type { ISegment } from "../segment/segment";
 import type { CPLine } from "shared/types/cp";
 import type { StartEvent, EndEvent } from "../event";
@@ -28,8 +29,8 @@ import type { PolyBool } from "../polyBool";
 
 export class Clip extends SweepLine {
 
-	constructor() {
-		super(new ClipEventProvider(), ClipIntersector);
+	constructor(Intersector: IntersectorConstructor = ClipIntersector) {
+		super(new ClipEventProvider(), Intersector);
 	}
 
 	/** Process the set of crease pattern lines. */

@@ -52,7 +52,9 @@ const segmentComparator: Comparator<StartEvent> = (a, b) =>
 	// The one with the smaller tangent slope goes first (be aware of floating error)
 	fix(getEventSlope(a) - getEventSlope(b)) ||
 	// Borders go before creases
-	a.$segment.$type - b.$segment.$type;
+	a.$segment.$type - b.$segment.$type ||
+	// The exiting segment goes first (this is for overlap testing)
+	a.$wrapDelta - b.$wrapDelta;
 
 function compareUpDown(a: StartEvent, b: StartEvent): number {
 	const ax = a.$point.x, bx = b.$point.x;
