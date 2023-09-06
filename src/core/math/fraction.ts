@@ -1,3 +1,4 @@
+import { InvalidParameterError } from "./invalidParameterError";
 import { $reduceInt } from "./utils/gcd";
 
 /** floor(sqrt(max_safe_integer / 2)) */
@@ -61,12 +62,10 @@ export class Fraction {
 				this._p = result._p;
 				this._q = result._q;
 			} else {
-				debugger;
-				throw new Error("Parameters are not valid");
+				throw new InvalidParameterError();
 			}
 		} else {
-			debugger;
-			throw new Error("Parameters are not valid");
+			throw new InvalidParameterError();
 		}
 		this._normalize();
 	}
