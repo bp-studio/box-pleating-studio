@@ -115,8 +115,8 @@ namespace WorkspaceService {
 		});
 	}
 
-	export async function close(id: number): Promise<void> {
-		if(await closeCore(id)) selectLast();
+	export async function close(id: number, force?: boolean): Promise<void> {
+		if(await closeCore(id, force)) selectLast();
 	}
 
 	export function selectLast(): void {
@@ -144,10 +144,13 @@ namespace WorkspaceService {
 
 	let confirming: Promise<boolean> = Promise.resolve(true);
 
-	async function closeCore(id: number): Promise<boolean> {
+	/**
+	 * @param force Whether to ignore saving warning and force close the project.
+	 */
+	async function closeCore(id: number, force?: boolean): Promise<boolean> {
 		const proj = bp.projects.get(id)!;
 		const title = proj.design.title || i18n.t("keyword.untitled");
-		if(proj.history.isModified) {
+		if(!force && proj.history.isModified) {
 			const message = i18n.t("message.unsaved", [title]);
 			const confirm = Dialogs.confirm(message);
 			const previous = confirming;
@@ -180,7 +183,7 @@ namespace WorkspaceService {
 	Studio.$onSetupOptions.push(options =>
 		options.onError = async (id: number, error: string) => {
 			await Dialogs.alert(i18n.t("message.fatal", [error]));
-			await close(id);
+			await close(id, true);
 		}
 	);
 
