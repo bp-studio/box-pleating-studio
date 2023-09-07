@@ -1,5 +1,5 @@
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
-import { Sheet } from "../sheet";
+import { Sheet, getRelativePoint } from "../sheet";
 import { Edge } from "./edge";
 import { Vertex } from "./vertex";
 import { shallowRef } from "client/shared/decorators";

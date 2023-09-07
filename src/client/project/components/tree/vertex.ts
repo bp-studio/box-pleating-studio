@@ -7,12 +7,12 @@ import { Label } from "client/utils/label";
 import { Independent } from "client/base/independent";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
-import { $round } from "client/controllers/share";
+import { getRelativePoint } from "../sheet";
 
+import type { IGrid } from "../grid";
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
 import type { LabelView } from "client/utils/label";
-import type { IGrid } from "../grid";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -140,12 +140,8 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 			if(!flap) {
 				this.$isNew = false;
 			} else {
-				const grid = layout.$sheet.grid;
-				const xFactor = grid.$renderWidth / this._sheet.grid.$renderWidth;
-				const yFactor = grid.$renderHeight / this._sheet.grid.$renderHeight;
-				const p: IPoint = $round({ x: this.$location.x * xFactor, y: this.$location.y * yFactor });
-				flap.$sync(grid.$constrain(p));
-				return Promise.resolve();
+				const p = getRelativePoint(this.$location, this._sheet, layout.$sheet);
+				return flap.$sync(p);
 			}
 		}
 		// If we get here, the Core will not be invoked, and we need to flush the history manually.

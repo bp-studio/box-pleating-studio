@@ -216,8 +216,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return this._getDots(this.$location, this._width, this._height);
 	}
 
-	public $sync(p: IPoint): void {
-		this._move(p.x, p.y);
+	public $sync(p: IPoint): Promise<void> {
+		return this._move(p.x, p.y);
 	}
 
 	protected override _move(x: number, y: number): Promise<void> {

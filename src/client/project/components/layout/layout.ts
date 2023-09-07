@@ -4,7 +4,7 @@ import { AlphaFilter } from "@pixi/filter-alpha";
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 import { shallowRef } from "client/shared/decorators";
 import { River } from "./river";
-import { Sheet } from "../sheet";
+import { Sheet, getRelativePoint } from "../sheet";
 import { Layer } from "client/shared/layers";
 import { Junction } from "./junction";
 import ProjectService from "client/services/projectService";
@@ -172,14 +172,9 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._draggingDevice = undefined;
 	}
 
-	public $createFlapPrototype(id: number, p: IPoint): JFlap {
-		return {
-			id,
-			x: p.x,
-			y: p.y,
-			width: 0,
-			height: 0,
-		};
+	public $createFlapPrototype(id: number, vertexLocation: IPoint): JFlap {
+		const { x, y } = getRelativePoint(vertexLocation, this.$project.design.tree.$sheet, this.$sheet);
+		return { id, x, y, width: 0, height: 0 };
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

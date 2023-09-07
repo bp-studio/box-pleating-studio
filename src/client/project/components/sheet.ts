@@ -15,6 +15,7 @@ import { GridType } from "shared/json";
 import { createGrid } from "./grid";
 import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
+import { $round } from "client/controllers/share";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Independent } from "client/base/independent";
@@ -265,4 +266,12 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			this._grid.$drawGrid(this._gridGraphics);
 		}
 	}
+}
+
+export function getRelativePoint(point: IPoint, fromSheet: Sheet, toSheet: Sheet): IPoint {
+	const fromGrid = fromSheet.grid, toGrid = toSheet.grid;
+	const xFactor = toGrid.$renderWidth / fromGrid.$renderWidth;
+	const yFactor = toGrid.$renderHeight / fromGrid.$renderHeight;
+	const p: IPoint = $round({ x: point.x * xFactor, y: point.y * yFactor });
+	return toGrid.$constrain(p);
 }
