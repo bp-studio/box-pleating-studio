@@ -1,6 +1,7 @@
 import { rotate } from "shared/utils/array";
 import { Line } from "./line";
 import { Point } from "./point";
+import { Matrix } from "./matrix";
 
 import type { Vector } from "./vector";
 import type { Path } from "shared/types/geometry";
@@ -18,6 +19,18 @@ export function toPath(path: Point[]): Path {
 /** Convert a path to {@link Line} objects. */
 export function toLines(path: Point[]): Line[] {
 	return path.map((p, i) => new Line(p, path[i + 1] || path[0]));
+}
+
+/**
+ * Given a triangle, let the first vertex stays stationary,
+ * and move the second vertex to the given target while keeping triangle similar.
+ * @returns The third vertex after the moving.
+ */
+export function triangleTransform(triangle: RationalPath, to: Point): Point {
+	const [p1, p2, p3] = triangle;
+	const [v1, v2, v3] = [to, p2, p3].map(p => p.sub(p1));
+	const m = Matrix.$getTransformMatrix(v2, v1);
+	return p1.$add(m.$multiply(v3));
 }
 
 /**

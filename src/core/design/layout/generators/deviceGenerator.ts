@@ -6,9 +6,11 @@ import { Piece } from "../pattern/piece";
 import { Gadget } from "../pattern/gadget";
 import { Direction } from "shared/types/direction";
 
-import type { JDevice, JGadget, JJunctions, JOverlap, JPartition, JPiece } from "shared/json";
+import type { Configuration } from "../configuration";
+import type { JDevice, JGadget, JOverlap, JPartition, JPiece } from "shared/json";
 
-export function* deviceGenerator(data: JPartition, junctions: JJunctions): Generator<JDevice> {
+export function* deviceGenerator(data: JPartition, config: Configuration): Generator<JDevice> {
+	const junctions = config.$junctions;
 	const { overlaps, strategy } = data;
 	if(overlaps.length == 1) {
 		const overlap = overlaps[0];
@@ -28,9 +30,11 @@ export function* deviceGenerator(data: JPartition, junctions: JJunctions): Gener
 				yield { gadgets: [gadget] };
 			}
 		}
-	} else {
-		// TODO
+	} else if(overlaps.length == 2) {
+		const joiner = config.$repo.getJoiner(overlaps);
+		yield* joiner.$simpleJoin(strategy);
 	}
+	//TODO: general case
 }
 
 /** The universal GPS strategy. Guaranteed to find a pattern in a single overlap. */

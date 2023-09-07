@@ -206,6 +206,11 @@ export class Line {
 		return this.$vector.dot(v) == 0;
 	}
 
+	/** Shift by the given {@link Vector} and return a new {@link Line}. */
+	public $shift(v: Vector): Line {
+		return new Line(this.p1.$add(v), this.p2.$add(v));
+	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods

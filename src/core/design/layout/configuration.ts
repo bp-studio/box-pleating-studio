@@ -21,9 +21,14 @@ import type { JConfiguration, JJunctions, JOverlap } from "shared/json";
 export class Configuration implements ISerializable<JConfiguration> {
 
 	public readonly $repo: Repository;
-	public readonly $junctions: JJunctions;
 	public readonly $partitions: readonly Partition[];
 	public readonly $overlaps!: readonly JOverlap[];
+
+	/**
+	 * This typically is the same as {@link Repository.$junctions},
+	 * but can also be a subset of it in special use cases.
+	 */
+	public readonly $junctions: JJunctions;
 
 	/**
 	 * Given the id (a negative number) of a {@link JOverlap},
@@ -37,10 +42,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	public $originDirty: boolean = false;
 
-	constructor(repo: Repository, junctions: JJunctions, config: JConfiguration) {
+	constructor(repo: Repository, config: JConfiguration, junctions?: JJunctions) {
 		this.$repo = repo;
-		this.$junctions = junctions;
-		this.$partitions = config.partitions.map(p => new Partition(this, junctions, p));
+		this.$partitions = config.partitions.map(p => new Partition(this, p));
+		this.$junctions = junctions || repo.$junctions;
 
 		const overlaps: JOverlap[] = [];
 		const overlapMap: Map<number, [number, number]> = new Map();

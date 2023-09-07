@@ -5,9 +5,8 @@ import { ConfigUtil } from "./configUtil";
 import { CornerType, Strategy } from "shared/json";
 import { clone } from "shared/utils/clone";
 
-import type { JJunction, JJunctions, JOverlap } from "shared/json";
+import type { JJunctions } from "shared/json";
 import type { Repository } from "../repository";
-import type { ValidJunction, Junctions } from "../junction/validJunction";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
 
 const MAX_RANK_PER_JOINT = 7;
@@ -33,14 +32,15 @@ export class GeneralConfigGeneratorContext {
 	private readonly _junctions: JJunctions;
 	private readonly _joints: readonly Joint[];
 
-	constructor(repo: Repository, junctions: Junctions) {
+	constructor(repo: Repository) {
 		this._repo = repo;
-		this._junctions = junctions.map(j => j.$toOrientedJSON(repo.$f));
+		this._junctions = repo.$junctions;
 		const junctionMap = new Map<number, number[]>();
 		const configs: Configuration[][] = [];
-		for(const [i, junction] of junctions.entries()) {
-			getOrSetEmptyArray(junctionMap, junction.$q1).push(i);
-			getOrSetEmptyArray(junctionMap, junction.$q2).push(i);
+		for(const [i, junction] of this._junctions.entries()) {
+			const c1 = junction.c[0], c2 = junction.c[2];
+			getOrSetEmptyArray(junctionMap, c1.e! << 2 | c1.q!).push(i);
+			getOrSetEmptyArray(junctionMap, c2.e! << 2 | c2.q!).push(i);
 			configs[i] = [...singleConfigGenerator(repo, junction)];
 		}
 
@@ -129,13 +129,13 @@ export class GeneralConfigGeneratorContext {
 			o1p.shift = { x: 0, y: o2.oy };
 		}
 
-		yield new Configuration(this._repo, junctions, {
+		yield new Configuration(this._repo, {
 			partitions: [
 				{ overlaps: [o1], strategy },
 				{ overlaps: [o2p], strategy },
 			],
 		});
-		yield new Configuration(this._repo, junctions, {
+		yield new Configuration(this._repo, {
 			partitions: [
 				{ overlaps: [o1p], strategy },
 				{ overlaps: [o2], strategy },
@@ -144,13 +144,18 @@ export class GeneralConfigGeneratorContext {
 	}
 
 	private *_searchJoin(junctions: JJunctions, rank: number): Generator<Configuration> {
+		if(junctions.length == 1) debugger;
+		let strategy: Strategy | undefined;
+		if(rank == 0) strategy = Strategy.perfect;
+		else return; // POC
+
 		const overlaps = junctions.map((j, i) => ConfigUtil.$toOverlap(j, i));
 		for(let i = 1; i < overlaps.length; i++) {
 			const [o1, o2] = [overlaps[0], overlaps[i]];
 			ConfigUtil.$joinOverlaps(o1, o2, -1, -(i + 1), o1.c[0].e == o2.c[0].e);
 		}
-		yield new Configuration(this._repo, this._junctions, {
-			partitions: [{ overlaps, strategy: Strategy.perfect }],
+		yield new Configuration(this._repo, {
+			partitions: [{ overlaps, strategy }],
 		});
 	}
 }

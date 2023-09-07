@@ -6,10 +6,11 @@ import { Quadrant, quadrantComparator } from "./pattern/quadrant";
 import { SlashDirection, makePerQuadrant, quadrantNumber } from "shared/types/direction";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { NodeSet } from "./nodeSet";
+import { Joiner } from "./joiner/joiner";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Pattern } from "./pattern/pattern";
-import type { JQuadrilateral, JRepository, JStretch } from "shared/json";
+import type { JJunctions, JOverlap, JQuadrilateral, JRepository, JStretch } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction, Junctions, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
@@ -40,6 +41,8 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** List {@link Quadrant}s by {@link QuadrantDirection} and sorted in tracing ordering. */
 	public readonly $directionalQuadrants: PerQuadrant<Quadrant[]>;
 
+	public readonly $junctions: JJunctions;
+
 	/**
 	 * The reference point of the stretch,
 	 * which is the {@link ValidJunction.$tip} of the first junction.
@@ -53,6 +56,8 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	public $nodeSet: NodeSet;
 
 	private readonly _configurations: Store<Configuration>;
+
+	private readonly _joinerCache: Map<string, Joiner> = new Map();
 
 	/** The current index of {@link Configuration}. */
 	private _index: number = 0;
@@ -71,7 +76,8 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		State.$newRepositories.add(this);
 		State.$repoToProcess.add(this);
 
-		this._configurations = new Store(configGenerator(this, junctions, prototype));
+		this.$junctions = junctions.map(j => j.$toOrientedJSON(this.$f));
+		this._configurations = new Store(configGenerator(this, prototype));
 		if(prototype?.repo) {
 			this._configurations.$rest();
 			this._index = prototype.repo.index;
@@ -142,6 +148,14 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		const n2 = r2.c[q].e!;
 		const n3 = r1.c[2 - q].e!;
 		return this.$nodeSet.$distTriple(n1, n2, n3).d3;
+	}
+
+	/** Create (or reuse) a {@link Joiner} by the {@link JOverlap}s. */
+	public getJoiner(overlaps: readonly JOverlap[]): Joiner {
+		const key = JSON.stringify(overlaps);
+		let j = this._joinerCache.get(key);
+		if(!j) this._joinerCache.set(key, j = new Joiner(overlaps, this));
+		return j;
 	}
 }
 

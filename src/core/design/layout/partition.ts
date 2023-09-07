@@ -45,10 +45,10 @@ export class Partition implements ISerializable<JPartition> {
 	 */
 	public readonly $devices: Store<JDevice>;
 
-	constructor(config: Configuration, junctions: JJunctions, data: JPartition) {
+	constructor(config: Configuration, data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
-		this.$devices = new Store(deviceGenerator(data, junctions));
+		this.$devices = new Store(deviceGenerator(data, config));
 
 		// Gather all corners
 		const map: CornerMap[] = [];

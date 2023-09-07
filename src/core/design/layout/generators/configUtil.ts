@@ -66,12 +66,12 @@ export namespace ConfigUtil {
 	}
 
 	/** Convert a {@link JJunction} to a {@link JOverlap}. */
-	export function $toOverlap(j: JJunction, index: number): JOverlap {
+	export function $toOverlap(j: JJunction, parentIndex: number): JOverlap {
 		return {
 			c: clone(j.c),
 			ox: j.ox,
 			oy: j.oy,
-			parent: index,
+			parent: parentIndex,
 		};
 	}
 }

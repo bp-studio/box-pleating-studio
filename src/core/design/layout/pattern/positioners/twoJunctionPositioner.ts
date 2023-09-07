@@ -11,10 +11,20 @@ import type { Gadget } from "../gadget";
  */
 //=================================================================
 export function twoJunctionPositioner(context: PositioningContext): boolean {
-
+	if(context.devices.length == 1) return makeSingeJoinDevicePattern(context);
 	if(context.devices.length == 2) return makeTwoDeviceRelayPattern(context);
-
 	return false;
+}
+
+function makeSingeJoinDevicePattern(context: PositioningContext): boolean {
+	const [o1, o2] = context.devices[0].$partition.$overlaps;
+	const [j1, j2] = [o1, o2].map(o => context.junctions[o.parent]);
+	const oriented = j1.c[0].e == j2.c[0].e;
+	const device = context.devices[0];
+	const gadgets = device.$gadgets;
+	if(gadgets[0].sx > j1.sx || gadgets[1].sx > j2.sx) return false;
+	if(!oriented) device.$offset = j1.sx - gadgets[0].sx;
+	return true;
 }
 
 /**

@@ -5,6 +5,7 @@ import { Line } from "core/math/geometry/line";
 import { cache, clearCache } from "core/utils/cache";
 import { nonEnumerable } from "shared/utils/nonEnumerable";
 import { toLines } from "core/math/geometry/rationalPath";
+import { clone } from "shared/utils/clone";
 
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
@@ -75,6 +76,35 @@ export class Piece extends Region implements JPiece {
 		this.u /= by;
 		this.v /= by;
 		return this;
+	}
+
+	/**
+	 * Add a {@link Piece.detour}. Resets all cached values.
+	 *
+	 * The added detour will be cloned.
+	 * Its coordinates should not incorporate the offset.
+	 */
+	public $addDetour(detour: IPoint[]): void {
+		detour = clone(detour);
+		// Precondition check
+		for(let i = 0; i < detour.length - 1; i++) {
+			if(detour[i].x == detour[i + 1].x && detour[i].y == detour[i + 1].y) {
+				detour.splice(i--, 1);
+			}
+		}
+		if(detour.length == 1) return;
+
+		// Add the detour for real
+		this.detours = this.detours || [];
+		this.detours.push(detour);
+		clearCache(this);
+	}
+
+	public $clearDetour(): void {
+		if(this.detours?.length) {
+			this.detours = undefined;
+			clearCache(this);
+		}
 	}
 
 

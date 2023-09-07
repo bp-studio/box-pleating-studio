@@ -2,21 +2,19 @@ import { GeneratorUtil } from "core/utils/generator";
 import { createConfigFilter } from "./filters";
 import { GeneralConfigGeneratorContext } from "./generalConfigGeneratorContext";
 
+import type { JJunctions } from "shared/json";
 import type { Repository } from "../repository";
 import type { Configuration } from "../configuration";
-import type { ValidJunction, Junctions } from "../junction/validJunction";
 
 //=================================================================
 /**
  * {@link generalConfigGenerator} is a {@link Configuration} {@link Generator}
- * that works for multiple {@link ValidJunction}s in general.
+ * that works for multiple {@link JJunction}s in general.
  */
 //=================================================================
-export function* generalConfigGenerator(
-	repo: Repository, junctions: Junctions, protoSignature?: string
-): Generator<Configuration> {
+export function* generalConfigGenerator(repo: Repository, protoSignature?: string): Generator<Configuration> {
 	// First find all possible configurations for each Junction
-	const context = new GeneralConfigGeneratorContext(repo, junctions);
+	const context = new GeneralConfigGeneratorContext(repo);
 	if(!context.$valid) return;
 
 	const generators: Generator<Configuration>[] = [];
