@@ -35,7 +35,7 @@ export class GeneralConfigGeneratorContext {
 
 	constructor(repo: Repository, junctions: Junctions) {
 		this._repo = repo;
-		this._junctions = junctions.map(j => j.toJSON());
+		this._junctions = junctions.map(j => j.$toOrientedJSON(repo.$f));
 		const junctionMap = new Map<number, number[]>();
 		const configs: Configuration[][] = [];
 		for(const [i, junction] of junctions.entries()) {

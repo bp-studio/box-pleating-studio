@@ -135,6 +135,16 @@ export class ValidJunction implements ISerializable<JJunction> {
 		const y = this.$tip.y + distanceToA * this.$f.y;
 		return new Rectangle({ x, y }, { x: x - this.$o.x * this.$f.x, y: y - this.$o.y * this.$f.y });
 	}
+
+	/** Create a {@link JJunction} matching the given transformation. */
+	public $toOrientedJSON(f: ISignPoint): JJunction {
+		const result = this.toJSON();
+		if(result.f.x !== f.x) {
+			result.f = f;
+			[result.c[0], result.c[2]] = [result.c[2], result.c[0]];
+		}
+		return result;
+	}
 }
 
 export function getStructureSignature(junctions: Junctions): string {
