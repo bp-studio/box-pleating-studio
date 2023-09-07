@@ -99,8 +99,9 @@ export namespace LayoutController {
 	function addPolygon(set: CPLine[], polygon: Polygon, type: CreaseType): void {
 		if(!polygon) return;
 		for(const path of polygon) {
-			for(let i = 0; i < path.length; i++) {
-				const p1 = path[i], p2 = path[(i + 1) % path.length];
+			const l = path.length;
+			for(let i = 0; i < l; i++) {
+				const p1 = path[i], p2 = path[i + 1] || path[0];
 				set.push([type, p1.x, p1.y, p2.x, p2.y]);
 			}
 		}

@@ -4,6 +4,7 @@ import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
 import { cache, clearCache } from "core/utils/cache";
 import { nonEnumerable } from "shared/utils/nonEnumerable";
+import { toLines } from "core/math/geometry/rationalPath";
 
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
@@ -99,7 +100,7 @@ export class Piece extends Region implements JPiece {
 
 	@cache public get $shape(): IRegionShape {
 		const contour = this._points.concat();
-		const ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
+		const ridges = toLines(contour);
 		(this.detours || []).forEach(d => this._processDetour(ridges, contour, d));
 		return { contour, ridges };
 	}

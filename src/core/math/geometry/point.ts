@@ -23,7 +23,8 @@ export class Point extends Couple implements IPoint {
 	constructor(p: IPoint);
 	constructor(x: Rational, y: Rational);
 	constructor(...p: [Couple | IPoint] | [Rational, Rational]) {
-		if(p.length == 1) super(p[0].x, p[0].y);
+		if(p[0] instanceof Couple) super(p[0]._x, p[0]._y);
+		else if(p.length == 1) super(p[0].x, p[0].y);
 		else super(...p);
 	}
 

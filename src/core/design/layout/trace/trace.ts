@@ -4,7 +4,6 @@ import { pathToString } from "core/math/geometry/path";
 import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";
 import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
-import { InvalidParameterError } from "core/math/invalidParameterError";
 
 import type { Quadrant } from "../pattern/quadrant";
 import type { Point } from "core/math/geometry/point";
@@ -62,19 +61,11 @@ export class Trace {
 			if(!intersection) break;
 
 			ridges.delete(intersection.line);
-			try {
-				cursor = {
-					last: intersection.line.$vector,
-					point: intersection.point,
-					vector: intersection.line.$reflect(cursor.vector),
-				};
-			} catch(e) {
-				// In some invalid layout, there could be patterns that leads to Fraction overflows.
-				// We catch the error here.
-				// TODO: investigate more into this.
-				if(e instanceof InvalidParameterError) break;
-				throw e;
-			}
+			cursor = {
+				last: intersection.line.$vector,
+				point: intersection.point,
+				vector: intersection.line.$reflect(cursor.vector),
+			};
 
 			const lastPoint = path[path.length - 1];
 			if(!lastPoint.eq(cursor.point)) {

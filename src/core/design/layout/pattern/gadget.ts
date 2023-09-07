@@ -3,10 +3,10 @@ import { Point } from "core/math/geometry/point";
 import { makePerQuadrant } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
 import { cache } from "core/utils/cache";
-import { join, shift, toPath } from "core/math/geometry/path";
 import { Fraction } from "core/math/fraction";
-import { Line, getIntersection } from "core/math/geometry/line";
+import { getIntersection } from "core/math/geometry/line";
 import { Overlap } from "core/math/polyBool/overlap/overlap";
+import { join, shift, toLines, toPath } from "core/math/geometry/rationalPath";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { JAnchor, JGadget, JOverlap } from "shared/json";
@@ -130,7 +130,7 @@ export class Gadget implements JGadget {
 
 	/** If the current {@link Gadget} contains the given ray. */
 	public $intersects(p: Point, v: Vector): boolean {
-		const test = this.$contour.map((c, i, a) => new Line(c, a[(i + 1) % a.length]));
+		const test = toLines(this.$contour);
 		return test.some(l => getIntersection(l, p, v, true));
 	}
 

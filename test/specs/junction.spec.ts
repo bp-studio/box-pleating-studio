@@ -4,7 +4,6 @@ import { Tree } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
-import { RepoNodeSet } from "core/design/layout/repoNodeSet";
 
 import type { Stretch } from "core/design/layout/stretch";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";

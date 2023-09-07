@@ -1,16 +1,16 @@
 import type { Path } from "shared/types/geometry";
 
 export function windingNumber(point: IPoint, path: Path): number {
-	let wn = 0;
+	let result = 0;
 	for(let i = 0, j = path.length - 1; i < path.length; j = i++) {
 		const pi = path[i], pj = path[j];
 		if(pj.y <= point.y) {
-			if(pi.y > point.y && isLeft(pj, pi, point) > 0) wn++;
+			if(pi.y > point.y && isLeft(pj, pi, point) > 0) result++;
 		} else {
-			if(pi.y <= point.y && isLeft(pj, pi, point) < 0) wn--;
+			if(pi.y <= point.y && isLeft(pj, pi, point) < 0) result--;
 		}
 	}
-	return wn;
+	return result;
 }
 
 function isLeft(p0: IPoint, p1: IPoint, p2: IPoint): number {

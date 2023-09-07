@@ -1,7 +1,7 @@
 import { AAUnion } from "./union/aaUnion";
 import { ExChainer } from "./chainer/exChainer";
 import { windingNumber } from "../geometry/winding";
-import { mapDirections } from "../geometry/path";
+import { deduplicate, mapDirections } from "../geometry/path";
 
 import type { RoughContour } from "core/design/context";
 import type { Path, PathEx, Polygon } from "shared/types/geometry";
@@ -96,11 +96,11 @@ function expandPath(path: PathEx, units: number): PathEx {
 	const l = path.length;
 	const result: PathEx = [];
 	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
-	for(let i = 0; i < l; i++) {
+	for(let i = 0, j = l - 1; i < l; j = i++) {
 		// Decide the direction of shifting.
 		// Here we assume that the polygon is non-degenerated.
 		const p = path[i];
-		const p1 = path[(i + l - 1) % l], p2 = path[(i + 1) % l];
+		const p1 = path[j], p2 = path[i + 1] || path[0];
 		const dx = Math.sign(p2.y - p1.y) * units;
 		const dy = Math.sign(p1.x - p2.x) * units;
 		if(p.x < minX) {
@@ -133,20 +133,18 @@ function span(path: Path): number {
 function simplify(path: PathEx): PathEx {
 	// First we need to remove duplicate vertices,
 	// or the next step won't work correctly.
-	let l = path.length;
-	const deduplicate = path.filter((p, i, a) => {
-		const prev = a[(i + l - 1) % l];
-		return prev.x != p.x || prev.y != p.y;
-	});
+	const deduplicated = deduplicate(path);
 
 	// Then we can check the turning condition.
-	l = deduplicate.length;
-	const result: PathEx = deduplicate.filter((p, i, a) => {
-		const prev = a[(i + l - 1) % l];
-		const next = a[(i + 1) % l];
+	const l = deduplicated.length;
+	deduplicated.push(deduplicated[0]);
+	const result: PathEx = [];
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const prev = deduplicated[j];
+		const next = deduplicated[i + 1];
 		const dx = next.x - prev.x, dy = next.y - prev.y;
-		return dx != 0 && dy != 0;
-	});
+		if(dx != 0 && dy != 0) result.push(deduplicated[i]);
+	}
 	result.from = path.from;
 	return result;
 }

@@ -1,8 +1,8 @@
 import { Region } from "./region";
 import { cache } from "core/utils/cache";
 import { Vector } from "core/math/geometry/vector";
-import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
+import { toLines } from "core/math/geometry/rationalPath";
 
 import type { IRegionShape } from "./region";
 import type { JAddOn } from "shared/json";
@@ -27,7 +27,7 @@ export class AddOn extends Region implements JAddOn {
 
 	@cache public get $shape(): IRegionShape {
 		const contour = this.contour.map(p => new Point(p));
-		const ridges = contour.map((p, i, c) => new Line(p, c[(i + 1) % c.length]));
+		const ridges = toLines(contour);
 		return { contour, ridges };
 	}
 

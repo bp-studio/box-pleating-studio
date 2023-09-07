@@ -9,7 +9,7 @@ import type { CornerMap } from "./partition";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
-import type { JConfiguration, JJunction, JJunctions, JOverlap } from "shared/json";
+import type { JConfiguration, JJunctions, JOverlap } from "shared/json";
 
 //=================================================================
 /**
@@ -67,8 +67,8 @@ export class Configuration implements ISerializable<JConfiguration> {
 	public toJSON(session: true): Required<JConfiguration>;
 	public toJSON(session?: true): JConfiguration {
 		return {
-			partitions: this.$partitions.map(p => p.toJSON()),
-			patterns: session && this._patterns.$entries.map(p => p.toJSON()),
+			partitions: this.$partitions.map(partition => partition.toJSON()),
+			patterns: session && this._patterns.$entries.map(pattern => pattern.toJSON()),
 			index: session && this._index,
 		};
 	}

@@ -148,5 +148,6 @@ export class ValidJunction implements ISerializable<JJunction> {
 }
 
 export function getStructureSignature(junctions: Junctions): string {
-	return JSON.stringify(junctions.map(j => j.toJSON()));
+	// Orientation doesn't matter here.
+	return JSON.stringify(junctions.map(junction => junction.toJSON()));
 }

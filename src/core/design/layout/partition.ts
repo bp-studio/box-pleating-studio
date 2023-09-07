@@ -5,6 +5,7 @@ import { Direction, opposite } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { State } from "core/service/state";
 import { deviceGenerator } from "./generators/deviceGenerator";
+import { rotate } from "shared/utils/array";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -229,6 +230,7 @@ export class Partition implements ISerializable<JPartition> {
 		return result;
 	}
 
+	// TODO: do we still need this?
 	/**
 	 * Obtain the original {@link JJunction} (transformed if needed) corresponding to the give {@link JOverlap}.
 	 *
@@ -240,7 +242,7 @@ export class Partition implements ISerializable<JPartition> {
 		let parent = this.$configuration.$junctions[ov.parent];
 		if(parent.f.x != this.$configuration.$repo.$f.x) {
 			parent = clone(parent);
-			parent.c.push(...parent.c.splice(0, 2));
+			rotate(parent.c, 2);
 		}
 		return parent;
 	}

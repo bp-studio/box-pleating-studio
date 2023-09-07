@@ -68,9 +68,9 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		// Output the tree by BFS
 		while(queue.length) {
 			const node = queue.shift()!;
-			for(const child of node.$children) {
-				result.push(child.toJSON());
-				if(!child.$isLeaf) queue.push(child);
+			for(const childNode of node.$children) {
+				result.push(childNode.toJSON());
+				if(!childNode.$isLeaf) queue.push(childNode);
 			}
 		}
 		return result;

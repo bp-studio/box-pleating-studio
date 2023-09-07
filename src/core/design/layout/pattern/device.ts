@@ -8,7 +8,7 @@ import { Vector } from "core/math/geometry/vector";
 import { clone } from "shared/utils/clone";
 import { MASK } from "../junction/validJunction";
 import { opposite } from "shared/types/direction";
-import { toPath } from "core/math/geometry/path";
+import { toPath } from "core/math/geometry/rationalPath";
 
 import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerMap, Partition } from "../partition";

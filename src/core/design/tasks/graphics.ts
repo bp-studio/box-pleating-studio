@@ -4,9 +4,9 @@ import { toCorners } from "../context/aabb/aabb";
 import { same } from "shared/types/geometry";
 import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
-import { clone } from "shared/utils/clone";
 import { Line } from "core/math/geometry/line";
-import { toPath } from "core/math/geometry/path";
+import { deduplicate } from "core/math/geometry/path";
+import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
@@ -14,6 +14,12 @@ import type { Contour, ILine, Path, PathEx } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode, PatternContour } from "../context";
 import type { expand } from "core/math/polyBool/expansion";
+
+interface RationalContour {
+	outer: Point[];
+	inner?: Point[][];
+	isHole?: boolean;
+}
 
 //=================================================================
 /**
@@ -75,20 +81,16 @@ function combineContour(node: ITreeNode): void {
 		const contours = child.$graphics.$patternContours.filter(p => p.$ids.includes(node.id));
 		childrenPatternContours.push(...contours);
 	}
-	const result: Contour[] = g.$roughContours.map(c => clone(c));
+	const result: RationalContour[] = g.$roughContours.map(toRationalContour);
 
 	// To temporarily disable pattern contour, comment the following two lines.
 	for(const path of g.$patternContours) tryInsert(result[path.$for].outer, path);
 	for(const contour of childrenPatternContours) tryInsertInner(contour, result);
 
-	for(const contour of result) {
-		contour.outer = simplify(contour.outer);
-		if(contour.inner) contour.inner = contour.inner.map(simplify);
-	}
-	g.$contours = result;
+	g.$contours = result.map(toContour);
 }
 
-function tryInsertInner(path: PatternContour, result: Contour[]): void {
+function tryInsertInner(path: PatternContour, result: RationalContour[]): void {
 	for(const contour of result) {
 		if(!contour.inner) continue;
 		for(const inner of contour.inner) {
@@ -97,13 +99,13 @@ function tryInsertInner(path: PatternContour, result: Contour[]): void {
 	}
 }
 
-function tryInsert(path: Path, insert: PatternContour): boolean {
+function tryInsert(path: Point[], insert: PatternContour): boolean {
 	const l = path.length;
 	const first = insert[0];
 	const last = insert[insert.length - 1];
 	let start: number | undefined, end: number | undefined;
 	for(let i = 0; i < l; i++) {
-		const line = Line.$fromIPoint(path[i], path[(i + 1) % l]);
+		const line = new Line(path[i], path[i + 1] || path[0]);
 		if(start === undefined && (line.$contains(first) || line.p1.eq(first))) {
 			start = i + 1;
 		}
@@ -111,13 +113,12 @@ function tryInsert(path: Path, insert: PatternContour): boolean {
 			end = i + 1;
 		}
 		if(start !== undefined && end !== undefined && start != end) {
-			const slice = toPath(insert);
 			if(end > start) {
-				path.splice(start, end - start, ...slice);
+				path.splice(start, end - start, ...insert);
 			} else {
 				path.splice(start);
 				path.splice(0, end);
-				path.push(...slice);
+				path.push(...insert);
 			}
 			return true;
 		}
@@ -130,7 +131,7 @@ function flapRidge(node: ITreeNode): ILine[] {
 	const c = node.$AABB.$toPath();
 	const ridges: ILine[] = [];
 	for(let i = 0; i < quadrantNumber; i++) {
-		const p1 = p[i], p2 = p[(i + 1) % quadrantNumber], c1 = c[i];
+		const p1 = p[i], p2 = p[i + 1] || p[0], c1 = c[i];
 		if(!same(p1, p2)) ridges.push([p1, p2]);
 
 		// Skip quadrants with patterns.
@@ -206,10 +207,10 @@ function tryAddRemainingRidge(p1: IPoint, p: IPoint, sideCorners: Point[], ridge
  */
 function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 	const l = path.length;
-	for(let i = 0; i < l; i++) {
-		const p0 = path[(i + l - 1) % l];
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const p0 = path[j];
 		const p1 = path[i];
-		const p2 = path[(i + 1) % l];
+		const p2 = path[i + 1] || path[0];
 
 		// Check for right angle.
 		const dot = (p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
@@ -217,8 +218,22 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 	}
 }
 
-function simplify(path: PathEx): PathEx {
-	const result: PathEx = path.filter((p, i, a) => !same(p, a[(i + 1) % a.length]));
-	result.isHole = path.isHole;
-	return result;
+function simplify(path: Point[]): Path {
+	return deduplicate(toPath(path));
+}
+
+function toRationalContour(contour: Contour): RationalContour {
+	return {
+		outer: toRationalPath(contour.outer),
+		inner: contour.inner?.map(toRationalPath),
+		isHole: contour.isHole,
+	};
+}
+
+function toContour(contour: RationalContour): Contour {
+	return {
+		outer: simplify(contour.outer),
+		inner: contour.inner?.map(simplify),
+		isHole: contour.isHole,
+	};
 }

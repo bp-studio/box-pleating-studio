@@ -52,16 +52,16 @@ export class Pattern implements ISerializable<JPattern> {
 
 	public toJSON(): JPattern {
 		return {
-			devices: this.$devices.map(d => d.toJSON()),
+			devices: this.$devices.map(device => device.toJSON()),
 		};
 	}
 
 	public get $signature(): string {
-		const devices = this.$devices.map(d => {
-			const json = d.toJSON();
+		const devices = this.$devices.map(device => {
+			const json = device.toJSON();
 			json.gadgets.forEach(g => Gadget.$simplify(g));
 			delete json.offset;
-			return d;
+			return device;
 		});
 		return JSON.stringify(devices);
 	}

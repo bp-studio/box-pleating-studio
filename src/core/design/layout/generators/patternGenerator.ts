@@ -24,7 +24,7 @@ export function* patternGenerator(config: Configuration, proto?: JConfiguration)
 
 		const pattern = new Pattern(config, proto.patterns[0].devices, true);
 		if(pattern.$valid) {
-			const devices = pattern.$devices.map(d => d.toJSON());
+			const devices = pattern.$devices.map(device => device.toJSON());
 			protoSignature = Device.$getSignature(devices);
 			yield pattern;
 		}

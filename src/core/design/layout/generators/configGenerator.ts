@@ -12,7 +12,7 @@ export function* configGenerator(
 
 	let protoSignature: string | undefined;
 	if(prototype) {
-		const jJunctions = junctions.map(j => j.toJSON());
+		const jJunctions = junctions.map(j => j.$toOrientedJSON(repo.$f));
 
 		// Recover entire set of configurations
 		if(prototype.repo) {
