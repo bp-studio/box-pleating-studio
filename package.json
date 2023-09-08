@@ -26,7 +26,7 @@
 		"@fal-works/esbuild-plugin-global-externals": "^2.1.2",
 		"@intlify/vue-i18n-extensions": "^5.0.1",
 		"@makeomatic/gulp-wrap-js": "^1.0.2",
-		"@swc/core": "^1.3.82",
+		"@swc/core": "^1.3.83",
 		"@types/bootstrap": "^5.2.6",
 		"@types/chai": "^4.3.6",
 		"@types/gtag.js": "^0.0.13",
