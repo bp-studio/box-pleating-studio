@@ -117,7 +117,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 			const device = this._devices.pop()!;
 			this.$layout.$sheet.$removeChild(device);
 			this.$removeChild(device);
-			device.$dispose();
+			device.$destruct();
 		}
 		for(let i = 0; i < deviceCount; i++) {
 			const device = this._devices[i];

@@ -115,7 +115,7 @@ export namespace ProjectController {
 	 */
 	export function close(proj: Project): void {
 		if(DEBUG_ENABLED) console.time("Close project");
-		proj.$dispose(); // Disposing must go first
+		proj.$destruct(); // Disposing must go first
 		if(current.value == proj) current.value = null;
 		projectMap.delete(proj.id);
 		if(projectMap.size == 0) __worker = new Worker(__worker_src);

@@ -100,7 +100,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
 
-		this._onDispose(() => {
+		this._onDestruct(() => {
 			this.$horizontalMargin.effect.stop();
 			this.$imageDimension.effect.stop();
 			this._grid = null!; // GC

@@ -321,7 +321,7 @@ export class Tree implements ISerializable<JTree> {
 		const vertex = this.$vertices[id]!;
 		const memento = vertex.$toMemento();
 		this.$sheet.$removeChild(vertex);
-		vertex.$dispose();
+		vertex.$destruct();
 		this._skippedIdHeap.$insert(id);
 		delete this.$vertices[id];
 		this.$project.history.$destruct(memento);
@@ -345,7 +345,7 @@ export class Tree implements ISerializable<JTree> {
 		if(v2) v2.$degree--;
 		const edge = this.$edges.get(e.n1, e.n2)!;
 		this.$sheet.$removeChild(edge);
-		edge.$dispose();
+		edge.$destruct();
 		this.$edges.delete(e.n1, e.n2);
 	}
 }

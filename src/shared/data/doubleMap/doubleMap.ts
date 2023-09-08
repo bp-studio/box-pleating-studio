@@ -54,10 +54,6 @@ export class DoubleMap<K, V> implements IDoubleMap<K, V> {
 		this._size = 0;
 	}
 
-	public $dispose(): void {
-		this._map.clear();
-	}
-
 	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: this = this): void {
 		for(const [k1, k2, v] of this.entries()) {
 			callbackfn.apply(thisArg, [v, k1, k2, this]);

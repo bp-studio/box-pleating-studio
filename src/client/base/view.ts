@@ -21,7 +21,7 @@ export abstract class View extends Mountable {
 	constructor(active: boolean = true) {
 		super(active);
 
-		this._onDispose(() => {
+		this._onDestruct(() => {
 			this._drawScope?.stop();
 			this._rootContainers.forEach(view => view.destroy({ children: true }));
 		});
@@ -41,7 +41,7 @@ export abstract class View extends Mountable {
 	 * Add a top-level object.
 	 * The implementation here assumes that the method is called only once for the same object.
 	 *
-	 * All top-level objects gets disposed as the {@link View} disposes.
+	 * All top-level objects gets destructed as the {@link View} destructs.
 	 */
 	protected $addRootObject<T extends Container>(object: T, target?: Container): T {
 		this._rootContainers.push(object);

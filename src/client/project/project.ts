@@ -68,7 +68,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this._worker = worker;
 		this.$core = this._createCoreProxy();
 
-		this._onDispose(() => this._worker.terminate());
+		this._onDestruct(() => this._worker.terminate());
 	}
 
 	/** Initialization. */

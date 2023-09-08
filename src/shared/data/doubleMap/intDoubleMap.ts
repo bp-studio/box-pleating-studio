@@ -96,10 +96,6 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		this._size = 0;
 	}
 
-	public $dispose(): void {
-		this.clear();
-	}
-
 	public forEach(callbackfn: DoubleMapCallback<number, V>, thisArg: this = this): void {
 		for(const [k1, k2, v] of this.entries()) {
 			callbackfn.apply(thisArg, [v, k1, k2, this]);

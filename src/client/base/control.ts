@@ -52,7 +52,7 @@ export abstract class Control extends View implements ITagObject {
 		this.$project = sheet.$project;
 
 		sheet.$controls.add(this);
-		this._onDispose(() => sheet.$controls.delete(this));
+		this._onDestruct(() => sheet.$controls.delete(this));
 	}
 
 	/**

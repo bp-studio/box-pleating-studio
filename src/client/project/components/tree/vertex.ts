@@ -96,7 +96,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public get isDeletable(): boolean {
-		return !this.$disposed && !this._tree.isMinimal && this.$degree <= 2;
+		return !this.$destructed && !this._tree.isMinimal && this.$degree <= 2;
 	}
 
 	public delete(): void {

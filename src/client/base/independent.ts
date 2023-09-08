@@ -20,7 +20,7 @@ export abstract class Independent extends Draggable {
 		this._sheet = sheet;
 
 		sheet.$independents.add(this);
-		this._onDispose(() => sheet.$independents.delete(this));
+		this._onDestruct(() => sheet.$independents.delete(this));
 	}
 
 	/** Test whether the given grid contains this object. */

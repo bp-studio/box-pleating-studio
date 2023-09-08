@@ -92,10 +92,10 @@ export class FlapContainer {
 		const tree = design.tree;
 		for(const f of this._flaps.values()) {
 			const vertex = tree.$vertices[f.id];
-			const edgeDisposed = !f.$edge.$v1; // The original flap is split
-			if(!vertex || !vertex.isLeaf || edgeDisposed) {
+			const edgeDestructed = !f.$edge.$v1; // The original flap is split
+			if(!vertex || !vertex.isLeaf || edgeDestructed) {
 				if(vertex) {
-					if(edgeDisposed) {
+					if(edgeDestructed) {
 						prototype.layout.flaps.push(f.toJSON());
 						model.graphics["f" + f.id] ||= f.$graphics;
 					} else {
@@ -112,7 +112,7 @@ export class FlapContainer {
 		const flap = this._flaps.get(id)!;
 		const memento = flap.$toMemento();
 		this._layout.$sheet.$removeChild(flap);
-		flap.$dispose();
+		flap.$destruct();
 		this._flaps.delete(id);
 		this._layout.$project.history.$destruct(memento);
 	}

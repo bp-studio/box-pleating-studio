@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
-import { Disposable } from "./disposable";
+import { Destructible } from "./destructible";
 
-import type { DisposableEventMap } from "./disposable";
+import type { DestructibleEventMap } from "./destructible";
 
 //=================================================================
 /**
@@ -14,7 +14,7 @@ import type { DisposableEventMap } from "./disposable";
  * they will not establish control items or draw on the screen.
  */
 //=================================================================
-export abstract class Mountable extends Disposable {
+export abstract class Mountable extends Destructible {
 
 	private readonly _children: Mountable[] = [];
 
@@ -34,12 +34,12 @@ export abstract class Mountable extends Disposable {
 		this._mounted = this.$mounted;
 
 		/**
-		 * {@link Mountable} will dispose all children on disposing,
-		 * so there's no need to call disposing separately.
+		 * {@link Mountable} will destruct all children on destructing,
+		 * so there's no need to call destructing separately.
 		 */
-		this._onDispose(() => {
+		this._onDestruct(() => {
 			for(const child of this._children) {
-				child.$dispose();
+				child.$destruct();
 			}
 			this.removeEventListener(MOUNTED, handler);
 		});
@@ -57,7 +57,7 @@ export abstract class Mountable extends Disposable {
 		return this._active;
 	}
 
-	/** Add child objects; the significance of child objects is that they will be disposed together. */
+	/** Add child objects; the significance of child objects is that they will be destructed together. */
 	public $addChild(child: Mountable): void {
 		child._parentIsNullOrMounted = this.$mounted;
 		child._updateMountedState();
@@ -82,7 +82,7 @@ export abstract class Mountable extends Disposable {
 	 * This action does not change the relatively active state of child objects.
 	 */
 	public $toggle(active: boolean): void {
-		if(this.$disposed || this._active == active) return;
+		if(this.$destructed || this._active == active) return;
 
 		this.dispatchEvent(new StateChangedEvent(ACTIVE, active));
 		this._active = active;
@@ -90,7 +90,7 @@ export abstract class Mountable extends Disposable {
 	}
 
 	private _updateMountedState(): void {
-		if(this.$disposed) return;
+		if(this.$destructed) return;
 		const mounted = this.$mounted;
 		if(this._mounted == mounted) return;
 		this.dispatchEvent(new StateChangedEvent(MOUNTED, mounted));
@@ -98,7 +98,7 @@ export abstract class Mountable extends Disposable {
 	}
 }
 
-export interface Mountable extends Disposable {
+export interface Mountable extends Destructible {
 	addEventListener<T extends keyof MountableEventMap>(
 		type: T,
 		callback: Consumer<MountableEventMap[T]>,
@@ -115,7 +115,7 @@ export const MOUNTED = "stateChanged:mounted";
  */
 export const ACTIVE = "stateChanged:active";
 
-interface MountableEventMap extends DisposableEventMap {
+interface MountableEventMap extends DestructibleEventMap {
 	[MOUNTED]: StateChangedEvent;
 	[ACTIVE]: StateChangedEvent;
 }

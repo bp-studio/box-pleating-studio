@@ -33,7 +33,6 @@ export interface IDoubleMap<K, V> extends ReadonlyDoubleMap<K, V> {
 	delete(key: K): boolean;
 	delete(key1: K, key2: K): boolean;
 	clear(): void;
-	$dispose(): void;
 }
 
 //=================================================================

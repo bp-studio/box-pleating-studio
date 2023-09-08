@@ -204,7 +204,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	private _removeRiver(river: River): void {
 		this.$sheet.$removeChild(river);
 		this.$rivers.delete(river.$edge.$v1.id, river.$edge.$v2.id);
-		river.$dispose();
+		river.$destruct();
 	}
 
 	private _updateStretches(model: UpdateModel): void {
@@ -227,7 +227,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 			this.$project.history.$destruct(stretch.$toMemento());
 			this.$stretches.delete(tag);
 			this.$sheet.$removeChild(stretch);
-			stretch.$dispose();
+			stretch.$destruct();
 		}
 	}
 
