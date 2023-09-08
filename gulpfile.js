@@ -63,6 +63,12 @@ gulp.task("deployDev", gulp.series(
 	"uploadDev"
 ));
 
+gulp.task("deployQa", gulp.series(
+	"buildDist",
+	"update",
+	"uploadQa"
+));
+
 gulp.task("deployPub", () => seriesIf(
 	async () => {
 		const inquirer = (await import("inquirer")).default;
