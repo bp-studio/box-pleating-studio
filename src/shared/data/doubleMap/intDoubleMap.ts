@@ -14,12 +14,13 @@ export const MAX = (1 << SHIFT) - 1;
  *
  * Here we use bit operations to improve performance,
  * with the price of maximal index being only {@link MAX} = `2 ** 16 - 1` = 65535.
- * In practice with is quite sufficient. In the implementation here,
- * we will check the validity of the parameters in the {@link set} method.
+ * In practice this is quite sufficient for our use cases.
+ * In the implementation here, we will check the validity of the
+ * parameters in the {@link set} method.
  *
  * If we use instead the Cantor function to encode the index,
- * we could double the maximal index, but the performance won't be as good,
- * so it's a bit pointless.
+ * we could double the maximal index, but the performance won't
+ * be as good, so it's a bit pointless.
  */
 //=================================================================
 

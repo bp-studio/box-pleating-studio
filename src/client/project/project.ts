@@ -168,5 +168,6 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private _flushUpdateCallback(): void {
 		for(const callback of this._updateCallbacks) callback();
 		this._updateCallbacks.length = 0;
+		this._updateCallbackTimeout = undefined;
 	}
 }
