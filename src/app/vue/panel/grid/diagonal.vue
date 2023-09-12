@@ -7,11 +7,11 @@
 	import Number from "@/gadgets/form/number.vue";
 
 	import type { DiagonalGrid } from "client/project/components/grid/diagonalGrid";
-	import type { IGrid } from "client/project/components/grid";
+	import type { Grid } from "client/project/components/grid/grid";
 
 	defineOptions({ name: "DiagonalGrid" });
 
-	const props = defineProps<{ target: IGrid }>();
+	const props = defineProps<{ target: Grid }>();
 	const grid = (): DiagonalGrid => props.target as DiagonalGrid;
 
 </script>

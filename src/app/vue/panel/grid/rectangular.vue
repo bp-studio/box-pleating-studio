@@ -8,11 +8,11 @@
 	import Number from "@/gadgets/form/number.vue";
 
 	import type { RectangularGrid } from "client/project/components/grid/rectangularGrid";
-	import type { IGrid } from "client/project/components/grid";
+	import type { Grid } from "client/project/components/grid/grid";
 
 	defineOptions({ name: "RectangularGrid" });
 
-	const props = defineProps<{ target: IGrid }>();
+	const props = defineProps<{ target: Grid }>();
 	const grid = (): RectangularGrid => props.target as RectangularGrid;
 
 </script>

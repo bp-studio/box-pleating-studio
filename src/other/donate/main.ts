@@ -3,9 +3,10 @@ import { createI18n } from "vue-i18n";
 
 import App from "./app.vue";
 
-import type { BpsLocale } from "shared/frontend/locale";
+// For unknown reason, the following line leads to ESLint error.
+// import type { BpsLocale } from "shared/frontend/locale";
 
-const i18n = createI18n<[BpsLocale], string>({
+const i18n = createI18n<[unknown], string>({
 	locale: "en",
 	fallbackLocale: "en",
 	silentFallbackWarn: true,
