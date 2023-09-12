@@ -70,6 +70,12 @@
 								   :label="$t('preference.color.ridge')" />
 							<Color :default="Studio.style.axisParallel.color" v-model="Settings.colorScheme.axialParallel"
 								   :label="$t('preference.color.axisParallel')" />
+							<Color :default="Studio.style.junction.color" v-model="Settings.colorScheme.junction"
+								   :label="$t('preference.color.overlap')" />
+							<Color :default="Studio.style.dot.fill" v-model="Settings.colorScheme.dot"
+								   :label="$t('preference.color.tip')" />
+							<Color :default="Studio.style.label.color" v-model="Settings.colorScheme.label"
+								   :label="$t('preference.color.label')" />
 						</div>
 					</div>
 					<!-- Use v-if to reset its state every time -->

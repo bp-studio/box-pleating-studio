@@ -125,7 +125,10 @@
 			"grid": "格线",
 			"hinge": "枢纽折痕",
 			"ridge": "脊线折痕",
-			"axisParallel": "轴平行折痕"
+			"axisParallel": "轴平行折痕",
+			"overlap": "重叠",
+			"tip": "角片顶点",
+			"label": "文字标签"
 		},
 		"hotkey": "热键",
 		"command": "命令",

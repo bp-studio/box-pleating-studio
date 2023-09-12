@@ -125,7 +125,10 @@
 			"grid": "Grid lines",
 			"hinge": "Hinge creases",
 			"ridge": "Ridge creases",
-			"axisParallel": "Axis-parallel creases"
+			"axisParallel": "Axis-parallel creases",
+			"overlap": "Overlapping",
+			"tip": "Flap tips",
+			"label": "Text label"
 		},
 		"hotkey": "Hotkeys",
 		"command": "Command",

@@ -78,7 +78,7 @@
 			"ridge": "Mostrar pliegues de cresta",
 			"axial": "Mostrar pliegues axiales-paralelos en gadgets",
 			"label": "Mostrar etiquetas",
-			"tip": "Mostrar puntas",
+			"tip": "Mostrar puntas de solapa",
 			"dPad": "Mostrar D-pad",
 			"status": "Mostrar barra de estado",
 			"preference": "Preferencias"
@@ -125,7 +125,10 @@
 			"grid": "Líneas de cuadrícula",
 			"hinge": "Pliegues de bisagra",
 			"ridge": "Pliegues de cresta",
-			"axisParallel": "Pliegues axiales-paralelos"
+			"axisParallel": "Pliegues axiales-paralelos",
+			"overlap": "Superpuestas",
+			"tip": "Puntas de solapa",
+			"label": "Etiqueta de texto"
 		},
 		"hotkey": "Acceso rápido",
 		"command": "Mando",

@@ -125,7 +125,10 @@
 			"grid": "グリッド線",
 			"hinge": "ヒンジ折り線",
 			"ridge": "リッジ折り線",
-			"axisParallel": "軸平行折り線"
+			"axisParallel": "軸平行折り線",
+			"overlap": "オーバーラップ",
+			"tip": "カドの頂点",
+			"label": "テキストラベル"
 		},
 		"hotkey": "ホットキー",
 		"command": "コマンド",

@@ -125,7 +125,10 @@
 			"grid": "格線",
 			"hinge": "樞紐摺痕",
 			"ridge": "脊線摺痕",
-			"axisParallel": "軸平行摺痕"
+			"axisParallel": "軸平行摺痕",
+			"overlap": "重疊",
+			"tip": "角片頂點",
+			"label": "文字標籤"
 		},
 		"hotkey": "快速鍵",
 		"command": "指令",

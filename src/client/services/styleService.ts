@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { computed, readonly } from "vue";
 
 import { BLACK, BLUE, CHARCOAL, DANGER, DARK, GREEN, LIGHT, LIGHT_GREEN, RED, WHITE } from "client/shared/constant";
@@ -39,12 +40,12 @@ namespace Style {
 		width: 1,
 		color: computed(() => app.isDark.value ? LIGHT : BLACK),
 		exp: 0.75,
-		fill: BLUE,
+		fill: computed(() => app.settings.colorScheme.dot ?? BLUE),
 	};
 
 	export const junction = {
-		alpha: 0.4,
-		color: RED,
+		alpha: computed(() => app.isDark.value ? 0.6 : 0.4),
+		color: computed(() => app.settings.colorScheme.junction ?? RED),
 	};
 
 	export const edge = {
@@ -67,7 +68,7 @@ namespace Style {
 		size: 14,
 		glow: 3,
 		weight: 0.2,
-		color: computed(() => app.isDark.value ? LIGHT : BLACK),
+		color: computed(() => app.settings.colorScheme.label ?? (app.isDark.value ? LIGHT : BLACK)),
 		border: computed(() => app.isDark.value ? DARK : WHITE),
 	};
 

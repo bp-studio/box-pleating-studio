@@ -52,6 +52,9 @@ export class Layout extends View implements ISerializable<JLayout> {
 	/** Cached value of scale. */
 	private _scale: number = 0;
 
+	/** Cached value of junction color. */
+	private _junctionColor: number = 0;
+
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
@@ -277,8 +280,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 	/** Redraw the junctions when scale changes */
 	private _redrawJunctions(): void {
 		const max = ProjectService.scale.value;
-		if(this._scale == max) return;
+		const color = style.junction.color;
+		if(this._scale == max && this._junctionColor == color) return;
 		this._scale = max;
+		this._junctionColor = color;
 		for(const junction of this.$junctions.values()) junction.$draw(max);
 	}
 }

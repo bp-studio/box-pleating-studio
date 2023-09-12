@@ -32,6 +32,9 @@ const defaultSettings = {
 		hinge: undefined as number | undefined,
 		ridge: undefined as number | undefined,
 		edge: undefined as number | undefined,
+		junction: undefined as number | undefined,
+		dot: undefined as number | undefined,
+		label: undefined as number | undefined,
 		axialParallel: undefined as number | undefined,
 	},
 	CP: {

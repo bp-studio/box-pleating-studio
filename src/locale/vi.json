@@ -125,7 +125,10 @@
 			"grid": "Đường lưới",
 			"hinge": "Nếp gấp bản lề",
 			"ridge": "Nếp gấp ở sườn",
-			"axisParallel": "Nếp gấp trục song song"
+			"axisParallel": "Nếp gấp trục song song",
+			"overlap": "Qua nối chồng",
+			"tip": "Mẹo nhánh",
+			"label": "Nhãn văn bản"
 		},
 		"hotkey": "Phím nóng",
 		"command": "Chỉ huy",

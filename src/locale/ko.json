@@ -125,7 +125,10 @@
 			"grid": "격자선",
 			"hinge": "경첩 주름",
 			"ridge": "능선 주름",
-			"axisParallel": "축 평행 주름"
+			"axisParallel": "축 평행 주름",
+			"overlap": "겹치는",
+			"tip": "가지 팁",
+			"label": "텍스트 라벨"
 		},
 		"hotkey": "단축키",
 		"command": "명령",
