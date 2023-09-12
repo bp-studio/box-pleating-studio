@@ -1,5 +1,5 @@
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
-import { Sheet, getRelativePoint } from "../sheet";
+import { Sheet } from "../sheet";
 import { Edge } from "./edge";
 import { Vertex } from "./vertex";
 import { shallowRef } from "client/shared/decorators";
@@ -7,6 +7,7 @@ import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { minComparator } from "shared/data/heap/heap";
 import { dist } from "shared/types/geometry";
 import { SelectionController } from "client/controllers/selectionController";
+import { chebyshev } from "client/utils/chebyshev";
 
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
@@ -15,7 +16,6 @@ import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
 const MIN_VERTICES = 3;
-const SIDES = 4;
 const SHIFT = 16;
 const X_DISPLACEMENT = 0.125;
 const Y_DISPLACEMENT = 0.0625;
@@ -236,19 +236,12 @@ export class Tree implements ISerializable<JTree> {
 		let offBound = false; // If we've already searched beyond the sheet
 		while(heap.$isEmpty && !offBound) {
 			offBound = true;
-			// The design of these loops make us traverse all points of Chebyshev distance r
-			for(let i = 0; i < SIDES; i++) {
-				for(let j = 0; j < 2 * r; j++) {
-					const f = i % 2 ? 1 : -1;
-					const p = i < 2 ?
-						{ x: x + f * (j - r), y: y + f * r } :
-						{ x: x + f * r, y: y + f * (r - j) };
-
-					const inSheet = this.$sheet.grid.$contains(p);
-					if(inSheet) offBound = false;
-					if(!occupied.has(p.x << SHIFT | p.y) && inSheet) {
-						heap.$insert([p, dist(p, ref)]);
-					}
+			for(const pt of chebyshev(r)) {
+				const p = { x: x + pt.x, y: y + pt.y };
+				const inSheet = this.$sheet.grid.$contains(p);
+				if(inSheet) offBound = false;
+				if(!occupied.has(p.x << SHIFT | p.y) && inSheet) {
+					heap.$insert([p, dist(p, ref)]);
 				}
 			}
 

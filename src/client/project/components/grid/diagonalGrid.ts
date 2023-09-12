@@ -3,6 +3,7 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { drawPath } from "client/utils/contourUtil";
 import { Grid } from "./grid";
+import { chebyshev } from "client/utils/chebyshev";
 
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path } from "shared/types/geometry";
@@ -64,9 +65,12 @@ export class DiagonalGrid extends Grid {
 		const offset = (v % 2 ? Math.floor : Math.ceil)((v - oldValue) / 2);
 		this._testShift = { x: offset, y: offset };
 		if(v < oldValue && !this._testFit()) {
-			this._testSize = this._size;
-			this._testShift = undefined;
-			return;
+			const range = Math.ceil((oldValue - v) / 2);
+			if(!this._tryShift(range)) {
+				this._testSize = this._size;
+				this._testShift = undefined;
+				return;
+			}
 		}
 
 		const flush = !this._applyOffset();
@@ -238,5 +242,19 @@ export class DiagonalGrid extends Grid {
 		} finally {
 			this._testShift = undefined;
 		}
+	}
+
+	/**
+	 * For now we just try all possible shifting with brute-force
+	 * until we find one that works.
+	 */
+	private _tryShift(range: number): boolean {
+		for(let r = 1; r <= range; r++) {
+			for(const pt of chebyshev(r)) {
+				this._testShift = pt;
+				if(this._testFit()) return true;
+			}
+		}
+		return false;
 	}
 }
