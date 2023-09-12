@@ -1,4 +1,4 @@
-import { watch, nextTick } from "vue";
+import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 
 import { copyright } from "app/misc/copyright";
@@ -7,7 +7,7 @@ import type { I18n } from "vue-i18n";
 import type { BpsLocale } from "shared/frontend/locale";
 import type Settings from "./settingService";
 
-const KEY = "locale";
+const LOCALE_KEY = "locale";
 const DEFAULT_LOCALE = "en";
 
 //=================================================================
@@ -19,7 +19,7 @@ const DEFAULT_LOCALE = "en";
  */
 //=================================================================
 namespace LanguageService {
-	const _options: string[] = [];
+	const _options: string[] = reactive([]);
 
 	export const options = _options as readonly string[];
 
@@ -37,8 +37,9 @@ namespace LanguageService {
 	}
 
 	export function init(): void {
+		_options.length = 0;
 		const build = Number(localStorage.getItem("build") || 0);
-		const localeSetting = localStorage.getItem(KEY);
+		const localeSetting = localStorage.getItem(LOCALE_KEY);
 		const langs = getLanguages(localeSetting);
 		const newLocale = langs.some(l => Number(locale[l].since) > build);
 
@@ -46,13 +47,14 @@ namespace LanguageService {
 			_options.push(...langs);
 		}
 		i18n.locale = format(localeSetting || langs[0] || DEFAULT_LOCALE);
+		localStorage.setItem(LOCALE_KEY, i18n.locale);
 	}
 
 	export function setup(): void {
 		// Sync locale
 		let syncing: boolean = false;
 		window.addEventListener("storage", e => {
-			if(e.key == KEY) {
+			if(e.key == LOCALE_KEY) {
 				syncing = true;
 				i18n.locale = e.newValue!;
 			}
@@ -60,7 +62,7 @@ namespace LanguageService {
 
 		watch(() => i18n.locale, loc => {
 			if(loc in locale) {
-				if(!syncing) localStorage.setItem(KEY, loc);
+				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
 				syncing = false;
 			} else {
 				loc = findFallbackLocale(loc);
@@ -108,7 +110,7 @@ namespace LanguageService {
 	export let onReset: Action;
 
 	export function reset(): void {
-		localStorage.removeItem(KEY);
+		localStorage.removeItem(LOCALE_KEY);
 		init();
 		onReset?.();
 	}
