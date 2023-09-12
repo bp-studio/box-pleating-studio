@@ -17,13 +17,13 @@ import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
 
+import type { Grid } from "./grid/grid";
 import type { ITagObject } from "client/shared/interface";
 import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
 import type { Label } from "client/utils/label";
 import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
-import type { IGrid } from "./grid";
 
 const LAYERS = Enum.values(Layer);
 
@@ -48,7 +48,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	@shallowRef private _type: GridType;
 
-	@shallowRef private _grid: IGrid;
+	@shallowRef private _grid: Grid;
 
 	/** Top-level container */
 	public readonly $view: Container = new Container();
@@ -139,7 +139,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		const oldValue = this._type;
 		if(v == oldValue) return;
 		const history = this.$project.history;
-		let grid: IGrid;
+		let grid: Grid;
 		if(history.$isLocked) {
 			const prototype = this.$project.design.$prototype[this.$tag].sheet;
 			grid = createGrid(this, v, prototype.width, prototype.height);
@@ -158,7 +158,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		});
 	}
 
-	public get grid(): IGrid {
+	public get grid(): Grid {
 		return this._grid;
 	}
 

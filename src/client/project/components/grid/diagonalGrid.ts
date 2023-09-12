@@ -2,12 +2,11 @@ import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { drawPath } from "client/utils/contourUtil";
+import { Grid } from "./grid";
 
-import type { Project } from "client/project/project";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";
-import type { IGrid } from "./iGrid";
 import type { Sheet } from "../sheet";
 
 const DEFAULT_SIZE = 16;
@@ -19,22 +18,15 @@ const MIN_SIZE = 6;
  */
 //=================================================================
 
-export class DiagonalGrid implements IGrid {
-
-	public readonly $tag: string;
-	public readonly $project: Project;
-	public readonly type = GridType.diagonal;
-	private readonly _sheet: Sheet;
+export class DiagonalGrid extends Grid {
 
 	private _testSize: number;
-	private _testOffset: IPoint | undefined;
+	private _testShift: IPoint | undefined;
 
 	@shallowRef private _size: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
-		this._sheet = sheet;
-		this.$project = sheet.$project;
-		this.$tag = sheet.$tag + ".g";
+		super(sheet, GridType.diagonal);
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
 		this._testSize = this._size = Math.round((width + height) / 2);
@@ -70,16 +62,16 @@ export class DiagonalGrid implements IGrid {
 		const oldValue = this.size;
 		this._testSize = v;
 		const offset = (v % 2 ? Math.floor : Math.ceil)((v - oldValue) / 2);
-		this._testOffset = { x: offset, y: offset };
+		this._testShift = { x: offset, y: offset };
 		if(v < oldValue && !this._testFit()) {
 			this._testSize = this._size;
-			this._testOffset = undefined;
+			this._testShift = undefined;
 			return;
 		}
 
-		if(offset != 0) this._applyOffset();
+		const flush = !this._applyOffset();
 		this._size = v;
-		this.$project.history.$fieldChange(this, "size", oldValue, v);
+		this.$project.history.$fieldChange(this, "size", oldValue, v, flush);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,9 +119,10 @@ export class DiagonalGrid implements IGrid {
 		const s = this._testSize, h = s % 2;
 		const f = (s - h) / 2;
 		const c = (s + h) / 2;
-		const offset = this._testOffset || { x: 0, y: 0 };
-		x += offset.x;
-		y += offset.y;
+		if(this._testShift) {
+			x += this._testShift.x;
+			y += this._testShift.y;
+		}
 		return x + y >= f && y - x <= c && x - y <= c && x + y <= c + s;
 	}
 
@@ -208,42 +201,42 @@ export class DiagonalGrid implements IGrid {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _initialFit(): void {
-		if(this._testFit()) return;
-
-		const anchors = [...this._sheet.$independents].flatMap(c => c.$anchors());
+	private get _span(): [number, number, number, number] {
+		const anchors = this._anchors();
 		const xpy = anchors.map(p => p.x + p.y), ymx = anchors.map(p => p.y - p.x);
 		const xpyMax = Math.max(...xpy), xpyMin = Math.min(...xpy);
 		const ymxMax = Math.max(...ymx), ymxMin = Math.min(...ymx);
+		return [xpyMin, xpyMax, ymxMin, ymxMax];
+	}
+
+	private _initialFit(): void {
+		if(this._testFit()) return;
+
+		const [xpyMin, xpyMax, ymxMin, ymxMax] = this._span;
 		this._testSize = Math.ceil(Math.max(xpyMax - xpyMin, ymxMax - ymxMin) / 2);
 
 		const a = (xpyMax + xpyMin) / 2, b = (ymxMax + ymxMin) / 2;
 		const x = Math.round((this._testSize - a + b) / 2);
 		const y = Math.round((this._testSize - a - b) / 2);
-		this._testOffset = { x, y };
+		this._testShift = { x, y };
 
 		while(!this._testFit()) {
 			this._testSize++;
 			if(this._testSize % 2 == 0) {
-				this._testOffset = { x: this._testOffset.x + 1, y: this._testOffset.y + 1 };
+				this._testShift = { x: this._testShift.x + 1, y: this._testShift.y + 1 };
 			}
 		}
 		this._size = this._testSize;
 		this._applyOffset();
 	}
 
-	private _applyOffset(): void {
-		if(!this._testOffset) return;
-		for(const c of this._sheet.$independents) {
-			c.$moveBy(this._testOffset);
+	private _applyOffset(): boolean {
+		try {
+			if(!this._testShift || this._testShift.x === 0 && this._testShift.y === 0) return false;
+			this._shift(this._testShift);
+			return true;
+		} finally {
+			this._testShift = undefined;
 		}
-		this._testOffset = undefined;
-	}
-
-	private _testFit(): boolean {
-		for(const c of this._sheet.$independents) {
-			if(!c.$testGrid(this)) return false;
-		}
-		return true;
 	}
 }

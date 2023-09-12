@@ -9,7 +9,7 @@ import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { getRelativePoint } from "../sheet";
 
-import type { IGrid } from "../grid";
+import type { Grid } from "../grid/grid";
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { SmoothGraphics } from "@pixi/graphics-smooth";
 import type { LabelView } from "client/utils/label";
@@ -124,7 +124,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return c instanceof Vertex;
 	}
 
-	public $testGrid(grid: IGrid): boolean {
+	public $testGrid(grid: Grid): boolean {
 		return grid.$contains(this.$location);
 	}
 

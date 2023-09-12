@@ -1,6 +1,6 @@
 import { Draggable } from "./draggable";
 
-import type { IGrid } from "client/project/components/grid";
+import type { Grid } from "client/project/components/grid/grid";
 import type { Sheet } from "client/project/components/sheet";
 
 //=================================================================
@@ -24,7 +24,7 @@ export abstract class Independent extends Draggable {
 	}
 
 	/** Test whether the given grid contains this object. */
-	public abstract $testGrid(grid: IGrid): boolean;
+	public abstract $testGrid(grid: Grid): boolean;
 
 	public abstract $anchors(): IPoint[];
 

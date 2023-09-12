@@ -1,13 +1,12 @@
 import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
+import { Grid } from "./grid";
 
 import type { Path } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json";
-import type { IGrid } from "./iGrid";
 import type { Sheet } from "../sheet";
-import type { Project } from "client/project/project";
 
 const DEFAULT_SIZE = 16;
 const MIN_SIZE = 4; // Used to be 8, now 4.
@@ -18,13 +17,8 @@ const MIN_SIZE = 4; // Used to be 8, now 4.
  */
 //=================================================================
 
-export class RectangularGrid implements IGrid {
+export class RectangularGrid extends Grid {
 
-	public readonly $tag: string;
-	public readonly $project: Project;
-	public readonly type = GridType.rectangular;
-
-	private readonly _sheet: Sheet;
 	private _testWidth: number;
 	private _testHeight: number;
 
@@ -32,9 +26,7 @@ export class RectangularGrid implements IGrid {
 	@shallowRef private _height: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
-		this._sheet = sheet;
-		this.$project = sheet.$project;
-		this.$tag = sheet.$tag + ".g";
+		super(sheet, GridType.rectangular);
 		this._testHeight = this._height = height ?? DEFAULT_SIZE;
 		this._testWidth = this._width = width ?? DEFAULT_SIZE;
 	}
@@ -64,15 +56,22 @@ export class RectangularGrid implements IGrid {
 			return;
 		}
 
+		let flush = true;
 		const oldValue = this._height;
 		if(v < MIN_SIZE || oldValue === v) return;
 		this._testHeight = v;
-		if(v < oldValue && !this._testFit()) {
-			this._testHeight = oldValue;
-			return;
+		if(v < oldValue) {
+			const [min, max] = this._ySpan;
+			if(max - min > v) {
+				this._testHeight = oldValue;
+				return;
+			} else if(max > v) {
+				this._shift({ x: 0, y: v - max });
+				flush = false;
+			}
 		}
 		this._height = v;
-		this.$project.history.$fieldChange(this, "height", oldValue, v);
+		this.$project.history.$fieldChange(this, "height", oldValue, v, flush);
 	}
 
 	public get width(): number {
@@ -84,15 +83,22 @@ export class RectangularGrid implements IGrid {
 			return;
 		}
 
+		let flush = true;
 		const oldValue = this._width;
 		if(v < MIN_SIZE || oldValue === v) return;
 		this._testWidth = v;
-		if(v < oldValue && !this._testFit()) {
-			this._testWidth = oldValue;
-			return;
+		if(v < oldValue) {
+			const [min, max] = this._xSpan;
+			if(max - min > v) {
+				this._testWidth = oldValue;
+				return;
+			} else if(max > v) {
+				this._shift({ x: v - max, y: 0 });
+				flush = false;
+			}
 		}
 		this._width = v;
-		this.$project.history.$fieldChange(this, "width", oldValue, v);
+		this.$project.history.$fieldChange(this, "width", oldValue, v, flush);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,10 +183,15 @@ export class RectangularGrid implements IGrid {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _testFit(): boolean {
-		for(const c of this._sheet.$independents) {
-			if(!c.$testGrid(this)) return false;
-		}
-		return true;
+	private get _xSpan(): [number, number] {
+		const anchors = this._anchors();
+		const xs = anchors.map(p => p.x);
+		return [Math.min(...xs), Math.max(...xs)];
+	}
+
+	private get _ySpan(): [number, number] {
+		const anchors = this._anchors();
+		const ys = anchors.map(p => p.y);
+		return [Math.min(...ys), Math.max(...ys)];
 	}
 }

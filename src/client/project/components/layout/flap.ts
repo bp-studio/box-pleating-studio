@@ -12,10 +12,10 @@ import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { shallowRef } from "client/shared/decorators";
 import { SelectionController } from "client/controllers/selectionController";
 
+import type { Grid } from "../grid/grid";
 import type { LabelView } from "client/utils/label";
 import type { GraphicsLike, SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { GraphicsData } from "core/service/updateModel";
-import type { IGrid } from "../grid";
 import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
@@ -208,7 +208,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		}
 	}
 
-	public $testGrid(grid: IGrid): boolean {
+	public $testGrid(grid: Grid): boolean {
 		return this._testResize(this._width, this._height, grid);
 	}
 
@@ -319,7 +319,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	/** Test if the new size is acceptable. */
-	private _testResize(w: number, h: number, grid: IGrid = this._sheet.grid): boolean {
+	private _testResize(w: number, h: number, grid: Grid = this._sheet.grid): boolean {
 		return this._getDots(this.$location, w, h)
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.
