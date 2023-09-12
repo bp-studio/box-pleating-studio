@@ -1,4 +1,6 @@
 
+const handlerMap = new Map<Consumer<KeyboardEvent>, Consumer<KeyboardEvent>>();
+
 namespace HotkeyService {
 
 	type HotkeyEntry = [Action, string, boolean, boolean];
@@ -16,32 +18,32 @@ namespace HotkeyService {
 		hotkeys.push([action, key.toLowerCase(), ctrl, shift]);
 	}
 
-	export function registerCore(handler: Consumer<KeyboardEvent>): EventListener {
-		document.body.addEventListener("keydown", handler);
-		return handler as EventListener;
+	function wrapHandler(handler: Consumer<KeyboardEvent>): Consumer<KeyboardEvent> {
+		return e => {
+			// Capturing exceptions
+			const k = e.key.toLowerCase();
+			if((k == "s" || k == "o" || k == "p") && (e.metaKey || e.ctrlKey)) return;
+			const active = document.activeElement;
+			if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+
+			handler(e);
+		};
+	}
+
+	export function registerCore(handler: Consumer<KeyboardEvent>): void {
+		const wrapped = wrapHandler(handler);
+		handlerMap.set(handler, wrapped);
+		document.body.addEventListener("keydown", wrapped);
 	}
 
 	export function unregisterCore(handler: Consumer<KeyboardEvent>): void {
-		document.body.removeEventListener("keydown", handler);
+		const wrapped = handlerMap.get(handler);
+		if(!wrapped) return;
+		document.body.removeEventListener("keydown", wrapped);
+		handlerMap.delete(handler);
 	}
 
 	export function init(): void {
-		document.addEventListener(
-			"keydown",
-			e => {
-				// Capturing exceptions
-				const k = e.key.toLowerCase();
-				if((k == "s" || k == "o" || k == "p") && (e.metaKey || e.ctrlKey)) return;
-
-				// If input field is in use, block all regular event listeners.
-				const active = document.activeElement;
-				if(active instanceof HTMLInputElement && !active.classList.contains("key") || active instanceof HTMLTextAreaElement) {
-					e.stopImmediatePropagation();
-				}
-			},
-			{ capture: true }
-		);
-
 		registerCore(e => {
 			// Skip processing hotkeys when there's opened dialogs
 			if(document.querySelector(".modal-open")) return;

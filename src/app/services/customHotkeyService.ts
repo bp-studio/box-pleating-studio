@@ -2,6 +2,7 @@ import { isMac } from "app/shared/constants";
 import { zoomStep } from "app/utils/viewUtility";
 import Settings from "./settingService";
 import Studio from "./studioService";
+import HotkeyService from "./hotkeyService";
 
 import type { DirectionKey } from "shared/types/types";
 
@@ -43,7 +44,7 @@ namespace CustomHotkeyService {
 		return null;
 	}
 
-	document.body.addEventListener("keydown", e => onKey(e), { capture: true });
+	HotkeyService.registerCore(onKey);
 
 	function onKey(e: KeyboardEvent): void {
 		// Condition for ignoring
