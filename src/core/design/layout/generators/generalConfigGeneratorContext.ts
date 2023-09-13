@@ -10,9 +10,11 @@ import type { JJunction, JOverlap } from "shared/json";
 import type { Repository } from "../repository";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
 
-const MAX_RANK_PER_JOINT = 7;
+const MAX_RANK_PER_JOINT = 8;
+
 const BASE_JOIN_RANK = 4;
 const STANDARD_JOIN_RANK = 6;
+const HALF_INTEGRAL_RANK = 7;
 
 interface Joint {
 	code: number;
@@ -108,7 +110,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const joint = this._joints[0];
 		const rank = ranks[0];
 
-		if(rank == 1) yield* this._searchRelay(joint.items);
+		if(rank > 1) yield* this._searchRelay(joint.items, rank - 1);
 
 		const splitted = joint.items.some(item => item.splitted);
 		if(!splitted) {
@@ -121,7 +123,11 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private *_searchRelay(items: readonly JointItem[], strategy?: Strategy): Generator<Configuration> {
+	private *_searchRelay(items: readonly JointItem[], rank: number): Generator<Configuration> {
+		let strategy: Strategy | undefined;
+		if(rank == HALF_INTEGRAL_RANK) strategy = Strategy.halfIntegral;
+		else if(rank != 0) return;
+
 		let [o1, o2] = this._itemsToOverlaps(items);
 		const oriented = o1.c[2].e == o2.c[2].e; // They share lower-left corner
 		if(o1.ox > o2.ox) [o1, o2] = [o2, o1];
