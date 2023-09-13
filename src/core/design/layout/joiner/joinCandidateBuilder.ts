@@ -34,22 +34,22 @@ export class JoinCandidateBuilder {
 		const int = this.joiner.$getRelayJoinIntersection(that.p, shift, opposite(this.q));
 		if(!int || !int.$isIntegral) return NaN;
 
-		let off: IPoint;
+		let offset: IPoint;
 		if(this.joiner.$oriented) {
-			this.offset = off = int.$toIPoint();
-			this.p.$offset(off);
+			this.offset = offset = int.$toIPoint();
+			this.p.$offset(offset);
 			this.a[this.joiner.q] = {
-				location: { x: -off.x, y: -off.y },
+				location: { x: -offset.x, y: -offset.y },
 			};
-			return off.x;
+			return offset.x;
 		} else {
 			const target = f == 1 ? that : this;
-			target.offset = off = { x: f * (that.p.sx - int.x), y: f * (that.p.sy - int.y) };
-			target.p.$offset(off);
+			target.offset = offset = { x: f * (that.p.sx - int.x), y: f * (that.p.sy - int.y) };
+			target.p.$offset(offset);
 			this.a[this.joiner.q] = {
-				location: { x: this.p.sx + f * off.x, y: this.p.sy + f * off.y },
+				location: { x: this.p.sx + f * offset.x, y: this.p.sy + f * offset.y },
 			};
-			return f * off.x;
+			return f * offset.x;
 		}
 	}
 

@@ -25,6 +25,7 @@ interface JoinData {
 	 */
 	readonly offset?: IPoint;
 
+	/** The point of join. */
 	readonly pt: Point;
 
 	/** The vector of the angle bisector of axis-parallel creases. */

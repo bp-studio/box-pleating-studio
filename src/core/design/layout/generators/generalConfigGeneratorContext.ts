@@ -10,6 +10,8 @@ import type { Repository } from "../repository";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
 
 const MAX_RANK_PER_JOINT = 7;
+const BASE_JOIN_RANK = 4;
+const STANDARD_JOIN_RANK = 6;
 
 interface Joint {
 	code: number;
@@ -87,6 +89,7 @@ export class GeneralConfigGeneratorContext {
 		if(rank == 1) yield* this._searchRelay(joint.junctions);
 
 		yield* this._searchJoin(joint.junctions, rank);
+		yield* this._searchRelayJoin(joint.junctions, rank - 1);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +99,8 @@ export class GeneralConfigGeneratorContext {
 	/**
 	 * To not overwhelm ourselves, let's put some conditions to restrict the processing
 	 * to previously solved cases, and then we will progressively allow more cases.
+	 *
+	 * TODO: allowing more cases here.
 	 */
 	private _checkPreconditions(): boolean {
 		// Previously, we can handle at most 1 joint...
@@ -108,7 +113,7 @@ export class GeneralConfigGeneratorContext {
 	}
 
 	private *_searchRelay(junctions: JJunctions, strategy?: Strategy): Generator<Configuration> {
-		let [o1, o2] = junctions.map((j, i) => ConfigUtil.$toOverlap(j, i));
+		let [o1, o2] = junctions.map(ConfigUtil.$toOverlap);
 		const oriented = o1.c[2].e == o2.c[2].e; // They share lower-left corner
 		if(o1.ox > o2.ox) [o1, o2] = [o2, o1];
 
@@ -145,11 +150,10 @@ export class GeneralConfigGeneratorContext {
 
 	private *_searchJoin(junctions: JJunctions, rank: number): Generator<Configuration> {
 		if(junctions.length == 1) debugger;
-		let strategy: Strategy | undefined;
-		if(rank == 0) strategy = Strategy.perfect;
-		else return; // POC
+		const strategy = resolveJoinRank(rank);
+		if(!strategy && rank != 2) return;
 
-		const overlaps = junctions.map((j, i) => ConfigUtil.$toOverlap(j, i));
+		const overlaps = junctions.map(ConfigUtil.$toOverlap);
 		for(let i = 1; i < overlaps.length; i++) {
 			const [o1, o2] = [overlaps[0], overlaps[i]];
 			ConfigUtil.$joinOverlaps(o1, o2, -1, -(i + 1), o1.c[0].e == o2.c[0].e);
@@ -158,4 +162,48 @@ export class GeneralConfigGeneratorContext {
 			partitions: [{ overlaps, strategy }],
 		});
 	}
+
+	private *_searchRelayJoin(junctions: JJunctions, rank: number): Generator<Configuration> {
+		const strategy = resolveJoinRank(rank);
+		if(!strategy && rank != 2) return;
+
+		const [o1, o2] = junctions.map(ConfigUtil.$toOverlap);
+		const oriented = o1.c[0].e == o2.c[0].e;
+		const o1x = o2.ox > o1.ox; // o1 is narrower in width
+		const x = (o1x ? o1 : o2).ox, y = (o1x ? o2 : o1).oy;
+
+		const o1i = -1, o2i = o1i - 1;
+		for(let n = 1; n < x; n++) {
+			const [o1p, o2p] = clone([o1, o2]);
+			const o = ConfigUtil.$joinOverlaps(o1p, o2p, o1i, o2i, oriented, !o1x);
+			o.ox -= n;
+			if(oriented) o.shift = { x: n, y: 0 };
+			yield new Configuration(this._repo, {
+				partitions: [{
+					overlaps: [o1p, o2p],
+					strategy,
+				}],
+			});
+		}
+
+		for(let n = 1; n < y; n++) {
+			const [o1p, o2p] = clone([o1, o2]);
+			const o = ConfigUtil.$joinOverlaps(o1p, o2p, o1i, o2i, oriented, o1x);
+			o.oy -= n;
+			if(oriented) o.shift = { x: 0, y: n };
+			yield new Configuration(this._repo, {
+				partitions: [{
+					overlaps: [o1p, o2p],
+					strategy,
+				}],
+			});
+		}
+	}
+}
+
+function resolveJoinRank(rank: number): Strategy | undefined {
+	if(rank == 0) return Strategy.perfect;
+	if(rank == BASE_JOIN_RANK) return Strategy.baseJoin;
+	if(rank == STANDARD_JOIN_RANK) return Strategy.standardJoin;
+	return undefined;
 }

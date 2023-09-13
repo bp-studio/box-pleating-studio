@@ -6,10 +6,10 @@ import type { JoinResult } from "./joinLogic";
 import type { Point } from "core/math/geometry/point";
 
 interface BaseJoinContext {
-	D1: Point;
-	D2: Point;
-	B1: Point;
-	B2: Point;
+	D1: Point | null;
+	D2: Point | null;
+	B1: Point | null;
+	B2: Point | null;
 	delta: Line;
 }
 
@@ -51,9 +51,12 @@ export class BaseJoinLogic extends JoinLogic {
 	 */
 	protected _baseJoinIntersections(): BaseJoinContext {
 		const { bv, c1, c2, pt } = this.data;
-		const delta = new Line(this._deltaPt, QV[0]), beta = new Line(pt, bv);
-		const D1 = c1.e.$intersection(delta)!, D2 = c2.e.$intersection(delta)!;
-		const B1 = c1.e.$intersection(beta)!, B2 = c2.e.$intersection(beta)!;
+		const deltaPt = this._deltaPt;
+		const delta = new Line(deltaPt, QV[0]);
+		const D1 = c1.e.$intersection(deltaPt, QV[0]);
+		const D2 = c2.e.$intersection(deltaPt, QV[0]);
+		const B1 = c1.e.$intersection(pt, bv);
+		const B2 = c2.e.$intersection(pt, bv);
 		return { D1, D2, B1, B2, delta };
 	}
 }
