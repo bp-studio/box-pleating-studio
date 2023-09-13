@@ -4,9 +4,11 @@ import { CornerType, Strategy } from "shared/json";
 import { clone } from "shared/utils/clone";
 import { ConfigGeneratorContext } from "./configGeneratorContext";
 import { Direction, nextQuadrantOffset, opposite, previousQuadrantOffset, quadrantNumber } from "shared/types/direction";
+import { MASK } from "../junction/validJunction";
 
+import type { QuadrantDirection } from "shared/types/direction";
 import type { Configuration } from "../configuration";
-import type { JJunction, JOverlap } from "shared/json";
+import type { JJunction, JOverlap, JPartition } from "shared/json";
 import type { Repository } from "../repository";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
 
@@ -17,7 +19,8 @@ const STANDARD_JOIN_RANK = 6;
 const HALF_INTEGRAL_RANK = 7;
 
 interface Joint {
-	code: number;
+	nodeId: number;
+	q: QuadrantDirection;
 	items: readonly JointItem[];
 	max: number;
 }
@@ -26,7 +29,12 @@ interface JointItem {
 	readonly index: number;
 	readonly junction: JJunction;
 	readonly configs: readonly Configuration[];
-	readonly splitted: boolean;
+	readonly split: boolean;
+}
+
+interface SplitItem {
+	o: JOverlap;
+	r?: JPartition;
 }
 
 //=================================================================
@@ -59,12 +67,14 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			if(junctionIndices.length > 1) {
 				const max = (junctionIndices.length - 1) * MAX_RANK_PER_JOINT;
 				joints.push({
-					code, max,
+					nodeId: code >>> 2,
+					q: code & MASK,
+					max,
 					items: junctionIndices.map(i => ({
 						index: i,
 						junction: this._junctions[i],
 						configs: configs[i],
-						splitted: configs[i][0] && configs[i][0].$partitions.length > 1,
+						split: configs[i][0] && configs[i][0].$partitions.length > 1,
 					})),
 				});
 				maxRank += max;
@@ -112,10 +122,14 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		if(rank > 1) yield* this._searchRelay(joint.items, rank - 1);
 
-		const splitted = joint.items.some(item => item.splitted);
-		if(!splitted) {
-			yield* this._searchJoin(joint.items, rank);
-			if(rank > 2) yield* this._searchRelayJoin(joint.items, rank - 1);
+		const splitCount = joint.items.filter(item => item.split).length;
+		if(splitCount == 0) {
+			const partitions = this._searchJoinPartitions(() => this._itemsToOverlaps(joint.items), rank);
+			for(const partition of partitions) {
+				yield this.$make([partition]);
+			}
+		} else if(rank > 1) {
+			yield* this._searchSplitJoint(joint, rank - splitCount);
 		}
 	}
 
@@ -139,7 +153,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		if(o1.id === undefined || o2.id === undefined) debugger;
 
 		// Perform two possible cuttings
-		if(!items[0].splitted) {
+		if(!items[0].split) {
 			o2p.ox -= o1.ox;
 			o2p.c[c] = { type: CornerType.internal, e: o1.id, q: d };
 			o2p.c[b] = { type: CornerType.intersection, e: o1.c[a].e };
@@ -151,7 +165,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			]);
 		}
 
-		if(!items[1].splitted) {
+		if(!items[1].split) {
 			o1p.oy -= o2.oy;
 			o1p.c[c] = { type: CornerType.internal, e: o2.id, q: b };
 			o1p.c[d] = { type: CornerType.intersection, e: o2.c[a].e };
@@ -164,23 +178,28 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
-	private *_searchJoin(items: readonly JointItem[], rank: number): Generator<Configuration> {
-		const strategy = resolveJoinRank(rank);
-		if(!strategy && rank != 2) return;
-
-		const overlaps = this._itemsToOverlaps(items);
-		for(let i = 1; i < overlaps.length; i++) {
-			const [o1, o2] = [overlaps[0], overlaps[i]];
-			this._joinOverlaps(o1, o2, o1.c[0].e == o2.c[0].e);
-		}
-		yield this.$make([{ overlaps, strategy }]);
+	private *_searchJoinPartitions(factory: () => JOverlap[], rank: number): Generator<JPartition> {
+		yield* this._searchJoin(factory(), rank);
+		if(rank > 2) yield* this._searchRelayJoin(factory(), rank - 1);
 	}
 
-	private *_searchRelayJoin(items: readonly JointItem[], rank: number): Generator<Configuration> {
+	private *_searchJoin(overlaps: JOverlap[], rank: number): Generator<JPartition> {
 		const strategy = resolveJoinRank(rank);
 		if(!strategy && rank != 2) return;
 
-		const [o1, o2] = this._itemsToOverlaps(items);
+		for(let i = 1; i < overlaps.length; i++) {
+			const [o1, o2] = [overlaps[0], overlaps[i]];
+			const oriented = o1.c[0].e == o2.c[0].e;
+			this._joinOverlaps(o1, o2, oriented);
+		}
+		yield { overlaps, strategy };
+	}
+
+	private *_searchRelayJoin(overlaps: JOverlap[], rank: number): Generator<JPartition> {
+		const strategy = resolveJoinRank(rank);
+		if(!strategy && rank != 2) return;
+
+		const [o1, o2] = overlaps;
 		const oriented = o1.c[0].e == o2.c[0].e;
 		const o1x = o2.ox > o1.ox; // o1 is narrower in width
 		const x = (o1x ? o1 : o2).ox, y = (o1x ? o2 : o1).oy;
@@ -190,10 +209,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			const o = this._joinOverlaps(o1p, o2p, oriented, !o1x);
 			o.ox -= n;
 			if(oriented) o.shift = { x: n, y: 0 };
-			yield this.$make([{
-				overlaps: [o1p, o2p],
-				strategy,
-			}]);
+			yield { overlaps: [o1p, o2p], strategy };
 		}
 
 		for(let n = 1; n < y; n++) {
@@ -201,10 +217,25 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			const o = this._joinOverlaps(o1p, o2p, oriented, o1x);
 			o.oy -= n;
 			if(oriented) o.shift = { x: 0, y: n };
-			yield this.$make([{
-				overlaps: [o1p, o2p],
-				strategy,
-			}]);
+			yield { overlaps: [o1p, o2p], strategy };
+		}
+	}
+
+	private *_searchSplitJoint(joint: Joint, rank: number): Generator<Configuration> {
+		const items1 = toSplitItems(joint.items[0].configs, joint.nodeId);
+		const items2 = toSplitItems(joint.items[1].configs, joint.nodeId);
+		for(const item1 of items1) {
+			for(const item2 of items2) {
+				const o1 = item1.o, o2 = item2.o;
+				if(cover(o1, o2) || cover(o2, o1)) continue;
+				const joins = this._searchJoinPartitions(() => clone([o1, o2]), rank);
+				for(const join of joins) {
+					const partitions = [join];
+					if(item1.r) partitions.push(clone(item1.r));
+					if(item2.r) partitions.push(clone(item2.r));
+					yield this.$make(partitions);
+				}
+			}
 		}
 	}
 
@@ -238,4 +269,20 @@ function resolveJoinRank(rank: number): Strategy | undefined {
 	if(rank == BASE_JOIN_RANK) return Strategy.baseJoin;
 	if(rank == STANDARD_JOIN_RANK) return Strategy.standardJoin;
 	return undefined;
+}
+
+function cover(o1: JOverlap, o2: JOverlap): boolean {
+	return o1.ox >= o2.ox && o1.oy >= o2.oy;
+}
+
+function toSplitItems(configs: readonly Configuration[], nodeId: number): SplitItem[] {
+	return configs.map(config => {
+		const partitions = config.$toRawPartitions();
+		const p = partitions.find(partition => {
+			const overlap = partition.overlaps[0];
+			return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;
+		})!;
+		const r = partitions.find(partition => partition != p);
+		return { o: p.overlaps[0], r };
+	});
 }

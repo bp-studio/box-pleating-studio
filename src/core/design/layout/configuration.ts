@@ -9,7 +9,7 @@ import type { CornerMap } from "./partition";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
-import type { JConfiguration, JJunctions, JOverlap } from "shared/json";
+import type { JConfiguration, JJunctions, JOverlap, JPartition } from "shared/json";
 
 //=================================================================
 /**
@@ -99,6 +99,16 @@ export class Configuration implements ISerializable<JConfiguration> {
 		const patterns = this._patterns.$entries;
 		if(patterns.length === 0) return null;
 		return patterns[this._index];
+	}
+
+	/** Create {@link JPartition}s with {@link JOverlap.id}s. */
+	public $toRawPartitions(): readonly JPartition[] {
+		const partitions = this.toJSON().partitions;
+		let i = -1;
+		for(const partition of partitions) {
+			for(const overlap of partition.overlaps) overlap.id = i--;
+		}
+		return partitions;
 	}
 
 	public $onDeviceMove(): void {

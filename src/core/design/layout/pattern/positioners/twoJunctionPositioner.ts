@@ -12,7 +12,14 @@ import type { Gadget } from "../gadget";
 //=================================================================
 export function twoJunctionPositioner(context: PositioningContext): boolean {
 	if(context.devices.length == 1) return makeSingeJoinDevicePattern(context);
-	if(context.devices.length == 2) return makeTwoDeviceRelayPattern(context);
+	if(context.devices.length == 2) {
+		if(context.devices.every(d => d.$partition.$overlaps.length == 1)) {
+			return makeTwoDeviceRelayPattern(context);
+		}
+
+		// TODO: split pattern
+		return true;
+	}
 	return false;
 }
 
