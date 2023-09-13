@@ -23,6 +23,12 @@ export interface JQuadrilateral {
 
 export interface JOverlap extends JQuadrilateral {
 
+	/**
+	 * A negative number that is unique during generation of {@link JConfiguration}.
+	 * Used for temporarily identifying each overlap.
+	 */
+	id?: number;
+
 	/** From which {@link JJunction} this {@link JOverlap} is cut off. */
 	parent: number;
 

@@ -1,8 +1,9 @@
 import { Configuration } from "../configuration";
 import { singleConfigGenerator } from "./singleConfigGenerator";
 import { generalConfigGenerator } from "./generalConfigGenerator";
+import { ConfigGeneratorContext } from "./configGeneratorContext";
 
-import type { JConfiguration, JJunctions, JStretch } from "shared/json/pattern";
+import type { JConfiguration, JStretch } from "shared/json/pattern";
 import type { Repository } from "../repository";
 
 export function* configGenerator(repo: Repository, prototype?: JStretch): Generator<Configuration> {
@@ -35,7 +36,8 @@ export function* configGenerator(repo: Repository, prototype?: JStretch): Genera
 
 	// Search for Configuration
 	if(repo.$junctions.length === 1) {
-		yield* singleConfigGenerator(repo, repo.$junctions[0], protoSignature);
+		const context = new ConfigGeneratorContext(repo);
+		yield* singleConfigGenerator(context, repo.$junctions[0], protoSignature);
 	} else {
 		yield* generalConfigGenerator(repo, protoSignature);
 	}
