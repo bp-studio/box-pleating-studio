@@ -5,7 +5,6 @@ import { Direction, opposite } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { State } from "core/service/state";
 import { deviceGenerator } from "./generators/deviceGenerator";
-import { rotate } from "shared/utils/array";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -119,7 +118,7 @@ export class Partition implements ISerializable<JPartition> {
 		const repo = this.$configuration.$repo;
 
 		let ov = this.$overlaps[map.overlapIndex];
-		const parent = this._getTransformedParent(ov);
+		const parent = this._getParent(ov);
 		const c1 = parent.c[0], c2 = parent.c[2];
 		const n1 = c1.e!, n2 = c2.e!;
 		const f1 = tree.$nodes[n1]!, f2 = tree.$nodes[n2]!;
@@ -152,7 +151,7 @@ export class Partition implements ISerializable<JPartition> {
 	 */
 	public $resolveDivision(map: CornerMap): [number, number] {
 		const ov = this.$overlaps[map.overlapIndex];
-		const parent = this.$configuration.$junctions[ov.parent];
+		const parent = this.$configuration.$repo.$junctions[ov.parent];
 
 		const n1 = parent.c[0].e!;
 		const n2 = parent.c[2].e!;
@@ -160,7 +159,7 @@ export class Partition implements ISerializable<JPartition> {
 
 		let [a, b] = [n1, n3];
 		if(a > b) [a, b] = [b, a];
-		const fromN1 = this.$configuration.$junctions.some(j => j.c[0].e == a && j.c[2].e == b);
+		const fromN1 = this.$configuration.$repo.$junctions.some(j => j.c[0].e == a && j.c[2].e == b);
 
 		[a, b] = [fromN1 ? n2 : n1, n3];
 		if(a > b) [a, b] = [b, a];
@@ -197,11 +196,13 @@ export class Partition implements ISerializable<JPartition> {
 		if(this.$overlaps.length == 1) return ov;
 
 		const result = clone(ov);
-		const parent = this._getTransformedParent(ov);
+		const parent = this._getParent(ov);
+		result.ox = parent.ox;
+		result.oy = parent.oy;
 		let shift = result.shift ?? { x: 0, y: 0 };
 		for(const o of this.$overlaps) {
 			if(o != ov) {
-				const p = this._getTransformedParent(o);
+				const p = this._getParent(o);
 				const w = result.ox + shift.x;
 				const h = result.oy + shift.y;
 				if(p.c[0].e == parent.c[0].e) {
@@ -230,20 +231,10 @@ export class Partition implements ISerializable<JPartition> {
 		return result;
 	}
 
-	// TODO: do we still need this?
 	/**
-	 * Obtain the original {@link JJunction} (transformed if needed) corresponding to the give {@link JOverlap}.
-	 *
-	 * Since version 0.6, {@link JJunction}s are created with respect to the ordering of the flaps
-	 * instead of the actual orientation. So during calculations they need to be transformed
-	 * when their orientation is different from that of the {@link Repository}.
+	 * Obtain the original {@link JJunction} corresponding to the give {@link JOverlap}.
 	 */
-	private _getTransformedParent(ov: JOverlap): Readonly<JJunction> {
-		let parent = this.$configuration.$junctions[ov.parent];
-		if(parent.f.x != this.$configuration.$repo.$f.x) {
-			parent = clone(parent);
-			rotate(parent.c, 2);
-		}
-		return parent;
+	private _getParent(ov: JOverlap): Readonly<JJunction> {
+		return this.$configuration.$repo.$junctions[ov.parent];
 	}
 }

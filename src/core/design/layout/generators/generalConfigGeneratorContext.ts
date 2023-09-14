@@ -57,7 +57,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			const c1 = junction.c[0], c2 = junction.c[2];
 			getOrSetEmptyArray(junctionMap, c1.e! << 2 | c1.q!).push(i);
 			getOrSetEmptyArray(junctionMap, c2.e! << 2 | c2.q!).push(i);
-			configs[i] = [...singleConfigGenerator(this, junction)];
+			configs[i] = [...singleConfigGenerator(this, i)];
 		}
 
 		const joints: Joint[] = [];

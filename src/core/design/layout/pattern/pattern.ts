@@ -89,12 +89,12 @@ export class Pattern implements ISerializable<JPattern> {
 	private _position(): boolean {
 		const context: PositioningContext = {
 			repo: this.$config.$repo,
-			junctions: this.$config.$junctions,
+			junctions: this.$config.$repo.$junctions,
 			devices: this.$devices,
 		};
 
 		// TODO
-		if(context.junctions.length == 1) {
+		if(this.$config.$singleMode || context.junctions.length == 1) {
 			return singleJunctionPositioner(context);
 		}
 		if(context.junctions.length == 2) {

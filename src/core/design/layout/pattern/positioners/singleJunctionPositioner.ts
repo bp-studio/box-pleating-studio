@@ -9,7 +9,8 @@ import type { JJunction } from "shared/json";
 export function singleJunctionPositioner(context: PositioningContext): boolean {
 
 	const { devices } = context;
-	const junction = context.junctions[0];
+	const overlap = devices[0].$partition.$overlaps[0];
+	const junction = context.junctions[overlap.parent];
 	const sx = junction.sx;
 
 	if(devices.length == 1) {

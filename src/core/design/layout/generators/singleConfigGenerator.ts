@@ -5,35 +5,41 @@ import { Strategy } from "shared/json";
 import type { Configuration } from "../configuration";
 import type { ConfigGeneratorContext } from "./configGeneratorContext";
 import type { JJunction, JOverlap, JPartition } from "shared/json";
+import type { Repository } from "../repository";
 
 //=================================================================
 /**
  * {@link singleConfigGenerator} is a {@link Configuration} {@link Generator}
  * that works for a single {@link JJunction}.
+ *
+ * @param index The index within {@link Repository.$junctions} to be processed.
  */
 //=================================================================
+
 export function* singleConfigGenerator(
-	context: ConfigGeneratorContext, junction: JJunction, protoSignature?: string
+	context: ConfigGeneratorContext, index: number, protoSignature?: string
 ): Generator<Configuration> {
 	yield* GeneratorUtil.$first([
-		singleGadget(context, junction),
-		doubleRelay(context, junction),
-		singleGadget(context, junction, Strategy.halfIntegral),
-		singleGadget(context, junction, Strategy.universal),
+		singleGadget(context, index),
+		doubleRelay(context, index),
+		singleGadget(context, index, Strategy.halfIntegral),
+		singleGadget(context, index, Strategy.universal),
 	], createConfigFilter(protoSignature));
 }
 
-function* singleGadget(context: ConfigGeneratorContext, j: JJunction, strategy?: Strategy): Generator<Configuration> {
+function* singleGadget(context: ConfigGeneratorContext, index: number, strategy?: Strategy): Generator<Configuration> {
+	const j = context.$repo.$junctions[index];
 	const partitions: JPartition[] = [{
-		overlaps: [context.$toOverlap(j, 0)],
+		overlaps: [context.$toOverlap(j, index)],
 		strategy,
 	}];
-	yield context.$make(partitions, [j]);
+	yield context.$make(partitions, true);
 }
 
-function* doubleRelay(context: ConfigGeneratorContext, j: JJunction, index: number = 0): Generator<Configuration> {
+function* doubleRelay(context: ConfigGeneratorContext, index: number): Generator<Configuration> {
+	const j = context.$repo.$junctions[index];
 	const make = (overlaps: JOverlap[]): Configuration =>
-		context.$make(overlaps.map(o => ({ overlaps: [o] })), [j]);
+		context.$make(overlaps.map(o => ({ overlaps: [o] })), true);
 
 	if(j.ox * j.oy % 2) return; // Odd area won't work
 	if(j.ox < j.oy) {

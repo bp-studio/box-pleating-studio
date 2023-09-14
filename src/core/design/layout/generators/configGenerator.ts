@@ -37,7 +37,7 @@ export function* configGenerator(repo: Repository, prototype?: JStretch): Genera
 	// Search for Configuration
 	if(repo.$junctions.length === 1) {
 		const context = new ConfigGeneratorContext(repo);
-		yield* singleConfigGenerator(context, repo.$junctions[0], protoSignature);
+		yield* singleConfigGenerator(context, 0, protoSignature);
 	} else {
 		yield* generalConfigGenerator(repo, protoSignature);
 	}

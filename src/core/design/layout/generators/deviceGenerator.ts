@@ -10,7 +10,7 @@ import type { Configuration } from "../configuration";
 import type { JDevice, JGadget, JOverlap, JPartition, JPiece } from "shared/json";
 
 export function* deviceGenerator(data: JPartition, config: Configuration): Generator<JDevice> {
-	const junctions = config.$junctions;
+	const junctions = config.$repo.$junctions;
 	const { overlaps, strategy } = data;
 	if(overlaps.length == 1) {
 		const overlap = overlaps[0];

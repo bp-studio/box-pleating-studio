@@ -9,7 +9,7 @@ import type { CornerMap } from "./partition";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
-import type { JConfiguration, JJunctions, JOverlap, JPartition } from "shared/json";
+import type { JConfiguration, JJunction, JOverlap, JPartition } from "shared/json";
 
 //=================================================================
 /**
@@ -25,10 +25,11 @@ export class Configuration implements ISerializable<JConfiguration> {
 	public readonly $overlaps!: readonly JOverlap[];
 
 	/**
-	 * This typically is the same as {@link Repository.$junctions},
-	 * but can also be a subset of it in special use cases.
+	 * Indicate that the current configuration is generated with only one
+	 * {@link JJunction}, either because there is indeed only one or that the current
+	 * {@link Configuration} is a temporary one.
 	 */
-	public readonly $junctions: JJunctions;
+	public readonly $singleMode: boolean;
 
 	/**
 	 * Given the id (a negative number) of a {@link JOverlap},
@@ -42,10 +43,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	public $originDirty: boolean = false;
 
-	constructor(repo: Repository, config: JConfiguration, junctions?: JJunctions) {
+	constructor(repo: Repository, config: JConfiguration, singleMode: boolean = false) {
 		this.$repo = repo;
 		this.$partitions = config.partitions.map(p => new Partition(this, p));
-		this.$junctions = junctions || repo.$junctions;
+		this.$singleMode = singleMode;
 
 		const overlaps: JOverlap[] = [];
 		const overlapMap: Map<number, [number, number]> = new Map();

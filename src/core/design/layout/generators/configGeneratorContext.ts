@@ -69,8 +69,11 @@ export class ConfigGeneratorContext {
 		};
 	}
 
-	/** Replace temporary id to real id and construct a new {@link Configuration}. */
-	public $make(partitions: JPartition[], junctions?: JJunctions): Configuration {
+	/**
+	 * Replace temporary id to real id and construct a new {@link Configuration}.
+	 * @param singleMode See {@link Configuration.$singleMode}.
+	 */
+	public $make(partitions: JPartition[], singleMode?: boolean): Configuration {
 		// Gather all id
 		const idMap = new Map<number, number>();
 		const overlaps = partitions.flatMap(p => p.overlaps);
@@ -85,6 +88,6 @@ export class ConfigGeneratorContext {
 			if(corner.e !== undefined && corner.e < 0) corner.e = idMap.get(corner.e);
 		}
 
-		return new Configuration(this.$repo, { partitions }, junctions || this._junctions);
+		return new Configuration(this.$repo, { partitions }, singleMode);
 	}
 }
