@@ -258,7 +258,8 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const offset = o2.ox > o1.ox ? previousQuadrantOffset : nextQuadrantOffset;
 		const q = (offset + c) % quadrantNumber;
 		o2.c[c] = { type: CornerType.coincide, e: o1.id, q: c };
-		o2.c[q] = { type: CornerType.intersection, e: o1.c[opposite(c)].e };
+		const other = this._junctions[o1.parent].c[opposite(c)].e!;
+		o2.c[q] = { type: CornerType.intersection, e: other };
 		o1.c[opposite(q)] = { type: CornerType.coincide, e: o2.id, q };
 		return o2;
 	}

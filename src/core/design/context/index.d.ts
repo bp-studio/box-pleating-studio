@@ -64,6 +64,8 @@ export interface PatternContour extends Array<Point> {
 
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly number[];
+
+	$linked?: boolean;
 }
 
 export interface NodeGraphics {

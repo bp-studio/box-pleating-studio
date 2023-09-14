@@ -5,21 +5,14 @@ import { same } from "shared/types/geometry";
 import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { Line } from "core/math/geometry/line";
-import { deduplicate } from "core/math/geometry/path";
-import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
+import { combineContour } from "./combine";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
-import type { Contour, ILine, Path, PathEx } from "shared/types/geometry";
+import type { ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
-import type { ITreeNode, PatternContour } from "../context";
+import type { ITreeNode } from "../context";
 import type { expand } from "core/math/polyBool/expansion";
-
-interface RationalContour {
-	outer: Point[];
-	inner?: Point[][];
-	isHole?: boolean;
-}
 
 //=================================================================
 /**
@@ -72,59 +65,6 @@ function addRepo(repo: Repository): void {
 	}
 }
 
-function combineContour(node: ITreeNode): void {
-	const g = node.$graphics;
-	const childrenPatternContours: PatternContour[] = [];
-	for(const child of node.$children) {
-		// There's no need to process a child pattern contour if the
-		// corresponding pattern does not involve the current node
-		const contours = child.$graphics.$patternContours.filter(p => p.$ids.includes(node.id));
-		childrenPatternContours.push(...contours);
-	}
-	const result: RationalContour[] = g.$roughContours.map(toRationalContour);
-
-	// To temporarily disable pattern contour, comment the following two lines.
-	for(const path of g.$patternContours) tryInsert(result[path.$for].outer, path);
-	for(const contour of childrenPatternContours) tryInsertInner(contour, result);
-
-	g.$contours = result.map(toContour);
-}
-
-function tryInsertInner(path: PatternContour, result: RationalContour[]): void {
-	for(const contour of result) {
-		if(!contour.inner) continue;
-		for(const inner of contour.inner) {
-			if(tryInsert(inner, path)) return;
-		}
-	}
-}
-
-function tryInsert(path: Point[], insert: PatternContour): boolean {
-	const l = path.length;
-	const first = insert[0];
-	const last = insert[insert.length - 1];
-	let start: number | undefined, end: number | undefined;
-	for(let i = 0; i < l; i++) {
-		const line = new Line(path[i], path[i + 1] || path[0]);
-		if(start === undefined && (line.$contains(first) || line.p1.eq(first))) {
-			start = i + 1;
-		}
-		if(end === undefined && (line.$contains(last) || line.p2.eq(last))) {
-			end = i + 1;
-		}
-		if(start !== undefined && end !== undefined && start != end) {
-			if(end > start) {
-				path.splice(start, end - start, ...insert);
-			} else {
-				path.splice(start);
-				path.splice(0, end);
-				path.push(...insert);
-			}
-			return true;
-		}
-	}
-	return false;
-}
 
 function flapRidge(node: ITreeNode): ILine[] {
 	const p = toCorners(node.$AABB.$toValues());
@@ -216,24 +156,4 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 		const dot = (p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
 		if(dot == 0) yield [p1, p0, p2];
 	}
-}
-
-function simplify(path: Point[]): Path {
-	return deduplicate(toPath(path));
-}
-
-function toRationalContour(contour: Contour): RationalContour {
-	return {
-		outer: toRationalPath(contour.outer),
-		inner: contour.inner?.map(toRationalPath),
-		isHole: contour.isHole,
-	};
-}
-
-function toContour(contour: RationalContour): Contour {
-	return {
-		outer: simplify(contour.outer),
-		inner: contour.inner?.map(simplify),
-		isHole: contour.isHole,
-	};
 }
