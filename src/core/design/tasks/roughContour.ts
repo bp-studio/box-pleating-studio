@@ -70,8 +70,8 @@ function updater(node: ITreeNode): boolean {
 function getRelevantCorners(node: ITreeNode): string[] {
 	const nodeSets = nodeSetMap.get(node.id)!;
 	if(!nodeSets) return [];
-	return nodeSets.flatMap(s => {
-		const coverage = s.$coverage.get(node) || [];
+	return nodeSets.flatMap(nodeSet => {
+		const coverage = nodeSet.$coverage.get(node) || [];
 		return coverage.map(q => {
 			// q.$flap is a descendant of node by definition
 			const d = q.$flap.$dist - node.$dist + node.$length;

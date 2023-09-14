@@ -11,12 +11,12 @@ const expander = new AAUnion(true, new ExChainer());
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
-export function expand(polygon: Polygon, units: number, corners: string[]): RoughContour[] {
-	const polygons: PathEx[][] = polygon.map(path => [expandPath(path, units)]);
-	const pathRemain = new Set(Array.from({ length: polygons.length }, (_, i) => i));
+export function expand(inputPolygons: Polygon, units: number, corners: string[]): RoughContour[] {
+	const expandedPolygons: PathEx[][] = inputPolygons.map(path => [expandPath(path, units)]);
+	const pathRemain = new Set(Array.from({ length: expandedPolygons.length }, (_, i) => i));
 
-	const result = expander.$get(...polygons).map(simplify);
-	if(!checkCorners(result, corners)) return createRaw(polygons, polygon);
+	const result = expander.$get(...expandedPolygons).map(simplify);
+	if(!checkCorners(result, corners)) return createRaw(expandedPolygons, inputPolygons);
 
 	const contours: RoughContour[] = [];
 	const newHoles: PathEx[] = [];
@@ -24,10 +24,10 @@ export function expand(polygon: Polygon, units: number, corners: string[]): Roug
 		const from = path.from!;
 		const inner = from.map(n => {
 			pathRemain.delete(n);
-			return polygon[n];
+			return inputPolygons[n];
 		});
-		const isHole = polygons[from[0]][0].isHole;
-		if(!isHole && expandPath(path, 1).isHole) {
+		const isHole = expandedPolygons[from[0]][0].isHole;
+		if(!isHole && isClockwise(path)) {
 			newHoles.push(path);
 		} else if(isHole && span(path) > span(inner[0])) {
 			// In this case a hole was over-shrunk and ended up even bigger.
@@ -48,7 +48,7 @@ export function expand(polygon: Polygon, units: number, corners: string[]): Roug
 	// The remaining paths are the holes that vanishes after expansion.
 	// We add those back.
 	for(const n of pathRemain) {
-		contours.push({ outer: [], inner: [polygon[n]], isHole: true });
+		contours.push({ outer: [], inner: [inputPolygons[n]], isHole: true });
 	}
 
 	return contours;
@@ -77,11 +77,15 @@ function checkCorners(result: Path[], corners: string[]): boolean {
  * so the best we can do in this case is not taking the union
  * but keeping the expanded path as they are.
  */
-function createRaw(polygons: Polygon[], polygon: Polygon): RoughContour[] {
-	return polygons.map<RoughContour>((p, i) => {
-		const outer = simplify(p[0]);
-		return { outer, inner: [polygon[i]], $raw: true };
-	});
+function createRaw(expandedPolygons: Polygon[], input: Polygon): RoughContour[] {
+	const result: RoughContour[] = [];
+	for(const [i, p] of expandedPolygons.entries()) {
+		if(p.length == 0) continue;
+		const paths = expander.$get(p).map(simplify);
+		const outer = paths.length == 1 ? paths[0] : paths.find(path => !isClockwise(path))!;
+		result.push({ outer, inner: [input[i]], $raw: true });
+	}
+	return result;
 }
 
 /**
@@ -131,6 +135,7 @@ function span(path: Path): number {
  * vertices in the path, to prevent potential bugs in tracing logics.
  */
 function simplify(path: PathEx): PathEx {
+	if(!path) return [];
 	// First we need to remove duplicate vertices,
 	// or the next step won't work correctly.
 	const deduplicated = deduplicate(path);
@@ -147,4 +152,22 @@ function simplify(path: PathEx): PathEx {
 	}
 	result.from = path.from;
 	return result;
+}
+
+/**
+ * The algorithm is much like {@link expandPath} but faster.
+ */
+function isClockwise(path: PathEx): boolean {
+	const l = path.length;
+	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const p = path[i];
+		if(p.x < minX) {
+			minX = p.x;
+			const p1 = path[j], p2 = path[i + 1] || path[0];
+			const dx = p2.y - p1.y;
+			minXDelta = dx;
+		}
+	}
+	return minXDelta > 0;
 }

@@ -43,3 +43,13 @@ function toString(p: IArcPoint): string {
 	if(p.arc) return `(${p.x},${p.y},${p.arc.x},${p.arc.y},${p.r!})`;
 	return `(${p.x},${p.y})`;
 }
+
+/** For testing. */
+export function isAAPath(path: Path): boolean {
+	const l = path.length;
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const prev = path[j], p = path[i];
+		if(prev.x != p.x && prev.y != p.y) return false;
+	}
+	return true;
+}
