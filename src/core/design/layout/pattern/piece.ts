@@ -7,6 +7,7 @@ import { nonEnumerable } from "shared/utils/nonEnumerable";
 import { toLines } from "core/math/geometry/rationalPath";
 import { clone } from "shared/utils/clone";
 
+import type { PerQuadrant } from "shared/types/direction";
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
 import type { JPiece } from "shared/json";
@@ -112,7 +113,7 @@ export class Piece extends Region implements JPiece {
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@cache public get $anchors(): (Point | null)[] {
+	@cache public get $anchors(): PerQuadrant<Point | null> {
 		const p = this._points;
 		const { contour } = this.$shape;
 		return [

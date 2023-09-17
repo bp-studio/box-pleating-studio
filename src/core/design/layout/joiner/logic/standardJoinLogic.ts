@@ -18,7 +18,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	public override *$join(): Generator<JoinResult> {
 		if(!this.data) return;
 		const { D1, D2, B1, B2, delta } = this._baseJoinIntersections();
-		const { f } = this.data;
+		const { f } = this;
 
 		if(B1 && D2 && !B1.eq(D2)) {
 			if(D2.x * f > B1.x * f) yield* this._obtuseStandardJoin(B1, D2, 0);
@@ -39,14 +39,15 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	 */
 	private *_obtuseStandardJoin(B: Point, D: Point, i: number): Generator<JoinResult> {
 		if(B.$isIntegral) return; // Degenerated to base join
-		const { c1, c2, pt, f } = this.data;
-		let e = [c1.e, c2.e][i];
-		const p = [c1.p, c2.p][i];
+		const { pt } = this.data;
+		const { j1, j2, f } = this;
+		let e = [j1.e, j2.e][i];
+		const p = [j1.p, j2.p][i];
 
 		// If the two gadgets are pointing inwards instead of outwards,
 		// there's no obtuse join (at least there's no such transformation so far).
 		// TODO: Think about this more deeply.
-		if(this.joiner.cw != c1.$isSteeperThan(c2)) return;
+		if(this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
 
 		if(!this._setupAnchor(D)) return;
 		const P = D.sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
@@ -64,7 +65,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 
 		// Check if the transformed R-point goes out of bounds
 		// by checking the intersection of line segments.
-		e = this._substituteEnd([c1.e, c2.e][1 - i], D);
+		e = this._substituteEnd([j1.e, j2.e][1 - i], D);
 		const test = e.$intersection(new Line(T, R));
 		if(test && !test.eq(T) && !test.eq(R)) return;
 
@@ -81,8 +82,8 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	 */
 	private *_acuteStandardJoin(B: Point, D: Point, i: number, delta: Line): Generator<JoinResult> {
 		if(D.$isIntegral) return; // Degenerated to base join
-		const { c1, c2 } = this.data;
-		const e = [c1.e, c2.e][i], p = [c1.p, c2.p][i];
+		const { j1, j2 } = this;
+		const e = [j1.e, j2.e][i], p = [j1.p, j2.p][i];
 		const T = closestGridPoint(this._substituteEnd(e, D), B);
 
 		// Before version 0.6, if the closest grid point happens to be the tip of the gadget,

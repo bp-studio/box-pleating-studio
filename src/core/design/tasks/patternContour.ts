@@ -3,7 +3,7 @@ import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
 import { Trace } from "../layout/trace/trace";
 import { quadrantNumber } from "shared/types/direction";
-import { createSegments as createHingeSegments } from "../layout/trace/hingeSegment";
+import { createHingeSegments, tryModifySegments } from "../layout/trace/hingeSegment";
 import { windingNumber } from "core/math/geometry/winding";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 
@@ -55,7 +55,7 @@ function patternContour(): void {
 }
 
 function processRepo(repo: Repository, trace: Trace): void {
-	const coverageMap = repo.$nodeSet.$coverage;
+	const coverageMap = repo.$nodeSet.$quadrantCoverage;
 	for(const [node, coveredQuadrants] of coverageMap.entries()) {
 		const multiContour = node.$graphics.$roughContours.length > 1;
 		for(const [index, roughContour] of node.$graphics.$roughContours.entries()) {
@@ -77,6 +77,7 @@ function processRepo(repo: Repository, trace: Trace): void {
 			for(const hingeSegment of hingeSegments) {
 				const map = startEndMap[hingeSegment.q];
 				if(!map) continue;
+				tryModifySegments(hingeSegment, node);
 				const contour = trace.$generate(hingeSegment, map[0], map[1]);
 				if(contour) {
 					State.$contourWillChange.add(node);

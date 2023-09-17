@@ -1,8 +1,9 @@
-import { AAUnion } from "./union/aaUnion";
-import { ExChainer } from "./chainer/exChainer";
-import { windingNumber } from "../geometry/winding";
-import { deduplicate, mapDirections } from "../geometry/path";
+import { AAUnion } from "core/math/polyBool/union/aaUnion";
+import { ExChainer } from "core/math/polyBool/chainer/exChainer";
+import { windingNumber } from "core/math/geometry/winding";
+import { deduplicate, mapDirections } from "core/math/geometry/path";
 
+import type { RepoCorners } from "core/design/tasks/roughContour";
 import type { RoughContour } from "core/design/context";
 import type { Path, PathEx, Polygon } from "shared/types/geometry";
 
@@ -11,12 +12,12 @@ const expander = new AAUnion(true, new ExChainer());
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
-export function expand(inputPolygons: Polygon, units: number, corners: string[]): RoughContour[] {
+export function expand(inputPolygons: Polygon, units: number, repoCorners: RepoCorners[]): RoughContour[] {
 	const expandedPolygons: PathEx[][] = inputPolygons.map(path => [expandPath(path, units)]);
 	const pathRemain = new Set(Array.from({ length: expandedPolygons.length }, (_, i) => i));
 
 	const result = expander.$get(...expandedPolygons).map(simplify);
-	if(!checkCorners(result, corners)) return createRaw(expandedPolygons, inputPolygons);
+	if(!checkCorners(result, repoCorners)) return createRaw(expandedPolygons, inputPolygons);
 
 	const contours: RoughContour[] = [];
 	const newHoles: PathEx[] = [];
@@ -60,8 +61,8 @@ export function expand(inputPolygons: Polygon, units: number, corners: string[])
  * Note that it does not suffice to check just the coordinates,
  * but also need to consider the turning direction of the corners.
  */
-function checkCorners(result: Path[], corners: string[]): boolean {
-	const set = new Set(corners);
+function checkCorners(result: Path[], repoCorners: RepoCorners[]): boolean {
+	const set = new Set(repoCorners.flatMap(r => r.corners));
 	for(const path of result) {
 		const dirs = mapDirections(path);
 		for(const [i, p] of path.entries()) {

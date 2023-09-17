@@ -1,7 +1,7 @@
 import { Vector } from "core/math/geometry/vector";
 import { opposite } from "shared/types/direction";
 import { Point } from "core/math/geometry/point";
-import { JoinCandidate } from "./joinCandidate";
+import { Joinee } from "./joinee";
 
 import type { QuadrantDirection } from "shared/types/direction";
 import type { Joiner } from "./joiner";
@@ -10,12 +10,11 @@ import type { JAnchor } from "shared/json";
 
 //=================================================================
 /**
- * {@link JoinCandidateBuilder} helps complete the complicated
- * construction of {@link JoinCandidate}s.
+ * {@link JoineeBuilder} helps complete the complicated construction of {@link Joinee}s.
  */
 //=================================================================
 
-export class JoinCandidateBuilder {
+export class JoineeBuilder {
 
 	public a: JAnchor[] = [];
 	private offset: IPoint = { x: 0, y: 0 };
@@ -28,9 +27,9 @@ export class JoinCandidateBuilder {
 	) {}
 
 	/**
-	 * This is the most complicated part of constructing a {@link JoinCandidate}.
+	 * This is the most complicated part of constructing a {@link Joinee}.
 	 */
-	public $setup(that: JoinCandidateBuilder, f: Sign, shift: IPoint): number {
+	public $setup(that: JoineeBuilder, f: Sign, shift: IPoint): number {
 		const int = this.joiner.$getRelayJoinIntersection(that.p, shift, opposite(this.q));
 		if(!int || !int.$isIntegral) return NaN;
 
@@ -67,8 +66,8 @@ export class JoinCandidateBuilder {
 		return new Point(this.a[this.joiner.q].location!);
 	}
 
-	public $build(pt: Point): JoinCandidate {
-		return new JoinCandidate(
+	public $build(pt: Point): Joinee {
+		return new Joinee(
 			this.p, this.offset, this.a, pt, this.q, this._additionalOffset
 		);
 	}

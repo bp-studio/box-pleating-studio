@@ -11,12 +11,12 @@ import type { JoinLogic } from "./logic/joinLogic";
 
 //=================================================================
 /**
- * {@link JoinCandidate} is the abstraction of one of the involved {@link JGadget}s.
+ * {@link Joinee} is the abstraction of one of the involved {@link JGadget}s.
  * It apportions some of the calculations in {@link JoinLogic}.
  */
 //=================================================================
 
-export class JoinCandidate {
+export class Joinee {
 
 	public readonly p: Piece;
 	public readonly o: IPoint;
@@ -62,7 +62,7 @@ export class JoinCandidate {
 		};
 	}
 
-	public $isSteeperThan(that: JoinCandidate): boolean {
+	public $isSteeperThan(that: Joinee): boolean {
 		return this.p.$direction.$slope.gt(that.p.$direction.$slope);
 	}
 

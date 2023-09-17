@@ -33,9 +33,11 @@ export class Joiner {
 	/** Sharing the lower-left corner. */
 	public $oriented: boolean;
 
-	/** It is clockwise from p1 to p2. */
-	public cw: boolean;
-	public $intDist: number;
+	/** It is clockwise from {@link g1} to {@link g2}. */
+	public $isClockwise: boolean;
+
+	/** See {@link Repository.$getMaxIntersectionDistance}. */
+	public $intersectionDist: number;
 
 	// Edge combinations in the 4 cases.
 	public q1: QuadrantDirection;
@@ -56,10 +58,10 @@ export class Joiner {
 		});
 		const [j1, j2] = junctions;
 		this.$oriented = j1.c[0].e == j2.c[0].e;
-		this.cw = o1.ox > o2.ox;
+		this.$isClockwise = o1.ox > o2.ox;
 		this.q = this.$oriented ? 0 : 2;
 		[this.q1, this.q2] = this._getQuadrantCombination();
-		this.$intDist = repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
+		this.$intersectionDist = repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
 
 		// Calculate Overlap shifting
 		[this.s1, this.s2] = this.$oriented ?
@@ -124,11 +126,11 @@ export class Joiner {
 		for(const [j] of result) yield j;
 	}
 
-	private _getQuadrantCombination(): QuadrantDirection[] {
+	private _getQuadrantCombination(): [QuadrantDirection, QuadrantDirection] {
 		if(this.$oriented) {
-			return this.cw ? [Direction.LL, Direction.UL] : [Direction.UL, Direction.LL];
+			return this.$isClockwise ? [Direction.LL, Direction.UL] : [Direction.UL, Direction.LL];
 		} else {
-			return this.cw ? [Direction.UR, Direction.LR] : [Direction.LR, Direction.UR];
+			return this.$isClockwise ? [Direction.UR, Direction.LR] : [Direction.LR, Direction.UR];
 		}
 	}
 

@@ -50,13 +50,14 @@ export class BaseJoinLogic extends JoinLogic {
 	 * chances are that only one pair will show up.
 	 */
 	protected _baseJoinIntersections(): BaseJoinContext {
-		const { bv, c1, c2, pt } = this.data;
+		const { bv, pt } = this.data;
+		const { j1, j2 } = this;
 		const deltaPt = this._deltaPt;
 		const delta = new Line(deltaPt, QV[0]);
-		const D1 = c1.e.$intersection(deltaPt, QV[0]);
-		const D2 = c2.e.$intersection(deltaPt, QV[0]);
-		const B1 = c1.e.$intersection(pt, bv);
-		const B2 = c2.e.$intersection(pt, bv);
+		const D1 = j1.e.$intersection(deltaPt, QV[0]);
+		const D2 = j2.e.$intersection(deltaPt, QV[0]);
+		const B1 = j1.e.$intersection(pt, bv);
+		const B2 = j2.e.$intersection(pt, bv);
 		return { D1, D2, B1, B2, delta };
 	}
 }

@@ -21,7 +21,11 @@ export class NodeSet {
 
 	public readonly $leaves: readonly number[];
 	public readonly $nodes: readonly number[];
-	public readonly $coverage: ReadonlyMap<ITreeNode, Quadrant[]>;
+
+	/**
+	 * Mapping each {@link ITreeNode} to the {@link Quadrant}s covered by it.
+	 */
+	public readonly $quadrantCoverage: ReadonlyMap<ITreeNode, Quadrant[]>;
 
 	/**
 	 * A {@link IntDoubleMap} mapping pairs of flap ids to their LCA.
@@ -76,7 +80,7 @@ export class NodeSet {
 		}
 
 		nodes.sort(minComparator);
-		this.$coverage = coverage;
+		this.$quadrantCoverage = coverage;
 		this.$nodes = nodes;
 	}
 
@@ -120,8 +124,8 @@ export class NodeSet {
 		const tree = State.$tree;
 		const A = tree.$nodes[a]!;
 		const B = tree.$nodes[b]!;
-		const ALeaf = this.$coverage.get(A)![0].$flap.id;
-		const BLeaf = this.$coverage.get(B)![0].$flap.id;
+		const ALeaf = this.$quadrantCoverage.get(A)![0].$flap.id;
+		const BLeaf = this.$quadrantCoverage.get(B)![0].$flap.id;
 		lca = lcaMap.get(ALeaf, BLeaf)!;
 		lcaMap.set(a, b, lca);
 		return lca;

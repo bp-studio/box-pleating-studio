@@ -2,13 +2,18 @@ import { Task } from "./task";
 import { climb } from "./climb";
 import { State } from "core/service/state";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
-import { expand } from "core/math/polyBool/expansion";
+import { expand } from "core/design/tasks/expansion";
 import { patternContourTask } from "./patternContour";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { Polygon } from "shared/types/geometry";
 import type { NodeSet } from "../layout/nodeSet";
 import type { ITreeNode, NodeGraphics, RoughContour, PatternContour } from "../context";
+
+export interface RepoCorners {
+	nodeSet: NodeSet;
+	corners: string[];
+}
 
 //=================================================================
 /**
@@ -58,26 +63,29 @@ function updater(node: ITreeNode): boolean {
 		const path = node.$AABB.$toPath();
 		node.$graphics.$roughContours = [{ outer: path }];
 	} else {
-		const corners = getRelevantCorners(node);
+		const repoCorners = getRelevantRepoCorners(node);
 		const components = getChildComponents(node);
 		const inner = union.$get(...components);
-		node.$graphics.$roughContours = expand(inner, node.$length, corners);
+		node.$graphics.$roughContours = expand(inner, node.$length, repoCorners);
 	}
 	State.$contourWillChange.add(node);
 	return true;
 }
 
-function getRelevantCorners(node: ITreeNode): string[] {
+function getRelevantRepoCorners(node: ITreeNode): RepoCorners[] {
 	const nodeSets = nodeSetMap.get(node.id)!;
 	if(!nodeSets) return [];
-	return nodeSets.flatMap(nodeSet => {
-		const coverage = nodeSet.$coverage.get(node) || [];
-		return coverage.map(q => {
-			// q.$flap is a descendant of node by definition
-			const d = q.$flap.$dist - node.$dist + node.$length;
-			const p = q.$corner(d);
-			return p.x + "," + p.y + "," + q.q;
-		});
+	return nodeSets.map(nodeSet => {
+		const quadrants = nodeSet.$quadrantCoverage.get(node) || [];
+		return {
+			nodeSet,
+			corners: quadrants.map(quadrant => {
+				// q.$flap is a descendant of node by definition
+				const d = quadrant.$flap.$dist - node.$dist + node.$length;
+				const p = quadrant.$corner(d);
+				return p.x + "," + p.y + "," + quadrant.q;
+			}),
+		};
 	});
 }
 

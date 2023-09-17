@@ -16,16 +16,17 @@ export class SimpleJoinLogic extends JoinLogic {
 
 	public *$join(): Generator<JoinResult> {
 		if(!this.data) return;
-		const { c1, c2, pt, bv } = this.data;
+		const { pt, bv } = this.data;
+		const { j1, j2 } = this;
 
 		// Find the intersection
-		const int = c1.e.$intersection(c2.e); // p1-perspective
+		const int = j1.e.$intersection(j2.e); // p1-perspective
 		if(!int) return;
 
 		// Check the simple join condition
 		if(
-			!c1.p.$direction.$parallel(c2.p.$direction) &&
-				!int.sub(pt).$parallel(bv)
+			!j1.p.$direction.$parallel(j2.p.$direction) &&
+			!int.sub(pt).$parallel(bv)
 		) return;
 
 		// Complete
