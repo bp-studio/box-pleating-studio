@@ -5,13 +5,13 @@ import type { PathEx } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link ExChainer} is the {@link Chainer} specialized for expansion.
+ * {@link UnionChainer} is the {@link Chainer} for taking unions.
  * It tracks the relation between the generated polygon and
  * the original polygon from which it forms.
  */
 //=================================================================
 
-export class ExChainer extends Chainer<PathEx> {
+export class UnionChainer extends Chainer<PathEx> {
 
 	/** The set of known source indices of each chain */
 	private _sources: Set<number>[] = [];

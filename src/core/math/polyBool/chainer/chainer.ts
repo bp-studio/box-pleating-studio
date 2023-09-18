@@ -23,6 +23,8 @@ const INITIAL_CHAIN_SIZE = 10;
 //=================================================================
 export class Chainer<PathType extends Path = Path> {
 
+	public $checkFunction = same;
+
 	protected _chainHeads!: number[];
 	protected _chainTails!: number[];
 	protected _points!: IPoint[];
@@ -126,9 +128,8 @@ export class Chainer<PathType extends Path = Path> {
 		 */
 		for(let i = 1; i <= this._chains; i++) {
 			// Typically the instances of IPoints is not shared here,
-			// so we need to check by coordinates. Fortunately,
-			// we don't need to perform epsilon checks here.
-			if(same(this._points[indices[i]], p)) return i;
+			// so we need to check by coordinates.
+			if(this.$checkFunction(this._points[indices[i]], p)) return i;
 		}
 		return 0;
 	}

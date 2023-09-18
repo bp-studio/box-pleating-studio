@@ -1,7 +1,6 @@
 import { Task } from "./task";
 import { climb } from "./climb";
 import { State } from "core/service/state";
-import { expand } from "core/design/tasks/expansion";
 import { patternContourTask } from "./patternContour";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { RoughContourContext } from "./roughContourContext";
@@ -54,7 +53,7 @@ function updater(node: ITreeNode): boolean {
 	} else {
 		const nodeSets = nodeSetMap.get(node.id);
 		const context = new RoughContourContext(node, nodeSets);
-		node.$graphics.$roughContours = expand(context);
+		context.$process();
 	}
 	State.$contourWillChange.add(node);
 	return true;

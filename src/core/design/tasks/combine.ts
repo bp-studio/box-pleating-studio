@@ -1,7 +1,7 @@
 import { Line } from "core/math/geometry/line";
 import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
-import { dist } from "shared/types/geometry";
+import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
@@ -17,6 +17,8 @@ interface RationalContour {
 	$inner?: RationalPath[];
 }
 
+const generalUnion = new GeneralUnion();
+
 export function combineContour(node: ITreeNode): void {
 	const g = node.$graphics;
 	const childrenPatternContours: PatternContour[] = [];
@@ -28,40 +30,32 @@ export function combineContour(node: ITreeNode): void {
 	}
 	const result: RationalContour[] = g.$roughContours.map(toRationalContour);
 
-	// if(node.id == 0) debugger;
-
 	// To temporarily disable pattern contour, comment the following two lines.
-	// insertOuter(g.$patternContours, result);
-	// insertInner(childrenPatternContours, result);
+	insertOuter(g.$patternContours, result);
+	insertInner(childrenPatternContours, result);
 
-	g.$contours = result.map(toGraphicalContour);
+	let contours = result.map(toGraphicalContour);
+	if(g.$raw) {
+		contours = generalUnion
+			.$get(...contours.map(c => [c.outer]))
+			.map(p => {
+				const innerContours = p.from!.flatMap(i => contours[i].inner || []);
+				const inner = generalUnion.$get(...innerContours.map(c => [c]));
+				return { outer: p, inner };
+			});
+	}
+	g.$contours = contours;
 }
 
 function insertOuter(patternContours: PatternContour[], result: RationalContour[]): void {
-	const remaining: PatternContour[] = [];
 	for(const contour of patternContours) {
-		if(!tryInsert(result[contour.$for].$outer, contour)) {
-			remaining.push(contour);
-		}
-	}
-	if(remaining.length == 0) return;
-	for(const linkedContour of linkContours(remaining)) {
-		const ok = tryInsert(result[linkedContour.$for].$outer, linkedContour);
-		// if(!ok) debugger;
+		tryInsert(result[contour.$for].$outer, contour);
 	}
 }
 
 function insertInner(childrenPatternContours: PatternContour[], result: RationalContour[]): void {
-	const remaining: PatternContour[] = [];
 	for(const childContour of childrenPatternContours) {
-		if(!tryInsertInner(childContour, result)) {
-			remaining.push(childContour);
-		}
-	}
-	if(remaining.length == 0) return;
-	// console.log(remaining.map(r => [r, r.map(p => p.toString())]));
-	for(const linkedContour of linkContours(remaining)) {
-		tryInsertInner(linkedContour, result);
+		tryInsertInner(childContour, result);
 	}
 }
 
@@ -100,36 +94,6 @@ function tryInsert(path: Point[], insert: PatternContour): boolean {
 		}
 	}
 	return false;
-}
-
-function linkContours(contours: (PatternContour | null)[]): PatternContour[] {
-	for(let i = 0; i < contours.length - 1; i++) {
-		for(let j = i + 1; j < contours.length; j++) {
-			const c1 = contours[i], c2 = contours[j];
-			if(!c1 || !c2 || c1.$for != c2.$for) continue;
-			const t1 = testLink(c1, c2), t2 = testLink(c2, c1);
-			if(t1 === undefined && t2 === undefined) continue;
-			const linkedContour = t2 === undefined || t1 !== undefined && t1 < t2 ? link(c1, c2) : link(c2, c1);
-			console.log(linkedContour.map(p => p.toString()));
-			linkedContour.$for = c1.$for;
-			linkedContour.$linked = true;
-			contours[i] = linkedContour;
-			contours[j] = null;
-		}
-	}
-	return contours.filter(c => c && c.$linked) as PatternContour[];
-}
-
-function testLink(c1: PatternContour, c2: PatternContour): number | undefined {
-	const l = c1.length - 1;
-	if(c1[l].x != c2[0].x && c1[l].y != c2[0].y) return undefined;
-	return dist(c1[l], c2[0]);
-}
-
-function link(c1: PatternContour, c2: PatternContour): PatternContour {
-	const result: Point[] = [];
-	result.push(...c1, ...c2);
-	return result as PatternContour;
 }
 
 function toRationalContour(contour: RoughContour): RationalContour {

@@ -1,12 +1,12 @@
 import { PolyBool } from "../polyBool";
 import { xyComparator } from "shared/types/geometry";
+import { UnionChainer } from "../chainer/unionChainer";
 
 import type { ISegment } from "../segment/segment";
-import type { Chainer } from "../chainer/chainer";
 import type { EndEvent } from "../event";
 import type { EventProvider } from "../eventProvider";
 import type { IntersectorConstructor } from "../intersector";
-import type { Path, Polygon } from "shared/types/geometry";
+import type { PathEx, Polygon } from "shared/types/geometry";
 
 type LineConstructor = new (p1: IPoint, p2: IPoint, i: number) => ISegment;
 
@@ -16,17 +16,16 @@ type LineConstructor = new (p1: IPoint, p2: IPoint, i: number) => ISegment;
  */
 //=================================================================
 
-export abstract class UnionBase extends PolyBool<Polygon> {
+export abstract class UnionBase extends PolyBool<Polygon, PathEx> {
 
 	private readonly _lineConstructor: LineConstructor;
 
 	constructor(
 		provider: EventProvider,
 		Intersector: IntersectorConstructor,
-		chainer: Chainer<Path>,
 		lineConstructor: LineConstructor
 	) {
-		super(provider, Intersector, chainer);
+		super(provider, Intersector, new UnionChainer());
 		this._lineConstructor = lineConstructor;
 	}
 

@@ -1,4 +1,5 @@
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
+import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
 
 import type { Polygon } from "shared/types/geometry";
 
@@ -9,8 +10,10 @@ const toast = document.getElementById("toast") as HTMLDivElement;
 const cInput = document.getElementById("cInput") as HTMLCanvasElement;
 const cOutput = document.getElementById("cOutput") as HTMLCanvasElement;
 const btn = document.getElementById("btn") as HTMLButtonElement;
+const btn2 = document.getElementById("btn2") as HTMLButtonElement;
 
 btn.onclick = run;
+btn2.onclick = run2;
 
 cInput.onmousemove = e => toast.innerText = `${Math.round(e.offsetX / factor)}, ${Math.round((full - e.offsetY) / factor)}`;
 cOutput.onmousemove = e => toast.innerText = `${Math.round(e.offsetX / factor)}, ${Math.round((full - e.offsetY) / factor)}`;
@@ -44,4 +47,10 @@ function run(): void {
 	draw(ctxOutput, result);
 }
 
-
+function run2(): void {
+	const textArea = document.getElementById("T") as HTMLTextAreaElement;
+	const data = JSON.parse(textArea.value) as Polygon[];
+	draw(ctxInput, ...data);
+	const result = new GeneralUnion().$get(...data);
+	draw(ctxOutput, result);
+}

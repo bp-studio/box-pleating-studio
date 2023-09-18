@@ -1,13 +1,10 @@
-import { AAUnion } from "core/math/polyBool/union/aaUnion";
 import { mapDirections } from "core/math/geometry/path";
+import { expand } from "./expansion";
 
 import type { ITreeNode, RoughContour, PatternContour } from "../context";
 import type { NodeSet } from "../layout/nodeSet";
-import type { Path, Polygon } from "shared/types/geometry";
+import type { Path } from "shared/types/geometry";
 import type { QuadrantDirection } from "shared/types/direction";
-
-const union = new AAUnion();
-const rawUnion = new AAUnion(true);
 
 //=================================================================
 /**
@@ -31,20 +28,26 @@ const rawUnion = new AAUnion(true);
 export class RoughContourContext {
 
 	public readonly $node: ITreeNode;
-	public readonly $components: readonly Polygon[];
+	public readonly $children: readonly RoughContour[];
 
 	private readonly _cornerMap: Map<string, NodeSet> = new Map();
 
 	constructor(node: ITreeNode, nodeSets: NodeSet[] | undefined) {
 		this.$node = node;
-		this.$components = getChildComponents(node);
+		this.$children = getChildContours(node);
 		for(const nodeSet of nodeSets || []) this._setupCriticalCorners(nodeSet);
+	}
 
-		// const inputPolygons = union.$get(...this.$components);
-		// const expandedPolygons: PathEx[][] = inputPolygons.map(path => [expandPath(path, node.$length)]);
-
-		// const result = expander.$get(...expandedPolygons).map(simplify);
-		// if(!context.$checkCriticalCorners(result)) return createRaw(expandedPolygons, inputPolygons);
+	public $process(): void {
+		this.$node.$graphics.$roughContours = expand(
+			this.$children,
+			this.$node.$length,
+			result => {
+				if(!this.$checkCriticalCorners(result)) {
+					return this.$createRaw();
+				}
+			}
+		);
 	}
 
 	/**
@@ -59,7 +62,26 @@ export class RoughContourContext {
 				this._cornerMap.delete(cornerSignature(p, dirs[i]));
 			}
 		}
-		return this._cornerMap.size == 0;
+		const ok = this._cornerMap.size == 0;
+		this.$node.$graphics.$raw = ok ? undefined : true;
+		return ok;
+	}
+
+	public $createRaw(): RoughContour[] {
+		const nodeSets = new Set(this._cornerMap.values());
+
+		const group: RoughContour[][] = [];
+		const remaining = new Set(this.$children);
+		for(const nodeSet of nodeSets) {
+			const leaves = new Set(nodeSet.$leaves);
+			const children = this.$children.filter(r => r.$leaves.some(l => leaves.has(l)));
+			children.forEach(c => remaining.delete(c));
+			group.push(children);
+		}
+		if(remaining.size) group.push([...remaining]);
+
+		const result = group.flatMap(g => expand(g, this.$node.$length));
+		return result;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,20 +111,11 @@ function cornerSignature(p: IPoint, dir: QuadrantDirection): string {
 	return p.x + "," + p.y + "," + dir;
 }
 
-function getChildComponents(node: ITreeNode): Polygon[] {
-	const components: Polygon[] = [];
+function getChildContours(node: ITreeNode): RoughContour[] {
+	const result: RoughContour[] = [];
 	for(const child of node.$children) {
 		const roughContours = child.$graphics.$roughContours;
-		if(!roughContours.length) continue;
-		// if(roughContours[0].$raw) {
-		// 	// If child contour is in raw mode, they all need to be treated separately
-		// 	for(const rough of roughContours) {
-		// 		components.push(rawUnion.$get([rough.outer]));
-		// 	}
-		// } else {
-		// 	components.push(roughContours.map(c => c.outer));
-		// }
-		components.push(roughContours.map(c => c.$outer));
+		result.push(...roughContours);
 	}
-	return components;
+	return result;
 }

@@ -64,13 +64,14 @@ export interface PatternContour extends Array<Point> {
 
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly number[];
-
-	$linked?: boolean;
 }
 
 export interface NodeGraphics {
 	/** See {@link RoughContour}. */
 	$roughContours: RoughContour[];
+
+	/** Indicating that {@link $roughContours} is in raw mode. */
+	$raw?: boolean;
 
 	$patternContours: PatternContour[];
 
@@ -102,9 +103,6 @@ export interface RoughContour {
 	 * The same note of {@link $outer} also applies here.
 	 */
 	$inner?: PathEx[];
-
-	/** Indicating that this contour is in raw mode. */
-	$raw?: boolean;
 
 	/** The ids of the leaf nodes inside this {@link RoughContour}. */
 	$leaves: number[];

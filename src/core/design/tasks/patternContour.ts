@@ -3,7 +3,7 @@ import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
 import { Trace } from "../layout/trace/trace";
 import { quadrantNumber } from "shared/types/direction";
-import { createHingeSegments, tryModifySegments } from "../layout/trace/hingeSegment";
+import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { windingNumber } from "core/math/geometry/winding";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 
@@ -77,7 +77,6 @@ function processRepo(repo: Repository, trace: Trace): void {
 			for(const hingeSegment of hingeSegments) {
 				const map = startEndMap[hingeSegment.q];
 				if(!map) continue;
-				tryModifySegments(hingeSegment, node);
 				const contour = trace.$generate(hingeSegment, map[0], map[1]);
 				if(contour) {
 					State.$contourWillChange.add(node);

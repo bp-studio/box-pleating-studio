@@ -12,7 +12,6 @@ import type { Repository } from "../layout/repository";
 import type { ILine, Path } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
-import type { expand } from "core/design/tasks/expansion";
 
 //=================================================================
 /**

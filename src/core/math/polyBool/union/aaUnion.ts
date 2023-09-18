@@ -1,4 +1,3 @@
-import { Chainer } from "../chainer/chainer";
 import { AALineSegment } from "../segment/aaLineSegment";
 import { AAIntersector } from "./aaIntersector";
 import { AAEventProvider } from "./aaEventProvider";
@@ -18,8 +17,8 @@ import type { Polygon } from "shared/types/geometry";
 
 export class AAUnion extends UnionBase {
 
-	constructor(checkSelfIntersection: boolean = false, chainer: Chainer | undefined = undefined) {
-		super(new AAEventProvider(), AAIntersector, chainer || new Chainer(), AALineSegment);
+	constructor(checkSelfIntersection: boolean = false) {
+		super(new AAEventProvider(), AAIntersector, AALineSegment);
 		(this._intersector as AAIntersector).$checkSelfIntersection = checkSelfIntersection;
 	}
 }

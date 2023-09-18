@@ -1,24 +1,27 @@
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
-import { ExChainer } from "core/math/polyBool/chainer/exChainer";
 import { windingNumber } from "core/math/geometry/winding";
 import { deduplicate } from "core/math/geometry/path";
 
-import type { RoughContourContext } from "./roughContourContext";
 import type { RoughContour } from "core/design/context";
-import type { Path, PathEx, Polygon } from "shared/types/geometry";
+import type { Path, PathEx } from "shared/types/geometry";
 
-const union = new AAUnion();
-const expander = new AAUnion(true, new ExChainer());
+const aaUnion = new AAUnion();
+const expander = new AAUnion(true);
+
+type CheckCallback = (result: PathEx[]) => RoughContour[] | undefined;
 
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
-export function expand(context: RoughContourContext): RoughContour[] {
-	const inputPolygons: PathEx[] = union.$get(...context.$components);
-	const expandedPolygons: PathEx[][] = inputPolygons.map(path => [expandPath(path, context.$node.$length)]);
+export function expand(inputs: readonly RoughContour[], units: number, check?: CheckCallback): RoughContour[] {
+	const union = aaUnion.$get(...inputs.map(c => [c.$outer]));
+	const expandedPolygons: PathEx[][] = union.map(path => [expandPath(path, units)]);
 
 	const result = expander.$get(...expandedPolygons).map(simplify);
-	if(!context.$checkCriticalCorners(result)) return createRaw(expandedPolygons, inputPolygons);
+	if(check) {
+		const checkResult = check(result);
+		if(checkResult) return checkResult;
+	}
 
 	const pathRemain = new Set(Array.from({ length: expandedPolygons.length }, (_, i) => i));
 	const contours: RoughContour[] = [];
@@ -28,7 +31,7 @@ export function expand(context: RoughContourContext): RoughContour[] {
 		let holeIndex = -1;
 		const inner = from.map((n, i) => {
 			pathRemain.delete(n);
-			const input = inputPolygons[n];
+			const input = union[n];
 			if(expandedPolygons[n][0].isHole) {
 				holeIndex = i;
 				input.isHole = true;
@@ -45,7 +48,10 @@ export function expand(context: RoughContourContext): RoughContour[] {
 			//TODO: why?
 			// contours.push({ outer: inner[0].toReversed() });
 		} else {
-			contours.push({ $outer: path, $inner: inner, $leaves: [] });
+			const leaves = inner
+				.flatMap(p => p.from!)
+				.flatMap(i => inputs[i].$leaves);
+			contours.push({ $outer: path, $inner: inner, $leaves: leaves });
 		}
 	}
 
@@ -58,27 +64,10 @@ export function expand(context: RoughContourContext): RoughContour[] {
 	// The remaining paths are the holes that vanishes after expansion.
 	// We add those back.
 	for(const n of pathRemain) {
-		contours.push({ $outer: [], $inner: [inputPolygons[n]], $leaves: [] });
+		contours.push({ $outer: [], $inner: [union[n]], $leaves: [] });
 	}
 
 	return contours;
-}
-
-/**
- * If some of the quadrant corners are missing in the union,
- * our tracing algorithm will likely go wrong,
- * so the best we can do in this case is not taking the union
- * but keeping the expanded path as they are.
- */
-function createRaw(expandedPolygons: Polygon[], input: Polygon): RoughContour[] {
-	const result: RoughContour[] = [];
-	for(const [i, p] of expandedPolygons.entries()) {
-		if(p.length == 0) continue;
-		const paths = expander.$get(p).map(simplify);
-		const outer = paths.length == 1 ? paths[0] : paths.find(path => !isClockwise(path))!;
-		result.push({ $outer: outer, $inner: [input[i]], $raw: true, $leaves: [] });
-	}
-	return result;
 }
 
 /**
