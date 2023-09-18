@@ -3,6 +3,7 @@ import { Store } from "./store";
 import { patternGenerator } from "./generators/patternGenerator";
 import { CornerType } from "shared/json";
 import { Line } from "core/math/geometry/line";
+import { clone } from "shared/utils/clone";
 
 import type { Point } from "core/math/geometry/point";
 import type { CornerMap } from "./partition";
@@ -26,8 +27,7 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	/**
 	 * Indicate that the current configuration is generated with only one
-	 * {@link JJunction}, either because there is indeed only one or that the current
-	 * {@link Configuration} is a temporary one.
+	 * {@link JJunction} and that the current {@link Configuration} is a temporary one.
 	 */
 	public readonly $singleMode: boolean;
 
@@ -37,21 +37,31 @@ export class Configuration implements ISerializable<JConfiguration> {
 	 */
 	public readonly $overlapMap!: ReadonlyMap<number, [number, number]>;
 
+	/** Whether the origin needs to be updated. */
+	public $originDirty: boolean = false;
+
+	/** Keeping a copy of the raw {@link JPartition}s, if available. */
+	private readonly _rawPartitions: readonly JPartition[] | undefined;
+
 	private readonly _patterns: Store<Pattern>;
 	private _index: number = 0;
 	private _freeCornerCache: FreeCornerInfo[] | undefined;
 
-	public $originDirty: boolean = false;
-
 	constructor(repo: Repository, config: JConfiguration, singleMode: boolean = false) {
 		this.$repo = repo;
-		this.$partitions = config.partitions.map(p => new Partition(this, p));
 		this.$singleMode = singleMode;
+
+		let partitions = config.partitions;
+		if(config.raw) {
+			this._rawPartitions = partitions;
+			partitions = cleanUp(clone(partitions));
+		}
+		this.$partitions = partitions.map(p => new Partition(this, p));
 
 		const overlaps: JOverlap[] = [];
 		const overlapMap: Map<number, [number, number]> = new Map();
 		let k = -1;
-		for(const [i, p] of config.partitions.entries()) {
+		for(const [i, p] of partitions.entries()) {
 			for(const [j, o] of p.overlaps.entries()) {
 				overlaps.push(o);
 				overlapMap.set(k--, [i, j]);
@@ -102,14 +112,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 		return patterns[this._index];
 	}
 
-	/** Create {@link JPartition}s with {@link JOverlap.id}s. */
-	public $toRawPartitions(): readonly JPartition[] {
-		const partitions = this.toJSON().partitions;
-		let i = -1;
-		for(const partition of partitions) {
-			for(const overlap of partition.overlaps) overlap.id = i--;
-		}
-		return partitions;
+	/** Raw {@link JPartition}s. */
+	public get $rawPartitions(): readonly JPartition[] {
+		return this._rawPartitions!;
 	}
 
 	public $onDeviceMove(): void {
@@ -169,4 +174,25 @@ interface FreeCornerInfo {
 	readonly map: CornerMap;
 	readonly corner: Point;
 	readonly partition: Partition;
+}
+
+/**
+ * Replace temporary id to real id.
+ */
+export function cleanUp(partitions: readonly JPartition[]): readonly JPartition[] {
+	// Gather all id
+	const idMap = new Map<number, number>();
+	const overlaps = partitions.flatMap(p => p.overlaps);
+	for(let i = 0; i < overlaps.length; i++) {
+		idMap.set(overlaps[i].id!, -i - 1);
+		delete overlaps[i].id;
+	}
+
+	// Replace temporary id to real id
+	const corners = overlaps.flatMap(o => o.c);
+	for(const corner of corners) {
+		if(corner.e !== undefined && corner.e < 0) corner.e = idMap.get(corner.e);
+	}
+
+	return partitions;
 }

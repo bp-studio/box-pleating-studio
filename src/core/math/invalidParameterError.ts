@@ -10,6 +10,6 @@ import type { Fraction } from "./fraction";
 export class InvalidParameterError extends Error {
 	constructor() {
 		super("Parameters are not valid");
-		debugger;
+		// debugger;
 	}
 }

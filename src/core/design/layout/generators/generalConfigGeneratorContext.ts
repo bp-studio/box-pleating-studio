@@ -45,6 +45,7 @@ interface SplitItem {
 //=================================================================
 export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
+	public override readonly $singleMode = true;
 	public readonly $maxRank: number;
 
 	private readonly _joints: readonly Joint[];
@@ -278,7 +279,7 @@ function cover(o1: JOverlap, o2: JOverlap): boolean {
 
 function toSplitItems(configs: readonly Configuration[], nodeId: number): SplitItem[] {
 	return configs.map(config => {
-		const partitions = config.$toRawPartitions();
+		const partitions = config.$rawPartitions;
 		const p = partitions.find(partition => {
 			const overlap = partition.overlaps[0];
 			return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;

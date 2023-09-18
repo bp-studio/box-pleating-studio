@@ -1,6 +1,6 @@
 import { clone } from "shared/utils/clone";
 import { CornerType } from "shared/json";
-import { Configuration } from "../configuration";
+import { Configuration, cleanUp } from "../configuration";
 
 import type { Repository } from "../repository";
 import type { JJunction, JJunctions, JOverlap, JPartition } from "shared/json";
@@ -14,6 +14,7 @@ import type { JJunction, JJunctions, JOverlap, JPartition } from "shared/json";
 
 export class ConfigGeneratorContext {
 
+	public readonly $singleMode: boolean = false;
 	public readonly $repo: Repository;
 	protected readonly _junctions: JJunctions;
 
@@ -71,23 +72,14 @@ export class ConfigGeneratorContext {
 
 	/**
 	 * Replace temporary id to real id and construct a new {@link Configuration}.
-	 * @param singleMode See {@link Configuration.$singleMode}.
+	 * @param single See {@link Configuration.$singleMode}.
 	 */
-	public $make(partitions: JPartition[], singleMode?: boolean): Configuration {
-		// Gather all id
-		const idMap = new Map<number, number>();
-		const overlaps = partitions.flatMap(p => p.overlaps);
-		for(let i = 0; i < overlaps.length; i++) {
-			idMap.set(overlaps[i].id!, -i - 1);
-			delete overlaps[i].id;
+	public $make(partitions: JPartition[], single?: boolean): Configuration {
+		if(single && this.$singleMode) {
+			return new Configuration(this.$repo, { partitions, raw: true }, true);
+		} else {
+			cleanUp(partitions); // perform clean-up in place
+			return new Configuration(this.$repo, { partitions });
 		}
-
-		// Replace temporary id to real id
-		const corners = overlaps.flatMap(o => o.c);
-		for(const corner of corners) {
-			if(corner.e !== undefined && corner.e < 0) corner.e = idMap.get(corner.e);
-		}
-
-		return new Configuration(this.$repo, { partitions }, singleMode);
 	}
 }

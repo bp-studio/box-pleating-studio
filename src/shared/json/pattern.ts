@@ -30,7 +30,14 @@ export interface JRepository {
 export interface JConfiguration {
 	/** All Partitions in this Configuration */
 	partitions: readonly JPartition[];
+
+	/** Indicating that the {@link JPartition}s have {@link JOverlap.id}. */
+	raw?: boolean;
+
+	/** For session only. */
 	patterns?: JPattern[];
+
+	/** For session only. */
 	index?: number;
 }
 

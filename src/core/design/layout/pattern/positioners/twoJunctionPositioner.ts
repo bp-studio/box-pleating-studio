@@ -20,6 +20,11 @@ export function twoJunctionPositioner(context: PositioningContext): boolean {
 		// TODO: split pattern
 		return true;
 	}
+
+	// TODO: split pattern
+	// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+	if(context.devices.length == 3) return true;
+
 	return false;
 }
 
