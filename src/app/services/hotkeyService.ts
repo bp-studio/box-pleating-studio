@@ -21,8 +21,6 @@ namespace HotkeyService {
 	function wrapHandler(handler: Consumer<KeyboardEvent>): Consumer<KeyboardEvent> {
 		return e => {
 			// Capturing exceptions
-			const k = e.key.toLowerCase();
-			if((k == "s" || k == "o" || k == "p") && (e.metaKey || e.ctrlKey)) return;
 			const active = document.activeElement;
 			if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
 
