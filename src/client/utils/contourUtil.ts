@@ -29,16 +29,9 @@ export function drawContours(graphics: GraphicsLike, contours: readonly Contour[
 export function fillContours(graphics: GraphicsLike, contours: readonly Contour[], color: number): void {
 	for(const contour of contours) {
 		graphics.beginFill(color);
-		drawPath(graphics, contour.isHole ? contour.inner![0] : contour.outer);
+		drawPath(graphics, contour.outer);
 		graphics.endFill();
-
-		if(contour.isHole) {
-			if(contour.outer.length) {
-				graphics.beginHole();
-				drawPath(graphics, contour.outer);
-				graphics.endHole();
-			}
-		} else if(contour.inner) {
+		if(contour.inner) {
 			graphics.beginHole();
 			for(const inner of contour.inner) {
 				drawPath(graphics, inner);

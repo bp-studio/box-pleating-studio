@@ -21,12 +21,30 @@ Roughly speaking, it consists of the following steps.
 4. The `Devices` are then put together through a `Positioner` function,
    and if the positioning is successful, we have found a valid `Pattern`.
 
-## Contour tracing
+## Tracing hinge contours
 
+Once the stretch patterns are found,
+the next big thing is to render the correct hinge contours for the flaps and rivers.
 Naively, it may appear that it suffices to reflect all hinge about the ridges of the stretch patterns,
 but in reality it is a lot more complicated than that,
 as such method only works when the entire layout is valid,
 and here we still want to make sense out of invalid layouts as much as possible.
-And even if the layout is valid,
-to completely determined the external ridges of stretch patterns is also a very difficult task in general.
-So in our tracing algorithm here we use many tricks to simplify the matter.
+
+The algorithm roughly goes as follows.
+
+1. Create the `RoughContour`s for all flaps and rivers.
+   For flaps, those are exactly the AABB of itself.
+   For rivers, those will be the union of the expanded rough contour of its children.
+   As those are axis-aligned polygons,
+   taking their union can be made much faster than taking general polygon unions,
+   and will work in most (say over 90%) of the scenarios.
+2. Check if the union contours expose all the relevant `Quadrant` corners.
+   For those `Quadrant`s with corners missing in the union,
+   we need to keep the relevant component separate from the overall union.
+   Those are known as the "raw contours".
+3. Break the contours (union or raw) into `HingeSegments`,
+   and decide the starting/ending point of tracing for each segment.
+4. Pass the input to the tracing algorithm and generate `PatternContour`s.
+5. Combine the `PatternContour` with the `RoughContour`.
+   If raw contours are used in step 2,
+   we need to take the general polygon union of the result.

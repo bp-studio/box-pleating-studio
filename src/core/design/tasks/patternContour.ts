@@ -60,7 +60,7 @@ function processRepo(repo: Repository, trace: Trace): void {
 		const multiContour = node.$graphics.$roughContours.length > 1;
 		for(const [index, roughContour] of node.$graphics.$roughContours.entries()) {
 			// Create start/end map
-			const outer = roughContour.outer;
+			const outer = roughContour.$outer;
 			const startEndMap = {} as Record<QuadrantDirection, [Point, Point]>;
 
 			const quadrants = coveredQuadrants

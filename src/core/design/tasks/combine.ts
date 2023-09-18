@@ -3,14 +3,18 @@ import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { dist } from "shared/types/geometry";
 
-import type { Contour, Path } from "shared/types/geometry";
-import type { ITreeNode, PatternContour } from "../context";
+import type { RationalPath } from "core/math/geometry/rationalPath";
+import type { Contour, PathEx } from "shared/types/geometry";
+import type { ITreeNode, PatternContour, RoughContour } from "../context";
 import type { Point } from "core/math/geometry/point";
 
+/**
+ * {@link RoughContour} represented in {@link RationalPath}s.
+ * The meaning of {@link $outer} and {@link $inner} here follows that of {@link RoughContour}.
+ */
 interface RationalContour {
-	outer: Point[];
-	inner?: Point[][];
-	isHole?: boolean;
+	$outer: RationalPath;
+	$inner?: RationalPath[];
 }
 
 export function combineContour(node: ITreeNode): void {
@@ -24,25 +28,25 @@ export function combineContour(node: ITreeNode): void {
 	}
 	const result: RationalContour[] = g.$roughContours.map(toRationalContour);
 
-	// if(node.id == 3) debugger;
+	// if(node.id == 0) debugger;
 
 	// To temporarily disable pattern contour, comment the following two lines.
-	insertOuter(g.$patternContours, result);
-	insertInner(childrenPatternContours, result);
+	// insertOuter(g.$patternContours, result);
+	// insertInner(childrenPatternContours, result);
 
-	g.$contours = result.map(toContour);
+	g.$contours = result.map(toGraphicalContour);
 }
 
 function insertOuter(patternContours: PatternContour[], result: RationalContour[]): void {
 	const remaining: PatternContour[] = [];
 	for(const contour of patternContours) {
-		if(!tryInsert(result[contour.$for].outer, contour)) {
+		if(!tryInsert(result[contour.$for].$outer, contour)) {
 			remaining.push(contour);
 		}
 	}
 	if(remaining.length == 0) return;
 	for(const linkedContour of linkContours(remaining)) {
-		const ok = tryInsert(result[linkedContour.$for].outer, linkedContour);
+		const ok = tryInsert(result[linkedContour.$for].$outer, linkedContour);
 		// if(!ok) debugger;
 	}
 }
@@ -63,8 +67,8 @@ function insertInner(childrenPatternContours: PatternContour[], result: Rational
 
 function tryInsertInner(childContour: PatternContour, result: RationalContour[]): boolean {
 	for(const contour of result) {
-		if(!contour.inner) continue;
-		for(const inner of contour.inner) {
+		if(!contour.$inner) continue;
+		for(const inner of contour.$inner) {
 			if(tryInsert(inner, childContour)) return true;
 		}
 	}
@@ -128,32 +132,44 @@ function link(c1: PatternContour, c2: PatternContour): PatternContour {
 	return result as PatternContour;
 }
 
-function toRationalContour(contour: Contour): RationalContour {
+function toRationalContour(contour: RoughContour): RationalContour {
 	return {
-		outer: toRationalPath(contour.outer),
-		inner: contour.inner?.map(toRationalPath),
-		isHole: contour.isHole,
+		$outer: toRationalPath(contour.$outer),
+		$inner: contour.$inner?.map(toRationalPath),
 	};
 }
 
-function toContour(contour: RationalContour): Contour {
-	return {
-		outer: simplify(contour.outer),
-		inner: contour.inner?.map(simplify),
-		isHole: contour.isHole,
-	};
+/**
+ * Convert {@link RationalContour} to the actual {@link Contour} for rendering.
+ * It reverses the role of outer and inner paths if necessary.
+ */
+function toGraphicalContour(contour: RationalContour): Contour {
+	let outer = simplify(contour.$outer);
+	const inner = contour.$inner?.map(simplify);
+	if(!outer.length) {
+		return { outer: inner![0] };
+	} else if(inner) {
+		const innerHoleIndex = inner.findIndex(p => p.isHole);
+		if(innerHoleIndex >= 0) {
+			inner.push(outer);
+			outer = inner[innerHoleIndex];
+			inner.splice(innerHoleIndex, 1);
+		}
+	}
+	return { outer, inner };
 }
 
-function simplify(path: Point[]): Path {
+function simplify(path: RationalPath): PathEx {
 	const deduplicated = deduplicate(toPath(path));
 	const l = deduplicated.length;
 	deduplicated.push(deduplicated[0]);
-	const result: Path = [];
+	const result: PathEx = [];
 	for(let i = 0, j = l - 1; i < l; j = i++) {
 		const prev = deduplicated[j];
 		const p = deduplicated[i];
 		const next = deduplicated[i + 1];
 		if((prev.x != p.x || next.x != p.x) && (prev.y != p.y || next.y != p.y)) result.push(p);
 	}
+	if(path.isHole) result.isHole = true;
 	return result;
 }

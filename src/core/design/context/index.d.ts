@@ -59,7 +59,7 @@ export interface PatternContour extends Array<Point> {
 	 */
 	$repo: string;
 
-	/** The index in {@link NodeGraphics.$contours} associated with this contour. */
+	/** The index in {@link NodeGraphics.$roughContours} associated with this contour. */
 	$for: number;
 
 	/** Same as {@link NodeSet.$nodes}. */
@@ -82,13 +82,30 @@ export interface NodeGraphics {
 }
 
 /**
- * The {@link Contour} of a flap/river without considering the stretch patterns.
+ * The contour of a flap/river without considering the stretch patterns.
  * Such contour consists of axis-aligned line segments only,
  * and can speed up the process of taking unions.
  *
  * See also {@link roughContourTask}.
  */
-export interface RoughContour extends Contour {
+export interface RoughContour {
+	/**
+	 * Outer path of the contour.
+	 * Note that it is not of the same meaning as {@link Contour.outer}.
+	 * In a {@link RoughContour}, {@link $outer} is from the processing perspective,
+	 * not from the rendering perspective.
+	 */
+	$outer: Path;
+
+	/**
+	 * Inner holes of the contour, if any.
+	 * The same note of {@link $outer} also applies here.
+	 */
+	$inner?: PathEx[];
+
 	/** Indicating that this contour is in raw mode. */
 	$raw?: boolean;
+
+	/** The ids of the leaf nodes inside this {@link RoughContour}. */
+	$leaves: number[];
 }

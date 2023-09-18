@@ -31,18 +31,15 @@ export type PathEx = Path & {
 	isHole?: boolean;
 };
 
-/** Contour format. a set of contours consists of an outer path plus a number of inner holes. */
-export type Contour = {
+/** Contour format. a set of contours consists of an outer path plus some inner holes. */
+export interface Contour {
 
 	/** Outer path of the contour. */
 	outer: Path;
 
 	/** Inner holes of the contour, if any. */
 	inner?: PathEx[];
-
-	/** Whether this contour is a hole itself. */
-	isHole?: boolean;
-};
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Utility functions

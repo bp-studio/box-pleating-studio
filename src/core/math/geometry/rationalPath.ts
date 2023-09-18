@@ -4,12 +4,16 @@ import { Point } from "./point";
 import { Matrix } from "./matrix";
 
 import type { Vector } from "./vector";
-import type { Path } from "shared/types/geometry";
+import type { Path, PathEx } from "shared/types/geometry";
 
-export type RationalPath = Point[];
+export type RationalPath = Point[] & {
+	isHole?: boolean;
+};
 
-export function toRationalPath(path: Path): RationalPath {
-	return path.map(p => new Point(p));
+export function toRationalPath(path: PathEx): RationalPath {
+	const result: RationalPath = path.map(p => new Point(p));
+	if(path.isHole) result.isHole = true;
+	return result;
 }
 
 export function toPath(path: Point[]): Path {

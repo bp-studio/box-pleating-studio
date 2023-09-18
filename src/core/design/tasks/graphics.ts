@@ -97,13 +97,8 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		// Create a record for all the vertices in inner contour.
 		const innerRightCorners = new Map<number, [IPoint, IPoint, IPoint]>();
 		for(const path of contour.inner) {
-			if(path.isHole === false) {
-				/** If it's explicitly marked (see {@link expand}), treat it as outer path. */
-				outers.push(path);
-			} else {
-				for(const [p1, p0, p2] of pathRightCorners(path)) {
-					innerRightCorners.set(getOrderedKey(p1.x, p1.y), [p1, p0, p2]);
-				}
+			for(const [p1, p0, p2] of pathRightCorners(path)) {
+				innerRightCorners.set(getOrderedKey(p1.x, p1.y), [p1, p0, p2]);
 			}
 		}
 
