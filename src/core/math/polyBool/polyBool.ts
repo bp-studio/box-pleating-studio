@@ -40,6 +40,7 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/** Load all initial events. */
 	protected abstract _initialize(components: ComponentType[]): void;
 
 	protected _isOriented(segment: ISegment, delta: Sign): boolean {

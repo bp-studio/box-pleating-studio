@@ -6,7 +6,7 @@ import { Line } from "core/math/geometry/line";
 import { Direction, SlashDirection } from "shared/types/direction";
 import { parsePath } from "../utils/path";
 import { mapDirections } from "core/math/geometry/path";
-import { createSegments } from "core/design/layout/trace/hingeSegment";
+import { createHingeSegments } from "core/design/layout/trace/hingeSegment";
 import { Point } from "core/math/geometry/point";
 
 import type { SideDiagonal } from "core/design/layout/configuration";
@@ -21,7 +21,7 @@ describe("Tracing algorithm", function() {
 
 		it("Segment hinges", function() {
 			const path = parsePath("(2,3),(1,3),(1,2),(0,2),(0,1),(1,1),(1,0),(2,0),(2,1),(3,1),(3,2),(2,2)");
-			const segments = createSegments(path, SlashDirection.FW);
+			const segments = createHingeSegments(path, SlashDirection.FW);
 			expect(segments.length).to.equal(2);
 			expect(segments[0].q).to.equal(Direction.LL);
 			expect(segments[0]).to.equalPath("(0,2),(0,1),(1,1),(1,0),(2,0)");
@@ -31,7 +31,7 @@ describe("Tracing algorithm", function() {
 
 		it("Works with connected segments", function() {
 			const path = parsePath("(0,0),(1,0),(1,1),(0,1)");
-			const segments = createSegments(path, SlashDirection.FW);
+			const segments = createHingeSegments(path, SlashDirection.FW);
 			expect(segments.length).to.equal(2);
 			expect(segments[0].q).to.equal(Direction.UR);
 			expect(segments[0]).to.equalPath("(1,0),(1,1),(0,1)");

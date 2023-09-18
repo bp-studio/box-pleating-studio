@@ -1,4 +1,4 @@
-import { ClipIntersector } from "../clip/clipIntersector";
+import { GeneralIntersector } from "../generalIntersector";
 
 //=================================================================
 /**
@@ -6,7 +6,7 @@ import { ClipIntersector } from "../clip/clipIntersector";
  * once an cross intersection is found.
  */
 //=================================================================
-export class OverlapIntersector extends ClipIntersector {
+export class OverlapIntersector extends GeneralIntersector {
 
 	public $found: boolean = false;
 

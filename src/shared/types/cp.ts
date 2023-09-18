@@ -1,6 +1,7 @@
 
 /** This follows ORIPA's format.*/
 export enum CreaseType {
+	None = 0,
 	Border = 1,
 	Mountains = 2,
 	Valley = 3,

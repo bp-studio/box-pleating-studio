@@ -25,7 +25,6 @@ export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Load all initial events. */
 	protected _initialize(components: IRoundedRect[]): void {
 		for(let i = 0; i < components.length; i++) {
 			const { x, y, width: w, height: h, radius: r } = components[i];
@@ -52,7 +51,6 @@ export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 		}
 	}
 
-	/** Process an {@link EndEvent}. */
 	protected _processEnd(event: EndEvent): void {
 		const start = event.$other;
 		if(start.$isInside) this._collectedSegments.push(start.$segment);

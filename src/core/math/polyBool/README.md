@@ -8,7 +8,7 @@ described in their 2009 paper
 
 The implementation here is different from the original algorithm in a few ways:
 1. It is optimized for dealing with polygons of very specific shapes,
-   not polygons in general. Most notably, in both use cases here,
+   not polygons in general. Most notably, in all use cases here,
    there is no need to check for new intersection between newly adjacent segments after an `EndEvent`.
    (Such checking is needed in general because the segments could form a `>>` formation,
    but that cannot happen in the use cases here.)
@@ -20,9 +20,10 @@ Also, comparing to some other existing implementations of the MRF algorithm
 the implementation here uses state-of-the-art data structures
 (in particular RAVL tree) to provide much greater performance.
 
-The algorithm is used in two places in BP Studio:
+The algorithm is used in three places in BP Studio:
 1. Find the union of some axis-aligned polygons. This is for generating the "rough contour" of rivers.
-2. Find the intersection of two rounded rectangles. This is for displaying invalid overlappings of flaps.
+2. Find the union of general polygons. This is when the rough contour strategy doesn't work.
+3. Find the intersection of two rounded rectangles. This is for displaying invalid overlappings of flaps.
 
 ## CP Generation and polygon intersection test
 

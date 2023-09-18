@@ -1,7 +1,8 @@
 import { expect } from "chai";
 
-import { expand } from "core/math/polyBool/expansion";
+import { expand } from "core/design/tasks/expansion";
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
+import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
 import { random } from "../utils/random";
 import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
 import { parsePath } from "../utils/path";
@@ -119,6 +120,50 @@ describe("PolyBool", function() {
 			expect(average).to.be.lessThan(0.5); // In ms!
 			// This could be as good as 0.45 in fact,
 			// but here we set it to 0.5 so that the test can pass more easily.
+		});
+	});
+
+	describe("GeneralUnion operation", function() {
+		it("Works for AA union the same way", function() {
+			const result = new GeneralUnion().$get(
+				aabbToPolygon({ top: 4, bottom: 1, left: 1, right: 5 }),
+				aabbToPolygon({ top: 3, bottom: 0, left: 0, right: 4 }),
+				aabbToPolygon({ top: 5, bottom: 4, left: 2, right: 4 })
+			);
+			expect(result.length).to.equal(1);
+			const path = result[0];
+			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)");
+		});
+
+		it("Finds general union", function() {
+			const result = new GeneralUnion().$get(
+				[parsePath("(0,0),(4,2),(0,4)")],
+				[parsePath("(4,0),(4,4),(0,2)")]
+			);
+			expect(result.length).to.equal(1);
+			const path = result[0];
+			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)");
+		});
+
+		// eslint-disable-next-line mocha/no-skipped-tests
+		xit("Is quite fast", function() {
+			this.retries(100);
+
+			// prepare random tests
+			const tests: Polygon[][] = [];
+			const rounds = 100;
+			for(let i = 0; i < rounds; i++) {
+				tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
+			}
+
+			// run tests
+			const start = performance.now();
+			for(const test of tests) {
+				new GeneralUnion().$get(...test);
+			}
+			const average = (performance.now() - start) / rounds;
+
+			expect(average).to.be.lessThan(0.8);
 		});
 	});
 

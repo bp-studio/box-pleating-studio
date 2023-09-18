@@ -1,17 +1,17 @@
-import { SweepLine } from "../sweepLine";
-import { ClipEventProvider } from "./clipEventProvider";
-import { ClipIntersector } from "./clipIntersector";
-import { LineSegment } from "../segment/lineSegment";
-import { same } from "../intersection/rrIntersector";
+import { SweepLine } from "../../sweepLine";
+import { GeneralIntersector } from "../generalIntersector";
+import { LineSegment } from "../../segment/lineSegment";
+import { same } from "../../intersection/rrIntersector";
 import { CreaseType } from "shared/types/cp";
 import { xyComparator } from "shared/types/geometry";
+import { GeneralEventProvider } from "../generalEventProvider";
 
-import type { IntersectorConstructor } from "../intersector";
-import type { ISegment } from "../segment/segment";
+import type { IntersectorConstructor } from "../../intersector";
+import type { ISegment } from "../../segment/segment";
 import type { CPLine } from "shared/types/cp";
-import type { StartEvent, EndEvent } from "../event";
-import type { Chainer } from "../chainer/chainer";
-import type { PolyBool } from "../polyBool";
+import type { StartEvent, EndEvent } from "../../event";
+import type { Chainer } from "../../chainer/chainer";
+import type { PolyBool } from "../../polyBool";
 
 //=================================================================
 /**
@@ -29,8 +29,8 @@ import type { PolyBool } from "../polyBool";
 
 export class Clip extends SweepLine {
 
-	constructor(Intersector: IntersectorConstructor = ClipIntersector) {
-		super(new ClipEventProvider(), Intersector);
+	constructor(Intersector: IntersectorConstructor = GeneralIntersector) {
+		super(new GeneralEventProvider(true), Intersector);
 	}
 
 	/** Process the set of crease pattern lines. */
@@ -40,7 +40,7 @@ export class Clip extends SweepLine {
 		for(const c of creases) {
 			const p1 = { x: c[1], y: c[2] };
 			const p2 = { x: c[3], y: c[4] };
-			const segment = new LineSegment(p1, p2, c[0]);
+			const segment = new LineSegment(p1, p2, 0, c[0]);
 			if(c[0] == CreaseType.Border) {
 				// Here it is assumed that the inputs are oriented
 				const entering = xyComparator(p1, p2) < 0;

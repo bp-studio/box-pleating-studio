@@ -1,6 +1,6 @@
 import { EPSILON } from "./arcSegment";
+import { CreaseType } from "shared/types/cp";
 
-import type { CreaseType } from "shared/types/cp";
 import type { ISegment } from "./segment";
 
 //=================================================================
@@ -13,7 +13,7 @@ export class LineSegment implements ISegment {
 
 	/** In this case this field stands for the type of the line in the crease pattern. */
 	public readonly $type: CreaseType;
-	public readonly $polygon: number = 0; // Doesn't matter
+	public readonly $polygon: number;
 	public $start: IPoint;
 	public $end: IPoint;
 	private readonly _isHorizontal: boolean;
@@ -25,10 +25,11 @@ export class LineSegment implements ISegment {
 	 */
 	public readonly $coefficients: readonly [number, number, number];
 
-	constructor(start: IPoint, end: IPoint, type: CreaseType) {
+	constructor(start: IPoint, end: IPoint, polygon: number = 0, type: CreaseType = CreaseType.None) {
 		this.$start = start;
 		this.$end = end;
 		this.$type = type;
+		this.$polygon = polygon;
 
 		this.$coefficients = [
 			end.y - start.y,
@@ -52,10 +53,10 @@ export class LineSegment implements ISegment {
 	public $subdivide(point: IPoint, oriented: boolean): ISegment {
 		let newSegment: ISegment;
 		if(oriented) {
-			newSegment = new LineSegment(point, this.$end, this.$type);
+			newSegment = new LineSegment(point, this.$end, this.$polygon, this.$type);
 			this.$end = point;
 		} else {
-			newSegment = new LineSegment(this.$start, point, this.$type);
+			newSegment = new LineSegment(this.$start, point, this.$polygon, this.$type);
 			this.$start = point;
 		}
 		return newSegment;

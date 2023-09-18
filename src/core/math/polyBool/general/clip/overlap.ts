@@ -1,10 +1,9 @@
-import { LineSegment } from "../segment/lineSegment";
-import { CreaseType } from "shared/types/cp";
+import { LineSegment } from "../../segment/lineSegment";
 import { xyComparator } from "shared/types/geometry";
-import { Clip } from "../clip/clip";
+import { Clip } from "./clip";
 import { OverlapIntersector } from "./overlapIntersector";
 
-import type { StartEvent } from "../event";
+import type { StartEvent } from "../../event";
 import type { Polygon } from "shared/types/geometry";
 
 //=================================================================
@@ -39,7 +38,7 @@ export class Overlap extends Clip {
 			for(let i = 0, j = l - 1; i < l; j = i++) {
 				const p1 = path[j];
 				const p2 = path[i];
-				const segment = new LineSegment(p1, p2, CreaseType.Auxiliary);
+				const segment = new LineSegment(p1, p2);
 				// Here it is assumed that the inputs are oriented in clockwise direction.
 				const delta = xyComparator(p1, p2) < 0 ? -1 : 1;
 				this._addSegment(segment, delta);

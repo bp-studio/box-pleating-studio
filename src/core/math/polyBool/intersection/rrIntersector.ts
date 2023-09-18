@@ -44,7 +44,7 @@ export class RRIntersector extends Intersector {
 		let seg2 = ev2.$segment as ArcSegment;
 		const intersections = seg1.$intersection(seg2);
 		for(let p of intersections) { // Already sorted
-			p = fix(fix(p, seg1), seg2);
+			p = ref(ref(p, seg1), seg2);
 			const in1 = seg1.$inArcRange(p), in2 = seg2.$inArcRange(p);
 			// The condition for intersection is:
 			// it in the interior of self, and at least at the endpoint of the other.
@@ -71,7 +71,7 @@ export class RRIntersector extends Intersector {
 			const dy = y - arc.$center.y;
 			const dx = leg(r, dy);
 			const x = arc.$center.x + (arc.$start.y > arc.$end.y ? -dx : dx);
-			const p = fix(fix({ x, y }, line), arc);
+			const p = ref(ref({ x, y }, line), arc);
 			const dl = (x - eLine.$point.x) * (x - eLine.$other.$point.x);
 			if(da < -EPSILON && dl < EPSILON) this._subdivide(eArc, p);
 			if(da < EPSILON && dl < -EPSILON) this._subdivide(eLine, p);
@@ -80,7 +80,7 @@ export class RRIntersector extends Intersector {
 			const da = (x - arc.$start.x) * (x - arc.$end.x);
 			if(da > EPSILON) return;
 			const y = yIntercept(arc, x);
-			const p = fix(fix({ x, y }, line), arc);
+			const p = ref(ref({ x, y }, line), arc);
 			const dl = (y - eLine.$point.y) * (y - eLine.$other.$point.y);
 			if(da < -EPSILON && dl < EPSILON) this._subdivide(eArc, p);
 			if(da < EPSILON && dl < -EPSILON) this._subdivide(eLine, p);
@@ -108,7 +108,7 @@ export function same(p1: IPoint, p2: IPoint): boolean {
  * If the intersection is essentially an endpoint of the segment,
  * returns the original endpoint to avoid sorting error.
  */
-export function fix(p: IPoint, seg: Segment): IPoint {
+export function ref(p: IPoint, seg: Segment): IPoint {
 	if(same(p, seg.$start)) return seg.$start;
 	if(same(p, seg.$end)) return seg.$end;
 	return p;

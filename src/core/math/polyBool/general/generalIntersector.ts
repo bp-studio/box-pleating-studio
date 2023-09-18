@@ -3,17 +3,15 @@ import { EPSILON } from "../segment/arcSegment";
 
 import type { LineSegment } from "../segment/lineSegment";
 import type { StartEvent } from "../event";
-import type { Clip } from "./clip";
-import type { OverlapIntersector } from "../overlap/overlapIntersector";
+import type { OverlapIntersector } from "./clip/overlapIntersector";
 
 //=================================================================
 /**
- * {@link ClipIntersector} is the {@link Intersector} used in {@link Clip}.
- * It finds intersections of general line segments.
+ * {@link GeneralIntersector} is the {@link Intersector} for general line segments.
  */
 //=================================================================
 
-export class ClipIntersector extends Intersector {
+export class GeneralIntersector extends Intersector {
 
 	public $possibleIntersection(ev1?: StartEvent | undefined, ev2?: StartEvent | undefined): void {
 		if(!ev1 || !ev2) return;
