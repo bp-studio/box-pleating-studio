@@ -5,6 +5,7 @@ import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";
 import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
 
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Quadrant } from "../pattern/quadrant";
 import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
@@ -46,7 +47,7 @@ export class Trace {
 		const ridges = this._createFilteredRidges(start, end, directionalVector);
 
 		// Initialize
-		const path: Point[] = [];
+		const path: RationalPath = [];
 		const startDiagonal = this.$sideDiagonals.find(d => d.$lineContains(start));
 		let cursor = ctx.$getInitialNode(ridges, startDiagonal);
 		if(!cursor) return null;

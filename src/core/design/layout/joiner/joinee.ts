@@ -2,6 +2,7 @@ import { Vector } from "core/math/geometry/vector";
 import { Direction } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Line } from "core/math/geometry/line";
 import type { Point } from "core/math/geometry/point";
 import type { JAnchor, JGadget } from "shared/json";
@@ -41,7 +42,7 @@ export class Joinee {
 		this.e = p.$shape.ridges[q].$shift(additionalOffset);
 	}
 
-	public $setupDetour(rawDetour: Point[], reverse: boolean): void {
+	public $setupDetour(rawDetour: RationalPath, reverse: boolean): void {
 		const detour = rawDetour.map(p => p.$add(this.v).$toIPoint());
 		detour.push(this.pt);
 		if(reverse) detour.reverse();

@@ -3,6 +3,7 @@ import { Vector } from "core/math/geometry/vector";
 import { JoineeBuilder } from "../joineeBuilder";
 import { cache } from "core/utils/cache";
 
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Joinee } from "../joinee";
 import type { JAddOn, JDevice } from "shared/json";
 import type { Joiner } from "../joiner";
@@ -103,7 +104,7 @@ export abstract class JoinLogic {
 	 * The input arrays are listed starting with the vertex far most
 	 * from the joining point, and not including the joining point itself.
 	 */
-	protected _setupDetour(dt1: Point[], dt2: Point[]): void {
+	protected _setupDetour(dt1: RationalPath, dt2: RationalPath): void {
 		const { j1, j2 } = this;
 		const shouldReverse2 = this.joiner.$isClockwise;
 		j1.$setupDetour(dt1, !shouldReverse2);

@@ -3,18 +3,17 @@ import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
 
-import type { RationalPath } from "core/math/geometry/rationalPath";
+import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
 import type { ITreeNode, PatternContour, RoughContour } from "../context";
-import type { Point } from "core/math/geometry/point";
 
 /**
  * {@link RoughContour} represented in {@link RationalPath}s.
  * The meaning of {@link $outer} and {@link $inner} here follows that of {@link RoughContour}.
  */
 interface RationalContour {
-	$outer: RationalPath;
-	$inner?: RationalPath[];
+	$outer: RationalPathEx;
+	$inner?: RationalPathEx[];
 }
 
 const generalUnion = new GeneralUnion();
@@ -69,7 +68,7 @@ function tryInsertInner(childContour: PatternContour, result: RationalContour[])
 	return false;
 }
 
-function tryInsert(path: Point[], insert: PatternContour): boolean {
+function tryInsert(path: RationalPath, insert: PatternContour): boolean {
 	const l = path.length;
 	const first = insert[0];
 	const last = insert[insert.length - 1];
@@ -123,7 +122,7 @@ function toGraphicalContour(contour: RationalContour): Contour {
 	return { outer, inner };
 }
 
-function simplify(path: RationalPath): PathEx {
+function simplify(path: RationalPathEx): PathEx {
 	const deduplicated = deduplicate(toPath(path));
 	const l = deduplicated.length;
 	deduplicated.push(deduplicated[0]);

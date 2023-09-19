@@ -2,6 +2,7 @@ import { Line, getIntersection } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { SlashDirection } from "shared/types/direction";
 
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { PatternContour } from "core/design/context";
 import type { Vector } from "core/math/geometry/vector";
 import type { Trace } from "./trace";
@@ -88,7 +89,7 @@ export class TraceContext {
 	 * Remove the first or last point of the generated path if needed,
 	 * so that the resulting path is irredundant.
 	 */
-	public $trim(path: Point[]): PatternContour | null {
+	public $trim(path: RationalPath): PatternContour | null {
 		if(path.length <= 1) return null;
 		const firstLine = new Line(path[0], path[1]);
 		const lastLine = new Line(path[path.length - 2], path[path.length - 1]);

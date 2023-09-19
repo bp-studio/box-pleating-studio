@@ -1,3 +1,4 @@
+import type { Path } from "shared/types/geometry";
 import type { Strategy } from "./enum";
 import type { JOverlap, JQuadrilateral } from "./layout";
 
@@ -72,7 +73,7 @@ export interface JDevice {
 }
 
 export interface JAddOn {
-	contour: IPoint[];
+	contour: Path;
 	dir: IPoint;
 }
 
@@ -106,7 +107,7 @@ export interface JPiece {
 	v: number;
 
 	/** Detour in clockwise direction. The coordinates are before adding the shift. */
-	detours?: IPoint[][];
+	detours?: Path[];
 
 	/**
 	 * The relative shifting of this Piece to the reference point (before transformation) of the Partition.

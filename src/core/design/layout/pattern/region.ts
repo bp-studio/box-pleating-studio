@@ -2,13 +2,14 @@ import { Fraction } from "core/math/fraction";
 import { Line } from "core/math/geometry/line";
 import { cache } from "core/utils/cache";
 
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Point } from "core/math/geometry/point";
 import type { Vector } from "core/math/geometry/vector";
 
 export interface IRegionShape {
 
 	/** The contour of the region. */
-	contour: Point[];
+	contour: RationalPath;
 
 	/**
 	 * The edges on the contour.

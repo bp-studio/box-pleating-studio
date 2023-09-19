@@ -6,22 +6,28 @@ import { Matrix } from "./matrix";
 import type { Vector } from "./vector";
 import type { Path, PathEx } from "shared/types/geometry";
 
-export type RationalPath = Point[] & {
-	isHole?: boolean;
-};
+/**
+ * This type signify that the array is intended to be a connected path,
+ * rather than merely a collection of {@link Point}s.
+ */
+export type RationalPath = Point[];
 
-export function toRationalPath(path: PathEx): RationalPath {
-	const result: RationalPath = path.map(p => new Point(p));
+export interface RationalPathEx extends RationalPath {
+	isHole?: boolean;
+}
+
+export function toRationalPath(path: PathEx): RationalPathEx {
+	const result: RationalPathEx = path.map(p => new Point(p));
 	if(path.isHole) result.isHole = true;
 	return result;
 }
 
-export function toPath(path: Point[]): Path {
+export function toPath(path: RationalPath): Path {
 	return path.map(p => p.$toIPoint());
 }
 
 /** Convert a path to {@link Line} objects. */
-export function toLines(path: Point[]): Line[] {
+export function toLines(path: RationalPath): Line[] {
 	return path.map((p, i) => new Line(p, path[i + 1] || path[0]));
 }
 
@@ -43,7 +49,7 @@ export function triangleTransform(triangle: RationalPath, to: Point): Point {
  * This algorithm assumes the two path are oriented the same way,
  * and shares exactly one edge.
  */
-export function join(p1: Point[], p2: Point[]): Point[] {
+export function join(p1: RationalPath, p2: RationalPath): RationalPath {
 	p1 = p1.concat(); p2 = p2.concat();
 	for(let i = 0; i < p1.length; i++) {
 		for(let j = 0; j < p2.length; j++) {
@@ -57,7 +63,7 @@ export function join(p1: Point[], p2: Point[]): Point[] {
 	return p1;
 }
 
-export function shift(path: Point[], v: Vector): Point[] {
+export function shift(path: RationalPath, v: Vector): RationalPath {
 	return path.map(p => p.$add(v));
 }
 
@@ -67,8 +73,10 @@ export function shift(path: Point[], v: Vector): Point[] {
  *
  * Based on the [PNPOLY](https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html)
  * algorithm by W. Randolph Franklin.
+ *
+ * This function is currently not in used, but we keep it just for the record.
  */
-function pointInPolygon(p: Point, path: Point[], boundary = false): boolean {
+export function pointInPolygon(p: Point, path: RationalPath, boundary = false): boolean {
 	const l = path.length;
 	// Degenerated case
 	if(l == 2) return boundary && new Line(path[0], path[1]).$contains(p, true);

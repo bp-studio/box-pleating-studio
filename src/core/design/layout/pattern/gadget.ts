@@ -8,6 +8,7 @@ import { getIntersection } from "core/math/geometry/line";
 import { Overlap } from "core/math/polyBool/general/clip/overlap";
 import { join, shift, toLines, toPath } from "core/math/geometry/rationalPath";
 
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { JAnchor, JGadget, JOverlap } from "shared/json";
 import type { Device } from "./device";
@@ -68,7 +69,7 @@ export class Gadget implements JGadget {
 		return makePerQuadrant(q => this._getSlack(q));
 	}
 
-	@cache public get $contour(): Point[] {
+	@cache public get $contour(): RationalPath {
 		const p = this.pieces;
 		let contour = p[0].$shape.contour;
 		for(let i = 1; i < p.length; i++) contour = join(contour, p[i].$shape.contour);

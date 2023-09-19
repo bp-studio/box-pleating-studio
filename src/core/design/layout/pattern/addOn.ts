@@ -4,6 +4,7 @@ import { Vector } from "core/math/geometry/vector";
 import { Point } from "core/math/geometry/point";
 import { toLines } from "core/math/geometry/rationalPath";
 
+import type { Path } from "shared/types/geometry";
 import type { IRegionShape } from "./region";
 import type { JAddOn } from "shared/json";
 import type { Device } from "./device";
@@ -16,7 +17,7 @@ import type { Gadget } from "./gadget";
  */
 //=================================================================
 export class AddOn extends Region implements JAddOn {
-	public readonly contour: IPoint[];
+	public readonly contour: Path;
 	public readonly dir: IPoint;
 
 	constructor(data: JAddOn) {
