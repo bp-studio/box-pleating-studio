@@ -64,12 +64,13 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	public $getDisplacement(pattern: Pattern): Vector {
-		const connection = this.$getDisplacementReference();
+		const connection = this.$displacementReference;
 		return pattern.$getConnectionTarget(connection).sub(pattern.$config.$repo.$origin);
 	}
 
-	public $getDisplacementReference(): JConnection {
-		// Arbitrarily choose an outward connection point in this Partition; doesn't matter which.
+	/** Choose an outward connection point in this Partition. */
+	@cache public get $displacementReference(): JConnection {
+		// Choose whichever first one that is out-going
 		return this.$overlaps.find(o => o.c[0].type != CornerType.coincide)!.c[0] as JConnection;
 	}
 

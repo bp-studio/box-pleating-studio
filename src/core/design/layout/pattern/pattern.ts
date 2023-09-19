@@ -5,8 +5,8 @@ import { State } from "core/service/state";
 import { Gadget } from "./gadget";
 import { singleJunctionPositioner } from "./positioners/singleJunctionPositioner";
 import { twoJunctionPositioner } from "./positioners/twoJunctionPositioner";
+import { PositioningContext } from "./positioners/positioningContext";
 
-import type { PositioningContext } from "./positioners/positioningContext";
 import type { JConnection, JDevice, JPattern } from "shared/json";
 import type { Configuration } from "../configuration";
 
@@ -41,7 +41,7 @@ export class Pattern implements ISerializable<JPattern> {
 		const devicesToInitialize = new Set(this.$devices);
 		while(devicesToInitialize.size > 0) {
 			for(const device of devicesToInitialize) {
-				const c = device.$partition.$getDisplacementReference();
+				const c = device.$partition.$displacementReference;
 				if(c.e >= 0 || this._getDeviceOfConnection(c).$initialized) {
 					device.$init();
 					devicesToInitialize.delete(device);
@@ -87,17 +87,13 @@ export class Pattern implements ISerializable<JPattern> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _position(): boolean {
-		const context: PositioningContext = {
-			repo: this.$config.$repo,
-			junctions: this.$config.$repo.$junctions,
-			devices: this.$devices,
-		};
+		const context = new PositioningContext(this.$config, this.$devices);
 
 		// TODO
-		if(this.$config.$singleMode || context.junctions.length == 1) {
+		if(this.$config.$singleMode || context.$junctions.length == 1) {
 			return singleJunctionPositioner(context);
 		}
-		if(context.junctions.length == 2) {
+		if(context.$junctions.length == 2) {
 			return twoJunctionPositioner(context);
 		}
 		return false;

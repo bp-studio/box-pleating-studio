@@ -38,11 +38,11 @@ export class Gadget implements JGadget {
 	}
 
 	@cache public get sx(): number {
-		return Math.ceil(this.$anchorMap[2][0].x - this.$anchorMap[0][0].x);
+		return Math.ceil(this.$anchorMap[2][0].x) - Math.floor(this.$anchorMap[0][0].x);
 	}
 
 	@cache public get sy(): number {
-		return Math.ceil(this.$anchorMap[2][0].y - this.$anchorMap[0][0].y);
+		return Math.ceil(this.$anchorMap[2][0].y) - Math.floor(this.$anchorMap[0][0].y);
 	}
 
 	@cache public get $anchorMap(): PerQuadrant<AnchorMap> {
@@ -106,6 +106,7 @@ export class Gadget implements JGadget {
 	 * @param g Connection target
 	 * @param q1 From which {@link QuadrantDirection} (0 or 2)
 	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
+	 * @returns The resulting slack
 	 */
 	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): number {
 		let c1 = this.$contour;

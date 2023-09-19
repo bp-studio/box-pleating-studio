@@ -88,7 +88,11 @@ export interface JGadget {
 }
 
 export interface JAnchor {
-	/** The slack that needs to be kept when connecting */
+	/**
+	 * The slack that needs to be kept when connecting.
+	 *
+	 * We need to specify this only if the slack cannot be inferred from the constraints of partitions.
+	 */
 	slack?: number;
 
 	/** Customize Anchor position. If not assigned, it will be inferred from the Gadget. */

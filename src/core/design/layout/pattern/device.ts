@@ -80,6 +80,7 @@ export class Device implements ISerializable<JDevice> {
 
 	/**
 	 * The distance between the first out-going anchor point
+	 * (see {@link Partition.$displacementReference})
 	 * of this device to its connection target.
 	 */
 	public get $offset(): number {
