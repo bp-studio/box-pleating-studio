@@ -121,7 +121,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const joint = this._joints[0];
 		const rank = ranks[0];
 
-		if(rank > 1) yield* this._searchRelay(joint.items, rank - 1);
+		if(rank >= 1) yield* this._searchRelay(joint.items, rank - 1);
 
 		const splitCount = joint.items.filter(item => item.split).length;
 		if(splitCount == 0) {
@@ -129,8 +129,8 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			for(const partition of partitions) {
 				yield this.$make([partition]);
 			}
-		} else if(rank > 1) {
-			yield* this._searchSplitJoint(joint, rank - splitCount);
+		} else if(rank >= splitCount) {
+			yield* this._searchSplitJoin(joint, rank - splitCount);
 		}
 	}
 
@@ -222,7 +222,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
-	private *_searchSplitJoint(joint: Joint, rank: number): Generator<Configuration> {
+	private *_searchSplitJoin(joint: Joint, rank: number): Generator<Configuration> {
 		const items1 = toSplitItems(joint.items[0].configs, joint.nodeId);
 		const items2 = toSplitItems(joint.items[1].configs, joint.nodeId);
 		for(const item1 of items1) {

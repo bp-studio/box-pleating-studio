@@ -39,11 +39,10 @@ function makeSingeJoinDevicePattern(context: PositioningContext): boolean {
  * Still need to think about a more generalized approach.
  */
 function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
-	let [g1, g2] = context.$devices.map(d => d.$gadgets[0]);
-	let [o1, o2] = context.$devices.map(d => d.$partition.$overlaps[0]);
+	let [g1, g2] = context.$gadgets;
+	let [o1, o2] = context.$overlaps;
 
-	// Focus on the cut-off JOverlap (called it o1),
-	// since the other one can't go wrong and requires no attention
+	// Focus on the cut-off JOverlap (called it o1)
 	const reversed = o1.c[0].e! >= 0 && o1.c[2].e! >= 0;
 	if(reversed) {
 		[g1, g2] = [g2, g1];
