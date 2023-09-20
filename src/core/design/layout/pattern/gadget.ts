@@ -148,17 +148,10 @@ export class Gadget implements JGadget {
 	// Static methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Simplify JSON data representation. */
+	/** Simplify JSON data representation, for creating signature. */
 	public static $simplify(g: JGadget): JGadget {
 		if(g.offset && g.offset.x == 0 && g.offset.y == 0) delete g.offset;
-		if(g.anchors) {
-			for(const [i, a] of g.anchors.entries()) {
-				if(!a) continue;
-				if(a.slack === 0) delete a.slack;
-				if(Object.keys(a).length == 0) delete g.anchors[i];
-			}
-			if(!g.anchors.some(a => Boolean(a))) delete g.anchors;
-		}
+		delete g.anchors; // anchor info is irrelevant to signature
 		return g;
 	}
 }

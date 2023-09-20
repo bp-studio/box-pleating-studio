@@ -2,11 +2,11 @@
 import { Device } from "./device";
 import { Point } from "core/math/geometry/point";
 import { State } from "core/service/state";
-import { Gadget } from "./gadget";
 import { singleJunctionPositioner } from "./positioners/singleJunctionPositioner";
 import { twoJunctionPositioner } from "./positioners/twoJunctionPositioner";
 import { PositioningContext } from "./positioners/positioningContext";
 
+import type { Gadget } from "./gadget";
 import type { JConnection, JDevice, JPattern } from "shared/json";
 import type { Configuration } from "../configuration";
 
@@ -54,16 +54,6 @@ export class Pattern implements ISerializable<JPattern> {
 		return {
 			devices: this.$devices.map(device => device.toJSON()),
 		};
-	}
-
-	public get $signature(): string {
-		const devices = this.$devices.map(device => {
-			const json = device.toJSON();
-			json.gadgets.forEach(g => Gadget.$simplify(g));
-			delete json.offset;
-			return device;
-		});
-		return JSON.stringify(devices);
 	}
 
 	/** Return the actual {@link Point} to which the given {@link JConnection} connects. */

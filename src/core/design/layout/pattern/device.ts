@@ -299,10 +299,11 @@ export class Device implements ISerializable<JDevice> {
 	 * disregarding positional information.
 	 */
 	public static $getSignature(devices: readonly JDevice[]): string {
-		return JSON.stringify(devices.map(d => {
-			d.gadgets.forEach(g => Gadget.$simplify(g));
-			delete d.offset;
-			return d;
-		}));
+		devices = clone(devices);
+		for(const device of devices) {
+			device.gadgets.forEach(g => Gadget.$simplify(g));
+			delete device.offset;
+		}
+		return JSON.stringify(devices);
 	}
 }
