@@ -78,10 +78,11 @@ export class Pattern implements ISerializable<JPattern> {
 
 	private _position(): boolean {
 		const context = new PositioningContext(this);
-		if(!this.$config.$singleMode && !context.$checkJunctions()) return false;
+		const singleMode = this.$config.$singleMode;
+		if(!context.$checkJunctions(singleMode)) return false;
 
 		// TODO
-		if(this.$config.$singleMode || context.$junctions.length == 1) {
+		if(singleMode || context.$junctions.length == 1) {
 			return singleJunctionPositioner(context);
 		}
 		if(context.$junctions.length == 2) {

@@ -29,7 +29,7 @@ export interface JOverlap extends JQuadrilateral {
 	 */
 	id?: number;
 
-	/** From which {@link JJunction} this {@link JOverlap} is cut off. */
+	/** The index within {@link Configuration.$junctions} of the {@link JJunction} from which this {@link JOverlap} is cut off. */
 	parent: number;
 
 	/**

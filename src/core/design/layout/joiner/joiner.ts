@@ -21,41 +21,43 @@ import type { Point } from "core/math/geometry/point";
 
 export class Joiner {
 
-	private g1: JPiece[];
-	private g2: JPiece[];
+	private readonly g1!: readonly JPiece[];
+	private readonly g2!: readonly JPiece[];
 
 	/** Shifting of the first {@link JOverlap}. */
-	public s1?: IPoint;
+	public readonly s1?: IPoint;
 
 	/** Shifting of the second {@link JOverlap}. */
-	public s2?: IPoint;
+	public readonly s2?: IPoint;
 
 	/** Sharing the lower-left corner. */
-	public $oriented: boolean;
+	public readonly $oriented!: boolean;
 
 	/** It is clockwise from {@link g1} to {@link g2}. */
-	public $isClockwise: boolean;
+	public readonly $isClockwise!: boolean;
 
 	/** See {@link Repository.$getMaxIntersectionDistance}. */
-	public $intersectionDist: number;
+	public readonly $intersectionDist!: number;
 
 	// Edge combinations in the 4 cases.
-	public q1: QuadrantDirection;
-	public q2: QuadrantDirection;
+	public readonly q1!: QuadrantDirection;
+	public readonly q2!: QuadrantDirection;
 
 	/** Direction of the shared corner. */
-	public q: QuadrantDirection;
+	public readonly q!: QuadrantDirection;
 
 	constructor(overlaps: readonly JOverlap[], repo: Repository) {
 		const junctions: JJunction[] = [];
 		const [o1, o2] = overlaps;
-		// if(o1.ox == o2.ox || o1.oy == o2.oy) return; // No need to continue in this case
+		if(o1.ox == o2.ox || o1.oy == o2.oy) return; // No need to continue in this case
 
+		//TODO: allowing pass in a predefined list of pieces for better performance
 		[this.g1, this.g2] = overlaps.map(o => {
 			const j = repo.$junctions[o.parent];
 			junctions.push(j);
 			return Array.from($generate(o.ox, o.oy, j.sx));
 		});
+
 		const [j1, j2] = junctions;
 		this.$oriented = j1.c[0].e == j2.c[0].e;
 		this.$isClockwise = o1.ox > o2.ox;

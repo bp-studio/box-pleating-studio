@@ -23,7 +23,7 @@ export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiec
 	}
 }
 
-/** Calculates the rand of a {@link JPiece}. The lower the better. */
+/** Calculates the rank of a {@link JPiece}. The lower the better. */
 export function $rank(p: JPiece): number {
 	const r1 = $reduceInt(p.oy + p.v, p.oy)[0];
 	const r2 = $reduceInt(p.ox + p.u, p.ox)[0];
@@ -35,14 +35,16 @@ function getOrCreateMemo(ox: number, oy: number): readonly JPieceMemo[] {
 	const m = Memo.get(key);
 	if(m) return m;
 
-	const ha = ox * oy / 2; // half area of the overlap rectangle
+	const halfArea = ox * oy / 2; // half area of the overlap rectangle
 	const array: JPieceMemo[] = [];
 	for(
-		let u = Math.floor(Math.sqrt(ha));	// Start from the number close to sqrt(ha)
-		u > 0; u--							// and search downwards. This will prioritize the most efficient gadget.
+		// Start from the number close to sqrt(halfArea)
+		let u = Math.floor(Math.sqrt(halfArea));
+		// and search downwards. This will prioritize the most efficient gadget.
+		u > 0; u--
 	) {
-		if(ha % u == 0) {
-			const v = ha / u;
+		if(halfArea % u == 0) {
+			const v = halfArea / u;
 			if(u == v) {
 				addMemo({ ox, oy, u, v }, array);
 			} else {

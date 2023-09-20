@@ -50,12 +50,17 @@ export class PositioningContext {
 		return device.$partition.$overlaps.map(o => this.$junctions[o.parent]);
 	}
 
-	public $checkJunctions(): boolean {
+	public $checkJunctions(singleMode: boolean): boolean {
 		// Trivial case
 		if(this.$junctions.length == 1 && this.$gadgets.length == 1) return true;
 
-		for(let i = 0; i < this.$junctions.length; i++) {
-			if(!this._checkJunction(i)) return false;
+		if(singleMode) {
+			const index = this.$overlaps[0].parent;
+			if(!this._checkJunction(index)) return false;
+		} else {
+			for(let i = 0; i < this.$junctions.length; i++) {
+				if(!this._checkJunction(i)) return false;
+			}
 		}
 		return true;
 	}

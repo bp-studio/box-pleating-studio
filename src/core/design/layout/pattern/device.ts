@@ -39,7 +39,13 @@ export class Device implements ISerializable<JDevice> {
 
 	private readonly _regions: readonly Region[];
 
+	/**
+	 * For each {@link Gadget} in {@link $gadgets}, list all its anchor point locations.
+	 * This is available only after the {@link Device} has been initialized,
+	 * so we cannot use this during positioning.
+	 */
 	public $anchors!: readonly Point[][];
+
 	public $location!: IPoint;
 
 	private readonly _originalDisplacement!: Vector;

@@ -8,7 +8,7 @@ import { deviceGenerator } from "./generators/deviceGenerator";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JJunctions } from "shared/json";
+import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
@@ -18,10 +18,10 @@ export interface CornerMap {
 	/** {@link JCorner} itself. */
 	corner: JCorner;
 
-	/** Which {@link Overlap} in the {@link Partition}  */
+	/** Which {@link JOverlap} in the {@link Partition}  */
 	overlapIndex: number;
 
-	/** Which {@link Anchor} in the {@link Overlap}. */
+	/** Which {@link JAnchor} in the {@link JOverlap}. */
 	anchorIndex: number;
 }
 
@@ -190,7 +190,7 @@ export class Partition implements ISerializable<JPartition> {
 
 	/**
 	 * Find, in a {@link Partition} containing joins, what is left of a given {@link JOverlap}
-	 * after subtracting the other `JOverlap`s.
+	 * after subtracting the other JOverlaps.
 	 */
 	private _getExposedOverlap(ov: JOverlap): JOverlap {
 		// Trivial case
