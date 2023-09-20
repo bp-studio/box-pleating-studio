@@ -198,8 +198,6 @@ export class Partition implements ISerializable<JPartition> {
 
 		const result = clone(ov);
 		const parent = this._getParent(ov);
-		result.ox = parent.ox;
-		result.oy = parent.oy;
 		let shift = result.shift ?? { x: 0, y: 0 };
 		for(const o of this.$overlaps) {
 			if(o != ov) {
