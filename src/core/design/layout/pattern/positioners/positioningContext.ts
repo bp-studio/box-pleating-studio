@@ -1,11 +1,12 @@
 import { Point } from "core/math/geometry/point";
-import { quadrantNumber } from "shared/types/direction";
+import { opposite, quadrantNumber } from "shared/types/direction";
 import { CornerType } from "shared/json";
 import { convertIndex } from "shared/utils/pattern";
 
+import type { QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../../repository";
 import type { Pattern } from "../pattern";
-import type { JJunction, JJunctions, JOverlap } from "shared/json";
+import type { JJunction, JJunctions, JOverlap, JCorner } from "shared/json";
 import type { Device } from "../device";
 import type { Gadget } from "../gadget";
 
@@ -21,6 +22,8 @@ export class PositioningContext {
 	public readonly $gadgets: readonly Gadget[];
 	public readonly $junctions: JJunctions;
 	public readonly $devices: readonly Device[];
+
+	private readonly _slackMap = new WeakMap<JCorner, number>();
 
 	constructor(pattern: Pattern) {
 		this.$repo = pattern.$config.$repo;
@@ -47,6 +50,22 @@ export class PositioningContext {
 		return device.$partition.$overlaps.map(o => this.$junctions[o.parent]);
 	}
 
+	public $checkJunctions(): boolean {
+		// Trivial case
+		if(this.$junctions.length == 1 && this.$gadgets.length == 1) return true;
+
+		for(let i = 0; i < this.$junctions.length; i++) {
+			if(!this._checkJunction(i)) return false;
+		}
+		return true;
+	}
+
+	public $getSlack(index: number, q: QuadrantDirection): number {
+		const corner = this.$overlaps[index].c[q];
+		const gadget = this.$gadgets[index];
+		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack[q]);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,13 +78,61 @@ export class PositioningContext {
 			if(corner.type != CornerType.internal) continue;
 			const targetIndex = convertIndex(corner.e);
 
-			// If there're mutual connections, there's no need to setup slack.
 			const targetOverlap = this.$overlaps[targetIndex];
-			if(targetOverlap.c.some(c => c.type == CornerType.internal && c.e == id)) continue;
+			const oppositeCorner = targetOverlap.c[2 - q];
+			const mutual = oppositeCorner.type == CornerType.internal && oppositeCorner.e == id;
 
 			const g1 = this.$gadgets[index];
 			const g2 = this.$gadgets[targetIndex];
-			g1.$setupConnectionSlack(g2, q, corner.q!);
+			if(!mutual) {
+				g1.$setupConnectionSlack(g2, q, corner.q!);
+			} else {
+				// If there're mutual connections, we don't need to setup
+				// the slack for real, but we keep a record for later usage.
+				const tx1 = g1.sx + g2.rx(q, corner.q!);
+				const tx2 = g2.sx + g1.rx(2 - q, opposite(corner.q!));
+				if(tx2 > tx1) this._slackMap.set(corner, tx2 - tx1);
+			}
 		}
+	}
+
+	/**
+	 * Given a {@link JJunction}, consider all possible {@link Gadget} chains within,
+	 * and make sure that all chains fit the space.
+	 */
+	private _checkJunction(index: number): boolean {
+		const junction = this.$junctions[index];
+		const overlapIndices = new Set<number>();
+
+		for(let i = 0; i < this.$overlaps.length; i++) {
+			const ov = this.$overlaps[i];
+			if(ov.parent != index) continue;
+			overlapIndices.add(i);
+		}
+
+		let total = 0;
+		while(overlapIndices.size > 0) {
+			const first = overlapIndices.values().next().value as number;
+			overlapIndices.delete(first);
+			const result = this.$gadgets[first].sx +
+				this._getChainSpanRecursive(overlapIndices, first, 0) +
+				this._getChainSpanRecursive(overlapIndices, first, 2);
+			if(result > total) total = result;
+		}
+		return junction.sx >= total;
+	}
+
+	private _getChainSpanRecursive(overlapIndices: Set<number>, index: number, q: QuadrantDirection): number {
+		const corner = this.$overlaps[index].c[q];
+		if(corner.type == CornerType.flap) return 0; // base case
+		let result = 0;
+		const next = convertIndex(corner.e);
+		overlapIndices.delete(next);
+		if(corner.type == CornerType.internal) {
+			const nextGadget = this.$gadgets[next];
+			const slack = this.$getSlack(index, q);
+			result = nextGadget.rx(q, corner.q!) + slack;
+		} // otherwise it is coincide
+		return result + this._getChainSpanRecursive(overlapIndices, next, q);
 	}
 }

@@ -21,14 +21,13 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 
 	if(devices.length == 2) {
 		const [g1, g2] = devices.map(d => d.$gadgets[0]);
-		const [o1, o2] = devices.map(d => d.$partition.$overlaps[0]);
-		const c1 = o1.c[2];
-		const c2 = o2.c[0];
-		const tx1 = g1.sx + g2.rx(c1.q!, 2);
-		const tx2 = g2.sx + g1.rx(c2.q!, 0);
-		if(tx1 > sx || tx2 > sx) return false;
+		const o2 = devices[1].$partition.$overlaps[0];
+		const tx = g2.sx + g1.rx(o2.c[0].q!, 0);
+		// There's no need to check for total span here anymore,
+		// as the general checking covers it already.
+
 		// Separate them as far as possible
-		devices[1].$offset = sx - tx2;
+		devices[1].$offset = sx - tx;
 		return true;
 	}
 

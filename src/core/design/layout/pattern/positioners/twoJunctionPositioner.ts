@@ -30,9 +30,7 @@ function makeSingeJoinDevicePattern(context: PositioningContext): boolean {
 	const device = context.$devices[0];
 	const [j1, j2] = context.$getJunctions(device);
 	const oriented = j1.c[0].e == j2.c[0].e;
-	const gadgets = device.$gadgets;
-	if(gadgets[0].sx > j1.sx || gadgets[1].sx > j2.sx) return false;
-	if(!oriented) device.$offset = j1.sx - gadgets[0].sx;
+	if(!oriented) device.$offset = j1.sx - device.$gadgets[0].sx;
 	return true;
 }
 
@@ -58,8 +56,7 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 
 	const tx = g1.sx;
 	const slack = Math.floor(g1.$slack[qSelf]);
-	const sx = j1.sx - Math.ceil(g2.rx(qTarget, qSelf)) - slack;
-	if(tx > sx) return false;
+	const sx = j1.sx - g2.rx(qTarget, qSelf) - slack;
 
 	// Push them towards the shared corner as much as possible
 	const offsets = oriented ? [slack ?? 0, 0] : [sx - tx, j2.sx - g2.sx];

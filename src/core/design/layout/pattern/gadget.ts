@@ -58,10 +58,7 @@ export class Gadget implements JGadget {
 				for(const [i, p] of this.pieces.entries()) {
 					if(p.$anchors[q]) return [p.$anchors[q]!, i];
 				}
-
-				// Shouldn't enter here in theory
-				debugger;
-				throw new Error();
+				throw new Error(); // Shouldn't enter here in theory
 			}
 		});
 	}
@@ -84,7 +81,7 @@ export class Gadget implements JGadget {
 	 * @param q2 {@link QuadrantDirection} of the corner by the other {@link Gadget}, which is either 0 or 2.
 	 */
 	public rx(q1: QuadrantDirection, q2: QuadrantDirection): number {
-		return Math.abs(this.$anchorMap[q1][0].x - this.$anchorMap[q2][0].x);
+		return Math.ceil(Math.abs(this.$anchorMap[q1][0].x - this.$anchorMap[q2][0].x));
 	}
 
 	public $reverseGPS(): Gadget {
