@@ -9,6 +9,7 @@ import { clone } from "shared/utils/clone";
 import { MASK } from "../junction/validJunction";
 import { opposite } from "shared/types/direction";
 import { toPath } from "core/math/geometry/rationalPath";
+import { convertIndex } from "shared/utils/pattern";
 
 import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerMap, Partition } from "../partition";
@@ -168,7 +169,7 @@ export class Device implements ISerializable<JDevice> {
 			const target = this.$pattern.$getConnectionTarget(c.corner as JConnection);
 			const slack = isOut ?
 				this.$gadgets[c.overlapIndex].$slack[c.anchorIndex] :
-				this.$pattern.$gadgets[-c.corner.e! - 1].$slack[c.corner.q!];
+				this.$pattern.$gadgets[convertIndex(c.corner.e)].$slack[c.corner.q!];
 			const bound = target.x - this.$resolveCornerMap(c).x - slack * f;
 			if(f > 0 && result[1] > bound) result[1] = bound;
 			else if(f < 0 && result[0] < bound) result[0] = bound;

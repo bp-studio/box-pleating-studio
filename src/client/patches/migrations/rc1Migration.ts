@@ -1,4 +1,5 @@
 import { CornerType } from "shared/json";
+import { convertIndex } from "shared/utils/pattern";
 
 import type { JConfiguration, JCorner, JProject, JGadget, JOverlap, JPartition, JPattern, JStretch, Strategy, JLayout } from "shared/json";
 
@@ -56,13 +57,13 @@ function partition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {
 		// Find all coincide anchors.
 		const coins = o.c.filter(cornerFilter);
 
-		const coin = coins.find(c => partitionMap.has(-c.e! - 1));
+		const coin = coins.find(c => partitionMap.has(convertIndex(c.e)));
 		const j = partitions.length;
 
 		if(coin) {
 			// If any of the coincide anchors has already been added,
 			// and this to the same group.
-			const k = partitionMap.get(-coin.e! - 1)!;
+			const k = partitionMap.get(convertIndex(coin.e))!;
 			partitionMap.set(i, k);
 			partitions[k].push(o);
 		} else {
@@ -73,7 +74,7 @@ function partition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {
 
 		// Add remaining coincided anchors to the group
 		coins.forEach(c => {
-			const e = -c.e! - 1;
+			const e = convertIndex(c.e);
 			if(!partitionMap.has(e)) {
 				partitionMap.set(e, j);
 				partitions[j].push(overlaps[e]);

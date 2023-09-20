@@ -7,6 +7,7 @@ import { Fraction } from "core/math/fraction";
 import { getIntersection } from "core/math/geometry/line";
 import { Overlap } from "core/math/polyBool/general/clip/overlap";
 import { join, shift, toLines, toPath } from "core/math/geometry/rationalPath";
+import { clone } from "shared/utils/clone";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
@@ -35,7 +36,7 @@ export class Gadget implements JGadget {
 		this.pieces = data.pieces.map(p => new Piece(p));
 		this.offset = data.offset;
 		this.pieces.forEach(p => p.$offset(this.offset));
-		this.anchors = data.anchors;
+		this.anchors = clone(data.anchors); // Must clone!
 	}
 
 	@cache public get sx(): number {
@@ -66,6 +67,7 @@ export class Gadget implements JGadget {
 	}
 
 	@cache public get $slack(): PerQuadrant<number> {
+		if(!this.anchors) return [0, 0, 0, 0];
 		return makePerQuadrant(q => this._getSlack(q));
 	}
 
@@ -96,9 +98,11 @@ export class Gadget implements JGadget {
 	}
 
 	public $addSlack(q: QuadrantDirection, slack: number): Gadget {
-		this.anchors = this.anchors || [];
-		this.anchors[q] = this.anchors[q] || {};
-		this.anchors[q].slack = (this.anchors[q].slack ?? 0) + slack;
+		if(slack != 0) {
+			this.anchors = this.anchors || [];
+			this.anchors[q] = this.anchors[q] || {};
+			this.anchors[q].slack = (this.anchors[q].slack ?? 0) + slack;
+		}
 		return this;
 	}
 
@@ -107,9 +111,8 @@ export class Gadget implements JGadget {
 	 * @param g Connection target
 	 * @param q1 From which {@link QuadrantDirection} (0 or 2)
 	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
-	 * @returns The resulting slack
 	 */
-	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): number {
+	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): void {
 		let c1 = this.$contour;
 		const c2 = g.$contour;
 		const f = q1 == 0 ? 1 : -1;
@@ -127,7 +130,6 @@ export class Gadget implements JGadget {
 			s++;
 		}
 		this.$addSlack(q1, s);
-		return s;
 	}
 
 	/** If the current {@link Gadget} contains the given ray. */

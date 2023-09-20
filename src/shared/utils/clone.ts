@@ -26,7 +26,8 @@ export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 }
 
 /** Clone an object. */
-function clonePolyfill<T extends object>(source: T): T {
+function clonePolyfill<T extends object | undefined>(source: T): T {
+	if(!source) return source;
 	// `isArray` is more reliable than `instanceof Array`,
 	// See https://stackoverflow.com/a/22289869/9953396
 	const target = Array.isArray(source) ? [] : {};

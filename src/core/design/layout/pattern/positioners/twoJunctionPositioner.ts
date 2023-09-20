@@ -57,12 +57,12 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 	const qTarget = o1.c[qSelf].q!;
 
 	const tx = g1.sx;
-	const s = g1.$setupConnectionSlack(g2, qSelf, qTarget);
-	const sx = j1.sx - Math.ceil(g2.rx(qTarget, qSelf)) + s;
+	const slack = Math.floor(g1.$slack[qSelf]);
+	const sx = j1.sx - Math.ceil(g2.rx(qTarget, qSelf)) - slack;
 	if(tx > sx) return false;
 
 	// Push them towards the shared corner as much as possible
-	const offsets = oriented ? [s ?? 0, 0] : [sx - tx, j2.sx - g2.sx];
+	const offsets = oriented ? [slack ?? 0, 0] : [sx - tx, j2.sx - g2.sx];
 	if(reversed) offsets.reverse();
 
 	// If after the pushing, the delta ray is still closer than g2

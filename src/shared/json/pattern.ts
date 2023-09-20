@@ -85,6 +85,10 @@ export interface JGadget {
 	/** The relative offset of the {@link Gadget} to the `p[0]` of its first {@link Piece} */
 	offset?: IPoint;
 
+	/**
+	 * Pay attention that the {@link anchors} are in opposite ordering from a {@link JOverlap},
+	 * that is, the one of index 0 is the lower left corner.
+	 */
 	anchors?: JAnchor[];
 }
 

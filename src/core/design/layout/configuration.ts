@@ -4,6 +4,7 @@ import { patternGenerator } from "./generators/patternGenerator";
 import { CornerType } from "shared/json";
 import { Line } from "core/math/geometry/line";
 import { clone } from "shared/utils/clone";
+import { convertIndex } from "shared/utils/pattern";
 
 import type { Point } from "core/math/geometry/point";
 import type { CornerMap } from "./partition";
@@ -184,7 +185,7 @@ export function cleanUp(partitions: readonly JPartition[]): readonly JPartition[
 	const idMap = new Map<number, number>();
 	const overlaps = partitions.flatMap(p => p.overlaps);
 	for(let i = 0; i < overlaps.length; i++) {
-		idMap.set(overlaps[i].id!, -i - 1);
+		idMap.set(overlaps[i].id!, convertIndex(i));
 		delete overlaps[i].id;
 	}
 

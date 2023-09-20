@@ -87,7 +87,7 @@ export class Pattern implements ISerializable<JPattern> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _position(): boolean {
-		const context = new PositioningContext(this.$config, this.$devices);
+		const context = new PositioningContext(this);
 
 		// TODO
 		if(this.$config.$singleMode || context.$junctions.length == 1) {
