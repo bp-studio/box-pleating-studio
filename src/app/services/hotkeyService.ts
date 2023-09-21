@@ -22,7 +22,9 @@ namespace HotkeyService {
 		return e => {
 			// Capturing exceptions
 			const active = document.activeElement;
-			if(active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+			const isInput = active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement;
+			const isSave = e.key.toLowerCase() == "s" && (e.metaKey || e.ctrlKey);
+			if(isInput && !isSave) return;
 
 			handler(e);
 		};
