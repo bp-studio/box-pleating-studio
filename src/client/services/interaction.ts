@@ -49,6 +49,12 @@ export namespace Interaction {
 		display.canvas.addEventListener("touchstart", pointerDown, { passive: true });
 		display.canvas.addEventListener("mousedown", pointerDown);
 		display.canvas.addEventListener("wheel", wheel);
+		display.canvas.addEventListener("touchend", event => {
+			// Prevent triggering simulated mouse event.
+			// This needs to be done here and not on the whole document,
+			// otherwise clicking won't work on UI.
+			event.preventDefault();
+		});
 
 		document.addEventListener("mouseup", mouseUp);
 		document.addEventListener("touchend", touchEnd);
@@ -103,8 +109,6 @@ export namespace Interaction {
 	}
 
 	function touchEnd(event: TouchEvent): void {
-		event.preventDefault(); // prevent triggering simulated mouse event
-
 		LongPressController.$cancel();
 		if(pendingTouchStart) {
 			// In this case we know that the user's intention is tapping.
