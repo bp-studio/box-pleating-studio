@@ -14,7 +14,7 @@ export function twoJunctionPositioner(context: PositioningContext): boolean {
 		pushJoinDeviceTowardsJoint(context, context.$devices[0]);
 		return true;
 	}
-	if(context.$devices.length == 2 && context.$devices.every(d => d.$partition.$overlaps.length == 1)) {
+	if(context.$devices.length == 2 && context.$overlaps.length == 2) {
 		return makeTwoDeviceRelayPattern(context);
 	}
 	return makeSpitJoinPattern(context);
