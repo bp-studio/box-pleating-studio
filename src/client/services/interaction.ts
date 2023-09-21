@@ -103,6 +103,8 @@ export namespace Interaction {
 	}
 
 	function touchEnd(event: TouchEvent): void {
+		event.preventDefault(); // prevent triggering simulated mouse event
+
 		LongPressController.$cancel();
 		if(pendingTouchStart) {
 			// In this case we know that the user's intention is tapping.
