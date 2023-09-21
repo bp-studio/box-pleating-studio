@@ -11,7 +11,7 @@
 			<DropdownItem :disabled="!Studio.project" @click="selectAll">
 				<Hotkey icon="fas fa-th" ctrl hk="A">{{ $t('toolbar.edit.selectAll') }}</Hotkey>
 			</DropdownItem>
-			<DropdownItem :disabled="!selection" @click="unselectAll">
+			<DropdownItem :disabled="!Studio.selections.length" @click="unselectAll">
 				<Hotkey icon="fas fa-border-none" :hk="isMac ? '⎋' : 'Esc'">{{ $t('toolbar.edit.unselectAll') }}</Hotkey>
 			</DropdownItem>
 		</template>
@@ -43,8 +43,6 @@
 		HotkeyService.register(redo, "redo", false);
 		HotkeyService.register(unselectAll, "clear", false);
 	});
-
-	const selection = Studio.selection;
 
 	function undo(): void {
 		Studio.history.undo();
