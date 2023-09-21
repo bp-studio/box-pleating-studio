@@ -62,7 +62,8 @@
 	const { el, show } = useModal("Share", async () => {
 		if(!Studio.project) return false;
 		const data = await LZ.compress(JSON.stringify(Studio.project));
-		shorten("https://bpstudio.abstreamace.com/?project=" + data);
+		const host = location.host.includes("qa") ? location.host : "bpstudio.abstreamace.com";
+		shorten(`https://${host}/?project=${data}`);
 		return true;
 	});
 
