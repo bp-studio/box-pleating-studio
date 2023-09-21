@@ -29,6 +29,9 @@ export type PathEx = Path & {
 
 	/** Whether this path is a hole. */
 	isHole?: boolean;
+
+	/** Indicate that this path was flipped during expansion. */
+	flipped?: boolean;
 };
 
 /** Contour format. a set of contours consists of an outer path plus some inner holes. */

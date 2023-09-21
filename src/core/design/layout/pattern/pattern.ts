@@ -81,7 +81,6 @@ export class Pattern implements ISerializable<JPattern> {
 		const singleMode = this.$config.$singleMode;
 		if(!context.$checkJunctions(singleMode)) return false;
 
-		// TODO
 		if(singleMode || context.$junctions.length == 1) {
 			return singleJunctionPositioner(context);
 		}

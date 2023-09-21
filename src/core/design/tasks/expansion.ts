@@ -28,25 +28,23 @@ export function expand(inputs: readonly RoughContour[], units: number, check?: C
 	const newHoles: PathEx[] = [];
 	for(const path of result) {
 		const from = path.from!;
-		let holeIndex = -1;
+		let isFromHole = false, flipped = false;
 		const inner = from.map((n, i) => {
 			pathRemain.delete(n);
 			const input = union[n];
-			if(expandedPolygons[n][0].isHole) {
-				holeIndex = i;
+			const expanded = expandedPolygons[n][0];
+			if(expanded.isHole) {
+				isFromHole = true;
 				input.isHole = true;
 			}
+			if(expanded.flipped) flipped = true;
 			return input;
 		});
-
-		const isFromHole = holeIndex >= 0;
 		if(!isFromHole && isClockwise(path)) {
 			newHoles.push(path);
-		} else if(isFromHole && span(path) > span(inner[holeIndex])) {
-			// In this case a hole was over-shrunk and ended up even bigger.
-			// We need to treat it as a simple filling.
-			//TODO: why?
-			// contours.push({ outer: inner[0].toReversed() });
+		} else if(isFromHole && flipped) {
+			// Flipped path need to treated as a simple filling.
+			contours.push({ $outer: [], $inner: inner, $leaves: [] });
 		} else {
 			const leaves = inner
 				.flatMap(p => p.from!)
@@ -82,6 +80,7 @@ function expandPath(path: PathEx, units: number): PathEx {
 	const l = path.length;
 	const result: PathEx = [];
 	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
+	let maxX = Number.NEGATIVE_INFINITY, maxXDelta: number = 0;
 	for(let i = 0, j = l - 1; i < l; j = i++) {
 		// Decide the direction of shifting.
 		// Here we assume that the polygon is non-degenerated.
@@ -93,22 +92,18 @@ function expandPath(path: PathEx, units: number): PathEx {
 			minX = p.x;
 			minXDelta = dx;
 		}
+		if(p.x > maxX) {
+			maxX = p.x;
+			maxXDelta = dx;
+		}
 		result.push({ x: p.x + dx, y: p.y + dy });
 	}
 	if(minXDelta > 0) result.isHole = true;
-	return result;
-}
-
-/** Returns the width span of a given {@link Path} */
-function span(path: Path): number {
-	const l = path.length;
-	let minX = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY;
-	for(let i = 0; i < l; i++) {
-		const p = path[i];
-		if(p.x < minX) minX = p.x;
-		if(p.x > maxX) maxX = p.x;
+	if(minX + minXDelta > maxX + maxXDelta) {
+		// In this case a hole was over-shrunk and ended up even bigger
+		result.flipped = true;
 	}
-	return maxX - minX;
+	return result;
 }
 
 /**

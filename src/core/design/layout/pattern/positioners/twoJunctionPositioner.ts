@@ -40,7 +40,8 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 	const oriented = o1.c[0].e! < 0; // Share lower-left corner
 
 	// If after the pushing, the delta ray is still closer than g2
-	// (the one getting relayed), then it won't work
+	// (the one getting relayed), then it won't work.
+	// This check is needed in some invalid layouts.
 	const deltaPt = context.$getRelativeDelta(j1, j2, g2);
 	if(g2.$intersects(deltaPt, oriented ? QV[0] : QV[2])) return false;
 
