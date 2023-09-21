@@ -59,6 +59,7 @@
 
 	function input(event: InputEvent): void {
 		const v = Number((event.target as HTMLInputElement).value);
+		if(!Number.isSafeInteger(v)) return;
 		if(v < props.min! || v > props.max!) return;
 		value.value = v;
 		emit("update:modelValue", v);
