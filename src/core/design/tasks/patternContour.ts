@@ -4,7 +4,7 @@ import { State } from "core/service/state";
 import { Trace } from "../layout/trace/trace";
 import { quadrantNumber } from "shared/types/direction";
 import { createHingeSegments } from "../layout/trace/hingeSegment";
-import { windingNumber } from "core/math/geometry/winding";
+import { isInside } from "core/math/geometry/winding";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 
 import type { QuadrantDirection } from "shared/types/direction";
@@ -61,11 +61,12 @@ function processRepo(repo: Repository, trace: Trace): void {
 		for(const [index, roughContour] of node.$graphics.$roughContours.entries()) {
 			// Create start/end map
 			const outer = roughContour.$outer;
+			const isHole = Boolean(outer.isHole);
 			const startEndMap = {} as Record<QuadrantDirection, [Point, Point]>;
 
 			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps around the quadrant
-				.filter(q => !multiContour || windingNumber(q.$point, outer) != 0);
+				.filter(q => !multiContour || isInside(q.$point, outer) != isHole);
 			for(let q = 0; q < quadrantNumber; q++) {
 				const filtered = quadrants.filter(quadrant => quadrant.q == q);
 				if(!filtered.length) continue;

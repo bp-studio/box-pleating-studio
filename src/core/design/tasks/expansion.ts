@@ -1,5 +1,5 @@
 import { AAUnion } from "core/math/polyBool/union/aaUnion";
-import { windingNumber } from "core/math/geometry/winding";
+import { isInside } from "core/math/geometry/winding";
 import { deduplicate } from "core/math/geometry/path";
 
 import type { RoughContour } from "core/design/context";
@@ -40,22 +40,21 @@ export function expand(inputs: readonly RoughContour[], units: number, check?: C
 			if(expanded.flipped) flipped = true;
 			return input;
 		});
-		if(!isFromHole && isClockwise(path)) {
+		path.isHole = isClockwise(path);
+		if(!isFromHole && path.isHole) {
 			newHoles.push(path);
 		} else if(isFromHole && flipped) {
 			// Flipped path need to treated as a simple filling.
 			contours.push({ $outer: [], $inner: inner, $leaves: [] });
 		} else {
-			const leaves = inner
-				.flatMap(p => p.from!)
-				.flatMap(i => inputs[i].$leaves);
+			const leaves = inner.flatMap(p => p.from!).flatMap(i => inputs[i].$leaves);
 			contours.push({ $outer: path, $inner: inner, $leaves: leaves });
 		}
 	}
 
 	// Decide where the newly created holes should go
 	for(const path of newHoles) {
-		const contour = contours.find(c => windingNumber(path[0], c.$outer) != 0);
+		const contour = contours.find(c => isInside(path[0], c.$outer));
 		if(contour) (contour.$inner ||= []).push(path);
 	}
 

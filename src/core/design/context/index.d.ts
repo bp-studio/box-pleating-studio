@@ -1,4 +1,4 @@
-import type { Contour, ILine, Path } from "shared/types/geometry";
+import type { Contour, ILine, Path, PathEx } from "shared/types/geometry";
 import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
@@ -96,7 +96,7 @@ export interface RoughContour {
 	 * In a {@link RoughContour}, {@link $outer} is from the processing perspective,
 	 * not from the rendering perspective.
 	 */
-	$outer: Path;
+	$outer: PathEx;
 
 	/**
 	 * Inner holes of the contour, if any.
