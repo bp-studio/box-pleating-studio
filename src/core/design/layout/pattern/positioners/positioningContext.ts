@@ -3,12 +3,15 @@ import { opposite, quadrantNumber } from "shared/types/direction";
 import { CornerType } from "shared/json";
 import { convertIndex } from "shared/utils/pattern";
 
-import type { QuadrantDirection } from "shared/types/direction";
+import type { Direction, QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../../repository";
 import type { Pattern } from "../pattern";
 import type { JJunction, JJunctions, JOverlap, JCorner } from "shared/json";
 import type { Device } from "../device";
 import type { Gadget } from "../gadget";
+
+type TipDirection = Direction.UR | Direction.LL;
+type SpanCache = Readonly<Record<TipDirection, Map<number, number>>>;
 
 //=================================================================
 /**
@@ -24,6 +27,7 @@ export class PositioningContext {
 	public readonly $devices: readonly Device[];
 
 	private readonly _slackMap = new WeakMap<JCorner, number>();
+	private readonly _spanCache: SpanCache = { 0: new Map(), 2: new Map() };
 
 	constructor(pattern: Pattern) {
 		this.$repo = pattern.$config.$repo;
@@ -65,10 +69,13 @@ export class PositioningContext {
 		return true;
 	}
 
-	public $getSlack(index: number, q: QuadrantDirection): number {
-		const corner = this.$overlaps[index].c[q];
-		const gadget = this.$gadgets[index];
-		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack[q]);
+	/**
+	 * Get the span of a {@link Gadget} towards a given {@link TipDirection},
+	 * but exclude the immediate slack for the sake of convenience.
+	 */
+	public $getSpan(g: Gadget, q: TipDirection): number {
+		const index = this.$gadgets.indexOf(g);
+		return this._getSpan(index, q) - this._getSlack(index, q);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,29 +122,49 @@ export class PositioningContext {
 			overlapIndices.add(i);
 		}
 
-		let total = 0;
+		let maxSpan = 0;
+		const callback: Consumer<number> = i => overlapIndices.delete(i);
 		while(overlapIndices.size > 0) {
 			const first = overlapIndices.values().next().value as number;
 			overlapIndices.delete(first);
 			const result = this.$gadgets[first].sx +
-				this._getChainSpanRecursive(overlapIndices, first, 0) +
-				this._getChainSpanRecursive(overlapIndices, first, 2);
-			if(result > total) total = result;
+				this._getSpan(first, 0, callback) +
+				this._getSpan(first, 2, callback);
+			if(result > maxSpan) maxSpan = result;
 		}
-		return junction.sx >= total;
+		return junction.sx >= maxSpan;
 	}
 
-	private _getChainSpanRecursive(overlapIndices: Set<number>, index: number, q: QuadrantDirection): number {
-		const corner = this.$overlaps[index].c[q];
-		if(corner.type == CornerType.flap) return 0; // base case
+	private _getSpan(index: number, q: TipDirection, callback?: Consumer<number>): number {
+		if(this._spanCache[q].has(index)) {
+			return this._spanCache[q].get(index)!;
+		}
+
 		let result = 0;
-		const next = convertIndex(corner.e);
-		overlapIndices.delete(next);
-		if(corner.type == CornerType.internal) {
-			const nextGadget = this.$gadgets[next];
-			const slack = this.$getSlack(index, q);
-			result = nextGadget.rx(q, corner.q!) + slack;
-		} // otherwise it is coincide
-		return result + this._getChainSpanRecursive(overlapIndices, next, q);
+		const next = this._getNextIndex(index, q);
+		if(next !== null) {
+			if(callback) callback(next);
+			const corner = this.$overlaps[index].c[q];
+			if(corner.type == CornerType.internal) {
+				const nextGadget = this.$gadgets[next];
+				const slack = this._getSlack(index, q);
+				result += nextGadget.rx(q, corner.q!) + slack;
+			} // otherwise it is coincide
+			result += this._getSpan(next, q, callback);
+		}
+		this._spanCache[q].set(index, result);
+		return result;
+	}
+
+	private _getSlack(index: number, q: QuadrantDirection): number {
+		const corner = this.$overlaps[index].c[q];
+		const gadget = this.$gadgets[index];
+		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack[q]);
+	}
+
+	private _getNextIndex(index: number, q: TipDirection): number | null {
+		const corner = this.$overlaps[index].c[q];
+		if(corner.type == CornerType.flap) return null;
+		return convertIndex(corner.e);
 	}
 }
