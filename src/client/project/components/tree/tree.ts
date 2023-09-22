@@ -176,6 +176,7 @@ export class Tree implements ISerializable<JTree> {
 		this.$updateCallback = () => {
 			// We know that one of them will survive
 			const v = this.$vertices[v1] || this.$vertices[v2]!;
+			this.$project.history.$move(v, { x, y });
 			v.$location = { x, y };
 			SelectionController.$toggle(v, true);
 		};

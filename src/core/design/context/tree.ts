@@ -138,13 +138,17 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	public $merge(id: number): void {
 		const node = this._nodes[id]!;
 		const parent = node.$parent!;
-		this.$removeEdge(id, parent.id);
 		const children = [...node.$children]; // need to make a copy first
 		for(const child of children) {
 			const length = child.$length;
 			this.$removeEdge(id, child.id);
 			this.$addEdge(child.id, parent.id, length);
 		}
+
+		// The order here matters, otherwise we'll be in trouble undoing
+		// this operation due to the way $addEdge works
+		this.$removeEdge(id, parent.id);
+
 		this.$flushRemove();
 	}
 
