@@ -31,7 +31,8 @@ html.dark {
 
 	table {
 		border-color: $line;
-		color: var(--bs-body-color);
+		--bs-table-bg: unset;
+		--bs-table-color-state: var(--bs-body-color);
 	}
 
 	th {
@@ -82,7 +83,7 @@ html.dark {
 		color: #4d95ff;
 	}
 
-	.modal-header{
+	.modal-header {
 		border-bottom-color: $line;
 	}
 
