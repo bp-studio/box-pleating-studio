@@ -112,7 +112,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** The name of the flap, which is the same as that of the vertex. */
 	public get name(): string {
-		return this.$vertex.name;
+		return this.$vertex?.name ?? "";
 	}
 	public set name(v: string) {
 		this.$vertex.name = v;
@@ -120,7 +120,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** The radius of the flap. */
 	public get radius(): number {
-		return this.$edge.length;
+		return this.$edge?.length ?? 0;
 	}
 	public set radius(v: number) {
 		this.$edge.length = v;
@@ -157,7 +157,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get isDeletable(): boolean {
-		return this.$vertex.isDeletable;
+		return !this.$destructed && this.$vertex.isDeletable;
 	}
 
 	public delete(): void {

@@ -102,7 +102,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	}
 
 	public get isRiver(): boolean {
-		return !this.$getLeaf();
+		return !this.$destructed && !this.$getLeaf();
 	}
 
 	public get isDeletable(): boolean {

@@ -44,6 +44,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	/** Whether we're navigating the history. */
 	private _moving: boolean = false;
 
+	private _moveQueue: Action[] = [];
+
 	private _initializing: boolean = true;
 
 	constructor(project: Project, json?: JHistory) {
@@ -102,8 +104,6 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	 */
 	public $flush(): void {
 		const selection = this._project.design.sheet.$getSelectedTags();
-		// const test = (this._construct[0]?.[1] as any)?.pattern.devices[0].offset == 11;
-		// if(test) console.log(this._queue.length);
 		if(this._queue.length) {
 			const s = this._lastStep;
 			if(!s || !s.$tryAdd(this._queue, this._construct, this._destruct)) {
@@ -131,6 +131,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		this._selection = undefined;
 		this._initializing = false;
 		this._moving = false;
+
+		// Continue the queue
+		if(this._moveQueue.length) this._moveQueue.shift()!();
 	}
 
 	public $cacheSelection(): void {
@@ -181,6 +184,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	public async $undo(): Promise<void> {
+		if(this._moving) {
+			this._moveQueue.push(() => this.$undo());
+			return;
+		}
 		if(this.$canUndo) {
 			this._moving = true;
 			const result = await this._steps[--this._index].$undo();
@@ -195,6 +202,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	public async $redo(): Promise<void> {
+		if(this._moving) {
+			this._moveQueue.push(() => this.$redo());
+			return;
+		}
 		if(this.$canRedo) {
 			this._moving = true;
 			const result = await this._steps[this._index++].$redo();
