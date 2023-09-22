@@ -45,6 +45,9 @@ export class Tree implements ISerializable<JTree> {
 	 */
 	private _skippedIdHeap: BinaryHeap<number> = new BinaryHeap<number>(minComparator);
 
+	/** If we're currently in the middle of an operation. */
+	private _executing: boolean = false;
+
 	constructor(project: Project, parentView: Container, json: JTree, state?: JViewport) {
 		this.$project = project;
 		this.$sheet = new Sheet(project, parentView, "tree", json.sheet, state);
@@ -119,7 +122,9 @@ export class Tree implements ISerializable<JTree> {
 		this.$updateCallback = undefined;
 	}
 
-	public $addLeaf(at: Vertex, length: number): Promise<void> {
+	public async $addLeaf(at: Vertex, length: number): Promise<void> {
+		if(this._executing) return; // ignore rapid clicking
+		this._executing = true;
 		const id = this._nextAvailableId;
 		const p = this._findClosestEmptySpot(at);
 		const design = this.$project.design;
@@ -127,7 +132,8 @@ export class Tree implements ISerializable<JTree> {
 		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y });
 		const flap = design.layout.$createFlapPrototype(id, p);
 		prototype.layout.flaps.push(flap);
-		return this.$project.$core.tree.addLeaf(id, at.id, length, flap);
+		await this.$project.$core.tree.addLeaf(id, at.id, length, flap);
+		this._executing = false;
 	}
 
 	public $delete(vertices: Vertex[]): Promise<void> {
