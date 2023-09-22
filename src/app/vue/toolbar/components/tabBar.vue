@@ -59,6 +59,7 @@
 		width: 100%;
 		height: 3.75rem;
 		white-space: nowrap;
+		display: flex;
 
 		&::-webkit-scrollbar {
 			display: none;
@@ -71,11 +72,6 @@
 		* {
 			/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 			touch-action: pan-x;
-		}
-
-		> div {
-			position: relative;
-			height: 100%;
 		}
 	}
 

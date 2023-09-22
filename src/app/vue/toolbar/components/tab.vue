@@ -1,6 +1,5 @@
 <template>
-	<div :id="`tab${id}`" @mousedown="Workspace.select(id)"
-		 @touchstart.passive="Workspace.select(id)">
+	<div :id="`tab${id}`" @mousedown="Workspace.select(id)" @touchstart.passive="Workspace.select(id)">
 		<div class="tab-close" :title="toolTip" @contextmenu="$emit('menu', $event)">
 			<div>
 				<span v-if="isModified">*</span>
@@ -29,7 +28,6 @@
 	import { computed } from "vue";
 
 	import Workspace from "app/services/workspaceService";
-	import Studio from "app/services/studioService";
 	import Handle from "app/services/handleService";
 
 	import type { Project } from "client/project/project";
@@ -155,7 +153,7 @@
 		}
 	}
 
-	@media (width <= 650px) {
+	@media (width <=650px) {
 		.tab {
 			line-height: 2rem;
 			font-size: 1rem;
