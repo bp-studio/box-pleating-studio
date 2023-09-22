@@ -111,7 +111,7 @@ function toGraphicalContour(contour: RationalContour): Contour {
 	const inner = contour.$inner?.map(simplify);
 	if(!outer.length) {
 		return { outer: inner![0] };
-	} else if(inner) {
+	} else if(outer.isHole && inner) {
 		const innerHoleIndex = inner.findIndex(p => p.isHole);
 		if(innerHoleIndex >= 0) {
 			inner.push(outer);
