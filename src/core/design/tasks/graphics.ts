@@ -9,7 +9,7 @@ import { combineContour } from "./combine";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
-import type { ILine, Path } from "shared/types/geometry";
+import type { ILine, Path, PathEx } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
 
@@ -91,7 +91,7 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		// It is possible that a contour of a river has no holes in invalid layouts.
 		// In that case adding ridges doesn't make sense either, so skip the rest.
 		if(!contour.inner) continue;
-		const outers = [contour.outer];
+		const side = (contour.outer as PathEx).isHole ? -1 : 1;
 
 		// Create a record for all the vertices in inner contour.
 		const innerRightCorners = new Map<number, [IPoint, IPoint, IPoint]>();
@@ -102,22 +102,20 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		}
 
 		// Check for each vertex on the outer contour.
-		for(const outer of outers) {
-			for(const [p1, p0, p2] of pathRightCorners(outer)) {
-				const p = getCorrespondingPoint(p1, p0, p2, width, 1);
-				const innerKey = getOrderedKey(p.x, p.y);
-				if(innerRightCorners.has(innerKey)) {
-					ridges.push([p1, p]);
-					innerRightCorners.delete(innerKey);
-				} else {
-					tryAddRemainingRidge(p1, p, freeCorners, ridges);
-				}
+		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
+			const p = getCorrespondingPoint(p1, p0, p2, width, side);
+			const innerKey = getOrderedKey(p.x, p.y);
+			if(innerRightCorners.has(innerKey)) {
+				ridges.push([p1, p]);
+				innerRightCorners.delete(innerKey);
+			} else {
+				tryAddRemainingRidge(p1, p, freeCorners, ridges);
 			}
 		}
 
 		// Check remaining inner vertices.
 		for(const [p1, p0, p2] of innerRightCorners.values()) {
-			const p = getCorrespondingPoint(p1, p0, p2, width, -1);
+			const p = getCorrespondingPoint(p1, p0, p2, width, -side as Sign);
 			tryAddRemainingRidge(p1, p, freeCorners, ridges);
 		}
 	}
