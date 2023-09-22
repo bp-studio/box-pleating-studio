@@ -155,7 +155,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			if(this._initialized) {
 				// Display a fatal message and close self, if the project has already been initialized.
 				// If not, the error thrown below will be caught by the App.
-				await options.onError?.(this.id, response.error);
+				await options.onError?.(this.id, response.error, this.history.$backup);
 			}
 			throw new Error(response.error); // Stop all further actions.
 		} else if("update" in response) {

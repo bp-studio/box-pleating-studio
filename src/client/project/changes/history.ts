@@ -6,6 +6,7 @@ import { Step, OperationResult, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";
 import { EditCommand } from "./commands/editCommand";
 
+import type { JProject } from "shared/json";
 import type { JEdit } from "shared/json/tree";
 import type { Draggable } from "client/base/draggable";
 import type { Project } from "../project";
@@ -49,6 +50,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	private _initializing: boolean = true;
 
+	private _backup: JProject | undefined;
+
 	constructor(project: Project, json?: JHistory) {
 		this._project = project;
 		if(json) {
@@ -71,6 +74,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			savedIndex: this._savedIndex,
 			steps: this._steps.map(s => s.toJSON()),
 		};
+	}
+
+	public get $backup(): JProject | undefined {
+		return this._backup;
 	}
 
 	/**
@@ -133,8 +140,14 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		this._initializing = false;
 		this._moving = false;
 
-		// Continue the queue
-		if(this._moveQueue.length) this._moveQueue.shift()!();
+
+		if(this._moveQueue.length) {
+			// Continue the queue
+			this._moveQueue.shift()!();
+		} else {
+			// Save a backup in case of crashes
+			this._backup = this._project.toJSON(true);
+		}
 	}
 
 	public $cacheSelection(): void {

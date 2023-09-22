@@ -181,8 +181,8 @@ namespace WorkspaceService {
 	}
 
 	Studio.$onSetupOptions.push(options =>
-		options.onError = async (id: number, error: string) => {
-			await Dialogs.alert(i18n.t("message.fatal", [error]));
+		options.onError = async (id: number, error: string, backup?: JProject) => {
+			await Dialogs.error(error, backup);
 			await close(id, true);
 		}
 	);
