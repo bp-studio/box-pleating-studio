@@ -131,8 +131,12 @@ export class Gadget implements JGadget {
 
 	/** If the current {@link Gadget} contains the given ray. */
 	public $intersects(p: Point, v: Vector): boolean {
-		const test = toLines(this.$contour);
-		return test.some(l => getIntersection(l, p, v, true));
+		const lines = toLines(this.$contour);
+		for(const line of lines) {
+			const intersection = getIntersection(line, p, v, true);
+			if(intersection && !intersection.point.eq(p)) return true;
+		}
+		return false;
 	}
 
 
