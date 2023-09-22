@@ -44,6 +44,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	/** Whether we're navigating the history. */
 	private _moving: boolean = false;
 
+	/** Queuing the undo/redo operations during rapid firing. */
 	private _moveQueue: Action[] = [];
 
 	private _initializing: boolean = true;
