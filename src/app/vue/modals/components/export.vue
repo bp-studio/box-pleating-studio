@@ -13,6 +13,7 @@
 							<input type="text" class="form-control" v-model="extFilename" />
 						</div>
 					</div>
+					<div v-if="isInApp" v-t="'message.inApp'"></div>
 					<div class="p-2 text-center">
 						<button disabled v-if="!url" type="button" class="btn btn-lg btn-success">
 							<i class="bp-spinner fa-spin" />
@@ -38,7 +39,7 @@
 
 	import Studio from "app/services/studioService";
 	import useModal from "../modal";
-	import { isFileApiEnabled } from "app/shared/constants";
+	import { isFileApiEnabled, isInApp } from "app/shared/constants";
 	import FileUtility from "app/utils/fileUtility";
 	import { compRef } from "app/utils/compRef";
 	import CheckButton from "@/gadgets/form/checkButton.vue";

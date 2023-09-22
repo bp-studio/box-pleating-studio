@@ -68,10 +68,18 @@
 	});
 
 	async function copy(): Promise<void> {
-		if(copyEnabled) {
-			await navigator.clipboard.writeText(url.value);
-		} else {
-			// polyfill for Safari < 13.1
+		let apiCopied = false;
+		try {
+			if(copyEnabled) {
+				await navigator.clipboard.writeText(url.value);
+				apiCopied = true;
+			}
+		} catch(e) {
+			// Error might happen in in-app browsers.
+			// In that case we fallback to polyfill.
+		}
+		if(!apiCopied) {
+			// polyfill
 			const ipt = input.value!;
 			ipt.select();
 			document.execCommand("copy");

@@ -43,6 +43,8 @@ export const isReload =
 	(performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)?.type == "reload" ??
 	performance.navigation.type == 1;
 
+export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
+
 /**
 * A lucky guess that we are probably in China.
 * If we are, replace the flag to avoid unnecessary trouble.

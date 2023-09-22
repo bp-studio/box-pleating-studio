@@ -256,7 +256,8 @@
 		"webGL": {
 			"title": "Khởi tạo WebGL không thành công",
 			"body": "BP Studio yêu cầu chạy WebGL nhưng không thể khởi tạo ngữ cảnh WebGL. Vui lòng kiểm tra cài đặt trình duyệt của bạn."
-		}
+		},
+		"inApp": "Có vẻ như bạn đang sử dụng trình duyệt trong ứng dụng. Tải xuống có thể không hoạt động."
 	},
 	"plugin": {
 		"TreeMaker": {

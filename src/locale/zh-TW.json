@@ -256,7 +256,8 @@
 		"webGL": {
 			"title": "WebGL 初始化失敗",
 			"body": "BP Studio 運行需要 WebGL，但無法初始化 WebGL 環境。請檢查您的瀏覽器設置。"
-		}
+		},
+		"inApp": "您似乎正在使用應用程式內瀏覽器。下載功能可能無法使用。"
 	},
 	"plugin": {
 		"TreeMaker": {

@@ -256,7 +256,8 @@
 		"webGL": {
 			"title": "WebGL initialization failed",
 			"body": "BP Studio requires WebGL to run, but is unable to initialize WebGL context. Please check your browser's settings."
-		}
+		},
+		"inApp": "It seems that you are using an in-app browser. Downloading might not work."
 	},
 	"plugin": {
 		"TreeMaker": {
