@@ -2,6 +2,7 @@ import { Control } from "client/base/control";
 import { signature } from "./commands/command";
 import { SelectionController } from "client/controllers/selectionController";
 import { $resolve } from "./commands/resolve";
+import { clone } from "shared/utils/clone";
 
 import type { Command } from "./commands/command";
 import type { Project } from "../project";
@@ -77,8 +78,8 @@ export class Step implements ISerializable<JStep> {
 			mode: this._mode,
 			before: this._before,
 			after: this._after,
-			construct: this._construct.length ? this._construct : undefined,
-			destruct: this._destruct.length ? this._destruct : undefined,
+			construct: this._construct.length ? clone(this._construct) : undefined,
+			destruct: this._destruct.length ? clone(this._destruct) : undefined,
 		};
 	}
 

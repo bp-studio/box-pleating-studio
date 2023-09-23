@@ -60,6 +60,7 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	public toJSON(): JPartition {
+		// This is OK since the array is readonly
 		return { overlaps: this.$overlaps };
 	}
 

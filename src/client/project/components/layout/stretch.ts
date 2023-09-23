@@ -2,6 +2,7 @@ import { Control } from "client/base/control";
 import { shallowRef } from "client/shared/decorators";
 import { SelectionController } from "client/controllers/selectionController";
 import { Device } from "./device";
+import { clone } from "shared/utils/clone";
 
 import type { ITagObject } from "client/shared/interface";
 import type { JRepository, JStretch, Memento } from "shared/json";
@@ -33,8 +34,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public toJSON(session?: true): JStretch {
-		if(session) return this._data;
-		return Object.assign({}, this._data, { repo: undefined });
+		const result = clone(this._data);
+		if(!session) delete result.repo;
+		return result;
 	}
 
 	public $toMemento(): Memento {
