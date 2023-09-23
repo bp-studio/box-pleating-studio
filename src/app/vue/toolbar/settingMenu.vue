@@ -24,7 +24,7 @@
 				</Hotkey>
 			</div>
 			<div class="dropdown-item" @click="toggle('showLabel')">
-				<Hotkey :icon="Settings.showLabel ? 'fas fa-font' : ''" ctrl hk="5">
+				<Hotkey :icon="Settings.showLabel ? 'fas fa-font' : ''" ctrl hk="5" :color="Studio.style.label.color">
 					{{ $t('toolbar.setting.label') }}
 				</Hotkey>
 			</div>
@@ -32,7 +32,7 @@
 				<Hotkey ctrl hk="6">
 					<template v-slot:icon>
 						<span class="dot-stack" v-if="Settings.showDot">
-							<i class="fas fa-circle" :style="'color:' + toHex(Studio.style.hinge.color)"></i>
+							<i class="fas fa-circle" :style="'color:' + toHex(Studio.style.dot.fill)"></i>
 							<i class="far fa-circle"></i>
 						</span>
 						<i v-else />

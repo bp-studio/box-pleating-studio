@@ -196,7 +196,7 @@
 		}
 	}
 
-	.viewport .quick-item {
+	.quick-item {
 		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;

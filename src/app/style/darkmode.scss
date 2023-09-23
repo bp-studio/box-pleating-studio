@@ -13,11 +13,16 @@ html.dark {
 	--bs-body-bg: #1e1e1e;
 	--bs-body-color: #ccc;
 	--bs-link-color: #579bff;
+	--bs-link-color-rgb: 87,155, 255;
 	--bs-link-hover-color: #70aaff;
 	--bs-gradient: linear-gradient(180deg, rgba(255 255 255 / 2%), rgba(255 255 255 / 0%));
 
 	--tab-border: #222;
 	--tab-active: var(--bs-body-bg);
+
+	.text-muted {
+		color: #666 !important;
+	}
 
 	.nav-tabs {
 		--bs-nav-tabs-link-hover-border-color: #555 #555 #{$line};
@@ -38,11 +43,6 @@ html.dark {
 	th {
 		background-color: #777;
 		color: #fff;
-	}
-
-	.viewport .quick-item:hover {
-		color: #fff;
-		background-color: var(--bs-primary);
 	}
 
 	.scroll-shadow {
@@ -78,9 +78,13 @@ html.dark {
 		color: #999;
 	}
 
-	.welcome a:not(.btn),
 	.quick-item {
-		color: #4d95ff;
+		color: var(--bs-link-color);
+
+		&:hover {
+			color: #fff;
+			background-color: var(--bs-primary);
+		}
 	}
 
 	.modal-header {
