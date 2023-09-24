@@ -12,6 +12,10 @@ import type { Polygon } from "shared/types/geometry";
  *
  * For performance reasons, it does not check for these conditions,
  * so unexpected results may occur if the input does not meet these conditions.
+ *
+ * It is guaranteed to generate paths that have no self-intersecting edges,
+ * but note that it could generate paths revisiting the same point twice.
+ * This, however, is not an issue for further operations.
  */
 //=================================================================
 

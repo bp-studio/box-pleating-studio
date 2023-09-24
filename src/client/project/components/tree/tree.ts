@@ -222,8 +222,14 @@ export class Tree implements ISerializable<JTree> {
 
 	/** Get the next available id for {@link Vertex}. */
 	private get _nextAvailableId(): number {
-		if(this._skippedIdHeap.$isEmpty) return this.$vertices.length;
-		return this._skippedIdHeap.$pop()!;
+		while(!this._skippedIdHeap.$isEmpty) {
+			const index = this._skippedIdHeap.$pop()!;
+			// We still have to check if the id is in fact available;
+			// it might not be the case because skipped id is not removed
+			// when a vertex is added back through undo/redo
+			if(!this.$vertices[index]) return index;
+		}
+		return this.$vertices.length;
 	}
 
 	/** Find the close empty spot around the given {@link Vertex}. */

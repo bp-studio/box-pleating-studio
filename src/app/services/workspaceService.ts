@@ -102,7 +102,9 @@ namespace WorkspaceService {
 	}
 
 	export function select(id: number): void {
-		const proj = getProject(id)!;
+		const proj = getProject(id);
+		if(!proj) return; // this happens if the session project is corrupted
+
 		bp.projects.current.value = proj;
 		const idx = tabHistory.indexOf(proj);
 		if(idx >= 0) tabHistory.splice(idx, 1);
