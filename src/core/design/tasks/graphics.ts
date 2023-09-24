@@ -95,9 +95,12 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 
 		// Create a record for all the vertices in inner contour.
 		const innerRightCorners = new Map<number, [IPoint, IPoint, IPoint]>();
+		const doubled = new Set<number>();
 		for(const path of contour.inner) {
 			for(const [p1, p0, p2] of pathRightCorners(path)) {
-				innerRightCorners.set(getOrderedKey(p1.x, p1.y), [p1, p0, p2]);
+				const key = getOrderedKey(p1.x, p1.y);
+				if(innerRightCorners.has(key)) doubled.add(key);
+				else innerRightCorners.set(key, [p1, p0, p2]);
 			}
 		}
 
@@ -107,7 +110,7 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 			const innerKey = getOrderedKey(p.x, p.y);
 			if(innerRightCorners.has(innerKey)) {
 				ridges.push([p1, p]);
-				innerRightCorners.delete(innerKey);
+				if(!doubled.has(innerKey)) innerRightCorners.delete(innerKey);
 			} else {
 				tryAddRemainingRidge(p1, p, freeCorners, ridges);
 			}

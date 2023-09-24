@@ -34,3 +34,9 @@ export function rotate<T>(array: T[], j: number): T[] {
 	array.push(...array.splice(0, j));
 	return array;
 }
+
+/** Using the array as set, remove an item at index {@link i}. */
+export function removeAt<T>(array: T[], i: number): void {
+	const last = array.pop();
+	if(i < array.length - 1) array[i] = last!;
+}
