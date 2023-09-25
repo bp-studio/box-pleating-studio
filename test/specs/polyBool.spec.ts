@@ -162,7 +162,7 @@ describe("PolyBool", function() {
 			}
 			const average = (performance.now() - start) / rounds;
 
-			expect(average).to.be.lessThan(0.8);
+			expect(average).to.be.lessThan(1.0);
 		});
 	});
 

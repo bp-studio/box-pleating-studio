@@ -34,11 +34,10 @@ function roughContour(): void {
 
 	// All nodes involved in the repo to be updated needs to be recalculated,
 	// as it could go from raw mode to normal mode and vice versa.
-	// TODO: improve efficiency of this part.
 	const repoNodes = new Set<ITreeNode>();
 	const tree = State.$tree;
 	for(const repo of [...State.$repoToProcess]) {
-		const nodes = repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
+		const nodes = repo.$nodeSet.$leaves.map(id => tree.$nodes[id]!);
 		for(const node of nodes) repoNodes.add(node);
 	}
 
@@ -66,6 +65,16 @@ function updater(node: ITreeNode): boolean {
 		const context = new RoughContourContext(node, nodeSets);
 		context.$process();
 	}
+
+	for(const contour of node.$graphics.$patternContours) {
+		// Whenever rough contour changes, established pairing relations are no longer valid.
+		contour.$for = undefined;
+	}
+
+	// For the moment, there is not concrete evidence that comparing the
+	// changes of contours here will help improving overall performance,
+	// so we always return true and continue on the parent regardlessly.
+
 	State.$contourWillChange.add(node);
 	return true;
 }

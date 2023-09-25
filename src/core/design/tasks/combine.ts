@@ -48,7 +48,15 @@ export function combineContour(node: ITreeNode): void {
 
 function insertOuter(patternContours: PatternContour[], result: RationalContour[]): void {
 	for(const contour of patternContours) {
-		tryInsert(result[contour.$for].$outer, contour);
+		if(contour.$for !== undefined) {
+			// If we know the pairing, we can process directly
+			tryInsert(result[contour.$for].$outer, contour);
+		} else {
+			// Otherwise fallback to trying each rough contour
+			for(const rough of result) {
+				if(tryInsert(rough.$outer, contour)) break;
+			}
+		}
 	}
 }
 
@@ -58,14 +66,13 @@ function insertInner(childrenPatternContours: PatternContour[], result: Rational
 	}
 }
 
-function tryInsertInner(childContour: PatternContour, result: RationalContour[]): boolean {
+function tryInsertInner(childContour: PatternContour, result: RationalContour[]): void {
 	for(const contour of result) {
 		if(!contour.$inner) continue;
 		for(const inner of contour.$inner) {
-			if(tryInsert(inner, childContour)) return true;
+			if(tryInsert(inner, childContour)) return;
 		}
 	}
-	return false;
 }
 
 function tryInsert(path: RationalPath, insert: PatternContour): boolean {

@@ -59,8 +59,11 @@ export interface PatternContour extends Array<Point> {
 	 */
 	$repo: string;
 
-	/** The index in {@link NodeGraphics.$roughContours} associated with this contour. */
-	$for: number;
+	/**
+	 * The index in {@link NodeGraphics.$roughContours} associated with this contour,
+	 * if available.
+	 */
+	$for?: number;
 
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly number[];
