@@ -243,7 +243,8 @@
 		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
 		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
 		"filePermission": "Por motivos de seguridad, BP Studio necesita su permiso para acceder al archivo. Para cada archivo, solo necesitará otorgar permiso una vez por sesión. ¿Aún desea acceder al archivo?",
-		"fatal": "Se produjo un error interno y el proyecto no se puede continuar operando: {0}",
+		"fatal": "Se produjo un error interno y el proyecto no se puede seguir utilizando.",
+		"recover": "El espacio de trabajo se recuperará automáticamente, pero es probable que el error persista. \nDescargue el registro de errores y envíelo al autor para diagnosticar el problema.",
 		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
 		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; \nlos datos pueden estar corruptos.",
 		"latest": "Ya tienes la última versión de BP Studio.",
@@ -272,7 +273,6 @@
 		"ok": "OK",
 		"here": "aquí",
 		"close": "Cerrar",
-		"backup": "Descargar copia de seguridad del proyecto",
 		"export": "Exportar",
 		"delete": "Borrar",
 		"discord": "Servidor Discord de BP Studio",
@@ -281,6 +281,7 @@
 		"download": "Descargar",
 		"homepage": "página principal",
 		"untitled": "Sin título",
+		"errorLog": "Descargar registro de errores",
 		"workspace": "espacio de trabajo"
 	}
 }

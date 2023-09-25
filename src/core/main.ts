@@ -6,6 +6,7 @@ import "shared/polyfill/flatMap";
 import { getAction } from "./routes/routes";
 import { State } from "./service/state";
 
+import type { CoreError } from "shared/json";
 import type { CoreResponse, CoreRequest } from "core/routes";
 
 //=================================================================
@@ -39,9 +40,11 @@ onmessage = function(event: MessageEvent): void {
 		}
 	} catch(e: unknown) {
 		debugger;
-		response = { error: e instanceof Error ? e.message : "Unknown error" };
+		const error = (e instanceof Error ?
+			{ message: e.message, coreTrace: e.stack || "" } :
+			{ message: "Unknown error", coreTrace: "" }) as CoreError;
+		response = { error };
 	}
-
 	event.ports[0].postMessage(response);
 };
 

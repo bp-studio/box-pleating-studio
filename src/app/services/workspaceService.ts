@@ -3,10 +3,11 @@ import { computed, reactive, shallowRef, watch, nextTick as vueNextTick } from "
 import Dialogs from "./dialogService";
 import Studio from "./studioService";
 import settings from "./settingService";
+import { clone as cloneObj } from "shared/utils/clone";
 
+import type { CoreError, JProject } from "shared/json";
 import type * as Client from "client/main";
 import type { Project } from "client/project/project";
-import type { JProject } from "shared/json";
 
 /**
  * We encapsule the Client in this service so that it is not exposed in other parts of the app.
@@ -60,9 +61,8 @@ namespace WorkspaceService {
 			const proj = await bp.projects.create(json);
 			manipulateIds(arr => arr.push(proj.id));
 			select(proj.id);
-		} catch(e) {
-			const msg = e instanceof Error ? e.message : "Unknown error";
-			Dialogs.alert(i18n.t("message.fatal", [msg]));
+		} catch {
+			Dialogs.alert(i18n.t("message.fatal"));
 		}
 	}
 
@@ -183,9 +183,20 @@ namespace WorkspaceService {
 	}
 
 	Studio.$onSetupOptions.push(options =>
-		options.onError = async (id: number, error: string, backup?: JProject) => {
-			await Dialogs.error(error, backup);
+		options.onError = async (id: number, error: CoreError, backup?: JProject) => {
+			gtag("event", "fatal_error");
+			const log = cloneObj(backup);
+			if(log) {
+				error.build = app_config.app_version;
+				log.error = error;
+			}
+			await Dialogs.error(log);
 			await close(id, true);
+			if(backup) {
+				// Auto recover
+				await open(backup as Pseudo<JProject>);
+				selectLast();
+			}
 		}
 	);
 

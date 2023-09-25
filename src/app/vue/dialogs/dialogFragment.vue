@@ -35,7 +35,7 @@
 	onMounted(() => {
 		setup({
 			alert: msg => alert.value!.show(msg),
-			error: (msg, backup) => error.value!.show(msg, backup),
+			error: log => error.value!.show(log),
 			confirm: msg => confirm.value!.show(msg),
 			loader: spinner.value!,
 		});

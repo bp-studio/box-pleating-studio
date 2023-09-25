@@ -243,7 +243,8 @@
 		"connFail": "网络连线失败；请稍后再试。",
 		"downloadHint": "按右键并点选「另存连结」可指定存档位置",
 		"filePermission": "出于安全性原因，BP Studio 需要您的授权才能访问该文件。对于每个文件，您在执行阶段中只需要授权一次。您仍要访问该文件吗？",
-		"fatal": "发生内部错误，无法进一步操作项目：{0}",
+		"fatal": "发生内部错误，项目无法进一步操作。",
+		"recover": "工作区将自动恢复，但错误可能会持续存在。请下载错误日志并发送给作者以诊断问题。",
 		"invalidFormat": "文件「{0}」的格式无效。",
 		"invalidLink": "打开项目链接时发生意外错误；数据可能已损坏。",
 		"latest": "您已经拥有最新版本的 BP Studio。",
@@ -272,7 +273,6 @@
 		"ok": "确定",
 		"here": "这里",
 		"close": "关闭",
-		"backup": "下载项目备份",
 		"export": "导出",
 		"delete": "删除",
 		"discord": "BP Studio Discord 服务器",
@@ -281,6 +281,7 @@
 		"download": "下载",
 		"homepage": "主页",
 		"untitled": "未命名",
+		"errorLog": "下载错误日志",
 		"workspace": "工作区"
 	}
 }

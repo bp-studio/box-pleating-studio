@@ -152,12 +152,16 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		for(const callback of callbacks) callback();
 		if("error" in response) {
 			this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
+			const clientError = new Error(response.error.message);
 			if(this._initialized) {
 				// Display a fatal message and close self, if the project has already been initialized.
 				// If not, the error thrown below will be caught by the App.
-				await options.onError?.(this.id, response.error, this.history.$backup);
+				const coreError = response.error;
+				coreError.clientTrace = clientError.stack || "";
+				coreError.request = request;
+				await options.onError?.(this.id, coreError, this.history.$backup);
 			}
-			throw new Error(response.error); // Stop all further actions.
+			throw clientError; // Stop all further actions.
 		} else if("update" in response) {
 			this.design.$update(response.update, () => this._flushUpdateCallback());
 		} else {

@@ -11,7 +11,7 @@ export function setup(d: typeof DialogService): void {
 //=================================================================
 namespace DialogService {
 	export let alert: (msg: string) => Promise<void>;
-	export let error: (error: string, _backup?: JProject) => Promise<void>;
+	export let error: (log?: JProject) => Promise<void>;
 	export let confirm: (mgs: string) => Promise<boolean>;
 	export let loader: {
 		show: () => Promise<void>;

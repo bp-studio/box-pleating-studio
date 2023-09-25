@@ -1,3 +1,4 @@
+import type { CoreError } from "shared/json/project";
 import type { UpdateModel } from "core/service/updateModel";
 import type { RouteMap } from "./routes";
 
@@ -27,7 +28,7 @@ interface UpdateResponse {
 
 /** Represents an unknown error had occurred. */
 interface ErrorResponse {
-	error: string;
+	error: CoreError;
 }
 
 export type CoreResponse = ValueResponse | UpdateResponse | ErrorResponse;

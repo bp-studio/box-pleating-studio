@@ -2,7 +2,7 @@
 	<div class="modal fade modal-second" ref="el">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content" v-if="initialized">
-				<div class="modal-body">{{ message }}</div>
+				<div class="modal-body" v-html="message"></div>
 				<div class="modal-footer">
 					<slot></slot>
 				</div>

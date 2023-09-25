@@ -10,6 +10,9 @@ export interface JProject {
 	/** The design */
 	design: JDesign;
 
+	/** For log file. */
+	error?: CoreError;
+
 	/** Editing history. @session */
 	history?: JHistory;
 
@@ -60,4 +63,21 @@ export interface JViewport {
 
 	/** Current scrolling position. @session */
 	scroll: IPoint;
+}
+
+export interface CoreError {
+	/** Error message itself. */
+	message: string;
+
+	/** Stack trace in the Core. */
+	coreTrace: string;
+
+	/** Stack trace in the client. */
+	clientTrace: string;
+
+	/** Last request sent to the Core. */
+	request: object;
+
+	/** Build version. */
+	build: string;
 }
