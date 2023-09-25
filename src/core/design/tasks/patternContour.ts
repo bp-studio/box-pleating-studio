@@ -20,15 +20,6 @@ import type { Point } from "core/math/geometry/point";
 export const patternContourTask = new Task(patternContour, graphicsTask);
 
 function patternContour(): void {
-	const tree = State.$tree;
-	for(const stretch of State.$stretches.values()) {
-		if(State.$repoToProcess.has(stretch.$repo)) continue;
-		const nodes = stretch.$repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
-		if(nodes.some(n => State.$contourWillChange.has(n))) {
-			State.$repoToProcess.add(stretch.$repo);
-		}
-	}
-
 	const repos = [...State.$repoToProcess];
 	for(const repo of repos) clearPatternContourForRepo(repo); // Reset
 

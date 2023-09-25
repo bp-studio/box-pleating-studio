@@ -32,11 +32,22 @@ function roughContour(): void {
 		}
 	}
 
+	// All nodes involved in the repo to be updated needs to be recalculated,
+	// as it could go from raw mode to normal mode and vice versa.
+	// TODO: improve efficiency of this part.
+	const repoNodes = new Set<ITreeNode>();
+	const tree = State.$tree;
+	for(const repo of [...State.$repoToProcess]) {
+		const nodes = repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
+		for(const node of nodes) repoNodes.add(node);
+	}
+
 	climb(updater,
 		State.$flapAABBChanged,
 		State.$parentChanged,
 		State.$childrenChanged,
-		State.$lengthChanged
+		State.$lengthChanged,
+		repoNodes
 	);
 }
 

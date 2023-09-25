@@ -50,4 +50,13 @@ function pattern(): void {
 			State.$contourWillChange.add(node);
 		}
 	}
+
+	const tree = State.$tree;
+	for(const stretch of State.$stretches.values()) {
+		if(State.$repoToProcess.has(stretch.$repo)) continue;
+		const nodes = stretch.$repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
+		if(nodes.some(n => State.$contourWillChange.has(n))) {
+			State.$repoToProcess.add(stretch.$repo);
+		}
+	}
 }
