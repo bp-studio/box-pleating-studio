@@ -112,7 +112,7 @@ export class Tree implements ISerializable<JTree> {
 			const v = this.$vertices.$get(v1) || this.$vertices.$get(v2)!;
 			this.$project.history.$move(v, { x, y });
 			v.$location = { x, y };
-			SelectionController.$toggle(v, true);
+			if(this.$project.design.mode == "tree") SelectionController.$toggle(v, true);
 		};
 		return this.$project.$core.tree.merge(edge.toJSON());
 	}
