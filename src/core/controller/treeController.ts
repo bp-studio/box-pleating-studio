@@ -3,6 +3,7 @@ import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { balanceTask } from "core/design/tasks/balance";
+import { setStretchPrototypes } from "core/design/tasks/stretch";
 
 import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
@@ -35,7 +36,7 @@ export namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	/** Add a new leaf */
+	/** Add a new leaf. */
 	export function addLeaf(id: number, at: number, length: number, flap: JFlap): void {
 		const node = State.$tree.$addEdge(id, at, length);
 		node.$setFlap(flap);
@@ -55,11 +56,12 @@ export namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	export function update(edges: JEdge[]): void {
+	export function update(edges: JEdge[], stretches: JStretch[]): void {
 		const tree = State.$tree;
 		for(const e of edges) {
 			tree.$setLength(getChildId(e), e.length);
 		}
+		setStretchPrototypes(stretches);
 		Processor.$run(distanceTask);
 	}
 

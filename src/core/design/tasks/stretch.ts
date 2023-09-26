@@ -9,6 +9,7 @@ import { patternTask } from "./pattern";
 import { Stretch } from "../layout/stretch";
 import { clearPatternContourForRepo } from "./patternContour";
 
+import type { JStretch } from "shared/json";
 import type { Junctions, ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
 import type { Junction } from "../layout/junction/junction";
@@ -208,4 +209,10 @@ function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [nu
 function isAncestor(p: ITreeNode, n: ITreeNode): boolean {
 	while(n.$dist > p.$dist) n = n.$parent!;
 	return n === p;
+}
+
+export function setStretchPrototypes(prototypes: JStretch[]): void {
+	for(const json of prototypes) {
+		State.$stretchPrototypes.set(json.id, json);
+	}
 }

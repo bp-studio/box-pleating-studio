@@ -118,7 +118,8 @@ export class Tree implements ISerializable<JTree> {
 	}
 
 	public $updateLength(edges: JEdge[]): Promise<void> {
-		return this.$project.$core.tree.update(edges);
+		const stretches = this.$project.design.$prototype.layout.stretches;
+		return this.$project.$core.tree.update(edges, stretches);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {

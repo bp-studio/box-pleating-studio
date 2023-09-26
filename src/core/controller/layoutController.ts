@@ -4,6 +4,7 @@ import { State } from "core/service/state";
 import { Clip } from "core/math/polyBool/general/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
+import { setStretchPrototypes } from "core/design/tasks/stretch";
 
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
@@ -21,12 +22,10 @@ export namespace LayoutController {
 	/**
 	 * Moving or resizing of flaps.
 	 */
-	export function updateFlap(flaps: JFlap[], dragging: boolean, prototypes: JStretch[]): void {
+	export function updateFlap(flaps: JFlap[], dragging: boolean, stretches: JStretch[]): void {
 		State.$isDragging = dragging;
 		State.$tree.$setFlaps(flaps);
-		for(const json of prototypes) {
-			State.$stretchPrototypes.set(json.id, json);
-		}
+		setStretchPrototypes(stretches);
 		Processor.$run(AABBTask);
 	}
 

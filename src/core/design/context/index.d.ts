@@ -48,6 +48,8 @@ export interface ITreeNode extends ISerializable<JEdge> {
 
 	/** Set the position by a given {@link JFlap} */
 	$setFlap(flap: JFlap): void;
+
+	$getLeaves(): Generator<ITreeNode>;
 }
 
 export interface PatternContour extends Array<Point> {

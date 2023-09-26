@@ -2,7 +2,6 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
-import { getKey, getPair } from "shared/data/doubleMap/intDoubleMap";
 import { stretchTask } from "./stretch";
 import { dist } from "../context/tree";
 
@@ -19,9 +18,6 @@ import type { ITreeNode } from "../context";
 //=================================================================
 export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask);
 
-/** The keys of those {@link Junction}s that should be deleted in the current round. */
-const pendingDelete = new Set<number>();
-
 function junction(): void {
 	// Delete junctions related to deleted nodes or nodes that are no longer leaves
 	for(const id of State.$updateResult.remove.nodes) {
@@ -31,23 +27,8 @@ function junction(): void {
 		if(node.$children.$size > 0) State.$junctions.delete(node.id);
 	}
 
-	if(State.$junctions.size > 0) {
-		// If one of the flaps changes, list it as pending delete.
-		for(const flap of State.$flapChanged) {
-			for(const id of State.$junctions.get(flap.id)!.keys()) {
-				pendingDelete.add(getKey(id, flap.id));
-			}
-		}
-	}
-
 	// Find all overlapping
 	getCollisionOfLCA(State.$tree.$root);
-
-	// Delete the pending junctions
-	for(const key of pendingDelete) {
-		State.$junctions.delete(...getPair(key));
-	}
-	pendingDelete.clear();
 }
 
 function getCollisionOfLCA(lca: ITreeNode): void {
@@ -63,11 +44,17 @@ function getCollisionOfLCA(lca: ITreeNode): void {
 }
 
 function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
+	const d = dist(a, b, lca);
+	const distChanged = State.$distCache.get(a.id, b.id) !== d;
 	// If both subtrees haven't changed, there's no need to re-compare.
-	if(!State.$subtreeAABBChanged.has(a) && !State.$subtreeAABBChanged.has(b)) return;
+	if(!distChanged && !State.$subtreeAABBChanged.has(a) && !State.$subtreeAABBChanged.has(b)) return;
+	if(distChanged) State.$distCache.set(a.id, b.id, d);
 
 	// Test for collision
-	if(!a.$AABB.$intersects(b.$AABB, dist(a, b, lca))) return;
+	if(!a.$AABB.$intersects(b.$AABB, d)) {
+		clearJunctions(a, b);
+		return;
+	}
 
 	a = getNontrivialDescendant(a);
 	b = getNontrivialDescendant(b);
@@ -76,9 +63,6 @@ function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
 	if(n === 0 && m === 0) {
 		// Leaves found; add it to the output
 		State.$junctions.set(a.id, b.id, createJunction(a, b, lca));
-
-		// Cancel the pending delete
-		pendingDelete.delete(getKey(a.id, b.id));
 	} else {
 		// Choose the one with fewer children, to minimize comparisons.
 		if(m === 0 || n !== 0 && n < m) {
@@ -94,4 +78,16 @@ function getNontrivialDescendant(node: ITreeNode): ITreeNode {
 		node = node.$children.$get()!;
 	}
 	return node;
+}
+
+/**
+ * Clear all {@link Junction} between leaves under the two given nodes.
+ */
+function clearJunctions(a: ITreeNode, b: ITreeNode): void {
+	// TODO: Improve this part
+	for(const aLeaf of a.$getLeaves()) {
+		for(const bLeaf of b.$getLeaves()) {
+			State.$junctions.delete(aLeaf.id, bLeaf.id);
+		}
+	}
 }

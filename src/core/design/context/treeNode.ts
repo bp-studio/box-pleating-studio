@@ -73,6 +73,14 @@ export class TreeNode implements ITreeNode {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public *$getLeaves(): Generator<TreeNode> {
+		if(this.$isLeaf) {
+			yield this;
+		} else {
+			for(const c of this.$children) yield* c.$getLeaves();
+		}
+	}
+
 	public $setFlap(flap: JFlap): void {
 		this.$setAABB(flap.y + flap.height, flap.x + flap.width, flap.y, flap.x);
 	}
