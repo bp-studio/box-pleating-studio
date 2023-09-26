@@ -2,6 +2,7 @@ import { Point } from "core/math/geometry/point";
 import { opposite, quadrantNumber } from "shared/types/direction";
 import { CornerType } from "shared/json";
 import { convertIndex } from "shared/utils/pattern";
+import { getFirst } from "shared/utils/set";
 
 import type { Direction, QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../../repository";
@@ -125,7 +126,7 @@ export class PositioningContext {
 		let maxSpan = 0;
 		const callback: Consumer<number> = i => overlapIndices.delete(i);
 		while(overlapIndices.size > 0) {
-			const first = overlapIndices.values().next().value as number;
+			const first = getFirst(overlapIndices)!;
 			overlapIndices.delete(first);
 			const result = this.$gadgets[first].sx +
 				this._getSpan(first, 0, callback) +

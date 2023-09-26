@@ -107,47 +107,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		this._savedIndex = this._index;
 	}
 
-	/**
-	 * Handles accumulating operations and gather them into a {@link Step} object.
-	 */
+	/** See {@link _flush}. */
 	public $flush(): void {
-		const selection = this._project.design.sheet.$getSelectedTags();
-		if(this._queue.length) {
-			const s = this._lastStep;
-			if(!s || !s.$tryAdd(this._queue, this._construct, this._destruct)) {
-				const step = new Step(this._project, {
-					commands: this._queue,
-					construct: this._construct,
-					destruct: this._destruct,
-					mode: this._project.design.mode ?? "layout",
-					before: this._selection || selection,
-					after: selection,
-				});
-				if(!step.$isVoid) this._addStep(step);
-			} else if(s.$isVoid) {
-				this._steps.pop();
-				this._index--;
-			}
-			this._queue = [];
-		}
-
-		// During history navigation, it is possible that these are still enqueued
-		// due to async operations. So we need to clean them in all cases.
-		this._construct = [];
-		this._destruct = [];
-
-		this._selection = undefined;
-		this._initializing = false;
-		this._moving = false;
-
-
-		if(this._moveQueue.length) {
-			// Continue the queue
-			this._moveQueue.shift()!();
-		} else {
-			// Save a backup in case of crashes
-			this._backup = this._project.toJSON(true);
-		}
+		// Public flushing is allowed only if we're not in the middle of navigating.
+		if(!this._moving) this._flush();
 	}
 
 	public $cacheSelection(): void {
@@ -163,7 +126,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	/**
 	 * Change a field.
-	 * @param flush Whether to flush immediately. The default value is true.\
+	 * @param flush Whether to flush immediately. The default value is `true`.\
 	 * Set the value to `false` if the same field of multiple objects are changed simultaneously,
 	 * or if the operation might involve construction/destruction of objects.
 	 */
@@ -171,7 +134,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		flush: boolean = true): void {
 		if(this.$isLocked) return;
 		this._enqueue(FieldCommand.$create(target, prop, oldValue, newValue));
-		if(flush) this.$flush();
+		if(flush) this._flush();
 	}
 
 	public $edit(edits: JEdit[], oldRoot: number, newRoot: number): void {
@@ -211,7 +174,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				this._steps.splice(0, this._index + (result == OperationResult.Failed ? 1 : 0));
 				this._index = 0;
 			}
-			this.$flush();
+			this._flush();
 		}
 	}
 
@@ -229,13 +192,55 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				if(result == OperationResult.Failed) this._index--;
 				this._steps.splice(this._index);
 			}
-			this.$flush();
+			this._flush();
 		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Handles accumulating operations and gather them into a {@link Step} object.
+	 */
+	private _flush(): void {
+		const selection = this._project.design.sheet.$getSelectedTags();
+		if(this._queue.length) {
+			const s = this._lastStep;
+			if(!s || !s.$tryAdd(this._queue, this._construct, this._destruct)) {
+				const step = new Step(this._project, {
+					commands: this._queue,
+					construct: this._construct,
+					destruct: this._destruct,
+					mode: this._project.design.mode ?? "layout",
+					before: this._selection || selection,
+					after: selection,
+				});
+				if(!step.$isVoid) this._addStep(step);
+			} else if(s.$isVoid) {
+				this._steps.pop();
+				this._index--;
+			}
+			this._queue = [];
+		}
+
+		// During history navigation, it is possible that these are still enqueued
+		// due to async operations. So we need to clean them in all cases.
+		this._construct = [];
+		this._destruct = [];
+
+		this._selection = undefined;
+		this._initializing = false;
+		this._moving = false;
+
+		if(this._moveQueue.length) {
+			// Continue the queue
+			this._moveQueue.shift()!();
+		} else {
+			// Save a backup in case of crashes
+			this._backup = this._project.toJSON(true);
+		}
+	}
 
 	private get _lastStep(): Step | undefined {
 		if(this._index == 0 || this._index < this._steps.length) return undefined;

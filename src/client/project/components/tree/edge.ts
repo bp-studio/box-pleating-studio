@@ -98,7 +98,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 
 	public delete(): void {
 		const v = this.$getLeaf();
-		if(v) this._tree.$delete([v]);
+		if(v) this._tree.$vertices.$delete([v]);
 	}
 
 	public get isRiver(): boolean {

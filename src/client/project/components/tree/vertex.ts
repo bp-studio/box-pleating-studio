@@ -88,7 +88,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	@field public name: string;
 
 	public addLeaf(length: number): Promise<void> {
-		return this._tree.$addLeaf(this, length);
+		return this._tree.$vertices.$addLeaf(this, length);
 	}
 
 	public get isLeaf(): boolean {
@@ -100,8 +100,8 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public delete(): void {
-		if(this.$degree === 1) this._tree.$delete([this]);
-		if(this.$degree === 2) this._tree.$join(this);
+		if(this.$degree === 1) this._tree.$vertices.$delete([this]);
+		if(this.$degree === 2) this._tree.$vertices.$join(this);
 	}
 
 	public goToDual(): void {

@@ -82,7 +82,7 @@ export class FlapContainer {
 
 		const project = this._layout.$project;
 		const tree = project.design.tree;
-		const vertex = tree.$vertices[f.id]!;
+		const vertex = tree.$vertices.$get(f.id)!;
 		const edge = tree.$getFirstEdge(vertex);
 		if(!edge || !graphics) debugger;
 		const flap = new Flap(this._layout, f, vertex, edge, graphics);
@@ -98,7 +98,7 @@ export class FlapContainer {
 		const prototype = design.$prototype;
 		const tree = design.tree;
 		for(const f of this._flaps.values()) {
-			const vertex = tree.$vertices[f.id];
+			const vertex = tree.$vertices.$get(f.id);
 			const edgeDestructed = !f.$edge.$v1; // The original flap is split
 			if(!vertex || !vertex.isLeaf || edgeDestructed) {
 				if(vertex) {

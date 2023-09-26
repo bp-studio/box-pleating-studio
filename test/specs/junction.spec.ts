@@ -4,6 +4,7 @@ import { Tree } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
+import { getFirst } from "shared/utils/set";
 
 import type { Stretch } from "core/design/layout/stretch";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
@@ -36,7 +37,7 @@ describe("Junction", function() {
 		expect(junction.$s.x).to.equal(5);
 		expect(junction.$s.y).to.equal(5);
 
-		const stretch: Stretch = State.$stretches.values().next().value;
+		const stretch = getFirst(State.$stretches)!;
 		expect(stretch).to.be.not.undefined;
 		expect(stretch.$repo.$nodeSet.$nodes).to.eql([1, 2, 3, 4]);
 	});
@@ -65,7 +66,7 @@ describe("Junction", function() {
 		const junction2 = State.$junctions.get(3, 4) as ValidJunction;
 		expect(junction1).to.not.equal(junction2, "Creates a new instance");
 
-		const stretch: Stretch = State.$stretches.values().next().value;
+		const stretch = getFirst(State.$stretches)!;
 		expect(stretch).to.be.not.undefined;
 		expect(stretch.$repo.$nodeSet.$nodes).to.eql([2, 3, 4]);
 	});

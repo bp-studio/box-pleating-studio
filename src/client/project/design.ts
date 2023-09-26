@@ -17,6 +17,7 @@ import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
 import type { Project } from "./project";
 import type { UpdateModel } from "core/service/updateModel";
+import type { Stretch } from "./components/layout/stretch";
 import type { DesignMode, JDesign, JFlap, JSheet, JState, JStretch, JVertex, Memento } from "shared/json";
 
 //=================================================================
@@ -36,7 +37,13 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	public readonly layout: Layout;
 	public readonly tree: Tree;
 
-	/** Prototypes of various objects before they are constructed. */
+	/**
+	 * Prototypes of various objects before they are constructed.
+	 *
+	 * Currently only three object types are relevant: {@link Flap}, {@link Stretch} and {@link Vertex}.
+	 *
+	 * It is cleared after each {@link $update}.
+	 */
 	public readonly $prototype: JDesign;
 
 
@@ -81,7 +88,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		callback();
 
 		// Note that the flushing is also invoked on initialization
-		if(!this.$project.history.$moving) this.$project.history.$flush();
+		this.$project.history.$flush();
 
 		// Clear prototypes
 		const { layout, tree } = this.$prototype;
@@ -110,7 +117,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 
 			const n = Number(id);
 			if(init == "f") return layout.$flaps.get(n);
-			if(init == "v") return tree.$vertices[n];
+			if(init == "v") return tree.$vertices.$get(n);
 		}
 		return undefined;
 	}
@@ -145,11 +152,11 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const selections = SelectionController.selections;
 		if(this.mode == "layout") {
 			if(isTypedArray(selections, Flap)) {
-				this.tree.$delete(selections.map(f => f.$vertex));
+				this.tree.$vertices.$delete(selections.map(f => f.$vertex));
 				SelectionController.clear();
 			}
 		} else {
-			if(isTypedArray(selections, Vertex)) this.tree.$delete(selections);
+			if(isTypedArray(selections, Vertex)) this.tree.$vertices.$delete(selections);
 		}
 	}
 

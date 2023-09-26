@@ -200,10 +200,8 @@ function getVertexLayer(design: Design): string {
 	if(design.mode != "tree") return "";
 	const graphics = new SvgGraphics();
 	for(const v of design.tree.$vertices) {
-		if(v) {
-			graphics.$class = "vertex" + (v.$selected ? " selected" : "");
-			v.$drawDot(graphics);
-		}
+		graphics.$class = "vertex" + (v.$selected ? " selected" : "");
+		v.$drawDot(graphics);
 	}
 	return layer(graphics.$get(), false);
 }
@@ -216,7 +214,7 @@ function getLabelLayer(design: Design): string {
 	const objects: LabelView[] = [];
 	if(design.mode == "layout") objects.push(...design.layout.$flaps);
 	if(design.mode == "tree") {
-		for(const v of design.tree.$vertices) if(v) objects.push(v);
+		for(const v of design.tree.$vertices) objects.push(v);
 		objects.push(...design.tree.$edges.values());
 	}
 	for(const obj of objects) {

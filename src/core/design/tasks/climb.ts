@@ -1,5 +1,6 @@
 import { HeapSet } from "shared/data/heap/heapSet";
 import { nodeComparator } from "../context/treeNode";
+import { getFirst } from "shared/utils/set";
 
 import type { ITreeNode } from "../context";
 import type { distanceTask } from "./distance";
@@ -23,7 +24,7 @@ export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: Reado
 	if(total === 1) {
 		// Single thread updating
 		// See https://github.com/microsoft/TypeScript/issues/52998
-		let n = sets.find(s => s.size === 1)!.values().next().value as T;
+		let n = getFirst(sets.find(s => s.size === 1)!)!;
 		while(updater(n) && n.$parent) n = n.$parent;
 	} else {
 		// Initializing
