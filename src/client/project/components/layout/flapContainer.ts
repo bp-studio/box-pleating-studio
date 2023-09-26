@@ -74,6 +74,12 @@ export class FlapContainer {
 	}
 
 	public $add(f: JFlap, graphics: GraphicsData): void {
+		if(this._flaps.has(f.id)) {
+			// This shouldn't happen, but just in case
+			debugger;
+			return;
+		}
+
 		const project = this._layout.$project;
 		const tree = project.design.tree;
 		const vertex = tree.$vertices[f.id]!;
@@ -87,7 +93,8 @@ export class FlapContainer {
 	}
 
 	public $batchRemove(model: UpdateModel, newRivers: JEdge[]): void {
-		const design = this._layout.$project.design;
+		const project = this._layout.$project;
+		const design = project.design;
 		const prototype = design.$prototype;
 		const tree = design.tree;
 		for(const f of this._flaps.values()) {
@@ -95,12 +102,12 @@ export class FlapContainer {
 			const edgeDestructed = !f.$edge.$v1; // The original flap is split
 			if(!vertex || !vertex.isLeaf || edgeDestructed) {
 				if(vertex) {
-					if(edgeDestructed) {
-						prototype.layout.flaps.push(f.toJSON());
-						model.graphics["f" + f.id] ||= f.$graphics;
-					} else {
+					if(!edgeDestructed) {
 						// A flap turns into a river
 						newRivers.push(f.$edge.toJSON());
+					} else if(!project.history.$moving) {
+						prototype.layout.flaps.push(f.toJSON());
+						model.graphics["f" + f.id] ||= f.$graphics;
 					}
 				}
 				this.$remove(f.id);
