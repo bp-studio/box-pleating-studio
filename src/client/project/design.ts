@@ -46,7 +46,6 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	 */
 	public readonly $prototype: JDesign;
 
-
 	constructor(project: Project, json: JDesign, state?: JState) {
 		super();
 		this.$prototype = json;
@@ -80,17 +79,14 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	}
 
 	/** Update using the model returned from the Core. */
-	public $update(model: UpdateModel, callback: Action): void {
+	public $update(model: UpdateModel): void {
 		this.layout.$cleanUp(model);
 		this.tree.$update(model);
 		this.layout.$update(model);
+	}
 
-		callback();
-
-		// Note that the flushing is also invoked on initialization
-		this.$project.history.$flush();
-
-		// Clear prototypes
+	/** Clear {@link $prototype}. */
+	public $resetPrototype(): void {
 		const { layout, tree } = this.$prototype;
 		layout.flaps = [];
 		layout.stretches = [];
@@ -148,15 +144,16 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		}
 	}
 
-	public delete(): void {
+	public async delete(): Promise<void> {
 		const selections = SelectionController.selections;
 		if(this.mode == "layout") {
 			if(isTypedArray(selections, Flap)) {
-				this.tree.$vertices.$delete(selections.map(f => f.$vertex));
-				SelectionController.clear();
+				const promise = this.tree.$vertices.$delete(selections.map(f => f.$vertex));
+				SelectionController.clear(); // order matters here
+				await promise;
 			}
 		} else {
-			if(isTypedArray(selections, Vertex)) this.tree.$vertices.$delete(selections);
+			if(isTypedArray(selections, Vertex)) await this.tree.$vertices.$delete(selections);
 		}
 	}
 

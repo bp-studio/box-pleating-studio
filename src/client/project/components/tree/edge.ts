@@ -88,17 +88,17 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public split(): void {
-		this._tree.$split(this);
+	public split(): Promise<void> {
+		return this._tree.$split(this);
 	}
 
-	public deleteAndMerge(): void {
-		this._tree.$merge(this);
+	public deleteAndMerge(): Promise<void> {
+		return this._tree.$merge(this);
 	}
 
-	public delete(): void {
+	public async delete(): Promise<void> {
 		const v = this.$getLeaf();
-		if(v) this._tree.$vertices.$delete([v]);
+		if(v) await this._tree.$vertices.$delete([v]);
 	}
 
 	public get isRiver(): boolean {

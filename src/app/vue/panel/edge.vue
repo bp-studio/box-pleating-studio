@@ -4,11 +4,10 @@
 		<Number :label="$t('panel.edge.length')" v-model="subject.length" hotkeys="d.rd,d.ri" />
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary me-2" @click="subject.split()" v-t="'panel.edge.split'"></button>
+		<AsyncButton class="me-2" :click="() => subject.split()" v-t="'panel.edge.split'" />
 		<template v-if="subject.isDeletable">
-			<button class="btn btn-primary" v-if="subject.isRiver" @click="subject.deleteAndMerge()"
-					v-t="'panel.edge.merge'"></button>
-			<button class="btn btn-primary" v-else @click="subject.delete()" v-t="'keyword.delete'"></button>
+			<AsyncButton v-if="subject.isRiver" :click="() => subject.deleteAndMerge()" v-t="'panel.edge.merge'" />
+			<AsyncButton v-else :click="() => subject.delete()" v-t="'keyword.delete'" />
 		</template>
 	</div>
 	<div class="mt-3">
@@ -20,6 +19,7 @@
 
 <script setup lang="ts">
 
+	import AsyncButton from "@/gadgets/form/asyncButton.vue";
 	import Number from "@/gadgets/form/number.vue";
 	import { hk } from "app/services/customHotkeyService";
 

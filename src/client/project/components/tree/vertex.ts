@@ -99,9 +99,9 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return !this.$destructed && !this._tree.isMinimal && this.$degree <= 2;
 	}
 
-	public delete(): void {
-		if(this.$degree === 1) this._tree.$vertices.$delete([this]);
-		if(this.$degree === 2) this._tree.$vertices.$join(this);
+	public async delete(): Promise<void> {
+		if(this.$degree === 1) await this._tree.$vertices.$delete([this]);
+		if(this.$degree === 2) await this._tree.$vertices.$join(this);
 	}
 
 	public goToDual(): void {

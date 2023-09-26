@@ -12,7 +12,7 @@ import type { CoreManager } from "./coreManager";
  * It is separated from {@link Layout} to make things organized.
  */
 //=================================================================
-export class FlapContainer {
+export class FlapContainer implements Iterable<Flap> {
 
 	/** The new flaps that should be synced. */
 	public readonly $sync = new Map<number, Flap>();

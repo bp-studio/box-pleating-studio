@@ -27,7 +27,7 @@ interface UpdateResponse {
 }
 
 /** Represents an unknown error had occurred. */
-interface ErrorResponse {
+export interface ErrorResponse {
 	error: CoreError;
 }
 

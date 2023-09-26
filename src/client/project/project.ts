@@ -7,7 +7,7 @@ import { options } from "client/options";
 import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
 
-import type { Route, CoreResponse } from "core/routes";
+import type { Route, CoreResponse, ErrorResponse } from "core/routes";
 import type { JProject } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
@@ -151,22 +151,29 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		const response = await app.callWorker<CoreResponse>(this._worker, request);
 		for(const callback of callbacks) callback();
 		if("error" in response) {
-			this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
-			const clientError = new Error(response.error.message);
-			if(this._initialized) {
-				// Display a fatal message and close self, if the project has already been initialized.
-				// If not, the error thrown below will be caught by the App.
-				const coreError = response.error;
-				coreError.clientTrace = clientError.stack || "";
-				coreError.request = request;
-				await options.onError?.(this.id, coreError, this.history.$backup);
-			}
-			throw clientError; // Stop all further actions.
+			await this._handleCoreError(request, response);
 		} else if("update" in response) {
-			this.design.$update(response.update, () => this._flushUpdateCallback());
+			this.design.$update(response.update);
+			this._flushUpdateCallback();
+			this.history.$flush(); // Note that the flushing is also invoked on initialization
+			this.design.$resetPrototype();
 		} else {
 			return response.value;
 		}
+	}
+
+	private async _handleCoreError(request: object, response: ErrorResponse): Promise<never> {
+		this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
+		const clientError = new Error(response.error.message);
+		if(this._initialized) {
+			// Display a fatal message and close self, if the project has already been initialized.
+			// If not, the error thrown below will be caught by the App.
+			const coreError = response.error;
+			coreError.clientTrace = clientError.stack || "";
+			coreError.request = request;
+			await options.onError?.(this.id, coreError, this.history.$backup);
+		}
+		throw clientError; // Stop all further actions.
 	}
 
 	private _flushUpdateCallback(): void {

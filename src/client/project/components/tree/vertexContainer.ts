@@ -1,10 +1,11 @@
+import { shallowRef } from "vue";
+
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { minComparator } from "shared/data/heap/heap";
 import { Vertex } from "./vertex";
 import { SelectionController } from "client/controllers/selectionController";
 import { chebyshev } from "client/utils/chebyshev";
 import { dist } from "shared/types/geometry";
-import { shallowRef } from "client/shared/decorators";
 import { getFirst } from "shared/utils/set";
 
 import type { UpdateModel } from "core/service/updateModel";
@@ -23,9 +24,9 @@ const Y_DISPLACEMENT = 0.0625;
  */
 //=================================================================
 
-export class VertexContainer {
+export class VertexContainer implements Iterable<Vertex> {
 
-	@shallowRef public $count: number = 0;
+	private readonly _count = shallowRef(0);
 	private readonly _tree: Tree;
 	private readonly _vertices: (Vertex | undefined)[] = [];
 
@@ -34,13 +35,11 @@ export class VertexContainer {
 	 * Used for obtaining available id quickly.
 	 * Maybe it's too fancy to use a heap here, but why not?
 	 */
-	private _skippedIdHeap: BinaryHeap<number> = new BinaryHeap<number>(minComparator);
-
-	/** If we're currently in the middle of an operation. */
-	private _executing: boolean = false;
+	private readonly _skippedIdHeap: BinaryHeap<number>;
 
 	constructor(tree: Tree, json: JTree) {
 		this._tree = tree;
+		this._skippedIdHeap = new BinaryHeap<number>(minComparator);
 
 		// Create the list of skipped ids.
 		const ids: boolean[] = [];
@@ -57,11 +56,15 @@ export class VertexContainer {
 	}
 
 	public toJSON(): JVertex[] {
-		return this._vertices.filter(v => v).map(v => v!.toJSON());
+		return [...this].map(v => v.toJSON());
+	}
+
+	public get $count(): number {
+		return this._count.value;
 	}
 
 	public get $isMinimal(): boolean {
-		return this.$count === MIN_VERTICES;
+		return this._count.value === MIN_VERTICES;
 	}
 
 	/** Get the next available id for {@link Vertex}. */
@@ -83,7 +86,7 @@ export class VertexContainer {
 	public $update(model: UpdateModel): void {
 		const prototype = this._tree.$project.design.$prototype.tree;
 
-		let count = this.$count;
+		let count = this._count.value;
 		for(const id of model.add.nodes) {
 			const json = prototype.nodes.find(n => n.id == id) ??
 				{ id, name: "", x: 0, y: 0 }; // fool-proof
@@ -94,12 +97,10 @@ export class VertexContainer {
 			this._remove(id);
 			count--;
 		}
-		this.$count = count;
+		this._count.value = count;
 	}
 
 	public async $addLeaf(at: Vertex, length: number): Promise<void> {
-		if(this._executing) return; // ignore rapid clicking
-		this._executing = true;
 		const id = this.$nextAvailableId;
 		const p = this._findClosestEmptySpot(at);
 		const design = this._tree.$project.design;
@@ -108,12 +109,9 @@ export class VertexContainer {
 		const flap = design.layout.$createFlapPrototype(id, p);
 		prototype.layout.flaps.push(flap);
 		await this._tree.$project.$core.tree.addLeaf(id, at.id, length, flap);
-		this._executing = false;
 	}
 
 	public async $delete(vertices: Vertex[]): Promise<void> {
-		if(this._executing) return; // ignore rapid clicking
-		this._executing = true;
 		const [ids, parentIds] = this._simulateDelete(vertices);
 		const design = this._tree.$project.design;
 		const prototypes = parentIds.map(n =>
@@ -124,18 +122,14 @@ export class VertexContainer {
 		this._tree.$project.history.$cacheSelection();
 		for(const id of ids) SelectionController.$toggle(this._vertices[id]!, false);
 		await this._tree.$project.$core.tree.removeLeaf(ids, prototypes);
-		this._executing = false;
 	}
 
 	public async $join(vertex: Vertex): Promise<void> {
-		if(this._executing) return; // ignore rapid clicking
-		this._executing = true;
 		this._tree.$project.history.$cacheSelection();
 		SelectionController.clear();
 		const [v1, v2] = Array.from(this._tree.$edges.get(vertex.id)!.keys());
 		this._tree.$updateCallback = () => SelectionController.$toggle(this._tree.$edges.get(v1, v2)!, true);
 		await this._tree.$project.$core.tree.join(vertex.id);
-		this._executing = false;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,9 +143,7 @@ export class VertexContainer {
 
 		// Create an index for the position of all vertices
 		const occupied = new Set<number>();
-		for(const v of this._vertices) {
-			if(v) occupied.add(v.$location.x << SHIFT | v.$location.y);
-		}
+		for(const v of this) occupied.add(v.$location.x << SHIFT | v.$location.y);
 
 		// Search for empty spot
 		const heap = new BinaryHeap<[IPoint, number]>((a, b) => a[1] - b[1]);
@@ -216,12 +208,10 @@ export class VertexContainer {
 
 	private _createNeighborMap(): Map<Vertex, Set<number>> {
 		const map = new Map<Vertex, Set<number>>();
-		for(const v of this._vertices) {
-			if(v) {
-				const neighbors = new Set<number>();
-				for(const n of this._tree.$edges.get(v.id)!.keys()) neighbors.add(n);
-				map.set(v, neighbors);
-			}
+		for(const v of this) {
+			const neighbors = new Set<number>();
+			for(const n of this._tree.$edges.get(v.id)!.keys()) neighbors.add(n);
+			map.set(v, neighbors);
 		}
 		return map;
 	}

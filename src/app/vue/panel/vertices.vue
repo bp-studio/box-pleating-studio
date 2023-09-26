@@ -1,7 +1,7 @@
 <template>
 	<div v-t="'panel.vertices.type'" class="h5 panel-title"></div>
 	<div v-if="selections.some(s => s.isLeaf)">
-		<button class="btn btn-primary" v-if="!design.tree.isMinimal" @click="design.delete()" v-t="'keyword.delete'"></button>
+		<AsyncButton v-if="!design.tree.isMinimal" :click="() => design.delete()" v-t="'keyword.delete'" />
 		<span v-else v-t="'message.min3vertex'"></span>
 	</div>
 	<div class="mt-3">
@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 
+	import AsyncButton from "@/gadgets/form/asyncButton.vue";
 	import { hk } from "app/services/customHotkeyService";
 	import Studio from "app/services/studioService";
 

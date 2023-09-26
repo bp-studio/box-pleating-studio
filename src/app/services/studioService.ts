@@ -25,6 +25,12 @@ export function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
 	return computed(() => StudioService.initialized.value ? target() : defaultValue);
 }
 
+/**
+ * If we're currently in the middle of an operation.
+ * Used for throttling.
+ */
+let executing = false;
+
 //=================================================================
 /**
  * {@link StudioService} manages the initialization of BP Studio and bridging.
@@ -97,6 +103,18 @@ namespace StudioService {
 		isTouch && Settings.showDPad && draggableSelected.value
 	);
 
+	export async function execute(action: Action<Promise<void>>): Promise<void> {
+		if(executing) return; // ignore rapid execution
+		try {
+			executing = true;
+			await action();
+		} finally {
+			// Need to consider the possibility of errors
+			// eslint-disable-next-line require-atomic-updates
+			executing = false;
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Delegate methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +129,9 @@ namespace StudioService {
 		bp.selection.clear();
 	}
 	export function del(): void {
-		project.value?.design.delete();
+		const proj = project.value;
+		if(!proj) return;
+		execute(() => proj.design.delete());
 	}
 	export function svg(proj: Project): Promise<Blob> {
 		return Promise.resolve(bp.svg(proj, Settings.includeHiddenElement));

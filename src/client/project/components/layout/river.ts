@@ -69,8 +69,8 @@ export class River extends Control {
 		this._layout.$goToDual(this);
 	}
 
-	public delete(): void {
-		this.$edge.deleteAndMerge();
+	public delete(): Promise<void> {
+		return this.$edge.deleteAndMerge();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

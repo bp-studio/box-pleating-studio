@@ -160,9 +160,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return !this.$destructed && this.$vertex.isDeletable;
 	}
 
-	public delete(): void {
-		this.$vertex.delete();
-		SelectionController.$toggle(this, false);
+	public delete(): Promise<void> {
+		const promise = this.$vertex.delete();
+		SelectionController.$toggle(this, false); // order matters here
+		return promise;
 	}
 
 	public goToDual(): void {
