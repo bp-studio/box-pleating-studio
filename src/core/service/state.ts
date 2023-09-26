@@ -2,8 +2,8 @@ import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/diff/diffDoubleSet";
 import { DiffSet } from "shared/data/diff/diffSet";
 
-import type { Device } from "core/design/layout/pattern/device";
 import type { Repository } from "core/design/layout/repository";
+import type { Device } from "core/design/layout/pattern/device";
 import type { JStretch } from "shared/json";
 import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";

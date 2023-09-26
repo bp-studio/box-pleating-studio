@@ -48,6 +48,18 @@ function roughContour(): void {
 		State.$lengthChanged,
 		repoNodes
 	);
+
+	for(const stretch of State.$stretches.values()) {
+		if(State.$repoToProcess.has(stretch.$repo)) continue;
+
+		// TODO: Currently any changes in one of the rough contours
+		// will cause all rivers related to the same repo to be
+		// re-rendered; try to improve this part.
+		const nodes = stretch.$repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
+		if(nodes.some(n => State.$contourWillChange.has(n))) {
+			State.$repoToProcess.add(stretch.$repo);
+		}
+	}
 }
 
 function updater(node: ITreeNode): boolean {

@@ -57,7 +57,8 @@ export class Stretch implements ISerializable<JStretch> {
 	public $update(junctions: Junctions, prototype: JStretch): void {
 		const signature = getStructureSignature(junctions);
 		const origin = junctions[0].$tip;
-		if(signature === this._repo.$signature) {
+		const repo = this._repo;
+		if(signature === repo.$signature) {
 			/**
 			 * The {@link Repository.$signature} only encodes the structure and not the {@link NodeSet},
 			 * so in case nodes are changed due to splitting/merging,
@@ -65,25 +66,25 @@ export class Stretch implements ISerializable<JStretch> {
 			 * Note that to compare the old and new {@link NodeSet}s is no less work
 			 * than to just create and replace the {@link NodeSet} regardlessly.
 			 */
-			this._repo.$nodeSet = new NodeSet(junctions, this._repo.$quadrants);
+			repo.$nodeSet = new NodeSet(junctions, repo.$quadrants);
 
-			const updated = this._repo.$tryUpdateOrigin(origin);
+			const updated = repo.$tryUpdateOrigin(origin);
 			if(!this.$isActive || updated) {
-				State.$repoToProcess.add(this._repo);
+				State.$repoToProcess.add(repo);
 				this.$isActive = true;
 			}
 			return;
 		}
 
-		clearPatternContourForRepo(this._repo);
+		clearPatternContourForRepo(repo);
 		this.$isActive = true;
 		if(State.$isDragging) {
-			this._repoCache.set(this._repo.$signature, this._repo);
-			const repo = this._repoCache.get(signature);
-			if(repo) {
-				this._repo = repo;
+			this._repoCache.set(repo.$signature, repo);
+			const newRepo = this._repoCache.get(signature);
+			if(newRepo) {
+				this._repo = newRepo;
 				this._repo.$tryUpdateOrigin(origin);
-				State.$repoToProcess.add(repo);
+				State.$repoToProcess.add(newRepo);
 				return;
 			}
 		}

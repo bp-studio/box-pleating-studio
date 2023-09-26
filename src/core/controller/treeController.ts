@@ -29,9 +29,7 @@ export namespace TreeController {
 		}
 		tree.$flushRemove();
 		tree.$setFlaps(flaps);
-		for(const json of stretches) {
-			State.$stretchPrototypes.set(json.id, json);
-		}
+		setStretchPrototypes(stretches);
 		balanceTask.data = rootId;
 		Processor.$run(heightTask);
 	}

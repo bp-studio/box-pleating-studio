@@ -69,15 +69,17 @@ export namespace LayoutController {
 
 	export function switchConfig(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
-		stretch.$repo.$index = to;
-		State.$repoToProcess.add(stretch.$repo);
+		const repo = stretch.$repo;
+		repo.$index = to;
+		State.$repoToProcess.add(repo);
 		Processor.$run(patternTask);
 	}
 
 	export function switchPattern(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
-		stretch.$repo.$configuration!.$index = to;
-		State.$repoToProcess.add(stretch.$repo);
+		const repo = stretch.$repo;
+		repo.$configuration!.$index = to;
+		State.$repoToProcess.add(repo);
 		Processor.$run(patternTask);
 	}
 
@@ -88,10 +90,11 @@ export namespace LayoutController {
 
 	export function moveDevice(stretchId: string, index: number, location: IPoint): void {
 		const stretch = State.$stretches.get(stretchId)!;
-		const device = stretch.$repo.$pattern!.$devices[index];
+		const repo = stretch.$repo;
+		const device = repo.$pattern!.$devices[index];
 		device.$location = location;
 		State.$movedDevices.add(device);
-		State.$repoToProcess.add(stretch.$repo);
+		State.$repoToProcess.add(repo);
 		Processor.$run(patternTask);
 	}
 
