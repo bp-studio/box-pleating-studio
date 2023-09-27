@@ -62,7 +62,7 @@ export interface JCorner extends Partial<JConnection> {
 	 * and then annotate the two side vertices on the connecting vertex.
 	 * When actually drawing, the dynamic behavior will be implemented based on which side vertex is closer.
 	 */
-	joint?: [JConnection, JConnection];
+	dynamic?: [JConnection, JConnection];
 }
 
 //=================================================================

@@ -11,7 +11,6 @@ export interface JSheet extends IDimension {
 export interface JVertex extends Writeable<IPoint> {
 	id: number;
 	name: string;
-	selected?: boolean;
 
 	/**
 	 * Explicity indicating that this vertex has just been created,
