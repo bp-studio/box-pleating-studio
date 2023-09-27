@@ -11,6 +11,11 @@ export interface JSheet extends IDimension {
 export interface JVertex extends Writeable<IPoint> {
 	id: number;
 	name: string;
-	isNew?: boolean;
 	selected?: boolean;
+
+	/**
+	 * Explicity indicating that this vertex has just been created,
+	 * and will effect the corresponding flap location before switching view.
+	 */
+	isNew?: boolean;
 }

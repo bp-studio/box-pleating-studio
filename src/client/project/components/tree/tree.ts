@@ -95,6 +95,7 @@ export class Tree implements ISerializable<JTree> {
 			name: "",
 			x: Math.round((l1.x + l2.x) / 2),
 			y: Math.round((l1.y + l2.y) / 2),
+			isNew: true,
 		});
 		this.$updateCallback = () => SelectionController.$toggle(this.$vertices.$get(id)!, true);
 		return this.$project.$core.tree.split(edge.toJSON(), id);

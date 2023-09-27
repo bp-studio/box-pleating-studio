@@ -47,6 +47,11 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
 	public readonly $label: Label;
+
+	/**
+	 * See {@link JVertex.isNew}.
+	 * This state is carried on in generating {@link Memento}.
+	 */
 	public $isNew: boolean;
 
 	constructor(tree: Tree, json: JVertex) {
@@ -56,7 +61,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 
 		this.$tag = "v" + json.id;
 		this.id = json.id;
-		this.$isNew = json.isNew ?? true;
+		this.$isNew = json.isNew || false;
 		this.$location = { x: json.x, y: json.y };
 		this.name = json.name;
 
@@ -78,7 +83,9 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public $toMemento(): Memento {
-		return [this.$tag, this.toJSON()];
+		const json = this.toJSON();
+		json.isNew = this.$isNew;
+		return [this.$tag, json];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

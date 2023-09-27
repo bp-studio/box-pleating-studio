@@ -79,9 +79,9 @@ export namespace ProjectController {
 				},
 				tree: {
 					nodes: [
-						{ id: 0, name: "", x: 10, y: 10 },
-						{ id: 1, name: "", x: 10, y: 13 },
-						{ id: 2, name: "", x: 10, y: 7 },
+						{ id: 0, name: "", x: 10, y: 10, isNew: true },
+						{ id: 1, name: "", x: 10, y: 13, isNew: true },
+						{ id: 2, name: "", x: 10, y: 7, isNew: true },
 					],
 					edges: [
 						{ n1: 0, n2: 1, length: 1 },

@@ -89,7 +89,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		let count = this._count.value;
 		for(const id of model.add.nodes) {
 			const json = prototype.nodes.find(n => n.id == id) ??
-				{ id, name: "", x: 0, y: 0 }; // fool-proof
+				{ id, name: "", x: 0, y: 0, isNew: true }; // fool-proof
 			this._add(json);
 			count++;
 		}
@@ -105,7 +105,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		const p = this._findClosestEmptySpot(at);
 		const design = this._tree.$project.design;
 		const prototype = design.$prototype;
-		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y });
+		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y, isNew: true });
 		const flap = design.layout.$createFlapPrototype(id, p);
 		prototype.layout.flaps.push(flap);
 		await this._tree.$project.$core.tree.addLeaf(id, at.id, length, flap);
