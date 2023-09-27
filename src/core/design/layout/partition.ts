@@ -8,7 +8,7 @@ import { deviceGenerator } from "./generators/deviceGenerator";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor } from "shared/json";
+import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, Strategy } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
@@ -44,10 +44,13 @@ export class Partition implements ISerializable<JPartition> {
 	 */
 	public readonly $devices: Store<JDevice>;
 
+	private readonly _strategy: Strategy | undefined;
+
 	constructor(config: Configuration, data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
 		this.$devices = new Store(deviceGenerator(data, config));
+		this._strategy = data.strategy;
 
 		// Gather all corners
 		const map: CornerMap[] = [];
@@ -60,8 +63,10 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	public toJSON(): JPartition {
-		// This is OK since the array is readonly
-		return { overlaps: this.$overlaps };
+		return {
+			overlaps: this.$overlaps, // This is OK since the array is readonly
+			strategy: this._strategy,
+		};
 	}
 
 	public $getDisplacement(pattern: Pattern): Vector {
