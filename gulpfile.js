@@ -1,61 +1,108 @@
-// 修改 path 套件的輸出方式
-const path = require('path');
-let rel = path.relative;
+/* Uncomment the following to diagnose startup performance. */
+// let requireCount = 0;
+// const Module = require("module");
+// const oldRequire = Module.prototype.require;
+// Module.prototype.require = function(...args) {
+// 	requireCount++;
+// 	return oldRequire.apply(this, args);
+// };
+// console.time("startup");
+
+// modify the way `path` outputs
+const path = require("path");
+const rel = path.relative;
 path.relative = function(from, to) {
-	return rel(from, to).replace(/\\/g, '/');
+	return rel(from, to).replace(/\\/g, "/");
 };
 
-// 載入一切相依性
-const del = require('del');
-const gulp = require('gulp');
-const inquirer = require('inquirer');
-const requireDir = require('require-dir');
+// Load all dependencies
+const gulp = require("gulp");
+const requireDir = require("require-dir");
+const seriesIf = require("./gulp/utils/seriesIf");
 
-const seriesIf = require('./gulp/utils/seriesIf');
+requireDir("./gulp/tasks");
 
-requireDir('./gulp/tasks');
-
-// 執行一切建置（除了 HTML 和 ServiceWorker 以外）
-gulp.task('build', gulp.parallel(
-	'static',
-	'theme',
-	'donate',
-	'core',
-	'worker',
-	'locale',
-	'app'
+gulp.task("share", gulp.parallel(
+	"static",
+	"lib",
+	"donate",
+	"locale"
 ));
 
-gulp.task('update', gulp.series(
-	'version',
-	'html',
-	'sw'
+// Run all builds (except HTML and ServiceWorker)
+gulp.task("build", gulp.parallel(
+	"share",
+	"client",
+	"core",
+	"app"
 ));
 
-gulp.task('deployDev', gulp.series(
-	'build',
-	'update',
-	'uploadDev'
+gulp.task("buildDebug", gulp.parallel(
+	"share",
+	"clientDebug",
+	"coreDebug",
+	"appDebug"
 ));
 
-gulp.task('deployPub', () => seriesIf(
+gulp.task("buildDist", gulp.parallel(
+	"share",
+	"clientDist",
+	"coreDist",
+	"appDist"
+));
+
+gulp.task("update", gulp.series(
+	"version",
+	"html",
+	"sw"
+));
+
+gulp.task("deployDev", gulp.series(
+	"buildDist",
+	"update",
+	"uploadDev"
+));
+
+gulp.task("deployQa", gulp.series(
+	"buildDist",
+	"update",
+	"uploadQa"
+));
+
+gulp.task("deployDQ", gulp.series(
+	"buildDist",
+	"update",
+	gulp.parallel(
+		"uploadDev",
+		"uploadQa"
+	)
+));
+
+gulp.task("deployPub", () => seriesIf(
 	async () => {
-		let answers = await inquirer.prompt([{
-			type: 'confirm',
-			message: '請記得在發布之前更新版本號、加入更新 log、並適度修改 README.md。確定發布到正式版？',
-			name: 'ok',
+		const inquirer = (await import("inquirer")).default;
+		const answers = await inquirer.prompt([{
+			type: "confirm",
+			message: "Before releasing, please update the version number, add update logs, and edit README.md if needed. Are you sure you want to deploy?",
+			name: "ok",
 			default: false,
 		}]);
 		return answers.ok;
 	},
-	'build',
-	'update',
-	'uploadPub'
+	"buildDist",
+	"update",
+	"uploadPub"
 ));
 
-// 清除一切建置檔案
-gulp.task('clean', () => del('build'));
+// Clear all built files
+gulp.task("clean", async () => {
+	const del = (await import("del")).deleteAsync;
+	del("build");
+});
 
-// 預設建置，會建置到可以在本地執行的程度；
-// 在 VS Code 裡面按下 F5 預設就會執行這個建置動作
-gulp.task('default', gulp.series('html', 'build'));
+// The default build. It will build to the point that it can be run locally.
+// Press F5 in VS Code will execute this task by default.
+gulp.task("default", gulp.parallel("html", "buildDebug"));
+
+// console.log("Require count", requireCount);
+// console.timeEnd("startup");

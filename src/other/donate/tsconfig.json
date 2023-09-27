@@ -1,11 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "es2018",
-		"moduleResolution": "node",
-		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true
+		"jsx": "preserve",
+		"types": []
 	},
+	"extends": "../../shared/tsconfig",
 	"include": [
-		"./**/*"
+		"./**/*.ts",
+		"./**/*.vue",
+		"../../shared/frontend/imports.d.ts",
+		"../../shared/frontend/shims-vue.d.ts"
 	]
 }

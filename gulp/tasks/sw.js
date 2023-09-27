@@ -1,37 +1,46 @@
-const fs = require('fs');
-const gulp = require('gulp');
-const terser = require('gulp-terser');
-const ts = require('gulp-typescript');
-const workbox = require('gulp-workbox');
+const $ = require("../utils/proxy");
+const fs = require("fs");
+const gulp = require("gulp");
 
-const config = require('../config.json');
-const projService = ts.createProject(config.src.sw + '/tsconfig.json');
+const config = require("../config.json");
+const { target } = require("../utils/esbuild");
 
-gulp.task('sw', () => {
-	// 找出最後一個 log
-	let dir = fs.opendirSync(config.dest.dist + '/log'), file, lastLog;
+gulp.task("sw", () => {
+	// Find the last log
+	const dir = fs.opendirSync(config.dest.dist + "/log");
+	let file, lastLog;
 	while((file = dir.readSync()) && file.isFile()) {
-		let [stem, ext] = file.name.split('.');
+		const [stem, ext] = file.name.split(".");
 		if(ext == "md" && (!lastLog || stem > lastLog)) lastLog = stem;
 	}
 	dir.closeSync();
 
-	return projService.src()
-		.pipe(projService())
-		.pipe(workbox({
+	return gulp.src(config.src.sw + "/sw.ts")
+		.pipe($.esbuild({
+			bundle: true,
+			treeShaking: true,
+			legalComments: "none",
+			target,
+			charset: "utf8",
+		}))
+		.pipe($.workbox({
 			globDirectory: config.dest.dist,
 			globPatterns: [
-				'**/*.htm',
-				'**/*.js',
-				'**/*.css',
-				'**/*.woff2',
-				'manifest.json',
-				'assets/icon/icon-32.png',
-				'assets/icon/icon-192.png',
-				`log/${lastLog}.md`, // 只有最後一個 log 會被 precache
+				"**/*.htm",
+				"**/*.js",
+				"**/*.css",
+				"**/*.woff2",
+				"manifest.json",
+
+				// Only precache the two most common resolution; see https://tinyurl.com/7rxv5f97
+				"assets/icon/icon-32.png",
+				"assets/icon/icon-192.png",
+
+				// Only the last log will be included in precache
+				`log/${lastLog}.md`,
 			],
-			globIgnores: ['sw.js'],
+			globIgnores: ["sw.js"],
 		}))
-		.pipe(terser())
+		.pipe($.terser())
 		.pipe(gulp.dest(config.dest.dist));
 });

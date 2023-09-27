@@ -1,0 +1,29 @@
+{
+	"extends": [
+		"stylelint-config-standard-scss",
+		"stylelint-config-recommended-vue"
+	],
+	"plugins": [
+		"stylelint-no-unsupported-browser-features"
+	],
+	"rules": {
+		"at-rule-no-vendor-prefix": null,
+		"custom-property-empty-line-before": null,
+		"import-notation": "string",
+		"media-feature-range-notation": null,
+		"no-descending-specificity": null,
+		"plugin/no-unsupported-browser-features": [
+			true,
+			{
+				"ignore": ["css-nesting", "css-media-range-syntax", "css-not-sel-list"],
+				"ignorePartialSupport": true,
+				"severity": "warning"
+			}
+		],
+		"scss/at-import-partial-extension": null,
+		"selector-id-pattern": null,
+		"selector-no-vendor-prefix": null,
+		"value-no-vendor-prefix": null,
+		"no-empty-first-line": null
+	}
+}

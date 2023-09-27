@@ -1,6 +1,7 @@
 {
 	"name": "Español",
 	"flag": "spain",
+	"emoji": "🇪🇸",
 	"since": 900,
 	"welcome": {
 		"title": "¡Bienvenido a Box Pleating Studio!",
@@ -21,7 +22,7 @@
 		"recent": "Recientemente usado",
 		"start": "Comienzo",
 		"website": "Sitio web de BP Studio",
-		"discord": "¡BP Studio ahora tiene un servidor Discord! ¡Por favor únete a nosotros {0}!"
+		"discord": "¡Únase a nuestro {0}!"
 	},
 	"toolbar": {
 		"file": {
@@ -77,13 +78,18 @@
 			"ridge": "Mostrar pliegues de cresta",
 			"axial": "Mostrar pliegues axiales-paralelos en gadgets",
 			"label": "Mostrar etiquetas",
-			"tip": "Mostrar puntas",
+			"tip": "Mostrar puntas de solapa",
 			"dPad": "Mostrar D-pad",
+			"status": "Mostrar barra de estado",
 			"preference": "Preferencias"
 		},
 		"tools": {
 			"title": "Herramientas",
-			"TreeMaker": "Importar archivo TreeMaker"
+			"TreeMaker": "Importar archivo TreeMaker",
+			"CP": {
+				"_": "Exportar archivo CP",
+				"reorient": "Reorientar la hoja si corresponde"
+			}
 		},
 		"help": {
 			"title": "Ayuda",
@@ -112,6 +118,18 @@
 	},
 	"preference": {
 		"general": "General",
+		"color": {
+			"_": "Colores",
+			"default": "Por defecto",
+			"border": "Líneas fronterizas",
+			"grid": "Líneas de cuadrícula",
+			"hinge": "Pliegues de bisagra",
+			"ridge": "Pliegues de cresta",
+			"axisParallel": "Pliegues axiales-paralelos",
+			"overlap": "Superpuestas",
+			"tip": "Puntas de solapa",
+			"label": "Etiqueta de texto"
+		},
 		"hotkey": "Acceso rápido",
 		"command": "Mando",
 		"language": "Idioma",
@@ -138,7 +156,13 @@
 			"layout": "Vista de maquetación",
 			"width": "Ancho",
 			"height": "Alto",
-			"zoom": "Zoom"
+			"size": "Tamaño",
+			"zoom": "Zoom",
+			"grid": {
+				"_": "Tipo",
+				"rect": "Cuadrícula rectangular",
+				"diag": "Cuadrícula diagonal"
+			}
 		},
 		"flap": {
 			"type": "Solapa",
@@ -153,9 +177,12 @@
 			"goto": "Ir a vértices"
 		},
 		"river": {
-			"type": "río",
+			"type": "Río",
 			"width": "Ancho",
 			"goto": "Ir al borde"
+		},
+		"rivers": {
+			"type": "Ríos"
 		},
 		"vertex": {
 			"type": "Vértice",
@@ -183,6 +210,9 @@
 			"onlyOne": "Solo se encuentra un patrón."
 		}
 	},
+	"status": {
+		"invalid": "Superposiciones no válidas"
+	},
 	"share": {
 		"title": "Compartir proyecto",
 		"copy": "Copiar",
@@ -197,7 +227,8 @@
 		"repo": "Repositorio de Github",
 		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyarla, puede donar cualquier cantidad con {0}.",
 		"visitBlog": "¡También visite el {0} del autor para obtener más información!",
-		"blog": "Blog"
+		"blog": "Blog",
+		"sponsor": "BP Studio está orgullosamente patrocinado por:"
 	},
 	"donate": {
 		"title": "Box Pleating Studio de apoyo",
@@ -212,6 +243,8 @@
 		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
 		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
 		"filePermission": "Por motivos de seguridad, BP Studio necesita su permiso para acceder al archivo. Para cada archivo, solo necesitará otorgar permiso una vez por sesión. ¿Aún desea acceder al archivo?",
+		"fatal": "Se produjo un error interno y el proyecto no se puede seguir utilizando.",
+		"recover": "El espacio de trabajo se recuperará automáticamente, pero es probable que el error persista. \nDescargue el registro de errores y envíelo al autor para diagnosticar el problema.",
 		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
 		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; \nlos datos pueden estar corruptos.",
 		"latest": "Ya tienes la última versión de BP Studio.",
@@ -219,7 +252,13 @@
 		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y es posible que sea necesario volver a seleccionar algunos patrones de estiramiento. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
 		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
-		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?"
+		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
+		"restartFail": "No se puede reiniciar. Cierre todas las instancias de BP Studio.",
+		"webGL": {
+			"title": "La inicialización de WebGL falló",
+			"body": "BP Studio requiere que se ejecute WebGL, pero no puede inicializar el contexto de WebGL. Por favor, compruebe la configuración de su navegador."
+		},
+		"inApp": "Parece que estás utilizando un navegador integrado en la aplicación. Es posible que la descarga no funcione."
 	},
 	"plugin": {
 		"TreeMaker": {
@@ -234,10 +273,15 @@
 		"ok": "OK",
 		"here": "aquí",
 		"close": "Cerrar",
+		"export": "Exportar",
 		"delete": "Borrar",
+		"discord": "Servidor Discord de BP Studio",
 		"version": "Versión",
+		"filename": "Nombre del archivo",
+		"download": "Descargar",
 		"homepage": "página principal",
 		"untitled": "Sin título",
+		"errorLog": "Descargar registro de errores",
 		"workspace": "espacio de trabajo"
 	}
 }

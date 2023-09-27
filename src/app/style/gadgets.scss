@@ -1,0 +1,67 @@
+/*********************************************
+ * Scroll-shadow (by Lea Verou)
+ *********************************************/
+
+.scroll-shadow {
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch; /* Use momentum-based scrolling on Safari, only works on Safari 5-12.5 */
+
+	/* local is not supported in Safari 13+, so we give up this part for now.
+	background-image:
+		linear-gradient(white 30%, rgba(255, 255, 255, 0)),
+		linear-gradient(rgba(255, 255, 255, 0), white 70%),
+		radial-gradient(50% 0, farthest-side, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)),
+		radial-gradient(50% 100%, farthest-side, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+
+	background-image:
+		linear-gradient(white 30%, rgba(255, 255, 255, 0)),
+		linear-gradient(rgba(255, 255, 255, 0), white 70%),
+		radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)),
+		radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+
+	background-repeat: no-repeat;
+	background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+	background-position: 0 0, 0 100%, 0 0, 0 100%;
+	background-attachment: local, local, scroll, scroll; */
+	background-color: white;
+}
+
+.scroll-shadow,
+.scroll-shadow * {
+	/* It's OK if this is not supported */
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	touch-action: pan-y;
+}
+
+/*********************************************
+ * Sortable
+ *********************************************/
+
+.sortable-ghost {
+	cursor: move;
+}
+
+.sortable-fallback {
+	border: none;
+}
+
+/*********************************************
+ * Switch
+ *********************************************/
+
+.form-switch {
+	padding-left: 3.5rem;
+
+	label {
+		padding-top: 0.5rem;
+	}
+
+	.form-check-input {
+		cursor: pointer;
+		height: 1.5rem;
+		width: 2.75rem;
+		border-radius: 3rem;
+		margin-top: 0.5rem;
+		margin-left: -3.5rem;
+	}
+}

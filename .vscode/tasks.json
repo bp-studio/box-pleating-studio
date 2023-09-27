@@ -1,12 +1,11 @@
 {
-	// 如需 tasks.json 格式的文件，
-	// 請參與 https://go.microsoft.com/fwlink/?LinkId=733558
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
 	"version": "2.0.0",
 	"tasks": [
 		{
 			"label": "Gulp build",
-			"type": "gulp",
-			"task": "default",
+			"type": "shell",
+			"command": "pnpm build",
 			"isBackground": true,
 			"presentation": {
 				"echo": true,

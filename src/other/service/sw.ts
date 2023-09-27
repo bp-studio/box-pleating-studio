@@ -1,86 +1,122 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.4.2/workbox-sw.js');
-const { strategies, routing, googleAnalytics, broadcastUpdate, precaching } = workbox;
+/**
+ * We've migrated from using `importScripts` for loading workbox-sw
+ * to directly import and bundle. Doing so has various benefits,
+ * in which the most important is that it works best with TypeScript.
+ * See https://github.com/GoogleChrome/workbox/issues/2967
+ *
+ * Other benefits are:
+ * 1. There's no need to query the workbox version to obtain the URL of workbox-sw.
+ * 2. We can now drop the dependency of gulp-typescript, which is no longer maintained.
+ * 3. In theory, the service worker will load faster than the previous approach.
+ *    Although workbox-sw has its CDN, but that increases a lot of network requests,
+ *    and it also downloads a lot more bytes.
+ */
+import * as broadcastUpdate from "workbox-broadcast-update";
+import * as googleAnalytics from "workbox-google-analytics";
+import * as precaching from "workbox-precaching";
+import * as routing from "workbox-routing";
+import * as strategies from "workbox-strategies";
+import * as idbKeyval from "idb-keyval";
 
-// 啟動 Workbox GA
+// Declare that we're in ServiceWorker environment
+declare const self: ServiceWorkerGlobalScope & typeof globalThis;
+
+// Activate Workbox GA
 googleAnalytics.initialize();
 
-// 預設的資源都使用靜態更新策略
-let defaultHandler = new strategies.StaleWhileRevalidate({
-	cacheName: 'assets',
+// Default resources use StaleWhileRevalidate strategy
+const defaultHandler = new strategies.StaleWhileRevalidate({
+	cacheName: "assets",
 	plugins: [new broadcastUpdate.BroadcastUpdatePlugin({
 		generatePayload: options => ({ path: new URL(options.request.url).pathname }),
 	})],
 });
 routing.setDefaultHandler(defaultHandler);
 
-// 啟動 workbox-precaching
+// Activates workbox-precaching
 const precacheController = new precaching.PrecacheController({ cacheName: "assets" });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-precacheController.addToCacheList((self as any).__WB_MANIFEST);
+precacheController.addToCacheList(self.__WB_MANIFEST);
 const precacheRoute = new precaching.PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],
-	directoryIndex: 'index.htm',
+	directoryIndex: "index.htm",
 	cleanURLs: false,
 });
 routing.registerRoute(precacheRoute);
 
-/**
- * 這是舊版的 cache；如果找得到就刪除掉以釋放空間
- * @since 662 (20210110)
- * @deprecated
- */
-caches.delete("versioned");
-
-// 除了 precache 之外的 Markdown 檔案都採用網路優先策略
+// All Markdown files other than those in precache should use NetworkFirst strategy.
 routing.registerRoute(
 	({ url }) => url.pathname.endsWith(".md"),
 	new strategies.NetworkFirst({
-		fetchOptions: { cache: 'reload' }, // 請瀏覽器不要使用快取
-		cacheName: 'assets',
+		fetchOptions: { cache: "reload" }, // No cache here
+		cacheName: "assets",
 	})
 );
 
-let netOnly = new strategies.NetworkOnly({
-	fetchOptions: { cache: 'reload' },
+const netOnly = new strategies.NetworkOnly({
+	fetchOptions: { cache: "reload" },
 });
 
-// TinyURL 一律不要快取（沒有意義）
-routing.registerRoute(({ url }) => url.host == 'tinyurl.com', netOnly);
+// Don't cache TinyURL (pointless)
+routing.registerRoute(({ url }) => url.host == "tinyurl.com", netOnly);
 
-// POST 請求全部都只能在有網路的時候進行
-routing.registerRoute(({ request }) => request.method == 'POST', netOnly, 'POST');
+// All POST requests are allowed only when there's an internet connection.
+routing.registerRoute(({ request }) => request.method == "POST", netOnly, "POST");
 
-self.addEventListener('install', event => {
-	skipWaiting();
+self.addEventListener("install", event => {
+	// This is necessary. Otherwise, service worker will not be updated even as we reload the page,
+	// and we'll have to restart the app.
+	// Although starting the service worker immediately has other potential issues,
+	// there is no better way for now.
+	self.skipWaiting();
+
 	console.log("service worker installing");
 	precacheController.install(event);
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener("activate", event => {
 	precacheController.activate(event);
 });
 
-// 與 Client 的通訊
-self.addEventListener('message', event => {
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// Web Lock polyfill
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+self.addEventListener("message", event => {
 	event.waitUntil(message(event));
 });
+
 async function message(event: ExtendableMessageEvent): Promise<void> {
-	if(event.ports[0] && event.data == "id") {
-		let clients = await self.clients.matchAll({ type: 'window' });
-		let tasks: Promise<number>[] = [];
-		for(let client of clients) {
-			if(client.id != (event.source as Client).id) {
-				tasks.push(callClient(client, "id") as Promise<number>);
+	const port = event.ports[0];
+	if(port) {
+		const clientList = await idbKeyval.get<string[]>("clients") || [];
+		const sourceId = (event.source as Client).id;
+		if(event.data == "request") {
+			clientList.push(sourceId);
+			port.postMessage(await check(clientList, sourceId));
+		} else if(event.data == "check") {
+			port.postMessage(await check(clientList, sourceId));
+		} else if(event.data == "query") {
+			port.postMessage(clientList.length);
+			return;
+		} else if(event.data == "steal") {
+			if(clientList.length) {
+				const client = await self.clients.get(clientList[0]);
+				if(client) client.postMessage("steal");
+				clientList.shift();
 			}
+			clientList.unshift(sourceId);
+			port.postMessage(true);
 		}
-		let result = await Promise.all(tasks);
-		event.ports[0].postMessage(Math.min(...result));
+		await idbKeyval.set("clients", clientList);
 	}
 }
-function callClient(client: Client, data: unknown): Promise<unknown> {
-	return new Promise<unknown>(resolve => {
-		let channel = new MessageChannel();
-		channel.port1.onmessage = event => resolve(event.data);
-		client.postMessage(data, [channel.port2]);
-	});
+
+async function check(clientList: string[], id: string): Promise<boolean> {
+	let client: Client | undefined;
+	while(clientList[0] !== id && !client) {
+		// eslint-disable-next-line no-await-in-loop
+		client = await self.clients.get(clientList[0]);
+		if(!client) clientList.shift();
+	}
+	return clientList[0] === id;
 }

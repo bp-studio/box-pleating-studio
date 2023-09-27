@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"baseUrl": "..",
+	},
+	"extends": "../shared/tsconfig",
+	"include": [
+		"./**/*.ts",
+		"../shared/**/*.ts",
+		"../../lib/pixi/pixi.ts",
+		"../../lib/pixi/pixi.ts"
+	]
+}

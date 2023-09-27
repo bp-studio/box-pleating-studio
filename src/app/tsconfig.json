@@ -1,22 +1,18 @@
 {
 	"compilerOptions": {
-		"target": "es2019",
-		"types": ["wicg-file-system-access"],
-		"lib": ["DOM", "ESNext"],
-		"moduleResolution": "node",
-		"experimentalDecorators": true,
-		"strictNullChecks": true,
-		"skipLibCheck": true,
-		"allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
+		"baseUrl": "..",
+		"jsx": "preserve",
 		"paths": {
-			"bp/*": [
-				"../core/*"
-			],
+			"@/*": [
+				"app/vue/*"
+			]
 		}
 	},
+	"extends": "../shared/tsconfig",
 	"include": [
-		"./**/*",
-		"../core/global/*.d.ts"
+		"./**/*.ts",
+		"./**/*.vue",
+		"../shared/types/**/*.ts",
+		"../shared/frontend/**/*.ts"
 	]
 }

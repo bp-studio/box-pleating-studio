@@ -1,0 +1,119 @@
+import { watch, nextTick, reactive } from "vue";
+import { createI18n } from "vue-i18n";
+
+import { copyright } from "app/misc/copyright";
+
+import type { I18n } from "vue-i18n";
+import type { BpsLocale } from "shared/frontend/locale";
+import type Settings from "./settingService";
+
+const LOCALE_KEY = "locale";
+const DEFAULT_LOCALE = "en";
+
+//=================================================================
+/**
+ * {@link LanguageService} determines locale on startup and manages related settings.
+ *
+ * For historical reasons, language setting is store separately,
+ * and is not part of the {@link Settings}.
+ */
+//=================================================================
+namespace LanguageService {
+	const _options: string[] = reactive([]);
+
+	export const options = _options as readonly string[];
+
+	/** Create i18n instance. */
+	export function createPlugin(): I18n {
+		const plugin = createI18n<[BpsLocale], string>({
+			locale: DEFAULT_LOCALE,
+			fallbackLocale: DEFAULT_LOCALE,
+			silentFallbackWarn: true,
+			messages: locale,
+		});
+		i18n = plugin.global;
+		const _ = copyright.value; // warm-up
+		return plugin;
+	}
+
+	export function init(): void {
+		_options.length = 0;
+		const build = Number(localStorage.getItem("build") || 0);
+		const localeSetting = localStorage.getItem(LOCALE_KEY);
+		const langs = getLanguages(localeSetting);
+		const newLocale = langs.some(l => Number(locale[l].since) > build);
+
+		if(langs.length > 1 && (!localeSetting || newLocale)) {
+			_options.push(...langs);
+		}
+		i18n.locale = format(localeSetting || langs[0] || DEFAULT_LOCALE);
+		localStorage.setItem(LOCALE_KEY, i18n.locale);
+	}
+
+	export function setup(): void {
+		// Sync locale
+		let syncing: boolean = false;
+		window.addEventListener("storage", e => {
+			if(e.key == LOCALE_KEY) {
+				syncing = true;
+				i18n.locale = e.newValue!;
+			}
+		});
+
+		watch(() => i18n.locale, loc => {
+			if(loc in locale) {
+				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
+				syncing = false;
+			} else {
+				loc = findFallbackLocale(loc);
+				nextTick(() => i18n.locale = loc);
+			}
+			document.documentElement.lang = loc;
+		}, { immediate: true });
+	}
+
+	/** Obtain the list of candidate languages. */
+	function getLanguages(loc: string | null): string[] {
+		const locales = Object.keys(locale);
+		if(!navigator.languages) return locales;
+		let languages = navigator.languages
+			.map(a => locales.find(l => format(a).startsWith(l)))
+			.filter((l): l is string => Boolean(l));
+		if(loc) languages.unshift(loc);
+		languages = Array.from(new Set(languages));
+		return languages;
+	}
+
+	function findFallbackLocale(loc: string): string {
+		const tokens = loc.split("-");
+		while(tokens.length) {
+			tokens.pop();
+			const l = tokens.join("-");
+			if(l in locale) return l;
+		}
+		return DEFAULT_LOCALE;
+	}
+
+	/**
+	 * Normalize the language codes returned by browsers.
+	 *
+	 * See https://datatracker.ietf.org/doc/html/rfc5646 for docs.
+	 */
+	function format(l: string): string {
+		return l.replace(/_/g, "-")
+			.toLowerCase()
+			// Firefox Android returns "zh-Hant-TW" instead of "zh-TW"
+			.replace(/^zh(-\w+)?-hant.*$/, "zh-tw")
+			.replace(/^zh(-\w+)?-hans.*$/, "zh-cn");
+	}
+
+	export let onReset: Action;
+
+	export function reset(): void {
+		localStorage.removeItem(LOCALE_KEY);
+		init();
+		onReset?.();
+	}
+}
+
+export default LanguageService;

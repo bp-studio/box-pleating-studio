@@ -1,6 +1,7 @@
 {
 	"name": "Tiếng Việt",
 	"flag": "vietnam",
+	"emoji": "🇻🇳",
 	"since": 935,
 	"welcome": {
 		"title": "Chào mừng bạn đến với Box Pleating Studio!",
@@ -21,7 +22,7 @@
 		"recent": "Được sử dụng gần đây",
 		"start": "Khởi đầu",
 		"website": "Trang web BP Studio",
-		"discord": "BP Studio hiện có một máy chủ Discord! Hãy tham gia với chúng tôi ở {0}!"
+		"discord": "Hãy tham gia {0} của chúng tôi!"
 	},
 	"toolbar": {
 		"file": {
@@ -79,11 +80,16 @@
 			"label": "Hiện nhãn",
 			"tip": "Hiện mẹo nhánh",
 			"dPad": "Hiện D-pad",
+			"status": "Thanh trạng thái chương trình",
 			"preference": "Tùy chọn"
 		},
 		"tools": {
 			"title": "Công cụ",
-			"TreeMaker": "Nhập tệp TreeMaker"
+			"TreeMaker": "Nhập tệp TreeMaker",
+			"CP": {
+				"_": "Xuất tệp CP",
+				"reorient": "Định hướng lại trang tính nếu có"
+			}
 		},
 		"help": {
 			"title": "Cứu giúp",
@@ -112,6 +118,18 @@
 	},
 	"preference": {
 		"general": "Tổng quan",
+		"color": {
+			"_": "Màu sắc",
+			"default": "Mặc định",
+			"border": "Đường biên giới",
+			"grid": "Đường lưới",
+			"hinge": "Nếp gấp bản lề",
+			"ridge": "Nếp gấp ở sườn",
+			"axisParallel": "Nếp gấp trục song song",
+			"overlap": "Qua nối chồng",
+			"tip": "Mẹo nhánh",
+			"label": "Nhãn văn bản"
+		},
 		"hotkey": "Phím nóng",
 		"command": "Chỉ huy",
 		"language": "Ngôn ngữ",
@@ -138,7 +156,13 @@
 			"layout": "Chế độ xem bố cục",
 			"width": "Chiều rộng",
 			"height": "Chiều cao",
-			"zoom": "Thu phóng"
+			"size": "Kích thước",
+			"zoom": "Thu phóng",
+			"grid": {
+				"_": "Loại",
+				"rect": "Lưới hình chữ nhật",
+				"diag": "Lưới đường chéo"
+			}
 		},
 		"flap": {
 			"type": "Nhánh",
@@ -156,6 +180,9 @@
 			"type": "Sông",
 			"width": "Chiều rộng",
 			"goto": "Đi tới cạnh"
+		},
+		"rivers": {
+			"type": "Sông"
 		},
 		"vertex": {
 			"type": "Đỉnh",
@@ -183,6 +210,9 @@
 			"onlyOne": "Chỉ có một mẫu được tìm thấy."
 		}
 	},
+	"status": {
+		"invalid": "chồng chéo không hợp lệ"
+	},
 	"share": {
 		"title": "Chia sẻ dự án",
 		"copy": "Sao chép",
@@ -197,7 +227,8 @@
 		"repo": "Kho lưu trữ Github",
 		"donation": "BP Studio hoàn toàn miễn phí để sử dụng. Nếu bạn thấy ứng dụng này hữu ích cho thiết kế của mình và quan tâm đến việc hỗ trợ ứng dụng này, bạn có thể quyên góp bất kỳ số tiền nào với {0}.",
 		"visitBlog": "Cũng truy cập {0} của tác giả để biết thêm thông tin!",
-		"blog": "Blog"
+		"blog": "Blog",
+		"sponsor": "BP Studio tự hào được tài trợ bởi:"
 	},
 	"donate": {
 		"title": "Hỗ trợ Box Pleating Studio",
@@ -212,6 +243,8 @@
 		"connFail": "Kết nối Internet không thành công; vui lòng thử lại sau.",
 		"downloadHint": "Nhấp chuột phải và sử dụng \"Save As\" để chọn vị trí tệp.",
 		"filePermission": "Vì lý do bảo mật, BP Studio cần sự cho phép của bạn để truy cập tệp. Đối với mỗi tệp, bạn sẽ chỉ cần cấp quyền một lần cho mỗi phiên. Bạn vẫn muốn truy cập tệp?",
+		"fatal": "Đã xảy ra lỗi nội bộ và dự án không thể tiếp tục được vận hành.",
+		"recover": "Không gian làm việc sẽ được khôi phục tự động nhưng lỗi có thể vẫn tồn tại. \nVui lòng tải xuống nhật ký lỗi và gửi cho tác giả để chẩn đoán sự cố.",
 		"invalidFormat": "Tệp \"{0}\" có định dạng không hợp lệ.",
 		"invalidLink": "Đã xảy ra lỗi không mong muốn khi mở liên kết dự án; \ndữ liệu có thể bị hỏng.",
 		"latest": "Bạn đã có phiên bản BP Studio mới nhất.",
@@ -219,7 +252,13 @@
 		"oldVersion": "Dự án \"{0}\" đã được tạo bằng phiên bản cũ hơn của BP Studio và một số mẫu căng có thể cần được chọn lại. Nó sẽ được cập nhật lên định dạng mới nhất trong lần lưu tiếp theo.",
 		"patternNotFound": "Một số phần xếp chồng lên nhau của các nắp trong thiết kế này là hợp lệ, nhưng hiện tại BP Studio không thể tìm thấy các mẫu co giãn phù hợp cho chúng. Tác giả của ứng dụng này sẽ tiếp tục triển khai nhiều thuật toán hơn để bao gồm nhiều trường hợp hơn.",
 		"unsaved": "Dự án \"{0}\" chứa các thay đổi chưa được lưu. Hủy các thay đổi?",
-		"updateReady": "Phiên bản BP Studio mới hơn đã sẵn sàng và sẽ tự động cập nhật khi khởi động lại. Bạn có muốn khởi động lại ngay bây giờ?"
+		"updateReady": "Phiên bản BP Studio mới hơn đã sẵn sàng và sẽ tự động cập nhật khi khởi động lại. Bạn có muốn khởi động lại ngay bây giờ?",
+		"restartFail": "Không thể khởi động lại. Vui lòng đóng tất cả các phiên bản của BP Studio.",
+		"webGL": {
+			"title": "Khởi tạo WebGL không thành công",
+			"body": "BP Studio yêu cầu chạy WebGL nhưng không thể khởi tạo ngữ cảnh WebGL. Vui lòng kiểm tra cài đặt trình duyệt của bạn."
+		},
+		"inApp": "Có vẻ như bạn đang sử dụng trình duyệt trong ứng dụng. Tải xuống có thể không hoạt động."
 	},
 	"plugin": {
 		"TreeMaker": {
@@ -234,10 +273,15 @@
 		"ok": "OK",
 		"here": "đây",
 		"close": "Đóng",
+		"export": "Xuất tệp",
 		"delete": "Xóa bỏ",
+		"discord": "Máy chủ BP Studio Discord",
 		"version": "Phiên bản",
+		"filename": "tên tệp",
+		"download": "Tải xuống",
 		"homepage": "trang chủ",
 		"untitled": "Không có tiêu đề",
+		"errorLog": "Tải xuống nhật ký lỗi",
 		"workspace": "không gian làm việc"
 	}
 }

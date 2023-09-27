@@ -1,0 +1,75 @@
+{
+	"extends": [
+		"plugin:import/typescript",
+		"plugin:compat/recommended",
+		"plugin:typescript-compat/recommended"
+	],
+	"plugins": [
+		"import"
+	],
+	"parserOptions": {
+		"sourceType": "module"
+	},
+	"env": {
+		"node": false
+	},
+	"rules": {
+		"@typescript-eslint/consistent-type-imports": [
+			"warn",
+			{
+				"prefer": "type-imports"
+			}
+		],
+		"@typescript-eslint/no-unsafe-declaration-merging": "off",
+		"import/consistent-type-specifier-style": [
+			"warn",
+			"prefer-top-level"
+		],
+		"import/newline-after-import": "warn",
+		"import/no-cycle": "warn",
+		"import/no-duplicates": "warn",
+		"import/no-unresolved": "error",
+		"import/order": [
+			"warn",
+			{
+				"groups": [
+					[
+						"builtin",
+						"external"
+					],
+					[
+						"internal",
+						"parent",
+						"sibling",
+						"index",
+						"object"
+					],
+					"type"
+				],
+				"newlines-between": "always"
+			}
+		],
+		"no-duplicate-imports": "off",
+		"sort-imports": "off"
+	},
+	"settings": {
+		"import/resolver": {
+			"typescript": {
+				"project": [
+					"src/app",
+					"src/client",
+					"src/core",
+					"src/other/donate",
+					"src/other/service"
+				]
+			}
+		},
+		"polyfills": [
+			"globalThis",
+			"navigator.locks",
+			"Array.flatMap",
+			"Array.prototype.toReversed",
+			"Array.prototype.flatMap"
+		]
+	}
+}

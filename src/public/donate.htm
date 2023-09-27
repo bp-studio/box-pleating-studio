@@ -16,24 +16,22 @@
 		gtag('config', 'G-GG1TEZGBCQ', { page_title: document.title });
 	</script>
 
-	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" />
+	<script defer src="lib/vue.runtime.global.prod.js"></script>
+	<script defer src="lib/vue-i18n.runtime.global.prod.js"></script>
+	<script defer src="locale.js"></script>
+	<script defer src="donate.js"></script>
 
-	<script src="lib/vue.runtime.min.js"></script>
-	<script src="lib/vue-i18n.js"></script>
-	<script src="locale.js"></script>
-</head>
-
-<body class="p-4 h-100">
-	<div id="app"></div>
-
-	<script src="https://www.paypal.com/sdk/js?currency=USD&client-id=AVuqwRAe9FaCu7B2OS_9LJtYfkBUi13_HWUb5PqPxjH2OTgv6_PFPdr60uWGwsxNNTbDDZiy2hYypWjF"
-			data-sdk-integration-source="button-factory"></script>
-
+	<script defer data-sdk-integration-source="button-factory"
+			src="https://www.paypal.com/sdk/js?currency=USD&client-id=AVuqwRAe9FaCu7B2OS_9LJtYfkBUi13_HWUb5PqPxjH2OTgv6_PFPdr60uWGwsxNNTbDDZiy2hYypWjF"></script>
 	<!-- Sandbox -->
 	<!-- <script src="https://www.paypal.com/sdk/js?currency=USD&client-id=AdQIEmR2UvYVCENR9boWeJhMRsATXUgIkLzU6x0pFv8DHRwHaskf87_eLAFh88TcVoyW5FqKnUH_TrE8"
 			data-sdk-integration-source="button-factory"></script> -->
 
-	<script src="donate.js"></script>
+	<link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" />
+</head>
+
+<body class="p-4 h-100">
+	<div id="app" class="h-100">__VUE_SSG__</div>
 </body>
 
 </html>

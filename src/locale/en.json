@@ -1,6 +1,7 @@
 {
 	"name": "English",
 	"flag": "usa",
+	"emoji": "🇺🇸",
 	"since": 0,
 	"welcome": {
 		"title": "Welcome to Box Pleating Studio!",
@@ -21,7 +22,7 @@
 		"recent": "Recently used",
 		"start": "Start",
 		"website": "BP Studio website",
-		"discord": "BP Studio now has a Discord server! Please join us {0}!"
+		"discord": "Please join our {0}!"
 	},
 	"toolbar": {
 		"file": {
@@ -79,11 +80,16 @@
 			"label": "Show labels",
 			"tip": "Show flap tips",
 			"dPad": "Show D-pad",
+			"status": "Show status bar",
 			"preference": "Preferences"
 		},
 		"tools": {
 			"title": "Tools",
-			"TreeMaker": "Import TreeMaker file"
+			"TreeMaker": "Import TreeMaker file",
+			"CP": {
+				"_": "Export CP file",
+				"reorient": "Reorient the sheet if applicable"
+			}
 		},
 		"help": {
 			"title": "Help",
@@ -112,6 +118,18 @@
 	},
 	"preference": {
 		"general": "General",
+		"color": {
+			"_": "Colors",
+			"default": "Default",
+			"border": "Border lines",
+			"grid": "Grid lines",
+			"hinge": "Hinge creases",
+			"ridge": "Ridge creases",
+			"axisParallel": "Axis-parallel creases",
+			"overlap": "Overlapping",
+			"tip": "Flap tips",
+			"label": "Text label"
+		},
 		"hotkey": "Hotkeys",
 		"command": "Command",
 		"language": "Language",
@@ -138,7 +156,13 @@
 			"layout": "Layout view",
 			"width": "Width",
 			"height": "Height",
-			"zoom": "Zoom"
+			"size": "Size",
+			"zoom": "Zoom",
+			"grid": {
+				"_": "Type",
+				"rect": "Rectangular grid",
+				"diag": "Diagonal grid"
+			}
 		},
 		"flap": {
 			"type": "Flap",
@@ -156,6 +180,9 @@
 			"type": "River",
 			"width": "Width",
 			"goto": "Go to edge"
+		},
+		"rivers": {
+			"type": "Rivers"
 		},
 		"vertex": {
 			"type": "Vertex",
@@ -183,6 +210,9 @@
 			"onlyOne": "Only one pattern is found."
 		}
 	},
+	"status": {
+		"invalid": "Invalid overlaps"
+	},
 	"share": {
 		"title": "Share project",
 		"copy": "Copy",
@@ -197,7 +227,8 @@
 		"repo": "Github repository",
 		"donation": "BP Studio is completely free to use. If you find this app helpful to your designing and are interested in supporting this app, you can donate any amount with {0}.",
 		"visitBlog": "Also visit author's {0} for more info!",
-		"blog": "blog"
+		"blog": "blog",
+		"sponsor": "BP Studio is proudly sponsored by:"
 	},
 	"donate": {
 		"title": "Supporting Box Pleating Studio",
@@ -212,6 +243,8 @@
 		"connFail": "Internet connection failed; please try again later.",
 		"downloadHint": "Right-click and use \"Save As\" to choose file location.",
 		"filePermission": "For security reason, BP Studio needs your permission to access the file. For each file, you'll only need to grant permission once per session. Do you still wish to access the file?",
+		"fatal": "An internal error occurred, and the project cannot be further operated.",
+		"recover": "The workspace will be recovered automatically, but the error will likely persist. Please download the error log and send it to the author for diagnosing the issue.",
 		"invalidFormat": "File \"{0}\" is of invalid format.",
 		"invalidLink": "Unexpected error occurred upon opening the project link; the data might be corrupted.",
 		"latest": "You already have the latest version of BP Studio.",
@@ -219,7 +252,13 @@
 		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and some stretch patterns may need to be re-selected. It will be updated to the latest format on the next saving.",
 		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
 		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?",
-		"updateReady": "A newer version of BP Studio is ready and will update automatically on restart. Would you like to restart now?"
+		"updateReady": "A newer version of BP Studio is ready and will update automatically on restart. Would you like to restart now?",
+		"restartFail": "Unable to restart. Please close all instances of BP Studio.",
+		"webGL": {
+			"title": "WebGL initialization failed",
+			"body": "BP Studio requires WebGL to run, but is unable to initialize WebGL context. Please check your browser's settings."
+		},
+		"inApp": "It seems that you are using an in-app browser. Downloading might not work."
 	},
 	"plugin": {
 		"TreeMaker": {
@@ -234,10 +273,15 @@
 		"ok": "OK",
 		"here": "here",
 		"close": "Close",
+		"export": "Export",
 		"delete": "Delete",
+		"discord": "BP Studio Discord server",
 		"version": "Version",
+		"filename": "Filename",
+		"download": "Download",
 		"homepage": "homepage",
 		"untitled": "Untitled",
+		"errorLog": "Download error log",
 		"workspace": "workspace"
 	}
 }

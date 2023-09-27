@@ -1,6 +1,7 @@
 {
 	"name": "简体中文",
 	"flag": "china",
+	"emoji": "🇨🇳",
 	"since": 900,
 	"welcome": {
 		"title": "欢迎使用 Box Pleating Studio！",
@@ -21,7 +22,7 @@
 		"recent": "最近使用",
 		"start": "开始",
 		"website": "BP Studio 网站",
-		"discord": "BP Studio 现在有了 Discord 服务器！请到{0}加入我们！"
+		"discord": "请加入我们的 {0}！"
 	},
 	"toolbar": {
 		"file": {
@@ -74,16 +75,21 @@
 			"fullscreenExit": "退出全屏模式",
 			"grid": "显示格线",
 			"hinge": "显示枢纽折痕",
-			"ridge": "显示脊折痕",
+			"ridge": "显示脊线折痕",
 			"axial": "显示装置中的轴平行折痕",
 			"label": "显示标签",
 			"tip": "显示角片顶点",
 			"dPad": "显示方向键",
+			"status": "显示状态栏",
 			"preference": "首选项"
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "导入 TreeMaker 文件"
+			"TreeMaker": "导入 TreeMaker 文件",
+			"CP": {
+				"_": "导出 CP 文件",
+				"reorient": "若适用的话重新定向纸张"
+			}
 		},
 		"help": {
 			"title": "说明",
@@ -112,6 +118,18 @@
 	},
 	"preference": {
 		"general": "一般",
+		"color": {
+			"_": "配色",
+			"default": "默认",
+			"border": "边线",
+			"grid": "格线",
+			"hinge": "枢纽折痕",
+			"ridge": "脊线折痕",
+			"axisParallel": "轴平行折痕",
+			"overlap": "重叠",
+			"tip": "角片顶点",
+			"label": "文字标签"
+		},
 		"hotkey": "热键",
 		"command": "命令",
 		"language": "语言",
@@ -138,7 +156,13 @@
 			"layout": "佈局视图",
 			"width": "宽度",
 			"height": "高度",
-			"zoom": "缩放"
+			"size": "尺寸",
+			"zoom": "缩放",
+			"grid": {
+				"_": "类型",
+				"rect": "矩形网格",
+				"diag": "对角网格"
+			}
 		},
 		"flap": {
 			"type": "角片",
@@ -156,6 +180,9 @@
 			"type": "河",
 			"width": "宽度",
 			"goto": "前往边"
+		},
+		"rivers": {
+			"type": "河"
 		},
 		"vertex": {
 			"type": "顶点",
@@ -183,6 +210,9 @@
 			"onlyOne": "只找到了一种折痕模式"
 		}
 	},
+	"status": {
+		"invalid": "无效重叠"
+	},
 	"share": {
 		"title": "分享项目",
 		"copy": "复制",
@@ -197,7 +227,8 @@
 		"repo": "Github 存储库",
 		"donation": "BP Studio 的使用是完全免费的。若您觉得本 App 对您的折纸设计有帮助并有兴趣提供支持，欢迎您透过 {0} 任意捐款。",
 		"visitBlog": "您还可以访问作者的{0}以了解更多信息！",
-		"blog": "博客"
+		"blog": "博客",
+		"sponsor": "BP Studio 荣幸地获得以下赞助："
 	},
 	"donate": {
 		"title": "赞助 Box Pleating Studio",
@@ -212,6 +243,8 @@
 		"connFail": "网络连线失败；请稍后再试。",
 		"downloadHint": "按右键并点选「另存连结」可指定存档位置",
 		"filePermission": "出于安全性原因，BP Studio 需要您的授权才能访问该文件。对于每个文件，您在执行阶段中只需要授权一次。您仍要访问该文件吗？",
+		"fatal": "发生内部错误，项目无法进一步操作。",
+		"recover": "工作区将自动恢复，但错误可能会持续存在。请下载错误日志并发送给作者以诊断问题。",
 		"invalidFormat": "文件「{0}」的格式无效。",
 		"invalidLink": "打开项目链接时发生意外错误；数据可能已损坏。",
 		"latest": "您已经拥有最新版本的 BP Studio。",
@@ -219,7 +252,13 @@
 		"oldVersion": "项目「{0}」是使用较旧版本的 BP Studio 产生的，部份伸展结构可能会需要重新选取。项目会在下次存档时更新为最新格式。",
 		"patternNotFound": "在当前的设计中，存在一些角片重叠是虽然有效、但目前的 BP Studio 却无法找到可行的伸展折痕模式的。本应用的作者将会持续实作更多演算法以涵盖更多情况。",
 		"unsaved": "项目「{0}」有尚未保存的变更，确定要舍弃？",
-		"updateReady": "更新版本的 BP Studio 已准备就绪，并将在重新启动时自动更新。您想要现在立刻重新启动吗？"
+		"updateReady": "更新版本的 BP Studio 已准备就绪，并将在重新启动时自动更新。您想要现在立刻重新启动吗？",
+		"restartFail": "无法重新启动。请关闭 BP Studio 的所有实例。",
+		"webGL": {
+			"title": "WebGL 初始化失败",
+			"body": "BP Studio 运行需要 WebGL，但无法初始化 WebGL 环境。请检查您的浏览器设置。"
+		},
+		"inApp": "您似乎正在使用应用内浏览器。下载功能可能无法使用。"
 	},
 	"plugin": {
 		"TreeMaker": {
@@ -234,10 +273,15 @@
 		"ok": "确定",
 		"here": "这里",
 		"close": "关闭",
+		"export": "导出",
 		"delete": "删除",
+		"discord": "BP Studio Discord 服务器",
 		"version": "版本",
+		"filename": "文件名",
+		"download": "下载",
 		"homepage": "主页",
 		"untitled": "未命名",
+		"errorLog": "下载错误日志",
 		"workspace": "工作区"
 	}
 }

@@ -1,113 +1,86 @@
-const all = require('gulp-all');
-const filter = require('gulp-filter');
-const fs = require('fs');
-const gulp = require('gulp');
-const gulpIf = require('gulp-if');
-const newer = require('gulp-newer');
-const purge = require('gulp-purgecss');
-const replace = require('gulp-replace');
-const terser = require('gulp-terser');
+const $ = require("../utils/proxy");
+const fs = require("fs");
+const gulp = require("gulp");
 
-const config = require('../config.json');
+const newer = require("../utils/newer");
+const config = require("../config.json");
 
-const buildLog = require('./static/log');
-const buildIcon = require('./static/icon');
+const buildLog = require("./static/log");
+const buildIcon = require("./static/icon");
 
-// 這邊必須指定副檔名，否則資料夾也會被比進去
-const compare = [
-	config.src.app + '/**/*.vue',
-	config.src.app + '/**/*.css',
-	config.src.donate + '/**/*.vue',
-	config.src.public + '/*.htm',
-];
+const libDest = config.dest.dist + "/lib";
 
-const libDest = config.dest.dist + '/lib';
-
-/**
- * 個別淨化一個 lib 的 CSS 檔案
- *
- * 當 lib 自己有更新、或者比較對象有更新的時候都要重新執行淨化，
- * 所以針對每一個檔案都要自己產一組 stream。
- */
-function makePurge(path) {
-	return gulp.src(config.src.lib + path, { base: config.src.lib })
-		.pipe(newer({
-			dest: libDest + path,
-			extra: compare.concat([__filename]),
-		}))
-		.pipe(purge({
-			content: compare,
-			safelist: {
-				standard: [/backdrop/], // for Bootstrap Modal
-				variables: ['--bs-primary'],
-			},
-			fontFace: true, // for Font Awesome
-			variables: true, // for Bootstrap
-		}))
-		.pipe(replace(/(\r|\n)*\/\*.+?\*\/$/, '')) // remove sourcemap
-		.pipe(gulp.dest(libDest));
+/** If a given js file has a `min` or `prod` version */
+function hasMin(file) {
+	return fs.existsSync(file.path.replace(/js$/, "min.js")) || fs.existsSync(file.path.replace(/js$/, "prod.js"));
 }
 
-/** 複製 debug 資源 */
+/** Copying debug assets */
 const copyDebugStatic = () => gulp.src([
-	'*.js',
-	'*.js.map',
+	"*.js",
+	"*.js.map",
 ], { cwd: config.src.lib })
-	.pipe(filter(file => {
-		// 選取具有 min 版本的 .js 檔案
+	.pipe($.filter(file => {
+		// include those .js files with a `min` version
 		if(file.extname != ".js") return true;
-		return fs.existsSync(file.path.replace(/js$/, "min.js"));
+		return hasMin(file);
 	}))
-	.pipe(newer(config.dest.debug + '/lib')) // 採用 1:1 比對目標的策略
-	.pipe(gulp.dest(config.dest.debug + '/lib'));
+	.pipe(newer(config.dest.debug + "/lib")) // Use 1:1 comparison
+	.pipe(gulp.dest(config.dest.debug + "/lib"));
 
-/** 複製靜態資源 */
+/** Copying static assets */
 const copyStatic = () => gulp.src([
-	'**/*',
-	'.htaccess', // 這種檔案需要另外指定
+	"**/*",
 
-	// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
-	'!index.htm',
-	'!log/*',
-	'!assets/bps/**/*',
-], { cwd: config.src.public })
-	.pipe(newer(config.dest.dist)) // 採用 1:1 比對目標的策略
-	.pipe(gulpIf(file => file.extname == ".js", terser({
+	// We need to make specific about the filenames starting with "."
+	".htaccess",
+	".well-known/**/*",
+
+	// These will not be included
+	"!**/README.md",
+
+	// These files will be built separately, so we don't treat them as static assets.
+	"!index.htm",
+	"!log/*",
+	"!assets/bps/**/*",
+], { cwd: config.src.public, base: config.src.public })
+	.pipe(newer(config.dest.dist)) // Use 1:1 comparison
+	.pipe($.if(file => file.extname == ".js", $.terser({
 		compress: {
 			drop_debugger: false,
 		},
 	})))
 	.pipe(gulp.dest(config.dest.dist));
 
-/** 複製程式庫 */
-const copyLib = () => gulp.src([
-	'**/*',
+/** FontAwesome */
+const faTarget = libDest + "/font-awesome";
+const fontAwesome = () =>
+	gulp.src(config.src.app + "/vue/**/*.vue")
+		.pipe($.fontawesome())
+		.pipe(gulp.dest(libDest + "/font-awesome"));
 
-	// 不包含下列檔案
-	'!**/README.md',
-	'!**/*.ts',
+gulp.task("log", () => buildLog());
 
-	// 底下這些檔案都會另外建置，所以不當作靜態資源來複製
-	'!**/*.css',
-	'!**/*.js.map',
-], { cwd: config.src.lib })
-	.pipe(filter(file => {
-		// 過濾掉具有 min 版本的 .js 檔案
-		if(file.extname != ".js") return true;
-		return !fs.existsSync(file.path.replace(/js$/, "min.js"));
-	}))
-	.pipe(gulpIf(file => file.extname == ".js",
-		replace(/\s+\/\/# sourceMappingURL=.+?$/ms, '') // 刪除 sourcemap
-	))
-	.pipe(newer(libDest)) // 採用 1:1 比對目標的策略
-	.pipe(gulp.dest(libDest));
+gulp.task("static", () => {
+	const tasks = [
+		buildIcon(),
+		buildLog(),
+		copyDebugStatic(),
+		copyStatic(),
+	];
+	// Only the first time the FontAwesome build will be executed automatically.
+	// In other cases we call the `fa` task manually to improve performance.
+	if(!fs.existsSync(faTarget)) {
+		tasks.push(fontAwesome());
+	}
+	return $.all(tasks);
+});
 
-gulp.task('static', () => all(
-	makePurge('/bootstrap/bootstrap.min.css'),
-	makePurge('/font-awesome/css/all.min.css'),
-	buildIcon(),
-	buildLog(),
-	copyDebugStatic(),
-	copyStatic(),
-	copyLib()
-));
+/**
+ * This is the task for rebuilding FontAwesome.
+ * Needs to be called manually.
+ *
+ * Note: For unknown reason, it appears that in local environment,
+ * restarting the browser is needed for the new font to take effect.
+ */
+gulp.task("fa", fontAwesome);

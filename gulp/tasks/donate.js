@@ -1,30 +1,43 @@
-const all = require('gulp-all');
-const gulp = require('gulp');
-const htmlMin = require('gulp-html-minifier-terser');
-const newer = require('gulp-newer');
-const terser = require('gulp-terser');
+const $ = require("../utils/proxy");
+const gulp = require("gulp");
 
-const config = require('../config.json');
-const vue = require('../plugins/vue');
-const htmlMinOption = require('../html.json');
+const newer = require("../utils/newer");
+const { esbuild, extra, ssgI18n } = require("../utils/esbuild");
+const config = require("../config.json");
+const htmlMinOption = require("../html.json");
 
-gulp.task('donate', () => all(
+gulp.task("donate", () => $.all(
 	// Vue
-	gulp.src(['main.vue', 'main.js'], { cwd: config.src.donate })
+	gulp.src(config.src.donate + "/main.ts")
 		.pipe(newer({
-			dest: config.dest.dist + '/donate.js',
-			extra: __filename,
+			dest: config.dest.dist + "/donate.js",
+			extra: [__filename, extra, config.src.donate + "/**/*"],
 		}))
-		.pipe(vue('donate.js'))
-		.pipe(terser())
+		.pipe(esbuild({
+			outfile: "donate.js",
+			minify: true,
+			tsconfig: config.src.donate + "/tsconfig.json",
+		}))
+		.pipe($.terser({
+			compress: {
+				// This removes unused imports
+				pure_getters: true,
+			},
+		}))
 		.pipe(gulp.dest(config.dest.dist)),
 
 	// Html
-	gulp.src(config.src.public + '/donate.htm')
+	gulp.src(config.src.public + "/donate.htm")
 		.pipe(newer({
-			dest: config.dest.dist + '/donate.htm',
-			extra: __filename,
+			dest: config.dest.dist + "/donate.htm",
+			extra: [__filename, extra],
 		}))
-		.pipe(htmlMin(htmlMinOption))
+		.pipe($.htmlMinifierTerser(htmlMinOption))
+		// Avoid VS Code Linter warnings
+		.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+		.pipe(ssgI18n({
+			appRoot: config.src.donate + "/app.vue",
+			messages: { en: require("../../" + config.src.locale + "/en.json") },
+		}))
 		.pipe(gulp.dest(config.dest.dist))
 ));

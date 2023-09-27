@@ -37,15 +37,29 @@
 		}
 	],
 	"user_preferences": {
-		"color_scheme_dark": {
-			"theme_color": "#007bff",
-			"background_color": "#1e1e1e"
-		},
-		"color_scheme_light": {
-			"theme_color": "#007bff",
-			"background_color": "#fff"
+		"color_scheme": {
+			"dark": {
+				"theme_color": "#007bff",
+				"background_color": "#1e1e1e"
+			},
+			"light": {
+				"theme_color": "#007bff",
+				"background_color": "#fff"
+			}
 		}
 	},
+	"theme_colors": [
+		{
+			"color": "#007bff",
+			"media": "(prefers-color-scheme: dark)"
+		}
+	],
+	"background_colors": [
+		{
+			"color": "#1e1e1e",
+			"media": "(prefers-color-scheme: dark)"
+		}
+	],
 	"related_applications": [
 		{
 			"platform": "webapp",
@@ -57,6 +71,10 @@
 			"origin": "https://bpstudio.abstreamace.com"
 		}
 	],
+	"launch_handler": {
+		"route_to": "existing-client-retain",
+		"client_mode": "focus-existing"
+	},
 	"file_handlers": [
 		{
 			"action": "/",

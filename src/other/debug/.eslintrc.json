@@ -1,0 +1,10 @@
+{
+	"globals": {
+		"app": true
+	},
+	"rules": {
+		"@typescript-eslint/no-magic-numbers": "off",
+		"compat/compat": "off",
+		"no-global-assign": "off"
+	}
+}

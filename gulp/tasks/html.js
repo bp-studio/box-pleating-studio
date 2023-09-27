@@ -1,37 +1,67 @@
-const all = require('gulp-all');
-const gulp = require('gulp');
-const htmlMin = require('gulp-html-minifier-terser');
-const newer = require('gulp-newer');
-const replace = require('gulp-replace');
+const $ = require("../utils/proxy");
+const gulp = require("gulp");
+const fs = require("fs");
 
-const config = require('../config.json');
-const debug = require('../plugins/debug');
-const htmlMinOption = require('../html.json');
+const newer = require("../utils/newer");
+const { ssgI18n } = require("../utils/esbuild");
+const config = require("../config.json");
+const debug = require("../plugins/debug");
+const htmlMinOption = require("../html.json");
 
-gulp.task('version', () =>
-	gulp.src(config.src.public + '/index.htm')
-		.pipe(replace(/app_version: "(\d+)"/, (a, b) => `app_version: "${Number(b) + 1}"`))
-		.pipe(gulp.dest(config.src.public))
+function ssg() {
+	// polyfill
+	require("global-jsdom/register");
+	globalThis.locale = [];
+	globalThis.logs = [];
+	globalThis.matchMedia = () => ({ matches: false });
+
+	return ssgI18n({
+		appRoot: config.src.app + "/vue/app.vue",
+		messages: { en: require("../../" + config.src.locale + "/en.json") },
+	});
+}
+
+const insertVersion = (package) => $.through2(
+	content => content
+		.replace("__VERSION__", package.version)
+		.replace("__APP_VERSION__", package.app_version)
 );
 
-gulp.task('html', () => all(
-	// 偵錯版
-	gulp.src(config.src.public + '/index.htm')
-		.pipe(newer({
-			dest: config.dest.debug + '/index.htm',
-			extra: [__filename, 'gulp/plugins/debug.js'],
-		}))
-		.pipe(debug())
-		.pipe(gulp.dest(config.dest.debug)),
+/** Bump build version */
+gulp.task("version", () =>
+	gulp.src("package.json")
+		.pipe($.replace(/"app_version": "(\d+)"/, (a, b) => `"app_version": "${Number(b) + 1}"`))
+		.pipe(gulp.dest("."))
+);
 
-	// 正式版
-	gulp.src(config.src.public + '/index.htm')
-		.pipe(newer({
-			dest: config.dest.dist + '/index.htm',
-			extra: __filename,
-		}))
-		.pipe(htmlMin(htmlMinOption))
-		// 避免 VS Code Linter 出錯
-		.pipe(replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
-		.pipe(gulp.dest(config.dest.dist))
-));
+/** Main HTML task */
+gulp.task("html", () => {
+	// We cannot directly use `require` here,
+	// as that will likely get the outdated content.
+	const package = JSON.parse(fs.readFileSync("package.json").toString("utf8"));
+	return $.all(
+		// Debug
+		gulp.src(config.src.public + "/index.htm")
+			.pipe(newer({
+				dest: config.dest.debug + "/index.htm",
+				extra: [__filename, "package.json", config.src.app + "/**/*", "gulp/plugins/debug.js"],
+			}))
+			.pipe(insertVersion(package))
+			.pipe(debug())
+			.pipe(ssg())
+			.pipe(gulp.dest(config.dest.debug)),
+
+		// Dist
+		gulp.src(config.src.public + "/index.htm")
+			.pipe(newer({
+				dest: config.dest.dist + "/index.htm",
+				extra: [__filename, "package.json", config.src.app + "/**/*"],
+			}))
+			.pipe(insertVersion(package))
+			.pipe($.htmlMinifierTerser(htmlMinOption))
+			// Avoid VS Code Linter warnings
+			.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+			.pipe(ssg())
+			.pipe(gulp.dest(config.dest.dist))
+	);
+});

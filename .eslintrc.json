@@ -1,20 +1,23 @@
 {
-	"env": {
-		"browser": true,
-		"es2021": true,
-		"node": true
-	},
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended"
 	],
+	"globals": {
+		"globalThis": false
+	},
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
-		"ecmaVersion": 12
+		"ecmaVersion": "latest"
 	},
 	"plugins": [
-		"@typescript-eslint"
+		"@typescript-eslint",
+		"eslint-plugin-local-rules"
 	],
+	"env": {
+		"node": true,
+		"es2022": true
+	},
 	"rules": {
 		"@typescript-eslint/ban-ts-comment": "off",
 		"@typescript-eslint/ban-types": "off",
@@ -37,12 +40,6 @@
 			}
 		],
 		"@typescript-eslint/comma-spacing": "warn",
-		"@typescript-eslint/explicit-function-return-type": [
-			"warn",
-			{
-				"allowExpressions": true
-			}
-		],
 		"@typescript-eslint/func-call-spacing": [
 			"warn",
 			"never"
@@ -54,30 +51,8 @@
 				"SwitchCase": 1,
 				"flatTernaryExpressions": true,
 				"ignoredNodes": [
-					"ClassDeclaration" // 暫時沒有正解，參見 https://github.com/typescript-eslint/typescript-eslint/issues/1824
+					"ClassDeclaration" // There's no good solution for the moment. See https://github.com/typescript-eslint/typescript-eslint/issues/1824
 				]
-			}
-		],
-		"@typescript-eslint/keyword-spacing": [
-			"warn",
-			{
-				"overrides": {
-					"catch": {
-						"after": false
-					},
-					"for": {
-						"after": false
-					},
-					"if": {
-						"after": false
-					},
-					"switch": {
-						"after": false
-					},
-					"while": {
-						"after": false
-					}
-				}
 			}
 		],
 		"@typescript-eslint/member-delimiter-style": [
@@ -91,6 +66,12 @@
 		],
 		"@typescript-eslint/no-empty-function": "warn",
 		"@typescript-eslint/no-empty-interface": "off",
+		"@typescript-eslint/no-explicit-any": [
+			"warn",
+			{
+				"ignoreRestArgs": true
+			}
+		],
 		"@typescript-eslint/no-extra-parens": "warn",
 		"@typescript-eslint/no-inferrable-types": "off",
 		"@typescript-eslint/no-invalid-this": "error",
@@ -109,6 +90,7 @@
 				"ignoreArrayIndexes": true,
 				"ignoreDefaultValues": true,
 				"ignoreEnums": true,
+				"ignoreNumericLiteralTypes": true,
 				"ignoreReadonlyClassProperties": true
 			}
 		],
@@ -117,6 +99,16 @@
 		"@typescript-eslint/no-shadow": [
 			"warn"
 		],
+		"@typescript-eslint/no-this-alias": [
+			"warn",
+			{
+				"allowDestructuring": true,
+				"allowedNames": [
+					"cursor"
+				]
+			}
+		],
+		"@typescript-eslint/no-unused-expressions": "warn",
 		"@typescript-eslint/no-unused-vars": "off",
 		"@typescript-eslint/no-useless-constructor": [
 			"warn"
@@ -168,7 +160,7 @@
 		"brace-style": "off", // see ts
 		"camelcase": "off",
 		"capitalized-comments": "off",
-		"class-methods-use-this": "off", // 本意很好但例外實在太多，沒辦法開啟
+		"class-methods-use-this": "off", // The intention is good, but there're too many exceptions
 		"comma-dangle": "off", // see ts
 		"comma-spacing": "off", // see ts
 		"comma-style": "warn",
@@ -230,6 +222,8 @@
 		"linebreak-style": "warn",
 		"lines-around-comment": "off",
 		"lines-between-class-members": "off",
+		"local-rules/ascii-comments": "error",
+		"local-rules/single-line-control-statement-spacing": "warn",
 		"max-classes-per-file": "warn",
 		"max-depth": "warn",
 		"max-len": [
@@ -238,6 +232,7 @@
 				"code": 120,
 				"ignoreComments": true,
 				"ignoreStrings": true,
+				"ignoreTemplateLiterals": true,
 				"tabWidth": 4
 			}
 		],
@@ -248,7 +243,12 @@
 				"skipComments": true
 			}
 		],
-		"max-lines-per-function": "warn",
+		"max-lines-per-function": [
+			"warn",
+			{
+				"skipComments": true
+			}
+		],
 		"max-nested-callbacks": "warn",
 		"max-params": [
 			"warn",
@@ -274,6 +274,12 @@
 		"no-cond-assign": "off",
 		"no-confusing-arrow": "off",
 		"no-console": "off",
+		"no-constant-condition": [
+			"warn",
+			{
+				"checkLoops": false
+			}
+		],
 		"no-constructor-return": "warn",
 		"no-continue": "off",
 		"no-debugger": "off",
@@ -305,9 +311,9 @@
 		"no-label-var": "warn",
 		"no-labels": "error",
 		"no-lone-blocks": "warn",
-		"no-lonely-if": "warn",
+		"no-lonely-if": "off",
 		"no-loop-func": "off", // see ts
-		"no-loss-of-precision": "warn",
+		"no-loss-of-precision": "off",
 		"no-magic-numbers": "off", // see ts
 		"no-mixed-operators": "off",
 		"no-mixed-spaces-and-tabs": [
@@ -328,7 +334,7 @@
 		"no-octal-escape": "warn",
 		"no-param-reassign": "off",
 		"no-plusplus": "off",
-		"no-promise-executor-return": "warn",
+		"no-promise-executor-return": "off",
 		"no-proto": "warn",
 		"no-restricted-exports": "warn",
 		"no-restricted-globals": "warn",
@@ -387,19 +393,26 @@
 		"padded-blocks": "off",
 		"padding-line-between-statements": "warn",
 		"prefer-arrow-callback": "warn",
-		"prefer-const": "off",
+		"prefer-const": "warn",
 		"prefer-destructuring": "off",
 		"prefer-exponentiation-operator": "warn",
 		"prefer-named-capture-group": "off",
 		"prefer-numeric-literals": "warn",
 		"prefer-object-spread": "off",
-		"prefer-promise-reject-errors": "warn",
+		"prefer-promise-reject-errors": "off",
 		"prefer-regex-literals": "warn",
 		"prefer-rest-params": "warn",
 		"prefer-spread": "off",
 		"prefer-template": "off",
 		"quote-props": "off",
-		"quotes": "off",
+		"quotes": [
+			"warn",
+			"double",
+			{
+				"allowTemplateLiterals": true,
+				"avoidEscape": true
+			}
+		],
 		"radix": "off",
 		"require-atomic-updates": "warn",
 		"require-await": "warn",
@@ -435,6 +448,28 @@
 		],
 		"wrap-regex": "warn",
 		"yield-star-spacing": "warn",
-		"yoda": "warn"
-	}
+		"yoda": [
+			"warn",
+			"never",
+			{
+				"onlyEquality": true
+			}
+		]
+	},
+	"overrides": [
+		{
+			"files": [
+				"*.ts",
+				"*.vue"
+			],
+			"rules": {
+				"@typescript-eslint/explicit-function-return-type": [
+					"warn",
+					{
+						"allowExpressions": true
+					}
+				]
+			}
+		}
+	]
 }

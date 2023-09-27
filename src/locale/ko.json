@@ -1,6 +1,7 @@
 {
 	"name": "한국어",
 	"flag": "s_korea",
+	"emoji": "🇰🇷",
 	"since": 1187,
 	"welcome": {
 		"title": "Box Pleating Studio 에 오신 것을 환영합니다!",
@@ -21,7 +22,7 @@
 		"recent": "최근 사용",
 		"start": "시작",
 		"website": "BP Studio 웹사이트",
-		"discord": "BP Studio에 Discord 서버가 생겼습니다! \n{0}에서 우리와 함께 해주세요!"
+		"discord": "{0} 에 가입하세요!"
 	},
 	"toolbar": {
 		"file": {
@@ -79,11 +80,16 @@
 			"label": "라벨 표시",
 			"tip": "가지 팁 표시",
 			"dPad": "방향 패드 표시",
+			"status": "상태 표시줄 표시",
 			"preference": "기본 설정"
 		},
 		"tools": {
 			"title": "도구",
-			"TreeMaker": "TreeMaker 파일 가져오기"
+			"TreeMaker": "TreeMaker 파일 가져오기",
+			"CP": {
+				"_": "CP 파일 내보내기",
+				"reorient": "해당하는 경우 시트 방향 변경"
+			}
 		},
 		"help": {
 			"title": "도움",
@@ -112,6 +118,18 @@
 	},
 	"preference": {
 		"general": "일반적인",
+		"color": {
+			"_": "그림 물감",
+			"default": "기본",
+			"border": "경계선",
+			"grid": "격자선",
+			"hinge": "경첩 주름",
+			"ridge": "능선 주름",
+			"axisParallel": "축 평행 주름",
+			"overlap": "겹치는",
+			"tip": "가지 팁",
+			"label": "텍스트 라벨"
+		},
 		"hotkey": "단축키",
 		"command": "명령",
 		"language": "언어",
@@ -138,7 +156,13 @@
 			"layout": "레이아웃 보기",
 			"width": "너비",
 			"height": "높이",
-			"zoom": "줌"
+			"size": "크기",
+			"zoom": "줌",
+			"grid": {
+				"_": "유형",
+				"rect": "직사각형 그리드",
+				"diag": "대각선 그리드"
+			}
 		},
 		"flap": {
 			"type": "가지",
@@ -156,6 +180,9 @@
 			"type": "리버",
 			"width": "너비",
 			"goto": "가장자리로 이동"
+		},
+		"rivers": {
+			"type": "리버"
 		},
 		"vertex": {
 			"type": "꼭짓점",
@@ -183,6 +210,9 @@
 			"onlyOne": "하나의 패턴만 발견됩니다."
 		}
 	},
+	"status": {
+		"invalid": "잘못된 겹침"
+	},
 	"share": {
 		"title": "프로젝트 공유",
 		"copy": "복사",
@@ -197,7 +227,8 @@
 		"repo": "Github 저장소",
 		"donation": "BP Studio 는 완전 무료입니다. 이 앱이 디자인에 도움이 되었다고 생각하고 이 앱을 지원하는 데 관심이 있다면 {0} 에 얼마든지 기부할 수 있습니다.",
 		"visitBlog": "자세한 내용은 작성자의 {0} 도 참조하세요!",
-		"blog": "블로그"
+		"blog": "블로그",
+		"sponsor": "BP Studio 는 자랑스럽게 다음과 같은 후원을 받고 있습니다:"
 	},
 	"donate": {
 		"title": "Box Pleating Studio 지원",
@@ -212,6 +243,8 @@
 		"connFail": "인터넷 연결에 실패했습니다. 나중에 다시 시도해주세요.",
 		"downloadHint": "마우스 오른쪽 버튼을 클릭하고 \"다른 이름으로 저장\" 을 사용하여 파일 위치를 선택합니다.",
 		"filePermission": "보안상의 이유로 BP Studio 는 파일에 액세스할 수 있는 권한이 필요합니다. 각 파일에 대해 세션당 한 번만 권한을 부여하면 됩니다. 파일에 계속 액세스하시겠습니까?",
+		"fatal": "내부 오류가 발생하여 프로젝트를 더 이상 실행할 수 없습니다.",
+		"recover": "작업공간은 자동으로 복구되지만 오류는 지속될 가능성이 높습니다. \n문제 진단을 위해 오류 로그를 다운로드하여 작성자에게 보내십시오.",
 		"invalidFormat": "파일 \"{0}\" 의 형식이 잘못되었습니다.",
 		"invalidLink": "프로젝트 링크를 열 때 예기치 않은 오류가 발생했습니다. 데이터가 손상되었을 수 있습니다.",
 		"latest": "이미 최신 버전의 BP Studio 가 있습니다.",
@@ -219,7 +252,13 @@
 		"oldVersion": "프로젝트 \"{0}\" 은 이전 버전의 BP Studio 로 생성되었으며 일부 스트레치 패턴을 다시 선택해야 할 수 있습니다. 다음 저장 시 최신 형식으로 업데이트됩니다.",
 		"patternNotFound": "이 디자인에서 가지의 겹침 중 일부는 유효하지만 현재 BP Studio 는 작동하는 스트레치 패턴을 찾을 수 없습니다. 이 앱의 작성자는 더 많은 사례를 다루기 위해 더 많은 알고리즘을 계속 구현할 것입니다.",
 		"unsaved": "프로젝트 \"{0}\" 에 저장되지 않은 변경 사항이 있습니다. 변경사항을 취소하시겠습니까?",
-		"updateReady": "최신 버전의 BP Studio 가 준비되었으며 다시 시작할 때 자동으로 업데이트됩니다. 지금 다시 시작하시겠습니까?"
+		"updateReady": "최신 버전의 BP Studio 가 준비되었으며 다시 시작할 때 자동으로 업데이트됩니다. 지금 다시 시작하시겠습니까?",
+		"restartFail": "다시 시작할 수 없습니다. BP Studio 의 모든 인스턴스를 닫으십시오.",
+		"webGL": {
+			"title": "WebGL 초기화 실패",
+			"body": "BP Studio 를 실행하려면 WebGL이 필요하지만 WebGL 컨텍스트를 초기화할 수 없습니다. 브라우저의 설정을 확인하십시오."
+		},
+		"inApp": "인앱 브라우저를 사용하고 있는 것 같습니다. 다운로드가 작동하지 않을 수 있습니다."
 	},
 	"plugin": {
 		"TreeMaker": {
@@ -234,10 +273,15 @@
 		"ok": "좋아요",
 		"here": "여기",
 		"close": "닫기",
+		"export": "내보내기",
 		"delete": "삭제",
+		"discord": "BP Studio 디스코드 서버",
 		"version": "버전",
+		"filename": "파일 이름",
+		"download": "다운로드",
 		"homepage": "홈페이지",
 		"untitled": "무제",
+		"errorLog": "오류 로그 다운로드",
 		"workspace": "작업 공간"
 	}
 }

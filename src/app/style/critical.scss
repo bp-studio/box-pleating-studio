@@ -1,0 +1,26 @@
+/*********************************************
+ * We repeat the rules here for speeding up rendering
+ *********************************************/
+
+.fa-fw {
+	display: inline-block;
+	text-align: center;
+	width: 1.25em;
+}
+
+.fa-spin {
+	display: inline-block;
+
+	/* There's are additional */
+	animation: fa-spin 2s linear infinite;
+}
+
+@keyframes fa-spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(1turn);
+	}
+}

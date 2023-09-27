@@ -1,26 +1,19 @@
 {
-	"compileOnSave": true,
 	"compilerOptions": {
-		"target": "es2019",
-		"types": [], // 避免使用到 Node 版的 setTimeout
-		"lib": ["DOM", "ESNext"], // 做了上一則設置之後這個是必要的
-		"removeComments": true,
-		"strictNullChecks": true,
-		"noImplicitReturns": true,
-		"noImplicitAny": true,
-		"preserveConstEnums": true,
-		"experimentalDecorators": true,
-		"moduleResolution": "node",
+		"baseUrl": "..",
 		"isolatedModules": true,
-		"baseUrl": ".",
-		"paths": {
-			"bp/*": [
-				"./*"
-			]
-		},
+		"lib": [
+			"webworker",
+			"esnext"
+		],
+		"types": []
 	},
+	"extends": "../shared/tsconfig",
 	"include": [
 		"./**/*.ts",
-		"./**/*.d.ts"
+		"../shared/types/**/*.ts",
+		"../shared/json/**/*.ts",
+		"../shared/utils/**/*.ts",
+		"../shared/data/**/*.ts"
 	]
 }

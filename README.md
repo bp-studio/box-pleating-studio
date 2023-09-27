@@ -13,8 +13,6 @@
 
 > Super-complex origami design made easy!
 
-**NOTE: The next version of BP Studio is currently under heavy development, so you won't be seeing recent activities on the main branch. Check out the [DEV](https://github.com/bp-studio/box-pleating-studio/tree/DEV) branch for more details.**
-
 ## Introduction
 
 Box pleating is arguably the standard framework of modern super-complex origami designs,
@@ -28,12 +26,24 @@ For instruction, user manual and all other general info, pleas visit [BP Studio 
 
 ## Feedbacks are greatly appreciated!
 
-If you notice any bugs, or have any suggestions, feel free to drop an issue [here](https://github.com/bp-studio/box-pleating-studio/issues).\
-If you use BP Studio to create new designs, please share your work with us [here](https://github.com/bp-studio/box-pleating-studio/discussions).
-
-Also, please join our [Discord server](https://discord.gg/HkcdTDS4zZ) for all discussions!
+Our [Discord server](https://discord.gg/HkcdTDS4zZ) will be our main channel for all sorts of discussions,
+but of course you could also use GitHub [Issues](https://github.com/bp-studio/box-pleating-studio/issues)
+and [Discussions](https://github.com/bp-studio/box-pleating-studio/discussions) as well.
 
 ## For contributors
 
 If you would like to contribute, checkout our
-[Contributing Guidelines](https://github.com/MuTsunTsai/box-pleating-studio/blob/main/CONTRIBUTING.md) for more details.
+[Contributing Guidelines](CONTRIBUTING.md) for more details.
+
+## Acknowledgement
+
+The author would like to specially thank the following people/parties, in no particular ordering:
+- [Robert J. Lang](https://langorigami.com/) for his work that inspired the idea of GOPS,
+and for his continuing support and encouragement throughout these years.
+- [Lucas Tay Kiat Loong](https://cexplr.github.io/), for so eagerly volunteering to test BP Studio,
+helping catching many critical and subtle bugs, and providing many invaluable feedbacks.
+- [Jason S. Ku](https://github.com/origamimagiro), for his insights on the subject of computational geometry.
+- Mat Groves and [GoodBoyDigital](https://www.goodboydigital.com), for maintaining [PixiJS](https://pixijs.com/),
+the graphics engine that powers BP Studio.
+- [BrowserStack](https://www.browserstack.com/), for enrolling BP Studio into its Open Source Program.
+It would be financially impossible for BP Studio to perform compatibility tests without it.

@@ -1,0 +1,24 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": "..",
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable"
+		],
+		"types": [
+			"wicg-file-system-access"
+		],
+		"esModuleInterop": true,
+		"experimentalDecorators": true, // Esbuild doesn't support ECMA decorators yet
+		"module": "esnext",
+		"moduleResolution": "node",
+		"noImplicitOverride": true,
+		"removeComments": true,
+		"resolveJsonModule": true, // For resolving the type of `Locale`
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "es2018"
+	}
+}

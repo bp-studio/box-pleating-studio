@@ -1,0 +1,115 @@
+@font-face {
+	font-family: Flag;
+	src:
+		local("Twemoji Mozilla"),
+		local("Apple Color Emoji"),
+		/* Segoe UI Emoji (Windows) doesn't support color flags. */
+		local("Noto Color Emoji"),
+		local("EmojiOne Color"),
+		local("Android Emoji"),
+		/* fallback to font file if none of the above is found */
+		url("assets/flags/twemoji.woff2");
+
+	/* This is the full range of flags. */
+	unicode-range: U+1F1E6-1F1FF;
+}
+
+:root {
+	--bg-ui: #aaa;
+	--tab-border: gray;
+	--tab-active: #999;
+}
+
+* {
+	/* We handle incompatibility in app.vue */
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	touch-action: none;
+}
+
+html {
+	font-size: 9pt;
+}
+
+html,
+body {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	position: fixed;
+}
+
+kbd {
+	border-radius: 0.3rem;
+	color: black;
+	border: 1px solid #aaa;
+	background-color: #ddd;
+	padding: 0.1rem 0.2rem;
+	margin: 0.1rem;
+	line-height: 1;
+	display: inline-block;
+}
+
+ul {
+	margin-left: 0;
+}
+
+.flag {
+	font-family: Flag, sans-serif;
+}
+
+/*********************************************
+ * Mac
+ *********************************************/
+
+body:not(.mac) .mac-only {
+	display: none;
+}
+
+body.mac .not-mac {
+	display: none;
+}
+
+/*********************************************
+ * Disable long-press selecting
+ *********************************************/
+
+*:not(input, textarea, .requirement) {
+	user-select: none;
+}
+
+/*********************************************
+ * Setup form components
+ *********************************************/
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+	/* hide spinner in Chrome, Safari, Edge, Opera */
+	appearance: none;
+	display: none;
+}
+
+input {
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	touch-action: manipulation;
+
+	&[type="number"] {
+		/* hide spinner in Firefox */
+		appearance: textfield;
+	}
+
+	&:invalid {
+		outline: 2px solid red;
+	}
+}
+
+textarea {
+	// iOS Safari doesn't support resize at all,
+	// but that's exactly the desired behavior, so no need to worry.
+	// See https://caniuse.com/css-resize and https://stackoverflow.com/questions/8443209
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	resize: none;
+}
+
+::placeholder {
+	opacity: 0.5 !important;
+}
