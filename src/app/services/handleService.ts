@@ -73,10 +73,14 @@ namespace HandleService {
 	}
 
 	export async function removeRecent(handle: FileSystemFileHandle): Promise<void> {
-		const tasks = recent.map(e => e.isSameEntry(handle));
+		const tasks = recent.map(async e => await e.isSameEntry(handle) ? e : null);
+		// Be careful that the recent array might mutate during this await
 		const results = await Promise.all(tasks);
-		const i = results.indexOf(true);
-		if(i != -1) recent.splice(i, 1);
+		const entries = results.filter(e => e) as FileSystemFileHandle[];
+		for(const entry of entries) {
+			const index = recent.indexOf(entry);
+			if(index >= 0) recent.splice(index, 1);
+		}
 	}
 
 	export async function addRecent(handle: FileSystemFileHandle): Promise<void> {
