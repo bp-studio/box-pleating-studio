@@ -8,7 +8,7 @@ import type { JDesign } from "shared/json";
 //=================================================================
 /**
  * {@link DesignController} manages the creation of a design.
- * There's no need for disposing, as everything will be disposed with the worker.
+ * There's no need for destructing, as everything will be destructed with the worker.
  */
 //=================================================================
 export namespace DesignController {

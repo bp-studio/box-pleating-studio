@@ -57,7 +57,7 @@ export interface DestructibleEventMap {
 	[DESTRUCT]: DestructEvent;
 }
 
-/** Disposing Event */
+/** Destructing Event */
 class DestructEvent extends Event {
 	constructor() { super(DESTRUCT); }
 }
