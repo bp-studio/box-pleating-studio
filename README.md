@@ -38,11 +38,11 @@ If you would like to contribute, checkout our
 ## Acknowledgement
 
 The author would like to specially thank the following people/parties, in no particular ordering:
-- Robert J. Lang for his work that inspired the idea of GOPS,
+- [Robert J. Lang](https://langorigami.com/) for his work that inspired the idea of GOPS,
 and for his continuing support and encouragement throughout these years.
-- Lucas Tay Kiat Loong, for so eagerly volunteering to test BP Studio,
+- [Lucas Tay Kiat Loong](https://cexplr.github.io/), for so eagerly volunteering to test BP Studio,
 helping catching many critical and subtle bugs, and providing many invaluable feedbacks.
-- Jason S. Ku, for his insights on the subject of computational geometry.
+- [Jason S. Ku](https://github.com/origamimagiro), for his insights on the subject of computational geometry.
 - Mat Groves and [GoodBoyDigital](https://www.goodboydigital.com), for maintaining [PixiJS](https://pixijs.com/),
 the graphics engine that powers BP Studio.
 - [BrowserStack](https://www.browserstack.com/), for enrolling BP Studio into its Open Source Program.
