@@ -73,6 +73,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		return {
 			title: this.title,
 			mode: this.mode,
+			description: this.description,
 			layout: this.layout.toJSON(session),
 			tree: this.tree.toJSON(),
 		};
