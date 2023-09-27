@@ -36,28 +36,37 @@ function getCollisionOfLCA(lca: ITreeNode): void {
 	const l = children.length;
 	for(let i = 0; i < l; i++) {
 		const a = children[i];
-		for(let j = i + 1; j < l; j++) compare(a, children[j], lca);
+		const distChanged = ancestorChanged(a);
+		for(let j = i + 1; j < l; j++) {
+			const b = children[j];
+			compare(a, b, lca, distChanged || ancestorChanged(b));
+		}
 		if(State.$subtreeAABBChanged.has(a)) {
 			getCollisionOfLCA(getNontrivialDescendant(a));
 		}
 	}
 }
 
-function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
-	const d = dist(a, b, lca);
-	const distChanged = State.$distCache.get(a.id, b.id) !== d;
+/**
+ * Recursively compare two branches under a given LCA.
+ * @param distChanged Indicating that the distance have changed along one of the branches,
+ * in which case the comparison cannot be skipped and must carry on.
+ */
+function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode, distChanged: boolean): void {
 	// If both subtrees haven't changed, there's no need to re-compare.
 	if(!distChanged && !State.$subtreeAABBChanged.has(a) && !State.$subtreeAABBChanged.has(b)) return;
-	if(distChanged) State.$distCache.set(a.id, b.id, d);
 
 	// Test for collision
-	if(!a.$AABB.$intersects(b.$AABB, d)) {
+	if(!a.$AABB.$intersects(b.$AABB, dist(a, b, lca))) {
 		clearJunctions(a, b);
 		return;
 	}
 
-	a = getNontrivialDescendant(a);
-	b = getNontrivialDescendant(b);
+	const ctx: NontrivialDescendantContext = { distChanged };
+	a = getNontrivialDescendant(a, ctx);
+	b = getNontrivialDescendant(b, ctx);
+	distChanged = ctx.distChanged;
+
 	const n = a.$children.$size;
 	const m = b.$children.$size;
 	if(n === 0 && m === 0) {
@@ -66,16 +75,21 @@ function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode): void {
 	} else {
 		// Choose the one with fewer children, to minimize comparisons.
 		if(m === 0 || n !== 0 && n < m) {
-			for(const c of a.$children) compare(c, b, lca);
+			for(const c of a.$children) compare(c, b, lca, distChanged || ancestorChanged(c));
 		} else {
-			for(const c of b.$children) compare(a, c, lca);
+			for(const c of b.$children) compare(a, c, lca, distChanged || ancestorChanged(c));
 		}
 	}
 }
 
-function getNontrivialDescendant(node: ITreeNode): ITreeNode {
+interface NontrivialDescendantContext {
+	distChanged: boolean;
+}
+
+function getNontrivialDescendant(node: ITreeNode, ctx?: NontrivialDescendantContext): ITreeNode {
 	while(node.$children.$size === 1) {
 		node = node.$children.$get()!;
+		if(ctx) ctx.distChanged ||= ancestorChanged(node);
 	}
 	return node;
 }
@@ -90,4 +104,8 @@ function clearJunctions(a: ITreeNode, b: ITreeNode): void {
 			State.$junctions.delete(aLeaf.id, bLeaf.id);
 		}
 	}
+}
+
+function ancestorChanged(n: ITreeNode): boolean {
+	return State.$lengthChanged.has(n) || State.$parentChanged.has(n);
 }
