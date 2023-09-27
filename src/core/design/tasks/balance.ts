@@ -1,6 +1,6 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
-import { distanceTask } from "./distance";
+import { structureTask } from "./structure";
 
 import type { heightTask } from "./height";
 import type { TreeNode } from "../context/treeNode";
@@ -8,7 +8,7 @@ import type { Tree } from "../context/tree";
 
 //=================================================================
 /**
- * {@link balanceTask} updates {@link Tree.$root}.
+ * {@link balanceTask} updates {@link Tree.$root} .
  *
  * It depends on {@link heightTask} as it decides whether to re-balance
  * based on the height of each subtrees under the root.
@@ -21,14 +21,13 @@ import type { Tree } from "../context/tree";
  * choice of root changes after history navigation.
  */
 //=================================================================
-export const balanceTask = new Task<number>(balance, distanceTask);
+export const balanceTask = new Task<number>(balance, structureTask);
 
 function balance(): void {
 	const tree = State.$tree;
 	const oldRoot = tree.$root;
 	let newRoot = tryBalance(oldRoot);
 	while(newRoot) {
-		State.$parentChanged.add(tree.$root);
 		tree.$root = newRoot;
 		newRoot = tryBalance(tree.$root);
 	}

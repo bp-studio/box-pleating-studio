@@ -36,7 +36,7 @@ end
 subgraph Tree
 	h([node heights])
 	b(tree balancing)
-	d([node distances])
+	d([structure])
 	a([AABB hierarchy])
 end
 j(junctions)

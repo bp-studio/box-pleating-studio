@@ -1,4 +1,4 @@
-import { distanceTask } from "core/design/tasks/distance";
+import { structureTask } from "core/design/tasks/structure";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
@@ -60,7 +60,7 @@ export namespace TreeController {
 			tree.$setLength(getChildId(e), e.length);
 		}
 		setStretchPrototypes(stretches);
-		Processor.$run(distanceTask);
+		Processor.$run(structureTask);
 	}
 
 	export function join(id: number): void {

@@ -3,14 +3,14 @@ import { nodeComparator } from "../context/treeNode";
 import { getFirst } from "shared/utils/set";
 
 import type { ITreeNode } from "../context";
-import type { distanceTask } from "./distance";
+import type { structureTask } from "./structure";
 import type { heightTask } from "./height";
 
 /**
  * A subroutine for updating the tree bottom-up.
  *
  * In principle, all tasks that uses this subroutine should depend
- * on {@link distanceTask}, since it relies on the updated {@link TreeNode.$dist}
+ * on {@link structureTask}, since it relies on the updated {@link TreeNode.$dist}
  * to perform the sorting of nodes; but one exception is {@link heightTask},
  * which uses the {@link TreeNode.$dist} before updating instead.
  *

@@ -8,6 +8,7 @@ import type { clearPatternContourForRepo } from "../tasks/patternContour";
 import type { NodeSet } from "../layout/nodeSet";
 import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
+import type { junctionTask } from "../tasks/junction";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -46,10 +47,11 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	readonly $tag: string;
 	readonly $graphics: NodeGraphics;
 
+	/** Used in {@link junctionTask} to clear junctions quicker. */
+	readonly $leaves: readonly ITreeNode[];
+
 	/** Set the position by a given {@link JFlap} */
 	$setFlap(flap: JFlap): void;
-
-	$getLeaves(): Generator<ITreeNode>;
 }
 
 export interface PatternContour extends Array<Point> {

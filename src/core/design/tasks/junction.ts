@@ -94,13 +94,10 @@ function getNontrivialDescendant(node: ITreeNode, ctx?: NontrivialDescendantCont
 	return node;
 }
 
-/**
- * Clear all {@link Junction} between leaves under the two given nodes.
- */
+/** Clear all {@link Junction} between leaves under the two given nodes. */
 function clearJunctions(a: ITreeNode, b: ITreeNode): void {
-	// TODO: Improve this part
-	for(const aLeaf of a.$getLeaves()) {
-		for(const bLeaf of b.$getLeaves()) {
+	for(const aLeaf of a.$leaves) {
+		for(const bLeaf of b.$leaves) {
 			State.$junctions.delete(aLeaf.id, bLeaf.id);
 		}
 	}

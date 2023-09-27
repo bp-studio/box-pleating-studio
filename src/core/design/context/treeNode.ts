@@ -42,6 +42,8 @@ export class TreeNode implements ITreeNode {
 	/** All child nodes. Implemented using maximal heap. */
 	public $children = new MutableHeap<TreeNode>((a, b) => b.$height - a.$height);
 
+	public _leafList!: TreeNode[];
+
 	public readonly $graphics: NodeGraphics = {
 		$contours: [],
 		$patternContours: [],
@@ -73,11 +75,18 @@ export class TreeNode implements ITreeNode {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public *$getLeaves(): Generator<TreeNode> {
+	public get $leaves(): readonly TreeNode[] {
+		return this._leafList;
+	}
+
+	public $updateLeaves(): void {
 		if(this.$isLeaf) {
-			yield this;
+			this._leafList = [this];
 		} else {
-			for(const c of this.$children) yield* c.$getLeaves();
+			this._leafList = [];
+			for(const child of this.$children) {
+				this._leafList.push(...child._leafList);
+			}
 		}
 	}
 

@@ -3,18 +3,19 @@ import { Task } from "./task";
 import { AABBTask } from "./aabb";
 import { HeapSet } from "shared/data/heap/heapSet";
 import { nodeComparator } from "../context/treeNode";
+import { climb } from "./climb";
 
 import type { ITreeNode } from "../context";
 import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
- * {@link distanceTask} updates {@link TreeNode.$dist} after the tree re-balances.
+ * {@link structureTask} updates {@link TreeNode.$dist} and {@link TreeNode.$leaves} after the tree re-balances.
  */
 //=================================================================
-export const distanceTask = new Task(distance, AABBTask);
+export const structureTask = new Task(structure, AABBTask);
 
-function distance(): void {
+function structure(): void {
 	if(State.$rootChanged) {
 		// Perform a full update if the root changed.
 		updateDistRecursive(State.$tree.$root, 0);
@@ -29,6 +30,9 @@ function distance(): void {
 			for(const child of node.$children) heap.$insert(child);
 		}
 	}
+
+	// Updating leaf lists. This depends on the distance info.
+	climb(leafList, State.$childrenChanged);
 }
 
 function updateDistRecursive(node: TreeNode, v: number): void {
@@ -36,4 +40,9 @@ function updateDistRecursive(node: TreeNode, v: number): void {
 	for(const child of node.$children) {
 		updateDistRecursive(child, v + child.$length);
 	}
+}
+
+function leafList(node: ITreeNode): boolean {
+	(node as TreeNode).$updateLeaves();
+	return true;
 }
