@@ -46,7 +46,8 @@
 					</div>
 					<Opener @open="Import.open($event, false)" multiple class="quick-item">
 						<i class="bp-folder-open fa-fw me-2" />
-						<span v-t="'toolbar.file.open'" />
+						<!-- v-t directive doesn't work here for some reason -->
+						<span>{{ $t('toolbar.file.open') }}</span>
 					</Opener>
 				</div>
 				<div class="col-12 col-sm-6 col-lg-5 col-xl-4 recent">
