@@ -78,10 +78,11 @@ namespace ImportService {
 			gtag("event", "project_open");
 			const ids = Workspace.ids.value;
 			Workspace.select(ids[ids.length - 1]);
+
+			// Hide the spinner after the rendering is completed
+			await nextTick();
 		}
 
-		// Hide the spinner after the rendering is completed
-		await nextTick();
 		Dialogs.loader.hide();
 	}
 
