@@ -85,6 +85,6 @@ errMgr.end();
 if(errMgr.ok()) init();
 
 export { isTouch } from "app/shared/constants";
-export { isDark } from "app/misc/isDark";
+export { isPrinting, isDark } from "app/misc/isDark";
 export { callWorker } from "app/utils/workerUtility";
 export { default as settings } from "app/services/settingService";
