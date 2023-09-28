@@ -146,6 +146,16 @@ html.dark {
 			opacity: 0.4;
 		}
 	}
+
+	@media print {
+		& {
+			color-scheme: light;
+		}
+
+		body {
+			background-color: unset;
+		}
+	}
 }
 
 html:not(.dark) {

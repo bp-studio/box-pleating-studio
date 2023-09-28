@@ -187,11 +187,10 @@
 		Import.open(handles);
 	}
 
-	function print(): void {
-		const PRINT_DELAY = 500;
+	async function print(): Promise<void> {
 		if(!Studio.project) return;
-		Studio.beforePrint();
-		setTimeout(window.print, PRINT_DELAY);
+		await Studio.beforePrint();
+		window.print();
 		gtag("event", "print", {});
 	}
 

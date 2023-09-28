@@ -1,6 +1,7 @@
 import ProjectService from "client/services/projectService";
 import { svg } from "client/svg";
 import { display } from "./display";
+import { isPrinting } from "app/misc/isDark";
 
 import type { Project } from "client/project/project";
 
@@ -23,10 +24,12 @@ let debounce: Timeout;
 window.addEventListener("beforeprint", () => beforePrint(ProjectService.project.value));
 window.addEventListener("afterprint", afterPrint);
 
-export function beforePrint(proj: Project | null): void {
+export async function beforePrint(proj: Project | null): Promise<void> {
+	if(!proj) proj = ProjectService.project.value;
 	if(!proj) return;
 	clearTimeout(debounce);
 	const img = display.scrollView.$img;
+
 	if(!printing &&
 		// Resetting printing format on mobile devices will
 		// trigger beforePrint again, but we can use the
@@ -41,8 +44,15 @@ export function beforePrint(proj: Project | null): void {
 		// printing service on mobile devices.
 		setTimeout(() => URL.revokeObjectURL(old), GC_TIME);
 
-		img.src = URL.createObjectURL(svg(proj, false));
+		isPrinting.value = true;
+		const promise = new Promise((resolve, reject) => {
+			img.onload = resolve;
+			img.onerror = reject;
+			img.src = URL.createObjectURL(svg(proj!, false));
+		});
+		isPrinting.value = false;
 		printing = true;
+		await promise;
 	}
 }
 

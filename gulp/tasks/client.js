@@ -16,7 +16,11 @@ const extra = [
 const exgConfig = {
 	"vue": {
 		varName: "Vue",
-		namedExports: ["shallowRef", "watchEffect", "watch", "computed", "shallowReactive", "readonly", "nextTick", "effectScope"],
+		namedExports: [
+			"shallowRef", "watchEffect", "watch", "computed", "shallowReactive", "readonly", "nextTick", "effectScope",
+			"createVNode", "Text", "ref", "getCurrentInstance", "Fragment", "defineComponent", "h", "inject",
+			"onMounted", "onUnmounted", "onBeforeMount", "isRef", "reactive",
+		],
 		defaultExport: false,
 	},
 	"@pixi/core": {
