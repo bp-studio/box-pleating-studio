@@ -29,13 +29,21 @@ export class BaseJoinLogic extends JoinLogic {
 	public *$join(): Generator<JoinResult> {
 		if(!this.data) return;
 		const { D1, D2, B1, B2 } = this._baseJoinIntersections();
+		const { j1, j2, f } = this;
 
 		if(B1?.$isIntegral && D2?.$isIntegral && !B1.eq(D2)) {
+			// If the two gadgets are pointing inwards instead of outwards,
+			// there's no obtuse join (at least there's no such transformation so far).
+			// TODO: Think about this more deeply.
+			if(D2.x * f > B1.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
+
 			if(!this._setupAnchor(D2)) return;
 			this._setupDetour([B1], [D2, B1]);
 			yield this._result(true);
 		}
 		if(B2?.$isIntegral && D1?.$isIntegral && !B2.eq(D1)) {
+			if(D1.x * f > B2.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
+
 			if(!this._setupAnchor(D1)) return;
 			this._setupDetour([D1, B2], [B2]);
 			yield this._result();
