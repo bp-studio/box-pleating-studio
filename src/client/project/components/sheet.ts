@@ -139,8 +139,9 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		const oldValue = this._type;
 		if(v == oldValue) return;
 		const history = this.$project.history;
+		const locked = history.$isLocked;
 		let grid: Grid;
-		if(history.$isLocked) {
+		if(locked) {
 			const prototype = this.$project.design.$prototype[this.$tag].sheet;
 			grid = createGrid(this, v, prototype.width, prototype.height);
 		} else {
@@ -153,8 +154,10 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this.$project.$onUpdate(() => {
 			this._grid = grid;
 			this._type = v;
-			history.$construct(this._toMemento());
-			history.$fieldChange(this, "type", oldValue, v);
+			if(!locked) {
+				history.$construct(this._toMemento());
+				history.$fieldChange(this, "type", oldValue, v);
+			}
 		});
 	}
 
