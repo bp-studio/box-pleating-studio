@@ -126,9 +126,11 @@ export class VertexContainer implements Iterable<Vertex> {
 
 	public async $join(vertex: Vertex): Promise<void> {
 		this._tree.$project.history.$cacheSelection();
-		SelectionController.clear();
 		const [v1, v2] = Array.from(this._tree.$edges.get(vertex.id)!.keys());
-		this._tree.$updateCallback = () => SelectionController.$toggle(this._tree.$edges.get(v1, v2)!, true);
+		this._tree.$updateCallback = () => {
+			SelectionController.clear();
+			SelectionController.$toggle(this._tree.$edges.get(v1, v2)!, true);
+		};
 		await this._tree.$project.$core.tree.join(vertex.id);
 	}
 

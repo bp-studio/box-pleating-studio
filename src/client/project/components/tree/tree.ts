@@ -87,7 +87,6 @@ export class Tree implements ISerializable<JTree> {
 
 	public $split(edge: Edge): Promise<void> {
 		this.$project.history.$cacheSelection();
-		SelectionController.clear();
 		const id = this.$vertices.$nextAvailableId;
 		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
 		this.$project.design.$prototype.tree.nodes.push({
@@ -97,13 +96,15 @@ export class Tree implements ISerializable<JTree> {
 			y: Math.round((l1.y + l2.y) / 2),
 			isNew: true,
 		});
-		this.$updateCallback = () => SelectionController.$toggle(this.$vertices.$get(id)!, true);
+		this.$updateCallback = () => {
+			SelectionController.clear();
+			SelectionController.$toggle(this.$vertices.$get(id)!, true);
+		};
 		return this.$project.$core.tree.split(edge.toJSON(), id);
 	}
 
 	public $merge(edge: Edge): Promise<void> {
 		this.$project.history.$cacheSelection();
-		SelectionController.clear();
 		const v1 = edge.$v1.id, v2 = edge.$v2.id;
 		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
 		const x = Math.round((l1.x + l2.x) / 2);
@@ -113,6 +114,7 @@ export class Tree implements ISerializable<JTree> {
 			const v = this.$vertices.$get(v1) || this.$vertices.$get(v2)!;
 			this.$project.history.$move(v, { x, y });
 			v.$location = { x, y };
+			SelectionController.clear();
 			if(this.$project.design.mode == "tree") SelectionController.$toggle(v, true);
 		};
 		return this.$project.$core.tree.merge(edge.toJSON());
