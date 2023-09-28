@@ -50,6 +50,8 @@ export function initPayPalButton(init: (action: PayPal.OnInitActions) => void, s
 			shape: "pill",
 			label: "paypal",
 			layout: "horizontal",
+			// tagline color currently doesn't work with dark mode
+			tagline: !matchMedia("(prefers-color-scheme: dark)").matches,
 		},
 		onInit(data: Record<string, unknown>, actions: PayPal.OnInitActions) {
 			init(actions);

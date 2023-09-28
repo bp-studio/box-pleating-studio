@@ -1,5 +1,5 @@
 <template>
-	<div class="container h-100">
+	<div class="container h-100" style="max-width: 750px;">
 		<div class="h-100 d-flex flex-column">
 			<div class="flex-grow-1" v-if="step == 1">
 				<div class="h4" v-t="'donate.title'"></div>
@@ -58,7 +58,7 @@
 
 	function amountChange(): void {
 		if(!actions) return;
-		if(error.value = Boolean(amount.value)) actions.disable();
+		if(error.value = !amount.value) actions.disable();
 		else actions.enable();
 	}
 
