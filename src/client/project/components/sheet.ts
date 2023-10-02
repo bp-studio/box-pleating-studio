@@ -103,7 +103,10 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._onDestruct(() => {
 			this.$horizontalMargin.effect.stop();
 			this.$imageDimension.effect.stop();
-			this._grid = null!; // GC
+
+			// GC
+			this._grid.$destruct();
+			this._grid = null!;
 		});
 	}
 

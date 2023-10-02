@@ -1,3 +1,5 @@
+import { Destructible } from "client/base/destructible";
+
 import type { ITagObject } from "client/shared/interface";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path } from "shared/types/geometry";
@@ -12,7 +14,7 @@ import type { Project } from "client/project/project";
  */
 //=================================================================
 
-export abstract class Grid implements ISerializable<JSheet>, ITagObject {
+export abstract class Grid extends Destructible implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $tag: string;
 	public readonly $project: Project;
@@ -23,6 +25,7 @@ export abstract class Grid implements ISerializable<JSheet>, ITagObject {
 	protected readonly _sheet: Sheet;
 
 	constructor(sheet: Sheet, type: GridType) {
+		super();
 		this._sheet = sheet;
 		this.$project = sheet.$project;
 		this.$tag = sheet.$tag + ".g";

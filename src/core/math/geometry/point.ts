@@ -67,7 +67,7 @@ export class Point extends Couple implements IPoint {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG==true
+	///#if DEBUG
 
 	public static $parseTest(p: unknown): Point {
 		if(typeof p != "string") throw new Error("Incorrect type");

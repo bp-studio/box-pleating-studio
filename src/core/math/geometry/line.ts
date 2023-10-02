@@ -271,7 +271,7 @@ export class Line {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG==true
+	///#if DEBUG
 
 	public static $parseTest<T extends Line = Line>(jsons: Record<string, unknown>[]): T[] {
 		return jsons.map(j => {

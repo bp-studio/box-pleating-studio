@@ -132,7 +132,7 @@ export class Trace {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG==true
+	///#if DEBUG
 	public createTestCase(hinges: Path, start: Point, end: Point): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;

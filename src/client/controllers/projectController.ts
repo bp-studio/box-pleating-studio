@@ -21,16 +21,16 @@ export interface IProjectController {
 	close(proj: Project): void;
 }
 
+///#if DEBUG
 /**
  * For debugging memory leaks. When in debug mode,
  * it prints a message in the console after the {@link Project} has been garbage collected.
  * If the message fails to appear after closing the project and hitting the GC button,
  * we will then have to figure out what is keeping the reference of the project.
  */
-let registry: FinalizationRegistry<number>;
-if(DEBUG_ENABLED) {
-	registry = new FinalizationRegistry(id => console.log(`Project #${id} GC.`));
-}
+// eslint-disable-next-line compat/compat
+const registry = new FinalizationRegistry<number>(id => console.log(`Project #${id} GC.`));
+///#endif
 
 //=================================================================
 /**
@@ -102,8 +102,10 @@ export namespace ProjectController {
 
 	function makeProject(json: RecursivePartial<JProject>): Promise<Project> {
 		const p = new Project(json, getOrCreateWorker());
+		///#if DEBUG
 		// eslint-disable-next-line typescript-compat/compat
-		if(DEBUG_ENABLED) registry.register(p, p.id);
+		registry.register(p, p.id);
+		///#endif
 		projectMap.set(p.id, p);
 		return p.$initialize();
 	}
