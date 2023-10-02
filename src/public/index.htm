@@ -183,11 +183,6 @@
 
 	<!-- Written in ES3 for maximal compatibility, so `var` instead of `let`, etc. -->
 	<script>
-		// Register service worker
-		if(location.protocol == 'https:' && 'serviceWorker' in navigator) {
-			navigator.serviceWorker.register('sw.js');
-		}
-
 		/** Launching Error Manager */
 		var errMgr = new (function() {
 			var self = this;
@@ -227,6 +222,12 @@
 					resErr = error;
 					setTimeout(self.callback, 0);
 				}
+			}
+
+			// Register service worker
+			if(location.protocol == 'https:') {
+				if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+				else setRunErr("Service worker is required in BP Studio, but is not supported in your browser.")
 			}
 
 			self.setRunErr = setRunErr;
@@ -336,6 +337,11 @@
 			};
 			window.onunhandledrejection = function(e) {
 				e = e.reason || "Unknown error";
+				if(e.toString().match(/globalThis/)) {
+					// There seems to be a bug in iOS 12 that triggers this error out of nowhere,
+					// and looks like it is safe to ignore it as the the app works fine regardlessly.
+					return;
+				}
 				setRunErr(stack(e));
 			}
 
@@ -420,8 +426,8 @@
 						Safari &ge; 11.1 (or 11.3 for iOS), or Samsung Internet &ge; 9.2.<br>
 						Other browsers (especially those that are Chromium-based) might also work,
 						but are not officially supported and there's no guarantee that all functionality will operate.<br>
-						If you haven't done so, please upgrade your browser (note that upgrading Safari requires upgrading the
-						system)
+						If you haven't done so, please upgrade your browser
+						(note that upgrading Safari requires upgrading the system)
 						or use the latest version of Chrome, which is the recommended browser.<br>
 						It is also known that earlier versions of Windows 7 may cause issues with SSL certificates.
 						Please try updating Windows if the website is marked "insecure".

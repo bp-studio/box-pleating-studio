@@ -1,15 +1,10 @@
 const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const esbuildIfdef = require("esbuild-ifdef").default;
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
-const { target, extra: ext, sourceMap } = require("../utils/esbuild");
+const { target, extra: ext, sourceMap, ifdef } = require("../utils/esbuild");
 const extra = [__filename, ext, config.src.core + "/**/*", config.src.shared + "/**/*"];
-
-function ifdef(debug) {
-	return esbuildIfdef({ variables: { DEBUG: debug } });
-}
 
 function esb(options) {
 	return $.esbuild(Object.assign({}, {

@@ -4,7 +4,7 @@ const gulp = require("gulp");
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
-const { target, extra: ext, sourceMap } = require("../utils/esbuild");
+const { target, extra: ext, sourceMap, ifdef } = require("../utils/esbuild");
 const extra = [
 	__filename,
 	ext,
@@ -56,7 +56,7 @@ const exgConfig = {
 	},
 };
 
-function esb(options) {
+function esb(options, debug) {
 	return $.esbuild(Object.assign({}, {
 		outfile: "client.js",
 		bundle: true,
@@ -64,7 +64,7 @@ function esb(options) {
 		target,
 		treeShaking: true,
 		tsconfig: config.src.client + "/tsconfig.json",
-		plugins: [exg(exgConfig)],
+		plugins: [exg(exgConfig), ifdef(debug)],
 	}, options || {}));
 }
 
@@ -86,7 +86,7 @@ gulp.task("clientDebug", () =>
 			// Breakpoints setup within VS Code will still work.
 			sourcesContent: true,
 			sourceRoot: "../../",
-		}))
+		}, true))
 		.pipe(sourceMap())
 		.pipe(gulp.dest(config.dest.debug, { sourcemaps: "." }))
 );
@@ -106,7 +106,7 @@ gulp.task("clientDist", () =>
 			mangleProps: /^[$_]/,
 			// These three exceptions are the private variables that PIXI will internally referred to by strings.
 			reserveProps: /^_(view|plugin|multisample)/,
-		}))
+		}, false))
 		.pipe(gulp.dest(config.dest.dist))
 );
 
