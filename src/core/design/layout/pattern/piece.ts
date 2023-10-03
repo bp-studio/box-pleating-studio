@@ -5,7 +5,7 @@ import { Line } from "core/math/geometry/line";
 import { cache, clearCache } from "core/utils/cache";
 import { nonEnumerable } from "shared/utils/nonEnumerable";
 import { toLines } from "core/math/geometry/rationalPath";
-import { clone } from "shared/utils/clone";
+import { deduplicate } from "core/math/geometry/path";
 
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
@@ -84,17 +84,11 @@ export class Piece extends Region implements JPiece {
 	/**
 	 * Add a {@link Piece.detour}. Resets all cached values.
 	 *
-	 * The added detour will be cloned.
 	 * Its coordinates should not incorporate the offset.
 	 */
 	public $addDetour(detour: Path): void {
-		detour = clone(detour);
 		// Precondition check
-		for(let i = 0; i < detour.length - 1; i++) {
-			if(detour[i].x == detour[i + 1].x && detour[i].y == detour[i + 1].y) {
-				detour.splice(i--, 1);
-			}
-		}
+		detour = deduplicate(detour);
 		if(detour.length == 1) return;
 
 		// Add the detour for real
@@ -134,7 +128,11 @@ export class Piece extends Region implements JPiece {
 	@cache public get $shape(): IRegionShape {
 		const contour = this._points.concat();
 		const ridges = toLines(contour);
-		(this.detours || []).forEach(d => this._processDetour(ridges, contour, d));
+		if(this.detours) {
+			for(const detour of this.detours) {
+				this._processDetour(ridges, contour, detour);
+			}
+		}
 		return { contour, ridges };
 	}
 
@@ -166,7 +164,7 @@ export class Piece extends Region implements JPiece {
 	}
 
 	private _processDetour(ridges: Line[], contour: RationalPath, _detour: Path): void {
-		const detour = _detour.map(p => new Point(p.x, p.y).addBy(this._shift));
+		const detour = _detour.map(p => new Point(p).addBy(this._shift));
 		const start = detour[0], end = detour[detour.length - 1];
 
 		const lines: Line[] = [];

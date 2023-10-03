@@ -41,7 +41,7 @@ const EXTRA_SIZE_WEIGHT = 10;
 //=================================================================
 /**
  * {@link JoinLogic} handles the core calculation for joining two given
- * {@link Gadget}s into one {@link Device}.
+ * {@link Piece}s into one {@link JDevice}.
  */
 //=================================================================
 
@@ -106,9 +106,9 @@ export abstract class JoinLogic {
 	 */
 	protected _setupDetour(dt1: RationalPath, dt2: RationalPath): void {
 		const { j1, j2 } = this;
-		const shouldReverse2 = this.joiner.$isClockwise;
-		j1.$setupDetour(dt1, !shouldReverse2);
-		j2.$setupDetour(dt2, shouldReverse2);
+		const shouldReverse = this.joiner.$isClockwise;
+		j1.$setupDetour(dt1, !shouldReverse);
+		j2.$setupDetour(dt2, shouldReverse);
 	}
 
 	/**
@@ -127,17 +127,20 @@ export abstract class JoinLogic {
 		return true;
 	}
 
-	/** Generated {@link JoinResult}. */
-	protected _result(json?: boolean, extraSize?: number): JoinResult {
+	/**
+	 * Generated {@link JoinResult}.
+	 * @param shouldClone Whether the piece should be cloned.
+	 */
+	protected _result(shouldClone: boolean = false, extraSize: number = 0): JoinResult {
 		const { offset, size, addOns } = this.data;
 		const { j1, j2 } = this;
 		this.data.addOns = undefined;
 		return [
 			{
-				gadgets: [j1.$toGadget(json), j2.$toGadget(json, offset)],
+				gadgets: [j1.$toGadget(shouldClone), j2.$toGadget(shouldClone, offset)],
 				addOns,
 			},
-			size + (extraSize ?? 0) * EXTRA_SIZE_WEIGHT,
+			size + extraSize * EXTRA_SIZE_WEIGHT,
 		];
 	}
 }

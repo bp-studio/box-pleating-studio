@@ -7,7 +7,7 @@ import { SimpleJoinLogic } from "./logic/simpleJoinLogic";
 import { BaseJoinLogic } from "./logic/baseJoinLogic";
 import { StandardJoinLogic } from "./logic/standardJoinLogic";
 
-import type { JoinLogic } from "./logic/joinLogic";
+import type { JoinLogic, JoinResult } from "./logic/joinLogic";
 import type { Repository } from "../repository";
 import type { JOverlap, JDevice, JJunction, JPiece } from "shared/json";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -114,7 +114,7 @@ export class Joiner {
 		precondition?: (P1: Piece, P2: Piece) => boolean
 	): Generator<JDevice> {
 		const { g1, g2 } = this;
-		const result: [JDevice, number][] = [];
+		const result: JoinResult[] = [];
 		if(!g1) return;
 		for(const p1 of g1) {
 			for(const p2 of g2) {

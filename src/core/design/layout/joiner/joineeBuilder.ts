@@ -16,36 +16,36 @@ import type { JAnchor } from "shared/json";
 
 export class JoineeBuilder {
 
-	public a: JAnchor[] = [];
-	private offset: IPoint = { x: 0, y: 0 };
+	private readonly _anchors: JAnchor[] = [];
+	private _offset: IPoint = { x: 0, y: 0 };
 	private _additionalOffset?: Vector;
 
 	constructor(
 		private readonly p: Piece,
 		private readonly q: QuadrantDirection,
-		private readonly joiner: Joiner
+		private readonly _joiner: Joiner
 	) {}
 
 	/**
 	 * This is the most complicated part of constructing a {@link Joinee}.
 	 */
 	public $setup(that: JoineeBuilder, f: Sign, shift: IPoint): number {
-		const int = this.joiner.$getRelayJoinIntersection(that.p, shift, opposite(this.q));
+		const int = this._joiner.$getRelayJoinIntersection(that.p, shift, opposite(this.q));
 		if(!int || !int.$isIntegral) return NaN;
 
 		let offset: IPoint;
-		if(this.joiner.$oriented) {
-			this.offset = offset = int.$toIPoint();
+		if(this._joiner.$oriented) {
+			this._offset = offset = int.$toIPoint();
 			this.p.$offset(offset);
-			this.a[this.joiner.q] = {
+			this._anchors[this._joiner.q] = {
 				location: { x: -offset.x, y: -offset.y },
 			};
 			return offset.x;
 		} else {
 			const target = f == 1 ? that : this;
-			target.offset = offset = { x: f * (that.p.sx - int.x), y: f * (that.p.sy - int.y) };
+			target._offset = offset = { x: f * (that.p.sx - int.x), y: f * (that.p.sy - int.y) };
 			target.p.$offset(offset);
-			this.a[this.joiner.q] = {
+			this._anchors[this._joiner.q] = {
 				location: { x: this.p.sx + f * offset.x, y: this.p.sy + f * offset.y },
 			};
 			return f * offset.x;
@@ -57,18 +57,18 @@ export class JoineeBuilder {
 	}
 
 	public get $anchor(): Point {
-		let a = this.p.$anchors[this.joiner.q]!;
+		let a = this.p.$anchors[this._joiner.q]!;
 		if(this._additionalOffset) a = a.$add(this._additionalOffset);
 		return a;
 	}
 
 	public get $jAnchor(): Point {
-		return new Point(this.a[this.joiner.q].location!);
+		return new Point(this._anchors[this._joiner.q].location!);
 	}
 
 	public $build(pt: Point): Joinee {
 		return new Joinee(
-			this.p, this.offset, this.a, pt, this.q, this._additionalOffset
+			this.p, this._offset, this._anchors, pt, this.q, this._additionalOffset
 		);
 	}
 }
