@@ -15,6 +15,14 @@ export const isFileApiEnabled = typeof window.showSaveFilePicker != "undefined";
  */
 export const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
+export const isIOS = (/iPad|iPhone|iPod/).test(navigator.userAgent);
+if(isIOS) {
+	// Prevent zooming on input on iOS. See https://stackoverflow.com/a/57527009/9953396
+	const el = document.querySelector("meta[name=viewport]")!;
+	const content = el.getAttribute("content")!;
+	el.setAttribute("content", content.replace(/5(\.0)?/, "1.0"));
+}
+
 /**
  * Determine whether the current environment is a desktop version of Mac.
  * Used for displaying Mac-style keyboard symbols.

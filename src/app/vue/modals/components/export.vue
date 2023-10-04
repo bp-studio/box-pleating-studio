@@ -95,7 +95,7 @@
 					accept: {
 						[props.mime]: [props.extension],
 					},
-				}],
+				} as FilePickerAcceptType],
 			},
 			() => props.blob()
 		);

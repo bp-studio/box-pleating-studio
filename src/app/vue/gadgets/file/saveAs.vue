@@ -34,7 +34,7 @@
 					accept: {
 						[props.mime!]: ["." + props.type],
 					},
-				}],
+				} as FilePickerAcceptType],
 			},
 			() => Export.getBlob(props.type!, proj),
 			handle => {
