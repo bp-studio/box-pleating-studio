@@ -14,7 +14,7 @@ type CheckCallback = (result: PathEx[]) => RoughContour[] | undefined;
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
 export function expand(inputs: readonly RoughContour[], units: number, check?: CheckCallback): RoughContour[] {
-	const union = aaUnion.$get(...inputs.map(c => [c.$outer]));
+	const union = aaUnion.$get(...inputs.map(c => c.$outer));
 	const expandedPolygons: PathEx[][] = union.map(path => [expandPath(path, units)]);
 
 	const result = expander.$get(...expandedPolygons).map(simplify);
@@ -48,13 +48,13 @@ export function expand(inputs: readonly RoughContour[], units: number, check?: C
 			contours.push({ $outer: [], $inner: inner, $leaves: [] });
 		} else {
 			const leaves = inner.flatMap(p => p.from!).flatMap(i => inputs[i].$leaves);
-			contours.push({ $outer: path, $inner: inner, $leaves: leaves });
+			contours.push({ $outer: [path], $inner: inner, $leaves: leaves });
 		}
 	}
 
 	// Decide where the newly created holes should go
 	for(const path of newHoles) {
-		const contour = contours.find(c => isInside(path[0], c.$outer));
+		const contour = contours.find(c => c.$outer.some(o => isInside(path[0], o)));
 		if(contour) (contour.$inner ||= []).push(path);
 	}
 
@@ -75,7 +75,7 @@ export function expand(inputs: readonly RoughContour[], units: number, check?: C
  * if the point with the smallest x value shifts towards the right,
  * then then path is a hole.
  */
-function expandPath(path: PathEx, units: number): PathEx {
+export function expandPath(path: PathEx, units: number): PathEx {
 	const l = path.length;
 	const result: PathEx = [];
 	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;

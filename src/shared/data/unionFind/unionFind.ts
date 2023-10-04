@@ -28,13 +28,23 @@ export class UnionFind<T> {
 		this._size = createArray(size, 1);
 	}
 
+	/** Add a single element as its own set. */
+	public $add(element: T): number {
+		let index = this._map.get(element);
+		if(index !== undefined) return index;
+		index = this._length++;
+		this._map.set(element, index);
+		this._element[index] = element;
+		return index;
+	}
+
 	/**
 	 * Signal that the two elements are in the same set.
 	 * The elements will be added to the list when in need.
 	 */
 	public $union(a: T, b: T): void {
-		const i = this._findRecursive(this._add(a));
-		const j = this._findRecursive(this._add(b));
+		const i = this._findRecursive(this.$add(a));
+		const j = this._findRecursive(this.$add(b));
 		if(i === j) return; // Already in the same set
 		if(this._size[i] < this._size[j]) this._pointTo(i, j);
 		else this._pointTo(j, i);
@@ -52,15 +62,6 @@ export class UnionFind<T> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _add(element: T): number {
-		let index = this._map.get(element);
-		if(index !== undefined) return index;
-		index = this._length++;
-		this._map.set(element, index);
-		this._element[index] = element;
-		return index;
-	}
 
 	private _findRecursive(cursor: number): number {
 		const parent = this._parent[cursor];

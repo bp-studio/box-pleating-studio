@@ -7,9 +7,11 @@ import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { isInside } from "core/math/geometry/winding";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 
+import type { HingeSegment } from "../layout/trace/hingeSegment";
+import type { Quadrant } from "../layout/pattern/quadrant";
 import type { QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../layout/repository";
-import type { NodeGraphics } from "../context";
+import type { ITreeNode, NodeGraphics } from "../context";
 import type { Point } from "core/math/geometry/point";
 
 //=================================================================
@@ -50,35 +52,55 @@ function processRepo(repo: Repository, trace: Trace): void {
 	for(const [node, coveredQuadrants] of coverageMap.entries()) {
 		const multiContour = node.$graphics.$roughContours.length > 1;
 		for(const [index, roughContour] of node.$graphics.$roughContours.entries()) {
-			// Create start/end map
-			const outer = roughContour.$outer;
-			const isHole = Boolean(outer.isHole);
-			const startEndMap = {} as Record<QuadrantDirection, [Point, Point]>;
+			for(const outer of roughContour.$outer) {
+				// Create start/end map
+				const isHole = Boolean(outer.isHole);
+				const quadrants = coveredQuadrants
+					// Make sure that the current path actually wraps around the quadrant
+					.filter(q => !multiContour || isInside(q.$point, outer) != isHole);
+				const map = createStartEndMap(quadrants, repo, trace);
 
-			const quadrants = coveredQuadrants
-				// Make sure that the current path actually wraps around the quadrant
-				.filter(q => !multiContour || isInside(q.$point, outer) != isHole);
-			for(let q = 0; q < quadrantNumber; q++) {
-				const filtered = quadrants.filter(quadrant => quadrant.q == q);
-				if(!filtered.length) continue;
-				startEndMap[q as QuadrantDirection] =
-					trace.$resolveStartEnd(filtered, repo.$directionalQuadrants[q]);
-			}
-
-			const hingeSegments = createHingeSegments(outer, repo.$direction);
-			for(const hingeSegment of hingeSegments) {
-				const map = startEndMap[hingeSegment.q];
-				if(!map) continue;
-				const contour = trace.$generate(hingeSegment, map[0], map[1]);
-				if(contour) {
-					State.$contourWillChange.add(node);
-					contour.$ids = repo.$nodeSet.$nodes;
-					contour.$repo = repo.$signature;
-					contour.$for = index;
-					node.$graphics.$patternContours.push(contour);
+				const hingeSegments = createHingeSegments(outer, repo.$direction);
+				const context: TraceContext = { map, repo, trace, node, index };
+				for(const hingeSegment of hingeSegments) {
+					processTrace(hingeSegment, context);
 				}
 			}
 		}
+	}
+}
+
+type StartEndMap = Record<QuadrantDirection, [Point, Point]>;
+
+function createStartEndMap(quadrants: Quadrant[], repo: Repository, trace: Trace): StartEndMap {
+	const startEndMap = {} as StartEndMap;
+	for(let q = 0; q < quadrantNumber; q++) {
+		const filtered = quadrants.filter(quadrant => quadrant.q == q);
+		if(!filtered.length) continue;
+		startEndMap[q as QuadrantDirection] =
+			trace.$resolveStartEnd(filtered, repo.$directionalQuadrants[q]);
+	}
+	return startEndMap;
+}
+
+interface TraceContext {
+	readonly map: StartEndMap;
+	readonly repo: Repository;
+	readonly trace: Trace;
+	readonly node: ITreeNode;
+	readonly index: number;
+}
+
+function processTrace(hingeSegment: HingeSegment, context: TraceContext): void {
+	const map = context.map[hingeSegment.q];
+	if(!map) return;
+	const contour = context.trace.$generate(hingeSegment, map[0], map[1]);
+	if(contour) {
+		State.$contourWillChange.add(context.node);
+		contour.$ids = context.repo.$nodeSet.$nodes;
+		contour.$repo = context.repo.$signature;
+		contour.$for = context.index;
+		context.node.$graphics.$patternContours.push(contour);
 	}
 }
 

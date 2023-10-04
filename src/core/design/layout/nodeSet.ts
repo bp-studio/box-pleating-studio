@@ -111,23 +111,20 @@ export class NodeSet {
 
 	private _dist(a: ITreeNode, b: ITreeNode): number {
 		if(a === b) return 0;
-		return dist(a, b, this._lca(a.id, b.id));
+		return dist(a, b, this._lca(a, b));
 	}
 
-	private _lca(a: number, b: number): ITreeNode {
+	private _lca(a: ITreeNode, b: ITreeNode): ITreeNode {
 		const lcaMap = this._lcaMap!;
-		let lca = lcaMap.get(a, b);
+		let lca = lcaMap.get(a.id, b.id);
 		if(lca) return lca;
 
 		// Otherwise, it suffices to pick a leaf covered by each
 		// of the given nodes and lookup the LCA of the leaves.
-		const tree = State.$tree;
-		const A = tree.$nodes[a]!;
-		const B = tree.$nodes[b]!;
-		const ALeaf = this.$quadrantCoverage.get(A)![0].$flap.id;
-		const BLeaf = this.$quadrantCoverage.get(B)![0].$flap.id;
-		lca = lcaMap.get(ALeaf, BLeaf)!;
-		lcaMap.set(a, b, lca);
+		const aLeaf = this.$quadrantCoverage.get(a)![0].$flap.id;
+		const bLeaf = this.$quadrantCoverage.get(b)![0].$flap.id;
+		lca = lcaMap.get(aLeaf, bLeaf)!;
+		lcaMap.set(a.id, b.id, lca);
 		return lca;
 	}
 }

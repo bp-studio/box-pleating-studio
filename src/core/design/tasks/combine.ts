@@ -12,7 +12,10 @@ import type { ITreeNode, PatternContour, RoughContour } from "../context";
  * The meaning of {@link $outer} and {@link $inner} here follows that of {@link RoughContour}.
  */
 interface RationalContour {
-	$outer: RationalPathEx;
+	/** See {@link RoughContour.$outer}. */
+	$outer: RationalPathEx[];
+
+	/** See {@link RoughContour.$inner}. */
 	$inner?: RationalPathEx[];
 }
 
@@ -50,14 +53,21 @@ function insertOuter(patternContours: PatternContour[], result: RationalContour[
 	for(const contour of patternContours) {
 		if(contour.$for !== undefined) {
 			// If we know the pairing, we can process directly
-			tryInsert(result[contour.$for].$outer, contour);
+			tryInsertOuter(contour, result[contour.$for]);
 		} else {
 			// Otherwise fallback to trying each rough contour
 			for(const rough of result) {
-				if(tryInsert(rough.$outer, contour)) break;
+				if(tryInsertOuter(contour, rough)) break;
 			}
 		}
 	}
+}
+
+function tryInsertOuter(patternContour: PatternContour, rough: RationalContour): boolean {
+	for(const outer of rough.$outer) {
+		if(tryInsert(outer, patternContour)) return true;
+	}
+	return false;
 }
 
 function insertInner(childrenPatternContours: PatternContour[], result: RationalContour[]): void {
@@ -104,7 +114,7 @@ function tryInsert(path: RationalPath, insert: PatternContour): boolean {
 
 function toRationalContour(contour: RoughContour): RationalContour {
 	return {
-		$outer: toRationalPath(contour.$outer),
+		$outer: contour.$outer.map(toRationalPath),
 		$inner: contour.$inner?.map(toRationalPath),
 	};
 }
@@ -114,7 +124,8 @@ function toRationalContour(contour: RoughContour): RationalContour {
  * It reverses the role of outer and inner paths if necessary.
  */
 function toGraphicalContour(contour: RationalContour): Contour {
-	let outer = simplify(contour.$outer);
+	const outers = contour.$outer.map(simplify);
+	let outer = outers.length == 1 ? outers[0] : generalUnion.$get(outers)[0];
 	const inner = contour.$inner?.map(simplify);
 	if(!outer.length) {
 		return { outer: inner![0] };

@@ -68,7 +68,7 @@ function updater(node: ITreeNode): boolean {
 		// Base case
 		const path = node.$AABB.$toPath();
 		const contour: RoughContour = {
-			$outer: path,
+			$outer: [path],
 			$leaves: [node.id],
 		};
 		node.$graphics.$roughContours = [contour];

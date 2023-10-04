@@ -9,6 +9,7 @@ import type { NodeSet } from "../layout/nodeSet";
 import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
+import type { RoughContourContext } from "../tasks/roughContourContext";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -102,8 +103,13 @@ export interface RoughContour {
 	 * Note that it is not of the same meaning as {@link Contour.outer}.
 	 * In a {@link RoughContour}, {@link $outer} is from the processing perspective,
 	 * not from the rendering perspective.
+	 *
+	 * In majority of cases there's only one outer path,
+	 * but in some edge cases of the raw mode,
+	 * we may need to break up the outer path for the tracing algorithm to work
+	 * (see {@link RoughContourContext._breakAllContour}).
 	 */
-	$outer: PathEx;
+	$outer: PathEx[];
 
 	/**
 	 * Inner holes of the contour, if any.
