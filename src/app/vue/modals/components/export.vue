@@ -53,7 +53,7 @@
 
 	const props = defineProps<{
 		title: string;
-		mime: string;
+		mime: MIMEType;
 		description: string;
 		extension: string;
 		observe?: Action<object>;

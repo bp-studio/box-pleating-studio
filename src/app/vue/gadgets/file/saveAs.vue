@@ -19,7 +19,7 @@
 	const props = defineProps<{
 		type: string;
 		desc: string;
-		mime: string;
+		mime: MIMEType;
 		disabled: boolean;
 	}>();
 
@@ -28,15 +28,15 @@
 	function execute(proj?: Project, callback?: (handle: FileSystemFileHandle) => void): Promise<boolean> {
 		return FileUtility.saveAs(
 			{
-				suggestedName: Export.getFilename(props.type!, proj),
+				suggestedName: Export.getFilename(props.type, proj),
 				types: [{
 					description: props.desc,
 					accept: {
-						[props.mime!]: ["." + props.type],
+						[props.mime]: ["." + props.type],
 					},
 				} as FilePickerAcceptType],
 			},
-			() => Export.getBlob(props.type!, proj),
+			() => Export.getBlob(props.type, proj),
 			handle => {
 				if(callback) callback(handle);
 				else emit("save", handle);
