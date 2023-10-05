@@ -21,9 +21,12 @@ the implementation here uses state-of-the-art data structures
 (in particular RAVL tree) to provide much greater performance.
 
 The algorithm is used in three places in BP Studio:
-1. Find the union of some axis-aligned polygons. This is for generating the "rough contour" of rivers.
-2. Find the union of general polygons. This is when the rough contour strategy doesn't work.
-3. Find the intersection of two rounded rectangles. This is for displaying invalid overlappings of flaps.
+1. Find the union of some axis-aligned polygons.
+   This is for generating the "rough contour" of rivers.
+2. Find the union of more general polygons (but still without the possibility of forming `>>` formation).
+   This is for the raw mode of the rough contours.
+3. Find the intersection of two rounded rectangles.
+   This is for displaying invalid overlappings of flaps.
 
 ## CP Generation and polygon intersection test
 

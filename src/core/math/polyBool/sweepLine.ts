@@ -12,24 +12,43 @@ import type { ISegment } from "./segment/segment";
 //=================================================================
 /**
  * {@link SweepLine} is the base class for all types of sweep line algorithms.
+ *
+ * The core idea of the sweep line algorithm is to imagine that a
+ * sweep line (vertical, but infinitesimally tilted to the left,
+ * so that it doesn't overlap with any given lines as it moves)
+ * moving from the left to the right of the plane.
+ *
+ * As it moves, the {@link _status} of the sweep line is defined as the ordered
+ * list of lines intersected with it (from the bottom to the top).
+ * For any two given lines to have an intersection, they must be
+ * adjacent in the list at some point during the sweeping process,
+ * so it suffices to check the adjacent lines in the status queue
+ * to find all intersections of the given lines. It is this property
+ * that makes the sweep line algorithm really fast.
  */
 //=================================================================
 
 export abstract class SweepLine {
 
-	/** Logic for event construction and comparison. */
+	/**
+	 * The logic for event construction and comparison (for ordering them).
+	 */
 	protected readonly _provider: EventProvider;
 
-	/** Event queue. */
+	/**
+	 * Event queue is an {@link IHeap} that stores all the future {@link SweepEvent}s
+	 * that have not yet occurred at the current stage of sweeping.
+	 * The events will be popped one by one from the queue and processed.
+	 */
 	protected readonly _eventQueue: IHeap<SweepEvent>;
 
-	/** The current state of sweeping. */
+	/** The current intersection state of sweeping. */
 	protected readonly _status: IBinarySearchTree<StartEvent>;
 
-	/** Logic for finding intersections. */
+	/** Logic for finding intersections among the given {@link ISegment}s. */
 	protected readonly _intersector: Intersector;
 
-	/** The segments we collected during the course. */
+	/** The {@link ISegment}s we collected during the course. */
 	protected readonly _collectedSegments: ISegment[] = [];
 
 	constructor(provider: EventProvider, Intersector: IntersectorConstructor) {
@@ -46,10 +65,16 @@ export abstract class SweepLine {
 	/** Process an {@link EndEvent}. */
 	protected abstract _processEnd(event: EndEvent): void;
 
-	/** Whether an initial segment is oriented. */
+	/** Whether an initial {@link ISegment} is oriented. */
 	protected abstract _isOriented(segment: ISegment, delta: Sign): boolean;
 
-	/** Determine whether a segment is considered "inside" in some sense. */
+	/**
+	 * Determine whether an {@link ISegment} is considered "inside" in some sense.
+	 * For example, in the use case of taking polygon union,
+	 * we only want those segments that are on the outside (i.e. not inside),
+	 * while in taking polygon intersection we need th opposite.
+	 * (See {@link StartEvent.$isInside}).
+	 */
 	protected abstract _setInsideFlag(event: StartEvent, prev?: StartEvent): void;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +101,10 @@ export abstract class SweepLine {
 		this._status.$insert(event, event);
 		const prev = this._status.$getPrev(event);
 		const next = this._status.$getNext(event);
+
+		// It is possible that after finding an intersection and subdividing the segments,
+		// a newly created event is inserted in front of the current event in the event queue.
+		// In that case, we need to handle those inserted events first.
 		const inserted = this._intersector.$process(prev, event, next);
 
 		if(!inserted) {
@@ -92,7 +121,7 @@ export abstract class SweepLine {
 	}
 
 	/**
-	 * Add a segment during initialization.
+	 * Add an {@link ISegment} during initialization.
 	 * @param segment The segment itself.
 	 * @param isEntering Whether this segment is entering its corresponding polygon.
 	 */

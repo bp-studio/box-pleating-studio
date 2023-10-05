@@ -7,6 +7,7 @@ import type { ISegment } from "../segment/segment";
 //=================================================================
 /**
  * {@link StartEvent} represents the start of a segment.
+ * It also represents the segment itself in the status queue.
  */
 //=================================================================
 export class StartEvent extends EventBase {
@@ -30,6 +31,18 @@ export class StartEvent extends EventBase {
 	 *
 	 * Its initial value equals {@link $wrapDelta}, while its actual value
 	 * will de determined during the course of the algorithm.
+	 *
+	 * This is the mechanism I used in my implementation for determining
+	 * {@link $isInside}, and is different from the original MRF algorithm.
+	 * It simplifies the logic quite a lot, and allows the union
+	 * to be taken over multiple polygons in one pass.
+	 *
+	 * One thing to keep in mind when one implements this logic is that,
+	 * when two {@link ISegment}s overlap, we need to carefully define
+	 * their ordering in the status queue, depending on the use case.
+	 * For example, when taking the union, the exiting edge should always be
+	 * placed after the entering edge, so that the {@link $wrapCount} doesn't
+	 * temporarily become zero as we examine them and cause them to be collected.
 	 */
 	public $wrapCount: number;
 

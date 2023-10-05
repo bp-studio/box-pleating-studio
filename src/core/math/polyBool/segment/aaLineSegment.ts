@@ -4,7 +4,8 @@ import type { ISegment } from "./segment";
 
 //=================================================================
 /**
- * {@link AALineSegment} represents an axis-aligned line segment.
+ * {@link AALineSegment} represents an axis-aligned line segment,
+ * that is, it is either horizontal or vertical.
  */
 //=================================================================
 

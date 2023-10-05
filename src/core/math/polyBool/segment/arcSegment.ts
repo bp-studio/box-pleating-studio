@@ -22,7 +22,7 @@ export const EPSILON = 1e-10;
 
 //=================================================================
 /**
- * {@link ArcSegment} represents an arc segment.
+ * {@link ArcSegment} represents an arc segment (i.e. part of a circle).
  */
 //=================================================================
 

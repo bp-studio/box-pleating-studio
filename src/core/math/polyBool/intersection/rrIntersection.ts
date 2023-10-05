@@ -11,7 +11,7 @@ import type { EndEvent } from "../event";
 
 //=================================================================
 /**
- * {@link RRIntersection} calculates the intersection of two rounded rectangles.
+ * {@link RRIntersection} calculates the intersection of two {@link IRoundedRect}s.
  */
 //=================================================================
 

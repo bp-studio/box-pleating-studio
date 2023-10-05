@@ -10,7 +10,7 @@ import type { StartEvent } from "./event";
 
 //=================================================================
 /**
- * {@link PolyBool} is the base class of boolean operations on polygons.
+ * {@link PolyBool} is the base class of boolean operations on {@link Polygon}s.
  */
 //=================================================================
 
@@ -53,18 +53,6 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 			event.$wrapCount += prev.$wrapCount;
 			event.$isInside = event.$wrapCount != 0;
 		}
-
-		// console.log(
-		// 	event.$isInside,
-		// 	event.$key & 0xfff,
-		// 	event.$wrapDelta,
-		// 	event.$wrapCount,
-		// 	event.$point, event.$other.$point,
-		// 	event.$segment.$type === 2 ? (event.$segment as ArcSegment).$radius : 0,
-		// 	event.$segment.$type === 2 ? getSlope(event) : NaN,
-		// 	prev?.$point, prev?.$other.$point,
-		// 	prev?.$segment.$type === 2 ? getSlope(prev) : NaN,
-		// 	prev?.$wrapCount);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

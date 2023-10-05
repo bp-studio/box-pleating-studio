@@ -5,6 +5,7 @@ export enum SegmentType {
 	Arc = 2,
 }
 
+/** A line segment to be processed. */
 export interface ISegment {
 	/** Segment type */
 	$type: SegmentType | CreaseType;
