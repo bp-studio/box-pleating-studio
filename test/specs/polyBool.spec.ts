@@ -169,11 +169,12 @@ describe("PolyBool", function() {
 	describe("Expansion operation", function() {
 		it("Expands given AA polygons", function() {
 			const result = expand([
-				{ $outer: parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"), $leaves: [] },
-				{ $outer: parsePath("(2,2),(2,4),(4,4),(4,2)"), $leaves: [] },
+				{ $outer: [parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)")], $leaves: [] },
+				{ $outer: [parsePath("(2,2),(2,4),(4,4),(4,2)")], $leaves: [] },
 			], 1);
 			expect(result.length).to.equal(2);
-			expect(result[0].$outer).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
+			expect(result[0].$outer.length).to.equal(1);
+			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
 			expect(result[1].$outer.length).to.equal(0);
 		});
 
@@ -182,7 +183,7 @@ describe("PolyBool", function() {
 			const result = expander.$get(
 				[parsePath("(9,8),(9,-4),(21,-4),(21,8)")],
 				[parsePath("(20,21),(20,9),(32,9),(32,21)")]
-			) as PathEx[];
+			);
 			expect(result.length).to.equal(2);
 			expect(result[0].from).to.eql([0]);
 			expect(result[1].from).to.eql([1]);
