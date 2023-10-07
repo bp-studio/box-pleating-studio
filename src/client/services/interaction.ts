@@ -13,6 +13,7 @@ import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
 import { options } from "client/options";
 import { TapController } from "client/controllers/tapController";
+import { Project } from "client/project/project";
 
 const TAP_DURATION = 50;
 const CANCEL_TAP_THRESHOLD = 3;
@@ -64,6 +65,11 @@ export namespace Interaction {
 		document.addEventListener("keyup", keyUp);
 
 		window.addEventListener("blur", blur);
+
+		Project.$onFatalError = () => {
+			pointerHeld = false;
+			DragController.$dragEnd(); // Stop any further dragging.
+		};
 
 		display.stage.on("mousemove", e => {
 			const sheet = ProjectService.sheet.value;

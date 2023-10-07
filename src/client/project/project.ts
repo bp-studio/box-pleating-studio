@@ -23,6 +23,8 @@ let nextId = 1;
 //=================================================================
 export class Project extends Mountable implements ISerializable<JProject> {
 
+	public static $onFatalError: Action;
+
 	public readonly id: number;
 	public readonly design: Design;
 	public readonly history: HistoryManager;
@@ -40,6 +42,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 	/** Whether self has been initialized. */
 	private _initialized: boolean = false;
+
+	/** Indicating that we're in a fatal error state. */
+	private _fatal: boolean = false;
 
 	private readonly _updateCallbacks: Action[] = [];
 	private _updateCallbackTimeout: number | undefined;
@@ -144,6 +149,10 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 * Send a request to the Core worker and obtain a direct result or an {@link UpdateModel}.
 	 */
 	private async _callCore(controller: string, action: string, args: unknown[]): Promise<unknown> {
+		// There could be pending calling after fatal error.
+		// In that case we throw an error to stop further processing.
+		if(this._fatal) throw new Error();
+
 		clearTimeout(this._updateCallbackTimeout);
 		const request = { controller, action, value: args };
 		const callbacks = this._returnCallbacks.concat();
@@ -165,12 +174,14 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private async _handleCoreError(request: object, response: ErrorResponse): Promise<never> {
 		this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
 		const clientError = new Error(response.error.message);
-		if(this._initialized) {
+		if(this._initialized && !this._fatal) {
+			this._fatal = true;
 			// Display a fatal message and close self, if the project has already been initialized.
 			// If not, the error thrown below will be caught by the App.
 			const coreError = response.error;
 			coreError.clientTrace = clientError.stack || "";
 			coreError.request = request;
+			Project.$onFatalError();
 			await options.onError?.(this.id, coreError, this.history.$backup);
 		}
 		throw clientError; // Stop all further actions.

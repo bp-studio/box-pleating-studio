@@ -193,9 +193,13 @@ namespace WorkspaceService {
 			await Dialogs.error(log);
 			await close(id, true);
 			if(backup) {
-				// Auto recover
-				await open(backup as Pseudo<JProject>);
-				selectLast();
+				try {
+					// Auto recover
+					await open(backup as Pseudo<JProject>);
+					selectLast();
+				} catch {
+					await Dialogs.alert("Recovery failed.");
+				}
 			}
 		}
 	);
