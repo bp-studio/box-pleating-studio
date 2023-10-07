@@ -125,9 +125,9 @@ function toRationalContour(contour: RoughContour): RationalContour {
  */
 function toGraphicalContour(contour: RationalContour): Contour {
 	const outers = contour.$outer.map(simplify);
-	let outer = outers.length == 1 ? outers[0] : generalUnion.$get(outers)[0];
+	let outer = outers.length <= 1 ? outers[0] : generalUnion.$get(outers)[0];
 	const inner = contour.$inner?.map(simplify);
-	if(!outer.length) {
+	if(!outer || !outer.length) {
 		return { outer: inner![0] };
 	} else if(outer.isHole && inner) {
 		const innerHoleIndex = inner.findIndex(p => p.isHole);

@@ -86,16 +86,17 @@ export class RoughContourContext {
 
 		const result = groups.flatMap(g => {
 			const contours = expand(g.$children, this.$node.$length);
-			const sets = g.$nodeSets;
-			if(sets) {
-				// Now we check again to see if the missing corners are exposed.
-				// In some edge cases, it is possible that some are still missing at this point.
-				const corners = [...this._cornerMap.entries()].filter(e => sets.includes(e[1])).map(e => e[0]);
-				const testMap = new Set(corners);
-				if(!checkCriticalCorners(contours.flatMap(c => c.$outer), testMap)) {
-					for(const contour of contours) this._breakAllContour(contour);
-				}
-			}
+			//TODO: This part needs more thoughts
+			// const sets = g.$nodeSets;
+			// if(sets) {
+			// 	// Now we check again to see if the missing corners are exposed.
+			// 	// In some edge cases, it is possible that some are still missing at this point.
+			// 	const corners = [...this._cornerMap.entries()].filter(e => sets.includes(e[1])).map(e => e[0]);
+			// 	const testMap = new Set(corners);
+			// 	if(!checkCriticalCorners(contours.flatMap(c => c.$outer), testMap)) {
+			// 		for(const contour of contours) this._breakAllContour(contour);
+			// 	}
+			// }
 			return contours;
 		});
 		return result;
