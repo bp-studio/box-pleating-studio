@@ -19,6 +19,7 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 
 	public override $getPrev(key: K): V | undefined {
 		let node = this._getNode(key);
+		if(node === this._nil) debugger;
 		if(node.$left !== this._nil) return this._max(node.$left).$value;
 		while(node.$parent !== this._nil && node.$parent.$left === node) node = node.$parent;
 		return node.$parent.$value;

@@ -1,4 +1,4 @@
-import { EPSILON } from "./arcSegment";
+import { EPSILON, isAlmostZero } from "core/math/geometry/float";
 import { CreaseType } from "shared/types/cp";
 
 import type { ISegment } from "./segment";
@@ -36,8 +36,8 @@ export class LineSegment implements ISegment {
 			start.x - end.x,
 			start.y * end.x - start.x * end.y,
 		];
-		this._isHorizontal = Math.abs(this.$coefficients[0]) < EPSILON;
-		this._isVertical = Math.abs(this.$coefficients[1]) < EPSILON;
+		this._isHorizontal = isAlmostZero(this.$coefficients[0]);
+		this._isVertical = isAlmostZero(this.$coefficients[1]);
 	}
 
 	/**

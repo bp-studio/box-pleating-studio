@@ -61,7 +61,7 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 
 	///#if DEBUG
 	public createTestCase(components: ComponentType[]): void {
-		console.log("[" + components.map(c => "[" + (c as Polygon).map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(","));
+		console.log(components.map(c => "[" + (c as Polygon).map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(",\n"));
 	}
 	///#endif
 }

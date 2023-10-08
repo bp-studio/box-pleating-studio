@@ -111,6 +111,8 @@ export interface RoughContour {
 	 */
 	$outer: PathEx[];
 
+	$union?: PathEx;
+
 	/**
 	 * Inner holes of the contour, if any.
 	 * The same note of {@link $outer} also applies here.

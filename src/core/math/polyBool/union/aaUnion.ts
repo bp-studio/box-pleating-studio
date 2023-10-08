@@ -2,6 +2,7 @@ import { AALineSegment } from "../segment/aaLineSegment";
 import { AAIntersector } from "./aaIntersector";
 import { AAEventProvider } from "./aaEventProvider";
 import { UnionBase } from "./unionBase";
+import { xyComparator } from "shared/types/geometry";
 
 import type { Polygon } from "shared/types/geometry";
 
@@ -20,6 +21,8 @@ import type { Polygon } from "shared/types/geometry";
 //=================================================================
 
 export class AAUnion extends UnionBase {
+
+	protected override _initComparator = xyComparator;
 
 	constructor(checkSelfIntersection: boolean = false) {
 		super(new AAEventProvider(), AAIntersector, AALineSegment);

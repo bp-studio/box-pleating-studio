@@ -1,7 +1,7 @@
 import { PolyBool } from "../polyBool";
-import { xyComparator } from "shared/types/geometry";
 import { UnionChainer } from "../chainer/unionChainer";
 
+import type { Comparator } from "shared/types/types";
 import type { ISegment } from "../segment/segment";
 import type { EndEvent } from "../event";
 import type { EventProvider } from "../eventProvider";
@@ -19,6 +19,9 @@ type LineConstructor = new (p1: IPoint, p2: IPoint, i: number) => ISegment;
 export abstract class UnionBase extends PolyBool<Polygon, PathEx> {
 
 	private readonly _lineConstructor: LineConstructor;
+
+	/** The comparator used in determine the direction of a line during {@link _initialize}. */
+	protected abstract _initComparator: Comparator<IPoint>;
 
 	constructor(
 		provider: EventProvider,
@@ -40,7 +43,7 @@ export abstract class UnionBase extends PolyBool<Polygon, PathEx> {
 				for(let j = 0; j < path.length; j++) {
 					const p1 = path[j], p2 = path[(j + 1) % path.length];
 					const segment = new this._lineConstructor(p1, p2, i);
-					const entering = xyComparator(p1, p2) < 0;
+					const entering = this._initComparator(p1, p2) < 0;
 					if(entering) this._addSegment(segment, 1);
 					else this._addSegment(segment, -1);
 				}

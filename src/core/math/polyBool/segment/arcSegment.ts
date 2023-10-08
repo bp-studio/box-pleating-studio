@@ -3,23 +3,6 @@ import { leg, xyComparator } from "shared/types/geometry";
 
 import type { ISegment } from "./segment";
 
-/**
- * The epsilon value for arc-related calculations.
- * For our application, we would rather take a larger value
- * than to mistake floating error as distinction.
- *
- * Some commonly used comparisons and their epsilon-equivalent forms:
- *
- * ```
- * x > 0  => x > EPSILON
- * x >= 0 => x > -EPSILON
- * x == 0 => Math.abs(x) < EPSILON
- * x <= 0 => x < EPSILON
- * x < 0  => x < -EPSILON
- * ```
- */
-export const EPSILON = 1e-10;
-
 //=================================================================
 /**
  * {@link ArcSegment} represents an arc segment (i.e. part of a circle).

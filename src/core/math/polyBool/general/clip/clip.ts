@@ -1,10 +1,10 @@
 import { SweepLine } from "../../sweepLine";
 import { GeneralIntersector } from "../generalIntersector";
 import { LineSegment } from "../../segment/lineSegment";
-import { same } from "../../intersection/rrIntersector";
 import { CreaseType } from "shared/types/cp";
 import { xyComparator } from "shared/types/geometry";
 import { GeneralEventProvider } from "../generalEventProvider";
+import { epsilonSame } from "core/math/geometry/float";
 
 import type { IntersectorConstructor } from "../../intersector";
 import type { ISegment } from "../../segment/segment";
@@ -85,5 +85,5 @@ export class Clip extends SweepLine {
 
 function sameLine(ev1: StartEvent, ev2?: StartEvent): boolean {
 	if(!ev2) return false;
-	return same(ev1.$point, ev2.$point) && same(ev1.$other.$point, ev2.$other.$point);
+	return epsilonSame(ev1.$point, ev2.$point) && epsilonSame(ev1.$other.$point, ev2.$other.$point);
 }

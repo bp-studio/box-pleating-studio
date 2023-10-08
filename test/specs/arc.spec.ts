@@ -1,8 +1,9 @@
 import { expect } from "chai";
 
+import { EPSILON } from "core/math/geometry/float";
 import { StartEvent } from "core/math/polyBool/event";
 import { getCurvature } from "core/math/polyBool/intersection/rrEventProvider";
-import { EPSILON, ArcSegment } from "core/math/polyBool/segment/arcSegment";
+import { ArcSegment } from "core/math/polyBool/segment/arcSegment";
 import { dist } from "shared/types/geometry";
 
 describe("Arc", function() {

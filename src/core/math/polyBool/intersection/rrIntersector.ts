@@ -1,6 +1,6 @@
 import { Intersector } from "../intersector";
 import { SegmentType } from "../segment/segment";
-import { EPSILON } from "../segment/arcSegment";
+import { EPSILON, epsilonSame } from "core/math/geometry/float";
 import { leg } from "shared/types/geometry";
 
 import type { ArcSegment } from "../segment/arcSegment";
@@ -99,17 +99,12 @@ export function yIntercept(arc: ArcSegment, x: number): number {
 	return arc.$center.y + (arc.$start.x > arc.$end.x ? dy : -dy);
 }
 
-/** Check if the two points are essentially equal under {@link EPSILON}-comparison. */
-export function same(p1: IPoint, p2: IPoint): boolean {
-	return Math.abs(p1.x - p2.x) < EPSILON && Math.abs(p1.y - p2.y) < EPSILON;
-}
-
 /**
  * If the intersection is essentially an endpoint of the segment,
  * returns the original endpoint to avoid sorting error.
  */
 export function ref(p: IPoint, seg: Segment): IPoint {
-	if(same(p, seg.$start)) return seg.$start;
-	if(same(p, seg.$end)) return seg.$end;
+	if(epsilonSame(p, seg.$start)) return seg.$start;
+	if(epsilonSame(p, seg.$end)) return seg.$end;
 	return p;
 }

@@ -2,7 +2,7 @@ import { EndEvent, StartEvent } from "../event";
 import { xyComparator } from "shared/types/geometry";
 import { SegmentType } from "../segment/segment";
 import { yIntercept } from "./rrIntersector";
-import { EPSILON } from "../segment/arcSegment";
+import { EPSILON, fixZero } from "core/math/geometry/float";
 import { EventProvider } from "../eventProvider";
 
 import type { ArcSegment } from "../segment/arcSegment";
@@ -56,7 +56,7 @@ const statusComparator: Comparator<StartEvent> = (a, b) =>
 /** Compare two {@link StartEvent}s with the same start point. */
 const segmentComparator: Comparator<StartEvent> = (a, b) =>
 	// The one with the smaller tangent slope goes first (be aware of floating error)
-	fix(getSlope(a) - getSlope(b)) ||
+	fixZero(getSlope(a) - getSlope(b)) ||
 	// Compare the curvature if the tangent slope equals
 	getCurvature(a) - getCurvature(b) ||
 	// In case of overlapping, the exiting segment goes first (opposite to case of union)
@@ -94,9 +94,4 @@ export function getCurvature(e: StartEvent): number {
 	if(seg.$type === SegmentType.AALine) return 0;
 	const sgn = e.$point === seg.$start ? 1 : -1; // curve upwards or downwards
 	return sgn / seg.$radius;
-}
-
-export function fix(x: number): number {
-	if(Math.abs(x) < EPSILON) return 0;
-	return x;
 }

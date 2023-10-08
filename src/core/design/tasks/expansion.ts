@@ -14,7 +14,7 @@ type CheckCallback = (result: PathEx[]) => RoughContour[] | undefined;
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
 export function expand(inputs: readonly RoughContour[], units: number, check?: CheckCallback): RoughContour[] {
-	const union = aaUnion.$get(...inputs.map(c => c.$outer));
+	const union = aaUnion.$get(...inputs.map(c => c.$union ? [c.$union] : c.$outer));
 	const expandedPolygons: PathEx[][] = union.map(path => [expandPath(path, units)]);
 
 	const result = expander.$get(...expandedPolygons).map(simplify);

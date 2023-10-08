@@ -1,4 +1,7 @@
 import { same } from "shared/types/geometry";
+///#if DEBUG
+import { pathToString } from "core/math/geometry/path";
+///#endif
 
 import type { ISegment } from "../segment/segment";
 import type { Path } from "shared/types/geometry";
@@ -133,4 +136,18 @@ export class Chainer<PathType extends Path = Path> {
 		}
 		return 0;
 	}
+
+	///#if DEBUG
+	protected debugChains(): void {
+		for(let i = 1; i <= this._chains; i++) {
+			const path: Path = [];
+			let cursor = this._chainHeads[i];
+			while(cursor) {
+				path.push(this._points[cursor]);
+				cursor = this._next[cursor];
+			}
+			console.log(pathToString(path));
+		}
+	}
+	///#endif
 }

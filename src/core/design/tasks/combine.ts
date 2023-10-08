@@ -2,6 +2,7 @@ import { Line } from "core/math/geometry/line";
 import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
+import { fixPath, isAlmostInteger } from "core/math/geometry/float";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
@@ -125,7 +126,7 @@ function toRationalContour(contour: RoughContour): RationalContour {
  */
 function toGraphicalContour(contour: RationalContour): Contour {
 	const outers = contour.$outer.map(simplify);
-	let outer = outers.length <= 1 ? outers[0] : generalUnion.$get(outers)[0];
+	let outer = outers.length <= 1 ? outers[0] : fixPath(generalUnion.$get(outers)[0]);
 	const inner = contour.$inner?.map(simplify);
 	if(!outer || !outer.length) {
 		return { outer: inner![0] };

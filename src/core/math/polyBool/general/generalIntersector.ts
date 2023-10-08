@@ -1,5 +1,5 @@
 import { Intersector } from "../intersector";
-import { EPSILON } from "../segment/arcSegment";
+import { isAlmostZero } from "core/math/geometry/float";
 
 import type { LineSegment } from "../segment/lineSegment";
 import type { StartEvent } from "../event";
@@ -21,9 +21,9 @@ export class GeneralIntersector extends Intersector {
 		const [a1, b1, c1] = seg1.$coefficients, [a2, b2, c2] = seg2.$coefficients;
 		const detAB = a1 * b2 - a2 * b1;
 		const detBC = b1 * c2 - b2 * c1;
-		if(Math.abs(detAB) < EPSILON) {
+		if(isAlmostZero(detAB)) {
 			// Parallel case
-			if(Math.abs(detBC) > EPSILON) return; // Different lines.
+			if(!isAlmostZero(detBC)) return; // Different lines.
 
 			// We know that ev1 and ev2 are sorted
 			const p2 = ev1.$other.$point;

@@ -1,4 +1,5 @@
 import { Fraction } from "../fraction";
+import { isAlmostInteger } from "./float";
 
 import type { Rational } from "../fraction";
 import type { Vector } from "./vector";

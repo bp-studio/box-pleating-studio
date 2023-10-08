@@ -6,7 +6,7 @@ import { same } from "shared/types/geometry";
 import type { Path } from "shared/types/geometry";
 
 export function parsePath(s: string): Path {
-	const numbers = s.match(/-?\d+/g)?.map(d => Number(d)) ?? [];
+	const numbers = s.match(/-?\d+(\.\d+)?/g)?.map(d => Number(d)) ?? [];
 	const result: Path = [];
 	for(let i = 0; i + 1 < numbers.length; i += 2) {
 		result.push({ x: numbers[i], y: numbers[i + 1] });
