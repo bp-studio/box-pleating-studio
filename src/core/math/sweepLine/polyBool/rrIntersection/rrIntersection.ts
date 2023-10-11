@@ -1,13 +1,13 @@
 import { PolyBool } from "../polyBool";
 import { RREventProvider } from "./rrEventProvider";
 import { RRIntersector } from "./rrIntersector";
-import { ArcChainer } from "../chainer/arcChainer";
-import { ArcSegment } from "../segment/arcSegment";
-import { AALineSegment } from "../segment/aaLineSegment";
+import { ArcChainer } from "../../classes/chainer/arcChainer";
+import { ArcSegment } from "../../classes/segment/arcSegment";
+import { AALineSegment } from "../../classes/segment/aaLineSegment";
 
 import type { ArcPath } from "shared/types/geometry";
 import type { IRoundedRect } from "./roundedRect";
-import type { EndEvent } from "../event";
+import type { EndEvent } from "../../classes/event";
 
 //=================================================================
 /**
@@ -18,7 +18,7 @@ import type { EndEvent } from "../event";
 export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 
 	constructor() {
-		super(new RREventProvider(), RRIntersector, new ArcChainer());
+		super(new RREventProvider(), new RRIntersector(), new ArcChainer());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

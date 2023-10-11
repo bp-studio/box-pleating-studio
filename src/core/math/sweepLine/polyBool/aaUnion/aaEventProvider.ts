@@ -1,10 +1,10 @@
-import { EndEvent, StartEvent } from "../event";
-import { EventProvider } from "../eventProvider";
+import { EndEvent, StartEvent } from "../../classes/event";
+import { EventProvider } from "../../classes/eventProvider";
 
 import type { Comparator } from "shared/types/types";
-import type { SweepEvent } from "../event";
-import type { AALineSegment } from "../segment/aaLineSegment";
-import type { ISegment } from "../segment/segment";
+import type { SweepEvent } from "../../classes/event";
+import type { AALineSegment } from "../../classes/segment/aaLineSegment";
+import type { ISegment } from "../../classes/segment/segment";
 
 const SHIFT_Y = 17;
 const SHIFT_START = 16;

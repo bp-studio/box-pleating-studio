@@ -1,9 +1,9 @@
-import { Intersector } from "../intersector";
+import { Intersector } from "../../classes/intersector";
 import { isAlmostZero } from "core/math/geometry/float";
 
-import type { LineSegment } from "../segment/lineSegment";
-import type { StartEvent } from "../event";
-import type { OverlapIntersector } from "./clip/overlapIntersector";
+import type { LineSegment } from "../../classes/segment/lineSegment";
+import type { StartEvent } from "../../classes/event";
+import type { OverlapIntersector } from "../../clip/overlapIntersector";
 
 //=================================================================
 /**

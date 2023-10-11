@@ -24,14 +24,11 @@ export type ArcPolygon = ArcPath[];
 
 export type PathEx = Path & {
 
-	/** In the use case of union, indicating from which polygons this path forms */
-	from?: number[];
+	/** In the use case of union, the id of a representative polygon from which this path forms. */
+	from?: number;
 
 	/** Whether this path is a hole. */
 	isHole?: boolean;
-
-	/** Indicate that this path was flipped during expansion. */
-	flipped?: boolean;
 };
 
 /** Contour format. a set of contours consists of an outer path plus some inner holes. */

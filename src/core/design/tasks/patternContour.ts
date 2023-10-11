@@ -100,6 +100,7 @@ function processTrace(hingeSegment: HingeSegment, context: TraceContext): void {
 		contour.$ids = context.repo.$nodeSet.$nodes;
 		contour.$repo = context.repo.$signature;
 		contour.$for = context.index;
+		contour.$leaves = context.repo.$nodeSet.$leaves;
 		context.node.$graphics.$patternContours.push(contour);
 	}
 }

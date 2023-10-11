@@ -1,11 +1,11 @@
-import { Intersector } from "../intersector";
-import { SegmentType } from "../segment/segment";
+import { Intersector } from "../../classes/intersector";
+import { SegmentType } from "../../classes/segment/segment";
 import { EPSILON, epsilonSame } from "core/math/geometry/float";
 import { leg } from "shared/types/geometry";
 
-import type { ArcSegment } from "../segment/arcSegment";
-import type { AALineSegment } from "../segment/aaLineSegment";
-import type { StartEvent } from "../event";
+import type { ArcSegment } from "../../classes/segment/arcSegment";
+import type { AALineSegment } from "../../classes/segment/aaLineSegment";
+import type { StartEvent } from "../../classes/event";
 
 export type Segment = AALineSegment | ArcSegment;
 

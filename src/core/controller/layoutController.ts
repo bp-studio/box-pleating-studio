@@ -1,7 +1,7 @@
 import { AABBTask } from "core/design/tasks/aabb";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
-import { Clip } from "core/math/polyBool/general/clip/clip";
+import { Clip } from "core/math/sweepLine/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
 import { setStretchPrototypes } from "core/design/tasks/stretch";

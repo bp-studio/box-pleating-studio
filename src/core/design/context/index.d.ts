@@ -72,6 +72,9 @@ export interface PatternContour extends Array<Point> {
 
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly number[];
+
+	/** The {@link RoughContour.$leaves} of the corresponding {@link RoughContour}. */
+	$leaves: readonly number[];
 }
 
 export interface NodeGraphics {
@@ -95,29 +98,41 @@ export interface NodeGraphics {
  * Such contour consists of axis-aligned line segments only,
  * and can speed up the process of taking unions.
  *
+ * Each instance of {@link RoughContour} should consist of a single connected region only.
+ *
  * See also {@link roughContourTask}.
  */
 export interface RoughContour {
 	/**
 	 * Outer path of the contour.
 	 * Note that it is not of the same meaning as {@link Contour.outer}.
-	 * In a {@link RoughContour}, {@link $outer} is from the processing perspective,
-	 * not from the rendering perspective.
+	 * In a {@link RoughContour}, {@link $outer} is from the processing perspective
+	 * (that is, it is the side of the river boundary facing away from the wrapped flaps),
+	 * not from the rendering perspective (that is, it is graphically the outer path).
+	 * Therefore, the outer paths are not necessarily counter-clockwise in orientation.
 	 *
 	 * In majority of cases there's only one outer path,
-	 * but in some edge cases of the raw mode,
+	 * but it could also contains newly formed holes,
+	 * and in some edge cases of the raw mode,
 	 * we may need to break up the outer path for the tracing algorithm to work
 	 * (see {@link RoughContourContext._breakAllContour}).
 	 */
 	$outer: PathEx[];
 
-	$union?: PathEx;
+	// /** The union of {@link $outer}, if it has more than one path. */
+	// $union?: PathEx;
 
 	/**
-	 * Inner holes of the contour, if any.
+	 * Inner holes of the contour contributed by the child contours, if any.
+	 * This does not include the newly formed holes.
+	 *
+	 * In most cases, this is the union of the outer paths of child contours.
+	 * But in some cases we need to keep them separate,
+	 * so that inserting the pattern contour may work properly.
+	 *
 	 * The same note of {@link $outer} also applies here.
 	 */
-	$inner?: PathEx[];
+	$inner: PathEx[];
 
 	/** The ids of the leaf nodes inside this {@link RoughContour}. */
 	$leaves: number[];

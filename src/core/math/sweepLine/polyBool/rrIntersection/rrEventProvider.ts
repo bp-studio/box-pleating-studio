@@ -1,15 +1,15 @@
-import { EndEvent, StartEvent } from "../event";
+import { EndEvent, StartEvent } from "../../classes/event";
 import { xyComparator } from "shared/types/geometry";
-import { SegmentType } from "../segment/segment";
+import { SegmentType } from "../../classes/segment/segment";
 import { yIntercept } from "./rrIntersector";
 import { EPSILON, fixZero } from "core/math/geometry/float";
-import { EventProvider } from "../eventProvider";
+import { EventProvider } from "../../classes/eventProvider";
 
-import type { ArcSegment } from "../segment/arcSegment";
+import type { ArcSegment } from "../../classes/segment/arcSegment";
 import type { Segment } from "./rrIntersector";
-import type { ISegment } from "../segment/segment";
+import type { ISegment } from "../../classes/segment/segment";
 import type { Comparator } from "shared/types/types";
-import type { SweepEvent } from "../event";
+import type { SweepEvent } from "../../classes/event";
 
 //=================================================================
 /**

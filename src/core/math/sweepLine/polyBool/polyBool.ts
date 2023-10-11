@@ -1,12 +1,12 @@
-import { SweepLine } from "./sweepLine";
-import { pathToString } from "../geometry/path";
+import { pathToString } from "../../geometry/path";
+import { DivideAndCollect } from "../divideAndCollect";
 
-import type { ISegment } from "./segment/segment";
-import type { EventProvider } from "./eventProvider";
+import type { Intersector } from "../classes/intersector";
+import type { ISegment } from "../classes/segment/segment";
+import type { EventProvider } from "../classes/eventProvider";
 import type { Path, Polygon } from "shared/types/geometry";
-import type { IntersectorConstructor } from "./intersector";
-import type { Chainer } from "./chainer/chainer";
-import type { StartEvent } from "./event";
+import type { Chainer } from "../classes/chainer/chainer";
+import type { StartEvent } from "../classes/event";
 
 //=================================================================
 /**
@@ -14,17 +14,17 @@ import type { StartEvent } from "./event";
  */
 //=================================================================
 
-export abstract class PolyBool<ComponentType, PathType extends Path = Path> extends SweepLine {
+export abstract class PolyBool<ComponentType, PathType extends Path = Path> extends DivideAndCollect {
 
 	/** Logic for final assembling. */
 	protected readonly _chainer: Chainer<PathType>;
 
 	constructor(
 		provider: EventProvider,
-		Intersector: IntersectorConstructor,
+		intersector: Intersector,
 		chainer: Chainer<PathType>
 	) {
-		super(provider, Intersector);
+		super(provider, intersector);
 		this._chainer = chainer;
 	}
 
@@ -32,7 +32,7 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 	public $get(...components: ComponentType[]): PathType[] {
 		this._reset();
 		this._initialize(components);
-		this._collect();
+		this._sweep();
 		return this._chainer.$chain(this._collectedSegments);
 	}
 

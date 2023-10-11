@@ -85,16 +85,18 @@ export class RoughContourContext {
 		if(remaining.size) groups.push({ $children: [...remaining] });
 
 		const result = groups.flatMap(g => {
-			const contours = expand(g.$children, this.$node.$length);
-			//TODO: This part needs more thoughts
+			let contours = expand(g.$children, this.$node.$length);
 			const sets = g.$nodeSets;
-			if(sets) {
+			// There's no need to check if each child component has only one leaf
+			if(sets && g.$children.some(c => c.$leaves.length > 1)) {
 				// Now we check again to see if the missing corners are exposed.
 				// In some edge cases, it is possible that some are still missing at this point.
 				const corners = [...this._cornerMap.entries()].filter(e => sets.includes(e[1])).map(e => e[0]);
 				const testMap = new Set(corners);
 				if(!checkCriticalCorners(contours.flatMap(c => c.$outer), testMap)) {
-					for(const contour of contours) this._breakAllContour(contour);
+
+					contours = g.$children.flatMap(c => expand([c], this.$node.$length));
+					// for(const contour of contours) this._breakAllContour(contour);
 				}
 			}
 			return contours;
@@ -108,7 +110,7 @@ export class RoughContourContext {
 	 */
 	private _breakAllContour(contour: RoughContour): void {
 		if(!contour.$outer.length) return;
-		contour.$union = contour.$outer[0];
+		// contour.$union = contour.$outer[0];
 		const tree = State.$tree;
 		const length = this.$node.$length;
 		const outer: Path[] = [];

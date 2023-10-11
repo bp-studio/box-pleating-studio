@@ -1,7 +1,7 @@
 import { AABBSide } from "./aabbSide";
 
 import type { PerQuadrant } from "shared/types/direction";
-import type { IRoundedRect } from "core/math/polyBool/intersection/roundedRect";
+import type { IRoundedRect } from "core/math/sweepLine/polyBool/rrIntersection/roundedRect";
 import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 

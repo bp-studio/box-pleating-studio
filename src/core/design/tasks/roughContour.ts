@@ -67,11 +67,11 @@ function updater(node: ITreeNode): boolean {
 	if(node.$isLeaf) {
 		// Base case
 		const path = node.$AABB.$toPath();
-		const contour: RoughContour = {
+		node.$graphics.$roughContours = [{
 			$outer: [path],
+			$inner: [],
 			$leaves: [node.id],
-		};
-		node.$graphics.$roughContours = [contour];
+		}];
 	} else {
 		const nodeSets = nodeSetMap.get(node.id);
 		const context = new RoughContourContext(node, nodeSets);

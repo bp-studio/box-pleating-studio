@@ -1,8 +1,9 @@
 import { Line } from "core/math/geometry/line";
 import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
-import { deduplicate } from "core/math/geometry/path";
-import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
-import { fixPath, isAlmostInteger } from "core/math/geometry/float";
+import { deduplicate, isClockwise } from "core/math/geometry/path";
+import { GeneralUnion } from "core/math/sweepLine/polyBool/generalUnion/generalUnion";
+import { fixPath } from "core/math/geometry/float";
+import { Stacking } from "core/math/sweepLine/stacking/stacking";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
@@ -18,6 +19,8 @@ interface RationalContour {
 
 	/** See {@link RoughContour.$inner}. */
 	$inner?: RationalPathEx[];
+
+	$leaves: readonly number[];
 }
 
 const generalUnion = new GeneralUnion();
@@ -25,10 +28,14 @@ const generalUnion = new GeneralUnion();
 export function combineContour(node: ITreeNode): void {
 	const g = node.$graphics;
 	const childrenPatternContours: PatternContour[] = [];
+
 	for(const child of node.$children) {
 		// There's no need to process a child pattern contour if the
 		// corresponding pattern does not involve the current node
-		const contours = child.$graphics.$patternContours.filter(p => p.$ids.includes(node.id));
+		const contours = child.$graphics.$patternContours.filter(p => {
+			if(!p.$ids.includes(node.id)) return false;
+			return true;
+		});
 		childrenPatternContours.push(...contours);
 	}
 	const result: RationalContour[] = g.$roughContours.map(toRationalContour);
@@ -37,17 +44,8 @@ export function combineContour(node: ITreeNode): void {
 	insertOuter(g.$patternContours, result);
 	insertInner(childrenPatternContours, result);
 
-	let contours = result.map(toGraphicalContour);
-	if(g.$raw) {
-		contours = generalUnion
-			.$get(...contours.map(c => [c.outer]))
-			.map(p => {
-				const innerContours = p.from!.flatMap(i => contours[i].inner || []);
-				const inner = generalUnion.$get(...innerContours.map(c => [c]));
-				return { outer: p, inner };
-			});
-	}
-	g.$contours = contours;
+	const contours = result.map(toGraphicalContour);
+	g.$contours = g.$raw ? reunionRaw(contours) : contours;
 }
 
 function insertOuter(patternContours: PatternContour[], result: RationalContour[]): void {
@@ -80,6 +78,7 @@ function insertInner(childrenPatternContours: PatternContour[], result: Rational
 function tryInsertInner(childContour: PatternContour, result: RationalContour[]): void {
 	for(const contour of result) {
 		if(!contour.$inner) continue;
+		// if(childContour.$leaves.every(l => contour.$leaves.includes(l))) debugger;
 		for(const inner of contour.$inner) {
 			if(tryInsert(inner, childContour)) return;
 		}
@@ -117,6 +116,7 @@ function toRationalContour(contour: RoughContour): RationalContour {
 	return {
 		$outer: contour.$outer.map(toRationalPath),
 		$inner: contour.$inner?.map(toRationalPath),
+		$leaves: contour.$leaves,
 	};
 }
 
@@ -125,9 +125,23 @@ function toRationalContour(contour: RoughContour): RationalContour {
  * It reverses the role of outer and inner paths if necessary.
  */
 function toGraphicalContour(contour: RationalContour): Contour {
-	const outers = contour.$outer.map(simplify);
-	let outer = outers.length <= 1 ? outers[0] : fixPath(generalUnion.$get(outers)[0]);
-	const inner = contour.$inner?.map(simplify);
+	let outer: PathEx | undefined;
+	let inner = contour.$inner?.map(simplify);
+	let outers = contour.$outer.map(simplify);
+	if(outers.length > 1) outers = generalUnion.$get(outers);
+	if(outers.length <= 1) {
+		outer = outers[0];
+	} else {
+		for(const path of outers) {
+			if(isClockwise(path)) {
+				if(!inner) inner = [];
+				inner.push(path);
+			} else {
+				fixPath(path);
+				outer = path;
+			}
+		}
+	}
 	if(!outer || !outer.length) {
 		return { outer: inner![0] };
 	} else if(outer.isHole && inner) {
@@ -155,3 +169,13 @@ function simplify(path: RationalPathEx): PathEx {
 	if(path.isHole) result.isHole = true;
 	return result;
 }
+
+function reunionRaw(contours: Contour[]): Contour[] {
+	const outers = generalUnion.$get(contours.map(c => c.outer));
+	const inners = generalUnion
+		.$get(contours.filter(c => c.inner).flatMap(c => c.inner!))
+		.map(p => p.toReversed());
+	return stacking.$get(...outers, ...inners);
+}
+
+const stacking = new Stacking();

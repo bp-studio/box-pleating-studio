@@ -1,17 +1,17 @@
-import { SweepLine } from "../../sweepLine";
-import { GeneralIntersector } from "../generalIntersector";
-import { LineSegment } from "../../segment/lineSegment";
+import { GeneralIntersector } from "../polyBool/generalUnion/generalIntersector";
+import { LineSegment } from "../classes/segment/lineSegment";
 import { CreaseType } from "shared/types/cp";
 import { xyComparator } from "shared/types/geometry";
-import { GeneralEventProvider } from "../generalEventProvider";
+import { GeneralEventProvider } from "../polyBool/generalUnion/generalEventProvider";
 import { epsilonSame } from "core/math/geometry/float";
+import { DivideAndCollect } from "../divideAndCollect";
 
-import type { IntersectorConstructor } from "../../intersector";
-import type { ISegment } from "../../segment/segment";
+import type { Intersector } from "../classes/intersector";
+import type { ISegment } from "../classes/segment/segment";
 import type { CPLine } from "shared/types/cp";
-import type { StartEvent, EndEvent } from "../../event";
-import type { Chainer } from "../../chainer/chainer";
-import type { PolyBool } from "../../polyBool";
+import type { StartEvent, EndEvent } from "../classes/event";
+import type { Chainer } from "../classes/chainer/chainer";
+import type { PolyBool } from "../polyBool/polyBool";
 
 //=================================================================
 /**
@@ -27,10 +27,10 @@ import type { PolyBool } from "../../polyBool";
  */
 //=================================================================
 
-export class Clip extends SweepLine {
+export class Clip extends DivideAndCollect {
 
-	constructor(Intersector: IntersectorConstructor = GeneralIntersector) {
-		super(new GeneralEventProvider(true), Intersector);
+	constructor(intersector: Intersector = new GeneralIntersector()) {
+		super(new GeneralEventProvider(true), intersector);
 	}
 
 	/** Process the set of crease pattern lines. */
@@ -52,7 +52,7 @@ export class Clip extends SweepLine {
 			}
 		}
 
-		this._collect();
+		this._sweep();
 
 		return this._collectedSegments.map(s =>
 			[s.$type as CreaseType, s.$start.x, s.$start.y, s.$end.x, s.$end.y]

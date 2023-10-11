@@ -2,12 +2,11 @@ import { same } from "shared/types/geometry";
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { RavlTree } from "shared/data/bst/ravlTree";
 
-import type { EventProvider } from "./eventProvider";
-import type { Intersector, IntersectorConstructor } from "./intersector";
+import type { EventProvider } from "./classes/eventProvider";
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 import type { IHeap } from "shared/data/heap/heap";
-import type { SweepEvent, EndEvent, StartEvent } from "./event";
-import type { ISegment } from "./segment/segment";
+import type { SweepEvent, EndEvent, StartEvent } from "./classes/event";
+import type { ISegment } from "./classes/segment/segment";
 
 //=================================================================
 /**
@@ -45,37 +44,24 @@ export abstract class SweepLine {
 	/** The current intersection state of sweeping. */
 	protected readonly _status: IBinarySearchTree<StartEvent>;
 
-	/** Logic for finding intersections among the given {@link ISegment}s. */
-	protected readonly _intersector: Intersector;
-
-	/** The {@link ISegment}s we collected during the course. */
-	protected readonly _collectedSegments: ISegment[] = [];
-
-	constructor(provider: EventProvider, Intersector: IntersectorConstructor) {
+	constructor(provider: EventProvider) {
 		this._provider = provider;
 		this._eventQueue = new BinaryHeap(provider.$eventComparator);
 		this._status = new RavlTree(provider.$statusComparator);
-		this._intersector = new Intersector(provider, this._eventQueue);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Abstract methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	/** Process a {@link StartEvent}. */
+	protected abstract _processStart(event: StartEvent): void;
+
 	/** Process an {@link EndEvent}. */
 	protected abstract _processEnd(event: EndEvent): void;
 
 	/** Whether an initial {@link ISegment} is oriented. */
 	protected abstract _isOriented(segment: ISegment, delta: Sign): boolean;
-
-	/**
-	 * Determine whether an {@link ISegment} is considered "inside" in some sense.
-	 * For example, in the use case of taking polygon union,
-	 * we only want those segments that are on the outside (i.e. not inside),
-	 * while in taking polygon intersection we need th opposite.
-	 * (See {@link StartEvent.$isInside}).
-	 */
-	protected abstract _setInsideFlag(event: StartEvent, prev?: StartEvent): void;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
@@ -84,39 +70,14 @@ export abstract class SweepLine {
 	/** Reset the state of self (for reusing instance). */
 	protected _reset(): void {
 		this._provider.$reset();
-		this._collectedSegments.length = 0;
 	}
 
 	/** The main routine of the sweep line algorithm. */
-	protected _collect(): void {
+	protected _sweep(): void {
 		while(!this._eventQueue.$isEmpty) {
 			const event = this._eventQueue.$pop()!;
 			if(!event.$isStart) this._processEnd(event);
 			else this._processStart(event);
-		}
-	}
-
-	/** Process a {@link StartEvent}. */
-	protected _processStart(event: StartEvent): void {
-		this._status.$insert(event, event);
-		const prev = this._status.$getPrev(event);
-		const next = this._status.$getNext(event);
-
-		// It is possible that after finding an intersection and subdividing the segments,
-		// a newly created event is inserted in front of the current event in the event queue.
-		// In that case, we need to handle those inserted events first.
-		const inserted = this._intersector.$process(prev, event, next);
-
-		if(!inserted) {
-			// Process inside flag only when there's no event being inserted.
-			this._setInsideFlag(event, prev);
-		} else {
-			// Otherwise we put the event back into the queue,
-			// and process it again later. Note that in edge cases,
-			// we will still have to repeat the same process above without cheating,
-			// since it is possible that it also have intersections with the
-			// new prev/next events.
-			this._eventQueue.$insert(event);
 		}
 	}
 

@@ -36,14 +36,7 @@ export class Chainer<PathType extends Path = Path> {
 	protected _chains: number = 0;
 
 	public $chain(segments: ISegment[]): PathType[] {
-		// We will reuse the Chainer instance, so we need to reset the states.
-		const size = segments.length + 1;
-		this._chainHeads = new Array(INITIAL_CHAIN_SIZE);
-		this._chainTails = new Array(INITIAL_CHAIN_SIZE);
-		this._points = new Array(size);
-		this._next = new Array(size);
-		this._chains = 0; // We don't need to reset this in theory, but just to be sure.
-		this._length = 0;
+		this._reset(segments.length + 1);
 
 		const result: PathType[] = [];
 		for(const segment of segments) {
@@ -72,6 +65,24 @@ export class Chainer<PathType extends Path = Path> {
 		return result;
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Protected methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Reset the state of this {@link Chainer}.
+	 * We will reuse the Chainer instance, so we need to reset the states.
+	 */
+	protected _reset(size: number): void {
+		this._chainHeads = new Array(INITIAL_CHAIN_SIZE);
+		this._chainTails = new Array(INITIAL_CHAIN_SIZE);
+		this._points = new Array(size);
+		this._next = new Array(size);
+		this._chains = 0; // We don't need to reset this in theory, but just to be sure.
+		this._length = 0;
+	}
+
+	/** Add the last segment to a chain and complete a path. */
 	protected _chainToPath(id: number, segment: ISegment): PathType {
 		const path: Path = [];
 		let i = this._chainHeads[id];
@@ -82,12 +93,14 @@ export class Chainer<PathType extends Path = Path> {
 		return path as PathType;
 	}
 
+	/** Connect two chains with matching head and tail. */
 	protected _connectChain(head: number, tail: number, segment: ISegment): void {
 		this._next[this._chainTails[head]] = this._chainHeads[tail];
 		this._chainTails[head] = this._chainTails[tail];
 		this._removeChain(tail);
 	}
 
+	/** Remove a chain after it gets connected or gets collected. */
 	protected _removeChain(id: number): void {
 		if(id < this._chains) {
 			this._chainHeads[id] = this._chainHeads[this._chains];
@@ -96,6 +109,7 @@ export class Chainer<PathType extends Path = Path> {
 		this._chains--;
 	}
 
+	/** Create a new chain consisting of a single segment. */
 	protected _createChain(segment: ISegment): void {
 		const i = ++this._length;
 		this._points[i] = segment.$start;
@@ -107,6 +121,7 @@ export class Chainer<PathType extends Path = Path> {
 		++this._length;
 	}
 
+	/** Add a segment to the tail of a chain. */
 	protected _append(segment: ISegment, id: number): void {
 		const i = ++this._length;
 		this._points[i] = segment.$end;
@@ -115,6 +130,7 @@ export class Chainer<PathType extends Path = Path> {
 		this._next[i] = 0;
 	}
 
+	/** Add a segment to the head of a chain. */
 	protected _prepend(segment: ISegment, id: number): void {
 		const i = ++this._length;
 		this._points[i] = segment.$start;
@@ -122,7 +138,11 @@ export class Chainer<PathType extends Path = Path> {
 		this._chainHeads[id] = i;
 	}
 
-	protected _findChain(indices: number[], p: IPoint): number {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private _findChain(indices: number[], p: IPoint): number {
 		/**
 		 * We use linear search here to check all chains,
 		 * which appears to be inefficient,
@@ -136,6 +156,10 @@ export class Chainer<PathType extends Path = Path> {
 		}
 		return 0;
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Debug methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///#if DEBUG
 	protected debugChains(): void {

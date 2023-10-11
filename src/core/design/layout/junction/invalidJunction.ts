@@ -1,4 +1,4 @@
-import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
+import { RRIntersection } from "core/math/sweepLine/polyBool/rrIntersection/rrIntersection";
 
 import type { ArcPolygon } from "shared/types/geometry";
 import type { ITreeNode } from "core/design/context";

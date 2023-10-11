@@ -1,9 +1,9 @@
-import { LineSegment } from "../../segment/lineSegment";
+import { LineSegment } from "../classes/segment/lineSegment";
 import { xyComparator } from "shared/types/geometry";
 import { Clip } from "./clip";
 import { OverlapIntersector } from "./overlapIntersector";
 
-import type { StartEvent } from "../../event";
+import type { StartEvent } from "../classes/event";
 import type { Polygon } from "shared/types/geometry";
 
 //=================================================================
@@ -28,7 +28,7 @@ export class Overlap extends Clip {
 	}
 
 	private constructor() {
-		super(OverlapIntersector);
+		super(new OverlapIntersector());
 	}
 
 	/** Test if two oriented paths overlap. */

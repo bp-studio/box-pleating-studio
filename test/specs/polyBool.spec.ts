@@ -1,17 +1,16 @@
 import { expect } from "chai";
 
 import { expand } from "core/design/tasks/expansion";
-import { AAUnion } from "core/math/polyBool/union/aaUnion";
-import { GeneralUnion } from "core/math/polyBool/general/generalUnion";
+import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
 import { random } from "../utils/random";
-import { RRIntersection } from "core/math/polyBool/intersection/rrIntersection";
 import { parsePath } from "../utils/path";
+import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
-import type { PathEx, Polygon } from "shared/types/geometry";
+import type { Polygon } from "shared/types/geometry";
 
 describe("PolyBool", function() {
-	describe("AAUnion operation", function() {
 
+	describe("AAUnion operation", function() {
 		it("Finds union of AABBs", function() {
 			// Test 1
 			let result = new AAUnion().$get(
@@ -122,6 +121,39 @@ describe("PolyBool", function() {
 		});
 	});
 
+	describe("RoughUnion operation", function() {
+		it("Marks holes in the result", function() {
+			const result = new RoughUnion().$union(
+				[parsePath("(0,0),(2,0),(2,2),(0,2)")],
+				[parsePath("(2,2),(4,2),(4,4),(2,4)")],
+				[parsePath("(2,0),(4,0),(4,2),(3,2),(3,1),(2,1)")],
+				[parsePath("(0,2),(1,2),(1,3),(2,3),(2,4),(0,4)")]
+			);
+			expect(result.length).to.equal(1);
+			expect(result[0].from).to.have.members([0, 1, 2, 3]);
+			const outers = result[0].paths.filter(p => !p.isHole);
+			const holes = result[0].paths.filter(p => p.isHole);
+			expect(outers.length).to.equal(1);
+			expect(holes.length).to.equal(1);
+		});
+
+		it("Gives the origin info for the resulting paths", function() {
+			const result = new RoughUnion().$union(
+				[parsePath("(0,0),(2,0),(2,4),(0,4)")],
+				[parsePath("(2,0),(4,0),(4,4),(2,4)")],
+				[parsePath("(1,1),(3,1),(3,3),(1,3)")],
+				[parsePath("(5,1),(7,1),(7,3),(5,3)")]
+			);
+			expect(result.length).to.equal(2);
+			const contour1 = result.find(p => p.from!.length == 3)!;
+			const contour2 = result.find(p => p.from!.length == 1)!;
+			expect(contour1).to.be.not.undefined;
+			expect(contour2).to.be.not.undefined;
+			expect(contour1.from).to.have.members([0, 1, 2]);
+			expect(contour2.from).to.eql([3]);
+		});
+	});
+
 	describe("GeneralUnion operation", function() {
 		it("Works for AA union the same way", function() {
 			const result = new GeneralUnion().$get(
@@ -164,36 +196,35 @@ describe("PolyBool", function() {
 
 			expect(average).to.be.lessThan(1.0);
 		});
-
-		it("test", function() {
-			const result = new GeneralUnion().$get(
-				[parsePath("(122,84),(110,84),(110,95),(92,95),(92,107),(90,107),(84,107),(84,115),(62,115),(62,110),(42,110),(42,115),(34,115),(34,138),(-34,138),(-34,70),(-18,70),(-18,48),(-18,38),(-14,38),(-14,14),(10,14),(10,6),(24.857142857142858,6),(28.285714285714285,7),(30,7),(30,7.5),(31.714285714285715,8),(36,8),(36,28),(36,32),(36,50),(36,52),(39,56),(42,56),(42,40),(46,40),(46,28),(63.333333333333336,28),(64.66666666666667,27),(67.99999999999999,26.999999999999993),(68,8),(72.28571428571429,8),(74,7.5),(74,7),(75.71428571428571,7),(79.14285714285714,6),(94,6),(94,14),(118,14),(118,38),(122,38),(122,48),(122,74)")]
-			);
-			console.log(result);
-		});
 	});
 
 	describe("Expansion operation", function() {
 		it("Expands given AA polygons", function() {
 			const result = expand([
-				{ $outer: [parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)")], $leaves: [] },
-				{ $outer: [parsePath("(2,2),(2,4),(4,4),(4,2)")], $leaves: [] },
+				{ $outer: [parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)")], $inner: [], $leaves: [] },
+				{ $outer: [parsePath("(2,2),(2,4),(4,4),(4,2)")], $inner: [], $leaves: [] }, // This is a hole
 			], 1);
-			expect(result.length).to.equal(2);
-			expect(result[0].$outer.length).to.equal(1);
+			expect(result.length).to.equal(1);
+			expect(result[0].$outer.length).to.equal(1); // The hole degenerates and vanishes
 			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
-			expect(result[1].$outer.length).to.equal(0);
 		});
 
-		it("Matches inner and outer contours", function() {
-			const expander = new AAUnion(true);
-			const result = expander.$get(
-				[parsePath("(9,8),(9,-4),(21,-4),(21,8)")],
-				[parsePath("(20,21),(20,9),(32,9),(32,21)")]
-			);
-			expect(result.length).to.equal(2);
-			expect(result[0].from).to.eql([0]);
-			expect(result[1].from).to.eql([1]);
+		it("Expands holes with repeated points", function() {
+			const result = expand([
+				{
+					$outer: [
+						parsePath("(0,0),(8,0),(8,8),(0,8)"),
+						parsePath("(1,4),(1,7),(4,7),(4,4),(7,4),(7,1),(4,1),(4,4)"),
+					],
+					$inner: [], $leaves: [],
+				},
+			], 1);
+			expect(result.length).to.equal(1);
+			expect(result[0].$outer.length).to.equal(3);
+			const holes = result[0].$outer.filter(p => p.isHole);
+			expect(holes.length).to.equal(2);
+			expect(holes[0]).to.equalPath("(3,6),(3,5),(2,5),(2,6)");
+			expect(holes[1]).to.equalPath("(6,3),(6,2),(5,2),(5,3)");
 		});
 	});
 

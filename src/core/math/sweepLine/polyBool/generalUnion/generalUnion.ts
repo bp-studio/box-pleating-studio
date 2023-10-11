@@ -1,12 +1,13 @@
 import { GeneralIntersector } from "./generalIntersector";
-import { LineSegment } from "../segment/lineSegment";
+import { LineSegment } from "../../classes/segment/lineSegment";
 import { GeneralEventProvider } from "./generalEventProvider";
-import { UnionBase } from "../union/unionBase";
-import { epsilonSame, isAlmostInteger, floatXyComparator, fixPath } from "core/math/geometry/float";
+import { UnionBase } from "../unionBase";
+import { epsilonSame, floatXyComparator } from "core/math/geometry/float";
+import { Initializer } from "../initializer";
+import { Chainer } from "../../classes/chainer/chainer";
 
-import type { EndEvent } from "../event";
-import type { PathEx, Polygon } from "shared/types/geometry";
-import type { AAUnion } from "../union/aaUnion";
+import type { Polygon } from "shared/types/geometry";
+import type { AAUnion } from "../aaUnion/aaUnion";
 
 //=================================================================
 /**
@@ -19,12 +20,12 @@ import type { AAUnion } from "../union/aaUnion";
 
 export class GeneralUnion extends UnionBase {
 
-	protected override _initComparator = floatXyComparator;
-
 	constructor() {
-		super(new GeneralEventProvider(false), GeneralIntersector, LineSegment);
+		super(new GeneralEventProvider(false), new GeneralIntersector(), new Chainer(), generalInitializer);
 
 		// General union will require epsilon comparison in the chainer
 		this._chainer.$checkFunction = epsilonSame;
 	}
 }
+
+export const generalInitializer = new Initializer(LineSegment, floatXyComparator);

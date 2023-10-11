@@ -5,10 +5,6 @@ import type { StartEvent, SweepEvent } from "./event";
 
 export type EventQueue = IHeap<SweepEvent>;
 
-export interface IntersectorConstructor {
-	new(provider: EventProvider, queue: EventQueue): Intersector;
-}
-
 //=================================================================
 /**
  * {@link Intersector} is the base class for segment intersection logic.
@@ -23,10 +19,10 @@ export abstract class Intersector {
 	/** Whether there is a new event being inserted to the front of the event queue. */
 	protected _eventInserted: boolean = false;
 
-	private readonly _provider: EventProvider;
-	private readonly _queue: EventQueue;
+	private _provider!: EventProvider;
+	private _queue!: EventQueue;
 
-	constructor(provider: EventProvider, queue: EventQueue) {
+	public $setup(provider: EventProvider, queue: EventQueue): void {
 		this._provider = provider;
 		this._queue = queue;
 	}

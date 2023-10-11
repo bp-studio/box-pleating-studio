@@ -1,4 +1,4 @@
-import type { IArcPoint, Path } from "shared/types/geometry";
+import type { IArcPoint, Path, PathEx } from "shared/types/geometry";
 import type { QuadrantDirection } from "shared/types/direction";
 
 /**
@@ -52,4 +52,19 @@ export function isAAPath(path: Path): boolean {
 		if(prev.x != p.x && prev.y != p.y) return false;
 	}
 	return true;
+}
+
+export function isClockwise(path: PathEx): boolean {
+	const l = path.length;
+	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const p = path[i];
+		if(p.x < minX) {
+			minX = p.x;
+			const p1 = path[j], p2 = path[i + 1] || path[0];
+			const dx = p2.y - p1.y;
+			minXDelta = dx;
+		}
+	}
+	return minXDelta > 0;
 }

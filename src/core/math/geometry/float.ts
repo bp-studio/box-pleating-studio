@@ -1,4 +1,4 @@
-import type { Path } from "shared/types/geometry";
+import type { Path, PathEx } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 
 /**
@@ -46,6 +46,6 @@ function fixIPoint(p: IPoint): void {
 	if(isAlmostZero(ry - y)) (p as Writeable<IPoint>).y = ry;
 }
 
-export function fixPath(path: Path): void {
+export function fixPath(path: PathEx): void {
 	path.forEach(p => fixIPoint(p));
 }

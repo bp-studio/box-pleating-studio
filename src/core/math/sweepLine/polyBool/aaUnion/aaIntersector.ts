@@ -1,6 +1,6 @@
-import { Intersector } from "../intersector";
+import { Intersector } from "../../classes/intersector";
 
-import type { StartEvent } from "../event";
+import type { StartEvent } from "../../classes/event";
 
 //=================================================================
 /**
@@ -11,7 +11,12 @@ import type { StartEvent } from "../event";
 export class AAIntersector extends Intersector {
 
 	/** Should we check for self-intersection of a polygon. */
-	public $checkSelfIntersection: boolean = false;
+	private _checkSelfIntersection: boolean;
+
+	constructor(checkSelfIntersection: boolean) {
+		super();
+		this._checkSelfIntersection = checkSelfIntersection;
+	}
 
 	/**
 	 * Find possible intersection between segments and
@@ -21,7 +26,7 @@ export class AAIntersector extends Intersector {
 	 */
 	public $possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
 		if(!ev1 || !ev2) return;
-		if(!this.$checkSelfIntersection && ev1.$segment.$polygon === ev2.$segment.$polygon) return;
+		if(!this._checkSelfIntersection && ev1.$segment.$polygon === ev2.$segment.$polygon) return;
 		this._processAALineSegments(ev1, ev2);
 	}
 }

@@ -41,6 +41,11 @@ export class UnionFind<T> {
 	/**
 	 * Signal that the two elements are in the same set.
 	 * The elements will be added to the list when in need.
+	 *
+	 * For the best performance in general,
+	 * here we don't check the trivial case where a === b.
+	 * Whoever uses this method should perform the check itself
+	 * if such case is frequently possible.
 	 */
 	public $union(a: T, b: T): void {
 		const i = this._findRecursive(this.$add(a));

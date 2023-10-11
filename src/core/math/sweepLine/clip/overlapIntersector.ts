@@ -1,4 +1,4 @@
-import { GeneralIntersector } from "../generalIntersector";
+import { GeneralIntersector } from "../polyBool/generalUnion/generalIntersector";
 
 //=================================================================
 /**

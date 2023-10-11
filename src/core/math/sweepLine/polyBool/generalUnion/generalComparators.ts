@@ -1,7 +1,7 @@
 import { fixZero, floatXyComparator, isAlmostZero } from "core/math/geometry/float";
 
 import type { Comparator } from "shared/types/types";
-import type { StartEvent, SweepEvent } from "../event";
+import type { StartEvent, SweepEvent } from "../../classes/event";
 
 function eventComparator(comparator: Comparator<StartEvent>): Comparator<SweepEvent> {
 	return (a, b) =>

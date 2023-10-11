@@ -5,7 +5,7 @@ import { Vector } from "core/math/geometry/vector";
 import { cache } from "core/utils/cache";
 import { Fraction } from "core/math/fraction";
 import { getIntersection } from "core/math/geometry/line";
-import { Overlap } from "core/math/polyBool/general/clip/overlap";
+import { Overlap } from "core/math/sweepLine/clip/overlap";
 import { join, shift, toLines, toPath } from "core/math/geometry/rationalPath";
 import { clone } from "shared/utils/clone";
 
