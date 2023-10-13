@@ -83,7 +83,7 @@ gulp.task("deployPub", () => seriesIf(
 		const inquirer = (await import("inquirer")).default;
 		const answers = await inquirer.prompt([{
 			type: "confirm",
-			message: "Before releasing, please update the version number, add update logs, and edit README.md if needed. Are you sure you want to deploy?",
+			message: "Before releasing, please update the version number in package.json, add update logs, edit README.md if needed, and deploy to DEV at least once to ensure there's no major building error. Are you sure you want to deploy?",
 			name: "ok",
 			default: false,
 		}]);
