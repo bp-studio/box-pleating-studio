@@ -55,7 +55,8 @@ function processRepo(repo: Repository, trace: Trace): void {
 		for(const [index, roughContour] of node.$graphics.$roughContours.entries()) {
 			for(const outer of roughContour.$outer) {
 				// Exclude irrelevant path in raw mode
-				if(roughContour.$raw && !outer.leaves!.some(l => repoLeaves.has(l))) continue;
+				const leaves = outer.leaves?.filter(l => repoLeaves.has(l));
+				if(roughContour.$raw && leaves!.length == 0) continue;
 
 				// Create start/end map
 				const isHole = Boolean(outer.isHole);
@@ -67,7 +68,7 @@ function processRepo(repo: Repository, trace: Trace): void {
 				const hingeSegments = createHingeSegments(outer, repo.$direction);
 				const context: TraceContext = { map, repo, trace, node, index };
 				for(const hingeSegment of hingeSegments) {
-					processTrace(hingeSegment, context, outer.leaves);
+					processTrace(hingeSegment, context, leaves);
 				}
 			}
 		}
@@ -98,7 +99,7 @@ interface TraceContext {
 function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves?: number[]): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
-	const contour = context.trace.$generate(hingeSegment, map[0], map[1]);
+	const contour = context.trace.$generate(hingeSegment, map[0], map[1], Boolean(leaves));
 	if(contour) {
 		State.$contourWillChange.add(context.node);
 		contour.$ids = context.repo.$nodeSet.$nodes;

@@ -39,7 +39,7 @@ export class Trace {
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
-	public $generate(hinges: Path, start: Point, end: Point): PatternContour | null {
+	public $generate(hinges: Path, start: Point, end: Point, rawMode: boolean): PatternContour | null {
 		const ctx = new TraceContext(this, hinges);
 		if(!ctx.$valid) return null;
 
@@ -77,7 +77,18 @@ export class Trace {
 			}
 		}
 
-		return ctx.$trim(path);
+		const result = ctx.$trim(path);
+		if(!rawMode) return result;
+
+		// In raw mode, we need to make one extra check to make sure the
+		// generated contour actually fits the given hinge segment.
+		if(!result) return null;
+		const lastPoint = result[result.length - 1];
+		for(let i = hinges.length - 1; i > 0; i--) {
+			const line = Line.$fromIPoint(hinges[i], hinges[i - 1]);
+			if(line.$contains(lastPoint, true)) return result;
+		}
+		return null;
 	}
 
 	/** Determine the starting/ending point of tracing. */
