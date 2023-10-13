@@ -91,7 +91,7 @@ export namespace ScrollController {
 		// touches remain very shortly as one release the fingers.
 		if(_scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
 			const [pt, diff] = CursorController.$diff(event);
-			const dpi = window.devicePixelRatio ?? 1;
+			const dpi = window.devicePixelRatio || 1;
 			if(_scrolling == ScrollingState.scrolling || norm(diff.x, diff.y) / dpi >= SCROLL_THRESHOLD) {
 				CursorController.$update(pt);
 				_scrolling = ScrollingState.scrolling;

@@ -45,15 +45,15 @@ export class EditCommand extends Command implements JEditCommand {
 		this.new = json.new;
 	}
 
-	public $canAddTo(command: Command): boolean {
+	public override $canAddTo(command: Command): boolean {
 		return false; // EditCommand cannot be combined
 	}
 
-	public $addTo(command: Command): void {
+	public override $addTo(command: Command): void {
 		// EditCommand cannot be combined
 	}
 
-	public get $isVoid(): boolean {
+	public override get $isVoid(): boolean {
 		return false; // EditCommand cannot be void
 	}
 

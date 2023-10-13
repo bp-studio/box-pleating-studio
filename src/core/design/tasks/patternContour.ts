@@ -70,7 +70,7 @@ function processRepo(repo: Repository, trace: Trace): void {
 	}
 }
 
-type StartEndMap = Record<QuadrantDirection, [Point, Point]>;
+type StartEndMap = Partial<Record<QuadrantDirection, [Point, Point]>>;
 
 function createStartEndMap(quadrants: Quadrant[], repo: Repository, trace: Trace): StartEndMap {
 	const startEndMap = {} as StartEndMap;

@@ -6,7 +6,8 @@ import { random } from "../utils/random";
 import { parsePath } from "../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
-import type { Polygon } from "shared/types/geometry";
+import type { RoughContour } from "core/design/context";
+import type { Path, Polygon } from "shared/types/geometry";
 
 describe("PolyBool", function() {
 
@@ -201,8 +202,8 @@ describe("PolyBool", function() {
 	describe("Expansion operation", function() {
 		it("Expands given AA polygons", function() {
 			const result = expand([
-				{ $outer: [parsePath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)")], $inner: [], $leaves: [] },
-				{ $outer: [parsePath("(2,2),(2,4),(4,4),(4,2)")], $inner: [], $leaves: [] }, // This is a hole
+				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
+				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
 			], 1);
 			expect(result.length).to.equal(1);
 			expect(result[0].$outer.length).to.equal(1); // The hole degenerates and vanishes
@@ -211,13 +212,7 @@ describe("PolyBool", function() {
 
 		it("Expands holes with repeated points", function() {
 			const result = expand([
-				{
-					$outer: [
-						parsePath("(0,0),(8,0),(8,8),(0,8)"),
-						parsePath("(1,4),(1,7),(4,7),(4,4),(7,4),(7,1),(4,1),(4,4)"),
-					],
-					$inner: [], $leaves: [],
-				},
+				makeRoughContour("(0,0),(8,0),(8,8),(0,8)", "(1,4),(1,7),(4,7),(4,4),(7,4),(7,1),(4,1),(4,4)"),
 			], 1);
 			expect(result.length).to.equal(1);
 			expect(result[0].$outer.length).to.equal(3);
@@ -290,4 +285,8 @@ function randomAabbPolygon(range: number, size: number): Polygon {
 	const left = random(range);
 	const right = left + random(size) + 1;
 	return aabbToPolygon({ top, bottom, left, right });
+}
+
+function makeRoughContour(...outer: string[]): RoughContour {
+	return { $outer: outer.map(parsePath), $inner: [], $leaves: [], $raw: false };
 }

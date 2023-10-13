@@ -5,10 +5,10 @@ import type { JConfiguration, JCorner, JProject, JGadget, JOverlap, JPartition, 
 
 /** Version rc1 adds {@link Partition} and {@link Device}. */
 export default function $process(proj: Pseudo<JProject>): boolean {
-	const st = (proj.layout as JLayout)?.stretches as Pseudo<JStretch>[];
+	const st = (proj.layout as JLayout | undefined)?.stretches as Pseudo<JStretch>[] | undefined;
 	if(st) {
 		for(const s of st.concat()) {
-			const cf = s.configuration as Pseudo<JConfiguration>;
+			const cf = s.configuration as Pseudo<JConfiguration> | undefined;
 			if(cf) pattern(cf, s);
 		}
 	}

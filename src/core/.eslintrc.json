@@ -6,6 +6,10 @@
 		"project": true
 	},
 	"rules": {
+		// This rule is good for identifying unnecessary optional chaining,
+		// but otherwise is giving too many warnings.
+		// So we keep it off in most cases and turn it on as needed.
+		"@typescript-eslint/no-unnecessary-condition": "off",
 		"jsdoc/require-jsdoc": [
 			"warn",
 			{

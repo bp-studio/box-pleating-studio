@@ -23,7 +23,7 @@ export default function $process(proj: Pseudo<JProject>): boolean {
 }
 
 function moveState(proj: Pseudo<JProject>, key: DesignMode): void {
-	const sheet = proj?.design?.[key]?.sheet;
+	const sheet = proj.design?.[key]?.sheet;
 	if(sheet && "scroll" in sheet) {
 		proj.state = Object.assign(proj.state ?? {}, {
 			[key]: {

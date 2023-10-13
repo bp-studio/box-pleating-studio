@@ -39,6 +39,7 @@ export abstract class Draggable extends Control {
 	 * The default behavior is fix it to the zero vector
 	 * (in other words, this {@link Draggable} cannot be moved).
 	 */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	public $constrainBy(v: IPoint): IPoint {
 		return { x: 0, y: 0 };
 	}

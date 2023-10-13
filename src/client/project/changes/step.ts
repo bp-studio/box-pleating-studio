@@ -171,7 +171,7 @@ export class Step implements ISerializable<JStep> {
 	private _restoreSelection(tags: string[]): void {
 		SelectionController.clear();
 		for(const tag of tags) {
-			const obj = this._project.design.$query?.(tag);
+			const obj = this._project.design.$query(tag);
 			if(obj instanceof Control) SelectionController.$toggle(obj, true);
 		}
 	}
@@ -223,7 +223,7 @@ async function runCommandsAsync(
 		try {
 			await factory(c);
 		} catch {
-			if(result == -1 || i < result) result = i;
+			if(i < result) result = i;
 		}
 	}
 	await Promise.all(commands.map(run));

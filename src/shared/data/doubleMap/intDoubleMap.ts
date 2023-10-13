@@ -179,6 +179,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		unlink(n);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	protected _changeValue(node: Node<V>, value: V): void {
 		node.value = value;
 	}

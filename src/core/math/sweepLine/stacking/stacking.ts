@@ -51,11 +51,11 @@ export class Stacking extends SweepLine {
 		this._parent.length = 0;
 	}
 
-	protected _isOriented(segment: ISegment, delta: Sign): boolean {
+	protected override _isOriented(segment: ISegment, delta: Sign): boolean {
 		return delta === 1;
 	}
 
-	protected _processStart(event: StartEvent): void {
+	protected override _processStart(event: StartEvent): void {
 		this._status.$insert(event, event);
 		const prev = this._status.$getPrev(event);
 		if(prev) event.$wrapCount += prev.$wrapCount;

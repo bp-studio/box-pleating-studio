@@ -2,13 +2,14 @@ import { AAUnion } from "core/math/sweepLine/polyBool/aaUnion/aaUnion";
 import { deduplicate } from "core/math/geometry/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
+import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import type { RoughContour } from "core/design/context";
 import type { Path, PathEx, Polygon } from "shared/types/geometry";
 
 const aaUnion = new AAUnion();
 const roughUnion = new RoughUnion();
 
-type CheckCallback = (result: PathEx[]) => RoughContour[] | undefined;
+type CheckCallback = (result: readonly PathEx[], leaves: readonly number[]) => boolean;
 
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
@@ -28,14 +29,31 @@ export function expand(inputs: readonly RoughContour[], units: number, check?: C
 
 	const contours: RoughContour[] = [];
 	for(const component of components) {
-		const children = component.from.map(i => inputs[i]);
-		contours.push({
-			$outer: component.paths.map(simplify),
-			$inner: aaUnion.$get(...children.map(c => c.$outer)),
-			$leaves: children.flatMap(c => c.$leaves),
-		});
+		contours.push(componentToContour(inputs, component, check));
 	}
 	return contours;
+}
+
+function componentToContour(
+	inputs: readonly RoughContour[],
+	component: UnionResult,
+	check?: CheckCallback
+): RoughContour {
+	let raw = false;
+	const children = component.from.map(i => inputs[i]);
+	let outers = component.paths.map(simplify);
+	const leaves = children.flatMap(c => c.$leaves);
+	if(check && !check(outers, leaves)) {
+		outers = children.flatMap(c => c.$outer);
+		raw = true;
+	}
+	return {
+		$outer: outers,
+		// TODO: need fix here
+		$inner: aaUnion.$get(...children.flatMap(c => c.$raw ? c.$outer.map(p => [p]) : [c.$outer])),
+		$leaves: children.flatMap(c => c.$leaves),
+		$raw: raw,
+	};
 }
 
 /**
@@ -50,7 +68,6 @@ export function expandPath(path: PathEx, units: number): PathEx {
 	const l = path.length;
 	const result: PathEx = [];
 	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
-	let maxX = Number.NEGATIVE_INFINITY, maxXDelta: number = 0;
 	for(let i = 0, j = l - 1; i < l; j = i++) {
 		// Decide the direction of shifting.
 		// Here we assume that the polygon is non-degenerated.
@@ -61,10 +78,6 @@ export function expandPath(path: PathEx, units: number): PathEx {
 		if(p.x < minX) {
 			minX = p.x;
 			minXDelta = dx;
-		}
-		if(p.x > maxX) {
-			maxX = p.x;
-			maxXDelta = dx;
 		}
 		result.push({ x: p.x + dx, y: p.y + dy });
 	}

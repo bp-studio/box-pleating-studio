@@ -1,13 +1,16 @@
 import { mapDirections } from "core/math/geometry/path";
-import { expand, expandPath } from "./expansion";
-import { State } from "core/service/state";
-import { ListUnionFind } from "shared/data/unionFind/listUnionFind";
-import { foreachPair } from "shared/utils/array";
+import { expand } from "./expansion";
 
 import type { ITreeNode, RoughContour, PatternContour } from "../context";
 import type { NodeSet } from "../layout/nodeSet";
 import type { Path } from "shared/types/geometry";
 import type { QuadrantDirection } from "shared/types/direction";
+
+interface CriticalCorner {
+	readonly $signature: string;
+	readonly $flap: number;
+	readonly $nodeSet: NodeSet;
+}
 
 //=================================================================
 /**
@@ -33,23 +36,24 @@ export class RoughContourContext {
 	public readonly $node: ITreeNode;
 	public readonly $children: readonly RoughContour[];
 
-	private readonly _cornerMap: Map<string, NodeSet> = new Map();
+	private readonly _corners: CriticalCorner[] = [];
+	// private readonly _cornerMap: Map<string, NodeSet> = new Map();
 
 	constructor(node: ITreeNode, nodeSets: NodeSet[] | undefined) {
 		this.$node = node;
 		this.$children = getChildContours(node);
-		for(const nodeSet of nodeSets || []) this._setupCriticalCorners(nodeSet);
+		if(nodeSets) {
+			for(const nodeSet of nodeSets) this._setupCriticalCorners(nodeSet);
+		}
 	}
 
 	public $process(): void {
 		this.$node.$graphics.$roughContours = expand(
 			this.$children,
 			this.$node.$length,
-			result => {
-				if(!checkCriticalCorners(result, this._cornerMap)) {
-					this.$node.$graphics.$raw = true;
-					return this._createRaw();
-				}
+			(result, leaves) => {
+				const corners = new Set(this._corners.filter(c => leaves.includes(c.$flap)).map(c => c.$signature));
+				return checkCriticalCorners(result, corners);
 			}
 		);
 	}
@@ -58,88 +62,22 @@ export class RoughContourContext {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _createRaw(): RoughContour[] {
-		const nodeSets = [...new Set(this._cornerMap.values())];
-
-		// The first step is to group the child contours that have missing corners.
-		// Two child contours will be placed in the same group if they're involved together in some pattern.
-		// We use the union-find algorithm to perform the grouping.
-		const remaining = new Set(this.$children);
-		const union = new ListUnionFind<RoughContour>(this.$children.length);
-		for(const nodeSet of nodeSets) {
-			const ids = new Set(nodeSet.$leaves);
-			const children = this.$children.filter(r => r.$leaves.some(l => ids.has(l)));
-			children.forEach(c => remaining.delete(c));
-			if(children.length == 1) union.$add(children[0]);
-			else foreachPair(children, (a, b) => union.$union(a, b));
-		}
-		const groups: RawGroup[] = union.$list().map(children => {
-			const leaves = new Set(children.flatMap(c => c.$leaves));
-			return {
-				$children: children,
-				$nodeSets: nodeSets.filter(s => s.$leaves.some(l => leaves.has(l))),
-			};
-		});
-
-		// Any child contour that wasn't collected will stay the way they are.
-		if(remaining.size) groups.push({ $children: [...remaining] });
-
-		const result = groups.flatMap(g => {
-			let contours = expand(g.$children, this.$node.$length);
-			const sets = g.$nodeSets;
-			// There's no need to check if each child component has only one leaf
-			if(sets && g.$children.some(c => c.$leaves.length > 1)) {
-				// Now we check again to see if the missing corners are exposed.
-				// In some edge cases, it is possible that some are still missing at this point.
-				const corners = [...this._cornerMap.entries()].filter(e => sets.includes(e[1])).map(e => e[0]);
-				const testMap = new Set(corners);
-				if(!checkCriticalCorners(contours.flatMap(c => c.$outer), testMap)) {
-
-					contours = g.$children.flatMap(c => expand([c], this.$node.$length));
-					// for(const contour of contours) this._breakAllContour(contour);
-				}
-			}
-			return contours;
-		});
-		return result;
-	}
-
-	/**
-	 * The last resort for creating raw contour,
-	 * by breaking up the contour for every leaves involved.
-	 */
-	private _breakAllContour(contour: RoughContour): void {
-		if(!contour.$outer.length) return;
-		// contour.$union = contour.$outer[0];
-		const tree = State.$tree;
-		const length = this.$node.$length;
-		const outer: Path[] = [];
-		for(const id of contour.$leaves) {
-			const leaf = tree.$nodes[id]!;
-			// Calculate the distance is simple here,
-			// since the leaf must be a descendant of the current node.
-			const dist = leaf.$dist - this.$node.$dist + length - leaf.$length;
-			outer.push(expandPath(leaf.$AABB.$toPath(), dist));
-		}
-		contour.$outer = outer;
-	}
-
 	private _setupCriticalCorners(nodeSet: NodeSet): void {
 		const node = this.$node;
 		const quadrants = nodeSet.$quadrantCoverage.get(node) || [];
 		for(const quadrant of quadrants) {
-			// q.$flap is a descendant of node by definition
-			const d = quadrant.$flap.$dist - node.$dist + node.$length;
+			const flap = quadrant.$flap;
+			/** {@link flap} is a descendant of {@link node} by definition. */
+			const d = flap.$dist - node.$dist + node.$length;
 			const p = quadrant.$corner(d);
 			const signature = cornerSignature(p, quadrant.q);
-			this._cornerMap.set(signature, nodeSet);
+			this._corners.push({
+				$signature: signature,
+				$flap: flap.id,
+				$nodeSet: nodeSet,
+			});
 		}
 	}
-}
-
-interface RawGroup {
-	$children: RoughContour[];
-	$nodeSets?: NodeSet[];
 }
 
 /**
@@ -166,7 +104,7 @@ function getChildContours(node: ITreeNode): RoughContour[] {
  *
  * This methods modifies {@link corners}, so it should only be invoked once.
  */
-function checkCriticalCorners(result: Path[], corners: Set<string> | Map<string, NodeSet>): boolean {
+function checkCriticalCorners(result: readonly Path[], corners: Set<string> | Map<string, NodeSet>): boolean {
 	for(const path of result) {
 		const dirs = mapDirections(path);
 		for(const [i, p] of path.entries()) {

@@ -6,7 +6,6 @@ import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
 import { getFirst } from "shared/utils/set";
 
-import type { Stretch } from "core/design/layout/stretch";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {

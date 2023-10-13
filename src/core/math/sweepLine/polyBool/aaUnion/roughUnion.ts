@@ -7,7 +7,7 @@ import type { PathEx, Polygon } from "shared/types/geometry";
 import type { RoughContour } from "core/design/context";
 
 /** Each {@link UnionResult} is a connected component. */
-interface UnionResult {
+export interface UnionResult {
 	/**
 	 * All paths of this component.
 	 * There should be exactly one outer boundary and zero or more inner holes.

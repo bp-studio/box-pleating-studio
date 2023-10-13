@@ -43,11 +43,11 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 	/** Load all initial events. */
 	protected abstract _initialize(components: ComponentType[]): void;
 
-	protected _isOriented(segment: ISegment, delta: Sign): boolean {
+	protected override _isOriented(segment: ISegment, delta: Sign): boolean {
 		return delta === 1; // For PolyBool, it can be simply determined by the delta
 	}
 
-	protected _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
+	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
 		// If the previous segment just exited, then the current segment should be on the boundary.
 		if(prev && prev.$wrapCount != 0) {
 			event.$wrapCount += prev.$wrapCount;
@@ -60,6 +60,7 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///#if DEBUG
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	public createTestCase(components: ComponentType[]): void {
 		console.log(components.map(c => "[" + (c as Polygon).map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(",\n"));
 	}

@@ -18,7 +18,7 @@ export interface RationalPathEx extends RationalPath {
 
 export function toRationalPath(path: PathEx): RationalPathEx {
 	const result: RationalPathEx = path.map(p => new Point(p));
-	if(path.isHole) result.isHole = true;
+	result.isHole = path.isHole;
 	return result;
 }
 

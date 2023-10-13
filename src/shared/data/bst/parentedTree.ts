@@ -65,6 +65,7 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 		newChild.$parent = parent;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	protected _getSibling(node: N): N {
 		const parent = node.$parent;
 		return node === parent.$left ? parent.$right : parent.$left;

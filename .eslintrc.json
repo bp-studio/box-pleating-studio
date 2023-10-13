@@ -28,6 +28,12 @@
 				"allowSingleLine": true
 			}
 		],
+		"@typescript-eslint/class-methods-use-this": [
+			"warn",
+			{
+				"ignoreOverrideMethods": true
+			}
+		],
 		"@typescript-eslint/comma-dangle": [
 			"warn",
 			{
@@ -51,7 +57,9 @@
 				"SwitchCase": 1,
 				"flatTernaryExpressions": true,
 				"ignoredNodes": [
-					"ClassDeclaration" // There's no good solution for the moment. See https://github.com/typescript-eslint/typescript-eslint/issues/1824
+					// There's no good solution for the moment.
+					// See https://github.com/typescript-eslint/typescript-eslint/issues/1824
+					"ClassDeclaration"
 				]
 			}
 		],
@@ -160,7 +168,7 @@
 		"brace-style": "off", // see ts
 		"camelcase": "off",
 		"capitalized-comments": "off",
-		"class-methods-use-this": "off", // The intention is good, but there're too many exceptions
+		"class-methods-use-this": "off", // see ts
 		"comma-dangle": "off", // see ts
 		"comma-spacing": "off", // see ts
 		"comma-style": "warn",

@@ -69,7 +69,7 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	public abstract $delete(key: K): void;
 
 	public $get(key: K): V | undefined {
-		return this._getNode(key)?.$value;
+		return this._getNode(key).$value;
 	}
 
 	public get $isEmpty(): boolean {
@@ -141,6 +141,7 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	 *  / \          / \
 	 * 1   3        3   5
 	 */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	protected _rotateRight(n: N): N {
 		const x = n.$left;
 		n.$left = x.$right;
@@ -156,6 +157,7 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	 *    / \    / \
 	 *   3   5  1   3
 	 */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	protected _rotateLeft(n: N): N {
 		const x = n.$right;
 		n.$right = x.$left;

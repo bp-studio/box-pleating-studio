@@ -71,6 +71,7 @@ function updater(node: ITreeNode): boolean {
 			$outer: [path],
 			$inner: [],
 			$leaves: [node.id],
+			$raw: false,
 		}];
 	} else {
 		const nodeSets = nodeSetMap.get(node.id);

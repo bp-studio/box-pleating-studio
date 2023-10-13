@@ -107,12 +107,12 @@ namespace LanguageService {
 			.replace(/^zh(-\w+)?-hans.*$/, "zh-cn");
 	}
 
-	export let onReset: Action;
+	export let onReset: Action | undefined;
 
 	export function reset(): void {
 		localStorage.removeItem(LOCALE_KEY);
 		init();
-		onReset?.();
+		if(onReset) onReset();
 	}
 }
 

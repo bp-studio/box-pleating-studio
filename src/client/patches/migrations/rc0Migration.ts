@@ -4,10 +4,10 @@ import type { JConfiguration, JCorner, JProject, JOverlap, JStretch, JLayout } f
 
 /** Since version rc0 it is required that {@link JIntersection} must have `e`. */
 export default function $process(proj: Pseudo<JProject>): boolean {
-	const st = (proj.layout as JLayout)?.stretches as Pseudo<JStretch>[];
+	const st = (proj.layout as JLayout | undefined)?.stretches as Pseudo<JStretch>[] | undefined;
 	if(st) {
 		for(const s of st.concat()) {
-			const cf = s.configuration as Pseudo<JConfiguration>;
+			const cf = s.configuration as Pseudo<JConfiguration> | undefined;
 			if(cf && (!cf.overlaps || (cf.overlaps as JOverlap[]).some(overlapFilter))) {
 				st.splice(st.indexOf(s), 1);
 				return true;

@@ -71,6 +71,7 @@ export abstract class Control extends View implements ITagObject {
 	}
 
 	/** Whether self can be selected together with another {@link Control}. */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	public $selectableWith(c: Control): boolean { return false; }
 
 	protected $setupHit(object: Container, hitArea?: IHitArea): void {

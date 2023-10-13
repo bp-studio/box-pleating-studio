@@ -91,7 +91,7 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _fixInsert(x: Node<K, V>): void {
-		while(x.$parent !== this._nil && this._is01Node(x.$parent)) {
+		while(x.$parent !== this._nil && _is01Node(x.$parent)) {
 			x.$parent.$rank++;
 			x = x.$parent;
 		}
@@ -144,9 +144,9 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		z.$left = y;
 		y.$parent = z;
 	}
+}
 
-	private _is01Node(node: Node<K, V>): boolean {
-		return node.$rank === node.$left.$rank && node.$rank === node.$right.$rank + 1 ||
-			node.$rank === node.$right.$rank && node.$rank === node.$left.$rank + 1;
-	}
+function _is01Node<K, V>(node: Node<K, V>): boolean {
+	return node.$rank === node.$left.$rank && node.$rank === node.$right.$rank + 1 ||
+		node.$rank === node.$right.$rank && node.$rank === node.$left.$rank + 1;
 }

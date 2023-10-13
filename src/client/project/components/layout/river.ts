@@ -56,7 +56,7 @@ export class River extends Control {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get length(): number {
-		return this.$edge?.length ?? 0;
+		return this.$destructed ? 0 : this.$edge.length;
 	}
 	public set length(v: number) {
 		this.$edge.length = v;

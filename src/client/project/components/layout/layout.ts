@@ -115,7 +115,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		for(const r of newRivers) {
 			const edge = tree.$edges.get(r.n1, r.n2)!;
 			if(edge.$v1.isLeaf || edge.$v2.isLeaf) continue;
-			const tag = this._getEdgeTag(r);
+			const tag = getEdgeTag(r);
 			if(!model.graphics[tag]) continue;
 			this._addRiver(r, model.graphics[tag]);
 		}
@@ -234,10 +234,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 		}
 	}
 
-	private _getEdgeTag(e: JEdgeBase): string {
-		const { n1, n2 } = e;
-		return n1 < n2 ? `re${n1},${n2}` : `re${n2},${n1}`;
-	}
 
 	private _parseTag(tag: string): Flap | River | void {
 		const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
@@ -286,4 +282,9 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._junctionColor = color;
 		for(const junction of this.$junctions.values()) junction.$draw(max);
 	}
+}
+
+function getEdgeTag(e: JEdgeBase): string {
+	const { n1, n2 } = e;
+	return n1 < n2 ? `re${n1},${n2}` : `re${n2},${n1}`;
 }

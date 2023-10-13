@@ -7,21 +7,12 @@ import { Stacking } from "core/math/sweepLine/stacking/stacking";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
-import type { ITreeNode, PatternContour, RoughContour } from "../context";
+import type { ContourComponent, ITreeNode, PatternContour, RoughContour } from "../context";
 
 /**
  * {@link RoughContour} represented in {@link RationalPath}s.
- * The meaning of {@link $outer} and {@link $inner} here follows that of {@link RoughContour}.
  */
-interface RationalContour {
-	/** See {@link RoughContour.$outer}. */
-	$outer: RationalPathEx[];
-
-	/** See {@link RoughContour.$inner}. */
-	$inner?: RationalPathEx[];
-
-	$leaves: readonly number[];
-}
+type RationalContour = ContourComponent<RationalPathEx>;
 
 const generalUnion = new GeneralUnion();
 
@@ -44,8 +35,7 @@ export function combineContour(node: ITreeNode): void {
 	insertOuter(g.$patternContours, result);
 	insertInner(childrenPatternContours, result);
 
-	const contours = result.map(toGraphicalContour);
-	g.$contours = g.$raw ? reunionRaw(contours) : contours;
+	g.$contours = result.map(toGraphicalContour);
 }
 
 function insertOuter(patternContours: PatternContour[], result: RationalContour[]): void {
@@ -77,8 +67,6 @@ function insertInner(childrenPatternContours: PatternContour[], result: Rational
 
 function tryInsertInner(childContour: PatternContour, result: RationalContour[]): void {
 	for(const contour of result) {
-		if(!contour.$inner) continue;
-		// if(childContour.$leaves.every(l => contour.$leaves.includes(l))) debugger;
 		for(const inner of contour.$inner) {
 			if(tryInsert(inner, childContour)) return;
 		}
@@ -115,8 +103,9 @@ function tryInsert(path: RationalPath, insert: PatternContour): boolean {
 function toRationalContour(contour: RoughContour): RationalContour {
 	return {
 		$outer: contour.$outer.map(toRationalPath),
-		$inner: contour.$inner?.map(toRationalPath),
+		$inner: contour.$inner.map(toRationalPath),
 		$leaves: contour.$leaves,
+		$raw: contour.$raw,
 	};
 }
 
@@ -126,15 +115,14 @@ function toRationalContour(contour: RoughContour): RationalContour {
  */
 function toGraphicalContour(contour: RationalContour): Contour {
 	let outer: PathEx | undefined;
-	let inner = contour.$inner?.map(simplify);
+	const inner = contour.$inner.map(simplify);
 	let outers = contour.$outer.map(simplify);
-	if(outers.length > 1) outers = generalUnion.$get(outers);
+	if(contour.$raw) outers = generalUnion.$get(outers);
 	if(outers.length <= 1) {
 		outer = outers[0];
 	} else {
 		for(const path of outers) {
 			if(isClockwise(path)) {
-				if(!inner) inner = [];
 				inner.push(path);
 			} else {
 				fixPath(path);
@@ -144,7 +132,7 @@ function toGraphicalContour(contour: RationalContour): Contour {
 	}
 	if(!outer || !outer.length) {
 		return { outer: inner![0] };
-	} else if(outer.isHole && inner) {
+	} else if(outer.isHole && inner.length > 0) {
 		const innerHoleIndex = inner.findIndex(p => p.isHole);
 		if(innerHoleIndex >= 0) {
 			inner.push(outer);

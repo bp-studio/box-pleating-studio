@@ -39,7 +39,7 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	}
 
 	public $pop(): V | undefined {
-		if(!this._root) return undefined;
+		if(this._root === this._nil) return undefined;
 		this._root = this._pop(this._root);
 		return this._tempNode.$value;
 	}
@@ -50,15 +50,15 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 
 	protected override _rotateRight(n: Node<K, V>): Node<K, V> {
 		const x = super._rotateRight(n);
-		this._updateHeight(n);
-		this._updateHeight(x);
+		updateHeight(n);
+		updateHeight(x);
 		return x;
 	}
 
 	protected override _rotateLeft(n: Node<K, V>): Node<K, V> {
 		const x = super._rotateLeft(n);
-		this._updateHeight(n);
-		this._updateHeight(x);
+		updateHeight(n);
+		updateHeight(x);
 		return x;
 	}
 
@@ -117,10 +117,6 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 		}
 	}
 
-	private _updateHeight(n: Node<K, V>): void {
-		n.$height = 1 + (n.$left.$height > n.$right.$height ? n.$left.$height : n.$right.$height);
-	}
-
 	/**
 	 * Find and remove the minimum value under node `n`.
 	 * This method is similar to {@link _delete}, but does not require comparisons, so it is faster.
@@ -137,7 +133,7 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	}
 
 	private _balance(n: Node<K, V>): Node<K, V> {
-		this._updateHeight(n);
+		updateHeight(n);
 		const balance = n.$right.$height - n.$left.$height;
 		if(balance > 1) {
 			if(n.$right.$right.$height <= n.$right.$left.$height) {
@@ -152,4 +148,8 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 		}
 		return n;
 	}
+}
+
+function updateHeight<K, V>(n: Node<K, V>): void {
+	n.$height = 1 + (n.$left.$height > n.$right.$height ? n.$left.$height : n.$right.$height);
 }

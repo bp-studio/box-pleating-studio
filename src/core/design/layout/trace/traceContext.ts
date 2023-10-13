@@ -41,7 +41,7 @@ export class TraceContext {
 	constructor(trace: Trace, hinges: Path) {
 		this._trace = trace;
 
-		this._hinges = this._candidateRoughContourLines(hinges);
+		this._hinges = candidateRoughContourLines(hinges);
 		if(!this._hinges.length) return;
 
 		this.$valid = true;
@@ -110,19 +110,6 @@ export class TraceContext {
 		return false;
 	}
 
-	/**
-	 * Find lines in the {@link RoughContour} that might intersect with the pattern,
-	 * in counter-clockwise ordering.
-	 */
-	private _candidateRoughContourLines(path: Path): Line[] {
-		const result = [];
-		const l = path.length;
-		const points = path.map(p => new Point(p));
-		for(let i = 0; i < l - 1; i++) {
-			result.push(new Line(points[i], points[i + 1]));
-		}
-		return result;
-	}
 
 	/**
 	 * If the first line hit by a candidate line is a {@link SideDiagonal},
@@ -142,7 +129,7 @@ export function getNextIntersection(ridges: Iterable<Ridge>, node: TraceNode, ed
 	let result: RidgeIntersection | null = null;
 	const { point, vector, last: shift } = node;
 	for(const ridge of ridges) {
-		const intersection = getIntersection(ridge, point, vector, true, Boolean(edge)) as RidgeIntersection;
+		const intersection = getIntersection(ridge, point, vector, true, Boolean(edge)) as RidgeIntersection | null;
 
 		// In finding initial vector, the head of the given edge should be ignored.
 		if(!intersection || edge && intersection.point.eq(edge.p1)) continue;
@@ -204,5 +191,19 @@ function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): bo
 			// or, the angle of the given ridge is further in front of the previously hit ridge
 			Boolean(ang) && getAngle(v, ridge.$vector) > ang!
 		);
+	return result;
+}
+
+/**
+ * Find lines in the {@link RoughContour} that might intersect with the pattern,
+ * in counter-clockwise ordering.
+ */
+function candidateRoughContourLines(path: Path): Line[] {
+	const result = [];
+	const l = path.length;
+	const points = path.map(p => new Point(p));
+	for(let i = 0; i < l - 1; i++) {
+		result.push(new Line(points[i], points[i + 1]));
+	}
 	return result;
 }

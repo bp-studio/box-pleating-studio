@@ -59,12 +59,16 @@ export class Clip extends DivideAndCollect {
 		);
 	}
 
-	protected _isOriented(segment: ISegment, delta: Sign): boolean {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Protected methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected override _isOriented(segment: ISegment, delta: Sign): boolean {
 		// Unlike PolyBool, we need to actually compare the endpoints here
 		return xyComparator(segment.$start, segment.$end) < 0;
 	}
 
-	protected _processEnd(event: EndEvent): void {
+	protected override _processEnd(event: EndEvent): void {
 		const start = event.$other;
 		const prev = this._status.$getPrev(start);
 		const next = this._status.$getNext(start);
@@ -75,7 +79,7 @@ export class Clip extends DivideAndCollect {
 		this._intersector.$possibleIntersection(prev, next);
 	}
 
-	protected _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
+	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
 		if(prev) event.$wrapCount += prev.$wrapCount;
 		event.$isInside = event.$segment.$type == CreaseType.Border || // borders always count
 			!sameLine(event, prev) && // ignore identical lines

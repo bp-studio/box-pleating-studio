@@ -5,6 +5,8 @@ import { display } from "client/screen/display";
 import { TapController } from "./tapController";
 import { norm } from "shared/types/geometry";
 
+import type { Sheet } from "client/project/components/sheet";
+
 const DELTA_SCALE = 10000;
 const STEP = 5;
 const ZOOM_THRESHOLD = 2;
@@ -43,7 +45,7 @@ export namespace ZoomController {
 
 		const zoomDelta = sheet.zoom * distDelta / FULL_ZOOM;
 		const newZoom = Math.round(zoomDelta + _lastTouchZoom);
-		$zoom(newZoom, $getEventCenter(event));
+		$zoom(newZoom, sheet, $getEventCenter(event));
 		_lastTouchDistance = touchDistance;
 		_lastTouchZoom = newZoom;
 	}
@@ -52,11 +54,10 @@ export namespace ZoomController {
 		_zooming = false;
 	}
 
-	export function $zoom(zoom: number, center?: IPoint): void {
+	export function $zoom(zoom: number, sheet: Sheet, center?: IPoint): void {
 		// Precondition checks
 		if(zoom < FULL_ZOOM) zoom = FULL_ZOOM;
-		const sheet = ProjectService.sheet.value;
-		if(!sheet || sheet.zoom == zoom) return;
+		if(sheet.zoom == zoom) return;
 
 		// If the zooming center is not given, use the center of the canvas.
 		center ||= { x: display.canvas.clientWidth / 2, y: display.canvas.clientHeight / 2 };
@@ -86,6 +87,7 @@ export namespace ZoomController {
 		if(!sheet) return;
 		$zoom(
 			sheet.zoom - Math.round(sheet.zoom * event.deltaY / DELTA_SCALE) * STEP,
+			sheet,
 			{ x: event.offsetX, y: event.offsetY }
 		);
 	}

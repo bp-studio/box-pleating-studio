@@ -81,9 +81,6 @@ export interface NodeGraphics {
 	/** See {@link RoughContour}. */
 	$roughContours: RoughContour[];
 
-	/** Indicating that {@link $roughContours} is in raw mode. */
-	$raw?: boolean;
-
 	$patternContours: PatternContour[];
 
 	/** The final contours. */
@@ -102,11 +99,13 @@ export interface NodeGraphics {
  *
  * See also {@link roughContourTask}.
  */
-export interface RoughContour {
+export type RoughContour = ContourComponent<PathEx>;
+
+export interface ContourComponent<T extends Path> {
 	/**
 	 * Outer path of the contour.
 	 * Note that it is not of the same meaning as {@link Contour.outer}.
-	 * In a {@link RoughContour}, {@link $outer} is from the processing perspective
+	 * In a {@link ContourComponent}, {@link $outer} is from the processing perspective
 	 * (that is, it is the side of the river boundary facing away from the wrapped flaps),
 	 * not from the rendering perspective (that is, it is graphically the outer path).
 	 * Therefore, the outer paths are not necessarily counter-clockwise in orientation.
@@ -114,13 +113,9 @@ export interface RoughContour {
 	 * In majority of cases there's only one outer path,
 	 * but it could also contains newly formed holes,
 	 * and in some edge cases of the raw mode,
-	 * we may need to break up the outer path for the tracing algorithm to work
-	 * (see {@link RoughContourContext._breakAllContour}).
+	 * we may need to break up the outer path for the tracing algorithm to work.
 	 */
-	$outer: PathEx[];
-
-	// /** The union of {@link $outer}, if it has more than one path. */
-	// $union?: PathEx;
+	$outer: T[];
 
 	/**
 	 * Inner holes of the contour contributed by the child contours, if any.
@@ -132,8 +127,11 @@ export interface RoughContour {
 	 *
 	 * The same note of {@link $outer} also applies here.
 	 */
-	$inner: PathEx[];
+	$inner: T[];
 
-	/** The ids of the leaf nodes inside this {@link RoughContour}. */
+	/** The ids of the leaf nodes inside this {@link ContourComponent}. */
 	$leaves: number[];
+
+	/** Indicating that this {@link ContourComponent} is in raw mode. */
+	$raw: boolean;
 }

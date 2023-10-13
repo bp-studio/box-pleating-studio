@@ -74,7 +74,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $labels: Set<Label> = shallowReactive(new Set());
 
-	constructor(project: Project, parentView: Container, tag: DesignMode, json: JSheet, state?: JViewport) {
+	constructor(project: Project, parentView: Container, tag: DesignMode, json?: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
 		this.$tag = tag;
@@ -173,7 +173,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 	public set zoom(v: number) {
 		if(v < FULL_ZOOM) v = FULL_ZOOM;
-		ZoomController.$zoom(v);
+		ZoomController.$zoom(v, this);
 	}
 
 	public get $layers(): readonly Container[] {

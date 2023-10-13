@@ -112,7 +112,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** The name of the flap, which is the same as that of the vertex. */
 	public get name(): string {
-		return this.$vertex?.name ?? "";
+		return this.$destructed ? "" : this.$vertex.name;
 	}
 	public set name(v: string) {
 		this.$vertex.name = v;
@@ -120,7 +120,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** The radius of the flap. */
 	public get radius(): number {
-		return this.$edge?.length ?? 0;
+		return this.$destructed ? 0 : this.$edge.length;
 	}
 	public set radius(v: number) {
 		this.$edge.length = v;
@@ -191,7 +191,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 			return this._fixVector(p, v);
 		} else {
 			// We allow at most one tip to go beyond the range of the sheet.
-			const data = this._getDots(this.$location, w, h)
+			const data = getDots(this.$location, w, h)
 				.map(p => {
 					const fix = this._fixVector(p, v);
 					const dx = fix.x - v.x;
@@ -214,7 +214,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public override $anchors(): IPoint[] {
-		return this._getDots(this.$location, this._width, this._height);
+		return getDots(this.$location, this._width, this._height);
 	}
 
 	public $sync(p: IPoint): Promise<void> {
@@ -261,7 +261,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const s = ProjectService.scale.value;
 		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
 		const { width: w, height: h } = this._drawParams;
-		const pts = this._getDots(this._drawParams, w, h);
+		const pts = getDots(this._drawParams, w, h);
 		graphics.clear().lineStyle(style.dot.width, style.dot.color);
 		for(let i = 0; i < quadrantNumber; i++) {
 			if(this._sheet.grid.$contains(pts[i])) {
@@ -308,21 +308,21 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Tip positions, ordered by quadrants. */
-	private _getDots(location: IPoint, w: number, h: number): IPoint[] {
-		const { x, y } = location;
-		return [
-			{ x: x + w, y: y + h },
-			{ x, y: y + h },
-			location,
-			{ x: x + w, y },
-		];
-	}
-
 	/** Test if the new size is acceptable. */
 	private _testResize(w: number, h: number, grid: Grid = this._sheet.grid): boolean {
-		return this._getDots(this.$location, w, h)
+		return getDots(this.$location, w, h)
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.
 	}
+}
+
+/** Tip positions, ordered by quadrants. */
+function getDots(location: IPoint, w: number, h: number): IPoint[] {
+	const { x, y } = location;
+	return [
+		{ x: x + w, y: y + h },
+		{ x, y: y + h },
+		location,
+		{ x: x + w, y },
+	];
 }
