@@ -57,4 +57,7 @@ export class StartEvent extends EventBase {
 export interface StartEvent extends EventBase {
 	$other: EndEvent;
 	readonly $isStart: 1;
+
+	/** For debug only. */
+	$prev?: StartEvent;
 }

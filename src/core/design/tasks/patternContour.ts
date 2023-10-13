@@ -48,11 +48,15 @@ function patternContour(): void {
 }
 
 function processRepo(repo: Repository, trace: Trace): void {
+	const repoLeaves = new Set(repo.$nodeSet.$leaves);
 	const coverageMap = repo.$nodeSet.$quadrantCoverage;
 	for(const [node, coveredQuadrants] of coverageMap.entries()) {
 		const multiContour = node.$graphics.$roughContours.length > 1;
 		for(const [index, roughContour] of node.$graphics.$roughContours.entries()) {
 			for(const outer of roughContour.$outer) {
+				// Exclude irrelevant path in raw mode
+				if(roughContour.$raw && !outer.leaves!.some(l => repoLeaves.has(l))) continue;
+
 				// Create start/end map
 				const isHole = Boolean(outer.isHole);
 				const quadrants = coveredQuadrants

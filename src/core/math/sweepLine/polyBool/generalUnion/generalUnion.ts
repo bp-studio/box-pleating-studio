@@ -6,6 +6,7 @@ import { epsilonSame, floatXyComparator } from "core/math/geometry/float";
 import { Initializer } from "../initializer";
 import { Chainer } from "../../classes/chainer/chainer";
 
+import type { EndEvent } from "../../classes/event";
 import type { Polygon } from "shared/types/geometry";
 import type { AAUnion } from "../aaUnion/aaUnion";
 
@@ -25,6 +26,22 @@ export class GeneralUnion extends UnionBase {
 
 		// General union will require epsilon comparison in the chainer
 		this._chainer.$checkFunction = epsilonSame;
+	}
+
+	/**
+	 * It turns out that in our use cases,
+	 * it is possible to have `>>` formation even for perfectly valid input,
+	 * so we need to override this method.
+	 */
+	protected override _processEnd(event: EndEvent): void {
+		const start = event.$other;
+		const prev = this._status.$getPrev(start);
+		const next = this._status.$getNext(start);
+		if(!start.$isInside) this._collectedSegments.push(start.$segment);
+		this._status.$delete(start);
+
+		// Need to check intersections after an EndEvent
+		this._intersector.$possibleIntersection(prev, next);
 	}
 }
 

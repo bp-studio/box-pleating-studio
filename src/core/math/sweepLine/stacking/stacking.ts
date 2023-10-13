@@ -33,9 +33,9 @@ export class Stacking extends SweepLine {
 		const stacking = new Map<Path, Path[]>();
 		for(let i = 0; i < paths.length; i++) {
 			const parent = this._parent[i];
-			if(parent === -1) {
-				stacking.set(paths[i], []);
-			} else if(parent !== null) {
+			if(parent === null) {
+				getOrSetEmptyArray(stacking, paths[i]);
+			} else {
 				getOrSetEmptyArray(stacking, paths[parent]).push(paths[i]);
 			}
 		}
@@ -62,14 +62,12 @@ export class Stacking extends SweepLine {
 
 		const index = event.$segment.$polygon;
 		if(this._parent[index] === undefined) {
-			if(event.$wrapDelta === 1) {
+			if(event.$wrapDelta === 1 || !prev) {
 				this._parent[index] = null;
-			} else if(prev) {
+			} else {
 				const prevIndex = prev.$segment.$polygon;
 				const prevParent = this._parent[prevIndex];
 				this._parent[index] = prevParent === null ? prevIndex : prevParent;
-			} else {
-				this._parent[index] = -1;
 			}
 		}
 	}

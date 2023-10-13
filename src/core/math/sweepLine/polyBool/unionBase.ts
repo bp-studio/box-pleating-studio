@@ -1,9 +1,8 @@
 import { PolyBool } from "./polyBool";
-import { UnionChainer } from "../classes/chainer/unionChainer";
+import { isClockwise } from "core/math/geometry/path";
 
 import type { Chainer } from "../classes/chainer/chainer";
 import type { Initializer } from "./initializer";
-import type { Comparator } from "shared/types/types";
 import type { ISegment } from "../classes/segment/segment";
 import type { EndEvent } from "../classes/event";
 import type { EventProvider } from "../classes/eventProvider";
@@ -30,6 +29,12 @@ export abstract class UnionBase extends PolyBool<Polygon, PathEx> {
 	) {
 		super(provider, intersector, chainer);
 		this._initializer = initializer;
+	}
+
+	public override $get(...components: Polygon[]): PathEx[] {
+		const result = super.$get(...components);
+		result.forEach(path => path.isHole = isClockwise(path));
+		return result;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

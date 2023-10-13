@@ -84,6 +84,8 @@ export class Fraction {
 
 	/** Output the fraction in the format of `p/q` (in lowest terms), or just `p` if `q` equals 1. */
 	public toString(): string {
+		// Uncomment the next line for easier debugging
+		// return this.$value.toString();
 		this._smp();
 		return this._p + (this._q > 1 ? "/" + this._q : "");
 	}

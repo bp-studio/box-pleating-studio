@@ -1,6 +1,6 @@
 import { same } from "shared/types/geometry";
 ///#if DEBUG
-import { pathToString } from "core/math/geometry/path";
+import { pathToString, pointToString } from "core/math/geometry/path";
 ///#endif
 
 import type { ISegment } from "../segment/segment";
@@ -174,4 +174,10 @@ export class Chainer<PathType extends Path = Path> {
 		}
 	}
 	///#endif
+}
+
+export function debugSegments(segments: ISegment[]): void {
+	for(const segment of segments) {
+		console.log(pointToString(segment.$start), pointToString(segment.$end));
+	}
 }

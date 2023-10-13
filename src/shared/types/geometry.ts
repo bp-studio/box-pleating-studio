@@ -27,6 +27,9 @@ export type PathEx = Path & {
 	/** In the use case of union, the id of a representative polygon from which this path forms. */
 	from?: number;
 
+	/** In raw mode, store the leaf ids involved in this path. */
+	leaves?: number[];
+
 	/** Whether this path is a hole. */
 	isHole?: boolean;
 };

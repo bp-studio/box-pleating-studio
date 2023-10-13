@@ -1,5 +1,4 @@
 import { Chainer } from "./chainer";
-import { isClockwise } from "core/math/geometry/path";
 
 import type { ISegment } from "../segment/segment";
 import type { PathEx } from "shared/types/geometry";
@@ -25,7 +24,6 @@ export class UnionChainer extends Chainer<PathEx> {
 	protected override _chainToPath(id: number, segment: ISegment): PathEx {
 		const path = super._chainToPath(id, segment);
 		path.from = this._sources[id];
-		path.isHole = isClockwise(path);
 		return path;
 	}
 

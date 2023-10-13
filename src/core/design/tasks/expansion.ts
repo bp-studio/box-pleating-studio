@@ -6,10 +6,10 @@ import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnio
 import type { RoughContour } from "core/design/context";
 import type { Path, PathEx, Polygon } from "shared/types/geometry";
 
-const aaUnion = new AAUnion();
+export const aaUnion = new AAUnion();
 const roughUnion = new RoughUnion();
 
-type CheckCallback = (result: readonly PathEx[], leaves: readonly number[]) => boolean;
+type CheckCallback = (result: readonly PathEx[], leaves: readonly number[]) => PathEx[] | undefined;
 
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
@@ -40,20 +40,25 @@ function componentToContour(
 	check?: CheckCallback
 ): RoughContour {
 	let raw = false;
-	const children = component.from.map(i => inputs[i]);
 	let outers = component.paths.map(simplify);
+	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);
-	if(check && !check(outers, leaves)) {
-		outers = children.flatMap(c => c.$outer);
-		raw = true;
+	if(check) {
+		const checkResult = check(outers, leaves);
+		if(checkResult) {
+			outers = checkResult;
+			raw = true;
+		}
 	}
-	return {
-		$outer: outers,
-		// TODO: need fix here
-		$inner: aaUnion.$get(...children.flatMap(c => c.$raw ? c.$outer.map(p => [p]) : [c.$outer])),
-		$leaves: children.flatMap(c => c.$leaves),
-		$raw: raw,
-	};
+
+	// For raw mode, we simply keep the inner contours as they are.
+	const inners = raw ? children.flatMap(c => c.$outer) :
+		// In theory, simply taking the union here could result in failure in pattern contour insertion,
+		// but in practice such failure can only occur when the layout is invalid (or so it seems),
+		// So we don't really need to worry about that.
+		aaUnion.$get(...children.flatMap(c => c.$raw ? c.$outer.map(p => [p]) : [c.$outer]));
+
+	return { $outer: outers, $inner: inners, $leaves: leaves, $raw: raw };
 }
 
 /**

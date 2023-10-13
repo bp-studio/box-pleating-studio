@@ -75,7 +75,7 @@ export class Clip extends DivideAndCollect {
 		if(start.$isInside) this._collectedSegments.push(start.$segment);
 		this._status.$delete(start);
 
-		// Unlike PolyBool, we need to check intersections after an EndEvent
+		// Need to check intersections after an EndEvent
 		this._intersector.$possibleIntersection(prev, next);
 	}
 

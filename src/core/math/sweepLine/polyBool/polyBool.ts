@@ -1,10 +1,11 @@
-import { pathToString } from "../../geometry/path";
+import { pathToString, pointToString } from "../../geometry/path";
 import { DivideAndCollect } from "../divideAndCollect";
+import { same } from "shared/types/geometry";
 
+import type { Path, Polygon } from "shared/types/geometry";
 import type { Intersector } from "../classes/intersector";
 import type { ISegment } from "../classes/segment/segment";
 import type { EventProvider } from "../classes/eventProvider";
-import type { Path, Polygon } from "shared/types/geometry";
 import type { Chainer } from "../classes/chainer/chainer";
 import type { StartEvent } from "../classes/event";
 
@@ -53,16 +54,30 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 			event.$wrapCount += prev.$wrapCount;
 			event.$isInside = event.$wrapCount != 0;
 		}
-	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	///#if DEBUG
-	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
-	public createTestCase(components: ComponentType[]): void {
-		console.log(components.map(c => "[" + (c as Polygon).map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(",\n"));
+		// Uncomment the following for wrapping debug.
+		// event.$prev = prev;
+		// if(same(event.$point, { x: 63, y: 114 })) debugWrap(event);
 	}
-	///#endif
 }
+
+///#if DEBUG
+export function createTestCase(components: Polygon[]): void {
+	console.log(components.map(c => "[" + c.map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(",\n"));
+}
+
+export function debugWrap(event: StartEvent): void {
+	if(same(event.$point, { x: 63, y: 114 })) {
+		let cursor: StartEvent | undefined = event;
+		while(cursor) {
+			console.log(
+				pointToString(cursor.$point),
+				pointToString(cursor.$other.$point),
+				cursor.$isInside,
+				cursor.$wrapCount
+			);
+			cursor = cursor.$prev;
+		}
+	}
+}
+///#endif

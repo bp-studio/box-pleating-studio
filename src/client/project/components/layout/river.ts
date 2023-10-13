@@ -6,7 +6,6 @@ import { Control } from "client/base/control";
 import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
 import ProjectService from "client/services/projectService";
 import { style } from "client/services/styleService";
-import { GREEN, LIGHT_GREEN, RED } from "client/shared/constant";
 
 import type { GraphicsData } from "core/service/updateModel";
 import type { Layout } from "./layout";
@@ -96,7 +95,10 @@ export class River extends Control {
 
 		const sh = ProjectService.shrink.value;
 		this._hinge.clear().lineStyle(width * sh, color);
-		if(this.$selected) this._hinge.lineStyle(width * 2 * sh, LIGHT_GREEN);
+
+		// Uncomment the next line for debugging
+		// if(this.$selected) this._hinge.lineStyle(width * 2 * sh, 0x66dd66);
+
 		drawContours(this._hinge, this.$graphics.contours);
 
 		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);

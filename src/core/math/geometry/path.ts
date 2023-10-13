@@ -36,10 +36,10 @@ export function deduplicate(path: Path): Path {
 
 /** For generating test cases. */
 export function pathToString(path: Path): string {
-	return path.map(p => toString(p)).join(",");
+	return path.map(p => pointToString(p)).join(",");
 }
 
-function toString(p: IArcPoint): string {
+export function pointToString(p: IArcPoint): string {
 	if(p.arc) return `(${p.x},${p.y},${p.arc.x},${p.arc.y},${p.r!})`;
 	return `(${p.x},${p.y})`;
 }

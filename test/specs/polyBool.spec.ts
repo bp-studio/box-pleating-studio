@@ -7,7 +7,7 @@ import { parsePath } from "../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
 import type { RoughContour } from "core/design/context";
-import type { Path, Polygon } from "shared/types/geometry";
+import type { Polygon } from "shared/types/geometry";
 
 describe("PolyBool", function() {
 

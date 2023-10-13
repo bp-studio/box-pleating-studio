@@ -1,4 +1,4 @@
-import type { Path, PathEx } from "shared/types/geometry";
+import type { PathEx } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 
 /**
@@ -38,7 +38,7 @@ export function fixZero(x: number): number {
 
 export const floatXyComparator: Comparator<IPoint> = (a, b) => fixZero(a.x - b.x) || fixZero(a.y - b.y);
 
-function fixIPoint(p: IPoint): void {
+export function fixIPoint(p: IPoint): void {
 	const { x, y } = p;
 	if(Number.isInteger(x) && Number.isInteger(y)) return;
 	const rx = Math.round(x), ry = Math.round(y);
@@ -46,6 +46,7 @@ function fixIPoint(p: IPoint): void {
 	if(isAlmostZero(ry - y)) (p as Writeable<IPoint>).y = ry;
 }
 
-export function fixPath(path: PathEx): void {
+export function fixPath(path: PathEx): PathEx {
 	path.forEach(p => fixIPoint(p));
+	return path;
 }
