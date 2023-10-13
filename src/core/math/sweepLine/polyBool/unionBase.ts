@@ -9,8 +9,6 @@ import type { EventProvider } from "../classes/eventProvider";
 import type { Intersector } from "../classes/intersector";
 import type { PathEx, Polygon } from "shared/types/geometry";
 
-type LineConstructor = new (p1: IPoint, p2: IPoint, i: number) => ISegment;
-
 //=================================================================
 /**
  * {@link UnionBase} is the base type of union operations.

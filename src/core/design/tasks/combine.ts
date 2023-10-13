@@ -67,6 +67,8 @@ function insertInner(childrenPatternContours: PatternContour[], result: Rational
 function tryInsertInner(childContour: PatternContour, result: RationalContour[]): void {
 	for(const contour of result) {
 		for(const inner of contour.$inner) {
+			if(inner.leaves && childContour.$leaves &&
+				childContour.$leaves.some(l => !inner.leaves!.includes(l))) continue;
 			if(tryInsert(inner, childContour)) return;
 		}
 	}
@@ -112,20 +114,19 @@ function toRationalContour(contour: RoughContour): RationalContour {
  * Convert {@link RationalContour} to the actual {@link Contour} for rendering.
  */
 function toGraphicalContours(contour: RationalContour): Contour[] {
-	let outers = contour.$outer.map(simplify);
-	let inners = contour.$inner.map(simplify).map(reverse);
+	let outers = contour.$outer.map(toPath).map(simplify);
+	let inners = contour.$inner.map(toPath).map(simplify).map(reverse);
+
+	rearrangeRole(outers, inners);
 	if(contour.$raw) {
 		outers = generalUnion.$get(outers);
-		inners = generalUnion.$get(inners);
+		inners = generalUnion.$get(inners.map(reverse)).map(reverse);
+		rearrangeRole(outers, inners);
 	}
 
-	// Rearrange roles
-	const outerHole = outers.filter(p => p.isHole);
-	const innerFill = inners.filter(p => !p.isHole);
-	outers = outers.filter(p => !p.isHole);
-	inners = inners.filter(p => p.isHole);
-	outers.push(...innerFill);
-	inners.push(...outerHole);
+	// Remove degenerated cases
+	outers = outers.map(simplify).filter(c => c.length > 2);
+	inners = inners.map(simplify).filter(c => c.length > 2);
 
 	// Trivial case
 	if(outers.length == 1) {
@@ -139,8 +140,19 @@ function toGraphicalContours(contour: RationalContour): Contour[] {
 	return stacking.$get(...outers, ...inners);
 }
 
-function simplify(path: RationalPathEx): PathEx {
-	const deduplicated = deduplicate(toPath(path));
+function rearrangeRole(outers: PathEx[], inners: PathEx[]): void {
+	const outerHole = outers.filter(p => p.isHole);
+	const innerFill = inners.filter(p => !p.isHole);
+	const outerFill = outers.filter(p => !p.isHole);
+	const innerHole = inners.filter(p => p.isHole);
+	outers.length = 0;
+	inners.length = 0;
+	outers.push(...innerFill, ...outerFill);
+	inners.push(...outerHole, ...innerHole);
+}
+
+function simplify(path: PathEx): PathEx {
+	const deduplicated = deduplicate(path);
 	const l = deduplicated.length;
 	deduplicated.push(deduplicated[0]);
 	const result: PathEx = [];

@@ -52,7 +52,10 @@ function componentToContour(
 	}
 
 	// For raw mode, we simply keep the inner contours as they are.
-	const inners = raw ? children.flatMap(c => c.$outer) :
+	const inners = raw ? children.flatMap(c => {
+		c.$outer.forEach(o => o.leaves = c.$leaves);
+		return c.$outer;
+	}) :
 		// In theory, simply taking the union here could result in failure in pattern contour insertion,
 		// but in practice such failure can only occur when the layout is invalid (or so it seems),
 		// So we don't really need to worry about that.

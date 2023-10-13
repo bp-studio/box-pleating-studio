@@ -67,7 +67,7 @@ function processRepo(repo: Repository, trace: Trace): void {
 				const hingeSegments = createHingeSegments(outer, repo.$direction);
 				const context: TraceContext = { map, repo, trace, node, index };
 				for(const hingeSegment of hingeSegments) {
-					processTrace(hingeSegment, context);
+					processTrace(hingeSegment, context, outer.leaves);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ interface TraceContext {
 	readonly index: number;
 }
 
-function processTrace(hingeSegment: HingeSegment, context: TraceContext): void {
+function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves?: number[]): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
 	const contour = context.trace.$generate(hingeSegment, map[0], map[1]);
@@ -104,7 +104,7 @@ function processTrace(hingeSegment: HingeSegment, context: TraceContext): void {
 		contour.$ids = context.repo.$nodeSet.$nodes;
 		contour.$repo = context.repo.$signature;
 		contour.$for = context.index;
-		contour.$leaves = context.repo.$nodeSet.$leaves;
+		contour.$leaves = leaves;
 		context.node.$graphics.$patternContours.push(contour);
 	}
 }

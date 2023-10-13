@@ -73,8 +73,8 @@ export interface PatternContour extends Array<Point> {
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly number[];
 
-	/** The {@link RoughContour.$leaves} of the corresponding {@link RoughContour}. */
-	$leaves: readonly number[];
+	/** The ids of the wrapped leaves of the corresponding {@link RoughContour}. */
+	$leaves?: readonly number[];
 }
 
 export interface NodeGraphics {

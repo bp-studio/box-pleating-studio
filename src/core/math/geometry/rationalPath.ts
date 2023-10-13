@@ -14,16 +14,20 @@ export type RationalPath = Point[];
 
 export interface RationalPathEx extends RationalPath {
 	isHole?: boolean;
+	leaves?: number[];
 }
 
 export function toRationalPath(path: PathEx): RationalPathEx {
 	const result: RationalPathEx = path.map(p => new Point(p));
 	result.isHole = path.isHole;
+	result.leaves = path.leaves;
 	return result;
 }
 
-export function toPath(path: RationalPath): Path {
-	return path.map(p => p.$toIPoint());
+export function toPath(path: RationalPathEx): PathEx {
+	const result: PathEx = path.map(p => p.$toIPoint());
+	result.isHole = path.isHole;
+	return result;
 }
 
 /** Convert a path to {@link Line} objects. */
