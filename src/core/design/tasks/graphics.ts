@@ -6,6 +6,7 @@ import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { Line } from "core/math/geometry/line";
 import { combineContour } from "./combine";
+import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
@@ -64,7 +65,6 @@ function addRepo(repo: Repository): void {
 	}
 }
 
-
 function flapRidge(node: ITreeNode): ILine[] {
 	const p = toCorners(node.$AABB.$toValues());
 	const c = node.$AABB.$toPath();
@@ -80,6 +80,9 @@ function flapRidge(node: ITreeNode): ILine[] {
 	return ridges;
 }
 
+/** A map for quickly lookup the free corners. */
+type FreeCornerMap = Record<1 | -1, ReadonlyMap<number, Point[]>>;
+
 /**
  * Add all ridges of the river at right angle corners.
  * The rest are handled by pattern ridges.
@@ -87,6 +90,8 @@ function flapRidge(node: ITreeNode): ILine[] {
 function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 	const ridges: ILine[] = [];
 	const width = node.$length;
+	const freeCornerMap = toFreeCornerMap(freeCorners);
+
 	for(const contour of node.$graphics.$contours) {
 		// It is possible that a contour of a river has no holes in invalid layouts.
 		// In that case adding ridges doesn't make sense either, so skip the rest.
@@ -108,21 +113,31 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
 			const p = getCorrespondingPoint(p1, p0, p2, width, side);
 			const innerKey = getOrderedKey(p.x, p.y);
-			if(innerRightCorners.has(innerKey)) {
+			if(!tryAddRemainingRidge(p1, p, freeCornerMap, ridges) && innerRightCorners.has(innerKey)) {
 				ridges.push([p1, p]);
 				if(!doubled.has(innerKey)) innerRightCorners.delete(innerKey);
-			} else {
-				tryAddRemainingRidge(p1, p, freeCorners, ridges);
 			}
 		}
 
 		// Check remaining inner vertices.
 		for(const [p1, p0, p2] of innerRightCorners.values()) {
 			const p = getCorrespondingPoint(p1, p0, p2, width, -side as Sign);
-			tryAddRemainingRidge(p1, p, freeCorners, ridges);
+			tryAddRemainingRidge(p1, p, freeCornerMap, ridges);
 		}
 	}
 	return ridges;
+}
+
+function toFreeCornerMap(freeCorners: Point[]): FreeCornerMap {
+	const freeCornerMap = {
+		1: new Map(),
+		[-1]: new Map(),
+	};
+	for(const corner of freeCorners) {
+		getOrSetEmptyArray(freeCornerMap[1], corner.x - corner.y).push(corner);
+		getOrSetEmptyArray(freeCornerMap[-1], corner.x + corner.y).push(corner);
+	}
+	return freeCornerMap;
 }
 
 function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number, side: Sign): IPoint {
@@ -131,10 +146,17 @@ function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number
 	return { x: p1.x - side * fy * width, y: p1.y + side * fx * width };
 }
 
-function tryAddRemainingRidge(p1: IPoint, p: IPoint, sideCorners: Point[], ridges: ILine[]): void {
+function tryAddRemainingRidge(p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[]): boolean {
 	const line = Line.$fromIPoint(p1, p);
+	const f = line.$slope.$value as 1 | -1;
+	const sideCorners = freeCornerMap[f].get(p.x - f * p.y);
+	if(!sideCorners) return false;
 	const corner = sideCorners.find(c => line.$contains(c, true));
-	if(corner) ridges.push([p1, corner.$toIPoint()]);
+	if(corner) {
+		ridges.push([p1, corner.$toIPoint()]);
+		return true;
+	}
+	return false;
 }
 
 /**
