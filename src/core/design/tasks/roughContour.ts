@@ -46,6 +46,7 @@ function roughContour(): void {
 		State.$parentChanged,
 		State.$childrenChanged,
 		State.$lengthChanged,
+		State.$contourWillChange,
 		repoNodes
 	);
 
