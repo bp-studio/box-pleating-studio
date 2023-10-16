@@ -1,10 +1,10 @@
 import { HeapSet } from "shared/data/heap/heapSet";
-import { nodeComparator } from "../context/treeNode";
+import { nodeComparator } from "../../context/treeNode";
 import { getFirst } from "shared/utils/set";
 
-import type { ITreeNode } from "../context";
-import type { structureTask } from "./structure";
-import type { heightTask } from "./height";
+import type { ITreeNode } from "../../context";
+import type { structureTask } from "../structure";
+import type { heightTask } from "../height";
 
 /**
  * A subroutine for updating the tree bottom-up.

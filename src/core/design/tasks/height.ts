@@ -1,4 +1,4 @@
-import { climb } from "./climb";
+import { climb } from "./utils/climb";
 import { Task } from "./task";
 import { State } from "core/service/state";
 import { balanceTask } from "./balance";

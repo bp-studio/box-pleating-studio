@@ -33,10 +33,7 @@ export class Quadrant {
 	constructor(code: number, junctions: Junctions) {
 		this.$flap = State.$tree.$nodes[code >>> 2]!;
 		this.q = code & MASK;
-		this.f = {
-			x: this.q == Direction.UR || this.q == Direction.LR ? 1 : -1,
-			y: this.q == Direction.UR || this.q == Direction.UL ? 1 : -1,
-		};
+		this.f = getFactors(this.q);
 
 		const ox: number[] = [], oy: number[] = [];
 		for(const junction of junctions) {
@@ -146,3 +143,10 @@ export const QV: readonly Vector[] = [
 	new Vector(-1, -1),
 	new Vector(1, -1),
 ];
+
+export function getFactors(q: QuadrantDirection): ISignPoint {
+	return {
+		x: q == Direction.UR || q == Direction.LR ? 1 : -1,
+		y: q == Direction.UR || q == Direction.UL ? 1 : -1,
+	};
+}

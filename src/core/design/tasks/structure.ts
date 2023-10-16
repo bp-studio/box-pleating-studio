@@ -3,7 +3,7 @@ import { Task } from "./task";
 import { AABBTask } from "./aabb";
 import { HeapSet } from "shared/data/heap/heapSet";
 import { nodeComparator } from "../context/treeNode";
-import { climb } from "./climb";
+import { climb } from "./utils/climb";
 
 import type { ITreeNode } from "../context";
 import type { TreeNode } from "../context/treeNode";

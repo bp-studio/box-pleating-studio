@@ -46,9 +46,6 @@ export namespace State {
 	/** Used for finding those {@link Stretch}es that need to be deleted. */
 	export const $stretchDiff = new DiffSet<string>();
 
-	/** Used for finding flaps or rivers that no longer have patterns. */
-	export const $patternDiff = new DiffSet<number>();
-
 	/** {@link Stretch} cache during dragging. */
 	export const $stretchCache = new Map<string, Stretch>();
 
@@ -99,17 +96,22 @@ export namespace State {
 	export const $newRepositories = new Set<Repository>();
 
 	/**
-	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} in the current round,
-	 * for one or more of the following reasons:
-	 * 1. Are created, switched over or resumed.
-	 * 2. Have devices that just moved.
-	 * 3. Some of the relevant river contours have changed.
-	 * 4. Some of the relevant river nodes are added/removed due to splitting/merging.
+	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} for all related nodes in the current round.
 	 */
 	export const $repoToProcess = new Set<Repository>();
 
+	/**
+	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} for only some of the related nodes in the current round.
+	 */
+	export const $repoToPartiallyProcess = new Map<Repository, ITreeNode[]>();
+
 	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
 	export const $stretchPrototypes = new Map<string, JStretch>();
+
+	/**
+	 * Those {@link ITreeNode}s that has its {@link ITreeNode.$roughContours} changed in the current round.
+	 */
+	export const $roughContourChanged = new Set<ITreeNode>();
 
 	/** Those flaps or rivers that will change their contours in the current round. */
 	export const $contourWillChange = new Set<ITreeNode>();
@@ -136,7 +138,9 @@ export namespace State {
 		$flapChanged.clear();
 		$newRepositories.clear();
 		$repoToProcess.clear();
+		$repoToPartiallyProcess.clear();
 		$stretchPrototypes.clear();
+		$roughContourChanged.clear();
 		$contourWillChange.clear();
 		$patternedQuadrants.clear();
 		$movedDevices.clear();
@@ -173,6 +177,5 @@ export function fullReset(): void {
 	State.$stretches.clear();
 	State.$invalidJunctionDiff.clear();
 	State.$stretchDiff.clear();
-	State.$patternDiff.clear();
 	State.$stretchCache.clear();
 }

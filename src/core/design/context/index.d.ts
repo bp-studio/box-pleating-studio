@@ -4,12 +4,12 @@ import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
 import type { TreeNode } from "./treeNode";
 import type { JEdge, JFlap } from "shared/json";
 import type { Repository } from "../layout/repository";
-import type { clearPatternContourForRepo } from "../tasks/patternContour";
+import type { clearPatternContourForRepo, patternContourTask } from "../tasks/patternContour";
 import type { NodeSet } from "../layout/nodeSet";
 import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
-import type { RoughContourContext } from "../tasks/roughContourContext";
+import type { traceContourTask } from "core/design/tasks/traceContour";
 
 export interface ITree {
 	readonly $nodes: readonly (ITreeNode | undefined)[];
@@ -55,6 +55,7 @@ export interface ITreeNode extends ISerializable<JEdge> {
 	$setFlap(flap: JFlap): void;
 }
 
+/** See {@link patternContourTask}. */
 export interface PatternContour extends Array<Point> {
 	/**
 	 * The {@link Repository.$signature} of the repo from which this path derives.
@@ -74,13 +75,17 @@ export interface PatternContour extends Array<Point> {
 	$ids: readonly number[];
 
 	/** The ids of the wrapped leaves of the corresponding {@link RoughContour}. */
-	$leaves?: readonly number[];
+	$leaves: readonly number[];
 }
 
 export interface NodeGraphics {
-	/** See {@link RoughContour}. */
+	/** See {@link roughContourTask}. */
 	$roughContours: RoughContour[];
 
+	/** See {@link traceContourTask}. */
+	$traceContours: TraceContour[];
+
+	/** See {@link patternContourTask}. */
 	$patternContours: PatternContour[];
 
 	/** The final contours. */
@@ -90,18 +95,16 @@ export interface NodeGraphics {
 	$ridges: ILine[];
 }
 
-/**
- * The contour of a flap/river without considering the stretch patterns.
- * Such contour consists of axis-aligned line segments only,
- * and can speed up the process of taking unions.
- *
- * Each instance of {@link RoughContour} should consist of a single connected region only.
- *
- * See also {@link roughContourTask}.
- */
-export type RoughContour = ContourComponent<PathEx>;
+/** See {@link roughContourTask}. */
+export interface RoughContour extends ContourComponentBase<PathEx> {
+	/** A pointer to the corresponding {@link TraceContour}. */
+	$trace?: TraceContour;
 
-export interface ContourComponent<T extends Path> {
+	/** Pointers to the child components. */
+	$children: RoughContour[];
+}
+
+interface ContourComponentBase<T extends Path> {
 	/**
 	 * Outer path of the contour.
 	 * Note that it is not of the same meaning as {@link Contour.outer}.
@@ -112,11 +115,15 @@ export interface ContourComponent<T extends Path> {
 	 *
 	 * In majority of cases there's only one outer path,
 	 * but it could also contains newly formed holes,
-	 * and in some edge cases of the raw mode,
-	 * we may need to break up the outer path for the tracing algorithm to work.
+	 * and in raw mode we also need to break up the outer path.
 	 */
 	$outer: T[];
 
+	/** The ids of the leaf nodes inside this {@link ContourComponent}. */
+	$leaves: number[];
+}
+
+export interface ContourComponent<T extends Path> extends ContourComponentBase<T> {
 	/**
 	 * Inner holes of the contour contributed by the child contours, if any.
 	 * This does not include the newly formed holes.
@@ -129,9 +136,9 @@ export interface ContourComponent<T extends Path> {
 	 */
 	$inner: T[];
 
-	/** The ids of the leaf nodes inside this {@link ContourComponent}. */
-	$leaves: number[];
-
 	/** Indicating that this {@link ContourComponent} is in raw mode. */
 	$raw: boolean;
 }
+
+/** See {@link traceContourTask}. */
+export type TraceContour = ContourComponent<PathEx>;

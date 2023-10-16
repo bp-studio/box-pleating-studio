@@ -3,7 +3,7 @@ import type { Strategy } from "./enum";
 import type { JOverlap, JQuadrilateral } from "./layout";
 
 export interface JStretch {
-	/** Comma-separated ids of flaps involved. */
+	/** Comma-separated, sorted ids of flaps involved. */
 	id: string;
 
 	/** `undefined` if there's no {@link Pattern} */

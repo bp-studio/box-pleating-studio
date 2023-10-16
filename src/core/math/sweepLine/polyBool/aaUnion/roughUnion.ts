@@ -21,6 +21,7 @@ export interface UnionResult {
 //=================================================================
 /**
  * {@link RoughUnion} is specialized for processing {@link RoughContour}s.
+ *
  * Besides taking union, it also group the result into components
  * and match the components to the source {@link Polygon}s.
  */

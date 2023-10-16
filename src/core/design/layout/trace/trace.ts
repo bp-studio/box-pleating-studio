@@ -22,13 +22,18 @@ import type { PatternContour } from "../../context";
 export class Trace {
 
 	public static $fromRepo(repo: Repository): Trace {
-		return new Trace(
+		const trace = new Trace(
 			repo.$pattern!.$devices.flatMap(d => d.$traceRidges),
 			repo.$direction,
 			repo.$configuration!.$sideDiagonals
-		);
+		) as Writeable<Trace>;
+		trace.$repo = repo;
+		trace.$leaves = new Set(repo.$nodeSet.$leaves);
+		return trace as Trace;
 	}
 
+	public readonly $repo!: Repository;
+	public readonly $leaves!: ReadonlySet<number>;
 	public readonly $ridges: readonly Ridge[];
 	public readonly $direction: SlashDirection;
 	public readonly $sideDiagonals: readonly SideDiagonal[];

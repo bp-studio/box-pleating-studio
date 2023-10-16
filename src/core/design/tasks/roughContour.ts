@@ -1,66 +1,37 @@
 import { Task } from "./task";
-import { climb } from "./climb";
+import { climb } from "./utils/climb";
 import { State } from "core/service/state";
-import { patternContourTask } from "./patternContour";
-import { getOrSetEmptyArray } from "shared/utils/map";
-import { RoughContourContext } from "./roughContourContext";
+import { traceContourTask } from "./traceContour";
+import { expandPath, simplify } from "./utils/expand";
+import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
-import type { NodeSet } from "../layout/nodeSet";
+import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
+import type { Polygon } from "shared/types/geometry";
 import type { ITreeNode, NodeGraphics, RoughContour } from "../context";
 
-export interface RepoCorners {
-	nodeSet: NodeSet;
-	corners: string[];
-}
+const roughUnion = new RoughUnion();
 
 //=================================================================
 /**
  * {@link roughContourTask} updates {@link NodeGraphics.$roughContours}.
+ *
+ * A {@link RoughContour} is the contour of a flap/river without considering the stretch patterns.
+ * Such contour consists of axis-aligned line segments only,
+ * and can speed up the process of taking unions.
+ * It also depends only on the AABB hierarchy.
+ *
+ * Each instance of rough contour should consist of a single connected region only.
  */
 //=================================================================
-export const roughContourTask = new Task(roughContour, patternContourTask);
-
-const nodeSetMap = new Map<number, NodeSet[]>();
+export const roughContourTask = new Task(roughContour, traceContourTask);
 
 function roughContour(): void {
-	nodeSetMap.clear();
-	for(const stretch of State.$stretches.values()) {
-		if(!stretch.$repo.$pattern) continue;
-		const set = stretch.$repo.$nodeSet;
-		for(const id of set.$nodes) {
-			getOrSetEmptyArray(nodeSetMap, id).push(set);
-		}
-	}
-
-	// All nodes involved in the repo to be updated needs to be recalculated,
-	// as it could go from raw mode to normal mode and vice versa.
-	const repoNodes = new Set<ITreeNode>();
-	const tree = State.$tree;
-	for(const repo of [...State.$repoToProcess]) {
-		const nodes = repo.$nodeSet.$leaves.map(id => tree.$nodes[id]!);
-		for(const node of nodes) repoNodes.add(node);
-	}
-
 	climb(updater,
 		State.$flapAABBChanged,
 		State.$parentChanged,
 		State.$childrenChanged,
-		State.$lengthChanged,
-		State.$contourWillChange,
-		repoNodes
+		State.$lengthChanged
 	);
-
-	for(const stretch of State.$stretches.values()) {
-		if(State.$repoToProcess.has(stretch.$repo)) continue;
-
-		// TODO: Currently any changes in one of the rough contours
-		// will cause all rivers related to the same repo to be
-		// re-rendered; try to improve this part.
-		const nodes = stretch.$repo.$nodeSet.$nodes.map(id => tree.$nodes[id]!);
-		if(nodes.some(n => State.$contourWillChange.has(n))) {
-			State.$repoToProcess.add(stretch.$repo);
-		}
-	}
 }
 
 function updater(node: ITreeNode): boolean {
@@ -70,25 +41,48 @@ function updater(node: ITreeNode): boolean {
 		const path = node.$AABB.$toPath();
 		node.$graphics.$roughContours = [{
 			$outer: [path],
-			$inner: [],
+			$children: [],
 			$leaves: [node.id],
-			$raw: false,
 		}];
 	} else {
-		const nodeSets = nodeSetMap.get(node.id);
-		const context = new RoughContourContext(node, nodeSets);
-		context.$process();
+		const children = [...node.$children].flatMap(c => c.$graphics.$roughContours);
+		node.$graphics.$roughContours = expand(children, node.$length);
 	}
+	State.$roughContourChanged.add(node);
 
-	for(const contour of node.$graphics.$patternContours) {
-		// Whenever rough contour changes, established pairing relations are no longer valid.
-		contour.$for = undefined;
-	}
-
-	// For the moment, there is not concrete evidence that comparing the
+	// For the moment, there is no concrete evidence that comparing the
 	// changes of contours here will help improving overall performance,
 	// so we always return true and continue on the parent regardlessly.
-
-	State.$contourWillChange.add(node);
 	return true;
+}
+
+/**
+ * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
+ */
+
+export function expand(inputs: readonly RoughContour[], units: number): RoughContour[] {
+	const components = roughUnion.$union(...inputs.map(c => {
+		const result: Polygon = [];
+		for(const outer of c.$outer) {
+			const expanded = expandPath(outer, units);
+			// Exclude holes that are over-shrunk.
+			// This does not remove degenerated holes,
+			// but those will be removed as we take the union.
+			if(!outer.isHole || expanded.isHole) result.push(expanded);
+		}
+		return result;
+	}));
+
+	const contours: RoughContour[] = [];
+	for(const component of components) {
+		contours.push(componentToContour(inputs, component));
+	}
+	return contours;
+}
+
+function componentToContour(inputs: readonly RoughContour[], component: UnionResult): RoughContour {
+	const outers = component.paths.map(simplify);
+	const children = component.from.map(i => inputs[i]);
+	const leaves = children.flatMap(c => c.$leaves);
+	return { $outer: outers, $children: children, $leaves: leaves };
 }

@@ -6,10 +6,10 @@ import { Stacking } from "core/math/sweepLine/stacking/stacking";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
-import type { ContourComponent, ITreeNode, PatternContour, RoughContour } from "../context";
+import type { ContourComponent, ITreeNode, PatternContour, TraceContour } from "../../context";
 
 /**
- * {@link RoughContour} represented in {@link RationalPath}s.
+ * {@link TraceContour} represented in {@link RationalPath}s.
  */
 type RationalContour = ContourComponent<RationalPathEx>;
 
@@ -28,7 +28,7 @@ export function combineContour(node: ITreeNode): void {
 		});
 		childrenPatternContours.push(...contours);
 	}
-	const result: RationalContour[] = g.$roughContours.map(toRationalContour);
+	const result: RationalContour[] = g.$traceContours.map(toRationalContour);
 
 	// To temporarily disable pattern contour, comment the following two lines.
 	insertOuter(g.$patternContours, result);
@@ -67,8 +67,8 @@ function insertInner(childrenPatternContours: PatternContour[], result: Rational
 function tryInsertInner(childContour: PatternContour, result: RationalContour[]): void {
 	for(const contour of result) {
 		for(const inner of contour.$inner) {
-			if(inner.leaves && childContour.$leaves &&
-				childContour.$leaves.some(l => !inner.leaves!.includes(l))) continue;
+			const leaves = inner.leaves || contour.$leaves;
+			if(childContour.$leaves.some(l => !leaves.includes(l))) continue;
 			if(tryInsert(inner, childContour)) return;
 		}
 	}
@@ -101,7 +101,7 @@ function tryInsert(path: RationalPath, insert: PatternContour): boolean {
 	return false;
 }
 
-function toRationalContour(contour: RoughContour): RationalContour {
+function toRationalContour(contour: TraceContour): RationalContour {
 	return {
 		$outer: contour.$outer.map(toRationalPath),
 		$inner: contour.$inner.map(toRationalPath),
@@ -116,6 +116,8 @@ function toRationalContour(contour: RoughContour): RationalContour {
 function toGraphicalContours(contour: RationalContour): Contour[] {
 	let outers = contour.$outer.map(toPath).map(simplify);
 	let inners = contour.$inner.map(toPath).map(simplify).map(reverse);
+
+	if(inners.some(p => p.length == 2)) debugger;
 
 	rearrangeRole(outers, inners);
 	if(contour.$raw) {

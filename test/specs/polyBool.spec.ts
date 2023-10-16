@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { expand } from "core/design/tasks/expansion";
+import { expand } from "core/design/tasks/roughContour";
 import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
 import { random } from "../utils/random";
 import { parsePath } from "../utils/path";
@@ -288,5 +288,5 @@ function randomAabbPolygon(range: number, size: number): Polygon {
 }
 
 function makeRoughContour(...outer: string[]): RoughContour {
-	return { $outer: outer.map(parsePath), $inner: [], $leaves: [], $raw: false };
+	return { $outer: outer.map(parsePath), $children: [], $leaves: [] };
 }

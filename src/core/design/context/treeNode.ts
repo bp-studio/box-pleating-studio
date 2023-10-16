@@ -47,6 +47,7 @@ export class TreeNode implements ITreeNode {
 	public readonly $graphics: NodeGraphics = {
 		$contours: [],
 		$patternContours: [],
+		$traceContours: [],
 		$roughContours: [],
 		$ridges: [],
 	};

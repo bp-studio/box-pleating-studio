@@ -1,5 +1,5 @@
 import { Task } from "./task";
-import { climb } from "./climb";
+import { climb } from "./utils/climb";
 import { State } from "core/service/state";
 import { roughContourTask } from "./roughContour";
 import { junctionTask } from "./junction";

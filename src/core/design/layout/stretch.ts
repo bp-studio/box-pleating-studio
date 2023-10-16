@@ -16,16 +16,17 @@ import type { Junctions, ValidJunction } from "./junction/validJunction";
 
 export class Stretch implements ISerializable<JStretch> {
 
+	/** See {@link JStretch.id}. */
 	public readonly $id: string;
-
-	/** {@link Repository} cache during dragging. */
-	private readonly _repoCache = new Map<string, Repository>();
 
 	/**
 	 * Whether self is currently active.
 	 * A {@link Stretch} could temporarily become inactive during dragging.
 	 */
 	public $isActive: boolean = true;
+
+	/** {@link Repository} cache during dragging. */
+	private readonly _repoCache = new Map<string, Repository>();
 
 	/** Current {@link Repository} in used. */
 	private _repo: Repository;

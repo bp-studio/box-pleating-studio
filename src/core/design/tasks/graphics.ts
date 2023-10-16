@@ -5,7 +5,7 @@ import { same } from "shared/types/geometry";
 import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { Line } from "core/math/geometry/line";
-import { combineContour } from "./combine";
+import { combineContour } from "./utils/combine";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { Point } from "core/math/geometry/point";

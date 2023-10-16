@@ -33,25 +33,28 @@ subgraph User input
 	F{{Flap positions\nand sizes}}
 	P{{Stretch pattern\nchoices}}
 end
-subgraph Tree
+subgraph "Tree#emsp;#emsp;#emsp;#emsp;"
 	h([node heights])
 	b(tree balancing)
 	d([structure])
 	a([AABB hierarchy])
 end
+rc(rough contours)
 j(junctions)
 i[[invalid\njunctions]]
-subgraph Pattern
+subgraph "Pattern#emsp;#emsp;#emsp;#emsp;"
 	s(stretches)
 	p([patterns])
-	rc(rough contours)
+	tc(trace contours)
 	pc(pattern contours)
-	g[[graphics]]
 end
+g[[graphics]]
 
 T --> h --> b
 b & L --> d
-d & F --> a --> j --> i & s
-rc --> pc --> g
-s & P --> p --> rc
+d & F --> a --> j
+j --> i
+j ---> s
+a ---> rc ----> tc --> pc --> g
+s & P --> p --> tc
 ```
