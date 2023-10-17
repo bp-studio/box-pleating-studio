@@ -218,6 +218,7 @@
 			}
 
 			function setResErr(error) {
+				if(error.indexOf("gtag")) return; // Ignore GA loading error
 				if(!resErr) {
 					resErr = error;
 					setTimeout(self.callback, 0);
