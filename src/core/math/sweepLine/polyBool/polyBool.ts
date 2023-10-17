@@ -1,6 +1,5 @@
 import { pathToString, pointToString } from "../../geometry/path";
 import { DivideAndCollect } from "../divideAndCollect";
-import { same } from "shared/types/geometry";
 
 import type { Path, Polygon } from "shared/types/geometry";
 import type { Intersector } from "../classes/intersector";
@@ -57,7 +56,7 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 
 		// Uncomment the following for wrapping debug.
 		// event.$prev = prev;
-		// if(same(event.$point, { x: 63, y: 114 })) debugWrap(event);
+		// if(event.$point.x == 73 && event.$point.y == 118) debugWrap(event);
 	}
 }
 
@@ -67,17 +66,16 @@ export function createTestCase(components: Polygon[]): void {
 }
 
 export function debugWrap(event: StartEvent): void {
-	if(same(event.$point, { x: 63, y: 114 })) {
-		let cursor: StartEvent | undefined = event;
-		while(cursor) {
-			console.log(
-				pointToString(cursor.$point),
-				pointToString(cursor.$other.$point),
-				cursor.$isInside,
-				cursor.$wrapCount
-			);
-			cursor = cursor.$prev;
-		}
+	let cursor: StartEvent | undefined = event;
+	while(cursor) {
+		console.log(
+			cursor.$segment.$polygon,
+			pointToString(cursor.$point),
+			pointToString(cursor.$other.$point),
+			cursor.$isInside,
+			cursor.$wrapCount
+		);
+		cursor = cursor.$prev;
 	}
 }
 ///#endif

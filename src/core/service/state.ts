@@ -101,7 +101,8 @@ export namespace State {
 	export const $repoToProcess = new Set<Repository>();
 
 	/**
-	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} for only some of the related nodes in the current round.
+	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} for only some of the related nodes in the current round,
+	 * excluding those that are already in {@link $repoToProcess}.
 	 */
 	export const $repoToPartiallyProcess = new Map<Repository, ITreeNode[]>();
 

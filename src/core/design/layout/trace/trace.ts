@@ -1,17 +1,13 @@
 import { SlashDirection } from "shared/types/direction";
 import { TraceContext, getNextIntersection } from "./traceContext";
-import { pathToString } from "core/math/geometry/path";
 import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";
-import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
-import type { Quadrant } from "../pattern/quadrant";
 import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
 import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
-import type { Repository } from "../repository";
 import type { PatternContour } from "../../context";
 
 //=================================================================
@@ -21,22 +17,10 @@ import type { PatternContour } from "../../context";
 //=================================================================
 export class Trace {
 
-	public static $fromRepo(repo: Repository): Trace {
-		const trace = new Trace(
-			repo.$pattern!.$devices.flatMap(d => d.$traceRidges),
-			repo.$direction,
-			repo.$configuration!.$sideDiagonals
-		) as Writeable<Trace>;
-		trace.$repo = repo;
-		trace.$leaves = new Set(repo.$nodeSet.$leaves);
-		return trace as Trace;
-	}
-
-	public readonly $repo!: Repository;
-	public readonly $leaves!: ReadonlySet<number>;
-	public readonly $ridges: readonly Ridge[];
 	public readonly $direction: SlashDirection;
-	public readonly $sideDiagonals: readonly SideDiagonal[];
+
+	protected readonly $ridges: readonly Ridge[];
+	protected readonly $sideDiagonals: readonly SideDiagonal[];
 
 	constructor(ridges: readonly Ridge[], dir: SlashDirection, sideDiagonals: readonly SideDiagonal[]) {
 		this.$ridges = ridges;
@@ -96,36 +80,9 @@ export class Trace {
 		return null;
 	}
 
-	/** Determine the starting/ending point of tracing. */
-	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[]): [Point, Point] {
-		let [start, end] = startEndPoints(filtered);
-		if(filtered.length != all.length) {
-			filtered.sort(quadrantComparator);
-			const first = all.indexOf(filtered[0]);
-			const last = all.indexOf(filtered[filtered.length - 1]);
-			if(first > 0) {
-				const a = all[first - 1].$flap.id, b = all[first].$flap.id;
-				const ridge = this._getIntersectionRidge(a, b);
-				// It is possible that the intersection ridge is missing in legacy patterns.
-				if(ridge) start = ridge.p1;
-			}
-			if(last < all.length - 1) {
-				const a = all[last].$flap.id, b = all[last + 1].$flap.id;
-				const ridge = this._getIntersectionRidge(a, b);
-				if(ridge) end = ridge.p1;
-			}
-		}
-		return [start, end];
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _getIntersectionRidge(a: number, b: number): Ridge {
-		if(a > b) [a, b] = [b, a];
-		return this.$ridges.find(r => r.$division && r.$division[0] == a && r.$division[1] == b)!;
-	}
 
 	private _createFilteredRidges(start: Point, end: Point, directionalVector: Vector): Set<Ridge> {
 		let startLine = new Line(start, directionalVector);
@@ -143,18 +100,4 @@ export class Trace {
 		);
 		return new Set(filteredRidges);
 	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	///#if DEBUG
-	public createTestCase(hinges: Path, start: Point, end: Point): string {
-		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
-		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
-		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");
-		const sideDiagonals = `Line.$parseTest<SideDiagonal>(${simp(this.$sideDiagonals)})`;
-		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"), new Point${start.toString()}, new Point${end.toString()});`;
-	}
-	///#endif
 }

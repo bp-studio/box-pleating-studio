@@ -18,8 +18,8 @@ import type { Comparator } from "shared/types/types";
  */
 export const EPSILON = 1e-10;
 
-export function isAlmostZero(x: number): boolean {
-	return Math.abs(x) < EPSILON;
+export function isAlmostZero(x: number, eps = EPSILON): boolean {
+	return Math.abs(x) < eps;
 }
 
 /** Check if the two points are essentially equal under {@link EPSILON}-comparison. */

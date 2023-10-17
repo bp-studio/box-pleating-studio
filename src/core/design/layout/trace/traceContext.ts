@@ -110,7 +110,6 @@ export class TraceContext {
 		return false;
 	}
 
-
 	/**
 	 * If the first line hit by a candidate line is a {@link SideDiagonal},
 	 * it may or may not reflect about it, depending on whether the {@link RoughContour}

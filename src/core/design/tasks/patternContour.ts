@@ -1,11 +1,10 @@
 import { Task } from "./task";
 import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
-import { Trace } from "../layout/trace/trace";
 import { quadrantNumber } from "shared/types/direction";
 import { createHingeSegments } from "../layout/trace/hingeSegment";
-import { isInside } from "core/math/geometry/winding";
 import { InvalidParameterError } from "core/math/invalidParameterError";
+import { RepoTrace } from "../layout/trace/repoTrace";
 
 import type { HingeSegment } from "../layout/trace/hingeSegment";
 import type { Quadrant } from "../layout/pattern/quadrant";
@@ -25,16 +24,13 @@ import type { Point } from "core/math/geometry/point";
 export const patternContourTask = new Task(patternContour, graphicsTask);
 
 function patternContour(): void {
-	const repos = [...State.$repoToProcess];
-	for(const repo of repos) clearPatternContourForRepo(repo); // Reset
-
-	// We separate this part for monitoring performance
-	const traces: Trace[] = repos.filter(r => r.$pattern).map(r => Trace.$fromRepo(r));
-
 	// Full process
-	for(const trace of traces) {
+	for(const repo of State.$repoToProcess) {
+		clearPatternContourForRepo(repo); // Reset
+		if(!repo.$pattern) continue;
+		const trace = new RepoTrace(repo);
 		try {
-			const coverageMap = trace.$repo.$nodeSet.$quadrantCoverage;
+			const coverageMap = repo.$nodeSet.$quadrantCoverage;
 			for(const [node, coveredQuadrants] of coverageMap.entries()) {
 				processNode(node, trace, coveredQuadrants);
 			}
@@ -53,7 +49,7 @@ function patternContour(): void {
 
 	// Partial process
 	for(const [repo, nodes] of State.$repoToPartiallyProcess) {
-		const trace = Trace.$fromRepo(repo);
+		const trace = new RepoTrace(repo);
 		try {
 			for(const node of nodes) {
 				clearPatternContourForNode(repo, node);
@@ -68,7 +64,7 @@ function patternContour(): void {
 	}
 }
 
-function processNode(node: ITreeNode, trace: Trace, coveredQuadrants: Quadrant[]): void {
+function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants: Quadrant[]): void {
 	const multiContour = node.$graphics.$traceContours.length > 1;
 	for(const [index, traceContour] of node.$graphics.$traceContours.entries()) {
 		for(const outer of traceContour.$outer) {
@@ -78,10 +74,9 @@ function processNode(node: ITreeNode, trace: Trace, coveredQuadrants: Quadrant[]
 			if(traceContour.$raw && leaves.length == 0) continue;
 
 			// Create start/end map
-			const isHole = Boolean(outer.isHole);
 			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps around the quadrant
-				.filter(q => !multiContour || isInside(q.$point, outer) != isHole);
+				.filter(q => !multiContour || leaves.includes(q.$flap.id));
 			const map = createStartEndMap(quadrants, trace);
 
 			const hingeSegments = createHingeSegments(outer, trace.$repo.$direction);
@@ -95,8 +90,8 @@ function processNode(node: ITreeNode, trace: Trace, coveredQuadrants: Quadrant[]
 
 type StartEndMap = Partial<Record<QuadrantDirection, [Point, Point]>>;
 
-function createStartEndMap(quadrants: Quadrant[], trace: Trace): StartEndMap {
-	const startEndMap = {} as StartEndMap;
+function createStartEndMap(quadrants: Quadrant[], trace: RepoTrace): StartEndMap {
+	const startEndMap: StartEndMap = {};
 	for(let q = 0; q < quadrantNumber; q++) {
 		const filtered = quadrants.filter(quadrant => quadrant.q == q);
 		if(!filtered.length) continue;
@@ -108,7 +103,7 @@ function createStartEndMap(quadrants: Quadrant[], trace: Trace): StartEndMap {
 
 interface TraceContext {
 	readonly map: StartEndMap;
-	readonly trace: Trace;
+	readonly trace: RepoTrace;
 	readonly node: ITreeNode;
 	readonly index: number;
 }

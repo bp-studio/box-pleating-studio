@@ -168,6 +168,7 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 		const p0 = path[j];
 		const p1 = path[i];
 		const p2 = path[i + 1] || path[0];
+		if(!Number.isInteger(p1.x) || !Number.isInteger(p2.x)) return;
 
 		// Check for right angle.
 		const dot = (p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);

@@ -58,10 +58,9 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
 		if(T.eq(e.p1) || T.eq(e.p2)) return;
 
-		const R = triangleTransform([D, P, B], T);
-
 		// If the triangle is too small, it could go out of bounds
-		if(R.x * f < pt.x * f) return;
+		const R = triangleTransform([D, P, B], T);
+		if(!R || R.x * f < pt.x * f) return;
 
 		// Check if the transformed R-point goes out of bounds
 		// by checking the intersection of line segments.
@@ -94,7 +93,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		const P = D.sub(B).$slope.gt(Fraction.ONE) ?
 			delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
 		const R = triangleTransform([T, D, P], B);
-		if(!this._setupAnchor(R)) return;
+		if(!R || !this._setupAnchor(R)) return;
 		this.data.addOns = [{
 			contour: [B, T, R].map(point => point.$toIPoint()),
 			dir: new Line(T, B).$reflect(p.$direction).$toIPoint(),

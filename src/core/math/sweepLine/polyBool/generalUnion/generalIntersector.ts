@@ -1,9 +1,12 @@
 import { Intersector } from "../../classes/intersector";
-import { isAlmostZero } from "core/math/geometry/float";
+import { epsilonSame, isAlmostZero } from "core/math/geometry/float";
 
 import type { LineSegment } from "../../classes/segment/lineSegment";
 import type { StartEvent } from "../../classes/event";
 import type { OverlapIntersector } from "../../clip/overlapIntersector";
+
+/** Experiments showed that the epsilon here needs to be slightly relaxed. */
+const PARALLEL_EPSILON = 1e-9;
 
 //=================================================================
 /**
@@ -23,7 +26,7 @@ export class GeneralIntersector extends Intersector {
 		const detBC = b1 * c2 - b2 * c1;
 		if(isAlmostZero(detAB)) {
 			// Parallel case
-			if(!isAlmostZero(detBC)) return; // Different lines.
+			if(!isAlmostZero(detBC, PARALLEL_EPSILON)) return; // Different lines.
 
 			// We know that ev1 and ev2 are sorted
 			const p2 = ev1.$other.$point;
@@ -42,5 +45,14 @@ export class GeneralIntersector extends Intersector {
 	/** This method is overwritten in {@link OverlapIntersector}. */
 	protected _crossSubdivide(event: StartEvent, point: IPoint): void {
 		this._subdivide(event, point);
+	}
+
+	protected override _subdivide(event: StartEvent, point: IPoint): StartEvent {
+		if(epsilonSame(point, event.$point) || epsilonSame(point, event.$other.$point)) {
+			// No need to subdivide in this case. It is known that creating essentially
+			// degenerated segments could lead to error in ordering the events.
+			return event;
+		}
+		return super._subdivide(event, point);
 	}
 }

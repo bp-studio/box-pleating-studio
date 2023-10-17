@@ -50,10 +50,19 @@ export const traceContourTask = new Task(traceContour, patternContourTask);
 function traceContour(): void {
 	// Update covered junction map
 	coveredJunctionMap.clear();
-	const covered = [...State.$junctions.values()].filter(j => j.$valid && j.$isCovered) as ValidJunction[];
-	for(const junction of covered) {
-		getOrSetEmptyArray(coveredJunctionMap, junction.$a.id).push(junction);
-		getOrSetEmptyArray(coveredJunctionMap, junction.$b.id).push(junction);
+	const junctions = [...State.$junctions.values()].filter(j => j.$valid) as ValidJunction[];
+	for(const junction of junctions) {
+		const covering = junction.$getCovering();
+		if(covering.length == 0) continue;
+		const a = junction.$a.id;
+		const b = junction.$b.id;
+		// We consider only the covering by those junctions of other flaps.
+		if(covering.every(j => !j.$involves(a))) {
+			getOrSetEmptyArray(coveredJunctionMap, a).push(junction);
+		}
+		if(covering.every(j => !j.$involves(b))) {
+			getOrSetEmptyArray(coveredJunctionMap, b).push(junction);
+		}
 	}
 
 	// Update stretch map
@@ -248,6 +257,7 @@ function createRawContour(node: ITreeNode, leaf: ITreeNode): PathEx {
 	const outer = leaf.$graphics.$roughContours[0].$outer[0];
 	const l = leaf.$dist - node.$dist - leaf.$length + node.$length;
 	const result = expandPath(outer, l);
+	// return result;
 
 	// The subtlety here is that if the leaf is involved in some covered junctions,
 	// we have to subtract the covered parts,

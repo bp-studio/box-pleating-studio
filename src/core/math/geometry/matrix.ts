@@ -1,6 +1,6 @@
 import { Fraction } from "../fraction";
-import { Vector } from "./vector";
 
+import type { Vector } from "./vector";
 import type { Point } from "./point";
 
 //=================================================================
@@ -54,9 +54,11 @@ export class Matrix {
 		);
 	}
 
-	/** Find the scaling-rotational matrix that transforms `from` to `to` */
+	/**
+	 * Find the scaling-rotational matrix that transforms `from` to `to`.
+	 * It is assumed that the parameters are non-zero vectors.
+	 */
 	public static $getTransformMatrix(from: Vector, to: Vector): Matrix {
-		if(from.eq(Vector.ZERO)) throw new Error("Cannot transform zero vector.");
 		const M = new Matrix(from._x, from._y.neg, from._y, from._x);
 		const { _x: a, _y: b } = M.$inverse!.$multiply(to);
 		return new Matrix(a, b.neg, b, a);

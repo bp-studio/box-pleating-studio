@@ -2,9 +2,9 @@ import { rotate } from "shared/utils/array";
 import { Line } from "./line";
 import { Point } from "./point";
 import { Matrix } from "./matrix";
+import { Vector } from "./vector";
 
-import type { Vector } from "./vector";
-import type { Path, PathEx } from "shared/types/geometry";
+import type { PathEx } from "shared/types/geometry";
 
 /**
  * This type signify that the array is intended to be a connected path,
@@ -40,9 +40,13 @@ export function toLines(path: RationalPath): Line[] {
  * and move the second vertex to the given target while keeping triangle similar.
  * @returns The third vertex after the moving.
  */
-export function triangleTransform(triangle: RationalPath, to: Point): Point {
+export function triangleTransform(triangle: RationalPath, to: Point): Point | null {
 	const [p1, p2, p3] = triangle;
 	const [v1, v2, v3] = [to, p2, p3].map(p => p.sub(p1));
+
+	// TODO: It is not yet clear why this might happen. More investigation is needed.
+	if(v2.eq(Vector.ZERO) || v1.eq(Vector.ZERO)) return null;
+
 	const m = Matrix.$getTransformMatrix(v2, v1);
 	return p1.$add(m.$multiply(v3));
 }
