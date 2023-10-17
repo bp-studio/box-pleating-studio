@@ -17,7 +17,7 @@ export class BinaryHeap<T> extends Heap<T> {
 
 	public $insert(value: T): void {
 		this._data.push(value);
-		this._moveBackwardRecursive(this._data.length - 1);
+		this._moveBackward(this._data.length - 1);
 	}
 
 	public get $isEmpty(): boolean {
@@ -34,7 +34,7 @@ export class BinaryHeap<T> extends Heap<T> {
 		if(this._data.length > 2) {
 			this._swap(1, this._data.length - 1);
 			this._data.pop();
-			this._moveForwardRecursive(1);
+			this._moveForward(1);
 		} else {
 			this._data.pop();
 		}
@@ -63,22 +63,26 @@ export class BinaryHeap<T> extends Heap<T> {
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected _moveForwardRecursive(index: number): boolean {
-		let child = index << 1;
-		if(this._shouldSwap(child, child + 1)) child++;
-		if(this._trySwap(index, child)) {
-			this._moveForwardRecursive(child);
-			return true;
+	protected _moveForward(index: number): boolean {
+		let result = false;
+		while(true) {
+			let child = index << 1;
+			if(this._shouldSwap(child, child + 1)) child++;
+			if(!this._trySwap(index, child)) break;
+			index = child;
+			result = true;
 		}
-		return false;
+		return result;
 	}
 
-	protected _moveBackwardRecursive(index: number): boolean {
-		const parent = index >>> 1;
-		if(parent && this._trySwap(parent, index)) {
-			this._moveBackwardRecursive(parent);
-			return true;
+	protected _moveBackward(index: number): boolean {
+		let result = false;
+		while(true) {
+			const parent = index >>> 1;
+			if(!parent || !this._trySwap(parent, index)) break;
+			index = parent;
+			result = true;
 		}
-		return false;
+		return result;
 	}
 }

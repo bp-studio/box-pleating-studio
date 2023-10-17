@@ -28,7 +28,7 @@ export class MutableHeap<T extends object> extends BinaryHeap<T> {
 		const index = this._data.length;
 		this._data.push(value);
 		this._indices.set(value, index);
-		this._moveBackwardRecursive(index);
+		this._moveBackward(index);
 	}
 
 	public $remove(value: T): void {
@@ -38,14 +38,14 @@ export class MutableHeap<T extends object> extends BinaryHeap<T> {
 		if(index === this._data.length) return;
 		this._indices.set(last, index);
 		this._data[index] = last;
-		this._moveForwardRecursive(index);
+		this._moveForward(index);
 	}
 
 	public $notifyUpdate(value: T): void {
 		const index = this._indices.get(value);
 		if(index === undefined) return;
-		if(!this._moveBackwardRecursive(index)) {
-			this._moveForwardRecursive(index);
+		if(!this._moveBackward(index)) {
+			this._moveForward(index);
 		}
 	}
 

@@ -19,8 +19,7 @@ checking. Therefore it is the Client's responsibility to ensure the validity of
 the commands.
 
 In the far future, the Core may be rewritten as WebAssembly for better
-performance, but for foreseeable future this seems unnecessary as the runtime of
-the Client exceeds that of the Core anyway.
+performance.
 
 The data flow of the Core is depicted in the following chart.
 
@@ -28,27 +27,27 @@ The data flow of the Core is depicted in the following chart.
 flowchart TB
 subgraph User input
 	direction LR
-	T{{Tree\nstructure}}
-	L{{Edge\nlengths}}
-	F{{Flap positions\nand sizes}}
-	P{{Stretch pattern\nchoices}}
+	T[\Tree\nstructure/]
+	L[\Edge\nlengths/]
+	F[\Flap positions\nand sizes/]
+	P[\Stretch pattern\nchoices/]
 end
 subgraph "Tree#emsp;#emsp;#emsp;#emsp;"
-	h([node heights])
-	b(tree balancing)
-	d([structure])
-	a([AABB hierarchy])
+	h{{node heights}}
+	b[tree balancing]
+	d[structure]
+	a{{AABB hierarchy}}
 end
-rc(rough contours)
-j(junctions)
-i[[invalid\njunctions]]
+rc[rough contours]
+j[junctions]
+i([invalid\njunctions])
 subgraph "Pattern#emsp;#emsp;#emsp;#emsp;"
-	s(stretches)
-	p([patterns])
-	tc(trace contours)
-	pc(pattern contours)
+	s[stretches]
+	p{{patterns}}
+	tc[trace contours]
+	pc[pattern contours]
 end
-g[[graphics]]
+g([graphics])
 
 T --> h --> b
 b & L --> d
