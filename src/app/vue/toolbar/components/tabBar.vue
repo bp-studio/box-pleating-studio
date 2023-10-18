@@ -51,8 +51,7 @@
 	}
 
 	#divTab {
-		overflow-x: scroll;
-		overflow-y: hidden;
+		overflow: scroll hidden;
 		-ms-overflow-style: none;
 		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 		scrollbar-width: none;

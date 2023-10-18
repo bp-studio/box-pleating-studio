@@ -262,6 +262,19 @@
 				return chunks;
 			}
 
+			window.gaErrorData = function(err) {
+				var chunks = splitString(err);
+				var data = {
+					app_version: app_config.app_version,
+					user_agent: navigator.userAgent,
+					error: chunks[0]
+				};
+				for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
+					data["error" + i] = chunks[i];
+				}
+				return data;
+			}
+
 			/**
 			 * Final processing.
 			 *
@@ -287,16 +300,7 @@
 					!(runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
 					!(/bot|crawl|spider/i.test(navigator.userAgent))
 				) {
-					var chunks = splitString(runErr);
-					var data = {
-						app_version: app_config.app_version,
-						user_agent: navigator.userAgent,
-						error: chunks[0]
-					};
-					for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
-						data["error" + i] = chunks[i];
-					}
-					gtag('event', 'unsupported', data);
+					gtag('event', 'unsupported', gaErrorData(runErr));
 				}
 				return false;
 			};

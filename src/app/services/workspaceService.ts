@@ -184,7 +184,7 @@ namespace WorkspaceService {
 
 	Studio.$onSetupOptions.push(options =>
 		options.onError = async (id: number, error: CoreError, backup?: JProject) => {
-			gtag("event", "fatal_error");
+			gtag("event", "fatal_error", gaErrorData(error.message + "\n" + error.coreTrace));
 			const log = cloneObj(backup);
 			if(log) {
 				error.build = app_config.app_version;

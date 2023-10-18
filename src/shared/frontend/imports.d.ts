@@ -17,6 +17,8 @@ declare global {
 		setResErr(error: string): void;
 	};
 
+	declare function gaErrorData(err: string): object;
+
 	/** Google Analytics. */
 	declare const gtag: (...args: unknown[]) => void;
 
