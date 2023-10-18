@@ -33,8 +33,14 @@ interface JointItem {
 }
 
 interface SplitItem {
+	/** The {@link JOverlap} to be joined. */
 	o: JOverlap;
+
+	/** The remaining {@link JPartition}. */
 	r?: JPartition;
+
+	/** The splitting is horizontal. */
+	h: boolean;
 }
 
 //=================================================================
@@ -227,6 +233,10 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const items2 = toSplitItems(joint.items[1].configs, joint.nodeId);
 		for(const item1 of items1) {
 			for(const item2 of items2) {
+				// This is not supported for the moment, so we skip it for now.
+				// TODO: But this is doable in theory. Try to implement this.
+				if(item1.h == item2.h) continue;
+
 				const o1 = item1.o, o2 = item2.o;
 				if(cover(o1, o2) || cover(o2, o1)) continue;
 				const joins = this._searchJoinPartitions(() => clone([o1, o2]), rank);
@@ -285,6 +295,7 @@ function toSplitItems(configs: readonly Configuration[], nodeId: number): SplitI
 			return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;
 		})!;
 		const r = partitions.find(partition => partition != p);
-		return { o: p.overlaps[0], r };
+		const o = p.overlaps[0];
+		return { o, r, h: o.c[1].type == CornerType.side };
 	});
 }
