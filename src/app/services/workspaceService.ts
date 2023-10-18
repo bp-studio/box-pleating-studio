@@ -4,6 +4,7 @@ import Dialogs from "./dialogService";
 import Studio from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
+import { isHttps } from "app/shared/constants";
 
 import type { CoreError, JProject } from "shared/json";
 import type * as Client from "client/main";
@@ -184,11 +185,11 @@ namespace WorkspaceService {
 
 	Studio.$onSetupOptions.push(options =>
 		options.onError = async (id: number, error: CoreError, backup?: JProject) => {
-			gtag("event", "fatal_error", gaErrorData(error.message + "\n" + error.coreTrace));
 			const log = cloneObj(backup);
 			if(log) {
 				error.build = app_config.app_version;
 				log.error = error;
+				if(isHttps) setTimeout(() => uploadLog(log, error), 0);
 			}
 			await Dialogs.error(log);
 			await close(id, true);
@@ -203,6 +204,22 @@ namespace WorkspaceService {
 			}
 		}
 	);
+
+	async function uploadLog(log: JProject, error: CoreError): Promise<void> {
+		let msg = error.message + "\n" + error.coreTrace;
+		try {
+			const response = await fetch("https://www.filestackapi.com/api/store/S3?key=AeCej8uvYSQ2GXTWtPBaTz", {
+				method: "POST", // Note that this won't work with file:// protocol somehow
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(log),
+			});
+			const json = await response.json();
+			msg = json.url || msg;
+		} catch(e) {
+			// ignore any error here.
+		}
+		gtag("event", "fatal_error", gaErrorData(msg));
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Exiting warning
