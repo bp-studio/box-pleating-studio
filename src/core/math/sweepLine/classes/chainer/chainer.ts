@@ -5,6 +5,7 @@ import { pathToString, pointToString } from "core/math/geometry/path";
 
 import type { ISegment } from "../segment/segment";
 import type { Path } from "shared/types/geometry";
+import type { StartEvent } from "../event";
 
 /**
  * In practice there wonk't be too many chains,
@@ -61,7 +62,7 @@ export class Chainer<PathType extends Path = Path> {
 			}
 		}
 
-		if(DEBUG_ENABLED && this._chains > 0) debugger; // Shouldn't happen in theory
+		if(DEBUG_ENABLED && this._chains > 0) this.debugChains();
 		return result;
 	}
 
@@ -162,6 +163,18 @@ export class Chainer<PathType extends Path = Path> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///#if DEBUG
+
+	/**
+	 * We shouldn't get here in theory. If we do,
+	 * the general rule of thumb is that the line segments are not thoroughly subdivided,
+	 * causing the {@link StartEvent.$wrapCount} to add up in the wrong way.
+	 * In that case, look for the following possible causes:
+	 *
+	 * 1. The input may contain self-intersections within the same polygon,
+	 *    while taking union in the mode without checking self-intersections.
+	 * 2. Something might be wrong with the epsilon-comparison,
+	 *    resulting in missing intersection detection.
+	 */
 	protected debugChains(): void {
 		for(let i = 1; i <= this._chains; i++) {
 			const path: Path = [];
@@ -172,6 +185,7 @@ export class Chainer<PathType extends Path = Path> {
 			}
 			console.log(pathToString(path));
 		}
+		debugger;
 	}
 	///#endif
 }

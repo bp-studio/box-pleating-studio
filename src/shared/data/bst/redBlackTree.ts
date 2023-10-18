@@ -99,7 +99,7 @@ export class RedBlackTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		if(!parent.isRed || grandpa === this._nil) return;
 
 		// Case 3
-		const uncle = this._getSibling(parent);
+		const uncle = getSibling(parent);
 		if(uncle !== this._nil && uncle.isRed) {
 			parent.isRed = false;
 			grandpa.isRed = true;
@@ -125,13 +125,13 @@ export class RedBlackTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		if(parent === this._nil) return;
 
 		// Case 2
-		let sibling = this._getSibling(node);
+		let sibling = getSibling(node);
 		if(sibling.isRed) {
 			sibling.isRed = false;
 			parent.isRed = true;
 			if(node === parent.$left) this._rotateLeft(parent);
 			else this._rotateRight(parent);
-			sibling = this._getSibling(node);
+			sibling = getSibling(node);
 		}
 
 		// Case 3 & 4
@@ -165,4 +165,9 @@ export class RedBlackTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 			this._rotateRight(parent);
 		}
 	}
+}
+
+function getSibling<K, V, N extends ParentedNode<K, V>>(node: N): N {
+	const parent = node.$parent;
+	return node === parent.$left ? parent.$right : parent.$left;
 }

@@ -44,9 +44,14 @@ export class Configuration implements ISerializable<JConfiguration> {
 	/** Keeping a copy of the raw {@link JPartition}s, if available. */
 	private readonly _rawPartitions: readonly JPartition[] | undefined;
 
+	/** All found {@link Pattern}s of this {@link Configuration}. */
 	private readonly _patterns: Store<Pattern>;
+
+	/** Current index of the selected {@link Pattern}. */
 	private _index: number = 0;
-	private _freeCornerCache: FreeCornerInfo[] | undefined;
+
+	/** See {@link $freeCorners}. */
+	private _freeCornerCache: FreeCorner[] | undefined;
 
 	constructor(repo: Repository, config: JConfiguration, singleMode: boolean = false) {
 		this.$repo = repo;
@@ -151,9 +156,14 @@ export class Configuration implements ISerializable<JConfiguration> {
 		return result;
 	}
 
-	public get $freeCorners(): FreeCornerInfo[] {
+	/**
+	 * Get all {@link FreeCorner}s in the current {@link Configuration}.
+	 *
+	 * The value is cached whenever applicable to provide performance.
+	 */
+	public get $freeCorners(): FreeCorner[] {
 		if(this._freeCornerCache) return this._freeCornerCache;
-		const result: FreeCornerInfo[] = [];
+		const result: FreeCorner[] = [];
 		for(const [i, partition] of this.$partitions.entries()) {
 			for(const map of partition.$cornerMap) {
 				if(map.corner.type == CornerType.side || map.corner.type == CornerType.intersection) {
@@ -171,7 +181,11 @@ export interface SideDiagonal extends Line {
 	readonly p0: Point;
 }
 
-interface FreeCornerInfo {
+/**
+ * A {@link FreeCorner} is a corner of either type {@link CornerType.side} or {@link CornerType.intersection}.
+ * Unless it is within the flap region, it is not yet connected to a ridge.
+ */
+interface FreeCorner {
 	readonly map: CornerMap;
 	readonly corner: Point;
 	readonly partition: Partition;

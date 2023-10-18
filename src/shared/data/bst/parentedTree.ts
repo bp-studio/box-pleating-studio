@@ -19,7 +19,12 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 
 	public override $getPrev(key: K): V | undefined {
 		let node = this._getNode(key);
-		if(node === this._nil) debugger;
+		if(DEBUG_ENABLED && node === this._nil) {
+			// We shouldn't get here in theory. If we do,
+			// it basically means we have a segment with the start/end events being sorted incorrectly,
+			// and that usually implies that we've created an essentially degenerated segment.
+			debugger;
+		}
 		if(node.$left !== this._nil) return this._max(node.$left).$value;
 		while(node.$parent !== this._nil && node.$parent.$left === node) node = node.$parent;
 		return node.$parent.$value;
@@ -63,11 +68,5 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 			parent.$right = newChild;
 		}
 		newChild.$parent = parent;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
-	protected _getSibling(node: N): N {
-		const parent = node.$parent;
-		return node === parent.$left ? parent.$right : parent.$left;
 	}
 }

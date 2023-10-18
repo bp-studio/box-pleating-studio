@@ -113,6 +113,9 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
 			const p = getCorrespondingPoint(p1, p0, p2, width, side);
 			const innerKey = getOrderedKey(p.x, p.y);
+			// In some edge cases, it is possible that the corresponding inner point exists
+			// while the proposed ridge crease also hits a free corner at the same time.
+			// In that case, free corner should be used first.
 			if(!tryAddRemainingRidge(p1, p, freeCornerMap, ridges) && innerRightCorners.has(innerKey)) {
 				ridges.push([p1, p]);
 				if(!doubled.has(innerKey)) innerRightCorners.delete(innerKey);
@@ -148,7 +151,8 @@ function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number
 
 function tryAddRemainingRidge(p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[]): boolean {
 	const line = Line.$fromIPoint(p1, p);
-	const f = line.$slope.$value as 1 | -1;
+	const f = line.$slope.$value;
+	if(f !== 1 && f !== -1) return false; // Fool proof
 	const sideCorners = freeCornerMap[f].get(p.x - f * p.y);
 	if(!sideCorners) return false;
 	const corner = sideCorners.find(c => line.$contains(c, true));
@@ -165,10 +169,11 @@ function tryAddRemainingRidge(p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMa
 function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 	const l = path.length;
 	for(let i = 0, j = l - 1; i < l; j = i++) {
-		const p0 = path[j];
 		const p1 = path[i];
-		const p2 = path[i + 1] || path[0];
 		if(!Number.isInteger(p1.x) || !Number.isInteger(p1.y)) continue;
+
+		const p0 = path[j];
+		const p2 = path[i + 1] || path[0];
 
 		// Check for right angle.
 		const dot = (p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
