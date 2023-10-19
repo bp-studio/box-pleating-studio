@@ -23,7 +23,7 @@
 	}
 
 	function save(): void {
-		gtag("event", "project_bps");
+		gtag("event", "project_bps", { data1: Studio.project?.design.title });
 		Studio.history.notify();
 	}
 

@@ -2,6 +2,7 @@
 import type { VueI18n } from "vue-i18n";
 import type bootstrap from "bootstrap";
 import type { BpsLocale } from "./locale";
+import "@types/gtag.js";
 
 declare global {
 	// This one is needed since Bootstrap package is lazily loaded.
@@ -18,9 +19,6 @@ declare global {
 	};
 
 	declare function gaErrorData(err: string): object;
-
-	/** Google Analytics. */
-	declare const gtag: (...args: unknown[]) => void;
 
 	/** App info, defined in HTML. */
 	declare const app_config: Record<string, string>;

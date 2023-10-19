@@ -126,7 +126,7 @@
 		Studio.history.notify();
 		Handles.set(Studio.project!.id, handle);
 		Handles.addRecent(handle);
-		gtag("event", "project_bps");
+		gtag("event", "project_bps", { data1: Studio.project!.design.title });
 	}
 	function notifyAll(handle?: FileSystemFileHandle): void {
 		Studio.history.notifyAll();
@@ -148,6 +148,7 @@
 	async function save(id?: number): Promise<boolean> {
 		if(id === undefined) id = Studio.project!.id as number;
 		const proj = Workspace.getProject(id)!;
+		gtag("event", "project_bps", { data1: proj.design.title });
 		try {
 			const handle = Handles.get(id);
 			const writable = await handle.createWritable();
@@ -176,7 +177,6 @@
 		const tasks: Promise<boolean>[] = [];
 		for(const id of Workspace.ids.value) tasks.push(save(id));
 		await Promise.all(tasks); // The failure to save individual files will not affect the saving of other files
-		gtag("event", "project_bps");
 	}
 
 	async function upload(files: FileList): Promise<void> {
@@ -191,7 +191,7 @@
 		if(!Studio.project) return;
 		await Studio.beforePrint();
 		window.print();
-		gtag("event", "print", {});
+		gtag("event", "print");
 	}
 
 </script>

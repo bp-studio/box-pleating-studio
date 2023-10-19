@@ -270,7 +270,7 @@
 					error: chunks[0]
 				};
 				for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
-					data["error" + i] = chunks[i];
+					data["data" + i] = chunks[i];
 				}
 				return data;
 			}

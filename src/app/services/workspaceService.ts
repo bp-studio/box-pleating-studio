@@ -199,6 +199,7 @@ namespace WorkspaceService {
 					await open(backup as Pseudo<JProject>);
 					selectLast();
 				} catch {
+					gtag("event", "fatal_recovery_failed");
 					await Dialogs.alert("Recovery failed.");
 				}
 			}
