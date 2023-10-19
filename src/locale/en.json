@@ -245,6 +245,7 @@
 		"filePermission": "For security reason, BP Studio needs your permission to access the file. For each file, you'll only need to grant permission once per session. Do you still wish to access the file?",
 		"fatal": "An internal error occurred, and the project cannot be further operated.",
 		"recover": "The workspace will be recovered automatically, but the error will likely persist. Please download the error log and send it to the author for diagnosing the issue.",
+		"recoverFailed": "Recovery failed.",
 		"invalidFormat": "File \"{0}\" is of invalid format.",
 		"invalidLink": "Unexpected error occurred upon opening the project link; the data might be corrupted.",
 		"latest": "You already have the latest version of BP Studio.",

@@ -200,7 +200,7 @@ namespace WorkspaceService {
 					selectLast();
 				} catch {
 					gtag("event", "fatal_recovery_failed");
-					await Dialogs.alert("Recovery failed.");
+					await Dialogs.alert(i18n.t("message.recoverFailed"));
 				}
 			}
 		}
