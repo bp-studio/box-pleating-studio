@@ -12,7 +12,6 @@
 		"project": "./src/app/tsconfig.json"
 	},
 	"rules": {
-		"@typescript-eslint/indent": "off", // see vue
 		"max-len": "off", // see vue
 		"no-undef": "off", // This is redudant as TypeScript catches things that are really undefined
 		"vue/no-mutating-props": "off", // see https://github.com/vuejs/eslint-plugin-vue/issues/1371

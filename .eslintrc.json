@@ -51,17 +51,9 @@
 			"never"
 		],
 		"@typescript-eslint/indent": [
-			"warn",
-			"tab",
-			{
-				"SwitchCase": 1,
-				"flatTernaryExpressions": true,
-				"ignoredNodes": [
-					// There's no good solution for the moment.
-					// See https://github.com/typescript-eslint/typescript-eslint/issues/1824
-					"ClassDeclaration"
-				]
-			}
+			// This rule has significant performance inpect and is recommended to be off.
+			// See https://typescript-eslint.io/linting/troubleshooting/performance-troubleshooting/
+			"off"
 		],
 		"@typescript-eslint/member-delimiter-style": [
 			"warn",

@@ -26,7 +26,12 @@
 			"prefer-top-level"
 		],
 		"import/newline-after-import": "warn",
-		"import/no-cycle": "warn",
+		"import/no-cycle": [
+			"warn",
+			{
+				"ignoreExternal": true
+			}
+		],
 		"import/no-duplicates": "warn",
 		"import/no-unresolved": "error",
 		"import/order": [

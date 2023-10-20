@@ -12,7 +12,6 @@
 		"project": "./src/other/donate/tsconfig.json"
 	},
 	"rules": {
-		"@typescript-eslint/indent": "off", // see vue
 		"max-len": "off", // see vue
 		"new-cap": [
 			"warn",
