@@ -9,6 +9,7 @@ import { isHttps } from "app/shared/constants";
  */
 //=================================================================
 
+const UPDATE_INTERVAL = 86_400_000; // one day
 const ready = shallowRef(false);
 
 if(isHttps) {
@@ -16,6 +17,7 @@ if(isHttps) {
 	// and onupdatefound event may not work on older version of Safari,
 	// but eventually the service worker and the app it will update.
 	navigator.serviceWorker.ready.then(reg => {
+		registerUpdate(reg);
 		if(reg.waiting) {
 			ready.value = true;
 		} else {
@@ -23,6 +25,21 @@ if(isHttps) {
 			reg.addEventListener("updatefound", () => watchInstalling(reg));
 		}
 	});
+}
+
+async function registerUpdate(reg: ServiceWorkerRegistration): Promise<void> {
+	try {
+		if("permissions" in navigator) {
+			const status = await navigator.permissions.query({
+				name: "periodic-background-sync" as PermissionName,
+			});
+			if(status.state === "granted") {
+				await reg.periodicSync.register("update", { minInterval: UPDATE_INTERVAL });
+			}
+		}
+	} catch(e) {
+		console.log(e);
+	}
 }
 
 function watchInstalling(reg: ServiceWorkerRegistration): void {

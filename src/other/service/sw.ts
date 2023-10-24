@@ -39,7 +39,7 @@ precacheController.addToCacheList(self.__WB_MANIFEST);
 const precacheRoute = new precaching.PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],
 	directoryIndex: "index.htm",
-	cleanURLs: false,
+	cleanURLs: false, // See https://developer.chrome.com/docs/workbox/modules/workbox-precaching/#clean-urls
 });
 routing.registerRoute(precacheRoute);
 
@@ -120,3 +120,18 @@ async function check(clientList: string[], id: string): Promise<boolean> {
 	}
 	return clientList[0] === id;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// Background sync
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+interface PeriodicBackgroundSyncEvent extends ExtendableEvent {
+	tag: string;
+}
+
+self.addEventListener("periodicsync", (event: PeriodicBackgroundSyncEvent) => {
+	if(event.tag == "update") {
+		console.log("Service worker periodic update check.");
+		event.waitUntil(self.registration.update());
+	}
+});
