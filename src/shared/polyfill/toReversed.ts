@@ -11,7 +11,6 @@ export function toReversed<T>(array: T[]): T[] {
 }
 
 if(typeof Array.prototype.toReversed !== "function") {
-	// eslint-disable-next-line no-extend-native
 	Object.defineProperty(Array.prototype, "toReversed", {
 		enumerable: false,
 		value<T>(this: T[]) {

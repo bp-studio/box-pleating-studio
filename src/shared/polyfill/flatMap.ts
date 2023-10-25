@@ -23,7 +23,6 @@ export function flatMap<T, U, This = undefined>(
 }
 
 if(typeof Array.prototype.flatMap !== "function") {
-	// eslint-disable-next-line no-extend-native
 	Object.defineProperty(Array.prototype, "flatMap", {
 		enumerable: false,
 		value<T, U, This>(
