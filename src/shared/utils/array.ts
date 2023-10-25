@@ -29,7 +29,7 @@ export function distinct<T>(array: T[]): T[] {
 	return result;
 }
 
-/** Move the first `j` items of an array to its tail in place. */
+/** Move the first {@link j} items of an array to its tail in place. */
 export function rotate<T>(array: T[], j: number): T[] {
 	array.push(...array.splice(0, j));
 	return array;

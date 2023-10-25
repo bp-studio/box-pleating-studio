@@ -10,7 +10,7 @@ const TIMEOUT = 750;
 
 export namespace LongPressController {
 
-	let _timeout: Timeout | undefined;
+	let _timeout: number | undefined;
 
 	export let $triggered: boolean = false;
 

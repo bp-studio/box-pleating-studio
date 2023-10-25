@@ -56,7 +56,7 @@ export class Step implements ISerializable<JStep> {
 	/** Tags of objects selected after this {@link Step}. */
 	private readonly _after: string[];
 
-	private _timeout!: Timeout;
+	private _timeout!: number;
 
 	constructor(project: Project, json: JStep<Command>) {
 		this._project = project;
@@ -159,7 +159,7 @@ export class Step implements ISerializable<JStep> {
 	/** Reset auto-sealing */
 	private _reset(): void {
 		if(this._timeout) clearTimeout(this._timeout);
-		if(!this._sealed) this._timeout = window.setTimeout(() => this._seal(), AUTO_RESET);
+		if(!this._sealed) this._timeout = setTimeout(() => this._seal(), AUTO_RESET);
 	}
 
 	/** Automatically seal self. */

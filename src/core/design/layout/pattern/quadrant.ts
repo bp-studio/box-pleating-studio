@@ -102,14 +102,14 @@ export class Quadrant {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Get the y-coordinate that is `d` units away from the tip.
+	 * Get the y-coordinate that is {@link d} units away from the tip.
 	 */
 	private y(d: number): number {
 		return this.$point.y + this.f.y * d;
 	}
 
 	/**
-	 * Get the x-coordinate that is `d` units away from the tip.
+	 * Get the x-coordinate that is {@link d} units away from the tip.
 	 */
 	private x(d: number): number {
 		return this.$point.x + this.f.x * d;

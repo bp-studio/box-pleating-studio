@@ -37,7 +37,4 @@ declare global {
 
 	/** Global VueI18n instance. Either injected by SSG or created in LanguageService.ts. */
 	declare let i18n: VueI18n;
-
-	// 20230512 update: This issue seems fixed somehow now. Keep observing.
-	type Timeout = ReturnType<typeof setTimeout> | number;
 }

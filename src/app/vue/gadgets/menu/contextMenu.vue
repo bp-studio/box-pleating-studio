@@ -35,22 +35,9 @@
 
 	function show(e: MouseEvent): void {
 		Popper.createPopper(
-			{
-				getBoundingClientRect() {
-					return {
-						top: e.pageY,
-						bottom: e.pageY,
-						left: e.pageX,
-						right: e.pageX,
-						width: 0,
-						height: 0,
-					};
-				},
-			} as popper.VirtualElement,
+			{ getBoundingClientRect: () => new DOMRect(e.pageX, e.pageY) },
 			el.value!,
-			{
-				placement: "bottom-start",
-			}
+			{ placement: "bottom-start" }
 		);
 		el.value!.classList.add("show");
 		shown = true;

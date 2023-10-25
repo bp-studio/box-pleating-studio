@@ -12,7 +12,7 @@
 
 	defineOptions({ name: "KeyButton" });
 
-	let to: Timeout;
+	let to: number;
 
 	const props = defineProps<{
 		dir: DirectionKey;

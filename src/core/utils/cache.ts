@@ -1,6 +1,6 @@
 
 /**
- * Accordingly, `Symbol` property is slightly faster than `WeakMap`. See
+ * Accordingly, {@link Symbol} property is slightly faster than {@link WeakMap}. See
  * https://www.measurethat.net/Benchmarks/Show/7142/0/weakmap-vs-symbol-property
  */
 const symbol = Symbol("cache");

@@ -11,13 +11,12 @@
 		"strict": true,
 		"target": "esnext",
 		"types": [
-			"mocha",
-			"wicg-file-system-access"
+			"mocha"
 		]
 	},
 	"include": [
 		"./**/*.ts",
-		"../src/shared/types/**/*.ts"
+		"../src/shared/types/**/*.d.ts"
 	],
 	"ts-node": {
 		"files": true,

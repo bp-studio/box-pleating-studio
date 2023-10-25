@@ -11,9 +11,6 @@
 	"extends": "../shared/tsconfig",
 	"include": [
 		"./**/*.ts",
-		"../shared/types/**/*.ts",
-		"../shared/json/**/*.ts",
-		"../shared/utils/**/*.ts",
-		"../shared/data/**/*.ts"
+		"../shared/types/**/*.d.ts"
 	]
 }

@@ -12,7 +12,7 @@
 	"include": [
 		"./**/*.ts",
 		"./**/*.vue",
-		"../shared/types/**/*.ts",
-		"../shared/frontend/**/*.ts"
+		"../shared/types/**/*.d.ts",
+		"../shared/frontend/**/*.d.ts"
 	]
 }

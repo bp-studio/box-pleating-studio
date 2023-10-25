@@ -67,8 +67,8 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Delete the node of the given key under node `n`.
-	 * @returns The node that replaces `n` in the tree.
+	 * Delete the node of the given key under node {@link n}.
+	 * @returns The node that replaces {@link n} in the tree.
 	 */
 	private _delete(n: Node<K, V>, key: K): Node<K, V> {
 		if(n === this._nil) {
@@ -118,9 +118,9 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 	}
 
 	/**
-	 * Find and remove the minimum value under node `n`.
+	 * Find and remove the minimum value under node {@link n}.
 	 * This method is similar to {@link _delete}, but does not require comparisons, so it is faster.
-	 * @returns The node that replaces `n` in the tree.
+	 * @returns The node that replaces {@link n} in the tree.
 	 */
 	private _pop(n: Node<K, V>): Node<K, V> {
 		if(n.$left === this._nil) {

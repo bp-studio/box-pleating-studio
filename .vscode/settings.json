@@ -120,6 +120,7 @@
 		"src/public/**/*",
 		"lib/**/*"
 	],
+	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"scss.validate": false,
 	"stylelint.validate": [
 		"css",

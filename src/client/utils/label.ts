@@ -44,7 +44,7 @@ export class Label extends Container {
 	public $color?: number;
 	public $distance: number = 1;
 
-	private _timeout!: Timeout;
+	private _timeout!: number;
 
 	constructor(sheet: Sheet) {
 		super();

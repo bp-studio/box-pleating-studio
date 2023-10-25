@@ -21,7 +21,7 @@
 	const sub = shallowRef<HTMLDivElement>();
 	const SUBMENU_DELAY = 250;
 
-	let timeout: Timeout;
+	let timeout: number;
 
 	defineProps<{
 		icon: string;

@@ -26,7 +26,7 @@
 		loading.value = true;
 
 		/**
-		 * In Safari, if you continue to execute JavaScript without waiting for the animation to start,
+		 * In Safari, if we continue to execute JavaScript without waiting for the animation to start,
 		 * The result is that the animation never appears. Using setTimeout to delay is of course one option,
 		 * but we don't know exactly how long the delay is enough, and it's unnecessary waiting for other browsers,
 		 * so here I set a Promise to make sure the animation starts before moving on to the next step.

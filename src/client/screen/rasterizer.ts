@@ -18,7 +18,7 @@ let printing: boolean = false;
  * {@link window.onafterprint} event also fires repeatedly,
  * and we use this to detect the last one.
  */
-let debounce: Timeout;
+let debounce: number;
 
 window.addEventListener("beforeprint", () => beforePrint(ProjectService.project.value));
 window.addEventListener("afterprint", afterPrint);

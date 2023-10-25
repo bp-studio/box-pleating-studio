@@ -2,7 +2,7 @@ import { CornerType } from "shared/json";
 
 import type { JConfiguration, JCorner, JProject, JOverlap, JStretch, JLayout } from "shared/json";
 
-/** Since version rc0 it is required that {@link JIntersection} must have `e`. */
+/** Since version rc0 it is required that {@link JCorner}s of type {@link CornerType.intersection} must have {@link JCorner.e}. */
 export default function $process(proj: Pseudo<JProject>): boolean {
 	const st = (proj.layout as JLayout | undefined)?.stretches as Pseudo<JStretch>[] | undefined;
 	if(st) {

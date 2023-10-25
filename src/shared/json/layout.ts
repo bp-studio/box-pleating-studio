@@ -44,7 +44,7 @@ export interface JOverlap extends JQuadrilateral {
  *
  * It describes the state of itself and the target it connects to.
  * It extends {@link Partial}<{@link JConnection}> interface,
- * and if `e` and `q` are `undefined` then it means it does not connect to anything.
+ * and if {@link JCorner.e e} and {@link JCorner.q q} are `undefined` then it means it does not connect to anything.
  */
 //=================================================================
 

@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"lib": [
+			"ESNext"
+		],
+		"types": [
+			"node"
+		]
+	}
+}

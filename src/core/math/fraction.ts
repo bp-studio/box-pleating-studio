@@ -25,7 +25,7 @@ export type Rational = number | Fraction;
 /**
  * {@link Fraction} represents a rational number.
  *
- * Originally, this class used the `BigInt` type internally for infinite precision,
+ * Originally, this class used the {@link BigInt} type internally for infinite precision,
  * and had overloaded parameters for various operations for flexibility.
  * However, later it was found that BigInt's arithmetic speed is way too slow,
  * and overloading also incurred unnecessary overheads, so in this version,

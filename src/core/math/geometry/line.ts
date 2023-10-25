@@ -6,7 +6,7 @@ import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { ILine } from "shared/types/geometry";
 
-/** Take the next integer of `x` in the direction of `f`. */
+/** Take the next integer of {@link x} in the direction of {@link f}. */
 function int(x: number, f: number): number {
 	return f > 0 ? Math.ceil(x) : Math.floor(x);
 }
