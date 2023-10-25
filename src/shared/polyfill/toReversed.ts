@@ -6,7 +6,8 @@
  */
 //=================================================================
 export function toReversed<T>(array: T[]): T[] {
-	return array.concat().reverse();
+	const l = array.length - 1;
+	return array.map((_, i) => array[l - i]);
 }
 
 if(typeof Array.prototype.toReversed !== "function") {

@@ -9,7 +9,6 @@
 	"require": [
 		"./test/mocha.env",
 		"ts-node/register",
-		"tsconfig-paths/register",
-		"./src/shared/polyfill/toReversed.ts"
+		"tsconfig-paths/register"
 	]
 }
