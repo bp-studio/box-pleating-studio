@@ -3,6 +3,8 @@
 
 BP Studio is developed using [VS Code](https://code.visualstudio.com/),
 and the project folder is already configured for it.
+As you open the project with it,
+it will also hint you the recommended extensions to install.
 
 ## Contributing new languages
 
@@ -57,6 +59,13 @@ Not that I don't want to, but that I don't have the resource to do so.
 ## Unit testing
 
 Refer to the [README](test/README.md) of tests.
+
+## Code styling
+
+This project use [ESLint](https://eslint.org/) for both linting and formatting
+(using [@stylistic/eslint-plugin](https://eslint.style/)).
+If one opens it with VS Code plus the recommended extensions,
+all files will go through auto formatting as one saves them.
 
 ## About the source code organization
 

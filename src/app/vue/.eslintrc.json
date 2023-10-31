@@ -12,7 +12,8 @@
 		"project": "./src/app/tsconfig.json"
 	},
 	"rules": {
-		"max-len": "off", // see vue
+		"@stylistic/max-len": "off", // see vue
+		"no-mixed-spaces-and-tabs": "off", // to work with Volar formatter
 		"no-undef": "off", // This is redudant as TypeScript catches things that are really undefined
 		"vue/no-mutating-props": "off", // see https://github.com/vuejs/eslint-plugin-vue/issues/1371
 		"vue/max-len": [
