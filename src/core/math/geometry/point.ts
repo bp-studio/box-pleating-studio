@@ -73,8 +73,8 @@ export class Point extends Couple implements IPoint {
 		if(typeof p != "string") throw new Error("Incorrect type");
 		const match = p.match(/^\((-?\d+)(?:\/(\d+))?, (-?\d+)(?:\/(\d+))?\)$/);
 		if(!match) throw new Error("Incorrect format: " + p);
-		const x = new Fraction(Number(match[1]), Number(match[2] || 1));
-		const y = new Fraction(Number(match[3]), Number(match[4] || 1));
+		const x = new Fraction(Number(match[1]), Number(match[2] || 1) as Positive);
+		const y = new Fraction(Number(match[3]), Number(match[4] || 1) as Positive);
 		return new Point(x, y);
 	}
 

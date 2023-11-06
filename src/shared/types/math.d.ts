@@ -21,3 +21,9 @@ interface ISignPoint {
 }
 
 type Sign = 0 | 1 | -1;
+
+/**
+ * We use this type alias to remind ourselves that certain numbers must be positive.
+ */
+type Positive = number & { _: undefined } // a trick to make the type distinguishable from just `number`
+	| 1; // to make our lives easier

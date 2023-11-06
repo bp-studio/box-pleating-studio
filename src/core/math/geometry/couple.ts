@@ -72,13 +72,6 @@ export abstract class Couple {
 		return this;
 	}
 
-	/** Round the {@link Couple} to the given place. */
-	public $round(place = 1): this {
-		const s = new Fraction(place);
-		this._x.d(s).r().m(s); this._y.d(s).r().m(s);
-		return this;
-	}
-
 	/** Restrict the Couple to a certain rectangular range */
 	public $range(min_X: Fraction, max_X: Fraction, min_Y: Fraction, max_Y: Fraction): this {
 		if(this._x.lt(min_X)) this._x = min_X;

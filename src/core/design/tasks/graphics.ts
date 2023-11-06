@@ -151,7 +151,7 @@ function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number
 
 function tryAddRemainingRidge(p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[]): boolean {
 	const line = Line.$fromIPoint(p1, p);
-	const f = line.$slope.$value;
+	const f = line.$slope;
 	if(f !== 1 && f !== -1) return false; // Fool proof
 	const sideCorners = freeCornerMap[f].get(p.x - f * p.y);
 	if(!sideCorners) return false;

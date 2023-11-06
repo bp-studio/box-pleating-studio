@@ -39,13 +39,13 @@ export class Vector extends Couple {
 		return Math.sqrt(this.dot(this));
 	}
 
-	/** Returns the slope in {@link Fraction}. */
+	/**
+	 * Returns the slope in a non-zero {@link Fraction}.
+	 *
+	 * Must ensure that the current vector is NOT axis-parallel.
+	 */
 	public get $slope(): Fraction {
 		return this._y.div(this._x);
-	}
-
-	public get $isAxisParallel(): boolean {
-		return this._x.eq(Fraction.ZERO) || this._y.eq(Fraction.ZERO);
 	}
 
 	/** Rotate the vector 90-degrees in counter-clockwise direction. */
@@ -123,21 +123,5 @@ export class Vector extends Couple {
 	/** Check if the given vector is parallel to this one. */
 	public $parallel(v: Vector): boolean {
 		return this._x.mul(v._y).eq(this._y.mul(v._x));
-	}
-
-	/**
-	 * Calculate the angle bisector of two vectors.
-	 *
-	 * This algorithm assumes that the passed-in vectors
-	 * are those axis-parallel vectors of GOPSs,
-	 * so during the course of computation,
-	 * z1 and z2 are guaranteed to be integers.
-	 */
-	public static $bisector(v1: Vector, v2: Vector): Vector {
-		const [x1, y1] = $reduce(v1._x, v1._y);
-		const [x2, y2] = $reduce(v2._x, v2._y);
-		const z1 = norm(x1, y1);
-		const z2 = norm(x2, y2);
-		return new Vector(x1 * z2 + x2 * z1, y1 * z2 + y2 * z1);
 	}
 }

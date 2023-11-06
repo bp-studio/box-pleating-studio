@@ -6,6 +6,8 @@ import { cache, clearCache } from "core/utils/cache";
 import { nonEnumerable } from "shared/utils/nonEnumerable";
 import { toLines } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
+import { norm } from "shared/types/geometry";
+import { $reduce } from "core/math/utils/gcd";
 
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
@@ -104,6 +106,17 @@ export class Piece extends Region implements JPiece {
 		}
 	}
 
+	/** Calculate the angle bisector of the directional vectors of two pieces. */
+	public $bisector(that: Piece): Vector {
+		const v1 = this.$direction;
+		const v2 = that.$direction;
+		const [x1, y1] = $reduce(v1._x, v1._y);
+		const [x2, y2] = $reduce(v2._x, v2._y);
+		// In this use case, z1 and z2 are guaranteed to be integers
+		const z1 = norm(x1, y1);
+		const z2 = norm(x2, y2);
+		return new Vector(x1 * z2 + x2 * z1, y1 * z2 + y2 * z1);
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Interface methods

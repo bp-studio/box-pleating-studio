@@ -1,8 +1,8 @@
 import { Point } from "core/math/geometry/point";
-import { Vector } from "core/math/geometry/vector";
 import { JoineeBuilder } from "../joineeBuilder";
 import { cache } from "core/utils/cache";
 
+import type { Vector } from "core/math/geometry/vector";
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Joinee } from "../joinee";
 import type { JAddOn, JDevice } from "shared/json";
@@ -71,7 +71,7 @@ export abstract class JoinLogic {
 
 		// Gather important parameters
 		const pt = s1 ? builder1.$anchor : builder2.$anchor;
-		const bv = Vector.$bisector(p1.$direction, p2.$direction);
+		const bv = p1.$bisector(p2);
 		this.f = $oriented ? 1 : -1;
 
 		let org = Point.ZERO;

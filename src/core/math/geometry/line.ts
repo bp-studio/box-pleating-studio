@@ -38,15 +38,14 @@ export class Line {
 		const result: Line[] = [];
 
 		// Group the lines by slope to improve performance.
-		const slopeMap = new Map<string, Line[]>();
+		const slopeMap = new Map<number, Line[]>();
 		for(const l of l2) {
-			const slope = l.$slope.toString();
-			const arr = getOrSetEmptyArray(slopeMap, slope);
-			arr.push(l);
+			const slope = l.$slope;
+			getOrSetEmptyArray(slopeMap, slope).push(l);
 		}
 
 		for(const l of l1) {
-			const slope = l.$slope.toString();
+			const slope = l.$slope;
 			if(!slopeMap.has(slope)) result.push(l);
 			else result.push(...l._cancel(slopeMap.get(slope)!));
 		}
@@ -73,9 +72,11 @@ export class Line {
 		return this.p2.sub(this.p1);
 	}
 
-	/** Returns the slope in {@link Fraction} (could be 1/0, i.e. infinity). */
-	public get $slope(): Fraction {
-		return this.p1._y.sub(this.p2._y).d(this.p1._x.sub(this.p2._x));
+	/** Returns the slope (could be {@link Number.POSITIVE_INFINITY}). */
+	public get $slope(): number {
+		const dx = this.p1._x.sub(this.p2._x);
+		if(dx.$numerator == 0) return Number.POSITIVE_INFINITY;
+		return this.p1._y.sub(this.p2._y).d(dx).$value;
 	}
 
 	/**
@@ -182,13 +183,13 @@ export class Line {
 	public $xIntersection(x: number): Point {
 		const v = this.p2.sub(this.p1);
 		const f = new Fraction(x);
-		return new Point(f, this.p1._y.sub(v.$slope.mul(this.p1._x.sub(f))));
+		return new Point(f, this.p1._y.sub(v.$slope.m(this.p1._x.sub(f))));
 	}
 
 	public $yIntersection(y: number): Point {
 		const v = this.p2.sub(this.p1);
 		const f = new Fraction(y);
-		return new Point(this.p1._x.sub(this.p1._y.sub(f).div(v.$slope)), f);
+		return new Point(this.p1._x.sub(this.p1._y.sub(f).d(v.$slope)), f);
 	}
 
 	/** Reflect the given {@link Vector} against this line. */

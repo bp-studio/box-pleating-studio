@@ -44,15 +44,15 @@ export class Fraction {
 	/** Numerator, could be negative. */
 	private _p: number;
 
-	/** Denominator, always positive. */
-	private _q: number;
+	/** Denominator, always {@link Positive}. */
+	private _q: Positive;
 
 	constructor(value: Rational);
-	constructor(numerator: number, denominator: number);
-	constructor(n: Rational, d: number = 1) {
+	constructor(numerator: number, denominator: Positive);
+	constructor(n: Rational, d: Positive = 1) {
 		if(n instanceof Fraction) {
 			this._p = n._p;
-			this._q = n._q * d;
+			this._q = n._q * d as Positive;
 		} else if(typeof n == "number" && typeof d == "number") {
 			if(Number.isSafeInteger(n) && Number.isSafeInteger(d)) {
 				this._p = n;
@@ -71,7 +71,7 @@ export class Fraction {
 	}
 
 	public get $numerator(): number { return this._p; }
-	public get $denominator(): number { return this._q; }
+	public get $denominator(): Positive { return this._q; }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Core members
@@ -112,8 +112,9 @@ export class Fraction {
 
 	/** Inversion in place */
 	public i(): this {
-		[this._p, this._q] = [this._q, this._p];
-		return this._normalize();
+		const sgn = Math.sign(this._p);
+		[this._p, this._q] = [sgn * this._q, sgn * this._p as Positive];
+		return this;
 	}
 
 	/** Round to the nearest integer in place */
@@ -148,12 +149,14 @@ export class Fraction {
 		return this._normalize();
 	}
 
-	/** Division in place */
+	/**
+	 * Division in place.
+	 * Must ensure that {@link f} is non-zero.
+	 */
 	public d(f: Fraction): this {
-		// Division by zero is not prohibited here,
-		// as it is possible to have a slope that is infinity.
-		this._p *= f._q;
-		this._q *= f._p;
+		const sgn = Math.sign(f._p);
+		this._p *= sgn * f._q;
+		this._q *= sgn * f._p;
 		return this._normalize();
 	}
 
@@ -171,30 +174,10 @@ export class Fraction {
 
 	/** Normalization after each operation */
 	private _normalize(): this {
-		// Try auto simplifying.
-		if(this._isDangerous) this._smp();
-
-		// Make sure that q is always positive.
-		if(this._q < 0) {
-			this._q = -this._q;
-			this._p = -this._p;
-		} else if(this._q == 0) {
-			// Infinity occurs only in slope calculation,
-			// and we don't need to distinguish the sign.
-			this._p = 1;
-		}
-
+		// Test if the numbers are greater than MAX_SAFE.
+		// If one of them are greater, then one more operation could lead to overflow.
+		if(this._q > MAX_SAFE || Math.abs(this._p) > MAX_SAFE) this._smp();
 		return this;
-	}
-
-	/**
-	 * Test if the numbers are greater than MAX_SAFE.
-	 * If one of them are greater, then one more operation could lead to overflow,
-	 * and we call that "dangerous".
-	 */
-	private get _isDangerous(): boolean {
-		// Note that this._q may temporarily be negative here
-		return Math.abs(this._p) > MAX_SAFE || Math.abs(this._q) > MAX_SAFE;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -204,7 +187,10 @@ export class Fraction {
 	/** Negation to new instance */
 	public get neg(): Fraction { return this.c().n(); }
 
-	/** Inversion to new instance */
+	/**
+	 * Inversion to new instance.
+	 * Must ensure that self is non-zero first.
+	 */
 	public get inv(): Fraction { return this.c().i(); }
 
 	/** Addition to new instance */
@@ -219,7 +205,10 @@ export class Fraction {
 	/** Apply factor to new instance */
 	public fac(f: Sign): Fraction { return this.c().f(f); }
 
-	/** Division to new instance */
+	/**
+	 * Division to new instance.
+	 * Must ensure that {@link v} is non-zero.
+	 */
 	public div(v: Fraction): Fraction { return this.c().d(v); }
 
 

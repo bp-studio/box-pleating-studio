@@ -17,7 +17,7 @@ import type { JProject } from "shared/json/project";
 export class TreeMakerParser {
 	public $result: JProject = Migration.$getSample();
 	private _visitor: TreeMakerVisitor;
-	private _set: Set<number> = new Set();
+	private _set: Set<Positive> = new Set();
 
 	constructor(v: TreeMakerVisitor) {
 		this._visitor = v;
@@ -92,7 +92,7 @@ export class TreeMakerParser {
 		if(v.$next() != "edge") throw new Error();
 		v.$skip(2);
 		const length = v.$float;
-		this._set.add(Number(toFractionRecursive(length, 1, 0, 0.1).$denominator));
+		this._set.add(toFractionRecursive(length, 1, 0, 0.1).$denominator);
 		this.$result.design.tree.edges.push({
 			length: length * (1 + v.$float),
 			n1: (v.$skip(4), v.$int),
