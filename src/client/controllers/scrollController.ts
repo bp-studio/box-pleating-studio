@@ -59,7 +59,7 @@ export namespace ScrollController {
 		display.canvas.style.cursor = "move";
 
 		// Temporarily disable interactivity, avoiding the cursor being changed by Pixi
-		display.stage.interactiveChildren = false;
+		display.$setInteractive(false);
 	}
 
 	export function $tryKeyStart(event: KeyboardEvent): boolean {
@@ -122,7 +122,7 @@ export namespace ScrollController {
 	function end(): void {
 		_scrolling = ScrollingState.notScrolling;
 		ZoomController.$end();
-		display.stage.interactiveChildren = true;
+		display.$setInteractive(true);
 
 		// In the case of space key dragging, there will be different behavior
 		// depending on which is release first.

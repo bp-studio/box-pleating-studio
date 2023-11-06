@@ -175,7 +175,7 @@ export namespace SelectionController {
 		const result = view.visible;
 		if(result && cancel) clear();
 		view.visible = false;
-		display.stage.interactiveChildren = true;
+		display.$setInteractive(true);
 		dragSelectables = [];
 		return result;
 	}
@@ -190,7 +190,7 @@ export namespace SelectionController {
 			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return false;
 			clear();
 			view.visible = true;
-			display.stage.interactiveChildren = false;
+			display.$setInteractive(false);
 			dragSelectables = [...sheet.$controls].filter(
 				(c: Control): c is DragSelectable => Boolean((c as DragSelectable).$anchor)
 			);

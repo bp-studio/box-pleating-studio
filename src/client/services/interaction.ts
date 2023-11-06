@@ -71,14 +71,14 @@ export namespace Interaction {
 			DragController.$dragEnd(); // Stop any further dragging.
 		};
 
-		display.stage.on("mousemove", e => {
+		display.$on("mousemove", e => {
 			const sheet = ProjectService.sheet.value;
 			if(!sheet) return;
 			const local = sheet.$view.toLocal(e.global);
 			mouseCoordinates.value = { x: Math.round(local.x), y: Math.round(local.y) };
 		});
 
-		display.stage.on("mouseleave", e => {
+		display.$on("mouseleave", e => {
 			mouseCoordinates.value = null;
 		});
 	}

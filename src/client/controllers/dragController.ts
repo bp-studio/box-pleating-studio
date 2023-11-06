@@ -63,8 +63,7 @@ export namespace DragController {
 			CursorController.$tryUpdate(pt);
 			for(const o of selections) o.$dragStart(CursorController.$offset);
 			isDragging.value = true;
-			display.stage.interactiveChildren = false;
-			display.stage.cursor = selections[0].$selectedCursor;
+			display.$setInteractive(false, selections[0].$selectedCursor);
 		}
 	}
 
@@ -120,8 +119,7 @@ export namespace DragController {
 				if(draggingDevice) project.design.layout.$endDeviceDrag();
 			});
 		}
-		display.stage.interactiveChildren = true;
-		display.stage.cursor = "default";
+		display.$setInteractive(true, "default");
 		return wasDragging;
 	}
 }

@@ -3,12 +3,14 @@ import { Container } from "@pixi/display";
 import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
 import { Ticker } from "@pixi/core";
 
+
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
 import { useControlEventBoundary } from "./controlEventBoundary";
 import { ScrollView } from "./scrollView";
 import { useRenderer } from "./renderer";
 
+import type { FederatedPointerEvent } from "@pixi/events";
 import type { Renderer } from "@pixi/core";
 import type { ControlEventBoundary } from "./controlEventBoundary";
 
@@ -59,11 +61,12 @@ namespace Display {
 
 	let renderer: Renderer;
 	let ticker: Ticker;
+	let stage: Container;
+
 	export let scrollView: ScrollView;
 	export let viewport: Readonly<IDimension>;
 	export let boundary: ControlEventBoundary;
 	export let canvas: HTMLCanvasElement;
-	export let stage: Container;
 	export let designs: Container;
 	export let ui: Container;
 
@@ -82,6 +85,19 @@ namespace Display {
 		return new Promise(resolve => {
 			ticker.addOnce(() => resolve());
 		});
+	}
+
+	export function $setInteractive(interactive: boolean, cursor?: string): void {
+		// There is a small chance that this method is called before initializing,
+		// so we safe guard it here.
+		if(!stage) return;
+
+		stage.interactiveChildren = interactive;
+		if(cursor) stage.cursor = cursor;
+	}
+
+	export function $on(event: string, fn: (e: FederatedPointerEvent) => void): void {
+		stage.on(event, fn);
 	}
 }
 
