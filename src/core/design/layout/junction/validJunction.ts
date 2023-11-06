@@ -2,7 +2,7 @@ import { Rectangle } from "core/math/geometry/rectangle";
 import { opposite } from "shared/types/direction";
 import { CornerType } from "shared/json/enum";
 
-import type { JJunction } from "shared/json";
+import type { JJunction, NodeId } from "shared/json";
 import type { ITreeNode } from "core/design/context";
 import type { QuadrantDirection } from "shared/types/direction";
 
@@ -118,7 +118,7 @@ export class ValidJunction implements ISerializable<JJunction> {
 		return this._geometricallyCoveredBy.filter(j => !j.$isCovered);
 	}
 
-	public $involves(id: number): boolean {
+	public $involves(id: NodeId): boolean {
 		return this.$a.id == id || this.$b.id == id;
 	}
 

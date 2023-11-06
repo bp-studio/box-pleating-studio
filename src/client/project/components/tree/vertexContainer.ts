@@ -9,7 +9,7 @@ import { dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 
 import type { UpdateModel } from "core/service/updateModel";
-import type { JTree, JVertex } from "shared/json";
+import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";
 
 const MIN_VERTICES = 3;
@@ -35,18 +35,18 @@ export class VertexContainer implements Iterable<Vertex> {
 	 * Used for obtaining available id quickly.
 	 * Maybe it's too fancy to use a heap here, but why not?
 	 */
-	private readonly _skippedIdHeap: BinaryHeap<number>;
+	private readonly _skippedIdHeap: BinaryHeap<NodeId>;
 
 	constructor(tree: Tree, json: JTree) {
 		this._tree = tree;
-		this._skippedIdHeap = new BinaryHeap<number>(minComparator);
+		this._skippedIdHeap = new BinaryHeap<NodeId>(minComparator);
 
 		// Create the list of skipped ids.
 		const ids: boolean[] = [];
 		for(const node of json.nodes) ids[node.id] = true;
 		if(ids.length > json.nodes.length) {
 			for(let i = 0; i < ids.length; i++) {
-				if(!ids[i]) this._skippedIdHeap.$insert(i);
+				if(!ids[i]) this._skippedIdHeap.$insert(i as NodeId);
 			}
 		}
 	}
@@ -68,7 +68,7 @@ export class VertexContainer implements Iterable<Vertex> {
 	}
 
 	/** Get the next available id for {@link Vertex}. */
-	public get $nextAvailableId(): number {
+	public get $nextAvailableId(): NodeId {
 		while(!this._skippedIdHeap.$isEmpty) {
 			const index = this._skippedIdHeap.$pop()!;
 			// We still have to check if the id is in fact available;
@@ -76,7 +76,7 @@ export class VertexContainer implements Iterable<Vertex> {
 			// when a vertex is added back through undo/redo
 			if(!this._vertices[index]) return index;
 		}
-		return this._vertices.length;
+		return this._vertices.length as NodeId;
 	}
 
 	public $get(id: number): Vertex | undefined {
@@ -179,8 +179,8 @@ export class VertexContainer implements Iterable<Vertex> {
 	 * If the user deliberately select all vertices and hit delete,
 	 * there's no way to tell which three vertices will survive ahead of time.
 	 */
-	private _simulateDelete(vertices: Vertex[]): [number[], number[]] {
-		const result: number[] = [];
+	private _simulateDelete(vertices: Vertex[]): [NodeId[], NodeId[]] {
+		const result: NodeId[] = [];
 		const map = this._createNeighborMap();
 		const parents = new Set<Vertex>();
 		let found = true;
@@ -225,7 +225,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		this._tree.$project.history.$construct(vertex.$toMemento());
 	}
 
-	private _remove(id: number): void {
+	private _remove(id: NodeId): void {
 		const vertex = this._vertices[id]!;
 		const memento = vertex.$toMemento();
 		this._tree.$sheet.$removeChild(vertex);

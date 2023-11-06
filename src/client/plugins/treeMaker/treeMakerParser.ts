@@ -5,6 +5,7 @@ import { GridType } from "shared/json";
 import { toFractionRecursive } from "core/math/fraction";
 import { t } from "../i18n";
 
+import type { NodeId } from "shared/json";
 import type { TreeMakerVisitor } from "./treeMakerVisitor";
 import type { JSheet, JVertex } from "shared/json/components";
 import type { JProject } from "shared/json/project";
@@ -62,7 +63,7 @@ export class TreeMakerParser {
 		const v = this._visitor;
 		if(v.$next() != "node") throw new Error();
 		const vertex: JVertex = {
-			id: v.$int,
+			id: v.$int as NodeId,
 			name: v.$next(),
 			x: v.$float,
 			y: v.$float,
@@ -95,8 +96,8 @@ export class TreeMakerParser {
 		this._set.add(toFractionRecursive(length, 1, 0, 0.1).$denominator);
 		this.$result.design.tree.edges.push({
 			length: length * (1 + v.$float),
-			n1: (v.$skip(4), v.$int),
-			n2: v.$int,
+			n1: (v.$skip(4), v.$int as NodeId),
+			n2: v.$int as NodeId,
 		});
 	}
 }

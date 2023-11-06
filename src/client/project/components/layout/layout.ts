@@ -20,7 +20,7 @@ import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
-import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport } from "shared/json";
+import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport, NodeId } from "shared/json";
 
 //=================================================================
 /**
@@ -175,7 +175,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this._draggingDevice = undefined;
 	}
 
-	public $createFlapPrototype(id: number, vertexLocation: IPoint): JFlap {
+	public $createFlapPrototype(id: NodeId, vertexLocation: IPoint): JFlap {
 		const { x, y } = getRelativePoint(vertexLocation, this.$project.design.tree.$sheet, this.$sheet);
 		return { id, x, y, width: 0, height: 0 };
 	}

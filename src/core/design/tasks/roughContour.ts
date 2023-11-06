@@ -5,6 +5,7 @@ import { traceContourTask } from "./traceContour";
 import { expandPath, simplify } from "./utils/expand";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
+import type { NodeId } from "shared/json/tree";
 import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import type { Polygon } from "shared/types/geometry";
 import type { ITreeNode, NodeGraphics, RoughContour } from "../context";
@@ -62,7 +63,7 @@ function updater(node: ITreeNode): boolean {
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
 
-export function expand(inputs: readonly RoughContour[], units: number, id = 0): RoughContour[] {
+export function expand(inputs: readonly RoughContour[], units: number, id = 0 as NodeId): RoughContour[] {
 	const components = roughUnion.$union(...inputs.map(c => {
 		const result: Polygon = [];
 		for(const outer of c.$outer) {
@@ -82,7 +83,7 @@ export function expand(inputs: readonly RoughContour[], units: number, id = 0): 
 	return contours;
 }
 
-function componentToContour(id: number, inputs: readonly RoughContour[], component: UnionResult): RoughContour {
+function componentToContour(id: NodeId, inputs: readonly RoughContour[], component: UnionResult): RoughContour {
 	const outers = component.paths.map(simplify);
 	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);

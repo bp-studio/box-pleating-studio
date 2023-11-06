@@ -3,6 +3,7 @@ import { SlashDirection } from "shared/types/direction";
 import { Trace } from "./trace";
 import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
 
+import type { NodeId } from "shared/json/tree";
 import type { Ridge } from "../pattern/device";
 import type { Repository } from "../repository";
 import type { Point } from "core/math/geometry/point";
@@ -57,7 +58,7 @@ export class RepoTrace extends Trace {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _getIntersectionRidge(a: number, b: number): Ridge {
+	private _getIntersectionRidge(a: NodeId, b: NodeId): Ridge {
 		if(a > b) [a, b] = [b, a];
 		return this.$ridges.find(r => r.$division && r.$division[0] == a && r.$division[1] == b)!;
 	}

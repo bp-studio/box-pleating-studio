@@ -3,11 +3,11 @@ import { Command } from "./command";
 
 import type { Project } from "client/project/project";
 import type { JCommand } from "shared/json/history";
-import type { JEdit } from "shared/json/tree";
+import type { JEdit, NodeId } from "shared/json/tree";
 
 export interface JEditCommand extends JCommand {
-	readonly old: number;
-	readonly new: number;
+	readonly old: NodeId;
+	readonly new: NodeId;
 	readonly edits: JEdit[];
 }
 
@@ -19,7 +19,7 @@ export interface JEditCommand extends JCommand {
 
 export class EditCommand extends Command implements JEditCommand {
 
-	public static $create(proj: Project, edits: JEdit[], oldRoot: number, newRoot: number): EditCommand {
+	public static $create(proj: Project, edits: JEdit[], oldRoot: NodeId, newRoot: NodeId): EditCommand {
 		return new EditCommand(proj, {
 			type: CommandType.edit,
 			tag: "tree",
@@ -35,8 +35,8 @@ export class EditCommand extends Command implements JEditCommand {
 	/** @exports */
 	public readonly edits: JEdit[];
 
-	public readonly old: number;
-	public readonly new: number;
+	public readonly old: NodeId;
+	public readonly new: NodeId;
 
 	constructor(project: Project, json: JEditCommand) {
 		super(project, json);

@@ -7,7 +7,7 @@ import type { Device } from "core/design/layout/pattern/device";
 export interface UpdateModel {
 
 	add: {
-		nodes: number[];
+		nodes: NodeId[];
 		junctions: Record<string, ArcPolygon>;
 		stretches: Record<string, JStretch>;
 	};
@@ -16,7 +16,7 @@ export interface UpdateModel {
 	tree?: JEdge[];
 
 	remove: {
-		nodes: number[];
+		nodes: NodeId[];
 		junctions: string[];
 		stretches: string[];
 	};

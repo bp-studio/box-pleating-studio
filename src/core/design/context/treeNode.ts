@@ -5,6 +5,7 @@ import { State } from "core/service/state";
 import type { Comparator } from "shared/types/types";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode, NodeGraphics } from ".";
+import type { NodeId } from "shared/json/tree";
 import type { Tree } from "./tree";
 
 export const nodeComparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist;
@@ -22,7 +23,7 @@ export const nodeComparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist
 export class TreeNode implements ITreeNode {
 
 	/** The id of the node. */
-	public readonly id: number;
+	public readonly id: NodeId;
 
 	public $parent: this | undefined;
 
@@ -55,7 +56,7 @@ export class TreeNode implements ITreeNode {
 	/** The length of its parent edge. */
 	public $length: number = 0;
 
-	constructor(id: number, parent?: TreeNode, length: number = 0) {
+	constructor(id: NodeId, parent?: TreeNode, length: number = 0) {
 		this.id = id;
 		State.$childrenChanged.add(this);
 		State.$updateResult.add.nodes.push(id);

@@ -4,6 +4,7 @@ import { MASK } from "../junction/validJunction";
 import { State } from "core/service/state";
 import { Vector } from "core/math/geometry/vector";
 
+import type { NodeId } from "shared/json";
 import type { Comparator } from "shared/types/types";
 import type { Junctions } from "../junction/validJunction";
 import type { Repository } from "../repository";
@@ -31,7 +32,7 @@ export class Quadrant {
 	private readonly o: IPoint;
 
 	constructor(code: number, junctions: Junctions) {
-		this.$flap = State.$tree.$nodes[code >>> 2]!;
+		this.$flap = State.$tree.$nodes[(code >>> 2) as NodeId]!;
 		this.q = code & MASK;
 		this.f = getFactors(this.q);
 
@@ -65,7 +66,7 @@ export class Quadrant {
 	 * @param q Which corner (before transformation) to get
 	 * @param d Additional distance
 	 */
-	public $getOverlapCorner(ov: JOverlap, junction: JJunction, q: number, d: number): Point {
+	public $getOverlapCorner(ov: JOverlap, junction: JJunction, q: QuadrantDirection, d: number): Point {
 		const r = this.$flap.$length + d;
 		let sx = ov.shift?.x ?? 0;
 		let sy = ov.shift?.y ?? 0;

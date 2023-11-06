@@ -1,7 +1,8 @@
+import type { NodeId } from "./tree";
 import type { GridType } from "./enum";
 
 export interface JFlap extends IDimension, Writeable<IPoint> {
-	id: number;
+	id: NodeId;
 }
 
 export interface JSheet extends IDimension {
@@ -9,7 +10,7 @@ export interface JSheet extends IDimension {
 }
 
 export interface JVertex extends Writeable<IPoint> {
-	id: number;
+	id: NodeId;
 	name: string;
 
 	/**

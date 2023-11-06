@@ -6,6 +6,7 @@ import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 import { RepoTrace } from "../layout/trace/repoTrace";
 
+import type { NodeId } from "shared/json/tree";
 import type { HingeSegment } from "../layout/trace/hingeSegment";
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -108,7 +109,7 @@ interface TraceContext {
 	readonly index: number;
 }
 
-function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves: number[]): void {
+function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves: NodeId[]): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
 	const contour = context.trace.$generate(hingeSegment, map[0], map[1], Boolean(leaves));

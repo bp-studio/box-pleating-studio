@@ -7,7 +7,7 @@ import { MoveCommand } from "./commands/moveCommand";
 import { EditCommand } from "./commands/editCommand";
 
 import type { JProject } from "shared/json";
-import type { JEdit } from "shared/json/tree";
+import type { JEdit, NodeId } from "shared/json/tree";
 import type { Draggable } from "client/base/draggable";
 import type { Project } from "../project";
 import type { ITagObject } from "client/shared/interface";
@@ -137,7 +137,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(flush) this._flush();
 	}
 
-	public $edit(edits: JEdit[], oldRoot: number, newRoot: number): void {
+	public $edit(edits: JEdit[], oldRoot: NodeId, newRoot: NodeId): void {
 		if(this.$isLocked) return;
 		this._enqueue(EditCommand.$create(this._project, edits, oldRoot, newRoot));
 	}

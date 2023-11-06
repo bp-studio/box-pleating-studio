@@ -8,7 +8,7 @@ import { deviceGenerator } from "./generators/deviceGenerator";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, Strategy } from "shared/json";
+import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, Strategy, NodeId } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
@@ -22,7 +22,7 @@ export interface CornerMap {
 	overlapIndex: number;
 
 	/** Which {@link JAnchor} in the {@link JOverlap}. */
-	anchorIndex: number;
+	anchorIndex: QuadrantDirection;
 }
 
 //=================================================================
@@ -127,7 +127,7 @@ export class Partition implements ISerializable<JPartition> {
 		let ov = this.$overlaps[map.overlapIndex];
 		const parent = this._getParent(ov);
 		const c1 = parent.c[0], c2 = parent.c[2];
-		const n1 = c1.e!, n2 = c2.e!;
+		const n1 = c1.e as NodeId, n2 = c2.e as NodeId;
 		const f1 = tree.$nodes[n1]!, f2 = tree.$nodes[n2]!;
 
 		const quad1 = repo.$quadrants.get(n1 << 2 | c1.q!)!;
@@ -140,7 +140,7 @@ export class Partition implements ISerializable<JPartition> {
 		if(map.corner.type == CornerType.intersection) {
 			const oriented = ov.c[0].e! < 0;
 
-			const t = repo.$nodeSet.$distTriple(n1, n2, map.corner.e!);
+			const t = repo.$nodeSet.$distTriple(n1, n2, map.corner.e as NodeId);
 			if(oriented) d2 = t.d2 - f2.$length;
 			else d1 = t.d1 - f1.$length;
 		}

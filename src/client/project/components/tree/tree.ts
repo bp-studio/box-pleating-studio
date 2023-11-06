@@ -8,7 +8,7 @@ import { getFirst } from "shared/utils/set";
 import type { Vertex } from "./vertex";
 import type { Project } from "client/project/project";
 import type { Container } from "@pixi/display";
-import type { JEdge, JEdgeBase, JTree, JViewport } from "shared/json";
+import type { JEdge, JEdgeBase, JTree, JViewport, NodeId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
 
@@ -58,8 +58,8 @@ export class Tree implements ISerializable<JTree> {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public get $rootId(): number {
-		if(!this._edges.length) return NaN; // This is the case during initialization
+	public get $rootId(): NodeId {
+		if(!this._edges.length) return NaN as NodeId; // This is the case during initialization
 		return this._edges[0].n1;
 	}
 

@@ -4,19 +4,16 @@ import { AvlTree } from "shared/data/bst/avlTree";
 import { RedBlackTree } from "shared/data/bst/redBlackTree";
 import { RavlTree } from "shared/data/bst/ravlTree";
 import { random } from "../../utils/random";
+import { minComparator } from "shared/data/heap/heap";
 
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
-
-function numericSort(a: number, b: number): number {
-	return a - b;
-}
 
 describe("Binary Search Tree", function() {
 
 	describe("AVL Tree", function() {
 
 		it("Can query adjacent elements", function() {
-			testAdjacency(new AvlTree<number>(numericSort));
+			testAdjacency(new AvlTree<number>(minComparator));
 		});
 
 		it("Supports pop operation", function() {
@@ -24,9 +21,9 @@ describe("Binary Search Tree", function() {
 			for(let i = 0; i < 300; i++) {
 				set.add(random(10000));
 			}
-			const sorted = [...set].sort(numericSort);
+			const sorted = [...set].sort(minComparator);
 
-			const tree = new AvlTree<number>(numericSort);
+			const tree = new AvlTree<number>(minComparator);
 			for(const n of set) {
 				tree.$insert(n, n);
 			}
@@ -42,7 +39,7 @@ describe("Binary Search Tree", function() {
 	describe("Red Black Tree", function() {
 
 		it("Can query adjacent elements", function() {
-			testAdjacency(new RedBlackTree<number>(numericSort));
+			testAdjacency(new RedBlackTree<number>(minComparator));
 		});
 
 	});
@@ -50,7 +47,7 @@ describe("Binary Search Tree", function() {
 	describe("RAVL Tree", function() {
 
 		it("Can query adjacent elements", function() {
-			testAdjacency(new RavlTree<number>(numericSort));
+			testAdjacency(new RavlTree<number>(minComparator));
 		});
 
 	});
@@ -74,7 +71,7 @@ function testAdjacency(tree: IBinarySearchTree<number>): void {
 	}
 
 	// Process
-	const sorted = [...set].sort(numericSort);
+	const sorted = [...set].sort(minComparator);
 	for(const n of original) tree.$insert(n, n);
 	for(const n of del) tree.$delete(n);
 

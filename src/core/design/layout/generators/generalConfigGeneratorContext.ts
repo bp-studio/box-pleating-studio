@@ -8,7 +8,7 @@ import { MASK } from "../junction/validJunction";
 
 import type { QuadrantDirection } from "shared/types/direction";
 import type { Configuration } from "../configuration";
-import type { JJunction, JOverlap, JPartition } from "shared/json";
+import type { JJunction, JOverlap, JPartition, NodeId } from "shared/json";
 import type { Repository } from "../repository";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
 
@@ -19,7 +19,7 @@ const STANDARD_JOIN_RANK = 6;
 const HALF_INTEGRAL_RANK = 7;
 
 interface Joint {
-	nodeId: number;
+	nodeId: NodeId;
 	q: QuadrantDirection;
 	items: readonly JointItem[];
 	max: number;
@@ -74,7 +74,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			if(junctionIndices.length > 1) {
 				const max = (junctionIndices.length - 1) * MAX_RANK_PER_JOINT;
 				joints.push({
-					nodeId: code >>> 2,
+					nodeId: code >>> 2 as NodeId,
 					q: code & MASK,
 					max,
 					items: junctionIndices.map(i => ({
@@ -287,7 +287,7 @@ function cover(o1: JOverlap, o2: JOverlap): boolean {
 	return o1.ox >= o2.ox && o1.oy >= o2.oy;
 }
 
-function toSplitItems(configs: readonly Configuration[], nodeId: number): SplitItem[] {
+function toSplitItems(configs: readonly Configuration[], nodeId: NodeId): SplitItem[] {
 	return configs.map(config => {
 		const partitions = config.$rawPartitions;
 		const p = partitions.find(partition => {

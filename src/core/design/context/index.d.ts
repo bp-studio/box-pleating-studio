@@ -1,3 +1,4 @@
+import type { NodeId } from "shared/json/tree";
 import type { Contour, ILine, Path, PathEx } from "shared/types/geometry";
 import type { AABB } from "./aabb/aabb";
 import type { IHeap, IReadonlyHeap } from "shared/data/heap/heap";
@@ -11,34 +12,40 @@ import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
 import type { traceContourTask } from "core/design/tasks/traceContour";
 
+export type NodeCollection<T> = {
+	readonly [id: NodeId]: T | undefined;
+	readonly length: number;
+	[Symbol.iterator](): IterableIterator<T | undefined>;
+};
+
 export interface ITree {
-	readonly $nodes: readonly (ITreeNode | undefined)[];
+	readonly $nodes: NodeCollection<ITreeNode>;
 
 	readonly $root: ITreeNode;
 
 	/** Deletes an leaf, and returns if the operation is successful */
-	$removeLeaf(id: number): boolean;
+	$removeLeaf(id: NodeId): boolean;
 
 	$setFlaps(flaps: JFlap[]): void;
 
 	/** Delete a given node and join the two adjacent edges into one */
-	$join(id: number): void;
+	$join(id: NodeId): void;
 
 	/** Split the parent edge of a node into two, and insert a new node*/
-	$split(id: number, at: number): void;
+	$split(id: NodeId, at: NodeId): void;
 
 	/** Merge the node with its parent */
-	$merge(id: number): void;
+	$merge(id: NodeId): void;
 
 	/** Update the length of the parent edge */
-	$setLength(id: number, length: number): void;
+	$setLength(id: NodeId, length: number): void;
 }
 
 /**
  * This is the readonly interface for {@link TreeNode}.
  */
 export interface ITreeNode extends ISerializable<JEdge> {
-	readonly id: number;
+	readonly id: NodeId;
 	readonly $parent: this | undefined;
 	readonly $length: number;
 	readonly $children: IReadonlyHeap<ITreeNode>;
@@ -72,10 +79,10 @@ export interface PatternContour extends Array<Point> {
 	$for?: number;
 
 	/** Same as {@link NodeSet.$nodes}. */
-	$ids: readonly number[];
+	$ids: readonly NodeId[];
 
 	/** The ids of the wrapped leaves of the corresponding {@link RoughContour}. */
-	$leaves: readonly number[];
+	$leaves: readonly NodeId[];
 }
 
 export interface NodeGraphics {
@@ -97,8 +104,8 @@ export interface NodeGraphics {
 
 /** See {@link roughContourTask}. */
 export interface RoughContour extends ContourComponentBase<PathEx> {
-	/** The {@link ITreeNode.$id} */
-	readonly $id: number;
+	/** The {@link ITreeNode.id} */
+	readonly $id: NodeId;
 
 	/** A pointer to the corresponding {@link TraceContour}. */
 	$trace?: TraceContour;
@@ -123,7 +130,7 @@ interface ContourComponentBase<T extends Path> {
 	$outer: T[];
 
 	/** The ids of the leaf nodes inside this {@link ContourComponent}. */
-	$leaves: number[];
+	$leaves: NodeId[];
 }
 
 export interface ContourComponent<T extends Path> extends ContourComponentBase<T> {

@@ -9,6 +9,7 @@ import { dist } from "../context/tree";
 
 import type { Quadrant } from "./pattern/quadrant";
 import type { ITreeNode } from "../context";
+import type { NodeId } from "shared/json/tree";
 import type { Junctions } from "./junction/validJunction";
 import type { Repository } from "./repository";
 
@@ -19,8 +20,8 @@ import type { Repository } from "./repository";
 //=================================================================
 export class NodeSet {
 
-	public readonly $leaves: readonly number[];
-	public readonly $nodes: readonly number[];
+	public readonly $leaves: readonly NodeId[];
+	public readonly $nodes: readonly NodeId[];
 
 	/**
 	 * Mapping each {@link ITreeNode} to the {@link Quadrant}s covered by it.
@@ -87,7 +88,7 @@ export class NodeSet {
 	/**
 	 * Given the ids of three flaps, return the distance from each of them to their branching node.
 	 */
-	public $distTriple(i1: number, i2: number, i3: number): {
+	public $distTriple(i1: NodeId, i2: NodeId, i3: NodeId): {
 		d1: number; d2: number; d3: number;
 	} {
 		const tree = State.$tree;
@@ -129,8 +130,8 @@ export class NodeSet {
 	}
 }
 
-function getLeaves(junctions: Junctions): number[] {
-	const leafSet = new Set<number>();
+function getLeaves(junctions: Junctions): NodeId[] {
+	const leafSet = new Set<NodeId>();
 	for(const j of junctions) {
 		leafSet.add(j.$a.id);
 		leafSet.add(j.$b.id);

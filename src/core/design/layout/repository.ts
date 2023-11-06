@@ -10,7 +10,7 @@ import { Joiner } from "./joiner/joiner";
 
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Pattern } from "./pattern/pattern";
-import type { JJunctions, JOverlap, JQuadrilateral, JRepository, JStretch } from "shared/json";
+import type { JJunctions, JOverlap, JQuadrilateral, JRepository, JStretch, NodeId } from "shared/json";
 import type { Configuration } from "./configuration";
 import type { ValidJunction, Junctions, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
@@ -144,9 +144,9 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	 */
 	public $getMaxIntersectionDistance(r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean): number {
 		const q = oriented ? 2 : 0;
-		const n1 = r1.c[q].e!;
-		const n2 = r2.c[q].e!;
-		const n3 = r1.c[2 - q].e!;
+		const n1 = r1.c[q].e as NodeId;
+		const n2 = r2.c[q].e as NodeId;
+		const n3 = r1.c[2 - q].e as NodeId;
 		return this.$nodeSet.$distTriple(n1, n2, n3).d3;
 	}
 

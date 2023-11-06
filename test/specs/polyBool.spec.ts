@@ -6,6 +6,7 @@ import { random } from "../utils/random";
 import { parsePath } from "../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
+import type { NodeId } from "shared/json/tree";
 import type { RoughContour } from "core/design/context";
 import type { Polygon } from "shared/types/geometry";
 
@@ -288,5 +289,5 @@ function randomAabbPolygon(range: number, size: number): Polygon {
 }
 
 function makeRoughContour(...outer: string[]): RoughContour {
-	return { $id: 0, $outer: outer.map(parsePath), $children: [], $leaves: [] };
+	return { $id: 0 as NodeId, $outer: outer.map(parsePath), $children: [], $leaves: [] };
 }

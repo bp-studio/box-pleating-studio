@@ -7,7 +7,7 @@ import { toPath } from "core/math/geometry/rationalPath";
 import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
 
-import type { JEdge, JFlap } from "shared/json";
+import type { JEdge, JFlap, NodeId } from "shared/json";
 
 describe("Pattern search", function() {
 
@@ -54,14 +54,14 @@ describe("Pattern search", function() {
 
 });
 
-const THREE_PERMUTATION: [number, number, number][] = [
+const THREE_PERMUTATION = [
 	[1, 2, 3],
 	[1, 3, 2],
 	[2, 1, 3],
 	[2, 3, 1],
 	[3, 1, 2],
 	[3, 2, 1],
-];
+] as [NodeId, NodeId, NodeId][];
 
 function loadAndComplete(edges: JEdge[], flaps: JFlap[]): Tree {
 	fullReset();
@@ -73,7 +73,7 @@ function loadAndComplete(edges: JEdge[], flaps: JFlap[]): Tree {
 }
 
 interface IFlap {
-	id: number;
+	id: NodeId;
 	x: number;
 	y: number;
 	radius: number;
@@ -81,7 +81,7 @@ interface IFlap {
 
 function generateFromFlaps(flaps: IFlap[]): Tree {
 	return loadAndComplete(
-		flaps.map(f => ({ n1: 0, n2: f.id, length: f.radius })),
+		flaps.map(f => ({ n1: 0 as NodeId, n2: f.id, length: f.radius })),
 		flaps.map(f => ({ id: f.id, width: 0, height: 0, x: f.x, y: f.y }))
 	);
 }

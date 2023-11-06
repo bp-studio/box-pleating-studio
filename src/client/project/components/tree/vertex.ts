@@ -16,7 +16,7 @@ import type { LabelView } from "client/utils/label";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
-import type { JVertex, Memento } from "shared/json";
+import type { JVertex, Memento, NodeId } from "shared/json";
 
 //=================================================================
 /**
@@ -29,7 +29,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	public readonly type = "Vertex";
 	public readonly $priority: number = Infinity;
 
-	public readonly id: number;
+	public readonly id: NodeId;
 	public readonly height = 0;
 	public readonly width = 0;
 

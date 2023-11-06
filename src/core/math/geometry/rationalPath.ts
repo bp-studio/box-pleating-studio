@@ -4,6 +4,7 @@ import { Point } from "./point";
 import { Matrix } from "./matrix";
 import { Vector } from "./vector";
 
+import type { NodeId } from "shared/json/tree";
 import type { PathEx } from "shared/types/geometry";
 
 /**
@@ -14,7 +15,7 @@ export type RationalPath = Point[];
 
 export interface RationalPathEx extends RationalPath {
 	isHole?: boolean;
-	leaves?: number[];
+	leaves?: NodeId[];
 }
 
 export function toRationalPath(path: PathEx): RationalPathEx {

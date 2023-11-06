@@ -10,6 +10,7 @@ import { quadrantNumber } from "shared/types/direction";
 import { getFactors } from "../layout/pattern/quadrant";
 import { MASK } from "../layout/junction/validJunction";
 
+import type { NodeId } from "shared/json/tree";
 import type { ValidJunction } from "../layout/junction/validJunction";
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -32,7 +33,7 @@ const expander = new AAUnion(true);
  */
 interface CriticalCorner {
 	readonly $signature: string;
-	readonly $flap: number;
+	readonly $flap: NodeId;
 	readonly $nodeSet: NodeSet;
 }
 
@@ -80,7 +81,7 @@ function traceContour(): void {
 	const tree = State.$tree;
 	const stretchChanged = new Set<ITreeNode>();
 	for(let i = 0; i < tree.$nodes.length; i++) {
-		const node = tree.$nodes[i];
+		const node = tree.$nodes[i as NodeId];
 		if(!node) continue;
 		const cache = signatureCache.get(i);
 		const stretches = stretchMap.get(i) || [];
@@ -217,7 +218,7 @@ function checkCriticalCorners(result: readonly Path[], corners: Set<string> | Ma
  */
 function createRawContour(
 	node: ITreeNode, nodeSets: Set<NodeSet>,
-	leaves: readonly number[], children: readonly RoughContour[]
+	leaves: readonly NodeId[], children: readonly RoughContour[]
 ): PathEx[] {
 	const tree = State.$tree;
 	const remainingLeaves = new Set(leaves);
@@ -226,7 +227,7 @@ function createRawContour(
 	// Group the leaves involved in the same NodeSet.
 	// Note that it is possible for two groups to contain the same leaf id, but that is perfectly fine.
 	for(const nodeSet of nodeSets) {
-		const group: number[] = [];
+		const group: NodeId[] = [];
 		for(const id of nodeSet.$leaves) {
 			if(remainingLeaves.has(id)) {
 				remainingLeaves.delete(id);
@@ -284,7 +285,7 @@ function recursiveExpand(
 	return result;
 }
 
-function packPaths(outers: PathEx[], leaves: number[]): PathEx[] {
+function packPaths(outers: PathEx[], leaves: NodeId[]): PathEx[] {
 	outers = outers.map(simplify); // For the final checking in tracing algorithm.
 	outers.forEach(o => o.leaves = leaves);
 	return outers;

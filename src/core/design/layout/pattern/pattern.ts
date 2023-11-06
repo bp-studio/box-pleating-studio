@@ -7,7 +7,7 @@ import { twoJunctionPositioner } from "./positioners/twoJunctionPositioner";
 import { PositioningContext } from "./positioners/positioningContext";
 
 import type { Gadget } from "./gadget";
-import type { JConnection, JDevice, JPattern } from "shared/json";
+import type { JConnection, JDevice, JPattern, NodeId } from "shared/json";
 import type { Configuration } from "../configuration";
 
 //=================================================================
@@ -59,7 +59,7 @@ export class Pattern implements ISerializable<JPattern> {
 	/** Return the actual {@link Point} to which the given {@link JConnection} connects. */
 	public $getConnectionTarget(c: JConnection): Point {
 		if(c.e >= 0) {
-			return new Point(State.$tree.$nodes[c.e]!.$AABB.$points[c.q]);
+			return new Point(State.$tree.$nodes[c.e as NodeId]!.$AABB.$points[c.q]);
 		} else {
 			const [i, j] = this.$config.$overlapMap.get(c.e)!;
 			return this.$devices[i].$anchors[j][c.q];

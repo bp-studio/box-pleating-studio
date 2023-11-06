@@ -1,3 +1,4 @@
+import type { NodeId } from "shared/json/tree";
 
 export type Path = IPoint[];
 
@@ -28,7 +29,7 @@ export type PathEx = Path & {
 	from?: number;
 
 	/** In raw mode, store the ids of the leaves wrapped inside this path. */
-	leaves?: number[];
+	leaves?: NodeId[];
 
 	/** Whether this path is a hole. */
 	isHole?: boolean;

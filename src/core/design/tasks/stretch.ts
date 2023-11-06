@@ -9,7 +9,7 @@ import { patternTask } from "./pattern";
 import { Stretch } from "../layout/stretch";
 import { clearPatternContourForRepo } from "./patternContour";
 
-import type { JStretch } from "shared/json";
+import type { JStretch, NodeId } from "shared/json";
 import type { Junctions, ValidJunction } from "../layout/junction/validJunction";
 import type { ITreeNode } from "../context";
 import type { Junction } from "../layout/junction/junction";
@@ -17,7 +17,7 @@ import type { Junction } from "../layout/junction/junction";
 /** A group of connected {@link ValidJunction}s */
 interface Team {
 	$junctions: Junctions;
-	$flaps: number[];
+	$flaps: NodeId[];
 }
 
 //=================================================================
@@ -74,7 +74,7 @@ function grouping(junctions: Junctions): Team[] {
 		// In some really rare cases, a single flap could have two opposite
 		// quadrants showing up in the same group, so the ids of the flaps
 		// may contain duplicates. We still have to make the check.
-		const $flaps = distinct(group.map(q => q >>> 2).sort(minComparator));
+		const $flaps = distinct(group.map(q => q >>> 2 as NodeId).sort(minComparator));
 
 		foreachPair($flaps, (i, j) => {
 			const junction = quadrantMap.get(i, j);

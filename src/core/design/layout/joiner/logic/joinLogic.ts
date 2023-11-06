@@ -52,7 +52,7 @@ export abstract class JoinLogic {
 
 	readonly j1!: Joinee;
 	readonly j2!: Joinee;
-	readonly f!: number;
+	readonly f!: Sign;
 
 	constructor(joiner: Joiner, p1: Piece, p2: Piece) {
 		const { $oriented, s1, s2, q1, q2 } = this.joiner = joiner;

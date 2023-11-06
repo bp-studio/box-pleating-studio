@@ -6,6 +6,7 @@ import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
 import { getFirst } from "shared/utils/set";
 
+import type { JEdge, JFlap, NodeId } from "shared/json";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {
@@ -20,11 +21,11 @@ describe("Junction", function() {
 			{ n1: 0, n2: 2, length: 1 },
 			{ n1: 1, n2: 3, length: 3 },
 			{ n1: 2, n2: 4, length: 2 },
-		]);
+		] as JEdge[]);
 		tree.$setFlaps([
 			{ id: 3, x: 0, y: 0, width: 0, height: 0 },
 			{ id: 4, x: 5, y: 5, width: 0, height: 0 },
-		]);
+		] as JFlap[]);
 		State.$tree = tree;
 		Processor.$run(heightTask);
 
@@ -47,16 +48,16 @@ describe("Junction", function() {
 			{ n1: 0, n2: 2, length: 1 },
 			{ n1: 1, n2: 3, length: 3 },
 			{ n1: 2, n2: 4, length: 2 },
-		]);
+		] as JEdge[]);
 		tree.$setFlaps([
 			{ id: 3, x: 0, y: 0, width: 0, height: 0 },
 			{ id: 4, x: 5, y: 5, width: 0, height: 0 },
-		]);
+		] as JFlap[]);
 		State.$tree = tree;
 		Processor.$run(heightTask);
 
 		const junction1 = State.$junctions.get(3, 4) as ValidJunction;
-		tree.$join(0);
+		tree.$join(0 as NodeId);
 		Processor.$run(heightTask);
 
 		expect(State.$junctions.size).to.equal(1);

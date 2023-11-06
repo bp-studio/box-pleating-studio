@@ -2,7 +2,8 @@ import { TreeNode } from "./treeNode";
 import { State } from "core/service/state";
 
 import type { JEdge, JFlap } from "shared/json";
-import type { ITree, ITreeNode } from ".";
+import type { ITree, ITreeNode, NodeCollection } from ".";
+import type { NodeId } from "shared/json/tree";
 
 //=================================================================
 /**
@@ -26,7 +27,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	 * Some of them might get added back to the tree,
 	 * so we need to double-check in {@link $flushRemove $flushRemove()}.
 	 */
-	private readonly _pendingRemove: Set<number> = new Set();
+	private readonly _pendingRemove: Set<NodeId> = new Set();
 
 	constructor(edges: JEdge[], flaps?: JFlap[]) {
 		this._nodes = new Array(edges.length + 1);
@@ -77,11 +78,11 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	}
 
 	/** Public node array. */
-	public get $nodes(): readonly (TreeNode | undefined)[] {
+	public get $nodes(): NodeCollection<TreeNode> {
 		return this._nodes;
 	}
 
-	public $removeLeaf(id: number): boolean {
+	public $removeLeaf(id: NodeId): boolean {
 		const node = this._nodes[id];
 		if(!node || !node.$isLeafLike) return false;
 
@@ -105,7 +106,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		}
 	}
 
-	public $join(id: number): void {
+	public $join(id: NodeId): void {
 		const node = this._nodes[id]!;
 		const parent = node.$parent;
 		const child = node.$children.$get()!;
@@ -125,7 +126,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		this.$flushRemove();
 	}
 
-	public $split(id: number, n: number): void {
+	public $split(id: NodeId, n: NodeId): void {
 		const node = this._nodes[n]!;
 		const parent = node.$parent!;
 		const l = node.$length;
@@ -135,7 +136,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		this.$flushRemove();
 	}
 
-	public $merge(id: number): void {
+	public $merge(id: NodeId): void {
 		const node = this._nodes[id]!;
 		const parent = node.$parent!;
 		const children = [...node.$children]; // need to make a copy first
@@ -152,7 +153,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		this.$flushRemove();
 	}
 
-	public $setLength(id: number, length: number): void {
+	public $setLength(id: NodeId, length: number): void {
 		const node = this._nodes[id]!;
 		node.$length = length;
 		node.$AABB.$setMargin(length);
@@ -169,7 +170,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	 *
 	 * @returns The first node.
 	 */
-	public $addEdge(n1: number, n2: number, length: number): TreeNode {
+	public $addEdge(n1: NodeId, n2: NodeId, length: number): TreeNode {
 		const N1 = this._nodes[n1] || this._addNode(n1);
 		const N2 = this._nodes[n2] || this._addNode(n2);
 
@@ -192,7 +193,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	 * This doesn't actually remove any node yet.
 	 * Must call {@link $flushRemove $flushRemove()} to perform the actual removal.
 	 */
-	public $removeEdge(n1: number, n2: number): void {
+	public $removeEdge(n1: NodeId, n2: NodeId): void {
 		const N1 = this._nodes[n1]!, N2 = this._nodes[n2]!;
 		const child = N1.$parent == N2 ? N1 : N2;
 		State.$updateResult.edit.push([false, { n1, n2, length: child.$length }]);
@@ -231,7 +232,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _addNode(id: number, at?: TreeNode, length?: number): TreeNode {
+	private _addNode(id: NodeId, at?: TreeNode, length?: number): TreeNode {
 		return this._nodes[id] = new TreeNode(id, at, length);
 	}
 
@@ -246,7 +247,7 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	 * Setup an edge and returns if a new edge is created.
 	 * Used only during initialization.
 	 */
-	private _setEdge(n1: number, n2: number, length: number): boolean {
+	private _setEdge(n1: NodeId, n2: NodeId, length: number): boolean {
 		let N1 = this._nodes[n1], N2 = this._nodes[n2];
 
 		// If the tree is non-empty, one of the vertices must be present.

@@ -20,7 +20,7 @@ import type { Layout } from "./layout";
 import type { DragSelectable } from "client/base/draggable";
 import type { Control } from "client/base/control";
 import type { Edge } from "../tree/edge";
-import type { JFlap, Memento } from "shared/json";
+import type { JFlap, Memento, NodeId } from "shared/json";
 import type { Vertex } from "../tree/vertex";
 
 //=================================================================
@@ -34,7 +34,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;
 
-	public readonly id: number;
+	public readonly id: NodeId;
 
 	public $graphics: GraphicsData;
 	@shallowRef private _width: number = 0;
