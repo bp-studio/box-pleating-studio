@@ -113,6 +113,7 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 	private _isCovered: boolean | undefined;
 
+	/** Get all {@link ValidJunction}s covering the current one. */
 	public $getCovering(): ValidJunction[] {
 		return this._geometricallyCoveredBy.filter(j => !j.$isCovered);
 	}

@@ -97,11 +97,14 @@ export interface NodeGraphics {
 
 /** See {@link roughContourTask}. */
 export interface RoughContour extends ContourComponentBase<PathEx> {
+	/** The {@link ITreeNode.$id} */
+	readonly $id: number;
+
 	/** A pointer to the corresponding {@link TraceContour}. */
 	$trace?: TraceContour;
 
 	/** Pointers to the child components. */
-	$children: RoughContour[];
+	readonly $children: RoughContour[];
 }
 
 interface ContourComponentBase<T extends Path> {

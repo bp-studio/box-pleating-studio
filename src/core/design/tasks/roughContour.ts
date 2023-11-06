@@ -40,13 +40,15 @@ function updater(node: ITreeNode): boolean {
 		// Base case
 		const path = node.$AABB.$toPath();
 		node.$graphics.$roughContours = [{
+			$id: node.id,
 			$outer: [path],
 			$children: [],
 			$leaves: [node.id],
 		}];
 	} else {
 		const children = [...node.$children].flatMap(c => c.$graphics.$roughContours);
-		node.$graphics.$roughContours = expand(children, node.$length);
+		const contours = expand(children, node.$length, node.id);
+		node.$graphics.$roughContours = contours;
 	}
 	State.$roughContourChanged.add(node);
 
@@ -60,7 +62,7 @@ function updater(node: ITreeNode): boolean {
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
 
-export function expand(inputs: readonly RoughContour[], units: number): RoughContour[] {
+export function expand(inputs: readonly RoughContour[], units: number, id = 0): RoughContour[] {
 	const components = roughUnion.$union(...inputs.map(c => {
 		const result: Polygon = [];
 		for(const outer of c.$outer) {
@@ -75,14 +77,14 @@ export function expand(inputs: readonly RoughContour[], units: number): RoughCon
 
 	const contours: RoughContour[] = [];
 	for(const component of components) {
-		contours.push(componentToContour(inputs, component));
+		contours.push(componentToContour(id, inputs, component));
 	}
 	return contours;
 }
 
-function componentToContour(inputs: readonly RoughContour[], component: UnionResult): RoughContour {
+function componentToContour(id: number, inputs: readonly RoughContour[], component: UnionResult): RoughContour {
 	const outers = component.paths.map(simplify);
 	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);
-	return { $outer: outers, $children: children, $leaves: leaves };
+	return { $id: id, $outer: outers, $children: children, $leaves: leaves };
 }

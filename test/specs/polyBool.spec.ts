@@ -288,5 +288,5 @@ function randomAabbPolygon(range: number, size: number): Polygon {
 }
 
 function makeRoughContour(...outer: string[]): RoughContour {
-	return { $outer: outer.map(parsePath), $children: [], $leaves: [] };
+	return { $id: 0, $outer: outer.map(parsePath), $children: [], $leaves: [] };
 }

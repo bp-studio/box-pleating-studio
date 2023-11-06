@@ -23,6 +23,7 @@ const stretchMap = new Map<number, Stretch[]>();
 const signatureCache = new Map<number, string>();
 
 const aaUnion = new AAUnion();
+const expander = new AAUnion(true);
 
 /**
  * A {@link CriticalCorner} is a the {@link Quadrant.$corner} of a involved {@link Quadrant}.
@@ -166,23 +167,9 @@ function toTraceContour(node: ITreeNode, roughContour: RoughContour, criticalCor
 		const cornerArray = criticalCorners.filter(c => leaves.includes(c.$flap));
 		const corners = new Map<string, CriticalCorner>();
 		for(const c of cornerArray) corners.set(c.$signature, c);
-
 		if(!checkCriticalCorners(result.$outer, corners)) {
-			const tree = State.$tree;
-			const raw: PathEx[] = [];
 			const nodeSets = new Set([...corners.values()].map(c => c.$nodeSet));
-			const groups = groupLeaves(nodeSets, leaves);
-			for(const group of groups) {
-				let outers: PathEx[] = [];
-				for(const id of group) {
-					outers.push(createRawContour(node, tree.$nodes[id]!));
-				}
-				if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
-				outers = outers.map(simplify); // For the final checking in tracing algorithm.
-				outers.forEach(o => o.leaves = group);
-				raw.push(...outers);
-			}
-			result.$outer = raw;
+			result.$outer = createRawContour(node, nodeSets, leaves, roughContour.$children);
 			result.$raw = true;
 		}
 	}
@@ -226,13 +213,18 @@ function checkCriticalCorners(result: readonly Path[], corners: Set<string> | Ma
 }
 
 /**
- * In raw mode, group the leaves involved in the same {@link NodeSet}.
- * Note that it is possible for two groups to contain the same leaf id,
- * but that is perfectly fine.
+ * Create the outer contour in raw mode.
  */
-function groupLeaves(nodeSets: Set<NodeSet>, leaves: readonly number[]): number[][] {
+function createRawContour(
+	node: ITreeNode, nodeSets: Set<NodeSet>,
+	leaves: readonly number[], children: readonly RoughContour[]
+): PathEx[] {
+	const tree = State.$tree;
 	const remainingLeaves = new Set(leaves);
-	const groups: number[][] = [];
+	const result: PathEx[] = [];
+
+	// Group the leaves involved in the same NodeSet.
+	// Note that it is possible for two groups to contain the same leaf id, but that is perfectly fine.
 	for(const nodeSet of nodeSets) {
 		const group: number[] = [];
 		for(const id of nodeSet.$leaves) {
@@ -241,23 +233,70 @@ function groupLeaves(nodeSets: Set<NodeSet>, leaves: readonly number[]): number[
 				group.push(id);
 			}
 		}
-		groups.push(group);
+		let outers = group.map(id => createRawContourForLeaf(node, tree.$nodes[id]!));
+		if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
+		result.push(...packPaths(outers, group));
 	}
+
+	// All the rest goes to the same group.
 	if(remainingLeaves.size > 0) {
-		// All the rest goes to the same group
-		groups.push([...remainingLeaves]);
+		// It is very common that majority of leaves remain,
+		// and thus it won't be very efficient to use the same approach as the case above,
+		// as the performance of aaUnion drops when the number of polygons increases.
+		// However, since the remaining doesn't involve any critical corners,
+		// we can simply expand relevant child contours to get it,
+		// this could greatly improve the performance of taking the union...
+		const paths = recursiveExpand(node, children, remainingLeaves, node.$length);
+		const outers = expander.$get(paths);
+		result.push(...packPaths(outers, [...remainingLeaves]));
 	}
-	return groups;
+
+	return result;
+}
+
+/**
+ * ...However, there is one catch here.
+ * As we collect the relevant child contours,
+ * we need to exclude those leaves that are already grouped,
+ * so we cannot just expand the immediate child contours.
+ * Instead, we need recursively find the contour that is OK to add.
+ * The overall performance of doing so is still a lot better than the naive approach.
+ */
+function recursiveExpand(
+	node: ITreeNode, children: readonly RoughContour[],
+	remainingLeaves: ReadonlySet<number>, length: number
+): PathEx[] {
+	const result: PathEx[] = [];
+	for(const child of children) {
+		const leaves = child.$leaves.filter(id => remainingLeaves.has(id));
+		if(leaves.length == 1) {
+			// In this case we fallback to the naive approach
+			result.push(createRawContourForLeaf(node, State.$tree.$nodes[leaves[0]]!));
+		} else if(leaves.length == child.$leaves.length) {
+			// We accept the contour only if all leaves are relevant
+			result.push(...child.$outer.map(o => expandPath(o, length)));
+		} else if(leaves.length > 0) {
+			// Otherwise, perform recursion
+			const unit = State.$tree.$nodes[child.$id]!.$length;
+			result.push(...recursiveExpand(node, child.$children, remainingLeaves, length + unit));
+		}
+	}
+	return result;
+}
+
+function packPaths(outers: PathEx[], leaves: number[]): PathEx[] {
+	outers = outers.map(simplify); // For the final checking in tracing algorithm.
+	outers.forEach(o => o.leaves = leaves);
+	return outers;
 }
 
 /**
  * Create raw trace contour for a single leaf.
  */
-function createRawContour(node: ITreeNode, leaf: ITreeNode): PathEx {
+function createRawContourForLeaf(node: ITreeNode, leaf: ITreeNode): PathEx {
 	const outer = leaf.$graphics.$roughContours[0].$outer[0];
 	const l = leaf.$dist - node.$dist - leaf.$length + node.$length;
 	const result = expandPath(outer, l);
-	// return result;
 
 	// The subtlety here is that if the leaf is involved in some covered junctions,
 	// we have to subtract the covered parts,
