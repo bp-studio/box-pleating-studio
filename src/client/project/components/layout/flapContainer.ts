@@ -3,7 +3,7 @@ import { Flap } from "./flap";
 
 import type { Layout } from "./layout";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
-import type { JFlap, JEdge } from "shared/json";
+import type { JFlap, JEdge, NodeId } from "shared/json";
 import type { CoreManager } from "./coreManager";
 
 //=================================================================
@@ -15,10 +15,10 @@ import type { CoreManager } from "./coreManager";
 export class FlapContainer implements Iterable<Flap> {
 
 	/** The new flaps that should be synced. */
-	public readonly $sync = new Map<number, Flap>();
+	public readonly $sync = new Map<NodeId, Flap>();
 
 	private readonly _layout: Layout;
-	private readonly _flaps: Map<number, Flap> = new Map();
+	private readonly _flaps: Map<NodeId, Flap> = new Map();
 
 	/** The flaps that are about to be updated, and their update actions. */
 	private readonly _pendingUpdate = new Map<Flap, Action>();
@@ -38,7 +38,7 @@ export class FlapContainer implements Iterable<Flap> {
 		return this._flaps.size;
 	}
 
-	public get(id: number): Flap | undefined {
+	public get(id: NodeId): Flap | undefined {
 		return this._flaps.get(id);
 	}
 
@@ -115,7 +115,7 @@ export class FlapContainer implements Iterable<Flap> {
 		}
 	}
 
-	public $remove(id: number): void {
+	public $remove(id: NodeId): void {
 		const flap = this._flaps.get(id)!;
 		const memento = flap.$toMemento();
 		this._layout.$sheet.$removeChild(flap);

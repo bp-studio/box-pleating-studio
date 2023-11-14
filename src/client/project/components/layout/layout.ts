@@ -41,7 +41,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public readonly $sheet: Sheet;
 	public readonly $flaps: FlapContainer;
 	public readonly $core: CoreManager;
-	public readonly $rivers: IDoubleMap<number, River> = new ValuedIntDoubleMap();
+	public readonly $rivers: IDoubleMap<NodeId, River> = new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
 
@@ -239,9 +239,9 @@ export class Layout extends View implements ISerializable<JLayout> {
 		const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
 		if(!m) return;
 		const init = m[1];
-		if(init == "f") return this.$flaps.get(Number(m[2]));
+		if(init == "f") return this.$flaps.get(Number(m[2]) as NodeId);
 		if(init == "re") {
-			const [n1, n2] = m[2].split(",").map(n => Number(n));
+			const [n1, n2] = m[2].split(",").map(n => Number(n) as NodeId);
 			return this.$rivers.get(n1, n2);
 		}
 	}

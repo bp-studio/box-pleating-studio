@@ -1,19 +1,17 @@
 import { shallowRef } from "vue";
 
-import { BinaryHeap } from "shared/data/heap/binaryHeap";
-import { minComparator } from "shared/data/heap/heap";
 import { Vertex } from "./vertex";
 import { SelectionController } from "client/controllers/selectionController";
 import { chebyshev } from "client/utils/chebyshev";
 import { dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
+import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 
 import type { UpdateModel } from "core/service/updateModel";
 import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";
 
 const MIN_VERTICES = 3;
-const SHIFT = 16;
 const X_DISPLACEMENT = 0.125;
 const Y_DISPLACEMENT = 0.0625;
 
@@ -33,20 +31,18 @@ export class VertexContainer implements Iterable<Vertex> {
 	/**
 	 * Those indices that are skipped in the {@link _vertices}.
 	 * Used for obtaining available id quickly.
-	 * Maybe it's too fancy to use a heap here, but why not?
 	 */
-	private readonly _skippedIdHeap: BinaryHeap<NodeId>;
+	private readonly _skippedIds: NodeId[] = [];
 
 	constructor(tree: Tree, json: JTree) {
 		this._tree = tree;
-		this._skippedIdHeap = new BinaryHeap<NodeId>(minComparator);
 
 		// Create the list of skipped ids.
 		const ids: boolean[] = [];
 		for(const node of json.nodes) ids[node.id] = true;
 		if(ids.length > json.nodes.length) {
 			for(let i = 0; i < ids.length; i++) {
-				if(!ids[i]) this._skippedIdHeap.$insert(i as NodeId);
+				if(!ids[i]) this._skippedIds.push(i as NodeId);
 			}
 		}
 	}
@@ -69,8 +65,8 @@ export class VertexContainer implements Iterable<Vertex> {
 
 	/** Get the next available id for {@link Vertex}. */
 	public get $nextAvailableId(): NodeId {
-		while(!this._skippedIdHeap.$isEmpty) {
-			const index = this._skippedIdHeap.$pop()!;
+		while(this._skippedIds.length) {
+			const index = this._skippedIds.pop()!;
 			// We still have to check if the id is in fact available;
 			// it might not be the case because skipped id is not removed
 			// when a vertex is added back through undo/redo
@@ -79,7 +75,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		return this._vertices.length as NodeId;
 	}
 
-	public $get(id: number): Vertex | undefined {
+	public $get(id: NodeId): Vertex | undefined {
 		return this._vertices[id];
 	}
 
@@ -145,30 +141,34 @@ export class VertexContainer implements Iterable<Vertex> {
 
 		// Create an index for the position of all vertices
 		const occupied = new Set<number>();
-		for(const v of this) occupied.add(v.$location.x << SHIFT | v.$location.y);
+		for(const v of this) occupied.add(getOrderedKey(v.$location.x, v.$location.y));
 
 		// Search for empty spot
-		const heap = new BinaryHeap<[IPoint, number]>((a, b) => a[1] - b[1]);
-		let r = 1;
+		let spot: IPoint | undefined;
+		let minDist = Number.POSITIVE_INFINITY;
+		let radius = 1;
 		let offBound = false; // If we've already searched beyond the sheet
-		while(heap.$isEmpty && !offBound) {
+		while(!spot && !offBound) {
 			offBound = true;
-			for(const pt of chebyshev(r)) {
+			for(const pt of chebyshev(radius)) {
 				const p = { x: x + pt.x, y: y + pt.y };
-				const inSheet = this._tree.$sheet.grid.$contains(p);
-				if(inSheet) offBound = false;
-				if(!occupied.has(p.x << SHIFT | p.y) && inSheet) {
-					heap.$insert([p, dist(p, ref)]);
+				if(!this._tree.$sheet.grid.$contains(p)) continue;
+				offBound = false;
+				if(occupied.has(getOrderedKey(p.x, p.y))) continue;
+				const d = dist(p, ref);
+				if(d < minDist) {
+					minDist = d;
+					spot = p;
 				}
 			}
 
-			// Increase r until we find one.
-			r++;
+			// Increase radius until we find one.
+			radius++;
 		}
 
 		// In case of off-bound (unlikely, but just in case)
 		// we can do nothing other than returning the same point
-		return offBound ? at.$location : heap.$get()![0];
+		return spot || at.$location;
 	}
 
 	/**
@@ -230,7 +230,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		const memento = vertex.$toMemento();
 		this._tree.$sheet.$removeChild(vertex);
 		vertex.$destruct();
-		this._skippedIdHeap.$insert(id);
+		this._skippedIds.push(id);
 		delete this._vertices[id];
 		this._tree.$project.history.$destruct(memento);
 	}

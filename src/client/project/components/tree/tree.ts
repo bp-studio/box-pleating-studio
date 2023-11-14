@@ -22,7 +22,7 @@ export class Tree implements ISerializable<JTree> {
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
 	public readonly $vertices: VertexContainer;
-	public readonly $edges: IDoubleMap<number, Edge> = new ValuedIntDoubleMap();
+	public readonly $edges: IDoubleMap<NodeId, Edge> = new ValuedIntDoubleMap();
 	public $updateCallback?: Action;
 
 	/** Cache the {@link JEdge}s in the order determined by the Core. */

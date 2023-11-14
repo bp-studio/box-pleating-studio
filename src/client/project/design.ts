@@ -18,7 +18,7 @@ import type { Sheet } from "./components/sheet";
 import type { Project } from "./project";
 import type { UpdateModel } from "core/service/updateModel";
 import type { Stretch } from "./components/layout/stretch";
-import type { DesignMode, JDesign, JFlap, JSheet, JState, JStretch, JVertex, Memento } from "shared/json";
+import type { DesignMode, JDesign, JFlap, JSheet, JState, JStretch, JVertex, Memento, NodeId } from "shared/json";
 
 //=================================================================
 /**
@@ -108,11 +108,11 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 			const init = m[1], id = m[2], then = m[3];
 			if(init == "s") return layout.$stretches.get(id)!.$query(then);
 			if(init == "e") {
-				const [a, b] = id.split(",").map(n => Number(n));
+				const [a, b] = id.split(",").map(n => Number(n) as NodeId);
 				return tree.$edges.get(a, b);
 			}
 
-			const n = Number(id);
+			const n = Number(id) as NodeId;
 			if(init == "f") return layout.$flaps.get(n);
 			if(init == "v") return tree.$vertices.$get(n);
 		}

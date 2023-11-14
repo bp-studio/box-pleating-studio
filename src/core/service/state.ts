@@ -4,7 +4,7 @@ import { DiffSet } from "shared/data/diff/diffSet";
 
 import type { Repository } from "core/design/layout/repository";
 import type { Device } from "core/design/layout/pattern/device";
-import type { JStretch } from "shared/json";
+import type { JStretch, NodeId } from "shared/json";
 import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
@@ -28,7 +28,7 @@ export namespace State {
 	export let $tree: Tree;
 
 	/** All {@link Junction}s. */
-	export const $junctions = new IntDoubleMap<Junction>();
+	export const $junctions = new IntDoubleMap<NodeId, Junction>();
 
 	/** All {@link Stretch}es. */
 	export const $stretches = new Map<string, Stretch>();

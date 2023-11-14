@@ -37,7 +37,7 @@ export class NodeSet {
 	 * This new algorithm completely removes the need of tracking
 	 * or calculating LCA in general for the whole tree.
 	 */
-	private readonly _lcaMap: IntDoubleMap<ITreeNode> | undefined;
+	private readonly _lcaMap: IntDoubleMap<NodeId, ITreeNode> | undefined;
 
 	constructor(junctions: Junctions, quadrants: ReadonlyMap<number, Quadrant>) {
 		this.$leaves = getLeaves(junctions);

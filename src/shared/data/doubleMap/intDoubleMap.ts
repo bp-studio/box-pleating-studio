@@ -24,24 +24,24 @@ export const MAX = (1 << SHIFT) - 1;
  */
 //=================================================================
 
-export class IntDoubleMap<V> implements IDoubleMap<number, V> {
+export class IntDoubleMap<K extends number, V> implements IDoubleMap<K, V> {
 
 	/**
 	 * Key chains, storing "the keys coupling the given key",
 	 * for improving the performance of single key operations.
 	 */
-	protected readonly _keyMap: Map<number, KeyNode> = new Map();
+	protected readonly _keyMap: Map<K, KeyNode<K>> = new Map();
 
 	/**
 	 * The main map, combines the double key into a single integer
 	 * (see {@link _getKey _getKey()} method) and stores the corresponding node.
 	 */
-	protected readonly _map: Map<number, Node<V>> = new Map();
+	protected readonly _map: Map<K, Node<K, V>> = new Map();
 
 	/** Current size */
 	protected _size: number = 0;
 
-	public set(key1: number, key2: number, value: V): this {
+	public set(key1: K, key2: K, value: V): this {
 		if(!checkKey(key1) || !checkKey(key2)) throw new Error("Invalid index");
 		const key = getKey(key1, key2);
 		let node = this._map.get(key);
@@ -58,9 +58,9 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 
 	public get [Symbol.toStringTag](): string { return `IntDoubleMap(${this._size})`; }
 
-	public has(key: number): boolean;
-	public has(key1: number, key2: number): boolean;
-	public has(...args: [number] | [number, number]): boolean {
+	public has(key: K): boolean;
+	public has(key1: K, key2: K): boolean;
+	public has(...args: [K] | [K, K]): boolean {
 		const key1 = args[0];
 		if(args.length === 1) {
 			return this._keyMap.has(key1);
@@ -69,12 +69,12 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		}
 	}
 
-	public get(key: number): ReadonlyMap<number, V> | undefined;
-	public get(key1: number, key2: number): V | undefined;
-	public get(...args: [number] | [number, number]): ReadonlyMap<number, V> | V | undefined {
+	public get(key: K): ReadonlyMap<K, V> | undefined;
+	public get(key1: K, key2: K): V | undefined;
+	public get(...args: [K] | [K, K]): ReadonlyMap<K, V> | V | undefined {
 		const key1 = args[0];
 		if(args.length === 1) {
-			const temp = new Map<number, V>();
+			const temp = new Map<K, V>();
 			let cursor = this._keyMap.get(key1);
 			while(cursor) {
 				const key2 = cursor.key;
@@ -97,15 +97,15 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: DoubleMapCallback<number, V>, thisArg: this = this): void {
+	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: this = this): void {
 		for(const [k1, k2, v] of this.entries()) {
 			callbackfn.apply(thisArg, [v, k1, k2, this]);
 		}
 	}
 
-	public delete(key: number): boolean;
-	public delete(key1: number, key2: number): boolean;
-	public delete(...args: [number] | [number, number]): boolean {
+	public delete(key: K): boolean;
+	public delete(key1: K, key2: K): boolean;
+	public delete(...args: [K] | [K, K]): boolean {
 		const key1 = args[0];
 		if(args.length === 1) {
 			let cursor = this._keyMap.get(key1);
@@ -136,19 +136,19 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 		}
 	}
 
-	[Symbol.iterator](): IterableIterator<[number, number, V]> {
+	[Symbol.iterator](): IterableIterator<[K, K, V]> {
 		return this.entries();
 	}
 
-	public *entries(): IterableIterator<[number, number, V]> {
+	public *entries(): IterableIterator<[K, K, V]> {
 		for(const [k1, k2] of this.keys()) yield [k1, k2, this.get(k1, k2)!];
 	}
 
-	public *keys(): IterableIterator<[number, number]> {
+	public *keys(): IterableIterator<[K, K]> {
 		for(const key of this._map.keys()) yield getPair(key);
 	}
 
-	public firstKeys(): IterableIterator<number> {
+	public firstKeys(): IterableIterator<K> {
 		return this._keyMap.keys();
 	}
 
@@ -160,18 +160,18 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	protected _createNode(key1: number, key2: number, value: V): Node<V> {
+	protected _createNode(key1: K, key2: K, value: V): Node<K, V> {
 		const node = new Node(key1, key2, value);
 		this._size++;
 		return node;
 	}
 
-	protected _deleteNode(key: number, node: Node<V>): void {
+	protected _deleteNode(key: K, node: Node<K, V>): void {
 		this._map.delete(key);
 		this._size--;
 	}
 
-	protected _deleteKeyNode(key: number, n: KeyNode): void {
+	protected _deleteKeyNode(key: K, n: KeyNode<K>): void {
 		if(n === this._keyMap.get(key)) {
 			if(n._next) this._keyMap.set(key, n._next);
 			else this._keyMap.delete(key);
@@ -180,7 +180,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
-	protected _changeValue(node: Node<V>, value: V): void {
+	protected _changeValue(node: Node<K, V>, value: V): void {
 		node.value = value;
 	}
 
@@ -188,7 +188,7 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _insertKeyNode(key: number, n: KeyNode): void {
+	private _insertKeyNode(key: K, n: KeyNode<K>): void {
 		const old = this._keyMap.get(key);
 		if(old) {
 			old._prev = n;
@@ -198,38 +198,38 @@ export class IntDoubleMap<V> implements IDoubleMap<number, V> {
 	}
 }
 
-export function getKey(key1: number, key2: number): number {
-	return key1 < key2 ? key1 << SHIFT | key2 : key2 << SHIFT | key1;
+export function getKey<K extends number>(key1: K, key2: K): K {
+	return (key1 < key2 ? key1 << SHIFT | key2 : key2 << SHIFT | key1) as K;
 }
 
 export function getOrderedKey(key1: number, key2: number): number {
 	return key1 << SHIFT | key2;
 }
 
-export function getPair(key: number): [number, number] {
-	return [key >> SHIFT, key & MAX];
+export function getPair<K extends number>(key: K): [K, K] {
+	return [key >> SHIFT as K, (key & MAX) as K];
 }
 
 function checkKey(key: number): boolean {
 	return Number.isInteger(key) && key >= 0 && key <= MAX;
 }
 
-export interface Node<V> extends IDoubleLinkedNode<Node<V>> { }
+export interface Node<K extends number, V > extends IDoubleLinkedNode<Node<K, V>> { }
 
-export class Node<V> {
+export class Node<K extends number, V> {
 	public value: V;
-	public readonly n1: KeyNode;
-	public readonly n2: KeyNode;
+	public readonly n1: KeyNode<K>;
+	public readonly n2: KeyNode<K>;
 
-	constructor(key1: number, key2: number, value: V) {
+	constructor(key1: K, key2: K, value: V) {
 		this.n1 = { key: key2 };
 		this.n2 = key1 !== key2 ? { key: key1 } : this.n1;
 		this.value = value;
 	}
 }
 
-interface KeyNode extends IDoubleLinkedNode<KeyNode> {
+interface KeyNode<K extends number> extends IDoubleLinkedNode<KeyNode<K>> {
 
 	/** The key of the coupling node (not the key of self) */
-	readonly key: number;
+	readonly key: K;
 }

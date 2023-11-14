@@ -61,7 +61,7 @@ function grouping(junctions: Junctions): Team[] {
 		// Involved Junctions are at most Quadrant times 2
 		junctions.length * 2
 	);
-	const quadrantMap = new IntDoubleMap<ValidJunction>();
+	const quadrantMap = new IntDoubleMap<NodeId, ValidJunction>();
 	for(const j of junctions) {
 		quadrantMap.set(j.$a.id, j.$b.id, j);
 		unionFind.$union(j.$q1, j.$q2);
