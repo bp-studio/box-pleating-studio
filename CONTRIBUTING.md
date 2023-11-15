@@ -20,11 +20,13 @@ To build BP Studio, first you need the following:
 1. Use the command `pnpm install` under the project root folder to install all dependencies.
 
 And then you can simply press `F5` in VS Code to build and launch the app automatically.
-This is the preferred way to launch as it adds additional parameters for launching Chrome to ensure all functionalities work properly in local environment.
+This is the preferred way to launch as it allows debugging in the IDE.
 
 Alternatively, run `pnpm build` to build the entire project manually,
-and use any browser to open `debug/index.htm` (or `dist/index.htm` if debug is not needed) to run it.
-Some of the features may not work with this approach though.
+and then run `pnpm start` to launch the local server on debug build.
+
+> Note: one should always run BP Studio through a server,
+> as some of the features would not work in `files://` protocol.
 
 Typically the default build task is sufficient for developing purpose,
 and you won't need to execute individual Gulp subtasks,

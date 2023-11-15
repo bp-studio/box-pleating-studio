@@ -22,11 +22,14 @@ const seriesIf = require("./gulp/utils/seriesIf");
 
 requireDir("./gulp/tasks");
 
-gulp.task("share", gulp.parallel(
-	"static",
-	"lib",
-	"donate",
-	"locale"
+gulp.task("share", gulp.series(
+	gulp.parallel(
+		"static",
+		"lib",
+		"donate",
+		"locale"
+	),
+	"link"
 ));
 
 // Run all builds (except HTML and ServiceWorker)

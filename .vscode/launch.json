@@ -6,15 +6,13 @@
 			"type": "chrome",
 			"request": "launch",
 			"name": "Launch in Chrome",
-			"preLaunchTask": "Gulp build",
+			"preLaunchTask": "PreLaunch",
 			"internalConsoleOptions": "neverOpen",
-			"file": "${workspaceFolder}/build/debug/index.htm",
+			"url": "http://localhost:30783",
 			"sourceMaps": true,
+			"webRoot": "${workspaceFolder}/build/debug",
 			"skipFiles": [
-				"${workspaceFolder}/build/dist/lib/**"
-			],
-			"runtimeArgs": [
-				"--allow-file-access-from-files"
+				"${workspaceFolder}/build/debug/lib/**"
 			]
 		},
 		{

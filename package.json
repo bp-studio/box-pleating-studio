@@ -6,6 +6,7 @@
 	"main": "./build/dist/bpstudio.js",
 	"scripts": {
 		"build": "gulp",
+		"start": "http-server build/debug -p 30783 -e htm",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"lint": "eslint src",
 		"loc": "powershell \"(gci src -include *.ts,*.htm,*.scss,*.vue -recurse | select-string .).Count\"",
@@ -77,6 +78,7 @@
 		"gulp-through2": "^1.0.1",
 		"gulp-vue-ssg": "^1.2.1",
 		"gulp-workbox": "^1.0.6",
+		"http-server": "^14.1.1",
 		"inquirer": "^9.2.12",
 		"jsdom": "^22.1.0",
 		"lazypipe": "^1.0.2",

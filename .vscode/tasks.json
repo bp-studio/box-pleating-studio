@@ -3,17 +3,43 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Server",
+			"type": "shell",
+			"command": "pnpm start",
+			"isBackground": true,
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": false
+			},
+			"problemMatcher": {
+				"pattern": {
+					"regexp": ".",
+					"file": 1,
+					"line": 1,
+					"column": 1,
+					"message": 1
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "Starting up http-server",
+					"endsPattern": "Available on"
+				}
+			}
+		},
+		{
 			"label": "Gulp build",
 			"type": "shell",
 			"command": "pnpm build",
-			"isBackground": true,
 			"presentation": {
 				"echo": true,
 				"reveal": "never",
 				"revealProblems": "onProblem",
 				"focus": false,
 				"panel": "dedicated",
-				"showReuseMessage": true
+				"showReuseMessage": false
 			},
 			"problemMatcher": {
 				"fileLocation": "relative",
@@ -24,17 +50,19 @@
 					"severity": 3,
 					"code": 4,
 					"message": 5
-				},
-				"background": {
-					"activeOnStart": true,
-					"beginsPattern": "^\\[.{8}\\]\\sStarting\\s\\'default",
-					"endsPattern": "^\\[.{8}\\]\\sFinished\\s\\'default"
 				}
 			},
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"label": "PreLaunch",
+			"dependsOn": [
+				"Server",
+				"Gulp build"
+			]
 		}
 	]
 }
