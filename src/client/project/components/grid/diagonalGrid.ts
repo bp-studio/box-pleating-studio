@@ -4,6 +4,7 @@ import { Direction } from "shared/types/direction";
 import { drawPath } from "client/utils/contourUtil";
 import { Grid } from "./grid";
 import { chebyshev } from "client/utils/chebyshev";
+import { MAX_SHEET_SIZE, MIN_DIAG_SIZE } from "shared/types/constants";
 
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path } from "shared/types/geometry";
@@ -11,7 +12,6 @@ import type { JSheet } from "shared/json/components";
 import type { Sheet } from "../sheet";
 
 const DEFAULT_SIZE = 16;
-const MIN_SIZE = 6;
 
 //=================================================================
 /**
@@ -59,7 +59,7 @@ export class DiagonalGrid extends Grid {
 			return;
 		}
 
-		if(v < MIN_SIZE) return;
+		if(v < MIN_DIAG_SIZE || v > MAX_SHEET_SIZE) return;
 		const oldValue = this.size;
 		this._testSize = v;
 		const offset = (v % 2 ? Math.floor : Math.ceil)((v - oldValue) / 2);

@@ -1,5 +1,6 @@
 import { EndEvent, StartEvent } from "../../classes/event";
 import { EventProvider } from "../../classes/eventProvider";
+import { COORDINATE_SHIFT } from "shared/types/constants";
 
 import type { Comparator } from "shared/types/types";
 import type { SweepEvent } from "../../classes/event";
@@ -45,18 +46,23 @@ const statusComparator: Comparator<StartEvent> = (a, b) => a.$key - b.$key;
  * Doing so can improve the performance for about 5%.
  *
  * The bits consist of, from high to low:
- * 15 bit	point.y
+ * 15 bit	point.y (shifted by -4096)
  * 1 bit	isStart
  * 1 bit	isHorizontal
  * 1 bit	wrapDelta
  * 14 bit	id
+ *
+ * Note that for this to work properly,
+ * the range of point.y has to be within [-16384, 16384)
+ * (See {@link COORDINATE_SHIFT}).
  */
 function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1, id: number): number {
 	let hor = (segment as AALineSegment).$isHorizontal ? 1 : 0;
 	if(isStart) hor ^= 1;
 	return (
-		// Sort by y-coordinate first
-		point.y << SHIFT_Y |
+		// Sort by y-coordinate first.
+		// Notice that negative values won't affect the comparison of the remaining parts.
+		point.y - COORDINATE_SHIFT << SHIFT_Y |
 
 		// for the events at the same location, end events goes first
 		isStart << SHIFT_START |

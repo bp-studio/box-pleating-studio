@@ -54,12 +54,12 @@ export const isReload =
 export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
 
 /**
-* A lucky guess that we are probably in China.
-* If we are, replace the flag to avoid unnecessary trouble.
-*
-* For the list of timeZone to country, see:
-* https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json
-*/
+ * A lucky guess that we are probably in China.
+ * If we are, replace the flag to avoid unnecessary trouble.
+ *
+ * For the list of timeZone to country, see:
+ * https://github.com/moment/moment-timezone/blob/develop/data/meta/latest.json
+ */
 const detectChinaLanguage = ["zh-CN", "zh-CHS", "zh-Hans", "zh-HK", "zh-MO"];
 const detectChinaTimeZone = ["Asia/Shanghai", "Asia/Urumqi"];
 const timeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;

@@ -77,6 +77,7 @@ function ssgOption(options) {
 					directiveTransforms: { t: vt(i18n) }, // So that v-t directives will be processed
 				})),
 			],
+			logLevel: "error", // silence warnings
 			target,
 		},
 	};

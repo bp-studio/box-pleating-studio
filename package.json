@@ -6,7 +6,7 @@
 	"main": "./build/dist/bpstudio.js",
 	"scripts": {
 		"build": "gulp",
-		"start": "http-server build/debug -p 30783 -e htm",
+		"start": "http-server build/debug -p 30783 -e htm -c-1",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"lint": "eslint src",
 		"loc": "powershell \"(gci src -include *.ts,*.htm,*.scss,*.vue -recurse | select-string .).Count\"",

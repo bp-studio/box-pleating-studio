@@ -2,6 +2,7 @@ import { shallowRef } from "client/shared/decorators";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
+import { MAX_SHEET_SIZE, MIN_RECT_SIZE } from "shared/types/constants";
 
 import type { Path } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
@@ -9,7 +10,6 @@ import type { JSheet } from "shared/json";
 import type { Sheet } from "../sheet";
 
 const DEFAULT_SIZE = 16;
-const MIN_SIZE = 4; // Used to be 8, now 4.
 
 //=================================================================
 /**
@@ -58,7 +58,7 @@ export class RectangularGrid extends Grid {
 
 		let flush = true;
 		const oldValue = this._height;
-		if(v < MIN_SIZE || oldValue === v) return;
+		if(v < MIN_RECT_SIZE || v > MAX_SHEET_SIZE || oldValue === v) return;
 		this._testHeight = v;
 		if(v < oldValue) {
 			const [min, max] = this._ySpan;
@@ -85,7 +85,7 @@ export class RectangularGrid extends Grid {
 
 		let flush = true;
 		const oldValue = this._width;
-		if(v < MIN_SIZE || oldValue === v) return;
+		if(v < MIN_RECT_SIZE || v > MAX_SHEET_SIZE || oldValue === v) return;
 		this._testWidth = v;
 		if(v < oldValue) {
 			const [min, max] = this._xSpan;
