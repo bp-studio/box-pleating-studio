@@ -2,6 +2,7 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 
+import type { JNode } from "core/service/updateModel";
 import type { Comparator } from "shared/types/types";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITreeNode, NodeGraphics } from ".";
@@ -79,6 +80,14 @@ export class TreeNode implements ITreeNode {
 
 	public get $leaves(): readonly TreeNode[] {
 		return this._leafList;
+	}
+
+	public get $data(): JNode {
+		return {
+			id: this.id,
+			dist: this.$dist,
+			height: this.$height,
+		};
 	}
 
 	public $updateLeaves(): void {

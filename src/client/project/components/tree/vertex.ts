@@ -8,6 +8,7 @@ import { Independent } from "client/base/independent";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { getRelativePoint } from "../sheet";
+import { MAX_TREE_HEIGHT } from "shared/types/constants";
 
 import type { Grid } from "../grid/grid";
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
@@ -43,6 +44,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	 * Several UI depends on this value, so it is reactive.
 	 */
 	@shallowRef public $degree: number = 0;
+
+	@shallowRef public $dist: number = 0;
+
+	@shallowRef public $height: number = 0;
 
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
@@ -94,8 +99,9 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 
 	@field public name: string;
 
-	public addLeaf(length: number): Promise<void> {
-		return this._tree.$vertices.$addLeaf(this, length);
+	public async addLeaf(length: number): Promise<void> {
+		if(length > this.maxNewLeafLength) return;
+		await this._tree.$vertices.$addLeaf(this, length);
 	}
 
 	public get isLeaf(): boolean {
@@ -104,6 +110,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 
 	public get cannotAdd(): boolean {
 		return this._tree.$vertices.$isMaximal;
+	}
+
+	public get maxNewLeafLength(): number {
+		return MAX_TREE_HEIGHT - this.$dist;
 	}
 
 	public get isDeletable(): boolean {

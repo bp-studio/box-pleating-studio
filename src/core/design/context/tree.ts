@@ -1,6 +1,7 @@
 import { TreeNode } from "./treeNode";
 import { State } from "core/service/state";
 
+import type { TreeData } from "core/service/updateModel";
 import type { JEdge, JFlap } from "shared/json";
 import type { ITree, ITreeNode, NodeCollection } from ".";
 import type { NodeId } from "shared/json/tree";
@@ -14,7 +15,7 @@ import type { NodeId } from "shared/json/tree";
  */
 //=================================================================
 
-export class Tree implements ITree, ISerializable<JEdge[]> {
+export class Tree implements ITree, ISerializable<TreeData> {
 
 	/** The array of all nodes. Some indices are skipped. */
 	private readonly _nodes: (TreeNode | undefined)[];
@@ -60,8 +61,11 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public toJSON(): JEdge[] {
-		const result: JEdge[] = [];
+	public toJSON(): TreeData {
+		const result: TreeData = {
+			edges: [],
+			nodes: [],
+		};
 
 		// We could consider optimize this implementation in the future.
 		const queue: TreeNode[] = [this.$root];
@@ -70,7 +74,8 @@ export class Tree implements ITree, ISerializable<JEdge[]> {
 		while(queue.length) {
 			const node = queue.shift()!;
 			for(const childNode of node.$children) {
-				result.push(childNode.toJSON());
+				result.edges.push(childNode.toJSON());
+				result.nodes.push(childNode.$data);
 				if(!childNode.$isLeaf) queue.push(childNode);
 			}
 		}

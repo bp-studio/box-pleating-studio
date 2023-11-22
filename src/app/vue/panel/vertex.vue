@@ -11,7 +11,7 @@
 			<div class="d-flex flex-grow-1">
 				<label class="col-form-label me-2 flex-shrink-0" v-t="'panel.vertex.ofLength'"></label>
 				<div class="flex-grow-1" style="width: 90px;">
-					<Number v-model="newLength" :min="1" />
+					<Number v-model="newLength" :min="1" :max="subject.maxNewLeafLength" />
 				</div>
 			</div>
 		</div>

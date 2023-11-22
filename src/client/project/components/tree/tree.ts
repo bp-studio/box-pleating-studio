@@ -67,7 +67,7 @@ export class Tree implements ISerializable<JTree> {
 		// update JEdges if needed
 		if(model.tree) {
 			const oldRoot = this.$rootId;
-			this._edges = model.tree;
+			this._edges = model.tree.edges;
 			if(model.edit.length) this.$project.history.$edit(model.edit, oldRoot, this.$rootId);
 		}
 

@@ -13,7 +13,7 @@ export interface UpdateModel {
 	};
 
 	/** Record the entire tree when any part of it changes. */
-	tree?: JEdge[];
+	tree?: TreeData;
 
 	remove: {
 		nodes: NodeId[];
@@ -32,6 +32,18 @@ export interface UpdateModel {
 	 * so the Client will need to check before using the data.
 	 */
 	graphics: Record<string, GraphicsData>;
+}
+
+export interface TreeData {
+	edges: JEdge[];
+	nodes: JNode[];
+}
+
+/** Used for calculating bounds. */
+export interface JNode {
+	id: NodeId;
+	dist: number;
+	height: number;
 }
 
 interface GraphicsData {

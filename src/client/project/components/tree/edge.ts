@@ -11,6 +11,7 @@ import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
 import { FieldCommand } from "client/project/changes/commands/fieldCommand";
 import { norm } from "shared/types/geometry";
+import { MAX_TREE_HEIGHT } from "shared/types/constants";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LabelView } from "client/utils/label";
@@ -101,6 +102,13 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		if(v) await this._tree.$vertices.$delete([v]);
 	}
 
+	/** For controlling max tree height. See {@link MAX_TREE_HEIGHT}. */
+	public get maxLength(): number {
+		const child = this.$v1.$dist > this.$v2.$dist ? this.$v1 : this.$v2;
+		const branchHeight = child.$dist + child.$height;
+		return MAX_TREE_HEIGHT - branchHeight + this._length;
+	}
+
 	public get isRiver(): boolean {
 		return !this.$destructed && !this.$getLeaf();
 	}
@@ -110,6 +118,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	}
 
 	public get cannotSplit(): boolean {
+		if(this.maxLength == 1) return true;
 		return this._tree.$vertices.$isMaximal;
 	}
 

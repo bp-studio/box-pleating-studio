@@ -104,6 +104,14 @@ export class VertexContainer implements Iterable<Vertex> {
 			count--;
 		}
 		this._count.value = count;
+
+		if(model.tree) {
+			for(const node of model.tree.nodes) {
+				const vertex = this._vertices[node.id]!;
+				vertex.$dist = node.dist;
+				vertex.$height = node.height;
+			}
+		}
 	}
 
 	public async $addLeaf(at: Vertex, length: number): Promise<void> {
