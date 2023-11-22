@@ -105,14 +105,15 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public get isLeaf(): boolean {
-		return this.$degree === 1;
+		return !this.$destructed && this.$degree === 1;
 	}
 
 	public get cannotAdd(): boolean {
-		return this._tree.$vertices.$isMaximal;
+		return !this.$destructed && this._tree.$vertices.$isMaximal;
 	}
 
 	public get maxNewLeafLength(): number {
+		if(this.$destructed) return 1;
 		return MAX_TREE_HEIGHT - this.$dist;
 	}
 

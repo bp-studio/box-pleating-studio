@@ -215,6 +215,12 @@ export class Tree implements ITree, ISerializable<TreeData> {
 	 * Check all {@link TreeNode}s in {@link _pendingRemove} and perform the actual removal.
 	 */
 	public $flushRemove(): void {
+		// Handle the special case where the current root is going to be removed
+		if(this._pendingRemove.has(this.$root.id) && this.$root.$children.$size == 0) {
+			this.$root = this._nodes.find(n => n && !n.$parent && n.$children.$size > 0)!;
+			State.$rootChanged = true;
+		}
+
 		for(const id of this._pendingRemove) {
 			const node = this._nodes[id]!;
 			// Double-check if the node actually needs to be removed.

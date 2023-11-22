@@ -104,6 +104,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 
 	/** For controlling max tree height. See {@link MAX_TREE_HEIGHT}. */
 	public get maxLength(): number {
+		if(this.$destructed) return 1;
 		const child = this.$v1.$dist > this.$v2.$dist ? this.$v1 : this.$v2;
 		const branchHeight = child.$dist + child.$height;
 		return MAX_TREE_HEIGHT - branchHeight + this._length;
