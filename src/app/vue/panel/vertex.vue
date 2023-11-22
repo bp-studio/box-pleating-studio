@@ -4,7 +4,7 @@
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 	</div>
 	<div class="mt-3 d-flex" style="flex-wrap: wrap;">
-		<AsyncButton class="flex-shrink-0" :click="() => subject.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'" />
+		<AsyncButton class="flex-shrink-0" :disabled="subject.cannotAdd" :click="() => subject.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'" />
 		<div class="flex-grow-1 d-flex">
 			<label class="col-form-label ms-2 text-end"
 				   style="width: 0; flex-grow: 1000; max-width: calc((100% - 230px * 0.98) * 50); overflow: hidden;">...&nbsp;</label>

@@ -10,7 +10,9 @@ import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import type { UpdateModel } from "core/service/updateModel";
 import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";
+import type { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 
+const MAX_VERTICES = 65535;
 const MIN_VERTICES = 3;
 const X_DISPLACEMENT = 0.125;
 const Y_DISPLACEMENT = 0.0625;
@@ -60,7 +62,15 @@ export class VertexContainer implements Iterable<Vertex> {
 	}
 
 	public get $isMinimal(): boolean {
-		return this._count.value === MIN_VERTICES;
+		return this._count.value <= MIN_VERTICES;
+	}
+
+	/**
+	 * Set a hard limit on the maximal number of vertices.
+	 * See the remark in {@link IntDoubleMap}.
+	 */
+	public get $isMaximal(): boolean {
+		return this._count.value >= MAX_VERTICES;
 	}
 
 	/** Get the next available id for {@link Vertex}. */

@@ -4,7 +4,7 @@
 		<Number :label="$t('panel.edge.length')" v-model="subject.length" hotkeys="d.rd,d.ri" />
 	</div>
 	<div class="mt-3">
-		<AsyncButton class="me-2" :click="() => subject.split()" v-t="'panel.edge.split'" />
+		<AsyncButton class="me-2" :disabled="subject.cannotSplit" :click="() => subject.split()" v-t="'panel.edge.split'" />
 		<template v-if="subject.isDeletable">
 			<AsyncButton v-if="subject.isRiver" :click="() => subject.deleteAndMerge()" v-t="'panel.edge.merge'" />
 			<AsyncButton v-else :click="() => subject.delete()" v-t="'keyword.delete'" />

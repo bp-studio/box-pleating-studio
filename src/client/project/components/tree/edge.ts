@@ -109,6 +109,10 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		return !this.$destructed && !this._tree.isMinimal;
 	}
 
+	public get cannotSplit(): boolean {
+		return this._tree.$vertices.$isMaximal;
+	}
+
 	public goToDual(): void {
 		this._tree.$goToDual(this);
 	}

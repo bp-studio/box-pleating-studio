@@ -102,6 +102,10 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return this.$degree === 1;
 	}
 
+	public get cannotAdd(): boolean {
+		return this._tree.$vertices.$isMaximal;
+	}
+
 	public get isDeletable(): boolean {
 		return !this.$destructed && !this._tree.isMinimal && this.$degree <= 2;
 	}
