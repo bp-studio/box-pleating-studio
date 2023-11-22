@@ -5,7 +5,7 @@ import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
 describe("Int Double Map", function() {
 
 	it("Stores double number indices", function() {
-		const map = new IntDoubleMap<string>();
+		const map = new IntDoubleMap<number, string>();
 		const value = "a";
 		map.set(1, 2, value);
 		expect(map.size).to.equal(1);
@@ -26,7 +26,7 @@ describe("Int Double Map", function() {
 	});
 
 	it("Checks validity of indices", function() {
-		const map = new IntDoubleMap<number>();
+		const map = new IntDoubleMap<number, number>();
 		expect(MAX).to.equal(65_535);
 		expect(() => map.set(-1, 0, 0)).to.throw();
 		expect(() => map.set(1.1, 0, 0)).to.throw();
@@ -37,7 +37,7 @@ describe("Int Double Map", function() {
 	});
 
 	it("Can navigate on single index", function() {
-		const map = new IntDoubleMap<string>();
+		const map = new IntDoubleMap<number, string>();
 		map.set(1, 2, "a");
 		map.set(2, 3, "b");
 		map.set(3, 4, "c");

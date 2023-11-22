@@ -5,7 +5,7 @@ import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 describe("Valued Int Double Map", function() {
 
 	it("Can lookup values", function() {
-		const map = new ValuedIntDoubleMap<string>();
+		const map = new ValuedIntDoubleMap<number, string>();
 		const value = "a", other = "other";
 		map.set(1, 2, value);
 		map.set(2, 3, value);
@@ -22,7 +22,7 @@ describe("Valued Int Double Map", function() {
 	});
 
 	it("Can delete by value", function() {
-		const map = new ValuedIntDoubleMap<string>();
+		const map = new ValuedIntDoubleMap<number, string>();
 		const value = "a";
 		map.set(1, 2, value);
 		map.set(2, 3, value);

@@ -131,13 +131,13 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		this.$flushRemove();
 	}
 
-	public $split(id: NodeId, n: NodeId): void {
-		const node = this._nodes[n]!;
+	public $split(newId: NodeId, atId: NodeId): void {
+		const node = this._nodes[atId]!;
 		const parent = node.$parent!;
 		const l = node.$length;
-		this.$removeEdge(n, parent.id);
-		this.$addEdge(parent.id, id, Math.ceil(l / 2));
-		this.$addEdge(id, n, Math.max(Math.floor(l / 2), 1));
+		this.$removeEdge(atId, parent.id);
+		this.$addEdge(parent.id, newId, Math.ceil(l / 2));
+		this.$addEdge(newId, atId, Math.max(Math.floor(l / 2), 1));
 		this.$flushRemove();
 	}
 

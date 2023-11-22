@@ -11,6 +11,9 @@ import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {
 
+	const id3 = 3 as NodeId;
+	const id4 = 4 as NodeId;
+
 	beforeEach(function() {
 		fullReset();
 	});
@@ -30,9 +33,9 @@ describe("Junction", function() {
 		Processor.$run(heightTask);
 
 		expect(State.$junctions.size).to.equal(1);
-		expect(State.$junctions.has(3, 4)).to.be.true;
+		expect(State.$junctions.has(id3, id4)).to.be.true;
 
-		const junction = State.$junctions.get(3, 4) as ValidJunction;
+		const junction = State.$junctions.get(id3, id4) as ValidJunction;
 		expect(junction.$valid).to.be.true;
 		expect(junction.$s.x).to.equal(5);
 		expect(junction.$s.y).to.equal(5);
@@ -56,14 +59,14 @@ describe("Junction", function() {
 		State.$tree = tree;
 		Processor.$run(heightTask);
 
-		const junction1 = State.$junctions.get(3, 4) as ValidJunction;
+		const junction1 = State.$junctions.get(id3, id4) as ValidJunction;
 		tree.$join(0 as NodeId);
 		Processor.$run(heightTask);
 
 		expect(State.$junctions.size).to.equal(1);
-		expect(State.$junctions.has(3, 4)).to.be.true;
+		expect(State.$junctions.has(id3, id4)).to.be.true;
 
-		const junction2 = State.$junctions.get(3, 4) as ValidJunction;
+		const junction2 = State.$junctions.get(id3, id4) as ValidJunction;
 		expect(junction1).to.not.equal(junction2, "Creates a new instance");
 
 		const stretch = getFirst(State.$stretches)!;

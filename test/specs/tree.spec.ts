@@ -11,6 +11,10 @@ describe("Tree", function() {
 
 	const id0 = 0 as NodeId;
 	const id1 = 1 as NodeId;
+	const id2 = 2 as NodeId;
+	const id3 = 3 as NodeId;
+	const id4 = 4 as NodeId;
+	const id6 = 6 as NodeId;
 
 	beforeEach(function() {
 		fullReset();
@@ -42,8 +46,8 @@ describe("Tree", function() {
 		expect(tree.$root).to.equal(n0);
 
 		// Add two more edges, causing unbalancing
-		tree.$addEdge(3 as NodeId, 1 as NodeId, 2);
-		tree.$addEdge(4 as NodeId, 3 as NodeId, 2);
+		tree.$addEdge(id3, id1, 2);
+		tree.$addEdge(id4, id3, 2);
 		Processor.$run(heightTask);
 
 		expect(tree.$root).to.equal(n1);
@@ -60,9 +64,8 @@ describe("Tree", function() {
 		State.$tree = tree;
 		Processor.$run(heightTask);
 
-
-		const n2 = tree.$nodes[2 as NodeId]!;
-		const n3 = tree.$nodes[3 as NodeId]!;
+		const n2 = tree.$nodes[id2]!;
+		const n3 = tree.$nodes[id3]!;
 		expect(tree.$root).to.equal(n2);
 		expect(tree.$nodes[id1]).to.be.not.undefined;
 		expect(tree.$nodes[id0]).to.be.not.undefined;
@@ -118,7 +121,7 @@ describe("Tree", function() {
 		Processor.$run(heightTask);
 
 		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
-		expect(JSON.stringify(tree)).to.equal(json);
+		expect(JSON.stringify(tree.toJSON().edges)).to.equal(json);
 	});
 
 	it("Keeps a record of AABB", function() {
@@ -145,5 +148,48 @@ describe("Tree", function() {
 		n2.$setAABB(0, 0, 0, 0);
 		Processor.$run(heightTask);
 		expect(n0.$AABB.$toArray()).to.eql([9, 12, -5, -3]);
+	});
+
+	describe("Edge joining", function() {
+		it("Works with root node", function() {
+			const tree = new Tree([
+				{ n1: 0, n2: 1, length: 2 },
+				{ n1: 1, n2: 2, length: 2 },
+				{ n1: 0, n2: 3, length: 2 },
+				{ n1: 3, n2: 4, length: 2 },
+			] as JEdge[]);
+			State.$tree = tree;
+			Processor.$run(heightTask);
+
+			expect(tree.$root.id).to.equal(0);
+
+			tree.$join(id0);
+			Processor.$run(heightTask);
+
+			expect(tree.$root.id).to.equal(3);
+			const n1 = tree.$nodes[id1]!;
+			expect(n1.$parent?.id).to.equal(3);
+		});
+	});
+
+	describe("Edge splitting", function() {
+		it("Works with depth-1 edge", function() {
+			const tree = new Tree([
+				{ n1: 0, n2: 1, length: 2 },
+				{ n1: 1, n2: 2, length: 2 },
+				{ n1: 0, n2: 3, length: 2 },
+				{ n1: 3, n2: 4, length: 2 },
+				{ n1: 4, n2: 5, length: 2 },
+			] as JEdge[]);
+			State.$tree = tree;
+			Processor.$run(heightTask);
+
+			expect(tree.$root.id).to.equal(0);
+
+			tree.$split(id6, id3);
+			Processor.$run(heightTask);
+
+			expect(tree.$root.id).to.equal(6);
+		});
 	});
 });
