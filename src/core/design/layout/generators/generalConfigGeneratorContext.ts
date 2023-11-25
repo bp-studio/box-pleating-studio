@@ -3,10 +3,9 @@ import { singleConfigGenerator } from "./singleConfigGenerator";
 import { CornerType, Strategy } from "shared/json";
 import { clone } from "shared/utils/clone";
 import { ConfigGeneratorContext } from "./configGeneratorContext";
-import { Direction, nextQuadrantOffset, opposite, previousQuadrantOffset, quadrantNumber } from "shared/types/direction";
-import { MASK } from "../junction/validJunction";
+import { Direction, getNodeId, getQuadrant, makeQuadrantCode, nextQuadrantOffset, opposite, previousQuadrantOffset, quadrantNumber } from "shared/types/direction";
 
-import type { QuadrantDirection } from "shared/types/direction";
+import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { Configuration } from "../configuration";
 import type { JJunction, JOverlap, JPartition, NodeId } from "shared/json";
 import type { Repository } from "../repository";
@@ -58,12 +57,12 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 	constructor(repo: Repository) {
 		super(repo);
-		const junctionMap = new Map<number, number[]>();
+		const junctionMap = new Map<QuadrantCode, number[]>();
 		const configs: Configuration[][] = [];
 		for(const [i, junction] of this._junctions.entries()) {
 			const c1 = junction.c[0], c2 = junction.c[2];
-			getOrSetEmptyArray(junctionMap, c1.e! << 2 | c1.q!).push(i);
-			getOrSetEmptyArray(junctionMap, c2.e! << 2 | c2.q!).push(i);
+			getOrSetEmptyArray(junctionMap, makeQuadrantCode(c1.e as NodeId, c1.q!)).push(i);
+			getOrSetEmptyArray(junctionMap, makeQuadrantCode(c2.e as NodeId, c2.q!)).push(i);
 			configs[i] = [...singleConfigGenerator(this, i)];
 		}
 
@@ -74,8 +73,8 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			if(junctionIndices.length > 1) {
 				const max = (junctionIndices.length - 1) * MAX_RANK_PER_JOINT;
 				joints.push({
-					nodeId: code >>> 2 as NodeId,
-					q: code & MASK,
+					nodeId: getNodeId(code),
+					q: getQuadrant(code),
 					max,
 					items: junctionIndices.map(i => ({
 						index: i,

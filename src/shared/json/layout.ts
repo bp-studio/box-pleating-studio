@@ -1,3 +1,4 @@
+import type { NodeId } from "./tree";
 import type { QuadrantDirection } from "shared/types/direction";
 import type { CornerType } from "./enum";
 import type { JConfiguration, JJunction } from "./pattern";
@@ -24,10 +25,10 @@ export interface JQuadrilateral {
 export interface JOverlap extends JQuadrilateral {
 
 	/**
-	 * A negative number that is unique during generation of {@link JConfiguration}.
+	 * An {@link OverlapId} that is unique during generation of {@link JConfiguration}.
 	 * Used for temporarily identifying each overlap.
 	 */
-	id?: number;
+	id?: OverlapId;
 
 	/** The index within {@link Configuration.$junctions} of the {@link JJunction} from which this {@link JOverlap} is cut off. */
 	parent: number;
@@ -37,6 +38,9 @@ export interface JOverlap extends JQuadrilateral {
 	 * If omitted, it would be (0, 0). */
 	shift?: IPoint;
 }
+
+/** A negative number. */
+export type OverlapId = TypedNumber<"OverlapId">;
 
 //=================================================================
 /**
@@ -78,7 +82,7 @@ export interface JConnection {
 	 * Non-negative integer represents flap,
 	 * while negative integer represents Overlap (the id of it in the {@link JConfiguration}).
 	 */
-	e: number;
+	e: NodeId | OverlapId;
 
 	/**
 	 * To which quadrant corner it connects.

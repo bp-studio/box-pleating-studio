@@ -30,16 +30,18 @@
 	import Workspace from "app/services/workspaceService";
 	import { ContextMenu, DropdownItem, Divider } from "@/gadgets/menu";
 
+	import type { ProjId } from "shared/json";
+
 	defineOptions({ name: "TabMenu" });
 
 	const tabMenu = compRef(ContextMenu);
 
-	function show(event: MouseEvent, id: number): void {
+	function show(event: MouseEvent, id: ProjId): void {
 		menuId = id;
 		tabMenu.value!.show(event);
 	}
 
-	let menuId: number;
+	let menuId: ProjId;
 
 	defineExpose({ show });
 

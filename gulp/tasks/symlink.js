@@ -13,6 +13,7 @@ const links = [
 
 gulp.task("link", () =>
 	// Note: symlink for individual files works in serve only when using "-S" option
+	// http-server on the other hand accepts those by default.
 	gulp.src(links, { cwd: config.dest.dist })
 		.pipe(gulp.symlink(config.dest.debug, { useJunctions: false }))
 );

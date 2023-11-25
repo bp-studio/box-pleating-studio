@@ -22,6 +22,8 @@
 	import Tab from "./tab.vue";
 	import TabMenu from "./tabMenu.vue";
 
+	import type { ProjId } from "shared/json";
+
 	defineOptions({ name: "TabBar" });
 
 	const tabMenu = compRef(TabMenu);
@@ -37,7 +39,7 @@
 		document.getElementById("divTab")!.style.cursor = cursor;
 	}
 
-	function contextMenu(event: MouseEvent, id: number): void {
+	function contextMenu(event: MouseEvent, id: ProjId): void {
 		event.preventDefault();
 		tabMenu.value!.show(event, id);
 	}

@@ -8,7 +8,7 @@ import { getOrSetEmptyArray } from "shared/utils/map";
 import { NodeSet } from "./nodeSet";
 import { Joiner } from "./joiner/joiner";
 
-import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
+import type { QuadrantCode, PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Pattern } from "./pattern/pattern";
 import type { JJunctions, JOverlap, JQuadrilateral, JRepository, JStretch, NodeId } from "shared/json";
 import type { Configuration } from "./configuration";
@@ -36,7 +36,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	public readonly $f: ISignPoint;
 
 	/** Mapping quadrant codes to {@link Quadrant}s. */
-	public readonly $quadrants: ReadonlyMap<number, Quadrant>;
+	public readonly $quadrants: ReadonlyMap<QuadrantCode, Quadrant>;
 
 	/** List {@link Quadrant}s by {@link QuadrantDirection} and sorted in tracing ordering. */
 	public readonly $directionalQuadrants: PerQuadrant<Quadrant[]>;
@@ -160,19 +160,19 @@ export class Repository implements ISerializable<JRepository | undefined> {
 }
 
 interface CreateQuadrantResult {
-	readonly map: ReadonlyMap<number, Quadrant>;
+	readonly map: ReadonlyMap<QuadrantCode, Quadrant>;
 	readonly directional: PerQuadrant<Quadrant[]>;
 }
 
 function createQuadrants(junctions: Junctions): CreateQuadrantResult {
-	const quadrantCodes = new Map<number, ValidJunction[]>();
+	const quadrantCodes = new Map<QuadrantCode, ValidJunction[]>();
 	for(const j of junctions) {
 		getOrSetEmptyArray(quadrantCodes, j.$q1).push(j);
 		getOrSetEmptyArray(quadrantCodes, j.$q2).push(j);
 	}
 
 	const directional = makePerQuadrant<Quadrant[]>(_ => []);
-	const map = new Map<number, Quadrant>();
+	const map = new Map<QuadrantCode, Quadrant>();
 	for(const [code, relevantJunctions] of quadrantCodes) {
 		const quadrant = new Quadrant(code, relevantJunctions);
 		map.set(code, quadrant);

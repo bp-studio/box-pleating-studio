@@ -1,4 +1,4 @@
-import type { JProject, CoreError } from "shared/json";
+import type { JProject, CoreError, ProjId } from "shared/json";
 
 export interface StudioOptions {
 	/** Callback for deprecated formats in the file */
@@ -14,7 +14,7 @@ export interface StudioOptions {
 	onLongPress?: Action;
 
 	/** Callback for fatal error. */
-	onError?: (id: number, error: CoreError, backup?: JProject) => Promise<void>;
+	onError?: (id: ProjId, error: CoreError, backup?: JProject) => Promise<void>;
 }
 
 export const options: StudioOptions = {};

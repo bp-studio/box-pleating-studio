@@ -5,7 +5,7 @@ import { deepAssign } from "shared/utils/clone";
 import ProjectService from "client/services/projectService";
 
 import type { ShallowRef } from "vue";
-import type { JProject } from "shared/json";
+import type { JProject, ProjId } from "shared/json";
 
 /** The worker instance that is pre-generated and is standing-by; declared in HTML. */
 declare let __worker: Worker | undefined;
@@ -15,7 +15,7 @@ declare const __worker_src: string;
 
 export interface IProjectController {
 	readonly current: ShallowRef<Project | null>;
-	get(id: number): Project | undefined;
+	get(id: ProjId): Project | undefined;
 	create(json: RecursivePartial<JProject>): Promise<Project>;
 	open(json: Pseudo<JProject>): Promise<Project>;
 	close(proj: Project): void;
@@ -40,12 +40,12 @@ const registry = new FinalizationRegistry<number>(id => console.log(`Project #${
 
 export namespace ProjectController {
 
-	const projectMap = new Map<number, Project>();
+	const projectMap = new Map<ProjId, Project>();
 
 	export const current = ProjectService.project;
 
 	/** Return the {@link Project} by id. */
-	export function get(id: number): Project | undefined {
+	export function get(id: ProjId): Project | undefined {
 		return projectMap.get(id);
 	}
 

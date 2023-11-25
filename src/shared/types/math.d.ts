@@ -24,5 +24,7 @@ type Sign = 0 | 1 | -1;
 
 /**
  * We use this type alias to remind ourselves that certain numbers must be positive.
+ *
+ * The `| 1` part of the definition is a trick that makes `*=` operator works between two {@link Positive} numbers.
  */
-type Positive = number & { _Positive: undefined } | 1;
+type Positive = TypedNumber<"Positive"> | 1;

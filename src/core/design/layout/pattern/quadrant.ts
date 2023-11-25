@@ -1,15 +1,13 @@
 import { Point } from "core/math/geometry/point";
-import { Direction, SlashDirection } from "shared/types/direction";
-import { MASK } from "../junction/validJunction";
+import { Direction, SlashDirection, getNodeId, getQuadrant } from "shared/types/direction";
 import { State } from "core/service/state";
 import { Vector } from "core/math/geometry/vector";
 
-import type { NodeId } from "shared/json";
 import type { Comparator } from "shared/types/types";
 import type { Junctions } from "../junction/validJunction";
 import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
-import type { QuadrantDirection } from "shared/types/direction";
+import type { QuadrantDirection, QuadrantCode } from "shared/types/direction";
 import type { JOverlap } from "shared/json/layout";
 import type { JJunction } from "shared/json/pattern";
 
@@ -31,9 +29,9 @@ export class Quadrant {
 	/** The starting point of tracing relative to the corner of the flap. */
 	private readonly o: IPoint;
 
-	constructor(code: number, junctions: Junctions) {
-		this.$flap = State.$tree.$nodes[(code >>> 2) as NodeId]!;
-		this.q = code & MASK;
+	constructor(code: QuadrantCode, junctions: Junctions) {
+		this.$flap = State.$tree.$nodes[getNodeId(code)]!;
+		this.q = getQuadrant(code);
 		this.f = getFactors(this.q);
 
 		const ox: number[] = [], oy: number[] = [];

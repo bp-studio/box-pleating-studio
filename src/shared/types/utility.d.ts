@@ -1,5 +1,10 @@
 
 /**
+ * Create a unique subtype of the built-in {@link number} type that are mutually incompatible.
+ */
+type TypedNumber<name extends string> = number & { [k in `_${name}`]: undefined };
+
+/**
  * The constructor of type `T` (default `unknown`).
  */
 type Constructor<T = unknown> = abstract new (...args: any[]) => T;

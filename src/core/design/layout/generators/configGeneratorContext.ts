@@ -3,7 +3,7 @@ import { CornerType } from "shared/json";
 import { Configuration, cleanUp } from "../configuration";
 
 import type { Repository } from "../repository";
-import type { JJunction, JJunctions, JOverlap, JPartition } from "shared/json";
+import type { JJunction, JJunctions, JOverlap, JPartition, OverlapId } from "shared/json";
 
 //=================================================================
 /**
@@ -62,7 +62,7 @@ export class ConfigGeneratorContext {
 	/** Convert a {@link JJunction} to a {@link JOverlap}. */
 	public $toOverlap(j: JJunction, parentIndex: number): JOverlap {
 		return {
-			id: this._nextId--,
+			id: this._nextId-- as OverlapId,
 			c: clone(j.c),
 			ox: j.ox,
 			oy: j.oy,

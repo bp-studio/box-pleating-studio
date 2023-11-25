@@ -11,7 +11,7 @@ import type { CornerMap } from "./partition";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
-import type { JConfiguration, JJunction, JOverlap, JPartition } from "shared/json";
+import type { JConfiguration, JJunction, JOverlap, JPartition, OverlapId } from "shared/json";
 
 //=================================================================
 /**
@@ -33,10 +33,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 	public readonly $singleMode: boolean;
 
 	/**
-	 * Given the id (a negative number) of a {@link JOverlap},
-	 * return the indices of its {@link Partition} and itself.
+	 * Given the {@link OverlapId}, return the indices of its {@link Partition} and itself.
 	 */
-	public readonly $overlapMap!: ReadonlyMap<number, [number, number]>;
+	public readonly $overlapMap!: ReadonlyMap<OverlapId, [number, number]>;
 
 	/** Whether the origin needs to be updated. */
 	public $originDirty: boolean = false;
@@ -65,12 +64,12 @@ export class Configuration implements ISerializable<JConfiguration> {
 		this.$partitions = partitions.map(p => new Partition(this, p));
 
 		const overlaps: JOverlap[] = [];
-		const overlapMap: Map<number, [number, number]> = new Map();
+		const overlapMap: Map<OverlapId, [number, number]> = new Map();
 		let k = -1;
 		for(const [i, p] of partitions.entries()) {
 			for(const [j, o] of p.overlaps.entries()) {
 				overlaps.push(o);
-				overlapMap.set(k--, [i, j]);
+				overlapMap.set(k-- as OverlapId, [i, j]);
 			}
 		}
 		this.$overlaps = overlaps;
@@ -196,17 +195,19 @@ interface FreeCorner {
  */
 export function cleanUp(partitions: readonly JPartition[]): readonly JPartition[] {
 	// Gather all id
-	const idMap = new Map<number, number>();
+	const idMap = new Map<OverlapId, OverlapId>();
 	const overlaps = partitions.flatMap(p => p.overlaps);
 	for(let i = 0; i < overlaps.length; i++) {
-		idMap.set(overlaps[i].id!, convertIndex(i));
+		idMap.set(overlaps[i].id!, convertIndex(i) as OverlapId);
 		delete overlaps[i].id;
 	}
 
 	// Replace temporary id to real id
 	const corners = overlaps.flatMap(o => o.c);
 	for(const corner of corners) {
-		if(corner.e !== undefined && corner.e < 0) corner.e = idMap.get(corner.e);
+		if(corner.e !== undefined && corner.e < 0) {
+			corner.e = idMap.get(corner.e as OverlapId);
+		}
 	}
 
 	return partitions;

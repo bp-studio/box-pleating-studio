@@ -1,10 +1,10 @@
 import { Rectangle } from "core/math/geometry/rectangle";
-import { opposite } from "shared/types/direction";
+import { opposite, makeQuadrantCode, getQuadrant } from "shared/types/direction";
 import { CornerType } from "shared/json/enum";
 
+import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { JJunction, NodeId } from "shared/json";
 import type { ITreeNode } from "core/design/context";
-import type { QuadrantDirection } from "shared/types/direction";
 
 interface ValidJunctionData {
 	lca: ITreeNode;
@@ -16,8 +16,6 @@ interface ValidJunctionData {
 }
 
 export type Junctions = readonly ValidJunction[];
-
-export const MASK = 3;
 
 //=================================================================
 /**
@@ -39,10 +37,10 @@ export class ValidJunction implements ISerializable<JJunction> {
 	public readonly $lca: ITreeNode;
 
 	/** The quadrant code of {@link $a}. */
-	public readonly $q1: number;
+	public readonly $q1: QuadrantCode;
 
 	/** The quadrant code of {@link $b}. */
-	public readonly $q2: number;
+	public readonly $q2: QuadrantCode;
 
 	/** The dimension of the tip rectangle. */
 	public readonly $s: IPoint;
@@ -69,16 +67,16 @@ export class ValidJunction implements ISerializable<JJunction> {
 		this.$f = data.f;
 		this.$tip = data.tip;
 
-		this.$q1 = a.id << 2 | data.dir;
-		this.$q2 = b.id << 2 | opposite(data.dir);
+		this.$q1 = makeQuadrantCode(a.id, data.dir);
+		this.$q2 = makeQuadrantCode(b.id, opposite(data.dir));
 	}
 
 	toJSON(): JJunction {
 		return {
 			c: [
-				{ type: CornerType.flap, e: this.$a.id, q: this.$q1 & MASK },
+				{ type: CornerType.flap, e: this.$a.id, q: getQuadrant(this.$q1) },
 				{ type: CornerType.side },
-				{ type: CornerType.flap, e: this.$b.id, q: this.$q2 & MASK },
+				{ type: CornerType.flap, e: this.$b.id, q: getQuadrant(this.$q2) },
 				{ type: CornerType.side },
 			],
 			f: this.$f,

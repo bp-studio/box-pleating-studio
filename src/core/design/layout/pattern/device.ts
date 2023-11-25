@@ -6,14 +6,13 @@ import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
 import { clone } from "shared/utils/clone";
-import { MASK } from "../junction/validJunction";
-import { opposite } from "shared/types/direction";
+import { getNodeId, getQuadrant, opposite } from "shared/types/direction";
 import { toPath } from "core/math/geometry/rationalPath";
 import { convertIndex } from "shared/utils/pattern";
 
-import type { QuadrantDirection } from "shared/types/direction";
+import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { CornerMap, Partition } from "../partition";
-import type { JDevice, JConnection, JCorner } from "shared/json";
+import type { JDevice, JConnection, JCorner, OverlapId } from "shared/json";
 import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
 import type { Pattern } from "./pattern";
@@ -44,7 +43,7 @@ export class Device implements ISerializable<JDevice> {
 	 * This is available only after the {@link Device} has been initialized,
 	 * so we cannot use this during positioning.
 	 */
-	public $anchors!: readonly Point[][];
+	public $anchors!: readonly PerQuadrant<Point>[];
 
 	public $location!: IPoint;
 
@@ -111,7 +110,7 @@ export class Device implements ISerializable<JDevice> {
 		this._delta = origin.$add(new Vector(this.$location)).sub(Point.ZERO);
 
 		// Update anchors
-		const result: Point[][] = [];
+		const result: PerQuadrant<Point>[] = [];
 		for(const g of this.$gadgets) {
 			result.push(g.$anchorMap.map(m => this._transform(m[0])));
 		}
@@ -248,7 +247,7 @@ export class Device implements ISerializable<JDevice> {
 		for(const o of this.$partition.$overlaps) {
 			for(const corner of o.c) {
 				if(corner.type == CornerType.socket || corner.type == CornerType.internal) {
-					const [i] = this.$partition.$configuration.$overlapMap.get(corner.e!)!;
+					const [i] = this.$partition.$configuration.$overlapMap.get(corner.e as OverlapId)!;
 					result.add(this.$pattern.$devices[i]);
 				}
 			}
@@ -286,7 +285,7 @@ export class Device implements ISerializable<JDevice> {
 		if(corner.type != CornerType.intersection) return undefined;
 		const codes = this.$partition.$configuration.$repo.$quadrants.keys();
 		for(const code of codes) {
-			if(code >>> 2 == corner.e) return code & MASK;
+			if(getNodeId(code) == corner.e) return getQuadrant(code);
 		}
 		return undefined;
 	}

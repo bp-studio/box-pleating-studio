@@ -4,6 +4,8 @@ import Workspace, { nextTick } from "./workspaceService";
 import Dialogs from "./dialogService";
 import JSZip from "app/utils/jszip";
 
+import type { ProjId } from "shared/json";
+
 namespace ImportService {
 
 	document.body.addEventListener("dragover", e => {
@@ -86,7 +88,7 @@ namespace ImportService {
 		Dialogs.loader.hide();
 	}
 
-	async function openHandle(handle: FileSystemFileHandle, request: boolean): Promise<number | undefined> {
+	async function openHandle(handle: FileSystemFileHandle, request: boolean): Promise<ProjId | undefined> {
 		if(request && !await requestPermission(handle)) return undefined;
 		try {
 			const file = await handle.getFile();
@@ -111,7 +113,7 @@ namespace ImportService {
 	 * Load the obtained file handle and returns the file id
 	 * (or the last id for workspace files).
 	 */
-	async function openFile(file: File, handle?: FileSystemFileHandle): Promise<number | undefined> {
+	async function openFile(file: File, handle?: FileSystemFileHandle): Promise<ProjId | undefined> {
 		try {
 			const buffer = await FileUtility.readFile(file);
 			const test = String.fromCharCode(new Uint8Array(buffer.slice(0, 1))[0]);
@@ -138,7 +140,7 @@ namespace ImportService {
 	/**
 	 * Open a workspace file and return the last opened project id, if any.
 	 */
-	async function openWorkspace(buffer: ArrayBuffer): Promise<number | undefined> {
+	async function openWorkspace(buffer: ArrayBuffer): Promise<ProjId | undefined> {
 		const list = await JSZip.decompress(buffer);
 		const files = Object.keys(list);
 		const ids = await Workspace.openMultiple(

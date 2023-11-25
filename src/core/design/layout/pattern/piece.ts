@@ -8,10 +8,11 @@ import { toLines } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { norm } from "shared/types/geometry";
 import { $reduce } from "core/math/utils/gcd";
+import { perQuadrant } from "shared/types/direction";
 
+import type { PerQuadrant } from "shared/types/direction";
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
-import type { PerQuadrant } from "shared/types/direction";
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
 import type { JPiece } from "shared/json";
@@ -125,12 +126,12 @@ export class Piece extends Region implements JPiece {
 	@cache public get $anchors(): PerQuadrant<Point | null> {
 		const p = this._points;
 		const { contour } = this.$shape;
-		return [
+		return perQuadrant([
 			contour.some(c => c.eq(p[0])) ? p[0] : null,
 			contour.includes(p[1]) ? p[1] : null,
 			contour.some(c => c.eq(p[2])) ? p[2] : null,
 			contour.includes(p[3]) ? p[3] : null,
-		];
+		]);
 	}
 
 	@cache public get $direction(): Vector {

@@ -1,4 +1,3 @@
-
 /**
  * Convert overlap id back and forth to the index within {@link Configuration.$overlaps}.
  *

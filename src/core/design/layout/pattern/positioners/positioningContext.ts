@@ -7,7 +7,7 @@ import { getFirst } from "shared/utils/set";
 import type { Direction, QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../../repository";
 import type { Pattern } from "../pattern";
-import type { JJunction, JJunctions, JOverlap, JCorner } from "shared/json";
+import type { JJunction, JJunctions, JOverlap, JCorner, OverlapId } from "shared/json";
 import type { Device } from "../device";
 import type { Gadget } from "../gadget";
 
@@ -89,7 +89,7 @@ export class PositioningContext {
 		for(let q = 0; q < quadrantNumber; q++) {
 			const corner = overlap.c[q];
 			if(corner.type != CornerType.internal) continue;
-			const targetIndex = convertIndex(corner.e);
+			const targetIndex = convertIndex(corner.e as OverlapId);
 
 			const targetOverlap = this.$overlaps[targetIndex];
 			const oppositeCorner = targetOverlap.c[2 - q];

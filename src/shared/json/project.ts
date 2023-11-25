@@ -3,6 +3,8 @@ import type { JEdge } from "./tree";
 import type { JHistory } from "./history";
 import type { JFlap, JSheet, JVertex } from "./components";
 
+export type ProjId = TypedNumber<"ProjId">;
+
 export interface JProject {
 	/** File format version. */
 	version: string;

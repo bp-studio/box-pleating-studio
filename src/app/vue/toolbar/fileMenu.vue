@@ -90,6 +90,8 @@
 	import { show } from "@/modals/modalFragment.vue";
 	import RecentMenu from "./recentMenu.vue";
 
+	import type { ProjId } from "shared/json";
+
 	defineOptions({ name: "FileMenu" });
 
 	type SaveAsInstance = InstanceType<typeof SaveAs>;
@@ -145,8 +147,8 @@
 		gtag("event", "share", { method: "copy", content_type: "image" });
 	}
 
-	async function save(id?: number): Promise<boolean> {
-		if(id === undefined) id = Studio.project!.id as number;
+	async function save(id?: ProjId): Promise<boolean> {
+		if(id === undefined) id = Studio.project!.id;
 		const proj = Workspace.getProject(id)!;
 		gtag("event", "project_bps", { data1: proj.design.title });
 		try {

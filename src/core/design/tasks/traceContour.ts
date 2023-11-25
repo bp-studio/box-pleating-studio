@@ -6,9 +6,8 @@ import { mapDirections } from "core/math/geometry/path";
 import { AAUnion } from "core/math/sweepLine/polyBool";
 import { climb } from "./utils/climb";
 import { expandPath, simplify } from "./utils/expand";
-import { quadrantNumber } from "shared/types/direction";
+import { getQuadrant, quadrantNumber } from "shared/types/direction";
 import { getFactors } from "../layout/pattern/quadrant";
-import { MASK } from "../layout/junction/validJunction";
 
 import type { NodeId } from "shared/json/tree";
 import type { ValidJunction } from "../layout/junction/validJunction";
@@ -308,7 +307,7 @@ function createRawContourForLeaf(node: ITreeNode, leaf: ITreeNode): PathEx {
 	const final: Path = [];
 	const quadrants = [] as IPoint[];
 	for(const junction of coveredJunctions) {
-		const q = junction.$a === leaf ? junction.$q1 & MASK : junction.$q2 & MASK;
+		const q = junction.$a === leaf ? getQuadrant(junction.$q1) : getQuadrant(junction.$q2);
 		quadrants[q] = junction.$o;
 	}
 	for(let q = 0; q < quadrantNumber; q++) {

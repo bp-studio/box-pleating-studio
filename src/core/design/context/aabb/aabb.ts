@@ -1,4 +1,5 @@
 import { AABBSide } from "./aabbSide";
+import { perQuadrant } from "shared/types/direction";
 
 import type { PerQuadrant } from "shared/types/direction";
 import type { IRoundedRect } from "core/math/sweepLine/polyBool/rrIntersection/roundedRect";
@@ -136,11 +137,11 @@ export class AABB {
 }
 
 /** Four corners in the order of quadrants. */
-export function toCorners([t, r, b, l]: number[]): [IPoint, IPoint, IPoint, IPoint] {
-	return [
+export function toCorners([t, r, b, l]: number[]): PerQuadrant<IPoint> {
+	return perQuadrant([
 		{ x: r, y: t },
 		{ x: l, y: t },
 		{ x: l, y: b },
 		{ x: r, y: b },
-	];
+	]);
 }

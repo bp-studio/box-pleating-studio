@@ -1,7 +1,7 @@
 import { Store } from "./store";
 import { CornerType } from "shared/json";
 import { cache } from "core/utils/cache";
-import { Direction, opposite } from "shared/types/direction";
+import { Direction, makeQuadrantCode, opposite } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { State } from "core/service/state";
 import { deviceGenerator } from "./generators/deviceGenerator";
@@ -130,8 +130,8 @@ export class Partition implements ISerializable<JPartition> {
 		const n1 = c1.e as NodeId, n2 = c2.e as NodeId;
 		const f1 = tree.$nodes[n1]!, f2 = tree.$nodes[n2]!;
 
-		const quad1 = repo.$quadrants.get(n1 << 2 | c1.q!)!;
-		const quad2 = repo.$quadrants.get(n2 << 2 | c2.q!)!;
+		const quad1 = repo.$quadrants.get(makeQuadrantCode(n1, c1.q!))!;
+		const quad2 = repo.$quadrants.get(makeQuadrantCode(n2, c2.q!))!;
 		let d1 = 0, d2 = 0;
 
 		// For intersections, the actual overlap to retrieve can be a lot more complicated

@@ -12,11 +12,7 @@ import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
 import type { traceContourTask } from "core/design/tasks/traceContour";
 
-export type NodeCollection<T> = {
-	readonly [id: NodeId]: T | undefined;
-	readonly length: number;
-	[Symbol.iterator](): IterableIterator<T | undefined>;
-};
+export type NodeCollection<T> = Readonly<Record<NodeId, T | undefined>> & Omit<ReadonlyArray<T | undefined>, number>;
 
 export interface ITree {
 	readonly $nodes: NodeCollection<ITreeNode>;

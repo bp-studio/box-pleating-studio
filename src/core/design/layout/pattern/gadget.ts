@@ -1,6 +1,6 @@
 import { Piece } from "./piece";
 import { Point } from "core/math/geometry/point";
-import { makePerQuadrant } from "shared/types/direction";
+import { makePerQuadrant, perQuadrant } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
 import { cache } from "core/utils/cache";
 import { Fraction } from "core/math/fraction";
@@ -64,7 +64,7 @@ export class Gadget implements JGadget {
 	}
 
 	@cache public get $slack(): PerQuadrant<number> {
-		if(!this.anchors) return [0, 0, 0, 0];
+		if(!this.anchors) return perQuadrant([0, 0, 0, 0]);
 		return makePerQuadrant(q => this._getSlack(q));
 	}
 

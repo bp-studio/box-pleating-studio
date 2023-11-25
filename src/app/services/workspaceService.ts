@@ -6,7 +6,7 @@ import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { isHttps } from "app/shared/constants";
 
-import type { CoreError, JProject } from "shared/json";
+import type { CoreError, JProject, ProjId } from "shared/json";
 import type * as Client from "client/main";
 import type { Project } from "client/project/project";
 
@@ -30,14 +30,14 @@ namespace WorkspaceService {
 	 * By making it a {@link shallowRef} instead of {@link reactive},
 	 * we have better compatibilities over libraries.
 	 */
-	export const ids = shallowRef<readonly number[]>([]);
+	export const ids = shallowRef<readonly ProjId[]>([]);
 
 	/** All opened {@link Project}s in the order of tabs */
 	export const projects = computed(() => ids.value.map(id => bp.projects.get(id)!));
 
 	const tabHistory: Project[] = [];
 
-	export function getProject(id: number): Project | undefined {
+	export function getProject(id: ProjId): Project | undefined {
 		if(!Studio.initialized) return undefined;
 		return bp.projects.get(id);
 	}
@@ -78,7 +78,7 @@ namespace WorkspaceService {
 	 * Open multiple files in parallel,
 	 * but ensure that the tab is opened in the correct order.
 	 */
-	export async function openMultiple(jsons: Pseudo<JProject>[], failCallback?: Action[]): Promise<number[]> {
+	export async function openMultiple(jsons: Pseudo<JProject>[], failCallback?: Action[]): Promise<ProjId[]> {
 		const tasks: Promise<Project | null>[] = [];
 		for(let i = 0; i < jsons.length; i++) {
 			const task: Promise<Project | null> = bp.projects
@@ -90,8 +90,8 @@ namespace WorkspaceService {
 			tasks.push(task);
 		}
 		const results = await Promise.all(tasks);
-		const successIds: number[] = [];
-		manipulateIds((arr: number[]) => {
+		const successIds: ProjId[] = [];
+		manipulateIds((arr: ProjId[]) => {
 			for(const proj of results) {
 				if(!proj) continue;
 				successIds.push(proj.id);
@@ -102,7 +102,7 @@ namespace WorkspaceService {
 		return successIds;
 	}
 
-	export function select(id: number): void {
+	export function select(id: ProjId): void {
 		const proj = getProject(id);
 		if(!proj) return; // this happens if the session project is corrupted
 
@@ -118,7 +118,7 @@ namespace WorkspaceService {
 		});
 	}
 
-	export async function close(id: number, force?: boolean): Promise<void> {
+	export async function close(id: ProjId, force?: boolean): Promise<void> {
 		if(await closeCore(id, force)) selectLast();
 	}
 
@@ -126,11 +126,11 @@ namespace WorkspaceService {
 		if(tabHistory.length) select(tabHistory[0].id);
 	}
 
-	export async function closeOther(id: number): Promise<void> {
+	export async function closeOther(id: ProjId): Promise<void> {
 		await closeBy(i => i != id);
 	}
 
-	export async function closeRight(id: number): Promise<void> {
+	export async function closeRight(id: ProjId): Promise<void> {
 		await closeBy(i => ids.value.indexOf(i) > ids.value.indexOf(id));
 	}
 
@@ -138,7 +138,7 @@ namespace WorkspaceService {
 		await closeBy(i => true);
 	}
 
-	async function closeBy(predicate: (i: number) => boolean): Promise<void> {
+	async function closeBy(predicate: (i: ProjId) => boolean): Promise<void> {
 		const promises: Promise<boolean>[] = [];
 		for(const i of ids.value.concat()) if(predicate(i)) promises.push(closeCore(i));
 		await Promise.all(promises);
@@ -150,7 +150,7 @@ namespace WorkspaceService {
 	/**
 	 * @param force Whether to ignore saving warning and force close the project.
 	 */
-	async function closeCore(id: number, force?: boolean): Promise<boolean> {
+	async function closeCore(id: ProjId, force?: boolean): Promise<boolean> {
 		const proj = bp.projects.get(id)!;
 		const title = proj.design.title || i18n.t("keyword.untitled");
 		if(!force && proj.history.isModified) {
@@ -168,7 +168,7 @@ namespace WorkspaceService {
 		return true;
 	}
 
-	export async function clone(id: number): Promise<void> {
+	export async function clone(id: ProjId): Promise<void> {
 		const i = ids.value.indexOf(id);
 		const proj = projects.value[i].toJSON(true);
 		const c = await bp.projects.open(checkTitle(proj));
@@ -177,14 +177,14 @@ namespace WorkspaceService {
 		gtag("event", "project_clone");
 	}
 
-	function manipulateIds(action: Consumer<number[]>): void {
+	function manipulateIds(action: Consumer<ProjId[]>): void {
 		const arr = ids.value.concat();
 		action(arr);
 		ids.value = arr;
 	}
 
 	Studio.$onSetupOptions.push(options =>
-		options.onError = async (id: number, error: CoreError, backup?: JProject) => {
+		options.onError = async (id: ProjId, error: CoreError, backup?: JProject) => {
 			const log = cloneObj(backup);
 			if(log) {
 				error.build = app_config.app_version;

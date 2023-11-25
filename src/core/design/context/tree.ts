@@ -84,7 +84,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 
 	/** Public node array. */
 	public get $nodes(): NodeCollection<TreeNode> {
-		return this._nodes;
+		return this._nodes as NodeCollection<TreeNode>;
 	}
 
 	public $removeLeaf(id: NodeId): boolean {

@@ -8,7 +8,7 @@ import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
 
 import type { Route, CoreResponse, ErrorResponse } from "core/routes";
-import type { JProject } from "shared/json";
+import type { JProject, ProjId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
 /**
@@ -25,7 +25,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 	public static $onFatalError: Action;
 
-	public readonly id: number;
+	public readonly id: ProjId;
 	public readonly design: Design;
 	public readonly history: HistoryManager;
 
@@ -62,7 +62,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		// It will become active when selected later (see ProjectService)
 		super(false);
 
-		this.id = nextId++;
+		this.id = nextId++ as ProjId;
 
 		const jProject = deepAssign(Migration.$getSample(), json);
 

@@ -31,10 +31,11 @@
 	import Handle from "app/services/handleService";
 
 	import type { Project } from "client/project/project";
+	import type { ProjId } from "shared/json";
 
 	defineOptions({ name: "Tab" });
 
-	const props = defineProps<{ id: number }>();
+	const props = defineProps<{ id: ProjId }>();
 
 	function project(): Project {
 		return Workspace.getProject(props.id)!;

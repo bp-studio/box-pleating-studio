@@ -1,6 +1,6 @@
 
 /** Type alias for node ids. */
-export type NodeId = number & { _NodeId: undefined };
+export type NodeId = TypedNumber<"NodeId">;
 
 export interface JEdgeBase {
 	n1: NodeId;

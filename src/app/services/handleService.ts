@@ -4,17 +4,19 @@ import * as idbKeyval from "idb-keyval"; // This library is really tiny, so it's
 import { isFileApiEnabled } from "app/shared/constants";
 import Workspace from "./workspaceService";
 
+import type { ProjId } from "shared/json";
+
 namespace HandleService {
 
 	export const recent: FileSystemFileHandle[] = reactive([]);
 
-	const handles: Map<number, FileSystemFileHandle> = reactive(new Map());
+	const handles: Map<ProjId, FileSystemFileHandle> = reactive(new Map());
 
-	export function get(id: number): FileSystemFileHandle {
+	export function get(id: ProjId): FileSystemFileHandle {
 		return handles.get(id)!;
 	}
 
-	export function set(id: number, value: FileSystemFileHandle): void {
+	export function set(id: ProjId, value: FileSystemFileHandle): void {
 		handles.set(id, value);
 	}
 
@@ -32,7 +34,7 @@ namespace HandleService {
 	 * Find the id of existing handle in the given {@link FileSystemFileHandle} array.
 	 * It returns `undefined` if not found.
 	 */
-	export function locate(list: FileHandleList): Promise<(number | undefined)[]> {
+	export function locate(list: FileHandleList): Promise<(ProjId | undefined)[]> {
 		const opened = [...handles.entries()];
 		const idTasks = list.map(async h => {
 			const tasks = opened.map(e => e[1].isSameEntry(h).then(yes => yes ? e[0] : undefined));

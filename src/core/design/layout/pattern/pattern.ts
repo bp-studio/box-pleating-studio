@@ -7,7 +7,7 @@ import { twoJunctionPositioner } from "./positioners/twoJunctionPositioner";
 import { PositioningContext } from "./positioners/positioningContext";
 
 import type { Gadget } from "./gadget";
-import type { JConnection, JDevice, JPattern, NodeId } from "shared/json";
+import type { JConnection, JDevice, JPattern, NodeId, OverlapId } from "shared/json";
 import type { Configuration } from "../configuration";
 
 //=================================================================
@@ -61,7 +61,7 @@ export class Pattern implements ISerializable<JPattern> {
 		if(c.e >= 0) {
 			return new Point(State.$tree.$nodes[c.e as NodeId]!.$AABB.$points[c.q]);
 		} else {
-			const [i, j] = this.$config.$overlapMap.get(c.e)!;
+			const [i, j] = this.$config.$overlapMap.get(c.e as OverlapId)!;
 			return this.$devices[i].$anchors[j][c.q];
 		}
 	}
@@ -91,6 +91,6 @@ export class Pattern implements ISerializable<JPattern> {
 	}
 
 	private _getDeviceOfConnection(c: JConnection): Device {
-		return this.$devices[this.$config.$overlapMap.get(c.e)![0]];
+		return this.$devices[this.$config.$overlapMap.get(c.e as OverlapId)![0]];
 	}
 }
