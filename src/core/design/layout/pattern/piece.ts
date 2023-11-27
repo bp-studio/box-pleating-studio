@@ -212,6 +212,7 @@ export class Piece extends Region implements JPiece {
 			}
 
 			// Something is wrong with the given detour if we get here.
+			/* istanbul ignore next */
 			debugger;
 		}
 	}

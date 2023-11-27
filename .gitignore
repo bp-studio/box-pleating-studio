@@ -19,5 +19,9 @@ debug.log
 /docs/*.toc
 /docs/*.snm
 
+# Istanbul
+.nyc_output/
+coverage/
+
 # My own notes
 NOTE.md

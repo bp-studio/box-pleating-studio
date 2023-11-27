@@ -6,6 +6,7 @@
  * https://caniuse.com/mdn-javascript_builtins_globalthis
  */
 //=================================================================
+/* istanbul ignore next */
 if(typeof globalThis === "undefined") {
 	Object.defineProperty(window, "globalThis", {
 		value: window,

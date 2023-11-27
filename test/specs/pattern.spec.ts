@@ -9,6 +9,11 @@ import { State, fullReset } from "core/service/state";
 
 import type { JEdge, JFlap, NodeId } from "shared/json";
 
+const id0 = 0 as NodeId;
+const id1 = 1 as NodeId;
+const id2 = 2 as NodeId;
+const id3 = 3 as NodeId;
+
 describe("Pattern search", function() {
 
 	describe("Three flap patterns", function() {
@@ -50,6 +55,18 @@ describe("Pattern search", function() {
 			}
 		});
 
+		it("Standard join", function() {
+			generateFromFlaps([
+				{ id: id1, x: 0, y: 0, radius: 11 },
+				{ id: id2, x: 5, y: 12, radius: 2 },
+				{ id: id3, x: 15, y: 8, radius: 6 },
+			]);
+			const stretch = State.$stretches.get("1,2,3")!;
+			expect(stretch).to.be.not.undefined;
+			expect(stretch.$repo.$configurations.length).to.equal(1);
+			expect(stretch.$repo.$configurations[0].$length).to.equal(2, "Should find two standard joins.");
+		});
+
 	});
 
 });
@@ -81,7 +98,7 @@ interface IFlap {
 
 function generateFromFlaps(flaps: IFlap[]): Tree {
 	return loadAndComplete(
-		flaps.map(f => ({ n1: 0 as NodeId, n2: f.id, length: f.radius })),
+		flaps.map(f => ({ n1: id0, n2: f.id, length: f.radius })),
 		flaps.map(f => ({ id: f.id, width: 0, height: 0, x: f.x, y: f.y }))
 	);
 }

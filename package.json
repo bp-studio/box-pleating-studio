@@ -10,7 +10,7 @@
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"lint": "eslint src",
 		"loc": "powershell \"(gci src -include *.ts,*.htm,*.scss,*.vue -recurse | select-string .).Count\"",
-		"test": "mocha"
+		"test": "nyc --reporter=lcovonly mocha"
 	},
 	"author": "Mu-Tsun Tsai",
 	"license": "MIT",
@@ -84,6 +84,7 @@
 		"lazypipe": "^1.0.2",
 		"marked": "^10.0.0",
 		"mocha": "^10.2.0",
+		"nyc": "^15.1.0",
 		"postcss": "^8.4.31",
 		"postcss-html": "^1.5.0",
 		"postcss-preset-env": "^9.3.0",

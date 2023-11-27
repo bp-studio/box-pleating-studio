@@ -62,9 +62,11 @@ export class Fraction {
 				this._p = result._p;
 				this._q = result._q;
 			} else {
+				/* istanbul ignore next */
 				throw new InvalidParameterError();
 			}
 		} else {
+			/* istanbul ignore next */
 			throw new InvalidParameterError();
 		}
 		this._normalize();

@@ -22,6 +22,7 @@ export function flatMap<T, U, This = undefined>(
 	return result;
 }
 
+/* istanbul ignore next */
 if(typeof Array.prototype.flatMap !== "function") {
 	Object.defineProperty(Array.prototype, "flatMap", {
 		enumerable: false,

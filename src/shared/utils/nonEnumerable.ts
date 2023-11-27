@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 
 /**
  * Declare a field as non-enumerable.

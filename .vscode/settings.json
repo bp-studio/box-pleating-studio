@@ -1,9 +1,4 @@
 {
-	"VSCodeCounter.include": [
-		"src/**/*.ts",
-		"src/**/*.vue",
-		"src/**/*.htm"
-	],
 	"[jsonc]": {
 		"editor.formatOnSave": true
 	},
@@ -13,8 +8,7 @@
 		".vscode",
 		".eslintrc*",
 		"debug/**/*",
-		"src/**/paper.d.ts",
-		"src/**/PolyBool.ts"
+		"**/*sample*",
 	],
 	"cSpell.ignoreRegExpList": [
 		"/[A-Z]+(?![a-z])/g"
@@ -99,6 +93,7 @@
 		".eslintrc.json": "eslint-local-rules.js"
 	},
 	"files.exclude": {
+		".nyc_output": true,
 		"**/debug.log": true,
 		"**/node_modules": true
 	},
