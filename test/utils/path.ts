@@ -25,12 +25,12 @@ function rotatePath(path: Path, pt: IPoint): boolean {
 declare global {
 	namespace Chai {
 		interface Assertion {
-			equalPath(pathString: string): Chai.Assertion;
+			equalPath(pathString: string, circular?: boolean): Chai.Assertion;
 		}
 	}
 }
 
-Assertion.addMethod("equalPath", function(pathString: string) {
+Assertion.addMethod("equalPath", function(pathString: string, circular: boolean = false) {
 	this.assert(
 		Array.isArray(this._obj),
 		"expect #{this} to be an array",
@@ -40,17 +40,22 @@ Assertion.addMethod("equalPath", function(pathString: string) {
 	const path = (this._obj as Path).concat();
 	const orgPathString = pathToString(path);
 
-	const match = pathString.match(/\((\d*\.?\d+),(\d*\.?\d+)(?:,\d*\.?\d+){0,3}\)/)!;
-	const point = { x: Number(match[1]), y: Number(match[2]) };
-	const rotateResult = rotatePath(path, point);
+	// Accepts fractions
+	pathString = pathString.replace(/(\d+)\/(\d+)/g, (_, $1, $2) => (Number($1) / Number($2)).toString());
 
-	this.assert(
-		rotateResult,
-		"expect #{act} to contain the point #{exp}",
-		"expect #{act} to not contain the point #{exp}",
-		match[0],
-		orgPathString
-	);
+	if(circular) {
+		const match = pathString.match(/\((-?\d*\.?\d+),(-?\d*\.?\d+)(?:,-?\d*\.?\d+){0,3}\)/)!;
+		const point = { x: Number(match[1]), y: Number(match[2]) };
+		const rotateResult = rotatePath(path, point);
+		this.assert(
+			rotateResult,
+			"expect #{act} to contain the point #{exp}",
+			"expect #{act} to not contain the point #{exp}",
+			match[0],
+			orgPathString
+		);
+	}
+
 	this.assert(
 		pathToString(path) == pathString,
 		"expect #{act} to equal #{exp}",

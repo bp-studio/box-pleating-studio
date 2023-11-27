@@ -23,6 +23,18 @@ describe("Tree", function() {
 		expect(tree.$root.$height).to.equal(1);
 	});
 
+	it("Fool-proof on invalid input", function() {
+		expect(() => createTree([
+			{ n1: 0, n2: 1, length: 2 },
+			{ n1: 2, n2: 3, length: 2 }, // wrong input ordering
+			{ n1: 1, n2: 2, length: 2 },
+			{ n1: 1, n2: 2, length: 3 }, // duplicate edge
+			{ n1: 2, n2: 1, length: 4 }, // duplicate edge in reverse
+			{ n1: 2, n2: 0, length: 1 }, // circuit
+			{ n1: 4, n2: 3, length: 1 }, // new edge in reverse
+		])).to.not.throw();
+	});
+
 	it("Balances itself", function() {
 		const tree = createTree([
 			{ n1: 0, n2: 1, length: 2 },
@@ -126,7 +138,7 @@ describe("Tree", function() {
 	});
 
 	describe("Edge joining", function() {
-		it("Works with root node", function() {
+		it("Works with root and non-root nodes", function() {
 			const tree = createTree([
 				{ n1: 0, n2: 1, length: 2 },
 				{ n1: 1, n2: 2, length: 2 },
@@ -135,10 +147,13 @@ describe("Tree", function() {
 			]);
 			expect(tree.$root.id).to.equal(0);
 
+			TreeController.join(id1);
+			expect(tree.$root.id).to.equal(0);
+			const n1 = node(2)!;
+			expect(n1.$parent?.id).to.equal(0);
+
 			TreeController.join(id0);
 			expect(tree.$root.id).to.equal(3);
-			const n1 = tree.$nodes[id1]!;
-			expect(n1.$parent?.id).to.equal(3);
 		});
 	});
 
@@ -155,6 +170,42 @@ describe("Tree", function() {
 
 			TreeController.split({ n1: id3, n2: id0 }, id6);
 			expect(tree.$root.id).to.equal(6);
+		});
+	});
+
+	describe("Leaf removal", function() {
+		it("Works with current root", function() {
+			const tree = createTree([
+				{ n1: 0, n2: 1, length: 2 },
+				{ n1: 1, n2: 2, length: 2 },
+				{ n1: 2, n2: 3, length: 2 },
+				{ n1: 0, n2: 4, length: 2 },
+				{ n1: 4, n2: 5, length: 2 },
+				{ n1: 5, n2: 6, length: 2 },
+			]);
+			expect(tree.$root.id).to.equal(0);
+
+			TreeController.removeLeaf(
+				[id3, id2, id1, id0],
+				[{ id: id4, x: 1, y: 1, width: 0, height: 0 }]
+			);
+			expect(tree.$root.id).to.equal(5);
+		});
+	});
+
+	describe("Edge merging", function() {
+		it("Merge end nodes of an edge", function() {
+			const tree = createTree([
+				{ n1: 0, n2: 1, length: 2 },
+				{ n1: 1, n2: 2, length: 2 },
+				{ n1: 1, n2: 3, length: 2 },
+				{ n1: 0, n2: 4, length: 2 },
+				{ n1: 0, n2: 5, length: 2 },
+			]);
+
+			TreeController.merge({ n1: id0, n2: id1 });
+			expect(tree.$root.id).to.equal(0);
+			expect(node(0)!.$children.$size).to.equal(4);
 		});
 	});
 

@@ -70,6 +70,7 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public toJSON(): JEdge {
+		/* istanbul ignore if */
 		if(!this.$parent) throw new Error("Cannot export root node");
 		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}
@@ -109,14 +110,6 @@ export class TreeNode implements ITreeNode {
 	public $setAABB(top: number, right: number, bottom: number, left: number): void {
 		State.$flapAABBChanged.add(this);
 		this.$AABB.$update(top, right, bottom, left);
-	}
-
-	/** Removes self if self is leaf, and returns whether the operation is successful. */
-	public $remove(): boolean {
-		const parent = this.$parent;
-		if(this.$children.$get() || !parent) return false;
-		this.$cut();
-		return true;
 	}
 
 	public $pasteTo(parent: this): void {

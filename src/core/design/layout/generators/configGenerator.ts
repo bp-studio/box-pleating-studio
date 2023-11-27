@@ -25,10 +25,12 @@ export function* configGenerator(repo: Repository, prototype?: JStretch): Genera
 			try {
 				const jConfig: JConfiguration = { partitions: proto.partitions, patterns: [pattern] };
 				const config = new Configuration(repo, jConfig);
+				/* istanbul ignore if */
 				if(!config.$pattern) throw new Error();
 				protoSignature = config.$signature;
 				yield config;
 			} catch {
+				/* istanbul ignore next */
 				console.log("Incompatible old version.");
 			}
 		}

@@ -1,14 +1,54 @@
 import { expect } from "chai";
 
+import { DesignController } from "core/controller/designController";
+import { LayoutController } from "core/controller/layoutController";
+import { Migration } from "client/patches";
 import { pathToString } from "core/math/geometry/path";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
 import { createTree, node } from "../utils/tree";
+import * as sample from "../samples/v04.session.sample.json";
 
 import type { NEdge, NFlap } from "../utils/tree";
 import type { Tree } from "core/design/context/tree";
 
 describe("Pattern search", function() {
+
+	it("Loads saved patterns", function() {
+		fullReset();
+		const data = Migration.$process(sample);
+		DesignController.init(data.design);
+	});
+
+	describe("Two flap patterns", function() {
+
+		it("Finds universal GPS patterns", function() {
+			fullReset();
+			createTree(
+				[
+					{ n1: 0, n2: 1, length: 6 },
+					{ n1: 0, n2: 2, length: 6 },
+				],
+				[
+					{ id: 1, x: 0, y: 0, width: 0, height: 0 },
+					{ id: 2, x: 11, y: 5, width: 0, height: 0 },
+				]
+			);
+			LayoutController.completeStretch("1,2");
+			const stretch = State.$stretches.get("1,2")!;
+			expect(stretch).to.be.not.undefined;
+			expect(stretch.$repo.$configurations.length).to.equal(1);
+			const config = stretch.$repo.$configurations[0];
+			expect(config.$length).to.equal(2);
+			const pattern = config.$pattern!;
+			expect(pattern.$devices.length).to.equal(1);
+			const device = pattern.$devices[0];
+			expect(device.$gadgets.length).to.equal(1);
+			const anchors = device.$anchors[0].map(p => p.$toIPoint());
+			expect(anchors).to.equalPath("(0,0),(2,3),(43/4,19/4),(9,2)");
+		});
+
+	});
 
 	describe("Three flap patterns", function() {
 
@@ -28,7 +68,7 @@ describe("Pattern search", function() {
 				expect(B.$graphics.$patternContours.length).to.be.equal(1);
 
 				const path = toPath(B.$graphics.$patternContours[0]);
-				expect(pathToString(path)).to.equal("(8,3),(7,4.333333333333333),(7,6),(5.333333333333333,6),(4,7),(4,8)");
+				expect(path).to.equalPath("(8,3),(7,13/3),(7,6),(16/3,6),(4,7),(4,8)");
 			}
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
@@ -45,7 +85,7 @@ describe("Pattern search", function() {
 				expect(B.$graphics.$patternContours.length).to.be.equal(1);
 
 				const path = toPath(B.$graphics.$patternContours[0]);
-				expect(pathToString(path)).to.equal("(-4,8),(-4,7),(-5.333333333333333,6),(-7,6),(-7,4.333333333333333),(-8,3)");
+				expect(path).to.equalPath("(-4,8),(-4,7),(-16/3,6),(-7,6),(-7,13/3),(-8,3)");
 			}
 		});
 
@@ -58,7 +98,12 @@ describe("Pattern search", function() {
 			const stretch = State.$stretches.get("1,2,3")!;
 			expect(stretch).to.be.not.undefined;
 			expect(stretch.$repo.$configurations.length).to.equal(1);
-			expect(stretch.$repo.$configurations[0].$length).to.equal(2, "Should find two standard joins.");
+			const config = stretch.$repo.$configurations[0];
+			expect(config.$length).to.equal(2, "Should find two standard joins.");
+			const pattern = config.$pattern!;
+			expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
+			const device = pattern.$devices[0];
+			expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
 		});
 
 	});

@@ -22,7 +22,7 @@ describe("PolyBool", function() {
 			);
 			expect(result.length).to.equal(1);
 			let path = result[0];
-			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)");
+			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)", true);
 
 			// Test 2
 			result = new AAUnion().$get(
@@ -31,7 +31,7 @@ describe("PolyBool", function() {
 			);
 			expect(result.length).to.equal(1);
 			path = result[0];
-			expect(path).to.equalPath("(1,0),(3,0),(3,2),(4,2),(4,4),(0,4),(0,2),(1,2)");
+			expect(path).to.equalPath("(1,0),(3,0),(3,2),(4,2),(4,4),(0,4),(0,2),(1,2)", true);
 		});
 
 		it("Results can be taken union again", function() {
@@ -47,7 +47,7 @@ describe("PolyBool", function() {
 			expect(result2.length).to.equal(1);
 
 			const path = result2[0];
-			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)");
+			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)", true);
 		});
 
 		it("Can handle multiple subpaths", function() {
@@ -60,8 +60,8 @@ describe("PolyBool", function() {
 
 			const path1 = result.find(p => p.length == 6);
 			const path2 = result.find(p => p.length == 4);
-			expect(path1).to.equalPath("(0,2),(1,2),(2,2),(2,3),(1,3),(0,3)");
-			expect(path2).to.equalPath("(0,0),(1,0),(1,1),(0,1)");
+			expect(path1).to.equalPath("(0,2),(1,2),(2,2),(2,3),(1,3),(0,3)", true);
+			expect(path2).to.equalPath("(0,0),(1,0),(1,1),(0,1)", true);
 		});
 
 		it("Can handle holes", function() {
@@ -75,8 +75,8 @@ describe("PolyBool", function() {
 
 			const path1 = result.find(p => p.length == 12)!;
 			const path2 = result.find(p => p.length == 4)!;
-			expect(path1).to.equalPath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)");
-			expect(path2).to.equalPath("(2,2),(2,4),(4,4),(4,2)"); // hole, clockwise
+			expect(path1).to.equalPath("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)", true);
+			expect(path2).to.equalPath("(2,2),(2,4),(4,4),(4,2)", true); // hole, clockwise
 		});
 
 		it("Can solve self-intersection", function() {
@@ -85,7 +85,7 @@ describe("PolyBool", function() {
 			);
 			expect(result.length).to.equal(1);
 			const path = result[0];
-			expect(path).to.equalPath("(0,0),(3,0),(3,2),(2,2),(2,3),(0,3)");
+			expect(path).to.equalPath("(0,0),(3,0),(3,2),(2,2),(2,3),(0,3)", true);
 		});
 
 		it("Can handle keyholes", function() {
@@ -95,8 +95,8 @@ describe("PolyBool", function() {
 			expect(result.length).to.equal(2);
 			const path1 = result.find(p => p.length == 5)!;
 			const path2 = result.find(p => p.length == 4)!;
-			expect(path1).to.equalPath("(0,0),(3,0),(3,2),(3,3),(0,3)");
-			expect(path2).to.equalPath("(1,1),(1,2),(2,2),(2,1)"); // hole, clockwise
+			expect(path1).to.equalPath("(0,0),(3,0),(3,2),(3,3),(0,3)", true);
+			expect(path2).to.equalPath("(1,1),(1,2),(2,2),(2,1)", true); // hole, clockwise
 		});
 
 		// eslint-disable-next-line mocha/no-skipped-tests
@@ -165,7 +165,7 @@ describe("PolyBool", function() {
 			);
 			expect(result.length).to.equal(1);
 			const path = result[0];
-			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)");
+			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)", true);
 		});
 
 		it("Finds general union", function() {
@@ -175,7 +175,7 @@ describe("PolyBool", function() {
 			);
 			expect(result.length).to.equal(1);
 			const path = result[0];
-			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)");
+			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)", true);
 		});
 
 		// eslint-disable-next-line mocha/no-skipped-tests
@@ -208,7 +208,7 @@ describe("PolyBool", function() {
 			], 1);
 			expect(result.length).to.equal(1);
 			expect(result[0].$outer.length).to.equal(1); // The hole degenerates and vanishes
-			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)");
+			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)", true);
 		});
 
 		it("Expands holes with repeated points", function() {
@@ -219,8 +219,8 @@ describe("PolyBool", function() {
 			expect(result[0].$outer.length).to.equal(3);
 			const holes = result[0].$outer.filter(p => p.isHole);
 			expect(holes.length).to.equal(2);
-			expect(holes[0]).to.equalPath("(3,6),(3,5),(2,5),(2,6)");
-			expect(holes[1]).to.equalPath("(6,3),(6,2),(5,2),(5,3)");
+			expect(holes[0]).to.equalPath("(3,6),(3,5),(2,5),(2,6)", true);
+			expect(holes[1]).to.equalPath("(6,3),(6,2),(5,2),(5,3)", true);
 		});
 	});
 
@@ -231,7 +231,7 @@ describe("PolyBool", function() {
 				{ x: 3, y: 3, width: 0, height: 0, radius: 1 }
 			);
 			expect(result.length).to.equal(1);
-			expect(result[0]).to.equalPath("(2,3),(3,2,2,2,1),(3.8660254037844384,2.5,3.5773502691896257,2,1),(3,3,3.5773502691896257,3,1)");
+			expect(result[0]).to.equalPath("(2,3),(3,2,2,2,1),(3.8660254037844384,2.5,3.5773502691896257,2,1),(3,3,3.5773502691896257,3,1)", true);
 		});
 
 		it("Handles complete overlapping", function() {
@@ -240,7 +240,7 @@ describe("PolyBool", function() {
 				{ x: 2, y: 2, width: 0, height: 0, radius: 1 } // completely contained in the previous one
 			);
 			expect(result.length).to.equal(1);
-			expect(result[0]).to.equalPath("(1,2,1,3,1),(2,1,1,1,1),(3,2,3,1,1),(2,3,3,3,1)");
+			expect(result[0]).to.equalPath("(1,2,1,3,1),(2,1,1,1,1),(3,2,3,1,1),(2,3,3,3,1)", true);
 		});
 
 		it("Handles arc trisection", function() {
@@ -249,7 +249,7 @@ describe("PolyBool", function() {
 				{ x: 3, y: 3, width: 0, height: 0, radius: 3 }
 			);
 			expect(result.length).to.equal(1);
-			expect(result[0]).to.equalPath("(1,2,2,2,1),(0.29289321881345254,1.7071067811865475,0.5857864376269049,2,1),(1.7071067811865475,0.29289321881345254,0.75,0.75,3),(2,1,2,0.585786437626905,1)");
+			expect(result[0]).to.equalPath("(1,2,2,2,1),(0.29289321881345254,1.7071067811865475,0.5857864376269049,2,1),(1.7071067811865475,0.29289321881345254,0.75,0.75,3),(2,1,2,0.585786437626905,1)", true);
 		});
 
 		it("Handles epsilon errors", function() {
@@ -259,7 +259,7 @@ describe("PolyBool", function() {
 				{ x: 3, y: 3, width: 0, height: 0, radius: 3 }
 			);
 			expect(result.length).to.equal(1);
-			expect(result[0]).to.equalPath("(2,5,2,4,1),(1.7071067811865483,5.707106781186548,2.0000000000000004,5.414213562373095,1),(0.2928932188134521,4.292893218813452,0.75,5.25,3),(1,4,0.585786437626905,4,1)");
+			expect(result[0]).to.equalPath("(2,5,2,4,1),(1.7071067811865483,5.707106781186548,2.0000000000000004,5.414213562373095,1),(0.2928932188134521,4.292893218813452,0.75,5.25,3),(1,4,0.585786437626905,4,1)", true);
 		});
 	});
 });
