@@ -5,11 +5,16 @@ import TrivialMigration from "./migrations/trivialMigration";
 import ProjectMigration from "./migrations/projectMigration";
 import { Migration } from "./migration";
 
+// These version formats were never publicly released,
+// therefore it should be OK to remove these migrations in the future.
 Migration.$add(BetaMigration, "beta");
 Migration.$add(Rc0Migration, "rc0");
 Migration.$add(Rc1Migration, "rc1");
 
-/** Version 0 is identical as rc1. We change the version code just for the record. */
+/**
+ * Version 0 is identical as rc1. We change the version code just for the record.
+ * This is the first publicly released format.
+ */
 Migration.$add(TrivialMigration, "0");
 
 /**

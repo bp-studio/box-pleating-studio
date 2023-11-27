@@ -62,7 +62,7 @@ export namespace Migration {
 		let deprecate = false;
 		while(i < migrations.length) {
 			console.info("Applying migration " + migrations[i][1]);
-			deprecate ||= migrations[i][0](proj);
+			deprecate = migrations[i][0](proj) || deprecate; // Ordering matters
 			i++;
 		}
 		proj.version = $getCurrentVersion();
