@@ -1,21 +1,13 @@
 import { expect } from "chai";
 
 import { TreeController } from "core/controller/treeController";
-import { Tree, getDist } from "core/design/context/tree";
+import { getDist } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
-import { State, fullReset } from "core/service/state";
-
-import type { JEdge, JFlap, NodeId } from "shared/json";
+import { fullReset } from "core/service/state";
+import { createTree, node, id0, id1, id2, id3, id4, id6 } from "../utils/tree";
 
 describe("Tree", function() {
-
-	const id0 = 0 as NodeId;
-	const id1 = 1 as NodeId;
-	const id2 = 2 as NodeId;
-	const id3 = 3 as NodeId;
-	const id4 = 4 as NodeId;
-	const id6 = 6 as NodeId;
 
 	beforeEach(function() {
 		fullReset();
@@ -25,7 +17,7 @@ describe("Tree", function() {
 		const tree = createTree([
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
-		] as JEdge[]);
+		]);
 		expect(tree.$nodes.length).to.equal(3);
 		expect(tree.$root.id).to.equal(0);
 		expect(tree.$root.$height).to.equal(1);
@@ -35,9 +27,9 @@ describe("Tree", function() {
 		const tree = createTree([
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
-		] as JEdge[]);
-		const n0 = tree.$nodes[id0]!;
-		const n1 = tree.$nodes[id1]!;
+		]);
+		const n0 = node(0);
+		const n1 = node(1);
 		expect(tree.$root).to.equal(n0);
 
 		// Add two more edges, causing unbalancing
@@ -55,24 +47,24 @@ describe("Tree", function() {
 			{ n1: 0, n2: 2, length: 2 },
 			{ n1: 2, n2: 3, length: 2 },
 			{ n1: 3, n2: 4, length: 2 },
-		] as JEdge[]);
-		const n2 = tree.$nodes[id2]!;
-		const n3 = tree.$nodes[id3]!;
+		]);
+		const n2 = node(2)!;
+		const n3 = node(3)!;
 		expect(tree.$root).to.equal(n2);
-		expect(tree.$nodes[id1]).to.be.not.undefined;
-		expect(tree.$nodes[id0]).to.be.not.undefined;
+		expect(node(1)).to.be.not.undefined;
+		expect(node(0)).to.be.not.undefined;
 
 		// Test invalid removal.
 		expect(tree.$removeLeaf(id0)).to.be.false;
 		tree.$flushRemove();
-		expect(tree.$nodes[id0]).to.be.not.undefined;
+		expect(node(0)).to.be.not.undefined;
 
 		// Test removal.
 		expect(tree.$removeLeaf(id1)).to.be.true;
 		expect(tree.$removeLeaf(id0)).to.be.true;
 		tree.$flushRemove();
-		expect(tree.$nodes[id1]).to.be.undefined;
-		expect(tree.$nodes[id0]).to.be.undefined;
+		expect(node(1)).to.be.undefined;
+		expect(node(0)).to.be.undefined;
 
 		Processor.$run(heightTask);
 		expect(tree.$root).to.equal(n3);
@@ -80,13 +72,13 @@ describe("Tree", function() {
 	});
 
 	it("Keeps a record of distances", function() {
-		const tree = createTree([
+		createTree([
 			{ n1: 0, n2: 1, length: 1 },
 			{ n1: 0, n2: 2, length: 2 },
 			{ n1: 2, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
-		] as JEdge[]);
-		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => tree.$nodes[id as NodeId]!);
+		]);
+		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
 		expect(n0.$dist).to.equal(2);
 		expect(n2.$dist).to.equal(0);
 		expect(n0.$parent).to.equal(n2);
@@ -103,25 +95,25 @@ describe("Tree", function() {
 			{ n1: 0, n2: 2, length: 2 },
 			{ n1: 2, n2: 3, length: 3 },
 			{ n1: 3, n2: 4, length: 4 },
-		] as JEdge[]);
+		]);
 		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
 		expect(JSON.stringify(tree.toJSON().edges)).to.equal(json);
 	});
 
 	it("Keeps a record of AABB", function() {
-		const tree = createTree(
+		createTree(
 			[
 				{ n1: 0, n2: 1, length: 1 },
 				{ n1: 1, n2: 2, length: 2 },
 				{ n1: 0, n2: 3, length: 3 },
 				{ n1: 3, n2: 4, length: 4 },
-			] as JEdge[],
+			],
 			[
-				{ id: id2, x: 8, y: 8, width: 0, height: 0 },
-				{ id: id4, x: 5, y: 2, width: 0, height: 0 },
+				{ id: 2, x: 8, y: 8, width: 0, height: 0 },
+				{ id: 4, x: 5, y: 2, width: 0, height: 0 },
 			]
 		);
-		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => tree.$nodes[id as NodeId]!);
+		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
 		expect(n2.$AABB.$toArray()).to.eql([10, 10, 6, 6]);
 		expect(n1.$AABB.$toArray()).to.eql([11, 11, 5, 5]);
 		expect(n4.$AABB.$toArray()).to.eql([6, 9, -2, 1]);
@@ -140,7 +132,7 @@ describe("Tree", function() {
 				{ n1: 1, n2: 2, length: 2 },
 				{ n1: 0, n2: 3, length: 2 },
 				{ n1: 3, n2: 4, length: 2 },
-			] as JEdge[]);
+			]);
 			expect(tree.$root.id).to.equal(0);
 
 			TreeController.join(id0);
@@ -158,7 +150,7 @@ describe("Tree", function() {
 				{ n1: 0, n2: 3, length: 2 },
 				{ n1: 3, n2: 4, length: 2 },
 				{ n1: 4, n2: 5, length: 2 },
-			] as JEdge[]);
+			]);
 			expect(tree.$root.id).to.equal(0);
 
 			TreeController.split({ n1: id3, n2: id0 }, id6);
@@ -171,14 +163,14 @@ describe("Tree", function() {
 			const tree = createTree([
 				{ n1: 0, n2: 1, length: 2 },
 				{ n1: 0, n2: 2, length: 2 },
-			] as JEdge[]);
+			]);
 
 			TreeController.split({ n1: id0, n2: id1 }, id3);
-			expect(tree.$nodes[id3]!.$length).to.equal(1);
+			expect(node(3)!.$length).to.equal(1);
 			expect(tree.$root.id).to.equal(0);
 
 			TreeController.split({ n1: id0, n2: id3 }, id4);
-			expect(tree.$nodes[id4]).to.be.not.undefined;
+			expect(node(4)).to.be.not.undefined;
 			expect(tree.$root.id).to.equal(4);
 
 			TreeController.edit([
@@ -187,14 +179,8 @@ describe("Tree", function() {
 				[false, { n1: id0, n2: id3, length: 1 }],
 			], id0, [], []);
 			expect(tree.$root.id).to.equal(0);
-			expect(tree.$nodes[id4]).to.be.undefined;
+			expect(node(4)).to.be.undefined;
 		});
 	});
 });
 
-function createTree(edges: JEdge[], flaps?: JFlap[]): Tree {
-	const tree = new Tree(edges, flaps);
-	State.$tree = tree;
-	Processor.$run(heightTask);
-	return tree;
-}
