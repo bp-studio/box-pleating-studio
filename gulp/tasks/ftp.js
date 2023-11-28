@@ -16,23 +16,51 @@ function connect() {
 	return ftp.create(options);
 }
 
+/**
+ * @param {string} folder
+ */
 function cleanFactory(folder) {
 	const conn = connect();
 	return conn.clean(`/public_html/${folder}/**/*.*`, config.dest.dist);
 }
 
-function ftpFactory(folder, additionalGlobs, pipeFactory) {
+/**
+ * @param {NodeJS.ReadWriteStream} stream
+ * @returns {Promise<void>}
+ */
+function streamToPromise(stream) {
+	return new Promise(resolve => {
+		stream.on("end", resolve);
+	});
+}
+
+/**
+ * @param {string} folder
+ * @param {string[]} additionalGlobs
+ * @param {(stream: NodeJS.ReadWriteStream) => NodeJS.ReadWriteStream} pipeFactory
+ */
+async function ftpFactory(folder, additionalGlobs, pipeFactory) {
 	const conn = connect();
+	const sw = config.dest.dist + "/sw.js";
 	const globs = [
 		config.dest.dist + "/**/*",
+		"!" + sw,
 		"!**/debug.log",
 	].concat(additionalGlobs);
 
 	const base = `/public_html/${folder}`;
 	const pipe = gulp.src(globs, { base: config.dest.dist, buffer: false });
-	return (pipeFactory ? pipeFactory(pipe) : pipe)
-		.pipe(conn.newer(base))
-		.pipe(conn.dest(base));
+	await streamToPromise(
+		(pipeFactory ? pipeFactory(pipe) : pipe)
+			.pipe(conn.newer(base))
+			.pipe(conn.dest(base))
+	);
+
+	// Ensure that sw.js is uploaded last, to avoid inconsistent update.
+	await streamToPromise(
+		gulp.src(sw, { base: config.dest.dist, buffer: false })
+			.pipe(conn.dest(base))
+	);
 }
 
 gulp.task("cleanPub", () => seriesIf(
