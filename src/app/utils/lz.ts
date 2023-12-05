@@ -43,23 +43,16 @@ function callWorker<T>(action: Act, data: unknown, mode: unknown): Promise<T> {
 //=================================================================
 namespace LZ {
 
-	// `atob` and `btoa` methods are deprecated in Node.js but not in frontend,
-	// so we use window.atob etc. to silence warnings.
-	// See https://stackoverflow.com/a/70851350/9953396
-	//
-	// 20230512 update: This issue seems fixed somehow now. Keep observing.
-
 	export async function compress(s: string): Promise<string> {
 		const arr = await callWorker<Uint8Array>(Act.compress, s, 1); // Experiments showed that 1 is good enough
-		s = window.btoa(String.fromCharCode.apply(null, Array.from<number>(Uint8Array.from(arr))));
+		s = btoa(String.fromCharCode(...Uint8Array.from(arr)));
 		return s.replace(/\+/g, "-").replace(/\//g, "_").replace(/[=]+/g, ""); // urlBase64
 	}
 
 	export async function decompress(s: string): Promise<string> {
 		// There's no need to add padding "=" back since atob() can infer it.
-		s = window.atob(s.replace(/-/g, "+").replace(/_/g, "/"));
-		const bytes = new Uint8Array(s.length);
-		for(let i = 0; i < bytes.length; i++) bytes[i] = s.charCodeAt(i);
+		s = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
+		const bytes = Uint8Array.from(s, char => char.charCodeAt(0));
 		return await callWorker<string>(Act.decompress, bytes, false);
 	}
 }
