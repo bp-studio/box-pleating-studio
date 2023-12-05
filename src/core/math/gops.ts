@@ -1,5 +1,5 @@
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
-import { $reduceInt } from "./utils/gcd";
+import { reduceInt } from "./utils/gcd";
 
 import type { JPiece } from "shared/json/pattern";
 
@@ -12,9 +12,8 @@ export interface JPieceMemo {
 const Memo = new Map<number, readonly JPieceMemo[]>();
 
 /** The basic integral {@link GOPS} search */
-export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiece> {
+export function* generate(ox: number, oy: number, sx = Number.POSITIVE_INFINITY): Generator<JPiece> {
 	if(ox % 2 && oy % 2) return;
-	if(sx === undefined) sx = Number.POSITIVE_INFINITY;
 
 	const memo = getOrCreateMemo(ox, oy);
 	for(const m of memo) {
@@ -24,9 +23,9 @@ export function* $generate(ox: number, oy: number, sx?: number): Generator<JPiec
 }
 
 /** Calculates the rank of a {@link JPiece}. The lower the better. */
-export function $rank(p: JPiece): number {
-	const r1 = $reduceInt(p.oy + p.v, p.oy)[0];
-	const r2 = $reduceInt(p.ox + p.u, p.ox)[0];
+export function rank(p: JPiece): number {
+	const r1 = reduceInt(p.oy + p.v, p.oy)[0];
+	const r2 = reduceInt(p.ox + p.u, p.ox)[0];
 	return Math.max(r1, r2);
 }
 
@@ -50,7 +49,7 @@ function getOrCreateMemo(ox: number, oy: number): readonly JPieceMemo[] {
 			} else {
 				const p1: JPiece = { ox, oy, u, v };
 				const p2: JPiece = { ox, oy, u: v, v: u };
-				const r1 = $rank(p1), r2 = $rank(p2);
+				const r1 = rank(p1), r2 = rank(p2);
 				if(r1 > r2) {
 					addMemo(p2, array);
 					addMemo(p1, array);

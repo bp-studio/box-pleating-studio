@@ -70,7 +70,6 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public toJSON(): JEdge {
-		/* istanbul ignore if */
 		if(!this.$parent) throw new Error("Cannot export root node");
 		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}

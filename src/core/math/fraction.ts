@@ -1,5 +1,5 @@
 import { InvalidParameterError } from "./invalidParameterError";
-import { $reduceInt } from "./utils/gcd";
+import { reduceInt } from "./utils/gcd";
 
 /** floor(sqrt(max_safe_integer / 2)) */
 const MAX_SAFE = 67108863;
@@ -53,7 +53,7 @@ export class Fraction {
 		if(n instanceof Fraction) {
 			this._p = n._p;
 			this._q = n._q * d as Positive;
-		} else if(typeof n == "number" && typeof d == "number") {
+		} else {
 			if(Number.isSafeInteger(n) && Number.isSafeInteger(d)) {
 				this._p = n;
 				this._q = d;
@@ -62,12 +62,8 @@ export class Fraction {
 				this._p = result._p;
 				this._q = result._q;
 			} else {
-				/* istanbul ignore next */
 				throw new InvalidParameterError();
 			}
-		} else {
-			/* istanbul ignore next */
-			throw new InvalidParameterError();
 		}
 		this._normalize();
 	}
@@ -103,7 +99,7 @@ export class Fraction {
 
 	/** Simplification in place */
 	private _smp(): void {
-		[this._p, this._q] = $reduceInt(this._p, this._q);
+		[this._p, this._q] = reduceInt(this._p, this._q);
 	}
 
 	/** Negation in place */
@@ -116,13 +112,6 @@ export class Fraction {
 	public i(): this {
 		const sgn = Math.sign(this._p);
 		[this._p, this._q] = [sgn * this._q, sgn * this._p as Positive];
-		return this;
-	}
-
-	/** Round to the nearest integer in place */
-	public r(): this {
-		this._p = Math.round(this.$value);
-		this._q = 1;
 		return this;
 	}
 
@@ -249,14 +238,14 @@ export class Fraction {
 
 	public $reduceWith(f: Fraction): [Fraction, Fraction] {
 		this._smp(); f._smp();
-		const [n1, n2] = $reduceInt(this._p, f._p);
-		const [d1, d2] = $reduceInt(this._q, f._q);
+		const [n1, n2] = reduceInt(this._p, f._p);
+		const [d1, d2] = reduceInt(this._q, f._q);
 		return [new Fraction(n1, d1), new Fraction(n2, d2)];
 	}
 
 	public $reduceToIntWith(f: Fraction): [Fraction, Fraction] {
 		this._smp(); f._smp();
-		const [n1, n2] = $reduceInt(this._p * f._q, this._q * f._p);
+		const [n1, n2] = reduceInt(this._p * f._q, this._q * f._p);
 		return [new Fraction(n1), new Fraction(n2)];
 	}
 

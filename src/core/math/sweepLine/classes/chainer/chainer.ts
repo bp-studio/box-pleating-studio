@@ -62,6 +62,7 @@ export class Chainer<PathType extends Path = Path> {
 			}
 		}
 
+		/* istanbul ignore next: debug */
 		if(DEBUG_ENABLED && this._chains > 0) this.debugChains();
 		return result;
 	}
@@ -175,6 +176,7 @@ export class Chainer<PathType extends Path = Path> {
 	 * 2. Something might be wrong with the epsilon-comparison,
 	 *    resulting in missing intersection detection.
 	 */
+	/* istanbul ignore next: debug */
 	protected debugChains(): void {
 		for(let i = 1; i <= this._chains; i++) {
 			const path: Path = [];
@@ -187,11 +189,14 @@ export class Chainer<PathType extends Path = Path> {
 		}
 		debugger;
 	}
-	///#endif
-}
 
-export function debugSegments(segments: ISegment[]): void {
-	for(const segment of segments) {
-		console.log(pointToString(segment.$start), pointToString(segment.$end));
+	/* istanbul ignore next: debug */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
+	protected debugSegments(segments: ISegment[]): void {
+		for(const segment of segments) {
+			console.log(pointToString(segment.$start), pointToString(segment.$end));
+		}
 	}
+
+	///#endif
 }

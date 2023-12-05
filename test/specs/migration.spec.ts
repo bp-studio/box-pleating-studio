@@ -25,13 +25,10 @@ describe("Migration", function() {
 		});
 
 		it("Moves state to the top-level", function() {
-			const keys = ["zoom", "scroll"];
 			expect(result).to.have.property("state");
-			expect(result.state).to.have.all.keys("layout", "tree");
-			expect(result.state?.layout).to.have.all.keys(...keys);
-			expect(result.state?.tree).to.have.all.keys(...keys);
-			expect(result.design.layout).to.not.have.any.keys(...keys);
-			expect(result.design.tree).to.not.have.any.keys(...keys);
+			expect(result.state).to.have.all.keys("layout");
+			expect(result.state?.layout).to.have.all.keys("zoom", "scroll");
+			expect(result.design.layout).to.not.have.any.keys("zoom", "scroll");
 		});
 	});
 

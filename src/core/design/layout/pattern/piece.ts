@@ -7,7 +7,7 @@ import { nonEnumerable } from "shared/utils/nonEnumerable";
 import { toLines } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { norm } from "shared/types/geometry";
-import { $reduce } from "core/math/utils/gcd";
+import { reduce } from "core/math/utils/gcd";
 import { perQuadrant } from "shared/types/direction";
 
 import type { PerQuadrant } from "shared/types/direction";
@@ -111,8 +111,8 @@ export class Piece extends Region implements JPiece {
 	public $bisector(that: Piece): Vector {
 		const v1 = this.$direction;
 		const v2 = that.$direction;
-		const [x1, y1] = $reduce(v1._x, v1._y);
-		const [x2, y2] = $reduce(v2._x, v2._y);
+		const [x1, y1] = reduce(v1._x, v1._y);
+		const [x2, y2] = reduce(v2._x, v2._y);
 		// In this use case, z1 and z2 are guaranteed to be integers
 		const z1 = norm(x1, y1);
 		const z2 = norm(x2, y2);
@@ -212,7 +212,7 @@ export class Piece extends Region implements JPiece {
 			}
 
 			// Something is wrong with the given detour if we get here.
-			/* istanbul ignore next */
+			/* istanbul ignore next: debug */
 			debugger;
 		}
 	}

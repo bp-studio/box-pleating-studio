@@ -189,10 +189,10 @@ export class IntDoubleMap<K extends number, V> implements IDoubleMap<K, V> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _insertKeyNode(key: K, n: KeyNode<K>): void {
-		const old = this._keyMap.get(key);
-		if(old) {
-			old._prev = n;
-			n._next = old;
+		const oldHead = this._keyMap.get(key);
+		if(oldHead) {
+			oldHead._prev = n;
+			n._next = oldHead;
 		}
 		this._keyMap.set(key, n);
 	}

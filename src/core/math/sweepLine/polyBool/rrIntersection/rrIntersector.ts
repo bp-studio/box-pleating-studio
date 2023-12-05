@@ -103,7 +103,7 @@ export function yIntercept(arc: ArcSegment, x: number): number {
  * If the intersection is essentially an endpoint of the segment,
  * returns the original endpoint to avoid sorting error.
  */
-export function ref(p: IPoint, seg: Segment): IPoint {
+function ref(p: IPoint, seg: Segment): IPoint {
 	if(epsilonSame(p, seg.$start)) return seg.$start;
 	if(epsilonSame(p, seg.$end)) return seg.$end;
 	return p;

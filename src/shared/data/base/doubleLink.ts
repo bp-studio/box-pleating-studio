@@ -15,10 +15,3 @@ export function unlink<T>(
 	else if(noPrevCallback) noPrevCallback(next);
 	if(next) next._prev = prev;
 }
-
-export function link<T>(node: DLNode<T>, prev?: DLNode<T>, next?: DLNode<T>): void {
-	node._next = next;
-	node._prev = prev;
-	if(next) next._prev = node;
-	if(prev) prev._next = node;
-}

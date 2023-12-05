@@ -1,3 +1,4 @@
+/* istanbul ignore file: legacy migration */
 import type { JProject, JLayout } from "shared/json";
 
 /**

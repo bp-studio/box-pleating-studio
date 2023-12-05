@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Migration } from "client/patches/migration";
-import { $LCM } from "core/math/utils/gcd";
+import { lcm } from "core/math/utils/gcd";
 import { GridType } from "shared/json";
 import { toFractionRecursive } from "core/math/fraction";
 import { t } from "../i18n";
@@ -34,7 +34,7 @@ export class TreeMakerParser {
 		for(let i = 0; i < numNode; i++) this._parseNode();
 		for(let i = 0; i < numEdge; i++) this._parseEdge();
 
-		const fix = $LCM(Array.from(this._set));
+		const fix = lcm(Array.from(this._set));
 		const sw = Math.ceil(width * scale * fix - 0.25);
 		const sh = Math.ceil(height * scale * fix - 0.25);
 		if(sw < 8 || sh < 8) throw t("plugin.TreeMaker.size8");

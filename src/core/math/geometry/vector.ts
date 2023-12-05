@@ -1,8 +1,5 @@
 import { Fraction } from "../fraction";
-import { $reduce } from "../utils/gcd";
 import { Couple } from "./couple";
-import { SlashDirection } from "shared/types/direction";
-import { norm } from "shared/types/geometry";
 
 import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Rational } from "../fraction";
@@ -18,10 +15,6 @@ export class Vector extends Couple {
 	/** Returns a new instance of the zero-vector. */
 	public static get ZERO(): Vector {
 		return new Vector(0, 0);
-	}
-
-	public static $fromDirection(dir: SlashDirection): Vector {
-		return new Vector(1, dir == SlashDirection.FW ? 1 : -1);
 	}
 
 	/**Create a Vector object */
@@ -64,13 +57,8 @@ export class Vector extends Couple {
 	}
 
 	/** Scale and returns a new vector. */
-	public $scale(r: Fraction): Vector;
-	public $scale(c: Couple): Vector;
-	public $scale(x: Fraction, y: Fraction): Vector;
-	public $scale(x: Fraction | Couple, y?: Fraction): Vector {
-		if(x instanceof Couple) return this.$scale(x._x, x._y);
-		if(!y) y = x;
-		return new Vector(this._x.mul(x), this._y.mul(y));
+	public $scale(r: Fraction): Vector {
+		return new Vector(this._x.mul(r), this._y.mul(r));
 	}
 
 	/** Calculates the dot product of vectors. */

@@ -1,5 +1,4 @@
 import { Fraction } from "../fraction";
-import { isAlmostInteger } from "./float";
 
 import type { Rational } from "../fraction";
 import type { Vector } from "./vector";
@@ -28,9 +27,7 @@ export abstract class Couple {
 	}
 
 	public get x(): number { return this._x.$value; }
-	public set x(v: number) { this._x = new Fraction(v); }
 	public get y(): number { return this._y.$value; }
-	public set y(v: number) { this._y = new Fraction(v); }
 
 	// Specify `c` as type `this` will block all calling of this method
 	// between different derived classes, which is the desired behavior
@@ -39,29 +36,8 @@ export abstract class Couple {
 		return this._x.eq(c._x) && this._y.eq(c._y);
 	}
 
-	public $clone(): this {
-		return new this.constructor(this._x, this._y);
-	}
-
 	/** Print out the Couple in the "(x, y)" format */
 	public toString(): string { return "(" + this._x + ", " + this._y + ")"; }
-
-	public toJSON(): string {
-		return this.toString();
-	}
-
-	public set(c: this): this;
-	public set(x: Rational, y: Rational): this;
-	public set(x: Rational | this, y: Rational = 0): this {
-		if(x instanceof Couple) {
-			this._x = x._x.c();
-			this._y = x._y.c();
-		} else {
-			this._x = new Fraction(x);
-			this._y = new Fraction(y);
-		}
-		return this;
-	}
 
 	public $add(v: Vector): this {
 		return new this.constructor(this._x.add(v._x), this._y.add(v._y));
@@ -69,15 +45,6 @@ export abstract class Couple {
 
 	public addBy(v: Vector): this {
 		this._x.a(v._x); this._y.a(v._y);
-		return this;
-	}
-
-	/** Restrict the Couple to a certain rectangular range */
-	public $range(min_X: Fraction, max_X: Fraction, min_Y: Fraction, max_Y: Fraction): this {
-		if(this._x.lt(min_X)) this._x = min_X;
-		if(this._x.gt(max_X)) this._x = max_X;
-		if(this._y.lt(min_Y)) this._y = min_Y;
-		if(this._y.gt(max_Y)) this._y = max_Y;
 		return this;
 	}
 

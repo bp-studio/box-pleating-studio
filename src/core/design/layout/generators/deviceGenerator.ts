@@ -1,4 +1,4 @@
-import { $generate } from "core/math/gops";
+import { generate } from "core/math/gops";
 import { kamiyaHalfIntegral } from "core/math/kamiya";
 import { Strategy } from "shared/json";
 import { clone } from "shared/utils/clone";
@@ -25,7 +25,7 @@ export function* deviceGenerator(data: JPartition, config: Configuration): Gener
 				yield { gadgets: [g] };
 			}
 		} else {
-			for(const piece of $generate(ox, oy, sx)) {
+			for(const piece of generate(ox, oy, sx)) {
 				const gadget: JGadget = { pieces: [piece] };
 				yield { gadgets: [gadget] };
 			}
@@ -45,7 +45,7 @@ function* universalGPS(o: JOverlap, sx: number): Generator<JGadget> {
 	while(!found) {
 		const bigO = clone(o);
 		bigO.ox *= d; bigO.oy *= d;
-		for(const p of $generate(bigO.ox, bigO.oy, sx * d)) {
+		for(const p of generate(bigO.ox, bigO.oy, sx * d)) {
 			const p1 = new Piece(p).$shrink(d);
 			if(!Number.isInteger(p1.v)) continue;
 			const { ox, oy, u, v } = p1;

@@ -1,7 +1,7 @@
 import { Strategy } from "shared/json";
 import { Direction } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
-import { $generate } from "core/math/gops";
+import { generate } from "core/math/gops";
 import { Piece } from "../pattern/piece";
 import { SimpleJoinLogic } from "./logic/simpleJoinLogic";
 import { BaseJoinLogic } from "./logic/baseJoinLogic";
@@ -55,7 +55,7 @@ export class Joiner {
 		[this.g1, this.g2] = overlaps.map(o => {
 			const j = repo.$junctions[o.parent];
 			junctions.push(j);
-			return Array.from($generate(o.ox, o.oy, j.sx));
+			return Array.from(generate(o.ox, o.oy, j.sx));
 		});
 
 		const [j1, j2] = junctions;

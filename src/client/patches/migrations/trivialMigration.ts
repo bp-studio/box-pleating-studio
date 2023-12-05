@@ -1,3 +1,4 @@
+/* istanbul ignore file: legacy migration */
 import type { JProject } from "shared/json";
 
 /** A {@link Migration} that does nothing. */

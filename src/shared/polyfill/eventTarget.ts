@@ -36,7 +36,7 @@ try {
 	new EventTarget();
 } catch {
 	// If `EventTarget` is undefined or is not a constructor, use polyfill
-	/* istanbul ignore next */
+	/* istanbul ignore next: polyfill */
 	globalThis.EventTarget = EventTargetPolyfill;
 }
 

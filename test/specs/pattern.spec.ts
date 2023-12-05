@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { DesignController } from "core/controller/designController";
 import { LayoutController } from "core/controller/layoutController";
 import { Migration } from "client/patches";
-import { pathToString } from "core/math/geometry/path";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
 import { createTree, node } from "../utils/tree";
@@ -104,6 +103,21 @@ describe("Pattern search", function() {
 			expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
 			const device = pattern.$devices[0];
 			expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
+		});
+
+		it("Split join", function() {
+			generateFromFlaps([
+				{ id: 1, x: 0, y: 0, radius: 15 },
+				{ id: 2, x: 7, y: 20, radius: 6 },
+				{ id: 3, x: 16, y: 12, radius: 5 },
+			]);
+			const stretch = State.$stretches.get("1,2,3")!;
+			expect(stretch).to.be.not.undefined;
+			expect(stretch.$repo.$configurations.length).to.equal(1);
+			const config = stretch.$repo.$configurations[0];
+			expect(config.$length).to.equal(1);
+			const pattern = config.$pattern!;
+			expect(pattern.$devices.length).to.equal(2);
 		});
 
 	});

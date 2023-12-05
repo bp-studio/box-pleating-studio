@@ -58,24 +58,33 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 		// event.$prev = prev;
 		// if(event.$point.x == 73 && event.$point.y == 118) debugWrap(event);
 	}
-}
 
-///#if DEBUG
-export function createTestCase(components: Polygon[]): void {
-	console.log(components.map(c => "[" + c.map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(",\n"));
-}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Debug methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function debugWrap(event: StartEvent): void {
-	let cursor: StartEvent | undefined = event;
-	while(cursor) {
-		console.log(
-			cursor.$segment.$polygon,
-			pointToString(cursor.$point),
-			pointToString(cursor.$other.$point),
-			cursor.$isInside,
-			cursor.$wrapCount
-		);
-		cursor = cursor.$prev;
+	///#if DEBUG
+
+	/* istanbul ignore next: debug */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
+	protected createTestCase(components: Polygon[]): void {
+		console.log(components.map(c => "[" + c.map(p => `parsePath("${pathToString(p)}")`).join(",") + "]").join(",\n"));
 	}
+
+	/* istanbul ignore next: debug */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
+	protected debugWrap(event: StartEvent): void {
+		let cursor: StartEvent | undefined = event;
+		while(cursor) {
+			console.log(
+				cursor.$segment.$polygon,
+				pointToString(cursor.$point),
+				pointToString(cursor.$other.$point),
+				cursor.$isInside,
+				cursor.$wrapCount
+			);
+			cursor = cursor.$prev;
+		}
+	}
+	///#endif
 }
-///#endif

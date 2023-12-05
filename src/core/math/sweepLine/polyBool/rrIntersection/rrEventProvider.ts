@@ -76,7 +76,7 @@ const statusYComparator: Comparator<StartEvent> = (a, b) => {
 };
 
 /** Calculate slope */
-export function getSlope(e: StartEvent): number {
+function getSlope(e: StartEvent): number {
 	const seg = e.$segment as Segment;
 	if(seg.$type === SegmentType.AALine) {
 		return seg.$isHorizontal ? 0 : Number.POSITIVE_INFINITY;

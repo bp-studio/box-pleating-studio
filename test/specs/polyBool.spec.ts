@@ -226,12 +226,19 @@ describe("PolyBool", function() {
 
 	describe("Rounded rectangle intersection", function() {
 		it("Finds intersection", function() {
-			const result = new RRIntersection().$get(
+			const result1 = new RRIntersection().$get(
 				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
 				{ x: 3, y: 3, width: 0, height: 0, radius: 1 }
 			);
-			expect(result.length).to.equal(1);
-			expect(result[0]).to.equalPath("(2,3),(3,2,2,2,1),(3.8660254037844384,2.5,3.5773502691896257,2,1),(3,3,3.5773502691896257,3,1)", true);
+			expect(result1.length).to.equal(1);
+			expect(result1[0]).to.equalPath("(2,3),(3,2,2,2,1),(3.8660254037844384,2.5,3.5773502691896257,2,1),(3,3,3.5773502691896257,3,1)", true);
+
+			const result2 = new RRIntersection().$get(
+				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
+				{ x: 5, y: 4, width: 0, height: 0, radius: 3 }
+			);
+			expect(result2.length).to.equal(1);
+			expect(result2[0]).to.equalPath("(4,2),(3,3,4,3,1),(2.1715728752538097,3),(4,1.1715728752538097,2.649165125326327,1.649165125326327,3)", true);
 		});
 
 		it("Handles complete overlapping", function() {

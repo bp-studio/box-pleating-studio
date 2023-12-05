@@ -1,3 +1,4 @@
+/* istanbul ignore file: legacy migration */
 import { CornerType } from "shared/json";
 
 import type { JConfiguration, JCorner, JProject, JOverlap, JStretch, JLayout } from "shared/json";

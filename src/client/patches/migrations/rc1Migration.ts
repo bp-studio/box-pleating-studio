@@ -1,3 +1,4 @@
+/* istanbul ignore file: legacy migration */
 import { CornerType } from "shared/json";
 import { convertIndex } from "shared/utils/pattern";
 

@@ -1,5 +1,5 @@
 import { clone } from "shared/utils/clone";
-import { $generate, $rank } from "./gops";
+import { generate, rank } from "./gops";
 import { Piece } from "core/design/layout/pattern/piece";
 import { Gadget } from "core/design/layout/pattern/gadget";
 import { Direction } from "shared/types/direction";
@@ -14,8 +14,8 @@ export function* kamiyaHalfIntegral(o: JOverlap, sx: number): Generator<JGadget>
 	if(o.ox % 2 == 0 || o.oy % 2 == 0) return;
 	const doubleO = clone(o);
 	doubleO.ox <<= 1; doubleO.oy <<= 1;
-	for(const p of $generate(doubleO.ox, doubleO.oy, sx * 2)) {
-		if($rank(p) > SLOPE) continue; // The rank of Kamiya patterns is 3
+	for(const p of generate(doubleO.ox, doubleO.oy, sx * 2)) {
+		if(rank(p) > SLOPE) continue; // The rank of Kamiya patterns is 3
 		const p1 = new Piece(p);
 		const v_even = p1.v % 2 == 0; // One of the original u, v must be even
 		if(p1.ox == p1.oy && v_even) continue; // If ox == oy then we only need to take one
