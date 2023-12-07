@@ -54,13 +54,13 @@ export namespace LayoutController {
 			if(!node || !node.$parent) continue;
 			// It suffices to include only the outer contours in CP exporting.
 			addPolygon(lines, node.$graphics.$contours.map(c => c.outer), CreaseType.Auxiliary);
-			addLines(lines, node.$graphics.$ridges, CreaseType.Mountains);
+			addLines(lines, node.$graphics.$ridges, CreaseType.Mountain);
 		}
 		for(const stretch of State.$stretches.values()) {
 			const pattern = stretch.$repo.$pattern;
 			if(!pattern) continue;
 			for(const device of pattern.$devices) {
-				addLines(lines, device.$drawRidges, CreaseType.Mountains);
+				addLines(lines, device.$drawRidges, CreaseType.Mountain);
 				addLines(lines, device.$axisParallels, CreaseType.Valley);
 			}
 		}

@@ -3,7 +3,7 @@
 export enum CreaseType {
 	None = 0,
 	Border = 1,
-	Mountains = 2,
+	Mountain = 2,
 	Valley = 3,
 
 	/**

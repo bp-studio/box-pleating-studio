@@ -1,7 +1,6 @@
 import { expect } from "chai";
 
 import { DesignController } from "core/controller/designController";
-import { LayoutController } from "core/controller/layoutController";
 import { Migration } from "client/patches";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
@@ -33,8 +32,8 @@ describe("Pattern search", function() {
 					{ id: 2, x: 11, y: 5, width: 0, height: 0 },
 				]
 			);
-			LayoutController.completeStretch("1,2");
 			const stretch = State.$stretches.get("1,2")!;
+			stretch.$complete();
 			expect(stretch).to.be.not.undefined;
 			expect(stretch.$repo.$configurations.length).to.equal(1);
 			const config = stretch.$repo.$configurations[0];
