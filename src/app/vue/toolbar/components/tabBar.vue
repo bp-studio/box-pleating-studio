@@ -53,15 +53,19 @@
 	}
 
 	#divTab {
-		overflow: scroll hidden;
-		-ms-overflow-style: none;
+		/* Only in Firefox and Chrome>=121, https://caniuse.com/mdn-css_properties_scrollbar-width */
 		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 		scrollbar-width: none;
-		width: 100%;
-		height: 3.75rem;
-		white-space: nowrap;
+
+		overflow: scroll hidden;
 		display: flex;
 
+		width: 100%;
+		height: 3.75rem;
+
+		white-space: nowrap;
+
+		/* For browsers other than Firefox */
 		&::-webkit-scrollbar {
 			display: none;
 		}
@@ -81,9 +85,11 @@
 			position: absolute;
 			top: 3.75rem;
 			left: 0;
-			margin: 0;
+
 			width: 100vw;
 			height: 2.4rem;
+			margin: 0;
+
 			background: var(--bg-ui);
 			border-top: 1px solid gray;
 		}

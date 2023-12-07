@@ -8,7 +8,7 @@
 		".vscode",
 		".eslintrc*",
 		"debug/**/*",
-		"**/*sample*",
+		"**/*sample*"
 	],
 	"cSpell.ignoreRegExpList": [
 		"/[A-Z]+(?![a-z])/g"
@@ -88,14 +88,14 @@
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
 		".*rc.json": ".$(capture)ignore",
-		"package.json": "pnpm-lock.yaml, .npmrc",
+		".eslintrc.json": "eslint-local-rules.js",
 		".gitignore": ".gitattributes",
-		".eslintrc.json": "eslint-local-rules.js"
+		"package.json": "pnpm-lock.yaml, .npmrc"
 	},
 	"files.exclude": {
-		".nyc_output": true,
 		"**/debug.log": true,
-		"**/node_modules": true
+		"**/node_modules": true,
+		".nyc_output": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"
@@ -117,6 +117,7 @@
 	],
 	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"scss.validate": false,
+	"stylelint.packageManager": "pnpm",
 	"stylelint.validate": [
 		"css",
 		"scss",

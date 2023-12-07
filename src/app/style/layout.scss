@@ -6,33 +6,45 @@ $statusbar-height: 25px;
 
 #divShade {
 	pointer-events: none;
+
 	right: 0;
-	background: black;
+
 	opacity: 0;
+	background: black;
+
 	transition: opacity 500ms;
 }
 
 aside {
-	position: fixed;
-	right: 0;
-	top: 3.75rem;
-	width: 250px;
-	bottom: 0;
-	color: #000; /* AAA consideration */
 	cursor: default;
-	transition: right 500ms;
+
+	position: fixed;
+	top: 3.75rem;
+	right: 0;
+	bottom: 0;
+
 	display: flex;
 	flex-direction: column;
+
+	width: 250px;
+
+	color: #000; /* AAA consideration */
+
 	background: var(--bg-ui) !important;
+
+	transition: right 500ms;
 }
 
 footer {
-	display: none;
 	position: absolute;
-	width: 100vw;
-	height: $statusbar-height;
 	bottom: 0;
 	left: 0;
+
+	display: none;
+
+	width: 100vw;
+	height: $statusbar-height;
+
 	background: var(--bg-ui);
 }
 
@@ -75,8 +87,8 @@ footer {
 		position: absolute;
 		top: 0; /* IE 8 fallback */
 		top: 3.75rem;
-		left: 0;
 		bottom: 0;
+		left: 0;
 	}
 }
 

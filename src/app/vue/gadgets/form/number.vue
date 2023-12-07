@@ -6,7 +6,7 @@
 			</button>
 			<input class="form-control" :class="{ 'error': value != modelValue }" type="number" v-model="value" @focus="focus($event)"
 				   @blur="blur" @input="input($event as InputEvent)" :min="min" :max="max" @wheel.passive="wheel($event)"
-				   style="min-width: 30px; cursor: ns-resize;" />
+				   style="cursor: ns-resize; min-width: 30px;" />
 			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
 				<i class="fas fa-plus" />
 			</button>

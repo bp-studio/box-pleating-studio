@@ -4,7 +4,6 @@
 
 .scroll-shadow {
 	overflow-y: auto;
-	-webkit-overflow-scrolling: touch; /* Use momentum-based scrolling on Safari, only works on Safari 5-12.5 */
 
 	/* local is not supported in Safari 13+, so we give up this part for now.
 	background-image:
@@ -24,6 +23,8 @@
 	background-position: 0 0, 0 100%, 0 0, 0 100%;
 	background-attachment: local, local, scroll, scroll; */
 	background-color: white;
+
+	-webkit-overflow-scrolling: touch; /* Use momentum-based scrolling on Safari, only works on Safari 5-12.5 */
 }
 
 .scroll-shadow,
@@ -58,10 +59,12 @@
 
 	.form-check-input {
 		cursor: pointer;
-		height: 1.5rem;
+
 		width: 2.75rem;
-		border-radius: 3rem;
+		height: 1.5rem;
 		margin-top: 0.5rem;
 		margin-left: -3.5rem;
+
+		border-radius: 3rem;
 	}
 }

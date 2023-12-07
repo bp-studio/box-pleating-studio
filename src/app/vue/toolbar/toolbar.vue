@@ -57,11 +57,14 @@
 
 <style lang="scss">
 	nav {
-		background: var(--bg-ui);
-		height: 3.75rem;
+		isolation: isolate;
+
 		overflow: visible;
 		flex-wrap: nowrap !important;
-		isolation: isolate;
+
+		height: 3.75rem;
+
+		background: var(--bg-ui);
 	}
 
 	@media (width <= 650px) {

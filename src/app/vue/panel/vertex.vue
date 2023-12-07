@@ -7,7 +7,7 @@
 		<AsyncButton class="flex-shrink-0" :disabled="subject.cannotAdd" :click="() => subject.addLeaf(newLength)" v-t="'panel.vertex.addLeaf'" />
 		<div class="flex-grow-1 d-flex">
 			<label class="col-form-label ms-2 text-end"
-				   style="width: 0; flex-grow: 1000; max-width: calc((100% - 230px * 0.98) * 50); overflow: hidden;">...&nbsp;</label>
+				   style="overflow: hidden; flex-grow: 1000; width: 0; max-width: calc((100% - 230px * 0.98) * 50);">...&nbsp;</label>
 			<div class="d-flex flex-grow-1">
 				<label class="col-form-label me-2 flex-shrink-0" v-t="'panel.vertex.ofLength'"></label>
 				<div class="flex-grow-1" style="width: 90px;">

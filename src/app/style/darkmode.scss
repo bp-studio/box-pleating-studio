@@ -3,8 +3,6 @@ html {
 }
 
 html.dark {
-	color-scheme: dark;
-
 	$line: #666;
 	$modal: #444;
 
@@ -21,6 +19,8 @@ html.dark {
 	--tab-border: #222;
 	--tab-active: var(--bs-body-bg);
 
+	color-scheme: dark;
+
 	.text-muted {
 		color: #666 !important;
 	}
@@ -36,14 +36,15 @@ html.dark {
 	}
 
 	table {
-		border-color: $line;
 		--bs-table-bg: unset;
 		--bs-table-color-state: var(--bs-body-color);
+
+		border-color: $line;
 	}
 
 	th {
-		background-color: #777;
 		color: #fff;
+		background-color: #777;
 	}
 
 	.scroll-shadow {
@@ -66,8 +67,8 @@ html.dark {
 
 	.form-control,
 	.form-select {
-		background-color: #555;
 		color: #eee;
+		background-color: #555;
 		border: #222;
 	}
 
@@ -126,9 +127,9 @@ html.dark {
 	}
 
 	.btn-light {
+		color: var(--bs-body-color);
 		background-color: #555;
 		border-color: #555;
-		color: var(--bs-body-color);
 
 		&:hover {
 			background-color: #666;

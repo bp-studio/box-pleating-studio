@@ -168,19 +168,21 @@
 	}
 
 	input {
-		outline: none;
 		padding: 0.25rem;
-		background: transparent;
 		color: var(--bs-body-color);
+		background: transparent;
+		outline: none;
 
 		&:focus {
 			box-shadow: inset 0 0 0.25rem var(--bs-primary);
 
 			+ .mask {
-				display: block;
 				position: absolute;
 				top: 0;
 				left: 0;
+
+				display: block;
+
 				width: 100%;
 				height: 100%;
 			}

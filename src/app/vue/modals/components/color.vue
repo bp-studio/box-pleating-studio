@@ -51,12 +51,13 @@
 
 <style>
 	input[type="color"] {
-		height: 1.5rem;
 		width: 4rem;
-		outline: none;
+		height: 1.5rem;
+
+		appearance: none;
 
 		/* This is needed to override Safari's terrible default style */
 		border-radius: 0.25rem;
-		appearance: none;
+		outline: none;
 	}
 </style>

@@ -1,7 +1,8 @@
 {
 	"extends": [
 		"stylelint-config-standard-scss",
-		"stylelint-config-recommended-vue"
+		"stylelint-config-recommended-vue",
+		"stylelint-config-clean-order"
 	],
 	"plugins": [
 		"stylelint-no-unsupported-browser-features"

@@ -59,32 +59,36 @@
 
 <style lang="scss">
 	.tab {
-		padding: 0.5rem;
-		flex-shrink: 0;
-		font-size: 1.25rem;
-		line-height: 2.5rem;
-		border-right: 1px solid var(--tab-border);
 		cursor: pointer;
+
+		display: inline-block;
+		flex-shrink: 0;
+
 		max-width: 150px;
 		height: 100%;
+		padding: 0.5rem;
+
+		font-size: 1.25rem;
+		line-height: 2.5rem;
+
 		background-color: var(--bg-ui);
-		display: inline-block;
+		border-right: 1px solid var(--tab-border);
 
 		&:first-child {
 			border-left: 1px solid var(--tab-border);
 		}
 
 		&.active {
+			color: black;
 			background-color: var(--tab-active);
 			background-image: var(--bs-gradient);
-			color: black;
 		}
 
 		:first-child {
-			flex-grow: 1;
 			overflow: hidden;
-			white-space: nowrap;
+			flex-grow: 1;
 			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 
 		:last-child {
@@ -92,10 +96,10 @@
 		}
 
 		i {
-			transition: opacity 0.1s linear;
-			opacity: 0;
 			width: 1rem;
 			text-align: center;
+			opacity: 0;
+			transition: opacity 0.1s linear;
 		}
 
 		&:hover i {
@@ -116,14 +120,18 @@
 		display: flex;
 
 		.close {
-			border-radius: 5px;
 			display: inline-block;
-			height: 1.75rem;
+
 			width: 1.75rem;
-			padding: 0.3rem;
+			height: 1.75rem;
 			margin-top: 0.15rem;
+			padding: 0.3rem;
+
 			line-height: 1;
 			text-align: center;
+
+			border-radius: 5px;
+
 			transition: background-color 0.1s linear;
 
 			&:hover {
@@ -156,16 +164,16 @@
 
 	@media (width <=650px) {
 		.tab {
-			line-height: 2rem;
-			font-size: 1rem;
 			padding: 0.2rem 0.5rem;
+			font-size: 1rem;
+			line-height: 2rem;
 		}
 
 		.tab-close .close {
-			height: 1.5rem;
 			width: 1.5rem;
-			padding: 0.25rem;
+			height: 1.5rem;
 			margin-top: 0;
+			padding: 0.25rem;
 		}
 
 		.tab:first-child {

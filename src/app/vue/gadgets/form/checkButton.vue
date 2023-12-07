@@ -32,11 +32,14 @@
 
 <style scoped>
 	i {
-		transition: width 0.5s;
-		width: 0;
-		display: inline-block;
-		text-align: right;
 		overflow: hidden;
+		display: inline-block;
+
+		width: 0;
+
+		text-align: right;
 		vertical-align: -.15em;
+
+		transition: width 0.5s;
 	}
 </style>

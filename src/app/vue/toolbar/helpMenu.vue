@@ -103,10 +103,12 @@
 <style lang="scss">
 	.notify {
 		display: inline-block;
-		height: 0.25em;
+
 		width: 0.25em;
-		border-radius: 0.125em;
+		height: 0.25em;
+
 		background-color: red;
+		border-radius: 0.125em;
 
 		.dropdown-item > & {
 			position: relative;

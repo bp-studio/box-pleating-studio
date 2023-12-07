@@ -56,8 +56,8 @@
 
 		/* The combination of this CSS makes Spinner to appear gradually, but vanishes instantly */
 		> div {
-			transition: opacity 0.5s cubic-bezier(1, 0, 0, 0);
 			opacity: 0;
+			transition: opacity 0.5s cubic-bezier(1, 0, 0, 0);
 		}
 
 		&.show {
@@ -70,10 +70,10 @@
 	}
 
 	.spinner-container {
+		flex-grow: 1;
 		font-size: 10rem;
 		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 		font-size: min(15vh, 15vw);
 		color: gray;
-		flex-grow: 1;
 	}
 </style>

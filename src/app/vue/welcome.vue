@@ -60,7 +60,7 @@
 				</div>
 			</div>
 		</div>
-		<div style="position: absolute; bottom: 1rem; right: 1rem;">{{ copyright }}</div>
+		<div style="position: absolute; right: 1rem; bottom: 1rem;">{{ copyright }}</div>
 	</div>
 </template>
 
@@ -175,8 +175,8 @@
 <style lang="scss">
 	@media (width < 576px) {
 		.file-api {
-			flex-grow: 1;
 			flex-direction: column;
+			flex-grow: 1;
 			justify-content: start !important;
 		}
 
@@ -185,9 +185,9 @@
 			height: 0;
 
 			> div {
+				overflow: hidden;
 				display: flex;
 				flex-flow: column wrap;
-				overflow: hidden;
 				height: 100%;
 
 				> * {
@@ -199,12 +199,15 @@
 
 	.quick-item {
 		cursor: pointer;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+
 		overflow: hidden;
+
 		max-width: 100%;
-		line-height: 1.75;
 		padding-left: 0.33rem;
+
+		line-height: 1.75;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 
 		&:hover {
 			background: #eee;
