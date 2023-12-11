@@ -50,8 +50,8 @@ export class Gadget implements JGadget {
 	@cache public get $anchorMap(): PerQuadrant<AnchorMap> {
 		return makePerQuadrant<AnchorMap>(q => {
 			if(this.anchors?.[q]?.location) {
-				const p = new Point(this.anchors[q].location!);
-				if(this.offset) p.addBy(new Vector(this.offset));
+				let p = new Point(this.anchors[q].location!);
+				if(this.offset) p = p.$add(new Vector(this.offset));
 				return [p, null];
 			} else {
 				if(this.pieces.length == 1) return [this.pieces[0].$anchors[q]!, 0];
@@ -115,9 +115,9 @@ export class Gadget implements JGadget {
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
 		const slack = new Fraction(this._getSlack(q1));
-		const v = g.$anchorMap[q2][0].sub(Point.ZERO).addBy(step.$scale(slack));
+		const v = g.$anchorMap[q2][0].$sub(Point.ZERO).$add(step.$scale(slack));
 
-		c1 = shift(c1, q1 == 0 ? v : v.$add(Point.ZERO.sub(this.$anchorMap[2][0])));
+		c1 = shift(c1, q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap[2][0])));
 
 		// Perform collision tests
 		let s = 0;

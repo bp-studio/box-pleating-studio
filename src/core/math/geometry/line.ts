@@ -69,7 +69,7 @@ export class Line {
 	public get $isDegenerated(): boolean { return this.p1.eq(this.p2); }
 
 	public get $vector(): Vector {
-		return this.p2.sub(this.p1);
+		return this.p2.$sub(this.p1);
 	}
 
 	/** Returns the slope (could be {@link Number.POSITIVE_INFINITY}). */
@@ -101,8 +101,8 @@ export class Line {
 	}
 
 	public $pointIsOnRight(point: Point, allowEq = false): boolean {
-		const v = point.sub(this.p1).$rotate90();
-		const dot = v.dot(this.$vector);
+		const v = point.$sub(this.p1).$rotate90();
+		const dot = v.$dot(this.$vector);
 		return dot > 0 || allowEq && dot == 0;
 	}
 
@@ -113,12 +113,12 @@ export class Line {
 	public $contains(point: Point | IPoint, includeEndpoints: boolean = false): boolean {
 		const p = point instanceof Point ? point : new Point(point);
 		if(includeEndpoints && (p.eq(this.p1) || p.eq(this.p2))) return true;
-		const v1 = p.sub(this.p1), v2 = p.sub(this.p2);
-		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.dot(v2) < 0;
+		const v1 = p.$sub(this.p1), v2 = p.$sub(this.p2);
+		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.$dot(v2) < 0;
 	}
 
 	public $lineContains(p: Point): boolean {
-		return this.$vector.$parallel(p.sub(this.p1));
+		return this.$vector.$parallel(p.$sub(this.p1));
 	}
 
 	/**
@@ -136,7 +136,7 @@ export class Line {
 	public $intersection(...t: [Point, Vector, boolean?, boolean?] | [Line]): Point | null {
 		let intersection: IIntersection | null;
 		if(t.length == 1) {
-			intersection = getIntersection(this, t[0].p1, t[0].p2.sub(t[0].p1), true, true);
+			intersection = getIntersection(this, t[0].p1, t[0].p2.$sub(t[0].p1), true, true);
 		} else {
 			const [p, v, headless, tailless] = t;
 			intersection = getIntersection(this, p, v, headless, tailless);
@@ -181,30 +181,30 @@ export class Line {
 	}
 
 	public $xIntersection(x: number): Point {
-		const v = this.p2.sub(this.p1);
+		const v = this.p2.$sub(this.p1);
 		const f = new Fraction(x);
 		return new Point(f, this.p1._y.sub(v.$slope.m(this.p1._x.sub(f))));
 	}
 
 	public $yIntersection(y: number): Point {
-		const v = this.p2.sub(this.p1);
+		const v = this.p2.$sub(this.p1);
 		const f = new Fraction(y);
 		return new Point(this.p1._x.sub(this.p1._y.sub(f).d(v.$slope)), f);
 	}
 
 	/** Reflect the given {@link Vector} against this line. */
 	public $reflect(v: Vector): Vector {
-		v = v.neg;
+		v = v.$neg;
 		const m = new Matrix(v._x, v._y.neg, v._y, v._x);
 		const mi = m.$inverse!;
-		v = mi.$multiply(this.p2.sub(this.p1));
+		v = mi.$multiply(this.p2.$sub(this.p1));
 		v = v.$doubleAngle();
-		return m.$multiply(v).reduce();
+		return m.$multiply(v).$reduce();
 	}
 
 	/** Whether the line is perpendicular to the given {@link Vector}. */
 	public $perpendicular(v: Vector): boolean {
-		return this.$vector.dot(v) == 0;
+		return this.$vector.$dot(v) == 0;
 	}
 
 	/** Shift by the given {@link Vector} and return a new {@link Line}. */
@@ -274,7 +274,7 @@ export class Line {
 
 	///#if DEBUG
 
-	public static $parseTest<T extends Line = Line>(jsons: Record<string, unknown>[]): T[] {
+	public static $parseTest<T extends Line = Line>(jsons: Record<string, string>[]): T[] {
 		return jsons.map(j => {
 			const line = new Line(Point.$parseTest(j.p1), Point.$parseTest(j.p2));
 			const r = line as unknown as Record<string, unknown>;
@@ -300,11 +300,11 @@ export function getIntersection<T extends Line>(
 	line: T, p: Point, v: Vector,
 	headless?: boolean, tailless?: boolean
 ): IIntersection<T> | null {
-	const v1 = line.p2.sub(line.p1);
+	const v1 = line.p2.$sub(line.p1);
 	const m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
 	if(m == null) return null;
 
-	const r = m.$multiply(new Point(p.sub(line.p1)));
+	const r = m.$multiply(new Point(p.$sub(line.p1)));
 	const a = r._x, b = r._y.neg;
 	if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
 	if(headless && b.lt(Fraction.ZERO)) return null;

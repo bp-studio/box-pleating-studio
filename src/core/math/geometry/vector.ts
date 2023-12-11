@@ -12,10 +12,8 @@ import type { Rational } from "../fraction";
 
 export class Vector extends Couple {
 
-	/** Returns a new instance of the zero-vector. */
-	public static get ZERO(): Vector {
-		return new Vector(0, 0);
-	}
+	/** The zero-vector. */
+	public static readonly ZERO = new Vector(0, 0);
 
 	/**Create a Vector object */
 	constructor();
@@ -29,7 +27,7 @@ export class Vector extends Couple {
 
 	/** Returns the floating length of the vector. */
 	public get $length(): number {
-		return Math.sqrt(this.dot(this));
+		return Math.sqrt(this.$dot(this));
 	}
 
 	/**
@@ -62,12 +60,12 @@ export class Vector extends Couple {
 	}
 
 	/** Calculates the dot product of vectors. */
-	public dot(v: Vector): number {
+	public $dot(v: Vector): number {
 		return this._x.mul(v._x).a(this._y.mul(v._y)).$value;
 	}
 
 	/** Take the negative value and returns a new vector. */
-	public get neg(): Vector {
+	public get $neg(): Vector {
 		return new Vector(this._x.neg, this._y.neg);
 	}
 
@@ -80,7 +78,7 @@ export class Vector extends Couple {
 	 * Reduce the vector, and return a new vector of the same direction,
 	 * but with denominators that are as small as possible.
 	 */
-	public reduce(): Vector {
+	public $reduce(): Vector {
 		return new Vector(...this._x.$reduceWith(this._y));
 	}
 
@@ -104,7 +102,7 @@ export class Vector extends Couple {
 	 * Note that the length of the new vector may be different from the original length.
 	 */
 	public $doubleAngle(): Vector {
-		const { _x, _y } = this.reduce();
+		const { _x, _y } = this.$reduce();
 		return new Vector(_x.mul(_x).s(_y.mul(_y)), Fraction.TWO.mul(_x).m(_y));
 	}
 

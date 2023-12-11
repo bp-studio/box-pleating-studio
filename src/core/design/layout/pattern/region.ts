@@ -39,7 +39,7 @@ export abstract class Region {
 		const step = dir.$rotate90().$normalize();
 		let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
 		for(const p of this.$shape.contour) {
-			const units = p.sub(ref).dot(step);
+			const units = p.$sub(ref).$dot(step);
 			if(units > max) max = units;
 			if(units < min) min = units;
 		}

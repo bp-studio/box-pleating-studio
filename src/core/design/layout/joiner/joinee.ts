@@ -39,7 +39,7 @@ export class Joinee {
 		this.p = p;
 		this._offset = offset;
 		this._anchors = anchors;
-		this._v = new Vector(offset).addBy(additionalOffset).neg;
+		this._v = new Vector(offset).$add(additionalOffset).$neg;
 		this._pt = pt.$add(this._v).$toIPoint();
 		this.e = p.$shape.ridges[q].$shift(additionalOffset);
 	}

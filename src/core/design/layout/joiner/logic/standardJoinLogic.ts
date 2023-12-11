@@ -50,7 +50,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		if(this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
 
 		if(!this._setupAnchor(D)) return;
-		const P = D.sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
+		const P = D.$sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
 		const T = closestGridPoint(this._substituteEnd(e, B), D);
 
 		// Before version 0.6, if the closest grid point happens to be the tip of the gadget,
@@ -90,7 +90,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
 		if(T.eq(e.p1) || T.eq(e.p2)) return;
 
-		const P = D.sub(B).$slope.gt(Fraction.ONE) ? delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
+		const P = D.$sub(B).$slope.gt(Fraction.ONE) ? delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
 		const R = triangleTransform([T, D, P], B);
 		if(!R || !this._setupAnchor(R)) return;
 		this.data.addOns = [{

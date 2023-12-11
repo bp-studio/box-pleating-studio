@@ -102,7 +102,7 @@ export class Joiner {
 	public $getRelayJoinIntersection(piece: Piece, shift: IPoint,
 		q: QuadrantDirection): Point | null {
 		const testVector = this.$oriented ? QV[Direction.UR] : QV[Direction.LL];
-		const pt = piece.$anchors[this.q]!.sub(new Vector(shift));
+		const pt = piece.$anchors[this.q]!.$sub(new Vector(shift));
 		return piece.$shape.ridges[q].$intersection(pt, testVector);
 	}
 

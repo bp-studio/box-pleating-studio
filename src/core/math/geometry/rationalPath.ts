@@ -43,7 +43,7 @@ export function toLines(path: RationalPath): Line[] {
  */
 export function triangleTransform(triangle: RationalPath, to: Point): Point | null {
 	const [p1, p2, p3] = triangle;
-	const [v1, v2, v3] = [to, p2, p3].map(p => p.sub(p1));
+	const [v1, v2, v3] = [to, p2, p3].map(p => p.$sub(p1));
 
 	// TODO: It is not yet clear why this might happen. More investigation is needed.
 	if(v2.eq(Vector.ZERO) || v1.eq(Vector.ZERO)) return null;

@@ -107,7 +107,7 @@ export class Device implements ISerializable<JDevice> {
 	public $updatePosition(): void {
 		// Update delta
 		const origin = this.$pattern.$config.$repo.$origin.$add(this._originalDisplacement);
-		this._delta = origin.$add(new Vector(this.$location)).sub(Point.ZERO);
+		this._delta = origin.$add(new Vector(this.$location)).$sub(Point.ZERO);
 
 		// Update anchors
 		const result: PerQuadrant<Point>[] = [];

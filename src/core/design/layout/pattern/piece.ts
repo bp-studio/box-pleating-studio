@@ -166,8 +166,7 @@ export class Piece extends Region implements JPiece {
 			new Point(oy + u + v, ox + u + v),
 			new Point(oy + v, v),
 		];
-		result.forEach(p => p.addBy(this._shift));
-		return result;
+		return result.map(p => p.$add(this._shift));
 	}
 
 	@cache private get _shift(): Vector {
@@ -178,7 +177,7 @@ export class Piece extends Region implements JPiece {
 	}
 
 	private _processDetour(ridges: Line[], contour: RationalPath, _detour: Path): void {
-		const detour = _detour.map(p => new Point(p).addBy(this._shift));
+		const detour = _detour.map(p => new Point(p).$add(this._shift));
 		const start = detour[0], end = detour[detour.length - 1];
 
 		const lines: Line[] = [];

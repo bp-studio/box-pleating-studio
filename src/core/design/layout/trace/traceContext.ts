@@ -65,7 +65,7 @@ export class TraceContext {
 					} else {
 						// In this case we modify the ray and go to the case 2.
 						ray.vector = hv;
-						ray.point = p.sub(hv);
+						ray.point = p.$sub(hv);
 						startDiagonal = undefined;
 					}
 				}
@@ -176,9 +176,9 @@ function isSideDiagonal(line: Line): line is SideDiagonal {
  */
 function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): boolean {
 	const rv = v.$rotate90();
-	const v1 = ridge.p1.sub(from), v2 = ridge.p2.sub(from);
-	const r1 = v1.dot(rv), r2 = v2.dot(rv);
-	const d1 = v1.dot(v), d2 = v2.dot(v);
+	const v1 = ridge.p1.$sub(from), v2 = ridge.p2.$sub(from);
+	const r1 = v1.$dot(rv), r2 = v2.$dot(rv);
+	const d1 = v1.$dot(v), d2 = v2.$dot(v);
 	const result =
 		(
 			// One endpoint of the segment lies completely on the side

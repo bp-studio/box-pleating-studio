@@ -12,10 +12,8 @@ import type { Rational } from "../fraction";
 
 export class Point extends Couple implements IPoint {
 
-	/** Returns a new instance of the origin. */
-	public static get ZERO(): Point {
-		return new Point(0, 0);
-	}
+	/** The origin. */
+	public static readonly ZERO = new Point(0, 0);
 
 	/** Create a {@link Point} object */
 	constructor();
@@ -30,20 +28,15 @@ export class Point extends Couple implements IPoint {
 
 	/** Distance to another {@link Point} */
 	public $dist(p: Point): number {
-		return this.sub(p).$length;
+		return this.$sub(p).$length;
 	}
 
-	public sub(v: Vector): Point;
-	public sub(p: IPoint): Vector;
-	public sub(c: Vector | IPoint): Point | Vector {
+	public $sub(v: Vector): Point;
+	public $sub(p: IPoint): Vector;
+	public $sub(c: Vector | IPoint): Point | Vector {
 		if(c instanceof Vector) return new Point(this._x.sub(c._x), this._y.sub(c._y));
 		else if(c instanceof Point) return new Vector(this._x.sub(c._x), this._y.sub(c._y));
 		else return new Vector(this._x.sub(new Fraction(c.x)), this._y.sub(new Fraction(c.y)));
-	}
-	public subBy(v: Vector): this {
-		this._x.s(v._x);
-		this._y.s(v._y);
-		return this;
 	}
 
 	/** {@link Point} is allowed to be compared with {@link IPoint}s. */
@@ -69,10 +62,8 @@ export class Point extends Couple implements IPoint {
 
 	///#if DEBUG
 
-	public static $parseTest(p: unknown): Point {
-		if(typeof p != "string") throw new Error("Incorrect type");
-		const match = p.match(/^\((-?\d+)(?:\/(\d+))?, (-?\d+)(?:\/(\d+))?\)$/);
-		if(!match) throw new Error("Incorrect format: " + p);
+	public static $parseTest(p: string): Point {
+		const match = p.match(/^\((-?\d+)(?:\/(\d+))?, (-?\d+)(?:\/(\d+))?\)$/)!;
 		const x = new Fraction(Number(match[1]), Number(match[2] || 1) as Positive);
 		const y = new Fraction(Number(match[3]), Number(match[4] || 1) as Positive);
 		return new Point(x, y);

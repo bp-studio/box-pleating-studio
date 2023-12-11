@@ -71,7 +71,7 @@ export class Partition implements ISerializable<JPartition> {
 
 	public $getDisplacement(pattern: Pattern): Vector {
 		const connection = this.$displacementReference;
-		return pattern.$getConnectionTarget(connection).sub(pattern.$config.$repo.$origin);
+		return pattern.$getConnectionTarget(connection).$sub(pattern.$config.$repo.$origin);
 	}
 
 	/** Choose an outward connection point in this Partition. */

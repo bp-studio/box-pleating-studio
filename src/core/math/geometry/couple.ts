@@ -9,6 +9,9 @@ import type { Vector } from "./vector";
  * they have completely different meanings in geometry,
  * so we defined them as two different classes,
  * both inherit from this {@link Couple} class.
+ *
+ * All derived classes of `Couple` are immutable by design,
+ * and all operations on them creates new instances.
  */
 //=================================================================
 
@@ -41,11 +44,6 @@ export abstract class Couple {
 
 	public $add(v: Vector): this {
 		return new this.constructor(this._x.add(v._x), this._y.add(v._y));
-	}
-
-	public addBy(v: Vector): this {
-		this._x.a(v._x); this._y.a(v._y);
-		return this;
 	}
 
 	/** Convert self into an {@link IPoint}. */
