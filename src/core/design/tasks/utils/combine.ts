@@ -3,6 +3,7 @@ import { toPath, toRationalPath } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { GeneralUnion } from "core/math/sweepLine/polyBool/generalUnion/generalUnion";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
+import { fixPath } from "core/math/geometry/float";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
@@ -11,7 +12,7 @@ import type { ContourComponent, ITreeNode, PatternContour, TraceContour } from "
 /**
  * {@link TraceContour} represented in {@link RationalPath}s.
  */
-type RationalContour = ContourComponent<RationalPathEx>;
+export type RationalContour = ContourComponent<RationalPathEx>;
 
 const generalUnion = new GeneralUnion();
 
@@ -113,10 +114,11 @@ function toRationalContour(contour: TraceContour): RationalContour {
 /**
  * Convert {@link RationalContour} to the actual {@link Contour} for rendering.
  */
-function toGraphicalContours(contour: RationalContour): Contour[] {
+export function toGraphicalContours(contour: RationalContour): Contour[] {
 	let outers = contour.$outer.map(toPath).map(simplify);
 	let inners = contour.$inner.map(toPath).map(simplify).map(reverse);
 
+	// TODO: is this still possible?
 	if(inners.some(p => p.length == 2)) debugger;
 
 	rearrangeRole(outers, inners);
@@ -125,10 +127,8 @@ function toGraphicalContours(contour: RationalContour): Contour[] {
 		inners = generalUnion.$get(inners.map(reverse)).map(reverse);
 		rearrangeRole(outers, inners);
 	}
-
-	// Remove degenerated cases
-	outers = outers.map(simplify).filter(c => c.length > 2);
-	inners = inners.map(simplify).filter(c => c.length > 2);
+	outers = cleanUp(outers);
+	inners = cleanUp(inners);
 
 	// Trivial case
 	if(outers.length == 1) {
@@ -140,6 +140,12 @@ function toGraphicalContours(contour: RationalContour): Contour[] {
 
 	// General case
 	return stacking.$get(...outers, ...inners);
+}
+
+function cleanUp(paths: PathEx[]): PathEx[] {
+	// GeneralUnion can sometimes generate contours with floating errors,
+	// and we need to fix those to make river ridges work properly.
+	return paths.map(simplify).filter(c => c.length > 2).map(fixPath);
 }
 
 function rearrangeRole(outers: PathEx[], inners: PathEx[]): void {

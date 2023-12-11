@@ -274,18 +274,23 @@ export class Line {
 
 	///#if DEBUG
 
-	public static $parseTest<T extends Line = Line>(jsons: Record<string, string>[]): T[] {
+	public static $parseTest<T extends Line = Line>(jsons: TestLine<T>[]): T[] {
 		return jsons.map(j => {
-			const line = new Line(Point.$parseTest(j.p1), Point.$parseTest(j.p2));
+			const l = j as unknown as Record<string, string>;
+			const line = new Line(Point.$parseTest(l.p1), Point.$parseTest(l.p2));
 			const r = line as unknown as Record<string, unknown>;
 			if("type" in j) r.type = j.type;
-			if("p0" in j) r.p0 = Point.$parseTest(j.p0);
+			if("p0" in j) r.p0 = Point.$parseTest(l.p0);
 			return line;
 		}) as T[];
 	}
 
 	///#endif
 }
+
+type TestLine<T extends Line> =
+	Partial<Omit<T, KeysOfType<T, Point>>> &
+	{ [k in KeysOfType<T, Point>]: string };
 
 export interface IIntersection<T extends Line = Line> {
 	/** The intersected line. */
