@@ -4,14 +4,9 @@ import { TreeController } from "core/controller/treeController";
 import { getDist } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
-import { fullReset } from "core/service/state";
 import { createTree, node, id0, id1, id2, id3, id4, id6 } from "../utils/tree";
 
 describe("Tree", function() {
-
-	beforeEach(function() {
-		fullReset();
-	});
 
 	it("Is constructed from JEdge[]", function() {
 		const tree = createTree([

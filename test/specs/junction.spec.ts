@@ -2,17 +2,13 @@ import { expect } from "chai";
 
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
-import { State, fullReset } from "core/service/state";
+import { State } from "core/service/state";
 import { getFirst } from "shared/utils/set";
 import { createTree, id0, id3, id4 } from "../utils/tree";
 
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {
-
-	beforeEach(function() {
-		fullReset();
-	});
 
 	it("Computes valid junctions", function() {
 		createTree(
@@ -68,5 +64,30 @@ describe("Junction", function() {
 		const stretch = getFirst(State.$stretches)!;
 		expect(stretch).to.be.not.undefined;
 		expect(stretch.$repo.$nodeSet.$nodes).to.eql([2, 3, 4]);
+	});
+
+	it("Determines junction covering", function() {
+		createTree(
+			[
+				{ n1: 0, n2: 1, length: 8 },
+				{ n1: 0, n2: 5, length: 2 },
+				{ n1: 8, n2: 0, length: 1 },
+				{ n1: 2, n2: 1, length: 8 },
+				{ n1: 8, n2: 6, length: 1 },
+				{ n1: 2, n2: 3, length: 2 },
+				{ n1: 7, n2: 2, length: 1 },
+				{ n1: 7, n2: 4, length: 1 },
+			],
+			[
+				{ id: 5, width: 0, height: 0, x: 0, y: 14 },
+				{ id: 6, width: 0, height: 0, x: 0, y: 18 },
+				{ id: 3, width: 0, height: 0, x: 15, y: 0 },
+				{ id: 4, width: 0, height: 0, x: 19, y: 0 },
+			]
+		);
+		const validJunctions = [...State.$junctions.values()].filter(j => j.$valid) as ValidJunction[];
+		expect(validJunctions.length).to.equal(4, "Should have 4 valid junctions");
+		const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
+		expect(uncoveredJunctions.length).to.equal(1, "Only one is uncovered");
 	});
 });

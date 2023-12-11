@@ -7,7 +7,7 @@ import type { Comparator } from "shared/types/types";
 import type { Junctions } from "../junction/validJunction";
 import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
-import type { QuadrantDirection, QuadrantCode } from "shared/types/direction";
+import type { QuadrantDirection, QuadrantCode, PerQuadrant } from "shared/types/direction";
 import type { JOverlap } from "shared/json/layout";
 import type { JJunction } from "shared/json/pattern";
 
@@ -136,12 +136,12 @@ function pointWeight(p: IPoint, f: IPoint): number {
 	return f.x * p.y - f.y * p.x;
 }
 
-export const QV: readonly Vector[] = [
+export const QV = [
 	new Vector(1, 1),
 	new Vector(-1, 1),
 	new Vector(-1, -1),
 	new Vector(1, -1),
-];
+] as PerQuadrant<Vector>;
 
 export function getFactors(q: QuadrantDirection): ISignPoint {
 	return {

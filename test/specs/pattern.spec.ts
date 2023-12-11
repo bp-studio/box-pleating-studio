@@ -21,7 +21,6 @@ describe("Pattern search", function() {
 	describe("Two flap patterns", function() {
 
 		it("Finds universal GPS patterns", function() {
-			fullReset();
 			createTree(
 				[
 					{ n1: 0, n2: 1, length: 6 },
@@ -87,6 +86,38 @@ describe("Pattern search", function() {
 			}
 		});
 
+		it("Half integral relay", function() {
+			generateFromFlaps([
+				{ id: 1, x: 0, y: 0, radius: 11 },
+				{ id: 2, x: 8, y: 14, radius: 4 },
+				{ id: 3, x: 15, y: 8, radius: 6 },
+			]);
+			const stretch = State.$stretches.get("1,2,3")!;
+			expect(stretch).to.be.not.undefined;
+			expect(stretch.$repo.$configurations.length).to.equal(1);
+			const config = stretch.$repo.$configurations[0];
+			expect(config.$length).to.equal(2, "Two half integral patterns");
+		});
+
+		it("Base join", function() {
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 11 },
+					{ id: b, x: 7, y: 14, radius: 4 },
+					{ id: c, x: 15, y: 8, radius: 6 },
+				]);
+				const stretch = State.$stretches.get("1,2,3")!;
+				expect(stretch).to.be.not.undefined;
+				expect(stretch.$repo.$configurations.length).to.equal(1);
+				const config = stretch.$repo.$configurations[0];
+				expect(config.$length).to.equal(1);
+				const pattern = config.$pattern!;
+				expect(pattern.$devices.length).to.equal(1);
+				const device = pattern.$devices[0];
+				expect(device.$addOns.length).to.equal(0, "Base joins have no addOn");
+			}
+		});
+
 		it("Standard join", function() {
 			generateFromFlaps([
 				{ id: 1, x: 0, y: 0, radius: 11 },
@@ -133,7 +164,6 @@ const THREE_PERMUTATION = [
 ];
 
 function loadAndComplete(edges: NEdge[], flaps: NFlap[]): Tree {
-	fullReset();
 	const tree = createTree(edges, flaps);
 	for(const stretch of State.$stretches.values()) stretch.$repo.$complete();
 	return tree;

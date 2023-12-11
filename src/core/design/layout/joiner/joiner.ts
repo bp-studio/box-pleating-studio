@@ -6,6 +6,7 @@ import { Piece } from "../pattern/piece";
 import { SimpleJoinLogic } from "./logic/simpleJoinLogic";
 import { BaseJoinLogic } from "./logic/baseJoinLogic";
 import { StandardJoinLogic } from "./logic/standardJoinLogic";
+import { QV } from "../pattern/quadrant";
 
 import type { JoinLogic, JoinResult } from "./logic/joinLogic";
 import type { Repository } from "../repository";
@@ -100,7 +101,7 @@ export class Joiner {
 
 	public $getRelayJoinIntersection(piece: Piece, shift: IPoint,
 		q: QuadrantDirection): Point | null {
-		const testVector = this.$oriented ? new Vector(1, 1) : new Vector(-1, -1);
+		const testVector = this.$oriented ? QV[Direction.UR] : QV[Direction.LL];
 		const pt = piece.$anchors[this.q]!.sub(new Vector(shift));
 		return piece.$shape.ridges[q].$intersection(pt, testVector);
 	}
