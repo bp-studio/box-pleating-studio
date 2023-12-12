@@ -6,13 +6,14 @@
 	"main": "./build/dist/bpstudio.js",
 	"scripts": {
 		"build": "gulp",
-		"start": "http-server build/debug -p 30783 -e htm -c-1",
-		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
+		"cov": "nyc --reporter=lcovonly --reporter=text-summary mocha --require mocha-suppress-logs",
+		"cov:text": "nyc --reporter=lcovonly --reporter=text mocha --require mocha-suppress-logs",
+		"license-check": "license-checker --exclude \"MIT,Apache-2.0,BSD-2-Clause,ISC\"",
 		"lint": "eslint src",
 		"loc": "powershell \"(gci src -include *.ts,*.htm,*.scss,*.vue -recurse | select-string .).Count\"",
-		"test": "mocha --require mocha-suppress-logs",
-		"cov": "nyc --reporter=lcovonly --reporter=text-summary mocha --require mocha-suppress-logs",
-		"cov:text": "nyc --reporter=lcovonly --reporter=text mocha --require mocha-suppress-logs"
+		"start": "http-server build/debug -p 30783 -e htm -c-1",
+		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
+		"test": "mocha --require mocha-suppress-logs"
 	},
 	"author": "Mu-Tsun Tsai",
 	"license": "MIT",
