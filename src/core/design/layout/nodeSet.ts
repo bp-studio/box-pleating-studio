@@ -106,6 +106,19 @@ export class NodeSet {
 		};
 	}
 
+	/**
+	 * Compare two node sets, and return if anything has changed.
+	 */
+	public $compare(that: NodeSet): boolean {
+		if(that.$nodes.length != this.$nodes.length) return true;
+		for(let i = 0; i < this.$nodes.length; i++) {
+			if(this.$nodes[i] != that.$nodes[i]) return true;
+			const node = State.$tree.$nodes[this.$nodes[i]]!;
+			if(State.$lengthChanged.has(node)) return true;
+		}
+		return false;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

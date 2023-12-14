@@ -106,6 +106,12 @@ export namespace State {
 	 */
 	export const $repoToPartiallyProcess = new Map<Repository, ITreeNode[]>();
 
+	/**
+	 * The {@link Repository Repositories} with changes in its {@link NodeSet},
+	 * excluding those that are already in {@link $repoToProcess}.
+	 */
+	export const $repoWithNodeSetChanged = new Set<Repository>();
+
 	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
 	export const $stretchPrototypes = new Map<string, JStretch>();
 
@@ -140,6 +146,7 @@ export namespace State {
 		$newRepositories.clear();
 		$repoToProcess.clear();
 		$repoToPartiallyProcess.clear();
+		$repoWithNodeSetChanged.clear();
 		$stretchPrototypes.clear();
 		$roughContourChanged.clear();
 		$contourWillChange.clear();
@@ -155,6 +162,9 @@ export namespace State {
 				nodes: [],
 				junctions: {},
 				stretches: {},
+			},
+			update: {
+				stretches: [],
 			},
 			remove: {
 				nodes: [],

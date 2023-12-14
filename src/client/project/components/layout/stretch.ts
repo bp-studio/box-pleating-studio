@@ -121,6 +121,10 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 			this.$removeChild(device);
 			device.$destruct();
 		}
+		this.$updateGraphics(model, deviceCount);
+	}
+
+	public $updateGraphics(model: UpdateModel, deviceCount: number = this.$devices.length): void {
 		for(let i = 0; i < deviceCount; i++) {
 			const device = this._devices[i];
 			const deviceTag = this.$tag + "." + i;

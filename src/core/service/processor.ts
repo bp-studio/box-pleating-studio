@@ -14,6 +14,10 @@ export namespace Processor {
 	const taskHeap = new HeapSet<Task>((a, b) => b.$priority - a.$priority);
 
 	export function $run(...tasks: readonly Task[]): void {
+		// It would seem that putting State.$resetResult() here will make sense,
+		// but the problem is the $updateResult could be written even
+		// before the tasks start running, so we cannot actually do that.
+
 		queue(tasks);
 		while(!taskHeap.$isEmpty) {
 			const task = taskHeap.$pop()!;

@@ -31,12 +31,7 @@ declare global {
 }
 
 Assertion.addMethod("equalPath", function(pathString: string, circular: boolean = false) {
-	this.assert(
-		Array.isArray(this._obj),
-		"expect #{this} to be an array",
-		"expect #{this} to not be an array",
-		null
-	);
+	new Assertion(Array.isArray(this._obj)).to.be.true;
 	const path = (this._obj as Path).concat();
 	const orgPathString = pathToString(path);
 

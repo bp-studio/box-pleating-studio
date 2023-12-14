@@ -1,110 +1,149 @@
 import { expect } from "chai";
 
+import "../utils/line";
 import { DesignController } from "core/controller/designController";
 import { Migration } from "client/patches";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
-import { createTree, node } from "../utils/tree";
+import { createTree, id4, node } from "../utils/tree";
+import { TreeController } from "core/controller/treeController";
 import * as sample from "../samples/v04.session.sample.json";
 
 import type { NEdge, NFlap } from "../utils/tree";
 import type { Tree } from "core/design/context/tree";
 
-describe("Pattern search", function() {
+describe("Pattern", function() {
 
-	it("Loads saved patterns", function() {
-		fullReset();
-		const data = Migration.$process(sample);
-		DesignController.init(data.design);
-	});
+	describe("Searching", function() {
 
-	describe("Two flap patterns", function() {
-
-		it("Finds universal GPS patterns", function() {
-			createTree(
-				[
-					{ n1: 0, n2: 1, length: 6 },
-					{ n1: 0, n2: 2, length: 6 },
-				],
-				[
-					{ id: 1, x: 0, y: 0, width: 0, height: 0 },
-					{ id: 2, x: 11, y: 5, width: 0, height: 0 },
-				]
-			);
-			const stretch = State.$stretches.get("1,2")!;
-			stretch.$complete();
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(2);
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(1);
-			const device = pattern.$devices[0];
-			expect(device.$gadgets.length).to.equal(1);
-			const anchors = device.$anchors[0].map(p => p.$toIPoint());
-			expect(anchors).to.equalPath("(0,0),(2,3),(43/4,19/4),(9,2)");
+		it("Loads saved patterns", function() {
+			fullReset();
+			const data = Migration.$process(sample);
+			DesignController.init(data.design);
 		});
 
-	});
+		describe("Two flap patterns", function() {
 
-	describe("Three flap patterns", function() {
+			it("Finds universal GPS patterns", function() {
+				createTree(
+					[
+						{ n1: 0, n2: 1, length: 6 },
+						{ n1: 0, n2: 2, length: 6 },
+					],
+					[
+						{ id: 1, x: 0, y: 0, width: 0, height: 0 },
+						{ id: 2, x: 11, y: 5, width: 0, height: 0 },
+					]
+				);
+				const stretch = State.$stretches.get("1,2")!;
+				stretch.$complete();
+				expect(stretch).to.be.not.undefined;
+				expect(stretch.$repo.$configurations.length).to.equal(1);
+				const config = stretch.$repo.$configurations[0];
+				expect(config.$length).to.equal(2);
+				const pattern = config.$pattern!;
+				expect(pattern.$devices.length).to.equal(1);
+				const device = pattern.$devices[0];
+				expect(device.$gadgets.length).to.equal(1);
+				const anchors = device.$anchors[0].map(p => p.$toIPoint());
+				expect(anchors).to.equalPath("(0,0),(2,3),(43/4,19/4),(9,2)");
+			});
 
-		it("Does not depend on the ordering of flap ids nor the transformation factors", function() {
-			for(const [a, b, c] of THREE_PERMUTATION) {
+		});
+
+		describe("Three flap patterns", function() {
+
+			it("Does not depend on the ordering of flap ids nor the transformation factors", function() {
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 9, y: 5, radius: 2 },
+						{ id: b, x: 0, y: 0, radius: 8 },
+						{ id: c, x: 6, y: 8, radius: 2 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					expect(stretch.$repo.$configurations[0].$length).to.equal(1);
+
+					const B = node(b)!;
+					expect(B.$graphics.$patternContours.length).to.be.equal(1);
+
+					const path = toPath(B.$graphics.$patternContours[0]);
+					expect(path).to.equalPath("(8,3),(7,13/3),(7,6),(16/3,6),(4,7),(4,8)");
+				}
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: -9, y: 5, radius: 2 },
+						{ id: b, x: 0, y: 0, radius: 8 },
+						{ id: c, x: -6, y: 8, radius: 2 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					expect(stretch.$repo.$configurations[0].$length).to.equal(1);
+
+					const B = node(b)!;
+					expect(B.$graphics.$patternContours.length).to.be.equal(1);
+
+					const path = toPath(B.$graphics.$patternContours[0]);
+					expect(path).to.equalPath("(-4,8),(-4,7),(-16/3,6),(-7,6),(-7,13/3),(-8,3)");
+				}
+			});
+
+			it("Half integral relay", function() {
 				generateFromFlaps([
-					{ id: a, x: 9, y: 5, radius: 2 },
-					{ id: b, x: 0, y: 0, radius: 8 },
-					{ id: c, x: 6, y: 8, radius: 2 },
+					{ id: 1, x: 0, y: 0, radius: 11 },
+					{ id: 2, x: 8, y: 14, radius: 4 },
+					{ id: 3, x: 15, y: 8, radius: 6 },
 				]);
 				const stretch = State.$stretches.get("1,2,3")!;
 				expect(stretch).to.be.not.undefined;
 				expect(stretch.$repo.$configurations.length).to.equal(1);
-				expect(stretch.$repo.$configurations[0].$length).to.equal(1);
+				const config = stretch.$repo.$configurations[0];
+				expect(config.$length).to.equal(2, "Two half integral patterns");
+			});
 
-				const B = node(b)!;
-				expect(B.$graphics.$patternContours.length).to.be.equal(1);
+			it("Base join", function() {
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 11 },
+						{ id: b, x: 7, y: 14, radius: 4 },
+						{ id: c, x: 15, y: 8, radius: 6 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					const config = stretch.$repo.$configurations[0];
+					expect(config.$length).to.equal(1);
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(1);
+					const device = pattern.$devices[0];
+					expect(device.$addOns.length).to.equal(0, "Base joins have no addOn");
+				}
+			});
 
-				const path = toPath(B.$graphics.$patternContours[0]);
-				expect(path).to.equalPath("(8,3),(7,13/3),(7,6),(16/3,6),(4,7),(4,8)");
-			}
-			for(const [a, b, c] of THREE_PERMUTATION) {
+			it("Standard join", function() {
 				generateFromFlaps([
-					{ id: a, x: -9, y: 5, radius: 2 },
-					{ id: b, x: 0, y: 0, radius: 8 },
-					{ id: c, x: -6, y: 8, radius: 2 },
+					{ id: 1, x: 0, y: 0, radius: 11 },
+					{ id: 2, x: 5, y: 12, radius: 2 },
+					{ id: 3, x: 15, y: 8, radius: 6 },
 				]);
 				const stretch = State.$stretches.get("1,2,3")!;
 				expect(stretch).to.be.not.undefined;
 				expect(stretch.$repo.$configurations.length).to.equal(1);
-				expect(stretch.$repo.$configurations[0].$length).to.equal(1);
+				const config = stretch.$repo.$configurations[0];
+				expect(config.$length).to.equal(2, "Should find two standard joins.");
+				const pattern = config.$pattern!;
+				expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
+				const device = pattern.$devices[0];
+				expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
+			});
 
-				const B = node(b)!;
-				expect(B.$graphics.$patternContours.length).to.be.equal(1);
-
-				const path = toPath(B.$graphics.$patternContours[0]);
-				expect(path).to.equalPath("(-4,8),(-4,7),(-16/3,6),(-7,6),(-7,13/3),(-8,3)");
-			}
-		});
-
-		it("Half integral relay", function() {
-			generateFromFlaps([
-				{ id: 1, x: 0, y: 0, radius: 11 },
-				{ id: 2, x: 8, y: 14, radius: 4 },
-				{ id: 3, x: 15, y: 8, radius: 6 },
-			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(2, "Two half integral patterns");
-		});
-
-		it("Base join", function() {
-			for(const [a, b, c] of THREE_PERMUTATION) {
+			it("Split join", function() {
 				generateFromFlaps([
-					{ id: a, x: 0, y: 0, radius: 11 },
-					{ id: b, x: 7, y: 14, radius: 4 },
-					{ id: c, x: 15, y: 8, radius: 6 },
+					{ id: 1, x: 0, y: 0, radius: 15 },
+					{ id: 2, x: 7, y: 20, radius: 6 },
+					{ id: 3, x: 16, y: 12, radius: 5 },
 				]);
 				const stretch = State.$stretches.get("1,2,3")!;
 				expect(stretch).to.be.not.undefined;
@@ -112,42 +151,41 @@ describe("Pattern search", function() {
 				const config = stretch.$repo.$configurations[0];
 				expect(config.$length).to.equal(1);
 				const pattern = config.$pattern!;
-				expect(pattern.$devices.length).to.equal(1);
-				const device = pattern.$devices[0];
-				expect(device.$addOns.length).to.equal(0, "Base joins have no addOn");
-			}
+				expect(pattern.$devices.length).to.equal(2);
+			});
+
 		});
 
-		it("Standard join", function() {
-			generateFromFlaps([
-				{ id: 1, x: 0, y: 0, radius: 11 },
-				{ id: 2, x: 5, y: 12, radius: 2 },
-				{ id: 3, x: 15, y: 8, radius: 6 },
-			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(2, "Should find two standard joins.");
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
-			const device = pattern.$devices[0];
-			expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
-		});
+	});
 
-		it("Split join", function() {
-			generateFromFlaps([
-				{ id: 1, x: 0, y: 0, radius: 15 },
-				{ id: 2, x: 7, y: 20, radius: 6 },
-				{ id: 3, x: 16, y: 12, radius: 5 },
-			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(1);
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(2);
+	describe("Rendering", function() {
+
+		it("Updates ridges when edges merge or split", function() {
+			loadAndComplete(
+				[
+					{ n1: 0, n2: 1, length: 2 },
+					{ n1: 0, n2: 2, length: 2 },
+					{ n1: 0, n2: 4, length: 1 },
+					{ n1: 4, n2: 3, length: 7 },
+				],
+				[
+					{ id: 1, x: 9, y: 5, width: 0, height: 0 },
+					{ id: 2, x: 6, y: 8, width: 0, height: 0 },
+					{ id: 3, x: 0, y: 0, width: 0, height: 0 },
+				]
+			);
+			const result1 = State.$updateResult;
+			const ridges1 = result1.graphics["s1,2,3.0"].ridges;
+			expect(ridges1).to.containLine([{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]);
+
+			State.$resetResult();
+			TreeController.join(id4);
+			const result2 = State.$updateResult;
+			const data2 = result2.graphics["s1,2,3.0"];
+			expect(data2).to.be.not.undefined;
+			const ridges2 = data2.ridges;
+			expect(ridges2).to.not.containLine([{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]);
+			expect(ridges2).to.containLine([{ x: 4.5, y: 3.5 }, { x: 7, y: 6 }]);
 		});
 
 	});

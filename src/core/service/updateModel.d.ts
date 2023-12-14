@@ -15,6 +15,10 @@ export interface UpdateModel {
 	/** Record the entire tree when any part of it changes. */
 	tree?: TreeData;
 
+	update: {
+		stretches: string[];
+	};
+
 	remove: {
 		nodes: NodeId[];
 		junctions: string[];

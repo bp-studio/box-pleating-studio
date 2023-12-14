@@ -23,8 +23,10 @@ export const graphicsTask = new Task(graphics);
 
 function graphics(): void {
 	// Devices
-	for(const repo of State.$repoToProcess) {
-		if(repo.$pattern) addRepo(repo);
+	for(const repo of State.$repoToProcess) addRepo(repo);
+	for(const repo of State.$repoWithNodeSetChanged) {
+		State.$updateResult.update.stretches.push(repo.$stretch.$id);
+		addRepo(repo);
 	}
 
 	const freeCorners: Point[] = [];

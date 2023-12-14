@@ -232,8 +232,13 @@ export class Layout extends View implements ISerializable<JLayout> {
 			this.$sheet.$removeChild(stretch);
 			stretch.$destruct();
 		}
+		for(const tag of model.update.stretches) {
+			const stretch = this.$stretches.get(tag);
+			if(stretch) {
+				stretch.$updateGraphics(model);
+			}
+		}
 	}
-
 
 	private _parseTag(tag: string): Flap | River | void {
 		const m = tag.match(/^([a-z]+)(\d+(?:,\d+)*)(?:\.(.+))?$/);
