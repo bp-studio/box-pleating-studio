@@ -193,10 +193,10 @@ export namespace Interaction {
 
 	function mouseDown(event: MouseEvent): void {
 		pointerHeld = true;
-		SelectionController.$process(event);
-
-		// Click-dragging is OK for mouse
-		DragController.$init(event);
+		if(SelectionController.$process(event)) {
+			// Click-dragging is OK for mouse
+			DragController.$init(event);
+		}
 	}
 
 	function touchStart(): void {

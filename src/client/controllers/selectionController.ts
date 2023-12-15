@@ -65,6 +65,7 @@ export namespace SelectionController {
 
 	let statusCache: HitStatus = { current: null, next: null };
 
+	const establishedSelections: Set<DragSelectable> = new Set();
 
 	let dragSelectables: DragSelectable[];
 
@@ -124,18 +125,28 @@ export namespace SelectionController {
 		return current instanceof Draggable;
 	}
 
-	/** Process a clicking event. */
-	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): void {
+	/**
+	 * Process a clicking event, and return whether we are in a state that should initialize dragging.
+	 */
+	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): boolean {
 		if(event instanceof MouseEvent) ctrlKey ??= event.ctrlKey || event.metaKey;
 		const { current, next } = getStatus();
 
 		// Selection logic for mouse click
 		if(!ctrlKey) {
 			if(!current) clear();
-			if(!current && next) select(next);
+			if(!current && next) trySelect(next);
+			return Boolean(current || next);
 		} else {
-			if(next) select(next);
-			else if(current) $toggle(current, !current.$selected);
+			if(next) {
+				return trySelect(next);
+			} else if(current) {
+				// For ctrl + click, drag only when selection is added
+				const newState = !current.$selected;
+				$toggle(current, newState);
+				return newState;
+			}
+			return false;
 		}
 	}
 
@@ -146,7 +157,7 @@ export namespace SelectionController {
 		if(project && !project.$isDragging) {
 			if(current && next) clear();
 			if(current && !next) clear(current);
-			if(next) select(next);
+			if(next) trySelect(next);
 		}
 	}
 
@@ -167,7 +178,7 @@ export namespace SelectionController {
 	}
 
 	/**
-	 * End drag-selection and returns in drag-selection was in progress.
+	 * End drag-selection and returns if drag-selection was in progress.
 	 *
 	 * @param cancel Should we cancel the selection already made
 	 */
@@ -176,6 +187,7 @@ export namespace SelectionController {
 		if(result && cancel) clear();
 		view.visible = false;
 		display.$setInteractive(true);
+		establishedSelections.clear();
 		dragSelectables = [];
 		return result;
 	}
@@ -183,12 +195,21 @@ export namespace SelectionController {
 	export function $processDragSelect(event: MouseEvent | TouchEvent): boolean {
 		const { point, downPoint, dist } = CursorController.$displacement(event);
 		const sheet = ProjectService.sheet.value!;
-
+		const ctrl = event.ctrlKey || event.metaKey;
 		// Initialization
 		if(!view.visible) {
 			// Must drag to a certain distance to trigger drag-selection.
 			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return false;
-			clear();
+			if(ctrl) {
+				// Keep a record of established selections
+				for(const control of selections.concat()) {
+					const c = control as DragSelectable;
+					if(c.$anchor) establishedSelections.add(c);
+					else $toggle(c, false);
+				}
+			} else {
+				clear();
+			}
 			view.visible = true;
 			display.$setInteractive(false);
 			dragSelectables = [...sheet.$controls].filter(
@@ -219,7 +240,10 @@ export namespace SelectionController {
 
 		// Check selected objects (linear search is good enough for the moment).
 		for(const ds of dragSelectables) {
-			$toggle(ds, rect.contains(ds.$anchor.x, ds.$anchor.y));
+			$toggle(ds,
+				ctrl && establishedSelections.has(ds) || // must hold ctrl to have this behavior
+				rect.contains(ds.$anchor.x, ds.$anchor.y)
+			);
 		}
 		return true;
 	}
@@ -258,10 +282,16 @@ export namespace SelectionController {
 		return statusCache = { current, next };
 	}
 
-	function select(c: Control): void {
+	/**
+	 * Try to add a control to the current selection,
+	 * and return if it was successful.
+	 */
+	function trySelect(c: Control): boolean {
 		if(!c.$selected && (selections.length == 0 || selections[0].$selectableWith(c))) {
 			c.$selected = true;
 			selections.push(c);
+			return true;
 		}
+		return false;
 	}
 }
