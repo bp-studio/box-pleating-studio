@@ -2,10 +2,25 @@ import { expect } from "chai";
 
 import { parseRationalPath } from "../utils/rationalPath";
 import { toGraphicalContours } from "core/design/tasks/utils/combine";
+import { parseTree } from "../utils/tree";
+import { State } from "core/service/state";
 
 import type { RationalContour } from "core/design/tasks/utils/combine";
 
 describe("Contour", function() {
+
+	describe("Trace contour", function() {
+
+		it("Creates raw contour when critical corners are missing", function() {
+			parseTree(
+				"(5,0,1),(5,7,1),(0,2,1),(0,1,3),(0,6,1),(7,13,1),(7,4,1),(2,11,1),(2,8,1),(2,3,2),(2,15,1),(6,10,1),(6,9,1),(13,14,6),(11,12,1)",
+				"(1,3,6,0,0),(3,11,6,0,0),(8,8,6,0,1),(9,4,11,0,0),(10,2,11,0,0),(12,9,10,0,0),(4,7,1,0,0),(14,17,21,0,0),(15,12,9,0,2)"
+			);
+			const outer = State.$updateResult.graphics["re0,5"].contours[0].outer;
+			expect(outer).to.equalPath("(43/3,13),(13,14),(-1,14),(-1,2),(5,2),(5,2.5),(17/3,3),(25/3,3),(9,2.5),(9,2),(15,2),(15,13)");
+		});
+
+	});
 
 	describe("Graphical contour", function() {
 		it("Handles floating error", function() {
