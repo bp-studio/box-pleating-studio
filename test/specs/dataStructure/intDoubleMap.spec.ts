@@ -4,25 +4,39 @@ import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
 
 describe("Int Double Map", function() {
 
+	it("Defines toStringTag", function() {
+		const map = new IntDoubleMap<number, string>();
+		expect(String(map)).to.equal("[object IntDoubleMap(0)]");
+	});
+
 	it("Stores double number indices", function() {
 		const map = new IntDoubleMap<number, string>();
 		const value = "a";
 		map.set(1, 2, value);
 		expect(map.size).to.equal(1);
+		expect([...map.keys()].length).to.equal(1);
+		expect([...map.firstKeys()].length).to.equal(2);
 		expect(map.has(1, 2)).to.be.true;
 		expect(map.has(2, 1)).to.be.true;
 		expect(map.get(2, 1)).to.equal(value);
+		expect([...map]).to.deep.equal([[1, 2, "a"]]);
+
+		let str = "";
+		map.forEach((v, k1, k2) => str += v + k1 + k2);
+		expect(str).to.equal("a12");
 
 		map.set(2, 2, "b");
-		expect(map.has(2));
+		expect(map.has(2)).to.be.true;
 		map.set(2, 1, "c");
+		map.set(2, 3, "d");
 
-		const keys = [...map.keys()];
-		expect(keys.length).to.equal(2);
+		expect([...map.keys()].length).to.equal(3);
 
-		map.clear();
-		expect(map.size).to.equal(0);
+		map.delete(2, 2);
+		map.delete(1, 2);
+		map.delete(3, 2);
 		expect(map.has(1)).to.be.false;
+		expect(map.size).to.equal(0);
 	});
 
 	it("Checks validity of indices", function() {
