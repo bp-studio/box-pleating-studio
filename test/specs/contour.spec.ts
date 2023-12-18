@@ -2,12 +2,30 @@ import { expect } from "chai";
 
 import { parseRationalPath } from "../utils/rationalPath";
 import { toGraphicalContours } from "core/design/tasks/utils/combine";
-import { parseTree } from "../utils/tree";
+import { id1, id6, parseTree } from "../utils/tree";
 import { State } from "core/service/state";
+import { TreeController } from "core/controller/treeController";
 
+import type { NodeId } from "shared/json/tree";
 import type { RationalContour } from "core/design/tasks/utils/combine";
 
 describe("Contour", function() {
+
+	describe("Pattern contour", function() {
+
+		it("Updates node ids after the tree is rebalanced", function() {
+			parseTree("(0,1,1),(1,2,2),(0,3,1),(3,4,1),(4,5,1),(4,6,1)", "(2,11,6,0,0),(5,7,1,0,0),(6,17,6,0,0)");
+			const node = State.$tree.$nodes[id1]!;
+			expect(node.$graphics.$patternContours.length).to.equal(1);
+			const contour = node.$graphics.$patternContours[0];
+			expect(contour.$ids).to.eql([1, 2, 3, 4, 5], "Root node is not included");
+
+			const id = 7 as NodeId;
+			TreeController.addLeaf(id, id6, 1, { id, x: 21, y: 9, width: 0, height: 0 });
+			expect(contour.$ids).to.eql([0, 1, 2, 4, 5], "Ids are updated");
+		});
+
+	});
 
 	describe("Trace contour", function() {
 
@@ -23,6 +41,7 @@ describe("Contour", function() {
 	});
 
 	describe("Graphical contour", function() {
+
 		it("Handles floating error", function() {
 			// This example is derived from Calvisia conicipennis
 			const contour: RationalContour = {
@@ -43,6 +62,7 @@ describe("Contour", function() {
 			const result = toGraphicalContours(contour);
 			expect(result[0]?.inner?.[0]).to.be.an("array").that.deep.contains({ x: 28, y: 26 });
 		});
+
 	});
 
 });
