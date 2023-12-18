@@ -211,9 +211,10 @@ describe("Tree", function() {
 			TreeController.edit([
 				[false, { n1: id4, n2: id0, length: 1 }],
 				[false, { n1: id4, n2: id3, length: 1 }],
-				[false, { n1: id0, n2: id3, length: 1 }],
+				[true, { n1: id0, n2: id3, length: 1 }],
 			], id0, [], []);
 			expect(tree.$root.id).to.equal(0);
+			expect(node(3)).to.be.not.undefined;
 			expect(node(4)).to.be.undefined;
 		});
 	});
