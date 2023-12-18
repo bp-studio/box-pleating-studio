@@ -24,7 +24,6 @@
 		"scss/at-import-partial-extension": null,
 		"selector-id-pattern": null,
 		"selector-no-vendor-prefix": null,
-		"value-no-vendor-prefix": null,
-		"no-empty-first-line": null
+		"value-no-vendor-prefix": null
 	}
 }
