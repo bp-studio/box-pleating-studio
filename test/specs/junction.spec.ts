@@ -4,26 +4,14 @@ import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { getFirst } from "shared/utils/set";
-import { createTree, id0, id3, id4 } from "../utils/tree";
+import { id0, id3, id4, parseTree } from "../utils/tree";
 
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {
 
 	it("Computes valid junctions", function() {
-		createTree(
-			[
-				{ n1: 0, n2: 1, length: 1 },
-				{ n1: 0, n2: 2, length: 1 },
-				{ n1: 1, n2: 3, length: 3 },
-				{ n1: 2, n2: 4, length: 2 },
-			],
-			[
-				{ id: 3, x: 0, y: 0, width: 0, height: 0 },
-				{ id: 4, x: 5, y: 5, width: 0, height: 0 },
-			]
-		);
-
+		parseTree("(0,1,1),(0,2,1),(1,3,3),(2,4,2)", "(3,0,0,0,0),(4,5,5,0,0)");
 		expect(State.$junctions.size).to.equal(1);
 		expect(State.$junctions.has(id3, id4)).to.be.true;
 
@@ -38,18 +26,7 @@ describe("Junction", function() {
 	});
 
 	it("Creates new junction upon merging", function() {
-		const tree = createTree(
-			[
-				{ n1: 0, n2: 1, length: 1 },
-				{ n1: 0, n2: 2, length: 1 },
-				{ n1: 1, n2: 3, length: 3 },
-				{ n1: 2, n2: 4, length: 2 },
-			],
-			[
-				{ id: 3, x: 0, y: 0, width: 0, height: 0 },
-				{ id: 4, x: 5, y: 5, width: 0, height: 0 },
-			]
-		);
+		const tree = parseTree("(0,1,1),(0,2,1),(1,3,3),(2,4,2)", "(3,0,0,0,0),(4,5,5,0,0)");
 
 		const junction1 = State.$junctions.get(id3, id4) as ValidJunction;
 		tree.$join(id0);
@@ -67,23 +44,9 @@ describe("Junction", function() {
 	});
 
 	it("Determines junction covering", function() {
-		createTree(
-			[
-				{ n1: 0, n2: 1, length: 8 },
-				{ n1: 0, n2: 5, length: 2 },
-				{ n1: 8, n2: 0, length: 1 },
-				{ n1: 2, n2: 1, length: 8 },
-				{ n1: 8, n2: 6, length: 1 },
-				{ n1: 2, n2: 3, length: 2 },
-				{ n1: 7, n2: 2, length: 1 },
-				{ n1: 7, n2: 4, length: 1 },
-			],
-			[
-				{ id: 5, width: 0, height: 0, x: 0, y: 14 },
-				{ id: 6, width: 0, height: 0, x: 0, y: 18 },
-				{ id: 3, width: 0, height: 0, x: 15, y: 0 },
-				{ id: 4, width: 0, height: 0, x: 19, y: 0 },
-			]
+		parseTree(
+			"(0,1,8),(0,5,2),(8,0,1),(2,1,8),(8,6,1),(2,3,2),(7,2,1),(7,4,1)",
+			"(5,0,14,0,0),(6,0,18,0,0),(3,15,0,0,0),(4,19,0,0,0)"
 		);
 		const validJunctions = [...State.$junctions.values()].filter(j => j.$valid) as ValidJunction[];
 		expect(validJunctions.length).to.equal(4, "Should have 4 valid junctions");

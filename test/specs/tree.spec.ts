@@ -4,7 +4,7 @@ import { TreeController } from "core/controller/treeController";
 import { getDist } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
-import { createTree, node, id0, id1, id2, id3, id4, id6 } from "../utils/tree";
+import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "../utils/tree";
 
 describe("Tree", function() {
 
@@ -108,18 +108,7 @@ describe("Tree", function() {
 	});
 
 	it("Keeps a record of AABB", function() {
-		createTree(
-			[
-				{ n1: 0, n2: 1, length: 1 },
-				{ n1: 1, n2: 2, length: 2 },
-				{ n1: 0, n2: 3, length: 3 },
-				{ n1: 3, n2: 4, length: 4 },
-			],
-			[
-				{ id: 2, x: 8, y: 8, width: 0, height: 0 },
-				{ id: 4, x: 5, y: 2, width: 0, height: 0 },
-			]
-		);
+		parseTree("(0,1,1),(1,2,2),(0,3,3),(3,4,4)", "(2,8,8,0,0),(4,5,2,0,0)");
 		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
 		expect(n2.$AABB.$toArray()).to.eql([10, 10, 6, 6]);
 		expect(n1.$AABB.$toArray()).to.eql([11, 11, 5, 5]);

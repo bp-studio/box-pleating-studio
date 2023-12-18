@@ -5,11 +5,10 @@ import { DesignController } from "core/controller/designController";
 import { Migration } from "client/patches";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
-import { createTree, id4, node } from "../utils/tree";
+import { createTree, id4, node, parseTree } from "../utils/tree";
 import { TreeController } from "core/controller/treeController";
 import * as sample from "../samples/v04.session.sample.json";
 
-import type { NEdge, NFlap } from "../utils/tree";
 import type { Tree } from "core/design/context/tree";
 
 describe("Pattern", function() {
@@ -25,16 +24,7 @@ describe("Pattern", function() {
 		describe("Two flap patterns", function() {
 
 			it("Finds universal GPS patterns", function() {
-				createTree(
-					[
-						{ n1: 0, n2: 1, length: 6 },
-						{ n1: 0, n2: 2, length: 6 },
-					],
-					[
-						{ id: 1, x: 0, y: 0, width: 0, height: 0 },
-						{ id: 2, x: 11, y: 5, width: 0, height: 0 },
-					]
-				);
+				parseTree("(0,1,6),(0,2,6)", "(1,0,0,0,0),(2,11,5,0,0)");
 				const stretch = State.$stretches.get("1,2")!;
 				stretch.$complete();
 				expect(stretch).to.be.not.undefined;
@@ -161,19 +151,8 @@ describe("Pattern", function() {
 	describe("Rendering", function() {
 
 		it("Updates ridges when edges merge or split", function() {
-			loadAndComplete(
-				[
-					{ n1: 0, n2: 1, length: 2 },
-					{ n1: 0, n2: 2, length: 2 },
-					{ n1: 0, n2: 4, length: 1 },
-					{ n1: 4, n2: 3, length: 7 },
-				],
-				[
-					{ id: 1, x: 9, y: 5, width: 0, height: 0 },
-					{ id: 2, x: 6, y: 8, width: 0, height: 0 },
-					{ id: 3, x: 0, y: 0, width: 0, height: 0 },
-				]
-			);
+			parseTree("(0,1,2),(0,2,2),(0,4,1),(4,3,7)", "(1,9,5,0,0),(2,6,8,0,0),(3,0,0,0,0)");
+			complete();
 			const result1 = State.$updateResult;
 			const ridges1 = result1.graphics["s1,2,3.0"].ridges;
 			expect(ridges1).to.containLine([{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]);
@@ -201,10 +180,8 @@ const THREE_PERMUTATION = [
 	[3, 2, 1],
 ];
 
-function loadAndComplete(edges: NEdge[], flaps: NFlap[]): Tree {
-	const tree = createTree(edges, flaps);
+function complete(): void {
 	for(const stretch of State.$stretches.values()) stretch.$repo.$complete();
-	return tree;
 }
 
 interface IFlap {
@@ -215,8 +192,10 @@ interface IFlap {
 }
 
 function generateFromFlaps(flaps: IFlap[]): Tree {
-	return loadAndComplete(
+	const tree = createTree(
 		flaps.map(f => ({ n1: 0, n2: f.id, length: f.radius })),
 		flaps.map(f => ({ id: f.id, width: 0, height: 0, x: f.x, y: f.y }))
 	);
+	complete();
+	return tree;
 }

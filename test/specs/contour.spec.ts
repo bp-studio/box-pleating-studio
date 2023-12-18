@@ -2,12 +2,46 @@ import { expect } from "chai";
 
 import { parseRationalPath } from "../utils/rationalPath";
 import { toGraphicalContours } from "core/design/tasks/utils/combine";
+import { id1, id6, parseTree } from "../utils/tree";
+import { State } from "core/service/state";
+import { TreeController } from "core/controller/treeController";
 
+import type { NodeId } from "shared/json/tree";
 import type { RationalContour } from "core/design/tasks/utils/combine";
 
 describe("Contour", function() {
 
+	describe("Pattern contour", function() {
+
+		it("Updates node ids after the tree is rebalanced", function() {
+			parseTree("(0,1,1),(1,2,2),(0,3,1),(3,4,1),(4,5,1),(4,6,1)", "(2,11,6,0,0),(5,7,1,0,0),(6,17,6,0,0)");
+			const node = State.$tree.$nodes[id1]!;
+			expect(node.$graphics.$patternContours.length).to.equal(1);
+			const contour = node.$graphics.$patternContours[0];
+			expect(contour.$ids).to.eql([1, 2, 3, 4, 5], "Root node is not included");
+
+			const id = 7 as NodeId;
+			TreeController.addLeaf(id, id6, 1, { id, x: 21, y: 9, width: 0, height: 0 });
+			expect(contour.$ids).to.eql([0, 1, 2, 4, 5], "Ids are updated");
+		});
+
+	});
+
+	describe("Trace contour", function() {
+
+		it("Creates raw contour when critical corners are missing", function() {
+			parseTree(
+				"(5,0,1),(5,7,1),(0,2,1),(0,1,3),(0,6,1),(7,13,1),(7,4,1),(2,11,1),(2,8,1),(2,3,2),(2,15,1),(6,10,1),(6,9,1),(13,14,6),(11,12,1)",
+				"(1,3,6,0,0),(3,11,6,0,0),(8,8,6,0,1),(9,4,11,0,0),(10,2,11,0,0),(12,9,10,0,0),(4,7,1,0,0),(14,17,21,0,0),(15,12,9,0,2)"
+			);
+			const outer = State.$updateResult.graphics["re0,5"].contours[0].outer;
+			expect(outer).to.equalPath("(43/3,13),(13,14),(-1,14),(-1,2),(5,2),(5,2.5),(17/3,3),(25/3,3),(9,2.5),(9,2),(15,2),(15,13)");
+		});
+
+	});
+
 	describe("Graphical contour", function() {
+
 		it("Handles floating error", function() {
 			// This example is derived from Calvisia conicipennis
 			const contour: RationalContour = {
@@ -28,6 +62,7 @@ describe("Contour", function() {
 			const result = toGraphicalContours(contour);
 			expect(result[0]?.inner?.[0]).to.be.an("array").that.deep.contains({ x: 28, y: 26 });
 		});
+
 	});
 
 });
