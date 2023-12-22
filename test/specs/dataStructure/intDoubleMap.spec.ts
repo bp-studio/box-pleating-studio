@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
 
-describe("Int Double Map", function() {
+export default function() {
 
 	it("Defines toStringTag", function() {
 		const map = new IntDoubleMap<number, string>();
@@ -74,4 +74,4 @@ describe("Int Double Map", function() {
 		expect(map.size).to.equal(1);
 	});
 
-});
+}

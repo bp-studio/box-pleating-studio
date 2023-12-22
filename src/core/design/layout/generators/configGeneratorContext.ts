@@ -38,6 +38,7 @@ export class ConfigGeneratorContext {
 	 */
 	public $cut(j: JJunction, index: number, x: number, y: number): [JOverlap, JOverlap] {
 		const o1 = this.$toOverlap(j, index), o2 = this.$toOverlap(j, index);
+		/* istanbul ignore next: debug */
 		if(o1.id === undefined || o2.id === undefined) debugger;
 		if(x > 0) {
 			o1.c[2] = { type: CornerType.internal, e: o2.id, q: 3 };

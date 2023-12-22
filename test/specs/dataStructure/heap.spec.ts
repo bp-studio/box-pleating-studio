@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { HeapSet } from "shared/data/heap/heapSet";
 import { xyComparator } from "shared/types/geometry";
 
-describe("Heap", function() {
+export default function() {
 
 	describe("HeapSet", function() {
 
@@ -21,4 +21,4 @@ describe("Heap", function() {
 			expect(heap.$pop()).to.be.undefined;
 		});
 	});
-});
+}

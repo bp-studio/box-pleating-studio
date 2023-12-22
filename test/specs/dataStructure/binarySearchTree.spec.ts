@@ -8,7 +8,7 @@ import { minComparator } from "shared/data/heap/heap";
 
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 
-describe("Binary Search Tree", function() {
+export default function() {
 
 	describe("AVL Tree", function() {
 
@@ -51,8 +51,8 @@ describe("Binary Search Tree", function() {
 		});
 
 	});
-});
 
+}
 
 function testAdjacency(tree: IBinarySearchTree<number>): void {
 	// Generate some numbers to add

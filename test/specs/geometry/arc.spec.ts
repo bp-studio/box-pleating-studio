@@ -6,7 +6,7 @@ import { StartEvent } from "core/math/sweepLine/classes/event";
 import { ArcSegment } from "core/math/sweepLine/classes/segment/arcSegment";
 import { dist } from "shared/types/geometry";
 
-describe("Arc", function() {
+export default function() {
 	it("Computes intersection", function() {
 		const c1 = { x: 6, y: 6 };
 		const c2 = { x: 3, y: 3 };
@@ -34,4 +34,4 @@ describe("Arc", function() {
 		const ev = new StartEvent(s, arc, 1, 0);
 		expect(getCurvature(ev)).to.equal(1 / 6);
 	});
-});
+}

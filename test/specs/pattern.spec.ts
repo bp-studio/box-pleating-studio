@@ -1,11 +1,12 @@
 import { expect } from "chai";
 
 import "../utils/line";
+import { LayoutController } from "core/controller/layoutController";
 import { DesignController } from "core/controller/designController";
 import { Migration } from "client/patches";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
-import { createTree, id4, node, parseTree } from "../utils/tree";
+import { createTree, id2, id4, node, parseTree } from "../utils/tree";
 import { TreeController } from "core/controller/treeController";
 import * as sample from "../samples/v04.session.sample.json";
 
@@ -19,17 +20,70 @@ describe("Pattern", function() {
 			fullReset();
 			const data = Migration.$process(sample);
 			DesignController.init(data.design);
+			const stretch = State.$stretches.get("12,27")!;
+			const device = stretch.$repo.$pattern!.$devices[0];
+			expect(device.$offset).to.equal(4);
+		});
+
+		it("Signifies when no pattern is found", function() {
+			generateFromFlaps([
+				{ id: 1, x: 0, y: 0, radius: 10 },
+				{ id: 2, x: 10, y: 11, radius: 3 },
+				{ id: 3, x: 11, y: 5, radius: 2 },
+			]);
+			const stretch = State.$stretches.get("1,2,3")!;
+			expect(stretch.$repo.$pattern).to.equal(null);
+			expect(State.$updateResult.patternNotFound).to.be.true;
+		});
+
+		it("Caches repo during dragging", function() {
+			parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
+			LayoutController.completeStretch("1,2");
+
+			const stretch = State.$stretches.get("1,2")!;
+			expect(stretch.$isActive).to.be.true;
+			const repo = stretch.$repo;
+			expect(repo.$configurations.length).to.equal(1);
+			const config = repo.$configuration!;
+			expect(config.$length).to.equal(2);
+			expect(config.$index).to.equal(0);
+
+			LayoutController.switchPattern("1,2", 1);
+			expect(config.$index).to.equal(1);
+
+			LayoutController.updateFlap([{ id: id2, x: 8, y: 10, width: 0, height: 0 }], true, []);
+			expect(stretch.$repo).to.not.equal(repo);
+
+			LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
+			LayoutController.dragEnd();
+			expect(stretch.$isActive).to.be.true;
+			expect(stretch.$repo).to.equal(repo);
+			expect(config.$index).to.equal(1);
+
+			LayoutController.updateFlap([{ id: id2, x: 11, y: 9, width: 0, height: 0 }], true, []);
+			expect(stretch.$isActive).to.be.false;
+
+			LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
+			LayoutController.dragEnd();
+			expect(stretch.$isActive).to.be.true;
+
+			// Not cached if not dragging
+			LayoutController.updateFlap([{ id: id2, x: 8, y: 10, width: 0, height: 0 }], false, []);
+			LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], false, []);
+			expect(stretch.$repo).to.not.equal(repo);
+			expect(stretch.$repo.$configuration!.$index).to.equal(0);
 		});
 
 		describe("Two flap patterns", function() {
 
 			it("Finds universal GPS patterns", function() {
 				parseTree("(0,1,6),(0,2,6)", "(1,0,0,0,0),(2,11,5,0,0)");
+				LayoutController.completeStretch("1,2");
+
 				const stretch = State.$stretches.get("1,2")!;
-				stretch.$complete();
 				expect(stretch).to.be.not.undefined;
 				expect(stretch.$repo.$configurations.length).to.equal(1);
-				const config = stretch.$repo.$configurations[0];
+				const config = stretch.$repo.$configuration!;
 				expect(config.$length).to.equal(2);
 				const pattern = config.$pattern!;
 				expect(pattern.$devices.length).to.equal(1);
@@ -37,6 +91,19 @@ describe("Pattern", function() {
 				expect(device.$gadgets.length).to.equal(1);
 				const anchors = device.$anchors[0].map(p => p.$toIPoint());
 				expect(anchors).to.equalPath("(0,0),(2,3),(43/4,19/4),(9,2)");
+			});
+
+			it("Find double relay patterns", function() {
+				parseTree("(0,1,8),(0,2,4)", "(1,0,0,0,0),(2,10,7,0,0)");
+				LayoutController.completeStretch("1,2");
+
+				const stretch = State.$stretches.get("1,2")!;
+				expect(stretch).to.be.not.undefined;
+				expect(stretch.$repo.$configurations.length).to.equal(4);
+				const config = stretch.$repo.$configuration!;
+				expect(config.$length).to.equal(1);
+				const pattern = config.$pattern!;
+				expect(pattern.$devices.length).to.equal(2);
 			});
 
 		});

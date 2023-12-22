@@ -1,11 +1,11 @@
 import { expect } from "chai";
 
-import { parsePath } from "../utils/path";
+import { parsePath } from "../../utils/path";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
 import { Clip } from "core/math/sweepLine/clip/clip";
 import { CreaseType } from "shared/types/cp";
 
-describe("Sweep-line algorithms", function() {
+export default function() {
 
 	describe("Stacking", function() {
 
@@ -45,4 +45,4 @@ describe("Sweep-line algorithms", function() {
 
 	});
 
-});
+}

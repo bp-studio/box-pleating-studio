@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { clone, clonePolyfill, deepAssign } from "shared/utils/clone";
 
-describe("Clone utility", function() {
+export default function() {
 	it("Works the same way as structureClone", function() {
 		const obj = {
 			data: {
@@ -29,4 +29,4 @@ describe("Clone utility", function() {
 		deepAssign(target, source, "test");
 		expect(target.data.attr).to.equal("test");
 	});
-});
+}

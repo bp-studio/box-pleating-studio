@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 
-describe("Valued Int Double Map", function() {
+export default function() {
 
 	it("Can lookup values", function() {
 		const map = new ValuedIntDoubleMap<number, string>();
@@ -51,4 +51,4 @@ describe("Valued Int Double Map", function() {
 		expect(map.has(1, 2)).to.be.false;
 	});
 
-});
+}

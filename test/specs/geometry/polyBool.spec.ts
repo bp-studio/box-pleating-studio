@@ -2,15 +2,15 @@ import { expect } from "chai";
 
 import { expand } from "core/design/tasks/roughContour";
 import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
-import { random } from "../utils/random";
-import { parsePath } from "../utils/path";
+import { random } from "../../utils/random";
+import { parsePath } from "../../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
 import type { NodeId } from "shared/json/tree";
 import type { RoughContour } from "core/design/context";
 import type { Polygon } from "shared/types/geometry";
 
-describe("PolyBool", function() {
+export default function() {
 
 	describe("AAUnion operation", function() {
 		it("Finds union of AABBs", function() {
@@ -269,7 +269,7 @@ describe("PolyBool", function() {
 			expect(result[0]).to.equalPath("(2,5,2,4,1),(1.7071067811865483,5.707106781186548,2.0000000000000004,5.414213562373095,1),(0.2928932188134521,4.292893218813452,0.75,5.25,3),(1,4,0.585786437626905,4,1)", true);
 		});
 	});
-});
+}
 
 interface IAABB {
 	top: number;
