@@ -1,6 +1,7 @@
 import { SweepLine } from "./sweepLine";
 
-import type { StartEvent } from "./classes/event";
+import type { IEndProcessor } from "./classes/endProcessor";
+import type { EndEvent, StartEvent } from "./classes/event";
 import type { EventProvider } from "./classes/eventProvider";
 import type { Intersector } from "./classes/intersector";
 import type { ISegment } from "./classes/segment/segment";
@@ -21,6 +22,11 @@ export abstract class DivideAndCollect extends SweepLine {
 
 	/** The {@link ISegment}s we collected during the course. */
 	protected readonly _collectedSegments: ISegment[] = [];
+
+	/** Allowing composition of {@link EndEvent} processing logic. */
+	protected abstract readonly _endProcessor: IEndProcessor;
+
+	protected abstract readonly _shouldPickInside: boolean;
 
 	constructor(provider: EventProvider, intersector: Intersector) {
 		super(provider);
@@ -51,7 +57,7 @@ export abstract class DivideAndCollect extends SweepLine {
 		this._collectedSegments.length = 0;
 	}
 
-	protected _processStart(event: StartEvent): void {
+	protected override _processStart(event: StartEvent): void {
 		this._status.$insert(event, event);
 		const prev = this._status.$getPrev(event);
 		const next = this._status.$getNext(event);
@@ -72,5 +78,10 @@ export abstract class DivideAndCollect extends SweepLine {
 			// new prev/next events.
 			this._eventQueue.$insert(event);
 		}
+	}
+
+	protected override _processEnd(event: EndEvent): void {
+		const start = this._endProcessor(event, this._status, this._intersector);
+		if(start.$isInside === this._shouldPickInside) this._collectedSegments.push(start.$segment);
 	}
 }

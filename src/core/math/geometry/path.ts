@@ -44,16 +44,6 @@ export function pointToString(p: IArcPoint): string {
 	return `(${p.x},${p.y})`;
 }
 
-/** For testing. */
-export function isAAPath(path: Path): boolean {
-	const l = path.length;
-	for(let i = 0, j = l - 1; i < l; j = i++) {
-		const prev = path[j], p = path[i];
-		if(prev.x != p.x && prev.y != p.y) return false;
-	}
-	return true;
-}
-
 export function isClockwise(path: PathEx): boolean {
 	const l = path.length;
 	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;

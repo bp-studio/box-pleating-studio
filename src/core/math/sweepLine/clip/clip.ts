@@ -5,11 +5,11 @@ import { xyComparator } from "shared/types/geometry";
 import { GeneralEventProvider } from "../polyBool/generalUnion/generalEventProvider";
 import { epsilonSame } from "core/math/geometry/float";
 import { DivideAndCollect } from "../divideAndCollect";
+import { compareOrientation } from "../classes/orientation";
+import { generalEndProcessor } from "../classes/endProcessor";
 
-import type { Intersector } from "../classes/intersector";
-import type { ISegment } from "../classes/segment/segment";
 import type { CPLine } from "shared/types/cp";
-import type { StartEvent, EndEvent } from "../classes/event";
+import type { StartEvent } from "../classes/event";
 import type { Chainer } from "../classes/chainer/chainer";
 import type { PolyBool } from "../polyBool/polyBool";
 
@@ -29,8 +29,12 @@ import type { PolyBool } from "../polyBool/polyBool";
 
 export class Clip extends DivideAndCollect {
 
-	constructor(intersector: Intersector = new GeneralIntersector()) {
-		super(new GeneralEventProvider(true), intersector);
+	protected override readonly _orientation = compareOrientation;
+	protected override readonly _endProcessor = generalEndProcessor;
+	protected override readonly _shouldPickInside = true;
+
+	constructor() {
+		super(new GeneralEventProvider(true), new GeneralIntersector());
 	}
 
 	/** Process the set of crease pattern lines. */
@@ -62,22 +66,6 @@ export class Clip extends DivideAndCollect {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected override _isOriented(segment: ISegment, delta: Sign): boolean {
-		// Unlike PolyBool, we need to actually compare the endpoints here
-		return xyComparator(segment.$start, segment.$end) < 0;
-	}
-
-	protected override _processEnd(event: EndEvent): void {
-		const start = event.$other;
-		const prev = this._status.$getPrev(start);
-		const next = this._status.$getNext(start);
-		if(start.$isInside) this._collectedSegments.push(start.$segment);
-		this._status.$delete(start);
-
-		// Need to check intersections after an EndEvent
-		this._intersector.$possibleIntersection(prev, next);
-	}
 
 	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
 		if(prev) event.$wrapCount += prev.$wrapCount;

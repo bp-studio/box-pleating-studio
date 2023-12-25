@@ -1,7 +1,10 @@
 import { LineSegment } from "../classes/segment/lineSegment";
 import { xyComparator } from "shared/types/geometry";
-import { Clip } from "./clip";
 import { OverlapIntersector } from "./overlapIntersector";
+import { DivideAndCollect } from "../divideAndCollect";
+import { GeneralEventProvider } from "../polyBool/generalUnion/generalEventProvider";
+import { compareOrientation } from "../classes/orientation";
+import { generalEndProcessor } from "../classes/endProcessor";
 
 import type { StartEvent } from "../classes/event";
 import type { Polygon } from "shared/types/geometry";
@@ -9,12 +12,11 @@ import type { Polygon } from "shared/types/geometry";
 //=================================================================
 /**
  * {@link Overlap} is the sweep line algorithm used for testing whether
- * two given polygons overlap. It shares much of the logic with {@link Clip},
- * so we simply make a derived class out of it.
+ * two given polygons overlap.
  */
 //=================================================================
 
-export class Overlap extends Clip {
+export class Overlap extends DivideAndCollect {
 
 	/**
 	 * Note that the {@link Overlap} instance can be in a dirty state after
@@ -27,8 +29,12 @@ export class Overlap extends Clip {
 		return instance._test(polygon);
 	}
 
+	protected override readonly _orientation = compareOrientation;
+	protected override readonly _endProcessor = generalEndProcessor;
+	protected override readonly _shouldPickInside = true;
+
 	private constructor() {
-		super(new OverlapIntersector());
+		super(new GeneralEventProvider(true), new OverlapIntersector());
 	}
 
 	/** Test if two oriented paths overlap. */

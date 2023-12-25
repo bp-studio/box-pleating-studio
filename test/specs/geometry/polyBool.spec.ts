@@ -99,7 +99,6 @@ export default function() {
 			expect(path2).to.equalPath("(1,1),(1,2),(2,2),(2,1)", true); // hole, clockwise
 		});
 
-		// eslint-disable-next-line mocha/no-skipped-tests
 		xit("Is really, really fast", function() {
 			this.retries(100);
 
@@ -178,7 +177,6 @@ export default function() {
 			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)", true);
 		});
 
-		// eslint-disable-next-line mocha/no-skipped-tests
 		xit("Is quite fast", function() {
 			this.retries(100);
 

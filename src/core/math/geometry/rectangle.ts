@@ -20,16 +20,9 @@ export class Rectangle {
 		[this.p1, this.p2] = [p1, p2];
 	}
 
-	public $contains(pt: IPoint): boolean;
-	public $contains(that: Rectangle): boolean;
-	public $contains(obj: Rectangle | IPoint): boolean {
-		if(obj instanceof Rectangle) {
-			return this.p1.x <= obj.p1.x && this.p1.y <= obj.p1.y &&
-				this.p2.x >= obj.p2.x && this.p2.y >= obj.p2.y;
-		} else {
-			return this.p1.x <= obj.x && obj.x <= this.p2.x &&
-				this.p1.y <= obj.y && obj.y <= this.p2.y;
-		}
+	public $contains(that: Rectangle): boolean {
+		return this.p1.x <= that.p1.x && this.p1.y <= that.p1.y &&
+				this.p2.x >= that.p2.x && this.p2.y >= that.p2.y;
 	}
 
 	public eq(that: Rectangle): boolean {

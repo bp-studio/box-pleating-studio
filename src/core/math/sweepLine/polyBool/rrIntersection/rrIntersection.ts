@@ -4,10 +4,10 @@ import { RRIntersector } from "./rrIntersector";
 import { ArcChainer } from "../../classes/chainer/arcChainer";
 import { ArcSegment } from "../../classes/segment/arcSegment";
 import { AALineSegment } from "../../classes/segment/aaLineSegment";
+import { simpleEndProcessor } from "../../classes/endProcessor";
 
 import type { ArcPath } from "shared/types/geometry";
 import type { IRoundedRect } from "./roundedRect";
-import type { EndEvent } from "../../classes/event";
 
 //=================================================================
 /**
@@ -17,8 +17,12 @@ import type { EndEvent } from "../../classes/event";
 
 export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 
+	protected override readonly _chainer = new ArcChainer();
+	protected override readonly _endProcessor = simpleEndProcessor;
+	protected override readonly _shouldPickInside = true;
+
 	constructor() {
-		super(new RREventProvider(), new RRIntersector(), new ArcChainer());
+		super(new RREventProvider(), new RRIntersector());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,11 +53,5 @@ export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 				this._addSegment(new AALineSegment({ x: x - r, y: y + h }, { x: x - r, y }, i), -1);
 			}
 		}
-	}
-
-	protected _processEnd(event: EndEvent): void {
-		const start = event.$other;
-		if(start.$isInside) this._collectedSegments.push(start.$segment);
-		this._status.$delete(start);
 	}
 }

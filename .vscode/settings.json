@@ -75,7 +75,8 @@
 		"tsai",
 		"tsun",
 		"typeless",
-		"wicg"
+		"wicg",
+		"xdescribe"
 	],
 	"css.validate": false,
 	"editor.codeActionsOnSave": {
