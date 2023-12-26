@@ -2,7 +2,7 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { dist } from "../context/tree";
 import { ListUnionFind } from "shared/data/unionFind/listUnionFind";
-import { getKey, IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
+import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { distinct, foreachPair } from "shared/utils/array";
 import { minComparator } from "shared/data/heap/heap";
 import { patternTask } from "./pattern";
@@ -108,9 +108,7 @@ function processTeam(junctions: Junctions): void {
  */
 function getUncoveredJunctions(junctions: Junctions): Junctions {
 	if(junctions.length === 1) return junctions;
-	const keys = new Set<number>();
-	junctions.forEach(j => keys.add(getKey(j.$a.id, j.$b.id)));
-	foreachPair(junctions, (j1, j2) => checkGeometricalCovering(j1, j2, keys));
+	foreachPair(junctions, (j1, j2) => checkGeometricalCovering(j1, j2));
 	return junctions.filter(j => !j.$isCovered);
 }
 
@@ -152,34 +150,27 @@ function getValidJunctions(): Junctions {
 }
 
 /** Check if two {@link Junction}s have a covering relation. */
-function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): void {
+function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction): void {
+	if(j2.$lca.$dist > j1.$lca.$dist) [j1, j2] = [j2, j1];
 	const n = getPathIntersectionDistances(j1, j2);
 	if(!n) return;
 	const r1 = j1.$getBaseRectangle(n[0]);
 	const r2 = j2.$getBaseRectangle(n[1]);
 
+	const j1Closer = j1.$isCloserThan(j2);
 	if(r1.eq(r2)) {
-		// If they are the same size, the near one covers the far one.
-		if(j1.$isCloserThan(j2)) j2.$setGeometricallyCoveredBy(j1);
+		// In case of equal junctions, at least one side should be of the same flap
+		const [a1, b1] = j1.$orientedIds;
+		const [a2, b2] = j2.$orientedIds;
+		if(a1 !== a2 && b1 !== b2) return;
+		// Then the near one covers the far one.
+		if(j1Closer) j2.$setGeometricallyCoveredBy(j1);
 		else j1.$setGeometricallyCoveredBy(j2);
-	} else if(r1.$contains(r2)) {
-		if(!checkCoveringException(j1, j2, keys)) j2.$setGeometricallyCoveredBy(j1);
-	} else if(r2.$contains(r1)) {
-		if(!checkCoveringException(j1, j2, keys)) j1.$setGeometricallyCoveredBy(j2);
+	} else if(j1Closer && r1.$contains(r2)) {
+		j2.$setGeometricallyCoveredBy(j1);
+	} else if(!j1Closer && r2.$contains(r1)) {
+		j1.$setGeometricallyCoveredBy(j2);
 	}
-}
-
-/**
- * This is rare in practice, but still needed for correctness.
- * For two {@link ValidJunction}s that might have a covering relation,
- * if there is again a {@link ValidJunction} between the two flaps on one side,
- * we should not treat that as covering.
- */
-function checkCoveringException(j1: ValidJunction, j2: ValidJunction, keys: Set<number>): boolean {
-	const [a1, b1] = j1.$orientedIds;
-	const [a2, b2] = j2.$orientedIds;
-	return a1 !== a2 && keys.has(getKey(a1, a2)) ||
-		b1 !== b2 && keys.has(getKey(b1, b2));
 }
 
 /**
@@ -190,13 +181,10 @@ function checkCoveringException(j1: ValidJunction, j2: ValidJunction, keys: Set<
 function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [number, number] | undefined {
 	const a1 = j1.$lca, a2 = j2.$lca;
 	if(a1 === a2) return [j1.$a.$dist - a1.$dist, j2.$a.$dist - a1.$dist];
-	if(a1.$dist > a2.$dist) {
-		if(isAncestor(a1, j2.$a)) return [j1.$a.$dist - a1.$dist, j2.$a.$dist - a1.$dist];
-		if(isAncestor(a1, j2.$b)) return [j1.$a.$dist - a1.$dist, dist(j2.$a, a1, a2)];
-	} else if(a2.$dist > a1.$dist) {
-		if(isAncestor(a2, j1.$a)) return [j1.$a.$dist - a2.$dist, j2.$a.$dist - a2.$dist];
-		if(isAncestor(a2, j1.$b)) return [dist(j1.$a, a2, a1), j2.$a.$dist - a2.$dist];
-	}
+	if(a1.$dist === a2.$dist) return undefined;
+	// It is assumed here that a1.$dist > a2.$dist
+	if(isAncestor(a1, j2.$a)) return [j1.$a.$dist - a1.$dist, j2.$a.$dist - a1.$dist];
+	if(isAncestor(a1, j2.$b)) return [j1.$a.$dist - a1.$dist, dist(j2.$a, a1, a2)];
 	return undefined;
 }
 
