@@ -77,33 +77,40 @@ describe("Pattern", function() {
 		describe("Two flap patterns", function() {
 
 			it("Finds universal GPS patterns", function() {
-				parseTree("(0,1,6),(0,2,6)", "(1,0,0,0,0),(2,11,5,0,0)");
-				LayoutController.completeStretch("1,2");
-
-				const stretch = State.$stretches.get("1,2")!;
-				expect(stretch).to.be.not.undefined;
-				expect(stretch.$repo.$configurations.length).to.equal(1);
-				const config = stretch.$repo.$configuration!;
-				expect(config.$length).to.equal(2);
-				const pattern = config.$pattern!;
-				expect(pattern.$devices.length).to.equal(1);
-				const device = pattern.$devices[0];
-				expect(device.$gadgets.length).to.equal(1);
-				const anchors = device.$anchors[0].map(p => p.$toIPoint());
-				expect(anchors).to.equalPath("(0,0),(2,3),(43/4,19/4),(9,2)");
+				for(const [a, b] of TWO_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 6 },
+						{ id: b, x: 11, y: 5, radius: 6 },
+					]);
+					const stretch = State.$stretches.get("1,2")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					const config = stretch.$repo.$configuration!;
+					expect(config.$length).to.equal(2);
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(1);
+					const device = pattern.$devices[0];
+					expect(device.$gadgets.length).to.equal(1);
+					const gadget = device.$gadgets[0];
+					expect(gadget.pieces.length).to.equal(2, "Universal GPS has two pieces");
+					expect(gadget.$slack).to.include(0.25);
+				}
 			});
 
 			it("Find double relay patterns", function() {
-				parseTree("(0,1,8),(0,2,4)", "(1,0,0,0,0),(2,10,7,0,0)");
-				LayoutController.completeStretch("1,2");
-
-				const stretch = State.$stretches.get("1,2")!;
-				expect(stretch).to.be.not.undefined;
-				expect(stretch.$repo.$configurations.length).to.equal(4);
-				const config = stretch.$repo.$configuration!;
-				expect(config.$length).to.equal(1);
-				const pattern = config.$pattern!;
-				expect(pattern.$devices.length).to.equal(2);
+				for(const [a, b] of TWO_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 8 },
+						{ id: b, x: 10, y: 7, radius: 4 },
+					]);
+					const stretch = State.$stretches.get("1,2")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(4);
+					const config = stretch.$repo.$configuration!;
+					expect(config.$length).to.equal(1);
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(2);
+				}
 			});
 
 		});
@@ -148,16 +155,18 @@ describe("Pattern", function() {
 			});
 
 			it("Half integral relay", function() {
-				generateFromFlaps([
-					{ id: 1, x: 0, y: 0, radius: 11 },
-					{ id: 2, x: 8, y: 14, radius: 4 },
-					{ id: 3, x: 15, y: 8, radius: 6 },
-				]);
-				const stretch = State.$stretches.get("1,2,3")!;
-				expect(stretch).to.be.not.undefined;
-				expect(stretch.$repo.$configurations.length).to.equal(1);
-				const config = stretch.$repo.$configurations[0];
-				expect(config.$length).to.equal(2, "Two half integral patterns");
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 11 },
+						{ id: b, x: 8, y: 14, radius: 4 },
+						{ id: c, x: 15, y: 8, radius: 6 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					const config = stretch.$repo.$configurations[0];
+					expect(config.$length).to.equal(2, "Two half integral patterns");
+				}
 			});
 
 			it("Base join", function() {
@@ -180,35 +189,39 @@ describe("Pattern", function() {
 			});
 
 			it("Standard join", function() {
-				generateFromFlaps([
-					{ id: 1, x: 0, y: 0, radius: 11 },
-					{ id: 2, x: 5, y: 12, radius: 2 },
-					{ id: 3, x: 15, y: 8, radius: 6 },
-				]);
-				const stretch = State.$stretches.get("1,2,3")!;
-				expect(stretch).to.be.not.undefined;
-				expect(stretch.$repo.$configurations.length).to.equal(1);
-				const config = stretch.$repo.$configurations[0];
-				expect(config.$length).to.equal(2, "Should find two standard joins.");
-				const pattern = config.$pattern!;
-				expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
-				const device = pattern.$devices[0];
-				expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 11 },
+						{ id: b, x: 5, y: 12, radius: 2 },
+						{ id: c, x: 15, y: 8, radius: 6 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					const config = stretch.$repo.$configurations[0];
+					expect(config.$length).to.equal(2, "Should find two standard joins.");
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
+					const device = pattern.$devices[0];
+					expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
+				}
 			});
 
 			it("Split join", function() {
-				generateFromFlaps([
-					{ id: 1, x: 0, y: 0, radius: 15 },
-					{ id: 2, x: 7, y: 20, radius: 6 },
-					{ id: 3, x: 16, y: 12, radius: 5 },
-				]);
-				const stretch = State.$stretches.get("1,2,3")!;
-				expect(stretch).to.be.not.undefined;
-				expect(stretch.$repo.$configurations.length).to.equal(1);
-				const config = stretch.$repo.$configurations[0];
-				expect(config.$length).to.equal(1);
-				const pattern = config.$pattern!;
-				expect(pattern.$devices.length).to.equal(2);
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 15 },
+						{ id: b, x: 7, y: 20, radius: 6 },
+						{ id: c, x: 16, y: 12, radius: 5 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					const config = stretch.$repo.$configurations[0];
+					expect(config.$length).to.equal(1);
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(2);
+				}
 			});
 
 		});
@@ -237,6 +250,11 @@ describe("Pattern", function() {
 	});
 
 });
+
+const TWO_PERMUTATION = [
+	[1, 2],
+	[2, 1],
+];
 
 const THREE_PERMUTATION = [
 	[1, 2, 3],
