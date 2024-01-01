@@ -5,7 +5,7 @@
 			<Design v-if="Studio.selections.length == 0" :design="design" />
 			<div v-else-if="Studio.selections.length == 1">
 				<StretchVue v-if="Studio.stretch" :stretch="Studio.stretch" />
-				<component v-else-if="type == 'Flap'" :is="Flap" :subject="<F>Studio.selection" :max="design.sheet.grid.diameter" />
+				<component v-else-if="isFlap(Studio.selection)" :is="FlapVue" :subject="Studio.selection" :max="design.sheet.grid.diameter" />
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
@@ -30,13 +30,14 @@
 	import StretchVue from "./stretch.vue";
 	import Vertex from "./vertex.vue";
 	import Edge from "./edge.vue";
-	import Flap from "./flap.vue";
+	import FlapVue from "./flap.vue";
 	import River from "./river.vue";
 	import Design from "./design.vue";
 	import Flaps from "./flaps.vue";
 	import Vertices from "./vertices.vue";
 
-	import type { Flap as F } from "client/project/components/layout/flap";
+	import type { Control } from "client/base/control";
+	import type { Flap } from "client/project/components/layout/flap";
 	import type { Component } from "vue";
 
 	defineOptions({ name: "Panel" });
@@ -45,7 +46,7 @@
 
 	const panel = shallowRef<HTMLDivElement>();
 
-	const componentMap: Record<string, Component> = { Vertex, Edge, Flap, River };
+	const componentMap: Record<string, Component> = { Vertex, Edge, FlapVue, River };
 	const type = computed(() => Studio.selections[0]?.type ?? "");
 	const design = computed(() => Studio.project?.design);
 
@@ -67,6 +68,10 @@
 			event.target instanceof HTMLTextAreaElement)) {
 			event.preventDefault();
 		}
+	}
+
+	function isFlap(control: Control): control is Flap {
+		return control.type === "Flap";
 	}
 
 </script>
