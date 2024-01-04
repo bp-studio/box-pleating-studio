@@ -3,10 +3,9 @@ import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
 import { cache, clearCache } from "core/utils/cache";
-import { nonEnumerable } from "shared/utils/nonEnumerable";
 import { toLines } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
-import { norm } from "shared/types/geometry";
+import { norm, same } from "shared/types/geometry";
 import { reduce } from "core/math/utils/gcd";
 import { perQuadrant } from "shared/types/direction";
 
@@ -16,6 +15,13 @@ import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Gadget } from "./gadget";
 import type { IRegionShape } from "./region";
 import type { JPiece } from "shared/json";
+
+/**
+ * Originally this is defined as a non-enumerable field on {@link Piece},
+ * but for some reason ts-node have problem with the non-enumerable decorator,
+ * so we use a {@link WeakMap} to store this info instead.
+ */
+const offsets = new WeakMap<Piece, IPoint>();
 
 //=================================================================
 /**
@@ -36,8 +42,6 @@ export class Piece extends Region implements JPiece {
 
 	public shift?: IPoint;
 
-	@nonEnumerable private _offset?: IPoint = { x: 0, y: 0 };
-
 	constructor(data: JPiece) {
 		super();
 		this.ox = data.ox;
@@ -46,11 +50,13 @@ export class Piece extends Region implements JPiece {
 		this.v = data.v;
 		this.detours = data.detours;
 		this.shift = data.shift;
+		offsets.set(this, { x: 0, y: 0 });
 	}
 
-	public $offset(o?: IPoint): void {
-		if(!o || this._offset && this._offset.x == o.x && this._offset.y == o.y) return;
-		this._offset = o;
+	public $offset(o: IPoint): void {
+		const offset = offsets.get(this)!;
+		if(same(offset, o)) return;
+		offsets.set(this, o);
 		clearCache(this);
 	}
 
@@ -170,9 +176,10 @@ export class Piece extends Region implements JPiece {
 	}
 
 	@cache private get _shift(): Vector {
+		const offset = offsets.get(this)!;
 		return new Vector(
-			(this.shift?.x ?? 0) + (this._offset?.x ?? 0),
-			(this.shift?.y ?? 0) + (this._offset?.y ?? 0)
+			(this.shift?.x ?? 0) + offset.x,
+			(this.shift?.y ?? 0) + offset.y
 		);
 	}
 

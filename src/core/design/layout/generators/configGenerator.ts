@@ -29,6 +29,7 @@ export function* configGenerator(repo: Repository, prototype?: JStretch): Genera
 				protoSignature = config.$signature;
 				yield config;
 			} catch {
+				/* istanbul ignore next: debug */
 				console.log("Incompatible old version.");
 			}
 		}

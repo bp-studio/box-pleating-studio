@@ -20,6 +20,7 @@ describe("Pattern", function() {
 			fullReset();
 			const data = Migration.$process(sample);
 			DesignController.init(data.design);
+			complete();
 			const stretch = State.$stretches.get("12,27")!;
 			const device = stretch.$repo.$pattern!.$devices[0];
 			expect(device.$offset).to.equal(4);
@@ -102,6 +103,20 @@ describe("Pattern", function() {
 					generateFromFlaps([
 						{ id: a, x: 0, y: 0, radius: 8 },
 						{ id: b, x: 10, y: 7, radius: 4 },
+					]);
+					const stretch = State.$stretches.get("1,2")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(4);
+					const config = stretch.$repo.$configuration!;
+					expect(config.$length).to.equal(1);
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(2);
+				}
+
+				for(const [a, b] of TWO_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 8 },
+						{ id: b, x: 7, y: 10, radius: 4 },
 					]);
 					const stretch = State.$stretches.get("1,2")!;
 					expect(stretch).to.be.not.undefined;
@@ -213,6 +228,21 @@ describe("Pattern", function() {
 						{ id: a, x: 0, y: 0, radius: 15 },
 						{ id: b, x: 7, y: 20, radius: 6 },
 						{ id: c, x: 16, y: 12, radius: 5 },
+					]);
+					const stretch = State.$stretches.get("1,2,3")!;
+					expect(stretch).to.be.not.undefined;
+					expect(stretch.$repo.$configurations.length).to.equal(1);
+					const config = stretch.$repo.$configurations[0];
+					expect(config.$length).to.equal(1);
+					const pattern = config.$pattern!;
+					expect(pattern.$devices.length).to.equal(2);
+				}
+
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 15 },
+						{ id: b, x: 20, y: 7, radius: 6 },
+						{ id: c, x: 12, y: 16, radius: 5 },
 					]);
 					const stretch = State.$stretches.get("1,2,3")!;
 					expect(stretch).to.be.not.undefined;

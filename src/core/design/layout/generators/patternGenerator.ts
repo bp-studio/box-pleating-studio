@@ -23,6 +23,7 @@ export function* patternGenerator(config: Configuration, proto?: JConfiguration)
 		}
 
 		const pattern = new Pattern(config, proto.patterns[0].devices, true);
+		/* istanbul ignore else: debug */
 		if(pattern.$valid) {
 			const devices = pattern.$devices.map(device => device.toJSON());
 			protoSignature = Device.$getSignature(devices);

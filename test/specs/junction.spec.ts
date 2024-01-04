@@ -5,7 +5,10 @@ import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { getFirst } from "shared/utils/set";
 import { id0, id3, id4, parseTree } from "../utils/tree";
+import { LayoutController } from "core/controller/layoutController";
 
+import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
+import type { Junction } from "core/design/layout/junction/junction";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
 describe("Junction", function() {
@@ -43,6 +46,23 @@ describe("Junction", function() {
 		expect(stretch.$repo.$nodeSet.$nodes).to.eql([2, 3, 4]);
 	});
 
+	describe("Invalid junction", function() {
+		it("Caches rendering result", function() {
+			parseTree("(0,1,1),(0,2,1),(0,3,1)", "(1,0,0,0,0),(2,1,1,0,0),(3,3,1,0,0)");
+			const invalidJunctions = getJunctions(false);
+			expect(invalidJunctions.length).to.equal(1);
+			const junction = invalidJunctions[0];
+			expect(junction.$processed).to.be.true;
+			expect(State.$updateResult.add.junctions["1,2"]).to.be.not.undefined;
+
+			// Moving an unrelated flap
+			State.$resetResult();
+			LayoutController.updateFlap([{ id: id3, x: 3, y: 2, width: 0, height: 0 }], false, []);
+			expect(getJunctions(false)).to.contain(junction, "Junction is reused");
+			expect(State.$updateResult.add.junctions["1,2"]).to.be.undefined;
+		});
+	});
+
 	describe("Junction covering", function() {
 
 		it("Larger junction covers smaller ones", function() {
@@ -50,7 +70,7 @@ describe("Junction", function() {
 				"(0,1,8),(0,5,2),(8,0,1),(2,1,8),(8,6,1),(2,3,2),(7,2,1),(7,4,1)",
 				"(5,0,14,0,0),(6,0,18,0,0),(3,15,0,0,0),(4,19,0,0,0)"
 			);
-			const validJunctions = getValidJunctions();
+			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(4, "Should have 4 valid junctions");
 			const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
 			expect(uncoveredJunctions.length).to.equal(1, "Only one is uncovered");
@@ -60,14 +80,14 @@ describe("Junction", function() {
 
 		it("Larger junction must be closer to cover", function() {
 			parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)");
-			const validJunctions = getValidJunctions();
+			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(3);
 			expect(validJunctions.every(j => !j.$isCovered)).to.be.true;
 		});
 
 		it("For equal size junctions, near one covers far one", function() {
 			parseTree("(0,1,9),(0,2,9),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,8,8,0,0)");
-			const validJunctions = getValidJunctions();
+			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(3);
 			const coveredJunctions = validJunctions.filter(j => j.$isCovered);
 			expect(coveredJunctions.length).to.equal(1);
@@ -80,7 +100,7 @@ describe("Junction", function() {
 				"(0,1,15),(0,2,15),(0,3,1),(3,4,2),(3,5,2)",
 				"(1,0,0,0,0),(2,29,29,0,0),(4,13,13,0,0),(5,16,16,0,0)"
 			);
-			const validJunctions = getValidJunctions();
+			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(6);
 			const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
 			expect(uncoveredJunctions.length).to.equal(3);
@@ -93,6 +113,8 @@ describe("Junction", function() {
 });
 
 
-function getValidJunctions(): ValidJunction[] {
-	return [...State.$junctions.values()].filter(j => j.$valid) as ValidJunction[];
+function getJunctions(valid: true): ValidJunction[];
+function getJunctions(valid: false): InvalidJunction[];
+function getJunctions(valid: boolean): Junction[] {
+	return [...State.$junctions.values()].filter(j => j.$valid == valid);
 }

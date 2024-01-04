@@ -37,6 +37,7 @@ export class TreeMakerParser {
 		const fix = lcm(Array.from(this._set));
 		const sw = Math.ceil(width * scale * fix - 0.25);
 		const sh = Math.ceil(height * scale * fix - 0.25);
+		/* istanbul ignore next: debug */
 		if(sw < 8 || sh < 8) throw t("plugin.TreeMaker.size8");
 
 		const fx = sw / width;
@@ -61,6 +62,7 @@ export class TreeMakerParser {
 
 	private _parseNode(): void {
 		const v = this._visitor;
+		/* istanbul ignore next: debug */
 		if(v.$next() != "node") throw new Error();
 		const vertex: JVertex = {
 			id: v.$int as NodeId,
@@ -90,6 +92,7 @@ export class TreeMakerParser {
 
 	private _parseEdge(): void {
 		const v = this._visitor;
+		/* istanbul ignore next: debug */
 		if(v.$next() != "edge") throw new Error();
 		v.$skip(2);
 		const length = v.$float;
