@@ -2,9 +2,9 @@ import { SweepLine } from "../sweepLine";
 import { generalInitializer } from "../polyBool/generalUnion/generalUnion";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { GeneralEventProvider } from "../polyBool/generalUnion/generalEventProvider";
+import { deltaOrientation } from "../classes/orientation";
 
 import type { Contour, Path, Polygon } from "shared/types/geometry";
-import type { ISegment } from "../classes/segment/segment";
 import type { EndEvent, StartEvent } from "../classes/event";
 
 //=================================================================
@@ -15,6 +15,8 @@ import type { EndEvent, StartEvent } from "../classes/event";
  */
 //=================================================================
 export class Stacking extends SweepLine {
+
+	protected override readonly _orientation = deltaOrientation;
 
 	private readonly _parent: (number | null)[] = [];
 
@@ -51,10 +53,6 @@ export class Stacking extends SweepLine {
 		this._parent.length = 0;
 	}
 
-	protected override _isOriented(segment: ISegment, delta: Sign): boolean {
-		return delta === 1;
-	}
-
 	protected override _processStart(event: StartEvent): void {
 		this._status.$insert(event, event);
 		const prev = this._status.$getPrev(event);
@@ -72,7 +70,7 @@ export class Stacking extends SweepLine {
 		}
 	}
 
-	protected _processEnd(event: EndEvent): void {
+	protected override _processEnd(event: EndEvent): void {
 		this._status.$delete(event.$other);
 	}
 }

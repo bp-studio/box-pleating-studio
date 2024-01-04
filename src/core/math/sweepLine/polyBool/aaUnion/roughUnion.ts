@@ -29,6 +29,8 @@ export interface UnionResult {
 
 export class RoughUnion extends AAUnion {
 
+	protected override readonly _chainer = new UnionChainer();
+
 	private _unionFind!: ListUnionFind<number>;
 
 	constructor() {
@@ -39,7 +41,7 @@ export class RoughUnion extends AAUnion {
 		 * (both for the outer boundary and for the inner holes),
 		 * so we should always check for self-intersections.
 		 */
-		super(true, new UnionChainer());
+		super(true);
 	}
 
 	public $union(...components: Polygon[]): UnionResult[] {

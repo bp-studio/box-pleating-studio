@@ -19,6 +19,7 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 		return true;
 	}
 
+	/* istanbul ignore else: not yet implemented */
 	if(devices.length == 2) {
 		const [g1, g2] = devices.map(d => d.$gadgets[0]);
 		const o2 = devices[1].$partition.$overlaps[0];
@@ -33,5 +34,6 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 
 	//TODO: Implement single junction patterns that are integral but require 4 or more devices
 
+	/* istanbul ignore next: not yet implemented */
 	return false;
 }

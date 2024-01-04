@@ -44,6 +44,38 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 		return this._tempNode.$value;
 	}
 
+	public $getPrev(key: K): V | undefined {
+		const node = this._getNode(key);
+		if(node.$left !== this._nil) return this._max(node.$left).$value;
+		let cursor = this._root;
+		let result: Node<K, V> = this._nil;
+		while(cursor !== this._nil) {
+			if(this._comparator(cursor.$key, node.$key) < 0) {
+				result = cursor;
+				cursor = cursor.$right;
+			} else {
+				cursor = cursor.$left;
+			}
+		}
+		return result.$value;
+	}
+
+	public $getNext(key: K): V | undefined {
+		const node = this._getNode(key);
+		if(node.$right !== this._nil) return this._min(node.$right).$value;
+		let cursor = this._root;
+		let result: Node<K, V> = this._nil;
+		while(cursor !== this._nil) {
+			if(this._comparator(cursor.$key, node.$key) > 0) {
+				result = cursor;
+				cursor = cursor.$left;
+			} else {
+				cursor = cursor.$right;
+			}
+		}
+		return result.$value;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

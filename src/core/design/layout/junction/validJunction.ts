@@ -105,7 +105,10 @@ export class ValidJunction implements ISerializable<JJunction> {
 	 */
 	public get $isCovered(): boolean {
 		if(this._isCovered === undefined) {
-			this._isCovered = this._geometricallyCoveredBy.some(j => !j.$isCovered);
+			const that = this._geometricallyCoveredBy.find(j => !j.$isCovered);
+			// Uncomment the next line for coverage debugging
+			// if(that) console.log(`Junction ${this.$a.id},${this.$b.id} is covered by ${that.$a.id},${that.$b.id}`);
+			this._isCovered = Boolean(that);
 		}
 		return this._isCovered;
 	}

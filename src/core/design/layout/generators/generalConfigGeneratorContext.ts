@@ -35,11 +35,17 @@ interface SplitItem {
 	/** The {@link JOverlap} to be joined. */
 	o: JOverlap;
 
-	/** The remaining {@link JPartition}. */
+	/**
+	 * The remaining {@link JPartition}.
+	 * It is `undefined` if there is no splitting.
+	 */
 	r?: JPartition;
 
-	/** The splitting is horizontal. */
-	h: boolean;
+	/**
+	 * Whether the splitting is horizontal.
+	 * It is `undefined` if there is no splitting.
+	 */
+	h?: boolean;
 }
 
 //=================================================================
@@ -289,12 +295,16 @@ function cover(o1: JOverlap, o2: JOverlap): boolean {
 function toSplitItems(configs: readonly Configuration[], nodeId: NodeId): SplitItem[] {
 	return configs.map(config => {
 		const partitions = config.$rawPartitions;
+		const overlaps = partitions.map(p => p.overlaps[0]);
+		if(partitions.length == 1) return { o: overlaps[0] };
+		const h = overlaps[0].ox == overlaps[1].ox;
+
 		const p = partitions.find(partition => {
 			const overlap = partition.overlaps[0];
 			return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;
 		})!;
 		const r = partitions.find(partition => partition != p);
 		const o = p.overlaps[0];
-		return { o, r, h: o.c[1].type == CornerType.side };
+		return { o, r, h } as SplitItem;
 	});
 }

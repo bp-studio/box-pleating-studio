@@ -35,7 +35,7 @@ export class Gadget implements JGadget {
 	constructor(data: JGadget) {
 		this.pieces = data.pieces.map(p => new Piece(p));
 		this.offset = data.offset;
-		this.pieces.forEach(p => p.$offset(this.offset));
+		this.pieces.forEach(p => this.offset && p.$offset(this.offset));
 		this.anchors = clone(data.anchors); // Must clone!
 	}
 
@@ -58,6 +58,7 @@ export class Gadget implements JGadget {
 				for(const [i, p] of this.pieces.entries()) {
 					if(p.$anchors[q]) return [p.$anchors[q]!, i];
 				}
+				/* istanbul ignore next: debug */
 				throw new Error(); // Shouldn't enter here in theory
 			}
 		});

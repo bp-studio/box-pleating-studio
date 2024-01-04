@@ -30,7 +30,7 @@ export function useInput(
 		(event.target as HTMLInputElement).select();
 	}
 
-	function input(event: InputEvent): void {
+	function input(event: Event): void {
 		value.value = (event.target as HTMLInputElement).value;
 		emit("update:modelValue", value.value);
 	}

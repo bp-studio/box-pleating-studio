@@ -1,4 +1,5 @@
 import { Assertion } from "chai";
+import { Line } from "core/math/geometry/line";
 
 import { pointToString } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
@@ -28,3 +29,8 @@ Assertion.addMethod("containLine", function(line: ILine) {
 		pointToString(line[0]) + "-" + pointToString(line[1])
 	);
 });
+
+export function parseLine(line: string) {
+	const m = line.match(/-?\d+/g)!.map(n => Number(n));
+	return Line.$fromIPoint({ x: m[0], y: m[1] }, { x: m[2], y: m[3] });
+}

@@ -21,8 +21,11 @@ import type { Polygon } from "shared/types/geometry";
 
 export class AAUnion extends UnionBase {
 
-	constructor(checkSelfIntersection: boolean = false, chainer: Chainer = new Chainer()) {
-		super(new AAEventProvider(), new AAIntersector(checkSelfIntersection), chainer, AAInitializer);
+	protected override readonly _chainer = new Chainer();
+	protected override readonly _initializer = AAInitializer;
+
+	constructor(checkSelfIntersection: boolean = false) {
+		super(new AAEventProvider(), new AAIntersector(checkSelfIntersection));
 	}
 }
 

@@ -68,44 +68,16 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 
 	public abstract $delete(key: K): void;
 
+	public abstract $getPrev(key: K): V | undefined;
+
+	public abstract $getNext(key: K): V | undefined;
+
 	public $get(key: K): V | undefined {
 		return this._getNode(key).$value;
 	}
 
 	public get $isEmpty(): boolean {
 		return this._root === this._nil;
-	}
-
-	public $getPrev(key: K): V | undefined {
-		const node = this._getNode(key);
-		if(node.$left !== this._nil) return this._max(node.$left).$value;
-		let cursor = this._root;
-		let result: N = this._nil;
-		while(cursor !== this._nil) {
-			if(this._comparator(cursor.$key, node.$key) < 0) {
-				result = cursor;
-				cursor = cursor.$right;
-			} else {
-				cursor = cursor.$left;
-			}
-		}
-		return result.$value;
-	}
-
-	public $getNext(key: K): V | undefined {
-		const node = this._getNode(key);
-		if(node.$right !== this._nil) return this._min(node.$right).$value;
-		let cursor = this._root;
-		let result: N = this._nil;
-		while(cursor !== this._nil) {
-			if(this._comparator(cursor.$key, node.$key) > 0) {
-				result = cursor;
-				cursor = cursor.$left;
-			} else {
-				cursor = cursor.$right;
-			}
-		}
-		return result.$value;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

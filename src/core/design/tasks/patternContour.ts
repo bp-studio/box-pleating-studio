@@ -6,6 +6,7 @@ import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 import { RepoTrace } from "../layout/trace/repoTrace";
 
+import type { TreeNode } from "../context/treeNode";
 import type { NodeId } from "shared/json/tree";
 import type { HingeSegment } from "../layout/trace/hingeSegment";
 import type { Quadrant } from "../layout/pattern/quadrant";
@@ -61,6 +62,15 @@ function patternContour(): void {
 			// Similarly
 			if(e instanceof InvalidParameterError) continue;
 			throw e;
+		}
+	}
+
+	// Update ids for existing pattern contours what doesn't need to be modified otherwise
+	for(const repo of State.$repoWithNodeSetChanged) {
+		for(const node of nodesOfRepo(repo)) {
+			for(const contour of node.$graphics.$patternContours) {
+				contour.$ids = repo.$nodeSet.$nodes;
+			}
 		}
 	}
 }
@@ -124,9 +134,15 @@ function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves:
 }
 
 export function clearPatternContourForRepo(repo: Repository): void {
+	for(const node of nodesOfRepo(repo)) {
+		clearPatternContourForNode(repo, node);
+	}
+}
+
+function* nodesOfRepo(repo: Repository): Generator<TreeNode> {
 	for(const id of repo.$nodeSet.$nodes) {
 		const node = State.$tree.$nodes[id];
-		if(node) clearPatternContourForNode(repo, node);
+		if(node) yield node;
 	}
 }
 

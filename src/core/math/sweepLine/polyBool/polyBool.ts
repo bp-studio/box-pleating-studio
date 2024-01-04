@@ -1,10 +1,8 @@
 import { pathToString, pointToString } from "../../geometry/path";
 import { DivideAndCollect } from "../divideAndCollect";
+import { deltaOrientation } from "../classes/orientation";
 
 import type { Path, Polygon } from "shared/types/geometry";
-import type { Intersector } from "../classes/intersector";
-import type { ISegment } from "../classes/segment/segment";
-import type { EventProvider } from "../classes/eventProvider";
 import type { Chainer } from "../classes/chainer/chainer";
 import type { StartEvent } from "../classes/event";
 
@@ -17,16 +15,9 @@ import type { StartEvent } from "../classes/event";
 export abstract class PolyBool<ComponentType, PathType extends Path = Path> extends DivideAndCollect {
 
 	/** Logic for final assembling. */
-	protected readonly _chainer: Chainer<PathType>;
+	protected abstract readonly _chainer: Chainer<PathType>;
 
-	constructor(
-		provider: EventProvider,
-		intersector: Intersector,
-		chainer: Chainer<PathType>
-	) {
-		super(provider, intersector);
-		this._chainer = chainer;
-	}
+	protected override readonly _orientation = deltaOrientation;
 
 	/** Generates the polygons of interest. */
 	public $get(...components: ComponentType[]): PathType[] {
@@ -42,10 +33,6 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 
 	/** Load all initial events. */
 	protected abstract _initialize(components: ComponentType[]): void;
-
-	protected override _isOriented(segment: ISegment, delta: Sign): boolean {
-		return delta === 1; // For PolyBool, it can be simply determined by the delta
-	}
 
 	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
 		// If the previous segment just exited, then the current segment should be on the boundary.

@@ -5,7 +5,7 @@
 				<i class="fas fa-minus" />
 			</button>
 			<input class="form-control" :class="{ 'error': value != modelValue }" type="number" v-model="value" @focus="focus($event)"
-				   @blur="blur" @input="input($event as InputEvent)" :min="min" :max="max" @wheel.passive="wheel($event)"
+				   @blur="blur" @input="input($event)" :min="min" :max="max" @wheel.passive="wheel($event)"
 				   style="cursor: ns-resize; min-width: 30px;" />
 			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
 				<i class="fas fa-plus" />
@@ -57,7 +57,7 @@
 		return props.max === undefined || v < props.max;
 	});
 
-	function input(event: InputEvent): void {
+	function input(event: Event): void {
 		const v = Number((event.target as HTMLInputElement).value);
 		if(!Number.isSafeInteger(v)) return;
 		if(v < props.min! || v > props.max!) return;

@@ -11,8 +11,10 @@ export namespace GeneratorUtil {
 
 	/**
 	 * Execute given {@link Generator}s in order,
-	 * and once one of them yields something that passes the filter,
-	 * remaining {@link Generator}s will not be execute further.
+	 * and once one of them yields something that passes the {@link GeneratorFilter},
+	 * remaining generators will not be execute further.
+	 *
+	 * If the filter returns `undefined`, it will also signify stopping after the current generator.
 	 */
 	export function* $first<T>(generators: Generator<T>[], filter: GeneratorFilter<T>): Generator<T> {
 		for(const generator of generators) {
@@ -24,10 +26,5 @@ export namespace GeneratorUtil {
 			}
 			if(found) return;
 		}
-	}
-
-	/** Filter the result of a {@link Generator} by the given predicate. */
-	export function* $filter<T>(generator: Generator<T>, predicate: Predicate<T>): Generator<T> {
-		for(const value of generator) if(predicate(value)) yield value;
 	}
 }

@@ -14,6 +14,12 @@
 				"prefer": "type-imports"
 			}
 		],
+		"@typescript-eslint/explicit-function-return-type": [
+			"warn",
+			{
+				"allowFunctionsWithoutTypeParameters": true
+			}
+		],
 		"@typescript-eslint/no-invalid-this": "off",
 		"@typescript-eslint/no-magic-numbers": "off",
 		"@typescript-eslint/no-unused-expressions": "off",
@@ -45,6 +51,8 @@
 		"max-classes-per-file": "off",
 		"max-lines-per-function": "off",
 		"mocha/prefer-arrow-callback": "warn",
+		"mocha/no-exports": "off",
+		"mocha/no-skipped-tests": "off",
 		"no-duplicate-imports": "off",
 		"prefer-arrow-callback": "off",
 		"sort-imports": "off"

@@ -39,5 +39,8 @@ export function clonePolyfill<T extends object | undefined>(source: T): T {
  * (see [CanIUse](https://caniuse.com/?search=structuredClone)),
  * otherwise fallback to polyfill.
  */
-export const clone: typeof clonePolyfill =
+/* istanbul ignore next: polyfill */
+const clone: typeof clonePolyfill =
 	typeof structuredClone === "function" ? structuredClone : clonePolyfill;
+
+export { clone };

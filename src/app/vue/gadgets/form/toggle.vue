@@ -3,7 +3,7 @@
 		<div class="col">
 			<div class="form-check form-switch">
 				<input class="form-check-input" type="checkbox" :id="id" :checked="modelValue"
-					   @input="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)" />
+					   @input="$emit('update:modelValue', isChecked($event.target))" />
 				<label class="form-check-label" v-bind:for="id">
 					<slot></slot>
 				</label>
@@ -23,5 +23,9 @@
 	defineProps<{
 		modelValue: boolean;
 	}>();
+
+	function isChecked(target: unknown): boolean {
+		return (target as HTMLInputElement).checked;
+	}
 
 </script>

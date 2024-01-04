@@ -51,15 +51,8 @@ export namespace Migration {
 	}
 
 	export function $process(proj: Pseudo<JProject>): JProject {
-		// Decide the starting point of migration
-		let i = 0;
-		if("version" in proj) {
-			i = migrations.findIndex(m => m[1] == proj.version) + 1;
-			if(i == 0) throw new Error("Unrecognized version");
-		}
-
-		// Run migration
 		let deprecate = false;
+		let i = $getVersionIndex(proj);
 		while(i < migrations.length) {
 			console.info("Applying migration " + migrations[i][1]);
 			deprecate = migrations[i][0](proj) || deprecate; // Ordering matters
@@ -67,7 +60,18 @@ export namespace Migration {
 		}
 		proj.version = $getCurrentVersion();
 
+		/* istanbul ignore next: legacy code */
 		if(deprecate) options.onDeprecate?.(proj.design!.title);
 		return proj as JProject;
+	}
+
+	/** Decide the starting point of migration. */
+	export function $getVersionIndex(proj: Pseudo<JProject>): number {
+		let i = 0;
+		if("version" in proj) {
+			i = migrations.findIndex(m => m[1] == proj.version) + 1;
+			if(i == 0) throw new Error("Unrecognized version");
+		}
+		return i;
 	}
 }

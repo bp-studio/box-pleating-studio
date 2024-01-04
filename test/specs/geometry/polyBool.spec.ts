@@ -2,15 +2,16 @@ import { expect } from "chai";
 
 import { expand } from "core/design/tasks/roughContour";
 import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
-import { random } from "../utils/random";
-import { parsePath } from "../utils/path";
+import { random } from "../../utils/random";
+import { parsePath } from "../../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
+import { isClockwise } from "core/math/geometry/path";
 
 import type { NodeId } from "shared/json/tree";
 import type { RoughContour } from "core/design/context";
-import type { Polygon } from "shared/types/geometry";
+import type { PathEx, Polygon } from "shared/types/geometry";
 
-describe("PolyBool", function() {
+export default function() {
 
 	describe("AAUnion operation", function() {
 		it("Finds union of AABBs", function() {
@@ -99,7 +100,6 @@ describe("PolyBool", function() {
 			expect(path2).to.equalPath("(1,1),(1,2),(2,2),(2,1)", true); // hole, clockwise
 		});
 
-		// eslint-disable-next-line mocha/no-skipped-tests
 		xit("Is really, really fast", function() {
 			this.retries(100);
 
@@ -178,7 +178,6 @@ describe("PolyBool", function() {
 			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)", true);
 		});
 
-		// eslint-disable-next-line mocha/no-skipped-tests
 		xit("Is quite fast", function() {
 			this.retries(100);
 
@@ -201,7 +200,7 @@ describe("PolyBool", function() {
 	});
 
 	describe("Expansion operation", function() {
-		it("Expands given AA polygons", function() {
+		it("Excludes degenerated holes", function() {
 			const result = expand([
 				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
 				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
@@ -209,6 +208,15 @@ describe("PolyBool", function() {
 			expect(result.length).to.equal(1);
 			expect(result[0].$outer.length).to.equal(1); // The hole degenerates and vanishes
 			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)", true);
+		});
+
+		it("Excludes over-shrunk holes", function() {
+			const result = expand([
+				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
+				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
+			], 2);
+			expect(result.length).to.equal(1);
+			expect(result[0].$outer.length).to.equal(1); // The hole over-shrunk
 		});
 
 		it("Expands holes with repeated points", function() {
@@ -269,7 +277,7 @@ describe("PolyBool", function() {
 			expect(result[0]).to.equalPath("(2,5,2,4,1),(1.7071067811865483,5.707106781186548,2.0000000000000004,5.414213562373095,1),(0.2928932188134521,4.292893218813452,0.75,5.25,3),(1,4,0.585786437626905,4,1)", true);
 		});
 	});
-});
+}
 
 interface IAABB {
 	top: number;
@@ -296,5 +304,9 @@ function randomAabbPolygon(range: number, size: number): Polygon {
 }
 
 function makeRoughContour(...outer: string[]): RoughContour {
-	return { $id: 0 as NodeId, $outer: outer.map(parsePath), $children: [], $leaves: [] };
+	const $outer = outer.map(parsePath);
+	for(const path of $outer) {
+		if(isClockwise(path)) (path as PathEx).isHole = true;
+	}
+	return { $id: 0 as NodeId, $outer, $children: [], $leaves: [] };
 }

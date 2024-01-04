@@ -1,11 +1,12 @@
 import { expect } from "chai";
 
-import { parsePath } from "../utils/path";
+import { parsePath } from "../../utils/path";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
 import { Clip } from "core/math/sweepLine/clip/clip";
 import { CreaseType } from "shared/types/cp";
+import { Overlap } from "core/math/sweepLine/clip/overlap";
 
-describe("Sweep-line algorithms", function() {
+export default function() {
 
 	describe("Stacking", function() {
 
@@ -45,4 +46,13 @@ describe("Sweep-line algorithms", function() {
 
 	});
 
-});
+	describe("Overlap detection", function() {
+
+		it("Detects if two polygon overlaps", function() {
+			const result = Overlap.$test(parsePath("(0,1),(2,1),(2,3),(0,3)"), parsePath("(1,0),(3,1),(3,2),(1,2)"));
+			expect(result).to.be.true;
+		});
+
+	});
+
+}

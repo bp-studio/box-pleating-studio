@@ -1,58 +1,38 @@
 import { expect } from "chai";
 
-import { AvlTree } from "shared/data/bst/avlTree";
-import { RedBlackTree } from "shared/data/bst/redBlackTree";
 import { RavlTree } from "shared/data/bst/ravlTree";
 import { random } from "../../utils/random";
 import { minComparator } from "shared/data/heap/heap";
 
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 
-describe("Binary Search Tree", function() {
-
-	describe("AVL Tree", function() {
-
-		it("Can query adjacent elements", function() {
-			testAdjacency(new AvlTree<number>(minComparator));
-		});
-
-		it("Supports pop operation", function() {
-			const set = new Set<number>();
-			for(let i = 0; i < 300; i++) {
-				set.add(random(10000));
-			}
-			const sorted = [...set].sort(minComparator);
-
-			const tree = new AvlTree<number>(minComparator);
-			for(const n of set) {
-				tree.$insert(n, n);
-			}
-
-			for(let i = 0; i < sorted.length; i++) {
-				const pop = tree.$pop();
-				expect(pop).to.equal(sorted[i]);
-			}
-		});
-
-	});
-
-	describe("Red Black Tree", function() {
-
-		it("Can query adjacent elements", function() {
-			testAdjacency(new RedBlackTree<number>(minComparator));
-		});
-
-	});
+export default function() {
 
 	describe("RAVL Tree", function() {
+		it("Can be used as tree map", function() {
+			const tree = new RavlTree<number>(minComparator);
+			tree.$insert(1, 2);
+			expect(tree.$get(1)).to.equal(2);
+		});
 
 		it("Can query adjacent elements", function() {
 			testAdjacency(new RavlTree<number>(minComparator));
 		});
 
-	});
-});
+		it("Can query emptiness", function() {
+			const tree = new RavlTree<number>(minComparator);
+			expect(tree.$isEmpty).to.be.true;
+			tree.$insert(12, 12);
+			expect(tree.$isEmpty).to.be.false;
+		});
 
+		it("Ignores deleting non-existing element", function() {
+			const tree = new RavlTree<number>(minComparator);
+			expect(() => tree.$delete(1)).to.not.throw();
+		});
+	});
+
+}
 
 function testAdjacency(tree: IBinarySearchTree<number>): void {
 	// Generate some numbers to add

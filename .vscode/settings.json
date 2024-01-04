@@ -75,7 +75,9 @@
 		"tsai",
 		"tsun",
 		"typeless",
-		"wicg"
+		"unversioned",
+		"wicg",
+		"xdescribe"
 	],
 	"css.validate": false,
 	"editor.codeActionsOnSave": {
@@ -116,6 +118,7 @@
 		"lib/**/*"
 	],
 	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
+	"mochaExplorer.multiFileSuites": true,
 	"scss.validate": false,
 	"stylelint.packageManager": "pnpm",
 	"stylelint.validate": [

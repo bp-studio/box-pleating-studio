@@ -5,8 +5,8 @@ import { UnionBase } from "../unionBase";
 import { epsilonSame, floatXyComparator } from "core/math/geometry/float";
 import { Initializer } from "../initializer";
 import { Chainer } from "../../classes/chainer/chainer";
+import { generalEndProcessor } from "../../classes/endProcessor";
 
-import type { EndEvent } from "../../classes/event";
 import type { Polygon } from "shared/types/geometry";
 import type { AAUnion } from "../aaUnion/aaUnion";
 
@@ -21,27 +21,22 @@ import type { AAUnion } from "../aaUnion/aaUnion";
 
 export class GeneralUnion extends UnionBase {
 
-	constructor() {
-		super(new GeneralEventProvider(false), new GeneralIntersector(), new Chainer(), generalInitializer);
-
-		// General union will require epsilon comparison in the chainer
-		this._chainer.$checkFunction = epsilonSame;
-	}
+	protected override readonly _chainer = new Chainer();
+	protected override readonly _initializer = generalInitializer;
 
 	/**
 	 * It turns out that in our use cases,
 	 * it is possible to have `>>` formation even for perfectly valid input,
 	 * so we need to override this method.
 	 */
-	protected override _processEnd(event: EndEvent): void {
-		const start = event.$other;
-		const prev = this._status.$getPrev(start);
-		const next = this._status.$getNext(start);
-		if(!start.$isInside) this._collectedSegments.push(start.$segment);
-		this._status.$delete(start);
+	protected override readonly _endProcessor = generalEndProcessor;
+	protected override readonly _shouldPickInside = false;
 
-		// Need to check intersections after an EndEvent
-		this._intersector.$possibleIntersection(prev, next);
+	constructor() {
+		super(new GeneralEventProvider(false), new GeneralIntersector());
+
+		// General union will require epsilon comparison in the chainer
+		this._chainer.$checkFunction = epsilonSame;
 	}
 }
 

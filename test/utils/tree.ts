@@ -20,6 +20,14 @@ type Substitute<T, T1, T2> = {
 export type NEdge = Substitute<JEdge, NodeId, number>;
 export type NFlap = Substitute<JFlap, NodeId, number>;
 
+export function parseTree(edges: string, flaps: string): Tree {
+	const nEdges: NEdge[] = [...edges.matchAll(/\((\d+),(\d+),(\d+)\)/g)]
+		.map(m => ({ n1: Number(m[1]), n2: Number(m[2]), length: Number(m[3]) }));
+	const nFlaps: NFlap[] = [...flaps.matchAll(/\((\d+),(\d+),(\d+),(\d+),(\d+)\)/g)]
+		.map(m => ({ id: Number(m[1]), x: Number(m[2]), y: Number(m[3]), width: Number(m[4]), height: Number(m[5]) }));
+	return createTree(nEdges, nFlaps);
+}
+
 export function createTree(edges: NEdge[], flaps?: NFlap[]): Tree {
 	fullReset();
 	const tree = new Tree(edges as JEdge[], flaps as JFlap[]);

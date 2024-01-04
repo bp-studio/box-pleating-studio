@@ -2,6 +2,7 @@ import { same } from "shared/types/geometry";
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { RavlTree } from "shared/data/bst/ravlTree";
 
+import type { IOrientation } from "./classes/orientation";
 import type { EventProvider } from "./classes/eventProvider";
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 import type { IHeap } from "shared/data/heap/heap";
@@ -51,7 +52,7 @@ export abstract class SweepLine {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Abstract methods
+	// Abstract members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** Process a {@link StartEvent}. */
@@ -60,8 +61,8 @@ export abstract class SweepLine {
 	/** Process an {@link EndEvent}. */
 	protected abstract _processEnd(event: EndEvent): void;
 
-	/** Whether an initial {@link ISegment} is oriented. */
-	protected abstract _isOriented(segment: ISegment, delta: Sign): boolean;
+	/** The logic for determine the orientation of an initial {@link ISegment}. */
+	protected abstract readonly _orientation: IOrientation;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected methods
@@ -88,7 +89,7 @@ export abstract class SweepLine {
 	 */
 	protected _addSegment(segment: ISegment, delta: Sign): void {
 		if(same(segment.$start, segment.$end)) return; // Skip degenerated segments
-		const [startPoint, endPoint] = this._isOriented(segment, delta) ?
+		const [startPoint, endPoint] = this._orientation(segment, delta) ?
 			[segment.$start, segment.$end] : [segment.$end, segment.$start];
 
 		// Create sweep events

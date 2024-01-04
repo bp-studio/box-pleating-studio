@@ -7,6 +7,16 @@ import type { JProject } from "shared/json";
 
 describe("Migration", function() {
 
+	describe("Versioning", function() {
+		it("Treats unversioned file as version 0", function() {
+			expect(Migration.$getVersionIndex({})).to.equal(0);
+		});
+
+		it("Throws error on unknown version", function() {
+			expect(() => Migration.$getVersionIndex({ version: "~~~" })).to.throw();
+		});
+	});
+
 	describe("v0.6", function() {
 
 		let result: JProject;

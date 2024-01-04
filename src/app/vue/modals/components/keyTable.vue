@@ -10,12 +10,15 @@
 				</thead>
 			</table>
 		</div>
-		<!-- We break it into two <table>s here since the result of applying position:sticky to <thead>
-			isn't all that great; there will still be glitches on scrolling. -->
+		<!--
+			We break it into two <table>s here since position:sticky is not supported on <thead> for Chrome<=90.
+			(See https://caniuse.com/css-sticky)
+			Even for newer Chrome, the result isn't all that great; there will still be glitches on scrolling.
+		-->
 		<table class="w-100 table table-sm table-bordered m-0">
 			<tbody>
 				<template v-for="(list, name) in Settings.hotkey" :key="name">
-					<tr @click="toggle(name as string)">
+					<tr @click="toggle(name)">
 						<td colspan="2">
 							<i class="fas fa-caret-down fa-fw" v-if="open[name]" />
 							<i class="fas fa-caret-right fa-fw" v-else />
@@ -28,8 +31,8 @@
 						</td>
 						<td class="p-0 position-relative">
 							<input :id="name + '.' + command" type="text" class="border-0 w-100"
-								   :value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target as HTMLInputElement)"
-								   @input.prevent @keydown.prevent="setKey($event, name as string, command as string)" />
+								   :value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target)"
+								   @input.prevent @keydown.prevent="setKey($event, name, command)" />
 							<!-- A mask for blocking mouse actions after the input getting focus -->
 							<div class="mask" @mousedown.capture.prevent></div>
 						</td>
@@ -92,7 +95,9 @@
 	/** If we're in a state that requires confirming and not yet decided. */
 	let pending = false;
 
-	async function setKey(e: KeyboardEvent, name: string, command: string): Promise<void> {
+	type key = string | number;
+
+	async function setKey(e: KeyboardEvent, name: key, command: key): Promise<void> {
 		// We don't stop the propagation in this case,
 		// so that users can continue to operate the confirm dialog with keyboard.
 		if(pending) return;
@@ -124,10 +129,11 @@
 		return confirm;
 	}
 
-	function setFocus(target: HTMLInputElement): void {
+	function setFocus(target: unknown): void {
+		const t = target as HTMLInputElement;
 		const SECOND_DELAY = 10;
-		const l = target.value.length;
-		const move = (): void => target.setSelectionRange(l, l);
+		const l = t.value.length;
+		const move = (): void => t.setSelectionRange(l, l);
 		setTimeout(move, 0);
 		setTimeout(move, SECOND_DELAY);
 	}
@@ -137,7 +143,7 @@
 		return labels[name]._ + " - " + labels[name][command];
 	}
 
-	function toggle(name: string): void {
+	function toggle(name: key): void {
 		open[name] = !open[name];
 	}
 
