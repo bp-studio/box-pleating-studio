@@ -7,7 +7,7 @@ import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 
 import type { NodeId } from "shared/json/tree";
 import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
-import type { Polygon } from "shared/types/geometry";
+import type { Path, Polygon } from "shared/types/geometry";
 import type { ITreeNode, NodeGraphics, RoughContour } from "../context";
 
 const roughUnion = new RoughUnion();
@@ -62,16 +62,18 @@ function updater(node: ITreeNode): boolean {
 /**
  * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
  */
-
 export function expand(inputs: readonly RoughContour[], units: number, id = 0 as NodeId): RoughContour[] {
 	const components = roughUnion.$union(...inputs.map(c => {
 		const result: Polygon = [];
 		for(const outer of c.$outer) {
+			if(outer.isHole) {
+				const inputSpan = span(outer);
+				if(inputSpan <= units * 2) {
+					continue; // degenerated or over-shrunk
+				}
+			}
 			const expanded = expandPath(outer, units);
-			// Exclude holes that are over-shrunk.
-			// This does not remove degenerated holes,
-			// but those will be removed as we take the union.
-			if(!outer.isHole || expanded.isHole) result.push(expanded);
+			result.push(expanded);
 		}
 		return result;
 	}));
@@ -88,4 +90,19 @@ function componentToContour(id: NodeId, inputs: readonly RoughContour[], compone
 	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);
 	return { $id: id, $outer: outers, $children: children, $leaves: leaves };
+}
+
+/**
+ * Returns the smaller of width-span and height-span of a {@link Path}.
+ */
+function span(path: Path): number {
+	let xMin = Number.POSITIVE_INFINITY, xMax = Number.NEGATIVE_INFINITY;
+	let yMin = Number.POSITIVE_INFINITY, yMax = Number.NEGATIVE_INFINITY;
+	for(const p of path) {
+		if(p.x < xMin) xMin = p.x;
+		if(p.x > xMax) xMax = p.x;
+		if(p.y < yMin) yMin = p.y;
+		if(p.y > yMax) yMax = p.y;
+	}
+	return Math.min(xMax - xMin, yMax - yMin);
 }

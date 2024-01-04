@@ -5,10 +5,11 @@ import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyB
 import { random } from "../../utils/random";
 import { parsePath } from "../../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
+import { isClockwise } from "core/math/geometry/path";
 
 import type { NodeId } from "shared/json/tree";
 import type { RoughContour } from "core/design/context";
-import type { Polygon } from "shared/types/geometry";
+import type { PathEx, Polygon } from "shared/types/geometry";
 
 export default function() {
 
@@ -199,7 +200,7 @@ export default function() {
 	});
 
 	describe("Expansion operation", function() {
-		it("Expands given AA polygons", function() {
+		it("Excludes degenerated holes", function() {
 			const result = expand([
 				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
 				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
@@ -207,6 +208,15 @@ export default function() {
 			expect(result.length).to.equal(1);
 			expect(result[0].$outer.length).to.equal(1); // The hole degenerates and vanishes
 			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)", true);
+		});
+
+		it("Excludes over-shrunk holes", function() {
+			const result = expand([
+				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
+				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
+			], 2);
+			expect(result.length).to.equal(1);
+			expect(result[0].$outer.length).to.equal(1); // The hole over-shrunk
 		});
 
 		it("Expands holes with repeated points", function() {
@@ -294,5 +304,9 @@ function randomAabbPolygon(range: number, size: number): Polygon {
 }
 
 function makeRoughContour(...outer: string[]): RoughContour {
-	return { $id: 0 as NodeId, $outer: outer.map(parsePath), $children: [], $leaves: [] };
+	const $outer = outer.map(parsePath);
+	for(const path of $outer) {
+		if(isClockwise(path)) (path as PathEx).isHole = true;
+	}
+	return { $id: 0 as NodeId, $outer, $children: [], $leaves: [] };
 }

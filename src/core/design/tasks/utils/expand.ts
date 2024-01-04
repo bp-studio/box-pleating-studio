@@ -4,16 +4,10 @@ import type { PathEx } from "shared/types/geometry";
 
 /**
  * Expand a given {@link PathEx} by given units.
- * At the same time, determine if the path is a hole.
- *
- * The method of determining is simple:
- * if the point with the smallest x value shifts towards the right,
- * then then path is a hole.
  */
 export function expandPath(path: PathEx, units: number): PathEx {
 	const l = path.length;
 	const result: PathEx = [];
-	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
 	for(let i = 0, j = l - 1; i < l; j = i++) {
 		// Decide the direction of shifting.
 		// Here we assume that the polygon is non-degenerated.
@@ -21,13 +15,9 @@ export function expandPath(path: PathEx, units: number): PathEx {
 		const p1 = path[j], p2 = path[i + 1] || path[0];
 		const dx = Math.sign(p2.y - p1.y) * units;
 		const dy = Math.sign(p1.x - p2.x) * units;
-		if(p.x < minX) {
-			minX = p.x;
-			minXDelta = dx;
-		}
 		result.push({ x: p.x + dx, y: p.y + dy });
 	}
-	if(minXDelta > 0) result.isHole = true;
+	result.isHole = path.isHole;
 	return result;
 }
 
