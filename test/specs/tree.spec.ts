@@ -1,7 +1,7 @@
 import { expect } from "chai";
 
 import { TreeController } from "core/controller/treeController";
-import { getDist } from "core/design/context/tree";
+import { Tree, getDist } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "../utils/tree";
@@ -107,18 +107,30 @@ describe("Tree", function() {
 		expect(JSON.stringify(tree.toJSON().edges)).to.equal(json);
 	});
 
-	it("Keeps a record of AABB", function() {
-		parseTree("(0,1,1),(1,2,2),(0,3,3),(3,4,4)", "(2,8,8,0,0),(4,5,2,0,0)");
-		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
-		expect(n2.$AABB.$toArray()).to.eql([10, 10, 6, 6]);
-		expect(n1.$AABB.$toArray()).to.eql([11, 11, 5, 5]);
-		expect(n4.$AABB.$toArray()).to.eql([6, 9, -2, 1]);
-		expect(n3.$AABB.$toArray()).to.eql([9, 12, -5, -2]);
-		expect(n0.$AABB.$toArray()).to.eql([11, 12, -5, -2]);
+	describe("AABB record", function() {
+		it("Updates AABB when a child updates", function() {
+			parseTree("(0,1,1),(1,2,2),(0,3,3),(3,4,4)", "(2,8,8,0,0),(4,5,2,0,0)");
+			const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
+			expect(n2.$AABB.$toArray()).to.eql([10, 10, 6, 6]);
+			expect(n1.$AABB.$toArray()).to.eql([11, 11, 5, 5]);
+			expect(n4.$AABB.$toArray()).to.eql([6, 9, -2, 1]);
+			expect(n3.$AABB.$toArray()).to.eql([9, 12, -5, -2]);
+			expect(n0.$AABB.$toArray()).to.eql([11, 12, -5, -2]);
 
-		n2.$setAABB(0, 0, 0, 0);
-		Processor.$run(heightTask);
-		expect(n0.$AABB.$toArray()).to.eql([9, 12, -5, -3]);
+			n2.$setAABB(0, 0, 0, 0);
+			Processor.$run(heightTask);
+			expect(n0.$AABB.$toArray()).to.eql([9, 12, -5, -3]);
+		});
+
+		it("Updates AABB when a child node is removed", function() {
+			parseTree("(0,1,1),(1,2,1),(2,3,1),(2,4,1),(0,5,1),(5,6,1)", "(6,0,0,0,0),(3,3,2,0,0),(4,5,2,0,0)");
+			const n1 = node(1)!;
+			expect(n1.$AABB.$toArray()).to.eql([5, 8, -1, 0]);
+
+			// Deleting n3 should propagate changes to n2 and then to n1
+			TreeController.removeLeaf([id3], []);
+			expect(n1.$AABB.$toArray()).to.eql([5, 8, -1, 2]);
+		});
 	});
 
 	describe("Edge joining", function() {

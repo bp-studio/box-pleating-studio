@@ -165,7 +165,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		State.$lengthChanged.add(node);
 		State.$treeStructureChanged = true;
 		if(node.$isLeaf) {
-			State.$flapAABBChanged.add(node);
+			State.$nodeAABBChanged.add(node);
 		}
 	}
 
@@ -231,7 +231,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			State.$lengthChanged.delete(node);
 			State.$parentChanged.delete(node);
 			State.$childrenChanged.delete(node);
-			State.$flapAABBChanged.delete(node);
+			State.$nodeAABBChanged.delete(node);
 
 			delete this._nodes[id];
 			State.$updateResult.remove.nodes.push(id);
@@ -250,7 +250,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 	private _removeEdgeAndCheckNewFlap(node: TreeNode, partner: TreeNode): void {
 		this.$removeEdge(node.id, partner.id);
 		if(partner.$isLeafLike) {
-			State.$flapAABBChanged.add(partner);
+			State.$nodeAABBChanged.add(partner);
 		}
 	}
 
