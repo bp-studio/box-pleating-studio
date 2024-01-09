@@ -49,6 +49,7 @@ export class Partition implements ISerializable<JPartition> {
 	constructor(config: Configuration, data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
+		if(data.overlaps[0].ox < 0) debugger;
 		this.$devices = new Store(deviceGenerator(data, config));
 		this._strategy = data.strategy;
 

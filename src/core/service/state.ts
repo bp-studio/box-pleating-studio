@@ -83,8 +83,8 @@ export namespace State {
 	 */
 	export const $subtreeAABBChanged = new Set<ITreeNode>();
 
-	/** Those flaps that have their {@link ITreeNode.$AABB AABB} changed in the current round. */
-	export const $flapAABBChanged = new Set<ITreeNode>();
+	/** Those nodes that have their {@link ITreeNode.$AABB AABB} proactively changed in the current round. */
+	export const $nodeAABBChanged = new Set<ITreeNode>();
 
 	/**
 	 * Those flaps that have any type of changes in the current round,
@@ -141,7 +141,7 @@ export namespace State {
 		$parentChanged.clear();
 		$lengthChanged.clear();
 		$subtreeAABBChanged.clear();
-		$flapAABBChanged.clear();
+		$nodeAABBChanged.clear();
 		$flapChanged.clear();
 		$newRepositories.clear();
 		$repoToProcess.clear();

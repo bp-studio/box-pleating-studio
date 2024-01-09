@@ -107,7 +107,7 @@ export class TreeNode implements ITreeNode {
 
 	/** For testing purpose. */
 	public $setAABB(top: number, right: number, bottom: number, left: number): void {
-		State.$flapAABBChanged.add(this);
+		State.$nodeAABBChanged.add(this);
 		this.$AABB.$update(top, right, bottom, left);
 	}
 
@@ -124,7 +124,9 @@ export class TreeNode implements ITreeNode {
 	public $cut(): void {
 		if(this.$parent) {
 			this.$parent.$children.$remove(this);
-			this.$parent.$AABB.$removeChild(this.$AABB);
+			if(this.$parent.$AABB.$removeChild(this.$AABB)) {
+				State.$nodeAABBChanged.add(this.$parent);
+			}
 			State.$childrenChanged.add(this.$parent);
 		}
 		this.$parent = undefined;

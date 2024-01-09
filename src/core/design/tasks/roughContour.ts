@@ -28,7 +28,7 @@ export const roughContourTask = new Task(roughContour, traceContourTask);
 
 function roughContour(): void {
 	climb(updater,
-		State.$flapAABBChanged,
+		State.$nodeAABBChanged,
 		State.$parentChanged,
 		State.$childrenChanged,
 		State.$lengthChanged

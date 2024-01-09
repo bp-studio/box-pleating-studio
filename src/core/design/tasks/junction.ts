@@ -52,24 +52,30 @@ function getCollisionOfLCA(lca: ITreeNode): void {
  * @param distChanged Indicating that the distance have changed along one of the branches,
  * in which case the comparison cannot be skipped and must carry on.
  */
-function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode, distChanged: boolean): void {
+function compare(A: ITreeNode, B: ITreeNode, lca: ITreeNode, distChanged: boolean): void {
 	// If both subtrees haven't changed, there's no need to re-compare.
-	if(!distChanged && !State.$subtreeAABBChanged.has(a) && !State.$subtreeAABBChanged.has(b)) return;
+	if(!distChanged && !State.$subtreeAABBChanged.has(A) && !State.$subtreeAABBChanged.has(B)) return;
 
 	// Test for collision
-	if(!a.$AABB.$intersects(b.$AABB, dist(a, b, lca))) {
-		clearJunctions(a, b);
+	if(!intersects(A, B, lca)) {
+		clearJunctions(A, B);
 		return;
 	}
 
 	const ctx: NontrivialDescendantContext = { distChanged };
-	a = getNontrivialDescendant(a, ctx);
-	b = getNontrivialDescendant(b, ctx);
+	const a = getNontrivialDescendant(A, ctx);
+	const b = getNontrivialDescendant(B, ctx);
 	distChanged = ctx.distChanged;
 
 	const n = a.$children.$size;
 	const m = b.$children.$size;
 	if(n === 0 && m === 0) {
+		// Since a and b are the only descendants of A and B, respectively,
+		// A intersecting B must imply that a intersects b.
+		// If that is not the case, the rest of the algorithm can go very wrong.
+		// Uncomment the next line to debug this.
+		// if(!intersects(a, b, lca)) debugger;
+
 		// Leaves found; add it to the output
 		State.$junctions.set(a.id, b.id, createJunction(a, b, lca));
 	} else {
@@ -84,6 +90,10 @@ function compare(a: ITreeNode, b: ITreeNode, lca: ITreeNode, distChanged: boolea
 
 interface NontrivialDescendantContext {
 	distChanged: boolean;
+}
+
+function intersects(a: ITreeNode, b: ITreeNode, lca: ITreeNode): boolean {
+	return a.$AABB.$intersects(b.$AABB, dist(a, b, lca));
 }
 
 function getNontrivialDescendant(node: ITreeNode, ctx?: NontrivialDescendantContext): ITreeNode {
