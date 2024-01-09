@@ -1,11 +1,11 @@
 import { EndEvent, StartEvent } from "../../classes/event";
 import { EventProvider } from "../../classes/eventProvider";
-import { COORDINATE_SHIFT } from "shared/types/constants";
 
 import type { Comparator } from "shared/types/types";
 import type { SweepEvent } from "../../classes/event";
 import type { AALineSegment } from "../../classes/segment/aaLineSegment";
 import type { ISegment } from "../../classes/segment/segment";
+import type { MAX_SHEET_SIZE, MAX_TREE_HEIGHT } from "shared/types/constants";
 
 const SHIFT_Y = 17;
 const SHIFT_START = 16;
@@ -81,3 +81,11 @@ function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1,
 		id
 	);
 }
+
+/**
+ * In order to ensure that the coordinates are in the range of [-16384, 16384),
+ * we set hard limit on the sheet size to be {@link MAX_SHEET_SIZE},
+ * and then we shifted the value by -{@link COORDINATE_SHIFT},
+ * together with {@link MAX_TREE_HEIGHT} this achieves the goal.
+ */
+const COORDINATE_SHIFT = 4096;

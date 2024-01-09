@@ -110,8 +110,7 @@ export class Line {
 	 * Whether a given point is in this line segment
 	 * (endpoints are not included by default).
 	 */
-	public $contains(point: Point | IPoint, includeEndpoints: boolean = false): boolean {
-		const p = point instanceof Point ? point : new Point(point);
+	public $contains(p: Point, includeEndpoints: boolean = false): boolean {
 		if(includeEndpoints && (p.eq(this.p1) || p.eq(this.p2))) return true;
 		const v1 = p.$sub(this.p1), v2 = p.$sub(this.p2);
 		return v1._x.mul(v2._y).eq(v2._x.mul(v1._y)) && v1.$dot(v2) < 0;

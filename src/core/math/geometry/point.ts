@@ -17,10 +17,9 @@ export class Point extends Couple implements IPoint {
 
 	/** Create a {@link Point} object */
 	constructor();
-	constructor(c: Couple);
 	constructor(p: IPoint);
 	constructor(x: Rational, y: Rational);
-	constructor(...p: [Couple | IPoint] | [Rational, Rational]) {
+	constructor(...p: [IPoint] | [Rational, Rational]) {
 		if(p[0] instanceof Couple) super(p[0]._x, p[0]._y);
 		else if(p.length == 1) super(p[0].x, p[0].y);
 		else super(...p);
@@ -32,11 +31,10 @@ export class Point extends Couple implements IPoint {
 	}
 
 	public $sub(v: Vector): Point;
-	public $sub(p: IPoint): Vector;
-	public $sub(c: Vector | IPoint): Point | Vector {
+	public $sub(p: Point): Vector;
+	public $sub(c: Vector | Point): Point | Vector {
 		if(c instanceof Vector) return new Point(this._x.sub(c._x), this._y.sub(c._y));
-		else if(c instanceof Point) return new Vector(this._x.sub(c._x), this._y.sub(c._y));
-		else return new Vector(this._x.sub(new Fraction(c.x)), this._y.sub(new Fraction(c.y)));
+		else return new Vector(this._x.sub(c._x), this._y.sub(c._y));
 	}
 
 	/** {@link Point} is allowed to be compared with {@link IPoint}s. */

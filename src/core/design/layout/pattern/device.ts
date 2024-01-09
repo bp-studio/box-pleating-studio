@@ -287,6 +287,7 @@ export class Device implements ISerializable<JDevice> {
 		for(const code of codes) {
 			if(getNodeId(code) == corner.e) return getQuadrant(code);
 		}
+		/* istanbul ignore next: type-safety */
 		return undefined;
 	}
 
