@@ -70,6 +70,7 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public toJSON(): JEdge {
+		/* istanbul ignore next: debug */
 		if(!this.$parent) throw new Error("Cannot export root node");
 		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}
@@ -122,13 +123,14 @@ export class TreeNode implements ITreeNode {
 	 * Temporarily disconnects a node from the tree, without changing its subtree.
 	 */
 	public $cut(): void {
-		if(this.$parent) {
-			this.$parent.$children.$remove(this);
-			if(this.$parent.$AABB.$removeChild(this.$AABB)) {
-				State.$nodeAABBChanged.add(this.$parent);
-			}
-			State.$childrenChanged.add(this.$parent);
+		/* istanbul ignore next: foolproof */
+		if(!this.$parent) return;
+
+		this.$parent.$children.$remove(this);
+		if(this.$parent.$AABB.$removeChild(this.$AABB)) {
+			State.$nodeAABBChanged.add(this.$parent);
 		}
+		State.$childrenChanged.add(this.$parent);
 		this.$parent = undefined;
 	}
 

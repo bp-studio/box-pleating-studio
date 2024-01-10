@@ -273,6 +273,7 @@ export class Line {
 
 	///#if DEBUG
 
+	/* istanbul ignore next: debug */
 	public static $parseTest<T extends Line = Line>(jsons: TestLine<T>[]): T[] {
 		return jsons.map(j => {
 			const l = j as unknown as Record<string, string>;

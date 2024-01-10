@@ -1,15 +1,21 @@
 import { Line } from "core/math/geometry/line";
 import { parseLine } from "../../utils/line";
+import { Vector } from "core/math/geometry/vector";
 
 export default function() {
 
 	it("Checks equality", function() {
 		expect(parseLine("(0,0)-(5,0)").eq(parseLine("(5,0)-(0,0)"))).to.be.true;
+		expect(parseLine("(0,0)-(5,0)").eq(parseLine("(0,0)-(5,0)"))).to.be.true;
 	});
 
-	it("List grid points", function() {
-		const result = [...parseLine("(6,3)-(0.0)").$gridPoints()];
-		expect(result.length).to.equal(4);
+	it("Lists grid points", function() {
+		expect([...parseLine("(4,10)-(0.0)").$gridPoints()].length).to.equal(3);
+		expect([...parseLine("(10,4)-(0.0)").$gridPoints()].length).to.equal(3);
+	});
+
+	it("Checks perpendicularity", function() {
+		expect(parseLine("(0,0)-(2,4)").$perpendicular(new Vector(2, -1))).to.be.true;
 	});
 
 	describe("Subtraction", function() {

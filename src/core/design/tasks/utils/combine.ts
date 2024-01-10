@@ -56,6 +56,7 @@ function tryInsertOuter(patternContour: PatternContour, rough: RationalContour):
 	for(const outer of rough.$outer) {
 		if(tryInsert(outer, patternContour)) return true;
 	}
+	/* istanbul ignore next: foolproof */
 	return false;
 }
 
@@ -119,6 +120,7 @@ export function toGraphicalContours(contour: RationalContour): Contour[] {
 	let inners = contour.$inner.map(toPath).map(simplify).map(reverse);
 
 	// TODO: is this still possible?
+	/* istanbul ignore next: debug */
 	if(inners.some(p => p.length == 2)) debugger;
 
 	rearrangeRole(outers, inners);

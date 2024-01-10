@@ -84,9 +84,11 @@ export class Pattern implements ISerializable<JPattern> {
 		if(singleMode || context.$junctions.length == 1) {
 			return singleJunctionPositioner(context);
 		}
+		/* istanbul ignore else: not implemented yet */
 		if(context.$junctions.length == 2) {
 			return twoJunctionPositioner(context);
 		}
+		/* istanbul ignore next: type-safety */
 		return false;
 	}
 

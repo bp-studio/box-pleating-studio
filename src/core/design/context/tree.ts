@@ -52,6 +52,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		if(flaps) {
 			for(const flap of flaps) {
 				const node = this._nodes[flap.id];
+				/* istanbul ignore else: foolproof */
 				if(node) node.$setFlap(flap);
 			}
 		}
@@ -107,6 +108,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		for(const flap of flaps) {
 			const node = this._nodes[flap.id];
 			const isLeaf = node && node.$isLeafLike;
+			/* istanbul ignore next: foolproof */
 			if(isLeaf) node.$setFlap(flap);
 		}
 	}

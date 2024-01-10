@@ -5,7 +5,7 @@ import { DesignController } from "core/controller/designController";
 import { Migration } from "client/patches";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
-import { createTree, id2, id4, node, parseTree } from "../utils/tree";
+import { createTree, id1, id2, id3, id4, node, parseTree } from "../utils/tree";
 import { TreeController } from "core/controller/treeController";
 import * as sample from "../samples/v04.session.sample.json";
 
@@ -168,6 +168,17 @@ describe("Pattern", function() {
 				}
 			});
 
+			it("Renders river in between", function() {
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					parseTree(
+						`(0,4,2),(0,5,2),(5,${a},4),(4,${b},2),(4,${c},2)`,
+						`(${a},0,0,0,0),(${b},9,5,0,0),(${c},6,8,0,0)`
+					);
+					const r = node(4)!;
+					expect(r.$graphics.$patternContours.length).to.be.equal(1);
+				}
+			});
+
 			it("Half integral relay", function() {
 				for(const [a, b, c] of THREE_PERMUTATION) {
 					generateFromFlaps([
@@ -274,6 +285,26 @@ describe("Pattern", function() {
 			const ridges2 = data2.ridges;
 			expect(ridges2).to.not.containLine([{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]);
 			expect(ridges2).to.containLine([{ x: 4.5, y: 3.5 }, { x: 7, y: 6 }]);
+		});
+
+		it("Update origin when all flaps move simultaneously", function() {
+			generateFromFlaps([
+				{ id: 1, x: 9, y: 5, radius: 2 },
+				{ id: 2, x: 0, y: 0, radius: 8 },
+				{ id: 3, x: 6, y: 8, radius: 2 },
+			]);
+			const stretch = State.$stretches.get("1,2,3")!;
+			expect(stretch).to.be.not.undefined;
+			const repo = stretch.$repo;
+
+			LayoutController.updateFlap([
+				{ id: id1, x: 10, y: 6, width: 0, height: 0 },
+				{ id: id2, x: 1, y: 1, width: 0, height: 0 },
+				{ id: id3, x: 7, y: 9, width: 0, height: 0 },
+			], false, []);
+
+			expect(State.$stretches.get("1,2,3")).to.equal(stretch);
+			expect(stretch.$repo).to.equal(repo);
 		});
 
 	});

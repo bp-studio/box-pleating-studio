@@ -20,6 +20,10 @@ type Substitute<T, T1, T2> = {
 export type NEdge = Substitute<JEdge, NodeId, number>;
 export type NFlap = Substitute<JFlap, NodeId, number>;
 
+/**
+ * @param edges Comma-separated list of `(n1,n2,length)`.
+ * @param flaps Comma-separated list of `(id,x,y,width,height)`.
+ */
 export function parseTree(edges: string, flaps: string): Tree {
 	const nEdges: NEdge[] = [...edges.matchAll(/\((\d+),(\d+),(\d+)\)/g)]
 		.map(m => ({ n1: Number(m[1]), n2: Number(m[2]), length: Number(m[3]) }));
