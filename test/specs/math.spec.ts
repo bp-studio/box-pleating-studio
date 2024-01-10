@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { gcd, lcm } from "core/math/utils/gcd";
 import { Fraction, toFraction } from "core/math/fraction";
 

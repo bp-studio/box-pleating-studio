@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { getCurvature } from "core/math/sweepLine/polyBool/rrIntersection/rrEventProvider";
 import { EPSILON } from "core/math/geometry/float";
 import { StartEvent } from "core/math/sweepLine/classes/event";

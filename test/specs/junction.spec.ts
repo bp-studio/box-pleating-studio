@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";

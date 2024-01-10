@@ -1,5 +1,3 @@
-import { Assertion } from "chai";
-
 import { pathToString } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
 

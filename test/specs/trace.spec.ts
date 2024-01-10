@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { Trace } from "core/design/layout/trace/trace";
 import { Line } from "core/math/geometry/line";
 import { Direction, SlashDirection } from "shared/types/direction";

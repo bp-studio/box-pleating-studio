@@ -7,7 +7,7 @@
 	],
 	"timeout": "0",
 	"require": [
-		"./test/mocha.env",
+		"./test/mocha.env.mjs",
 		"ts-node/register",
 		"tsconfig-paths/register"
 	]

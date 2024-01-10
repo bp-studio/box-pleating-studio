@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { HeapSet } from "shared/data/heap/heapSet";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { xyComparator } from "shared/types/geometry";

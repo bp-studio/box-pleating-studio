@@ -1,4 +1,3 @@
-import { expect } from "chai";
 import { readFileSync } from "fs";
 
 import { treeMaker } from "client/plugins/treeMaker";

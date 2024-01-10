@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { parseRationalPath } from "../utils/rationalPath";
 import { toGraphicalContours } from "core/design/tasks/utils/combine";
 import { id1, id6, parseTree } from "../utils/tree";

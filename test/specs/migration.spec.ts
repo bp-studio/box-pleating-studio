@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { Migration } from "client/patches";
 import * as sample from "../samples/v04.session.sample.json";
 

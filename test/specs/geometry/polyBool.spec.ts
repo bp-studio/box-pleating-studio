@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { expand } from "core/design/tasks/roughContour";
 import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
 import { random } from "../../utils/random";

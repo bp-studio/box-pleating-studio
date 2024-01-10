@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
 
 export default function() {

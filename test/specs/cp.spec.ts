@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { parseTree } from "../utils/tree";
 import { LayoutController } from "core/controller/layoutController";
 import { parsePath } from "../utils/path";

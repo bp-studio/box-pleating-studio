@@ -1,5 +1,3 @@
-import { expect } from "chai";
-
 import { RavlTree } from "shared/data/bst/ravlTree";
 import { random } from "../../utils/random";
 import { minComparator } from "shared/data/heap/heap";
