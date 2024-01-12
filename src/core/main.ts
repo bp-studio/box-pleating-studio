@@ -5,6 +5,7 @@ import "shared/polyfill/flatMap";
 
 import { getAction } from "./routes/routes";
 import { State } from "./service/state";
+import { UpdateResult } from "./service/updateResult";
 
 import type { CoreError } from "shared/json";
 import type { CoreResponse, CoreRequest } from "core/routes";
@@ -34,9 +35,7 @@ onmessage = function(event: MessageEvent): void {
 			response = { value: result };
 		} else {
 			// Otherwise we will return the UpdateModel by default.
-			const update = State.$updateResult;
-			State.$resetResult();
-			response = { update };
+			response = { update: UpdateResult.$flush() };
 		}
 	} catch(e: unknown) {
 		debugger;

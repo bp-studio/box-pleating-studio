@@ -1,7 +1,7 @@
+import { random } from "@utils/random";
+import { parsePath } from "@utils/path";
 import { expand } from "core/design/tasks/roughContour";
 import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
-import { random } from "../../utils/random";
-import { parsePath } from "../../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import { isClockwise } from "core/math/geometry/path";
 

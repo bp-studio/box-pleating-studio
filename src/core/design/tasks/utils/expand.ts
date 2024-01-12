@@ -27,6 +27,7 @@ export function expandPath(path: PathEx, units: number): PathEx {
  * vertices in the path, to prevent potential bugs in tracing logics.
  */
 export function simplify(path: PathEx): PathEx {
+	/* istanbul ignore next: foolproof */
 	if(!path) return [];
 	// First we need to remove duplicate vertices,
 	// or the next step won't work correctly.

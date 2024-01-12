@@ -10,22 +10,14 @@
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "esnext",
-		"types": [
-			"mocha",
-			"node"
-		],
-		"paths": {
-			"@utils/*": [
-				"../test/utils/*"
-			]
-		}
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable"
+		]
 	},
 	"include": [
 		"./**/*.ts",
 		"../src/shared/types/**/*.d.ts"
-	],
-	"ts-node": {
-		"files": true,
-		"swc": true
-	}
+	]
 }

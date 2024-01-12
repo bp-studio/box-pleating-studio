@@ -1,6 +1,6 @@
-import { parseTree } from "../utils/tree";
+import { parseTree } from "@utils/tree";
+import { parsePath } from "@utils/path";
 import { LayoutController } from "core/controller/layoutController";
-import { parsePath } from "../utils/path";
 import { CreaseType } from "shared/types/cp";
 
 describe("CP exporting", function() {

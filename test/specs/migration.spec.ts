@@ -1,5 +1,5 @@
+import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
-import * as sample from "../samples/v04.session.sample.json";
 
 import type { JProject } from "shared/json";
 
@@ -19,7 +19,10 @@ describe("Migration", function() {
 
 		let result: JProject;
 
-		before(function() { return result = Migration.$process(sample); });
+		before(async function() {
+			const sample = await getJSON("v04.session.sample.json");
+			result = Migration.$process(sample);
+		});
 
 		it("Isolates design", function() {
 			expect(result).to.have.property("design");

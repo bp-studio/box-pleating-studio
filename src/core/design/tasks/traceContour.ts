@@ -307,8 +307,8 @@ function createRawContourForLeaf(node: ITreeNode, leaf: ITreeNode): PathEx {
 	const final: Path = [];
 	const quadrants = [] as IPoint[];
 	for(const junction of coveredJunctions) {
-		const q = junction.$a === leaf ? getQuadrant(junction.$q1) : getQuadrant(junction.$q2);
-		quadrants[q] = junction.$o;
+		const code = junction.$a === leaf ? junction.$q1 : junction.$q2;
+		quadrants[getQuadrant(code)] = junction.$o;
 	}
 	for(let q = 0; q < quadrantNumber; q++) {
 		const p = result[q];

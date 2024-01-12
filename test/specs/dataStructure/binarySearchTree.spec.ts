@@ -1,5 +1,5 @@
+import { random } from "@utils/random";
 import { RavlTree } from "shared/data/bst/ravlTree";
-import { random } from "../../utils/random";
 import { minComparator } from "shared/data/heap/heap";
 
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";

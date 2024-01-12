@@ -1,8 +1,8 @@
+import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "@utils/tree";
 import { TreeController } from "core/controller/treeController";
 import { getDist } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
-import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "../utils/tree";
 
 describe("Tree", function() {
 

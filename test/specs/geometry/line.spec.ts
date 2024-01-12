@@ -1,5 +1,5 @@
+import { parseLine } from "@utils/line";
 import { Line } from "core/math/geometry/line";
-import { parseLine } from "../../utils/line";
 import { Vector } from "core/math/geometry/vector";
 
 export default function() {

@@ -38,6 +38,7 @@ function balance(): void {
 function tryBalance(root: TreeNode): TreeNode | null {
 	// Precondition check
 	const first = root.$children.$get();
+	/* istanbul ignore next: type-safety */
 	if(!first) return null;
 	const second = root.$children.$getSecond();
 	const secondHeight = second ? second.$height + 1 : 0;

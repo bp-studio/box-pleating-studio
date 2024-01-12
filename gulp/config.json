@@ -2,7 +2,7 @@
 	"dest": {
 		"debug": "build/debug",
 		"dist": "build/dist",
-		"test": "build/test"
+		"tool": "build/tools"
 	},
 	"src": {
 		"app": "src/app",
@@ -17,6 +17,6 @@
 		"sw": "src/other/service",
 		"worker": "src/other/worker",
 		"shared": "src/shared",
-		"test": "test/tests"
+		"tool": "tools"
 	}
 }

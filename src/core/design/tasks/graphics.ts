@@ -7,6 +7,7 @@ import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { Line } from "core/math/geometry/line";
 import { combineContour } from "./utils/combine";
 import { getOrSetEmptyArray } from "shared/utils/map";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
@@ -25,7 +26,7 @@ function graphics(): void {
 	// Devices
 	for(const repo of State.$repoToProcess) addRepo(repo);
 	for(const repo of State.$repoWithNodeSetChanged) {
-		State.$updateResult.update.stretches.push(repo.$stretch.$id);
+		UpdateResult.$updateStretch(repo.$stretch.$id);
 		addRepo(repo);
 	}
 
@@ -41,21 +42,21 @@ function graphics(): void {
 		combineContour(node);
 		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node, freeCorners);
 
-		State.$updateResult.graphics[node.$tag] = {
+		UpdateResult.$addGraphics(node.$tag, {
 			contours: g.$contours,
 			ridges: g.$ridges,
-		};
+		});
 	}
 
 	// Pass the updated structure to the client.
-	if(State.$treeStructureChanged) State.$updateResult.tree = State.$tree.toJSON();
+	if(State.$treeStructureChanged) UpdateResult.$exportTree(State.$tree.toJSON());
 }
 
 function addRepo(repo: Repository): void {
 	if(!repo.$pattern) return;
 	const forward = repo.$direction == SlashDirection.FW;
 	for(const [i, device] of repo.$pattern.$devices.entries()) {
-		State.$updateResult.graphics["s" + repo.$stretch.$id + "." + i] = {
+		UpdateResult.$addGraphics("s" + repo.$stretch.$id + "." + i, {
 			contours: device.$contour,
 			ridges: device.$drawRidges,
 			axisParallel: device.$axisParallels,
@@ -63,7 +64,7 @@ function addRepo(repo: Repository): void {
 			// Note that the range of all devices in the pattern will be updated.
 			range: device.$getDraggingRange(),
 			forward,
-		} as DeviceData;
+		} as DeviceData);
 	}
 }
 

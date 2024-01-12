@@ -1,13 +1,12 @@
-import "../utils/line";
-import "../utils/path";
+import { createTree, id1, id2, id3, id4, node, parseTree } from "@utils/tree";
+import { getJSON } from "@utils/sample";
 import { LayoutController } from "core/controller/layoutController";
 import { DesignController } from "core/controller/designController";
 import { Migration } from "client/patches";
 import { toPath } from "core/math/geometry/rationalPath";
 import { State, fullReset } from "core/service/state";
-import { createTree, id1, id2, id3, id4, node, parseTree } from "../utils/tree";
 import { TreeController } from "core/controller/treeController";
-import * as sample from "../samples/v04.session.sample.json";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { Tree } from "core/design/context/tree";
 
@@ -15,8 +14,9 @@ describe("Pattern", function() {
 
 	describe("Searching", function() {
 
-		it("Loads saved patterns", function() {
+		it("Loads saved patterns", async function() {
 			fullReset();
+			const sample = await getJSON("v04.session.sample.json");
 			const data = Migration.$process(sample);
 			DesignController.init(data.design);
 			complete();
@@ -33,7 +33,7 @@ describe("Pattern", function() {
 			]);
 			const stretch = State.$stretches.get("1,2,3")!;
 			expect(stretch.$repo.$pattern).to.equal(null);
-			expect(State.$updateResult.patternNotFound).to.be.true;
+			expect(UpdateResult.$flush().patternNotFound).to.be.true;
 		});
 
 		it("Caches repo during dragging", function() {
@@ -273,13 +273,12 @@ describe("Pattern", function() {
 		it("Updates ridges when edges merge or split", function() {
 			parseTree("(0,1,2),(0,2,2),(0,4,1),(4,3,7)", "(1,9,5,0,0),(2,6,8,0,0),(3,0,0,0,0)");
 			complete();
-			const result1 = State.$updateResult;
+			const result1 = UpdateResult.$flush();
 			const ridges1 = result1.graphics["s1,2,3.0"].ridges;
 			expect(ridges1).to.containLine([{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]);
 
-			State.$resetResult();
 			TreeController.join(id4);
-			const result2 = State.$updateResult;
+			const result2 = UpdateResult.$flush();
 			const data2 = result2.graphics["s1,2,3.0"];
 			expect(data2).to.be.not.undefined;
 			const ridges2 = data2.ridges;

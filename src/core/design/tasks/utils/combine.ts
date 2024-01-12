@@ -46,6 +46,7 @@ function insertOuter(patternContours: PatternContour[], result: RationalContour[
 		} else {
 			// Otherwise fallback to trying each rough contour
 			for(const rough of result) {
+				/* istanbul ignore else: foolproof */
 				if(tryInsertOuter(contour, rough)) break;
 			}
 		}
@@ -71,6 +72,7 @@ function tryInsertInner(childContour: PatternContour, result: RationalContour[])
 		for(const inner of contour.$inner) {
 			const leaves = inner.leaves || contour.$leaves;
 			if(childContour.$leaves.some(l => !leaves.includes(l))) continue;
+			/* istanbul ignore else: foolproof */
 			if(tryInsert(inner, childContour)) return;
 		}
 	}

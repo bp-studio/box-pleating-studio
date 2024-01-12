@@ -1,12 +1,11 @@
-import { readFileSync } from "fs";
-
+import { getText } from "@utils/sample";
 import { treeMaker } from "client/plugins/treeMaker";
 
 describe("TreeMaker importing", function() {
 	let sample: string;
 
-	before(function() {
-		sample = readFileSync("./test/samples/sample.tmd5").toString();
+	before(async function() {
+		sample = await getText("sample.tmd5");
 	});
 
 	it("Reads TreeMaker v5 format", function() {

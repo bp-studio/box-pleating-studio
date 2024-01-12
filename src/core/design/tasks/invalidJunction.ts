@@ -1,5 +1,6 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { InvalidJunction } from "../layout/junction/invalidJunction";
 
@@ -20,11 +21,11 @@ function invalid(): void {
 		if(junction.$processed) continue;
 
 		// Calculate the shape of intersection.
-		State.$updateResult.add.junctions[`${a},${b}`] = junction.$getPolygon();
+		UpdateResult.$addJunction(`${a},${b}`, junction.$getPolygon());
 	}
 
 	// After the process above, the remaining ones are those that should be deleted.
 	for(const [a, b] of State.$invalidJunctionDiff.$diff()) {
-		State.$updateResult.remove.junctions.push(`${a},${b}`);
+		UpdateResult.$removeJunction(`${a},${b}`);
 	}
 }

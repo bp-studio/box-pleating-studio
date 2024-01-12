@@ -8,6 +8,7 @@ import { minComparator } from "shared/data/heap/heap";
 import { patternTask } from "./pattern";
 import { Stretch } from "../layout/stretch";
 import { clearPatternContourForRepo } from "./patternContour";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { JStretch, NodeId } from "shared/json";
 import type { Junctions, ValidJunction } from "../layout/junction/validJunction";
@@ -51,7 +52,7 @@ function stretches(): void {
 			State.$stretchCache.set(id, s);
 		}
 		State.$stretches.delete(id);
-		State.$updateResult.remove.stretches.push(id);
+		UpdateResult.$removeStretch(id);
 	}
 }
 

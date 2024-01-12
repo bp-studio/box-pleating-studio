@@ -1,6 +1,7 @@
 import { State } from "core/service/state";
 import { Task } from "./task";
 import { traceContourTask } from "./traceContour";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { Configuration } from "../layout/configuration";
 import type { Pattern } from "../layout/pattern/pattern";
@@ -20,15 +21,15 @@ function pattern(): void {
 	for(const repo of State.$repoToProcess) {
 		const id = repo.$stretch.$id;
 		if(repo.$pattern) {
-			State.$updateResult.add.stretches[id] = repo.$stretch.toJSON();
+			UpdateResult.$addStretch(id, repo.$stretch.toJSON());
 		} else {
-			State.$updateResult.remove.stretches.push(id);
+			UpdateResult.$removeStretch(id);
 		}
 	}
 
 	for(const s of State.$stretches.values()) {
 		if(!s.$repo.$pattern) {
-			State.$updateResult.patternNotFound = true;
+			UpdateResult.$setPatternNotFound();
 			continue;
 		}
 

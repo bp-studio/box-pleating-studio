@@ -1,6 +1,7 @@
 import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { JNode } from "core/service/updateModel";
 import type { Comparator } from "shared/types/types";
@@ -23,12 +24,8 @@ export const nodeComparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist
 
 export class TreeNode implements ITreeNode {
 
-	/** The id of the node. */
 	public readonly id: NodeId;
-
 	public $parent: this | undefined;
-
-	/** The distance from the node to the root. */
 	public $dist: number = 0;
 
 	/**
@@ -54,13 +51,12 @@ export class TreeNode implements ITreeNode {
 		$ridges: [],
 	};
 
-	/** The length of its parent edge. */
 	public $length: number = 0;
 
 	constructor(id: NodeId, parent?: TreeNode, length: number = 0) {
 		this.id = id;
 		State.$childrenChanged.add(this);
-		State.$updateResult.add.nodes.push(id);
+		UpdateResult.$addNode(id);
 		if(parent) {
 			this.$length = length;
 			this.$AABB.$setMargin(length);
