@@ -9,6 +9,11 @@
 	"background_color": "#fff",
 	"orientation": "any",
 	"description": "Super-complex origami design made easy!",
+	"categories": [
+		"education",
+		"entertainment",
+		"productivity"
+	],
 	"icons": [
 		{
 			"src": "assets/icon/icon-512.png",
