@@ -5,11 +5,13 @@ import { QV } from "../../pattern/quadrant";
 import type { JoinResult } from "./joinLogic";
 import type { Point } from "core/math/geometry/point";
 
+type NPoint = Point | null;
+
 interface BaseJoinContext {
-	D1: Point | null;
-	D2: Point | null;
-	B1: Point | null;
-	B2: Point | null;
+	D1: NPoint;
+	D2: NPoint;
+	B1: NPoint;
+	B2: NPoint;
 	delta: Line;
 }
 
@@ -29,25 +31,10 @@ export class BaseJoinLogic extends JoinLogic {
 	public *$join(): Generator<JoinResult> {
 		if(!this.data) return;
 		const { D1, D2, B1, B2 } = this._baseJoinIntersections();
-		const { j1, j2, f } = this;
-
-		if(B1?.$isIntegral && D2?.$isIntegral && !B1.eq(D2)) {
-			// If the two gadgets are pointing inwards instead of outwards,
-			// there's no obtuse join (at least there's no such transformation so far).
-			// TODO: Think about this more deeply.
-			if(D2.x * f > B1.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
-
-			if(!this._setupAnchor(D2)) return;
-			this._setupDetour([B1], [D2, B1]);
-			yield this._result(true);
-		}
-		if(B2?.$isIntegral && D1?.$isIntegral && !B2.eq(D1)) {
-			if(D1.x * f > B2.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
-
-			if(!this._setupAnchor(D1)) return;
-			this._setupDetour([D1, B2], [B2]);
-			yield this._result();
-		}
+		const try1 = this.tryJoin(B1, D2, true, true);
+		if(try1) yield try1;
+		const try2 = this.tryJoin(B2, D1, false, false);
+		if(try2) yield try2;
 	}
 
 	/**
@@ -67,5 +54,22 @@ export class BaseJoinLogic extends JoinLogic {
 		const B1 = j1.e.$intersection(pt, bv);
 		const B2 = j2.e.$intersection(pt, bv);
 		return { D1, D2, B1, B2, delta };
+	}
+
+	private tryJoin(B: NPoint, D: NPoint, Din2: boolean, shouldClone: boolean): JoinResult | undefined {
+		const { j1, j2, f } = this;
+		if(!B || !D) return;
+		if(B.$isIntegral && D.$isIntegral && !B.eq(D)) {
+			// There is no obtuse join if the two gadgets are "pointing inwards",
+			// as the straight-skeleton degenerates into a relay pattern.
+			if(D.x * f > B.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
+
+			/* istanbul ignore next: debug */
+			if(!this._setupAnchor(D)) return;
+
+			if(Din2) this._setupDetour([B], [D, B]);
+			else this._setupDetour([D, B], [B]);
+			return this._result(shouldClone);
+		}
 	}
 }
