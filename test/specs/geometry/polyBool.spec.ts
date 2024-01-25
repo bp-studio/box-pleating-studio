@@ -1,9 +1,7 @@
-import { expect } from "chai";
-
+import { random } from "@utils/random";
+import { parsePath } from "@utils/path";
 import { expand } from "core/design/tasks/roughContour";
 import { AAUnion, GeneralUnion, RRIntersection } from "core/math/sweepLine/polyBool";
-import { random } from "../../utils/random";
-import { parsePath } from "../../utils/path";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import { isClockwise } from "core/math/geometry/path";
 
@@ -176,6 +174,21 @@ export default function() {
 			expect(result.length).to.equal(1);
 			const path = result[0];
 			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)", true);
+		});
+
+		it("Handles floating error", function() {
+			const result = new GeneralUnion().$get([
+				parsePath("(34,4),(34,-3),(40,-3),(40,2.6666666666666665),(39,4)"),
+				parsePath("(70,4),(66.6842105263158,4),(66.10309278350516,3.8762886597938144),(64,3),(64,-3),(70,-3)"),
+				parsePath("(64,36),(62,36),(62,24),(64,24)"),
+				parsePath("(64,42),(41,42),(40.17910447761194,40.02985074626866),(40,39.46153846153846),(40,36),(64,36)"),
+				parsePath("(40,52),(40,40),(64,40),(64,52)"),
+				parsePath("(42,36),(40,36),(40,24),(42,24)"),
+				parsePath("(64,8),(44,8),(40,5),(40,-8),(64,-8)"),
+				parsePath("(62,30),(43.333333333333336,30),(42,29),(42,22),(62,22)"),
+				parsePath("(62,24),(62,36),(42.5,36),(42,35.333333333333336),(42,24),(40,24),(40,-4),(64,-4),(64,24)"),
+			]);
+			expect(result.length).to.equal(2);
 		});
 
 		xit("Is quite fast", function() {

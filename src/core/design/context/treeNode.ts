@@ -1,6 +1,7 @@
 import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { JNode } from "core/service/updateModel";
 import type { Comparator } from "shared/types/types";
@@ -23,12 +24,8 @@ export const nodeComparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist
 
 export class TreeNode implements ITreeNode {
 
-	/** The id of the node. */
 	public readonly id: NodeId;
-
 	public $parent: this | undefined;
-
-	/** The distance from the node to the root. */
 	public $dist: number = 0;
 
 	/**
@@ -54,13 +51,12 @@ export class TreeNode implements ITreeNode {
 		$ridges: [],
 	};
 
-	/** The length of its parent edge. */
 	public $length: number = 0;
 
 	constructor(id: NodeId, parent?: TreeNode, length: number = 0) {
 		this.id = id;
 		State.$childrenChanged.add(this);
-		State.$updateResult.add.nodes.push(id);
+		UpdateResult.$addNode(id);
 		if(parent) {
 			this.$length = length;
 			this.$AABB.$setMargin(length);
@@ -70,6 +66,7 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public toJSON(): JEdge {
+		/* istanbul ignore next: debug */
 		if(!this.$parent) throw new Error("Cannot export root node");
 		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}
@@ -122,13 +119,14 @@ export class TreeNode implements ITreeNode {
 	 * Temporarily disconnects a node from the tree, without changing its subtree.
 	 */
 	public $cut(): void {
-		if(this.$parent) {
-			this.$parent.$children.$remove(this);
-			if(this.$parent.$AABB.$removeChild(this.$AABB)) {
-				State.$nodeAABBChanged.add(this.$parent);
-			}
-			State.$childrenChanged.add(this.$parent);
+		/* istanbul ignore next: foolproof */
+		if(!this.$parent) return;
+
+		this.$parent.$children.$remove(this);
+		if(this.$parent.$AABB.$removeChild(this.$AABB)) {
+			State.$nodeAABBChanged.add(this.$parent);
 		}
+		State.$childrenChanged.add(this.$parent);
 		this.$parent = undefined;
 	}
 

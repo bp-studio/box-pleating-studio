@@ -43,11 +43,13 @@ export class RepoTrace extends Trace {
 				const a = all[first - 1].$flap.id, b = all[first].$flap.id;
 				const ridge = this._getIntersectionRidge(a, b);
 				// It is possible that the intersection ridge is missing in legacy patterns.
+				/* istanbul ignore else: legacy */
 				if(ridge) start = ridge.p1;
 			}
 			if(last < all.length - 1) {
 				const a = all[last].$flap.id, b = all[last + 1].$flap.id;
 				const ridge = this._getIntersectionRidge(a, b);
+				/* istanbul ignore else: legacy */
 				if(ridge) end = ridge.p1;
 			}
 		}
@@ -68,6 +70,7 @@ export class RepoTrace extends Trace {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///#if DEBUG
+	/* istanbul ignore next: debug */
 	public createTestCase(hinges: Path, start: Point, end: Point): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;

@@ -71,8 +71,3 @@ export function leg(c: number, b: number): number {
 export function xyComparator(p1: IPoint, p2: IPoint): number {
 	return p1.x - p2.x || p1.y - p2.y;
 }
-
-/** Reverses the direction of all paths in a {@link Polygon} and returns the new polygon */
-export function reverse(polygon: Polygon): Polygon {
-	return polygon.map(path => path.toReversed());
-}

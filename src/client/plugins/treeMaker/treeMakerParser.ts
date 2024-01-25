@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { Migration } from "client/patches/migration";
+import { Migration } from "client/patches";
 import { lcm } from "core/math/utils/gcd";
 import { GridType } from "shared/json";
 import { toFractionRecursive } from "core/math/fraction";

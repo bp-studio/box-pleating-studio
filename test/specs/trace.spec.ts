@@ -1,9 +1,7 @@
-import { expect } from "chai";
-
+import { parsePath } from "@utils/path";
 import { Trace } from "core/design/layout/trace/trace";
 import { Line } from "core/math/geometry/line";
 import { Direction, SlashDirection } from "shared/types/direction";
-import { parsePath } from "../utils/path";
 import { mapDirections } from "core/math/geometry/path";
 import { createHingeSegments } from "core/design/layout/trace/hingeSegment";
 import { Point } from "core/math/geometry/point";

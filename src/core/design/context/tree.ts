@@ -1,5 +1,6 @@
 import { TreeNode } from "./treeNode";
 import { State } from "core/service/state";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { TreeData } from "core/service/updateModel";
 import type { JEdge, JFlap } from "shared/json";
@@ -17,10 +18,8 @@ import type { NodeId } from "shared/json/tree";
 
 export class Tree implements ITree, ISerializable<TreeData> {
 
-	/** The array of all nodes. Some indices are skipped. */
 	private readonly _nodes: (TreeNode | undefined)[];
 
-	/** The root node of the tree. */
 	public $root!: TreeNode;
 
 	/**
@@ -52,6 +51,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		if(flaps) {
 			for(const flap of flaps) {
 				const node = this._nodes[flap.id];
+				/* istanbul ignore else: foolproof */
 				if(node) node.$setFlap(flap);
 			}
 		}
@@ -82,7 +82,6 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		return result;
 	}
 
-	/** Public node array. */
 	public get $nodes(): NodeCollection<TreeNode> {
 		return this._nodes as NodeCollection<TreeNode>;
 	}
@@ -107,6 +106,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		for(const flap of flaps) {
 			const node = this._nodes[flap.id];
 			const isLeaf = node && node.$isLeafLike;
+			/* istanbul ignore next: foolproof */
 			if(isLeaf) node.$setFlap(flap);
 		}
 	}
@@ -187,7 +187,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			this.$setLength(n2, length);
 		}
 
-		State.$updateResult.edit.push([true, { n1, n2, length }]);
+		UpdateResult.$edit([true, { n1, n2, length }]);
 		return N1;
 	}
 
@@ -201,7 +201,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 	public $removeEdge(n1: NodeId, n2: NodeId): void {
 		const N1 = this._nodes[n1]!, N2 = this._nodes[n2]!;
 		const child = N1.$parent == N2 ? N1 : N2;
-		State.$updateResult.edit.push([false, { n1, n2, length: child.$length }]);
+		UpdateResult.$edit([false, { n1, n2, length: child.$length }]);
 		State.$treeStructureChanged = true;
 		child.$cut();
 
@@ -234,7 +234,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			State.$nodeAABBChanged.delete(node);
 
 			delete this._nodes[id];
-			State.$updateResult.remove.nodes.push(id);
+			UpdateResult.$removeNode(id);
 		}
 		this._pendingRemove.clear();
 	}
@@ -281,17 +281,18 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			if(!N1) this.$root = N1 = this._addNode(n1);
 			N2 = this._addNode(n2, N1, length);
 		}
-		State.$updateResult.edit.push([true, { n1, n2, length }]);
+		UpdateResult.$edit([true, { n1, n2, length }]);
 		return true;
 	}
 }
 
+/** Return the structural distance between two {@link ITreeNode}s using LCA. */
 export function dist(a: ITreeNode, b: ITreeNode, lca: ITreeNode): number {
 	return a.$dist + b.$dist - 2 * lca.$dist;
 }
 
 /**
- * Returns the distance between two nodes on the tree. Used only in unit tests.
+ * Return the structural distance between two nodes without supplying LCA. Used only in unit tests.
  */
 export function getDist(n1: TreeNode, n2: TreeNode): number {
 	return dist(n1, n2, getLCA(n1, n2));

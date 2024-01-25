@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"baseUrl": "../src",
+		"experimentalDecorators": true,
+		"isolatedModules": true,
+		"moduleResolution": "node",
+		"noImplicitOverride": true,
+		"preserveSymlinks": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "esnext",
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable"
+		]
+	},
+	"include": [
+		"./**/*.ts",
+		"../src/shared/types/**/*.d.ts"
+	]
+}

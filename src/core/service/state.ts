@@ -1,11 +1,11 @@
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { DiffDoubleSet } from "shared/data/diff/diffDoubleSet";
 import { DiffSet } from "shared/data/diff/diffSet";
+import { UpdateResult } from "./updateResult";
 
 import type { Repository } from "core/design/layout/repository";
 import type { Device } from "core/design/layout/pattern/device";
 import type { JStretch, NodeId } from "shared/json";
-import type { UpdateModel } from "./updateModel";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
@@ -133,8 +133,6 @@ export namespace State {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	export let $updateResult: UpdateModel;
-
 	/** Reset the temporary states after each round. */
 	export function $reset(): void {
 		$childrenChanged.clear();
@@ -156,34 +154,13 @@ export namespace State {
 		$rootChanged = false;
 	}
 
-	export function $resetResult(): void {
-		$updateResult = {
-			add: {
-				nodes: [],
-				junctions: {},
-				stretches: {},
-			},
-			update: {
-				stretches: [],
-			},
-			remove: {
-				nodes: [],
-				junctions: [],
-				stretches: [],
-			},
-			patternNotFound: false,
-			edit: [],
-			graphics: {},
-		};
-	}
-
 	$reset();
-	$resetResult();
 }
 
 /** For unit tests only */
 export function fullReset(): void {
 	State.$reset();
+	UpdateResult.$flush();
 	State.$junctions.clear();
 	State.$stretches.clear();
 	State.$invalidJunctionDiff.clear();

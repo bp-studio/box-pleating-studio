@@ -124,21 +124,22 @@ export class NodeSet {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _dist(a: ITreeNode, b: ITreeNode): number {
-		if(a === b) return 0;
 		return dist(a, b, this._lca(a, b));
 	}
 
 	private _lca(a: ITreeNode, b: ITreeNode): ITreeNode {
 		const lcaMap = this._lcaMap!;
 		let lca = lcaMap.get(a.id, b.id);
-		if(lca) return lca;
 
-		// Otherwise, it suffices to pick a leaf covered by each
-		// of the given nodes and lookup the LCA of the leaves.
-		const aLeaf = this.$quadrantCoverage.get(a)![0].$flap.id;
-		const bLeaf = this.$quadrantCoverage.get(b)![0].$flap.id;
-		lca = lcaMap.get(aLeaf, bLeaf)!;
-		lcaMap.set(a.id, b.id, lca);
+		/* istanbul ignore next: completeness */
+		if(!lca) {
+			// Otherwise, it suffices to pick a leaf covered by each
+			// of the given nodes and lookup the LCA of the leaves.
+			const aLeaf = this.$quadrantCoverage.get(a)![0].$flap.id;
+			const bLeaf = this.$quadrantCoverage.get(b)![0].$flap.id;
+			lca = lcaMap.get(aLeaf, bLeaf)!;
+			lcaMap.set(a.id, b.id, lca);
+		}
 		return lca;
 	}
 }

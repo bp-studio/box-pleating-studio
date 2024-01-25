@@ -214,9 +214,9 @@ function checkKey(key: number): boolean {
 	return Number.isInteger(key) && key >= 0 && key <= MAX;
 }
 
-export interface Node<K extends number, V > extends IDoubleLinkedNode<Node<K, V>> { }
+interface Node<K extends number, V> extends IDoubleLinkedNode<Node<K, V>> { }
 
-export class Node<K extends number, V> {
+class Node<K extends number, V> {
 	public value: V;
 	public readonly n1: KeyNode<K>;
 	public readonly n2: KeyNode<K>;
@@ -227,6 +227,8 @@ export class Node<K extends number, V> {
 		this.value = value;
 	}
 }
+
+export type { Node };
 
 interface KeyNode<K extends number> extends IDoubleLinkedNode<KeyNode<K>> {
 

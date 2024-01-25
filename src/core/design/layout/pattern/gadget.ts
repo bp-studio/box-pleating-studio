@@ -39,11 +39,13 @@ export class Gadget implements JGadget {
 		this.anchors = clone(data.anchors); // Must clone!
 	}
 
-	@cache public get sx(): number {
+	/** The width of the stretch circumscribing rectangle (SCR). */
+	@cache public get scrX(): number {
 		return Math.ceil(this.$anchorMap[2][0].x) - Math.floor(this.$anchorMap[0][0].x);
 	}
 
-	@cache public get sy(): number {
+	/** The height of the stretch circumscribing rectangle (SCR). */
+	@cache public get scrY(): number {
 		return Math.ceil(this.$anchorMap[2][0].y) - Math.floor(this.$anchorMap[0][0].y);
 	}
 

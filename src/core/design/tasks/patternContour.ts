@@ -37,6 +37,7 @@ function patternContour(): void {
 				processNode(node, trace, coveredQuadrants);
 			}
 		} catch(e) {
+			/* istanbul ignore next: debug */
 			if(e instanceof InvalidParameterError) {
 				// When this happens, it means that the generated
 				// pattern doesn't make sense in the first place,
@@ -44,8 +45,9 @@ function patternContour(): void {
 				// In theory this shouldn't happen, but just in case,
 				// we catch the error here to prevent fatal crashes.
 				continue;
+			} else {
+				throw e;
 			}
-			throw e;
 		}
 	}
 
@@ -60,8 +62,9 @@ function patternContour(): void {
 			}
 		} catch(e) {
 			// Similarly
+			/* istanbul ignore next: debug */
 			if(e instanceof InvalidParameterError) continue;
-			throw e;
+			else throw e;
 		}
 	}
 
@@ -142,6 +145,7 @@ export function clearPatternContourForRepo(repo: Repository): void {
 function* nodesOfRepo(repo: Repository): Generator<TreeNode> {
 	for(const id of repo.$nodeSet.$nodes) {
 		const node = State.$tree.$nodes[id];
+		/* istanbul ignore else: type-safety */
 		if(node) yield node;
 	}
 }

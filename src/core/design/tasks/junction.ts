@@ -4,6 +4,7 @@ import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
 import { stretchTask } from "./stretch";
 import { dist } from "../context/tree";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { ITreeNode } from "../context";
 
@@ -20,9 +21,7 @@ export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask)
 
 function junction(): void {
 	// Delete junctions related to deleted nodes or nodes that are no longer leaves
-	for(const id of State.$updateResult.remove.nodes) {
-		State.$junctions.delete(id);
-	}
+	UpdateResult.$pruneJunctions(State.$junctions);
 	for(const node of State.$childrenChanged) {
 		if(node.$children.$size > 0) State.$junctions.delete(node.id);
 	}

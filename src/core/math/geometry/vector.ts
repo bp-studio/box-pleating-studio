@@ -17,10 +17,9 @@ export class Vector extends Couple {
 
 	/**Create a Vector object */
 	constructor();
-	constructor(c: Couple);
 	constructor(p: IPoint);
 	constructor(x: Rational, y: Rational);
-	constructor(...p: [Couple | IPoint] | [Rational, Rational]) {
+	constructor(...p: [IPoint] | [Rational, Rational]) {
 		if(p.length == 1) super(p[0].x, p[0].y);
 		else super(...p);
 	}

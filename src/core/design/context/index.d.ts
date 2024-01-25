@@ -15,8 +15,10 @@ import type { traceContourTask } from "core/design/tasks/traceContour";
 export type NodeCollection<T> = Readonly<Record<NodeId, T | undefined>> & Omit<ReadonlyArray<T | undefined>, number>;
 
 export interface ITree {
+	/** The array of all nodes. Some indices are skipped. */
 	readonly $nodes: NodeCollection<ITreeNode>;
 
+	/** The root node of the tree. */
 	readonly $root: ITreeNode;
 
 	/** Deletes an leaf, and returns if the operation is successful */
@@ -41,10 +43,15 @@ export interface ITree {
  * This is the readonly interface for {@link TreeNode}.
  */
 export interface ITreeNode extends ISerializable<JEdge> {
+	/** The id of the node. */
 	readonly id: NodeId;
 	readonly $parent: this | undefined;
+
+	/** The length of its parent edge. */
 	readonly $length: number;
 	readonly $children: IReadonlyHeap<ITreeNode>;
+
+	/** The distance from the node to the root. */
 	readonly $dist: number;
 	readonly $isLeaf: boolean;
 	readonly $AABB: AABB;

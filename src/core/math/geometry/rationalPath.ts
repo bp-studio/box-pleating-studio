@@ -69,6 +69,7 @@ export function join(p1: RationalPath, p2: RationalPath): RationalPath {
 			}
 		}
 	}
+	/* istanbul ignore next: type-safety */
 	return p1;
 }
 

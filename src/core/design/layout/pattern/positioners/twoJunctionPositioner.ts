@@ -46,9 +46,9 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 	if(g2.$intersects(deltaPt, oriented ? QV[0] : QV[2])) return false;
 
 	// Push them towards the shared corner as much as possible
-	const offsets = oriented ?
-		[Math.floor(g1.$slack[0]), 0] :
-		[j1.sx - context.$getSpan(g1, 2) - g1.sx, j2.sx - g2.sx];
+	const slack = Math.floor(g1.$slack[oriented ? 0 : 2]);
+	const offsets = oriented ? [slack, 0] :
+		[j1.sx - context.$getSpan(g1, 2) - g1.scrX - slack, j2.sx - g2.scrX];
 	if(reversed) offsets.reverse();
 	context.$devices.forEach((d, i) => d.$offset = offsets[i]);
 	return true;
@@ -70,7 +70,7 @@ function makeSpitJoinPattern(context: PositioningContext): boolean {
 		const j = context.$getJunctions(device)[0];
 		if(overlap.c[0].e! < 0) {
 			const gadget = device.$gadgets[0];
-			device.$offset = j.sx - context.$getSpan(gadget, 0) - gadget.sx;
+			device.$offset = j.sx - context.$getSpan(gadget, 0) - gadget.scrX;
 		}
 	}
 
@@ -82,6 +82,6 @@ function pushJoinDeviceTowardsJoint(context: PositioningContext, device: Device)
 	const oriented = j1.c[0].e == j2.c[0].e;
 	if(!oriented) {
 		const gadget = device.$gadgets[0];
-		device.$offset = j1.sx - context.$getSpan(gadget, 0) - gadget.sx;
+		device.$offset = j1.sx - context.$getSpan(gadget, 0) - gadget.scrX;
 	}
 }

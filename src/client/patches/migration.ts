@@ -60,8 +60,9 @@ export namespace Migration {
 		}
 		proj.version = $getCurrentVersion();
 
+		const callback = options.onDeprecate;
 		/* istanbul ignore next: legacy code */
-		if(deprecate) options.onDeprecate?.(proj.design!.title);
+		if(callback && deprecate) callback(proj.design!.title);
 		return proj as JProject;
 	}
 

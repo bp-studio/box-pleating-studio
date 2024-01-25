@@ -1,11 +1,10 @@
-import { expect } from "chai";
-
+import { id0, id3, id4, parseTree } from "@utils/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { getFirst } from "shared/utils/set";
-import { id0, id3, id4, parseTree } from "../utils/tree";
 import { LayoutController } from "core/controller/layoutController";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 import type { Junction } from "core/design/layout/junction/junction";
@@ -53,13 +52,12 @@ describe("Junction", function() {
 			expect(invalidJunctions.length).to.equal(1);
 			const junction = invalidJunctions[0];
 			expect(junction.$processed).to.be.true;
-			expect(State.$updateResult.add.junctions["1,2"]).to.be.not.undefined;
+			expect(UpdateResult.$flush().add.junctions["1,2"]).to.be.not.undefined;
 
 			// Moving an unrelated flap
-			State.$resetResult();
 			LayoutController.updateFlap([{ id: id3, x: 3, y: 2, width: 0, height: 0 }], false, []);
 			expect(getJunctions(false)).to.contain(junction, "Junction is reused");
-			expect(State.$updateResult.add.junctions["1,2"]).to.be.undefined;
+			expect(UpdateResult.$flush().add.junctions["1,2"]).to.be.undefined;
 		});
 	});
 

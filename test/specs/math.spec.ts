@@ -1,9 +1,16 @@
-import { expect } from "chai";
-
 import { gcd, lcm } from "core/math/utils/gcd";
 import { Fraction, toFraction } from "core/math/fraction";
+import { Matrix } from "core/math/geometry/matrix";
 
 describe("Mathematics", function() {
+
+	describe("Matrix", function() {
+		it("Computes inverse", function() {
+			const m = new Matrix(new Fraction(1), new Fraction(2), new Fraction(3), new Fraction(4));
+			const inv = m.$inverse!;
+			expect(inv.toString()).to.equal("-2,1,3/2,-1/2");
+		});
+	});
 
 	describe("Fraction", function() {
 		it("Approximates using continuous fraction", function() {

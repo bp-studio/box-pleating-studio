@@ -1,10 +1,9 @@
-import { expect } from "chai";
-
-import { parseRationalPath } from "../utils/rationalPath";
+import { parseRationalPath } from "@utils/rationalPath";
+import { id1, id6, parseTree } from "@utils/tree";
 import { toGraphicalContours } from "core/design/tasks/utils/combine";
-import { id1, id6, parseTree } from "../utils/tree";
 import { State } from "core/service/state";
 import { TreeController } from "core/controller/treeController";
+import { UpdateResult } from "core/service/updateResult";
 
 import type { NodeId } from "shared/json/tree";
 import type { RationalContour } from "core/design/tasks/utils/combine";
@@ -34,8 +33,18 @@ describe("Contour", function() {
 				"(5,0,1),(5,7,1),(0,2,1),(0,1,3),(0,6,1),(7,13,1),(7,4,1),(2,11,1),(2,8,1),(2,3,2),(2,15,1),(6,10,1),(6,9,1),(13,14,6),(11,12,1)",
 				"(1,3,6,0,0),(3,11,6,0,0),(8,8,6,0,1),(9,4,11,0,0),(10,2,11,0,0),(12,9,10,0,0),(4,7,1,0,0),(14,17,21,0,0),(15,12,9,0,2)"
 			);
-			const outer = State.$updateResult.graphics["re0,5"].contours[0].outer;
-			expect(outer).to.equalPath("(43/3,13),(13,14),(-1,14),(-1,2),(5,2),(5,2.5),(17/3,3),(25/3,3),(9,2.5),(9,2),(15,2),(15,13)");
+			const result1 = UpdateResult.$flush();
+			const outer1 = result1.graphics["re0,5"].contours[0].outer;
+			expect(outer1).to.equalPath("(43/3,13),(13,14),(-1,14),(-1,2),(5,2),(5,2.5),(17/3,3),(25/3,3),(9,2.5),(9,2),(15,2),(15,13)");
+
+			// rotate and swap some indices for branch coverage
+			parseTree(
+				"(5,0,1),(5,7,1),(0,2,1),(0,1,3),(0,6,1),(7,13,1),(7,4,1),(2,11,1),(2,8,1),(2,3,2),(2,15,1),(6,10,1),(6,9,1),(13,12,6),(11,14,1)",
+				"(1,6,-3,0,0),(3,6,-11,0,0),(8,6,-8,1,0),(9,11,-4,0,0),(10,11,-2,0,0),(14,10,-9,0,0),(4,1,-7,0,0),(12,21,-17,0,0),(15,9,-12,2,0)"
+			);
+			const result2 = UpdateResult.$flush();
+			const outer2 = result2.graphics["re0,5"].contours[0].outer;
+			expect(outer2).to.equalPath("(2,1),(2,-5),(2.5,-5),(3,-17/3),(3,-25/3),(2.5,-9),(2,-9),(2,-15),(13,-15),(13,-43/3),(14,-13),(14,1)");
 		});
 
 	});
@@ -61,6 +70,19 @@ describe("Contour", function() {
 			};
 			const result = toGraphicalContours(contour);
 			expect(result[0]?.inner?.[0]).to.be.an("array").that.deep.contains({ x: 28, y: 26 });
+		});
+
+		it("Resolves stacking", function() {
+			parseTree( // "hole contour 1.bps"
+				"(0,1,1),(0,2,1),(1,3,1),(1,4,1),(1,5,1),(1,6,1),(2,7,1)",
+				"(7,7,16,0,0),(3,5,4,0,3),(4,6,3,3,0),(5,6,8,3,0),(6,10,4,0,3)"
+			);
+			const contours = UpdateResult.$flush().graphics["re0,1"].contours
+				.toSorted((a, b) => a.outer.length - b.outer.length);
+			expect(contours.length).to.equal(2);
+			expect(contours[0].outer).to.equalPath("(6,4),(9,4),(9,7),(6,7)", true);
+			expect(contours[0].inner?.length).to.equal(1);
+			expect(contours[0].inner![0]).to.equalPath("(7,6),(8,6),(8,5),(7,5)", true);
 		});
 
 	});

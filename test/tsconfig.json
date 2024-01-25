@@ -13,7 +13,12 @@
 		"types": [
 			"mocha",
 			"node"
-		]
+		],
+		"paths": {
+			"@utils/*": [
+				"../test/utils/*"
+			]
+		}
 	},
 	"include": [
 		"./**/*.ts",
