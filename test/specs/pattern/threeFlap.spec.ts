@@ -1,5 +1,4 @@
-import { State } from "core/service/state";
-import { generateFromFlaps } from "./util";
+import { expectRepo, generateFromFlaps } from "./util";
 import { node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";
 
@@ -11,10 +10,7 @@ export default function() {
 				{ id: b, x: 0, y: 0, radius: 8 },
 				{ id: c, x: 6, y: 8, radius: 2 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			expect(stretch.$repo.$configurations[0].$length).to.equal(1);
+			expectRepo("1,2,3", 1, 1);
 
 			const B = node(b)!;
 			expect(B.$graphics.$patternContours.length).to.be.equal(1);
@@ -28,10 +24,7 @@ export default function() {
 				{ id: b, x: 0, y: 0, radius: 8 },
 				{ id: c, x: -6, y: 8, radius: 2 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			expect(stretch.$repo.$configurations[0].$length).to.equal(1);
+			expectRepo("1,2,3", 1, 1);
 
 			const B = node(b)!;
 			expect(B.$graphics.$patternContours.length).to.be.equal(1);
@@ -59,11 +52,7 @@ export default function() {
 				{ id: b, x: 8, y: 14, radius: 4 },
 				{ id: c, x: 15, y: 8, radius: 6 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(2, "Two half integral patterns");
+			expectRepo("1,2,3", 1, 2); // Two half integral patterns
 		}
 	});
 
@@ -74,14 +63,7 @@ export default function() {
 				{ id: b, x: 7, y: 14, radius: 4 },
 				{ id: c, x: 15, y: 8, radius: 6 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(1);
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(1);
-			const device = pattern.$devices[0];
+			const device = expectRepo("1,2,3", 1, 1, 1)[0];
 			expect(device.$addOns.length).to.equal(0, "Base joins have no addOn");
 		}
 	});
@@ -93,14 +75,10 @@ export default function() {
 				{ id: b, x: 5, y: 12, radius: 2 },
 				{ id: c, x: 15, y: 8, radius: 6 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(2, "Should find two standard joins.");
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(1, "Standard join creates 1 Device");
-			const device = pattern.$devices[0];
+			const device = expectRepo("1,2,3", 1,
+				2, //Should find two standard joins.
+				1 // Standard join creates 1 Device
+			)[0];
 			expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
 		}
 	});
@@ -112,13 +90,7 @@ export default function() {
 				{ id: b, x: 7, y: 20, radius: 6 },
 				{ id: c, x: 16, y: 12, radius: 5 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(1);
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(2);
+			expectRepo("1,2,3", 1, 1, 2);
 		}
 
 		for(const [a, b, c] of THREE_PERMUTATION) {
@@ -127,13 +99,7 @@ export default function() {
 				{ id: b, x: 20, y: 7, radius: 6 },
 				{ id: c, x: 12, y: 16, radius: 5 },
 			]);
-			const stretch = State.$stretches.get("1,2,3")!;
-			expect(stretch).to.be.not.undefined;
-			expect(stretch.$repo.$configurations.length).to.equal(1);
-			const config = stretch.$repo.$configurations[0];
-			expect(config.$length).to.equal(1);
-			const pattern = config.$pattern!;
-			expect(pattern.$devices.length).to.equal(2);
+			expectRepo("1,2,3", 1, 1, 2);
 		}
 	});
 }

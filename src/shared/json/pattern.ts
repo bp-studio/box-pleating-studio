@@ -43,7 +43,7 @@ export interface JConfiguration {
 }
 
 export interface JJunction extends JQuadrilateral {
-	/** The maximal space between the {@link Flap}s; always positive. */
+	/** The width of the flap rectangle (FR); always positive. */
 	sx: number;
 
 	/** Coefficients of transformation. */
@@ -105,9 +105,16 @@ export interface JAnchor {
 }
 
 export interface JPiece {
+	/** The width of the corresponding overlap rectangle (OR). */
 	ox: number;
+
+	/** The height of the corresponding overlap rectangle (OR). */
 	oy: number;
+
+	/** The width of the margin rectangle (MR). */
 	u: number;
+
+	/** The height of the margin rectangle (MR). */
 	v: number;
 
 	/** Detour in clockwise direction. The coordinates are before adding the shift. */

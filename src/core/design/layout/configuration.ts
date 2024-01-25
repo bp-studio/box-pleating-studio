@@ -111,8 +111,12 @@ export class Configuration implements ISerializable<JConfiguration> {
 		return this._patterns.$length;
 	}
 
+	public get $patterns(): readonly Pattern[] {
+		return this._patterns.$entries;
+	}
+
 	public get $pattern(): Pattern | null {
-		const patterns = this._patterns.$entries;
+		const patterns = this.$patterns;
 		if(patterns.length === 0) return null;
 		return patterns[this._index];
 	}
