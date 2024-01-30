@@ -21,12 +21,12 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		const { f } = this;
 
 		if(B1 && D2 && !B1.eq(D2)) {
-			if(D2.x * f > B1.x * f) yield* this._obtuseStandardJoin(B1, D2, 0);
-			else yield* this._acuteStandardJoin(B1, D2, 1, delta);
+			if(D2.x * f > B1.x * f) yield* this._convexStandardJoin(B1, D2, 0);
+			else yield* this._concaveStandardJoin(B1, D2, 1, delta);
 		}
 		if(B2 && D1 && !B2.eq(D1)) {
-			if(D1.x * f > B2.x * f) yield* this._obtuseStandardJoin(B2, D1, 1);
-			else yield* this._acuteStandardJoin(B2, D1, 0, delta);
+			if(D1.x * f > B2.x * f) yield* this._convexStandardJoin(B2, D1, 1);
+			else yield* this._concaveStandardJoin(B2, D1, 0, delta);
 		}
 	}
 
@@ -35,18 +35,17 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Obtuse standard join.
+	 * Convex standard join.
 	 */
-	private *_obtuseStandardJoin(B: Point, D: Point, i: number): Generator<JoinResult> {
+	private *_convexStandardJoin(B: Point, D: Point, i: number): Generator<JoinResult> {
 		if(B.$isIntegral) return; // Degenerated to base join
 		const { pt } = this.data;
 		const { j1, j2, f } = this;
 		let e = [j1.e, j2.e][i];
 		const p = [j1.p, j2.p][i];
 
-		// If the two gadgets are pointing inwards instead of outwards,
-		// there's no obtuse join (at least there's no such transformation so far).
-		// TODO: Think about this more deeply.
+		// There is no convex join if the two gadgets are "pointing inwards",
+		// as the straight-skeleton degenerates into a relay pattern.
 		if(this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
 
 		if(!this._setupAnchor(D)) return;
@@ -77,9 +76,9 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	}
 
 	/**
-	 * Acute standard join.
+	 * Concave standard join.
 	 */
-	private *_acuteStandardJoin(B: Point, D: Point, i: number, delta: Line): Generator<JoinResult> {
+	private *_concaveStandardJoin(B: Point, D: Point, i: number, delta: Line): Generator<JoinResult> {
 		if(D.$isIntegral) return; // Degenerated to base join
 		const { j1, j2 } = this;
 		const e = [j1.e, j2.e][i], p = [j1.p, j2.p][i];

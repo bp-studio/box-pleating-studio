@@ -60,7 +60,7 @@ export class BaseJoinLogic extends JoinLogic {
 		const { j1, j2, f } = this;
 		if(!B || !D) return;
 		if(B.$isIntegral && D.$isIntegral && !B.eq(D)) {
-			// There is no obtuse join if the two gadgets are "pointing inwards",
+			// There is no convex join if the two gadgets are "pointing inwards",
 			// as the straight-skeleton degenerates into a relay pattern.
 			if(D.x * f > B.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
 
