@@ -51,7 +51,7 @@ export namespace Interaction {
 		display.canvas.addEventListener("mousedown", pointerDown);
 		display.canvas.addEventListener("wheel", wheel);
 		display.canvas.addEventListener("touchend", event => {
-			// Prevent triggering simulated mouse event.
+			// Prevent triggering simulated mouse events on mobile devices.
 			// This needs to be done here and not on the whole document,
 			// otherwise clicking won't work on UI.
 			event.preventDefault();

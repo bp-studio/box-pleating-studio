@@ -9,7 +9,7 @@ export interface DragSelectable extends Draggable {
  * {@link Draggable} is a {@link Control} that can be dragged.
  */
 //=================================================================
-export abstract class Draggable extends Control {
+export abstract class Draggable extends Control implements Draggable {
 
 	public $location: IPoint = { x: 0, y: 0 };
 
@@ -39,7 +39,6 @@ export abstract class Draggable extends Control {
 	 * The default behavior is fix it to the zero vector
 	 * (in other words, this {@link Draggable} cannot be moved).
 	 */
-	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	public $constrainBy(v: IPoint): IPoint {
 		return { x: 0, y: 0 };
 	}
@@ -77,3 +76,5 @@ export abstract class Draggable extends Control {
 		return Promise.resolve();
 	}
 }
+
+export interface Draggable { }

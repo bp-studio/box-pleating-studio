@@ -30,6 +30,10 @@ import type { Vertex } from "../tree/vertex";
 //=================================================================
 export class Flap extends Independent implements DragSelectable, LabelView, ISerializable<JFlap> {
 
+	public static $isFlap(c: Control): c is Flap {
+		return c.type === "Flap";
+	}
+
 	public readonly $tag: string;
 	public readonly type = "Flap";
 	public readonly $priority: number = 1;
