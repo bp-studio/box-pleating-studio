@@ -7,7 +7,9 @@ import { drawLines, fillContours } from "client/utils/contourUtil";
 import ProjectService from "client/services/projectService";
 import { style } from "client/services/styleService";
 import { Draggable } from "client/base/draggable";
+import { Flap } from "./flap";
 
+import type { Control } from "client/base/control";
 import type { Stretch } from "./stretch";
 import type { DeviceData } from "core/service/updateModel";
 
@@ -67,6 +69,11 @@ export class Device extends Draggable {
 		if(dx < range[0]) dx = range[0];
 		if(dx > range[1]) dx = range[1];
 		return { x: dx, y: f * dx };
+	}
+
+	public override $reselectableAfter(c: Control): boolean {
+		// It must be a relevant flap in order to be reselectable.
+		return Flap.$isFlap(c) && this.stretch.$ids.includes(c.id);
 	}
 
 	protected override async _move(x: number, y: number): Promise<void> {

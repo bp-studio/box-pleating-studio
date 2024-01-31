@@ -183,7 +183,8 @@
 		"@typescript-eslint/class-methods-use-this": [
 			"warn",
 			{
-				"ignoreOverrideMethods": true
+				"ignoreOverrideMethods": true,
+				"ignoreClassesThatImplementAnInterface": "public-fields"
 			}
 		],
 		"@typescript-eslint/no-empty-function": "warn",

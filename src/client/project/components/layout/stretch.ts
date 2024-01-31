@@ -20,6 +20,7 @@ import type { Layout } from "./layout";
 //=================================================================
 export class Stretch extends Control implements ISerializable<JStretch> {
 	public readonly $tag: string;
+	public readonly $ids: number[];
 	public readonly type = "Stretch";
 	public readonly $priority: number = 0;
 	private readonly _devices: Device[] = [];
@@ -29,6 +30,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	constructor(layout: Layout, data: JStretch, model: UpdateModel) {
 		super(layout.$sheet);
 		this.$tag = "s" + data.id;
+		this.$ids = data.id.split(",").map(n => Number(n));
 		this.$layout = layout;
 		this.$update(data, model);
 	}

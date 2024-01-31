@@ -71,8 +71,18 @@ export abstract class Control extends View implements ITagObject {
 	}
 
 	/** Whether self can be selected together with another {@link Control}. */
-	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	public $selectableWith(c: Control): boolean { return false; }
+
+	/**
+	 * Whether self can be reselected after the given {@link Control}.
+	 *
+	 * When a {@link Flap} is selected, if the user immediately drags on a region
+	 * overlapped by the flap and a relevant {@link Device}, such interaction
+	 * is not interpreted as dragging the flap, but as dragging the device.
+	 * Therefore, when such dragging happens, we need to immediately
+	 * select the device instead. Such behavior is known as "reselection".
+	 */
+	public $reselectableAfter(c: Control): boolean { return false; }
 
 	protected $setupHit(object: Container, hitArea?: IHitArea): void {
 		this._hitObject = object;
