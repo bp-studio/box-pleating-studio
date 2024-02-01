@@ -1,7 +1,7 @@
 <template>
 	<div class="btn-group" ref="el" @mouseenter.once="init" @touchstart.once.passive="init">
 		<button ref="btn" type="button" @mouseenter="mouseenter" :title="title" :disabled="!Studio.initialized"
-				class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label">
+				class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label" :id="id">
 			<i :class="icon" />
 			<div class="notify" v-if="notify"></div>
 		</button>
@@ -34,6 +34,7 @@
 		title: string;
 		notify?: boolean;
 		label?: string;
+		id?: string;
 	}>();
 
 	const emit = defineEmits(["show", "hide"]);

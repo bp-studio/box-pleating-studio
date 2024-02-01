@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"baseUrl": "../src",
+	},
+	"extends": "../src/shared/tsconfig",
+	"include": [
+		"./**/*.ts",
+		"../src/shared/types/**/*.d.ts",
+		"../src/shared/frontend/**/*.d.ts"
+	]
+}
