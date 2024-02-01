@@ -221,7 +221,7 @@
 			}
 
 			function setResErr(error) {
-				if(error.indexOf("gtag")) return; // Ignore GA loading error
+				if(error.indexOf("gtag") >= 0) return; // Ignore GA loading error
 				if(!resErr) {
 					resErr = error;
 					setTimeout(self.callback, 0);
@@ -422,7 +422,7 @@
 
 <body class="show-status">
 	<!-- Error message -->
-	<div class="viewport p-3 scroll-shadow" style="z-index: 0; padding: 20px;">
+	<div class="viewport p-3 scroll-shadow" style="z-index: 0;">
 		<div id="requirement" style="display:none;">
 			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
 			<div class="mt-2">
@@ -467,14 +467,17 @@
 				Resource failed to load:
 			</div>
 		</div>
-		<noscript>
-			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
-		</noscript>
 	</div>
 
 	<!-- Actual app -->
 	<div id="divWorkspace"></div>
 	<div id="app">__VUE_SSG__</div>
+
+	<noscript>
+		<div class="viewport p-3 noscript">
+			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
+		</div>
+	</noscript>
 
 </body>
 
