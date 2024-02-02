@@ -1,8 +1,8 @@
 <template>
-	<div v-if="!disabled" class="dropdown-item" @click="emit('click')" :id="id">
+	<div v-if="!disabled" class="dropdown-item" @click="emit('click')" role="menuitem">
 		<slot></slot>
 	</div>
-	<div v-else class="dropdown-item disabled" @click.stop :id="id">
+	<div v-else class="dropdown-item disabled" @click.stop role="menuitem">
 		<slot></slot>
 	</div>
 </template>
@@ -13,7 +13,6 @@
 
 	const props = defineProps<{
 		disabled?: boolean;
-		id?: string;
 	}>();
 	const emit = defineEmits(["click"]);
 

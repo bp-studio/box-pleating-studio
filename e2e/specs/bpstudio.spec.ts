@@ -9,23 +9,26 @@ test.beforeEach(async ({ page }) => {
 
 test("Basic UI", async ({ page }) => {
 	await expect(page).toHaveTitle(/Box Pleating Studio/);
-	await expect(page.locator("nav")).toBeInViewport();
-	await expect(page.locator("aside")).toBeAttached();
+	const menu = page.getByRole("menubar");
+	await expect(menu).toBeInViewport();
+	await expect(menu.getByRole("menu").first()).not.toBeDisabled();
+	await expect(page.getByRole("toolbar")).toBeInViewport();
+	await expect(page.getByRole("form")).toBeAttached();
 	await expect(page.locator(".noscript")).not.toBeAttached();
 });
 
 test("Project creation", async ({ page }) => {
-	await page.locator("#mFile").click();
-	await page.locator("#mNew").click();
-	const locator = page.locator("nav .tab.active");
+	await page.getByRole("menu", { name: "File" }).click();
+	await page.getByRole("menuitem", { name: "New" }).click();
+	const locator = page.getByRole("tab");
 	await expect(locator).toBeAttached();
 	await expect(locator).toContainText("Untitled");
 });
 
 test("Basic vertex dragging", async ({ page }) => {
-	await page.locator("#mFile").click();
-	await page.locator("#mNew").click();
-	await expect(page.locator("nav .tab.active")).toBeAttached();
+	await page.getByRole("menu", { name: "File" }).click();
+	await page.getByRole("menuitem", { name: "New" }).click();
+	await expect(page.getByRole("tab")).toBeAttached();
 	await page.mouse.move(514, 282);
 	await page.mouse.down();
 	const bpHandle = await page.evaluateHandle<typeof Studio>("bp");

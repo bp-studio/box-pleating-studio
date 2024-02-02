@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("JavaScript disabled", () => {
 	test.use({ javaScriptEnabled: false });
 
-	test("shows JavaScript error message", async ({ page }) => {
+	test("Shows JavaScript error message", async ({ page }) => {
 		await page.goto("/");
 		await expect(page.locator(".noscript")).toBeVisible();
 	});

@@ -1,6 +1,6 @@
 <template>
 	<nav class="btn-toolbar p-2">
-		<div class="btn-group me-2">
+		<div class="btn-group me-2" role="menubar">
 			<FileMenu />
 			<EditMenu />
 			<SettingMenu />
@@ -8,7 +8,7 @@
 			<HelpMenu />
 		</div>
 
-		<div class="btn-group me-2">
+		<div class="btn-group me-2" role="toolbar">
 			<button type="button" class="btn btn-primary" :class="{ active: Studio.project && Studio.project.design.mode == 'tree' }"
 					@click="toTree" :title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
 				<i class="bp-tree" />
@@ -67,7 +67,7 @@
 		background: var(--bg-ui);
 	}
 
-	@media (width <= 650px) {
+	@media (width <=650px) {
 		#panelToggle {
 			flex-grow: 1;
 			text-align: right;

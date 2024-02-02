@@ -2,33 +2,23 @@
 	<Dropdown label="Settings" icon="bp-tasks" :title="$t('toolbar.setting.title')">
 		<template v-slot>
 			<Fullscreen />
-			<div class="dropdown-item" @click="toggle('showGrid')">
-				<Hotkey :icon="Settings.showGrid ? 'fas fa-grip-lines' : ''" :color="Studio.style.grid.color" ctrl hk="1">
-					{{ $t('toolbar.setting.grid') }}
-				</Hotkey>
-			</div>
-			<div class="dropdown-item" @click="toggle('showHinge')">
-				<Hotkey :icon="Settings.showHinge ? 'fas fa-grip-lines' : ''" :color="Studio.style.hinge.color" ctrl hk="2">
-					{{ $t('toolbar.setting.hinge') }}
-				</Hotkey>
-			</div>
-			<div class="dropdown-item" @click="toggle('showRidge')">
-				<Hotkey :icon="Settings.showRidge ? 'fas fa-grip-lines' : ''" :color="Studio.style.ridge.color" ctrl hk="3">
-					{{ $t('toolbar.setting.ridge') }}
-				</Hotkey>
-			</div>
-			<div class="dropdown-item" @click="toggle('showAxialParallel')">
-				<Hotkey :icon="Settings.showAxialParallel ? 'fas fa-grip-lines' : ''" ctrl hk="4"
-						:color="Studio.style.axisParallel.color">
-					{{ $t('toolbar.setting.axial') }}
-				</Hotkey>
-			</div>
-			<div class="dropdown-item" @click="toggle('showLabel')">
-				<Hotkey :icon="Settings.showLabel ? 'fas fa-font' : ''" ctrl hk="5" :color="Studio.style.label.color">
-					{{ $t('toolbar.setting.label') }}
-				</Hotkey>
-			</div>
-			<div class="dropdown-item" @click="toggle('showDot')">
+			<DropdownCheck v-model="Settings.showGrid" icon="fas fa-grip-lines" :color="Studio.style.grid.color" hk="1">
+				{{ $t('toolbar.setting.grid') }}
+			</DropdownCheck>
+			<DropdownCheck v-model="Settings.showHinge" icon="fas fa-grip-lines" :color="Studio.style.hinge.color" hk="2">
+				{{ $t('toolbar.setting.hinge') }}
+			</DropdownCheck>
+			<DropdownCheck v-model="Settings.showRidge" icon="fas fa-grip-lines" :color="Studio.style.ridge.color" hk="3">
+				{{ $t('toolbar.setting.ridge') }}
+			</DropdownCheck>
+			<DropdownCheck v-model="Settings.showAxialParallel" icon="fas fa-grip-lines" :color="Studio.style.axisParallel.color"
+						   hk="4">
+				{{ $t('toolbar.setting.axial') }}
+			</DropdownCheck>
+			<DropdownCheck v-model="Settings.showLabel" icon="fas fa-font" :color="Studio.style.label.color" hk="5">
+				{{ $t('toolbar.setting.label') }}
+			</DropdownCheck>
+			<div class="dropdown-item" role="menuitemcheckbox" @click="toggle('showDot')">
 				<Hotkey ctrl hk="6">
 					<template v-slot:icon>
 						<span class="dot-stack" v-if="Settings.showDot">
@@ -41,18 +31,18 @@
 				</Hotkey>
 			</div>
 			<Divider />
-			<div class="dropdown-item" @click="toggle('showStatus')">
-				<i v-if="!Settings.showStatus" /><i class="fas fa-compass" v-else />{{ $t('toolbar.setting.status') }}
-			</div>
+			<DropdownCheck v-model="Settings.showStatus" icon="fas fa-compass">
+				{{ $t('toolbar.setting.status') }}
+			</DropdownCheck>
 			<div class="touch-only">
-				<div class="dropdown-item" @click="toggle('showDPad')">
-					<i v-if="!Settings.showDPad" /><i class="fas fa-arrows-alt" v-else />{{ $t('toolbar.setting.dPad') }}
-				</div>
+				<DropdownCheck v-model="Settings.showDPad" icon="fas fa-arrows-alt" @click="dPad">
+					{{ $t('toolbar.setting.dPad') }}
+				</DropdownCheck>
 			</div>
 			<Divider />
-			<div class="dropdown-item" @click="show('pref')">
+			<DropdownItem @click="show('pref')">
 				<i class="fas fa-cog" />{{ $t('toolbar.setting.preference') }}
-			</div>
+			</DropdownItem>
 		</template>
 	</Dropdown>
 </template>
@@ -61,7 +51,7 @@
 
 	import { onMounted } from "vue";
 
-	import { Divider, Dropdown, Hotkey } from "@/gadgets/menu";
+	import { Divider, Dropdown, Hotkey, DropdownItem, DropdownCheck } from "@/gadgets/menu";
 	import { show } from "@/modals/modalFragment.vue";
 	import Settings from "app/services/settingService";
 	import HotkeyService from "app/services/hotkeyService";
@@ -82,7 +72,10 @@
 
 	function toggle(key: KeysOfType<typeof Settings, boolean>): void {
 		Settings[key] = !Settings[key];
-		if(key == "showDPad") gtag("event", "dpad_" + (Settings.showDPad ? "on" : "off"));
+	}
+
+	function dPad(): void {
+		gtag("event", "dpad_" + (Settings.showDPad ? "on" : "off"));
 	}
 
 </script>
