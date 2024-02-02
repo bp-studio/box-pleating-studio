@@ -30,25 +30,25 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 	let [g1, g2] = context.$gadgets;
 	let [o1, o2] = context.$overlaps;
 
-	// Focus on the cut-off JOverlap (called it o1)
-	const reversed = o1.c[0].e! >= 0 && o1.c[2].e! >= 0;
+	// Focus on the cut-off JOverlap (called it o2)
+	const reversed = o2.c[0].e! >= 0 && o2.c[2].e! >= 0;
 	if(reversed) {
 		[g1, g2] = [g2, g1];
 		[o1, o2] = [o2, o1];
 	}
 	const [j1, j2] = [o1, o2].map(o => context.$junctions[o.parent]);
-	const oriented = o1.c[0].e! < 0; // Share lower-left corner
+	const oriented = o2.c[0].e! < 0; // Share lower-left corner
 
-	// If after the pushing, the delta ray is still closer than g2
+	// If after the pushing, the delta ray is still closer than g1
 	// (the one getting relayed), then it won't work.
 	// This check is needed in some invalid layouts.
-	const deltaPt = context.$getRelativeDelta(j1, j2, g2);
-	if(g2.$intersects(deltaPt, oriented ? QV[0] : QV[2])) return false;
+	const deltaPt = context.$getRelativeDelta(j1, j2, g1);
+	if(g1.$intersects(deltaPt, oriented ? QV[0] : QV[2])) return false;
 
 	// Push them towards the shared corner as much as possible
-	const slack = Math.floor(g1.$slack[oriented ? 0 : 2]);
-	const offsets = oriented ? [slack, 0] :
-		[j1.sx - context.$getSpan(g1, 2) - g1.scrX - slack, j2.sx - g2.scrX];
+	const slack = Math.floor(g2.$slack[oriented ? 0 : 2]);
+	const offsets = oriented ? [0, slack] :
+		[j1.sx - g1.scrX, j2.sx - context.$getSpan(g2, 2) - g2.scrX - slack];
 	if(reversed) offsets.reverse();
 	context.$devices.forEach((d, i) => d.$offset = offsets[i]);
 	return true;
