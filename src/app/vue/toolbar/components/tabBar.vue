@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 
-	import { SlickList, SlickItem } from "vue-slicksort/dist/vue-slicksort.esm.js";
+	import { SlickList, SlickItem } from "vue-slicksort";
 
 	import { compRef } from "app/utils/compRef";
 	import Workspace from "app/services/workspaceService";
