@@ -12,7 +12,6 @@
  *    and it also downloads a lot more bytes.
  */
 import * as broadcastUpdate from "workbox-broadcast-update";
-import * as googleAnalytics from "workbox-google-analytics";
 import * as precaching from "workbox-precaching";
 import * as routing from "workbox-routing";
 import * as strategies from "workbox-strategies";
@@ -20,9 +19,6 @@ import * as idbKeyval from "idb-keyval";
 
 // Declare that we're in ServiceWorker environment
 declare const self: ServiceWorkerGlobalScope & typeof globalThis;
-
-// Activate Workbox GA
-googleAnalytics.initialize();
 
 // Default resources use StaleWhileRevalidate strategy
 const defaultHandler = new strategies.StaleWhileRevalidate({
