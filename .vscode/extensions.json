@@ -12,7 +12,6 @@
 		"mutsuntsai.jsdoc-link",
 		"sibiraj-s.vscode-scss-formatter",
 		"stylelint.vscode-stylelint",
-		"vue.volar",
-		"vue.vscode-typescript-vue-plugin"
+		"vue.volar"
 	]
 }
