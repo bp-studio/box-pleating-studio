@@ -13,7 +13,6 @@
 		"url": "https://github.com/bp-studio/box-pleating-studio/issues"
 	},
 	"license": "MIT",
-
 	"author": "Mu-Tsun Tsai <don.m.t.tsai@gmail.com> (https://github.com/MuTsunTsai)",
 	"funding": "https://bpstudio.abstreamace.com/donate.htm",
 	"repository": "github:bp-studio/box-pleating-studio",
@@ -51,8 +50,8 @@
 		"@types/mocha": "^10.0.6",
 		"@types/node": "^20.11.24",
 		"@types/wicg-file-system-access": "^2023.10.4",
-		"@typescript-eslint/eslint-plugin": "^7.1.0",
-		"@typescript-eslint/parser": "^7.1.0",
+		"@typescript-eslint/eslint-plugin": "^7.1.1",
+		"@typescript-eslint/parser": "^7.1.1",
 		"@vue/compiler-sfc": "^3.4.21",
 		"@vue/eslint-config-typescript": "12.0.0",
 		"chai": "^5.1.0",

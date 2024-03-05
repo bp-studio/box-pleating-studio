@@ -31,8 +31,8 @@
 						</td>
 						<td class="p-0 position-relative">
 							<input :id="name + '.' + command" type="text" class="border-0 w-100"
-								   :value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target)"
-								   @input.prevent @keydown.prevent="setKey($event, name, command)" />
+								   :value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target)" @input.prevent
+								   @keydown.prevent="setKey($event, name, command)" />
 							<!-- A mask for blocking mouse actions after the input getting focus -->
 							<div class="mask" @mousedown.capture.prevent></div>
 						</td>
@@ -50,8 +50,12 @@
 	import Settings from "app/services/settingService";
 	import Dialogs from "app/services/dialogService";
 	import CustomHotkeyService from "app/services/customHotkeyService";
+	import { useThrottledGA } from "app/utils/ga";
 
 	defineOptions({ name: "KeyTable" });
+
+	const ONE_HOUR = 3600000;
+	const ga = useThrottledGA("custom_key", ONE_HOUR);
 
 	type KeyMap = Record<string, Record<string, string>>;
 
@@ -111,19 +115,24 @@
 		const key = CustomHotkeyService.toKey(e);
 		if(!key) return;
 
-		const find = CustomHotkeyService.findKey(key);
-		if(find && !await confirmKey(key, find)) return;
+		const existingKey = CustomHotkeyService.findKey(key);
+		if(existingKey && !await confirmKey(key, existingKey)) return;
+
+		ga();
 		Settings.hotkey[name][command] = key;
-		if(find) {
-			[name, command] = find.split(".");
+		if(existingKey) {
+			[name, command] = existingKey.split(".");
 			Settings.hotkey[name][command] = "";
 		}
 	}
 
 	/** Confirm overwriting an existing key. */
-	async function confirmKey(key: string, find: string): Promise<boolean> {
+	async function confirmKey(key: string, existingKey: string): Promise<boolean> {
 		pending = true;
-		const message = i18n.t("preference.confirmKey", [CustomHotkeyService.formatKey(key), getName(find)]);
+		const message = i18n.t(
+			"preference.confirmKey",
+			[CustomHotkeyService.formatKey(key), getName(existingKey)]
+		);
 		const confirm = await Dialogs.confirm(message);
 		pending = false;
 		return confirm;

@@ -2,6 +2,7 @@ import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 
 import { copyright } from "app/misc/copyright";
+import { useDebounce } from "app/utils/timerUtility";
 
 import type { I18n } from "vue-i18n";
 import type { BpsLocale } from "shared/frontend/locale";
@@ -46,9 +47,14 @@ namespace LanguageService {
 		if(langs.length > 1 && (!localeSetting || newLocale)) {
 			_options.push(...langs);
 		}
-		i18n.locale = format(localeSetting || langs[0] || DEFAULT_LOCALE);
-		localStorage.setItem(LOCALE_KEY, i18n.locale);
+		const loc = format(localeSetting || langs[0] || DEFAULT_LOCALE);
+		i18n.locale = loc;
+		localStorage.setItem(LOCALE_KEY, loc);
 	}
+
+	// We log the event only when the locale is fully settled.
+	const TWO_MINUTES = 120000;
+	const debounce = useDebounce(TWO_MINUTES);
 
 	export function setup(): void {
 		// Sync locale
@@ -64,6 +70,7 @@ namespace LanguageService {
 			if(loc in locale) {
 				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
 				syncing = false;
+				debounce(() => gtag("event", "lang_" + loc.replace("-", "_")));
 			} else {
 				loc = findFallbackLocale(loc);
 				nextTick(() => i18n.locale = loc);

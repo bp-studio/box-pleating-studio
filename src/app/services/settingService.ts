@@ -147,6 +147,7 @@ function save(): void {
 /** Reset to default settings */
 export async function reset(): Promise<void> {
 	if(!await dialogs.confirm(i18n.t("preference.confirmReset"))) return;
+	gtag("event", "settings_reset");
 	Object.assign(settings, JSON.parse(JSON.stringify(defaultSettings)));
 	save();
 	Language.reset();
