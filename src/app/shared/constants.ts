@@ -43,8 +43,14 @@ export const defaultTitle = document.title;
 // eslint-disable-next-line compat/compat
 export const copyEnabled = "clipboard" in navigator && "write" in navigator.clipboard;
 
-/** Whether the current instance is running online. */
-export const isHttps = location.protocol === "https:";
+/** Whether the current instance is running online, as opposed to running locally. */
+export const isOnline = location.protocol === "https:";
+
+/**
+ * {@link isOnline} does not automatically implies the availability of service worker,
+ * as it is possible that secure connection is not really established.
+ */
+export const hasServiceWorker = "serviceWorker" in navigator;
 
 /** Whether the current page is reloaded. */
 export const isReload =

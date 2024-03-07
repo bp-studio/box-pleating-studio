@@ -184,7 +184,11 @@
 		  media="screen and (width: 744px) and (height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
 		  href="assets/splash/8.3__iPad_Mini_portrait.png">
 
-	<!-- Written in ES3 for maximal compatibility, so `var` instead of `let`, etc. -->
+	<!--
+		Written in ES3 for maximal compatibility, so `var` instead of `let`, etc.
+		For IE < 10, our build process adds conditional comments to provide immediate error message,
+		so we no longer need to support those cases here.
+	-->
 	<script>
 		/** Launching Error Manager */
 		var errMgr = new (function() {
@@ -325,8 +329,6 @@
 			 *
 			 * `window.onerror` is a special event handler that it takes 5 arguments. See:
 			 * https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
-			 *
-			 * Note that IE 8 does not support this event, so fallback is needed.
 			 */
 			window.onerror = function(msg, source, line, column, error) {
 				if(!source && !line && !column) return; // error is caused by injection; ignore.
@@ -369,10 +371,11 @@
 				document.documentElement.classList.add('dark');
 			}
 
-			// Legacy browser fallback
-			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
+			// Quick legacy browser detection, covering:
+			// Chrome < 33, Edge < 12 & IE, Safari < 7.1, Firefox < 20, Opera < 20
+			if(typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
 				runErr = 'Legacy browser';
-				window.onload = self.callback; // This covers the case for IE < 9 as well.
+				window.onload = self.callback;
 			} else {
 				// Capture <script> or <link> loading error
 				window.addEventListener('error', resourceErrorHandler, true);

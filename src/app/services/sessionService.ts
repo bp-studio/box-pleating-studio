@@ -5,7 +5,7 @@ import Settings from "./settingService";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
 import { callService } from "app/utils/workerUtility";
-import { isReload } from "app/shared/constants";
+import { hasServiceWorker, isReload } from "app/shared/constants";
 
 const SAVE_INTERVAL = 3000;
 const RESET_TIME = 1000;
@@ -110,6 +110,7 @@ if(!("locks" in navigator)) {
 
 	nav.locks = {
 		async request(_: string, options: LockOptions, callback: Action<Promise<void>>): Promise<void> {
+			if(!hasServiceWorker) return;
 			const success = await callService<boolean>(options.steal ? "steal" : "request");
 			if(!success) await check();
 			callback();
@@ -120,6 +121,7 @@ if(!("locks" in navigator)) {
 			});
 		},
 		async query() {
+			if(!hasServiceWorker) return { held: [] };
 			const count = await new Promise<number>(resolve => {
 				// During the first launch, service worker will take more time to react,
 				// causing timeout. In that case we return falsy result.
