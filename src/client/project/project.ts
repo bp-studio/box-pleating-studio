@@ -7,9 +7,11 @@ import { options } from "client/options";
 import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
 
-import type { Route, CoreResponse, ErrorResponse } from "core/routes";
-import type { JProject, ProjId } from "shared/json";
+import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
+import type { CoreError, JProject, ProjId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
+
+const CORE_TIMEOUT = 3000;
 
 /**
  * Id starts from 1 to ensure true values.
@@ -154,10 +156,10 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		if(this._fatal) throw new Error();
 
 		clearTimeout(this._updateCallbackTimeout);
-		const request = { controller, action, value: args };
+		const request = { controller, action, value: args } as CoreRequest;
 		const callbacks = this._returnCallbacks.concat();
 		this._returnCallbacks.length = 0;
-		const response = await app.callWorker<CoreResponse>(this._worker, request);
+		const response = await callCore(this._worker, request);
 		for(const callback of callbacks) callback();
 		if("error" in response) {
 			await this._handleCoreError(request, response);
@@ -192,4 +194,22 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this._updateCallbacks.length = 0;
 		this._updateCallbackTimeout = undefined;
 	}
+}
+
+function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
+	return new Promise(resolve => {
+		const timeout = setTimeout(() => {
+			worker.terminate(); // Terminate immediately in this case
+			resolve({
+				"error": {
+					message: "Computation timeout",
+					coreTrace: "",
+				} as CoreError,
+			});
+		}, CORE_TIMEOUT);
+		app.callWorker<CoreResponse>(worker, request).then(response => {
+			clearTimeout(timeout);
+			resolve(response);
+		});
+	});
 }
