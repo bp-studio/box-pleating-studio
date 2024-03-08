@@ -1,6 +1,7 @@
 import { Vector } from "core/math/geometry/vector";
 import { Direction } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
+import { Gadget } from "../pattern/gadget";
 
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
@@ -52,17 +53,29 @@ export class Joinee {
 		this.p.$addDetour(detour);
 	}
 
-	public $toGadget(shouldClone: boolean, offset?: IPoint): JGadget {
+	public $toGadget(shouldClone: boolean, oriented: boolean, offset?: IPoint): JGadget {
 		let off: IPoint | undefined = this._offset;
 		if(offset) {
 			off = { x: off.x + offset.x, y: off.y + offset.y };
 		}
 		if(off.x == 0 && off.y == 0) off = undefined;
-		return {
+		const result = new Gadget({
 			pieces: [shouldClone ? clone(this.p) : this.p],
 			offset: off,
 			anchors: this._anchors.concat(), // need to make a copy here
-		};
+		});
+
+		for(const q of [Direction.UL, Direction.LR]) {
+			const p = result.$anchorMap[q][0];
+			if(!p.$isIntegral) {
+				const x = p.x;
+				const fractionalPart = x - Math.floor(x);
+				const slack = oriented ? 1 - fractionalPart : fractionalPart;
+				result.$addSlack(q as QuadrantDirection, slack);
+			}
+		}
+
+		return result;
 	}
 
 	public $isSteeperThan(that: Joinee): boolean {

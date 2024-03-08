@@ -172,9 +172,10 @@ export class Device implements ISerializable<JDevice> {
 			const q = isOut ? c.anchorIndex : opposite(c.corner.q!);
 			const f = fx * (q == 0 ? -1 : 1);
 			const target = this.$pattern.$getConnectionTarget(c.corner as JConnection);
-			const slack = isOut ?
-				this.$gadgets[c.overlapIndex].$slack[c.anchorIndex] :
-				this.$pattern.$gadgets[convertIndex(c.corner.e)].$slack[c.corner.q!];
+			const selfSlack = this.$gadgets[c.overlapIndex].$slack[c.anchorIndex];
+			const targetSlack = c.corner.e !== undefined && c.corner.e < 0 ?
+				this.$pattern.$gadgets[convertIndex(c.corner.e)].$slack[c.corner.q!] : 0;
+			const slack = isOut && c.corner.type !== CornerType.internal ? selfSlack : targetSlack + selfSlack;
 			const bound = target.x - this.$resolveCornerMap(c).x - slack * f;
 			if(f > 0 && result[1] > bound) result[1] = bound;
 			else if(f < 0 && result[0] < bound) result[0] = bound;

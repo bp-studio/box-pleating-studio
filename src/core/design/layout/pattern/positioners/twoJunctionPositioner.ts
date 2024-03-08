@@ -1,8 +1,10 @@
 import { QV } from "../quadrant";
+import { CornerType } from "shared/json";
+import { convertIndex } from "shared/utils/pattern";
 
+import type { JJunction } from "shared/json";
 import type { Device } from "../device";
 import type { PositioningContext } from "./positioningContext";
-import type { JJunction } from "shared/json";
 
 //=================================================================
 /**
@@ -68,9 +70,17 @@ function makeSpitJoinPattern(context: PositioningContext): boolean {
 	for(const device of nonJoin) {
 		const overlap = device.$partition.$overlaps[0];
 		const j = context.$getJunctions(device)[0];
-		if(overlap.c[0].e! < 0) {
+		const corner = overlap.c[0];
+		if(corner.e! < 0) {
 			const gadget = device.$gadgets[0];
-			device.$offset = j.sx - context.$getSpan(gadget, 0) - gadget.scrX;
+			const index = convertIndex(corner.e);
+			const q = corner.q!;
+			const targetCorner = device.$pattern.$config.$overlaps[index].c[q];
+			let offset = j.sx - context.$getSpan(gadget, 0) - gadget.scrX;
+			if(targetCorner.type == CornerType.socket) {
+				offset += device.$pattern.$gadgets[index].$slack[q];
+			}
+			device.$offset = offset;
 		}
 	}
 

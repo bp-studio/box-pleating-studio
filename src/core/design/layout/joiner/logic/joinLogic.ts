@@ -134,10 +134,14 @@ export abstract class JoinLogic {
 	protected _result(shouldClone: boolean = false, extraSize: number = 0): JoinResult {
 		const { offset, size, addOns } = this.data;
 		const { j1, j2 } = this;
+		const oriented = this.joiner.$oriented;
 		this.data.addOns = undefined;
 		return [
 			{
-				gadgets: [j1.$toGadget(shouldClone), j2.$toGadget(shouldClone, offset)],
+				gadgets: [
+					j1.$toGadget(shouldClone, oriented),
+					j2.$toGadget(shouldClone, oriented, offset),
+				],
 				addOns,
 			},
 			size + extraSize * EXTRA_SIZE_WEIGHT,
