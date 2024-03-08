@@ -7,7 +7,7 @@ import { Direction, getNodeId, getQuadrant, makeQuadrantCode, nextQuadrantOffset
 
 import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { Configuration } from "../configuration";
-import type { JJunction, JOverlap, JPartition, NodeId } from "shared/json";
+import type { JJunction, JOverlap, JPartition, NodeId, OverlapId } from "shared/json";
 import type { Repository } from "../repository";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
 
@@ -27,25 +27,25 @@ interface Joint {
 interface JointItem {
 	readonly index: number;
 	readonly junction: JJunction;
+	readonly oppositeNodeId: NodeId;
 	readonly configs: readonly Configuration[];
 	readonly split: boolean;
 }
 
 interface SplitItem {
 	/** The {@link JOverlap} to be joined. */
-	o: JOverlap;
+	readonly overlap: JOverlap;
 
-	/**
-	 * The remaining {@link JPartition}.
-	 * It is `undefined` if there is no splitting.
-	 */
-	r?: JPartition;
+	readonly oppositeNodeId: NodeId;
 
-	/**
-	 * Whether the splitting is horizontal.
-	 * It is `undefined` if there is no splitting.
-	 */
-	h?: boolean;
+	/** Info about the splitting, if applicable. */
+	split?: {
+		/** The remaining {@link JPartition}. */
+		remainingPartition: JPartition;
+
+		/** Whether the splitting is horizontal (i.e. the two parts have the same width). */
+		isHorizontal: boolean;
+	};
 }
 
 //=================================================================
@@ -78,16 +78,21 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			const junctionIndices = junctionMap.get(code)!;
 			if(junctionIndices.length > 1) {
 				const max = (junctionIndices.length - 1) * MAX_RANK_PER_JOINT;
+				const nodeId = getNodeId(code);
 				joints.push({
-					nodeId: getNodeId(code),
+					nodeId,
 					q: getQuadrant(code),
 					max,
-					items: junctionIndices.map(i => ({
-						index: i,
-						junction: this._junctions[i],
-						configs: configs[i],
-						split: configs[i][0] && configs[i][0].$partitions.length > 1,
-					})),
+					items: junctionIndices.map(i => {
+						const j = this._junctions[i];
+						return {
+							index: i,
+							junction: j,
+							oppositeNodeId: (j.c[0].e == nodeId ? j.c[2].e : j.c[0].e) as NodeId,
+							configs: configs[i],
+							split: configs[i][0] && configs[i][0].$partitions.length > 1,
+						};
+					}),
 				});
 				maxRank += max;
 			}
@@ -234,21 +239,23 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	}
 
 	private *_searchSplitJoin(joint: Joint, rank: number): Generator<Configuration> {
-		const items1 = toSplitItems(joint.items[0].configs, joint.nodeId);
-		const items2 = toSplitItems(joint.items[1].configs, joint.nodeId);
+		const items1 = toSplitItems(joint.items[0], joint.nodeId);
+		const items2 = toSplitItems(joint.items[1], joint.nodeId);
 		for(const item1 of items1) {
 			for(const item2 of items2) {
 				// This is not supported for the moment, so we skip it for now.
 				// TODO: But this is doable in theory. Try to implement this.
-				if(item1.h == item2.h) continue;
+				if(item1.split?.isHorizontal == item2.split?.isHorizontal) continue;
 
-				const o1 = item1.o, o2 = item2.o;
+				const o1 = item1.overlap, o2 = item2.overlap;
 				if(cover(o1, o2) || cover(o2, o1)) continue;
 				const joins = this._searchJoinPartitions(() => clone([o1, o2]), rank);
 				for(const join of joins) {
 					const partitions = [join];
-					if(item1.r) partitions.push(clone(item1.r));
-					if(item2.r) partitions.push(clone(item2.r));
+					const remain1 = getExposedPart(item1, item2, join);
+					const remain2 = getExposedPart(item2, item1, join);
+					if(remain1) partitions.push(remain1);
+					if(remain2) partitions.push(remain2);
 					yield this.$make(partitions);
 				}
 			}
@@ -292,19 +299,74 @@ function cover(o1: JOverlap, o2: JOverlap): boolean {
 	return o1.ox >= o2.ox && o1.oy >= o2.oy;
 }
 
-function toSplitItems(configs: readonly Configuration[], nodeId: NodeId): SplitItem[] {
-	return configs.map(config => {
-		const partitions = config.$rawPartitions;
-		const overlaps = partitions.map(p => p.overlaps[0]);
-		if(partitions.length == 1) return { o: overlaps[0] };
-		const h = overlaps[0].ox == overlaps[1].ox;
+function toSplitItems(item: JointItem, nodeId: NodeId): SplitItem[] {
+	return item.configs.map(config => toSplitItem(config, nodeId, item.oppositeNodeId));
+}
 
-		const p = partitions.find(partition => {
-			const overlap = partition.overlaps[0];
-			return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;
-		})!;
-		const r = partitions.find(partition => partition != p);
-		const o = p.overlaps[0];
-		return { o, r, h } as SplitItem;
-	});
+function toSplitItem(config: Configuration, nodeId: NodeId, oppositeNodeId: NodeId): SplitItem {
+	const partitions = config.$rawPartitions;
+	const overlaps = partitions.map(p => p.overlaps[0]);
+	if(partitions.length == 1) return { overlap: overlaps[0], oppositeNodeId };
+	const isHorizontal = overlaps[0].ox == overlaps[1].ox;
+
+	const p = partitions.find(partition => {
+		const overlap = partition.overlaps[0];
+		return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;
+	})!;
+	const remainingPartition = partitions.find(partition => partition != p);
+	const overlap = p.overlaps[0];
+	return { overlap, oppositeNodeId, split: { remainingPartition, isHorizontal } } as SplitItem;
+}
+
+function getExposedPart(item: SplitItem, against: SplitItem, join: JPartition): JPartition | undefined {
+	if(!item.split) return;
+	const itemIsTaller = item.overlap.oy > against.overlap.oy;
+	const isHorizontal = item.split.isHorizontal;
+	const splittingOnOutside = itemIsTaller == isHorizontal;
+	const result = clone(item.split.remainingPartition);
+	if(!splittingOnOutside) {
+		if(isHorizontal) {
+			result.overlaps[0].ox -= against.overlap.ox;
+		} else {
+			result.overlaps[0].oy -= against.overlap.oy;
+		}
+		for(const i of [0, 1]) {
+			const overlap = join.overlaps[i];
+			for(let q = 0; q < quadrantNumber; q++) {
+				if(overlap.c[q].type == CornerType.intersection) {
+					const overlapIsSelf = overlap.parent == item.overlap.parent;
+					replaceIntersectionCorner(
+						result.overlaps[0], overlap, q,
+						overlapIsSelf ? overlap.id! : join.overlaps[1 - i].id!,
+						against.oppositeNodeId
+					);
+				}
+			}
+		}
+	}
+	return result;
+}
+
+function replaceIntersectionCorner(
+	from: JOverlap, to: JOverlap, q: number, socketOverlapId: OverlapId, againstFlapId: NodeId
+): void {
+	const overlapIsSelf = socketOverlapId == to.id;
+	const target = to.c[q];
+	const q_ = overlapIsSelf ? q : quadrantNumber - q;
+	const source = from.c[q_];
+	source.type = CornerType.intersection;
+	if(overlapIsSelf) {
+		source.e = target.e;
+	} else {
+		source.e = againstFlapId;
+	}
+	target.type = CornerType.socket;
+	target.e = from.id;
+	for(const [i, c] of from.c.entries()) {
+		if(c.type == CornerType.internal && c.e == socketOverlapId) {
+			target.q = i;
+			c.e = to.id;
+			c.q = q;
+		}
+	}
 }

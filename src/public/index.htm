@@ -184,7 +184,11 @@
 		  media="screen and (width: 744px) and (height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
 		  href="assets/splash/8.3__iPad_Mini_portrait.png">
 
-	<!-- Written in ES3 for maximal compatibility, so `var` instead of `let`, etc. -->
+	<!--
+		Written in ES3 for maximal compatibility, so `var` instead of `let`, etc.
+		For IE < 10, our build process adds conditional comments to provide immediate error message,
+		so we no longer need to support those cases here.
+	-->
 	<script>
 		/** Launching Error Manager */
 		var errMgr = new (function() {
@@ -221,7 +225,7 @@
 			}
 
 			function setResErr(error) {
-				if(error.indexOf("gtag")) return; // Ignore GA loading error
+				if(error.indexOf("gtag") >= 0) return; // Ignore GA loading error
 				if(!resErr) {
 					resErr = error;
 					setTimeout(self.callback, 0);
@@ -325,8 +329,6 @@
 			 *
 			 * `window.onerror` is a special event handler that it takes 5 arguments. See:
 			 * https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
-			 *
-			 * Note that IE 8 does not support this event, so fallback is needed.
 			 */
 			window.onerror = function(msg, source, line, column, error) {
 				if(!source && !line && !column) return; // error is caused by injection; ignore.
@@ -369,10 +371,11 @@
 				document.documentElement.classList.add('dark');
 			}
 
-			// Legacy browser fallback
-			if(!window.addEventListener || typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
+			// Quick legacy browser detection, covering:
+			// Chrome < 33, Edge < 12 & IE, Safari < 7.1, Firefox < 20, Opera < 20
+			if(typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
 				runErr = 'Legacy browser';
-				window.onload = self.callback; // This covers the case for IE < 9 as well.
+				window.onload = self.callback;
 			} else {
 				// Capture <script> or <link> loading error
 				window.addEventListener('error', resourceErrorHandler, true);
@@ -422,7 +425,7 @@
 
 <body class="show-status">
 	<!-- Error message -->
-	<div class="viewport p-3 scroll-shadow" style="z-index: 0; padding: 20px;">
+	<div class="viewport p-3 scroll-shadow" style="z-index: 0;">
 		<div id="requirement" style="display:none;">
 			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
 			<div class="mt-2">
@@ -467,14 +470,17 @@
 				Resource failed to load:
 			</div>
 		</div>
-		<noscript>
-			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
-		</noscript>
 	</div>
 
 	<!-- Actual app -->
 	<div id="divWorkspace"></div>
 	<div id="app">__VUE_SSG__</div>
+
+	<noscript>
+		<div class="viewport p-3 noscript">
+			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
+		</div>
+	</noscript>
 
 </body>
 

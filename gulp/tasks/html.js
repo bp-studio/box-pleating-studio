@@ -27,6 +27,9 @@ const insertVersion = (package) => $.through2(
 		.replace("__APP_VERSION__", package.app_version)
 );
 
+/** Add simple handling for IE < 10, where conditional comments were supported. */
+const wrapIE = () => $.through2(c => `<!--[if IE]><body>IE is not supported.</body><![endif]--><!--[if !IE]><!-->${c}<!--<![endif]-->`);
+
 /** Bump build version */
 gulp.task("version", () =>
 	gulp.src("package.json")
@@ -49,6 +52,7 @@ gulp.task("html", () => {
 			.pipe(insertVersion(package))
 			.pipe(debug())
 			.pipe(ssg())
+			.pipe(wrapIE())
 			.pipe(gulp.dest(config.dest.debug)),
 
 		// Dist
@@ -62,6 +66,7 @@ gulp.task("html", () => {
 			// Avoid VS Code Linter warnings
 			.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
 			.pipe(ssg())
+			.pipe(wrapIE())
 			.pipe(gulp.dest(config.dest.dist))
 	);
 });

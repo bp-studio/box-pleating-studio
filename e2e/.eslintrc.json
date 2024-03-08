@@ -1,0 +1,62 @@
+{
+	"extends": [
+		"plugin:import/typescript"
+	],
+	"plugins": [
+		"import"
+	],
+	"rules": {
+		"@typescript-eslint/consistent-type-imports": [
+			"warn",
+			{
+				"prefer": "type-imports"
+			}
+		],
+		"@typescript-eslint/explicit-function-return-type": [
+			"warn",
+			{
+				"allowFunctionsWithoutTypeParameters": true
+			}
+		],
+		"@typescript-eslint/no-invalid-this": "off",
+		"@typescript-eslint/no-magic-numbers": "off",
+		"@typescript-eslint/no-unused-expressions": "off",
+		"import/consistent-type-specifier-style": [
+			"warn",
+			"prefer-top-level"
+		],
+		"import/no-duplicates": "warn",
+		"import/order": [
+			"warn",
+			{
+				"groups": [
+					[
+						"builtin",
+						"external"
+					],
+					[
+						"internal",
+						"parent",
+						"sibling",
+						"index",
+						"object"
+					],
+					"type"
+				],
+				"newlines-between": "always"
+			}
+		],
+		"max-classes-per-file": "off",
+		"max-lines-per-function": "off",
+		"no-duplicate-imports": "off",
+		"prefer-arrow-callback": "off",
+		"sort-imports": "off"
+	},
+	"settings": {
+		"import/resolver": {
+			"typescript": {
+				"project": "e2e"
+			}
+		}
+	}
+}

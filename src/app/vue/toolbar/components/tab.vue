@@ -1,5 +1,5 @@
 <template>
-	<div :id="`tab${id}`" @mousedown="Workspace.select(id)" @touchstart.passive="Workspace.select(id)">
+	<div :id="`tab${id}`" role="tab" @mousedown="Workspace.select(id)" @touchstart.passive="Workspace.select(id)">
 		<div class="tab-close" :title="toolTip" @contextmenu="$emit('menu', $event)">
 			<div>
 				<span v-if="isModified">*</span>

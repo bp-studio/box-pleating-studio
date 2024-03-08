@@ -48,11 +48,14 @@ export default function() {
 	it("Half integral relay", function() {
 		for(const [a, b, c] of THREE_PERMUTATION) {
 			generateFromFlaps([
-				{ id: a, x: 0, y: 0, radius: 11 },
-				{ id: b, x: 8, y: 14, radius: 4 },
-				{ id: c, x: 15, y: 8, radius: 6 },
+				{ id: a, x: 0, y: 0, radius: 10 },
+				{ id: b, x: 7, y: 11, radius: 2 },
+				{ id: c, x: 10, y: 6, radius: 1 },
 			]);
-			expectRepo("1,2,3", 1, 2); // Two half integral patterns
+			expectRepo("1,2,3",
+				2,	// Both ways of cutting works
+				4	// Each configuration has four conjugate patterns
+			);
 		}
 	});
 

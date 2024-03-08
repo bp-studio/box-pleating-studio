@@ -1,5 +1,5 @@
 <template>
-	<div class="flex-grow-1 tab-container" @wheel.passive="tabWheel($event)">
+	<div class="flex-grow-1 tab-container" @wheel.passive="tabWheel($event)" role="tablist">
 		<SlickList lockAxis="x" axis="x" v-model:list="Workspace.ids.value" :distance="10" id="divTab"
 				   :class="{ 'hide': !Workspace.ids.value.length }" @sort-start="setCursor('ew-resize')"
 				   @sort-end="setCursor('default')">
@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 
-	import { SlickList, SlickItem } from "vue-slicksort/dist/vue-slicksort.esm.js";
+	import { SlickList, SlickItem } from "vue-slicksort";
 
 	import { compRef } from "app/utils/compRef";
 	import Workspace from "app/services/workspaceService";

@@ -7,8 +7,11 @@
 <script setup lang="ts">
 
 	import Studio from "app/services/studioService";
+	import { useThrottledGA } from "app/utils/ga";
 
 	import type { DirectionKey } from "shared/types/types";
+
+	const ONE_HOUR = 3600000;
 
 	defineOptions({ name: "KeyButton" });
 
@@ -18,6 +21,7 @@
 		dir: DirectionKey;
 		icon: string;
 	}>();
+	const ga = useThrottledGA("dpad", ONE_HOUR);
 
 	function down(repeat: number, e?: Event): void {
 		const SENSITIVITY = 150;
@@ -30,6 +34,7 @@
 	}
 
 	function up(): void {
+		ga();
 		clearTimeout(to);
 	}
 

@@ -14,5 +14,6 @@ export const isDark = computed(() => {
 	const theme = Settings.theme;
 	const result = theme == "dark" || theme == "system" && isPreferred.value;
 	document.documentElement.classList.toggle("dark", result);
+	gtag("event", "theme_" + (result ? "dark" : "light"));
 	return result;
 });

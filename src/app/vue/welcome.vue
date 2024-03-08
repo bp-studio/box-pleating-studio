@@ -84,7 +84,7 @@
 	import { copyright } from "app/misc/copyright";
 	import { lcpReady } from "app/misc/lcpReady";
 	import handles from "app/services/handleService";
-	import { isFileApiEnabled, isHttps } from "app/shared/constants";
+	import { hasServiceWorker, isFileApiEnabled } from "app/shared/constants";
 	import Opener from "@/gadgets/file/opener.vue";
 	import Studio from "app/services/studioService";
 	import Workspace from "app/services/workspaceService";
@@ -108,7 +108,7 @@
 	// but that's OK since in that case we will have the prompt available immediately.
 	const installAvailable =
 		"onbeforeinstallprompt" in window &&
-		isHttps &&
+		hasServiceWorker &&
 		// eslint-disable-next-line compat/compat
 		!navigator.serviceWorker.controller;
 

@@ -10,18 +10,15 @@ node_modules/
 debug.log
 .VSCodeCounter/
 
-# LaTeX aux files
-/docs/*.aux
-/docs/*.log
-/docs/*.synctex.gz
-/docs/*.nav
-/docs/*.out
-/docs/*.toc
-/docs/*.snm
-
 # Istanbul
 .nyc_output/
 coverage/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
 # My own notes
 NOTE.md

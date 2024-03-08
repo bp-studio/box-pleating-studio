@@ -138,15 +138,25 @@ export class Partition implements ISerializable<JPartition> {
 		// For intersections, the actual overlap to retrieve can be a lot more complicated
 		// because of the rivers around the flaps, so we need a series of additional
 		// calculations here to decide at what distance should we set the overlap.
+		const overlaps = this.$overlaps.concat();
 		if(map.corner.type == CornerType.intersection) {
 			const oriented = ov.c[0].e! < 0;
 
-			const t = repo.$nodeSet.$distTriple(n1, n2, map.corner.e as NodeId);
+			const n3 = map.corner.e as NodeId;
+			const t = repo.$nodeSet.$distTriple(n1, n2, n3);
 			if(oriented) d2 = t.d2 - f2.$length;
 			else d1 = t.d1 - f1.$length;
+
+			if(!this._findOverlapForFlap(n3)) {
+				for(const p of this.$configuration.$partitions) {
+					if(p == this) continue;
+					const find = p._findOverlapForFlap(n3);
+					if(find) overlaps.push(find);
+				}
+			}
 		}
 
-		ov = this._getExposedOverlap(ov);
+		ov = this._getExposedOverlap(ov, overlaps);
 		const p1 = quad1.$getOverlapCorner(ov, parent, map.anchorIndex, d1);
 		const p2 = quad2.$getOverlapCorner(ov, parent, opposite(map.anchorIndex), d2);
 
@@ -195,18 +205,26 @@ export class Partition implements ISerializable<JPartition> {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	private _findOverlapForFlap(id: NodeId): JOverlap | undefined {
+		for(const ov of this.$overlaps) {
+			for(const corner of ov.c) {
+				if(corner.type == CornerType.flap && corner.e == id) return ov;
+			}
+		}
+	}
+
 	/**
 	 * Find, in a {@link Partition} containing joins, what is left of a given {@link JOverlap}
 	 * after subtracting the other JOverlaps.
 	 */
-	private _getExposedOverlap(ov: JOverlap): JOverlap {
+	private _getExposedOverlap(ov: JOverlap, overlaps: readonly JOverlap[]): JOverlap {
 		// Trivial case
-		if(this.$overlaps.length == 1) return ov;
+		if(overlaps.length == 1) return ov;
 
 		const result = clone(ov);
 		const parent = this._getParent(ov);
 		let shift = result.shift ?? { x: 0, y: 0 };
-		for(const o of this.$overlaps) {
+		for(const o of overlaps) {
 			if(o != ov) {
 				const p = this._getParent(o);
 				const w = result.ox + shift.x;

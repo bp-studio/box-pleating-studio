@@ -18,7 +18,7 @@ const target = ["es2018", "chrome66", "edge79", "firefox78", "opera53", "safari1
 let plugins;
 function getDefaultPlugins() {
 	const esSass = require("esbuild-sass-plugin").sassPlugin;
-	const esVue = require("esbuild-plugin-vue-next");
+	const esVue = require("@mutsuntsai/esbuild-plugin-vue");
 	const exg = require("@fal-works/esbuild-plugin-global-externals").globalExternals;
 	return plugins = plugins || [
 		exg({
@@ -56,7 +56,7 @@ const option = {
 
 function ssgOption(options) {
 	const vt = require("@intlify/vue-i18n-extensions").transformVTDirective;
-	const esVue = require("esbuild-plugin-vue-next");
+	const esVue = require("@mutsuntsai/esbuild-plugin-vue");
 	const VueI18n = require("vue-i18n");
 	const i18n = VueI18n.createI18n({
 		locale: "en",

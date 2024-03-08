@@ -157,6 +157,7 @@ export class Gadget implements JGadget {
 
 	/** Simplify JSON data representation, for creating signature. */
 	public static $simplify(g: JGadget): JGadget {
+		/* istanbul ignore next: foolproof */
 		if(g.offset && g.offset.x == 0 && g.offset.y == 0) delete g.offset;
 		delete g.anchors; // anchor info is irrelevant to signature
 		return g;

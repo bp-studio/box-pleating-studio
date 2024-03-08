@@ -1,8 +1,8 @@
 <template>
 	<Dropdown label="File" icon="bp-file-alt" :title="$t('toolbar.file.title')" ref="menu">
-		<div class="dropdown-item" @click="Workspace.create()">
+		<DropdownItem @click="Workspace.create()">
 			<i class="far fa-file" />{{ $t('toolbar.file.new') }}
-		</div>
+		</DropdownItem>
 		<Divider />
 
 		<template v-if="isFileApiEnabled">

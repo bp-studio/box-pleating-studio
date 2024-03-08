@@ -4,7 +4,7 @@ import Dialogs from "./dialogService";
 import Studio from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
-import { isHttps } from "app/shared/constants";
+import { isOnline } from "app/shared/constants";
 
 import type { CoreError, JProject, ProjId } from "shared/json";
 import type * as Client from "client/main";
@@ -189,7 +189,7 @@ namespace WorkspaceService {
 			if(log) {
 				error.build = app_config.app_version;
 				log.error = error;
-				if(isHttps) setTimeout(() => uploadLog(log, error), 0);
+				if(isOnline) setTimeout(() => uploadLog(log, error), 0);
 			}
 			await Dialogs.error(log);
 			await close(id, true);

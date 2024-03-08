@@ -178,14 +178,15 @@ function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction): void {
  * Find a common node on the two corresponding paths,
  * and return the distance of the two {@link Junction.$a}s to that node
  * (the canonical distances).
+ *
+ * It is assumed here that `p1.$dist >= p2.$dist`.
  */
 function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [number, number] | undefined {
-	const a1 = j1.$lca, a2 = j2.$lca;
-	if(a1 === a2) return [j1.$a.$dist - a1.$dist, j2.$a.$dist - a1.$dist];
-	if(a1.$dist === a2.$dist) return undefined;
-	// It is assumed here that a1.$dist > a2.$dist
-	if(isAncestor(a1, j2.$a)) return [j1.$a.$dist - a1.$dist, j2.$a.$dist - a1.$dist];
-	if(isAncestor(a1, j2.$b)) return [j1.$a.$dist - a1.$dist, dist(j2.$a, a1, a2)];
+	const p1 = j1.$lca, p2 = j2.$lca;
+	if(p1 === p2) return [j1.$a.$dist - p1.$dist, j2.$a.$dist - p1.$dist];
+	if(p1.$dist === p2.$dist) return undefined;
+	if(isAncestor(p1, j2.$a)) return [j1.$a.$dist - p1.$dist, j2.$a.$dist - p1.$dist];
+	if(isAncestor(p1, j2.$b)) return [j1.$a.$dist - p1.$dist, dist(j2.$a, p1, p2)];
 	return undefined;
 }
 

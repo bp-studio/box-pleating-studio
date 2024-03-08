@@ -33,7 +33,10 @@ export default function() {
 	});
 
 	it("Caches repo during dragging", function() {
-		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
+		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,0,0,0,0)");
+
+		// Drag into stretch
+		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
 		LayoutController.completeStretch("1,2");
 
 		const stretch = State.$stretches.get("1,2")!;
@@ -44,12 +47,16 @@ export default function() {
 		expect(config.$length).to.equal(2);
 		expect(config.$index).to.equal(0);
 
+		const prototype = UpdateResult.$flush().add.stretches["1,2"];
+
 		LayoutController.switchPattern("1,2", 1);
 		expect(config.$index).to.equal(1);
 
+		// Drag out of stretch
 		LayoutController.updateFlap([{ id: id2, x: 8, y: 10, width: 0, height: 0 }], true, []);
 		expect(stretch.$repo).to.not.equal(repo);
 
+		// Drag back into stretch again
 		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
 		LayoutController.dragEnd();
 		expect(stretch.$isActive).to.be.true;
@@ -65,7 +72,7 @@ export default function() {
 
 		// Not cached if not dragging
 		LayoutController.updateFlap([{ id: id2, x: 8, y: 10, width: 0, height: 0 }], false, []);
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], false, []);
+		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], false, [prototype]);
 		expect(stretch.$repo).to.not.equal(repo);
 		expect(stretch.$repo.$configuration!.$index).to.equal(0);
 	});

@@ -49,6 +49,7 @@
 		"makeomatic",
 		"mixins",
 		"mozfullscreenchange",
+		"mutsuntsai",
 		"nocheck",
 		"notranslate",
 		"onbeforeinstallprompt",
@@ -98,6 +99,7 @@
 	"files.exclude": {
 		"**/debug.log": true,
 		"**/node_modules": true,
+		"test-results/": true,
 		".nyc_output": true
 	},
 	"i18n-ally.enabledFrameworks": [

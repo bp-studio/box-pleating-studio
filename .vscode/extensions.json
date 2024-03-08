@@ -7,11 +7,11 @@
 		"hbenl.vscode-mocha-test-adapter",
 		"hbenl.vscode-test-explorer",
 		"lokalise.i18n-ally",
+		"ms-playwright.playwright",
 		"ms-vscode.test-adapter-converter",
 		"mutsuntsai.jsdoc-link",
 		"sibiraj-s.vscode-scss-formatter",
 		"stylelint.vscode-stylelint",
-		"vue.volar",
-		"vue.vscode-typescript-vue-plugin"
+		"vue.volar"
 	]
 }

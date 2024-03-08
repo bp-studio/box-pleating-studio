@@ -55,6 +55,7 @@ export class Piece extends Region implements JPiece {
 
 	public $offset(o: IPoint): void {
 		const offset = offsets.get(this)!;
+		/* istanbul ignore next: foolproof */
 		if(same(offset, o)) return;
 		offsets.set(this, o);
 		clearCache(this);
@@ -74,14 +75,14 @@ export class Piece extends Region implements JPiece {
 		let { shift } = this;
 		shift = shift || { x: 0, y: 0 };
 		const s = { x: tx - sx - shift.x, y: ty - sy - shift.y };
-		if(s.x || s.y) this.shift = s;
+		this.shift = s;
 		this.detours = detours?.map(c =>
 			c.map(p => ({ x: sx - p.x, y: sy - p.y }))
 		);
 	}
 
 	/** Shrink a {@link Piece} proportionally. This will reset the cache. */
-	public $shrink(by: number = 2): this {
+	public $shrink(by: number): this {
 		clearCache(this);
 		this.ox /= by;
 		this.oy /= by;
@@ -98,6 +99,7 @@ export class Piece extends Region implements JPiece {
 	public $addDetour(detour: Path): void {
 		// Precondition check
 		detour = deduplicate(detour);
+		/* istanbul ignore next: foolproof */
 		if(detour.length == 1) return;
 
 		// Add the detour for real
@@ -132,11 +134,12 @@ export class Piece extends Region implements JPiece {
 	@cache public get $anchors(): PerQuadrant<Point | null> {
 		const p = this._points;
 		const { contour } = this.$shape;
+		// Anchor 0 and 2 must exist for any piece
 		return perQuadrant([
-			contour.some(c => c.eq(p[0])) ? p[0] : null,
-			contour.includes(p[1]) ? p[1] : null,
-			contour.some(c => c.eq(p[2])) ? p[2] : null,
-			contour.includes(p[3]) ? p[3] : null,
+			p[0],
+			getIdentical(contour, p[1]),
+			p[2],
+			getIdentical(contour, p[3]),
 		]);
 	}
 
@@ -222,4 +225,8 @@ export class Piece extends Region implements JPiece {
 			debugger;
 		}
 	}
+}
+
+function getIdentical(contour: RationalPath, p: Point): Point | null {
+	return contour.includes(p) ? p : null;
 }
