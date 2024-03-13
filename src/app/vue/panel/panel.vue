@@ -1,6 +1,6 @@
 <template>
 	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.prevent="hide"></div>
-	<aside role="form" class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel"
+	<aside class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel"
 		   v-on:contextmenu.stop="onContextMenu($event)">
 		<template v-if="design">
 			<Design v-if="Studio.selections.length == 0" :design="design" />
