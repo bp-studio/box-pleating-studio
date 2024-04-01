@@ -1,12 +1,20 @@
 const $ = require("../utils/proxy");
 const gulp = require("gulp");
+const { existsSync } = require("fs");
 
 const config = require("../config.json");
 const seriesIf = require("../utils/seriesIf");
 
 // This file is not in the repo, of course
-/** @type {import("../../.vscode/ftp.json")} */
-const ftpConfig = require(process.cwd() + "/.vscode/ftp.json");
+const ftpConfigPath = process.cwd() + "/.vscode/ftp.json";
+
+/** @type {import("../../.vscode/ftp.json")|null} */
+const ftpConfig = existsSync(ftpConfigPath) ? require(ftpConfigPath) : null;
+
+function configGuard() {
+	if(!ftpConfig) throw new Error("The repo is not figured with FTP. This operation is for maintainers only.");
+	return true;
+}
 
 function connect() {
 	const ftp = require("vinyl-ftp");
@@ -63,7 +71,7 @@ async function ftpFactory(folder, additionalGlobs, pipeFactory) {
 	);
 }
 
-gulp.task("cleanPub", () => seriesIf(
+gulp.task("cleanPub", () => configGuard() && seriesIf(
 	async () => {
 		const inquirer = (await import("inquirer")).default;
 		const answers = await inquirer.prompt([{
@@ -76,15 +84,19 @@ gulp.task("cleanPub", () => seriesIf(
 	},
 	() => cleanFactory("bp")
 ));
-gulp.task("uploadPub", () => ftpFactory("bp", [config.dest.dist + "/.htaccess"]));
+gulp.task("uploadPub", () => configGuard() && ftpFactory("bp", [
+	config.dest.dist + "/.htaccess",
+	"!**/vue.runtime.global.js", // debug-only
+]));
 
 /**
  * @param {"qa"|"dev"} id
  */
 function taskFactory(id) {
 	const name = id.replace(/^\w/, a => a.toUpperCase());
-	gulp.task("clean" + name, () => cleanFactory(ftpConfig[id].folder));
+	gulp.task("clean" + name, () => configGuard() && cleanFactory(ftpConfig[id].folder));
 	gulp.task("upload" + name, () => {
+		configGuard();
 		const lazypipe = require("lazypipe");
 		const htmlPipe = lazypipe()
 			.pipe(() => $.replace('<script async src="https://www.googletagmanager.com' +
@@ -95,9 +107,12 @@ function taskFactory(id) {
 			.pipe(() => $.replace(/\/\/bpstudio\./g, `//${ftpConfig[id].subdomain}.`))
 			.pipe(() => $.replace(/Box Pleating Studio/g, ftpConfig[id].title));
 
-		return ftpFactory(ftpConfig[id].folder, [], pipe => pipe
-			.pipe($.if(file => file.basename == "index.htm", htmlPipe()))
-			.pipe($.if(file => file.basename == "manifest.json", manifestPipe()))
+		return ftpFactory(
+			ftpConfig[id].folder,
+			["!**/vue.runtime.global.prod.js"], // production-only
+			pipe => pipe
+				.pipe($.if(file => file.basename == "index.htm", htmlPipe()))
+				.pipe($.if(file => file.basename == "manifest.json", manifestPipe()))
 		);
 	});
 }
