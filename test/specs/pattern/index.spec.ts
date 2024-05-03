@@ -5,7 +5,9 @@ import searchingSpec from "./searching.spec";
 describe("Pattern", function() {
 
 	describe("Searching", searchingSpec);
+
 	describe("Positioning", positioningSpec);
+
 	describe("Rendering", renderingSpec);
 
 });

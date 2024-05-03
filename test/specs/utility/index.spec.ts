@@ -4,6 +4,7 @@ import cloneSpec from "./clone.spec";
 describe("Utility", function() {
 
 	describe("Array utility", arraySpec);
+
 	describe("Clone utility", cloneSpec);
 
 });

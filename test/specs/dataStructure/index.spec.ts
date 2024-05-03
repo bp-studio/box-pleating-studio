@@ -6,8 +6,11 @@ import valuedIntDoubleMapSpec from "./valuedIntDoubleMap.spec";
 describe("Data structures", function() {
 
 	describe("Binary Search Tree", binarySearchTreeSpec);
+
 	describe("Heap", heapSpec);
+
 	describe("Int Double Map", intDoubleMapSpec);
+
 	describe("Valued Int Double Map", valuedIntDoubleMapSpec);
 
 });
