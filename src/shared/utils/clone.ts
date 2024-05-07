@@ -1,25 +1,34 @@
 
 /**
+ * Cache object references with results, to handle recursive data structures.
+ */
+type CloneContext = WeakMap<object, unknown>;
+
+/**
  * Deeply clone the nested contents of an object.
  * Objects on all depths will be cloned, not referred.
  */
 export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
-	for(const s of sources) {
-		if(!(s instanceof Object)) continue;
+	const ctx = new WeakMap();
+	for(const s of sources) deepAssignCore(target, s, ctx);
+	return target;
+}
 
-		// This also applies to the case where s is an array.
-		// In that case, the keys will automatically be the indices of the array.
-		const keys = Object.keys(s);
+function deepAssignCore<T>(target: T, source: RecursivePartial<T>, ctx: CloneContext): T {
+	if(!(source instanceof Object)) return target;
 
-		for(const k of keys) {
-			const v = s[k] as T[typeof k];
-			if(!(v instanceof Object)) {
-				target[k] = v; // primitive values can be copied directly
-			} else if(target[k] instanceof Object && target[k] != v) { // Make sure that reference is different
-				target[k] = deepAssign(target[k], v);
-			} else {
-				target[k] = clonePolyfill(v);
-			}
+	// This also applies to the case where s is an array.
+	// In that case, the keys will automatically be the indices of the array.
+	const keys = Object.keys(source);
+
+	for(const key of keys) {
+		const value = source[key] as T[typeof key];
+		if(!(value instanceof Object)) {
+			target[key] = value; // primitive values can be copied directly
+		} else if(target[key] instanceof Object && target[key] != value) { // Make sure that reference is different
+			deepAssignCore(target[key], value, ctx);
+		} else {
+			target[key] = clonePolyfillCore(value, ctx);
 		}
 	}
 	return target;
@@ -27,11 +36,21 @@ export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 
 /** Clone an object. */
 export function clonePolyfill<T extends object | undefined>(source: T): T {
+	return clonePolyfillCore(source, new WeakMap());
+}
+
+function clonePolyfillCore<T extends object | undefined>(source: T, ctx: CloneContext): T {
 	if(!source) return source;
+	if(ctx.has(source)) return ctx.get(source) as T;
+
 	// `isArray` is more reliable than `instanceof Array`,
 	// See https://stackoverflow.com/a/22289869/9953396
 	const target = Array.isArray(source) ? [] : {};
-	return deepAssign(target as T, source);
+
+	// Cache the reference immediately, so that recursive reference will work.
+	ctx.set(source, target);
+
+	return deepAssignCore(target as T, source, ctx);
 }
 
 /**
