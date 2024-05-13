@@ -57,7 +57,12 @@ async function ftpFactory(folder, additionalGlobs, pipeFactory) {
 	].concat(additionalGlobs);
 
 	const base = `/public_html/${folder}`;
-	const pipe = gulp.src(globs, { base: config.dest.dist, buffer: false });
+	const pipe = gulp.src(globs, {
+		base: config.dest.dist,
+		buffer: false,
+		dot: true, // Gulp v5, for .htaccess
+		encoding: false, // Gulp v5
+	});
 	await streamToPromise(
 		(pipeFactory ? pipeFactory(pipe) : pipe)
 			.pipe(conn.newer(base))

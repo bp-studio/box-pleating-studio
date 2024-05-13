@@ -6,6 +6,8 @@ import { BaseJoinLogic } from "./baseJoinLogic";
 import type { JoinResult } from "./joinLogic";
 import type { Point } from "core/math/geometry/point";
 
+type Index = 0 | 1;
+
 //=================================================================
 /**
  * Standard joins are two special cases of more generalized joins.
@@ -37,54 +39,69 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	/**
 	 * Convex standard join.
 	 */
-	private *_convexStandardJoin(B: Point, D: Point, i: number): Generator<JoinResult> {
+	private *_convexStandardJoin(B: Point, D: Point, i: Index): Generator<JoinResult> {
 		if(B.$isIntegral) return; // Degenerated to base join
-		const { pt } = this.data;
-		const { j1, j2, f } = this;
-		let e = [j1.e, j2.e][i];
-		const p = [j1.p, j2.p][i];
+		const { j1, j2 } = this;
+		const e = i ? j2.e : j1.e;
+		const p = i ? j2.p : j1.p;
 
 		// There is no convex join if the two gadgets are "pointing inwards",
 		// as the straight-skeleton degenerates into a relay pattern.
 		if(this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
 
 		if(!this._setupAnchor(D)) return;
-		const P = D.$sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
-		const T = closestGridPoint(this._substituteEnd(e, B), D);
 
-		// Before version 0.6, if the closest grid point happens to be the tip of the gadget,
-		// the tracing algorithm couldn't handle such cases, so we discarded those.
-		// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
-		if(T.eq(e.p1) || T.eq(e.p2)) return;
-
-		// If the triangle is too small, it could go out of bounds
-		const R = triangleTransform([D, P, B], T);
-		if(!R || R.x * f < pt.x * f) return;
-
-		// Check if the transformed R-point goes out of bounds
-		// by checking the intersection of line segments.
-		e = this._substituteEnd([j1.e, j2.e][1 - i], D);
-		const test = e.$intersection(new Line(T, R));
-		if(test && !test.eq(T) && !test.eq(R)) return;
+		const tryResult = this._tryConvexTransform(e, B, D, i);
+		if(!tryResult) return;
+		const [T, R] = tryResult;
 
 		this.data.addOns = [{
 			contour: [D, T, R].map(point => point.$toIPoint()),
 			dir: new Line(T, R).$reflect(p.$direction).$toIPoint(),
 		}];
-		this._setupDetour([i == 0 ? T : D, R], [i == 0 ? D : T, R]);
+		this._setupDetour([i ? D : T, R], [i ? T : D, R]);
 		yield this._result(true, R.$dist(T));
+	}
+
+
+	private _tryConvexTransform(e: Line, B: Point, D: Point, i: Index): [Point, Point] | null {
+		const { pt } = this.data;
+		const { j1, j2, f } = this;
+
+		const P = D.$sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
+		const gridPoints = closestGridPoints(this._substituteEnd(e, B), D);
+
+		// It is possible that the closest T results in an R that goes out of bounds.
+		// In that case we need to try the second closest T.
+		for(const T of gridPoints) {
+			// Before version 0.6, if T happens to be the tip of the gadget,
+			// the tracing algorithm couldn't handle such cases, so we discarded those.
+			// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
+			if(T.eq(e.p1) || T.eq(e.p2)) continue;
+
+			// If the triangle is too small, it could go out of bounds
+			const R = triangleTransform([D, P, B], T);
+			if(!R || R.x * f < pt.x * f) continue;
+
+			// Check if the transformed R-point goes out of bounds
+			if(!(i ? j1 : j2).$contains(R)) continue;
+
+			return [T, R];
+		}
+		return null;
 	}
 
 	/**
 	 * Concave standard join.
 	 */
-	private *_concaveStandardJoin(B: Point, D: Point, i: number, delta: Line): Generator<JoinResult> {
+	private *_concaveStandardJoin(B: Point, D: Point, i: Index, delta: Line): Generator<JoinResult> {
 		if(D.$isIntegral) return; // Degenerated to base join
 		const { j1, j2 } = this;
-		const e = [j1.e, j2.e][i], p = [j1.p, j2.p][i];
-		const T = closestGridPoint(this._substituteEnd(e, D), B);
+		const e = i ? j2.e : j1.e;
+		const p = i ? j2.p : j1.p;
+		const T = closestGridPoints(this._substituteEnd(e, D), B)[0];
 
-		// Before version 0.6, if the closest grid point happens to be the tip of the gadget,
+		// Before version 0.6, if T happens to be the tip of the gadget,
 		// the tracing algorithm couldn't handle such cases, so we discarded those.
 		// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
 		if(T.eq(e.p1) || T.eq(e.p2)) return;
@@ -96,7 +113,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 			contour: [B, T, R].map(point => point.$toIPoint()),
 			dir: new Line(T, B).$reflect(p.$direction).$toIPoint(),
 		}];
-		this._setupDetour(i == 0 ? [T, B] : [B], i == 0 ? [B] : [T, B]);
+		this._setupDetour(i ? [B] : [T, B], i ? [T, B] : [B]);
 		yield this._result(true, B.$dist(T));
 	}
 
@@ -110,14 +127,14 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	}
 }
 
-function closestGridPoint(e: Line, p: Point): Point {
-	let r!: Point, d: number = Number.POSITIVE_INFINITY;
-	for(const i of e.$gridPoints()) {
-		const dist = i.$dist(p);
-		if(dist < d) {
-			d = dist;
-			r = i;
-		}
-	}
-	return r;
+/**
+ * Return the grid points on {@link e}, in the order of distance to {@link p}.
+ *
+ * In practice there won't be many such grid points,
+ * so sorting them shouldn't be significant in terms of performance.
+ */
+function closestGridPoints(e: Line, p: Point): Point[] {
+	const gridPoints = e.$gridPoints().map(q => [q, q.$dist(p)] as [Point, number]);
+	gridPoints.sort((a, b) => a[1] - b[1]);
+	return gridPoints.map(t => t[0]);
 }

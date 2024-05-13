@@ -43,7 +43,11 @@ const copyStatic = () => gulp.src([
 	"!index.htm",
 	"!log/*",
 	"!assets/bps/**/*",
-], { cwd: config.src.public, base: config.src.public })
+], {
+	cwd: config.src.public,
+	base: config.src.public,
+	encoding: false, // Gulp v5
+})
 	.pipe(newer(config.dest.dist)) // Use 1:1 comparison
 	.pipe($.if(file => file.extname == ".js", $.terser({
 		compress: {

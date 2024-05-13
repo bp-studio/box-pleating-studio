@@ -2,6 +2,7 @@ import { Vector } from "core/math/geometry/vector";
 import { Direction } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { Gadget } from "../pattern/gadget";
+import { windingNumber } from "core/math/geometry/winding";
 
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
@@ -22,6 +23,8 @@ import type { JoinLogic } from "./logic/joinLogic";
 export class Joinee {
 
 	public readonly p: Piece;
+
+	/** The ridge of the gadget that is facing the delta line. */
 	public readonly e: Line;
 
 	private readonly _offset: IPoint;
@@ -51,6 +54,11 @@ export class Joinee {
 		if(reverse) detour.reverse();
 		this.p.$clearDetour();
 		this.p.$addDetour(detour);
+	}
+
+	public $contains(p: Point): boolean {
+		// The shape of this.p could be dirty here, so we need to use $originalContour
+		return windingNumber(p.$add(this._v), this.p.$originalContour) != 0;
 	}
 
 	public $toGadget(shouldClone: boolean, oriented: boolean, offset?: IPoint): JGadget {

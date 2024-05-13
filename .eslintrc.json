@@ -218,9 +218,7 @@
 		],
 		"@typescript-eslint/no-namespace": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
-		"@typescript-eslint/no-shadow": [
-			"warn"
-		],
+		"@typescript-eslint/no-shadow": "warn",
 		"@typescript-eslint/no-this-alias": [
 			"warn",
 			{

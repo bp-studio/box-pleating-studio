@@ -7,7 +7,9 @@ const woff2 = require("../../plugins/woff2");
 
 /** Build BPS icon set */
 module.exports = () =>
-	gulp.src(config.src.public + "/assets/bps/**/*")
+	gulp.src(config.src.public + "/assets/bps/**/*", {
+		encoding: false, // Gulp v5
+	})
 		.pipe(newer({
 			dest: config.dest.dist + "/assets/bps/style.css",
 			extra: [__filename, "gulp/plugins/woff2.js"],

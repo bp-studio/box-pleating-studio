@@ -198,7 +198,10 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 	return new Promise(resolve => {
+		// Setup a timeout mechanism in production mode.
 		const timeout = setTimeout(() => {
+			// We don't do that in debug mode, otherwise debugging will be impossible.
+			///#if !DEBUG
 			worker.terminate(); // Terminate immediately in this case
 			resolve({
 				"error": {
@@ -206,6 +209,7 @@ function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 					coreTrace: "",
 				} as CoreError,
 			});
+			///#endif
 		}, CORE_TIMEOUT);
 		app.callWorker<CoreResponse>(worker, request).then(response => {
 			clearTimeout(timeout);

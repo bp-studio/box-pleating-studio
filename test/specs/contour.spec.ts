@@ -85,6 +85,18 @@ describe("Contour", function() {
 			expect(contours[0].inner![0]).to.equalPath("(7,6),(8,6),(8,5),(7,5)", true);
 		});
 
+		it("Builds river ridges", function() {
+			parseTree(
+				"(0,1,3),(1,2,4),(0,3,1),(3,4,1),(4,5,1),(4,6,1)",
+				"(2,8,8,0,0),(5,0,2,0,0),(6,2,0,0,0)"
+			);
+			const ridges = UpdateResult.$flush().graphics["re0,3"].ridges;
+			expect(ridges.length).to.equal(6);
+			// In this example, the outer corner (3,3) is not a right one,
+			// but the corresponding inner corner (2,2) is.
+			expect(ridges).to.deep.contain([{ x: 2, y: 2 }, { x: 3, y: 3 }]);
+		});
+
 	});
 
 });

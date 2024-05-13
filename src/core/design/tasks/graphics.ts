@@ -127,7 +127,9 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 
 		// Check remaining inner vertices.
 		for(const [p1, p0, p2] of innerRightCorners.values()) {
-			const p = getCorrespondingPoint(p1, p0, p2, width, -side as Sign);
+			// 20240513: It seems that the current algorithm already oriented the contours
+			// by their outer/inner relation, so there's no need to flip `side` parameter here.
+			const p = getCorrespondingPoint(p1, p0, p2, width, side);
 			tryAddRemainingRidge(p1, p, freeCornerMap, ridges);
 		}
 	}
@@ -146,6 +148,13 @@ function toFreeCornerMap(freeCorners: Point[]): FreeCornerMap {
 	return freeCornerMap;
 }
 
+/**
+ * @param p1 The current point.
+ * @param p0 The previous point.
+ * @param p2 The next point.
+ * @param width The width of the river.
+ * @param side 1=right side, -1=left side
+ */
 function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number, side: Sign): IPoint {
 	const fx = Math.sign(p2.x - p0.x);
 	const fy = Math.sign(p2.y - p0.y);

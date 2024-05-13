@@ -4,7 +4,7 @@ export function isInside(point: IPoint, path: Path): boolean {
 	return windingNumber(point, path) != 0;
 }
 
-export function windingNumber(point: IPoint, path: Path): number {
+export function windingNumber(point: IPoint, path: Readonly<Path>): number {
 	let result = 0;
 	for(let i = 0, j = path.length - 1; i < path.length; j = i++) {
 		const pi = path[i], pj = path[j];

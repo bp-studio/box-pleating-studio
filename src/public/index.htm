@@ -208,22 +208,35 @@
 				return el;
 			};
 
-			/** Resource Error */
+			/**
+			 * Resource Error.
+			 * @type {string|null}
+			 */
 			var resErr = null;
 
-			/** Runtime Error */
+			/**
+			 * Runtime Error.
+			 * @type {string|null}
+			 */
 			var runErr = null;
 
 			/** Whether error has already been shown */
 			var errShown = false;
 
+			/**
+			 * @param error {string}
+			 */
 			function setRunErr(error) {
+				if(error.includes("chrome-extension")) return; // ignore errors caused by extensions
 				if(!runErr) {
 					runErr = error;
 					setTimeout(self.callback, 0);
 				}
 			}
 
+			/**
+			 * @param error {string}
+			 */
 			function setResErr(error) {
 				if(error.indexOf("gtag") >= 0) return; // Ignore GA loading error
 				if(!resErr) {
@@ -332,7 +345,6 @@
 			 */
 			window.onerror = function(msg, source, line, column, error) {
 				if(!source && !line && !column) return; // error is caused by injection; ignore.
-				if(source.startsWith("chrome-extension")) return; // ignore errors caused by extensions
 
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(msg.match(ignoreError[i])) return;
