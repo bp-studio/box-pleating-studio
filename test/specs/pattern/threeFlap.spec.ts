@@ -79,10 +79,24 @@ export default function() {
 				{ id: c, x: 15, y: 8, radius: 6 },
 			]);
 			const device = expectRepo("1,2,3", 1,
-				2, //Should find two standard joins.
+				2, //Should find two standard joins, one concave and one convex
 				1 // Standard join creates 1 Device
 			)[0];
 			expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
+		}
+	});
+
+	it("Convex standard join is not valid if point R goes beyond the gadget", function() {
+		for(const [a, b, c] of THREE_PERMUTATION) {
+			generateFromFlaps([
+				{ id: a, x: 0, y: 0, radius: 28 },
+				{ id: b, x: 9, y: 32, radius: 5 },
+				{ id: c, x: 20, y: 31, radius: 5 },
+			]);
+			expectRepo("1,2,3", 1,
+				8, // Should find many half-integral patterns, instead of a convex standard join
+				2 // Should be 2 devices instead of 1
+			);
 		}
 	});
 

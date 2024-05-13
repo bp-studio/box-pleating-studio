@@ -10,8 +10,8 @@ export default function() {
 	});
 
 	it("Lists grid points", function() {
-		expect([...parseLine("(4,10)-(0.0)").$gridPoints()].length).to.equal(3);
-		expect([...parseLine("(10,4)-(0.0)").$gridPoints()].length).to.equal(3);
+		expect(parseLine("(4,10)-(0.0)").$gridPoints().length).to.equal(3);
+		expect(parseLine("(10,4)-(0.0)").$gridPoints().length).to.equal(3);
 	});
 
 	it("Checks perpendicularity", function() {

@@ -161,22 +161,24 @@ export class Line {
 	}
 
 	/** Return all grid points that are on this line. */
-	public *$gridPoints(): Generator<Point> {
+	public $gridPoints(): Point[] {
+		const result: Point[] = [];
 		const { p1, p2 } = this;
 		const dx = p2.x - p1.x, dy = p2.y - p1.y;
 		if(Math.abs(dx) < Math.abs(dy)) {
 			const f = Math.sign(dx);
 			for(let x = int(p1.x, f); x * f <= p2.x * f; x += f) {
 				const p = this.$xIntersection(x);
-				if(p.$isIntegral) yield p;
+				if(p.$isIntegral) result.push(p);
 			}
 		} else {
 			const f = Math.sign(dy);
 			for(let y = int(p1.y, f); y * f <= p2.y * f; y += f) {
 				const p = this.$yIntersection(y);
-				if(p.$isIntegral) yield p;
+				if(p.$isIntegral) result.push(p);
 			}
 		}
+		return result;
 	}
 
 	public $xIntersection(x: number): Point {
