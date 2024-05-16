@@ -1,5 +1,6 @@
 import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
+import probablyChina from "probably-china";
 
 import { copyright } from "app/misc/copyright";
 import { useDebounce } from "app/utils/timerUtility";
@@ -26,6 +27,9 @@ namespace LanguageService {
 
 	/** Create i18n instance. */
 	export function createPlugin(): I18n {
+		// Replace the flag to avoid unnecessary trouble.
+		if(probablyChina) locale["zh-tw"].emoji = () => "🇭🇰";
+
 		const plugin = createI18n<[BpsLocale], string>({
 			locale: DEFAULT_LOCALE,
 			fallbackLocale: DEFAULT_LOCALE,
