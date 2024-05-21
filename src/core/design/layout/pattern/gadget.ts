@@ -122,7 +122,8 @@ export class Gadget implements JGadget {
 
 		c1 = shift(c1, q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap[2][0])));
 
-		// Perform collision tests
+		// Perform collision tests.
+		// Be careful! We must ensure that the contours are simple here!
 		let s = 0;
 		const path2 = toPath(c2);
 		while(Overlap.$test(toPath(c1), path2)) {
