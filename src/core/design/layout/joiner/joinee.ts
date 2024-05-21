@@ -2,7 +2,7 @@ import { Vector } from "core/math/geometry/vector";
 import { Direction } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { Gadget } from "../pattern/gadget";
-import { windingNumber } from "core/math/geometry/winding";
+import { isInside } from "core/math/geometry/winding";
 
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
@@ -56,9 +56,17 @@ export class Joinee {
 		this.p.$addDetour(detour);
 	}
 
+	/**
+	 * We need to be careful that the point may not be on the boundary,
+	 * otherwise our join algorithm will create non-simple gadgets,
+	 * which will end up in big trouble in {@link Gadget.$setupConnectionSlack}
+	 * as the overlap test will then always return true.
+	 *
+	 * TODO: But do such non-simple gadget make sense in practice?
+	 */
 	public $contains(p: Point): boolean {
 		// The shape of this.p could be dirty here, so we need to use $originalContour
-		return windingNumber(p.$add(this._v), this.p.$originalContour) != 0;
+		return isInside(p.$add(this._v), this.p.$originalContour);
 	}
 
 	public $toGadget(shouldClone: boolean, oriented: boolean, offset?: IPoint): JGadget {

@@ -60,7 +60,7 @@ async function ftpFactory(folder, additionalGlobs, pipeFactory) {
 	const pipe = gulp.src(globs, {
 		base: config.dest.dist,
 		buffer: false,
-		dot: true, // Gulp v5, for .htaccess
+		dot: true, // for .htaccess
 		encoding: false, // Gulp v5
 	});
 	await streamToPromise(
@@ -90,8 +90,7 @@ gulp.task("cleanPub", () => configGuard() && seriesIf(
 	() => cleanFactory("bp")
 ));
 gulp.task("uploadPub", () => configGuard() && ftpFactory("bp", [
-	config.dest.dist + "/.htaccess",
-	"!**/vue.runtime.global.js", // debug-only
+	"!**/vue.runtime.global.js", // exclude for production
 ]));
 
 /**
@@ -112,12 +111,16 @@ function taskFactory(id) {
 			.pipe(() => $.replace(/\/\/bpstudio\./g, `//${ftpConfig[id].subdomain}.`))
 			.pipe(() => $.replace(/Box Pleating Studio/g, ftpConfig[id].title));
 
+		const htaccessPipe = lazypipe()
+			.pipe(() => $.replace(/!bpstudio\./g, `!${ftpConfig[id].subdomain}.`));
+
 		return ftpFactory(
 			ftpConfig[id].folder,
-			["!**/vue.runtime.global.prod.js"], // production-only
+			["!**/vue.runtime.global.prod.js"], // exclude for debug
 			pipe => pipe
 				.pipe($.if(file => file.basename == "index.htm", htmlPipe()))
 				.pipe($.if(file => file.basename == "manifest.json", manifestPipe()))
+				.pipe($.if(file => file.basename == ".htaccess", htaccessPipe()))
 		);
 	});
 }
