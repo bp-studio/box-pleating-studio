@@ -7,7 +7,7 @@ import { compareOrientation } from "../classes/orientation";
 import { generalEndProcessor } from "../classes/endProcessor";
 
 import type { StartEvent } from "../classes/event";
-import type { Polygon } from "shared/types/geometry";
+import type { Path, Polygon } from "shared/types/geometry";
 
 //=================================================================
 /**
@@ -19,12 +19,20 @@ import type { Polygon } from "shared/types/geometry";
 export class Overlap extends DivideAndCollect {
 
 	/**
+	 * Test if several paths has any overlap.
+	 *
+	 * For performance considerations, we do not check for self-intersection
+	 * for each path, ane one must ensure that the parameters are simple paths,
+	 * otherwise the algorithm will always return true in such a case.
+	 *
 	 * Note that the {@link Overlap} instance can be in a dirty state after
 	 * completion, so a new instance must be create on every call
 	 * to the {@link _test} method. We use this static method
 	 * to control this behavior.
 	 */
-	public static $test(...polygon: Polygon): boolean {
+	public static $test(
+		...polygon: [Path, Path, ...Path[]] // enforcing at least two paths
+	): boolean {
 		const instance = new Overlap();
 		return instance._test(polygon);
 	}
@@ -37,7 +45,7 @@ export class Overlap extends DivideAndCollect {
 		super(new GeneralEventProvider(true), new OverlapIntersector());
 	}
 
-	/** Test if two oriented paths overlap. */
+	/** Test if two or more oriented paths overlap. */
 	private _test(polygon: Polygon): boolean {
 		for(const path of polygon) {
 			const l = path.length;
