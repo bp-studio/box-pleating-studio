@@ -74,7 +74,8 @@
 			"navigator.locks",
 			"Array.flatMap",
 			"Array.prototype.toReversed",
-			"Array.prototype.flatMap"
+			"Array.prototype.flatMap",
+			"PromiseConstructor.withResolvers"
 		]
 	}
 }

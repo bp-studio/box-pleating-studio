@@ -61,6 +61,8 @@
 
 	import { onMounted, shallowRef } from "vue";
 
+	import "shared/polyfill/withResolvers"; // We import this polyfill again for SSG.
+
 	import { phase } from "app/misc/lcpReady"; // This must be loaded before anything else.
 	import Panel from "@/panel/panel.vue";
 	import Toolbar from "@/toolbar/toolbar.vue";

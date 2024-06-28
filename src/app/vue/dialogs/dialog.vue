@@ -42,8 +42,10 @@
 		initialized.value = true;
 
 		const wait = lastHidden;
-		let hidden: Action<Awaitable<void>>;
-		lastHidden = new Promise<void>(resolve => { hidden = resolve; });
+
+		const resolvers = Promise.withResolvers<void>();
+		const hidden: Action = resolvers.resolve;
+		lastHidden = resolvers.promise;
 
 		await wait;
 		message.value = msg;
