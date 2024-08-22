@@ -1,7 +1,10 @@
+import { writeFileSync } from "fs";
+
 import { Tree } from "core/design/context/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
+import { Migration } from "client/patches";
 
 import type { TreeNode } from "core/design/context/treeNode";
 import type { JEdge, JFlap, NodeId } from "shared/json";
@@ -30,6 +33,31 @@ export function parseTree(edges: string, flaps: string): Tree {
 	const nFlaps: NFlap[] = [...flaps.matchAll(/\((\d+),(-?\d+),(-?\d+),(\d+),(\d+)\)/g)]
 		.map(m => ({ id: Number(m[1]), x: Number(m[2]), y: Number(m[3]), width: Number(m[4]), height: Number(m[5]) }));
 	return createTree(nEdges, nFlaps);
+}
+
+/**
+ * Given a tree object, export it a BPS file `export.bps` for further inspection.
+ */
+export function exportProject(tree: Tree): void {
+	const project = Migration.$getSample();
+	project.design.mode = "layout";
+	const sheet = project.design.layout.sheet;
+	for(const flap of tree.$nodes.filter(l => l?.$isLeaf) as TreeNode[]) {
+		const sides = flap.$AABB.$toValues();
+		project.design.layout.flaps.push({
+			id: flap.id, x: sides[3], y: sides[2],
+			width: sides[1] - sides[3], height: sides[0] - sides[2],
+		});
+		if(sheet.width < sides[1]) sheet.width = sides[1];
+		if(sheet.height < sides[0]) sheet.height = sides[0];
+	}
+	for(const n of tree.$nodes.filter(l => l) as TreeNode[]) {
+		project.design.tree.nodes.push({ id: n.id, x: 0, y: 0, name: "" });
+		if(n.$parent) {
+			project.design.tree.edges.push({ n1: n.$parent.id, n2: n.id, length: n.$length });
+		}
+	}
+	writeFileSync("export.bps", JSON.stringify(project));
 }
 
 export function createTree(edges: NEdge[], flaps?: NFlap[]): Tree {
