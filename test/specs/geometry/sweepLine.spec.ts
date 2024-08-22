@@ -51,6 +51,16 @@ export default function() {
 			expect(result).to.be.true;
 		});
 
+		it("Does not check for self-intersection", function() {
+			const result = Overlap.$test(
+				// These two are obviously disjoint, but the result will be true
+				// since the second path have self-intersection at (11,8)
+				parsePath("(-1,-1),(-1,-2),(-2,-2),(-2,-1)"),
+				parsePath("(0,0),(1,3),(15,10),(14,7),(11,8),(2,1)")
+			);
+			expect(result).to.be.true;
+		});
+
 	});
 
 }

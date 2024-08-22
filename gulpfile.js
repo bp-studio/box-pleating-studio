@@ -81,12 +81,21 @@ gulp.task("deployDQ", gulp.series(
 	)
 ));
 
+const deployMsg = `Before releasing, please check the following steps:
+1. Update the version number in package.json.
+2. Add update logs.
+3. Edit README.md if needed.
+4. Run tests and make sure that new codes are covered.
+5. Add relevant tests.
+6. Deploy to DEV at least once to ensure there's no major building error.
+Are you sure you want to deploy?"`;
+
 gulp.task("deployPub", () => seriesIf(
 	async () => {
 		const inquirer = (await import("inquirer")).default;
 		const answers = await inquirer.prompt([{
 			type: "confirm",
-			message: "Before releasing, please update the version number in package.json, add update logs, edit README.md if needed, and deploy to DEV at least once to ensure there's no major building error. Are you sure you want to deploy?",
+			message: deployMsg,
 			name: "ok",
 			default: false,
 		}]);

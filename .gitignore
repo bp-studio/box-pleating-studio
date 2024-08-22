@@ -22,3 +22,6 @@ coverage/
 
 # My own notes
 NOTE.md
+
+# Exported test project
+/export.bps

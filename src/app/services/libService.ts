@@ -6,12 +6,11 @@
 //=================================================================
 namespace LibService {
 
-	let libResolve: Action;
+	const resolver = Promise.withResolvers<void>();
+	const libResolve: Action = resolver.resolve;
 
 	/** Wait for all non-critical libraries to load */
-	export const ready: Promise<void> = new Promise<void>(resolve => {
-		libResolve = resolve;
-	});
+	export const ready = resolver.promise;
 
 	/** Load non-critical libraries */
 	export function load(): Promise<void> {

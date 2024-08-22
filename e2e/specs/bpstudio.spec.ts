@@ -20,7 +20,7 @@ test("Basic UI", async ({ page }) => {
 
 test("Project creation", async ({ page }) => {
 	await page.getByRole("menuitem", { name: "File" }).click();
-	await page.getByRole("menuitem", { name: "New" }).click();
+	await page.getByRole("menuitem", { name: /New project$/ }).click();
 	const locator = page.getByRole("tab");
 	await expect(locator).toBeAttached();
 	await expect(locator).toContainText("Untitled");
@@ -28,7 +28,7 @@ test("Project creation", async ({ page }) => {
 
 test("Basic vertex dragging", async ({ page }) => {
 	await page.getByRole("menuitem", { name: "File" }).click();
-	await page.getByRole("menuitem", { name: "New" }).click();
+	await page.getByRole("menuitem", { name: /New project$/ }).click();
 	await expect(page.getByRole("tab")).toBeAttached();
 	await page.mouse.move(514, 282);
 	await page.mouse.down();

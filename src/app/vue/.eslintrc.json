@@ -9,7 +9,7 @@
 			".vue"
 		],
 		"sourceType": "module",
-		"project": "./src/app/tsconfig.json"
+		"project": true
 	},
 	"rules": {
 		"@stylistic/max-len": "off", // see vue
