@@ -1,5 +1,5 @@
 import { expectRepo, generateFromFlaps } from "./util";
-import { node, parseTree } from "@utils/tree";
+import { exportProject, node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";
 
 export default function() {
@@ -100,25 +100,60 @@ export default function() {
 		}
 	});
 
-	it("Split join", function() {
-		for(const [a, b, c] of THREE_PERMUTATION) {
-			generateFromFlaps([
-				{ id: a, x: 0, y: 0, radius: 15 },
-				{ id: b, x: 7, y: 20, radius: 6 },
-				{ id: c, x: 16, y: 12, radius: 5 },
-			]);
-			expectRepo("1,2,3", 1, 1, 2);
-		}
+	describe("Split join", function() {
+		it("Creates split pattern with two devices", function() {
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 15 },
+					{ id: b, x: 7, y: 20, radius: 6 },
+					{ id: c, x: 16, y: 12, radius: 5 },
+				]);
+				expectRepo("1,2,3", 1, 1, 2);
+			}
 
-		for(const [a, b, c] of THREE_PERMUTATION) {
-			generateFromFlaps([
-				{ id: a, x: 0, y: 0, radius: 15 },
-				{ id: b, x: 20, y: 7, radius: 6 },
-				{ id: c, x: 12, y: 16, radius: 5 },
-			]);
-			expectRepo("1,2,3", 1, 1, 2);
-		}
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 15 },
+					{ id: b, x: 20, y: 7, radius: 6 },
+					{ id: c, x: 12, y: 16, radius: 5 },
+				]);
+				expectRepo("1,2,3", 1, 1, 2);
+			}
+		});
+
+		it("Creates split pattern with three devices", function() {
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				const flaps = [
+					{ id: a, x: 0, y: 0, radius: 21 },
+					{ id: b, x: 14, y: 25, radius: 6 },
+					{ id: c, x: 25, y: 14, radius: 6 },
+				];
+				generateFromFlaps(flaps);
+				const set = new Set(flaps.map(f => f.x + "," + f.y));
+				const devices = expectRepo("1,2,3", -1, -1, 3);
+				for(const device of devices) {
+					const anchors = device.$anchors.flat();
+					for(const anchor of anchors) {
+						set.delete(anchor.x + "," + anchor.y);
+					}
+				}
+				expect(set.size).to.equal(0, "devices are all moved towards the flaps");
+			}
+		});
+
+		it("Checks slack distance", function() {
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 139, y: 0, radius: 80 },
+					{ id: b, x: 73, y: 124, radius: 60 },
+					{ id: c, x: 84, y: 125, radius: 56 },
+				]);
+				expectRepo("1,2,3", 0);
+			}
+		});
 	});
+
+
 }
 
 const THREE_PERMUTATION = [
