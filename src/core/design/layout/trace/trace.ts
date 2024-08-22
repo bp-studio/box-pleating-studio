@@ -68,9 +68,18 @@ export class Trace {
 
 		const result = ctx.$trim(path);
 		if(!rawMode) return result;
+		else return Trace._rawModeFinalCheck(result, hinges);
+	}
 
-		// In raw mode, we need to make one extra check to make sure the
-		// generated contour actually fits the given hinge segment.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * In raw mode, we need to make one extra check to make sure the
+	 * generated contour actually fits the given hinge segment.
+	 */
+	private static _rawModeFinalCheck(result: PatternContour | null, hinges: Path): PatternContour | null {
 		if(!result) return null;
 		const lastPoint = result[result.length - 1];
 		for(let i = hinges.length - 1; i > 0; i--) {
@@ -79,10 +88,6 @@ export class Trace {
 		}
 		return null;
 	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private _createFilteredRidges(start: Point, end: Point, directionalVector: Vector): Set<Ridge> {
 		let startLine = new Line(start, directionalVector);

@@ -96,7 +96,7 @@ function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants: Quadra
 			const hingeSegments = createHingeSegments(outer, trace.$repo.$direction);
 			const context: TraceContext = { map, trace, node, index };
 			for(const hingeSegment of hingeSegments) {
-				processTrace(hingeSegment, context, leaves);
+				processTrace(hingeSegment, context, leaves, traceContour.$raw);
 			}
 		}
 	}
@@ -122,10 +122,10 @@ interface TraceContext {
 	readonly index: number;
 }
 
-function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves: NodeId[]): void {
+function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves: NodeId[], rawMode: boolean): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
-	const contour = context.trace.$generate(hingeSegment, map[0], map[1], Boolean(leaves));
+	const contour = context.trace.$generate(hingeSegment, map[0], map[1], rawMode);
 	if(contour) {
 		State.$contourWillChange.add(context.node); // Acquiring pattern contours
 		contour.$ids = context.trace.$repo.$nodeSet.$nodes;

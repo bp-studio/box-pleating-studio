@@ -47,6 +47,17 @@ describe("Contour", function() {
 			expect(outer2).to.equalPath("(2,1),(2,-5),(2.5,-5),(3,-17/3),(3,-25/3),(2.5,-9),(2,-9),(2,-15),(13,-15),(13,-43/3),(14,-13),(14,1)");
 		});
 
+		/** Added v0.6.16 */
+		it("Breaks up raw group if any flap is used in more than one repos", function() {
+			parseTree(
+				"(12,8,2),(12,15,2),(12,14,10),(12,13,10),(8,4,5),(15,20,16),(15,19,4),(15,18,4)",
+				"(13,10,24,2,0),(14,60,24,2,0),(18,55,8,0,0),(19,17,8,0,0),(20,36,0,0,0),(4,36,25,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			const outer = result.graphics["re12,15"].contours[0].outer;
+			expect(outer).to.equalPath("(61,14),(50,14),(50,18),(22,18),(22,14),(11,14),(11,2),(18,2),(18,-18),(54,-18),(54,2),(61,2)");
+		});
+
 	});
 
 	describe("Graphical contour", function() {

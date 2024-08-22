@@ -168,4 +168,17 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		this.tree.$sheet.$toggle(mode === "tree");
 		if(mode === "layout") this.layout.$flaps.$sync.clear();
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Debug methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	///#if DEBUG
+	/* istanbul ignore next: debug */
+	public createTestCase(): string {
+		const edges = this.tree.toJSON().edges.map(e => `(${e.n1},${e.n2},${e.length})`).join(",");
+		const flaps = this.layout.toJSON().flaps.map(f => `(${f.id},${f.x},${f.y},${f.width},${f.height})`).join(",");
+		return `parseTree(\n\t"${edges}",\n\t"${flaps}"\n);`;
+	}
+	///#endif
 }

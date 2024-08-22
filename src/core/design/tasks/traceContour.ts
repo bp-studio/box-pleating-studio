@@ -168,7 +168,7 @@ function toTraceContour(node: ITreeNode, roughContour: RoughContour, criticalCor
 		const corners = new Map<string, CriticalCorner>();
 		for(const c of cornerArray) corners.set(c.$signature, c);
 		if(!checkCriticalCorners(result.$outer, corners)) {
-			const nodeSets = new Set([...corners.values()].map(c => c.$nodeSet));
+			const nodeSets = [...corners.values()].map(c => c.$nodeSet);
 			result.$outer = createRawContour(node, nodeSets, leaves, roughContour.$children);
 			result.$raw = true;
 		}
@@ -212,30 +212,35 @@ function checkCriticalCorners(result: readonly Path[], corners: Set<string> | Ma
 	return corners.size == 0;
 }
 
+interface LeafSet extends Array<NodeId> {
+	/** This {@link LeafSet} contains a leaf that is shared with another LeafSet. */
+	hasOverlapping?: boolean;
+}
+
 /**
  * Create the outer contour in raw mode.
  */
 function createRawContour(
-	node: ITreeNode, nodeSets: Set<NodeSet>,
+	node: ITreeNode, nodeSets: NodeSet[],
 	leaves: readonly NodeId[], children: readonly RoughContour[]
 ): PathEx[] {
 	const tree = State.$tree;
 	const remainingLeaves = new Set(leaves);
 	const result: PathEx[] = [];
 
-	// Group the leaves involved in the same NodeSet.
-	// Note that it is possible for two groups to contain the same leaf id, but that is perfectly fine.
-	for(const nodeSet of nodeSets) {
-		const group: NodeId[] = [];
-		for(const id of nodeSet.$leaves) {
-			if(remainingLeaves.has(id)) {
-				remainingLeaves.delete(id);
-				group.push(id);
-			}
+	const leafSets = createLeafSets(nodeSets, remainingLeaves);
+	const sharedLeaves = new Set<NodeId>();
+	for(const leafSet of leafSets) {
+		if(leafSet.hasOverlapping) { // We'll handle these later
+			for(const id of leafSet) sharedLeaves.add(id);
+		} else { // Group all relevant leaves into one raw contour
+			let outers = leafSet.map(id => createRawContourForLeaf(node, tree.$nodes[id]!));
+			if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
+			result.push(...packPaths(outers, leafSet));
 		}
-		let outers = group.map(id => createRawContourForLeaf(node, tree.$nodes[id]!));
-		if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
-		result.push(...packPaths(outers, group));
+	}
+	for(const id of sharedLeaves) { // Each shared leaf will have its own raw contour
+		result.push(...packPaths([createRawContourForLeaf(node, tree.$nodes[id]!)], [id]));
 	}
 
 	// All the rest goes to the same group.
@@ -245,7 +250,8 @@ function createRawContour(
 		// as the performance of aaUnion drops when the number of polygons increases.
 		// However, since the remaining doesn't involve any critical corners,
 		// we can simply expand relevant child contours to get it,
-		// this could greatly improve the performance of taking the union...
+		// this could greatly improve the performance of taking the union.
+		// However, there is one catch here (see recursiveExpand).
 		const paths = recursiveExpand(node, children, remainingLeaves, node.$length);
 		const outers = expander.$get(paths);
 		result.push(...packPaths(outers, [...remainingLeaves]));
@@ -255,7 +261,35 @@ function createRawContour(
 }
 
 /**
- * ...However, there is one catch here.
+ * Ideally, we want to have as few raw contours as possible reduce the cost of processing them,
+ * so we would like to group all leaves belonging to the same {@link NodeSet}.
+ * However, in some cases a single leaf could belong to more than one NodeSet.
+ * For such "shared leaf", we have to fully break up the corresponding NodeSet into individual raw contours,
+ * otherwise generated pattern contours could be blocked by the rough contours from other raw contours.
+ *
+ * In this subroutine, we identify those leaves that are shared by more than one NodeSet,
+ * and mark the corresponding {@link LeafSet.hasOverlapping}.
+ */
+function createLeafSets(nodeSets: NodeSet[], remainingLeaves: Set<NodeId>): LeafSet[] {
+	const leafSets = nodeSets.map(nodeSet => nodeSet.$leaves.filter(id => remainingLeaves.has(id))) as LeafSet[];
+	const leafMap = new Map<NodeId, LeafSet>();
+	for(const leafSet of leafSets) {
+		for(const id of leafSet) {
+			remainingLeaves.delete(id);
+			if(leafMap.has(id)) {
+				// Found overlapping
+				leafMap.get(id)!.hasOverlapping = true;
+				leafSet.hasOverlapping = true;
+				break;
+			} else {
+				leafMap.set(id, leafSet);
+			}
+		}
+	}
+	return leafSets;
+}
+
+/**
  * As we collect the relevant child contours,
  * we need to exclude those leaves that are already grouped,
  * so we cannot just expand the immediate child contours.

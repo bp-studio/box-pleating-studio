@@ -72,7 +72,10 @@ export class TraceContext {
 			}
 
 			// Case 2: normal ridges
-			const intersection = getNextIntersection(ridges, ray, hinge);
+			const intersection = getNextIntersection(
+				ridges, ray,
+				hinge.p1 // In finding initial vector, the head of the hinge should be ignored.
+			);
 			if(!intersection) continue;
 			const result = {
 				point: intersection.point,
@@ -124,14 +127,21 @@ export class TraceContext {
 	}
 }
 
-export function getNextIntersection(ridges: Iterable<Ridge>, node: TraceNode, edge?: Line): RidgeIntersection | null {
+/**
+ * @param omit If given, this point will be considered invalid intersection and ignored.
+ */
+export function getNextIntersection(ridges: Iterable<Ridge>, node: TraceNode, omit?: Point): RidgeIntersection | null {
 	let result: RidgeIntersection | null = null;
 	const { point, vector, last: shift } = node;
 	for(const ridge of ridges) {
-		const intersection = getIntersection(ridge, point, vector, true, Boolean(edge)) as RidgeIntersection | null;
+		const intersection = getIntersection(
+			ridge, point, vector,
+			true,
+			Boolean(omit),
+			ridge.$type !== undefined	// Outgoing ridges should be treated as rays.
+		) as RidgeIntersection | null;
 
-		// In finding initial vector, the head of the given edge should be ignored.
-		if(!intersection || edge && intersection.point.eq(edge.p1)) continue;
+		if(!intersection || omit && intersection.point.eq(omit)) continue;
 
 		const angle = shift ? getAngle(vector, shift) : undefined;
 

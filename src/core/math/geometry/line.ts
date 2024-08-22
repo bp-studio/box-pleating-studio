@@ -303,9 +303,18 @@ export interface IIntersection<T extends Line = Line> {
 	readonly dist: Fraction;
 }
 
+/**
+ * Given a point {@link p} and a directional vector {@link v},
+ * determine whether it will intersect a given {@link line}.
+ * @param headless If set to `true`, exclude the intersection that is on the opposite direction of {@link v}.
+ * @param tailless If set to `true`, exclude the intersection that goes beyond the length of {@link v}.
+ * @param targetAsRay If set to `true`, the {@link line} is treated as a ray instead.
+ */
 export function getIntersection<T extends Line>(
 	line: T, p: Point, v: Vector,
-	headless?: boolean, tailless?: boolean
+	headless: boolean = false,
+	tailless: boolean = false,
+	targetAsRay: boolean = false
 ): IIntersection<T> | null {
 	const v1 = line.p2.$sub(line.p1);
 	const m = new Matrix(v1._x, v._x, v1._y, v._y).$inverse;
@@ -313,7 +322,7 @@ export function getIntersection<T extends Line>(
 
 	const r = m.$multiply(new Point(p.$sub(line.p1)));
 	const a = r._x, b = r._y.neg;
-	if(a.lt(Fraction.ZERO) || a.gt(Fraction.ONE)) return null;
+	if(a.lt(Fraction.ZERO) || !targetAsRay && a.gt(Fraction.ONE)) return null;
 	if(headless && b.lt(Fraction.ZERO)) return null;
 	if(tailless && b.gt(Fraction.ONE)) return null;
 
