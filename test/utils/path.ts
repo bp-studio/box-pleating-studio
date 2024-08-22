@@ -4,7 +4,7 @@ import { same } from "shared/types/geometry";
 import type { Path } from "shared/types/geometry";
 
 export function parsePath(s: string): Path {
-	const numbers = s.match(/-?\d+(\.\d+)?/g)?.map(d => Number(d)) ?? [];
+	const numbers = parseFractions(s).match(/-?\d+(\.\d+)?/g)?.map(d => Number(d)) ?? [];
 	const result: Path = [];
 	for(let i = 0; i + 1 < numbers.length; i += 2) {
 		result.push({ x: numbers[i], y: numbers[i + 1] });
@@ -28,13 +28,17 @@ declare global {
 	}
 }
 
+function parseFractions(s: string): string {
+	return s.replace(/(\d+)\/(\d+)/g, (_, $1, $2) => (Number($1) / Number($2)).toString());
+}
+
 Assertion.addMethod("equalPath", function(pathString: string, circular: boolean = false) {
 	new Assertion(Array.isArray(this._obj)).to.be.true;
 	const path = (this._obj as Path).concat();
 	const orgPathString = pathToString(path);
 
 	// Accepts fractions
-	pathString = pathString.replace(/(\d+)\/(\d+)/g, (_, $1, $2) => (Number($1) / Number($2)).toString());
+	pathString = parseFractions(pathString);
 
 	if(circular) {
 		const match = pathString.match(/\((-?\d*\.?\d+),(-?\d*\.?\d+)(?:,-?\d*\.?\d+){0,3}\)/)!;

@@ -47,12 +47,12 @@ export class Overlap extends DivideAndCollect {
 
 	/** Test if two or more oriented paths overlap. */
 	private _test(polygon: Polygon): boolean {
-		for(const path of polygon) {
+		for(const [n, path] of polygon.entries()) {
 			const l = path.length;
 			for(let i = 0, j = l - 1; i < l; j = i++) {
 				const p1 = path[j];
 				const p2 = path[i];
-				const segment = new LineSegment(p1, p2);
+				const segment = new LineSegment(p1, p2, n);
 				// Here it is assumed that the inputs are oriented in clockwise direction.
 				const delta = xyComparator(p1, p2) < 0 ? -1 : 1;
 				this._addSegment(segment, delta);

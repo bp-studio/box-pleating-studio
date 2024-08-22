@@ -129,6 +129,18 @@ export class Gadget implements JGadget {
 		while(Overlap.$test(toPath(c1), path2)) {
 			c1 = shift(c1, step);
 			s++;
+
+			///#if DEBUG
+			if(s == OVERLAP_LIMIT) {
+				// If we get here, typically it means one of the contours is not simple.
+				// Goto joinLogic.ts to debug the issue.
+				console.log(this.$contour.map(p => p.toString()));
+				console.log(c2.map(p => p.toString()));
+				console.log(JSON.stringify([[this.$contour.map(p => p.$toIPoint()), c2.map(p => p.$toIPoint())]]));
+				debugger;
+				throw new Error("Contour error");
+			}
+			///#endif
 		}
 		this.$addSlack(q1, s);
 	}
@@ -164,3 +176,7 @@ export class Gadget implements JGadget {
 		return g;
 	}
 }
+
+///#if DEBUG
+const OVERLAP_LIMIT = 1000;
+///#endif

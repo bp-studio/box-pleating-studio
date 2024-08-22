@@ -1,11 +1,13 @@
 import { Point } from "core/math/geometry/point";
 import { JoineeBuilder } from "../joineeBuilder";
 import { cache } from "core/utils/cache";
+import { Gadget } from "../../pattern/gadget";
+import { Fraction } from "core/math/fraction";
 
 import type { Vector } from "core/math/geometry/vector";
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Joinee } from "../joinee";
-import type { JAddOn, JDevice } from "shared/json";
+import type { JAddOn, JDevice, JGadget } from "shared/json";
 import type { Joiner } from "../joiner";
 import type { Piece } from "../../pattern/piece";
 
@@ -136,15 +138,34 @@ export abstract class JoinLogic {
 		const { j1, j2 } = this;
 		const oriented = this.joiner.$oriented;
 		this.data.addOns = undefined;
+		const g1 = j1.$toGadget(shouldClone, oriented);
+		const g2 = j2.$toGadget(shouldClone, oriented, offset);
+
+		// Uncomment the following for debugging non-simple contour issue
+		// JoinLogic.debugContour(g1, g2);
+
 		return [
-			{
-				gadgets: [
-					j1.$toGadget(shouldClone, oriented),
-					j2.$toGadget(shouldClone, oriented, offset),
-				],
-				addOns,
-			},
+			{ gadgets: [g1, g2], addOns },
 			size + extraSize * EXTRA_SIZE_WEIGHT,
 		];
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Debug methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	///#if DEBUG
+	/* istanbul ignore next: debug */
+	public static debugContour(g1: JGadget, g2: JGadget): void {
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+		const pt = new Point(new Fraction(429, 7 as Positive), new Fraction(520, 7 as Positive));
+		const c1 = new Gadget(g1).$contour;
+		const c2 = new Gadget(g2).$contour;
+		if(c1.some(p => p.eq(pt)) || c2.some(p => p.eq(pt))) {
+			// Paste the result of the following output to debug tools for inspection
+			console.log(JSON.stringify([[c1.map(p => p.$toIPoint())], [c2.map(p => p.$toIPoint())]]));
+			debugger;
+		}
+	}
+	///#endif
 }

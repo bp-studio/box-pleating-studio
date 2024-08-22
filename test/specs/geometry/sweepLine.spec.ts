@@ -4,6 +4,8 @@ import { Clip } from "core/math/sweepLine/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { Overlap } from "core/math/sweepLine/clip/overlap";
 
+import type { OverlapIntersector } from "core/math/sweepLine/clip/overlapIntersector";
+
 export default function() {
 
 	describe("Stacking", function() {
@@ -51,14 +53,13 @@ export default function() {
 			expect(result).to.be.true;
 		});
 
-		it("Does not check for self-intersection", function() {
+		/** v0.6.17, see {@link OverlapIntersector.$possibleIntersection}. */
+		it("Ignores self-intersections resulting from floating error", function() {
 			const result = Overlap.$test(
-				// These two are obviously disjoint, but the result will be true
-				// since the second path have self-intersection at (11,8)
-				parsePath("(-1,-1),(-1,-2),(-2,-2),(-2,-1)"),
-				parsePath("(0,0),(1,3),(15,10),(14,7),(11,8),(2,1)")
+				parsePath("(1019/16,907/16),(1131/16,2139/16),(1611/16,2539/16),(1499/16,1307/16)"),
+				parsePath("(28,109),(61,131),(42,36),(1375/31,1130/31),(8,9)")
 			);
-			expect(result).to.be.true;
+			expect(result).to.be.false;
 		});
 
 	});
