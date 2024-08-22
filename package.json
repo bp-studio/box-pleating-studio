@@ -36,7 +36,7 @@
 	},
 	"devDependencies": {
 		"@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-		"@intlify/vue-i18n-extensions": "^6.0.0",
+		"@intlify/vue-i18n-extensions": "^6.2.0",
 		"@makeomatic/gulp-wrap-js": "^1.0.2",
 		"@mutsuntsai/esbuild-plugin-vue": "^0.1.6",
 		"@playwright/test": "^1.45.1",

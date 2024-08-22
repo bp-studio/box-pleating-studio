@@ -95,8 +95,8 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2
       '@intlify/vue-i18n-extensions':
-        specifier: ^6.0.0
-        version: 6.0.0(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.3)))(vue@3.4.31(typescript@5.5.3))
+        specifier: ^6.2.0
+        version: 6.2.0(@intlify/shared@9.13.1)(@vue/compiler-dom@3.4.31)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.3)))(vue@3.4.31(typescript@5.5.3))
       '@makeomatic/gulp-wrap-js':
         specifier: ^1.0.2
         version: 1.0.2
@@ -1572,12 +1572,23 @@ packages:
     resolution: {integrity: sha512-u3b6BKGhE6j/JeRU6C/RL2FgyJfy6LakbtfeVF8fJXURpZZTzfh3e05J0bu0XPw447Q6/WUp3C4ajv4TMS4YsQ==}
     engines: {node: '>= 16'}
 
-  '@intlify/vue-i18n-extensions@6.0.0':
-    resolution: {integrity: sha512-rPS0SLjkfD5Bk0HI0c9xkfnuYKlajjl8YMenzL9r1G8DyYvCQhJ6Q4LrgXDweVHHqhpXGW+8t/x0wTW7nTA18A==}
+  '@intlify/vue-i18n-extensions@6.2.0':
+    resolution: {integrity: sha512-RN6Jg80NxY/yv408zFQz/pSLh6mw7cFU/WoykzNsb24L8H0YvktOkdLtJSZcKgRiAlbK0MpK4n4nG2n8FxHiNw==}
     engines: {node: '>= 18'}
     peerDependencies:
+      '@intlify/shared': ^9.0.0 || ^10.0.0
+      '@vue/compiler-dom': ^3.0.0
       vue: ^3.0.0
-      vue-i18n: ^9.0.0
+      vue-i18n: ^9.0.0 || ^10.0.0
+    peerDependenciesMeta:
+      '@intlify/shared':
+        optional: true
+      '@vue/compiler-dom':
+        optional: true
+      vue:
+        optional: true
+      vue-i18n:
+        optional: true
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -7353,9 +7364,10 @@ snapshots:
 
   '@intlify/shared@9.13.1': {}
 
-  '@intlify/vue-i18n-extensions@6.0.0(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.3)))(vue@3.4.31(typescript@5.5.3))':
+  '@intlify/vue-i18n-extensions@6.2.0(@intlify/shared@9.13.1)(@vue/compiler-dom@3.4.31)(vue-i18n@9.13.1(vue@3.4.31(typescript@5.5.3)))(vue@3.4.31(typescript@5.5.3))':
     dependencies:
       '@babel/parser': 7.24.8
+    optionalDependencies:
       '@intlify/shared': 9.13.1
       '@vue/compiler-dom': 3.4.31
       vue: 3.4.31(typescript@5.5.3)
