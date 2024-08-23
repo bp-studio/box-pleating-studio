@@ -28,6 +28,8 @@ function pattern(): void {
 	}
 
 	for(const s of State.$stretches.values()) {
+		if(!s.$repo.$isValid) continue;
+
 		if(!s.$repo.$pattern) {
 			UpdateResult.$setPatternNotFound();
 			continue;

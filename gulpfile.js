@@ -82,11 +82,11 @@ gulp.task("deployDQ", gulp.series(
 ));
 
 const deployMsg = `Before releasing, please check the following steps:
-1. Update the version number in package.json.
-2. Add update logs.
-3. Edit README.md if needed.
-4. Run tests and make sure that new codes are covered.
-5. Add relevant tests.
+1. Check if there's unresolved fatal error report.
+2. Consider updating dependencies.
+3. Update the version number in package.json, and add update logs.
+4. Edit README.md if needed.
+5. Add relevant tests, and make sure that new codes are covered.
 6. Deploy to DEV at least once to ensure there's no major building error.
 Are you sure you want to deploy?"`;
 

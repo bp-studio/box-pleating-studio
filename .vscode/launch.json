@@ -20,7 +20,7 @@
 			"request": "launch",
 			"name": "Test PolyBool",
 			"internalConsoleOptions": "neverOpen",
-			"file": "${workspaceFolder}/build/test/index.htm",
+			"file": "${workspaceFolder}/build/tools/index.htm",
 			"sourceMaps": true,
 			"skipFiles": [
 				"${workspaceFolder}/build/dist/lib/**"

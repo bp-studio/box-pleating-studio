@@ -54,6 +54,9 @@ export class River extends Control {
 	// Proxy properties
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public get maxWidth(): number {
+		return this.$edge.maxLength;
+	}
 	public get length(): number {
 		return this.$destructed ? 0 : this.$edge.length;
 	}

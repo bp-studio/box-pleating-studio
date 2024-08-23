@@ -3,8 +3,10 @@ import { Direction, SlashDirection, getNodeId, getQuadrant } from "shared/types/
 import { State } from "core/service/state";
 import { Vector } from "core/math/geometry/vector";
 
+import type { NodeSet } from "../nodeSet";
+import type { NodeId } from "shared/json/tree";
 import type { Comparator } from "shared/types/types";
-import type { Junctions } from "../junction/validJunction";
+import type { Junctions, ValidJunction } from "../junction/validJunction";
 import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
 import type { QuadrantDirection, QuadrantCode, PerQuadrant } from "shared/types/direction";
@@ -29,13 +31,17 @@ export class Quadrant {
 	/** The starting point of tracing relative to the corner of the flap. */
 	private readonly o: IPoint;
 
+	private readonly _junctions: Junctions;
+
 	constructor(code: QuadrantCode, junctions: Junctions) {
 		this.$flap = State.$tree.$nodes[getNodeId(code)]!;
 		this.q = getQuadrant(code);
 		this.f = getFactors(this.q);
+		this._junctions = junctions;
 
 		const ox: number[] = [], oy: number[] = [];
-		for(const junction of junctions) {
+		for(let i = 0; i < junctions.length; i++) {
+			const junction = junctions[i];
 			ox.push(junction.$o.x);
 			oy.push(junction.$o.y);
 		}
@@ -44,6 +50,26 @@ export class Quadrant {
 		// Weight is relatively invariant as the entire repo moves,
 		// so can be calculated as constant.
 		this.w = pointWeight(this.$point, this.f);
+	}
+
+	/**
+	 * v0.6.17 Basic validity check: if the delta point of any two junctions
+	 * falls inside the circle, then this quadrant is clearly invalid.
+	 */
+	public $checkValidity(nodeSet: NodeSet): boolean {
+		for(let i = 0; i < this._junctions.length; i++) {
+			const j1 = this._junctions[i];
+			for(let j = i + 1; j < this._junctions.length; j++) {
+				const j2 = this._junctions[j];
+				const offset = getDeltaPointOffsetFromCorner(j1, j2);
+				const n1 = this._getOppositeId(j1);
+				const n2 = this._getOppositeId(j2);
+				const r = nodeSet.$distTriple(n1, n2, this.$flap.id).d3;
+				const deltaPtDist = new Vector(r - offset.x, r - offset.y).$length;
+				if(deltaPtDist < r) return false;
+			}
+		}
+		return true;
 	}
 
 	public get $startEndPoints(): [Point, Point] {
@@ -113,6 +139,10 @@ export class Quadrant {
 	private x(d: number): number {
 		return this.$point.x + this.f.x * d;
 	}
+
+	private _getOppositeId(j: ValidJunction): NodeId {
+		return j.$a.id == this.$flap.id ? j.$b.id : j.$a.id;
+	}
 }
 
 export const quadrantComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
@@ -147,5 +177,12 @@ export function getFactors(q: QuadrantDirection): ISignPoint {
 	return {
 		x: q == Direction.UR || q == Direction.LR ? 1 : -1,
 		y: q == Direction.UR || q == Direction.UL ? 1 : -1,
+	};
+}
+
+function getDeltaPointOffsetFromCorner(j1: ValidJunction, j2: ValidJunction): IPoint {
+	return {
+		x: Math.min(j1.$o.x, j2.$o.x),
+		y: Math.min(j1.$o.y, j2.$o.y),
 	};
 }

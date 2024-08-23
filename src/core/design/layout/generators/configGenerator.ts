@@ -35,6 +35,8 @@ export function* configGenerator(repo: Repository, prototype?: JStretch): Genera
 		}
 	}
 
+	if(!repo.$isValid) return; // No need to search
+
 	// Search for Configuration
 	if(repo.$junctions.length === 1) {
 		const context = new ConfigGeneratorContext(repo);

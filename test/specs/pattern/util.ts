@@ -1,6 +1,7 @@
 import { createTree } from "@utils/tree";
 import { State } from "core/service/state";
 
+import type { Repository } from "core/design/layout/repository";
 import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Configuration } from "core/design/layout/configuration";
 import type { Tree } from "core/design/context/tree";
@@ -24,6 +25,10 @@ export function generateFromFlaps(flaps: IFlap[]): Tree {
 	);
 }
 
+/**
+ * If a negative count number is given, the corresponding checking is skipped.
+ */
+export function expectRepo(id: string): Repository;
 export function expectRepo(id: string, configCount: number): readonly Configuration[];
 export function expectRepo(id: string, configCount: number, patternCount: number): readonly Pattern[];
 export function expectRepo(
@@ -31,22 +36,24 @@ export function expectRepo(
 ): readonly Device[];
 export function expectRepo(
 	id: string,
-	configCount: number,
+	configCount?: number,
 	patternCount?: number,
 	deviceCount?: number
-): readonly Configuration[] | readonly Pattern[] | readonly Device[] {
+): Repository | readonly Configuration[] | readonly Pattern[] | readonly Device[] {
 
 	complete();
 	const stretch = State.$stretches.get(id)!;
 	expect(stretch).to.be.not.undefined;
-	expect(stretch.$repo.$configurations.length).to.equal(configCount);
+	if(configCount === undefined) return stretch.$repo;
+
+	if(configCount >= 0) expect(stretch.$repo.$configurations.length).to.equal(configCount);
 	if(patternCount === undefined) return stretch.$repo.$configurations;
 
 	const config = stretch.$repo.$configurations[0];
-	expect(config.$length).to.equal(patternCount);
+	if(patternCount >= 0) expect(config.$length).to.equal(patternCount);
 	if(deviceCount === undefined) return config.$patterns;
 
 	const pattern = config.$pattern!;
-	expect(pattern.$devices.length).to.equal(deviceCount);
+	if(deviceCount >= 0) expect(pattern.$devices.length).to.equal(deviceCount);
 	return pattern.$devices;
 }

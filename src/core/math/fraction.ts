@@ -4,8 +4,13 @@ import { reduceInt } from "./utils/gcd";
 /** floor(sqrt(max_safe_integer / 2)) */
 const MAX_SAFE = 67108863;
 
-/** Allowed error for converting a floating number to a fraction. */
-const ERROR = 1e-12;
+/**
+ * Allowed error for converting a floating number to a fraction.
+ *
+ * v0.6.17: We enlarge the value of this to avoid falsely
+ * create a fraction with huge denominator.
+ */
+const ERROR = 1e-10;
 
 /** Using continuous fractions to obtain a rational approximation of any floating number. */
 export function toFraction(v: number, err: number): Fraction {

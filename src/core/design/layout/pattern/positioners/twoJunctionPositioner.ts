@@ -70,18 +70,19 @@ function makeSpitJoinPattern(context: PositioningContext): boolean {
 	for(const device of nonJoin) {
 		const overlap = device.$partition.$overlaps[0];
 		const j = context.$getJunctions(device)[0];
-		const corner = overlap.c[0];
-		if(corner.e! < 0) {
-			const gadget = device.$gadgets[0];
-			const index = convertIndex(corner.e);
-			const q = corner.q!;
-			const targetCorner = device.$pattern.$config.$overlaps[index].c[q];
-			let offset = j.sx - context.$getSpan(gadget, 0) - gadget.scrX;
-			if(targetCorner.type == CornerType.socket) {
-				offset += device.$pattern.$gadgets[index].$slack[q];
-			}
-			device.$offset = offset;
+		const qOut = overlap.c[0].e! < 0 ? 0 : 2; // v0.6.17: orientation matters
+		const corner = overlap.c[qOut];
+		const gadget = device.$gadgets[0];
+		const index = convertIndex(corner.e);
+		const q = corner.q!;
+		const targetCorner = device.$pattern.$config.$overlaps[index].c[q];
+		let offset = j.sx - context.$getSpan(gadget, qOut) - gadget.scrX;
+		if(targetCorner.type == CornerType.socket) {
+			offset += device.$pattern.$gadgets[index].$slack[q];
 		}
+
+		if(offset < gadget.$slack[qOut]) return false;
+		if(qOut == 0) device.$offset = offset;
 	}
 
 	return true;

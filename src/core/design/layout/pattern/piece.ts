@@ -159,8 +159,13 @@ export class Piece extends Region implements JPiece {
 		return { contour, ridges };
 	}
 
+	/**
+	 * Return the original contour (not including shifting and detour)
+	 * of this piece. Used only for constructing standard join.
+	 */
 	public get $originalContour(): readonly Point[] {
-		return this._points;
+		const unshift = this._shift.$neg; // v0.6.17: This is needed
+		return this._points.map(p => p.$add(unshift));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
