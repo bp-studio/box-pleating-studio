@@ -175,7 +175,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		if(this.$junctions.length == 1) return true;
 		for(const quadrants of this.$directionalQuadrants) {
 			for(const quadrant of quadrants) {
-				if(!quadrant.$isValid) return false;
+				if(!quadrant.$checkValidity(this.$nodeSet)) return false;
 			}
 		}
 		return true;
