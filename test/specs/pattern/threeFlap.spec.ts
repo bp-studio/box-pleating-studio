@@ -1,8 +1,20 @@
 import { expectRepo, generateFromFlaps } from "./util";
-import { exportProject, node, parseTree } from "@utils/tree";
+import { node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";
 
 export default function() {
+	it("Checks basic delta point validity", function() {
+		for(const [a, b, c] of THREE_PERMUTATION) {
+			generateFromFlaps([
+				{ id: a, x: 139, y: 0, radius: 80 },
+				{ id: b, x: 73, y: 124, radius: 60 },
+				{ id: c, x: 84, y: 125, radius: 56 },
+			]);
+			const repo = expectRepo("1,2,3");
+			expect(repo.$isValid).to.be.false;
+		}
+	});
+
 	it("Does not depend on the ordering of flap ids nor the transformation factors", function() {
 		for(const [a, b, c] of THREE_PERMUTATION) {
 			generateFromFlaps([
@@ -144,16 +156,14 @@ export default function() {
 		it("Checks slack distance", function() {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
-					{ id: a, x: 139, y: 0, radius: 80 },
-					{ id: b, x: 73, y: 124, radius: 60 },
-					{ id: c, x: 84, y: 125, radius: 56 },
+					{ id: a, x: 139, y: 0, radius: 126 },
+					{ id: b, x: 78, y: 124, radius: 12 },
+					{ id: c, x: 90, y: 125, radius: 8 },
 				]);
-				expectRepo("1,2,3", 0);
+				expectRepo("1,2,3", 1); // There would be 2 configs without the check
 			}
 		});
 	});
-
-
 }
 
 const THREE_PERMUTATION = [

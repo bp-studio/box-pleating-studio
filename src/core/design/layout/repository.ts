@@ -43,6 +43,9 @@ export class Repository implements ISerializable<JRepository | undefined> {
 
 	public readonly $junctions: JJunctions;
 
+	/** Whether the structure of this {@link Repository} makes sense. See {@link _checkValidity}(). */
+	public readonly $isValid: boolean;
+
 	/**
 	 * The reference point of the stretch,
 	 * which is the {@link ValidJunction.$tip} of the first junction.
@@ -77,6 +80,8 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		State.$repoToProcess.add(this);
 
 		this.$junctions = junctions.map(j => j.$toOrientedJSON(this.$f));
+		this.$isValid = Boolean(prototype?.pattern) || this._checkValidity();
+
 		this._configurations = new Store(configGenerator(this, prototype));
 		if(prototype?.repo) {
 			this._configurations.$rest();
@@ -156,6 +161,24 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		let j = this._joinerCache.get(key);
 		if(!j) this._joinerCache.set(key, j = new Joiner(overlaps, this));
 		return j;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Perform some basic checks to see if it's remotely possible
+	 * for this {@link Repository} to have a working pattern.
+	 */
+	private _checkValidity(): boolean {
+		if(this.$junctions.length == 1) return true;
+		for(const quadrants of this.$directionalQuadrants) {
+			for(const quadrant of quadrants) {
+				if(!quadrant.$isValid) return false;
+			}
+		}
+		return true;
 	}
 }
 

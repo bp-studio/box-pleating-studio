@@ -4,7 +4,7 @@ import { State } from "core/service/state";
 import { Vector } from "core/math/geometry/vector";
 
 import type { Comparator } from "shared/types/types";
-import type { Junctions } from "../junction/validJunction";
+import type { Junctions, ValidJunction } from "../junction/validJunction";
 import type { Repository } from "../repository";
 import type { ITreeNode } from "core/design/context";
 import type { QuadrantDirection, QuadrantCode, PerQuadrant } from "shared/types/direction";
@@ -26,6 +26,8 @@ export class Quadrant {
 	/** Weight for sorting {@link Quadrant}s. */
 	public readonly w: number;
 
+	public readonly $isValid: boolean;
+
 	/** The starting point of tracing relative to the corner of the flap. */
 	private readonly o: IPoint;
 
@@ -34,10 +36,27 @@ export class Quadrant {
 		this.q = getQuadrant(code);
 		this.f = getFactors(this.q);
 
+		const r = this.$flap.$length;
+		this.$isValid = true;
+
 		const ox: number[] = [], oy: number[] = [];
-		for(const junction of junctions) {
+		for(let i = 0; i < junctions.length; i++) {
+			const junction = junctions[i];
 			ox.push(junction.$o.x);
 			oy.push(junction.$o.y);
+
+			// v0.6.17 Basic validity check: if the delta point of any two junctions
+			// falls inside the circle, then this quadrant is clearly invalid.
+			for(let j = i + 1; j < junctions.length; j++) {
+				const offset = getDeltaPointOffsetFromCorner(junction, junctions[j]);
+				const deltaPtDist = new Vector(r - offset.x, r - offset.y).$length;
+				if(deltaPtDist < r) {
+					this.$isValid = false;
+					this.o = { x: 0, y: 0 };
+					this.w = 0;
+					return;
+				}
+			}
 		}
 		this.o = { x: Math.max(...ox), y: Math.max(...oy) };
 
@@ -147,5 +166,12 @@ export function getFactors(q: QuadrantDirection): ISignPoint {
 	return {
 		x: q == Direction.UR || q == Direction.LR ? 1 : -1,
 		y: q == Direction.UR || q == Direction.UL ? 1 : -1,
+	};
+}
+
+function getDeltaPointOffsetFromCorner(j1: ValidJunction, j2: ValidJunction): IPoint {
+	return {
+		x: Math.min(j1.$o.x, j2.$o.x),
+		y: Math.min(j1.$o.y, j2.$o.y),
 	};
 }
