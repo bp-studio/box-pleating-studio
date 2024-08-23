@@ -63,7 +63,6 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		yield this._result(true, R.$dist(T));
 	}
 
-
 	private _tryConvexTransform(e: Line, B: Point, D: Point, i: Index): [Point, Point] | null {
 		const { pt } = this.data;
 		const { j1, j2, f } = this;

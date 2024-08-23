@@ -25,6 +25,7 @@
 		"license-check": "pnpx license-checker --exclude \"MIT,Apache-2.0,BSD-2-Clause,ISC\"",
 		"lint": "eslint src",
 		"loc": "powershell \"(gci src -include *.ts,*.htm,*.scss,*.vue -recurse | select-string .).Count\"",
+		"postinstall": "playwright install --with-deps",
 		"start": "http-server build/debug -p 30783 -e htm -c-1",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"test": "mocha --require mocha-suppress-logs"
@@ -35,13 +36,16 @@
 		"yarn": "please-use-pnpm"
 	},
 	"devDependencies": {
+		"@eslint/compat": "^1.1.1",
+		"@eslint/eslintrc": "^3.1.0",
+		"@eslint/js": "^9.9.1",
 		"@fal-works/esbuild-plugin-global-externals": "^2.1.2",
 		"@intlify/vue-i18n-extensions": "^6.2.0",
 		"@makeomatic/gulp-wrap-js": "^1.0.2",
 		"@mutsuntsai/esbuild-plugin-vue": "^0.1.6",
+		"@mutsuntsai/stylistic": "^1.0.1",
 		"@playwright/test": "^1.46.1",
-		"@stylistic/eslint-plugin": "^1.8.1",
-		"@swc/core": "^1.7.14",
+		"@swc/core": "^1.7.18",
 		"@types/bootstrap": "^5.2.10",
 		"@types/chai": "^4.3.17",
 		"@types/gtag.js": "^0.0.20",
@@ -50,26 +54,22 @@
 		"@types/mocha": "^10.0.7",
 		"@types/node": "^22.5.0",
 		"@types/wicg-file-system-access": "^2023.10.5",
-		"@typescript-eslint/eslint-plugin": "^7.18.0",
-		"@typescript-eslint/parser": "^7.18.0",
-		"@vue/eslint-config-typescript": "13.0.0",
 		"chai": "^5.1.1",
 		"del": "7.1.0",
 		"esbuild": "^0.23.1",
 		"esbuild-ifdef": "^0.2.0",
 		"esbuild-sass-plugin": "^3.3.1",
-		"eslint": "^8.57.0",
+		"eslint": "^9.9.1",
 		"eslint-import-resolver-typescript": "^3.6.1",
-		"eslint-plugin-compat": "^4.2.0",
+		"eslint-plugin-compat": "^6.0.0",
 		"eslint-plugin-html": "^8.1.1",
-		"eslint-plugin-import": "^2.29.1",
-		"eslint-plugin-jsdoc": "^48.11.0",
-		"eslint-plugin-local-rules": "^2.0.1",
+		"eslint-plugin-jsdoc": "^50.2.2",
 		"eslint-plugin-mocha": "^10.5.0",
 		"eslint-plugin-typescript-compat": "^1.0.2",
 		"eslint-plugin-vue": "^9.27.0",
 		"fancy-log": "^2.0.0",
 		"global-jsdom": "^24.0.0",
+		"globals": "^15.9.0",
 		"gulp": "^5.0.0",
 		"gulp-all": "^1.1.0",
 		"gulp-clean-css": "^4.3.0",
@@ -113,6 +113,7 @@
 		"tsconfig-paths": "^4.2.0",
 		"ttf2woff2": "^6.0.1",
 		"typescript": "^5.5.4",
+		"typescript-eslint": "^8.2.0",
 		"vinyl-ftp": "^0.6.1",
 		"vue-eslint-parser": "^9.4.3",
 		"workbox-build": "^7.1.1",
@@ -153,7 +154,8 @@
 		},
 		"peerDependencyRules": {
 			"allowAny": [
-				"esbuild"
+				"esbuild",
+				"eslint"
 			]
 		}
 	}

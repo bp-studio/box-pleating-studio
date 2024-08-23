@@ -32,7 +32,6 @@ export class TernaryHeap<T> extends Heap<T> {
 		return this._data.length;
 	}
 
-
 	public $pop(): T | undefined {
 		if(this.$isEmpty) return undefined;
 		const result = this._data[0];

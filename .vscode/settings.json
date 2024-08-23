@@ -92,7 +92,7 @@
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
 		".*rc.json": ".$(capture)ignore",
-		".eslintrc.json": "eslint-local-rules.js",
+		"eslint.config.mjs": "eslint-local-rules.js",
 		".gitignore": ".gitattributes",
 		"package.json": "pnpm-lock.yaml, .npmrc"
 	},

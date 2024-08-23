@@ -53,7 +53,6 @@
 	const notify = shallowRef(false);
 	const checking = shallowRef(false);
 
-	// eslint-disable-next-line compat/compat
 	const serviceWorker = navigator.serviceWorker;
 
 	onMounted(() => {

@@ -5,7 +5,6 @@ const through2 = require("gulp-through2");
 function copyInOrderOf(source, order) {
 	if(typeof source != "object" || Array.isArray(source)) return source;
 	const result = {};
-	// eslint-disable-next-line guard-for-in
 	for(const key in order) result[key] = copyInOrderOf(source[key], order[key]);
 	return result;
 }

@@ -7,7 +7,7 @@ export function useFieldId(): string {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function useInput(
 	props: { readonly modelValue: unknown },
-	emit: Function
+	emit: Action
 ) {
 	const value = shallowRef<unknown>();
 	let focused = false;

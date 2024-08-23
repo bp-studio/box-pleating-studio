@@ -80,4 +80,3 @@ export default function() {
 	describe("Two flap patterns", twoFlapSpec);
 	describe("Three flap patterns", threeFlapSpec);
 }
-
