@@ -1,7 +1,7 @@
 <template>
 	<div v-t="'panel.river.type'" class="h5 panel-title"></div>
 	<div class="panel-grid">
-		<Number :label="$t('panel.river.width')" v-model="subject.length" hotkeys="d.rd,d.ri" />
+		<Number :label="$t('panel.river.width')" v-model="subject.length" :min="1" :max="subject.maxWidth" hotkeys="d.rd,d.ri" />
 	</div>
 	<div class="mt-3">
 		<AsyncButton :click="() => subject.delete()" v-t="'keyword.delete'" />
