@@ -44,7 +44,7 @@ export class NodeSet {
 
 		const heap = new MutableHeap<ITreeNode>(nodeComparator);
 		const coverage = new Map<ITreeNode, Quadrant[]>();
-		const numLeaves = this.$leaves.length;
+		const numQuadrants = quadrants.size;
 		for(const id of this.$leaves) {
 			const leaf = State.$tree.$nodes[id]!;
 			heap.$insert(leaf);
@@ -60,10 +60,10 @@ export class NodeSet {
 		if(junctions.length > 1) this._lcaMap = new IntDoubleMap();
 		while(!heap.$isEmpty) {
 			const node = heap.$pop()!;
-			const coveredLeaves = coverage.get(node)!;
+			const coveredQuadrants = coverage.get(node)!;
 
-			// Stop processing if we've reached the LCA
-			if(coveredLeaves.length == numLeaves) {
+			// Stop processing if we've covered everything (i.e. reached the LCA)
+			if(coveredQuadrants.length == numQuadrants) {
 				coverage.delete(node);
 				continue;
 			}
@@ -74,10 +74,10 @@ export class NodeSet {
 			const parentCoverage = getOrSetEmptyArray(coverage, parent, () => heap.$insert(parent));
 			if(this._lcaMap && parentCoverage.length) {
 				for(const A of parentCoverage) {
-					for(const B of coveredLeaves) this._lcaMap.set(A.$flap.id, B.$flap.id, parent);
+					for(const B of coveredQuadrants) this._lcaMap.set(A.$flap.id, B.$flap.id, parent);
 				}
 			}
-			parentCoverage.push(...coveredLeaves);
+			parentCoverage.push(...coveredQuadrants);
 		}
 
 		nodes.sort(minComparator);
