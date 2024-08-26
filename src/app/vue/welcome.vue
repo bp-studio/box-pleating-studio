@@ -109,7 +109,6 @@
 	const installAvailable =
 		"onbeforeinstallprompt" in window &&
 		hasServiceWorker &&
-		// eslint-disable-next-line compat/compat
 		!navigator.serviceWorker.controller;
 
 	const state = shallowRef<installState>(installState.uninstalled);

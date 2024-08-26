@@ -14,23 +14,23 @@ interface Store {
 function onApprove(details: PayPal.OrderResponseBody, store: Store): void {
 	if(gtag) {
 		gtag("event", "purchase", {
-			"transaction_id": details.id,
-			"affiliation": "PayPal",
-			"value": store.amount.value,
-			"currency": "USD",
-			"shipping": store.extra.value,
-			"items": [
+			transaction_id: details.id,
+			affiliation: "PayPal",
+			value: store.amount.value,
+			currency: "USD",
+			shipping: store.extra.value,
+			items: [
 				{
-					"id": "default",
-					"name": "Supporting Box Pleating Studio",
-					"category": "Donation",
-					"quantity": 1,
-					"price": store.amount.value,
+					id: "default",
+					name: "Supporting Box Pleating Studio",
+					category: "Donation",
+					quantity: 1,
+					price: store.amount.value,
 				},
 			],
 		});
 	}
-	store.name.value = details.payer.name?.given_name;
+	store.name.value = details.payer!.name?.given_name;
 	store.step.value = 2;
 }
 
@@ -41,7 +41,7 @@ export function initPayPalButton(init: (action: PayPal.OnInitActions) => void, s
 	}
 
 	const purchase_units: PayPal.PurchaseUnit[] = [];
-	purchase_units[0] = { amount: { value: "" } };
+	purchase_units[0] = { amount: { currency_code: "USD", value: "" } };
 
 	if(!paypal.Buttons) return; // type guard
 	paypal.Buttons({
@@ -63,7 +63,7 @@ export function initPayPalButton(init: (action: PayPal.OnInitActions) => void, s
 		},
 		createOrder(data: Record<string, unknown>, actions: PayPal.CreateOrderActions) {
 			store.processing.value = true;
-			return actions.order.create({ purchase_units });
+			return actions.order.create({ intent: "AUTHORIZE", purchase_units });
 		},
 		onApprove(data: Record<string, unknown>, actions: PayPal.OnApproveActions): Promise<void> {
 			if(!actions.order) return Promise.resolve();

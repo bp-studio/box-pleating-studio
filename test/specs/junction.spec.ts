@@ -110,7 +110,6 @@ describe("Junction", function() {
 
 });
 
-
 function getJunctions(valid: true): ValidJunction[];
 function getJunctions(valid: false): InvalidJunction[];
 function getJunctions(valid: boolean): Junction[] {

@@ -31,7 +31,6 @@ export class River extends Control {
 	private readonly _hinge: SmoothGraphics;
 	private readonly _ridge: SmoothGraphics;
 
-
 	constructor(layout: Layout, edge: Edge, graphics: GraphicsData) {
 		const sheet = layout.$sheet;
 		super(sheet);

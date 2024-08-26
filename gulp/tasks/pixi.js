@@ -52,7 +52,6 @@ module.exports.pixiCore = () =>
 		}))
 		.pipe(gulp.dest(config.dest.dist + "/lib"));
 
-
 module.exports.pixi = () =>
 	gulp.src(base + "/pixi.ts", { base })
 		.pipe(newer({

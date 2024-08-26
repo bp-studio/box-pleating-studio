@@ -204,7 +204,7 @@ function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 			///#if !DEBUG
 			worker.terminate(); // Terminate immediately in this case
 			resolve({
-				"error": {
+				error: {
 					message: "Computation timeout",
 					coreTrace: "",
 				} as CoreError,

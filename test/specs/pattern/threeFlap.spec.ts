@@ -91,7 +91,7 @@ export default function() {
 				{ id: c, x: 15, y: 8, radius: 6 },
 			]);
 			const device = expectRepo("1,2,3", 1,
-				2, //Should find two standard joins, one concave and one convex
+				2, // Should find two standard joins, one concave and one convex
 				1 // Standard join creates 1 Device
 			)[0];
 			expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");

@@ -43,10 +43,10 @@
 			page_title: document.title,
 			page_path: "/",
 			app_name: document.title,
-			app_version: "__APP_VERSION__"
+			app_version: "__APP_VERSION__",
 		};
-		gtag('js', new Date());
-		gtag('config', 'G-GG1TEZGBCQ', app_config);
+		gtag("js", new Date());
+		gtag("config", "G-GG1TEZGBCQ", app_config);
 
 		// Setup dark mode if needed immediately on first visit, to avoid flashing
 		if(!localStorage.getItem("settings") && matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -191,7 +191,7 @@
 	-->
 	<script>
 		/** Launching Error Manager */
-		var errMgr = new (function() {
+		var errMgr = new function() {
 			var self = this;
 			var resourceErrorHandler = function(e) {
 				if(e.filename) {
@@ -203,7 +203,7 @@
 			var display = function(id, v, c) {
 				var el = document.getElementById(id);
 				if(!el) return;
-				el.style.display = v ? 'block' : 'none';
+				el.style.display = v ? "block" : "none";
 				if(c) el.innerHTML += c;
 				return el;
 			};
@@ -246,31 +246,31 @@
 			}
 
 			// Register service worker
-			if(location.protocol == 'https:') {
-				if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-				else setRunErr("Service worker is required in BP Studio, but is not supported in your browser.")
+			if(location.protocol == "https:") {
+				if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+				else setRunErr("Service worker is required in BP Studio, but is not supported in your browser.");
 			}
 
 			self.setRunErr = setRunErr;
 			self.setResErr = setResErr;
 			self.setCustomError = function(title, message) {
-				display('divWorkspace');
-				display('divSpinner')
-				display('resource', true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
+				display("divWorkspace");
+				display("divSpinner");
+				display("resource", true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
 				errShown = true;
 				// eslint-disable-next-line compat/compat
 				throw new Error(); // stops all further processing
-			}
+			};
 
 			/** Finish listening to global errors */
 			self.end = function() {
-				window.removeEventListener('error', resourceErrorHandler, true);
-			}
+				window.removeEventListener("error", resourceErrorHandler, true);
+			};
 
 			/** Whether the launching fine so far. */
 			self.ok = function() {
 				return !resErr && !runErr && !errShown;
-			}
+			};
 
 			/** GA parameter has a 100-character limit, so we split the message into chunks. */
 			function splitString(str) {
@@ -287,13 +287,13 @@
 				var data = {
 					app_version: app_config.app_version,
 					user_agent: navigator.userAgent,
-					error: chunks[0]
+					error: chunks[0],
 				};
 				for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
 					data["data" + i] = chunks[i];
 				}
 				return data;
-			}
+			};
 
 			/**
 			 * Final processing.
@@ -305,12 +305,14 @@
 				if(errShown) return false;
 				errShown = true;
 
-				display('divWorkspace');
-				display('app');
+				display("divWorkspace");
+				display("app");
 				display(
-					resErr ? 'resource' : 'requirement',
+					resErr ? "resource" : "requirement",
 					true,
-					resErr ? resErr : "<br>Build number: " + app_config.app_version +
+					resErr ?
+						resErr :
+						"<br>Build number: " + app_config.app_version +
 						"<br>" + navigator.userAgent +
 						"<br>" + runErr
 				);
@@ -320,7 +322,7 @@
 					!(runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
 					!(/bot|crawl|spider/i.test(navigator.userAgent))
 				) {
-					gtag('event', 'unsupported', gaErrorData(runErr));
+					gtag("event", "unsupported", gaErrorData(runErr));
 				}
 				return false;
 			};
@@ -333,7 +335,7 @@
 				"__firefox__",
 				"$UCBrowser",
 				"_WebViewJavascriptBridge",
-				"hackLocationSuccess"
+				"hackLocationSuccess",
 			];
 
 			/**
@@ -350,11 +352,11 @@
 					if(msg.match(ignoreError[i])) return;
 				}
 				setRunErr([
-					msg.replace(/^.+: (.+)$/, "$1"),							// error message
+					msg.replace(/^.+: (.+)$/, "$1"), // error message
 					source.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
-					line,														// line number
-					column,														// column number
-					stack(error)												// stack trace
+					line, // line number
+					column, // column number
+					stack(error), // stack trace
 				].toString());
 			};
 			window.onunhandledrejection = function(e) {
@@ -365,7 +367,7 @@
 					return;
 				}
 				setRunErr(stack(e));
-			}
+			};
 
 			function stack(e) {
 				if(!e) return "";
@@ -373,26 +375,26 @@
 			}
 
 			// Switch to dark theme immediately if necessary to avoid white flash
-			var theme = 'system', dark = false;
+			var theme = "system", dark = false;
 			try {
 				// eslint-disable-next-line compat/compat
-				theme = JSON.parse(localStorage.getItem('settings')).theme;
-				dark = matchMedia('(prefers-color-scheme: dark)').matches;
+				theme = JSON.parse(localStorage.getItem("settings")).theme;
+				dark = matchMedia("(prefers-color-scheme: dark)").matches;
 			} catch(e) { }
-			if(theme == 'dark' || theme == 'system' && dark) {
-				document.documentElement.classList.add('dark');
+			if(theme == "dark" || theme == "system" && dark) {
+				document.documentElement.classList.add("dark");
 			}
 
 			// Quick legacy browser detection, covering:
 			// Chrome < 33, Edge < 12 & IE, Safari < 7.1, Firefox < 20, Opera < 20
-			if(typeof Promise == 'undefined' || typeof TextDecoder == 'undefined') {
-				runErr = 'Legacy browser';
+			if(typeof Promise == "undefined" || typeof TextDecoder == "undefined") {
+				runErr = "Legacy browser";
 				window.onload = self.callback;
 			} else {
 				// Capture <script> or <link> loading error
-				window.addEventListener('error', resourceErrorHandler, true);
+				window.addEventListener("error", resourceErrorHandler, true);
 			}
-		})();
+		}();
 
 		// Top level objects
 		var i18n, bp;

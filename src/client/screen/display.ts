@@ -3,7 +3,6 @@ import { Container } from "@pixi/display";
 import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
 import { Ticker } from "@pixi/core";
 
-
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
 import { useControlEventBoundary } from "./controlEventBoundary";
@@ -69,7 +68,6 @@ namespace Display {
 	export let canvas: HTMLCanvasElement;
 	export let designs: Container;
 	export let ui: Container;
-
 
 	// Automatically switch Pixi on or off by the opening of projects
 	async function toggleDisplay(on: boolean): Promise<void> {

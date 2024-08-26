@@ -21,7 +21,7 @@ function ssg() {
 	});
 }
 
-const insertVersion = (package) => $.through2(
+const insertVersion = package => $.through2(
 	content => content
 		.replace("__VERSION__", package.version)
 		.replace("__APP_VERSION__", package.app_version)

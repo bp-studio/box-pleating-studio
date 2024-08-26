@@ -19,7 +19,6 @@ const SIDES = [Side.top, Side.right, Side.bottom, Side.left];
 const minComparator: Comparator<AABBSide> = (a, b) => a.$key - b.$key;
 const maxComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
 
-
 //=================================================================
 /**
  * {@link AABB} (Axis-Aligned Bounding Box) is an orthogonal rectangular range.
