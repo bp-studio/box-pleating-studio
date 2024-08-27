@@ -26,7 +26,7 @@ function legacyPlugin(name, alias = name) {
 export default [
 	{
 		name: "Global ignores",
-		ignores: ["{build,lib,coverage}/**"],
+		ignores: ["{build,lib,coverage}/**", "src/app/gen/**"],
 	},
 	{
 		name: "Matching file extensions",
@@ -256,6 +256,7 @@ export default [
 			parserOptions: {
 				sourceType: "module",
 				project: true,
+				extraFileExtensions: [".vue"],
 			},
 		},
 		plugins: {

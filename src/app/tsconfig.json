@@ -2,9 +2,16 @@
 	"compilerOptions": {
 		"baseUrl": "..",
 		"jsx": "preserve",
+		"resolveJsonModule": true,
 		"paths": {
 			"@/*": [
 				"app/vue/*"
+			],
+			"temp/*": [
+				"../build/temp/*"
+			],
+			"lib/*": [
+				"../lib/*"
 			]
 		}
 	},

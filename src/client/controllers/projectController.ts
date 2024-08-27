@@ -7,11 +7,12 @@ import ProjectService from "client/services/projectService";
 import type { ShallowRef } from "vue";
 import type { JProject, ProjId } from "shared/json";
 
-/** The worker instance that is pre-generated and is standing-by; declared in HTML. */
-declare let __worker: Worker | undefined;
+function createWorker(): Worker {
+	return new Worker(/* webpackChunkName: "core" */ new URL("../../core/main.ts", import.meta.url));
+}
 
-/** The URL of the worker. Declared in HTML. */
-declare const __worker_src: string;
+/** The worker instance that is pre-generated and is standing-by. */
+let __worker: Worker | undefined = createWorker();
 
 export interface IProjectController {
 	readonly current: ShallowRef<Project | null>;
@@ -56,7 +57,7 @@ export namespace ProjectController {
 
 	/** Returns the standing-by worker, or create a new worker. */
 	function getOrCreateWorker(): Worker {
-		const worker = __worker ? __worker : new Worker(__worker_src);
+		const worker = __worker ? __worker : createWorker();
 		__worker = undefined;
 		return worker;
 	}
@@ -102,10 +103,10 @@ export namespace ProjectController {
 
 	function makeProject(json: RecursivePartial<JProject>): Promise<Project> {
 		const p = new Project(json, getOrCreateWorker());
-		///#if DEBUG
+		/// #if DEBUG
 		// eslint-disable-next-line typescript-compat/compat
 		registry.register(p, p.id);
-		///#endif
+		/// #endif
 		projectMap.set(p.id, p);
 		return p.$initialize();
 	}
@@ -120,7 +121,7 @@ export namespace ProjectController {
 		proj.$destruct(); // Destructing must go first
 		if(current.value == proj) current.value = null;
 		projectMap.delete(proj.id);
-		if(projectMap.size == 0) __worker = new Worker(__worker_src);
+		if(projectMap.size == 0) __worker = createWorker();
 		if(DEBUG_ENABLED) console.timeEnd("Close project");
 	}
 }

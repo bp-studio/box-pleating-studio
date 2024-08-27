@@ -6,6 +6,7 @@ import HistoryManager from "./changes/history";
 import { options } from "client/options";
 import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
+import { callWorker } from "app/utils/workerUtility";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
 import type { CoreError, JProject, ProjId } from "shared/json";
@@ -201,7 +202,7 @@ function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 		// Setup a timeout mechanism in production mode.
 		const timeout = setTimeout(() => {
 			// We don't do that in debug mode, otherwise debugging will be impossible.
-			///#if !DEBUG
+			/// #if !DEBUG
 			worker.terminate(); // Terminate immediately in this case
 			resolve({
 				error: {
@@ -209,9 +210,9 @@ function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 					coreTrace: "",
 				} as CoreError,
 			});
-			///#endif
+			/// #endif
 		}, CORE_TIMEOUT);
-		app.callWorker<CoreResponse>(worker, request).then(response => {
+		callWorker<CoreResponse>(worker, request).then(response => {
 			clearTimeout(timeout);
 			resolve(response);
 		});

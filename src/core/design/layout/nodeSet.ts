@@ -151,8 +151,8 @@ function getLeaves(junctions: Junctions): NodeId[] {
 		leafSet.add(j.$b.id);
 	}
 	const leaves = Array.from(leafSet);
-	///#if DEBUG
+	/// #if DEBUG
 	leaves.sort(minComparator);
-	///#endif
+	/// #endif
 	return leaves;
 }

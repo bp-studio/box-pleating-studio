@@ -16,7 +16,7 @@
 				<div class="text-center mt-3" id="paypal-button-container"></div>
 				<div v-if="processing" v-t="'donate.wait'"></div>
 			</div>
-			<div class="flex-grow-1" v-if="step == 2">
+			<div class="flex-grow-1" v-else-if="step == 2">
 				<div class="h4" v-t="'donate.title'"></div>
 				<div>{{ $t('donate.thank', [name]) }}</div>
 			</div>

@@ -4,24 +4,16 @@
 	</div>
 </template>
 
-<script lang="ts">
-	declare const Popper: typeof popper;
-</script>
-
 <script setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
-
-	import Lib from "app/services/libService";
-
-	import type * as popper from "@popperjs/core";
 
 	defineOptions({ name: "ContextMenu" });
 
 	const el = shallowRef<HTMLDivElement>();
 	const initialized = shallowRef(false);
 
-	Lib.ready.then(() => initialized.value = true);
+	import("@popperjs/core").then(() => initialized.value = true);
 
 	let shown: boolean = false;
 
@@ -33,7 +25,8 @@
 		document.addEventListener("mousedown", handle, { capture: true, passive: true });
 	});
 
-	function show(e: MouseEvent): void {
+	async function show(e: MouseEvent): Promise<void> {
+		const Popper = await import("@popperjs/core");
 		Popper.createPopper(
 			{ getBoundingClientRect: () => new DOMRect(e.pageX, e.pageY) },
 			el.value!,

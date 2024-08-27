@@ -272,7 +272,7 @@ export class Line {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 
 	/* istanbul ignore next: debug */
 	public static $parseTest<T extends Line = Line>(jsons: TestLine<T>[]): T[] {
@@ -286,7 +286,7 @@ export class Line {
 		}) as T[];
 	}
 
-	///#endif
+	/// #endif
 }
 
 type TestLine<T extends Line> =

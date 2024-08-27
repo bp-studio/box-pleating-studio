@@ -11,10 +11,11 @@ import { lcpReady, phase } from "app/misc/lcpReady";
 import { doEvents } from "shared/utils/async";
 import App from "@/app.vue";
 import Core from "app/core";
-import Lib from "app/services/libService";
 import LanguageService from "app/services/languageService";
 import { init as settingInit } from "app/services/settingService";
 
+import "temp/bootstrap.min.css";
+import "temp/bps/style.css";
 import "app/style/main.scss";
 
 const TIME_TERMINATE = 100;
@@ -65,7 +66,7 @@ async function init(): Promise<void> {
 		// Load all non-critical resources
 		await doEvents();
 		LanguageService.setup();
-		await Lib.load();
+		await import("temp/font-awesome/css/all.min.css"); // load Font-Awesome here
 
 		// Phase 3 to 6
 		await runPhase(TOTAL_PHASES);

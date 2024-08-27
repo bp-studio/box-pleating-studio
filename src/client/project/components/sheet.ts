@@ -4,6 +4,7 @@ import { Graphics } from "@pixi/graphics";
 import { Rectangle } from "@pixi/core";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
+import settings from "app/services/settingService";
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { FULL_ZOOM, MARGIN, MARGIN_FIX } from "client/shared/constant";
@@ -189,7 +190,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$renderWidth;
 		let horizontalScale = (viewWidth - 2 * MARGIN) * factor / width;
-		if(app.settings.showLabel) {
+		if(settings.showLabel) {
 			const vw = viewWidth * factor - 2 * MARGIN_FIX;
 			const scales = [...this.$labels].map(label =>
 				label.$inferHorizontalScale(width, vw)
@@ -233,11 +234,11 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {
-		this._layers[Layer.axisParallels].visible = app.settings.showAxialParallel;
-		this._layers[Layer.dot].visible = app.settings.showDot;
-		this._layers[Layer.hinge].visible = app.settings.showHinge;
-		this._layers[Layer.label].visible = app.settings.showLabel;
-		this._layers[Layer.ridge].visible = app.settings.showRidge;
+		this._layers[Layer.axisParallels].visible = settings.showAxialParallel;
+		this._layers[Layer.dot].visible = settings.showDot;
+		this._layers[Layer.hinge].visible = settings.showHinge;
+		this._layers[Layer.label].visible = settings.showLabel;
+		this._layers[Layer.ridge].visible = settings.showRidge;
 	}
 
 	/** Adjust the position of the container by the scrolling position. */
@@ -265,7 +266,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._mask.endFill();
 
 		// Draw grid lines
-		this._gridGraphics.visible = app.settings.showGrid;
+		this._gridGraphics.visible = settings.showGrid;
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()
 				.lineStyle(style.grid.width * sh, style.grid.color);

@@ -1,7 +1,6 @@
 import { computed, reactive, shallowRef } from "vue";
 
 import { defaultTitle, isTouch } from "app/shared/constants";
-import Lib from "./libService";
 import Dialogs from "./dialogService";
 import Settings from "./settingService";
 import { doEvents } from "shared/utils/async";
@@ -18,7 +17,7 @@ import type { Device } from "client/project/components/layout/device";
  * We encapsule the Client in this service so that it is not exposed in other parts of the app.
  * Declared in HTML.
  */
-declare const bp: typeof Client;
+export let bp: typeof Client;
 
 /** Before the Studio is initialized, use a default value as placeholder. */
 export function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
@@ -54,8 +53,11 @@ namespace StudioService {
 
 	/** Initialize the Client, and return whether it was successful. */
 	export async function init(): Promise<boolean> {
-		await Promise.all(bpLibs.map(l => Lib.loadScript(l)));
-		if(typeof bp === "undefined") return false;
+		try {
+			bp = await import(/* webpackChunkName: "client" */ "../../client/main");
+		} catch {
+			return false;
+		}
 
 		await doEvents();
 		await bp.init();

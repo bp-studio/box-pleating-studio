@@ -14,7 +14,8 @@
 			<!-- Use official color -->
 			<i class="fab fa-discord" style="color: #5865F2;" />Discord
 		</a>
-		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank" rel="noopener">
+		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank"
+		   rel="noopener">
 			<i class="far fa-comment-dots" />{{ $t("toolbar.help.discussions") }}
 		</a>
 		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/issues/new/choose" target="_blank"
@@ -43,6 +44,7 @@
 
 	import { computed, onMounted, shallowRef } from "vue";
 
+	import logs from "app/gen/log";
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
 	import Dialogs from "app/services/dialogService";
 	import { updateReady } from "app/misc/updateReady";

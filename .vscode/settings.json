@@ -85,6 +85,7 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
 	},
+	"eslint.useFlatConfig": true,
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.expand": false,
 	"explorer.fileNesting.patterns": {
@@ -97,6 +98,7 @@
 		"package.json": "pnpm-lock.yaml, .npmrc"
 	},
 	"files.exclude": {
+		"src/app/gen": true,
 		"**/debug.log": true,
 		"test-results/": true,
 		".nyc_output": true

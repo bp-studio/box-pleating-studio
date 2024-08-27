@@ -20,17 +20,19 @@
 	import { onMounted, shallowRef } from "vue";
 
 	import HotkeyService from "app/services/hotkeyService";
-	import Lib from "app/services/libService";
+
+	import type Modal from "bootstrap/js/dist/modal";
 
 	defineOptions({ name: "DialogModal" });
 
-	let modal: bootstrap.Modal;
+	let modal: Modal;
 	const el = shallowRef<HTMLElement>();
 
 	onMounted(() => {
-		Lib.ready.then(() => {
+		import("bootstrap/js/dist/modal").then(module => {
+			const Modal = module.default;
 			if(!el.value) return;
-			modal = new Bootstrap.Modal(el.value, { backdrop: "static" });
+			modal = new Modal(el.value, { backdrop: "static" });
 		});
 	});
 
@@ -38,7 +40,7 @@
 	const message = shallowRef<string>();
 
 	async function show(msg: string, key: Func<KeyboardEvent, boolean>, reset?: Action): Promise<void> {
-		await Lib.ready;
+		await import("bootstrap/js/dist/modal");
 		initialized.value = true;
 
 		const wait = lastHidden;

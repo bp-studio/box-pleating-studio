@@ -25,7 +25,6 @@
 	import { shallowRef } from "vue";
 
 	import Studio from "app/services/studioService";
-	import Lib from "app/services/libService";
 
 	defineOptions({ name: "Dropdown" });
 
@@ -48,8 +47,9 @@
 	function init(): void {
 		if(initialized.value) return;
 		initialized.value = true;
-		Lib.ready.then(() => {
-			const dd = new Bootstrap.Dropdown(btn.value!, {});
+		import("bootstrap/js/dist/dropdown").then(module => {
+			const Dropdown = module.default;
+			const dd = new Dropdown(btn.value!, {});
 
 			// Bootstrap doesn't support touch cancel
 			document.addEventListener("touchstart", event => {

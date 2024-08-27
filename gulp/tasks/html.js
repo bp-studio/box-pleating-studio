@@ -5,14 +5,11 @@ const fs = require("fs");
 const newer = require("../utils/newer");
 const { ssgI18n } = require("../utils/esbuild");
 const config = require("../config.json");
-const debug = require("../plugins/debug");
 const htmlMinOption = require("../html.json");
 
 function ssg() {
 	// polyfill
 	require("global-jsdom/register");
-	globalThis.locale = [];
-	globalThis.logs = [];
 	globalThis.matchMedia = () => ({ matches: false });
 
 	return ssgI18n({
@@ -42,31 +39,16 @@ gulp.task("html", () => {
 	// We cannot directly use `require` here,
 	// as that will likely get the outdated content.
 	const package = JSON.parse(fs.readFileSync("package.json").toString("utf8"));
-	return $.all(
-		// Debug
-		gulp.src(config.src.public + "/index.htm")
-			.pipe(newer({
-				dest: config.dest.debug + "/index.htm",
-				extra: [__filename, "package.json", config.src.app + "/**/*", "gulp/plugins/debug.js"],
-			}))
-			.pipe(insertVersion(package))
-			.pipe(debug())
-			.pipe(ssg())
-			.pipe(wrapIE())
-			.pipe(gulp.dest(config.dest.debug)),
-
-		// Dist
-		gulp.src(config.src.public + "/index.htm")
-			.pipe(newer({
-				dest: config.dest.dist + "/index.htm",
-				extra: [__filename, "package.json", config.src.app + "/**/*"],
-			}))
-			.pipe(insertVersion(package))
-			.pipe($.htmlMinifierTerser(htmlMinOption))
-			// Avoid VS Code Linter warnings
-			.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
-			.pipe(ssg())
-			.pipe(wrapIE())
-			.pipe(gulp.dest(config.dest.dist))
-	);
+	return gulp.src(config.src.app + "/html/index.htm")
+		.pipe(newer({
+			dest: config.dest.temp + "/index.htm",
+			extra: [__filename, "package.json", config.src.app + "/**/*"],
+		}))
+		.pipe(insertVersion(package))
+		.pipe($.htmlMinifierTerser(htmlMinOption))
+		// Avoid VS Code Linter warnings
+		.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+		.pipe(ssg())
+		.pipe(wrapIE())
+		.pipe(gulp.dest(config.dest.temp));
 });

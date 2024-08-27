@@ -5,6 +5,10 @@ let worker: Worker;
 
 type List = Record<string, string>;
 
+function createWorker(): Worker {
+	return new Worker(/* webpackChunkName: "jszip" */ new URL("lib/jszip/jszip.ts", import.meta.url));
+}
+
 //=================================================================
 /**
  * {@link JSZip} is a wrapper for JSZip library.
@@ -15,7 +19,7 @@ namespace JSZip {
 	 * Unzip a given zip file, and returns a filename-content dictionary.
 	 */
 	export async function decompress(buffer: ArrayBuffer): Promise<List> {
-		worker ||= new Worker("lib/jszip.js");
+		worker ||= createWorker();
 		const blob = new Blob([buffer]);
 		const url = URL.createObjectURL(blob);
 		const result = await callWorker<List>(worker, {
@@ -30,7 +34,7 @@ namespace JSZip {
 	 * Create a zip file using the given filename-content dictionary.
 	 */
 	export async function compress(files: List): Promise<Blob> {
-		worker ||= new Worker("lib/jszip.js");
+		worker ||= createWorker();
 		const url = await callWorker<string>(worker, {
 			command: "save",
 			payload: files,

@@ -4,5 +4,5 @@ import type * as appInstance from "app/main";
 // to avoid polluting the Donate project.
 declare global {
 	/** Global app instance, created in main.js. */
-	declare const app: typeof appInstance;
+	// declare const app: typeof appInstance;
 }

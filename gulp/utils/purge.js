@@ -6,8 +6,9 @@ const config = require("../config.json");
 const compare = [
 	config.src.app + "/**/*.vue",
 	config.src.app + "/**/*.scss",
+	config.src.app + "/**/*.htm",
 	config.src.donate + "/**/*.vue",
-	config.src.public + "/*.htm",
+	config.src.donate + "/**/*.htm",
 ];
 
 /**

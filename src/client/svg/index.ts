@@ -5,6 +5,7 @@ import { SvgGraphics } from "./svgGraphics";
 import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
 import { SelectionController } from "client/controllers/selectionController";
 import { toHex } from "shared/utils/color";
+import settings from "app/services/settingService";
 
 import type { LabelView } from "client/utils/label";
 import type { Project } from "client/project/project";
@@ -98,9 +99,9 @@ function getTransform(sheet: Sheet, height: number): string {
 
 function getBorderLayer(sheet: Sheet, borderPath: string): string {
 	let result = `<path class="border" d="${borderPath}" />`;
-	if(app.settings.showGrid || includeHiddenElement) {
+	if(settings.showGrid || includeHiddenElement) {
 		const graphics = new SvgGraphics();
-		graphics.$class = "grid" + (app.settings.showGrid ? "" : " hidden");
+		graphics.$class = "grid" + (settings.showGrid ? "" : " hidden");
 		sheet.grid.$drawGrid(graphics);
 		result += graphics.$get();
 	}
@@ -129,7 +130,7 @@ function getEdgeLayer(design: Design): string {
 }
 
 function getHingeLayer(design: Design): string {
-	const hidden = !app.settings.showHinge;
+	const hidden = !settings.showHinge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
@@ -145,7 +146,7 @@ function getHingeLayer(design: Design): string {
 }
 
 function getRidgeLayer(design: Design): string {
-	const hidden = !app.settings.showRidge;
+	const hidden = !settings.showRidge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
@@ -162,7 +163,7 @@ function getRidgeLayer(design: Design): string {
 }
 
 function getAxisParallelLayer(design: Design): string {
-	const hidden = !app.settings.showAxialParallel;
+	const hidden = !settings.showAxialParallel;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "axis-parallel";
@@ -186,7 +187,7 @@ function getJunctionLayer(design: Design): string {
 }
 
 function getDotLayer(design: Design): string {
-	const hidden = !app.settings.showDot;
+	const hidden = !settings.showDot;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "dot";
@@ -207,7 +208,7 @@ function getVertexLayer(design: Design): string {
 }
 
 function getLabelLayer(design: Design): string {
-	const hidden = !app.settings.showLabel;
+	const hidden = !settings.showLabel;
 	if(hidden && !includeHiddenElement) return "";
 	let result = "";
 	const s = ProjectService.scale.value;

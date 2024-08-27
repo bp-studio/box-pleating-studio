@@ -19,65 +19,45 @@ path.relative = function(from, to) {
 const gulp = require("gulp");
 const requireDir = require("require-dir");
 const seriesIf = require("./gulp/utils/seriesIf");
+const { exec } = require("child_process");
 
 requireDir("./gulp/tasks");
 
-gulp.task("share", gulp.series(
-	gulp.parallel(
-		"static",
-		"lib",
-		"donate",
-		"locale"
-	),
-	"link"
-));
-
-// Run all builds (except HTML and ServiceWorker)
+// Run all builds (except HTML)
 gulp.task("build", gulp.parallel(
-	"share",
-	"client",
-	"core",
-	"app"
+	"static",
+	"bootstrap",
+	"donate",
+	"locale"
 ));
 
-gulp.task("buildDebug", gulp.parallel(
-	"share",
-	"clientDebug",
-	"coreDebug",
-	"appDebug"
-));
+gulp.task("rsbuild", cb => exec("pnpm rsbuild build", cb));
 
-gulp.task("buildDist", gulp.parallel(
-	"share",
-	"clientDist",
-	"coreDist",
-	"appDist"
-));
-
-gulp.task("update", gulp.series(
-	"version",
-	"html",
-	"sw"
+gulp.task("buildDist", gulp.series(
+	gulp.parallel(
+		"build",
+		gulp.series("version", "html")
+	),
+	"rsbuild"
 ));
 
 gulp.task("deployDev", gulp.series(
 	"buildDist",
-	"update",
-	"uploadDev"
+	"uploadDev",
+	"cleanDev"
 ));
 
 gulp.task("deployQa", gulp.series(
 	"buildDist",
-	"update",
-	"uploadQa"
+	"uploadQa",
+	"cleanQa"
 ));
 
 gulp.task("deployDQ", gulp.series(
 	"buildDist",
-	"update",
 	gulp.parallel(
-		"uploadDev",
-		"uploadQa"
+		gulp.series("uploadDev", "cleanDev"),
+		gulp.series("uploadQa", "cleanQa")
 	)
 ));
 
@@ -102,8 +82,8 @@ gulp.task("deployPub", () => seriesIf(
 		return answers.ok;
 	},
 	"buildDist",
-	"update",
-	"uploadPub"
+	"uploadPub",
+	"cleanPub"
 ));
 
 // Clear all built files
@@ -114,7 +94,10 @@ gulp.task("clean", async () => {
 
 // The default build. It will build to the point that it can be run locally.
 // Press F5 in VS Code will execute this task by default.
-gulp.task("default", gulp.parallel("html", "buildDebug"));
+gulp.task("default", gulp.parallel(
+	"html",
+	"build"
+));
 
 // console.log("Require count", requireCount);
 // console.timeEnd("startup");

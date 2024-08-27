@@ -1,6 +1,7 @@
 const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const { existsSync } = require("fs");
+const { createHash } = require("node:crypto");
+const { existsSync, readFileSync, writeFileSync } = require("fs");
 
 const config = require("../config.json");
 const seriesIf = require("../utils/seriesIf");
@@ -14,6 +15,28 @@ const ftpConfig = existsSync(ftpConfigPath) ? require(ftpConfigPath) : null;
 function configGuard() {
 	if(!ftpConfig) throw new Error("The repo is not figured with FTP. This operation is for maintainers only.");
 	return true;
+}
+
+function compare(findCacheDirectory, tag) {
+	const cacheDir = findCacheDirectory({ name: "smart-ftp", create: true });
+	const cache = `${cacheDir}/${tag}.json`;
+	const records = existsSync(cache) ? JSON.parse(readFileSync(cache)) : [];
+	const map = new Map();
+	for(const record of records) map.set(record.path, record.hash);
+	records.length = 0;
+	return $.through2({
+		transform(content, file, encoding) {
+			const md5 = createHash("md5");
+			md5.update(file.contents);
+			const hash = md5.digest("hex");
+			records.push({ path: file.relative, hash });
+			if(map.get(file.relative) === hash) return null;
+		},
+		flushEmptyList: true,
+		flush(files) {
+			writeFileSync(cache, JSON.stringify(records));
+		},
+	});
 }
 
 function connect() {
@@ -48,6 +71,7 @@ function streamToPromise(stream) {
  * @param {(stream: NodeJS.ReadWriteStream) => NodeJS.ReadWriteStream} pipeFactory
  */
 async function ftpFactory(folder, additionalGlobs, pipeFactory) {
+	const findCacheDirectory = (await import("find-cache-dir")).default;
 	const conn = connect();
 	const sw = config.dest.dist + "/sw.js";
 	const globs = [
@@ -59,19 +83,18 @@ async function ftpFactory(folder, additionalGlobs, pipeFactory) {
 	const base = `/public_html/${folder}`;
 	const pipe = gulp.src(globs, {
 		base: config.dest.dist,
-		buffer: false,
 		dot: true, // for .htaccess
 		encoding: false, // Gulp v5
 	});
 	await streamToPromise(
 		(pipeFactory ? pipeFactory(pipe) : pipe)
-			.pipe(conn.newer(base))
+			.pipe(compare(findCacheDirectory, "bpstudio"))
 			.pipe(conn.dest(base))
 	);
 
 	// Ensure that sw.js is uploaded last, to avoid inconsistent update.
 	await streamToPromise(
-		gulp.src(sw, { base: config.dest.dist, buffer: false })
+		gulp.src(sw, { base: config.dest.dist })
 			.pipe(conn.dest(base))
 	);
 }

@@ -50,7 +50,7 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 
 	/* istanbul ignore next: debug */
 	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
@@ -73,5 +73,5 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 			cursor = cursor.$prev;
 		}
 	}
-	///#endif
+	/// #endif
 }

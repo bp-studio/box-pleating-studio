@@ -1,0 +1,15 @@
+/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bs-body-bg: #1e1e1e;
+		--bs-body-color: #ccc;
+		--bs-tertiary-bg: #666;
+		--bs-border-color: #222;
+	}
+
+	.form-control {
+		color: #eee;
+		color-scheme: dark;
+		background-color: #555 !important;
+	}
+}

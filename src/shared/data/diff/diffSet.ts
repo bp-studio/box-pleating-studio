@@ -25,10 +25,10 @@ export class DiffSet<T> {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 	public clear(): void {
 		this._oldSet.clear();
 		this._newSet.clear();
 	}
-	///#endif
+	/// #endif
 }

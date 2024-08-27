@@ -1,5 +1,7 @@
 import { readonly, shallowRef } from "vue";
 
+import { isTouch } from "app/shared/constants";
+
 const RETRY = 10;
 
 export type Viewport = Readonly<IDimension> & {
@@ -36,7 +38,7 @@ export function useViewport(el: HTMLElement): Viewport {
 	// Setup the events to lock the Viewport on virtual keyboard.
 	// This is based on whether the device is a pure touch device;
 	// of course other devices may also have virtual keyboards, but let's not worry about those for now.
-	if(app.isTouch) {
+	if(isTouch) {
 		document.addEventListener("focusin", e => {
 			const t = e.target;
 			if(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) {

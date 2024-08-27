@@ -1,13 +1,21 @@
 {
 	"compilerOptions": {
 		"jsx": "preserve",
-		"types": []
+		"types": [],
+		"resolveJsonModule": true,
+		"paths": {
+			"temp/*": [
+				"../build/temp/*"
+			]
+		}
 	},
 	"extends": "../../shared/tsconfig",
 	"include": [
 		"./**/*.ts",
 		"./**/*.vue",
+		"../../shared/frontend/locale.d.ts",
 		"../../shared/frontend/imports.d.ts",
-		"../../shared/frontend/shims-vue.d.ts"
+		"../../shared/frontend/shims-vue.d.ts",
+		"../../shared/types/**/*.d.ts"
 	]
 }

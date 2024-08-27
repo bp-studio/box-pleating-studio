@@ -130,7 +130,7 @@ export class Gadget implements JGadget {
 			c1 = shift(c1, step);
 			s++;
 
-			///#if DEBUG
+			/// #if DEBUG
 			/* istanbul ignore next: debug */
 			if(s == OVERLAP_LIMIT) {
 				// If we get here, typically it means one of the contours is not simple.
@@ -141,7 +141,7 @@ export class Gadget implements JGadget {
 				debugger;
 				throw new Error("Contour error");
 			}
-			///#endif
+			/// #endif
 		}
 		this.$addSlack(q1, s);
 	}
@@ -177,6 +177,6 @@ export class Gadget implements JGadget {
 	}
 }
 
-///#if DEBUG
+/// #if DEBUG
 const OVERLAP_LIMIT = 1000;
-///#endif
+/// #endif

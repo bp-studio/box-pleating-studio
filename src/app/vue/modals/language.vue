@@ -19,17 +19,19 @@
 	</div>
 </template>
 
-<script  setup lang="ts">
+<script setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
 
 	import Language from "app/services/languageService";
 
+	import type Modal from "bootstrap/js/dist/modal";
+
 	defineOptions({ name: "Language" });
 
 	const el = shallowRef<HTMLDivElement>();
 
-	let modal: bootstrap.Modal;
+	let modal: Modal;
 
 	function setLocale(l: string): void {
 		i18n.locale = l;
@@ -39,8 +41,9 @@
 		if(Language.options.length) modal.show();
 	}
 
-	onMounted(() => {
-		modal = new Bootstrap.Modal(el.value!);
+	onMounted(async () => {
+		const Modal = (await import("bootstrap/js/dist/modal")).default;
+		modal = new Modal(el.value!);
 		Language.onReset = show;
 		show();
 	});

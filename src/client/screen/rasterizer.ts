@@ -1,6 +1,7 @@
 import ProjectService from "client/services/projectService";
 import { svg } from "client/svg";
 import { display } from "./display";
+import { isDark, isPrinting } from "app/misc/isDark";
 
 import type { Project } from "client/project/project";
 
@@ -43,13 +44,13 @@ export async function beforePrint(proj: Project | null): Promise<void> {
 		// printing service on mobile devices.
 		setTimeout(() => URL.revokeObjectURL(old), GC_TIME);
 
-		app.isPrinting.value = true;
+		isPrinting.value = true;
 		const promise = new Promise((resolve, reject) => {
 			img.onload = resolve;
 			img.onerror = reject;
 			img.src = URL.createObjectURL(svg(proj!, false));
 		});
-		app.isPrinting.value = false;
+		isPrinting.value = false;
 		printing = true;
 		await promise;
 	}
@@ -75,7 +76,7 @@ export function png(proj: Project): Promise<Blob> {
 			canvas.height = img.clientHeight;
 
 			// Draw background
-			ctx.fillStyle = app.isDark.value ? "black" : "white";
+			ctx.fillStyle = isDark.value ? "black" : "white";
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 			// Draw the content of img onto canvas.

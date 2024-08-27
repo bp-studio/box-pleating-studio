@@ -5,7 +5,7 @@
 		{
 			"label": "Server",
 			"type": "shell",
-			"command": "pnpm start",
+			"command": "pnpm rsbuild dev",
 			"isBackground": true,
 			"presentation": {
 				"echo": true,
@@ -24,15 +24,18 @@
 				},
 				"background": {
 					"activeOnStart": true,
-					"beginsPattern": "Starting up http-server",
-					"endsPattern": "Available on"
+					"beginsPattern": "start   Compiling",
+					"endsPattern": "ready   Compiled"
 				}
+			},
+			"runOptions": {
+				"instanceLimit": 1
 			}
 		},
 		{
 			"label": "Gulp build",
 			"type": "shell",
-			"command": "pnpm build",
+			"command": "pnpm prebuild",
 			"presentation": {
 				"echo": true,
 				"reveal": "never",

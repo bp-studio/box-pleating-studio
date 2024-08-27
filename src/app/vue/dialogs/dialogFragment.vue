@@ -13,7 +13,6 @@
 
 	import { compRef } from "app/utils/compRef";
 	import { setup } from "app/services/dialogService";
-	import Lib from "app/services/libService";
 	import Spinner from "./spinner.vue";
 	import Alert from "./alert.vue";
 	import Confirm from "./confirm.vue";
@@ -30,7 +29,7 @@
 	const error = compRef(Error);
 
 	const initialized = shallowRef(false);
-	Lib.ready.then(() => initialized.value = true);
+	import("bootstrap/js/dist/modal").then(() => initialized.value = true);
 
 	onMounted(() => {
 		setup({

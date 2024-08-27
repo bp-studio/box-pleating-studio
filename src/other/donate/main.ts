@@ -1,6 +1,10 @@
 import { createSSRApp } from "vue";
 import { createI18n } from "vue-i18n";
 
+import "temp/bootstrap.min.css";
+import "./style.css";
+
+import locale from "app/gen/locale";
 import App from "./app.vue";
 
 // For unknown reason, the following line leads to ESLint error.

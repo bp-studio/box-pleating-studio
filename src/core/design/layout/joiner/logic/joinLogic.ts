@@ -154,7 +154,7 @@ export abstract class JoinLogic {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 	/* istanbul ignore next: debug */
 	public static debugContour(g1: JGadget, g2: JGadget): void {
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -167,5 +167,5 @@ export abstract class JoinLogic {
 			debugger;
 		}
 	}
-	///#endif
+	/// #endif
 }

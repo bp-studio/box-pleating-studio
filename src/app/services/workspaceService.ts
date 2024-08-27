@@ -1,20 +1,13 @@
 import { computed, reactive, shallowRef, watch, nextTick as vueNextTick } from "vue";
 
 import Dialogs from "./dialogService";
-import Studio from "./studioService";
+import Studio, { bp } from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { isOnline } from "app/shared/constants";
 
 import type { CoreError, JProject, ProjId } from "shared/json";
-import type * as Client from "client/main";
 import type { Project } from "client/project/project";
-
-/**
- * We encapsule the Client in this service so that it is not exposed in other parts of the app.
- * Declared in HTML.
- */
-declare const bp: typeof Client;
 
 type ProjectProto = { design: { title: string } };
 

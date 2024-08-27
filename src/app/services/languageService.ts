@@ -2,6 +2,7 @@ import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 import probablyChina from "probably-china";
 
+import locale from "app/gen/locale";
 import { copyright } from "app/misc/copyright";
 import { useDebounce } from "app/utils/timerUtility";
 
