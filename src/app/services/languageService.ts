@@ -3,7 +3,6 @@ import { createI18n } from "vue-i18n";
 import probablyChina from "probably-china";
 
 import locale from "app/gen/locale";
-import { copyright } from "app/misc/copyright";
 import { useDebounce } from "app/utils/timerUtility";
 
 import type { I18n } from "vue-i18n";
@@ -37,8 +36,10 @@ namespace LanguageService {
 			silentFallbackWarn: true,
 			messages: locale,
 		});
-		i18n = plugin.global;
-		const _ = copyright.value; // warm-up
+		Object.defineProperty(window, "i18n", {
+			writable: false,
+			value: plugin.global,
+		});
 		return plugin;
 	}
 

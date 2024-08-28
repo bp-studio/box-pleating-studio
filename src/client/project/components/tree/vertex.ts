@@ -1,4 +1,4 @@
-import { Circle } from "@pixi/core";
+import { Circle } from "@pixi/math";
 
 import { Layer } from "client/shared/layers";
 import { field, shallowRef } from "client/shared/decorators";

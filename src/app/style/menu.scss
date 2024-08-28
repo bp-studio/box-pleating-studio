@@ -1,0 +1,60 @@
+
+.notify {
+	display: inline-block;
+
+	width: 0.25em;
+	height: 0.25em;
+
+	background-color: red;
+	border-radius: 0.125em;
+
+	.dropdown-item > & {
+		position: relative;
+		top: -0.5em;
+	}
+
+	button > & {
+		position: absolute;
+		top: 0.3rem;
+		right: 0.3rem;
+	}
+}
+
+.dot-stack {
+	position: relative;
+	height: 1rem;
+
+	> * {
+		position: absolute;
+		top: 0.25rem;
+		left: 0.5rem;
+
+		/* Simply setting font size won't work on desktops. */
+		transform: scale(0.5);
+	}
+}
+
+.dropdown-item:not(.disabled) {
+	&:hover,
+	&:active {
+		color: #fff;
+		text-decoration: none;
+		background-color: var(--bs-primary);
+		background-image: var(--bs-gradient);
+	}
+}
+
+.dropdown-item:hover i {
+	/* Disable all custom icon color on hover */
+	color: unset !important;
+}
+
+.dropdown-submenu {
+	position: relative;
+
+	>.dropdown-menu {
+		top: 0;
+		left: calc(100% - 0.5rem);
+		margin-top: -0.5rem;
+	}
+}

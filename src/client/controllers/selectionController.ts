@@ -1,6 +1,6 @@
 import { computed, shallowReactive, watch } from "vue";
 import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/core";
+import { Rectangle } from "@pixi/math";
 
 import { Draggable } from "client/base/draggable";
 import { $isTouch } from "./share";

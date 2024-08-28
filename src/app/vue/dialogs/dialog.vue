@@ -78,13 +78,3 @@
 	});
 
 </script>
-
-<style>
-	.modal-backdrop + .modal-backdrop {
-		z-index: 1061 !important;
-	}
-
-	.modal-second {
-		z-index: 1062 !important;
-	}
-</style>

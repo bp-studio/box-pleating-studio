@@ -30,7 +30,6 @@ const buildIcon = () =>
 			extra: [__filename, "gulp/plugins/woff2.js"],
 		}))
 		.pipe(woff2("bps"))
-		.pipe($.if(file => file.extname == ".css", $.cleanCss()))
 		.pipe(gulp.dest(config.dest.temp + "/bps"));
 
 /** FontAwesome */

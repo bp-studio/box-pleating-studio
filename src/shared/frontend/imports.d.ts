@@ -1,12 +1,9 @@
 // Third-party library types
 import type { VueI18n } from "vue-i18n";
-import type { BpsLocale } from "./locale";
+import type * as Client from "client/main";
 import "@types/gtag.js";
 
 declare global {
-	// This one is needed since Bootstrap package is lazily loaded.
-	// declare const Bootstrap: typeof bootstrap;
-
 	/** Launching error manager, defined in HTML. */
 	declare const errMgr: {
 		end(): void;
@@ -22,12 +19,9 @@ declare global {
 	/** App info, defined in HTML. */
 	declare const app_config: Record<string, string>;
 
-	/** List of version logs, defined in log.js. */
-	// declare const logs: number[];
-
-	/** Locale messages, defined in locale.js. */
-	// declare const locale: Record<string, BpsLocale>;
+	/** Global instance of the Client. Declared in HTML. */
+	declare const bp: typeof Client;
 
 	/** Global VueI18n instance. Either injected by SSG or created in LanguageService.ts. */
-	declare let i18n: VueI18n;
+	declare const i18n: VueI18n;
 }

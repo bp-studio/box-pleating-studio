@@ -1,7 +1,7 @@
 import { createSSRApp } from "vue";
 import { createI18n } from "vue-i18n";
 
-import "temp/bootstrap.min.css";
+import "temp/bootstrap.css";
 import "./style.css";
 
 import locale from "app/gen/locale";

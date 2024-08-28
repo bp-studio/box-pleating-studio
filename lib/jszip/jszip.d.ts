@@ -1,4 +1,4 @@
-declare module "jszip/lib/index" {
+declare module "jszip/dist/jsZip.js" {
 	const jszip: typeof import("jszip");
 	export = jszip;
 }

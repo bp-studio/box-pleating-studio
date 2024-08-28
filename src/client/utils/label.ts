@@ -9,7 +9,7 @@ import { style } from "client/services/styleService";
 
 import type { Control } from "client/base/control";
 import type { IDestroyOptions } from "@pixi/display";
-import type { Rectangle } from "@pixi/core";
+import type { Rectangle } from "@pixi/math";
 import type { Sheet } from "client/project/components/sheet";
 
 const TIMEOUT = 10;

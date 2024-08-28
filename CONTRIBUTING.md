@@ -16,14 +16,15 @@ To build BP Studio, first you need the following:
 
 1. Install or upgrade [Node.js](https://nodejs.org/) to v20+.
 1. BP Studio had migrated from NPM to [PNPM](https://pnpm.io/) for package managing,
-   so install PNPM by the command `npm install -g pnpm`.
+   so install PNPM by the command `npx pnpm install -g pnpm`.
 1. Use the command `pnpm install` under the project root folder to install all dependencies.
+1. Run `pnpm gulp` once to create pre-build assets.
 
 And then you can simply press `F5` in VS Code to build and launch the app automatically.
 This is the preferred way to launch as it allows debugging in the IDE.
 
 Alternatively, run `pnpm build` to build the entire project manually,
-and then run `pnpm start` to launch the local server on debug build.
+and then run `pnpm preview` to launch the local server on production build.
 
 > Note: one should always run BP Studio through a server,
 > as some of the features would not work in `files://` protocol.
@@ -31,7 +32,7 @@ and then run `pnpm start` to launch the local server on debug build.
 Typically the default build task is sufficient for developing purpose,
 and you won't need to execute individual Gulp subtasks,
 as all subtasks will skip themselves if the source files are not changed.
-If something goes wrong, you can run `pnpm build clean` to cleanup built files and then rebuild everything.
+If something goes wrong, you can run `pnpm gulp clean` to cleanup built files and then rebuild everything.
 
 ## Browser compatibility
 

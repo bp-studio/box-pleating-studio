@@ -48,7 +48,7 @@
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
 	import Dialogs from "app/services/dialogService";
 	import { updateReady } from "app/misc/updateReady";
-	import { show } from "../modals/modalFragment.vue";
+	import { show } from "../modals/modals";
 
 	defineOptions({ name: "HelpMenu" });
 
@@ -100,26 +100,3 @@
 	}
 
 </script>
-
-<style lang="scss">
-	.notify {
-		display: inline-block;
-
-		width: 0.25em;
-		height: 0.25em;
-
-		background-color: red;
-		border-radius: 0.125em;
-
-		.dropdown-item > & {
-			position: relative;
-			top: -0.5em;
-		}
-
-		button > & {
-			position: absolute;
-			top: 0.3rem;
-			right: 0.3rem;
-		}
-	}
-</style>

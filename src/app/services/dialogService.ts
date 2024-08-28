@@ -1,6 +1,6 @@
 import type { JProject } from "shared/json";
 
-export function setup(d: typeof DialogService): void {
+export function setup(d: Partial<typeof DialogService>): void {
 	Object.assign(DialogService, d);
 }
 

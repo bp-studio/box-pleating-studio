@@ -10,9 +10,10 @@
 
 <script setup lang="ts">
 
-	import { computed, shallowRef } from "vue";
+	import { computed, onMounted, shallowRef } from "vue";
 
-	import { lcpReady } from "app/misc/lcpReady";
+	import { setup } from "app/services/dialogService";
+	import { lcpReady } from "app/misc/phase";
 	import Workspace from "app/services/workspaceService";
 
 	defineOptions({ name: "Spinner" });
@@ -43,37 +44,10 @@
 		loading.value = false;
 	}
 
-	defineExpose({
-		show,
-		hide,
+	onMounted(() => {
+		setup({
+			loader: { show, hide },
+		});
 	});
 
 </script>
-
-<style lang="scss">
-	#divSpinner {
-		visibility: hidden;
-
-		/* The combination of this CSS makes Spinner to appear gradually, but vanishes instantly */
-		> div {
-			opacity: 0;
-			transition: opacity 0.5s cubic-bezier(1, 0, 0, 0);
-		}
-
-		&.show {
-			visibility: visible;
-
-			> div {
-				opacity: 1;
-			}
-		}
-	}
-
-	.spinner-container {
-		flex-grow: 1;
-		font-size: 10rem;
-		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-		font-size: min(15vh, 15vw);
-		color: gray;
-	}
-</style>

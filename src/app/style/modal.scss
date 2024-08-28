@@ -1,0 +1,76 @@
+
+.key-table {
+	table {
+		td:first-child {
+			cursor: pointer;
+		}
+
+		// <col width> is deprecated, so we use CSS to define instead.
+		// There's perhaps no satisfying solutions. See https://stackoverflow.com/questions/67487357
+		th,
+		td {
+			&:first-child {
+				width: 66%;
+			}
+
+			&:last-child {
+				width: 34%;
+			}
+		}
+	}
+
+	.mask {
+		display: none;
+	}
+
+	input {
+		padding: 0.25rem;
+		color: var(--bs-body-color);
+		background: transparent;
+		outline: none;
+
+		&:focus {
+			box-shadow: inset 0 0 0.25rem var(--bs-primary);
+
+			+ .mask {
+				position: absolute;
+				top: 0;
+				left: 0;
+
+				display: block;
+
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+}
+
+.color-grid {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	gap: 0.5rem 1rem;
+}
+
+input[type="color"] {
+	width: 4rem;
+	height: 1.5rem;
+
+	appearance: none;
+
+	/* This is needed to override Safari's terrible default style */
+	border-radius: 0.25rem;
+	outline: none;
+}
+
+.check-btn i {
+	overflow: hidden;
+	display: inline-block;
+
+	width: 0;
+
+	text-align: right;
+	vertical-align: -.15em;
+
+	transition: width 0.5s;
+}

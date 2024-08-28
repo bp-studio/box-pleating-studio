@@ -1,5 +1,5 @@
 <template>
-	<div class="h-100 scroll-shadow" style="border: 1px solid lightgray;">
+	<div class="h-100 scroll-shadow key-table" style="border: 1px solid lightgray;">
 		<div style="position: sticky; z-index: 10; top: 0; background: lightgray;">
 			<table class="w-100 table table-sm table-bordered m-0">
 				<thead>
@@ -157,50 +157,3 @@
 	}
 
 </script>
-
-<style scoped lang="scss">
-	table {
-		td:first-child {
-			cursor: pointer;
-		}
-
-		// <col width> is deprecated, so we use CSS to define instead.
-		// There's perhaps no satisfying solutions. See https://stackoverflow.com/questions/67487357
-		th,
-		td {
-			&:first-child {
-				width: 66%;
-			}
-
-			&:last-child {
-				width: 34%;
-			}
-		}
-	}
-
-	.mask {
-		display: none;
-	}
-
-	input {
-		padding: 0.25rem;
-		color: var(--bs-body-color);
-		background: transparent;
-		outline: none;
-
-		&:focus {
-			box-shadow: inset 0 0 0.25rem var(--bs-primary);
-
-			+ .mask {
-				position: absolute;
-				top: 0;
-				left: 0;
-
-				display: block;
-
-				width: 100%;
-				height: 100%;
-			}
-		}
-	}
-</style>

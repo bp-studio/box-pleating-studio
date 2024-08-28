@@ -52,7 +52,7 @@
 	import { onMounted } from "vue";
 
 	import { Divider, Dropdown, Hotkey, DropdownItem, DropdownCheck } from "@/gadgets/menu";
-	import { show } from "@/modals/modalFragment.vue";
+	import { show } from "@/modals/modals";
 	import Settings from "app/services/settingService";
 	import HotkeyService from "app/services/hotkeyService";
 	import Studio from "app/services/studioService";
@@ -79,19 +79,3 @@
 	}
 
 </script>
-
-<style scoped lang="scss">
-	.dot-stack {
-		position: relative;
-		height: 1rem;
-
-		> * {
-			position: absolute;
-			top: 0.25rem;
-			left: 0.5rem;
-
-			/* Simply setting font size won't work on desktops. */
-			transform: scale(0.5);
-		}
-	}
-</style>

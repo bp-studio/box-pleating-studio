@@ -1,6 +1,9 @@
-import { shallowRef } from "vue";
+import { shallowRef, defineAsyncComponent } from "vue";
 
 import { isSSG } from "app/shared/constants";
+import { doEvents } from "shared/utils/async";
+
+import type { AsyncComponentLoader, Component, ComponentPublicInstance } from "vue";
 
 /** If we are ready to perform LCP (largest contentful paint) */
 export const lcpReady = shallowRef<boolean | undefined>(false);
@@ -22,4 +25,19 @@ if((!session || !JSON.parse(session).jsons.length)! && !isSSG) {
 		// use this value to signify that it should be set to true immediately on init.
 		lcpReady.value = undefined;
 	}
+}
+
+export const lcp = Promise.withResolvers<void>();
+
+export function asyncComp<T extends Component = {
+	new(): ComponentPublicInstance;
+}>(loader: AsyncComponentLoader<T>, wrapDoEvent: boolean = false): T {
+	return defineAsyncComponent({
+		loader: async () => {
+			if(wrapDoEvent && !isSSG) await doEvents();
+			const module = await loader();
+			return (module as { default: T }).default; // SSG must use this for some reason
+		},
+		delay: 0,
+	});
 }

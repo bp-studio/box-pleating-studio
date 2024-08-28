@@ -1,7 +1,7 @@
 import { computed, shallowReactive } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/core";
+import { Rectangle } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import settings from "app/services/settingService";

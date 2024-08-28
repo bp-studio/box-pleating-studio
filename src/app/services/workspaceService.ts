@@ -1,7 +1,7 @@
 import { computed, reactive, shallowRef, watch, nextTick as vueNextTick } from "vue";
 
 import Dialogs from "./dialogService";
-import Studio, { bp } from "./studioService";
+import Studio from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { isOnline } from "app/shared/constants";

@@ -23,6 +23,7 @@
 	],
 	"cSpell.words": [
 		"aabb",
+		"aaroon",
 		"appinstalled",
 		"beforeinstallprompt",
 		"bpstudio",
@@ -32,6 +33,7 @@
 		"configurator",
 		"dpad",
 		"draggables",
+		"earcut",
 		"esbuild",
 		"fontawesome",
 		"fullscreen",
@@ -68,6 +70,8 @@
 		"Rebalancing",
 		"Renderable",
 		"reselectable",
+		"rsbuild",
+		"rspack",
 		"scrollable",
 		"selectables",
 		"serializable",
@@ -95,7 +99,8 @@
 		".*rc.json": ".$(capture)ignore",
 		"eslint.config.mjs": "eslint-local-rules.js",
 		".gitignore": ".gitattributes",
-		"package.json": "pnpm-lock.yaml, .npmrc"
+		"package.json": "pnpm-lock.yaml, .npmrc",
+		"rsbuild.config.ts": "rsbuild.*.ts"
 	},
 	"files.exclude": {
 		"src/app/gen": true,

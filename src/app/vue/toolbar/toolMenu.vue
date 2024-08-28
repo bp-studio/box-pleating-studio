@@ -20,7 +20,7 @@
 	import Studio from "app/services/studioService";
 	import { Uploader } from "@/gadgets/file";
 	import Workspace from "app/services/workspaceService";
-	import { show } from "@/modals/modalFragment.vue";
+	import { show } from "@/modals/modals";
 
 	defineOptions({ name: "ToolMenu" });
 

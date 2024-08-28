@@ -3,7 +3,7 @@
 		<Welcome />
 		<DPad v-if="phase >= 2" />
 
-		<Panel v-if="phase >= 2" />
+		<Panel v-if="phase >= 1" />
 		<template v-else>
 			<div id="divShade"></div>
 			<aside class="scroll-shadow p-3"></aside>
@@ -11,33 +11,7 @@
 
 		<Toolbar v-if="phase >= 3" />
 		<nav class="btn-toolbar p-2" v-else>
-			<div class="btn-group me-2">
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="File">
-						<i class="bp-file-alt"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Edit">
-						<i class="bp-pencil-ruler"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Settings">
-						<i class="bp-tasks"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Tools">
-						<i class="bp-tools"></i>
-					</button>
-				</div>
-				<div class="btn-group">
-					<button type="button" disabled class="btn btn-primary dropdown-toggle" aria-label="Help">
-						<i class="bp-question-circle"></i>
-					</button>
-				</div>
-			</div>
+			<StubMenu />
 
 			<div class="btn-group me-2">
 				<button type="button" class="btn btn-primary" disabled>
@@ -52,8 +26,9 @@
 		<Status v-if="phase >= 2" />
 		<footer class="py-1 px-3" v-else></footer>
 
-		<ModalFragment v-if="phase >= 1" />
-		<DialogFragment />
+		<ModalFragment v-if="phase >= 2" />
+		<DialogFragment v-if="phase >= 1" />
+		<Spinner />
 	</div>
 </template>
 
@@ -63,16 +38,25 @@
 
 	import "shared/polyfill/withResolvers"; // We import this polyfill again for SSG.
 
-	import { phase } from "app/misc/lcpReady"; // This must be loaded before anything else.
-	import Panel from "@/panel/panel.vue";
-	import Toolbar from "@/toolbar/toolbar.vue";
+	import { phase, asyncComp } from "app/misc/phase"; // This must be loaded before anything else.
+	import StubMenu from "@/toolbar/stubMenu.vue";
 	import DPad from "@/gadgets/dpad.vue";
-	import Welcome from "@/welcome.vue";
 	import Status from "@/status.vue";
-	import DialogFragment from "@/dialogs/dialogFragment.vue";
-	import ModalFragment from "@/modals/modalFragment.vue";
 
 	defineOptions({ name: "App" });
+
+	// Loading of the following two will directly impact LCP score,
+	// so we must load it as fast as possible, but still,
+	// we can't afford to load them synchronously with the App itself
+	// (that will add too much to TBT), so we use a doEvents trick here.
+	const Welcome = asyncComp(() => import("@/welcome.vue"), true);
+	const Spinner = asyncComp(() => import("@/dialogs/spinner.vue"), true);
+
+	// The rest are loaded in later phase
+	const Toolbar = asyncComp(() => import("@/toolbar/toolbar.vue"));
+	const Panel = asyncComp(() => import("@/panel/panel.vue"));
+	const ModalFragment = asyncComp(() => import("@/modals/modalFragment.vue"));
+	const DialogFragment = asyncComp(() => import("@/dialogs/dialogFragment.vue"));
 
 	const el = shallowRef<HTMLDivElement>();
 

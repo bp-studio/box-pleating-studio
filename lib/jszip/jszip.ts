@@ -1,7 +1,7 @@
 /// <reference lib="esnext" />
 /// <reference path="jszip.d.ts" />
 
-import JSZip = require("jszip/lib/index");
+import JSZip from "jszip/dist/jsZip.js";
 
 onmessage = async event => {
 	if(!event.ports[0]) return;

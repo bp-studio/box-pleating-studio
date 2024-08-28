@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"module": "Preserve",
+		"moduleResolution": "Bundler"
+	},
+	"include": [
+		"./*.ts"
+	]
+}

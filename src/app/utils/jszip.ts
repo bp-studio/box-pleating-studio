@@ -6,7 +6,7 @@ let worker: Worker;
 type List = Record<string, string>;
 
 function createWorker(): Worker {
-	return new Worker(/* webpackChunkName: "jszip" */ new URL("lib/jszip/jszip.ts", import.meta.url));
+	return new Worker(/* webpackChunkName: "jszip" */ new URL("lib/jszip/jszip.js", import.meta.url));
 }
 
 //=================================================================

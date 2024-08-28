@@ -2,6 +2,7 @@ import { reactive, watch } from "vue";
 
 import dialogs from "./dialogService";
 import Language from "./languageService";
+import { doEvents } from "shared/utils/async";
 
 import type { KeyStore } from "./customHotkeyService";
 
@@ -113,7 +114,6 @@ export function init(): void {
 	hadSettings = loadSettings(localStorage.getItem(KEY));
 
 	watch(settings, save, { deep: true });
-
 	watch(
 		() => settings.showStatus,
 		s => document.body.classList.toggle("show-status", s),

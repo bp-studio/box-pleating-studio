@@ -7,7 +7,7 @@ import StudioService from "app/services/studioService";
 import Dialogs from "app/services/dialogService";
 import LZ from "app/utils/lz";
 import Workspace from "./services/workspaceService";
-import { lcpReady } from "app/misc/lcpReady";
+import { lcpReady } from "app/misc/phase";
 import HotkeyService from "./services/hotkeyService";
 
 namespace Core {

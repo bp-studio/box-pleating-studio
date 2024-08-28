@@ -39,15 +39,3 @@
 	}
 
 </script>
-
-<style lang="scss">
-	.dropdown-submenu {
-		position: relative;
-
-		>.dropdown-menu {
-			top: 0;
-			left: calc(100% - 0.5rem);
-			margin-top: -0.5rem;
-		}
-	}
-</style>

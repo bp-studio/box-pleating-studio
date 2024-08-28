@@ -1,6 +1,5 @@
 const $ = require("../utils/proxy");
 const gulp = require("gulp");
-const fs = require("fs");
 
 const newer = require("../utils/newer");
 const { ssgI18n } = require("../utils/esbuild");
@@ -18,12 +17,6 @@ function ssg() {
 	});
 }
 
-const insertVersion = package => $.through2(
-	content => content
-		.replace("__VERSION__", package.version)
-		.replace("__APP_VERSION__", package.app_version)
-);
-
 /** Add simple handling for IE < 10, where conditional comments were supported. */
 const wrapIE = () => $.through2(c => `<!--[if IE]><body>IE is not supported.</body><![endif]--><!--[if !IE]><!-->${c}<!--<![endif]-->`);
 
@@ -35,20 +28,14 @@ gulp.task("version", () =>
 );
 
 /** Main HTML task */
-gulp.task("html", () => {
-	// We cannot directly use `require` here,
-	// as that will likely get the outdated content.
-	const package = JSON.parse(fs.readFileSync("package.json").toString("utf8"));
-	return gulp.src(config.src.app + "/html/index.htm")
-		.pipe(newer({
-			dest: config.dest.temp + "/index.htm",
-			extra: [__filename, "package.json", config.src.app + "/**/*"],
-		}))
-		.pipe(insertVersion(package))
-		.pipe($.htmlMinifierTerser(htmlMinOption))
-		// Avoid VS Code Linter warnings
-		.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
-		.pipe(ssg())
-		.pipe(wrapIE())
-		.pipe(gulp.dest(config.dest.temp));
-});
+gulp.task("html", () => gulp.src(config.src.app + "/html/index.htm")
+	.pipe(newer({
+		dest: config.dest.temp + "/index.htm",
+		extra: [__filename, "package.json", config.src.app + "/**/*"],
+	}))
+	.pipe($.htmlMinifierTerser(htmlMinOption))
+	// Avoid VS Code Linter warnings
+	.pipe($.replace(/<script>(.+?)<\/script>/g, "<script>$1;</script>"))
+	.pipe(ssg())
+	.pipe(wrapIE())
+	.pipe(gulp.dest(config.dest.temp)));

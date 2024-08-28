@@ -1,7 +1,7 @@
 import { nextTick, watch, watchEffect } from "vue";
 import { Container } from "@pixi/display";
 import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
-import { Ticker } from "@pixi/core";
+import { Ticker } from "@pixi/ticker";
 
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";

@@ -1,5 +1,5 @@
 import { computed } from "vue";
-import { Polygon } from "@pixi/core";
+import { Polygon } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Control } from "client/base/control";

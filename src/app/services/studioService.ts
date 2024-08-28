@@ -8,16 +8,9 @@ import { doEvents } from "shared/utils/async";
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
 import type { ComputedRef, UnwrapNestedRefs } from "vue";
-import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
 import type { StudioOptions } from "client/options";
 import type { Device } from "client/project/components/layout/device";
-
-/**
- * We encapsule the Client in this service so that it is not exposed in other parts of the app.
- * Declared in HTML.
- */
-export let bp: typeof Client;
 
 /** Before the Studio is initialized, use a default value as placeholder. */
 export function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
@@ -54,13 +47,17 @@ namespace StudioService {
 	/** Initialize the Client, and return whether it was successful. */
 	export async function init(): Promise<boolean> {
 		try {
-			bp = await import(/* webpackChunkName: "client" */ "../../client/main");
+			Object.defineProperty(window, "bp", {
+				writable: false,
+				value: await import(/* webpackChunkName: "client" */ "../../client/main"),
+			});
 		} catch {
 			return false;
 		}
 
 		await doEvents();
 		await bp.init();
+		await doEvents();
 
 		// Setup the bridges
 		bp.options.onLongPress = () => showPanel.value = true;

@@ -26,7 +26,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" style="height: 400px; max-height: 40vh;">
 					<div v-show="tab == 0" class="p-2">
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
@@ -58,7 +58,7 @@
 							{{ $t('preference.includeHidden') }}
 						</Toggle>
 					</div>
-					<div v-show="tab == 1" class="p-2 h-100">
+					<div v-if="phase >= 10" v-show="tab == 1" class="p-2 h-100">
 						<div class="color-grid">
 							<Color :default="Studio.style.border.color" v-model="Settings.colorScheme.border"
 								   :label="$t('preference.color.border')" />
@@ -98,6 +98,7 @@
 
 	import { onMounted, shallowRef, watch } from "vue";
 
+	import { phase } from "app/misc/phase";
 	import { isFileApiEnabled } from "app/shared/constants";
 	import Studio from "app/services/studioService";
 	import Settings, { reset } from "app/services/settingService";
@@ -122,16 +123,3 @@
 	defineExpose({ show });
 
 </script>
-
-<style scoped>
-	.color-grid {
-		display: grid;
-		grid-template-columns: auto auto auto;
-		gap: 0.5rem 1rem;
-	}
-
-	.modal-body {
-		height: 400px;
-		max-height: 40vh;
-	}
-</style>

@@ -1,9 +1,19 @@
+///<reference path="./src/shared/frontend/imports.d.ts" />
+
 import { defineConfig } from "@rsbuild/core";
 import { pluginVue } from "@rsbuild/plugin-vue";
+import { pluginCheckSyntax } from "@rsbuild/plugin-check-syntax";
+import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry";
 import { InjectManifest } from "@aaroon/workbox-rspack-plugin";
 import { pluginSass } from "@rsbuild/plugin-sass";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+import postcssPresetEnv from "postcss-preset-env";
+
+import { createDescendantRegExp, makeTest } from "./rsbuild.utils";
+import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
+const inspectBundle = false;
 const inspectBuild = false;
 
 export default defineConfig({
@@ -11,6 +21,10 @@ export default defineConfig({
 		progressBar: true,
 	},
 	source: {
+		include: [/@pixi/],
+		alias: {
+			"vue-slicksort$": "./node_modules/vue-slicksort/dist/vue-slicksort.esm.js",
+		},
 		entry: {
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",
@@ -27,6 +41,10 @@ export default defineConfig({
 	},
 	html: {
 		template: ({ entryName }) => `./build/temp/${entryName}.htm`,
+		templateParameters: {
+			VERSION: pkg.version,
+			APP_VERSION: pkg.app_version,
+		},
 	},
 	server: {
 		port: 30783,
@@ -44,50 +62,63 @@ export default defineConfig({
 			strategy: "custom",
 			splitChunks: {
 				cacheGroups: {
-					locale: {
-						test: /locale/,
-						name: "locale",
-						chunks: "initial",
+					vue: {
+						test: createDescendantRegExp("vue"),
+						name: "vue",
+						chunks: "all",
+					},
+					index: {
+						test: makeTest(/src[\\/]app[\\/]/, /idb-keyval/, /probably-china/),
+						name: "index",
+						chunks: "all",
+					},
+					shared: {
+						// This contains the modules used both by the main thread and the worker,
+						// so this must be in a separate file.
+						test: makeTest(/src[\\/]shared[\\/]/, /tslib/),
+						name: "shared",
+						chunks: "async",
+						priority: -1,
+					},
+					pixiUtils: {
+						test: makeTest(null, createDescendantRegExp("@pixi/ticker", "@pixi/math")),
+						name: "pixi-utils",
+						chunks: "async",
 					},
 					pixiCore: {
-						test: /@pixi[\\/]core|earcut/,
+						test: /@pixi[\\/]core/,
 						name: "pixi-core",
 						chunks: "async",
-						priority: 2,
 					},
 					pixi: {
 						test: /@pixi/,
 						name: "pixi",
 						chunks: "async",
+						priority: -1,
+					},
+					i18n: {
+						test: makeTest(createDescendantRegExp("vue-i18n"), /locale\.ts/),
+						name: "vue-i18n",
+						chunks: "all",
 						priority: 1,
 					},
-					bootstrap: {
-						test: /bootstrap|popper/,
-						name: "bootstrap",
-						chunks: "async",
-					},
-					jszip: {
-						test: /jszip/,
-						name: "jszip-core",
-						chunks: "async",
-					},
-					vue: {
-						test: /@vue[\\/]/,
-						name: "vue",
-						chunks: "initial",
-					},
 					vendor: {
-						test: /node_modules/,
+						test: createDescendantRegExp("vue-slicksort", "bootstrap"),
 						name: "vendor",
-						chunks: "initial",
-						priority: -1,
+						chunks: "async",
+						priority: 1,
 					},
 				},
 			},
 		},
 		preload: {
 			type: "all-chunks",
-			include: [/fa-.+\.woff2$/, /locale\.\w+\.js/],
+			include: [
+				/\.css$/,
+				/bps\.\w+\.woff2$/,
+				/(vue(-\w+)?)\.\w+\.js/,
+				/(client|shared)\.\w+\.js/,
+			],
 		},
 	},
 	output: {
@@ -105,6 +136,7 @@ export default defineConfig({
 		dataUriLimit: 100,
 		legalComments: inspectBuild ? "inline" : "none",
 		polyfill: "off",
+		// sourceMap: { js: "source-map" },
 		minify: !inspectBuild && {
 			jsOptions: {
 				minimizerOptions: {
@@ -127,22 +159,36 @@ export default defineConfig({
 			},
 		}),
 		pluginVue(),
+		pluginCheckSyntax({
+			ecmaVersion: 2019,
+		}),
+		pluginAssetsRetry({
+			addQuery: true,
+			max: 2,
+			minify: true,
+			onFail: ({ url }) => typeof (errMgr) !== "undefined" && errMgr.setResErr(url),
+		}),
 	],
 	tools: {
+		postcss: (_, { addPlugins }) => {
+			addPlugins(postcssPresetEnv());
+		},
 		rspack: (config, { appendPlugins, isDev }) => {
-			const rule = config.module?.rules[2];
-			if(rule && typeof rule == "object" && Array.isArray(rule.use)) {
-				rule.use.push({
-					loader: "ifdef-loader",
-					options: {
-						DEBUG: isDev,
-					},
-				});
-			}
+			config.module.rules.push({
+				test: /\.ts$/,
+				loader: "ifdef-loader",
+				options: {
+					DEBUG: isDev,
+				},
+			});
 
-			const workboxPlugin = new InjectManifest({
+			if(isDev) return;
+
+			if(inspectBundle) appendPlugins(new BundleAnalyzerPlugin());
+
+			appendPlugins(new InjectManifest({
 				swSrc: "./src/other/service/sw.ts",
-				exclude: [/\.(svg|ttf|woff)$/],
+				exclude: [/\.ttf$/],
 				manifestTransforms: [
 					/** Only the last log will be included in precache */
 					manifest => {
@@ -158,16 +204,7 @@ export default defineConfig({
 						return { manifest };
 					},
 				],
-			});
-			if(isDev) {
-				// Silence Workbox build warning with HMR
-				// https://github.com/GoogleChrome/workbox/issues/1790#issuecomment-1435032010
-				Object.defineProperty(workboxPlugin, "alreadyCalled", {
-					get() { return false; },
-					set() { /* do nothing */ },
-				});
-			}
-			appendPlugins(workboxPlugin);
+			}));
 		},
 	},
 });

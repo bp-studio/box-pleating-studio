@@ -87,12 +87,17 @@
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
 	import Hotkey from "@/gadgets/menu/hotkey.vue";
 	import { Uploader, Opener, SaveAs } from "@/gadgets/file";
-	import { show } from "@/modals/modalFragment.vue";
 	import RecentMenu from "./recentMenu.vue";
+	import { show } from "@/modals/modals";
 
+	import type { ComponentPublicInstance } from "vue";
 	import type { ProjId } from "shared/json";
 
 	defineOptions({ name: "FileMenu" });
+
+	interface Executor extends ComponentPublicInstance {
+		execute(): void;
+	}
 
 	type SaveAsInstance = InstanceType<typeof SaveAs>;
 

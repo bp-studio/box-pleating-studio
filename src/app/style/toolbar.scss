@@ -1,0 +1,188 @@
+nav {
+	isolation: isolate;
+
+	overflow: visible;
+	flex-wrap: nowrap !important;
+
+	height: 3.75rem;
+
+	background: var(--bg-ui);
+}
+
+@media (width <=650px) {
+	#panelToggle {
+		flex-grow: 1;
+		text-align: right;
+	}
+}
+
+.tab-container {
+	width: 0;
+	margin: -0.5rem 0.5rem;
+}
+
+#divTab {
+	/* Only in Firefox and Chrome>=121, https://caniuse.com/mdn-css_properties_scrollbar-width */
+	/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+	scrollbar-width: none;
+
+	overflow: scroll hidden;
+	display: flex;
+
+	width: 100%;
+	height: 3.75rem;
+
+	white-space: nowrap;
+
+	/* For browsers other than Firefox */
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	&.hide {
+		visibility: hidden;
+	}
+
+	* {
+		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+		touch-action: pan-x;
+	}
+}
+
+@media (width <= 650px) {
+	#divTab {
+		position: absolute;
+		top: 3.75rem;
+		left: 0;
+
+		width: 100vw;
+		height: 2.4rem;
+		margin: 0;
+
+		background: var(--bg-ui);
+		border-top: 1px solid gray;
+	}
+}
+
+.tab {
+	cursor: pointer;
+
+	display: inline-block;
+	flex-shrink: 0;
+
+	max-width: 150px;
+	height: 100%;
+	padding: 0.5rem;
+
+	font-size: 1.25rem;
+	line-height: 2.5rem;
+
+	background-color: var(--bg-ui);
+	border-right: 1px solid var(--tab-border);
+
+	&:first-child {
+		border-left: 1px solid var(--tab-border);
+	}
+
+	&.active {
+		color: black;
+		background-color: var(--tab-active);
+		background-image: var(--bs-gradient);
+	}
+
+	:first-child {
+		overflow: hidden;
+		flex-grow: 1;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	:last-child {
+		flex-shrink: 0;
+	}
+
+	i {
+		width: 1rem;
+		text-align: center;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+	}
+
+	&:hover i {
+		opacity: 1;
+	}
+}
+
+/* vue-slicksort places clone directly under <body> */
+body > .tab .bt {
+	display: none;
+}
+
+.tab-down {
+	display: none;
+}
+
+.tab-close {
+	display: flex;
+
+	.close {
+		display: inline-block;
+
+		width: 1.75rem;
+		height: 1.75rem;
+		margin-top: 0.15rem;
+		padding: 0.3rem;
+
+		line-height: 1;
+		text-align: center;
+
+		border-radius: 5px;
+
+		transition: background-color 0.1s linear;
+
+		&:hover {
+			background-color: rgba(255 255 255 / 20%);
+			background-image: var(--bs-gradient);
+		}
+	}
+}
+
+@media (hover: hover) {
+	.tab:not(:hover, .active) {
+		color: #444;
+	}
+}
+
+@media (hover: none),
+(pointer: coarse) {
+	.tab .tab-down i {
+		opacity: 1 !important;
+	}
+
+	.tab-down {
+		display: flex;
+	}
+
+	.tab-close {
+		display: none;
+	}
+}
+
+@media (width <=650px) {
+	.tab {
+		padding: 0.2rem 0.5rem;
+		font-size: 1rem;
+		line-height: 2rem;
+	}
+
+	.tab-close .close {
+		width: 1.5rem;
+		height: 1.5rem;
+		margin-top: 0;
+		padding: 0.25rem;
+	}
+
+	.tab:first-child {
+		border-left: none;
+	}
+}
