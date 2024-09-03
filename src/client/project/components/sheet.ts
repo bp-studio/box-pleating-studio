@@ -43,13 +43,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	 * We made it {@link shallowRef} for better performance,
 	 * and use {@link Readonly} to ensure that we use different instances each time.
 	 */
-	@shallowRef public $scroll: IPoint = { x: 0, y: 0 };
+	@shallowRef public accessor $scroll: IPoint = { x: 0, y: 0 };
 
-	@shallowRef public $zoom: number = FULL_ZOOM;
+	@shallowRef public accessor $zoom: number = FULL_ZOOM;
 
-	@shallowRef private _type: GridType;
+	@shallowRef private accessor _type: GridType;
 
-	@shallowRef private _grid: Grid;
+	@shallowRef private accessor _grid: Grid;
 
 	/** Top-level container */
 	public readonly $view: Container = new Container();

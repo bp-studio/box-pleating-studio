@@ -34,12 +34,12 @@ export class Label extends Container {
 	private readonly _sheet: Sheet;
 	private readonly _label: Text = new Text();
 	private readonly _glow: Text = new Text();
-	@shallowRef private _labelWidth: number = 0;
-	@shallowRef private _labelBounds: Rectangle = null!;
+	@shallowRef private accessor _labelWidth: number = 0;
+	@shallowRef private accessor _labelBounds: Rectangle = null!;
 
 	private _contentCache: string = "";
-	@shallowRef private _directionCache: Direction = Direction.none;
-	@shallowRef private _xCache: number = 0;
+	@shallowRef private accessor _directionCache: Direction = Direction.none;
+	@shallowRef private accessor _xCache: number = 0;
 
 	public $color?: number;
 	public $distance: number = 1;

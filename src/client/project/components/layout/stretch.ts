@@ -24,7 +24,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	public readonly type = "Stretch";
 	public readonly $priority: number = 0;
 	private readonly _devices: Device[] = [];
-	@shallowRef private _data!: JStretch;
+	@shallowRef private accessor _data!: JStretch;
 	public readonly $layout: Layout;
 
 	constructor(layout: Layout, data: JStretch, model: UpdateModel) {

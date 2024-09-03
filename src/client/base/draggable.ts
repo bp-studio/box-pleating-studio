@@ -11,7 +11,7 @@ export interface DragSelectable extends Draggable {
 //=================================================================
 export abstract class Draggable extends Control implements Draggable {
 
-	public $location: IPoint = { x: 0, y: 0 };
+	public accessor $location: IPoint = { x: 0, y: 0 };
 
 	/** The offset vector between mouse location and the object location when the dragging started. */
 	private _dragOffset!: IPoint;

@@ -38,16 +38,16 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	 * The movement of {@link Vertex Vertices} does not concerns the Core,
 	 * so we directly made it a {@link shallowRef}.
 	 */
-	@shallowRef public override $location: IPoint;
+	@shallowRef public override accessor $location: IPoint;
 
 	/**
 	 * Several UI depends on this value, so it is reactive.
 	 */
-	@shallowRef public $degree: number = 0;
+	@shallowRef public accessor $degree: number = 0;
 
-	@shallowRef public $dist: number = 0;
+	@shallowRef public accessor $dist: number = 0;
 
-	@shallowRef public $height: number = 0;
+	@shallowRef public accessor $height: number = 0;
 
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
@@ -97,7 +97,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@field public name: string;
+	@field public accessor name: string;
 
 	public async addLeaf(length: number): Promise<void> {
 		if(length > this.maxNewLeafLength) return;

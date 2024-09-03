@@ -1,7 +1,6 @@
 {
 	"compilerOptions": {
 		"baseUrl": "../src",
-		"experimentalDecorators": true,
 		"isolatedModules": true,
 		"moduleResolution": "node",
 		"noImplicitOverride": true,

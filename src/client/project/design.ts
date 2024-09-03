@@ -30,9 +30,9 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	public readonly $tag = "design";
 	public readonly $project: Project;
 
-	@field public title: string;
-	@field public description: string;
-	@shallowRef public mode: DesignMode;
+	@field public accessor title: string;
+	@field public accessor description: string;
+	@shallowRef public accessor mode: DesignMode;
 
 	public readonly layout: Layout;
 	public readonly tree: Tree;
@@ -49,10 +49,10 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	constructor(project: Project, json: JDesign, state?: JState) {
 		super();
 		this.$prototype = json;
+		this.$project = project; // This must go before the decorated accessors
 		this.title = json.title ?? "";
 		this.description = json.description ?? "";
 		this.mode = json.mode ?? "tree";
-		this.$project = project;
 
 		const view = this.$addRootObject(new Container(), display.designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);

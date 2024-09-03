@@ -26,10 +26,10 @@ const MAX_STEP = 30;
 export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** Current history location. */
-	@shallowRef private _index: number = 0;
+	@shallowRef private accessor _index: number = 0;
 
 	/** History location during last file saving. */
-	@shallowRef private _savedIndex: number = 0;
+	@shallowRef private accessor _savedIndex: number = 0;
 
 	private readonly _project: Project;
 	private readonly _steps: Step[] = shallowReactive([]);

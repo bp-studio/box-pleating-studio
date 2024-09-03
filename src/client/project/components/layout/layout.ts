@@ -32,10 +32,10 @@ import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport, Nod
 //=================================================================
 export class Layout extends View implements ISerializable<JLayout> {
 
-	@shallowRef public flapCount: number = 0;
-	@shallowRef public riverCount: number = 0;
-	@shallowRef public invalidCount: number = 0;
-	@shallowRef public patternNotFound: boolean = false;
+	@shallowRef public accessor flapCount: number = 0;
+	@shallowRef public accessor riverCount: number = 0;
+	@shallowRef public accessor invalidCount: number = 0;
+	@shallowRef public accessor patternNotFound: boolean = false;
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;

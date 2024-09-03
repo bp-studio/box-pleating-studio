@@ -58,7 +58,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 * Whether the user is performing dragging on the current {@link Project}.
 	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
 	 */
-	@shallowRef public $isDragging: boolean = false;
+	@shallowRef public accessor $isDragging: boolean = false;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Projects are all inactive on construction.

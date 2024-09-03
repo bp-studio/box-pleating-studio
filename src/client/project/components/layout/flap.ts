@@ -41,8 +41,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public readonly id: NodeId;
 
 	public $graphics: GraphicsData;
-	@shallowRef private _width: number = 0;
-	@shallowRef private _height: number = 0;
+	@shallowRef private accessor _width: number = 0;
+	@shallowRef private accessor _height: number = 0;
 
 	/**
 	 * The parameters used for the drawing process.

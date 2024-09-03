@@ -24,7 +24,7 @@ export class DiagonalGrid extends Grid {
 	private _testSize: number;
 	private _testShift: IPoint | undefined;
 
-	@shallowRef private _size: number;
+	@shallowRef private accessor _size: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		super(sheet, GridType.diagonal);

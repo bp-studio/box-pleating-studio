@@ -33,7 +33,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
 
-	@shallowRef private _length: number;
+	@shallowRef private accessor _length: number;
 
 	public readonly $v1: Vertex;
 	public readonly $v2: Vertex;

@@ -22,8 +22,8 @@ export class RectangularGrid extends Grid {
 	private _testWidth: number;
 	private _testHeight: number;
 
-	@shallowRef private _width: number;
-	@shallowRef private _height: number;
+	@shallowRef private accessor _width: number;
+	@shallowRef private accessor _height: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		super(sheet, GridType.rectangular);

@@ -1,10 +1,10 @@
-import { nonEnumerable } from "shared/utils/nonEnumerable";
-
 import type { Project } from "client/project/project";
 import type { CommandType } from "shared/json/enum";
 import type { JCommand } from "shared/json/history";
 
 export type Typeless<T extends JCommand> = Omit<T, "type">;
+
+const projectMap = new WeakMap<Command, Project>();
 
 //=================================================================
 /**
@@ -14,15 +14,15 @@ export type Typeless<T extends JCommand> = Omit<T, "type">;
 
 export abstract class Command implements JCommand {
 
-	@nonEnumerable protected readonly _project: Project;
-
 	public abstract readonly type: CommandType;
 	public readonly tag: string;
+
+	protected get _project(): Project { return projectMap.get(this)!; }
 
 	public get $signature(): string { return this.type + ":" + this.tag; }
 
 	constructor(project: Project, json: Typeless<JCommand>) {
-		this._project = project;
+		projectMap.set(this, project);
 		this.tag = json.tag;
 	}
 

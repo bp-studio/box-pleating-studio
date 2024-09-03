@@ -29,9 +29,6 @@ export default defineConfig({
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",
 		},
-		decorators: {
-			version: "legacy",
-		},
 		define: {
 			// __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
 			DEBUG_ENABLED: !isProduction,
