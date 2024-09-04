@@ -1,8 +1,8 @@
-import { watchEffect } from "vue";
+import { effectScope, watchEffect } from "vue";
 
-import { ResumableEffectScope } from "client/utils/resumableEffectScope";
 import { ACTIVE, Mountable, MOUNTED } from "./mountable";
 
+import type { EffectScope } from "vue";
 import type { Container } from "@pixi/display";
 
 //=================================================================
@@ -15,14 +15,24 @@ export abstract class View extends Mountable {
 	/** The top-level {@link Container}s of this component. */
 	private readonly _rootContainers: Container[] = [];
 
-	/** {@link ResumableEffectScope} of this {@link View}. */
-	private _drawScope?: ResumableEffectScope;
+	/**
+	 * {@link EffectScope} of this {@link View}.
+	 *
+	 * Since Vue 3.5, EffectScope now has the functionality of pause and resume,
+	 * so there's no more need to implement them ourselves.
+	 */
+	private _drawScope: EffectScope = effectScope();
+
+	/// #if DEBUG
+	/** Guard the running of {@link $react} method. */
+	private _scopeInitialized: boolean = false;
+	/// #endif
 
 	constructor(active: boolean = true) {
 		super(active);
 
 		this._onDestruct(() => {
-			this._drawScope?.stop();
+			this._drawScope.stop();
 			this._rootContainers.forEach(view => view.destroy({ children: true }));
 		});
 
@@ -33,7 +43,8 @@ export abstract class View extends Mountable {
 
 		this.addEventListener(MOUNTED, event => {
 			// Whether the scope is activated depends on the mounted state.
-			this._drawScope?.toggle(event.state);
+			if(event.state) this._drawScope.resume();
+			else this._drawScope.pause();
 		});
 	}
 
@@ -50,15 +61,26 @@ export abstract class View extends Mountable {
 	}
 
 	/**
+	 * Low-level method for starting the scope.
+	 *
+	 * This method should only be called once.
+	 */
+	protected $react(setup: Action): void {
+		/// #if DEBUG
+		if(this._scopeInitialized) throw new Error("React scope already started.");
+		this._scopeInitialized = true;
+		/// #endif
+		this._drawScope.run(setup);
+	}
+
+	/**
 	 * Register a reactive drawing method.
 	 * All passed-in methods will be bound to `this`.
 	 *
-	 * Note that this method should be called only once.
-	 * If it is recalled, it overwrites the previous setups.
+	 * This method should only be called once.
 	 */
 	protected $reactDraw(...actions: Action[]): void {
-		this._drawScope ??= new ResumableEffectScope();
-		this._drawScope.run(() => {
+		this.$react(() => {
 			for(const action of actions) watchEffect(action.bind(this));
 		});
 	}

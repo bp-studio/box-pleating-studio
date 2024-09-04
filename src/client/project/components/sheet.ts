@@ -1,4 +1,4 @@
-import { computed, shallowReactive } from "vue";
+import { computed, shallowReactive, watchEffect } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 import { Rectangle } from "@pixi/math";
@@ -18,6 +18,7 @@ import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
 
+import type { ComputedRef } from "vue";
 import type { Grid } from "./grid/grid";
 import type { ITagObject } from "client/shared/interface";
 import type { Independent } from "client/base/independent";
@@ -99,12 +100,16 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._type = json?.type ?? GridType.rectangular;
 		this._grid = createGrid(this, this._type, json?.width, json?.height);
 
-		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
+		this.$react(() => {
+			const self = this as Writeable<Sheet>;
+			self.$horizontalMargin = computed(() => this._horizontalMargin);
+			self.$imageDimension = computed(() => this._imageDimension);
+			watchEffect(() => this._drawSheet());
+			watchEffect(() => this._positioning());
+			watchEffect(() => this._layerVisibility());
+		});
 
 		this._onDestruct(() => {
-			this.$horizontalMargin.effect.stop();
-			this.$imageDimension.effect.stop();
-
 			// GC
 			this._grid.$destruct();
 			this._grid = null!;
@@ -203,14 +208,22 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	/** Horizontal margin by the actual rendered result. */
-	public readonly $horizontalMargin = computed(() => {
+	declare public readonly $horizontalMargin: ComputedRef<number>;
+
+	/** The dimension of the sheet after rasterization. */
+	declare public readonly $imageDimension: ComputedRef<IDimension>;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private get _horizontalMargin(): number {
 		const overflows = [...this.$labels].map(l => l.$overflow);
 		const result = Math.max(MARGIN, ...overflows);
 		return result;
-	});
+	}
 
-	/** The dimension of the sheet after rasterization. */
-	public readonly $imageDimension = computed<IDimension>(() => {
+	private get _imageDimension(): IDimension {
 		const s = ProjectService.scale.value;
 		const { x, y } = this._grid.$offset;
 		const hitMargin = 0.5; // Extra margin is needed, or the vertices on the boundary will be difficult to click
@@ -222,11 +235,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			width: (width + x * 2) * s + this.$horizontalMargin.value * 2,
 			height: (height + y * 2) * s + MARGIN * 2,
 		};
-	});
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	}
 
 	private _toMemento(): Memento {
 		return [this.$tag, this.toJSON()];
