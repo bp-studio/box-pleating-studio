@@ -32,6 +32,7 @@ export async function init(): Promise<void> {
 	ScrollController.$init();
 }
 
+export const setInteractive = display.$setInteractive;
 export const nextTick = display.appNextTick;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

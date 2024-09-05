@@ -49,7 +49,7 @@ namespace StudioService {
 		try {
 			Object.defineProperty(window, "bp", {
 				writable: false,
-				value: await import(/* webpackChunkName: "client" */ "../../client/main"),
+				value: await import(/* webpackChunkName: "client" */ "client/main"),
 			});
 		} catch {
 			return false;
@@ -113,6 +113,19 @@ namespace StudioService {
 			executing = false;
 		}
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Modal control
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Workspace should not be interactive if any modal is opened.
+	let modalCount = 0;
+	document.body.addEventListener("show.bs.modal", () => {
+		if(modalCount++ == 0) bp?.setInteractive(false);
+	});
+	document.body.addEventListener("hidden.bs.modal", () => {
+		if(--modalCount == 0) bp?.setInteractive(true);
+	});
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Delegate methods

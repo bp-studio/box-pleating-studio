@@ -30,15 +30,16 @@ gulp.task("bootstrap", () => {
 		.pipe($.purgecss({
 			content: compare,
 			safelist: {
-				standard: [/backdrop/], // for Bootstrap Modal
+				standard: [
+					/backdrop/,
+					/modal-static/,
+				],
 				variables: [
 					"--bs-primary",
 					/^--bs-btn-disabled/,
 					/^--bs-nav-tabs/,
 				],
 			},
-
-			// for Bootstrap
 			variables: true,
 		}))
 		.pipe($.replace(/(\r|\n)*\/\*.+?\*\/$/, "")) // remove sourcemap
