@@ -192,6 +192,17 @@ footer {
 	}
 }
 
+/* We use this to force loading Font-Awesome */
+.font-preload {
+	pointer-events: none;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	opacity: 0;
+}
+
 #divDPad {
 	pointer-events: none;
 

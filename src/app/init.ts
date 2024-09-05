@@ -45,11 +45,11 @@ try {
 	await doEvents();
 	app.mount("#app");
 
-	// LanguageService initialization and LCP
-	// Vue will flush the rendering during the sleep.
-	// Therefore we initialize the LanguageService afterwards to prevent hydration mismatches.
-	// This will slightly slow down LCP, but still very acceptable.
+	// LCP
 	await lcp.promise;
+
+	// LanguageService initialization
+	// This is done after LCP to prevent hydration mismatches.
 	await doEvents();
 	LanguageService.init();
 	if(lcpReady.value === undefined) lcpReady.value = true;

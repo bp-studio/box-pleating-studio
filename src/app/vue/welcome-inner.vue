@@ -7,9 +7,12 @@
 		<i18n-t keypath="welcome.discord" tag="span" scope="global">
 			<a target="_blank" rel="noopener" href="https://discord.gg/HkcdTDS4zZ" v-t="'keyword.discord'"></a>
 		</i18n-t>
-
-		<i class="fas fa-plus" style="opacity: 0; /* We use this to force loading Font-Awesome */" />
 	</p>
+	<div class="font-preload">
+		<i class="fas fa-plus" />
+		<i class="fab fa-discord" />
+		<i class="far fa-clone" />
+	</div>
 </template>
 
 <script setup lang="ts">
