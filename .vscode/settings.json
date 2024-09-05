@@ -106,6 +106,8 @@
 		"src/app/gen": true,
 		"**/debug.log": true,
 		"test-results/": true,
+		"node_modules/": true,
+		"patches/": true,
 		".nyc_output": true
 	},
 	"i18n-ally.enabledFrameworks": [

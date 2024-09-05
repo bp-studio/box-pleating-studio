@@ -151,6 +151,9 @@
 				"esbuild",
 				"eslint"
 			]
+		},
+		"patchedDependencies": {
+			"ts-node": "patches/ts-node.patch"
 		}
 	}
 }

@@ -9,6 +9,11 @@ overrides:
   node-gyp: ^10.0.0
   caniuse-lite: 1.0.30001653
 
+patchedDependencies:
+  ts-node:
+    hash: 4lkyg5ytb6n7qngbv6lyoes5c4
+    path: patches/ts-node.patch
+
 importers:
 
   .:
@@ -283,7 +288,7 @@ importers:
         version: 4.0.2
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@22.5.3)(typescript@5.5.4)
+        version: 10.9.2(patch_hash=4lkyg5ytb6n7qngbv6lyoes5c4)(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@22.5.3)(typescript@5.5.4)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -12099,7 +12104,7 @@ snapshots:
     dependencies:
       typescript: 5.5.4
 
-  ts-node@10.9.2(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@22.5.3)(typescript@5.5.4):
+  ts-node@10.9.2(patch_hash=4lkyg5ytb6n7qngbv6lyoes5c4)(@swc/core@1.7.23(@swc/helpers@0.5.13))(@types/node@22.5.3)(typescript@5.5.4):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
