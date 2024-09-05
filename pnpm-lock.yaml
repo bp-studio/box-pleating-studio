@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  caniuse-lite: 1.0.30001653
   magic-string: ^0.27.0
   node-gyp: ^10.0.0
-  caniuse-lite: 1.0.30001653
 
 patchedDependencies:
   ts-node:

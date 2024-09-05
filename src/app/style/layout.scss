@@ -175,6 +175,15 @@ footer {
 	}
 }
 
+#divWelcome {
+	overflow-y: auto;
+
+	&, * {
+		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+		touch-action: pan-y;
+	}
+}
+
 .quick-item {
 	cursor: pointer;
 

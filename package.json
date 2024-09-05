@@ -1,7 +1,7 @@
 {
 	"name": "box-pleating-studio",
 	"version": "0.6.18",
-	"app_version": "1813",
+	"app_version": "1814",
 	"description": "Super-complex origami design made easy!",
 	"keywords": [
 		"origami",
@@ -142,14 +142,15 @@
 	},
 	"pnpm": {
 		"overrides": {
+			"caniuse-lite": "1.0.30001653",
 			"magic-string": "^0.27.0",
-			"node-gyp": "^10.0.0",
-			"caniuse-lite": "1.0.30001653"
+			"node-gyp": "^10.0.0"
 		},
 		"peerDependencyRules": {
 			"allowAny": [
 				"esbuild",
-				"eslint"
+				"eslint",
+				"jsdom"
 			]
 		},
 		"patchedDependencies": {
