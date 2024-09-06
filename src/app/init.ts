@@ -33,6 +33,16 @@ try {
 	// Client side hydration
 	const settingInit = (await import("app/services/settingService")).init;
 	settingInit();
+
+	// Run a "warm-up app". This significantly lowers TBT for the actual app
+	// while adding almost zero overhead to the total run time.
+	const stub = (await import("@/stub.vue")).default;
+	const testApp = createSSRApp(stub);
+	await doEvents();
+	testApp.mount(document.createElement("div"));
+	testApp.unmount();
+
+	await doEvents();
 	await import("@/welcome.vue");
 	const App = (await import("@/app.vue")).default;
 	const app = createSSRApp(App);
@@ -44,6 +54,8 @@ try {
 	app.use(plugin);
 	await doEvents();
 	app.mount("#app");
+	await doEvents();
+	fixTouchAction();
 
 	// LCP
 	await lcp.promise;
@@ -82,5 +94,19 @@ try {
 			window.onerror = null;
 			window.onunhandledrejection = null;
 		}, TIME_TERMINATE);
+	}
+}
+
+/**
+ * Fixing the issue that iPhone 6 does not support touch-action: none.
+ *
+ * Originally this was done in app.vue; we moved it out here for improving TBT.
+ */
+function fixTouchAction(): void {
+	const el = document.querySelector("#app") as HTMLDivElement;
+	if(getComputedStyle(el).touchAction != "none") {
+		el.addEventListener("touchmove", (e: TouchEvent) => {
+			if(e.touches.length > 1) e.preventDefault();
+		}, { passive: false });
 	}
 }

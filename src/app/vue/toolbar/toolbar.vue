@@ -1,17 +1,11 @@
 <template>
 	<nav class="btn-toolbar p-2">
-		<!--
-			Since most menus are loaded asynchronously,
-			we need to hide them until we're ready.
-		-->
-		<div class="btn-group me-2" role="menubar" v-show="phase >= 4">
-			<FileMenu />
-			<EditMenu />
-			<SettingMenu />
-			<ToolMenu />
-			<HelpMenu />
-		</div>
-		<StubMenu v-show="phase < 4" />
+		<Suspense>
+			<Menus />
+			<template #fallback>
+				<StubMenu />
+			</template>
+		</Suspense>
 
 		<div class="btn-group me-2" role="toolbar">
 			<button type="button" class="btn btn-primary"
@@ -27,6 +21,7 @@
 		</div>
 
 		<TabBar v-if="phase >= 5" />
+		<div v-else class="flex-grow-1"></div>
 
 		<div class="btn-group" id="panelToggle">
 			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')"
@@ -46,12 +41,8 @@
 	import { toggle } from "@/panel/panel.vue";
 	import StubMenu from "@/toolbar/stubMenu.vue";
 	import TabBar from "./components/tabBar.vue";
-	import ToolMenu from "./toolMenu.vue";
 
-	const FileMenu = asyncComp(() => import("./fileMenu.vue"), true);
-	const EditMenu = asyncComp(() => import("./editMenu.vue"), true);
-	const SettingMenu = asyncComp(() => import("./settingMenu.vue"), true);
-	const HelpMenu = asyncComp(() => import("./helpMenu.vue"), true);
+	const Menus = asyncComp(() => import("./menus.vue"), true);
 
 	defineOptions({ name: "Toolbar" });
 

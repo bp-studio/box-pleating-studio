@@ -1,5 +1,5 @@
 <template>
-	<div ref="el" v-on:mousedown.stop v-on:touchstart.stop.passive>
+	<div v-on:mousedown.stop v-on:touchstart.stop.passive>
 		<Welcome />
 		<DPad v-if="phase >= 2" />
 
@@ -32,9 +32,11 @@
 	</div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+	// const warmedUp = false;
+</script>
 
-	import { onMounted, shallowRef } from "vue";
+<script setup lang="ts">
 
 	import "shared/polyfill/withResolvers"; // We import this polyfill again for SSG.
 
@@ -42,8 +44,14 @@
 	import StubMenu from "@/toolbar/stubMenu.vue";
 	import DPad from "@/gadgets/dpad.vue";
 	import Status from "@/status.vue";
+	// import { isSSG } from "app/shared/constants";
 
 	defineOptions({ name: "App" });
+
+	// if(!isSSG && !warmedUp) {
+	// 	warmedUp = true;
+	// 	throw new Error();
+	// }
 
 	// Loading of the following two will directly impact LCP score,
 	// so we must load it as fast as possible, but still,
@@ -57,17 +65,5 @@
 	const Panel = asyncComp(() => import("@/panel/panel.vue"));
 	const ModalFragment = asyncComp(() => import("@/modals/modalFragment.vue"));
 	const DialogFragment = asyncComp(() => import("@/dialogs/dialogFragment.vue"));
-
-	const el = shallowRef<HTMLDivElement>();
-
-	onMounted(() => {
-		if(!el.value) return;
-		// iPhone 6 does not support touch-action: none
-		if(getComputedStyle(el.value).touchAction != "none") {
-			el.value.addEventListener("touchmove", (e: TouchEvent) => {
-				if(e.touches.length > 1) e.preventDefault();
-			}, { passive: false });
-		}
-	});
 
 </script>
