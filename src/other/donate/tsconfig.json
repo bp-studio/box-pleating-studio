@@ -1,8 +1,6 @@
 {
 	"compilerOptions": {
 		"jsx": "preserve",
-		"types": [],
-		"resolveJsonModule": true,
 		"paths": {
 			"temp/*": [
 				"../build/temp/*"

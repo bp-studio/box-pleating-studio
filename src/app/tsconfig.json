@@ -3,7 +3,6 @@
 		"baseUrl": "..",
 		"jsx": "preserve",
 		"target": "ESNext",
-		"resolveJsonModule": true,
 		"paths": {
 			"@/*": [
 				"app/vue/*"
