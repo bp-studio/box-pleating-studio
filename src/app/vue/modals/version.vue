@@ -28,7 +28,7 @@
 
 	import { onMounted, reactive, shallowRef, watch } from "vue";
 
-	import logs from "app/gen/log";
+	import logs from "app/misc/logs";
 	import Dialogs from "app/services/dialogService";
 	import useModal from "./modal";
 

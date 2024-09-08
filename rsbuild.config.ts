@@ -65,7 +65,7 @@ export default defineConfig({
 						chunks: "all",
 					},
 					index: {
-						test: makeTest(/src[\\/]app[\\/]/, /idb-keyval/, /probably-china/),
+						test: makeTest(null, /src[\\/](app|log)[\\/]/, /idb-keyval/, /probably-china/),
 						name: "index",
 						chunks: "all",
 					},
@@ -78,7 +78,7 @@ export default defineConfig({
 						priority: -1,
 					},
 					pixiUtils: {
-						test: makeTest(null, createDescendantRegExp("@pixi/ticker", "@pixi/math")),
+						test: makeTest(createDescendantRegExp("@pixi/ticker", "@pixi/math")),
 						name: "pixi-utils",
 						chunks: "async",
 					},
@@ -128,7 +128,6 @@ export default defineConfig({
 			// Only precache the two most common resolution; see https://tinyurl.com/7rxv5f97
 			{ from: "src/public/assets/icon/icon-32.png", to: "assets/icon" },
 			{ from: "src/public/assets/icon/icon-192.png", to: "assets/icon" },
-			{ from: "*.md", to: "log", context: "build/temp/log" },
 		],
 		dataUriLimit: 100,
 		legalComments: inspectBuild ? "inline" : "none",
@@ -170,7 +169,24 @@ export default defineConfig({
 		postcss: (_, { addPlugins }) => {
 			addPlugins(postcssPresetEnv());
 		},
-		rspack: (config, { appendPlugins, isDev }) => {
+		rspack: (config, { addRules, appendPlugins, isDev }) => {
+			addRules({
+				test: /\.md$/,
+				use: [
+					"html-minifier-loader",
+					{
+						loader: "markdown-loader",
+						options: {
+							headerIds: false,
+							mangle: false,
+						},
+					},
+				],
+				type: "asset/resource",
+				generator: {
+					filename: "log/[name][ext]",
+				},
+			});
 			config.module.rules.push({
 				test: /\.ts$/,
 				loader: "ifdef-loader",

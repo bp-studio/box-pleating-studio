@@ -44,7 +44,7 @@
 
 	import { computed, onMounted, shallowRef } from "vue";
 
-	import logs from "app/gen/log";
+	import logs from "app/misc/logs";
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
 	import Dialogs from "app/services/dialogService";
 	import { updateReady } from "app/misc/updateReady";

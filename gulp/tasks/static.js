@@ -4,22 +4,7 @@ const gulp = require("gulp");
 
 const config = require("../config.json");
 const newer = require("../utils/newer");
-const log = require("../plugins/log");
 const woff2 = require("../plugins/woff2");
-const htmlMinOption = require("../html.json");
-
-const buildLog = () =>
-	gulp.src([
-		config.src.log + "/*.md",
-		"!**/README.md",
-	])
-		.pipe(newer({
-			dest: config.src.app + "/gen/log.ts",
-			extra: [__filename, "gulp/plugins/log.js"],
-		}))
-		.pipe(log("log.ts"))
-		.pipe($.if(file => file.extname == ".md", $.htmlMinifierTerser(htmlMinOption)))
-		.pipe(gulp.dest(file => file.extname == ".md" ? config.dest.temp + "/log" : config.src.app + "/gen"));
 
 const buildIcon = () =>
 	gulp.src(config.src.icon + "/bps/**/*", {
@@ -39,12 +24,9 @@ const fontAwesome = () =>
 		.pipe($.fontawesome())
 		.pipe(gulp.dest(faTarget));
 
-gulp.task("log", buildLog);
-
 gulp.task("static", () => {
 	const tasks = [
 		buildIcon(),
-		buildLog(),
 	];
 	// Only the first time the FontAwesome build will be executed automatically.
 	// In other cases we call the `fa` task manually to improve performance.

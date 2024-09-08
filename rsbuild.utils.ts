@@ -1,7 +1,7 @@
 import { parse } from "yaml";
 import { readFileSync } from "fs";
 
-import type { Rspack } from "@rsbuild/core";
+import type { Module } from "@rspack/core";
 
 const yaml = readFileSync("pnpm-lock.yaml").toString();
 const json = parse(yaml);
@@ -10,7 +10,7 @@ const packages = Object.keys(json.snapshots);
 const collected = new Set<string>();
 
 export function makeTest(...tests: (RegExp | null)[]) {
-	return (m: Rspack.Module) => {
+	return (m: Module) => {
 		const name = m.nameForCondition();
 		for(const test of tests) {
 			if(test == null && name == null) return true;

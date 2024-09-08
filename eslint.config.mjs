@@ -458,6 +458,12 @@ export default [
 		},
 	},
 	{
+		files: ["rsbuild.config.ts"],
+		rules: {
+			"max-lines-per-function": "off",
+		},
+	},
+	{
 		files: ["src/**"],
 		languageOptions: {
 			globals: globals.browser,
