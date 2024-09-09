@@ -1,7 +1,7 @@
 import FileUtility from "app/utils/fileUtility";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
-import JSZip from "app/utils/jszip";
+import Zip from "app/utils/zip";
 
 import type { Project } from "client/project/project";
 
@@ -55,7 +55,7 @@ namespace ExportService {
 			names.add(name);
 			files[name + ".bps"] = JSON.stringify(project);
 		}
-		return JSZip.compress(files);
+		return Zip.compress(files);
 	}
 }
 

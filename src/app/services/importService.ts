@@ -2,7 +2,7 @@ import FileUtility from "app/utils/fileUtility";
 import Handles from "./handleService";
 import Workspace, { nextTick } from "./workspaceService";
 import Dialogs from "./dialogService";
-import JSZip from "app/utils/jszip";
+import Zip from "app/utils/zip";
 
 import type { ProjId } from "shared/json";
 
@@ -149,7 +149,7 @@ namespace ImportService {
 	 * Open a workspace file and return the last opened project id, if any.
 	 */
 	async function openWorkspace(buffer: ArrayBuffer): Promise<ProjId | undefined> {
-		const list = await JSZip.decompress(buffer);
+		const list = await Zip.decompress(buffer);
 		const files = Object.keys(list);
 		const ids = await Workspace.openMultiple(
 			files.map(f => JSON.parse(list[f])),

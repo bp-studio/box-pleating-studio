@@ -45,19 +45,3 @@ gulp.task("bootstrap", () => {
 		.pipe($.replace(/(\r|\n)*\/\*.+?\*\/$/, "")) // remove sourcemap
 		.pipe(gulp.dest(config.dest.temp));
 });
-
-/**
- * Prebuild jszip worker. The result is already included in the Repo,
- * so this task is needed only if jszip ever update itself.
- */
-gulp.task("jszip", () =>
-	gulp.src(config.src.lib + "/jszip/jszip.ts")
-		.pipe($.esbuild({
-			bundle: true,
-			define: {
-				require: "undefined",
-			},
-			treeShaking: true,
-		}))
-		.pipe(gulp.dest(config.src.lib + "/jszip"))
-);
