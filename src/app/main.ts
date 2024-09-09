@@ -5,7 +5,7 @@ import "shared/polyfill/flatMap"; // For Safari < 12, used in VueDraggable
 import "shared/polyfill/toReversed"; // Used in Client
 import "shared/polyfill/withResolvers";
 
-import "temp/bootstrap.css";
+import "lib/bootstrap/bootstrap.scss";
 import "temp/bps/style.css";
 import "app/style/main.scss";
 import "temp/font-awesome/css/all.min.css";

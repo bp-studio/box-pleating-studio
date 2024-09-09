@@ -26,7 +26,6 @@ requireDir("./gulp/tasks");
 // Run all builds
 gulp.task("build", gulp.parallel(
 	"static",
-	"bootstrap",
 	"donate",
 	"locale",
 	"html"

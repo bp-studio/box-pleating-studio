@@ -187,6 +187,10 @@ export default defineConfig({
 					filename: "log/[name][ext]",
 				},
 			});
+			addRules({
+				test: /lib[\\/]bootstrap[\\/]bootstrap\.scss$/,
+				loader: "./lib/bootstrap/loader.mjs",
+			});
 			config.module.rules.push({
 				test: /\.ts$/,
 				loader: "ifdef-loader",

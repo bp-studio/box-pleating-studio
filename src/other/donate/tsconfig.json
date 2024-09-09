@@ -4,6 +4,9 @@
 		"paths": {
 			"temp/*": [
 				"../build/temp/*"
+			],
+			"lib/*": [
+				"../lib/*"
 			]
 		}
 	},

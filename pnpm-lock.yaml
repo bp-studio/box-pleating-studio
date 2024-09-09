@@ -217,15 +217,9 @@ importers:
       gulp-newer:
         specifier: ^1.4.0
         version: 1.4.0
-      gulp-purgecss:
-        specifier: 6.0.0
-        version: 6.0.0
       gulp-replace:
         specifier: ^1.1.4
         version: 1.1.4
-      gulp-sass:
-        specifier: ^5.1.0
-        version: 5.1.0
       gulp-through2:
         specifier: ^1.1.0
         version: 1.1.0
@@ -262,15 +256,12 @@ importers:
       postcss-preset-env:
         specifier: ^10.0.2
         version: 10.0.2(postcss@8.4.45)
+      purgecss:
+        specifier: ^6.0.0
+        version: 6.0.0
       require-dir:
         specifier: ^1.2.0
         version: 1.2.0
-      resolve:
-        specifier: ^1.22.8
-        version: 1.22.8
-      sass:
-        specifier: ^1.78.0
-        version: 1.78.0
       stylelint:
         specifier: ^16.9.0
         version: 16.9.0(typescript@5.5.4)
@@ -2389,20 +2380,12 @@ packages:
     resolution: {integrity: sha512-OQwDZUqYaQwyyhDJHThmzId8daf4/RFNLaeh3AevmSeZ5Y7ug4Ga/yKc6l6kTZOBW781rCj103ZuTh8GAsB3+Q==}
     engines: {node: '>=0.10.0'}
 
-  arr-diff@4.0.0:
-    resolution: {integrity: sha512-YVIQ82gZPGBebQV/a8dar4AitzCQs0jjXwMPZllpXMaGjXPYVUawSxQrRsjhjupyVxEvbHgUmIhKVlND+j02kA==}
-    engines: {node: '>=0.10.0'}
-
   arr-flatten@1.1.0:
     resolution: {integrity: sha512-L3hKV5R/p5o81R7O02IGnwpDmkp6E982XhtbuwSe3O4qOtMMMtodicASA1Cny2U+aCXcNpml+m4dPsvsJ3jatg==}
     engines: {node: '>=0.10.0'}
 
   arr-union@2.1.0:
     resolution: {integrity: sha512-t5db90jq+qdgk8aFnxEkjqta0B/GHrM1pxzuuZz2zWsOXc5nKu3t+76s/PQBA8FTcM/ipspIH9jWG4OxCBc2eA==}
-    engines: {node: '>=0.10.0'}
-
-  arr-union@3.1.0:
-    resolution: {integrity: sha512-sKpyeERZ02v1FeCZT8lrfJq5u6goHCtpTAzPwJYe7c8SPFOboNjNg1vz2L4VTn9T4PQxEx13TbXLmYUcS6Ug7Q==}
     engines: {node: '>=0.10.0'}
 
   array-buffer-byte-length@1.0.1:
@@ -2460,10 +2443,6 @@ packages:
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
-
-  assign-symbols@1.0.0:
-    resolution: {integrity: sha512-Q+JC7Whu8HhmTdBph/Tq59IoRtoy6KAm5zzPv00WdujX82lbAL8K7WVjne7vdCsAmbF4AYaDOPyO3k0kl8qIrw==}
-    engines: {node: '>=0.10.0'}
 
   ast-metadata-inferer@0.8.0:
     resolution: {integrity: sha512-jOMKcHht9LxYIEQu+RVd22vtgrPaVCtDRQ/16IGmurdzxvYbDd5ynxjnyrzLnieG96eTcAyaoj/wN/4/1FyyeA==}
@@ -3276,10 +3255,6 @@ packages:
     resolution: {integrity: sha512-L7AGmkO6jhDkEBBGWlLtftA80Xq8DipnrRPr0pyi7GQLXkaq9JYA4xF4z6qnadIC6euiTDKco0cGSU9muw+WTw==}
     engines: {node: '>=0.10.0'}
 
-  extend-shallow@3.0.2:
-    resolution: {integrity: sha512-BwY5b5Ql4+qZoefgMj2NUmx+tehVTH/Kf4k1ZEtOHNFcm2wSxMRo992l6X3TIgni2eZVTZ85xMOjF31fwZAj6Q==}
-    engines: {node: '>=0.10.0'}
-
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
 
@@ -3640,16 +3615,9 @@ packages:
   gulp-newer@1.4.0:
     resolution: {integrity: sha512-h79fGO55S/P9eAADbLAP9aTtVYpLSR1ONj08VPaSdVVNVYhTS8p1CO1TW7kEMu+hC+sytmCqcUr5LesvZEtDoQ==}
 
-  gulp-purgecss@6.0.0:
-    resolution: {integrity: sha512-NZS8GQ8Yga/exoI0Coq6VOvjP5DL13NwcFc6K70zIWM3ZVsyr4KgoepeYaOqH5gOCMv7vbzX0q4TeCNmi1687w==}
-
   gulp-replace@1.1.4:
     resolution: {integrity: sha512-SVSF7ikuWKhpAW4l4wapAqPPSToJoiNKsbDoUnRrSgwZHH7lH8pbPeQj1aOVYQrbZKhfSVBxVW+Py7vtulRktw==}
     engines: {node: '>=10'}
-
-  gulp-sass@5.1.0:
-    resolution: {integrity: sha512-7VT0uaF+VZCmkNBglfe1b34bxn/AfcssquLKVDYnCDJ3xNBaW7cUuI3p3BQmoKcoKFrs9jdzUxyb+u+NGfL4OQ==}
-    engines: {node: '>=12'}
 
   gulp-through2@1.1.0:
     resolution: {integrity: sha512-c7ENVnqYvnlGnGfPCwoN0dXbwqJ/fP0YVpK5/htK5GmDyhm6rzE/sE+x441jydr1e1XoIpbm5/M3Qoku0huafw==}
@@ -3885,10 +3853,6 @@ packages:
     resolution: {integrity: sha512-9YQaSxsAiSwcvS33MBk3wTCVnWK+HhF8VZR2jRxehM16QcVOdHqPn4VPHmRK4lSr38n9JriurInLcP90xsYNfQ==}
     engines: {node: '>= 0.4'}
 
-  is-extendable@1.0.1:
-    resolution: {integrity: sha512-arnXMxT1hhoKo9k1LZdmlNyJdDDfy2v0fXjFlmok4+i8ul/6WlbVge9bhM74OpNPQPMGUToDtz+KXa1PneJxOA==}
-    engines: {node: '>=0.10.0'}
-
   is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
     engines: {node: '>=0.10.0'}
@@ -3942,10 +3906,6 @@ packages:
   is-plain-obj@2.1.0:
     resolution: {integrity: sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==}
     engines: {node: '>=8'}
-
-  is-plain-object@2.0.4:
-    resolution: {integrity: sha512-h5PpgXkWitc38BBMYawTYMWJHFZJVnBquFE57xFpjB8pJFiF6gZ+bU+WyI/yqXiFR5mdLsgYNaPe8uao6Uv9Og==}
-    engines: {node: '>=0.10.0'}
 
   is-plain-object@5.0.0:
     resolution: {integrity: sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==}
@@ -4218,9 +4178,6 @@ packages:
   locate-path@7.2.0:
     resolution: {integrity: sha512-gvVijfZvn7R+2qyPX8mAuKcFGDf6Nc61GdvGafQsHL0sBIxfKzA+usWn4GFC/bk+QdwPUD4kWFJLhElipq+0VA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-
-  lodash.clonedeep@4.5.0:
-    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
 
   lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
@@ -4690,10 +4647,6 @@ packages:
   plugin-error@0.1.2:
     resolution: {integrity: sha512-WzZHcm4+GO34sjFMxQMqZbsz3xiNEgonCskQ9v+IroMmYgk/tas8dG+Hr2D6IbRPybZ12oWpzE/w3cGJ6FJzOw==}
     engines: {node: '>=0.10.0'}
-
-  plugin-error@1.0.1:
-    resolution: {integrity: sha512-L1zP0dk7vGweZME2i+EeakvUNqSrdiI3F91TwEoYiGrAfUXmVv6fJIq4g82PAXxNsWOp0J7ZqQy/3Szz0ajTxA==}
-    engines: {node: '>= 0.10'}
 
   plugin-error@2.0.1:
     resolution: {integrity: sha512-zMakqvIDyY40xHOvzXka0kUvf40nYIuwRE8dWhti2WtjQZ31xAgBZBhxsK7vK3QbRXS1Xms/LO7B5cuAsfB2Gg==}
@@ -5261,11 +5214,6 @@ packages:
     engines: {node: '>=16.0.0'}
     hasBin: true
 
-  sass@1.78.0:
-    resolution: {integrity: sha512-AaIqGSrjo5lA2Yg7RvFZrlXDBCp3nV4XP73GrLGvdRWWwk+8H3l0SDvq/5bA4eF+0RFPLuWUk3E+P1U/YqnpsQ==}
-    engines: {node: '>=14.0.0'}
-    hasBin: true
-
   saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
@@ -5360,10 +5308,6 @@ packages:
 
   source-map-support@0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
-
-  source-map@0.5.7:
-    resolution: {integrity: sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==}
-    engines: {node: '>=0.10.0'}
 
   source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
@@ -5913,9 +5857,6 @@ packages:
   vinyl-sourcemap@2.0.0:
     resolution: {integrity: sha512-BAEvWxbBUXvlNoFQVFVHpybBbjW1r03WhohJzJDSfgrrK5xVYIDTan6xN14DlyImShgDRv2gl9qhM6irVMsV0Q==}
     engines: {node: '>=10.13.0'}
-
-  vinyl-sourcemaps-apply@0.2.1:
-    resolution: {integrity: sha512-+oDh3KYZBoZC8hfocrbrxbLUeaYtQK7J5WU5Br9VqWqmCll3tFJqKp97GC9GmMsVIL0qnx2DgEDVxdo5EZ5sSw==}
 
   vinyl@2.2.1:
     resolution: {integrity: sha512-LII3bXRFBZLlezoG5FfZVcXflZgWP/4dCwKtxd5ky9+LOtM4CS3bIRQsmR1KMnMW07jpE8fqR2lcxPZ+8sJIcw==}
@@ -8481,13 +8422,9 @@ snapshots:
       arr-flatten: 1.1.0
       array-slice: 0.2.3
 
-  arr-diff@4.0.0: {}
-
   arr-flatten@1.1.0: {}
 
   arr-union@2.1.0: {}
-
-  arr-union@3.1.0: {}
 
   array-buffer-byte-length@1.0.1:
     dependencies:
@@ -8552,8 +8489,6 @@ snapshots:
   arrify@2.0.1: {}
 
   assertion-error@2.0.1: {}
-
-  assign-symbols@1.0.0: {}
 
   ast-metadata-inferer@0.8.0:
     dependencies:
@@ -9519,11 +9454,6 @@ snapshots:
     dependencies:
       kind-of: 1.1.0
 
-  extend-shallow@3.0.2:
-    dependencies:
-      assign-symbols: 1.0.0
-      is-extendable: 1.0.1
-
   extend@3.0.2: {}
 
   external-editor@3.1.0:
@@ -9957,14 +9887,6 @@ snapshots:
       kew: 0.7.0
       plugin-error: 0.1.2
 
-  gulp-purgecss@6.0.0:
-    dependencies:
-      glob: 10.4.5
-      plugin-error: 2.0.1
-      purgecss: 6.0.0
-      through2: 4.0.2
-      vinyl-sourcemaps-apply: 0.2.1
-
   gulp-replace@1.1.4:
     dependencies:
       '@types/node': 22.5.4
@@ -9972,15 +9894,6 @@ snapshots:
       istextorbinary: 3.3.0
       replacestream: 4.0.3
       yargs-parser: 21.1.1
-
-  gulp-sass@5.1.0:
-    dependencies:
-      lodash.clonedeep: 4.5.0
-      picocolors: 1.1.0
-      plugin-error: 1.0.1
-      replace-ext: 2.0.0
-      strip-ansi: 6.0.1
-      vinyl-sourcemaps-apply: 0.2.1
 
   gulp-through2@1.1.0:
     dependencies:
@@ -10234,10 +10147,6 @@ snapshots:
     dependencies:
       has-tostringtag: 1.0.2
 
-  is-extendable@1.0.1:
-    dependencies:
-      is-plain-object: 2.0.4
-
   is-extglob@2.1.1: {}
 
   is-fullwidth-code-point@3.0.0: {}
@@ -10269,10 +10178,6 @@ snapshots:
   is-path-inside@4.0.0: {}
 
   is-plain-obj@2.1.0: {}
-
-  is-plain-object@2.0.4:
-    dependencies:
-      isobject: 3.0.1
 
   is-plain-object@5.0.0: {}
 
@@ -10549,8 +10454,6 @@ snapshots:
   locate-path@7.2.0:
     dependencies:
       p-locate: 6.0.0
-
-  lodash.clonedeep@4.5.0: {}
 
   lodash.debounce@4.0.8: {}
 
@@ -11051,13 +10954,6 @@ snapshots:
       arr-diff: 1.1.0
       arr-union: 2.1.0
       extend-shallow: 1.1.4
-
-  plugin-error@1.0.1:
-    dependencies:
-      ansi-colors: 1.1.0
-      arr-diff: 4.0.0
-      arr-union: 3.1.0
-      extend-shallow: 3.0.2
 
   plugin-error@2.0.1:
     dependencies:
@@ -11634,12 +11530,6 @@ snapshots:
       sass-embedded-win32-ia32: 1.78.0
       sass-embedded-win32-x64: 1.78.0
 
-  sass@1.78.0:
-    dependencies:
-      chokidar: 3.6.0
-      immutable: 4.3.7
-      source-map-js: 1.2.0
-
   saxes@6.0.0:
     dependencies:
       xmlchars: 2.2.0
@@ -11738,8 +11628,6 @@ snapshots:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
-
-  source-map@0.5.7: {}
 
   source-map@0.6.1: {}
 
@@ -12397,10 +12285,6 @@ snapshots:
       streamx: 2.20.0
       vinyl: 3.0.0
       vinyl-contents: 2.0.0
-
-  vinyl-sourcemaps-apply@0.2.1:
-    dependencies:
-      source-map: 0.5.7
 
   vinyl@2.2.1:
     dependencies:
