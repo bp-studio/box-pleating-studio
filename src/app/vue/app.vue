@@ -44,14 +44,8 @@
 	import StubMenu from "@/toolbar/stubMenu.vue";
 	import DPad from "@/gadgets/dpad.vue";
 	import Status from "@/status.vue";
-	// import { isSSG } from "app/shared/constants";
 
 	defineOptions({ name: "App" });
-
-	// if(!isSSG && !warmedUp) {
-	// 	warmedUp = true;
-	// 	throw new Error();
-	// }
 
 	// Loading of the following two will directly impact LCP score,
 	// so we must load it as fast as possible, but still,
