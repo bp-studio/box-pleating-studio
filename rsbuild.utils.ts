@@ -9,12 +9,11 @@ const json = parse(yaml);
 const packages = Object.keys(json.snapshots);
 const collected = new Set<string>();
 
-export function makeTest(...tests: (RegExp | null)[]) {
+export function makeTest(...tests: RegExp[]) {
 	return (m: Module) => {
-		const name = m.nameForCondition();
+		const name = m.nameForCondition() || m.identifier();
 		for(const test of tests) {
-			if(test == null && name == null) return true;
-			if(test && test.test(name)) return true;
+			if(test.test(name)) return true;
 		}
 		return false;
 	};

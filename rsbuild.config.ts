@@ -6,7 +6,7 @@ import { pluginCheckSyntax } from "@rsbuild/plugin-check-syntax";
 import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry";
 import { InjectManifest } from "@aaroon/workbox-rspack-plugin";
 import { pluginSass } from "@rsbuild/plugin-sass";
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+import { RsdoctorRspackPlugin } from "@rsdoctor/rspack-plugin";
 import postcssPresetEnv from "postcss-preset-env";
 
 import { createDescendantRegExp, makeTest } from "./rsbuild.utils";
@@ -24,6 +24,7 @@ export default defineConfig({
 		include: [/@pixi/],
 		alias: {
 			"vue-slicksort$": "./node_modules/vue-slicksort/dist/vue-slicksort.esm.js",
+			"./url.mjs$": "./lib/pixi/url.mjs", // see lib/README.md
 		},
 		entry: {
 			index: "./src/app/main.ts",
@@ -65,7 +66,7 @@ export default defineConfig({
 						chunks: "all",
 					},
 					index: {
-						test: makeTest(null, /src[\\/](app|log)[\\/]/, /idb-keyval/, /probably-china/),
+						test: makeTest(/src[\\/](app|log)\b/, /idb-keyval/, /probably-china/),
 						name: "index",
 						chunks: "all",
 					},
@@ -78,7 +79,10 @@ export default defineConfig({
 						priority: -1,
 					},
 					pixiUtils: {
-						test: makeTest(createDescendantRegExp("@pixi/ticker", "@pixi/math")),
+						test: makeTest(
+							createDescendantRegExp("@pixi/ticker", "@pixi/math"),
+							/pixi[\\/]url.mjs/ // see lib/README.md
+						),
 						name: "pixi-utils",
 						chunks: "async",
 					},
@@ -162,38 +166,53 @@ export default defineConfig({
 			addPlugins(postcssPresetEnv());
 		},
 		rspack: (config, { addRules, appendPlugins, isDev }) => {
-			addRules({
-				test: /\.md$/,
-				use: [
-					"html-minifier-loader",
-					{
-						loader: "markdown-loader",
-						options: {
-							headerIds: false,
-							mangle: false,
+			addRules([
+				{
+					test: /\.md$/,
+					use: [
+						"html-minifier-loader",
+						{
+							loader: "markdown-loader",
+							options: {
+								headerIds: false,
+								mangle: false,
+							},
 						},
+					],
+					type: "asset/resource",
+					generator: {
+						filename: "log/[name][ext]",
 					},
-				],
-				type: "asset/resource",
-				generator: {
-					filename: "log/[name][ext]",
 				},
-			});
-			addRules({
-				test: /lib[\\/]bootstrap[\\/]bootstrap\.scss$/,
-				loader: "./lib/bootstrap/loader.mjs",
-			});
-			config.module.rules.push({
-				test: /\.ts$/,
-				loader: "ifdef-loader",
-				options: {
-					DEBUG: isDev,
+				{
+					test: /lib[\\/]bootstrap[\\/]bootstrap\.scss$/,
+					loader: "./lib/bootstrap/loader.mjs",
 				},
-			});
+			]);
+
+			// This one needs to be placed last
+			config.module.rules.push(
+				{
+					test: /\.ts$/,
+					loader: "ifdef-loader",
+					options: {
+						DEBUG: isDev,
+					},
+				}
+			);
 
 			if(isDev) return;
 
-			if(inspectBundle) appendPlugins(new BundleAnalyzerPlugin());
+			if(inspectBundle) {
+				appendPlugins(new RsdoctorRspackPlugin({
+					linter: {
+						rules: { "ecma-version-check": "off" },
+					},
+					supports: {
+						generateTileGraph: true,
+					},
+				}));
+			}
 
 			appendPlugins(new InjectManifest({
 				swSrc: "./src/other/service/sw.ts",

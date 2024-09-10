@@ -8,3 +8,6 @@ Those including:
 
 - Bootstrap: Customized for BP Studio.
 - LZMA: The released file by LZMA.js contains minification error which makes it unusable, the file here fixed the error.
+- Pixi: Pixi v7 has a deprecated dependency of `url`, and since v7 isn't designed to be side-effect-free,
+  Rspack's tree-shaking doesn't work with it. We use a stub module as a substitute to reduce the bundle size.
+  This can be removed after updating to Pixi v8.

@@ -22,7 +22,7 @@ export interface IProjectController {
 	close(proj: Project): void;
 }
 
-///#if DEBUG
+/// #if DEBUG
 /**
  * For debugging memory leaks. When in debug mode,
  * it prints a message in the console after the {@link Project} has been garbage collected.
@@ -31,7 +31,7 @@ export interface IProjectController {
  */
 // eslint-disable-next-line compat/compat
 const registry = new FinalizationRegistry<number>(id => console.log(`Project #${id} GC.`));
-///#endif
+/// #endif
 
 //=================================================================
 /**
