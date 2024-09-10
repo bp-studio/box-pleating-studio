@@ -133,15 +133,7 @@ export default defineConfig({
 		legalComments: inspectBuild ? "inline" : "none",
 		polyfill: "off",
 		// sourceMap: { js: "source-map" },
-		minify: !inspectBuild && {
-			jsOptions: {
-				minimizerOptions: {
-					format: {
-						asciiOnly: false, // do not escape unicode in strings
-					},
-				},
-			},
-		},
+		minify: !inspectBuild,
 		distPath: {
 			root: "build/dist",
 		},

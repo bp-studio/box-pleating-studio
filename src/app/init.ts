@@ -1,7 +1,6 @@
 import { createSSRApp } from "vue";
 
 import { doEvents } from "shared/utils/async";
-import { lcp } from "app/misc/phase";
 
 //=================================================================
 /**
@@ -17,7 +16,8 @@ const TIME_TERMINATE = 100;
 const TOTAL_PHASES = 10;
 
 await doEvents();
-const { lcpReady, phase } = await import("app/misc/phase");
+const { lcp, welcomeScreenReady, phase, checkForEarlyWelcome } = await import("app/misc/phase");
+const earlyWelcome = checkForEarlyWelcome();
 await import("app/gen/locale");
 await doEvents();
 
@@ -39,11 +39,13 @@ try {
 	const stub = (await import("@/stub.vue")).default;
 	const testApp = createSSRApp(stub);
 	await doEvents();
-	testApp.mount(document.createElement("div"));
+	const testRoot = document.createElement("div");
+	testRoot.innerHTML = "<div></div>";
+	testApp.mount(testRoot);
 	testApp.unmount();
 
 	await doEvents();
-	await import("@/welcome.vue");
+	await import("@/welcome/welcome.vue");
 	const App = (await import("@/app.vue")).default;
 	const app = createSSRApp(App);
 	await doEvents();
@@ -64,7 +66,7 @@ try {
 	// This is done after LCP to prevent hydration mismatches.
 	await doEvents();
 	LanguageService.init();
-	if(lcpReady.value === undefined) lcpReady.value = true;
+	if(earlyWelcome) welcomeScreenReady.value = true;
 
 	// Phase 1 to 2
 	await import("@/panel/panel.vue");

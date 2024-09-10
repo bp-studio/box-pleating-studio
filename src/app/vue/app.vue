@@ -32,18 +32,12 @@
 	</div>
 </template>
 
-<script lang="ts">
-	// const warmedUp = false;
-</script>
-
 <script setup lang="ts">
 
 	import "shared/polyfill/withResolvers"; // We import this polyfill again for SSG.
 
 	import { phase, asyncComp } from "app/misc/phase"; // This must be loaded before anything else.
 	import StubMenu from "@/toolbar/stubMenu.vue";
-	import DPad from "@/gadgets/dpad.vue";
-	import Status from "@/status.vue";
 
 	defineOptions({ name: "App" });
 
@@ -51,12 +45,14 @@
 	// so we must load it as fast as possible, but still,
 	// we can't afford to load them synchronously with the App itself
 	// (that will add too much to TBT), so we use a doEvents trick here.
-	const Welcome = asyncComp(() => import("@/welcome.vue"), true);
+	const Welcome = asyncComp(() => import("@/welcome/welcome.vue"), true);
 	const Spinner = asyncComp(() => import("@/dialogs/spinner.vue"), true);
 
 	// The rest are loaded in later phase
 	const Toolbar = asyncComp(() => import("@/toolbar/toolbar.vue"));
 	const Panel = asyncComp(() => import("@/panel/panel.vue"));
+	const Status = asyncComp(() => import("@/status.vue"));
+	const DPad = asyncComp(() => import("@/gadgets/dpad.vue"));
 	const ModalFragment = asyncComp(() => import("@/modals/modalFragment.vue"));
 	const DialogFragment = asyncComp(() => import("@/dialogs/dialogFragment.vue"));
 

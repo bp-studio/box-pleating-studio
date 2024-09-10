@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 
-	defineOptions({ name: "Welcome-Inner" });
+	defineOptions({ name: "Links" });
 
 	import { onMounted } from "vue";
 

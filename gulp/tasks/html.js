@@ -42,7 +42,17 @@ function ssgOption(options) {
 					directiveTransforms: { t: vt(i18n) }, // So that v-t directives will be processed
 				})),
 			],
-			external: ["vue", "@vue", "vue-*", "@pixi", "bootstrap", "@popperjs", "fflate", "./src/client"],
+			external: [
+				// Mark async dependencies as external to reduce compile time
+				"vue", "@vue", "vue-*", "@pixi", "bootstrap", "@popperjs", "fflate",
+				"./src/client/*",
+				"./src/app/vue/toolbar/toolbar.vue",
+				"./src/app/vue/panel/panel.vue",
+				"./src/app/vue/status.vue",
+				"./src/app/vue/gadgets/dpad.vue",
+				"./src/app/vue/modals/modalFragment.vue",
+				"./src/app/vue/dialogs/dialogFragment.vue",
+			],
 			logLevel: "error", // silence warnings
 			target,
 		},
@@ -87,6 +97,7 @@ gulp.task("html", () => gulp.src(config.src.app + "/html/index.htm")
 	.pipe(wrapIE())
 	.pipe(gulp.dest(config.dest.temp)));
 
+/** Donate page */
 gulp.task("donate", () =>
 	gulp.src(config.src.donate + "/donate.htm")
 		.pipe(newer({

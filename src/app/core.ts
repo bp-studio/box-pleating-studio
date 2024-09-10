@@ -7,7 +7,7 @@ import StudioService from "app/services/studioService";
 import Dialogs from "app/services/dialogService";
 import LZ from "app/utils/lz";
 import Workspace from "./services/workspaceService";
-import { lcpReady } from "app/misc/phase";
+import { welcomeScreenReady } from "app/misc/phase";
 import HotkeyService from "./services/hotkeyService";
 
 namespace Core {
@@ -28,7 +28,7 @@ namespace Core {
 		const hasSession = await SessionService.init(Settings.loadSessionOnQueue || !hasQueue);
 		if(getHadSettings()) await HandleService.load(hasSession);
 		await loadQuery();
-		lcpReady.value = true;
+		welcomeScreenReady.value = true;
 		return true;
 	}
 

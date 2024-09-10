@@ -1,8 +1,7 @@
 import { computed, reactive, shallowRef } from "vue";
 
-import { defaultTitle, isTouch } from "app/shared/constants";
+import { defaultTitle } from "app/shared/constants";
 import Dialogs from "./dialogService";
-import Settings from "./settingService";
 import { doEvents } from "shared/utils/async";
 
 import type { Stretch } from "client/project/components/layout/stretch";
@@ -98,10 +97,6 @@ namespace StudioService {
 		notifyAll() { /* */ },
 	});
 
-	export const shouldShowDPad = computed(() =>
-		isTouch && Settings.showDPad && draggableSelected.value
-	);
-
 	export async function execute(action: Action<Promise<void>>): Promise<void> {
 		if(executing) return; // ignore rapid execution
 		try {
@@ -145,8 +140,8 @@ namespace StudioService {
 		if(!proj) return;
 		execute(() => proj.design.delete());
 	}
-	export function svg(proj: Project): Promise<Blob> {
-		return Promise.resolve(bp.svg(proj, Settings.includeHiddenElement));
+	export function svg(proj: Project, includeHidden: boolean): Promise<Blob> {
+		return Promise.resolve(bp.svg(proj, includeHidden));
 	}
 	export function png(proj: Project): Promise<Blob> {
 		return bp.png(proj);

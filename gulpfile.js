@@ -17,11 +17,14 @@ path.relative = function(from, to) {
 
 // Load all dependencies
 const gulp = require("gulp");
-const requireDir = require("require-dir");
 const seriesIf = require("./gulp/utils/seriesIf");
 const { exec } = require("child_process");
 
-requireDir("./gulp/tasks");
+require("./gulp/tasks/ftp.js");
+require("./gulp/tasks/html.js");
+require("./gulp/tasks/locale.js");
+require("./gulp/tasks/static.js");
+require("./gulp/tasks/tool.js");
 
 // Run all builds
 gulp.task("build", gulp.parallel(

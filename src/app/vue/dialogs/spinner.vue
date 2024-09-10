@@ -13,13 +13,13 @@
 	import { computed, onMounted, shallowRef } from "vue";
 
 	import { setup } from "app/services/dialogService";
-	import { lcpReady } from "app/misc/phase";
+	import { welcomeScreenReady } from "app/misc/phase";
 	import Workspace from "app/services/workspaceService";
 
 	defineOptions({ name: "Spinner" });
 
 	const loading = shallowRef(false);
-	const visible = computed(() => !lcpReady.value || loading.value);
+	const visible = computed(() => !welcomeScreenReady.value || loading.value);
 
 	const ONE_SECOND = 1000;
 
