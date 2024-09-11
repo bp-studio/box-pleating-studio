@@ -1,5 +1,5 @@
 // Third-party library types
-import type { VueI18n } from "vue-i18n";
+import type { Composer } from "vue-i18n";
 import type * as Client from "client/main";
 import "@types/gtag.js";
 
@@ -22,6 +22,6 @@ declare global {
 	/** Global instance of the Client. Declared in HTML. */
 	declare const bp: typeof Client;
 
-	/** Global VueI18n instance. Either injected by SSG or created in LanguageService.ts. */
-	declare const i18n: VueI18n;
+	/** Global vue-i18n Composer instance. Either injected by SSG or created in LanguageService.ts. */
+	declare const i18n: Composer;
 }

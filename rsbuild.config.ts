@@ -13,7 +13,7 @@ import { createDescendantRegExp, makeTest } from "./rsbuild.utils";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
-const inspectBundle = false;
+const useRsdoctor = false;
 const inspectBuild = false;
 
 export default defineConfig({
@@ -32,6 +32,7 @@ export default defineConfig({
 		},
 		define: {
 			// __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
+			__VUE_I18N_LEGACY_API__: false,
 			DEBUG_ENABLED: !isProduction,
 			TEST_MODE: false,
 		},
@@ -203,7 +204,7 @@ export default defineConfig({
 
 			if(isDev) return;
 
-			if(inspectBundle) {
+			if(useRsdoctor) {
 				appendPlugins(new RsdoctorRspackPlugin({
 					linter: {
 						rules: { "ecma-version-check": "off" },

@@ -34,7 +34,7 @@
 	let modal: Modal;
 
 	function setLocale(l: string): void {
-		i18n.locale = l;
+		i18n.locale.value = l;
 	}
 
 	function show(): void {

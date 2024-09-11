@@ -31,6 +31,7 @@ namespace LanguageService {
 		if(probablyChina) locale["zh-tw"].emoji = () => "🇭🇰";
 
 		const plugin = createI18n<[BpsLocale], string>({
+			legacy: false,
 			locale: DEFAULT_LOCALE,
 			fallbackLocale: DEFAULT_LOCALE,
 			silentFallbackWarn: true,
@@ -54,7 +55,7 @@ namespace LanguageService {
 			_options.push(...langs);
 		}
 		const loc = format(localeSetting || langs[0] || DEFAULT_LOCALE);
-		i18n.locale = loc;
+		i18n.locale.value = loc;
 		localStorage.setItem(LOCALE_KEY, loc);
 	}
 
@@ -68,18 +69,18 @@ namespace LanguageService {
 		window.addEventListener("storage", e => {
 			if(e.key == LOCALE_KEY) {
 				syncing = true;
-				i18n.locale = e.newValue!;
+				i18n.locale.value = e.newValue!;
 			}
 		});
 
-		watch(() => i18n.locale, loc => {
+		watch(i18n.locale, loc => {
 			if(loc in locale) {
 				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
 				syncing = false;
 				debounce(() => gtag("event", "lang_" + loc.replace("-", "_")));
 			} else {
 				loc = findFallbackLocale(loc);
-				nextTick(() => i18n.locale = loc);
+				nextTick(() => i18n.locale.value = loc);
 			}
 			document.documentElement.lang = loc;
 		}, { immediate: true });

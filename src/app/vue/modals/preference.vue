@@ -31,9 +31,9 @@
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
 							<div class="col-8">
-								<select class="form-select flag" v-model="I18n.locale">
-									<option v-for="l in I18n.availableLocales" :key="l" :value="l">
-										{{ $t('emoji', l) }}&ensp;{{ $t('name', l) }}
+								<select class="form-select flag" v-model="$i18n.locale">
+									<option v-for="l in $i18n.availableLocales" :key="l" :value="l">
+										{{ $t('emoji', {}, { locale: l }) }}&ensp;{{ $t('name', {}, { locale: l }) }}
 									</option>
 								</select>
 							</div>
@@ -112,7 +112,6 @@
 	const { el, on, show } = useModal("Preference");
 
 	const tab = shallowRef(0);
-	const I18n = i18n;
 
 	onMounted(() => {
 		watch(on, v => {
