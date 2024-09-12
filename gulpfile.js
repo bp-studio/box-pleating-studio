@@ -66,8 +66,8 @@ const deployMsg = `Before releasing, please check the following steps:
 2. Consider updating dependencies.
 3. Update the version number in package.json, and add update logs.
 4. Edit README.md if needed.
-5. Add relevant tests, and make sure that new codes are covered.
-6. Deploy to DEV at least once to ensure there's no major building error.
+5. Add relevant Mocha tests, and make sure that new codes are covered.
+6. Build and run e2e tests.
 Are you sure you want to deploy?"`;
 
 gulp.task("deployPub", () => seriesIf(

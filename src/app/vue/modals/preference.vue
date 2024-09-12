@@ -31,7 +31,7 @@
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
 							<div class="col-8">
-								<select class="form-select flag" v-model="$i18n.locale">
+								<select class="form-select flag" v-model="$i18n.locale" aria-label="Language">
 									<option v-for="l in $i18n.availableLocales" :key="l" :value="l">
 										{{ $t('emoji', {}, { locale: l }) }}&ensp;{{ $t('name', {}, { locale: l }) }}
 									</option>
