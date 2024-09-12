@@ -80,9 +80,9 @@ Their relations can be roughly depicted as follows:
 
 ```mermaid
 graph LR
-	a("App\n(user interface)")
-	b("Client\n(workspace)")
-	c("Core\n(worker thread)")
+	a("App<br>(user interface)")
+	b("Client<br>(workspace)")
+	c("Core<br>(worker thread)")
 	a -->|controls| b
 	b -->|data| a
 	b -->|manipulates| c
