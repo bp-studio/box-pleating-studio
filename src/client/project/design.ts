@@ -175,10 +175,10 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 
 	/// #if DEBUG
 	/* istanbul ignore next: debug */
-	public createTestCase(): string {
+	public createTestCase(): void {
 		const edges = this.tree.toJSON().edges.map(e => `(${e.n1},${e.n2},${e.length})`).join(",");
 		const flaps = this.layout.toJSON().flaps.map(f => `(${f.id},${f.x},${f.y},${f.width},${f.height})`).join(",");
-		return `parseTree(\n\t"${edges}",\n\t"${flaps}"\n);`;
+		console.log(`parseTree(\n\t"${edges}",\n\t"${flaps}"\n);`);
 	}
 	/// #endif
 }

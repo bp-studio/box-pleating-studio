@@ -25,7 +25,7 @@ export default function() {
 			expectRepo("1,2,3", 1, 1);
 
 			const B = node(b)!;
-			expect(B.$graphics.$patternContours.length).to.be.equal(1);
+			expect(B.$graphics.$patternContours.length).to.equal(1);
 
 			const path = toPath(B.$graphics.$patternContours[0]);
 			expect(path).to.equalPath("(8,3),(7,13/3),(7,6),(16/3,6),(4,7),(4,8)");
@@ -39,7 +39,7 @@ export default function() {
 			expectRepo("1,2,3", 1, 1);
 
 			const B = node(b)!;
-			expect(B.$graphics.$patternContours.length).to.be.equal(1);
+			expect(B.$graphics.$patternContours.length).to.equal(1);
 
 			const path = toPath(B.$graphics.$patternContours[0]);
 			expect(path).to.equalPath("(-4,8),(-4,7),(-16/3,6),(-7,6),(-7,13/3),(-8,3)");
@@ -53,7 +53,7 @@ export default function() {
 				`(${a},0,0,0,0),(${b},9,5,0,0),(${c},6,8,0,0)`
 			);
 			const r = node(4)!;
-			expect(r.$graphics.$patternContours.length).to.be.equal(1);
+			expect(r.$graphics.$patternContours.length).to.equal(1);
 		}
 	});
 
@@ -64,10 +64,42 @@ export default function() {
 				{ id: b, x: 7, y: 11, radius: 2 },
 				{ id: c, x: 10, y: 6, radius: 1 },
 			]);
-			expectRepo("1,2,3",
-				2,	// Both ways of cutting works
-				4	// Each configuration has four conjugate patterns
+			const devices = expectRepo("1,2,3",
+				1,	// v0.7: Under the new spec, now only one cutting will work.
+				4,	// Each configuration has four conjugate patterns
+				2
 			);
+			let pieceCount = 0;
+			for(const device of devices) {
+				expect(device.$gadgets.length).to.equal(1);
+				const gadget = device.$gadgets[0];
+				pieceCount += gadget.pieces.length;
+				if(gadget.pieces.length == 2) {
+					expect(gadget.$slack).to.contain(0.5);
+				}
+			}
+			expect(pieceCount).to.equal(3);
+		}
+	});
+
+	it("Universal gadget relay", function() {
+		for(const [a, b, c] of THREE_PERMUTATION) {
+			generateFromFlaps([
+				{ id: a, x: 0, y: 0, radius: 10 },
+				{ id: b, x: 10, y: 11, radius: 3 },
+				{ id: c, x: 11, y: 5, radius: 2 },
+			]);
+			const devices = expectRepo("1,2,3", 1, 4, 2);
+			let pieceCount = 0;
+			for(const device of devices) {
+				expect(device.$gadgets.length).to.equal(1);
+				const gadget = device.$gadgets[0];
+				pieceCount += gadget.pieces.length;
+				if(gadget.pieces.length == 2) {
+					expect(gadget.$slack).to.contain(0.25);
+				}
+			}
+			expect(pieceCount).to.equal(3);
 		}
 	});
 

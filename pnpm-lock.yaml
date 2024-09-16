@@ -55,14 +55,14 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       vue:
-        specifier: ^3.5.5
-        version: 3.5.5(typescript@5.6.2)
+        specifier: ^3.5.6
+        version: 3.5.6(typescript@5.6.2)
       vue-i18n:
         specifier: ^10.0.1
-        version: 10.0.1(vue@3.5.5(typescript@5.6.2))
+        version: 10.0.1(vue@3.5.6(typescript@5.6.2))
       vue-slicksort:
         specifier: ^2.0.5
-        version: 2.0.5(vue@3.5.5(typescript@5.6.2))
+        version: 2.0.5(vue@3.5.6(typescript@5.6.2))
       workbox-broadcast-update:
         specifier: ^7.1.0
         version: 7.1.0
@@ -90,10 +90,10 @@ importers:
         version: 9.10.0
       '@intlify/vue-i18n-extensions':
         specifier: ^6.2.0
-        version: 6.2.0(@intlify/shared@10.0.1)(@vue/compiler-dom@3.5.5)(vue-i18n@10.0.1(vue@3.5.5(typescript@5.6.2)))(vue@3.5.5(typescript@5.6.2))
+        version: 6.2.0(@intlify/shared@10.0.1)(@vue/compiler-dom@3.5.6)(vue-i18n@10.0.1(vue@3.5.6(typescript@5.6.2)))(vue@3.5.6(typescript@5.6.2))
       '@mutsuntsai/esbuild-plugin-vue':
         specifier: ^0.1.6
-        version: 0.1.6(@vue/compiler-sfc@3.5.5)
+        version: 0.1.6(@vue/compiler-sfc@3.5.6)
       '@mutsuntsai/stylistic':
         specifier: ^1.0.3
         version: 1.0.3(eslint@9.10.0)(typescript@5.6.2)
@@ -114,7 +114,7 @@ importers:
         version: 1.0.1(@rsbuild/core@1.0.4)
       '@rsbuild/plugin-vue':
         specifier: ^1.0.1
-        version: 1.0.1(@rsbuild/core@1.0.4)(@swc/core@1.7.26(@swc/helpers@0.5.13))(@vue/compiler-sfc@3.5.5)(esbuild@0.23.1)(vue@3.5.5(typescript@5.6.2))
+        version: 1.0.1(@rsbuild/core@1.0.4)(@swc/core@1.7.26(@swc/helpers@0.5.13))(@vue/compiler-sfc@3.5.6)(esbuild@0.23.1)(vue@3.5.6(typescript@5.6.2))
       '@rsdoctor/rspack-plugin':
         specifier: ^0.4.2
         version: 0.4.2(@rspack/core@1.0.5(@swc/helpers@0.5.13))(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1))
@@ -228,7 +228,7 @@ importers:
         version: 1.1.0
       gulp-vue-ssg:
         specifier: ^1.2.4
-        version: 1.2.4(esbuild@0.23.1)(gulp@5.0.0)(vue@3.5.5(typescript@5.6.2))
+        version: 1.2.4(esbuild@0.23.1)(gulp@5.0.0)(vue@3.5.6(typescript@5.6.2))
       html-minifier-loader:
         specifier: ^1.4.1
         version: 1.4.1(html-minifier@4.0.0)
@@ -236,8 +236,8 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2
       inquirer:
-        specifier: ^11.0.0
-        version: 11.0.0
+        specifier: ^11.0.1
+        version: 11.0.1
       jsdom:
         specifier: ^25.0.0
         version: 25.0.0
@@ -1498,60 +1498,60 @@ packages:
     resolution: {integrity: sha512-d2CGZR2o7fS6sWB7DG/3a95bGKQyHMACZ5aW8qGkkqQpUoZV6C0X7Pc7l4ZNMZkfNBf4VWNe9E1jRsf0G146Ew==}
     engines: {node: '>=18.18'}
 
-  '@inquirer/checkbox@3.0.0':
-    resolution: {integrity: sha512-fLHcJ3Xc76EDRRACUxuBl2c5CJz8Tlc8CLjdvZGur6WfdzkdmQr3N+7IAR8FJ9/fNaNJdi6ykD8e0ac3hhqwjw==}
+  '@inquirer/checkbox@3.0.1':
+    resolution: {integrity: sha512-0hm2nrToWUdD6/UHnel/UKGdk1//ke5zGUpHIvk5ZWmaKezlGxZkOJXNSWsdxO/rEqTkbB3lNC2J6nBElV2aAQ==}
     engines: {node: '>=18'}
 
-  '@inquirer/confirm@4.0.0':
-    resolution: {integrity: sha512-QNTcMaKyYsoEMgev94Hhbr5Lbkfo4yo87hv11+9own9mF9AlQ7yC+/sq/pzvygVGvRT+3BDIGIffEK2Qd1tHmg==}
+  '@inquirer/confirm@4.0.1':
+    resolution: {integrity: sha512-46yL28o2NJ9doViqOy0VDcoTzng7rAb6yPQKU7VDLqkmbCaH4JqK4yk4XqlzNWy9PVC5pG1ZUXPBQv+VqnYs2w==}
     engines: {node: '>=18'}
 
-  '@inquirer/core@9.2.0':
-    resolution: {integrity: sha512-pDmhEEvhMSB49LrE/VxkUbWuFpYfllgn3pBGVoi+Up6cI/godUh5PoK3d2OrPV61LtMTBCWCizd0AIiMHTPQfQ==}
+  '@inquirer/core@9.2.1':
+    resolution: {integrity: sha512-F2VBt7W/mwqEU4bL0RnHNZmC/OxzNx9cOYxHqnXX3MP6ruYvZUZAW9imgN9+h/uBT/oP8Gh888J2OZSbjSeWcg==}
     engines: {node: '>=18'}
 
-  '@inquirer/editor@3.0.0':
-    resolution: {integrity: sha512-aFXpH025HBeIPdyytcriLzyxAP27Rw17BjwhthvH7D3AAyGd1foo8dIR6oGUnMTZViuoNODwIQmoN0PUu4bckA==}
+  '@inquirer/editor@3.0.1':
+    resolution: {integrity: sha512-VA96GPFaSOVudjKFraokEEmUQg/Lub6OXvbIEZU1SDCmBzRkHGhxoFAVaF30nyiB4m5cEbDgiI2QRacXZ2hw9Q==}
     engines: {node: '>=18'}
 
-  '@inquirer/expand@3.0.0':
-    resolution: {integrity: sha512-3v5Yw0LI93UqlQkGyygKuYXuwWMI7u5M32jdwWMhqOw+goJ6Km4YBTRIAhq56NgJAc28LSXoY1WMP8Hn6yXorA==}
+  '@inquirer/expand@3.0.1':
+    resolution: {integrity: sha512-ToG8d6RIbnVpbdPdiN7BCxZGiHOTomOX94C2FaT5KOHupV40tKEDozp12res6cMIfRKrXLJyexAZhWVHgbALSQ==}
     engines: {node: '>=18'}
 
-  '@inquirer/figures@1.0.5':
-    resolution: {integrity: sha512-79hP/VWdZ2UVc9bFGJnoQ/lQMpL74mGgzSYX1xUqCVk7/v73vJCMw1VuyWN1jGkZ9B3z7THAbySqGbCNefcjfA==}
+  '@inquirer/figures@1.0.6':
+    resolution: {integrity: sha512-yfZzps3Cso2UbM7WlxKwZQh2Hs6plrbjs1QnzQDZhK2DgyCo6D8AaHps9olkNcUFlcYERMqU3uJSp1gmy3s/qQ==}
     engines: {node: '>=18'}
 
-  '@inquirer/input@3.0.0':
-    resolution: {integrity: sha512-GJ/8TMNEH0Gc7/T+685LFxmqGl0n5cNEalNZE3rFYanD2h1lZD69xU+KDeI3wnt66yB97zpsCi3V/3pzRO96NA==}
+  '@inquirer/input@3.0.1':
+    resolution: {integrity: sha512-BDuPBmpvi8eMCxqC5iacloWqv+5tQSJlUafYWUe31ow1BVXjW2a5qe3dh4X/Z25Wp22RwvcaLCc2siHobEOfzg==}
     engines: {node: '>=18'}
 
-  '@inquirer/number@2.0.0':
-    resolution: {integrity: sha512-nmmg5y6uJSz6RwBZMOkY1h2s+RQ3+iudxDPeD87Uesx7uC4dCZ/A/CRZye7TGCElLw+s/y5TY+Kkk3FEWdJV5g==}
+  '@inquirer/number@2.0.1':
+    resolution: {integrity: sha512-QpR8jPhRjSmlr/mD2cw3IR8HRO7lSVOnqUvQa8scv1Lsr3xoAMMworcYW3J13z3ppjBFBD2ef1Ci6AE5Qn8goQ==}
     engines: {node: '>=18'}
 
-  '@inquirer/password@3.0.0':
-    resolution: {integrity: sha512-fHDtVC2bk90nGn9Ly+1M7xfQfwfATijbqXZ/ajvV5X7GbjvI1mwXYU1r8wEwTv1uypWpd8knevif7G4dEy5gdA==}
+  '@inquirer/password@3.0.1':
+    resolution: {integrity: sha512-haoeEPUisD1NeE2IanLOiFr4wcTXGWrBOyAyPZi1FfLJuXOzNmxCJPgUrGYKVh+Y8hfGJenIfz5Wb/DkE9KkMQ==}
     engines: {node: '>=18'}
 
-  '@inquirer/prompts@6.0.0':
-    resolution: {integrity: sha512-WIUHc3PwyTv7lQeVQCKtjJdq/tY4QCYKWuF/HqCBoBhhVvOCyep3quZpfwV3ytHZQF+TwjM35yz14hn6ol0NZg==}
+  '@inquirer/prompts@6.0.1':
+    resolution: {integrity: sha512-yl43JD/86CIj3Mz5mvvLJqAOfIup7ncxfJ0Btnl0/v5TouVUyeEdcpknfgc+yMevS/48oH9WAkkw93m7otLb/A==}
     engines: {node: '>=18'}
 
-  '@inquirer/rawlist@3.0.0':
-    resolution: {integrity: sha512-if3HewI2XBztgaNUQqMiwxMPQ20n0eap4LaffieoeXF+AK6CruNxfwbqcHtzQzsDZ+4tvbyWXC1mOJvLPKTYag==}
+  '@inquirer/rawlist@3.0.1':
+    resolution: {integrity: sha512-VgRtFIwZInUzTiPLSfDXK5jLrnpkuSOh1ctfaoygKAdPqjcjKYmGh6sCY1pb0aGnCGsmhUxoqLDUAU0ud+lGXQ==}
     engines: {node: '>=18'}
 
-  '@inquirer/search@2.0.0':
-    resolution: {integrity: sha512-I8f7QWIwEVibIqZyalaL3rO2PNwPYYNrNHhafy75D7Xe5K0AjDiJq3wmjVvoO022F+Iib2/f7BOMAf1aJ5o9aA==}
+  '@inquirer/search@2.0.1':
+    resolution: {integrity: sha512-r5hBKZk3g5MkIzLVoSgE4evypGqtOannnB3PKTG9NRZxyFRKcfzrdxXXPcoJQsxJPzvdSU2Rn7pB7lw0GCmGAg==}
     engines: {node: '>=18'}
 
-  '@inquirer/select@3.0.0':
-    resolution: {integrity: sha512-mraI4Mb7zAXqtQydxoQk9k2ByezfXSWjiLU2X0IVfZ36DDtlphziCGUi1KTkSzH79yYp8wwHPh58dQcSl4/KWg==}
+  '@inquirer/select@3.0.1':
+    resolution: {integrity: sha512-lUDGUxPhdWMkN/fHy1Lk7pF3nK1fh/gqeyWXmctefhxLYxlDsc7vsPBEpxrfVGDsVdyYJsiJoD4bJ1b623cV1Q==}
     engines: {node: '>=18'}
 
-  '@inquirer/type@1.5.4':
-    resolution: {integrity: sha512-E9sqh3kOGvFj+/tF0RVnclE39tUoa03kDu++WyYXjjf/X0FSI5tAfSHedRWYelix9l3xBUr2klQ92eFyl0aNzQ==}
+  '@inquirer/type@2.0.0':
+    resolution: {integrity: sha512-XvJRx+2KR3YXyYtPUUy+qd9i7p+GO9Ko6VIIpWlBrpWwXDv8WLFeHTxz35CfQFUiBMLXlGHhGzys7lqit9gWag==}
     engines: {node: '>=18'}
 
   '@intlify/core-base@10.0.1':
@@ -2227,37 +2227,37 @@ packages:
     resolution: {integrity: sha512-yTPqMnbAZJNy2Xq2XU8AdtOW9tJIr+UQb64aXB9f3B1498Zx9JorVgFJcZpEc9UBuCCrdzKID2RGAMkYcDtZOw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@vue/compiler-core@3.5.5':
-    resolution: {integrity: sha512-ZrxcY8JMoV+kgDrmRwlDufz0SjDZ7jfoNZiIBluAACMBmgr55o/jTbxnyrccH6VSJXnFaDI4Ik1UFCiq9r8i7w==}
+  '@vue/compiler-core@3.5.6':
+    resolution: {integrity: sha512-r+gNu6K4lrvaQLQGmf+1gc41p3FO2OUJyWmNqaIITaJU6YFiV5PtQSFZt8jfztYyARwqhoCayjprC7KMvT3nRA==}
 
-  '@vue/compiler-dom@3.5.5':
-    resolution: {integrity: sha512-HSvK5q1gmBbxRse3S0Wt34RcKuOyjDJKDDMuF3i7NC+QkDFrbAqw8NnrEm/z7zFDxWZa4/5eUwsBOMQzm1RHBA==}
+  '@vue/compiler-dom@3.5.6':
+    resolution: {integrity: sha512-xRXqxDrIqK8v8sSScpistyYH0qYqxakpsIvqMD2e5sV/PXQ1mTwtXp4k42yHK06KXxKSmitop9e45Ui/3BrTEw==}
 
-  '@vue/compiler-sfc@3.5.5':
-    resolution: {integrity: sha512-MzBHDxwZhgQPHrwJ5tj92gdTYRCuPDSZr8PY3+JFv8cv2UD5/WayH5yo0kKCkKfrtJhc39jNSMityHrkMSbfnA==}
+  '@vue/compiler-sfc@3.5.6':
+    resolution: {integrity: sha512-pjWJ8Kj9TDHlbF5LywjVso+BIxCY5wVOLhkEXRhuCHDxPFIeX1zaFefKs8RYoHvkSMqRWt93a0f2gNJVJixHwg==}
 
-  '@vue/compiler-ssr@3.5.5':
-    resolution: {integrity: sha512-oFasHnpv/upubjJEmqiTKQYb4qS3ziJddf4UVWuFw6ebk/QTrTUc+AUoTJdo39x9g+AOQBzhOU0ICCRuUjvkmw==}
+  '@vue/compiler-ssr@3.5.6':
+    resolution: {integrity: sha512-VpWbaZrEOCqnmqjE83xdwegtr5qO/2OPUC6veWgvNqTJ3bYysz6vY3VqMuOijubuUYPRpG3OOKIh9TD0Stxb9A==}
 
   '@vue/devtools-api@6.6.4':
     resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
-  '@vue/reactivity@3.5.5':
-    resolution: {integrity: sha512-V4tTWElZQhT73PSK3Wnax9R9m4qvMX+LeKHnfylZc6SLh4Jc5/BPakp6e3zEhKWi5AN8TDzRkGnLkp8OqycYng==}
+  '@vue/reactivity@3.5.6':
+    resolution: {integrity: sha512-shZ+KtBoHna5GyUxWfoFVBCVd7k56m6lGhk5e+J9AKjheHF6yob5eukssHRI+rzvHBiU1sWs/1ZhNbLExc5oYQ==}
 
-  '@vue/runtime-core@3.5.5':
-    resolution: {integrity: sha512-2/CFaRN17jgsXy4MpigWFBCAMmLkXPb4CjaHrndglwYSra7ajvkH2cat21dscuXaH91G8fXAeg5gCyxWJ+wCRA==}
+  '@vue/runtime-core@3.5.6':
+    resolution: {integrity: sha512-FpFULR6+c2lI+m1fIGONLDqPQO34jxV8g6A4wBOgne8eSRHP6PQL27+kWFIx5wNhhjkO7B4rgtsHAmWv7qKvbg==}
 
-  '@vue/runtime-dom@3.5.5':
-    resolution: {integrity: sha512-0bQGgCuL+4Muz5PsCLgF4Ata9BTdhHi5VjsxtTDyI0Wy4MgoSvBGaA6bDc7W7CGgZOyirf9LNeetMYHQ05pgpw==}
+  '@vue/runtime-dom@3.5.6':
+    resolution: {integrity: sha512-SDPseWre45G38ENH2zXRAHL1dw/rr5qp91lS4lt/nHvMr0MhsbCbihGAWLXNB/6VfFOJe2O+RBRkXU+CJF7/sw==}
 
-  '@vue/server-renderer@3.5.5':
-    resolution: {integrity: sha512-XjRamLIq5f47cxgy+hiX7zUIY+4RHdPDVrPvvMDAUTdW5RJWX/S0ji/rCbm3LWTT/9Co9bvQME8ZI15ahL4/Qw==}
+  '@vue/server-renderer@3.5.6':
+    resolution: {integrity: sha512-zivnxQnOnwEXVaT9CstJ64rZFXMS5ZkKxCjDQKiMSvUhXRzFLWZVbaBiNF4HGDqGNNsTgmjcCSmU6TB/0OOxLA==}
     peerDependencies:
-      vue: 3.5.5
+      vue: 3.5.6
 
-  '@vue/shared@3.5.5':
-    resolution: {integrity: sha512-0KyMXyEgnmFAs6rNUL+6eUHtUCqCaNrVd+AW3MX3LyA0Yry5SA0Km03CDKiOua1x1WWnIr+W9+S0GMFoSDWERQ==}
+  '@vue/shared@3.5.6':
+    resolution: {integrity: sha512-eidH0HInnL39z6wAt6SFIwBrvGOpDWsDxlw3rCgo1B+CQ1781WzQUSU3YjxgdkcJo9Q8S6LmXTkvI+cLHGkQfA==}
 
   '@webassemblyjs/ast@1.12.1':
     resolution: {integrity: sha512-EKfMUOPRRUTy5UII4qJDGPpqfwjOmZ5jeGFwid9mnoqIFK+e0vqoi1qH56JpmZSzEL53jKnNzScdmftJyG5xWg==}
@@ -3971,8 +3971,8 @@ packages:
   ini@1.3.8:
     resolution: {integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==}
 
-  inquirer@11.0.0:
-    resolution: {integrity: sha512-q+h5lZA+cJPpmRlMlOLhp/x2yF+DTDhA5dWX/imxCBfGkYs/Jy3nVwXBocgCe7WE2mE+ph0rwna/0hwi+ttDLA==}
+  inquirer@11.0.1:
+    resolution: {integrity: sha512-G+GdcKg7AaWER6H3UuccHkDZSJYxE1x12V2AbmJQNY5/WYSBVEDip1nDy0yoQQz21Qm+CscYEXw09lG6OGqTeA==}
     engines: {node: '>=18'}
 
   internal-slot@1.0.7:
@@ -6188,8 +6188,8 @@ packages:
     peerDependencies:
       vue: '>=3.0.0'
 
-  vue@3.5.5:
-    resolution: {integrity: sha512-ybC+xn67K4+df1yVeov4UjBGyVcXM0a1g7JVZr+pWVUX3xF6ntXU0wIjkTkduZBUIpxTlsftJSxz2kwhsT7dgA==}
+  vue@3.5.6:
+    resolution: {integrity: sha512-zv+20E2VIYbcJOzJPUWp03NOGFhMmpCKOfSxVTmCYyYFFko48H9tmuQFzYj7tu4qX1AeXlp9DmhIP89/sSxxhw==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -7708,23 +7708,23 @@ snapshots:
 
   '@humanwhocodes/retry@0.3.0': {}
 
-  '@inquirer/checkbox@3.0.0':
+  '@inquirer/checkbox@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/figures': 1.0.5
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/figures': 1.0.6
+      '@inquirer/type': 2.0.0
       ansi-escapes: 4.3.2
       yoctocolors-cjs: 2.1.2
 
-  '@inquirer/confirm@4.0.0':
+  '@inquirer/confirm@4.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
 
-  '@inquirer/core@9.2.0':
+  '@inquirer/core@9.2.1':
     dependencies:
-      '@inquirer/figures': 1.0.5
-      '@inquirer/type': 1.5.4
+      '@inquirer/figures': 1.0.6
+      '@inquirer/type': 2.0.0
       '@types/mute-stream': 0.0.4
       '@types/node': 22.5.5
       '@types/wrap-ansi': 3.0.0
@@ -7736,71 +7736,71 @@ snapshots:
       wrap-ansi: 6.2.0
       yoctocolors-cjs: 2.1.2
 
-  '@inquirer/editor@3.0.0':
+  '@inquirer/editor@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
       external-editor: 3.1.0
 
-  '@inquirer/expand@3.0.0':
+  '@inquirer/expand@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
       yoctocolors-cjs: 2.1.2
 
-  '@inquirer/figures@1.0.5': {}
+  '@inquirer/figures@1.0.6': {}
 
-  '@inquirer/input@3.0.0':
+  '@inquirer/input@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
 
-  '@inquirer/number@2.0.0':
+  '@inquirer/number@2.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
 
-  '@inquirer/password@3.0.0':
+  '@inquirer/password@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
       ansi-escapes: 4.3.2
 
-  '@inquirer/prompts@6.0.0':
+  '@inquirer/prompts@6.0.1':
     dependencies:
-      '@inquirer/checkbox': 3.0.0
-      '@inquirer/confirm': 4.0.0
-      '@inquirer/editor': 3.0.0
-      '@inquirer/expand': 3.0.0
-      '@inquirer/input': 3.0.0
-      '@inquirer/number': 2.0.0
-      '@inquirer/password': 3.0.0
-      '@inquirer/rawlist': 3.0.0
-      '@inquirer/search': 2.0.0
-      '@inquirer/select': 3.0.0
+      '@inquirer/checkbox': 3.0.1
+      '@inquirer/confirm': 4.0.1
+      '@inquirer/editor': 3.0.1
+      '@inquirer/expand': 3.0.1
+      '@inquirer/input': 3.0.1
+      '@inquirer/number': 2.0.1
+      '@inquirer/password': 3.0.1
+      '@inquirer/rawlist': 3.0.1
+      '@inquirer/search': 2.0.1
+      '@inquirer/select': 3.0.1
 
-  '@inquirer/rawlist@3.0.0':
+  '@inquirer/rawlist@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/type': 2.0.0
       yoctocolors-cjs: 2.1.2
 
-  '@inquirer/search@2.0.0':
+  '@inquirer/search@2.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/figures': 1.0.5
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/figures': 1.0.6
+      '@inquirer/type': 2.0.0
       yoctocolors-cjs: 2.1.2
 
-  '@inquirer/select@3.0.0':
+  '@inquirer/select@3.0.1':
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/figures': 1.0.5
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/figures': 1.0.6
+      '@inquirer/type': 2.0.0
       ansi-escapes: 4.3.2
       yoctocolors-cjs: 2.1.2
 
-  '@inquirer/type@1.5.4':
+  '@inquirer/type@2.0.0':
     dependencies:
       mute-stream: 1.0.0
 
@@ -7816,14 +7816,14 @@ snapshots:
 
   '@intlify/shared@10.0.1': {}
 
-  '@intlify/vue-i18n-extensions@6.2.0(@intlify/shared@10.0.1)(@vue/compiler-dom@3.5.5)(vue-i18n@10.0.1(vue@3.5.5(typescript@5.6.2)))(vue@3.5.5(typescript@5.6.2))':
+  '@intlify/vue-i18n-extensions@6.2.0(@intlify/shared@10.0.1)(@vue/compiler-dom@3.5.6)(vue-i18n@10.0.1(vue@3.5.6(typescript@5.6.2)))(vue@3.5.6(typescript@5.6.2))':
     dependencies:
       '@babel/parser': 7.25.6
     optionalDependencies:
       '@intlify/shared': 10.0.1
-      '@vue/compiler-dom': 3.5.5
-      vue: 3.5.5(typescript@5.6.2)
-      vue-i18n: 10.0.1(vue@3.5.5(typescript@5.6.2))
+      '@vue/compiler-dom': 3.5.6
+      vue: 3.5.6(typescript@5.6.2)
+      vue-i18n: 10.0.1(vue@3.5.6(typescript@5.6.2))
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -7889,9 +7889,9 @@ snapshots:
       '@module-federation/runtime': 0.5.1
       '@module-federation/sdk': 0.5.1
 
-  '@mutsuntsai/esbuild-plugin-vue@0.1.6(@vue/compiler-sfc@3.5.5)':
+  '@mutsuntsai/esbuild-plugin-vue@0.1.6(@vue/compiler-sfc@3.5.6)':
     dependencies:
-      '@vue/compiler-sfc': 3.5.5
+      '@vue/compiler-sfc': 3.5.6
       convert-source-map: 2.0.0
       hash-sum: 2.0.0
 
@@ -8113,10 +8113,10 @@ snapshots:
       reduce-configs: 1.0.0
       sass-embedded: 1.78.0
 
-  '@rsbuild/plugin-vue@1.0.1(@rsbuild/core@1.0.4)(@swc/core@1.7.26(@swc/helpers@0.5.13))(@vue/compiler-sfc@3.5.5)(esbuild@0.23.1)(vue@3.5.5(typescript@5.6.2))':
+  '@rsbuild/plugin-vue@1.0.1(@rsbuild/core@1.0.4)(@swc/core@1.7.26(@swc/helpers@0.5.13))(@vue/compiler-sfc@3.5.6)(esbuild@0.23.1)(vue@3.5.6(typescript@5.6.2))':
     dependencies:
       '@rsbuild/core': 1.0.4
-      vue-loader: 17.4.2(@vue/compiler-sfc@3.5.5)(vue@3.5.5(typescript@5.6.2))(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1))
+      vue-loader: 17.4.2(@vue/compiler-sfc@3.5.6)(vue@3.5.6(typescript@5.6.2))(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1))
       webpack: 5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1)
     transitivePeerDependencies:
       - '@swc/core'
@@ -8620,61 +8620,61 @@ snapshots:
       '@typescript-eslint/types': 8.5.0
       eslint-visitor-keys: 3.4.3
 
-  '@vue/compiler-core@3.5.5':
+  '@vue/compiler-core@3.5.6':
     dependencies:
       '@babel/parser': 7.25.6
-      '@vue/shared': 3.5.5
+      '@vue/shared': 3.5.6
       entities: 4.5.0
       estree-walker: 2.0.2
       source-map-js: 1.2.1
 
-  '@vue/compiler-dom@3.5.5':
+  '@vue/compiler-dom@3.5.6':
     dependencies:
-      '@vue/compiler-core': 3.5.5
-      '@vue/shared': 3.5.5
+      '@vue/compiler-core': 3.5.6
+      '@vue/shared': 3.5.6
 
-  '@vue/compiler-sfc@3.5.5':
+  '@vue/compiler-sfc@3.5.6':
     dependencies:
       '@babel/parser': 7.25.6
-      '@vue/compiler-core': 3.5.5
-      '@vue/compiler-dom': 3.5.5
-      '@vue/compiler-ssr': 3.5.5
-      '@vue/shared': 3.5.5
+      '@vue/compiler-core': 3.5.6
+      '@vue/compiler-dom': 3.5.6
+      '@vue/compiler-ssr': 3.5.6
+      '@vue/shared': 3.5.6
       estree-walker: 2.0.2
       magic-string: 0.27.0
       postcss: 8.4.47
       source-map-js: 1.2.1
 
-  '@vue/compiler-ssr@3.5.5':
+  '@vue/compiler-ssr@3.5.6':
     dependencies:
-      '@vue/compiler-dom': 3.5.5
-      '@vue/shared': 3.5.5
+      '@vue/compiler-dom': 3.5.6
+      '@vue/shared': 3.5.6
 
   '@vue/devtools-api@6.6.4': {}
 
-  '@vue/reactivity@3.5.5':
+  '@vue/reactivity@3.5.6':
     dependencies:
-      '@vue/shared': 3.5.5
+      '@vue/shared': 3.5.6
 
-  '@vue/runtime-core@3.5.5':
+  '@vue/runtime-core@3.5.6':
     dependencies:
-      '@vue/reactivity': 3.5.5
-      '@vue/shared': 3.5.5
+      '@vue/reactivity': 3.5.6
+      '@vue/shared': 3.5.6
 
-  '@vue/runtime-dom@3.5.5':
+  '@vue/runtime-dom@3.5.6':
     dependencies:
-      '@vue/reactivity': 3.5.5
-      '@vue/runtime-core': 3.5.5
-      '@vue/shared': 3.5.5
+      '@vue/reactivity': 3.5.6
+      '@vue/runtime-core': 3.5.6
+      '@vue/shared': 3.5.6
       csstype: 3.1.3
 
-  '@vue/server-renderer@3.5.5(vue@3.5.5(typescript@5.6.2))':
+  '@vue/server-renderer@3.5.6(vue@3.5.6(typescript@5.6.2))':
     dependencies:
-      '@vue/compiler-ssr': 3.5.5
-      '@vue/shared': 3.5.5
-      vue: 3.5.5(typescript@5.6.2)
+      '@vue/compiler-ssr': 3.5.6
+      '@vue/shared': 3.5.6
+      vue: 3.5.6(typescript@5.6.2)
 
-  '@vue/shared@3.5.5': {}
+  '@vue/shared@3.5.6': {}
 
   '@webassemblyjs/ast@1.12.1':
     dependencies:
@@ -10479,12 +10479,12 @@ snapshots:
       plugin-error: 2.0.1
       vinyl: 3.0.0
 
-  gulp-vue-ssg@1.2.4(esbuild@0.23.1)(gulp@5.0.0)(vue@3.5.5(typescript@5.6.2)):
+  gulp-vue-ssg@1.2.4(esbuild@0.23.1)(gulp@5.0.0)(vue@3.5.6(typescript@5.6.2)):
     dependencies:
       esbuild: 0.23.1
       gulp: 5.0.0
       gulp-through2: 1.1.0
-      vue: 3.5.5(typescript@5.6.2)
+      vue: 3.5.6(typescript@5.6.2)
     optionalDependencies:
       global-jsdom: 24.0.0(jsdom@25.0.0)
       jsdom: 25.0.0
@@ -10663,11 +10663,11 @@ snapshots:
 
   ini@1.3.8: {}
 
-  inquirer@11.0.0:
+  inquirer@11.0.1:
     dependencies:
-      '@inquirer/core': 9.2.0
-      '@inquirer/prompts': 6.0.0
-      '@inquirer/type': 1.5.4
+      '@inquirer/core': 9.2.1
+      '@inquirer/prompts': 6.0.1
+      '@inquirer/type': 2.0.0
       '@types/mute-stream': 0.0.4
       ansi-escapes: 4.3.2
       mute-stream: 1.0.0
@@ -13028,34 +13028,34 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vue-i18n@10.0.1(vue@3.5.5(typescript@5.6.2)):
+  vue-i18n@10.0.1(vue@3.5.6(typescript@5.6.2)):
     dependencies:
       '@intlify/core-base': 10.0.1
       '@intlify/shared': 10.0.1
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.5(typescript@5.6.2)
+      vue: 3.5.6(typescript@5.6.2)
 
-  vue-loader@17.4.2(@vue/compiler-sfc@3.5.5)(vue@3.5.5(typescript@5.6.2))(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1)):
+  vue-loader@17.4.2(@vue/compiler-sfc@3.5.6)(vue@3.5.6(typescript@5.6.2))(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1)):
     dependencies:
       chalk: 4.1.2
       hash-sum: 2.0.0
       watchpack: 2.4.2
       webpack: 5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.13))(esbuild@0.23.1)
     optionalDependencies:
-      '@vue/compiler-sfc': 3.5.5
-      vue: 3.5.5(typescript@5.6.2)
+      '@vue/compiler-sfc': 3.5.6
+      vue: 3.5.6(typescript@5.6.2)
 
-  vue-slicksort@2.0.5(vue@3.5.5(typescript@5.6.2)):
+  vue-slicksort@2.0.5(vue@3.5.6(typescript@5.6.2)):
     dependencies:
-      vue: 3.5.5(typescript@5.6.2)
+      vue: 3.5.6(typescript@5.6.2)
 
-  vue@3.5.5(typescript@5.6.2):
+  vue@3.5.6(typescript@5.6.2):
     dependencies:
-      '@vue/compiler-dom': 3.5.5
-      '@vue/compiler-sfc': 3.5.5
-      '@vue/runtime-dom': 3.5.5
-      '@vue/server-renderer': 3.5.5(vue@3.5.5(typescript@5.6.2))
-      '@vue/shared': 3.5.5
+      '@vue/compiler-dom': 3.5.6
+      '@vue/compiler-sfc': 3.5.6
+      '@vue/runtime-dom': 3.5.6
+      '@vue/server-renderer': 3.5.6(vue@3.5.6(typescript@5.6.2))
+      '@vue/shared': 3.5.6
     optionalDependencies:
       typescript: 5.6.2
 

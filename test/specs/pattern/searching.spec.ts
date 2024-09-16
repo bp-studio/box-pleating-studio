@@ -4,7 +4,7 @@ import { id2, parseTree } from "@utils/tree";
 import threeFlapSpec from "./threeFlap.spec";
 import { UpdateResult } from "core/service/updateResult";
 import { State, fullReset } from "core/service/state";
-import { complete, generateFromFlaps } from "./util";
+import { complete } from "./util";
 import { DesignController } from "core/controller/designController";
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
@@ -22,12 +22,8 @@ export default function() {
 	});
 
 	it("Signifies when no pattern is found", function() {
-		generateFromFlaps([
-			{ id: 1, x: 0, y: 0, radius: 10 },
-			{ id: 2, x: 10, y: 11, radius: 3 },
-			{ id: 3, x: 11, y: 5, radius: 2 },
-		]);
-		const stretch = State.$stretches.get("1,2,3")!;
+		parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
+		const stretch = State.$stretches.get("0,1,3")!;
 		expect(stretch.$repo.$pattern).to.equal(null);
 		expect(UpdateResult.$flush().patternNotFound).to.be.true;
 	});
