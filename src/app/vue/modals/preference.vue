@@ -15,8 +15,10 @@
 										v-t="'preference.hotkey'"></button>
 							</div>
 						</div>
-						<!--Tabs are too wide on mobile devices for some locales, so we used select box instead.
-							It's possible to completely switch to select box if tabs keeps increasing in the future.-->
+						<!--
+							Tabs are too wide on mobile devices for some locales, so we used select box instead.
+							It's possible to completely switch to select box if tabs keeps increasing in the future.
+						-->
 						<div class="d-block d-sm-none">
 							<select class="form-select" v-model.number="tab">
 								<option value="0" v-t="'preference.general'"></option>
@@ -31,6 +33,14 @@
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
 							<div class="col-8">
+								<!--
+									Note that showing flags requires COLR/CPAL(v0) support, see https://caniuse.com/colr
+									There is a feature-detection library at https://github.com/RoelN/ChromaCheck,
+									but the detecting result appears inconsistent with the actual support
+									(especially on Opera), so I decided to not include the detection for now.
+									The worst that can happen is missing flags in the select box,
+									and only in very old browsers.
+								-->
 								<select class="form-select flag" v-model="$i18n.locale" aria-label="Language">
 									<option v-for="l in $i18n.availableLocales" :key="l" :value="l">
 										{{ $t('emoji', {}, { locale: l }) }}&ensp;{{ $t('name', {}, { locale: l }) }}

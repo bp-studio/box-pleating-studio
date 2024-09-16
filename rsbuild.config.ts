@@ -163,44 +163,45 @@ export default defineConfig({
 		}),
 	],
 	tools: {
+		bundlerChain: chain => {
+			chain.module.rule("js")
+				.use("ifdef")
+				.after("swc")
+				.loader("ifdef-loader")
+				.options({
+					DEBUG: !isProduction,
+				});
+			chain.module.rule("sass")
+				.use("bootstrap-loader")
+				.after("css")
+				.loader("./lib/bootstrap/loader.mjs");
+		},
 		postcss: (_, { addPlugins }) => {
+			/**
+			 * For the moment, although LightingCSS claims to handle vendor prefixes,
+			 * the functionality seems less complete than postcssPresetEnv.
+			 * For example, `-webkit-text-decoration` is not handled by LightingCSS (see https://caniuse.com/text-decoration).
+			 */
 			addPlugins(postcssPresetEnv());
 		},
-		rspack: (config, { addRules, appendPlugins, isDev }) => {
-			addRules([
-				{
-					test: /\.md$/,
-					use: [
-						"html-minifier-loader",
-						{
-							loader: "markdown-loader",
-							options: {
-								headerIds: false,
-								mangle: false,
-							},
+		rspack: (_, { addRules, appendPlugins, isDev }) => {
+			addRules({
+				test: /\.md$/,
+				use: [
+					"html-minifier-loader",
+					{
+						loader: "markdown-loader",
+						options: {
+							headerIds: false,
+							mangle: false,
 						},
-					],
-					type: "asset/resource",
-					generator: {
-						filename: "log/[name][ext]",
 					},
+				],
+				type: "asset/resource",
+				generator: {
+					filename: "log/[name][ext]",
 				},
-				{
-					test: /lib[\\/]bootstrap[\\/]bootstrap\.scss$/,
-					loader: "./lib/bootstrap/loader.mjs",
-				},
-			]);
-
-			// This one needs to be placed last
-			config.module.rules.push(
-				{
-					test: /\.ts$/,
-					loader: "ifdef-loader",
-					options: {
-						DEBUG: isDev,
-					},
-				}
-			);
+			});
 
 			if(isDev) return;
 

@@ -100,14 +100,11 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._type = json?.type ?? GridType.rectangular;
 		this._grid = createGrid(this, this._type, json?.width, json?.height);
 
-		this.$react(() => {
-			const self = this as Writeable<Sheet>;
-			self.$horizontalMargin = computed(() => this._horizontalMargin);
-			self.$imageDimension = computed(() => this._imageDimension);
-			watchEffect(() => this._drawSheet());
-			watchEffect(() => this._positioning());
-			watchEffect(() => this._layerVisibility());
-		});
+		// Computed no longer requires effect scope since Vue 3.5
+		this.$horizontalMargin = computed(() => this._horizontalMargin);
+		this.$imageDimension = computed(() => this._imageDimension);
+
+		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
 
 		this._onDestruct(() => {
 			// GC
