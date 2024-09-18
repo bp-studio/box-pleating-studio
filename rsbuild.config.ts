@@ -147,7 +147,7 @@ export default defineConfig({
 		pluginSass({
 			sassLoaderOptions: {
 				sassOptions: {
-					silenceDeprecations: ["mixed-decls"],
+					silenceDeprecations: ["mixed-decls", "color-functions"],
 				},
 			},
 		}),
@@ -163,17 +163,17 @@ export default defineConfig({
 		}),
 	],
 	tools: {
-		bundlerChain: chain => {
-			chain.module.rule("js")
+		bundlerChain: (chain, { CHAIN_ID }) => {
+			chain.module.rule(CHAIN_ID.RULE.JS)
 				.use("ifdef")
-				.after("swc")
+				.after(CHAIN_ID.USE.SWC)
 				.loader("ifdef-loader")
 				.options({
 					DEBUG: !isProduction,
 				});
-			chain.module.rule("sass")
+			chain.module.rule(CHAIN_ID.RULE.SASS)
 				.use("bootstrap-loader")
-				.after("css")
+				.after(CHAIN_ID.USE.CSS)
 				.loader("./lib/bootstrap/loader.mjs");
 		},
 		postcss: (_, { addPlugins }) => {
