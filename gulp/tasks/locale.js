@@ -1,5 +1,5 @@
-const $ = require("../utils/proxy");
 const gulp = require("gulp");
+const through2 = require("gulp-through2");
 
 const newer = require("../utils/newer");
 const config = require("../config.json");
@@ -20,13 +20,20 @@ gulp.task("locale", () => gulp.src(config.src.locale + "/*.json")
 	}))
 	.pipe(order("en.json"))
 	.pipe(gulp.dest(config.src.locale))
-	.pipe($.through2((content, file) => `"${file.stem.toLowerCase()}": ${content},`))
-	.pipe($.concat("locale.ts"))
-	.pipe($.through2(content => {
-		content = content.replace(/"((?:[^"\\]|\\.)+)"(.)/gs, ($0, $1, $2) => {
-			if($2 == "]" || $2 == ":") return $0;
-			return compile($1) + $2;
-		});
-		return `import type { BpsLocale } from "shared/frontend/locale";\n\nexport default {${content}} as Record<string, BpsLocale>;`;
+	.pipe(through2({
+		transform: (content, file) => `"${file.stem.toLowerCase()}": ${content},`,
+		flush(files) {
+			let content = files
+				.map(f => through2.read(f))
+				.join("\n")
+				.replace(/"((?:[^"\\]|\\.)+)"(.)/gs, ($0, $1, $2) => {
+					if($2 == "]" || $2 == ":") return $0;
+					return compile($1) + $2;
+				});
+			content = `import type { BpsLocale } from "shared/frontend/locale";\n\nexport default {${content}} as Record<string, BpsLocale>;`;
+			through2.write(files[0], content);
+			files[0].basename = "locale.ts";
+			return [files[0]];
+		},
 	}))
 	.pipe(gulp.dest(config.src.app + "/gen")));

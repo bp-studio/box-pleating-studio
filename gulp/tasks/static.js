@@ -1,6 +1,7 @@
-const $ = require("../utils/proxy");
+const all = require("gulp-all");
 const fs = require("fs");
 const gulp = require("gulp");
+const fontawesome = require("gulp-fontawesome");
 
 const config = require("../config.json");
 const newer = require("../utils/newer");
@@ -21,7 +22,7 @@ const buildIcon = () =>
 const faTarget = config.dest.temp + "/font-awesome";
 const fontAwesome = () =>
 	gulp.src(config.src.app + "/vue/**/*.vue")
-		.pipe($.fontawesome())
+		.pipe(fontawesome())
 		.pipe(gulp.dest(faTarget));
 
 gulp.task("static", () => {
@@ -33,7 +34,7 @@ gulp.task("static", () => {
 	if(!fs.existsSync(faTarget)) {
 		tasks.push(fontAwesome());
 	}
-	return $.all(tasks);
+	return all(tasks);
 });
 
 /**
