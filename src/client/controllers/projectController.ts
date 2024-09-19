@@ -117,11 +117,17 @@ export namespace ProjectController {
 	 * If all projects are closed, it creates a new standing-by worker.
 	 */
 	export function close(proj: Project): void {
-		if(DEBUG_ENABLED) console.time("Close project");
+		/// #if DEBUG
+		console.time("Close project");
+		/// #endif
+
 		proj.$destruct(); // Destructing must go first
 		if(current.value == proj) current.value = null;
 		projectMap.delete(proj.id);
 		if(projectMap.size == 0) __worker = createWorker();
-		if(DEBUG_ENABLED) console.timeEnd("Close project");
+
+		/// #if DEBUG
+		console.timeEnd("Close project");
+		/// #endif
 	}
 }

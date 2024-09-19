@@ -81,9 +81,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 	/** Initialization. */
 	public async $initialize(): Promise<Project> {
-		if(DEBUG_ENABLED && !this._initialized) {
-			console.time("First render #" + this.id);
-		}
+		/// #if DEBUG
+		if(!this._initialized) console.time("First render #" + this.id);
+		/// #endif
 
 		await this.$core.design.init(this.design.$prototype);
 
@@ -92,9 +92,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		// discovered that such an approach will lead to memory leaks.
 		await doEvents();
 
-		if(DEBUG_ENABLED && !this._initialized) {
-			console.timeEnd("First render #" + this.id);
-		}
+		/// #if DEBUG
+		if(!this._initialized) console.timeEnd("First render #" + this.id);
+		/// #endif
 
 		this._initialized = true;
 		return this;

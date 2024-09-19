@@ -53,8 +53,7 @@ export const isOnline = location.protocol === "https:";
 export const hasServiceWorker = "serviceWorker" in navigator;
 
 /** Whether the current page is reloaded. */
-export const isReload =
-	(performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)?.type == "reload" ??
-	performance.navigation.type == 1;
+const timing = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+export const isReload =	timing?.type == "reload" || performance.navigation.type == 1;
 
 export const isInApp = navigator.userAgent.match(/\bFBAV\b/);

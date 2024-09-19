@@ -5,13 +5,17 @@
  */
 //=================================================================
 export class TreeMakerVisitor {
-	private _lines: IterableIterator<string>;
+	private _lines: ArrayIterator<string>;
 
 	constructor(data: string) {
 		this._lines = data.split("\n").values();
 	}
 
-	public $next(): string { return (this._lines.next().value as string).trim(); }
+	public $next(): string {
+		const next = this._lines.next().value;
+		if(next === undefined) throw new Error();
+		return next.trim();
+	}
 	public get $int(): number { return parseInt(this.$next(), 10); }
 	public get $float(): number { return parseFloat(this.$next()); }
 	public get $bool(): boolean { return this.$next() == "true"; }

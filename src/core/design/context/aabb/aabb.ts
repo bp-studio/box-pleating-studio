@@ -16,8 +16,8 @@ export enum Side {
 
 const SIDES = [Side.top, Side.right, Side.bottom, Side.left];
 
-const minComparator: Comparator<AABBSide> = (a, b) => a.$key - b.$key;
-const maxComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
+const minKeyComparator: Comparator<AABBSide> = (a, b) => a.$key - b.$key;
+const maxKeyComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
 
 //=================================================================
 /**
@@ -45,10 +45,10 @@ export class AABB {
 
 	constructor() {
 		this._sides = [
-			new AABBSide(maxComparator), // top
-			new AABBSide(maxComparator), // right
-			new AABBSide(minComparator), // bottom
-			new AABBSide(minComparator), // left
+			new AABBSide(maxKeyComparator), // top
+			new AABBSide(maxKeyComparator), // right
+			new AABBSide(minKeyComparator), // bottom
+			new AABBSide(minKeyComparator), // left
 		];
 	}
 

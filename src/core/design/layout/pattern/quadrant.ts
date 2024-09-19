@@ -25,7 +25,10 @@ export class Quadrant {
 	public readonly q: QuadrantDirection;
 	public readonly f: IPoint;
 
-	/** Weight for sorting {@link Quadrant}s. */
+	/**
+	 * Weight for sorting {@link Quadrant}s in counter-clockwise ordering.
+	 * See also {@link pointWeight}.
+	 */
 	public readonly w: number;
 
 	/** The starting point of tracing relative to the corner of the flap. */
@@ -145,7 +148,7 @@ export class Quadrant {
 	}
 }
 
-export const quadrantComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
+export const minQuadrantWeightComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
 
 /**
  * Find the start/end {@link Point}s for tracing for a given set of {@link Quadrant}s
@@ -162,6 +165,12 @@ export function startEndPoints(quadrants: Quadrant[]): [Point, Point] {
 	return [start, end];
 }
 
+/**
+ * The weight for sorting points from the perspective of a given quadrant.
+ * In particular, it will sort the points in counter-clockwise ordering.
+ * @param p The {@link IPoint} to compare.
+ * @param f The directional factor of the {@link Quadrant}.
+ */
 function pointWeight(p: IPoint, f: IPoint): number {
 	return f.x * p.y - f.y * p.x;
 }

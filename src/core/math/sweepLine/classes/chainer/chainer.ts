@@ -62,8 +62,11 @@ export class Chainer<PathType extends Path = Path> {
 			}
 		}
 
+		/// #if DEBUG
 		/* istanbul ignore next: debug */
-		if(DEBUG_ENABLED && this._chains > 0) this.debugChains();
+		if(this._chains > 0) this.debugChains();
+		/// #endif
+
 		return result;
 	}
 

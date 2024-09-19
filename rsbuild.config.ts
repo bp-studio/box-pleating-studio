@@ -33,8 +33,6 @@ export default defineConfig({
 		define: {
 			// __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
 			__VUE_I18N_LEGACY_API__: false,
-			DEBUG_ENABLED: !isProduction,
-			TEST_MODE: false,
 		},
 		tsconfigPath: "./src/app/tsconfig.json",
 	},

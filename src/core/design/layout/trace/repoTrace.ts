@@ -1,7 +1,7 @@
 import { pathToString } from "core/math/geometry/path";
 import { SlashDirection } from "shared/types/direction";
 import { Trace } from "./trace";
-import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
+import { minQuadrantWeightComparator, startEndPoints } from "../pattern/quadrant";
 
 import type { NodeId } from "shared/json/tree";
 import type { Ridge } from "../pattern/device";
@@ -36,7 +36,7 @@ export class RepoTrace extends Trace {
 	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[]): [Point, Point] {
 		let [start, end] = startEndPoints(filtered);
 		if(filtered.length != all.length) {
-			filtered.sort(quadrantComparator);
+			filtered.sort(minQuadrantWeightComparator);
 			const first = all.indexOf(filtered[0]);
 			const last = all.indexOf(filtered[filtered.length - 1]);
 			if(first > 0) {

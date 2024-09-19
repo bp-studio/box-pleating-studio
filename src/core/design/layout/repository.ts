@@ -2,7 +2,7 @@ import { State } from "core/service/state";
 import { Store } from "./store";
 import { Point } from "core/math/geometry/point";
 import { configGenerator } from "./generators/configGenerator";
-import { Quadrant, quadrantComparator } from "./pattern/quadrant";
+import { Quadrant, minQuadrantWeightComparator } from "./pattern/quadrant";
 import { SlashDirection, makePerQuadrant, quadrantNumber } from "shared/types/direction";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { NodeSet } from "./nodeSet";
@@ -202,7 +202,7 @@ function createQuadrants(junctions: Junctions): CreateQuadrantResult {
 		directional[quadrant.q].push(quadrant);
 	}
 	for(let q = 0; q < quadrantNumber; q++) {
-		directional[q].sort(quadrantComparator);
+		directional[q].sort(minQuadrantWeightComparator);
 	}
 
 	return { map, directional };

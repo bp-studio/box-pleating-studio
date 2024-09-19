@@ -15,8 +15,10 @@ export namespace DesignController {
 
 	/** Initialize a design by the given data. */
 	export function init(data: JDesign): void {
+		/// #if DEBUG
 		/* istanbul ignore next: debug */
-		if(DEBUG_ENABLED) console.time("Design initializing");
+		console.time("Design initializing");
+		/// #endif
 
 		State.$tree = new Tree(data.tree.edges, data.layout.flaps);
 		State.$treeStructureChanged = true;
@@ -26,7 +28,9 @@ export namespace DesignController {
 		}
 		Processor.$run(heightTask);
 
+		/// #if DEBUG
 		/* istanbul ignore next: debug */
-		if(DEBUG_ENABLED) console.timeEnd("Design initializing");
+		console.timeEnd("Design initializing");
+		/// #endif
 	}
 }

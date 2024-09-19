@@ -76,6 +76,7 @@ function ssg() {
 	// polyfill
 	require("global-jsdom/register");
 	globalThis.matchMedia = () => ({ matches: false });
+	globalThis.performance.navigation = {};
 
 	return ssgI18n({
 		appRoot: config.src.app + "/vue/app.vue",

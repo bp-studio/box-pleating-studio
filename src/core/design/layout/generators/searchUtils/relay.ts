@@ -25,7 +25,7 @@ export function* searchRelay(
 	}
 	if(!items[1].split) {
 		yield makeYRelay(clone(o1), clone(o2), oriented, s1, s2);
-		if(s1 !== s2) makeYRelay(clone(o1), clone(o2), oriented, s2, s1);
+		if(s1 !== s2) yield makeYRelay(clone(o1), clone(o2), oriented, s2, s1);
 	}
 }
 

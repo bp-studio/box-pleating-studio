@@ -1,5 +1,5 @@
 import { HeapSet } from "shared/data/heap/heapSet";
-import { nodeComparator } from "../../context/treeNode";
+import { maxDistComparator } from "../../context/treeNode";
 import { getFirst } from "shared/utils/set";
 
 import type { ITreeNode } from "../../context";
@@ -28,7 +28,7 @@ export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: Reado
 		while(updater(n) && n.$parent) n = n.$parent;
 	} else {
 		// Initializing
-		const heap = new HeapSet<T>(nodeComparator);
+		const heap = new HeapSet<T>(maxDistComparator);
 		for(const set of sets) {
 			for(const n of set) heap.$insert(n);
 		}
