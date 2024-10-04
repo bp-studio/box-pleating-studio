@@ -91,6 +91,16 @@ export default {"en": {
 			"CP": {
 				"_": _=>"Export CP file",
 				"reorient": _=>"Reorient the sheet if applicable"
+			},
+			"optimizer": {
+				"_": _=>"Optimize layout",
+				"layout": {
+					"_": _=>"Layout method",
+					"view": _=>"Use current layout as reference.",
+					"random": _=>"Try random layouts and use the best one."
+				},
+				"run": _=>"Run!",
+				"running": _=>"Running..."
 			}
 		},
 		"help": {
@@ -276,6 +286,7 @@ export default {"en": {
 		"ok": _=>"OK",
 		"here": _=>"here",
 		"close": _=>"Close",
+		"cancel": _=>"Cancel",
 		"export": _=>"Export",
 		"delete": _=>"Delete",
 		"discord": _=>"BP Studio Discord server",
@@ -380,6 +391,11 @@ export default {"en": {
 			"CP": {
 				"_": _=>"Exportar archivo CP",
 				"reorient": _=>"Reorientar la hoja si corresponde"
+			},
+			"optimizer": {
+				"_": _=>"Optimizar el diseño",
+				"run": _=>"¡Ejecuta!",
+				"running": _=>"Ejecutando..."
 			}
 		},
 		"help": {
@@ -565,6 +581,7 @@ export default {"en": {
 		"ok": _=>"OK",
 		"here": _=>"aquí",
 		"close": _=>"Cerrar",
+		"cancel": _=>"Cancelar",
 		"export": _=>"Exportar",
 		"delete": _=>"Borrar",
 		"discord": _=>"Servidor Discord de BP Studio",
@@ -669,6 +686,11 @@ export default {"en": {
 			"CP": {
 				"_": _=>"CP ファイルのエクスポート",
 				"reorient": _=>"該当する場合は、シートの向きを変更します"
+			},
+			"optimizer": {
+				"_": _=>"レイアウトの最適化",
+				"run": _=>"実行して！",
+				"running": _=>"実行中..."
 			}
 		},
 		"help": {
@@ -854,6 +876,7 @@ export default {"en": {
 		"ok": _=>"OK",
 		"here": _=>"こちら",
 		"close": _=>"閉じる",
+		"cancel": _=>"キャンセル",
 		"export": _=>"エクスポート",
 		"delete": _=>"削除",
 		"discord": _=>"BP Studio Discord サーバー",
@@ -958,6 +981,11 @@ export default {"en": {
 			"CP": {
 				"_": _=>"CP 파일 내보내기",
 				"reorient": _=>"해당하는 경우 시트 방향 변경"
+			},
+			"optimizer": {
+				"_": _=>"레이아웃 최적화",
+				"run": _=>"실행해!",
+				"running": _=>"실행 중..."
 			}
 		},
 		"help": {
@@ -1143,6 +1171,7 @@ export default {"en": {
 		"ok": _=>"좋아요",
 		"here": _=>"여기",
 		"close": _=>"닫기",
+		"cancel": _=>"취소",
 		"export": _=>"내보내기",
 		"delete": _=>"삭제",
 		"discord": _=>"BP Studio 디스코드 서버",
@@ -1247,6 +1276,11 @@ export default {"en": {
 			"CP": {
 				"_": _=>"Xuất tệp CP",
 				"reorient": _=>"Định hướng lại trang tính nếu có"
+			},
+			"optimizer": {
+				"_": _=>"Tối ưu hóa bố cục",
+				"run": _=>"Chạy!",
+				"running": _=>"Đang chạy..."
 			}
 		},
 		"help": {
@@ -1432,6 +1466,7 @@ export default {"en": {
 		"ok": _=>"OK",
 		"here": _=>"đây",
 		"close": _=>"Đóng",
+		"cancel": _=>"Hủy bỏ",
 		"export": _=>"Xuất tệp",
 		"delete": _=>"Xóa bỏ",
 		"discord": _=>"Máy chủ BP Studio Discord",
@@ -1536,6 +1571,11 @@ export default {"en": {
 			"CP": {
 				"_": _=>"导出 CP 文件",
 				"reorient": _=>"若适用的话重新定向纸张"
+			},
+			"optimizer": {
+				"_": _=>"优化布局",
+				"run": _=>"运行！",
+				"running": _=>"运行中..."
 			}
 		},
 		"help": {
@@ -1721,6 +1761,7 @@ export default {"en": {
 		"ok": _=>"确定",
 		"here": _=>"这里",
 		"close": _=>"关闭",
+		"cancel": _=>"取消",
 		"export": _=>"导出",
 		"delete": _=>"删除",
 		"discord": _=>"BP Studio Discord 服务器",
@@ -1825,6 +1866,11 @@ export default {"en": {
 			"CP": {
 				"_": _=>"匯出 CP 檔案",
 				"reorient": _=>"若適用的話重新定向紙張"
+			},
+			"optimizer": {
+				"_": _=>"最佳化佈局",
+				"run": _=>"執行！",
+				"running": _=>"執行中…"
 			}
 		},
 		"help": {
@@ -2010,6 +2056,7 @@ export default {"en": {
 		"ok": _=>"確定",
 		"here": _=>"這裡",
 		"close": _=>"關閉",
+		"cancel": _=>"取消",
 		"export": _=>"匯出",
 		"delete": _=>"刪除",
 		"discord": _=>"BP Studio Discord 伺服器",

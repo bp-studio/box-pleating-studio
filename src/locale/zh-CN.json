@@ -89,6 +89,11 @@
 			"CP": {
 				"_": "导出 CP 文件",
 				"reorient": "若适用的话重新定向纸张"
+			},
+			"optimizer": {
+				"_": "优化布局",
+				"run": "运行！",
+				"running": "运行中..."
 			}
 		},
 		"help": {
@@ -274,6 +279,7 @@
 		"ok": "确定",
 		"here": "这里",
 		"close": "关闭",
+		"cancel": "取消",
 		"export": "导出",
 		"delete": "删除",
 		"discord": "BP Studio Discord 服务器",

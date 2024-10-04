@@ -8,14 +8,14 @@ interface MessageContext {
 interface MessageFunction {
 	(ctx: MessageContext): void | string;
 }
-type CompiledLocale<T extends object> = {
-	[k in keyof T]:
+type PartialCompiledLocale<T extends object> = {
+	[k in keyof T]?:
 	T[k] extends string[] ? MessageFunction[] :
-	T[k] extends object ? CompiledLocale<T[k]> :
+	T[k] extends object ? PartialCompiledLocale<T[k]> :
 	T[k] extends string ? MessageFunction :
 	T[k]
 };
 
-export type BpsLocale = CompiledLocale<typeof bpsLocale>;
+export type BpsLocale = PartialCompiledLocale<typeof bpsLocale>;
 
 export type BpsMessageKey = undefined | keyof BpsLocale["message"];

@@ -47,15 +47,15 @@ function makeXRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy
 	];
 }
 
-function makeYRelay(o1p: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy, s2?: Strategy): JPartition[] {
-	o1p.oy -= o2.oy;
+function makeYRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy, s2?: Strategy): JPartition[] {
+	o1.oy -= o2.oy;
 	const [a, b, c, d] = getRelayParameters(oriented);
-	o1p.c[c] = { type: CornerType.internal, e: o2.id, q: b };
-	o1p.c[d] = { type: CornerType.intersection, e: o2.c[a].e };
-	o2.c[b] = { type: CornerType.socket, e: o1p.id, q: c };
-	if(!oriented) o1p.shift = { x: 0, y: o2.oy };
+	o1.c[c] = { type: CornerType.internal, e: o2.id, q: b };
+	o1.c[d] = { type: CornerType.intersection, e: o2.c[a].e };
+	o2.c[b] = { type: CornerType.socket, e: o1.id, q: c };
+	if(!oriented) o1.shift = { x: 0, y: o2.oy };
 	return [
-		{ overlaps: [o1p], strategy: s1 },
+		{ overlaps: [o1], strategy: s1 },
 		{ overlaps: [o2], strategy: s2 },
 	];
 }

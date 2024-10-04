@@ -82,6 +82,11 @@ export class DiagonalGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $fixDimension(d: IDimension): void {
+		if(d.height < MIN_DIAG_SIZE) d.height = MIN_DIAG_SIZE;
+		if(d.width < MIN_DIAG_SIZE) d.width = MIN_DIAG_SIZE;
+	}
+
 	public $constrain(p: IPoint): IPoint {
 		let { x, y } = p;
 		const s = this._size, h = s % 2;

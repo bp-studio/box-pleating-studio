@@ -34,6 +34,14 @@ and you won't need to execute individual Gulp subtasks,
 as all subtasks will skip themselves if the source files are not changed.
 If something goes wrong, you can run `pnpm gulp clean` to cleanup built files and then rebuild everything.
 
+## Developing optimizer
+
+The BP Studio optimizer is written in Python as it utilizes [scipy](https://pypi.org/project/scipy/).
+In order to have typing supports in VS Code,
+you will need [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) extension,
+Python 3.9+ and [pipenv](https://pypi.org/project/pipenv/) installed.
+You can then install the dependencies with `pipenv install`.
+
 ## Browser compatibility
 
 BP Studio have tried to support as much browser versions as possible,

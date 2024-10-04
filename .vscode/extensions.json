@@ -8,6 +8,7 @@
 		"hbenl.vscode-test-explorer",
 		"lokalise.i18n-ally",
 		"ms-playwright.playwright",
+		"ms-python.vscode-pylance",
 		"ms-vscode.test-adapter-converter",
 		"mutsuntsai.jsdoc-link",
 		"sibiraj-s.vscode-scss-formatter",

@@ -89,6 +89,11 @@
 			"CP": {
 				"_": "CP 파일 내보내기",
 				"reorient": "해당하는 경우 시트 방향 변경"
+			},
+			"optimizer": {
+				"_": "레이아웃 최적화",
+				"run": "실행해!",
+				"running": "실행 중..."
 			}
 		},
 		"help": {
@@ -274,6 +279,7 @@
 		"ok": "좋아요",
 		"here": "여기",
 		"close": "닫기",
+		"cancel": "취소",
 		"export": "내보내기",
 		"delete": "삭제",
 		"discord": "BP Studio 디스코드 서버",

@@ -26,7 +26,7 @@ function legacyPlugin(name, alias = name) {
 export default [
 	{
 		name: "Global ignores",
-		ignores: ["{build,lib,coverage}/**", "src/app/gen/**"],
+		ignores: ["{build,coverage}/**", "lib/**/*.js", "src/app/gen/**"],
 	},
 	{
 		name: "Matching file extensions",
@@ -277,6 +277,8 @@ export default [
 				"Array.flatMap",
 				"Array.prototype.toReversed",
 				"Array.prototype.flatMap",
+				"Object.fromEntries",
+				"ObjectConstructor.fromEntries",
 				"PromiseConstructor.withResolvers",
 			],
 		},
@@ -434,7 +436,7 @@ export default [
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	{
-		files: ["gulpfile.js", "gulp/**", "test/mocha.env.mjs", "eslint-local-rules.js"],
+		files: ["gulpfile.js", "gulp/**", "test/mocha.env.mjs", "eslint-local-rules.js", "lib/**/*.mjs"],
 		languageOptions: {
 			globals: globals.node,
 			sourceType: "commonjs",

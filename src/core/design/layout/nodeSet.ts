@@ -5,7 +5,7 @@ import { State } from "core/service/state";
 import { minComparator } from "shared/data/heap/heap";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { quadrantNumber } from "shared/types/direction";
-import { dist } from "../context/tree";
+import { dist } from "../context/treeUtils";
 
 import type { Quadrant } from "./pattern/quadrant";
 import type { ITreeNode } from "../context";

@@ -1,5 +1,10 @@
 <template>
 	<Dropdown label="Tools" icon="bp-tools" :title="$t('toolbar.tools.title')">
+		<DropdownItem :disabled="!Studio.project" @click="show('optimizer')">
+			<i class="fa-solid fa-wand-magic-sparkles"></i>
+			{{ $t("toolbar.tools.optimizer._") }}
+		</DropdownItem>
+		<Divider />
 		<Uploader accept=".tmd5" @upload="TreeMaker($event)">
 			<i class="fas fa-file-import" />
 			{{ $t("toolbar.tools.TreeMaker") }}
@@ -21,6 +26,7 @@
 	import { Uploader } from "@/gadgets/file";
 	import Workspace from "app/services/workspaceService";
 	import { show } from "@/modals/modals";
+	import Divider from "@/gadgets/menu/divider.vue";
 
 	defineOptions({ name: "ToolMenu" });
 

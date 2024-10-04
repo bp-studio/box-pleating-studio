@@ -18,6 +18,7 @@
 		</template>
 	</template>
 	<template v-if="phase >= 9">
+		<Optimizer :ref="mdlRef('optimizer')" />
 		<Preference :ref="mdlRef('pref')" />
 	</template>
 </template>
@@ -38,6 +39,7 @@
 	import PNG from "./png.vue";
 	import BPS from "./bps.vue";
 	import BPZ from "./bpz.vue";
+	import Optimizer from "./optimizer.vue";
 
 	import type { IShow } from "./modals";
 

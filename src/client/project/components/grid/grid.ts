@@ -68,6 +68,12 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	public abstract $constrain(p: IPoint): IPoint;
 
 	/**
+	 * Given an {@link IDimension}, check if the values are valid, and fix them if not.
+	 * Used during optimization.
+	 */
+	public abstract $fixDimension(d: IDimension): void;
+
+	/**
 	 * Transformation matrix for a given point for CP exporting.
 	 * The numbers are arranged in such a way that the transformation is:
 	 * $$\left[\begin{matrix} A & B \\ C & D \end{matrix}\right]\left

@@ -3,7 +3,7 @@ import { State } from "core/service/state";
 import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
 import { stretchTask } from "./stretch";
-import { dist } from "../context/tree";
+import { dist } from "../context/treeUtils";
 import { UpdateResult } from "core/service/updateResult";
 
 import type { ITreeNode } from "../context";

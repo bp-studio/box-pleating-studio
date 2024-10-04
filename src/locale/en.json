@@ -89,6 +89,16 @@
 			"CP": {
 				"_": "Export CP file",
 				"reorient": "Reorient the sheet if applicable"
+			},
+			"optimizer": {
+				"_": "Optimize layout",
+				"layout": {
+					"_": "Layout method",
+					"view": "Use current layout as reference.",
+					"random": "Try random layouts and use the best one."
+				},
+				"run": "Run!",
+				"running": "Running..."
 			}
 		},
 		"help": {
@@ -274,6 +284,7 @@
 		"ok": "OK",
 		"here": "here",
 		"close": "Close",
+		"cancel": "Cancel",
 		"export": "Export",
 		"delete": "Delete",
 		"discord": "BP Studio Discord server",

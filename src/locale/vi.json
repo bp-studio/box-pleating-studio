@@ -89,6 +89,11 @@
 			"CP": {
 				"_": "Xuất tệp CP",
 				"reorient": "Định hướng lại trang tính nếu có"
+			},
+			"optimizer": {
+				"_": "Tối ưu hóa bố cục",
+				"run": "Chạy!",
+				"running": "Đang chạy..."
 			}
 		},
 		"help": {
@@ -274,6 +279,7 @@
 		"ok": "OK",
 		"here": "đây",
 		"close": "Đóng",
+		"cancel": "Hủy bỏ",
 		"export": "Xuất tệp",
 		"delete": "Xóa bỏ",
 		"discord": "Máy chủ BP Studio Discord",

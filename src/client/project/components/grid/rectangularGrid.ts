@@ -105,6 +105,11 @@ export class RectangularGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $fixDimension(d: IDimension): void {
+		if(d.height < MIN_RECT_SIZE) d.height = MIN_RECT_SIZE;
+		if(d.width < MIN_RECT_SIZE) d.width = MIN_RECT_SIZE;
+	}
+
 	public $constrain(p: IPoint): IPoint {
 		let { x, y } = p;
 		const w = this._width, h = this._height;

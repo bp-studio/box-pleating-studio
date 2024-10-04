@@ -1,12 +1,13 @@
 <template>
 	<Row :label="label">
 		<div class="input-group" style="flex-wrap: nowrap;">
-			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)" :title="tooltips[0]">
+			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)"
+					:title="tooltips[0]">
 				<i class="fas fa-minus" />
 			</button>
-			<input class="form-control" :class="{ 'error': value != modelValue }" type="number" v-model="value" @focus="focus($event)"
-				   @blur="blur" @input="input($event)" :min="min" :max="max" @wheel.passive="wheel($event)"
-				   style="cursor: ns-resize; min-width: 30px;" />
+			<input class="form-control" :disabled="disabled" :class="{ 'error': value != modelValue }" type="number"
+				   v-model="value" @focus="focus($event)" @blur="blur" @input="input($event)" :min="min" :max="max"
+				   @wheel.passive="wheel($event)" style="cursor: ns-resize; min-width: 30px;" />
 			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
 				<i class="fas fa-plus" />
 			</button>
@@ -26,6 +27,7 @@
 	defineOptions({ name: "Number" });
 
 	const props = withDefaults(defineProps<{
+		disabled?: boolean;
 		label?: string;
 		type?: string;
 		min?: number;
@@ -48,11 +50,13 @@
 	}));
 
 	const canMinus = computed(() => {
+		if(props.disabled) return false;
 		const v = value.value as number;
 		return props.min === undefined || v > props.min;
 	});
 
 	const canPlus = computed(() => {
+		if(props.disabled) return false;
 		const v = value.value as number;
 		return props.max === undefined || v < props.max;
 	});

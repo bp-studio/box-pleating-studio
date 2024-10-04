@@ -59,12 +59,14 @@
 	const bt = compRef(CheckButton);
 	const input = shallowRef<HTMLInputElement>();
 
-	const { el, show } = useModal("Share", async () => {
-		if(!Studio.project) return false;
-		const data = await LZ.compress(JSON.stringify(Studio.project));
-		const host = location.host.includes("qa") ? location.host : "bpstudio.abstreamace.com";
-		shorten(`https://${host}/?project=${data}`);
-		return true;
+	const { el, show } = useModal("Share", {
+		onBeforeShow: async () => {
+			if(!Studio.project) return false;
+			const data = await LZ.compress(JSON.stringify(Studio.project));
+			const host = location.host.includes("qa") ? location.host : "bpstudio.abstreamace.com";
+			shorten(`https://${host}/?project=${data}`);
+			return true;
+		},
 	});
 
 	async function copy(): Promise<void> {

@@ -21,6 +21,10 @@ html.dark {
 
 	color-scheme: dark;
 
+	.progress {
+		--bs-progress-bg: #555;
+	}
+
 	.text-muted {
 		color: #666 !important;
 	}
@@ -70,6 +74,11 @@ html.dark {
 		color: #eee;
 		background-color: #555;
 		border: #222;
+
+		&:disabled {
+			color: #aaa;
+			background-color: #505050;
+		}
 	}
 
 	.form-select {

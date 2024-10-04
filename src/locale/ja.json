@@ -89,6 +89,11 @@
 			"CP": {
 				"_": "CP ファイルのエクスポート",
 				"reorient": "該当する場合は、シートの向きを変更します"
+			},
+			"optimizer": {
+				"_": "レイアウトの最適化",
+				"run": "実行して！",
+				"running": "実行中..."
 			}
 		},
 		"help": {
@@ -274,6 +279,7 @@
 		"ok": "OK",
 		"here": "こちら",
 		"close": "閉じる",
+		"cancel": "キャンセル",
 		"export": "エクスポート",
 		"delete": "削除",
 		"discord": "BP Studio Discord サーバー",

@@ -24,6 +24,7 @@
 		"aabb",
 		"aaroon",
 		"appinstalled",
+		"basinhopping",
 		"beforeinstallprompt",
 		"bpstudio",
 		"browserslistrc",
@@ -65,6 +66,7 @@
 		"popperjs",
 		"precache",
 		"precaching",
+		"pyodide",
 		"queryable",
 		"Ravl",
 		"Rebalancing",
@@ -101,6 +103,7 @@
 		"eslint.config.mjs": "eslint-local-rules.js",
 		".gitignore": ".gitattributes",
 		"package.json": "pnpm-lock.yaml, .npmrc",
+		"Pipfile": "Pipfile.lock, pyproject.toml",
 		"rsbuild.config.ts": "rsbuild.*.ts"
 	},
 	"files.exclude": {

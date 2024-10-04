@@ -4,7 +4,9 @@ import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { balanceTask } from "core/design/tasks/balance";
 import { setStretchPrototypes } from "core/design/tasks/stretch";
+import { distMap } from "core/design/context/treeUtils";
 
+import type { DistMap } from "core/design/context/treeUtils";
 import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
 
@@ -76,6 +78,10 @@ export namespace TreeController {
 	export function merge(edge: JEdgeBase): void {
 		State.$tree.$merge(getChildId(edge));
 		Processor.$run(heightTask);
+	}
+
+	export function getDistMap(): DistMap {
+		return distMap(State.$tree);
 	}
 
 	/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */

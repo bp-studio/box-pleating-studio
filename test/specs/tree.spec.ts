@@ -1,6 +1,6 @@
 import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "@utils/tree";
 import { TreeController } from "core/controller/treeController";
-import { getDist } from "core/design/context/tree";
+import { getDist } from "core/design/context/treeUtils";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 
@@ -103,6 +103,21 @@ describe("Tree", function() {
 		]);
 		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
 		expect(JSON.stringify(tree.toJSON().edges)).to.equal(json);
+	});
+
+	it("Creates distance map", function() {
+		createTree([
+			{ n1: 0, n2: 1, length: 1 },
+			{ n1: 0, n2: 2, length: 2 },
+			{ n1: 0, n2: 3, length: 2 },
+			{ n1: 3, n2: 4, length: 1 },
+			{ n1: 3, n2: 5, length: 2 },
+		]);
+		const distMap = TreeController.getDistMap();
+		expect(distMap.length).to.equal(6);
+		expect(distMap).to.deep.include([5, 4, 3]);
+		expect(distMap).to.deep.include([4, 1, 4]);
+		expect(distMap).to.deep.include([5, 2, 6]);
 	});
 
 	describe("AABB record", function() {

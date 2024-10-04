@@ -6,6 +6,7 @@ import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { isOnline } from "app/shared/constants";
 
+import type { OptimizerOptions } from "client/plugins/optimizer";
 import type { CoreError, JProject, ProjId } from "shared/json";
 import type { Project } from "client/project/project";
 
@@ -161,13 +162,24 @@ namespace WorkspaceService {
 		return true;
 	}
 
-	export async function clone(id: ProjId): Promise<void> {
-		const i = ids.value.indexOf(id);
-		const proj = projects.value[i].toJSON(true);
+	async function insertAfterAndSelect(proj: JProject, after: ProjId): Promise<void> {
+		const i = ids.value.indexOf(after);
 		const c = await bp.projects.open(checkTitle(proj));
 		manipulateIds(arr => arr.splice(i + 1, 0, c.id));
 		select(c.id);
+	}
+
+	export async function clone(id: ProjId): Promise<void> {
+		const i = ids.value.indexOf(id);
+		await insertAfterAndSelect(projects.value[i].toJSON(true), id);
 		gtag("event", "project_clone");
+	}
+
+	export async function optimize(options: OptimizerOptions): Promise<void> {
+		const proj = Studio.project;
+		if(!proj) return;
+		const optimized = await bp.plugins.optimizer(proj, options);
+		await insertAfterAndSelect(optimized, proj.id);
 	}
 
 	function manipulateIds(action: Consumer<ProjId[]>): void {
