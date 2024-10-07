@@ -87,7 +87,7 @@ async function ftpFactory(folder, pipeFactory) {
 	});
 	await streamToPromise(
 		(pipeFactory ? pipeFactory(pipe) : pipe)
-			.pipe(compare(findCacheDirectory, "bpstudio"))
+			.pipe(compare(findCacheDirectory, folder))
 			.pipe(conn.dest(base))
 	);
 

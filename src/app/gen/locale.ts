@@ -91,16 +91,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"Export CP file",
 				"reorient": _=>"Reorient the sheet if applicable"
-			},
-			"optimizer": {
-				"_": _=>"Optimize layout",
-				"layout": {
-					"_": _=>"Layout method",
-					"view": _=>"Use current layout as reference.",
-					"random": _=>"Try random layouts and use the best one."
-				},
-				"run": _=>"Run!",
-				"running": _=>"Running..."
 			}
 		},
 		"help": {
@@ -278,6 +268,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["File \"",i(l(0)),"\" is not of TreeMaker 5 format."]),
 			"size8": _=>"BP Studio requires sheet size at least 8.",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["File \"",i(l(0)),"\" seems corrupted and cannot be loaded successfully."])
+		},
+		"optimizer": {
+			"_": _=>"Optimize layout",
+			"options": {
+				"_": _=>"Options",
+				"useDim": _=>"Keep widths and heights of flaps"
+			},
+			"layout": {
+				"_": _=>"Layout method",
+				"view": _=>"Use current layout as reference",
+				"random": _=>"Try random layouts and use the best one",
+				"toTry": _=>"Number of layouts to try:",
+				"useBH": _=>"Also search nearby solutions"
+			},
+			"fit": {
+				"_": _=>"Fitting method",
+				"quick": _=>"Quick mode",
+				"full": _=>"Full mode"
+			},
+			"skip": _=>"Skip",
+			"run": _=>"Run!",
+			"running": _=>"Running..."
 		}
 	},
 	"keyword": {
@@ -285,6 +297,7 @@ export default {"en": {
 		"no": _=>"No",
 		"ok": _=>"OK",
 		"here": _=>"here",
+		"abort": _=>"Abort",
 		"close": _=>"Close",
 		"cancel": _=>"Cancel",
 		"export": _=>"Export",
@@ -391,11 +404,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"Exportar archivo CP",
 				"reorient": _=>"Reorientar la hoja si corresponde"
-			},
-			"optimizer": {
-				"_": _=>"Optimizar el diseño",
-				"run": _=>"¡Ejecuta!",
-				"running": _=>"Ejecutando..."
 			}
 		},
 		"help": {
@@ -573,6 +581,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["El archivo \"",i(l(0)),"\" no tiene el formato TreeMaker 5."]),
 			"size8": _=>"BP Studio requiere un tamaño de hoja de al menos 8.",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["El archivo \"",i(l(0)),"\" parece dañado y no se puede cargar correctamente."])
+		},
+		"optimizer": {
+			"_": _=>"Optimizar el diseño",
+			"options": {
+				"_": _=>"Opciones",
+				"useDim": _=>"Mantenga los anchos y altos de las solapas."
+			},
+			"layout": {
+				"_": _=>"Método de diseño",
+				"view": _=>"Utilice el diseño actual como referencia",
+				"random": _=>"Pruebe diseños aleatorios y utilice el mejor",
+				"toTry": _=>"Número de diseños para probar:",
+				"useBH": _=>"Busque también soluciones cercanas"
+			},
+			"fit": {
+				"_": _=>"Método de ajuste",
+				"quick": _=>"modo rápido",
+				"full": _=>"Modo completo"
+			},
+			"skip": _=>"Saltar",
+			"run": _=>"¡Ejecuta!",
+			"running": _=>"Ejecutando..."
 		}
 	},
 	"keyword": {
@@ -580,6 +610,7 @@ export default {"en": {
 		"no": _=>"No",
 		"ok": _=>"OK",
 		"here": _=>"aquí",
+		"abort": _=>"Abortar",
 		"close": _=>"Cerrar",
 		"cancel": _=>"Cancelar",
 		"export": _=>"Exportar",
@@ -686,11 +717,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"CP ファイルのエクスポート",
 				"reorient": _=>"該当する場合は、シートの向きを変更します"
-			},
-			"optimizer": {
-				"_": _=>"レイアウトの最適化",
-				"run": _=>"実行して！",
-				"running": _=>"実行中..."
 			}
 		},
 		"help": {
@@ -868,6 +894,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["ファイル \"",i(l(0)),"\" は TreeMaker 5 形式ではありません。"]),
 			"size8": _=>"BP Studio には、少なくとも 8 枚のシートサイズが必要です。",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["ファイル \"",i(l(0)),"\" が破損しているようで、正常にロードできません。"])
+		},
+		"optimizer": {
+			"_": _=>"レイアウトの最適化",
+			"options": {
+				"_": _=>"オプション",
+				"useDim": _=>"カドの幅と高さを維持する"
+			},
+			"layout": {
+				"_": _=>"レイアウト方法",
+				"view": _=>"現在のレイアウトを参考として使用してください",
+				"random": _=>"ランダムなレイアウトを試して、最適なものを使用してください",
+				"toTry": _=>"試行するレイアウトの数:",
+				"useBH": _=>"近くのソリューションも検索します"
+			},
+			"fit": {
+				"_": _=>"はめ込み方法",
+				"quick": _=>"クイックモード",
+				"full": _=>"フルモード"
+			},
+			"skip": _=>"スキップ",
+			"run": _=>"実行して！",
+			"running": _=>"実行中..."
 		}
 	},
 	"keyword": {
@@ -875,6 +923,7 @@ export default {"en": {
 		"no": _=>"いいえ",
 		"ok": _=>"OK",
 		"here": _=>"こちら",
+		"abort": _=>"アボート",
 		"close": _=>"閉じる",
 		"cancel": _=>"キャンセル",
 		"export": _=>"エクスポート",
@@ -981,11 +1030,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"CP 파일 내보내기",
 				"reorient": _=>"해당하는 경우 시트 방향 변경"
-			},
-			"optimizer": {
-				"_": _=>"레이아웃 최적화",
-				"run": _=>"실행해!",
-				"running": _=>"실행 중..."
 			}
 		},
 		"help": {
@@ -1163,6 +1207,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["파일 \"",i(l(0)),"\" 은 TreeMaker 5 형식이 아닙니다."]),
 			"size8": _=>"BP Studio 는 시트 크기가 적어도 8 이상이어야 합니다.",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["파일 \"",i(l(0)),"\" 이 손상되어 성공적으로 로드할 수 없습니다."])
+		},
+		"optimizer": {
+			"_": _=>"레이아웃 최적화",
+			"options": {
+				"_": _=>"옵션",
+				"useDim": _=>"가지의 너비와 높이를 유지하십시오"
+			},
+			"layout": {
+				"_": _=>"레이아웃 방법",
+				"view": _=>"현재 레이아웃을 참조로 사용합니다",
+				"random": _=>"임의의 레이아웃을 시도하고 가장 좋은 레이아웃을 사용하십시오",
+				"toTry": _=>"시도할 레이아웃 수:",
+				"useBH": _=>"주변 솔루션도 검색해 보세요"
+			},
+			"fit": {
+				"_": _=>"피팅 방법",
+				"quick": _=>"빠른 모드",
+				"full": _=>"전체 모드"
+			},
+			"skip": _=>"건너뛰다",
+			"run": _=>"실행해!",
+			"running": _=>"실행 중..."
 		}
 	},
 	"keyword": {
@@ -1170,6 +1236,7 @@ export default {"en": {
 		"no": _=>"아니요",
 		"ok": _=>"좋아요",
 		"here": _=>"여기",
+		"abort": _=>"중단",
 		"close": _=>"닫기",
 		"cancel": _=>"취소",
 		"export": _=>"내보내기",
@@ -1276,11 +1343,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"Xuất tệp CP",
 				"reorient": _=>"Định hướng lại trang tính nếu có"
-			},
-			"optimizer": {
-				"_": _=>"Tối ưu hóa bố cục",
-				"run": _=>"Chạy!",
-				"running": _=>"Đang chạy..."
 			}
 		},
 		"help": {
@@ -1458,6 +1520,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["Tệp \"",i(l(0)),"\" không có định dạng TreeMaker 5."]),
 			"size8": _=>"BP Studio yêu cầu kích thước trang tính ít nhất là 8.",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["Tệp \"",i(l(0)),"\" có vẻ như bị hỏng và không thể tải thành công."])
+		},
+		"optimizer": {
+			"_": _=>"Tối ưu hóa bố cục",
+			"options": {
+				"_": _=>"Tùy chọn",
+				"useDim": _=>"Giữ nguyên chiều rộng và chiều cao của các nhánh"
+			},
+			"layout": {
+				"_": _=>"Phương pháp bố trí",
+				"view": _=>"Sử dụng bố cục hiện tại làm tài liệu tham khảo",
+				"random": _=>"Hãy thử bố cục ngẫu nhiên và sử dụng bố cục tốt nhất",
+				"toTry": _=>"Số lượng bố cục để thử:",
+				"useBH": _=>"Cũng tìm kiếm các giải pháp gần đó"
+			},
+			"fit": {
+				"_": _=>"Phương pháp lắp",
+				"quick": _=>"Chế độ nhanh",
+				"full": _=>"Chế độ đầy đủ"
+			},
+			"skip": _=>"Nhảy",
+			"run": _=>"Chạy!",
+			"running": _=>"Đang chạy..."
 		}
 	},
 	"keyword": {
@@ -1465,6 +1549,7 @@ export default {"en": {
 		"no": _=>"Không",
 		"ok": _=>"OK",
 		"here": _=>"đây",
+		"abort": _=>"Hủy bỏ",
 		"close": _=>"Đóng",
 		"cancel": _=>"Hủy bỏ",
 		"export": _=>"Xuất tệp",
@@ -1571,11 +1656,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"导出 CP 文件",
 				"reorient": _=>"若适用的话重新定向纸张"
-			},
-			"optimizer": {
-				"_": _=>"优化布局",
-				"run": _=>"运行！",
-				"running": _=>"运行中..."
 			}
 		},
 		"help": {
@@ -1591,7 +1671,7 @@ export default {"en": {
 		},
 		"view": {
 			"tree": _=>"树状结构",
-			"layout": _=>"佈局"
+			"layout": _=>"布局"
 		},
 		"tab": {
 			"clone": _=>"复制",
@@ -1640,7 +1720,7 @@ export default {"en": {
 			"titlePH": _=>"(项目标题)",
 			"descriptionPH": _=>"(项目描述)",
 			"tree": _=>"树状结构视图",
-			"layout": _=>"佈局视图",
+			"layout": _=>"布局视图",
 			"width": _=>"宽度",
 			"height": _=>"高度",
 			"size": _=>"尺寸",
@@ -1753,6 +1833,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["文件「",i(l(0)),"」不是 TreeMaker 5 的格式。"]),
 			"size8": _=>"BP Studio 要求纸张大小至少为 8。",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["文件「",i(l(0)),"」似乎已损坏，无法成功读取。"])
+		},
+		"optimizer": {
+			"_": _=>"优化布局",
+			"options": {
+				"_": _=>"选项",
+				"useDim": _=>"保持角片的宽度和高度"
+			},
+			"layout": {
+				"_": _=>"布局方法",
+				"view": _=>"使用当前布局作为参考",
+				"random": _=>"尝试随机布局并使用最好的布局",
+				"toTry": _=>"要尝试的布局数量：",
+				"useBH": _=>"搜索附近的解答"
+			},
+			"fit": {
+				"_": _=>"拟合方法",
+				"quick": _=>"快速模式",
+				"full": _=>"完整模式"
+			},
+			"skip": _=>"跳过",
+			"run": _=>"运行！",
+			"running": _=>"运行中..."
 		}
 	},
 	"keyword": {
@@ -1760,6 +1862,7 @@ export default {"en": {
 		"no": _=>"否",
 		"ok": _=>"确定",
 		"here": _=>"这里",
+		"abort": _=>"中止",
 		"close": _=>"关闭",
 		"cancel": _=>"取消",
 		"export": _=>"导出",
@@ -1866,11 +1969,6 @@ export default {"en": {
 			"CP": {
 				"_": _=>"匯出 CP 檔案",
 				"reorient": _=>"若適用的話重新定向紙張"
-			},
-			"optimizer": {
-				"_": _=>"最佳化佈局",
-				"run": _=>"執行！",
-				"running": _=>"執行中…"
 			}
 		},
 		"help": {
@@ -2048,6 +2146,28 @@ export default {"en": {
 			"not5": ({normalize:n,interpolate:i,list:l})=>n(["檔案「",i(l(0)),"」不是 TreeMaker 5 的格式。"]),
 			"size8": _=>"BP Studio 要求紙張大小至少為 8。",
 			"invalid": ({normalize:n,interpolate:i,list:l})=>n(["檔案「",i(l(0)),"」似乎已損壞，無法成功讀取。"])
+		},
+		"optimizer": {
+			"_": _=>"最佳化佈局",
+			"options": {
+				"_": _=>"選項",
+				"useDim": _=>"保持角片的寬度和高度"
+			},
+			"layout": {
+				"_": _=>"佈局方法",
+				"view": _=>"使用當前佈局作為參考",
+				"random": _=>"嘗試隨機佈局並使用最佳的佈局",
+				"toTry": _=>"要嘗試的佈局數量：",
+				"useBH": _=>"搜尋附近的解答"
+			},
+			"fit": {
+				"_": _=>"擬合方法",
+				"quick": _=>"快速模式",
+				"full": _=>"完整模式"
+			},
+			"skip": _=>"跳過",
+			"run": _=>"執行！",
+			"running": _=>"執行中…"
 		}
 	},
 	"keyword": {
@@ -2055,6 +2175,7 @@ export default {"en": {
 		"no": _=>"否",
 		"ok": _=>"確定",
 		"here": _=>"這裡",
+		"abort": _=>"中止",
 		"close": _=>"關閉",
 		"cancel": _=>"取消",
 		"export": _=>"匯出",

@@ -2,7 +2,7 @@
 	<Dropdown label="Tools" icon="bp-tools" :title="$t('toolbar.tools.title')">
 		<DropdownItem :disabled="!Studio.project" @click="show('optimizer')">
 			<i class="fa-solid fa-wand-magic-sparkles"></i>
-			{{ $t("toolbar.tools.optimizer._") }}
+			{{ $t("plugin.optimizer._") }}
 		</DropdownItem>
 		<Divider />
 		<Uploader accept=".tmd5" @upload="TreeMaker($event)">

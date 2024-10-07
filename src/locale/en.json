@@ -89,16 +89,6 @@
 			"CP": {
 				"_": "Export CP file",
 				"reorient": "Reorient the sheet if applicable"
-			},
-			"optimizer": {
-				"_": "Optimize layout",
-				"layout": {
-					"_": "Layout method",
-					"view": "Use current layout as reference.",
-					"random": "Try random layouts and use the best one."
-				},
-				"run": "Run!",
-				"running": "Running..."
 			}
 		},
 		"help": {
@@ -276,6 +266,28 @@
 			"not5": "File \"{0}\" is not of TreeMaker 5 format.",
 			"size8": "BP Studio requires sheet size at least 8.",
 			"invalid": "File \"{0}\" seems corrupted and cannot be loaded successfully."
+		},
+		"optimizer": {
+			"_": "Optimize layout",
+			"options": {
+				"_": "Options",
+				"useDim": "Keep widths and heights of flaps"
+			},
+			"layout": {
+				"_": "Layout method",
+				"view": "Use current layout as reference",
+				"random": "Try random layouts and use the best one",
+				"toTry": "Number of layouts to try:",
+				"useBH": "Also search nearby solutions"
+			},
+			"fit": {
+				"_": "Fitting method",
+				"quick": "Quick mode",
+				"full": "Full mode"
+			},
+			"skip": "Skip",
+			"run": "Run!",
+			"running": "Running..."
 		}
 	},
 	"keyword": {
@@ -283,6 +295,7 @@
 		"no": "No",
 		"ok": "OK",
 		"here": "here",
+		"abort": "Abort",
 		"close": "Close",
 		"cancel": "Cancel",
 		"export": "Export",

@@ -89,11 +89,6 @@
 			"CP": {
 				"_": "Exportar archivo CP",
 				"reorient": "Reorientar la hoja si corresponde"
-			},
-			"optimizer": {
-				"_": "Optimizar el diseño",
-				"run": "¡Ejecuta!",
-				"running": "Ejecutando..."
 			}
 		},
 		"help": {
@@ -271,6 +266,28 @@
 			"not5": "El archivo \"{0}\" no tiene el formato TreeMaker 5.",
 			"size8": "BP Studio requiere un tamaño de hoja de al menos 8.",
 			"invalid": "El archivo \"{0}\" parece dañado y no se puede cargar correctamente."
+		},
+		"optimizer": {
+			"_": "Optimizar el diseño",
+			"options": {
+				"_": "Opciones",
+				"useDim": "Mantenga los anchos y altos de las solapas."
+			},
+			"layout": {
+				"_": "Método de diseño",
+				"view": "Utilice el diseño actual como referencia",
+				"random": "Pruebe diseños aleatorios y utilice el mejor",
+				"toTry": "Número de diseños para probar:",
+				"useBH": "Busque también soluciones cercanas"
+			},
+			"fit": {
+				"_": "Método de ajuste",
+				"quick": "modo rápido",
+				"full": "Modo completo"
+			},
+			"skip": "Saltar",
+			"run": "¡Ejecuta!",
+			"running": "Ejecutando..."
 		}
 	},
 	"keyword": {
@@ -278,6 +295,7 @@
 		"no": "No",
 		"ok": "OK",
 		"here": "aquí",
+		"abort": "Abortar",
 		"close": "Cerrar",
 		"cancel": "Cancelar",
 		"export": "Exportar",

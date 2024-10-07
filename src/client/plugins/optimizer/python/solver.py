@@ -1,17 +1,18 @@
 import numpy as np
-from scipy.optimize import minimize, basinhopping
+from scipy.optimize import minimize, basinhopping, OptimizeResult
 
-from .constraints import MAX_SHEET_SIZE, get_scale, select_initial_scale
+from .problem import Problem
+from .constraints import MIN_SHEET_SIZE, MAX_SHEET_SIZE, get_scale, select_initial_scale
 
 
-TOL = 1e-8
+TOL = 1e-6
 MINIMIZE_OPTION = {
 	"maxiter": 200,
 	"ftol": 1e-5,
 }
 
 FLAP_BOUND = (0, 1)
-SCALE_BOUND = (0, 1)
+SCALE_BOUND = (1 / MAX_SHEET_SIZE, 1 / MIN_SHEET_SIZE)
 
 
 def objective(x):
@@ -37,18 +38,21 @@ def pack(x0, cons, fix=None):
 	return minimize(objective, x0, bounds=bounds, constraints=cons, jac=jacobian, tol=TOL, options=MINIMIZE_OPTION)
 
 
-async def generate_candidate(target: int, flap_count: int, dist_map, checkInterrupt):
+async def generate_candidate(target: int, problem: Problem, checkInterrupt):
 	vectors = []
-	for i in range(target * 100):
-		vec = np.random.rand(flap_count * 2 + 1)
-		select_initial_scale(vec, dist_map)
-		vectors.append(vec)
-		if i % 10 == 0:
-			print(f'{{"event": "candidate", "data": {i/100}}}')
-		if i % 100 == 0:
-			interrupt = await checkInterrupt()
-			if interrupt > 0:
-				break
+	try:
+		for i in range(target * 100):
+			vec = np.random.rand(len(problem.flaps) * 2 + 1)
+			select_initial_scale(vec, problem)
+			vectors.append(vec)
+			if i % 10 == 0:
+				print(f'{{"event": "candidate", "data": {i/100}}}')
+			if i % 50 == 0:
+				interrupt = await checkInterrupt()
+				if interrupt > 0:
+					break
+	except KeyboardInterrupt:
+		pass
 
 	vectors.sort(key=objective)
 	return vectors[:target]
@@ -66,28 +70,48 @@ async def solve_global(initial_vectors: int, cons, checkInterrupt):
 		if not result.success:
 			continue
 
-		interrupt = await checkInterrupt()
-		if interrupt > 0:
-			break
-
 		s = get_scale(result.x)
 		if s < best_s:
 			best_result = result
 			best_s = s
+
+		interrupt = await checkInterrupt()
+		if interrupt > 0 or "interrupt" in result:
+			break
 
 	return best_result
 
 
 def basin_hopping(x0, cons):
 	bounds = [FLAP_BOUND] * (len(x0) - 1) + [SCALE_BOUND]
-	return basinhopping(
-		objective,
-		x0,
-		interval=5,
-		niter=50,
-		niter_success=8,
-		stepsize=0.1,
-		T=0.01,
-		disp=True,
-		minimizer_kwargs={"method": "SLSQP", "bounds": bounds, "constraints": cons, "jac": jacobian, "tol": TOL, "options": MINIMIZE_OPTION},
-	)
+
+	best_temp_f = 0
+	best_temp_x = None
+
+	def callback(x, f, accept):
+		nonlocal best_temp_f, best_temp_x
+		if f < best_temp_f:
+			best_temp_f = f
+			best_temp_x = x
+
+	try:
+		return basinhopping(
+			objective,
+			x0,
+			interval=5,
+			niter=50,
+			niter_success=16,
+			stepsize=0.1,
+			T=0.01,
+			disp=True,
+			callback=callback,
+			minimizer_kwargs={"method": "SLSQP", "bounds": bounds, "constraints": cons, "jac": jacobian, "tol": TOL, "options": MINIMIZE_OPTION},
+		)
+	except KeyboardInterrupt:
+		if best_temp_x is None:
+			best_temp_x = x0
+		result = OptimizeResult()
+		result.x = best_temp_x
+		result.success = True
+		result["interrupt"] = True
+		return result

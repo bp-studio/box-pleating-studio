@@ -54,6 +54,8 @@ export const hasServiceWorker = "serviceWorker" in navigator;
 
 /** Whether the current page is reloaded. */
 const timing = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
-export const isReload =	timing?.type == "reload" || performance.navigation.type == 1;
+export const isReload = timing?.type == "reload" || performance.navigation.type == 1;
 
 export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
+
+export const hasSharedArrayBuffer = typeof SharedArrayBuffer !== "undefined";

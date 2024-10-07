@@ -6,18 +6,23 @@ export type FittingMode = "quick" | "full";
 
 export interface OptimizerOptionsBase {
 	layout: LayoutMode;
+	/** Whether to use Basin-hopping in view-mode. */
+	useBH: boolean;
 	fit: FittingMode;
 	random: number;
 }
 
-export type OptimizerCommand = "start" | "skip" | "stop";
+export type OptimizerCommand = "buffer" | "start" | "skip" | "stop";
 
 export interface OptimizerRequest extends OptimizerOptionsBase {
 	command: OptimizerCommand;
-	flaps: IDimension[];
-	type: GridType;
+	buffer?: Uint8Array;
+	problem: {
+		type: GridType;
+		flaps: IDimension[];
+		distMap: DistMap<number>;
+	};
 	vec: IPoint[] | null;
-	distMap: DistMap<number>;
 }
 
 export interface OptimizerResult extends IDimension {
@@ -33,6 +38,7 @@ export type OptimizerEvent = {
 
 interface OptimizerEventMap {
 	handle: Consumer<OptimizerCommand>;
+	loading: number;
 	candidate: number;
 	flap: number;
 	bh: number;

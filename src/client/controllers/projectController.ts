@@ -8,7 +8,7 @@ import type { ShallowRef } from "vue";
 import type { JProject, ProjId } from "shared/json";
 
 function createWorker(): Worker {
-	return new Worker(/* webpackChunkName: "core" */ new URL("../../core/main.ts", import.meta.url));
+	return new Worker(new URL("core/main.ts", import.meta.url), { name: "core" });
 }
 
 /** The worker instance that is pre-generated and is standing-by. */

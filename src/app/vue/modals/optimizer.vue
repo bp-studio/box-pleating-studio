@@ -3,48 +3,50 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header">
-					<div class="h4 modal-title" v-t="'toolbar.tools.optimizer._'"></div>
+					<div class="h4 modal-title" v-t="'plugin.optimizer._'"></div>
 				</div>
 				<div class="modal-body">
 					<div v-if="state.stage == Stage.stopped">
 						<div class="row">
-							<label class="col-12 col-sm-4 mb-2" v-t="'toolbar.tools.optimizer.layout._'"></label>
+							<label class="col-12 col-sm-4 mb-2 col-form-label" v-t="'plugin.optimizer.options._'"></label>
 							<div class="col mb-2">
-								<div>
-									<Radio name="layout_mode" v-model="options.layout" value="view"
-										   :label="$t('toolbar.tools.optimizer.layout.view')" />
+								<Toggle v-model="options.useDimension">{{ $t('plugin.optimizer.options.useDim') }}</Toggle>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-12 col-sm-4 mb-2 col-form-label" v-t="'plugin.optimizer.layout._'"></label>
+							<div class="col mb-2">
+								<select class="form-select" v-model="options.layout">
+									<option value="view" v-t="'plugin.optimizer.layout.view'"></option>
+									<option value="random" v-t="'plugin.optimizer.layout.random'"></option>
+								</select>
+								<div class="row" v-if="options.layout == 'view'">
+									<Toggle v-model="options.useBH">{{ $t('plugin.optimizer.layout.useBH') }}</Toggle>
 								</div>
-								<div>
-									<Radio name="layout_mode" v-model="options.layout" value="random"
-										   :label="$t('toolbar.tools.optimizer.layout.random')" />
-									<div class="row mt-1 ms-3 gx-3">
-										<div class="col-auto col-form-label">
-											Try
-										</div>
-										<div class="col">
-											<Number v-model="options.random" :disabled="options.layout != 'random'" :min="1"
-													:max="100" />
-										</div>
-										<div class="col-auto col-form-label">
-											layouts.
-										</div>
+								<div class="row mt-2 gx-3" v-if="options.layout == 'random'">
+									<div class="col-auto col-form-label" v-t="'plugin.optimizer.layout.toTry'"></div>
+									<div class="col">
+										<Number v-model="options.random" :disabled="options.layout != 'random'" :min="1"
+												:max="100" />
 									</div>
 								</div>
 							</div>
 						</div>
-
 						<div class="row mt-3 mt-sm-2">
-							<label class="col-12 col-sm-4 mb-2">Fitting method</label>
+							<label class="col-12 col-sm-4 mb-2" v-t="'plugin.optimizer.fit._'"></label>
 							<div class="col mb-2">
-								<Radio name="fit_mode" v-model="options.fit" value="quick" label="Quick mode" class="me-3" />
-								<Radio name="fit_mode" v-model="options.fit" value="full" label="Full mode" />
+								<Radio name="fit_mode" v-model="options.fit" value="quick"
+									   :label="$t('plugin.optimizer.fit.quick')" class="me-3" />
+								<Radio name="fit_mode" v-model="options.fit" value="full"
+									   :label="$t('plugin.optimizer.fit.full')" />
 							</div>
 						</div>
 
 					</div>
-					<div v-else-if="state.stage == Stage.initializing">
-						Initializing...
-					</div>
+					<OptProgress v-else-if="state.stage == Stage.initializing" :state="state" :options="options"
+								 :value="state.minor" :max="100" noSkip @stop="stop">
+						Initializing ({{ state.minor.toFixed(1) }}%)...
+					</OptProgress>
 					<OptProgress v-else-if="state.stage == Stage.candidate" :state="state" :options="options" :value="state.major"
 								 :max="options.random" @skip="skip" @stop="stop">
 						Generating candidate layouts...
@@ -55,12 +57,16 @@
 									 @stop="stop">
 							Trying random layout #{{ state.major }}, step {{ state.minor }}...
 						</OptProgress>
+						<OptProgress v-else-if="options.useBH" :state="state" :options="options" :value="state.minor" :max="50"
+									 :noSkip="!hasSharedArrayBuffer" @skip="skip" @stop="stop">
+							Pre-solving, step {{ state.minor }}...
+						</OptProgress>
 						<div v-else>
 							Pre-solving...
 						</div>
 					</div>
 					<OptProgress v-else-if="state.stage == Stage.integral" :state="state" :options="options" :value="state.minor"
-								 :max="state.flaps" noSkip @stop="stop">
+								 :max="state.flaps" :noSkip="!hasSharedArrayBuffer" @skip="skip" @stop="stop">
 						Trying grid size {{ state.major }}...
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.error" class="text-danger">
@@ -73,10 +79,10 @@
 					<button type="button" class="btn btn-primary" :disabled="state.running || state.stage == Stage.error"
 							@click="run">
 						<span v-if="state.running">
-							{{ $t('toolbar.tools.optimizer.running') }}&ensp;<i class="bp-spinner fa-spin" />
+							{{ $t('plugin.optimizer.running') }}&ensp;<i class="bp-spinner fa-spin" />
 						</span>
 						<span v-else>
-							{{ $t('toolbar.tools.optimizer.run') }}&ensp;<i class="fa-solid fa-wand-magic-sparkles" />
+							{{ $t('plugin.optimizer.run') }}&ensp;<i class="fa-solid fa-wand-magic-sparkles" />
 						</span>
 					</button>
 				</div>
@@ -86,7 +92,9 @@
 </template>
 
 <script lang="ts">
-	import.meta.webpackHot.dispose(() => document.querySelector(".modal-backdrop.show")?.remove());
+	if(import.meta.webpackHot) {
+		import.meta.webpackHot.dispose(() => document.querySelector(".modal-backdrop.show")?.remove());
+	}
 </script>
 
 <script setup lang="ts">
@@ -98,6 +106,8 @@
 	import Number from "@/gadgets/form/number.vue";
 	import OptProgress from "./components/optProgress.vue";
 	import Radio from "@/gadgets/form/radio.vue";
+	import Toggle from "@/gadgets/form/toggle.vue";
+	import { hasSharedArrayBuffer } from "app/shared/constants";
 
 	import type { OptimizerOptions } from "client/plugins/optimizer";
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";
@@ -127,6 +137,8 @@
 	});
 	const options = reactive<OptimizerOptions>({
 		layout: "view",
+		useDimension: true,
+		useBH: false,
 		fit: "quick",
 		random: 1,
 		callback,
@@ -139,6 +151,9 @@
 		switch(event.event) {
 			case "handle":
 				handler = event.data;
+				break;
+			case "loading":
+				state.minor = event.data;
 				break;
 			case "flap":
 				state.flaps = event.data;

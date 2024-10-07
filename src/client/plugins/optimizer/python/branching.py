@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+from .problem import Problem
 from .solver import pack
 from .constraints import check_constraints, get_scale, set_scale
 
@@ -54,76 +55,77 @@ def _select_lower_left(fix: list[bool], current_solution: list[float]) -> int:
 MAX_BACKTRACK = 10
 
 
-def solve_integer(constraints, x0, grid, dist_map):
+def solve_integer(constraints, x0, grid, problem: Problem):
 	print(f'{{"event": "grid", "data": {grid}}}')
 	stack = []
 	flap_count = (len(x0) - 1) >> 1
 	fix = [False] * flap_count
 
 	backtrack_count = 0
+	current_solution = x0
+	try:
+		while len(stack) < flap_count:
+			depth = len(stack)
+			if depth > 0:
+				state = stack[-1]
+				index = state["index"]
+				child_count = len(state["children"])
+				if index >= child_count:
+					fix[state["fix"]] = False
+					stack.pop()
+					backtrack_count += 1
+					if len(stack) == 0 or backtrack_count == MAX_BACKTRACK:
+						return None
+					else:
+						stack[-1]["index"] += 1
+					continue
+				progress = [s["index"] for s in stack]
+				print(f'{{"event": "fit", "data": {progress}}}')
+				current_solution = state["children"][state["index"]]
 
-	while len(stack) < flap_count:
-		depth = len(stack)
-		if depth == 0:
-			current_solution = x0
-		else:
-			state = stack[-1]
-			index = state["index"]
-			child_count = len(state["children"])
-			if index >= child_count:
-				fix[state["fix"]] = False
-				stack.pop()
-				backtrack_count += 1
-				if len(stack) == 0 or backtrack_count == MAX_BACKTRACK:
+			branch_at = _select_max_offset(fix, current_solution, grid)
+			fix[branch_at] = True
+
+			children = []
+			i = branch_at * 2
+			x = convert_if_almost_integer(current_solution[i] * grid)
+			y = convert_if_almost_integer(current_solution[i + 1] * grid)
+			for q in range(4):
+				if x.is_integer() and q % 2 == 1 or y.is_integer() and q > 1:
+					continue
+				xk = np.copy(current_solution)
+				xk[i] = _branch(x, q & 1) / grid
+				xk[i + 1] = _branch(y, q >> 1) / grid
+				set_scale(xk, grid)
+				if not check_constraints(xk, branch_at, fix, problem):
+					continue
+				solution = pack(xk, constraints, fix)
+				ok = solution.success and get_scale(solution.x) <= grid
+				if ok:
+					children.append(solution.x)
+
+			if len(children) == 0:
+				if depth == 0:
 					return None
-				else:
-					stack[-1]["index"] += 1
+				fix[branch_at] = False
+				state["index"] += 1
 				continue
-			progress = [s["index"] for s in stack]
-			print(f'{{"event": "fit", "data": {progress}}}')
-			current_solution = state["children"][state["index"]]
 
-		branch_at = _select_max_offset(fix, current_solution, grid)
-		fix[branch_at] = True
-
-		children = []
-		i = branch_at * 2
-		x = current_solution[i] * grid
-		y = current_solution[i + 1] * grid
-		for q in range(4):
-			if x.is_integer() and q % 2 == 1 or y.is_integer() and q > 1:
-				continue
-			xk = np.copy(current_solution)
-			xk[i] = _branch(x, q & 1) / grid
-			xk[i + 1] = _branch(y, q >> 1) / grid
-			set_scale(xk, grid)
-			if not check_constraints(xk, branch_at, fix, dist_map):
-				continue
-			solution = pack(xk, constraints, fix)
-			ok = solution.success and get_scale(solution.x) <= grid
-			if ok:
-				children.append(solution.x)
-
-		if len(children) == 0:
-			if depth == 0:
-				return None
-			fix[branch_at] = False
-			state["index"] += 1
-			continue
-
-		children.sort(key=get_scale)
-		stack.append(
-			{
-				"fix": branch_at,
-				"index": 0,
-				"children": children,
-			}
-		)
+			children.sort(key=get_scale)
+			stack.append(
+				{
+					"fix": branch_at,
+					"index": 0,
+					"children": children,
+				}
+			)
+	except KeyboardInterrupt:
+		return current_solution
 
 	return stack[-1]["children"][0]
 
 
-def greedy_solve_integer(constraints, x0, grid, dist_map):
+def greedy_solve_integer(constraints, x0, grid, problem: Problem):
 	print(f'{{"event": "grid", "data": {grid}}}')
 	flap_count = (len(x0) - 1) >> 1
 	fix = [False] * flap_count
@@ -131,56 +133,67 @@ def greedy_solve_integer(constraints, x0, grid, dist_map):
 
 	depth = 0
 	current_solution = x0
-	while depth < flap_count:
-		print(f'{{"event": "greedy", "data": {depth}}}')
+	try:
+		while depth < flap_count:
+			print(f'{{"event": "greedy", "data": {depth}}}')
 
-		branch_at = _select_lower_left(fix, current_solution)
-		fix[branch_at] = True
-		# print(("branch", branch_at))
+			branch_at = _select_lower_left(fix, current_solution)
+			fix[branch_at] = True
+			# print(("branch", branch_at))
 
-		children = []
-		i = branch_at * 2
-		x = current_solution[i] * f_grid
-		y = current_solution[i + 1] * f_grid
-		for q in range(4):
-			if x.is_integer() and q % 2 == 1 or y.is_integer() and q > 1:
-				continue
-			xk = np.copy(current_solution)
-			xk[i] = _branch(x, q & 1) / f_grid
-			xk[i + 1] = _branch(y, q >> 1) / f_grid
-			set_scale(xk, f_grid)
+			children = []
+			i = branch_at * 2
+			x = convert_if_almost_integer(current_solution[i] * f_grid)
+			y = convert_if_almost_integer(current_solution[i + 1] * f_grid)
+			for q in range(4):
+				if x.is_integer() and q % 2 == 1 or y.is_integer() and q > 1:
+					continue
+				xk = np.copy(current_solution)
+				xk[i] = _branch(x, q & 1) / f_grid
+				xk[i + 1] = _branch(y, q >> 1) / f_grid
+				set_scale(xk, f_grid)
+				if not check_constraints(xk, branch_at, fix, problem):
+					continue
+				if q == 0:
+					children.append(xk)
+					break # greedy
+				solution = pack(xk, constraints, fix)
+				if solution.success:
+					children.append(solution.x)
+				if q == 2 and len(children) > 0:
+					break # greedy
 
-			if not check_constraints(xk, branch_at, fix, dist_map):
-				continue
+			if len(children) == 0:
+				return None
 
-			solution = pack(xk, constraints, fix)
-			if solution.success:
-				children.append(solution.x)
+			# In greedy mode, we don't do any backtracking.
+			# We always navigate only the most promising branch.
+			children.sort(key=get_scale)
+			current_solution = children[0]
 
-		if len(children) == 0:
-			return None
+			# What if even the best solution requires larger sheet?
+			# No problem! Just enlarge the sheet and keep going.
+			current_grid = get_scale(current_solution)
+			if current_grid > f_grid:
+				current_solution = resize_solution(current_solution, current_grid)
+				f_grid = current_grid
+				if math.ceil(f_grid) > grid:
+					grid = math.ceil(f_grid)
+					# We don't report new grid size here, since the increase could be an illusion.
 
-		# In greedy mode, we don't do any backtracking.
-		# We always navigate only the most promising branch.
-		children.sort(key=get_scale)
-		current_solution = children[0]
+			depth += 1
 
-		# What if even the best solution requires larger sheet?
-		# No problem! Just enlarge the sheet and keep going.
-		current_grid = get_scale(current_solution)
-		if current_grid > f_grid:
-			current_solution = resize_solution(current_solution, current_grid)
-			f_grid = current_grid
-			if math.ceil(f_grid) > grid:
-				grid = math.ceil(f_grid)
-				# We don't report new grid size here, since the increase could be an illusion.
-
-		depth += 1
-
-	if f_grid != grid:  # Make one more resizing if needed
-		current_solution = resize_solution(current_solution, grid)
+		if f_grid != grid:  # Make one more resizing if needed
+			current_solution = resize_solution(current_solution, grid)
+	except KeyboardInterrupt:
+		pass
 
 	return current_solution
+
+
+def convert_if_almost_integer(x: float):
+	rnd = round(x)
+	return float(rnd) if abs(x - rnd) < 1e-5 else x
 
 
 def resize_solution(solution, new):

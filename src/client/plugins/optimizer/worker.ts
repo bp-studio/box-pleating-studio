@@ -3,7 +3,7 @@
 import "shared/polyfill/fromEntries";
 
 import type { OptimizerRequest, OptimizerResult } from "./types";
-import type { loadPyodide as LoadPyodide } from "pyodide";
+import type { loadPyodide as LoadPyodide, PyodideInterface } from "pyodide";
 import type { PyProxy } from "pyodide/ffi";
 
 declare const loadPyodide: typeof LoadPyodide;
@@ -24,7 +24,8 @@ if(typeof TransformStream != "undefined") {
 		const now = performance.now();
 		if(now - lastProgress > PROGRESS_STEP) {
 			const progress = HUNDRED * bytesLoaded / totalBytes;
-			postMessage({ loading: progress });
+			console.log("progress", progress);
+			postMessage({ event: "loading", data: progress });
 			lastProgress = now;
 		}
 	}
@@ -51,6 +52,7 @@ type MainParams = OptimizerRequest & {
 
 interface Optimizer {
 	main(data: MainParams): Promise<PyProxy>;
+	get_error(): string;
 };
 
 function stdout(msg: string): void {
@@ -72,7 +74,7 @@ async function loadArchive(): Promise<ArrayBuffer> {
 	return await response.arrayBuffer();
 }
 
-async function init(): Promise<Optimizer> {
+async function initPyodide(): Promise<PyodideInterface> {
 	console.log("Loading Pyodide");
 	const [pyodide, buffer] = await Promise.all([
 		loadPyodide({ stdout }),
@@ -80,19 +82,23 @@ async function init(): Promise<Optimizer> {
 	]);
 	await pyodide.loadPackage("scipy");
 	pyodide.unpackArchive(buffer, "zip");
+	return pyodide;
+}
+
+async function initOptimizer(): Promise<Optimizer> {
+	const pyodide = await pyodidePromise;
 	const optimizer: Optimizer = await pyodide.pyimport("optimizer");
 	console.log("Total loaded bytes: " + bytesLoaded);
-	postMessage({ loading: HUNDRED });
+	postMessage({ event: "loading", data: HUNDRED });
 	return optimizer;
 }
-const optimizerPromise = init();
+
+const pyodidePromise = initPyodide();
+const optimizerPromise = initOptimizer();
 
 /**
- * Currently there's only one type of interruption, that is skipping the current step.
- * Since the current support for interrupting Pyodide execution is quite limited
- * (either requires {@link SharedArrayBuffer} which has limited browser support,
- * or uses [JSPI](https://developer.chrome.com/blog/webassembly-jspi-origin-trial) which is even more limited),
- * for now we implement the "stop" mechanism simply by terminating the worker.
+ * This is the interruption fallback in case {@link SharedArrayBuffer} is not available
+ * (for example iOS < 15.2).
  */
 enum InterruptType {
 	none = 0,
@@ -113,17 +119,23 @@ function checkInterrupt(): Promise<InterruptType> {
 
 addEventListener("message", async event => {
 	const data = event.data as OptimizerRequest;
+	if(data.command == "buffer") {
+		const pyodide = await pyodidePromise;
+		pyodide.setInterruptBuffer(data.buffer!);
+		console.log("InterruptBuffer ready");
+	}
 	if(data.command == "start") {
+		shouldInterrupt = InterruptType.none;
+		const optimizer = await optimizerPromise;
 		try {
-			shouldInterrupt = InterruptType.none;
-			const optimizer = await optimizerPromise;
 			const response = await optimizer.main({ checkInterrupt, ...data });
 			const result = response?.toJs({
 				dict_converter: Object.fromEntries,
 			}) as OptimizerResult;
 			postMessage({ result });
 		} catch(e) {
-			postMessage({ error: e });
+			console.log(e);
+			postMessage({ error: optimizer.get_error() });
 		}
 	}
 	if(data.command == "skip") {

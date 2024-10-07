@@ -89,11 +89,6 @@
 			"CP": {
 				"_": "Xuất tệp CP",
 				"reorient": "Định hướng lại trang tính nếu có"
-			},
-			"optimizer": {
-				"_": "Tối ưu hóa bố cục",
-				"run": "Chạy!",
-				"running": "Đang chạy..."
 			}
 		},
 		"help": {
@@ -271,6 +266,28 @@
 			"not5": "Tệp \"{0}\" không có định dạng TreeMaker 5.",
 			"size8": "BP Studio yêu cầu kích thước trang tính ít nhất là 8.",
 			"invalid": "Tệp \"{0}\" có vẻ như bị hỏng và không thể tải thành công."
+		},
+		"optimizer": {
+			"_": "Tối ưu hóa bố cục",
+			"options": {
+				"_": "Tùy chọn",
+				"useDim": "Giữ nguyên chiều rộng và chiều cao của các nhánh"
+			},
+			"layout": {
+				"_": "Phương pháp bố trí",
+				"view": "Sử dụng bố cục hiện tại làm tài liệu tham khảo",
+				"random": "Hãy thử bố cục ngẫu nhiên và sử dụng bố cục tốt nhất",
+				"toTry": "Số lượng bố cục để thử:",
+				"useBH": "Cũng tìm kiếm các giải pháp gần đó"
+			},
+			"fit": {
+				"_": "Phương pháp lắp",
+				"quick": "Chế độ nhanh",
+				"full": "Chế độ đầy đủ"
+			},
+			"skip": "Nhảy",
+			"run": "Chạy!",
+			"running": "Đang chạy..."
 		}
 	},
 	"keyword": {
@@ -278,6 +295,7 @@
 		"no": "Không",
 		"ok": "OK",
 		"here": "đây",
+		"abort": "Hủy bỏ",
 		"close": "Đóng",
 		"cancel": "Hủy bỏ",
 		"export": "Xuất tệp",

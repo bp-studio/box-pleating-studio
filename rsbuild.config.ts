@@ -53,6 +53,10 @@ export default defineConfig({
 			index: "/index.htm",
 			rewrites: [{ from: /^\/donate/, to: "/donate.htm" }],
 		},
+		headers: {
+			"Cross-Origin-Opener-Policy": "same-origin",
+			"Cross-Origin-Embedder-Policy": "require-corp",
+		},
 	},
 	performance: !isProduction ? undefined : {
 		chunkSplit: {
