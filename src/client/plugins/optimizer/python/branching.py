@@ -157,12 +157,12 @@ def greedy_solve_integer(constraints, x0, grid, problem: Problem):
 					continue
 				if q == 0:
 					children.append(xk)
-					break # greedy
+					break  # greedy
 				solution = pack(xk, constraints, fix)
 				if solution.success:
 					children.append(solution.x)
 				if q == 2 and len(children) > 0:
-					break # greedy
+					break  # greedy
 
 			if len(children) == 0:
 				return None

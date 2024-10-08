@@ -51,7 +51,7 @@ async def main(args):
 		best_solution = result.x
 
 		# print(best_solution)
-		grid = math.ceil(get_scale(best_solution) - 0.001) # The offset is for handling floating error
+		grid = math.ceil(get_scale(best_solution) - 0.001)  # The offset is for handling floating error
 		if fit == "quick":
 			integer_solution = None
 			while integer_solution is None:

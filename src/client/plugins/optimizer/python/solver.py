@@ -106,7 +106,14 @@ def basin_hopping(x0, cons):
 			T=0.01,
 			disp=True,
 			callback=callback,
-			minimizer_kwargs={"method": "SLSQP", "bounds": bounds, "constraints": cons, "jac": jacobian, "tol": TOL, "options": MINIMIZE_OPTION},
+			minimizer_kwargs={
+				"method": "SLSQP",
+				"bounds": bounds,
+				"constraints": cons,
+				"jac": jacobian,
+				"tol": TOL,
+				"options": MINIMIZE_OPTION,
+			},
 		)
 	except KeyboardInterrupt:
 		if best_temp_x is None:

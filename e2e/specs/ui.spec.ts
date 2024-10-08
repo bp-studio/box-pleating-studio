@@ -16,7 +16,7 @@ test.describe("I18n", () => {
 		await expect(locator).toContainText("欢迎使用");
 
 		const i18nHandle = await page.evaluateHandle<Composer<Record<string, BpsLocale>>>("i18n");
-		const emoji = () => page.evaluate(i18n => i18n.messages.value["zh-tw"].emoji(null!), i18nHandle);
+		const emoji = () => page.evaluate(i18n => i18n.messages.value["zh-tw"].emoji!(null!), i18nHandle);
 		expect(await emoji()).toBe("🇭🇰");
 	});
 

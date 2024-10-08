@@ -1,6 +1,11 @@
 [tool.ruff]
-line-length = 180
+line-length = 130
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "tab"
+
+[tool.pytest.ini_options]
+testpaths = [
+	"src/client/plugins/optimizer/python/tests"
+]

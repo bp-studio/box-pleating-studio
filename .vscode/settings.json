@@ -112,7 +112,9 @@
 		"test-results/": true,
 		"node_modules/": true,
 		"patches/": true,
-		".nyc_output": true
+		".nyc_output": true,
+		"**/__pycache__/": true,
+		".pytest_cache": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"
@@ -141,5 +143,6 @@
 		"scss",
 		"vue"
 	],
-	"typescript.tsdk": "node_modules\\typescript\\lib"
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+	"python.testing.pytestEnabled": true
 }
