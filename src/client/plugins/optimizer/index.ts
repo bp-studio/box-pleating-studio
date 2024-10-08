@@ -1,5 +1,5 @@
 import { MAX_SHEET_SIZE } from "shared/types/constants";
-import { hasSharedArrayBuffer } from "app/shared/constants";
+import { hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
 
 import type { OptimizerEvent, OptimizerRequest, OptimizerResult, OptimizerOptionsBase, OptimizerCommand } from "./types";
 import type { JFlap, JProject, JSheet } from "shared/json";
@@ -35,7 +35,8 @@ export function initOptimizerWorker(): void {
 	};
 }
 
-initOptimizerWorker();
+// For some reason, loading the optimizer leads to crashes in Playwright webkit.
+if(!isPlaywright) initOptimizerWorker();
 
 let loading: number = 0;
 let callback: Consumer<OptimizerEvent>;

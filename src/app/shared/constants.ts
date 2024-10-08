@@ -59,3 +59,5 @@ export const isReload = timing?.type == "reload" || performance.navigation.type 
 export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
 
 export const hasSharedArrayBuffer = typeof SharedArrayBuffer !== "undefined";
+
+export const isPlaywright = navigator.userAgent == "Playwright";
