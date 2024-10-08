@@ -43,6 +43,7 @@ let execution: PromiseWithResolvers<OptimizerResult>;
 
 export interface OptimizerOptions extends OptimizerOptionsBase {
 	useDimension: boolean;
+	openNew: boolean;
 	random: number;
 
 	/** Callback for showing the progress of optimizer. */
@@ -88,7 +89,9 @@ export async function optimizer(project: Project, options: OptimizerOptions): Pr
 
 	const result = await execution.promise;
 	checkOptimizerResult(result, project);
-	writeToTemplate(json, result);
+
+	if(!options.openNew) writeToProject(project, request, result);
+	else writeToTemplate(json, result);
 	return json;
 }
 
@@ -140,6 +143,7 @@ function makeInitialVector(flaps: JFlap[], sheet: JSheet): IPoint[] {
 	});
 }
 
+/** Performs basic validity checks on the {@link OptimizerResult}. */
 function checkOptimizerResult(result: OptimizerResult, project: Project): void {
 	if(!result) throw new Error("Problem not feasible.");
 	project.design.layout.$sheet.grid.$fixDimension(result); // Fix dimensions that are too small.
@@ -160,4 +164,14 @@ function writeToTemplate(json: JProject, result: OptimizerResult): void {
 		stretches: [],
 	};
 	json.design.mode = "layout";
+}
+
+function writeToProject(proj: Project, request: OptimizerRequest, result: OptimizerResult): void {
+	const layout = proj.design.layout;
+	layout.$sheet.grid.$setDimension(result.width, result.height);
+	for(const [i, flap] of [...layout.$flaps].entries()) {
+		const pt = result.flaps[i];
+		const { width, height } = request.problem.flaps[i];
+		flap.$manipulate(pt.x, pt.y, width, height);
+	}
 }

@@ -105,6 +105,15 @@ export class RectangularGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $setDimension(width: number, height: number): void {
+		const w = this._width;
+		const h = this._height;
+		this._width = width;
+		this._height = height;
+		this.$project.history.$fieldChange(this, "width", w, width, false);
+		this.$project.history.$fieldChange(this, "height", h, height, false);
+	}
+
 	public override $fixDimension(d: IDimension): void {
 		if(d.height < MIN_RECT_SIZE) d.height = MIN_RECT_SIZE;
 		if(d.width < MIN_RECT_SIZE) d.width = MIN_RECT_SIZE;

@@ -271,6 +271,7 @@
 			"_": "Optimize layout",
 			"options": {
 				"_": "Options",
+				"openNew": "Show result in a new tab",
 				"useDim": "Keep widths and heights of flaps"
 			},
 			"layout": {

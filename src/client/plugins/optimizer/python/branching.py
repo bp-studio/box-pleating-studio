@@ -3,7 +3,8 @@ import numpy as np
 
 from .problem import Problem
 from .solver import pack
-from .constraints import check_constraints, get_scale, set_scale
+from .constraints import check_constraints
+from .calc import get_scale, set_scale
 
 
 def _meg(x: float, y: float):

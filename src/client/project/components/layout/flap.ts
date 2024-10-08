@@ -225,6 +225,26 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return this._move(p.x, p.y);
 	}
 
+	/** Manipulate by internal functions instead of by UI. */
+	public $manipulate(x: number, y: number, width: number, height: number): void {
+		const location = { x, y };
+		const w = this._width;
+		const h = this._height;
+		this._lastLocation = this.$location;
+		this.$location = location;
+		this._layout.$flaps.$update(this, () => {
+			if(w != width) {
+				this._width = w;
+				this.$project.history.$fieldChange(this, "width", w, width, false);
+			}
+			if(h != height) {
+				this._width = h;
+				this.$project.history.$fieldChange(this, "height", h, height, false);
+			}
+			this.$project.history.$move(this, location, this._lastLocation);
+		});
+	}
+
 	protected override _move(x: number, y: number): Promise<void> {
 		const location = { x, y };
 		this._lastLocation ||= this.$location;

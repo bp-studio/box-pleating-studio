@@ -179,7 +179,7 @@ namespace WorkspaceService {
 		const proj = Studio.project;
 		if(!proj) return;
 		const optimized = await bp.plugins.optimizer(proj, options);
-		await insertAfterAndSelect(optimized, proj.id);
+		if(options.openNew) await insertAfterAndSelect(optimized, proj.id);
 	}
 
 	function manipulateIds(action: Consumer<ProjId[]>): void {

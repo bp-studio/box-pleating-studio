@@ -2,7 +2,8 @@ import numpy as np
 from scipy.optimize import minimize, basinhopping, OptimizeResult
 
 from .problem import Problem
-from .constraints import MIN_SHEET_SIZE, MAX_SHEET_SIZE, get_scale, select_initial_scale
+from .calc import get_scale
+from .constraints import MIN_SHEET_SIZE, MAX_SHEET_SIZE, select_initial_scale
 
 
 TOL = 1e-6

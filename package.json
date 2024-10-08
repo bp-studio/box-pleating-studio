@@ -1,7 +1,7 @@
 {
 	"name": "box-pleating-studio",
-	"version": "0.6.18",
-	"app_version": "1849",
+	"version": "0.7.0-alpha",
+	"app_version": "1850",
 	"description": "Super-complex origami design made easy!",
 	"keywords": [
 		"origami",
@@ -58,8 +58,8 @@
 		"@types/chai": "^5.0.0",
 		"@types/gtag.js": "^0.0.20",
 		"@types/gulp": "^4.0.17",
-		"@types/mocha": "^10.0.8",
-		"@types/node": "^22.7.4",
+		"@types/mocha": "^10.0.9",
+		"@types/node": "^22.7.5",
 		"@types/wicg-file-system-access": "^2023.10.5",
 		"chai": "^5.1.1",
 		"del": "8.0.0",
@@ -105,7 +105,7 @@
 		"tsconfig-paths": "^4.2.0",
 		"ttf2woff2": "^6.0.1",
 		"typescript": "^5.6.2",
-		"typescript-eslint": "^8.8.0",
+		"typescript-eslint": "^8.8.1",
 		"vinyl-ftp": "^0.6.1",
 		"vue-eslint-parser": "^9.4.3",
 		"yaml": "^2.5.1",
@@ -136,6 +136,7 @@
 	"pnpm": {
 		"overrides": {
 			"caniuse-lite": "1.0.30001653",
+			"doiuse": "6.0.2",
 			"magic-string": "^0.27.0",
 			"node-gyp": "^10.0.0"
 		},

@@ -271,7 +271,8 @@
 			"_": "Optimizar el diseño",
 			"options": {
 				"_": "Opciones",
-				"useDim": "Mantenga los anchos y altos de las solapas."
+				"openNew": "Mostrar resultado en una nueva pestaña",
+				"useDim": "Mantenga los anchos y altos de las solapas"
 			},
 			"layout": {
 				"_": "Método de diseño",

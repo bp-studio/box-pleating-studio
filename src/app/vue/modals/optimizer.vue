@@ -7,14 +7,15 @@
 				</div>
 				<div class="modal-body">
 					<div v-if="state.stage == Stage.stopped">
-						<div class="row">
-							<label class="col-12 col-sm-4 mb-2 col-form-label" v-t="'plugin.optimizer.options._'"></label>
-							<div class="col mb-2">
+						<div class="row mb-2">
+							<label class="col-12 col-sm-4 col-form-label fw-bolder" v-t="'plugin.optimizer.options._'"></label>
+							<div class="col">
+								<Toggle v-model="options.openNew">{{ $t('plugin.optimizer.options.openNew') }}</Toggle>
 								<Toggle v-model="options.useDimension">{{ $t('plugin.optimizer.options.useDim') }}</Toggle>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-12 col-sm-4 mb-2 col-form-label" v-t="'plugin.optimizer.layout._'"></label>
+							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder" v-t="'plugin.optimizer.layout._'"></label>
 							<div class="col mb-2">
 								<select class="form-select" v-model="options.layout">
 									<option value="view" v-t="'plugin.optimizer.layout.view'"></option>
@@ -33,7 +34,7 @@
 							</div>
 						</div>
 						<div class="row mt-3 mt-sm-2">
-							<label class="col-12 col-sm-4 mb-2" v-t="'plugin.optimizer.fit._'"></label>
+							<label class="col-12 col-sm-4 mb-2 fw-bolder" v-t="'plugin.optimizer.fit._'"></label>
 							<div class="col mb-2">
 								<Radio name="fit_mode" v-model="options.fit" value="quick"
 									   :label="$t('plugin.optimizer.fit.quick')" class="me-3" />
@@ -82,7 +83,7 @@
 							{{ $t('plugin.optimizer.running') }}&ensp;<i class="bp-spinner fa-spin" />
 						</span>
 						<span v-else>
-							{{ $t('plugin.optimizer.run') }}&ensp;<i class="fa-solid fa-wand-magic-sparkles" />
+							{{ $t('plugin.optimizer.run') }}&ensp;<i class="fa-solid fa-play" />
 						</span>
 					</button>
 				</div>
@@ -137,6 +138,7 @@
 	});
 	const options = reactive<OptimizerOptions>({
 		layout: "view",
+		openNew: true,
 		useDimension: true,
 		useBH: false,
 		fit: "quick",

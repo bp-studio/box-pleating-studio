@@ -55,8 +55,10 @@ export class FlapContainer implements Iterable<Flap> {
 	 *
 	 * This is one rather complicated part of the architecture.
 	 * There are two issues we're solving here:
+	 *
 	 * 1. The user could manipulate multiple flaps in one operation.
 	 * 2. The user could very rapidly trigger changes, say during dragging.
+	 *
 	 * To handle the first issue, we use {@link _flapUpdatePromise} to wait until
 	 * all flaps are manipulated, and then we process them all in {@link _flushUpdate}.
 	 * For the second issue, we use a {@link CoreManager} to control the callings.

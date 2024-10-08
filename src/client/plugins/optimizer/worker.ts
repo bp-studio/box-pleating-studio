@@ -24,7 +24,6 @@ if(typeof TransformStream != "undefined") {
 		const now = performance.now();
 		if(now - lastProgress > PROGRESS_STEP) {
 			const progress = HUNDRED * bytesLoaded / totalBytes;
-			console.log("progress", progress);
 			postMessage({ event: "loading", data: progress });
 			lastProgress = now;
 		}
@@ -82,6 +81,7 @@ async function initPyodide(): Promise<PyodideInterface> {
 	]);
 	await pyodide.loadPackage("scipy");
 	pyodide.unpackArchive(buffer, "zip");
+	// console.log(pyodide.FS.readdir("optimizer"));
 	return pyodide;
 }
 

@@ -82,6 +82,12 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	 */
 	public abstract $getTransformMatrix(size: number, reorient: boolean): number[];
 
+	/**
+	 * Change the dimension by internal functions instead of by UI.
+	 * History is not flushed by this operation.
+	 */
+	public abstract $setDimension(width: number, height: number): void;
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected method
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

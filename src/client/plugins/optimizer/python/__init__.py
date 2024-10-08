@@ -3,7 +3,8 @@ import sys
 import signal
 
 from .problem import Problem
-from .constraints import generate_constraints, get_scale, select_initial_scale
+from .calc import get_scale
+from .constraints import generate_constraints, select_initial_scale
 from .solver import basin_hopping, generate_candidate, pack, solve_global
 from .branching import greedy_solve_integer, solve_integer
 

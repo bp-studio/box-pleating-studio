@@ -271,6 +271,7 @@
 			"_": "Tối ưu hóa bố cục",
 			"options": {
 				"_": "Tùy chọn",
+				"openNew": "Hiển thị kết quả trong tab mới",
 				"useDim": "Giữ nguyên chiều rộng và chiều cao của các nhánh"
 			},
 			"layout": {

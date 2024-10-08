@@ -273,6 +273,7 @@ export default {"en": {
 			"_": _=>"Optimize layout",
 			"options": {
 				"_": _=>"Options",
+				"openNew": _=>"Show result in a new tab",
 				"useDim": _=>"Keep widths and heights of flaps"
 			},
 			"layout": {
@@ -586,7 +587,8 @@ export default {"en": {
 			"_": _=>"Optimizar el diseño",
 			"options": {
 				"_": _=>"Opciones",
-				"useDim": _=>"Mantenga los anchos y altos de las solapas."
+				"openNew": _=>"Mostrar resultado en una nueva pestaña",
+				"useDim": _=>"Mantenga los anchos y altos de las solapas"
 			},
 			"layout": {
 				"_": _=>"Método de diseño",
@@ -899,6 +901,7 @@ export default {"en": {
 			"_": _=>"レイアウトの最適化",
 			"options": {
 				"_": _=>"オプション",
+				"openNew": _=>"新しいタブに結果を表示",
 				"useDim": _=>"カドの幅と高さを維持する"
 			},
 			"layout": {
@@ -1212,6 +1215,7 @@ export default {"en": {
 			"_": _=>"레이아웃 최적화",
 			"options": {
 				"_": _=>"옵션",
+				"openNew": _=>"새 탭에 결과 표시",
 				"useDim": _=>"가지의 너비와 높이를 유지하십시오"
 			},
 			"layout": {
@@ -1525,6 +1529,7 @@ export default {"en": {
 			"_": _=>"Tối ưu hóa bố cục",
 			"options": {
 				"_": _=>"Tùy chọn",
+				"openNew": _=>"Hiển thị kết quả trong tab mới",
 				"useDim": _=>"Giữ nguyên chiều rộng và chiều cao của các nhánh"
 			},
 			"layout": {
@@ -1838,6 +1843,7 @@ export default {"en": {
 			"_": _=>"优化布局",
 			"options": {
 				"_": _=>"选项",
+				"openNew": _=>"在新选项卡中显示结果",
 				"useDim": _=>"保持角片的宽度和高度"
 			},
 			"layout": {
@@ -2151,6 +2157,7 @@ export default {"en": {
 			"_": _=>"最佳化佈局",
 			"options": {
 				"_": _=>"選項",
+				"openNew": _=>"在新分頁中顯示結果",
 				"useDim": _=>"保持角片的寬度和高度"
 			},
 			"layout": {
