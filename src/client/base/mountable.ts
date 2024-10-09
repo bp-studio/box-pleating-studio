@@ -21,8 +21,12 @@ export abstract class Mountable extends Destructible {
 	/** Local state of {@link $isActive}. */
 	private _active: boolean;
 
-	/** Whether parent is `null` or is mounted. */
-	private _parentIsNullOrMounted: boolean;
+	/**
+	 * Whether parent is `null` or is mounted.
+	 * The initial value is `true`, since the parent relations
+	 * are always established after the constructors.
+	 */
+	private _parentIsNullOrMounted: boolean = true;
 
 	/** The cached value of {@link $mounted}, used for comparing changes. */
 	private _mounted: boolean;
@@ -30,7 +34,6 @@ export abstract class Mountable extends Destructible {
 	constructor(active: boolean = true) {
 		super();
 		this._active = active;
-		this._parentIsNullOrMounted = true;
 		this._mounted = this.$mounted;
 
 		/**

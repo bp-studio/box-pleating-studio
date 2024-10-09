@@ -50,9 +50,8 @@ export abstract class View extends Mountable {
 				if(this._setup) {
 					this._drawScope.run(this._setup);
 					this._setup = null;
-				} else {
-					this._drawScope.resume();
 				}
+				this._drawScope.resume();
 			} else {
 				this._drawScope.pause();
 			}
