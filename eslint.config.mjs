@@ -10,6 +10,7 @@ import pluginJsDoc from "eslint-plugin-jsdoc";
 import pluginMocha from "eslint-plugin-mocha";
 import pluginTs from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
+import pluginImport from "eslint-plugin-import";
 import stylistic from "@mutsuntsai/stylistic";
 
 import pluginLocal from "./eslint-local-rules.js";
@@ -290,10 +291,10 @@ export default [
 
 	{
 		name: "Plugin:import",
-		...compat.extends("plugin:import/typescript")[0],
-		files: ["src/**/*.{vue,htm}", "**/*.ts", "eslint.config.mjs"],
+		...pluginImport.flatConfigs.typescript,
+		files: ["src/**/*.vue", "**/*.ts", "eslint.config.mjs"],
 		plugins: {
-			import: legacyPlugin("eslint-plugin-import", "import"),
+			import: pluginImport,
 		},
 		rules: {
 			"@typescript-eslint/consistent-type-imports": ["warn", {
