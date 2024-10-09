@@ -18,7 +18,7 @@ export abstract class Mountable extends Destructible {
 
 	private readonly _children: Mountable[] = [];
 
-	/** Whether self is active relative to the parent object. */
+	/** Local state of {@link $isActive}. */
 	private _active: boolean;
 
 	/** Whether parent is `null` or is mounted. */
@@ -53,6 +53,7 @@ export abstract class Mountable extends Destructible {
 		this.addEventListener(MOUNTED, handler);
 	}
 
+	/** Whether self is active relative to the parent object. */
 	protected get $isActive(): boolean {
 		return this._active;
 	}

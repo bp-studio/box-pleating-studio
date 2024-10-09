@@ -23,6 +23,9 @@ export abstract class View extends Mountable {
 	 */
 	private _drawScope: EffectScope = effectScope();
 
+	/** Setup action for the {@link _drawScope}. */
+	private _setup: Action | null = null;
+
 	/// #if DEBUG
 	/** Guard the running of {@link $react} method. */
 	private _scopeInitialized: boolean = false;
@@ -43,8 +46,16 @@ export abstract class View extends Mountable {
 
 		this.addEventListener(MOUNTED, event => {
 			// Whether the scope is activated depends on the mounted state.
-			if(event.state) this._drawScope.resume();
-			else this._drawScope.pause();
+			if(event.state) {
+				if(this._setup) {
+					this._drawScope.run(this._setup);
+					this._setup = null;
+				} else {
+					this._drawScope.resume();
+				}
+			} else {
+				this._drawScope.pause();
+			}
 		});
 	}
 
@@ -70,7 +81,10 @@ export abstract class View extends Mountable {
 		if(this._scopeInitialized) throw new Error("React scope already started.");
 		this._scopeInitialized = true;
 		/// #endif
-		this._drawScope.run(setup);
+
+		// Here we only register the setup action.
+		// It will execute during the first mounting.
+		this._setup = setup;
 	}
 
 	/**

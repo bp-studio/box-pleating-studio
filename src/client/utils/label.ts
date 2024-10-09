@@ -34,7 +34,13 @@ export class Label extends Container {
 	private readonly _sheet: Sheet;
 	private readonly _label: Text = new Text();
 	private readonly _glow: Text = new Text();
+
+	/**
+	 * Scale-independent rendered width of the label.
+	 * This depends only on the {@link $text}.
+	 */
 	@shallowRef private accessor _labelWidth: number = 0;
+
 	@shallowRef private accessor _labelBounds: Rectangle = null!;
 
 	private _contentCache: string = "";
@@ -43,8 +49,6 @@ export class Label extends Container {
 
 	public $color?: number;
 	public $distance: number = 1;
-
-	private _timeout!: number;
 
 	constructor(sheet: Sheet) {
 		super();
@@ -82,13 +86,12 @@ export class Label extends Container {
 			const bounds = this._label.getLocalBounds().clone();
 
 			// Delay the following to avoid circular references.
-			clearTimeout(this._timeout);
-			this._timeout = setTimeout(() => {
+			registerUpdate(() => {
 				this._directionCache = dir;
 				this._labelWidth = width;
 				this._labelBounds = bounds;
 				this._xCache = x;
-			}, TIMEOUT);
+			});
 		}
 	}
 
@@ -212,3 +215,20 @@ const directionalOffsets: Record<Direction, IPoint> = {
 	[Direction.R]: { x: 20, y: 0 },
 	[Direction.none]: { x: 0, y: 0 },
 };
+
+let updatePending = false;
+const updateQueue: Action[] = [];
+
+function flushUpdate(): void {
+	updatePending = false;
+	for(const action of updateQueue) action();
+	updateQueue.length = 0;
+}
+
+function registerUpdate(action: Action): void {
+	updateQueue.push(action);
+	if(!updatePending) {
+		updatePending = true;
+		setTimeout(flushUpdate, TIMEOUT);
+	}
+}

@@ -37,8 +37,8 @@ async function registerUpdate(reg: ServiceWorkerRegistration): Promise<void> {
 				await reg.periodicSync.register("update", { minInterval: UPDATE_INTERVAL });
 			}
 		}
-	} catch(e) {
-		console.log(e);
+	} catch {
+		// Ignore error if any
 	}
 }
 

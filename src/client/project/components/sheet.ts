@@ -215,9 +215,9 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private get _horizontalMargin(): number {
+		if(!settings.showLabel) return MARGIN;
 		const overflows = [...this.$labels].map(l => l.$overflow);
-		const result = Math.max(MARGIN, ...overflows);
-		return result;
+		return Math.max(MARGIN, ...overflows);
 	}
 
 	private get _imageDimension(): IDimension {

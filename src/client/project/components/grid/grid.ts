@@ -42,10 +42,10 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	public abstract readonly $offset: IPoint;
 
 	/** Rendered width, in number of grids. */
-	public abstract readonly $renderHeight: number;
+	public abstract readonly $renderWidth: number;
 
 	/** Rendered height, in number of grids. */
-	public abstract readonly $renderWidth: number;
+	public abstract readonly $renderHeight: number;
 
 	public abstract toJSON(): JSheet;
 
