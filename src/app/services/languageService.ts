@@ -37,10 +37,15 @@ namespace LanguageService {
 			silentFallbackWarn: true,
 			messages: locale,
 		});
+
+		// When using such method to define a global constant,
+		// it is important NOT to declare a global var ahead of time,
+		// as it will make older Safari (say v11) thinks the two are different symbols.
 		Object.defineProperty(window, "i18n", {
 			writable: false,
 			value: plugin.global,
 		});
+
 		return plugin;
 	}
 

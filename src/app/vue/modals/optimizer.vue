@@ -5,7 +5,7 @@
 				<div class="modal-header">
 					<div class="h4 modal-title" v-t="'plugin.optimizer._'"></div>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" v-if="hasBigInt64Array">
 					<div v-if="state.stage == Stage.stopped">
 						<div class="row mb-2">
 							<label class="col-12 col-sm-4 col-form-label fw-bolder" v-t="'plugin.optimizer.options._'"></label>
@@ -15,7 +15,8 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder" v-t="'plugin.optimizer.layout._'"></label>
+							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder"
+								   v-t="'plugin.optimizer.layout._'"></label>
 							<div class="col mb-2">
 								<select class="form-select" v-model="options.layout">
 									<option value="view" v-t="'plugin.optimizer.layout.view'"></option>
@@ -74,11 +75,12 @@
 						An error occurred: {{ state.error }}
 					</div>
 				</div>
+				<div class="modal-body" v-else v-t="'plugin.optimizer.unsupported'"></div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" :disabled="state.running" data-bs-dismiss="modal"
 							@click="state.stage = Stage.stopped" v-t="'keyword.close'"></button>
-					<button type="button" class="btn btn-primary" :disabled="state.running || state.stage == Stage.error"
-							@click="run">
+					<button v-if="hasBigInt64Array" type="button" class="btn btn-primary"
+							:disabled="state.running || state.stage == Stage.error" @click="run">
 						<span v-if="state.running">
 							{{ $t('plugin.optimizer.running') }}&ensp;<i class="bp-spinner fa-spin" />
 						</span>
@@ -108,7 +110,7 @@
 	import OptProgress from "./components/optProgress.vue";
 	import Radio from "@/gadgets/form/radio.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
-	import { hasSharedArrayBuffer } from "app/shared/constants";
+	import { hasBigInt64Array, hasSharedArrayBuffer } from "app/shared/constants";
 
 	import type { OptimizerOptions } from "client/plugins/optimizer";
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";

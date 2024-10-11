@@ -271,6 +271,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"Optimize layout",
+			"unsupported": _=>"Your browser does not support this feature. Please upgrade to the latest version.",
 			"options": {
 				"_": _=>"Options",
 				"openNew": _=>"Show result in a new tab",
@@ -585,6 +586,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"Optimizar el diseño",
+			"unsupported": _=>"Su navegador no soporta esta característica. Actualice a la última versión.",
 			"options": {
 				"_": _=>"Opciones",
 				"openNew": _=>"Mostrar resultado en una nueva pestaña",
@@ -899,6 +901,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"レイアウトの最適化",
+			"unsupported": _=>"お使いのブラウザはこの機能をサポートしていません。最新バージョンにアップグレードしてください。",
 			"options": {
 				"_": _=>"オプション",
 				"openNew": _=>"新しいタブに結果を表示",
@@ -1213,6 +1216,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"레이아웃 최적화",
+			"unsupported": _=>"귀하의 브라우저는 이 기능을 지원하지 않습니다. 최신 버전으로 업그레이드해주세요.",
 			"options": {
 				"_": _=>"옵션",
 				"openNew": _=>"새 탭에 결과 표시",
@@ -1527,6 +1531,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"Tối ưu hóa bố cục",
+			"unsupported": _=>"Trình duyệt của bạn không hỗ trợ tính năng này. Vui lòng nâng cấp lên phiên bản mới nhất.",
 			"options": {
 				"_": _=>"Tùy chọn",
 				"openNew": _=>"Hiển thị kết quả trong tab mới",
@@ -1841,6 +1846,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"优化布局",
+			"unsupported": _=>"您的浏览器不支持此功能。请升级到最新版本。",
 			"options": {
 				"_": _=>"选项",
 				"openNew": _=>"在新选项卡中显示结果",
@@ -2155,6 +2161,7 @@ export default {"en": {
 		},
 		"optimizer": {
 			"_": _=>"最佳化佈局",
+			"unsupported": _=>"您的瀏覽器不支援此功能。請升級到最新版本。",
 			"options": {
 				"_": _=>"選項",
 				"openNew": _=>"在新分頁中顯示結果",

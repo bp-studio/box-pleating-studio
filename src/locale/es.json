@@ -269,6 +269,7 @@
 		},
 		"optimizer": {
 			"_": "Optimizar el diseño",
+			"unsupported": "Su navegador no soporta esta característica. Actualice a la última versión.",
 			"options": {
 				"_": "Opciones",
 				"openNew": "Mostrar resultado en una nueva pestaña",

@@ -1,5 +1,5 @@
 import { MAX_SHEET_SIZE } from "shared/types/constants";
-import { hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
+import { hasBigInt64Array, hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
 
 import type { OptimizerEvent, OptimizerRequest, OptimizerResult, OptimizerOptionsBase, OptimizerCommand } from "./types";
 import type { JFlap, JProject, JSheet } from "shared/json";
@@ -15,6 +15,8 @@ const SIGABRT = 6;
 const COMPLETE = 100;
 
 export function initOptimizerWorker(): void {
+	if(!hasBigInt64Array) return;
+
 	workerReady = Promise.withResolvers<Worker>();
 	const worker = new Worker(new URL("./worker.ts", import.meta.url), { name: "optimizer" });
 	if(hasSharedArrayBuffer) {

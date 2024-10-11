@@ -269,6 +269,7 @@
 		},
 		"optimizer": {
 			"_": "Tối ưu hóa bố cục",
+			"unsupported": "Trình duyệt của bạn không hỗ trợ tính năng này. Vui lòng nâng cấp lên phiên bản mới nhất.",
 			"options": {
 				"_": "Tùy chọn",
 				"openNew": "Hiển thị kết quả trong tab mới",

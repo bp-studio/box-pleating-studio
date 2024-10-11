@@ -269,6 +269,7 @@
 		},
 		"optimizer": {
 			"_": "Optimize layout",
+			"unsupported": "Your browser does not support this feature. Please upgrade to the latest version.",
 			"options": {
 				"_": "Options",
 				"openNew": "Show result in a new tab",
