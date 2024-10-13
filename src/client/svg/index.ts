@@ -88,7 +88,7 @@ function getClip(clipPath: string): string {
 /** The global transformation. */
 function getTransform(sheet: Sheet, height: number): string {
 	const s = ProjectService.scale.value;
-	const horOffset = sheet.$horizontalMargin.value;
+	const horOffset = MARGIN;
 	const verOffset = height - MARGIN;
 	return `translate(${horOffset} ${verOffset}) scale(${s} ${-s})`;
 }

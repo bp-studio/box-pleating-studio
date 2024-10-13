@@ -1,8 +1,11 @@
 
 export const FULL_ZOOM = 100;
 
+/** The margin between the sheet border and the viewport boundary */
 export const MARGIN = 35;
-export const MARGIN_FIX = 10;
+
+/** The margin enforced between any labels and the viewport boundary. */
+export const LABEL_MARGIN = 10;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Colors

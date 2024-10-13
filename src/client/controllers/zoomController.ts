@@ -65,7 +65,7 @@ export namespace ZoomController {
 		// Find the coordinates of the zooming center
 		const oldScale = ProjectService.scale.value;
 		const point = {
-			x: sheet.$scroll.x + center.x - sheet.$horizontalMargin.value,
+			x: sheet.$scroll.x + center.x - MARGIN,
 			y: sheet.$scroll.y + center.y - MARGIN,
 		};
 
@@ -77,7 +77,7 @@ export namespace ZoomController {
 
 		// Calculate the scrolling position and complete the scrolling
 		sheet.$scroll = display.scrollView.$scrollTo(
-			point.x * newScale / oldScale + sheet.$horizontalMargin.value - center.x,
+			point.x * newScale / oldScale + MARGIN - center.x,
 			point.y * newScale / oldScale + MARGIN - center.y
 		);
 	}

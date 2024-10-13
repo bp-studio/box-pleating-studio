@@ -2,7 +2,7 @@ import { readonly, shallowRef } from "vue";
 
 import { isTouch } from "app/shared/constants";
 
-const RETRY = 10;
+const RETRY_DELAY = 10;
 
 export type Viewport = Readonly<IDimension> & {
 	$update(): void;
@@ -33,7 +33,7 @@ export function useViewport(el: HTMLElement): Viewport {
 
 	// When reloading the page, there may be a momentary size change on mobile devices.
 	// So we check the size one more time after constructing
-	setTimeout($update, RETRY);
+	setTimeout($update, RETRY_DELAY);
 
 	// Setup the events to lock the Viewport on virtual keyboard.
 	// This is based on whether the device is a pure touch device;

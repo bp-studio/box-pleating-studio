@@ -1,4 +1,4 @@
-import { computed, shallowReactive, watchEffect } from "vue";
+import { computed } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 import { Rectangle } from "@pixi/math";
@@ -7,7 +7,7 @@ import { SmoothGraphics } from "@pixi/graphics-smooth";
 import settings from "app/services/settingService";
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
-import { FULL_ZOOM, MARGIN, MARGIN_FIX } from "client/shared/constant";
+import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { display } from "client/screen/display";
 import { Enum } from "client/shared/enum";
@@ -24,7 +24,6 @@ import type { ITagObject } from "client/shared/interface";
 import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
-import type { Label } from "client/utils/label";
 import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
 
 const LAYERS = Enum.values(Layer);
@@ -74,8 +73,6 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $independents: Set<Independent> = new Set();
 
-	public readonly $labels: Set<Label> = shallowReactive(new Set());
-
 	constructor(project: Project, parentView: Container, tag: DesignMode, json?: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
@@ -101,7 +98,6 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._grid = createGrid(this, this._type, json?.width, json?.height);
 
 		// Computed no longer requires effect scope since Vue 3.5
-		this.$horizontalMargin = computed(() => this._horizontalMargin);
 		this.$imageDimension = computed(() => this._imageDimension);
 
 		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
@@ -188,24 +184,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getScale(): number {
-		const viewWidth = display.viewport.width, viewHeight = display.viewport.height;
-
-		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$renderWidth;
-		let horizontalScale = (viewWidth - 2 * MARGIN) * factor / width;
-		if(settings.showLabel) {
-			const vw = viewWidth * factor - 2 * MARGIN_FIX;
-			const scales = [...this.$labels].map(label =>
-				label.$inferHorizontalScale(width, vw)
-			).filter(s => !isNaN(s));
-			horizontalScale = Math.min(horizontalScale, ...scales);
-		}
-
+		const viewWidth = display.viewport.width;
+		const viewHeight = display.viewport.height;
+		const factor = this.$zoom / FULL_ZOOM;
+		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.$renderWidth;
 		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$renderHeight;
 		return Math.min(horizontalScale, verticalScale);
 	}
-
-	/** Horizontal margin by the actual rendered result. */
-	declare public readonly $horizontalMargin: ComputedRef<number>;
 
 	/** The dimension of the sheet after rasterization. */
 	declare public readonly $imageDimension: ComputedRef<IDimension>;
@@ -213,12 +198,6 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private get _horizontalMargin(): number {
-		if(!settings.showLabel) return MARGIN;
-		const overflows = [...this.$labels].map(l => l.$overflow);
-		return Math.max(MARGIN, ...overflows);
-	}
 
 	private get _imageDimension(): IDimension {
 		const s = ProjectService.scale.value;
@@ -229,7 +208,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
 		);
 		return {
-			width: (width + x * 2) * s + this.$horizontalMargin.value * 2,
+			width: (width + x * 2) * s + MARGIN * 2,
 			height: (height + y * 2) * s + MARGIN * 2,
 		};
 	}
@@ -251,7 +230,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	private _positioning(): void {
 		const image = this.$imageDimension.value;
 		const vp = display.viewport;
-		this.$view.x = Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + this.$horizontalMargin.value;
+		this.$view.x = Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
 		this.$view.y = Math.max((vp.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
