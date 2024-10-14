@@ -372,7 +372,7 @@ export default [
 				tabWidth: 4,
 			}],
 			"vue/multi-word-component-names": "off",
-			"vue/no-mutating-props": "off", // see https://github.com/vuejs/eslint-plugin-vue/issues/1371
+			"vue/no-mutating-props": ["warn", { shallowOnly: true }],
 			"vue/script-indent": ["warn", "tab", {
 				baseIndent: 1,
 				ignores: [],

@@ -182,7 +182,8 @@ export default defineConfig({
 			/**
 			 * For the moment, although LightingCSS claims to handle vendor prefixes,
 			 * the functionality seems less complete than postcssPresetEnv.
-			 * For example, `-webkit-text-decoration` is not handled by LightingCSS (see https://caniuse.com/text-decoration).
+			 * For example, `-webkit-text-decoration` is not handled by LightingCSS
+			 * (see https://caniuse.com/text-decoration).
 			 */
 			addPlugins(postcssPresetEnv());
 		},

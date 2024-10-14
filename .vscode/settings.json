@@ -99,12 +99,14 @@
 		"*.css": "$(capture).css.map",
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
-		".*rc.json": ".$(capture)ignore",
-		"eslint.config.mjs": "eslint-local-rules.js",
+		".stylelintrc.json": ".stylelintignore",
+		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
 		".gitignore": ".gitattributes",
-		"package.json": "pnpm-lock.yaml, .npmrc",
+		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
 		"Pipfile": "Pipfile.lock, pyproject.toml",
-		"rsbuild.config.ts": "rsbuild.*.ts"
+		"rsbuild.config.ts": "rsbuild.*.ts",
+		".mocharc.json": ".nycrc",
+		"README.md": "LICENSE.md, CONTRIBUTING.md"
 	},
 	"files.exclude": {
 		"src/app/gen": true,
