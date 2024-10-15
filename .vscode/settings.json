@@ -103,7 +103,7 @@
 		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
 		".gitignore": ".gitattributes",
 		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
-		"Pipfile": "Pipfile.lock, pyproject.toml",
+		"Pipfile": "Pipfile.lock, pyproject.toml, .pylintrc",
 		"rsbuild.config.ts": "rsbuild.*.ts",
 		".mocharc.json": ".nycrc",
 		"README.md": "LICENSE.md, CONTRIBUTING.md"

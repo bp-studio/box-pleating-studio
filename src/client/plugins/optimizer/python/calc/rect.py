@@ -20,8 +20,7 @@ def jacobian(x: list[float], i: int, dim: int):
 
 
 def add_bounds(cons, flaps: list[Flap]):
-	for i in range(len(flaps)):
-		flap = flaps[i]
+	for i, flap in enumerate(flaps):
 		if flap.width != 0:
 			cons.append({"type": "ineq", "fun": bound, "jac": jacobian, "args": [i * 2, flap.width]})
 		if flap.height != 0:

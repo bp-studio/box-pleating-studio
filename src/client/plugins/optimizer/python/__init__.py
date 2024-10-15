@@ -5,12 +5,12 @@ import numpy as np
 from .heuristics import generate_candidate
 from .problem import Hierarchy, Problem
 from .calc import get_scale, int_scale
-from .constraints import generate_constraints, select_initial_scale
+from .constraints import MAX_SHEET_SIZE, generate_constraints, select_initial_scale
 from .solver import basin_hopping, pack, solve_global
 from .branching import greedy_solve_integer, solve_integer
 
 
-def abort_handler(sig_num, frame):
+def abort_handler(_, __):
 	print("Abort operation")
 	raise StopAsyncIteration
 
@@ -25,9 +25,6 @@ def convert_vector(vec, hierarchy: Hierarchy):
 
 async def main(args):
 	data = args.to_py()
-	checkInterrupt = data.get("checkInterrupt")
-	useBH = data.get("useBH")
-	layout: str = data.get("layout")
 	fit: str = data.get("fit")
 	problem = Problem(data.get("problem"))
 	hierarchy = problem.hierarchies[-1]
@@ -35,22 +32,9 @@ async def main(args):
 
 	try:
 		constraints = generate_constraints(hierarchy)
-
-		if layout == "view":
-			x0 = convert_vector(data.get("vec"), hierarchy)
-			if useBH:
-				print('{"event": "bh", "data": 0}')
-				result = basin_hopping(x0, constraints)
-			else:
-				result = pack(x0, constraints)
-		else:
-			initial_vectors = await generate_candidate(data.get("random"), problem.hierarchies, checkInterrupt)
-			# print(initial_vectors)
-			result = await solve_global(initial_vectors, constraints, checkInterrupt)
-
-		if result is None:
+		best_solution = pre_solve(data, problem, constraints)
+		if best_solution is None:
 			return None
-		best_solution = result if isinstance(result, np.ndarray) else result.x
 
 		# print(best_solution)
 		grid = int_scale(get_scale(best_solution))
@@ -75,6 +59,26 @@ async def main(args):
 		}
 	except StopAsyncIteration:
 		return None
+
+
+async def pre_solve(data, problem, constraints):
+	layout: str = data.get("layout")
+	check_interrupt = data.get("checkInterrupt")
+	hierarchy = problem.hierarchies[-1]
+
+	if layout == "view":
+		x0 = convert_vector(data.get("vec"), hierarchy)
+		if data.get("useBH"):
+			print('{"event": "bh", "data": 0}')
+			result = basin_hopping(x0, constraints, 1, MAX_SHEET_SIZE)
+		else:
+			result = pack(x0, constraints)
+	else:
+		initial_vectors = await generate_candidate(data.get("random"), problem.hierarchies, check_interrupt)
+		# print(initial_vectors)
+		result = await solve_global(initial_vectors, constraints, check_interrupt)
+
+	return result if result is None or isinstance(result, np.ndarray) else result.x
 
 
 def get_error():

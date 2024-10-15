@@ -7,29 +7,29 @@ class Problem:
 
 class Hierarchy:
 	def __init__(self, data):
-		id_map = dict()
-		id_lookup = dict()
+		id_map = {}
+		id_lookup = {}
 		self.flaps = []
-		for id in data.get("leaves"):
+		for l_id in data.get("leaves"):
 			next_id = len(id_map)
-			id_map[id] = next_id
-			id_lookup[next_id] = id
-			self.flaps.append(Flap({"id": id, "width": 0, "height": 0}))
+			id_map[l_id] = next_id
+			id_lookup[next_id] = l_id
+			self.flaps.append(Flap({"id": l_id, "width": 0, "height": 0}))
 
 		dist_map = data.get("distMap")
-		for map in dist_map:
-			map[0] = id_map[map[0]]
-			map[1] = id_map[map[1]]
+		for d_map in dist_map:
+			d_map[0] = id_map[d_map[0]]
+			d_map[1] = id_map[d_map[1]]
 
 		self.dist_map = dist_map
 		self.lookup = id_lookup
 		self.parents = [Parent(p) for p in data.get("parents")]
 
-		map = dict()
+		d_map = {}
 		for parent in self.parents:
-			for id in parent.children:
-				map[id] = parent
-		self.parent_map = map
+			for l_id in parent.children:
+				d_map[l_id] = parent
+		self.parent_map = d_map
 
 	def restore(self, x):
 		flap_count = len(self.lookup)

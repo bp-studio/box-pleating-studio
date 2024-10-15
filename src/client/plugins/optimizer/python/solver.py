@@ -68,7 +68,7 @@ def basin_hopping(x0, cons, trials, best_s):
 	best_temp_x = None
 	step = 0
 
-	def callback(x, f, accept):
+	def callback(x, f, _):
 		nonlocal best_temp_f, best_temp_x, step
 		if f < best_temp_f:
 			best_temp_f = f

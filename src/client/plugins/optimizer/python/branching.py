@@ -15,11 +15,8 @@ def _get_offset(x: float):
 	return abs(round(x) - x)
 
 
-def _branch(x: float, dir: int):
-	if dir == 0:
-		return math.floor(x)
-	else:
-		return math.ceil(x)
+def _branch(x: float, direction: int):
+	return math.floor(x) if direction == 0 else math.ceil(x)
 
 
 def _select_max_offset(fix: list[bool], current_solution: list[float], grid: int) -> int:
@@ -76,8 +73,7 @@ def solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 					backtrack_count += 1
 					if len(stack) == 0 or backtrack_count == MAX_BACKTRACK:
 						return None
-					else:
-						stack[-1]["index"] += 1
+					stack[-1]["index"] += 1
 					continue
 				progress = [s["index"] for s in stack]
 				print(f'{{"event": "fit", "data": [{grid}, {progress}]}}')
@@ -174,9 +170,8 @@ def greedy_solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 			if current_grid > f_grid + GRID_ERROR:
 				current_solution = resize_solution(current_solution, current_grid)
 				f_grid = current_grid
-				if math.ceil(f_grid) > grid:
-					grid = math.ceil(f_grid)
-					# We don't report new grid size here, since the increase could be an illusion.
+				grid = max(math.ceil(f_grid), grid)
+				# We don't report new grid size here, since the increase could be an illusion.
 
 			depth += 1
 
