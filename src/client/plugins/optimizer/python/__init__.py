@@ -32,7 +32,7 @@ async def main(args):
 
 	try:
 		constraints = generate_constraints(hierarchy)
-		best_solution = pre_solve(data, problem, constraints)
+		best_solution = await pre_solve(data, problem, constraints)
 		if best_solution is None:
 			return None
 

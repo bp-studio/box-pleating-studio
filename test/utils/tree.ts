@@ -43,6 +43,7 @@ export function parseTree(edges: string, flaps?: string): Tree {
 
 /**
  * Export tree to a BPS file `export.bps` for further inspection.
+ * This should only be used momentarily.
  */
 export function exportProject(id: string | number = ""): void {
 	const nodes = State.$tree.$nodes.filter(l => l) as TreeNode[];

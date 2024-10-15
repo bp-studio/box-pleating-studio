@@ -89,7 +89,7 @@ describe("Tree", function() {
 
 	it("Creates distance map", function() {
 		parseTree("(0,1,1),(0,2,2),(0,3,2),(3,4,1),(3,5,2)");
-		const distMap = TreeController.getDistMap();
+		const distMap = TreeController.getHierarchy(false, false)[0].distMap;
 		expect(distMap.length).to.equal(6);
 		expect(distMap).to.deep.include([5, 4, 3]);
 		expect(distMap).to.deep.include([4, 1, 4]);

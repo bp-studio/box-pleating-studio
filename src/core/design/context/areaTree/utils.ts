@@ -40,7 +40,7 @@ export function getArea(node: TreeNode, radius: number, useDimension: boolean): 
 	if(!useDimension) return baseArea;
 	const [t, r, b, l] = node.$AABB.$toValues();
 	const width = r - l, height = t - b;
-	return (width * height + (width + height) * radius) / Math.PI + baseArea;
+	return (width * height + 2 * (width + height) * radius) / Math.PI + baseArea;
 }
 
 /**

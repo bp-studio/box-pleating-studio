@@ -1,5 +1,5 @@
 import { expectRepo, generateFromFlaps } from "./util";
-import { exportProject, node, parseTree } from "@utils/tree";
+import { node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";
 
 export default function() {
@@ -64,7 +64,6 @@ export default function() {
 				{ id: b, x: 7, y: 11, radius: 2 },
 				{ id: c, x: 10, y: 6, radius: 1 },
 			]);
-			exportProject();
 			const devices = expectRepo("1,2,3",
 				2,	// Both ways of cutting works
 				4,	// Each configuration has four conjugate patterns
