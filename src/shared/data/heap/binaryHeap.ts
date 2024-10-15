@@ -55,7 +55,7 @@ export class BinaryHeap<T> extends Heap<T> {
 
 	public [Symbol.iterator](): IterableIterator<T> {
 		const result = this._data.values();
-		result.next();
+		result.next(); // Skip the first slot
 		return result;
 	}
 

@@ -55,17 +55,12 @@ interface Optimizer {
 };
 
 function stdout(msg: string): void {
-	let data: unknown;
 	/// #if DEBUG
 	console.log(msg);
 	/// #endif
 	if(msg.startsWith("{")) {
-		data = (JSON.parse(msg));
-	} else {
-		const match = msg.match(/basinhopping step (\d+)/);
-		if(match) data = { event: "bhs", data: Number(match[1]) };
+		postMessage(JSON.parse(msg));
 	}
-	if(data) postMessage(data);
 }
 
 async function loadArchive(): Promise<ArrayBuffer> {

@@ -2,7 +2,7 @@ import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { maxDistComparator } from "./treeNode";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
-import type { ITreeNode, ITree } from ".";
+import type { ITreeNode, ITree, ITreeNodeBase, NodeCollection } from ".";
 import type { NodeId } from "shared/json/tree";
 
 /**
@@ -12,10 +12,10 @@ import type { NodeId } from "shared/json/tree";
 export type DistMap<T = NodeId> = [T, T, number][];
 
 /** Create a record for the distances between all leaf-pairs. */
-export function distMap(tree: ITree): DistMap {
+export function distMap(nodes: NodeCollection<ITreeNodeBase>): DistMap {
 	const heap = new BinaryHeap(maxDistComparator);
-	const coverages = new Map<ITreeNode, ITreeNode[]>();
-	for(const node of tree.$nodes) {
+	const coverages = new Map<ITreeNodeBase, ITreeNodeBase[]>();
+	for(const node of nodes) {
 		if(node && node.$isLeaf) {
 			heap.$insert(node);
 			coverages.set(node, [node]);
@@ -40,7 +40,7 @@ export function distMap(tree: ITree): DistMap {
 }
 
 /** Return the structural distance between two {@link ITreeNode}s using LCA. */
-export function dist(a: ITreeNode, b: ITreeNode, lca: ITreeNode): number {
+export function dist(a: ITreeNodeBase, b: ITreeNodeBase, lca: ITreeNodeBase): number {
 	return a.$dist + b.$dist - 2 * lca.$dist;
 }
 

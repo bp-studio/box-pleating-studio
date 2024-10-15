@@ -134,6 +134,9 @@ export namespace SelectionController {
 		if(!ctrlKey) {
 			if(!current) clear();
 			if(!current && next) trySelect(next);
+			/// #if DEBUG
+			if(selections.length == 1) console.log("selected: " + selections[0].$tag);
+			/// #endif
 			return Boolean(current || next);
 		} else {
 			if(next) {

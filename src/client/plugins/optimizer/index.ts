@@ -1,10 +1,9 @@
 import { MAX_SHEET_SIZE } from "shared/types/constants";
 import { hasBigInt64Array, hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
 
+import type { Hierarchy } from "core/design/context/areaTree/utils";
 import type { OptimizerEvent, OptimizerRequest, OptimizerResult, OptimizerOptionsBase, OptimizerCommand } from "./types";
-import type { JFlap, JProject, JSheet } from "shared/json";
-import type { DistMap } from "core/design/context/treeUtils";
-import type { NodeId } from "shared/json/tree";
+import type { JFlap, JProject, JSheet, NodeId } from "shared/json";
 import type { Project } from "client/project/project";
 
 let workerReady: PromiseWithResolvers<Worker>;
@@ -85,31 +84,29 @@ export async function optimizer(project: Project, options: OptimizerOptions): Pr
 
 	if(hasSharedArrayBuffer) interruptBuffer[0] = 0;
 	const json = project.toJSON();
-	const distMap = await project.$core.tree.getDistMap();
-	const map = createNonSkippingDistMap(distMap, json);
-	const request = createOptimizerRequest(json, map, options);
+	const hierarchies = await project.$core.tree.getHierarchy(options.layout == "random", options.useDimension);
+	const request = createOptimizerRequest(json, hierarchies, options);
 	worker.postMessage(request);
 
 	const result = await execution.promise;
 	checkOptimizerResult(result, project);
 
 	if(!options.openNew) writeToProject(project, request, result);
-	else writeToTemplate(json, result);
+	else writeToTemplate(json, request, result);
 	return json;
 }
 
-function createNonSkippingDistMap(distMap: DistMap, json: JProject): DistMap<number> {
-	const ids = json.design.layout.flaps.map(f => f.id);
-	const idMap = new Map<NodeId, number>();
-	for(let i = 0; i < ids.length; i++) idMap.set(ids[i], i);
-	return distMap.map(([i, j, d]) => [idMap.get(i)!, idMap.get(j)!, d]);
-}
-
-function createOptimizerRequest(json: JProject, map: DistMap<number>, options: OptimizerOptions): OptimizerRequest {
+function createOptimizerRequest(json: JProject, hierarchies: Hierarchy[], options: OptimizerOptions): OptimizerRequest {
 	const { flaps, sheet } = json.design.layout;
 	options.callback({ event: "flap", data: flaps.length });
 	if(!options.useDimension) flaps.forEach(f => f.width = f.height = 0);
 	const { type } = sheet;
+
+	const flapMap = new Map<NodeId, JFlap>();
+	for(const f of flaps) {
+		flapMap.set(f.id, f);
+	}
+	const orderedFlaps = hierarchies[hierarchies.length - 1].leaves.map(id => flapMap.get(id)!);
 
 	const request: OptimizerRequest = {
 		command: "start",
@@ -119,12 +116,12 @@ function createOptimizerRequest(json: JProject, map: DistMap<number>, options: O
 		random: options.random,
 		problem: {
 			type,
-			flaps: flaps.map(f => ({ width: f.width, height: f.height })),
-			distMap: map,
+			flaps: orderedFlaps.map(f => ({ id: f.id, width: f.width, height: f.height })),
+			hierarchies,
 		},
 		vec: null,
 	};
-	if(options.layout == "view") request.vec = makeInitialVector(flaps, sheet);
+	if(options.layout == "view") request.vec = makeInitialVector(orderedFlaps, sheet);
 	return request;
 }
 
@@ -155,15 +152,18 @@ function checkOptimizerResult(result: OptimizerResult, project: Project): void {
 	}
 }
 
-function writeToTemplate(json: JProject, result: OptimizerResult): void {
-	const { flaps, sheet } = json.design.layout;
+function writeToTemplate(json: JProject, request: OptimizerRequest, result: OptimizerResult): void {
+	const { sheet } = json.design.layout;
 	json.design.layout = {
 		sheet: {
 			...sheet,
 			width: result.width,
 			height: result.height,
 		},
-		flaps: result.flaps.map((p, i) => ({ ...flaps[i], ...p })),
+		flaps: result.flaps.map(f => ({
+			...f,
+			...request.problem.flaps.find(r => r.id == f.id)!,
+		})),
 		stretches: [],
 	};
 	json.design.mode = "layout";
@@ -172,9 +172,10 @@ function writeToTemplate(json: JProject, result: OptimizerResult): void {
 function writeToProject(proj: Project, request: OptimizerRequest, result: OptimizerResult): void {
 	const layout = proj.design.layout;
 	layout.$sheet.grid.$setDimension(result.width, result.height);
-	for(const [i, flap] of [...layout.$flaps].entries()) {
-		const pt = result.flaps[i];
-		const { width, height } = request.problem.flaps[i];
-		flap.$manipulate(pt.x, pt.y, width, height);
+
+	for(const f of result.flaps) {
+		const flap = layout.$flaps.get(f.id)!;
+		const { width, height } = request.problem.flaps.find(r => r.id == f.id)!;
+		flap.$manipulate(f.x, f.y, width, height);
 	}
 }

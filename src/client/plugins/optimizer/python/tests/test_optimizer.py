@@ -9,16 +9,23 @@ def test_optimizer():
 		{
 			"type": "rect",
 			"flaps": [
-				{"width": 0, "height": 0},
-				{"width": 0, "height": 0},
-				{"width": 0, "height": 0},
+				{"id": 1, "width": 0, "height": 0},
+				{"id": 2, "width": 0, "height": 0},
+				{"id": 4, "width": 0, "height": 0},
 			],
-			"distMap": [[0, 1, 16], [0, 2, 16], [1, 2, 12]],
+			"hierarchies": [
+				{
+					"leaves": [1, 2, 4],
+					"distMap": [[1, 2, 16], [1, 4, 16], [2, 4, 12]],
+					"parents": [],
+				}
+			],
 		}
 	)
-	constraints = generate_constraints(problem)
+	hierarchy = problem.hierarchies[-1]
+	constraints = generate_constraints(hierarchy)
 	x0 = [0.3, 0.3, 0.4, 0.5, 0.5, 0.4, 0]
-	select_initial_scale(x0, problem)
+	select_initial_scale(x0, hierarchy)
 	assert get_scale(x0) == 85.0
 	result = pack(x0, constraints)
 	assert result.success

@@ -1,10 +1,10 @@
 import math
 import numpy as np
 
-from .problem import Problem
+from .problem import Hierarchy
 from .solver import pack
 from .constraints import check_constraints
-from .calc import get_scale, set_scale
+from .calc import GRID_ERROR, get_scale, set_scale
 
 
 def _meg(x: float, y: float):
@@ -56,8 +56,7 @@ def _select_lower_left(fix: list[bool], current_solution: list[float]) -> int:
 MAX_BACKTRACK = 10
 
 
-def solve_integer(constraints, x0, grid, problem: Problem):
-	print(f'{{"event": "grid", "data": {grid}}}')
+def solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 	stack = []
 	flap_count = (len(x0) - 1) >> 1
 	fix = [False] * flap_count
@@ -81,7 +80,7 @@ def solve_integer(constraints, x0, grid, problem: Problem):
 						stack[-1]["index"] += 1
 					continue
 				progress = [s["index"] for s in stack]
-				print(f'{{"event": "fit", "data": {progress}}}')
+				print(f'{{"event": "fit", "data": [{grid}, {progress}]}}')
 				current_solution = state["children"][state["index"]]
 
 			branch_at = _select_max_offset(fix, current_solution, grid)
@@ -98,10 +97,10 @@ def solve_integer(constraints, x0, grid, problem: Problem):
 				xk[i] = _branch(x, q & 1) / grid
 				xk[i + 1] = _branch(y, q >> 1) / grid
 				set_scale(xk, grid)
-				if not check_constraints(xk, branch_at, fix, problem):
+				if not check_constraints(xk, branch_at, fix, hierarchy):
 					continue
 				solution = pack(xk, constraints, fix)
-				ok = solution.success and get_scale(solution.x) <= grid
+				ok = solution.success and get_scale(solution.x) <= grid + GRID_ERROR
 				if ok:
 					children.append(solution.x)
 
@@ -126,8 +125,7 @@ def solve_integer(constraints, x0, grid, problem: Problem):
 	return stack[-1]["children"][0]
 
 
-def greedy_solve_integer(constraints, x0, grid, problem: Problem):
-	print(f'{{"event": "grid", "data": {grid}}}')
+def greedy_solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 	flap_count = (len(x0) - 1) >> 1
 	fix = [False] * flap_count
 	f_grid = grid
@@ -136,7 +134,7 @@ def greedy_solve_integer(constraints, x0, grid, problem: Problem):
 	current_solution = x0
 	try:
 		while depth < flap_count:
-			print(f'{{"event": "greedy", "data": {depth}}}')
+			print(f'{{"event": "greedy", "data": [{grid}, {depth}]}}')
 
 			branch_at = _select_lower_left(fix, current_solution)
 			fix[branch_at] = True
@@ -153,7 +151,7 @@ def greedy_solve_integer(constraints, x0, grid, problem: Problem):
 				xk[i] = _branch(x, q & 1) / f_grid
 				xk[i + 1] = _branch(y, q >> 1) / f_grid
 				set_scale(xk, f_grid)
-				if not check_constraints(xk, branch_at, fix, problem):
+				if not check_constraints(xk, branch_at, fix, hierarchy):
 					continue
 				if q == 0:
 					children.append(xk)
@@ -161,8 +159,6 @@ def greedy_solve_integer(constraints, x0, grid, problem: Problem):
 				solution = pack(xk, constraints, fix)
 				if solution.success:
 					children.append(solution.x)
-				if q == 2 and len(children) > 0:
-					break  # greedy
 
 			if len(children) == 0:
 				return None
@@ -175,7 +171,7 @@ def greedy_solve_integer(constraints, x0, grid, problem: Problem):
 			# What if even the best solution requires larger sheet?
 			# No problem! Just enlarge the sheet and keep going.
 			current_grid = get_scale(current_solution)
-			if current_grid > f_grid:
+			if current_grid > f_grid + GRID_ERROR:
 				current_solution = resize_solution(current_solution, current_grid)
 				f_grid = current_grid
 				if math.ceil(f_grid) > grid:

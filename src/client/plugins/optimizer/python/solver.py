@@ -1,9 +1,8 @@
 import numpy as np
 from scipy.optimize import minimize, basinhopping, OptimizeResult
 
-from .problem import Problem
-from .calc import get_scale
-from .constraints import MIN_SHEET_SIZE, MAX_SHEET_SIZE, select_initial_scale
+from .calc import get_scale, int_scale
+from .constraints import MIN_SHEET_SIZE, MAX_SHEET_SIZE
 
 
 TOL = 1e-6
@@ -39,26 +38,6 @@ def pack(x0, cons, fix=None):
 	return minimize(objective, x0, bounds=bounds, constraints=cons, jac=jacobian, tol=TOL, options=MINIMIZE_OPTION)
 
 
-async def generate_candidate(target: int, problem: Problem, checkInterrupt):
-	vectors = []
-	try:
-		for i in range(target * 100):
-			vec = np.random.rand(len(problem.flaps) * 2 + 1)
-			select_initial_scale(vec, problem)
-			vectors.append(vec)
-			if i % 10 == 0:
-				print(f'{{"event": "candidate", "data": {i/100}}}')
-			if i % 50 == 0:
-				interrupt = await checkInterrupt()
-				if interrupt > 0:
-					break
-	except KeyboardInterrupt:
-		pass
-
-	vectors.sort(key=objective)
-	return vectors[:target]
-
-
 async def solve_global(initial_vectors: int, cons, checkInterrupt):
 	best_s = MAX_SHEET_SIZE
 	best_result = None
@@ -66,8 +45,7 @@ async def solve_global(initial_vectors: int, cons, checkInterrupt):
 	trials = 0
 	for vec in initial_vectors:
 		trials += 1
-		print(f'{{"event": "bh", "data": {trials}}}')  # report progress
-		result = basin_hopping(vec, cons)
+		result = basin_hopping(vec, cons, trials, best_s)
 		if not result.success:
 			continue
 
@@ -83,17 +61,21 @@ async def solve_global(initial_vectors: int, cons, checkInterrupt):
 	return best_result
 
 
-def basin_hopping(x0, cons):
+def basin_hopping(x0, cons, trials, best_s):
 	bounds = [FLAP_BOUND] * (len(x0) - 1) + [SCALE_BOUND]
 
 	best_temp_f = 0
 	best_temp_x = None
+	step = 0
 
 	def callback(x, f, accept):
-		nonlocal best_temp_f, best_temp_x
+		nonlocal best_temp_f, best_temp_x, step
 		if f < best_temp_f:
 			best_temp_f = f
 			best_temp_x = x
+		best = int_scale(min(best_s, get_scale(best_temp_x)))
+		print(f'{{"event": "bh", "data": [{trials}, {step}, {best}]}}')  # report progress
+		step += 1
 
 	try:
 		return basinhopping(
@@ -104,7 +86,7 @@ def basin_hopping(x0, cons):
 			niter_success=16,
 			stepsize=0.1,
 			T=0.01,
-			disp=True,
+			# disp=True,
 			callback=callback,
 			minimizer_kwargs={
 				"method": "SLSQP",

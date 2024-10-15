@@ -29,10 +29,7 @@ describe("Tree", function() {
 	});
 
 	it("Balances itself", function() {
-		const tree = createTree([
-			{ n1: 0, n2: 1, length: 2 },
-			{ n1: 0, n2: 2, length: 2 },
-		]);
+		const tree = parseTree("(0,1,2),(0,2,2)");
 		const n0 = node(0);
 		const n1 = node(1);
 		expect(tree.$root).to.equal(n0);
@@ -47,12 +44,7 @@ describe("Tree", function() {
 	});
 
 	it("Can remove leaf nodes", function() {
-		const tree = createTree([
-			{ n1: 0, n2: 1, length: 2 },
-			{ n1: 0, n2: 2, length: 2 },
-			{ n1: 2, n2: 3, length: 2 },
-			{ n1: 3, n2: 4, length: 2 },
-		]);
+		const tree = parseTree("(0,1,2),(0,2,2),(2,3,2),(3,4,2)");
 		const n2 = node(2)!;
 		const n3 = node(3)!;
 		expect(tree.$root).to.equal(n2);
@@ -77,12 +69,7 @@ describe("Tree", function() {
 	});
 
 	it("Keeps a record of distances", function() {
-		createTree([
-			{ n1: 0, n2: 1, length: 1 },
-			{ n1: 0, n2: 2, length: 2 },
-			{ n1: 2, n2: 3, length: 3 },
-			{ n1: 3, n2: 4, length: 4 },
-		]);
+		parseTree("(0,1,1),(0,2,2),(2,3,3),(3,4,4)");
 		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
 		expect(n0.$dist).to.equal(2);
 		expect(n2.$dist).to.equal(0);
@@ -95,24 +82,13 @@ describe("Tree", function() {
 	});
 
 	it("Outputs balanced JSON", function() {
-		const tree = createTree([
-			{ n1: 0, n2: 1, length: 1 },
-			{ n1: 0, n2: 2, length: 2 },
-			{ n1: 2, n2: 3, length: 3 },
-			{ n1: 3, n2: 4, length: 4 },
-		]);
+		const tree = parseTree("(0,1,1),(0,2,2),(2,3,3),(3,4,4)");
 		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
 		expect(JSON.stringify(tree.toJSON().edges)).to.equal(json);
 	});
 
 	it("Creates distance map", function() {
-		createTree([
-			{ n1: 0, n2: 1, length: 1 },
-			{ n1: 0, n2: 2, length: 2 },
-			{ n1: 0, n2: 3, length: 2 },
-			{ n1: 3, n2: 4, length: 1 },
-			{ n1: 3, n2: 5, length: 2 },
-		]);
+		parseTree("(0,1,1),(0,2,2),(0,3,2),(3,4,1),(3,5,2)");
 		const distMap = TreeController.getDistMap();
 		expect(distMap.length).to.equal(6);
 		expect(distMap).to.deep.include([5, 4, 3]);
@@ -148,12 +124,7 @@ describe("Tree", function() {
 
 	describe("Edge joining", function() {
 		it("Works with root and non-root nodes", function() {
-			const tree = createTree([
-				{ n1: 0, n2: 1, length: 2 },
-				{ n1: 1, n2: 2, length: 2 },
-				{ n1: 0, n2: 3, length: 2 },
-				{ n1: 3, n2: 4, length: 2 },
-			]);
+			const tree = parseTree("(0,1,2),(1,2,2),(0,3,2),(3,4,2)");
 			expect(tree.$root.id).to.equal(0);
 
 			TreeController.join(id1);
@@ -168,13 +139,7 @@ describe("Tree", function() {
 
 	describe("Edge splitting", function() {
 		it("Works with depth-1 edge", function() {
-			const tree = createTree([
-				{ n1: 0, n2: 1, length: 2 },
-				{ n1: 1, n2: 2, length: 2 },
-				{ n1: 0, n2: 3, length: 2 },
-				{ n1: 3, n2: 4, length: 2 },
-				{ n1: 4, n2: 5, length: 2 },
-			]);
+			const tree = parseTree("(0,1,2),(1,2,2),(0,3,2),(3,4,2),(4,5,2)");
 			expect(tree.$root.id).to.equal(0);
 
 			TreeController.split({ n1: id3, n2: id0 }, id6);
@@ -184,14 +149,7 @@ describe("Tree", function() {
 
 	describe("Leaf removal", function() {
 		it("Works with current root", function() {
-			const tree = createTree([
-				{ n1: 0, n2: 1, length: 2 },
-				{ n1: 1, n2: 2, length: 2 },
-				{ n1: 2, n2: 3, length: 2 },
-				{ n1: 0, n2: 4, length: 2 },
-				{ n1: 4, n2: 5, length: 2 },
-				{ n1: 5, n2: 6, length: 2 },
-			]);
+			const tree = parseTree("(0,1,2),(1,2,2),(2,3,2),(0,4,2),(4,5,2),(5,6,2)");
 			expect(tree.$root.id).to.equal(0);
 
 			TreeController.removeLeaf(
@@ -204,13 +162,7 @@ describe("Tree", function() {
 
 	describe("Edge merging", function() {
 		it("Merge end nodes of an edge", function() {
-			const tree = createTree([
-				{ n1: 0, n2: 1, length: 2 },
-				{ n1: 1, n2: 2, length: 2 },
-				{ n1: 1, n2: 3, length: 2 },
-				{ n1: 0, n2: 4, length: 2 },
-				{ n1: 0, n2: 5, length: 2 },
-			]);
+			const tree = parseTree("(0,1,2),(1,2,2),(1,3,2),(0,4,2),(0,5,2)");
 
 			TreeController.merge({ n1: id0, n2: id1 });
 			expect(tree.$root.id).to.equal(0);
@@ -220,10 +172,7 @@ describe("Tree", function() {
 
 	describe("Tree editing", function() {
 		it("Undoes splitting", function() {
-			const tree = createTree([
-				{ n1: 0, n2: 1, length: 2 },
-				{ n1: 0, n2: 2, length: 2 },
-			]);
+			const tree = parseTree("(0,1,2),(0,2,2)");
 
 			TreeController.split({ n1: id0, n2: id1 }, id3);
 			expect(node(3)!.$length).to.equal(1);

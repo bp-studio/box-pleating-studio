@@ -5,7 +5,9 @@ import { State } from "core/service/state";
 import { balanceTask } from "core/design/tasks/balance";
 import { setStretchPrototypes } from "core/design/tasks/stretch";
 import { distMap } from "core/design/context/treeUtils";
+import { AreaTree } from "core/design/context/areaTree/areaTree";
 
+import type { Hierarchy } from "core/design/context/areaTree/utils";
 import type { DistMap } from "core/design/context/treeUtils";
 import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
@@ -80,8 +82,16 @@ export namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	export function getDistMap(): DistMap {
-		return distMap(State.$tree);
+	export function getHierarchy(random: boolean, useDimension: boolean): Hierarchy[] {
+		if(!random) {
+			return [{
+				leaves: State.$tree.$nodes.filter(n => n && n.$isLeaf).map(n => n!.id),
+				distMap: distMap(State.$tree.$nodes),
+				parents: [],
+			}];
+		}
+		const aTree = new AreaTree(State.$tree, useDimension);
+		return aTree.$createHierarchy();
 	}
 
 	/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */

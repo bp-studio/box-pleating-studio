@@ -49,15 +49,15 @@
 								 :value="state.minor" :max="100" noSkip @stop="stop">
 						Initializing ({{ state.minor.toFixed(1) }}%)...
 					</OptProgress>
-					<OptProgress v-else-if="state.stage == Stage.candidate" :state="state" :options="options" :value="state.major"
-								 :max="options.random" @skip="skip" @stop="stop">
+					<OptProgress v-else-if="state.stage == Stage.candidate" :state="state" :options="options" :value="state.minor"
+								 :max="state.major" @skip="skip" @stop="stop">
 						Generating candidate layouts...
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.continuous">
 						<OptProgress v-if="options.layout == 'random'" :state="state" :options="options"
-									 :value="(state.major - 1) + (state.minor / 50)" :max="options.random" @skip="skip"
+									 :value="(state.major - 1) * 50 + state.minor" :max="options.random * 50" @skip="skip"
 									 @stop="stop">
-							Trying random layout #{{ state.major }}, step {{ state.minor }}...
+							Trying random layout #{{ state.major }}, step {{ state.minor }} (Best size {{ state.best }})...
 						</OptProgress>
 						<OptProgress v-else-if="options.useBH" :state="state" :options="options" :value="state.minor" :max="50"
 									 :noSkip="!hasSharedArrayBuffer" @skip="skip" @stop="stop">
@@ -132,6 +132,7 @@
 		stage: Stage.stopped,
 		major: 0,
 		minor: 0,
+		best: 0,
 		flaps: 0,
 		running: false,
 		skipping: false,
@@ -164,29 +165,23 @@
 				break;
 			case "candidate":
 				updateState(Stage.candidate);
-				state.major = event.data;
+				[state.minor, state.major] = event.data;
 				break;
 			case "bh":
 				updateState(Stage.continuous);
-				state.major = event.data;
-				state.minor = 0;
-				break;
-			case "bhs":
-				state.minor = event.data;
-				break;
-			case "grid":
-				updateState(Stage.integral);
-				state.major = event.data;
-				state.minor = 0;
+				[state.major, state.minor, state.best] = event.data;
 				break;
 			case "fit": {
-				const depth = event.data.length;
+				updateState(Stage.integral);
+				state.major = event.data[0];
+				const depth = event.data[1].length;
 				if(depth > state.minor) state.minor = depth;
 				else state.minor += 0.1; // For better UX
 				break;
 			}
 			case "greedy":
-				state.minor = event.data;
+				updateState(Stage.integral);
+				[state.major, state.minor] = event.data;
 				break;
 			default:
 		}

@@ -1,4 +1,12 @@
+import math
+
+
+GRID_ERROR = 1e-4
 CONS_WEIGHT = 3  # This reduces constraint violations.
+
+
+def int_scale(s: float):
+	return math.ceil(s - GRID_ERROR)
 
 
 def get_scale(x: list[float]):

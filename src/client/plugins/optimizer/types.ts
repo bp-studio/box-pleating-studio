@@ -1,5 +1,5 @@
-import type { DistMap } from "core/design/context/treeUtils";
-import type { GridType } from "shared/json";
+import type { Hierarchy } from "core/design/context/areaTree/utils";
+import type { GridType, NodeId } from "shared/json";
 
 export type LayoutMode = "view" | "random";
 export type FittingMode = "quick" | "full";
@@ -19,15 +19,22 @@ export interface OptimizerRequest extends OptimizerOptionsBase {
 	buffer?: Uint8Array;
 	problem: {
 		type: GridType;
-		flaps: IDimension[];
-		distMap: DistMap<number>;
+		flaps: FlapRequest[];
+		hierarchies: Hierarchy[];
 	};
 	vec: IPoint[] | null;
 }
 
 export interface OptimizerResult extends IDimension {
-	flaps: IPoint[];
+	flaps: FlapResult[];
 }
+
+interface IdModel {
+	id: NodeId;
+}
+
+interface FlapRequest extends IDimension, IdModel { }
+interface FlapResult extends IPoint, IdModel { }
 
 export type OptimizerEvent = {
 	[k in keyof OptimizerEventMap]: {
@@ -39,11 +46,9 @@ export type OptimizerEvent = {
 interface OptimizerEventMap {
 	handle: Consumer<OptimizerCommand>;
 	loading: number;
-	candidate: number;
+	candidate: [number, number];
 	flap: number;
-	bh: number;
-	bhs: number;
-	grid: number;
-	greedy: number;
-	fit: number[];
+	bh: [number, number, number];
+	greedy: [number, number];
+	fit: [number, number[]];
 }

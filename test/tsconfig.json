@@ -11,6 +11,9 @@
 		// Since SWC 1.7.35 it no longer transpile decorators for esnext target,
 		// so we need to explicitly set a target other than esnext for ts-node + SWC to work
 		"target": "es2022",
+		"lib": [
+			"ESNext"
+		],
 		"types": [
 			"mocha",
 			"node"
