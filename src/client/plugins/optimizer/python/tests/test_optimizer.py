@@ -1,3 +1,5 @@
+from ..branching.greedy import greedy_solve_integer
+from ..branching.standard import solve_integer
 from ..solver import pack
 from ..calc import get_scale
 from ..constraints import generate_constraints, select_initial_scale
@@ -30,7 +32,8 @@ def test_optimizer():
 	result = pack(x0, constraints)
 	assert result.success
 	x = result.x
-	grid = round(get_scale(x))
-	assert grid == 15
-	coordinates = [round(v * grid) for v in x[:-1]]
-	assert coordinates == [0, 0, 6, 15, 15, 6]
+	solution = greedy_solve_integer(constraints, x, round(get_scale(x)), hierarchy)
+	assert solution == [0, 0, 6, 15, 15, 6, 15]
+
+	solution = solve_integer(constraints, x, round(get_scale(x)), hierarchy)
+	assert solution == [0, 0, 6, 15, 15, 6, 15]

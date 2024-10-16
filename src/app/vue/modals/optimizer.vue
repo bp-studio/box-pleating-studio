@@ -173,10 +173,13 @@
 				break;
 			case "fit": {
 				updateState(Stage.integral);
-				state.major = event.data[0];
-				const depth = event.data[1].length;
-				if(depth > state.minor) state.minor = depth;
-				else state.minor += 0.1; // For better UX
+				if(event.data[0] != state.major) {
+					state.major = event.data[0];
+					state.minor = 0;
+				} else {
+					const depth = event.data[1].length;
+					if(depth > state.minor) state.minor = depth;
+				}
 				break;
 			}
 			case "greedy":

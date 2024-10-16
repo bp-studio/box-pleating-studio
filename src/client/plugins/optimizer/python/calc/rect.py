@@ -1,6 +1,5 @@
 import numpy as np
 
-from . import get_scale
 from ..problem import Flap
 
 
@@ -9,7 +8,7 @@ def bound(x: list[float], i: int, dim: int):
 
 
 def exact(x: list[float], i: int, dim: int):
-	return get_scale(x) - round(x[i] / x[-1]) - dim
+	return x[-1] - x[i] - dim
 
 
 def jacobian(x: list[float], i: int, dim: int):

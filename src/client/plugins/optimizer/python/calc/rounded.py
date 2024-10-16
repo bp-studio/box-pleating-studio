@@ -39,9 +39,8 @@ def jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
 
 def exact(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> int:
 	"""Like constraint, but without floating error."""
-	s = x[-1]
-	dx = _interval_distance(round(x[i * 2] / s), flaps[i].width, round(x[j * 2] / s), flaps[j].width)
-	dy = _interval_distance(round(x[i * 2 + 1] / s), flaps[i].height, round(x[j * 2 + 1] / s), flaps[j].height)
+	dx = _interval_distance(x[i * 2], flaps[i].width, x[j * 2], flaps[j].width)
+	dy = _interval_distance(x[i * 2 + 1], flaps[i].height, x[j * 2 + 1], flaps[j].height)
 	return dx * dx + dy * dy - dist * dist
 
 

@@ -17,14 +17,6 @@ def constraint(x: list[float], i: int, j: int, dist: int) -> float:
 	return (dx * dx + dy * dy - d * d) * CONS_WEIGHT
 
 
-def exact(x: list[float], i: int, j: int, dist: int) -> int:
-	"""Like constraint, but without floating error."""
-	s = x[-1]
-	dx = round(x[i * 2] / s) - round(x[j * 2] / s)
-	dy = round(x[i * 2 + 1] / s) - round(x[j * 2 + 1] / s)
-	return dx * dx + dy * dy - dist * dist
-
-
 def jacobian(x: list[float], i: int, j: int, dist: int):
 	"""Jacobian vector of constraint."""
 	vec: list[float] = [0] * len(x)

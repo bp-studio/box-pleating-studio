@@ -7,7 +7,8 @@ from .problem import Hierarchy, Problem
 from .calc import get_scale, int_scale
 from .constraints import MAX_SHEET_SIZE, generate_constraints, select_initial_scale
 from .solver import basin_hopping, pack, solve_global
-from .branching import greedy_solve_integer, solve_integer
+from .branching.greedy import greedy_solve_integer
+from .branching.standard import solve_integer
 
 
 def abort_handler(_, __):
@@ -49,8 +50,7 @@ def main(args):
 				integer_solution = solve_integer(constraints, best_solution, grid, hierarchy)
 				grid += 1
 
-		grid = round(get_scale(integer_solution))
-		coordinates = [round(v * grid) for v in integer_solution[0 : flap_count * 2]]
+		coordinates = integer_solution[0 : flap_count * 2]
 		grid = max(coordinates)
 		return {
 			"width": grid,
@@ -68,7 +68,6 @@ def pre_solve(data, problem, constraints):
 	if layout == "view":
 		x0 = convert_vector(data.get("vec"), hierarchy)
 		if data.get("useBH"):
-			print('{"event": "bh", "data": 0}')
 			result = basin_hopping(x0, constraints, 1, MAX_SHEET_SIZE)
 		else:
 			result = pack(x0, constraints)
