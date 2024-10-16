@@ -45,12 +45,8 @@ if(typeof TransformStream != "undefined") {
 
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js");
 
-type MainParams = OptimizerRequest & {
-	checkInterrupt: typeof checkInterrupt;
-};
-
 interface Optimizer {
-	main(data: MainParams): Promise<PyProxy>;
+	main(data: OptimizerRequest): PyProxy;
 	get_error(): string;
 };
 
@@ -91,27 +87,6 @@ async function initOptimizer(): Promise<Optimizer> {
 const pyodidePromise = initPyodide();
 const optimizerPromise = initOptimizer();
 
-/**
- * This is the interruption fallback in case {@link SharedArrayBuffer} is not available
- * (for example iOS < 15.2).
- */
-enum InterruptType {
-	none = 0,
-	skip = 1,
-}
-
-let shouldInterrupt = InterruptType.none;
-
-function checkInterrupt(): Promise<InterruptType> {
-	return new Promise(resolve => {
-		setTimeout(() => {
-			const value = shouldInterrupt;
-			shouldInterrupt = InterruptType.none;
-			resolve(value);
-		}, 0);
-	});
-}
-
 addEventListener("message", async event => {
 	const data = event.data as OptimizerRequest;
 	if(data.command == "buffer") {
@@ -120,10 +95,9 @@ addEventListener("message", async event => {
 		console.log("InterruptBuffer ready");
 	}
 	if(data.command == "start") {
-		shouldInterrupt = InterruptType.none;
 		const optimizer = await optimizerPromise;
 		try {
-			const response = await optimizer.main({ checkInterrupt, ...data });
+			const response = optimizer.main(data);
 			const result = response?.toJs({
 				dict_converter: Object.fromEntries,
 			}) as OptimizerResult;
@@ -132,8 +106,5 @@ addEventListener("message", async event => {
 			console.log(e);
 			postMessage({ error: optimizer.get_error() });
 		}
-	}
-	if(data.command == "skip") {
-		shouldInterrupt = InterruptType.skip;
 	}
 });

@@ -53,9 +53,8 @@ export interface OptimizerOptions extends OptimizerOptionsBase {
 }
 
 function handler(command: OptimizerCommand, worker: Worker): void {
-	if(command == "skip") {
-		if(hasSharedArrayBuffer) interruptBuffer[0] = SIGINT;
-		else worker.postMessage({ command }); // fallback
+	if(command == "skip" && hasSharedArrayBuffer) {
+		interruptBuffer[0] = SIGINT;
 	} else if(command == "stop") {
 		if(hasSharedArrayBuffer) {
 			interruptBuffer[0] = SIGABRT;

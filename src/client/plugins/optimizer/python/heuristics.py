@@ -7,7 +7,7 @@ from .constraints import generate_constraints, select_initial_scale
 from .problem import Circle, Hierarchy
 
 
-async def generate_candidate(target: int, hierarchies: list[Hierarchy], check_interrupt):
+def generate_candidate(target: int, hierarchies: list[Hierarchy]):
 	vectors = []
 	try:
 		growth = target ** (1 / len(hierarchies))
@@ -21,30 +21,21 @@ async def generate_candidate(target: int, hierarchies: list[Hierarchy], check_in
 			print(f'{{"event": "candidate", "data": [{generated}, {total}]}}')
 
 		last_hierarchy = None
-		interrupted = False
 		for hierarchy in hierarchies:
 			constraints = generate_constraints(hierarchy)
 			if len(vectors) == 0:
-				(vectors, interrupted) = await generate_candidate_core(
-					math.floor(num), constraints, hierarchy, callback, check_interrupt
-				)
+				vectors = generate_candidate_core(math.floor(num), constraints, hierarchy, callback)
 			else:
 				next_vec = []
 				num_per_vec = round(num / len(vectors))
 				for vec in vectors:
 					circles = make_circles(vec, hierarchy, last_hierarchy)
 					n = min(num_per_vec, target - len(next_vec))
-					(vec, interrupted) = await generate_candidate_core(
-						n, constraints, hierarchy, callback, check_interrupt, circles
-					)
+					vec = generate_candidate_core(n, constraints, hierarchy, callback, circles)
 					next_vec.extend(vec)
-					if interrupted:
-						break
 				vectors = next_vec
 			last_hierarchy = hierarchy
 			num *= growth
-			if interrupted:
-				break
 	except KeyboardInterrupt:
 		pass
 
@@ -84,9 +75,8 @@ def make_circles(vec, hierarchy: Hierarchy, last_hierarchy: Hierarchy):
 	return circles
 
 
-async def generate_candidate_core(target: int, constraints, hierarchy: Hierarchy, callback, check_interrupt, circles=None):
+def generate_candidate_core(target: int, constraints, hierarchy: Hierarchy, callback, circles=None):
 	vectors = []
-	interrupted = False
 	while len(vectors) < target:
 		if circles is None:
 			vec = np.random.rand(len(hierarchy.flaps) * 2 + 1)
@@ -97,10 +87,7 @@ async def generate_candidate_core(target: int, constraints, hierarchy: Hierarchy
 		if result.success:
 			vectors.append(result.x)
 			callback()
-		if await check_interrupt():
-			interrupted = True
-			break
-	return (vectors, interrupted)
+	return vectors
 
 
 def generate_in_circles(circles: list[Circle]):

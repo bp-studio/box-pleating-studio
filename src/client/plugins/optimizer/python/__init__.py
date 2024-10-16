@@ -23,7 +23,7 @@ def convert_vector(vec, hierarchy: Hierarchy):
 	return select_initial_scale(vec, hierarchy)
 
 
-async def main(args):
+def main(args):
 	data = args.to_py()
 	fit: str = data.get("fit")
 	problem = Problem(data.get("problem"))
@@ -32,7 +32,7 @@ async def main(args):
 
 	try:
 		constraints = generate_constraints(hierarchy)
-		best_solution = await pre_solve(data, problem, constraints)
+		best_solution = pre_solve(data, problem, constraints)
 		if best_solution is None:
 			return None
 
@@ -61,9 +61,8 @@ async def main(args):
 		return None
 
 
-async def pre_solve(data, problem, constraints):
+def pre_solve(data, problem, constraints):
 	layout: str = data.get("layout")
-	check_interrupt = data.get("checkInterrupt")
 	hierarchy = problem.hierarchies[-1]
 
 	if layout == "view":
@@ -74,9 +73,9 @@ async def pre_solve(data, problem, constraints):
 		else:
 			result = pack(x0, constraints)
 	else:
-		initial_vectors = await generate_candidate(data.get("random"), problem.hierarchies, check_interrupt)
+		initial_vectors = generate_candidate(data.get("random"), problem.hierarchies)
 		# print(initial_vectors)
-		result = await solve_global(initial_vectors, constraints, check_interrupt)
+		result = solve_global(initial_vectors, constraints)
 
 	return result if result is None or isinstance(result, np.ndarray) else result.x
 

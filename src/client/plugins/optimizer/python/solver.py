@@ -38,7 +38,7 @@ def pack(x0, cons, fix=None):
 	return minimize(objective, x0, bounds=bounds, constraints=cons, jac=jacobian, tol=TOL, options=MINIMIZE_OPTION)
 
 
-async def solve_global(initial_vectors: int, cons, checkInterrupt):
+def solve_global(initial_vectors: int, cons):
 	best_s = MAX_SHEET_SIZE
 	best_result = None
 
@@ -54,8 +54,7 @@ async def solve_global(initial_vectors: int, cons, checkInterrupt):
 			best_result = result
 			best_s = s
 
-		interrupt = await checkInterrupt()
-		if interrupt > 0 or "interrupt" in result:
+		if "interrupt" in result:
 			break
 
 	return best_result

@@ -9,7 +9,12 @@
 				<ProgressBar :value="value + animate()" :max="max" />
 			</div>
 			<div class="col-auto">
-				<button type="button" class="btn btn-secondary me-2" @click="$emit('skip')"
+				<!--
+					We use only the SharedArrayBuffer approach to implement Pyodide interruption,
+					without using async checking to provide fallback.
+					This significantly simplifies the code architecture.
+				-->
+				<button v-if="hasSharedArrayBuffer" type="button" class="btn btn-secondary me-2" @click="$emit('skip')"
 						:disabled="state.skipping || state.stopping || noSkip" v-t="'plugin.optimizer.skip'"></button>
 				<button type="button" class="btn btn-danger" @click="$emit('stop')" :disabled="state.stopping"
 						v-t="'keyword.abort'"></button>
@@ -22,6 +27,7 @@
 	import { onMounted, onUnmounted, shallowRef, watch } from "vue";
 
 	import ProgressBar from "@/gadgets/form/progressBar.vue";
+	import { hasSharedArrayBuffer } from "app/shared/constants";
 
 	import type { OptimizerOptions } from "client/plugins/optimizer";
 
