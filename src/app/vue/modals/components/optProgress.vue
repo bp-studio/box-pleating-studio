@@ -2,7 +2,7 @@
 	<div>
 		<div>
 			<slot></slot>
-			<span v-if="state.skipping" class="text-warning">&ensp;(Waiting for skipping)</span>
+			<span v-if="context.state.skipping" class="text-warning">&ensp;(Waiting for skipping)</span>
 		</div>
 		<div class="row mt-3">
 			<div class="col col-form-label">
@@ -14,32 +14,43 @@
 					without using async checking to provide fallback.
 					This significantly simplifies the code architecture.
 				-->
-				<button v-if="hasSharedArrayBuffer" type="button" class="btn btn-secondary me-2" @click="$emit('skip')"
-						:disabled="state.skipping || state.stopping || noSkip" v-t="'plugin.optimizer.skip'"></button>
-				<button type="button" class="btn btn-danger" @click="$emit('stop')" :disabled="state.stopping"
+				<button v-if="hasSharedArrayBuffer" type="button" class="btn btn-secondary me-2" @click="context.skip"
+						:disabled="context.state.skipping || context.state.stopping || noSkip"
+						v-t="'plugin.optimizer.skip'"></button>
+				<button type="button" class="btn btn-danger" @click="context.stop" :disabled="context.state.stopping"
 						v-t="'keyword.abort'"></button>
 			</div>
 		</div>
 	</div>
 </template>
 
-<script setup lang="ts">
-	import { onMounted, onUnmounted, shallowRef, watch } from "vue";
-
-	import ProgressBar from "@/gadgets/form/progressBar.vue";
-	import { hasSharedArrayBuffer } from "app/shared/constants";
-
-	import type { OptimizerOptions } from "client/plugins/optimizer";
-
-	defineOptions({ name: "OptProgress" });
-
-	const props = defineProps<{
+<script lang="ts">
+	export interface ProgressContext {
 		state: {
 			skipping: boolean;
 			stopping: boolean;
 		};
+		skip(): void;
+		stop(): void;
+	}
+
+	export const contextKey: InjectionKey<ProgressContext> = Symbol("ProgressContext");
+</script>
+
+<script setup lang="ts">
+	import { inject, onMounted, onUnmounted, shallowRef, watch } from "vue";
+
+	import ProgressBar from "@/gadgets/form/progressBar.vue";
+	import { hasSharedArrayBuffer } from "app/shared/constants";
+
+	import type { InjectionKey } from "vue";
+
+	defineOptions({ name: "OptProgress" });
+
+	const context = inject(contextKey)!;
+
+	const props = defineProps<{
 		noSkip?: boolean;
-		options: OptimizerOptions;
 		value: number;
 		max: number;
 	}>();
@@ -61,7 +72,5 @@
 	function animate(): number {
 		return 2 * Math.atan(time.value * SPEED) / Math.PI;
 	}
-
-	defineEmits(["skip", "stop"]);
 
 </script>

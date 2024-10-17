@@ -19,12 +19,20 @@ def objective(x):
 	return -x[-1]
 
 
+def int_objective(x):
+	"""Objective function with periodic penalty."""
+	s = x[-1]
+	# Using cos could seems like overkill here,
+	# but it converges better than naive alternatives such as offsets.
+	return -s * (np.sum(np.cos(np.pi * x[:-1] / s) ** 2) + 1)
+
+
 def jacobian(x):
 	return np.array([0] * (len(x) - 1) + [-1])
 
 
 def pack(x0, cons, fix=None):
-	"""Pack a set of flaps with given lengths using scipy's solver."""
+	"""Pack the flaps as continuous problem."""
 	flap_count = (len(x0) - 1) >> 1
 	bounds = []
 	for n in range(flap_count):
@@ -36,6 +44,28 @@ def pack(x0, cons, fix=None):
 			bounds += [FLAP_BOUND, FLAP_BOUND]
 	bounds.append(SCALE_BOUND)
 	return minimize(objective, x0, bounds=bounds, constraints=cons, jac=jacobian, tol=TOL, options=MINIMIZE_OPTION)
+
+
+def pack_int(x0, cons):
+	"""
+	Pack the flaps using periodic penalty.
+	Note that the result guarantees neither the integrity of the coordinates nor the meeting of constraints.
+	Also, this is MUCH slower to run than the continuous packing.
+	"""
+	flap_count = (len(x0) - 1) >> 1
+	bounds = [FLAP_BOUND, FLAP_BOUND] * flap_count
+	bounds.append(SCALE_BOUND)
+	step = 0
+
+	def int_callback(xk):
+		nonlocal step
+		print(f'{{"event": "int", "data": [{step}, {get_scale(xk)}]}}')
+		step += 1
+
+	int_callback(x0)
+	# The Jacobian of the int_objective is a bit complicated,
+	# so for now we just use built-in numerical approximation for it.
+	return minimize(int_objective, x0, bounds=bounds, constraints=cons, tol=TOL, callback=int_callback, options=MINIMIZE_OPTION)
 
 
 def solve_global(initial_vectors: int, cons):

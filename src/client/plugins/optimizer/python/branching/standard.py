@@ -1,7 +1,7 @@
 from ..solver import pack
 from ..calc import GRID_ERROR, get_scale, int_scale
 from ..problem import Hierarchy
-from . import BranchingContext, meg, to_float, to_grid
+from . import BranchingContext, meg, to_float
 
 
 def _get_offset(x: float):
@@ -16,8 +16,8 @@ def _select_max_offset(context: BranchingContext) -> int:
 	for n in range(flap_count):
 		if context.fixed[n]:
 			continue
-		ox = _get_offset(context.current_solution[n * 2])
-		oy = _get_offset(context.current_solution[n * 2 + 1])
+		ox = _get_offset(context.solution[n * 2])
+		oy = _get_offset(context.solution[n * 2 + 1])
 		offset = meg(ox, oy)
 		if offset > max_offset:
 			max_offset = offset
@@ -41,8 +41,7 @@ def solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 			if len(stack) > 0:
 				state = stack[-1]
 				index = state["index"]
-				child_count = len(state["children"])
-				if index >= child_count:
+				if index >= len(state["children"]):
 					context.fixed[state["fix"]] = False
 					stack.pop()
 					backtrack_count += 1
@@ -53,7 +52,7 @@ def solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 					continue
 				progress = [s["index"] for s in stack]
 				print(f'{{"event": "fit", "data": [{grid}, {progress}]}}')
-				context.current_solution = state["children"][state["index"]]
+				context.solution = state["children"][index]
 
 			branch_at = _select_max_offset(context)
 			context.fixed[branch_at] = True
@@ -71,11 +70,11 @@ def solve_integer(constraints, x0, grid, hierarchy: Hierarchy):
 				{
 					"fix": branch_at,
 					"index": 0,
-					"children": [to_grid(c, context.fixed, grid) for c in children],
+					"children": [context.to_grid(c, grid) for c in children],
 				}
 			)
 	except KeyboardInterrupt:
-		return [round(v) for v in context.current_solution]
+		return context.round()
 
 	solution = stack[-1]["children"][0]
 	solution[-1] = int_scale(solution[-1])
@@ -86,14 +85,13 @@ def _branch(branch_at, context: BranchingContext, grid):
 	children = []
 	x, y = context.get(branch_at)
 	for q in range(4):
-		if x.is_integer() and q % 2 == 1 or y.is_integer() and q > 1:
-			continue
 		xk = context.branch(x, y, branch_at, q)
-		if not context.check_constraints(xk, branch_at):
+		if xk is None:
 			continue
 
 		solution = pack(to_float(xk), context.constraints, context.fixed)
 		ok = solution.success and get_scale(solution.x) <= grid + GRID_ERROR
 		if ok:
 			children.append(solution.x)
+
 	return children

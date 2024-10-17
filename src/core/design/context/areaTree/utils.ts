@@ -7,7 +7,6 @@ import type { NodeId } from "shared/json/tree";
 import type { Comparator } from "shared/types/types";
 import type { TreeNode } from "../treeNode";
 
-const MIN_HIERARCHY_LEAVES = 5;
 const maxChildrenComparator: Comparator<AreaNode> = (a, b) => b.$children.$size - a.$children.$size;
 
 export interface ParentMap {
@@ -44,23 +43,33 @@ export function getArea(node: TreeNode, radius: number, useDimension: boolean): 
 }
 
 /**
- * Collect a {@link PartialTree} from a given root node,
- * until we have a tree with at least {@link MIN_HIERARCHY_LEAVES} leaves.
+ * Collect a {@link PartialTree} from a given root node.
  */
 export function collectPartialTree(root: AreaNode): PartialTree {
 	const result = [root];
 	const leafHeap = new BinaryHeap(maxChildrenComparator);
+	const leafSet = new Set<AreaNode>();
+	leafSet.add(root);
 	leafHeap.$insert(root);
-	while(leafHeap.$size < MIN_HIERARCHY_LEAVES && !leafHeap.$get()!.$isLeaf) {
+	while(!leafHeap.$isEmpty) {
 		const parent = leafHeap.$pop()!;
-		for(const child of parent.$children) {
-			leafHeap.$insert(child);
+		const children = [...parent.$children];
+		const leaves = children.filter(c => c.$isLeaf);
+		if(result.length > 1) {
+			// We stop if: all children are leaves, or there're at least 3 leaf children
+			if(leaves.length == children.length || leaves.length > 2) continue;
+		}
+		const addToHeap = leaves.length > 0;
+		leafSet.delete(parent);
+		for(const child of children) {
+			if(addToHeap) leafHeap.$insert(child);
+			leafSet.add(child);
 			result.push(child);
 		}
 	}
 	return {
 		nodes: result,
-		leaves: [...leafHeap],
+		leaves: [...leafSet],
 	};
 }
 

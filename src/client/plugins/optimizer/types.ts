@@ -49,6 +49,7 @@ interface OptimizerEventMap {
 	candidate: [number, number];
 	flap: number;
 	bh: [number, number, number];
+	int: [number, number];
 	greedy: [number, number];
 	fit: [number, number[]];
 }

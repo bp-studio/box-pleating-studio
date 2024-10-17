@@ -2,7 +2,6 @@ import math
 
 
 GRID_ERROR = 1e-4
-CONS_WEIGHT = 3  # This reduces constraint violations.
 
 
 def int_scale(s: float):

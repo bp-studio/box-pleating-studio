@@ -144,10 +144,19 @@ function makeInitialVector(flaps: JFlap[], sheet: JSheet): IPoint[] {
 
 /** Performs basic validity checks on the {@link OptimizerResult}. */
 function checkOptimizerResult(result: OptimizerResult, project: Project): void {
-	if(!result) throw new Error("Problem not feasible.");
+	if(!result) throw new Error("Optimizer fails to solve the layout.");
 	project.design.layout.$sheet.grid.$fixDimension(result); // Fix dimensions that are too small.
+
+	// The following shouldn't happen, but we safe-guard them here anyway.
+	if(
+		!Number.isInteger(result.width) ||
+		!Number.isInteger(result.height) ||
+		result.flaps.some(f => !Number.isInteger(f.x) || !Number.isInteger(f.y))
+	) {
+		throw new Error("Optimizer returns a non-integer result.");
+	}
 	if(result.width > MAX_SHEET_SIZE || result.height > MAX_SHEET_SIZE) {
-		throw new Error("Solution exceeds maximal sheet size."); // Just in case
+		throw new Error("Solution exceeds maximal sheet size.");
 	}
 }
 

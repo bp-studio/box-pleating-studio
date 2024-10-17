@@ -1,3 +1,4 @@
+# https://docs.astral.sh/ruff/settings/#format
 [tool.ruff]
 line-length = 130
 
@@ -5,6 +6,7 @@ line-length = 130
 quote-style = "double"
 indent-style = "tab"
 
+# https://docs.pytest.org/en/stable/reference/customize.html
 [tool.pytest.ini_options]
 testpaths = [
 	"src/client/plugins/optimizer/python/tests"

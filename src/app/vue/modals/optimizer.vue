@@ -45,31 +45,32 @@
 						</div>
 
 					</div>
-					<OptProgress v-else-if="state.stage == Stage.initializing" :state="state" :options="options"
-								 :value="state.minor" :max="100" noSkip @stop="stop">
-						Initializing ({{ state.minor.toFixed(1) }}%)...
+					<OptProgress v-else-if="state.stage == Stage.initializing" :value="state.minor"
+								 :max="hasTransformStream ? 100 : 1" noSkip>
+						Initializing<span v-if="hasTransformStream"> ({{ state.minor.toFixed(1) }}%)</span>...
 					</OptProgress>
-					<OptProgress v-else-if="state.stage == Stage.candidate" :state="state" :options="options" :value="state.minor"
-								 :max="state.major" @skip="skip" @stop="stop">
-						Generating candidate layouts...
+					<OptProgress v-else-if="state.stage == Stage.candidate" :value="state.minor" :max="state.major">
+						Generating candidate layouts ({{ (state.minor / state.major * 100).toFixed(1) }}%)...
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.continuous">
-						<OptProgress v-if="options.layout == 'random'" :state="state" :options="options"
-									 :value="(state.major - 1) * 50 + state.minor" :max="options.random * 50" @skip="skip"
-									 @stop="stop">
-							Trying random layout #{{ state.major }}, step {{ state.minor }} (Best size {{ state.best }})...
+						<OptProgress v-if="options.layout == 'random'" :value="(state.major - 1) * 50 + state.minor"
+									 :max="options.random * 50">
+							Trying random layout #{{ state.major }}, step {{ state.minor }}<span v-if="state.best < 8192"> (Best
+								size {{ state.best }})</span>...
 						</OptProgress>
-						<OptProgress v-else-if="options.useBH" :state="state" :options="options" :value="state.minor" :max="50"
-									 :noSkip="!hasSharedArrayBuffer" @skip="skip" @stop="stop">
-							Pre-solving, step {{ state.minor }} (Best size {{ state.best }})...
+						<OptProgress v-else-if="options.useBH" :value="state.minor" :max="50">
+							Pre-solving, step {{ state.minor }}<span v-if="state.best < 8192"> (Best size {{ state.best
+								}})</span>...
 						</OptProgress>
 						<div v-else>
 							Pre-solving...
 						</div>
 					</div>
-					<OptProgress v-else-if="state.stage == Stage.integral" :state="state" :options="options" :value="state.minor"
-								 :max="state.flaps" :noSkip="!hasSharedArrayBuffer" @skip="skip" @stop="stop">
-						Trying grid size {{ state.major }}...
+					<OptProgress v-else-if="state.stage == Stage.preInt" :value="state.minor" :max="200">
+						Pre-fitting ({{ (state.minor / 2).toFixed(1) }}%)...
+					</OptProgress>
+					<OptProgress v-else-if="state.stage == Stage.integral" :value="state.minor" :max="state.flaps">
+						Trying grid size {{ state.major }} ({{ state.minor }} / {{ state.flaps }})...
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.error" class="text-danger">
 						An error occurred: {{ state.error }}
@@ -102,15 +103,15 @@
 
 <script setup lang="ts">
 
-	import { reactive } from "vue";
+	import { provide, reactive } from "vue";
 
 	import Workspace from "app/services/workspaceService";
 	import useModal from "./modal";
 	import Number from "@/gadgets/form/number.vue";
-	import OptProgress from "./components/optProgress.vue";
+	import OptProgress, { contextKey } from "./components/optProgress.vue";
 	import Radio from "@/gadgets/form/radio.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
-	import { hasBigInt64Array, hasSharedArrayBuffer } from "app/shared/constants";
+	import { hasBigInt64Array } from "app/shared/constants";
 
 	import type { OptimizerOptions } from "client/plugins/optimizer";
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";
@@ -122,11 +123,13 @@
 		initializing,
 		candidate,
 		continuous,
+		preInt,
 		integral,
 		error,
 	};
 
 	const { el, show, hide } = useModal("Optimizer", { backdrop: "static" });
+	const hasTransformStream = typeof TransformStream != "undefined";
 
 	const state = reactive({
 		stage: Stage.stopped,
@@ -171,6 +174,10 @@
 				updateState(Stage.continuous);
 				[state.major, state.minor, state.best] = event.data;
 				break;
+			case "int":
+				updateState(Stage.preInt);
+				state.minor = event.data[0];
+				break;
 			case "fit": {
 				updateState(Stage.integral);
 				if(event.data[0] != state.major) {
@@ -198,15 +205,17 @@
 		state.stage = newState;
 	}
 
-	function skip(): void {
-		state.skipping = true;
-		handler("skip");
-	}
-
-	function stop(): void {
-		state.stopping = true;
-		handler("stop");
-	}
+	provide(contextKey, {
+		state,
+		skip(): void {
+			state.skipping = true;
+			handler("skip");
+		},
+		stop(): void {
+			state.stopping = true;
+			handler("stop");
+		},
+	});
 
 	async function run(): Promise<void> {
 		state.running = true;

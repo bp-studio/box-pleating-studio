@@ -33,13 +33,13 @@ def select_initial_scale(x, hierarchy: Hierarchy):
 	return x
 
 
-def check_constraints(x, n, fix, hierarchy: Hierarchy) -> bool:
+def check_constraints(x, n, fixed, hierarchy: Hierarchy) -> bool:
 	if not rect.check_bounds(x, n, hierarchy.flaps):
 		return False
 
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
-		if i == n and fix[j] or j == n and fix[i]:
+		if i == n and fixed[j] or j == n and fixed[i]:
 			if rounded.exact(x, i, j, dist, hierarchy.flaps) < 0:
 				return False
 	return True

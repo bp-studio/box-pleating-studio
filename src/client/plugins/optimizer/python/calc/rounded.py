@@ -1,6 +1,5 @@
 import numpy as np
 
-from . import CONS_WEIGHT
 from ..problem import Flap
 
 
@@ -18,10 +17,10 @@ def constraint(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> 
 	d = dist * s
 	dx = _interval_distance(x[i * 2], s * flaps[i].width, x[j * 2], s * flaps[j].width)
 	dy = _interval_distance(x[i * 2 + 1], s * flaps[i].height, x[j * 2 + 1], s * flaps[j].height)
-	return (dx * dx + dy * dy - d * d) * CONS_WEIGHT
+	return dx * dx + dy * dy - d * d
 
 
-def jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
+def _jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
 	"""Jacobian vector of constraint."""
 	vec: list[float] = [0] * len(x)
 	s = x[-1]
@@ -34,7 +33,7 @@ def jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
 	vec[i * 2 + 1] = 2 * dy
 	vec[j * 2 + 1] = -2 * dy
 	vec[-1] = 2 * dx * dx_s + 2 * dy * dy_s - 2 * dist * dist * s
-	return np.array(vec) * CONS_WEIGHT
+	return np.array(vec)
 
 
 def exact(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> int:
@@ -48,6 +47,6 @@ def make(i: int, j: int, dist: int, flaps: list[Flap]):
 	return {
 		"type": "ineq",
 		"fun": constraint,
-		"jac": jacobian,
+		"jac": _jacobian,
 		"args": [i, j, dist, flaps],
 	}

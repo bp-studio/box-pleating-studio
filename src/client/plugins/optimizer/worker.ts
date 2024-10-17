@@ -97,10 +97,16 @@ addEventListener("message", async event => {
 	if(data.command == "start") {
 		const optimizer = await optimizerPromise;
 		try {
+			/// #if DEBUG
+			console.log(JSON.stringify(data));
+			/// #endif
 			const response = optimizer.main(data);
 			const result = response?.toJs({
 				dict_converter: Object.fromEntries,
 			}) as OptimizerResult;
+			/// #if DEBUG
+			console.log(result);
+			/// #endif
 			postMessage({ result });
 		} catch(e) {
 			console.log(e);
