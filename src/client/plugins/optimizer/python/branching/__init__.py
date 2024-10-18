@@ -1,9 +1,9 @@
 import math
 import numpy as np
 
-from ..constraints import check_constraints
+from ..constraints import check_constraints, generate_constraints
 from ..problem import Hierarchy
-from ..calc import get_scale
+from ..calc import get_scale, fixed, int_scale
 
 
 def meg(x: float, y: float):
@@ -36,18 +36,33 @@ class BranchingContext:
 	def branch(self, x, y, i: int, q: int):
 		if x.is_integer() and q % 2 == 1 or y.is_integer() and q > 1:
 			return None
+		return self.make_xk(_branch(x, q & 1), _branch(y, q >> 1), i)
+
+	def make_xk(self, x, y, i: int):
+		if x < 0 or y < 0:
+			return None
 		xk = np.copy(self.solution)
-		xk[i * 2] = _branch(x, q & 1)
-		xk[i * 2 + 1] = _branch(y, q >> 1)
+		xk[i * 2] = x
+		xk[i * 2 + 1] = y
 		return xk if check_constraints(xk, i, self.fixed, self.hierarchy) else None
 
 	def round(self):
 		"""Used for interruption. Return the current progress regardlessly."""
-		return [round(v) for v in self.solution]
+		return [round(v) for v in self.solution[:-1]] + [int_scale(self.solution[-1])]
 
 	def to_grid(self, x: list[float], grid=None) -> list[float]:
 		grid = grid or get_scale(x)
 		return [coord for i, fix in enumerate(self.fixed) for coord in _to_grid_core(x, i, fix, grid)] + [grid]
+
+	def generate_constraints(self, solution):
+		"""
+		Generate a new set of constraints by the current fixing status.
+		Each fixed flap will contribute equality constraints for its coordinates,
+		and distance constraints between a pair of fixed flaps will be omitted.
+		"""
+		result = generate_constraints(self.hierarchy, self.fixed)
+		result.extend(fixed.make(i * 2 + j, solution[i * 2 + j]) for i, fix in enumerate(self.fixed) if fix for j in range(2))
+		return result
 
 
 def _convert_if_almost_integer(x: float):

@@ -98,7 +98,7 @@ addEventListener("message", async event => {
 		const optimizer = await optimizerPromise;
 		try {
 			/// #if DEBUG
-			console.log(JSON.stringify(data));
+			console.log(data);
 			/// #endif
 			const response = optimizer.main(data);
 			const result = response?.toJs({

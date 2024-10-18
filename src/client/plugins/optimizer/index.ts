@@ -111,7 +111,6 @@ function createOptimizerRequest(json: JProject, hierarchies: Hierarchy[], option
 		command: "start",
 		useBH: options.useBH,
 		layout: options.layout,
-		fit: options.fit,
 		random: options.random,
 		problem: {
 			type,

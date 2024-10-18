@@ -3,11 +3,9 @@ import signal
 
 from .heuristics import generate_candidate
 from .problem import Hierarchy, Problem
-from .calc import get_scale, int_scale
 from .constraints import MAX_SHEET_SIZE, generate_constraints, select_initial_scale
 from .solver import basin_hopping, pack, pack_int, solve_global
 from .branching.greedy import greedy_solve_integer
-from .branching.standard import solve_integer
 
 
 def abort_handler(_, __):
@@ -25,7 +23,6 @@ def convert_vector(vec, hierarchy: Hierarchy):
 
 def main(args):
 	data = args.to_py()
-	fit: str = data.get("fit")
 	problem = Problem(data.get("problem"))
 	hierarchy = problem.hierarchies[-1]
 	flap_count = len(hierarchy.flaps)
@@ -37,21 +34,7 @@ def main(args):
 			return None
 
 		# print(best_solution)
-		grid = int_scale(get_scale(best_solution))
-		if fit == "quick":
-			integer_solution = None
-			while integer_solution is None:
-				integer_solution = greedy_solve_integer(constraints, best_solution, grid, hierarchy)
-				grid += 1
-		else:
-			# best_solution = try_pack_int(best_solution, constraints)
-			# s = get_scale(best_solution)
-			# integer_solution = [round(v * s) for v in best_solution[:-1]] + [int_scale(s)]
-			integer_solution = None
-			while integer_solution is None:
-				integer_solution = solve_integer(constraints, best_solution, grid, hierarchy)
-				grid += 1
-
+		integer_solution = greedy_solve_integer(constraints, best_solution, hierarchy)
 		coordinates = integer_solution[0 : flap_count * 2]
 		grid = max(coordinates)
 		return {

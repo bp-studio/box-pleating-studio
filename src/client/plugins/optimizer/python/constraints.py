@@ -1,4 +1,6 @@
+import math
 from .calc import circle, rect, rounded, set_scale
+from .calc.infer import infer_scale
 from .problem import Hierarchy
 
 
@@ -7,12 +9,17 @@ MAX_SHEET_SIZE = 8192
 MAX_INIT_SCALE = 1024
 
 
-def generate_constraints(hierarchy: Hierarchy):
+def generate_constraints(hierarchy: Hierarchy, fixed=None):
 	cons = []
-	rect.add_bounds(cons, hierarchy.flaps)
+	rect.add_bounds(cons, hierarchy.flaps, fixed)
 
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
+
+		# Omit the constraint if both flaps are fixed.
+		if fixed and fixed[i] and fixed[j]:
+			continue
+
 		if hierarchy.flaps[i].has_dimension() or hierarchy.flaps[j].has_dimension():
 			cons.append(rounded.make(i, j, dist, hierarchy.flaps))
 		else:
@@ -22,14 +29,14 @@ def generate_constraints(hierarchy: Hierarchy):
 
 def select_initial_scale(x, hierarchy: Hierarchy):
 	grid = MIN_SHEET_SIZE
-	set_scale(x, grid)
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
-		while rounded.constraint(x, i, j, dist, hierarchy.flaps) < 0:
-			grid += 1
-			set_scale(x, grid)
-			if grid >= MAX_INIT_SCALE:
-				return x  # Proceed regardlessly
+		s = infer_scale(x, i, j, dist, hierarchy.flaps)
+		if s > MAX_INIT_SCALE:
+			grid = MAX_INIT_SCALE  # Proceed regardlessly
+			break
+		grid = max(math.ceil(s), grid)
+	set_scale(x, grid)
 	return x
 
 
@@ -40,6 +47,7 @@ def check_constraints(x, n, fixed, hierarchy: Hierarchy) -> bool:
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
 		if i == n and fixed[j] or j == n and fixed[i]:
+			# if fixed[i] and fixed[j]:
 			if rounded.exact(x, i, j, dist, hierarchy.flaps) < 0:
 				return False
 	return True

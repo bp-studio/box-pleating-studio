@@ -278,14 +278,9 @@
 			"layout": {
 				"_": "Phương pháp bố trí",
 				"view": "Sử dụng bố cục hiện tại làm tài liệu tham khảo",
-				"random": "Hãy thử bố cục ngẫu nhiên và sử dụng bố cục tốt nhất",
+				"random": "Hãy thử bố trí ngẫu nhiên",
 				"toTry": "Số lượng bố cục để thử:",
 				"useBH": "Cũng tìm kiếm các giải pháp gần đó"
-			},
-			"fit": {
-				"_": "Phương pháp lắp",
-				"quick": "Chế độ nhanh",
-				"full": "Chế độ đầy đủ"
 			},
 			"skip": "Nhảy",
 			"run": "Chạy!",

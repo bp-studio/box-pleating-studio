@@ -34,16 +34,6 @@
 								</div>
 							</div>
 						</div>
-						<div class="row mt-3 mt-sm-2">
-							<label class="col-12 col-sm-4 mb-2 fw-bolder" v-t="'plugin.optimizer.fit._'"></label>
-							<div class="col mb-2">
-								<Radio name="fit_mode" v-model="options.fit" value="quick"
-									   :label="$t('plugin.optimizer.fit.quick')" class="me-3" />
-								<Radio name="fit_mode" v-model="options.fit" value="full"
-									   :label="$t('plugin.optimizer.fit.full')" />
-							</div>
-						</div>
-
 					</div>
 					<OptProgress v-else-if="state.stage == Stage.initializing" :value="state.minor"
 								 :max="hasTransformStream ? 100 : 1" noSkip>
@@ -109,7 +99,6 @@
 	import useModal from "./modal";
 	import Number from "@/gadgets/form/number.vue";
 	import OptProgress, { contextKey } from "./components/optProgress.vue";
-	import Radio from "@/gadgets/form/radio.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
 	import { hasBigInt64Array } from "app/shared/constants";
 
@@ -147,7 +136,6 @@
 		openNew: true,
 		useDimension: true,
 		useBH: false,
-		fit: "quick",
 		random: 1,
 		callback,
 	});

@@ -2,13 +2,11 @@ import type { Hierarchy } from "core/design/context/areaTree/utils";
 import type { GridType, NodeId } from "shared/json";
 
 export type LayoutMode = "view" | "random";
-export type FittingMode = "quick" | "full";
 
 export interface OptimizerOptionsBase {
 	layout: LayoutMode;
 	/** Whether to use Basin-hopping in view-mode. */
 	useBH: boolean;
-	fit: FittingMode;
 	random: number;
 }
 

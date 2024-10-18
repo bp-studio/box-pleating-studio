@@ -18,8 +18,10 @@ def _jacobian(x: list[float], i: int, dim: int):
 	return np.array(vec)
 
 
-def add_bounds(cons, flaps: list[Flap]):
+def add_bounds(cons, flaps: list[Flap], fixed=None):
 	for i, flap in enumerate(flaps):
+		if fixed and fixed[i]:
+			continue
 		if flap.width != 0:
 			cons.append({"type": "ineq", "fun": _bound, "jac": _jacobian, "args": [i * 2, flap.width]})
 		if flap.height != 0:

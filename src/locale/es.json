@@ -278,14 +278,9 @@
 			"layout": {
 				"_": "Método de diseño",
 				"view": "Utilice el diseño actual como referencia",
-				"random": "Pruebe diseños aleatorios y utilice el mejor",
+				"random": "Pruebe diseños aleatorios",
 				"toTry": "Número de diseños para probar:",
 				"useBH": "Busque también soluciones cercanas"
-			},
-			"fit": {
-				"_": "Método de ajuste",
-				"quick": "modo rápido",
-				"full": "Modo completo"
 			},
 			"skip": "Saltar",
 			"run": "¡Ejecuta!",

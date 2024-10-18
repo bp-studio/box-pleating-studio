@@ -280,14 +280,9 @@ export default {"en": {
 			"layout": {
 				"_": _=>"Layout method",
 				"view": _=>"Use current layout as reference",
-				"random": _=>"Try random layouts and use the best one",
+				"random": _=>"Try random layouts",
 				"toTry": _=>"Number of layouts to try:",
 				"useBH": _=>"Also search nearby solutions"
-			},
-			"fit": {
-				"_": _=>"Fitting method",
-				"quick": _=>"Quick mode",
-				"full": _=>"Full mode"
 			},
 			"skip": _=>"Skip",
 			"run": _=>"Run!",
@@ -595,14 +590,9 @@ export default {"en": {
 			"layout": {
 				"_": _=>"Método de diseño",
 				"view": _=>"Utilice el diseño actual como referencia",
-				"random": _=>"Pruebe diseños aleatorios y utilice el mejor",
+				"random": _=>"Pruebe diseños aleatorios",
 				"toTry": _=>"Número de diseños para probar:",
 				"useBH": _=>"Busque también soluciones cercanas"
-			},
-			"fit": {
-				"_": _=>"Método de ajuste",
-				"quick": _=>"modo rápido",
-				"full": _=>"Modo completo"
 			},
 			"skip": _=>"Saltar",
 			"run": _=>"¡Ejecuta!",
@@ -909,15 +899,10 @@ export default {"en": {
 			},
 			"layout": {
 				"_": _=>"レイアウト方法",
-				"view": _=>"現在のレイアウトを参考として使用してください",
-				"random": _=>"ランダムなレイアウトを試して、最適なものを使用してください",
+				"view": _=>"現在のレイアウトを参考として使用して",
+				"random": _=>"ランダムなレイアウトを試して",
 				"toTry": _=>"試行するレイアウトの数:",
 				"useBH": _=>"近くのソリューションも検索します"
-			},
-			"fit": {
-				"_": _=>"はめ込み方法",
-				"quick": _=>"クイックモード",
-				"full": _=>"フルモード"
 			},
 			"skip": _=>"スキップ",
 			"run": _=>"実行して！",
@@ -1225,14 +1210,9 @@ export default {"en": {
 			"layout": {
 				"_": _=>"레이아웃 방법",
 				"view": _=>"현재 레이아웃을 참조로 사용합니다",
-				"random": _=>"임의의 레이아웃을 시도하고 가장 좋은 레이아웃을 사용하십시오",
+				"random": _=>"임의의 레이아웃을 사용해 보세요",
 				"toTry": _=>"시도할 레이아웃 수:",
 				"useBH": _=>"주변 솔루션도 검색해 보세요"
-			},
-			"fit": {
-				"_": _=>"피팅 방법",
-				"quick": _=>"빠른 모드",
-				"full": _=>"전체 모드"
 			},
 			"skip": _=>"건너뛰다",
 			"run": _=>"실행해!",
@@ -1540,14 +1520,9 @@ export default {"en": {
 			"layout": {
 				"_": _=>"Phương pháp bố trí",
 				"view": _=>"Sử dụng bố cục hiện tại làm tài liệu tham khảo",
-				"random": _=>"Hãy thử bố cục ngẫu nhiên và sử dụng bố cục tốt nhất",
+				"random": _=>"Hãy thử bố trí ngẫu nhiên",
 				"toTry": _=>"Số lượng bố cục để thử:",
 				"useBH": _=>"Cũng tìm kiếm các giải pháp gần đó"
-			},
-			"fit": {
-				"_": _=>"Phương pháp lắp",
-				"quick": _=>"Chế độ nhanh",
-				"full": _=>"Chế độ đầy đủ"
 			},
 			"skip": _=>"Nhảy",
 			"run": _=>"Chạy!",
@@ -1855,14 +1830,9 @@ export default {"en": {
 			"layout": {
 				"_": _=>"布局方法",
 				"view": _=>"使用当前布局作为参考",
-				"random": _=>"尝试随机布局并使用最好的布局",
+				"random": _=>"尝试随机布局",
 				"toTry": _=>"要尝试的布局数量：",
 				"useBH": _=>"搜索附近的解答"
-			},
-			"fit": {
-				"_": _=>"拟合方法",
-				"quick": _=>"快速模式",
-				"full": _=>"完整模式"
 			},
 			"skip": _=>"跳过",
 			"run": _=>"运行！",
@@ -2170,14 +2140,9 @@ export default {"en": {
 			"layout": {
 				"_": _=>"佈局方法",
 				"view": _=>"使用當前佈局作為參考",
-				"random": _=>"嘗試隨機佈局並使用最佳的佈局",
+				"random": _=>"嘗試隨機佈局",
 				"toTry": _=>"要嘗試的佈局數量：",
 				"useBH": _=>"搜尋附近的解答"
-			},
-			"fit": {
-				"_": _=>"擬合方法",
-				"quick": _=>"快速模式",
-				"full": _=>"完整模式"
 			},
 			"skip": _=>"跳過",
 			"run": _=>"執行！",
