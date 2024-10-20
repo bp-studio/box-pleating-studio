@@ -13,4 +13,4 @@ def get_scale(x: list[float]):
 
 
 def set_scale(x: list[float], s: float):
-	x[-1] = 1 / s
+	x[-1] = 1 / s  # Denoted as `m`

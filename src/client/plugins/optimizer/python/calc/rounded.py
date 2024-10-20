@@ -13,26 +13,26 @@ def _interval_distance(l1: float, w1: float, l2: float, w2: float) -> float:
 
 
 def constraint(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> float:
-	s = x[-1]
-	d = dist * s
-	dx = _interval_distance(x[i * 2], s * flaps[i].width, x[j * 2], s * flaps[j].width)
-	dy = _interval_distance(x[i * 2 + 1], s * flaps[i].height, x[j * 2 + 1], s * flaps[j].height)
+	m = x[-1]
+	d = dist * m
+	dx = _interval_distance(x[i * 2], m * flaps[i].width, x[j * 2], m * flaps[j].width)
+	dy = _interval_distance(x[i * 2 + 1], m * flaps[i].height, x[j * 2 + 1], m * flaps[j].height)
 	return dx * dx + dy * dy - d * d
 
 
 def _jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
 	"""Jacobian vector of constraint."""
 	vec: list[float] = [0] * len(x)
-	s = x[-1]
-	dx = _interval_distance(x[i * 2], s * flaps[i].width, x[j * 2], s * flaps[j].width)
-	dy = _interval_distance(x[i * 2 + 1], s * flaps[i].height, x[j * 2 + 1], s * flaps[j].height)
+	m = x[-1]
+	dx = _interval_distance(x[i * 2], m * flaps[i].width, x[j * 2], m * flaps[j].width)
+	dy = _interval_distance(x[i * 2 + 1], m * flaps[i].height, x[j * 2 + 1], m * flaps[j].height)
 	dx_s = -flaps[j].width if dx > 0 else flaps[i].width if dx < 0 else 0
 	dy_s = -flaps[j].height if dy > 0 else flaps[i].height if dy < 0 else 0
 	vec[i * 2] = 2 * dx
 	vec[j * 2] = -2 * dx
 	vec[i * 2 + 1] = 2 * dy
 	vec[j * 2 + 1] = -2 * dy
-	vec[-1] = 2 * dx * dx_s + 2 * dy * dy_s - 2 * dist * dist * s
+	vec[-1] = 2 * dx * dx_s + 2 * dy * dy_s - 2 * dist * dist * m
 	return np.array(vec)
 
 

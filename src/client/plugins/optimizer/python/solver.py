@@ -21,10 +21,10 @@ def objective(x):
 
 def int_objective(x):
 	"""Objective function with periodic penalty."""
-	s = x[-1]
+	m = x[-1]
 	# Using cos could seems like overkill here,
 	# but it converges better than naive alternatives such as offsets.
-	return -s * (np.sum(np.cos(np.pi * x[:-1] / s) ** 2) + 1)
+	return -m * (np.sum(np.cos(np.pi * x[:-1] / m) ** 2) + 1)
 
 
 def jacobian(x):

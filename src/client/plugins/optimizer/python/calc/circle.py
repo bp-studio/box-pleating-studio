@@ -3,9 +3,9 @@ import numpy as np
 
 def _constraint(x: list[float], i: int, j: int, dist: int) -> float:
 	"""
-	Corresponding to the formula `(x1 - x2)^2 + (y1 - y2)^2 >= (s d)^2`.
+	Corresponding to the formula `(x1 - x2)^2 + (y1 - y2)^2 >= (m d)^2`.
 
-	I've also tried moving s to left side of the inequality,
+	I've also tried moving m to left side of the inequality,
 	but the current version performs better (in terms of both the quality of the solutions,
 	and the basin-hopping stability) in practice.
 	"""
