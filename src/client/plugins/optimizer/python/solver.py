@@ -1,7 +1,9 @@
+from typing import Optional
+
 import numpy as np
 from scipy.optimize import minimize, basinhopping, OptimizeResult
 
-from .calc import get_scale, int_scale
+from .calc import ConstraintDict, get_scale, int_scale
 from .constraints import MIN_SHEET_SIZE, MAX_SHEET_SIZE
 
 
@@ -15,28 +17,20 @@ FLAP_BOUND = (0, 1)
 SCALE_BOUND = (1 / MAX_SHEET_SIZE, 1 / MIN_SHEET_SIZE)
 
 
-def objective(x):
+def objective(x: np.ndarray) -> float:
 	return -x[-1]
 
 
-def int_objective(x):
-	"""Objective function with periodic penalty."""
-	m = x[-1]
-	# Using cos could seems like overkill here,
-	# but it converges better than naive alternatives such as offsets.
-	return -m * (np.sum(np.cos(np.pi * x[:-1] / m) ** 2) + 1)
-
-
-def jacobian(x):
+def jacobian(x: np.ndarray) -> np.ndarray:
 	return np.array([0] * (len(x) - 1) + [-1])
 
 
-def pack(x0, cons, fix=None):
+def pack(x0, cons: list[ConstraintDict], fixed: Optional[list[bool]] = None) -> OptimizeResult:
 	"""Pack the flaps as continuous problem."""
 	flap_count = (len(x0) - 1) >> 1
-	bounds = []
+	bounds: list[tuple[float, float]] = []
 	for n in range(flap_count):
-		if (fix is not None) and fix[n]:
+		if fixed and fixed[n]:
 			x = x0[n * 2]
 			y = x0[n * 2 + 1]
 			bounds += [(x, x), (y, y)]
@@ -46,30 +40,8 @@ def pack(x0, cons, fix=None):
 	return minimize(objective, x0, bounds=bounds, constraints=cons, jac=jacobian, tol=TOL, options=MINIMIZE_OPTION)
 
 
-def pack_int(x0, cons):
-	"""
-	Pack the flaps using periodic penalty.
-	Note that the result guarantees neither the integrity of the coordinates nor the meeting of constraints.
-	Also, this is MUCH slower to run than the continuous packing.
-	"""
-	flap_count = (len(x0) - 1) >> 1
-	bounds = [FLAP_BOUND, FLAP_BOUND] * flap_count
-	bounds.append(SCALE_BOUND)
-	step = 0
-
-	def int_callback(xk):
-		nonlocal step
-		print(f'{{"event": "int", "data": [{step}, {get_scale(xk)}]}}')
-		step += 1
-
-	int_callback(x0)
-	# The Jacobian of the int_objective is a bit complicated,
-	# so for now we just use built-in numerical approximation for it.
-	return minimize(int_objective, x0, bounds=bounds, constraints=cons, tol=TOL, callback=int_callback, options=MINIMIZE_OPTION)
-
-
-def solve_global(initial_vectors: int, cons):
-	best_s = MAX_SHEET_SIZE
+def solve_global(initial_vectors: list[np.ndarray], cons: list[ConstraintDict]) -> Optional[OptimizeResult]:
+	best_s: float = MAX_SHEET_SIZE
 	best_result = None
 
 	trials = 0
@@ -90,7 +62,7 @@ def solve_global(initial_vectors: int, cons):
 	return best_result
 
 
-def basin_hopping(x0, cons, trials, best_s):
+def basin_hopping(x0: np.ndarray, cons: list[ConstraintDict], trials: int, best_s: float) -> OptimizeResult:
 	bounds = [FLAP_BOUND] * (len(x0) - 1) + [SCALE_BOUND]
 
 	best_temp_f = 0
@@ -102,6 +74,7 @@ def basin_hopping(x0, cons, trials, best_s):
 		if f < best_temp_f:
 			best_temp_f = f
 			best_temp_x = x
+		assert best_temp_x is not None
 		best = int_scale(min(best_s, get_scale(best_temp_x)))
 		print(f'{{"event": "bh", "data": [{trials}, {step}, {best}]}}')  # report progress
 		step += 1
@@ -113,9 +86,8 @@ def basin_hopping(x0, cons, trials, best_s):
 			interval=5,
 			niter=50,
 			niter_success=16,
-			stepsize=0.1,
+			stepsize=max(0.01, x0[-1] * 2),  # two grid size
 			T=0.01,
-			# disp=True,
 			callback=callback,
 			minimizer_kwargs={
 				"method": "SLSQP",

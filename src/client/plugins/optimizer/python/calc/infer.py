@@ -1,9 +1,9 @@
 import math
 
 from ..problem import Flap
+from . import Array
 
-
-def infer_scale(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> float:
+def infer_scale(x: Array, i: int, j: int, dist: int, flaps: list[Flap]) -> float:
 	"""Infer the minimal scale necessary for the distance constraint to be satisfied."""
 	x1, y1 = x[i * 2 : i * 2 + 2]
 	x2, y2 = x[j * 2 : j * 2 + 2]
@@ -23,7 +23,7 @@ def infer_scale(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) ->
 	return _solve_quadratic(dx, dy, w, h, dist)
 
 
-def _solve_quadratic(dx, dy, w, h, dist):
+def _solve_quadratic(dx: float, dy: float, w: int, h: int, dist: int) -> float:
 	"""
 	Solve quadratic equation to find the scale.
 	The equation is (s*dx-w)^2+(s*dy-h)^2 > dist^2.

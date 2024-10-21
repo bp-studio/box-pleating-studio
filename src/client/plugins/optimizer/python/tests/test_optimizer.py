@@ -1,4 +1,6 @@
+import numpy as np
 import pytest
+
 from ..calc.infer import infer_scale
 from ..branching.greedy import greedy_solve_integer, annulus
 from ..solver import pack
@@ -27,13 +29,13 @@ def test_optimizer():
 	)
 	hierarchy = problem.hierarchies[-1]
 	constraints = generate_constraints(hierarchy)
-	x0 = [0.3, 0.3, 0.4, 0.5, 0.5, 0.4, 0]
+	x0 = np.array([0.3, 0.3, 0.4, 0.5, 0.5, 0.4, 0])
 	select_initial_scale(x0, hierarchy)
 	assert get_scale(x0) == 85.0
 	result = pack(x0, constraints)
 	assert result.success
 	x = result.x
-	solution = greedy_solve_integer(constraints, x, hierarchy)
+	solution = greedy_solve_integer(x, hierarchy)
 	assert solution == pytest.approx([0, 0, 6, 15, 15, 7, 15])
 
 

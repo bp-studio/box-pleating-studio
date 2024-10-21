@@ -1,5 +1,7 @@
 import math
 import random
+from typing import Callable, cast
+
 import numpy as np
 
 from .calc import get_scale
@@ -8,8 +10,8 @@ from .constraints import generate_constraints, select_initial_scale
 from .problem import Circle, Hierarchy
 
 
-def generate_candidate(target: int, hierarchies: list[Hierarchy]):
-	vectors = []
+def generate_candidate(target: int, hierarchies: list[Hierarchy]) -> list[np.ndarray]:
+	vectors: list[np.ndarray] = []
 	try:
 		growth = target ** (1 / len(hierarchies))
 		num = growth
@@ -27,7 +29,7 @@ def generate_candidate(target: int, hierarchies: list[Hierarchy]):
 			context = GenerateContext(hierarchy, callback)
 			if len(vectors) == 0:
 				vectors = _generate_candidate(math.floor(num), context)
-			else:
+			elif last_hierarchy:
 				vectors = _generate_next_level(vectors, context, last_hierarchy, num, target)
 			last_hierarchy = hierarchy
 			num *= growth
@@ -39,20 +41,22 @@ def generate_candidate(target: int, hierarchies: list[Hierarchy]):
 
 
 class GenerateContext:
-	def __init__(self, hierarchy, callback):
+	def __init__(self, hierarchy: Hierarchy, callback: Callable):
 		self.hierarchy = hierarchy
 		self.constraints = generate_constraints(hierarchy)
 		self.callback = callback
 
 
-def _generate_next_level(vectors, context: GenerateContext, last_hierarchy: Hierarchy, num, target):
-	next_vec = []
+def _generate_next_level(
+	vectors: list[np.ndarray], context: GenerateContext, last_hierarchy: Hierarchy, num: float, target: int
+) -> list[np.ndarray]:
+	next_vec: list[np.ndarray] = []
 	num_per_vec = round(num / len(vectors))
 	for vec in vectors:
 		circles = _make_circles(vec, context.hierarchy, last_hierarchy)
 		n = min(num_per_vec, target - len(next_vec))
-		vec = _generate_candidate(n, context, circles)
-		next_vec.extend(vec)
+		candidates = _generate_candidate(n, context, circles)
+		next_vec.extend(candidates)
 	return next_vec
 
 
@@ -75,8 +79,8 @@ def _estimate_total(target: int, growth: float, rounds: int) -> int:
 	return total
 
 
-def _make_circles(vec, hierarchy: Hierarchy, last_hierarchy: Hierarchy):
-	circles = []
+def _make_circles(vec, hierarchy: Hierarchy, last_hierarchy: Hierarchy) -> list[Circle]:
+	circles: list[Circle] = []
 	for f in hierarchy.flaps:
 		parent = hierarchy.parent_map.get(f.id, None)
 		if parent is not None:
@@ -88,8 +92,8 @@ def _make_circles(vec, hierarchy: Hierarchy, last_hierarchy: Hierarchy):
 	return circles
 
 
-def _generate_candidate(target: int, context: GenerateContext, circles=None):
-	vectors = []
+def _generate_candidate(target: int, context: GenerateContext, circles=None) -> list[np.ndarray]:
+	vectors: list[np.ndarray] = []
 	while len(vectors) < target:
 		vec = _generate_random_candidate(context.hierarchy, circles)
 		result = pack(vec, context.constraints)
@@ -99,21 +103,21 @@ def _generate_candidate(target: int, context: GenerateContext, circles=None):
 	return vectors
 
 
-def _generate_random_candidate(hierarchy: Hierarchy, circles):
+def _generate_random_candidate(hierarchy: Hierarchy, circles) -> np.ndarray:
 	result = None
 	for _ in range(10):
 		if circles is None:
-			vec = np.random.rand(len(hierarchy.flaps) * 2 + 1)
+			vec: np.ndarray = np.random.rand(len(hierarchy.flaps) * 2 + 1)
 		else:
 			vec = np.array(_generate_in_circles(circles))
 		select_initial_scale(vec, hierarchy)
 		if result is None or get_scale(vec) < get_scale(result):
 			result = vec
-	return result
+	return cast(np.ndarray, result)
 
 
-def _generate_in_circles(circles: list[Circle]):
-	vec = []
+def _generate_in_circles(circles: list[Circle]) -> list[float]:
+	vec: list[float] = []
 	for c in circles:
 		if c.radius == 0:
 			vec += [c.x, c.y]

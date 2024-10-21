@@ -53,6 +53,7 @@
 		"mixins",
 		"mozfullscreenchange",
 		"mutsuntsai",
+		"ndarray",
 		"nocheck",
 		"notranslate",
 		"onbeforeinstallprompt",
@@ -99,24 +100,24 @@
 		"*.css": "$(capture).css.map",
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
-		".stylelintrc.json": ".stylelintignore",
-		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
 		".gitignore": ".gitattributes",
-		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
-		"Pipfile": "Pipfile.lock, pyproject.toml, .pylintrc",
-		"rsbuild.config.ts": "rsbuild.*.ts",
 		".mocharc.json": ".nycrc",
-		"README.md": "LICENSE.md, CONTRIBUTING.md"
+		".stylelintrc.json": ".stylelintignore",
+		"Pipfile": "Pipfile.lock, pyproject.toml, .pylintrc",
+		"README.md": "LICENSE.md, CONTRIBUTING.md",
+		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
+		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
+		"rsbuild.config.ts": "rsbuild.*.ts"
 	},
 	"files.exclude": {
-		"src/app/gen": true,
+		"**/__pycache__/": true,
 		"**/debug.log": true,
-		"test-results/": true,
+		".nyc_output": true,
+		".pytest_cache": true,
 		"node_modules/": true,
 		"patches/": true,
-		".nyc_output": true,
-		"**/__pycache__/": true,
-		".pytest_cache": true
+		"src/app/gen": true,
+		"test-results/": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"
@@ -138,6 +139,10 @@
 	],
 	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"mochaExplorer.multiFileSuites": true,
+	"mypy-type-checker.args": [
+		"--check-untyped-defs"
+	],
+	"python.testing.pytestEnabled": true,
 	"scss.validate": false,
 	"stylelint.packageManager": "pnpm",
 	"stylelint.validate": [
@@ -145,6 +150,5 @@
 		"scss",
 		"vue"
 	],
-	"typescript.tsdk": "node_modules\\typescript\\lib",
-	"python.testing.pytestEnabled": true
+	"typescript.tsdk": "node_modules\\typescript\\lib"
 }

@@ -1,4 +1,7 @@
 import math
+
+import numpy as np
+
 from ..solver import pack
 from ..problem import Hierarchy
 from ..calc import get_scale, int_scale
@@ -19,13 +22,13 @@ def _select_lower_left(context: BranchingContext) -> int:
 	return min_n
 
 
-def greedy_solve_integer(constraints, x0, hierarchy: Hierarchy):
+def greedy_solve_integer(x0: np.ndarray, hierarchy: Hierarchy) -> list[int]:
 	"""
 	For now this is the only reliable fitting algorithm I came up,
 	in the sense that it is guaranteed to find a valid fitting on grids for any circle packing.
 	For that reason, I currently do not provide alternative options for the users.
 	"""
-	context = BranchingContext(constraints, x0, hierarchy)
+	context = BranchingContext(x0, hierarchy)
 	depth = 0
 	try:
 		while depth < context.flap_count:
@@ -37,13 +40,13 @@ def greedy_solve_integer(constraints, x0, hierarchy: Hierarchy):
 			# print(("info", hierarchy.lookup[branch_at], context.solution[branch_at * 2 : branch_at * 2 + 2]))
 
 	except KeyboardInterrupt:
-		context.solution = context.round()
+		pass
 
-	return context.solution
+	return context.round()
 
 
-def _branch(branch_at, context: BranchingContext):
-	children = []
+def _branch(branch_at: int, context: BranchingContext) -> np.ndarray:
+	children: list[np.ndarray] = []
 	x, y = context.get(branch_at)
 
 	# Try branching towards the 4 closest grid points.
@@ -65,24 +68,26 @@ def _branch(branch_at, context: BranchingContext):
 	# In some cases, the flap to be branched could get stuck by fixed flaps,
 	# and none of the branch direction works.
 	# The best we can do then is to find the closest spot that does work and continue.
-	x, y = round(x), round(y)
+	rx, ry = round(x), round(y)
 	r = 1
 	while True:
-		for dx, dy in annulus(r):
-			xk = context.make_xk(x + dx, y + dy, branch_at)
+		pts = [(rx + dx, ry + dy) for dx, dy in annulus(r)]
+		pts.sort(key=lambda t: meg(t[0] - x, t[1] - y)) # sorted by the distance to the original point
+		for ox, oy in pts:
+			xk = context.make_xk(ox, oy, branch_at)
 			if xk is None:
 				continue
 			constraints = context.generate_constraints(xk)
 			solution = pack(to_float(xk), constraints)
 			if solution.success:
-				print(("Fallback", [x + dx, y + dy]))  # Print debug message
+				print(("Fallback", [ox, oy]))  # Print debug message
 				return solution.x
 		r += 1
 
 
-def annulus(r: int):
+def annulus(r: int) -> list[tuple[int, int]]:
 	"""
-	Returns all grid points of distance [r, r+1) from the origin, sorted by the distance.
+	Returns all grid points of distance [r, r+1) from the origin.
 	"""
 	result = []
 	for x in range(-r, r + 1):
@@ -92,5 +97,4 @@ def annulus(r: int):
 			result.append((x, y))
 			if y > 0:
 				result.append((x, -y))
-	result.sort(key=lambda t: meg(t[0], t[1]))
 	return result

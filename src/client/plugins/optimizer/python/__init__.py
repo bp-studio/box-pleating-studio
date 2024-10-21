@@ -1,10 +1,14 @@
 import sys
 import signal
+from typing import Optional, cast
 
+import numpy as np
+
+from .calc import ConstraintDict
 from .heuristics import generate_candidate
 from .problem import Hierarchy, Problem
 from .constraints import MAX_SHEET_SIZE, generate_constraints, select_initial_scale
-from .solver import basin_hopping, pack, pack_int, solve_global
+from .solver import basin_hopping, pack, solve_global
 from .branching.greedy import greedy_solve_integer
 
 
@@ -16,14 +20,14 @@ def abort_handler(_, __):
 signal.signal(signal.SIGABRT, abort_handler)
 
 
-def convert_vector(vec, hierarchy: Hierarchy):
-	vec = [coord for point in vec for coord in (point["x"], point["y"])] + [0]
+def convert_vector(vec, hierarchy: Hierarchy) -> np.ndarray:
+	vec = np.array([coord for point in vec for coord in (point["x"], point["y"])] + [0])
 	return select_initial_scale(vec, hierarchy)
 
 
-def main(args):
-	data = args.to_py()
-	problem = Problem(data.get("problem"))
+def main(args) -> Optional[dict]:
+	data: dict = args.to_py()
+	problem = Problem(cast(dict, data.get("problem")))
 	hierarchy = problem.hierarchies[-1]
 	flap_count = len(hierarchy.flaps)
 
@@ -34,7 +38,7 @@ def main(args):
 			return None
 
 		# print(best_solution)
-		integer_solution = greedy_solve_integer(constraints, best_solution, hierarchy)
+		integer_solution = greedy_solve_integer(best_solution, hierarchy)
 		coordinates = integer_solution[0 : flap_count * 2]
 		grid = max(coordinates)
 		return {
@@ -46,8 +50,8 @@ def main(args):
 		return None
 
 
-def pre_solve(data, problem, constraints):
-	layout: str = data.get("layout")
+def pre_solve(data: dict, problem: Problem, constraints: list[ConstraintDict]) -> Optional[np.ndarray]:
+	layout = cast(str, data.get("layout"))
 	hierarchy = problem.hierarchies[-1]
 
 	if layout == "view":
@@ -57,26 +61,13 @@ def pre_solve(data, problem, constraints):
 		else:
 			result = pack(x0, constraints)
 	else:
-		initial_vectors = generate_candidate(data.get("random"), problem.hierarchies)
+		random = cast(int, data.get("random"))
+		initial_vectors = generate_candidate(random, problem.hierarchies)
 		# print(initial_vectors)
 		result = solve_global(initial_vectors, constraints)
 
 	return None if result is None else result.x
 
 
-def try_pack_int(solution, constraints):
-	try:
-		int_result = pack_int(solution, constraints)
-		if int_result.success:
-			x = int_result.x
-			output = [round(v, 4) for v in (x[:-1] / x[-1]).tolist()]
-			print(f'{{"event": "log", "data": {output}}}')
-			return x
-		print('{"event": "log", "data": "int failed"}')
-		return solution
-	except KeyboardInterrupt:
-		return solution
-
-
-def get_error():
+def get_error() -> str:
 	return str(sys.last_value)

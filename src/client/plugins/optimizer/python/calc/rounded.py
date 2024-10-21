@@ -1,6 +1,7 @@
 import numpy as np
 
 from ..problem import Flap
+from . import ConstraintDict, Array
 
 
 def _interval_distance(l1: float, w1: float, l2: float, w2: float) -> float:
@@ -12,7 +13,7 @@ def _interval_distance(l1: float, w1: float, l2: float, w2: float) -> float:
 	return max(l1 - l2 - w2, 0) + min(l1 + w1 - l2, 0)
 
 
-def constraint(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> float:
+def constraint(x: Array, i: int, j: int, dist: int, flaps: list[Flap]) -> float:
 	m = x[-1]
 	d = dist * m
 	dx = _interval_distance(x[i * 2], m * flaps[i].width, x[j * 2], m * flaps[j].width)
@@ -20,7 +21,7 @@ def constraint(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> 
 	return dx * dx + dy * dy - d * d
 
 
-def _jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
+def _jacobian(x: Array, i: int, j: int, dist: int, flaps: list[Flap]) -> np.ndarray:
 	"""Jacobian vector of constraint."""
 	vec: list[float] = [0] * len(x)
 	m = x[-1]
@@ -36,14 +37,14 @@ def _jacobian(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]):
 	return np.array(vec)
 
 
-def exact(x: list[float], i: int, j: int, dist: int, flaps: list[Flap]) -> int:
+def exact(x: Array, i: int, j: int, dist: int, flaps: list[Flap]) -> float:
 	"""Like constraint, but without floating error."""
 	dx = _interval_distance(x[i * 2], flaps[i].width, x[j * 2], flaps[j].width)
 	dy = _interval_distance(x[i * 2 + 1], flaps[i].height, x[j * 2 + 1], flaps[j].height)
 	return dx * dx + dy * dy - dist * dist
 
 
-def make(i: int, j: int, dist: int, flaps: list[Flap]):
+def make(i: int, j: int, dist: int, flaps: list[Flap]) -> ConstraintDict:
 	return {
 		"type": "ineq",
 		"fun": constraint,

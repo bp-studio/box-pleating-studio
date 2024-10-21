@@ -1,5 +1,9 @@
 import math
-from .calc import circle, rect, rounded, set_scale
+from typing import Optional
+
+import numpy as np
+
+from .calc import ConstraintDict, circle, rect, rounded, set_scale
 from .calc.infer import infer_scale
 from .problem import Hierarchy
 
@@ -9,8 +13,8 @@ MAX_SHEET_SIZE = 8192
 MAX_INIT_SCALE = 1024
 
 
-def generate_constraints(hierarchy: Hierarchy, fixed=None):
-	cons = []
+def generate_constraints(hierarchy: Hierarchy, fixed: Optional[list[bool]] = None) -> list[ConstraintDict]:
+	cons: list[ConstraintDict] = []
 	rect.add_bounds(cons, hierarchy.flaps, fixed)
 
 	for entry in hierarchy.dist_map:
@@ -27,20 +31,20 @@ def generate_constraints(hierarchy: Hierarchy, fixed=None):
 	return cons
 
 
-def select_initial_scale(x, hierarchy: Hierarchy):
+def select_initial_scale(x0: np.ndarray, hierarchy: Hierarchy) -> np.ndarray:
 	grid = MIN_SHEET_SIZE
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
-		s = infer_scale(x, i, j, dist, hierarchy.flaps)
+		s = infer_scale(x0, i, j, dist, hierarchy.flaps)
 		if s > MAX_INIT_SCALE:
 			grid = MAX_INIT_SCALE  # Proceed regardlessly
 			break
 		grid = max(math.ceil(s), grid)
-	set_scale(x, grid)
-	return x
+	set_scale(x0, grid)
+	return x0
 
 
-def check_constraints(x, n, fixed, hierarchy: Hierarchy) -> bool:
+def check_constraints(x, n: int, fixed: list[bool], hierarchy: Hierarchy) -> bool:
 	if not rect.check_bounds(x, n, hierarchy.flaps):
 		return False
 

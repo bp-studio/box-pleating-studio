@@ -1,7 +1,9 @@
 import numpy as np
 
+from . import ConstraintDict, Array
 
-def _constraint(x: list[float], i: int, j: int, dist: int) -> float:
+
+def _constraint(x: Array, i: int, j: int, dist: int) -> float:
 	"""
 	Corresponding to the formula `(x1 - x2)^2 + (y1 - y2)^2 >= (m d)^2`.
 
@@ -15,7 +17,7 @@ def _constraint(x: list[float], i: int, j: int, dist: int) -> float:
 	return dx * dx + dy * dy - d * d
 
 
-def _jacobian(x: list[float], i: int, j: int, dist: int):
+def _jacobian(x: Array, i: int, j: int, dist: int) -> np.ndarray:
 	"""Jacobian vector of constraint."""
 	vec: list[float] = [0] * len(x)
 	dx = x[i * 2] - x[j * 2]
@@ -28,7 +30,7 @@ def _jacobian(x: list[float], i: int, j: int, dist: int):
 	return np.array(vec)
 
 
-def make(i: int, j: int, dist: int):
+def make(i: int, j: int, dist: int) -> ConstraintDict:
 	return {
 		"type": "ineq",
 		"fun": _constraint,

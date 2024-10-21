@@ -11,3 +11,8 @@ indent-style = "tab"
 testpaths = [
 	"src/client/plugins/optimizer/python/tests"
 ]
+
+# https://mypy.readthedocs.io/en/stable/config_file.html
+[[tool.mypy.overrides]]
+module = "scipy.*"
+ignore_missing_imports = true
