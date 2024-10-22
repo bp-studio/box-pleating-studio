@@ -1,7 +1,7 @@
 import math
 
-from ..problem import Flap
-from . import Array
+from . import Array, Flap
+
 
 def infer_scale(x: Array, i: int, j: int, dist: int, flaps: list[Flap]) -> float:
 	"""Infer the minimal scale necessary for the distance constraint to be satisfied."""

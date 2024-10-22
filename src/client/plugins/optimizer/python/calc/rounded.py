@@ -1,7 +1,6 @@
 import numpy as np
 
-from ..problem import Flap
-from . import ConstraintDict, Array
+from . import ConstraintDict, Array, Flap
 
 
 def _interval_distance(l1: float, w1: float, l2: float, w2: float) -> float:

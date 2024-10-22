@@ -1,15 +1,21 @@
 from typing import cast
 
+from .calc.diag import Diag
+from .calc.rect import Rect
+from .calc import Flap, Sheet
+
 
 class Problem:
 	def __init__(self, data: dict):
-		self.type = cast(str, data.get("type"))
-		self.hierarchies = [Hierarchy(h) for h in cast(list[dict], data.get("hierarchies"))]
+		sheet_type = cast(str, data.get("type"))
+		sheet = Rect() if sheet_type == "rect" else Diag()
+		self.hierarchies = [Hierarchy(h, sheet) for h in cast(list[dict], data.get("hierarchies"))]
 		self.hierarchies[-1].flaps = [Flap(f) for f in cast(list[dict], data.get("flaps"))]
 
 
 class Hierarchy:
-	def __init__(self, data: dict):
+	def __init__(self, data: dict, sheet: Sheet):
+		self.sheet = sheet
 		id_map: dict[int, int] = {}
 		id_lookup: dict[int, int] = {}
 		self.flaps: list[Flap] = []
@@ -44,16 +50,6 @@ class Parent:
 		self.id = cast(int, data.get("id"))
 		self.radius = cast(float, data.get("radius"))
 		self.children = cast(list[int], data.get("children"))
-
-
-class Flap:
-	def __init__(self, data: dict):
-		self.id = cast(int, data["id"])
-		self.width = cast(int, data["width"])
-		self.height = cast(int, data["height"])
-
-	def has_dimension(self) -> bool:
-		return self.height != 0 or self.width != 0
 
 
 class Circle:

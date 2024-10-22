@@ -4,7 +4,7 @@ import numpy as np
 
 from ..constraints import check_constraints, generate_constraints
 from ..problem import Hierarchy
-from ..calc import ConstraintDict, get_scale, fixed, int_scale, Array
+from ..calc import ConstraintDict, fixed, Array, get_scale
 
 
 def meg(x: float, y: float) -> float:
@@ -13,10 +13,6 @@ def meg(x: float, y: float) -> float:
 
 def _branch(x: float, direction: int) -> float:
 	return math.floor(x) if direction == 0 else math.ceil(x)
-
-
-def to_float(x: np.ndarray) -> np.ndarray:
-	return np.append(x[:-1], [1]) / x[-1]
 
 
 class BranchingContext:
@@ -39,20 +35,22 @@ class BranchingContext:
 		return self.make_xk(_branch(x, q & 1), _branch(y, q >> 1), i)
 
 	def make_xk(self, x: float, y: float, i: int) -> Optional[np.ndarray]:
-		if x < 0 or y < 0:
-			return None
 		xk = np.copy(self.solution)
 		xk[i * 2] = x
 		xk[i * 2 + 1] = y
 		return xk if check_constraints(xk, i, self.fixed, self.hierarchy) else None
 
-	def round(self) -> list[int]:
-		"""Used for interruption. Return the current progress regardlessly."""
-		return [round(v) for v in self.solution[:-1]] + [int_scale(self.solution[-1])]
+	def output(self) -> list[int]:
+		return self.hierarchy.sheet.output(self.solution)
 
 	def to_grid(self, x: Array) -> list[float]:
 		grid = get_scale(x)
-		return [coord for i, fix in enumerate(self.fixed) for coord in _to_grid_core(x, i, fix, grid)] + [grid]
+		offset = self.hierarchy.sheet.get_offset()
+		return [coord for i, fix in enumerate(self.fixed) for coord in _to_grid(x, i, offset, fix, grid)] + [grid]
+
+	def to_float(self, x: np.ndarray) -> np.ndarray:
+		coords = x[:-1] / x[-1] + self.hierarchy.sheet.get_offset()
+		return np.append(coords, [1 / x[-1]])
 
 	def generate_constraints(self, solution: np.ndarray) -> list[ConstraintDict]:
 		"""
@@ -61,7 +59,10 @@ class BranchingContext:
 		and distance constraints between a pair of fixed flaps will be omitted.
 		"""
 		result = generate_constraints(self.hierarchy, self.fixed)
-		result.extend(fixed.make(i * 2 + j, solution[i * 2 + j]) for i, fix in enumerate(self.fixed) if fix for j in range(2))
+		offset = self.hierarchy.sheet.get_offset()
+		result.extend(
+			fixed.make(i * 2 + j, solution[i * 2 + j], offset) for i, fix in enumerate(self.fixed) if fix for j in range(2)
+		)
 		return result
 
 
@@ -70,8 +71,8 @@ def _convert_if_almost_integer(x: float) -> float:
 	return float(rnd) if abs(x - rnd) < 1e-5 else x
 
 
-def _to_grid_core(x: Array, i: int, fix: bool, grid: float):
-	return (_round_if_fix(coord * grid, fix) for coord in x[i * 2 : i * 2 + 2])
+def _to_grid(x: Array, i: int, offset: float, fix: bool, grid: float):
+	return (_round_if_fix((coord - offset) * grid, fix) for coord in x[i * 2 : i * 2 + 2])
 
 
 def _round_if_fix(v: float, fix: bool):

@@ -5,7 +5,7 @@ import numpy as np
 from ..solver import pack
 from ..problem import Hierarchy
 from ..calc import get_scale, int_scale
-from . import BranchingContext, to_float, meg
+from . import BranchingContext, meg
 
 
 def _select_lower_left(context: BranchingContext) -> int:
@@ -42,7 +42,7 @@ def greedy_solve_integer(x0: np.ndarray, hierarchy: Hierarchy) -> list[int]:
 	except KeyboardInterrupt:
 		pass
 
-	return context.round()
+	return context.output()
 
 
 def _branch(branch_at: int, context: BranchingContext) -> np.ndarray:
@@ -55,7 +55,7 @@ def _branch(branch_at: int, context: BranchingContext) -> np.ndarray:
 		if xk is None:
 			continue
 		constraints = context.generate_constraints(xk)
-		solution = pack(to_float(xk), constraints)
+		solution = pack(context.to_float(xk), constraints)
 		if solution.success:
 			children.append(solution.x)
 
@@ -78,7 +78,7 @@ def _branch(branch_at: int, context: BranchingContext) -> np.ndarray:
 			if xk is None:
 				continue
 			constraints = context.generate_constraints(xk)
-			solution = pack(to_float(xk), constraints)
+			solution = pack(context.to_float(xk), constraints)
 			if solution.success:
 				print(("Fallback", [ox, oy]))  # Print debug message
 				return solution.x

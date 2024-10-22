@@ -3,7 +3,7 @@ from typing import Optional
 
 import numpy as np
 
-from .calc import ConstraintDict, circle, rect, rounded, set_scale
+from .calc import ConstraintDict, circle, rounded, set_scale
 from .calc.infer import infer_scale
 from .problem import Hierarchy
 
@@ -15,7 +15,7 @@ MAX_INIT_SCALE = 1024
 
 def generate_constraints(hierarchy: Hierarchy, fixed: Optional[list[bool]] = None) -> list[ConstraintDict]:
 	cons: list[ConstraintDict] = []
-	rect.add_bounds(cons, hierarchy.flaps, fixed)
+	hierarchy.sheet.add_bounds(cons, hierarchy.flaps, fixed)
 
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
@@ -45,7 +45,7 @@ def select_initial_scale(x0: np.ndarray, hierarchy: Hierarchy) -> np.ndarray:
 
 
 def check_constraints(x, n: int, fixed: list[bool], hierarchy: Hierarchy) -> bool:
-	if not rect.check_bounds(x, n, hierarchy.flaps):
+	if not hierarchy.sheet.check_bounds(x, n, hierarchy.flaps):
 		return False
 
 	for entry in hierarchy.dist_map:

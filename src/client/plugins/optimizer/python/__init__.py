@@ -29,7 +29,6 @@ def main(args) -> Optional[dict]:
 	data: dict = args.to_py()
 	problem = Problem(cast(dict, data.get("problem")))
 	hierarchy = problem.hierarchies[-1]
-	flap_count = len(hierarchy.flaps)
 
 	try:
 		constraints = generate_constraints(hierarchy)
@@ -39,12 +38,11 @@ def main(args) -> Optional[dict]:
 
 		# print(best_solution)
 		integer_solution = greedy_solve_integer(best_solution, hierarchy)
-		coordinates = integer_solution[0 : flap_count * 2]
-		grid = max(coordinates)
+		grid = integer_solution[-1]
 		return {
 			"width": grid,
 			"height": grid,
-			"flaps": hierarchy.restore(coordinates),
+			"flaps": hierarchy.restore(integer_solution[:-1]),
 		}
 	except StopAsyncIteration:
 		return None
