@@ -282,7 +282,7 @@ export default {"en": {
 				"view": _=>"Use current layout as reference",
 				"random": _=>"Try random layouts",
 				"toTry": _=>"Number of layouts to try:",
-				"useBH": _=>"Also search nearby solutions"
+				"useBH": _=>"Try variantions of the current layouts"
 			},
 			"skip": _=>"Skip",
 			"run": _=>"Run!",
@@ -592,7 +592,7 @@ export default {"en": {
 				"view": _=>"Utilice el diseño actual como referencia",
 				"random": _=>"Pruebe diseños aleatorios",
 				"toTry": _=>"Número de diseños para probar:",
-				"useBH": _=>"Busque también soluciones cercanas"
+				"useBH": _=>"Pruebe variantes de los diseños actuales."
 			},
 			"skip": _=>"Saltar",
 			"run": _=>"¡Ejecuta!",
@@ -902,7 +902,7 @@ export default {"en": {
 				"view": _=>"現在のレイアウトを参考として使用して",
 				"random": _=>"ランダムなレイアウトを試して",
 				"toTry": _=>"試行するレイアウトの数:",
-				"useBH": _=>"近くのソリューションも検索します"
+				"useBH": _=>"現在のレイアウトのバリエーションを試す"
 			},
 			"skip": _=>"スキップ",
 			"run": _=>"実行して！",
@@ -1212,7 +1212,7 @@ export default {"en": {
 				"view": _=>"현재 레이아웃을 참조로 사용합니다",
 				"random": _=>"임의의 레이아웃을 사용해 보세요",
 				"toTry": _=>"시도할 레이아웃 수:",
-				"useBH": _=>"주변 솔루션도 검색해 보세요"
+				"useBH": _=>"현재 레이아웃의 변형을 사용해 보세요"
 			},
 			"skip": _=>"건너뛰다",
 			"run": _=>"실행해!",
@@ -1522,7 +1522,7 @@ export default {"en": {
 				"view": _=>"Sử dụng bố cục hiện tại làm tài liệu tham khảo",
 				"random": _=>"Hãy thử bố trí ngẫu nhiên",
 				"toTry": _=>"Số lượng bố cục để thử:",
-				"useBH": _=>"Cũng tìm kiếm các giải pháp gần đó"
+				"useBH": _=>"Hãy thử các biến thể của bố cục hiện tại"
 			},
 			"skip": _=>"Nhảy",
 			"run": _=>"Chạy!",
@@ -1832,7 +1832,7 @@ export default {"en": {
 				"view": _=>"使用当前布局作为参考",
 				"random": _=>"尝试随机布局",
 				"toTry": _=>"要尝试的布局数量：",
-				"useBH": _=>"搜索附近的解答"
+				"useBH": _=>"尝试当前布局的变体"
 			},
 			"skip": _=>"跳过",
 			"run": _=>"运行！",
@@ -2142,7 +2142,7 @@ export default {"en": {
 				"view": _=>"使用當前佈局作為參考",
 				"random": _=>"嘗試隨機佈局",
 				"toTry": _=>"要嘗試的佈局數量：",
-				"useBH": _=>"搜尋附近的解答"
+				"useBH": _=>"嘗試當前佈局的變體"
 			},
 			"skip": _=>"跳過",
 			"run": _=>"執行！",

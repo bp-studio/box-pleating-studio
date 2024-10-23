@@ -76,7 +76,7 @@ def basin_hopping(x0: np.ndarray, cons: list[ConstraintDict], trials: int, best_
 			best_temp_x = x
 		assert best_temp_x is not None
 		best = int_scale(min(best_s, get_scale(best_temp_x)))
-		print(f'{{"event": "bh", "data": [{trials}, {step}, {best}]}}')  # report progress
+		print(f'{{"event": "cont", "data": [{trials}, {step}, {best}]}}')  # report progress
 		step += 1
 
 	try:

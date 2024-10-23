@@ -44,10 +44,9 @@ export type OptimizerEvent = {
 interface OptimizerEventMap {
 	handle: Consumer<OptimizerCommand>;
 	loading: number;
+	start: undefined;
 	candidate: [number, number];
 	flap: number;
-	bh: [number, number, number];
-	int: [number, number];
-	greedy: [number, number];
-	fit: [number, number[]];
+	cont: [number, number, number];
+	fit: [number, number];
 }

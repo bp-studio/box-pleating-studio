@@ -26,6 +26,7 @@ def convert_vector(vec, hierarchy: Hierarchy) -> np.ndarray:
 
 
 def main(args) -> Optional[dict]:
+	print('{"event": "start"}')
 	data: dict = args.to_py()
 	problem = Problem(cast(dict, data.get("problem")))
 	hierarchy = problem.hierarchies[-1]
@@ -57,6 +58,7 @@ def pre_solve(data: dict, problem: Problem, constraints: list[ConstraintDict]) -
 		if data.get("useBH"):
 			result = basin_hopping(x0, constraints, 1, MAX_SHEET_SIZE)
 		else:
+			print('{"event": "cont", "data": [0, 0, 0]}')
 			result = pack(x0, constraints)
 	else:
 		random = cast(int, data.get("random"))

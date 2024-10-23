@@ -6,7 +6,7 @@
 		</div>
 		<div class="row mt-3">
 			<div class="col col-form-label">
-				<ProgressBar :value="value + animate()" :max="max" />
+				<ProgressBar :value="value + animate()" :max="max" :percentage="percentage" />
 			</div>
 			<div class="col-auto">
 				<!--
@@ -51,6 +51,7 @@
 
 	const props = defineProps<{
 		noSkip?: boolean;
+		percentage?: boolean;
 		value: number;
 		max: number;
 	}>();

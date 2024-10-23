@@ -280,7 +280,7 @@
 				"view": "Utilice el diseño actual como referencia",
 				"random": "Pruebe diseños aleatorios",
 				"toTry": "Número de diseños para probar:",
-				"useBH": "Busque también soluciones cercanas"
+				"useBH": "Pruebe variantes de los diseños actuales."
 			},
 			"skip": "Saltar",
 			"run": "¡Ejecuta!",

@@ -32,7 +32,7 @@ def greedy_solve_integer(x0: np.ndarray, hierarchy: Hierarchy) -> list[int]:
 	depth = 0
 	try:
 		while depth < context.flap_count:
-			print(f'{{"event": "greedy", "data": [{int_scale(context.solution[-1])}, {depth}]}}')
+			print(f'{{"event": "fit", "data": [{int_scale(context.solution[-1])}, {depth}]}}')
 			branch_at = _select_lower_left(context)
 			context.fixed[branch_at] = True
 			context.solution = context.to_grid(_branch(branch_at, context))

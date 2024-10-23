@@ -280,7 +280,7 @@
 				"view": "Use current layout as reference",
 				"random": "Try random layouts",
 				"toTry": "Number of layouts to try:",
-				"useBH": "Also search nearby solutions"
+				"useBH": "Try variantions of the current layouts"
 			},
 			"skip": "Skip",
 			"run": "Run!",
