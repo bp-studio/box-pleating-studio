@@ -2,8 +2,11 @@
 	<div class="modal fade" ref="el">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
-				<div class="modal-header">
-					<div class="h4 modal-title" v-t="'plugin.optimizer._'"></div>
+				<div class="modal-header h4 d-flex">
+					<div class="modal-title flex-grow-1" v-t="'plugin.optimizer._'"></div>
+					<a class="text-info" href="https://bp-studio.github.io/manual.html#layout-optimization" target="_blank">
+						<i class="fa-regular fa-circle-question"></i>
+					</a>
 				</div>
 				<div class="modal-body" v-if="hasBigInt64Array">
 					<div v-if="state.stage == Stage.stopped">
