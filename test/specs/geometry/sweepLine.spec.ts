@@ -51,6 +51,9 @@ export default function() {
 		it("Detects if two polygon overlaps", function() {
 			const result = Overlap.$test(parsePath("(0,1),(2,1),(2,3),(0,3)"), parsePath("(1,0),(3,1),(3,2),(1,2)"));
 			expect(result).to.be.true;
+
+			const result2 = Overlap.$test(parsePath("(3,-1),(4,2),(6,3),(5,0)"), parsePath("(3,6),(15/2,15/2),(6,3),(0,0)"));
+			expect(result2).to.be.false;
 		});
 
 		/** v0.6.17, see {@link OverlapIntersector.$possibleIntersection}. */

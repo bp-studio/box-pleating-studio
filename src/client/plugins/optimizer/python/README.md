@@ -28,7 +28,9 @@ which are instances of the classical circle-river packing problem
 studied by Robert J. Lang and implemented in his [TreeMaker](https://langorigami.com/article/treemaker/) app.
 Essentially, the problem is about minimizing the sheet size while constraining the Euclidean
 distances between each pair of flaps to be at least the corresponding structural distances.
-We use the sequential least squares programming (SLSQP, a type of [SQP](https://en.wikipedia.org/wiki/Sequential_quadratic_programming) method) implemented in SciPy to solve such problems.
+We use the sequential least squares programming
+(SLSQP, a type of [SQP](https://en.wikipedia.org/wiki/Sequential_quadratic_programming) method)
+implemented in SciPy to solve such problems.
 The method starts with a given initial layout (discussed next) and improves the layout progressively,
 until it finds a solution that has no better alternatives nearby (i.e. local optima).
 
@@ -42,7 +44,8 @@ When we use the current layout as reference,
 using only SLSQP will typically result in a layout that has essentially the same arrangement,
 only packed as tightly as possible.
 To explore more possible arrangements, there is an option of "trying variations",
-and what it does is to use the [Basin-hopping algorithm](https://en.wikipedia.org/wiki/Basin-hopping) to find potentially better solutions.
+and what it does is to use the [Basin-hopping algorithm](https://en.wikipedia.org/wiki/Basin-hopping)
+to find potentially better solutions.
 Simply put, it tries to slightly "jiggle" the arrangement and run SLSQP again on the jiggled layout,
 repeating the process several times.
 This will take longer than a single round of SLSQP,
@@ -63,7 +66,8 @@ Also, Basin-hopping is automatically enabled in this mode.
 
 ## Fitting
 
-Discrete optimization typically uses [branch-and-bound](https://en.wikipedia.org/wiki/Branch_and_bound) algorithms to find integral solutions from a given non-integral solution.
+Discrete optimization typically uses [branch-and-bound](https://en.wikipedia.org/wiki/Branch_and_bound)
+algorithms to find integral solutions from a given non-integral solution.
 BP Studio Optimizer, on the other hand, uses a much simpler "greedy algorithm" approach,
 which is a lot faster but could potentially lead to larger sheet sizes.
 Basically, it chooses a center of origin (which is the lower left corner for square sheets and the center point for diagonal sheets),

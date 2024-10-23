@@ -113,14 +113,15 @@ export class Gadget implements JGadget {
 	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
 	 */
 	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): void {
-		let c1 = this.$contour;
 		const c2 = g.$contour;
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
 		const slack = new Fraction(this._getSlack(q1));
 		const v = g.$anchorMap[q2][0].$sub(Point.ZERO).$add(step.$scale(slack));
 
-		c1 = shift(c1, q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap[2][0])));
+		const c0_shift = q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap[2][0]));
+		const c0 = shift(this.$contour, c0_shift); // We keep this for debugging
+		let c1 = c0;
 
 		// Perform collision tests.
 		// Be careful! We must ensure that the contours are simple here!

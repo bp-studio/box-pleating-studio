@@ -37,14 +37,16 @@ export class GeneralIntersector extends Intersector {
 		} else {
 			// Crossing case
 			const pt: IPoint = { x: detBC / detAB, y: (a2 * c1 - a1 * c2) / detAB };
-			if(seg1.$containsPtOnLine(pt, false) && seg2.$containsPtOnLine(pt, true)) this._crossSubdivide(ev1, pt);
-			if(seg2.$containsPtOnLine(pt, false) && seg1.$containsPtOnLine(pt, true)) this._crossSubdivide(ev2, pt);
+			this._crossIntersection(ev1, ev2, pt);
 		}
 	}
 
 	/** This method is overwritten in {@link OverlapIntersector}. */
-	protected _crossSubdivide(event: StartEvent, point: IPoint): void {
-		this._subdivide(event, point);
+	protected _crossIntersection(ev1: StartEvent, ev2: StartEvent, pt: IPoint): void {
+		const seg1 = ev1.$segment as LineSegment;
+		const seg2 = ev2.$segment as LineSegment;
+		if(seg1.$containsPtOnLine(pt, false) && seg2.$containsPtOnLine(pt, true)) this._subdivide(ev1, pt);
+		if(seg2.$containsPtOnLine(pt, false) && seg1.$containsPtOnLine(pt, true)) this._subdivide(ev2, pt);
 	}
 
 	protected override _subdivide(event: StartEvent, point: IPoint): StartEvent {
