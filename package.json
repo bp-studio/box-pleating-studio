@@ -29,6 +29,7 @@
 		"lint:inspect": "pnpx @eslint/config-inspector@latest",
 		"postinstall": "playwright install --with-deps",
 		"preview": "rsbuild preview --port 30784 -o",
+		"scss:migrate": "pnpx sass-migrator module --migrate-deps src/app/style/main.scss",
 		"start": "rsbuild dev",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"test": "mocha --require mocha-suppress-logs"
