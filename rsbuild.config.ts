@@ -149,7 +149,7 @@ export default defineConfig({
 		pluginSass({
 			sassLoaderOptions: {
 				sassOptions: {
-					silenceDeprecations: ["mixed-decls", "color-functions"],
+					silenceDeprecations: ["mixed-decls", "color-functions", "import"],
 				},
 			},
 		}),
