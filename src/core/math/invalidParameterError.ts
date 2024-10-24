@@ -11,7 +11,7 @@ export class InvalidParameterError extends Error {
 	constructor() {
 		super("Parameters are not valid");
 		/// #if DEBUG
-		debugger;
+		if(!("expect" in globalThis)) debugger;
 		/// #endif
 	}
 }
