@@ -14,6 +14,9 @@ import type { JJunctions, JOverlap, JQuadrilateral, JRepository, JStretch, NodeI
 import type { Configuration } from "./configuration";
 import type { ValidJunction, Junctions, getStructureSignature } from "./junction/validJunction";
 import type { Stretch } from "./stretch";
+import type { processNode } from "../tasks/patternContour";
+
+type OppositeMap = Record<NodeId, NodeId[]>;
 
 //=================================================================
 /**
@@ -43,6 +46,14 @@ export class Repository implements ISerializable<JRepository | undefined> {
 
 	public readonly $junctions: JJunctions;
 
+	/**
+	 * Mapping each flap id to those flap ids that are immediately opposing it.
+	 * Used for speeding up the processing of pattern contours in raw mode.
+	 * @see {@link processNode}
+	 * @since 20241024
+	 */
+	public readonly $oppositeMap: Readonly<OppositeMap>;
+
 	/** Whether the structure of this {@link Repository} makes sense. See {@link _checkValidity}(). */
 	public readonly $isValid: boolean;
 
@@ -71,9 +82,10 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		this.$f = junctions[0].$f;
 		this.$origin = new Point(junctions[0].$tip);
 
-		const { map, directional } = createQuadrants(junctions);
+		const { map, directional, oppositeMap } = createQuadrants(junctions);
 		this.$quadrants = map;
 		this.$directionalQuadrants = directional;
+		this.$oppositeMap = oppositeMap;
 		this.$nodeSet = new NodeSet(junctions, map);
 
 		State.$newRepositories.add(this);
@@ -156,7 +168,7 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	}
 
 	/** Create (or reuse) a {@link Joiner} by the {@link JOverlap}s. */
-	public getJoiner(overlaps: readonly JOverlap[]): Joiner {
+	public $getJoiner(overlaps: readonly JOverlap[]): Joiner {
 		const key = JSON.stringify(overlaps);
 		let j = this._joinerCache.get(key);
 		if(!j) this._joinerCache.set(key, j = new Joiner(overlaps, this));
@@ -184,12 +196,18 @@ export class Repository implements ISerializable<JRepository | undefined> {
 
 interface CreateQuadrantResult {
 	readonly map: ReadonlyMap<QuadrantCode, Quadrant>;
+	readonly oppositeMap: Readonly<OppositeMap>;
 	readonly directional: PerQuadrant<Quadrant[]>;
 }
 
 function createQuadrants(junctions: Junctions): CreateQuadrantResult {
+	const oppositeMap: OppositeMap = {};
 	const quadrantCodes = new Map<QuadrantCode, ValidJunction[]>();
+
 	for(const j of junctions) {
+		const a = j.$a.id, b = j.$b.id;
+		(oppositeMap[a] ||= []).push(b);
+		(oppositeMap[b] ||= []).push(a);
 		getOrSetEmptyArray(quadrantCodes, j.$q1).push(j);
 		getOrSetEmptyArray(quadrantCodes, j.$q2).push(j);
 	}
@@ -205,5 +223,5 @@ function createQuadrants(junctions: Junctions): CreateQuadrantResult {
 		directional[q].sort(minQuadrantWeightComparator);
 	}
 
-	return { map, directional };
+	return { map, directional, oppositeMap };
 }

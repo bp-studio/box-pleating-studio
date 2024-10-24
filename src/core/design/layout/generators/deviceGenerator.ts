@@ -31,7 +31,7 @@ export function* deviceGenerator(data: JPartition, config: Configuration): Gener
 			}
 		}
 	} else if(overlaps.length == 2) {
-		const joiner = config.$repo.getJoiner(overlaps);
+		const joiner = config.$repo.$getJoiner(overlaps);
 		if(strategy == Strategy.standardJoin) yield* joiner.$standardJoin();
 		else if(strategy == Strategy.baseJoin) yield* joiner.$baseJoin();
 		else yield* joiner.$simpleJoin(strategy);

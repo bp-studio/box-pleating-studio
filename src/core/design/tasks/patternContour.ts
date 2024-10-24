@@ -78,14 +78,22 @@ function patternContour(): void {
 	}
 }
 
-function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants: Quadrant[]): void {
+export function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants: Quadrant[]): void {
 	const multiContour = node.$graphics.$traceContours.length > 1;
+	const oppositeMap = trace.$repo.$oppositeMap;
 	for(const [index, traceContour] of node.$graphics.$traceContours.entries()) {
+		const traceLeaves = new Set(traceContour.$leaves);
 		for(const outer of traceContour.$outer) {
 			const leaves = outer.leaves ? outer.leaves.filter(l => trace.$leaves.has(l)) : traceContour.$leaves;
 
-			// Exclude irrelevant path in raw mode
-			if(traceContour.$raw && leaves.length == 0) continue;
+			if(traceContour.$raw) {
+				// In raw mode, if, for all leaves L in a raw component,
+				// all other leaves opposing L in the repo are in fact also contained inside this trace contour,
+				// then there is no need to process this component,
+				// since the resulting contour cannot possibly effect the trace contour anyway.
+				// Notice that this condition also exclude irrelevant paths (i.e. when `leaves` is empty).
+				if(leaves.every(l => oppositeMap[l].every(o => traceLeaves.has(o)))) continue;
+			}
 
 			// Create start/end map
 			const quadrants = coveredQuadrants
