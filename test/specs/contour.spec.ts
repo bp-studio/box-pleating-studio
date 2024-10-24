@@ -24,6 +24,16 @@ describe("Contour", function() {
 			expect(contour.$ids).to.eql([0, 1, 2, 4, 5], "Ids are updated");
 		});
 
+		it("Fixes pattern contour tail in raw mode", function() {
+			parseTree(
+				"(13,15,1),(13,0,3),(13,16,1),(15,14,1),(0,8,10),(0,19,3),(14,1,1)",
+				"(19,13,12,0,0),(16,18,7,0,0),(1,22,5,0,0),(8,5,1,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			const outer = result.graphics["re0,13"].contours[0].outer;
+			expect(outer).to.equalPath("(19,18),(7,18),(7,14),(-8,14),(-8,-12),(18,-12),(18,6),(17.5,6),(17,20/3),(17,7.5),(53/3,8),(19,8)");
+		});
+
 	});
 
 	describe("Trace contour", function() {

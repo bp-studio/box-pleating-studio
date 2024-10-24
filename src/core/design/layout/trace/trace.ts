@@ -76,16 +76,44 @@ export class Trace {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * In raw mode, we need to make one extra check to make sure the
+	 * In raw mode, we need to make some extra checks to make sure the
 	 * generated contour actually fits the given hinge segment.
 	 */
 	private static _rawModeFinalCheck(result: PatternContour | null, hinges: Path): PatternContour | null {
 		if(!result) return null;
+
+		// First we quickly check if the last point is on the hinges.
+		const hingeLines: Line[] = [];
 		const lastPoint = result[result.length - 1];
 		for(let i = hinges.length - 1; i > 0; i--) {
 			const line = Line.$fromIPoint(hinges[i], hinges[i - 1]);
+			hingeLines.push(line);
 			if(line.$contains(lastPoint, true)) return result;
 		}
+
+		// Otherwise, try to find the intersection of the last pattern segment (as ray) with the hinges.
+		for(let i = result.length - 1; i > 0; i--) {
+			const last = result[i];
+			const prev = result[i - 1];
+			const vec = last.$sub(prev);
+
+			// If the segment is not orthogonal, we're out of luck.
+			if(vec.x != 0 && vec.y != 0) break;
+
+			result.pop();
+			for(const hinge of hingeLines) {
+				const intersection = hinge.$intersection(prev, vec, true);
+				if(intersection) {
+					result.push(intersection);
+					return result;
+				}
+			}
+		}
+
+		/// #if DEBUG
+		/* istanbul ignore next: debug */
+		debugger; // Not supposed to get here in theory
+		/// #endif
 		return null;
 	}
 
