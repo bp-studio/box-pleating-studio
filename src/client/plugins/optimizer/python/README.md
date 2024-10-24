@@ -3,8 +3,9 @@
 The BP Studio Optimizer is written in Python and running in the web page using [Pyodide](https://pyodide.org/).
 As much as I wish to write the optimizer using languages like C/C++ or Rust,
 I haven't had much luck in compiling the optimization libraries for those languages into WebAssembly yet.
-Using Python + Pyodide certainly adds some overhead in both loading and running the program,
-but I believe that the runtime overhead is insignificant compared to core solving routine
+Using Python + Pyodide certainly adds some overhead in both loading
+(requires downloading 69MB of packages) and running the program,
+but I believe that the runtime overhead is insignificant compared to the core solving routine
 and the performance should already be as good as one can hope for with any WebAssembly solvers.
 
 The idea of using the [SciPy](https://scipy.org/) package of Python as optimizer was originally

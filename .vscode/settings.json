@@ -112,8 +112,10 @@
 	"files.exclude": {
 		"**/__pycache__/": true,
 		"**/debug.log": true,
+		".mypy_cache": true,
 		".nyc_output": true,
 		".pytest_cache": true,
+		"coverage": true,
 		"node_modules/": true,
 		"patches/": true,
 		"src/app/gen": true,

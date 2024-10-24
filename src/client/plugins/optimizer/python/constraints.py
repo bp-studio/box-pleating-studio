@@ -51,7 +51,6 @@ def check_constraints(x, n: int, fixed: list[bool], hierarchy: Hierarchy) -> boo
 	for entry in hierarchy.dist_map:
 		[i, j, dist] = entry
 		if i == n and fixed[j] or j == n and fixed[i]:
-			# if fixed[i] and fixed[j]:
 			if rounded.exact(x, i, j, dist, hierarchy.flaps) < 0:
 				return False
 	return True

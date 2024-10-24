@@ -19,7 +19,7 @@
 	"scripts": {
 		"build": "rsbuild build",
 		"cov": "nyc -r lcovonly -r text-summary mocha --require mocha-suppress-logs",
-		"cov:html": "nyc -r lcov mocha --require mocha-suppress-logs",
+		"cov:html": "nyc -r lcov mocha --require mocha-suppress-logs && pnpx open-cli coverage/lcov-report/index.html",
 		"cov:text": "nyc -r lcovonly -r text mocha --require mocha-suppress-logs",
 		"e2e": "playwright test",
 		"prebuild": "gulp",

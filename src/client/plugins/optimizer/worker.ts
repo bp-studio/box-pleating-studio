@@ -31,7 +31,6 @@ if(typeof TransformStream != "undefined") {
 
 	// Hack fetch
 	globalThis.fetch = async url => {
-		// console.log("Worker fetch", url);
 		const response = await fetchOriginal(url);
 		const ts = new TransformStream({
 			transform(chunk, ctrl) {
@@ -43,6 +42,8 @@ if(typeof TransformStream != "undefined") {
 	};
 }
 
+// In general we shouldn't update Pyodide unless there's a strong reason,
+// such as fixing of critical bugs.
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js");
 
 interface Optimizer {
@@ -70,16 +71,18 @@ async function initPyodide(): Promise<PyodideInterface> {
 		loadPyodide({ stdout }),
 		loadArchive(),
 	]);
-	await pyodide.loadPackage("scipy");
-	pyodide.unpackArchive(buffer, "zip");
-	// console.log(pyodide.FS.readdir("optimizer"));
+	const pkg = pyodide.loadPackage("scipy");
+	pyodide.unpackArchive(buffer, "zip"); // We can unpack while downloading packages
+	await pkg;
 	return pyodide;
 }
 
 async function initOptimizer(): Promise<Optimizer> {
 	const pyodide = await pyodidePromise;
-	const optimizer: Optimizer = await pyodide.pyimport("optimizer");
+	const optimizer: Optimizer = pyodide.pyimport("optimizer");
+	/// #if DEBUG
 	console.log("Total loaded bytes: " + bytesLoaded);
+	/// #endif
 	postMessage({ event: "loading", data: HUNDRED });
 	return optimizer;
 }
@@ -92,7 +95,9 @@ addEventListener("message", async event => {
 	if(data.command == "buffer") {
 		const pyodide = await pyodidePromise;
 		pyodide.setInterruptBuffer(data.buffer!);
+		/// #if DEBUG
 		console.log("InterruptBuffer ready");
+		/// #endif
 	}
 	if(data.command == "start") {
 		try {
