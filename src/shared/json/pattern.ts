@@ -1,4 +1,8 @@
 import type { Path } from "shared/types/geometry";
+import type { Repository } from "core/design/layout/repository";
+import type { Gadget } from "core/design/layout/pattern/gadget";
+import type { AddOn } from "core/design/layout/pattern/addOn";
+import type { Pattern } from "core/design/layout/pattern/pattern";
 import type { Strategy } from "./enum";
 import type { JOverlap, JQuadrilateral } from "./layout";
 
@@ -92,6 +96,13 @@ export interface JGadget {
 	anchors?: JAnchor[];
 }
 
+/**
+ * An anchor point is a corner on a {@link Gadget} that connects to an outer ridge
+ * (possibly degenerated). Usually it is one of the original corners
+ * of the gadget, but for joined gadgets it could be a corner of an {@link AddOn}
+ * (as in the case of general joins), or a corner of another gadget
+ * (as in the case of relay joins).
+ */
 export interface JAnchor {
 	/**
 	 * The slack that needs to be kept when connecting.

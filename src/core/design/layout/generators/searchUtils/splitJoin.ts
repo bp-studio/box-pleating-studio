@@ -8,7 +8,7 @@ import type { JPartition } from "shared/json/pattern";
 import type { Configuration } from "../../configuration";
 import type { JOverlap, OverlapId } from "shared/json/layout";
 
-interface SplitItem {
+export interface SplitItem {
 	/** The {@link JOverlap} to be joined. */
 	readonly overlap: JOverlap;
 

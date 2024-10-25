@@ -7,6 +7,7 @@ import { Direction, getNodeId, getQuadrant, makeQuadrantCode, nextQuadrantOffset
 import { searchRelay } from "./searchUtils/relay";
 import { cover, getExposedPart, toSplitItems } from "./searchUtils/splitJoin";
 
+import type { SplitItem } from "./searchUtils/splitJoin";
 import type { JointItem } from "./searchUtils/types";
 import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { Configuration } from "../configuration";
@@ -27,6 +28,9 @@ interface Joint {
 	q: QuadrantDirection;
 	items: readonly JointItem[];
 	max: number;
+
+	/** Cache for the {@link SplitItem}s. */
+	splitItems?: SplitItem[][];
 }
 
 //=================================================================
@@ -193,10 +197,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	}
 
 	private *_searchSplitJoin(joint: Joint, rank: number): Generator<Configuration> {
-		const items1 = toSplitItems(joint.items[0], joint.nodeId);
-		const items2 = toSplitItems(joint.items[1], joint.nodeId);
-		for(const item1 of items1) {
-			for(const item2 of items2) {
+		joint.splitItems ||= joint.items.map(i => toSplitItems(i, joint.nodeId));
+		for(const item1 of joint.splitItems[0]) {
+			for(const item2 of joint.splitItems[1]) {
 				// This is not supported for the moment, so we skip it for now.
 				// TODO: But this is doable in theory. Try to implement this.
 				if(item1.split?.isHorizontal == item2.split?.isHorizontal) continue;

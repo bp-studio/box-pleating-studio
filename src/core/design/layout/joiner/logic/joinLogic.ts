@@ -50,6 +50,11 @@ const EXTRA_SIZE_WEIGHT = 10;
 export abstract class JoinLogic {
 
 	protected readonly joiner: Joiner;
+
+	/**
+	 * The critical parameters used for joining.
+	 * Absence of this object implies that the joining is infeasible.
+	 */
 	protected data!: JoinData;
 
 	readonly j1!: Joinee;
@@ -57,15 +62,15 @@ export abstract class JoinLogic {
 	readonly f!: Sign;
 
 	constructor(joiner: Joiner, p1: Piece, p2: Piece) {
-		const { $oriented, s1, s2, q1, q2 } = this.joiner = joiner;
+		const { $oriented, s1, s2, q1, q2, w1, w2 } = this.joiner = joiner;
 		let size = p1.sx + p2.sx;
 
 		const builder1 = new JoineeBuilder(p1, q1, joiner);
 		const builder2 = new JoineeBuilder(p2, q2, joiner);
 
 		// Calculate the starting point of relay join
-		if(s1) size += builder1.$setup(builder2, 1, s1);
-		if(s2) size += builder2.$setup(builder1, -1, s2);
+		if(s1) size += builder1.$setup(builder2, 1, s1, w1);
+		if(s2) size += builder2.$setup(builder1, -1, s2, w2);
 		if(isNaN(size)) return;
 
 		let offset: IPoint | undefined;

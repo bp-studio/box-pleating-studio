@@ -1,6 +1,6 @@
 import { LayoutController } from "core/controller/layoutController";
 import twoFlapSpec from "./twoFlap.spec";
-import { id2, parseTree } from "@utils/tree";
+import { exportProject, id2, parseTree } from "@utils/tree";
 import threeFlapSpec from "./threeFlap.spec";
 import { UpdateResult } from "core/service/updateResult";
 import { State, fullReset } from "core/service/state";

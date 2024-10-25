@@ -7,7 +7,7 @@ import { State, fullReset } from "core/service/state";
 import { Migration } from "client/patches";
 
 import type { TreeNode } from "core/design/context/treeNode";
-import type { JEdge, JFlap, NodeId } from "shared/json";
+import type { JEdge, JFlap, JProject, NodeId } from "shared/json";
 
 export const id0 = 0 as NodeId;
 export const id1 = 1 as NodeId;
@@ -45,7 +45,7 @@ export function parseTree(edges: string, flaps?: string): Tree {
  * Export tree to a BPS file `export.bps` for further inspection.
  * This should only be used momentarily.
  */
-export function exportProject(id: string | number = ""): void {
+export function exportProject(id: string | number = ""): JProject {
 	const nodes = State.$tree.$nodes.filter(l => l) as TreeNode[];
 	const project = Migration.$getSample();
 	project.design.mode = "layout";
@@ -66,6 +66,7 @@ export function exportProject(id: string | number = ""): void {
 		}
 	}
 	writeFileSync(`export${id}.bps`, JSON.stringify(project));
+	return project;
 }
 
 export function createTree(edges: NEdge[], flaps?: NFlap[]): Tree {
