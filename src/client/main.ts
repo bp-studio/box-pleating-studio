@@ -35,6 +35,15 @@ export async function init(): Promise<void> {
 export const setInteractive = display.$setInteractive;
 export const nextTick = display.appNextTick;
 
+/** Used for Playwright testing. */
+export function resolveCoordinate(p: IPoint): IPoint {
+	const sheet = ProjectService.sheet.value;
+	if(!sheet) return { x: NaN, y: NaN };
+	const rect = display.canvas.getBoundingClientRect();
+	const global = sheet.$view.toGlobal(p);
+	return { x: rect.left + global.x, y: rect.top + global.y };
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // History operations
 /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import type { Vertex } from "client/project/components/tree/vertex";
-import type * as Studio from "client/main";
+import { StudioPage } from "../utils";
 
 test.beforeEach(async ({ page }) => {
 	await page.goto("/");
@@ -27,24 +26,20 @@ test("Project creation", async ({ page }) => {
 });
 
 test("Basic vertex dragging", async ({ page }) => {
-	await page.getByRole("menuitem", { name: "File" }).click();
-	await page.getByRole("menuitem", { name: /New project$/ }).click();
-	await expect(page.getByRole("tab")).toBeAttached();
-	await page.mouse.move(514, 282);
-	await page.mouse.down();
-	const bpHandle = await page.evaluateHandle<typeof Studio>("bp");
-	const getX = () => page.evaluate(bp => (bp.selection.selections[0] as Vertex).$location.x, bpHandle);
-	expect(await getX()).toBe(10);
-	await page.mouse.move(601, 282);
-	await page.mouse.up();
-	expect(await getX()).toBe(13);
+	const studio = new StudioPage(page);
+	await studio.newProject();
+	await studio.mouse.move(10, 7);
+	await studio.mouse.down();
+	expect(await studio.getX()).toBe(10);
+	await studio.mouse.move(13, 7);
+	await studio.mouse.up();
+	expect(await studio.getX()).toBe(13);
 });
 
 test("Basic history", async ({ page }) => {
-	await page.getByRole("menuitem", { name: "File" }).click();
-	await page.getByRole("menuitem", { name: /New project$/ }).click();
-	await expect(page.getByRole("tab")).toBeAttached();
-	await page.mouse.click(514, 456);
+	const studio = new StudioPage(page);
+	await studio.newProject();
+	await studio.mouse.click(10, 7);
 	await page.getByRole("button", { name: "Add leaf" }).click();
 	await page.keyboard.press("Control+z");
 	await expect(page.getByText("Vertices: 1 / 3")).toBeInViewport();
