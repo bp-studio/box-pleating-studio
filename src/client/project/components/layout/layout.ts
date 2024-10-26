@@ -122,7 +122,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.riverCount = this.$rivers.size;
 	}
 
-	/** We separate this method for the execution order. */
+	/**
+	 * Remove rivers that no longer exist.
+	 * We separate this method for the execution order.
+	 */
 	public $cleanUp(model: UpdateModel): void {
 		for(const edit of model.edit.filter(e => !e[0])) {
 			const river = this.$rivers.get(edit[1].n1, edit[1].n2);

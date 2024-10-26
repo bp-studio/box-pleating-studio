@@ -6,6 +6,13 @@ import type { ITagObject } from "./interface";
 
 const REF_MAP = Symbol("RefMap");
 
+/**
+ * A symbol that represents uninitialized {@link field}.
+ * It is possible for a field value to be `undefined`,
+ * so we use this symbol for that purpose.
+ */
+const INIT = Symbol("uninitialized");
+
 interface RefMapTarget {
 	[REF_MAP]: Record<string, ShallowRef<unknown>>;
 }
@@ -59,13 +66,16 @@ export function field<This extends ITagObject, V>(
 			const oldValue = ref.value;
 			if(oldValue === v) return;
 			ref.value = v;
-			this.$project.history.$fieldChange(this, name, oldValue, v);
+			if(oldValue !== INIT) {
+				// Signify changes only after the field is initialized.
+				this.$project.history.$fieldChange(this, name, oldValue, v);
+			}
 		},
 		get() {
 			return getRef(this, name).value as V;
 		},
 		init(v: V) {
-			initMap(this, name, v);
+			initMap(this, name, v === undefined ? INIT : v);
 			return v;
 		},
 	};

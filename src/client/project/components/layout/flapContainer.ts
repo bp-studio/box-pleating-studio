@@ -78,7 +78,9 @@ export class FlapContainer implements Iterable<Flap> {
 	public $add(f: JFlap, graphics: GraphicsData): void {
 		if(this._flaps.has(f.id)) {
 			// This shouldn't happen, but just in case
+			/// #if DEBUG
 			debugger;
+			/// #endif
 			return;
 		}
 

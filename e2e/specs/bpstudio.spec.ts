@@ -39,3 +39,15 @@ test("Basic vertex dragging", async ({ page }) => {
 	await page.mouse.up();
 	expect(await getX()).toBe(13);
 });
+
+test("Basic history", async ({ page }) => {
+	await page.getByRole("menuitem", { name: "File" }).click();
+	await page.getByRole("menuitem", { name: /New project$/ }).click();
+	await expect(page.getByRole("tab")).toBeAttached();
+	await page.mouse.click(514, 456);
+	await page.getByRole("button", { name: "Add leaf" }).click();
+	await page.keyboard.press("Control+z");
+	await expect(page.getByText("Vertices: 1 / 3")).toBeInViewport();
+	await page.keyboard.press("2");
+	await expect(page.getByText("Flaps: 2")).toBeInViewport();
+});
