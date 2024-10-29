@@ -68,7 +68,11 @@
 			"redo": "恢复",
 			"selectAll": "全选",
 			"unselectAll": "取消选取",
-			"subdivide": "细分格子"
+			"subdivide": "细分格子",
+			"rotate_right": "向右旋转",
+			"rotate_left": "向左旋转",
+			"horizontal_flip": "水平翻转",
+			"vertical_flip": "垂直翻转"
 		},
 		"setting": {
 			"title": "设置",

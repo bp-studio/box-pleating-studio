@@ -83,6 +83,10 @@ export class DiagonalGrid extends Grid {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public override $getResizeCenter(): IPoint {
+		return this.$getCenter();
+	}
+
+	public override $getCenter(): IPoint {
 		return { x: this._size / 2, y: this.size / 2 };
 	}
 

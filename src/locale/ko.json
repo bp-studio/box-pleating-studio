@@ -68,7 +68,11 @@
 			"redo": "다시 하기",
 			"selectAll": "모두 선택",
 			"unselectAll": "모두 선택 해제",
-			"subdivide": "그리드 세분화"
+			"subdivide": "그리드 세분화",
+			"rotate_right": "오른쪽으로 회전",
+			"rotate_left": "왼쪽으로 회전",
+			"horizontal_flip": "수평 뒤집기",
+			"vertical_flip": "수직 뒤집기"
 		},
 		"setting": {
 			"title": "설정",

@@ -207,6 +207,19 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._editor.$transform([2, 0, 0, 2, newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y]);
 	}
 
+	public rotate(by: Sign): void {
+		const oldCenter = this.grid.$getCenter();
+		const { width, height } = this.grid.toJSON();
+		this.grid.$setDimension(height, width);
+		const newCenter = this.grid.$getCenter();
+		this._editor.$transform([0, by, -by, 0, newCenter.x - by * oldCenter.y, newCenter.y + by * oldCenter.x]);
+	}
+
+	public flip(horizontal: boolean): void {
+		const { x, y } = this.grid.$getCenter();
+		this._editor.$transform(horizontal ? [-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]);
+	}
+
 	/** The dimension of the sheet after rasterization. */
 	declare public readonly $imageDimension: ComputedRef<IDimension>;
 

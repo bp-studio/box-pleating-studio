@@ -68,7 +68,11 @@
 			"redo": "Làm lại",
 			"selectAll": "Chọn tất cả",
 			"unselectAll": "Bỏ chọn tất cả",
-			"subdivide": "Lưới chia nhỏ"
+			"subdivide": "Lưới chia nhỏ",
+			"rotate_right": "Xoay phải",
+			"rotate_left": "Xoay trái",
+			"horizontal_flip": "Lật ngang",
+			"vertical_flip": "Lật dọc"
 		},
 		"setting": {
 			"title": "Thiết lập",

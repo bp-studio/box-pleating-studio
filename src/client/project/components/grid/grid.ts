@@ -68,6 +68,7 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	public abstract $constrain(p: IPoint): IPoint;
 
 	public abstract $getResizeCenter(): IPoint;
+	public abstract $getCenter(): IPoint;
 
 	/**
 	 * Given an {@link IDimension}, check if the values are valid, and fix them if not.

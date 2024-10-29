@@ -264,7 +264,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	private _enqueue(command: Command): void {
 		for(const q of this._queue) {
-			if(command.$canAddTo(q)) return command.$addTo(q);
+			if(command.$canAddTo(q)) {
+				return command.$addTo(q);
+			}
 		}
 		this._queue.push(command);
 	}

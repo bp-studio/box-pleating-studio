@@ -68,7 +68,11 @@
 			"redo": "やり直し",
 			"selectAll": "すべて選択",
 			"unselectAll": "すべて選択解除",
-			"subdivide": "グリッドを細分化する"
+			"subdivide": "グリッドを細分化する",
+			"rotate_right": "右回転",
+			"rotate_left": "左に回転",
+			"horizontal_flip": "水平反転",
+			"vertical_flip": "垂直反転"
 		},
 		"setting": {
 			"title": "設定",

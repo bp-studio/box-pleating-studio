@@ -109,6 +109,10 @@ export class RectangularGrid extends Grid {
 		return { x: 0, y: 0 };
 	}
 
+	public override $getCenter(): IPoint {
+		return { x: this._width / 2, y: this._height / 2 };
+	}
+
 	public override $setDimension(width: number, height: number): void {
 		const w = this._width;
 		const h = this._height;

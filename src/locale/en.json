@@ -68,7 +68,11 @@
 			"redo": "Redo",
 			"selectAll": "Select all",
 			"unselectAll": "Unselect all",
-			"subdivide": "Subdivide grid"
+			"subdivide": "Subdivide grid",
+			"rotate_right": "Rotate right",
+			"rotate_left": "Rotate left",
+			"horizontal_flip": "Horizontal flip",
+			"vertical_flip": "Vertical flip"
 		},
 		"setting": {
 			"title": "Settings",

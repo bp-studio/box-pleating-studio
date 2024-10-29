@@ -68,7 +68,11 @@
 			"redo": "Rehacer",
 			"selectAll": "Seleccionar todo",
 			"unselectAll": "Deselecciona todo",
-			"subdivide": "Subdividir cuadrícula"
+			"subdivide": "Subdividir cuadrícula",
+			"rotate_right": "Girar a la derecha",
+			"rotate_left": "Girar a la izquierda",
+			"horizontal_flip": "volteo horizontal",
+			"vertical_flip": "volteo vertical"
 		},
 		"setting": {
 			"title": "Ajustes",

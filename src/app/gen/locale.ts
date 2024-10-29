@@ -70,7 +70,11 @@ export default {"en": {
 			"redo": _=>"Redo",
 			"selectAll": _=>"Select all",
 			"unselectAll": _=>"Unselect all",
-			"subdivide": _=>"Subdivide grid"
+			"subdivide": _=>"Subdivide grid",
+			"rotate_right": _=>"Rotate right",
+			"rotate_left": _=>"Rotate left",
+			"horizontal_flip": _=>"Horizontal flip",
+			"vertical_flip": _=>"Vertical flip"
 		},
 		"setting": {
 			"title": _=>"Settings",
@@ -381,7 +385,11 @@ export default {"en": {
 			"redo": _=>"Rehacer",
 			"selectAll": _=>"Seleccionar todo",
 			"unselectAll": _=>"Deselecciona todo",
-			"subdivide": _=>"Subdividir cuadrícula"
+			"subdivide": _=>"Subdividir cuadrícula",
+			"rotate_right": _=>"Girar a la derecha",
+			"rotate_left": _=>"Girar a la izquierda",
+			"horizontal_flip": _=>"volteo horizontal",
+			"vertical_flip": _=>"volteo vertical"
 		},
 		"setting": {
 			"title": _=>"Ajustes",
@@ -692,7 +700,11 @@ export default {"en": {
 			"redo": _=>"やり直し",
 			"selectAll": _=>"すべて選択",
 			"unselectAll": _=>"すべて選択解除",
-			"subdivide": _=>"グリッドを細分化する"
+			"subdivide": _=>"グリッドを細分化する",
+			"rotate_right": _=>"右回転",
+			"rotate_left": _=>"左に回転",
+			"horizontal_flip": _=>"水平反転",
+			"vertical_flip": _=>"垂直反転"
 		},
 		"setting": {
 			"title": _=>"設定",
@@ -1003,7 +1015,11 @@ export default {"en": {
 			"redo": _=>"다시 하기",
 			"selectAll": _=>"모두 선택",
 			"unselectAll": _=>"모두 선택 해제",
-			"subdivide": _=>"그리드 세분화"
+			"subdivide": _=>"그리드 세분화",
+			"rotate_right": _=>"오른쪽으로 회전",
+			"rotate_left": _=>"왼쪽으로 회전",
+			"horizontal_flip": _=>"수평 뒤집기",
+			"vertical_flip": _=>"수직 뒤집기"
 		},
 		"setting": {
 			"title": _=>"설정",
@@ -1314,7 +1330,11 @@ export default {"en": {
 			"redo": _=>"Làm lại",
 			"selectAll": _=>"Chọn tất cả",
 			"unselectAll": _=>"Bỏ chọn tất cả",
-			"subdivide": _=>"Lưới chia nhỏ"
+			"subdivide": _=>"Lưới chia nhỏ",
+			"rotate_right": _=>"Xoay phải",
+			"rotate_left": _=>"Xoay trái",
+			"horizontal_flip": _=>"Lật ngang",
+			"vertical_flip": _=>"Lật dọc"
 		},
 		"setting": {
 			"title": _=>"Thiết lập",
@@ -1625,7 +1645,11 @@ export default {"en": {
 			"redo": _=>"恢复",
 			"selectAll": _=>"全选",
 			"unselectAll": _=>"取消选取",
-			"subdivide": _=>"细分格子"
+			"subdivide": _=>"细分格子",
+			"rotate_right": _=>"向右旋转",
+			"rotate_left": _=>"向左旋转",
+			"horizontal_flip": _=>"水平翻转",
+			"vertical_flip": _=>"垂直翻转"
 		},
 		"setting": {
 			"title": _=>"设置",
@@ -1936,7 +1960,11 @@ export default {"en": {
 			"redo": _=>"取消復原",
 			"selectAll": _=>"全選",
 			"unselectAll": _=>"取消選取",
-			"subdivide": _=>"細分格子"
+			"subdivide": _=>"細分格子",
+			"rotate_right": _=>"向右旋轉",
+			"rotate_left": _=>"向左旋轉",
+			"horizontal_flip": _=>"水平翻轉",
+			"vertical_flip": _=>"垂直翻轉"
 		},
 		"setting": {
 			"title": _=>"設定",
