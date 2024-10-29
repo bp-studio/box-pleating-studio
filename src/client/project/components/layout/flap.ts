@@ -138,7 +138,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(v < 0 || !this._testResize(this._width, v)) return;
 		const oldValue = this._height;
 		this._height = v;
-		this._layout.$flaps.$update(this,
+		this.$project.design.$batchUpdateManager.$addFlap(this,
 			() => this.$project.history.$fieldChange(this, "height", oldValue, v, false)
 		);
 	}
@@ -151,7 +151,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(v < 0 || !this._testResize(v, this._height)) return;
 		const oldValue = this._width;
 		this._width = v;
-		this._layout.$flaps.$update(this,
+		this.$project.design.$batchUpdateManager.$addFlap(this,
 			() => this.$project.history.$fieldChange(this, "width", oldValue, v, false)
 		);
 	}
@@ -232,15 +232,11 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const h = this._height;
 		this._lastLocation = this._location;
 		this._location = location;
-		this._layout.$flaps.$update(this, () => {
-			if(w != width) {
-				this._width = w;
-				this.$project.history.$fieldChange(this, "width", w, width, false);
-			}
-			if(h != height) {
-				this._width = h;
-				this.$project.history.$fieldChange(this, "height", h, height, false);
-			}
+		this._width = width;
+		this._height = height;
+		this.$project.design.$batchUpdateManager.$addFlap(this, () => {
+			if(w != width) this.$project.history.$fieldChange(this, "width", w, width, false);
+			if(h != height) this.$project.history.$fieldChange(this, "height", h, height, false);
 			this.$project.history.$move(this, location, this._lastLocation);
 		});
 	}
@@ -249,7 +245,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const location = { x, y };
 		this._lastLocation ||= this._location;
 		this._location = location;
-		return this._layout.$flaps.$update(this, () => {
+		return this.$project.design.$batchUpdateManager.$addFlap(this, () => {
 			this.$project.history.$move(this, location, this._lastLocation);
 			this._lastLocation = undefined;
 		});

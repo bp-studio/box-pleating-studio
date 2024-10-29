@@ -82,7 +82,8 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		if(v < 1 || oldValue === v) return;
 		this._length = v;
 		this.$project.history.$fieldChange(this, "length", oldValue, v, false);
-		FieldCommand.$setterPromise = this._tree.$updateLength([this.toJSON()]);
+		const manager = this.$project.design.$batchUpdateManager;
+		FieldCommand.$setterPromise = manager.$addEdge(this.toJSON());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

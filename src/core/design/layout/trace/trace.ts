@@ -110,10 +110,7 @@ export class Trace {
 			}
 		}
 
-		/// #if DEBUG
-		/* istanbul ignore next: debug */
-		debugger; // Not supposed to get here in theory
-		/// #endif
+		// TODO: is it a bug to get here?
 		return null;
 	}
 

@@ -2,13 +2,23 @@ import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { Tree } from "core/design/context/tree";
+import { setStretchPrototypes } from "core/design/tasks/stretch";
+import { getChildId } from "./treeController";
+import { structureTask } from "core/design/tasks/structure";
+import { AABBTask } from "core/design/tasks/aabb";
 
-import type { JDesign } from "shared/json";
+import type { JDesign, JEdge, JFlap, JStretch } from "shared/json";
+
+export interface UpdateRequest {
+	flaps: JFlap[];
+	edges: JEdge[];
+	stretches: JStretch[];
+	dragging: boolean;
+}
 
 //=================================================================
 /**
- * {@link DesignController} manages the creation of a design.
- * There's no need for destructing, as everything will be destructed with the worker.
+ * {@link DesignController} manages operation related to the whole design.
  */
 //=================================================================
 export namespace DesignController {
@@ -32,5 +42,18 @@ export namespace DesignController {
 		/* istanbul ignore next: debug */
 		console.timeEnd("Design initializing");
 		/// #endif
+	}
+
+	/**
+	 * Perform batch update for flaps and edges.
+	 */
+	export function update(request: UpdateRequest): void {
+		State.$isDragging = request.dragging;
+		State.$tree.$setFlaps(request.flaps);
+		for(const e of request.edges) {
+			State.$tree.$setLength(getChildId(e), e.length);
+		}
+		setStretchPrototypes(request.stretches);
+		Processor.$run(request.edges.length ? structureTask : AABBTask);
 	}
 }

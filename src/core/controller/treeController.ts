@@ -8,7 +8,6 @@ import { distMap } from "core/design/context/treeUtils";
 import { AreaTree } from "core/design/context/areaTree/areaTree";
 
 import type { Hierarchy } from "core/design/context/areaTree/utils";
-import type { DistMap } from "core/design/context/treeUtils";
 import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
 
@@ -93,11 +92,11 @@ export namespace TreeController {
 		const aTree = new AreaTree(State.$tree, useDimension);
 		return aTree.$createHierarchy();
 	}
+}
 
-	/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
-	function getChildId(edge: JEdgeBase): NodeId {
-		const tree = State.$tree;
-		const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;
-		return n1.$parent === n2 ? edge.n1 : edge.n2;
-	}
+/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
+export function getChildId(edge: JEdgeBase): NodeId {
+	const tree = State.$tree;
+	const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;
+	return n1.$parent === n2 ? edge.n1 : edge.n2;
 }

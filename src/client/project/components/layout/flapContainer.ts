@@ -7,7 +7,6 @@ import type { IEditor } from "../sheet";
 import type { Layout } from "./layout";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { JFlap, JEdge, NodeId } from "shared/json";
-import type { CoreManager } from "./coreManager";
 
 //=================================================================
 /**
@@ -22,12 +21,6 @@ export class FlapContainer implements Iterable<Flap>, IEditor {
 
 	private readonly _layout: Layout;
 	private readonly _flaps: Map<NodeId, Flap> = new Map();
-
-	/** The flaps that are about to be updated, and their update actions. */
-	private readonly _pendingUpdate = new Map<Flap, Action>();
-
-	/** The current {@link Promise} for flap updating process. */
-	private _flapUpdatePromise: Promise<void> | undefined;
 
 	constructor(layout: Layout) {
 		this._layout = layout;
@@ -52,31 +45,6 @@ export class FlapContainer implements Iterable<Flap>, IEditor {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Register an update operation for a {@link Flap}.
-	 *
-	 * This is one rather complicated part of the architecture.
-	 * There are two issues we're solving here:
-	 *
-	 * 1. The user could manipulate multiple flaps in one operation.
-	 * 2. The user could very rapidly trigger changes, say during dragging.
-	 *
-	 * To handle the first issue, we use {@link _flapUpdatePromise} to wait until
-	 * all flaps are manipulated, and then we process them all in {@link _flushUpdate}.
-	 * For the second issue, we use a {@link CoreManager} to control the callings.
-	 */
-	public $update(flap: Flap, action: Action): Promise<void> {
-		this._pendingUpdate.set(flap, action);
-		if(this._flapUpdatePromise === undefined) {
-			this._flapUpdatePromise = this._layout.$core.$prepare().then(this._flushUpdate);
-		}
-		return this._flapUpdatePromise;
-	}
-
-	public get $flapUpdatePromise(): Promise<void> | undefined {
-		return this._flapUpdatePromise;
-	}
 
 	public $add(f: JFlap, graphics: GraphicsData): void {
 		if(this._flaps.has(f.id)) {
@@ -143,27 +111,11 @@ export class FlapContainer implements Iterable<Flap>, IEditor {
 			const newWidth = Math.abs(ur.x - ll.x);
 			const newHeight = Math.abs(ur.y - ll.y);
 			flap.$manipulate(newX, newY, newWidth, newHeight);
-			flap.radius *= scale;
+			if(scale != 1) flap.radius *= scale;
+		}
+		if(scale == 1) return;
+		for(const river of this._layout.$rivers.values()) {
+			river.$edge.length *= scale;
 		}
 	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private readonly _flushUpdate = (): Promise<void> => {
-		const project = this._layout.$project;
-		this._flapUpdatePromise = undefined;
-		const flaps: JFlap[] = [];
-		for(const [f, action] of this._pendingUpdate) {
-			flaps.push(f.$updateDrawParams());
-			action();
-		}
-		this._pendingUpdate.clear();
-		const dragging = project.$isDragging;
-		const prototypes = project.design.$prototype.layout.stretches;
-		return this._layout.$core.$run(() =>
-			project.$core.layout.updateFlap(flaps, dragging, prototypes)
-		);
-	};
 }

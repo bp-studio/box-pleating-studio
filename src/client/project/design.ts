@@ -12,6 +12,8 @@ import { isTypedArray } from "shared/utils/array";
 import { River } from "./components/layout/river";
 import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
+import { BatchUpdateManager } from "./batchUpdateManager";
+import { CoreManager } from "./coreManager";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
@@ -37,6 +39,9 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	public readonly layout: Layout;
 	public readonly tree: Tree;
 
+	public readonly $coreManager: CoreManager;
+	public readonly $batchUpdateManager: BatchUpdateManager;
+
 	/**
 	 * Prototypes of various objects before they are constructed.
 	 *
@@ -53,6 +58,9 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		this.title = json.title ?? "";
 		this.description = json.description ?? "";
 		this.mode = json.mode ?? "tree";
+
+		this.$coreManager = new CoreManager(project);
+		this.$batchUpdateManager = new BatchUpdateManager(this.$coreManager);
 
 		const view = this.$addRootObject(new Container(), display.designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);

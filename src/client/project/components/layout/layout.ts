@@ -11,10 +11,10 @@ import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
-import { CoreManager } from "./coreManager";
 import { FlapContainer } from "./flapContainer";
 
 import type { Flap } from "./flap";
+import type { BatchUpdateManager } from "client/project/batchUpdateManager";
 import type { Device } from "./device";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
@@ -40,7 +40,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
 	public readonly $flaps: FlapContainer;
-	public readonly $core: CoreManager;
 	public readonly $rivers: IDoubleMap<NodeId, River> = new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
@@ -58,7 +57,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
-		this.$core = new CoreManager(project);
 		this.$flaps = new FlapContainer(this);
 		this.$sheet = new Sheet(project, parentView, "layout", this.$flaps, json, state);
 		this.$sheet.$addChild(this);
@@ -143,11 +141,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$project.design.mode = "tree";
 	}
 
-	/** Return a {@link Promise} that resolves when all updates are completed. */
-	public get $updateComplete(): Promise<void> {
-		return (this.$flaps.$flapUpdatePromise || Promise.resolve()).then(() => this.$core.$updating);
-	}
-
 	public $switchConfig(stretchId: string, to: number): Promise<void> {
 		return this.$project.$core.layout.switchConfig(stretchId, to);
 	}
@@ -161,14 +154,15 @@ export class Layout extends View implements ISerializable<JLayout> {
 	}
 
 	/**
-	 * Similar to {@link $updateFlap}, dragging of {@link Device} can also fire rapidly,
+	 * Similar to {@link BatchUpdateManager}, dragging of {@link Device} can also fire rapidly,
 	 * and we use the same mechanism to control the callings to the Core.
 	 */
 	public $moveDevice(device: Device, action: Action): Promise<void> {
 		this._draggingDeviceAction = action;
 		if(this._deviceMovePromise === undefined) {
 			this._draggingDevice = device;
-			this._deviceMovePromise = this.$core.$prepare().then(this._flushDeviceMove);
+			const prepare = this.$project.design.$coreManager.$prepare();
+			this._deviceMovePromise = prepare.then(() => this._flushDeviceMove());
 		}
 		return this._deviceMovePromise;
 	}
@@ -187,13 +181,13 @@ export class Layout extends View implements ISerializable<JLayout> {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private readonly _flushDeviceMove = (): Promise<void> => {
+	private _flushDeviceMove(): Promise<void> {
 		this._deviceMovePromise = undefined;
 		this._draggingDeviceAction!();
 		this._draggingDeviceAction = undefined;
 		const device = this._draggingDevice!;
-		return this.$core.$run(() =>
-			this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location)
+		return this.$project.design.$coreManager.$run(c =>
+			c.layout.moveDevice(device.stretch.id, device.$index, device.$location)
 		);
 	};
 

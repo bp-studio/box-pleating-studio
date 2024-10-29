@@ -1,13 +1,14 @@
+import type { Route } from "core/routes";
 import type { Project } from "client/project/project";
 
 //=================================================================
 /**
- * {@link CoreManager} controls the calling to the Core.
+ * {@link CoreManager} schedules the rapid calling to the Core.
  */
 //=================================================================
 export class CoreManager {
 
-	private _project: Project;
+	public readonly $project: Project;
 
 	/** A {@link Promise} that resolves immediately after returning from the Core. */
 	private _lastReturn: Promise<void> = Promise.resolve();
@@ -19,27 +20,28 @@ export class CoreManager {
 	private _updating: Promise<void> = Promise.resolve();
 
 	constructor(project: Project) {
-		this._project = project;
+		this.$project = project;
 	}
 
+	/** The current updating process. */
 	public get $updating(): Promise<void> {
 		return this._updating;
 	}
 
 	/** Wait until the Core is free to call. */
 	public $prepare(): Promise<void> {
-		const ready = this._project.history.$moving || this._pendingUpdateCount == 0 ?
+		const ready = this.$project.history.$moving || this._pendingUpdateCount == 0 ?
 			Promise.resolve() : this._lastReturn;
 		this._pendingUpdateCount++;
 		return ready;
 	}
 
 	/** Execute a calling to the Core. */
-	public $run(factory: Action<Promise<void>>): Promise<void> {
-		this._lastReturn = new Promise(resolve => this._project.$onReturn(() => {
+	public $run(factory: Func<Route, Promise<void>>): Promise<void> {
+		this._lastReturn = new Promise(resolve => this.$project.$onReturn(() => {
 			this._pendingUpdateCount--;
 			resolve();
 		}));
-		return this._updating = factory();
+		return this._updating = factory(this.$project.$core);
 	}
 }
