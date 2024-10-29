@@ -1,4 +1,4 @@
-$statusbar-height: 25px;
+$statusbar-height: 2rem;
 
 .viewport {
 	background: var(--bs-body-bg);
@@ -70,7 +70,7 @@ footer {
 	}
 
 	#note {
-		bottom: $statusbar-height + 20px;
+		bottom: calc($statusbar-height + 20px);
 	}
 }
 

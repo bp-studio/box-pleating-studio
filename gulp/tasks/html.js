@@ -101,7 +101,7 @@ gulp.task("version", () =>
 gulp.task("html", () => gulp.src(config.src.app + "/html/index.htm")
 	.pipe(newer({
 		dest: config.dest.temp + "/index.htm",
-		extra: [__filename, "package.json", config.src.app + "/**/*"],
+		extra: [__filename, config.src.app + "/**/*"],
 	}))
 	.pipe(htmlMinifierTerser(htmlMinOption))
 	.pipe(patchScript())
