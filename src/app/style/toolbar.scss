@@ -43,6 +43,7 @@ nav {
 		visibility: hidden;
 	}
 
+	&,
 	* {
 		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
 		touch-action: pan-x;
@@ -153,8 +154,7 @@ body > .tab .bt {
 	}
 }
 
-@media (hover: none),
-(pointer: coarse) {
+@media (hover: none), (pointer: coarse) {
 	.tab .tab-down i {
 		opacity: 1 !important;
 	}
