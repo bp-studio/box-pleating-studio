@@ -6,7 +6,9 @@ import { chebyshev } from "client/utils/chebyshev";
 import { dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
+import { applyTransform } from "../editor";
 
+import type { IEditor, TransformationMatrix } from "../editor";
 import type { UpdateModel } from "core/service/updateModel";
 import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";
@@ -24,7 +26,7 @@ const Y_DISPLACEMENT = 0.0625;
  */
 //=================================================================
 
-export class VertexContainer implements Iterable<Vertex> {
+export class VertexContainer implements Iterable<Vertex>, IEditor {
 
 	private readonly _count = shallowRef(0);
 	private readonly _tree: Tree;
@@ -146,6 +148,12 @@ export class VertexContainer implements Iterable<Vertex> {
 			SelectionController.$toggle(this._tree.$edges.get(v1, v2)!, true);
 		};
 		await this._tree.$project.$core.tree.join(vertex.id);
+	}
+
+	public $transform(matrix: TransformationMatrix): void {
+		for(const v of this) {
+			v.$assign(applyTransform(v._location, matrix));
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

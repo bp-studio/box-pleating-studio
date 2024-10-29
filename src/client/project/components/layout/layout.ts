@@ -13,7 +13,6 @@ import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 import { CoreManager } from "./coreManager";
 import { FlapContainer } from "./flapContainer";
-import { LayoutEditor } from "./layoutEditor";
 
 import type { Flap } from "./flap";
 import type { Device } from "./device";
@@ -61,8 +60,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$project = project;
 		this.$core = new CoreManager(project);
 		this.$flaps = new FlapContainer(this);
-		const editor = new LayoutEditor(this.$flaps);
-		this.$sheet = new Sheet(project, parentView, "layout", editor, json, state);
+		this.$sheet = new Sheet(project, parentView, "layout", this.$flaps, json, state);
 		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(style.junction.alpha);

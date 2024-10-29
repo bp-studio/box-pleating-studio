@@ -1,6 +1,8 @@
 
 import { Flap } from "./flap";
+import { applyTransform } from "../editor";
 
+import type { IEditor, TransformationMatrix } from "../editor";
 import type { Layout } from "./layout";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { JFlap, JEdge, NodeId } from "shared/json";
@@ -12,7 +14,7 @@ import type { CoreManager } from "./coreManager";
  * It is separated from {@link Layout} to make things organized.
  */
 //=================================================================
-export class FlapContainer implements Iterable<Flap> {
+export class FlapContainer implements Iterable<Flap>, IEditor {
 
 	/** The new flaps that should be synced. */
 	public readonly $sync = new Map<NodeId, Flap>();
@@ -126,6 +128,22 @@ export class FlapContainer implements Iterable<Flap> {
 		flap.$destruct();
 		this._flaps.delete(id);
 		this._layout.$project.history.$destruct(memento);
+	}
+
+	public $transform(matrix: TransformationMatrix): void {
+		const [a, b, c, d] = matrix;
+		const scale = Math.round((Math.sqrt(a * a + c * c) + Math.sqrt(b * b + d * d)) / 2);
+		for(const flap of this._flaps.values()) {
+			const { x, y, width, height } = flap.toJSON();
+			const ll = applyTransform({ x, y }, matrix);
+			const ur = applyTransform({ x: x + width, y: y + height }, matrix);
+			const newX = Math.min(ur.x, ll.x);
+			const newY = Math.min(ur.y, ll.y);
+			const newWidth = Math.abs(ur.x - ll.x);
+			const newHeight = Math.abs(ur.y - ll.y);
+			flap.$manipulate(newX, newY, newWidth, newHeight);
+			flap.radius *= scale;
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

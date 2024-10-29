@@ -4,7 +4,6 @@ import { Edge } from "./edge";
 import { SelectionController } from "client/controllers/selectionController";
 import { VertexContainer } from "./vertexContainer";
 import { getFirst } from "shared/utils/set";
-import { TreeEditor } from "./treeEditor";
 
 import type { Vertex } from "./vertex";
 import type { Project } from "client/project/project";
@@ -32,8 +31,7 @@ export class Tree implements ISerializable<JTree> {
 	constructor(project: Project, parentView: Container, json: JTree, state?: JViewport) {
 		this.$project = project;
 		this.$vertices = new VertexContainer(this, json);
-		const editor = new TreeEditor(this.$vertices);
-		this.$sheet = new Sheet(project, parentView, "tree", editor, json.sheet, state);
+		this.$sheet = new Sheet(project, parentView, "tree", this.$vertices, json.sheet, state);
 	}
 
 	public toJSON(): JTree {
