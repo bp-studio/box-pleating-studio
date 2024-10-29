@@ -67,7 +67,8 @@
 			"undo": "Undo",
 			"redo": "Redo",
 			"selectAll": "Select all",
-			"unselectAll": "Unselect all"
+			"unselectAll": "Unselect all",
+			"subdivide": "Subdivide grid"
 		},
 		"setting": {
 			"title": "Settings",

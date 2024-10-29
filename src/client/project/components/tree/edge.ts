@@ -186,8 +186,8 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	}
 
 	private readonly _coordinates = computed(() => {
-		const { x: x1, y: y1 } = this.$v1.$location;
-		const { x: x2, y: y2 } = this.$v2.$location;
+		const { x: x1, y: y1 } = this.$v1._location;
+		const { x: x2, y: y2 } = this.$v2._location;
 		return { x1, x2, y1, y2 };
 	});
 }

@@ -69,7 +69,8 @@ export default {"en": {
 			"undo": _=>"Undo",
 			"redo": _=>"Redo",
 			"selectAll": _=>"Select all",
-			"unselectAll": _=>"Unselect all"
+			"unselectAll": _=>"Unselect all",
+			"subdivide": _=>"Subdivide grid"
 		},
 		"setting": {
 			"title": _=>"Settings",
@@ -379,7 +380,8 @@ export default {"en": {
 			"undo": _=>"Deshacer",
 			"redo": _=>"Rehacer",
 			"selectAll": _=>"Seleccionar todo",
-			"unselectAll": _=>"Deselecciona todo"
+			"unselectAll": _=>"Deselecciona todo",
+			"subdivide": _=>"Subdividir cuadrícula"
 		},
 		"setting": {
 			"title": _=>"Ajustes",
@@ -689,7 +691,8 @@ export default {"en": {
 			"undo": _=>"元に戻す",
 			"redo": _=>"やり直し",
 			"selectAll": _=>"すべて選択",
-			"unselectAll": _=>"すべて選択解除"
+			"unselectAll": _=>"すべて選択解除",
+			"subdivide": _=>"グリッドを細分化する"
 		},
 		"setting": {
 			"title": _=>"設定",
@@ -999,7 +1002,8 @@ export default {"en": {
 			"undo": _=>"실행 취소",
 			"redo": _=>"다시 하기",
 			"selectAll": _=>"모두 선택",
-			"unselectAll": _=>"모두 선택 해제"
+			"unselectAll": _=>"모두 선택 해제",
+			"subdivide": _=>"그리드 세분화"
 		},
 		"setting": {
 			"title": _=>"설정",
@@ -1309,7 +1313,8 @@ export default {"en": {
 			"undo": _=>"Hoàn tác",
 			"redo": _=>"Làm lại",
 			"selectAll": _=>"Chọn tất cả",
-			"unselectAll": _=>"Bỏ chọn tất cả"
+			"unselectAll": _=>"Bỏ chọn tất cả",
+			"subdivide": _=>"Lưới chia nhỏ"
 		},
 		"setting": {
 			"title": _=>"Thiết lập",
@@ -1619,7 +1624,8 @@ export default {"en": {
 			"undo": _=>"撤消",
 			"redo": _=>"恢复",
 			"selectAll": _=>"全选",
-			"unselectAll": _=>"取消选取"
+			"unselectAll": _=>"取消选取",
+			"subdivide": _=>"细分格子"
 		},
 		"setting": {
 			"title": _=>"设置",
@@ -1929,7 +1935,8 @@ export default {"en": {
 			"undo": _=>"復原",
 			"redo": _=>"取消復原",
 			"selectAll": _=>"全選",
-			"unselectAll": _=>"取消選取"
+			"unselectAll": _=>"取消選取",
+			"subdivide": _=>"細分格子"
 		},
 		"setting": {
 			"title": _=>"設定",

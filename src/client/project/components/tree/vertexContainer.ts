@@ -129,7 +129,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		const [ids, parentIds] = this._simulateDelete(vertices);
 		const design = this._tree.$project.design;
 		const prototypes = parentIds.map(n =>
-			design.layout.$createFlapPrototype(n, this._vertices[n]!.$location)
+			design.layout.$createFlapPrototype(n, this._vertices[n]!._location)
 		);
 		design.$prototype.layout.flaps.push(...prototypes);
 
@@ -154,12 +154,12 @@ export class VertexContainer implements Iterable<Vertex> {
 
 	/** Find the close empty spot around the given {@link Vertex}. */
 	private _findClosestEmptySpot(at: Vertex): IPoint {
-		const { x, y } = at.$location;
+		const { x, y } = at._location;
 		const ref: IPoint = { x: x + X_DISPLACEMENT, y: y + Y_DISPLACEMENT };
 
 		// Create an index for the position of all vertices
 		const occupied = new Set<number>();
-		for(const v of this) occupied.add(getOrderedKey(v.$location.x, v.$location.y));
+		for(const v of this) occupied.add(getOrderedKey(v._location.x, v._location.y));
 
 		// Search for empty spot
 		let spot: IPoint | undefined;
@@ -186,7 +186,7 @@ export class VertexContainer implements Iterable<Vertex> {
 
 		// In case of off-bound (unlikely, but just in case)
 		// we can do nothing other than returning the same point
-		return spot || at.$location;
+		return spot || at._location;
 	}
 
 	/**

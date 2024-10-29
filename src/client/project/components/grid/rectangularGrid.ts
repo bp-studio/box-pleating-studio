@@ -105,11 +105,15 @@ export class RectangularGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $getResizeCenter(): IPoint {
+		return { x: 0, y: 0 };
+	}
+
 	public override $setDimension(width: number, height: number): void {
 		const w = this._width;
 		const h = this._height;
-		this._width = width;
-		this._height = height;
+		this._testWidth = this._width = width;
+		this._testHeight = this._height = height;
 		this.$project.history.$fieldChange(this, "width", w, width, false);
 		this.$project.history.$fieldChange(this, "height", h, height, false);
 	}

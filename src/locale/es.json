@@ -67,7 +67,8 @@
 			"undo": "Deshacer",
 			"redo": "Rehacer",
 			"selectAll": "Seleccionar todo",
-			"unselectAll": "Deselecciona todo"
+			"unselectAll": "Deselecciona todo",
+			"subdivide": "Subdividir cuadrícula"
 		},
 		"setting": {
 			"title": "Ajustes",

@@ -82,10 +82,14 @@ export class DiagonalGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $getResizeCenter(): IPoint {
+		return { x: this._size / 2, y: this.size / 2 };
+	}
+
 	public override $setDimension(width: number, height: number): void {
 		if(width != height) throw new Error("Dimension mismatch for diagonal grid.");
 		const oldValue = this._size;
-		this._size = width;
+		this._testSize = this._size = width;
 		this.$project.history.$fieldChange(this, "size", oldValue, width, false);
 	}
 

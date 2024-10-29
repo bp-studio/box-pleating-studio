@@ -8,8 +8,12 @@
 				<Hotkey icon="bp-redo" ctrl hk="Y" touch="bp-3-finger">{{ $t('toolbar.edit.redo') }}</Hotkey>
 			</DropdownItem>
 			<Divider />
+			<DropdownItem :disabled="!Studio.project" @click="Studio.project && Studio.project.design.sheet.subdivide()">
+				<i class="fa-solid fa-table-cells"></i>{{ $t('toolbar.edit.subdivide') }}
+			</DropdownItem>
+			<Divider />
 			<DropdownItem :disabled="!Studio.project" @click="selectAll">
-				<Hotkey icon="fas fa-th" ctrl hk="A">{{ $t('toolbar.edit.selectAll') }}</Hotkey>
+				<Hotkey icon="fa-solid fa-border-all" ctrl hk="A">{{ $t('toolbar.edit.selectAll') }}</Hotkey>
 			</DropdownItem>
 			<DropdownItem :disabled="!Studio.selections.length" @click="unselectAll">
 				<Hotkey icon="fas fa-border-none" :hk="isMac ? '⎋' : 'Esc'">{{ $t('toolbar.edit.unselectAll') }}</Hotkey>

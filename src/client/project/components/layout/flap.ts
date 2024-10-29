@@ -76,7 +76,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 		this.$tag = "f" + json.id;
 		this.id = json.id;
-		this.$location = { x: json.x, y: json.y };
+		this._location = { x: json.x, y: json.y };
 		this._width = json.width;
 		this._height = json.height;
 		this.$graphics = graphics;
@@ -99,8 +99,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public toJSON(): JFlap {
 		return {
 			id: this.id,
-			x: this.$location.x,
-			y: this.$location.y,
+			x: this._location.x,
+			y: this._location.y,
 			width: this._width,
 			height: this._height,
 		};
@@ -186,16 +186,16 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const w = this._width, h = this._height;
 		const zeroWidth = w === 0;
 		const zeroHeight = h === 0;
-		const { x, y } = this.$location;
+		const { x, y } = this._location;
 		if(zeroWidth && zeroHeight) {
-			return this._fixVector(this.$location, v);
+			return this._fixVector(this._location, v);
 		} else if(zeroWidth || zeroHeight) {
-			v = this._fixVector(this.$location, v);
+			v = this._fixVector(this._location, v);
 			const p = zeroWidth ? { x, y: y + h } : { x: x + w, y };
 			return this._fixVector(p, v);
 		} else {
 			// We allow at most one tip to go beyond the range of the sheet.
-			const data = getDots(this.$location, w, h)
+			const data = getDots(this._location, w, h)
 				.map(p => {
 					const fix = this._fixVector(p, v);
 					const dx = fix.x - v.x;
@@ -218,7 +218,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public override $anchors(): IPoint[] {
-		return getDots(this.$location, this._width, this._height);
+		return getDots(this._location, this._width, this._height);
 	}
 
 	public $sync(p: IPoint): Promise<void> {
@@ -230,8 +230,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const location = { x, y };
 		const w = this._width;
 		const h = this._height;
-		this._lastLocation = this.$location;
-		this.$location = location;
+		this._lastLocation = this._location;
+		this._location = location;
 		this._layout.$flaps.$update(this, () => {
 			if(w != width) {
 				this._width = w;
@@ -247,8 +247,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	protected override _move(x: number, y: number): Promise<void> {
 		const location = { x, y };
-		this._lastLocation ||= this.$location;
-		this.$location = location;
+		this._lastLocation ||= this._location;
+		this._location = location;
 		return this._layout.$flaps.$update(this, () => {
 			this.$project.history.$move(this, location, this._lastLocation);
 			this._lastLocation = undefined;
@@ -334,7 +334,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** Test if the new size is acceptable. */
 	private _testResize(w: number, h: number, grid: Grid = this._sheet.grid): boolean {
-		return getDots(this.$location, w, h)
+		return getDots(this._location, w, h)
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.
 	}

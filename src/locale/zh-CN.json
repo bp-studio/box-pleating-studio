@@ -67,7 +67,8 @@
 			"undo": "撤消",
 			"redo": "恢复",
 			"selectAll": "全选",
-			"unselectAll": "取消选取"
+			"unselectAll": "取消选取",
+			"subdivide": "细分格子"
 		},
 		"setting": {
 			"title": "设置",

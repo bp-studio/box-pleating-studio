@@ -67,7 +67,8 @@
 			"undo": "실행 취소",
 			"redo": "다시 하기",
 			"selectAll": "모두 선택",
-			"unselectAll": "모두 선택 해제"
+			"unselectAll": "모두 선택 해제",
+			"subdivide": "그리드 세분화"
 		},
 		"setting": {
 			"title": "설정",

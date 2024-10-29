@@ -67,7 +67,8 @@
 			"undo": "Hoàn tác",
 			"redo": "Làm lại",
 			"selectAll": "Chọn tất cả",
-			"unselectAll": "Bỏ chọn tất cả"
+			"unselectAll": "Bỏ chọn tất cả",
+			"subdivide": "Lưới chia nhỏ"
 		},
 		"setting": {
 			"title": "Thiết lập",

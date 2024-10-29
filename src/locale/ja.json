@@ -67,7 +67,8 @@
 			"undo": "元に戻す",
 			"redo": "やり直し",
 			"selectAll": "すべて選択",
-			"unselectAll": "すべて選択解除"
+			"unselectAll": "すべて選択解除",
+			"subdivide": "グリッドを細分化する"
 		},
 		"setting": {
 			"title": "設定",

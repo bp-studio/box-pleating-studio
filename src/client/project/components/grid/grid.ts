@@ -67,6 +67,8 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	/** Find the point on the grid that is closest to the given point. */
 	public abstract $constrain(p: IPoint): IPoint;
 
+	public abstract $getResizeCenter(): IPoint;
+
 	/**
 	 * Given an {@link IDimension}, check if the values are valid, and fix them if not.
 	 * Used during optimization.

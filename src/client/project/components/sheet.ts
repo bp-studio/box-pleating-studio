@@ -18,6 +18,7 @@ import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
 
+import type { IEditor } from "./editor";
 import type { ComputedRef } from "vue";
 import type { Grid } from "./grid/grid";
 import type { ITagObject } from "client/shared/interface";
@@ -57,6 +58,10 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/** The project to which it belongs. */
 	public readonly $project: Project;
 
+	public readonly $controls: Set<Control> = new Set();
+
+	public readonly $independents: Set<Independent> = new Set();
+
 	/** The layers. */
 	private _layers: Container[] = [];
 
@@ -69,14 +74,17 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/** The mask for the clipped layers. */
 	private _mask: Graphics = new Graphics();
 
-	public readonly $controls: Set<Control> = new Set();
+	private readonly _editor: IEditor;
 
-	public readonly $independents: Set<Independent> = new Set();
-
-	constructor(project: Project, parentView: Container, tag: DesignMode, json?: JSheet, state?: JViewport) {
+	constructor(
+		project: Project, parentView: Container,
+		tag: DesignMode, editor: IEditor,
+		json?: JSheet, state?: JViewport
+	) {
 		super();
 		this.$project = project;
 		this.$tag = tag;
+		this._editor = editor;
 
 		if(state) {
 			this.$zoom = state.zoom;
@@ -190,6 +198,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.$renderWidth;
 		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$renderHeight;
 		return Math.min(horizontalScale, verticalScale);
+	}
+
+	public subdivide(): void {
+		const oldCenter = this.grid.$getResizeCenter();
+		this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
+		const newCenter = this.grid.$getResizeCenter();
+		this._editor.$transform([2, 0, 0, 2, newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y]);
 	}
 
 	/** The dimension of the sheet after rasterization. */

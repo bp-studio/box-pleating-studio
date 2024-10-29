@@ -46,7 +46,7 @@ export class Device extends Draggable {
 
 		this.$graphics = graphics;
 		this.$selectedCursor = graphics.forward ? "nesw-resize" : "nwse-resize"; // Should be a one-time setup in theory.
-		this.$location = graphics.location;
+		this._location = graphics.location;
 
 		// We deliberately put the shade on a higher layer,
 		// so that its hovering effect can be prioritized.
@@ -77,7 +77,7 @@ export class Device extends Draggable {
 	}
 
 	protected override async _move(x: number, y: number): Promise<void> {
-		const dx = x - this.$location.x;
+		const dx = x - this._location.x;
 
 		// Update range, so that subsequent dragging can be constraint correctly even before redraw.
 		const r = this.$graphics.range;
@@ -85,8 +85,8 @@ export class Device extends Draggable {
 
 		this._dragging = this.stretch.$project.$isDragging;
 		const location = { x, y };
-		this._lastLocation ||= this.$location;
-		this.$location = location;
+		this._lastLocation ||= this._location;
+		this._location = location;
 		await this.stretch.$layout.$moveDevice(this, () => {
 			this.$project.history.$move(this, location, this._lastLocation);
 			this._lastLocation = undefined;
@@ -117,7 +117,7 @@ export class Device extends Draggable {
 			this.$graphics.range = range;
 		} else {
 			// In other cases, the location needs to be updated.
-			this.$location = data.location;
+			this._location = data.location;
 		}
 		this._draw();
 	}
