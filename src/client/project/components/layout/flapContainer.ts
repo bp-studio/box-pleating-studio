@@ -1,8 +1,9 @@
 
 import { Flap } from "./flap";
-import { applyTransform } from "../editor";
+import { applyTransform } from "shared/types/geometry";
 
-import type { IEditor, TransformationMatrix } from "../editor";
+import type { TransformationMatrix } from "shared/types/geometry";
+import type { IEditor } from "../sheet";
 import type { Layout } from "./layout";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { JFlap, JEdge, NodeId } from "shared/json";

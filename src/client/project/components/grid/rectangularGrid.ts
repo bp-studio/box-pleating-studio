@@ -4,7 +4,7 @@ import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
 import { MAX_SHEET_SIZE, MIN_RECT_SIZE } from "shared/types/constants";
 
-import type { Path } from "shared/types/geometry";
+import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json";
 import type { Sheet } from "../sheet";
@@ -184,7 +184,7 @@ export class RectangularGrid extends Grid {
 		}
 	}
 
-	public $getTransformMatrix(size: number, reorient: boolean): number[] {
+	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
 		const w = this._width, h = this._height;
 		const max = Math.max(w, h);
 		const s = size / max;

@@ -2,7 +2,7 @@ import { Destructible } from "client/base/destructible";
 
 import type { ITagObject } from "client/shared/interface";
 import type { GraphicsLike } from "client/utils/contourUtil";
-import type { Path } from "shared/types/geometry";
+import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { Direction } from "shared/types/direction";
 import type { GridType, JSheet } from "shared/json";
 import type { Sheet } from "../sheet";
@@ -83,7 +83,7 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	 * [\begin{matrix} x \\ y \end{matrix}\right] +
 	 * \left[\begin{matrix} E \\ F \end{matrix}\right]$$
 	 */
-	public abstract $getTransformMatrix(size: number, reorient: boolean): number[];
+	public abstract $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix;
 
 	/**
 	 * Change the dimension by internal functions instead of by UI.

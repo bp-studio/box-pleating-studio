@@ -3,12 +3,12 @@ import { shallowRef } from "vue";
 import { Vertex } from "./vertex";
 import { SelectionController } from "client/controllers/selectionController";
 import { chebyshev } from "client/utils/chebyshev";
-import { dist } from "shared/types/geometry";
+import { applyTransform, dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
-import { applyTransform } from "../editor";
 
-import type { IEditor, TransformationMatrix } from "../editor";
+import type { TransformationMatrix } from "shared/types/geometry";
+import type { IEditor } from "../sheet";
 import type { UpdateModel } from "core/service/updateModel";
 import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";

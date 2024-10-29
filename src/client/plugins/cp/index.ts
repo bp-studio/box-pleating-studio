@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import ProjectService from "client/services/projectService";
+import { applyTransform } from "shared/types/geometry";
 
+import type { TransformationMatrix } from "shared/types/geometry";
 import type { CPLine } from "shared/types/cp";
 
 export interface CPOptions {
@@ -29,10 +31,10 @@ export async function cp(options: CPOptions): Promise<string> {
 }
 
 /** Transform a given line by the given matrix. */
-function transform(l: CPLine, offset: number, matrix: number[]): void {
-	const x = l[offset], y = l[offset + 1];
-	l[offset] = fix(x * matrix[0] + y * matrix[1] + matrix[4]);
-	l[offset + 1] = fix(x * matrix[2] + y * matrix[3] + matrix[5]);
+function transform(l: CPLine, offset: number, matrix: TransformationMatrix): void {
+	const { x, y } = applyTransform({ x: l[offset], y: l[offset + 1] }, matrix);
+	l[offset] = fix(x);
+	l[offset + 1] = fix(y);
 }
 
 /** Remove floating error. */

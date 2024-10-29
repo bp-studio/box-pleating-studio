@@ -18,7 +18,7 @@ import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
 
-import type { IEditor } from "./editor";
+import type { TransformationMatrix } from "shared/types/geometry";
 import type { ComputedRef } from "vue";
 import type { Grid } from "./grid/grid";
 import type { ITagObject } from "client/shared/interface";
@@ -28,6 +28,11 @@ import type { Control } from "client/base/control";
 import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
 
 const LAYERS = Enum.values(Layer);
+
+/** {@link IEditor} is the associated editing logic for a {@link Sheet}. */
+export interface IEditor {
+	$transform(matrix: TransformationMatrix): void;
+}
 
 //=================================================================
 /**

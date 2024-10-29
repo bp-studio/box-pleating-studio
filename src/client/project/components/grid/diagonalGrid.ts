@@ -7,7 +7,7 @@ import { chebyshev } from "client/utils/chebyshev";
 import { MAX_SHEET_SIZE, MIN_DIAG_SIZE } from "shared/types/constants";
 
 import type { GraphicsLike } from "client/utils/contourUtil";
-import type { Path } from "shared/types/geometry";
+import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";
 import type { Sheet } from "../sheet";
 
@@ -195,7 +195,7 @@ export class DiagonalGrid extends Grid {
 		}
 	}
 
-	public $getTransformMatrix(size: number, reorient: boolean): number[] {
+	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
 		const full = this.$renderWidth;
 		const s = size / full;
 		const shift = this._size % 2 / 2;
