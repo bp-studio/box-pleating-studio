@@ -1,4 +1,3 @@
-import { structureTask } from "core/design/tasks/structure";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
@@ -8,7 +7,7 @@ import { distMap } from "core/design/context/treeUtils";
 import { AreaTree } from "core/design/context/areaTree/areaTree";
 
 import type { Hierarchy } from "core/design/context/areaTree/utils";
-import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
+import type { JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
 
 //=================================================================
@@ -55,15 +54,6 @@ export namespace TreeController {
 		tree.$flushRemove();
 		tree.$setFlaps(prototypes);
 		Processor.$run(heightTask);
-	}
-
-	export function update(edges: JEdge[], stretches: JStretch[]): void {
-		const tree = State.$tree;
-		for(const e of edges) {
-			tree.$setLength(getChildId(e), e.length);
-		}
-		setStretchPrototypes(stretches);
-		Processor.$run(structureTask);
 	}
 
 	export function join(id: NodeId): void {

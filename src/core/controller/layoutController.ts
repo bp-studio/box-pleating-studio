@@ -1,15 +1,12 @@
-import { AABBTask } from "core/design/tasks/aabb";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { Clip } from "core/math/sweepLine/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
-import { setStretchPrototypes } from "core/design/tasks/stretch";
-import { TreeController } from "./treeController";
 
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
-import type { JEdge, JFlap, JStretch } from "shared/json";
+import type { JStretch } from "shared/json";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Repository } from "core/design/layout/repository";
 
@@ -19,20 +16,6 @@ import type { Repository } from "core/design/layout/repository";
  */
 //=================================================================
 export namespace LayoutController {
-
-	/**
-	 * Moving or resizing of flaps.
-	 */
-	export function update(flaps: JFlap[], edges: JEdge[], dragging: boolean, stretches: JStretch[]): void {
-		State.$isDragging = dragging;
-		State.$tree.$setFlaps(flaps);
-		if(edges.length) {
-			TreeController.update(edges, stretches);
-			return;
-		}
-		setStretchPrototypes(stretches);
-		Processor.$run(AABBTask);
-	}
 
 	/**
 	 * Clears the cached {@link Stretch}es and {@link Repository Repositories} after dragging.

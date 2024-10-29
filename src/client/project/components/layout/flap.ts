@@ -330,6 +330,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** Test if the new size is acceptable. */
 	private _testResize(w: number, h: number, grid: Grid = this._sheet.grid): boolean {
+		if(this.$project.history.$isLocked) return true;
 		return getDots(this._location, w, h)
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.

@@ -120,11 +120,6 @@ export class Tree implements ISerializable<JTree> {
 		return this.$project.$core.tree.merge(edge.toJSON());
 	}
 
-	public $updateLength(edges: JEdge[]): Promise<void> {
-		const stretches = this.$project.design.$prototype.layout.stretches;
-		return this.$project.$core.tree.update(edges, stretches);
-	}
-
 	public $goToDual(subject: Edge | Vertex[]): void {
 		const layout = this.$project.design.layout;
 		layout.$sheet.$clearSelection();

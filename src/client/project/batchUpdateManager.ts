@@ -1,5 +1,7 @@
+import { getOrSetEmptyArray } from "shared/utils/map";
+
+import type { UpdateRequest } from "core/controller/designController";
 import type { JEdge } from "shared/json/tree";
-import type { JFlap } from "shared/json/components";
 import type { CoreManager } from "./coreManager";
 import type { Flap } from "./components/layout/flap";
 import type { Edge } from "./components/tree/edge";
@@ -20,7 +22,7 @@ import type { Edge } from "./components/tree/edge";
 //=================================================================
 export class BatchUpdateManager {
 	/** The flaps that are about to be updated, and their update actions. */
-	private readonly _pendingFlaps = new Map<Flap, Action>();
+	private readonly _pendingFlaps = new Map<Flap, Action[]>();
 
 	/** The current {@link Promise} for flap updating process. */
 	private _updatePromise: Promise<void> | undefined;
@@ -39,7 +41,7 @@ export class BatchUpdateManager {
 
 	/** Register an update operation for a {@link Flap}. */
 	public $addFlap(flap: Flap, action: Action): Promise<void> {
-		this._pendingFlaps.set(flap, action);
+		getOrSetEmptyArray(this._pendingFlaps, flap).push(action);
 		return this._setupPromise();
 	}
 
@@ -68,16 +70,18 @@ export class BatchUpdateManager {
 	private _flush(): Promise<void> {
 		const project = this._core.$project;
 		this._updatePromise = undefined;
-		const flaps: JFlap[] = [];
-		for(const [f, action] of this._pendingFlaps) {
-			flaps.push(f.$updateDrawParams());
-			action();
+		const request: UpdateRequest = {
+			flaps: [],
+			edges: this._pendingEdges.concat(),
+			dragging: project.$isDragging,
+			stretches: project.design.$prototype.layout.stretches,
+		};
+		for(const [f, actions] of this._pendingFlaps) {
+			request.flaps.push(f.$updateDrawParams());
+			for(const action of actions) action();
 		}
 		this._pendingFlaps.clear();
-		const edges = this._pendingEdges.concat();
 		this._pendingEdges.length = 0;
-		const dragging = project.$isDragging;
-		const stretches = project.design.$prototype.layout.stretches;
-		return this._core.$run(c => c.design.update({ flaps, edges, dragging, stretches }));
+		return this._core.$run(c => c.design.update(request));
 	};
 }

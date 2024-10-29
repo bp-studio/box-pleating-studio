@@ -1,4 +1,5 @@
 import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "@utils/tree";
+import { DesignController } from "core/controller/designController";
 import { TreeController } from "core/controller/treeController";
 import { getDist } from "core/design/context/treeUtils";
 import { heightTask } from "core/design/tasks/height";
@@ -77,7 +78,10 @@ describe("Tree", function() {
 		expect(getDist(n0, n3)).to.equal(5);
 		expect(getDist(n1, n4)).to.equal(10);
 
-		TreeController.update([{ n1: id0, n2: id2, length: 5 }], []);
+		DesignController.update({
+			edges: [{ n1: id0, n2: id2, length: 5 }],
+			flaps: [], dragging: false, stretches: [],
+		});
 		expect(getDist(n1, n4)).to.equal(13);
 	});
 
