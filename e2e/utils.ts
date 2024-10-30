@@ -35,8 +35,13 @@ export class StudioPage {
 	public async newProject(): Promise<void> {
 		await this.page.getByRole("menuitem", { name: "File" }).click();
 		await this.page.getByRole("menuitem", { name: /New project$/ }).click();
-		await expect(this.page.getByRole("tab")).toBeAttached();
+		await expect(this.page.getByRole("tab")).toBeAttached({ timeout: 10000 });
 		await expect(this.page.getByText("Tree structure view")).toBeInViewport();
+	}
+
+	public async layoutReady(): Promise<void> {
+		await expect(this.page.getByRole("tab")).toBeAttached({ timeout: 10000 });
+		await expect(this.page.getByText("Layout view")).toBeInViewport();
 	}
 
 	/** Get the x-coordinate of the location of the selected {@link Draggable}. */
@@ -44,6 +49,14 @@ export class StudioPage {
 		const bpHandle = await this.getHandle();
 		return await this.page.evaluate(
 			bp => (bp.selection.selections[0] as Draggable)?.$location.x ?? NaN,
+			bpHandle
+		);
+	}
+
+	public async getTag(): Promise<string | undefined> {
+		const bpHandle = await this.getHandle();
+		return await this.page.evaluate(
+			bp => bp.selection.selections[0]?.$tag,
 			bpHandle
 		);
 	}
