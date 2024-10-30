@@ -49,11 +49,11 @@
 		"@mutsuntsai/esbuild-plugin-vue": "^0.1.6",
 		"@mutsuntsai/stylistic": "^1.0.3",
 		"@playwright/test": "^1.48.2",
-		"@rsbuild/core": "^1.0.18",
-		"@rsbuild/plugin-assets-retry": "^1.0.3",
+		"@rsbuild/core": "^1.0.19",
+		"@rsbuild/plugin-assets-retry": "^1.0.4",
 		"@rsbuild/plugin-check-syntax": "^1.0.1",
-		"@rsbuild/plugin-sass": "^1.0.4",
-		"@rsbuild/plugin-vue": "^1.0.2",
+		"@rsbuild/plugin-sass": "^1.1.0",
+		"@rsbuild/plugin-vue": "^1.0.3",
 		"@rsdoctor/rspack-plugin": "^0.4.7",
 		"@swc/core": "^1.7.40",
 		"@types/bootstrap": "^5.2.10",
@@ -61,7 +61,7 @@
 		"@types/gtag.js": "^0.0.20",
 		"@types/gulp": "^4.0.17",
 		"@types/mocha": "^10.0.9",
-		"@types/node": "^22.8.2",
+		"@types/node": "^22.8.4",
 		"@types/wicg-file-system-access": "^2023.10.5",
 		"chai": "^5.1.2",
 		"del": "^8.0.0",
@@ -93,7 +93,7 @@
 		"inquirer": "^12.0.1",
 		"jsdom": "^25.0.1",
 		"markdown-loader": "^8.0.0",
-		"mocha": "^10.7.3",
+		"mocha": "^10.8.1",
 		"mocha-suppress-logs": "^0.5.1",
 		"nyc": "^17.1.0",
 		"postcss-preset-env": "^10.0.8",
@@ -107,7 +107,7 @@
 		"tsconfig-paths": "^4.2.0",
 		"ttf2woff2": "^6.0.1",
 		"typescript": "^5.6.3",
-		"typescript-eslint": "^8.12.1",
+		"typescript-eslint": "^8.12.2",
 		"vinyl-ftp": "^0.6.1",
 		"vue-eslint-parser": "^9.4.3",
 		"yaml": "^2.6.0",
@@ -130,17 +130,16 @@
 		"vue": "^3.5.12",
 		"vue-i18n": "^10.0.4",
 		"vue-slicksort": "^2.0.5",
-		"workbox-broadcast-update": "^7.1.0",
-		"workbox-precaching": "^7.1.0",
-		"workbox-routing": "^7.1.0",
-		"workbox-strategies": "^7.1.0"
+		"workbox-broadcast-update": "^7.3.0",
+		"workbox-precaching": "^7.3.0",
+		"workbox-routing": "^7.3.0",
+		"workbox-strategies": "^7.3.0"
 	},
 	"pnpm": {
 		"overrides": {
 			"caniuse-lite": "1.0.30001653",
 			"doiuse": "6.0.2",
-			"magic-string": "^0.27.0",
-			"node-gyp": "^10.0.0"
+			"magic-string": "^0.27.0"
 		},
 		"peerDependencyRules": {
 			"allowAny": [
