@@ -86,6 +86,8 @@
 		"tsun",
 		"typeless",
 		"unversioned",
+		"webglcontextlost",
+		"webglcontextrestored",
 		"wicg",
 		"xdescribe"
 	],

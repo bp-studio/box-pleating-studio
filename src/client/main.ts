@@ -82,4 +82,9 @@ export function createTestCase(): void {
 	const proj = projects.current.value;
 	if(proj) proj.design.createTestCase();
 }
+
+export function simulateContextLoss(): void {
+	const context = display.canvas.getContext("webgl2");
+	context?.getExtension("WEBGL_lose_context")?.loseContext();
+}
 /// #endif
