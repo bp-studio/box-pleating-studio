@@ -1,5 +1,6 @@
 import { MAX_SHEET_SIZE } from "shared/types/constants";
 import { hasBigInt64Array, hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
+import { display } from "client/screen/display";
 
 import type { Hierarchy } from "core/design/context/areaTree/utils";
 import type { OptimizerEvent, OptimizerRequest, OptimizerResult, OptimizerOptionsBase, OptimizerCommand } from "./types";
@@ -90,7 +91,7 @@ export async function optimizer(project: Project, options: OptimizerOptions): Pr
 	const result = await execution.promise;
 	checkOptimizerResult(result, project);
 
-	if(!options.openNew) writeToProject(project, request, result);
+	if(!options.openNew) await writeToProject(project, request, result);
 	else writeToTemplate(json, request, result);
 	return json;
 }
@@ -176,13 +177,16 @@ function writeToTemplate(json: JProject, request: OptimizerRequest, result: Opti
 	json.design.mode = "layout";
 }
 
-function writeToProject(proj: Project, request: OptimizerRequest, result: OptimizerResult): void {
-	const layout = proj.design.layout;
-	layout.$sheet.grid.$setDimension(result.width, result.height);
+function writeToProject(proj: Project, request: OptimizerRequest, result: OptimizerResult): Promise<void> {
+	return display.shield(async () => {
+		const layout = proj.design.layout;
+		layout.$sheet.grid.$setDimension(result.width, result.height);
 
-	for(const f of result.flaps) {
-		const flap = layout.$flaps.get(f.id)!;
-		const { width, height } = request.problem.flaps.find(r => r.id == f.id)!;
-		flap.$manipulate(f.x, f.y, width, height);
-	}
+		for(const f of result.flaps) {
+			const flap = layout.$flaps.get(f.id)!;
+			const { width, height } = request.problem.flaps.find(r => r.id == f.id)!;
+			flap.$manipulate(f.x, f.y, width, height);
+		}
+		await proj.design.$batchUpdateManager.$updateComplete;
+	});
 }

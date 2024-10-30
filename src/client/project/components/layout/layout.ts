@@ -12,7 +12,10 @@ import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 import { FlapContainer } from "./flapContainer";
+import { applyTransform } from "shared/types/geometry";
 
+import type { IEditor } from "../sheet";
+import type { TransformationMatrix } from "shared/types/geometry";
 import type { Flap } from "./flap";
 import type { BatchUpdateManager } from "client/project/batchUpdateManager";
 import type { Device } from "./device";
@@ -30,7 +33,7 @@ import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport, Nod
  * as it handles the drawing of invalid junctions.
  */
 //=================================================================
-export class Layout extends View implements ISerializable<JLayout> {
+export class Layout extends View implements ISerializable<JLayout>, IEditor {
 
 	@shallowRef public accessor flapCount: number = 0;
 	@shallowRef public accessor riverCount: number = 0;
@@ -58,7 +61,7 @@ export class Layout extends View implements ISerializable<JLayout> {
 		super();
 		this.$project = project;
 		this.$flaps = new FlapContainer(this);
-		this.$sheet = new Sheet(project, parentView, "layout", this.$flaps, json, state);
+		this.$sheet = new Sheet(project, parentView, "layout", this, json, state);
 		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(style.junction.alpha);
@@ -175,6 +178,26 @@ export class Layout extends View implements ISerializable<JLayout> {
 	public $createFlapPrototype(id: NodeId, vertexLocation: IPoint): JFlap {
 		const { x, y } = getRelativePoint(vertexLocation, this.$project.design.tree.$sheet, this.$sheet);
 		return { id, x, y, width: 0, height: 0 };
+	}
+
+	public $transform(matrix: TransformationMatrix): void {
+		const [a, b, c, d] = matrix;
+		const scale = Math.round((Math.sqrt(a * a + c * c) + Math.sqrt(b * b + d * d)) / 2);
+		for(const flap of this.$flaps) {
+			const { x, y, width, height } = flap.toJSON();
+			const ll = applyTransform({ x, y }, matrix);
+			const ur = applyTransform({ x: x + width, y: y + height }, matrix);
+			const newX = Math.min(ur.x, ll.x);
+			const newY = Math.min(ur.y, ll.y);
+			const newWidth = Math.abs(ur.x - ll.x);
+			const newHeight = Math.abs(ur.y - ll.y);
+			flap.$manipulate(newX, newY, newWidth, newHeight);
+			if(scale != 1) flap.radius *= scale;
+		}
+		if(scale == 1) return;
+		for(const river of this.$rivers.values()) {
+			river.$edge.length *= scale;
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

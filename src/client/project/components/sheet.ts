@@ -1,4 +1,4 @@
-import { computed } from "vue";
+import { computed, h } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 import { Rectangle } from "@pixi/math";
@@ -206,23 +206,32 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	public subdivide(): void {
-		const oldCenter = this.grid.$getResizeCenter();
-		this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
-		const newCenter = this.grid.$getResizeCenter();
-		this._editor.$transform([2, 0, 0, 2, newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y]);
+		display.shield(async () => {
+			const oldCenter = this.grid.$getResizeCenter();
+			this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
+			const newCenter = this.grid.$getResizeCenter();
+			this._editor.$transform([2, 0, 0, 2, newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y]);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
 	}
 
 	public rotate(by: Sign): void {
-		const oldCenter = this.grid.$getCenter();
-		const { width, height } = this.grid.toJSON();
-		this.grid.$setDimension(height, width);
-		const newCenter = this.grid.$getCenter();
-		this._editor.$transform([0, by, -by, 0, newCenter.x - by * oldCenter.y, newCenter.y + by * oldCenter.x]);
+		display.shield(async () => {
+			const oldCenter = this.grid.$getCenter();
+			const { width, height } = this.grid.toJSON();
+			this.grid.$setDimension(height, width);
+			const newCenter = this.grid.$getCenter();
+			this._editor.$transform([0, by, -by, 0, newCenter.x - by * oldCenter.y, newCenter.y + by * oldCenter.x]);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
 	}
 
 	public flip(horizontal: boolean): void {
-		const { x, y } = this.grid.$getCenter();
-		this._editor.$transform(horizontal ? [-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]);
+		display.shield(async () => {
+			const { x, y } = this.grid.$getCenter();
+			this._editor.$transform(horizontal ? [-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
 	}
 
 	/** The dimension of the sheet after rasterization. */
