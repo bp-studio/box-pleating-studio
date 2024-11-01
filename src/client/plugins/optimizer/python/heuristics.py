@@ -12,39 +12,39 @@ from .problem import Circle, Hierarchy
 
 def generate_candidate(target: int, hierarchies: list[Hierarchy]) -> list[np.ndarray]:
 	vectors: list[np.ndarray] = []
-	try:
-		growth = target ** (1 / len(hierarchies))
-		num = growth
-		total = _estimate_total(target, growth, len(hierarchies))
-		generated = 0
+	growth = target ** (1 / len(hierarchies))
+	num = growth
+	total = _estimate_total(target, growth, len(hierarchies))
+	generated = 0
+	interrupted = False
 
-		def callback():
-			nonlocal generated
-			print(f'{{"event": "candidate", "data": [{generated}, {total}]}}')
-			generated += 1
+	def callback():
+		nonlocal generated
+		print(f'{{"event": "candidate", "data": [{generated}, {total}]}}')
+		generated += 1
 
-		callback()
-		last_hierarchy = None
-		for hierarchy in hierarchies:
-			context = GenerateContext(hierarchy, callback)
-			if len(vectors) == 0:
-				vectors = _generate_candidate(math.floor(num), context)
-			elif last_hierarchy:
-				vectors = _generate_next_level(vectors, context, last_hierarchy, num, target)
-			last_hierarchy = hierarchy
-			num *= growth
-	except KeyboardInterrupt:
-		pass
+	callback()
+	last_hierarchy = None
+	for hierarchy in hierarchies:
+		context = GenerateContext(hierarchy, callback, interrupted)
+		if len(vectors) == 0:
+			vectors = _generate_candidate(math.floor(num), context)
+		elif last_hierarchy:
+			vectors = _generate_next_level(vectors, context, last_hierarchy, num, target)
+		last_hierarchy = hierarchy
+		num *= growth
+		interrupted = context.interrupted
 
 	vectors.sort(key=objective)
 	return vectors[:target]
 
 
 class GenerateContext:
-	def __init__(self, hierarchy: Hierarchy, callback: Callable):
+	def __init__(self, hierarchy: Hierarchy, callback: Callable, interrupted):
 		self.hierarchy = hierarchy
 		self.constraints = generate_constraints(hierarchy)
 		self.callback = callback
+		self.interrupted = interrupted
 
 
 def _generate_next_level(
@@ -53,10 +53,15 @@ def _generate_next_level(
 	next_vec: list[np.ndarray] = []
 	num_per_vec = round(num / len(vectors))
 	for vec in vectors:
-		circles = _make_circles(vec, context.hierarchy, last_hierarchy)
-		n = min(num_per_vec, target - len(next_vec))
-		candidates = _generate_candidate(n, context, circles)
-		next_vec.extend(candidates)
+		while True:
+			try:
+				circles = _make_circles(vec, context.hierarchy, last_hierarchy)
+				n = min(num_per_vec, target - len(next_vec))
+				candidates = _generate_candidate(n, context, circles)
+				next_vec.extend(candidates)
+				break
+			except KeyboardInterrupt:
+				context.interrupted = True
 	return next_vec
 
 
@@ -95,17 +100,23 @@ def _make_circles(vec, hierarchy: Hierarchy, last_hierarchy: Hierarchy) -> list[
 def _generate_candidate(target: int, context: GenerateContext, circles=None) -> list[np.ndarray]:
 	vectors: list[np.ndarray] = []
 	while len(vectors) < target:
-		vec = _generate_random_candidate(context.hierarchy, circles)
-		result = pack(vec, context.constraints)
-		if result.success:
-			vectors.append(result.x)
+		try:
+			vec = _generate_random_candidate(context.hierarchy, circles)
+			if not context.interrupted:
+				result = pack(vec, context.constraints)
+				if not result.success:
+					continue
+				vec = result.x
+			vectors.append(vec)
 			context.callback()
+		except KeyboardInterrupt:
+			context.interrupted = True
 	return vectors
 
 
 def _generate_random_candidate(hierarchy: Hierarchy, circles) -> np.ndarray:
 	result = None
-	for _ in range(10):
+	for _ in range(4):
 		if circles is None:
 			vec: np.ndarray = np.random.rand(len(hierarchy.flaps) * 2 + 1)
 		else:

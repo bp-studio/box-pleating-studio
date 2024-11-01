@@ -14,7 +14,7 @@ from .branching.greedy import greedy_solve_integer
 
 def abort_handler(_, __):
 	print("Abort operation")
-	raise StopAsyncIteration
+	raise StopIteration
 
 
 signal.signal(signal.SIGABRT, abort_handler)
@@ -45,7 +45,7 @@ def main(args) -> Optional[dict]:
 			"height": grid,
 			"flaps": hierarchy.restore(integer_solution[:-1]),
 		}
-	except StopAsyncIteration:
+	except StopIteration:
 		return None
 
 
