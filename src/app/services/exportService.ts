@@ -22,7 +22,7 @@ namespace ExportService {
 		proj ??= Studio.project ?? undefined;
 		if(!proj) throw new Error();
 		if(type == "png") return Studio.png(proj);
-		if(type == "svg") return Studio.svg(proj, Settings.includeHiddenElement);
+		if(type == "svg") return Studio.svg(proj, Settings.tools.SVG.includeHiddenElement);
 		if(type == "bpz") return zip();
 		if(type == "bps") return toBPS(proj);
 		throw new Error();

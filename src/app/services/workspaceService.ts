@@ -6,7 +6,7 @@ import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { isOnline } from "app/shared/constants";
 
-import type { OptimizerOptions } from "client/plugins/optimizer";
+import type { OptimizerCallback, OptimizerOptions } from "client/plugins/optimizer";
 import type { CoreError, JProject, ProjId } from "shared/json";
 import type { Project } from "client/project/project";
 
@@ -175,10 +175,10 @@ namespace WorkspaceService {
 		gtag("event", "project_clone");
 	}
 
-	export async function optimize(options: OptimizerOptions): Promise<void> {
+	export async function optimize(options: OptimizerOptions, callback: OptimizerCallback): Promise<void> {
 		const proj = Studio.project;
 		if(!proj) return;
-		const optimized = await bp.plugins.optimizer(proj, options);
+		const optimized = await bp.plugins.optimizer(proj, options, callback);
 		if(options.openNew) await insertAfterAndSelect(optimized, proj.id);
 	}
 

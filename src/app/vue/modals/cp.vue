@@ -1,7 +1,7 @@
 <template>
 	<Export :title="$t('toolbar.tools.CP._')" :blob="getBlob" ref="exp" mime="text/cp+plain" description="ORIPA CP" extension=".cp"
-			screen="CP" :observe="() => Settings.CP" @save="save">
-		<Toggle v-model="Settings.CP.reorient">{{ $t('toolbar.tools.CP.reorient') }}</Toggle>
+			screen="CP" :observe="() => options" @save="save">
+		<Toggle v-model="options.reorient">{{ $t('toolbar.tools.CP.reorient') }}</Toggle>
 	</Export>
 </template>
 
@@ -17,9 +17,10 @@
 	defineOptions({ name: "CP" });
 
 	const exp = compRef(Export);
+	const options = Settings.tools.CP;
 
 	async function getBlob(): Promise<Blob> {
-		const content = await Studio.plugins.cp(Settings.CP);
+		const content = await Studio.plugins.cp(options);
 		return new Blob([content], { type: "text/cp+plain" });
 	}
 

@@ -64,7 +64,7 @@
 						<Toggle v-if="isFileApiEnabled" v-model="Settings.loadSessionOnQueue">
 							{{ $t('preference.loadSessionOnQueue') }}
 						</Toggle>
-						<Toggle v-model="Settings.includeHiddenElement">
+						<Toggle v-model="Settings.tools.SVG.includeHiddenElement">
 							{{ $t('preference.includeHidden') }}
 						</Toggle>
 					</div>

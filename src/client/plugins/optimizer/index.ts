@@ -41,16 +41,16 @@ export function initOptimizerWorker(): void {
 if(!isPlaywright) initOptimizerWorker();
 
 let loading: number = 0;
-let callback: Consumer<OptimizerEvent>;
+let callback: OptimizerCallback;
 let execution: PromiseWithResolvers<OptimizerResult>;
+
+/** Callback for showing the progress of optimizer. */
+export type OptimizerCallback = Consumer<OptimizerEvent>;
 
 export interface OptimizerOptions extends OptimizerOptionsBase {
 	useDimension: boolean;
 	openNew: boolean;
 	random: number;
-
-	/** Callback for showing the progress of optimizer. */
-	callback: Consumer<OptimizerEvent>;
 }
 
 function handler(command: OptimizerCommand, worker: Worker): void {
@@ -67,8 +67,8 @@ function handler(command: OptimizerCommand, worker: Worker): void {
 	}
 }
 
-export async function optimizer(project: Project, options: OptimizerOptions): Promise<JProject> {
-	callback = options.callback;
+export async function optimizer(project: Project, options: OptimizerOptions, cb: OptimizerCallback): Promise<JProject> {
+	callback = cb;
 	const init = Promise.withResolvers<Worker>();
 	callback({
 		event: "handle",
@@ -98,7 +98,7 @@ export async function optimizer(project: Project, options: OptimizerOptions): Pr
 
 function createOptimizerRequest(json: JProject, hierarchies: Hierarchy[], options: OptimizerOptions): OptimizerRequest {
 	const { flaps, sheet } = json.design.layout;
-	options.callback({ event: "flap", data: flaps.length });
+	callback({ event: "flap", data: flaps.length });
 	if(!options.useDimension) flaps.forEach(f => f.width = f.height = 0);
 	const { type } = sheet;
 

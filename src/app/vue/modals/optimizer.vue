@@ -99,13 +99,13 @@
 	import { provide, reactive } from "vue";
 
 	import Workspace from "app/services/workspaceService";
+	import Settings from "app/services/settingService";
 	import useModal from "./modal";
 	import Number from "@/gadgets/form/number.vue";
 	import OptProgress, { contextKey } from "./components/optProgress.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
 	import { hasBigInt64Array } from "app/shared/constants";
 
-	import type { OptimizerOptions } from "client/plugins/optimizer";
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";
 
 	defineOptions({ name: "Optimizer" });
@@ -134,14 +134,7 @@
 		stopping: false,
 		error: "",
 	});
-	const options = reactive<OptimizerOptions>({
-		layout: "view",
-		openNew: true,
-		useDimension: true,
-		useBH: false,
-		random: 1,
-		callback,
-	});
+	const options = Settings.tools.Optimizer;
 
 	let handler: Consumer<OptimizerCommand> = () => { /**/ };
 
@@ -200,7 +193,7 @@
 		state.running = true;
 		state.stage = Stage.initializing;
 		try {
-			await Workspace.optimize(options);
+			await Workspace.optimize(options, callback);
 			hide();
 			state.stage = Stage.stopped;
 		} catch(e) {

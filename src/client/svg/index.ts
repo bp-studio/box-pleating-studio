@@ -99,9 +99,9 @@ function getTransform(sheet: Sheet, height: number): string {
 
 function getBorderLayer(sheet: Sheet, borderPath: string): string {
 	let result = `<path class="border" d="${borderPath}" />`;
-	if(settings.showGrid || includeHiddenElement) {
+	if(settings.display.grid || includeHiddenElement) {
 		const graphics = new SvgGraphics();
-		graphics.$class = "grid" + (settings.showGrid ? "" : " hidden");
+		graphics.$class = "grid" + (settings.display.grid ? "" : " hidden");
 		sheet.grid.$drawGrid(graphics);
 		result += graphics.$get();
 	}
@@ -130,7 +130,7 @@ function getEdgeLayer(design: Design): string {
 }
 
 function getHingeLayer(design: Design): string {
-	const hidden = !settings.showHinge;
+	const hidden = !settings.display.hinge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
@@ -146,7 +146,7 @@ function getHingeLayer(design: Design): string {
 }
 
 function getRidgeLayer(design: Design): string {
-	const hidden = !settings.showRidge;
+	const hidden = !settings.display.ridge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
@@ -163,7 +163,7 @@ function getRidgeLayer(design: Design): string {
 }
 
 function getAxisParallelLayer(design: Design): string {
-	const hidden = !settings.showAxialParallel;
+	const hidden = !settings.display.axialParallel;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "axis-parallel";
@@ -187,7 +187,7 @@ function getJunctionLayer(design: Design): string {
 }
 
 function getDotLayer(design: Design): string {
-	const hidden = !settings.showDot;
+	const hidden = !settings.display.dot;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
 	const graphics = new SvgGraphics();
 	graphics.$class = "dot";
@@ -208,7 +208,7 @@ function getVertexLayer(design: Design): string {
 }
 
 function getLabelLayer(design: Design): string {
-	const hidden = !settings.showLabel;
+	const hidden = !settings.display.label;
 	if(hidden && !includeHiddenElement) return "";
 	let result = "";
 	const s = ProjectService.scale.value;

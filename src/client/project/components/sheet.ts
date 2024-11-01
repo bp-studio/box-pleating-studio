@@ -261,11 +261,11 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {
-		this._layers[Layer.axisParallels].visible = settings.showAxialParallel;
-		this._layers[Layer.dot].visible = settings.showDot;
-		this._layers[Layer.hinge].visible = settings.showHinge;
-		this._layers[Layer.label].visible = settings.showLabel;
-		this._layers[Layer.ridge].visible = settings.showRidge;
+		this._layers[Layer.axisParallels].visible = settings.display.axialParallel;
+		this._layers[Layer.dot].visible = settings.display.dot;
+		this._layers[Layer.hinge].visible = settings.display.hinge;
+		this._layers[Layer.label].visible = settings.display.label;
+		this._layers[Layer.ridge].visible = settings.display.ridge;
 	}
 
 	/** Adjust the position of the container by the scrolling position. */
@@ -293,7 +293,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._mask.endFill();
 
 		// Draw grid lines
-		this._gridGraphics.visible = settings.showGrid;
+		this._gridGraphics.visible = settings.display.grid;
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()
 				.lineStyle(style.grid.width * sh, style.grid.color);
