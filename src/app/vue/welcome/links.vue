@@ -12,6 +12,7 @@
 		<i class="fas fa-plus" />
 		<i class="fab fa-discord" />
 		<i class="far fa-clone" />
+		🇺🇸
 	</div>
 </template>
 

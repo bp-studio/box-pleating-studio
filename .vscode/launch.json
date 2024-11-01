@@ -3,6 +3,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			// https://github.com/microsoft/vscode-js-debug/blob/main/OPTIONS.md
 			"type": "chrome",
 			"request": "launch",
 			"name": "Launch in Chrome",
