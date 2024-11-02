@@ -44,7 +44,7 @@
 		"@aaroon/workbox-rspack-plugin": "^0.3.2",
 		"@eslint/compat": "^1.2.2",
 		"@eslint/eslintrc": "^3.1.0",
-		"@eslint/js": "^9.13.0",
+		"@eslint/js": "^9.14.0",
 		"@intlify/vue-i18n-extensions": "^6.2.0",
 		"@mutsuntsai/esbuild-plugin-vue": "^0.1.6",
 		"@mutsuntsai/stylistic": "^1.0.3",
@@ -66,7 +66,7 @@
 		"chai": "^5.1.2",
 		"del": "^8.0.0",
 		"esbuild": "^0.24.0",
-		"eslint": "^9.13.0",
+		"eslint": "^9.14.0",
 		"eslint-import-resolver-typescript": "^3.6.3",
 		"eslint-plugin-compat": "^6.0.1",
 		"eslint-plugin-html": "^8.1.2",
@@ -96,13 +96,13 @@
 		"mocha": "^10.8.2",
 		"mocha-suppress-logs": "^0.5.1",
 		"nyc": "^17.1.0",
-		"postcss-preset-env": "^10.0.8",
+		"postcss-preset-env": "^10.0.9",
 		"purgecss": "^6.0.0",
 		"stylelint": "^16.10.0",
 		"stylelint-config-clean-order": "^6.1.0",
 		"stylelint-config-recommended-vue": "^1.5.0",
 		"stylelint-config-standard-scss": "^13.1.0",
-		"stylelint-no-unsupported-browser-features": "^8.0.1",
+		"stylelint-no-unsupported-browser-features": "^8.0.2",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0",
 		"ttf2woff2": "^6.0.1",
@@ -137,8 +137,6 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"caniuse-lite": "1.0.30001653",
-			"doiuse": "6.0.2",
 			"magic-string": "^0.27.0"
 		},
 		"peerDependencyRules": {
