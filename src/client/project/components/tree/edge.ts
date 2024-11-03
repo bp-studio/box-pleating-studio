@@ -12,6 +12,7 @@ import { style } from "client/services/styleService";
 import { FieldCommand } from "client/project/changes/commands/fieldCommand";
 import { norm } from "shared/types/geometry";
 import { MAX_TREE_HEIGHT } from "shared/types/constants";
+import { SelectionController } from "client/controllers/selectionController";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LabelView } from "client/utils/label";
@@ -100,7 +101,10 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 
 	public async delete(): Promise<void> {
 		const v = this.$getLeaf();
-		if(v) await this._tree.$vertices.$delete([v]);
+		if(v) {
+			await this._tree.$vertices.$delete([v]);
+			SelectionController.clear();
+		}
 	}
 
 	/** For controlling max tree height. See {@link MAX_TREE_HEIGHT}. */

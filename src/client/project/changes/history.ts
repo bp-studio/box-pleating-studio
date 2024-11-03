@@ -114,6 +114,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(!this._moving) this._flush();
 	}
 
+	/** Tell the {@link HistoryManager} to record the current selections. */
 	public $cacheSelection(): void {
 		this._selection = this._project.design.sheet.$getSelectedTags();
 	}
