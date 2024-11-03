@@ -1,5 +1,5 @@
 <template>
-	<div class="dropdown-menu" @touchend="tap" @mouseup="tap" ref="el" v-if="initialized">
+	<div class="dropdown-menu" @touchend="hide(false)" @mouseup="hide(false)" ref="el" v-if="initialized">
 		<slot></slot>
 	</div>
 </template>
@@ -22,7 +22,7 @@
 
 	onMounted(() => {
 		const handle = (event: Event): void => {
-			if(shown && !el.value!.contains(event.target as Element)) hide();
+			if(shown && !el.value!.contains(event.target as Element)) hide(true);
 		};
 		document.addEventListener("touchstart", handle, { capture: true, passive: true });
 		document.addEventListener("mousedown", handle, { capture: true, passive: true });
@@ -41,24 +41,21 @@
 
 	function hideCore(): void {
 		el.value!.classList.remove("show");
+		popper.destroy();
 	}
 
-	function hide(): void {
-		if(shown) {
-			hideCore();
-			popper.destroy();
-			shown = false;
-		}
-	}
+	// A delay of 10 is known to be insufficient on some versions of Safari,
+	// so we set it to 50 to be on the safe side
+	const HIDDEN_DELAY = 50;
 
-	function tap(): void {
-		// A delay of 10 is known to be insufficient on some versions of Safari,
-		// so we set it to 50 to be on the safe side
-		const HIDDEN_DELAY = 50;
+	function hide(force: boolean): void {
 		if(shown) {
-			// A delay is required here, or it won't be clickable in touch mode.
-			setTimeout(hideCore, HIDDEN_DELAY);
-			popper.destroy();
+			if(force) {
+				hideCore();
+			} else {
+				// A delay is required here, or it won't be clickable in touch mode.
+				setTimeout(hideCore, HIDDEN_DELAY);
+			}
 			shown = false;
 		}
 	}
