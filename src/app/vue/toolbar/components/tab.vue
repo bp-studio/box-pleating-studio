@@ -37,19 +37,24 @@
 
 	const props = defineProps<{ id: ProjId }>();
 
-	function project(): Project {
-		return Workspace.getProject(props.id)!;
+	function project(): Project | undefined {
+		// It is possible during context loss that the result is undefined.
+		return Workspace.getProject(props.id);
 	}
 
 	defineEmits(["menu"]);
 
-	const isModified = computed(() => project().history.isModified);
+	function getTitle(): string {
+		return project()?.design.title ?? "";
+	}
+
+	const isModified = computed(() => project()?.history.isModified ?? false);
 	const title = computed(() => {
-		const designTitle = project().design.title;
+		const designTitle = getTitle();
 		return designTitle ? designTitle : i18n.t("toolbar.tab.noTitle").toString();
 	});
 	const toolTip = computed(() => {
-		let result = project().design.title;
+		let result = getTitle();
 		const handle = Handle.get(props.id);
 		if(handle) result += "\n" + handle.name;
 		return result;

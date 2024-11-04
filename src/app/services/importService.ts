@@ -3,6 +3,8 @@ import Handles from "./handleService";
 import Workspace, { nextTick } from "./workspaceService";
 import Dialogs from "./dialogService";
 import Zip from "app/utils/zip";
+import Studio from "./studioService";
+import SessionService from "./sessionService";
 
 import type { ProjId } from "shared/json";
 
@@ -72,6 +74,7 @@ namespace ImportService {
 	 * Process files opened by `<input type="file">`
 	 */
 	export async function openFiles(files: FileList): Promise<void> {
+		const takeover = Studio.shouldTakeOverContextHandling();
 		await Dialogs.loader.show();
 		const tasks: Promise<number | undefined>[] = [];
 		if(files.length) {
@@ -87,11 +90,17 @@ namespace ImportService {
 		if(success) {
 			gtag("event", "project_open");
 			const ids = Workspace.ids.value;
-			Workspace.select(ids[ids.length - 1]);
-
-			// Hide the spinner after the rendering is completed
-			await nextTick();
+			const index = ids.length - 1;
+			if(!takeover) {
+				Workspace.select(ids[index]);
+				await nextTick(); // Hide the spinner after the rendering is completed
+			} else {
+				await SessionService.save(index);
+			}
 		}
+
+		// Handling context loss
+		if(takeover) location.reload();
 
 		Dialogs.loader.hide();
 	}
@@ -127,12 +136,12 @@ namespace ImportService {
 			const test = String.fromCharCode(new Uint8Array(buffer.slice(0, 1))[0]);
 			if(test == "{") { // JSON
 				const dataString = FileUtility.bufferToText(buffer);
-				const proj = await Workspace.open(JSON.parse(dataString));
+				const id = await Workspace.open(JSON.parse(dataString));
 				if(handle) {
-					Handles.set(proj.id, handle);
+					Handles.set(id, handle);
 					await Handles.addRecent(handle);
 				}
-				return proj.id;
+				return id;
 			} else if(test == "P") { // PKZip
 				const id = await openWorkspace(buffer);
 				if(handle) await Handles.addRecent(handle);

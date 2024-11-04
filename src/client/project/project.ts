@@ -7,6 +7,7 @@ import { options } from "client/options";
 import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
 import { callWorker } from "app/utils/workerUtility";
+import { isContextLost } from "client/main";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
 import type { CoreError, JProject, ProjId } from "shared/json";
@@ -18,6 +19,10 @@ const CORE_TIMEOUT = 3000;
  * Id starts from 1 to ensure true values.
  */
 let nextId = 1;
+
+export function getNextId(): ProjId {
+	return nextId++ as ProjId;
+}
 
 //=================================================================
 /**
@@ -64,9 +69,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		// Projects are all inactive on construction.
 		// It will become active when selected later (see ProjectService)
 		super(false);
-
-		this.id = nextId++ as ProjId;
-
+		this.id = getNextId();
 		const jProject = deepAssign(Migration.$getSample(), json);
 
 		this.history = new HistoryManager(this, jProject.history);

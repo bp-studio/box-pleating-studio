@@ -24,6 +24,7 @@
 	const ONE_SECOND = 1000;
 
 	function show(): Promise<void> {
+		if(loading.value) return Promise.resolve();
 		loading.value = true;
 
 		/**

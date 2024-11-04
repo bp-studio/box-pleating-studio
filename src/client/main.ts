@@ -7,12 +7,11 @@ import { Interaction } from "./services/interaction";
 import { ScrollController } from "./controllers/scrollController";
 import { doEvents } from "shared/utils/async";
 
-import type { IProjectController } from "./controllers/projectController";
 import type { IDragController } from "./controllers/dragController";
 import type { ISelectionController } from "./controllers/selectionController";
 import type HistoryManager from "./project/changes/history";
 
-export const projects: IProjectController = ProjectController;
+export const projects = ProjectController;
 export const drag: IDragController = DragController;
 export const selection: ISelectionController = SelectionController;
 
@@ -23,6 +22,7 @@ export { style } from "./services/styleService";
 export { mouseCoordinates } from "./services/interaction";
 export { options } from "./options";
 export { plugins } from "./plugins";
+export { isContextLost, shouldTakeOverContextHandling } from "./screen/contextManager";
 
 export async function init(): Promise<void> {
 	await display.$init();

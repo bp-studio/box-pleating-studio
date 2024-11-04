@@ -1,10 +1,10 @@
 
-import { Project } from "client/project/project";
+import { getNextId, Project } from "client/project/project";
 import { Migration } from "client/patches";
 import { deepAssign } from "shared/utils/clone";
 import ProjectService from "client/services/projectService";
+import { isContextLost } from "client/main";
 
-import type { ShallowRef } from "vue";
 import type { JProject, ProjId } from "shared/json";
 
 function createWorker(): Worker {
@@ -13,14 +13,6 @@ function createWorker(): Worker {
 
 /** The worker instance that is pre-generated and is standing-by. */
 let __worker: Worker | undefined = createWorker();
-
-export interface IProjectController {
-	readonly current: ShallowRef<Project | null>;
-	get(id: ProjId): Project | undefined;
-	create(json: RecursivePartial<JProject>): Promise<Project>;
-	open(json: Pseudo<JProject>): Promise<Project>;
-	close(proj: Project): void;
-}
 
 /// #if DEBUG
 /**
@@ -43,6 +35,9 @@ export namespace ProjectController {
 
 	const projectMap = new Map<ProjId, Project>();
 
+	/** A fallback for creating session during context loss. */
+	const fallbackMap: Record<ProjId, JProject> = {};
+
 	export const current = ProjectService.project;
 
 	/** Return the {@link Project} by id. */
@@ -53,6 +48,10 @@ export namespace ProjectController {
 	/** Return all {@link Project}s. */
 	export function all(): Project[] {
 		return [...projectMap.values()];
+	}
+
+	export function getSession(ids: readonly ProjId[]): JProject[] {
+		return ids.map(id => projectMap.get(id)?.toJSON(true) ?? fallbackMap[id]);
 	}
 
 	/** Returns the standing-by worker, or create a new worker. */
@@ -66,7 +65,7 @@ export namespace ProjectController {
 	 * Creates a new {@link Project}.
 	 * The passed-in data will be deeply assigned on the template project instead of passing through migration.
 	 */
-	export function create(json: RecursivePartial<JProject>): Promise<Project> {
+	export function create(json: RecursivePartial<JProject>): Promise<ProjId> {
 		json = deepAssign<RecursivePartial<JProject>>({
 			design: {
 				layout: {
@@ -97,18 +96,27 @@ export namespace ProjectController {
 	/**
 	 * Opens an old project. Passed-in data will go through {@link Migration} and updated to the latest format.
 	 */
-	export function open(json: Pseudo<JProject>): Promise<Project> {
+	export function open(json: Pseudo<JProject>): Promise<ProjId> {
 		return makeProject(Migration.$process(json));
 	}
 
-	function makeProject(json: RecursivePartial<JProject>): Promise<Project> {
+	async function makeProject(json: RecursivePartial<JProject>): Promise<ProjId> {
+		// Handling context loss, in which case we don't actually construct
+		// a Project instance, but just keep the JSON data for session saving.
+		if(isContextLost()) {
+			const id = getNextId();
+			fallbackMap[id] = deepAssign(Migration.$getSample(), json);
+			return id;
+		}
+
 		const p = new Project(json, getOrCreateWorker());
 		/// #if DEBUG
 		// eslint-disable-next-line typescript-compat/compat
 		registry.register(p, p.id);
 		/// #endif
 		projectMap.set(p.id, p);
-		return p.$initialize();
+		await p.$initialize();
+		return p.id;
 	}
 
 	/**

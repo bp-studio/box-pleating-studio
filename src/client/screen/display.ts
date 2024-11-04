@@ -8,14 +8,11 @@ import { useBackground } from "./background";
 import { useControlEventBoundary } from "./controlEventBoundary";
 import { ScrollView } from "./scrollView";
 import { useRenderer } from "./renderer";
+import { setup } from "./contextManager";
 
 import type { FederatedPointerEvent } from "@pixi/events";
-import type { Renderer, WebGLContextEventMap } from "@pixi/core";
+import type { Renderer } from "@pixi/core";
 import type { ControlEventBoundary } from "./controlEventBoundary";
-
-declare global {
-	interface HTMLElementEventMap extends WebGLContextEventMap { }
-}
 
 namespace Display {
 
@@ -41,8 +38,7 @@ namespace Display {
 		});
 
 		// Context loss handling
-		canvas.addEventListener("webglcontextlost", handleContextLost, false);
-		canvas.addEventListener("webglcontextrestored", handleContextRestored, false);
+		setup(canvas);
 
 		// Create top-level containers
 		stage = new Container();
@@ -76,26 +72,6 @@ namespace Display {
 	export let canvas: HTMLCanvasElement;
 	export let designs: Container;
 	export let ui: Container;
-
-	/**
-	 * WebGL context loss happens when there is something wrong with the GPU.
-	 * This is beyond the control of our app, so there is no way to prevent it.
-	 * The best we can do is to handle the error and restore the context properly.
-	 */
-	function handleContextLost(event: WebGLContextEvent): void {
-		console.log("WebGL context lost: #" + renderer.CONTEXT_UID);
-		event.preventDefault();
-		ticker.stop();
-	}
-
-	/**
-	 * This is not thoroughly tested, but hopefully it will work.
-	 */
-	function handleContextRestored(): void {
-		console.log("WebGL context restored: #" + renderer.CONTEXT_UID);
-		renderer.render(stage, { clear: true });
-		ticker.start();
-	}
 
 	/**
 	 * Pause or resume the {@link Display}.

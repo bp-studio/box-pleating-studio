@@ -87,6 +87,7 @@ namespace StudioService {
 
 	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
+	export const shouldTakeOverContextHandling = proxy(() => bp.shouldTakeOverContextHandling, () => false);
 
 	export const history = proxy(() => bp.history, {
 		canUndo: false,

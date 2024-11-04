@@ -54,7 +54,7 @@ export namespace Interaction {
 			// Prevent triggering simulated mouse events on mobile devices.
 			// This needs to be done here and not on the whole document,
 			// otherwise clicking won't work on UI.
-			event.preventDefault();
+			if(event.cancelable) event.preventDefault();
 		});
 
 		document.addEventListener("mouseup", mouseUp);

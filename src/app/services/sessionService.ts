@@ -23,6 +23,12 @@ namespace SessionService {
 	let initialized = false;
 	let hasSession = false;
 
+	/**
+	 * In takeover mode, we stop further auto-saving
+	 * to prevent the opened index being overwritten.
+	 */
+	let stopAutoSave = false;
+
 	export async function init(loadSession: boolean): Promise<boolean> {
 		watch(() => Settings.autoSave, shouldAutoSave => {
 			if(!shouldAutoSave && initialized) localStorage.removeItem("session");
@@ -46,7 +52,7 @@ namespace SessionService {
 		// The following is the best we can do to ensure session is saved before exiting.
 		// See https://developer.chrome.com/blog/page-lifecycle-api/
 		window.setInterval(save, SAVE_INTERVAL);
-		window.addEventListener("pagehide", save);
+		window.addEventListener("pagehide", () => save());
 		document.addEventListener("visibilitychange", () => {
 			if(document.visibilityState == "hidden") save();
 		});
@@ -75,13 +81,16 @@ namespace SessionService {
 	}
 
 	/** Save session */
-	async function save(): Promise<void> {
+	export async function save(openedIndex?: number): Promise<void> {
+		if(openedIndex !== undefined) stopAutoSave = true;
+		else if(stopAutoSave) return;
+
 		// There's no point saving the session during dragging.
 		if(Studio.isDragging || !Settings.autoSave || !hasSession) return;
 
 		const session = {
-			jsons: await Promise.all(Workspace.projects.value.map(proj => proj.toJSON(true))),
-			open: Studio.project ? Workspace.projects.value.indexOf(Studio.project) : -1,
+			jsons: bp.projects.getSession(Workspace.ids.value),
+			open: openedIndex ?? (Studio.project ? Workspace.projects.value.indexOf(Studio.project) : -1),
 		};
 		const sessionString = JSON.stringify(session);
 		localStorage.setItem("session", sessionString);
