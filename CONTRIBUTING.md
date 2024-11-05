@@ -1,8 +1,9 @@
 
 # Contributing Guidelines
 
-BP Studio is developed using [VS Code](https://code.visualstudio.com/),
-and the project folder is already configured for it.
+While one may use any editors to work with BP Studio,
+it is highly recommended to use [VS Code](https://code.visualstudio.com/)
+as the project folder is already configured for it.
 As you open the project with it,
 it will also hint you the recommended extensions to install.
 
@@ -28,11 +29,6 @@ and then run `pnpm preview` to launch the local server on production build.
 
 > Note: one should always run BP Studio through a server,
 > as some of the features would not work in `files://` protocol.
-
-Typically the default build task is sufficient for developing purpose,
-and you won't need to execute individual Gulp subtasks,
-as all subtasks will skip themselves if the source files are not changed.
-If something goes wrong, you can run `pnpm gulp clean` to cleanup built files and then rebuild everything.
 
 ## Developing optimizer
 
@@ -67,9 +63,12 @@ There's currently no plans for officially supporting browsers other than
 Chrome, Edge, Safari, Firefox, Opera, and Samsung Internet.
 Not that I don't want to, but that I don't have the resource to do so.
 
-## Unit testing
+## Automate testing
 
-Refer to the [README](test/README.md) of tests.
+BP Studio contains three test sets: the [Mocha unit tests](test/README.md),
+the [Playwright e2e tests](e2e/README.md),
+and the [Python tests](src/client/plugins/optimizer/python/tests/README.md).
+Refer to the README of each for details.
 
 ## Code styling
 
