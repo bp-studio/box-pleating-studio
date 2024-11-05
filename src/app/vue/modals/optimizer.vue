@@ -181,15 +181,18 @@
 		state,
 		skip(): void {
 			state.skipping = true;
+			gtag("event", "optimizer_skip", { data1: Stage[state.stage] });
 			handler("skip");
 		},
 		stop(): void {
 			state.stopping = true;
+			gtag("event", "optimizer_stop", { data1: Stage[state.stage] });
 			handler("stop");
 		},
 	});
 
 	async function run(): Promise<void> {
+		gtag("event", "optimizer_start");
 		state.running = true;
 		state.stage = Stage.initializing;
 		try {
@@ -201,6 +204,7 @@
 				state.stage = Stage.stopped;
 			} else {
 				state.error = e instanceof Error ? e.message : String(e);
+				gtag("event", "optimizer_error", { data1: state.error, data2: Stage[state.stage] });
 				state.stage = Stage.error;
 			}
 		} finally {

@@ -206,6 +206,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	public subdivide(): void {
+		gtag("event", "edit_subdivide");
 		display.shield(async () => {
 			const oldCenter = this.grid.$getResizeCenter();
 			this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
@@ -216,6 +217,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	public rotate(by: Sign): void {
+		gtag("event", "edit_rotate");
 		display.shield(async () => {
 			const oldCenter = this.grid.$getCenter();
 			const { width, height } = this.grid.toJSON();
@@ -227,6 +229,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	public flip(horizontal: boolean): void {
+		gtag("event", "edit_flip");
 		display.shield(async () => {
 			const { x, y } = this.grid.$getCenter();
 			this._editor.$transform(horizontal ? [-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]);

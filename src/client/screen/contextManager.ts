@@ -21,6 +21,8 @@ export function isContextLost(): boolean {
 }
 
 function handleContextLost(): void {
+	gtag("event", "context_lost");
+
 	// If the page is currently in view, we can restart immediately.
 	if(document.visibilityState == "visible") {
 		location.reload();
@@ -44,6 +46,7 @@ function handleContextLost(): void {
 
 /** Cancel auto-restart in the case of file opening. */
 export function shouldTakeOverContextHandling(): boolean {
+	gtag("event", "context_lost_takeover");
 	if(restartTimeout === undefined) return false;
 	clearTimeout(restartTimeout);
 	return true;
