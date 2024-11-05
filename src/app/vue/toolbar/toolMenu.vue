@@ -27,19 +27,29 @@
 	import Workspace from "app/services/workspaceService";
 	import { show } from "@/modals/modals";
 	import Divider from "@/gadgets/menu/divider.vue";
+	import SessionService from "app/services/sessionService";
 
 	defineOptions({ name: "ToolMenu" });
 
 	async function TreeMaker(files: File[]): Promise<void> {
+		const takeover = Studio.shouldTakeOverContextHandling();
 		const file = files[0];
 		const content = FileUtil.bufferToText(await FileUtil.readFile(file));
 		const name = file.name;
+		let index: number | undefined;
 		try {
 			const project = Studio.plugins.treeMaker(name.replace(/\.tmd5$/i, ""), content);
 			await Workspace.open(project as Pseudo<typeof project>);
 			Workspace.selectLast();
+			index = Workspace.ids.value.length - 1;
 		} catch(e) {
 			if(e instanceof Error) Dialogs.alert(i18n.t(e.message, [name]));
+		} finally {
+			// Handling context loss
+			if(takeover) {
+				await SessionService.save(index);
+				location.reload();
+			}
 		}
 	}
 
