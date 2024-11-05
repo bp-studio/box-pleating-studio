@@ -44,6 +44,15 @@ export class StudioPage {
 		await expect(this.page.getByText("Layout view")).toBeInViewport();
 	}
 
+	/** Wait for the core to complete updating */
+	public async update(): Promise<void> {
+		const bpHandle = await this.getHandle();
+		await this.page.evaluate(
+			bp => bp.projects.current.value!.design.$batchUpdateManager.$updateComplete,
+			bpHandle
+		);
+	}
+
 	/** Get the x-coordinate of the location of the selected {@link Draggable}. */
 	public async getX(): Promise<number> {
 		const bpHandle = await this.getHandle();

@@ -13,11 +13,11 @@ test("Subdivide grid", async ({ page }) => {
 	await expect(iptWidth).toHaveValue("48");
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 	await page.getByRole("menuitem", { name: /Subdivide grid$/ }).click();
-	await expect(iptWidth).toHaveValue("96");
+	await expect(iptWidth).toHaveValue("96"); // Auto-wait
 	await studio.mouse.click(79, 49);
 	expect(await studio.getTag()).toBe("r16,20");
 	await page.keyboard.press("Control+z");
-	await expect(iptWidth).toHaveValue("48");
+	await expect(iptWidth).toHaveValue("48"); // Auto-wait
 });
 
 test("Rotate", async ({ page }) => {
@@ -25,6 +25,7 @@ test("Rotate", async ({ page }) => {
 	await studio.layoutReady();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 	await page.getByRole("menuitem", { name: /Rotate right$/ }).click();
+	await studio.update();
 	await studio.mouse.click(20, 33);
 	expect(await studio.getTag()).toBe("f31");
 });
@@ -34,6 +35,7 @@ test("Flip", async ({ page }) => {
 	await studio.layoutReady();
 	await page.getByRole("menuitem", { name: "Edit" }).click();
 	await page.getByRole("menuitem", { name: /Horizontal flip$/ }).click();
+	await studio.update();
 	await studio.mouse.click(2, 36);
 	expect(await studio.getTag()).toBe("f19");
 });
