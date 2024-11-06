@@ -297,9 +297,7 @@ export default [
 			import: pluginImport,
 		},
 		rules: {
-			"@typescript-eslint/consistent-type-imports": ["warn", {
-				prefer: "type-imports",
-			}],
+			"@typescript-eslint/consistent-type-imports": ["warn", { prefer: "type-imports" }],
 			"import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
 			"import/newline-after-import": "warn",
 			"import/no-cycle": ["warn", { ignoreExternal: true }],
@@ -455,9 +453,7 @@ export default [
 			"@typescript-eslint/no-magic-numbers": "off",
 			"import/no-unresolved": "off",
 			"max-lines": "off",
-			"sort-keys": ["warn", "asc", {
-				minKeys: 6,
-			}],
+			"sort-keys": ["warn", "asc", { minKeys: 6 }],
 		},
 	},
 	{
