@@ -6,8 +6,13 @@ import "@types/gtag.js";
 declare global {
 	/** Launching error manager, defined in HTML. */
 	declare const errMgr: {
+		/** Finish listening to global errors */
 		end(): void;
+
+		/** Whether the launching fine so far. */
 		ok(): boolean;
+
+		/** Final processing. */
 		callback(): boolean;
 		setCustomError(title: string, body: string): never;
 		setRunErr(error: string): void;

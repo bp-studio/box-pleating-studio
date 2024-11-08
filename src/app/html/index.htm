@@ -209,6 +209,38 @@
 			var errShown = false;
 
 			/**
+			 * Final processing.
+			 *
+			 * @return Whether the app has launched successfully.
+			 */
+			self.callback = function() {
+				if(self.ok()) return true;
+				if(errShown) return false;
+				errShown = true;
+
+				display("divWorkspace");
+				display("app");
+				display(
+					resErr ? "resource" : "requirement",
+					true,
+					resErr ?
+						resErr :
+						"<br>Build number: " + app_config.app_version +
+						"<br>" + navigator.userAgent +
+						"<br>" + runErr
+				);
+
+				if(runErr &&
+					// Filter clawers; no need to report related errors.
+					!(runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
+					!(/bot|crawl|spider/i.test(navigator.userAgent))
+				) {
+					gtag("event", "unsupported", gaErrorData(runErr));
+				}
+				return false;
+			};
+
+			/**
 			 * @param error {string}
 			 */
 			function setRunErr(error) {
@@ -278,38 +310,6 @@
 					data["data" + i] = chunks[i];
 				}
 				return data;
-			};
-
-			/**
-			 * Final processing.
-			 *
-			 * @return Whether the app has launched successfully.
-			 */
-			self.callback = function() {
-				if(self.ok()) return true;
-				if(errShown) return false;
-				errShown = true;
-
-				display("divWorkspace");
-				display("app");
-				display(
-					resErr ? "resource" : "requirement",
-					true,
-					resErr ?
-						resErr :
-						"<br>Build number: " + app_config.app_version +
-						"<br>" + navigator.userAgent +
-						"<br>" + runErr
-				);
-
-				if(runErr &&
-					// Filter clawers; no need to report related errors.
-					!(runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
-					!(/bot|crawl|spider/i.test(navigator.userAgent))
-				) {
-					gtag("event", "unsupported", gaErrorData(runErr));
-				}
-				return false;
 			};
 
 			// Some in-app browsers might attempt to call the following functions,
