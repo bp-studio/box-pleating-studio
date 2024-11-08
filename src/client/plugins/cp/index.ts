@@ -1,11 +1,15 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+
 import ProjectService from "client/services/projectService";
 import { applyTransform } from "shared/types/geometry";
+import { toFOLD } from "./fold";
 
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { CPLine } from "shared/types/cp";
 
+export type CPFormat = "cp" | "fold";
+
 export interface CPOptions {
+	format: CPFormat;
 	reorient: boolean;
 }
 
@@ -23,18 +27,21 @@ export async function cp(options: CPOptions): Promise<string> {
 
 	const matrix = grid.$getTransformMatrix(CP_FULL_WIDTH, options.reorient);
 	for(const l of lines) {
-		transform(l, 1, matrix);
-		transform(l, 3, matrix);
+		l.p1 = transform(l.p1, matrix);
+		l.p2 = transform(l.p2, matrix);
 	}
 
-	return lines.map(l => l.join(" ")).join("\n");
+	switch(options.format) {
+		case "cp": return toCP(lines);
+		case "fold": return toFOLD(lines, project);
+		default: throw new Error("Unknown format");
+	}
 }
 
 /** Transform a given line by the given matrix. */
-function transform(l: CPLine, offset: number, matrix: TransformationMatrix): void {
-	const { x, y } = applyTransform({ x: l[offset], y: l[offset + 1] }, matrix);
-	l[offset] = fix(x);
-	l[offset + 1] = fix(y);
+function transform(p: IPoint, matrix: TransformationMatrix): IPoint {
+	const { x, y } = applyTransform(p, matrix);
+	return { x: fix(x), y: fix(y) };
 }
 
 /** Remove floating error. */
@@ -43,4 +50,9 @@ function fix(x: number): number {
 	const n = Math.round(x * PRECISION) / PRECISION;
 	if(Math.abs(x - n) < EPSILON) return n;
 	return x;
+}
+
+/** Generate ORIPA CP format. */
+function toCP(lines: CPLine[]): string {
+	return lines.map(l => `${l.type} ${l.p1.x} ${l.p1.y} ${l.p2.x} ${l.p2.y}`).join("\n");
 }

@@ -11,7 +11,7 @@
 		</Uploader>
 		<DropdownItem :disabled="!Studio.project" @click="show('cp')">
 			<i class="fas fa-file-export" />
-			{{ $t("toolbar.tools.CP._") }}
+			{{ $t("plugin.CP._") }}
 		</DropdownItem>
 	</Dropdown>
 </template>

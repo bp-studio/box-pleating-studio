@@ -5,6 +5,7 @@ import Language from "./languageService";
 import { deepCopy } from "shared/utils/copy";
 import { clone } from "shared/utils/clone";
 
+import type { CPOptions } from "client/plugins/cp";
 import type { OptimizerOptions } from "client/plugins/optimizer";
 import type { KeyStore } from "./customHotkeyService";
 
@@ -84,8 +85,9 @@ const defaultSettings = {
 			random: 1,
 		} as OptimizerOptions,
 		CP: {
+			format: "cp",
 			reorient: false,
-		},
+		} as CPOptions,
 		SVG: {
 			includeHiddenElement: false,
 		},

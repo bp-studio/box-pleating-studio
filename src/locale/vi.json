@@ -90,11 +90,7 @@
 		},
 		"tools": {
 			"title": "Công cụ",
-			"TreeMaker": "Nhập tệp TreeMaker",
-			"CP": {
-				"_": "Xuất tệp CP",
-				"reorient": "Định hướng lại trang tính nếu có"
-			}
+			"TreeMaker": "Nhập tệp TreeMaker"
 		},
 		"help": {
 			"title": "Cứu giúp",
@@ -290,6 +286,11 @@
 			"skip": "Nhảy",
 			"run": "Chạy!",
 			"running": "Đang chạy..."
+		},
+		"CP": {
+			"_": "Xuất tệp CP",
+			"format": "Định dạng",
+			"reorient": "Định hướng lại trang tính nếu có"
 		}
 	},
 	"keyword": {

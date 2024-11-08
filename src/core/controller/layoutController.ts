@@ -91,7 +91,7 @@ export namespace LayoutController {
 			const l = path.length;
 			for(let i = 0; i < l; i++) {
 				const p1 = path[i], p2 = path[i + 1] || path[0];
-				set.push([type, p1.x, p1.y, p2.x, p2.y]);
+				set.push({ type, p1, p2 });
 			}
 		}
 	}
@@ -99,7 +99,7 @@ export namespace LayoutController {
 	function addLines(set: CPLine[], lines: readonly ILine[], type: CreaseType): void {
 		for(const line of lines) {
 			const [p1, p2] = line;
-			set.push([type, p1.x, p1.y, p2.x, p2.y]);
+			set.push({ type, p1, p2 });
 		}
 	}
 }

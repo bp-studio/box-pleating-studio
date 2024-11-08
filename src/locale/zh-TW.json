@@ -90,11 +90,7 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "匯入 TreeMaker 檔案",
-			"CP": {
-				"_": "匯出 CP 檔案",
-				"reorient": "若適用的話重新定向紙張"
-			}
+			"TreeMaker": "匯入 TreeMaker 檔案"
 		},
 		"help": {
 			"title": "說明",
@@ -290,6 +286,11 @@
 			"skip": "跳過",
 			"run": "執行！",
 			"running": "執行中…"
+		},
+		"CP": {
+			"_": "匯出 CP 檔案",
+			"format": "格式",
+			"reorient": "若適用的話重新定向紙張"
 		}
 	},
 	"keyword": {

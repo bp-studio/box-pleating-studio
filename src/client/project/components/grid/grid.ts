@@ -78,10 +78,7 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 
 	/**
 	 * Transformation matrix for a given point for CP exporting.
-	 * The numbers are arranged in such a way that the transformation is:
-	 * $$\left[\begin{matrix} A & B \\ C & D \end{matrix}\right]\left
-	 * [\begin{matrix} x \\ y \end{matrix}\right] +
-	 * \left[\begin{matrix} E \\ F \end{matrix}\right]$$
+	 * See {@link TransformationMatrix} for format.
 	 */
 	public abstract $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix;
 

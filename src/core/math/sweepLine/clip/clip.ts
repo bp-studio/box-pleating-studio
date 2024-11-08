@@ -42,10 +42,9 @@ export class Clip extends DivideAndCollect {
 		this._reset();
 
 		for(const c of creases) {
-			const p1 = { x: c[1], y: c[2] };
-			const p2 = { x: c[3], y: c[4] };
-			const segment = new LineSegment(p1, p2, 0, c[0]);
-			if(c[0] == CreaseType.Border) {
+			const { p1, p2 } = c;
+			const segment = new LineSegment(p1, p2, 0, c.type);
+			if(c.type == CreaseType.Border) {
 				// Here it is assumed that the inputs are oriented
 				const entering = xyComparator(p1, p2) < 0;
 				if(entering) this._addSegment(segment, 1);
@@ -58,9 +57,11 @@ export class Clip extends DivideAndCollect {
 
 		this._sweep();
 
-		return this._collectedSegments.map(s =>
-			[s.$type as CreaseType, s.$start.x, s.$start.y, s.$end.x, s.$end.y]
-		);
+		return this._collectedSegments.map(s => ({
+			type: s.$type as CreaseType,
+			p1: s.$start,
+			p2: s.$end,
+		}));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

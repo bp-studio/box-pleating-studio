@@ -90,11 +90,7 @@
 		},
 		"tools": {
 			"title": "Herramientas",
-			"TreeMaker": "Importar archivo TreeMaker",
-			"CP": {
-				"_": "Exportar archivo CP",
-				"reorient": "Reorientar la hoja si corresponde"
-			}
+			"TreeMaker": "Importar archivo TreeMaker"
 		},
 		"help": {
 			"title": "Ayuda",
@@ -290,6 +286,11 @@
 			"skip": "Saltar",
 			"run": "¡Ejecuta!",
 			"running": "Ejecutando..."
+		},
+		"CP": {
+			"_": "Exportar archivo CP",
+			"format": "Formato",
+			"reorient": "Reorientar la hoja si corresponde"
 		}
 	},
 	"keyword": {

@@ -90,11 +90,7 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "导入 TreeMaker 文件",
-			"CP": {
-				"_": "导出 CP 文件",
-				"reorient": "若适用的话重新定向纸张"
-			}
+			"TreeMaker": "导入 TreeMaker 文件"
 		},
 		"help": {
 			"title": "说明",
@@ -290,6 +286,11 @@
 			"skip": "跳过",
 			"run": "运行！",
 			"running": "运行中..."
+		},
+		"CP": {
+			"_": "导出 CP 文件",
+			"format": "格式",
+			"reorient": "若适用的话重新定向纸张"
 		}
 	},
 	"keyword": {

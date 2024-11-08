@@ -19,4 +19,8 @@ export enum CreaseType {
  * This follows ORIPA's format.
  * It goes like `[type, x1, y1, x2, y2]`.
  */
-export type CPLine = [CreaseType, number, number, number, number];
+export interface CPLine {
+	type: CreaseType;
+	p1: IPoint;
+	p2: IPoint;
+}

@@ -92,11 +92,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"Tools",
-			"TreeMaker": _=>"Import TreeMaker file",
-			"CP": {
-				"_": _=>"Export CP file",
-				"reorient": _=>"Reorient the sheet if applicable"
-			}
+			"TreeMaker": _=>"Import TreeMaker file"
 		},
 		"help": {
 			"title": _=>"Help",
@@ -292,6 +288,11 @@ export default {"en": {
 			"skip": _=>"Skip",
 			"run": _=>"Run!",
 			"running": _=>"Running..."
+		},
+		"CP": {
+			"_": _=>"Export CP file",
+			"format": _=>"Format",
+			"reorient": _=>"Reorient the sheet if applicable"
 		}
 	},
 	"keyword": {
@@ -407,11 +408,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"Herramientas",
-			"TreeMaker": _=>"Importar archivo TreeMaker",
-			"CP": {
-				"_": _=>"Exportar archivo CP",
-				"reorient": _=>"Reorientar la hoja si corresponde"
-			}
+			"TreeMaker": _=>"Importar archivo TreeMaker"
 		},
 		"help": {
 			"title": _=>"Ayuda",
@@ -607,6 +604,11 @@ export default {"en": {
 			"skip": _=>"Saltar",
 			"run": _=>"¡Ejecuta!",
 			"running": _=>"Ejecutando..."
+		},
+		"CP": {
+			"_": _=>"Exportar archivo CP",
+			"format": _=>"Formato",
+			"reorient": _=>"Reorientar la hoja si corresponde"
 		}
 	},
 	"keyword": {
@@ -722,11 +724,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"ツール",
-			"TreeMaker": _=>"TreeMaker ファイルをインポートする",
-			"CP": {
-				"_": _=>"CP ファイルのエクスポート",
-				"reorient": _=>"該当する場合は、シートの向きを変更します"
-			}
+			"TreeMaker": _=>"TreeMaker ファイルをインポートする"
 		},
 		"help": {
 			"title": _=>"ヘルプ",
@@ -922,6 +920,11 @@ export default {"en": {
 			"skip": _=>"スキップ",
 			"run": _=>"実行して！",
 			"running": _=>"実行中..."
+		},
+		"CP": {
+			"_": _=>"CP ファイルのエクスポート",
+			"format": _=>"形式",
+			"reorient": _=>"該当する場合は、シートの向きを変更します"
 		}
 	},
 	"keyword": {
@@ -1037,11 +1040,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"도구",
-			"TreeMaker": _=>"TreeMaker 파일 가져오기",
-			"CP": {
-				"_": _=>"CP 파일 내보내기",
-				"reorient": _=>"해당하는 경우 시트 방향 변경"
-			}
+			"TreeMaker": _=>"TreeMaker 파일 가져오기"
 		},
 		"help": {
 			"title": _=>"도움",
@@ -1237,6 +1236,11 @@ export default {"en": {
 			"skip": _=>"건너뛰다",
 			"run": _=>"실행해!",
 			"running": _=>"실행 중..."
+		},
+		"CP": {
+			"_": _=>"CP 파일 내보내기",
+			"format": _=>"체재",
+			"reorient": _=>"해당하는 경우 시트 방향 변경"
 		}
 	},
 	"keyword": {
@@ -1352,11 +1356,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"Công cụ",
-			"TreeMaker": _=>"Nhập tệp TreeMaker",
-			"CP": {
-				"_": _=>"Xuất tệp CP",
-				"reorient": _=>"Định hướng lại trang tính nếu có"
-			}
+			"TreeMaker": _=>"Nhập tệp TreeMaker"
 		},
 		"help": {
 			"title": _=>"Cứu giúp",
@@ -1552,6 +1552,11 @@ export default {"en": {
 			"skip": _=>"Nhảy",
 			"run": _=>"Chạy!",
 			"running": _=>"Đang chạy..."
+		},
+		"CP": {
+			"_": _=>"Xuất tệp CP",
+			"format": _=>"Định dạng",
+			"reorient": _=>"Định hướng lại trang tính nếu có"
 		}
 	},
 	"keyword": {
@@ -1667,11 +1672,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"工具",
-			"TreeMaker": _=>"导入 TreeMaker 文件",
-			"CP": {
-				"_": _=>"导出 CP 文件",
-				"reorient": _=>"若适用的话重新定向纸张"
-			}
+			"TreeMaker": _=>"导入 TreeMaker 文件"
 		},
 		"help": {
 			"title": _=>"说明",
@@ -1867,6 +1868,11 @@ export default {"en": {
 			"skip": _=>"跳过",
 			"run": _=>"运行！",
 			"running": _=>"运行中..."
+		},
+		"CP": {
+			"_": _=>"导出 CP 文件",
+			"format": _=>"格式",
+			"reorient": _=>"若适用的话重新定向纸张"
 		}
 	},
 	"keyword": {
@@ -1982,11 +1988,7 @@ export default {"en": {
 		},
 		"tools": {
 			"title": _=>"工具",
-			"TreeMaker": _=>"匯入 TreeMaker 檔案",
-			"CP": {
-				"_": _=>"匯出 CP 檔案",
-				"reorient": _=>"若適用的話重新定向紙張"
-			}
+			"TreeMaker": _=>"匯入 TreeMaker 檔案"
 		},
 		"help": {
 			"title": _=>"說明",
@@ -2182,6 +2184,11 @@ export default {"en": {
 			"skip": _=>"跳過",
 			"run": _=>"執行！",
 			"running": _=>"執行中…"
+		},
+		"CP": {
+			"_": _=>"匯出 CP 檔案",
+			"format": _=>"格式",
+			"reorient": _=>"若適用的話重新定向紙張"
 		}
 	},
 	"keyword": {
