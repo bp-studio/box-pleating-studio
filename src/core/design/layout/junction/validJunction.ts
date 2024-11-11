@@ -134,7 +134,13 @@ export class ValidJunction implements ISerializable<JJunction> {
 		this._isCovered = undefined;
 	}
 
-	/** When the comparison rectangle is of the same size, the closer one goes first. */
+	/**
+	 * This method is mainly used in the case where the comparison rectangles are of the same size.
+	 * In that case, the junction corresponding to the closer flap should cover the other one.
+	 *
+	 * v0.7: Note that if the comparison rectangles are not of the same size,
+	 * then the result can mutually be `true`.
+	 */
 	public $isCloserThan(that: ValidJunction): boolean {
 		return this.$s.x < that.$s.x || this.$s.y < that.$s.y;
 	}

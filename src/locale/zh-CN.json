@@ -67,7 +67,12 @@
 			"undo": "撤消",
 			"redo": "恢复",
 			"selectAll": "全选",
-			"unselectAll": "取消选取"
+			"unselectAll": "取消选取",
+			"subdivide": "细分格子",
+			"rotate_right": "向右旋转",
+			"rotate_left": "向左旋转",
+			"horizontal_flip": "水平翻转",
+			"vertical_flip": "垂直翻转"
 		},
 		"setting": {
 			"title": "设置",
@@ -85,11 +90,7 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "导入 TreeMaker 文件",
-			"CP": {
-				"_": "导出 CP 文件",
-				"reorient": "若适用的话重新定向纸张"
-			}
+			"TreeMaker": "导入 TreeMaker 文件"
 		},
 		"help": {
 			"title": "说明",
@@ -104,7 +105,7 @@
 		},
 		"view": {
 			"tree": "树状结构",
-			"layout": "佈局"
+			"layout": "布局"
 		},
 		"tab": {
 			"clone": "复制",
@@ -153,7 +154,7 @@
 			"titlePH": "(项目标题)",
 			"descriptionPH": "(项目描述)",
 			"tree": "树状结构视图",
-			"layout": "佈局视图",
+			"layout": "布局视图",
 			"width": "宽度",
 			"height": "高度",
 			"size": "尺寸",
@@ -266,6 +267,30 @@
 			"not5": "文件「{0}」不是 TreeMaker 5 的格式。",
 			"size8": "BP Studio 要求纸张大小至少为 8。",
 			"invalid": "文件「{0}」似乎已损坏，无法成功读取。"
+		},
+		"optimizer": {
+			"_": "优化布局",
+			"unsupported": "您的浏览器不支持此功能。请升级到最新版本。",
+			"options": {
+				"_": "选项",
+				"openNew": "在新选项卡中显示结果",
+				"useDim": "保持角片的宽度和高度"
+			},
+			"layout": {
+				"_": "布局方法",
+				"view": "使用当前布局作为参考",
+				"random": "尝试随机布局",
+				"toTry": "要尝试的布局数量：",
+				"useBH": "尝试当前布局的变化"
+			},
+			"skip": "跳过",
+			"run": "运行！",
+			"running": "运行中..."
+		},
+		"CP": {
+			"_": "导出 CP 文件",
+			"format": "格式",
+			"reorient": "若适用的话重新定向纸张"
 		}
 	},
 	"keyword": {
@@ -273,7 +298,9 @@
 		"no": "否",
 		"ok": "确定",
 		"here": "这里",
+		"abort": "中止",
 		"close": "关闭",
+		"cancel": "取消",
 		"export": "导出",
 		"delete": "删除",
 		"discord": "BP Studio Discord 服务器",

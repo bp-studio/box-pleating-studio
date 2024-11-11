@@ -14,7 +14,8 @@ export namespace GeneratorUtil {
 	 * and once one of them yields something that passes the {@link GeneratorFilter},
 	 * remaining generators will not be execute further.
 	 *
-	 * If the filter returns `undefined`, it will also signify stopping after the current generator.
+	 * If the filter returns `undefined`, it will also signify stopping after the current generator,
+	 * only that the generated value will not be yielded.
 	 */
 	export function* $first<T>(generators: Generator<T>[], filter: GeneratorFilter<T>): Generator<T> {
 		for(const generator of generators) {

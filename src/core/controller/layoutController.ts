@@ -1,14 +1,12 @@
-import { AABBTask } from "core/design/tasks/aabb";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { Clip } from "core/math/sweepLine/clip/clip";
 import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
-import { setStretchPrototypes } from "core/design/tasks/stretch";
 
 import type { CPLine } from "shared/types/cp";
 import type { ILine, Path, Polygon } from "shared/types/geometry";
-import type { JFlap, JStretch } from "shared/json";
+import type { JStretch } from "shared/json";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Repository } from "core/design/layout/repository";
 
@@ -18,16 +16,6 @@ import type { Repository } from "core/design/layout/repository";
  */
 //=================================================================
 export namespace LayoutController {
-
-	/**
-	 * Moving or resizing of flaps.
-	 */
-	export function updateFlap(flaps: JFlap[], dragging: boolean, stretches: JStretch[]): void {
-		State.$isDragging = dragging;
-		State.$tree.$setFlaps(flaps);
-		setStretchPrototypes(stretches);
-		Processor.$run(AABBTask);
-	}
 
 	/**
 	 * Clears the cached {@link Stretch}es and {@link Repository Repositories} after dragging.
@@ -103,7 +91,7 @@ export namespace LayoutController {
 			const l = path.length;
 			for(let i = 0; i < l; i++) {
 				const p1 = path[i], p2 = path[i + 1] || path[0];
-				set.push([type, p1.x, p1.y, p2.x, p2.y]);
+				set.push({ type, p1, p2 });
 			}
 		}
 	}
@@ -111,7 +99,7 @@ export namespace LayoutController {
 	function addLines(set: CPLine[], lines: readonly ILine[], type: CreaseType): void {
 		for(const line of lines) {
 			const [p1, p2] = line;
-			set.push([type, p1.x, p1.y, p2.x, p2.y]);
+			set.push({ type, p1, p2 });
 		}
 	}
 }

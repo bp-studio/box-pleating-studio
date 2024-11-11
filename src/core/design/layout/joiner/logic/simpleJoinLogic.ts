@@ -20,7 +20,7 @@ export class SimpleJoinLogic extends JoinLogic {
 		const { j1, j2 } = this;
 
 		// Find the intersection
-		const int = j1.e.$intersection(j2.e); // p1-perspective
+		const int = j1.e.$intersectLine(j2.e); // p1-perspective
 		if(!int) return;
 
 		// Check the simple join condition

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html translate="no" lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Box Pleating Studio</title>
+
+	<!-- Core info -->
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=5.0, width=device-width">
+	<meta name="description" content="Super-complex origami design made easy!">
+	<meta name="google" content="notranslate">
+	<meta name="version" content="<%= VERSION %>">
+
+	<!--
+		Not implemented in Chrome yet, but are supported in Firefox and Opera.
+		See https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload#browser_compatibility
+	-->
+	<link rel="preload" as="manifest" href="manifest.json">
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
+	<script>
+		// This part is kept in debug because app_config is also used elsewhere
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		var app_config = {
+			page_title: document.title,
+			page_path: "/",
+			app_name: document.title,
+			app_version: "<%= APP_VERSION %>",
+		};
+		gtag("js", new Date());
+		gtag("config", "G-GG1TEZGBCQ", app_config);
+
+		// Setup dark mode if needed immediately on first visit, to avoid flashing
+		if(!localStorage.getItem("settings") && matchMedia("(prefers-color-scheme: dark)").matches) {
+			document.documentElement.classList.add("dark");
+		}
+	</script>
+
+	<!-- SEO -->
+	<meta property="og:url" content="https://bpstudio.abstreamace.com">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Box Pleating Studio">
+	<meta property="og:image" content="https://bpstudio.abstreamace.com/assets/mockup.jpg">
+	<meta property="og:description" content="Super-complex origami design made easy!">
+
+	<!-- PWA setup -->
+	<link rel="canonical" href="https://bpstudio.abstreamace.com" />
+	<link rel="manifest" href="manifest.json">
+	<link rel="icon" type="image/png" sizes="512x512" href="assets/icon/icon-512.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="assets/icon/icon-192.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="assets/icon/icon-96.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="assets/icon/icon-32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="assets/icon/icon-16.png">
+	<link rel='apple-touch-icon' sizes='192x192' href="assets/icon/icon-192.png">
+	<meta name="theme-color" content="#007bff">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio">
+
+	<!--
+		iOS Splash
+		This is just SOOO absurd. Curse iOS for this.
+		Note that "device-width:" and "device-height:" are deprecated by the current HTML spec,
+		and should be replaced by "width:" and "height:", respectively.
+		See https://validator.w3.org/
+	-->
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 430px) and (height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_14_Pro_Max_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 393px) and (height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_14_Pro_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 428px) and (height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 390px) and (height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 375px) and (height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 414px) and (height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 414px) and (height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/iPhone_11__iPhone_XR_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 414px) and (height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+		  href="assets/splash/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 375px) and (height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 320px) and (height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 1024px) and (height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/12.9__iPad_Pro_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 834px) and (height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/11__iPad_Pro__10.5__iPad_Pro_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 820px) and (height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/10.9__iPad_Air_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 834px) and (height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/10.5__iPad_Air_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 810px) and (height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/10.2__iPad_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 768px) and (height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 744px) and (height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+		  href="assets/splash/8.3__iPad_Mini_landscape.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 430px) and (height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_14_Pro_Max_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 393px) and (height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_14_Pro_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 428px) and (height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 390px) and (height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 375px) and (height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 414px) and (height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 414px) and (height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/iPhone_11__iPhone_XR_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 414px) and (height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+		  href="assets/splash/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 375px) and (height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 320px) and (height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 1024px) and (height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/12.9__iPad_Pro_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 834px) and (height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/11__iPad_Pro__10.5__iPad_Pro_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 820px) and (height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/10.9__iPad_Air_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 834px) and (height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/10.5__iPad_Air_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 810px) and (height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/10.2__iPad_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 768px) and (height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
+	<link rel="apple-touch-startup-image"
+		  media="screen and (width: 744px) and (height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+		  href="assets/splash/8.3__iPad_Mini_portrait.png">
+
+	<!--
+		Written in ES3 for maximal compatibility, so `var` instead of `let`, etc.
+		For IE < 10, our build process adds conditional comments to provide immediate error message,
+		so we no longer need to support those cases here.
+	-->
+	<script>
+		/** Launching Error Manager */
+		var errMgr = new function() {
+			var self = this;
+			var resourceErrorHandler = function(e) {
+				if(e.filename) {
+					setRunErr(e.filename + ": " + e.message);
+				} else if(document.head.contains(e.target) && !resErr) {
+					setResErr(e.target.src || e.target.href);
+				}
+			};
+			var display = function(id, v, c) {
+				var el = document.getElementById(id);
+				if(!el) return;
+				el.style.display = v ? "block" : "none";
+				if(c) el.innerHTML += c;
+				return el;
+			};
+
+			/**
+			 * Resource Error.
+			 * @type {string|null}
+			 */
+			var resErr = null;
+
+			/**
+			 * Runtime Error.
+			 * @type {string|null}
+			 */
+			var runErr = null;
+
+			/** Whether error has already been shown */
+			var errShown = false;
+
+			/**
+			 * Final processing.
+			 *
+			 * @return Whether the app has launched successfully.
+			 */
+			self.callback = function() {
+				if(self.ok()) return true;
+				if(errShown) return false;
+				errShown = true;
+
+				display("divWorkspace");
+				display("app");
+				display(
+					resErr ? "resource" : "requirement",
+					true,
+					resErr ?
+						resErr :
+						"<br>Build number: " + app_config.app_version +
+						"<br>" + navigator.userAgent +
+						"<br>" + runErr
+				);
+
+				if(runErr &&
+					// Filter clawers; no need to report related errors.
+					!(runErr.indexOf("Illegal invocation") >= 0 && location.search.indexOf("fbclid") >= 0) &&
+					!(/bot|crawl|spider/i.test(navigator.userAgent))
+				) {
+					gtag("event", "unsupported", gaErrorData(runErr));
+				}
+				return false;
+			};
+
+			/**
+			 * @param error {string}
+			 */
+			function setRunErr(error) {
+				if(error.includes("chrome-extension")) return; // ignore errors caused by extensions
+				if(!runErr) {
+					runErr = error;
+					setTimeout(self.callback, 0);
+				}
+			}
+
+			/**
+			 * @param error {string}
+			 */
+			function setResErr(error) {
+				if(error.indexOf("gtag") >= 0) return; // Ignore GA loading error
+				if(!resErr) {
+					resErr = error;
+					setTimeout(self.callback, 0);
+				}
+			}
+
+			// Register service worker
+			if(location.protocol == "https:") {
+				if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+				else setRunErr("Service worker is required in BP Studio, but is not supported in your browser.");
+			}
+
+			self.setRunErr = setRunErr;
+			self.setResErr = setResErr;
+			self.setCustomError = function(title, message) {
+				display("divWorkspace");
+				display("divSpinner");
+				display("resource", true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
+				errShown = true;
+				// eslint-disable-next-line compat/compat
+				throw new Error(); // stops all further processing
+			};
+
+			/** Finish listening to global errors */
+			self.end = function() {
+				window.removeEventListener("error", resourceErrorHandler, true);
+			};
+
+			/** Whether the launching fine so far. */
+			self.ok = function() {
+				return !resErr && !runErr && !errShown;
+			};
+
+			/** GA parameter has a 100-character limit, so we split the message into chunks. */
+			function splitString(str) {
+				var chunks = [];
+				while(str.length > 0) {
+					chunks.push(str.substring(0, 100));
+					str = str.substring(100);
+				}
+				return chunks;
+			}
+
+			window.gaErrorData = function(err) {
+				var chunks = splitString(err);
+				var data = {
+					app_version: app_config.app_version,
+					user_agent: navigator.userAgent,
+					error: chunks[0],
+				};
+				for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
+					data["data" + i] = chunks[i];
+				}
+				return data;
+			};
+
+			// Some in-app browsers might attempt to call the following functions,
+			// and we shall ignore such errors.
+			var ignoreError = [
+				"WeixinJSBridge",
+				"_WXJS",
+				"__firefox__",
+				"$UCBrowser",
+				"_WebViewJavascriptBridge",
+				"hackLocationSuccess",
+			];
+
+			/**
+			 * Global error handler;
+			 * handles syntax error and all uncaught sync errors.
+			 *
+			 * `window.onerror` is a special event handler that it takes 5 arguments. See:
+			 * https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
+			 */
+			window.onerror = function(msg, source, line, column, error) {
+				if(!source && !line && !column) return; // error is caused by injection; ignore.
+
+				for(var i = 0; i < ignoreError.length; i++) {
+					if(msg.match(ignoreError[i])) return;
+				}
+				setRunErr([
+					msg.replace(/^.+: (.+)$/, "$1"), // error message
+					source.replace(/\?.+$/, "").replace(/^.+(\/.*?)$/, "$1"),	// path
+					line, // line number
+					column, // column number
+					stack(error), // stack trace
+				].toString());
+			};
+			window.onunhandledrejection = function(e) {
+				e = e.reason || "Unknown error";
+				if(e.toString().match(/globalThis/)) {
+					// There seems to be a bug in iOS 12 that triggers this error out of nowhere,
+					// and looks like it is safe to ignore it as the the app works fine regardlessly.
+					return;
+				}
+				setRunErr(stack(e));
+			};
+
+			function stack(e) {
+				if(!e) return "";
+				return typeof e.stack == "string" ? e.stack.replace(/^.+? at/, "") : e.toString();
+			}
+
+			// Switch to dark theme immediately if necessary to avoid white flash
+			var theme = "system", dark = false;
+			try {
+				// eslint-disable-next-line compat/compat
+				theme = JSON.parse(localStorage.getItem("settings")).theme;
+				dark = matchMedia("(prefers-color-scheme: dark)").matches;
+			} catch(e) { }
+			if(theme == "dark" || theme == "system" && dark) {
+				document.documentElement.classList.add("dark");
+			}
+
+			// Quick legacy browser detection, covering:
+			// Chrome < 33, Edge < 12 & IE, Safari < 7.1, Firefox < 20, Opera < 20
+			if(typeof Promise == "undefined" || typeof TextDecoder == "undefined") {
+				runErr = "Legacy browser";
+				window.onload = self.callback;
+			} else {
+				// Capture <script> or <link> loading error
+				window.addEventListener("error", resourceErrorHandler, true);
+			}
+		}();
+	</script>
+</head>
+
+<body class="show-status">
+	<!-- Error message -->
+	<div class="viewport p-3 scroll-shadow" style="z-index: 0;">
+		<div id="requirement" style="display:none;">
+			<h3>An error occurred during the startup of Box Pleating Studio.</h3>
+			<div class="mt-2">
+				Possible causes include:
+				<ol>
+					<li>
+						Outdated browser or operating system<br>
+						Minimal requirement for BP Studio is Chrome &ge; 66, Edge &ge; 79, Firefox &ge; 78, Opera &ge; 53,
+						Safari &ge; 11.1 (or 11.3 for iOS), or Samsung Internet &ge; 9.2.<br>
+						Other browsers (especially those that are Chromium-based) might also work,
+						but are not officially supported and there's no guarantee that all functionality will operate.<br>
+						If you haven't done so, please upgrade your browser
+						(note that upgrading Safari requires upgrading the system)
+						or use the latest version of Chrome, which is the recommended browser.<br>
+						It is also known that earlier versions of Windows 7 may cause issues with SSL certificates.
+						Please try updating Windows if the website is marked "insecure".
+					</li>
+					<li>
+						Temporary bug<br>
+						Please try clearing browser cache data and reloading the app to update BP Studio to the latest version,
+						which might have fixed the bug, especially on Safari,
+						in which a known bug in its caching mechanism could lead to you seeing this error.
+					</li>
+				</ol>
+				In all cases, the error has been reported to the author,
+				and he will try his best to fix the issue when applicable.<br>
+				If none of the above solved the problem,
+				please come back later in a few days and see if the error has been solved.
+				The author apologize for the inconvenience.<br>
+				You could also submit an issue on
+				<a href="https://github.com/MuTsunTsai/box-pleating-studio/issues" target="_blank" rel="noopener">GitHub</a>
+				or through <a href="https://discord.gg/zS4FPxHwHX" target="_blank" rel="noopener">Discord</a>
+				to report this issue; please include the following diagnosis information in your submission.
+			</div>
+		</div>
+		<div id="resource" style="display:none;">
+			<h3>Some of the required resources cannot be loaded successfully.</h3>
+			<div class="mt-2">
+				As a result, Box Pleating Studio cannot be started.<br>
+				This is probably due to internet connection problem and/or missing cached resources.
+				Please check you network and try again.<br><br>
+				Resource failed to load:
+			</div>
+		</div>
+	</div>
+
+	<!-- Actual app -->
+	<div id="divWorkspace"></div>
+	<div id="app">__VUE_SSG__</div>
+
+	<noscript>
+		<div class="viewport p-3 noscript">
+			<h3>Box Pleating Studio requires JavaScript enabled in your browser.</h3>
+		</div>
+	</noscript>
+
+</body>
+
+</html>

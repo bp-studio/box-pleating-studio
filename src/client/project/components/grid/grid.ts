@@ -2,7 +2,7 @@ import { Destructible } from "client/base/destructible";
 
 import type { ITagObject } from "client/shared/interface";
 import type { GraphicsLike } from "client/utils/contourUtil";
-import type { Path } from "shared/types/geometry";
+import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { Direction } from "shared/types/direction";
 import type { GridType, JSheet } from "shared/json";
 import type { Sheet } from "../sheet";
@@ -42,10 +42,10 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	public abstract readonly $offset: IPoint;
 
 	/** Rendered width, in number of grids. */
-	public abstract readonly $renderHeight: number;
+	public abstract readonly $renderWidth: number;
 
 	/** Rendered height, in number of grids. */
-	public abstract readonly $renderWidth: number;
+	public abstract readonly $renderHeight: number;
 
 	public abstract toJSON(): JSheet;
 
@@ -67,14 +67,26 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	/** Find the point on the grid that is closest to the given point. */
 	public abstract $constrain(p: IPoint): IPoint;
 
+	public abstract $getResizeCenter(): IPoint;
+	public abstract $getCenter(): IPoint;
+
+	/**
+	 * Given an {@link IDimension}, check if the values are valid, and fix them if not.
+	 * Used during optimization.
+	 */
+	public abstract $fixDimension(d: IDimension): void;
+
 	/**
 	 * Transformation matrix for a given point for CP exporting.
-	 * The numbers are arranged in such a way that the transformation is:
-	 * $$\left[\begin{matrix} A & B \\ C & D \end{matrix}\right]\left
-	 * [\begin{matrix} x \\ y \end{matrix}\right] +
-	 * \left[\begin{matrix} E \\ F \end{matrix}\right]$$
+	 * See {@link TransformationMatrix} for format.
 	 */
-	public abstract $getTransformMatrix(size: number, reorient: boolean): number[];
+	public abstract $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix;
+
+	/**
+	 * Change the dimension by internal functions instead of by UI.
+	 * History is not flushed by this operation.
+	 */
+	public abstract $setDimension(width: number, height: number): void;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Protected method

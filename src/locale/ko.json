@@ -67,7 +67,12 @@
 			"undo": "실행 취소",
 			"redo": "다시 하기",
 			"selectAll": "모두 선택",
-			"unselectAll": "모두 선택 해제"
+			"unselectAll": "모두 선택 해제",
+			"subdivide": "그리드 세분화",
+			"rotate_right": "오른쪽으로 회전",
+			"rotate_left": "왼쪽으로 회전",
+			"horizontal_flip": "수평 뒤집기",
+			"vertical_flip": "수직 뒤집기"
 		},
 		"setting": {
 			"title": "설정",
@@ -85,11 +90,7 @@
 		},
 		"tools": {
 			"title": "도구",
-			"TreeMaker": "TreeMaker 파일 가져오기",
-			"CP": {
-				"_": "CP 파일 내보내기",
-				"reorient": "해당하는 경우 시트 방향 변경"
-			}
+			"TreeMaker": "TreeMaker 파일 가져오기"
 		},
 		"help": {
 			"title": "도움",
@@ -266,6 +267,30 @@
 			"not5": "파일 \"{0}\" 은 TreeMaker 5 형식이 아닙니다.",
 			"size8": "BP Studio 는 시트 크기가 적어도 8 이상이어야 합니다.",
 			"invalid": "파일 \"{0}\" 이 손상되어 성공적으로 로드할 수 없습니다."
+		},
+		"optimizer": {
+			"_": "레이아웃 최적화",
+			"unsupported": "귀하의 브라우저는 이 기능을 지원하지 않습니다. 최신 버전으로 업그레이드해주세요.",
+			"options": {
+				"_": "옵션",
+				"openNew": "새 탭에 결과 표시",
+				"useDim": "가지의 너비와 높이를 유지하십시오"
+			},
+			"layout": {
+				"_": "레이아웃 방법",
+				"view": "현재 레이아웃을 참조로 사용합니다",
+				"random": "임의의 레이아웃을 사용해 보세요",
+				"toTry": "시도할 레이아웃 수:",
+				"useBH": "현재 레이아웃을 변형해 보세요."
+			},
+			"skip": "건너뛰다",
+			"run": "실행해!",
+			"running": "실행 중..."
+		},
+		"CP": {
+			"_": "CP 파일 내보내기",
+			"format": "체재",
+			"reorient": "해당하는 경우 시트 방향 변경"
 		}
 	},
 	"keyword": {
@@ -273,7 +298,9 @@
 		"no": "아니요",
 		"ok": "좋아요",
 		"here": "여기",
+		"abort": "중단",
 		"close": "닫기",
+		"cancel": "취소",
 		"export": "내보내기",
 		"delete": "삭제",
 		"discord": "BP Studio 디스코드 서버",

@@ -6,11 +6,14 @@ import { UpdateResult } from "core/service/updateResult";
 import type { JNode } from "core/service/updateModel";
 import type { Comparator } from "shared/types/types";
 import type { JEdge, JFlap } from "shared/json";
-import type { ITreeNode, NodeGraphics } from ".";
+import type { ITreeNode, ITreeNodeBase, NodeGraphics } from ".";
 import type { NodeId } from "shared/json/tree";
 import type { Tree } from "./tree";
 
-export const nodeComparator: Comparator<ITreeNode> = (a, b) => b.$dist - a.$dist;
+/** Sorted by maximize {@link ITreeNode.$dist}. */
+export const maxDistComparator: Comparator<ITreeNodeBase> = (a, b) => b.$dist - a.$dist;
+
+const maxHeightComparator: Comparator<TreeNode> = (a, b) => b.$height - a.$height;
 
 //=================================================================
 /**
@@ -39,7 +42,7 @@ export class TreeNode implements ITreeNode {
 	public readonly $AABB: AABB = new AABB();
 
 	/** All child nodes. Implemented using maximal heap. */
-	public $children = new MutableHeap<TreeNode>((a, b) => b.$height - a.$height);
+	public $children = new MutableHeap<this>(maxHeightComparator);
 
 	public _leafList!: TreeNode[];
 

@@ -25,7 +25,10 @@ export class Quadrant {
 	public readonly q: QuadrantDirection;
 	public readonly f: IPoint;
 
-	/** Weight for sorting {@link Quadrant}s. */
+	/**
+	 * Weight for sorting {@link Quadrant}s in counter-clockwise ordering.
+	 * See also {@link pointWeight}.
+	 */
 	public readonly w: number;
 
 	/** The starting point of tracing relative to the corner of the flap. */
@@ -52,15 +55,16 @@ export class Quadrant {
 		this.w = pointWeight(this.$point, this.f);
 	}
 
-	/**
-	 * v0.6.17 Basic validity check: if the delta point of any two junctions
-	 * falls inside the circle, then this quadrant is clearly invalid.
-	 */
+	/** Basic validity checks. */
 	public $checkValidity(nodeSet: NodeSet): boolean {
 		for(let i = 0; i < this._junctions.length; i++) {
 			const j1 = this._junctions[i];
 			for(let j = i + 1; j < this._junctions.length; j++) {
 				const j2 = this._junctions[j];
+				if(oneIsContainedInAnother(j1.$o, j2.$o)) return false;
+
+				// v0.6.17: if the delta point of any two junctions falls inside the circle,
+				// then this quadrant is clearly invalid.
 				const offset = getDeltaPointOffsetFromCorner(j1, j2);
 				const n1 = this._getOppositeId(j1);
 				const n2 = this._getOppositeId(j2);
@@ -145,7 +149,7 @@ export class Quadrant {
 	}
 }
 
-export const quadrantComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
+export const minQuadrantWeightComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
 
 /**
  * Find the start/end {@link Point}s for tracing for a given set of {@link Quadrant}s
@@ -162,6 +166,12 @@ export function startEndPoints(quadrants: Quadrant[]): [Point, Point] {
 	return [start, end];
 }
 
+/**
+ * The weight for sorting points from the perspective of a given quadrant.
+ * In particular, it will sort the points in counter-clockwise ordering.
+ * @param p The {@link IPoint} to compare.
+ * @param f The directional factor of the {@link Quadrant}.
+ */
 function pointWeight(p: IPoint, f: IPoint): number {
 	return f.x * p.y - f.y * p.x;
 }
@@ -185,4 +195,21 @@ function getDeltaPointOffsetFromCorner(j1: ValidJunction, j2: ValidJunction): IP
 		x: Math.min(j1.$o.x, j2.$o.x),
 		y: Math.min(j1.$o.y, j2.$o.y),
 	};
+}
+
+/**
+ * v0.7.0: If one of the overlap rectangle is fully contained inside another
+ * (but not considered covered by our covering rules),
+ * then this is currently not supported and we can skip searching.
+ *
+ * To resolve such a junction team, sophisticated cutting is required,
+ * and we need more insights on such cases to implement the cutting algorithm.
+ *
+ * A classic example of this is the following:
+ * ```
+ * parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)");
+ * ```
+ */
+function oneIsContainedInAnother(o1: IPoint, o2: IPoint): boolean {
+	return o1.x <= o2.x && o1.y <= o2.y || o2.x <= o1.x && o2.y <= o1.y;
 }

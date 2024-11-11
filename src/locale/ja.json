@@ -67,7 +67,12 @@
 			"undo": "元に戻す",
 			"redo": "やり直し",
 			"selectAll": "すべて選択",
-			"unselectAll": "すべて選択解除"
+			"unselectAll": "すべて選択解除",
+			"subdivide": "グリッドを細分化する",
+			"rotate_right": "右回転",
+			"rotate_left": "左に回転",
+			"horizontal_flip": "水平反転",
+			"vertical_flip": "垂直反転"
 		},
 		"setting": {
 			"title": "設定",
@@ -85,11 +90,7 @@
 		},
 		"tools": {
 			"title": "ツール",
-			"TreeMaker": "TreeMaker ファイルをインポートする",
-			"CP": {
-				"_": "CP ファイルのエクスポート",
-				"reorient": "該当する場合は、シートの向きを変更します"
-			}
+			"TreeMaker": "TreeMaker ファイルをインポートする"
 		},
 		"help": {
 			"title": "ヘルプ",
@@ -266,6 +267,30 @@
 			"not5": "ファイル \"{0}\" は TreeMaker 5 形式ではありません。",
 			"size8": "BP Studio には、少なくとも 8 枚のシートサイズが必要です。",
 			"invalid": "ファイル \"{0}\" が破損しているようで、正常にロードできません。"
+		},
+		"optimizer": {
+			"_": "レイアウトの最適化",
+			"unsupported": "お使いのブラウザはこの機能をサポートしていません。最新バージョンにアップグレードしてください。",
+			"options": {
+				"_": "オプション",
+				"openNew": "新しいタブに結果を表示",
+				"useDim": "カドの幅と高さを維持する"
+			},
+			"layout": {
+				"_": "レイアウト方法",
+				"view": "現在のレイアウトを参考として使用して",
+				"random": "ランダムなレイアウトを試して",
+				"toTry": "試行するレイアウトの数:",
+				"useBH": "現在のレイアウトのバリエーションを試して"
+			},
+			"skip": "スキップ",
+			"run": "実行して！",
+			"running": "実行中..."
+		},
+		"CP": {
+			"_": "CP ファイルのエクスポート",
+			"format": "形式",
+			"reorient": "該当する場合は、シートの向きを変更します"
 		}
 	},
 	"keyword": {
@@ -273,7 +298,9 @@
 		"no": "いいえ",
 		"ok": "OK",
 		"here": "こちら",
+		"abort": "アボート",
 		"close": "閉じる",
+		"cancel": "キャンセル",
 		"export": "エクスポート",
 		"delete": "削除",
 		"discord": "BP Studio Discord サーバー",

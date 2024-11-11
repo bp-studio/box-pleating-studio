@@ -4,7 +4,7 @@ import { UpdateResult } from "core/service/updateResult";
 
 import type { TreeData } from "core/service/updateModel";
 import type { JEdge, JFlap } from "shared/json";
-import type { ITree, ITreeNode, NodeCollection } from ".";
+import type { ITree, NodeCollection } from ".";
 import type { NodeId } from "shared/json/tree";
 
 //=================================================================
@@ -284,30 +284,4 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		UpdateResult.$edit([true, { n1, n2, length }]);
 		return true;
 	}
-}
-
-/** Return the structural distance between two {@link ITreeNode}s using LCA. */
-export function dist(a: ITreeNode, b: ITreeNode, lca: ITreeNode): number {
-	return a.$dist + b.$dist - 2 * lca.$dist;
-}
-
-/**
- * Return the structural distance between two nodes without supplying LCA. Used only in unit tests.
- */
-export function getDist(n1: TreeNode, n2: TreeNode): number {
-	return dist(n1, n2, getLCA(n1, n2));
-}
-
-/**
- * Returns the LCA of two nodes. Used only in unit tests.
- */
-function getLCA(n1: TreeNode, n2: TreeNode): TreeNode {
-	while(n1 !== n2) {
-		// Originally this part compares the depths of the nodes,
-		// but in fact comparing the distance results the same,
-		// and we save ourselves the overhead of maintaining one extra field.
-		if(n1.$dist >= n2.$dist) n1 = n1.$parent!;
-		if(n2.$dist > n1.$dist) n2 = n2.$parent!;
-	}
-	return n1;
 }

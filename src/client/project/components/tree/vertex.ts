@@ -1,4 +1,4 @@
-import { Circle } from "@pixi/core";
+import { Circle } from "@pixi/math";
 
 import { Layer } from "client/shared/layers";
 import { field, shallowRef } from "client/shared/decorators";
@@ -38,16 +38,16 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	 * The movement of {@link Vertex Vertices} does not concerns the Core,
 	 * so we directly made it a {@link shallowRef}.
 	 */
-	@shallowRef public override $location: IPoint;
+	@shallowRef public override accessor _location: IPoint;
 
 	/**
 	 * Several UI depends on this value, so it is reactive.
 	 */
-	@shallowRef public $degree: number = 0;
+	@shallowRef public accessor $degree: number = 0;
 
-	@shallowRef public $dist: number = 0;
+	@shallowRef public accessor $dist: number = 0;
 
-	@shallowRef public $height: number = 0;
+	@shallowRef public accessor $height: number = 0;
 
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
@@ -67,7 +67,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this.$tag = "v" + json.id;
 		this.id = json.id;
 		this.$isNew = json.isNew || false;
-		this.$location = { x: json.x, y: json.y };
+		this._location = { x: json.x, y: json.y };
 		this.name = json.name;
 
 		this._dot = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.vertex]);
@@ -82,8 +82,8 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return {
 			id: this.id,
 			name: this.name,
-			x: this.$location.x,
-			y: this.$location.y,
+			x: this._location.x,
+			y: this._location.y,
 		};
 	}
 
@@ -97,7 +97,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@field public name: string;
+	@field public accessor name: string;
 
 	public async addLeaf(length: number): Promise<void> {
 		if(length > this.maxNewLeafLength) return;
@@ -135,11 +135,11 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get $anchor(): IPoint {
-		return this.$location;
+		return this._location;
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		return this._fixVector(this.$location, v);
+		return this._fixVector(this._location, v);
 	}
 
 	public override $selectableWith(c: Control): boolean {
@@ -147,11 +147,11 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public $testGrid(grid: Grid): boolean {
-		return grid.$contains(this.$location);
+		return grid.$contains(this._location);
 	}
 
 	public override $anchors(): IPoint[] {
-		return [this.$location];
+		return [this._location];
 	}
 
 	protected override async _move(x: number, y: number): Promise<void> {
@@ -162,7 +162,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 			if(!flap) {
 				this.$isNew = false;
 			} else {
-				const p = getRelativePoint(this.$location, this._sheet, layout.$sheet);
+				const p = getRelativePoint(this._location, this._sheet, layout.$sheet);
 				return flap.$sync(p);
 			}
 		}
@@ -184,19 +184,19 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		graphics.clear()
 			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
 			.beginFill(style.vertex.fill)
-			.drawCircle(this.$location.x, this.$location.y, size / s)
+			.drawCircle(this._location.x, this._location.y, size / s)
 			.endFill();
 	}
 
 	private _draw(): void {
 		this.$drawDot(this._dot);
 		const s = ProjectService.scale.value;
-		this._dot.hitArea = new Circle(this.$location.x * s, this.$location.y * s, style.vertex.size * 2);
+		this._dot.hitArea = new Circle(this._location.x * s, this._location.y * s, style.vertex.size * 2);
 	}
 
 	private _drawLabel(): void {
 		this.$label.$color = this.$selected ? style.vertex.selected : undefined;
-		this.$label.$draw(this.name, this.$location.x, this.$location.y);
+		this.$label.$draw(this.name, this._location.x, this._location.y);
 	}
 }
 

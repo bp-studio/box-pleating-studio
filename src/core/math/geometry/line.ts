@@ -122,26 +122,20 @@ export class Line {
 
 	/**
 	 * Return the intersection of this line segment (endpoints included)
-	 * with the given line segment.
+	 * with the given line segment (or straight line).
 	 */
-	public $intersection(l: Line): Point | null;
+	public $intersectLine(l: Line, asSegment = true): Point | null {
+		const intersection = getIntersection(this, l.p1, l.$vector, asSegment, asSegment);
+		return intersection && intersection.point;
+	}
 
 	/**
 	 * Return the intersection of this line (as segment, endpoints included)
 	 * with the given direction (as a straight line, unless {@link headless} or {@link tailless} is assigned).
 	 */
-	public $intersection(p: Point, v: Vector, headless?: boolean, tailless?: boolean): Point | null;
-
-	public $intersection(...t: [Point, Vector, boolean?, boolean?] | [Line]): Point | null {
-		let intersection: IIntersection | null;
-		if(t.length == 1) {
-			intersection = getIntersection(this, t[0].p1, t[0].p2.$sub(t[0].p1), true, true);
-		} else {
-			const [p, v, headless, tailless] = t;
-			intersection = getIntersection(this, p, v, headless, tailless);
-		}
-		if(!intersection) return null;
-		return intersection.point;
+	public $intersection(p: Point, v: Vector, headless?: boolean, tailless?: boolean): Point | null {
+		const intersection = getIntersection(this, p, v, headless, tailless);
+		return intersection && intersection.point;
 	}
 
 	/** Transform the line by the given orientation and return a new line. */
@@ -272,7 +266,7 @@ export class Line {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 
 	/* istanbul ignore next: debug */
 	public static $parseTest<T extends Line = Line>(jsons: TestLine<T>[]): T[] {
@@ -286,7 +280,7 @@ export class Line {
 		}) as T[];
 	}
 
-	///#endif
+	/// #endif
 }
 
 type TestLine<T extends Line> =

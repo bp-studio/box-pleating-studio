@@ -19,13 +19,17 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 
 	public override $getPrev(key: K): V | undefined {
 		let node = this._getNode(key);
+
+		/// #if DEBUG
 		/* istanbul ignore next: debug */
-		if(DEBUG_ENABLED && node === this._nil) {
+		if(node === this._nil) {
 			// We shouldn't get here in theory. If we do,
 			// it basically means we have a segment with the start/end events being sorted incorrectly,
 			// and that usually implies that we've created an essentially degenerated segment.
 			debugger;
 		}
+		/// #endif
+
 		if(node.$left !== this._nil) return this._max(node.$left).$value;
 		while(node.$parent !== this._nil && node.$parent.$left === node) node = node.$parent;
 		return node.$parent.$value;

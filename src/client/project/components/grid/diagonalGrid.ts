@@ -7,7 +7,7 @@ import { chebyshev } from "client/utils/chebyshev";
 import { MAX_SHEET_SIZE, MIN_DIAG_SIZE } from "shared/types/constants";
 
 import type { GraphicsLike } from "client/utils/contourUtil";
-import type { Path } from "shared/types/geometry";
+import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { JSheet } from "shared/json/components";
 import type { Sheet } from "../sheet";
 
@@ -24,7 +24,7 @@ export class DiagonalGrid extends Grid {
 	private _testSize: number;
 	private _testShift: IPoint | undefined;
 
-	@shallowRef private _size: number;
+	@shallowRef private accessor _size: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		super(sheet, GridType.diagonal);
@@ -81,6 +81,26 @@ export class DiagonalGrid extends Grid {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public override $getResizeCenter(): IPoint {
+		return this.$getCenter();
+	}
+
+	public override $getCenter(): IPoint {
+		return { x: this._size / 2, y: this.size / 2 };
+	}
+
+	public override $setDimension(width: number, height: number): void {
+		if(width != height) throw new Error("Dimension mismatch for diagonal grid.");
+		const oldValue = this._size;
+		this._testSize = this._size = width;
+		this.$project.history.$fieldChange(this, "size", oldValue, width, false);
+	}
+
+	public override $fixDimension(d: IDimension): void {
+		if(d.height < MIN_DIAG_SIZE) d.height = MIN_DIAG_SIZE;
+		if(d.width < MIN_DIAG_SIZE) d.width = MIN_DIAG_SIZE;
+	}
 
 	public $constrain(p: IPoint): IPoint {
 		let { x, y } = p;
@@ -175,7 +195,7 @@ export class DiagonalGrid extends Grid {
 		}
 	}
 
-	public $getTransformMatrix(size: number, reorient: boolean): number[] {
+	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
 		const full = this.$renderWidth;
 		const s = size / full;
 		const shift = this._size % 2 / 2;

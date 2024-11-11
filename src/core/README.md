@@ -27,10 +27,10 @@ The data flow of the Core is depicted in the following chart.
 flowchart TB
 subgraph User input
 	direction LR
-	T[\Tree\nstructure/]
-	L[\Edge\nlengths/]
-	F[\Flap positions\nand sizes/]
-	P[\Stretch pattern\nchoices/]
+	T[\Tree<br>structure/]
+	L[\Edge<br>lengths/]
+	F[\Flap positions<br>and sizes/]
+	P[\Stretch pattern<br>choices/]
 end
 subgraph "Tree#emsp;#emsp;#emsp;#emsp;"
 	h{{node heights}}
@@ -40,7 +40,7 @@ subgraph "Tree#emsp;#emsp;#emsp;#emsp;"
 end
 rc[rough contours]
 j[junctions]
-i([invalid\njunctions])
+i([invalid<br>junctions])
 subgraph "Pattern#emsp;#emsp;#emsp;#emsp;"
 	s[stretches]
 	p{{patterns}}

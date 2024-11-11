@@ -6,5 +6,5 @@ declare global {
 	declare const gtag: Gtag;
 	declare const paypal: PayPalNamespace;
 
-	declare const locale: Record<string, BpsLocale>;
+	// declare const locale: Record<string, BpsLocale>;
 }

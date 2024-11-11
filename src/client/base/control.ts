@@ -38,8 +38,8 @@ export abstract class Control extends View implements ITagObject {
 	 */
 	public abstract readonly $priority: number;
 
-	@shallowRef private _selected: boolean = false;
-	@shallowRef private _hovered: boolean = false;
+	@shallowRef private accessor _selected: boolean = false;
+	@shallowRef private accessor _hovered: boolean = false;
 
 	/** The cursor style to use when the object is selected. */
 	public $selectedCursor: string = "move";

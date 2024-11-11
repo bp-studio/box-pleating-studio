@@ -23,14 +23,18 @@ declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 // Default resources use StaleWhileRevalidate strategy
 const defaultHandler = new strategies.StaleWhileRevalidate({
 	cacheName: "assets",
-	plugins: [new broadcastUpdate.BroadcastUpdatePlugin({
-		generatePayload: options => ({ path: new URL(options.request.url).pathname }),
-	})],
+	plugins: [
+		new broadcastUpdate.BroadcastUpdatePlugin({
+			generatePayload: options => ({ path: new URL(options.request.url).pathname }),
+		}),
+	],
 });
 routing.setDefaultHandler(defaultHandler);
 
 // Activates workbox-precaching
-const precacheController = new precaching.PrecacheController({ cacheName: "assets" });
+const precacheController = new precaching.PrecacheController({
+	cacheName: "assets",
+});
 precacheController.addToCacheList(self.__WB_MANIFEST);
 const precacheRoute = new precaching.PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],

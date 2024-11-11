@@ -5,20 +5,10 @@ import "shared/polyfill/flatMap"; // For Safari < 12, used in VueDraggable
 import "shared/polyfill/toReversed"; // Used in Client
 import "shared/polyfill/withResolvers";
 
-import { createSSRApp } from "vue";
-
-import { lcpReady, phase } from "app/misc/lcpReady";
-import { doEvents } from "shared/utils/async";
-import App from "@/app.vue";
-import Core from "app/core";
-import Lib from "app/services/libService";
-import LanguageService from "app/services/languageService";
-import { init as settingInit } from "app/services/settingService";
-
+import "lib/bootstrap/bootstrap.scss";
+import "temp/bps/style.css";
 import "app/style/main.scss";
-
-const TIME_TERMINATE = 100;
-const TOTAL_PHASES = 6;
+import "temp/font-awesome/css/all.min.css";
 
 // Disable native mouse wheel zooming
 document.addEventListener(
@@ -32,60 +22,5 @@ document.addEventListener(
 	}
 );
 
-async function runPhase(to: number): Promise<void> {
-	while(phase.value < to) {
-		// eslint-disable-next-line no-await-in-loop
-		await doEvents();
-		phase.value++;
-	}
-}
-
-async function init(): Promise<void> {
-	try {
-		// Client side hydration
-		await doEvents();
-		settingInit();
-		const app = createSSRApp(App);
-		app.use(LanguageService.createPlugin());
-		await doEvents();
-		app.mount("#app");
-
-		// LCP
-		await doEvents();
-		LanguageService.init();
-		if(lcpReady.value === undefined) lcpReady.value = true;
-
-		// Phase 1 to 2
-		await runPhase(2);
-
-		// Initialize services and Client
-		await doEvents();
-		if(!await Core.init()) return;
-
-		// Load all non-critical resources
-		await doEvents();
-		LanguageService.setup();
-		await Lib.load();
-
-		// Phase 3 to 6
-		await runPhase(TOTAL_PHASES);
-
-	} catch(e: unknown) {
-		if(e instanceof Error) errMgr.setRunErr(e.message);
-	} finally {
-		if(errMgr.callback()) { // Second checkpoint
-			setTimeout(() => {
-				window.onerror = null;
-				window.onunhandledrejection = null;
-			}, TIME_TERMINATE);
-		}
-	}
-}
-
 errMgr.end();
-if(errMgr.ok()) init();
-
-export { isTouch } from "app/shared/constants";
-export { isPrinting, isDark } from "app/misc/isDark";
-export { callWorker } from "app/utils/workerUtility";
-export { default as settings } from "app/services/settingService";
+if(errMgr.ok()) import("./init");

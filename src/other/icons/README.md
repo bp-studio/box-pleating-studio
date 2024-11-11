@@ -6,4 +6,4 @@ The `src` folder contains the original SVG files,
 and `dist` folder contains processed SVG
 (mainly by converting strokes to fills)
 files as well as the [IcoMoon](https://icomoon.io/app/) project JSON file.
-The font file is then generated with IcoMoon and placed under `public/assets/bps`.
+The font file is then generated with IcoMoon and placed under `bps`.

@@ -67,7 +67,12 @@
 			"undo": "Deshacer",
 			"redo": "Rehacer",
 			"selectAll": "Seleccionar todo",
-			"unselectAll": "Deselecciona todo"
+			"unselectAll": "Deselecciona todo",
+			"subdivide": "Subdividir cuadrícula",
+			"rotate_right": "Girar a la derecha",
+			"rotate_left": "Girar a la izquierda",
+			"horizontal_flip": "volteo horizontal",
+			"vertical_flip": "volteo vertical"
 		},
 		"setting": {
 			"title": "Ajustes",
@@ -85,11 +90,7 @@
 		},
 		"tools": {
 			"title": "Herramientas",
-			"TreeMaker": "Importar archivo TreeMaker",
-			"CP": {
-				"_": "Exportar archivo CP",
-				"reorient": "Reorientar la hoja si corresponde"
-			}
+			"TreeMaker": "Importar archivo TreeMaker"
 		},
 		"help": {
 			"title": "Ayuda",
@@ -266,6 +267,30 @@
 			"not5": "El archivo \"{0}\" no tiene el formato TreeMaker 5.",
 			"size8": "BP Studio requiere un tamaño de hoja de al menos 8.",
 			"invalid": "El archivo \"{0}\" parece dañado y no se puede cargar correctamente."
+		},
+		"optimizer": {
+			"_": "Optimizar el diseño",
+			"unsupported": "Su navegador no soporta esta característica. Actualice a la última versión.",
+			"options": {
+				"_": "Opciones",
+				"openNew": "Mostrar resultado en una nueva pestaña",
+				"useDim": "Mantenga los anchos y altos de las solapas"
+			},
+			"layout": {
+				"_": "Método de diseño",
+				"view": "Utilice el diseño actual como referencia",
+				"random": "Pruebe diseños aleatorios",
+				"toTry": "Número de diseños para probar:",
+				"useBH": "Pruebe variaciones de los diseños actuales."
+			},
+			"skip": "Saltar",
+			"run": "¡Ejecuta!",
+			"running": "Ejecutando..."
+		},
+		"CP": {
+			"_": "Exportar archivo CP",
+			"format": "Formato",
+			"reorient": "Reorientar la hoja si corresponde"
 		}
 	},
 	"keyword": {
@@ -273,7 +298,9 @@
 		"no": "No",
 		"ok": "OK",
 		"here": "aquí",
+		"abort": "Abortar",
 		"close": "Cerrar",
+		"cancel": "Cancelar",
 		"export": "Exportar",
 		"delete": "Borrar",
 		"discord": "Servidor Discord de BP Studio",

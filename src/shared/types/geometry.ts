@@ -6,6 +6,17 @@ export type ILine = [IPoint, IPoint];
 
 export type Polygon = Path[];
 
+/**
+ * Matrix [a, b, c, d, tx, ty] so that the transformation is:
+ * ```
+ * |a b||x|   |tx|
+ * |   || | + |  |
+ * |c d||y|   |ty|
+ * ```
+ * Note that this is different from the ordering used in Pixi.js.
+ */
+export type TransformationMatrix = [number, number, number, number, number, number];
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Arc
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,4 +81,12 @@ export function leg(c: number, b: number): number {
 /** Sort first by x-coordinate, then by y-coordinate */
 export function xyComparator(p1: IPoint, p2: IPoint): number {
 	return p1.x - p2.x || p1.y - p2.y;
+}
+
+export function applyTransform(pt: IPoint, matrix: TransformationMatrix): IPoint {
+	const [a, b, c, d, x, y] = matrix;
+	return {
+		x: pt.x * a + pt.y * b + x,
+		y: pt.x * c + pt.y * d + y,
+	};
 }

@@ -1,7 +1,7 @@
 import { pathToString } from "core/math/geometry/path";
 import { SlashDirection } from "shared/types/direction";
 import { Trace } from "./trace";
-import { quadrantComparator, startEndPoints } from "../pattern/quadrant";
+import { minQuadrantWeightComparator, startEndPoints } from "../pattern/quadrant";
 
 import type { NodeId } from "shared/json/tree";
 import type { Ridge } from "../pattern/device";
@@ -36,7 +36,7 @@ export class RepoTrace extends Trace {
 	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[]): [Point, Point] {
 		let [start, end] = startEndPoints(filtered);
 		if(filtered.length != all.length) {
-			filtered.sort(quadrantComparator);
+			filtered.sort(minQuadrantWeightComparator);
 			const first = all.indexOf(filtered[0]);
 			const last = all.indexOf(filtered[filtered.length - 1]);
 			if(first > 0) {
@@ -69,7 +69,7 @@ export class RepoTrace extends Trace {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 	/* istanbul ignore next: debug */
 	public createTestCase(hinges: Path, start: Point, end: Point): string {
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
@@ -78,5 +78,5 @@ export class RepoTrace extends Trace {
 		const sideDiagonals = `Line.$parseTest<SideDiagonal>(${simp(this.$sideDiagonals)})`;
 		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"), new Point${start.toString()}, new Point${end.toString()});`;
 	}
-	///#endif
+	/// #endif
 }

@@ -1,11 +1,11 @@
-import { MutableHeap } from "shared/data/heap/mutableHeap";
-import { nodeComparator } from "../context/treeNode";
+import { BinaryHeap } from "shared/data/heap/binaryHeap";
+import { maxDistComparator } from "../context/treeNode";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { State } from "core/service/state";
 import { minComparator } from "shared/data/heap/heap";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { quadrantNumber } from "shared/types/direction";
-import { dist } from "../context/tree";
+import { dist } from "../context/treeUtils";
 
 import type { Quadrant } from "./pattern/quadrant";
 import type { ITreeNode } from "../context";
@@ -42,7 +42,7 @@ export class NodeSet {
 	constructor(junctions: Junctions, quadrants: ReadonlyMap<number, Quadrant>) {
 		this.$leaves = getLeaves(junctions);
 
-		const heap = new MutableHeap<ITreeNode>(nodeComparator);
+		const heap = new BinaryHeap<ITreeNode>(maxDistComparator);
 		const coverage = new Map<ITreeNode, Quadrant[]>();
 		const numQuadrants = quadrants.size;
 		for(const id of this.$leaves) {
@@ -62,7 +62,7 @@ export class NodeSet {
 			const node = heap.$pop()!;
 			const coveredQuadrants = coverage.get(node)!;
 
-			// Stop processing if we've covered everything (i.e. reached the LCA)
+			// Stop processing if we've covered everything (i.e. reached the LCA of all relevant leaves)
 			if(coveredQuadrants.length == numQuadrants) {
 				coverage.delete(node);
 				continue;
@@ -151,8 +151,8 @@ function getLeaves(junctions: Junctions): NodeId[] {
 		leafSet.add(j.$b.id);
 	}
 	const leaves = Array.from(leafSet);
-	///#if DEBUG
+	/// #if DEBUG
 	leaves.sort(minComparator);
-	///#endif
+	/// #endif
 	return leaves;
 }

@@ -4,7 +4,7 @@ import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
 import { MAX_SHEET_SIZE, MIN_RECT_SIZE } from "shared/types/constants";
 
-import type { Path } from "shared/types/geometry";
+import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { JSheet } from "shared/json";
 import type { Sheet } from "../sheet";
@@ -22,8 +22,8 @@ export class RectangularGrid extends Grid {
 	private _testWidth: number;
 	private _testHeight: number;
 
-	@shallowRef private _width: number;
-	@shallowRef private _height: number;
+	@shallowRef private accessor _width: number;
+	@shallowRef private accessor _height: number;
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		super(sheet, GridType.rectangular);
@@ -105,6 +105,28 @@ export class RectangularGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $getResizeCenter(): IPoint {
+		return { x: 0, y: 0 };
+	}
+
+	public override $getCenter(): IPoint {
+		return { x: this._width / 2, y: this._height / 2 };
+	}
+
+	public override $setDimension(width: number, height: number): void {
+		const w = this._width;
+		const h = this._height;
+		this._testWidth = this._width = width;
+		this._testHeight = this._height = height;
+		this.$project.history.$fieldChange(this, "width", w, width, false);
+		this.$project.history.$fieldChange(this, "height", h, height, false);
+	}
+
+	public override $fixDimension(d: IDimension): void {
+		if(d.height < MIN_RECT_SIZE) d.height = MIN_RECT_SIZE;
+		if(d.width < MIN_RECT_SIZE) d.width = MIN_RECT_SIZE;
+	}
+
 	public $constrain(p: IPoint): IPoint {
 		let { x, y } = p;
 		const w = this._width, h = this._height;
@@ -162,7 +184,7 @@ export class RectangularGrid extends Grid {
 		}
 	}
 
-	public $getTransformMatrix(size: number, reorient: boolean): number[] {
+	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
 		const w = this._width, h = this._height;
 		const max = Math.max(w, h);
 		const s = size / max;

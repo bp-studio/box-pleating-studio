@@ -1,5 +1,5 @@
 import { computed } from "vue";
-import { Polygon } from "@pixi/core";
+import { Polygon } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Control } from "client/base/control";
@@ -12,6 +12,7 @@ import { style } from "client/services/styleService";
 import { FieldCommand } from "client/project/changes/commands/fieldCommand";
 import { norm } from "shared/types/geometry";
 import { MAX_TREE_HEIGHT } from "shared/types/constants";
+import { SelectionController } from "client/controllers/selectionController";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
 import type { LabelView } from "client/utils/label";
@@ -33,7 +34,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
 
-	@shallowRef private _length: number;
+	@shallowRef private accessor _length: number;
 
 	public readonly $v1: Vertex;
 	public readonly $v2: Vertex;
@@ -82,7 +83,8 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		if(v < 1 || oldValue === v) return;
 		this._length = v;
 		this.$project.history.$fieldChange(this, "length", oldValue, v, false);
-		FieldCommand.$setterPromise = this._tree.$updateLength([this.toJSON()]);
+		const manager = this.$project.design.$batchUpdateManager;
+		FieldCommand.$setterPromise = manager.$addEdge(this.toJSON());
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,7 +101,10 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 
 	public async delete(): Promise<void> {
 		const v = this.$getLeaf();
-		if(v) await this._tree.$vertices.$delete([v]);
+		if(v) {
+			await this._tree.$vertices.$delete([v]);
+			SelectionController.clear();
+		}
 	}
 
 	/** For controlling max tree height. See {@link MAX_TREE_HEIGHT}. */
@@ -186,8 +191,8 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	}
 
 	private readonly _coordinates = computed(() => {
-		const { x: x1, y: y1 } = this.$v1.$location;
-		const { x: x2, y: y2 } = this.$v2.$location;
+		const { x: x1, y: y1 } = this.$v1._location;
+		const { x: x2, y: y2 } = this.$v2._location;
 		return { x1, x2, y1, y2 };
 	});
 }

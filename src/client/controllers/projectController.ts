@@ -1,27 +1,20 @@
 
-import { Project } from "client/project/project";
+import { getNextId, Project } from "client/project/project";
 import { Migration } from "client/patches";
 import { deepAssign } from "shared/utils/clone";
 import ProjectService from "client/services/projectService";
+import { isContextLost } from "client/main";
 
-import type { ShallowRef } from "vue";
 import type { JProject, ProjId } from "shared/json";
 
-/** The worker instance that is pre-generated and is standing-by; declared in HTML. */
-declare let __worker: Worker | undefined;
-
-/** The URL of the worker. Declared in HTML. */
-declare const __worker_src: string;
-
-export interface IProjectController {
-	readonly current: ShallowRef<Project | null>;
-	get(id: ProjId): Project | undefined;
-	create(json: RecursivePartial<JProject>): Promise<Project>;
-	open(json: Pseudo<JProject>): Promise<Project>;
-	close(proj: Project): void;
+function createWorker(): Worker {
+	return new Worker(new URL("core/main.ts", import.meta.url), { name: "core" });
 }
 
-///#if DEBUG
+/** The worker instance that is pre-generated and is standing-by. */
+let __worker: Worker | undefined = createWorker();
+
+/// #if DEBUG
 /**
  * For debugging memory leaks. When in debug mode,
  * it prints a message in the console after the {@link Project} has been garbage collected.
@@ -30,7 +23,7 @@ export interface IProjectController {
  */
 // eslint-disable-next-line compat/compat
 const registry = new FinalizationRegistry<number>(id => console.log(`Project #${id} GC.`));
-///#endif
+/// #endif
 
 //=================================================================
 /**
@@ -41,6 +34,9 @@ const registry = new FinalizationRegistry<number>(id => console.log(`Project #${
 export namespace ProjectController {
 
 	const projectMap = new Map<ProjId, Project>();
+
+	/** A fallback for creating session during context loss. */
+	const fallbackMap: Record<ProjId, JProject> = {};
 
 	export const current = ProjectService.project;
 
@@ -54,9 +50,13 @@ export namespace ProjectController {
 		return [...projectMap.values()];
 	}
 
+	export function getSession(ids: readonly ProjId[]): JProject[] {
+		return ids.map(id => projectMap.get(id)?.toJSON(true) ?? fallbackMap[id]);
+	}
+
 	/** Returns the standing-by worker, or create a new worker. */
 	function getOrCreateWorker(): Worker {
-		const worker = __worker ? __worker : new Worker(__worker_src);
+		const worker = __worker ? __worker : createWorker();
 		__worker = undefined;
 		return worker;
 	}
@@ -65,7 +65,7 @@ export namespace ProjectController {
 	 * Creates a new {@link Project}.
 	 * The passed-in data will be deeply assigned on the template project instead of passing through migration.
 	 */
-	export function create(json: RecursivePartial<JProject>): Promise<Project> {
+	export function create(json: RecursivePartial<JProject>): Promise<ProjId> {
 		json = deepAssign<RecursivePartial<JProject>>({
 			design: {
 				layout: {
@@ -96,18 +96,27 @@ export namespace ProjectController {
 	/**
 	 * Opens an old project. Passed-in data will go through {@link Migration} and updated to the latest format.
 	 */
-	export function open(json: Pseudo<JProject>): Promise<Project> {
+	export function open(json: Pseudo<JProject>): Promise<ProjId> {
 		return makeProject(Migration.$process(json));
 	}
 
-	function makeProject(json: RecursivePartial<JProject>): Promise<Project> {
+	async function makeProject(json: RecursivePartial<JProject>): Promise<ProjId> {
+		// Handling context loss, in which case we don't actually construct
+		// a Project instance, but just keep the JSON data for session saving.
+		if(isContextLost()) {
+			const id = getNextId();
+			fallbackMap[id] = deepAssign(Migration.$getSample(), json);
+			return id;
+		}
+
 		const p = new Project(json, getOrCreateWorker());
-		///#if DEBUG
+		/// #if DEBUG
 		// eslint-disable-next-line typescript-compat/compat
 		registry.register(p, p.id);
-		///#endif
+		/// #endif
 		projectMap.set(p.id, p);
-		return p.$initialize();
+		await p.$initialize();
+		return p.id;
 	}
 
 	/**
@@ -116,11 +125,17 @@ export namespace ProjectController {
 	 * If all projects are closed, it creates a new standing-by worker.
 	 */
 	export function close(proj: Project): void {
-		if(DEBUG_ENABLED) console.time("Close project");
+		/// #if DEBUG
+		console.time("Close project");
+		/// #endif
+
 		proj.$destruct(); // Destructing must go first
 		if(current.value == proj) current.value = null;
 		projectMap.delete(proj.id);
-		if(projectMap.size == 0) __worker = new Worker(__worker_src);
-		if(DEBUG_ENABLED) console.timeEnd("Close project");
+		if(projectMap.size == 0) __worker = createWorker();
+
+		/// #if DEBUG
+		console.timeEnd("Close project");
+		/// #endif
 	}
 }

@@ -1,8 +1,9 @@
 
 # Contributing Guidelines
 
-BP Studio is developed using [VS Code](https://code.visualstudio.com/),
-and the project folder is already configured for it.
+While one may use any editors to work with BP Studio,
+it is highly recommended to use [VS Code](https://code.visualstudio.com/)
+as the project folder is already configured for it.
 As you open the project with it,
 it will also hint you the recommended extensions to install.
 
@@ -16,22 +17,26 @@ To build BP Studio, first you need the following:
 
 1. Install or upgrade [Node.js](https://nodejs.org/) to v20+.
 1. BP Studio had migrated from NPM to [PNPM](https://pnpm.io/) for package managing,
-   so install PNPM by the command `npm install -g pnpm`.
+   so install PNPM by the command `npx pnpm install -g pnpm`.
 1. Use the command `pnpm install` under the project root folder to install all dependencies.
+1. Run `pnpm gulp` once to create pre-build assets.
 
 And then you can simply press `F5` in VS Code to build and launch the app automatically.
 This is the preferred way to launch as it allows debugging in the IDE.
 
 Alternatively, run `pnpm build` to build the entire project manually,
-and then run `pnpm start` to launch the local server on debug build.
+and then run `pnpm preview` to launch the local server on production build.
 
 > Note: one should always run BP Studio through a server,
 > as some of the features would not work in `files://` protocol.
 
-Typically the default build task is sufficient for developing purpose,
-and you won't need to execute individual Gulp subtasks,
-as all subtasks will skip themselves if the source files are not changed.
-If something goes wrong, you can run `pnpm build clean` to cleanup built files and then rebuild everything.
+## Developing optimizer
+
+The BP Studio optimizer is written in Python as it utilizes [scipy](https://pypi.org/project/scipy/).
+In order to have typing supports in VS Code,
+you will need [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) extension,
+Python 3.9+ and [pipenv](https://pypi.org/project/pipenv/) installed.
+You can then install the dependencies with `pipenv install`.
 
 ## Browser compatibility
 
@@ -58,9 +63,12 @@ There's currently no plans for officially supporting browsers other than
 Chrome, Edge, Safari, Firefox, Opera, and Samsung Internet.
 Not that I don't want to, but that I don't have the resource to do so.
 
-## Unit testing
+## Automate testing
 
-Refer to the [README](test/README.md) of tests.
+BP Studio contains three test sets: the [Mocha unit tests](test/README.md),
+the [Playwright e2e tests](e2e/README.md),
+and the [Python tests](src/client/plugins/optimizer/python/tests/README.md).
+Refer to the README of each for details.
 
 ## Code styling
 
@@ -79,9 +87,9 @@ Their relations can be roughly depicted as follows:
 
 ```mermaid
 graph LR
-	a("App\n(user interface)")
-	b("Client\n(workspace)")
-	c("Core\n(worker thread)")
+	a("App<br>(user interface)")
+	b("Client<br>(workspace)")
+	c("Core<br>(worker thread)")
 	a -->|controls| b
 	b -->|data| a
 	b -->|manipulates| c

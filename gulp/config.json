@@ -1,22 +1,16 @@
 {
 	"dest": {
-		"debug": "build/debug",
+		"temp": "build/temp",
 		"dist": "build/dist",
 		"tool": "build/tools"
 	},
 	"src": {
 		"app": "src/app",
-		"client": "src/client",
-		"core": "src/core",
 		"donate": "src/other/donate",
 		"icon": "src/other/icons",
 		"lib": "lib",
 		"log": "src/log",
 		"locale": "src/locale",
-		"public": "src/public",
-		"sw": "src/other/service",
-		"worker": "src/other/worker",
-		"shared": "src/shared",
 		"tool": "tools"
 	}
 }

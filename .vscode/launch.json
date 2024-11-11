@@ -3,17 +3,20 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			// https://github.com/microsoft/vscode-js-debug/blob/main/OPTIONS.md
 			"type": "chrome",
 			"request": "launch",
 			"name": "Launch in Chrome",
 			"preLaunchTask": "PreLaunch",
 			"internalConsoleOptions": "neverOpen",
 			"url": "http://localhost:30783",
+			// For some unknown reason, source binding does not work
+			// for some (but not all) of the Vue files for now.
+			"webRoot": "${workspaceFolder}",
 			"sourceMaps": true,
-			"webRoot": "${workspaceFolder}/build/debug",
-			"skipFiles": [
-				"${workspaceFolder}/build/debug/lib/**"
-			]
+			"sourceMapPathOverrides": {
+				"webpack://box-pleating-studio/./*": "${webRoot}/*"
+			}
 		},
 		{
 			"type": "chrome",

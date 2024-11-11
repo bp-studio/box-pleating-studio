@@ -12,6 +12,8 @@ import { isTypedArray } from "shared/utils/array";
 import { River } from "./components/layout/river";
 import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
+import { BatchUpdateManager } from "./batchUpdateManager";
+import { CoreManager } from "./coreManager";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
@@ -30,12 +32,15 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	public readonly $tag = "design";
 	public readonly $project: Project;
 
-	@field public title: string;
-	@field public description: string;
-	@shallowRef public mode: DesignMode;
+	@field public accessor title: string;
+	@field public accessor description: string;
+	@shallowRef public accessor mode: DesignMode;
 
 	public readonly layout: Layout;
 	public readonly tree: Tree;
+
+	public readonly $coreManager: CoreManager;
+	public readonly $batchUpdateManager: BatchUpdateManager;
 
 	/**
 	 * Prototypes of various objects before they are constructed.
@@ -49,10 +54,13 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	constructor(project: Project, json: JDesign, state?: JState) {
 		super();
 		this.$prototype = json;
+		this.$project = project; // This must go before the decorated accessors
 		this.title = json.title ?? "";
 		this.description = json.description ?? "";
 		this.mode = json.mode ?? "tree";
-		this.$project = project;
+
+		this.$coreManager = new CoreManager(project);
+		this.$batchUpdateManager = new BatchUpdateManager(this.$coreManager);
 
 		const view = this.$addRootObject(new Container(), display.designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);
@@ -173,12 +181,12 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 	/* istanbul ignore next: debug */
-	public createTestCase(): string {
+	public createTestCase(): void {
 		const edges = this.tree.toJSON().edges.map(e => `(${e.n1},${e.n2},${e.length})`).join(",");
 		const flaps = this.layout.toJSON().flaps.map(f => `(${f.id},${f.x},${f.y},${f.width},${f.height})`).join(",");
-		return `parseTree(\n\t"${edges}",\n\t"${flaps}"\n);`;
+		console.log(`parseTree(\n\t"${edges}",\n\t"${flaps}"\n);`);
 	}
-	///#endif
+	/// #endif
 }

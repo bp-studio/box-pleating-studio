@@ -1,17 +1,18 @@
 // Third-party library types
-import type { VueI18n } from "vue-i18n";
-import type bootstrap from "bootstrap";
-import type { BpsLocale } from "./locale";
+import type { Composer } from "vue-i18n";
+import type * as Client from "client/main";
 import "@types/gtag.js";
 
 declare global {
-	// This one is needed since Bootstrap package is lazily loaded.
-	declare const Bootstrap: typeof bootstrap;
-
 	/** Launching error manager, defined in HTML. */
 	declare const errMgr: {
+		/** Finish listening to global errors */
 		end(): void;
+
+		/** Whether the launching fine so far. */
 		ok(): boolean;
+
+		/** Final processing. */
 		callback(): boolean;
 		setCustomError(title: string, body: string): never;
 		setRunErr(error: string): void;
@@ -23,18 +24,9 @@ declare global {
 	/** App info, defined in HTML. */
 	declare const app_config: Record<string, string>;
 
-	/** List of critical (necessary for Studio core) libraries to load, defined in HTML. */
-	declare const bpLibs: string[];
+	/** Global instance of the Client. Declared in HTML. */
+	declare const bp: typeof Client;
 
-	/** List of non-critical libraries to load, defined in log.js. */
-	declare const libs: string[];
-
-	/** List of version logs, defined in log.js. */
-	declare const logs: number[];
-
-	/** Locale messages, defined in locale.js. */
-	declare const locale: Record<string, BpsLocale>;
-
-	/** Global VueI18n instance. Either injected by SSG or created in LanguageService.ts. */
-	declare let i18n: VueI18n;
+	/** Global vue-i18n Composer instance. Either injected by SSG or created in LanguageService.ts. */
+	declare const i18n: Composer;
 }

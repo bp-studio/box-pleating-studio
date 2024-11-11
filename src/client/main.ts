@@ -7,12 +7,11 @@ import { Interaction } from "./services/interaction";
 import { ScrollController } from "./controllers/scrollController";
 import { doEvents } from "shared/utils/async";
 
-import type { IProjectController } from "./controllers/projectController";
 import type { IDragController } from "./controllers/dragController";
 import type { ISelectionController } from "./controllers/selectionController";
 import type HistoryManager from "./project/changes/history";
 
-export const projects: IProjectController = ProjectController;
+export const projects = ProjectController;
 export const drag: IDragController = DragController;
 export const selection: ISelectionController = SelectionController;
 
@@ -23,6 +22,7 @@ export { style } from "./services/styleService";
 export { mouseCoordinates } from "./services/interaction";
 export { options } from "./options";
 export { plugins } from "./plugins";
+export { isContextLost, shouldTakeOverContextHandling } from "./screen/contextManager";
 
 export async function init(): Promise<void> {
 	await display.$init();
@@ -32,7 +32,17 @@ export async function init(): Promise<void> {
 	ScrollController.$init();
 }
 
+export const setInteractive = display.$setInteractive;
 export const nextTick = display.appNextTick;
+
+/** Used for Playwright testing. */
+export function resolveCoordinate(p: IPoint): IPoint {
+	const sheet = ProjectService.sheet.value;
+	if(!sheet) return { x: NaN, y: NaN };
+	const rect = display.canvas.getBoundingClientRect();
+	const global = sheet.$view.toGlobal(p);
+	return { x: rect.left + global.x, y: rect.top + global.y };
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // History operations
@@ -62,3 +72,19 @@ export const history = {
 		ProjectController.all().forEach(p => p.history.$notifySave());
 	},
 };
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+// Debug methods
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// #if DEBUG
+export function createTestCase(): void {
+	const proj = projects.current.value;
+	if(proj) proj.design.createTestCase();
+}
+
+export function simulateContextLoss(): void {
+	const context = display.canvas.getContext("webgl2");
+	context?.getExtension("WEBGL_lose_context")?.loseContext();
+}
+/// #endif

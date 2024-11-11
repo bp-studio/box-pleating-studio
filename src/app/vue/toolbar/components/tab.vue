@@ -37,147 +37,27 @@
 
 	const props = defineProps<{ id: ProjId }>();
 
-	function project(): Project {
-		return Workspace.getProject(props.id)!;
+	function project(): Project | undefined {
+		// It is possible during context loss that the result is undefined.
+		return Workspace.getProject(props.id);
 	}
 
 	defineEmits(["menu"]);
 
-	const isModified = computed(() => project().history.isModified);
+	function getTitle(): string {
+		return project()?.design.title ?? "";
+	}
+
+	const isModified = computed(() => project()?.history.isModified ?? false);
 	const title = computed(() => {
-		const designTitle = project().design.title;
+		const designTitle = getTitle();
 		return designTitle ? designTitle : i18n.t("toolbar.tab.noTitle").toString();
 	});
 	const toolTip = computed(() => {
-		let result = project().design.title;
+		let result = getTitle();
 		const handle = Handle.get(props.id);
 		if(handle) result += "\n" + handle.name;
 		return result;
 	});
 
 </script>
-
-<style lang="scss">
-	.tab {
-		cursor: pointer;
-
-		display: inline-block;
-		flex-shrink: 0;
-
-		max-width: 150px;
-		height: 100%;
-		padding: 0.5rem;
-
-		font-size: 1.25rem;
-		line-height: 2.5rem;
-
-		background-color: var(--bg-ui);
-		border-right: 1px solid var(--tab-border);
-
-		&:first-child {
-			border-left: 1px solid var(--tab-border);
-		}
-
-		&.active {
-			color: black;
-			background-color: var(--tab-active);
-			background-image: var(--bs-gradient);
-		}
-
-		:first-child {
-			overflow: hidden;
-			flex-grow: 1;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		:last-child {
-			flex-shrink: 0;
-		}
-
-		i {
-			width: 1rem;
-			text-align: center;
-			opacity: 0;
-			transition: opacity 0.1s linear;
-		}
-
-		&:hover i {
-			opacity: 1;
-		}
-	}
-
-	/* vue-slicksort places clone directly under <body> */
-	body > .tab .bt {
-		display: none;
-	}
-
-	.tab-down {
-		display: none;
-	}
-
-	.tab-close {
-		display: flex;
-
-		.close {
-			display: inline-block;
-
-			width: 1.75rem;
-			height: 1.75rem;
-			margin-top: 0.15rem;
-			padding: 0.3rem;
-
-			line-height: 1;
-			text-align: center;
-
-			border-radius: 5px;
-
-			transition: background-color 0.1s linear;
-
-			&:hover {
-				background-color: rgba(255 255 255 / 20%);
-				background-image: var(--bs-gradient);
-			}
-		}
-	}
-
-	@media (hover: hover) {
-		.tab:not(:hover, .active) {
-			color: #444;
-		}
-	}
-
-	@media (hover: none),
-	(pointer: coarse) {
-		.tab .tab-down i {
-			opacity: 1 !important;
-		}
-
-		.tab-down {
-			display: flex;
-		}
-
-		.tab-close {
-			display: none;
-		}
-	}
-
-	@media (width <=650px) {
-		.tab {
-			padding: 0.2rem 0.5rem;
-			font-size: 1rem;
-			line-height: 2rem;
-		}
-
-		.tab-close .close {
-			width: 1.5rem;
-			height: 1.5rem;
-			margin-top: 0;
-			padding: 0.25rem;
-		}
-
-		.tab:first-child {
-			border-left: none;
-		}
-	}
-</style>

@@ -39,13 +39,21 @@ export class Gadget implements JGadget {
 		this.anchors = clone(data.anchors); // Must clone!
 	}
 
-	/** The width of the stretch circumscribing rectangle (SCR). */
-	@cache public get scrX(): number {
+	/**
+	 * The width span between the two major anchors.
+	 * Note that this might be larger than the width of the SCR.
+	 * Used for positioning.
+	 */
+	@cache public get widthSpan(): number {
 		return Math.ceil(this.$anchorMap[2][0].x) - Math.floor(this.$anchorMap[0][0].x);
 	}
 
-	/** The height of the stretch circumscribing rectangle (SCR). */
-	@cache public get scrY(): number {
+	/**
+	 * The height span between the two major anchors.
+	 * Note that this might be larger than the height of the SCR.
+	 * Used for positioning.
+	 */
+	@cache public get heightSpan(): number {
 		return Math.ceil(this.$anchorMap[2][0].y) - Math.floor(this.$anchorMap[0][0].y);
 	}
 
@@ -113,14 +121,15 @@ export class Gadget implements JGadget {
 	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
 	 */
 	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): void {
-		let c1 = this.$contour;
 		const c2 = g.$contour;
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
 		const slack = new Fraction(this._getSlack(q1));
 		const v = g.$anchorMap[q2][0].$sub(Point.ZERO).$add(step.$scale(slack));
 
-		c1 = shift(c1, q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap[2][0])));
+		const c0_shift = q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap[2][0]));
+		const c0 = shift(this.$contour, c0_shift); // We keep this for debugging
+		let c1 = c0;
 
 		// Perform collision tests.
 		// Be careful! We must ensure that the contours are simple here!
@@ -130,7 +139,7 @@ export class Gadget implements JGadget {
 			c1 = shift(c1, step);
 			s++;
 
-			///#if DEBUG
+			/// #if DEBUG
 			/* istanbul ignore next: debug */
 			if(s == OVERLAP_LIMIT) {
 				// If we get here, typically it means one of the contours is not simple.
@@ -141,7 +150,7 @@ export class Gadget implements JGadget {
 				debugger;
 				throw new Error("Contour error");
 			}
-			///#endif
+			/// #endif
 		}
 		this.$addSlack(q1, s);
 	}
@@ -177,6 +186,6 @@ export class Gadget implements JGadget {
 	}
 }
 
-///#if DEBUG
+/// #if DEBUG
 const OVERLAP_LIMIT = 1000;
-///#endif
+/// #endif

@@ -67,7 +67,12 @@
 			"undo": "Hoàn tác",
 			"redo": "Làm lại",
 			"selectAll": "Chọn tất cả",
-			"unselectAll": "Bỏ chọn tất cả"
+			"unselectAll": "Bỏ chọn tất cả",
+			"subdivide": "Lưới chia nhỏ",
+			"rotate_right": "Xoay phải",
+			"rotate_left": "Xoay trái",
+			"horizontal_flip": "Lật ngang",
+			"vertical_flip": "Lật dọc"
 		},
 		"setting": {
 			"title": "Thiết lập",
@@ -85,11 +90,7 @@
 		},
 		"tools": {
 			"title": "Công cụ",
-			"TreeMaker": "Nhập tệp TreeMaker",
-			"CP": {
-				"_": "Xuất tệp CP",
-				"reorient": "Định hướng lại trang tính nếu có"
-			}
+			"TreeMaker": "Nhập tệp TreeMaker"
 		},
 		"help": {
 			"title": "Cứu giúp",
@@ -266,6 +267,30 @@
 			"not5": "Tệp \"{0}\" không có định dạng TreeMaker 5.",
 			"size8": "BP Studio yêu cầu kích thước trang tính ít nhất là 8.",
 			"invalid": "Tệp \"{0}\" có vẻ như bị hỏng và không thể tải thành công."
+		},
+		"optimizer": {
+			"_": "Tối ưu hóa bố cục",
+			"unsupported": "Trình duyệt của bạn không hỗ trợ tính năng này. Vui lòng nâng cấp lên phiên bản mới nhất.",
+			"options": {
+				"_": "Tùy chọn",
+				"openNew": "Hiển thị kết quả trong tab mới",
+				"useDim": "Giữ nguyên chiều rộng và chiều cao của các nhánh"
+			},
+			"layout": {
+				"_": "Phương pháp bố trí",
+				"view": "Sử dụng bố cục hiện tại làm tài liệu tham khảo",
+				"random": "Hãy thử bố trí ngẫu nhiên",
+				"toTry": "Số lượng bố cục để thử:",
+				"useBH": "Hãy thử các biến thể của bố cục hiện tại"
+			},
+			"skip": "Nhảy",
+			"run": "Chạy!",
+			"running": "Đang chạy..."
+		},
+		"CP": {
+			"_": "Xuất tệp CP",
+			"format": "Định dạng",
+			"reorient": "Định hướng lại trang tính nếu có"
 		}
 	},
 	"keyword": {
@@ -273,7 +298,9 @@
 		"no": "Không",
 		"ok": "OK",
 		"here": "đây",
+		"abort": "Hủy bỏ",
 		"close": "Đóng",
+		"cancel": "Hủy bỏ",
 		"export": "Xuất tệp",
 		"delete": "Xóa bỏ",
 		"discord": "Máy chủ BP Studio Discord",

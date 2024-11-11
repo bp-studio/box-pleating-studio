@@ -24,14 +24,25 @@ export class JoineeBuilder {
 		private readonly p: Piece,
 		private readonly q: QuadrantDirection,
 		private readonly _joiner: Joiner
-	) {}
+	) { }
 
 	/**
 	 * This is the most complicated part of constructing a {@link Joinee}.
 	 */
-	public $setup(that: JoineeBuilder, f: Sign, shift: IPoint): number {
+	public $setup(that: JoineeBuilder, f: Sign, shift: IPoint, sx: number): number {
 		const int = this._joiner.$getRelayJoinIntersection(that.p, shift, opposite(this.q));
 		if(!int || !int.$isIntegral) return NaN;
+
+		/**
+		 * v0.7: Check relay condition
+		 * When we generate the piece candidates in the {@link Joiner} constructor,
+		 * we only set the gadget width limit to be the width of SCR.
+		 * Here we perform an additional check by adding the relay offset to see if the gadget still fits the SCR.
+		 * This will help us avoid trying invalid relay patterns.
+		 */
+		// TODO: can we block this even earlier?
+		const rx = this._joiner.$oriented ? int.x : that.p.sx - int.x;
+		if(this.p.sx + rx > sx) return NaN;
 
 		let offset: IPoint;
 		if(this._joiner.$oriented) {

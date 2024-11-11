@@ -1,7 +1,8 @@
 import { EventBoundary } from "@pixi/events";
 
 import type { Control } from "client/base/control";
-import type { Point, Renderer } from "@pixi/core";
+import type { Point } from "@pixi/math";
+import type { Renderer } from "@pixi/core";
 import type { EventMode, EventSystem } from "@pixi/events";
 import type { Container, DisplayObject } from "@pixi/display";
 import type { Sheet } from "client/project/components/sheet";

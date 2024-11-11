@@ -4,7 +4,7 @@ import { id2, parseTree } from "@utils/tree";
 import threeFlapSpec from "./threeFlap.spec";
 import { UpdateResult } from "core/service/updateResult";
 import { State, fullReset } from "core/service/state";
-import { complete, generateFromFlaps } from "./util";
+import { complete } from "./util";
 import { DesignController } from "core/controller/designController";
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
@@ -22,12 +22,8 @@ export default function() {
 	});
 
 	it("Signifies when no pattern is found", function() {
-		generateFromFlaps([
-			{ id: 1, x: 0, y: 0, radius: 10 },
-			{ id: 2, x: 10, y: 11, radius: 3 },
-			{ id: 3, x: 11, y: 5, radius: 2 },
-		]);
-		const stretch = State.$stretches.get("1,2,3")!;
+		parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
+		const stretch = State.$stretches.get("0,1,3")!;
 		expect(stretch.$repo.$pattern).to.equal(null);
 		expect(UpdateResult.$flush().patternNotFound).to.be.true;
 	});
@@ -36,7 +32,10 @@ export default function() {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,0,0,0,0)");
 
 		// Drag into stretch
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
+		DesignController.update({
+			flaps: [{ id: id2, x: 8, y: 9, width: 0, height: 0 }],
+			edges: [], dragging: true, stretches: [],
+		});
 		LayoutController.completeStretch("1,2");
 
 		const stretch = State.$stretches.get("1,2")!;
@@ -53,26 +52,44 @@ export default function() {
 		expect(config.$index).to.equal(1);
 
 		// Drag out of stretch
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 10, width: 0, height: 0 }], true, []);
+		DesignController.update({
+			flaps: [{ id: id2, x: 8, y: 10, width: 0, height: 0 }],
+			edges: [], dragging: true, stretches: [],
+		});
 		expect(stretch.$repo).to.not.equal(repo);
 
 		// Drag back into stretch again
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
+		DesignController.update({
+			flaps: [{ id: id2, x: 8, y: 9, width: 0, height: 0 }],
+			edges: [], dragging: true, stretches: [],
+		});
 		LayoutController.dragEnd();
 		expect(stretch.$isActive).to.be.true;
 		expect(stretch.$repo).to.equal(repo);
 		expect(config.$index).to.equal(1);
 
-		LayoutController.updateFlap([{ id: id2, x: 11, y: 9, width: 0, height: 0 }], true, []);
+		DesignController.update({
+			flaps: [{ id: id2, x: 11, y: 9, width: 0, height: 0 }],
+			edges: [], dragging: true, stretches: [],
+		});
 		expect(stretch.$isActive).to.be.false;
 
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], true, []);
+		DesignController.update({
+			flaps: [{ id: id2, x: 8, y: 9, width: 0, height: 0 }],
+			edges: [], dragging: true, stretches: [],
+		});
 		LayoutController.dragEnd();
 		expect(stretch.$isActive).to.be.true;
 
 		// Not cached if not dragging
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 10, width: 0, height: 0 }], false, []);
-		LayoutController.updateFlap([{ id: id2, x: 8, y: 9, width: 0, height: 0 }], false, [prototype]);
+		DesignController.update({
+			flaps: [{ id: id2, x: 8, y: 10, width: 0, height: 0 }],
+			edges: [], dragging: false, stretches: [],
+		});
+		DesignController.update({
+			flaps: [{ id: id2, x: 8, y: 9, width: 0, height: 0 }],
+			edges: [], dragging: false, stretches: [prototype],
+		});
 		expect(stretch.$repo).to.not.equal(repo);
 		expect(stretch.$repo.$configuration!.$index).to.equal(0);
 	});

@@ -7,7 +7,7 @@ import { State, fullReset } from "core/service/state";
 import { Migration } from "client/patches";
 
 import type { TreeNode } from "core/design/context/treeNode";
-import type { JEdge, JFlap, NodeId } from "shared/json";
+import type { JEdge, JFlap, JProject, NodeId } from "shared/json";
 
 export const id0 = 0 as NodeId;
 export const id1 = 1 as NodeId;
@@ -27,18 +27,25 @@ export type NFlap = Substitute<JFlap, NodeId, number>;
  * @param edges Comma-separated list of `(n1,n2,length)`.
  * @param flaps Comma-separated list of `(id,x,y,width,height)`.
  */
-export function parseTree(edges: string, flaps: string): Tree {
+export function parseTree(edges: string, flaps?: string): Tree {
 	const nEdges: NEdge[] = [...edges.matchAll(/\((\d+),(\d+),(\d+)\)/g)]
-		.map(m => ({ n1: Number(m[1]), n2: Number(m[2]), length: Number(m[3]) }));
-	const nFlaps: NFlap[] = [...flaps.matchAll(/\((\d+),(-?\d+),(-?\d+),(\d+),(\d+)\)/g)]
-		.map(m => ({ id: Number(m[1]), x: Number(m[2]), y: Number(m[3]), width: Number(m[4]), height: Number(m[5]) }));
-	return createTree(nEdges, nFlaps);
+		.map(m => m.map(Number))
+		.map(m => ({ n1: m[1], n2: m[2], length: m[3] }));
+	if(flaps) {
+		const nFlaps: NFlap[] = [...flaps.matchAll(/\((\d+),(-?\d+),(-?\d+),(\d+),(\d+)\)/g)]
+			.map(m => m.map(Number))
+			.map(m => ({ id: m[1], x: m[2], y: m[3], width: m[4], height: m[5] }));
+		return createTree(nEdges, nFlaps);
+	} else {
+		return createTree(nEdges);
+	}
 }
 
 /**
  * Export tree to a BPS file `export.bps` for further inspection.
+ * This should only be used momentarily.
  */
-export function exportProject(id: string | number = ""): void {
+export function exportProject(id: string | number = ""): JProject {
 	const nodes = State.$tree.$nodes.filter(l => l) as TreeNode[];
 	const project = Migration.$getSample();
 	project.design.mode = "layout";
@@ -59,6 +66,7 @@ export function exportProject(id: string | number = ""): void {
 		}
 	}
 	writeFileSync(`export${id}.bps`, JSON.stringify(project));
+	return project;
 }
 
 export function createTree(edges: NEdge[], flaps?: NFlap[]): Tree {

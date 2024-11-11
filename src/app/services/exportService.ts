@@ -1,7 +1,8 @@
 import FileUtility from "app/utils/fileUtility";
 import Studio from "./studioService";
 import Workspace from "./workspaceService";
-import JSZip from "app/utils/jszip";
+import Settings from "./settingService";
+import Zip from "app/utils/zip";
 
 import type { Project } from "client/project/project";
 
@@ -17,19 +18,11 @@ namespace ExportService {
 		return Promise.resolve(new Blob([json], { type: "application/bpstudio.project+json" }));
 	}
 
-	export function toSVG(proj: Project): Promise<Blob> {
-		return Studio.svg(proj);
-	}
-
-	export function toPNG(proj: Project): Promise<Blob> {
-		return Studio.png(proj);
-	}
-
 	export function getBlob(type: string, proj?: Project): Promise<Blob> {
 		proj ??= Studio.project ?? undefined;
 		if(!proj) throw new Error();
-		if(type == "png") return toPNG(proj);
-		if(type == "svg") return toSVG(proj);
+		if(type == "png") return Studio.png(proj);
+		if(type == "svg") return Studio.svg(proj, Settings.tools.SVG.includeHiddenElement);
 		if(type == "bpz") return zip();
 		if(type == "bps") return toBPS(proj);
 		throw new Error();
@@ -55,7 +48,7 @@ namespace ExportService {
 			names.add(name);
 			files[name + ".bps"] = JSON.stringify(project);
 		}
-		return JSZip.compress(files);
+		return Zip.compress(files);
 	}
 }
 

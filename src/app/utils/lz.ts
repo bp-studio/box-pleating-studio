@@ -16,7 +16,7 @@ function createCallbackNumber(): number {
 
 function callWorker<T>(action: Act, data: unknown, mode: unknown): Promise<T> {
 	if(!lzma_worker) {
-		lzma_worker = new Worker("lib/lzma_worker-min.js");
+		lzma_worker = new Worker(new URL("lib/lzma/lzma_worker-min.js", import.meta.url), { name: "lzma" });
 		lzma_worker.onmessage = e => {
 			if(e.data.action !== Act.progress && callbacks[e.data.cbn]) {
 				callbacks[e.data.cbn](e.data.result);

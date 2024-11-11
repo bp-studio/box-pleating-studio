@@ -41,8 +41,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public readonly id: NodeId;
 
 	public $graphics: GraphicsData;
-	@shallowRef private _width: number = 0;
-	@shallowRef private _height: number = 0;
+	@shallowRef private accessor _width: number = 0;
+	@shallowRef private accessor _height: number = 0;
 
 	/**
 	 * The parameters used for the drawing process.
@@ -76,7 +76,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 		this.$tag = "f" + json.id;
 		this.id = json.id;
-		this.$location = { x: json.x, y: json.y };
+		this._location = { x: json.x, y: json.y };
 		this._width = json.width;
 		this._height = json.height;
 		this.$graphics = graphics;
@@ -99,8 +99,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public toJSON(): JFlap {
 		return {
 			id: this.id,
-			x: this.$location.x,
-			y: this.$location.y,
+			x: this._location.x,
+			y: this._location.y,
 			width: this._width,
 			height: this._height,
 		};
@@ -138,7 +138,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(v < 0 || !this._testResize(this._width, v)) return;
 		const oldValue = this._height;
 		this._height = v;
-		this._layout.$flaps.$update(this,
+		this.$project.design.$batchUpdateManager.$addFlap(this,
 			() => this.$project.history.$fieldChange(this, "height", oldValue, v, false)
 		);
 	}
@@ -151,7 +151,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		if(v < 0 || !this._testResize(v, this._height)) return;
 		const oldValue = this._width;
 		this._width = v;
-		this._layout.$flaps.$update(this,
+		this.$project.design.$batchUpdateManager.$addFlap(this,
 			() => this.$project.history.$fieldChange(this, "width", oldValue, v, false)
 		);
 	}
@@ -186,16 +186,16 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const w = this._width, h = this._height;
 		const zeroWidth = w === 0;
 		const zeroHeight = h === 0;
-		const { x, y } = this.$location;
+		const { x, y } = this._location;
 		if(zeroWidth && zeroHeight) {
-			return this._fixVector(this.$location, v);
+			return this._fixVector(this._location, v);
 		} else if(zeroWidth || zeroHeight) {
-			v = this._fixVector(this.$location, v);
+			v = this._fixVector(this._location, v);
 			const p = zeroWidth ? { x, y: y + h } : { x: x + w, y };
 			return this._fixVector(p, v);
 		} else {
 			// We allow at most one tip to go beyond the range of the sheet.
-			const data = getDots(this.$location, w, h)
+			const data = getDots(this._location, w, h)
 				.map(p => {
 					const fix = this._fixVector(p, v);
 					const dx = fix.x - v.x;
@@ -218,18 +218,34 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public override $anchors(): IPoint[] {
-		return getDots(this.$location, this._width, this._height);
+		return getDots(this._location, this._width, this._height);
 	}
 
 	public $sync(p: IPoint): Promise<void> {
 		return this._move(p.x, p.y);
 	}
 
+	/** Manipulate by internal functions instead of by UI. */
+	public $manipulate(x: number, y: number, width: number, height: number): void {
+		const location = { x, y };
+		const w = this._width;
+		const h = this._height;
+		this._lastLocation = this._location;
+		this._location = location;
+		this._width = width;
+		this._height = height;
+		this.$project.design.$batchUpdateManager.$addFlap(this, () => {
+			if(w != width) this.$project.history.$fieldChange(this, "width", w, width, false);
+			if(h != height) this.$project.history.$fieldChange(this, "height", h, height, false);
+			this.$project.history.$move(this, location, this._lastLocation);
+		});
+	}
+
 	protected override _move(x: number, y: number): Promise<void> {
 		const location = { x, y };
-		this._lastLocation ||= this.$location;
-		this.$location = location;
-		return this._layout.$flaps.$update(this, () => {
+		this._lastLocation ||= this._location;
+		this._location = location;
+		return this.$project.design.$batchUpdateManager.$addFlap(this, () => {
 			this.$project.history.$move(this, location, this._lastLocation);
 			this._lastLocation = undefined;
 		});
@@ -314,7 +330,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** Test if the new size is acceptable. */
 	private _testResize(w: number, h: number, grid: Grid = this._sheet.grid): boolean {
-		return getDots(this.$location, w, h)
+		if(this.$project.history.$isLocked) return true;
+		return getDots(this._location, w, h)
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.
 	}

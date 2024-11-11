@@ -15,8 +15,10 @@
 										v-t="'preference.hotkey'"></button>
 							</div>
 						</div>
-						<!--Tabs are too wide on mobile devices for some locales, so we used select box instead.
-							It's possible to completely switch to select box if tabs keeps increasing in the future.-->
+						<!--
+							Tabs are too wide on mobile devices for some locales, so we used select box instead.
+							It's possible to completely switch to select box if tabs keeps increasing in the future.
+						-->
 						<div class="d-block d-sm-none">
 							<select class="form-select" v-model.number="tab">
 								<option value="0" v-t="'preference.general'"></option>
@@ -26,14 +28,22 @@
 						</div>
 					</div>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" style="height: 400px; max-height: 40vh;">
 					<div v-show="tab == 0" class="p-2">
 						<div class="row mb-2">
 							<label class="col-form-label col-4" v-t="'preference.language'"></label>
 							<div class="col-8">
-								<select class="form-select flag" v-model="I18n.locale">
-									<option v-for="l in I18n.availableLocales" :key="l" :value="l">
-										{{ $t('emoji', l) }}&ensp;{{ $t('name', l) }}
+								<!--
+									Note that showing flags requires COLR/CPAL(v0) support, see https://caniuse.com/colr
+									There is a feature-detection library at https://github.com/RoelN/ChromaCheck,
+									but the detecting result appears inconsistent with the actual support
+									(especially on Opera), so I decided to not include the detection for now.
+									The worst that can happen is missing flags in the select box,
+									and only in very old browsers.
+								-->
+								<select class="form-select flag" v-model="$i18n.locale" aria-label="Language">
+									<option v-for="l in $i18n.availableLocales" :key="l" :value="l">
+										{{ $t('emoji', {}, { locale: l }) }}&ensp;{{ $t('name', {}, { locale: l }) }}
 									</option>
 								</select>
 							</div>
@@ -54,11 +64,11 @@
 						<Toggle v-if="isFileApiEnabled" v-model="Settings.loadSessionOnQueue">
 							{{ $t('preference.loadSessionOnQueue') }}
 						</Toggle>
-						<Toggle v-model="Settings.includeHiddenElement">
+						<Toggle v-model="Settings.tools.SVG.includeHiddenElement">
 							{{ $t('preference.includeHidden') }}
 						</Toggle>
 					</div>
-					<div v-show="tab == 1" class="p-2 h-100">
+					<div v-if="phase >= 10" v-show="tab == 1" class="p-2 h-100">
 						<div class="color-grid">
 							<Color :default="Studio.style.border.color" v-model="Settings.colorScheme.border"
 								   :label="$t('preference.color.border')" />
@@ -98,6 +108,7 @@
 
 	import { onMounted, shallowRef, watch } from "vue";
 
+	import { phase } from "app/misc/phase";
 	import { isFileApiEnabled } from "app/shared/constants";
 	import Studio from "app/services/studioService";
 	import Settings, { reset } from "app/services/settingService";
@@ -111,7 +122,6 @@
 	const { el, on, show } = useModal("Preference");
 
 	const tab = shallowRef(0);
-	const I18n = i18n;
 
 	onMounted(() => {
 		watch(on, v => {
@@ -122,16 +132,3 @@
 	defineExpose({ show });
 
 </script>
-
-<style scoped>
-	.color-grid {
-		display: grid;
-		grid-template-columns: auto auto auto;
-		gap: 0.5rem 1rem;
-	}
-
-	.modal-body {
-		height: 400px;
-		max-height: 40vh;
-	}
-</style>

@@ -9,22 +9,23 @@ interface CacheTarget {
 	[symbol]: Record<string, unknown>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ClassMethod<This, V = any> = (this: This, ...args: any) => V;
+
 /**
  * Create a getter that will only execute once, and return cached result afterwards.
  *
  * The getter will be non-enumerable.
  */
-export function cache(target: object, name: string, desc: PropertyDescriptor): PropertyDescriptor {
-	const getter = desc.get!;
-	return {
-		get(this: CacheTarget) {
-			const record = this[symbol] ||= {};
-			if(name in record) return record[name];
-			else return record[name] = getter.apply(this);
-		},
-		enumerable: false,
-		configurable: false,
-	};
+export function cache<This, V>(
+	method: ClassMethod<This, V>, context: ClassGetterDecoratorContext<This, V>): ClassMethod<This, V> {
+	const name = context.name as string;
+	function getter(this: This): V {
+		const record = (this as CacheTarget)[symbol] ||= {};
+		if(name in record) return record[name] as V;
+		else return record[name] = method.apply(this);
+	}
+	return getter;
 }
 
 /**

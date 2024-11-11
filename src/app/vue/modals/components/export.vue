@@ -18,7 +18,8 @@
 						<button disabled v-if="!url" type="button" class="btn btn-lg btn-success">
 							<i class="bp-spinner fa-spin" />
 						</button>
-						<CheckButton v-else-if="isFileApiEnabled" ref="bt" type="button" class="btn btn-lg btn-success" @click="save">
+						<CheckButton v-else-if="isFileApiEnabled" ref="bt" type="button" class="btn btn-lg btn-success"
+									 @click="save">
 							{{ $t("keyword.export") }}
 						</CheckButton>
 						<a v-else :href="url" :download="extFilename" class="btn btn-lg btn-success" v-t="'keyword.download'"
@@ -61,7 +62,9 @@
 	}>();
 
 	const attrs = useAttrs();
-	const { el, show, on } = useModal(attrs.screen as string, () => Boolean(Studio.project));
+	const { el, show, on } = useModal(attrs.screen as string, {
+		onBeforeShow: () => Boolean(Studio.project),
+	});
 
 	async function update(): Promise<void> {
 		tryClearURL();

@@ -15,7 +15,7 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 
 	if(devices.length == 1) {
 		// If there's only one GOPS, center it
-		devices[0].$offset = Math.floor((sx - devices[0].$gadgets[0].scrX) / 2);
+		devices[0].$offset = Math.floor((sx - devices[0].$gadgets[0].widthSpan) / 2);
 		return true;
 	}
 
@@ -23,7 +23,7 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 	if(devices.length == 2) {
 		const [g1, g2] = devices.map(d => d.$gadgets[0]);
 		const o2 = devices[1].$partition.$overlaps[0];
-		const tx = g2.scrX + g1.rx(o2.c[0].q!, 0);
+		const tx = g2.widthSpan + g1.rx(o2.c[0].q!, 0);
 		// There's no need to check for total span here anymore,
 		// as the general checking covers it already.
 

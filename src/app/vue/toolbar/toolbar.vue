@@ -1,16 +1,16 @@
 <template>
 	<nav class="btn-toolbar p-2">
-		<div class="btn-group me-2" role="menubar">
-			<FileMenu />
-			<EditMenu />
-			<SettingMenu />
-			<ToolMenu />
-			<HelpMenu />
-		</div>
+		<Suspense>
+			<Menus />
+			<template #fallback>
+				<StubMenu />
+			</template>
+		</Suspense>
 
 		<div class="btn-group me-2" role="toolbar">
-			<button type="button" class="btn btn-primary" :class="{ active: Studio.project && Studio.project.design.mode == 'tree' }"
-					@click="toTree" :title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
+			<button type="button" class="btn btn-primary"
+					:class="{ active: Studio.project && Studio.project.design.mode == 'tree' }" @click="toTree"
+					:title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
 				<i class="bp-tree" />
 			</button>
 			<button type="button" class="btn btn-primary"
@@ -20,10 +20,12 @@
 			</button>
 		</div>
 
-		<TabBar v-if="phase >= 4" />
+		<TabBar v-if="phase >= 5" />
+		<div v-else class="flex-grow-1"></div>
 
 		<div class="btn-group" id="panelToggle">
-			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')" :disabled="!Studio.project">
+			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')"
+					:disabled="!Studio.project">
 				<i class="bp-sliders-h" />
 			</button>
 		</div>
@@ -33,16 +35,14 @@
 
 <script setup lang="ts">
 
-	import { phase } from "app/misc/lcpReady";
+	import { phase, asyncComp } from "app/misc/phase";
 	import Studio from "app/services/studioService";
 	import { hk } from "app/services/customHotkeyService";
 	import { toggle } from "@/panel/panel.vue";
+	import StubMenu from "@/toolbar/stubMenu.vue";
 	import TabBar from "./components/tabBar.vue";
-	import FileMenu from "./fileMenu.vue";
-	import SettingMenu from "./settingMenu.vue";
-	import HelpMenu from "./helpMenu.vue";
-	import EditMenu from "./editMenu.vue";
-	import ToolMenu from "./toolMenu.vue";
+
+	const Menus = asyncComp(() => import("./menus.vue"), true);
 
 	defineOptions({ name: "Toolbar" });
 
@@ -54,23 +54,3 @@
 	}
 
 </script>
-
-<style lang="scss">
-	nav {
-		isolation: isolate;
-
-		overflow: visible;
-		flex-wrap: nowrap !important;
-
-		height: 3.75rem;
-
-		background: var(--bg-ui);
-	}
-
-	@media (width <=650px) {
-		#panelToggle {
-			flex-grow: 1;
-			text-align: right;
-		}
-	}
-</style>

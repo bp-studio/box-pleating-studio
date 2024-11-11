@@ -8,9 +8,10 @@
 		local("EmojiOne Color"),
 		local("Android Emoji"),
 		/* fallback to font file if none of the above is found */
-		url("assets/flags/twemoji.woff2");
+		url("twemoji.woff2") format("woff2"),
+		url('twemoji.ttf') format("truetype");
 
-	/* This is the full range of flags. */
+	/* This is the full range of flags, although we generate the font using only 🇺🇸🇪🇸🇯🇵🇰🇷🇻🇳🇨🇳🇹🇼🇭🇰 */
 	unicode-range: U+1F1E6-1F1FF;
 }
 

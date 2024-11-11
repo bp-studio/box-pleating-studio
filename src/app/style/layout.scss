@@ -1,4 +1,4 @@
-$statusbar-height: 25px;
+$statusbar-height: 2rem;
 
 .viewport {
 	background: var(--bs-body-bg);
@@ -70,7 +70,7 @@ footer {
 	}
 
 	#note {
-		bottom: $statusbar-height + 20px;
+		bottom: calc($statusbar-height + 20px);
 	}
 }
 
@@ -148,5 +148,125 @@ footer {
 @media (display-mode: standalone) {
 	.browser-only {
 		display: none;
+	}
+}
+
+@media (width < 576px) {
+	.file-api {
+		flex-direction: column;
+		flex-grow: 1;
+		justify-content: start !important;
+	}
+
+	.recent {
+		flex-grow: 1;
+		height: 0;
+
+		> div {
+			overflow: hidden;
+			display: flex;
+			flex-flow: column wrap;
+			height: 100%;
+
+			> * {
+				width: 100%;
+			}
+		}
+	}
+}
+
+#divWelcome {
+	overflow-y: auto;
+
+	&, * {
+		/* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+		touch-action: pan-y;
+	}
+}
+
+.quick-item {
+	cursor: pointer;
+
+	overflow: hidden;
+
+	max-width: 100%;
+	padding-left: 0.33rem;
+
+	line-height: 1.75;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&:hover {
+		background: #eee;
+	}
+}
+
+/* We use this to force loading Font-Awesome */
+.font-preload {
+	pointer-events: none;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	opacity: 0;
+}
+
+#divDPad {
+	pointer-events: none;
+
+	position: absolute;
+	z-index: 100;
+	bottom: 1rem;
+	left: 1rem;
+
+	overflow: hidden;
+
+	width: 7.5rem;
+	height: 7.5rem;
+
+	opacity: 0;
+	background-color: var(--bs-primary);
+	border-radius: 3.75rem;
+
+	/* Vanishing is faster */
+	transition-duration: 0.1s;
+	transition-property: opacity;
+
+	&.show {
+		pointer-events: all;
+		opacity: 0.8;
+
+		/* Slightly delay displaying to avoid glitches in multiple touches */
+		transition-delay: 60ms;
+		transition-duration: 0.2s;
+
+		&.disabled {
+			pointer-events: none;
+			opacity: 0.5;
+		}
+	}
+
+	div {
+		position: absolute;
+
+		/* Create diamond shaped clicking area. */
+		transform: rotate(45deg);
+
+		padding: 0.75rem;
+
+		line-height: 1;
+		color: white;
+	}
+
+	i {
+		transform: rotate(-45deg);
+
+		display: inline-block;
+
+		width: 2rem;
+		height: 2rem;
+
+		font-size: 2rem;
 	}
 }

@@ -31,7 +31,7 @@ export class Tree implements ISerializable<JTree> {
 	constructor(project: Project, parentView: Container, json: JTree, state?: JViewport) {
 		this.$project = project;
 		this.$vertices = new VertexContainer(this, json);
-		this.$sheet = new Sheet(project, parentView, "tree", json.sheet, state);
+		this.$sheet = new Sheet(project, parentView, "tree", this.$vertices, json.sheet, state);
 	}
 
 	public toJSON(): JTree {
@@ -88,7 +88,7 @@ export class Tree implements ISerializable<JTree> {
 	public $split(edge: Edge): Promise<void> {
 		this.$project.history.$cacheSelection();
 		const id = this.$vertices.$nextAvailableId;
-		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
+		const l1 = edge.$v1._location, l2 = edge.$v2._location;
 		this.$project.design.$prototype.tree.nodes.push({
 			id,
 			name: "",
@@ -106,23 +106,18 @@ export class Tree implements ISerializable<JTree> {
 	public $merge(edge: Edge): Promise<void> {
 		this.$project.history.$cacheSelection();
 		const v1 = edge.$v1.id, v2 = edge.$v2.id;
-		const l1 = edge.$v1.$location, l2 = edge.$v2.$location;
+		const l1 = edge.$v1._location, l2 = edge.$v2._location;
 		const x = Math.round((l1.x + l2.x) / 2);
 		const y = Math.round((l1.y + l2.y) / 2);
 		this.$updateCallback = () => {
 			// We know that one of them will survive
 			const v = this.$vertices.$get(v1) || this.$vertices.$get(v2)!;
 			this.$project.history.$move(v, { x, y });
-			v.$location = { x, y };
+			v._location = { x, y };
 			SelectionController.clear();
 			if(this.$project.design.mode == "tree") SelectionController.$toggle(v, true);
 		};
 		return this.$project.$core.tree.merge(edge.toJSON());
-	}
-
-	public $updateLength(edges: JEdge[]): Promise<void> {
-		const stretches = this.$project.design.$prototype.layout.stretches;
-		return this.$project.$core.tree.update(edges, stretches);
 	}
 
 	public $goToDual(subject: Edge | Vertex[]): void {

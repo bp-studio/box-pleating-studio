@@ -1,6 +1,6 @@
 import { Task } from "./task";
 import { State } from "core/service/state";
-import { dist } from "../context/tree";
+import { dist } from "../context/treeUtils";
 import { ListUnionFind } from "shared/data/unionFind/listUnionFind";
 import { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 import { distinct, foreachPair } from "shared/utils/array";
@@ -169,7 +169,7 @@ function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction): void {
 		else j1.$setGeometricallyCoveredBy(j2);
 	} else if(j1Closer && r1.$contains(r2)) {
 		j2.$setGeometricallyCoveredBy(j1);
-	} else if(!j1Closer && r2.$contains(r1)) {
+	} else if(j2.$isCloserThan(j1) && r2.$contains(r1)) {
 		j1.$setGeometricallyCoveredBy(j2);
 	}
 }

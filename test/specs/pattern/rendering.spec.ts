@@ -1,9 +1,9 @@
 import { id1, id2, id3, id4, parseTree } from "@utils/tree";
-import { LayoutController } from "core/controller/layoutController";
 import { State } from "core/service/state";
 import { TreeController } from "core/controller/treeController";
 import { UpdateResult } from "core/service/updateResult";
 import { complete, generateFromFlaps } from "./util";
+import { DesignController } from "core/controller/designController";
 
 export default function() {
 	it("Updates ridges when edges merge or split", function() {
@@ -32,11 +32,16 @@ export default function() {
 		expect(stretch).to.be.not.undefined;
 		const repo = stretch.$repo;
 
-		LayoutController.updateFlap([
-			{ id: id1, x: 10, y: 6, width: 0, height: 0 },
-			{ id: id2, x: 1, y: 1, width: 0, height: 0 },
-			{ id: id3, x: 7, y: 9, width: 0, height: 0 },
-		], false, []);
+		DesignController.update({
+			flaps: [
+				{ id: id1, x: 10, y: 6, width: 0, height: 0 },
+				{ id: id2, x: 1, y: 1, width: 0, height: 0 },
+				{ id: id3, x: 7, y: 9, width: 0, height: 0 },
+			],
+			edges: [],
+			dragging: false,
+			stretches: [],
+		});
 
 		expect(State.$stretches.get("1,2,3")).to.equal(stretch);
 		expect(stretch.$repo).to.equal(repo);

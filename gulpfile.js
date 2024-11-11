@@ -17,67 +17,47 @@ path.relative = function(from, to) {
 
 // Load all dependencies
 const gulp = require("gulp");
-const requireDir = require("require-dir");
 const seriesIf = require("./gulp/utils/seriesIf");
+const { exec } = require("child_process");
 
-requireDir("./gulp/tasks");
+require("./gulp/tasks/ftp.js");
+require("./gulp/tasks/html.js");
+require("./gulp/tasks/locale.js");
+require("./gulp/tasks/static.js");
+require("./gulp/tasks/tool.js");
 
-gulp.task("share", gulp.series(
-	gulp.parallel(
-		"static",
-		"lib",
-		"donate",
-		"locale"
-	),
-	"link"
-));
-
-// Run all builds (except HTML and ServiceWorker)
+// Run all builds
 gulp.task("build", gulp.parallel(
-	"share",
-	"client",
-	"core",
-	"app"
+	"static",
+	"donate",
+	"locale",
+	"html"
 ));
 
-gulp.task("buildDebug", gulp.parallel(
-	"share",
-	"clientDebug",
-	"coreDebug",
-	"appDebug"
-));
+gulp.task("rsbuild", cb => exec("pnpm rsbuild build", cb));
 
-gulp.task("buildDist", gulp.parallel(
-	"share",
-	"clientDist",
-	"coreDist",
-	"appDist"
-));
-
-gulp.task("update", gulp.series(
-	"version",
-	"html",
-	"sw"
+gulp.task("buildDist", gulp.series(
+	gulp.parallel("build", "version"),
+	"rsbuild"
 ));
 
 gulp.task("deployDev", gulp.series(
 	"buildDist",
-	"update",
-	"uploadDev"
+	"uploadDev",
+	"cleanDev"
 ));
 
 gulp.task("deployQa", gulp.series(
 	"buildDist",
-	"update",
-	"uploadQa"
+	"uploadQa",
+	"cleanQa"
 ));
 
 gulp.task("deployDQ", gulp.series(
 	"buildDist",
-	"update",
 	gulp.parallel(
-		"uploadDev",
-		"uploadQa"
+		gulp.series("uploadDev", "cleanDev"),
+		gulp.series("uploadQa", "cleanQa")
 	)
 ));
 
@@ -86,8 +66,8 @@ const deployMsg = `Before releasing, please check the following steps:
 2. Consider updating dependencies.
 3. Update the version number in package.json, and add update logs.
 4. Edit README.md if needed.
-5. Add relevant tests, and make sure that new codes are covered.
-6. Deploy to DEV at least once to ensure there's no major building error.
+5. Add GA tracking to new functionalities.
+6. Add relevant tests, and make sure that new codes are covered.
 Are you sure you want to deploy?"`;
 
 gulp.task("deployPub", () => seriesIf(
@@ -102,8 +82,8 @@ gulp.task("deployPub", () => seriesIf(
 		return answers.ok;
 	},
 	"buildDist",
-	"update",
-	"uploadPub"
+	"uploadPub",
+	"cleanPub"
 ));
 
 // Clear all built files
@@ -114,7 +94,7 @@ gulp.task("clean", async () => {
 
 // The default build. It will build to the point that it can be run locally.
 // Press F5 in VS Code will execute this task by default.
-gulp.task("default", gulp.parallel("html", "buildDebug"));
+gulp.task("default", gulp.series("build"));
 
 // console.log("Require count", requireCount);
 // console.timeEnd("startup");

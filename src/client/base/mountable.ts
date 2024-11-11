@@ -18,20 +18,28 @@ export abstract class Mountable extends Destructible {
 
 	private readonly _children: Mountable[] = [];
 
-	/** Whether self is active relative to the parent object. */
+	/** Local state of {@link $isActive}. */
 	private _active: boolean;
 
-	/** Whether parent is `null` or is mounted. */
-	private _parentIsNullOrMounted: boolean;
+	/**
+	 * Whether parent is `null` or is mounted.
+	 *
+	 * The initial value is `true`, since the parent relations
+	 * are always established after the constructors.
+	 */
+	private _parentIsNullOrMounted: boolean = true;
 
-	/** The cached value of {@link $mounted}, used for comparing changes. */
-	private _mounted: boolean;
+	/**
+	 * The cached value of {@link $mounted}, used for comparing changes.
+	 *
+	 * The initial value is `undefined`,
+	 * so that changing to either value will trigger event firing.
+	 */
+	private _mountedCache: boolean | undefined = undefined;
 
 	constructor(active: boolean = true) {
 		super();
 		this._active = active;
-		this._parentIsNullOrMounted = true;
-		this._mounted = this.$mounted;
 
 		/**
 		 * {@link Mountable} will destruct all children on destructing,
@@ -53,6 +61,7 @@ export abstract class Mountable extends Destructible {
 		this.addEventListener(MOUNTED, handler);
 	}
 
+	/** Whether self is active relative to the parent object. */
 	protected get $isActive(): boolean {
 		return this._active;
 	}
@@ -92,9 +101,9 @@ export abstract class Mountable extends Destructible {
 	private _updateMountedState(): void {
 		if(this.$destructed) return;
 		const mounted = this.$mounted;
-		if(this._mounted == mounted) return;
+		if(this._mountedCache === mounted) return;
 		this.dispatchEvent(new StateChangedEvent(MOUNTED, mounted));
-		this._mounted = mounted;
+		this._mountedCache = mounted;
 	}
 }
 

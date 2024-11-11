@@ -19,9 +19,3 @@
 	}>();
 
 </script>
-
-<style>
-	.col-form-label {
-		white-space: nowrap;
-	}
-</style>

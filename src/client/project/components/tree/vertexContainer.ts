@@ -3,10 +3,12 @@ import { shallowRef } from "vue";
 import { Vertex } from "./vertex";
 import { SelectionController } from "client/controllers/selectionController";
 import { chebyshev } from "client/utils/chebyshev";
-import { dist } from "shared/types/geometry";
+import { applyTransform, dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 
+import type { TransformationMatrix } from "shared/types/geometry";
+import type { IEditor } from "../sheet";
 import type { UpdateModel } from "core/service/updateModel";
 import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";
@@ -24,7 +26,7 @@ const Y_DISPLACEMENT = 0.0625;
  */
 //=================================================================
 
-export class VertexContainer implements Iterable<Vertex> {
+export class VertexContainer implements Iterable<Vertex>, IEditor {
 
 	private readonly _count = shallowRef(0);
 	private readonly _tree: Tree;
@@ -129,7 +131,7 @@ export class VertexContainer implements Iterable<Vertex> {
 		const [ids, parentIds] = this._simulateDelete(vertices);
 		const design = this._tree.$project.design;
 		const prototypes = parentIds.map(n =>
-			design.layout.$createFlapPrototype(n, this._vertices[n]!.$location)
+			design.layout.$createFlapPrototype(n, this._vertices[n]!._location)
 		);
 		design.$prototype.layout.flaps.push(...prototypes);
 
@@ -148,18 +150,24 @@ export class VertexContainer implements Iterable<Vertex> {
 		await this._tree.$project.$core.tree.join(vertex.id);
 	}
 
+	public $transform(matrix: TransformationMatrix): void {
+		for(const v of this) {
+			v.$assign(applyTransform(v._location, matrix));
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/** Find the close empty spot around the given {@link Vertex}. */
 	private _findClosestEmptySpot(at: Vertex): IPoint {
-		const { x, y } = at.$location;
+		const { x, y } = at._location;
 		const ref: IPoint = { x: x + X_DISPLACEMENT, y: y + Y_DISPLACEMENT };
 
 		// Create an index for the position of all vertices
 		const occupied = new Set<number>();
-		for(const v of this) occupied.add(getOrderedKey(v.$location.x, v.$location.y));
+		for(const v of this) occupied.add(getOrderedKey(v._location.x, v._location.y));
 
 		// Search for empty spot
 		let spot: IPoint | undefined;
@@ -186,7 +194,7 @@ export class VertexContainer implements Iterable<Vertex> {
 
 		// In case of off-bound (unlikely, but just in case)
 		// we can do nothing other than returning the same point
-		return spot || at.$location;
+		return spot || at._location;
 	}
 
 	/**

@@ -3,5 +3,5 @@
 * eof=lf
 
 # Set GitHub linguist exclusion
-lib/**/* linguist-vendored
+lib/**/*.js linguist-vendored
 src/log/*.md linguist-detectable=true

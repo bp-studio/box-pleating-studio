@@ -1,11 +1,13 @@
-import { structureTask } from "core/design/tasks/structure";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { balanceTask } from "core/design/tasks/balance";
 import { setStretchPrototypes } from "core/design/tasks/stretch";
+import { distMap } from "core/design/context/treeUtils";
+import { AreaTree } from "core/design/context/areaTree/areaTree";
 
-import type { JEdge, JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
+import type { Hierarchy } from "core/design/context/areaTree/utils";
+import type { JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
 
 //=================================================================
@@ -54,15 +56,6 @@ export namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	export function update(edges: JEdge[], stretches: JStretch[]): void {
-		const tree = State.$tree;
-		for(const e of edges) {
-			tree.$setLength(getChildId(e), e.length);
-		}
-		setStretchPrototypes(stretches);
-		Processor.$run(structureTask);
-	}
-
 	export function join(id: NodeId): void {
 		State.$tree.$join(id);
 		Processor.$run(heightTask);
@@ -78,10 +71,22 @@ export namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
-	function getChildId(edge: JEdgeBase): NodeId {
-		const tree = State.$tree;
-		const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;
-		return n1.$parent === n2 ? edge.n1 : edge.n2;
+	export function getHierarchy(random: boolean, useDimension: boolean): Hierarchy[] {
+		if(!random) {
+			return [{
+				leaves: State.$tree.$nodes.filter(n => n && n.$isLeaf).map(n => n!.id),
+				distMap: distMap(State.$tree.$nodes),
+				parents: [],
+			}];
+		}
+		const aTree = new AreaTree(State.$tree, useDimension);
+		return aTree.$createHierarchy();
 	}
+}
+
+/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
+export function getChildId(edge: JEdgeBase): NodeId {
+	const tree = State.$tree;
+	const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;
+	return n1.$parent === n2 ? edge.n1 : edge.n2;
 }

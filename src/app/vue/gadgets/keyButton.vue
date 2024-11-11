@@ -20,12 +20,13 @@
 	const props = defineProps<{
 		dir: DirectionKey;
 		icon: string;
+		show: boolean;
 	}>();
 	const ga = useThrottledGA("dpad", ONE_HOUR);
 
 	function down(repeat: number, e?: Event): void {
 		const SENSITIVITY = 150;
-		if(Studio.shouldShowDPad) {
+		if(props.show) {
 			Studio.dragByKey(props.dir);
 			to = setTimeout(() => down(SENSITIVITY), repeat);
 		} else {

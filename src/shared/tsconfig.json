@@ -11,7 +11,6 @@
 			"wicg-file-system-access"
 		],
 		"esModuleInterop": true,
-		"experimentalDecorators": true, // Esbuild doesn't support ECMA decorators yet
 		"module": "esnext",
 		"moduleResolution": "node",
 		"noImplicitOverride": true,

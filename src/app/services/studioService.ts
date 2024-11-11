@@ -1,24 +1,15 @@
 import { computed, reactive, shallowRef } from "vue";
 
-import { defaultTitle, isTouch } from "app/shared/constants";
-import Lib from "./libService";
+import { defaultTitle } from "app/shared/constants";
 import Dialogs from "./dialogService";
-import Settings from "./settingService";
 import { doEvents } from "shared/utils/async";
 
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
 import type { ComputedRef, UnwrapNestedRefs } from "vue";
-import type * as Client from "client/main";
 import type { DirectionKey } from "shared/types/types";
 import type { StudioOptions } from "client/options";
 import type { Device } from "client/project/components/layout/device";
-
-/**
- * We encapsule the Client in this service so that it is not exposed in other parts of the app.
- * Declared in HTML.
- */
-declare const bp: typeof Client;
 
 /** Before the Studio is initialized, use a default value as placeholder. */
 export function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
@@ -54,11 +45,18 @@ namespace StudioService {
 
 	/** Initialize the Client, and return whether it was successful. */
 	export async function init(): Promise<boolean> {
-		await Promise.all(bpLibs.map(l => Lib.loadScript(l)));
-		if(typeof bp === "undefined") return false;
+		try {
+			Object.defineProperty(window, "bp", {
+				writable: false,
+				value: await import(/* webpackChunkName: "client" */ "client/main"),
+			});
+		} catch {
+			return false;
+		}
 
 		await doEvents();
 		await bp.init();
+		await doEvents();
 
 		// Setup the bridges
 		bp.options.onLongPress = () => showPanel.value = true;
@@ -89,6 +87,7 @@ namespace StudioService {
 
 	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
+	export const shouldTakeOverContextHandling = proxy(() => bp.shouldTakeOverContextHandling, () => false);
 
 	export const history = proxy(() => bp.history, {
 		canUndo: false,
@@ -98,10 +97,6 @@ namespace StudioService {
 		notify() { /* */ },
 		notifyAll() { /* */ },
 	});
-
-	export const shouldShowDPad = computed(() =>
-		isTouch && Settings.showDPad && draggableSelected.value
-	);
 
 	export async function execute(action: Action<Promise<void>>): Promise<void> {
 		if(executing) return; // ignore rapid execution
@@ -114,6 +109,19 @@ namespace StudioService {
 			executing = false;
 		}
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Modal control
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Workspace should not be interactive if any modal is opened.
+	let modalCount = 0;
+	document.body.addEventListener("show.bs.modal", () => {
+		if(modalCount++ == 0) bp?.setInteractive(false);
+	});
+	document.body.addEventListener("hidden.bs.modal", () => {
+		if(--modalCount == 0) bp?.setInteractive(true);
+	});
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Delegate methods
@@ -133,8 +141,8 @@ namespace StudioService {
 		if(!proj) return;
 		execute(() => proj.design.delete());
 	}
-	export function svg(proj: Project): Promise<Blob> {
-		return Promise.resolve(bp.svg(proj, Settings.includeHiddenElement));
+	export function svg(proj: Project, includeHidden: boolean): Promise<Blob> {
+		return Promise.resolve(bp.svg(proj, includeHidden));
 	}
 	export function png(proj: Project): Promise<Blob> {
 		return bp.png(proj);

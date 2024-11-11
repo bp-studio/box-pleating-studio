@@ -24,7 +24,7 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
-		baseURL: "http://localhost:30783",
+		baseURL: "http://localhost:30785",
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: "on-first-retry",
@@ -44,7 +44,7 @@ export default defineConfig({
 
 		{
 			name: "webkit",
-			use: { ...devices["Desktop Safari"] },
+			use: { ...devices["Desktop Safari"], userAgent: "Playwright" },
 		},
 
 		/* Test against mobile viewports. */
@@ -70,8 +70,8 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: "pnpm start",
-		url: "http://localhost:30783",
+		command: "pnpm rsbuild preview --port 30785",
+		url: "http://localhost:30785",
 		reuseExistingServer: !process.env.CI,
 	},
 });

@@ -22,6 +22,7 @@
 			}
 		],
 		"scss/at-import-partial-extension": null,
+		"scss/load-partial-extension": null,
 		"selector-id-pattern": null,
 		"selector-no-vendor-prefix": null,
 		"value-no-vendor-prefix": null

@@ -11,9 +11,16 @@ module.exports = function(stem) {
 	return through2({
 		name: "woff2",
 		transform(content, file) {
+			// These are redundant considering our target browser versions
+			if(file.extname == ".svg" || file.extname == ".woff") return null;
+
+			// We keep the .ttf format since Safari 11 has limited support for woff2
 			if(file.extname == ".ttf") ttf = file;
+
 			if(file.extname == ".css") {
-				return content.replace(reg, "$1url('fonts/" + stem + ".woff2') format('woff2'),\n$2$3");
+				return content
+					.replace(reg, "$1url('fonts/" + stem + ".woff2') format('woff2'),\n$2$3")
+					.replace(/(?<=format\('truetype'\)).+?;/s, ";");
 			}
 		},
 		async flush(files) {

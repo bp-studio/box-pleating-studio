@@ -67,7 +67,12 @@
 			"undo": "復原",
 			"redo": "取消復原",
 			"selectAll": "全選",
-			"unselectAll": "取消選取"
+			"unselectAll": "取消選取",
+			"subdivide": "細分格子",
+			"rotate_right": "向右旋轉",
+			"rotate_left": "向左旋轉",
+			"horizontal_flip": "水平翻轉",
+			"vertical_flip": "垂直翻轉"
 		},
 		"setting": {
 			"title": "設定",
@@ -85,11 +90,7 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "匯入 TreeMaker 檔案",
-			"CP": {
-				"_": "匯出 CP 檔案",
-				"reorient": "若適用的話重新定向紙張"
-			}
+			"TreeMaker": "匯入 TreeMaker 檔案"
 		},
 		"help": {
 			"title": "說明",
@@ -266,6 +267,30 @@
 			"not5": "檔案「{0}」不是 TreeMaker 5 的格式。",
 			"size8": "BP Studio 要求紙張大小至少為 8。",
 			"invalid": "檔案「{0}」似乎已損壞，無法成功讀取。"
+		},
+		"optimizer": {
+			"_": "最佳化佈局",
+			"unsupported": "您的瀏覽器不支援此功能。請升級到最新版本。",
+			"options": {
+				"_": "選項",
+				"openNew": "在新分頁中顯示結果",
+				"useDim": "保持角片的寬度和高度"
+			},
+			"layout": {
+				"_": "佈局方法",
+				"view": "使用當前佈局作為參考",
+				"random": "嘗試隨機佈局",
+				"toTry": "要嘗試的佈局數量：",
+				"useBH": "嘗試當前佈局的變化"
+			},
+			"skip": "跳過",
+			"run": "執行！",
+			"running": "執行中…"
+		},
+		"CP": {
+			"_": "匯出 CP 檔案",
+			"format": "格式",
+			"reorient": "若適用的話重新定向紙張"
 		}
 	},
 	"keyword": {
@@ -273,7 +298,9 @@
 		"no": "否",
 		"ok": "確定",
 		"here": "這裡",
+		"abort": "中止",
 		"close": "關閉",
+		"cancel": "取消",
 		"export": "匯出",
 		"delete": "刪除",
 		"discord": "BP Studio Discord 伺服器",

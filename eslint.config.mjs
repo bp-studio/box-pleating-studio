@@ -10,6 +10,7 @@ import pluginJsDoc from "eslint-plugin-jsdoc";
 import pluginMocha from "eslint-plugin-mocha";
 import pluginTs from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
+import pluginImport from "eslint-plugin-import";
 import stylistic from "@mutsuntsai/stylistic";
 
 import pluginLocal from "./eslint-local-rules.js";
@@ -26,7 +27,7 @@ function legacyPlugin(name, alias = name) {
 export default [
 	{
 		name: "Global ignores",
-		ignores: ["{build,lib,coverage}/**"],
+		ignores: ["{build,coverage}/**", "lib/**/*.js", "src/app/gen/**"],
 	},
 	{
 		name: "Matching file extensions",
@@ -256,6 +257,7 @@ export default [
 			parserOptions: {
 				sourceType: "module",
 				project: true,
+				extraFileExtensions: [".vue"],
 			},
 		},
 		plugins: {
@@ -276,6 +278,8 @@ export default [
 				"Array.flatMap",
 				"Array.prototype.toReversed",
 				"Array.prototype.flatMap",
+				"Object.fromEntries",
+				"ObjectConstructor.fromEntries",
 				"PromiseConstructor.withResolvers",
 			],
 		},
@@ -287,15 +291,13 @@ export default [
 
 	{
 		name: "Plugin:import",
-		...compat.extends("plugin:import/typescript")[0],
-		files: ["src/**/*.{vue,htm}", "**/*.ts", "eslint.config.mjs"],
+		...pluginImport.flatConfigs.typescript,
+		files: ["src/**/*.vue", "**/*.ts", "eslint.config.mjs"],
 		plugins: {
-			import: legacyPlugin("eslint-plugin-import", "import"),
+			import: pluginImport,
 		},
 		rules: {
-			"@typescript-eslint/consistent-type-imports": ["warn", {
-				prefer: "type-imports",
-			}],
+			"@typescript-eslint/consistent-type-imports": ["warn", { prefer: "type-imports" }],
 			"import/consistent-type-specifier-style": ["warn", "prefer-top-level"],
 			"import/newline-after-import": "warn",
 			"import/no-cycle": ["warn", { ignoreExternal: true }],
@@ -368,7 +370,7 @@ export default [
 				tabWidth: 4,
 			}],
 			"vue/multi-word-component-names": "off",
-			"vue/no-mutating-props": "off", // see https://github.com/vuejs/eslint-plugin-vue/issues/1371
+			"vue/no-mutating-props": ["warn", { shallowOnly: true }],
 			"vue/script-indent": ["warn", "tab", {
 				baseIndent: 1,
 				ignores: [],
@@ -433,7 +435,7 @@ export default [
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	{
-		files: ["gulpfile.js", "gulp/**", "test/mocha.env.mjs", "eslint-local-rules.js"],
+		files: ["gulpfile.js", "gulp/**", "test/mocha.env.mjs", "eslint-local-rules.js", "lib/**/*.mjs"],
 		languageOptions: {
 			globals: globals.node,
 			sourceType: "commonjs",
@@ -451,9 +453,13 @@ export default [
 			"@typescript-eslint/no-magic-numbers": "off",
 			"import/no-unresolved": "off",
 			"max-lines": "off",
-			"sort-keys": ["warn", "asc", {
-				minKeys: 6,
-			}],
+			"sort-keys": ["warn", "asc", { minKeys: 6 }],
+		},
+	},
+	{
+		files: ["rsbuild.config.ts"],
+		rules: {
+			"max-lines-per-function": "off",
 		},
 	},
 	{

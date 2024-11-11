@@ -1,12 +1,13 @@
-import { computed, shallowReactive } from "vue";
+import { computed, h } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/core";
+import { Rectangle } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
+import settings from "app/services/settingService";
 import { shallowRef } from "client/shared/decorators";
 import { View } from "client/base/view";
-import { FULL_ZOOM, MARGIN, MARGIN_FIX } from "client/shared/constant";
+import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { display } from "client/screen/display";
 import { Enum } from "client/shared/enum";
@@ -17,15 +18,21 @@ import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
 
+import type { TransformationMatrix } from "shared/types/geometry";
+import type { ComputedRef } from "vue";
 import type { Grid } from "./grid/grid";
 import type { ITagObject } from "client/shared/interface";
 import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
-import type { Label } from "client/utils/label";
 import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
 
 const LAYERS = Enum.values(Layer);
+
+/** {@link IEditor} is the associated editing logic for a {@link Sheet}. */
+export interface IEditor {
+	$transform(matrix: TransformationMatrix): void;
+}
 
 //=================================================================
 /**
@@ -42,19 +49,23 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	 * We made it {@link shallowRef} for better performance,
 	 * and use {@link Readonly} to ensure that we use different instances each time.
 	 */
-	@shallowRef public $scroll: IPoint = { x: 0, y: 0 };
+	@shallowRef public accessor $scroll: IPoint = { x: 0, y: 0 };
 
-	@shallowRef public $zoom: number = FULL_ZOOM;
+	@shallowRef public accessor $zoom: number = FULL_ZOOM;
 
-	@shallowRef private _type: GridType;
+	@shallowRef private accessor _type: GridType;
 
-	@shallowRef private _grid: Grid;
+	@shallowRef private accessor _grid: Grid;
 
 	/** Top-level container */
 	public readonly $view: Container = new Container();
 
 	/** The project to which it belongs. */
 	public readonly $project: Project;
+
+	public readonly $controls: Set<Control> = new Set();
+
+	public readonly $independents: Set<Independent> = new Set();
 
 	/** The layers. */
 	private _layers: Container[] = [];
@@ -68,16 +79,17 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/** The mask for the clipped layers. */
 	private _mask: Graphics = new Graphics();
 
-	public readonly $controls: Set<Control> = new Set();
+	private readonly _editor: IEditor;
 
-	public readonly $independents: Set<Independent> = new Set();
-
-	public readonly $labels: Set<Label> = shallowReactive(new Set());
-
-	constructor(project: Project, parentView: Container, tag: DesignMode, json?: JSheet, state?: JViewport) {
+	constructor(
+		project: Project, parentView: Container,
+		tag: DesignMode, editor: IEditor,
+		json?: JSheet, state?: JViewport
+	) {
 		super();
 		this.$project = project;
 		this.$tag = tag;
+		this._editor = editor;
 
 		if(state) {
 			this.$zoom = state.zoom;
@@ -98,12 +110,12 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._type = json?.type ?? GridType.rectangular;
 		this._grid = createGrid(this, this._type, json?.width, json?.height);
 
+		// Computed no longer requires effect scope since Vue 3.5
+		this.$imageDimension = computed(() => this._imageDimension);
+
 		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
 
 		this._onDestruct(() => {
-			this.$horizontalMargin.effect.stop();
-			this.$imageDimension.effect.stop();
-
 			// GC
 			this._grid.$destruct();
 			this._grid = null!;
@@ -185,31 +197,54 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public $getScale(): number {
-		const viewWidth = display.viewport.width, viewHeight = display.viewport.height;
-
-		const factor = this.$zoom / FULL_ZOOM, width = this._grid.$renderWidth;
-		let horizontalScale = (viewWidth - 2 * MARGIN) * factor / width;
-		if(app.settings.showLabel) {
-			const vw = viewWidth * factor - 2 * MARGIN_FIX;
-			const scales = [...this.$labels].map(label =>
-				label.$inferHorizontalScale(width, vw)
-			).filter(s => !isNaN(s));
-			horizontalScale = Math.min(horizontalScale, ...scales);
-		}
-
+		const viewWidth = display.viewport.width;
+		const viewHeight = display.viewport.height;
+		const factor = this.$zoom / FULL_ZOOM;
+		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.$renderWidth;
 		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$renderHeight;
 		return Math.min(horizontalScale, verticalScale);
 	}
 
-	/** Horizontal margin by the actual rendered result. */
-	public readonly $horizontalMargin = computed(() => {
-		const overflows = [...this.$labels].map(l => l.$overflow);
-		const result = Math.max(MARGIN, ...overflows);
-		return result;
-	});
+	public subdivide(): void {
+		gtag("event", "edit_subdivide");
+		display.shield(async () => {
+			const oldCenter = this.grid.$getResizeCenter();
+			this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
+			const newCenter = this.grid.$getResizeCenter();
+			this._editor.$transform([2, 0, 0, 2, newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y]);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
+	}
+
+	public rotate(by: Sign): void {
+		gtag("event", "edit_rotate");
+		display.shield(async () => {
+			const oldCenter = this.grid.$getCenter();
+			const { width, height } = this.grid.toJSON();
+			this.grid.$setDimension(height, width);
+			const newCenter = this.grid.$getCenter();
+			this._editor.$transform([0, by, -by, 0, newCenter.x - by * oldCenter.y, newCenter.y + by * oldCenter.x]);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
+	}
+
+	public flip(horizontal: boolean): void {
+		gtag("event", "edit_flip");
+		display.shield(async () => {
+			const { x, y } = this.grid.$getCenter();
+			this._editor.$transform(horizontal ? [-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
+	}
 
 	/** The dimension of the sheet after rasterization. */
-	public readonly $imageDimension = computed<IDimension>(() => {
+	declare public readonly $imageDimension: ComputedRef<IDimension>;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private get _imageDimension(): IDimension {
 		const s = ProjectService.scale.value;
 		const { x, y } = this._grid.$offset;
 		const hitMargin = 0.5; // Extra margin is needed, or the vertices on the boundary will be difficult to click
@@ -218,14 +253,10 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
 		);
 		return {
-			width: (width + x * 2) * s + this.$horizontalMargin.value * 2,
+			width: (width + x * 2) * s + MARGIN * 2,
 			height: (height + y * 2) * s + MARGIN * 2,
 		};
-	});
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	}
 
 	private _toMemento(): Memento {
 		return [this.$tag, this.toJSON()];
@@ -233,18 +264,18 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {
-		this._layers[Layer.axisParallels].visible = app.settings.showAxialParallel;
-		this._layers[Layer.dot].visible = app.settings.showDot;
-		this._layers[Layer.hinge].visible = app.settings.showHinge;
-		this._layers[Layer.label].visible = app.settings.showLabel;
-		this._layers[Layer.ridge].visible = app.settings.showRidge;
+		this._layers[Layer.axisParallels].visible = settings.display.axialParallel;
+		this._layers[Layer.dot].visible = settings.display.dot;
+		this._layers[Layer.hinge].visible = settings.display.hinge;
+		this._layers[Layer.label].visible = settings.display.label;
+		this._layers[Layer.ridge].visible = settings.display.ridge;
 	}
 
 	/** Adjust the position of the container by the scrolling position. */
 	private _positioning(): void {
 		const image = this.$imageDimension.value;
 		const vp = display.viewport;
-		this.$view.x = Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + this.$horizontalMargin.value;
+		this.$view.x = Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
 		this.$view.y = Math.max((vp.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
 	}
 
@@ -265,7 +296,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this._mask.endFill();
 
 		// Draw grid lines
-		this._gridGraphics.visible = app.settings.showGrid;
+		this._gridGraphics.visible = settings.display.grid;
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()
 				.lineStyle(style.grid.width * sh, style.grid.color);

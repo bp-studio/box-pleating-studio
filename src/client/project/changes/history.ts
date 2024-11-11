@@ -5,6 +5,7 @@ import { FieldCommand } from "./commands/fieldCommand";
 import { Step, OperationResult, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";
 import { EditCommand } from "./commands/editCommand";
+import { display } from "client/screen/display";
 
 import type { JProject } from "shared/json";
 import type { JEdit, NodeId } from "shared/json/tree";
@@ -26,10 +27,10 @@ const MAX_STEP = 30;
 export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** Current history location. */
-	@shallowRef private _index: number = 0;
+	@shallowRef private accessor _index: number = 0;
 
 	/** History location during last file saving. */
-	@shallowRef private _savedIndex: number = 0;
+	@shallowRef private accessor _savedIndex: number = 0;
 
 	private readonly _project: Project;
 	private readonly _steps: Step[] = shallowReactive([]);
@@ -113,6 +114,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(!this._moving) this._flush();
 	}
 
+	/** Tell the {@link HistoryManager} to record the current selections. */
 	public $cacheSelection(): void {
 		this._selection = this._project.design.sheet.$getSelectedTags();
 	}
@@ -166,15 +168,17 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			return;
 		}
 		if(this.$canUndo) {
-			this._moving = true;
-			const result = await this._steps[--this._index].$undo();
-			if(result != OperationResult.Success) {
-				// If something goes wrong, the step in question and everything
-				// before that should be discarded.
-				this._steps.splice(0, this._index + (result == OperationResult.Failed ? 1 : 0));
-				this._index = 0;
-			}
-			this._flush();
+			await display.shield(async () => {
+				this._moving = true;
+				const result = await this._steps[--this._index].$undo();
+				if(result != OperationResult.Success) {
+					// If something goes wrong, the step in question and everything
+					// before that should be discarded.
+					this._steps.splice(0, this._index + (result == OperationResult.Failed ? 1 : 0));
+					this._index = 0;
+				}
+				this._flush();
+			});
 		}
 	}
 
@@ -184,15 +188,17 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			return;
 		}
 		if(this.$canRedo) {
-			this._moving = true;
-			const result = await this._steps[this._index++].$redo();
-			if(result != OperationResult.Success) {
-				// If something goes wrong, the step in question and everything
-				// after that should be discarded.
-				if(result == OperationResult.Failed) this._index--;
-				this._steps.splice(this._index);
-			}
-			this._flush();
+			await display.shield(async () => {
+				this._moving = true;
+				const result = await this._steps[this._index++].$redo();
+				if(result != OperationResult.Success) {
+					// If something goes wrong, the step in question and everything
+					// after that should be discarded.
+					if(result == OperationResult.Failed) this._index--;
+					this._steps.splice(this._index);
+				}
+				this._flush();
+			});
 		}
 	}
 
@@ -264,7 +270,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	private _enqueue(command: Command): void {
 		for(const q of this._queue) {
-			if(command.$canAddTo(q)) return command.$addTo(q);
+			if(command.$canAddTo(q)) {
+				return command.$addTo(q);
+			}
 		}
 		this._queue.push(command);
 	}

@@ -2,7 +2,7 @@ import { State } from "core/service/state";
 import { Task } from "./task";
 import { AABBTask } from "./aabb";
 import { HeapSet } from "shared/data/heap/heapSet";
-import { nodeComparator } from "../context/treeNode";
+import { maxDistComparator } from "../context/treeNode";
 import { climb } from "./utils/climb";
 
 import type { ITreeNode } from "../context";
@@ -22,7 +22,7 @@ function structure(): void {
 	} else {
 		// Otherwise it suffices to update the subtrees
 		// under nodes with the lengths of their parent edges changed.
-		const heap = new HeapSet<ITreeNode>(nodeComparator);
+		const heap = new HeapSet<ITreeNode>(maxDistComparator);
 		for(const node of State.$lengthChanged) heap.$insert(node);
 		while(!heap.$isEmpty) {
 			const node = heap.$pop()!;

@@ -6,15 +6,9 @@ import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { isOnline } from "app/shared/constants";
 
+import type { OptimizerCallback, OptimizerOptions } from "client/plugins/optimizer";
 import type { CoreError, JProject, ProjId } from "shared/json";
-import type * as Client from "client/main";
 import type { Project } from "client/project/project";
-
-/**
- * We encapsule the Client in this service so that it is not exposed in other parts of the app.
- * Declared in HTML.
- */
-declare const bp: typeof Client;
 
 type ProjectProto = { design: { title: string } };
 
@@ -35,7 +29,7 @@ namespace WorkspaceService {
 	/** All opened {@link Project}s in the order of tabs */
 	export const projects = computed(() => ids.value.map(id => bp.projects.get(id)!));
 
-	const tabHistory: Project[] = [];
+	const tabHistory: ProjId[] = [];
 
 	export function getProject(id: ProjId): Project | undefined {
 		if(!Studio.initialized) return undefined;
@@ -59,19 +53,19 @@ namespace WorkspaceService {
 					title: i18n.t("keyword.untitled").toString(),
 				},
 			});
-			const proj = await bp.projects.create(json);
-			manipulateIds(arr => arr.push(proj.id));
-			select(proj.id);
+			const id = await bp.projects.create(json);
+			manipulateIds(arr => arr.push(id));
+			select(id);
 		} catch {
 			Dialogs.alert(i18n.t("message.fatal"));
 		}
 	}
 
-	export async function open(data: Pseudo<JProject>): Promise<Project> {
-		const proj = await bp.projects.open(data);
-		manipulateIds(arr => arr.push(proj.id));
-		tabHistory.unshift(proj);
-		return proj;
+	export async function open(data: Pseudo<JProject>): Promise<ProjId> {
+		const id = await bp.projects.open(data);
+		manipulateIds(arr => arr.push(id));
+		tabHistory.unshift(id);
+		return id;
 	}
 
 	/**
@@ -79,9 +73,9 @@ namespace WorkspaceService {
 	 * but ensure that the tab is opened in the correct order.
 	 */
 	export async function openMultiple(jsons: Pseudo<JProject>[], failCallback?: Action[]): Promise<ProjId[]> {
-		const tasks: Promise<Project | null>[] = [];
+		const tasks: Promise<ProjId | null>[] = [];
 		for(let i = 0; i < jsons.length; i++) {
-			const task: Promise<Project | null> = bp.projects
+			const task: Promise<ProjId | null> = bp.projects
 				.open(jsons[i])
 				.catch(() => {
 					if(failCallback) failCallback[i]();
@@ -92,11 +86,11 @@ namespace WorkspaceService {
 		const results = await Promise.all(tasks);
 		const successIds: ProjId[] = [];
 		manipulateIds((arr: ProjId[]) => {
-			for(const proj of results) {
-				if(!proj) continue;
-				successIds.push(proj.id);
-				arr.push(proj.id);
-				tabHistory.unshift(proj);
+			for(const id of results) {
+				if(!id) continue;
+				successIds.push(id);
+				arr.push(id);
+				tabHistory.unshift(id);
 			}
 		});
 		return successIds;
@@ -107,9 +101,9 @@ namespace WorkspaceService {
 		if(!proj) return; // this happens if the session project is corrupted
 
 		bp.projects.current.value = proj;
-		const idx = tabHistory.indexOf(proj);
+		const idx = tabHistory.indexOf(id);
 		if(idx >= 0) tabHistory.splice(idx, 1);
-		tabHistory.unshift(proj);
+		tabHistory.unshift(id);
 
 		// Scroll to the selected tab
 		vueNextTick(() => {
@@ -123,7 +117,7 @@ namespace WorkspaceService {
 	}
 
 	export function selectLast(): void {
-		if(tabHistory.length) select(tabHistory[0].id);
+		if(tabHistory.length) select(tabHistory[0]);
 	}
 
 	export async function closeOther(id: ProjId): Promise<void> {
@@ -162,19 +156,30 @@ namespace WorkspaceService {
 			select(id);
 			if(!await confirm) return false;
 		}
-		manipulateIds(arr => arr.splice(ids.value.indexOf(proj.id), 1));
-		tabHistory.splice(tabHistory.indexOf(proj), 1);
+		manipulateIds(arr => arr.splice(ids.value.indexOf(id), 1));
+		tabHistory.splice(tabHistory.indexOf(id), 1);
 		bp.projects.close(proj);
 		return true;
 	}
 
+	async function insertAfterAndSelect(proj: JProject, after: ProjId): Promise<void> {
+		const i = ids.value.indexOf(after);
+		const id = await bp.projects.open(checkTitle(proj));
+		manipulateIds(arr => arr.splice(i + 1, 0, id));
+		select(id);
+	}
+
 	export async function clone(id: ProjId): Promise<void> {
 		const i = ids.value.indexOf(id);
-		const proj = projects.value[i].toJSON(true);
-		const c = await bp.projects.open(checkTitle(proj));
-		manipulateIds(arr => arr.splice(i + 1, 0, c.id));
-		select(c.id);
+		await insertAfterAndSelect(projects.value[i].toJSON(true), id);
 		gtag("event", "project_clone");
+	}
+
+	export async function optimize(options: OptimizerOptions, callback: OptimizerCallback): Promise<void> {
+		const proj = Studio.project;
+		if(!proj) return;
+		const optimized = await bp.plugins.optimizer(proj, options, callback);
+		if(options.openNew) await insertAfterAndSelect(optimized, proj.id);
 	}
 
 	function manipulateIds(action: Consumer<ProjId[]>): void {

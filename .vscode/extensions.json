@@ -8,8 +8,12 @@
 		"hbenl.vscode-test-explorer",
 		"lokalise.i18n-ally",
 		"ms-playwright.playwright",
+		"ms-python.mypy-type-checker",
+		"ms-python.pylint",
+		"ms-python.vscode-pylance",
 		"ms-vscode.test-adapter-converter",
 		"mutsuntsai.jsdoc-link",
+		"ryanluker.vscode-coverage-gutters",
 		"sibiraj-s.vscode-scss-formatter",
 		"stylelint.vscode-stylelint",
 		"vue.volar"

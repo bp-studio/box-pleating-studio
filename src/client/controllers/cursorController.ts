@@ -15,13 +15,13 @@ interface Displacement {
 
 export namespace CursorController {
 
-	/** MouseDown or TouchStart location. */
+	/** MouseDown or TouchStart location, in pixels. */
 	let downPoint: IPoint;
 
-	/** Cursor location in floating numbers. */
+	/** Cursor location in pixels. */
 	let location: IPoint = { x: 0, y: 0 };
 
-	/** Cursor coordinates in integers. */
+	/** Cursor grid coordinates in integers. */
 	let coordinate: IPoint = { x: 0, y: 0 };
 
 	export function $setDown(event: MouseEvent | TouchEvent): void {

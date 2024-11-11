@@ -28,6 +28,7 @@
 
 	import { onMounted, reactive, shallowRef, watch } from "vue";
 
+	import logs from "app/misc/logs";
 	import Dialogs from "app/services/dialogService";
 	import useModal from "./modal";
 
@@ -37,7 +38,9 @@
 	const index = shallowRef<number>(max);
 	const record = reactive<Record<number, string>>({});
 
-	const { el, show, hide, on } = useModal("News", () => load(index.value));
+	const { el, show, hide, on } = useModal("News", {
+		onBeforeShow: () => load(index.value),
+	});
 
 	onMounted(() => watch(index, id => load(id)));
 

@@ -2,7 +2,7 @@ import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 import probablyChina from "probably-china";
 
-import { copyright } from "app/misc/copyright";
+import locale from "app/gen/locale";
 import { useDebounce } from "app/utils/timerUtility";
 
 import type { I18n } from "vue-i18n";
@@ -31,13 +31,21 @@ namespace LanguageService {
 		if(probablyChina) locale["zh-tw"].emoji = () => "🇭🇰";
 
 		const plugin = createI18n<[BpsLocale], string>({
+			legacy: false,
 			locale: DEFAULT_LOCALE,
 			fallbackLocale: DEFAULT_LOCALE,
 			silentFallbackWarn: true,
 			messages: locale,
 		});
-		i18n = plugin.global;
-		const _ = copyright.value; // warm-up
+
+		// When using such method to define a global constant,
+		// it is important NOT to declare a global var ahead of time,
+		// as it will make older Safari (say v11) thinks the two are different symbols.
+		Object.defineProperty(window, "i18n", {
+			writable: false,
+			value: plugin.global,
+		});
+
 		return plugin;
 	}
 
@@ -52,7 +60,7 @@ namespace LanguageService {
 			_options.push(...langs);
 		}
 		const loc = format(localeSetting || langs[0] || DEFAULT_LOCALE);
-		i18n.locale = loc;
+		i18n.locale.value = loc;
 		localStorage.setItem(LOCALE_KEY, loc);
 	}
 
@@ -66,18 +74,18 @@ namespace LanguageService {
 		window.addEventListener("storage", e => {
 			if(e.key == LOCALE_KEY) {
 				syncing = true;
-				i18n.locale = e.newValue!;
+				i18n.locale.value = e.newValue!;
 			}
 		});
 
-		watch(() => i18n.locale, loc => {
+		watch(i18n.locale, loc => {
 			if(loc in locale) {
 				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
 				syncing = false;
 				debounce(() => gtag("event", "lang_" + loc.replace("-", "_")));
 			} else {
 				loc = findFallbackLocale(loc);
-				nextTick(() => i18n.locale = loc);
+				nextTick(() => i18n.locale.value = loc);
 			}
 			document.documentElement.lang = loc;
 		}, { immediate: true });

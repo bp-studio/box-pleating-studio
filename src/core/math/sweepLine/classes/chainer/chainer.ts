@@ -1,7 +1,7 @@
 import { same } from "shared/types/geometry";
-///#if DEBUG
+/// #if DEBUG
 import { pathToString, pointToString } from "core/math/geometry/path";
-///#endif
+/// #endif
 
 import type { ISegment } from "../segment/segment";
 import type { Path } from "shared/types/geometry";
@@ -62,8 +62,11 @@ export class Chainer<PathType extends Path = Path> {
 			}
 		}
 
+		/// #if DEBUG
 		/* istanbul ignore next: debug */
-		if(DEBUG_ENABLED && this._chains > 0) this.debugChains();
+		if(this._chains > 0) this.debugChains();
+		/// #endif
+
 		return result;
 	}
 
@@ -163,7 +166,7 @@ export class Chainer<PathType extends Path = Path> {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 
 	/**
 	 * We shouldn't get here in theory. If we do,
@@ -198,5 +201,5 @@ export class Chainer<PathType extends Path = Path> {
 		}
 	}
 
-	///#endif
+	/// #endif
 }

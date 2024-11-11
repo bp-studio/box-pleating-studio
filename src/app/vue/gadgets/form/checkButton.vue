@@ -1,5 +1,5 @@
 <template>
-	<button ref="bt">
+	<button ref="bt" class="check-btn">
 		<slot></slot>
 		<i class="fas fa-check d-inline-block" ref="success" />
 	</button>
@@ -29,17 +29,3 @@
 	defineExpose({ check, focus });
 
 </script>
-
-<style scoped>
-	i {
-		overflow: hidden;
-		display: inline-block;
-
-		width: 0;
-
-		text-align: right;
-		vertical-align: -.15em;
-
-		transition: width 0.5s;
-	}
-</style>

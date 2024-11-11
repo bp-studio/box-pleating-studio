@@ -2,107 +2,122 @@ import { reactive, watch } from "vue";
 
 import dialogs from "./dialogService";
 import Language from "./languageService";
+import { deepCopy } from "shared/utils/copy";
+import { clone } from "shared/utils/clone";
 
+import type { CPOptions } from "client/plugins/cp";
+import type { OptimizerOptions } from "client/plugins/optimizer";
 import type { KeyStore } from "./customHotkeyService";
 
 const KEY = "settings";
 
 type Theme = "system" | "dark" | "light";
 
-// Self-reference will happen if we use Record here,
-// so we have to write it out explicitly.
-type Store = { [key: string]: string | Store };
+const DEFAULT_COLOR = undefined as number | undefined;
 
-const defaultSettings = {
-	autoSave: true,
-	showDPad: true,
-	theme: "system" as Theme,
-	loadSessionOnQueue: false,
-	hotkey: defaultHotkey(),
-	showAxialParallel: true,
-	showGrid: true,
-	showHinge: true,
-	showRidge: true,
-	showLabel: true,
-	showDot: true,
-	showStatus: true,
-	colorScheme: {
-		border: undefined as number | undefined,
-		grid: undefined as number | undefined,
-		hinge: undefined as number | undefined,
-		ridge: undefined as number | undefined,
-		edge: undefined as number | undefined,
-		junction: undefined as number | undefined,
-		dot: undefined as number | undefined,
-		label: undefined as number | undefined,
-		axialParallel: undefined as number | undefined,
+const DEFAULT_HOTKEY: KeyStore = {
+	v: {
+		t: "1",
+		l: "2",
+		zi: "X",
+		zo: "Z",
 	},
-	CP: {
-		reorient: false,
+	m: {
+		u: "W",
+		d: "S",
+		l: "A",
+		r: "D",
 	},
-	includeHiddenElement: false,
+	d: {
+		ri: "E",
+		rd: "Q",
+		hi: "sW",
+		hd: "sS",
+		wi: "sD",
+		wd: "sA",
+	},
+	n: {
+		d: "\t",
+		cn: "T",
+		cp: "R",
+		pn: "G",
+		pp: "F",
+	},
 };
 
-function defaultHotkey(): KeyStore {
-	return {
-		v: {
-			t: "1",
-			l: "2",
-			zi: "X",
-			zo: "Z",
+/**
+ * In v0.7 we made some refactoring on the data schema,
+ * which will result in some settings reset to default value for some users.
+ * But this is a one-time change so please bear with me.
+ */
+const defaultSettings = {
+	autoSave: true,
+	loadSessionOnQueue: false,
+	showDPad: true,
+	showStatus: true,
+	theme: "system" as Theme,
+	hotkey: DEFAULT_HOTKEY,
+	display: {
+		axialParallel: true,
+		grid: true,
+		hinge: true,
+		ridge: true,
+		label: true,
+		dot: true,
+	},
+	colorScheme: {
+		border: DEFAULT_COLOR,
+		grid: DEFAULT_COLOR,
+		hinge: DEFAULT_COLOR,
+		ridge: DEFAULT_COLOR,
+		edge: DEFAULT_COLOR,
+		junction: DEFAULT_COLOR,
+		dot: DEFAULT_COLOR,
+		label: DEFAULT_COLOR,
+		axialParallel: DEFAULT_COLOR,
+	},
+	tools: {
+		Optimizer: {
+			layout: "view",
+			openNew: true,
+			useDimension: true,
+			useBH: false,
+			random: 1,
+		} as OptimizerOptions,
+		CP: {
+			format: "cp",
+			reorient: false,
+		} as CPOptions,
+		SVG: {
+			includeHiddenElement: false,
 		},
-		m: {
-			u: "W",
-			d: "S",
-			l: "A",
-			r: "D",
-		},
-		d: {
-			ri: "E",
-			rd: "Q",
-			hi: "sW",
-			hd: "sS",
-			wi: "sD",
-			wd: "sA",
-		},
-		n: {
-			d: "\t",
-			cn: "T",
-			cp: "R",
-			pn: "G",
-			pp: "F",
-		},
-	};
-}
+	},
+};
 
-const settings = reactive(Object.assign({}, defaultSettings));
+const settings = reactive(clone(defaultSettings));
 
-function loadSettings(settingString: string | null): boolean {
+function loadSettings(settingString: string | null): void {
 	if(settingString) {
 		const savedSettings = JSON.parse(settingString);
-
-		for(const key in settings) {
-			if(key == "hotkey") continue;
-			// @ts-ignore
-			if(savedSettings[key] !== undefined) settings[key] = savedSettings[key];
-		}
-
-		// Use deepCopy to read the hotkey settings,
+		// Use deepCopy to read saved settings,
 		// so that old setting will not be overwritten as we add more settings in the future.
-		if(savedSettings.hotkey !== undefined) copy(settings.hotkey, savedSettings.hotkey);
-	} else {
-		// Save initial settings
-		save();
+		deepCopy(settings, savedSettings);
 	}
-	return settingString !== null;
+	// Save settings in all cases, since there could be schema migration.
+	save();
 }
 
-// Sync settings
+/**
+ * Whether we are synchronizing settings.
+ * If that is the case, we don't write the settings to local storage again.
+ */
 let syncing: boolean = false;
 
+/** Whether there was saved settings before the current instance launched. */
 let hadSettings: boolean = false;
 
 export function init(): void {
+	// This event only fires when other instances make the writing
 	window.addEventListener("storage", e => {
 		if(e.storageArea === localStorage && e.key === KEY) {
 			syncing = true;
@@ -110,10 +125,11 @@ export function init(): void {
 		}
 	});
 
-	hadSettings = loadSettings(localStorage.getItem(KEY));
+	const savedSettings = localStorage.getItem(KEY);
+	hadSettings = savedSettings !== null;
+	loadSettings(savedSettings);
 
 	watch(settings, save, { deep: true });
-
 	watch(
 		() => settings.showStatus,
 		s => document.body.classList.toggle("show-status", s),
@@ -121,24 +137,15 @@ export function init(): void {
 	);
 }
 
+/**
+ * Return the value of {@link hadSettings}.
+ * We use this to decide whether we should process file handles.
+ */
 export function getHadSettings(): boolean {
 	return hadSettings;
 }
 
-/**
- * Copy the properties in the source object to the target object,
- * ignoring the properties absent in either of them.
- */
-function copy(target: Store, source: Store): void {
-	if(!source) return;
-	for(const key in target) {
-		const value = target[key];
-		if(value instanceof Object) copy(value, source[key] as Store);
-		else if(key in source) target[key] = source[key];
-	}
-}
-
-/** Save settings */
+/** Save settings, unless {@link syncing}. */
 function save(): void {
 	if(!syncing) localStorage.setItem(KEY, JSON.stringify(settings));
 	syncing = false;
@@ -148,8 +155,7 @@ function save(): void {
 export async function reset(): Promise<void> {
 	if(!await dialogs.confirm(i18n.t("preference.confirmReset"))) return;
 	gtag("event", "settings_reset");
-	Object.assign(settings, JSON.parse(JSON.stringify(defaultSettings)));
-	save();
+	Object.assign(settings, clone(defaultSettings));
 	Language.reset();
 }
 

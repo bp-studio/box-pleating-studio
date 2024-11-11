@@ -1,40 +1,36 @@
 <template>
-	<div class="dropdown-menu" @touchend="hide" @mouseup="hide" ref="el" v-if="initialized">
+	<div class="dropdown-menu" @touchend="hide(false)" @mouseup="hide(false)" ref="el" v-if="initialized">
 		<slot></slot>
 	</div>
 </template>
-
-<script lang="ts">
-	declare const Popper: typeof popper;
-</script>
 
 <script setup lang="ts">
 
 	import { onMounted, shallowRef } from "vue";
 
-	import Lib from "app/services/libService";
-
-	import type * as popper from "@popperjs/core";
+	import type { Instance } from "@popperjs/core";
 
 	defineOptions({ name: "ContextMenu" });
 
 	const el = shallowRef<HTMLDivElement>();
 	const initialized = shallowRef(false);
 
-	Lib.ready.then(() => initialized.value = true);
+	import("@popperjs/core").then(() => initialized.value = true);
 
 	let shown: boolean = false;
+	let popper: Instance;
 
 	onMounted(() => {
 		const handle = (event: Event): void => {
-			if(shown && !el.value!.contains(event.target as Element)) hide();
+			if(shown && !el.value!.contains(event.target as Element)) hide(true);
 		};
 		document.addEventListener("touchstart", handle, { capture: true, passive: true });
 		document.addEventListener("mousedown", handle, { capture: true, passive: true });
 	});
 
-	function show(e: MouseEvent): void {
-		Popper.createPopper(
+	async function show(e: MouseEvent): Promise<void> {
+		const Popper = await import("@popperjs/core");
+		popper = Popper.createPopper(
 			{ getBoundingClientRect: () => new DOMRect(e.pageX, e.pageY) },
 			el.value!,
 			{ placement: "bottom-start" }
@@ -43,13 +39,23 @@
 		shown = true;
 	}
 
-	function hide(): void {
-		// A delay of 10 is known to be insufficient on some versions of Safari,
-		// so we set it to 50 to be on the safe side
-		const HIDDEN_DELAY = 50;
+	function hideCore(): void {
+		el.value!.classList.remove("show");
+		popper.destroy();
+	}
+
+	// A delay of 10 is known to be insufficient on some versions of Safari,
+	// so we set it to 50 to be on the safe side
+	const HIDDEN_DELAY = 50;
+
+	function hide(force: boolean): void {
 		if(shown) {
-			// A delay is required here, or it won't be clickable in touch mode.
-			setTimeout(() => el.value!.classList.remove("show"), HIDDEN_DELAY);
+			if(force) {
+				hideCore();
+			} else {
+				// A delay is required here, or it won't be clickable in touch mode.
+				setTimeout(hideCore, HIDDEN_DELAY);
+			}
 			shown = false;
 		}
 	}

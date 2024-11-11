@@ -44,6 +44,10 @@ export class Joiner {
 	public readonly q1!: QuadrantDirection;
 	public readonly q2!: QuadrantDirection;
 
+	// The width of SCR for the two original junctions.
+	public readonly w1!: number;
+	public readonly w2!: number;
+
 	/** Direction of the shared corner. */
 	public readonly q!: QuadrantDirection;
 
@@ -65,11 +69,13 @@ export class Joiner {
 		this.q = this.$oriented ? 0 : 2;
 		[this.q1, this.q2] = this._getQuadrantCombination();
 		this.$intersectionDist = repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
+		this.w1 = j1.sx;
+		this.w2 = j2.sx;
 
 		// Calculate Overlap shifting
 		[this.s1, this.s2] = this.$oriented ?
 			[o1.shift, o2.shift] :
-			[Joiner._getReverseShift(o1, j1), Joiner._getReverseShift(o2, j2)];
+			[getReverseShift(o1, j1), getReverseShift(o2, j2)];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,10 +142,10 @@ export class Joiner {
 			return this.$isClockwise ? [Direction.UR, Direction.LR] : [Direction.LR, Direction.UR];
 		}
 	}
+}
 
-	private static _getReverseShift(o: JOverlap, j: JJunction): IPoint | undefined {
-		const x = o.ox + (o.shift?.x ?? 0), y = o.oy + (o.shift?.y ?? 0);
-		if(x == j.ox && y == j.oy) return undefined;
-		return { x: x - j.ox, y: y - j.oy }; // We return negative value on purpose here
-	}
+function getReverseShift(o: JOverlap, j: JJunction): IPoint | undefined {
+	const x = o.ox + (o.shift?.x ?? 0), y = o.oy + (o.shift?.y ?? 0);
+	if(x == j.ox && y == j.oy) return undefined;
+	return { x: x - j.ox, y: y - j.oy }; // We return negative value on purpose here
 }

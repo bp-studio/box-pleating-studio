@@ -1,13 +1,13 @@
 <template>
-	<template v-if="phase >= 3">
+	<template v-if="phase >= 6">
 		<Note />
 		<Language />
 	</template>
-	<template v-if="phase >= 4">
+	<template v-if="phase >= 7">
 		<About :ref="mdlRef('about')" />
 		<Version :ref="mdlRef('ver')" />
 	</template>
-	<template v-if="phase >= 5">
+	<template v-if="phase >= 8">
 		<Share :ref="mdlRef('share')" />
 		<CP :ref="mdlRef('cp')" />
 		<template v-if="!isFileApiEnabled">
@@ -17,35 +17,17 @@
 			<BPZ :ref="mdlRef('bpz')" />
 		</template>
 	</template>
-	<template v-if="phase >= 6">
+	<template v-if="phase >= 9">
+		<Optimizer :ref="mdlRef('optimizer')" />
 		<Preference :ref="mdlRef('pref')" />
 	</template>
 </template>
 
-<script lang="ts">
-	const modals: Record<string, IShow> = {};
-	export async function show(key: string): Promise<void> {
-		(await getModal(key)).show();
-	}
-
-	/** Just in case the modal is called too early. */
-	function getModal(key: string): Promise<IShow> {
-		return new Promise(resolve => {
-			if(modals[key]) resolve(modals[key]);
-			const int = setInterval(() => {
-				if(modals[key]) {
-					clearInterval(int);
-					resolve(modals[key]);
-				}
-			}, 1);
-		});
-	}
-</script>
-
 <script setup lang="ts">
 
 	import { isFileApiEnabled } from "app/shared/constants";
-	import { phase } from "app/misc/lcpReady";
+	import { phase } from "app/misc/phase";
+	import { modals } from "./modals";
 	import Share from "./share.vue";
 	import About from "./about.vue";
 	import Version from "./version.vue";
@@ -57,6 +39,9 @@
 	import PNG from "./png.vue";
 	import BPS from "./bps.vue";
 	import BPZ from "./bpz.vue";
+	import Optimizer from "./optimizer.vue";
+
+	import type { IShow } from "./modals";
 
 	defineOptions({ name: "ModalFragment" });
 

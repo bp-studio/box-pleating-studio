@@ -6,6 +6,8 @@ import HistoryManager from "./changes/history";
 import { options } from "client/options";
 import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
+import { callWorker } from "app/utils/workerUtility";
+import { isContextLost } from "client/main";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
 import type { CoreError, JProject, ProjId } from "shared/json";
@@ -17,6 +19,10 @@ const CORE_TIMEOUT = 3000;
  * Id starts from 1 to ensure true values.
  */
 let nextId = 1;
+
+export function getNextId(): ProjId {
+	return nextId++ as ProjId;
+}
 
 //=================================================================
 /**
@@ -57,15 +63,13 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 * Whether the user is performing dragging on the current {@link Project}.
 	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
 	 */
-	@shallowRef public $isDragging: boolean = false;
+	@shallowRef public accessor $isDragging: boolean = false;
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Projects are all inactive on construction.
 		// It will become active when selected later (see ProjectService)
 		super(false);
-
-		this.id = nextId++ as ProjId;
-
+		this.id = getNextId();
 		const jProject = deepAssign(Migration.$getSample(), json);
 
 		this.history = new HistoryManager(this, jProject.history);
@@ -80,9 +84,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 	/** Initialization. */
 	public async $initialize(): Promise<Project> {
-		if(DEBUG_ENABLED && !this._initialized) {
-			console.time("First render #" + this.id);
-		}
+		/// #if DEBUG
+		if(!this._initialized) console.time("First render #" + this.id);
+		/// #endif
 
 		await this.$core.design.init(this.design.$prototype);
 
@@ -91,9 +95,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		// discovered that such an approach will lead to memory leaks.
 		await doEvents();
 
-		if(DEBUG_ENABLED && !this._initialized) {
-			console.timeEnd("First render #" + this.id);
-		}
+		/// #if DEBUG
+		if(!this._initialized) console.timeEnd("First render #" + this.id);
+		/// #endif
 
 		this._initialized = true;
 		return this;
@@ -198,10 +202,12 @@ export class Project extends Mountable implements ISerializable<JProject> {
 
 function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 	return new Promise(resolve => {
-		// Setup a timeout mechanism in production mode.
+		// Setup a timeout mechanism.
 		const timeout = setTimeout(() => {
-			// We don't do that in debug mode, otherwise debugging will be impossible.
-			///#if !DEBUG
+			/// #if DEBUG
+			// We don't kill the worker in debug mode to allow debugging the issue.
+			console.error("Core computation timeout.");
+			/// #else
 			worker.terminate(); // Terminate immediately in this case
 			resolve({
 				error: {
@@ -209,9 +215,9 @@ function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
 					coreTrace: "",
 				} as CoreError,
 			});
-			///#endif
+			/// #endif
 		}, CORE_TIMEOUT);
-		app.callWorker<CoreResponse>(worker, request).then(response => {
+		callWorker<CoreResponse>(worker, request).then(response => {
 			clearTimeout(timeout);
 			resolve(response);
 		});

@@ -3,8 +3,8 @@ import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
 import { getFirst } from "shared/utils/set";
-import { LayoutController } from "core/controller/layoutController";
 import { UpdateResult } from "core/service/updateResult";
+import { DesignController } from "core/controller/designController";
 
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 import type { Junction } from "core/design/layout/junction/junction";
@@ -55,7 +55,12 @@ describe("Junction", function() {
 			expect(UpdateResult.$flush().add.junctions["1,2"]).to.be.not.undefined;
 
 			// Moving an unrelated flap
-			LayoutController.updateFlap([{ id: id3, x: 3, y: 2, width: 0, height: 0 }], false, []);
+			DesignController.update({
+				flaps: [{ id: id3, x: 3, y: 2, width: 0, height: 0 }],
+				edges: [],
+				dragging: false,
+				stretches: [],
+			});
 			expect(getJunctions(false)).to.contain(junction, "Junction is reused");
 			expect(UpdateResult.$flush().add.junctions["1,2"]).to.be.undefined;
 		});

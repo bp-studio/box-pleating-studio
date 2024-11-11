@@ -15,7 +15,6 @@
 	],
 	"cSpell.ignoreWords": [
 		"fbclid",
-		"lazypipe",
 		"opendir",
 		"purgecss",
 		"tinyurl",
@@ -23,7 +22,9 @@
 	],
 	"cSpell.words": [
 		"aabb",
+		"aaroon",
 		"appinstalled",
+		"basinhopping",
 		"beforeinstallprompt",
 		"bpstudio",
 		"browserslistrc",
@@ -32,7 +33,9 @@
 		"configurator",
 		"dpad",
 		"draggables",
+		"earcut",
 		"esbuild",
+		"fflate",
 		"fontawesome",
 		"fullscreen",
 		"gops",
@@ -50,6 +53,7 @@
 		"mixins",
 		"mozfullscreenchange",
 		"mutsuntsai",
+		"ndarray",
 		"nocheck",
 		"notranslate",
 		"onbeforeinstallprompt",
@@ -63,11 +67,15 @@
 		"popperjs",
 		"precache",
 		"precaching",
+		"pyodide",
 		"queryable",
 		"Ravl",
 		"Rebalancing",
 		"Renderable",
 		"reselectable",
+		"rsbuild",
+		"Rsdoctor",
+		"rspack",
 		"scrollable",
 		"selectables",
 		"serializable",
@@ -78,6 +86,8 @@
 		"tsun",
 		"typeless",
 		"unversioned",
+		"webglcontextlost",
+		"webglcontextrestored",
 		"wicg",
 		"xdescribe"
 	],
@@ -85,21 +95,33 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
 	},
+	"eslint.useFlatConfig": true,
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.expand": false,
 	"explorer.fileNesting.patterns": {
 		"*.css": "$(capture).css.map",
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
-		".*rc.json": ".$(capture)ignore",
-		"eslint.config.mjs": "eslint-local-rules.js",
 		".gitignore": ".gitattributes",
-		"package.json": "pnpm-lock.yaml, .npmrc"
+		".mocharc.json": ".nycrc",
+		".stylelintrc.json": ".stylelintignore",
+		"Pipfile": "Pipfile.lock, pyproject.toml, .pylintrc",
+		"README.md": "LICENSE.md, CONTRIBUTING.md",
+		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
+		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
+		"rsbuild.config.ts": "rsbuild.*.ts"
 	},
 	"files.exclude": {
+		"**/__pycache__/": true,
 		"**/debug.log": true,
-		"test-results/": true,
-		".nyc_output": true
+		".mypy_cache": true,
+		".nyc_output": true,
+		".pytest_cache": true,
+		"coverage": true,
+		"node_modules/": true,
+		"patches/": true,
+		"src/app/gen": true,
+		"test-results/": true
 	},
 	"i18n-ally.enabledFrameworks": [
 		"vue"
@@ -121,6 +143,10 @@
 	],
 	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"mochaExplorer.multiFileSuites": true,
+	"mypy-type-checker.args": [
+		"--check-untyped-defs"
+	],
+	"python.testing.pytestEnabled": true,
 	"scss.validate": false,
 	"stylelint.packageManager": "pnpm",
 	"stylelint.validate": [

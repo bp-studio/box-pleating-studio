@@ -11,10 +11,13 @@ import ProjectService from "client/services/projectService";
 import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
-import { CoreManager } from "./coreManager";
 import { FlapContainer } from "./flapContainer";
+import { applyTransform } from "shared/types/geometry";
 
+import type { IEditor } from "../sheet";
+import type { TransformationMatrix } from "shared/types/geometry";
 import type { Flap } from "./flap";
+import type { BatchUpdateManager } from "client/project/batchUpdateManager";
 import type { Device } from "./device";
 import type { Container } from "@pixi/display";
 import type { Project } from "client/project/project";
@@ -30,17 +33,16 @@ import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport, Nod
  * as it handles the drawing of invalid junctions.
  */
 //=================================================================
-export class Layout extends View implements ISerializable<JLayout> {
+export class Layout extends View implements ISerializable<JLayout>, IEditor {
 
-	@shallowRef public flapCount: number = 0;
-	@shallowRef public riverCount: number = 0;
-	@shallowRef public invalidCount: number = 0;
-	@shallowRef public patternNotFound: boolean = false;
+	@shallowRef public accessor flapCount: number = 0;
+	@shallowRef public accessor riverCount: number = 0;
+	@shallowRef public accessor invalidCount: number = 0;
+	@shallowRef public accessor patternNotFound: boolean = false;
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
 	public readonly $flaps: FlapContainer;
-	public readonly $core: CoreManager;
 	public readonly $rivers: IDoubleMap<NodeId, River> = new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
@@ -58,9 +60,8 @@ export class Layout extends View implements ISerializable<JLayout> {
 	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
 		super();
 		this.$project = project;
-		this.$core = new CoreManager(project);
 		this.$flaps = new FlapContainer(this);
-		this.$sheet = new Sheet(project, parentView, "layout", json, state);
+		this.$sheet = new Sheet(project, parentView, "layout", this, json, state);
 		this.$sheet.$addChild(this);
 
 		const filter = new AlphaFilter(style.junction.alpha);
@@ -122,7 +123,10 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.riverCount = this.$rivers.size;
 	}
 
-	/** We separate this method for the execution order. */
+	/**
+	 * Remove rivers that no longer exist.
+	 * We separate this method for the execution order.
+	 */
 	public $cleanUp(model: UpdateModel): void {
 		for(const edit of model.edit.filter(e => !e[0])) {
 			const river = this.$rivers.get(edit[1].n1, edit[1].n2);
@@ -140,11 +144,6 @@ export class Layout extends View implements ISerializable<JLayout> {
 		this.$project.design.mode = "tree";
 	}
 
-	/** Return a {@link Promise} that resolves when all updates are completed. */
-	public get $updateComplete(): Promise<void> {
-		return (this.$flaps.$flapUpdatePromise || Promise.resolve()).then(() => this.$core.$updating);
-	}
-
 	public $switchConfig(stretchId: string, to: number): Promise<void> {
 		return this.$project.$core.layout.switchConfig(stretchId, to);
 	}
@@ -158,14 +157,15 @@ export class Layout extends View implements ISerializable<JLayout> {
 	}
 
 	/**
-	 * Similar to {@link $updateFlap}, dragging of {@link Device} can also fire rapidly,
+	 * Similar to {@link BatchUpdateManager}, dragging of {@link Device} can also fire rapidly,
 	 * and we use the same mechanism to control the callings to the Core.
 	 */
 	public $moveDevice(device: Device, action: Action): Promise<void> {
 		this._draggingDeviceAction = action;
 		if(this._deviceMovePromise === undefined) {
 			this._draggingDevice = device;
-			this._deviceMovePromise = this.$core.$prepare().then(this._flushDeviceMove);
+			const prepare = this.$project.design.$coreManager.$prepare();
+			this._deviceMovePromise = prepare.then(() => this._flushDeviceMove());
 		}
 		return this._deviceMovePromise;
 	}
@@ -180,17 +180,37 @@ export class Layout extends View implements ISerializable<JLayout> {
 		return { id, x, y, width: 0, height: 0 };
 	}
 
+	public $transform(matrix: TransformationMatrix): void {
+		const [a, b, c, d] = matrix;
+		const scale = Math.round((Math.sqrt(a * a + c * c) + Math.sqrt(b * b + d * d)) / 2);
+		for(const flap of this.$flaps) {
+			const { x, y, width, height } = flap.toJSON();
+			const ll = applyTransform({ x, y }, matrix);
+			const ur = applyTransform({ x: x + width, y: y + height }, matrix);
+			const newX = Math.min(ur.x, ll.x);
+			const newY = Math.min(ur.y, ll.y);
+			const newWidth = Math.abs(ur.x - ll.x);
+			const newHeight = Math.abs(ur.y - ll.y);
+			flap.$manipulate(newX, newY, newWidth, newHeight);
+			if(scale != 1) flap.radius *= scale;
+		}
+		if(scale == 1) return;
+		for(const river of this.$rivers.values()) {
+			river.$edge.length *= scale;
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private readonly _flushDeviceMove = (): Promise<void> => {
+	private _flushDeviceMove(): Promise<void> {
 		this._deviceMovePromise = undefined;
 		this._draggingDeviceAction!();
 		this._draggingDeviceAction = undefined;
 		const device = this._draggingDevice!;
-		return this.$core.$run(() =>
-			this.$project.$core.layout.moveDevice(device.stretch.id, device.$index, device.$location)
+		return this.$project.design.$coreManager.$run(c =>
+			c.layout.moveDevice(device.stretch.id, device.$index, device.$location)
 		);
 	};
 

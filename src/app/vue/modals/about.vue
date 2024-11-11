@@ -48,7 +48,7 @@
 
 	import { computed } from "vue";
 
-	import { copyright } from "app/misc/copyright";
+	import { copyright } from "app/misc/helper";
 	import useModal from "./modal";
 
 	defineOptions({ name: "About" });

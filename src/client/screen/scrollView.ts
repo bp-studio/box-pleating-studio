@@ -1,5 +1,6 @@
 import { computed, watch } from "vue";
 
+import settings from "app/services/settingService";
 import ProjectService from "client/services/projectService";
 import { useViewport } from "./viewport";
 
@@ -62,7 +63,7 @@ export class ScrollView extends EventTarget {
 		// Scroll area size change
 		window.addEventListener("resize", () => this.$updateScrollbar());
 
-		watch(() => app.settings.showStatus, () => this.$updateScrollbar());
+		watch(() => settings.showStatus, () => this.$updateScrollbar());
 	}
 
 	public get $isScrollable(): boolean {

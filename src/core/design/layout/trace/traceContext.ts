@@ -57,7 +57,7 @@ export class TraceContext {
 
 			// Case 1: side diagonals
 			if(startDiagonal) {
-				const p = hinge.$intersection(startDiagonal);
+				const p = hinge.$intersectLine(startDiagonal, false);
 				if(p) {
 					const hv = this._diagonalHitInitialVector(hinge, v, startDiagonal);
 					if(!p.eq(startDiagonal.p0)) {

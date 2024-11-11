@@ -3,7 +3,7 @@ import { display } from "client/screen/display";
 // Some environments does not support this class
 const TOUCH_SUPPORT = typeof TouchEvent != "undefined";
 
-/** Get the center of a mouse event or a touch event (relative to the canvas) */
+/** Get the center of a mouse event or a touch event (relative to the canvas, in pixels). */
 export function $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
 	/**
 	 * We need to obtain the coordinates relative to the page first, for two reasons:

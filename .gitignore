@@ -25,3 +25,8 @@ NOTE.md
 
 # Exported test project
 /export*.bps
+
+# Python
+__pycache__/
+/.pytest_cache/
+/.mypy_cache/

@@ -9,11 +9,15 @@ RewriteRule ^(.*)$ - [R=404,L]
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-# Necessary for Safari to prioritize service worker over memeroy cache
 <IfModule mod_headers.c>
-	<FilesMatch "(?<!paper-worker\.js)$">
-		Header set Cache-Control "no-cache, no-store, must-revalidate"
-		Header set Pragma "no-cache"
-		Header set Expires 0
+	# SharedArrayBuffer
+	<FilesMatch "(index.htm|(core|optimizer|lzma)\.\w+\.js)$">
+		Header set Cross-Origin-Opener-Policy "same-origin"
+		Header set Cross-Origin-Embedder-Policy "require-corp"
 	</FilesMatch>
+
+	# Necessary for Safari to prioritize service worker over memeroy cache
+	Header set Cache-Control "no-cache, no-store, must-revalidate"
+	Header set Pragma "no-cache"
+	Header set Expires 0
 </IfModule>

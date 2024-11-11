@@ -58,7 +58,7 @@ export class Point extends Couple implements IPoint {
 	// Debug methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	///#if DEBUG
+	/// #if DEBUG
 
 	public static $parseTest(p: string): Point {
 		const match = p.match(/^\((-?\d+)(?:\/(\d+))?, (-?\d+)(?:\/(\d+))?\)$/)!;
@@ -67,5 +67,5 @@ export class Point extends Couple implements IPoint {
 		return new Point(x, y);
 	}
 
-	///#endif
+	/// #endif
 }

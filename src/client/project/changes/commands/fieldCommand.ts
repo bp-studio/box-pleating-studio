@@ -58,6 +58,7 @@ export class FieldCommand extends Command implements JFieldCommand {
 
 	public $canAddTo(command: Command): boolean {
 		return command instanceof FieldCommand &&
+			command.prop == this.prop &&
 			command.tag == this.tag &&
 			command.new == this.old;
 	}

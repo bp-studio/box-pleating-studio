@@ -1,4 +1,4 @@
-import { dist } from "../../context/tree";
+import { dist } from "../../context/treeUtils";
 import { InvalidJunction } from "./invalidJunction";
 import { ValidJunction } from "./validJunction";
 

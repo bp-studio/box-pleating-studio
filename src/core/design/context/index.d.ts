@@ -39,21 +39,23 @@ export interface ITree {
 	$setLength(id: NodeId, length: number): void;
 }
 
-/**
- * This is the readonly interface for {@link TreeNode}.
- */
-export interface ITreeNode extends ISerializable<JEdge> {
-	/** The id of the node. */
+export interface ITreeNodeBase {
 	readonly id: NodeId;
 	readonly $parent: this | undefined;
 
 	/** The length of its parent edge. */
 	readonly $length: number;
-	readonly $children: IReadonlyHeap<ITreeNode>;
+	readonly $children: IReadonlyHeap<this>;
 
 	/** The distance from the node to the root. */
 	readonly $dist: number;
 	readonly $isLeaf: boolean;
+}
+
+/**
+ * This is the readonly interface for {@link TreeNode}.
+ */
+export interface ITreeNode extends ITreeNodeBase, ISerializable<JEdge> {
 	readonly $AABB: AABB;
 	readonly $tag: string;
 	readonly $graphics: NodeGraphics;
