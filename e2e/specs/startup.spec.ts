@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { StudioPage } from "../utils";
+
 test.describe("JavaScript disabled", () => {
 	test.use({ javaScriptEnabled: false });
 
@@ -31,9 +33,8 @@ test.describe("Network failure", () => {
 			}
 		});
 		await page.goto("/");
-		const menu = page.getByRole("menubar");
-		await expect(menu).toBeInViewport();
-		await expect(menu.getByRole("menuitem").first()).not.toBeDisabled();
+		const studio = new StudioPage(page);
+		await studio.initialized();
 		expect(retry).toBeTruthy();
 	});
 });
