@@ -4,6 +4,7 @@ import "shared/polyfill/eventTarget"; // For Safari < 14, used in Client
 import "shared/polyfill/flatMap"; // For Safari < 12, used in VueDraggable
 import "shared/polyfill/toReversed"; // Used in Client
 import "shared/polyfill/withResolvers";
+import "shared/polyfill/scheduler";
 
 import "lib/bootstrap/bootstrap.scss";
 import "temp/bps/style.css";

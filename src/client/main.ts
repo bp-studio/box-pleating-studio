@@ -5,7 +5,6 @@ import { SelectionController } from "./controllers/selectionController";
 import { display } from "./screen/display";
 import { Interaction } from "./services/interaction";
 import { ScrollController } from "./controllers/scrollController";
-import { doEvents } from "shared/utils/async";
 
 import type { IDragController } from "./controllers/dragController";
 import type { ISelectionController } from "./controllers/selectionController";
@@ -26,7 +25,7 @@ export { isContextLost, shouldTakeOverContextHandling } from "./screen/contextMa
 
 export async function init(): Promise<void> {
 	await display.$init();
-	await doEvents();
+	await scheduler.yield();
 	Interaction.$init();
 	SelectionController.$init();
 	ScrollController.$init();

@@ -281,6 +281,7 @@ export default [
 				"Object.fromEntries",
 				"ObjectConstructor.fromEntries",
 				"PromiseConstructor.withResolvers",
+				"scheduler",
 			],
 		},
 	},

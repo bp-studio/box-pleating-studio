@@ -4,10 +4,8 @@ import { Migration } from "client/patches";
 import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
-import { doEvents } from "shared/utils/async";
 import { shallowRef } from "client/shared/decorators";
 import { callWorker } from "app/utils/workerUtility";
-import { isContextLost } from "client/main";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
 import type { CoreError, JProject, ProjId } from "shared/json";
@@ -93,7 +91,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		// Wait for rendering to complete.
 		// Originally `Vue.nextTick()` was used here, but it is later
 		// discovered that such an approach will lead to memory leaks.
-		await doEvents();
+		await scheduler.yield();
 
 		/// #if DEBUG
 		if(!this._initialized) console.timeEnd("First render #" + this.id);

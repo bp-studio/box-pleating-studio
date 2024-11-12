@@ -1,7 +1,5 @@
 import { ContextSystem, Renderer, StartupSystem, getTestContext } from "@pixi/core";
 
-import { doEvents } from "shared/utils/async";
-
 import type { IRendererOptions, ContextSystemOptions, IRenderingContext, StartupSystemOptions } from "@pixi/core";
 
 //=================================================================
@@ -30,9 +28,9 @@ export async function useRenderer(options: Partial<IRendererOptions>): Promise<R
 		);
 	}
 
-	await doEvents();
+	await scheduler.yield();
 	getTestContext();
-	await doEvents();
+	await scheduler.yield();
 
 	// Create renderer. When context is given in the options,
 	// For some reason it won't run the getExtensions() method,
@@ -41,7 +39,7 @@ export async function useRenderer(options: Partial<IRendererOptions>): Promise<R
 	const renderer = new Renderer(options);
 	renderer.context.extensions = contextSystem.extensions;
 	await StartupPromise;
-	await doEvents();
+	await scheduler.yield();
 
 	return renderer;
 }
@@ -53,7 +51,7 @@ let StartupPromise: Promise<void>;
 const oldRun = StartupSystem.prototype.run;
 const oldResize = Renderer.prototype.resize;
 StartupSystem.prototype.run = function(options: StartupSystemOptions): void {
-	StartupPromise = doEvents().then(() => {
+	StartupPromise = scheduler.yield().then(() => {
 		oldRun.call(this, options);
 		Renderer.prototype.resize = oldResize; // Restore resize functionality.
 	});
@@ -70,7 +68,7 @@ class AsyncContextSystem extends ContextSystem {
 	public $context!: Promise<IRenderingContext>;
 
 	protected override getExtensions(): void {
-		this.$context = doEvents().then(() => {
+		this.$context = scheduler.yield().then(() => {
 			super.getExtensions();
 			return this.gl;
 		});

@@ -2,7 +2,6 @@ import { computed, reactive, shallowRef } from "vue";
 
 import { defaultTitle } from "app/shared/constants";
 import Dialogs from "./dialogService";
-import { doEvents } from "shared/utils/async";
 
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
@@ -54,9 +53,9 @@ namespace StudioService {
 			return false;
 		}
 
-		await doEvents();
+		await scheduler.yield();
 		await bp.init();
-		await doEvents();
+		await scheduler.yield();
 
 		// Setup the bridges
 		bp.options.onLongPress = () => showPanel.value = true;
