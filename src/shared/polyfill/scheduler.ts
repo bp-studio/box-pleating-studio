@@ -1,7 +1,8 @@
 //=================================================================
 /**
  * A polyfill for {@link Scheduler.yield} method.
- * See https://developer.mozilla.org/en-US/docs/Web/API/Scheduler/yield.
+ * https://developer.mozilla.org/en-US/docs/Web/API/Scheduler/yield
+ * https://caniuse.com/mdn-api_scheduler_yield
  *
  * There is also https://github.com/GoogleChromeLabs/scheduler-polyfill
  * but it's way more than what we need.

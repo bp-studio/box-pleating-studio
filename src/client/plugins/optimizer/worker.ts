@@ -6,6 +6,8 @@ import type { OptimizerRequest, OptimizerResult } from "./types";
 import type { loadPyodide as LoadPyodide, PyodideInterface } from "pyodide";
 import type { PyProxy } from "pyodide/ffi";
 
+// Declare that we're in worker environment
+declare const self: WorkerGlobalScope & typeof globalThis;
 declare const loadPyodide: typeof LoadPyodide;
 
 let bytesLoaded = 0;
@@ -30,7 +32,7 @@ if(typeof TransformStream != "undefined") {
 	}
 
 	// Hack fetch
-	globalThis.fetch = async url => {
+	self.fetch = async url => {
 		const response = await fetchOriginal(url);
 		const ts = new TransformStream({
 			transform(chunk, ctrl) {

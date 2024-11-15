@@ -8,8 +8,8 @@
 //=================================================================
 /* istanbul ignore next: polyfill */
 if(typeof globalThis === "undefined") {
-	Object.defineProperty(window, "globalThis", {
-		value: window,
+	Object.defineProperty(self, "globalThis", {
+		value: self,
 		writable: false,
 	});
 }
