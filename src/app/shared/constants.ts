@@ -60,6 +60,7 @@ export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
 
 /**
  * This feature is needed for Pyodide.
+ * https://caniuse.com/mdn-javascript_builtins_bigint64array
  *
  * A polyfill can be found in Pyodide v0.24, but it still requires {@link BigInt} anyway,
  * which is not supported for Safari < 14.

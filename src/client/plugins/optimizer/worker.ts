@@ -67,28 +67,41 @@ async function loadArchive(): Promise<ArrayBuffer> {
 	return await response.arrayBuffer();
 }
 
-async function initPyodide(): Promise<PyodideInterface> {
-	console.log("Loading Pyodide");
-	const [pyodide, buffer] = await Promise.all([
-		loadPyodide({ stdout }),
-		loadArchive(),
-	]);
-	const pkg = pyodide.loadPackage("scipy");
-	pyodide.unpackArchive(buffer, "zip"); // We can unpack while downloading packages
-	await pkg;
-	return pyodide;
+async function initPyodide(): Promise<PyodideInterface | null> {
+	try {
+		console.log("Loading Pyodide");
+		const [pyodide, buffer] = await Promise.all([
+			loadPyodide({ stdout }),
+			loadArchive(),
+		]);
+		const pkg = pyodide.loadPackage("scipy");
+		pyodide.unpackArchive(buffer, "zip"); // We can unpack while downloading packages
+		await pkg;
+		return pyodide;
+	} catch(e) {
+		initError ||= e instanceof Error ? e.message : "unknown error";
+		return null;
+	}
 }
 
-async function initOptimizer(): Promise<Optimizer> {
-	const pyodide = await pyodidePromise;
-	const optimizer: Optimizer = pyodide.pyimport("optimizer");
-	/// #if DEBUG
-	console.log("Total loaded bytes: " + bytesLoaded);
-	/// #endif
-	postMessage({ event: "loading", data: HUNDRED });
-	return optimizer;
+async function initOptimizer(): Promise<Optimizer | null> {
+	try {
+		const pyodide = await pyodidePromise;
+		const optimizer: Optimizer = pyodide!.pyimport("optimizer");
+		/// #if DEBUG
+		console.log("Total loaded bytes: " + bytesLoaded);
+		/// #endif
+		postMessage({ event: "loading", data: HUNDRED });
+		return optimizer;
+	} catch(e) {
+		initError ||= e instanceof Error ? e.message : "unknown error";
+		console.log(initError);
+		postMessage({ event: "initError" });
+		return null;
+	}
 }
 
+let initError: string | undefined;
 const pyodidePromise = initPyodide();
 const optimizerPromise = initOptimizer();
 
@@ -96,6 +109,7 @@ addEventListener("message", async event => {
 	const data = event.data as OptimizerRequest;
 	if(data.command == "buffer") {
 		const pyodide = await pyodidePromise;
+		if(!pyodide) return;
 		pyodide.setInterruptBuffer(data.buffer!);
 		/// #if DEBUG
 		console.log("InterruptBuffer ready");
@@ -104,6 +118,7 @@ addEventListener("message", async event => {
 	if(data.command == "start") {
 		try {
 			const optimizer = await optimizerPromise;
+			if(!optimizer) return;
 			try {
 				/// #if DEBUG
 				console.log(data);

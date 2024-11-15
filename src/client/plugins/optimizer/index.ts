@@ -28,6 +28,9 @@ export function initOptimizerWorker(): void {
 		if("result" in ev.data) execution.resolve(ev.data.result);
 		if("error" in ev.data) execution.reject(ev.data.error);
 		if("event" in ev.data) {
+			if(ev.data.event == "initError") {
+				workerReady.reject(new Error("initError"));
+			}
 			if(ev.data.event == "loading") {
 				loading = ev.data.data;
 				if(loading == COMPLETE) workerReady.resolve(worker);
