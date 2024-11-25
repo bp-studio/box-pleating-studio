@@ -8,7 +8,7 @@
 						<i class="fa-regular fa-circle-question"></i>
 					</a>
 				</div>
-				<div class="modal-body" v-if="hasBigInt64Array">
+				<div class="modal-body" v-if="support">
 					<div v-if="state.stage == Stage.stopped">
 						<div class="row mb-2">
 							<label class="col-12 col-sm-4 col-form-label fw-bolder" v-t="'plugin.optimizer.options._'"></label>
@@ -65,15 +65,15 @@
 					<OptProgress v-else-if="state.stage == Stage.integral" :value="state.minor" :max="state.flaps">
 						Trying grid size {{ state.major }}...
 					</OptProgress>
-					<div v-else-if="state.stage == Stage.error" class="text-danger">
-						An error occurred: {{ state.error }}
+					<div v-else-if="state.stage == Stage.error" class="text-danger w-100" style="overflow: scroll; max-height: 60vh;">
+						<pre>An error occurred: {{ state.error }}</pre>
 					</div>
 				</div>
 				<div class="modal-body" v-else v-t="'plugin.optimizer.unsupported'"></div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" :disabled="state.running" data-bs-dismiss="modal"
 							@click="state.stage = Stage.stopped" v-t="'keyword.close'"></button>
-					<button v-if="hasBigInt64Array" type="button" class="btn btn-primary"
+					<button v-if="support" type="button" class="btn btn-primary"
 							:disabled="state.running || state.stage == Stage.error" @click="run">
 						<span v-if="state.running">
 							{{ $t('plugin.optimizer.running') }}&ensp;<i class="bp-spinner fa-spin" />
@@ -96,7 +96,7 @@
 
 <script setup lang="ts">
 
-	import { provide, reactive } from "vue";
+	import { provide, reactive, shallowRef } from "vue";
 
 	import Workspace from "app/services/workspaceService";
 	import Settings from "app/services/settingService";
@@ -122,6 +122,7 @@
 
 	const { el, show, hide } = useModal("Optimizer", { backdrop: "static" });
 	const hasTransformStream = typeof TransformStream != "undefined";
+	const support = shallowRef(hasBigInt64Array);
 
 	const state = reactive({
 		stage: Stage.stopped,
@@ -203,9 +204,14 @@
 			if(state.stopping) {
 				state.stage = Stage.stopped;
 			} else {
-				state.error = e instanceof Error ? e.message : String(e);
-				gtag("event", "optimizer_error", { data1: state.error, data2: Stage[state.stage] });
-				state.stage = Stage.error;
+				const error = e instanceof Error ? e.message : String(e);
+				if(error == "initError") {
+					support.value = false;
+				} else {
+					state.error = error;
+					gtag("event", "optimizer_error", { data1: state.error, data2: Stage[state.stage] });
+					state.stage = Stage.error;
+				}
 			}
 		} finally {
 			state.stopping = false;

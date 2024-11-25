@@ -8,9 +8,8 @@ test.beforeEach(async ({ page }) => {
 
 test("Basic UI", async ({ page }) => {
 	await expect(page).toHaveTitle(/Box Pleating Studio/);
-	const menu = page.getByRole("menubar");
-	await expect(menu).toBeInViewport();
-	await expect(menu.getByRole("menuitem").first()).not.toBeDisabled();
+	const studio = new StudioPage(page);
+	await studio.initialized();
 	await expect(page.getByRole("toolbar")).toBeInViewport();
 	await expect(page.getByRole("complementary")).toBeAttached(); // <aside>
 	await expect(page.getByRole("contentinfo")).toBeAttached(); // <footer>
@@ -41,7 +40,7 @@ test("Basic history", async ({ page }) => {
 	await studio.newProject();
 	await studio.mouse.click(10, 7);
 	await page.getByRole("button", { name: "Add leaf" }).click();
-	await page.keyboard.press("Control+z");
+	await page.keyboard.press("Control+z"); // Undo
 	await expect(page.getByText("Vertices: 1 / 3")).toBeInViewport();
 	await page.keyboard.press("2");
 	await expect(page.getByText("Flaps: 2")).toBeInViewport();

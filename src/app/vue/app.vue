@@ -44,7 +44,7 @@
 	// Loading of the following two will directly impact LCP score,
 	// so we must load it as fast as possible, but still,
 	// we can't afford to load them synchronously with the App itself
-	// (that will add too much to TBT), so we use a doEvents trick here.
+	// (that will add too much to TBT), so we use a Scheduler.yield trick here.
 	const Welcome = asyncComp(() => import("@/welcome/welcome.vue"), true);
 	const Spinner = asyncComp(() => import("@/dialogs/spinner.vue"), true);
 

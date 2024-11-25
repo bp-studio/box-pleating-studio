@@ -97,14 +97,15 @@ const defaultSettings = {
 const settings = reactive(clone(defaultSettings));
 
 function loadSettings(settingString: string | null): void {
-	if(settingString) {
+	if(!settingString) return;
+	try {
 		const savedSettings = JSON.parse(settingString);
 		// Use deepCopy to read saved settings,
 		// so that old setting will not be overwritten as we add more settings in the future.
 		deepCopy(settings, savedSettings);
+	} catch {
+		// Simply ignore if anything went wrong
 	}
-	// Save settings in all cases, since there could be schema migration.
-	save();
 }
 
 /**
@@ -121,7 +122,7 @@ export function init(): void {
 	window.addEventListener("storage", e => {
 		if(e.storageArea === localStorage && e.key === KEY) {
 			syncing = true;
-			loadSettings(e.newValue);
+			loadSettings(e.newValue); // triggers watcher
 		}
 	});
 
@@ -129,7 +130,7 @@ export function init(): void {
 	hadSettings = savedSettings !== null;
 	loadSettings(savedSettings);
 
-	watch(settings, save, { deep: true });
+	watch(settings, save, { deep: true, immediate: true });
 	watch(
 		() => settings.showStatus,
 		s => document.body.classList.toggle("show-status", s),

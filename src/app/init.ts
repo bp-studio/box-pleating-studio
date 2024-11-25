@@ -1,30 +1,28 @@
 import { createSSRApp } from "vue";
 
-import { doEvents } from "shared/utils/async";
-
 //=================================================================
 /**
  * This module contains the key to BP Studio's startup optimization.
  * AS BP Studio now use Rsbuild (which is webpack-compatible) for bundling,
  * there is some inevitable overhead in simply importing the modules,
  * so we make everything async in order to improve TBT.
- * In some cases, we even insert doEvents() between importing and execution of a module.
+ * In some cases, we even insert Scheduler.yield() between importing and execution of a module.
  */
 //=================================================================
 
 const TIME_TERMINATE = 100;
 const TOTAL_PHASES = 10;
 
-await doEvents();
+await scheduler.yield();
 const { lcp, welcomeScreenReady, phase, checkForEarlyWelcome } = await import("app/misc/phase");
 const earlyWelcome = checkForEarlyWelcome();
 await import("app/gen/locale");
-await doEvents();
+await scheduler.yield();
 
 async function runPhase(to: number): Promise<void> {
 	while(phase.value < to) {
 		// eslint-disable-next-line no-await-in-loop
-		await doEvents();
+		await scheduler.yield();
 		phase.value++;
 	}
 }
@@ -38,25 +36,25 @@ try {
 	// while adding almost zero overhead to the total run time.
 	const stub = (await import("@/stub.vue")).default;
 	const testApp = createSSRApp(stub);
-	await doEvents();
+	await scheduler.yield();
 	const testRoot = document.createElement("div");
 	testRoot.innerHTML = "<div></div>";
 	testApp.mount(testRoot);
 	testApp.unmount();
 
-	await doEvents();
+	await scheduler.yield();
 	await import("@/welcome/welcome.vue");
 	const App = (await import("@/app.vue")).default;
 	const app = createSSRApp(App);
-	await doEvents();
+	await scheduler.yield();
 	const LanguageService = (await import("app/services/languageService")).default;
 	const plugin = LanguageService.createPlugin();
 	const { copyright } = (await import("app/misc/helper"));
 	const _ = copyright.value; // warm-up
 	app.use(plugin);
-	await doEvents();
+	await scheduler.yield();
 	app.mount("#app");
-	await doEvents();
+	await scheduler.yield();
 	fixTouchAction();
 
 	// LCP
@@ -64,7 +62,7 @@ try {
 
 	// LanguageService initialization
 	// This is done after LCP to prevent hydration mismatches.
-	await doEvents();
+	await scheduler.yield();
 	LanguageService.init();
 	if(earlyWelcome) welcomeScreenReady.value = true;
 
@@ -77,7 +75,7 @@ try {
 
 	// Initialize services and Client
 	await import("@pixi/utils");
-	await doEvents();
+	await scheduler.yield();
 	await import("@pixi/display");
 	const Core = (await import("app/core")).default;
 	if(await Core.init()) {

@@ -1,12 +1,11 @@
 // For Safari < 14
 
-import "./globalThis";
-
 type Listener = EventListenerOrEventListenerObject;
 
 //=================================================================
 /**
  * Polyfill for the {@link EventTarget} constructor (so that it can be extended).
+ * Look up `extends EventTarget` to find its usage.
  * https://caniuse.com/mdn-api_eventtarget_eventtarget
  *
  * The idea is simply to wrap around a native {@link EventTarget}, such as an {@link HTMLElement}.
@@ -37,7 +36,7 @@ try {
 } catch {
 	// If `EventTarget` is undefined or is not a constructor, use polyfill
 	/* istanbul ignore next: polyfill */
-	globalThis.EventTarget = EventTargetPolyfill;
+	self.EventTarget = EventTargetPolyfill;
 }
 
 export { };

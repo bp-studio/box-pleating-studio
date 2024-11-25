@@ -1,7 +1,6 @@
 import { shallowRef, defineAsyncComponent } from "vue";
 
 import { isSSG } from "app/shared/constants";
-import { doEvents } from "shared/utils/async";
 
 import type { AsyncComponentLoader, Component, ComponentPublicInstance } from "vue";
 
@@ -35,10 +34,10 @@ export const lcp = Promise.withResolvers<void>();
 
 export function asyncComp<T extends Component = {
 	new(): ComponentPublicInstance;
-}>(loader: AsyncComponentLoader<T>, wrapDoEvent: boolean = false): T {
+}>(loader: AsyncComponentLoader<T>, wrapYield: boolean = false): T {
 	return defineAsyncComponent({
 		loader: async () => {
-			if(wrapDoEvent && !isSSG) await doEvents();
+			if(wrapYield && !isSSG) await scheduler.yield();
 			const module = await loader();
 			return (module as { default: T }).default; // SSG must use this for some reason
 		},

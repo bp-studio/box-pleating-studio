@@ -9,7 +9,7 @@ When it comes to polyfill,
 [core-js](https://github.com/zloirock/core-js) easily come into mind,
 but I deliberately don't use it here for the following reasons:
 
-1. It doesn't cover everything I need (e.g. `EventTarget`).
+1. It barely covers any web API related features.
 2. Its codes and import chains are, in my opinion, unnecessarily complex.
 3. I don't want to be one of the "ungrateful users" (paraphrased) implied by its author Denis Pushkarev.
    (See https://github.com/zloirock/core-js/blob/master/docs/2023-02-14-so-whats-next.md)

@@ -8,7 +8,8 @@
 			"dom.iterable"
 		],
 		"types": [
-			"wicg-file-system-access"
+			"wicg-file-system-access",
+			"scheduler-polyfill"
 		],
 		"esModuleInterop": true,
 		"module": "esnext",
