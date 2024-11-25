@@ -9,7 +9,7 @@ import type { Project } from "client/project/project";
 
 let workerReady: PromiseWithResolvers<Worker>;
 
-const interruptBuffer = new Uint8Array(hasSharedArrayBuffer ? new SharedArrayBuffer(1) : []);
+const interruptBuffer = hasSharedArrayBuffer ? new Uint8Array(new SharedArrayBuffer(1)) : null;
 const SIGINT = 2;
 const SIGABRT = 6;
 const COMPLETE = 100;
@@ -19,7 +19,7 @@ export function initOptimizerWorker(): void {
 
 	workerReady = Promise.withResolvers<Worker>();
 	const worker = new Worker(new URL("./worker.ts", import.meta.url), { name: "optimizer" });
-	if(hasSharedArrayBuffer) {
+	if(interruptBuffer) {
 		worker.postMessage({ command: "buffer", buffer: interruptBuffer });
 	}
 
@@ -57,10 +57,10 @@ export interface OptimizerOptions extends OptimizerOptionsBase {
 }
 
 function handler(command: OptimizerCommand, worker: Worker): void {
-	if(command == "skip" && hasSharedArrayBuffer) {
+	if(command == "skip" && interruptBuffer) {
 		interruptBuffer[0] = SIGINT;
 	} else if(command == "stop") {
-		if(hasSharedArrayBuffer) {
+		if(interruptBuffer) {
 			interruptBuffer[0] = SIGABRT;
 		} else {
 			execution.reject();
@@ -85,7 +85,7 @@ export async function optimizer(project: Project, options: OptimizerOptions, cb:
 	});
 	execution = Promise.withResolvers();
 
-	if(hasSharedArrayBuffer) interruptBuffer[0] = 0;
+	if(interruptBuffer) interruptBuffer[0] = 0;
 	const json = project.toJSON();
 	const hierarchies = await project.$core.tree.getHierarchy(options.layout == "random", options.useDimension);
 	const request = createOptimizerRequest(json, hierarchies, options);
