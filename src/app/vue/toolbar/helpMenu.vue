@@ -14,11 +14,11 @@
 			<!-- Use official color -->
 			<i class="fab fa-discord" style="color: #5865F2;" />Discord
 		</a>
-		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/discussions" target="_blank"
+		<a class="dropdown-item" href="https://github.com/bp-studio/box-pleating-studio/discussions" target="_blank"
 		   rel="noopener">
 			<i class="far fa-comment-dots" />{{ $t("toolbar.help.discussions") }}
 		</a>
-		<a class="dropdown-item" href="https://github.com/MuTsunTsai/box-pleating-studio/issues/new/choose" target="_blank"
+		<a class="dropdown-item" href="https://github.com/bp-studio/box-pleating-studio/issues/new/choose" target="_blank"
 		   rel="noopener">
 			<i class="fas fa-bug" />{{ $t("toolbar.help.issue") }}
 		</a>
