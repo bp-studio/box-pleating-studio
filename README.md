@@ -1,3 +1,4 @@
+![GitHub package.json version](https://img.shields.io/github/package-json/v/bp-studio/box-pleating-studio)
 ![GitHub](https://img.shields.io/github/license/bp-studio/box-pleating-studio)
 ![](https://img.shields.io/badge/platform-ALL-brightgreen)
 ![nycrc config on GitHub](https://img.shields.io/nycrc/bp-studio/box-pleating-studio)
