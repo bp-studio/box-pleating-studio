@@ -4,4 +4,6 @@
 
 # Set GitHub linguist exclusion
 lib/**/*.js linguist-vendored
+lib/optimizer/**/*.mjs linguist-vendored
+lib/nlopt/* linguist-vendored
 src/log/*.md linguist-detectable=true

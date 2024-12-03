@@ -1,0 +1,11 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+AlignAfterOpenBracket: BlockIndent
+AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBraces: Attach
+ColumnLimit: 0
+IndentWidth: 4
+NamespaceIndentation: All
+PackConstructorInitializers: NextLine
+TabWidth: 4
+UseTab: Always

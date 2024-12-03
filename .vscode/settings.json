@@ -11,7 +11,8 @@
 		"**/*sample*"
 	],
 	"cSpell.ignoreRegExpList": [
-		"/[A-Z]+(?![a-z])/g"
+		"/[A-Z]+(?![a-z])/g",
+		"/(?:NL|nl)opt/g"
 	],
 	"cSpell.ignoreWords": [
 		"fbclid",
@@ -28,12 +29,14 @@
 		"beforeinstallprompt",
 		"bpstudio",
 		"browserslistrc",
+		"ccall",
 		"Chainer",
 		"Chebyshev",
 		"configurator",
 		"dpad",
 		"draggables",
 		"earcut",
+		"Emscripten",
 		"esbuild",
 		"fflate",
 		"fontawesome",
@@ -91,6 +94,7 @@
 		"wicg",
 		"xdescribe"
 	],
+	"C_Cpp.autoAddFileAssociations": false,
 	"css.validate": false,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
@@ -109,14 +113,13 @@
 		"README.md": "LICENSE.md, CONTRIBUTING.md",
 		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
 		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
-		"rsbuild.config.ts": "rsbuild.*.ts"
+		"rsbuild.config.ts": "rsbuild.*.ts",
+		".clang-format": ".clang-*"
 	},
 	"files.exclude": {
-		"**/__pycache__/": true,
 		"**/debug.log": true,
-		".mypy_cache": true,
 		".nyc_output": true,
-		".pytest_cache": true,
+		"build/obj/": true,
 		"coverage": true,
 		"node_modules/": true,
 		"patches/": true,
@@ -143,10 +146,6 @@
 	],
 	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"mochaExplorer.multiFileSuites": true,
-	"mypy-type-checker.args": [
-		"--check-untyped-defs"
-	],
-	"python.testing.pytestEnabled": true,
 	"scss.validate": false,
 	"stylelint.packageManager": "pnpm",
 	"stylelint.validate": [

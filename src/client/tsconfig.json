@@ -1,6 +1,11 @@
 {
 	"compilerOptions": {
 		"baseUrl": "..",
+		"paths": {
+			"lib/*": [
+				"../lib/*"
+			]
+		}
 	},
 	"extends": "../shared/tsconfig",
 	"include": [

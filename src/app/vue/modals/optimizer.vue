@@ -38,8 +38,7 @@
 							</div>
 						</div>
 					</div>
-					<OptProgress v-else-if="state.stage == Stage.initializing" :value="state.minor"
-								 :max="hasTransformStream ? 100 : 1" noSkip percentage>
+					<OptProgress v-else-if="state.stage == Stage.initializing" :value="state.minor" :max="1" noSkip percentage>
 						Initializing...
 					</OptProgress>
 					<OptProgress v-else-if="state.stage == Stage.start" :value="0" :max="1" noSkip percentage>
@@ -65,7 +64,8 @@
 					<OptProgress v-else-if="state.stage == Stage.integral" :value="state.minor" :max="state.flaps">
 						Trying grid size {{ state.major }}...
 					</OptProgress>
-					<div v-else-if="state.stage == Stage.error" class="text-danger w-100" style="overflow: scroll; max-height: 60vh;">
+					<div v-else-if="state.stage == Stage.error" class="text-danger w-100"
+						 style="overflow: scroll; max-height: 60vh;">
 						<pre>An error occurred: {{ state.error }}</pre>
 					</div>
 				</div>
@@ -104,7 +104,6 @@
 	import Number from "@/gadgets/form/number.vue";
 	import OptProgress, { contextKey } from "./components/optProgress.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
-	import { hasBigInt64Array } from "app/shared/constants";
 
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";
 
@@ -121,8 +120,7 @@
 	};
 
 	const { el, show, hide } = useModal("Optimizer", { backdrop: "static" });
-	const hasTransformStream = typeof TransformStream != "undefined";
-	const support = shallowRef(hasBigInt64Array);
+	const support = shallowRef(true);
 
 	const state = reactive({
 		stage: Stage.stopped,
@@ -140,13 +138,10 @@
 	let handler: Consumer<OptimizerCommand> = () => { /**/ };
 
 	function callback(event: OptimizerEvent): void {
-		if(state.stopping) return;
+		if(state.stopping || !state.running) return;
 		switch(event.event) {
 			case "handle":
 				handler = event.data;
-				break;
-			case "loading":
-				state.minor = event.data;
 				break;
 			case "flap":
 				state.flaps = event.data;
@@ -195,6 +190,7 @@
 	async function run(): Promise<void> {
 		gtag("event", "optimizer_start");
 		state.running = true;
+		state.minor = 0;
 		state.stage = Stage.initializing;
 		try {
 			await Workspace.optimize(options, callback);

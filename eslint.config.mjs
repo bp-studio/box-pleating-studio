@@ -27,7 +27,7 @@ function legacyPlugin(name, alias = name) {
 export default [
 	{
 		name: "Global ignores",
-		ignores: ["{build,coverage}/**", "lib/**/*.js", "src/app/gen/**"],
+		ignores: ["{build,coverage}/**", "lib/**/*.js", "lib/optimizer/**/*.mjs", "src/app/gen/**"],
 	},
 	{
 		name: "Matching file extensions",

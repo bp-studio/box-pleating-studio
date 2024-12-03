@@ -1,0 +1,4 @@
+Checks: '-*,
+	modernize-*,
+	-modernize-use-trailing-return-type,
+	-modernize-use-nodiscard'
