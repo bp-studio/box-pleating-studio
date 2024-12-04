@@ -47,4 +47,8 @@ onmessage = function(event: MessageEvent): void {
 	event.ports[0].postMessage(response);
 };
 
+// Signify that the worker is ready. This is needed in Safari 11,
+// otherwise the main thread might post message before the worker is ready.
+postMessage(null);
+
 export { State as Data };
