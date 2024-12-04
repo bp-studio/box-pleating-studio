@@ -68,25 +68,21 @@ OptimizeResult solve_global(const vector<vector<double>> &initial_vectors, const
  */
 EXPORT void init(bool async) {
 	Shared::async = async;
-
-	// Initialize random number generator.
-	// We call emscripten_random only once here,
-	// to reduce the cost of communicating between JS and WASM.
-	float random = emscripten_random();
-	unsigned int &seed = reinterpret_cast<unsigned int &>(random);
-	std::srand(seed);
-
 	int major, minor, bugfix;
 	nlopt::version(major, minor, bugfix);
 	cout << "NLopt version: " << major << "." << minor << "." << bugfix << endl;
-	cout << "Random seed: " << seed << endl;
 }
 
 /**
  * The entry function for optimizing.
  */
-EXPORT Output *solve(double *ptr) {
+EXPORT Output *solve(double *ptr, unsigned int seed) {
 	result.clear();
+
+	// Initialize random number generator.
+	// This improves performance and makes it easier to reproduce issues if any.
+	std::srand(seed);
+	cout << "Random seed: " << seed << endl;
 
 	Problem problem(ptr);
 	Hierarchy &main = problem.hierarchies.back();

@@ -1,6 +1,8 @@
 import type { OptimizerRequest, OptimizerResult } from "./types";
 import type { OptimizerInstance } from "lib/optimizer/types";
 
+const UINT_MAX = 4294967295; // Max value of unsigned int
+
 //=================================================================
 /**
  * {@link Bridge} communicates between JavaScript and WASM.
@@ -15,11 +17,19 @@ export class Bridge {
 		instance._init(async);
 	}
 
-	public async solve(data: OptimizerRequest): Promise<OptimizerResult> {
+	public async solve(data: OptimizerRequest, seed?: number): Promise<OptimizerResult> {
+		if(seed === undefined || !Number.isInteger(seed) || seed > UINT_MAX) {
+			seed = Math.floor(Math.random() * UINT_MAX);
+		}
+
 		const arr = serialize(data);
 		const ptr = this._createDoubleArrayPointer(arr);
 		// We need to use ccall to return a Promise in async mode
-		const awaitable = this.instance.ccall("solve", "number", ["number"], [ptr], { async: this.async }) as Awaitable<number>;
+		const awaitable = this.instance.ccall(
+			"solve", "number",
+			["number", "number"], [ptr, seed],
+			{ async: this.async }
+		) as Awaitable<number>;
 		const outputPtr = await awaitable;
 		const response = this._parseIntArray(outputPtr);
 		if(!response.length) throw new Error("No solution found.");
