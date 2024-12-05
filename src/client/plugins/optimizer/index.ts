@@ -21,7 +21,10 @@ export function initOptimizerWorker(): void {
 	worker.onmessage = ev => {
 		if(!ev.data) return;
 		if("result" in ev.data) execution.resolve(ev.data.result);
-		if("error" in ev.data) execution.reject(ev.data.error);
+		if("error" in ev.data) {
+			if(execution) execution.reject(ev.data.error);
+			else workerReady.reject(new Error("initError"));
+		}
 		if("event" in ev.data) {
 			if(ev.data.event == "initError") {
 				workerReady.reject(new Error("initError"));

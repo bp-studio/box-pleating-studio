@@ -1,4 +1,7 @@
 
+# Required to host WASM files
+AddType application/wasm .wasm
+
 RewriteEngine On
 
 # Reject all requests from the wrong domain
