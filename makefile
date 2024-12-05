@@ -75,4 +75,4 @@ clean:
 
 .PHONY: dist
 dist:
-	$(MAKE) MODE=dist
+	@$(MAKE) MODE=dist --no-print-directory

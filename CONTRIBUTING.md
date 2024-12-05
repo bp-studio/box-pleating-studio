@@ -32,7 +32,7 @@ and then run `pnpm preview` to launch the local server on production build.
 
 ## Developing optimizer
 
-The BP Studio optimizer is written in C++. To compile it, you'll need:
+The BP Studio optimizer is written in C++. Pre-compiled WASM binaries are already included in the repo, but if you'd like to compile it, you'll need:
 
 - [Emscripten](https://emscripten.org/), and make sure that `emcc` is available in PATH.\
 	You may also need to change `configurations.compilerPath` in the
@@ -43,8 +43,9 @@ The BP Studio optimizer is written in C++. To compile it, you'll need:
 
 Then you can compile the Optimizer by:
 
-```
-make MODE=dist
+```bash
+make      # For debug build
+make dist # For dist (release) build
 ```
 
 ## Browser compatibility

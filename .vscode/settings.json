@@ -95,6 +95,16 @@
 		"xdescribe"
 	],
 	"C_Cpp.autoAddFileAssociations": false,
+	"C_Cpp.codeAnalysis.clangTidy.args": [
+		"--extra-arg-before=-target",
+		"--extra-arg-before=wasm32-unknown-emscripten"
+	],
+	"C_Cpp.codeAnalysis.clangTidy.enabled": true,
+	"C_Cpp.codeAnalysis.clangTidy.headerFilter": "${workspaceFolder}",
+	"C_Cpp.codeAnalysis.exclude": {
+		"lib/**": true
+	},
+	"C_Cpp.loggingLevel": "Debug",
 	"css.validate": false,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
@@ -114,7 +124,7 @@
 		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
 		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
 		"rsbuild.config.ts": "rsbuild.*.ts",
-		".clang-format": ".clang-*"
+		"makefile": ".clang-*"
 	},
 	"files.exclude": {
 		"**/debug.log": true,

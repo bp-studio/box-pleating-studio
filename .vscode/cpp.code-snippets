@@ -1,0 +1,13 @@
+{
+	"PragmaOnce": {
+		"prefix": "ponce",
+		"body": [
+			"",
+			"#pragma once",
+			"",
+			"$1",
+			"",
+		],
+		"scope": "cpp"
+	}
+}

@@ -6,6 +6,7 @@ import { GridType } from "shared/json";
 import type { OptimizerRequest, OptimizerResult } from "client/plugins/optimizer/types";
 import type { OptimizerFactory } from "lib/optimizer/types";
 
+/** Injected in mocha.env.mjs */
 declare const optimizer: OptimizerFactory;
 
 // Changes made to the C++ part will take effect after `make`
