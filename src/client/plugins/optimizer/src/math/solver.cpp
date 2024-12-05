@@ -1,10 +1,15 @@
 
 #include "solver.h"
+#include "math/scale.h"
 
 #include <iostream>
 #include <nlopt.hpp>
 
 double objective(const vector<double> &x, vector<double> &grad, void *data) {
+	// Uncomment the next two lines to debug issues
+	// for (auto &v : x) cout << v << ",";
+	// cout << endl;
+
 	if (!grad.empty()) {
 		for (int i = 0; i < Shared::last; i++) grad[i] = 0;
 		grad[Shared::last] = -1;
@@ -27,6 +32,8 @@ OptimizeResult pack(vector<double> x, const ConstraintList &cons) {
 
 	vector<double> lb(Shared::dim, 0);
 	vector<double> ub(Shared::dim, 1);
+	lb.back() = 1.0 / MAX_SHEET_SIZE;
+	ub.back() = 1.0 / MIN_SHEET_SIZE;
 	optimizer.set_lower_bounds(lb);
 	optimizer.set_upper_bounds(ub);
 

@@ -3,9 +3,9 @@
 
 Rect *Rect::instance = nullptr;
 
-class DiagBounds : public Constraint {
+class RectBounds : public Constraint {
   public:
-	DiagBounds(int i, int dim)
+	RectBounds(int i, int dim)
 		: Constraint(Type::inequality), i(i), dim(dim) {}
 
   protected:
@@ -27,10 +27,10 @@ void Rect::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vec
 		if (fixed && (*fixed)[i]) continue;
 		auto &flap = flaps[i];
 		if (flap.width != 0) {
-			cons.emplace_back(make_unique<DiagBounds>(i * 2, flap.width));
+			cons.emplace_back(make_unique<RectBounds>(i * 2, flap.width));
 		}
 		if (flap.height != 0) {
-			cons.emplace_back(make_unique<DiagBounds>(i * 2 + 1, flap.height));
+			cons.emplace_back(make_unique<RectBounds>(i * 2 + 1, flap.height));
 		}
 	}
 }

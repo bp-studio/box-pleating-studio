@@ -25,7 +25,7 @@ double RoundedConstraint::constraint(const vector<double> &x, vector<double> &gr
 		grad[j * 2] = 2 * dx;
 		grad[i * 2 + 1] = -2 * dy;
 		grad[j * 2 + 1] = 2 * dy;
-		grad[Shared::last] = 2 * dist * dist * m - 2 * dx * dx_s - 2 * dy * dy_s;
+		grad[Shared::last] = 2 * dist * d - 2 * dx * dx_s - 2 * dy * dy_s;
 	}
 	return d * d - dx * dx - dy * dy;
 }
