@@ -9,12 +9,7 @@
 				<ProgressBar :value="value + animate()" :max="max" :percentage="percentage" />
 			</div>
 			<div class="col-auto">
-				<!--
-					We use only the SharedArrayBuffer approach to implement Pyodide interruption,
-					without using async checking to provide fallback.
-					This significantly simplifies the code architecture.
-				-->
-				<button v-if="hasSharedArrayBuffer" type="button" class="btn btn-secondary me-2" @click="context.skip"
+				<button type="button" class="btn btn-secondary me-2" @click="context.skip"
 						:disabled="context.state.skipping || context.state.stopping || noSkip"
 						v-t="'plugin.optimizer.skip'"></button>
 				<button type="button" class="btn btn-danger" @click="context.stop" :disabled="context.state.stopping"
@@ -41,7 +36,6 @@
 	import { inject, onMounted, onUnmounted, shallowRef, watch } from "vue";
 
 	import ProgressBar from "@/gadgets/form/progressBar.vue";
-	import { hasSharedArrayBuffer } from "app/shared/constants";
 
 	import type { InjectionKey } from "vue";
 
