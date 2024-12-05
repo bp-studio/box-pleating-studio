@@ -5,7 +5,7 @@ Originally, it was written in Python using [SciPy](https://scipy.org/) and ran t
 but it turns out that re-writing everything in C++ dramatically improve everything:
 
 1. Performance improved by up to 10x.
-2. Total package size went from 69MB to only 400KB.
+2. Total package size went from 69MB to less than 1MB.
 3. Memory usage went down by 10x.
 4. Browser compatibility is a lot better, especially for Safari.
 

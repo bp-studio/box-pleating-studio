@@ -33,7 +33,7 @@ vector<Circle> make_circles(const Vec &vec, const Hierarchy &hierarchy, const Hi
 		auto parent = hierarchy.parent_map.find(f.id);
 		if (parent != hierarchy.parent_map.end()) {
 			int n = find_index_by_id(last_hierarchy.flaps, parent->second->id);
-			circles.emplace_back(vec[n * 2], vec[n * 2 + 1], parent->second->radius * vec[Shared::last]);
+			circles.emplace_back(vec[n * 2], vec[n * 2 + 1], parent->second->radius * vec.back());
 		} else {
 			int n = find_index_by_id(last_hierarchy.flaps, f.id);
 			circles.emplace_back(vec[n * 2], vec[n * 2 + 1], 0);

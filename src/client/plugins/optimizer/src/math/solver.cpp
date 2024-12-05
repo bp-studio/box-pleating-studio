@@ -43,7 +43,23 @@ OptimizeResult pack(vector<double> x, const ConstraintList &cons) {
 	optimizer.set_xtol_abs(1e-6);
 	optimizer.set_ftol_abs(1e-5);
 
-	double minf;
-	auto result = optimizer.optimize(x, minf);
-	return {x, result > 0, result, minf}; // RVO, no need to move x
+	/**
+	 * Error is still possible in some cases, so we need to handle it.
+	 * Possibly because the number are just coincidentally bad?
+	 * This requires compiling with -sNO_DISABLE_EXCEPTION_CATCHING
+	 *
+	 * According to the [NLopt docs](https://nlopt.readthedocs.io/en/latest/NLopt_Reference/#error-codes-negative-return-values),
+	 * in case of NLOPT_ROUNDOFF_LIMITED, the result is still typically useful.
+	 * However, it is known that wrong setup of the problem can equally trigger this error,
+	 * so in the end I think it is safer to treat it as failure still.
+	 */
+	try {
+		double minf;
+		auto result = optimizer.optimize(x, minf);
+		return {x, result > 0, result, minf}; // RVO, no need to move x
+	} catch (const std::runtime_error &e) {
+		cout << e.what() << endl;
+		// Return whatever progress we have, as Basin-hopping might still need it
+		return {x, false, 0, -x.back()};
+	}
 }
