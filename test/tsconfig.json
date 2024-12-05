@@ -21,6 +21,9 @@
 		"paths": {
 			"@utils/*": [
 				"../test/utils/*"
+			],
+			"lib/*": [
+				"../lib/*"
 			]
 		}
 	},

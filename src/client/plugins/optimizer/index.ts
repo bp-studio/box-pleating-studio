@@ -1,5 +1,5 @@
 import { MAX_SHEET_SIZE } from "shared/types/constants";
-import { hasBigInt64Array, hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
+import { hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
 import { display } from "client/screen/display";
 
 import type { Hierarchy } from "core/design/context/areaTree/utils";
@@ -10,31 +10,26 @@ import type { Project } from "client/project/project";
 let workerReady: PromiseWithResolvers<Worker>;
 
 const interruptBuffer = hasSharedArrayBuffer ? new Uint8Array(new SharedArrayBuffer(1)) : null;
-const SIGINT = 2;
-const SIGABRT = 6;
-const COMPLETE = 100;
 
 export function initOptimizerWorker(): void {
-	if(!hasBigInt64Array) return;
-
 	workerReady = Promise.withResolvers<Worker>();
 	const worker = new Worker(new URL("./worker.ts", import.meta.url), { name: "optimizer" });
 	if(interruptBuffer) {
-		worker.postMessage({ command: "buffer", buffer: interruptBuffer });
+		workerReady.promise.then(() => worker.postMessage({ command: "buffer", buffer: interruptBuffer }));
 	}
 
 	worker.onmessage = ev => {
 		if(!ev.data) return;
 		if("result" in ev.data) execution.resolve(ev.data.result);
-		if("error" in ev.data) execution.reject(ev.data.error);
+		if("error" in ev.data) {
+			if(execution) execution.reject(ev.data.error);
+			else workerReady.reject(new Error("initError"));
+		}
 		if("event" in ev.data) {
 			if(ev.data.event == "initError") {
 				workerReady.reject(new Error("initError"));
 			}
-			if(ev.data.event == "loading") {
-				loading = ev.data.data;
-				if(loading == COMPLETE) workerReady.resolve(worker);
-			}
+			if(ev.data.event == "init") workerReady.resolve(worker);
 			callback?.(ev.data);
 		}
 	};
@@ -43,7 +38,6 @@ export function initOptimizerWorker(): void {
 // For some reason, loading the optimizer leads to crashes in Playwright webkit.
 if(!isPlaywright) initOptimizerWorker();
 
-let loading: number = 0;
 let callback: OptimizerCallback;
 let execution: PromiseWithResolvers<OptimizerResult>;
 
@@ -57,16 +51,15 @@ export interface OptimizerOptions extends OptimizerOptionsBase {
 }
 
 function handler(command: OptimizerCommand, worker: Worker): void {
-	if(command == "skip" && interruptBuffer) {
-		interruptBuffer[0] = SIGINT;
+	if(command == "skip") {
+		if(interruptBuffer) interruptBuffer[0] = 1;
+		else worker.postMessage({ event: "skip" });
 	} else if(command == "stop") {
-		if(interruptBuffer) {
-			interruptBuffer[0] = SIGABRT;
-		} else {
-			execution.reject();
-			worker.terminate();
-			initOptimizerWorker();
-		}
+		// The cost of restarting the worker is very low,
+		// so we can just kill the current one.
+		execution.reject();
+		worker.terminate();
+		initOptimizerWorker();
 	}
 }
 
@@ -77,7 +70,6 @@ export async function optimizer(project: Project, options: OptimizerOptions, cb:
 		event: "handle",
 		data: command => command == "stop" && init.reject(),
 	});
-	callback({ event: "loading", data: loading });
 	const worker = await Promise.race([workerReady.promise, init.promise]);
 	callback({
 		event: "handle",

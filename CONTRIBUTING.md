@@ -32,11 +32,21 @@ and then run `pnpm preview` to launch the local server on production build.
 
 ## Developing optimizer
 
-The BP Studio optimizer is written in Python as it utilizes [scipy](https://pypi.org/project/scipy/).
-In order to have typing supports in VS Code,
-you will need [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) extension,
-Python 3.9+ and [pipenv](https://pypi.org/project/pipenv/) installed.
-You can then install the dependencies with `pipenv install`.
+The BP Studio optimizer is written in C++. Pre-compiled WASM binaries are already included in the repo, but if you'd like to compile it, you'll need:
+
+- [Emscripten](https://emscripten.org/), and make sure that `emcc` is available in PATH.\
+	You may also need to change `configurations.compilerPath` in the
+	[.vscode/c_cpp_properties.json](./.vscode/c_cpp_properties.json)
+	file to reflect the location of your Emscripten installation.
+- [GNU make](https://community.chocolatey.org/packages/make), if you're on Windows.\
+	(Our makefile should work on all desktop platforms regardlessly.)
+
+Then you can compile the Optimizer by:
+
+```bash
+make      # For debug build
+make dist # For dist (release) build
+```
 
 ## Browser compatibility
 

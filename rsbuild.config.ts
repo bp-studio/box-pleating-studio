@@ -205,14 +205,6 @@ export default defineConfig({
 					filename: "log/[name][ext]",
 				},
 			});
-			addRules({
-				test: /\.py$/,
-				loader: "./lib/pyodide/loader.mjs",
-				type: "asset/resource",
-				generator: {
-					filename: "static/python/optimizer.[hash:8].zip",
-				},
-			});
 
 			if(isDev) return;
 

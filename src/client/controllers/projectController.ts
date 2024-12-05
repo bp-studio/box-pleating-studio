@@ -7,12 +7,17 @@ import { isContextLost } from "client/main";
 
 import type { JProject, ProjId } from "shared/json";
 
-function createWorker(): Worker {
-	return new Worker(new URL("core/main.ts", import.meta.url), { name: "core" });
+function createWorker(): Promise<Worker> {
+	// This mechanism of waiting for the worker to get ready is needed only for Safari 11,
+	// and can be dropped in the future.
+	const worker = new Worker(new URL("core/main.ts", import.meta.url), { name: "core" });
+	return new Promise<Worker>(resolve => {
+		worker.addEventListener("message", () => resolve(worker), { once: true });
+	});
 }
 
 /** The worker instance that is pre-generated and is standing-by. */
-let __worker: Worker | undefined = createWorker();
+let __worker: Promise<Worker> | undefined = createWorker();
 
 /// #if DEBUG
 /**
@@ -20,9 +25,13 @@ let __worker: Worker | undefined = createWorker();
  * it prints a message in the console after the {@link Project} has been garbage collected.
  * If the message fails to appear after closing the project and hitting the GC button,
  * we will then have to figure out what is keeping the reference of the project.
+ *
+ * Since we might run the DEBUG mode in BrowserStack,
+ * we also need to consider the case where {@link FinalizationRegistry} is not supported.
  */
-// eslint-disable-next-line compat/compat
-const registry = new FinalizationRegistry<number>(id => console.log(`Project #${id} GC.`));
+const registry = typeof FinalizationRegistry == "undefined" ? null :
+	// eslint-disable-next-line compat/compat
+	new FinalizationRegistry<number>(id => console.log(`Project #${id} GC.`));
 /// #endif
 
 //=================================================================
@@ -55,7 +64,7 @@ export namespace ProjectController {
 	}
 
 	/** Returns the standing-by worker, or create a new worker. */
-	function getOrCreateWorker(): Worker {
+	function getOrCreateWorker(): Promise<Worker> {
 		const worker = __worker ? __worker : createWorker();
 		__worker = undefined;
 		return worker;
@@ -109,10 +118,10 @@ export namespace ProjectController {
 			return id;
 		}
 
-		const p = new Project(json, getOrCreateWorker());
+		const p = new Project(json, await getOrCreateWorker());
 		/// #if DEBUG
 		// eslint-disable-next-line typescript-compat/compat
-		registry.register(p, p.id);
+		if(registry) registry.register(p, p.id);
 		/// #endif
 		projectMap.set(p.id, p);
 		await p.$initialize();

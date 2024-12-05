@@ -181,7 +181,7 @@
 			var resourceErrorHandler = function(e) {
 				if(e.filename) {
 					setRunErr(e.filename + ": " + e.message);
-				} else if(document.head.contains(e.target) && !resErr) {
+				} else if(e.target instanceof Node && document.head.contains(e.target) && !resErr) {
 					setResErr(e.target.src || e.target.href);
 				}
 			};
