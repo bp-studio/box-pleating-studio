@@ -19,20 +19,32 @@ export function initOptimizerWorker(): void {
 	}
 
 	worker.onmessage = ev => {
-		if(!ev.data) return;
-		if("result" in ev.data) execution.resolve(ev.data.result);
-		if("error" in ev.data) {
-			if(execution) execution.reject(ev.data.error);
+		const data = parseData(ev);
+		if(!data) return;
+
+		if("result" in data) execution.resolve(data.result);
+		if("error" in data) {
+			if(execution) execution.reject(data.error);
 			else workerReady.reject(new Error("initError"));
 		}
-		if("event" in ev.data) {
-			if(ev.data.event == "initError") {
+		if("event" in data) {
+			if(data.event == "initError") {
 				workerReady.reject(new Error("initError"));
 			}
-			if(ev.data.event == "init") workerReady.resolve(worker);
-			callback?.(ev.data);
+			if(data.event == "init") workerReady.resolve(worker);
+			callback?.(data);
 		}
 	};
+}
+
+function parseData<T>(ev: MessageEvent<T>): T {
+	if(typeof ev.data == "string") {
+		/// #if DEBUG
+		console.log(ev.data);
+		/// #endif
+		return JSON.parse(ev.data);
+	}
+	return ev.data;
 }
 
 // For some reason, loading the optimizer leads to crashes in Playwright webkit.

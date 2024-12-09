@@ -15,12 +15,11 @@ class DiagBounds : public Constraint {
 	const int offset;
 	const double v;
 
-	double constraint(const vector<double> &x, vector<double> &grad) const override {
-		if (!grad.empty()) {
-			for (double &v : grad) v = 0;
+	double constraint(const double *x, double *grad) const override {
+		if (grad) {
+			reset(grad, offset);
 			grad[i * 2] = fx;
 			grad[i * 2 + 1] = fy;
-			grad[Shared::last] = offset;
 		}
 		return fx * x[i * 2] + fy * x[i * 2 + 1] + offset * x[Shared::last] + v;
 	}

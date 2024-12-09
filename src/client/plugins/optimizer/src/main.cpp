@@ -77,6 +77,7 @@ EXPORT void init(bool async) {
  * The entry function for optimizing.
  */
 EXPORT Output *solve(double *ptr, unsigned int seed) {
+	cout << R"({"event": "start", "data": null})" << endl;
 	result.clear();
 
 	// Initialize random number generator.
@@ -93,10 +94,10 @@ EXPORT Output *solve(double *ptr, unsigned int seed) {
 	if (useView) {
 		auto x0 = read_initial_vector(ptr, main);
 		bool useBH = read(ptr);
+		cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
 		if (useBH) {
 			sol = basin_hopping(x0, cons, 1, bhp, MAX_SHEET_SIZE);
 		} else {
-			cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
 			sol = pack(x0, cons);
 		}
 	} else {

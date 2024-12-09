@@ -17,5 +17,5 @@ class RoundedConstraint : public Constraint {
 	const int dist;
 	const vector<Flap>* flaps;
 
-	double constraint(const vector<double> &x, vector<double> &grad) const override;
+	double constraint(const double *x, double *grad) const override;
 };

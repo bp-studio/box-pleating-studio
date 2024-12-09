@@ -5,15 +5,12 @@
 #include <iostream>
 #include <nlopt.hpp>
 
-double objective(const vector<double> &x, vector<double> &grad, void *data) {
+double objective(unsigned int n, const double *x, double *grad, void *data) {
 	// Uncomment the next two lines to debug issues
-	// for (auto &v : x) cout << v << ",";
+	// for (int i = 0; i < n; i++) cout << x[i] << ",";
 	// cout << endl;
 
-	if (!grad.empty()) {
-		for (int i = 0; i < Shared::last; i++) grad[i] = 0;
-		grad[Shared::last] = -1;
-	}
+	if (grad) Constraint::reset(grad, -1);
 	return -x[Shared::last];
 }
 

@@ -1,12 +1,11 @@
 
-#include "global/global.h"
 #include "fixedConstraint.h"
+#include "global/global.h"
 
-double FixedConstraint::constraint(const vector<double> &x, vector<double> &grad) const {
-	if (!grad.empty()) {
-		for (double &e : grad) e = 0;
+double FixedConstraint::constraint(const double *x, double *grad) const {
+	if (grad) {
+		reset(grad, -v);
 		grad[i] = 1;
-		grad[Shared::last] = -v;
 	}
 	return x[i] - offset - v * x[Shared::last];
 }

@@ -54,7 +54,7 @@
 								size {{ state.best }})</span>...
 						</OptProgress>
 						<OptProgress v-else-if="options.useBH" :value="state.minor" :max="50">
-							Pre-solving<span v-if="state.best < 8192"> (Best size {{ state.best
+							Pre-solving<span v-if="state.best < 8192 && state.best > 0"> (Best size {{ state.best
 								}})</span>...
 						</OptProgress>
 						<OptProgress v-else :value="0" :max="1" noSkip percentage>

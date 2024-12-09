@@ -13,5 +13,5 @@ class CircleConstraint : public Constraint {
 	const int j;
 	const int dist;
 
-	double constraint(const vector<double> &x, vector<double> &grad) const override;
+	double constraint(const double *x, double *grad) const override;
 };
