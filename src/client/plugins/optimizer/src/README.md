@@ -76,7 +76,7 @@ which is a lot faster but could potentially lead to larger sheet sizes.
 Basically, it chooses a center of origin (which is the lower left corner for square sheets and the center point for diagonal sheets),
 and process the flaps one by one by their distances to the origin.
 For each flap, it will try to assign its location to the four closest grid points
-(by adding additional constraints to the original problem)
+(by adding additional constraints to the original problem),
 run SLSQP for each of the four choices
 (excluding those that violate the distance constraints with the already processed flaps;
 and if all four violate the constraints, it will use the next closest grid point that works),
