@@ -5,11 +5,17 @@
 #include <iostream>
 #include <nlopt.hpp>
 
+int step = 0;
+
 double objective(unsigned int n, const double *x, double *grad, void *data) {
 	// Uncomment the next two lines to debug issues
 	// for (int i = 0; i < n; i++) cout << x[i] << ",";
 	// cout << endl;
 
+	if (data) {
+		auto *callback = reinterpret_cast<cfunc>(data);
+		callback(++step);
+	}
 	if (grad) Constraint::reset(grad, -1);
 	return -x[Shared::last];
 }
@@ -20,10 +26,10 @@ void clip_to_bounds(vector<double> &x0, const vector<double> &lower_bounds, cons
 	}
 }
 
-OptimizeResult pack(vector<double> x, const ConstraintList &cons) {
+OptimizeResult pack(vector<double> x, const ConstraintList &cons, cfunc callback) {
 	nlopt::opt optimizer(nlopt::LD_SLSQP, Shared::dim);
 
-	optimizer.set_min_objective(objective, nullptr);
+	optimizer.set_min_objective(objective, (void *)callback);
 
 	for (auto &con : cons) con->add_to(optimizer);
 
@@ -39,6 +45,7 @@ OptimizeResult pack(vector<double> x, const ConstraintList &cons) {
 	optimizer.set_maxeval(200);
 	optimizer.set_xtol_abs(1e-6);
 	optimizer.set_ftol_abs(1e-5);
+	step = 0;
 
 	/**
 	 * We have modified mythrow in nlopt.hpp, so no exception will be thrown here.

@@ -94,11 +94,14 @@ EXPORT Output *solve(double *ptr, unsigned int seed) {
 	if (useView) {
 		auto x0 = read_initial_vector(ptr, main);
 		bool useBH = read(ptr);
-		cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
 		if (useBH) {
+			cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
 			sol = basin_hopping(x0, cons, 1, bhp, MAX_SHEET_SIZE);
 		} else {
-			sol = pack(x0, cons);
+			cout << R"({"event": "pack", "data": 0})" << endl;
+			sol = pack(x0, cons, [](int step) {
+				cout << R"({"event": "pack", "data": )" << step << "}" << endl;
+			});
 		}
 	} else {
 		int random = read(ptr);
