@@ -12,11 +12,11 @@ const asyncMode = typeof SharedArrayBuffer == "undefined";
 try {
 	const instance = await module({
 		print: (msg: string) => {
-			/// #if DEBUG
-			console.log(msg);
-			/// #endif
 			if(msg.startsWith("NLopt")) postMessage({ event: "init" });
-			if(msg.startsWith("{")) postMessage(JSON.parse(msg));
+			else if(msg.startsWith("{")) postMessage(msg); // Leave the parsing to the main thread
+			/// #if DEBUG
+			else console.log(msg);
+			/// #endif
 		},
 		printErr: (err: string) => postMessage({ error: err }),
 

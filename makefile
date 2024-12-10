@@ -15,7 +15,7 @@ DEP := $(patsubst $(SRCF)/%.cpp,$(TEMP)/%.d,$(SRC))
 OUT := optimizer
 
 CXXFLAG_dist = -O3
-CXXFLAG_debug = -g -Wno-limited-postlink-optimizations
+CXXFLAG_debug = -g -Wno-limited-postlink-optimizations -sNO_DISABLE_EXCEPTION_CATCHING
 
 LDFLAG_dist = -sENVIRONMENT=worker
 LDFLAG_debug = -sENVIRONMENT=node
@@ -24,7 +24,7 @@ LDFLAG_debug = -sENVIRONMENT=node
 # https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
 
 CPPFLAGS := -I$(SRCF) -Ilib/nlopt -std=c++20
-CXXFLAGS := $(CXXFLAG_$(MODE)) -sNO_DISABLE_EXCEPTION_CATCHING
+CXXFLAGS := $(CXXFLAG_$(MODE))
 LDFLAGS :=\
 	-Llib/nlopt\
 	-lnlopt.slsqp.2.9.0\

@@ -14,7 +14,7 @@ void Constraint::add_to(nlopt::opt &opt) {
 	}
 }
 
-double Constraint::constraint_wrapper(const vector<double> &x, vector<double> &grad, void *data) {
+double Constraint::constraint_wrapper(unsigned n, const double *x, double *grad, void *data) {
 	auto self = static_cast<const Constraint *>(data);
 	return self->constraint(x, grad);
 }

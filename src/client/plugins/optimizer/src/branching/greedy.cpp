@@ -47,7 +47,7 @@ vector<double> branch(int branch_at, const BranchingContext &context) {
 		auto xk = context.branch(x, y, branch_at, q);
 		if (xk.empty()) continue;
 		auto cons = context.generate_constraints(xk);
-		auto sol = pack(context.to_double(xk), cons);
+		auto sol = pack(context.to_double(xk), cons, nullptr);
 		if (sol.success) {
 			children.push_back(sol.x);
 		}
@@ -77,7 +77,7 @@ vector<double> branch(int branch_at, const BranchingContext &context) {
 			auto xk = context.make_xk(pt.x, pt.y, branch_at);
 			if (xk.empty()) continue;
 			auto cons = context.generate_constraints(xk);
-			auto sol = pack(context.to_double(xk), cons);
+			auto sol = pack(context.to_double(xk), cons, nullptr);
 			if (sol.success) {
 				cout << "Fallback [" << pt.x << ", " << pt.y << "]" << endl;
 				return sol.x;

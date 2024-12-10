@@ -131,7 +131,7 @@ VecList generate_candidate(int target, GenerateContext &context, const vector<Ci
 	while (vectors.size() < target) {
 		auto vec = generate_random_candidate(context.hierarchy, circles);
 		if (!context.interrupted) {
-			auto result = pack(vec, context.constraints);
+			auto result = pack(vec, context.constraints, nullptr);
 			if (!result.success) continue;
 			vec = result.x;
 			if (check_interrupt()) context.interrupted = true;

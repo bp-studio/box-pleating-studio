@@ -13,5 +13,5 @@ class FixedConstraint : public Constraint {
 	const double v;
 	const double offset;
 
-	double constraint(const vector<double> &x, vector<double> &grad) const override;
+	double constraint(const double *x, double *grad) const override;
 };

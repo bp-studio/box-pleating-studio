@@ -12,11 +12,10 @@ class RectBounds : public Constraint {
 	const int i;
 	const int dim;
 
-	double constraint(const vector<double> &x, vector<double> &grad) const override {
-		if (!grad.empty()) {
-			for (double &v : grad) v = 0;
+	double constraint(const double *x, double *grad) const override {
+		if (grad) {
+			reset(grad, dim);
 			grad[i] = 1;
-			grad[Shared::last] = dim;
 		}
 		return x[i] + dim * x[Shared::last] - 1;
 	}

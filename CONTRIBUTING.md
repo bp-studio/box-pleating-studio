@@ -48,6 +48,8 @@ make      # For debug build
 make dist # For dist (release) build
 ```
 
+For more about the optimizer, see [README](src/client/plugins/optimizer/src/README.md).
+
 ## Browser compatibility
 
 BP Studio have tried to support as much browser versions as possible,

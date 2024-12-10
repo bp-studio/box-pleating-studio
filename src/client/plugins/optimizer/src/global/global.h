@@ -14,14 +14,17 @@ struct Pt {
 /**
  * Global variables.
  */
-class Shared {
-  public:
-	static int flap_count;
-	static int dim;
-	static int last;
-	static bool async;
+namespace Shared {
+	inline int flap_count = 0;
+	inline int dim = 0;
+	inline int last = 0;
+	inline bool async = false;
 
-	static void setup(int count);
+	inline void setup(int count) {
+		flap_count = count;
+		dim = flap_count * 2 + 1;
+		last = dim - 1;
+	}
 };
 
 /**

@@ -7,4 +7,7 @@
 
 using namespace std;
 
-OptimizeResult pack(vector<double> x, const ConstraintList &cons);
+/** Callback function for SLSQP */
+using cfunc = void (*)(int);
+
+OptimizeResult pack(vector<double> x, const ConstraintList &cons, cfunc callback);

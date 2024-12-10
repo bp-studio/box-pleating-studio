@@ -45,6 +45,7 @@ interface OptimizerEventMap {
 	handle: Consumer<OptimizerCommand>;
 	loading: number;
 	start: undefined;
+	pack: number;
 	candidate: [number, number];
 	flap: number;
 	cont: [number, number, number];

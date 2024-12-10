@@ -10,6 +10,7 @@ Those including:
 - LZMA: The released file by [LZMA.js](https://github.com/LZMA-JS/LZMA-JS) contains minification error which makes it unusable, the file here fixed the error.
 - NLopt: This contains the precompiled [NLopt](https://github.com/stevengj/nlopt) static library and header files.
   Note that this is a specially compiled version that runs only the SLSQP algorithm and nothing else.
+  We have also modified nlopt.hpp to disable exception throwing.
 - Optimizer: The compiled WASM files of the optimizer.
   There are two build variants:
   1. Debug build is for running in Node.js and for mocha unit tests

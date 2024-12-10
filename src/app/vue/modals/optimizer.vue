@@ -54,13 +54,14 @@
 								size {{ state.best }})</span>...
 						</OptProgress>
 						<OptProgress v-else-if="options.useBH" :value="state.minor" :max="50">
-							Pre-solving<span v-if="state.best < 8192"> (Best size {{ state.best
+							Pre-solving<span v-if="state.best < 8192 && state.best > 0"> (Best size {{ state.best
 								}})</span>...
 						</OptProgress>
-						<OptProgress v-else :value="0" :max="1" noSkip percentage>
-							Pre-solving...
-						</OptProgress>
 					</div>
+					<OptProgress v-else-if="state.stage == Stage.pack" :value="state.minor" :max="packTransform(200)" noSkip
+								 percentage>
+						Pre-solving...
+					</OptProgress>
 					<OptProgress v-else-if="state.stage == Stage.integral" :value="state.minor" :max="state.flaps">
 						Trying grid size {{ state.major }}...
 					</OptProgress>
@@ -113,6 +114,7 @@
 		stopped,
 		initializing,
 		start,
+		pack,
 		candidate,
 		continuous,
 		integral,
@@ -137,6 +139,11 @@
 
 	let handler: Consumer<OptimizerCommand> = () => { /**/ };
 
+	function packTransform(n: number): number {
+		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+		return Math.log(n + 1) * 10;
+	}
+
 	function callback(event: OptimizerEvent): void {
 		if(state.stopping || !state.running) return;
 		switch(event.event) {
@@ -148,6 +155,10 @@
 				break;
 			case "start":
 				updateState(Stage.start);
+				break;
+			case "pack":
+				updateState(Stage.pack);
+				state.minor = packTransform(event.data);
 				break;
 			case "candidate":
 				updateState(Stage.candidate);

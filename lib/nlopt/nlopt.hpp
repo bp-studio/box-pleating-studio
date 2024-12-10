@@ -130,14 +130,14 @@ namespace nlopt {
   private:
     nlopt_opt o;
     void mythrow(nlopt_result ret) const {
-      switch (ret) {
-      case NLOPT_FAILURE: throw std::runtime_error(get_errmsg() ? get_errmsg() : "nlopt failure");
-      case NLOPT_OUT_OF_MEMORY: throw std::bad_alloc();
-      case NLOPT_INVALID_ARGS: throw std::invalid_argument(get_errmsg() ? get_errmsg() : "nlopt invalid argument");
-      case NLOPT_ROUNDOFF_LIMITED: throw roundoff_limited();
-      case NLOPT_FORCED_STOP: throw forced_stop();
-      default: break;
-      }
+    //   switch (ret) {
+    //   case NLOPT_FAILURE: throw std::runtime_error(get_errmsg() ? get_errmsg() : "nlopt failure");
+    //   case NLOPT_OUT_OF_MEMORY: throw std::bad_alloc();
+    //   case NLOPT_INVALID_ARGS: throw std::invalid_argument(get_errmsg() ? get_errmsg() : "nlopt invalid argument");
+    //   case NLOPT_ROUNDOFF_LIMITED: throw roundoff_limited();
+    //   case NLOPT_FORCED_STOP: throw forced_stop();
+    //   default: break;
+    //   }
     }
     typedef struct {
       opt *o;

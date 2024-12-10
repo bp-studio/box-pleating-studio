@@ -108,7 +108,7 @@ class AdaptiveStepSize {
 	}
 };
 
-using mfunc = OptimizeResult (*)(vector<double>, const ConstraintList &);
+using mfunc = OptimizeResult (*)(vector<double>, const ConstraintList &, cfunc);
 
 /**
  * Wrap a minimizer function as a minimizer class.
@@ -119,7 +119,7 @@ class MinimizerWrapper {
 		: minimizer(minimizer), cons(cons) {}
 
 	OptimizeResult operator()(vector<double> &x) {
-		return (*minimizer)(x, *cons);
+		return (*minimizer)(x, *cons, nullptr);
 	}
 
   private:
