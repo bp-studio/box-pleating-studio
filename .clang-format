@@ -4,6 +4,7 @@ AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortLoopsOnASingleLine: true
 BreakBeforeBraces: Attach
 ColumnLimit: 0
+FixNamespaceComments: false
 IndentWidth: 4
 NamespaceIndentation: All
 PackConstructorInitializers: NextLine
