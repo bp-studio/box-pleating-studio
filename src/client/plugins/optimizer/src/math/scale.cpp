@@ -29,9 +29,9 @@ inline double infer_scale(const vector<double> &x, const int &i, const int &j, c
 	double dw = dist + w;
 
 	// Degenerated cases
-	if (dx == 0 && dy == 0) return MAX_INIT_SCALE;
-	if (dx == 0 || dy * w > dh * dx) return dh / dy;
-	if (dy == 0 || dx * h > dw * dy) return dw / dx;
+	if(dx == 0 && dy == 0) return MAX_INIT_SCALE;
+	if(dx == 0 || dy * w > dh * dx) return dh / dy;
+	if(dy == 0 || dx * h > dw * dy) return dw / dx;
 
 	// Solve the quadratic equation
 	return solve_quadratic(dx, dy, w, h, dist);
@@ -39,10 +39,10 @@ inline double infer_scale(const vector<double> &x, const int &i, const int &j, c
 
 void setup_initial_scale(vector<double> &x0, const Hierarchy *hierarchy) {
 	int grid = MIN_SHEET_SIZE;
-	for (auto &entry : hierarchy->dist_map) {
+	for(const auto &entry: hierarchy->dist_map) {
 		auto [i, j, dist] = entry;
 		double s = infer_scale(x0, i, j, dist, hierarchy->flaps);
-		if (s >= MAX_INIT_SCALE) {
+		if(s >= MAX_INIT_SCALE) {
 			grid = MAX_INIT_SCALE;
 			break;
 		}

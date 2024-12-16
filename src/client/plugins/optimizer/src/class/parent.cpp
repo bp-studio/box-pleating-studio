@@ -8,7 +8,7 @@ Parent::Parent(double *&ptr) {
 
 	int child_count = read(ptr);
 	children.reserve(child_count);
-	for (int i = 0; i < child_count; i++) {
+	for(int i = 0; i < child_count; i++) {
 		children.push_back(read(ptr));
 	}
 }

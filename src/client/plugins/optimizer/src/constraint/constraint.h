@@ -24,18 +24,18 @@ class Constraint {
 	 * Reset all entries to zero, except for the last entry,
 	 * which is assigned to the given value.
 	 */
-	static inline void reset(double *grad, double s) {
-		for (int i = 0; i < Shared::last; i++) grad[i] = 0;
+	static void reset(double *grad, double s) {
+		for(int i = 0; i < Shared::last; i++) grad[i] = 0;
 		grad[Shared::last] = s;
 	}
 
   protected:
-	enum Type {
+	enum Type : std::uint8_t {
 		equality,
 		inequality,
 	};
 
-	Constraint(Type type) : type(type) {}
+	Constraint(Type type): type(type) {}
 	Type type;
 
 	// Using std::vector<double> functions with NLopt will result in copying memory,

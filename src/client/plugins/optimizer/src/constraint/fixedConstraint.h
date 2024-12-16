@@ -3,7 +3,7 @@
 
 #include "constraint.h"
 
-class FixedConstraint : public Constraint {
+class FixedConstraint: public Constraint {
   public:
 	FixedConstraint(int i, double v, double offset)
 		: Constraint(Type::equality), i(i), v(v), offset(offset) {}

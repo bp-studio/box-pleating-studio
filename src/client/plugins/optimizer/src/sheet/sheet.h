@@ -10,7 +10,7 @@ using namespace std;
 
 class Sheet {
   public:
-	Sheet(double offset) : offset(offset) {}
+	Sheet(double offset): offset(offset) {}
 	virtual ~Sheet() = default;
 
 	const double offset;

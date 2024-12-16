@@ -14,7 +14,7 @@ double CircleConstraint::constraint(const double *x, double *grad) const {
 	double dx = x[i * 2] - x[j * 2];
 	double dy = x[i * 2 + 1] - x[j * 2 + 1];
 
-	if (grad) {
+	if(grad) {
 		reset(grad, 2 * dist * d);
 		grad[i * 2] = -2 * dx;
 		grad[j * 2] = 2 * dx;

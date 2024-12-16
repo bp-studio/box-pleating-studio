@@ -3,7 +3,7 @@
 
 #include "constraint.h"
 
-class CircleConstraint : public Constraint {
+class CircleConstraint: public Constraint {
   public:
 	CircleConstraint(int i, int j, int dist)
 		: Constraint(Type::inequality), i(i), j(j), dist(dist) {}

@@ -1,4 +1,15 @@
 {
+	"C_Cpp.autoAddFileAssociations": false,
+	"C_Cpp.codeAnalysis.clangTidy.args": [
+		"--extra-arg-before=-target",
+		"--extra-arg-before=wasm32-unknown-emscripten"
+	],
+	"C_Cpp.codeAnalysis.clangTidy.enabled": true,
+	"C_Cpp.codeAnalysis.clangTidy.headerFilter": "${workspaceFolder}",
+	"C_Cpp.codeAnalysis.exclude": {
+		"lib/**": true
+	},
+	"C_Cpp.loggingLevel": "Debug",
 	"[jsonc]": {
 		"editor.formatOnSave": true
 	},
@@ -94,17 +105,6 @@
 		"wicg",
 		"xdescribe"
 	],
-	"C_Cpp.autoAddFileAssociations": false,
-	"C_Cpp.codeAnalysis.clangTidy.args": [
-		"--extra-arg-before=-target",
-		"--extra-arg-before=wasm32-unknown-emscripten"
-	],
-	"C_Cpp.codeAnalysis.clangTidy.enabled": true,
-	"C_Cpp.codeAnalysis.clangTidy.headerFilter": "${workspaceFolder}",
-	"C_Cpp.codeAnalysis.exclude": {
-		"lib/**": true
-	},
-	"C_Cpp.loggingLevel": "Debug",
 	"css.validate": false,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
@@ -122,9 +122,13 @@
 		"Pipfile": "Pipfile.lock, pyproject.toml, .pylintrc",
 		"README.md": "LICENSE.md, CONTRIBUTING.md",
 		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
+		"makefile": ".clang-*",
 		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
-		"rsbuild.config.ts": "rsbuild.*.ts",
-		"makefile": ".clang-*"
+		"rsbuild.config.ts": "rsbuild.*.ts"
+	},
+	"files.associations": {
+		"*.bps": "json",
+		".clang-*": "yaml"
 	},
 	"files.exclude": {
 		"**/debug.log": true,
