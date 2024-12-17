@@ -8,8 +8,8 @@ import { InjectManifest } from "@aaroon/workbox-rspack-plugin";
 import { pluginSass } from "@rsbuild/plugin-sass";
 import { RsdoctorRspackPlugin } from "@rsdoctor/rspack-plugin";
 import postcssPresetEnv from "postcss-preset-env";
+import { createDescendantRegExp, makeTest } from "@mutsuntsai/rsbuild-utils";
 
-import { createDescendantRegExp, makeTest } from "./rsbuild.utils";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";

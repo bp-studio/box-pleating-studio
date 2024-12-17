@@ -92,6 +92,9 @@ importers:
       '@mutsuntsai/esbuild-plugin-vue':
         specifier: ^0.1.6
         version: 0.1.6(@vue/compiler-sfc@3.5.13)
+      '@mutsuntsai/rsbuild-utils':
+        specifier: ^1.0.1
+        version: 1.0.1
       '@mutsuntsai/stylistic':
         specifier: ^1.0.3
         version: 1.0.3(eslint@9.16.0)(typescript@5.7.2)
@@ -287,9 +290,6 @@ importers:
       vue-eslint-parser:
         specifier: ^9.4.3
         version: 9.4.3(eslint@9.16.0)
-      yaml:
-        specifier: ^2.6.1
-        version: 2.6.1
       yargs:
         specifier: ^17.7.2
         version: 17.7.2
@@ -1465,6 +1465,9 @@ packages:
     resolution: {integrity: sha512-PPoZ4ibyAQ/gA+LH4WbHPHMyj7//MVSP6C6yktzU7O1zNNUDVgpHfAHfm5F3qXvUFPx+Kr6bMcqrOdxbaO+yBA==}
     peerDependencies:
       '@vue/compiler-sfc': '>=3.0.0'
+
+  '@mutsuntsai/rsbuild-utils@1.0.1':
+    resolution: {integrity: sha512-YthD1g1sNATukcwoNDN3pRbIMrzX3Nplsgw5TahVgVoMW10Zw7FAGB4iAGDJRCmMGfmc6TtqB4IG+Wo7bAgndQ==}
 
   '@mutsuntsai/stylistic@1.0.3':
     resolution: {integrity: sha512-CX8MlmkZtmc5xugM7a2N9aPM67lCMdNLvYXZ62bjS74rbckx8Vww4j5z5PfFKsoF19xZWadyu9FarMHGVOWnpQ==}
@@ -7589,6 +7592,10 @@ snapshots:
       '@vue/compiler-sfc': 3.5.13
       convert-source-map: 2.0.0
       hash-sum: 2.0.0
+
+  '@mutsuntsai/rsbuild-utils@1.0.1':
+    dependencies:
+      yaml: 2.6.1
 
   '@mutsuntsai/stylistic@1.0.3(eslint@9.16.0)(typescript@5.7.2)':
     dependencies:
