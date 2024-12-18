@@ -20,12 +20,15 @@ export default defineConfig({
 	dev: {
 		progressBar: true,
 	},
-	source: {
-		include: [/@pixi/],
+	resolve: {
 		alias: {
+			// This is needed, otherwise umd will be used, causing vue compiler to be bundled.
 			"vue-slicksort$": "./node_modules/vue-slicksort/dist/vue-slicksort.esm.js",
 			"./url.mjs$": "./lib/pixi/url.mjs", // see lib/README.md
 		},
+	},
+	source: {
+		include: [/@pixi/],
 		entry: {
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",
