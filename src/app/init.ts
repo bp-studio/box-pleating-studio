@@ -16,7 +16,7 @@ const TOTAL_PHASES = 10;
 await scheduler.yield();
 const { lcp, welcomeScreenReady, phase, checkForEarlyWelcome } = await import("app/misc/phase");
 const earlyWelcome = checkForEarlyWelcome();
-await import("app/gen/locale");
+await import("app/shared/locale");
 await scheduler.yield();
 
 async function runPhase(to: number): Promise<void> {

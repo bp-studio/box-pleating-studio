@@ -15,12 +15,11 @@ class Storage {
 	Storage(OptimizeResult &minres) : _minres(minres) {}
 
 	bool update(OptimizeResult &minres) {
-		if (minres.success && (minres.fun < _minres.fun || !_minres.success)) {
+		if(minres.success && (minres.fun < _minres.fun || !_minres.success)) {
 			add(minres);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	OptimizeResult &get_lowest() {
@@ -45,9 +44,9 @@ class RandomDisplacement {
   public:
 	RandomDisplacement(double stepsize = 0.5) : stepsize(stepsize) {}
 
-	void displace(vector<double> &x) {
+	void displace(vector<double> &x) const {
 		// We strategically leave the last one untouched.
-		for (int i = 0; i < Shared::last; i++) {
+		for(int i = 0; i < Shared::last; i++) {
 			x[i] += random01() * 2 * stepsize - stepsize;
 		}
 	}
@@ -78,14 +77,14 @@ class AdaptiveStepSize {
 	vector<double> take_step(vector<double> x) { // copy here
 		nstep++;
 		nstep_tot++;
-		if (nstep % params.interval == 0) adjust_step_size();
+		if(nstep % params.interval == 0) adjust_step_size();
 		takeStep->displace(x);
 		return x;
 	}
 
 	/** Called by basin-hopping to report the result of the step. */
 	void report(bool accept) {
-		if (accept) naccept++;
+		if(accept) naccept++;
 	}
 
   private:
@@ -95,9 +94,9 @@ class AdaptiveStepSize {
 	int nstep_tot{0};
 	int naccept{0};
 
-	inline void adjust_step_size() {
+	void adjust_step_size() {
 		auto accept_rate = (double)naccept / nstep;
-		if (accept_rate > params.accept_rate) {
+		if(accept_rate > params.accept_rate) {
 			// We're accepting too many steps. This generally means we're
 			// trapped in a basin. Take bigger steps.
 			takeStep->increase(params.factor);
@@ -142,7 +141,7 @@ class Metropolis {
 	 * If new is higher than old, there is a chance it will be accepted,
 	 * less likely for larger differences.
 	 */
-	bool accept_reject(const OptimizeResult &res_new, const OptimizeResult &res_old) {
+	bool accept_reject(const OptimizeResult &res_new, const OptimizeResult &res_old) const {
 		auto prod = -(res_new.fun - res_old.fun) * beta;
 		auto w = exp(min(0.0, prod));
 		auto rand = random01();
@@ -161,7 +160,7 @@ class BasinHoppingRunner {
 	BasinHoppingRunner(vector<double> &x0, MinimizerWrapper *minimizer, AdaptiveStepSize *step_taking, Metropolis *accept_test)
 		: minimizer(minimizer), step_taking(step_taking), accept_test(accept_test), res() {
 		auto minres = (*minimizer)(x0);
-		if (!minres.success) cout << "Minimize failed" << endl;
+		if(!minres.success) cout << "Minimize failed" << endl;
 
 		x = minres.x;
 		energy = minres.fun;
@@ -178,7 +177,7 @@ class BasinHoppingRunner {
 		bool new_global_min = false;
 		bool accept = true;
 		auto minres = monte_carlo_step(accept);
-		if (accept) {
+		if(accept) {
 			energy = minres.fun;
 			x = minres.x;
 			incumbent_minres = minres;
@@ -210,10 +209,10 @@ class BasinHoppingRunner {
 		auto minres = (*minimizer)(x_after_step);
 		auto x_after_quench = minres.x;
 		auto entergy_after_quench = minres.fun;
-		if (!minres.success) cout << "Minimize failed" << endl;
+		if(!minres.success) cout << "Minimize failed" << endl;
 
 		auto test_result = accept_test->accept_reject(minres, incumbent_minres);
-		if (!test_result) accept = false;
+		if(!test_result) accept = false;
 		step_taking->report(accept);
 
 		return minres;
@@ -230,21 +229,21 @@ OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, int 
 
 	// start main iteration loop
 	int count = 0;
-	for (int i = 0; i < params.niter; i++) {
+	for(int i = 0; i < params.niter; i++) {
 		auto new_global_min = bh.one_cycle();
 
 		// progress report
 		auto &min_result = bh.storage->get_lowest();
 		auto best = int_scale(min(best_s, get_scale(min_result.x)));
 		cout << R"({"event": "cont", "data": [)" << trials << ", " << i << ", " << best << ", " << count << "]}" << endl;
-		if (check_interrupt()) {
+		if(check_interrupt()) {
 			min_result.interrupted = true;
 			break;
 		}
 
 		count++;
-		if (new_global_min) count = 0;
-		else if (count > params.niter_success) break;
+		if(new_global_min) count = 0;
+		else if(count > params.niter_success) break;
 	}
 
 	return bh.storage->get_lowest();

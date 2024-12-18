@@ -14,12 +14,14 @@ double interval_distance(double l1, double w1, double l2, double w2) {
 double RoundedConstraint::constraint(const double *x, double *grad) const {
 	auto m = x[Shared::last];
 	auto d = dist * m;
-	auto dx = interval_distance(x[i * 2], m * (*flaps)[i].width, x[j * 2], m * (*flaps)[j].width);
-	auto dy = interval_distance(x[i * 2 + 1], m * (*flaps)[i].height, x[j * 2 + 1], m * (*flaps)[j].height);
+	const auto &fi = (*flaps)[i];
+	const auto &fj = (*flaps)[j];
+	auto dx = interval_distance(x[i * 2], m * fi.width, x[j * 2], m * fj.width);
+	auto dy = interval_distance(x[i * 2 + 1], m * fi.height, x[j * 2 + 1], m * fj.height);
 
-	if (grad) {
-		auto dx_s = dx > 0 ? -(*flaps)[j].width : (dx < 0 ? (*flaps)[i].width : 0);
-		auto dy_s = dy > 0 ? -(*flaps)[j].height : (dy < 0 ? (*flaps)[i].height : 0);
+	if(grad) {
+		auto dx_s = dx > 0 ? -fj.width : (dx < 0 ? fi.width : 0);
+		auto dy_s = dy > 0 ? -fj.height : (dy < 0 ? fi.height : 0);
 		reset(grad, 2 * dist * d - 2 * dx * dx_s - 2 * dy * dy_s);
 		grad[i * 2] = -2 * dx;
 		grad[j * 2] = 2 * dx;

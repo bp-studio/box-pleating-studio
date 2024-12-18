@@ -23,13 +23,13 @@ class Hierarchy {
 
 	const Sheet *sheet;
 	vector<Flap> flaps;
-	unordered_map<int, int> id_map;
-	unordered_map<int, int> id_lookup;
-
 	vector<DistMap> dist_map;
-	vector<Parent> parents;
-	unordered_map<int, Parent *> parent_map;
 
 	ConstraintList generate_constraints(const vector<bool> *fixed) const;
 	bool check(const vector<double> &x, int n, const vector<bool> &fixed) const;
+	const Parent *get_parent(int id) const;
+
+  private:
+	unordered_map<int, const Parent *> parent_map;
+	vector<const Parent> parents;
 };

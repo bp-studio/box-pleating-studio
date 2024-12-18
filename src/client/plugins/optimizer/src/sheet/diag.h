@@ -3,10 +3,10 @@
 
 #include "sheet.h"
 
-class Diag : public Sheet {
+class Diag: public Sheet {
   public:
 	static Sheet *getInstance() {
-		if (instance == nullptr) instance = new Diag();
+		if(instance == nullptr) instance = new Diag();
 		return instance;
 	}
 
@@ -19,6 +19,6 @@ class Diag : public Sheet {
 	vector<int> output(const vector<double> &solution) const override;
 
   private:
-	Diag() : Sheet(0.5) {} // Use the center of the sheet as origin
+	Diag(): Sheet(0.5) {} // Use the center of the sheet as origin
 	static Diag *instance;
 };

@@ -3,7 +3,7 @@
 #include "global/global.h"
 
 double FixedConstraint::constraint(const double *x, double *grad) const {
-	if (grad) {
+	if(grad) {
 		reset(grad, -v);
 		grad[i] = 1;
 	}

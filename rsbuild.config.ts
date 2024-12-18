@@ -8,8 +8,8 @@ import { InjectManifest } from "@aaroon/workbox-rspack-plugin";
 import { pluginSass } from "@rsbuild/plugin-sass";
 import { RsdoctorRspackPlugin } from "@rsdoctor/rspack-plugin";
 import postcssPresetEnv from "postcss-preset-env";
+import { createDescendantRegExp, makeTest } from "@mutsuntsai/rsbuild-utils";
 
-import { createDescendantRegExp, makeTest } from "./rsbuild.utils";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -101,7 +101,7 @@ export default defineConfig({
 						priority: -1,
 					},
 					i18n: {
-						test: makeTest(createDescendantRegExp("vue-i18n"), /locale\.ts/),
+						test: makeTest(createDescendantRegExp("vue-i18n"), /locale\.ts$/, /\.json$/),
 						name: "vue-i18n",
 						chunks: "all",
 						priority: 1,
@@ -204,6 +204,11 @@ export default defineConfig({
 				generator: {
 					filename: "log/[name][ext]",
 				},
+			});
+			addRules({
+				test: /\.json$/,
+				use: "./lib/locale.mjs",
+				type: "javascript/auto",
 			});
 
 			if(isDev) return;

@@ -27,7 +27,7 @@ vector<int> result;
 vector<double> read_initial_vector(double *&ptr, const Hierarchy &hierarchy) {
 	vector<double> x;
 	x.reserve(Shared::dim);
-	for (int i = 0; i < Shared::last; i++) x.push_back(read(ptr));
+	for(int i = 0; i < Shared::last; i++) x.push_back(read(ptr));
 	x.push_back(0);
 	setup_initial_scale(x, &hierarchy);
 	return x;
@@ -48,17 +48,17 @@ OptimizeResult solve_global(const vector<vector<double>> &initial_vectors, const
 	double best_s = MAX_SHEET_SIZE;
 	OptimizeResult best_result = {.success = false};
 	int trials = 0;
-	for (auto &vec : initial_vectors) {
+	for(const auto &vec: initial_vectors) {
 		trials++;
 		auto result = basin_hopping(vec, cons, trials, bhp, best_s);
-		if (result.success) {
+		if(result.success) {
 			auto s = get_scale(result.x);
-			if (s < best_s) {
+			if(s < best_s) {
 				best_result = std::move(result);
 				best_s = s;
 			}
 		}
-		if (result.interrupted) break;
+		if(result.interrupted) break;
 	}
 	return best_result;
 }
@@ -68,7 +68,9 @@ OptimizeResult solve_global(const vector<vector<double>> &initial_vectors, const
  */
 EXPORT void init(bool async) {
 	Shared::async = async;
-	int major, minor, bugfix;
+	int major;
+	int minor;
+	int bugfix;
 	nlopt::version(major, minor, bugfix);
 	cout << "NLopt version: " << major << "." << minor << "." << bugfix << endl;
 }
@@ -91,10 +93,10 @@ EXPORT Output *solve(double *ptr, unsigned int seed) {
 
 	OptimizeResult sol;
 	bool useView = read(ptr);
-	if (useView) {
+	if(useView) {
 		auto x0 = read_initial_vector(ptr, main);
 		bool useBH = read(ptr);
-		if (useBH) {
+		if(useBH) {
 			cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
 			sol = basin_hopping(x0, cons, 1, bhp, MAX_SHEET_SIZE);
 		} else {
@@ -109,9 +111,9 @@ EXPORT Output *solve(double *ptr, unsigned int seed) {
 		sol = solve_global(initial_vectors, cons);
 	}
 
-	if (sol.success) {
+	if(sol.success) {
 		auto int_sol = greedy_solve_integer(sol.x, &main);
-		for (int i = 0; i < Shared::dim; i++) result.push_back(int_sol[i]);
+		for(int i = 0; i < Shared::dim; i++) result.push_back(int_sol[i]);
 	}
 	output.size = result.size();
 	output.ptr = result.data();

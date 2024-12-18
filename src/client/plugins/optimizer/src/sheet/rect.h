@@ -3,10 +3,10 @@
 
 #include "sheet.h"
 
-class Rect : public Sheet {
+class Rect: public Sheet {
   public:
 	static Sheet *getInstance() {
-		if (instance == nullptr) instance = new Rect();
+		if(instance == nullptr) instance = new Rect();
 		return instance;
 	}
 
@@ -19,6 +19,6 @@ class Rect : public Sheet {
 	vector<int> output(const vector<double> &solution) const override;
 
   private:
-	Rect() : Sheet(0) {} // No offset
+	Rect(): Sheet(0) {} // No offset
 	static Rect *instance;
 };
