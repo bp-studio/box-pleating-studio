@@ -4,8 +4,10 @@ import { createI18n } from "vue-i18n";
 import "lib/bootstrap/bootstrap.scss";
 import "./style.css";
 
-import locale from "app/gen/locale";
+import locale from "app/shared/locale";
 import App from "./app.vue";
+
+import type { Composer } from "vue-i18n";
 
 // For unknown reason, the following line leads to ESLint error.
 // import type { BpsLocale } from "shared/frontend/locale";
@@ -20,5 +22,6 @@ const app = createSSRApp(App);
 app.use(i18n);
 app.mount("#app");
 
-i18n.global.locale = localStorage.getItem("locale") ?? "en";
-document.title = i18n.global.t("donate.title");
+const instance = i18n.global as unknown as Composer;
+instance.locale.value = localStorage.getItem("locale") ?? "en";
+document.title = instance.t("donate.title");

@@ -30,7 +30,6 @@ require("./gulp/tasks/tool.js");
 gulp.task("build", gulp.parallel(
 	"static",
 	"donate",
-	"locale",
 	"html"
 ));
 

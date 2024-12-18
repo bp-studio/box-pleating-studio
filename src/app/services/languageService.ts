@@ -2,11 +2,11 @@ import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 import probablyChina from "probably-china";
 
-import locale from "app/gen/locale";
+import locale from "app/shared/locale";
 import { useDebounce } from "app/utils/timerUtility";
 
 import type { I18n } from "vue-i18n";
-import type { BpsLocale } from "shared/frontend/locale";
+import type { BpsLocale } from "app/shared/locale";
 import type Settings from "./settingService";
 
 const LOCALE_KEY = "locale";

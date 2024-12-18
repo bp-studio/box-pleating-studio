@@ -136,7 +136,6 @@
 		"coverage": true,
 		"node_modules/": true,
 		"patches/": true,
-		"src/app/gen": true,
 		"test-results/": true
 	},
 	"i18n-ally.enabledFrameworks": [
