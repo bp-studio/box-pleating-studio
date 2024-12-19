@@ -80,7 +80,7 @@
 		"fancy-log": "^2.0.0",
 		"find-cache-dir": "^5.0.0",
 		"global-jsdom": "^25.0.0",
-		"globals": "^15.13.0",
+		"globals": "^15.14.0",
 		"gulp": "^5.0.0",
 		"gulp-all": "^1.1.0",
 		"gulp-esbuild": "^0.14.0",
@@ -112,7 +112,6 @@
 		"typescript": "^5.7.2",
 		"typescript-eslint": "^8.18.1",
 		"vinyl-ftp": "^0.6.1",
-		"vue-eslint-parser": "^9.4.3",
 		"yargs": "^17.7.2"
 	},
 	"dependencies": {
