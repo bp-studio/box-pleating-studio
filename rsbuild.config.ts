@@ -164,6 +164,7 @@ export default defineConfig({
 			addQuery: true,
 			max: 2,
 			minify: true,
+			test: url => !url.includes("gtag"),
 			onFail: ({ url }) => typeof (errMgr) !== "undefined" && errMgr.setResErr(url),
 		}),
 	],
