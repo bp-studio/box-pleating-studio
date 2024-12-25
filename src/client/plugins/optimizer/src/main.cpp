@@ -1,7 +1,7 @@
 #include <array>
 #include <emscripten.h>
 #include <iostream>
-#include <nlopt.hpp>
+#include <nlopt.h>
 #include <vector>
 
 #include "branching/greedy.h"
@@ -71,7 +71,7 @@ EXPORT void init(bool async) {
 	int major;
 	int minor;
 	int bugfix;
-	nlopt::version(major, minor, bugfix);
+	nlopt_version(&major, &minor, &bugfix);
 	cout << "NLopt version: " << major << "." << minor << "." << bugfix << endl;
 }
 

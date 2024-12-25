@@ -23,7 +23,7 @@ int find_index_by_id(const vector<Flap> &flaps, int id) {
 	for(int i = 0; i < Shared::flap_count; i++) {
 		if(flaps[i].id == id) return i;
 	}
-	throw std::runtime_error("Flap not found");
+	return -1; // Not possible
 }
 
 vector<Circle> make_circles(const Vec &vec, const Hierarchy &hierarchy, const Hierarchy &last_hierarchy) {

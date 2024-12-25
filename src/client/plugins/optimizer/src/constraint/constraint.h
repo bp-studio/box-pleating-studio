@@ -8,16 +8,15 @@
 using namespace std;
 
 // forward declaration
-namespace nlopt {
-	class opt;
-}
+struct nlopt_opt_s;
+using nlopt_opt = nlopt_opt_s *;
 
 /**
  * Base class of the constraints.
  */
 class Constraint {
   public:
-	void add_to(nlopt::opt &opt);
+	void add_to(nlopt_opt opt);
 	virtual ~Constraint() = default;
 
 	/**
@@ -38,9 +37,6 @@ class Constraint {
 	Constraint(Type type): type(type) {}
 	Type type;
 
-	// Using std::vector<double> functions with NLopt will result in copying memory,
-	// therefore it is better to use the C-flavored function signature.
-	// We don't need the array size parameter here since it is already known.
 	virtual double constraint(const double *x, double *grad) const = 0;
 
 	static double constraint_wrapper(unsigned n, const double *x, double *grad, void *data);

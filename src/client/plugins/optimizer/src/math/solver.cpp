@@ -3,7 +3,7 @@
 #include "math/scale.h"
 
 #include <iostream>
-#include <nlopt.hpp>
+#include <nlopt.h>
 
 int step = 0;
 
@@ -27,35 +27,38 @@ void clip_to_bounds(vector<double> &x0, const vector<double> &lower_bounds, cons
 }
 
 OptimizeResult pack(vector<double> x, const ConstraintList &cons, cfunc callback) {
-	nlopt::opt optimizer(nlopt::LD_SLSQP, Shared::dim);
+	/**
+	 * We deliberately use the C API of NLopt instead of the C++ API,
+	 * to save some overhead of conversion and error handling (which we don't need).
+	 */
+	nlopt_opt opt = nlopt_create(NLOPT_LD_SLSQP, Shared::dim);
+	nlopt_set_min_objective(opt, objective, (void *)callback);
 
-	optimizer.set_min_objective(objective, (void *)callback);
-
-	for(const auto &con: cons) con->add_to(optimizer);
+	for(const auto &con: cons) con->add_to(opt);
 
 	vector<double> lb(Shared::dim, 0);
 	vector<double> ub(Shared::dim, 1);
 	lb.back() = 1.0 / MAX_SHEET_SIZE;
 	ub.back() = 1.0 / MIN_SHEET_SIZE;
-	optimizer.set_lower_bounds(lb);
-	optimizer.set_upper_bounds(ub);
+
+	nlopt_set_lower_bounds(opt, lb.data());
+	nlopt_set_upper_bounds(opt, ub.data());
 
 	clip_to_bounds(x, lb, ub);
 
-	optimizer.set_maxeval(200);
-	optimizer.set_xtol_abs(1e-6);
-	optimizer.set_ftol_abs(1e-5);
+	nlopt_set_maxeval(opt, 200);
+	nlopt_set_xtol_abs1(opt, 1e-6);
+	nlopt_set_ftol_abs(opt, 1e-5);
 	step = 0;
 
 	/**
-	 * We have modified mythrow in nlopt.hpp, so no exception will be thrown here.
-	 *
 	 * According to the [NLopt docs](https://nlopt.readthedocs.io/en/latest/NLopt_Reference/#error-codes-negative-return-values),
 	 * in case of NLOPT_ROUNDOFF_LIMITED, the result is still typically useful.
 	 * However, it is known that wrong setup of the problem can equally trigger this error,
 	 * so in the end I think it is safer to treat it as failure still.
 	 */
 	double minf;
-	auto result = optimizer.optimize(x, minf);
+	auto result = nlopt_optimize(opt, x.data(), &minf);
+	nlopt_destroy(opt);					  // With C API we need to manually do this
 	return {x, result > 0, result, minf}; // RVO, no need to move x
 }

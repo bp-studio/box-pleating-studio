@@ -2,15 +2,15 @@
 #include "constraint.h"
 #include "class/hierarchy.h"
 
-#include <nlopt.hpp>
+#include <nlopt.h>
 
 constexpr double TOL = 1e-10;
 
-void Constraint::add_to(nlopt::opt &opt) {
+void Constraint::add_to(nlopt_opt opt) {
 	if(type == Type::equality) {
-		opt.add_equality_constraint(constraint_wrapper, this, TOL);
+		nlopt_add_equality_constraint(opt, constraint_wrapper, this, TOL);
 	} else {
-		opt.add_inequality_constraint(constraint_wrapper, this, TOL);
+		nlopt_add_inequality_constraint(opt, constraint_wrapper, this, TOL);
 	}
 }
 
