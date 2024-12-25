@@ -14,22 +14,10 @@ const htmlMinOption = {
 	},
 };
 
-function esVueOption(options) {
-	return {
-		templateOptions: {
-			compilerOptions: {
-				comments: false, // Remove HTML comments
-				directiveTransforms: options?.directiveTransforms,
-			},
-		},
-	};
-}
-
 // Setting ECMAScript building target
 const target = ["es2018", "chrome66", "edge79", "firefox78", "opera53", "safari11.1", "ios11.3"];
 
 function ssgOption(options) {
-	const vt = require("@intlify/vue-i18n-extensions").transformVTDirective;
 	const esVue = require("@mutsuntsai/esbuild-plugin-vue");
 	const VueI18n = require("vue-i18n");
 	const i18n = VueI18n.createI18n({
@@ -47,9 +35,13 @@ function ssgOption(options) {
 		},
 		esbuildOptions: {
 			plugins: [
-				esVue(esVueOption({
-					directiveTransforms: { t: vt(i18n) }, // So that v-t directives will be processed
-				})),
+				esVue({
+					templateOptions: {
+						compilerOptions: {
+							comments: false, // Remove HTML comments
+						},
+					},
+				}),
 			],
 			external: [
 				// Mark async dependencies as external to reduce compile time

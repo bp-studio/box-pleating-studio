@@ -1,11 +1,11 @@
 <template>
-	<div v-t="'panel.vertices.type'" class="h5 panel-title"></div>
+	<div class="h5 panel-title">{{ $t("panel.vertices.type") }}</div>
 	<div v-if="selections.some(s => s.isLeaf)">
-		<AsyncButton v-if="!design.tree.isMinimal" :click="() => design.delete()" v-t="'keyword.delete'" />
-		<span v-else v-t="'message.min3vertex'"></span>
+		<AsyncButton v-if="!design.tree.isMinimal" :click="() => design.delete()">{{ $t("keyword.delete") }}</AsyncButton>
+		<span v-else>{{ $t("message.min3vertex") }}</span>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="design.goToDual()" v-t="'panel.vertices.goto'" :title="hk('n', 'd')"></button>
+		<button class="btn btn-primary" @click="design.goToDual()" :title="hk('n', 'd')">{{ $t("panel.vertices.goto") }}</button>
 	</div>
 </template>
 

@@ -5,9 +5,9 @@
 	<div class="modal fade" ref="el">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-body" v-t="'message.patternNotFound'"></div>
+				<div class="modal-body">{{ $t("message.patternNotFound") }}</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
 				</div>
 			</div>
 		</div>

@@ -3,7 +3,7 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header">
-					<div class="h4 modal-title" v-t="'share.title'"></div>
+					<div class="h4 modal-title">{{ $t("share.title") }}</div>
 				</div>
 				<div class="modal-body p-5 text-center" v-if="sending">
 					<i class="bp-spinner fa-spin display-4" />
@@ -30,7 +30,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
 					</div>
 				</template>
 			</div>

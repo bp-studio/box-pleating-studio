@@ -3,7 +3,7 @@
 			:description="formats[options.format].description" :extension="'.' + options.format" screen="CP"
 			:observe="() => options" @save="save">
 		<div class="row">
-			<label class="col-4 mb-2 col-form-label fw-bolder" v-t="'plugin.CP.format'"></label>
+			<label class="col-4 mb-2 col-form-label fw-bolder">{{ $t("plugin.CP.format") }}</label>
 			<div class="col mb-2">
 				<select class="form-select" v-model="options.format">
 					<option value="cp">CP</option>

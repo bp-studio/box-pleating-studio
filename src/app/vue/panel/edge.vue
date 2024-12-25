@@ -1,13 +1,14 @@
 <template>
-	<div v-t="'panel.edge.type'" class="h5 panel-title"></div>
+	<div class="h5 panel-title">{{ $t("panel.edge.type") }}</div>
 	<div class="panel-grid">
 		<Number :label="$t('panel.edge.length')" v-model="subject.length" :min="1" :max="subject.maxLength" hotkeys="d.rd,d.ri" />
 	</div>
 	<div class="mt-3">
-		<AsyncButton class="me-2" :disabled="subject.cannotSplit" :click="() => subject.split()" v-t="'panel.edge.split'" />
+		<AsyncButton class="me-2" :disabled="subject.cannotSplit" :click="() => subject.split()">{{ $t("panel.edge.split") }}
+		</AsyncButton>
 		<template v-if="subject.isDeletable">
-			<AsyncButton v-if="subject.isRiver" :click="() => subject.deleteAndMerge()" v-t="'panel.edge.merge'" />
-			<AsyncButton v-else :click="() => subject.delete()" v-t="'keyword.delete'" />
+			<AsyncButton v-if="subject.isRiver" :click="() => subject.deleteAndMerge()">{{ $t("panel.edge.merge") }}</AsyncButton>
+			<AsyncButton v-else :click="() => subject.delete()">{{ $t("keyword.delete") }}</AsyncButton>
 		</template>
 	</div>
 	<div class="mt-3">

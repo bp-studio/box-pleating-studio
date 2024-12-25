@@ -1,8 +1,8 @@
 <template>
-	<div v-t="'panel.repo.type'" class="h5 panel-title"></div>
+	<div class="h5 panel-title">{{ $t("panel.repo.type") }}</div>
 	<template v-if="stretch.repo">
 		<div class="row" v-if="configCount(stretch.repo) == 1 && patternCount(stretch.repo) == 1">
-			<label class="col-form-label col" v-t="'panel.repo.onlyOne'"></label>
+			<label class="col-form-label col">{{ $t("panel.repo.onlyOne") }}</label>
 		</div>
 		<div class="panel-grid" v-else>
 			<Store :size="configCount(stretch.repo)" :index="stretch.configIndex" @move="stretch.switchConfig($event)"
