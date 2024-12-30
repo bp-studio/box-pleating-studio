@@ -4,10 +4,10 @@
 #include "class/flap.h"
 #include "constraint.h"
 
-class RoundedConstraint: public Constraint {
+class RoundedConstraint: public ScalarConstraint {
   public:
 	RoundedConstraint(int i, int j, int dist, const vector<Flap> *flaps)
-		: Constraint(Type::inequality), i(i), j(j), dist(dist), flaps(flaps) {}
+		: ScalarConstraint(Type::inequality), i(i), j(j), dist(dist), flaps(flaps) {}
 
 	static double exact(const vector<double> &x, int i, int j, int dist, const vector<Flap> &flaps);
 

@@ -3,10 +3,10 @@
 
 Rect *Rect::instance = nullptr;
 
-class RectBounds: public Constraint {
+class RectBounds: public ScalarConstraint {
   public:
 	RectBounds(int i, int dim)
-		: Constraint(Type::inequality), i(i), dim(dim) {}
+		: ScalarConstraint(Type::inequality), i(i), dim(dim) {}
 
   protected:
 	const int i;

@@ -1,27 +1,37 @@
 
 #include "diag.h"
 
+#include <array>
+
 Diag *Diag::instance = nullptr;
 
-class DiagBounds: public Constraint {
+// LL, UR, UL, LR
+const array<double, 4> fx = {-1, 1, -1, 1};
+const array<double, 4> fy = {-1, 1, 1, -1};
+const array<double, 4> v = {0.5, -1.5, -0.5, -0.5};
+
+class DiagBounds: public VectorConstraint {
   public:
-	DiagBounds(int i, int fx, int fy, int offset, double v)
-		: Constraint(Type::inequality), i(i), fx(fx), fy(fy), offset(offset), v(v) {}
+	DiagBounds(int i, int offset)
+		: VectorConstraint(Type::inequality, 4), ix(i * 2), iy(i * 2 + 1), off{-offset, offset, offset, offset} {}
 
   protected:
-	const int i;
-	const int fx;
-	const int fy;
-	const int offset;
-	const double v;
+	const int ix;
+	const int iy;
+	const array<int, 4> off;
 
-	double constraint(const double *x, double *grad) const override {
+	void constraint(double *result, const double *x, double *grad) const override {
 		if(grad) {
-			reset(grad, offset);
-			grad[i * 2] = fx;
-			grad[i * 2 + 1] = fy;
+			for(int n = 0; n < 4; n++) {
+				reset(grad, off[n]);
+				grad[ix] = fx[n];
+				grad[iy] = fy[n];
+				grad += Shared::dim;
+			}
 		}
-		return fx * x[i * 2] + fy * x[i * 2 + 1] + offset * x[Shared::last] + v;
+		for(int n = 0; n < 4; n++) {
+			*(result + n) = fx[n] * x[ix] + fy[n] * x[iy] + off[n] * x[Shared::last] + v[n];
+		}
 	}
 };
 
@@ -30,10 +40,7 @@ void Diag::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vec
 		if(fixed && (*fixed)[i]) continue;
 		const auto &flap = flaps[i];
 		auto offset = min(flap.width, flap.height);
-		cons.emplace_back(make_unique<DiagBounds>(i, -1, -1, -offset, 0.5)); // LL
-		cons.emplace_back(make_unique<DiagBounds>(i, 1, 1, offset, -1.5));	 // UR
-		cons.emplace_back(make_unique<DiagBounds>(i, -1, 1, offset, -0.5));	 // UL
-		cons.emplace_back(make_unique<DiagBounds>(i, 1, -1, offset, -0.5));	 // LR
+		cons.emplace_back(make_unique<DiagBounds>(i, offset));
 	}
 }
 

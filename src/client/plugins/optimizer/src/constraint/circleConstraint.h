@@ -3,10 +3,10 @@
 
 #include "constraint.h"
 
-class CircleConstraint: public Constraint {
+class CircleConstraint: public ScalarConstraint {
   public:
 	CircleConstraint(int i, int j, int dist)
-		: Constraint(Type::inequality), i(i), j(j), dist(dist) {}
+		: ScalarConstraint(Type::inequality), i(i), j(j), dist(dist) {}
 
   protected:
 	const int i;

@@ -77,8 +77,7 @@ ConstraintList BranchingContext::generate_constraints(const vector<double> &sol)
 	const auto &offset = hierarchy->sheet->offset;
 	for(int i = 0; i < Shared::flap_count; i++) {
 		if(!fixed[i]) continue;
-		result.emplace_back(make_unique<FixedConstraint>(i * 2, sol[i * 2], offset));
-		result.emplace_back(make_unique<FixedConstraint>(i * 2 + 1, sol[i * 2 + 1], offset));
+		result.emplace_back(make_unique<FixedConstraint>(i * 2, sol[i * 2], sol[i * 2 + 1], offset));
 	}
 	return result;
 }
