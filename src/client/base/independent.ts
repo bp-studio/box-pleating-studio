@@ -27,14 +27,4 @@ export abstract class Independent extends Draggable {
 	public abstract $testGrid(grid: Grid): boolean;
 
 	public abstract $anchors(): IPoint[];
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	protected _fixVector(pt: IPoint, v: IPoint): IPoint {
-		const target = { x: pt.x + v.x, y: pt.y + v.y };
-		const fix = this._sheet.grid.$constrain(target);
-		return { x: fix.x - pt.x, y: fix.y - pt.y };
-	}
 }

@@ -3,6 +3,7 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
 import { MAX_SHEET_SIZE, MIN_RECT_SIZE } from "shared/types/constants";
+import { rectangularConstrain } from "./constrain";
 
 import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
@@ -128,13 +129,7 @@ export class RectangularGrid extends Grid {
 	}
 
 	public $constrain(p: IPoint): IPoint {
-		let { x, y } = p;
-		const w = this._width, h = this._height;
-		if(x < 0) x = 0;
-		if(x > w) x = w;
-		if(y < 0) y = 0;
-		if(y > h) y = h;
-		return { x, y };
+		return rectangularConstrain(this._width, this._height, p);
 	}
 
 	public $contains(p: IPoint): boolean {

@@ -259,7 +259,8 @@ export class Tree implements ITree, ISerializable<TreeData> {
 	 * Used only during initialization.
 	 */
 	private _setEdge(n1: NodeId, n2: NodeId, length: number): boolean {
-		let N1 = this._nodes[n1], N2 = this._nodes[n2];
+		let N1 = this._nodes[n1];
+		const N2 = this._nodes[n2];
 
 		// If the tree is non-empty, one of the vertices must be present.
 		if(this.$root && !N1 && !N2) {
@@ -275,13 +276,18 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			return false;
 		}
 
-		if(N2) {
-			N1 = this._addNode(n1, N2, length);
-		} else {
-			if(!N1) this.$root = N1 = this._addNode(n1);
-			N2 = this._addNode(n2, N1, length);
+		try {
+			if(N2) {
+				this._addNode(n1, N2, length);
+			} else {
+				if(!N1) this.$root = N1 = this._addNode(n1);
+				this._addNode(n2, N1, length);
+			}
+			UpdateResult.$edit([true, { n1, n2, length }]);
+			return true;
+		} catch {
+			// tree overflow
+			return false;
 		}
-		UpdateResult.$edit([true, { n1, n2, length }]);
-		return true;
 	}
 }

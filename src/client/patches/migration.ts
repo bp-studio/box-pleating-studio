@@ -60,9 +60,12 @@ export namespace Migration {
 		}
 		proj.version = $getCurrentVersion();
 
-		const callback = options.onDeprecate;
 		/* istanbul ignore next: legacy code */
-		if(callback && deprecate) callback(proj.design!.title);
+		if(deprecate) {
+			delete proj.history; // In deprecated files, history records are likely invalid.
+			options.onDeprecate?.(proj.design!.title);
+		}
+
 		return proj as JProject;
 	}
 

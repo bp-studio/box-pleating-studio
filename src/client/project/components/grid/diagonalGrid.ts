@@ -5,6 +5,7 @@ import { drawPath } from "client/utils/contourUtil";
 import { Grid } from "./grid";
 import { chebyshev } from "client/utils/chebyshev";
 import { MAX_SHEET_SIZE, MIN_DIAG_SIZE } from "shared/types/constants";
+import { diagonalConstrain } from "./constrain";
 
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path, TransformationMatrix } from "shared/types/geometry";
@@ -103,39 +104,7 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public $constrain(p: IPoint): IPoint {
-		let { x, y } = p;
-		const s = this._size, h = s % 2;
-		const f = (s - h) / 2;
-		const c = (s + h) / 2;
-
-		if(x + y < f) {
-			const d = f - x - y;
-			x += Math.floor(d / 2);
-			y += Math.ceil(d / 2);
-		}
-
-		if(y - x > c) {
-			const d = y - x - c;
-			x += Math.floor(d / 2);
-			y -= Math.ceil(d / 2);
-		}
-
-		if(x - y > c) {
-			const d = x - y - c;
-			x -= Math.floor(d / 2);
-			y += Math.ceil(d / 2);
-		}
-
-		if(x + y > c + s) {
-			const d = x + y - c - s;
-			x -= Math.floor(d / 2);
-			y -= Math.ceil(d / 2);
-		}
-
-		if(x < 0) x = 0;
-		if(x > s) x = s;
-
-		return { x, y };
+		return diagonalConstrain(this._size, this._size, p);
 	}
 
 	public $contains(p: IPoint): boolean {

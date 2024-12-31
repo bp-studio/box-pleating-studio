@@ -9,6 +9,7 @@ import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { getRelativePoint } from "../sheet";
 import { MAX_TREE_HEIGHT } from "shared/types/constants";
+import { constrainVertex } from "../grid/constrain";
 
 import type { Grid } from "../grid/grid";
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
@@ -139,7 +140,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		return this._fixVector(this._location, v);
+		return constrainVertex(p => this._sheet.grid.$constrain(p), this._location, v);
 	}
 
 	public override $selectableWith(c: Control): boolean {

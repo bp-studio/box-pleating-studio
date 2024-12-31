@@ -1,5 +1,6 @@
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
+import { MAX_SHEET_SIZE } from "shared/types/constants";
 
 import type { JProject } from "shared/json";
 
@@ -41,6 +42,21 @@ describe("Migration", function() {
 			expect(result.state?.layout).to.have.all.keys("zoom", "scroll");
 			expect(result.design.layout).to.not.have.any.keys("zoom", "scroll");
 		});
+	});
+
+	describe("v0.7", function() {
+
+		let result: JProject;
+
+		before(async function() {
+			const sample = await getJSON("v06.troll.sample.json");
+			result = Migration.$process(sample);
+		});
+
+		it("Imposes sheet limit", function() {
+			expect(result.design.layout.sheet.width).to.equal(MAX_SHEET_SIZE);
+		});
+
 	});
 
 });

@@ -1,4 +1,6 @@
 
+import type { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
+
 /**
  * In practice, user's device will probably crash before reaching this limit.
  */
@@ -13,3 +15,8 @@ export const MAX_TREE_HEIGHT = 11586;
 
 export const MIN_RECT_SIZE = 4; // Used to be 8, now 4.
 export const MIN_DIAG_SIZE = 6;
+
+/**
+ * This limit comes from our implementation of {@link IntDoubleMap}.
+ */
+export const MAX_VERTICES = 65535;

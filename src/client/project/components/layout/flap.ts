@@ -11,6 +11,7 @@ import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { shallowRef } from "client/shared/decorators";
 import { SelectionController } from "client/controllers/selectionController";
+import { constrainFlap, getDots } from "../grid/constrain";
 
 import type { Grid } from "../grid/grid";
 import type { LabelView } from "client/utils/label";
@@ -183,34 +184,7 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		const w = this._width, h = this._height;
-		const zeroWidth = w === 0;
-		const zeroHeight = h === 0;
-		const { x, y } = this._location;
-		if(zeroWidth && zeroHeight) {
-			return this._fixVector(this._location, v);
-		} else if(zeroWidth || zeroHeight) {
-			v = this._fixVector(this._location, v);
-			const p = zeroWidth ? { x, y: y + h } : { x: x + w, y };
-			return this._fixVector(p, v);
-		} else {
-			// We allow at most one tip to go beyond the range of the sheet.
-			const data = getDots(this._location, w, h)
-				.map(p => {
-					const fix = this._fixVector(p, v);
-					const dx = fix.x - v.x;
-					const dy = fix.y - v.y;
-					const d = dx * dx + dy * dy;
-					return { p, d, fix };
-				})
-				.filter(e => e.d > 0)
-				.sort((a, b) => b.d - a.d);
-			if(data.length <= 1) return v;
-			let result = data[1].fix;
-			if(data[2]) result = this._fixVector(data[2].p, result);
-			if(data[3]) result = this._fixVector(data[3].p, result);
-			return result;
-		}
+		return constrainFlap(p => this._sheet.grid.$constrain(p), this._location, this._width, this.height, v);
 	}
 
 	public $testGrid(grid: Grid): boolean {
@@ -335,15 +309,4 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 			.filter(p => !grid.$contains(p))
 			.length <= 1; // At most one tip may go beyond the range of the sheet.
 	}
-}
-
-/** Tip positions, ordered by quadrants. */
-function getDots(location: IPoint, w: number, h: number): IPoint[] {
-	const { x, y } = location;
-	return [
-		{ x: x + w, y: y + h },
-		{ x, y: y + h },
-		location,
-		{ x: x + w, y },
-	];
 }

@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-
 import { unlink } from "../base/doubleLink";
 
 import type { IDoubleLinkedNode } from "../base/doubleLink";
@@ -13,7 +12,7 @@ export const MAX = (1 << SHIFT) - 1;
  * {@link IntDoubleMap} is an {@link IDoubleMap} with integer indices.
  *
  * Here we use bit operations to improve performance,
- * with the price of maximal index being only {@link MAX} = `2 ** 16 - 1` = 65535.
+ * with the price of maximal index being only {@link MAX} = `2 ** {@link SHIFT} - 1` = 65535.
  * In practice this is quite sufficient for our use cases.
  * In the implementation here, we will check the validity of the
  * parameters in the {@link set} method.

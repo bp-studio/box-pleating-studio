@@ -1,4 +1,5 @@
 import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
+import { MAX_VERTICES } from "shared/types/constants";
 
 export default function() {
 
@@ -39,7 +40,7 @@ export default function() {
 
 	it("Checks validity of indices", function() {
 		const map = new IntDoubleMap<number, number>();
-		expect(MAX).to.equal(65_535);
+		expect(MAX).to.equal(MAX_VERTICES);
 		expect(() => map.set(-1, 0, 0)).to.throw();
 		expect(() => map.set(1.1, 0, 0)).to.throw();
 		expect(() => map.set(MAX + 1, 0, 0)).to.throw();
