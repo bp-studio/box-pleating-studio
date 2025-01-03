@@ -6,6 +6,7 @@ import { chebyshev } from "client/utils/chebyshev";
 import { applyTransform, dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
+import { MAX_VERTICES } from "shared/types/constants";
 
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { IEditor } from "../sheet";
@@ -14,7 +15,6 @@ import type { JTree, JVertex, NodeId } from "shared/json";
 import type { Tree } from "./tree";
 import type { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 
-const MAX_VERTICES = 65535;
 const MIN_VERTICES = 3;
 const X_DISPLACEMENT = 0.125;
 const Y_DISPLACEMENT = 0.0625;

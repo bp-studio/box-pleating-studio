@@ -10,10 +10,10 @@
 			</div>
 			<div class="col-auto">
 				<button type="button" class="btn btn-secondary me-2" @click="context.skip"
-						:disabled="context.state.skipping || context.state.stopping || noSkip"
-						v-t="'plugin.optimizer.skip'"></button>
-				<button type="button" class="btn btn-danger" @click="context.stop" :disabled="context.state.stopping"
-						v-t="'keyword.abort'"></button>
+						:disabled="context.state.skipping || context.state.stopping || noSkip">{{ $t("plugin.optimizer.skip")
+					}}</button>
+				<button type="button" class="btn btn-danger" @click="context.stop" :disabled="context.state.stopping">{{
+					$t("keyword.abort") }}</button>
 			</div>
 		</div>
 	</div>

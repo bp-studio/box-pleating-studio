@@ -3,7 +3,7 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header h4 d-flex">
-					<div class="modal-title flex-grow-1" v-t="'plugin.optimizer._'"></div>
+					<div class="modal-title flex-grow-1">{{ $t("plugin.optimizer._") }}</div>
 					<a class="text-info" href="https://bp-studio.github.io/manual.html#layout-optimization" target="_blank">
 						<i class="fa-regular fa-circle-question"></i>
 					</a>
@@ -11,7 +11,7 @@
 				<div class="modal-body" v-if="support">
 					<div v-if="state.stage == Stage.stopped">
 						<div class="row mb-2">
-							<label class="col-12 col-sm-4 col-form-label fw-bolder" v-t="'plugin.optimizer.options._'"></label>
+							<label class="col-12 col-sm-4 col-form-label fw-bolder">{{ $t("plugin.optimizer.options._") }}</label>
 							<div class="col">
 								<Toggle v-model="options.openNew">{{ $t('plugin.optimizer.options.openNew') }}</Toggle>
 								<Toggle v-model="options.useDimension">{{ $t('plugin.optimizer.options.useDim') }}</Toggle>
@@ -19,17 +19,17 @@
 						</div>
 						<div class="row">
 							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder"
-								   v-t="'plugin.optimizer.layout._'"></label>
+								  >{{ $t("plugin.optimizer.layout._") }}</label>
 							<div class="col mb-2">
 								<select class="form-select" v-model="options.layout">
-									<option value="view" v-t="'plugin.optimizer.layout.view'"></option>
-									<option value="random" v-t="'plugin.optimizer.layout.random'"></option>
+									<option value="view">{{ $t("plugin.optimizer.layout.view") }}</option>
+									<option value="random">{{ $t("plugin.optimizer.layout.random") }}</option>
 								</select>
 								<div class="row" v-if="options.layout == 'view'">
 									<Toggle v-model="options.useBH">{{ $t('plugin.optimizer.layout.useBH') }}</Toggle>
 								</div>
 								<div class="row mt-2 gx-3" v-if="options.layout == 'random'">
-									<div class="col-auto col-form-label" v-t="'plugin.optimizer.layout.toTry'"></div>
+									<div class="col-auto col-form-label">{{ $t("plugin.optimizer.layout.toTry") }}</div>
 									<div class="col">
 										<Number v-model="options.random" :disabled="options.layout != 'random'" :min="1"
 												:max="100" />
@@ -70,10 +70,10 @@
 						<pre>An error occurred: {{ state.error }}</pre>
 					</div>
 				</div>
-				<div class="modal-body" v-else v-t="'plugin.optimizer.unsupported'"></div>
+				<div class="modal-body" v-else>{{ $t("plugin.optimizer.unsupported") }}</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" :disabled="state.running" data-bs-dismiss="modal"
-							@click="state.stage = Stage.stopped" v-t="'keyword.close'"></button>
+							@click="state.stage = Stage.stopped">{{ $t("keyword.close") }}</button>
 					<button v-if="support" type="button" class="btn btn-primary"
 							:disabled="state.running || state.stage == Stage.error" @click="run">
 						<span v-if="state.running">

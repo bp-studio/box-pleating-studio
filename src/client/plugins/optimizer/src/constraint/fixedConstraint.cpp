@@ -2,10 +2,13 @@
 #include "fixedConstraint.h"
 #include "global/global.h"
 
-double FixedConstraint::constraint(const double *x, double *grad) const {
+void FixedConstraint::constraint(double *result, const double *x, double *grad) const {
 	if(grad) {
-		reset(grad, -v);
+		reset(grad, -vx);
+		reset(grad + Shared::dim, -vy);
 		grad[i] = 1;
+		grad[i + 1 + Shared::dim] = 1;
 	}
-	return x[i] - offset - v * x[Shared::last];
+	*result = x[i] - offset - vx * x[Shared::last];
+	*(result + 1) = x[i + 1] - offset - vy * x[Shared::last];
 }

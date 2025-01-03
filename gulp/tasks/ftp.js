@@ -111,6 +111,7 @@ gulp.task("cleanPub", () => configGuard() && seriesIf(
 	},
 	() => cleanFactory("bp")
 ));
+gulp.task("cleanPubInternal_", () => configGuard() && cleanFactory("bp"));
 gulp.task("uploadPub", () => configGuard() && ftpFactory("bp"));
 
 /**

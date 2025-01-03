@@ -1,9 +1,9 @@
 <template>
 	<div class="browser-only col-12 col-lg-10 col-xl-8">
 		<div v-if="(installAvailable || prompt || ios) && welcomeScreenReady && state == installState.uninstalled">
-			<p v-t="'welcome.install.hint'"></p>
-			<p v-if="ios" v-t="'welcome.install.ios'"></p>
-			<button v-else-if="!nativeMode" class="btn btn-primary" @click="install" v-t="'welcome.install.bt'"></button>
+			<p>{{ $t("welcome.install.hint") }}</p>
+			<p v-if="ios">{{ $t("welcome.install.ios") }}</p>
+			<button v-else-if="!nativeMode" class="btn btn-primary" @click="install">{{ $t("welcome.install.bt") }}</button>
 			<button v-else class="btn btn-primary" disabled>
 				{{ $t('welcome.install.prepare') }}&nbsp;
 				<i class="bp-spinner fa-spin" />
@@ -14,8 +14,8 @@
 			<i class="bp-spinner fa-spin" />
 		</div>
 		<div v-if="state == installState.installed">
-			<p v-t="'welcome.install.ed'"></p>
-			<a class="btn btn-primary" rel="noopener" :href="origin" target="_blank" v-t="'welcome.install.open'"></a>
+			<p>{{ $t("welcome.install.ed") }}</p>
+			<a class="btn btn-primary" rel="noopener" :href="origin" target="_blank">{{ $t("welcome.install.open") }}</a>
 		</div>
 	</div>
 </template>

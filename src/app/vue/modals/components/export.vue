@@ -8,12 +8,12 @@
 				<div class="modal-body">
 					<slot></slot>
 					<div class="row mb-2" v-if="!isFileApiEnabled">
-						<div class="col col-form-label flex-grow-0" v-t="'keyword.filename'"></div>
+						<div class="col col-form-label flex-grow-0">{{ $t("keyword.filename") }}</div>
 						<div class="col flex-grow-1">
 							<input type="text" class="form-control" v-model="extFilename" />
 						</div>
 					</div>
-					<div v-if="isInApp" v-t="'message.inApp'"></div>
+					<div v-if="isInApp">{{ $t("message.inApp") }}</div>
 					<div class="p-2 text-center">
 						<button disabled v-if="!url" type="button" class="btn btn-lg btn-success">
 							<i class="bp-spinner fa-spin" />
@@ -22,12 +22,12 @@
 									 @click="save">
 							{{ $t("keyword.export") }}
 						</CheckButton>
-						<a v-else :href="url" :download="extFilename" class="btn btn-lg btn-success" v-t="'keyword.download'"
-						   @click="$emit('save')"></a>
+						<a v-else :href="url" :download="extFilename" class="btn btn-lg btn-success" @click="$emit('save')">{{
+							$t("keyword.download") }}</a>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
 				</div>
 			</div>
 		</div>

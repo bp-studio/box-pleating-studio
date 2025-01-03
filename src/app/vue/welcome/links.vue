@@ -1,11 +1,11 @@
 <template>
 	<i18n-t keypath="welcome.intro[1]" tag="p" scope="global">
-		<a target="_blank" rel="noopener" href="https://bp-studio.github.io/" v-t="'welcome.website'"></a>
+		<a target="_blank" rel="noopener" href="https://bp-studio.github.io/">{{ $t("welcome.website") }}</a>
 	</i18n-t>
 	<p>
 		💥
 		<i18n-t keypath="welcome.discord" tag="span" scope="global">
-			<a target="_blank" rel="noopener" href="https://discord.gg/HkcdTDS4zZ" v-t="'keyword.discord'"></a>
+			<a target="_blank" rel="noopener" href="https://discord.gg/HkcdTDS4zZ">{{ $t("keyword.discord") }}</a>
 		</i18n-t>
 	</p>
 	<div class="font-preload">

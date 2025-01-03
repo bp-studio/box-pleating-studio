@@ -82,7 +82,7 @@ gulp.task("deployPub", () => seriesIf(
 	},
 	"buildDist",
 	"uploadPub",
-	"cleanPub"
+	"cleanPubInternal_"
 ));
 
 // Clear all built files

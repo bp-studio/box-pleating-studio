@@ -3,15 +3,16 @@
 
 #include "constraint.h"
 
-class FixedConstraint: public Constraint {
+class FixedConstraint: public VectorConstraint {
   public:
-	FixedConstraint(int i, double v, double offset)
-		: Constraint(Type::equality), i(i), v(v), offset(offset) {}
+	FixedConstraint(int i, double x, double y, double offset)
+		: VectorConstraint(Type::equality, 2), i(i), vx(x), vy(y), offset(offset) {}
 
   protected:
 	const int i;
-	const double v;
+	const double vx;
+	const double vy;
 	const double offset;
 
-	double constraint(const double *x, double *grad) const override;
+	void constraint(double *result, const double *x, double *grad) const override;
 };

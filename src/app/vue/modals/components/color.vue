@@ -4,7 +4,7 @@
 		<div class="form-check d-inline-block text-start">
 			<input class="form-check-input" type="radio" :name="id" :id="id" :checked="modelValue === undefined"
 				   @input="toDefault">
-			<label class="form-check-label" :for="id" v-t="'preference.color.default'" />
+			<label class="form-check-label" :for="id">{{ $t("preference.color.default") }}</label>
 		</div>
 	</div>
 	<div class="text-end">

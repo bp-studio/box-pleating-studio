@@ -251,7 +251,7 @@
 		"invalidLink": "Unexpected error occurred upon opening the project link; the data might be corrupted.",
 		"latest": "You already have the latest version of BP Studio.",
 		"min3vertex": "The tree needs to have at least 3 vertices.",
-		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and some stretch patterns may need to be re-selected. It will be updated to the latest format on the next saving.",
+		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and part of the design has been modified. It will be updated to the latest format on the next saving.",
 		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
 		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?",
 		"updateReady": "A newer version of BP Studio is ready and will update automatically on restart. Would you like to restart now?",

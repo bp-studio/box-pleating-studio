@@ -255,7 +255,9 @@
 			 * @param error {string}
 			 */
 			function setResErr(error) {
-				if(error.indexOf("gtag") >= 0) return; // Ignore GA loading error
+				// ignore errors caused by extensions (also GA)
+				if(error.indexOf("http") == 0 && error.indexOf(location.origin) < 0) return;
+
 				if(!resErr) {
 					resErr = error;
 					setTimeout(self.callback, 0);

@@ -1,6 +1,6 @@
 <template>
 	<Dialog ref="dialog">
-		<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
+		<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
 	</Dialog>
 </template>
 

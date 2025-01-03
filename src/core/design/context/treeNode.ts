@@ -2,6 +2,7 @@ import { AABB } from "./aabb/aabb";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
 import { State } from "core/service/state";
 import { UpdateResult } from "core/service/updateResult";
+import { MAX_TREE_HEIGHT } from "shared/types/constants";
 
 import type { JNode } from "core/service/updateModel";
 import type { Comparator } from "shared/types/types";
@@ -58,14 +59,15 @@ export class TreeNode implements ITreeNode {
 
 	constructor(id: NodeId, parent?: TreeNode, length: number = 0) {
 		this.id = id;
-		State.$childrenChanged.add(this);
-		UpdateResult.$addNode(id);
 		if(parent) {
 			this.$length = length;
+			this.$dist = parent.$dist + length;
+			if(this.$dist > MAX_TREE_HEIGHT) throw new Error("tree overflow");
 			this.$AABB.$setMargin(length);
 			this.$pasteTo(parent as this);
-			this.$dist = parent.$dist + length;
 		}
+		State.$childrenChanged.add(this);
+		UpdateResult.$addNode(id);
 	}
 
 	public toJSON(): JEdge {

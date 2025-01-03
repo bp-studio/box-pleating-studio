@@ -5,10 +5,10 @@
 				<div class="container-fluid d-flex flex-column">
 					<div class="row justify-content-center flex-grow-0">
 						<div class="col-12 col-lg-10 col-xl-8">
-							<div class="h2 d-none d-sm-block" v-t="'welcome.title'"></div>
-							<div class="h3 d-sm-none" v-t="'welcome.title'"></div>
+							<div class="h2 d-none d-sm-block">{{ $t("welcome.title") }}</div>
+							<div class="h3 d-sm-none">{{ $t("welcome.title") }}</div>
 
-							<p class="mt-4" v-t="'welcome.intro[0]'"></p>
+							<p class="mt-4">{{ $t("welcome.intro[0]") }}</p>
 							<Links />
 						</div>
 						<Instructions />

@@ -4,8 +4,8 @@
 			<table class="w-100 table table-sm table-bordered m-0">
 				<thead>
 					<tr>
-						<th class="ps-1" v-t="'preference.command'"></th>
-						<th class="ps-1" v-t="'preference.hotkey'"></th>
+						<th class="ps-1">{{ $t("preference.command") }}</th>
+						<th class="ps-1">{{ $t("preference.hotkey") }}</th>
 					</tr>
 				</thead>
 			</table>

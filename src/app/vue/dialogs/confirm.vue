@@ -1,7 +1,7 @@
 <template>
 	<DialogVue ref="dialog">
-		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" v-t="'keyword.no'"></button>
-		<button type="button" class="btn btn-primary" v-t="'keyword.yes'" @click="yes"></button>
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t("keyword.no") }}</button>
+		<button type="button" class="btn btn-primary" @click="yes">{{ $t("keyword.yes") }}</button>
 	</DialogVue>
 </template>
 

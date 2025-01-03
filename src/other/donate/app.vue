@@ -2,28 +2,27 @@
 	<div class="container h-100" style="max-width: 750px;">
 		<div class="h-100 d-flex flex-column">
 			<div class="flex-grow-1" v-if="step == 1">
-				<div class="h4" v-t="'donate.title'"></div>
-				<div v-t="'donate.intro'"></div>
+				<div class="h4">{{ $t("donate.title") }}</div>
+				<div>{{ $t("donate.intro") }}</div>
 				<div class="form-row mt-3">
 					<div class="input-group">
 						<div class="input-group-text">$</div>
 						<input class="form-control" type="number" v-model.number="amount" @input="amountChange" />
 						<div class="input-group-text">USD{{ handling }}</div>
 					</div>
-					<div class="text-danger" v-show="error" v-t="'donate.error'"></div>
+					<div class="text-danger" v-show="error">{{ $t("donate.error") }}</div>
 				</div>
-				<div class="mt-3" v-t="'donate.then'"></div>
+				<div class="mt-3">{{ $t("donate.then") }}</div>
 				<div class="text-center mt-3" id="paypal-button-container"></div>
-				<div v-if="processing" v-t="'donate.wait'"></div>
+				<div v-if="processing">{{ $t("donate.wait") }}</div>
 			</div>
 			<div class="flex-grow-1" v-else-if="step == 2">
-				<div class="h4" v-t="'donate.title'"></div>
+				<div class="h4">{{ $t("donate.title") }}</div>
 				<div>{{ $t('donate.thank', [name]) }}</div>
 			</div>
 			<div class="wait flex-grow-0">
 				<button class="btn btn-primary w-100" onclick="window.close()">{{ step == 1 ? $t('donate.nextTime') :
-					$t('keyword.close')
-				}}</button>
+					$t('keyword.close') }}</button>
 			</div>
 		</div>
 	</div>

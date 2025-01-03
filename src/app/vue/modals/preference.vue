@@ -3,16 +3,16 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header d-flex">
-					<div class="h4 modal-title" v-t="'toolbar.setting.preference'"></div>
+					<div class="h4 modal-title">{{ $t("toolbar.setting.preference") }}</div>
 					<div class="flex-grow-1 ps-5">
 						<div class="d-none d-sm-block">
 							<div class="nav nav-tabs position-relative" style="top: 1rem;">
-								<button class="nav-link" :class="{ active: tab == 0 }" @click="tab = 0"
-										v-t="'preference.general'"></button>
-								<button class="nav-link" :class="{ active: tab == 1 }" @click="tab = 1"
-										v-t="'preference.color._'"></button>
-								<button class="nav-link" :class="{ active: tab == 2 }" @click="tab = 2"
-										v-t="'preference.hotkey'"></button>
+								<button class="nav-link" :class="{ active: tab == 0 }" @click="tab = 0">{{
+									$t("preference.general") }}</button>
+								<button class="nav-link" :class="{ active: tab == 1 }" @click="tab = 1">{{
+									$t("preference.color._") }}</button>
+								<button class="nav-link" :class="{ active: tab == 2 }" @click="tab = 2">{{ $t("preference.hotkey")
+									}}</button>
 							</div>
 						</div>
 						<!--
@@ -21,9 +21,9 @@
 						-->
 						<div class="d-block d-sm-none">
 							<select class="form-select" v-model.number="tab">
-								<option value="0" v-t="'preference.general'"></option>
-								<option value="1" v-t="'preference.color._'"></option>
-								<option value="2" v-t="'preference.hotkey'"></option>
+								<option value="0">{{ $t("preference.general") }}</option>
+								<option value="1">{{ $t("preference.color._") }}</option>
+								<option value="2">{{ $t("preference.hotkey") }}</option>
 							</select>
 						</div>
 					</div>
@@ -31,7 +31,7 @@
 				<div class="modal-body" style="height: 400px; max-height: 40vh;">
 					<div v-show="tab == 0" class="p-2">
 						<div class="row mb-2">
-							<label class="col-form-label col-4" v-t="'preference.language'"></label>
+							<label class="col-form-label col-4">{{ $t("preference.language") }}</label>
 							<div class="col-8">
 								<!--
 									Note that showing flags requires COLR/CPAL(v0) support, see https://caniuse.com/colr
@@ -49,12 +49,12 @@
 							</div>
 						</div>
 						<div class="row mb-2">
-							<label class="col-form-label col-4" v-t="'preference.theme._'"></label>
+							<label class="col-form-label col-4">{{ $t("preference.theme._") }}</label>
 							<div class="col-8">
 								<select class="form-select" v-model="Settings.theme">
-									<option value="system" v-t="'preference.theme.system'"></option>
-									<option value="light" v-t="'preference.theme.light'"></option>
-									<option value="dark" v-t="'preference.theme.dark'"></option>
+									<option value="system">{{ $t("preference.theme.system") }}</option>
+									<option value="light">{{ $t("preference.theme.light") }}</option>
+									<option value="dark">{{ $t("preference.theme.dark") }}</option>
 								</select>
 							</div>
 						</div>
@@ -95,9 +95,9 @@
 				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1">
-						<button class="btn btn-secondary" @click="reset()"><span v-t="'preference.reset'" /></button>
+						<button class="btn btn-secondary" @click="reset()">{{ $t("preference.reset") }}</button>
 					</div>
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-t="'keyword.ok'"></button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
 				</div>
 			</div>
 		</div>

@@ -7,10 +7,6 @@
 					{{ Studio.mouseCoordinates.x }}, {{ Studio.mouseCoordinates.y }}
 				</span>
 			</div>
-			<!--
-				In the following, as of Vue-i18n 9.2.2,
-				for some reason using v-t directive would not react immediately to local changes.
-			-->
 			<template v-if="Studio.project.design.mode == 'layout'">
 				<div style="width: 100px;">
 					{{ $t('panel.flaps.type') }}: {{ flapCount }}

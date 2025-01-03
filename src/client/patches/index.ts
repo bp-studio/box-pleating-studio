@@ -3,6 +3,7 @@ import Rc0Migration from "./migrations/rc0Migration";
 import Rc1Migration from "./migrations/rc1Migration";
 import TrivialMigration from "./migrations/trivialMigration";
 import ProjectMigration from "./migrations/projectMigration";
+import HardLimitMigration from "./migrations/hardLimitMigration";
 import { Migration } from "./migration";
 
 // These version formats were never publicly released,
@@ -27,5 +28,8 @@ Migration.$add(TrivialMigration, "0.4");
 
 /** Version 0.6 separates `design` from the rest. */
 Migration.$add(ProjectMigration, "0.6");
+
+/** Version 0.7 imposes several hard limits. */
+Migration.$add(HardLimitMigration, "0.7");
 
 export { Migration };

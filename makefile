@@ -14,7 +14,7 @@ DEP := $(patsubst $(SRCF)/%.cpp,$(TEMP)/%.d,$(SRC))
 
 OUT := optimizer
 
-CXXFLAG_dist = -O3
+CXXFLAG_dist = -O3 -fno-exceptions
 CXXFLAG_debug = -g -Wno-limited-postlink-optimizations -sNO_DISABLE_EXCEPTION_CATCHING
 
 LDFLAG_dist = -sENVIRONMENT=worker
@@ -65,6 +65,7 @@ $(TEMP)/%.o: $(SRCF)/%.cpp
 
 # Ignoring old dependencies that were removed
 %.h: ;
+%.hpp: ;
 %.d: ;
 
 -include $(DEP)

@@ -1,5 +1,5 @@
 <template>
-	<div v-t="'panel.flap.type'" class="h5 panel-title"></div>
+	<div class="h5 panel-title">{{ $t("panel.flap.type") }}</div>
 	<div class="panel-grid">
 		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
 		<NumberVue :label="$t('panel.flap.radius')" v-model="subject.radius" :min="1" :max="max" hotkeys="d.rd,d.ri" />
@@ -7,10 +7,10 @@
 		<NumberVue :label="$t('panel.flap.height')" v-model="subject.height" :min="0" :max="max" hotkeys="d.hd,d.hi" />
 	</div>
 	<div class="mt-3">
-		<AsyncButton v-if="subject.isDeletable" :click="() => subject.delete()" v-t="'keyword.delete'" />
+		<AsyncButton v-if="subject.isDeletable" :click="() => subject.delete()">{{ $t("keyword.delete") }}</AsyncButton>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="subject.goToDual()" v-t="'panel.flap.goto'" :title="hk('n', 'd')"></button>
+		<button class="btn btn-primary" @click="subject.goToDual()" :title="hk('n', 'd')">{{ $t("panel.flap.goto") }}</button>
 	</div>
 </template>
 

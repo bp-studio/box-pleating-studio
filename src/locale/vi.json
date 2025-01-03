@@ -251,7 +251,7 @@
 		"invalidLink": "Đã xảy ra lỗi không mong muốn khi mở liên kết dự án; \ndữ liệu có thể bị hỏng.",
 		"latest": "Bạn đã có phiên bản BP Studio mới nhất.",
 		"min3vertex": "Cây cần có ít nhất 3 đỉnh.",
-		"oldVersion": "Dự án \"{0}\" đã được tạo bằng phiên bản cũ hơn của BP Studio và một số mẫu căng có thể cần được chọn lại. Nó sẽ được cập nhật lên định dạng mới nhất trong lần lưu tiếp theo.",
+		"oldVersion": "Dự án \"{0}\" đã được tạo bằng phiên bản cũ hơn của BP Studio và một phần thiết kế đã được sửa đổi. Nó sẽ được cập nhật lên định dạng mới nhất trong lần lưu tiếp theo.",
 		"patternNotFound": "Một số phần xếp chồng lên nhau của các nắp trong thiết kế này là hợp lệ, nhưng hiện tại BP Studio không thể tìm thấy các mẫu co giãn phù hợp cho chúng. Tác giả của ứng dụng này sẽ tiếp tục triển khai nhiều thuật toán hơn để bao gồm nhiều trường hợp hơn.",
 		"unsaved": "Dự án \"{0}\" chứa các thay đổi chưa được lưu. Hủy các thay đổi?",
 		"updateReady": "Phiên bản BP Studio mới hơn đã sẵn sàng và sẽ tự động cập nhật khi khởi động lại. Bạn có muốn khởi động lại ngay bây giờ?",
