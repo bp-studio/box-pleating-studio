@@ -6,7 +6,8 @@
 	"keywords": [
 		"origami",
 		"GOPS",
-		"box pleating"
+		"box pleating",
+		"optimization"
 	],
 	"homepage": "https://bp-studio.github.io/",
 	"bugs": {
@@ -62,7 +63,7 @@
 		"@types/gtag.js": "^0.0.20",
 		"@types/gulp": "^4.0.17",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^22.10.4",
+		"@types/node": "^22.10.5",
 		"@types/wicg-file-system-access": "^2023.10.5",
 		"chai": "^5.1.2",
 		"del": "^8.0.0",
@@ -94,7 +95,7 @@
 		"inquirer": "^12.3.0",
 		"jsdom": "^25.0.1",
 		"markdown-loader": "^8.0.0",
-		"mocha": "^11.0.1",
+		"mocha": "^11.1.0",
 		"mocha-suppress-logs": "^0.5.1",
 		"nyc": "^17.1.0",
 		"postcss-preset-env": "^10.1.3",
