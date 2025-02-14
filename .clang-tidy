@@ -10,4 +10,6 @@ Checks: '-*,
   -readability-braces-around-statements,
   -readability-magic-numbers,
   -readability-avoid-nested-conditional-operator,
+  -readability-math-missing-parentheses,
+  -readability-use-std-min-max,
   -readability-use-anyofallof'
