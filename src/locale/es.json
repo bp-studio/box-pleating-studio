@@ -145,7 +145,8 @@
 		"confirmKey": "La tecla de acceso rápido {0} ya está asignada al comando \"{1}\"; ¿te gustaría reemplazarlo?",
 		"autoSave": "Guardar el espacio de trabajo automáticamente",
 		"includeHidden": "Incluir elementos ocultos en las exportaciones SVG",
-		"loadSessionOnQueue": "Cargar la sesión anterior al abrir directamente un archivo de proyecto"
+		"loadSessionOnQueue": "Cargar la sesión anterior al abrir directamente un archivo de proyecto",
+		"useFileSystem": "Utilice la API del sistema de archivos"
 	},
 	"panel": {
 		"design": {
@@ -311,5 +312,8 @@
 		"untitled": "Sin título",
 		"errorLog": "Descargar registro de errores",
 		"workspace": "espacio de trabajo"
+	},
+	"help": {
+		"useFileSystem": "Habilitar esto le permite guardar directamente en los archivos de edición y mantener un registro de archivos abiertos recientemente. Puede deshabilitar esto si encuentra algún problema para abrir archivos en dispositivos móviles."
 	}
 }

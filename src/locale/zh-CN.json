@@ -145,7 +145,8 @@
 		"confirmKey": "热键 {0} 已分配给命令「{1}」；你想更换它吗？",
 		"autoSave": "自动保存工作区",
 		"includeHidden": "在 SVG 输出中包含隐藏元件",
-		"loadSessionOnQueue": "直接打开项目文件时加载先前的会话"
+		"loadSessionOnQueue": "直接打开项目文件时加载先前的会话",
+		"useFileSystem": "使用文件系统 API"
 	},
 	"panel": {
 		"design": {
@@ -311,5 +312,8 @@
 		"untitled": "未命名",
 		"errorLog": "下载错误日志",
 		"workspace": "工作区"
+	},
+	"help": {
+		"useFileSystem": "启用此功能使您可以直接保存到编辑文件中，并保留最近打开的文件的记录。如果您在移动设备上打开文件遇到任何故障，可以禁用此功能。"
 	}
 }

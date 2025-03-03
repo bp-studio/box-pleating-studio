@@ -5,7 +5,7 @@
 		</DropdownItem>
 		<Divider />
 
-		<template v-if="isFileApiEnabled">
+		<template v-if="Handles.enabled.value">
 			<Opener class="dropdown-item m-0" ref="opn" @open="open($event)" multiple>
 				<Hotkey icon="far fa-folder-open" ctrl hk="O">{{ $t('toolbar.file.open') }}</Hotkey>
 			</Opener>
@@ -40,7 +40,7 @@
 
 		<Divider />
 
-		<template v-if="isFileApiEnabled">
+		<template v-if="Handles.enabled.value">
 			<SaveAs :disabled="!Studio.project" type="svg" @save="svgSaved" :desc="$t('toolbar.file.SVG.name')" mime="image/svg+xml">
 				<i class="far fa-file-image" />
 				{{ $t('toolbar.file.SVG.save') }}
@@ -79,7 +79,7 @@
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
 	import HotKeyService from "app/services/hotkeyService";
-	import { isFileApiEnabled, copyEnabled } from "app/shared/constants";
+	import { copyEnabled } from "app/shared/constants";
 	import Import from "app/services/importService";
 	import { compRef } from "app/utils/compRef";
 	import Handles from "app/services/handleService";
@@ -121,7 +121,7 @@
 		}, "o");
 		HotKeyService.register(() => {
 			if(!Studio.project) return;
-			if(isFileApiEnabled) save();
+			if(Handles.enabled.value) save();
 			else bps.value!.execute();
 		}, "s");
 		HotKeyService.register(() => Studio.project && bps.value!.execute(), "s", true); // Save as

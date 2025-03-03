@@ -1,12 +1,15 @@
-import { reactive, watch } from "vue";
+import { computed, reactive, watch } from "vue";
 import * as idbKeyval from "idb-keyval"; // This library is really tiny, so it's OK to bundle
 
 import { isFileApiEnabled } from "app/shared/constants";
 import Workspace from "./workspaceService";
+import settings from "./settingService";
 
 import type { ProjId } from "shared/json";
 
 namespace HandleService {
+
+	export const enabled = computed(() => isFileApiEnabled && settings.useFileSystem);
 
 	export const recent: FileSystemFileHandle[] = reactive([]);
 
@@ -45,7 +48,7 @@ namespace HandleService {
 	}
 
 	export async function load(haveSession: boolean): Promise<void> {
-		if(!isFileApiEnabled) return;
+		if(!enabled.value) return;
 		if(haveSession) {
 			const entries: [number, FileSystemFileHandle][] = await idbKeyval.get("handle") || [];
 			for(const [i, handle] of entries) handles.set(Workspace.ids.value[i], handle);
@@ -54,13 +57,13 @@ namespace HandleService {
 	}
 
 	export async function getRecent(): Promise<void> {
-		if(!isFileApiEnabled) return;
+		if(!enabled.value) return;
 		recent.length = 0;
 		recent.push(...await idbKeyval.get("recent") || []);
 	}
 
 	export async function save(): Promise<void> {
-		if(!isFileApiEnabled) return;
+		if(!enabled.value) return;
 
 		const entries: [number, FileSystemFileHandle][] = [];
 		const ids = Workspace.ids.value;

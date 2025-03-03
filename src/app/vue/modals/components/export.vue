@@ -7,7 +7,7 @@
 				</div>
 				<div class="modal-body">
 					<slot></slot>
-					<div class="row mb-2" v-if="!isFileApiEnabled">
+					<div class="row mb-2" v-if="!HandleService.enabled.value">
 						<div class="col col-form-label flex-grow-0">{{ $t("keyword.filename") }}</div>
 						<div class="col flex-grow-1">
 							<input type="text" class="form-control" v-model="extFilename" />
@@ -18,7 +18,7 @@
 						<button disabled v-if="!url" type="button" class="btn btn-lg btn-success">
 							<i class="bp-spinner fa-spin" />
 						</button>
-						<CheckButton v-else-if="isFileApiEnabled" ref="bt" type="button" class="btn btn-lg btn-success"
+						<CheckButton v-else-if="HandleService.enabled.value" ref="bt" type="button" class="btn btn-lg btn-success"
 									 @click="save">
 							{{ $t("keyword.export") }}
 						</CheckButton>
@@ -40,7 +40,8 @@
 
 	import Studio from "app/services/studioService";
 	import useModal from "../modal";
-	import { isFileApiEnabled, isInApp } from "app/shared/constants";
+	import { isInApp } from "app/shared/constants";
+	import HandleService from "app/services/handleService";
 	import FileUtility from "app/utils/fileUtility";
 	import { compRef } from "app/utils/compRef";
 	import CheckButton from "@/gadgets/form/checkButton.vue";

@@ -10,7 +10,7 @@
 	<template v-if="phase >= 8">
 		<Share :ref="mdlRef('share')" />
 		<CP :ref="mdlRef('cp')" />
-		<template v-if="!isFileApiEnabled">
+		<template v-if="!HandleService.enabled.value">
 			<SVG_ :ref="mdlRef('svg')" />
 			<PNG :ref="mdlRef('png')" />
 			<BPS :ref="mdlRef('bps')" />
@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 
-	import { isFileApiEnabled } from "app/shared/constants";
+	import HandleService from "app/services/handleService";
 	import { phase } from "app/misc/phase";
 	import { modals } from "./modals";
 	import Share from "./share.vue";
