@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)" />
-		<label class="dropdown-item m-0" :for="id" ref="lbl">
+		<label :class="labelCls ?? 'dropdown-item m-0'" :for="id" ref="lbl">
 			<slot></slot>
 		</label>
 	</div>
@@ -21,6 +21,7 @@
 	const props = defineProps<{
 		accept: string;
 		multiple?: boolean;
+		labelCls?: string;
 	}>();
 
 	const type = computed(() =>

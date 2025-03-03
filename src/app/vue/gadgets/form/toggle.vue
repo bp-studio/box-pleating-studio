@@ -7,6 +7,7 @@
 				<label class="form-check-label" v-bind:for="id">
 					<slot></slot>
 				</label>
+				<slot name="append"></slot>
 			</div>
 		</div>
 	</div>

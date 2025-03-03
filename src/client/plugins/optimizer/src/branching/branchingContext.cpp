@@ -49,8 +49,8 @@ double _branch(double x, int dir) {
 
 Pt BranchingContext::get(int i) const {
 	return {
-		convert_if_almost_integer(solution[i * 2]),
-		convert_if_almost_integer(solution[i * 2 + 1])
+		.x = convert_if_almost_integer(solution[i * 2]),
+		.y = convert_if_almost_integer(solution[i * 2 + 1])
 	};
 }
 

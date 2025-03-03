@@ -52,6 +52,7 @@ const DEFAULT_HOTKEY: KeyStore = {
  */
 const defaultSettings = {
 	autoSave: true,
+	useFileSystem: true,
 	loadSessionOnQueue: false,
 	showDPad: true,
 	showStatus: true,

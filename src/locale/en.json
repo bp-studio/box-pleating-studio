@@ -145,7 +145,8 @@
 		"confirmKey": "Hotkey {0} is already assigned to the command \"{1}\"; would you like to replace it?",
 		"autoSave": "Save workspace automatically",
 		"includeHidden": "Include hidden elements in SVG exports",
-		"loadSessionOnQueue": "Load previous session when directly open a project file"
+		"loadSessionOnQueue": "Load previous session when directly open a project file",
+		"useFileSystem": "Use file system API"
 	},
 	"panel": {
 		"design": {
@@ -311,5 +312,8 @@
 		"untitled": "Untitled",
 		"errorLog": "Download error log",
 		"workspace": "workspace"
+	},
+	"help": {
+		"useFileSystem": "Enabling this allows you to directly save into editing files and keep a record of recently opened files. You can disable this if you encounter any trouble opening files on mobile devices."
 	}
 }

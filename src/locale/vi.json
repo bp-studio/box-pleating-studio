@@ -145,7 +145,8 @@
 		"confirmKey": "Phím nóng {0} đã được gán cho lệnh \"{1}\"; bạn có muốn thay thế nó không?",
 		"autoSave": "Tự động lưu không gian làm việc",
 		"includeHidden": "Bao gồm các yếu tố ẩn trong xuất SVG",
-		"loadSessionOnQueue": "Tải phiên trước khi mở trực tiếp tệp dự án"
+		"loadSessionOnQueue": "Tải phiên trước khi mở trực tiếp tệp dự án",
+		"useFileSystem": "Sử dụng API hệ thống tệp"
 	},
 	"panel": {
 		"design": {
@@ -311,5 +312,8 @@
 		"untitled": "Không có tiêu đề",
 		"errorLog": "Tải xuống nhật ký lỗi",
 		"workspace": "không gian làm việc"
+	},
+	"help": {
+		"useFileSystem": "Kích hoạt điều này cho phép bạn lưu trực tiếp vào các tệp chỉnh sửa và lưu giữ bản ghi các tệp được mở gần đây. Bạn có thể vô hiệu hóa điều này nếu bạn gặp bất kỳ sự cố nào mở các tệp trên thiết bị di động."
 	}
 }

@@ -44,8 +44,8 @@ The BP Studio optimizer is written in C++. Pre-compiled WASM binaries are alread
 Then you can compile the Optimizer by:
 
 ```bash
-make      # For debug build
-make dist # For dist (release) build
+make      # For debug build used in unit tests
+make dist # For dist (release) build used in the actual app
 ```
 
 For more about the optimizer, see [README](src/client/plugins/optimizer/src/README.md).
@@ -109,6 +109,4 @@ graph LR
 ```
 
 Refer to the README of each of them through the links above for more details.
-
-**All comments are now in English!**
 Feel free to contact me in any part of the code is unclear to you.

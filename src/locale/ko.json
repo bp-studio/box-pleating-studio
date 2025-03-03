@@ -145,7 +145,8 @@
 		"confirmKey": "단축키 {0} 은(는) 이미 \"{1}\" 명령에 할당되었습니다. 교체하시겠습니까?",
 		"autoSave": "자동으로 작업 공간 저장",
 		"includeHidden": "SVG 내보내기에 숨겨진 요소 포함",
-		"loadSessionOnQueue": "프로젝트 파일을 직접 열 때 이전 세션 로드"
+		"loadSessionOnQueue": "프로젝트 파일을 직접 열 때 이전 세션 로드",
+		"useFileSystem": "파일 시스템 API 를 사용하십시오"
 	},
 	"panel": {
 		"design": {
@@ -311,5 +312,8 @@
 		"untitled": "무제",
 		"errorLog": "오류 로그 다운로드",
 		"workspace": "작업 공간"
+	},
+	"help": {
+		"useFileSystem": "이를 활성화하면 파일 편집에 직접 저장하고 최근에 열린 파일의 레코드를 유지할 수 있습니다. 모바일 장치에서 파일을 열는 데 문제가 발생하면이를 비활성화 할 수 있습니다."
 	}
 }

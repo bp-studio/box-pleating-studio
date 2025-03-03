@@ -145,7 +145,8 @@
 		"confirmKey": "快速鍵 {0} 已分配給指令「{1}」；您想更換它嗎？",
 		"autoSave": "自動儲存工作區",
 		"includeHidden": "在 SVG 輸出中包含隱藏元件",
-		"loadSessionOnQueue": "直接打開專案檔案時載入之前的工作階段"
+		"loadSessionOnQueue": "直接打開專案檔案時載入之前的工作階段",
+		"useFileSystem": "使用檔案系統 API"
 	},
 	"panel": {
 		"design": {
@@ -311,5 +312,8 @@
 		"untitled": "未命名",
 		"errorLog": "下載錯誤紀錄",
 		"workspace": "工作區"
+	},
+	"help": {
+		"useFileSystem": "啟用此功能使您可以直接存檔到編輯檔案中，並保留最近打開的檔案之記錄。如果您在手機上開啟檔案時遇到問題，可以停用此功能。"
 	}
 }

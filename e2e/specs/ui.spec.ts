@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import type { BpsLocale } from "shared/frontend/locale";
+import type { BpsLocale } from "app/shared/locale";
 import type { Composer } from "vue-i18n";
 
 test.beforeEach(async ({ page }) => {

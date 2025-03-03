@@ -12,7 +12,7 @@
 								<button class="nav-link" :class="{ active: tab == 1 }" @click="tab = 1">{{
 									$t("preference.color._") }}</button>
 								<button class="nav-link" :class="{ active: tab == 2 }" @click="tab = 2">{{ $t("preference.hotkey")
-									}}</button>
+								}}</button>
 							</div>
 						</div>
 						<!--
@@ -61,9 +61,15 @@
 						<Toggle v-model="Settings.autoSave">
 							{{ $t('preference.autoSave') }}
 						</Toggle>
-						<Toggle v-if="isFileApiEnabled" v-model="Settings.loadSessionOnQueue">
-							{{ $t('preference.loadSessionOnQueue') }}
-						</Toggle>
+						<template v-if="isFileApiEnabled">
+							<Toggle v-model="Settings.useFileSystem">
+								<template v-slot:append><Help :title="$t('help.useFileSystem')" /></template>
+								{{ $t('preference.useFileSystem') }}
+							</Toggle>
+							<Toggle v-model="Settings.loadSessionOnQueue">
+								{{ $t('preference.loadSessionOnQueue') }}
+							</Toggle>
+						</template>
 						<Toggle v-model="Settings.tools.SVG.includeHiddenElement">
 							{{ $t('preference.includeHidden') }}
 						</Toggle>
@@ -116,6 +122,7 @@
 	import useModal from "./modal";
 	import KeyTable from "./components/keyTable.vue";
 	import Color from "./components/color.vue";
+	import Help from "@/gadgets/help.vue";
 
 	defineOptions({ name: "Preference" });
 

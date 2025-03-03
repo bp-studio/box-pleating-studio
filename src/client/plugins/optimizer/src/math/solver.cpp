@@ -59,6 +59,11 @@ OptimizeResult pack(vector<double> x, const ConstraintList &cons, cfunc callback
 	 */
 	double minf;
 	auto result = nlopt_optimize(opt, x.data(), &minf);
-	nlopt_destroy(opt);					  // With C API we need to manually do this
-	return {x, result > 0, result, minf}; // RVO, no need to move x
+	nlopt_destroy(opt); // With C API we need to manually do this
+	return {
+		.x = x,
+		.success = result > 0,
+		.status = result,
+		.fun = minf
+	}; // RVO, no need to move x
 }
