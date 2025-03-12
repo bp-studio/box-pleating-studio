@@ -37,11 +37,11 @@ export class CoreManager {
 	}
 
 	/** Execute a calling to the Core. */
-	public $run(factory: Func<Route, Promise<void>>): Promise<void> {
+	public $run(stack: string, factory: Func<Route, Promise<void>>): Promise<void> {
 		this._lastReturn = new Promise(resolve => this.$project.$onReturn(() => {
 			this._pendingUpdateCount--;
 			resolve();
 		}));
-		return this._updating = factory(this.$project.$core);
+		return this._updating = factory(this.$project.$createCoreProxy(stack));
 	}
 }
