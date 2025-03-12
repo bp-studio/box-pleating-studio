@@ -75,7 +75,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this.$addChild(this.design);
 
 		this._worker = worker;
-		this.$core = this._createCoreProxy();
+		this.$core = this.$createCoreProxy();
 
 		this._onDestruct(() => this._worker.terminate());
 	}
@@ -131,31 +131,39 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this._returnCallbacks.push(callback);
 	}
 
+	/**
+	 * Currently there's no way to directly get the full async stack trace,
+	 * so in case we need to invoke {@link _callCore} in an async stack,
+	 * we have to manually record the stack trace before we enter the async parts.
+	 */
+	public $createCoreProxy(stack?: string): Route {
+		return new Proxy({}, {
+			get: (controllers: Record<string, object>, controller: string) =>
+				controllers[controller] ||= this._createControllerProxy(controller, stack),
+		}) as Route;
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _createCoreProxy(): Route {
-		return new Proxy({}, {
-			get: (controllers: Record<string, object>, controller: string) =>
-				controllers[controller] ||= this._createControllerProxy(controller),
-		}) as Route;
-	}
-
-	private _createControllerProxy(controller: string): Record<string, Action> {
+	private _createControllerProxy(controller: string, stack?: string): Record<string, Action> {
 		return new Proxy({}, {
 			get: (actions: Record<string, Action>, action: string) =>
-				actions[action] ||= (...args: unknown[]) => this._callCore(controller, action, args),
+				actions[action] ||= (...args: unknown[]) => this._callCore(controller, action, args, stack),
 		});
 	}
 
 	/**
 	 * Send a request to the Core worker and obtain a direct result or an {@link UpdateModel}.
 	 */
-	private async _callCore(controller: string, action: string, args: unknown[]): Promise<unknown> {
+	private async _callCore(controller: string, action: string, args: unknown[], stack?: string): Promise<unknown> {
 		// There could be pending calling after fatal error.
 		// In that case we throw an error to stop further processing.
 		if(this._fatal) throw new Error();
+
+		// Create one here if the client stack trace is not provided.
+		stack ??= new Error().stack || "";
 
 		clearTimeout(this._updateCallbackTimeout);
 		const request = { controller, action, value: args } as CoreRequest;
@@ -164,7 +172,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		const response = await callCore(this._worker, request);
 		for(const callback of callbacks) callback();
 		if("error" in response) {
-			await this._handleCoreError(request, response);
+			await this._handleCoreError(request, response, stack);
 		} else if("update" in response) {
 			this.design.$update(response.update);
 			this._flushUpdateCallback();
@@ -175,20 +183,19 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		}
 	}
 
-	private async _handleCoreError(request: object, response: ErrorResponse): Promise<never> {
+	private async _handleCoreError(request: object, response: ErrorResponse, stack: string): Promise<never> {
 		this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
-		const clientError = new Error(response.error.message);
 		if(this._initialized && !this._fatal) {
 			this._fatal = true;
 			// Display a fatal message and close self, if the project has already been initialized.
 			// If not, the error thrown below will be caught by the App.
 			const coreError = response.error;
-			coreError.clientTrace = clientError.stack || "";
+			coreError.clientTrace = stack;
 			coreError.request = request;
 			Project.$onFatalError();
 			await options.onError?.(this.id, coreError, this.history.$backup);
 		}
-		throw clientError; // Stop all further actions.
+		throw new Error(); // Stop all further actions.
 	}
 
 	private _flushUpdateCallback(): void {

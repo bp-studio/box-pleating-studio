@@ -164,8 +164,9 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		this._draggingDeviceAction = action;
 		if(this._deviceMovePromise === undefined) {
 			this._draggingDevice = device;
+			const stack = new Error().stack || "";
 			const prepare = this.$project.design.$coreManager.$prepare();
-			this._deviceMovePromise = prepare.then(() => this._flushDeviceMove());
+			this._deviceMovePromise = prepare.then(() => this._flushDeviceMove(stack));
 		}
 		return this._deviceMovePromise;
 	}
@@ -204,12 +205,12 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private _flushDeviceMove(): Promise<void> {
+	private _flushDeviceMove(stack: string): Promise<void> {
 		this._deviceMovePromise = undefined;
 		this._draggingDeviceAction!();
 		this._draggingDeviceAction = undefined;
 		const device = this._draggingDevice!;
-		return this.$project.design.$coreManager.$run(c =>
+		return this.$project.design.$coreManager.$run(stack, c =>
 			c.layout.moveDevice(device.stretch.id, device.$index, device.$location)
 		);
 	};

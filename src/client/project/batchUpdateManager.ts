@@ -62,12 +62,13 @@ export class BatchUpdateManager {
 
 	private _setupPromise(): Promise<void> {
 		if(this._updatePromise === undefined) {
-			this._updatePromise = this._core.$prepare().then(() => this._flush());
+			const stack = new Error().stack || "";
+			this._updatePromise = this._core.$prepare().then(() => this._flush(stack));
 		}
 		return this._updatePromise;
 	}
 
-	private _flush(): Promise<void> {
+	private _flush(stack: string): Promise<void> {
 		const project = this._core.$project;
 		this._updatePromise = undefined;
 		const request: UpdateRequest = {
@@ -82,6 +83,6 @@ export class BatchUpdateManager {
 		}
 		this._pendingFlaps.clear();
 		this._pendingEdges.length = 0;
-		return this._core.$run(c => c.design.update(request));
+		return this._core.$run(stack, c => c.design.update(request));
 	};
 }
