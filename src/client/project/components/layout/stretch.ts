@@ -146,9 +146,17 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		return this._devices[parseInt(id)];
 	}
 
+	/**
+	 * Complete the calculation of all stretch patterns when a {@link Stretch} is selected.
+	 */
 	public async $complete(): Promise<void> {
+		// Skip if this is already done.
 		if(this._data.repo) return;
-		this._data = await this.$layout.$completeStretch(this.id);
+
+		// If the result is null, then the stretch is already deleted,
+		// and we can just ignore the result.
+		const data = await this.$layout.$completeStretch(this.id);
+		if(data) this._data = data;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

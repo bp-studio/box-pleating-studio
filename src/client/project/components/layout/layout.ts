@@ -152,7 +152,7 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		return this.$project.$core.layout.switchPattern(stretchId, to);
 	}
 
-	public $completeStretch(stretchId: string): Promise<JStretch> {
+	public $completeStretch(stretchId: string): Promise<JStretch | null> {
 		return this.$project.$core.layout.completeStretch(stretchId);
 	}
 

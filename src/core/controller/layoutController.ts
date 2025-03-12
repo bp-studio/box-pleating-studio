@@ -71,8 +71,15 @@ export namespace LayoutController {
 		Processor.$run(patternTask);
 	}
 
-	export function completeStretch(stretchId: string): JStretch {
-		const stretch = State.$stretches.get(stretchId)!;
+	export function completeStretch(stretchId: string): JStretch | null {
+		const stretch = State.$stretches.get(stretchId);
+
+		// v0.7.6: It is possible that, after the user hit the delete command of vertices,
+		// the user then select a Stretch BEFORE the delete command is completed.
+		// In that case the stretch id will be invalid, leading to fatal error.
+		// We safeguard this here.
+		if(!stretch) return null;
+
 		return stretch.$complete();
 	}
 
