@@ -99,7 +99,7 @@ namespace SessionService {
 	}
 }
 
-// Web Locks polyfill
+// Web Locks polyfill, for Chrome < 85, Safari < 13.1
 if(!("locks" in navigator)) {
 	const SESSION_CHECK_TIMEOUT = 250;
 	const CHECK_INTERVAL = 500;

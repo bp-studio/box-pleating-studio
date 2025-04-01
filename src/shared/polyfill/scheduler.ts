@@ -1,3 +1,5 @@
+// Not supported in Safari as of 18.4 and Firefox as of 139
+
 //=================================================================
 /**
  * A polyfill for {@link Scheduler.yield} method.
