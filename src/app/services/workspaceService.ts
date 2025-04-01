@@ -4,7 +4,7 @@ import Dialogs from "./dialogService";
 import Studio from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
-import { isOnline } from "app/shared/constants";
+import { uploadLog } from "./errorReportService";
 
 import type { OptimizerCallback, OptimizerOptions } from "client/plugins/optimizer";
 import type { CoreError, JProject, ProjId } from "shared/json";
@@ -194,7 +194,7 @@ namespace WorkspaceService {
 			if(log) {
 				error.build = app_config.app_version;
 				log.error = error;
-				if(isOnline) setTimeout(() => uploadLog(log, error), 0);
+				setTimeout(() => uploadLog(log, error), 0);
 			}
 			await Dialogs.error(log);
 			await close(id, true);
@@ -210,30 +210,6 @@ namespace WorkspaceService {
 			}
 		}
 	);
-
-	const LOG_FILENAME_LENGTH = 20;
-
-	async function uploadLog(log: JProject, error: CoreError): Promise<void> {
-		let msg = error.message + "\n" + error.coreTrace;
-		try {
-			const err = (error.message.match(/^[a-z ]+/i)?.[0] ?? "")
-				.replace(/\s/g, "-")
-				.substring(0, LOG_FILENAME_LENGTH);
-			const url = new URL("https://www.filestackapi.com/api/store/S3");
-			url.searchParams.set("key", "AeCej8uvYSQ2GXTWtPBaTz");
-			url.searchParams.set("filename", `${app_config.app_version}-${err}.json`);
-			const response = await fetch(url, {
-				method: "POST", // Note that this won't work with file:// protocol somehow
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(log),
-			});
-			const json = await response.json();
-			msg = json.url || msg;
-		} catch(e) {
-			// ignore any error here.
-		}
-		gtag("event", "fatal_error", gaErrorData(msg));
-	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Exiting warning
