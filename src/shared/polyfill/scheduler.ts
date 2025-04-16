@@ -8,7 +8,8 @@
  *
  * There is also https://github.com/GoogleChromeLabs/scheduler-polyfill
  * but it's way more than what we need.
- * We use that package only for TypeScript definitions.
+ * We use that package only for TypeScript definitions
+ * (used in {@link ../tsconfig.json tsconfig.json}).
  */
 //=================================================================
 

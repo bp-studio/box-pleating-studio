@@ -18,3 +18,11 @@ but I deliberately don't use it here for the following reasons:
    but I can't agree with his response when (naturally) very few people are willing to sponsor.
    I think people should not be doing open-source work beyond their capacities in the first place,
    let alone complaining when they are overloaded.
+
+There is also [ungap project](https://ungap.github.io/),
+which I also used in some other projects of mine,
+but not in BP Studio for the following reasons:
+
+1. For now it covers even less features comparing to core-js.
+2. For the most parts, it targets all environments,
+   while in my case I only need the polyfill for browser environments.
