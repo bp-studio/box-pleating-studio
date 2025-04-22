@@ -2,7 +2,7 @@ import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { maxDistComparator } from "./treeNode";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
-import type { ITreeNode, ITree, ITreeNodeBase, NodeCollection } from ".";
+import type { ITreeNode, ITreeNodeBase, NodeCollection } from ".";
 import type { NodeId } from "shared/json/tree";
 
 /**

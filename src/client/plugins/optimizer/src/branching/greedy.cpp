@@ -70,8 +70,10 @@ vector<double> branch(int branch_at, const BranchingContext &context) {
 	int r = 1;
 	while(true) {
 		auto pts = annulus(r, rx, ry);
-		sort(pts.begin(), pts.end(), [x, y](const Pt &a, const Pt &b) {
-			return meg(a.x - x, a.y - y) < meg(b.x - x, b.y - y); // sorted by the distance to the original point
+		// ranges::sort doesn't work with VS Code IntelliSense for some reason,
+		// so we keep using the old-fashioned sort for now.
+		sort(pts.begin(), pts.end(), [=](const Pt &a, const Pt &b) { // NOLINT
+			return meg(a.x - x, a.y - y) < meg(b.x - x, b.y - y);	 // sorted by the distance to the original point
 		});
 		for(auto &pt: pts) {
 			auto xk = context.make_xk(pt.x, pt.y, branch_at);

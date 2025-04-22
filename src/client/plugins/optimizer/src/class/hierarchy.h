@@ -31,5 +31,5 @@ class Hierarchy {
 
   private:
 	unordered_map<int, const Parent *> parent_map;
-	vector<const Parent> parents;
+	vector<Parent> parents;
 };
