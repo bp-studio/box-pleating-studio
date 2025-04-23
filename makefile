@@ -27,17 +27,17 @@ CPPFLAGS := -I$(SRCF) -Ilib/nlopt -std=c++20
 CXXFLAGS := $(CXXFLAG_$(MODE))
 LDFLAGS :=\
 	-Llib/nlopt\
+	-lembind\
 	-lnlopt.slsqp.2.9.0\
 	$(LDFLAG_$(MODE))\
+	-sFILESYSTEM=0\
 	-sINITIAL_MEMORY=10MB\
 	-sALLOW_MEMORY_GROWTH\
 	-sASYNCIFY=1\
 	-sMIN_SAFARI_VERSION=120000\
 	-sASSERTIONS\
 	-sMAXIMUM_MEMORY=4GB\
-	-sEXPORT_ES6=1\
-	-sEXPORTED_RUNTIME_METHODS=ccall\
-	-sEXPORTED_FUNCTIONS=_malloc,_free
+	-sEXPORT_ES6=1
 
 WASM := $(TARGET)/$(OUT).mjs
 

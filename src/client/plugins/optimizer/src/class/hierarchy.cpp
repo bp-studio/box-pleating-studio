@@ -3,31 +3,35 @@
 #include "constraint/circleConstraint.h"
 #include "constraint/roundedConstraint.h"
 
-Hierarchy::Hierarchy(double *&ptr, const Sheet *sheet) : sheet(sheet) {
-	int flap_count = read(ptr);
+Hierarchy::Hierarchy(const emscripten::val &data, const Sheet *sheet): sheet(sheet) {
+	auto array = data["leaves"];
+	const int flap_count = array["length"].as<int>();
 	flaps.reserve(flap_count);
 	unordered_map<int, int> id_map;
 	id_map.reserve(flap_count);
 
 	for(int i = 0; i < flap_count; i++) {
-		int id = read(ptr);
+		int id = array[i].as<int>();
 		id_map.emplace(id, i);
 		flaps.emplace_back(id, 0, 0);
 	}
 
-	int dist_map_count = read(ptr);
+	array = data["distMap"];
+	const int dist_map_count = array["length"].as<int>();
 	dist_map.reserve(dist_map_count);
 	for(int n = 0; n < dist_map_count; n++) {
-		int i = id_map.at(read(ptr));
-		int j = id_map.at(read(ptr));
-		int dist = read(ptr);
+		auto map = array[n];
+		int i = id_map.at(map[0].as<int>());
+		int j = id_map.at(map[1].as<int>());
+		int dist = map[2].as<int>();
 		dist_map.emplace_back(i, j, dist);
 	}
 
-	int parent_count = read(ptr);
+	array = data["parents"];
+	const int parent_count = array["length"].as<int>();
 	parents.reserve(parent_count);
 	for(int i = 0; i < parent_count; i++) {
-		parents.emplace_back(ptr);
+		parents.emplace_back(array[i]);
 	}
 
 	for(const auto &parent: parents) {

@@ -27,13 +27,6 @@ namespace Shared {
 	}
 };
 
-/**
- * Utility function for reading sequential data from pointer.
- */
-inline double read(double *&ptr) {
-	return *(ptr++);
-}
-
 constexpr double D_RAND_MAX = static_cast<double>(RAND_MAX);
 
 /**

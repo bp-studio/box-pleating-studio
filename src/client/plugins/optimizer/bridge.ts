@@ -10,88 +10,51 @@ const UINT_MAX = 4294967295; // Max value of unsigned int
 //=================================================================
 export class Bridge {
 
-	constructor(
-		private instance: OptimizerInstance,
-		private async: boolean = false
-	) {
-		instance._init(async);
+	private _instance: OptimizerInstance;
+
+	constructor(instance: OptimizerInstance, async: boolean = false) {
+		this._instance = instance;
+		instance.init(async);
 	}
 
-	public async solve(data: OptimizerRequest, seed?: number): Promise<OptimizerResult> {
+	public async solve(request: OptimizerRequest, seed?: number): Promise<OptimizerResult> {
 		if(seed === undefined || !Number.isInteger(seed) || seed > UINT_MAX) {
 			seed = Math.floor(Math.random() * UINT_MAX);
 		}
 
-		const arr = serialize(data);
-		const ptr = this._createDoubleArrayPointer(arr);
-		// We need to use ccall to return a Promise in async mode
-		const awaitable = this.instance.ccall(
-			"solve", "number",
-			["number", "number"], [ptr, seed],
-			{ async: this.async }
-		) as Awaitable<number>;
-		const outputPtr = await awaitable;
-		const response = this._parseIntArray(outputPtr);
-		if(!response.length) throw new Error("No solution found.");
-		const grid = response[response.length - 1];
+		const data = makeData(request);
+		const response = await this._instance.solve(data, seed);
+		const size = response.size();
+		if(!size) throw new Error("No solution found.");
+		const grid = response.get(size - 1);
 		const result: OptimizerResult = {
 			width: grid,
 			height: grid,
-			flaps: data.problem.flaps.map((f, i) => ({
+			flaps: request.problem.flaps.map((f, i) => ({
 				id: f.id,
-				x: response[2 * i],
-				y: response[2 * i + 1],
+				x: response.get(2 * i),
+				y: response.get(2 * i + 1),
 			})),
 		};
+		response.delete(); // release memory
 		return result;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Private members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private _createDoubleArrayPointer(jsArray: number[]): number {
-		const arrayLength = jsArray.length;
-		const arrayBytes = arrayLength * Float64Array.BYTES_PER_ELEMENT;
-		const arrayPtr = this.instance._malloc(arrayBytes);
-		this.instance.HEAPF64.set(jsArray, arrayPtr / Float64Array.BYTES_PER_ELEMENT);
-		return arrayPtr;
-	}
-
-	private _parseIntArray(ptr: number): number[] {
-		// There's no need to free memory here.
-		const output = Array.from(new Int32Array(this.instance.HEAP32.buffer, ptr, 2));
-		return Array.from(new Int32Array(this.instance.HEAP32.buffer, output[1], output[0]));
 	}
 }
 
-function serialize(data: OptimizerRequest): number[] {
-	const { problem } = data;
-	const result: number[] = [];
-	result.push(problem.type == "rect" ? 1 : 2);
-	result.push(problem.hierarchies.length);
-	for(const h of problem.hierarchies) {
-		result.push(h.leaves.length);
-		result.push(...h.leaves);
-		result.push(h.distMap.length);
-		for(const d of h.distMap) result.push(...d);
-		result.push(h.parents.length);
-		for(const p of h.parents) {
-			result.push(p.id, p.radius, p.children.length, ...p.children);
-		}
-	}
-	result.push(problem.flaps.length);
-	for(const f of problem.flaps) {
-		result.push(f.id, f.width, f.height);
-	}
-
-	const useView = data.layout == "view";
-	result.push(Number(useView));
+function makeData(request: OptimizerRequest): object {
+	const { problem } = request;
+	const data: Record<string, unknown> = {
+		type: problem.type == "rect" ? 1 : 2,
+		hierarchies: problem.hierarchies,
+		flaps: problem.flaps,
+	};
+	const useView = request.layout == "view";
+	data.useView = useView;
 	if(useView) {
-		for(const p of data.vec!) result.push(p.x, p.y);
-		result.push(Number(data.useBH));
+		data.vec = request.vec!;
+		data.useBH = request.useBH;
 	} else {
-		result.push(data.random);
+		data.random = request.random;
 	}
-	return result;
+	return data;
 }

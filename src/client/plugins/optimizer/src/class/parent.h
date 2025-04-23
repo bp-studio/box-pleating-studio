@@ -1,13 +1,14 @@
 
 #pragma once
 
+#include <emscripten/bind.h>
 #include <vector>
 
 using namespace std;
 
 class Parent {
   public:
-	Parent(double *&ptr);
+	Parent(const emscripten::val &data);
 
 	int id;
 	double radius;

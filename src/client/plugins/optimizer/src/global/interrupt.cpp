@@ -5,24 +5,15 @@
 #include <emscripten.h>
 
 // clang-format off
-EM_ASYNC_JS(const bool*, check_interrupt_async, (), {
-	const value = await Module.checkInterruptAsync();
-	const ptr = _malloc(1);
-	setValue(ptr, value, "i8");
-	return ptr;
+EM_ASYNC_JS(bool, check_interrupt_async, (), {
+	return await Module.checkInterruptAsync();
 });
 
-EM_JS(const bool*, check_interrupt_sync, (), {
-	const value = Module.checkInterrupt();
-	const ptr = _malloc(1);
-	setValue(ptr, value, "i8");
-	return ptr;
+EM_JS(bool, check_interrupt_sync, (), {
+	return Module.checkInterrupt();
 });
 // clang-format on
 
 bool check_interrupt() {
-	const bool *ptr = Shared::async ? check_interrupt_async() : check_interrupt_sync();
-	auto result = *ptr;
-	std::free((void *)ptr);
-	return result;
+	return Shared::async ? check_interrupt_async() : check_interrupt_sync();
 }
