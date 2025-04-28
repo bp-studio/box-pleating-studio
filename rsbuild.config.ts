@@ -13,8 +13,10 @@ import { createDescendantRegExp, makeTest } from "@mutsuntsai/rsbuild-utils";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
-const useRsdoctor = false;
-const inspectBuild = false;
+
+// To enable these, execute for example `pnpm build -- doctor inspect`.
+const useRsdoctor = process.argv.includes("doctor");
+const inspectBuild = process.argv.includes("inspect");
 
 export default defineConfig({
 	dev: {
