@@ -231,6 +231,7 @@ export default defineConfig({
 					supports: {
 						generateTileGraph: true,
 					},
+					port: 6060,
 				}));
 			}
 
