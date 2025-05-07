@@ -1,5 +1,6 @@
 #include <array>
 #include <emscripten.h>
+#include <emscripten/bind.h>
 #include <iostream>
 #include <nlopt.h>
 #include <vector>
@@ -14,20 +15,14 @@
 
 using namespace std;
 
-#define EXPORT extern "C" EMSCRIPTEN_KEEPALIVE
-
-struct Output {
-	int size;
-	int *ptr;
-};
-
-Output output;
-vector<int> result;
-
-vector<double> read_initial_vector(double *&ptr, const Hierarchy &hierarchy) {
+vector<double> read_initial_vector(const emscripten::val &data, const Hierarchy &hierarchy) {
 	vector<double> x;
 	x.reserve(Shared::dim);
-	for(int i = 0; i < Shared::last; i++) x.push_back(read(ptr));
+	for(int i = 0; i < Shared::flap_count; i++) {
+		auto p = data["vec"][i];
+		x.push_back(p["x"].as<double>());
+		x.push_back(p["y"].as<double>());
+	}
 	x.push_back(0);
 	setup_initial_scale(x, &hierarchy);
 	return x;
@@ -66,7 +61,7 @@ OptimizeResult solve_global(const vector<vector<double>> &initial_vectors, const
 /**
  * Setup and print welcome message to indicate that the WASM is ready.
  */
-EXPORT void init(bool async) {
+void init(bool async) {
 	Shared::async = async;
 	int major;
 	int minor;
@@ -78,24 +73,24 @@ EXPORT void init(bool async) {
 /**
  * The entry function for optimizing.
  */
-EXPORT Output *solve(double *ptr, unsigned int seed) {
+vector<int> solve(const emscripten::val &data, unsigned int seed) {
 	cout << R"({"event": "start", "data": null})" << endl;
-	result.clear();
+	vector<int> result;
 
 	// Initialize random number generator.
 	// This improves performance and makes it easier to reproduce issues if any.
 	std::srand(seed);
 	cout << "Random seed: " << seed << endl;
 
-	Problem problem(ptr);
+	Problem problem(data);
 	Hierarchy &main = problem.hierarchies.back();
 	auto cons = main.generate_constraints(nullptr);
 
 	OptimizeResult sol;
-	bool useView = read(ptr);
+	bool useView = data["useView"].as<bool>();
 	if(useView) {
-		auto x0 = read_initial_vector(ptr, main);
-		bool useBH = read(ptr);
+		auto x0 = read_initial_vector(data, main);
+		bool useBH = data["useBH"].as<bool>();
 		if(useBH) {
 			cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
 			sol = basin_hopping(x0, cons, 1, bhp, MAX_SHEET_SIZE);
@@ -106,7 +101,7 @@ EXPORT Output *solve(double *ptr, unsigned int seed) {
 			});
 		}
 	} else {
-		int random = read(ptr);
+		int random = data["random"].as<int>();
 		auto initial_vectors = generate_candidate(random, problem.hierarchies);
 		sol = solve_global(initial_vectors, cons);
 	}
@@ -115,7 +110,11 @@ EXPORT Output *solve(double *ptr, unsigned int seed) {
 		auto int_sol = greedy_solve_integer(sol.x, &main);
 		for(int i = 0; i < Shared::dim; i++) result.push_back(int_sol[i]);
 	}
-	output.size = result.size();
-	output.ptr = result.data();
-	return &output;
+	return result;
+}
+
+EMSCRIPTEN_BINDINGS(main) {
+	emscripten::register_vector<int>("VectorInt");
+	emscripten::function("init", &init);
+	emscripten::function("solve", &solve);
 }

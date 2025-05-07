@@ -3,13 +3,14 @@
 
 #include "hierarchy.h"
 
+#include <emscripten/bind.h>
 #include <vector>
 
 using namespace std;
 
 class Problem {
   public:
-	Problem(double *&ptr);
+	Problem(const emscripten::val &data);
 
 	vector<Hierarchy> hierarchies;
 };

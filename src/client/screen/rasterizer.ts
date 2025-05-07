@@ -1,7 +1,7 @@
 import ProjectService from "client/services/projectService";
 import { svg } from "client/svg";
 import { display } from "./display";
-import { isDark, isPrinting } from "app/misc/isDark";
+import { isDark, forceLightMode } from "app/misc/isDark";
 
 import type { Project } from "client/project/project";
 
@@ -44,13 +44,13 @@ export async function beforePrint(proj: Project | null): Promise<void> {
 		// printing service on mobile devices.
 		setTimeout(() => URL.revokeObjectURL(old), GC_TIME);
 
-		isPrinting.value = true;
 		const promise = new Promise((resolve, reject) => {
 			img.onload = resolve;
 			img.onerror = reject;
-			img.src = URL.createObjectURL(svg(proj!, false));
+			// Always print in light mode
+			const blob = forceLightMode(() => svg(proj!, false));
+			img.src = URL.createObjectURL(blob);
 		});
-		isPrinting.value = false;
 		printing = true;
 		await promise;
 	}

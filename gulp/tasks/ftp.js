@@ -70,7 +70,7 @@ function streamToPromise(stream) {
  * @param {(stream: NodeJS.ReadWriteStream) => NodeJS.ReadWriteStream} pipeFactory
  */
 async function ftpFactory(folder, pipeFactory) {
-	const findCacheDirectory = (await import("find-cache-dir")).default;
+	const findCacheDirectory = (await import("find-cache-directory")).default;
 	const conn = connect();
 	const sw = config.dest.dist + "/sw.js";
 	const globs = [

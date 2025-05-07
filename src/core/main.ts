@@ -24,6 +24,9 @@ onmessage = function(event: MessageEvent): void {
 	const request = event.data as CoreRequest;
 	let response: CoreResponse;
 	try {
+		// Uncomment the next line to mock fatal error.
+		// if(Math.random() < 0.1) throw new Error("Test error");
+
 		// Get the route corresponding the the request.
 		const action = getAction(request);
 
