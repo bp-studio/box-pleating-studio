@@ -7,10 +7,10 @@ const config = require("../config.json");
 const seriesIf = require("../utils/seriesIf");
 
 // This file is not in the repo, of course
-const ftpConfigPath = process.cwd() + "/.vscode/ftp.json";
+const secretPath = process.cwd() + "/.vscode/secrets.json";
 
-/** @type {import("../../.vscode/ftp.json")|null} */
-const ftpConfig = existsSync(ftpConfigPath) ? require(ftpConfigPath) : null;
+/** @type {import("../../.vscode/secrets.json")|null} */
+const ftpConfig = existsSync(secretPath) ? require(secretPath).ftp : null;
 
 function configGuard() {
 	if(!ftpConfig) throw new Error("The repo is not configured with FTP. This operation is for maintainers only.");
@@ -42,7 +42,7 @@ function compare(findCacheDirectory, tag) {
 function connect() {
 	const ftp = require("vinyl-ftp");
 	const log = require("fancy-log");
-	const options = ftpConfig.ftp;
+	const options = ftpConfig.server;
 	options.log = log;
 	return ftp.create(options);
 }

@@ -5,7 +5,10 @@ import type { CoreError, JProject } from "shared/json/project";
 const LOG_FILENAME_LENGTH = 20;
 const JSON_INDENT = 4;
 
-const WEBHOOK = "https://discord.com/api/webhooks/1356479295622742096/CJ975w-YJG-THl3HDK0YZRoYNl_BpNHe4qTepO3tL4NX4b42oD9spaPcV1KTodpG5j0B";
+// Injected in build process
+declare const __DISCORD_WEBHOOK__: string;
+
+const WEBHOOK = __DISCORD_WEBHOOK__;
 
 declare global {
 	interface Navigator {
@@ -22,7 +25,7 @@ declare global {
  */
 export async function uploadLog(log: JProject, error: CoreError): Promise<void> {
 	// Comment the next line to test fatal error reporting.
-	if(!isOnline) return;
+	if(!isOnline || !WEBHOOK) return;
 
 	try {
 		const err_short = (error.message.match(/^[a-z ]+/i)?.[0] ?? "")
