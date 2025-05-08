@@ -5,10 +5,8 @@ import type { CoreError, JProject } from "shared/json/project";
 const LOG_FILENAME_LENGTH = 20;
 const JSON_INDENT = 4;
 
-// Injected in build process
-declare const __DISCORD_WEBHOOK__: string;
-
-const WEBHOOK = __DISCORD_WEBHOOK__;
+/** @see [error.php](../../other/php/error.php) */
+const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
 
 declare global {
 	interface Navigator {

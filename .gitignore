@@ -3,7 +3,7 @@
 /build
 
 # You don't really think I'll leave sensitive info in the repo, do you?
-/.vscode/secrets.*
+/.vscode/*ftp*
 
 # Non-essential files
 node_modules/

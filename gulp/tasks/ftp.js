@@ -7,10 +7,10 @@ const config = require("../config.json");
 const seriesIf = require("../utils/seriesIf");
 
 // This file is not in the repo, of course
-const secretPath = process.cwd() + "/.vscode/secrets.json";
+const ftpConfigPath = process.cwd() + "/.vscode/ftp.json";
 
-/** @type {import("../../.vscode/secrets.json")|null} */
-const ftpConfig = existsSync(secretPath) ? require(secretPath).ftp : null;
+/** @type {import("../../.vscode/ftp.json")} */
+const ftpConfig = existsSync(ftpConfigPath) ? require(ftpConfigPath) : null;
 
 function configGuard() {
 	if(!ftpConfig) throw new Error("The repo is not configured with FTP. This operation is for maintainers only.");
