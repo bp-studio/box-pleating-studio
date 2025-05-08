@@ -43,9 +43,6 @@ function ssgOption(options) {
 					},
 				}),
 			],
-			define: {
-				__DISCORD_WEBHOOK__: "null",
-			},
 			external: [
 				// Mark async dependencies as external to reduce compile time
 				"vue", "@vue", "vue-*", "@pixi", "bootstrap", "@popperjs", "fflate",

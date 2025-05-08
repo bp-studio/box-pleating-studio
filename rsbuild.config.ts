@@ -1,6 +1,5 @@
 ///<reference path="./src/shared/frontend/imports.d.ts" />
 
-import { existsSync } from "node:fs";
 import { defineConfig } from "@rsbuild/core";
 import { pluginVue } from "@rsbuild/plugin-vue";
 import { pluginCheckSyntax } from "@rsbuild/plugin-check-syntax";
@@ -12,9 +11,6 @@ import postcssPresetEnv from "postcss-preset-env";
 import { createDescendantRegExp, makeTest } from "@mutsuntsai/rsbuild-utils";
 
 import pkg from "./package.json";
-
-const secretPath = process.cwd() + "/.vscode/secrets.json";
-const secrets = existsSync(secretPath) ? require(secretPath) : null;
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -42,7 +38,6 @@ export default defineConfig({
 		define: {
 			// __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: true,
 			__VUE_I18N_LEGACY_API__: false,
-			__DISCORD_WEBHOOK__: secrets?.discord,
 		},
 		tsconfigPath: "./src/app/tsconfig.json",
 	},
