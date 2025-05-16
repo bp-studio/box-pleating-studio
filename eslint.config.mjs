@@ -405,7 +405,7 @@ export default [
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	{
-		...pluginMocha.configs.flat.recommended,
+		...pluginMocha.configs.recommended,
 		files: ["test/**"],
 	},
 	{
