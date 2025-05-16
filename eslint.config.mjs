@@ -327,6 +327,7 @@ export default [
 		settings: {
 			"import/resolver": {
 				typescript: {
+					noWarnOnMultipleProjects: true,
 					project: [
 						"src/app",
 						"src/client",
