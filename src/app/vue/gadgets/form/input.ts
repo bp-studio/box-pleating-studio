@@ -4,7 +4,6 @@ export function useFieldId(): string {
 	return "field" + getCurrentInstance()?.uid;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function useInput(
 	props: { readonly modelValue: unknown },
 	emit: Action

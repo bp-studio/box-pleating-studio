@@ -6,7 +6,6 @@ interface ModalOptions extends Modal.Options {
 	onBeforeShow: Action<Awaitable<boolean>>;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default function useModal(screen_name: string, options?: Partial<ModalOptions>) {
 
 	let modal: Modal;

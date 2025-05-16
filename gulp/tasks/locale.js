@@ -5,10 +5,10 @@ const config = require("../config.json");
 
 // For sorting the locale file entries to the same ordering as the source locale
 
-function copyInOrderOf(source, order) {
+function copyInOrderOf(source, ref) {
 	if(typeof source != "object" || Array.isArray(source)) return source;
 	const result = {};
-	for(const key in order) result[key] = copyInOrderOf(source[key], order[key]);
+	for(const key in ref) result[key] = copyInOrderOf(source[key], ref[key]);
 	return result;
 }
 
