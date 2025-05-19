@@ -1,4 +1,4 @@
-import { AAUnion, GeneralUnion } from "core/math/sweepLine/polyBool";
+import { AAUnion, GeneralUnion } from "../../src/core/math/sweepLine/polyBool";
 
 import type { Polygon } from "shared/types/geometry";
 

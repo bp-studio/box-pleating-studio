@@ -1,7 +1,10 @@
 ///<reference path="./src/shared/frontend/imports.d.ts" />
 
+import fs from "node:fs";
+import { spawnSync } from "node:child_process";
 import { defineConfig } from "@rsbuild/core";
 import { pluginVue } from "@rsbuild/plugin-vue";
+import { pluginVueSSG } from "@mutsuntsai/rsbuild-plugin-vue-ssg";
 import { pluginCheckSyntax } from "@rsbuild/plugin-check-syntax";
 import { pluginAssetsRetry } from "@rsbuild/plugin-assets-retry";
 import { InjectManifest } from "@aaroon/workbox-rspack-plugin";
@@ -9,7 +12,9 @@ import { pluginSass } from "@rsbuild/plugin-sass";
 import { RsdoctorRspackPlugin } from "@rsdoctor/rspack-plugin";
 import postcssPresetEnv from "postcss-preset-env";
 import { createDescendantRegExp, makeTest } from "@mutsuntsai/rsbuild-utils";
+import { createI18n } from "vue-i18n";
 
+import locale from "./src/locale/en.json";
 import pkg from "./package.json";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -17,6 +22,11 @@ const isProduction = process.env.NODE_ENV === "production";
 // To enable these, execute for example `pnpm build -- doctor inspect`.
 const useRsdoctor = process.argv.includes("doctor");
 const inspectBuild = process.argv.includes("inspect");
+
+// Build static assets once
+if(!fs.existsSync("build/temp")) {
+	spawnSync("gulp", ["static"], { stdio: "inherit", shell: true });
+}
 
 export default defineConfig({
 	dev: {
@@ -42,7 +52,10 @@ export default defineConfig({
 		tsconfigPath: "./src/app/tsconfig.json",
 	},
 	html: {
-		template: ({ entryName }) => `./build/temp/${entryName}.htm`,
+		template: ({ entryName }) => ({
+			index: "./src/app/html/index.htm",
+			donate: "./src/other/donate/donate.htm",
+		}[entryName]),
 		templateParameters: {
 			VERSION: pkg.version,
 			APP_VERSION: pkg.app_version,
@@ -52,7 +65,6 @@ export default defineConfig({
 		port: 30783,
 		publicDir: {
 			name: "src/public",
-			copyOnBuild: true,
 		},
 		historyApiFallback: {
 			index: "/index.htm",
@@ -151,6 +163,30 @@ export default defineConfig({
 		},
 	},
 	plugins: [
+		pluginVue(),
+		pluginVueSSG({
+			entry: {
+				index: "./src/app/vue/app.vue",
+				donate: "./src/other/donate/app.vue",
+			},
+			externals: [
+				"fflate",
+				/^client\//,
+				"@/toolbar/toolbar.vue",
+				"@/panel/panel.vue",
+				"@/status.vue",
+				"@/gadgets/dpad.vue",
+				"@/modals/modalFragment.vue",
+				"@/dialogs/dialogFragment.vue",
+			],
+			appFactory: app => app.use(i18n),
+			postProcess: (html: string, entryName: string) => entryName == "index" ? wrapIE(html) : html,
+			jsdom(global) {
+				global.matchMedia = () => ({ matches: false });
+				global.__VUE_PROD_DEVTOOLS__ = false; // Used in vue-i18n
+				global.i18n = i18n.global;
+			},
+		}),
 		pluginSass({
 			sassLoaderOptions: {
 				sassOptions: {
@@ -162,7 +198,6 @@ export default defineConfig({
 				},
 			},
 		}),
-		pluginVue(),
 		pluginCheckSyntax({
 			ecmaVersion: 2019,
 		}),
@@ -256,4 +291,12 @@ export default defineConfig({
 			}));
 		},
 	},
+});
+
+/** Add simple handling for IE < 10, where conditional comments were supported. */
+const wrapIE = (c: string) => `<!--[if IE]><body>IE is not supported.</body><![endif]--><!--[if !IE]><!-->${c}<!--<![endif]-->`;
+
+const i18n = createI18n<false, object>({
+	locale: "en",
+	messages: { en: locale },
 });

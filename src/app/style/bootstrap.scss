@@ -79,8 +79,10 @@
 	display: none;
 }
 
-.form-select, .form-check {
-	&, * {
+.form-select,
+.form-check {
+	&,
+	* {
 		cursor: pointer;
 	}
 }
@@ -101,5 +103,22 @@
 
 	.touch-only {
 		display: unset;
+	}
+}
+
+.tooltip {
+	--bs-tooltip-opacity: 1 !important;
+	--bs-tooltip-bg: var(--bs-gray-200) !important;
+	--bs-tooltip-color: var(--bs-black) !important;
+}
+
+.tooltip-inner {
+	text-align: left !important;
+}
+
+html.dark {
+	.tooltip {
+		--bs-tooltip-bg: var(--bs-gray-800) !important;
+		--bs-tooltip-color: var(--bs-white) !important;
 	}
 }

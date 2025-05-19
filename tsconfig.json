@@ -2,6 +2,9 @@
 	"compilerOptions": {
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
+		"lib": [
+			"ESNext"
+		],
 		"module": "Preserve",
 		"moduleResolution": "Bundler"
 	},
