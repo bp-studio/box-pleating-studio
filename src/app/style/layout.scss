@@ -224,10 +224,10 @@ footer {
 
 	width: 7.5rem;
 	height: 7.5rem;
+	border-radius: 3.75rem;
 
 	opacity: 0;
 	background-color: var(--bs-primary);
-	border-radius: 3.75rem;
 
 	/* Vanishing is faster */
 	transition-duration: 0.1s;

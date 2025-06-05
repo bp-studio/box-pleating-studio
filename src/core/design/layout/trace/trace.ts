@@ -68,7 +68,7 @@ export class Trace {
 
 		const result = ctx.$trim(path);
 		if(!rawMode) return result;
-		else return Trace._rawModeFinalCheck(result, hinges);
+		else return Trace._rawModeFinalCheck(result, hinges, cursor.vector);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,11 @@ export class Trace {
 	 * In raw mode, we need to make some extra checks to make sure the
 	 * generated contour actually fits the given hinge segment.
 	 */
-	private static _rawModeFinalCheck(result: PatternContour | null, hinges: Path): PatternContour | null {
+	private static _rawModeFinalCheck(
+		result: PatternContour | null,
+		hinges: Path,
+		lastVec: Vector
+	): PatternContour | null {
 		if(!result) return null;
 
 		// First we quickly check if the last point is on the hinges.
@@ -91,7 +95,24 @@ export class Trace {
 			if(line.$contains(lastPoint, true)) return result;
 		}
 
-		// Otherwise, try to find the intersection of the last pattern segment (as ray) with the hinges.
+		const findIntersection = (pt: Point, v: Vector) => {
+			for(const hinge of hingeLines) {
+				const intersection = hinge.$intersection(pt, v, true);
+				if(intersection) return intersection;
+			}
+			return null;
+		};
+
+		// Otherwise, try to find the intersection of the last known cursor direction with the hinges.
+		if(lastVec.x == 0 || lastVec.y == 0) {
+			const intersection = findIntersection(result[result.length - 1], lastVec);
+			if(intersection) {
+				result.push(intersection);
+				return result;
+			}
+		}
+
+		// If this still doesn't work, try popping the tail segments and retry.
 		for(let i = result.length - 1; i > 0; i--) {
 			const last = result[i];
 			const prev = result[i - 1];
@@ -101,16 +122,17 @@ export class Trace {
 			if(vec.x != 0 && vec.y != 0) break;
 
 			result.pop();
-			for(const hinge of hingeLines) {
-				const intersection = hinge.$intersection(prev, vec, true);
-				if(intersection) {
-					result.push(intersection);
-					return result;
-				}
+			const intersection = findIntersection(prev, vec);
+			if(intersection) {
+				result.push(intersection);
+				return result;
 			}
 		}
 
-		// TODO: is it a bug to get here?
+		// Very likely, something is wrong is we ever get here.
+		/// #if DEBUG
+		debugger;
+		/// #endif
 		return null;
 	}
 

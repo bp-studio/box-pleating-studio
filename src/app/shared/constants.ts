@@ -34,7 +34,7 @@ export const isMac = navigator.platform?.toLowerCase().startsWith("mac");
 if(isMac) document.body.classList.add("mac");
 
 /** If the current execution is under SSG. */
-export const isSSG = navigator.userAgent.includes("jsdom");
+export const isSSG = navigator.userAgent.includes("Node");
 
 /** Store the original page title (this will vary from build to build) */
 export const defaultTitle = document.title;
@@ -54,7 +54,7 @@ export const hasServiceWorker = "serviceWorker" in navigator;
 
 /** Whether the current page is reloaded. */
 const timing = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
-export const isReload = timing?.type == "reload" || performance.navigation.type == 1;
+export const isReload = timing?.type == "reload" || performance.navigation?.type == 1;
 
 export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
 

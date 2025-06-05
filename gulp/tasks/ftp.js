@@ -25,7 +25,7 @@ function compare(findCacheDirectory, tag) {
 	for(const record of records) map.set(record.path, record.hash);
 	records.length = 0;
 	return through2({
-		transform(content, file, encoding) {
+		transform(_, file) {
 			const md5 = createHash("md5");
 			md5.update(file.contents);
 			const hash = md5.digest("hex");
@@ -33,7 +33,7 @@ function compare(findCacheDirectory, tag) {
 			if(map.get(file.relative) === hash) return null;
 		},
 		flushEmptyList: true,
-		flush(files) {
+		flush() {
 			writeFileSync(cache, JSON.stringify(records));
 		},
 	});

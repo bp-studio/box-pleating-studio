@@ -193,6 +193,7 @@ namespace WorkspaceService {
 			const log = cloneObj(backup);
 			if(log) {
 				error.build = app_config.app_version;
+				error.userAgent = navigator.userAgent;
 				log.error = error;
 				setTimeout(() => uploadLog(log, error), 0);
 			}

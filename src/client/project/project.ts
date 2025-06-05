@@ -6,12 +6,19 @@ import HistoryManager from "./changes/history";
 import { options } from "client/options";
 import { shallowRef } from "client/shared/decorators";
 import { callWorker } from "app/utils/workerUtility";
+import { isIOS } from "app/shared/constants";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
 import type { CoreError, JProject, ProjId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
-const CORE_TIMEOUT = 3000;
+/**
+ * It seems that iOS more often triggers computation timeout errors,
+ * so we use a larger value here.
+ */
+const IOS_TIMEOUT = 6000;
+const NORMAL_TIMEOUT = 3000;
+const CORE_TIMEOUT = isIOS ? IOS_TIMEOUT : NORMAL_TIMEOUT;
 
 /**
  * Id starts from 1 to ensure true values.

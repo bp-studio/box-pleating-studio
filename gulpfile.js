@@ -21,22 +21,13 @@ const seriesIf = require("./gulp/utils/seriesIf");
 const { exec } = require("child_process");
 
 require("./gulp/tasks/ftp.js");
-require("./gulp/tasks/html.js");
 require("./gulp/tasks/locale.js");
 require("./gulp/tasks/static.js");
-require("./gulp/tasks/tool.js");
-
-// Run all builds
-gulp.task("build", gulp.parallel(
-	"static",
-	"donate",
-	"html"
-));
 
 gulp.task("rsbuild", cb => exec("pnpm rsbuild build", cb));
 
 gulp.task("buildDist", gulp.series(
-	gulp.parallel("build", "version"),
+	gulp.parallel("static", "version"),
 	"rsbuild"
 ));
 
@@ -93,7 +84,7 @@ gulp.task("clean", async () => {
 
 // The default build. It will build to the point that it can be run locally.
 // Press F5 in VS Code will execute this task by default.
-gulp.task("default", gulp.series("build"));
+gulp.task("default", gulp.series("static"));
 
 // console.log("Require count", requireCount);
 // console.timeEnd("startup");

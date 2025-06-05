@@ -1,6 +1,5 @@
 import { mapDirections } from "core/math/geometry/path";
 
-import type { ITreeNode } from "core/design/context";
 import type { QuadrantDirection, SlashDirection } from "shared/types/direction";
 import type { Path } from "shared/types/geometry";
 

@@ -14,7 +14,7 @@ html.dark {
 	--bs-link-color-rgb: 87, 155, 255;
 	--bs-link-hover-color: #70aaff;
 	--bs-link-hover-color-rgb: 112, 170, 255;
-	--bs-gradient: linear-gradient(180deg, rgba(255 255 255 / 2%), rgba(255 255 255 / 0%));
+	--bs-gradient: linear-gradient(180deg, rgb(255 255 255 / 2%), rgb(255 255 255 / 0%));
 
 	--tab-border: #222;
 	--tab-active: var(--bs-body-bg);
@@ -71,9 +71,9 @@ html.dark {
 
 	.form-control,
 	.form-select {
+		border: #222;
 		color: #eee;
 		background-color: #555;
-		border: #222;
 
 		&:disabled {
 			color: #aaa;
@@ -115,8 +115,8 @@ html.dark {
 	}
 
 	.dropdown-menu {
-		background: #333;
 		border-color: #444;
+		background: #333;
 	}
 
 	.dropdown-item {
@@ -136,9 +136,9 @@ html.dark {
 	}
 
 	.btn-light {
+		border-color: #555;
 		color: var(--bs-body-color);
 		background-color: #555;
-		border-color: #555;
 
 		&:hover {
 			background-color: #666;

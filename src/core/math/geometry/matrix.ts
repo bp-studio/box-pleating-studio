@@ -26,6 +26,12 @@ export class Matrix {
 
 	public toString(): string { return [this.a, this.b, this.c, this.d].toString(); }
 
+	/// #if DEBUG
+	public toArray(): [number, number, number, number] {
+		return [this.a.$value, this.b.$value, this.c.$value, this.d.$value];
+	}
+	/// #endif
+
 	/**
 	 * Returns the inverse matrix in a new instance.
 	 * Returns `null` if the current matrix is not invertible.

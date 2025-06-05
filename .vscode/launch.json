@@ -7,7 +7,7 @@
 			"type": "chrome",
 			"request": "launch",
 			"name": "Launch in Chrome",
-			"preLaunchTask": "PreLaunch",
+			"preLaunchTask": "Server",
 			"internalConsoleOptions": "neverOpen",
 			"url": "http://localhost:30783",
 			// For some unknown reason, source binding does not work

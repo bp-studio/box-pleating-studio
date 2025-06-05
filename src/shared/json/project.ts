@@ -82,4 +82,7 @@ export interface CoreError {
 
 	/** Build version. */
 	build: string;
+
+	/** Same as {@link Navigator.userAgent}. */
+	userAgent: string;
 }

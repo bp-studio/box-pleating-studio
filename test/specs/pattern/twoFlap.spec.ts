@@ -1,6 +1,7 @@
 import { expectRepo, generateFromFlaps } from "./util";
 
 export default function() {
+
 	it("Finds universal GPS patterns", function() {
 		for(const [a, b] of TWO_PERMUTATION) {
 			generateFromFlaps([

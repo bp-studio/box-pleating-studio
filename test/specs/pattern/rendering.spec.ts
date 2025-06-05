@@ -6,6 +6,7 @@ import { complete, generateFromFlaps } from "./util";
 import { DesignController } from "core/controller/designController";
 
 export default function() {
+
 	it("Updates ridges when edges merge or split", function() {
 		parseTree("(0,1,2),(0,2,2),(0,4,1),(4,3,7)", "(1,9,5,0,0),(2,6,8,0,0),(3,0,0,0,0)");
 		complete();

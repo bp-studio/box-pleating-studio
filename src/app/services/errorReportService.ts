@@ -20,10 +20,22 @@ declare global {
 
 /**
  * Submit the fatal error report to Discord webhook.
+ *
+ * To test the functionality, paste and run the following in the console:
+ * ```js
+ * (function() {
+ * 	const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
+ * 	const jsonBlob = new Blob([JSON.stringify({ data: "test file" })], { type: "application/json" });
+ * 	const formData = new FormData();
+ * 	formData.append("payload_json", JSON.stringify({ content: `Test` }));
+ * 	formData.append("file", jsonBlob, `test.json`);
+ * 	fetch(WEBHOOK, { method: "POST", body: formData });
+ * })()
+ * ```
  */
 export async function uploadLog(log: JProject, error: CoreError): Promise<void> {
 	// Comment the next line to test fatal error reporting.
-	if(!isOnline || !WEBHOOK) return;
+	if(!isOnline) return;
 
 	try {
 		const err_short = (error.message.match(/^[a-z ]+/i)?.[0] ?? "")

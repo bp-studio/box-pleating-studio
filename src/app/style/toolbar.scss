@@ -59,9 +59,9 @@ nav {
 		width: 100vw;
 		height: 2.4rem;
 		margin: 0;
+		border-top: 1px solid gray;
 
 		background: var(--bg-ui);
-		border-top: 1px solid gray;
 	}
 }
 
@@ -74,12 +74,12 @@ nav {
 	max-width: 150px;
 	height: 100%;
 	padding: 0.5rem;
+	border-right: 1px solid var(--tab-border);
 
 	font-size: 1.25rem;
 	line-height: 2.5rem;
 
 	background-color: var(--bg-ui);
-	border-right: 1px solid var(--tab-border);
 
 	&:first-child {
 		border-left: 1px solid var(--tab-border);
@@ -133,16 +133,15 @@ body > .tab .bt {
 		height: 1.75rem;
 		margin-top: 0.15rem;
 		padding: 0.3rem;
+		border-radius: 5px;
 
 		line-height: 1;
 		text-align: center;
 
-		border-radius: 5px;
-
 		transition: background-color 0.1s linear;
 
 		&:hover {
-			background-color: rgba(255 255 255 / 20%);
+			background-color: rgb(255 255 255 / 20%);
 			background-image: var(--bs-gradient);
 		}
 	}

@@ -18,8 +18,15 @@
 					<i18n-t keypath="about.visitBlog" tag="p" scope="global">
 						<a target="_blank" rel="noopener" href="https://origami.abstreamace.com/">{{ $t("about.blog") }}</a>
 					</i18n-t>
+
+					<!--
+						As of Vue-i18n v11.1.3 there seems to be a bug in this component,
+						and we need to wrap plain HTML with <template> to bypass the bug.
+					-->
 					<i18n-t keypath="about.donation" tag="p" scope="global">
-						<a target="_blank" href="donate.htm">PayPal</a>
+						<template #default>
+							<a target="_blank" href="donate.htm">PayPal</a>
+						</template>
 					</i18n-t>
 
 					<!--

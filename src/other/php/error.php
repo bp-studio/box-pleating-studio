@@ -1,6 +1,12 @@
 <?php
+/**
+ * This is currently the only backend script used by BP Studio,
+ * for forwarding Discord Webhook request to the actual endpoint
+ * without publishing the endpoint URL to GitHub repo.
+ */
+
 // Set CORS headers
-header('Access-Control-Allow-Origin: *'); // You can specify allowed origins here
+header('Access-Control-Allow-Origin: https://bpstudio.abstreamace.com');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -10,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Discord Webhook URL (not included here)
-$webhook_url = __DISCORD_WEBHOOK__;
+// Discord Webhook URL (in environment variable)
+$webhook_url = $_SERVER['DISCORD_WEBHOOK'];
 
 // Verify request method is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

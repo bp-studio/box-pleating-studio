@@ -5,6 +5,7 @@ import { ArcSegment } from "core/math/sweepLine/classes/segment/arcSegment";
 import { dist } from "shared/types/geometry";
 
 export default function() {
+
 	it("Computes intersection", function() {
 		const c1 = { x: 6, y: 6 };
 		const c2 = { x: 3, y: 3 };
