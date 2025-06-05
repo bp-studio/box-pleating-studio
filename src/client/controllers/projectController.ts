@@ -3,7 +3,7 @@ import { getNextId, Project } from "client/project/project";
 import { Migration } from "client/patches";
 import { deepAssign } from "shared/utils/clone";
 import ProjectService from "client/services/projectService";
-import { isContextLost } from "client/main";
+import { isContextLost } from "client/screen/contextManager";
 
 import type { JProject, ProjId } from "shared/json";
 

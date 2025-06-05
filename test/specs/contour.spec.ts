@@ -44,6 +44,18 @@ describe("Contour", function() {
 			expect(outer).to.equalPath("(18,34),(-6,34),(-6,10),(6,10),(6,5),(18,5),(18,14),(17.5,14),(17,44/3),(17,16),(18,16)");
 		});
 
+		/** Added v0.7.9 */
+		it("Raw mode final check should first attempt last know cursor direction", function() {
+			// This example is derived from Scutigera by Matt LaBoone
+			parseTree(
+				"(24,45,1),(24,38,7),(24,27,1),(45,1,1),(45,43,5),(27,26,1),(1,3,17)",
+				"(3,88,88,0,0),(38,66,74,0,0),(43,77,67,0,0),(26,63,62,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			const outer = result.graphics["re24,45"].contours[0].outer;
+			expect(outer).to.equalPath("(107,107),(69,107),(69,81),(69.5,81),(73,229/3),(73,215/3),(71,69),(71,61),(83,61),(83,69),(107,69)");
+		});
+
 	});
 
 	describe("Trace contour", function() {

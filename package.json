@@ -91,7 +91,7 @@
 		"stylelint-no-unsupported-browser-features": "^8.0.4",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0",
-		"ttf2woff2": "^7.0.0",
+		"ttf2woff2": "^8.0.0",
 		"typescript": "^5.8.3",
 		"vinyl-ftp": "^0.6.1"
 	},
