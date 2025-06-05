@@ -10,6 +10,7 @@ import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
 
 export default function() {
+
 	it("Loads saved patterns", async function() {
 		fullReset();
 		const sample = await getJSON("v04.session.sample.json");

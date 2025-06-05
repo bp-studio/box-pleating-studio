@@ -1,6 +1,7 @@
 import { clone, clonePolyfill, deepAssign } from "shared/utils/clone";
 
 export default function() {
+
 	it("Use native structureClone when possible", function() {
 		expect(clone).to.equal(structuredClone);
 	});
