@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { parsePath } from "@utils/path";
 import { Trace } from "core/design/layout/trace/trace";
 import { Line } from "core/math/geometry/line";

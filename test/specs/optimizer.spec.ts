@@ -1,12 +1,10 @@
+import { expect } from "chai";
 
 import { Bridge } from "client/plugins/optimizer/bridge";
 import { GridType } from "shared/json";
+import optimizer from "lib/optimizer/debug/optimizer.js";
 
 import type { OptimizerRequest } from "client/plugins/optimizer/types";
-import type { OptimizerFactory } from "lib/optimizer/types";
-
-/** Injected in mocha.env.mjs */
-declare const optimizer: OptimizerFactory;
 
 // Changes made to the C++ part will take effect after `make`
 

@@ -24,14 +24,14 @@ import type { Tree } from "../context/tree";
 export const balanceTask = new Task<number>(balance, structureTask);
 
 function balance(): void {
-	const tree = State.$tree;
+	const tree = State.m.$tree;
 	const oldRoot = tree.$root;
 	let newRoot = tryBalance(oldRoot);
 	while(newRoot) {
 		tree.$root = newRoot;
 		newRoot = tryBalance(tree.$root);
 	}
-	if(tree.$root != oldRoot) State.$rootChanged = true;
+	if(tree.$root != oldRoot) State.m.$rootChanged = true;
 	balanceTask.data = undefined;
 }
 

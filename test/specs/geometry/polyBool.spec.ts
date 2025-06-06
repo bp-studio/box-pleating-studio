@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { random } from "@utils/random";
 import { parsePath } from "@utils/path";
 import { expand } from "core/design/tasks/roughContour";

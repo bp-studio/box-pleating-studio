@@ -82,7 +82,7 @@ export class Stretch implements ISerializable<JStretch> {
 
 		clearPatternContourForRepo(repo);
 		this.$isActive = true;
-		if(State.$isDragging) {
+		if(State.m.$isDragging) {
 			this._repoCache.set(repo.$signature, repo);
 			const newRepo = this._repoCache.get(signature);
 			if(newRepo) {

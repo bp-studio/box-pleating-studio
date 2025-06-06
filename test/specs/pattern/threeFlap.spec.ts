@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { expectRepo, generateFromFlaps } from "./util";
 import { node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";

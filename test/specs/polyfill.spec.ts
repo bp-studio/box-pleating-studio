@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { toReversed } from "shared/polyfill/toReversed";
 import { flatMap } from "shared/polyfill/flatMap";
 

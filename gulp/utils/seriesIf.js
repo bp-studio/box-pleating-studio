@@ -1,6 +1,6 @@
-const gulp = require("gulp");
+import gulp from "gulp";
 
-module.exports = function(predicate, ...tasks) {
+export default function(predicate, ...tasks) {
 	return (async () => {
 		const result = await predicate();
 		if(result) {

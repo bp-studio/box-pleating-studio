@@ -6,21 +6,22 @@ import { createConfig, legacyPlugin } from "@mutsuntsai/eslint";
 
 export default defineConfig([
 	...createConfig({
-		ignores: ["{build,coverage}/**", "lib/**/*.js", "lib/optimizer/**/*.mjs", "src/app/gen/**"],
-		import: ["**/*.{ts,vue}", "eslint.config.mjs"],
-		project: [
-			"src/app",
-			"src/client",
-			"src/core",
-			"src/other/donate",
-			"src/other/service",
-			"test",
-			"e2e",
-			"tools",
-		],
+		ignores: ["{build,coverage}/**", "lib/{lzma,optimizer}/*.js", "lib/optimizer/**/*.js", "src/app/gen/**"],
+		import: {
+			files: ["**/*.{ts,vue}", "eslint.config.js"],
+			project: [
+				"src/app",
+				"src/client",
+				"src/core",
+				"src/other/donate",
+				"src/other/service",
+				"test",
+				"e2e",
+				"tools",
+			],
+		},
 		globals: {
-			cjs: ["gulpfile.js", "gulp/**"],
-			esm: ["test/mocha.env.mjs", "lib/**/*.mjs", "eslint.config.mjs"],
+			esm: ["test/mocha.env.js", "lib/**/*.js", "eslint.config.js", "gulpfile.js", "gulp/**"],
 			browser: ["src/**"],
 		},
 		html: {

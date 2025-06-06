@@ -77,7 +77,7 @@ function traceContour(): void {
 	}
 
 	// Collect nodes with stretch changes
-	const tree = State.$tree;
+	const tree = State.m.$tree;
 	const stretchChanged = new Set<ITreeNode>();
 	for(let i = 0; i < tree.$nodes.length; i++) {
 		const node = tree.$nodes[i as NodeId];
@@ -224,7 +224,7 @@ function createRawContour(
 	node: ITreeNode, nodeSets: NodeSet[],
 	leaves: readonly NodeId[], children: readonly RoughContour[]
 ): PathEx[] {
-	const tree = State.$tree;
+	const tree = State.m.$tree;
 	const remainingLeaves = new Set(leaves);
 	const result: PathEx[] = [];
 
@@ -305,13 +305,13 @@ function recursiveExpand(
 		const leaves = child.$leaves.filter(id => remainingLeaves.has(id));
 		if(leaves.length == 1) {
 			// In this case we fallback to the naive approach
-			result.push(createRawContourForLeaf(node, State.$tree.$nodes[leaves[0]]!));
+			result.push(createRawContourForLeaf(node, State.m.$tree.$nodes[leaves[0]]!));
 		} else if(leaves.length == child.$leaves.length) {
 			// We accept the contour only if all leaves are relevant
 			result.push(...child.$outer.map(o => expandPath(o, length)));
 		} else if(leaves.length > 0) {
 			// Otherwise, perform recursion
-			const unit = State.$tree.$nodes[child.$id]!.$length;
+			const unit = State.m.$tree.$nodes[child.$id]!.$length;
 			result.push(...recursiveExpand(node, child.$children, remainingLeaves, length + unit));
 		}
 	}

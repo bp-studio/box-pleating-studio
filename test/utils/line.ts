@@ -1,3 +1,5 @@
+import { Assertion } from "chai";
+
 import { Line } from "core/math/geometry/line";
 import { pointToString } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";

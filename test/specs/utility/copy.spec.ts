@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { deepCopy } from "shared/utils/copy";
 
 export default function() {
@@ -9,9 +11,9 @@ export default function() {
 	});
 
 	it("Ignores properties that are absent in source", function() {
-		const target = { test: "test", newProp: "new" };
+		const target = { test: "test", newProp: "new", objProp: {} };
 		deepCopy(target, { test: "ok" });
-		expect(target).to.eql({ test: "ok", newProp: "new" });
+		expect(target).to.eql({ test: "ok", newProp: "new", objProp: {} });
 	});
 
 	it("Ignores properties that are absent in target", function() {

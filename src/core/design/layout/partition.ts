@@ -122,7 +122,7 @@ export class Partition implements ISerializable<JPartition> {
 	 * {@link _getExposedOverlap} method in order to calculate the location of the target.
 	 */
 	public $getExternalConnectionTargets(map: CornerMap): [Point, Point] {
-		const tree = State.$tree;
+		const tree = State.m.$tree;
 		const repo = this.$configuration.$repo;
 
 		let ov = this.$overlaps[map.overlapIndex];

@@ -112,7 +112,11 @@ export class Trace {
 			}
 		}
 
-		// If this still doesn't work, try popping the tail segments and retry.
+		// If the above still doesn't work, try popping the tail segments and retry.
+		// It is not known if this is actually helpful,
+		// as I don't have a sample that really requires this for a valid rendering.
+		// However, the follow paths can be triggered by dragging Imai's JSP.
+		/* istanbul ignore next: significance unsure */
 		for(let i = result.length - 1; i > 0; i--) {
 			const last = result[i];
 			const prev = result[i - 1];
@@ -128,12 +132,7 @@ export class Trace {
 				return result;
 			}
 		}
-
-		// Very likely, something is wrong is we ever get here.
-		/// #if DEBUG
-		debugger;
-		/// #endif
-		return null;
+		return null; // Out of luck
 	}
 
 	private _createFilteredRidges(start: Point, end: Point, directionalVector: Vector): Set<Ridge> {

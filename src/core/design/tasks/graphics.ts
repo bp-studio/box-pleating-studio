@@ -49,7 +49,7 @@ function graphics(): void {
 	}
 
 	// Pass the updated structure to the client.
-	if(State.$treeStructureChanged) UpdateResult.$exportTree(State.$tree.toJSON());
+	if(State.m.$treeStructureChanged) UpdateResult.$exportTree(State.m.$tree.toJSON());
 }
 
 function addRepo(repo: Repository): void {

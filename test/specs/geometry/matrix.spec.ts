@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { Matrix } from "core/math/geometry/matrix";
 import { Vector } from "core/math/geometry/vector";
 import { applyTransform } from "shared/types/geometry";

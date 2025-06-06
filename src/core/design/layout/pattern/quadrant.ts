@@ -37,7 +37,7 @@ export class Quadrant {
 	private readonly _junctions: Junctions;
 
 	constructor(code: QuadrantCode, junctions: Junctions) {
-		this.$flap = State.$tree.$nodes[getNodeId(code)]!;
+		this.$flap = State.m.$tree.$nodes[getNodeId(code)]!;
 		this.q = getQuadrant(code);
 		this.f = getFactors(this.q);
 		this._junctions = junctions;

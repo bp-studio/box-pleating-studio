@@ -16,9 +16,9 @@ import type { TreeNode } from "../context/treeNode";
 export const structureTask = new Task(structure, AABBTask);
 
 function structure(): void {
-	if(State.$rootChanged) {
+	if(State.m.$rootChanged) {
 		// Perform a full update if the root changed.
-		updateDistRecursive(State.$tree.$root, 0);
+		updateDistRecursive(State.m.$tree.$root, 0);
 	} else {
 		// Otherwise it suffices to update the subtrees
 		// under nodes with the lengths of their parent edges changed.

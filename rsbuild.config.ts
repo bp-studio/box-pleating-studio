@@ -36,7 +36,7 @@ export default defineConfig({
 		alias: {
 			// This is needed, otherwise umd will be used, causing vue compiler to be bundled.
 			"vue-slicksort$": "./node_modules/vue-slicksort/dist/vue-slicksort.esm.js",
-			"./url.mjs$": "./lib/pixi/url.mjs", // see lib/README.md
+			"./url.mjs$": "./lib/pixi/url.js", // see lib/README.md
 		},
 	},
 	source: {
@@ -101,7 +101,7 @@ export default defineConfig({
 					pixiUtils: {
 						test: makeTest(
 							createDescendantRegExp("@pixi/ticker", "@pixi/math"),
-							/pixi[\\/]url.mjs/ // see lib/README.md
+							/pixi[\\/]url.js/ // see lib/README.md
 						),
 						name: "pixi-utils",
 						chunks: "async",
@@ -221,7 +221,7 @@ export default defineConfig({
 			chain.module.rule(CHAIN_ID.RULE.SASS)
 				.use("bootstrap-loader")
 				.after(CHAIN_ID.USE.CSS)
-				.loader("./lib/bootstrap/loader.mjs");
+				.loader("./lib/bootstrap/loader.js");
 		},
 		postcss: (_, { addPlugins }) => {
 			/**
@@ -230,6 +230,7 @@ export default defineConfig({
 			 * For example, `-webkit-text-decoration` is not handled by LightingCSS
 			 * (see https://caniuse.com/text-decoration).
 			 */
+			//@ts-ignore
 			addPlugins(postcssPresetEnv());
 		},
 		rspack: (_, { addRules, appendPlugins, isDev }) => {
@@ -252,7 +253,7 @@ export default defineConfig({
 			});
 			addRules({
 				test: /\.json$/,
-				use: "./lib/locale.mjs",
+				use: "./lib/locale.js",
 				type: "javascript/auto",
 			});
 

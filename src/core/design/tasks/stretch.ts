@@ -46,7 +46,7 @@ function stretches(): void {
 	for(const id of State.$stretchDiff.$diff()) {
 		const s = State.$stretches.get(id)!;
 		clearPatternContourForRepo(s.$repo);
-		if(State.$isDragging) {
+		if(State.m.$isDragging) {
 			// Put into cache
 			s.$isActive = false;
 			State.$stretchCache.set(id, s);
@@ -130,7 +130,7 @@ function createOrUpdateStretch(team: Team): void {
 /** Try to get an existing (including cached) {@link Stretch} by id. */
 function tryGetStretch(id: string): Stretch | undefined {
 	let result = State.$stretches.get(id);
-	if(!result && State.$isDragging) {
+	if(!result && State.m.$isDragging) {
 		result = State.$stretchCache.get(id);
 		// Don't forget to put the cached object back
 		if(result) State.$stretches.set(id, result);

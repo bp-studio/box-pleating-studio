@@ -1,16 +1,16 @@
-const gulp = require("gulp");
-const through2 = require("gulp-through2");
-const { createHash } = require("node:crypto");
-const { existsSync, readFileSync, writeFileSync } = require("fs");
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import gulp from "gulp";
+import through2 from "gulp-through2";
 
-const config = require("../config.json");
-const seriesIf = require("../utils/seriesIf");
+import config from "../config.json" with { type: "json" };
+import seriesIf from "../utils/seriesIf.js";
 
 // This file is not in the repo, of course
 const ftpConfigPath = process.cwd() + "/.vscode/ftp.json";
 
 /** @type {import("../../.vscode/ftp.json")} */
-const ftpConfig = existsSync(ftpConfigPath) ? require(ftpConfigPath) : null;
+const ftpConfig = existsSync(ftpConfigPath) ? JSON.parse(readFileSync(ftpConfigPath, "utf-8")) : null;
 
 function configGuard() {
 	if(!ftpConfig) throw new Error("The repo is not configured with FTP. This operation is for maintainers only.");
@@ -39,9 +39,9 @@ function compare(findCacheDirectory, tag) {
 	});
 }
 
-function connect() {
-	const ftp = require("vinyl-ftp");
-	const log = require("fancy-log");
+async function connect() {
+	const ftp = (await import("vinyl-ftp")).default;
+	const log = (await import("fancy-log")).default;
 	const options = ftpConfig.server;
 	options.log = log;
 	return ftp.create(options);
@@ -50,8 +50,8 @@ function connect() {
 /**
  * @param {string} folder
  */
-function cleanFactory(folder) {
-	const conn = connect();
+async function cleanFactory(folder) {
+	const conn = await connect();
 	return conn.clean(`/public_html/${folder}/**/*.*`, config.dest.dist);
 }
 
@@ -71,7 +71,7 @@ function streamToPromise(stream) {
  */
 async function ftpFactory(folder, pipeFactory) {
 	const findCacheDirectory = (await import("find-cache-directory")).default;
-	const conn = connect();
+	const conn = await connect();
 	const sw = config.dest.dist + "/sw.js";
 	const globs = [
 		config.dest.dist + "/**/*",

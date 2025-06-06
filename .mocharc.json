@@ -7,9 +7,8 @@
 	],
 	"timeout": "0",
 	"require": [
-		"./test/mocha.env.mjs",
-		"ts-node/register",
-		"tsconfig-paths/register",
+		"./test/mocha.env.js",
+		"@hyperse/ts-node/register",
 		"./test/utils/line.ts",
 		"./test/utils/path.ts"
 	]

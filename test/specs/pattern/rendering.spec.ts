@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { id1, id2, id3, id4, parseTree } from "@utils/tree";
 import { State } from "core/service/state";
 import { TreeController } from "core/controller/treeController";

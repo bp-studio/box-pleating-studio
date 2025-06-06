@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 
 export default function() {

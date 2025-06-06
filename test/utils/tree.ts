@@ -46,7 +46,7 @@ export function parseTree(edges: string, flaps?: string): Tree {
  * This should only be used momentarily.
  */
 export function exportProject(id: string | number = ""): JProject {
-	const nodes = State.$tree.$nodes.filter(l => l) as TreeNode[];
+	const nodes = State.m.$tree.$nodes.filter(l => l) as TreeNode[];
 	const project = Migration.$getSample();
 	project.design.mode = "layout";
 	const sheet = project.design.layout.sheet;
@@ -72,11 +72,11 @@ export function exportProject(id: string | number = ""): JProject {
 export function createTree(edges: NEdge[], flaps?: NFlap[]): Tree {
 	fullReset();
 	const tree = new Tree(edges as JEdge[], flaps as JFlap[]);
-	State.$tree = tree;
+	State.m.$tree = tree;
 	Processor.$run(heightTask);
 	return tree;
 }
 
 export function node(id: number): TreeNode | undefined {
-	return State.$tree.$nodes[id as NodeId];
+	return State.m.$tree.$nodes[id as NodeId];
 }

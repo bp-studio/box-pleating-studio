@@ -24,7 +24,7 @@ export namespace LayoutController {
 	 * so there is no need to clear the cache.
 	 */
 	export function dragEnd(): boolean {
-		State.$isDragging = false;
+		State.m.$isDragging = false;
 		State.$stretchCache.clear();
 		for(const stretch of State.$stretches.values()) stretch.$cleanup();
 		return true; // So that updateModel is not processed.
@@ -35,7 +35,7 @@ export namespace LayoutController {
 	 */
 	export function getCP(borders: Path): CPLine[] {
 		const clip = new Clip();
-		const tree = State.$tree;
+		const tree = State.m.$tree;
 		const lines: CPLine[] = [];
 		addPolygon(lines, [borders], CreaseType.Border);
 		for(const node of tree.$nodes) {
@@ -55,6 +55,7 @@ export namespace LayoutController {
 		return clip.$get(lines);
 	}
 
+	/* istanbul ignore next: covered in practice */
 	export function switchConfig(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		const repo = stretch.$repo;
@@ -83,6 +84,7 @@ export namespace LayoutController {
 		return stretch.$complete();
 	}
 
+	/* istanbul ignore next: covered in practice */
 	export function moveDevice(stretchId: string, index: number, location: IPoint): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		const repo = stretch.$repo;

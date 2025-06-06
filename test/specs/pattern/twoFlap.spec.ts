@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { expectRepo, generateFromFlaps } from "./util";
 
 export default function() {

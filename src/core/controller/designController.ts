@@ -30,9 +30,9 @@ export namespace DesignController {
 		console.time("Design initializing");
 		/// #endif
 
-		State.$tree = new Tree(data.tree.edges, data.layout.flaps);
-		State.$treeStructureChanged = true;
-		State.$rootChanged = true;
+		State.m.$tree = new Tree(data.tree.edges, data.layout.flaps);
+		State.m.$treeStructureChanged = true;
+		State.m.$rootChanged = true;
 		for(const s of data.layout.stretches) {
 			State.$stretchPrototypes.set(s.id, s);
 		}
@@ -48,10 +48,10 @@ export namespace DesignController {
 	 * Perform batch update for flaps and edges.
 	 */
 	export function update(request: UpdateRequest): void {
-		State.$isDragging = request.dragging;
-		State.$tree.$setFlaps(request.flaps);
+		State.m.$isDragging = request.dragging;
+		State.m.$tree.$setFlaps(request.flaps);
 		for(const e of request.edges) {
-			State.$tree.$setLength(getChildId(e), e.length);
+			State.m.$tree.$setLength(getChildId(e), e.length);
 		}
 		setStretchPrototypes(request.stretches);
 		Processor.$run(request.edges.length ? structureTask : AABBTask);

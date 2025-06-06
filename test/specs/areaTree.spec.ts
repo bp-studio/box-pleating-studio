@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { id0, parseTree } from "@utils/tree";
 import { AreaTree } from "core/design/context/areaTree/areaTree";
 import { TreeController } from "core/controller/treeController";

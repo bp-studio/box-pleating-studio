@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import * as C from "shared/types/constants";
 
 describe("Constants", function() {

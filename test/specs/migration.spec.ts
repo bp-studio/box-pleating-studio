@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
 import { MAX_SHEET_SIZE } from "shared/types/constants";
