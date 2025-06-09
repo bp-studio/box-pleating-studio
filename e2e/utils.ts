@@ -34,7 +34,7 @@ export class StudioPage {
 	public async initialized(): Promise<void> {
 		const menu = this.page.getByRole("menubar");
 		await expect(menu).toBeInViewport();
-		await expect(menu.getByRole("menuitem").first()).not.toBeDisabled();
+		await expect(menu.getByRole("menuitem").first()).toBeEnabled();
 	}
 
 	/** Create a new project and wait for the workspace to be ready. */

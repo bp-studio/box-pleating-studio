@@ -2,7 +2,6 @@
 	"name": "box-pleating-studio",
 	"version": "0.7.9",
 	"app_version": "1884",
-	"type": "module",
 	"description": "Super-complex origami design made easy!",
 	"keywords": [
 		"origami",
@@ -14,17 +13,21 @@
 	"bugs": {
 		"url": "https://github.com/bp-studio/box-pleating-studio/issues"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bp-studio/box-pleating-studio"
+	},
+	"funding": "https://bpstudio.abstreamace.com/donate.htm",
 	"license": "MIT",
 	"author": "Mu-Tsun Tsai <don.m.t.tsai@gmail.com> (https://github.com/MuTsunTsai)",
-	"funding": "https://bpstudio.abstreamace.com/donate.htm",
-	"repository": "github:bp-studio/box-pleating-studio",
+	"type": "module",
 	"scripts": {
 		"browserstack": "cd ../browserstack-automate && pnpm start",
 		"build": "rsbuild build",
 		"cov": "pnpm cov:env nyc -r lcovonly -r text-summary mocha --require mocha-suppress-logs",
+		"cov:env": "cross-env NODE_OPTIONS=\"--experimental-loader=@istanbuljs/esm-loader-hook --no-warnings\" HPS_TS_NODE_PROJECT=test/tsconfig.json",
 		"cov:html": "pnpm cov:env nyc -r lcov mocha --require mocha-suppress-logs || echo. && pnpx open-cli coverage/lcov-report/index.html",
 		"cov:text": "pnpm cov:env nyc -r lcovonly -r text mocha --require mocha-suppress-logs",
-		"cov:env": "cross-env NODE_OPTIONS=\"--experimental-loader=@istanbuljs/esm-loader-hook --no-warnings\" HPS_TS_NODE_PROJECT=test/tsconfig.json",
 		"e2e": "playwright test",
 		"license-check": "pnpx license-checker --exclude \"MIT,Apache-2.0,BSD-2-Clause,ISC\"",
 		"linguist": "pnpx linguist-js -a",
@@ -38,16 +41,35 @@
 		"test": "mocha --require mocha-suppress-logs",
 		"tools": "rsbuild dev -c tools/rsbuild.config.ts -o"
 	},
-	"engines": {
-		"node": ">=22.0.0",
-		"npm": "please-use-pnpm",
-		"yarn": "please-use-pnpm"
+	"dependencies": {
+		"@fortawesome/fontawesome-free": "^6.7.2",
+		"@paypal/paypal-js": "^8.2.0",
+		"@pixi/core": "^7.4.3",
+		"@pixi/display": "^7.4.3",
+		"@pixi/events": "^7.4.3",
+		"@pixi/filter-alpha": "^7.4.3",
+		"@pixi/graphics": "^7.4.3",
+		"@pixi/graphics-smooth": "^1.1.1",
+		"@pixi/sprite": "^7.4.3",
+		"@pixi/text": "^7.4.3",
+		"bootstrap": "^5.3.6",
+		"fflate": "^0.8.2",
+		"idb-keyval": "^6.2.2",
+		"lzma": "^2.3.2",
+		"probably-china": "^1.1.0",
+		"vue": "^3.5.16",
+		"vue-i18n": "^11.1.5",
+		"vue-slicksort": "^2.0.5",
+		"workbox-broadcast-update": "^7.3.0",
+		"workbox-precaching": "^7.3.0",
+		"workbox-routing": "^7.3.0",
+		"workbox-strategies": "^7.3.0"
 	},
 	"devDependencies": {
 		"@aaroon/workbox-rspack-plugin": "^0.3.2",
 		"@hyperse/ts-node": "^1.0.3",
 		"@istanbuljs/esm-loader-hook": "^0.3.0",
-		"@mutsuntsai/eslint": "^1.1.0",
+		"@mutsuntsai/eslint": "^1.2.5",
 		"@mutsuntsai/rsbuild-plugin-vue-ssg": "^1.0.4",
 		"@mutsuntsai/rsbuild-utils": "^1.0.1",
 		"@playwright/test": "^1.52.0",
@@ -73,6 +95,7 @@
 		"eslint-plugin-compat": "^6.0.2",
 		"eslint-plugin-jsdoc": "^50.7.1",
 		"eslint-plugin-mocha": "^11.1.0",
+		"eslint-plugin-playwright": "^2.2.0",
 		"eslint-plugin-typescript-compat": "^1.0.2",
 		"fancy-log": "^2.0.0",
 		"find-cache-directory": "^6.0.0",
@@ -98,29 +121,10 @@
 		"typescript": "^5.8.3",
 		"vinyl-ftp": "^0.6.1"
 	},
-	"dependencies": {
-		"@fortawesome/fontawesome-free": "^6.7.2",
-		"@paypal/paypal-js": "^8.2.0",
-		"@pixi/core": "^7.4.3",
-		"@pixi/display": "^7.4.3",
-		"@pixi/events": "^7.4.3",
-		"@pixi/filter-alpha": "^7.4.3",
-		"@pixi/graphics": "^7.4.3",
-		"@pixi/graphics-smooth": "^1.1.1",
-		"@pixi/sprite": "^7.4.3",
-		"@pixi/text": "^7.4.3",
-		"bootstrap": "^5.3.6",
-		"fflate": "^0.8.2",
-		"idb-keyval": "^6.2.2",
-		"lzma": "^2.3.2",
-		"probably-china": "^1.1.0",
-		"vue": "^3.5.16",
-		"vue-i18n": "^11.1.5",
-		"vue-slicksort": "^2.0.5",
-		"workbox-broadcast-update": "^7.3.0",
-		"workbox-precaching": "^7.3.0",
-		"workbox-routing": "^7.3.0",
-		"workbox-strategies": "^7.3.0"
+	"engines": {
+		"node": ">=22.0.0",
+		"npm": "please-use-pnpm",
+		"yarn": "please-use-pnpm"
 	},
 	"pnpm": {
 		"overrides": {

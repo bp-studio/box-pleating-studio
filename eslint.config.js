@@ -2,6 +2,7 @@ import { defineConfig } from "eslint/config";
 import pluginCompat from "eslint-plugin-compat";
 import pluginJsDoc from "eslint-plugin-jsdoc";
 import pluginMocha from "eslint-plugin-mocha";
+import pluginPlaywright from "eslint-plugin-playwright";
 import { createConfig, legacyPlugin } from "@mutsuntsai/eslint";
 
 export default defineConfig([
@@ -33,6 +34,12 @@ export default defineConfig([
 			"no-var": "off",
 			"vars-on-top": "off",
 		},
+		package: [
+			"name",
+			"version",
+			"app_version",
+			"description",
+		],
 	}),
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +134,11 @@ export default defineConfig([
 			"mocha/no-exports": "off",
 			"mocha/no-pending-tests": "off",
 		},
+	},
+	{
+		...pluginPlaywright.configs["flat/recommended"],
+		name: "Playwright",
+		files: ["e2e/**"],
 	},
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

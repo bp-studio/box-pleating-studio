@@ -17,6 +17,8 @@ import { createI18n } from "vue-i18n";
 import locale from "./src/locale/en.json";
 import pkg from "./package.json";
 
+import type { PostCSSPlugin } from "@rsbuild/core";
+
 const isProduction = process.env.NODE_ENV === "production";
 
 // To enable these, execute for example `pnpm build -- doctor inspect`.
@@ -141,13 +143,14 @@ export default defineConfig({
 				/(client|shared)\.\w+\.js/,
 			],
 		},
+		// buildCache: true,
 	},
 	output: {
 		cleanDistPath: isProduction,
 		filename: {
 			html: "[name].htm", // For historical reason
 		},
-		copy: [
+		copy: [ // Copied files will be precached by the Service Worker.
 			{ from: "src/public/manifest.json", to: "." },
 			// Only precache the two most common resolution; see https://tinyurl.com/7rxv5f97
 			{ from: "src/public/assets/icon/icon-32.png", to: "assets/icon" },
@@ -230,8 +233,7 @@ export default defineConfig({
 			 * For example, `-webkit-text-decoration` is not handled by LightingCSS
 			 * (see https://caniuse.com/text-decoration).
 			 */
-			//@ts-ignore
-			addPlugins(postcssPresetEnv());
+			addPlugins(postcssPresetEnv() as PostCSSPlugin);
 		},
 		rspack: (_, { addRules, appendPlugins, isDev }) => {
 			addRules({
