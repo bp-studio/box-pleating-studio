@@ -11,56 +11,56 @@
  *    Although workbox-sw has its CDN, but that increases a lot of network requests,
  *    and it also downloads a lot more bytes.
  */
-import * as broadcastUpdate from "workbox-broadcast-update";
-import * as precaching from "workbox-precaching";
-import * as routing from "workbox-routing";
-import * as strategies from "workbox-strategies";
-import * as idbKeyval from "idb-keyval";
+import { BroadcastUpdatePlugin } from "workbox-broadcast-update";
+import { PrecacheController, PrecacheRoute } from "workbox-precaching";
+import { setDefaultHandler, registerRoute } from "workbox-routing";
+import { StaleWhileRevalidate, NetworkFirst, NetworkOnly } from "workbox-strategies";
+import { get, set } from "idb-keyval";
 
 // Declare that we're in ServiceWorker environment
 declare const self: ServiceWorkerGlobalScope & typeof globalThis;
 
 // Default resources use StaleWhileRevalidate strategy
-const defaultHandler = new strategies.StaleWhileRevalidate({
+const defaultHandler = new StaleWhileRevalidate({
 	cacheName: "assets",
 	plugins: [
-		new broadcastUpdate.BroadcastUpdatePlugin({
+		new BroadcastUpdatePlugin({
 			generatePayload: options => ({ path: new URL(options.request.url).pathname }),
 		}),
 	],
 });
-routing.setDefaultHandler(defaultHandler);
+setDefaultHandler(defaultHandler);
 
 // Activates workbox-precaching
-const precacheController = new precaching.PrecacheController({
+const precacheController = new PrecacheController({
 	cacheName: "assets",
 });
 precacheController.addToCacheList(self.__WB_MANIFEST);
-const precacheRoute = new precaching.PrecacheRoute(precacheController, {
+const precacheRoute = new PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],
 	directoryIndex: "index.htm",
 	cleanURLs: false, // See https://developer.chrome.com/docs/workbox/modules/workbox-precaching/#clean-urls
 });
-routing.registerRoute(precacheRoute);
+registerRoute(precacheRoute);
 
 // All Markdown files other than those in precache should use NetworkFirst strategy.
-routing.registerRoute(
+registerRoute(
 	({ url }) => url.pathname.endsWith(".md"),
-	new strategies.NetworkFirst({
+	new NetworkFirst({
 		fetchOptions: { cache: "reload" }, // No cache here
 		cacheName: "assets",
 	})
 );
 
-const netOnly = new strategies.NetworkOnly({
+const netOnly = new NetworkOnly({
 	fetchOptions: { cache: "reload" },
 });
 
 // Don't cache TinyURL (pointless)
-routing.registerRoute(({ url }) => url.host == "tinyurl.com", netOnly);
+registerRoute(({ url }) => url.host == "tinyurl.com", netOnly);
 
 // All POST requests are allowed only when there's an internet connection.
-routing.registerRoute(({ request }) => request.method == "POST", netOnly, "POST");
+registerRoute(({ request }) => request.method == "POST", netOnly, "POST");
 
 self.addEventListener("install", event => {
 	// This is necessary. Otherwise, service worker will not be updated even as we reload the page,
@@ -88,7 +88,7 @@ self.addEventListener("message", event => {
 async function message(event: ExtendableMessageEvent): Promise<void> {
 	const port = event.ports[0];
 	if(port) {
-		const clientList = await idbKeyval.get<string[]>("clients") || [];
+		const clientList = await get<string[]>("clients") || [];
 		const sourceId = (event.source as Client).id;
 		if(event.data == "request") {
 			clientList.push(sourceId);
@@ -107,7 +107,7 @@ async function message(event: ExtendableMessageEvent): Promise<void> {
 			clientList.unshift(sourceId);
 			port.postMessage(true);
 		}
-		await idbKeyval.set("clients", clientList);
+		await set("clients", clientList);
 	}
 }
 
