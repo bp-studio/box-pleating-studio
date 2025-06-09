@@ -1,13 +1,11 @@
 import { defineConfig } from "eslint/config";
 import pluginCompat from "eslint-plugin-compat";
 import pluginJsDoc from "eslint-plugin-jsdoc";
-import pluginMocha from "eslint-plugin-mocha";
-import pluginPlaywright from "eslint-plugin-playwright";
 import { createConfig, legacyPlugin } from "@mutsuntsai/eslint";
 
 export default defineConfig([
 	...createConfig({
-		ignores: ["{build,coverage}/**", "lib/{lzma,optimizer}/*.js", "lib/optimizer/**/*.js", "src/app/gen/**"],
+		ignores: ["{build,coverage}/**", "lib/{lzma,optimizer}/**/*.js"],
 		import: {
 			files: ["**/*.{ts,vue}", "eslint.config.js"],
 			project: [
@@ -26,20 +24,15 @@ export default defineConfig([
 			browser: ["src/**"],
 		},
 		html: {
-			"@typescript-eslint/no-magic-numbers": "off",
-			"@typescript-eslint/no-this-alias": "off",
-			"@typescript-eslint/no-unused-vars": "off",
 			"max-lines-per-function": "off",
 			"no-invalid-this": "off",
+			"no-unused-vars": "off",
 			"no-var": "off",
 			"vars-on-top": "off",
 		},
-		package: [
-			"name",
-			"version",
-			"app_version",
-			"description",
-		],
+		mocha: ["test/**"],
+		playwright: ["e2e/**"],
+		package: order => order.toSpliced(order.indexOf("version") + 1, 0, "app_version"),
 	}),
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,44 +94,6 @@ export default defineConfig([
 				enableFixer: false,
 			}],
 		},
-	},
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Tests
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	{
-		...pluginMocha.configs.recommended,
-		files: ["test/**"],
-	},
-	{
-		name: "General Tests",
-		files: ["{test,e2e,tools}/**"],
-		rules: {
-			"@typescript-eslint/explicit-function-return-type": ["warn", {
-				allowFunctionsWithoutTypeParameters: true,
-			}],
-			"@typescript-eslint/no-invalid-this": "off",
-			"@typescript-eslint/no-magic-numbers": "off",
-			"@typescript-eslint/no-unused-expressions": "off",
-			"max-classes-per-file": "off",
-			"max-lines-per-function": "off",
-			"prefer-arrow-callback": "off",
-		},
-	},
-	{
-		name: "Mocha",
-		files: ["test/**"],
-		rules: {
-			"mocha/prefer-arrow-callback": "warn",
-			"mocha/no-exports": "off",
-			"mocha/no-pending-tests": "off",
-		},
-	},
-	{
-		...pluginPlaywright.configs["flat/recommended"],
-		name: "Playwright",
-		files: ["e2e/**"],
 	},
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
