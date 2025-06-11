@@ -3,7 +3,7 @@
  * If native File Access API is supported.
  *
  * So far only desktop Chromium browsers have better support. Safari 15.2+ has support for private file system.
- * https://caniuse.com/native-filesystem-api
+ * @see https://caniuse.com/native-filesystem-api
  */
 export const isFileApiEnabled = typeof window.showSaveFilePicker != "undefined";
 

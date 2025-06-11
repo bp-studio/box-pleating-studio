@@ -1,8 +1,11 @@
 
 import type { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
+import type { COORDINATE_SHIFT } from "core/math/sweepLine/polyBool/aaUnion/aaEventProvider";
 
 /**
  * In practice, user's device will probably crash before reaching this limit.
+ *
+ * This number is chosen to fit the need of {@link COORDINATE_SHIFT}.
  */
 export const MAX_SHEET_SIZE = 8192;
 

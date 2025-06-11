@@ -10,7 +10,7 @@ namespace HotkeyService {
 	 * Register a global hotkey.
 	 *
 	 * @param key Case-insensitive. For the full list of keys, see
-	 * https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values
+	 * [MDN](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_values).
 	 * @param ctrl Default value is `true`.
 	 * @param shift Default value is `false`.
 	 */

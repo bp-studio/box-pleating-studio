@@ -1,6 +1,6 @@
 import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
-import probablyChina from "probably-china";
+import { probablyChina } from "probably-china";
 
 import locale from "app/shared/locale";
 import { useDebounce } from "app/utils/timerUtility";
@@ -115,8 +115,7 @@ namespace LanguageService {
 
 	/**
 	 * Normalize the language codes returned by browsers.
-	 *
-	 * See https://datatracker.ietf.org/doc/html/rfc5646 for docs.
+	 * @see https://datatracker.ietf.org/doc/html/rfc5646
 	 */
 	function format(l: string): string {
 		return l.replace(/_/g, "-")
