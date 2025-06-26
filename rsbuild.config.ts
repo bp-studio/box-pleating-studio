@@ -143,7 +143,7 @@ export default defineConfig({
 				/(client|shared)\.\w+\.js/,
 			],
 		},
-		// buildCache: true,
+		buildCache: true,
 	},
 	output: {
 		cleanDistPath: isProduction,
