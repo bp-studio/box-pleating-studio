@@ -20,8 +20,8 @@ type Substitute<T, T1, T2> = {
 	[k in keyof T]: T[k] extends T1 ? T2 : T[k];
 };
 
-export type NEdge = Substitute<JEdge, NodeId, number>;
-export type NFlap = Substitute<JFlap, NodeId, number>;
+type NEdge = Substitute<JEdge, NodeId, number>;
+type NFlap = Substitute<JFlap, NodeId, number>;
 
 /**
  * @param edges Comma-separated list of `(n1,n2,length)`.
@@ -44,6 +44,7 @@ export function parseTree(edges: string, flaps?: string): Tree {
 /**
  * Export tree to a BPS file `export.bps` for further inspection.
  * This should only be used momentarily.
+ * @knipIgnore
  */
 export function exportProject(id: string | number = ""): JProject {
 	const nodes = State.m.$tree.$nodes.filter(l => l) as TreeNode[];

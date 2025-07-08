@@ -21,7 +21,7 @@
 		</div>
 
 		<TabBar v-if="phase >= 5" />
-		<div v-else class="flex-grow-1"/>
+		<div v-else class="flex-grow-1" />
 
 		<div class="btn-group" id="panelToggle">
 			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')"
@@ -36,9 +36,8 @@
 <script setup lang="ts">
 
 	import { phase, asyncComp } from "app/misc/phase";
-	import Studio from "app/services/studioService";
+	import Studio, { showPanel } from "app/services/studioService";
 	import { hk } from "app/services/customHotkeyService";
-	import { toggle } from "@/panel/panel.vue";
 	import StubMenu from "@/toolbar/stubMenu.vue";
 	import TabBar from "./components/tabBar.vue";
 
@@ -46,9 +45,14 @@
 
 	defineOptions({ name: "Toolbar" });
 
+	function toggle(): void {
+		showPanel.value = !showPanel.value;
+	}
+
 	function toLayout(): void {
 		if(Studio.project) Studio.project.design.mode = "layout";
 	}
+
 	function toTree(): void {
 		if(Studio.project) Studio.project.design.mode = "tree";
 	}

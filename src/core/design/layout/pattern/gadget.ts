@@ -18,7 +18,7 @@ import type { Device } from "./device";
  * The first field is the anchor point itself,
  * ths second field is the index of the {@link Piece} from which it came (if available).
  */
-export type AnchorMap = [Point, number | null];
+type AnchorMap = [Point, number | null];
 
 //=================================================================
 /**

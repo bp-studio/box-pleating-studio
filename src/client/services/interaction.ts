@@ -7,7 +7,7 @@ import { SelectionController } from "client/controllers/selectionController";
 import { ScrollController } from "client/controllers/scrollController";
 import { CursorController } from "client/controllers/cursorController";
 import { KeyboardController } from "client/controllers/keyboardController";
-import { $getEventCenter, $isTouch, MouseButton } from "client/controllers/share";
+import { $getEventCenter, $isTouch, MOUSE_MIDDLE_BUTTON, MOUSE_RIGHT_BUTTON } from "client/controllers/share";
 import { ZoomController } from "client/controllers/zoomController";
 import { DragController } from "client/controllers/dragController";
 import { LongPressController } from "client/controllers/longPressController";
@@ -148,7 +148,7 @@ export namespace Interaction {
 			const bt = event.button;
 			// Perform scrolling. Supported methods are
 			// space key scrolling and middle or right mouse button scrolling.
-			if(space || bt == MouseButton.right || bt == MouseButton.middle) {
+			if(space || bt == MOUSE_MIDDLE_BUTTON || bt == MOUSE_RIGHT_BUTTON) {
 				event.preventDefault();
 				initScroll(event);
 				return;

@@ -11,7 +11,7 @@ let workerReady: PromiseWithResolvers<Worker>;
 
 const interruptBuffer = hasSharedArrayBuffer ? new Uint8Array(new SharedArrayBuffer(1)) : null;
 
-export function initOptimizerWorker(): void {
+function initOptimizerWorker(): void {
 	workerReady = Promise.withResolvers<Worker>();
 	const worker = new Worker(new URL("./worker.ts", import.meta.url), { name: "optimizer" });
 	if(interruptBuffer) {

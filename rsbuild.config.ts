@@ -301,5 +301,6 @@ const wrapIE = (c: string) => `<!--[if IE]><body>IE is not supported.</body><![e
 
 const i18n = createI18n<false, object>({
 	locale: "en",
+	legacy: false,
 	messages: { en: locale },
 });

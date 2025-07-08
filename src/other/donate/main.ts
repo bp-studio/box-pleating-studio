@@ -7,13 +7,12 @@ import "./style.css";
 import locale from "app/shared/locale";
 import App from "./app.vue";
 
+import type { BpsLocale } from "app/shared/locale";
 import type { Composer } from "vue-i18n";
 
-// For unknown reason, the following line leads to ESLint error.
-// import type { BpsLocale } from "shared/frontend/locale";
-
-const i18n = createI18n<[unknown], string>({
+const i18n = createI18n<[BpsLocale], string, false>({
 	locale: "en",
+	legacy: false,
 	fallbackLocale: "en",
 	silentFallbackWarn: true,
 	messages: locale,

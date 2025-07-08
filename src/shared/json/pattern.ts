@@ -64,8 +64,6 @@ export interface JPartition {
 	strategy?: Strategy;
 }
 
-export type JStructure = readonly Readonly<JJunction>[];
-
 export interface JPattern {
 	devices: readonly JDevice[];
 }

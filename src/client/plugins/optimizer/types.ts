@@ -1,7 +1,7 @@
 import type { Hierarchy } from "core/design/context/areaTree/utils";
 import type { GridType, NodeId } from "shared/json";
 
-export type LayoutMode = "view" | "random";
+type LayoutMode = "view" | "random";
 
 export interface OptimizerOptionsBase {
 	layout: LayoutMode;

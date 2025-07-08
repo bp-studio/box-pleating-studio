@@ -30,7 +30,7 @@ namespace LanguageService {
 		// Replace the flag to avoid unnecessary trouble.
 		if(probablyChina) locale["zh-tw"].emoji = () => "🇭🇰";
 
-		const plugin = createI18n<[BpsLocale], string>({
+		const plugin = createI18n<[BpsLocale], string, false>({
 			legacy: false,
 			locale: DEFAULT_LOCALE,
 			fallbackLocale: DEFAULT_LOCALE,

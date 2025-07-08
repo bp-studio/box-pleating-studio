@@ -3,7 +3,7 @@ import { computed, shallowRef, watch } from "vue";
 import type { Project } from "client/project/project";
 import type { Sheet } from "client/project/components/sheet";
 
-export const MIN_SCALE = 10;
+const MIN_SCALE = 10;
 
 //=================================================================
 /**
@@ -37,6 +37,11 @@ namespace ProjectService {
 		const s = scale.value;
 		return s < MIN_SCALE ? s / MIN_SCALE : 1;
 	});
+
+	/** Take the square root of the shrink factor for smoother results. */
+	export function getSmoothShrinkFactor() {
+		return Math.sqrt(shrink.value);
+	}
 }
 
 export default ProjectService;

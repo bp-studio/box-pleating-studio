@@ -40,8 +40,5 @@ export function $isTouch(event: Event): event is TouchEvent {
 	return TOUCH_SUPPORT && event instanceof TouchEvent;
 }
 
-export enum MouseButton {
-	left = 0,
-	middle = 1,
-	right = 2,
-}
+export const MOUSE_MIDDLE_BUTTON = 1;
+export const MOUSE_RIGHT_BUTTON = 2;

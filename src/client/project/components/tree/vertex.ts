@@ -181,7 +181,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	public $drawDot(graphics: SmoothGraphicsLike): void {
 		const s = ProjectService.scale.value;
 		const width = this.$selected || this.$hovered ? style.vertex.hover : style.vertex.width;
-		const size = style.vertex.size * Math.sqrt(ProjectService.shrink.value);
+		const size = style.vertex.size * ProjectService.getSmoothShrinkFactor();
 		graphics.clear()
 			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
 			.beginFill(style.vertex.fill)

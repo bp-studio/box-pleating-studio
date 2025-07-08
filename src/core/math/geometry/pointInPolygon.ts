@@ -12,7 +12,6 @@ import type { RationalPath } from "./rationalPath";
  *
  * This function is currently not in used, but we keep it just for the record.
  */
-
 export function pointInPolygon(p: Point, path: RationalPath, boundary = false): boolean {
 	const l = path.length;
 	// Degenerated case

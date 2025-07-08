@@ -43,11 +43,27 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	public readonly history: HistoryManager;
 
 	/**
-	 * A {@link Proxy} object that represents the controllers and actions of the Core.
-	 * This greatly improves the typing and code navigating for the Core APIs.
+	 * A type-safe {@link Proxy} object that provides access to all Core controllers and actions.
 	 *
-	 * Typical route will return a {@link Promise} that resolves after
-	 * {@link Design.$update Design.$update()} is completed.
+	 * This proxy system offers several key benefits:
+	 * - **Full type safety**: All controller methods are properly typed with IntelliSense support
+	 * - **Automatic Promise wrapping**: Synchronous Core methods become async Client calls
+	 * - **Dynamic API generation**: Controllers and actions are created on-demand via proxy
+	 * - **Runtime validation**: Invalid controller/action calls throw descriptive errors
+	 *
+	 * @example
+	 * ```typescript
+	 * // All calls are fully typed and validated
+	 * await project.$core.design.init(designPrototype);
+	 * await project.$core.tree.addVertex(x, y);
+	 * await project.$core.layout.updateConfiguration(config);
+	 * ```
+	 *
+	 * Most routes return a {@link Promise} that resolves after {@link Design.$update} completes,
+	 * ensuring the UI is updated before the Promise resolves. Some routes may return direct values.
+	 *
+	 * @see {@link Route} - The complete type definition for available controllers
+	 * @see {@link RouteMap} - The source mapping of controllers to their implementations
 	 */
 	public readonly $core: Route;
 

@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-	export interface ProgressContext {
+	interface ProgressContext {
 		state: {
 			skipping: boolean;
 			stopping: boolean;

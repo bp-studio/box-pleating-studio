@@ -2,6 +2,7 @@ import { same } from "shared/types/geometry";
 import { BinaryHeap } from "shared/data/heap/binaryHeap";
 import { RavlTree } from "shared/data/bst/ravlTree";
 
+import type { EventQueue } from "./classes/intersector";
 import type { IOrientation } from "./classes/orientation";
 import type { EventProvider } from "./classes/eventProvider";
 import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
@@ -40,7 +41,7 @@ export abstract class SweepLine {
 	 * that have not yet occurred at the current stage of sweeping.
 	 * The events will be popped one by one from the queue and processed.
 	 */
-	protected readonly _eventQueue: IHeap<SweepEvent>;
+	protected readonly _eventQueue: EventQueue;
 
 	/** The current intersection state of sweeping. */
 	protected readonly _status: IBinarySearchTree<StartEvent>;

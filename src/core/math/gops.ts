@@ -3,7 +3,7 @@ import { reduceInt } from "./utils/gcd";
 
 import type { JPiece } from "shared/json/pattern";
 
-export interface JPieceMemo {
+interface JPieceMemo {
 	p: JPiece;
 	sx: number;
 }
