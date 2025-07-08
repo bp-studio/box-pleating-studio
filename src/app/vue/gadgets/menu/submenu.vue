@@ -7,7 +7,7 @@
 			<i :class="icon" />{{ label }}
 		</div>
 		<div class="dropdown-menu" ref="sub">
-			<slot></slot>
+			<slot/>
 		</div>
 	</div>
 </template>

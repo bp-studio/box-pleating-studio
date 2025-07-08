@@ -1,6 +1,6 @@
 <template>
 	<Export :title="$t('toolbar.file.BPZ.download')" :blob="getBlob" ref="exp" mime="application/bpstudio.workspace+zip"
-			:description="$t('toolbar.file.BPZ.name')" extension=".bpz" screen="BPZ" @save="save" />
+		:description="$t('toolbar.file.BPZ.name')" extension=".bpz" screen="BPZ" @save="save" />
 </template>
 
 <script setup lang="ts">

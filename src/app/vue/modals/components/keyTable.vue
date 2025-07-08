@@ -31,10 +31,10 @@
 						</td>
 						<td class="p-0 position-relative">
 							<input :id="name + '.' + command" type="text" class="border-0 w-100"
-								   :value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target)" @input.prevent
-								   @keydown.prevent="setKey($event, name, command)" />
+								:value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target)" @input.prevent
+								@keydown.prevent="setKey($event, name, command)" >
 							<!-- A mask for blocking mouse actions after the input getting focus -->
-							<div class="mask" @mousedown.capture.prevent></div>
+							<div class="mask" @mousedown.capture.prevent/>
 						</td>
 					</tr>
 				</template>

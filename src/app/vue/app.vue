@@ -5,8 +5,8 @@
 
 		<Panel v-if="phase >= 1" />
 		<template v-else>
-			<div id="divShade"></div>
-			<aside class="scroll-shadow p-3"></aside>
+			<div id="divShade"/>
+			<aside class="scroll-shadow p-3"/>
 		</template>
 
 		<Toolbar v-if="phase >= 3" />
@@ -24,7 +24,7 @@
 		</nav>
 
 		<Status v-if="phase >= 2" />
-		<footer class="py-1 px-3" v-else></footer>
+		<footer class="py-1 px-3" v-else/>
 
 		<ModalFragment v-if="phase >= 2" />
 		<DialogFragment v-if="phase >= 1" />

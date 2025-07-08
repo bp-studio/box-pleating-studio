@@ -1,6 +1,6 @@
 <template>
 	<Export :title="$t('toolbar.file.SVG.download')" :blob="getBlob" ref="exp" mime="image/svg+xml"
-			:description="$t('toolbar.file.SVG.name')" extension=".svg" screen="SVG" @save="save">
+		:description="$t('toolbar.file.SVG.name')" extension=".svg" screen="SVG" @save="save">
 		<Toggle v-model="Settings.tools.SVG.includeHiddenElement">{{ $t('preference.includeHidden') }}</Toggle>
 	</Export>
 </template>

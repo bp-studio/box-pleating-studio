@@ -1,14 +1,14 @@
 <template>
 	<div class="btn-group" ref="el" @mouseenter.once="init" @touchstart.once.passive="init">
 		<button ref="btn" type="button" @mouseenter="mouseenter" :title="title" :disabled="!Studio.initialized"
-				class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label" role="menuitem">
+			class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label" role="menuitem">
 			<i :class="icon" />
-			<div class="notify" v-if="notify"></div>
+			<div class="notify" v-if="notify"/>
 		</button>
 		<!--We display the content of the dropdown menu only
 			after initialization to improve startup performance. -->
 		<div ref="menu" class="dropdown-menu" role="menuitem" v-if="initialized">
-			<slot></slot>
+			<slot/>
 		</div>
 	</div>
 </template>

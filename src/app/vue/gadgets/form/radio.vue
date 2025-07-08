@@ -1,8 +1,8 @@
 <template>
 	<div class="form-check d-inline-block">
 		<input class="form-check-input" type="radio" :name="name" :id="id" :checked="modelValue === value"
-			   @input="emit('update:modelValue', value)">
-		<label class="form-check-label" :for="id" v-text="label"></label>
+			@input="emit('update:modelValue', value)">
+		<label class="form-check-label" :for="id" v-text="label"/>
 	</div>
 </template>
 

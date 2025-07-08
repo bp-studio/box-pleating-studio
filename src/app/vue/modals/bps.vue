@@ -1,6 +1,6 @@
 <template>
 	<Export :title="$t('toolbar.file.BPS.download')" :blob="getBlob" ref="exp" mime="application/bpstudio.project+json"
-			:description="$t('toolbar.file.BPS.name')" extension=".bps" screen="BPS" @save="save" />
+		:description="$t('toolbar.file.BPS.name')" extension=".bps" screen="BPS" @save="save" />
 </template>
 
 <script setup lang="ts">

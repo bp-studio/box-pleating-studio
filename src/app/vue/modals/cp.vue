@@ -1,7 +1,7 @@
 <template>
 	<Export :title="$t('plugin.CP._')" :blob="getBlob" ref="exp" :mime="mime()"
-			:description="formats[options.format].description" :extension="'.' + options.format" screen="CP"
-			:observe="() => options" @save="save">
+		:description="formats[options.format].description" :extension="'.' + options.format" screen="CP"
+		:observe="() => options" @save="save">
 		<div class="row">
 			<label class="col-4 mb-2 col-form-label fw-bolder">{{ $t("plugin.CP.format") }}</label>
 			<div class="col mb-2">

@@ -1,9 +1,9 @@
 <template>
 	<a v-if="!disabled" class="dropdown-item" @click="execute()">
-		<slot></slot>
+		<slot/>
 	</a>
 	<div v-else class="dropdown-item disabled" @click.stop>
-		<slot></slot>
+		<slot/>
 	</div>
 </template>
 

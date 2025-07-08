@@ -2,11 +2,11 @@
 	<template v-if="label">
 		<div class="col-form-label">{{ label }}</div>
 		<div>
-			<slot></slot>
+			<slot/>
 		</div>
 	</template>
 	<div v-else style="grid-column-end: span 2;">
-		<slot></slot>
+		<slot/>
 	</div>
 </template>
 

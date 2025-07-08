@@ -5,7 +5,7 @@
 				<div class="modal-header h4 d-flex">
 					<div class="modal-title flex-grow-1">{{ $t("plugin.optimizer._") }}</div>
 					<a class="text-info" href="https://bp-studio.github.io/manual.html#layout-optimization" target="_blank">
-						<i class="fa-regular fa-circle-question"></i>
+						<i class="fa-regular fa-circle-question"/>
 					</a>
 				</div>
 				<div class="modal-body" v-if="support">
@@ -19,7 +19,7 @@
 						</div>
 						<div class="row">
 							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder"
-								  >{{ $t("plugin.optimizer.layout._") }}</label>
+							>{{ $t("plugin.optimizer.layout._") }}</label>
 							<div class="col mb-2">
 								<select class="form-select" v-model="options.layout">
 									<option value="view">{{ $t("plugin.optimizer.layout.view") }}</option>
@@ -32,7 +32,7 @@
 									<div class="col-auto col-form-label">{{ $t("plugin.optimizer.layout.toTry") }}</div>
 									<div class="col">
 										<Number v-model="options.random" :disabled="options.layout != 'random'" :min="1"
-												:max="100" />
+											:max="100" />
 									</div>
 								</div>
 							</div>
@@ -49,33 +49,33 @@
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.continuous">
 						<OptProgress v-if="options.layout == 'random'" :value="(state.major - 1) * 50 + state.minor"
-									 :max="options.random * 50" percentage>
+							:max="options.random * 50" percentage>
 							Trying random layout #{{ state.major }}, step {{ state.minor }}<span v-if="state.best < 8192"> (Best
 								size {{ state.best }})</span>...
 						</OptProgress>
 						<OptProgress v-else-if="options.useBH" :value="state.minor" :max="50">
 							Pre-solving<span v-if="state.best < 8192 && state.best > 0"> (Best size {{ state.best
-								}})</span>...
+							}})</span>...
 						</OptProgress>
 					</div>
 					<OptProgress v-else-if="state.stage == Stage.pack" :value="state.minor" :max="packTransform(200)" noSkip
-								 percentage>
+						percentage>
 						Pre-solving...
 					</OptProgress>
 					<OptProgress v-else-if="state.stage == Stage.integral" :value="state.minor" :max="state.flaps">
 						Trying grid size {{ state.major }}...
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.error" class="text-danger w-100"
-						 style="overflow: scroll; max-height: 60vh;">
+						style="overflow: scroll; max-height: 60vh;">
 						<pre>An error occurred: {{ state.error }}</pre>
 					</div>
 				</div>
 				<div class="modal-body" v-else>{{ $t("plugin.optimizer.unsupported") }}</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" :disabled="state.running" data-bs-dismiss="modal"
-							@click="state.stage = Stage.stopped">{{ $t("keyword.close") }}</button>
+						@click="state.stage = Stage.stopped">{{ $t("keyword.close") }}</button>
 					<button v-if="support" type="button" class="btn btn-primary"
-							:disabled="state.running || state.stage == Stage.error" @click="run">
+						:disabled="state.running || state.stage == Stage.error" @click="run">
 						<span v-if="state.running">
 							{{ $t('plugin.optimizer.running') }}&ensp;<i class="bp-spinner fa-spin" />
 						</span>

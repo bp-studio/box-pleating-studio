@@ -4,7 +4,7 @@
 			<!-- Fully customized icon is possible with icon slot -->
 			<slot name="icon" v-if="$slots.icon" />
 			<i v-else :class="icon" :style="color !== undefined ? `color: ${toHex(color)}` : ''" />
-			<slot></slot>
+			<slot/>
 		</div>
 		<div class="ms-3 text-end desktop-only">{{ key }}</div>
 		<div v-if="touch" class="ms-4 text-end touch-only" style="margin-right:-1rem"><i :class="touch" /></div>

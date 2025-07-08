@@ -77,21 +77,21 @@
 					<div v-if="phase >= 10" v-show="tab == 1" class="p-2 h-100">
 						<div class="color-grid">
 							<Color :default="Studio.style.border.color" v-model="Settings.colorScheme.border"
-								   :label="$t('preference.color.border')" />
+								:label="$t('preference.color.border')" />
 							<Color :default="Studio.style.grid.color" v-model="Settings.colorScheme.grid"
-								   :label="$t('preference.color.grid')" />
+								:label="$t('preference.color.grid')" />
 							<Color :default="Studio.style.hinge.color" v-model="Settings.colorScheme.hinge"
-								   :label="$t('preference.color.hinge')" />
+								:label="$t('preference.color.hinge')" />
 							<Color :default="Studio.style.ridge.color" v-model="Settings.colorScheme.ridge"
-								   :label="$t('preference.color.ridge')" />
+								:label="$t('preference.color.ridge')" />
 							<Color :default="Studio.style.axisParallel.color" v-model="Settings.colorScheme.axialParallel"
-								   :label="$t('preference.color.axisParallel')" />
+								:label="$t('preference.color.axisParallel')" />
 							<Color :default="Studio.style.junction.color" v-model="Settings.colorScheme.junction"
-								   :label="$t('preference.color.overlap')" />
+								:label="$t('preference.color.overlap')" />
 							<Color :default="Studio.style.dot.fill" v-model="Settings.colorScheme.dot"
-								   :label="$t('preference.color.tip')" />
+								:label="$t('preference.color.tip')" />
 							<Color :default="Studio.style.label.color" v-model="Settings.colorScheme.label"
-								   :label="$t('preference.color.label')" />
+								:label="$t('preference.color.label')" />
 						</div>
 					</div>
 					<!-- Use v-if to reset its state every time -->

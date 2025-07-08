@@ -12,7 +12,7 @@
 				{{ $t('toolbar.setting.ridge') }}
 			</DropdownCheck>
 			<DropdownCheck v-model="Settings.display.axialParallel" icon="fas fa-grip-lines" :color="Studio.style.axisParallel.color"
-						   hk="4">
+				hk="4">
 				{{ $t('toolbar.setting.axial') }}
 			</DropdownCheck>
 			<DropdownCheck v-model="Settings.display.label" icon="fas fa-font" :color="Studio.style.label.color" hk="5">
@@ -22,8 +22,8 @@
 				<Hotkey ctrl hk="6">
 					<template v-slot:icon>
 						<span class="dot-stack" v-if="Settings.display.dot">
-							<i class="fas fa-circle" :style="'color:' + toHex(Studio.style.dot.fill)"></i>
-							<i class="far fa-circle"></i>
+							<i class="fas fa-circle" :style="'color:' + toHex(Studio.style.dot.fill)"/>
+							<i class="far fa-circle"/>
 						</span>
 						<i v-else />
 					</template>

@@ -1,6 +1,6 @@
 <template>
 	<div style="overflow: auto;" @click.stop @touchend.stop @mouseup.stop>
-		<div class="dropdown-divider"></div>
+		<div class="dropdown-divider"/>
 	</div>
 </template>
 

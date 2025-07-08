@@ -5,7 +5,7 @@
 		<Row>
 			<div class="mt-1 mb-4">
 				<textarea class="form-control" v-model="design.description" rows="4"
-						  :placeholder="$t('panel.design.descriptionPH')"></textarea>
+					:placeholder="$t('panel.design.descriptionPH')"/>
 			</div>
 			<div class="my-2">
 				<div class="h6" v-if="design.mode == 'tree'">{{ $t("panel.design.tree") }}</div>

@@ -2,7 +2,7 @@
 	<footer class="py-1 px-3">
 		<div v-if="Studio.project" class="d-flex">
 			<div v-if="!isTouch" style="width: 80px;">
-				<i class="fas fa-mouse-pointer me-2"></i>
+				<i class="fas fa-mouse-pointer me-2"/>
 				<span v-if="Studio.mouseCoordinates">
 					{{ Studio.mouseCoordinates.x }}, {{ Studio.mouseCoordinates.y }}
 				</span>

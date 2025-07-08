@@ -13,7 +13,7 @@
 					<div class="modal-body" v-else>
 						<div class="mb-2">
 							<div class="input-group">
-								<input class="form-control" :value="url" ref="input" />
+								<input class="form-control" :value="url" ref="input" >
 							</div>
 						</div>
 						<div class="d-flex">

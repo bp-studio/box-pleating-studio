@@ -1,7 +1,7 @@
 <template>
 	<Dropdown label="Tools" icon="bp-tools" :title="$t('toolbar.tools.title')">
 		<DropdownItem :disabled="!Studio.project" @click="show('optimizer')">
-			<i class="fa-solid fa-calculator"></i>
+			<i class="fa-solid fa-calculator"/>
 			{{ $t("plugin.optimizer._") }}
 		</DropdownItem>
 		<Divider />

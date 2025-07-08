@@ -9,23 +9,23 @@
 
 		<div class="btn-group me-2" role="toolbar">
 			<button type="button" class="btn btn-primary"
-					:class="{ active: Studio.project && Studio.project.design.mode == 'tree' }" @click="toTree"
-					:title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
+				:class="{ active: Studio.project && Studio.project.design.mode == 'tree' }" @click="toTree"
+				:title="$t('toolbar.view.tree') + hk('v', 't', true)" :disabled="!Studio.project">
 				<i class="bp-tree" />
 			</button>
 			<button type="button" class="btn btn-primary"
-					:class="{ active: Studio.project && Studio.project.design.mode == 'layout' }" @click="toLayout"
-					:title="$t('toolbar.view.layout') + hk('v', 'l', true)" :disabled="!Studio.project">
+				:class="{ active: Studio.project && Studio.project.design.mode == 'layout' }" @click="toLayout"
+				:title="$t('toolbar.view.layout') + hk('v', 'l', true)" :disabled="!Studio.project">
 				<i class="bp-layout" />
 			</button>
 		</div>
 
 		<TabBar v-if="phase >= 5" />
-		<div v-else class="flex-grow-1"></div>
+		<div v-else class="flex-grow-1"/>
 
 		<div class="btn-group" id="panelToggle">
 			<button type="button" class="btn btn-primary" @click="toggle" :title="$t('toolbar.panel')"
-					:disabled="!Studio.project">
+				:disabled="!Studio.project">
 				<i class="bp-sliders-h" />
 			</button>
 		</div>
