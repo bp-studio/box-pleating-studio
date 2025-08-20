@@ -23,6 +23,9 @@ coverage/
 # My own notes
 NOTE.md
 
+# This is private for now
+CLAUDE.md
+
 # Exported test project
 /export*.bps
 
