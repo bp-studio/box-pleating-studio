@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { LayoutController } from "core/controller/layoutController";
 import twoFlapSpec from "./twoFlap.spec";
 import { id2, parseTree } from "@utils/tree";

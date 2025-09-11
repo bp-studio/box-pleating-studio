@@ -226,8 +226,8 @@ namespace WorkspaceService {
 		const unloadHandler = (e: BeforeUnloadEvent): string => {
 			e.preventDefault();
 
-			// Triggers exiting warning. The message is not actually shown,
-			// see https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent
+			// Triggers exiting warning. The message is not actually show.
+			// See https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent/returnValue
 			return e.returnValue = "unsaved";
 		};
 

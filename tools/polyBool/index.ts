@@ -2,8 +2,9 @@ import { AAUnion, GeneralUnion } from "../../src/core/math/sweepLine/polyBool";
 
 import type { Polygon } from "shared/types/geometry";
 
+const OFFSET = 0.5;
 const factor = 4;
-const full = 150 * factor;
+const full = 600;
 
 const toast = document.getElementById("toast") as HTMLDivElement;
 const cInput = document.getElementById("cInput") as HTMLCanvasElement;
@@ -30,8 +31,8 @@ function draw(ctx: CanvasRenderingContext2D, ...polygons: Polygon[]): void {
 		for(const path of polygon) {
 			ctx.beginPath();
 			const last = path[path.length - 1];
-			ctx.moveTo(last.x * factor + 0.5, full - last.y * factor + 0.5);
-			for(const p of path) ctx.lineTo(p.x * factor + 0.5, full - p.y * factor + 0.5);
+			ctx.moveTo(last.x * factor + OFFSET, full - last.y * factor + OFFSET);
+			for(const p of path) ctx.lineTo(p.x * factor + OFFSET, full - p.y * factor + OFFSET);
 			ctx.closePath();
 			ctx.stroke();
 		}

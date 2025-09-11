@@ -3,11 +3,11 @@
 		<div class="col">
 			<div class="form-check form-switch">
 				<input class="form-check-input" type="checkbox" :id="id" :checked="modelValue"
-					   @input="$emit('update:modelValue', isChecked($event.target))" />
+					@input="$emit('update:modelValue', isChecked($event.target))" >
 				<label class="form-check-label" v-bind:for="id">
-					<slot></slot>
+					<slot/>
 				</label>
-				<slot name="append"></slot>
+				<slot name="append"/>
 			</div>
 		</div>
 	</div>

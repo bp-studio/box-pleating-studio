@@ -1,6 +1,6 @@
 <template>
 	<button ref="bt" class="check-btn">
-		<slot></slot>
+		<slot/>
 		<i class="fas fa-check d-inline-block" ref="success" />
 	</button>
 </template>

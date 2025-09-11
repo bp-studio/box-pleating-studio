@@ -1,5 +1,9 @@
 {
 	"check-coverage": true,
+	"exclude": [
+		"lib/**",
+		"test/**"
+	],
 	"branches": 95,
 	"lines": 95,
 	"functions": 95,

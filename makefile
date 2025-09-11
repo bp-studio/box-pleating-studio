@@ -39,7 +39,7 @@ LDFLAGS :=\
 	-sMAXIMUM_MEMORY=4GB\
 	-sEXPORT_ES6=1
 
-WASM := $(TARGET)/$(OUT).mjs
+WASM := $(TARGET)/$(OUT).js
 
 ifeq ($(OS),Windows_NT)
 # Error is still possible in parallel running, so we add extra protection

@@ -46,7 +46,7 @@ export class NodeSet {
 		const coverage = new Map<ITreeNode, Quadrant[]>();
 		const numQuadrants = quadrants.size;
 		for(const id of this.$leaves) {
-			const leaf = State.$tree.$nodes[id]!;
+			const leaf = State.m.$tree.$nodes[id]!;
 			heap.$insert(leaf);
 			const covered: Quadrant[] = [];
 			for(let q = 0; q < quadrantNumber; q++) {
@@ -91,7 +91,7 @@ export class NodeSet {
 	public $distTriple(i1: NodeId, i2: NodeId, i3: NodeId): {
 		d1: number; d2: number; d3: number;
 	} {
-		const tree = State.$tree;
+		const tree = State.m.$tree;
 		const n1 = tree.$nodes[i1]!;
 		const n2 = tree.$nodes[i2]!;
 		const n3 = tree.$nodes[i3]!;
@@ -113,7 +113,7 @@ export class NodeSet {
 		if(that.$nodes.length != this.$nodes.length) return true;
 		for(let i = 0; i < this.$nodes.length; i++) {
 			if(this.$nodes[i] != that.$nodes[i]) return true;
-			const node = State.$tree.$nodes[this.$nodes[i]]!;
+			const node = State.m.$tree.$nodes[this.$nodes[i]]!;
 			if(State.$lengthChanged.has(node)) return true;
 		}
 		return false;

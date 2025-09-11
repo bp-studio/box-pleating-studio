@@ -27,7 +27,7 @@ function junction(): void {
 	}
 
 	// Find all overlapping
-	getCollisionOfLCA(State.$tree.$root);
+	getCollisionOfLCA(State.m.$tree.$root);
 }
 
 function getCollisionOfLCA(lca: ITreeNode): void {

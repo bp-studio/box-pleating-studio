@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { parseRationalPath } from "@utils/rationalPath";
 import { id1, id6, parseTree } from "@utils/tree";
 import { toGraphicalContours } from "core/design/tasks/utils/combine";
@@ -14,7 +16,7 @@ describe("Contour", function() {
 
 		it("Updates node ids after the tree is rebalanced", function() {
 			parseTree("(0,1,1),(1,2,2),(0,3,1),(3,4,1),(4,5,1),(4,6,1)", "(2,11,6,0,0),(5,7,1,0,0),(6,17,6,0,0)");
-			const node = State.$tree.$nodes[id1]!;
+			const node = State.m.$tree.$nodes[id1]!;
 			expect(node.$graphics.$patternContours.length).to.equal(1);
 			const contour = node.$graphics.$patternContours[0];
 			expect(contour.$ids).to.eql([1, 2, 3, 4, 5], "Root node is not included");

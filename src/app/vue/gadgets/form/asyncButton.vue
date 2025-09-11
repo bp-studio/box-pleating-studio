@@ -1,6 +1,6 @@
 <template>
 	<button class="btn btn-primary" @click="StudioService.execute(click)">
-		<slot></slot>
+		<slot/>
 	</button>
 </template>
 

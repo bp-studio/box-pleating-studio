@@ -12,7 +12,7 @@ import { View } from "client/base/view";
 import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 import { FlapContainer } from "./flapContainer";
-import { applyTransform } from "shared/types/geometry";
+import { applyTransform, norm } from "shared/types/geometry";
 
 import type { IEditor } from "../sheet";
 import type { TransformationMatrix } from "shared/types/geometry";
@@ -183,7 +183,7 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 
 	public $transform(matrix: TransformationMatrix): void {
 		const [a, b, c, d] = matrix;
-		const scale = Math.round((Math.sqrt(a * a + c * c) + Math.sqrt(b * b + d * d)) / 2);
+		const scale = Math.round((norm(a, c) + norm(b, d)) / 2);
 		for(const flap of this.$flaps) {
 			const { x, y, width, height } = flap.toJSON();
 			const ll = applyTransform({ x, y }, matrix);

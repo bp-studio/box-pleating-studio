@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { distinct, isTypedArray } from "shared/utils/array";
 
 export default function() {

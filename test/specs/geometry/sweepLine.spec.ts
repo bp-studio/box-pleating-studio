@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { parsePath } from "@utils/path";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
 import { Clip } from "core/math/sweepLine/clip/clip";

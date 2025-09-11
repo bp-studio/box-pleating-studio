@@ -1,7 +1,7 @@
-const gulp = require("gulp");
-const through2 = require("gulp-through2");
+import gulp from "gulp";
+import through2 from "gulp-through2";
 
-const config = require("../config.json");
+import config from "../config.json" with { type: "json" };
 
 function copyInOrderOf(source, ref) {
 	if(typeof source != "object" || Array.isArray(source)) return source;

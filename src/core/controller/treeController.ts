@@ -24,7 +24,7 @@ export namespace TreeController {
 	 * @param stretches Prototype {@link JStretch}s for newly created stretches.
 	 */
 	export function edit(edits: JEdit[], rootId: NodeId, flaps: JFlap[], stretches: JStretch[]): void {
-		const tree = State.$tree;
+		const tree = State.m.$tree;
 		for(const e of edits) {
 			if(e[0]) tree.$addEdge(e[1].n1, e[1].n2, e[1].length);
 			else tree.$removeEdge(e[1].n1, e[1].n2);
@@ -38,7 +38,7 @@ export namespace TreeController {
 
 	/** Add a new leaf. */
 	export function addLeaf(id: NodeId, at: NodeId, length: number, flap: JFlap): void {
-		const node = State.$tree.$addEdge(id, at, length);
+		const node = State.m.$tree.$addEdge(id, at, length);
 		node.$setFlap(flap);
 		Processor.$run(heightTask);
 	}
@@ -49,7 +49,7 @@ export namespace TreeController {
 	 * @param prototypes The {@link JFlap}s corresponding to the new leaves after deletion.
 	 */
 	export function removeLeaf(ids: NodeId[], prototypes: JFlap[]): void {
-		const tree = State.$tree;
+		const tree = State.m.$tree;
 		for(const id of ids) tree.$removeLeaf(id);
 		tree.$flushRemove();
 		tree.$setFlaps(prototypes);
@@ -57,36 +57,36 @@ export namespace TreeController {
 	}
 
 	export function join(id: NodeId): void {
-		State.$tree.$join(id);
+		State.m.$tree.$join(id);
 		Processor.$run(heightTask);
 	}
 
 	export function split(edge: JEdgeBase, id: NodeId): void {
-		State.$tree.$split(id, getChildId(edge));
+		State.m.$tree.$split(id, getChildId(edge));
 		Processor.$run(heightTask);
 	}
 
 	export function merge(edge: JEdgeBase): void {
-		State.$tree.$merge(getChildId(edge));
+		State.m.$tree.$merge(getChildId(edge));
 		Processor.$run(heightTask);
 	}
 
 	export function getHierarchy(random: boolean, useDimension: boolean): Hierarchy[] {
 		if(!random) {
 			return [{
-				leaves: State.$tree.$nodes.filter(n => n && n.$isLeaf).map(n => n!.id),
-				distMap: distMap(State.$tree.$nodes),
+				leaves: State.m.$tree.$nodes.filter(n => n && n.$isLeaf).map(n => n!.id),
+				distMap: distMap(State.m.$tree.$nodes),
 				parents: [],
 			}];
 		}
-		const aTree = new AreaTree(State.$tree, useDimension);
+		const aTree = new AreaTree(State.m.$tree, useDimension);
 		return aTree.$createHierarchy();
 	}
 }
 
 /** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
 export function getChildId(edge: JEdgeBase): NodeId {
-	const tree = State.$tree;
+	const tree = State.m.$tree;
 	const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;
 	return n1.$parent === n2 ? edge.n1 : edge.n2;
 }

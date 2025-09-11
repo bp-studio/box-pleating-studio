@@ -1,37 +1,38 @@
 import { defineConfig } from "eslint/config";
 import pluginCompat from "eslint-plugin-compat";
 import pluginJsDoc from "eslint-plugin-jsdoc";
-import pluginMocha from "eslint-plugin-mocha";
 import { createConfig, legacyPlugin } from "@mutsuntsai/eslint";
 
 export default defineConfig([
 	...createConfig({
-		ignores: ["{build,coverage}/**", "lib/**/*.js", "lib/optimizer/**/*.mjs", "src/app/gen/**"],
-		import: ["**/*.{ts,vue}", "eslint.config.mjs"],
-		project: [
-			"src/app",
-			"src/client",
-			"src/core",
-			"src/other/donate",
-			"src/other/service",
-			"test",
-			"e2e",
-			"tools",
-		],
+		ignores: ["{build,coverage}/**", "lib/{lzma,optimizer}/**/*.js"],
+		import: {
+			files: ["**/*.{ts,vue}", "eslint.config.js"],
+			project: [
+				"src/app",
+				"src/client",
+				"src/core",
+				"src/other/donate",
+				"src/other/service",
+				"test",
+				"e2e",
+				"tools",
+			],
+		},
 		globals: {
-			cjs: ["gulpfile.js", "gulp/**"],
-			esm: ["test/mocha.env.mjs", "lib/**/*.mjs", "eslint.config.mjs"],
+			esm: ["test/mocha.env.js", "lib/**/*.js", "eslint.config.js", "gulpfile.js", "gulp/**"],
 			browser: ["src/**"],
 		},
 		html: {
-			"@typescript-eslint/no-magic-numbers": "off",
-			"@typescript-eslint/no-this-alias": "off",
-			"@typescript-eslint/no-unused-vars": "off",
 			"max-lines-per-function": "off",
 			"no-invalid-this": "off",
+			"no-unused-vars": "off",
 			"no-var": "off",
 			"vars-on-top": "off",
 		},
+		mocha: ["test/**"],
+		playwright: ["e2e/**"],
+		package: order => order.toSpliced(order.indexOf("version") + 1, 0, "app_version"),
 	}),
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,39 +93,6 @@ export default defineConfig([
 				},
 				enableFixer: false,
 			}],
-		},
-	},
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Tests
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	{
-		...pluginMocha.configs.recommended,
-		files: ["test/**"],
-	},
-	{
-		name: "General Tests",
-		files: ["{test,e2e,tools}/**"],
-		rules: {
-			"@typescript-eslint/explicit-function-return-type": ["warn", {
-				allowFunctionsWithoutTypeParameters: true,
-			}],
-			"@typescript-eslint/no-invalid-this": "off",
-			"@typescript-eslint/no-magic-numbers": "off",
-			"@typescript-eslint/no-unused-expressions": "off",
-			"max-classes-per-file": "off",
-			"max-lines-per-function": "off",
-			"prefer-arrow-callback": "off",
-		},
-	},
-	{
-		name: "Mocha",
-		files: ["test/**"],
-		rules: {
-			"mocha/prefer-arrow-callback": "warn",
-			"mocha/no-exports": "off",
-			"mocha/no-pending-tests": "off",
 		},
 	},
 

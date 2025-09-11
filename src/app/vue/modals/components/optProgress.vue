@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div>
-			<slot></slot>
+			<slot/>
 			<span v-if="context.state.skipping" class="text-warning">&ensp;(Waiting for skipping)</span>
 		</div>
 		<div class="row mt-3">
@@ -10,7 +10,7 @@
 			</div>
 			<div class="col-auto">
 				<button type="button" class="btn btn-secondary me-2" @click="context.skip"
-						:disabled="context.state.skipping || context.state.stopping || noSkip">{{ $t("plugin.optimizer.skip")
+					:disabled="context.state.skipping || context.state.stopping || noSkip">{{ $t("plugin.optimizer.skip")
 					}}</button>
 				<button type="button" class="btn btn-danger" @click="context.stop" :disabled="context.state.stopping">{{
 					$t("keyword.abort") }}</button>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-	export interface ProgressContext {
+	interface ProgressContext {
 		state: {
 			skipping: boolean;
 			stopping: boolean;

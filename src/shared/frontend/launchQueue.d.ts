@@ -1,14 +1,22 @@
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/launchQueue
+ */
 declare const launchQueue: LaunchQueue;
 
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/LaunchQueue
+ */
 interface LaunchQueue {
-	setConsumer(consumer: LaunchConsumer): void;
+	/**
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/LaunchQueue/setConsumer
+	 */
+	setConsumer(consumer: (launchParams: LaunchParams) => void): void;
 }
 
-interface LaunchConsumer {
-	(launchParams: LaunchParams): void;
-}
-
+/**
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/LaunchParams
+ */
 interface LaunchParams {
 	readonly files: FileHandleList;
 }

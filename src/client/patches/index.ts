@@ -3,7 +3,7 @@ import Rc0Migration from "./migrations/rc0Migration";
 import Rc1Migration from "./migrations/rc1Migration";
 import TrivialMigration from "./migrations/trivialMigration";
 import ProjectMigration from "./migrations/projectMigration";
-import HardLimitMigration from "./migrations/hardLimitMigration";
+import HardLimitCheck from "./checks/hardLimitCheck";
 import { Migration } from "./migration";
 
 // These version formats were never publicly released,
@@ -29,7 +29,14 @@ Migration.$add(TrivialMigration, "0.4");
 /** Version 0.6 separates `design` from the rest. */
 Migration.$add(ProjectMigration, "0.6");
 
-/** Version 0.7 imposes several hard limits. */
-Migration.$add(HardLimitMigration, "0.7");
+/**
+ * Version 0.7 originally is for migrating hard limits,
+ * but since v0.7.10 we have made it into a check instead,
+ * so now this version doesn't modify anything.
+ */
+Migration.$add(TrivialMigration, "0.7");
+
+/** Check for hard limits. */
+Migration.$check(HardLimitCheck);
 
 export { Migration };

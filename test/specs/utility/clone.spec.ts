@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { clone, clonePolyfill, deepAssign } from "shared/utils/clone";
 
 export default function() {

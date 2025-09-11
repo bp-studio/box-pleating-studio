@@ -152,7 +152,7 @@ export function clearPatternContourForRepo(repo: Repository): void {
 
 function* nodesOfRepo(repo: Repository): Generator<TreeNode> {
 	for(const id of repo.$nodeSet.$nodes) {
-		const node = State.$tree.$nodes[id];
+		const node = State.m.$tree.$nodes[id];
 		/* istanbul ignore else: type-safety */
 		if(node) yield node;
 	}

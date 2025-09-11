@@ -21,9 +21,20 @@ interface IMigration {
 export namespace Migration {
 
 	const migrations: [IMigration, string][] = [];
+	const checks: IMigration[] = [];
 
+	/** Add a migration to the list. */
 	export function $add(migration: IMigration, version: string): void {
 		migrations.push([migration, version]);
+	}
+
+	/**
+	 * Add a check to the list.
+	 *
+	 * Checks will always be executed regardless of version.
+	 */
+	export function $check(check: IMigration): void {
+		checks.push(check);
 	}
 
 	export function $getCurrentVersion(): string {
@@ -59,6 +70,11 @@ export namespace Migration {
 			i++;
 		}
 		proj.version = $getCurrentVersion();
+
+		// Checks will be run regardless of file version.
+		for(const check of checks) {
+			deprecate = check(proj) || deprecate;
+		}
 
 		/* istanbul ignore next: legacy code */
 		if(deprecate) {

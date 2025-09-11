@@ -1,0 +1,19 @@
+diff --git a/lib/index.js b/lib/index.js
+index eba8a53908aa83dc3b5f284b0eb2d3eff0ad1133..75ce429082f7350c208f4b8b07aa7143da528ab4 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -21,12 +21,12 @@ function transformOption(path, options, jest = false) {
+                 parser: {
+                     syntax: 'typescript',
+                     tsx: typeof opts.jsx !== 'undefined' ? opts.jsx : path.endsWith('.tsx'),
+-                    decorators: Boolean(opts.experimentalDecorators),
++                    decorators: true,
+                     dynamicImport: Boolean(opts.dynamicImport),
+                 },
+                 transform: {
+                     legacyDecorator: Boolean(opts.experimentalDecorators),
+-                    decoratorVersion: (_e = opts.decoratorVersion) !== null && _e !== void 0 ? _e : '2021-12',
++                    decoratorVersion: '2022-03',
+                     decoratorMetadata: Boolean(opts.emitDecoratorMetadata),
+                     useDefineForClassFields: Boolean(opts.useDefineForClassFields),
+                     react: options === null || options === void 0 ? void 0 : options.react,

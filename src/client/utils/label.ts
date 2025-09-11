@@ -107,7 +107,7 @@ export class Label extends Container {
 		this.scale = { x: 1 / s / SMOOTHNESS, y: -1 / s / SMOOTHNESS };
 		this.x = x;
 		this.y = y;
-		const factor = Math.sqrt(ProjectService.shrink.value);
+		const factor = ProjectService.getSmoothShrinkFactor();
 		this._label.scale.set(factor);
 		this._glow.scale.set(factor);
 

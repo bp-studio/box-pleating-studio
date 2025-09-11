@@ -120,12 +120,10 @@
 		".gitignore": ".gitattributes",
 		".mocharc.json": ".nycrc",
 		".stylelintrc.json": ".stylelintignore",
-		"Pipfile": "Pipfile.lock, pyproject.toml, .pylintrc",
 		"README.md": "LICENSE.md, CONTRIBUTING.md",
-		"eslint.config.mjs": ".editorconfig, eslint-local-rules.js",
+		"eslint.config.js": ".editorconfig",
 		"makefile": ".clang-*",
-		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc",
-		"rsbuild.config.ts": "rsbuild.*"
+		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc, knip.config.ts"
 	},
 	"files.associations": {
 		"*.bps": "json",
@@ -160,6 +158,9 @@
 	],
 	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"mochaExplorer.multiFileSuites": true,
+	"mochaExplorer.nodeArgv": [
+		"--enable-source-maps"
+	],
 	"scss.validate": false,
 	"stylelint.packageManager": "pnpm",
 	"stylelint.validate": [

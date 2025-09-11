@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
 import { MAX_VERTICES } from "shared/types/constants";
 

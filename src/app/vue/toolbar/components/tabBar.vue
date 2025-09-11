@@ -1,10 +1,10 @@
 <template>
 	<div class="flex-grow-1 tab-container" @wheel.passive="tabWheel($event)" role="tablist">
 		<SlickList lockAxis="x" axis="x" v-model:list="Workspace.ids.value" v-bind="slickAttrs()" id="divTab"
-				   :class="{ 'hide': !Workspace.ids.value.length }" @sort-start="setCursor('ew-resize')"
-				   @sort-end="setCursor('default')">
+			:class="{ 'hide': !Workspace.ids.value.length }" @sort-start="setCursor('ew-resize')"
+			@sort-end="setCursor('default')">
 			<SlickItem v-for="(id, i) in Workspace.ids.value" :key="id" :index="i" class="tab"
-					   :class="{ active: Studio.project?.id == id }">
+				:class="{ active: Studio.project?.id == id }">
 				<Tab :id="id" @menu="contextMenu($event, id)" />
 			</SlickItem>
 		</SlickList>

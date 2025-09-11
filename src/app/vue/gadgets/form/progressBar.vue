@@ -1,8 +1,8 @@
 <template>
 	<div class="progress" role="progressbar" aria-label="Animated striped example" :aria-valuenow="value" aria-valuemin="0"
-		 :aria-valuemax="max" style="height:1.5rem;" :style="transition ? '' : '--bs-progress-bar-transition: none;'">
+		:aria-valuemax="max" style="height:1.5rem;" :style="transition ? '' : '--bs-progress-bar-transition: none;'">
 		<div class="progress-bar progress-bar-striped progress-bar-animated" :style="{ 'width': (value / max * 100) + '%' }"
-			 v-text="text()"></div>
+			v-text="text()"/>
 	</div>
 </template>
 

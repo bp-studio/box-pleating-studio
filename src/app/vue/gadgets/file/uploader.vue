@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)" />
+		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)" >
 		<label :class="labelCls ?? 'dropdown-item m-0'" :for="id" ref="lbl">
-			<slot></slot>
+			<slot/>
 		</label>
 	</div>
 </template>

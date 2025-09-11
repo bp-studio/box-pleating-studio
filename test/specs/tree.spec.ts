@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "@utils/tree";
 import { DesignController } from "core/controller/designController";
 import { TreeController } from "core/controller/treeController";

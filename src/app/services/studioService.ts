@@ -11,7 +11,7 @@ import type { StudioOptions } from "client/options";
 import type { Device } from "client/project/components/layout/device";
 
 /** Before the Studio is initialized, use a default value as placeholder. */
-export function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
+function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
 	return computed(() => StudioService.initialized.value ? target() : defaultValue);
 }
 

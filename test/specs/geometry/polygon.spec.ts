@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { parsePath } from "@utils/path";
 import { isInside } from "core/math/geometry/winding";
 

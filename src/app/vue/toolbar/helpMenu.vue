@@ -5,7 +5,7 @@
 		</div>
 		<div class="dropdown-item" @click="news">
 			<i class="fas fa-newspaper" />{{ $t('toolbar.help.news') }}
-			<div class="notify" v-if="notify"></div>
+			<div class="notify" v-if="notify"/>
 		</div>
 		<a class="dropdown-item" href="https://bp-studio.github.io" target="_blank" rel="noopener">
 			<i class="fas fa-globe" />{{ $t("toolbar.help.homepage") }}
@@ -15,11 +15,11 @@
 			<i class="fab fa-discord" style="color: #5865F2;" />Discord
 		</a>
 		<a class="dropdown-item" href="https://github.com/bp-studio/box-pleating-studio/discussions" target="_blank"
-		   rel="noopener">
+			rel="noopener">
 			<i class="far fa-comment-dots" />{{ $t("toolbar.help.discussions") }}
 		</a>
 		<a class="dropdown-item" href="https://github.com/bp-studio/box-pleating-studio/issues/new/choose" target="_blank"
-		   rel="noopener">
+			rel="noopener">
 			<i class="fas fa-bug" />{{ $t("toolbar.help.issue") }}
 		</a>
 		<Divider />
@@ -28,7 +28,7 @@
 		</DropdownItem>
 		<div class="dropdown-item" @click="update" v-else-if="updateReady">
 			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.update') }}
-			<div class="notify"></div>
+			<div class="notify"/>
 		</div>
 		<div class="dropdown-item" @click="checkUpdate" v-else>
 			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.checkUpdate') }}

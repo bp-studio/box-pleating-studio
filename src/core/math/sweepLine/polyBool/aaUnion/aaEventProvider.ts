@@ -88,4 +88,4 @@ function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1,
  * and then we shifted the value by -{@link COORDINATE_SHIFT},
  * together with {@link MAX_TREE_HEIGHT} this achieves the goal.
  */
-const COORDINATE_SHIFT = 4096;
+export const COORDINATE_SHIFT = 4096;

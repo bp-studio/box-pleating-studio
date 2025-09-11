@@ -1,5 +1,8 @@
+import { expect } from "chai";
+
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
+import { options } from "client/options";
 import { MAX_SHEET_SIZE } from "shared/types/constants";
 
 import type { JProject } from "shared/json";
@@ -44,17 +47,16 @@ describe("Migration", function() {
 		});
 	});
 
-	describe("v0.7", function() {
+	describe("Checks", function() {
 
-		let result: JProject;
-
-		before(async function() {
-			const sample = await getJSON("v06.troll.sample.json");
-			result = Migration.$process(sample);
-		});
-
-		it("Imposes sheet limit", function() {
+		it("Imposes sheet limit", async function() {
+			let deprecated = false;
+			options.onDeprecate = () => deprecated = true;
+			const sample = await getJSON("v07.troll.sample.json");
+			const result = Migration.$process(sample);
 			expect(result.design.layout.sheet.width).to.equal(MAX_SHEET_SIZE);
+			expect(deprecated).to.be.true;
+			delete options.onDeprecate;
 		});
 
 	});

@@ -1,12 +1,15 @@
 {
 	"compilerOptions": {
 		"baseUrl": "../src",
+		"rootDir": "../",
+		"outDir": "../build",
 		"isolatedModules": true,
 		"moduleResolution": "node",
 		"noImplicitOverride": true,
 		"preserveSymlinks": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
+		"sourceMap": true,
 		"strict": true,
 		// Since SWC 1.7.35 it no longer transpile decorators for esnext target,
 		// so we need to explicitly set a target other than esnext for ts-node + SWC to work
@@ -30,9 +33,5 @@
 	"include": [
 		"./**/*.ts",
 		"../src/shared/types/**/*.d.ts"
-	],
-	"ts-node": {
-		"files": true,
-		"swc": true
-	}
+	]
 }

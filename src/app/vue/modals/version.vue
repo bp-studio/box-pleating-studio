@@ -3,7 +3,7 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-body scroll-shadow" style="max-height: 70vh; border-radius: 0.3rem;">
-					<div v-if="record[index]" v-html="record[index]"></div>
+					<div v-if="record[index]" v-html="record[index]"/>
 					<div v-else class="m-5 display-2 text-muted text-center">
 						<i class="bp-spinner fa-spin" />
 					</div>

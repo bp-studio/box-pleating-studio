@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { createTree } from "@utils/tree";
 import { State } from "core/service/state";
 

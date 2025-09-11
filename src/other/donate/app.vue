@@ -7,13 +7,13 @@
 				<div class="form-row mt-3">
 					<div class="input-group">
 						<div class="input-group-text">$</div>
-						<input class="form-control" type="number" v-model.number="amount" @input="amountChange" />
+						<input class="form-control" type="number" v-model.number="amount" @input="amountChange" >
 						<div class="input-group-text">USD{{ handling }}</div>
 					</div>
 					<div class="text-danger" v-show="error">{{ $t("donate.error") }}</div>
 				</div>
 				<div class="mt-3">{{ $t("donate.then") }}</div>
-				<div class="text-center mt-3" id="paypal-button-container"></div>
+				<div class="text-center mt-3" id="paypal-button-container"/>
 				<div v-if="processing">{{ $t("donate.wait") }}</div>
 			</div>
 			<div class="flex-grow-1" v-else-if="step == 2">

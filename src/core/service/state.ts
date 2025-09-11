@@ -20,12 +20,35 @@ import type { Tree } from "core/design/context/tree";
 
 export namespace State {
 
+	interface StateData {
+		/** Current {@link Tree}. */
+		$tree: Tree;
+
+		/** If the Client is performing dragging. Some of the tasks could take a shortcut in that case. */
+		$isDragging: boolean;
+
+		/** Root have changed in the current round. */
+		$rootChanged: boolean;
+
+		/** The structure of the tree (not the edge lengths) have changed. */
+		$treeStructureChanged: boolean;
+	}
+
+	/**
+	 * We put all mutable states in this object,
+	 * as some of our toolchains (in particular Istanbul ESM loader) depends on Babel,
+	 * which does not support non-constant members in a namespace.
+	 */
+	export const m: StateData = {
+		$tree: undefined!,
+		$isDragging: false,
+		$rootChanged: false,
+		$treeStructureChanged: false,
+	};
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Persistent states
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** Current {@link Tree}. */
-	export let $tree: Tree;
 
 	/** All {@link Junction}s. */
 	export const $junctions = new IntDoubleMap<NodeId, Junction>();
@@ -36,9 +59,6 @@ export namespace State {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Semi-persistent states
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** If the Client is performing dragging. Some of the tasks could take a shortcut in that case. */
-	export let $isDragging: boolean;
 
 	/** Used for finding those {@link InvalidJunction}s that needs to be deleted. */
 	export const $invalidJunctionDiff = new DiffDoubleSet();
@@ -64,12 +84,6 @@ export namespace State {
 	 * except for the final root node.
 	 */
 	export const $parentChanged = new Set<ITreeNode>();
-
-	/** Root have changed in the current round. */
-	export let $rootChanged: boolean;
-
-	/** The structure of the tree (not the edge lengths) have changed. */
-	export let $treeStructureChanged: boolean;
 
 	/**
 	 * Those nodes that have the length of their parent edges changed in the current round,
@@ -150,8 +164,8 @@ export namespace State {
 		$contourWillChange.clear();
 		$patternedQuadrants.clear();
 		$movedDevices.clear();
-		$treeStructureChanged = false;
-		$rootChanged = false;
+		m.$treeStructureChanged = false;
+		m.$rootChanged = false;
 	}
 
 	$reset();

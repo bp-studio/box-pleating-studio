@@ -1,13 +1,12 @@
 <template>
-	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.prevent="hide"></div>
-	<aside class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel"
-		   v-on:contextmenu.stop="onContextMenu($event)">
+	<div id="divShade" :class="{ 'show': showPanel }" @mousedown="hide" @touchstart.prevent="hide" />
+	<aside class="scroll-shadow p-3" :class="{ 'show': showPanel }" ref="panel" v-on:contextmenu.stop="onContextMenu($event)">
 		<template v-if="design">
 			<Design v-if="Studio.selections.length == 0" :design="design" />
 			<div v-else-if="Studio.selections.length == 1">
 				<StretchVue v-if="Studio.stretch" :stretch="Studio.stretch" />
 				<component v-else-if="isFlap(Studio.selection)" :is="FlapVue" :subject="Studio.selection"
-						   :max="design.sheet.grid.diameter" />
+					:max="design.sheet.grid.diameter" />
 				<component v-else :is="componentMap[type]" :subject="Studio.selection" />
 			</div>
 			<div v-else>
@@ -17,12 +16,6 @@
 		</template>
 	</aside>
 </template>
-
-<script lang="ts">
-	export function show(): void { showPanel.value = true; }
-	export function hide(): void { showPanel.value = false; }
-	export function toggle(): void { showPanel.value = !showPanel.value; }
-</script>
 
 <script setup lang="ts">
 
@@ -63,6 +56,10 @@
 			if(el && panel.value?.contains(el)) el.blur();
 		});
 	});
+
+	function hide(): void {
+		showPanel.value = false;
+	}
 
 	function onContextMenu(event: Event): void {
 		// Disable context menu outside text fields.

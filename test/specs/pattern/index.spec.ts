@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { parseTree } from "@utils/tree";
 import positioningSpec from "./positioning.spec";
 import renderingSpec from "./rendering.spec";

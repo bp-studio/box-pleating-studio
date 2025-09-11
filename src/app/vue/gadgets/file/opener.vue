@@ -1,6 +1,6 @@
 <template>
 	<div @click="execute">
-		<slot></slot>
+		<slot/>
 	</div>
 </template>
 

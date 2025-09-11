@@ -6,9 +6,9 @@
 		</div>
 		<div class="panel-grid" v-else>
 			<Store :size="configCount(stretch.repo)" :index="stretch.configIndex" @move="stretch.switchConfig($event)"
-				   :label="$t('panel.repo.config')"></store>
+				:label="$t('panel.repo.config')"/>
 			<Store :size="patternCount(stretch.repo)" :index="stretch.patternIndex" @move="stretch.switchPattern($event)"
-				   :label="$t('panel.repo.pattern')"></Store>
+				:label="$t('panel.repo.pattern')"/>
 		</div>
 	</template>
 </template>

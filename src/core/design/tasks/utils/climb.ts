@@ -23,7 +23,6 @@ export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: Reado
 	if(total === 0) return;
 	if(total === 1) {
 		// Single thread updating
-		// See https://github.com/microsoft/TypeScript/issues/52998
 		let n = getFirst(sets.find(s => s.size === 1)!)!;
 		while(updater(n) && n.$parent) n = n.$parent;
 	} else {

@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { getText } from "@utils/sample";
 import { treeMaker } from "client/plugins/treeMaker";
 

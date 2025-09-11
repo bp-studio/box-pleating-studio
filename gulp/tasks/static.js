@@ -1,8 +1,8 @@
-const gulp = require("gulp");
-const through2 = require("gulp-through2");
-const fontawesome = require("gulp-fontawesome");
+import fontawesome from "gulp-fontawesome";
+import gulp from "gulp";
+import through2 from "gulp-through2";
 
-const config = require("../config.json");
+import config from "../config.json" with { type: "json" };
 
 function woff2(stem) {
 	if(!stem) throw new Error("Woff2 error: must specify filename.");

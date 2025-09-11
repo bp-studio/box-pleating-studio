@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { parseLine } from "@utils/line";
 import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";

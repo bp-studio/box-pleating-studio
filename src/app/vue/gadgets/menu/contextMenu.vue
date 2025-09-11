@@ -1,6 +1,6 @@
 <template>
 	<div class="dropdown-menu" @touchend="hide(false)" @mouseup="hide(false)" ref="el" v-if="initialized">
-		<slot></slot>
+		<slot/>
 	</div>
 </template>
 

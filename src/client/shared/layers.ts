@@ -13,7 +13,7 @@ export enum Layer {
 	label,
 }
 
-export interface ILayerOptions {
+interface ILayerOptions {
 	/** Whether this layer should be clipped around the sheet. Default value is `false`. */
 	clipped?: boolean;
 

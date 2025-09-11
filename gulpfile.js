@@ -1,55 +1,45 @@
-/* Uncomment the following to diagnose startup performance. */
-// let requireCount = 0;
-// const Module = require("module");
-// const oldRequire = Module.prototype.require;
-// Module.prototype.require = function(...args) {
-// 	requireCount++;
-// 	return oldRequire.apply(this, args);
-// };
-// console.time("startup");
-
 // modify the way `path` outputs
-const path = require("path");
+import path from "path";
 const rel = path.relative;
 path.relative = function(from, to) {
 	return rel(from, to).replace(/\\/g, "/");
 };
 
 // Load all dependencies
-const gulp = require("gulp");
-const seriesIf = require("./gulp/utils/seriesIf");
-const { exec } = require("child_process");
+import { exec } from "child_process";
+import gulp from "gulp";
+import seriesIf from "./gulp/utils/seriesIf.js";
 
-require("./gulp/tasks/ftp.js");
-require("./gulp/tasks/locale.js");
-require("./gulp/tasks/static.js");
+import "./gulp/tasks/ftp.js";
+import "./gulp/tasks/locale.js";
+import "./gulp/tasks/static.js";
 
-gulp.task("rsbuild", cb => exec("pnpm rsbuild build", cb));
+export const rsbuild = cb => exec("pnpm rsbuild build", cb);
 
-gulp.task("buildDist", gulp.series(
+export const buildDist = gulp.series(
 	gulp.parallel("static", "version"),
-	"rsbuild"
-));
+	rsbuild
+);
 
-gulp.task("deployDev", gulp.series(
-	"buildDist",
+export const deployDev = gulp.series(
+	buildDist,
 	"uploadDev",
 	"cleanDev"
-));
+);
 
-gulp.task("deployQa", gulp.series(
-	"buildDist",
+export const deployQa = gulp.series(
+	buildDist,
 	"uploadQa",
 	"cleanQa"
-));
+);
 
-gulp.task("deployDQ", gulp.series(
-	"buildDist",
+export const deployDQ = gulp.series(
+	buildDist,
 	gulp.parallel(
 		gulp.series("uploadDev", "cleanDev"),
 		gulp.series("uploadQa", "cleanQa")
 	)
-));
+);
 
 const deployMsg = `Before releasing, please check the following steps:
 1. Check if there's unresolved fatal error report.
@@ -60,7 +50,7 @@ const deployMsg = `Before releasing, please check the following steps:
 6. Add relevant tests, and make sure that new codes are covered.
 Are you sure you want to deploy?"`;
 
-gulp.task("deployPub", () => seriesIf(
+export const deployPub = () => seriesIf(
 	async () => {
 		const inquirer = (await import("inquirer")).default;
 		const answers = await inquirer.prompt([{
@@ -71,20 +61,16 @@ gulp.task("deployPub", () => seriesIf(
 		}]);
 		return answers.ok;
 	},
-	"buildDist",
+	buildDist,
 	"uploadPub",
 	"cleanPubInternal_"
-));
+);
 
 // Clear all built files
-gulp.task("clean", async () => {
+export const clean = async () => {
 	const del = (await import("del")).deleteAsync;
 	del("build");
-});
+};
 
-// The default build. It will build to the point that it can be run locally.
-// Press F5 in VS Code will execute this task by default.
-gulp.task("default", gulp.series("static"));
-
-// console.log("Require count", requireCount);
-// console.timeEnd("startup");
+// The default build.
+export default gulp.series("static");

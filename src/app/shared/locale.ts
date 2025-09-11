@@ -28,8 +28,6 @@ type PartialCompiledLocale<T extends object> = {
 
 export type BpsLocale = PartialCompiledLocale<typeof bpsLocale>;
 
-export type BpsMessageKey = undefined | keyof BpsLocale["message"];
-
 const locale = {
 	en, es, ja, ko, vi,
 	"zh-cn": cn,

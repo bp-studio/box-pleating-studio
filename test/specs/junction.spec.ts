@@ -1,3 +1,5 @@
+import { expect } from "chai";
+
 import { id0, id3, id4, parseTree } from "@utils/tree";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";

@@ -15,14 +15,14 @@
 				<Hotkey icon="fas fa-save" ctrl hk="S">{{ $t('toolbar.file.BPS.save') }}</Hotkey>
 			</DropdownItem>
 			<SaveAs :disabled="!Studio.project" type="bps" ref="bps" @save="notify($event)" :desc="$t('toolbar.file.BPS.name')"
-					mime="application/bpstudio.project+json">
+				mime="application/bpstudio.project+json">
 				<Hotkey icon="fas fa-save" ctrl shift hk="S">{{ $t('toolbar.file.BPS.saveAs') }}</Hotkey>
 			</SaveAs>
 			<DropdownItem :disabled="!Studio.project" @click="saveAll()">
 				<Hotkey icon="bp-save-all" ctrl hk="K">{{ $t('toolbar.file.BPS.saveAll') }}</Hotkey>
 			</DropdownItem>
 			<SaveAs :disabled="!Studio.project" type="bpz" ref="bpz" @save="notifyAll($event)" :desc="$t('toolbar.file.BPZ.name')"
-					mime="application/bpstudio.workspace+zip">
+				mime="application/bpstudio.workspace+zip">
 				<Hotkey icon="bp-save-all">{{ $t('toolbar.file.BPZ.save') }}</Hotkey>
 			</SaveAs>
 		</template>

@@ -83,6 +83,10 @@ export class DiagonalGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $canSubdivide(): boolean {
+		return this._size * 2 <= MAX_SHEET_SIZE;
+	}
+
 	public override $getResizeCenter(): IPoint {
 		return this.$getCenter();
 	}

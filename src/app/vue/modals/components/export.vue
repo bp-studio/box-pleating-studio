@@ -6,11 +6,11 @@
 					<div class="h4 modal-title">{{ title }}</div>
 				</div>
 				<div class="modal-body">
-					<slot></slot>
+					<slot/>
 					<div class="row mb-2" v-if="!HandleService.enabled.value">
 						<div class="col col-form-label flex-grow-0">{{ $t("keyword.filename") }}</div>
 						<div class="col flex-grow-1">
-							<input type="text" class="form-control" v-model="extFilename" />
+							<input type="text" class="form-control" v-model="extFilename" >
 						</div>
 					</div>
 					<div v-if="isInApp">{{ $t("message.inApp") }}</div>
@@ -19,7 +19,7 @@
 							<i class="bp-spinner fa-spin" />
 						</button>
 						<CheckButton v-else-if="HandleService.enabled.value" ref="bt" type="button" class="btn btn-lg btn-success"
-									 @click="save">
+							@click="save">
 							{{ $t("keyword.export") }}
 						</CheckButton>
 						<a v-else :href="url" :download="extFilename" class="btn btn-lg btn-success" @click="$emit('save')">{{

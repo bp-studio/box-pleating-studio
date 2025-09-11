@@ -7,7 +7,7 @@ import type { Path } from "shared/types/geometry";
 import type { Comparator } from "shared/types/types";
 
 /** The order is inspired by CSS */
-export enum Side {
+enum Side {
 	top,
 	right,
 	bottom,

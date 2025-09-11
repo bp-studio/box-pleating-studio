@@ -56,7 +56,7 @@ export function svg(proj: Project, includeHidden: boolean): Blob {
 function getStyle(): string {
 	const { border, hinge, ridge, junction, grid, shade, label, edge, vertex, dot, axisParallel } = style;
 	const s = ProjectService.scale.value;
-	const fontSize = label.size * Math.sqrt(ProjectService.shrink.value) / s;
+	const fontSize = label.size * ProjectService.getSmoothShrinkFactor() / s;
 	const text = `dominant-baseline:middle;text-anchor:middle;font-size:${fontSize}px;font-family:Arial`;
 	const result =
 		`.hidden{opacity:0;}` +

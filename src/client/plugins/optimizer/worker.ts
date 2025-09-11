@@ -1,7 +1,5 @@
 ///<reference lib="WebWorker" />
 
-import "shared/polyfill/withResolvers";
-
 import module from "lib/optimizer/dist/optimizer";
 import { Bridge } from "./bridge";
 

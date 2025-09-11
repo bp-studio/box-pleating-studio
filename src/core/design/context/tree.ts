@@ -97,7 +97,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			const child = node.$children.$get()!;
 			this._removeEdgeAndCheckNewFlap(node, child);
 			this.$root = child;
-			State.$rootChanged = true;
+			State.m.$rootChanged = true;
 		}
 		return true;
 	}
@@ -125,7 +125,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 			const length = child.$length + second.$length;
 			this.$removeEdge(second.id, id);
 			this.$root = child;
-			State.$rootChanged = true;
+			State.m.$rootChanged = true;
 			this.$addEdge(second.id, child.id, length);
 		}
 		this.$flushRemove();
@@ -163,7 +163,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		node.$length = length;
 		node.$AABB.$setMargin(length);
 		State.$lengthChanged.add(node);
-		State.$treeStructureChanged = true;
+		State.m.$treeStructureChanged = true;
 		if(node.$isLeaf) {
 			State.$nodeAABBChanged.add(node);
 		}
@@ -202,7 +202,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		const N1 = this._nodes[n1]!, N2 = this._nodes[n2]!;
 		const child = N1.$parent == N2 ? N1 : N2;
 		UpdateResult.$edit([false, { n1, n2, length: child.$length }]);
-		State.$treeStructureChanged = true;
+		State.m.$treeStructureChanged = true;
 		child.$cut();
 
 		// Add both of them to the pending list, as it is unclear
@@ -218,7 +218,7 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		// Handle the special case where the current root is going to be removed
 		if(this._pendingRemove.has(this.$root.id) && this.$root.$children.$size == 0) {
 			this.$root = this._nodes.find(n => n && !n.$parent && n.$children.$size > 0)!;
-			State.$rootChanged = true;
+			State.m.$rootChanged = true;
 		}
 
 		for(const id of this._pendingRemove) {

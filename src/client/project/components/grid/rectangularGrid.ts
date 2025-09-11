@@ -106,6 +106,10 @@ export class RectangularGrid extends Grid {
 	// Public methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	public override $canSubdivide(): boolean {
+		return this._width * 2 <= MAX_SHEET_SIZE && this._height * 2 <= MAX_SHEET_SIZE;
+	}
+
 	public override $getResizeCenter(): IPoint {
 		return { x: 0, y: 0 };
 	}

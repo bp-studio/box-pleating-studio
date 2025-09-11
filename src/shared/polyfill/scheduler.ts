@@ -22,7 +22,7 @@ let promise: Promise<void> | undefined;
  * Creates a new macro-task using {@link MessageChannel}-trick.
  * This can break the 4ms-limitation of {@link setTimeout}.
  */
-export function doEvents(): Promise<void> {
+function doEvents(): Promise<void> {
 	// Return existing Promise if available.
 	// This helps resolving consecutive callings of this method.
 	if(promise) return promise;

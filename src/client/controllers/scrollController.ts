@@ -2,7 +2,7 @@ import { watch } from "vue";
 
 import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
-import { $isTouch, MouseButton } from "./share";
+import { $isTouch, MOUSE_MIDDLE_BUTTON } from "./share";
 import { ZoomController } from "./zoomController";
 import { display } from "client/screen/display";
 import { KeyboardController } from "./keyboardController";
@@ -108,7 +108,7 @@ export namespace ScrollController {
 	function pointerUp(event: MouseEvent | TouchEvent): void {
 		if(
 			$isTouch(event) && event.touches.length == 0 ||
-			event instanceof MouseEvent && event.button == MouseButton.middle
+			event instanceof MouseEvent && event.button == MOUSE_MIDDLE_BUTTON
 		) {
 			end();
 		}

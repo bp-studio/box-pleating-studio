@@ -20,8 +20,6 @@ export const WHITE = 0xffffff;
 
 export const LIGHT = 0xbbbbbb;
 
-export const GRAY = 0x888888;
-
 export const CHARCOAL = 0x444444;
 
 export const DARK = 0x1e1e1e;

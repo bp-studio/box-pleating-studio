@@ -7,8 +7,8 @@
 						<div v-for="l in Language.options" :key="l" class="col text-center">
 							<button @click="setLocale(l)" class="w-100 btn btn-light" data-bs-dismiss="modal">
 								<img :src="'assets/flags/' + $t('flag', {}, { locale: l }) + '.png'"
-									 :alt="$t('flag', {}, { locale: l })" width="64" height="64" />
-								<br />
+									:alt="$t('flag', {}, { locale: l })" width="64" height="64" >
+								<br >
 								{{ $t('name', {}, { locale: l }) }}
 							</button>
 						</div>
