@@ -44,10 +44,10 @@ namespace Zip {
 		for(const file in files) {
 			data[file] = encoder.encode(files[file]);
 		}
-		const result = await new Promise<Uint8Array>((resolve, reject) => {
+		const result = await new Promise<Uint8Array<ArrayBuffer>>((resolve, reject) => {
 			zip(data, {}, (err, zipData) => {
 				if(err) reject(err);
-				else resolve(zipData);
+				else resolve(zipData as Uint8Array<ArrayBuffer>);
 			});
 		});
 		const blob = new Blob([result], { type: "application/bpstudio.workspace+zip" });

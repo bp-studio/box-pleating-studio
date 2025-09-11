@@ -67,6 +67,9 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	/** Find the point on the grid that is closest to the given point. */
 	public abstract $constrain(p: IPoint): IPoint;
 
+	/** Returns whether the grid can be subdivided. */
+	public abstract $canSubdivide(): boolean;
+
 	public abstract $getResizeCenter(): IPoint;
 	public abstract $getCenter(): IPoint;
 

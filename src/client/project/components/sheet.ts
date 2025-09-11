@@ -205,8 +205,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		return Math.min(horizontalScale, verticalScale);
 	}
 
+	public canSubdivide(): boolean {
+		return this._grid.$canSubdivide();
+	}
+
 	public subdivide(): void {
 		gtag("event", "edit_subdivide");
+		if(!this.canSubdivide()) return;
 		display.shield(async () => {
 			const oldCenter = this.grid.$getResizeCenter();
 			this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
