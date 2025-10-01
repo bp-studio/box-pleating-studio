@@ -12,6 +12,7 @@
 			</div>
 		</div>
 		<Toggle v-model="options.reorient">{{ $t('plugin.CP.reorient') }}</Toggle>
+		<Toggle :style="{visibility: options.format==='cp' ? 'visible': 'hidden'}" v-model="options.useAuxiliary">{{ $t('plugin.CP.useAuxiliary') }}</Toggle>
 	</Export>
 </template>
 

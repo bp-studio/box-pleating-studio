@@ -291,7 +291,8 @@
 		"CP": {
 			"_": "匯出 CP 檔案",
 			"format": "格式",
-			"reorient": "若適用的話重新定向紙張"
+			"reorient": "若適用的話重新定向紙張",
+			"useAuxiliary": "使用輔助線（非官方標準）"
 		}
 	},
 	"keyword": {

@@ -291,7 +291,8 @@
 		"CP": {
 			"_": "Exportar archivo CP",
 			"format": "Formato",
-			"reorient": "Reorientar la hoja si corresponde"
+			"reorient": "Reorientar la hoja si corresponde",
+			"useAuxiliary": "Use líneas auxiliares (estándar no oficial)"
 		}
 	},
 	"keyword": {

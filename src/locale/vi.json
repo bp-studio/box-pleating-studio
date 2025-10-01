@@ -291,7 +291,8 @@
 		"CP": {
 			"_": "Xuất tệp CP",
 			"format": "Định dạng",
-			"reorient": "Định hướng lại trang tính nếu có"
+			"reorient": "Định hướng lại trang tính nếu có",
+			"useAuxiliary": "Sử dụng các dòng phụ trợ (tiêu chuẩn không chính thức)"
 		}
 	},
 	"keyword": {
