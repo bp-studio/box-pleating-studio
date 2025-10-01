@@ -8,10 +8,16 @@ import { makeCPLine } from "@utils/line";
 
 describe("CP exporting", function() {
 
-	it("Hinge lines are exported as auxiliary lines", function() {
+	it("Hinge lines are exported as auxiliary lines by default", function() {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
 		const result = LayoutController.getCP(parsePath("(0,0),(16,0),(16,16),(0,16)"));
 		expect(result).to.deep.include(makeCPLine(CreaseType.Auxiliary, 4, 7, 0, 7));
+	});
+
+	it("Hinge lines are exported as valley lines if auxiliary lines are disabled", function() {
+		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
+		const result = LayoutController.getCP(parsePath("(0,0),(16,0),(16,16),(0,16)"), false);
+		expect(result).to.deep.include(makeCPLine(CreaseType.Valley, 4, 7, 0, 7));
 	});
 
 	it("Ridge lines are exported as mountain lines", function() {

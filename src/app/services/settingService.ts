@@ -88,6 +88,7 @@ const defaultSettings = {
 		CP: {
 			format: "cp",
 			reorient: false,
+			useAuxiliary: true,
 		} as CPOptions,
 		SVG: {
 			includeHiddenElement: false,

@@ -33,15 +33,16 @@ export namespace LayoutController {
 	/**
 	 * Generate the set of {@link CPLine}s clipped to the given boundary.
 	 */
-	export function getCP(borders: Path): CPLine[] {
+	export function getCP(borders: Path, useAuxiliary: boolean = true): CPLine[] {
 		const clip = new Clip();
 		const tree = State.m.$tree;
 		const lines: CPLine[] = [];
 		addPolygon(lines, [borders], CreaseType.Border);
 		for(const node of tree.$nodes) {
 			if(!node || !node.$parent) continue;
+			const hingeType = useAuxiliary ? CreaseType.Auxiliary : CreaseType.Valley;
 			// It suffices to include only the outer contours in CP exporting.
-			addPolygon(lines, node.$graphics.$contours.map(c => c.outer), CreaseType.Auxiliary);
+			addPolygon(lines, node.$graphics.$contours.map(c => c.outer), hingeType);
 			addLines(lines, node.$graphics.$ridges, CreaseType.Mountain);
 		}
 		for(const stretch of State.$stretches.values()) {

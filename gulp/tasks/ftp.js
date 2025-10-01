@@ -134,6 +134,7 @@ function taskFactory(id) {
 					if(file.basename == "manifest.json") {
 						return content
 							.replace(/\/\/bpstudio\./g, `//${ftpConfig[id].subdomain}.`)
+							.replace(/"BP Studio"/, `"BP Studio ${name}"`)
 							.replace(/Box Pleating Studio/g, ftpConfig[id].title);
 					}
 					if(file.basename == ".htaccess") {

@@ -33,6 +33,7 @@ if(!fs.existsSync("build/temp")) {
 export default defineConfig({
 	dev: {
 		progressBar: true,
+		lazyCompilation: false, // This causes too many reloads on DEV.
 	},
 	resolve: {
 		alias: {

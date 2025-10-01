@@ -2,10 +2,10 @@ import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
 	entry: [
-		"src/app/main.ts",
-		"src/core/main.ts",
+		"src/app/init.ts",
+		"src/client/main.ts",
 		"src/client/plugins/optimizer/worker.ts",
-		"src/other/donate/main.ts",
+		"src/core/main.ts",
 		"src/other/service/sw.ts",
 		"gulpfile.js",
 		"lib/bootstrap/loader.js",
@@ -35,7 +35,8 @@ const config: KnipConfig = {
 		".+-loader",
 		"nyc",
 		"eslint-plugin-typescript-compat",
-		"@swc-node/core",
+		"@swc-node/core", // used in mocha test
+		"@swc/core", // peer of @swc-node/core
 		"@fortawesome/fontawesome-free",
 	],
 	typescript: {

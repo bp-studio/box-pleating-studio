@@ -1,0 +1,21 @@
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - "@mutsuntsai/*"
+onlyBuiltDependencies:
+  - "@swc/core"
+  - "core-js"
+  - "oxc-resolver"
+  - "ttf2woff2"
+  - "unrs-resolver"
+overrides:
+  magic-string: ^0.30.0
+patchedDependencies:
+  "@swc-node/core": patches/@swc-node__core.patch
+peerDependencyRules:
+  allowAny:
+    - eslint
+publicHoistPattern:
+  - "@rspack/core"
+  - "@popperjs/core"
+  - "@pixi/*"
+  - "@vue/*"

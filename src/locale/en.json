@@ -291,7 +291,8 @@
 		"CP": {
 			"_": "Export CP file",
 			"format": "Format",
-			"reorient": "Reorient the sheet if applicable"
+			"reorient": "Reorient the sheet if applicable",
+			"useAuxiliary": "Use auxiliary lines (unofficial standard)"
 		}
 	},
 	"keyword": {

@@ -123,7 +123,7 @@
 		"README.md": "LICENSE.md, CONTRIBUTING.md",
 		"eslint.config.js": ".editorconfig",
 		"makefile": ".clang-*",
-		"package.json": "pnpm-lock.yaml, .npmrc, .browserslistrc, knip.config.ts"
+		"package.json": "pnpm-*.yaml, .npmrc, .browserslistrc, knip.config.ts"
 	},
 	"files.associations": {
 		"*.bps": "json",
