@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { StudioPage } from "../utils";
+import { StudioPage } from "../utils/studioPage";
 
 test.beforeEach(async ({ page }) => {
 	await page.goto("/");
