@@ -20,6 +20,13 @@ export default function() {
 		expect(parseLine("(0,0)-(2,4)").$perpendicular(new Vector(2, -1))).to.be.true;
 	});
 
+	it("Reflects about a given direction", function() {
+		// This particular example overflows for v0.7.11 and below.
+		const l = parseLine("(-21, 131)-(144031/3031, 374438/3031)");
+		const result = l.$reflect(new Vector(2508, 3995)).toString();
+		expect(result).to.equal("(-3116880, 8711609)");
+	});
+
 	describe("Subtraction", function() {
 		function testSubtract(l1: string, l2: string) {
 			return Line.$subtract([parseLine(l1)], [parseLine(l2)]);

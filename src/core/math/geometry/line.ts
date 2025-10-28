@@ -187,14 +187,18 @@ export class Line {
 		return new Point(this.p1._x.sub(this.p1._y.sub(f).d(v.$slope)), f);
 	}
 
-	/** Reflect the given {@link Vector} against this line. */
+	/**
+	 * Reflect the given {@link Vector} against this line.
+	 *
+	 * Note that the length of the resulting vector has no significance.
+	 */
 	public $reflect(v: Vector): Vector {
-		v = v.$neg;
-		const m = new Matrix(v._x, v._y.neg, v._y, v._x);
+		const m = new Matrix(v._x.neg, v._y.c(), v._y.neg, v._x.neg);
 		const mi = m.$inverse!;
-		v = mi.$multiply(this.p2.$sub(this.p1));
-		v = v.$doubleAngle();
-		return m.$multiply(v).$reduce();
+		const lineVector = this.p2.$sub(this.p1);
+		const rotated = mi.$multiply(lineVector);
+		const doubled = rotated.$doubleAngle();
+		return m.$multiply(doubled).$reduce();
 	}
 
 	/** Whether the line is perpendicular to the given {@link Vector}. */
