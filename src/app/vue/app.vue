@@ -2,11 +2,12 @@
 	<div v-on:mousedown.stop v-on:touchstart.stop.passive>
 		<Welcome />
 		<DPad v-if="phase >= 2" />
+		<Dropzone v-if="phase >= 3" />
 
 		<Panel v-if="phase >= 1" />
 		<template v-else>
-			<div id="divShade"/>
-			<aside class="scroll-shadow p-3"/>
+			<div id="divShade" />
+			<aside class="scroll-shadow p-3" />
 		</template>
 
 		<Toolbar v-if="phase >= 3" />
@@ -24,7 +25,7 @@
 		</nav>
 
 		<Status v-if="phase >= 2" />
-		<footer class="py-1 px-3" v-else/>
+		<footer class="py-1 px-3" v-else />
 
 		<ModalFragment v-if="phase >= 2" />
 		<DialogFragment v-if="phase >= 1" />
@@ -49,6 +50,7 @@
 	const Spinner = asyncComp(() => import("@/dialogs/spinner.vue"), true);
 
 	// The rest are loaded in later phase
+	const Dropzone = asyncComp(() => import("@/gadgets/dropzone.vue"));
 	const Toolbar = asyncComp(() => import("@/toolbar/toolbar.vue"));
 	const Panel = asyncComp(() => import("@/panel/panel.vue"));
 	const Status = asyncComp(() => import("@/status.vue"));

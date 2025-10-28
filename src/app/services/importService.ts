@@ -73,7 +73,7 @@ namespace ImportService {
 	/**
 	 * Process files opened by `<input type="file">`
 	 */
-	export async function openFiles(files: FileList): Promise<void> {
+	export async function openFiles(files: FileList | File[]): Promise<void> {
 		const takeover = Studio.shouldTakeOverContextHandling();
 		await Dialogs.loader.show();
 		const tasks: Promise<number | undefined>[] = [];
