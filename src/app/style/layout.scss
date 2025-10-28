@@ -151,30 +151,6 @@ footer {
 	}
 }
 
-@media (width < 576px) {
-	.file-api {
-		flex-direction: column;
-		flex-grow: 1;
-		justify-content: start !important;
-	}
-
-	.recent {
-		flex-grow: 1;
-		height: 0;
-
-		> div {
-			overflow: hidden;
-			display: flex;
-			flex-flow: column wrap;
-			height: 100%;
-
-			> * {
-				width: 100%;
-			}
-		}
-	}
-}
-
 #divWelcome {
 	overflow-y: auto;
 
