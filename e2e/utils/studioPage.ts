@@ -31,6 +31,7 @@ export class StudioPage {
 		});
 	}
 
+	/** Await for BP Studio initialization. */
 	public async initialized(): Promise<void> {
 		const menu = this.page.getByRole("menubar");
 		await expect(menu).toBeInViewport();
