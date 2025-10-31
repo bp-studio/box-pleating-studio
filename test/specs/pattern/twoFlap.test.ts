@@ -1,10 +1,10 @@
-import { expect } from "chai";
+import { it, expect } from "@rstest/core";
 
 import { expectRepo, generateFromFlaps } from "./util";
 
 export default function() {
 
-	it("Finds universal GPS patterns", function() {
+	it("Finds universal GPS patterns", () => {
 		for(const [a, b] of TWO_PERMUTATION) {
 			generateFromFlaps([
 				{ id: a, x: 0, y: 0, radius: 6 },
@@ -18,7 +18,7 @@ export default function() {
 		}
 	});
 
-	it("Find double relay patterns", function() {
+	it("Find double relay patterns", () => {
 		for(const [a, b] of TWO_PERMUTATION) {
 			generateFromFlaps([
 				{ id: a, x: 0, y: 0, radius: 8 },

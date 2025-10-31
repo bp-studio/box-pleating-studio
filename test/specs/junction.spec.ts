@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { id0, id3, id4, parseTree } from "@utils/tree";
 import { heightTask } from "core/design/tasks/height";
@@ -12,9 +12,9 @@ import type { InvalidJunction } from "core/design/layout/junction/invalidJunctio
 import type { Junction } from "core/design/layout/junction/junction";
 import type { ValidJunction } from "core/design/layout/junction/validJunction";
 
-describe("Junction", function() {
+describe("Junction", () => {
 
-	it("Computes valid junctions", function() {
+	it("Computes valid junctions", () => {
 		parseTree("(0,1,1),(0,2,1),(1,3,3),(2,4,2)", "(3,0,0,0,0),(4,5,5,0,0)");
 		expect(State.$junctions.size).to.equal(1);
 		expect(State.$junctions.has(id3, id4)).to.be.true;
@@ -29,7 +29,7 @@ describe("Junction", function() {
 		expect(stretch.$repo.$nodeSet.$nodes).to.eql([1, 2, 3, 4]);
 	});
 
-	it("Creates new junction upon merging", function() {
+	it("Creates new junction upon merging", () => {
 		const tree = parseTree("(0,1,1),(0,2,1),(1,3,3),(2,4,2)", "(3,0,0,0,0),(4,5,5,0,0)");
 
 		const junction1 = State.$junctions.get(id3, id4) as ValidJunction;
@@ -47,8 +47,8 @@ describe("Junction", function() {
 		expect(stretch.$repo.$nodeSet.$nodes).to.eql([2, 3, 4]);
 	});
 
-	describe("Invalid junction", function() {
-		it("Caches rendering result", function() {
+	describe("Invalid junction", () => {
+		it("Caches rendering result", () => {
 			parseTree("(0,1,1),(0,2,1),(0,3,1)", "(1,0,0,0,0),(2,1,1,0,0),(3,3,1,0,0)");
 			const invalidJunctions = getJunctions(false);
 			expect(invalidJunctions.length).to.equal(1);
@@ -68,9 +68,9 @@ describe("Junction", function() {
 		});
 	});
 
-	describe("Junction covering", function() {
+	describe("Junction covering", () => {
 
-		it("Larger junction covers smaller ones", function() {
+		it("Larger junction covers smaller ones", () => {
 			parseTree(
 				"(0,1,8),(0,5,2),(8,0,1),(2,1,8),(8,6,1),(2,3,2),(7,2,1),(7,4,1)",
 				"(5,0,14,0,0),(6,0,18,0,0),(3,15,0,0,0),(4,19,0,0,0)"
@@ -83,14 +83,14 @@ describe("Junction", function() {
 			expect([j.$a.id, j.$b.id]).to.eql([3, 5]);
 		});
 
-		it("Larger junction must be closer to cover", function() {
+		it("Larger junction must be closer to cover", () => {
 			parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)");
 			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(3);
 			expect(validJunctions.every(j => !j.$isCovered)).to.be.true;
 		});
 
-		it("For equal size junctions, near one covers far one", function() {
+		it("For equal size junctions, near one covers far one", () => {
 			parseTree("(0,1,9),(0,2,9),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,8,8,0,0)");
 			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(3);
@@ -100,7 +100,7 @@ describe("Junction", function() {
 			expect([j.$a.id, j.$b.id]).to.eql([1, 2]);
 		});
 
-		it("Compares two junctions with different LCAs", function() {
+		it("Compares two junctions with different LCAs", () => {
 			parseTree(
 				"(0,1,15),(0,2,15),(0,3,1),(3,4,2),(3,5,2)",
 				"(1,0,0,0,0),(2,29,29,0,0),(4,13,13,0,0),(5,16,16,0,0)"

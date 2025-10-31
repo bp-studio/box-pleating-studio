@@ -1,8 +1,10 @@
-import arraySpec from "./array.spec";
-import cloneSpec from "./clone.spec";
-import copySpec from "./copy.spec";
+import { describe } from "@rstest/core";
 
-describe("Utility", function() {
+import arraySpec from "./array.test";
+import cloneSpec from "./clone.test";
+import copySpec from "./copy.test";
+
+describe("Utility", () => {
 
 	describe("Array utility", arraySpec);
 

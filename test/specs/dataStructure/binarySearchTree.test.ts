@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { random } from "@utils/random";
 import { RavlTree } from "shared/data/bst/ravlTree";
@@ -8,25 +8,25 @@ import type { IBinarySearchTree } from "shared/data/bst/binarySearchTree";
 
 export default function() {
 
-	describe("RAVL Tree", function() {
-		it("Can be used as tree map", function() {
+	describe("RAVL Tree", () => {
+		it("Can be used as tree map", () => {
 			const tree = new RavlTree<number>(minComparator);
 			tree.$insert(1, 2);
 			expect(tree.$get(1)).to.equal(2);
 		});
 
-		it("Can query adjacent elements", function() {
+		it("Can query adjacent elements", () => {
 			testAdjacency(new RavlTree<number>(minComparator));
 		});
 
-		it("Can query emptiness", function() {
+		it("Can query emptiness", () => {
 			const tree = new RavlTree<number>(minComparator);
 			expect(tree.$isEmpty).to.be.true;
 			tree.$insert(12, 12);
 			expect(tree.$isEmpty).to.be.false;
 		});
 
-		it("Ignores deleting non-existing element", function() {
+		it("Ignores deleting non-existing element", () => {
 			const tree = new RavlTree<number>(minComparator);
 			expect(() => tree.$delete(1)).to.not.throw();
 		});

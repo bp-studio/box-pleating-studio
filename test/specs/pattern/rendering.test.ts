@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { id1, id2, id3, id4, parseTree } from "@utils/tree";
 import { State } from "core/service/state";
@@ -9,7 +9,7 @@ import { DesignController } from "core/controller/designController";
 
 export default function() {
 
-	it("Updates ridges when edges merge or split", function() {
+	it("Updates ridges when edges merge or split", () => {
 		parseTree("(0,1,2),(0,2,2),(0,4,1),(4,3,7)", "(1,9,5,0,0),(2,6,8,0,0),(3,0,0,0,0)");
 		complete();
 		const result1 = UpdateResult.$flush();
@@ -25,7 +25,7 @@ export default function() {
 		expect(ridges2).to.containLine([{ x: 4.5, y: 3.5 }, { x: 7, y: 6 }]);
 	});
 
-	it("Update origin when all flaps move simultaneously", function() {
+	it("Update origin when all flaps move simultaneously", () => {
 		generateFromFlaps([
 			{ id: 1, x: 9, y: 5, radius: 2 },
 			{ id: 2, x: 0, y: 0, radius: 8 },

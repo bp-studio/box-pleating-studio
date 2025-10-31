@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { expectRepo, generateFromFlaps } from "./util";
 import { node, parseTree } from "@utils/tree";
@@ -6,7 +6,7 @@ import { toPath } from "core/math/geometry/rationalPath";
 
 export default function() {
 
-	it("Does not depend on the ordering of flap ids nor the transformation factors", function() {
+	it("Does not depend on the ordering of flap ids nor the transformation factors", () => {
 		for(const [a, b, c] of THREE_PERMUTATION) {
 			generateFromFlaps([
 				{ id: a, x: 9, y: 5, radius: 2 },
@@ -37,7 +37,7 @@ export default function() {
 		}
 	});
 
-	it("Renders river in between", function() {
+	it("Renders river in between", () => {
 		for(const [a, b, c] of THREE_PERMUTATION) {
 			parseTree(
 				`(0,4,2),(0,5,2),(5,${a},4),(4,${b},2),(4,${c},2)`,
@@ -48,15 +48,15 @@ export default function() {
 		}
 	});
 
-	describe("Validity checks", function() {
+	describe("Validity checks", () => {
 
-		it("Checks nested overlaps", function() {
+		it("Checks nested overlaps", () => {
 			parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)");
 			const repo = expectRepo("1,2,3");
 			expect(repo.$isValid).to.be.false;
 		});
 
-		it("Checks delta point", function() {
+		it("Checks delta point", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 139, y: 0, radius: 80 },
@@ -70,9 +70,9 @@ export default function() {
 
 	});
 
-	describe("Three flap relay", function() {
+	describe("Three flap relay", () => {
 
-		it("Half integral relay", function() {
+		it("Half integral relay", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 0, y: 0, radius: 10 },
@@ -97,7 +97,7 @@ export default function() {
 			}
 		});
 
-		it("Universal gadget relay", function() {
+		it("Universal gadget relay", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 0, y: 0, radius: 10 },
@@ -120,9 +120,9 @@ export default function() {
 
 	});
 
-	describe("Joins", function() {
+	describe("Joins", () => {
 
-		it("Base join", function() {
+		it("Base join", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 0, y: 0, radius: 11 },
@@ -134,7 +134,7 @@ export default function() {
 			}
 		});
 
-		it("Standard join", function() {
+		it("Standard join", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 0, y: 0, radius: 11 },
@@ -149,7 +149,7 @@ export default function() {
 			}
 		});
 
-		it("Convex standard join is not valid if point R goes beyond the gadget", function() {
+		it("Convex standard join is not valid if point R goes beyond the gadget", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 0, y: 0, radius: 28 },
@@ -165,8 +165,8 @@ export default function() {
 
 	});
 
-	describe("Split join", function() {
-		it("Creates split pattern with two devices", function() {
+	describe("Split join", () => {
+		it("Creates split pattern with two devices", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 0, y: 0, radius: 15 },
@@ -186,7 +186,7 @@ export default function() {
 			}
 		});
 
-		it("Creates split pattern with three devices", function() {
+		it("Creates split pattern with three devices", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				const flaps = [
 					{ id: a, x: 0, y: 0, radius: 21 },
@@ -206,7 +206,7 @@ export default function() {
 			}
 		});
 
-		it("Checks slack distance", function() {
+		it("Checks slack distance", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
 				generateFromFlaps([
 					{ id: a, x: 139, y: 0, radius: 126 },

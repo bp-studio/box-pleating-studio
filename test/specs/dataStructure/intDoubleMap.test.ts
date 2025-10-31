@@ -1,16 +1,16 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { IntDoubleMap, MAX } from "shared/data/doubleMap/intDoubleMap";
 import { MAX_VERTICES } from "shared/types/constants";
 
 export default function() {
 
-	it("Defines toStringTag", function() {
+	it("Defines toStringTag", () => {
 		const map = new IntDoubleMap<number, string>();
 		expect(String(map)).to.equal("[object IntDoubleMap(0)]");
 	});
 
-	it("Stores double number indices", function() {
+	it("Stores double number indices", () => {
 		const map = new IntDoubleMap<number, string>();
 		const value = "a";
 		map.set(1, 2, value);
@@ -40,7 +40,7 @@ export default function() {
 		expect(map.size).to.equal(0);
 	});
 
-	it("Checks validity of indices", function() {
+	it("Checks validity of indices", () => {
 		const map = new IntDoubleMap<number, number>();
 		expect(MAX).to.equal(MAX_VERTICES);
 		expect(() => map.set(-1, 0, 0)).to.throw();
@@ -51,7 +51,7 @@ export default function() {
 		expect(map.get(0, MAX)).to.equal(1);
 	});
 
-	it("Can navigate on single index", function() {
+	it("Can navigate on single index", () => {
 		const map = new IntDoubleMap<number, string>();
 		map.set(1, 2, "a");
 		map.set(2, 3, "b");

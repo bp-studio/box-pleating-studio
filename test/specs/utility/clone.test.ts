@@ -1,14 +1,14 @@
-import { expect } from "chai";
+import { it, expect } from "@rstest/core";
 
 import { clone, clonePolyfill, deepAssign } from "shared/utils/clone";
 
 export default function() {
 
-	it("Use native structureClone when possible", function() {
+	it("Use native structureClone when possible", () => {
 		expect(clone).to.equal(structuredClone);
 	});
 
-	it("Works the same way as structureClone", function() {
+	it("Works the same way as structureClone", () => {
 		const obj = {
 			data: {
 				arr: [1, 2, 3],
@@ -18,7 +18,7 @@ export default function() {
 		expect(clonePolyfill(undefined)).to.be.undefined;
 	});
 
-	it("Handles recursive reference", function() {
+	it("Handles recursive reference", () => {
 		const obj = {
 			self: undefined as unknown,
 		};
@@ -29,7 +29,7 @@ export default function() {
 		expect(cloned.self).to.equal(cloned);
 	});
 
-	it("Deep assigns data", function() {
+	it("Deep assigns data", () => {
 		const source = {
 			data: {
 				attr: "test",

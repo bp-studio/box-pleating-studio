@@ -1,8 +1,12 @@
 import { readFile } from "fs";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function readFileAsync(path: string): Promise<string> {
 	return new Promise((resolve, reject) => {
-		readFile("./test/samples/" + path, (err, data) => {
+		readFile(__dirname + "/../samples/" + path, (err, data) => {
 			if(err) reject(err);
 			else resolve(data.toString());
 		});

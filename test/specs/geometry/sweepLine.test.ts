@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { parsePath } from "@utils/path";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
@@ -11,9 +11,9 @@ import type { OverlapIntersector } from "core/math/sweepLine/clip/overlapInterse
 
 export default function() {
 
-	describe("Stacking", function() {
+	describe("Stacking", () => {
 
-		it("Groups paths into outer and inner paths", function() {
+		it("Groups paths into outer and inner paths", () => {
 			const result = new Stacking().$get(
 				parsePath("(0,0),(5,0),(5,5),(0,5)"),
 				parsePath("(1,1),(1,4),(4,4),(4,1)"),
@@ -28,9 +28,9 @@ export default function() {
 
 	});
 
-	describe("Clipping", function() {
+	describe("Clipping", () => {
 
-		it("Clips lines in given boundary and subdivides all lines", function() {
+		it("Clips lines in given boundary and subdivides all lines", () => {
 			const result = new Clip().$get([
 				makeCPLine(CreaseType.Border, 1, 1, 5, 1),
 				makeCPLine(CreaseType.Border, 5, 1, 5, 5),
@@ -49,9 +49,9 @@ export default function() {
 
 	});
 
-	describe("Overlap detection", function() {
+	describe("Overlap detection", () => {
 
-		it("Detects if two polygon overlaps", function() {
+		it("Detects if two polygon overlaps", () => {
 			const result = Overlap.$test(parsePath("(0,1),(2,1),(2,3),(0,3)"), parsePath("(1,0),(3,1),(3,2),(1,2)"));
 			expect(result).to.be.true;
 
@@ -60,7 +60,7 @@ export default function() {
 		});
 
 		/** v0.6.17, see {@link OverlapIntersector.$possibleIntersection}. */
-		it("Ignores self-intersections resulting from floating error", function() {
+		it("Ignores self-intersections resulting from floating error", () => {
 			const result = Overlap.$test(
 				parsePath("(1019/16,907/16),(1131/16,2139/16),(1611/16,2539/16),(1499/16,1307/16)"),
 				parsePath("(28,109),(61,131),(42,36),(1375/31,1130/31),(8,9)")

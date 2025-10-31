@@ -1,11 +1,13 @@
-import arcSpec from "./arc.spec";
-import lineSpec from "./line.spec";
-import polyBoolSpec from "./polyBool.spec";
-import sweepLineSpec from "./sweepLine.spec";
-import matrixSpec from "./matrix.spec";
-import polygonSpec from "./polygon.spec";
+import { describe } from "@rstest/core";
 
-describe("Geometry", function() {
+import arcSpec from "./arc.test";
+import lineSpec from "./line.test";
+import polyBoolSpec from "./polyBool.test";
+import sweepLineSpec from "./sweepLine.test";
+import matrixSpec from "./matrix.test";
+import polygonSpec from "./polygon.test";
+
+describe("Geometry", () => {
 
 	describe("Arc", arcSpec);
 

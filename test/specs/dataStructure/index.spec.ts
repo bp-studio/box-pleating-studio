@@ -1,9 +1,11 @@
-import binarySearchTreeSpec from "./binarySearchTree.spec";
-import heapSpec from "./heap.spec";
-import intDoubleMapSpec from "./intDoubleMap.spec";
-import valuedIntDoubleMapSpec from "./valuedIntDoubleMap.spec";
+import { describe } from "@rstest/core";
 
-describe("Data structures", function() {
+import binarySearchTreeSpec from "./binarySearchTree.test";
+import heapSpec from "./heap.test";
+import intDoubleMapSpec from "./intDoubleMap.test";
+import valuedIntDoubleMapSpec from "./valuedIntDoubleMap.test";
+
+describe("Data structures", () => {
 
 	describe("Binary Search Tree", binarySearchTreeSpec);
 

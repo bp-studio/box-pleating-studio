@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { HeapSet } from "shared/data/heap/heapSet";
 import { MutableHeap } from "shared/data/heap/mutableHeap";
@@ -6,8 +6,8 @@ import { xyComparator } from "shared/types/geometry";
 
 export default function(): void {
 
-	describe("HeapSet", function() {
-		it("Checks repeated elements", function() {
+	describe("HeapSet", () => {
+		it("Checks repeated elements", () => {
 			const heap = new HeapSet<IPoint>(xyComparator);
 			const p1: IPoint = { x: 1, y: 2 };
 			const p2: IPoint = { x: 0, y: 3 };
@@ -22,8 +22,8 @@ export default function(): void {
 		});
 	});
 
-	describe("MutableHeap", function() {
-		it("Ignores values that are not in the heap", function() {
+	describe("MutableHeap", () => {
+		it("Ignores values that are not in the heap", () => {
 			const heap = new MutableHeap<IPoint>(xyComparator);
 			expect(() => heap.$notifyUpdate({ x: 0, y: 0 })).to.not.throw();
 		});

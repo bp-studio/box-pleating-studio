@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { createTree, node, id0, id1, id2, id3, id4, id6, parseTree } from "@utils/tree";
 import { DesignController } from "core/controller/designController";
@@ -7,9 +7,9 @@ import { getDist } from "core/design/context/treeUtils";
 import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 
-describe("Tree", function() {
+describe("Tree", () => {
 
-	it("Is constructed from JEdge[]", function() {
+	it("Is constructed from JEdge[]", () => {
 		const tree = createTree([
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 0, n2: 2, length: 2 },
@@ -19,7 +19,7 @@ describe("Tree", function() {
 		expect(tree.$root.$height).to.equal(1);
 	});
 
-	it("Fool-proof on invalid input", function() {
+	it("Fool-proof on invalid input", () => {
 		expect(() => createTree([
 			{ n1: 0, n2: 1, length: 2 },
 			{ n1: 2, n2: 3, length: 2 }, // wrong input ordering
@@ -31,7 +31,7 @@ describe("Tree", function() {
 		])).to.not.throw();
 	});
 
-	it("Balances itself", function() {
+	it("Balances itself", () => {
 		const tree = parseTree("(0,1,2),(0,2,2)");
 		const n0 = node(0);
 		const n1 = node(1);
@@ -46,7 +46,7 @@ describe("Tree", function() {
 		expect(tree.$root.$height).to.equal(2);
 	});
 
-	it("Can remove leaf nodes", function() {
+	it("Can remove leaf nodes", () => {
 		const tree = parseTree("(0,1,2),(0,2,2),(2,3,2),(3,4,2)");
 		const n2 = node(2)!;
 		const n3 = node(3)!;
@@ -71,7 +71,7 @@ describe("Tree", function() {
 		expect(tree.$root.$height).to.equal(1);
 	});
 
-	it("Keeps a record of distances", function() {
+	it("Keeps a record of distances", () => {
 		parseTree("(0,1,1),(0,2,2),(2,3,3),(3,4,4)");
 		const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
 		expect(n0.$dist).to.equal(2);
@@ -87,13 +87,13 @@ describe("Tree", function() {
 		expect(getDist(n1, n4)).to.equal(13);
 	});
 
-	it("Outputs balanced JSON", function() {
+	it("Outputs balanced JSON", () => {
 		const tree = parseTree("(0,1,1),(0,2,2),(2,3,3),(3,4,4)");
 		const json = '[{"n1":2,"n2":3,"length":3},{"n1":2,"n2":0,"length":2},{"n1":3,"n2":4,"length":4},{"n1":0,"n2":1,"length":1}]';
 		expect(JSON.stringify(tree.toJSON().edges)).to.equal(json);
 	});
 
-	it("Creates distance map", function() {
+	it("Creates distance map", () => {
 		parseTree("(0,1,1),(0,2,2),(0,3,2),(3,4,1),(3,5,2)");
 		const distMap = TreeController.getHierarchy(false, false)[0].distMap;
 		expect(distMap.length).to.equal(6);
@@ -102,8 +102,8 @@ describe("Tree", function() {
 		expect(distMap).to.deep.include([5, 2, 6]);
 	});
 
-	describe("AABB record", function() {
-		it("Updates AABB when a child updates", function() {
+	describe("AABB record", () => {
+		it("Updates AABB when a child updates", () => {
 			parseTree("(0,1,1),(1,2,2),(0,3,3),(3,4,4)", "(2,8,8,0,0),(4,5,2,0,0)");
 			const [n0, n1, n2, n3, n4] = [0, 1, 2, 3, 4].map(id => node(id)!);
 			expect(n2.$AABB.$toArray()).to.eql([10, 10, 6, 6]);
@@ -117,7 +117,7 @@ describe("Tree", function() {
 			expect(n0.$AABB.$toArray()).to.eql([9, 12, -5, -3]);
 		});
 
-		it("Updates AABB when a child node is removed", function() {
+		it("Updates AABB when a child node is removed", () => {
 			parseTree("(0,1,1),(1,2,1),(2,3,1),(2,4,1),(0,5,1),(5,6,1)", "(6,0,0,0,0),(3,3,2,0,0),(4,5,2,0,0)");
 			const n1 = node(1)!;
 			expect(n1.$AABB.$toArray()).to.eql([5, 8, -1, 0]);
@@ -128,8 +128,8 @@ describe("Tree", function() {
 		});
 	});
 
-	describe("Edge joining", function() {
-		it("Works with root and non-root nodes", function() {
+	describe("Edge joining", () => {
+		it("Works with root and non-root nodes", () => {
 			const tree = parseTree("(0,1,2),(1,2,2),(0,3,2),(3,4,2)");
 			expect(tree.$root.id).to.equal(0);
 
@@ -143,8 +143,8 @@ describe("Tree", function() {
 		});
 	});
 
-	describe("Edge splitting", function() {
-		it("Works with depth-1 edge", function() {
+	describe("Edge splitting", () => {
+		it("Works with depth-1 edge", () => {
 			const tree = parseTree("(0,1,2),(1,2,2),(0,3,2),(3,4,2),(4,5,2)");
 			expect(tree.$root.id).to.equal(0);
 
@@ -153,8 +153,8 @@ describe("Tree", function() {
 		});
 	});
 
-	describe("Leaf removal", function() {
-		it("Works with current root", function() {
+	describe("Leaf removal", () => {
+		it("Works with current root", () => {
 			const tree = parseTree("(0,1,2),(1,2,2),(2,3,2),(0,4,2),(4,5,2),(5,6,2)");
 			expect(tree.$root.id).to.equal(0);
 
@@ -166,8 +166,8 @@ describe("Tree", function() {
 		});
 	});
 
-	describe("Edge merging", function() {
-		it("Merge end nodes of an edge", function() {
+	describe("Edge merging", () => {
+		it("Merge end nodes of an edge", () => {
 			const tree = parseTree("(0,1,2),(1,2,2),(1,3,2),(0,4,2),(0,5,2)");
 
 			TreeController.merge({ n1: id0, n2: id1 });
@@ -176,8 +176,8 @@ describe("Tree", function() {
 		});
 	});
 
-	describe("Tree editing", function() {
-		it("Undoes splitting", function() {
+	describe("Tree editing", () => {
+		it("Undoes splitting", () => {
 			const tree = parseTree("(0,1,2),(0,2,2)");
 
 			TreeController.split({ n1: id0, n2: id1 }, id3);

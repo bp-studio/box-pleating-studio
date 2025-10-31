@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { random } from "@utils/random";
 import { parsePath } from "@utils/path";
@@ -13,8 +13,8 @@ import type { PathEx, Polygon } from "shared/types/geometry";
 
 export default function() {
 
-	describe("AAUnion operation", function() {
-		it("Finds union of AABBs", function() {
+	describe("AAUnion operation", () => {
+		it("Finds union of AABBs", () => {
 			// Test 1
 			let result = new AAUnion().$get(
 				aabbToPolygon({ top: 4, bottom: 1, left: 1, right: 5 }),
@@ -35,7 +35,7 @@ export default function() {
 			expect(path).to.equalPath("(1,0),(3,0),(3,2),(4,2),(4,4),(0,4),(0,2),(1,2)", true);
 		});
 
-		it("Results can be taken union again", function() {
+		it("Results can be taken union again", () => {
 			const union = new AAUnion();
 			const result1 = union.$get(
 				aabbToPolygon({ top: 4, bottom: 1, left: 1, right: 5 }),
@@ -51,7 +51,7 @@ export default function() {
 			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)", true);
 		});
 
-		it("Can handle multiple subpaths", function() {
+		it("Can handle multiple subpaths", () => {
 			const result = new AAUnion().$get(
 				aabbToPolygon({ top: 1, bottom: 0, left: 0, right: 1 }),
 				aabbToPolygon({ top: 3, bottom: 2, left: 0, right: 1 }),
@@ -65,7 +65,7 @@ export default function() {
 			expect(path2).to.equalPath("(0,0),(1,0),(1,1),(0,1)", true);
 		});
 
-		it("Can handle holes", function() {
+		it("Can handle holes", () => {
 			const result = new AAUnion().$get(
 				aabbToPolygon({ top: 2, bottom: 0, left: 1, right: 5 }),
 				aabbToPolygon({ top: 5, bottom: 1, left: 0, right: 2 }),
@@ -80,7 +80,7 @@ export default function() {
 			expect(path2).to.equalPath("(2,2),(2,4),(4,4),(4,2)", true); // hole, clockwise
 		});
 
-		it("Can solve self-intersection", function() {
+		it("Can solve self-intersection", () => {
 			const result = new AAUnion(true).$get(
 				[parsePath("(0,0),(3,0),(3,2),(1,2),(1,1),(2,1),(2,3),(0,3)")]
 			);
@@ -89,7 +89,7 @@ export default function() {
 			expect(path).to.equalPath("(0,0),(3,0),(3,2),(2,2),(2,3),(0,3)", true);
 		});
 
-		it("Can handle keyholes", function() {
+		it("Can handle keyholes", () => {
 			const result = new AAUnion(true).$get(
 				[parsePath("(0,0),(3,0),(3,2),(2,2),(2,1),(1,1),(1,2),(3,2),(3,3),(0,3)")]
 			);
@@ -100,31 +100,31 @@ export default function() {
 			expect(path2).to.equalPath("(1,1),(1,2),(2,2),(2,1)", true); // hole, clockwise
 		});
 
-		xit("Is really, really fast", function() {
-			this.retries(100);
+		// xit("Is really, really fast", function() {
+		// 	this.retries(100);
 
-			// prepare random tests
-			const tests: Polygon[][] = [];
-			const rounds = 100;
-			for(let i = 0; i < rounds; i++) {
-				tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
-			}
+		// 	// prepare random tests
+		// 	const tests: Polygon[][] = [];
+		// 	const rounds = 100;
+		// 	for(let i = 0; i < rounds; i++) {
+		// 		tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
+		// 	}
 
-			// run tests
-			const start = performance.now();
-			for(const test of tests) {
-				new AAUnion().$get(...test);
-			}
-			const average = (performance.now() - start) / rounds;
+		// 	// run tests
+		// 	const start = performance.now();
+		// 	for(const test of tests) {
+		// 		new AAUnion().$get(...test);
+		// 	}
+		// 	const average = (performance.now() - start) / rounds;
 
-			expect(average).to.be.lessThan(0.5); // In ms!
-			// This could be as good as 0.45 in fact,
-			// but here we set it to 0.5 so that the test can pass more easily.
-		});
+		// 	expect(average).to.be.lessThan(0.5); // In ms!
+		// 	// This could be as good as 0.45 in fact,
+		// 	// but here we set it to 0.5 so that the test can pass more easily.
+		// });
 	});
 
-	describe("RoughUnion operation", function() {
-		it("Marks holes in the result", function() {
+	describe("RoughUnion operation", () => {
+		it("Marks holes in the result", () => {
 			const result = new RoughUnion().$union(
 				[parsePath("(0,0),(2,0),(2,2),(0,2)")],
 				[parsePath("(2,2),(4,2),(4,4),(2,4)")],
@@ -139,7 +139,7 @@ export default function() {
 			expect(holes.length).to.equal(1);
 		});
 
-		it("Gives the origin info for the resulting paths", function() {
+		it("Gives the origin info for the resulting paths", () => {
 			const result = new RoughUnion().$union(
 				[parsePath("(0,0),(2,0),(2,4),(0,4)")],
 				[parsePath("(2,0),(4,0),(4,4),(2,4)")],
@@ -156,8 +156,8 @@ export default function() {
 		});
 	});
 
-	describe("GeneralUnion operation", function() {
-		it("Works for AA union the same way", function() {
+	describe("GeneralUnion operation", () => {
+		it("Works for AA union the same way", () => {
 			const result = new GeneralUnion().$get(
 				aabbToPolygon({ top: 4, bottom: 1, left: 1, right: 5 }),
 				aabbToPolygon({ top: 3, bottom: 0, left: 0, right: 4 }),
@@ -168,7 +168,7 @@ export default function() {
 			expect(path).to.equalPath("(0,0),(4,0),(4,1),(5,1),(5,4),(4,4),(4,5),(2,5),(2,4),(1,4),(1,3),(0,3)", true);
 		});
 
-		it("Finds general union", function() {
+		it("Finds general union", () => {
 			const result = new GeneralUnion().$get(
 				[parsePath("(0,0),(4,2),(0,4)")],
 				[parsePath("(4,0),(4,4),(0,2)")]
@@ -178,7 +178,7 @@ export default function() {
 			expect(path).to.equalPath("(0,0),(2,1),(4,0),(4,2),(4,4),(2,3),(0,4),(0,2)", true);
 		});
 
-		it("Handles floating error", function() {
+		it("Handles floating error", () => {
 			const result = new GeneralUnion().$get([
 				parsePath("(34,4),(34,-3),(40,-3),(40,2.6666666666666665),(39,4)"),
 				parsePath("(70,4),(66.6842105263158,4),(66.10309278350516,3.8762886597938144),(64,3),(64,-3),(70,-3)"),
@@ -193,29 +193,29 @@ export default function() {
 			expect(result.length).to.equal(2);
 		});
 
-		xit("Is quite fast", function() {
-			this.retries(100);
+		// xit("Is quite fast", function() {
+		// 	this.retries(100);
 
-			// prepare random tests
-			const tests: Polygon[][] = [];
-			const rounds = 100;
-			for(let i = 0; i < rounds; i++) {
-				tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
-			}
+		// 	// prepare random tests
+		// 	const tests: Polygon[][] = [];
+		// 	const rounds = 100;
+		// 	for(let i = 0; i < rounds; i++) {
+		// 		tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
+		// 	}
 
-			// run tests
-			const start = performance.now();
-			for(const test of tests) {
-				new GeneralUnion().$get(...test);
-			}
-			const average = (performance.now() - start) / rounds;
+		// 	// run tests
+		// 	const start = performance.now();
+		// 	for(const test of tests) {
+		// 		new GeneralUnion().$get(...test);
+		// 	}
+		// 	const average = (performance.now() - start) / rounds;
 
-			expect(average).to.be.lessThan(1.0);
-		});
+		// 	expect(average).to.be.lessThan(1.0);
+		// });
 	});
 
-	describe("Expansion operation", function() {
-		it("Excludes degenerated holes", function() {
+	describe("Expansion operation", () => {
+		it("Excludes degenerated holes", () => {
 			const result = expand([
 				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
 				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
@@ -225,7 +225,7 @@ export default function() {
 			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)", true);
 		});
 
-		it("Excludes over-shrunk holes", function() {
+		it("Excludes over-shrunk holes", () => {
 			const result = expand([
 				makeRoughContour("(1,1),(1,0),(5,0),(5,1),(6,1),(6,5),(5,5),(5,6),(1,6),(1,5),(0,5),(0,1)"),
 				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
@@ -234,7 +234,7 @@ export default function() {
 			expect(result[0].$outer.length).to.equal(1); // The hole over-shrunk
 		});
 
-		it("Expands holes with repeated points", function() {
+		it("Expands holes with repeated points", () => {
 			const result = expand([
 				makeRoughContour("(0,0),(8,0),(8,8),(0,8)", "(1,4),(1,7),(4,7),(4,4),(7,4),(7,1),(4,1),(4,4)"),
 			], 1);
@@ -247,8 +247,8 @@ export default function() {
 		});
 	});
 
-	describe("Rounded rectangle intersection", function() {
-		it("Finds intersection", function() {
+	describe("Rounded rectangle intersection", () => {
+		it("Finds intersection", () => {
 			const result1 = new RRIntersection().$get(
 				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
 				{ x: 3, y: 3, width: 0, height: 0, radius: 1 }
@@ -264,7 +264,7 @@ export default function() {
 			expect(result2[0]).to.equalPath("(4,2),(3,3,4,3,1),(2.1715728752538097,3),(4,1.1715728752538097,2.649165125326327,1.649165125326327,3)", true);
 		});
 
-		it("Handles complete overlapping", function() {
+		it("Handles complete overlapping", () => {
 			const result = new RRIntersection().$get(
 				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
 				{ x: 2, y: 2, width: 0, height: 0, radius: 1 } // completely contained in the previous one
@@ -273,7 +273,7 @@ export default function() {
 			expect(result[0]).to.equalPath("(1,2,1,3,1),(2,1,1,1,1),(3,2,3,1,1),(2,3,3,3,1)", true);
 		});
 
-		it("Handles arc trisection", function() {
+		it("Handles arc trisection", () => {
 			const result = new RRIntersection().$get(
 				{ x: 1, y: 1, width: 0, height: 0, radius: 1 },
 				{ x: 3, y: 3, width: 0, height: 0, radius: 3 }
@@ -282,7 +282,7 @@ export default function() {
 			expect(result[0]).to.equalPath("(1,2,2,2,1),(0.29289321881345254,1.7071067811865475,0.5857864376269049,2,1),(1.7071067811865475,0.29289321881345254,0.75,0.75,3),(2,1,2,0.585786437626905,1)", true);
 		});
 
-		it("Handles epsilon errors", function() {
+		it("Handles epsilon errors", () => {
 			// This examples creates an epsilon error in the intersection
 			const result = new RRIntersection().$get(
 				{ x: 1, y: 5, width: 0, height: 0, radius: 1 },

@@ -1,10 +1,10 @@
-import { expect } from "chai";
+import { it, expect } from "@rstest/core";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
 
 export default function() {
 
-	it("Can lookup values", function() {
+	it("Can lookup values", () => {
 		const map = new ValuedIntDoubleMap<number, string>();
 		const value = "a", other = "other";
 		map.set(1, 2, value);
@@ -21,7 +21,7 @@ export default function() {
 		expect([...map.$getValueKeys(other)].length).to.equal(2);
 	});
 
-	it("Can delete by value", function() {
+	it("Can delete by value", () => {
 		const map = new ValuedIntDoubleMap<number, string>();
 		const value = "a";
 		map.set(1, 2, value);
@@ -40,7 +40,7 @@ export default function() {
 		expect(keys.length).to.equal(0);
 	});
 
-	it("Can clear everything", function() {
+	it("Can clear everything", () => {
 		const map = new ValuedIntDoubleMap<number, string>();
 		const value = "a";
 		map.set(1, 2, value);

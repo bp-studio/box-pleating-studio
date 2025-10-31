@@ -1,9 +1,9 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { LayoutController } from "core/controller/layoutController";
-import twoFlapSpec from "./twoFlap.spec";
+import twoFlapSpec from "./twoFlap.test";
 import { id2, parseTree } from "@utils/tree";
-import threeFlapSpec from "./threeFlap.spec";
+import threeFlapSpec from "./threeFlap.test";
 import { UpdateResult } from "core/service/updateResult";
 import { State, fullReset } from "core/service/state";
 import { complete } from "./util";
@@ -13,7 +13,7 @@ import { Migration } from "client/patches";
 
 export default function() {
 
-	it("Loads saved patterns", async function() {
+	it("Loads saved patterns", async () => {
 		fullReset();
 		const sample = await getJSON("v04.session.sample.json");
 		const data = Migration.$process(sample);
@@ -24,14 +24,14 @@ export default function() {
 		expect(device.$offset).to.equal(4);
 	});
 
-	it("Signifies when no pattern is found", function() {
+	it("Signifies when no pattern is found", () => {
 		parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
 		const stretch = State.$stretches.get("0,1,3")!;
 		expect(stretch.$repo.$pattern).to.equal(null);
 		expect(UpdateResult.$flush().patternNotFound).to.be.true;
 	});
 
-	it("Caches repo during dragging", function() {
+	it("Caches repo during dragging", () => {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,0,0,0,0)");
 
 		// Drag into stretch

@@ -1,6 +1,7 @@
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@mutsuntsai/*"
+  - "@rstest/*"
 onlyBuiltDependencies:
   - "@swc/core"
   - "core-js"
@@ -9,8 +10,6 @@ onlyBuiltDependencies:
   - "unrs-resolver"
 overrides:
   magic-string: ^0.30.0
-patchedDependencies:
-  "@swc-node/core": patches/@swc-node__core.patch
 peerDependencyRules:
   allowAny:
     - eslint

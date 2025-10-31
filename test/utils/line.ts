@@ -1,4 +1,4 @@
-import { Assertion } from "chai";
+import { expect } from "@rstest/core";
 
 import { Line } from "core/math/geometry/line";
 import { pointToString } from "core/math/geometry/path";
@@ -17,20 +17,25 @@ declare global {
 	}
 }
 
-Assertion.addMethod("containLine", function(line: ILine) {
-	new Assertion(Array.isArray(this._obj)).to.be.true;
-
-	const match = this._obj.find((l: ILine) =>
-		same(line[0], l[0]) && same(line[1], l[1]) ||
-		same(line[0], l[1]) && same(line[1], l[0])
-	);
-
-	this.assert(
-		match !== undefined,
-		"expect the array to contain #{exp}",
-		"expect the array to not contain #{exp}",
-		pointToString(line[0]) + "-" + pointToString(line[1])
-	);
+expect.extend({
+	containLine(receive, line: ILine) {
+		expect(Array.isArray(receive)).to.be.true;
+		const match = receive.find((l: ILine) =>
+			same(line[0], l[0]) && same(line[1], l[1]) ||
+			same(line[0], l[1]) && same(line[1], l[0])
+		);
+		const sLine = pointToString(line[0]) + "-" + pointToString(line[1]);
+		if(!match) {
+			return {
+				message: () => `expect the array to contain ${sLine}`,
+				pass: false,
+			};
+		}
+		return {
+			message: () => `expect the array to not contain ${sLine}`,
+			pass: true,
+		};
+	},
 });
 
 export function parseLine(line: string) {
