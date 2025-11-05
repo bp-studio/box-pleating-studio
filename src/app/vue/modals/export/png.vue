@@ -5,13 +5,14 @@
 
 <script setup lang="ts">
 
+	import { useTemplateRef } from "vue";
+
 	import ExportService from "app/services/exportService";
-	import { compRef } from "app/utils/compRef";
-	import Export from "./components/export.vue";
+	import Export from "../components/export.vue";
 
 	defineOptions({ name: "PNG" });
 
-	const exp = compRef(Export);
+	const exp = useTemplateRef("exp");
 
 	function getBlob(): Promise<Blob> {
 		return ExportService.getBlob("png");

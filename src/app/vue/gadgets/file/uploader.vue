@@ -9,14 +9,14 @@
 
 <script setup lang="ts">
 
-	import { computed, getCurrentInstance, shallowRef } from "vue";
+	import { computed, getCurrentInstance, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 
 	defineOptions({ name: "Uploader" });
 
 	const id: string = "file" + getCurrentInstance()?.uid;
-	const lbl = shallowRef<HTMLLabelElement>();
+	const lbl = useTemplateRef("lbl");
 
 	const props = defineProps<{
 		accept: string;

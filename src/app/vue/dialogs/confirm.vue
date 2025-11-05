@@ -7,13 +7,14 @@
 
 <script setup lang="ts">
 
-	import { compRef } from "app/utils/compRef";
+	import { useTemplateRef } from "vue";
+
 	import DialogVue from "./dialog.vue";
 
 	defineOptions({ name: "Confirm" });
 
 	let value: boolean = false;
-	const dialog = compRef(DialogVue);
+	const dialog = useTemplateRef("dialog");
 
 	function key(e: KeyboardEvent): boolean {
 		const k = e.key.toLowerCase();

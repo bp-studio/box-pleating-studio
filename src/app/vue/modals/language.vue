@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, useTemplateRef } from "vue";
 
 	import Language from "app/services/languageService";
 
@@ -29,7 +29,7 @@
 
 	defineOptions({ name: "Language" });
 
-	const el = shallowRef<HTMLDivElement>();
+	const el = useTemplateRef("el");
 
 	let modal: Modal;
 

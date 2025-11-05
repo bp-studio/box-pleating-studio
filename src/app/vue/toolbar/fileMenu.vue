@@ -74,14 +74,13 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef, nextTick } from "vue";
+	import { onMounted, shallowRef, nextTick, useTemplateRef } from "vue";
 
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
 	import HotKeyService from "app/services/hotkeyService";
 	import { copyEnabled } from "app/shared/constants";
 	import Import from "app/services/importService";
-	import { compRef } from "app/utils/compRef";
 	import Handles from "app/services/handleService";
 	import Export from "app/services/exportService";
 	import { Divider, Dropdown, DropdownItem } from "@/gadgets/menu";
@@ -104,7 +103,7 @@
 	const opn = shallowRef<Executor>();
 	const bps = shallowRef<Executor>();
 	const bpz = shallowRef<Executor>();
-	const menu = compRef(Dropdown);
+	const menu = useTemplateRef("menu");
 
 	onMounted(() => {
 		HotKeyService.register(() => {

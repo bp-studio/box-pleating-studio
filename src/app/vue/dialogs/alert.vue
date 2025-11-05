@@ -6,12 +6,13 @@
 
 <script setup lang="ts">
 
-	import { compRef } from "app/utils/compRef";
+	import { useTemplateRef } from "vue";
+
 	import Dialog from "./dialog.vue";
 
 	defineOptions({ name: "Alert" });
 
-	const dialog = compRef(Dialog);
+	const dialog = useTemplateRef("dialog");
 
 	function key(e: KeyboardEvent): boolean {
 		const k = e.key.toLowerCase();

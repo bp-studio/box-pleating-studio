@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { shallowRef, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 
@@ -40,9 +40,9 @@
 	const initialized = shallowRef(false);
 	const self = Symbol("dropdown");
 
-	const el = shallowRef<HTMLDivElement>();
-	const btn = shallowRef<HTMLButtonElement>();
-	const menu = shallowRef<HTMLDivElement>();
+	const el = useTemplateRef("el");
+	const btn = useTemplateRef("btn");
+	const menu = useTemplateRef("menu");
 
 	function init(): void {
 		if(initialized.value) return;

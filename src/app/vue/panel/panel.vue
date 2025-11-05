@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 
-	import { computed, onMounted, shallowRef, watch } from "vue";
+	import { computed, onMounted, useTemplateRef, watch } from "vue";
 
 	import Studio, { showPanel } from "app/services/studioService";
 	import StretchVue from "./stretch.vue";
@@ -39,7 +39,7 @@
 
 	defineEmits(["hide"]);
 
-	const panel = shallowRef<HTMLDivElement>();
+	const panel = useTemplateRef("panel");
 
 	const componentMap: Record<string, Component> = { Vertex, Edge, FlapVue, River };
 	const type = computed(() => Studio.selections[0]?.type ?? "");

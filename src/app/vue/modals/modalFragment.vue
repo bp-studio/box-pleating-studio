@@ -34,11 +34,11 @@
 	import Preference from "./preference.vue";
 	import Language from "./language.vue";
 	import Note from "./note.vue";
-	import CP from "./cp.vue";
-	import SVG_ from "./svg.vue"; // To avoid conflicting with native <svg> tag
-	import PNG from "./png.vue";
-	import BPS from "./bps.vue";
-	import BPZ from "./bpz.vue";
+	import CP from "./export/cp.vue";
+	import SVG_ from "./export/svg.vue"; // To avoid conflicting with native <svg> tag
+	import PNG from "./export/png.vue";
+	import BPS from "./export/bps.vue";
+	import BPZ from "./export/bpz.vue";
 	import Optimizer from "./optimizer.vue";
 
 	import type { IShow } from "./modals";

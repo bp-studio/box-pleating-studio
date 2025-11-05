@@ -26,7 +26,8 @@
 
 <script setup lang="ts">
 
-	import { compRef } from "app/utils/compRef";
+	import { useTemplateRef } from "vue";
+
 	import Workspace from "app/services/workspaceService";
 	import { ContextMenu, DropdownItem, Divider } from "@/gadgets/menu";
 
@@ -34,7 +35,7 @@
 
 	defineOptions({ name: "TabMenu" });
 
-	const tabMenu = compRef(ContextMenu);
+	const tabMenu = useTemplateRef("tabMenu");
 
 	function show(event: MouseEvent, id: ProjId): void {
 		menuId = id;

@@ -9,9 +9,8 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { shallowRef, useTemplateRef } from "vue";
 
-	import { compRef } from "app/utils/compRef";
 	import Dialog from "./dialog.vue";
 	import FileUtility from "app/utils/fileUtility";
 
@@ -19,7 +18,7 @@
 
 	defineOptions({ name: "Alert" });
 
-	const dialog = compRef(Dialog);
+	const dialog = useTemplateRef("dialog");
 	const url = shallowRef<string | undefined>();
 	const filename = shallowRef<string>("");
 

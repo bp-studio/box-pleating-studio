@@ -40,13 +40,12 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { shallowRef, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 	import LZ from "app/utils/lz";
 	import { copyEnabled } from "app/shared/constants";
 	import useModal from "./modal";
-	import { compRef } from "app/utils/compRef";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
 
 	defineOptions({ name: "Share" });
@@ -56,8 +55,8 @@
 	const sending = shallowRef(false);
 	const error = shallowRef<string | null>(null);
 
-	const bt = compRef(CheckButton);
-	const input = shallowRef<HTMLInputElement>();
+	const bt = useTemplateRef("bt");
+	const input = useTemplateRef("input");
 
 	const { el, show } = useModal("Share", {
 		onBeforeShow: async () => {
