@@ -1,7 +1,7 @@
 <template>
 	<div class="dropdown-item" role="menuitemcheckbox" @click="toggle">
 		<Hotkey :icon="modelValue ? icon : ''" :color="color" :ctrl="Boolean(hk)" :hk="hk">
-			<slot/>
+			<slot />
 		</Hotkey>
 	</div>
 </template>
@@ -17,7 +17,10 @@
 		hk?: string;
 		modelValue: boolean;
 	}>();
-	const emit = defineEmits(["click", "update:modelValue"]);
+	const emit = defineEmits<{
+		"click": [];
+		"update:modelValue": [value: boolean];
+	}>();
 
 	function toggle(): void {
 		emit("update:modelValue", !props.modelValue);

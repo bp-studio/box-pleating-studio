@@ -37,7 +37,9 @@
 
 	defineOptions({ name: "Panel" });
 
-	defineEmits(["hide"]);
+	const emit = defineEmits<{
+		hide: [event: Event];
+	}>();
 
 	const panel = useTemplateRef("panel");
 

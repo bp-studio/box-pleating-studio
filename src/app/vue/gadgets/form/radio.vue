@@ -18,7 +18,9 @@
 		value: T;
 		modelValue: T;
 	}>();
-	const emit = defineEmits(["update:modelValue"]);
+	const emit = defineEmits<{
+		"update:modelValue": [value: T];
+	}>();
 
 	const id: string = props.name + getCurrentInstance()?.uid;
 

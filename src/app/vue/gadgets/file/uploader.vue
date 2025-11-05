@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)" >
+		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)">
 		<label :class="labelCls ?? 'dropdown-item m-0'" :for="id" ref="lbl">
-			<slot/>
+			<slot />
 		</label>
 	</div>
 </template>
@@ -29,7 +29,9 @@
 			"" : props.accept
 	);
 
-	const emit = defineEmits(["upload"]);
+	const emit = defineEmits<{
+		upload: [value: File[]];
+	}>();
 
 	function upload(event: Event): void {
 		const input = event.target as HTMLInputElement;

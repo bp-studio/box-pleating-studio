@@ -36,7 +36,7 @@
 
 	defineOptions({ name: "FileList" });
 
-	async function upload(files: FileList): Promise<void> {
+	async function upload(files: File[]): Promise<void> {
 		await Import.openFiles(files);
 	}
 

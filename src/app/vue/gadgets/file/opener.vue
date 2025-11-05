@@ -1,6 +1,6 @@
 <template>
 	<div @click="execute">
-		<slot/>
+		<slot />
 	</div>
 </template>
 
@@ -12,7 +12,9 @@
 		multiple?: boolean;
 	}>();
 
-	const emit = defineEmits(["open"]);
+	const emit = defineEmits<{
+		open: [value: FileSystemFileHandle[]];
+	}>();
 
 	async function execute(): Promise<void> {
 		try {

@@ -14,7 +14,9 @@
 	const props = defineProps<{
 		disabled?: boolean;
 	}>();
-	const emit = defineEmits(["click"]);
+	const emit = defineEmits<{
+		click: [];
+	}>();
 
 	function execute(): void {
 		if(!props.disabled) emit("click");

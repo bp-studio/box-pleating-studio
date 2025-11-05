@@ -115,7 +115,9 @@
 		show();
 	}
 
-	const emit = defineEmits(["save"]);
+	const emit = defineEmits<{
+		save: [];
+	}>();
 	defineExpose({ show: showWithFilename });
 
 </script>

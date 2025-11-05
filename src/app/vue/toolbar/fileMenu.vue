@@ -33,7 +33,7 @@
 			<DropdownItem :disabled="!Studio.project" ref="bps" @click="show('bps')">
 				<Hotkey icon="fas fa-download" ctrl hk="S">{{ $t('toolbar.file.BPS.download') }}</Hotkey>
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.project" ref="bpz" @click="show('bpz')">
+			<DropdownItem :disabled="!Studio.project" @click="show('bpz')">
 				<Hotkey icon="bp-save-all">{{ $t('toolbar.file.BPZ.download') }}</Hotkey>
 			</DropdownItem>
 		</template>
@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef, nextTick, useTemplateRef } from "vue";
+	import { onMounted, nextTick, useTemplateRef } from "vue";
 
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
@@ -89,20 +89,14 @@
 	import RecentMenu from "./recentMenu.vue";
 	import { show } from "@/modals/modals";
 
-	import type { ComponentPublicInstance } from "vue";
 	import type { ProjId } from "shared/json";
 
 	defineOptions({ name: "FileMenu" });
 
-	interface Executor extends ComponentPublicInstance {
-		execute(): void;
-	}
-
 	type SaveAsInstance = InstanceType<typeof SaveAs>;
 
-	const opn = shallowRef<Executor>();
-	const bps = shallowRef<Executor>();
-	const bpz = shallowRef<Executor>();
+	const opn = useTemplateRef("opn");
+	const bps = useTemplateRef("bps");
 	const menu = useTemplateRef("menu");
 
 	onMounted(() => {
@@ -185,7 +179,7 @@
 		await Promise.all(tasks); // The failure to save individual files will not affect the saving of other files
 	}
 
-	async function upload(files: FileList): Promise<void> {
+	async function upload(files: File[]): Promise<void> {
 		await Import.openFiles(files);
 	}
 

@@ -1,7 +1,7 @@
 <template>
 	<Row :label="label">
 		<input v-model="value" class="form-control" :placeholder="placeholder" :class="{ error: value != modelValue }"
-			:type="type" @focus="focus($event)" @blur="blur" @input="input($event)" >
+			:type="type" @focus="focus($event)" @blur="blur" @input="input($event)">
 	</Row>
 </template>
 
@@ -18,7 +18,9 @@
 		placeholder?: string;
 		modelValue: string;
 	}>();
-	const emit = defineEmits(["update:modelValue"]);
+	const emit = defineEmits<{
+		"update:modelValue": [value: string];
+	}>();
 	const { blur, focus, input, value } = useInput(props, emit);
 
 </script>

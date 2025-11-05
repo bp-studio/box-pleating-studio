@@ -39,7 +39,9 @@
 		step: 1,
 		hotkeys: "",
 	});
-	const emit = defineEmits(["update:modelValue"]);
+	const emit = defineEmits<{
+		"update:modelValue": [value: number];
+	}>();
 	const { blur, focus, value } = useInput(props, emit);
 
 	const tooltips = computed(() => props.hotkeys.split(",").map(k => {

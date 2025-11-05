@@ -33,7 +33,9 @@
 		modelValue?: number;
 		default: number;
 	}>();
-	const emit = defineEmits(["update:modelValue"]);
+	const emit = defineEmits<{
+		"update:modelValue": [value: number | undefined];
+	}>();
 	const ga = useThrottledGA("custom_color", TEN_MINUTES);
 
 	const hex = computed(() => toHex(props.modelValue ?? props.default));
