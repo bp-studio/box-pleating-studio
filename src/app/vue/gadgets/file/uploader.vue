@@ -9,13 +9,13 @@
 
 <script setup lang="ts">
 
-	import { computed, getCurrentInstance, useTemplateRef } from "vue";
+	import { computed, useId, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 
 	defineOptions({ name: "Uploader" });
 
-	const id: string = "file" + getCurrentInstance()?.uid;
+	const id: string = "file" + useId();
 	const lbl = useTemplateRef("lbl");
 
 	const props = defineProps<{

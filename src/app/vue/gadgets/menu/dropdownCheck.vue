@@ -11,19 +11,18 @@
 
 	defineOptions({ name: "DropdownCheck" });
 
-	const props = defineProps<{
+	const modelValue = defineModel<boolean>({ required: true });
+	defineProps<{
 		icon?: string;
 		color?: number;
 		hk?: string;
-		modelValue: boolean;
 	}>();
 	const emit = defineEmits<{
-		"click": [];
-		"update:modelValue": [value: boolean];
+		click: [];
 	}>();
 
 	function toggle(): void {
-		emit("update:modelValue", !props.modelValue);
+		modelValue.value = !modelValue.value;
 		emit("click");
 	}
 
