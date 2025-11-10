@@ -2,12 +2,12 @@
 	<row :label="label" v-if="size > 1">
 		<div class="input-group">
 			<button class="btn btn-sm btn-primary" type="button" @click="$emit('move', -1)">
-				<i class="fas fa-arrow-left"/>
+				<i class="fas fa-arrow-left" />
 			</button>
 			<input class="form-control text-center" readonly type="text" :value="(index + 1) + ' / ' + size"
-				@wheel.passive="wheel($event)" style="cursor: ew-resize;" >
+				@wheel.passive="wheel($event)" style="cursor: ew-resize;">
 			<button class="btn btn-sm btn-primary" type="button" @click="$emit('move', 1)">
-				<i class="fas fa-arrow-right"/>
+				<i class="fas fa-arrow-right" />
 			</button>
 		</div>
 	</row>
@@ -25,7 +25,9 @@
 		index: number;
 		label: string;
 	}>();
-	const emit = defineEmits(["move"]);
+	const emit = defineEmits<{
+		move: [value: number];
+	}>();
 
 	const wheel = useWheel(by => emit("move", by));
 

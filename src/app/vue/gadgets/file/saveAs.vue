@@ -1,9 +1,9 @@
 <template>
 	<a v-if="!disabled" class="dropdown-item" @click="execute()">
-		<slot/>
+		<slot />
 	</a>
 	<div v-else class="dropdown-item disabled" @click.stop>
-		<slot/>
+		<slot />
 	</div>
 </template>
 
@@ -23,7 +23,9 @@
 		disabled: boolean;
 	}>();
 
-	const emit = defineEmits(["save"]);
+	const emit = defineEmits<{
+		save: [value: FileSystemFileHandle];
+	}>();
 
 	function execute(proj?: Project, callback?: (handle: FileSystemFileHandle) => void): Promise<boolean> {
 		return FileUtility.saveAs(

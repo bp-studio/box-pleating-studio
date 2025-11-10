@@ -3,12 +3,12 @@
 		<button ref="btn" type="button" @mouseenter="mouseenter" :title="title" :disabled="!Studio.initialized"
 			class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label" role="menuitem">
 			<i :class="icon" />
-			<div class="notify" v-if="notify"/>
+			<div class="notify" v-if="notify" />
 		</button>
 		<!--We display the content of the dropdown menu only
 			after initialization to improve startup performance. -->
 		<div ref="menu" class="dropdown-menu" role="menuitem" v-if="initialized">
-			<slot/>
+			<slot />
 		</div>
 	</div>
 </template>
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { shallowRef, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 
@@ -35,14 +35,17 @@
 		label?: string;
 	}>();
 
-	const emit = defineEmits(["show", "hide"]);
+	const emit = defineEmits<{
+		show: [];
+		hide: [];
+	}>();
 
 	const initialized = shallowRef(false);
 	const self = Symbol("dropdown");
 
-	const el = shallowRef<HTMLDivElement>();
-	const btn = shallowRef<HTMLButtonElement>();
-	const menu = shallowRef<HTMLDivElement>();
+	const el = useTemplateRef("el");
+	const btn = useTemplateRef("btn");
+	const menu = useTemplateRef("menu");
 
 	function init(): void {
 		if(initialized.value) return;

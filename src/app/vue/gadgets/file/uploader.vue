@@ -1,22 +1,22 @@
 <template>
 	<div>
-		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)" >
+		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)">
 		<label :class="labelCls ?? 'dropdown-item m-0'" :for="id" ref="lbl">
-			<slot/>
+			<slot />
 		</label>
 	</div>
 </template>
 
 <script setup lang="ts">
 
-	import { computed, getCurrentInstance, shallowRef } from "vue";
+	import { computed, useId, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 
 	defineOptions({ name: "Uploader" });
 
-	const id: string = "file" + getCurrentInstance()?.uid;
-	const lbl = shallowRef<HTMLLabelElement>();
+	const id: string = "file" + useId();
+	const lbl = useTemplateRef("lbl");
 
 	const props = defineProps<{
 		accept: string;
@@ -29,7 +29,9 @@
 			"" : props.accept
 	);
 
-	const emit = defineEmits(["upload"]);
+	const emit = defineEmits<{
+		upload: [value: File[]];
+	}>();
 
 	function upload(event: Event): void {
 		const input = event.target as HTMLInputElement;

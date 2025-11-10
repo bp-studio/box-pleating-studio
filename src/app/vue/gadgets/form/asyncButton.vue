@@ -4,10 +4,7 @@
 	</button>
 </template>
 
-<script setup lang="ts" >
-
-	import StudioService from "app/services/studioService";
-
+<script lang="ts">
 	/**
 	 * AsyncButton is a button for executing async operations.
 	 * It prevents rapid clicking.
@@ -16,7 +13,14 @@
 	 * as the operations are supposed to be considerably quick,
 	 * and disabling the button will result in flashes.
 	 */
-	defineOptions({ name: "AsyncButton" });
+	export default {
+		name: "AsyncButton",
+	};
+</script>
+
+<script setup lang="ts" >
+
+	import StudioService from "app/services/studioService";
 
 	defineProps<{
 		click: Action<Promise<void>>;

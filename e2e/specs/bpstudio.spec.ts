@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { StudioPage } from "../utils";
+import { StudioPage } from "../utils/studioPage";
 
 test.beforeEach(async ({ page }) => {
 	await page.goto("/");
@@ -39,8 +39,13 @@ test("Basic history", async ({ page }) => {
 	const studio = new StudioPage(page);
 	await studio.newProject();
 	await studio.mouse.click(10, 7);
+
+	// Add leaf and confirm
 	await page.getByRole("button", { name: "Add leaf" }).click();
-	await page.keyboard.press("Control+z"); // Undo
+	await expect(page.getByText("Vertices: 1 / 4")).toBeInViewport();
+
+	// Undo and confirm
+	await page.keyboard.press("Control+z");
 	await expect(page.getByText("Vertices: 1 / 3")).toBeInViewport();
 	await page.keyboard.press("2");
 	await expect(page.getByText("Flaps: 2")).toBeInViewport();

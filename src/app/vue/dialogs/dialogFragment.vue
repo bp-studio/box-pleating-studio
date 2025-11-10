@@ -8,9 +8,8 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, shallowRef, useTemplateRef } from "vue";
 
-	import { compRef } from "app/utils/compRef";
 	import { setup } from "app/services/dialogService";
 	import Alert from "./alert.vue";
 	import Confirm from "./confirm.vue";
@@ -21,9 +20,9 @@
 	 */
 	defineOptions({ name: "DialogFragment" });
 
-	const confirm = compRef(Confirm);
-	const alert = compRef(Alert);
-	const error = compRef(Error);
+	const confirm = useTemplateRef("confirm");
+	const alert = useTemplateRef("alert");
+	const error = useTemplateRef("error");
 
 	const initialized = shallowRef(false);
 	import("bootstrap/js/dist/modal").then(() => initialized.value = true);

@@ -17,9 +17,14 @@ export class Matrix {
 
 	private readonly _det: Fraction;
 
+	/**
+	 * For performance, we do not clone the {@link Fraction}s again inside the constructor,
+	 * so make sure that the parameters are new instances already,
+	 * unless it is certain that the parameters will not mutate.
+	 */
 	constructor(a: Fraction, b: Fraction, c: Fraction, d: Fraction, det?: Fraction) {
-		this.a = a.c(); this.b = b.c();
-		this.c = c.c(); this.d = d.c();
+		this.a = a; this.b = b;
+		this.c = c; this.d = d;
 		if(det) this._det = det;
 		else this._det = this.a.mul(this.d).s(this.b.mul(this.c));
 	}

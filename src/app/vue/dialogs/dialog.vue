@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, shallowRef, useTemplateRef } from "vue";
 
 	import HotkeyService from "app/services/hotkeyService";
 
@@ -26,7 +26,7 @@
 	defineOptions({ name: "DialogModal" });
 
 	let modal: Modal;
-	const el = shallowRef<HTMLElement>();
+	const el = useTemplateRef("el");
 
 	onMounted(() => {
 		import("bootstrap/js/dist/modal").then(module => {

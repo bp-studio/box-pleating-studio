@@ -7,14 +7,14 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { useTemplateRef } from "vue";
 
 	defineOptions({ name: "CheckButton" });
 
 	const MESSAGE_DELAY = 3000;
 
-	const bt = shallowRef<HTMLButtonElement>();
-	const success = shallowRef<HTMLSpanElement>();
+	const bt = useTemplateRef("bt");
+	const success = useTemplateRef("success");
 
 	function check(): void {
 		const s = success.value!;

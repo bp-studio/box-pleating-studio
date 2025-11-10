@@ -15,9 +15,8 @@
 <script setup lang="ts">
 
 	import { SlickList, SlickItem } from "vue-slicksort";
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, shallowRef, useTemplateRef } from "vue";
 
-	import { compRef } from "app/utils/compRef";
 	import Workspace from "app/services/workspaceService";
 	import Studio from "app/services/studioService";
 	import Tab from "./tab.vue";
@@ -28,7 +27,7 @@
 
 	defineOptions({ name: "TabBar" });
 
-	const tabMenu = compRef(TabMenu);
+	const tabMenu = useTemplateRef("tabMenu");
 	const hasScrollbar = shallowRef(false);
 	const DELTA_UNIT = 5;
 

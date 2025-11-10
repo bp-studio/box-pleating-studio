@@ -3,14 +3,14 @@
 </template>
 
 <script setup lang="ts">
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, useTemplateRef } from "vue";
 
 	defineOptions({ name: "Help" });
 	defineProps<{
 		title: string;
 	}>();
 
-	const el = shallowRef<HTMLElement>();
+	const el = useTemplateRef("el");
 
 	onMounted(() => {
 		import("bootstrap/js/dist/tooltip").then(tp => tp.default.getOrCreateInstance(el.value!));

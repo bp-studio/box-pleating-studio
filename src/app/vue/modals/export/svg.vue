@@ -7,15 +7,16 @@
 
 <script setup lang="ts">
 
+	import { useTemplateRef } from "vue";
+
 	import ExportService from "app/services/exportService";
 	import Settings from "app/services/settingService";
 	import Toggle from "@/gadgets/form/toggle.vue";
-	import { compRef } from "app/utils/compRef";
-	import Export from "./components/export.vue";
+	import Export from "../components/export.vue";
 
 	defineOptions({ name: "SVG" });
 
-	const exp = compRef(Export);
+	const exp = useTemplateRef("exp");
 
 	function getBlob(): Promise<Blob> {
 		return ExportService.getBlob("svg");

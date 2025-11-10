@@ -24,6 +24,13 @@ export function toFractionRecursive(v: number, k2: number, k1: number, err: numb
 	else return toFractionRecursive(1 / r, k1, k0, err).i().a(f);
 }
 
+/** Parse string expressions to {@link Fraction}s. Used for tests only. */
+export function parseFraction(exp: string): Fraction {
+	const match = exp.match(/^(-?\d+)\/(\d+)$/);
+	if(!match) throw new Error("Invalid expression");
+	return new Fraction(Number(match[1]), Number(match[2]) as Positive);
+}
+
 export type Rational = number | Fraction;
 
 //=================================================================
@@ -33,7 +40,7 @@ export type Rational = number | Fraction;
  * Originally, this class used the {@link BigInt} type internally for infinite precision,
  * and had overloaded parameters for various operations for flexibility.
  * However, later it was found that BigInt's arithmetic speed is way too slow,
- * and overloading also incurred unnecessary overheads, so in this version,
+ * and overloading also incurred unnecessary overheads, so since v0.6.0,
  * this class was completely re-implemented to use the primitive number type,
  * and all overloading was removed,
  * so that all operations can only be performed with rational numbers.
@@ -124,17 +131,25 @@ export class Fraction {
 	// Arithmetic methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Addition in place */
+	/**
+	 * Addition in place.
+	 *
+	 * Since v0.7.12, we optimize by reducing the denominators before addition
+	 * to prevent intermediate overflow during the common denominator calculation,
+	 * which may occur especially during matrix multiplications.
+	 */
 	public a(f: Fraction): this {
-		this._p = this._p * f._q + this._q * f._p;
-		this._q *= f._q;
+		const [q1, q2, g] = reduceInt(this._q, f._q);
+		this._p = this._p * q2 + f._p * q1;
+		this._q = (q1 * q2 * g) as Positive;
 		return this._normalize();
 	}
 
 	/** Subtraction in place */
 	public s(f: Fraction): this {
-		this._p = this._p * f._q - this._q * f._p;
-		this._q *= f._q;
+		const [q1, q2, g] = reduceInt(this._q, f._q);
+		this._p = this._p * q2 - f._p * q1;
+		this._q = (q1 * q2 * g) as Positive;
 		return this._normalize();
 	}
 

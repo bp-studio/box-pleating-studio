@@ -6,13 +6,13 @@
 
 <script setup lang="ts">
 
-	import { onMounted, shallowRef } from "vue";
+	import { onMounted, shallowRef, useTemplateRef } from "vue";
 
 	import type { Instance } from "@popperjs/core";
 
 	defineOptions({ name: "ContextMenu" });
 
-	const el = shallowRef<HTMLDivElement>();
+	const el = useTemplateRef("el");
 	const initialized = shallowRef(false);
 
 	import("@popperjs/core").then(() => initialized.value = true);

@@ -36,19 +36,18 @@
 
 <script setup lang="ts">
 
-	import { shallowRef, useAttrs, watch } from "vue";
+	import { shallowRef, useAttrs, useTemplateRef, watch } from "vue";
 
 	import Studio from "app/services/studioService";
 	import useModal from "../modal";
 	import { isInApp } from "app/shared/constants";
 	import HandleService from "app/services/handleService";
 	import FileUtility from "app/utils/fileUtility";
-	import { compRef } from "app/utils/compRef";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
 
 	defineOptions({ name: "Export" });
 
-	const bt = compRef(CheckButton);
+	const bt = useTemplateRef("bt");
 	const url = shallowRef<string | null>(null);
 	const extFilename = shallowRef<string>("");
 	let suggestedName: string;
@@ -116,7 +115,9 @@
 		show();
 	}
 
-	const emit = defineEmits(["save"]);
+	const emit = defineEmits<{
+		save: [];
+	}>();
 	defineExpose({ show: showWithFilename });
 
 </script>

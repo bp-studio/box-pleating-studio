@@ -7,7 +7,7 @@
 			</button>
 			<input class="form-control" :disabled="disabled" :class="{ 'error': value != modelValue }" type="number"
 				v-model="value" @focus="focus($event)" @blur="blur" @input="input($event)" :min="min" :max="max"
-				@wheel.passive="wheel($event)" style="cursor: ns-resize; min-width: 30px;" >
+				@wheel.passive="wheel($event)" style="cursor: ns-resize; min-width: 30px;">
 			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
 				<i class="fas fa-plus" />
 			</button>
@@ -26,6 +26,7 @@
 
 	defineOptions({ name: "Number" });
 
+	const modelValue = defineModel<number>({ required: true });
 	const props = withDefaults(defineProps<{
 		disabled?: boolean;
 		label?: string;
@@ -34,13 +35,11 @@
 		max?: number;
 		step?: number;
 		hotkeys?: string;
-		modelValue: number;
 	}>(), {
 		step: 1,
 		hotkeys: "",
 	});
-	const emit = defineEmits(["update:modelValue"]);
-	const { blur, focus, value } = useInput(props, emit);
+	const { blur, focus, value } = useInput(modelValue, Number);
 
 	const tooltips = computed(() => props.hotkeys.split(",").map(k => {
 		const [name, command] = k.split(".");
@@ -66,7 +65,7 @@
 		if(!Number.isSafeInteger(v)) return;
 		if(v < props.min! || v > props.max!) return;
 		value.value = v;
-		emit("update:modelValue", v);
+		modelValue.value = v;
 	}
 
 	function change(by: number): void {
@@ -74,8 +73,8 @@
 		// to avoid errors in the case of speedy wheeling
 		const v = Math.round((value.value as number + by) / props.step) * props.step;
 		if(v < props.min! || v > props.max!) return;
-		emit("update:modelValue", v);
 		value.value = v;
+		modelValue.value = v;
 		nextTick(blur);
 	}
 

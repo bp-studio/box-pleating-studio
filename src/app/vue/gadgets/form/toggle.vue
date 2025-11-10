@@ -3,11 +3,11 @@
 		<div class="col">
 			<div class="form-check form-switch">
 				<input class="form-check-input" type="checkbox" :id="id" :checked="modelValue"
-					@input="$emit('update:modelValue', isChecked($event.target))" >
+					@input="modelValue = isChecked($event.target)">
 				<label class="form-check-label" v-bind:for="id">
-					<slot/>
+					<slot />
 				</label>
-				<slot name="append"/>
+				<slot name="append" />
 			</div>
 		</div>
 	</div>
@@ -15,15 +15,13 @@
 
 <script setup lang="ts">
 
-	import { useFieldId } from "./input";
+	import { useId } from "vue";
 
 	defineOptions({ name: "Toggle" });
 
-	const id = useFieldId();
+	const id = `field${useId()}`;
 
-	defineProps<{
-		modelValue: boolean;
-	}>();
+	const modelValue = defineModel<boolean>({ required: true });
 
 	function isChecked(target: unknown): boolean {
 		return (target as HTMLInputElement).checked;

@@ -25,6 +25,7 @@ NOTE.md
 
 # This is private for now
 CLAUDE.md
+.claude/
 
 # Exported test project
 /export*.bps

@@ -7,6 +7,8 @@ import settings from "./settingService";
 
 import type { ProjId } from "shared/json";
 
+window.idbKeyval = idbKeyval;
+
 namespace HandleService {
 
 	export const enabled = computed(() => isFileApiEnabled && settings.useFileSystem);

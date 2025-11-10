@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 
-	import { computed, getCurrentInstance } from "vue";
+	import { computed, useId } from "vue";
 
 	import { toHex } from "shared/utils/color";
 	import { useThrottledGA } from "app/utils/ga";
@@ -26,24 +26,23 @@
 
 	const TEN_MINUTES = 600000;
 
-	const id: string = "color" + getCurrentInstance()?.uid;
+	const id: string = "color" + useId();
 
+	const modelValue = defineModel<number | undefined>({ required: true });
 	const props = defineProps<{
 		label: string;
-		modelValue?: number;
 		default: number;
 	}>();
-	const emit = defineEmits(["update:modelValue"]);
 	const ga = useThrottledGA("custom_color", TEN_MINUTES);
 
-	const hex = computed(() => toHex(props.modelValue ?? props.default));
+	const hex = computed(() => toHex(modelValue.value ?? props.default));
 
 	function toDefault(): void {
 		update(undefined);
 	}
 
 	function toCustom(): void {
-		if(props.modelValue === undefined) update(props.default);
+		if(modelValue.value === undefined) update(props.default);
 	}
 
 	function setColor(event: Event): void {
@@ -54,7 +53,7 @@
 
 	function update(color: number | undefined): void {
 		ga();
-		emit("update:modelValue", color);
+		modelValue.value = color;
 	}
 
 </script>

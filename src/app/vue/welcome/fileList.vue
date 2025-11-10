@@ -36,8 +36,36 @@
 
 	defineOptions({ name: "FileList" });
 
-	async function upload(files: FileList): Promise<void> {
+	async function upload(files: File[]): Promise<void> {
 		await Import.openFiles(files);
 	}
 
 </script>
+
+<style lang="scss">
+	@media (width < 576px) {
+		.file-api {
+			flex-direction: column;
+			flex-grow: 1;
+			justify-content: start !important;
+		}
+
+		.recent {
+			flex-grow: 1;
+			height: 0;
+
+			> div {
+				// We use a trick of vertically wrapping flex child,
+				// and set `overflow: hidden` to hide the wrapped ones.
+				overflow: hidden;
+				display: flex;
+				flex-flow: column wrap;
+				height: 100%;
+
+				> * {
+					width: 100%;
+				}
+			}
+		}
+	}
+</style>

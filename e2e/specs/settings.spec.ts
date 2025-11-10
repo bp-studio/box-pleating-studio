@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { StudioPage } from "../utils";
+import { StudioPage } from "../utils/studioPage";
 
 test("Migration from v0.6 settings", async ({ page }) => {
 	await page.goto("/");

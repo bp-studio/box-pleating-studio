@@ -1,26 +1,24 @@
-import { getCurrentInstance, onMounted, shallowRef, watch } from "vue";
+import { onMounted, shallowRef, watch } from "vue";
 
-export function useFieldId(): string {
-	return "field" + getCurrentInstance()?.uid;
-}
+import type { ModelRef } from "vue";
 
-export function useInput(
-	props: { readonly modelValue: unknown },
-	emit: Action
+export function useInput<T>(
+	modelValue: ModelRef<T>,
+	parser: (value: string) => T
 ) {
-	const value = shallowRef<unknown>();
+	const value = shallowRef<T>();
 	let focused = false;
 
 	onMounted(() => {
-		value.value = props.modelValue;
+		value.value = modelValue.value;
 
-		watch(() => props.modelValue, v => {
+		watch(modelValue, v => {
 			if(!focused) value.value = v;
 		});
 	});
 
 	function blur(): void {
-		value.value = props.modelValue;
+		value.value = modelValue.value;
 		focused = false;
 	}
 
@@ -30,8 +28,8 @@ export function useInput(
 	}
 
 	function input(event: Event): void {
-		value.value = (event.target as HTMLInputElement).value;
-		emit("update:modelValue", value.value);
+		value.value = parser((event.target as HTMLInputElement).value);
+		modelValue.value = value.value;
 	}
 
 	return { blur, focus, input, value };

@@ -1,7 +1,7 @@
 <template>
 	<Row :label="label">
 		<input v-model="value" class="form-control" :placeholder="placeholder" :class="{ error: value != modelValue }"
-			:type="type" @focus="focus($event)" @blur="blur" @input="input($event)" >
+			:type="type" @focus="focus($event)" @blur="blur" @input="input($event)">
 	</Row>
 </template>
 
@@ -12,13 +12,12 @@
 
 	defineOptions({ name: "Field" });
 
-	const props = defineProps<{
+	const modelValue = defineModel<string>({ required: true });
+	defineProps<{
 		label: string;
 		type?: string;
 		placeholder?: string;
-		modelValue: string;
 	}>();
-	const emit = defineEmits(["update:modelValue"]);
-	const { blur, focus, input, value } = useInput(props, emit);
+	const { blur, focus, input, value } = useInput(modelValue, String);
 
 </script>

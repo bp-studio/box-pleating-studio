@@ -42,7 +42,9 @@
 		return Workspace.getProject(props.id);
 	}
 
-	defineEmits(["menu"]);
+	const emit = defineEmits<{
+		menu: [event: PointerEvent];
+	}>();
 
 	function getTitle(): string {
 		return project()?.design.title ?? "";

@@ -14,11 +14,11 @@
 
 <script setup lang="ts">
 
-	import { shallowRef } from "vue";
+	import { useTemplateRef } from "vue";
 
 	defineOptions({ name: "SubMenu" });
 
-	const sub = shallowRef<HTMLDivElement>();
+	const sub = useTemplateRef("sub");
 	const SUBMENU_DELAY = 250;
 
 	let timeout: number;
