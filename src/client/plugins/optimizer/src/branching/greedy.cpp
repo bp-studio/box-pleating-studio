@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-double meg(double x, double y) {
+double meg(const double x, const double y) {
 	return sqrt(x * x + y * y);
 }
 
@@ -25,7 +25,7 @@ int select_meg(const BranchingContext &context) {
 }
 
 /** Returns all grid points of distance [r, r+1) from the given center (cx, cy). */
-vector<Pt> annulus(int r, double cx, double cy) {
+vector<Pt> annulus(const int r, const double cx, const double cy) {
 	vector<Pt> result;
 	for(int x = -r; x <= r; x++) {
 		int low = ceil(sqrt(r * r - x * x));
@@ -38,7 +38,7 @@ vector<Pt> annulus(int r, double cx, double cy) {
 	return result;
 }
 
-vector<double> branch(int branch_at, const BranchingContext &context) {
+vector<double> branch(const int branch_at, const BranchingContext &context) {
 	vector<vector<double>> children;
 	auto [x, y] = context.get(branch_at);
 

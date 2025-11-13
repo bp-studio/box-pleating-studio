@@ -42,7 +42,7 @@ class Storage {
  */
 class RandomDisplacement {
   public:
-	RandomDisplacement(double stepsize = 0.5) : stepsize(stepsize) {}
+	RandomDisplacement(const double stepsize = 0.5) : stepsize(stepsize) {}
 
 	void displace(vector<double> &x) const {
 		// We strategically leave the last one untouched.
@@ -51,11 +51,11 @@ class RandomDisplacement {
 		}
 	}
 
-	void increase(double factor) {
+	void increase(const double factor) {
 		stepsize /= factor;
 	}
 
-	void decrease(double factor) {
+	void decrease(const double factor) {
 		stepsize *= factor;
 	}
 
@@ -83,7 +83,7 @@ class AdaptiveStepSize {
 	}
 
 	/** Called by basin-hopping to report the result of the step. */
-	void report(bool accept) {
+	void report(const bool accept) {
 		if(accept) naccept++;
 	}
 
@@ -131,7 +131,7 @@ class MinimizerWrapper {
  */
 class Metropolis {
   public:
-	Metropolis(double T) {
+	Metropolis(const double T) {
 		beta = T != 0 ? 1.0 / T : numeric_limits<double>::infinity();
 	}
 
@@ -219,7 +219,7 @@ class BasinHoppingRunner {
 	}
 };
 
-OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, int trials, const BasinHoppingParams &params, double best_s) {
+OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, const int trials, const BasinHoppingParams &params, const double best_s) {
 	// set up
 	auto wrapped_minimizer = MinimizerWrapper(&pack, &cons);
 	auto displacer = RandomDisplacement(params.stepsize);

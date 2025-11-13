@@ -7,7 +7,7 @@
 
 int step = 0;
 
-double objective(unsigned int n, const double *x, double *grad, void *data) {
+double objective(const unsigned int n, const double *x, double *grad, void *data) {
 	// Uncomment the next two lines to debug issues
 	// for(int i = 0; i < n; i++) cout << x[i] << ",";
 	// cout << endl;

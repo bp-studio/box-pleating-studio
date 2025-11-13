@@ -12,4 +12,5 @@ Checks: '-*,
   -readability-avoid-nested-conditional-operator,
   -readability-math-missing-parentheses,
   -readability-use-std-min-max,
-  -readability-use-anyofallof'
+  -readability-use-anyofallof,
+  -readability-avoid-const-params-in-decls'

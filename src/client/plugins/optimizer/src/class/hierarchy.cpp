@@ -57,7 +57,7 @@ ConstraintList Hierarchy::generate_constraints(const vector<bool> *fixed) const 
 	return cons;
 }
 
-bool Hierarchy::check(const vector<double> &x, int n, const vector<bool> &fixed) const {
+bool Hierarchy::check(const vector<double> &x, const int n, const vector<bool> &fixed) const {
 	if(!sheet->check_bounds(x, n, flaps)) return false;
 
 	for(const auto &entry: dist_map) {
@@ -69,7 +69,7 @@ bool Hierarchy::check(const vector<double> &x, int n, const vector<bool> &fixed)
 	return true;
 }
 
-const Parent *Hierarchy::get_parent(int id) const {
+const Parent *Hierarchy::get_parent(const int id) const {
 	auto iter = parent_map.find(id);
 	if(iter != parent_map.end()) return iter->second;
 	return nullptr;

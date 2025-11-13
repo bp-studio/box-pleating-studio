@@ -5,7 +5,7 @@ Rect *Rect::instance = nullptr;
 
 class RectBounds: public ScalarConstraint {
   public:
-	RectBounds(int i, int dim)
+	RectBounds(const int i, const int dim)
 		: ScalarConstraint(Type::inequality), i(i), dim(dim) {}
 
   protected:
@@ -34,7 +34,7 @@ void Rect::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vec
 	}
 }
 
-bool Rect::check_bounds(const vector<double> &xk, int n, const vector<Flap> &flaps) const {
+bool Rect::check_bounds(const vector<double> &xk, const int n, const vector<Flap> &flaps) const {
 	return xk[n * 2] >= 0 && xk[n * 2 + 1] >= 0;
 }
 
@@ -50,7 +50,7 @@ vector<int> Rect::output(const vector<double> &solution) const {
 	return result;
 }
 
-void Rect::enlarge_if_necessary(vector<double> &xk, double x, double y) const {
+void Rect::enlarge_if_necessary(vector<double> &xk, const double x, const double y) const {
 	auto &s = xk[Shared::last];
 	if(x > s) s = x;
 	if(y > s) s = y;

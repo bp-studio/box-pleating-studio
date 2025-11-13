@@ -61,7 +61,7 @@ OptimizeResult solve_global(const vector<vector<double>> &initial_vectors, const
 /**
  * Setup and print welcome message to indicate that the WASM is ready.
  */
-void init(bool async) {
+void init(const bool async) {
 	Shared::async = async;
 	int major;
 	int minor;
@@ -73,7 +73,7 @@ void init(bool async) {
 /**
  * The entry function for optimizing.
  */
-vector<int> solve(const emscripten::val &data, unsigned int seed) {
+vector<int> solve(const emscripten::val &data, const unsigned int seed) {
 	cout << R"({"event": "start", "data": null})" << endl;
 	vector<int> result;
 

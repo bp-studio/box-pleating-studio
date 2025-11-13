@@ -19,7 +19,7 @@ struct Circle {
 	double radius;
 };
 
-int find_index_by_id(const vector<Flap> &flaps, int id) {
+int find_index_by_id(const vector<Flap> &flaps, const int id) {
 	for(int i = 0; i < Shared::flap_count; i++) {
 		if(flaps[i].id == id) return i;
 	}
@@ -60,7 +60,7 @@ Vec generate_in_circles(const vector<Circle> *circles) {
 	return vec;
 }
 
-int estimate_total(int target, double growth, int rounds) {
+int estimate_total(const int target, const double growth, const int rounds) {
 	int total = 0;
 	int vectors = 0;
 	auto num = growth;
@@ -109,7 +109,7 @@ class GenerateContext {
 	int generated{0};
 };
 
-Vec generate_random_vector(int size) {
+Vec generate_random_vector(const int size) {
 	Vec result;
 	result.reserve(size);
 	for(int i = 0; i < size; i++) result.push_back(random01());
@@ -126,7 +126,7 @@ Vec generate_random_candidate(const Hierarchy *hierarchy, const vector<Circle> *
 	return result;
 }
 
-VecList generate_candidate(int target, GenerateContext &context, const vector<Circle> *circles) {
+VecList generate_candidate(const int target, GenerateContext &context, const vector<Circle> *circles) {
 	VecList vectors;
 	while(vectors.size() < target) {
 		auto vec = generate_random_candidate(context.hierarchy, circles);
@@ -142,7 +142,7 @@ VecList generate_candidate(int target, GenerateContext &context, const vector<Ci
 	return vectors;
 }
 
-VecList generate_next_level(const VecList &vectors, GenerateContext &context, const Hierarchy &last_hierarchy, double num, int target) {
+VecList generate_next_level(const VecList &vectors, GenerateContext &context, const Hierarchy &last_hierarchy, const double num, const int target) {
 	VecList next_level;
 	int num_per_vec = round(num / vectors.size());
 	for(const auto &vec: vectors) {
@@ -154,7 +154,7 @@ VecList generate_next_level(const VecList &vectors, GenerateContext &context, co
 	return next_level;
 }
 
-VecList generate_candidate(int target, const vector<Hierarchy> &hierarchies) {
+VecList generate_candidate(const int target, const vector<Hierarchy> &hierarchies) {
 	VecList vectors;
 
 	double growth = pow(target, 1.0 / hierarchies.size());
