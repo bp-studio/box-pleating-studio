@@ -24,10 +24,7 @@ export class SimpleJoinLogic extends JoinLogic {
 		if(!int) return;
 
 		// Check the simple join condition
-		if(
-			!j1.p.$direction.$parallel(j2.p.$direction) &&
-			!int.$sub(pt).$parallel(bv)
-		) return;
+		if(!int.$sub(pt).$parallel(bv)) return;
 
 		// Complete
 		if(!this._setupAnchor(int)) return;

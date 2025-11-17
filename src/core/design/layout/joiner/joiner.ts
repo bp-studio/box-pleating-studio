@@ -31,7 +31,9 @@ export class Joiner {
 	/** Shifting of the second {@link JOverlap}. */
 	public readonly s2?: IPoint;
 
-	/** Sharing the lower-left corner. */
+	/**
+	 * Sharing the lower-left corner, as opposed to the upper-right corner.
+	 */
 	public readonly $oriented!: boolean;
 
 	/** It is clockwise from {@link g1} to {@link g2}. */

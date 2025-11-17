@@ -3,8 +3,8 @@ import { JoineeBuilder } from "../joineeBuilder";
 import { cache } from "core/utils/cache";
 import { Gadget } from "../../pattern/gadget";
 import { Fraction } from "core/math/fraction";
+import { Vector } from "core/math/geometry/vector";
 
-import type { Vector } from "core/math/geometry/vector";
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Joinee } from "../joinee";
 import type { JAddOn, JDevice, JGadget } from "shared/json";
@@ -78,7 +78,10 @@ export abstract class JoinLogic {
 
 		// Gather important parameters
 		const pt = s1 ? builder1.$anchor : builder2.$anchor;
-		const bv = p1.$bisector(p2);
+		const bv = new Vector(
+			p1.ox * p2.u + p2.ox * p1.u + 2 * p1.u * p2.u,
+			p1.ox * p2.ox + p1.ox * p2.u + p2.ox * p1.u
+		);
 		this.f = $oriented ? 1 : -1;
 
 		let org = Point.ZERO;
