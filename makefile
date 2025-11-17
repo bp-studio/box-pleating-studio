@@ -28,7 +28,7 @@ CXXFLAGS := $(CXXFLAG_$(MODE))
 LDFLAGS :=\
 	-Llib/nlopt\
 	-lembind\
-	-lnlopt.slsqp.2.9.0\
+	-lnlopt.slsqp.2.9.1\
 	$(LDFLAG_$(MODE))\
 	-sFILESYSTEM=0\
 	-sINITIAL_MEMORY=10MB\
