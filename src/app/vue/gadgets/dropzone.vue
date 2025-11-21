@@ -1,7 +1,7 @@
 <template>
 	<div class="dropzone" style="display: none;">
 		<div class="h2">
-			<span v-text="$t('message.dropzone')"/>
+			<span v-text="$t('message.dropzone')" />
 		</div>
 	</div>
 </template>
@@ -18,7 +18,9 @@
 			event.preventDefault();
 			dropzone.classList.toggle("drag", drag);
 		};
-		document.body.addEventListener("dragover", event => toggle(event, true));
+		document.body.addEventListener("dragover", event => {
+			if(event.dataTransfer?.files.length) toggle(event, true);
+		});
 		dropzone.addEventListener("dragover", event => event.preventDefault());
 		dropzone.addEventListener("dragleave", event => toggle(event, false));
 		dropzone.addEventListener("drop", event => {
