@@ -17,33 +17,50 @@ function configGuard() {
 	return true;
 }
 
-function compare(findCacheDirectory, tag) {
+function getCompareRecords(findCacheDirectory, tag) {
 	const cacheDir = findCacheDirectory({ name: "smart-ftp", create: true });
 	const cache = `${cacheDir}/${tag}.json`;
 	const records = existsSync(cache) ? JSON.parse(readFileSync(cache)) : [];
+	return { records, cache };
+}
+
+function compare(records, newRecords) {
 	const map = new Map();
 	for(const record of records) map.set(record.path, record.hash);
+
+	// Clear all records, so that files that no longer exists can be removedZ
 	records.length = 0;
+
 	return through2({
 		transform(_, file) {
 			const md5 = createHash("md5");
 			md5.update(file.contents);
 			const hash = md5.digest("hex");
-			records.push({ path: file.relative, hash });
-			if(map.get(file.relative) === hash) return null;
-		},
-		flushEmptyList: true,
-		flush() {
-			writeFileSync(cache, JSON.stringify(records));
+			const record = { path: file.relative, hash };
+			if(map.get(file.relative) === hash) {
+				records.push(record);
+				return null;
+			} else {
+				newRecords.push(record);
+			}
 		},
 	});
 }
 
-async function connect() {
+async function connect(list, base) {
 	const ftp = (await import("vinyl-ftp")).default;
 	const log = (await import("fancy-log")).default;
 	const options = ftpConfig.server;
-	options.log = log;
+	options.log = function(...args) {
+		if(list && args[0].startsWith("UP")) {
+			const test1 = "100% " + (base ?? "") + "/";
+			const test2 = " 99% " + (base ?? "") + "/"; // This shows sometimes
+			if(args[1].startsWith(test1) || args[1].startsWith(test2)) {
+				list.push(args[1].substring(test1.length));
+			}
+		}
+		log(...args);
+	};
 	return ftp.create(options);
 }
 
@@ -52,7 +69,8 @@ async function connect() {
  */
 async function cleanFactory(folder) {
 	const conn = await connect();
-	return conn.clean(`/public_html/${folder}/**/*.*`, config.dest.dist);
+	const stream = conn.clean(`/public_html/${folder}/**/*.*`, config.dest.dist);
+	await streamToPromise(stream);
 }
 
 /**
@@ -60,8 +78,10 @@ async function cleanFactory(folder) {
  * @returns {Promise<void>}
  */
 function streamToPromise(stream) {
-	return new Promise(resolve => {
+	return new Promise((resolve, reject) => {
 		stream.on("end", resolve);
+		stream.on("finish", resolve);
+		stream.on("error", reject);
 	});
 }
 
@@ -71,7 +91,9 @@ function streamToPromise(stream) {
  */
 async function ftpFactory(folder, pipeFactory) {
 	const findCacheDirectory = (await import("find-cache-directory")).default;
-	const conn = await connect();
+	const base = `/public_html/${folder}`;
+	const uploaded = [];
+	const conn = await connect(uploaded, base);
 	const sw = config.dest.dist + "/sw.js";
 	const globs = [
 		config.dest.dist + "/**/*",
@@ -79,23 +101,33 @@ async function ftpFactory(folder, pipeFactory) {
 		"!**/debug.log",
 	];
 
-	const base = `/public_html/${folder}`;
-	const pipe = gulp.src(globs, {
-		base: config.dest.dist,
-		dot: true, // for .htaccess
-		encoding: false, // Gulp v5
-	});
-	await streamToPromise(
-		(pipeFactory ? pipeFactory(pipe) : pipe)
-			.pipe(compare(findCacheDirectory, folder))
-			.pipe(conn.dest(base))
-	);
+	const newRecords = [];
+	let records, cache;
+	try {
+		({ records, cache } = getCompareRecords(findCacheDirectory, folder));
+		const pipe = gulp.src(globs, {
+			base: config.dest.dist,
+			dot: true, // for .htaccess
+			encoding: false, // Gulp v5
+		});
+		await streamToPromise(
+			(pipeFactory ? pipeFactory(pipe) : pipe)
+				.pipe(compare(records, newRecords))
+				.pipe(conn.dest(base))
+		);
 
-	// Ensure that sw.js is uploaded last, to avoid inconsistent update.
-	await streamToPromise(
-		gulp.src(sw, { base: config.dest.dist })
-			.pipe(conn.dest(base))
-	);
+		// Ensure that sw.js is uploaded last, to avoid inconsistent update.
+		await streamToPromise(
+			gulp.src(sw, { base: config.dest.dist })
+				.pipe(conn.dest(base))
+		);
+	} finally {
+		// Combine old records with the new ones that are actually uploaded
+		for(const record of newRecords) {
+			if(uploaded.includes(record.path)) records.push(record);
+		}
+		if(cache && records) writeFileSync(cache, JSON.stringify(records));
+	}
 }
 
 gulp.task("cleanPub", () => configGuard() && seriesIf(
