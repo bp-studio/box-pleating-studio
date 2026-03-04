@@ -201,6 +201,7 @@ export default defineConfig({
 						"color-functions",
 						"import",
 						"global-builtin",
+						"if-function",
 					],
 				},
 			},

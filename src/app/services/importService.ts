@@ -27,18 +27,22 @@ namespace ImportService {
 	export async function openQueue(): Promise<boolean> {
 		if(!("launchQueue" in window)) return false;
 		return await new Promise<boolean>(resolve => {
-			launchQueue.setConsumer(launchParams => {
+			if(launchQueue.setConsumer) {
+				launchQueue.setConsumer(launchParams => {
 				// Since somewhere around early 2024, Chrome always call this
 				// callback in desktop PWA even if no file handle is passed in.
 				// So we need to check if there's actually any files.
-				if(launchParams.files.length > 0) {
-					open(launchParams.files);
-					resolve(true);
-				} else {
-					resolve(false);
-				}
-			});
-			setTimeout(() => resolve(false), 0);
+					if(launchParams.files.length > 0) {
+						open(launchParams.files);
+						resolve(true);
+					} else {
+						resolve(false);
+					}
+				});
+				setTimeout(() => resolve(false), 0);
+			} else {
+				resolve(false);
+			}
 		});
 	}
 

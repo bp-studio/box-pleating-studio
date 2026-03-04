@@ -125,6 +125,7 @@ namespace LanguageService {
 			.replace(/^zh(-\w+)?-hans.*$/, "zh-cn");
 	}
 
+	// eslint-disable-next-line no-unassigned-vars
 	export let onReset: Action | undefined;
 
 	export function reset(): void {
