@@ -32,6 +32,9 @@ if(!fs.existsSync("build/temp")) {
 
 export default defineConfig({
 	dev: {
+		client: {
+			overlay: false,
+		},
 		progressBar: true,
 		lazyCompilation: false, // This causes too many reloads on DEV.
 	},
@@ -198,12 +201,14 @@ export default defineConfig({
 						"color-functions",
 						"import",
 						"global-builtin",
+						"if-function",
 					],
 				},
 			},
 		}),
 		pluginCheckSyntax({
 			ecmaVersion: 2019,
+			excludeOutput: /optimizer/,
 		}),
 		pluginAssetsRetry({
 			addQuery: true,

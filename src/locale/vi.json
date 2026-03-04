@@ -287,7 +287,8 @@
 			},
 			"skip": "Nhảy",
 			"run": "Chạy!",
-			"running": "Đang chạy..."
+			"running": "Đang chạy...",
+			"mp": "Đa xử lý đã được kích hoạt"
 		},
 		"CP": {
 			"_": "Xuất tệp CP",

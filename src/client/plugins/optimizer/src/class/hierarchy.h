@@ -27,8 +27,8 @@ class Hierarchy {
 	vector<DistMap> dist_map;
 
 	ConstraintList generate_constraints(const vector<bool> *fixed) const;
-	bool check(const vector<double> &x, int n, const vector<bool> &fixed) const;
-	const Parent *get_parent(int id) const;
+	bool check(const vector<double> &x, const int n, const vector<bool> &fixed) const;
+	const Parent *get_parent(const int id) const;
 
   private:
 	unordered_map<int, const Parent *> parent_map;

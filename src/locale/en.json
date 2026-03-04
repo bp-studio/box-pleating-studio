@@ -287,7 +287,8 @@
 			},
 			"skip": "Skip",
 			"run": "Run!",
-			"running": "Running..."
+			"running": "Running...",
+			"mp": "Multiple-processing activated"
 		},
 		"CP": {
 			"_": "Export CP file",

@@ -7,7 +7,7 @@
  *
  * The formula is `max(l1 - r2, 0) + min(r1 - l2, 0)`.
  */
-double interval_distance(double l1, double w1, double l2, double w2) {
+double interval_distance(const double l1, const double w1, const double l2, const double w2) {
 	return max(l1 - l2 - w2, 0.0) + min(l1 + w1 - l2, 0.0);
 }
 
@@ -31,7 +31,7 @@ double RoundedConstraint::constraint(const double *x, double *grad) const {
 	return d * d - dx * dx - dy * dy;
 }
 
-double RoundedConstraint::exact(const vector<double> &x, int i, int j, int dist, const vector<Flap> &flaps) {
+double RoundedConstraint::exact(const vector<double> &x, const int i, const int j, const int dist, const vector<Flap> &flaps) {
 	auto dx = interval_distance(x[i * 2], flaps[i].width, x[j * 2], flaps[j].width);
 	auto dy = interval_distance(x[i * 2 + 1], flaps[i].height, x[j * 2 + 1], flaps[j].height);
 	return dist * dist - dx * dx - dy * dy;

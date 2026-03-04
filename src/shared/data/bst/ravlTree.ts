@@ -67,7 +67,7 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 	}
 
 	public $delete(key: K): void {
-		let n = this._root;
+		let n: Node<K, V>;
 		if(this._lastQueriedNode.$key === key) {
 			n = this._lastQueriedNode;
 			this._lastQueriedNode = this._nil;

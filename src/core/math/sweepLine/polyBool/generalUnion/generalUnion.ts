@@ -25,9 +25,16 @@ export class GeneralUnion extends UnionBase {
 	protected override readonly _initializer = generalInitializer;
 
 	/**
+	 * A `>>` formation: four segments are involved -- the first two converge
+	 * to a point on the right, but before that point, two more segments appear
+	 * above and below them, and these outer two converge to another point
+	 * further to the right. When the inner pair ends, the outer pair becomes
+	 * newly adjacent and their intersection must be detected.
+	 *
 	 * It turns out that in our use cases,
 	 * it is possible to have `>>` formation even for perfectly valid input,
-	 * so we need to override this method.
+	 * so we need to use {@link generalEndProcessor} (which checks prev/next
+	 * intersections upon removal) instead of {@link simpleEndProcessor}.
 	 */
 	protected override readonly _endProcessor = generalEndProcessor;
 	protected override readonly _shouldPickInside = false;

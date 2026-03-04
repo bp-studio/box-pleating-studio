@@ -15,6 +15,16 @@ export const isFileApiEnabled = typeof window.showSaveFilePicker != "undefined";
  */
 export const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
+function testLowEnd(): boolean {
+	if(navigator.hardwareConcurrency && navigator.deviceMemory) {
+		return navigator.hardwareConcurrency <= 2 || navigator.deviceMemory <= 2;
+	}
+	return true;
+}
+
+/** Whether is might be a low-end device. */
+export const isLowEndDevice = testLowEnd();
+
 export const isIOS = (/iPad|iPhone|iPod/).test(navigator.userAgent);
 if(isIOS) {
 	// Prevent zooming on input on iOS. See https://stackoverflow.com/a/57527009/9953396

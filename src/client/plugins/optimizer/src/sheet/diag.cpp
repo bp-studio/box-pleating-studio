@@ -12,7 +12,8 @@ const array<double, 4> v = {0.5, -1.5, -0.5, -0.5};
 
 class DiagBounds: public VectorConstraint {
   public:
-	DiagBounds(int i, int offset)
+    DiagBounds() = delete;
+	DiagBounds(const int i, const int offset)
 		: VectorConstraint(Type::inequality, 4), ix(i * 2), iy(i * 2 + 1), off{-offset, offset, offset, offset} {}
 
   protected:
@@ -44,7 +45,7 @@ void Diag::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vec
 	}
 }
 
-bool Diag::check_bounds(const vector<double> &xk, int n, const vector<Flap> &flaps) const {
+bool Diag::check_bounds(const vector<double> &xk, const int n, const vector<Flap> &flaps) const {
 	return true; // For diagonal sheet there's nothing to check
 }
 
@@ -67,7 +68,7 @@ vector<int> Diag::output(const vector<double> &solution) const {
 	return result;
 }
 
-void Diag::enlarge_if_necessary(vector<double> &xk, double x, double y) const {
+void Diag::enlarge_if_necessary(vector<double> &xk, const double x, const double y) const {
 	auto &s = xk[Shared::last];
 	double r = 2 * (abs(x) + abs(y));
 	if(r > s) s = r;

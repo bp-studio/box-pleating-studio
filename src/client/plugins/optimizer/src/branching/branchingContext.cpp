@@ -34,33 +34,33 @@ vector<double> BranchingContext::to_double(const vector<double> &x) const {
 	return result;
 }
 
-double convert_if_almost_integer(double x) {
+double convert_if_almost_integer(const double x) {
 	auto rnd = round(x);
 	return abs(x - rnd) < 1e-5 ? rnd : x;
 }
 
-bool isInteger(double value) {
+bool isInteger(const double value) {
 	return value == floor(value);
 }
 
-double _branch(double x, int dir) {
+double _branch(const double x, const int dir) {
 	return dir ? ceil(x) : floor(x);
 }
 
-Pt BranchingContext::get(int i) const {
+Pt BranchingContext::get(const int i) const {
 	return {
 		.x = convert_if_almost_integer(solution[i * 2]),
 		.y = convert_if_almost_integer(solution[i * 2 + 1])
 	};
 }
 
-vector<double> BranchingContext::branch(double x, double y, int i, int q) const {
+vector<double> BranchingContext::branch(const vector<double> *vec, const double x, const double y, const int i, const int q) const {
 	if(isInteger(x) && q % 2 || isInteger(y) && q > 1) return {};
-	return make_xk(_branch(x, q & 1), _branch(y, q >> 1), i);
+	return make_xk(vec, _branch(x, q & 1), _branch(y, q >> 1), i);
 }
 
-vector<double> BranchingContext::make_xk(double x, double y, int i) const {
-	auto xk = solution; // copy
+vector<double> BranchingContext::make_xk(const vector<double> *vec, const double x, const double y, const int i) const {
+	auto xk = vec == nullptr ? solution : *vec; // copy
 	xk[i * 2] = x;
 	xk[i * 2 + 1] = y;
 	if(!hierarchy->check(xk, i, fixed)) return {};

@@ -13,5 +13,4 @@ struct OptimizeResult {
 	bool success;
 	int status;
 	double fun;
-	bool interrupted = false;
 };

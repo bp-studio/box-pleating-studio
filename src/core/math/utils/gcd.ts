@@ -1,5 +1,3 @@
-import type { Fraction } from "../fraction";
-
 /**
  * Find the greatest common divider of two numbers.
  * The result is always a positive integer.
@@ -33,12 +31,4 @@ export function lcm(list: Positive[]): Positive {
 export function reduceInt<A extends number, B extends number>(a: A, b: B): [A, B, Positive] {
 	const g = gcd(a, b);
 	return [a / g as A, b / g as B, g];
-}
-
-/** Reduce a pair of fractions. */
-export function reduce(af: Fraction, bf: Fraction): [number, number, Positive] {
-	const a = af.$numerator * bf.$denominator;
-	const b = af.$denominator * bf.$numerator;
-	const g = gcd(a, b);
-	return [a / g, b / g, g];
 }

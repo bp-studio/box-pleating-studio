@@ -6,6 +6,7 @@ AllowShortLoopsOnASingleLine: true
 BreakBeforeBraces: Attach
 ColumnLimit: 0
 FixNamespaceComments: false
+IndentExternBlock: Indent
 IndentWidth: 4
 NamespaceIndentation: All
 PackConstructorInitializers: NextLine

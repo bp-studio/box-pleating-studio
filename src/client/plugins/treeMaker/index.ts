@@ -11,7 +11,7 @@ export function treeMaker(title: string, data: string): JProject {
 		$result.design.title = title;
 		return $result;
 	} catch(e) {
-		if(typeof e == "string") throw new Error(e);
-		else throw new Error(t("plugin.TreeMaker.invalid"));
+		if(typeof e == "string") throw new Error(e, { cause: e });
+		else throw new Error(t("plugin.TreeMaker.invalid"), { cause: e });
 	}
 }

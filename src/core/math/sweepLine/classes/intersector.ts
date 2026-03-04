@@ -48,7 +48,20 @@ export abstract class Intersector {
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/** Subdivide a segment at the given point, and returns the {@link StartEvent} of the second segment. */
+	/**
+	 * Subdivide a segment at the given point, and returns the {@link StartEvent} of the second segment.
+	 *
+	 * Given a segment [A--B] being split at point P, this produces:
+	 * - [A--P] (the original event, with its end redirected to a new EndEvent at P)
+	 * - [P--B] (a new StartEvent at P, linked to the original EndEvent at B)
+	 *
+	 * Both the new StartEvent and the new EndEvent are inserted into the event queue.
+	 *
+	 * If a neighbor segment (not the currently processed one) gets subdivided and
+	 * the new events fall before the current event in the queue, we set
+	 * {@link _eventInserted} so that {@link DivideAndCollect._processStart} knows
+	 * to re-queue the current event and process the newly inserted ones first.
+	 */
 	protected _subdivide(event: StartEvent, point: IPoint): StartEvent {
 		const provider = this._provider;
 		const segment = event.$segment;

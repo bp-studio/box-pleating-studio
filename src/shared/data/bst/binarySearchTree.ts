@@ -53,9 +53,13 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	 * This mechanism can simplify the API for prev/next,
 	 * improve deletion performance, and improve encapsulation.
 	 *
-	 * When implementing this, it is important to handle the cases of
-	 * {@link $delete} and {@link _replaceKeyValue} with care,
-	 * so that this mechanism can function correctly.
+	 * Correctness invariant: this must always point to either {@link _nil}
+	 * or a node that is currently in the tree. Specifically:
+	 * - {@link $delete} must reset this to {@link _nil} if it deletes the cached node.
+	 * - {@link _replaceKeyValue} must redirect this if the cached node's
+	 *   key/value are moved to a different physical node.
+	 * Violating these would cause {@link $getPrev}/{@link $getNext} to
+	 * operate on a stale or detached node.
 	 */
 	protected _lastQueriedNode: N;
 

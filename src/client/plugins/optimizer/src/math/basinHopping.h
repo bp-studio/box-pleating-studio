@@ -29,4 +29,4 @@ struct BasinHoppingParams {
  * Based on the implementation of SciPy:
  * https://github.com/scipy/scipy/blob/main/scipy/optimize/_basinhopping.py
  */
-OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, int trials, const BasinHoppingParams &params, double best_s);
+OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, const int trials, const BasinHoppingParams &params, const double best_s, bool &interrupted);
