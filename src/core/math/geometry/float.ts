@@ -23,8 +23,8 @@ export function isAlmostZero(x: number, eps = EPSILON): boolean {
 }
 
 /** Check if the two points are essentially equal under {@link EPSILON}-comparison. */
-export function epsilonSame(p1: IPoint, p2: IPoint): boolean {
-	return isAlmostZero(p1.x - p2.x) && isAlmostZero(p1.y - p2.y);
+export function epsilonSame(p1: IPoint, p2: IPoint, eps = EPSILON): boolean {
+	return isAlmostZero(p1.x - p2.x, eps) && isAlmostZero(p1.y - p2.y, eps);
 }
 
 export function fixZero(x: number): number {

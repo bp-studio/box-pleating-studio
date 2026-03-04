@@ -24,8 +24,12 @@ export abstract class ParentedTree<K, V, N extends ParentedNode<K, V>> extends B
 		/* istanbul ignore next: debug */
 		if(node === this._nil) {
 			// We shouldn't get here in theory. If we do,
-			// it basically means we have a segment with the start/end events being sorted incorrectly,
-			// and that usually implies that we've created an essentially degenerated segment.
+			// it means _getNode failed to locate the key in the BST.
+			// In the sweep line context, this typically indicates that
+			// the status comparator returned inconsistent results between
+			// insertion and lookup (e.g. due to floating-point instability),
+			// which in turn usually implies that we've created an essentially
+			// degenerated segment whose slope calculation is unreliable.
 			debugger;
 		}
 		/// #endif

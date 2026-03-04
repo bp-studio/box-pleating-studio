@@ -3,6 +3,16 @@ import { fixZero, floatXyComparator, isAlmostZero } from "core/math/geometry/flo
 import type { Comparator } from "shared/types/types";
 import type { StartEvent, SweepEvent } from "../../classes/event";
 
+/**
+ * Create an event comparator for the event queue (a heap).
+ * The ordering is: location (left-to-right, bottom-to-top) ->
+ * end before start -> segment slope -> segment type ->
+ * wrap delta direction -> unique key as tiebreaker.
+ *
+ * The third line uses short-circuit: when both events are starts
+ * (`a.$isStart` is truthy as 1), it further compares them by segment;
+ * when either is an end event (`a.$isStart` is 0, falsy), it skips to the key tiebreaker.
+ */
 function eventComparator(comparator: Comparator<StartEvent>): Comparator<SweepEvent> {
 	return (a, b) =>
 		floatXyComparator(a.$point, b.$point) ||
@@ -31,6 +41,16 @@ const exitFirstComparator: Comparator<StartEvent> = (a, b) => a.$wrapDelta - b.$
 
 const enterFirstComparator: Comparator<StartEvent> = (a, b) => b.$wrapDelta - a.$wrapDelta;
 
+/**
+ * Compare the vertical positions of two segments at the current sweep line.
+ *
+ * - If both start at the same x, compare their y directly.
+ * - If `a` starts earlier (ax < bx), then at x = bx the sweep line
+ *   intersects segment `a` at some height. We compare `a`'s slope
+ *   against the slope from `a.$point` to `b.$point` to determine
+ *   whether `a` is above or below `b` at that x position.
+ * - The symmetric case applies when `b` starts earlier.
+ */
 function compareUpDown(a: StartEvent, b: StartEvent): number {
 	const ax = a.$point.x, bx = b.$point.x;
 	if(isAlmostZero(ax - bx)) return fixZero(a.$point.y - b.$point.y);

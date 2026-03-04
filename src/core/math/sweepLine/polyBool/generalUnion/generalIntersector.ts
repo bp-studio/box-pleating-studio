@@ -5,8 +5,15 @@ import type { LineSegment } from "../../classes/segment/lineSegment";
 import type { StartEvent } from "../../classes/event";
 import type { OverlapIntersector } from "../../clip/overlapIntersector";
 
-/** Experiments showed that the epsilon here needs to be slightly relaxed. */
-const PARALLEL_EPSILON = 1e-9;
+/**
+ * A relaxed epsilon (larger than the default {@link EPSILON}) used in two places:
+ * 1. Parallel-line detection: since {@link LineSegment.$coefficients} are not
+ *    normalized, their cross products can amplify floating errors beyond EPSILON.
+ * 2. Subdivision guard: prevents creating near-degenerate segments whose
+ *    unreliable slope calculations would make the status BST comparator
+ *    inconsistent, ultimately leading to lookup failures.
+ */
+const RELAXED_EPSILON = 1e-9;
 
 //=================================================================
 /**
@@ -25,8 +32,12 @@ export class GeneralIntersector extends Intersector {
 		const detAB = a1 * b2 - a2 * b1;
 		const detBC = b1 * c2 - b2 * c1;
 		if(isAlmostZero(detAB)) {
-			// Parallel case
-			if(!isAlmostZero(detBC, PARALLEL_EPSILON)) return; // Different lines.
+			// Parallel case.
+			// A relaxed epsilon is needed here because $coefficients are not
+			// normalized (their magnitude scales with segment length), so
+			// detBC can accumulate floating errors larger than EPSILON
+			// when the segments have non-trivial length.
+			if(!isAlmostZero(detBC, RELAXED_EPSILON)) return; // Different lines.
 
 			// We know that ev1 and ev2 are sorted
 			const p2 = ev1.$other.$point;
@@ -50,9 +61,14 @@ export class GeneralIntersector extends Intersector {
 	}
 
 	protected override _subdivide(event: StartEvent, point: IPoint): StartEvent {
-		if(epsilonSame(point, event.$point) || epsilonSame(point, event.$other.$point)) {
-			// No need to subdivide in this case. It is known that creating essentially
-			// degenerated segments could lead to error in ordering the events.
+		if(
+			epsilonSame(point, event.$point, RELAXED_EPSILON) ||
+			epsilonSame(point, event.$other.$point, RELAXED_EPSILON)
+		) {
+			// Skip subdivision when the split point is too close to either endpoint.
+			// Creating near-degenerate segments leads to unreliable slope values,
+			// causing the status BST comparator to become inconsistent and
+			// failing to locate nodes during $getPrev/$getNext lookups.
 			return event;
 		}
 		return super._subdivide(event, point);
