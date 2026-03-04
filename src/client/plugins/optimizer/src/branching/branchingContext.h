@@ -17,8 +17,8 @@ class BranchingContext {
 	vector<double> to_grid(const vector<double> &x) const;
 	vector<double> to_double(const vector<double> &x) const;
 	Pt get(const int i) const;
-	vector<double> branch(const double x, const double y, const int i, const int q) const;
-	vector<double> make_xk(const double x, const double y, const int i) const;
+	vector<double> branch(const vector<double> *vec, const double x, const double y, const int i, const int q) const;
+	vector<double> make_xk(const vector<double> *vec, const double x, const double y, const int i) const;
 	vector<int> output() const;
 
 	/**

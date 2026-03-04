@@ -5,7 +5,7 @@
 			"name": "Emscripten",
 			"includePath": [
 				"${workspaceFolder}/src/client/plugins/optimizer/src",
-				"${workspaceFolder}/lib/nlopt"
+				"${workspaceFolder}/lib/include"
 			],
 			// Change the next line to your Emscripten location
 			"compilerPath": "C:/Sdk/emsdk/upstream/emscripten/emcc.bat",

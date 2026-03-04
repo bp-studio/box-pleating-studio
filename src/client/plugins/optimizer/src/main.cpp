@@ -42,27 +42,31 @@ BasinHoppingParams bhp = {
 OptimizeResult solve_global(const vector<vector<double>> &initial_vectors, const ConstraintList &cons) {
 	double best_s = MAX_SHEET_SIZE;
 	OptimizeResult best_result = {.success = false};
-	int trials = 0;
-	for(const auto &vec: initial_vectors) {
-		trials++;
-		auto result = basin_hopping(vec, cons, trials, bhp, best_s);
+	bool interrupted = false;
+	const int size = initial_vectors.size();
+#pragma omp parallel for schedule(dynamic, 1)
+	for(int i = 0; i < size; i++) {
+		if(interrupted) continue;
+		const auto &vec = initial_vectors[i];
+		auto result = basin_hopping(vec, cons, i + 1, bhp, best_s, interrupted);
 		if(result.success) {
 			auto s = get_scale(result.x);
-			if(s < best_s) {
-				best_result = std::move(result);
-				best_s = s;
+#pragma omp critical
+			{
+				if(s < best_s) {
+					best_result = std::move(result);
+					best_s = s;
+				}
 			}
 		}
-		if(result.interrupted) break;
 	}
 	return best_result;
 }
 
 /**
- * Setup and print welcome message to indicate that the WASM is ready.
+ * Print welcome message to indicate that the WASM is ready.
  */
-void init(const bool async) {
-	Shared::async = async;
+void init() {
 	int major;
 	int minor;
 	int bugfix;
@@ -93,7 +97,8 @@ vector<int> solve(const emscripten::val &data, const unsigned int seed) {
 		bool useBH = data["useBH"].as<bool>();
 		if(useBH) {
 			cout << R"({"event": "cont", "data": [0, 0, 0]})" << endl;
-			sol = basin_hopping(x0, cons, 1, bhp, MAX_SHEET_SIZE);
+			bool interrupted = false;
+			sol = basin_hopping(x0, cons, 1, bhp, MAX_SHEET_SIZE, interrupted);
 		} else {
 			cout << R"({"event": "pack", "data": 0})" << endl;
 			sol = pack(x0, cons, [](int step) {

@@ -1,7 +1,7 @@
 {
 	"name": "box-pleating-studio",
 	"version": "0.7.12",
-	"app_version": "1890",
+	"app_version": "1894",
 	"description": "Super-complex origami design made easy!",
 	"keywords": [
 		"origami",
@@ -100,6 +100,7 @@
 		"find-cache-directory": "^6.0.0",
 		"gulp": "^5.0.1",
 		"gulp-fontawesome": "^1.1.0",
+		"gulp-sftp": "^0.1.5",
 		"gulp-through2": "^1.1.0",
 		"html-minifier-loader": "^1.4.1",
 		"ifdef-loader": "^2.3.2",

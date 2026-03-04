@@ -38,20 +38,55 @@ vector<Pt> annulus(const int r, const double cx, const double cy) {
 	return result;
 }
 
-vector<double> branch(const int branch_at, const BranchingContext &context) {
+vector<double> branch(const int branch_at, int branch_at2, BranchingContext &context, int &depth) { // NOLINT
 	vector<vector<double>> children;
-	auto [x, y] = context.get(branch_at);
+	auto p = context.get(branch_at);
 
-	// Try branching towards the 4 closest grid points.
-	for(int q = 0; q < 4; q++) {
-		auto xk = context.branch(x, y, branch_at, q);
-		if(xk.empty()) continue;
-		auto cons = context.generate_constraints(xk);
-		auto sol = pack(context.to_double(xk), cons, nullptr);
-		if(sol.success) {
-			children.push_back(sol.x);
+	if(branch_at2 >= 0) {
+		// In parallel mode, we can handle 2 points at once!
+		auto p2 = context.get(branch_at2);
+
+#pragma omp parallel for
+		for(int q = 0; q < 16; q++) {
+			// This part will likely fail if p and p2 are close,
+			// but in all cases we still have our fallback
+			auto xk = context.branch(nullptr, p.x, p.y, branch_at, q >> 2);
+			if(xk.empty()) continue;
+			auto xk2 = context.branch(&xk, p2.x, p2.y, branch_at2, q % 4);
+			if(xk2.empty()) continue;
+
+			auto cons = context.generate_constraints(xk2);
+			auto sol = pack(context.to_double(xk2), cons, nullptr);
+			if(sol.success) {
+#pragma omp critical
+				{
+					children.push_back(sol.x);
+				}
+			}
+		}
+		if(children.empty()) { // fallback
+			context.fixed[branch_at2] = false;
+			branch_at2 = -1;
 		}
 	}
+
+	if(branch_at2 == -1) {
+// Try branching towards the 4 closest grid points.
+#pragma omp parallel for
+		for(int q = 0; q < 4; q++) {
+			auto xk = context.branch(nullptr, p.x, p.y, branch_at, q);
+			if(xk.empty()) continue;
+			auto cons = context.generate_constraints(xk);
+			auto sol = pack(context.to_double(xk), cons, nullptr);
+			if(sol.success) {
+#pragma omp critical
+				{
+					children.push_back(sol.x);
+				}
+			}
+		}
+	}
+
 	if(!children.empty()) {
 		// As a greedy algorithm, we don't do any backtracking.
 		// We always navigate only the most promising branch.
@@ -59,32 +94,54 @@ vector<double> branch(const int branch_at, const BranchingContext &context) {
 		for(int i = 1; i < children.size(); i++) {
 			if(children[i].back() > children[n].back()) n = i;
 		}
+		depth += branch_at2 > -1 ? 2 : 1;
 		return children[n];
 	}
 
 	// In some cases, the flap to be branched could get stuck by fixed flaps,
 	// and none of the branch direction works.
 	// The best we can do then is to find the closest spot that does work and continue.
-	auto rx = round(x);
-	auto ry = round(y);
+	// In this mode we always handle just one point.
+	auto rx = round(p.x);
+	auto ry = round(p.y);
 	int r = 1;
+	children.resize(0);
 	while(true) {
 		auto pts = annulus(r, rx, ry);
 		// ranges::sort doesn't work with VS Code IntelliSense for some reason,
 		// so we keep using the old-fashioned sort for now.
-		sort(pts.begin(), pts.end(), [=](const Pt &a, const Pt &b) { // NOLINT
-			return meg(a.x - x, a.y - y) < meg(b.x - x, b.y - y);	 // sorted by the distance to the original point
+		sort(pts.begin(), pts.end(), [=](const Pt &a, const Pt &b) {	  // NOLINT
+			return meg(a.x - p.x, a.y - p.y) < meg(b.x - p.x, b.y - p.y); // sorted by the distance to the original point
 		});
-		for(auto &pt: pts) {
-			auto xk = context.make_xk(pt.x, pt.y, branch_at);
+		const int size = pts.size();
+
+#pragma omp parallel for
+		for(int i = 0; i < size; i++) {
+			if(!children.empty()) continue;
+			auto &pt = pts[i];
+			auto xk = context.make_xk(nullptr, pt.x, pt.y, branch_at);
 			if(xk.empty()) continue;
 			auto cons = context.generate_constraints(xk);
 			auto sol = pack(context.to_double(xk), cons, nullptr);
 			if(sol.success) {
-				cout << "Fallback [" << pt.x << ", " << pt.y << "]" << endl;
-				return sol.x;
+#pragma omp critical
+				{
+					cout << "Fallback [" << pt.x << ", " << pt.y << "]" << endl;
+#ifdef __EMSCRIPTEN_PTHREADS__
+					children.push_back(sol.x);
+#else
+					depth++;
+					return sol.x;
+#endif
+				}
 			}
 		}
+#ifdef __EMSCRIPTEN_PTHREADS__
+		if(!children.empty()) {
+			depth++;
+			return children[0];
+		}
+#endif
 		r++;
 	}
 }
@@ -96,8 +153,14 @@ vector<int> greedy_solve_integer(const vector<double> &x0, Hierarchy *hierarchy)
 		cout << R"({"event": "fit", "data": [)" << int_scale(context.solution.back()) << ", " << depth << "]}" << endl;
 		const int branch_at = select_meg(context);
 		context.fixed[branch_at] = true;
-		context.solution = context.to_grid(branch(branch_at, context));
-		depth++;
+		int branch_at2 = -1;
+#ifdef __EMSCRIPTEN_PTHREADS__
+		if(depth < Shared::flap_count - 1) {
+			branch_at2 = select_meg(context);
+			context.fixed[branch_at2] = true;
+		}
+#endif
+		context.solution = context.to_grid(branch(branch_at, branch_at2, context, depth));
 
 		if(check_interrupt()) break;
 	}

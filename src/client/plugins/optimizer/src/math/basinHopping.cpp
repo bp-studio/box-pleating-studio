@@ -12,7 +12,7 @@
  */
 class Storage {
   public:
-	Storage(OptimizeResult &minres) : _minres(minres) {}
+	Storage(OptimizeResult &minres): _minres(minres) {}
 
 	bool update(OptimizeResult &minres) {
 		if(minres.success && (minres.fun < _minres.fun || !_minres.success)) {
@@ -42,7 +42,7 @@ class Storage {
  */
 class RandomDisplacement {
   public:
-	RandomDisplacement(const double stepsize = 0.5) : stepsize(stepsize) {}
+	RandomDisplacement(const double stepsize = 0.5): stepsize(stepsize) {}
 
 	void displace(vector<double> &x) const {
 		// We strategically leave the last one untouched.
@@ -219,7 +219,7 @@ class BasinHoppingRunner {
 	}
 };
 
-OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, const int trials, const BasinHoppingParams &params, const double best_s) {
+OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, const int trials, const BasinHoppingParams &params, const double best_s, bool &interrupted) {
 	// set up
 	auto wrapped_minimizer = MinimizerWrapper(&pack, &cons);
 	auto displacer = RandomDisplacement(params.stepsize);
@@ -229,22 +229,31 @@ OptimizeResult basin_hopping(vector<double> x0, const ConstraintList &cons, cons
 
 	// start main iteration loop
 	int count = 0;
+	int best = 0;
 	for(int i = 0; i < params.niter; i++) {
 		auto new_global_min = bh.one_cycle();
 
 		// progress report
 		auto &min_result = bh.storage->get_lowest();
-		auto best = int_scale(min(best_s, get_scale(min_result.x)));
-		cout << R"({"event": "cont", "data": [)" << trials << ", " << i << ", " << best << ", " << count << "]}" << endl;
-		if(check_interrupt()) {
-			min_result.interrupted = true;
-			break;
+		best = int_scale(min(best_s, get_scale(min_result.x)));
+#pragma omp critical
+		{
+			cout << R"({"event": "cont", "data": [)" << trials << ", " << i << ", " << best << ", " << count << "]}" << endl;
 		}
+		if(check_interrupt()) {
+			interrupted = true;
+		}
+
+		if(interrupted) break;
 
 		count++;
 		if(new_global_min) count = 0;
 		else if(count > params.niter_success) break;
 	}
 
+#pragma omp critical
+	{
+		cout << R"({"event": "cont", "data": [)" << trials << ", " << 50 << ", " << best << ", " << count << "]}" << endl;
+	}
 	return bh.storage->get_lowest();
 }

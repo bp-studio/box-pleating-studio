@@ -5,7 +5,7 @@
 				<div class="modal-header h4 d-flex">
 					<div class="modal-title flex-grow-1">{{ $t("plugin.optimizer._") }}</div>
 					<a class="text-info" href="https://bp-studio.github.io/manual.html#layout-optimization" target="_blank">
-						<i class="fa-regular fa-circle-question"/>
+						<i class="fa-regular fa-circle-question" />
 					</a>
 				</div>
 				<div class="modal-body" v-if="support">
@@ -18,8 +18,8 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder"
-							>{{ $t("plugin.optimizer.layout._") }}</label>
+							<label class="col-12 col-sm-4 mb-2 col-form-label fw-bolder">{{ $t("plugin.optimizer.layout._")
+							}}</label>
 							<div class="col mb-2">
 								<select class="form-select" v-model="options.layout">
 									<option value="view">{{ $t("plugin.optimizer.layout.view") }}</option>
@@ -37,6 +37,12 @@
 								</div>
 							</div>
 						</div>
+						<div class="row" v-if="studioService.mpSupported">
+							<div class="d-none d-sm-block col-4"/>
+							<div class="col">
+								⚡ {{ $t('plugin.optimizer.mp') }}
+							</div>
+						</div>
 					</div>
 					<OptProgress v-else-if="state.stage == Stage.initializing" :value="state.minor" :max="1" noSkip percentage>
 						Initializing...
@@ -48,13 +54,14 @@
 						Generating candidate layouts...
 					</OptProgress>
 					<div v-else-if="state.stage == Stage.continuous">
-						<OptProgress v-if="options.layout == 'random'" :value="(state.major - 1) * 50 + state.minor"
-							:max="options.random * 50" percentage>
-							Trying random layout #{{ state.major }}, step {{ state.minor }}<span v-if="state.best < 8192"> (Best
+						<OptProgress v-if="options.layout == 'random'" :value="randomOverallProgress"
+							:max="options.random * MAX_STEP" percentage>
+							Trying random layout #{{ state.range }}, step {{ state.minor }}<span v-if="state.best < MAX_SIZE">
+								(Best
 								size {{ state.best }})</span>...
 						</OptProgress>
-						<OptProgress v-else-if="options.useBH" :value="state.minor" :max="50">
-							Pre-solving<span v-if="state.best < 8192 && state.best > 0"> (Best size {{ state.best
+						<OptProgress v-else-if="options.useBH" :value="state.minor" :max="MAX_STEP">
+							Pre-solving<span v-if="state.best < MAX_SIZE && state.best > 0"> (Best size {{ state.best
 							}})</span>...
 						</OptProgress>
 					</div>
@@ -105,6 +112,7 @@
 	import Number from "@/gadgets/form/number.vue";
 	import OptProgress, { contextKey } from "./components/optProgress.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
+	import studioService from "app/services/studioService";
 
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";
 
@@ -127,6 +135,7 @@
 	const state = reactive({
 		stage: Stage.stopped,
 		major: 0,
+		range: "",
 		minor: 0,
 		best: 0,
 		flaps: 0,
@@ -143,6 +152,12 @@
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		return Math.log(n + 1) * 10;
 	}
+
+	const randomProgress: number[] = [];
+	const randomOverallProgress = shallowRef(0);
+
+	const MAX_SIZE = 8192;
+	const MAX_STEP = 50;
 
 	function callback(event: OptimizerEvent): void {
 		if(state.stopping || !state.running) return;
@@ -165,8 +180,7 @@
 				[state.minor, state.major] = event.data;
 				break;
 			case "cont":
-				updateState(Stage.continuous);
-				[state.major, state.minor, state.best] = event.data;
+				handleCont(event.data);
 				break;
 			case "fit":
 				updateState(Stage.integral);
@@ -174,6 +188,36 @@
 				break;
 			default:
 		}
+	}
+
+	/** Logic for handling random layout parallel progress. */
+	function handleCont(data: [number, number, number]) {
+		updateState(Stage.continuous);
+		const [major, minor, best] = data;
+		if(options.layout == "random") {
+			randomProgress[major] = minor;
+			const keysInProgress: number[] = [];
+			let total = 0, inProgress = 0;
+			for(const [key, value] of randomProgress.entries()) {
+				if(typeof value != "number") continue;
+				if(value < MAX_STEP) {
+					keysInProgress.push(key);
+					inProgress += value;
+				}
+				total += value;
+			}
+			randomOverallProgress.value = total;
+
+			// We display the average of progress here
+			state.minor = Math.floor(inProgress / keysInProgress.length);
+
+			if(keysInProgress.length == 1) state.range = keysInProgress[0].toString();
+			else state.range = Math.min(...keysInProgress) + "-" + Math.max(...keysInProgress);
+		} else {
+			state.major = major;
+			state.minor = minor;
+		}
+		state.best = Math.min(best, state.best);
 	}
 
 	function updateState(newState: Stage): void {
@@ -203,6 +247,9 @@
 		state.running = true;
 		state.minor = 0;
 		state.stage = Stage.initializing;
+		state.best = MAX_SIZE;
+		randomProgress.length = 0;
+		randomOverallProgress.value = 0;
 		try {
 			await Workspace.optimize(options, callback);
 			hide();

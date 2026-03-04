@@ -69,9 +69,11 @@ int estimate_total(const int target, const double growth, const int rounds) {
 			vectors = floor(num);
 		} else {
 			int next_vec = 0;
-			int num_per_vec = round(num / vectors);
+			int num_per_vec = ceil(num / vectors);
 			for(int j = 0; j < vectors; j++) {
-				next_vec += min(num_per_vec, target - next_vec);
+				int n = min(num_per_vec, target - num_per_vec * j);
+				if(n <= 0) continue;
+				next_vec += n;
 			}
 			vectors = next_vec;
 		}
@@ -83,7 +85,7 @@ int estimate_total(const int target, const double growth, const int rounds) {
 
 class GenerateContext {
   public:
-	GenerateContext(int total) : total(total) {}
+	GenerateContext(int total): total(total) {}
 
 	// We need the following because ConstraintList is holding unique_ptr
 	GenerateContext(const GenerateContext &) = delete;
@@ -96,8 +98,11 @@ class GenerateContext {
 	}
 
 	void callback() {
-		cout << R"({"event": "candidate", "data": [)" << generated << ", " << total << "]}" << endl;
-		generated++;
+#pragma omp critical
+		{
+			cout << R"({"event": "candidate", "data": [)" << generated << ", " << total << "]}" << endl;
+			generated++;
+		}
 	}
 
 	const Hierarchy *hierarchy;
@@ -144,12 +149,19 @@ VecList generate_candidate(const int target, GenerateContext &context, const vec
 
 VecList generate_next_level(const VecList &vectors, GenerateContext &context, const Hierarchy &last_hierarchy, const double num, const int target) {
 	VecList next_level;
-	int num_per_vec = round(num / vectors.size());
-	for(const auto &vec: vectors) {
+	const int num_per_vec = ceil(num / vectors.size());
+	const int size = vectors.size();
+#pragma omp parallel for
+	for(int i = 0; i < size; i++) {
+		const auto &vec = vectors[i];
+		auto n = min(num_per_vec, target - i * num_per_vec);
+		if(n <= 0) continue;
 		auto circles = make_circles(vec, *context.hierarchy, last_hierarchy);
-		auto n = min(num_per_vec, target - (int)next_level.size());
 		auto candidates = generate_candidate(n, context, &circles);
-		next_level.insert(next_level.end(), candidates.begin(), candidates.end());
+#pragma omp critical
+		{
+			next_level.insert(next_level.end(), candidates.begin(), candidates.end());
+		}
 	}
 	return next_level;
 }

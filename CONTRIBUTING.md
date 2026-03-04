@@ -36,7 +36,9 @@ The BP Studio optimizer is written in C++. Pre-compiled WASM binaries are alread
 - [Emscripten](https://emscripten.org/), and make sure that `emcc` is available in PATH.\
 	You may also need to change `configurations.compilerPath` in the
 	[.vscode/c_cpp_properties.json](./.vscode/c_cpp_properties.json)
-	file to reflect the location of your Emscripten installation.
+	file to reflect the location of your Emscripten installation.\
+	**Note: For now we're locking the Emscripten version to 4.0.7,
+	and it is necessary that you use this exact version to compile the optimizer.**
 - [GNU make](https://community.chocolatey.org/packages/make), if you're on Windows.\
 	(Our makefile should work on all desktop platforms regardlessly.)
 
@@ -45,6 +47,7 @@ Then you can compile the Optimizer by:
 ```bash
 make      # For debug build used in unit tests
 make dist # For dist (release) build used in the actual app
+make mp   # For the multiple processing build, also needed in the app
 ```
 
 For more about the optimizer, see [README](src/client/plugins/optimizer/src/README.md).

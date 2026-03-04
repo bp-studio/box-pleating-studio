@@ -1,20 +1,32 @@
 ///<reference lib="WebWorker" />
 
-import module from "lib/optimizer/dist/optimizer";
 import { Bridge } from "./bridge";
 
 import type { OptimizerRequest } from "./types";
 
-const asyncMode = typeof SharedArrayBuffer == "undefined";
+// Decide the wasm build to use
+const module = checkMPSupport() ?
+	await import("lib/optimizer/dist_mp/optimizer") :
+	await import("lib/optimizer/dist/optimizer");
 
 try {
-	const instance = await module({
+	// We explicitly pass this to Emscripten, preventing circular reference.
+	const url = new URL("lib/optimizer/dist_mp/optimizer", import.meta.url).toString();
+
+	const instance = await module.default({
+		mainScriptUrlOrBlob: url,
+
 		print: (msg: string) => {
-			if(msg.startsWith("NLopt")) postMessage({ event: "init" });
-			else if(msg.startsWith("{")) postMessage(msg); // Leave the parsing to the main thread
-			/// #if DEBUG
-			else console.log(msg);
-			/// #endif
+			if(msg.startsWith("NLopt")) {
+				console.log(msg);
+				postMessage({ event: "init" });
+			} else if(msg.startsWith("{")) {
+				postMessage(msg); // Leave the parsing to the main thread
+			} else {
+				/// #if DEBUG
+				console.log(msg);
+				/// #endif
+			}
 		},
 		printErr: (err: string) => postMessage({ error: err }),
 
@@ -33,7 +45,7 @@ try {
 			return result;
 		},
 	});
-	const bridge = new Bridge(instance, asyncMode);
+	const bridge = new Bridge(instance);
 
 	let interruptResolve = (_: boolean): void => { /* */ };
 	let buffer: Uint8Array<ArrayBufferLike>;
@@ -69,4 +81,31 @@ try {
 	const msg = e instanceof Error ? e.message : "unknown error";
 	console.log(msg);
 	postMessage({ event: "initError" });
+}
+
+/**
+ * Check if multiple processing can be supported.
+ */
+function checkMPSupport(): boolean {
+	// SharedArrayBuffer is required
+	if(typeof SharedArrayBuffer === "undefined") return false;
+
+	// SimpleOMP uses hardwareConcurrency as default thread pool size,
+	// so it is necessary that it has a valid value greater than 1.
+	if(!(navigator.hardwareConcurrency > 1)) return false;
+
+	try {
+		// check if nested worker is supported
+		const blob = new Blob(["self.onmessage = () => {}"], { type: "application/javascript" });
+		const url = URL.createObjectURL(blob);
+		const worker = new Worker(url);
+		worker.terminate();
+
+		// Inform the UI that MP is supported
+		postMessage({ event: "mp" });
+
+		return true;
+	} catch {
+		return false;
+	}
 }

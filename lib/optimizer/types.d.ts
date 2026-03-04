@@ -2,7 +2,7 @@
 /// <reference path="../../src/shared/types/utility.d.ts" />
 
 export interface OptimizerInstance extends EmscriptenModule {
-	init(async: boolean): void;
+	init(): void;
 
 	solve(data: object, seed: number): Awaitable<EmVector>;
 }

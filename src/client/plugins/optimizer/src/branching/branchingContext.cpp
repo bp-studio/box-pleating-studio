@@ -54,13 +54,13 @@ Pt BranchingContext::get(const int i) const {
 	};
 }
 
-vector<double> BranchingContext::branch(const double x, const double y, const int i, const int q) const {
+vector<double> BranchingContext::branch(const vector<double> *vec, const double x, const double y, const int i, const int q) const {
 	if(isInteger(x) && q % 2 || isInteger(y) && q > 1) return {};
-	return make_xk(_branch(x, q & 1), _branch(y, q >> 1), i);
+	return make_xk(vec, _branch(x, q & 1), _branch(y, q >> 1), i);
 }
 
-vector<double> BranchingContext::make_xk(const double x, const double y, const int i) const {
-	auto xk = solution; // copy
+vector<double> BranchingContext::make_xk(const vector<double> *vec, const double x, const double y, const int i) const {
+	auto xk = vec == nullptr ? solution : *vec; // copy
 	xk[i * 2] = x;
 	xk[i * 2 + 1] = y;
 	if(!hierarchy->check(xk, i, fixed)) return {};

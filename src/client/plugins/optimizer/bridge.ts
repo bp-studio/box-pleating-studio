@@ -12,9 +12,9 @@ export class Bridge {
 
 	private _instance: OptimizerInstance;
 
-	constructor(instance: OptimizerInstance, async: boolean = false) {
+	constructor(instance: OptimizerInstance) {
 		this._instance = instance;
-		instance.init(async);
+		instance.init();
 	}
 
 	public async solve(request: OptimizerRequest, seed?: number): Promise<OptimizerResult> {

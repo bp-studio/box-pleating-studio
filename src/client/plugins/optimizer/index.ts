@@ -1,3 +1,5 @@
+import { shallowRef } from "vue";
+
 import { MAX_SHEET_SIZE } from "shared/types/constants";
 import { hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
 import { display } from "client/screen/display";
@@ -8,6 +10,8 @@ import type { JFlap, JProject, JSheet, NodeId } from "shared/json";
 import type { Project } from "client/project/project";
 
 let workerReady: PromiseWithResolvers<Worker>;
+
+export const mpSupported = shallowRef(false);
 
 const interruptBuffer = hasSharedArrayBuffer ? new Uint8Array(new SharedArrayBuffer(1)) : null;
 
@@ -28,6 +32,9 @@ function initOptimizerWorker(): void {
 			else workerReady.reject(new Error("initError"));
 		}
 		if("event" in data) {
+			if(data.event == "mp") {
+				mpSupported.value = true;
+			}
 			if(data.event == "initError") {
 				workerReady.reject(new Error("initError"));
 			}
