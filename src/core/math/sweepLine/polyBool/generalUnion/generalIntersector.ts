@@ -12,6 +12,9 @@ import type { OverlapIntersector } from "../../clip/overlapIntersector";
  * 2. Subdivision guard: prevents creating near-degenerate segments whose
  *    unreliable slope calculations would make the status BST comparator
  *    inconsistent, ultimately leading to lookup failures.
+ *
+ * The 10x factor over EPSILON is sufficient for both use cases and
+ * remains negligible relative to the coordinate scale of this application.
  */
 const RELAXED_EPSILON = 1e-9;
 

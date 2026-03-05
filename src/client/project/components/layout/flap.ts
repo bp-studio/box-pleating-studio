@@ -9,7 +9,7 @@ import { Independent } from "client/base/independent";
 import { Direction, quadrantNumber } from "shared/types/direction";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { SelectionController } from "client/controllers/selectionController";
 import { constrainFlap, getDots } from "../grid/constrain";
 
@@ -42,8 +42,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	public readonly id: NodeId;
 
 	public $graphics: GraphicsData;
-	@shallowRef private accessor _width: number = 0;
-	@shallowRef private accessor _height: number = 0;
+	private readonly _width = shallowRef(0);
+	private readonly _height = shallowRef(0);
 
 	/**
 	 * The parameters used for the drawing process.
@@ -78,8 +78,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this.$tag = "f" + json.id;
 		this.id = json.id;
 		this._location = { x: json.x, y: json.y };
-		this._width = json.width;
-		this._height = json.height;
+		this._width.value = json.width;
+		this._height.value = json.height;
 		this.$graphics = graphics;
 		this.$vertex = vertex;
 		this.$edge = edge;
@@ -102,8 +102,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 			id: this.id,
 			x: this._location.x,
 			y: this._location.y,
-			width: this._width,
-			height: this._height,
+			width: this._width.value,
+			height: this._height.value,
 		};
 	}
 
@@ -133,12 +133,12 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** The height of the flap. */
 	public get height(): number {
-		return this._height;
+		return this._height.value;
 	}
 	public set height(v: number) {
-		if(v < 0 || !this._testResize(this._width, v)) return;
-		const oldValue = this._height;
-		this._height = v;
+		if(v < 0 || !this._testResize(this._width.value, v)) return;
+		const oldValue = this._height.value;
+		this._height.value = v;
 		this.$project.design.$batchUpdateManager.$addFlap(this,
 			() => this.$project.history.$fieldChange(this, "height", oldValue, v, false)
 		);
@@ -146,12 +146,12 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	/** The width of the flap. */
 	public get width(): number {
-		return this._width;
+		return this._width.value;
 	}
 	public set width(v: number) {
-		if(v < 0 || !this._testResize(v, this._height)) return;
-		const oldValue = this._width;
-		this._width = v;
+		if(v < 0 || !this._testResize(v, this._height.value)) return;
+		const oldValue = this._width.value;
+		this._width.value = v;
 		this.$project.design.$batchUpdateManager.$addFlap(this,
 			() => this.$project.history.$fieldChange(this, "width", oldValue, v, false)
 		);
@@ -184,15 +184,15 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		return constrainFlap(p => this._sheet.grid.$constrain(p), this._location, this._width, this.height, v);
+		return constrainFlap(p => this._sheet.grid.$constrain(p), this._location, this._width.value, this.height, v);
 	}
 
 	public $testGrid(grid: Grid): boolean {
-		return this._testResize(this._width, this._height, grid);
+		return this._testResize(this._width.value, this._height.value, grid);
 	}
 
 	public override $anchors(): IPoint[] {
-		return getDots(this._location, this._width, this._height);
+		return getDots(this._location, this._width.value, this._height.value);
 	}
 
 	public $sync(p: IPoint): Promise<void> {
@@ -202,12 +202,12 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	/** Manipulate by internal functions instead of by UI. */
 	public $manipulate(x: number, y: number, width: number, height: number): void {
 		const location = { x, y };
-		const w = this._width;
-		const h = this._height;
+		const w = this._width.value;
+		const h = this._height.value;
 		this._lastLocation = this._location;
 		this._location = location;
-		this._width = width;
-		this._height = height;
+		this._width.value = width;
+		this._height.value = height;
 		this.$project.design.$batchUpdateManager.$addFlap(this, () => {
 			if(w != width) this.$project.history.$fieldChange(this, "width", w, width, false);
 			if(h != height) this.$project.history.$fieldChange(this, "height", h, height, false);

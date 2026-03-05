@@ -1,7 +1,8 @@
 import { Circle } from "@pixi/math";
 
 import { Layer } from "client/shared/layers";
-import { field, shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
+import { Field } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
 import { Label } from "client/utils/label";
 import { Independent } from "client/base/independent";
@@ -39,16 +40,24 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	 * The movement of {@link Vertex Vertices} does not concerns the Core,
 	 * so we directly made it a {@link shallowRef}.
 	 */
-	@shallowRef public override accessor _location: IPoint;
+	private readonly _locationRef = shallowRef<IPoint>({ x: 0, y: 0 });
+	public override get _location(): IPoint { return this._locationRef.value; }
+	public override set _location(v: IPoint) { this._locationRef.value = v; }
 
 	/**
 	 * Several UI depends on this value, so it is reactive.
 	 */
-	@shallowRef public accessor $degree: number = 0;
+	private readonly _degree = shallowRef(0);
+	public get $degree(): number { return this._degree.value; }
+	public set $degree(v: number) { this._degree.value = v; }
 
-	@shallowRef public accessor $dist: number = 0;
+	private readonly _dist = shallowRef(0);
+	public get $dist(): number { return this._dist.value; }
+	public set $dist(v: number) { this._dist.value = v; }
 
-	@shallowRef public accessor $height: number = 0;
+	private readonly _height = shallowRef(0);
+	public get $height(): number { return this._height.value; }
+	public set $height(v: number) { this._height.value = v; }
 
 	private readonly _tree: Tree;
 	private readonly _dot: SmoothGraphics;
@@ -69,7 +78,7 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this.id = json.id;
 		this.$isNew = json.isNew || false;
 		this._location = { x: json.x, y: json.y };
-		this.name = json.name;
+		this._name = new Field(this, "name", json.name);
 
 		this._dot = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.vertex]);
 		this.$setupHit(this._dot, new Circle(0, 0, style.vertex.size * 2));
@@ -98,7 +107,9 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@field public accessor name: string;
+	private _name!: Field<string>;
+	public get name(): string { return this._name.value; }
+	public set name(v: string) { this._name.value = v; }
 
 	public async addLeaf(length: number): Promise<void> {
 		if(length > this.maxNewLeafLength) return;

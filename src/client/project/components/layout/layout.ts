@@ -2,7 +2,7 @@
 import { AlphaFilter } from "@pixi/filter-alpha";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { River } from "./river";
 import { Sheet, getRelativePoint } from "../sheet";
 import { Layer } from "client/shared/layers";
@@ -35,10 +35,21 @@ import type { JEdge, JEdgeBase, JFlap, JLayout, JSheet, JStretch, JViewport, Nod
 //=================================================================
 export class Layout extends View implements ISerializable<JLayout>, IEditor {
 
-	@shallowRef public accessor flapCount: number = 0;
-	@shallowRef public accessor riverCount: number = 0;
-	@shallowRef public accessor invalidCount: number = 0;
-	@shallowRef public accessor patternNotFound: boolean = false;
+	private readonly _flapCount = shallowRef(0);
+	public get flapCount(): number { return this._flapCount.value; }
+	public set flapCount(v: number) { this._flapCount.value = v; }
+
+	private readonly _riverCount = shallowRef(0);
+	public get riverCount(): number { return this._riverCount.value; }
+	public set riverCount(v: number) { this._riverCount.value = v; }
+
+	private readonly _invalidCount = shallowRef(0);
+	public get invalidCount(): number { return this._invalidCount.value; }
+	public set invalidCount(v: number) { this._invalidCount.value = v; }
+
+	private readonly _patternNotFound = shallowRef(false);
+	public get patternNotFound(): boolean { return this._patternNotFound.value; }
+	public set patternNotFound(v: boolean) { this._patternNotFound.value = v; }
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;

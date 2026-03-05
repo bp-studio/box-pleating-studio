@@ -38,8 +38,8 @@ export namespace ScrollController {
 	export function $init(): void {
 		display.scrollView.$onScroll(p => {
 			if(_scrolling) return;
-			const sheet = ProjectService.sheet.value!;
-			sheet.$scroll = p;
+			const sheet = ProjectService.sheet.value;
+			if(sheet) sheet.$scroll = p;
 		});
 
 		// Restore the scroll position as we switch the view

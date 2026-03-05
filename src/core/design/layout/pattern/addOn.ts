@@ -1,5 +1,5 @@
 import { Region } from "./region";
-import { cache } from "core/utils/cache";
+import { Cache } from "core/utils/cache";
 import { Vector } from "core/math/geometry/vector";
 import { Point } from "core/math/geometry/point";
 import { toLines } from "core/math/geometry/rationalPath";
@@ -26,13 +26,11 @@ export class AddOn extends Region implements JAddOn {
 		this.dir = data.dir;
 	}
 
-	@cache public get $shape(): IRegionShape {
+	public readonly $shape = new Cache<IRegionShape>(() => {
 		const contour = this.contour.map(p => new Point(p));
 		const ridges = toLines(contour);
 		return { contour, ridges };
-	}
+	});
 
-	@cache public get $direction(): Vector {
-		return new Vector(this.dir).$reduceToInt();
-	}
+	public readonly $direction = new Cache(() => new Vector(this.dir).$reduceToInt());
 }

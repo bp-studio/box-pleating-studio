@@ -24,7 +24,7 @@ export class MoveCommand extends Command implements JMoveCommand {
 		return new MoveCommand(target.$project, {
 			tag: target.$tag,
 			old: oldLocation || clone(target.$location),
-			new: newLocation,
+			new: clone(newLocation),
 		});
 	}
 
@@ -44,12 +44,14 @@ export class MoveCommand extends Command implements JMoveCommand {
 	}
 
 	public $canAddTo(command: Command): boolean {
-		return command instanceof MoveCommand && command.tag == this.tag &&
+		const result = command instanceof MoveCommand && command.tag == this.tag &&
 			// Candidate command must be immediately after self
 			command.new.x == this.old.x && command.new.y == this.old.y &&
 			// In case of keyboard moving, it must roughly towards the same direction.
 			// This solves the issue of returning to the origin.
 			(this._project.$isDragging || this._dx * command._dx >= 0 && this._dy * command._dy >= 0);
+		console.log("canAddToMove", result, this._project.$isDragging, JSON.stringify((command as MoveCommand).new), JSON.stringify(this.old), JSON.stringify(this.new));
+		return result;
 	}
 
 	public $addTo(command: Command): void {

@@ -90,7 +90,7 @@ export default function() {
 					const gadget = device.$gadgets[0];
 					pieceCount += gadget.pieces.length;
 					if(gadget.pieces.length == 2) {
-						expect(gadget.$slack).to.contain(0.5);
+						expect(gadget.$slack.value).to.contain(0.5);
 					}
 				}
 				expect(pieceCount).to.equal(3);
@@ -111,7 +111,7 @@ export default function() {
 					const gadget = device.$gadgets[0];
 					pieceCount += gadget.pieces.length;
 					if(gadget.pieces.length == 2) {
-						expect(gadget.$slack).to.contain(0.25);
+						expect(gadget.$slack.value).to.contain(0.25);
 					}
 				}
 				expect(pieceCount).to.equal(3);

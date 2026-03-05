@@ -1,6 +1,6 @@
 import { Point } from "core/math/geometry/point";
 import { JoineeBuilder } from "../joineeBuilder";
-import { cache } from "core/utils/cache";
+import { Cache } from "core/utils/cache";
 import { Gadget } from "../../pattern/gadget";
 import { Fraction } from "core/math/fraction";
 import { Vector } from "core/math/geometry/vector";
@@ -98,7 +98,7 @@ export abstract class JoinLogic {
 	// Protected members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@cache protected get _deltaPt(): Point {
+	protected readonly _deltaPt = new Cache(() => {
 		const { org } = this.data;
 		const { j1, j2, f } = this;
 		const { $isClockwise: cw, $intersectionDist: $intDist } = this.joiner;
@@ -106,7 +106,7 @@ export abstract class JoinLogic {
 			org.x + ($intDist - (cw ? j2.p : j1.p).ox) * f,
 			org.y + ($intDist - (cw ? j1.p : j2.p).oy) * f
 		);
-	}
+	});
 
 	/**
 	 * Setup the {@link Piece.detours} for the two {@link Piece}s.
@@ -130,7 +130,7 @@ export abstract class JoinLogic {
 		const { $oriented, $isClockwise: cw } = this.joiner;
 
 		// If the intersection anchor goes beyond the delta point, it fails
-		if(a.x * f > this._deltaPt.x * f) return false;
+		if(a.x * f > this._deltaPt.value.x * f) return false;
 
 		j1.$setupAnchor($oriented != cw, a);
 		j2.$setupAnchor($oriented == cw, a);
@@ -167,8 +167,8 @@ export abstract class JoinLogic {
 	public static debugContour(g1: JGadget, g2: JGadget): void {
 		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 		const pt = new Point(new Fraction(429, 7 as Positive), new Fraction(520, 7 as Positive));
-		const c1 = new Gadget(g1).$contour;
-		const c2 = new Gadget(g2).$contour;
+		const c1 = new Gadget(g1).$contour.value;
+		const c2 = new Gadget(g2).$contour.value;
 		if(c1.some(p => p.eq(pt)) || c2.some(p => p.eq(pt))) {
 			// Paste the result of the following output to debug tools for inspection
 			console.log(JSON.stringify([[c1.map(p => p.$toIPoint())], [c2.map(p => p.$toIPoint())]]));

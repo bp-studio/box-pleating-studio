@@ -5,7 +5,7 @@ import { Rectangle } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import settings from "app/services/settingService";
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { View } from "client/base/view";
 import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
@@ -49,13 +49,16 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	 * We made it {@link shallowRef} for better performance,
 	 * and use {@link Readonly} to ensure that we use different instances each time.
 	 */
-	@shallowRef public accessor $scroll: IPoint = { x: 0, y: 0 };
+	private readonly _scroll = shallowRef<IPoint>({ x: 0, y: 0 });
+	public get $scroll(): IPoint { return this._scroll.value; }
+	public set $scroll(v: IPoint) { this._scroll.value = v; }
 
-	@shallowRef public accessor $zoom: number = FULL_ZOOM;
+	private readonly _zoom = shallowRef(FULL_ZOOM);
+	public get $zoom(): number { return this._zoom.value; }
+	public set $zoom(v: number) { this._zoom.value = v; }
 
-	@shallowRef private accessor _type: GridType;
-
-	@shallowRef private accessor _grid: Grid;
+	private readonly _type = shallowRef<GridType>(GridType.rectangular);
+	private readonly _grid = shallowRef<Grid>(null!);
 
 	/** Top-level container */
 	public readonly $view: Container = new Container();
@@ -107,8 +110,8 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 		this._layers[Layer.sheet].addChild(this._borderGraphics, this._gridGraphics);
 
-		this._type = json?.type ?? GridType.rectangular;
-		this._grid = createGrid(this, this._type, json?.width, json?.height);
+		this._type.value = json?.type ?? GridType.rectangular;
+		this._grid.value = createGrid(this, this._type.value, json?.width, json?.height);
 
 		// Computed no longer requires effect scope since Vue 3.5
 		this.$imageDimension = computed(() => this._imageDimension);
@@ -117,13 +120,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 		this._onDestruct(() => {
 			// GC
-			this._grid.$destruct();
-			this._grid = null!;
+			this._grid.value.$destruct();
+			this._grid.value = null!;
 		});
 	}
 
 	public toJSON(): JSheet {
-		return this._grid.toJSON();
+		return this._grid.value.toJSON();
 	}
 
 	public $getViewport(): JViewport {
@@ -148,10 +151,10 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get type(): GridType {
-		return this._type;
+		return this._type.value;
 	}
 	public set type(v: GridType) {
-		const oldValue = this._type;
+		const oldValue = this._type.value;
 		if(v == oldValue) return;
 		const history = this.$project.history;
 		const locked = history.$isLocked;
@@ -161,14 +164,14 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			grid = createGrid(this, v, prototype.width, prototype.height);
 		} else {
 			history.$destruct(this._toMemento());
-			grid = createGrid(this, v, this._grid.$renderHeight, this._grid.$renderWidth);
+			grid = createGrid(this, v, this._grid.value.$renderHeight, this._grid.value.$renderWidth);
 		}
 
 		// Due to the possible flap moving, the actual switching of grid will have
 		// to wait until the updates are complete, otherwise there will be glitches.
 		this.$project.$onUpdate(() => {
-			this._grid = grid;
-			this._type = v;
+			this._grid.value = grid;
+			this._type.value = v;
 			if(!locked) {
 				history.$construct(this._toMemento());
 				history.$fieldChange(this, "type", oldValue, v);
@@ -177,7 +180,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	public get grid(): Grid {
-		return this._grid;
+		return this._grid.value;
 	}
 
 	public get zoom(): number {
@@ -200,13 +203,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		const viewWidth = display.viewport.width;
 		const viewHeight = display.viewport.height;
 		const factor = this.$zoom / FULL_ZOOM;
-		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.$renderWidth;
-		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.$renderHeight;
+		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.value.$renderWidth;
+		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.value.$renderHeight;
 		return Math.min(horizontalScale, verticalScale);
 	}
 
 	public canSubdivide(): boolean {
-		return this._grid.$canSubdivide();
+		return this._grid.value.$canSubdivide();
 	}
 
 	public subdivide(): void {
@@ -251,9 +254,9 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	private get _imageDimension(): IDimension {
 		const s = ProjectService.scale.value;
-		const { x, y } = this._grid.$offset;
+		const { x, y } = this._grid.value.$offset;
 		const hitMargin = 0.5; // Extra margin is needed, or the vertices on the boundary will be difficult to click
-		const [width, height] = [this._grid.$renderWidth, this._grid.$renderHeight];
+		const [width, height] = [this._grid.value.$renderWidth, this._grid.value.$renderHeight];
 		this.$view.hitArea = new Rectangle(
 			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
 		);
@@ -293,11 +296,11 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		// Draw border
 		this._borderGraphics.clear()
 			.lineStyle(style.border.width * sh, style.border.color);
-		this._grid.$drawBorder(this._borderGraphics);
+		this._grid.value.$drawBorder(this._borderGraphics);
 
 		// Draw layer mask
 		this._mask.clear().beginFill(0);
-		this._grid.$drawBorder(this._mask);
+		this._grid.value.$drawBorder(this._mask);
 		this._mask.endFill();
 
 		// Draw grid lines
@@ -305,7 +308,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		if(this._gridGraphics.visible) {
 			this._gridGraphics.clear()
 				.lineStyle(style.grid.width * sh, style.grid.color);
-			this._grid.$drawGrid(this._gridGraphics);
+			this._grid.value.$drawGrid(this._gridGraphics);
 		}
 	}
 }

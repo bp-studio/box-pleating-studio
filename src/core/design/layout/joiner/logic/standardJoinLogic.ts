@@ -57,7 +57,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 
 		this.data.addOns = [{
 			contour: [D, T, R].map(point => point.$toIPoint()),
-			dir: new Line(T, R).$reflect(p.$direction).$toIPoint(),
+			dir: new Line(T, R).$reflect(p.$direction.value).$toIPoint(),
 		}];
 		this._setupDetour([i ? D : T, R], [i ? T : D, R]);
 		yield this._result(true, R.$dist(T));
@@ -110,7 +110,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		if(!R || !this._setupAnchor(R)) return;
 		this.data.addOns = [{
 			contour: [B, T, R].map(point => point.$toIPoint()),
-			dir: new Line(T, B).$reflect(p.$direction).$toIPoint(),
+			dir: new Line(T, B).$reflect(p.$direction.value).$toIPoint(),
 		}];
 		this._setupDetour(i ? [B] : [T, B], i ? [T, B] : [B]);
 		yield this._result(true, B.$dist(T));

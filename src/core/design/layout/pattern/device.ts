@@ -1,6 +1,6 @@
 import { Gadget } from "./gadget";
 import { AddOn } from "./addOn";
-import { cache } from "core/utils/cache";
+import { Cache } from "core/utils/cache";
 import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
@@ -112,13 +112,13 @@ export class Device implements ISerializable<JDevice> {
 		// Update anchors
 		const result: PerQuadrant<Point>[] = [];
 		for(const g of this.$gadgets) {
-			result.push(g.$anchorMap.map(m => this._transform(m[0])));
+			result.push(g.$anchorMap.value.map(m => this._transform(m[0])));
 		}
 		this.$anchors = result;
 
 		// Clear cache of self and neighbors
 		this._clearCache();
-		this._neighbors.forEach(n => n._clearCache());
+		this._neighbors.value.forEach(n => n._clearCache());
 
 		// Fire event
 		this.$partition.$configuration.$onDeviceMove();
@@ -127,7 +127,7 @@ export class Device implements ISerializable<JDevice> {
 	/** All ridges that should be drawn. */
 	public get $drawRidges(): readonly ILine[] {
 		const ridges = this._ridges.filter(r => r.$type != CornerType.intersection);
-		for(const map of this.$partition.$externalCornerMaps) {
+		for(const map of this.$partition.$externalCornerMaps.value) {
 			if(map.corner.type != CornerType.intersection) continue;
 			const from = this.$resolveCornerMap(map);
 			const to = this.$partition.$getExternalConnectionTarget(from, map);
@@ -149,7 +149,7 @@ export class Device implements ISerializable<JDevice> {
 	public get $axisParallels(): readonly ILine[] {
 		const result: Line[] = [];
 		for(const r of this._regions) {
-			for(const l of r.$axisParallels) {
+			for(const l of r.$axisParallels.value) {
 				result.push(this._transform(l));
 			}
 		}
@@ -159,7 +159,7 @@ export class Device implements ISerializable<JDevice> {
 	/** Contours for the devices. Used for drawing selection shade. */
 	public get $contour(): readonly Contour[] {
 		return this._regions.map(r => ({
-			outer: toPath(r.$shape.contour.map(p => this._transform(p))),
+			outer: toPath(r.$shape.value.contour.map(p => this._transform(p))),
 		}));
 	}
 
@@ -167,14 +167,14 @@ export class Device implements ISerializable<JDevice> {
 	public $getDraggingRange(): readonly [number, number] {
 		const fx = this.$pattern.$config.$repo.$f.x;
 		const result = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY] as [number, number];
-		for(const c of this.$partition.$constraints) {
+		for(const c of this.$partition.$constraints.value) {
 			const isOut = c.corner.type != CornerType.socket;
 			const q = isOut ? c.anchorIndex : opposite(c.corner.q!);
 			const f = fx * (q == 0 ? -1 : 1);
 			const target = this.$pattern.$getConnectionTarget(c.corner as JConnection);
-			const selfSlack = this.$gadgets[c.overlapIndex].$slack[c.anchorIndex];
+			const selfSlack = this.$gadgets[c.overlapIndex].$slack.value[c.anchorIndex];
 			const targetSlack = c.corner.e !== undefined && c.corner.e < 0 ?
-				this.$pattern.$gadgets[convertIndex(c.corner.e)].$slack[c.corner.q!] : 0;
+				this.$pattern.$gadgets[convertIndex(c.corner.e)].$slack.value[c.corner.q!] : 0;
 			const slack = isOut && c.corner.type !== CornerType.internal ? selfSlack : targetSlack + selfSlack;
 			const bound = target.x - this.$resolveCornerMap(c).x - slack * f;
 			if(f > 0 && result[1] > bound) result[1] = bound;
@@ -214,7 +214,7 @@ export class Device implements ISerializable<JDevice> {
 	/** All ridges after considering overlapping with neighbors. */
 	private get _ridges(): readonly Ridge[] {
 		if(this._ridgeCache) return this._ridgeCache;
-		const neighborRidges = this._neighbors.flatMap(g => g._rawRidges);
+		const neighborRidges = this._neighbors.value.flatMap(g => g._rawRidges);
 		return this._ridgeCache = Line.$subtract(this._rawRidges, neighborRidges);
 	}
 
@@ -222,28 +222,28 @@ export class Device implements ISerializable<JDevice> {
 	 * Ridges of the {@link Region}s before transformation.
 	 * The result is constant, so it is cached.
 	 */
-	@cache private get _innerRidges(): readonly Ridge[] {
+	private readonly _innerRidges = new Cache(() => {
 		const result: Line[] = [];
 		for(const region of this._regions) {
 			const parallelRegions = this._regions.filter(
-				q => q != region && q.$direction.$parallel(region.$direction)
+				q => q != region && q.$direction.value.$parallel(region.$direction.value)
 			);
 
 			// Ridges that are perpendicular to the axis-parallel creases
 			// should not be eliminated (this happens in meandering)
 			const lines = parallelRegions.flatMap(
-				q => q.$shape.ridges.filter(l => !l.$perpendicular(q.$direction))
+				q => q.$shape.value.ridges.filter(l => !l.$perpendicular(q.$direction.value))
 			);
 
-			result.push(...Line.$subtract(region.$shape.ridges, lines));
+			result.push(...Line.$subtract(region.$shape.value.ridges, lines));
 		}
 		return Line.$distinct(result);
-	}
+	});
 
 	/**
 	 * All neighboring {@link Device}s.
 	 */
-	@cache private get _neighbors(): readonly Device[] {
+	private readonly _neighbors = new Cache(() => {
 		const result = new Set<Device>();
 		for(const o of this.$partition.$overlaps) {
 			for(const corner of o.c) {
@@ -254,19 +254,19 @@ export class Device implements ISerializable<JDevice> {
 			}
 		}
 		return Array.from(result);
-	}
+	});
 
 	/** Self-owned ridges. */
 	private get _rawRidges(): readonly Ridge[] {
 		if(this._rawRidgeCache) return this._rawRidgeCache;
-		const selfRidges = this._innerRidges.map(l => this._transform(l));
+		const selfRidges = this._innerRidges.value.map(l => this._transform(l));
 		const outerRidges = this._getOuterRidges();
 		return this._rawRidgeCache = selfRidges.concat(outerRidges);
 	}
 
 	private _getOuterRidges(): readonly Ridge[] {
 		const result = this.$getConnectionRidges(false);
-		for(const map of this.$partition.$externalCornerMaps) {
+		for(const map of this.$partition.$externalCornerMaps.value) {
 			const from = this.$resolveCornerMap(map);
 			const dir = this._resolveCornerDirection(map.corner);
 			const to = this.$partition.$getExternalConnectionTarget(from, map, dir);

@@ -47,7 +47,7 @@ export class BaseJoinLogic extends JoinLogic {
 	protected _baseJoinIntersections(): BaseJoinContext {
 		const { bv, pt } = this.data;
 		const { j1, j2 } = this;
-		const deltaPt = this._deltaPt;
+		const deltaPt = this._deltaPt.value;
 		const delta = new Line(deltaPt, QV[0]);
 		const D1 = j1.e.$intersection(deltaPt, QV[0]);
 		const D2 = j2.e.$intersection(deltaPt, QV[0]);
