@@ -42,7 +42,13 @@ test.describe("Dropzone", () => {
 		await studio.initialized();
 
 		// Display dropzone
-		await page.locator("body").dispatchEvent("dragover");
+		await page.locator("body").dispatchEvent("dragover", {
+			dataTransfer: await page.evaluateHandle(() => {
+				const dt = new DataTransfer();
+				dt.items.add(new File([""], "dummy.json"));
+				return dt;
+			}),
+		});
 		const locale = JSON.parse(readFileSync("src/locale/en.json", "utf8"));
 		const dropzone = page.getByText(locale.message.dropzone);
 		await expect(dropzone).toBeVisible();

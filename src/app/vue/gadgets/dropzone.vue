@@ -19,7 +19,7 @@
 			dropzone.classList.toggle("drag", drag);
 		};
 		document.body.addEventListener("dragover", event => {
-			if(event.dataTransfer?.files.length) toggle(event, true);
+			if(event.dataTransfer?.types.includes("Files")) toggle(event, true);
 		});
 		dropzone.addEventListener("dragover", event => event.preventDefault());
 		dropzone.addEventListener("dragleave", event => toggle(event, false));
