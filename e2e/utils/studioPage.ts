@@ -69,6 +69,11 @@ export class StudioPage {
 		);
 	}
 
+	public async getCanUndo(): Promise<boolean> {
+		const bpHandle = await this.getHandle();
+		return await this.page.evaluate(bp => bp.history.canUndo, bpHandle);
+	}
+
 	public async getTag(): Promise<string | undefined> {
 		const bpHandle = await this.getHandle();
 		return await this.page.evaluate(
