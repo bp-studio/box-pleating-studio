@@ -27,6 +27,7 @@ test("Dragging session", async ({ page }) => {
 
 	// Undo dragging
 	await page.keyboard.press("Control+z");
+	await studio.update();
 
 	// Should restore everything
 	expect(await studio.getX()).toBe(46);
