@@ -1,11 +1,10 @@
-import { computed } from "vue";
+import { computed, shallowRef } from "vue";
 import { Polygon } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import { Control } from "client/base/control";
 import { Layer } from "client/shared/layers";
 import ProjectService from "client/services/projectService";
-import { shallowRef } from "client/shared/decorators";
 import { Label } from "client/utils/label";
 import { Direction } from "shared/types/direction";
 import { style } from "client/services/styleService";
@@ -34,7 +33,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	public readonly type = "Edge";
 	public readonly $priority: number = 0;
 
-	@shallowRef private accessor _length: number;
+	private readonly _length = shallowRef(0);
 
 	public readonly $v1: Vertex;
 	public readonly $v2: Vertex;
@@ -52,7 +51,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		this.$tag = `e${v1.id},${v2.id}`;
 		this.$v1 = v1;
 		this.$v2 = v2;
-		this._length = length;
+		this._length.value = length;
 
 		this.$setupHit(this._line);
 		this.$addRootObject(this._line, sheet.$layers[Layer.edge]);
@@ -67,7 +66,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		return {
 			n1: this.$v1.id,
 			n2: this.$v2.id,
-			length: this._length,
+			length: this._length.value,
 		};
 	}
 
@@ -76,12 +75,12 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get length(): number {
-		return this._length;
+		return this._length.value;
 	}
 	public set length(v: number) {
-		const oldValue = this._length;
+		const oldValue = this._length.value;
 		if(v < 1 || oldValue === v) return;
-		this._length = v;
+		this._length.value = v;
 		this.$project.history.$fieldChange(this, "length", oldValue, v, false);
 		const manager = this.$project.design.$batchUpdateManager;
 		FieldCommand.$setterPromise = manager.$addEdge(this.toJSON());
@@ -112,7 +111,7 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		if(this.$destructed) return 1;
 		const child = this.$v1.$dist > this.$v2.$dist ? this.$v1 : this.$v2;
 		const branchHeight = child.$dist + child.$height;
-		return MAX_TREE_HEIGHT - branchHeight + this._length;
+		return MAX_TREE_HEIGHT - branchHeight + this._length.value;
 	}
 
 	public get isRiver(): boolean {

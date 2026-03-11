@@ -87,7 +87,7 @@ export class Joiner {
 	public *$simpleJoin(strategy?: Strategy): Generator<JDevice> {
 		const { s1, s2 } = this;
 		yield* this.join(SimpleJoinLogic, (P1, P2) => {
-			const parallel = P1.$direction.$parallel(P2.$direction);
+			const parallel = P1.$direction.value.$parallel(P2.$direction.value);
 			if(strategy == Strategy.perfect && !parallel) return false;
 			if((s1 || s2) && parallel) return false;
 			return true;
@@ -110,8 +110,8 @@ export class Joiner {
 	public $getRelayJoinIntersection(piece: Piece, shift: IPoint,
 		q: QuadrantDirection): Point | null {
 		const testVector = this.$oriented ? QV[Direction.UR] : QV[Direction.LL];
-		const pt = piece.$anchors[this.q]!.$sub(new Vector(shift));
-		return piece.$shape.ridges[q].$intersection(pt, testVector);
+		const pt = piece.$anchors.value[this.q]!.$sub(new Vector(shift));
+		return piece.$shape.value.ridges[q].$intersection(pt, testVector);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

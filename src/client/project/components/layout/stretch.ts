@@ -1,5 +1,5 @@
 import { Control } from "client/base/control";
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { SelectionController } from "client/controllers/selectionController";
 import { Device } from "./device";
 import { clone } from "shared/utils/clone";
@@ -24,7 +24,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	public readonly type = "Stretch";
 	public readonly $priority: number = 0;
 	private readonly _devices: Device[] = [];
-	@shallowRef private accessor _data!: JStretch;
+	private readonly _data = shallowRef<JStretch>(null!);
 	public readonly $layout: Layout;
 
 	constructor(layout: Layout, data: JStretch, model: UpdateModel) {
@@ -36,7 +36,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public toJSON(session?: true): JStretch {
-		const result = clone(this._data);
+		const result = clone(this._data.value);
 		if(!session) delete result.repo;
 		return result;
 	}
@@ -50,15 +50,15 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get repo(): JRepository | undefined {
-		return this._data.repo;
+		return this._data.value.repo;
 	}
 
 	public get id(): string {
-		return this._data.id;
+		return this._data.value.id;
 	}
 
 	public get configIndex(): number {
-		return this._data.repo?.index ?? 0;
+		return this._data.value.repo?.index ?? 0;
 	}
 	public set configIndex(v: number) {
 		// Since the entire repository is stored in the memo,
@@ -68,7 +68,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public get patternIndex(): number {
-		const repo = this._data.repo;
+		const repo = this._data.value.repo;
 		if(!repo) return 0;
 		return repo.configurations[repo.index].index;
 	}
@@ -78,7 +78,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public switchConfig(by: number): void {
-		const repo = this._data.repo;
+		const repo = this._data.value.repo;
 		if(!repo) return;
 		const i = repo.index;
 		const l = repo.configurations.length;
@@ -86,7 +86,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public switchPattern(by: number): void {
-		const repo = this._data.repo;
+		const repo = this._data.value.repo;
 		if(!repo) return;
 		const config = repo.configurations[repo.index];
 		const i = config.index;
@@ -115,7 +115,7 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	public $update(data: JStretch, model: UpdateModel): void {
-		this._data = data;
+		this._data.value = data;
 		const deviceCount = data.pattern!.devices.length;
 		while(deviceCount < this._devices.length) {
 			const device = this._devices.pop()!;
@@ -151,12 +151,12 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	 */
 	public async $complete(): Promise<void> {
 		// Skip if this is already done.
-		if(this._data.repo) return;
+		if(this._data.value.repo) return;
 
 		// If the result is null, then the stretch is already deleted,
 		// and we can just ignore the result.
 		const data = await this.$layout.$completeStretch(this.id);
-		if(data) this._data = data;
+		if(data) this._data.value = data;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

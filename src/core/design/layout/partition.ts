@@ -1,6 +1,6 @@
 import { Store } from "./store";
 import { CornerType } from "shared/json";
-import { cache } from "core/utils/cache";
+import { Cache } from "core/utils/cache";
 import { Direction, makeQuadrantCode, opposite } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { State } from "core/service/state";
@@ -71,15 +71,15 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	public $getDisplacement(pattern: Pattern): Vector {
-		const connection = this.$displacementReference;
+		const connection = this.$displacementReference.value;
 		return pattern.$getConnectionTarget(connection).$sub(pattern.$config.$repo.$origin);
 	}
 
 	/** Choose an outward connection point in this Partition. */
-	@cache public get $displacementReference(): JConnection {
+	public readonly $displacementReference = new Cache<JConnection>(() =>
 		// Choose whichever first one that is out-going
-		return this.$overlaps.find(o => o.c[0].type != CornerType.coincide)!.c[0] as JConnection;
-	}
+		this.$overlaps.find(o => o.c[0].type != CornerType.coincide)!.c[0] as JConnection
+	);
 
 	/**
 	 * Get the "target" of an external connection point.
@@ -185,21 +185,21 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	/** All {@link JCorner}s that are dragging constraints of the current {@link Partition}. */
-	@cache public get $constraints(): readonly CornerMap[] {
-		return this.$cornerMap.filter(m => {
+	public readonly $constraints = new Cache(() =>
+		this.$cornerMap.filter(m => {
 			const type = m.corner.type;
 			return type == CornerType.socket ||
 				type == CornerType.internal ||
 				type == CornerType.flap;
-		});
-	}
+		})
+	);
 
-	@cache public get $externalCornerMaps(): readonly CornerMap[] {
-		return this.$cornerMap.filter(m => {
+	public readonly $externalCornerMaps = new Cache(() =>
+		this.$cornerMap.filter(m => {
 			const type = m.corner.type;
 			return type == CornerType.side || type == CornerType.intersection;
-		});
-	}
+		})
+	);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods

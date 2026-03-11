@@ -47,7 +47,7 @@ export class PositioningContext {
 		const r = this.$repo.$getMaxIntersectionDistance(j1, j2, oriented);
 		if(j2.ox > j1.ox) [j1, j2] = [j2, j1];
 		let p: IPoint = { x: r - j2.ox, y: r - j1.oy };
-		if(!oriented) p = { x: g.widthSpan - p.x, y: g.heightSpan - p.y };
+		if(!oriented) p = { x: g.widthSpan.value - p.x, y: g.heightSpan.value - p.y };
 		return new Point(p);
 	}
 
@@ -102,8 +102,8 @@ export class PositioningContext {
 			} else {
 				// If there're mutual connections, we don't need to setup
 				// the slack for real, but we keep a record for later usage.
-				const tx1 = g1.widthSpan + g2.rx(q, corner.q!);
-				const tx2 = g2.widthSpan + g1.rx(2 - q, opposite(corner.q!));
+				const tx1 = g1.widthSpan.value + g2.rx(q, corner.q!);
+				const tx2 = g2.widthSpan.value + g1.rx(2 - q, opposite(corner.q!));
 				if(tx2 > tx1) this._slackMap.set(corner, tx2 - tx1);
 			}
 		}
@@ -128,7 +128,7 @@ export class PositioningContext {
 		while(overlapIndices.size > 0) {
 			const first = getFirst(overlapIndices)!;
 			overlapIndices.delete(first);
-			const result = this.$gadgets[first].widthSpan +
+			const result = this.$gadgets[first].widthSpan.value +
 				this._getSpan(first, 0, callback) +
 				this._getSpan(first, 2, callback);
 			if(result > maxSpan) maxSpan = result;
@@ -160,7 +160,7 @@ export class PositioningContext {
 	private _getSlack(index: number, q: QuadrantDirection): number {
 		const corner = this.$overlaps[index].c[q];
 		const gadget = this.$gadgets[index];
-		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack[q]);
+		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack.value[q]);
 	}
 
 	private _getNextIndex(index: number, q: TipDirection): number | null {

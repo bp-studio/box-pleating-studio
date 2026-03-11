@@ -1,4 +1,4 @@
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { View } from "./view";
 import { hitMap } from "client/screen/controlEventBoundary";
 import { display } from "client/screen/display";
@@ -38,8 +38,8 @@ export abstract class Control extends View implements ITagObject {
 	 */
 	public abstract readonly $priority: number;
 
-	@shallowRef private accessor _selected: boolean = false;
-	@shallowRef private accessor _hovered: boolean = false;
+	private readonly _selected = shallowRef(false);
+	private readonly _hovered = shallowRef(false);
 
 	/** The cursor style to use when the object is selected. */
 	public $selectedCursor: string = "move";
@@ -63,11 +63,11 @@ export abstract class Control extends View implements ITagObject {
 	 * The only exceptions are the "goToDual" methods.
 	 */
 	public get $selected(): boolean {
-		return this._selected;
+		return this._selected.value;
 	}
 	public set $selected(v: boolean) {
 		if(this._hitObject) this._hitObject.cursor = v ? this.$selectedCursor : "pointer";
-		this._selected = v;
+		this._selected.value = v;
 	}
 
 	/** Whether self can be selected together with another {@link Control}. */
@@ -90,12 +90,12 @@ export abstract class Control extends View implements ITagObject {
 		object.eventMode = "static";
 		object.cursor = "pointer";
 		if(hitArea) object.hitArea = hitArea;
-		object.on("mouseenter", () => this._hovered = true);
-		object.on("mouseleave", () => this._hovered = false);
+		object.on("mouseenter", () => this._hovered.value = true);
+		object.on("mouseleave", () => this._hovered.value = false);
 		object.on("mousedown", () => display.canvas.style.cursor = this.$selectedCursor);
 	}
 
 	protected get $hovered(): boolean {
-		return this._hovered;
+		return this._hovered.value;
 	}
 }

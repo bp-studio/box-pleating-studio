@@ -10,6 +10,7 @@ import { Device } from "client/project/components/layout/device";
 
 import type { Draggable } from "client/base/draggable";
 import type { ShallowRef } from "vue";
+import { MoveCommand } from "client/project/changes/commands/moveCommand";
 
 export interface IDragController {
 	readonly isDragging: ShallowRef<boolean>;
@@ -63,6 +64,7 @@ export namespace DragController {
 			CursorController.$tryUpdate(pt);
 			for(const o of selections) o.$dragStart(CursorController.$offset);
 			isDragging.value = true;
+			MoveCommand.$onDragStart();
 			display.$setInteractive(false, selections[0].$selectedCursor);
 		}
 	}

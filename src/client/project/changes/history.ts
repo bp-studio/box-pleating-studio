@@ -1,6 +1,4 @@
-import { shallowReactive } from "vue";
-
-import { shallowRef } from "client/shared/decorators";
+import { shallowReactive, shallowRef } from "vue";
 import { FieldCommand } from "./commands/fieldCommand";
 import { Step, OperationResult, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";
@@ -27,10 +25,10 @@ const MAX_STEP = 30;
 export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** Current history location. */
-	@shallowRef private accessor _index: number = 0;
+	private readonly _index = shallowRef(0);
 
 	/** History location during last file saving. */
-	@shallowRef private accessor _savedIndex: number = 0;
+	private readonly _savedIndex = shallowRef(0);
 
 	private readonly _project: Project;
 	private readonly _steps: Step[] = shallowReactive([]);
@@ -58,21 +56,21 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(json) {
 			try {
 				this._steps.push(...json.steps.map(s => restore(project, s)));
-				this._index = json.index;
-				this._savedIndex = json.savedIndex;
+				this._index.value = json.index;
+				this._savedIndex.value = json.savedIndex;
 			} catch {
 				// If anything goes wrong, reset everything.
 				this._steps.length = 0;
-				this._index = 0;
-				this._savedIndex = 0;
+				this._index.value = 0;
+				this._savedIndex.value = 0;
 			}
 		}
 	}
 
 	public toJSON(): JHistory {
 		return {
-			index: this._index,
-			savedIndex: this._savedIndex,
+			index: this._index.value,
+			savedIndex: this._savedIndex.value,
 			steps: this._steps.map(s => s.toJSON()),
 		};
 	}
@@ -101,11 +99,11 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	public get isModified(): boolean {
 		// Always display as modified during dragging to reduce UI flashes.
-		return this._project.$isDragging || this._savedIndex != this._index;
+		return this._project.$isDragging || this._savedIndex.value != this._index.value;
 	}
 
 	public $notifySave(): void {
-		this._savedIndex = this._index;
+		this._savedIndex.value = this._index.value;
 	}
 
 	/** See {@link _flush}. */
@@ -155,11 +153,11 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	public get $canUndo(): boolean {
-		return this._index > 0;
+		return this._index.value > 0;
 	}
 
 	public get $canRedo(): boolean {
-		return this._index < this._steps.length;
+		return this._index.value < this._steps.length;
 	}
 
 	public async $undo(): Promise<void> {
@@ -170,12 +168,12 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(this.$canUndo) {
 			await display.shield(async () => {
 				this._moving = true;
-				const result = await this._steps[--this._index].$undo();
+				const result = await this._steps[--this._index.value].$undo();
 				if(result != OperationResult.Success) {
 					// If something goes wrong, the step in question and everything
 					// before that should be discarded.
-					this._steps.splice(0, this._index + (result == OperationResult.Failed ? 1 : 0));
-					this._index = 0;
+					this._steps.splice(0, this._index.value + (result == OperationResult.Failed ? 1 : 0));
+					this._index.value = 0;
 				}
 				this._flush();
 			});
@@ -190,12 +188,12 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		if(this.$canRedo) {
 			await display.shield(async () => {
 				this._moving = true;
-				const result = await this._steps[this._index++].$redo();
+				const result = await this._steps[this._index.value++].$redo();
 				if(result != OperationResult.Success) {
 					// If something goes wrong, the step in question and everything
 					// after that should be discarded.
-					if(result == OperationResult.Failed) this._index--;
-					this._steps.splice(this._index);
+					if(result == OperationResult.Failed) this._index.value--;
+					this._steps.splice(this._index.value);
 				}
 				this._flush();
 			});
@@ -225,7 +223,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				if(!step.$isVoid) this._addStep(step);
 			} else if(s.$isVoid) {
 				this._steps.pop();
-				this._index--;
+				this._index.value--;
 			}
 			this._queue = [];
 		}
@@ -249,22 +247,22 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	private get _lastStep(): Step | undefined {
-		if(this._index == 0 || this._index < this._steps.length) return undefined;
-		return this._steps[this._index - 1];
+		if(this._index.value == 0 || this._index.value < this._steps.length) return undefined;
+		return this._steps[this._index.value - 1];
 	}
 
 	private _addStep(step: Step): void {
 		// Remove all Steps afterwards
-		if(this._steps.length > this._index) this._steps.length = this._index;
+		if(this._steps.length > this._index.value) this._steps.length = this._index.value;
 
 		// Add a new Step and move the index
-		this._steps[this._index++] = step;
+		this._steps[this._index.value++] = step;
 
 		// We keep at most 30 Steps, so get rid of the extras.
 		if(this._steps.length > MAX_STEP) {
 			this._steps.shift();
-			this._index--;
-			this._savedIndex--;
+			this._index.value--;
+			this._savedIndex.value--;
 		}
 	}
 

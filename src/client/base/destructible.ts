@@ -28,8 +28,11 @@ export abstract class Destructible extends EventTarget {
 		// Remove all object references to improve GC.
 		// We have to wait until all destructing actions are done to do this,
 		// or we'll end up in a lot of trouble.
+		// Skip Vue reactive wrappers (ShallowRef/Field), as Vue may still
+		// trigger re-renders after destruction; deleting them causes errors.
 		for(const key of Object.keys(this)) {
-			if(typeof this[key] === "object") delete this[key];
+			const val = this[key];
+			if(typeof val === "object" && !isReactiveWrapper(val)) delete this[key];
 		}
 
 		this._destructed = true;
@@ -49,6 +52,16 @@ export interface Destructible extends EventTarget {
 		type: T,
 		callback: Consumer<DestructibleEventMap[T]>,
 		options?: boolean | AddEventListenerOptions): void;
+}
+
+/**
+ * Check if the value is a Vue reactive wrapper ({@link ShallowRef})
+ * or a {@link Field} (which internally wraps a {@link ShallowRef}).
+ * These should be preserved after destruction since Vue may still
+ * access them during pending re-renders.
+ */
+function isReactiveWrapper(val: unknown): boolean {
+	return val != null && (val as { __v_isRef?: boolean }).__v_isRef === true;
 }
 
 const DESTRUCT = "destruct";

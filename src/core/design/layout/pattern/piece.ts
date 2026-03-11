@@ -2,7 +2,7 @@ import { Region } from "./region";
 import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 import { Line } from "core/math/geometry/line";
-import { cache, clearCache } from "core/utils/cache";
+import { Cache, clearCaches } from "core/utils/cache";
 import { toLines } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
@@ -57,7 +57,7 @@ export class Piece extends Region implements JPiece {
 		/* istanbul ignore next: foolproof */
 		if(same(offset, o)) return;
 		offsets.set(this, o);
-		clearCache(this);
+		this._clearCaches();
 	}
 
 	public get sx(): number {
@@ -82,7 +82,7 @@ export class Piece extends Region implements JPiece {
 
 	/** Shrink a {@link Piece} proportionally. This will reset the cache. */
 	public $shrink(by: number): this {
-		clearCache(this);
+		this._clearCaches();
 		this.ox /= by;
 		this.oy /= by;
 		this.u /= by;
@@ -104,13 +104,13 @@ export class Piece extends Region implements JPiece {
 		// Add the detour for real
 		this.detours = this.detours || [];
 		this.detours.push(detour);
-		clearCache(this);
+		this._clearCaches();
 	}
 
 	public $clearDetour(): void {
 		if(this.detours?.length) {
 			this.detours = undefined;
-			clearCache(this);
+			this._clearCaches();
 		}
 	}
 
@@ -118,9 +118,9 @@ export class Piece extends Region implements JPiece {
 	// Interface methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@cache public get $anchors(): PerQuadrant<Point | null> {
-		const p = this._points;
-		const { contour } = this.$shape;
+	public readonly $anchors = new Cache<PerQuadrant<Point | null>>(() => {
+		const p = this._points.value;
+		const { contour } = this.$shape.value;
 		// Anchor 0 and 2 must exist for any piece
 		return perQuadrant([
 			p[0],
@@ -128,15 +128,15 @@ export class Piece extends Region implements JPiece {
 			p[2],
 			getIdentical(contour, p[3]),
 		]);
-	}
+	});
 
-	@cache public get $direction(): Vector {
+	public readonly $direction = new Cache(() => {
 		const { ox, oy, u, v } = this;
 		return new Vector(oy * (ox + u), ox * (oy + v));
-	}
+	});
 
-	@cache public get $shape(): IRegionShape {
-		const contour = this._points.concat();
+	public readonly $shape = new Cache<IRegionShape>(() => {
+		const contour = this._points.value.concat();
 		const ridges = toLines(contour);
 		if(this.detours) {
 			for(const detour of this.detours) {
@@ -144,22 +144,22 @@ export class Piece extends Region implements JPiece {
 			}
 		}
 		return { contour, ridges };
-	}
+	});
 
 	/**
 	 * Return the original contour (not including shifting and detour)
 	 * of this piece. Used only for constructing standard join.
 	 */
 	public get $originalContour(): readonly Point[] {
-		const unshift = this._shift.$neg; // v0.6.17: This is needed
-		return this._points.map(p => p.$add(unshift));
+		const unshift = this._shift.value.$neg; // v0.6.17: This is needed
+		return this._points.value.map(p => p.$add(unshift));
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private members
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@cache private get _points(): Point[] {
+	private readonly _points = new Cache(() => {
 		const { ox, oy, u, v } = this;
 
 		// A GOPS is like the reverse of the Overlap region,
@@ -171,19 +171,26 @@ export class Piece extends Region implements JPiece {
 			new Point(oy + u + v, ox + u + v),
 			new Point(oy + v, v),
 		];
-		return result.map(p => p.$add(this._shift));
-	}
+		return result.map(p => p.$add(this._shift.value));
+	});
 
-	@cache private get _shift(): Vector {
+	private readonly _shift = new Cache(() => {
 		const offset = offsets.get(this)!;
 		return new Vector(
 			(this.shift?.x ?? 0) + offset.x,
 			(this.shift?.y ?? 0) + offset.y
 		);
+	});
+
+	private _clearCaches(): void {
+		clearCaches([
+			this.$axisParallels, this.$anchors, this.$direction,
+			this.$shape, this._points, this._shift,
+		]);
 	}
 
 	private _processDetour(ridges: Line[], contour: RationalPath, _detour: Path): void {
-		const detour = _detour.map(p => new Point(p).$add(this._shift));
+		const detour = _detour.map(p => new Point(p).$add(this._shift.value));
 		const start = detour[0], end = detour[detour.length - 1];
 
 		const lines: Line[] = [];

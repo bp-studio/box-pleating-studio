@@ -4,7 +4,7 @@ import { Migration } from "client/patches";
 import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { callWorker } from "app/utils/workerUtility";
 import { isIOS, isLowEndDevice } from "app/shared/constants";
 
@@ -84,7 +84,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 * Whether the user is performing dragging on the current {@link Project}.
 	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
 	 */
-	@shallowRef public accessor $isDragging: boolean = false;
+	private readonly _isDragging = shallowRef(false);
+	public get $isDragging(): boolean { return this._isDragging.value; }
+	public set $isDragging(v: boolean) { this._isDragging.value = v; }
 
 	constructor(json: RecursivePartial<JProject>, worker: Worker) {
 		// Projects are all inactive on construction.

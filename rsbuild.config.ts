@@ -46,7 +46,7 @@ export default defineConfig({
 		},
 	},
 	source: {
-		include: [/@pixi/],
+		include: [/@pixi/, /core-base/],
 		entry: {
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",

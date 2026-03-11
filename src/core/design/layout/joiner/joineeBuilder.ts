@@ -68,7 +68,7 @@ export class JoineeBuilder {
 	}
 
 	public get $anchor(): Point {
-		let a = this.p.$anchors[this._joiner.q]!;
+		let a = this.p.$anchors.value[this._joiner.q]!;
 		if(this._additionalOffset) a = a.$add(this._additionalOffset);
 		return a;
 	}

@@ -41,7 +41,7 @@ export class Pattern implements ISerializable<JPattern> {
 		const devicesToInitialize = new Set(this.$devices);
 		while(devicesToInitialize.size > 0) {
 			for(const device of devicesToInitialize) {
-				const c = device.$partition.$displacementReference;
+				const c = device.$partition.$displacementReference.value;
 				if(c.e >= 0 || this._getDeviceOfConnection(c).$initialized) {
 					device.$init();
 					devicesToInitialize.delete(device);

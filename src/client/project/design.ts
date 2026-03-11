@@ -1,6 +1,7 @@
 import { Container } from "@pixi/display";
 
-import { field, shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
+import { Field } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { display } from "client/screen/display";
 import { MOUNTED } from "client/base/mountable";
@@ -32,9 +33,17 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	public readonly $tag = "design";
 	public readonly $project: Project;
 
-	@field public accessor title: string;
-	@field public accessor description: string;
-	@shallowRef public accessor mode: DesignMode;
+	private _title!: Field<string>;
+	public get title(): string { return this._title.value; }
+	public set title(v: string) { this._title.value = v; }
+
+	private _description!: Field<string>;
+	public get description(): string { return this._description.value; }
+	public set description(v: string) { this._description.value = v; }
+
+	private readonly _mode = shallowRef<DesignMode>("tree");
+	public get mode(): DesignMode { return this._mode.value; }
+	public set mode(v: DesignMode) { this._mode.value = v; }
 
 	public readonly layout: Layout;
 	public readonly tree: Tree;
@@ -54,10 +63,10 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	constructor(project: Project, json: JDesign, state?: JState) {
 		super();
 		this.$prototype = json;
-		this.$project = project; // This must go before the decorated accessors
-		this.title = json.title ?? "";
-		this.description = json.description ?? "";
-		this.mode = json.mode ?? "tree";
+		this.$project = project;
+		this._title = new Field(this, "title", json.title ?? "");
+		this._description = new Field(this, "description", json.description ?? "");
+		this._mode.value = json.mode ?? "tree";
 
 		this.$coreManager = new CoreManager(project);
 		this.$batchUpdateManager = new BatchUpdateManager(this.$coreManager);

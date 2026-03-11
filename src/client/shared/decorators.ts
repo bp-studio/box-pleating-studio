@@ -1,82 +1,42 @@
 import { shallowRef } from "vue";
 
-import type HistoryManager from "client/project/changes/history";
 import type { ShallowRef } from "vue";
-import type { ITagObject } from "./interface";
+import type { Project } from "client/project/project";
 
-const REF_MAP = Symbol("RefMap");
-
-/**
- * A symbol that represents uninitialized {@link field}.
- * It is possible for a field value to be `undefined`,
- * so we use this symbol for that purpose.
- */
-const INIT = Symbol("uninitialized");
-
-interface RefMapTarget {
-	[REF_MAP]: Record<string, ShallowRef<unknown>>;
-}
-
-function initMap<V>(target: unknown, name: string, v: V): void {
-	((target as RefMapTarget)[REF_MAP] ||= {})[name] = shallowRef(v);
-}
-
-function getRef<V>(target: unknown, name: string): ShallowRef<V> {
-	return (target as RefMapTarget)[REF_MAP][name] as ShallowRef<V>;
+interface ITagObject {
+	readonly $tag: string;
+	readonly $project: Project;
 }
 
 /**
- * Use {@link shallowRef} in Vue to implement an accessor property.
- */
-function shallowRefDecorator<This, V>(
-	target: ClassAccessorDecoratorTarget<This, V>,
-	context: ClassAccessorDecoratorContext<This, V>
-): ClassAccessorDecoratorResult<This, V> {
-	const name = context.name as string;
-	return {
-		set(v: V) {
-			getRef(this, name).value = v;
-		},
-		get() {
-			return getRef(this, name).value as V;
-		},
-		init(v: V) {
-			initMap(this, name, v);
-			return v;
-		},
-	};
-}
-
-export { shallowRefDecorator as shallowRef };
-
-/**
- * Besides {@link shallowRefDecorator shallowRef}, implement {@link HistoryManager.$fieldChange} on this accessor property.
+ * {@link Field} wraps a {@link shallowRef} and additionally
+ * calls {@link history.$fieldChange} on set, implementing undo/redo support.
  *
  * This only works for purely synchronous properties.
- * For asynchronous properties, one must implement {@link HistoryManager.$fieldChange} elsewhere.
+ * For asynchronous properties, one must implement {@link history.$fieldChange} elsewhere.
  */
-export function field<This extends ITagObject, V>(
-	target: ClassAccessorDecoratorTarget<This, V>,
-	context: ClassAccessorDecoratorContext<This, V>
-): ClassAccessorDecoratorResult<This, V> {
-	const name = context.name as string;
-	return {
-		set(v: V) {
-			const ref = getRef(this, name);
-			const oldValue = ref.value;
-			if(oldValue === v) return;
-			ref.value = v;
-			if(oldValue !== INIT) {
-				// Signify changes only after the field is initialized.
-				this.$project.history.$fieldChange(this, name, oldValue, v);
-			}
-		},
-		get() {
-			return getRef(this, name).value as V;
-		},
-		init(v: V) {
-			initMap(this, name, v === undefined ? INIT : v);
-			return v;
-		},
-	};
+export class Field<V> {
+	/** Marks this as a reactive wrapper so {@link Destructible} preserves it. */
+	public readonly __v_isRef = true;
+
+	private readonly _ref: ShallowRef<V>;
+	private readonly _target: ITagObject;
+	private readonly _prop: string;
+
+	constructor(target: ITagObject, prop: string, initial: V) {
+		this._target = target;
+		this._prop = prop;
+		this._ref = shallowRef<V>(initial);
+	}
+
+	public get value(): V {
+		return this._ref.value as V;
+	}
+
+	public set value(v: V) {
+		const oldValue = this._ref.value;
+		if(oldValue === v) return;
+		this._ref.value = v;
+		this._target.$project.history.$fieldChange(this._target, this._prop, oldValue, v);
+	}
 }

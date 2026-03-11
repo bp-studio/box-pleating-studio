@@ -14,7 +14,7 @@ export default function() {
 			expect(device.$gadgets.length).to.equal(1);
 			const gadget = device.$gadgets[0];
 			expect(gadget.pieces.length).to.equal(2, "Universal GPS has two pieces");
-			expect(gadget.$slack).to.include(0.25);
+			expect(gadget.$slack.value).to.include(0.25);
 		}
 	});
 

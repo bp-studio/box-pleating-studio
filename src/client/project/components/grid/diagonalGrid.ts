@@ -1,4 +1,4 @@
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { drawPath } from "client/utils/contourUtil";
@@ -25,21 +25,21 @@ export class DiagonalGrid extends Grid {
 	private _testSize: number;
 	private _testShift: IPoint | undefined;
 
-	@shallowRef private accessor _size: number;
+	private readonly _size = shallowRef(0);
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		super(sheet, GridType.diagonal);
 		width ??= DEFAULT_SIZE;
 		height ??= DEFAULT_SIZE;
-		this._testSize = this._size = Math.round((width + height) / 2);
+		this._testSize = this._size.value = Math.round((width + height) / 2);
 		if(!sheet.$project.history.$isLocked) this._initialFit();
 	}
 
 	public toJSON(): JSheet {
 		return {
 			type: this.type,
-			height: this._size,
-			width: this._size,
+			height: this._size.value,
+			width: this._size.value,
 		};
 	}
 
@@ -48,15 +48,15 @@ export class DiagonalGrid extends Grid {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get diameter(): number {
-		return this._size;
+		return this._size.value;
 	}
 
 	public get size(): number {
-		return this._size;
+		return this._size.value;
 	}
 	public set size(v: number) {
 		if(this.$project.history.$isLocked) {
-			this._testSize = this._size = v; // Skip all checks and effects
+			this._testSize = this._size.value = v; // Skip all checks and effects
 			return;
 		}
 
@@ -68,14 +68,14 @@ export class DiagonalGrid extends Grid {
 		if(v < oldValue && !this._testFit()) {
 			const range = Math.ceil((oldValue - v) / 2);
 			if(!this._tryShift(range)) {
-				this._testSize = this._size;
+				this._testSize = this._size.value;
 				this._testShift = undefined;
 				return;
 			}
 		}
 
 		const flush = !this._applyOffset();
-		this._size = v;
+		this._size.value = v;
 		this.$project.history.$fieldChange(this, "size", oldValue, v, flush);
 	}
 
@@ -84,7 +84,7 @@ export class DiagonalGrid extends Grid {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public override $canSubdivide(): boolean {
-		return this._size * 2 <= MAX_SHEET_SIZE;
+		return this._size.value * 2 <= MAX_SHEET_SIZE;
 	}
 
 	public override $getResizeCenter(): IPoint {
@@ -92,13 +92,13 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public override $getCenter(): IPoint {
-		return { x: this._size / 2, y: this.size / 2 };
+		return { x: this._size.value / 2, y: this.size / 2 };
 	}
 
 	public override $setDimension(width: number, height: number): void {
 		if(width != height) throw new Error("Dimension mismatch for diagonal grid.");
-		const oldValue = this._size;
-		this._testSize = this._size = width;
+		const oldValue = this._size.value;
+		this._testSize = this._size.value = width;
 		this.$project.history.$fieldChange(this, "size", oldValue, width, false);
 	}
 
@@ -108,7 +108,7 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public $constrain(p: IPoint): IPoint {
-		return diagonalConstrain(this._size, this._size, p);
+		return diagonalConstrain(this._size.value, this._size.value, p);
 	}
 
 	public $contains(p: IPoint): boolean {
@@ -124,7 +124,7 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {
-		const shift = this._size % 2, s = this._size + shift, h = s / 2;
+		const shift = this._size.value % 2, s = this._size.value + shift, h = s / 2;
 		if(shift == 0) {
 			if(x == 0 && y == h) return Direction.L;
 			if(x == h && y == 0) return Direction.B;
@@ -145,7 +145,7 @@ export class DiagonalGrid extends Grid {
 
 	public $getBorderPath(): Path {
 		let full = this.$renderHeight, half = full / 2;
-		const shift = this._size % 2 / 2;
+		const shift = this._size.value % 2 / 2;
 		full -= shift;
 		half -= shift;
 		return [
@@ -157,8 +157,8 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public $drawGrid(grid: GraphicsLike): void {
-		const size = this._size;
-		const shift = this._size % 2;
+		const size = this._size.value;
+		const shift = this._size.value % 2;
 		for(let i = 1 - shift; i < size + shift; i++) {
 			const offset = Math.abs(i - size / 2) - shift / 2;
 			grid.moveTo(offset, i);
@@ -171,7 +171,7 @@ export class DiagonalGrid extends Grid {
 	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
 		const full = this.$renderWidth;
 		const s = size / full;
-		const shift = this._size % 2 / 2;
+		const shift = this._size.value % 2 / 2;
 		if(reorient) {
 			const offset = full - 2 * shift;
 			return [s, s, s, -s, -s * offset, 0];
@@ -182,16 +182,16 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public get $offset(): IPoint {
-		const shift = this._size % 2 / 2;
+		const shift = this._size.value % 2 / 2;
 		return { x: -shift, y: -shift };
 	}
 
 	public get $renderHeight(): number {
-		return this._size + this._size % 2;
+		return this._size.value + this._size.value % 2;
 	}
 
 	public get $renderWidth(): number {
-		return this._size + this._size % 2;
+		return this._size.value + this._size.value % 2;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ export class DiagonalGrid extends Grid {
 				this._testShift = { x: this._testShift.x + 1, y: this._testShift.y + 1 };
 			}
 		}
-		this._size = this._testSize;
+		this._size.value = this._testSize;
 		this._applyOffset();
 	}
 

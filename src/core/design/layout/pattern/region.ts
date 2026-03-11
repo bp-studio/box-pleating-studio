@@ -1,6 +1,6 @@
 import { Fraction } from "core/math/fraction";
 import { Line } from "core/math/geometry/line";
-import { cache } from "core/utils/cache";
+import { Cache } from "core/utils/cache";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Point } from "core/math/geometry/point";
@@ -26,19 +26,22 @@ export interface IRegionShape {
 
 export abstract class Region {
 
-	public abstract get $shape(): IRegionShape;
+	public abstract readonly $shape: Cache<IRegionShape>;
 
 	/** The direction {@link Vector} of axis-parallel creases. */
-	public abstract get $direction(): Vector;
+	public abstract readonly $direction: Cache<Vector>;
 
-	@cache public get $axisParallels(): readonly Line[] {
-		const ref = this.$shape.contour.find(p => p.$isIntegral)!;
+	public readonly $axisParallels = new Cache(() => this._computeAxisParallels());
+
+	private _computeAxisParallels(): readonly Line[] {
+		const shape = this.$shape.value;
+		const ref = shape.contour.find(p => p.$isIntegral)!;
 
 		// find the range of axis-parallel creases
-		const dir = this.$direction;
+		const dir = this.$direction.value;
 		const step = dir.$rotate90().$normalize();
 		let min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY;
-		for(const p of this.$shape.contour) {
+		for(const p of shape.contour) {
 			const units = p.$sub(ref).$dot(step);
 			if(units > max) max = units;
 			if(units < min) min = units;
@@ -51,7 +54,7 @@ export abstract class Region {
 			const intersections: Point[] = [];
 
 			// TODO: improve this part
-			for(const r of this.$shape.ridges) {
+			for(const r of shape.ridges) {
 				const j = r.$intersection(p, dir);
 				if(j && !j.eq(intersections[0])) intersections.push(j);
 

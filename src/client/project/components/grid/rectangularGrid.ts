@@ -1,4 +1,4 @@
-import { shallowRef } from "client/shared/decorators";
+import { shallowRef } from "vue";
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
@@ -23,20 +23,20 @@ export class RectangularGrid extends Grid {
 	private _testWidth: number;
 	private _testHeight: number;
 
-	@shallowRef private accessor _width: number;
-	@shallowRef private accessor _height: number;
+	private readonly _width = shallowRef(0);
+	private readonly _height = shallowRef(0);
 
 	constructor(sheet: Sheet, width?: number, height?: number) {
 		super(sheet, GridType.rectangular);
-		this._testHeight = this._height = height ?? DEFAULT_SIZE;
-		this._testWidth = this._width = width ?? DEFAULT_SIZE;
+		this._testHeight = this._height.value = height ?? DEFAULT_SIZE;
+		this._testWidth = this._width.value = width ?? DEFAULT_SIZE;
 	}
 
 	public toJSON(): JSheet {
 		return {
 			type: this.type,
-			height: this._height,
-			width: this._width,
+			height: this._height.value,
+			width: this._width.value,
 		};
 	}
 
@@ -45,20 +45,20 @@ export class RectangularGrid extends Grid {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public get diameter(): number {
-		return Math.max(this._height, this._width);
+		return Math.max(this._height.value, this._width.value);
 	}
 
 	public get height(): number {
-		return this._height;
+		return this._height.value;
 	}
 	public set height(v: number) {
 		if(this.$project.history.$isLocked) {
-			this._testHeight = this._height = v;
+			this._testHeight = this._height.value = v;
 			return;
 		}
 
 		let flush = true;
-		const oldValue = this._height;
+		const oldValue = this._height.value;
 		if(v < MIN_RECT_SIZE || v > MAX_SHEET_SIZE || oldValue === v) return;
 		this._testHeight = v;
 		if(v < oldValue) {
@@ -71,21 +71,21 @@ export class RectangularGrid extends Grid {
 				flush = false;
 			}
 		}
-		this._height = v;
+		this._height.value = v;
 		this.$project.history.$fieldChange(this, "height", oldValue, v, flush);
 	}
 
 	public get width(): number {
-		return this._width;
+		return this._width.value;
 	}
 	public set width(v: number) {
 		if(this.$project.history.$isLocked) {
-			this._testWidth = this._width = v;
+			this._testWidth = this._width.value = v;
 			return;
 		}
 
 		let flush = true;
-		const oldValue = this._width;
+		const oldValue = this._width.value;
 		if(v < MIN_RECT_SIZE || v > MAX_SHEET_SIZE || oldValue === v) return;
 		this._testWidth = v;
 		if(v < oldValue) {
@@ -98,7 +98,7 @@ export class RectangularGrid extends Grid {
 				flush = false;
 			}
 		}
-		this._width = v;
+		this._width.value = v;
 		this.$project.history.$fieldChange(this, "width", oldValue, v, flush);
 	}
 
@@ -107,7 +107,7 @@ export class RectangularGrid extends Grid {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public override $canSubdivide(): boolean {
-		return this._width * 2 <= MAX_SHEET_SIZE && this._height * 2 <= MAX_SHEET_SIZE;
+		return this._width.value * 2 <= MAX_SHEET_SIZE && this._height.value * 2 <= MAX_SHEET_SIZE;
 	}
 
 	public override $getResizeCenter(): IPoint {
@@ -115,14 +115,14 @@ export class RectangularGrid extends Grid {
 	}
 
 	public override $getCenter(): IPoint {
-		return { x: this._width / 2, y: this._height / 2 };
+		return { x: this._width.value / 2, y: this._height.value / 2 };
 	}
 
 	public override $setDimension(width: number, height: number): void {
-		const w = this._width;
-		const h = this._height;
-		this._testWidth = this._width = width;
-		this._testHeight = this._height = height;
+		const w = this._width.value;
+		const h = this._height.value;
+		this._testWidth = this._width.value = width;
+		this._testHeight = this._height.value = height;
 		this.$project.history.$fieldChange(this, "width", w, width, false);
 		this.$project.history.$fieldChange(this, "height", h, height, false);
 	}
@@ -133,7 +133,7 @@ export class RectangularGrid extends Grid {
 	}
 
 	public $constrain(p: IPoint): IPoint {
-		return rectangularConstrain(this._width, this._height, p);
+		return rectangularConstrain(this._width.value, this._height.value, p);
 	}
 
 	public $contains(p: IPoint): boolean {
@@ -143,7 +143,7 @@ export class RectangularGrid extends Grid {
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {
-		const w = this._width, h = this._height;
+		const w = this._width.value, h = this._height.value;
 		if(x == 0) {
 			if(y == 0) return Direction.LL;
 			if(y == h) return Direction.UL;
@@ -159,11 +159,11 @@ export class RectangularGrid extends Grid {
 	}
 
 	public $drawBorder(border: GraphicsLike): void {
-		border.drawRect(0, 0, this._width, this._height);
+		border.drawRect(0, 0, this._width.value, this._height.value);
 	}
 
 	public $getBorderPath(): Path {
-		const w = this._width, h = this._height;
+		const w = this._width.value, h = this._height.value;
 		return [
 			{ x: 0, y: 0 },
 			{ x: w, y: 0 },
@@ -173,18 +173,18 @@ export class RectangularGrid extends Grid {
 	}
 
 	public $drawGrid(grid: GraphicsLike): void {
-		for(let i = 1; i < this._height; i++) {
+		for(let i = 1; i < this._height.value; i++) {
 			grid.moveTo(0, i);
-			grid.lineTo(this._width, i);
+			grid.lineTo(this._width.value, i);
 		}
-		for(let i = 1; i < this._width; i++) {
+		for(let i = 1; i < this._width.value; i++) {
 			grid.moveTo(i, 0);
-			grid.lineTo(i, this._height);
+			grid.lineTo(i, this._height.value);
 		}
 	}
 
 	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
-		const w = this._width, h = this._height;
+		const w = this._width.value, h = this._height.value;
 		const max = Math.max(w, h);
 		const s = size / max;
 		return [s, 0, 0, -s, -s * w / 2, s * h / 2];
@@ -193,11 +193,11 @@ export class RectangularGrid extends Grid {
 	public readonly $offset: IPoint = { x: 0, y: 0 };
 
 	public get $renderHeight(): number {
-		return this._height;
+		return this._height.value;
 	}
 
 	public get $renderWidth(): number {
-		return this._width;
+		return this._width.value;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

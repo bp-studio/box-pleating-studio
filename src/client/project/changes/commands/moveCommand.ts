@@ -12,6 +12,8 @@ export interface JMoveCommand extends JCommand {
 	readonly new: IPoint;
 }
 
+const draggingSession = new Set<MoveCommand>();
+
 //=================================================================
 /**
  * {@link MoveCommand} is when the user moves an object.
@@ -20,11 +22,15 @@ export interface JMoveCommand extends JCommand {
 
 export class MoveCommand extends Command implements JMoveCommand {
 
+	public static $onDragStart(): void {
+		draggingSession.clear();
+	}
+
 	public static $create(target: Draggable, newLocation: IPoint, oldLocation?: IPoint): MoveCommand {
 		return new MoveCommand(target.$project, {
 			tag: target.$tag,
 			old: oldLocation || clone(target.$location),
-			new: newLocation,
+			new: clone(newLocation),
 		});
 	}
 
@@ -41,15 +47,21 @@ export class MoveCommand extends Command implements JMoveCommand {
 		super(project, json);
 		this.old = json.old;
 		this.new = json.new;
+		if(project.$isDragging) draggingSession.add(this);
 	}
 
 	public $canAddTo(command: Command): boolean {
-		return command instanceof MoveCommand && command.tag == this.tag &&
-			// Candidate command must be immediately after self
+		// Precondition
+		if(!(command instanceof MoveCommand && command.tag == this.tag)) return false;
+
+		// Handle dragging
+		if(this._project.$isDragging) return draggingSession.has(command);
+
+		return (// Candidate command must be immediately after self
 			command.new.x == this.old.x && command.new.y == this.old.y &&
 			// In case of keyboard moving, it must roughly towards the same direction.
 			// This solves the issue of returning to the origin.
-			(this._project.$isDragging || this._dx * command._dx >= 0 && this._dy * command._dy >= 0);
+			this._dx * command._dx >= 0 && this._dy * command._dy >= 0);
 	}
 
 	public $addTo(command: Command): void {

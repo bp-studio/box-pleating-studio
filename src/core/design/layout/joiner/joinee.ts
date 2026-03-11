@@ -45,7 +45,7 @@ export class Joinee {
 		this._anchors = anchors;
 		this._v = new Vector(offset).$add(additionalOffset).$neg;
 		this._pt = pt.$add(this._v).$toIPoint();
-		this.e = p.$shape.ridges[q].$shift(additionalOffset);
+		this.e = p.$shape.value.ridges[q].$shift(additionalOffset);
 	}
 
 	public $setupDetour(rawDetour: RationalPath, reverse: boolean): void {
@@ -82,7 +82,7 @@ export class Joinee {
 		});
 
 		for(const q of [Direction.UL, Direction.LR]) {
-			const p = result.$anchorMap[q][0];
+			const p = result.$anchorMap.value[q][0];
 			if(!p.$isIntegral) {
 				const x = p.x;
 				const fractionalPart = x - Math.floor(x);
@@ -95,7 +95,7 @@ export class Joinee {
 	}
 
 	public $isSteeperThan(that: Joinee): boolean {
-		return this.p.$direction.$slope.gt(that.p.$direction.$slope);
+		return this.p.$direction.value.$slope.gt(that.p.$direction.value.$slope);
 	}
 
 	public $setupAnchor(upperLeft: boolean, anchor: Point): void {
