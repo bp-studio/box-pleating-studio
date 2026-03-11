@@ -16,6 +16,9 @@ interface ITagObject {
  * For asynchronous properties, one must implement {@link history.$fieldChange} elsewhere.
  */
 export class Field<V> {
+	/** Marks this as a reactive wrapper so {@link Destructible} preserves it. */
+	public readonly __v_isRef = true;
+
 	private readonly _ref: ShallowRef<V>;
 	private readonly _target: ITagObject;
 	private readonly _prop: string;
