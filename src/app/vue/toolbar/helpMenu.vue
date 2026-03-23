@@ -5,9 +5,9 @@
 		</div>
 		<div class="dropdown-item" @click="news">
 			<i class="fas fa-newspaper" />{{ $t('toolbar.help.news') }}
-			<div class="notify" v-if="notify"/>
+			<div class="notify" v-if="notify" />
 		</div>
-		<a class="dropdown-item" href="https://bp-studio.github.io" target="_blank" rel="noopener">
+		<a class="dropdown-item" :href="'https://bp-studio.github.io/' + loc" target="_blank" rel="noopener">
 			<i class="fas fa-globe" />{{ $t("toolbar.help.homepage") }}
 		</a>
 		<a class="dropdown-item" href="https://discord.gg/HkcdTDS4zZ" target="_blank" rel="noopener">
@@ -28,7 +28,7 @@
 		</DropdownItem>
 		<div class="dropdown-item" @click="update" v-else-if="updateReady">
 			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.update') }}
-			<div class="notify"/>
+			<div class="notify" />
 		</div>
 		<div class="dropdown-item" @click="checkUpdate" v-else>
 			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.checkUpdate') }}
@@ -63,6 +63,7 @@
 	});
 
 	const icon = computed(() => checking.value ? "bp-spinner fa-spin" : "bp-question-circle");
+	const loc = computed(() => i18n.locale.value == "en" ? "" : i18n.locale.value + "/");
 
 	async function update(): Promise<void> {
 		if(!await Dialogs.confirm(i18n.t("message.updateReady"))) return;

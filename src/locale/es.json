@@ -7,7 +7,7 @@
 		"title": "¡Bienvenido a Box Pleating Studio!",
 		"intro": [
 			"Esta aplicación se ha desarrollado para ayudar a los diseñadores de origami a crear modelos complejos y sorprendentes utilizando pliegues en grilla cuadriculada (box pleating) y dispositivos GOPS.",
-			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0} (solo en inglés)."
+			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0}."
 		],
 		"install": {
 			"hint": "¡También puede instalar BP Studio como una aplicación independiente en su dispositivo y usarla sin conexión!",

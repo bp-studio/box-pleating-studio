@@ -21,6 +21,11 @@ import type { Repository } from "./repository";
 export class NodeSet {
 
 	public readonly $leaves: readonly NodeId[];
+
+	/**
+	 * All nodes on the paths from {@link $leaves} to their LCA, excluding the LCA itself.
+	 * This is used in {@link traceContourTask} to build the {@link stretchMap}.
+	 */
 	public readonly $nodes: readonly NodeId[];
 
 	/**

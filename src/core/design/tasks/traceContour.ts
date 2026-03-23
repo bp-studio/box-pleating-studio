@@ -20,6 +20,13 @@ import type { ITreeNode, NodeGraphics, RoughContour, TraceContour, PatternContou
 
 const coveredJunctionMap = new Map<number, ValidJunction[]>();
 const stretchMap = new Map<number, Stretch[]>();
+
+/**
+ * Caches the stretch signature (sorted stretch IDs joined by ";") for each node.
+ * Persists across {@link Processor.$run} calls to detect stretch changes:
+ * when a node's current signature differs from its cached value,
+ * the node enters `stretchChanged` and its trace contour is recomputed.
+ */
 const signatureCache = new Map<number, string>();
 
 const aaUnion = new AAUnion();
