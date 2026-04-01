@@ -1,6 +1,6 @@
 import { Container } from "@pixi/display";
-
 import { shallowRef } from "vue";
+
 import { Field } from "client/shared/decorators";
 import { View } from "client/base/view";
 import { display } from "client/screen/display";

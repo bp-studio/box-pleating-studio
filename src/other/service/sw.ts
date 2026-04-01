@@ -129,7 +129,13 @@ interface PeriodicBackgroundSyncEvent extends ExtendableEvent {
 	tag: string;
 }
 
-self.addEventListener("periodicsync", (event: PeriodicBackgroundSyncEvent) => {
+declare global {
+	interface ServiceWorkerGlobalScopeEventMap {
+		periodicsync: PeriodicBackgroundSyncEvent;
+	}
+}
+
+self.addEventListener("periodicsync", event => {
 	if(event.tag == "update") {
 		console.log("Service worker periodic update check.");
 		event.waitUntil(self.registration.update());

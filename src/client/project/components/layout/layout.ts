@@ -1,8 +1,8 @@
 
 import { AlphaFilter } from "@pixi/filter-alpha";
+import { shallowRef } from "vue";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
-import { shallowRef } from "vue";
 import { River } from "./river";
 import { Sheet, getRelativePoint } from "../sheet";
 import { Layer } from "client/shared/layers";

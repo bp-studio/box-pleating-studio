@@ -7,10 +7,10 @@ import ProjectService from "client/services/projectService";
 import { display } from "client/screen/display";
 import { isTypedArray } from "shared/utils/array";
 import { Device } from "client/project/components/layout/device";
+import { MoveCommand } from "client/project/changes/commands/moveCommand";
 
 import type { Draggable } from "client/base/draggable";
 import type { ShallowRef } from "vue";
-import { MoveCommand } from "client/project/changes/commands/moveCommand";
 
 export interface IDragController {
 	readonly isDragging: ShallowRef<boolean>;

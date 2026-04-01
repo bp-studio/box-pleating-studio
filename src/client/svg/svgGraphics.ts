@@ -1,5 +1,5 @@
-import type { ILineStyleOptions, SmoothGraphics } from "@pixi/graphics-smooth";
-import type { LINE_SCALE_MODE } from "@pixi/graphics-smooth/lib/core/LineStyle";
+import type { ColorSource } from "@pixi/core";
+import type { ILineStyleOptions, SmoothGraphics, LINE_SCALE_MODE } from "@pixi/graphics-smooth";
 
 //=================================================================
 /**
@@ -80,10 +80,10 @@ export class SvgGraphics {
 	/**
 	 * We use the same signature as {@link SmoothGraphics} here.
 	 */
-	public lineStyle(options: ILineStyleOptions): this;
 	public lineStyle(
-		width: number, color?: number, alpha?: number,
+		width: number, color?: ColorSource, alpha?: number,
 		alignment?: number, scaleMode?: LINE_SCALE_MODE): this;
+	public lineStyle(options: ILineStyleOptions): this;
 	public lineStyle(...args: [number, ...unknown[]] | [ILineStyleOptions]): this {
 		if(typeof args[0] == "number") this._width = args[0];
 		else this._width = args[0].width;

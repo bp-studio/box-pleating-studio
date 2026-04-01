@@ -1,5 +1,6 @@
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 import { Graphics } from "@pixi/graphics";
+import { shallowRef } from "vue";
 
 import { Layer } from "client/shared/layers";
 import { drawContours, drawLines, fillContours } from "client/utils/contourUtil";
@@ -9,7 +10,6 @@ import { Independent } from "client/base/independent";
 import { Direction, quadrantNumber } from "shared/types/direction";
 import { style } from "client/services/styleService";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
-import { shallowRef } from "vue";
 import { SelectionController } from "client/controllers/selectionController";
 import { constrainFlap, getDots } from "../grid/constrain";
 

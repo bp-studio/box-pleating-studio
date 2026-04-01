@@ -1,7 +1,5 @@
 {
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
-		"baseUrl": "..",
 		"lib": [
 			"esnext",
 			"dom",
@@ -11,9 +9,14 @@
 			"wicg-file-system-access",
 			"scheduler-polyfill"
 		],
+		"paths": {
+			"*": [
+				"../*"
+			]
+		},
 		"esModuleInterop": true,
 		"module": "esnext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"noImplicitOverride": true,
 		"removeComments": true,
 		"resolveJsonModule": true, // For resolving the type of `Locale`

@@ -1,4 +1,5 @@
 import { shallowRef } from "vue";
+
 import { View } from "./view";
 import { hitMap } from "client/screen/controlEventBoundary";
 import { display } from "client/screen/display";

@@ -1,11 +1,10 @@
-import { computed, h } from "vue";
+import { computed, shallowRef } from "vue";
 import { Container } from "@pixi/display";
 import { Graphics } from "@pixi/graphics";
 import { Rectangle } from "@pixi/math";
 import { SmoothGraphics } from "@pixi/graphics-smooth";
 
 import settings from "app/services/settingService";
-import { shallowRef } from "vue";
 import { View } from "client/base/view";
 import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import ProjectService from "client/services/projectService";

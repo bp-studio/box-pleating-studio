@@ -1,4 +1,4 @@
-///<reference types="@rspack/core/module.d.ts" />
+///<reference types="../../../node_modules/@rspack/core/module.d.ts" />
 
 /**
  * Import all log files.
