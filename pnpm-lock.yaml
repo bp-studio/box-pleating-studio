@@ -150,6 +150,9 @@ importers:
       '@types/node':
         specifier: ^25.5.0
         version: 25.5.0
+      '@types/serviceworker':
+        specifier: ^0.0.194
+        version: 0.0.194
       '@types/wicg-file-system-access':
         specifier: ^2023.10.7
         version: 2023.10.7
@@ -2422,6 +2425,9 @@ packages:
 
   '@types/semver@7.7.1':
     resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
+
+  '@types/serviceworker@0.0.194':
+    resolution: {integrity: sha512-VYWvMo93nA+tio3g9eAeRcbp4jn0cfpjMyS4IUwVQURMWKVyLr93HqLWBHqOoVvt+KbOueENVOu9Fhb2t15wSQ==}
 
   '@types/streamx@2.9.5':
     resolution: {integrity: sha512-IHYsa6jYrck8VEdSwpY141FTTf6D7boPeMq9jy4qazNrFMA4VbRz/sw5LSsfR7jwdDcx0QKWkUexZvsWBC2eIQ==}
@@ -9079,6 +9085,8 @@ snapshots:
   '@types/resolve@1.20.2': {}
 
   '@types/semver@7.7.1': {}
+
+  '@types/serviceworker@0.0.194': {}
 
   '@types/streamx@2.9.5':
     dependencies:

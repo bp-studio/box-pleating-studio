@@ -9,7 +9,9 @@
 		"removeComments": true,
 		"skipLibCheck": true,
 		"target": "es2017",
-		"types": []
+		"types": [
+			"serviceworker"
+		]
 	},
 	"include": [
 		"./**/*.ts"
