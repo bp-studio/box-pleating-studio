@@ -1,7 +1,5 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".", // This is required by @hyperse/ts-node as of v1.1.0
-		"ignoreDeprecations": "6.0", // This is for the previous line
 		"rootDir": "../",
 		"outDir": "../build",
 		"isolatedModules": true,
