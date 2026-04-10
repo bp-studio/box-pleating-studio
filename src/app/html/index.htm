@@ -32,10 +32,18 @@
 		gtag("js", new Date());
 		gtag("config", "G-GG1TEZGBCQ", app_config);
 
-		// Setup dark mode if needed immediately on first visit, to avoid flashing
-		if(!localStorage.getItem("settings") && matchMedia("(prefers-color-scheme: dark)").matches) {
-			document.documentElement.classList.add("dark");
-		}
+		// Switch to dark theme immediately if necessary to avoid flashing
+		(function() {
+			var theme = "system", dark = false;
+			try {
+				// eslint-disable-next-line compat/compat
+				theme = JSON.parse(localStorage.getItem("settings")).theme;
+				dark = matchMedia("(prefers-color-scheme: dark)").matches;
+			} catch(e) { }
+			if(theme == "dark" || theme == "system" && dark) {
+				document.documentElement.classList.add("dark");
+			}
+		})();
 	</script>
 
 	<!-- SEO -->
@@ -47,17 +55,19 @@
 
 	<!-- PWA setup -->
 	<link rel="canonical" href="https://bpstudio.abstreamace.com" />
-	<link rel="manifest" href="manifest.json">
 	<link rel="icon" type="image/png" sizes="512x512" href="assets/icon/icon-512.png">
 	<link rel="icon" type="image/png" sizes="192x192" href="assets/icon/icon-192.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="assets/icon/icon-96.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="assets/icon/icon-32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="assets/icon/icon-16.png">
-	<link rel='apple-touch-icon' sizes='192x192' href="assets/icon/icon-192.png">
 	<meta name="theme-color" content="#007bff">
-	<meta name="mobile-web-app-capable" content="yes">
+
+	<!-- The followings are needed for iOS 11.3-16.3 -->
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="Box Pleating Studio">
+
+	<!-- The following is needed for iOS 11.3-15.3 -->
+	<link rel='apple-touch-icon' sizes='192x192' href="assets/icon/icon-192.png">
 
 	<!--
 		iOS Splash
@@ -359,17 +369,6 @@
 			function stack(e) {
 				if(!e) return "";
 				return typeof e.stack == "string" ? e.stack.replace(/^.+? at/, "") : e.toString();
-			}
-
-			// Switch to dark theme immediately if necessary to avoid white flash
-			var theme = "system", dark = false;
-			try {
-				// eslint-disable-next-line compat/compat
-				theme = JSON.parse(localStorage.getItem("settings")).theme;
-				dark = matchMedia("(prefers-color-scheme: dark)").matches;
-			} catch(e) { }
-			if(theme == "dark" || theme == "system" && dark) {
-				document.documentElement.classList.add("dark");
 			}
 
 			// Quick legacy browser detection, covering:
