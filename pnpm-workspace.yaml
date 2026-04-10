@@ -5,11 +5,12 @@ onlyBuiltDependencies:
   - "@swc/core"
   - "core-js"
   - "oxc-resolver"
+  - sharp
   - "ttf2woff2"
   - "unrs-resolver"
 overrides:
-  magic-string: ^0.30.0
   js-yaml: ^4.1.1
+  magic-string: ^0.30.0
 patchedDependencies:
   "@swc-node/core": patches/@swc-node__core.patch
 peerDependencyRules:

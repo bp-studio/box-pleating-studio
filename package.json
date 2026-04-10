@@ -115,6 +115,7 @@
 		"postcss-preset-env": "^11.2.0",
 		"purgecss": "^8.0.0",
 		"scheduler-polyfill": "^1.3.0",
+		"sharp": "^0.34.5",
 		"stylelint": "^17.6.0",
 		"stylelint-config-clean-order": "^8.0.1",
 		"stylelint-config-recommended-vue": "^1.6.1",
