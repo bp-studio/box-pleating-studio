@@ -9,9 +9,6 @@ overrides:
   magic-string: ^0.30.0
 
 patchedDependencies:
-  '@swc-node/core':
-    hash: 22da051c6caa8afb0c7820b027552fd73bbf0fb05a6e81932849b1a7fd241277
-    path: patches/@swc-node__core.patch
   fantasticon@4.1.0:
     hash: 6eec05e4dcd50c9062a34aa54b6b8ccdf192b6e00c924b41ce3fcd8a8143405d
     path: patches/fantasticon@4.1.0.patch
@@ -126,12 +123,6 @@ importers:
       '@rspack/core':
         specifier: ^1.7.11
         version: 1.7.11(@swc/helpers@0.5.21)
-      '@swc-node/core':
-        specifier: ^1.14.1
-        version: 1.14.1(patch_hash=22da051c6caa8afb0c7820b027552fd73bbf0fb05a6e81932849b1a7fd241277)(@swc/core@1.15.24(@swc/helpers@0.5.21))(@swc/types@0.1.26)
-      '@swc/core':
-        specifier: ^1.15.24
-        version: 1.15.24(@swc/helpers@0.5.21)
       '@types/bootstrap':
         specifier: ^5.2.10
         version: 5.2.10
@@ -9308,14 +9299,14 @@ snapshots:
       magic-string: 0.30.21
       string.prototype.matchall: 4.0.12
 
-  '@swc-node/core@1.14.1(patch_hash=22da051c6caa8afb0c7820b027552fd73bbf0fb05a6e81932849b1a7fd241277)(@swc/core@1.15.24(@swc/helpers@0.5.21))(@swc/types@0.1.26)':
+  '@swc-node/core@1.14.1(@swc/core@1.15.24(@swc/helpers@0.5.21))(@swc/types@0.1.26)':
     dependencies:
       '@swc/core': 1.15.24(@swc/helpers@0.5.21)
       '@swc/types': 0.1.26
 
   '@swc-node/register@1.11.1(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@swc/core@1.15.24(@swc/helpers@0.5.21))(@swc/types@0.1.26)(typescript@6.0.2)':
     dependencies:
-      '@swc-node/core': 1.14.1(patch_hash=22da051c6caa8afb0c7820b027552fd73bbf0fb05a6e81932849b1a7fd241277)(@swc/core@1.15.24(@swc/helpers@0.5.21))(@swc/types@0.1.26)
+      '@swc-node/core': 1.14.1(@swc/core@1.15.24(@swc/helpers@0.5.21))(@swc/types@0.1.26)
       '@swc-node/sourcemap-support': 0.6.1
       '@swc/core': 1.15.24(@swc/helpers@0.5.21)
       colorette: 2.0.20
