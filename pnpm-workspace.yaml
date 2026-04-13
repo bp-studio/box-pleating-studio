@@ -4,6 +4,7 @@ minimumReleaseAgeExclude:
 onlyBuiltDependencies:
   - "@swc/core"
   - "core-js"
+  - es5-ext
   - "oxc-resolver"
   - sharp
   - "ttf2woff2"
@@ -13,6 +14,7 @@ overrides:
   magic-string: ^0.30.0
 patchedDependencies:
   "@swc-node/core": patches/@swc-node__core.patch
+  fantasticon@4.1.0: patches/fantasticon@4.1.0.patch
 peerDependencyRules:
   allowAny:
     - eslint

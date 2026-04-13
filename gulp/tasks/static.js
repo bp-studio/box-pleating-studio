@@ -1,50 +1,28 @@
 import fontawesome from "gulp-fontawesome";
 import gulp from "gulp";
 import through2 from "gulp-through2";
+import { FontAssetType, OtherAssetType, generateFonts } from "fantasticon";
+import { existsSync, mkdirSync } from "fs";
 
 import config from "../config.json" with { type: "json" };
 
-function woff2(stem) {
-	if(!stem) throw new Error("Woff2 error: must specify filename.");
-	let ttf;
-	const reg = new RegExp("(src:\\n(\\s+))(url\\('fonts\\/" +
-		stem + ".ttf\\?(......)'\\) format\\('truetype'\\))");
+gulp.task("icon", () => {
+	const dest = "./build/temp/bps";
+	if(!existsSync(dest)) mkdirSync(dest, { recursive: true });
 
-	return through2({
-		name: "woff2",
-		transform(content, file) {
-			// These are redundant considering our target browser versions
-			if(file.extname == ".svg" || file.extname == ".woff") return null;
-
-			// We keep the .ttf format since Safari 11 has limited support for woff2
-			if(file.extname == ".ttf") ttf = file;
-
-			if(file.extname == ".css") {
-				return content
-					.replace(reg, "$1url('fonts/" + stem + ".woff2') format('woff2'),\n$2$3")
-					.replace(/(?<=format\('truetype'\)).+?;/s, ";");
-			}
+	return generateFonts({
+		name: "bps",
+		inputDir: "./src/other/icons/dist",
+		outputDir: dest,
+		fontTypes: [FontAssetType.WOFF2, FontAssetType.TTF],
+		assetTypes: [OtherAssetType.CSS],
+		prefix: "bp",
+		pathOptions: {
+			css: `${dest}/style.css`,
 		},
-		async flush(files) {
-			if(ttf) {
-				const ttf2woff2 = (await import("ttf2woff2")).default;
-				const file = ttf.clone({ contents: false });
-				file.extname = ".woff2";
-				file.contents = ttf2woff2(ttf.contents);
-				files.push(file);
-			}
-		},
+		getIconId: ({ basename }) => basename,
 	});
-};
-
-const buildIcon = () =>
-	gulp.src(config.src.icon + "/bps/**/*", {
-		encoding: false, // Gulp v5
-	})
-		.pipe(woff2("bps"))
-		.pipe(gulp.dest(config.dest.temp + "/bps"));
-
-gulp.task("icon", buildIcon);
+});
 
 /** FontAwesome */
 const faTarget = config.dest.temp + "/font-awesome";

@@ -100,6 +100,7 @@
 		"eslint-plugin-jsdoc": "^62.9.0",
 		"eslint-plugin-typescript-compat": "^1.0.2",
 		"fancy-log": "^2.0.0",
+		"fantasticon": "^4.1.0",
 		"find-cache-directory": "^6.0.0",
 		"gulp": "^5.0.1",
 		"gulp-fontawesome": "^1.1.0",
