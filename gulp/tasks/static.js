@@ -1,7 +1,7 @@
 import fontawesome from "gulp-fontawesome";
 import gulp from "gulp";
 import through2 from "gulp-through2";
-import { FontAssetType, OtherAssetType, generateFonts } from "fantasticon";
+import { FontAssetType, OtherAssetType, generateFonts } from "@twbs/fantasticon";
 import { existsSync, mkdirSync } from "fs";
 
 import config from "../config.json" with { type: "json" };

@@ -12,8 +12,6 @@ onlyBuiltDependencies:
 overrides:
   js-yaml: ^4.1.1
   magic-string: ^0.30.0
-patchedDependencies:
-  fantasticon@4.1.0: patches/fantasticon@4.1.0.patch
 peerDependencyRules:
   allowAny:
     - eslint
