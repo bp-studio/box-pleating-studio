@@ -1,18 +1,26 @@
 <template>
-	<Export :title="$t('plugin.CP._')" :blob="getBlob" ref="exp" :mime="mime()"
-		:description="formats[options.format].description" :extension="'.' + options.format" screen="CP"
-		:observe="() => options" @save="save">
+	<Export
+		ref="exp"
+		:title="$t('plugin.CP._')"
+		:blob="getBlob"
+		:mime="mime()"
+		:description="formats[options.format].description"
+		:extension="'.' + options.format"
+		screen="CP"
+		:observe="() => options"
+		@save="save"
+	>
 		<div class="row">
 			<label class="col-4 mb-2 col-form-label fw-bolder">{{ $t("plugin.CP.format") }}</label>
 			<div class="col mb-2">
-				<select class="form-select" v-model="options.format">
+				<select v-model="options.format" class="form-select">
 					<option value="cp">CP</option>
 					<option value="fold">FOLD</option>
 				</select>
 			</div>
 		</div>
 		<Toggle v-model="options.reorient">{{ $t('plugin.CP.reorient') }}</Toggle>
-		<Toggle :style="{visibility: options.format==='cp' ? 'visible': 'hidden'}" v-model="options.useAuxiliary">{{ $t('plugin.CP.useAuxiliary') }}</Toggle>
+		<Toggle v-model="options.useAuxiliary" :style="{visibility: options.format==='cp' ? 'visible': 'hidden'}">{{ $t('plugin.CP.useAuxiliary') }}</Toggle>
 	</Export>
 </template>
 

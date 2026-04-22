@@ -2,12 +2,17 @@
 	<div class="row mb-2 py-1">
 		<div class="col">
 			<div class="form-check form-switch">
-				<input class="form-check-input" type="checkbox" :id="id" :checked="modelValue"
-					@input="modelValue = isChecked($event.target)">
-				<label class="form-check-label" v-bind:for="id">
-					<slot />
+				<input
+					:id="id"
+					class="form-check-input"
+					type="checkbox"
+					:checked="modelValue"
+					@input="modelValue = isChecked($event.target)"
+				>
+				<label class="form-check-label" :for="id">
+					<slot/>
 				</label>
-				<slot name="append" />
+				<slot name="append"/>
 			</div>
 		</div>
 	</div>
@@ -19,9 +24,9 @@
 
 	defineOptions({ name: "Toggle" });
 
-	const id = `field${useId()}`;
-
 	const modelValue = defineModel<boolean>({ required: true });
+
+	const id = `field${useId()}`;
 
 	function isChecked(target: unknown): boolean {
 		return (target as HTMLInputElement).checked;

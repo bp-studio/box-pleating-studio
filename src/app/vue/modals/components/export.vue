@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" ref="el">
+	<div ref="el" class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header">
@@ -7,22 +7,38 @@
 				</div>
 				<div class="modal-body">
 					<slot/>
-					<div class="row mb-2" v-if="!HandleService.enabled.value">
+					<div v-if="!HandleService.enabled.value" class="row mb-2">
 						<div class="col col-form-label flex-grow-0">{{ $t("keyword.filename") }}</div>
 						<div class="col flex-grow-1">
-							<input type="text" class="form-control" v-model="extFilename" >
+							<input v-model="extFilename" type="text" class="form-control">
 						</div>
 					</div>
 					<div v-if="isInApp">{{ $t("message.inApp") }}</div>
 					<div class="p-2 text-center">
-						<button disabled v-if="!url" type="button" class="btn btn-lg btn-success">
-							<i class="bp-spinner fa-spin" />
+						<button
+							v-if="!url"
+							disabled
+							type="button"
+							class="btn btn-lg btn-success"
+						>
+							<i class="bp-spinner fa-spin"/>
 						</button>
-						<CheckButton v-else-if="HandleService.enabled.value" ref="bt" type="button" class="btn btn-lg btn-success"
-							@click="save">
+						<CheckButton
+							v-else-if="HandleService.enabled.value"
+							ref="bt"
+							type="button"
+							class="btn btn-lg btn-success"
+							@click="save"
+						>
 							{{ $t("keyword.export") }}
 						</CheckButton>
-						<a v-else :href="url" :download="extFilename" class="btn btn-lg btn-success" @click="$emit('save')">{{
+						<a
+							v-else
+							:href="url"
+							:download="extFilename"
+							class="btn btn-lg btn-success"
+							@click="$emit('save')"
+						>{{
 							$t("keyword.download") }}</a>
 					</div>
 				</div>
@@ -47,11 +63,6 @@
 
 	defineOptions({ name: "Export" });
 
-	const bt = useTemplateRef("bt");
-	const url = shallowRef<string | null>(null);
-	const extFilename = shallowRef<string>("");
-	let suggestedName: string;
-
 	const props = defineProps<{
 		title: string;
 		mime: MIMEType;
@@ -60,6 +71,15 @@
 		observe?: Action<object>;
 		blob: Action<Promise<Blob>>;
 	}>();
+
+	const emit = defineEmits<{
+		save: [];
+	}>();
+
+	const bt = useTemplateRef("bt");
+	const url = shallowRef<string | null>(null);
+	const extFilename = shallowRef<string>("");
+	let suggestedName: string;
 
 	const attrs = useAttrs();
 	const { el, show, on } = useModal(attrs.screen as string, {
@@ -115,9 +135,6 @@
 		show();
 	}
 
-	const emit = defineEmits<{
-		save: [];
-	}>();
 	defineExpose({ show: showWithFilename });
 
 </script>

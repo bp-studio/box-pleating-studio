@@ -1,13 +1,23 @@
 <template>
-	<div :id="`tab${id}`" role="tab" @mousedown="Workspace.select(id)" @touchstart.passive="Workspace.select(id)">
+	<div
+		:id="`tab${id}`"
+		role="tab"
+		@mousedown="Workspace.select(id)"
+		@touchstart.passive="Workspace.select(id)"
+	>
 		<div class="tab-close" :title="toolTip" @contextmenu="$emit('menu', $event)">
 			<div>
 				<span v-if="isModified">*</span>
 				{{ title }}
 			</div>
-			<div class="ps-2 pt-1 bt" @click.stop="Workspace.close(id)" @pointerdown.stop @mousedown.stop>
+			<div
+				class="ps-2 pt-1 bt"
+				@click.stop="Workspace.close(id)"
+				@pointerdown.stop
+				@mousedown.stop
+			>
 				<div class="close">
-					<i class="fas fa-times" />
+					<i class="fas fa-times"/>
 				</div>
 			</div>
 		</div>
@@ -16,8 +26,13 @@
 				<span v-if="isModified">*</span>
 				{{ title }}
 			</div>
-			<div class="px-2 bt" @click.stop="$emit('menu', $event)" @pointerdown.stop @touchstart.stop.passive>
-				<i class="fas fa-caret-down" />
+			<div
+				class="px-2 bt"
+				@click.stop="$emit('menu', $event)"
+				@pointerdown.stop
+				@touchstart.stop.passive
+			>
+				<i class="fas fa-caret-down"/>
 			</div>
 		</div>
 	</div>
@@ -37,14 +52,14 @@
 
 	const props = defineProps<{ id: ProjId }>();
 
+	const emit = defineEmits<{
+		menu: [event: PointerEvent];
+	}>();
+
 	function project(): Project | undefined {
 		// It is possible during context loss that the result is undefined.
 		return Workspace.getProject(props.id);
 	}
-
-	const emit = defineEmits<{
-		menu: [event: PointerEvent];
-	}>();
 
 	function getTitle(): string {
 		return project()?.design.title ?? "";

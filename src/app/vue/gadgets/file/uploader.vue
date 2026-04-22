@@ -1,8 +1,15 @@
 <template>
 	<div>
-		<input type="file" :id="id" :accept="type" :multiple="multiple" class="d-none" @change="upload($event)">
-		<label :class="labelCls ?? 'dropdown-item m-0'" :for="id" ref="lbl">
-			<slot />
+		<input
+			:id="id"
+			type="file"
+			:accept="type"
+			:multiple="multiple"
+			class="d-none"
+			@change="upload($event)"
+		>
+		<label ref="lbl" :class="labelCls ?? 'dropdown-item m-0'" :for="id">
+			<slot/>
 		</label>
 	</div>
 </template>
@@ -15,23 +22,23 @@
 
 	defineOptions({ name: "Uploader" });
 
-	const id: string = "file" + useId();
-	const lbl = useTemplateRef("lbl");
-
 	const props = defineProps<{
 		accept: string;
 		multiple?: boolean;
 		labelCls?: string;
 	}>();
 
+	const emit = defineEmits<{
+		upload: [value: File[]];
+	}>();
+
+	const id: string = "file" + useId();
+	const lbl = useTemplateRef("lbl");
+
 	const type = computed(() =>
 		!Studio.initialized || navigator.vendor && navigator.vendor.startsWith("Apple") ?
 			"" : props.accept
 	);
-
-	const emit = defineEmits<{
-		upload: [value: File[]];
-	}>();
 
 	function upload(event: Event): void {
 		const input = event.target as HTMLInputElement;

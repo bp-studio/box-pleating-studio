@@ -1,9 +1,29 @@
 <template>
-	<div id="divDPad" v-bind:class="{ 'show': show && !showPanel, 'disabled': Studio.isDragging }">
-		<KeyButton :show="show" icon="bp-up" style="top: -0.5rem; left: 2rem;" dir="up" />
-		<KeyButton :show="show" icon="bp-left" style="top: 2rem; left: -0.5rem;" dir="left" />
-		<KeyButton :show="show" icon="bp-right" style="top: 2rem; left: 4.5rem;" dir="right" />
-		<KeyButton :show="show" icon="bp-down" style="top: 4.5rem; left: 2rem;" dir="down" />
+	<div id="divDPad" :class="{ 'show': show && !showPanel, 'disabled': Studio.isDragging }">
+		<KeyButton
+			:show="show"
+			icon="bp-up"
+			style="top: -0.5rem; left: 2rem;"
+			dir="up"
+		/>
+		<KeyButton
+			:show="show"
+			icon="bp-left"
+			style="top: 2rem; left: -0.5rem;"
+			dir="left"
+		/>
+		<KeyButton
+			:show="show"
+			icon="bp-right"
+			style="top: 2rem; left: 4.5rem;"
+			dir="right"
+		/>
+		<KeyButton
+			:show="show"
+			icon="bp-down"
+			style="top: 4.5rem; left: 2rem;"
+			dir="down"
+		/>
 	</div>
 </template>
 

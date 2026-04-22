@@ -1,24 +1,24 @@
 <template>
 	<ContextMenu ref="tabMenu">
 		<DropdownItem @click="Workspace.clone(menuId)">
-			<i class="far fa-clone" />
+			<i class="far fa-clone"/>
 			{{ $t('toolbar.tab.clone') }}
 		</DropdownItem>
-		<Divider />
+		<Divider/>
 		<DropdownItem @click="Workspace.close(menuId)">
-			<i class="far fa-window-close" />
+			<i class="far fa-window-close"/>
 			{{ $t('toolbar.tab.close') }}
 		</DropdownItem>
 		<DropdownItem @click="Workspace.closeOther(menuId)">
-			<i class="far fa-window-close" />
+			<i class="far fa-window-close"/>
 			{{ $t('toolbar.tab.closeOther') }}
 		</DropdownItem>
 		<DropdownItem @click="Workspace.closeRight(menuId)">
-			<i class="far fa-window-close" />
+			<i class="far fa-window-close"/>
 			{{ $t('toolbar.tab.closeRight') }}
 		</DropdownItem>
 		<DropdownItem @click="Workspace.closeAll()">
-			<i class="far fa-window-close" />
+			<i class="far fa-window-close"/>
 			{{ $t('toolbar.tab.closeAll') }}
 		</DropdownItem>
 	</ContextMenu>

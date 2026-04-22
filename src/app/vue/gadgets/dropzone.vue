@@ -1,7 +1,7 @@
 <template>
 	<div class="dropzone" style="display: none;">
 		<div class="h2">
-			<span v-text="$t('message.dropzone')" />
+			<span v-text="$t('message.dropzone')"/>
 		</div>
 	</div>
 </template>

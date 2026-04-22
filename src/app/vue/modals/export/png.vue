@@ -1,6 +1,14 @@
 <template>
-	<Export :title="$t('toolbar.file.PNG.download')" :blob="getBlob" ref="exp" mime="image/png"
-		:description="$t('toolbar.file.PNG.name')" extension=".png" screen="PNG" @save="save" />
+	<Export
+		ref="exp"
+		:title="$t('toolbar.file.PNG.download')"
+		:blob="getBlob"
+		mime="image/png"
+		:description="$t('toolbar.file.PNG.name')"
+		extension=".png"
+		screen="PNG"
+		@save="save"
+	/>
 </template>
 
 <script setup lang="ts">

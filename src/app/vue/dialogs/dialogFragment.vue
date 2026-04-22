@@ -1,8 +1,8 @@
 <template>
 	<template v-if="initialized">
-		<Alert ref="alert" />
-		<Confirm ref="confirm" />
-		<Error ref="error" />
+		<Alert ref="alert"/>
+		<Confirm ref="confirm"/>
+		<Error ref="error"/>
 	</template>
 </template>
 

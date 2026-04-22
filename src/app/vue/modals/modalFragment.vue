@@ -1,25 +1,25 @@
 <template>
 	<template v-if="phase >= 6">
-		<Note />
-		<Language />
+		<Note/>
+		<Language/>
 	</template>
 	<template v-if="phase >= 7">
-		<About :ref="mdlRef('about')" />
-		<Version :ref="mdlRef('ver')" />
+		<About :ref="mdlRef('about')"/>
+		<Version :ref="mdlRef('ver')"/>
 	</template>
 	<template v-if="phase >= 8">
-		<Share :ref="mdlRef('share')" />
-		<CP :ref="mdlRef('cp')" />
+		<Share :ref="mdlRef('share')"/>
+		<CP :ref="mdlRef('cp')"/>
 		<template v-if="!HandleService.enabled.value">
-			<SVG_ :ref="mdlRef('svg')" />
-			<PNG :ref="mdlRef('png')" />
-			<BPS :ref="mdlRef('bps')" />
-			<BPZ :ref="mdlRef('bpz')" />
+			<SVG_ :ref="mdlRef('svg')"/>
+			<PNG :ref="mdlRef('png')"/>
+			<BPS :ref="mdlRef('bps')"/>
+			<BPZ :ref="mdlRef('bpz')"/>
 		</template>
 	</template>
 	<template v-if="phase >= 9">
-		<Optimizer :ref="mdlRef('optimizer')" />
-		<Preference :ref="mdlRef('pref')" />
+		<Optimizer :ref="mdlRef('optimizer')"/>
+		<Preference :ref="mdlRef('pref')"/>
 	</template>
 </template>
 

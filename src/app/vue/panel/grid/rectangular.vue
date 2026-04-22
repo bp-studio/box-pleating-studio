@@ -1,6 +1,18 @@
 <template>
-	<Number :label="$t('panel.design.width')" v-model="grid().width" :min="MIN_RECT_SIZE" :max="MAX_SHEET_SIZE" hotkeys="d.wd,d.wi" />
-	<Number :label="$t('panel.design.height')" v-model="grid().height" :min="MIN_RECT_SIZE" :max="MAX_SHEET_SIZE" hotkeys="d.hd,d.hi" />
+	<Number
+		v-model="grid().width"
+		:label="$t('panel.design.width')"
+		:min="MIN_RECT_SIZE"
+		:max="MAX_SHEET_SIZE"
+		hotkeys="d.wd,d.wi"
+	/>
+	<Number
+		v-model="grid().height"
+		:label="$t('panel.design.height')"
+		:min="MIN_RECT_SIZE"
+		:max="MAX_SHEET_SIZE"
+		hotkeys="d.hd,d.hi"
+	/>
 </template>
 
 <script setup lang="ts">

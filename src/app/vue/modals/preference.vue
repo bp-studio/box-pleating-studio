@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" ref="el">
+	<div ref="el" class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header d-flex">
@@ -7,12 +7,18 @@
 					<div class="flex-grow-1 ps-5">
 						<div class="d-none d-sm-block">
 							<div class="nav nav-tabs position-relative" style="top: 1rem;">
-								<button class="nav-link" :class="{ active: tab == 0 }" @click="tab = 0">{{
-									$t("preference.general") }}</button>
-								<button class="nav-link" :class="{ active: tab == 1 }" @click="tab = 1">{{
-									$t("preference.color._") }}</button>
-								<button class="nav-link" :class="{ active: tab == 2 }" @click="tab = 2">{{ $t("preference.hotkey")
-								}}</button>
+								<button class="nav-link" :class="{ active: tab == 0 }" @click="tab = 0">
+									{{
+										$t("preference.general") }}
+								</button>
+								<button class="nav-link" :class="{ active: tab == 1 }" @click="tab = 1">
+									{{
+										$t("preference.color._") }}
+								</button>
+								<button class="nav-link" :class="{ active: tab == 2 }" @click="tab = 2">
+									{{ $t("preference.hotkey")
+									}}
+								</button>
 							</div>
 						</div>
 						<!--
@@ -20,7 +26,7 @@
 							It's possible to completely switch to select box if tabs keeps increasing in the future.
 						-->
 						<div class="d-block d-sm-none">
-							<select class="form-select" v-model.number="tab">
+							<select v-model.number="tab" class="form-select">
 								<option value="0">{{ $t("preference.general") }}</option>
 								<option value="1">{{ $t("preference.color._") }}</option>
 								<option value="2">{{ $t("preference.hotkey") }}</option>
@@ -41,7 +47,7 @@
 									The worst that can happen is missing flags in the select box,
 									and only in very old browsers.
 								-->
-								<select class="form-select flag" v-model="$i18n.locale" aria-label="Language">
+								<select v-model="$i18n.locale" class="form-select flag" aria-label="Language">
 									<option v-for="l in $i18n.availableLocales" :key="l" :value="l">
 										{{ $t('emoji', {}, { locale: l }) }}&ensp;{{ $t('name', {}, { locale: l }) }}
 									</option>
@@ -51,7 +57,7 @@
 						<div class="row mb-2">
 							<label class="col-form-label col-4">{{ $t("preference.theme._") }}</label>
 							<div class="col-8">
-								<select class="form-select" v-model="Settings.theme">
+								<select v-model="Settings.theme" class="form-select">
 									<option value="system">{{ $t("preference.theme.system") }}</option>
 									<option value="light">{{ $t("preference.theme.light") }}</option>
 									<option value="dark">{{ $t("preference.theme.dark") }}</option>
@@ -63,7 +69,7 @@
 						</Toggle>
 						<template v-if="isFileApiEnabled">
 							<Toggle v-model="Settings.useFileSystem">
-								<template v-slot:append><Help :title="$t('help.useFileSystem')" /></template>
+								<template #append><Help :title="$t('help.useFileSystem')"/></template>
 								{{ $t('preference.useFileSystem') }}
 							</Toggle>
 							<Toggle v-model="Settings.loadSessionOnQueue">
@@ -76,27 +82,51 @@
 					</div>
 					<div v-if="phase >= 10" v-show="tab == 1" class="p-2 h-100">
 						<div class="color-grid">
-							<Color :default="Studio.style.border.color" v-model="Settings.colorScheme.border"
-								:label="$t('preference.color.border')" />
-							<Color :default="Studio.style.grid.color" v-model="Settings.colorScheme.grid"
-								:label="$t('preference.color.grid')" />
-							<Color :default="Studio.style.hinge.color" v-model="Settings.colorScheme.hinge"
-								:label="$t('preference.color.hinge')" />
-							<Color :default="Studio.style.ridge.color" v-model="Settings.colorScheme.ridge"
-								:label="$t('preference.color.ridge')" />
-							<Color :default="Studio.style.axisParallel.color" v-model="Settings.colorScheme.axialParallel"
-								:label="$t('preference.color.axisParallel')" />
-							<Color :default="Studio.style.junction.color" v-model="Settings.colorScheme.junction"
-								:label="$t('preference.color.overlap')" />
-							<Color :default="Studio.style.dot.fill" v-model="Settings.colorScheme.dot"
-								:label="$t('preference.color.tip')" />
-							<Color :default="Studio.style.label.color" v-model="Settings.colorScheme.label"
-								:label="$t('preference.color.label')" />
+							<Color
+								v-model="Settings.colorScheme.border"
+								:default="Studio.style.border.color"
+								:label="$t('preference.color.border')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.grid"
+								:default="Studio.style.grid.color"
+								:label="$t('preference.color.grid')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.hinge"
+								:default="Studio.style.hinge.color"
+								:label="$t('preference.color.hinge')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.ridge"
+								:default="Studio.style.ridge.color"
+								:label="$t('preference.color.ridge')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.axialParallel"
+								:default="Studio.style.axisParallel.color"
+								:label="$t('preference.color.axisParallel')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.junction"
+								:default="Studio.style.junction.color"
+								:label="$t('preference.color.overlap')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.dot"
+								:default="Studio.style.dot.fill"
+								:label="$t('preference.color.tip')"
+							/>
+							<Color
+								v-model="Settings.colorScheme.label"
+								:default="Studio.style.label.color"
+								:label="$t('preference.color.label')"
+							/>
 						</div>
 					</div>
 					<!-- Use v-if to reset its state every time -->
 					<div v-if="tab == 2" class="p-2 h-100">
-						<KeyTable />
+						<KeyTable/>
 					</div>
 				</div>
 				<div class="modal-footer">

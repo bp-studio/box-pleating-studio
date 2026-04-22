@@ -2,7 +2,7 @@
 	<div id="divSpinner" class="viewport" :class="{ 'shift-down': Workspace.ids.value.length, 'show': visible }">
 		<div class="h-100 d-flex text-center align-items-center">
 			<div class="spinner-container">
-				<i class="bp-spinner fa-spin" />
+				<i class="bp-spinner fa-spin"/>
 			</div>
 		</div>
 	</div>

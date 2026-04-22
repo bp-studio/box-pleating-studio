@@ -13,14 +13,15 @@
 	 * as the operations are supposed to be considerably quick,
 	 * and disabling the button will result in flashes.
 	 */
-	export default {
-		name: "AsyncButton",
-	};
 </script>
 
-<script setup lang="ts" >
+<script setup lang="ts">
 
 	import StudioService from "app/services/studioService";
+
+	defineOptions({
+		name: "AsyncButton",
+	});
 
 	defineProps<{
 		click: Action<Promise<void>>;

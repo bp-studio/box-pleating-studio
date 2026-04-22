@@ -1,15 +1,15 @@
 <template>
 	<SubMenu icon="fas fa-history" :label="$t('toolbar.file.recent.title')">
 		<DropdownItem v-if="Handles.recent.length == 0" disabled>
-			<i />{{ $t('toolbar.file.recent.empty') }}
+			<i/>{{ $t('toolbar.file.recent.empty') }}
 		</DropdownItem>
 		<template v-else>
 			<DropdownItem v-for="(h, i) in Handles.recent" :key="i" @click="open(h)">
-				<i />{{ h.name }}
+				<i/>{{ h.name }}
 			</DropdownItem>
-			<Divider />
+			<Divider/>
 			<DropdownItem @click="Handles.clearRecent()">
-				<i class="fas fa-trash-alt" />{{ $t('toolbar.file.recent.clear') }}
+				<i class="fas fa-trash-alt"/>{{ $t('toolbar.file.recent.clear') }}
 			</DropdownItem>
 		</template>
 	</SubMenu>

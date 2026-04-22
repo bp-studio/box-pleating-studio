@@ -1,41 +1,69 @@
 <template>
-	<Dropdown label="Help" :icon="icon" :title="$t('toolbar.help.title')" :notify="notify || updateReady">
+	<Dropdown
+		label="Help"
+		:icon="icon"
+		:title="$t('toolbar.help.title')"
+		:notify="notify || updateReady"
+	>
 		<div class="dropdown-item" @click="show('about')">
-			<i class="bp-info text-info darken" />{{ $t('toolbar.help.about') }}
+			<i class="bp-info text-info darken"/>{{ $t('toolbar.help.about') }}
 		</div>
 		<div class="dropdown-item" @click="news">
-			<i class="fas fa-newspaper" />{{ $t('toolbar.help.news') }}
-			<div class="notify" v-if="notify" />
+			<i class="fas fa-newspaper"/>{{ $t('toolbar.help.news') }}
+			<div v-if="notify" class="notify"/>
 		</div>
-		<a class="dropdown-item" :href="'https://bp-studio.github.io/' + loc" target="_blank" rel="noopener">
-			<i class="fas fa-globe" />{{ $t("toolbar.help.homepage") }}
+		<a
+			class="dropdown-item"
+			:href="'https://bp-studio.github.io/' + loc"
+			target="_blank"
+			rel="noopener"
+		>
+			<i class="fas fa-globe"/>{{ $t("toolbar.help.homepage") }}
 		</a>
-		<a class="dropdown-item" href="https://discord.gg/HkcdTDS4zZ" target="_blank" rel="noopener">
+		<a
+			class="dropdown-item"
+			href="https://discord.gg/HkcdTDS4zZ"
+			target="_blank"
+			rel="noopener"
+		>
 			<!-- Use official color -->
-			<i class="fab fa-discord" style="color: #5865F2;" />Discord
+			<i class="fab fa-discord" style="color: #5865F2;"/>Discord
 		</a>
-		<a class="dropdown-item" href="https://github.com/bp-studio/box-pleating-studio/discussions" target="_blank"
-			rel="noopener">
-			<i class="far fa-comment-dots" />{{ $t("toolbar.help.discussions") }}
+		<a
+			class="dropdown-item"
+			href="https://github.com/bp-studio/box-pleating-studio/discussions"
+			target="_blank"
+			rel="noopener"
+		>
+			<i class="far fa-comment-dots"/>{{ $t("toolbar.help.discussions") }}
 		</a>
-		<a class="dropdown-item" href="https://github.com/bp-studio/box-pleating-studio/issues/new/choose" target="_blank"
-			rel="noopener">
-			<i class="fas fa-bug" />{{ $t("toolbar.help.issue") }}
+		<a
+			class="dropdown-item"
+			href="https://github.com/bp-studio/box-pleating-studio/issues/new/choose"
+			target="_blank"
+			rel="noopener"
+		>
+			<i class="fas fa-bug"/>{{ $t("toolbar.help.issue") }}
 		</a>
-		<Divider />
-		<DropdownItem disabled v-if="checking">
-			<i class="bp-spinner fa-spin" />{{ $t('toolbar.help.checkUpdate') }}
+		<Divider/>
+		<DropdownItem v-if="checking" disabled>
+			<i class="bp-spinner fa-spin"/>{{ $t('toolbar.help.checkUpdate') }}
 		</DropdownItem>
-		<div class="dropdown-item" @click="update" v-else-if="updateReady">
-			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.update') }}
-			<div class="notify" />
+		<div v-else-if="updateReady" class="dropdown-item" @click="update">
+			<i class="far fa-arrow-alt-circle-up"/>{{ $t('toolbar.help.update') }}
+			<div class="notify"/>
 		</div>
-		<div class="dropdown-item" @click="checkUpdate" v-else>
-			<i class="far fa-arrow-alt-circle-up" />{{ $t('toolbar.help.checkUpdate') }}
+		<div v-else class="dropdown-item" @click="checkUpdate">
+			<i class="far fa-arrow-alt-circle-up"/>{{ $t('toolbar.help.checkUpdate') }}
 		</div>
-		<Divider />
-		<a class="dropdown-item" href="donate.htm" target="_blank" rel="noopener">
-			<i class="fas fa-hand-holding-usd text-warning darken" />{{ $t('toolbar.help.donation') }}
+		<Divider/>
+		<a
+			class="dropdown-item"
+			href="donate.htm"
+			target="_blank"
+			rel="noopener"
+		>
+			<i class="fas fa-hand-holding-usd text-warning darken"/>{{ $t('toolbar.help.donation') }}
 		</a>
 	</Dropdown>
 </template>

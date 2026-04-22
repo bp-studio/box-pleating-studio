@@ -6,16 +6,21 @@
 			<button v-else-if="!nativeMode" class="btn btn-primary" @click="install">{{ $t("welcome.install.bt") }}</button>
 			<button v-else class="btn btn-primary" disabled>
 				{{ $t('welcome.install.prepare') }}&nbsp;
-				<i class="bp-spinner fa-spin" />
+				<i class="bp-spinner fa-spin"/>
 			</button>
 		</div>
 		<div v-if="state == installState.installing">
 			{{ $t('welcome.install.ing') }}&nbsp;
-			<i class="bp-spinner fa-spin" />
+			<i class="bp-spinner fa-spin"/>
 		</div>
 		<div v-if="state == installState.installed">
 			<p>{{ $t("welcome.install.ed") }}</p>
-			<a class="btn btn-primary" rel="noopener" :href="origin" target="_blank">{{ $t("welcome.install.open") }}</a>
+			<a
+				class="btn btn-primary"
+				rel="noopener"
+				:href="origin"
+				target="_blank"
+			>{{ $t("welcome.install.open") }}</a>
 		</div>
 	</div>
 </template>

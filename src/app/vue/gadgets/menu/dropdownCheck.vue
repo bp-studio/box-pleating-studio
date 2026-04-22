@@ -1,7 +1,12 @@
 <template>
 	<div class="dropdown-item" role="menuitemcheckbox" @click="toggle">
-		<Hotkey :icon="modelValue ? icon : ''" :color="color" :ctrl="Boolean(hk)" :hk="hk">
-			<slot />
+		<Hotkey
+			:icon="modelValue ? icon : ''"
+			:color="color"
+			:ctrl="Boolean(hk)"
+			:hk="hk"
+		>
+			<slot/>
 		</Hotkey>
 	</div>
 </template>

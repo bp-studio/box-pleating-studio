@@ -1,7 +1,7 @@
 <template>
-	<div class="modal fade modal-second" ref="el">
+	<div ref="el" class="modal fade modal-second">
 		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content" v-if="initialized">
+			<div v-if="initialized" class="modal-content">
 				<div class="modal-body" v-html="message"/>
 				<div class="modal-footer">
 					<slot/>

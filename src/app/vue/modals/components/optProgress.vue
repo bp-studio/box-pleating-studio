@@ -6,14 +6,27 @@
 		</div>
 		<div class="row mt-3">
 			<div class="col col-form-label">
-				<ProgressBar :value="value + animate()" :max="max" :percentage="percentage" />
+				<ProgressBar :value="value + animate()" :max="max" :percentage="percentage"/>
 			</div>
 			<div class="col-auto">
-				<button type="button" class="btn btn-secondary me-2" @click="context.skip"
-					:disabled="context.state.skipping || context.state.stopping || noSkip">{{ $t("plugin.optimizer.skip")
-					}}</button>
-				<button type="button" class="btn btn-danger" @click="context.stop" :disabled="context.state.stopping">{{
-					$t("keyword.abort") }}</button>
+				<button
+					type="button"
+					class="btn btn-secondary me-2"
+					:disabled="context.state.skipping || context.state.stopping || noSkip"
+					@click="context.skip"
+				>
+					{{ $t("plugin.optimizer.skip")
+					}}
+				</button>
+				<button
+					type="button"
+					class="btn btn-danger"
+					:disabled="context.state.stopping"
+					@click="context.stop"
+				>
+					{{
+						$t("keyword.abort") }}
+				</button>
 			</div>
 		</div>
 	</div>
@@ -41,14 +54,14 @@
 
 	defineOptions({ name: "OptProgress" });
 
-	const context = inject(contextKey)!;
-
 	const props = defineProps<{
 		noSkip?: boolean;
 		percentage?: boolean;
 		value: number;
 		max: number;
 	}>();
+
+	const context = inject(contextKey)!;
 
 	const time = shallowRef(0);
 	const INTERVAL = 500;

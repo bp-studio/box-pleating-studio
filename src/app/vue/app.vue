@@ -1,35 +1,35 @@
 <template>
-	<div v-on:mousedown.stop v-on:touchstart.stop.passive>
-		<Welcome />
-		<DPad v-if="phase >= 2" />
-		<Dropzone v-if="phase >= 3" />
+	<div @mousedown.stop @touchstart.stop.passive>
+		<Welcome/>
+		<DPad v-if="phase >= 2"/>
+		<Dropzone v-if="phase >= 3"/>
 
-		<Panel v-if="phase >= 1" />
+		<Panel v-if="phase >= 1"/>
 		<template v-else>
-			<div id="divShade" />
-			<aside class="scroll-shadow p-3" />
+			<div id="divShade"/>
+			<aside class="scroll-shadow p-3"/>
 		</template>
 
-		<Toolbar v-if="phase >= 3" />
-		<nav class="btn-toolbar p-2" v-else>
-			<StubMenu />
+		<Toolbar v-if="phase >= 3"/>
+		<nav v-else class="btn-toolbar p-2">
+			<StubMenu/>
 
 			<div class="btn-group me-2">
 				<button type="button" class="btn btn-primary" disabled>
-					<i class="bp-tree" />
+					<i class="bp-tree"/>
 				</button>
 				<button type="button" class="btn btn-primary" disabled>
-					<i class="bp-layout" />
+					<i class="bp-layout"/>
 				</button>
 			</div>
 		</nav>
 
-		<Status v-if="phase >= 2" />
-		<footer class="py-1 px-3" v-else />
+		<Status v-if="phase >= 2"/>
+		<footer v-else class="py-1 px-3"/>
 
-		<ModalFragment v-if="phase >= 2" />
-		<DialogFragment v-if="phase >= 1" />
-		<Spinner />
+		<ModalFragment v-if="phase >= 2"/>
+		<DialogFragment v-if="phase >= 1"/>
+		<Spinner/>
 	</div>
 </template>
 
