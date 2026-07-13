@@ -1,14 +1,14 @@
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@mutsuntsai/*"
-onlyBuiltDependencies:
-  - "@swc/core"
-  - "core-js"
-  - es5-ext
-  - "oxc-resolver"
-  - sharp
-  - "ttf2woff2"
-  - "unrs-resolver"
+allowBuilds:
+  "@swc/core": true
+  core-js: true
+  es5-ext: true
+  oxc-resolver: true
+  sharp: true
+  ttf2woff2: true
+  unrs-resolver: true
 overrides:
   js-yaml: ^4.1.1
   magic-string: ^0.30.0

@@ -95,6 +95,8 @@ typedef enum {
     NLOPT_GD_STOGO,
     NLOPT_GD_STOGO_RAND,
 
+    NLOPT_LD_LBFGS_NOCEDAL,
+
     NLOPT_LD_LBFGS,
 
     NLOPT_LN_PRAXIS,
@@ -180,7 +182,7 @@ NLOPT_EXTERN(nlopt_result) nlopt_result_from_string(const char *name);
 #define NLOPT_MINF_MAX_REACHED NLOPT_STOPVAL_REACHED
 
 NLOPT_EXTERN(void) nlopt_srand(unsigned long seed);
-NLOPT_EXTERN(void) nlopt_srand_time(void);
+// NLOPT_EXTERN(void) nlopt_srand_time(void);
 
 NLOPT_EXTERN(void) nlopt_version(int *major, int *minor, int *bugfix);
 

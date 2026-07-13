@@ -1,6 +1,5 @@
 {
 	"recommendations": [
-		"bierner.markdown-mermaid",
 		"bpruitt-goddard.mermaid-markdown-syntax-highlighting",
 		"dbaeumer.vscode-eslint",
 		"editorconfig.editorconfig",

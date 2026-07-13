@@ -15,7 +15,7 @@ DEP := $(patsubst $(SRCF)/%.cpp,$(TEMP)/%.d,$(SRC))
 OUT := optimizer
 
 LIB := lib/include
-NLOPT := nlopt.slsqp.2.9.1
+NLOPT := nlopt.slsqp.2.11.0
 
 CXXFLAG_dist = -O3 -fno-exceptions -flto
 CXXFLAG_dist_mp = -O3 -fno-exceptions -flto -fopenmp -pthread -mbulk-memory
