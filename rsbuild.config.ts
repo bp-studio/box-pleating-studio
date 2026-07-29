@@ -221,6 +221,7 @@ export default defineConfig({
 	tools: {
 		bundlerChain: (chain, { CHAIN_ID }) => {
 			chain.module.rule(CHAIN_ID.RULE.JS)
+				.oneOf(CHAIN_ID.ONE_OF.JS_MAIN)
 				.use("ifdef")
 				.after(CHAIN_ID.USE.SWC)
 				.loader("ifdef-loader")
@@ -228,6 +229,7 @@ export default defineConfig({
 					DEBUG: !isProduction,
 				});
 			chain.module.rule(CHAIN_ID.RULE.SASS)
+				.oneOf(CHAIN_ID.ONE_OF.CSS_MAIN)
 				.use("bootstrap-loader")
 				.after(CHAIN_ID.USE.CSS)
 				.loader("./lib/bootstrap/loader.js");
