@@ -36,7 +36,13 @@ function roughContour(): void {
 }
 
 function updater(node: ITreeNode): boolean {
-	if(!node.$parent) return false;
+	if(!node.$parent) {
+		// The root has no parent edge and therefore no rough contour of its own.
+		// Clear any contour it held as a former non-root, so that no stale
+		// contour referencing its previous subtree survives.
+		node.$graphics.$roughContours = [];
+		return false;
+	}
 	if(node.$isLeaf) {
 		// Base case
 		const path = node.$AABB.$toPath();

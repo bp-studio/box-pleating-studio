@@ -1,5 +1,11 @@
 <template>
-	<div class="dropdown-menu" @touchend="hide(false)" @mouseup="hide(false)" ref="el" v-if="initialized">
+	<div
+		v-if="initialized"
+		ref="el"
+		class="dropdown-menu"
+		@touchend="hide(false)"
+		@mouseup="hide(false)"
+	>
 		<slot/>
 	</div>
 </template>

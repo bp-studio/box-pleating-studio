@@ -1,36 +1,60 @@
 <template>
 	<Dropdown label="Settings" icon="bp-tasks" :title="$t('toolbar.setting.title')">
-		<template v-slot>
-			<Fullscreen />
-			<DropdownCheck v-model="Settings.display.grid" icon="fas fa-grip-lines" :color="Studio.style.grid.color" hk="1">
+		<template #default>
+			<Fullscreen/>
+			<DropdownCheck
+				v-model="Settings.display.grid"
+				icon="fas fa-grip-lines"
+				:color="Studio.style.grid.color"
+				hk="1"
+			>
 				{{ $t('toolbar.setting.grid') }}
 			</DropdownCheck>
-			<DropdownCheck v-model="Settings.display.hinge" icon="fas fa-grip-lines" :color="Studio.style.hinge.color" hk="2">
+			<DropdownCheck
+				v-model="Settings.display.hinge"
+				icon="fas fa-grip-lines"
+				:color="Studio.style.hinge.color"
+				hk="2"
+			>
 				{{ $t('toolbar.setting.hinge') }}
 			</DropdownCheck>
-			<DropdownCheck v-model="Settings.display.ridge" icon="fas fa-grip-lines" :color="Studio.style.ridge.color" hk="3">
+			<DropdownCheck
+				v-model="Settings.display.ridge"
+				icon="fas fa-grip-lines"
+				:color="Studio.style.ridge.color"
+				hk="3"
+			>
 				{{ $t('toolbar.setting.ridge') }}
 			</DropdownCheck>
-			<DropdownCheck v-model="Settings.display.axialParallel" icon="fas fa-grip-lines" :color="Studio.style.axisParallel.color"
-				hk="4">
+			<DropdownCheck
+				v-model="Settings.display.axialParallel"
+				icon="fas fa-grip-lines"
+				:color="Studio.style.axisParallel.color"
+				hk="4"
+			>
 				{{ $t('toolbar.setting.axial') }}
 			</DropdownCheck>
-			<DropdownCheck v-model="Settings.display.label" icon="fas fa-font" :color="Studio.style.label.color" hk="5">
+			<DropdownCheck
+				v-model="Settings.display.label"
+				icon="fas fa-font"
+				:color="Studio.style.label.color"
+				hk="5"
+			>
 				{{ $t('toolbar.setting.label') }}
 			</DropdownCheck>
 			<div class="dropdown-item" role="menuitemcheckbox" @click="toggle('dot')">
 				<Hotkey ctrl hk="6">
-					<template v-slot:icon>
-						<span class="dot-stack" v-if="Settings.display.dot">
+					<template #icon>
+						<span v-if="Settings.display.dot" class="dot-stack">
 							<i class="fas fa-circle" :style="'color:' + toHex(Studio.style.dot.fill)"/>
 							<i class="far fa-circle"/>
 						</span>
-						<i v-else />
+						<i v-else/>
 					</template>
 					<span>{{ $t('toolbar.setting.tip') }}</span>
 				</Hotkey>
 			</div>
-			<Divider />
+			<Divider/>
 			<DropdownCheck v-model="Settings.showStatus" icon="fas fa-compass">
 				{{ $t('toolbar.setting.status') }}
 			</DropdownCheck>
@@ -39,9 +63,9 @@
 					{{ $t('toolbar.setting.dPad') }}
 				</DropdownCheck>
 			</div>
-			<Divider />
+			<Divider/>
 			<DropdownItem @click="show('pref')">
-				<i class="fas fa-cog" />{{ $t('toolbar.setting.preference') }}
+				<i class="fas fa-cog"/>{{ $t('toolbar.setting.preference') }}
 			</DropdownItem>
 		</template>
 	</Dropdown>

@@ -5,11 +5,13 @@
 			"esnext",
 		],
 		"module": "esnext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"removeComments": true,
 		"skipLibCheck": true,
 		"target": "es2017",
-		"types": []
+		"types": [
+			"serviceworker"
+		]
 	},
 	"include": [
 		"./**/*.ts"

@@ -156,7 +156,8 @@
 		"src/public/**/*",
 		"lib/**/*"
 	],
-	"javascript.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
+	"js/ts.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
+	"js/ts.tsdk.path": "node_modules\\typescript\\lib",
 	"mochaExplorer.multiFileSuites": true,
 	"mochaExplorer.nodeArgv": [
 		"--enable-source-maps"
@@ -167,6 +168,5 @@
 		"css",
 		"scss",
 		"vue"
-	],
-	"typescript.tsdk": "node_modules\\typescript\\lib"
+	]
 }

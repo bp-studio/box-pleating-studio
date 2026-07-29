@@ -1,7 +1,15 @@
 <template>
 	<Row :label="label">
-		<input v-model="value" class="form-control" :placeholder="placeholder" :class="{ error: value != modelValue }"
-			:type="type" @focus="focus($event)" @blur="blur" @input="input($event)">
+		<input
+			v-model="value"
+			class="form-control"
+			:placeholder="placeholder"
+			:class="{ error: value != modelValue }"
+			:type="type"
+			@focus="focus($event)"
+			@blur="blur"
+			@input="input($event)"
+		>
 	</Row>
 </template>
 

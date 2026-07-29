@@ -1,5 +1,11 @@
 <template>
-	<Number :label="$t('panel.design.size')" v-model="grid().size" :min="MIN_DIAG_SIZE" :max="MAX_SHEET_SIZE" hotkeys="d.wd,d.wi" />
+	<Number
+		v-model="grid().size"
+		:label="$t('panel.design.size')"
+		:min="MIN_DIAG_SIZE"
+		:max="MAX_SHEET_SIZE"
+		hotkeys="d.wd,d.wi"
+	/>
 </template>
 
 <script setup lang="ts">

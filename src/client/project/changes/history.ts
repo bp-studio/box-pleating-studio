@@ -1,4 +1,5 @@
 import { shallowReactive, shallowRef } from "vue";
+
 import { FieldCommand } from "./commands/fieldCommand";
 import { Step, OperationResult, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";

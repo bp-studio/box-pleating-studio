@@ -5,7 +5,7 @@
 		<span v-else>{{ $t("message.min3vertex") }}</span>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="design.goToDual()" :title="hk('n', 'd')">{{ $t("panel.vertices.goto") }}</button>
+		<button class="btn btn-primary" :title="hk('n', 'd')" @click="design.goToDual()">{{ $t("panel.vertices.goto") }}</button>
 	</div>
 </template>
 

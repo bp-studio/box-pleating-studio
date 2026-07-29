@@ -1,8 +1,19 @@
 <template>
-	<div class="progress" role="progressbar" aria-label="Animated striped example" :aria-valuenow="value" aria-valuemin="0"
-		:aria-valuemax="max" style="height:1.5rem;" :style="transition ? '' : '--bs-progress-bar-transition: none;'">
-		<div class="progress-bar progress-bar-striped progress-bar-animated" :style="{ 'width': (value / max * 100) + '%' }"
-			v-text="text()"/>
+	<div
+		class="progress"
+		role="progressbar"
+		aria-label="Animated striped example"
+		:aria-valuenow="value"
+		aria-valuemin="0"
+		:aria-valuemax="max"
+		style="height:1.5rem;"
+		:style="transition ? '' : '--bs-progress-bar-transition: none;'"
+	>
+		<div
+			class="progress-bar progress-bar-striped progress-bar-animated"
+			:style="{ 'width': (value / max * 100) + '%' }"
+			v-text="text()"
+		/>
 	</div>
 </template>
 
@@ -11,16 +22,16 @@
 
 	defineOptions({ name: "ProgressBar" });
 
-	let lastChange = performance.now();
-
-	const transition = shallowRef(true);
-	const TRANSITION_THRESHOLD = 50;
-
 	const props = defineProps<{
 		value: number;
 		max: number;
 		percentage?: boolean;
 	}>();
+
+	let lastChange = performance.now();
+
+	const transition = shallowRef(true);
+	const TRANSITION_THRESHOLD = 50;
 
 	const FULL = 100;
 

@@ -20,19 +20,25 @@
 				<template v-for="(list, name) in Settings.hotkey" :key="name">
 					<tr @click="toggle(name)">
 						<td colspan="2">
-							<i class="fas fa-caret-down fa-fw" v-if="open[name]" />
-							<i class="fas fa-caret-right fa-fw" v-else />
+							<i v-if="open[name]" class="fas fa-caret-down fa-fw"/>
+							<i v-else class="fas fa-caret-right fa-fw"/>
 							{{ labels[name]['_'] }}
 						</td>
 					</tr>
-					<tr v-for="(key, command) in list" :key="name + '.' + command" v-show="open[name]">
+					<tr v-for="(k, command) in list" v-show="open[name]" :key="name + '.' + command">
 						<td class="ps-4">
 							<label :for="name + '.' + command">{{ labels[name][command] }}</label>
 						</td>
 						<td class="p-0 position-relative">
-							<input :id="name + '.' + command" type="text" class="border-0 w-100"
-								:value="CustomHotkeyService.formatKey(key)" @focus="setFocus($event.target)" @input.prevent
-								@keydown.prevent="setKey($event, name, command)" >
+							<input
+								:id="name + '.' + command"
+								type="text"
+								class="border-0 w-100"
+								:value="CustomHotkeyService.formatKey(k)"
+								@focus="setFocus($event.target)"
+								@input.prevent
+								@keydown.prevent="setKey($event, name, command)"
+							>
 							<!-- A mask for blocking mouse actions after the input getting focus -->
 							<div class="mask" @mousedown.capture.prevent/>
 						</td>

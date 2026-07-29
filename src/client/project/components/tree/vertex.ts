@@ -1,7 +1,7 @@
 import { Circle } from "@pixi/math";
+import { shallowRef } from "vue";
 
 import { Layer } from "client/shared/layers";
-import { shallowRef } from "vue";
 import { Field } from "client/shared/decorators";
 import ProjectService from "client/services/projectService";
 import { Label } from "client/utils/label";

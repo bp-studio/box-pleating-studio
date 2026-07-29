@@ -9,7 +9,7 @@ type CloneContext = WeakMap<object, unknown>;
  * Objects on all depths will be cloned, not referred.
  */
 export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
-	const ctx = new WeakMap();
+	const ctx = new WeakMap<object, unknown>();
 	for(const s of sources) deepAssignCore(target, s, ctx);
 	return target;
 }

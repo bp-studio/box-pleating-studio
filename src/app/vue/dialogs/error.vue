@@ -1,7 +1,12 @@
 <template>
 	<Dialog ref="dialog">
 		<span v-if="url">
-			<a :href="url" :download="filename" class="btn btn-secondary" @click="download">{{ $t("keyword.errorLog") }}</a>
+			<a
+				:href="url"
+				:download="filename"
+				class="btn btn-secondary"
+				@click="download"
+			>{{ $t("keyword.errorLog") }}</a>
 		</span>
 		<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
 	</Dialog>

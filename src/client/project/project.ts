@@ -1,10 +1,11 @@
+import { shallowRef } from "vue";
+
 import { deepAssign } from "shared/utils/clone";
 import { Mountable } from "client/base/mountable";
 import { Migration } from "client/patches";
 import { Design } from "./design";
 import HistoryManager from "./changes/history";
 import { options } from "client/options";
-import { shallowRef } from "vue";
 import { callWorker } from "app/utils/workerUtility";
 import { isIOS, isLowEndDevice } from "app/shared/constants";
 

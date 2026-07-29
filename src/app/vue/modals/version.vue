@@ -1,20 +1,30 @@
 <template>
-	<div class="modal fade" ref="el">
+	<div ref="el" class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-body scroll-shadow" style="max-height: 70vh; border-radius: 0.3rem;">
 					<div v-if="record[index]" v-html="record[index]"/>
 					<div v-else class="m-5 display-2 text-muted text-center">
-						<i class="bp-spinner fa-spin" />
+						<i class="bp-spinner fa-spin"/>
 					</div>
 				</div>
 				<div class="modal-footer">
 					<div class="flex-grow-1">
-						<button class="btn btn-primary me-2" style="width: 2.5rem;" :disabled="index == 0" @click="index--">
-							<i class="fas fa-caret-left" />
+						<button
+							class="btn btn-primary me-2"
+							style="width: 2.5rem;"
+							:disabled="index == 0"
+							@click="index--"
+						>
+							<i class="fas fa-caret-left"/>
 						</button>
-						<button class="btn btn-primary" style="width: 2.5rem;" :disabled="index == max" @click="index++">
-							<i class="fas fa-caret-right" />
+						<button
+							class="btn btn-primary"
+							style="width: 2.5rem;"
+							:disabled="index == max"
+							@click="index++"
+						>
+							<i class="fas fa-caret-right"/>
 						</button>
 					</div>
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>

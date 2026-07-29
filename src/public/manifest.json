@@ -41,41 +41,11 @@
 			"sizes": "16x16"
 		}
 	],
-	"user_preferences": {
-		"color_scheme": {
-			"dark": {
-				"theme_color": "#007bff",
-				"background_color": "#1e1e1e"
-			},
-			"light": {
-				"theme_color": "#007bff",
-				"background_color": "#fff"
-			}
-		}
+	"color_scheme_dark": {
+		"theme_color": "#007bff",
+		"background_color": "#1e1e1e"
 	},
-	"theme_colors": [
-		{
-			"color": "#007bff",
-			"media": "(prefers-color-scheme: dark)"
-		}
-	],
-	"background_colors": [
-		{
-			"color": "#1e1e1e",
-			"media": "(prefers-color-scheme: dark)"
-		}
-	],
-	"related_applications": [
-		{
-			"platform": "webapp",
-			"url": "https://bpstudio.abstreamace.com/manifest.json"
-		}
-	],
-	"url_handlers": [
-		{
-			"origin": "https://bpstudio.abstreamace.com"
-		}
-	],
+	"handle_links": "preferred",
 	"launch_handler": {
 		"route_to": "existing-client-retain",
 		"client_mode": "focus-existing"

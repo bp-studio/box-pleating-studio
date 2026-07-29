@@ -1,8 +1,13 @@
 <template>
-	<button id="note" class="btn btn-light text-warning" v-on:click="show" v-if="Studio.project?.design.layout.patternNotFound">
-		<i class="fas fa-exclamation-triangle h1 my-1" />
+	<button
+		v-if="Studio.project?.design.layout.patternNotFound"
+		id="note"
+		class="btn btn-light text-warning"
+		@click="show"
+	>
+		<i class="fas fa-exclamation-triangle h1 my-1"/>
 	</button>
-	<div class="modal fade" ref="el">
+	<div ref="el" class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-body">{{ $t("message.patternNotFound") }}</div>

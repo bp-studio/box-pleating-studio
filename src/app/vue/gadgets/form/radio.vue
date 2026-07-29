@@ -1,8 +1,14 @@
 <template>
 	<div class="form-check d-inline-block">
-		<input class="form-check-input" type="radio" :name="name" :id="id" :checked="modelValue === value"
-			@input="modelValue = value">
-		<label class="form-check-label" :for="id" v-text="label" />
+		<input
+			:id="id"
+			class="form-check-input"
+			type="radio"
+			:name="name"
+			:checked="modelValue === value"
+			@input="modelValue = value"
+		>
+		<label class="form-check-label" :for="id" v-text="label"/>
 	</div>
 </template>
 

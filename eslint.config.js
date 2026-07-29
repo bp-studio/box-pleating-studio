@@ -7,7 +7,7 @@ export default defineConfig([
 	...createConfig({
 		ignores: ["{build,coverage}/**", "lib/{lzma,optimizer}/**/*.js"],
 		import: {
-			files: ["**/*.{ts,vue}", "eslint.config.js"],
+			files: ["**/*.{ts,vue}", "eslint.config.js", "{scripts,gulp}/**"],
 			project: [
 				"src/app",
 				"src/client",
@@ -20,7 +20,7 @@ export default defineConfig([
 			],
 		},
 		globals: {
-			esm: ["test/mocha.env.js", "lib/**/*.js", "eslint.config.js", "gulpfile.js", "gulp/**"],
+			esm: ["test/mocha.env.js", "lib/**/*.js", "scripts/**", "eslint.config.js", "gulpfile.js", "gulp/**"],
 			browser: ["src/**"],
 		},
 		html: {

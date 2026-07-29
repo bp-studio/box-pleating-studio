@@ -1,5 +1,5 @@
 <template>
-	<div id="divWelcome" class="viewport" v-show="!Studio.project">
+	<div v-show="!Studio.project" id="divWelcome" class="viewport">
 		<div class="d-flex flex-column h-100">
 			<div class="p-3 p-md-4 p-lg-5 container-fluid d-flex flex-column" style="overflow: hidden; flex:1 0 0;">
 				<div class="row justify-content-center flex-grow-0">
@@ -8,11 +8,11 @@
 						<div class="h3 d-sm-none">{{ $t("welcome.title") }}</div>
 
 						<p class="mt-4">{{ $t("welcome.intro[0]") }}</p>
-						<Links />
+						<Links/>
 					</div>
-					<Instructions />
+					<Instructions/>
 				</div>
-				<FileList />
+				<FileList/>
 			</div>
 			<div class="p-3 text-end">{{ copyright }}</div>
 		</div>

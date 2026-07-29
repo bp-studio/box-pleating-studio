@@ -1,6 +1,12 @@
 {
 	"compilerOptions": {
-		"baseUrl": "../src"
+		"paths": {
+			"*": [
+				"../src/*"
+			]
+		},
+		"module": "esnext",
+		"moduleResolution": "bundler",
 	},
 	"extends": "../src/shared/tsconfig",
 	"include": [

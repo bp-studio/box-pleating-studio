@@ -1,13 +1,19 @@
 <template>
 	<div class="h5 panel-title">{{ $t("panel.river.type") }}</div>
 	<div class="panel-grid">
-		<Number :label="$t('panel.river.width')" v-model="subject.length" :min="1" :max="subject.maxWidth" hotkeys="d.rd,d.ri" />
+		<Number
+			v-model="subject.length"
+			:label="$t('panel.river.width')"
+			:min="1"
+			:max="subject.maxWidth"
+			hotkeys="d.rd,d.ri"
+		/>
 	</div>
 	<div class="mt-3">
 		<AsyncButton :click="() => subject.delete()">{{ $t("keyword.delete") }}</AsyncButton>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="subject.goToDual()" :title="hk('n', 'd')">{{ $t("panel.river.goto") }}</button>
+		<button class="btn btn-primary" :title="hk('n', 'd')" @click="subject.goToDual()">{{ $t("panel.river.goto") }}</button>
 	</div>
 </template>
 

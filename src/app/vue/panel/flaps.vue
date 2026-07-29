@@ -1,10 +1,10 @@
 <template>
-	<div  class="h5 panel-title">{{ $t("panel.flaps.type") }}</div>
+	<div class="h5 panel-title">{{ $t("panel.flaps.type") }}</div>
 	<div class="mt-3">
 		<AsyncButton v-if="!design.tree.isMinimal" :click="() => design.delete()">{{ $t("keyword.delete") }}</AsyncButton>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" @click="design.goToDual()" :title="hk('n', 'd')">{{ $t("panel.flaps.goto") }}</button>
+		<button class="btn btn-primary" :title="hk('n', 'd')" @click="design.goToDual()">{{ $t("panel.flaps.goto") }}</button>
 	</div>
 </template>
 

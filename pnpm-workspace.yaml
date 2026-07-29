@@ -1,17 +1,17 @@
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@mutsuntsai/*"
-onlyBuiltDependencies:
-  - "@swc/core"
-  - "core-js"
-  - "oxc-resolver"
-  - "ttf2woff2"
-  - "unrs-resolver"
+allowBuilds:
+  "@swc/core": true
+  core-js: true
+  es5-ext: true
+  oxc-resolver: true
+  sharp: true
+  ttf2woff2: true
+  unrs-resolver: true
 overrides:
-  magic-string: ^0.30.0
   js-yaml: ^4.1.1
-patchedDependencies:
-  "@swc-node/core": patches/@swc-node__core.patch
+  magic-string: ^0.30.0
 peerDependencyRules:
   allowAny:
     - eslint

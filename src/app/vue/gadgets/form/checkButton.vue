@@ -1,7 +1,7 @@
 <template>
 	<button ref="bt" class="check-btn">
 		<slot/>
-		<i class="fas fa-check d-inline-block" ref="success" />
+		<i ref="success" class="fas fa-check d-inline-block"/>
 	</button>
 </template>
 

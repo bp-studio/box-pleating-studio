@@ -62,18 +62,18 @@ registerRoute(({ url }) => url.host == "tinyurl.com", netOnly);
 // All POST requests are allowed only when there's an internet connection.
 registerRoute(({ request }) => request.method == "POST", netOnly, "POST");
 
-self.addEventListener("install", event => {
+addEventListener("install", event => {
 	// This is necessary. Otherwise, service worker will not be updated even as we reload the page,
 	// and we'll have to restart the app.
 	// Although starting the service worker immediately has other potential issues,
 	// there is no better way for now.
-	self.skipWaiting();
+	skipWaiting();
 
 	console.log("service worker installing");
 	precacheController.install(event);
 });
 
-self.addEventListener("activate", event => {
+addEventListener("activate", event => {
 	precacheController.activate(event);
 });
 
@@ -81,7 +81,7 @@ self.addEventListener("activate", event => {
 // Web Lock polyfill
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-self.addEventListener("message", event => {
+addEventListener("message", event => {
 	event.waitUntil(message(event));
 });
 
@@ -100,7 +100,7 @@ async function message(event: ExtendableMessageEvent): Promise<void> {
 			return;
 		} else if(event.data == "steal") {
 			if(clientList.length) {
-				const client = await self.clients.get(clientList[0]);
+				const client = await clients.get(clientList[0]);
 				if(client) client.postMessage("steal");
 				clientList.shift();
 			}
@@ -115,7 +115,7 @@ async function check(clientList: string[], id: string): Promise<boolean> {
 	let client: Client | undefined;
 	while(clientList[0] !== id && !client) {
 		// eslint-disable-next-line no-await-in-loop
-		client = await self.clients.get(clientList[0]);
+		client = await clients.get(clientList[0]);
 		if(!client) clientList.shift();
 	}
 	return clientList[0] === id;
@@ -129,9 +129,15 @@ interface PeriodicBackgroundSyncEvent extends ExtendableEvent {
 	tag: string;
 }
 
-self.addEventListener("periodicsync", (event: PeriodicBackgroundSyncEvent) => {
+declare global {
+	interface ServiceWorkerGlobalScopeEventMap {
+		periodicsync: PeriodicBackgroundSyncEvent;
+	}
+}
+
+addEventListener("periodicsync", event => {
 	if(event.tag == "update") {
 		console.log("Service worker periodic update check.");
-		event.waitUntil(self.registration.update());
+		event.waitUntil(registration.update());
 	}
 });

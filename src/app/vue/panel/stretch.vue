@@ -1,14 +1,22 @@
 <template>
 	<div class="h5 panel-title">{{ $t("panel.repo.type") }}</div>
 	<template v-if="stretch.repo">
-		<div class="row" v-if="configCount(stretch.repo) == 1 && patternCount(stretch.repo) == 1">
+		<div v-if="configCount(stretch.repo) == 1 && patternCount(stretch.repo) == 1" class="row">
 			<label class="col-form-label col">{{ $t("panel.repo.onlyOne") }}</label>
 		</div>
-		<div class="panel-grid" v-else>
-			<Store :size="configCount(stretch.repo)" :index="stretch.configIndex" @move="stretch.switchConfig($event)"
-				:label="$t('panel.repo.config')"/>
-			<Store :size="patternCount(stretch.repo)" :index="stretch.patternIndex" @move="stretch.switchPattern($event)"
-				:label="$t('panel.repo.pattern')"/>
+		<div v-else class="panel-grid">
+			<Store
+				:size="configCount(stretch.repo)"
+				:index="stretch.configIndex"
+				:label="$t('panel.repo.config')"
+				@move="stretch.switchConfig($event)"
+			/>
+			<Store
+				:size="patternCount(stretch.repo)"
+				:index="stretch.patternIndex"
+				:label="$t('panel.repo.pattern')"
+				@move="stretch.switchPattern($event)"
+			/>
 		</div>
 	</template>
 </template>

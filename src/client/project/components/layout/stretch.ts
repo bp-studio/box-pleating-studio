@@ -1,5 +1,6 @@
-import { Control } from "client/base/control";
 import { shallowRef } from "vue";
+
+import { Control } from "client/base/control";
 import { SelectionController } from "client/controllers/selectionController";
 import { Device } from "./device";
 import { clone } from "shared/utils/clone";

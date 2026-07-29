@@ -1,15 +1,37 @@
 <template>
 	<Row :label="label">
 		<div class="input-group" style="flex-wrap: nowrap;">
-			<button class="btn btn-sm btn-primary" :disabled="!canMinus" type="button" @click="change(-step)"
-				:title="tooltips[0]">
-				<i class="fas fa-minus" />
+			<button
+				class="btn btn-sm btn-primary"
+				:disabled="!canMinus"
+				type="button"
+				:title="tooltips[0]"
+				@click="change(-step)"
+			>
+				<i class="fas fa-minus"/>
 			</button>
-			<input class="form-control" :disabled="disabled" :class="{ 'error': value != modelValue }" type="number"
-				v-model="value" @focus="focus($event)" @blur="blur" @input="input($event)" :min="min" :max="max"
-				@wheel.passive="wheel($event)" style="cursor: ns-resize; min-width: 30px;">
-			<button class="btn btn-sm btn-primary" :disabled="!canPlus" type="button" @click="change(step)" :title="tooltips[1]">
-				<i class="fas fa-plus" />
+			<input
+				v-model="value"
+				class="form-control"
+				:disabled="disabled"
+				:class="{ 'error': value != modelValue }"
+				type="number"
+				:min="min"
+				:max="max"
+				style="cursor: ns-resize; min-width: 30px;"
+				@focus="focus($event)"
+				@blur="blur"
+				@input="input($event)"
+				@wheel.passive="wheel($event)"
+			>
+			<button
+				class="btn btn-sm btn-primary"
+				:disabled="!canPlus"
+				type="button"
+				:title="tooltips[1]"
+				@click="change(step)"
+			>
+				<i class="fas fa-plus"/>
 			</button>
 		</div>
 	</Row>
@@ -37,6 +59,10 @@
 		hotkeys?: string;
 	}>(), {
 		step: 1,
+		label: undefined,
+		type: undefined,
+		min: undefined,
+		max: undefined,
 		hotkeys: "",
 	});
 	const { blur, focus, value } = useInput(modelValue, Number);

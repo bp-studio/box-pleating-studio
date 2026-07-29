@@ -4,7 +4,7 @@ import { dist } from "shared/types/geometry";
 import { style } from "client/services/styleService";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
-import type { LINE_JOIN } from "@pixi/graphics/lib/const";
+import type { LINE_JOIN } from "@pixi/graphics";
 import type { ArcPath, ArcPolygon } from "shared/types/geometry";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 

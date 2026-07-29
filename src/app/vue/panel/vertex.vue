@@ -1,29 +1,33 @@
 <template>
 	<div class="h5 panel-title">{{ $t("panel.vertex.type") }}</div>
 	<div class="panel-grid">
-		<Field :label="$t('panel.vertex.name')" v-model="subject.name" />
+		<Field v-model="subject.name" :label="$t('panel.vertex.name')"/>
 	</div>
 	<div class="mt-3 d-flex" style="flex-wrap: wrap;">
-		<AsyncButton class="flex-shrink-0" :disabled="subject.cannotAdd" :click="() => subject.addLeaf(newLength)">{{
-			$t("panel.vertex.addLeaf") }}</AsyncButton>
+		<AsyncButton class="flex-shrink-0" :disabled="subject.cannotAdd" :click="() => subject.addLeaf(newLength)">
+			{{
+				$t("panel.vertex.addLeaf") }}
+		</AsyncButton>
 		<div class="flex-grow-1 d-flex">
-			<label class="col-form-label ms-2 text-end"
-				style="overflow: hidden; flex-grow: 1000; width: 0; max-width: calc((100% - 230px * 0.98) * 50);">...&nbsp;</label>
+			<label
+				class="col-form-label ms-2 text-end"
+				style="overflow: hidden; flex-grow: 1000; width: 0; max-width: calc((100% - 230px * 0.98) * 50);"
+			>...&nbsp;</label>
 			<div class="d-flex flex-grow-1">
 				<label class="col-form-label me-2 flex-shrink-0">{{ $t("panel.vertex.ofLength") }}</label>
 				<div class="flex-grow-1" style="width: 90px;">
-					<Number v-model="newLength" :min="1" :max="subject.maxNewLeafLength" />
+					<Number v-model="newLength" :min="1" :max="subject.maxNewLeafLength"/>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="mt-3" v-if="subject.isDeletable">
+	<div v-if="subject.isDeletable" class="mt-3">
 		<AsyncButton :click="() => subject.delete()">
 			{{ subject.isLeaf ? $t('keyword.delete') : $t('panel.vertex.delJoin') }}
 		</AsyncButton>
 	</div>
-	<div class="mt-3" v-if="subject.isLeaf">
-		<button class="btn btn-primary" @click="subject.goToDual()" :title="hk('n', 'd')">{{ $t("panel.vertex.goto") }}</button>
+	<div v-if="subject.isLeaf" class="mt-3">
+		<button class="btn btn-primary" :title="hk('n', 'd')" @click="subject.goToDual()">{{ $t("panel.vertex.goto") }}</button>
 	</div>
 </template>
 

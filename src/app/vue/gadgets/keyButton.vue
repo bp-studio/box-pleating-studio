@@ -1,6 +1,6 @@
 <template>
-	<div v-on:touchstart.passive="down(750, $event)" v-on:touchend="up" v-on:touchcancel="up">
-		<i :class="icon" />
+	<div @touchstart.passive="down(750, $event)" @touchend="up" @touchcancel="up">
+		<i :class="icon"/>
 	</div>
 </template>
 
@@ -11,17 +11,18 @@
 
 	import type { DirectionKey } from "shared/types/types";
 
-	const ONE_HOUR = 3600000;
-
 	defineOptions({ name: "KeyButton" });
-
-	let to: number;
 
 	const props = defineProps<{
 		dir: DirectionKey;
 		icon: string;
 		show: boolean;
 	}>();
+
+	const ONE_HOUR = 3600000;
+
+	let to: number;
+
 	const ga = useThrottledGA("dpad", ONE_HOUR);
 
 	function down(repeat: number, e?: Event): void {

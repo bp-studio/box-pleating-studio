@@ -1,17 +1,19 @@
 {
 	"compilerOptions": {
-		"baseUrl": "..",
 		"jsx": "preserve",
 		"target": "ESNext",
 		"paths": {
 			"@/*": [
-				"app/vue/*"
+				"./vue/*"
 			],
 			"temp/*": [
-				"../build/temp/*"
+				"../../build/temp/*"
 			],
 			"lib/*": [
-				"../lib/*"
+				"../../lib/*"
+			],
+			"*": [
+				"../*"
 			]
 		}
 	},

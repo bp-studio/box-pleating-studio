@@ -2,11 +2,11 @@
 	<div class="dropdown-submenu" @mouseenter="enter" @mouseleave="leave">
 		<div class="dropdown-item" @click.stop>
 			<div class="float-end" style="margin-right: -1.25rem;">
-				<i class="fas fa-caret-right" />
+				<i class="fas fa-caret-right"/>
 			</div>
-			<i :class="icon" />{{ label }}
+			<i :class="icon"/>{{ label }}
 		</div>
-		<div class="dropdown-menu" ref="sub">
+		<div ref="sub" class="dropdown-menu">
 			<slot/>
 		</div>
 	</div>
@@ -18,15 +18,15 @@
 
 	defineOptions({ name: "SubMenu" });
 
-	const sub = useTemplateRef("sub");
-	const SUBMENU_DELAY = 250;
-
-	let timeout: number;
-
 	defineProps<{
 		icon: string;
 		label: string;
 	}>();
+
+	const sub = useTemplateRef("sub");
+	const SUBMENU_DELAY = 250;
+
+	let timeout: number;
 
 	function enter(): void {
 		clearTimeout(timeout);

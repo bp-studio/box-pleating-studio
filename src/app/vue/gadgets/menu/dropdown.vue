@@ -1,14 +1,33 @@
 <template>
-	<div class="btn-group" ref="el" @mouseenter.once="init" @touchstart.once.passive="init">
-		<button ref="btn" type="button" @mouseenter="mouseenter" :title="title" :disabled="!Studio.initialized"
-			class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" :aria-label="label" role="menuitem">
-			<i :class="icon" />
-			<div class="notify" v-if="notify" />
+	<div
+		ref="el"
+		class="btn-group"
+		@mouseenter.once="init"
+		@touchstart.once.passive="init"
+	>
+		<button
+			ref="btn"
+			type="button"
+			:title="title"
+			:disabled="!Studio.initialized"
+			class="btn btn-primary dropdown-toggle"
+			data-bs-toggle="dropdown"
+			:aria-label="label"
+			role="menuitem"
+			@mouseenter="mouseenter"
+		>
+			<i :class="icon"/>
+			<div v-if="notify" class="notify"/>
 		</button>
 		<!--We display the content of the dropdown menu only
 			after initialization to improve startup performance. -->
-		<div ref="menu" class="dropdown-menu" role="menuitem" v-if="initialized">
-			<slot />
+		<div
+			v-if="initialized"
+			ref="menu"
+			class="dropdown-menu"
+			role="menuitem"
+		>
+			<slot/>
 		</div>
 	</div>
 </template>

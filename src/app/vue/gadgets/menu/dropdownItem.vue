@@ -1,8 +1,18 @@
 <template>
-	<div v-if="!disabled" class="dropdown-item" @click="emit('click')" role="menuitem">
+	<div
+		v-if="!disabled"
+		class="dropdown-item"
+		role="menuitem"
+		@click="emit('click')"
+	>
 		<slot/>
 	</div>
-	<div v-else class="dropdown-item disabled" @click.stop role="menuitem">
+	<div
+		v-else
+		class="dropdown-item disabled"
+		role="menuitem"
+		@click.stop
+	>
 		<slot/>
 	</div>
 </template>

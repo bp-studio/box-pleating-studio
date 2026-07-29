@@ -1,4 +1,5 @@
 import { shallowRef } from "vue";
+
 import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";

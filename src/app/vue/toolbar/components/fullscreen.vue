@@ -1,10 +1,10 @@
 <template>
-	<div class="browser-only" v-show="fullscreenEnabled">
+	<div v-show="fullscreenEnabled" class="browser-only">
 		<div class="dropdown-item" @click="toggleFullscreen">
-			<i class="fas fa-expand" />{{ fullscreen ? $t('toolbar.setting.fullscreenExit') : $t('toolbar.setting.fullscreen')
+			<i class="fas fa-expand"/>{{ fullscreen ? $t('toolbar.setting.fullscreenExit') : $t('toolbar.setting.fullscreen')
 			}}
 		</div>
-		<Divider />
+		<Divider/>
 	</div>
 </template>
 

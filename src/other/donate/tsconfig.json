@@ -1,12 +1,16 @@
 {
 	"compilerOptions": {
 		"jsx": "preserve",
+		"moduleResolution": "bundler",
 		"paths": {
 			"temp/*": [
-				"../build/temp/*"
+				"../../../build/temp/*"
 			],
 			"lib/*": [
-				"../lib/*"
+				"../../../lib/*"
+			],
+			"*": [
+				"../../*"
 			]
 		}
 	},
@@ -16,7 +20,7 @@
 		"./**/*.vue",
 		"../../shared/frontend/locale.d.ts",
 		"../../shared/frontend/imports.d.ts",
-		"../../shared/frontend/shims-vue.d.ts",
+		"../../shared/frontend/shims.d.ts",
 		"../../shared/types/**/*.d.ts"
 	]
 }

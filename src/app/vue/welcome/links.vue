@@ -9,9 +9,9 @@
 		</i18n-t>
 	</p>
 	<div class="font-preload">
-		<i class="fas fa-plus" />
-		<i class="fab fa-discord" />
-		<i class="far fa-clone" />
+		<i class="fas fa-plus"/>
+		<i class="fab fa-discord"/>
+		<i class="far fa-clone"/>
 		🇺🇸
 	</div>
 </template>

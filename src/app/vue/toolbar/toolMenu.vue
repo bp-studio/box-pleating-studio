@@ -4,13 +4,13 @@
 			<i class="fa-solid fa-calculator"/>
 			{{ $t("plugin.optimizer._") }}
 		</DropdownItem>
-		<Divider />
+		<Divider/>
 		<Uploader accept=".tmd5" @upload="TreeMaker($event)">
-			<i class="fas fa-file-import" />
+			<i class="fas fa-file-import"/>
 			{{ $t("toolbar.tools.TreeMaker") }}
 		</Uploader>
 		<DropdownItem :disabled="!Studio.project" @click="show('cp')">
-			<i class="fas fa-file-export" />
+			<i class="fas fa-file-export"/>
 			{{ $t("plugin.CP._") }}
 		</DropdownItem>
 	</Dropdown>

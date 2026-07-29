@@ -10,9 +10,15 @@ export type GeneratorFilter<T> = Func<T, boolean | undefined>;
 export namespace GeneratorUtil {
 
 	/**
-	 * Execute given {@link Generator}s in order,
-	 * and once one of them yields something that passes the {@link GeneratorFilter},
-	 * remaining generators will not be execute further.
+	 * Execute given {@link Generator}s in order.
+	 *
+	 * Each generator is always run to completion (every value it yields is
+	 * tested against the {@link GeneratorFilter}, and every value that passes
+	 * is yielded onwards) -- this is intentional, as a single generator can
+	 * legitimately produce more than one acceptable result that the caller
+	 * needs in full. Once a generator has yielded at least one value that
+	 * passes (or that the filter marks with `undefined`, see below), no
+	 * further generators in the list will be executed.
 	 *
 	 * If the filter returns `undefined`, it will also signify stopping after the current generator,
 	 * only that the generated value will not be yielded.

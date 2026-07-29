@@ -1,10 +1,10 @@
 <template>
 	<div class="btn-group me-2" role="menubar">
-		<FileMenu />
-		<EditMenu />
-		<SettingMenu />
-		<ToolMenu />
-		<HelpMenu />
+		<FileMenu/>
+		<EditMenu/>
+		<SettingMenu/>
+		<ToolMenu/>
+		<HelpMenu/>
 	</div>
 </template>
 

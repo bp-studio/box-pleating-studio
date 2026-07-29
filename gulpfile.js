@@ -12,6 +12,7 @@ import seriesIf from "./gulp/utils/seriesIf.js";
 
 import "./gulp/tasks/ftp.js";
 import "./gulp/tasks/locale.js";
+import "./gulp/tasks/splash.js";
 import "./gulp/tasks/static.js";
 
 export const rsbuild = cb => exec("pnpm rsbuild build", cb);

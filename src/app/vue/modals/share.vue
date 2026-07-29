@@ -1,29 +1,29 @@
 <template>
-	<div class="modal fade" ref="el">
+	<div ref="el" class="modal fade">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content mx-4">
 				<div class="modal-header">
 					<div class="h4 modal-title">{{ $t("share.title") }}</div>
 				</div>
-				<div class="modal-body p-5 text-center" v-if="sending">
-					<i class="bp-spinner fa-spin display-4" />
+				<div v-if="sending" class="modal-body p-5 text-center">
+					<i class="bp-spinner fa-spin display-4"/>
 				</div>
 				<template v-else>
-					<div class="modal-body p-3 text-center" v-if="error">{{ error }}</div>
-					<div class="modal-body" v-else>
+					<div v-if="error" class="modal-body p-3 text-center">{{ error }}</div>
+					<div v-else class="modal-body">
 						<div class="mb-2">
 							<div class="input-group">
-								<input class="form-control" :value="url" ref="input" >
+								<input ref="input" class="form-control" :value="url">
 							</div>
 						</div>
 						<div class="d-flex">
 							<div>
 								<button v-if="canShare" class="btn btn-primary me-2" @click="share">
-									<i class="fas fa-share" />
+									<i class="fas fa-share"/>
 									{{ $t('share.share') }}
 								</button>
-								<CheckButton class="btn btn-primary" @click="copy" ref="bt">
-									<i class="fas fa-copy" />
+								<CheckButton ref="bt" class="btn btn-primary" @click="copy">
+									<i class="fas fa-copy"/>
 									{{ $t('share.copy') }}
 								</CheckButton>
 							</div>

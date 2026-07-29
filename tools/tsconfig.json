@@ -1,14 +1,19 @@
 {
 	"compilerOptions": {
-		"baseUrl": "../src",
 		"isolatedModules": true,
-		"moduleResolution": "node",
+		"module": "esnext",
+		"moduleResolution": "bundler",
 		"noImplicitOverride": true,
 		"preserveSymlinks": true,
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "esnext",
+		"paths": {
+			"*": [
+				"../src/*"
+			]
+		},
 		"lib": [
 			"esnext",
 			"dom",
