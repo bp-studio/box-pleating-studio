@@ -100,13 +100,21 @@
 		gtag("event", "share", { method: "app", content_type: "link" });
 	}
 
+	/**
+	 * Since 2026, TinyURL no longer allows cross-origin requests from other origins,
+	 * so we call its API through our own proxy instead.
+	 * @see [tinyurl.php](../../../other/php/tinyurl.php)
+	 */
+	const SHORTENER = "https://abstreamace.com/php-tool/bpstudio/tinyurl.php";
+
 	async function shorten(rawUrl: string): Promise<void> {
 		sending.value = true;
 		try {
-			const api = "https://tinyurl.com/api-create.php?url=" + encodeURIComponent(rawUrl);
+			const api = SHORTENER + "?url=" + encodeURIComponent(rawUrl);
 			// For unknown reason, using `{ cache: "reload" }`
 			// option here will lead to no-response error in Safari.
 			const response = await fetch(api);
+			if(!response.ok) throw new Error(await response.text());
 			url.value = await response.text();
 			sending.value = false;
 			await waitButton();

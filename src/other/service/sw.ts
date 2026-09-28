@@ -56,8 +56,8 @@ const netOnly = new NetworkOnly({
 	fetchOptions: { cache: "reload" },
 });
 
-// Don't cache TinyURL (pointless)
-registerRoute(({ url }) => url.host == "tinyurl.com", netOnly);
+// Don't cache the backend scripts (such as the TinyURL proxy)
+registerRoute(({ url }) => url.host == "abstreamace.com" && url.pathname.startsWith("/php-tool/"), netOnly);
 
 // All POST requests are allowed only when there's an internet connection.
 registerRoute(({ request }) => request.method == "POST", netOnly, "POST");
