@@ -1,12 +1,14 @@
 import { SlashDirection } from "shared/types/direction";
+import { CornerType } from "shared/json/enum";
 import { TraceContext, getNextIntersection } from "./traceContext";
 import { Line } from "core/math/geometry/line";
+import { Point } from "core/math/geometry/point";
 import { Vector } from "core/math/geometry/vector";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
-import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
 import type { SideDiagonal } from "../configuration";
+import type { NodeStart } from "../pattern/quadrant";
 import type { Path } from "shared/types/geometry";
 import type { PatternContour } from "../../context";
 
@@ -28,7 +30,15 @@ export class Trace {
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
-	public $generate(hinges: Path, start: Point, end: Point, rawMode: boolean): PatternContour | null {
+	/**
+	 * @param nodeStart The starting point specific to the node being traced (see {@link Quadrant.$startPointFor}).
+	 * If it differs from `start`, the region next to the hinge between the two is filled by the flaps inside the node,
+	 * so the side diagonal emerges from `nodeStart` instead of `start`,
+	 * and the outgoing ridges ending in the filled region are terminated there.
+	 */
+	public $generate(
+		hinges: Path, start: Point, end: Point, rawMode: boolean, nodeStart?: NodeStart
+	): PatternContour | null {
 		const ctx = new TraceContext(this, hinges);
 		if(!ctx.$valid) return null;
 
@@ -37,7 +47,10 @@ export class Trace {
 
 		// Initialize
 		const path: RationalPath = [];
-		const startDiagonal = this.$sideDiagonals.find(d => d.$lineContains(start));
+		let startDiagonal = this.$sideDiagonals.find(d => d.$lineContains(start));
+		if(startDiagonal && nodeStart?.filled) {
+			startDiagonal = Trace._applyFilledRegion(startDiagonal, start, nodeStart as Required<NodeStart>, ridges);
+		}
 		let cursor = ctx.$getInitialNode(ridges, startDiagonal);
 		if(!cursor) return null;
 		path.push(cursor.point);
@@ -74,6 +87,46 @@ export class Trace {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * When the region next to the hinge between `start` and the node-specific starting point
+	 * is filled by the flaps inside the node, the filled region acts like a flap region:
+	 * the side diagonal emerges from the far corner of the region on the hinge (the node-specific starting point),
+	 * and a diagonal ridge emerges from the far corner of the region inside the flap,
+	 * except that the outgoing ridges ending in the filled region are terminated there instead
+	 * (in which case they cancel out with the emerging diagonal).
+	 */
+	private static _applyFilledRegion(
+		diagonal: SideDiagonal, start: Point, nodeStart: Required<NodeStart>, ridges: Set<Ridge>
+	): SideDiagonal {
+		const { point, filled } = nodeStart;
+		let terminated = false;
+		for(const ridge of ridges) {
+			const { x, y } = ridge.p2;
+			if(ridge.$type !== undefined && filled.x1 <= x && x <= filled.x2 && filled.y1 <= y && y <= filled.y2) {
+				ridges.delete(ridge);
+				terminated = true;
+			}
+		}
+
+		// The side diagonal is shifted to the node-specific starting point
+		const v = diagonal.$vector;
+		const shifted = new Line(point, v) as Partial<Writeable<SideDiagonal>>;
+		shifted.p0 = diagonal.p0.$sub(start.$sub(point));
+
+		// The diagonal ridge from the inner corner, pointing outwards (i.e. away from the side corner)
+		if(!terminated) {
+			const vertical = point.x == start.x; // Whether the hinge is vertical
+			const inner = vertical ?
+				new Point(point.x == filled.x1 ? filled.x2 : filled.x1, point.y) :
+				new Point(point.x, point.y == filled.y1 ? filled.y2 : filled.y1);
+			const outward = diagonal.p0.$sub(diagonal.p1).$dot(v) > 0 ? v.$neg : v;
+			const ridge = new Line(inner, inner.$sub(outward.$neg)) as Ridge;
+			ridge.$type = CornerType.side;
+			ridges.add(ridge);
+		}
+		return shifted as SideDiagonal;
+	}
 
 	/**
 	 * In raw mode, we need to make some extra checks to make sure the

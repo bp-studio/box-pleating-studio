@@ -184,7 +184,7 @@ function isSideDiagonal(line: Line): line is SideDiagonal {
  * Given a ridge, imagine that if we slightly shift our tracing contour inwards,
  * can we still touch the ridge?
  */
-function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): boolean {
+function isShiftTouchable(ridge: Ridge, from: Point, v: Vector, ang?: number): boolean {
 	const rv = v.$rotate90();
 	const v1 = ridge.p1.$sub(from), v2 = ridge.p2.$sub(from);
 	const r1 = v1.$dot(rv), r2 = v2.$dot(rv);
@@ -197,6 +197,8 @@ function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): bo
 		(
 			// At least one endpoint is in front
 			d1 > 0 || d2 > 0 ||
+			// or, the ridge is a ray extending to the front
+			ridge.$type !== undefined && d2 > d1 ||
 			// or, the angle of the given ridge is further in front of the previously hit ridge
 			Boolean(ang) && getAngle(v, ridge.$vector) > ang!
 		);

@@ -1,14 +1,17 @@
 import { pathToString } from "core/math/geometry/path";
 import { SlashDirection } from "shared/types/direction";
 import { Trace } from "./trace";
-import { minQuadrantWeightComparator, startEndPoints } from "../pattern/quadrant";
+import { minQuadrantWeightComparator, startEndPoints, startPointFor } from "../pattern/quadrant";
 
 import type { NodeId } from "shared/json/tree";
 import type { Ridge } from "../pattern/device";
 import type { Repository } from "../repository";
 import type { Point } from "core/math/geometry/point";
 import type { Path } from "shared/types/geometry";
-import type { Quadrant } from "../pattern/quadrant";
+import type { NodeStart, Quadrant } from "../pattern/quadrant";
+
+/** [start, end, node-specific start] */
+export type StartEnd = [Point, Point, NodeStart];
 
 //=================================================================
 /**
@@ -32,9 +35,15 @@ export class RepoTrace extends Trace {
 		this.$leaves = new Set(repo.$nodeSet.$leaves);
 	}
 
-	/** Determine the starting/ending point of tracing. */
-	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[]): [Point, Point] {
+	/**
+	 * Determine the starting/ending point of tracing for the contour of a node (given by its leaves).
+	 *
+	 * The third item returned is the node-specific starting point
+	 * (see {@link Quadrant.$startPointFor}). It is the same as the first one in most cases.
+	 */
+	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[], leaves: ReadonlySet<NodeId>): StartEnd {
 		let [start, end] = startEndPoints(filtered);
+		let nodeStart = startPointFor(filtered, leaves);
 		if(filtered.length != all.length) {
 			filtered.sort(minQuadrantWeightComparator);
 			const first = all.indexOf(filtered[0]);
@@ -44,7 +53,10 @@ export class RepoTrace extends Trace {
 				const ridge = this._getIntersectionRidge(a, b);
 				// It is possible that the intersection ridge is missing in legacy patterns.
 				/* istanbul ignore else: legacy */
-				if(ridge) start = ridge.p1;
+				if(ridge) {
+					start = ridge.p1;
+					nodeStart = { point: start };
+				}
 			}
 			if(last < all.length - 1) {
 				const a = all[last].$flap.id, b = all[last + 1].$flap.id;
@@ -53,7 +65,7 @@ export class RepoTrace extends Trace {
 				if(ridge) end = ridge.p1;
 			}
 		}
-		return [start, end];
+		return [start, end, nodeStart];
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////

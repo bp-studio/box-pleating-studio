@@ -92,6 +92,28 @@ describe("Contour", function() {
 			expect(outer).to.equalPath("(61,14),(50,14),(50,18),(22,18),(22,14),(11,14),(11,2),(18,2),(18,-18),(54,-18),(54,2),(61,2)");
 		});
 
+		/** Added v0.7.16 */
+		it("River contour shares the boundary with its sibling river", function() {
+			// This example is derived from Japanese spiny lobster
+			parseTree(
+				"(90,76,3),(90,94,2),(76,5,1),(94,97,2),(5,31,12),(97,102,23),(97,101,1),(97,100,1)",
+				"(31,72,64,0,0),(100,76,87,0,0),(101,76,85,0,0),(102,98,100,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			const contours = result.graphics["re90,94"].contours;
+			expect(contours.length).to.equal(1);
+			expect(contours[0].outer).to.equalPath("(71,127),(71,80),(238/3,80),(88,147/2),(88,73),(125,73),(125,127)");
+
+			// Without flap 101, flap 100 alone fills a 2x2 region only, so all the diagonals shift by 2
+			parseTree(
+				"(90,76,3),(90,94,2),(76,5,1),(94,97,2),(5,31,12),(97,102,23),(97,100,1)",
+				"(31,72,64,0,0),(100,76,87,0,0),(102,98,100,0,0)"
+			);
+			const result2 = UpdateResult.$flush();
+			const outer = result2.graphics["re90,94"].contours[0].outer;
+			expect(outer).to.equalPath("(71,127),(71,82),(73,82),(73,80),(238/3,80),(88,147/2),(88,73),(125,73),(125,127)");
+		});
+
 	});
 
 	describe("Graphical contour", function() {
