@@ -13,10 +13,31 @@ class Sheet {
 	Sheet(const double offset): offset(offset) {}
 	virtual ~Sheet() = default;
 
+	/** The origin of the grid coordinates, in the normalized coordinates of the continuous problem. */
 	const double offset;
 
-	virtual void enlarge_if_necessary(vector<double> &xk, const double x, const double y) const = 0;
-	virtual void add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vector<bool> *fixed) const = 0;
-	virtual bool check_bounds(const vector<double> &xk, const int n, const vector<Flap> &flaps) const = 0;
-	virtual vector<int> output(const vector<double> &solution) const = 0;
+	/** Add the bound constraints of the continuous problem. */
+	virtual void add_bounds(ConstraintList &cons, const vector<Flap> &flaps) const = 0;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Integer grid interface (used by the CSP fitter)
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/** The increment of sheet size when searching for integral solutions (2 for diagonal sheets). */
+	virtual int size_step() const = 0;
+
+	/** Round the given (real) sheet size up to the next admissible integral size. */
+	virtual int ceil_size(const double size) const = 0;
+
+	/**
+	 * Whether the given flap can be placed at the integer grid location (x, y) on a sheet of the given size.
+	 * The grid coordinates are the normalized coordinates minus {@link offset}, scaled by the size.
+	 */
+	virtual bool int_contains(const int x, const int y, const Flap &flap, const int size) const = 0;
+
+	/**
+	 * Convert an integral grid solution (2 entries per flap, no scale) to the output format,
+	 * i.e. the coordinates of the flaps followed by the sheet size.
+	 */
+	virtual vector<int> int_output(const vector<int> &grid, const vector<Flap> &flaps) const = 0;
 };

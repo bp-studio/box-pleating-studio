@@ -5,6 +5,7 @@
 #include "global/global.h"
 #include "parent.h"
 #include "sheet/sheet.h"
+#include "tree.h"
 
 #include <emscripten/bind.h>
 #include <unordered_map>
@@ -26,8 +27,10 @@ class Hierarchy {
 	vector<Flap> flaps;
 	vector<DistMap> dist_map;
 
-	ConstraintList generate_constraints(const vector<bool> *fixed) const;
-	bool check(const vector<double> &x, const int n, const vector<bool> &fixed) const;
+	/** The structure of the tree; only available for the last hierarchy, and could be null. */
+	const Tree *tree = nullptr;
+
+	ConstraintList generate_constraints() const;
 	const Parent *get_parent(const int id) const;
 
   private:

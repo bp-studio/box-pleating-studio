@@ -6,11 +6,6 @@
 
 using namespace std;
 
-struct Pt {
-	double x;
-	double y;
-};
-
 /**
  * Global variables.
  */

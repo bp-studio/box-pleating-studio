@@ -9,6 +9,7 @@ import { AreaTree } from "core/design/context/areaTree/areaTree";
 import type { Hierarchy } from "core/design/context/areaTree/utils";
 import type { JEdgeBase, JEdit, JFlap, JStretch, NodeId } from "shared/json";
 import type { TreeNode } from "core/design/context/treeNode";
+import type { TreeStructure } from "core/design/context/treeUtils";
 
 //=================================================================
 /**
@@ -81,6 +82,16 @@ export namespace TreeController {
 		}
 		const aTree = new AreaTree(State.m.$tree, useDimension);
 		return aTree.$createHierarchy();
+	}
+
+	/** Returns the structure of the tree (see {@link TreeStructure}). */
+	export function getStructure(): TreeStructure {
+		const result: TreeStructure = [];
+		for(const node of State.m.$tree.$nodes) {
+			if(!node) continue;
+			result.push({ id: node.id, parent: node.$parent ? node.$parent.id : null, dist: node.$dist });
+		}
+		return result;
 	}
 }
 

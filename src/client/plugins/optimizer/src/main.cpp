@@ -5,7 +5,8 @@
 #include <nlopt.h>
 #include <vector>
 
-#include "branching/greedy.h"
+#include "branching/csp.h"
+#include "branching/tidy.h"
 #include "class/problem.h"
 #include "constraint/circleConstraint.h"
 #include "math/basinHopping.h"
@@ -33,7 +34,7 @@ BasinHoppingParams bhp = {
 	.niter_success = 16,
 	.T = 0.01,
 	.stepsize = 0.01,
-	.step = {.interval = 5}
+	.step = {.interval = 5},
 };
 
 /**
@@ -88,7 +89,7 @@ vector<int> solve(const emscripten::val &data, const unsigned int seed) {
 
 	Problem problem(data);
 	Hierarchy &main = problem.hierarchies.back();
-	auto cons = main.generate_constraints(nullptr);
+	auto cons = main.generate_constraints();
 
 	OptimizeResult sol;
 	bool useView = data["useView"].as<bool>();
@@ -112,8 +113,12 @@ vector<int> solve(const emscripten::val &data, const unsigned int seed) {
 	}
 
 	if(sol.success) {
-		auto int_sol = greedy_solve_integer(sol.x, &main);
-		for(int i = 0; i < Shared::dim; i++) result.push_back(int_sol[i]);
+		cout << "Continuous sheet size: " << get_scale(sol.x) << endl;
+		auto layout = csp_solve_integer(sol.x, &main);
+		if(!layout.grid.empty()) {
+			tidy_layout(layout, &main);
+			result = main.sheet->int_output(layout.grid, main.flaps);
+		}
 	}
 	return result;
 }

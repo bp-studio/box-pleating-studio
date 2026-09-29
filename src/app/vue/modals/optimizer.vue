@@ -49,22 +49,13 @@
 						</div>
 					</div>
 					<OptProgress
-						v-else-if="state.stage == Stage.initializing"
+						v-else-if="state.stage == Stage.initializing || state.stage == Stage.start"
 						:value="state.minor"
 						:max="1"
 						no-skip
 						percentage
 					>
-						Initializing...
-					</OptProgress>
-					<OptProgress
-						v-else-if="state.stage == Stage.start"
-						:value="0"
-						:max="1"
-						no-skip
-						percentage
-					>
-						Processing problem...
+						{{ state.stage == Stage.initializing ? "Initializing..." : "Processing problem..." }}
 					</OptProgress>
 					<OptProgress
 						v-else-if="state.stage == Stage.candidate"
@@ -101,6 +92,9 @@
 					</OptProgress>
 					<OptProgress v-else-if="state.stage == Stage.integral" :value="state.minor" :max="state.flaps">
 						Trying grid size {{ state.major }}...
+					</OptProgress>
+					<OptProgress v-else-if="state.stage == Stage.tidy" :value="state.major - state.minor" :max="state.major">
+						Tidying up layout (contour vertices {{ state.minor }})...
 					</OptProgress>
 					<div
 						v-else-if="state.stage == Stage.error"
@@ -171,6 +165,7 @@
 		candidate,
 		continuous,
 		integral,
+		tidy,
 		error,
 	};
 
@@ -215,6 +210,7 @@
 				break;
 			case "start":
 				updateState(Stage.start);
+				state.minor = 0;
 				break;
 			case "pack":
 				updateState(Stage.pack);
@@ -229,6 +225,10 @@
 				break;
 			case "fit":
 				updateState(Stage.integral);
+				[state.major, state.minor] = event.data;
+				break;
+			case "tidy":
+				updateState(Stage.tidy);
 				[state.major, state.minor] = event.data;
 				break;
 			default:

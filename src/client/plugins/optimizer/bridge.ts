@@ -47,6 +47,7 @@ function makeData(request: OptimizerRequest): object {
 		type: problem.type == "rect" ? 1 : 2,
 		hierarchies: problem.hierarchies,
 		flaps: problem.flaps,
+		tree: problem.tree,
 	};
 	const useView = request.layout == "view";
 	data.useView = useView;

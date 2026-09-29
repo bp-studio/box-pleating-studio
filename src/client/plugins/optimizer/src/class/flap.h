@@ -7,6 +7,6 @@ struct Flap {
 	int height;
 
 	bool has_dimension() const {
-		return height != 0 && width != 0;
+		return height != 0 || width != 0;
 	}
 };

@@ -94,7 +94,7 @@ class GenerateContext {
 	void set_hierarchy(const Hierarchy *h) {
 		hierarchy = h;
 		Shared::setup(h->flaps.size()); // Next line depends on this
-		constraints = h->generate_constraints(nullptr);
+		constraints = h->generate_constraints();
 	}
 
 	void callback() {

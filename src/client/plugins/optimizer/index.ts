@@ -5,6 +5,7 @@ import { hasSharedArrayBuffer, isPlaywright } from "app/shared/constants";
 import { display } from "client/screen/display";
 
 import type { Hierarchy } from "core/design/context/areaTree/utils";
+import type { TreeStructure } from "core/design/context/treeUtils";
 import type { OptimizerEvent, OptimizerRequest, OptimizerResult, OptimizerOptionsBase, OptimizerCommand } from "./types";
 import type { JFlap, JProject, JSheet, NodeId } from "shared/json";
 import type { Project } from "client/project/project";
@@ -99,7 +100,8 @@ export async function optimizer(project: Project, options: OptimizerOptions, cb:
 	if(interruptBuffer) interruptBuffer[0] = 0;
 	const json = project.toJSON();
 	const hierarchies = await project.$core.tree.getHierarchy(options.layout == "random", options.useDimension);
-	const request = createOptimizerRequest(json, hierarchies, options);
+	const tree = await project.$core.tree.getStructure();
+	const request = createOptimizerRequest(json, hierarchies, tree, options);
 	worker.postMessage(request);
 
 	const result = await execution.promise;
@@ -110,7 +112,9 @@ export async function optimizer(project: Project, options: OptimizerOptions, cb:
 	return json;
 }
 
-function createOptimizerRequest(json: JProject, hierarchies: Hierarchy[], options: OptimizerOptions): OptimizerRequest {
+function createOptimizerRequest(
+	json: JProject, hierarchies: Hierarchy[], tree: TreeStructure, options: OptimizerOptions
+): OptimizerRequest {
 	const { flaps, sheet } = json.design.layout;
 	callback({ event: "flap", data: flaps.length });
 	if(!options.useDimension) flaps.forEach(f => f.width = f.height = 0);
@@ -131,6 +135,7 @@ function createOptimizerRequest(json: JProject, hierarchies: Hierarchy[], option
 			type,
 			flaps: orderedFlaps.map(f => ({ id: f.id, width: f.width, height: f.height })),
 			hierarchies,
+			tree,
 		},
 		vec: null,
 	};

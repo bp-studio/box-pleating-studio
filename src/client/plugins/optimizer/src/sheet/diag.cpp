@@ -1,5 +1,6 @@
 
 #include "diag.h"
+#include "math/scale.h"
 
 #include <array>
 
@@ -36,40 +37,41 @@ class DiagBounds: public VectorConstraint {
 	}
 };
 
-void Diag::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vector<bool> *fixed) const {
+void Diag::add_bounds(ConstraintList &cons, const vector<Flap> &flaps) const {
 	for(int i = 0; i < Shared::flap_count; i++) {
-		if(fixed && (*fixed)[i]) continue;
 		const auto &flap = flaps[i];
 		auto offset = min(flap.width, flap.height);
 		cons.emplace_back(make_unique<DiagBounds>(i, offset));
 	}
 }
 
-bool Diag::check_bounds(const vector<double> &xk, const int n, const vector<Flap> &flaps) const {
-	return true; // For diagonal sheet there's nothing to check
+/** The minimal half-size of the sheet for the flap to be placed at (x, y); the inverse of {@link Diag::int_contains}. */
+int min_half(const int x, const int y, const Flap &flap) {
+	const int offset = min(flap.width, flap.height);
+	return max({x + y + offset, y - x + offset, x - y + offset, -x - y - offset});
 }
 
-vector<int> Diag::output(const vector<double> &solution) const {
+int Diag::ceil_size(const double size) const {
+	// Only even sizes are admissible, so that the origin (the center) is a grid point
+	int s = int_scale(size);
+	return s % 2 ? s + 1 : s;
+}
+
+bool Diag::int_contains(const int x, const int y, const Flap &flap, const int size) const {
+	// This is the integral version of DiagBounds (same signs as `off` there)
+	const int half = size / 2;
+	const int offset = min(flap.width, flap.height);
+	return -x - y <= half + offset && x + y <= half - offset && y - x <= half - offset && x - y <= half - offset;
+}
+
+vector<int> Diag::int_output(const vector<int> &grid, const vector<Flap> &flaps) const {
 	// For diagonal sheet, we only output even grid size
-	vector<int> result;
-	for(int i = 0; i < Shared::last; i++) {
-		int r = round(solution[i]);
-		result.push_back(r);
-	}
-	int grid = 0;
+	vector<int> result(grid);
+	int half = 0;
 	for(int i = 0; i < Shared::flap_count; i++) {
-		auto x = result[i * 2];
-		auto y = result[i * 2 + 1];
-		auto v = abs(x) + abs(y);
-		if(v > grid) grid = v;
+		half = max(half, min_half(grid[i * 2], grid[i * 2 + 1], flaps[i]));
 	}
-	for(auto &v: result) v += grid;
-	result.push_back(2 * grid);
+	for(auto &v: result) v += half;
+	result.push_back(2 * half);
 	return result;
-}
-
-void Diag::enlarge_if_necessary(vector<double> &xk, const double x, const double y) const {
-	auto &s = xk[Shared::last];
-	double r = 2 * (abs(x) + abs(y));
-	if(r > s) s = r;
 }

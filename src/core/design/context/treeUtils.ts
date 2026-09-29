@@ -11,6 +11,21 @@ import type { NodeId } from "shared/json/tree";
  */
 export type DistMap<T = NodeId> = [T, T, number][];
 
+/** A node in the {@link TreeStructure}. */
+export interface TreeStructureNode {
+	id: NodeId;
+	/** The id of the parent node, or `null` for the root. */
+	parent: NodeId | null;
+	/** The distance to the root. */
+	dist: number;
+}
+
+/**
+ * The structure of the tree, in terms of parent relations and distances to the root.
+ * This is used by the Optimizer for replicating the covering rules of junctions.
+ */
+export type TreeStructure = TreeStructureNode[];
+
 /** Create a record for the distances between all leaf-pairs. */
 export function distMap(nodes: NodeCollection<ITreeNodeBase>): DistMap {
 	const heap = new BinaryHeap(maxDistComparator);

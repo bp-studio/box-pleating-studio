@@ -1,4 +1,5 @@
 import type { Hierarchy } from "core/design/context/areaTree/utils";
+import type { TreeStructure } from "core/design/context/treeUtils";
 import type { GridType, NodeId } from "shared/json";
 
 type LayoutMode = "view" | "random";
@@ -19,6 +20,8 @@ export interface OptimizerRequest extends OptimizerOptionsBase {
 		type: GridType;
 		flaps: FlapRequest[];
 		hierarchies: Hierarchy[];
+		/** Used by the tidying stage for the covering rules of junctions. */
+		tree: TreeStructure;
 	};
 	vec: IPoint[] | null;
 }
@@ -50,4 +53,6 @@ interface OptimizerEventMap {
 	flap: number;
 	cont: [number, number, number];
 	fit: [number, number];
+	/** [initial contour vertices, current contour vertices] */
+	tidy: [number, number];
 }
