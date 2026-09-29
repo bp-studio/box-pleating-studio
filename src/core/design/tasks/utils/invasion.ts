@@ -15,6 +15,23 @@ interface Invader {
 /** Maps each invaded leaf to its invaders. */
 const invasionMap = new Map<NodeId, Invader[]>();
 
+/**
+ * The quadrants (as {@link QuadrantCode}s) carved in the rough contours, updated by {@link roughContourTask}.
+ * This persists across rounds, as the graphics could be updated without the rough contours being recalculated.
+ */
+const carvedQuadrants = new Set<QuadrantCode>();
+
+/** Update {@link carvedQuadrants}. */
+export function setCarvedQuadrants(codes: Iterable<QuadrantCode>): void {
+	carvedQuadrants.clear();
+	for(const code of codes) carvedQuadrants.add(code);
+}
+
+/** Whether the given quadrant is carved in the rough contours (see {@link ValidJunction.$invasion}). */
+export function isCarvedQuadrant(code: QuadrantCode): boolean {
+	return carvedQuadrants.has(code);
+}
+
 /** Rebuild {@link invasionMap} from the given valid junctions. */
 export function updateInvasionMap(junctions: Junctions): void {
 	invasionMap.clear();

@@ -132,6 +132,9 @@ export class ValidJunction implements ISerializable<JJunction> {
 	 * while the other flap B has a hinge rectangle larger than the overlapping region in both dimensions,
 	 * then the region of B should be carved out by the overlapping region at its corner
 	 * (see {@link roughContourTask}).
+	 *
+	 * This is purely geometric, and in particular it does not depend on whether the junction
+	 * is resolved by a stretch pattern (see the notes in {@link roughContourTask} for the reason).
 	 */
 	public get $invasion(): Invasion | undefined {
 		if(this._invasion === undefined) this._invasion = this._computeInvasion();

@@ -6,8 +6,10 @@ import { expandPath, simplify } from "./utils/expand";
 import { carveCorners } from "./utils/carve";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import { getOrSetEmptyArray } from "shared/utils/map";
+import { setCarvedQuadrants } from "./utils/invasion";
 
 import type { NodeId } from "shared/json/tree";
+import type { QuadrantCode } from "shared/types/direction";
 import type { IRect } from "./utils/carve";
 import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import type { Path, Polygon } from "shared/types/geometry";
@@ -46,15 +48,26 @@ function roughContour(): void {
 	);
 }
 
-/** Update {@link invasionMap}, and return the leaves whose invasions have changed. */
+/**
+ * Update {@link invasionMap}, and return the leaves whose invasions have changed.
+ *
+ * Note that the carving takes place regardless of whether the junction is resolved by a stretch pattern.
+ * We had tried carving only for the corners resolved by patterns (which requires this task to run after
+ * {@link patternTask}), but it turned out that the rivers wrapping around the flaps look more logical
+ * if the carving always takes place. The default flap ridges in the carved quadrants
+ * without patterns are omitted instead (see {@link graphicsTask}).
+ */
 function updateInvasions(): Set<ITreeNode> {
 	invasionMap.clear();
+	const carved: QuadrantCode[] = [];
 	for(const junction of State.$junctions.values()) {
 		if(!junction.$valid) continue;
 		const invasion = junction.$invasion;
 		if(!invasion) continue;
 		getOrSetEmptyArray(invasionMap, invasion.flap.id).push(invasion.rect);
+		carved.push(junction.$a === invasion.flap ? junction.$q1 : junction.$q2);
 	}
+	setCarvedQuadrants(carved);
 
 	const changed = new Set<ITreeNode>();
 	const ids = new Set([...invasionCache.keys(), ...invasionMap.keys()]);

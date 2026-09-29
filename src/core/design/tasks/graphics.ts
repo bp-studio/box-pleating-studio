@@ -8,12 +8,14 @@ import { Line } from "core/math/geometry/line";
 import { combineContour } from "./utils/combine";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { UpdateResult } from "core/service/updateResult";
+import { isCarvedQuadrant } from "./utils/invasion";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
 import type { ILine, Path, PathEx } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
+import type { QuadrantCode } from "shared/types/direction";
 
 //=================================================================
 /**
@@ -77,8 +79,10 @@ function flapRidge(node: ITreeNode): ILine[] {
 		if(!same(p1, p2)) ridges.push([p1, p2]);
 
 		// Skip quadrants with patterns.
+		// Also skip the carved quadrants (see ValidJunction.$invasion) without patterns,
+		// as the default ridge would run across the carved region.
 		const q = node.id << 2 | i;
-		if(!State.$patternedQuadrants.has(q)) ridges.push([p1, c1]);
+		if(!State.$patternedQuadrants.has(q) && !isCarvedQuadrant(q as QuadrantCode)) ridges.push([p1, c1]);
 	}
 	return ridges;
 }

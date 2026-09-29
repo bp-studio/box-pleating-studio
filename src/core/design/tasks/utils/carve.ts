@@ -18,11 +18,11 @@ export interface IRect {
  *
  * Since the removed region is a union of corner-anchored rectangles,
  * the remaining region is exactly `(x, y)` with `bottom(x) < y < top(x)`,
- * where `top` and `bottom` are step functions, so we can compute the result directly
- * without a general polygon subtraction algorithm.
+ * where `top` and `bottom` are step functions, so we can compute the result
+ * directly without a general polygon subtraction algorithm.
  *
- * The result consists of counter-clockwise paths (one for each connected component,
- * as the remaining region could be disconnected in edge cases),
+ * The result consists of counter-clockwise paths (one for each connected
+ * component, as the remaining region could be disconnected in edge cases),
  * with collinear vertices removed.
  */
 export function carveCorners(rect: IRect, corners: readonly IRect[]): PathEx[] {
@@ -59,10 +59,16 @@ export function carveCorners(rect: IRect, corners: readonly IRect[]): PathEx[] {
 
 		const path: PathEx = [];
 		for(let i = start; i <= end; i++) {
-			path.push({ x: columns[i], y: bottom[i] }, { x: columns[i + 1], y: bottom[i] });
+			path.push(
+				{ x: columns[i], y: bottom[i] },
+				{ x: columns[i + 1], y: bottom[i] }
+			);
 		}
 		for(let i = end; i >= start; i--) {
-			path.push({ x: columns[i + 1], y: top[i] }, { x: columns[i], y: top[i] });
+			path.push(
+				{ x: columns[i + 1], y: top[i] },
+				{ x: columns[i], y: top[i] }
+			);
 		}
 		result.push(simplify(path));
 		start = end + 1;

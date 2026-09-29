@@ -23,12 +23,13 @@
 	"author": "Mu-Tsun Tsai <don.m.t.tsai@gmail.com> (https://github.com/MuTsunTsai)",
 	"type": "module",
 	"scripts": {
-		"browserstack": "cd ../browserstack-automate && pnpm start",
+		"browserstack": "cd ../browserstack-automate && pnpm dev",
 		"build": "rsbuild build",
 		"cov": "pnpm cov:env nyc -r lcovonly -r text-summary mocha --require mocha-suppress-logs",
 		"cov:env": "cross-env NODE_OPTIONS=\"--experimental-loader=@istanbuljs/esm-loader-hook --no-warnings\" HPS_TS_NODE_PROJECT=test/tsconfig.json",
 		"cov:html": "pnpm cov:env nyc -r lcov mocha --require mocha-suppress-logs || echo. && pnpx open-cli coverage/lcov-report/index.html",
 		"cov:text": "pnpm cov:env nyc -r lcovonly -r text mocha --require mocha-suppress-logs",
+		"dev": "rsbuild dev",
 		"e2e": "playwright test",
 		"postinstall": "playwright install --with-deps",
 		"license-check": "pnpx license-checker --exclude \"MIT,Apache-2.0,BSD-2-Clause,ISC\"",
@@ -38,7 +39,6 @@
 		"lint:inspect": "pnpx @eslint/config-inspector@latest",
 		"preview": "rsbuild preview --port 30784 -o",
 		"scss:migrate": "pnpx sass-migrator module --migrate-deps src/app/style/main.scss",
-		"start": "rsbuild dev",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"test": "mocha --require mocha-suppress-logs",
 		"tools": "rsbuild dev -c tools/rsbuild.config.ts -o"

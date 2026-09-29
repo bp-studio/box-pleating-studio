@@ -76,6 +76,19 @@ describe("Contour", function() {
 			expect(contours[0].outer).to.equalPath("(11,80),(11,48),(39,48),(39,51),(41,51),(41,53),(43,53),(43,80)", true);
 		});
 
+		/** Added v0.8.0 */
+		it("Omits the default ridge of a carved quadrant without pattern", function() {
+			// Flap 1 invades the upper-right corner of flap 0, but the repo of flaps 0, 1, 3 has no pattern.
+			// The hinge is still carved, but the default ridge towards (10,10) would run across the carved region.
+			parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
+			const result = UpdateResult.$flush();
+			expect(result.patternNotFound).to.be.true;
+			const f0 = result.graphics.f0;
+			expect(f0.contours[0].outer).to.equalPath("(-10,-10),(10,-10),(10,3),(9,3),(9,10),(-10,10)", true);
+			expect(f0.ridges.length).to.equal(3);
+			expect(f0.ridges.some(([, p]) => p.x == 10 && p.y == 10)).to.be.false;
+		});
+
 	});
 
 	describe("Trace contour", function() {

@@ -14,6 +14,7 @@ export const id1 = 1 as NodeId;
 export const id2 = 2 as NodeId;
 export const id3 = 3 as NodeId;
 export const id4 = 4 as NodeId;
+export const id5 = 5 as NodeId;
 export const id6 = 6 as NodeId;
 
 type Substitute<T, T1, T2> = {

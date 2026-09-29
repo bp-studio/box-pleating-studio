@@ -68,6 +68,24 @@ export default function() {
 			}
 		});
 
+		it("Checks delta point in a legal layout", function() {
+			// Unlike the case above, all three junctions here are valid and uncovered,
+			// and the overlaps around flap 3 are not nested.
+			// The delta point (at (8,4)) lies inside the circle of flap 3.
+			//
+			// Note that this layout actually admits a valid stretch pattern,
+			// if we first make the stretch of flaps 1 and 2 alone,
+			// and then make the pattern for the carved flaps 1, 2 together with flap 3 (as the shared corner).
+			// The current algorithm has no notion of such staged construction,
+			// so the check still rejects it (and no pattern can be found without the check either).
+			parseTree(
+				"(0,2,12),(0,1,2),(0,3,9)",
+				"(1,10,5,0,0),(2,19,16,0,0),(3,0,0,0,0)"
+			);
+			const repo = expectRepo("1,2,3");
+			expect(repo.$isValid).to.be.false;
+		});
+
 	});
 
 	describe("Three flap relay", function() {
