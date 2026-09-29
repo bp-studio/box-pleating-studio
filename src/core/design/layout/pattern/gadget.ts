@@ -40,6 +40,18 @@ export class Gadget implements JGadget {
 	}
 
 	/**
+	 * The {@link Cache}s are enumerable fields of the instance,
+	 * so we must not serialize (or clone) the instance directly,
+	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 */
+	public toJSON(): JGadget {
+		const result: JGadget = { pieces: this.pieces.map(p => p.toJSON()) };
+		if(this.offset) result.offset = { x: this.offset.x, y: this.offset.y };
+		if(this.anchors) result.anchors = clone(this.anchors);
+		return result;
+	}
+
+	/**
 	 * The width span between the two major anchors.
 	 * Note that this might be larger than the width of the SCR.
 	 * Used for positioning.

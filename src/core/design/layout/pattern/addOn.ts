@@ -26,6 +26,18 @@ export class AddOn extends Region implements JAddOn {
 		this.dir = data.dir;
 	}
 
+	/**
+	 * The {@link Cache}s are enumerable fields of the instance,
+	 * so we must not serialize (or clone) the instance directly,
+	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 */
+	public toJSON(): JAddOn {
+		return {
+			contour: this.contour.map(p => ({ x: p.x, y: p.y })),
+			dir: { x: this.dir.x, y: this.dir.y },
+		};
+	}
+
 	public readonly $shape = new Cache<IRegionShape>(() => {
 		const contour = this.contour.map(p => new Point(p));
 		const ridges = toLines(contour);
