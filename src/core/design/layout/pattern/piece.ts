@@ -7,6 +7,7 @@ import { toLines } from "core/math/geometry/rationalPath";
 import { deduplicate } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
 import { perQuadrant } from "shared/types/direction";
+import { clone } from "shared/utils/clone";
 
 import type { PerQuadrant } from "shared/types/direction";
 import type { Path } from "shared/types/geometry";
@@ -50,6 +51,18 @@ export class Piece extends Region implements JPiece {
 		this.detours = data.detours;
 		this.shift = data.shift;
 		offsets.set(this, { x: 0, y: 0 });
+	}
+
+	/**
+	 * The {@link Cache}s are enumerable fields of the instance,
+	 * so we must not serialize (or clone) the instance directly,
+	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 */
+	public toJSON(): JPiece {
+		const result: JPiece = { ox: this.ox, oy: this.oy, u: this.u, v: this.v };
+		if(this.detours) result.detours = clone(this.detours);
+		if(this.shift) result.shift = { x: this.shift.x, y: this.shift.y };
+		return result;
 	}
 
 	public $offset(o: IPoint): void {
