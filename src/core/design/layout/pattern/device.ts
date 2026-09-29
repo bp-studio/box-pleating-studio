@@ -5,7 +5,6 @@ import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
-import { clone } from "shared/utils/clone";
 import { getNodeId, getQuadrant, opposite } from "shared/types/direction";
 import { toPath } from "core/math/geometry/rationalPath";
 import { convertIndex } from "shared/utils/pattern";
@@ -78,9 +77,9 @@ export class Device implements ISerializable<JDevice> {
 
 	public toJSON(): JDevice {
 		return {
-			gadgets: clone(this.$gadgets),
+			gadgets: this.$gadgets.map(g => g.toJSON()),
 			offset: this.$offset,
-			addOns: this.$addOns.length ? this.$addOns : undefined,
+			addOns: this.$addOns.length ? this.$addOns.map(a => a.toJSON()) : undefined,
 		};
 	}
 
@@ -306,7 +305,10 @@ export class Device implements ISerializable<JDevice> {
 	 * disregarding positional information.
 	 */
 	public static $getSignature(devices: readonly JDevice[]): string {
-		devices = clone(devices);
+		// The given devices could consist of Gadget instances (for example, those generated in searching),
+		// so we go through JSON to make a plain deep copy, which invokes their toJSON methods.
+		// Cloning the instances directly would include their caches (see Gadget.toJSON).
+		devices = JSON.parse(JSON.stringify(devices)) as JDevice[];
 		for(const device of devices) {
 			device.gadgets.forEach(g => Gadget.$simplify(g));
 			delete device.offset;

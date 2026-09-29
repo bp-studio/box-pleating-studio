@@ -11,6 +11,8 @@ import { DesignController } from "core/controller/designController";
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
 
+import type { JEdge, JFlap } from "shared/json";
+
 export default function() {
 
 	it("Loads saved patterns", async function() {
@@ -22,6 +24,41 @@ export default function() {
 		const stretch = State.$stretches.get("12,27")!;
 		const device = stretch.$repo.$pattern!.$devices[0];
 		expect(device.$offset).to.equal(4);
+	});
+
+	/** Added v0.7.17 */
+	it("Recognizes the saved pattern when searching", function() {
+		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
+		complete();
+		const count = State.$stretches.get("1,2")!.$repo.$configuration!.$length;
+		expect(count).to.equal(2);
+
+		// Save the stretch as in a project file, that is, without the repo
+		const { id, configuration, pattern } = State.$stretches.get("1,2")!.toJSON();
+		const project = Migration.$getSample();
+		project.design.tree.edges = [{ n1: 0, n2: 1, length: 7 }, { n1: 0, n2: 2, length: 4 }] as JEdge[];
+		project.design.layout.flaps = [
+			{ id: 1, x: 0, y: 0, width: 0, height: 0 },
+			{ id: 2, x: 8, y: 9, width: 0, height: 0 },
+		] as JFlap[];
+		project.design.layout.stretches = [{ id, configuration, pattern }];
+
+		// The saved pattern should be recognized among the searched ones, instead of being counted twice
+		fullReset();
+		DesignController.init(project.design);
+		complete();
+		const repo = State.$stretches.get("1,2")!.$repo;
+		expect(repo.$configurations.length).to.equal(1);
+		expect(repo.$configuration!.$length).to.equal(count);
+	});
+
+	/** Added v0.7.17 */
+	it("Serializes patterns without caches", function() {
+		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
+		complete();
+		UpdateResult.$flush(); // Make sure that the devices are rendered, so that the caches are filled
+		const json = JSON.stringify(State.$stretches.get("1,2")!.toJSON());
+		expect(json).to.not.match(/"[$_]\w*":/);
 	});
 
 	it("Signifies when no pattern is found", function() {
