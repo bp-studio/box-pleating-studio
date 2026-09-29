@@ -6,8 +6,9 @@ import { mapDirections } from "core/math/geometry/path";
 import { AAUnion } from "core/math/sweepLine/polyBool";
 import { climb } from "./utils/climb";
 import { expandPath, simplify } from "./utils/expand";
-import { getQuadrant, quadrantNumber } from "shared/types/direction";
+import { getQuadrant, makeQuadrantCode, quadrantNumber } from "shared/types/direction";
 import { getFactors } from "../layout/pattern/quadrant";
+import { getCarvedQuadrants, getInnerInvaders, updateInvasionMap } from "./utils/invasion";
 
 import type { NodeId } from "shared/json/tree";
 import type { ValidJunction } from "../layout/junction/validJunction";
@@ -56,9 +57,10 @@ interface CriticalCorner {
 export const traceContourTask = new Task(traceContour, patternContourTask);
 
 function traceContour(): void {
-	// Update covered junction map
+	// Update covered junction map and invasion map
 	coveredJunctionMap.clear();
 	const junctions = [...State.$junctions.values()].filter(j => j.$valid) as ValidJunction[];
+	updateInvasionMap(junctions);
 	for(const junction of junctions) {
 		const covering = junction.$getCovering();
 		if(covering.length == 0) continue;
@@ -133,10 +135,14 @@ function updater(node: ITreeNode): boolean {
 
 function getCriticalCorners(node: ITreeNode, nodeSets: NodeSet[]): CriticalCorner[] {
 	const result: CriticalCorner[] = [];
+	const carved = getCarvedQuadrants(node);
 	for(const nodeSet of nodeSets) {
 		const quadrants = nodeSet.$quadrantCoverage.get(node) || [];
 		for(const quadrant of quadrants) {
 			const flap = quadrant.$flap;
+			// The corner is carved out (see ValidJunction.$invasion) by flaps wrapped inside the node,
+			// so it is digested and not required to be exposed.
+			if(carved.has(makeQuadrantCode(flap.id, quadrant.q))) continue;
 			/** {@link flap} is a descendant of {@link node} by definition. */
 			const d = flap.$dist - node.$dist + node.$length;
 			const p = quadrant.$corner(d);
@@ -241,13 +247,13 @@ function createRawContour(
 		if(leafSet.hasOverlapping) { // We'll handle these later
 			for(const id of leafSet) sharedLeaves.add(id);
 		} else { // Group all relevant leaves into one raw contour
-			let outers = leafSet.map(id => createRawContourForLeaf(node, tree.$nodes[id]!));
+			let outers = leafSet.flatMap(id => createRawContourForLeaf(node, tree.$nodes[id]!));
 			if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
 			result.push(...packPaths(outers, leafSet));
 		}
 	}
 	for(const id of sharedLeaves) { // Each shared leaf will have its own raw contour
-		result.push(...packPaths([createRawContourForLeaf(node, tree.$nodes[id]!)], [id]));
+		result.push(...packPaths(createRawContourForLeaf(node, tree.$nodes[id]!), [id]));
 	}
 
 	// All the rest goes to the same group.
@@ -312,7 +318,7 @@ function recursiveExpand(
 		const leaves = child.$leaves.filter(id => remainingLeaves.has(id));
 		if(leaves.length == 1) {
 			// In this case we fallback to the naive approach
-			result.push(createRawContourForLeaf(node, State.m.$tree.$nodes[leaves[0]]!));
+			result.push(...createRawContourForLeaf(node, State.m.$tree.$nodes[leaves[0]]!));
 		} else if(leaves.length == child.$leaves.length) {
 			// We accept the contour only if all leaves are relevant
 			result.push(...child.$outer.map(o => expandPath(o, length)));
@@ -333,15 +339,35 @@ function packPaths(outers: PathEx[], leaves: NodeId[]): PathEx[] {
 
 /**
  * Create raw trace contour for a single leaf.
+ *
+ * If the leaf is carved by invaders (see {@link ValidJunction.$invasion}) that are also under the node,
+ * the carved parts are digested by the invaders, so we take the union with the invaders as well
+ * (otherwise the carved parts would expose the hinges to ridges that should not be traced).
  */
-function createRawContourForLeaf(node: ITreeNode, leaf: ITreeNode): PathEx {
-	const outer = leaf.$graphics.$roughContours[0].$outer[0];
+function createRawContourForLeaf(node: ITreeNode, leaf: ITreeNode): PathEx[] {
+	const outers = leaf.$graphics.$roughContours[0].$outer;
 	const l = leaf.$dist - node.$dist - leaf.$length + node.$length;
-	const result = expandPath(outer, l);
+	const paths = outers.map(o => expandPath(o, l));
+	if(outers.length == 1 && outers[0].length == quadrantNumber) {
+		paths[0] = subtractCoveredJunctions(leaf, paths[0], l);
+	}
 
-	// The subtlety here is that if the leaf is involved in some covered junctions,
-	// we have to subtract the covered parts,
-	// otherwise there could be small glitches after we take the general union later.
+	const invaders = getInnerInvaders(node, leaf);
+	if(!invaders.length) return paths;
+	for(const invader of invaders) {
+		paths.push(...createRawContourForLeaf(node, invader));
+	}
+	return aaUnion.$get(...paths.map(p => [p])).filter(p => !p.isHole);
+}
+
+/**
+ * The subtlety here is that if the leaf is involved in some covered junctions,
+ * we have to subtract the covered parts,
+ * otherwise there could be small glitches after we take the general union later.
+ *
+ * This applies only to a plain rectangular hinge (in quadrant ordering).
+ */
+function subtractCoveredJunctions(leaf: ITreeNode, result: PathEx, l: number): PathEx {
 	const coveredJunctions = coveredJunctionMap.get(leaf.id);
 	if(!coveredJunctions) return result;
 

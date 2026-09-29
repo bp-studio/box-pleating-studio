@@ -3,14 +3,23 @@ import { climb } from "./utils/climb";
 import { State } from "core/service/state";
 import { traceContourTask } from "./traceContour";
 import { expandPath, simplify } from "./utils/expand";
+import { carveCorners } from "./utils/carve";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
+import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { NodeId } from "shared/json/tree";
+import type { IRect } from "./utils/carve";
 import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import type { Path, Polygon } from "shared/types/geometry";
 import type { ITreeNode, NodeGraphics, RoughContour } from "../context";
 
 const roughUnion = new RoughUnion();
+
+/** The invading rectangles to carve out of each leaf (see {@link ValidJunction.$invasion}), by leaf id. */
+const invasionMap = new Map<NodeId, IRect[]>();
+
+/** The signature of the invasions of each leaf in the previous run, for detecting changes. */
+const invasionCache = new Map<NodeId, string>();
 
 //=================================================================
 /**
@@ -19,7 +28,8 @@ const roughUnion = new RoughUnion();
  * A {@link RoughContour} is the contour of a flap/river without considering the stretch patterns.
  * Such contour consists of axis-aligned line segments only,
  * and can speed up the process of taking unions.
- * It also depends only on the AABB hierarchy.
+ * It depends only on the AABB hierarchy, except for the "invasions"
+ * (see {@link ValidJunction.$invasion}) which are carved out of the leaves.
  *
  * Each instance of rough contour should consist of a single connected region only.
  */
@@ -31,8 +41,33 @@ function roughContour(): void {
 		State.$nodeAABBChanged,
 		State.$parentChanged,
 		State.$childrenChanged,
-		State.$lengthChanged
+		State.$lengthChanged,
+		updateInvasions()
 	);
+}
+
+/** Update {@link invasionMap}, and return the leaves whose invasions have changed. */
+function updateInvasions(): Set<ITreeNode> {
+	invasionMap.clear();
+	for(const junction of State.$junctions.values()) {
+		if(!junction.$valid) continue;
+		const invasion = junction.$invasion;
+		if(!invasion) continue;
+		getOrSetEmptyArray(invasionMap, invasion.flap.id).push(invasion.rect);
+	}
+
+	const changed = new Set<ITreeNode>();
+	const ids = new Set([...invasionCache.keys(), ...invasionMap.keys()]);
+	for(const id of ids) {
+		const rects = invasionMap.get(id);
+		const signature = rects ? JSON.stringify(rects.map(r => [r.x1, r.y1, r.x2, r.y2]).sort()) : "";
+		if(invasionCache.get(id) === signature) continue;
+		if(signature) invasionCache.set(id, signature);
+		else invasionCache.delete(id);
+		const node = State.m.$tree.$nodes[id];
+		if(node) changed.add(node);
+	}
+	return changed;
 }
 
 function updater(node: ITreeNode): boolean {
@@ -46,9 +81,11 @@ function updater(node: ITreeNode): boolean {
 	if(node.$isLeaf) {
 		// Base case
 		const path = node.$AABB.$toPath();
+		const invasions = invasionMap.get(node.id);
+		const outer = invasions ? carveCorners(pathToRect(path), invasions) : [path];
 		node.$graphics.$roughContours = [{
 			$id: node.id,
-			$outer: [path],
+			$outer: outer,
 			$children: [],
 			$leaves: [node.id],
 		}];
@@ -96,6 +133,12 @@ function componentToContour(id: NodeId, inputs: readonly RoughContour[], compone
 	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);
 	return { $id: id, $outer: outers, $children: children, $leaves: leaves };
+}
+
+/** Convert the hinge path of a leaf (see {@link AABB.$toPath}) to a rectangle. */
+function pathToRect(path: Path): IRect {
+	const [ur, , ll] = path;
+	return { x1: ll.x, y1: ll.y, x2: ur.x, y2: ur.y };
 }
 
 /**

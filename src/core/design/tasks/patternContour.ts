@@ -13,7 +13,7 @@ import type { Quadrant } from "../layout/pattern/quadrant";
 import type { QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../layout/repository";
 import type { ITreeNode, NodeGraphics } from "../context";
-import type { StartEnd } from "../layout/trace/repoTrace";
+import type { StartEnd } from "../layout/trace/trace";
 
 //=================================================================
 /**
@@ -117,8 +117,8 @@ function createStartEndMap(quadrants: Quadrant[], trace: RepoTrace, leaves: Read
 	for(let q = 0; q < quadrantNumber; q++) {
 		const filtered = quadrants.filter(quadrant => quadrant.q == q);
 		if(!filtered.length) continue;
-		startEndMap[q as QuadrantDirection] =
-			trace.$resolveStartEnd(filtered, trace.$repo.$directionalQuadrants[q], leaves);
+		const startEnd = trace.$resolveStartEnd(filtered, trace.$repo.$directionalQuadrants[q], leaves);
+		if(startEnd) startEndMap[q as QuadrantDirection] = startEnd;
 	}
 	return startEndMap;
 }
@@ -133,7 +133,7 @@ interface TraceContext {
 function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves: NodeId[], rawMode: boolean): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
-	const contour = context.trace.$generate(hingeSegment, map[0], map[1], rawMode, map[2]);
+	const contour = context.trace.$generate(hingeSegment, map.start, map.end, rawMode, map.virtualStart);
 	if(contour) {
 		State.$contourWillChange.add(context.node); // Acquiring pattern contours
 		contour.$ids = context.trace.$repo.$nodeSet.$nodes;

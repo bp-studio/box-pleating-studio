@@ -1,4 +1,5 @@
 import arcSpec from "./arc.spec";
+import carveSpec from "./carve.spec";
 import lineSpec from "./line.spec";
 import polyBoolSpec from "./polyBool.spec";
 import sweepLineSpec from "./sweepLine.spec";
@@ -8,6 +9,8 @@ import polygonSpec from "./polygon.spec";
 describe("Geometry", function() {
 
 	describe("Arc", arcSpec);
+
+	describe("Carve", carveSpec);
 
 	describe("Matrix", matrixSpec);
 

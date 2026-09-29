@@ -5,6 +5,7 @@ import { CornerType } from "shared/json/enum";
 import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { JJunction, NodeId } from "shared/json";
 import type { ITreeNode } from "core/design/context";
+import type { IRect } from "core/design/tasks/utils/carve";
 
 interface ValidJunctionData {
 	lca: ITreeNode;
@@ -16,6 +17,14 @@ interface ValidJunctionData {
 }
 
 export type Junctions = readonly ValidJunction[];
+
+/** See {@link ValidJunction.$invasion}. */
+export interface Invasion {
+	/** The flap being invaded (the larger one). */
+	readonly flap: ITreeNode;
+	/** The overlapping region, positioned at the corner of the hinge rectangle of {@link flap}. */
+	readonly rect: IRect;
+}
 
 //=================================================================
 /**
@@ -113,6 +122,59 @@ export class ValidJunction implements ISerializable<JJunction> {
 		return this._isCovered;
 	}
 	private _isCovered: boolean | undefined;
+
+	/**
+	 * Whether this junction is an "invasion" of a relatively small flap into the territory of a large flap.
+	 *
+	 * The rough contours are made by expanding the flaps and taking unions, regardless of the junctions.
+	 * That works in most cases, but when a flap A, even after expanding to the LCA,
+	 * is still smaller than the overlapping region in width or height,
+	 * while the other flap B has a hinge rectangle larger than the overlapping region in both dimensions,
+	 * then the region of B should be carved out by the overlapping region at its corner
+	 * (see {@link roughContourTask}).
+	 */
+	public get $invasion(): Invasion | undefined {
+		if(this._invasion === undefined) this._invasion = this._computeInvasion();
+		return this._invasion || undefined;
+	}
+	private _invasion: Invasion | null | undefined;
+
+	private _computeInvasion(): Invasion | null {
+		const [a, b] = [this.$a, this.$b];
+		const rA = a.$dist - this.$lca.$dist;
+		const rB = b.$dist - this.$lca.$dist;
+		if(this._isSmall(a, rA) && this._isLarge(b)) return this._makeInvasion(b, -1);
+		if(this._isSmall(b, rB) && this._isLarge(a)) return this._makeInvasion(a, 1);
+		return null;
+	}
+
+	/** Whether the flap is smaller than the overlapping region in width or height after expanding by `r`. */
+	private _isSmall(flap: ITreeNode, r: number): boolean {
+		const [t, right, bottom, l] = flap.$AABB.$toValues();
+		return right - l + 2 * r < this.$o.x || t - bottom + 2 * r < this.$o.y;
+	}
+
+	/** Whether the hinge rectangle of the flap is larger than the overlapping region in both dimensions. */
+	private _isLarge(flap: ITreeNode): boolean {
+		const [t, right, bottom, l] = flap.$AABB.$toValues();
+		const len = flap.$length;
+		return right - l + 2 * len > this.$o.x && t - bottom + 2 * len > this.$o.y;
+	}
+
+	/** @param sign 1 if the flap is {@link $a} (so that the other flap is in the direction {@link $f}), -1 otherwise. */
+	private _makeInvasion(flap: ITreeNode, sign: 1 | -1): Invasion {
+		const q = getQuadrant(sign === 1 ? this.$q1 : this.$q2);
+		const tip = flap.$AABB.$points[q];
+		const fx = this.$f.x * sign, fy = this.$f.y * sign;
+		const len = flap.$length;
+		const cx = tip.x + fx * len, cy = tip.y + fy * len; // The hinge corner facing the other flap
+		const ix = cx - fx * this.$o.x, iy = cy - fy * this.$o.y; // The inner corner of the overlapping region
+		const rect: IRect = {
+			x1: Math.min(cx, ix), y1: Math.min(cy, iy),
+			x2: Math.max(cx, ix), y2: Math.max(cy, iy),
+		};
+		return { flap, rect };
+	}
 
 	/** Get all {@link ValidJunction}s covering the current one. */
 	public $getCovering(): ValidJunction[] {

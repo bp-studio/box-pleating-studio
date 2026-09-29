@@ -43,7 +43,7 @@ describe("Contour", function() {
 			);
 			const result = UpdateResult.$flush();
 			const outer = result.graphics["re0,13"].contours[0].outer;
-			expect(outer).to.equalPath("(18,34),(-6,34),(-6,10),(6,10),(6,5),(18,5),(18,14),(17.5,14),(17,44/3),(17,16),(18,16)");
+			expect(outer).to.equalPath("(18,34),(-6,34),(-6,10),(6,10),(6,5),(18,5),(18,14),(17.5,14),(17,44/3),(17,16),(18,16)", true);
 		});
 
 		/** Added v0.7.9 */
@@ -55,7 +55,25 @@ describe("Contour", function() {
 			);
 			const result = UpdateResult.$flush();
 			const outer = result.graphics["re24,45"].contours[0].outer;
-			expect(outer).to.equalPath("(107,107),(69,107),(69,81),(69.5,81),(73,229/3),(73,215/3),(71,69),(71,61),(83,61),(83,69),(107,69)");
+			expect(outer).to.equalPath("(107,107),(69,107),(69,81),(69.5,81),(73,229/3),(73,215/3),(71,69),(71,61),(83,61),(83,69),(107,69)", true);
+		});
+
+	});
+
+	describe("Rough contour", function() {
+
+		/** Added v0.8.0 */
+		it("Carves the hinge of a flap invaded by a small flap", function() {
+			// Flap 7 is large, while flaps 59 and 61 are small and poke into its corner region.
+			// Without carving, the rough contour of node 60 would be a plain rectangle.
+			parseTree(
+				"(15,17,1),(15,59,1),(15,13,1),(17,19,1),(13,60,1),(19,48,1),(19,52,1),(60,10,1),(60,61,1),(48,36,1),(52,56,3),(10,6,1),(36,43,1),(6,5,1),(43,45,1),(5,7,12)",
+				"(7,27,64,0,0),(56,46,44,0,0),(59,41,49,0,0),(61,39,53,0,0),(45,46,36,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			const contours = result.graphics["re13,60"].contours;
+			expect(contours.length).to.equal(1);
+			expect(contours[0].outer).to.equalPath("(11,80),(11,48),(39,48),(39,51),(41,51),(41,53),(43,53),(43,80)", true);
 		});
 
 	});
