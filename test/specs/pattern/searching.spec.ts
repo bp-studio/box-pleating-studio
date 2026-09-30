@@ -59,6 +59,36 @@ describe("Searching", () => {
 		expect(json).to.not.match(/"[$_]\w*":/);
 	});
 
+	/** Added v0.8.0 */
+	it("Recovers the entire repo from session", () => {
+		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
+		complete();
+		LayoutController.completeStretch("1,2");
+		LayoutController.switchPattern("1,2", 1);
+
+		// Save the stretch as in a session, that is, with the entire repo
+		const json = State.$stretches.get("1,2")!.toJSON();
+		expect(json.repo).to.not.be.undefined;
+		const project = Migration.$getSample();
+		project.design.tree.edges = [{ n1: 0, n2: 1, length: 7 }, { n1: 0, n2: 2, length: 4 }] as JEdge[];
+		project.design.layout.flaps = [
+			{ id: 1, x: 0, y: 0, width: 0, height: 0 },
+			{ id: 2, x: 8, y: 9, width: 0, height: 0 },
+		] as JFlap[];
+		project.design.layout.stretches = [json];
+
+		fullReset();
+		DesignController.init(project.design);
+		complete();
+		const repo = State.$stretches.get("1,2")!.$repo;
+		expect(repo.$configurations.length).to.equal(1);
+		const config = repo.$configuration!;
+		expect(config.$length).to.equal(2);
+		// Only the recovered repo remembers the chosen pattern;
+		// recovering from the single saved pattern would put it at index 0 instead.
+		expect(config.$index).to.equal(1);
+	});
+
 	/**
 	 * The rule: the notification is shown if and only if there is a stretch without pattern
 	 * such that the flaps involved do not form any invalid junctions among themselves.

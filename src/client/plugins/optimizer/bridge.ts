@@ -25,6 +25,7 @@ export class Bridge {
 		const data = makeData(request);
 		const response = await this._instance.solve(data, seed);
 		const size = response.size();
+		/* istanbul ignore next: foolproof */
 		if(!size) throw new Error("No solution found.");
 		const grid = response.get(size - 1);
 		const result: OptimizerResult = {

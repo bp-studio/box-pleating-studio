@@ -130,6 +130,22 @@ describe("Tree", () => {
 		expect(distMap).to.deep.include([5, 2, 6]);
 	});
 
+	/** Added v0.8.0 */
+	it("Outputs the structure of the balanced tree", () => {
+		const tree = parseTree("(0,1,1),(0,2,2),(2,3,3),(3,4,4)");
+		tree.$removeLeaf(id1); // Leaves a gap in the node array
+		tree.$flushRemove();
+		Processor.$run(heightTask);
+
+		const structure = TreeController.getStructure().sort((a, b) => a.id - b.id);
+		expect(structure).to.deep.equal([
+			{ id: 0, parent: 2, dist: 2 },
+			{ id: 2, parent: null, dist: 0 },
+			{ id: 3, parent: 2, dist: 3 },
+			{ id: 4, parent: 3, dist: 7 },
+		]);
+	});
+
 	describe("AABB record", () => {
 		it("Updates AABB when a child updates", () => {
 			parseTree("(0,1,1),(1,2,2),(0,3,3),(3,4,4)", "(2,8,8,0,0),(4,5,2,0,0)");
