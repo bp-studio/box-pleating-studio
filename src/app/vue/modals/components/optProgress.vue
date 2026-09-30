@@ -12,7 +12,7 @@
 				<button
 					type="button"
 					class="btn btn-secondary me-2"
-					:disabled="context.state.skipping || context.state.stopping || noSkip"
+					:disabled="context.state.skipping || context.state.stopping || !context.skippable()"
 					@click="context.skip"
 				>
 					{{ $t("plugin.optimizer.skip")
@@ -38,6 +38,8 @@
 			skipping: boolean;
 			stopping: boolean;
 		};
+		/** Whether the current stage supports skipping. */
+		skippable(): boolean;
 		skip(): void;
 		stop(): void;
 	}
@@ -55,7 +57,6 @@
 	defineOptions({ name: "OptProgress" });
 
 	const props = defineProps<{
-		noSkip?: boolean;
 		percentage?: boolean;
 		value: number;
 		max: number;

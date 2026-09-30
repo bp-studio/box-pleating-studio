@@ -52,7 +52,6 @@
 						v-else-if="state.stage == Stage.initializing || state.stage == Stage.start"
 						:value="state.minor"
 						:max="1"
-						no-skip
 						percentage
 					>
 						{{ state.stage == Stage.initializing ? "Initializing..." : "Processing problem..." }}
@@ -85,7 +84,6 @@
 						v-else-if="state.stage == Stage.pack"
 						:value="state.minor"
 						:max="packTransform(200)"
-						no-skip
 						percentage
 					>
 						Pre-solving...
@@ -275,6 +273,10 @@
 
 	provide(contextKey, {
 		state,
+		skippable(): boolean {
+			// The other stages are fast enough that skipping makes little sense.
+			return state.stage == Stage.candidate || state.stage == Stage.continuous;
+		},
 		skip(): void {
 			state.skipping = true;
 			gtag("event", "optimizer_skip", { data1: Stage[state.stage] });

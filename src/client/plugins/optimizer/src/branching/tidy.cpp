@@ -2,7 +2,6 @@
 #include "tidy.h"
 #include "contour.h"
 #include "covering.h"
-#include "global/interrupt.h"
 
 #include <algorithm>
 #include <array>
@@ -150,9 +149,8 @@ namespace {
 					best_score = result;
 					best_layout = layout;
 				}
-				if(interrupted) break;
 			}
-			layout = best_layout;
+			layout = std::move(best_layout);
 			report(best_score);
 		}
 
@@ -165,18 +163,13 @@ namespace {
 		Score optimize(const bool use_covering) {
 			const char *name = use_covering ? "covering" : "plain";
 			Score current = objective(nullptr);
-			for(int round = 1; round <= MAX_ROUNDS && !interrupted; round++) {
+			for(int round = 1; round <= MAX_ROUNDS; round++) {
 				for(int pass = 1; pass <= MAX_PASSES; pass++) {
 					const int improved = lns_pass(current, use_covering);
 					cout << "Tidy: " << name << " proxy, round " << round << " pass " << pass << " improved " << improved
 						 << " neighborhoods, junction area " << total_area() << " " << current << endl;
 					if(improved == 0) break;
-					if(check_interrupt()) {
-						interrupted = true;
-						break;
-					}
 				}
-				if(interrupted) break;
 				const int moved = single_pass(current);
 				cout << "Tidy: " << name << " proxy, round " << round << " moved " << moved
 					 << " single flaps, junction area " << total_area() << " " << current << endl;
@@ -262,10 +255,6 @@ namespace {
 						}
 					}
 				}
-				if(check_interrupt()) {
-					interrupted = true;
-					return swapped;
-				}
 			}
 			return swapped;
 		}
@@ -302,7 +291,6 @@ namespace {
 		};
 
 		Score initial = {};
-		bool interrupted = false;
 
 		GridLayout &layout;
 		const Hierarchy *hierarchy;

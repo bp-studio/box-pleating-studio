@@ -1,6 +1,5 @@
 
 #include "csp.h"
-#include "global/interrupt.h"
 #include "grid.h"
 #include "math/scale.h"
 
@@ -93,16 +92,6 @@ namespace {
 		}
 
 		string reason;
-
-		/** Best-effort result by naive rounding, used when the process is interrupted. */
-		void round(const int size, GridLayout &out) {
-			out.size = size;
-			setup_positions(size);
-			for(int i = 0; i < vars.size(); i++) {
-				out.grid[i * 2] = std::round(vars[i].px);
-				out.grid[i * 2 + 1] = std::round(vars[i].py);
-			}
-		}
 
 	  private:
 		const vector<double> &x0;
@@ -310,10 +299,6 @@ GridLayout csp_solve_integer(const vector<double> &x0, const Hierarchy *hierarch
 				 << (ok ? " solved" : " failed: " + csp.reason) << endl;
 			if(ok) {
 				report(size, MAX_RADIUS);
-				return layout;
-			}
-			if(check_interrupt()) {
-				csp.round(size, layout);
 				return layout;
 			}
 		}
