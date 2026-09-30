@@ -14,6 +14,7 @@ import type { IRect } from "./utils/carve";
 import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
 import type { Path, Polygon } from "shared/types/geometry";
 import type { ITreeNode, NodeGraphics, RoughContour } from "../context";
+import type { junctionTask } from "./junction";
 
 const roughUnion = new RoughUnion();
 
@@ -31,7 +32,8 @@ const invasionCache = new Map<NodeId, string>();
  * Such contour consists of axis-aligned line segments only,
  * and can speed up the process of taking unions.
  * It depends only on the AABB hierarchy, except for the "invasions"
- * (see {@link ValidJunction.$invasion}) which are carved out of the leaves.
+ * (see {@link ValidJunction.$invasion}) which are carved out of the leaves,
+ * so this task runs after {@link junctionTask}.
  *
  * Each instance of rough contour should consist of a single connected region only.
  */

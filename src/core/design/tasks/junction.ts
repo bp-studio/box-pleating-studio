@@ -3,6 +3,7 @@ import { State } from "core/service/state";
 import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
 import { stretchTask } from "./stretch";
+import { roughContourTask } from "./roughContour";
 import { dist } from "../context/treeUtils";
 import { UpdateResult } from "core/service/updateResult";
 
@@ -17,7 +18,7 @@ import type { ITreeNode } from "../context";
  * be provided automatically during the course of the algorithm.
  */
 //=================================================================
-export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask);
+export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask, roughContourTask);
 
 function junction(): void {
 	// Delete junctions related to deleted nodes or nodes that are no longer leaves
