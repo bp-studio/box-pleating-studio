@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { Bridge } from "client/plugins/optimizer/bridge";
 import { GridType } from "shared/json";
@@ -8,9 +8,9 @@ import type { OptimizerRequest } from "client/plugins/optimizer/types";
 
 // Changes made to the C++ part will take effect after `make`
 
-describe("Optimizer", function() {
+describe("Optimizer", () => {
 
-	it("Solve SLSQP", async function() {
+	it("Solve SLSQP", async () => {
 		const instance = await optimizer({
 			print: () => undefined,
 			checkInterrupt: () => false,
@@ -20,7 +20,7 @@ describe("Optimizer", function() {
 		expect(result).to.deep.equal(simpleResult);
 	});
 
-	it("Solves problems with flap dimensions", async function() {
+	it("Solves problems with flap dimensions", async () => {
 		const instance = await optimizer({
 			print: () => undefined,
 			checkInterrupt: () => false,
@@ -38,7 +38,7 @@ describe("Optimizer", function() {
 		});
 	});
 
-	it("Generates random layouts", async function() {
+	it("Generates random layouts", async () => {
 		const instance = await optimizer({
 			print: () => undefined,
 			checkInterrupt: () => false,
@@ -61,7 +61,8 @@ describe("Optimizer", function() {
 
 	// This is the template for examine issues. Uncomment to use it.
 
-	// it("test", async function() {
+	// eslint-disable-next-line vitest/no-commented-out-tests
+	// it("test", async () => {
 	// 	const instance = await optimizer({ checkInterrupt: () => false });
 	// 	const bridge = new Bridge(instance);
 	// 	const request = makeRequest();

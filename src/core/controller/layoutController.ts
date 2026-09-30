@@ -56,8 +56,7 @@ export namespace LayoutController {
 		return clip.$get(lines);
 	}
 
-	/* istanbul ignore next: covered in practice */
-	export function switchConfig(stretchId: string, to: number): void {
+	export /* istanbul ignore next: covered in practice */ function switchConfig(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		const repo = stretch.$repo;
 		repo.$index = to;
@@ -85,8 +84,7 @@ export namespace LayoutController {
 		return stretch.$complete();
 	}
 
-	/* istanbul ignore next: covered in practice */
-	export function moveDevice(stretchId: string, index: number, location: IPoint): void {
+	export /* istanbul ignore next: covered in practice */ function moveDevice(stretchId: string, index: number, location: IPoint): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		const repo = stretch.$repo;
 		const device = repo.$pattern!.$devices[index];

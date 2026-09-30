@@ -79,7 +79,7 @@ Not that I don't want to, but that I don't have the resource to do so.
 
 ## Automate testing
 
-BP Studio contains three test sets: the [Mocha unit tests](test/README.md),
+BP Studio contains three test sets: the [Rstest unit tests](test/README.md),
 the [Playwright e2e tests](e2e/README.md),
 and the [Python tests](src/client/plugins/optimizer/python/tests/README.md).
 Refer to the README of each for details.

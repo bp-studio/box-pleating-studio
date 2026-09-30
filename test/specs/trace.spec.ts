@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { parsePath } from "@utils/path";
 import { Trace } from "core/design/layout/trace/trace";
@@ -10,15 +10,15 @@ import { Point } from "core/math/geometry/point";
 
 import type { SideDiagonal } from "core/design/layout/configuration";
 
-describe("Tracing algorithm", function() {
+describe("Tracing algorithm", () => {
 
-	describe("Hinge segmentation", function() {
-		it("Determines corner direction", function() {
+	describe("Hinge segmentation", () => {
+		it("Determines corner direction", () => {
 			const path = parsePath("(2,3),(1,3),(1,2),(0,2),(0,1),(1,1),(1,0),(2,0),(2,1),(3,1),(3,2),(2,2)");
 			expect(mapDirections(path)).to.eql([0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0, 0]);
 		});
 
-		it("Segment hinges", function() {
+		it("Segment hinges", () => {
 			const path = parsePath("(2,3),(1,3),(1,2),(0,2),(0,1),(1,1),(1,0),(2,0),(2,1),(3,1),(3,2),(2,2)");
 			const segments = createHingeSegments(path, SlashDirection.FW);
 			expect(segments.length).to.equal(2);
@@ -28,7 +28,7 @@ describe("Tracing algorithm", function() {
 			expect(segments[1]).to.equalPath("(3,1),(3,2),(2,2),(2,3),(1,3)");
 		});
 
-		it("Works with connected segments", function() {
+		it("Works with connected segments", () => {
 			const path = parsePath("(0,0),(1,0),(1,1),(0,1)");
 			const segments = createHingeSegments(path, SlashDirection.FW);
 			expect(segments.length).to.equal(2);
@@ -39,9 +39,9 @@ describe("Tracing algorithm", function() {
 		});
 	});
 
-	describe("Ridge filtering", function() {
+	describe("Ridge filtering", () => {
 
-		it("Includes the intersection ridge at the end", function() {
+		it("Includes the intersection ridge at the end", () => {
 			const trace = new Trace(
 				Line.$parseTest([
 					{ p1: "(8, 61)", p2: "(25, 32)" },

@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "@rstest/core";
 
 import { createTree } from "@utils/tree";
 import { State } from "core/service/state";

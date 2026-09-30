@@ -3,7 +3,7 @@
  *
  * Usage:
  *   make                                       # builds lib/optimizer/debug
- *   pnpm mocha --spec test/bench/optimizer.bench.ts
+ *   pnpm rstest run --include test/bench/optimizer.bench.ts --disableConsoleIntercept
  *
  * Note that the debug build is about 25x slower than the optimized ones.
  * For timing, build an optimized Node.js build with
@@ -18,6 +18,7 @@
  *   TYPE      Set to "diag" to force diagonal sheets
  */
 
+import { describe, it, beforeAll } from "@rstest/core";
 import { readFileSync, readdirSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
@@ -52,12 +53,13 @@ const only = process.env.BPS_ONLY;
 const useBH = process.env.BH == "1";
 const useDimension = process.env.DIM == "1";
 const SEED = 12345;
+const TIMEOUT = 24 * 60 * 60 * 1000; // Effectively no timeout
 
-describe("Optimizer integer stages benchmark", function() {
+describe("Optimizer integer stages benchmark", () => {
 
 	const cases: Case[] = [];
 
-	before(function() {
+	beforeAll(() => {
 		const files = readdirSync(dir).filter(f => f.endsWith(".bps") && (!only || f.includes(only)));
 		for(const file of files) {
 			try {
@@ -71,7 +73,8 @@ describe("Optimizer integer stages benchmark", function() {
 		console.log(`Loaded ${cases.length} designs from ${dir}`);
 	});
 
-	it("Runs the optimizer", async function() {
+	// eslint-disable-next-line vitest/expect-expect -- This is a benchmark
+	it("Runs the optimizer", async () => {
 		const rows: string[] = [];
 		rows.push("| design | flaps | cont. | size | fit ms | vertices before | vertices after | tidy ms |", "|---|---|---|---|---|---|---|---|");
 		for(const c of cases) {
@@ -83,7 +86,7 @@ describe("Optimizer integer stages benchmark", function() {
 			rows.push(`| ${c.name} | ${flaps} | ${r.continuous.toFixed(2)} | ${r.width} | ${r.fitMs.toFixed(0)} | ${r.verticesBefore} | ${r.verticesAfter} | ${r.tidyMs.toFixed(0)} |`);
 		}
 		console.log("\n" + rows.join("\n"));
-	});
+	}, TIMEOUT);
 });
 
 async function run(request: OptimizerRequest): Promise<RunResult> {

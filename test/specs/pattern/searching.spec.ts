@@ -1,9 +1,7 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { LayoutController } from "core/controller/layoutController";
-import twoFlapSpec from "./twoFlap.spec";
 import { id2, id3, id4, id5, parseTree } from "@utils/tree";
-import threeFlapSpec from "./threeFlap.spec";
 import { UpdateResult } from "core/service/updateResult";
 import { State, fullReset } from "core/service/state";
 import { complete, generateFromFlaps } from "./util";
@@ -13,9 +11,9 @@ import { Migration } from "client/patches";
 
 import type { JEdge, JFlap } from "shared/json";
 
-export default function() {
+describe("Searching", () => {
 
-	it("Loads saved patterns", async function() {
+	it("Loads saved patterns", async () => {
 		fullReset();
 		const sample = await getJSON("v04.session.sample.json");
 		const data = Migration.$process(sample);
@@ -27,7 +25,7 @@ export default function() {
 	});
 
 	/** Added v0.7.17 */
-	it("Recognizes the saved pattern when searching", function() {
+	it("Recognizes the saved pattern when searching", () => {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
 		complete();
 		const count = State.$stretches.get("1,2")!.$repo.$configuration!.$length;
@@ -53,7 +51,7 @@ export default function() {
 	});
 
 	/** Added v0.7.17 */
-	it("Serializes patterns without caches", function() {
+	it("Serializes patterns without caches", () => {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
 		complete();
 		UpdateResult.$flush(); // Make sure that the devices are rendered, so that the caches are filled
@@ -65,9 +63,9 @@ export default function() {
 	 * The rule: the notification is shown if and only if there is a stretch without pattern
 	 * such that the flaps involved do not form any invalid junctions among themselves.
 	 */
-	describe("Pattern-not-found notification", function() {
+	describe("Pattern-not-found notification", () => {
 
-		it("Signifies when no pattern is found", function() {
+		it("Signifies when no pattern is found", () => {
 			parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
 			const stretch = State.$stretches.get("0,1,3")!;
 			expect(stretch.$repo.$isValid).to.be.true;
@@ -76,7 +74,7 @@ export default function() {
 		});
 
 		/** Added v0.8.0 */
-		it("Signifies when the repo is skipped by the validity checks", function() {
+		it("Signifies when the repo is skipped by the validity checks", () => {
 			// The layout is legal, but the repo fails the delta point check,
 			// so the searching is skipped altogether (see threeFlap.spec).
 			parseTree("(0,2,12),(0,1,2),(0,3,9)", "(1,10,5,0,0),(2,19,16,0,0),(3,0,0,0,0)");
@@ -87,7 +85,7 @@ export default function() {
 		});
 
 		/** Added v0.8.0 */
-		it("Does not signify if the flaps involved form invalid junctions", function() {
+		it("Does not signify if the flaps involved form invalid junctions", () => {
 			// Flaps 2 and 3 are way too close, which is already signified by the invalid junction.
 			generateFromFlaps([
 				{ id: 1, x: 139, y: 0, radius: 80 },
@@ -101,7 +99,7 @@ export default function() {
 		});
 
 		/** Added v0.8.0 */
-		it("Ignores invalid junctions among other flaps", function() {
+		it("Ignores invalid junctions among other flaps", () => {
 			// Same as the first case, plus flaps 4 and 5 forming an invalid junction far away.
 			parseTree(
 				"(2,0,10),(2,1,2),(2,3,3),(2,4,1),(2,5,1)",
@@ -112,7 +110,7 @@ export default function() {
 			expect(UpdateResult.$flush().patternNotFound).to.be.true;
 		});
 
-		it("Does not signify when all stretches have patterns", function() {
+		it("Does not signify when all stretches have patterns", () => {
 			parseTree(
 				"(0,1,7),(0,2,4),(0,3,1),(0,4,1)",
 				"(1,0,0,0,0),(2,8,9,0,0),(3,40,40,0,0),(4,40,41,0,0)"
@@ -124,7 +122,7 @@ export default function() {
 
 	});
 
-	it("Caches repo during dragging", function() {
+	it("Caches repo during dragging", () => {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,0,0,0,0)");
 
 		// Drag into stretch
@@ -190,7 +188,4 @@ export default function() {
 		expect(stretch.$repo.$configuration!.$index).to.equal(0);
 	});
 
-	describe("Two flap patterns", twoFlapSpec);
-
-	describe("Three flap patterns", threeFlapSpec);
-}
+});

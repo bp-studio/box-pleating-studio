@@ -10,8 +10,7 @@ node_modules/
 debug.log
 .VSCodeCounter/
 
-# Istanbul
-.nyc_output/
+# Coverage
 coverage/
 
 # Playwright

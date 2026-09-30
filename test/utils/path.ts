@@ -1,4 +1,4 @@
-import { Assertion } from "chai";
+import { expect } from "@rstest/core";
 
 import { pathToString } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
@@ -34,32 +34,33 @@ function parseFractions(s: string): string {
 	return s.replace(/(\d+)\/(\d+)/g, (_, $1, $2) => (Number($1) / Number($2)).toString());
 }
 
-Assertion.addMethod("equalPath", function(pathString: string, circular: boolean = false) {
-	new Assertion(Array.isArray(this._obj)).to.be.true;
-	const path = (this._obj as Path).concat();
-	const orgPathString = pathToString(path);
+expect.extend({
+	equalPath(received, pathString: string, circular: boolean = false) {
+		expect(Array.isArray(received)).to.be.true;
+		const path = (received as Path).concat();
+		const orgPathString = pathToString(path);
 
-	// Accepts fractions
-	pathString = parseFractions(pathString);
+		// Accepts fractions
+		pathString = parseFractions(pathString);
 
-	if(circular) {
-		const match = pathString.match(/\((-?\d*\.?\d+),(-?\d*\.?\d+)(?:,-?\d*\.?\d+){0,3}\)/)!;
-		const point = { x: Number(match[1]), y: Number(match[2]) };
-		const rotateResult = rotatePath(path, point);
-		this.assert(
-			rotateResult,
-			"expect #{act} to contain the point #{exp}",
-			"expect #{act} to not contain the point #{exp}",
-			match[0],
-			orgPathString
-		);
-	}
+		if(circular) {
+			const match = pathString.match(/\((-?\d*\.?\d+),(-?\d*\.?\d+)(?:,-?\d*\.?\d+){0,3}\)/)!;
+			const point = { x: Number(match[1]), y: Number(match[2]) };
+			const rotateResult = rotatePath(path, point);
+			if(!rotateResult) {
+				return {
+					pass: false,
+					message: () => `expect ${orgPathString} to contain the point ${match[0]}`,
+				};
+			}
+		}
 
-	this.assert(
-		pathToString(path) == pathString,
-		"expect #{act} to equal #{exp}",
-		"expect #{act} to not equal #{exp}",
-		pathString,
-		orgPathString
-	);
+		const pass = pathToString(path) == pathString;
+		return {
+			pass,
+			message: () => pass ?
+				`expect ${orgPathString} to not equal ${pathString}` :
+				`expect ${orgPathString} to equal ${pathString}`,
+		};
+	},
 });

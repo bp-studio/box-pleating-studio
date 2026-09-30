@@ -20,7 +20,7 @@ export default defineConfig([
 			],
 		},
 		globals: {
-			esm: ["test/mocha.env.js", "lib/**/*.js", "scripts/**", "eslint.config.js", "gulpfile.js", "gulp/**"],
+			esm: ["lib/**/*.js", "scripts/**", "eslint.config.js", "gulpfile.js", "gulp/**"],
 			browser: ["src/**"],
 		},
 		html: {
@@ -30,7 +30,11 @@ export default defineConfig([
 			"no-var": "off",
 			"vars-on-top": "off",
 		},
-		mocha: ["test/**"],
+		rstest: {
+			files: ["test/**"],
+			// Custom assertion helpers
+			assertFunctionNames: ["expect*", "testAdjacency"],
+		},
 		playwright: ["e2e/**"],
 		package: order => order.toSpliced(order.indexOf("version") + 1, 0, "app_version"),
 	}),
