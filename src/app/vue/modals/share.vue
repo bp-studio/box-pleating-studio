@@ -28,6 +28,7 @@
 								</CheckButton>
 							</div>
 						</div>
+						<div v-if="shortened" class="mt-2 small text-info">{{ $t("share.note") }}</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ $t("keyword.ok") }}</button>
@@ -40,7 +41,7 @@
 
 <script setup lang="ts">
 
-	import { shallowRef, useTemplateRef } from "vue";
+	import { computed, shallowRef, useTemplateRef } from "vue";
 
 	import Studio from "app/services/studioService";
 	import LZ from "app/utils/lz";
@@ -50,7 +51,12 @@
 
 	defineOptions({ name: "Share" });
 
+	/** The host of the share links. */
+	const HOST = location.host.includes("qa") ? location.host : "bpstudio.abstreamace.com";
+
 	const url = shallowRef("");
+	/** Whether the link is actually shortened (the proxy returns the original link on failure). */
+	const shortened = computed(() => !url.value.startsWith(`https://${HOST}/`));
 	const canShare = Boolean(navigator.share);
 	const sending = shallowRef(false);
 	const error = shallowRef<string | null>(null);
@@ -62,8 +68,7 @@
 		onBeforeShow: async () => {
 			if(!Studio.project) return false;
 			const data = await LZ.compress(JSON.stringify(Studio.project));
-			const host = location.host.includes("qa") ? location.host : "bpstudio.abstreamace.com";
-			shorten(`https://${host}/?project=${data}`);
+			shorten(`https://${HOST}/?project=${data}`);
 			return true;
 		},
 	});
@@ -101,8 +106,9 @@
 	}
 
 	/**
-	 * Since 2026, TinyURL no longer allows cross-origin requests from other origins,
-	 * so we call its API through our own proxy instead.
+	 * We shorten the links through our own proxy, which currently uses reurl.cc
+	 * (originally TinyURL, hence the file name), and returns the original link
+	 * if the link cannot be shortened (e.g. too long).
 	 * @see [tinyurl.php](../../../other/php/tinyurl.php)
 	 */
 	const SHORTENER = "https://abstreamace.com/php-tool/bpstudio/tinyurl.php";

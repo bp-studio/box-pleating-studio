@@ -219,7 +219,8 @@
 		"title": "プロジェクトを共有する",
 		"copy": "コピー",
 		"share": "シェア",
-		"message": "Box Pleating Studio で設計された私のプロジェクト \"{0}\" をチェックしてください！"
+		"message": "Box Pleating Studio で設計された私のプロジェクト \"{0}\" をチェックしてください！",
+		"note": "このURLはプロジェクトの短期的な共有専用であり、長期的に有効であることは保証されません。"
 	},
 	"about": {
 		"title": "Box Pleating Studio について",

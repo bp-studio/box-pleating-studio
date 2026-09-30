@@ -219,7 +219,8 @@
 		"title": "Chia sẻ dự án",
 		"copy": "Sao chép",
 		"share": "Chia sẻ",
-		"message": "Xem dự án của tôi \"{0}\" được thiết kế với Box Pleating Studio!"
+		"message": "Xem dự án của tôi \"{0}\" được thiết kế với Box Pleating Studio!",
+		"note": "Liên kết này chỉ dùng để chia sẻ dự án trong thời gian ngắn và không đảm bảo sẽ còn hiệu lực lâu dài."
 	},
 	"about": {
 		"title": "Giới thiệu về Box Pleating Studio",

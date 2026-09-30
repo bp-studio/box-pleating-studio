@@ -219,7 +219,8 @@
 		"title": "Share project",
 		"copy": "Copy",
 		"share": "Share",
-		"message": "Check out my project \"{0}\" designed with Box Pleating Studio!"
+		"message": "Check out my project \"{0}\" designed with Box Pleating Studio!",
+		"note": "This link is intended for short-term sharing of the project only, and is not guaranteed to remain valid in the long term."
 	},
 	"about": {
 		"title": "About Box Pleating Studio",

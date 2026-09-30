@@ -1,8 +1,8 @@
 <?php
 /**
- * This is currently the only backend script used by BP Studio,
- * for forwarding Discord Webhook request to the actual endpoint
+ * Backend script for forwarding Discord Webhook request to the actual endpoint
  * without publishing the endpoint URL to GitHub repo.
+ * The same webhook is also used by tinyurl.php for notifying failures.
  */
 
 // Set CORS headers

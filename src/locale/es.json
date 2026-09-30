@@ -219,7 +219,8 @@
 		"title": "Compartir proyecto",
 		"copy": "Copiar",
 		"share": "Cuota",
-		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!"
+		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!",
+		"note": "Este enlace solo está pensado para compartir el proyecto a corto plazo, y no se garantiza que siga siendo válido a largo plazo."
 	},
 	"about": {
 		"title": "Acerca de Box Pleating Studio",
