@@ -145,6 +145,23 @@ describe("Contour", () => {
 			expect(outer).to.equalPath("(71,127),(71,82),(73,82),(73,80),(238/3,80),(88,147/2),(88,73),(125,73),(125,127)");
 		});
 
+		/** Added v0.8.0 */
+		it("Resolves the starting/ending points by the leaves of each raw contour", () => {
+			// Flap 19 is used in three repos, so the leaves 6, 12 and 19 of node 0 have separate raw contours.
+			// The junctions 6-19 and 12-19 are digested by node 0 as a whole, but not by the raw contours of 6 and 12,
+			// so the starting/ending points of tracing in those raw contours must not be moved.
+			parseTree(
+				"(13,0,3),(13,15,1),(13,16,1),(0,4,5),(0,19,3),(0,3,7),(15,14,1),(15,17,1),(4,6,3),(3,12,1),(14,18,1),(14,1,1)",
+				"(1,18,20,0,0),(6,4,20,0,0),(12,20,4,0,0),(16,15,15,0,0),(17,18,17,0,0),(18,20,20,0,0),(19,10,10,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			const outer = result.graphics["re0,13"].contours[0].outer;
+			expect(outer).to.equalPath(
+				"(31,15),(16,15),(16,157/11),(731/47,661/47),(77/5,14),(44/3,14),(14,29/2),(14,77/5),(661/47,731/47),(157/11,16),(15,16)," +
+				"(15,31),(-7,31),(-7,9),(4,9),(4,4),(9,4),(9,-7),(31,-7)"
+			);
+		});
+
 	});
 
 	describe("Graphical contour", () => {

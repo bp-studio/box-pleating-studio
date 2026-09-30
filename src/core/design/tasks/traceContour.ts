@@ -249,11 +249,12 @@ function createRawContour(
 		} else { // Group all relevant leaves into one raw contour
 			let outers = leafSet.flatMap(id => createRawContourForLeaf(node, tree.$nodes[id]!));
 			if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
-			result.push(...packPaths(outers, leafSet));
+			result.push(...packPaths(outers, withInnerInvaders(node, leafSet)));
 		}
 	}
 	for(const id of sharedLeaves) { // Each shared leaf will have its own raw contour
-		result.push(...packPaths(createRawContourForLeaf(node, tree.$nodes[id]!), [id]));
+		const outers = createRawContourForLeaf(node, tree.$nodes[id]!);
+		result.push(...packPaths(outers, withInnerInvaders(node, [id])));
 	}
 
 	// All the rest goes to the same group.
@@ -267,7 +268,7 @@ function createRawContour(
 		// However, there is one catch here (see recursiveExpand).
 		const paths = recursiveExpand(node, children, remainingLeaves, node.$length);
 		const outers = expander.$get(paths);
-		result.push(...packPaths(outers, [...remainingLeaves]));
+		result.push(...packPaths(outers, withInnerInvaders(node, [...remainingLeaves])));
 	}
 
 	return result;
@@ -329,6 +330,19 @@ function recursiveExpand(
 		}
 	}
 	return result;
+}
+
+/**
+ * The given leaves, plus the invaders (recursively) that {@link createRawContourForLeaf} includes along with them.
+ * The resulting raw contour wraps these invaders as well, so their junctions with the leaves are digested.
+ */
+function withInnerInvaders(node: ITreeNode, leaves: readonly NodeId[]): NodeId[] {
+	const result = new Set(leaves);
+	const tree = State.m.$tree;
+	for(const id of result) { // Iterating a Set also visits the elements added during the iteration
+		for(const invader of getInnerInvaders(node, tree.$nodes[id]!)) result.add(invader.id);
+	}
+	return [...result];
 }
 
 function packPaths(outers: PathEx[], leaves: NodeId[]): PathEx[] {

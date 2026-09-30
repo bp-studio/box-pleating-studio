@@ -99,7 +99,10 @@ export function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants:
 			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps around the quadrant
 				.filter(q => !multiContour || leaves.includes(q.$flap.id));
-			const map = createStartEndMap(quadrants, trace, traceLeaves);
+			// In raw mode, the junctions are digested only by the leaves wrapped inside the current path,
+			// not by all leaves of the trace contour (which are split into separate paths).
+			const insideLeaves = traceContour.$raw ? new Set(leaves) : traceLeaves;
+			const map = createStartEndMap(quadrants, trace, insideLeaves);
 
 			const hingeSegments = createHingeSegments(outer, trace.$repo.$direction);
 			const context: TraceContext = { map, trace, node, index };
