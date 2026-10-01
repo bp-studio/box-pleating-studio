@@ -65,18 +65,3 @@ export function getCarvedQuadrants(node: ITreeNode): Set<QuadrantCode> {
 	for(const code of external) result.delete(code);
 	return result;
 }
-
-/**
- * Get the invaders (see {@link ValidJunction.$invasion}) of the leaf that are under the given node.
- */
-export function getInnerInvaders(node: ITreeNode, leaf: ITreeNode): ITreeNode[] {
-	const invaders = invasionMap.get(leaf.id);
-	if(!invaders) return [];
-	const result: ITreeNode[] = [];
-	for(const { flap } of invaders) {
-		let n: ITreeNode | undefined = flap;
-		while(n && n.$dist > node.$dist) n = n.$parent;
-		if(n === node) result.push(flap);
-	}
-	return result;
-}

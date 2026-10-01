@@ -51,7 +51,16 @@ export class TraceContext {
 	 * Find the first candidate line that intersects the pattern, and decide the initial ray.
 	 */
 	public $getInitialNode(ridges: Set<Ridge>, startDiagonal?: SideDiagonal): TraceNode | null {
-		for(const hinge of this._hinges) {
+		// If the start diagonal hits the hinges, the hinges before it lie outside the starting line,
+		// and they should not be considered (they could hit some ridges, especially when the hinges
+		// are carved in raw mode; see getQuadrantShape).
+		let startIndex = 0;
+		const diagonal = startDiagonal;
+		if(diagonal) {
+			const index = this._hinges.findIndex(h => h.$intersectLine(diagonal, false));
+			if(index >= 0) startIndex = index;
+		}
+		for(const hinge of this._hinges.slice(startIndex)) {
 			const v = hinge.$vector;
 			const ray = { point: hinge.p1, vector: v };
 

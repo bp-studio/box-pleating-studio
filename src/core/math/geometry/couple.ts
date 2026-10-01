@@ -40,6 +40,7 @@ export abstract class Couple {
 	public toString(): string { return "(" + this._x + ", " + this._y + ")"; }
 
 	public $add(v: Vector): this {
+		// eslint-disable-next-line new-cap
 		return new this.constructor(this._x.add(v._x), this._y.add(v._y));
 	}
 

@@ -1,10 +1,11 @@
 import { Task } from "./task";
 import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
-import { quadrantNumber } from "shared/types/direction";
+import { makePerQuadrant, quadrantNumber } from "shared/types/direction";
 import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 import { RepoTrace } from "../layout/trace/repoTrace";
+import { extendToBase, getQuadrantShape } from "./utils/rawPiece";
 
 import type { TreeNode } from "../context/treeNode";
 import type { NodeId } from "shared/json/tree";
@@ -14,6 +15,8 @@ import type { QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../layout/repository";
 import type { ITreeNode, NodeGraphics } from "../context";
 import type { StartEnd } from "../layout/trace/trace";
+import type { RawPiece } from "./utils/rawPiece";
+import type { Path, PathEx } from "shared/types/geometry";
 
 //=================================================================
 /**
@@ -99,16 +102,11 @@ export function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants:
 			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps around the quadrant
 				.filter(q => !multiContour || leaves.includes(q.$flap.id));
-			// In raw mode, the junctions are digested only by the leaves wrapped inside the current path,
-			// not by all leaves of the trace contour (which are split into separate paths).
-			const insideLeaves = traceContour.$raw ? new Set(leaves) : traceLeaves;
-			const map = createStartEndMap(quadrants, trace, insideLeaves);
-
-			const hingeSegments = createHingeSegments(outer, trace.$repo.$direction);
-			const context: TraceContext = { map, trace, node, index };
-			for(const hingeSegment of hingeSegments) {
-				processTrace(hingeSegment, context, leaves, traceContour.$raw);
-			}
+			// The junctions with the flaps inside the whole node are considered digested.
+			// In raw mode, that is made consistent with the geometry by getQuadrantShape (see processOuter).
+			const map = createStartEndMap(quadrants, trace, traceLeaves);
+			const context: TraceContext = { map, trace, node, index, leaves, rawMode: traceContour.$raw };
+			processOuter(outer, context);
 		}
 	}
 }
@@ -131,18 +129,44 @@ interface TraceContext {
 	readonly trace: RepoTrace;
 	readonly node: ITreeNode;
 	readonly index: number;
+	readonly leaves: NodeId[];
+	readonly rawMode: boolean;
 }
 
-function processTrace(hingeSegment: HingeSegment, context: TraceContext, leaves: NodeId[], rawMode: boolean): void {
+/**
+ * Process the hinge segments of a path of the {@link TraceContour}.
+ *
+ * In raw mode, a quadrant involving digested junctions is traced on its own shape (see {@link getQuadrantShape}),
+ * and the resulting contours are extended so that they can be inserted into the base shape (see {@link extendToBase}).
+ */
+function processOuter(outer: PathEx, context: TraceContext): void {
+	const dir = context.trace.$repo.$direction;
+	const shapes = makePerQuadrant(q =>
+		context.rawMode && context.map[q] ? getQuadrantShape(outer as RawPiece, q) : null
+	);
+	for(const hingeSegment of createHingeSegments(outer, dir)) {
+		if(!shapes[hingeSegment.q]) processTrace(hingeSegment, context);
+	}
+	for(const [q, paths] of shapes.entries()) {
+		for(const shape of paths ?? []) {
+			for(const hingeSegment of createHingeSegments(shape, dir)) {
+				if(hingeSegment.q == q) processTrace(hingeSegment, context, outer, shape);
+			}
+		}
+	}
+}
+
+function processTrace(hingeSegment: HingeSegment, context: TraceContext, base?: Path, shape?: Path): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
-	const contour = context.trace.$generate(hingeSegment, map.start, map.end, rawMode, map.virtualStart);
+	let contour = context.trace.$generate(hingeSegment, map.start, map.end, context.rawMode, map.virtualStart);
+	if(contour && base && shape) contour = extendToBase(base, shape, contour);
 	if(contour) {
 		State.$contourWillChange.add(context.node); // Acquiring pattern contours
 		contour.$ids = context.trace.$repo.$nodeSet.$nodes;
 		contour.$repo = context.trace.$repo.$signature;
 		contour.$for = context.index;
-		contour.$leaves = leaves;
+		contour.$leaves = context.leaves;
 		context.node.$graphics.$patternContours.push(contour);
 	}
 }

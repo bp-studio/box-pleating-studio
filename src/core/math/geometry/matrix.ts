@@ -59,6 +59,7 @@ export class Matrix {
 	public $multiply(p: Point): Point;
 	public $multiply(v: Vector): Vector;
 	public $multiply(that: Point | Vector): typeof that {
+		// eslint-disable-next-line new-cap
 		return new that.constructor(
 			this.a.mul(that._x).a(this.b.mul(that._y)),
 			this.c.mul(that._x).a(this.d.mul(that._y))

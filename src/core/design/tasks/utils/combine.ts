@@ -78,7 +78,11 @@ function tryInsertInner(childContour: PatternContour, result: RationalContour[])
 	}
 }
 
-function tryInsert(path: RationalPath, insert: PatternContour): boolean {
+/**
+ * Replace the part of the path between the two ends of the inserted path (which should lie on the path).
+ * Returns `false` if the ends are not found on the path.
+ */
+export function tryInsert(path: RationalPath, insert: RationalPath): boolean {
 	const l = path.length;
 	const first = insert[0];
 	const last = insert[insert.length - 1];

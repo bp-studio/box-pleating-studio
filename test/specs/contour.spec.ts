@@ -33,7 +33,7 @@ describe("Contour", () => {
 			);
 			const result = UpdateResult.$flush();
 			const outer = result.graphics["re0,13"].contours[0].outer;
-			expect(outer).to.equalPath("(19,18),(7,18),(7,14),(-8,14),(-8,-12),(18,-12),(18,6),(17.5,6),(17,20/3),(17,7.5),(53/3,8),(19,8)");
+			expect(outer).to.equalPath("(19,18),(7,18),(7,14),(-8,14),(-8,-12),(18,-12),(18,6),(17.5,6),(17,20/3),(17,7.5),(53/3,8),(19,8)", true);
 		});
 
 		it("Use start diagonal to find the initial node", () => {
@@ -140,7 +140,7 @@ describe("Contour", () => {
 			);
 			const result = UpdateResult.$flush();
 			const outer = result.graphics["re12,15"].contours[0].outer;
-			expect(outer).to.equalPath("(61,14),(50,14),(50,18),(22,18),(22,14),(11,14),(11,2),(18,2),(18,-18),(54,-18),(54,2),(61,2)");
+			expect(outer).to.equalPath("(61,14),(50,14),(50,18),(22,18),(22,14),(11,14),(11,2),(18,2),(18,-18),(54,-18),(54,2),(61,2)", true);
 		});
 
 		/** Added v0.7.16 */
@@ -178,7 +178,8 @@ describe("Contour", () => {
 			const outer = result.graphics["re0,13"].contours[0].outer;
 			expect(outer).to.equalPath(
 				"(31,15),(16,15),(16,157/11),(731/47,661/47),(77/5,14),(44/3,14),(14,29/2),(14,77/5),(661/47,731/47),(157/11,16),(15,16)," +
-				"(15,31),(-7,31),(-7,9),(4,9),(4,4),(9,4),(9,-7),(31,-7)"
+				"(15,31),(-7,31),(-7,9),(4,9),(4,4),(9,4),(9,-7),(31,-7)",
+				true
 			);
 		});
 
