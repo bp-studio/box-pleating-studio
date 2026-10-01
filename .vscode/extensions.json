@@ -7,7 +7,7 @@
 		"ms-playwright.playwright",
 		"ms-vscode.cpptools",
 		"mutsuntsai.jsdoc-link",
-		"rstack.rstest",
+		"rstack.rstack",
 		"ryanluker.vscode-coverage-gutters",
 		"sibiraj-s.vscode-scss-formatter",
 		"stylelint.vscode-stylelint",

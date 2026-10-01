@@ -129,9 +129,13 @@ export class ValidJunction implements ISerializable<JJunction> {
 	 * The rough contours are made by expanding the flaps and taking unions, regardless of the junctions.
 	 * That works in most cases, but when a flap A, even after expanding to the LCA,
 	 * is still smaller than the overlapping region in width or height,
-	 * while the other flap B has a hinge rectangle larger than the overlapping region in both dimensions,
-	 * then the region of B should be carved out by the overlapping region at its corner
+	 * then the region of the other flap B should be carved out by the overlapping region at its corner
 	 * (see {@link roughContourTask}).
+	 *
+	 * The carving applies only if the overlapping region is strictly smaller than the quadrant of B
+	 * (i.e. half of the hinge rectangle of B) in both dimensions, so that the carvings of different quadrants
+	 * can never meet, and B always remains non-empty and connected.
+	 * Otherwise, we consider it an extreme edge case that we don't attempt to handle perfectly.
 	 *
 	 * This is purely geometric, and in particular it does not depend on whether the junction
 	 * is resolved by a stretch pattern (see the notes in {@link roughContourTask} for the reason).
@@ -146,8 +150,8 @@ export class ValidJunction implements ISerializable<JJunction> {
 		const [a, b] = [this.$a, this.$b];
 		const rA = a.$dist - this.$lca.$dist;
 		const rB = b.$dist - this.$lca.$dist;
-		if(this._isSmall(a, rA) && this._isLarge(b)) return this._makeInvasion(b, -1);
-		if(this._isSmall(b, rB) && this._isLarge(a)) return this._makeInvasion(a, 1);
+		if(this._isSmall(a, rA) && this._fitsQuadrant(b)) return this._makeInvasion(b, -1);
+		if(this._isSmall(b, rB) && this._fitsQuadrant(a)) return this._makeInvasion(a, 1);
 		return null;
 	}
 
@@ -157,11 +161,14 @@ export class ValidJunction implements ISerializable<JJunction> {
 		return right - l + 2 * r < this.$o.x || t - bottom + 2 * r < this.$o.y;
 	}
 
-	/** Whether the hinge rectangle of the flap is larger than the overlapping region in both dimensions. */
-	private _isLarge(flap: ITreeNode): boolean {
+	/**
+	 * Whether the overlapping region is strictly smaller than a quadrant of the flap
+	 * (i.e. half of its hinge rectangle) in both dimensions.
+	 */
+	private _fitsQuadrant(flap: ITreeNode): boolean {
 		const [t, right, bottom, l] = flap.$AABB.$toValues();
 		const len = flap.$length;
-		return right - l + 2 * len > this.$o.x && t - bottom + 2 * len > this.$o.y;
+		return 2 * this.$o.x < right - l + 2 * len && 2 * this.$o.y < t - bottom + 2 * len;
 	}
 
 	/** @param sign 1 if the flap is {@link $a} (so that the other flap is in the direction {@link $f}), -1 otherwise. */

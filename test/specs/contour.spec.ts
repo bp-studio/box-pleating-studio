@@ -89,6 +89,26 @@ describe("Contour", () => {
 			expect(f0.ridges.some(([, p]) => p.x == 10 && p.y == 10)).to.be.false;
 		});
 
+		/** Added v0.8.0 */
+		it("Does not carve beyond the quadrant of a flap", () => {
+			// Flap 3 (radius 7) is wrapped by a thick river, and the small flaps 4-7 sit at its four diagonal corners,
+			// each making a 7x7 overlapping region, which is not smaller than the quadrant of flap 3.
+			// Carving them would erase flap 3 completely (and the river wrapping it along with it).
+			// Leaf 9 is a far branch keeping node 1 as the center of the tree.
+			parseTree(
+				"(1,2,16),(2,3,7),(1,4,1),(1,5,1),(1,6,1),(1,7,1),(1,8,1),(8,9,30)",
+				"(3,0,0,0,0),(4,17,17,0,0),(5,-17,17,0,0),(6,-17,-17,0,0),(7,17,-17,0,0),(9,-200,0,0,0)"
+			);
+			const result = UpdateResult.$flush();
+			for(const junction of State.$junctions.values()) {
+				expect(junction.$valid && junction.$invasion).to.not.be.ok;
+			}
+			const rough = State.m.$tree.$nodes[3 as NodeId]!.$graphics.$roughContours;
+			expect(rough.length).to.equal(1);
+			expect(rough[0].$outer[0]).to.equalPath("(7,7),(-7,7),(-7,-7),(7,-7)", true);
+			expect(result.graphics["re1,2"].contours.length).to.equal(1);
+		});
+
 	});
 
 	describe("Trace contour", () => {
