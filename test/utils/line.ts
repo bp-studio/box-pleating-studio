@@ -43,7 +43,11 @@ export function parseLine(line: string) {
 	return new Line(p1, p2);
 }
 
-export function makeCPLine(type: CreaseType, x1: number, y1: number, x2: number, y2: number): CPLine {
+export function makeCPLine(
+	type: CreaseType,
+	x1: number, y1: number,
+	x2: number, y2: number
+): CPLine {
 	return {
 		type,
 		p1: { x: x1, y: y1 },

@@ -35,7 +35,11 @@ export function parseTree(edges: string, flaps?: string): Tree {
 	if(flaps) {
 		const nFlaps: NFlap[] = [...flaps.matchAll(/\((\d+),(-?\d+),(-?\d+),(\d+),(\d+)\)/g)]
 			.map(m => m.map(Number))
-			.map(m => ({ id: m[1], x: m[2], y: m[3], width: m[4], height: m[5] }));
+			.map(m => ({
+				id: m[1],
+				x: m[2], y: m[3],
+				width: m[4], height: m[5],
+			}));
 		return createTree(nEdges, nFlaps);
 	} else {
 		return createTree(nEdges);
@@ -64,7 +68,9 @@ export function exportProject(id: string | number = ""): JProject {
 	for(const n of nodes) {
 		project.design.tree.nodes.push({ id: n.id, x: 0, y: 0, name: "" });
 		if(n.$parent) {
-			project.design.tree.edges.push({ n1: n.$parent.id, n2: n.id, length: n.$length });
+			project.design.tree.edges.push({
+				n1: n.$parent.id, n2: n.id, length: n.$length,
+			});
 		}
 	}
 	writeFileSync(`export${id}.bps`, JSON.stringify(project));

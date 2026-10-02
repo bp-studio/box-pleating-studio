@@ -11,6 +11,7 @@ import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
 import type { traceContourTask } from "core/design/tasks/traceContour";
+import type { fitsAt } from "core/design/tasks/utils/invasion";
 
 export type NodeCollection<T> =
 	Readonly<Record<NodeId, T | undefined>> &
@@ -122,6 +123,12 @@ export interface RoughContour extends ContourComponentBase<PathEx> {
 
 	/** Pointers to the child components. */
 	readonly $children: RoughContour[];
+
+	/**
+	 * The leaves inside this component with invasions not yet carved at this
+	 * level (see {@link fitsAt}).
+	 */
+	$pending?: NodeId[];
 }
 
 interface ContourComponentBase<T extends Path> {

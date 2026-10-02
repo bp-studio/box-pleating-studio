@@ -3,6 +3,7 @@ import { TreeController } from "core/controller/treeController";
 import { State } from "core/service/state";
 
 import type { NodeId } from "shared/json/tree";
+import type { ITreeNode } from "core/design/context";
 
 interface JFlapLike {
 	id: NodeId;
@@ -51,7 +52,10 @@ const SPOTS: ReadonlyArray<readonly [number, number]> = [
 	[16, 0], [0, 16], [0, 0], [6, 10], [10, 6], [4, 4], [13, 3], [3, 13],
 ];
 
-/** A deterministic PRNG (mulberry32). Same seed always yields the same stream. */
+/**
+ * A deterministic PRNG (mulberry32).
+ * Same seed always yields the same stream.
+ */
 export function makeRng(seed: number): () => number {
 	let a = seed >>> 0;
 	return () => {
@@ -65,15 +69,22 @@ export function makeRng(seed: number): () => number {
 /** Ids of the current directed leaves (excluding the root). */
 export function currentLeaves(): number[] {
 	const out: number[] = [];
-	for(const n of State.m.$tree.$nodes) if(n && n.$isLeaf && n.$parent) out.push(n.id);
+	for(const n of State.m.$tree.$nodes) {
+		if(n && n.$isLeaf && n.$parent) out.push(n.id);
+	}
 	return out;
+}
+
+/** Whether the node is an internal node with exactly one child. */
+function isJoinable(n: ITreeNode | undefined): boolean {
+	return Boolean(n && n.$parent && !n.$isLeaf && n.$children.$size === 1);
 }
 
 /** Ids of internal nodes with exactly one child (candidates for `join`). */
 function joinableNodes(): number[] {
 	const out: number[] = [];
 	for(const n of State.m.$tree.$nodes) {
-		if(n && n.$parent && !n.$isLeaf && n.$children.$size === 1) out.push(n.id);
+		if(isJoinable(n)) out.push(n!.id);
 	}
 	return out;
 }
@@ -99,13 +110,16 @@ function removeLeaves(ids: number[]): void {
 	const protos: JFlapLike[] = [];
 	for(const id of alive) {
 		const p = State.m.$tree.$nodes[id as NodeId]!.$parent!;
-		if(p.$children.$size <= 1 && !alive.includes(p.id)) protos.push({ id: p.id, x: 8, y: 8, width: 0, height: 0 });
+		if(p.$children.$size <= 1 && !alive.includes(p.id)) {
+			protos.push({ id: p.id, x: 8, y: 8, width: 0, height: 0 });
+		}
 	}
 	TreeController.removeLeaf(alive as NodeId[], protos);
 }
 
 function addLeaf(nid: number, at: number, x: number, y: number): void {
-	TreeController.addLeaf(nid as NodeId, at as NodeId, 1, { id: nid as NodeId, x, y, width: 0, height: 0 });
+	const flap = { id: nid as NodeId, x, y, width: 0, height: 0 };
+	TreeController.addLeaf(nid as NodeId, at as NodeId, 1, flap);
 }
 
 function tryJoin(id: number): void {
@@ -113,7 +127,9 @@ function tryJoin(id: number): void {
 }
 
 /** Picks 1-3 distinct leaves to delete in one batch. */
-function pickLeavesToRemove(leaves: number[], rng: () => number, pick: <T>(a: T[]) => T): number[] {
+function pickLeavesToRemove(
+	leaves: number[], rng: () => number, pick: <T>(a: T[]) => T
+): number[] {
 	const k = 1 + Math.floor(rng() * Math.min(3, leaves.length - 4));
 	const ids: number[] = [];
 	for(let j = 0; j < k; j++) {
@@ -141,7 +157,9 @@ export interface FuzzCrash {
  * with leaf additions/deletions and occasional structural `join`s. The exact
  * distribution matches what reproduced the build-1898 crash.
  */
-export function runFuzzSession(seed: number, steps: number, build: () => void): FuzzCrash | null {
+export function runFuzzSession(
+	seed: number, steps: number, build: () => void
+): FuzzCrash | null {
 	build();
 	const rng = makeRng(seed);
 	const ops: string[] = [];
@@ -195,18 +213,21 @@ export function execOp(op: string): void {
 	let m: RegExpMatchArray | null;
 	if((m = op.match(/^drag (\d+)->\((-?\d+),(-?\d+)\)$/))) {
 		const id = Number(m[1]);
-		if(State.m.$tree.$nodes[id as NodeId]) drag(id, Number(m[2]), Number(m[3]));
+		if(State.m.$tree.$nodes[id as NodeId]) {
+			drag(id, Number(m[2]), Number(m[3]));
+		}
 	} else if((m = op.match(/^removeLeaf \[([\d,]*)\]$/))) {
 		if(m[1]) removeLeaves(m[1].split(",").map(Number));
 	} else if((m = op.match(/^addLeaf (\d+)@(\d+)->\((-?\d+),(-?\d+)\)$/))) {
 		const nid = Number(m[1]), at = Number(m[2]);
-		if(State.m.$tree.$nodes[at as NodeId] && !State.m.$tree.$nodes[nid as NodeId]) {
+		const nodes = State.m.$tree.$nodes;
+		if(nodes[at as NodeId] && !nodes[nid as NodeId]) {
 			addLeaf(nid, at, Number(m[3]), Number(m[4]));
 		}
 	} else if((m = op.match(/^join (\d+)$/))) {
 		const id = Number(m[1]);
 		const n = State.m.$tree.$nodes[id as NodeId];
-		if(n && n.$parent && !n.$isLeaf && n.$children.$size === 1) TreeController.join(id as NodeId);
+		if(isJoinable(n)) TreeController.join(id as NodeId);
 	}
 }
 
@@ -221,7 +242,9 @@ export function replayOps(ops: readonly string[], build: () => void): void {
  * same crash (matched by {@link messageIncludes}). Greedy single-op removal
  * followed by contiguous-chunk removal.
  */
-export function minimizeOps(ops: string[], build: () => void, messageIncludes: string): string[] {
+export function minimizeOps(
+	ops: string[], build: () => void, messageIncludes: string
+): string[] {
 	const stillCrashes = (candidate: string[]): boolean => {
 		build();
 		try {
@@ -244,10 +267,12 @@ export function minimizeOps(ops: string[], build: () => void, messageIncludes: s
 			}
 		}
 	}
-	for(let size = Math.min(16, current.length); size >= 1; size = Math.floor(size / 2)) {
+	const maxSize = Math.min(16, current.length);
+	for(let size = maxSize; size >= 1; size = Math.floor(size / 2)) {
 		let i = 0;
 		while(i + size <= current.length) {
-			const removeChunk = current.slice(0, i).concat(current.slice(i + size));
+			const removeChunk =
+				current.slice(0, i).concat(current.slice(i + size));
 			if(stillCrashes(removeChunk)) current = removeChunk;
 			else i++;
 		}

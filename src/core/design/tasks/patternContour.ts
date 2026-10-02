@@ -113,8 +113,9 @@ export function processNode(
 			// Create start/end map
 			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps
-				// around the quadrant
-				.filter(q => !multiContour || leaves.includes(q.$flap.id));
+				// around the quadrant (also for each raw piece)
+				.filter(q => !multiContour && !traceContour.$raw ||
+					leaves.includes(q.$flap.id));
 			// The junctions with the flaps inside the whole node are considered
 			// digested. In raw mode, that is made consistent with the geometry
 			// by getQuadrantShape (see processOuter).

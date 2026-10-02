@@ -5,7 +5,7 @@ import { CornerType } from "shared/json/enum";
 import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { JJunction, NodeId } from "shared/json";
 import type { ITreeNode } from "core/design/context";
-import type { IRect } from "core/design/tasks/utils/carve";
+import type { fitsAt } from "core/design/tasks/utils/invasion";
 
 interface ValidJunctionData {
 	lca: ITreeNode;
@@ -22,11 +22,15 @@ export type Junctions = readonly ValidJunction[];
 export interface Invasion {
 	/** The flap being invaded (the larger one). */
 	readonly flap: ITreeNode;
+	/** The flap invading (the smaller one). */
+	readonly invader: ITreeNode;
+	/** The quadrant of {@link flap} facing {@link invader}. */
+	readonly q: QuadrantDirection;
 	/**
-	 * The overlapping region, positioned at the corner of the hinge rectangle
-	 * of {@link flap}.
+	 * The size of the overlapping region, which is carved out of the corner
+	 * of {@link flap} (see {@link fitsAt}).
 	 */
-	readonly rect: IRect;
+	readonly o: IPoint;
 }
 
 //=================================================================
@@ -144,12 +148,8 @@ export class ValidJunction implements ISerializable<JJunction> {
 	 * flap B should be carved out by the overlapping region at its corner
 	 * (see {@link roughContourTask}).
 	 *
-	 * The carving applies only if the overlapping region is strictly smaller
-	 * than the quadrant of B (i.e. half of the hinge rectangle of B) in both
-	 * dimensions, so that the carvings of different quadrants can never meet,
-	 * and B always remains non-empty and connected.
-	 * Otherwise, we consider it an extreme edge case that we don't attempt to
-	 * handle perfectly.
+	 * Whether the carving applies at a given level is decided by
+	 * {@link fitsAt}.
 	 *
 	 * This is purely geometric, and in particular it does not depend on
 	 * whether the junction is resolved by a stretch pattern (see the notes in
@@ -167,12 +167,8 @@ export class ValidJunction implements ISerializable<JJunction> {
 		const [a, b] = [this.$a, this.$b];
 		const rA = a.$dist - this.$lca.$dist;
 		const rB = b.$dist - this.$lca.$dist;
-		if(this._isSmall(a, rA) && this._fitsQuadrant(b)) {
-			return this._makeInvasion(b, -1);
-		}
-		if(this._isSmall(b, rB) && this._fitsQuadrant(a)) {
-			return this._makeInvasion(a, 1);
-		}
+		if(this._isSmall(a, rA)) return this._makeInvasion(b, -1);
+		if(this._isSmall(b, rB)) return this._makeInvasion(a, 1);
 		return null;
 	}
 
@@ -185,35 +181,11 @@ export class ValidJunction implements ISerializable<JJunction> {
 		return right - l + 2 * r < this.$o.x || t - bottom + 2 * r < this.$o.y;
 	}
 
-	/**
-	 * Whether the overlapping region is strictly smaller than a quadrant of
-	 * the flap (i.e. half of its hinge rectangle) in both dimensions.
-	 */
-	private _fitsQuadrant(flap: ITreeNode): boolean {
-		const [t, right, bottom, l] = flap.$AABB.$toValues();
-		const len = flap.$length;
-		return 2 * this.$o.x < right - l + 2 * len &&
-			2 * this.$o.y < t - bottom + 2 * len;
-	}
-
-	/**
-	 * @param sign 1 if the flap is {@link $a} (so that the other flap is in
-	 * the direction {@link $f}), -1 otherwise.
-	 */
+	/** @param sign 1 if the flap is {@link $a}, -1 otherwise. */
 	private _makeInvasion(flap: ITreeNode, sign: 1 | -1): Invasion {
 		const q = getQuadrant(sign === 1 ? this.$q1 : this.$q2);
-		const tip = flap.$AABB.$points[q];
-		const fx = this.$f.x * sign, fy = this.$f.y * sign;
-		const len = flap.$length;
-		// The hinge corner facing the other flap
-		const cx = tip.x + fx * len, cy = tip.y + fy * len;
-		// The inner corner of the overlapping region
-		const ix = cx - fx * this.$o.x, iy = cy - fy * this.$o.y;
-		const rect: IRect = {
-			x1: Math.min(cx, ix), y1: Math.min(cy, iy),
-			x2: Math.max(cx, ix), y2: Math.max(cy, iy),
-		};
-		return { flap, rect };
+		const invader = sign === 1 ? this.$b : this.$a;
+		return { flap, invader, q, o: this.$o };
 	}
 
 	/** Get all {@link ValidJunction}s covering the current one. */

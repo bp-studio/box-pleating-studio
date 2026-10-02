@@ -1,5 +1,7 @@
 import { simplify } from "./expand";
+import { getFactors } from "../../layout/pattern/quadrant";
 
+import type { QuadrantDirection } from "shared/types/direction";
 import type { PathEx } from "shared/types/geometry";
 
 /** An axis-aligned rectangle, with `x1 < x2` and `y1 < y2`. */
@@ -11,10 +13,31 @@ export interface IRect {
 }
 
 /**
+ * The rectangle of the given size at the given corner of the rectangle
+ * (clipped by it).
+ */
+export function cornerRect(
+	rect: IRect, q: QuadrantDirection, x: number, y: number
+): IRect {
+	const f = getFactors(q);
+	const cx = f.x > 0 ? rect.x2 : rect.x1;
+	const cy = f.y > 0 ? rect.y2 : rect.y1;
+	const ix = cx - f.x * x;
+	const iy = cy - f.y * y;
+	return {
+		x1: Math.max(rect.x1, Math.min(cx, ix)),
+		y1: Math.max(rect.y1, Math.min(cy, iy)),
+		x2: Math.min(rect.x2, Math.max(cx, ix)),
+		y2: Math.min(rect.y2, Math.max(cy, iy)),
+	};
+}
+
+/**
  * Subtract from the given rectangle a set of rectangles,
  * each of which is anchored at one of the corners of the given rectangle
- * (that is, sharing one vertical and one horizontal edge with it),
- * and strictly smaller than the given rectangle in both dimensions.
+ * (that is, sharing one vertical and one horizontal edge with it).
+ * A rectangle spanning the whole width or height removes the corresponding
+ * columns or rows entirely.
  *
  * Since the removed region is a union of corner-anchored rectangles,
  * the remaining region is exactly `(x, y)` with `bottom(x) < y < top(x)`,

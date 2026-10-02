@@ -1,8 +1,7 @@
-import { AAUnion } from "core/math/sweepLine/polyBool";
 import { State } from "core/service/state";
 import { getQuadrant, makePerQuadrant } from "shared/types/direction";
-import { getFactors } from "../../layout/pattern/quadrant";
-import { carveCorners } from "./carve";
+import { carveCorners, cornerRect } from "./carve";
+import { fitsAt } from "./invasion";
 import { simplify } from "./expand";
 import { tryInsert } from "./combine";
 import { Line } from "core/math/geometry/line";
@@ -16,8 +15,6 @@ import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { ValidJunction } from "../../layout/junction/validJunction";
 import type { ITreeNode, PatternContour } from "../../context";
 
-const aaUnion = new AAUnion();
-
 /**
  * The carving of a leaf in a raw piece (see {@link traceContourTask}).
  *
@@ -30,14 +27,17 @@ export interface Carving {
 
 	/**
 	 * The corners carved out of the piece in any case, namely the invasions
-	 * from the flaps outside the node and the covered junctions.
+	 * carved at the level of the node and the covered junctions.
+	 * Note that an invasion is carved even if the invading flap is also inside
+	 * the node, since the part of the overlapping region not covered by that
+	 * flap belongs to the outside (see {@link ValidJunction.$invasion}).
 	 */
 	readonly always: IRect[];
 
 	/**
-	 * The corners of the digested junctions (i.e. with the flaps also inside
-	 * the node), by the quadrant of the leaf. These are carved out only when
-	 * tracing the corresponding quadrant (see {@link getQuadrantShape}).
+	 * The corners of the other digested junctions (i.e. with the flaps also
+	 * inside the node), by the quadrant of the leaf. These are carved out only
+	 * when tracing the corresponding quadrant (see {@link getQuadrantShape}).
 	 */
 	readonly digested: PerQuadrant<IRect[]>;
 }
@@ -67,21 +67,22 @@ export function createRawPieces(
 /**
  * The shape of the raw piece for tracing the given quadrant, that is, with the
  * overlapping regions of the digested junctions in that quadrant carved out as
- * well. For a piece formed by multiple leaves, each leaf is carved first, and
- * then we take the union. Returns `null` if there is no such junctions (so
- * that the base shape applies).
+ * well. Returns `null` if there is no such junctions (so that the base shape
+ * applies).
  */
 export function getQuadrantShape(
 	piece: RawPiece, q: QuadrantDirection
 ): PathEx[] | null {
 	const carvings = piece.carvings;
 	if(!carvings || carvings.every(c => !c.digested[q].length)) return null;
-	const shapes = carvings.flatMap(
-		c => carveCorners(c.rect, c.always.concat(c.digested[q]))
-	);
-	const result = shapes.length > 1 ?
-		aaUnion.$get(...shapes.map(p => [p])) : shapes;
-	return result.map(simplify);
+	// Under the current understanding, a piece formed by multiple leaves never
+	// needs the shape of a quadrant: the digested junction would be with
+	// another leaf of the same group, which eats the corner of the quadrant,
+	// and so the group would have been broken up (see createRawContour). So
+	// there is only one carving here. We'll deal with it if we ever encounter
+	// a counterexample.
+	const c = carvings[0];
+	return carveCorners(c.rect, c.always.concat(c.digested[q])).map(simplify);
 }
 
 /**
@@ -97,6 +98,7 @@ export function extendToBase(
 	base: Path, shape: Path, contour: PatternContour
 ): PatternContour | null {
 	const patched = toRationalPath(shape);
+	/* istanbul ignore next: foolproof */
 	if(!tryInsert(patched, contour)) return null;
 	const n = patched.length;
 	const start = patched.findIndex(p => p.eq(contour[0]));
@@ -137,32 +139,14 @@ function createCarving(
 		const j = junction as ValidJunction;
 		const isCovered = covered.has(j);
 		const isDigested = inside.has((j.$a === leaf ? j.$b : j.$a).id);
-		if(!isCovered && !isDigested && j.$invasion?.flap !== leaf) continue;
+		const invasion = j.$invasion;
+		const isInvaded = invasion?.flap === leaf && fitsAt(invasion, l);
+		if(!isCovered && !isDigested && !isInvaded) continue;
 
 		const q = getQuadrant(j.$a === leaf ? j.$q1 : j.$q2);
 		const corner = cornerRect(rect, q, j.$o.x, j.$o.y);
-		if(isDigested && !isCovered) digested[q].push(corner);
+		if(isDigested && !isCovered && !isInvaded) digested[q].push(corner);
 		else always.push(corner);
 	}
 	return { rect, always, digested };
-}
-
-/**
- * The rectangle of the given size at the given corner of the rectangle
- * (clipped by it).
- */
-function cornerRect(
-	rect: IRect, q: QuadrantDirection, x: number, y: number
-): IRect {
-	const f = getFactors(q);
-	const cx = f.x > 0 ? rect.x2 : rect.x1;
-	const cy = f.y > 0 ? rect.y2 : rect.y1;
-	const ix = cx - f.x * x;
-	const iy = cy - f.y * y;
-	return {
-		x1: Math.max(rect.x1, Math.min(cx, ix)),
-		y1: Math.max(rect.y1, Math.min(cy, iy)),
-		x2: Math.min(rect.x2, Math.max(cx, ix)),
-		y2: Math.min(rect.y2, Math.max(cy, iy)),
-	};
 }

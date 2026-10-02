@@ -2,31 +2,21 @@ import { Task } from "./task";
 import { climb } from "./utils/climb";
 import { State } from "core/service/state";
 import { traceContourTask } from "./traceContour";
-import { expandPath, simplify } from "./utils/expand";
-import { carveCorners } from "./utils/carve";
+import { simplify } from "./utils/expand";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
-import { getOrSetEmptyArray } from "shared/utils/map";
-import { setCarvedQuadrants } from "./utils/invasion";
+import { carveLeaf, expandOuter, fitsAt, getInvasions, getNewCarvings, radius, rebuild, updateInvasions } from "./utils/invasion";
 
+import type { ValidJunction } from "../layout/junction/validJunction";
 import type { NodeId } from "shared/json/tree";
-import type { QuadrantCode } from "shared/types/direction";
-import type { IRect } from "./utils/carve";
 import type { UnionResult } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
-import type { Path, Polygon } from "shared/types/geometry";
 import type { ITreeNode, NodeGraphics, RoughContour } from "../context";
 import type { junctionTask } from "./junction";
 
 const roughUnion = new RoughUnion();
 
 /**
- * The invading rectangles to carve out of each leaf (see
- * {@link ValidJunction.$invasion}), by leaf id.
- */
-const invasionMap = new Map<NodeId, IRect[]>();
-
-/**
- * The signature of the invasions of each leaf in the previous run, for
- * detecting changes.
+ * The signature of the invasions of each leaf in the previous run,
+ * for detecting changes.
  */
 const invasionCache = new Map<NodeId, string>();
 
@@ -41,6 +31,11 @@ const invasionCache = new Map<NodeId, string>();
  * (see {@link ValidJunction.$invasion}) which are carved out of the leaves,
  * so this task runs after {@link junctionTask}.
  *
+ * An invasion is carved only from the level where it fits the quadrant of the
+ * expanded leaf (see {@link fitsAt}). Before that level, the leaf is kept in
+ * {@link RoughContour.$pending}, and at that level, the region of the leaf is
+ * rebuilt from its expanded hinge rectangle (see {@link rebuild}).
+ *
  * Each instance of rough contour should consist of a single connected region
  * only.
  */
@@ -53,13 +48,13 @@ function roughContour(): void {
 		State.$parentChanged,
 		State.$childrenChanged,
 		State.$lengthChanged,
-		updateInvasions()
+		updateInvasionMap()
 	);
 }
 
 /**
- * Update {@link invasionMap}, and return the leaves whose invasions have
- * changed.
+ * Update the invasions of the leaves,
+ * and return the leaves whose invasions have changed.
  *
  * Note that the carving takes place regardless of whether the junction is
  * resolved by a stretch pattern. We had tried carving only for the corners
@@ -69,24 +64,18 @@ function roughContour(): void {
  * ridges in the carved quadrants without patterns are omitted instead (see
  * {@link graphicsTask}).
  */
-function updateInvasions(): Set<ITreeNode> {
-	invasionMap.clear();
-	const carved: QuadrantCode[] = [];
-	for(const junction of State.$junctions.values()) {
-		if(!junction.$valid) continue;
-		const invasion = junction.$invasion;
-		if(!invasion) continue;
-		getOrSetEmptyArray(invasionMap, invasion.flap.id).push(invasion.rect);
-		const q = junction.$a === invasion.flap ? junction.$q1 : junction.$q2;
-		carved.push(q);
-	}
-	setCarvedQuadrants(carved);
+function updateInvasionMap(): Set<ITreeNode> {
+	const junctions = [...State.$junctions.values()]
+		.filter(j => j.$valid) as ValidJunction[];
+	updateInvasions(junctions);
 
 	const changed = new Set<ITreeNode>();
-	const ids = new Set([...invasionCache.keys(), ...invasionMap.keys()]);
+	const ids = new Set(invasionCache.keys());
+	for(const j of junctions) if(j.$invasion) ids.add(j.$invasion.flap.id);
 	for(const id of ids) {
-		const rects = invasionMap.get(id);
-		const signature = rects ? JSON.stringify(rects.map(r => [r.x1, r.y1, r.x2, r.y2]).sort()) : "";
+		const signature = getInvasions(id)
+			.map(i => [i.invader.id, i.q, i.o.x, i.o.y].join(","))
+			.sort().join(";");
 		if(invasionCache.get(id) === signature) continue;
 		if(signature) invasionCache.set(id, signature);
 		else invasionCache.delete(id);
@@ -106,16 +95,18 @@ function updater(node: ITreeNode): boolean {
 	}
 	if(node.$isLeaf) {
 		// Base case
-		const path = node.$AABB.$toPath();
-		const invasions = invasionMap.get(node.id);
-		const outer = invasions ?
-			carveCorners(pathToRect(path), invasions) : [path];
-		node.$graphics.$roughContours = [{
+		const r = node.$length;
+		const invasions = getInvasions(node.id);
+		const outer = invasions.some(i => fitsAt(i, r)) ?
+			carveLeaf(node, r) : [node.$AABB.$toPath()];
+		const contour: RoughContour = {
 			$id: node.id,
 			$outer: outer,
 			$children: [],
 			$leaves: [node.id],
-		}];
+		};
+		if(invasions.some(i => !fitsAt(i, r))) contour.$pending = [node.id];
+		node.$graphics.$roughContours = [contour];
 	} else {
 		const children =
 			[...node.$children].flatMap(c => c.$graphics.$roughContours);
@@ -131,62 +122,39 @@ function updater(node: ITreeNode): boolean {
 }
 
 /**
- * Expand the given AA polygon by given units, and generate contours matching
- * outer and inner paths.
+ * Expand the given AA polygon by given units,
+ * and generate contours matching outer and inner paths.
  */
 export function expand(
 	inputs: readonly RoughContour[], units: number, id = 0 as NodeId
 ): RoughContour[] {
 	const components = roughUnion.$union(...inputs.map(c => {
-		const result: Polygon = [];
-		for(const outer of c.$outer) {
-			if(outer.isHole) {
-				const inputSpan = span(outer);
-				if(inputSpan <= units * 2) {
-					continue; // degenerated or over-shrunk
-				}
-			}
-			const expanded = expandPath(outer, units);
-			result.push(expanded);
-		}
-		return result;
+		// The pending leaves that are carved at this level for the first time
+		const targets = getNewCarvings(c, units);
+		return targets.length ?
+			rebuild(c, new Set(targets), units, units) : expandOuter(c, units);
 	}));
 
 	const contours: RoughContour[] = [];
 	for(const component of components) {
-		contours.push(componentToContour(id, inputs, component));
+		contours.push(componentToContour(id, inputs, component, units));
 	}
 	return contours;
 }
 
 function componentToContour(
-	id: NodeId, inputs: readonly RoughContour[], component: UnionResult
+	id: NodeId, inputs: readonly RoughContour[], component: UnionResult,
+	units: number
 ): RoughContour {
 	const outers = component.paths.map(simplify);
 	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);
-	return { $id: id, $outer: outers, $children: children, $leaves: leaves };
-}
-
-/**
- * Convert the hinge path of a leaf (see {@link AABB.$toPath}) to a rectangle.
- */
-function pathToRect(path: Path): IRect {
-	const [ur, , ll] = path;
-	return { x1: ll.x, y1: ll.y, x2: ur.x, y2: ur.y };
-}
-
-/**
- * Returns the smaller of width-span and height-span of a {@link Path}.
- */
-function span(path: Path): number {
-	let xMin = Number.POSITIVE_INFINITY, xMax = Number.NEGATIVE_INFINITY;
-	let yMin = Number.POSITIVE_INFINITY, yMax = Number.NEGATIVE_INFINITY;
-	for(const p of path) {
-		if(p.x < xMin) xMin = p.x;
-		if(p.x > xMax) xMax = p.x;
-		if(p.y < yMin) yMin = p.y;
-		if(p.y > yMax) yMax = p.y;
-	}
-	return Math.min(xMax - xMin, yMax - yMin);
+	const contour: RoughContour = {
+		$id: id, $outer: outers, $children: children, $leaves: leaves,
+	};
+	const pending = children.flatMap(c => (c.$pending ?? []).filter(
+		l => getInvasions(l).some(i => !fitsAt(i, radius(l, c) + units))
+	));
+	if(pending.length) contour.$pending = pending;
+	return contour;
 }
