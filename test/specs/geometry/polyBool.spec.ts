@@ -101,13 +101,16 @@ describe("PolyBool", () => {
 		});
 
 		it.skip("Is really, really fast", () => {
-			// Timing-sensitive; Rstest has no per-test retries, so use `--retry` when running this.
+			// Timing-sensitive; Rstest has no per-test retries,
+			// so use `--retry` when running this.
 
 			// prepare random tests
 			const tests: Polygon[][] = [];
 			const rounds = 100;
 			for(let i = 0; i < rounds; i++) {
-				tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
+				tests.push(
+					Array.from({ length: 40 }, () => randomAabbPolygon(80, 30))
+				);
 			}
 
 			// run tests
@@ -205,13 +208,16 @@ describe("PolyBool", () => {
 		});
 
 		it.skip("Is quite fast", () => {
-			// Timing-sensitive; Rstest has no per-test retries, so use `--retry` when running this.
+			// Timing-sensitive; Rstest has no per-test retries,
+			// so use `--retry` when running this.
 
 			// prepare random tests
 			const tests: Polygon[][] = [];
 			const rounds = 100;
 			for(let i = 0; i < rounds; i++) {
-				tests.push(Array.from({ length: 40 }, () => randomAabbPolygon(80, 30)));
+				tests.push(
+					Array.from({ length: 40 }, () => randomAabbPolygon(80, 30))
+				);
 			}
 
 			// run tests
@@ -232,7 +238,8 @@ describe("PolyBool", () => {
 				makeRoughContour("(2,2),(2,4),(4,4),(4,2)"), // This is a hole
 			], 1);
 			expect(result.length).to.equal(1);
-			expect(result[0].$outer.length).to.equal(1); // The hole degenerates and vanishes
+			// The hole degenerates and vanishes
+			expect(result[0].$outer.length).to.equal(1);
 			expect(result[0].$outer[0]).to.equalPath("(0,0),(0,-1),(6,-1),(6,0),(7,0),(7,6),(6,6),(6,7),(0,7),(0,6),(-1,6),(-1,0)", true);
 		});
 
@@ -278,7 +285,8 @@ describe("PolyBool", () => {
 		it("Handles complete overlapping", () => {
 			const result = new RRIntersection().$get(
 				{ x: 1, y: 1, width: 2, height: 1, radius: 1 },
-				{ x: 2, y: 2, width: 0, height: 0, radius: 1 } // completely contained in the previous one
+				// completely contained in the previous one
+				{ x: 2, y: 2, width: 0, height: 0, radius: 1 }
 			);
 			expect(result.length).to.equal(1);
 			expect(result[0]).to.equalPath("(1,2,1,3,1),(2,1,1,1,1),(3,2,3,1,1),(2,3,3,3,1)", true);

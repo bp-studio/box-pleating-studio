@@ -1,6 +1,7 @@
 import { describe, it, expect } from "@rstest/core";
 
-import { parseTree } from "@utils/tree";
+import { exportProject, parseTree } from "@utils/tree";
+import { LayoutController } from "core/controller/layoutController";
 import { State } from "core/service/state";
 import { UpdateResult } from "core/service/updateResult";
 
@@ -88,7 +89,7 @@ describe("Trace contour", () => {
 		const result = UpdateResult.$flush();
 		const contours = result.graphics["re90,94"].contours;
 		expect(contours.length).to.equal(1);
-		expect(contours[0].outer).to.equalPath("(71,127),(71,80),(238/3,80),(88,147/2),(88,73),(125,73),(125,127)");
+		expect(contours[0].outer).to.equalPath("(71,127),(71,80),(1192/15,80),(256/3,73),(125,73),(125,127)");
 
 		// Without flap 101, flap 100 alone fills a 2x2 region only, so all
 		// the diagonals shift by 2
@@ -98,7 +99,7 @@ describe("Trace contour", () => {
 		);
 		const result2 = UpdateResult.$flush();
 		const outer = result2.graphics["re90,94"].contours[0].outer;
-		expect(outer).to.equalPath("(71,127),(71,82),(73,82),(73,80),(238/3,80),(88,147/2),(88,73),(125,73),(125,127)");
+		expect(outer).to.equalPath("(71,127),(71,82),(73,82),(73,80),(1192/15,80),(256/3,73),(125,73),(125,127)");
 	});
 
 	/** Added v0.8.0 */

@@ -15,7 +15,9 @@ describe("Tracing algorithm", () => {
 	describe("Hinge segmentation", () => {
 		it("Determines corner direction", () => {
 			const path = parsePath("(2,3),(1,3),(1,2),(0,2),(0,1),(1,1),(1,0),(2,0),(2,1),(3,1),(3,2),(2,2)");
-			expect(mapDirections(path)).to.eql([0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0, 0]);
+			expect(mapDirections(path)).to.eql(
+				[0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 0, 0]
+			);
 		});
 
 		it("Segment hinges", () => {

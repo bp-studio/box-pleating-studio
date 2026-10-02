@@ -1,3 +1,4 @@
+/* eslint-disable vitest/no-conditional-expect */
 import { describe, it, expect } from "@rstest/core";
 
 import { expectRepo, generateFromFlaps } from "./util";
@@ -69,15 +70,16 @@ describe("Three flap patterns", () => {
 		});
 
 		it("Checks delta point in a legal layout", () => {
-			// Unlike the case above, all three junctions here are valid and uncovered,
-			// and the overlaps around flap 3 are not nested.
+			// Unlike the case above, all three junctions here are valid and
+			// uncovered, and the overlaps around flap 3 are not nested.
 			// The delta point (at (8,4)) lies inside the circle of flap 3.
 			//
 			// Note that this layout actually admits a valid stretch pattern,
 			// if we first make the stretch of flaps 1 and 2 alone,
-			// and then make the pattern for the carved flaps 1, 2 together with flap 3 (as the shared corner).
-			// The current algorithm has no notion of such staged construction,
-			// so the check still rejects it (and no pattern can be found without the check either).
+			// and then make the pattern for the carved flaps 1, 2 together with
+			// flap 3 (as the shared corner). The current algorithm has no
+			// notion of such staged construction, so the check still rejects it
+			// (and no pattern can be found without the check either).
 			parseTree(
 				"(0,2,12),(0,1,2),(0,3,9)",
 				"(1,10,5,0,0),(2,19,16,0,0),(3,0,0,0,0)"
@@ -108,7 +110,6 @@ describe("Three flap patterns", () => {
 					const gadget = device.$gadgets[0];
 					pieceCount += gadget.pieces.length;
 					if(gadget.pieces.length == 2) {
-						// eslint-disable-next-line vitest/no-conditional-expect -- Only the gadget with two pieces has the slack
 						expect(gadget.$slack.value).to.contain(0.5);
 					}
 				}
@@ -130,7 +131,6 @@ describe("Three flap patterns", () => {
 					const gadget = device.$gadgets[0];
 					pieceCount += gadget.pieces.length;
 					if(gadget.pieces.length == 2) {
-						// eslint-disable-next-line vitest/no-conditional-expect -- Only the gadget with two pieces has the slack
 						expect(gadget.$slack.value).to.contain(0.25);
 					}
 				}
@@ -162,7 +162,9 @@ describe("Three flap patterns", () => {
 					{ id: c, x: 15, y: 8, radius: 6 },
 				]);
 				const device = expectRepo("1,2,3", 1,
-					2, // Should find two standard joins, one concave and one convex
+					// Should find two standard joins,
+					// one concave and one convex
+					2,
 					1 // Standard join creates 1 Device
 				)[0];
 				expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
@@ -177,7 +179,9 @@ describe("Three flap patterns", () => {
 					{ id: c, x: 20, y: 31, radius: 5 },
 				]);
 				expectRepo("1,2,3", 1,
-					8, // Should find many half-integral patterns, instead of a convex standard join
+					// Should find many half-integral patterns,
+					// instead of a convex standard join
+					8,
 					2 // Should be 2 devices instead of 1
 				);
 			}

@@ -62,14 +62,19 @@ describe("Tree", () => {
 		// later consumed by traceContour, which then dereferences the missing
 		// node and crashes (`Cannot read properties of undefined (reading
 		// '$graphics')`). This was observed in a build-1898 crash report and
-		// found reproducible by the deterministic fuzzer in `test/utils/fuzz.ts`.
+		// found reproducible by the deterministic fuzzer in
+		// `test/utils/fuzz.ts`.
 		const tree = parseTree("(0,1,1),(0,2,1),(2,3,1),(3,4,1)", "(1,0,8,0,0),(4,8,0,0,0)");
 		expect(tree.$root.id).to.equal(2);
 		expect(tree.$root.$graphics.$roughContours).to.be.empty;
 
 		// Grow node 1's side until the root flips from 2 to 0.
-		TreeController.addLeaf(id6, id1, 1, { id: id6, x: 0, y: 4, width: 0, height: 0 });
-		TreeController.addLeaf(id5, id6, 1, { id: id5, x: 0, y: 0, width: 0, height: 0 });
+		TreeController.addLeaf(
+			id6, id1, 1, { id: id6, x: 0, y: 4, width: 0, height: 0 }
+		);
+		TreeController.addLeaf(
+			id5, id6, 1, { id: id5, x: 0, y: 0, width: 0, height: 0 }
+		);
 		expect(tree.$root.id).to.equal(0);
 		expect(tree.$root.$graphics.$roughContours).to.be.empty;
 	});
@@ -137,7 +142,8 @@ describe("Tree", () => {
 		tree.$flushRemove();
 		Processor.$run(heightTask);
 
-		const structure = TreeController.getStructure().sort((a, b) => a.id - b.id);
+		const structure = TreeController.getStructure()
+			.sort((a, b) => a.id - b.id);
 		expect(structure).to.deep.equal([
 			{ id: 0, parent: 2, dist: 2 },
 			{ id: 2, parent: null, dist: 0 },

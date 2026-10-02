@@ -31,8 +31,12 @@ export function generateFromFlaps(flaps: IFlap[]): Tree {
  * If a negative count number is given, the corresponding checking is skipped.
  */
 export function expectRepo(id: string): Repository;
-export function expectRepo(id: string, configCount: number): readonly Configuration[];
-export function expectRepo(id: string, configCount: number, patternCount: number): readonly Pattern[];
+export function expectRepo(
+	id: string, configCount: number
+): readonly Configuration[];
+export function expectRepo(
+	id: string, configCount: number, patternCount: number
+): readonly Pattern[];
 export function expectRepo(
 	id: string, configCount: number, patternCount: number, deviceCount: number
 ): readonly Device[];
@@ -41,14 +45,17 @@ export function expectRepo(
 	configCount?: number,
 	patternCount?: number,
 	deviceCount?: number
-): Repository | readonly Configuration[] | readonly Pattern[] | readonly Device[] {
+): Repository | readonly Configuration[] |
+	readonly Pattern[] | readonly Device[] {
 
 	complete();
 	const stretch = State.$stretches.get(id)!;
 	expect(stretch).to.be.not.undefined;
 	if(configCount === undefined) return stretch.$repo;
 
-	if(configCount >= 0) expect(stretch.$repo.$configurations.length).to.equal(configCount);
+	if(configCount >= 0) {
+		expect(stretch.$repo.$configurations.length).to.equal(configCount);
+	}
 	if(patternCount === undefined) return stretch.$repo.$configurations;
 
 	const config = stretch.$repo.$configurations[0];

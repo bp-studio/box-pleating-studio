@@ -22,8 +22,13 @@ describe("Arc", () => {
 	});
 
 	it("Computes anchor", () => {
-		const arc1 = new ArcSegment({ x: 6, y: 6 }, 6, { x: 0, y: 6 }, { x: 6, y: 0 }, 0);
-		const arc2 = new ArcSegment({ x: 0, y: 0 }, 2, { x: Math.SQRT2, y: Math.SQRT2 }, { x: 0, y: 2 }, 0);
+		const arc1 = new ArcSegment(
+			{ x: 6, y: 6 }, 6, { x: 0, y: 6 }, { x: 6, y: 0 }, 0
+		);
+		const arc2 = new ArcSegment(
+			{ x: 0, y: 0 }, 2,
+			{ x: Math.SQRT2, y: Math.SQRT2 }, { x: 0, y: 2 }, 0
+		);
 		expect(arc1.$anchor).to.eql(arc2.$center);
 		expect(arc2.$anchor.x).to.be.closeTo(Math.sqrt(8) - 2, EPSILON);
 		expect(arc2.$anchor.y).to.be.closeTo(2, EPSILON);

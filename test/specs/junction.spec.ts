@@ -77,7 +77,8 @@ describe("Junction", () => {
 			);
 			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(4, "Should have 4 valid junctions");
-			const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
+			const uncoveredJunctions =
+				validJunctions.filter(j => !j.$isCovered);
 			expect(uncoveredJunctions.length).to.equal(1, "Only one is uncovered");
 			const j = uncoveredJunctions[0];
 			expect([j.$a.id, j.$b.id]).to.eql([3, 5]);
@@ -107,7 +108,8 @@ describe("Junction", () => {
 			);
 			const validJunctions = getJunctions(true);
 			expect(validJunctions.length).to.equal(6);
-			const uncoveredJunctions = validJunctions.filter(j => !j.$isCovered);
+			const uncoveredJunctions =
+				validJunctions.filter(j => !j.$isCovered);
 			expect(uncoveredJunctions.length).to.equal(3);
 			const signature = uncoveredJunctions.map(j => `${j.$a.id},${j.$b.id}`).sort();
 			expect(signature).to.eql(["1,4", "2,5", "4,5"]);

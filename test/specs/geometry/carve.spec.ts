@@ -48,7 +48,8 @@ describe("Carve", () => {
 	});
 
 	it("Handles rectangles from adjacent corners overlapping each other", () => {
-		// The two rectangles overlap over x in [4,6]; the deeper one wins there.
+		// The two rectangles overlap over x in [4,6];
+		// the deeper one wins there.
 		const result = carveCorners(base, [
 			{ x1: 0, y1: 7, x2: 6, y2: 10 },
 			{ x1: 4, y1: 5, x2: 10, y2: 10 },

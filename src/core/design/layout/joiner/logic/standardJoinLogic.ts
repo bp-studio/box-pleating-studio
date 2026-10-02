@@ -78,13 +78,6 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		// It is possible that the closest T results in an R that goes out of
 		// bounds. In that case we need to try the second closest T.
 		for(const T of gridPoints) {
-			// Before version 0.6, if T happens to be the tip of the gadget,
-			// the tracing algorithm couldn't handle such cases,
-			// so we discarded those.
-			// TODO: Check if it is still the case in the new tracing algorithm
-			// since v0.6.
-			if(T.eq(e.p1) || T.eq(e.p2)) continue;
-
 			// If the triangle is too small, it could go out of bounds
 			const R = triangleTransform([D, P, B], T);
 			if(!R || R.x * f < pt.x * f) continue;
@@ -108,13 +101,6 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		const e = i ? j2.e : j1.e;
 		const p = i ? j2.p : j1.p;
 		const T = closestGridPoints(this._substituteEnd(e, D), B)[0];
-
-		// Before version 0.6, if T happens to be the tip of the gadget,
-		// the tracing algorithm couldn't handle such cases,
-		// so we discarded those.
-		// TODO: Check if it is still the case in the new tracing algorithm
-		// since v0.6.
-		if(T.eq(e.p1) || T.eq(e.p2)) return;
 
 		const P = D.$sub(B).$slope.gt(Fraction.ONE) ?
 			delta.$yIntersection(T.y) : delta.$xIntersection(T.x);

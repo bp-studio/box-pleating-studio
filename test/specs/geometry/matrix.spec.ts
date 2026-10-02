@@ -21,7 +21,9 @@ describe("Matrix", () => {
 	});
 
 	it("Computes inverse", () => {
-		const m = new Matrix(new Fraction(1), new Fraction(2), new Fraction(3), new Fraction(4));
+		const m = new Matrix(
+			new Fraction(1), new Fraction(2), new Fraction(3), new Fraction(4)
+		);
 		const inv = m.$inverse!;
 		expect(inv.toString()).to.equal("-2,1,3/2,-1/2");
 	});

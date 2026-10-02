@@ -34,14 +34,18 @@ describe("Searching", () => {
 		// Save the stretch as in a project file, that is, without the repo
 		const { id, configuration, pattern } = State.$stretches.get("1,2")!.toJSON();
 		const project = Migration.$getSample();
-		project.design.tree.edges = [{ n1: 0, n2: 1, length: 7 }, { n1: 0, n2: 2, length: 4 }] as JEdge[];
+		project.design.tree.edges = [
+			{ n1: 0, n2: 1, length: 7 },
+			{ n1: 0, n2: 2, length: 4 },
+		] as JEdge[];
 		project.design.layout.flaps = [
 			{ id: 1, x: 0, y: 0, width: 0, height: 0 },
 			{ id: 2, x: 8, y: 9, width: 0, height: 0 },
 		] as JFlap[];
 		project.design.layout.stretches = [{ id, configuration, pattern }];
 
-		// The saved pattern should be recognized among the searched ones, instead of being counted twice
+		// The saved pattern should be recognized among the searched ones,
+		// instead of being counted twice
 		fullReset();
 		DesignController.init(project.design);
 		complete();
@@ -54,7 +58,11 @@ describe("Searching", () => {
 	it("Serializes patterns without caches", () => {
 		parseTree("(0,1,7),(0,2,4)", "(1,0,0,0,0),(2,8,9,0,0)");
 		complete();
-		UpdateResult.$flush(); // Make sure that the devices are rendered, so that the caches are filled
+
+		// Make sure that the devices are rendered,
+		// so that the caches are filled
+		UpdateResult.$flush();
+
 		const json = JSON.stringify(State.$stretches.get("1,2")!.toJSON());
 		expect(json).to.not.match(/"[$_]\w*":/);
 	});
@@ -70,7 +78,10 @@ describe("Searching", () => {
 		const json = State.$stretches.get("1,2")!.toJSON();
 		expect(json.repo).to.not.be.undefined;
 		const project = Migration.$getSample();
-		project.design.tree.edges = [{ n1: 0, n2: 1, length: 7 }, { n1: 0, n2: 2, length: 4 }] as JEdge[];
+		project.design.tree.edges = [
+			{ n1: 0, n2: 1, length: 7 },
+			{ n1: 0, n2: 2, length: 4 },
+		] as JEdge[];
 		project.design.layout.flaps = [
 			{ id: 1, x: 0, y: 0, width: 0, height: 0 },
 			{ id: 2, x: 8, y: 9, width: 0, height: 0 },
@@ -85,13 +96,15 @@ describe("Searching", () => {
 		const config = repo.$configuration!;
 		expect(config.$length).to.equal(2);
 		// Only the recovered repo remembers the chosen pattern;
-		// recovering from the single saved pattern would put it at index 0 instead.
+		// recovering from the single saved pattern would put it
+		// at index 0 instead.
 		expect(config.$index).to.equal(1);
 	});
 
 	/**
-	 * The rule: the notification is shown if and only if there is a stretch without pattern
-	 * such that the flaps involved do not form any invalid junctions among themselves.
+	 * The rule: the notification is shown if and only if there is a stretch
+	 * without pattern such that the flaps involved do not form any invalid
+	 * junctions among themselves.
 	 */
 	describe("Pattern-not-found notification", () => {
 
@@ -116,7 +129,8 @@ describe("Searching", () => {
 
 		/** Added v0.8.0 */
 		it("Does not signify if the flaps involved form invalid junctions", () => {
-			// Flaps 2 and 3 are way too close, which is already signified by the invalid junction.
+			// Flaps 2 and 3 are way too close, which is already signified by
+			// the invalid junction.
 			generateFromFlaps([
 				{ id: 1, x: 139, y: 0, radius: 80 },
 				{ id: 2, x: 73, y: 124, radius: 60 },
@@ -130,7 +144,8 @@ describe("Searching", () => {
 
 		/** Added v0.8.0 */
 		it("Ignores invalid junctions among other flaps", () => {
-			// Same as the first case, plus flaps 4 and 5 forming an invalid junction far away.
+			// Same as the first case, plus flaps 4 and 5 forming an invalid
+			// junction far away.
 			parseTree(
 				"(2,0,10),(2,1,2),(2,3,3),(2,4,1),(2,5,1)",
 				"(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0),(4,40,40,0,0),(5,40,41,0,0)"

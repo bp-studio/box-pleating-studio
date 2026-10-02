@@ -21,7 +21,9 @@ describe("Rendering", () => {
 		const data2 = result2.graphics["s1,2,3.0"];
 		expect(data2).to.be.not.undefined;
 		const ridges2 = data2.ridges;
-		expect(ridges2).to.not.containLine([{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]);
+		expect(ridges2).to.not.containLine(
+			[{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]
+		);
 		expect(ridges2).to.containLine([{ x: 4.5, y: 3.5 }, { x: 7, y: 6 }]);
 	});
 
