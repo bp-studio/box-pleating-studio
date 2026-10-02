@@ -28,12 +28,14 @@ export class Configuration implements ISerializable<JConfiguration> {
 
 	/**
 	 * Indicate that the current configuration is generated with only one
-	 * {@link JJunction} and that the current {@link Configuration} is a temporary one.
+	 * {@link JJunction} and that the current {@link Configuration} is a
+	 * temporary one.
 	 */
 	public readonly $singleMode: boolean;
 
 	/**
-	 * Given the {@link OverlapId}, return the indices of its {@link Partition} and itself.
+	 * Given the {@link OverlapId}, return the indices of its {@link Partition}
+	 * and itself.
 	 */
 	public readonly $overlapMap!: ReadonlyMap<OverlapId, [number, number]>;
 
@@ -52,7 +54,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 	/** See {@link $freeCorners}. */
 	private _freeCornerCache: FreeCorner[] | undefined;
 
-	constructor(repo: Repository, config: JConfiguration, singleMode: boolean = false) {
+	constructor(
+		repo: Repository, config: JConfiguration, singleMode: boolean = false
+	) {
 		this.$repo = repo;
 		this.$singleMode = singleMode;
 
@@ -89,7 +93,8 @@ export class Configuration implements ISerializable<JConfiguration> {
 	public toJSON(session?: true): JConfiguration {
 		return {
 			partitions: this.$partitions.map(partition => partition.toJSON()),
-			patterns: session && this._patterns.$entries.map(pattern => pattern.toJSON()),
+			patterns: session &&
+				this._patterns.$entries.map(pattern => pattern.toJSON()),
 			index: session && this._index,
 		};
 	}
@@ -151,8 +156,11 @@ export class Configuration implements ISerializable<JConfiguration> {
 		for(const { map, corner, partition } of this.$freeCorners) {
 			if(map.corner.type != CornerType.side) continue;
 
-			let diagonal = new Line(...partition.$getExternalConnectionTargets(map));
-			if(diagonal.$isDegenerated) diagonal = new Line(diagonal.p1, corner);
+			const targets = partition.$getExternalConnectionTargets(map);
+			let diagonal = new Line(...targets);
+			if(diagonal.$isDegenerated) {
+				diagonal = new Line(diagonal.p1, corner);
+			}
 			(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
 			result.push(diagonal as SideDiagonal);
 		}
@@ -169,8 +177,10 @@ export class Configuration implements ISerializable<JConfiguration> {
 		const result: FreeCorner[] = [];
 		for(const [i, partition] of this.$partitions.entries()) {
 			for(const map of partition.$cornerMap) {
-				if(map.corner.type == CornerType.side || map.corner.type == CornerType.intersection) {
-					const corner = this.$pattern!.$devices[i].$resolveCornerMap(map);
+				const type = map.corner.type;
+				if(type == CornerType.side || type == CornerType.intersection) {
+					const device = this.$pattern!.$devices[i];
+					const corner = device.$resolveCornerMap(map);
 					result.push({ map, corner, partition });
 				}
 			}
@@ -185,7 +195,8 @@ export interface SideDiagonal extends Line {
 }
 
 /**
- * A {@link FreeCorner} is a corner of either type {@link CornerType.side} or {@link CornerType.intersection}.
+ * A {@link FreeCorner} is a corner of either type {@link CornerType.side} or
+ * {@link CornerType.intersection}.
  * Unless it is within the flap region, it is not yet connected to a ridge.
  */
 interface FreeCorner {
@@ -197,7 +208,9 @@ interface FreeCorner {
 /**
  * Replace temporary id to real id.
  */
-export function cleanUp(partitions: readonly JPartition[]): readonly JPartition[] {
+export function cleanUp(
+	partitions: readonly JPartition[]
+): readonly JPartition[] {
 	// Gather all id
 	const idMap = new Map<OverlapId, OverlapId>();
 	const overlaps = partitions.flatMap(p => p.overlaps);

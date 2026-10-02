@@ -9,8 +9,8 @@ import type { EndEvent, StartEvent } from "../classes/event";
 
 //=================================================================
 /**
- * {@link Stacking} determines the stacking relations among a set of {@link Polygon}s.
- * It is assumed that none of those polygons intersects,
+ * {@link Stacking} determines the stacking relations among a set of
+ * {@link Polygon}s. It is assumed that none of those polygons intersects,
  * so there is no need for intersection detection here.
  */
 //=================================================================
@@ -44,9 +44,9 @@ export class Stacking extends SweepLine {
 		return [...stacking].map(([outer, inner]) => ({ outer, inner }));
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected override _reset(): void {
 		super._reset();
@@ -65,7 +65,8 @@ export class Stacking extends SweepLine {
 			} else {
 				const prevIndex = prev.$segment.$polygon;
 				const prevParent = this._parent[prevIndex];
-				this._parent[index] = prevParent === null ? prevIndex : prevParent;
+				this._parent[index] =
+					prevParent === null ? prevIndex : prevParent;
 			}
 		}
 	}

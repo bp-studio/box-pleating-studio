@@ -102,8 +102,8 @@ function loadSettings(settingString: string | null): void {
 	if(!settingString) return;
 	try {
 		const savedSettings = JSON.parse(settingString);
-		// Use deepCopy to read saved settings,
-		// so that old setting will not be overwritten as we add more settings in the future.
+		// Use deepCopy to read saved settings, so that old setting will not be
+		// overwritten as we add more settings in the future.
 		deepCopy(settings, savedSettings);
 	} catch {
 		// Simply ignore if anything went wrong

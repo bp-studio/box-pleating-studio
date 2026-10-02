@@ -9,7 +9,9 @@ import { Direction } from "shared/types/direction";
 import type { Configuration } from "../configuration";
 import type { JDevice, JGadget, JOverlap, JPartition, JPiece } from "shared/json";
 
-export function* deviceGenerator(data: JPartition, config: Configuration): Generator<JDevice> {
+export function* deviceGenerator(
+	data: JPartition, config: Configuration
+): Generator<JDevice> {
 	const junctions = config.$repo.$junctions;
 	const { overlaps, strategy } = data;
 	if(overlaps.length == 1) {
@@ -39,7 +41,9 @@ export function* deviceGenerator(data: JPartition, config: Configuration): Gener
 	//TODO: general case
 }
 
-/** The universal GPS strategy. Guaranteed to find a pattern in a single overlap. */
+/**
+ * The universal GPS strategy. Guaranteed to find a pattern in a single overlap.
+ */
 function* universalGPS(o: JOverlap, sx: number): Generator<JGadget> {
 	let d = 2, found = false;
 	while(!found) {

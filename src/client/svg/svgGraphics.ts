@@ -40,9 +40,9 @@ export class SvgGraphics {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public closePath(): this {
 		this._path += "Z";
@@ -60,7 +60,9 @@ export class SvgGraphics {
 		return this;
 	}
 
-	public drawRoundedRect(x: number, y: number, width: number, height: number, radius: number): this {
+	public drawRoundedRect(
+		x: number, y: number, width: number, height: number, radius: number
+	): this {
 		this.$addPath();
 		this._svg += `<rect class="${this.$class}" x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" />`;
 		return this;
@@ -72,7 +74,9 @@ export class SvgGraphics {
 		return this;
 	}
 
-	public arcTo(x1: number, y1: number, x2: number, y2: number, radius: number): this {
+	public arcTo(
+		x1: number, y1: number, x2: number, y2: number, radius: number
+	): this {
 		this._path += `A${radius},${radius},0,0,1,${x2},${y2}`;
 		return this;
 	}
@@ -84,7 +88,9 @@ export class SvgGraphics {
 		width: number, color?: ColorSource, alpha?: number,
 		alignment?: number, scaleMode?: LINE_SCALE_MODE): this;
 	public lineStyle(options: ILineStyleOptions): this;
-	public lineStyle(...args: [number, ...unknown[]] | [ILineStyleOptions]): this {
+	public lineStyle(
+		...args: [number, ...unknown[]] | [ILineStyleOptions]
+	): this {
 		if(typeof args[0] == "number") this._width = args[0];
 		else this._width = args[0].width;
 		return this;
@@ -96,9 +102,9 @@ export class SvgGraphics {
 		return this;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Stub methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public clear(): this { return this; }
 	public endFill(): this { return this; }

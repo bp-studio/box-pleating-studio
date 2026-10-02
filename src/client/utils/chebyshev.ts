@@ -1,7 +1,8 @@
 import { quadrantNumber } from "shared/types/direction";
 
 /**
- * The design of these loops make us traverse all points of Chebyshev distance r.
+ * The design of these loops make us traverse all points of Chebyshev distance
+ * r.
  */
 export function* chebyshev(r: number): Generator<IPoint> {
 	for(let i = 0; i < quadrantNumber; i++) {

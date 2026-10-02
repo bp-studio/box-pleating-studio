@@ -19,7 +19,9 @@ export interface JEditCommand extends JCommand {
 
 export class EditCommand extends Command implements JEditCommand {
 
-	public static $create(proj: Project, edits: JEdit[], oldRoot: NodeId, newRoot: NodeId): EditCommand {
+	public static $create(
+		proj: Project, edits: JEdit[], oldRoot: NodeId, newRoot: NodeId
+	): EditCommand {
 		return new EditCommand(proj, {
 			type: CommandType.edit,
 			tag: "tree",
@@ -60,11 +62,15 @@ export class EditCommand extends Command implements JEditCommand {
 	public $undo(): Promise<void> {
 		const edits = this.edits.map<JEdit>(e => [!e[0], e[1]]).reverse();
 		const layout = this._project.design.$prototype.layout;
-		return this._project.$core.tree.edit(edits, this.old, layout.flaps, layout.stretches);
+		return this._project.$core.tree.edit(
+			edits, this.old, layout.flaps, layout.stretches
+		);
 	}
 
 	public $redo(): Promise<void> {
 		const layout = this._project.design.$prototype.layout;
-		return this._project.$core.tree.edit(this.edits, this.new, layout.flaps, layout.stretches);
+		return this._project.$core.tree.edit(
+			this.edits, this.new, layout.flaps, layout.stretches
+		);
 	}
 }

@@ -12,7 +12,9 @@ import type { ITreeNode } from "../../context";
 //=================================================================
 export type Junction = InvalidJunction | ValidJunction;
 
-export function createJunction(a: ITreeNode, b: ITreeNode, lca: ITreeNode): Junction {
+export function createJunction(
+	a: ITreeNode, b: ITreeNode, lca: ITreeNode
+): Junction {
 	if(a.id > b.id) [a, b] = [b, a];
 	const d = dist(a, b, lca);
 

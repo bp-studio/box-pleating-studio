@@ -57,9 +57,9 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public toJSON(): TreeData {
 		const result: TreeData = {
@@ -196,7 +196,8 @@ export class Tree implements ITree, ISerializable<TreeData> {
 	 * This is one of the two fundamental operations.
 	 *
 	 * This doesn't actually remove any node yet.
-	 * Must call {@link $flushRemove $flushRemove()} to perform the actual removal.
+	 * Must call {@link $flushRemove $flushRemove()} to perform the actual
+	 * removal.
 	 */
 	public $removeEdge(n1: NodeId, n2: NodeId): void {
 		const N1 = this._nodes[n1]!, N2 = this._nodes[n2]!;
@@ -212,12 +213,16 @@ export class Tree implements ITree, ISerializable<TreeData> {
 	}
 
 	/**
-	 * Check all {@link TreeNode}s in {@link _pendingRemove} and perform the actual removal.
+	 * Check all {@link TreeNode}s in {@link _pendingRemove} and perform the
+	 * actual removal.
 	 */
 	public $flushRemove(): void {
 		// Handle the special case where the current root is going to be removed
-		if(this._pendingRemove.has(this.$root.id) && this.$root.$children.$size == 0) {
-			this.$root = this._nodes.find(n => n && !n.$parent && n.$children.$size > 0)!;
+		const root = this.$root;
+		if(this._pendingRemove.has(root.id) && root.$children.$size == 0) {
+			this.$root = this._nodes.find(
+				n => n && !n.$parent && n.$children.$size > 0
+			)!;
 			State.m.$rootChanged = true;
 		}
 
@@ -239,15 +244,17 @@ export class Tree implements ITree, ISerializable<TreeData> {
 		this._pendingRemove.clear();
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _addNode(id: NodeId, at?: TreeNode, length?: number): TreeNode {
 		return this._nodes[id] = new TreeNode(id, at, length);
 	}
 
-	private _removeEdgeAndCheckNewFlap(node: TreeNode, partner: TreeNode): void {
+	private _removeEdgeAndCheckNewFlap(
+		node: TreeNode, partner: TreeNode
+	): void {
 		this.$removeEdge(node.id, partner.id);
 		if(partner.$isLeafLike) {
 			State.$nodeAABBChanged.add(partner);

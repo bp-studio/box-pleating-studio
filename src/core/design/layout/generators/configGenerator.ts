@@ -6,7 +6,9 @@ import { ConfigGeneratorContext } from "./configGeneratorContext";
 import type { JConfiguration, JStretch } from "shared/json/pattern";
 import type { Repository } from "../repository";
 
-export function* configGenerator(repo: Repository, prototype?: JStretch): Generator<Configuration> {
+export function* configGenerator(
+	repo: Repository, prototype?: JStretch
+): Generator<Configuration> {
 
 	let protoSignature: string | undefined;
 	if(prototype) {
@@ -23,7 +25,10 @@ export function* configGenerator(repo: Repository, prototype?: JStretch): Genera
 		const pattern = prototype.pattern;
 		if(proto && pattern) {
 			try {
-				const jConfig: JConfiguration = { partitions: proto.partitions, patterns: [pattern] };
+				const jConfig: JConfiguration = {
+					partitions: proto.partitions,
+					patterns: [pattern],
+				};
 				const config = new Configuration(repo, jConfig);
 				if(!config.$pattern) throw new Error();
 				protoSignature = config.$signature;

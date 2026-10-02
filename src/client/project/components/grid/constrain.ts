@@ -4,11 +4,15 @@
 
 type ConstrainFunc = Func<IPoint, IPoint>;
 
-export function constrainVertex(constrain: ConstrainFunc, location: IPoint, v: IPoint): IPoint {
+export function constrainVertex(
+	constrain: ConstrainFunc, location: IPoint, v: IPoint
+): IPoint {
 	return fixVector(constrain, location, v);
 }
 
-export function constrainFlap(constrain: ConstrainFunc, location: IPoint, w: number, h: number, v: IPoint): IPoint {
+export function constrainFlap(
+	constrain: ConstrainFunc, location: IPoint, w: number, h: number, v: IPoint
+): IPoint {
 	const zeroWidth = w === 0;
 	const zeroHeight = h === 0;
 	const { x, y } = location;

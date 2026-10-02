@@ -10,9 +10,10 @@ import type { ScrollController } from "client/controllers/scrollController";
 /**
  * The global image size.
  *
- * Note that we don't setup a watcher for this value and call {@link ScrollView.$updateScrollbar} when it changes,
- * because as long as the label calculation logic is correct,
- * the size of the image is not supposed to have significant changes except for the case of zooming.
+ * Note that we don't setup a watcher for this value and call
+ * {@link ScrollView.$updateScrollbar} when it changes, because as long as the
+ * label calculation logic is correct, the size of the image is not supposed to
+ * have significant changes except for the case of zooming.
  */
 const imageDimension = computed<IDimension>(() => {
 	const sheet = ProjectService.sheet.value;
@@ -22,8 +23,8 @@ const imageDimension = computed<IDimension>(() => {
 
 //=================================================================
 /**
- * {@link ScrollView} manages the scrollable area, including whether to show the scrollbars,
- * the the low-level operations upon scrolling.
+ * {@link ScrollView} manages the scrollable area, including whether to show
+ * the scrollbars, the the low-level operations upon scrolling.
  * It doesn't include the UI logic of scrolling though;
  * that part is handled by {@link ScrollController}.
  */
@@ -67,7 +68,8 @@ export class ScrollView extends EventTarget {
 	}
 
 	public get $isScrollable(): boolean {
-		return this._el.classList.contains("scroll-x") || this._el.classList.contains("scroll-y");
+		const classList = this._el.classList;
+		return classList.contains("scroll-x") || classList.contains("scroll-y");
 	}
 
 	public $onScroll(handler: Consumer<IPoint>): void {
@@ -92,9 +94,14 @@ export class ScrollView extends EventTarget {
 		this._el.classList.toggle("scroll-x", scrollX);
 		this._el.classList.toggle("scroll-y", scrollY);
 
-		// Double check, to handle the case where on scrollbar is needed only because of the other scrollbar.
-		this._el.classList.toggle("scroll-x", scrollX || image.width > this._el.clientWidth + 2);
-		this._el.classList.toggle("scroll-y", scrollY || image.height > this._el.clientHeight + 2);
+		// Double check, to handle the case where on scrollbar is needed only
+		// because of the other scrollbar.
+		this._el.classList.toggle(
+			"scroll-x", scrollX || image.width > this._el.clientWidth + 2
+		);
+		this._el.classList.toggle(
+			"scroll-y", scrollY || image.height > this._el.clientHeight + 2
+		);
 
 		// The toggling of scrollbars could result in changes of the Viewport,
 		// so we setup a delay and update it again.

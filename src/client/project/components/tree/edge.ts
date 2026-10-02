@@ -56,7 +56,8 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		this.$setupHit(this._line);
 		this.$addRootObject(this._line, sheet.$layers[Layer.edge]);
 
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
+		this.$label =
+			this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
 		this.$label.$distance = LABEL_DISTANCE;
 
 		this.$reactDraw(this._draw, this._hitArea, this._drawLabel);
@@ -70,9 +71,9 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Proxy properties
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get length(): number {
 		return this._length.value;
@@ -86,9 +87,9 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		FieldCommand.$setterPromise = manager.$addEdge(this.toJSON());
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public split(): Promise<void> {
 		return this._tree.$split(this);
@@ -131,25 +132,27 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		this._tree.$goToDual(this);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $getLeaf(): Vertex | undefined {
 		if(this.$v1.isLeaf) return this.$v1;
 		if(this.$v2.isLeaf) return this.$v2;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $drawLine(graphics: SmoothGraphicsLike): void {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const sh = ProjectService.shrink.value;
+		const width = this.$hovered || this.$selected ?
+			style.edge.hover : style.edge.width;
 		graphics.clear()
 			.lineStyle(
-				(this.$hovered || this.$selected ? style.edge.hover : style.edge.width) * sh,
+				width * sh,
 				this.$selected ? style.edge.selected : style.edge.color
 			)
 			.moveTo(x1, y1)
@@ -164,7 +167,9 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		const { x1, x2, y1, y2 } = this._coordinates.value;
 		const dir = getDirectionOfSlope((y2 - y1) / (x2 - x1));
 		this.$label.$color = this.$selected ? style.edge.selected : undefined;
-		this.$label.$draw(this.length.toString(), (x1 + x2) / 2, (y1 + y2) / 2, dir);
+		this.$label.$draw(
+			this.length.toString(), (x1 + x2) / 2, (y1 + y2) / 2, dir
+		);
 	}
 
 	private _hitArea(): void {

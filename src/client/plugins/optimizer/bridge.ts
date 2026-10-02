@@ -17,7 +17,9 @@ export class Bridge {
 		instance.init();
 	}
 
-	public async solve(request: OptimizerRequest, seed?: number): Promise<OptimizerResult> {
+	public async solve(
+		request: OptimizerRequest, seed?: number
+	): Promise<OptimizerResult> {
 		if(seed === undefined || !Number.isInteger(seed) || seed > UINT_MAX) {
 			seed = Math.floor(Math.random() * UINT_MAX);
 		}

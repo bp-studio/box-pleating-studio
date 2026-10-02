@@ -27,7 +27,9 @@ namespace WorkspaceService {
 	export const ids = shallowRef<readonly ProjId[]>([]);
 
 	/** All opened {@link Project}s in the order of tabs */
-	export const projects = computed(() => ids.value.map(id => bp.projects.get(id)!));
+	export const projects = computed(
+		() => ids.value.map(id => bp.projects.get(id)!)
+	);
 
 	const tabHistory: ProjId[] = [];
 
@@ -72,7 +74,9 @@ namespace WorkspaceService {
 	 * Open multiple files in parallel,
 	 * but ensure that the tab is opened in the correct order.
 	 */
-	export async function openMultiple(jsons: Pseudo<JProject>[], failCallback?: Action[]): Promise<ProjId[]> {
+	export async function openMultiple(
+		jsons: Pseudo<JProject>[], failCallback?: Action[]
+	): Promise<ProjId[]> {
 		const tasks: Promise<ProjId | null>[] = [];
 		for(let i = 0; i < jsons.length; i++) {
 			const task: Promise<ProjId | null> = bp.projects
@@ -134,7 +138,9 @@ namespace WorkspaceService {
 
 	async function closeBy(predicate: (i: ProjId) => boolean): Promise<void> {
 		const promises: Promise<boolean>[] = [];
-		for(const i of ids.value.concat()) if(predicate(i)) promises.push(closeCore(i));
+		for(const i of ids.value.concat()) {
+			if(predicate(i)) promises.push(closeCore(i));
+		}
 		await Promise.all(promises);
 		selectLast();
 	}
@@ -142,7 +148,8 @@ namespace WorkspaceService {
 	let confirming: Promise<boolean> = Promise.resolve(true);
 
 	/**
-	 * @param force Whether to ignore saving warning and force close the project.
+	 * @param force Whether to ignore saving warning and force close the
+	 * project.
 	 */
 	async function closeCore(id: ProjId, force?: boolean): Promise<boolean> {
 		const proj = bp.projects.get(id)!;
@@ -162,7 +169,9 @@ namespace WorkspaceService {
 		return true;
 	}
 
-	async function insertAfterAndSelect(proj: JProject, after: ProjId): Promise<void> {
+	async function insertAfterAndSelect(
+		proj: JProject, after: ProjId
+	): Promise<void> {
 		const i = ids.value.indexOf(after);
 		const id = await bp.projects.open(checkTitle(proj));
 		manipulateIds(arr => arr.splice(i + 1, 0, id));
@@ -175,7 +184,9 @@ namespace WorkspaceService {
 		gtag("event", "project_clone");
 	}
 
-	export async function optimize(options: OptimizerOptions, callback: OptimizerCallback): Promise<void> {
+	export async function optimize(
+		options: OptimizerOptions, callback: OptimizerCallback
+	): Promise<void> {
 		const proj = Studio.project;
 		if(!proj) return;
 		const optimized = await bp.plugins.optimizer(proj, options, callback);
@@ -189,7 +200,9 @@ namespace WorkspaceService {
 	}
 
 	Studio.$onSetupOptions.push(options =>
-		options.onError = async (id: ProjId, error: CoreError, backup?: JProject) => {
+		options.onError = async (
+			id: ProjId, error: CoreError, backup?: JProject
+		) => {
 			const log = cloneObj(backup);
 			if(log) {
 				error.build = app_config.app_version;
@@ -212,9 +225,9 @@ namespace WorkspaceService {
 		}
 	);
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Exiting warning
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	export function init(): void {
 		/** If the user is in risk of losing progress on closing the app. */

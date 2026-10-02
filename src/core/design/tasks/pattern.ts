@@ -9,7 +9,8 @@ import type { NodeId } from "shared/json/tree";
 
 //=================================================================
 /**
- * {@link patternTask} find all possible {@link Configuration}s and {@link Pattern}s.
+ * {@link patternTask} find all possible {@link Configuration}s and
+ * {@link Pattern}s.
  */
 //=================================================================
 export const patternTask = new Task(pattern, traceContourTask);
@@ -30,11 +31,14 @@ function pattern(): void {
 
 	for(const s of State.$stretches.values()) {
 		if(!s.$repo.$pattern) {
-			// Notify the user, unless some of the flaps involved form invalid junctions
-			// (in which case the layout itself is invalid, and that is already signified).
-			// Note that this includes the repos skipped by the validity checks (see Repository.$isValid),
-			// as those are also stretches without patterns from the user's point of view.
-			if(!hasInvalidJunction(s.$repo.$nodeSet.$leaves)) UpdateResult.$setPatternNotFound();
+			// Notify the user, unless some of the flaps involved form invalid
+			// junctions (in which case the layout itself is invalid, and that
+			// is already signified). Note that this includes the repos skipped
+			// by the validity checks (see Repository.$isValid), as those are
+			// also stretches without patterns from the user's point of view.
+			if(!hasInvalidJunction(s.$repo.$nodeSet.$leaves)) {
+				UpdateResult.$setPatternNotFound();
+			}
 			continue;
 		}
 

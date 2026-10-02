@@ -20,6 +20,8 @@ export class TreeMakerVisitor {
 	public get $float(): number { return parseFloat(this.$next()); }
 	public get $bool(): boolean { return this.$next() == "true"; }
 
-	public $skip(n: number): void { for(let i = 0; i < n; i++) this._lines.next(); }
+	public $skip(n: number): void {
+		for(let i = 0; i < n; i++) this._lines.next();
+	}
 	public $skipArray(): void { this.$skip(this.$int); }
 }

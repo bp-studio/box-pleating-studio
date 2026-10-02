@@ -36,11 +36,14 @@ export abstract class View extends Mountable {
 
 		this._onDestruct(() => {
 			this._drawScope.stop();
-			this._rootContainers.forEach(view => view.destroy({ children: true }));
+			this._rootContainers.forEach(
+				view => view.destroy({ children: true })
+			);
 		});
 
 		this.addEventListener(ACTIVE, event => {
-			// Visibilities of the top-level containers depend on the active state.
+			// Visibilities of the top-level containers depend on the active
+			// state.
 			this._rootContainers.forEach(view => view.visible = event.state);
 		});
 
@@ -60,11 +63,14 @@ export abstract class View extends Mountable {
 
 	/**
 	 * Add a top-level object.
-	 * The implementation here assumes that the method is called only once for the same object.
+	 * The implementation here assumes that the method is called only once for
+	 * the same object.
 	 *
 	 * All top-level objects gets destructed as the {@link View} destructs.
 	 */
-	protected $addRootObject<T extends Container>(object: T, target?: Container): T {
+	protected $addRootObject<T extends Container>(
+		object: T, target?: Container
+	): T {
 		this._rootContainers.push(object);
 		target?.addChild(object);
 		return object;

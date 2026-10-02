@@ -136,7 +136,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		design.$prototype.layout.flaps.push(...prototypes);
 
 		this._tree.$project.history.$cacheSelection();
-		for(const id of ids) SelectionController.$toggle(this._vertices[id]!, false);
+		for(const id of ids) {
+			SelectionController.$toggle(this._vertices[id]!, false);
+		}
 		await this._tree.$project.$core.tree.removeLeaf(ids, prototypes);
 	}
 
@@ -156,9 +158,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Find the close empty spot around the given {@link Vertex}. */
 	private _findClosestEmptySpot(at: Vertex): IPoint {
@@ -167,7 +169,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 
 		// Create an index for the position of all vertices
 		const occupied = new Set<number>();
-		for(const v of this) occupied.add(getOrderedKey(v._location.x, v._location.y));
+		for(const v of this) {
+			occupied.add(getOrderedKey(v._location.x, v._location.y));
+		}
 
 		// Search for empty spot
 		let spot: IPoint | undefined;
@@ -200,7 +204,8 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 	/**
 	 * Simulate the process of a round of deleting,
 	 * and returns those {@link Vertex Vertices} that are actually deleted
-	 * (in the order of deletion), and those parent vertices that becomes new leaves.
+	 * (in the order of deletion), and those parent vertices that becomes new
+	 * leaves.
 	 *
 	 * If the user deliberately select all vertices and hit delete,
 	 * there's no way to tell which three vertices will survive ahead of time.
@@ -230,7 +235,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 			}
 			vertices = nextRound;
 		}
-		const parentIds = [...parents].filter(v => map.get(v)!.size === 1).map(v => v.id);
+		const parentIds = [...parents]
+			.filter(v => map.get(v)!.size === 1)
+			.map(v => v.id);
 		return [result, parentIds];
 	}
 
@@ -238,7 +245,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		const map = new Map<Vertex, Set<number>>();
 		for(const v of this) {
 			const neighbors = new Set<number>();
-			for(const n of this._tree.$edges.get(v.id)!.keys()) neighbors.add(n);
+			for(const n of this._tree.$edges.get(v.id)!.keys()) {
+				neighbors.add(n);
+			}
 			map.set(v, neighbors);
 		}
 		return map;

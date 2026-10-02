@@ -20,7 +20,10 @@ export class AreaNode implements ITreeNodeBase {
 	public $dist: number = 0;
 	public $area: number;
 
-	constructor(id: NodeId, length: number, parent: AreaNode | undefined, area: number = 0) {
+	constructor(
+		id: NodeId, length: number,
+		parent: AreaNode | undefined, area: number = 0
+	) {
 		this.id = id;
 		this.$length = length;
 		this.$area = area;

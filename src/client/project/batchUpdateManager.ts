@@ -35,9 +35,9 @@ export class BatchUpdateManager {
 		this._core = core;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Register an update operation for a {@link Flap}. */
 	public $addFlap(flap: Flap, action: Action): Promise<void> {
@@ -51,19 +51,23 @@ export class BatchUpdateManager {
 		return this._setupPromise();
 	}
 
-	/** Return a {@link Promise} that resolves when all updates are completed. */
+	/**
+	 * Return a {@link Promise} that resolves when all updates are completed.
+	 */
 	public get $updateComplete(): Promise<void> {
-		return (this._updatePromise || Promise.resolve()).then(() => this._core.$updating);
+		return (this._updatePromise || Promise.resolve())
+			.then(() => this._core.$updating);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _setupPromise(): Promise<void> {
 		if(this._updatePromise === undefined) {
 			const stack = new Error().stack || "";
-			this._updatePromise = this._core.$prepare().then(() => this._flush(stack));
+			this._updatePromise =
+				this._core.$prepare().then(() => this._flush(stack));
 		}
 		return this._updatePromise;
 	}

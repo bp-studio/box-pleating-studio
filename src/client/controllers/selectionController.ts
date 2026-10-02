@@ -9,6 +9,7 @@ import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
 import { Independent } from "client/base/independent";
 
+import type { MTEvent } from "./share";
 import type { Control } from "client/base/control";
 import type { DragSelectable } from "client/base/draggable";
 import type { ComputedRef } from "vue";
@@ -21,7 +22,9 @@ export interface ISelectionController {
 }
 
 interface HitStatus {
-	/** The current selected {@link Control} (last one if multiple are selected). */
+	/**
+	 * The current selected {@link Control} (last one if multiple are selected).
+	 */
 	current: Control | null;
 
 	/** The next unselected {@link Control} in the stacking. */
@@ -57,7 +60,8 @@ export namespace SelectionController {
 
 	/**
 	 * The flag {@link possiblyReselect} indicates that we are in a situation
-	 * that might qualify as reselection. See {@link Control.$reselectableAfter}.
+	 * that might qualify as reselection. See
+	 * {@link Control.$reselectableAfter}.
 	 */
 	let possiblyReselect: boolean = false;
 
@@ -124,10 +128,13 @@ export namespace SelectionController {
 	}
 
 	/**
-	 * Process a clicking event, and return whether we are in a state that should initialize dragging.
+	 * Process a clicking event, and return whether we are in a state that
+	 * should initialize dragging.
 	 */
-	export function $process(event: MouseEvent | TouchEvent, ctrlKey?: boolean): boolean {
-		if(event instanceof MouseEvent) ctrlKey ??= event.ctrlKey || event.metaKey;
+	export function $process(event: MTEvent, ctrlKey?: boolean): boolean {
+		if(event instanceof MouseEvent) {
+			ctrlKey ??= event.ctrlKey || event.metaKey;
+		}
 		const { current, next } = getStatus();
 
 		// Selection logic for mouse click
@@ -163,7 +170,7 @@ export namespace SelectionController {
 	}
 
 	/** See {@link Control.$reselectableAfter}. */
-	export function $tryReselect(event: MouseEvent | TouchEvent): boolean {
+	export function $tryReselect(event: MTEvent): boolean {
 		if(!possiblyReselect) return false;
 
 		clear();
@@ -187,14 +194,17 @@ export namespace SelectionController {
 		return result;
 	}
 
-	export function $processDragSelect(event: MouseEvent | TouchEvent): boolean {
-		const { point, downPoint, dist } = CursorController.$displacement(event);
+	export function $processDragSelect(event: MTEvent): boolean {
+		const { point, downPoint, dist } =
+			CursorController.$displacement(event);
 		const sheet = ProjectService.sheet.value!;
 		const ctrl = event.ctrlKey || event.metaKey;
 		// Initialization
 		if(!view.visible) {
 			// Must drag to a certain distance to trigger drag-selection.
-			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) return false;
+			if(dist < ($isTouch(event) ? TOUCH_THRESHOLD : MOUSE_THRESHOLD)) {
+				return false;
+			}
 			if(ctrl) {
 				// Keep a record of established selections
 				for(const control of selections.concat()) {
@@ -208,11 +218,34 @@ export namespace SelectionController {
 			view.visible = true;
 			display.$setInteractive(false);
 			dragSelectables = [...sheet.$controls].filter(
-				(c: Control): c is DragSelectable => Boolean((c as DragSelectable).$anchor)
+				(c: Control): c is DragSelectable =>
+					Boolean((c as DragSelectable).$anchor)
 			);
 		}
 
-		// Draws the rectangle
+		drawRect(downPoint, point);
+
+		// Calculate the corresponding coordinates of the rectangle.
+		const bounds = view.getBounds();
+		const matrix = sheet.$view.localTransform;
+		const pt = matrix.applyInverse({ x: bounds.left, y: bounds.bottom });
+		const rect = new Rectangle(
+			pt.x, pt.y, bounds.width / matrix.a, bounds.height / matrix.a
+		);
+
+		// Check selected objects (linear search is good enough for the moment).
+		for(const ds of dragSelectables) {
+			$toggle(ds,
+				// must hold ctrl to have this behavior
+				ctrl && establishedSelections.has(ds) ||
+				rect.contains(ds.$anchor.x, ds.$anchor.y)
+			);
+		}
+		return true;
+	}
+
+	/** Draws the rectangle */
+	function drawRect(downPoint: IPoint, point: IPoint): void {
 		let w = Math.abs(downPoint.x - point.x);
 		let h = Math.abs(downPoint.y - point.y);
 		if(w < MIN_WIDTH) w = MIN_WIDTH;
@@ -226,21 +259,6 @@ export namespace SelectionController {
 				w, h
 			)
 			.endFill();
-
-		// Calculate the corresponding coordinates of the rectangle.
-		const bounds = view.getBounds();
-		const matrix = sheet.$view.localTransform;
-		const pt = matrix.applyInverse({ x: bounds.left, y: bounds.bottom });
-		const rect = new Rectangle(pt.x, pt.y, bounds.width / matrix.a, bounds.height / matrix.a);
-
-		// Check selected objects (linear search is good enough for the moment).
-		for(const ds of dragSelectables) {
-			$toggle(ds,
-				ctrl && establishedSelections.has(ds) || // must hold ctrl to have this behavior
-				rect.contains(ds.$anchor.x, ds.$anchor.y)
-			);
-		}
-		return true;
 	}
 
 	export function $toggle(c: Control, selected: boolean): void {
@@ -271,7 +289,10 @@ export namespace SelectionController {
 		if(current) {
 			const that = current;
 			const p = current.$priority;
-			if(controls.some(c => c.$priority > p && c.$reselectableAfter(that))) {
+			const reselectable = controls.some(
+				c => c.$priority > p && c.$reselectableAfter(that)
+			);
+			if(reselectable) {
 				possiblyReselect = true;
 			}
 		}
@@ -284,7 +305,10 @@ export namespace SelectionController {
 	 * and return if it was successful.
 	 */
 	function trySelect(c: Control): boolean {
-		if(!c.$selected && (selections.length == 0 || selections[0].$selectableWith(c))) {
+		if(
+			!c.$selected &&
+			(selections.length == 0 || selections[0].$selectableWith(c))
+		) {
 			c.$selected = true;
 			selections.push(c);
 			return true;

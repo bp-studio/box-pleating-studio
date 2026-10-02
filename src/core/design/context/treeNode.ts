@@ -12,9 +12,11 @@ import type { NodeId } from "shared/json/tree";
 import type { Tree } from "./tree";
 
 /** Sorted by maximize {@link ITreeNode.$dist}. */
-export const maxDistComparator: Comparator<ITreeNodeBase> = (a, b) => b.$dist - a.$dist;
+export const maxDistComparator: Comparator<ITreeNodeBase> =
+	(a, b) => b.$dist - a.$dist;
 
-const maxHeightComparator: Comparator<TreeNode> = (a, b) => b.$height - a.$height;
+const maxHeightComparator: Comparator<TreeNode> =
+	(a, b) => b.$height - a.$height;
 
 //=================================================================
 /**
@@ -35,7 +37,8 @@ export class TreeNode implements ITreeNode {
 	/**
 	 * The branch height under the node (0 for a leaf).
 	 *
-	 * We set the initial value to -1, so that changing is triggered on construction.
+	 * We set the initial value to -1, so that changing is triggered on
+	 * construction.
 	 */
 	public $height: number = -1;
 
@@ -76,9 +79,9 @@ export class TreeNode implements ITreeNode {
 		return { n1: this.$parent.id, n2: this.id, length: this.$length };
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get $leaves(): readonly TreeNode[] {
 		return this._leafList;
@@ -104,11 +107,15 @@ export class TreeNode implements ITreeNode {
 	}
 
 	public $setFlap(flap: JFlap): void {
-		this.$setAABB(flap.y + flap.height, flap.x + flap.width, flap.y, flap.x);
+		this.$setAABB(
+			flap.y + flap.height, flap.x + flap.width, flap.y, flap.x
+		);
 	}
 
 	/** For testing purpose. */
-	public $setAABB(top: number, right: number, bottom: number, left: number): void {
+	public $setAABB(
+		top: number, right: number, bottom: number, left: number
+	): void {
 		State.$nodeAABBChanged.add(this);
 		this.$AABB.$update(top, right, bottom, left);
 	}
@@ -121,7 +128,8 @@ export class TreeNode implements ITreeNode {
 	}
 
 	/**
-	 * Temporarily disconnects a node from the tree, without changing its subtree.
+	 * Temporarily disconnects a node from the tree,
+	 * without changing its subtree.
 	 */
 	public $cut(): void {
 		/* istanbul ignore next: foolproof */

@@ -13,12 +13,13 @@ const NIL = { isRed: false };
 
 //=================================================================
 /**
- * {@link RedBlackTree} is a self-balancing {@link IBinarySearchTree}
- * that sacrifices a little balance (its branch heights may differ by up to a factor of 2)
- * to reduce the number of rotations and speed up insertion and deletion operations.
- * Although its search speed is slightly slower than that of {@link AvlTree},
- * it performs better in scenarios where frequent insertions and deletions are required.
- * In fact, the vast majority of algorithm libraries use red-black trees as their implementation of BST.
+ * {@link RedBlackTree} is a self-balancing {@link IBinarySearchTree} that
+ * sacrifices a little balance (its branch heights may differ by up to a factor
+ * of 2) to reduce the number of rotations and speed up insertion and deletion
+ * operations. Although its search speed is slightly slower than that of
+ * {@link AvlTree}, it performs better in scenarios where frequent insertions
+ * and deletions are required. In fact, the vast majority of algorithm libraries
+ * use red-black trees as their implementation of BST.
  */
 //=================================================================
 
@@ -84,9 +85,9 @@ export class RedBlackTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		if(!n.isRed) this._fixDelete(moveUp);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _fixInsert(node: Node<K, V>): void {
 		// Case 1 & 2

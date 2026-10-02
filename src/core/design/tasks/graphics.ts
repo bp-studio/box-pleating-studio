@@ -35,14 +35,17 @@ function graphics(): void {
 	const freeCorners: Point[] = [];
 	for(const stretch of State.$stretches.values()) {
 		const config = stretch.$repo.$configuration;
-		if(config) freeCorners.push(...config.$freeCorners.map(s => s.corner));
+		if(config) {
+			freeCorners.push(...config.$freeCorners.map(s => s.corner));
+		}
 	}
 
 	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
 		const g = node.$graphics;
 		combineContour(node);
-		g.$ridges = node.$isLeaf ? flapRidge(node) : riverRidge(node, freeCorners);
+		g.$ridges = node.$isLeaf ?
+			flapRidge(node) : riverRidge(node, freeCorners);
 
 		UpdateResult.$addGraphics(node.$tag, {
 			contours: g.$contours,
@@ -51,7 +54,9 @@ function graphics(): void {
 	}
 
 	// Pass the updated structure to the client.
-	if(State.m.$treeStructureChanged) UpdateResult.$exportTree(State.m.$tree.toJSON());
+	if(State.m.$treeStructureChanged) {
+		UpdateResult.$exportTree(State.m.$tree.toJSON());
+	}
 }
 
 function addRepo(repo: Repository): void {
@@ -63,7 +68,8 @@ function addRepo(repo: Repository): void {
 			ridges: device.$drawRidges,
 			axisParallel: device.$axisParallels,
 			location: device.$location,
-			// Note that the range of all devices in the pattern will be updated.
+			// Note that the range of all devices in the pattern will be
+			// updated.
 			range: device.$getDraggingRange(),
 			forward,
 		} as DeviceData);
@@ -79,10 +85,13 @@ function flapRidge(node: ITreeNode): ILine[] {
 		if(!same(p1, p2)) ridges.push([p1, p2]);
 
 		// Skip quadrants with patterns.
-		// Also skip the carved quadrants (see ValidJunction.$invasion) without patterns,
-		// as the default ridge would run across the carved region.
+		// Also skip the carved quadrants (see ValidJunction.$invasion) without
+		// patterns, as the default ridge would run across the carved region.
 		const q = node.id << 2 | i;
-		if(!State.$patternedQuadrants.has(q) && !isCarvedQuadrant(q as QuadrantCode)) ridges.push([p1, c1]);
+		const patterned = State.$patternedQuadrants.has(q);
+		if(!patterned && !isCarvedQuadrant(q as QuadrantCode)) {
+			ridges.push([p1, c1]);
+		}
 	}
 	return ridges;
 }
@@ -100,8 +109,9 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 	const freeCornerMap = toFreeCornerMap(freeCorners);
 
 	for(const contour of node.$graphics.$contours) {
-		// It is possible that a contour of a river has no holes in invalid layouts.
-		// In that case adding ridges doesn't make sense either, so skip the rest.
+		// It is possible that a contour of a river has no holes in invalid
+		// layouts. In that case adding ridges doesn't make sense either, so
+		// skip the rest.
 		if(!contour.inner) continue;
 		const side = (contour.outer as PathEx).isHole ? -1 : 1;
 
@@ -120,10 +130,12 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
 			const p = getCorrespondingPoint(p1, p0, p2, width, side);
 			const innerKey = getOrderedKey(p.x, p.y);
-			// In some edge cases, it is possible that the corresponding inner point exists
-			// while the proposed ridge crease also hits a free corner at the same time.
-			// In that case, free corner should be used first.
-			if(!tryAddRemainingRidge(p1, p, freeCornerMap, ridges) && innerRightCorners.has(innerKey)) {
+			// In some edge cases, it is possible that the corresponding inner
+			// point exists while the proposed ridge crease also hits a free
+			// corner at the same time. In that case, free corner should be used
+			// first.
+			const added = tryAddRemainingRidge(p1, p, freeCornerMap, ridges);
+			if(!added && innerRightCorners.has(innerKey)) {
 				ridges.push([p1, p]);
 				if(!doubled.has(innerKey)) innerRightCorners.delete(innerKey);
 			}
@@ -131,8 +143,9 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 
 		// Check remaining inner vertices.
 		for(const [p1, p0, p2] of innerRightCorners.values()) {
-			// 20240513: It seems that the current algorithm already oriented the contours
-			// by their outer/inner relation, so there's no need to flip `side` parameter here.
+			// 20240513: It seems that the current algorithm already oriented
+			// the contours by their outer/inner relation, so there's no need to
+			// flip `side` parameter here.
 			const p = getCorrespondingPoint(p1, p0, p2, width, side);
 			tryAddRemainingRidge(p1, p, freeCornerMap, ridges);
 		}
@@ -159,13 +172,17 @@ function toFreeCornerMap(freeCorners: Point[]): FreeCornerMap {
  * @param width The width of the river.
  * @param side 1=right side, -1=left side
  */
-function getCorrespondingPoint(p1: IPoint, p0: IPoint, p2: IPoint, width: number, side: Sign): IPoint {
+function getCorrespondingPoint(
+	p1: IPoint, p0: IPoint, p2: IPoint, width: number, side: Sign
+): IPoint {
 	const fx = Math.sign(p2.x - p0.x);
 	const fy = Math.sign(p2.y - p0.y);
 	return { x: p1.x - side * fy * width, y: p1.y + side * fx * width };
 }
 
-function tryAddRemainingRidge(p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[]): boolean {
+function tryAddRemainingRidge(
+	p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[]
+): boolean {
 	const line = Line.$fromIPoint(p1, p);
 	const f = line.$slope;
 	if(f !== 1 && f !== -1) return false; // Fool proof
@@ -180,9 +197,12 @@ function tryAddRemainingRidge(p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMa
 }
 
 /**
- * Return only the right angle corners of a path, as well as the adjacent points.
+ * Return only the right angle corners of a path, as well as the adjacent
+ * points.
  */
-function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
+function* pathRightCorners(
+	path: Path
+): Generator<[IPoint, IPoint, IPoint]> {
 	const l = path.length;
 	for(let i = 0, j = l - 1; i < l; j = i++) {
 		const p1 = path[i];
@@ -192,7 +212,8 @@ function* pathRightCorners(path: Path): Generator<[IPoint, IPoint, IPoint]> {
 		const p2 = path[i + 1] || path[0];
 
 		// Check for right angle.
-		const dot = (p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
+		const dot =
+			(p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
 		if(dot == 0) yield [p1, p0, p2];
 	}
 }

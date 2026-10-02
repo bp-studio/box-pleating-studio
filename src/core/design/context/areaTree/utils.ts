@@ -7,7 +7,8 @@ import type { NodeId } from "shared/json/tree";
 import type { Comparator } from "shared/types/types";
 import type { TreeNode } from "../treeNode";
 
-const maxChildrenComparator: Comparator<AreaNode> = (a, b) => b.$children.$size - a.$children.$size;
+const maxChildrenComparator: Comparator<AreaNode> =
+	(a, b) => b.$children.$size - a.$children.$size;
 
 export interface ParentMap {
 	id: NodeId;
@@ -21,25 +22,34 @@ export interface Hierarchy {
 	parents: ParentMap[];
 }
 
-/** A {@link PartialTree} is a subset of the original tree with the same root. */
+/**
+ * A {@link PartialTree} is a subset of the original tree with the same root.
+ */
 interface PartialTree {
 	/** All nodes in the current {@link PartialTree}. */
 	nodes: AreaNode[];
 
-	/** All leaves in the current {@link PartialTree} (which may not be leaves in the original tree). */
+	/**
+	 * All leaves in the current {@link PartialTree}
+	 * (which may not be leaves in the original tree).
+	 */
 	leaves: AreaNode[];
 }
 
 /**
  * Return the area (ignoring the factor of PI) of a flap.
- * We ignore the PI part because it is not critical to the rest of the computation.
+ * We ignore the PI part because it is not critical to the rest of the
+ * computation.
  */
-export function getArea(node: TreeNode, radius: number, useDimension: boolean): number {
+export function getArea(
+	node: TreeNode, radius: number, useDimension: boolean
+): number {
 	const baseArea = radius * radius;
 	if(!useDimension) return baseArea;
 	const [t, r, b, l] = node.$AABB.$toValues();
 	const width = r - l, height = t - b;
-	return (width * height + 2 * (width + height) * radius) / Math.PI + baseArea;
+	const dimensionArea = width * height + 2 * (width + height) * radius;
+	return dimensionArea / Math.PI + baseArea;
 }
 
 /**
@@ -56,7 +66,8 @@ export function collectPartialTree(root: AreaNode): PartialTree {
 		const children = [...parent.$children];
 		const leaves = children.filter(c => c.$isLeaf);
 		if(result.length > 1) {
-			// We stop if: all children are leaves, or there're at least 3 leaf children
+			// We stop if: all children are leaves,
+			// or there're at least 3 leaf children
 			if(leaves.length == children.length || leaves.length > 2) continue;
 		}
 		const addToHeap = leaves.length > 0;
@@ -79,7 +90,8 @@ export function getDistMap(data: PartialTree): DistMap {
 	for(const node of data.nodes) {
 		const id = node.id;
 		const length = leaves.has(node) ? Math.sqrt(node.$area) : node.$length;
-		result[id] = new AreaNode(id, length, node.$parent && result[node.$parent.id]);
+		const parent = node.$parent && result[node.$parent.id];
+		result[id] = new AreaNode(id, length, parent);
 	}
 	return distMap(result);
 }

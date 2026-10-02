@@ -10,8 +10,8 @@ import type { Polygon } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link AAUnion} computes the union of certain {@link Polygon}s,
- * with the premise that all edges are axis-aligned and all subpaths have been oriented
+ * {@link AAUnion} computes the union of certain {@link Polygon}s, with the
+ * premise that all edges are axis-aligned and all subpaths have been oriented
  * (that is, counter-clockwise for outer boundary and clockwise for holes).
  *
  * For performance reasons, it does not check for these conditions,

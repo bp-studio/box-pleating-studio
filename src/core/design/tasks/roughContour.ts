@@ -18,24 +18,31 @@ import type { junctionTask } from "./junction";
 
 const roughUnion = new RoughUnion();
 
-/** The invading rectangles to carve out of each leaf (see {@link ValidJunction.$invasion}), by leaf id. */
+/**
+ * The invading rectangles to carve out of each leaf (see
+ * {@link ValidJunction.$invasion}), by leaf id.
+ */
 const invasionMap = new Map<NodeId, IRect[]>();
 
-/** The signature of the invasions of each leaf in the previous run, for detecting changes. */
+/**
+ * The signature of the invasions of each leaf in the previous run, for
+ * detecting changes.
+ */
 const invasionCache = new Map<NodeId, string>();
 
 //=================================================================
 /**
  * {@link roughContourTask} updates {@link NodeGraphics.$roughContours}.
  *
- * A {@link RoughContour} is the contour of a flap/river without considering the stretch patterns.
- * Such contour consists of axis-aligned line segments only,
+ * A {@link RoughContour} is the contour of a flap/river without considering the
+ * stretch patterns. Such contour consists of axis-aligned line segments only,
  * and can speed up the process of taking unions.
  * It depends only on the AABB hierarchy, except for the "invasions"
  * (see {@link ValidJunction.$invasion}) which are carved out of the leaves,
  * so this task runs after {@link junctionTask}.
  *
- * Each instance of rough contour should consist of a single connected region only.
+ * Each instance of rough contour should consist of a single connected region
+ * only.
  */
 //=================================================================
 export const roughContourTask = new Task(roughContour, traceContourTask);
@@ -51,13 +58,16 @@ function roughContour(): void {
 }
 
 /**
- * Update {@link invasionMap}, and return the leaves whose invasions have changed.
+ * Update {@link invasionMap}, and return the leaves whose invasions have
+ * changed.
  *
- * Note that the carving takes place regardless of whether the junction is resolved by a stretch pattern.
- * We had tried carving only for the corners resolved by patterns (which requires this task to run after
- * {@link patternTask}), but it turned out that the rivers wrapping around the flaps look more logical
- * if the carving always takes place. The default flap ridges in the carved quadrants
- * without patterns are omitted instead (see {@link graphicsTask}).
+ * Note that the carving takes place regardless of whether the junction is
+ * resolved by a stretch pattern. We had tried carving only for the corners
+ * resolved by patterns (which requires this task to run after
+ * {@link patternTask}), but it turned out that the rivers wrapping around the
+ * flaps look more logical if the carving always takes place. The default flap
+ * ridges in the carved quadrants without patterns are omitted instead (see
+ * {@link graphicsTask}).
  */
 function updateInvasions(): Set<ITreeNode> {
 	invasionMap.clear();
@@ -67,7 +77,8 @@ function updateInvasions(): Set<ITreeNode> {
 		const invasion = junction.$invasion;
 		if(!invasion) continue;
 		getOrSetEmptyArray(invasionMap, invasion.flap.id).push(invasion.rect);
-		carved.push(junction.$a === invasion.flap ? junction.$q1 : junction.$q2);
+		const q = junction.$a === invasion.flap ? junction.$q1 : junction.$q2;
+		carved.push(q);
 	}
 	setCarvedQuadrants(carved);
 
@@ -87,9 +98,9 @@ function updateInvasions(): Set<ITreeNode> {
 
 function updater(node: ITreeNode): boolean {
 	if(!node.$parent) {
-		// The root has no parent edge and therefore no rough contour of its own.
-		// Clear any contour it held as a former non-root, so that no stale
-		// contour referencing its previous subtree survives.
+		// The root has no parent edge and therefore no rough contour of its
+		// own. Clear any contour it held as a former non-root, so that no
+		// stale contour referencing its previous subtree survives.
 		node.$graphics.$roughContours = [];
 		return false;
 	}
@@ -97,7 +108,8 @@ function updater(node: ITreeNode): boolean {
 		// Base case
 		const path = node.$AABB.$toPath();
 		const invasions = invasionMap.get(node.id);
-		const outer = invasions ? carveCorners(pathToRect(path), invasions) : [path];
+		const outer = invasions ?
+			carveCorners(pathToRect(path), invasions) : [path];
 		node.$graphics.$roughContours = [{
 			$id: node.id,
 			$outer: outer,
@@ -105,7 +117,8 @@ function updater(node: ITreeNode): boolean {
 			$leaves: [node.id],
 		}];
 	} else {
-		const children = [...node.$children].flatMap(c => c.$graphics.$roughContours);
+		const children =
+			[...node.$children].flatMap(c => c.$graphics.$roughContours);
 		const contours = expand(children, node.$length, node.id);
 		node.$graphics.$roughContours = contours;
 	}
@@ -118,9 +131,12 @@ function updater(node: ITreeNode): boolean {
 }
 
 /**
- * Expand the given AA polygon by given units, and generate contours matching outer and inner paths.
+ * Expand the given AA polygon by given units, and generate contours matching
+ * outer and inner paths.
  */
-export function expand(inputs: readonly RoughContour[], units: number, id = 0 as NodeId): RoughContour[] {
+export function expand(
+	inputs: readonly RoughContour[], units: number, id = 0 as NodeId
+): RoughContour[] {
 	const components = roughUnion.$union(...inputs.map(c => {
 		const result: Polygon = [];
 		for(const outer of c.$outer) {
@@ -143,14 +159,18 @@ export function expand(inputs: readonly RoughContour[], units: number, id = 0 as
 	return contours;
 }
 
-function componentToContour(id: NodeId, inputs: readonly RoughContour[], component: UnionResult): RoughContour {
+function componentToContour(
+	id: NodeId, inputs: readonly RoughContour[], component: UnionResult
+): RoughContour {
 	const outers = component.paths.map(simplify);
 	const children = component.from.map(i => inputs[i]);
 	const leaves = children.flatMap(c => c.$leaves);
 	return { $id: id, $outer: outers, $children: children, $leaves: leaves };
 }
 
-/** Convert the hinge path of a leaf (see {@link AABB.$toPath}) to a rectangle. */
+/**
+ * Convert the hinge path of a leaf (see {@link AABB.$toPath}) to a rectangle.
+ */
 function pathToRect(path: Path): IRect {
 	const [ur, , ll] = path;
 	return { x1: ll.x, y1: ll.y, x2: ur.x, y2: ur.y };

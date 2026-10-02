@@ -22,6 +22,8 @@ export interface JProject {
 	state?: JState;
 }
 
+export type JProjectLike = RecursivePartial<JProject>;
+
 export type DesignMode = "layout" | "tree";
 
 export interface JDesign {

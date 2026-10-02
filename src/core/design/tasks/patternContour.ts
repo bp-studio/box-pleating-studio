@@ -60,7 +60,8 @@ function patternContour(): void {
 		try {
 			for(const node of nodes) {
 				clearPatternContourForNode(repo, node);
-				const coveredQuadrants = repo.$nodeSet.$quadrantCoverage.get(node)!;
+				const coveredQuadrants =
+					repo.$nodeSet.$quadrantCoverage.get(node)!;
 				processNode(node, trace, coveredQuadrants);
 			}
 		} catch(e) {
@@ -71,7 +72,8 @@ function patternContour(): void {
 		}
 	}
 
-	// Update ids for existing pattern contours what doesn't need to be modified otherwise
+	// Update ids for existing pattern contours what
+	// doesn't need to be modified otherwise
 	for(const repo of State.$repoWithNodeSetChanged) {
 		for(const node of nodesOfRepo(repo)) {
 			for(const contour of node.$graphics.$patternContours) {
@@ -81,31 +83,46 @@ function patternContour(): void {
 	}
 }
 
-export function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants: Quadrant[]): void {
+export function processNode(
+	node: ITreeNode, trace: RepoTrace, coveredQuadrants: Quadrant[]
+): void {
 	const multiContour = node.$graphics.$traceContours.length > 1;
 	const oppositeMap = trace.$repo.$oppositeMap;
-	for(const [index, traceContour] of node.$graphics.$traceContours.entries()) {
+	const entries = node.$graphics.$traceContours.entries();
+	for(const [index, traceContour] of entries) {
 		const traceLeaves = new Set(traceContour.$leaves);
 		for(const outer of traceContour.$outer) {
-			const leaves = outer.leaves ? outer.leaves.filter(l => trace.$leaves.has(l)) : traceContour.$leaves;
+			const leaves = outer.leaves ?
+				outer.leaves.filter(l => trace.$leaves.has(l)) :
+				traceContour.$leaves;
 
 			if(traceContour.$raw) {
 				// In raw mode, if, for all leaves L in a raw component,
-				// all other leaves opposing L in the repo are in fact also contained inside this trace contour,
-				// then there is no need to process this component,
-				// since the resulting contour cannot possibly effect the trace contour anyway.
-				// Notice that this condition also exclude irrelevant paths (i.e. when `leaves` is empty).
-				if(leaves.every(l => oppositeMap[l].every(o => traceLeaves.has(o)))) continue;
+				// all other leaves opposing L in the repo are in fact also
+				// contained inside this trace contour, then there is no
+				// need to process this component, since the resulting contour
+				// cannot possibly effect the trace contour anyway.
+				// Notice that this condition also exclude irrelevant paths
+				// (i.e. when `leaves` is empty).
+				const shouldSkip = leaves.every(
+					l => oppositeMap[l].every(o => traceLeaves.has(o))
+				);
+				if(shouldSkip) continue;
 			}
 
 			// Create start/end map
 			const quadrants = coveredQuadrants
-				// Make sure that the current path actually wraps around the quadrant
+				// Make sure that the current path actually wraps
+				// around the quadrant
 				.filter(q => !multiContour || leaves.includes(q.$flap.id));
-			// The junctions with the flaps inside the whole node are considered digested.
-			// In raw mode, that is made consistent with the geometry by getQuadrantShape (see processOuter).
+			// The junctions with the flaps inside the whole node are considered
+			// digested. In raw mode, that is made consistent with the geometry
+			// by getQuadrantShape (see processOuter).
 			const map = createStartEndMap(quadrants, trace, traceLeaves);
-			const context: TraceContext = { map, trace, node, index, leaves, rawMode: traceContour.$raw };
+			const context: TraceContext = {
+				map, trace, node, index, leaves,
+				rawMode: traceContour.$raw,
+			};
 			processOuter(outer, context);
 		}
 	}
@@ -113,12 +130,15 @@ export function processNode(node: ITreeNode, trace: RepoTrace, coveredQuadrants:
 
 type StartEndMap = Partial<Record<QuadrantDirection, StartEnd>>;
 
-function createStartEndMap(quadrants: Quadrant[], trace: RepoTrace, leaves: ReadonlySet<NodeId>): StartEndMap {
+function createStartEndMap(
+	quadrants: Quadrant[], trace: RepoTrace, leaves: ReadonlySet<NodeId>
+): StartEndMap {
 	const startEndMap: StartEndMap = {};
 	for(let q = 0; q < quadrantNumber; q++) {
 		const filtered = quadrants.filter(quadrant => quadrant.q == q);
 		if(!filtered.length) continue;
-		const startEnd = trace.$resolveStartEnd(filtered, trace.$repo.$directionalQuadrants[q], leaves);
+		const quadrant = trace.$repo.$directionalQuadrants[q];
+		const startEnd = trace.$resolveStartEnd(filtered, quadrant, leaves);
 		if(startEnd) startEndMap[q as QuadrantDirection] = startEnd;
 	}
 	return startEndMap;
@@ -136,13 +156,15 @@ interface TraceContext {
 /**
  * Process the hinge segments of a path of the {@link TraceContour}.
  *
- * In raw mode, a quadrant involving digested junctions is traced on its own shape (see {@link getQuadrantShape}),
- * and the resulting contours are extended so that they can be inserted into the base shape (see {@link extendToBase}).
+ * In raw mode, a quadrant involving digested junctions is traced on its own
+ * shape (see {@link getQuadrantShape}), and the resulting contours are extended
+ * so that they can be inserted into the base shape (see {@link extendToBase}).
  */
 function processOuter(outer: PathEx, context: TraceContext): void {
 	const dir = context.trace.$repo.$direction;
 	const shapes = makePerQuadrant(q =>
-		context.rawMode && context.map[q] ? getQuadrantShape(outer as RawPiece, q) : null
+		context.rawMode && context.map[q] ?
+			getQuadrantShape(outer as RawPiece, q) : null
 	);
 	for(const hingeSegment of createHingeSegments(outer, dir)) {
 		if(!shapes[hingeSegment.q]) processTrace(hingeSegment, context);
@@ -150,19 +172,27 @@ function processOuter(outer: PathEx, context: TraceContext): void {
 	for(const [q, paths] of shapes.entries()) {
 		for(const shape of paths ?? []) {
 			for(const hingeSegment of createHingeSegments(shape, dir)) {
-				if(hingeSegment.q == q) processTrace(hingeSegment, context, outer, shape);
+				if(hingeSegment.q == q) {
+					processTrace(hingeSegment, context, outer, shape);
+				}
 			}
 		}
 	}
 }
 
-function processTrace(hingeSegment: HingeSegment, context: TraceContext, base?: Path, shape?: Path): void {
+function processTrace(
+	hingeSegment: HingeSegment, context: TraceContext,
+	base?: Path, shape?: Path
+): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
-	let contour = context.trace.$generate(hingeSegment, map.start, map.end, context.rawMode, map.virtualStart);
+	let contour = context.trace.$generate(
+		hingeSegment, map.start, map.end, context.rawMode, map.virtualStart
+	);
 	if(contour && base && shape) contour = extendToBase(base, shape, contour);
 	if(contour) {
-		State.$contourWillChange.add(context.node); // Acquiring pattern contours
+		// Acquiring pattern contours
+		State.$contourWillChange.add(context.node);
 		contour.$ids = context.trace.$repo.$nodeSet.$nodes;
 		contour.$repo = context.trace.$repo.$signature;
 		contour.$for = context.index;
@@ -189,6 +219,7 @@ function clearPatternContourForNode(repo: Repository, node: ITreeNode): void {
 	const g = node.$graphics;
 	if(g.$patternContours.some(p => p.$repo == repo.$signature)) {
 		State.$contourWillChange.add(node); // Losing pattern contours
-		g.$patternContours = g.$patternContours.filter(p => p.$repo != repo.$signature);
+		g.$patternContours =
+			g.$patternContours.filter(p => p.$repo != repo.$signature);
 	}
 }

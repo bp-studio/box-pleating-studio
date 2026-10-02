@@ -47,4 +47,5 @@ export class GeneralUnion extends UnionBase {
 	}
 }
 
-export const generalInitializer = new Initializer(LineSegment, floatXyComparator);
+export const generalInitializer =
+	new Initializer(LineSegment, floatXyComparator);

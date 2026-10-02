@@ -18,10 +18,11 @@ import type { Repository } from "core/design/layout/repository";
 export namespace LayoutController {
 
 	/**
-	 * Clears the cached {@link Stretch}es and {@link Repository Repositories} after dragging.
+	 * Clears the cached {@link Stretch}es and {@link Repository Repositories}
+	 * after dragging.
 	 *
-	 * If we are not in dragging mode, those are never cached in the first place,
-	 * so there is no need to clear the cache.
+	 * If we are not in dragging mode, those are never cached in the first
+	 * place, so there is no need to clear the cache.
 	 */
 	export function dragEnd(): boolean {
 		State.m.$isDragging = false;
@@ -33,16 +34,20 @@ export namespace LayoutController {
 	/**
 	 * Generate the set of {@link CPLine}s clipped to the given boundary.
 	 */
-	export function getCP(borders: Path, useAuxiliary: boolean = true): CPLine[] {
+	export function getCP(
+		borders: Path, useAuxiliary: boolean = true
+	): CPLine[] {
 		const clip = new Clip();
 		const tree = State.m.$tree;
 		const lines: CPLine[] = [];
 		addPolygon(lines, [borders], CreaseType.Border);
 		for(const node of tree.$nodes) {
 			if(!node || !node.$parent) continue;
-			const hingeType = useAuxiliary ? CreaseType.Auxiliary : CreaseType.Valley;
+			const hingeType = useAuxiliary ?
+				CreaseType.Auxiliary : CreaseType.Valley;
 			// It suffices to include only the outer contours in CP exporting.
-			addPolygon(lines, node.$graphics.$contours.map(c => c.outer), hingeType);
+			const outers = node.$graphics.$contours.map(c => c.outer);
+			addPolygon(lines, outers, hingeType);
 			addLines(lines, node.$graphics.$ridges, CreaseType.Mountain);
 		}
 		for(const stretch of State.$stretches.values()) {
@@ -56,7 +61,8 @@ export namespace LayoutController {
 		return clip.$get(lines);
 	}
 
-	export /* istanbul ignore next: covered in practice */ function switchConfig(stretchId: string, to: number): void {
+	export /* istanbul ignore next: covered in practice */
+	function switchConfig(stretchId: string, to: number): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		const repo = stretch.$repo;
 		repo.$index = to;
@@ -75,17 +81,19 @@ export namespace LayoutController {
 	export function completeStretch(stretchId: string): JStretch | null {
 		const stretch = State.$stretches.get(stretchId);
 
-		// v0.7.6: It is possible that, after the user hit the delete command of vertices,
-		// the user then select a Stretch BEFORE the delete command is completed.
-		// In that case the stretch id will be invalid, leading to fatal error.
-		// We safeguard this here.
+		// v0.7.6: It is possible that, after the user hit the delete command of
+		// vertices, the user then select a Stretch BEFORE the delete command is
+		// completed. In that case the stretch id will be invalid, leading to
+		// fatal error. We safeguard this here.
 		if(!stretch) return null;
 
 		return stretch.$complete();
 	}
 
 	export /* istanbul ignore next: covered in practice */
-	function moveDevice(stretchId: string, index: number, location: IPoint): void {
+	function moveDevice(
+		stretchId: string, index: number, location: IPoint
+	): void {
 		const stretch = State.$stretches.get(stretchId)!;
 		const repo = stretch.$repo;
 		const device = repo.$pattern!.$devices[index];
@@ -95,7 +103,9 @@ export namespace LayoutController {
 		Processor.$run(patternTask);
 	}
 
-	function addPolygon(set: CPLine[], polygon: Polygon, type: CreaseType): void {
+	function addPolygon(
+		set: CPLine[], polygon: Polygon, type: CreaseType
+	): void {
 		for(const path of polygon) {
 			const l = path.length;
 			for(let i = 0; i < l; i++) {
@@ -105,7 +115,9 @@ export namespace LayoutController {
 		}
 	}
 
-	function addLines(set: CPLine[], lines: readonly ILine[], type: CreaseType): void {
+	function addLines(
+		set: CPLine[], lines: readonly ILine[], type: CreaseType
+	): void {
 		for(const line of lines) {
 			const [p1, p2] = line;
 			set.push({ type, p1, p2 });

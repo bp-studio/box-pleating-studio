@@ -14,7 +14,8 @@ import type { Project } from "client/project/project";
  */
 //=================================================================
 
-export abstract class Grid extends Destructible implements ISerializable<JSheet>, ITagObject {
+export abstract class Grid extends Destructible
+	implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $tag: string;
 	public readonly $project: Project;
@@ -74,7 +75,8 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	public abstract $getCenter(): IPoint;
 
 	/**
-	 * Given an {@link IDimension}, check if the values are valid, and fix them if not.
+	 * Given an {@link IDimension}, check if the values are valid, and fix them
+	 * if not.
 	 * Used during optimization.
 	 */
 	public abstract $fixDimension(d: IDimension): void;
@@ -83,7 +85,9 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	 * Transformation matrix for a given point for CP exporting.
 	 * See {@link TransformationMatrix} for format.
 	 */
-	public abstract $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix;
+	public abstract $getTransformMatrix(
+		size: number, reorient: boolean
+	): TransformationMatrix;
 
 	/**
 	 * Change the dimension by internal functions instead of by UI.
@@ -91,9 +95,9 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	 */
 	public abstract $setDimension(width: number, height: number): void;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected method
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected _testFit(): boolean {
 		for(const c of this._sheet.$independents) {

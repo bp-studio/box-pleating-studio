@@ -26,7 +26,10 @@ export class AAIntersector extends Intersector {
 	 */
 	public $possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void {
 		if(!ev1 || !ev2) return;
-		if(!this._checkSelfIntersection && ev1.$segment.$polygon === ev2.$segment.$polygon) return;
+		if(
+			!this._checkSelfIntersection &&
+			ev1.$segment.$polygon === ev2.$segment.$polygon
+		) return;
 		this._processAALineSegments(ev1, ev2);
 	}
 }

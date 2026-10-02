@@ -14,12 +14,13 @@ const NIL = { $rank: -1 };
 /**
  * {@link RavlTree} is a new breed of BST published in the 2016 paper
  * [Deletion Without Rebalancing in Binary Search Trees](http://sidsen.azurewebsites.net/papers/ravl-trees-journal.pdf).
- * Its characteristic is that it does not require any rebalancing when deleting a node,
- * and like {@link RedBlackTree}, it requires at most two rotations when inserting a node,
- * making its operation very fast. In practice, its tree height is not much higher
- * than that of a red-black tree (the theoretical upper bound of its tree height is
- * the logarithm of the number of operations), so if the comparator is fast enough,
- * its performance can surpass that of a red-black tree.
+ * Its characteristic is that it does not require any rebalancing when deleting
+ * a node, and like {@link RedBlackTree}, it requires at most two rotations when
+ * inserting a node, making its operation very fast. In practice, its tree
+ * height is not much higher than that of a red-black tree (the theoretical
+ * upper bound of its tree height is the logarithm of the number of operations),
+ * so if the comparator is fast enough, its performance can surpass that of a
+ * red-black tree.
  */
 //=================================================================
 
@@ -86,9 +87,9 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		// No rebalancing required!
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _fixInsert(x: Node<K, V>): void {
 		while(x.$parent !== this._nil && _is01Node(x.$parent)) {
@@ -121,7 +122,9 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		y.$rank--;
 	}
 
-	private _doubleRotateRight(x: Node<K, V>, y: Node<K, V>, z: Node<K, V>): void {
+	private _doubleRotateRight(
+		x: Node<K, V>, y: Node<K, V>, z: Node<K, V>
+	): void {
 		this._replaceChild(y.$parent, y, z);
 		x.$right = z.$left;
 		z.$left.$parent = x;
@@ -133,7 +136,9 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 		y.$parent = z;
 	}
 
-	private _doubleRotateLeft(x: Node<K, V>, y: Node<K, V>, z: Node<K, V>): void {
+	private _doubleRotateLeft(
+		x: Node<K, V>, y: Node<K, V>, z: Node<K, V>
+	): void {
 		this._replaceChild(y.$parent, y, z);
 		x.$left = z.$right;
 		z.$right.$parent = x;
@@ -147,6 +152,8 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 }
 
 function _is01Node<K, V>(node: Node<K, V>): boolean {
-	return node.$rank === node.$left.$rank && node.$rank === node.$right.$rank + 1 ||
-		node.$rank === node.$right.$rank && node.$rank === node.$left.$rank + 1;
+	const rank = node.$rank;
+	const left = node.$left.$rank, right = node.$right.$rank;
+	return rank === left && rank === right + 1 ||
+		rank === right && rank === left + 1;
 }

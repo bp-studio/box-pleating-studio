@@ -5,8 +5,9 @@ import { rectangularConstrain, constrainVertex, constrainFlap, diagonalConstrain
 import type { JDesign, JProject, JSheet } from "shared/json";
 
 /**
- * Since v0.6.7 we imposes hard limits on sheet sizes, tree heights, and number of vertices.
- * That means project files created before v0.6.7 could violate these limits in theory.
+ * Since v0.6.7 we imposes hard limits on sheet sizes, tree heights, and number
+ * of vertices. That means project files created before v0.6.7 could violate
+ * these limits in theory.
  *
  * Although such violations are clearly results of trolling users,
  * we still have to handle them in order to avoid triggering fatal errors.
@@ -29,7 +30,9 @@ export default function $process(proj: Pseudo<JProject>): boolean {
 	if(!checkSheet(treeSheet)) {
 		const constrain = createConstrainFunc(treeSheet);
 		for(const n of design.tree!.nodes) {
-			const v = constrainVertex(constrain, { x: n.x, y: n.y }, { x: 0, y: 0 });
+			const v = constrainVertex(
+				constrain, { x: n.x, y: n.y }, { x: 0, y: 0 }
+			);
 			n.x += v.x;
 			n.y += v.y;
 		}
@@ -43,7 +46,9 @@ export default function $process(proj: Pseudo<JProject>): boolean {
 		for(const f of design.layout.flaps) {
 			f.width = Math.min(f.width, layoutSheet.width);
 			f.height = Math.min(f.height, layoutSheet.height);
-			const v = constrainFlap(constrain, { x: f.x, y: f.y }, f.width, f.height, { x: 0, y: 0 });
+			const v = constrainFlap(
+				constrain, { x: f.x, y: f.y }, f.width, f.height, { x: 0, y: 0 }
+			);
 			f.x += v.x;
 			f.y += v.y;
 		}
@@ -59,7 +64,8 @@ const constrainFunc = {
 };
 
 function createConstrainFunc(sheet: JSheet) {
-	return (p: IPoint) => constrainFunc[sheet.type](sheet.width, sheet.height, p);
+	return (p: IPoint) =>
+		constrainFunc[sheet.type](sheet.width, sheet.height, p);
 }
 
 function checkSheet(sheet: JSheet): boolean {

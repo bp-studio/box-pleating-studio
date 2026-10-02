@@ -16,8 +16,9 @@ interface Invader {
 const invasionMap = new Map<NodeId, Invader[]>();
 
 /**
- * The quadrants (as {@link QuadrantCode}s) carved in the rough contours, updated by {@link roughContourTask}.
- * This persists across rounds, as the graphics could be updated without the rough contours being recalculated.
+ * The quadrants (as {@link QuadrantCode}s) carved in the rough contours,
+ * updated by {@link roughContourTask}. This persists across rounds, as the
+ * graphics could be updated without the rough contours being recalculated.
  */
 const carvedQuadrants = new Set<QuadrantCode>();
 
@@ -27,7 +28,10 @@ export function setCarvedQuadrants(codes: Iterable<QuadrantCode>): void {
 	for(const code of codes) carvedQuadrants.add(code);
 }
 
-/** Whether the given quadrant is carved in the rough contours (see {@link ValidJunction.$invasion}). */
+/**
+ * Whether the given quadrant is carved in the rough contours
+ * (see {@link ValidJunction.$invasion}).
+ */
 export function isCarvedQuadrant(code: QuadrantCode): boolean {
 	return carvedQuadrants.has(code);
 }
@@ -47,9 +51,10 @@ export function updateInvasionMap(junctions: Junctions): void {
 }
 
 /**
- * Find the quadrants (as {@link QuadrantCode}s) of the leaves under the given node
- * that are carved by invasions (see {@link ValidJunction.$invasion}) of flaps also under the node.
- * If any of the invaders is outside the node, the quadrant is not considered carved here.
+ * Find the quadrants (as {@link QuadrantCode}s) of the leaves under the given
+ * node that are carved by invasions (see {@link ValidJunction.$invasion}) of
+ * flaps also under the node. If any of the invaders is outside the node, the
+ * quadrant is not considered carved here.
  */
 export function getCarvedQuadrants(node: ITreeNode): Set<QuadrantCode> {
 	const result = new Set<QuadrantCode>();

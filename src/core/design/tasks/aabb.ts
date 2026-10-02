@@ -13,7 +13,10 @@ import type { ITreeNode } from "../context";
 export const AABBTask = new Task(aabb, junctionTask);
 
 function aabb(): void {
-	climb(updater, State.$lengthChanged, State.$nodeAABBChanged, State.$parentChanged);
+	climb(
+		updater,
+		State.$lengthChanged, State.$nodeAABBChanged, State.$parentChanged
+	);
 }
 
 function updater(node: ITreeNode): boolean {

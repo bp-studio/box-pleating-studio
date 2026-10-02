@@ -16,7 +16,8 @@ import type { Point } from "core/math/geometry/point";
 
 //=================================================================
 /**
- * {@link Joiner} search for possible {@link Gadget}s and cache them during joining.
+ * {@link Joiner} search for possible {@link Gadget}s and cache them during
+ * joining.
  */
 //=================================================================
 
@@ -56,9 +57,11 @@ export class Joiner {
 	constructor(overlaps: readonly JOverlap[], repo: Repository) {
 		const junctions: JJunction[] = [];
 		const [o1, o2] = overlaps;
-		if(o1.ox == o2.ox || o1.oy == o2.oy) return; // No need to continue in this case
+		// No need to continue in this case
+		if(o1.ox == o2.ox || o1.oy == o2.oy) return;
 
-		//TODO: allowing pass in a predefined list of pieces for better performance
+		//TODO: allowing pass in a predefined list of pieces
+		// for better performance
 		[this.g1, this.g2] = overlaps.map(o => {
 			const j = repo.$junctions[o.parent];
 			junctions.push(j);
@@ -70,7 +73,8 @@ export class Joiner {
 		this.$isClockwise = o1.ox > o2.ox;
 		this.q = this.$oriented ? 0 : 2;
 		[this.q1, this.q2] = this._getQuadrantCombination();
-		this.$intersectionDist = repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
+		this.$intersectionDist =
+			repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
 		this.w1 = j1.sx;
 		this.w2 = j2.sx;
 
@@ -80,9 +84,9 @@ export class Joiner {
 			[getReverseShift(o1, j1), getReverseShift(o2, j2)];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public *$simpleJoin(strategy?: Strategy): Generator<JDevice> {
 		const { s1, s2 } = this;
@@ -114,9 +118,9 @@ export class Joiner {
 		return piece.$shape.value.ridges[q].$intersection(pt, testVector);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private *join<T extends JoinLogic>(
 		Logic: new (joiner: Joiner, p1: Piece, p2: Piece) => T,
@@ -139,9 +143,11 @@ export class Joiner {
 
 	private _getQuadrantCombination(): [QuadrantDirection, QuadrantDirection] {
 		if(this.$oriented) {
-			return this.$isClockwise ? [Direction.LL, Direction.UL] : [Direction.UL, Direction.LL];
+			return this.$isClockwise ?
+				[Direction.LL, Direction.UL] : [Direction.UL, Direction.LL];
 		} else {
-			return this.$isClockwise ? [Direction.UR, Direction.LR] : [Direction.LR, Direction.UR];
+			return this.$isClockwise ?
+				[Direction.UR, Direction.LR] : [Direction.LR, Direction.UR];
 		}
 	}
 }
@@ -149,5 +155,6 @@ export class Joiner {
 function getReverseShift(o: JOverlap, j: JJunction): IPoint | undefined {
 	const x = o.ox + (o.shift?.x ?? 0), y = o.oy + (o.shift?.y ?? 0);
 	if(x == j.ox && y == j.oy) return undefined;
-	return { x: x - j.ox, y: y - j.oy }; // We return negative value on purpose here
+	// We return negative value on purpose here
+	return { x: x - j.ox, y: y - j.oy };
 }

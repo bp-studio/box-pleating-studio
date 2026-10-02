@@ -14,7 +14,9 @@ export interface UnionResult {
 	 */
 	paths: PathEx[];
 
-	/** The indices of source {@link Polygon}s that contribute to this component. */
+	/**
+	 * The indices of source {@link Polygon}s that contribute to this component.
+	 */
 	from: readonly number[];
 }
 
@@ -37,8 +39,8 @@ export class RoughUnion extends AAUnion {
 		/**
 		 * In our use case, the inputs are the expanded rough contours
 		 * of child components, and in general it is possible for
-		 * non-self-intersecting contours to become self-intersecting after expansion
-		 * (both for the outer boundary and for the inner holes),
+		 * non-self-intersecting contours to become self-intersecting after
+		 * expansion (both for the outer boundary and for the inner holes),
 		 * so we should always check for self-intersections.
 		 */
 		super(true);
@@ -52,23 +54,27 @@ export class RoughUnion extends AAUnion {
 		});
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected override _initialize(components: Polygon[]): void {
 		this._unionFind = new ListUnionFind(components.length);
 		super._initialize(components);
 	}
 
-	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
+	protected override _setInsideFlag(
+		event: StartEvent, prev?: StartEvent
+	): void {
 		super._setInsideFlag(event, prev);
 		const source = event.$segment.$polygon;
 		if(!event.$isInside && event.$wrapDelta === 1) {
 			this._unionFind.$add(source);
 		} else {
 			const prevSource = prev!.$segment.$polygon;
-			if(source !== prevSource) this._unionFind.$union(source, prevSource);
+			if(source !== prevSource) {
+				this._unionFind.$union(source, prevSource);
+			}
 		}
 	}
 }

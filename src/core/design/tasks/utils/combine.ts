@@ -38,7 +38,9 @@ export function combineContour(node: ITreeNode): void {
 	g.$contours = result.flatMap(toGraphicalContours);
 }
 
-function insertOuter(patternContours: PatternContour[], result: RationalContour[]): void {
+function insertOuter(
+	patternContours: PatternContour[], result: RationalContour[]
+): void {
 	for(const contour of patternContours) {
 		if(contour.$for !== undefined) {
 			// If we know the pairing, we can process directly
@@ -53,7 +55,9 @@ function insertOuter(patternContours: PatternContour[], result: RationalContour[
 	}
 }
 
-function tryInsertOuter(patternContour: PatternContour, rough: RationalContour): boolean {
+function tryInsertOuter(
+	patternContour: PatternContour, rough: RationalContour
+): boolean {
 	for(const outer of rough.$outer) {
 		if(tryInsert(outer, patternContour)) return true;
 	}
@@ -61,13 +65,17 @@ function tryInsertOuter(patternContour: PatternContour, rough: RationalContour):
 	return false;
 }
 
-function insertInner(childrenPatternContours: PatternContour[], result: RationalContour[]): void {
+function insertInner(
+	childrenPatternContours: PatternContour[], result: RationalContour[]
+): void {
 	for(const childContour of childrenPatternContours) {
 		tryInsertInner(childContour, result);
 	}
 }
 
-function tryInsertInner(childContour: PatternContour, result: RationalContour[]): void {
+function tryInsertInner(
+	childContour: PatternContour, result: RationalContour[]
+): void {
 	for(const contour of result) {
 		for(const inner of contour.$inner) {
 			const leaves = inner.leaves || contour.$leaves;
@@ -79,7 +87,8 @@ function tryInsertInner(childContour: PatternContour, result: RationalContour[])
 }
 
 /**
- * Replace the part of the path between the two ends of the inserted path (which should lie on the path).
+ * Replace the part of the path between the two ends of the inserted path
+ * (which should lie on the path).
  * Returns `false` if the ends are not found on the path.
  */
 export function tryInsert(path: RationalPath, insert: RationalPath): boolean {
@@ -89,7 +98,10 @@ export function tryInsert(path: RationalPath, insert: RationalPath): boolean {
 	let start: number | undefined, end: number | undefined;
 	for(let i = 0; i < l; i++) {
 		const line = new Line(path[i], path[i + 1] || path[0]);
-		if(start === undefined && (line.$contains(first) || line.p1.eq(first))) {
+		if(
+			start === undefined &&
+			(line.$contains(first) || line.p1.eq(first))
+		) {
 			start = i + 1;
 		}
 		if(end === undefined && (line.$contains(last) || line.p2.eq(last))) {
@@ -176,7 +188,9 @@ function simplify(path: PathEx): PathEx {
 		const prev = deduplicated[j];
 		const p = deduplicated[i];
 		const next = deduplicated[i + 1];
-		if((prev.x != p.x || next.x != p.x) && (prev.y != p.y || next.y != p.y)) result.push(p);
+		const isCorner = (prev.x != p.x || next.x != p.x) &&
+			(prev.y != p.y || next.y != p.y);
+		if(isCorner) result.push(p);
 	}
 	result.isHole = path.isHole;
 	return result;

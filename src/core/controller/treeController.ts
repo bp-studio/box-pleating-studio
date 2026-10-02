@@ -22,9 +22,12 @@ export namespace TreeController {
 	 * Batch perform tree editing. Used in history navigation.
 	 * @param rootId: The {@link TreeNode.id} of the expected root.
 	 * @param flaps Prototypes {@link JFlap}s for newly created leaves.
-	 * @param stretches Prototype {@link JStretch}s for newly created stretches.
+	 * @param stretches Prototype {@link JStretch}s for newly created
+	 * stretches.
 	 */
-	export function edit(edits: JEdit[], rootId: NodeId, flaps: JFlap[], stretches: JStretch[]): void {
+	export function edit(
+		edits: JEdit[], rootId: NodeId, flaps: JFlap[], stretches: JStretch[]
+	): void {
 		const tree = State.m.$tree;
 		for(const e of edits) {
 			if(e[0]) tree.$addEdge(e[1].n1, e[1].n2, e[1].length);
@@ -38,7 +41,9 @@ export namespace TreeController {
 	}
 
 	/** Add a new leaf. */
-	export function addLeaf(id: NodeId, at: NodeId, length: number, flap: JFlap): void {
+	export function addLeaf(
+		id: NodeId, at: NodeId, length: number, flap: JFlap
+	): void {
 		const node = State.m.$tree.$addEdge(id, at, length);
 		node.$setFlap(flap);
 		Processor.$run(heightTask);
@@ -46,8 +51,10 @@ export namespace TreeController {
 
 	/**
 	 * Delete leaves one by one.
-	 * @param ids The node ids that should be deleted. Must be in correct ordering.
-	 * @param prototypes The {@link JFlap}s corresponding to the new leaves after deletion.
+	 * @param ids The node ids that should be deleted.
+	 * Must be in correct ordering.
+	 * @param prototypes The {@link JFlap}s corresponding to the new leaves
+	 * after deletion.
 	 */
 	export function removeLeaf(ids: NodeId[], prototypes: JFlap[]): void {
 		const tree = State.m.$tree;
@@ -72,10 +79,13 @@ export namespace TreeController {
 		Processor.$run(heightTask);
 	}
 
-	export function getHierarchy(random: boolean, useDimension: boolean): Hierarchy[] {
+	export function getHierarchy(
+		random: boolean, useDimension: boolean
+	): Hierarchy[] {
 		if(!random) {
+			const leaves = State.m.$tree.$nodes.filter(n => n && n.$isLeaf);
 			return [{
-				leaves: State.m.$tree.$nodes.filter(n => n && n.$isLeaf).map(n => n!.id),
+				leaves: leaves.map(n => n!.id),
 				distMap: distMap(State.m.$tree.$nodes),
 				parents: [],
 			}];
@@ -89,13 +99,20 @@ export namespace TreeController {
 		const result: TreeStructure = [];
 		for(const node of State.m.$tree.$nodes) {
 			if(!node) continue;
-			result.push({ id: node.id, parent: node.$parent ? node.$parent.id : null, dist: node.$dist });
+			result.push({
+				id: node.id,
+				parent: node.$parent ? node.$parent.id : null,
+				dist: node.$dist,
+			});
 		}
 		return result;
 	}
 }
 
-/** For a given edge, returns the {@link ITreeNode.id id} of the node that is the child */
+/**
+ * For a given edge, returns the {@link ITreeNode.id id} of the node that is
+ * the child
+ */
 export function getChildId(edge: JEdgeBase): NodeId {
 	const tree = State.m.$tree;
 	const n1 = tree.$nodes[edge.n1]!, n2 = tree.$nodes[edge.n2]!;

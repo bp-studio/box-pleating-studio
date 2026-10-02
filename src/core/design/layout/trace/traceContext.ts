@@ -36,7 +36,8 @@ export class TraceContext {
 
 	/**
 	 * @param trace The underlying {@link Trace} instance.
-	 * @param hinges The hinge path. It is assumed to be simplified and oriented counterclockwise.
+	 * @param hinges The hinge path. It is assumed to be simplified and oriented
+	 * counterclockwise.
 	 */
 	constructor(trace: Trace, hinges: Path) {
 		this._trace = trace;
@@ -48,16 +49,22 @@ export class TraceContext {
 	}
 
 	/**
-	 * Find the first candidate line that intersects the pattern, and decide the initial ray.
+	 * Find the first candidate line that intersects the pattern, and decide the
+	 * initial ray.
 	 */
-	public $getInitialNode(ridges: Set<Ridge>, startDiagonal?: SideDiagonal): TraceNode | null {
-		// If the start diagonal hits the hinges, the hinges before it lie outside the starting line,
-		// and they should not be considered (they could hit some ridges, especially when the hinges
-		// are carved in raw mode; see getQuadrantShape).
+	public $getInitialNode(
+		ridges: Set<Ridge>, startDiagonal?: SideDiagonal
+	): TraceNode | null {
+		// If the start diagonal hits the hinges, the hinges before it lie
+		// outside the starting line, and they should not be considered (they
+		// could hit some ridges, especially when the hinges are carved in raw
+		// mode; see getQuadrantShape).
 		let startIndex = 0;
 		const diagonal = startDiagonal;
 		if(diagonal) {
-			const index = this._hinges.findIndex(h => h.$intersectLine(diagonal, false));
+			const index = this._hinges.findIndex(
+				h => h.$intersectLine(diagonal, false)
+			);
 			if(index >= 0) startIndex = index;
 		}
 		for(const hinge of this._hinges.slice(startIndex)) {
@@ -68,7 +75,8 @@ export class TraceContext {
 			if(startDiagonal) {
 				const p = hinge.$intersectLine(startDiagonal, false);
 				if(p) {
-					const hv = this._diagonalHitInitialVector(hinge, v, startDiagonal);
+					const hv =
+						this._diagonalHitInitialVector(hinge, v, startDiagonal);
 					if(!p.eq(startDiagonal.p0)) {
 						return { point: p, vector: hv };
 					} else {
@@ -83,7 +91,9 @@ export class TraceContext {
 			// Case 2: normal ridges
 			const intersection = getNextIntersection(
 				ridges, ray,
-				hinge.p1 // In finding initial vector, the head of the hinge should be ignored.
+				// In finding initial vector, the head of the hinge should be
+				// ignored.
+				hinge.p1
 			);
 			if(!intersection) continue;
 			const result = {
@@ -104,30 +114,36 @@ export class TraceContext {
 	public $trim(path: RationalPath): PatternContour | null {
 		if(path.length <= 1) return null;
 		const firstLine = new Line(path[0], path[1]);
-		const lastLine = new Line(path[path.length - 2], path[path.length - 1]);
+		const lastLine =
+			new Line(path[path.length - 2], path[path.length - 1]);
 		if(this._testEndPoints(lastLine, false)) path.pop();
 		if(this._testEndPoints(firstLine, true)) path.shift();
 		if(path.length <= 1) return null;
 		return path as PatternContour;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _testEndPoints(line: Line, start: boolean): boolean {
 		for(const hinge of this._hinges) {
-			if(hinge.$contains(start ? line.p2 : line.p1) && hinge.$vector.$parallel(line.$vector)) return true;
+			const p = start ? line.p2 : line.p1;
+			if(hinge.$contains(p) && hinge.$vector.$parallel(line.$vector)) {
+				return true;
+			}
 		}
 		return false;
 	}
 
 	/**
 	 * If the first line hit by a candidate line is a {@link SideDiagonal},
-	 * it may or may not reflect about it, depending on whether the {@link RoughContour}
-	 * wraps around {@link SideDiagonal.p0}.
+	 * it may or may not reflect about it, depending on whether the
+	 * {@link RoughContour} wraps around {@link SideDiagonal.p0}.
 	 */
-	private _diagonalHitInitialVector(hinge: Line, v: Vector, diagonal: SideDiagonal): Vector {
+	private _diagonalHitInitialVector(
+		hinge: Line, v: Vector, diagonal: SideDiagonal
+	): Vector {
 		const cornerIsOnOutside = hinge.$pointIsOnRight(diagonal.p0, true);
 		const forward = this._trace.$direction == SlashDirection.FW;
 		const resultIsVertical = forward == cornerIsOnOutside;
@@ -137,9 +153,12 @@ export class TraceContext {
 }
 
 /**
- * @param omit If given, this point will be considered invalid intersection and ignored.
+ * @param omit If given, this point will be considered invalid intersection and
+ * ignored.
  */
-export function getNextIntersection(ridges: Iterable<Ridge>, node: TraceNode, omit?: Point): RidgeIntersection | null {
+export function getNextIntersection(
+	ridges: Iterable<Ridge>, node: TraceNode, omit?: Point
+): RidgeIntersection | null {
 	let result: RidgeIntersection | null = null;
 	const { point, vector, last: shift } = node;
 	for(const ridge of ridges) {
@@ -147,7 +166,8 @@ export function getNextIntersection(ridges: Iterable<Ridge>, node: TraceNode, om
 			ridge, point, vector,
 			true,
 			Boolean(omit),
-			ridge.$type !== undefined	// Outgoing ridges should be treated as rays.
+			// Outgoing ridges should be treated as rays.
+			ridge.$type !== undefined
 		) as RidgeIntersection | null;
 
 		if(!intersection || omit && intersection.point.eq(omit)) continue;
@@ -193,7 +213,9 @@ function isSideDiagonal(line: Line): line is SideDiagonal {
  * Given a ridge, imagine that if we slightly shift our tracing contour inwards,
  * can we still touch the ridge?
  */
-function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): boolean {
+function isShiftTouchable(
+	ridge: Line, from: Point, v: Vector, ang?: number
+): boolean {
 	const rv = v.$rotate90();
 	const v1 = ridge.p1.$sub(from), v2 = ridge.p2.$sub(from);
 	const r1 = v1.$dot(rv), r2 = v2.$dot(rv);
@@ -206,15 +228,16 @@ function isShiftTouchable(ridge: Line, from: Point, v: Vector, ang?: number): bo
 		(
 			// At least one endpoint is in front
 			d1 > 0 || d2 > 0 ||
-			// or, the angle of the given ridge is further in front of the previously hit ridge
+			// or, the angle of the given ridge is further in front of the
+			// previously hit ridge
 			Boolean(ang) && getAngle(v, ridge.$vector) > ang!
 		);
 	return result;
 }
 
 /**
- * Find lines in the {@link RoughContour} that might intersect with the pattern,
- * in counter-clockwise ordering.
+ * Find lines in the {@link RoughContour} that might intersect with the
+ * pattern, in counter-clockwise ordering.
  */
 function candidateRoughContourLines(path: Path): Line[] {
 	const result = [];

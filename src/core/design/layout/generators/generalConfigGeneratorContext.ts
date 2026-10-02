@@ -52,8 +52,10 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const configs: Configuration[][] = [];
 		for(const [i, junction] of this._junctions.entries()) {
 			const c1 = junction.c[0], c2 = junction.c[2];
-			getOrSetEmptyArray(junctionMap, makeQuadrantCode(c1.e as NodeId, c1.q!)).push(i);
-			getOrSetEmptyArray(junctionMap, makeQuadrantCode(c2.e as NodeId, c2.q!)).push(i);
+			const code1 = makeQuadrantCode(c1.e as NodeId, c1.q!);
+			const code2 = makeQuadrantCode(c2.e as NodeId, c2.q!);
+			getOrSetEmptyArray(junctionMap, code1).push(i);
+			getOrSetEmptyArray(junctionMap, code2).push(i);
 			configs[i] = [...singleConfigGenerator(this, i)];
 		}
 
@@ -70,12 +72,15 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 					max,
 					items: junctionIndices.map(i => {
 						const j = this._junctions[i];
+						const oppositeId = j.c[0].e == nodeId ?
+							j.c[2].e : j.c[0].e;
 						return {
 							index: i,
 							junction: j,
-							oppositeNodeId: (j.c[0].e == nodeId ? j.c[2].e : j.c[0].e) as NodeId,
+							oppositeNodeId: oppositeId as NodeId,
 							configs: configs[i],
-							split: configs[i][0] && configs[i][0].$partitions.length > 1,
+							split: configs[i][0] &&
+								configs[i][0].$partitions.length > 1,
 						};
 					}),
 				});
@@ -87,8 +92,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	}
 
 	/**
-	 * To not overwhelm ourselves, let's put some conditions to restrict the processing
-	 * to previously solved cases, and then we will progressively allow more cases.
+	 * To not overwhelm ourselves, let's put some conditions to restrict the
+	 * processing to previously solved cases, and then we will progressively
+	 * allow more cases.
 	 *
 	 * TODO: allowing more cases here.
 	 */
@@ -102,7 +108,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		return true;
 	}
 
-	public *$rankCombination(targetRank: number, ranks: number[] = []): Generator<number[]> {
+	public *$rankCombination(
+		targetRank: number, ranks: number[] = []
+	): Generator<number[]> {
 		if(targetRank < 0) return;
 		const depth = ranks.length;
 		const joint = this._joints[depth];
@@ -110,7 +118,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			if(targetRank <= joint.max) yield ranks.concat(targetRank);
 		} else {
 			for(let rank = 0; rank <= joint.max && rank <= targetRank; rank++) {
-				yield* this.$rankCombination(targetRank - rank, ranks.concat(rank));
+				yield* this.$rankCombination(
+					targetRank - rank, ranks.concat(rank)
+				);
 			}
 		}
 	}
@@ -128,7 +138,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		const splitCount = joint.items.filter(item => item.split).length;
 		if(splitCount == 0) {
-			const partitions = this._searchJoinPartitions(() => this._itemsToOverlaps(joint.items), rank);
+			const partitions = this._searchJoinPartitions(
+				() => this._itemsToOverlaps(joint.items), rank
+			);
 			for(const partition of partitions) {
 				yield this.$make([partition]);
 			}
@@ -137,11 +149,13 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	private *_searchRelay(items: readonly JointItem[], rank: number): Generator<Configuration> {
+	private *_searchRelay(
+		items: readonly JointItem[], rank: number
+	): Generator<Configuration> {
 		let strategy: Strategy | undefined;
 		if(rank == UNIVERSAL_RANK) strategy = Strategy.universal;
 		else if(rank == HALF_INTEGRAL_RANK) strategy = Strategy.halfIntegral;
@@ -153,12 +167,16 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
-	private *_searchJoinPartitions(factory: () => JOverlap[], rank: number): Generator<JPartition> {
+	private *_searchJoinPartitions(
+		factory: () => JOverlap[], rank: number
+	): Generator<JPartition> {
 		yield* this._searchJoin(factory(), rank);
 		if(rank > 2) yield* this._searchRelayJoin(factory(), rank - 1);
 	}
 
-	private *_searchJoin(overlaps: JOverlap[], rank: number): Generator<JPartition> {
+	private *_searchJoin(
+		overlaps: JOverlap[], rank: number
+	): Generator<JPartition> {
 		const strategy = resolveJoinRank(rank);
 		if(!strategy && rank != 2) return;
 
@@ -170,7 +188,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		yield { overlaps, strategy };
 	}
 
-	private *_searchRelayJoin(overlaps: JOverlap[], rank: number): Generator<JPartition> {
+	private *_searchRelayJoin(
+		overlaps: JOverlap[], rank: number
+	): Generator<JPartition> {
 		const strategy = resolveJoinRank(rank);
 		if(!strategy && rank != 2) return;
 
@@ -196,17 +216,24 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
-	private *_searchSplitJoin(joint: Joint, rank: number): Generator<Configuration> {
-		joint.splitItems ||= joint.items.map(i => toSplitItems(i, joint.nodeId));
+	private *_searchSplitJoin(
+		joint: Joint, rank: number
+	): Generator<Configuration> {
+		joint.splitItems ||=
+			joint.items.map(i => toSplitItems(i, joint.nodeId));
 		for(const item1 of joint.splitItems[0]) {
 			for(const item2 of joint.splitItems[1]) {
 				// This is not supported for the moment, so we skip it for now.
 				// TODO: But this is doable in theory. Try to implement this.
-				if(item1.split?.isHorizontal == item2.split?.isHorizontal) continue;
+				if(item1.split?.isHorizontal == item2.split?.isHorizontal) {
+					continue;
+				}
 
 				const o1 = item1.overlap, o2 = item2.overlap;
 				if(cover(o1, o2) || cover(o2, o1)) continue;
-				const joins = this._searchJoinPartitions(() => clone([o1, o2]), rank);
+				const joins = this._searchJoinPartitions(
+					() => clone([o1, o2]), rank
+				);
 				for(const join of joins) {
 					const partitions = [join];
 					const remain1 = getExposedPart(item1, item2, join);
@@ -219,7 +246,10 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
-	/** This method should be called each time to create new {@link JOverlap} instances. */
+	/**
+	 * This method should be called each time to create new {@link JOverlap}
+	 * instances.
+	 */
 	private _itemsToOverlaps(items: readonly JointItem[]): JOverlap[] {
 		return items.map(item => this.$toOverlap(item.junction, item.index));
 	}
@@ -227,15 +257,19 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	/**
 	 * Setup parameters to join {@link o2} onto {@link o1}.
 	 *
-	 * @param oriented The shared corner of {@link o1} and {@link o2} is on the lower left
+	 * @param oriented The shared corner of {@link o1} and {@link o2} is on the
+	 * lower left
 	 * @param reverse Join in the reversed way ({@link o1} onto {@link o2})
 	 *
 	 * @returns Whichever {@link JOverlap} that joins onto the other.
 	 */
-	private _joinOverlaps(o1: JOverlap, o2: JOverlap, oriented: boolean, reverse = false): JOverlap {
+	private _joinOverlaps(
+		o1: JOverlap, o2: JOverlap, oriented: boolean, reverse = false
+	): JOverlap {
 		if(reverse) [o1, o2] = [o2, o1];
 		const c = oriented ? Direction.UR : Direction.LL;
-		const offset = o2.ox > o1.ox ? previousQuadrantOffset : nextQuadrantOffset;
+		const offset = o2.ox > o1.ox ?
+			previousQuadrantOffset : nextQuadrantOffset;
 		const q = (offset + c) % quadrantNumber;
 		o2.c[c] = { type: CornerType.coincide, e: o1.id, q: c };
 		const other = this._junctions[o1.parent].c[opposite(c)].e!;

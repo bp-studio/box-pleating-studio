@@ -1,8 +1,10 @@
 
 /**
- * Create a unique subtype of the built-in {@link number} type that are mutually incompatible.
+ * Create a unique subtype of the built-in {@link number} type that are mutually
+ * incompatible.
  */
-type TypedNumber<name extends string> = number & { [k in `_${name}`]: undefined };
+type TypedNumber<name extends string> =
+	number & { [k in `_${name}`]: undefined };
 
 /**
  * The constructor of type `T` (default `unknown`).
@@ -46,8 +48,10 @@ type KeysOfType<O, T> = {
 	[K in keyof O]: O[K] extends T ? K : never
 }[keyof O];
 
-// We add undefined here so that the nested properties will be compatible with RecursivePartial
-type RecursivePartial<T> = { [P in keyof T]?: RecursivePartial<T[P]> } | undefined;
+type RecursivePartial<T> =
+	// We add undefined here so that the nested properties will be
+	// compatible with RecursivePartial.
+	{ [P in keyof T]?: RecursivePartial<T[P]> } | undefined;
 
 type PseudoValue<T> =
 	T extends (infer U)[] ? PseudoValue<U>[] :
@@ -56,7 +60,8 @@ type OtherKeys<T, V> = Partial<Record<Exclude<string, keyof T>, V>>;
 type PartialPseudo<T> = { [key in keyof T]?: PseudoValue<T[key]> };
 
 /**
- * In addition to being a {@link RecursivePartial}, there could also be some other
- * properties remaining from the old format (the values are all assumed to be `unknown`).
+ * In addition to being a {@link RecursivePartial}, there could also be some
+ * other properties remaining from the old format (the values are all assumed
+ * to be `unknown`).
  */
 type Pseudo<T> = (T | PartialPseudo<T>) & OtherKeys<T, unknown>;

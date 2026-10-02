@@ -21,8 +21,9 @@ export interface TreeStructureNode {
 }
 
 /**
- * The structure of the tree, in terms of parent relations and distances to the root.
- * This is used by the Optimizer for replicating the covering rules of junctions.
+ * The structure of the tree, in terms of parent relations and distances to the
+ * root. This is used by the Optimizer for replicating the covering rules of
+ * junctions.
  */
 export type TreeStructure = TreeStructureNode[];
 
@@ -43,7 +44,9 @@ export function distMap(nodes: NodeCollection<ITreeNodeBase>): DistMap {
 		const coverage = coverages.get(node)!;
 		const parent = node.$parent;
 		if(!parent) break;
-		const parentCoverage = getOrSetEmptyArray(coverages, parent, () => heap.$insert(parent));
+		const parentCoverage = getOrSetEmptyArray(
+			coverages, parent, () => heap.$insert(parent)
+		);
 		for(const A of parentCoverage) {
 			for(const B of coverage) {
 				result.push([A.id, B.id, dist(A, B, parent)]);
@@ -54,13 +57,18 @@ export function distMap(nodes: NodeCollection<ITreeNodeBase>): DistMap {
 	return result;
 }
 
-/** Return the structural distance between two {@link ITreeNode}s using LCA. */
-export function dist(a: ITreeNodeBase, b: ITreeNodeBase, lca: ITreeNodeBase): number {
+/**
+ * Return the structural distance between two {@link ITreeNode}s using LCA.
+ */
+export function dist(
+	a: ITreeNodeBase, b: ITreeNodeBase, lca: ITreeNodeBase
+): number {
 	return a.$dist + b.$dist - 2 * lca.$dist;
 }
 
 /**
- * Return the structural distance between two nodes without supplying LCA. Used only in unit tests.
+ * Return the structural distance between two nodes without supplying LCA.
+ * Used only in unit tests.
  */
 export function getDist(n1: ITreeNode, n2: ITreeNode): number {
 	return dist(n1, n2, getLCA(n1, n2));

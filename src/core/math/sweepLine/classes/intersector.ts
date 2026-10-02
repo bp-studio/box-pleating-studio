@@ -16,7 +16,10 @@ export abstract class Intersector {
 	/** The {@link StartEvent} that is being processed */
 	protected _currentStart!: StartEvent;
 
-	/** Whether there is a new event being inserted to the front of the event queue. */
+	/**
+	 * Whether there is a new event being inserted to the front of the event
+	 * queue.
+	 */
 	protected _eventInserted: boolean = false;
 
 	private _provider!: EventProvider;
@@ -27,8 +30,13 @@ export abstract class Intersector {
 		this._queue = queue;
 	}
 
-	/** Process possible intersections, and returns if there is an insertion. */
-	public $process(prev: StartEvent | undefined, ev: StartEvent, next: StartEvent | undefined): boolean {
+	/**
+	 * Process possible intersections, and returns if there is an insertion.
+	 */
+	public $process(
+		prev: StartEvent | undefined, ev: StartEvent,
+		next: StartEvent | undefined
+	): boolean {
 		this._currentStart = ev;
 		this._eventInserted = false;
 		this.$possibleIntersection(prev, ev);
@@ -37,38 +45,47 @@ export abstract class Intersector {
 	}
 
 	/**
-	 * This is the main method that the derived classes need to implement,
-	 * which considers various situations to find possible intersection points of the segments,
-	 * and calls the {@link _subdivide} method properly to subdivide the segments.
-	 * The derived classes can make highly optimized performance tuning for specific requirements in this method.
+	 * This is the main method that the derived classes need to implement, which
+	 * considers various situations to find possible intersection points of the
+	 * segments, and calls the {@link _subdivide} method properly to subdivide
+	 * the segments. The derived classes can make highly optimized performance
+	 * tuning for specific requirements in this method.
 	 */
-	public abstract $possibleIntersection(ev1?: StartEvent, ev2?: StartEvent): void;
+	public abstract $possibleIntersection(
+		ev1?: StartEvent, ev2?: StartEvent
+	): void;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Subdivide a segment at the given point, and returns the {@link StartEvent} of the second segment.
+	 * Subdivide a segment at the given point, and returns the
+	 * {@link StartEvent} of the second segment.
 	 *
 	 * Given a segment [A--B] being split at point P, this produces:
-	 * - [A--P] (the original event, with its end redirected to a new EndEvent at P)
+	 * - [A--P] (the original event, with its end redirected to a new EndEvent
+	 *   at P)
 	 * - [P--B] (a new StartEvent at P, linked to the original EndEvent at B)
 	 *
-	 * Both the new StartEvent and the new EndEvent are inserted into the event queue.
+	 * Both the new StartEvent and the new EndEvent are inserted into the event
+	 * queue.
 	 *
-	 * If a neighbor segment (not the currently processed one) gets subdivided and
-	 * the new events fall before the current event in the queue, we set
-	 * {@link _eventInserted} so that {@link DivideAndCollect._processStart} knows
-	 * to re-queue the current event and process the newly inserted ones first.
+	 * If a neighbor segment (not the currently processed one) gets subdivided
+	 * and the new events fall before the current event in the queue, we set
+	 * {@link _eventInserted} so that {@link DivideAndCollect._processStart}
+	 * knows to re-queue the current event and process the newly inserted ones
+	 * first.
 	 */
 	protected _subdivide(event: StartEvent, point: IPoint): StartEvent {
 		const provider = this._provider;
 		const segment = event.$segment;
-		const newSegment = segment.$subdivide(point, event.$point === segment.$start);
+		const newSegment =
+			segment.$subdivide(point, event.$point === segment.$start);
 
 		const end = event.$other;
-		const newStart = provider.$createStart(point, newSegment, event.$wrapDelta);
+		const newStart =
+			provider.$createStart(point, newSegment, event.$wrapDelta);
 		newStart.$other = end;
 		end.$other = newStart;
 		this._queue.$insert(newStart);
@@ -80,7 +97,8 @@ export abstract class Intersector {
 
 		// If the edge being subdivided is not the edge being processed...
 		if(event != this._currentStart && !this._eventInserted) {
-			// ...check if there is a new event being inserted to the front of the event queue
+			// ...check if there is a new event being inserted to the front of
+			// the event queue
 			this._eventInserted ||=
 				provider.$eventComparator(this._currentStart, newStart) > 0 ||
 				provider.$eventComparator(this._currentStart, newEnd) > 0;
@@ -100,19 +118,25 @@ export abstract class Intersector {
 			const x = v.$point.x, y = h.$point.y;
 			const hx1 = h.$point.x, hx2 = h.$other.$point.x;
 			const vy1 = v.$point.y, vy2 = v.$other.$point.y;
-			if(hx1 < x && x < hx2 && vy1 <= y && y <= vy2) this._subdivide(h, { x, y });
-			if(vy1 < y && y < vy2 && hx1 <= x && x <= hx2) this._subdivide(v, { x, y });
+			if(hx1 < x && x < hx2 && vy1 <= y && y <= vy2) {
+				this._subdivide(h, { x, y });
+			}
+			if(vy1 < y && y < vy2 && hx1 <= x && x <= hx2) {
+				this._subdivide(v, { x, y });
+			}
 		} else {
 			this._processOverlap(ev1, ev2, seg1.$isHorizontal);
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Process the case where the two line segment overlaps. */
-	private _processOverlap(ev1: StartEvent, ev2: StartEvent, isHorizontal: boolean): void {
+	private _processOverlap(
+		ev1: StartEvent, ev2: StartEvent, isHorizontal: boolean
+	): void {
 		// We know that ev1 and ev2 are sorted
 		const { x: x1, y: y1 } = ev1.$point;
 		const p2 = ev1.$other.$point, { x: x2, y: y2 } = p2;

@@ -34,7 +34,10 @@ function getRelayParameters(oriented: boolean): QuadrantDirection[] {
 	return oriented ? [0, 1, 2, 3] : [2, 3, 0, 1];
 }
 
-function makeXRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy, s2?: Strategy): JPartition[] {
+function makeXRelay(
+	o1: JOverlap, o2: JOverlap, oriented: boolean,
+	s1?: Strategy, s2?: Strategy
+): JPartition[] {
 	o2.ox -= o1.ox;
 	const [a, b, c, d] = getRelayParameters(oriented);
 	o2.c[c] = { type: CornerType.internal, e: o1.id, q: d };
@@ -47,7 +50,10 @@ function makeXRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy
 	];
 }
 
-function makeYRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy, s2?: Strategy): JPartition[] {
+function makeYRelay(
+	o1: JOverlap, o2: JOverlap, oriented: boolean,
+	s1?: Strategy, s2?: Strategy
+): JPartition[] {
 	o1.oy -= o2.oy;
 	const [a, b, c, d] = getRelayParameters(oriented);
 	o1.c[c] = { type: CornerType.internal, e: o2.id, q: b };

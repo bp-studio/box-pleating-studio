@@ -19,7 +19,10 @@ export interface SplitItem {
 		/** The remaining {@link JPartition}. */
 		remainingPartition: JPartition;
 
-		/** Whether the splitting is horizontal (i.e. the two parts have the same width). */
+		/**
+		 * Whether the splitting is horizontal
+		 * (i.e. the two parts have the same width).
+		 */
 		isHorizontal: boolean;
 	};
 }
@@ -29,10 +32,14 @@ export function cover(o1: JOverlap, o2: JOverlap): boolean {
 }
 
 export function toSplitItems(item: JointItem, nodeId: NodeId): SplitItem[] {
-	return item.configs.map(config => toSplitItem(config, nodeId, item.oppositeNodeId));
+	return item.configs.map(
+		config => toSplitItem(config, nodeId, item.oppositeNodeId)
+	);
 }
 
-function toSplitItem(config: Configuration, nodeId: NodeId, oppositeNodeId: NodeId): SplitItem {
+function toSplitItem(
+	config: Configuration, nodeId: NodeId, oppositeNodeId: NodeId
+): SplitItem {
 	const partitions = config.$rawPartitions;
 	const overlaps = partitions.map(p => p.overlaps[0]);
 	if(partitions.length == 1) return { overlap: overlaps[0], oppositeNodeId };
@@ -44,10 +51,15 @@ function toSplitItem(config: Configuration, nodeId: NodeId, oppositeNodeId: Node
 	})!;
 	const remainingPartition = partitions.find(partition => partition != p);
 	const overlap = p.overlaps[0];
-	return { overlap, oppositeNodeId, split: { remainingPartition, isHorizontal } } as SplitItem;
+	return {
+		overlap, oppositeNodeId,
+		split: { remainingPartition, isHorizontal },
+	} as SplitItem;
 }
 
-export function getExposedPart(item: SplitItem, against: SplitItem, join: JPartition): JPartition | undefined {
+export function getExposedPart(
+	item: SplitItem, against: SplitItem, join: JPartition
+): JPartition | undefined {
 	if(!item.split) return;
 	const itemIsTaller = item.overlap.oy > against.overlap.oy;
 	const isHorizontal = item.split.isHorizontal;
@@ -77,7 +89,8 @@ export function getExposedPart(item: SplitItem, against: SplitItem, join: JParti
 }
 
 function replaceIntersectionCorner(
-	from: JOverlap, to: JOverlap, q: number, socketOverlapId: OverlapId, againstFlapId: NodeId
+	from: JOverlap, to: JOverlap, q: number,
+	socketOverlapId: OverlapId, againstFlapId: NodeId
 ): void {
 	const overlapIsSelf = socketOverlapId == to.id;
 	const target = to.c[q];

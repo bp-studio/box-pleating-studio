@@ -7,12 +7,15 @@ import type { RationalPath } from "./rationalPath";
  * Determine if the given point lies completely inside a polygon
  * (boundary is excluded by default).
  *
- * Based on the [PNPOLY](https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html)
+ * Based on the
+ * [PNPOLY](https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html)
  * algorithm by W. Randolph Franklin.
  *
  * This function is currently not in used, but we keep it just for the record.
  */
-export function pointInPolygon(p: Point, path: RationalPath, boundary = false): boolean {
+export function pointInPolygon(
+	p: Point, path: RationalPath, boundary = false
+): boolean {
 	const l = path.length;
 	// Degenerated case
 	if(l == 2) return boundary && new Line(path[0], path[1]).$contains(p, true);

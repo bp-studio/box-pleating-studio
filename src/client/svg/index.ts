@@ -48,13 +48,16 @@ export function svg(proj: Project, includeHidden: boolean): Blob {
 	return new Blob([content], { type: "image/svg+xml" });
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Headers
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /** Generate the CSS rules. */
 function getStyle(): string {
-	const { border, hinge, ridge, junction, grid, shade, label, edge, vertex, dot, axisParallel } = style;
+	const {
+		border, hinge, ridge, junction, grid, shade,
+		label, edge, vertex, dot, axisParallel,
+	} = style;
 	const s = ProjectService.scale.value;
 	const fontSize = label.size * ProjectService.getSmoothShrinkFactor() / s;
 	const text = `dominant-baseline:middle;text-anchor:middle;font-size:${fontSize}px;font-family:Arial`;
@@ -93,9 +96,9 @@ function getTransform(sheet: Sheet, height: number): string {
 	return `translate(${horOffset} ${verOffset}) scale(${s} ${-s})`;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Layers
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 function getBorderLayer(sheet: Sheet, borderPath: string): string {
 	let result = `<path class="border" d="${borderPath}" />`;
@@ -132,7 +135,8 @@ function getEdgeLayer(design: Design): string {
 function getHingeLayer(design: Design): string {
 	const hidden = !settings.display.hinge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
-	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
+	const objects =
+		[...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
 	for(const obj of objects) {
 		graphics.$class = "hinge";
@@ -148,7 +152,8 @@ function getHingeLayer(design: Design): string {
 function getRidgeLayer(design: Design): string {
 	const hidden = !settings.display.ridge;
 	if(design.mode != "layout" || hidden && !includeHiddenElement) return "";
-	const objects = [...design.layout.$flaps, ...design.layout.$rivers.values()];
+	const objects =
+		[...design.layout.$flaps, ...design.layout.$rivers.values()];
 	const graphics = new SvgGraphics();
 	graphics.$class = "ridge";
 	for(const obj of objects) {
@@ -231,11 +236,13 @@ function getLabelLayer(design: Design): string {
 	return layer(result, false, hidden);
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Utility
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-function layer(content: string, clipped?: boolean, hidden?: boolean, attr?: string): string {
+function layer(
+	content: string, clipped?: boolean, hidden?: boolean, attr?: string
+): string {
 	attr = attr ? " " + attr : "";
 	if(hidden) attr += ` class="hidden"`;
 	return clipped ? `<g clip-path="url(#clip)"${attr}>${content}</g>` : `<g${attr}>${content}</g>`;

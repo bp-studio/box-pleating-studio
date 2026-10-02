@@ -14,7 +14,9 @@ export function deepAssign<T>(target: T, ...sources: RecursivePartial<T>[]): T {
 	return target;
 }
 
-function deepAssignCore<T>(target: T, source: RecursivePartial<T>, ctx: CloneContext): T {
+function deepAssignCore<T>(
+	target: T, source: RecursivePartial<T>, ctx: CloneContext
+): T {
 	if(!(source instanceof Object)) return target;
 
 	// This also applies to the case where s is an array.
@@ -25,7 +27,8 @@ function deepAssignCore<T>(target: T, source: RecursivePartial<T>, ctx: CloneCon
 		const value = source[key] as T[typeof key];
 		if(!(value instanceof Object)) {
 			target[key] = value; // primitive values can be copied directly
-		} else if(target[key] instanceof Object && target[key] != value) { // Make sure that reference is different
+		} else if(target[key] instanceof Object && target[key] != value) {
+			// Make sure that reference is different
 			deepAssignCore(target[key], value, ctx);
 		} else {
 			target[key] = clonePolyfillCore(value, ctx);
@@ -39,7 +42,9 @@ export function clonePolyfill<T extends object | undefined>(source: T): T {
 	return clonePolyfillCore(source, new WeakMap());
 }
 
-function clonePolyfillCore<T extends object | undefined>(source: T, ctx: CloneContext): T {
+function clonePolyfillCore<T extends object | undefined>(
+	source: T, ctx: CloneContext
+): T {
 	if(!source) return source;
 	if(ctx.has(source)) return ctx.get(source) as T;
 

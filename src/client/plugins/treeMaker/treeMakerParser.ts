@@ -55,7 +55,9 @@ export class TreeMakerParser {
 			e.length = Math.max(Math.round(e.length * fix), 1);
 		}
 
-		const sheet: JSheet = { type: GridType.rectangular, width: sw, height: sh };
+		const sheet: JSheet = {
+			type: GridType.rectangular, width: sw, height: sh,
+		};
 		this.$result.design.layout.sheet = sheet;
 		this.$result.design.tree.sheet = sheet;
 	}

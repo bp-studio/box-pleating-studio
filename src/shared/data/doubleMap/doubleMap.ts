@@ -28,13 +28,19 @@ export class DoubleMap<K, V> implements IDoubleMap<K, V> {
 		return this;
 	}
 
-	public get [Symbol.toStringTag](): string { return `DoubleMap(${this._size})`; }
+	public get [Symbol.toStringTag](): string {
+		return `DoubleMap(${this._size})`;
+	}
 
 	public has(key: K): boolean;
 	public has(key1: K, key2: K): boolean;
 	public has(...args: [K] | [K, K]): boolean {
-		if(args.length === 1) return this._map.has(args[0]);
-		else return this._map.has(args[0]) && this._map.get(args[0])!.has(args[1]);
+		if(args.length === 1) {
+			return this._map.has(args[0]);
+		} else {
+			return this._map.has(args[0]) &&
+				this._map.get(args[0])!.has(args[1]);
+		}
 	}
 
 	public get(key: K): ReadonlyMap<K, V> | undefined;
@@ -54,7 +60,9 @@ export class DoubleMap<K, V> implements IDoubleMap<K, V> {
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: this = this): void {
+	public forEach(
+		callbackfn: DoubleMapCallback<K, V>, thisArg: this = this
+	): void {
 		for(const [k1, k2, v] of this.entries()) {
 			callbackfn.apply(thisArg, [v, k1, k2, this]);
 		}

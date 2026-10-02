@@ -44,9 +44,9 @@ export class DiagonalGrid extends Grid {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Proxy properties
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get diameter(): number {
 		return this._size.value;
@@ -57,7 +57,8 @@ export class DiagonalGrid extends Grid {
 	}
 	public set size(v: number) {
 		if(this.$project.history.$isLocked) {
-			this._testSize = this._size.value = v; // Skip all checks and effects
+			// Skip all checks and effects
+			this._testSize = this._size.value = v;
 			return;
 		}
 
@@ -80,9 +81,9 @@ export class DiagonalGrid extends Grid {
 		this.$project.history.$fieldChange(this, "size", oldValue, v, flush);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public override $canSubdivide(): boolean {
 		return this._size.value * 2 <= MAX_SHEET_SIZE;
@@ -125,7 +126,8 @@ export class DiagonalGrid extends Grid {
 	}
 
 	public $getLabelDirection(x: number, y: number): Direction {
-		const shift = this._size.value % 2, s = this._size.value + shift, h = s / 2;
+		const shift = this._size.value % 2;
+		const s = this._size.value + shift, h = s / 2;
 		if(shift == 0) {
 			if(x == 0 && y == h) return Direction.L;
 			if(x == h && y == 0) return Direction.B;
@@ -169,7 +171,9 @@ export class DiagonalGrid extends Grid {
 		}
 	}
 
-	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
+	public $getTransformMatrix(
+		size: number, reorient: boolean
+	): TransformationMatrix {
 		const full = this.$renderWidth;
 		const s = size / full;
 		const shift = this._size.value % 2 / 2;
@@ -195,13 +199,14 @@ export class DiagonalGrid extends Grid {
 		return this._size.value + this._size.value % 2;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private get _span(): [number, number, number, number] {
 		const anchors = this._anchors();
-		const xpy = anchors.map(p => p.x + p.y), ymx = anchors.map(p => p.y - p.x);
+		const xpy = anchors.map(p => p.x + p.y);
+		const ymx = anchors.map(p => p.y - p.x);
 		const xpyMax = Math.max(...xpy), xpyMin = Math.min(...xpy);
 		const ymxMax = Math.max(...ymx), ymxMin = Math.min(...ymx);
 		return [xpyMin, xpyMax, ymxMin, ymxMax];
@@ -211,7 +216,8 @@ export class DiagonalGrid extends Grid {
 		if(this._testFit()) return;
 
 		const [xpyMin, xpyMax, ymxMin, ymxMax] = this._span;
-		this._testSize = Math.ceil(Math.max(xpyMax - xpyMin, ymxMax - ymxMin) / 2);
+		this._testSize =
+			Math.ceil(Math.max(xpyMax - xpyMin, ymxMax - ymxMin) / 2);
 
 		const a = (xpyMax + xpyMin) / 2, b = (ymxMax + ymxMin) / 2;
 		const x = Math.round((this._testSize - a + b) / 2);
@@ -221,7 +227,10 @@ export class DiagonalGrid extends Grid {
 		while(!this._testFit()) {
 			this._testSize++;
 			if(this._testSize % 2 == 0) {
-				this._testShift = { x: this._testShift.x + 1, y: this._testShift.y + 1 };
+				this._testShift = {
+					x: this._testShift.x + 1,
+					y: this._testShift.y + 1,
+				};
 			}
 		}
 		this._size.value = this._testSize;
@@ -230,7 +239,12 @@ export class DiagonalGrid extends Grid {
 
 	private _applyOffset(): boolean {
 		try {
-			if(!this._testShift || this._testShift.x === 0 && this._testShift.y === 0) return false;
+			if(
+				!this._testShift ||
+				this._testShift.x === 0 && this._testShift.y === 0
+			) {
+				return false;
+			}
 			this._shift(this._testShift);
 			return true;
 		} finally {

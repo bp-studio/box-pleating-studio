@@ -26,10 +26,16 @@ export abstract class Command implements JCommand {
 		this.tag = json.tag;
 	}
 
-	/** Whether this {@link Command} doesn't actually change anything, and can be ignored. */
+	/**
+	 * Whether this {@link Command} doesn't actually change anything, and can be
+	 * ignored.
+	 */
 	public abstract get $isVoid(): boolean;
 
-	/** Determine if this {@link Command} can be combined into another {@link Command}. */
+	/**
+	 * Determine if this {@link Command} can be combined into another
+	 * {@link Command}.
+	 */
 	public abstract $canAddTo(command: Command): boolean;
 
 	/** Combine this {@link Command} into the given {@link Command}. */

@@ -16,14 +16,15 @@ import type { Device } from "./device";
 
 /**
  * The first field is the anchor point itself,
- * ths second field is the index of the {@link Piece} from which it came (if available).
+ * ths second field is the index of the {@link Piece} from which it came
+ * (if available).
  */
 type AnchorMap = [Point, number | null];
 
 //=================================================================
 /**
- * {@link Gadget} is a component in a {@link Device} corresponding to a single {@link JOverlap}.
- * It always have four {@link JAnchor}s.
+ * {@link Gadget} is a component in a {@link Device} corresponding to a single
+ * {@link JOverlap}. It always have four {@link JAnchor}s.
  */
 //=================================================================
 export class Gadget implements JGadget {
@@ -42,7 +43,8 @@ export class Gadget implements JGadget {
 	/**
 	 * The {@link Cache}s are enumerable fields of the instance,
 	 * so we must not serialize (or clone) the instance directly,
-	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 * otherwise the caches will be included, and the result will depend on the
+	 * states of the caches.
 	 */
 	public toJSON(): JGadget {
 		const result: JGadget = { pieces: this.pieces.map(p => p.toJSON()) };
@@ -57,7 +59,8 @@ export class Gadget implements JGadget {
 	 * Used for positioning.
 	 */
 	public readonly widthSpan = new Cache(() =>
-		Math.ceil(this.$anchorMap.value[2][0].x) - Math.floor(this.$anchorMap.value[0][0].x)
+		Math.ceil(this.$anchorMap.value[2][0].x) -
+		Math.floor(this.$anchorMap.value[0][0].x)
 	);
 
 	/**
@@ -66,7 +69,8 @@ export class Gadget implements JGadget {
 	 * Used for positioning.
 	 */
 	public readonly heightSpan = new Cache(() =>
-		Math.ceil(this.$anchorMap.value[2][0].y) - Math.floor(this.$anchorMap.value[0][0].y)
+		Math.ceil(this.$anchorMap.value[2][0].y) -
+		Math.floor(this.$anchorMap.value[0][0].y)
 	);
 
 	public readonly $anchorMap = new Cache<PerQuadrant<AnchorMap>>(() =>
@@ -76,7 +80,9 @@ export class Gadget implements JGadget {
 				if(this.offset) p = p.$add(new Vector(this.offset));
 				return [p, null];
 			} else {
-				if(this.pieces.length == 1) return [this.pieces[0].$anchors.value[q]!, 0];
+				if(this.pieces.length == 1) {
+					return [this.pieces[0].$anchors.value[q]!, 0];
+				}
 				for(const [i, p] of this.pieces.entries()) {
 					if(p.$anchors.value[q]) return [p.$anchors.value[q]!, i];
 				}
@@ -94,17 +100,22 @@ export class Gadget implements JGadget {
 	public readonly $contour = new Cache<RationalPath>(() => {
 		const p = this.pieces;
 		let contour = p[0].$shape.value.contour;
-		for(let i = 1; i < p.length; i++) contour = join(contour, p[i].$shape.value.contour);
+		for(let i = 1; i < p.length; i++) {
+			contour = join(contour, p[i].$shape.value.contour);
+		}
 		return contour;
 	});
 
 	/**
 	 * In case of relay, get the remaining x-component.
-	 * @param q1 {@link QuadrantDirection} of the corner being connected to, which is either 1 or 3.
-	 * @param q2 {@link QuadrantDirection} of the corner by the other {@link Gadget}, which is either 0 or 2.
+	 * @param q1 {@link QuadrantDirection} of the corner being connected to,
+	 * which is either 1 or 3.
+	 * @param q2 {@link QuadrantDirection} of the corner by the other
+	 * {@link Gadget}, which is either 0 or 2.
 	 */
 	public rx(q1: QuadrantDirection, q2: QuadrantDirection): number {
-		return Math.ceil(Math.abs(this.$anchorMap.value[q1][0].x - this.$anchorMap.value[q2][0].x));
+		const map = this.$anchorMap.value;
+		return Math.ceil(Math.abs(map[q1][0].x - map[q2][0].x));
 	}
 
 	public $reverseGPS(): Gadget {
@@ -132,15 +143,21 @@ export class Gadget implements JGadget {
 	 * @param q1 From which {@link QuadrantDirection} (0 or 2)
 	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
 	 */
-	public $setupConnectionSlack(g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection): void {
+	public $setupConnectionSlack(
+		g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection
+	): void {
 		const c2 = g.$contour.value;
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
 		const slack = new Fraction(this._getSlack(q1));
-		const v = g.$anchorMap.value[q2][0].$sub(Point.ZERO).$add(step.$scale(slack));
+		const v = g.$anchorMap.value[q2][0]
+			.$sub(Point.ZERO)
+			.$add(step.$scale(slack));
 
-		const c0_shift = q1 == 0 ? v : v.$add(Point.ZERO.$sub(this.$anchorMap.value[2][0]));
-		const c0 = shift(this.$contour.value, c0_shift); // We keep this for debugging
+		const c0_shift = q1 == 0 ?
+			v : v.$add(Point.ZERO.$sub(this.$anchorMap.value[2][0]));
+		// We keep this for debugging
+		const c0 = shift(this.$contour.value, c0_shift);
 		let c1 = c0;
 
 		// Perform collision tests.
@@ -154,12 +171,14 @@ export class Gadget implements JGadget {
 			/// #if DEBUG
 			/* istanbul ignore next: debug */
 			if(s == OVERLAP_LIMIT) {
-				// If we get here, typically it means one of the contours is not simple.
-				// Goto joinLogic.ts to debug the issue.
+				// If we get here, typically it means one of the contours is
+				// not simple. Goto joinLogic.ts to debug the issue.
 				console.log(this.$contour.value.map(p => p.toString()));
 				console.log(c2.map(p => p.toString()));
 				const c = this.$contour.value;
-				console.log(JSON.stringify([[c.map(p => p.$toIPoint()), c2.map(p => p.$toIPoint())]]));
+				const p1 = c.map(p => p.$toIPoint());
+				const p2 = c2.map(p => p.$toIPoint());
+				console.log(JSON.stringify([[p1, p2]]));
 				debugger;
 				throw new Error("Contour error");
 			}
@@ -178,17 +197,17 @@ export class Gadget implements JGadget {
 		return false;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _getSlack(q: QuadrantDirection): number {
 		return this.anchors?.[q]?.slack ?? 0;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Static methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Simplify JSON data representation, for creating signature. */
 	public static $simplify(g: JGadget): JGadget {

@@ -34,28 +34,37 @@ export class RepoTrace extends Trace {
 	}
 
 	/**
-	 * Determine the starting/ending point of tracing for the contour of a node (given by its leaves).
+	 * Determine the starting/ending point of tracing for the contour of a node
+	 * (given by its leaves).
 	 *
-	 * @param filtered The {@link Quadrant}s covered by the node in a specific direction.
-	 * @param all All {@link Quadrant}s of the {@link Repository} in that direction.
+	 * @param filtered The {@link Quadrant}s covered by the node in a specific
+	 * direction.
+	 * @param all All {@link Quadrant}s of the {@link Repository} in that
+	 * direction.
 	 * @param leaves The leaves of the node.
 	 *
 	 * Returns `null` if the node has nothing to trace in that direction.
 	 */
-	public $resolveStartEnd(filtered: Quadrant[], all: Quadrant[], leaves: ReadonlySet<NodeId>): StartEnd | null {
+	public $resolveStartEnd(
+		filtered: Quadrant[], all: Quadrant[], leaves: ReadonlySet<NodeId>
+	): StartEnd | null {
 		let result: StartEnd | undefined;
 		filtered = filtered.filter(quadrant => {
 			const resolved = this._resolveQuadrant(quadrant, leaves);
-			if(!resolved) return false; // The junctions of this quadrant are all digested by the node
+			// The junctions of this quadrant are all digested by the node
+			if(!resolved) return false;
 			const f = quadrant.f;
 			if(!result) {
 				result = resolved;
 			} else {
-				if(pointWeight(resolved.start, f) < pointWeight(result.start, f)) {
+				const startWeight = pointWeight(resolved.start, f);
+				if(startWeight < pointWeight(result.start, f)) {
 					result.start = resolved.start;
 					result.virtualStart = resolved.virtualStart;
 				}
-				if(pointWeight(resolved.end, f) > pointWeight(result.end, f)) result.end = resolved.end;
+				if(pointWeight(resolved.end, f) > pointWeight(result.end, f)) {
+					result.end = resolved.end;
+				}
 			}
 			return true;
 		});
@@ -68,7 +77,8 @@ export class RepoTrace extends Trace {
 			if(first > 0) {
 				const a = all[first - 1].$flap.id, b = all[first].$flap.id;
 				const ridge = this._getIntersectionRidge(a, b);
-				// It is possible that the intersection ridge is missing in legacy patterns.
+				// It is possible that the intersection ridge is missing in
+				// legacy patterns.
 				/* istanbul ignore else: legacy */
 				if(ridge) {
 					result.start = hingeSideEnd(ridge, all[first]);
@@ -85,15 +95,22 @@ export class RepoTrace extends Trace {
 		return result;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	/** Resolve the starting/ending points for a single {@link Quadrant} (see {@link Quadrant.$resolveStartEnd}). */
-	private _resolveQuadrant(quadrant: Quadrant, leaves: ReadonlySet<NodeId>): StartEnd | null {
+	/**
+	 * Resolve the starting/ending points for a single {@link Quadrant} (see
+	 * {@link Quadrant.$resolveStartEnd}).
+	 */
+	private _resolveQuadrant(
+		quadrant: Quadrant, leaves: ReadonlySet<NodeId>
+	): StartEnd | null {
 		const resolved = quadrant.$resolveStartEnd(leaves);
 		if(!resolved) return null;
-		const result: StartEnd = { start: resolved.start, end: resolved.end, virtualStart: false };
+		const result: StartEnd = {
+			start: resolved.start, end: resolved.end, virtualStart: false,
+		};
 		if(resolved.startDivision) {
 			const ridge = this._getIntersectionRidge(...resolved.startDivision);
 			/* istanbul ignore else: legacy */
@@ -112,17 +129,20 @@ export class RepoTrace extends Trace {
 
 	private _getIntersectionRidge(a: NodeId, b: NodeId): Ridge {
 		if(a > b) [a, b] = [b, a];
-		return this.$ridges.find(r => r.$division && r.$division[0] == a && r.$division[1] == b)!;
+		return this.$ridges.find(
+			r => r.$division && r.$division[0] == a && r.$division[1] == b
+		)!;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 	/* istanbul ignore next: debug */
 	public createTestCase(hinges: Path, start: Point, end: Point): string {
-		// Note that this does not include the virtual starting diagonal (see StartEnd).
+		// Note that this does not include the virtual starting diagonal (see
+		// StartEnd).
 		const simp = (s: object): string => JSON.stringify(s).replace(/"(\w+)":/g, "$1:");
 		const ridges = `Line.$parseTest(${simp(this.$ridges)})`;
 		const dir = "SlashDirection." + (this.$direction == SlashDirection.FW ? "FW" : "BW");
@@ -133,10 +153,12 @@ export class RepoTrace extends Trace {
 }
 
 /**
- * Both endpoints of an intersection ridge lie on the same diagonal line, so either of them
- * results in the same filtering of the ridges. But for deciding the initial direction of tracing
- * (see {@link TraceContext._diagonalHitInitialVector}), the endpoint on the side of the hinge matters,
- * which is the one farther along the outward direction of the given {@link Quadrant}.
+ * Both endpoints of an intersection ridge lie on the same diagonal line, so
+ * either of them results in the same filtering of the ridges. But for deciding
+ * the initial direction of tracing (see
+ * {@link TraceContext._diagonalHitInitialVector}), the endpoint on the side of
+ * the hinge matters, which is the one farther along the outward direction of
+ * the given {@link Quadrant}.
  */
 function hingeSideEnd(ridge: Ridge, quadrant: Quadrant): Point {
 	const v = QV[quadrant.q];

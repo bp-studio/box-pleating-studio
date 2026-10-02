@@ -6,7 +6,8 @@ import { createSSRApp } from "vue";
  * AS BP Studio now use Rsbuild (which is webpack-compatible) for bundling,
  * there is some inevitable overhead in simply importing the modules,
  * so we make everything async in order to improve TBT.
- * In some cases, we even insert Scheduler.yield() between importing and execution of a module.
+ * In some cases, we even insert Scheduler.yield() between importing and
+ * execution of a module.
  */
 //=================================================================
 

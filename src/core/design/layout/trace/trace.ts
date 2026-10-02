@@ -15,9 +15,11 @@ export interface StartEnd {
 	start: Point;
 	end: Point;
 	/**
-	 * Whether the starting point is not on an actual {@link SideDiagonal} but on an intersection ridge
-	 * (whose line then acts as a virtual side diagonal, with the starting point as its corner).
-	 * This happens when the side diagonal is digested by the flaps wrapped inside the node being traced.
+	 * Whether the starting point is not on an actual {@link SideDiagonal} but
+	 * on an intersection ridge (whose line then acts as a virtual side
+	 * diagonal, with the starting point as its corner). This happens when the
+	 * side diagonal is digested by the flaps wrapped inside the node being
+	 * traced.
 	 */
 	virtualStart: boolean;
 }
@@ -34,36 +36,40 @@ export class Trace {
 	protected readonly $ridges: readonly Ridge[];
 	protected readonly $sideDiagonals: readonly SideDiagonal[];
 
-	constructor(ridges: readonly Ridge[], dir: SlashDirection, sideDiagonals: readonly SideDiagonal[]) {
+	constructor(
+		ridges: readonly Ridge[], dir: SlashDirection,
+		sideDiagonals: readonly SideDiagonal[]
+	) {
 		this.$ridges = ridges;
 		this.$direction = dir;
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
 	public $generate(
-		hinges: Path, start: Point, end: Point, rawMode: boolean, virtualStart: boolean = false
+		hinges: Path, start: Point, end: Point, rawMode: boolean,
+		virtualStart: boolean = false
 	): PatternContour | null {
 		const ctx = new TraceContext(this, hinges);
 		if(!ctx.$valid) return null;
 
-		const directionalVector = new Vector(1, this.$direction == SlashDirection.FW ? 1 : -1);
-		const ridges = this._createFilteredRidges(start, end, directionalVector);
+		const directionalVector =
+			new Vector(1, this.$direction == SlashDirection.FW ? 1 : -1);
+		const ridges =
+			this._createFilteredRidges(start, end, directionalVector);
 
 		// Initialize
 		const path: RationalPath = [];
-		let startDiagonal = this.$sideDiagonals.find(d => d.$lineContains(start));
+		let startDiagonal =
+			this.$sideDiagonals.find(d => d.$lineContains(start));
 		if(!startDiagonal && virtualStart) {
-			// The side diagonal is digested (see StartEnd.virtualStart), so we make a virtual one.
-			// Only its line and its corner matter (it is not part of the ridges).
-			const virtual = new Line(start, directionalVector) as Partial<Writeable<SideDiagonal>>;
-			virtual.p0 = start;
-			startDiagonal = virtual as SideDiagonal;
+			startDiagonal = createVirtualDiagonal(start, directionalVector);
 		}
 		let cursor = ctx.$getInitialNode(ridges, startDiagonal);
 		if(!cursor) return null;
 		path.push(cursor.point);
 
-		const endDiagonal = this.$sideDiagonals.find(d => d.$contains(end, true));
+		const endDiagonal =
+			this.$sideDiagonals.find(d => d.$contains(end, true));
 		if(endDiagonal) ridges.add(endDiagonal);
 
 		// Main loop
@@ -92,9 +98,9 @@ export class Trace {
 		else return Trace._rawModeFinalCheck(result, hinges, cursor.vector);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * In raw mode, we need to make some extra checks to make sure the
@@ -124,19 +130,21 @@ export class Trace {
 			return null;
 		};
 
-		// Otherwise, try to find the intersection of the last known cursor direction with the hinges.
+		// Otherwise, try to find the intersection of the last known cursor
+		// direction with the hinges.
 		if(lastVec.x == 0 || lastVec.y == 0) {
-			const intersection = findIntersection(result[result.length - 1], lastVec);
+			const intersection =
+				findIntersection(result[result.length - 1], lastVec);
 			if(intersection) {
 				result.push(intersection);
 				return result;
 			}
 		}
 
-		// If the above still doesn't work, try popping the tail segments and retry.
-		// It is not known if this is actually helpful,
-		// as I don't have a sample that really requires this for a valid rendering.
-		// However, the follow paths can be triggered by dragging Imai's JSP.
+		// If the above still doesn't work, try popping the tail segments and
+		// retry. It is not known if this is actually helpful, as I don't have a
+		// sample that really requires this for a valid rendering. However, the
+		// follow paths can be triggered by dragging Imai's JSP.
 		/* istanbul ignore next: significance unsure */
 		for(let i = result.length - 1; i > 0; i--) {
 			const last = result[i];
@@ -156,7 +164,9 @@ export class Trace {
 		return null; // Out of luck
 	}
 
-	private _createFilteredRidges(start: Point, end: Point, directionalVector: Vector): Set<Ridge> {
+	private _createFilteredRidges(
+		start: Point, end: Point, directionalVector: Vector
+	): Set<Ridge> {
 		let startLine = new Line(start, directionalVector);
 		let endLine = new Line(end, directionalVector);
 
@@ -165,11 +175,28 @@ export class Trace {
 		if(endLine.$pointIsOnRight(start)) endLine = endLine.$reverse();
 
 		const filteredRidges = this.$ridges.filter(r =>
-			(!startLine.$pointIsOnRight(r.p1, true) || !startLine.$pointIsOnRight(r.p2, true)) &&
-			(!endLine.$pointIsOnRight(r.p1, true) || !endLine.$pointIsOnRight(r.p2, true) ||
+			(
+				!startLine.$pointIsOnRight(r.p1, true) ||
+				!startLine.$pointIsOnRight(r.p2, true)
+			) &&
+			(
+				!endLine.$pointIsOnRight(r.p1, true) ||
+				!endLine.$pointIsOnRight(r.p2, true) ||
 				// Include the intersection ridge when applicable
-				endLine.$lineContains(r.p1) && endLine.$lineContains(r.p2))
+				endLine.$lineContains(r.p1) && endLine.$lineContains(r.p2)
+			)
 		);
 		return new Set(filteredRidges);
 	}
+}
+
+/**
+ * The side diagonal is digested (see StartEnd.virtualStart),
+ * so we make a virtual one. Only its line and its corner matter
+ * (it is not part of the ridges).
+ */
+function createVirtualDiagonal(start: Point, v: Vector): SideDiagonal {
+	const virtual = new Line(start, v) as Partial<Writeable<SideDiagonal>>;
+	virtual.p0 = start;
+	return virtual as SideDiagonal;
 }

@@ -27,7 +27,9 @@ export function* singleConfigGenerator(
 	], createConfigFilter(protoSignature));
 }
 
-function* singleGadget(context: ConfigGeneratorContext, index: number, strategy?: Strategy): Generator<Configuration> {
+function* singleGadget(
+	context: ConfigGeneratorContext, index: number, strategy?: Strategy
+): Generator<Configuration> {
 	const j = context.$repo.$junctions[index];
 	const partitions: JPartition[] = [{
 		overlaps: [context.$toOverlap(j, index)],
@@ -36,7 +38,9 @@ function* singleGadget(context: ConfigGeneratorContext, index: number, strategy?
 	yield context.$make(partitions, true);
 }
 
-function* doubleRelay(context: ConfigGeneratorContext, index: number): Generator<Configuration> {
+function* doubleRelay(
+	context: ConfigGeneratorContext, index: number
+): Generator<Configuration> {
 	const j = context.$repo.$junctions[index];
 	const make = (overlaps: JOverlap[]): Configuration =>
 		context.$make(overlaps.map(o => ({ overlaps: [o] })), true);

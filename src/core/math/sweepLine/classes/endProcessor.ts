@@ -17,7 +17,9 @@ export const simpleEndProcessor: IEndProcessor = function(event, status) {
 	return start;
 };
 
-export const generalEndProcessor: IEndProcessor = function(event, status, intersector) {
+export const generalEndProcessor: IEndProcessor = function(
+	event, status, intersector
+) {
 	const start = event.$other;
 	const prev = status.$getPrev(start);
 	const next = status.$getNext(start);

@@ -1,9 +1,11 @@
 
-export type DoubleMapCallback<K, V> = (value: V, key1: K, key2: K, map: ReadonlyDoubleMap<K, V>) => void;
+export type DoubleMapCallback<K, V> =
+	(value: V, key1: K, key2: K, map: ReadonlyDoubleMap<K, V>) => void;
 
 //=================================================================
 /**
- * {@link ReadonlyDoubleMap} maps a pair of keys (not necessarily distinct) to corresponding value.
+ * {@link ReadonlyDoubleMap} maps a pair of keys (not necessarily distinct) to
+ * corresponding value.
  */
 //=================================================================
 
@@ -24,7 +26,8 @@ export interface ReadonlyDoubleMap<K, V> {
 
 //=================================================================
 /**
- * {@link IDoubleMap} is a {@link ReadonlyDoubleMap} with writing functionalities.
+ * {@link IDoubleMap} is a {@link ReadonlyDoubleMap} with writing
+ * functionalities.
  */
 //=================================================================
 

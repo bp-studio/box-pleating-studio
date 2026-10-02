@@ -20,9 +20,11 @@ export interface ISegment {
 	readonly $polygon: number;
 
 	/**
-	 * Subdivides a segment at the given point and returns the newly created segment.
+	 * Subdivides a segment at the given point and returns the newly created
+	 * segment.
 	 * @param point The position where the segment will be subdivided.
-	 * @param oriented Whether the new segment have the same orientation as the original segment.
+	 * @param oriented Whether the new segment have the same orientation as the
+	 * original segment.
 	 */
 	$subdivide(point: IPoint, oriented: boolean): ISegment;
 }

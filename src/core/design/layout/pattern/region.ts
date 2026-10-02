@@ -31,7 +31,8 @@ export abstract class Region {
 	/** The direction {@link Vector} of axis-parallel creases. */
 	public abstract readonly $direction: Cache<Vector>;
 
-	public readonly $axisParallels = new Cache(() => this._computeAxisParallels());
+	public readonly $axisParallels =
+		new Cache(() => this._computeAxisParallels());
 
 	private _computeAxisParallels(): readonly Line[] {
 		const shape = this.$shape.value;
@@ -58,7 +59,8 @@ export abstract class Region {
 				const j = r.$intersection(p, dir);
 				if(j && !j.eq(intersections[0])) intersections.push(j);
 
-				// An axis parallel crease would not intersect a region more than twice.
+				// An axis parallel crease would not intersect a region more
+				// than twice.
 				if(intersections.length == 2) {
 					ap.push(new Line(...intersections as [Point, Point]));
 					break;

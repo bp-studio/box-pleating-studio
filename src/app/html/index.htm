@@ -319,7 +319,9 @@
 			var resourceErrorHandler = function(e) {
 				if(e.filename) {
 					setRunErr(e.filename + ": " + e.message);
-				} else if(e.target instanceof Node && document.head.contains(e.target) && !resErr) {
+				} else if(e.target instanceof Node &&
+					document.head.contains(e.target) && !resErr
+				) {
 					setResErr(e.target.src || e.target.href);
 				}
 			};
@@ -429,7 +431,10 @@
 				return !resErr && !runErr && !errShown;
 			};
 
-			/** GA parameter has a 100-character limit, so we split the message into chunks. */
+			/**
+			 * GA parameter has a 100-character limit, so we split the message
+			 * into chunks.
+			 */
 			function splitString(str) {
 				var chunks = [];
 				while(str.length > 0) {
@@ -446,7 +451,8 @@
 					user_agent: navigator.userAgent,
 					error: chunks[0],
 				};
-				for(var i = 1; i < chunks.length && i <= 10; i++) { // 1000 should be enough
+				// 1000 should be enough
+				for(var i = 1; i < chunks.length && i <= 10; i++) {
 					data["data" + i] = chunks[i];
 				}
 				return data;
@@ -467,11 +473,13 @@
 			 * Global error handler;
 			 * handles syntax error and all uncaught sync errors.
 			 *
-			 * `window.onerror` is a special event handler that it takes 5 arguments. See:
+			 * `window.onerror` is a special event handler that it takes 5
+			 * arguments. See:
 			 * https://developer.mozilla.org/en-US/docs/Web/API/Window/error_event
 			 */
 			window.onerror = function(msg, source, line, column, error) {
-				if(!source && !line && !column) return; // error is caused by injection; ignore.
+				// error is caused by injection; ignore.
+				if(!source && !line && !column) return;
 
 				for(var i = 0; i < ignoreError.length; i++) {
 					if(msg.match(ignoreError[i])) return;
@@ -487,8 +495,9 @@
 			window.onunhandledrejection = function(e) {
 				e = e.reason || "Unknown error";
 				if(e.toString().match(/globalThis/)) {
-					// There seems to be a bug in iOS 12 that triggers this error out of nowhere,
-					// and looks like it is safe to ignore it as the the app works fine regardlessly.
+					// There seems to be a bug in iOS 12 that triggers this error
+					// out of nowhere, and looks like it is safe to ignore it as
+					// the the app works fine regardlessly.
 					return;
 				}
 				setRunErr(stack(e));

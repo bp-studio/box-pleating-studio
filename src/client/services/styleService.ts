@@ -14,12 +14,16 @@ namespace Style {
 
 	export const border = {
 		width: 3,
-		color: computed(() => settings.colorScheme.border ?? (isDark.value ? LIGHT : CHARCOAL)),
+		color: computed(() =>
+			settings.colorScheme.border ?? (isDark.value ? LIGHT : CHARCOAL)
+		),
 	};
 
 	export const grid = {
 		width: 0.25,
-		color: computed(() => settings.colorScheme.grid ?? (isDark.value ? LIGHT : CHARCOAL)),
+		color: computed(() =>
+			settings.colorScheme.grid ?? (isDark.value ? LIGHT : CHARCOAL)
+		),
 	};
 
 	export const hinge = {
@@ -53,7 +57,9 @@ namespace Style {
 	export const edge = {
 		width: 2,
 		hover: 3,
-		color: computed(() => settings.colorScheme.edge ?? (isDark.value ? LIGHT : BLACK)),
+		color: computed(() =>
+			settings.colorScheme.edge ?? (isDark.value ? LIGHT : BLACK)
+		),
 		selected: DANGER,
 	};
 
@@ -70,12 +76,17 @@ namespace Style {
 		size: 14,
 		glow: 3,
 		weight: 0.2,
-		color: computed(() => settings.colorScheme.label ?? (isDark.value ? LIGHT : BLACK)),
+		color: computed(() =>
+			settings.colorScheme.label ?? (isDark.value ? LIGHT : BLACK)
+		),
 		border: computed(() => isDark.value ? DARK : WHITE),
 	};
 
 	export const axisParallel = {
-		color: computed(() => settings.colorScheme.axialParallel ?? (isDark.value ? LIGHT_GREEN : GREEN)),
+		color: computed(() =>
+			settings.colorScheme.axialParallel ??
+			(isDark.value ? LIGHT_GREEN : GREEN)
+		),
 		width: 1,
 	};
 }

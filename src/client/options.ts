@@ -14,7 +14,9 @@ export interface StudioOptions {
 	onLongPress?: Action;
 
 	/** Callback for fatal error. */
-	onError?: (id: ProjId, error: CoreError, backup?: JProject) => Promise<void>;
+	onError?: (
+		id: ProjId, error: CoreError, backup?: JProject
+	) => Promise<void>;
 }
 
 export const options: StudioOptions = {};

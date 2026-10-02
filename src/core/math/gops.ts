@@ -12,7 +12,9 @@ interface JPieceMemo {
 const Memo = new Map<number, readonly JPieceMemo[]>();
 
 /** The basic integral {@link GOPS} search */
-export function* generate(ox: number, oy: number, sx = Number.POSITIVE_INFINITY): Generator<JPiece> {
+export function* generate(
+	ox: number, oy: number, sx = Number.POSITIVE_INFINITY
+): Generator<JPiece> {
 	if(ox % 2 && oy % 2) return;
 
 	const memo = getOrCreateMemo(ox, oy);

@@ -14,7 +14,8 @@ let workerReady: PromiseWithResolvers<Worker>;
 
 export const mpSupported = shallowRef(false);
 
-const interruptBuffer = hasSharedArrayBuffer ? new Uint8Array(new SharedArrayBuffer(1)) : null;
+const interruptBuffer = hasSharedArrayBuffer ?
+	new Uint8Array(new SharedArrayBuffer(1)) : null;
 
 function initOptimizerWorker(): void {
 	workerReady = Promise.withResolvers<Worker>();
@@ -83,7 +84,9 @@ function handler(command: OptimizerCommand, worker: Worker): void {
 	}
 }
 
-export async function optimizer(project: Project, options: OptimizerOptions, cb: OptimizerCallback): Promise<JProject> {
+export async function optimizer(
+	project: Project, options: OptimizerOptions, cb: OptimizerCallback
+): Promise<JProject> {
 	callback = cb;
 	const init = Promise.withResolvers<Worker>();
 	callback({
@@ -113,7 +116,8 @@ export async function optimizer(project: Project, options: OptimizerOptions, cb:
 }
 
 function createOptimizerRequest(
-	json: JProject, hierarchies: Hierarchy[], tree: TreeStructure, options: OptimizerOptions
+	json: JProject, hierarchies: Hierarchy[],
+	tree: TreeStructure, options: OptimizerOptions
 ): OptimizerRequest {
 	const { flaps, sheet } = json.design.layout;
 	callback({ event: "flap", data: flaps.length });
@@ -124,7 +128,8 @@ function createOptimizerRequest(
 	for(const f of flaps) {
 		flapMap.set(f.id, f);
 	}
-	const orderedFlaps = hierarchies[hierarchies.length - 1].leaves.map(id => flapMap.get(id)!);
+	const leaves = hierarchies[hierarchies.length - 1].leaves;
+	const orderedFlaps = leaves.map(id => flapMap.get(id)!);
 
 	const request: OptimizerRequest = {
 		command: "start",
@@ -133,7 +138,9 @@ function createOptimizerRequest(
 		random: options.random,
 		problem: {
 			type,
-			flaps: orderedFlaps.map(f => ({ id: f.id, width: f.width, height: f.height })),
+			flaps: orderedFlaps.map(
+				f => ({ id: f.id, width: f.width, height: f.height })
+			),
 			hierarchies,
 			tree,
 		},
@@ -164,7 +171,8 @@ function makeInitialVector(flaps: JFlap[], sheet: JSheet): IPoint[] {
 /** Performs basic validity checks on the {@link OptimizerResult}. */
 function checkOptimizerResult(result: OptimizerResult, project: Project): void {
 	if(!result) throw new Error("Optimizer fails to solve the layout.");
-	project.design.layout.$sheet.grid.$fixDimension(result); // Fix dimensions that are too small.
+	// Fix dimensions that are too small.
+	project.design.layout.$sheet.grid.$fixDimension(result);
 
 	// The following shouldn't happen, but we safe-guard them here anyway.
 	if(
@@ -179,7 +187,9 @@ function checkOptimizerResult(result: OptimizerResult, project: Project): void {
 	}
 }
 
-function writeToTemplate(json: JProject, request: OptimizerRequest, result: OptimizerResult): void {
+function writeToTemplate(
+	json: JProject, request: OptimizerRequest, result: OptimizerResult
+): void {
 	const { sheet } = json.design.layout;
 	json.design.layout = {
 		sheet: {
@@ -196,14 +206,17 @@ function writeToTemplate(json: JProject, request: OptimizerRequest, result: Opti
 	json.design.mode = "layout";
 }
 
-function writeToProject(proj: Project, request: OptimizerRequest, result: OptimizerResult): Promise<void> {
+function writeToProject(
+	proj: Project, request: OptimizerRequest, result: OptimizerResult
+): Promise<void> {
 	return display.shield(async () => {
 		const layout = proj.design.layout;
 		layout.$sheet.grid.$setDimension(result.width, result.height);
 
 		for(const f of result.flaps) {
 			const flap = layout.$flaps.get(f.id)!;
-			const { width, height } = request.problem.flaps.find(r => r.id == f.id)!;
+			const { width, height } =
+				request.problem.flaps.find(r => r.id == f.id)!;
 			flap.$manipulate(f.x, f.y, width, height);
 		}
 		await proj.design.$batchUpdateManager.$updateComplete;

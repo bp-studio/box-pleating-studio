@@ -9,14 +9,16 @@ export interface IOrientation {
 }
 
 /**
- * This is the simplest {@link IOrientation} logic where orientation can be determined by {@link delta} alone.
+ * This is the simplest {@link IOrientation} logic where orientation can be
+ * determined by {@link delta} alone.
  */
 export const deltaOrientation: IOrientation = function(segment, delta) {
 	return delta === 1;
 };
 
 /**
- * This is the {@link IOrientation} logic in which we need to actually compare the end points.
+ * This is the {@link IOrientation} logic in which we need to actually compare
+ * the end points.
  */
 export const compareOrientation: IOrientation = function(segment, delta) {
 	return xyComparator(segment.$start, segment.$end) < 0;

@@ -9,6 +9,7 @@ import { isTypedArray } from "shared/utils/array";
 import { Device } from "client/project/components/layout/device";
 import { MoveCommand } from "client/project/changes/commands/moveCommand";
 
+import type { MTEvent } from "./share";
 import type { Draggable } from "client/base/draggable";
 import type { ShallowRef } from "vue";
 
@@ -57,7 +58,7 @@ export namespace DragController {
 	}
 
 	/** Initialize dragging on clicking. */
-	export function $init(event: MouseEvent | TouchEvent): void {
+	export function $init(event: MTEvent): void {
 		const selections = SelectionController.draggables.value;
 		if(selections.length) {
 			const pt = getCoordinate(event);
@@ -73,9 +74,10 @@ export namespace DragController {
 	 * Handles the dragging and returns whether the dragging actually happened.
 	 *
 	 * Since the dragging behavior is discrete, we always have to compare with
-	 * the initial cursor location instead of comparing with the last cursor position.
+	 * the initial cursor location instead of comparing with the last cursor
+	 * position.
 	 */
-	export function $process(event: MouseEvent | TouchEvent): boolean {
+	export function $process(event: MTEvent): boolean {
 		// Check if the mouse location changed.
 		let pt = getCoordinate(event);
 		if(!CursorController.$tryUpdate(pt)) return false;
@@ -98,7 +100,7 @@ export namespace DragController {
 	 * Return the coordinate of a {@link PointerEvent} relative to the sheet,
 	 * in rounded integers.
 	 */
-	function getCoordinate(event: MouseEvent | TouchEvent): IPoint {
+	function getCoordinate(event: MTEvent): IPoint {
 		const pt = $getEventCenter(event);
 		const local = ProjectService.sheet.value!.$view.toLocal(pt);
 		return $round(local);

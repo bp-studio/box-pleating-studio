@@ -14,10 +14,15 @@ export enum Layer {
 }
 
 interface ILayerOptions {
-	/** Whether this layer should be clipped around the sheet. Default value is `false`. */
+	/**
+	 * Whether this layer should be clipped around the sheet. Default value is
+	 * `false`.
+	 */
 	clipped?: boolean;
 
-	/** Whether objects on this layer is interactive. Default value is `false`. */
+	/**
+	 * Whether objects on this layer is interactive. Default value is `false`.
+	 */
 	interactive?: boolean;
 }
 

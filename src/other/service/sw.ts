@@ -5,11 +5,13 @@
  * See https://github.com/GoogleChrome/workbox/issues/2967
  *
  * Other benefits are:
- * 1. There's no need to query the workbox version to obtain the URL of workbox-sw.
- * 2. We can now drop the dependency of gulp-typescript, which is no longer maintained.
+ * 1. There's no need to query the workbox version to obtain the URL of
+ *    workbox-sw.
+ * 2. We can now drop the dependency of gulp-typescript, which is no longer
+ *    maintained.
  * 3. In theory, the service worker will load faster than the previous approach.
- *    Although workbox-sw has its CDN, but that increases a lot of network requests,
- *    and it also downloads a lot more bytes.
+ *    Although workbox-sw has its CDN, but that increases a lot of network
+ *    requests, and it also downloads a lot more bytes.
  */
 import { BroadcastUpdatePlugin } from "workbox-broadcast-update";
 import { PrecacheController, PrecacheRoute } from "workbox-precaching";
@@ -25,7 +27,9 @@ const defaultHandler = new StaleWhileRevalidate({
 	cacheName: "assets",
 	plugins: [
 		new BroadcastUpdatePlugin({
-			generatePayload: options => ({ path: new URL(options.request.url).pathname }),
+			generatePayload: options => ({
+				path: new URL(options.request.url).pathname,
+			}),
 		}),
 	],
 });
@@ -39,11 +43,13 @@ precacheController.addToCacheList(self.__WB_MANIFEST);
 const precacheRoute = new PrecacheRoute(precacheController, {
 	ignoreURLParametersMatching: [/.*/],
 	directoryIndex: "index.htm",
-	cleanURLs: false, // See https://developer.chrome.com/docs/workbox/modules/workbox-precaching/#clean-urls
+	// See https://developer.chrome.com/docs/workbox/modules/workbox-precaching/#clean-urls
+	cleanURLs: false,
 });
 registerRoute(precacheRoute);
 
-// All Markdown files other than those in precache should use NetworkFirst strategy.
+// All Markdown files other than those in precache
+// should use NetworkFirst strategy.
 registerRoute(
 	({ url }) => url.pathname.endsWith(".md"),
 	new NetworkFirst({
@@ -56,17 +62,22 @@ const netOnly = new NetworkOnly({
 	fetchOptions: { cache: "reload" },
 });
 
-// Don't cache the backend scripts (such as the proxy for shortening share links)
-registerRoute(({ url }) => url.host == "abstreamace.com" && url.pathname.startsWith("/php-tool/"), netOnly);
+// Don't cache the backend scripts
+// (such as the proxy for shortening share links)
+registerRoute(
+	({ url }) =>
+		url.host == "abstreamace.com" && url.pathname.startsWith("/php-tool/"),
+	netOnly
+);
 
 // All POST requests are allowed only when there's an internet connection.
 registerRoute(({ request }) => request.method == "POST", netOnly, "POST");
 
 addEventListener("install", event => {
-	// This is necessary. Otherwise, service worker will not be updated even as we reload the page,
-	// and we'll have to restart the app.
-	// Although starting the service worker immediately has other potential issues,
-	// there is no better way for now.
+	// This is necessary. Otherwise, service worker will not be updated even as
+	// we reload the page, and we'll have to restart the app.
+	// Although starting the service worker immediately has other potential
+	// issues, there is no better way for now.
 	skipWaiting();
 
 	console.log("service worker installing");
@@ -77,9 +88,9 @@ addEventListener("activate", event => {
 	precacheController.activate(event);
 });
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Web Lock polyfill
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 addEventListener("message", event => {
 	event.waitUntil(message(event));
@@ -121,9 +132,9 @@ async function check(clientList: string[], id: string): Promise<boolean> {
 	return clientList[0] === id;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Background sync
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 interface PeriodicBackgroundSyncEvent extends ExtendableEvent {
 	tag: string;

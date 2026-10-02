@@ -11,7 +11,10 @@ import type { ISegment } from "./segment";
 
 export class LineSegment implements ISegment {
 
-	/** In this case this field stands for the type of the line in the crease pattern. */
+	/**
+	 * In this case this field stands for the type of the line in the crease
+	 * pattern.
+	 */
 	public readonly $type: CreaseType;
 	public readonly $polygon: number;
 	public $start: IPoint;
@@ -25,7 +28,10 @@ export class LineSegment implements ISegment {
 	 */
 	public readonly $coefficients: readonly [number, number, number];
 
-	constructor(start: IPoint, end: IPoint, polygon: number = 0, type: CreaseType = CreaseType.None) {
+	constructor(
+		start: IPoint, end: IPoint,
+		polygon: number = 0, type: CreaseType = CreaseType.None
+	) {
 		this.$start = start;
 		this.$end = end;
 		this.$type = type;
@@ -46,17 +52,22 @@ export class LineSegment implements ISegment {
 	 */
 	public $containsPtOnLine(point: IPoint, endPoints: boolean): boolean {
 		const threshold = endPoints ? EPSILON : -EPSILON;
-		return !this._isVertical && (point.x - this.$start.x) * (point.x - this.$end.x) < threshold ||
-			!this._isHorizontal && (point.y - this.$start.y) * (point.y - this.$end.y) < threshold;
+		const { x, y } = point, s = this.$start, e = this.$end;
+		return !this._isVertical && (x - s.x) * (x - e.x) < threshold ||
+			!this._isHorizontal && (y - s.y) * (y - e.y) < threshold;
 	}
 
 	public $subdivide(point: IPoint, oriented: boolean): ISegment {
 		let newSegment: ISegment;
 		if(oriented) {
-			newSegment = new LineSegment(point, this.$end, this.$polygon, this.$type);
+			newSegment = new LineSegment(
+				point, this.$end, this.$polygon, this.$type
+			);
 			this.$end = point;
 		} else {
-			newSegment = new LineSegment(this.$start, point, this.$polygon, this.$type);
+			newSegment = new LineSegment(
+				this.$start, point, this.$polygon, this.$type
+			);
 			this.$start = point;
 		}
 		return newSegment;

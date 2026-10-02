@@ -9,7 +9,9 @@ import type { IRendererOptions, ContextSystemOptions, IRenderingContext, Startup
  * here to break the routine into several async operations.
  */
 //=================================================================
-export async function useRenderer(options: Partial<IRendererOptions>): Promise<Renderer> {
+export async function useRenderer(
+	options: Partial<IRendererOptions>
+): Promise<Renderer> {
 	const contextSystem = new AsyncContextSystem({
 		background: {
 			alpha: 1,

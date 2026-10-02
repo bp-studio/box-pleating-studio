@@ -36,8 +36,8 @@ export enum CornerType {
 	/** A conner that connects to a flap. */
 	flap,
 	/**
-	 * This corner coincides with another corner of another Overlap,
-	 * which makes the current overlap belong to the same Partition as the former.
+	 * This corner coincides with another corner of another Overlap, which makes
+	 * the current overlap belong to the same Partition as the former.
 	 */
 	coincide,
 }

@@ -47,7 +47,12 @@ export class PositioningContext {
 		const r = this.$repo.$getMaxIntersectionDistance(j1, j2, oriented);
 		if(j2.ox > j1.ox) [j1, j2] = [j2, j1];
 		let p: IPoint = { x: r - j2.ox, y: r - j1.oy };
-		if(!oriented) p = { x: g.widthSpan.value - p.x, y: g.heightSpan.value - p.y };
+		if(!oriented) {
+			p = {
+				x: g.widthSpan.value - p.x,
+				y: g.heightSpan.value - p.y,
+			};
+		}
 		return new Point(p);
 	}
 
@@ -57,7 +62,9 @@ export class PositioningContext {
 
 	public $checkJunctions(singleMode: boolean): boolean {
 		// Trivial case
-		if(this.$junctions.length == 1 && this.$gadgets.length == 1) return true;
+		if(this.$junctions.length == 1 && this.$gadgets.length == 1) {
+			return true;
+		}
 
 		if(singleMode) {
 			const index = this.$overlaps[0].parent;
@@ -79,9 +86,9 @@ export class PositioningContext {
 		return this._getSpan(index, q) - this._getSlack(index, q);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _setupSlackForOverlap(index: number): void {
 		const overlap = this.$overlaps[index];
@@ -93,7 +100,9 @@ export class PositioningContext {
 
 			const targetOverlap = this.$overlaps[targetIndex];
 			const oppositeCorner = targetOverlap.c[2 - q];
-			const mutual = oppositeCorner.type == CornerType.internal && oppositeCorner.e == id;
+			const mutual =
+				oppositeCorner.type == CornerType.internal &&
+				oppositeCorner.e == id;
 
 			const g1 = this.$gadgets[index];
 			const g2 = this.$gadgets[targetIndex];
@@ -103,15 +112,16 @@ export class PositioningContext {
 				// If there're mutual connections, we don't need to setup
 				// the slack for real, but we keep a record for later usage.
 				const tx1 = g1.widthSpan.value + g2.rx(q, corner.q!);
-				const tx2 = g2.widthSpan.value + g1.rx(2 - q, opposite(corner.q!));
+				const tx2 =
+					g2.widthSpan.value + g1.rx(2 - q, opposite(corner.q!));
 				if(tx2 > tx1) this._slackMap.set(corner, tx2 - tx1);
 			}
 		}
 	}
 
 	/**
-	 * Given a {@link JJunction}, consider all possible {@link Gadget} chains within,
-	 * and make sure that all chains fit the space.
+	 * Given a {@link JJunction}, consider all possible {@link Gadget} chains
+	 * within, and make sure that all chains fit the space.
 	 */
 	private _checkJunction(index: number): boolean {
 		const junction = this.$junctions[index];
@@ -136,7 +146,9 @@ export class PositioningContext {
 		return junction.sx >= maxSpan;
 	}
 
-	private _getSpan(index: number, q: TipDirection, callback?: Consumer<number>): number {
+	private _getSpan(
+		index: number, q: TipDirection, callback?: Consumer<number>
+	): number {
 		if(this._spanCache[q].has(index)) {
 			return this._spanCache[q].get(index)!;
 		}

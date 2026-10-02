@@ -12,8 +12,8 @@ function getCornerDirection(prev: IPoint, next: IPoint): QuadrantDirection {
 }
 
 /**
- * Map the corners of an axis-aligned path
- * (assumed to be simplified and counterclockwise) to {@link QuadrantDirection}s.
+ * Map the corners of an axis-aligned path (assumed to be simplified and
+ * counterclockwise) to {@link QuadrantDirection}s.
  */
 export function mapDirections(path: Path): QuadrantDirection[] {
 	const l = path.length;

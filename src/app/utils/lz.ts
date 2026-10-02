@@ -44,9 +44,11 @@ function callWorker<T>(action: Act, data: unknown, mode: unknown): Promise<T> {
 namespace LZ {
 
 	export async function compress(s: string): Promise<string> {
-		const arr = await callWorker<Uint8Array>(Act.compress, s, 1); // Experiments showed that 1 is good enough
+		// Experiments showed that 1 is good enough
+		const arr = await callWorker<Uint8Array>(Act.compress, s, 1);
 		s = btoa(String.fromCharCode(...Uint8Array.from(arr)));
-		return s.replace(/\+/g, "-").replace(/\//g, "_").replace(/[=]+/g, ""); // urlBase64
+		// urlBase64
+		return s.replace(/\+/g, "-").replace(/\//g, "_").replace(/[=]+/g, "");
 	}
 
 	export async function decompress(s: string): Promise<string> {

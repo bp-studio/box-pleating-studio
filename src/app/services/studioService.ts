@@ -12,7 +12,9 @@ import type { Device } from "client/project/components/layout/device";
 
 /** Before the Studio is initialized, use a default value as placeholder. */
 function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
-	return computed(() => StudioService.initialized.value ? target() : defaultValue);
+	return computed(
+		() => StudioService.initialized.value ? target() : defaultValue
+	);
 }
 
 /**
@@ -73,7 +75,8 @@ namespace StudioService {
 
 	export const mpSupported = proxy(() => bp.plugins.mpSupported.value, false);
 	export const style = proxy(() => bp.style, null!);
-	export const mouseCoordinates = proxy(() => bp.mouseCoordinates.value, null);
+	export const mouseCoordinates =
+		proxy(() => bp.mouseCoordinates.value, null);
 	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);
 	export const stretch = computed(() => {
@@ -85,9 +88,11 @@ namespace StudioService {
 
 	export const plugins = proxy(() => bp.plugins, null!);
 
-	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
+	export const draggableSelected =
+		proxy(() => bp.selection.draggables.value.length > 0, false);
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
-	export const shouldTakeOverContextHandling = proxy(() => bp.shouldTakeOverContextHandling, () => false);
+	export const shouldTakeOverContextHandling =
+		proxy(() => bp.shouldTakeOverContextHandling, () => false);
 
 	export const history = proxy(() => bp.history, {
 		canUndo: false,
@@ -98,7 +103,9 @@ namespace StudioService {
 		notifyAll() { /* */ },
 	});
 
-	export async function execute(action: Action<Promise<void>>): Promise<void> {
+	export async function execute(
+		action: Action<Promise<void>>
+	): Promise<void> {
 		if(executing) return; // ignore rapid execution
 		try {
 			executing = true;
@@ -110,9 +117,9 @@ namespace StudioService {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Modal control
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	// Workspace should not be interactive if any modal is opened.
 	let modalCount = 0;
@@ -123,9 +130,9 @@ namespace StudioService {
 		if(--modalCount == 0) bp?.setInteractive(true);
 	});
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Delegate methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	export function beforePrint(): Promise<void> {
 		return bp.beforePrint(null);
@@ -157,4 +164,5 @@ namespace StudioService {
 
 export const showPanel = shallowRef(false);
 
-export default <Readonly<UnwrapNestedRefs<typeof StudioService>>>reactive(StudioService);
+export default
+	<Readonly<UnwrapNestedRefs<typeof StudioService>>>reactive(StudioService);

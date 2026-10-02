@@ -7,7 +7,9 @@ export type SmoothGraphicsLike = SmoothGraphics | SvgGraphics;
 export type GraphicsLike = Graphics | SmoothGraphicsLike;
 
 /** Draw the lines of a contour (no filling) */
-export function drawContours(graphics: GraphicsLike, contours: readonly Contour[]): void {
+export function drawContours(
+	graphics: GraphicsLike, contours: readonly Contour[]
+): void {
 	for(const contour of contours) {
 		drawPath(graphics, contour.outer);
 		if(contour.inner) {
@@ -19,14 +21,19 @@ export function drawContours(graphics: GraphicsLike, contours: readonly Contour[
 /**
  * Fill a contour.
  *
- * The filling API of Pixi consists of low-level methods such as {@link Graphics.beginFill} and {@link Graphics.beginHole}.
- * The premise of these methods is that we have to pair up the outer and inner paths of the polygons explicitly.
- * (There's no need for orientation though, as Pixi will do it itself)
- * Once this premise is met, Pixi will use the library [earcut](https://github.com/mapbox/earcut) to triangulate the polygon,
- * thereby reducing the general filling to triangle filling.
- * Accordingly, the library is super efficient, so probably there's no need to further optimize it.
+ * The filling API of Pixi consists of low-level methods such as
+ * {@link Graphics.beginFill} and {@link Graphics.beginHole}. The premise of
+ * these methods is that we have to pair up the outer and inner paths of the
+ * polygons explicitly. (There's no need for orientation though, as Pixi will do
+ * it itself) Once this premise is met, Pixi will use the library
+ * [earcut](https://github.com/mapbox/earcut) to triangulate the polygon,
+ * thereby reducing the general filling to triangle filling. Accordingly, the
+ * library is super efficient, so probably there's no need to further optimize
+ * it.
  */
-export function fillContours(graphics: GraphicsLike, contours: readonly Contour[], color: number): void {
+export function fillContours(
+	graphics: GraphicsLike, contours: readonly Contour[], color: number
+): void {
 	for(const contour of contours) {
 		graphics.beginFill(color);
 		drawPath(graphics, contour.outer);
@@ -51,7 +58,9 @@ export function drawPath(graphics: GraphicsLike, path: Path): void {
 	graphics.closePath();
 }
 
-export function drawLines(graphics: GraphicsLike, lines: readonly ILine[]): void {
+export function drawLines(
+	graphics: GraphicsLike, lines: readonly ILine[]
+): void {
 	for(const l of lines) {
 		graphics.moveTo(l[0].x, l[0].y).lineTo(l[1].x, l[1].y);
 	}

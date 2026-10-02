@@ -28,10 +28,14 @@ export class Tree implements ISerializable<JTree> {
 	/** Cache the {@link JEdge}s in the order determined by the Core. */
 	private _edges: JEdge[] = [];
 
-	constructor(project: Project, parentView: Container, json: JTree, state?: JViewport) {
+	constructor(
+		project: Project, parentView: Container, json: JTree, state?: JViewport
+	) {
 		this.$project = project;
 		this.$vertices = new VertexContainer(this, json);
-		this.$sheet = new Sheet(project, parentView, "tree", this.$vertices, json.sheet, state);
+		this.$sheet = new Sheet(
+			project, parentView, "tree", this.$vertices, json.sheet, state
+		);
 	}
 
 	public toJSON(): JTree {
@@ -42,9 +46,9 @@ export class Tree implements ISerializable<JTree> {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get vertexCount(): number {
 		return this.$vertices.$count;
@@ -54,12 +58,13 @@ export class Tree implements ISerializable<JTree> {
 		return this.$vertices.$isMinimal;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get $rootId(): NodeId {
-		if(!this._edges.length) return NaN as NodeId; // This is the case during initialization
+		// This is the case during initialization
+		if(!this._edges.length) return NaN as NodeId;
 		return this._edges[0].n1;
 	}
 
@@ -68,11 +73,15 @@ export class Tree implements ISerializable<JTree> {
 		if(model.tree) {
 			const oldRoot = this.$rootId;
 			this._edges = model.tree.edges;
-			if(model.edit.length) this.$project.history.$edit(model.edit, oldRoot, this.$rootId);
+			if(model.edit.length) {
+				this.$project.history.$edit(model.edit, oldRoot, this.$rootId);
+			}
 		}
 
 		// Deleting edges. We have to handle it first.
-		for(const edit of model.edit.filter(e => !e[0])) this._removeEdge(edit[1]);
+		for(const edit of model.edit.filter(e => !e[0])) {
+			this._removeEdge(edit[1]);
+		}
 
 		// Vertices
 		this.$vertices.$update(model);
@@ -115,7 +124,9 @@ export class Tree implements ISerializable<JTree> {
 			this.$project.history.$move(v, { x, y });
 			v._location = { x, y };
 			SelectionController.clear();
-			if(this.$project.design.mode == "tree") SelectionController.$toggle(v, true);
+			if(this.$project.design.mode == "tree") {
+				SelectionController.$toggle(v, true);
+			}
 		};
 		return this.$project.$core.tree.merge(edge.toJSON());
 	}
@@ -143,9 +154,9 @@ export class Tree implements ISerializable<JTree> {
 		return getFirst(this.$edges.get(v.id)!)!;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _addEdge(e: JEdge): void {
 		const v1 = this.$vertices.$get(e.n1);

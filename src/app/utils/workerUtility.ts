@@ -8,12 +8,14 @@
 /**
  * An async method to call Service Worker and wait for its reply.
  *
- * It will wait until Service Worker is ready. It throws an error if Service Worker is not found.
+ * It will wait until Service Worker is ready. It throws an error if Service
+ * Worker is not found.
  */
 export function callService<T = unknown>(data: unknown): Promise<T> {
 	return new Promise((resolve, reject) => {
 		navigator.serviceWorker.ready.then(reg => {
-			if(!reg || !reg.active) return reject(); // Safari might get here on first usage
+			// Safari might get here on first usage
+			if(!reg || !reg.active) return reject();
 			callWorker<T>(reg.active, data).then(resolve, reject);
 		}, reject);
 	});
@@ -22,7 +24,9 @@ export function callService<T = unknown>(data: unknown): Promise<T> {
 /**
  * Send an message to a given worker and wait for its reply.
  */
-export function callWorker<T = unknown>(worker: Worker | ServiceWorker, data: unknown): Promise<T> {
+export function callWorker<T = unknown>(
+	worker: Worker | ServiceWorker, data: unknown
+): Promise<T> {
 	return new Promise((resolve, reject) => {
 		const channel = new MessageChannel();
 		channel.port1.onmessage = event => {

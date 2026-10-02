@@ -67,7 +67,7 @@
 	},
 	"devDependencies": {
 		"@aaroon/workbox-rspack-plugin": "^1.0.1",
-		"@mutsuntsai/eslint": "^1.5.0",
+		"@mutsuntsai/eslint": "^1.5.2",
 		"@mutsuntsai/rsbuild-plugin-vue-ssg": "^2.0.1",
 		"@mutsuntsai/rsbuild-utils": "^1.0.1",
 		"@playwright/test": "^1.63.0",

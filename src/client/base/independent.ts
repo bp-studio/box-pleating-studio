@@ -5,7 +5,8 @@ import type { Sheet } from "client/project/components/sheet";
 
 //=================================================================
 /**
- * {@link Independent} is a {@link Draggable} of which dragging behavior is independent of other objects.
+ * {@link Independent} is a {@link Draggable} of which dragging behavior is
+ * independent of other objects.
  *
  * Such object will limit the extend to which {@link Sheet} may shrink.
  */

@@ -65,11 +65,14 @@ export class Joinee {
 	 * TODO: But do such non-simple gadget make sense in practice?
 	 */
 	public $contains(p: Point): boolean {
-		// The shape of this.p could be dirty here, so we need to use $originalContour
+		// The shape of this.p could be dirty here,
+		// so we need to use $originalContour
 		return isInside(p.$add(this._v), this.p.$originalContour);
 	}
 
-	public $toGadget(shouldClone: boolean, oriented: boolean, offset?: IPoint): JGadget {
+	public $toGadget(
+		shouldClone: boolean, oriented: boolean, offset?: IPoint
+	): JGadget {
 		let off: IPoint | undefined = this._offset;
 		if(offset) {
 			off = { x: off.x + offset.x, y: off.y + offset.y };
@@ -95,7 +98,9 @@ export class Joinee {
 	}
 
 	public $isSteeperThan(that: Joinee): boolean {
-		return this.p.$direction.value.$slope.gt(that.p.$direction.value.$slope);
+		return this.p.$direction.value.$slope.gt(
+			that.p.$direction.value.$slope
+		);
 	}
 
 	public $setupAnchor(upperLeft: boolean, anchor: Point): void {

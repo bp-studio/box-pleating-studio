@@ -22,7 +22,9 @@ export class ArcSegment implements ISegment {
 	/** The control point of the arc (intersection of two tangents) */
 	public $anchor!: IPoint;
 
-	public constructor(c: IPoint, r: number, s: IPoint, e: IPoint, polygon: number) {
+	public constructor(
+		c: IPoint, r: number, s: IPoint, e: IPoint, polygon: number
+	) {
 		this.$polygon = polygon;
 		this.$center = c;
 		this.$radius = r;
@@ -50,10 +52,14 @@ export class ArcSegment implements ISegment {
 	public $subdivide(point: IPoint, oriented: boolean): ISegment {
 		let newSegment: ArcSegment;
 		if(oriented) {
-			newSegment = new ArcSegment(this.$center, this.$radius, point, this.$end, this.$polygon);
+			newSegment = new ArcSegment(
+				this.$center, this.$radius, point, this.$end, this.$polygon
+			);
 			this.$end = point;
 		} else {
-			newSegment = new ArcSegment(this.$center, this.$radius, this.$start, point, this.$polygon);
+			newSegment = new ArcSegment(
+				this.$center, this.$radius, this.$start, point, this.$polygon
+			);
 			this.$start = point;
 		}
 		this._update();
@@ -82,8 +88,14 @@ export class ArcSegment implements ISegment {
 			yield { x: x1 - dx * l / d, y: y1 - dy * l / d };
 		} else {
 			const result = [
-				{ x: x1 - (dx * l + dy * h) / d, y: y1 - (dy * l - dx * h) / d },
-				{ x: x1 - (dx * l - dy * h) / d, y: y1 - (dy * l + dx * h) / d },
+				{
+					x: x1 - (dx * l + dy * h) / d,
+					y: y1 - (dy * l - dx * h) / d,
+				},
+				{
+					x: x1 - (dx * l - dy * h) / d,
+					y: y1 - (dy * l + dx * h) / d,
+				},
 			];
 			result.sort(xyComparator);
 			yield result[0];
@@ -92,24 +104,29 @@ export class ArcSegment implements ISegment {
 	}
 
 	/**
-	 * Using vectors to quickly check if a given point is within the range of the arc,
-	 * without involving atan calculations. Returns a negative value if the point is in the interior,
-	 * zero if it's on the endpoints, and positive value if it's outside the arc.
+	 * Using vectors to quickly check if a given point is within the range of
+	 * the arc, without involving atan calculations. Returns a negative value if
+	 * the point is in the interior, zero if it's on the endpoints, and positive
+	 * value if it's outside the arc.
 	 */
 	public $inArcRange(p: IPoint): number {
 		// Needs to be on the same side as the arc
 		// (In theory the difference will be huge, so epsilon is not needed)
-		if((p.x - this.$center.x) * this._out.x + (p.y - this.$center.y) * this._out.y <= 0) return 1;
+		const side =
+			(p.x - this.$center.x) * this._out.x +
+			(p.y - this.$center.y) * this._out.y;
+		if(side <= 0) return 1;
 
 		// Needs to be between the start point and the end point
 		const { x, y } = this._delta;
-		const weight = ((p.x - this._start.x) * x + (p.y - this._start.y) * y) / (x * x + y * y);
+		const dot = (p.x - this._start.x) * x + (p.y - this._start.y) * y;
+		const weight = dot / (x * x + y * y);
 		return weight * (weight - 1);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Update the vector for comparison etc. */
 	private _update(): void {
@@ -117,7 +134,10 @@ export class ArcSegment implements ISegment {
 		this._delta = { x: e.x - s.x, y: e.y - s.y };
 		let r = (e.y - s.y) / (s.x + e.x - 2 * c.x);
 		r = 1 + r * r;
-		this._out = { x: ((e.x + s.x) / 2 - c.x) * r, y: ((e.y + s.y) / 2 - c.y) * r };
+		this._out = {
+			x: ((e.x + s.x) / 2 - c.x) * r,
+			y: ((e.y + s.y) / 2 - c.y) * r,
+		};
 		this.$anchor = { x: c.x + this._out.x, y: c.y + this._out.y };
 	}
 }

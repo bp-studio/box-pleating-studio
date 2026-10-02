@@ -19,7 +19,10 @@ type Axis = "x" | "y";
 export interface QuadrantStartEnd {
 	start: Point;
 	end: Point;
-	/** If defined, the starting point should be moved to the intersection ridge dividing the gadgets of these flaps. */
+	/**
+	 * If defined, the starting point should be moved to the intersection ridge
+	 * dividing the gadgets of these flaps.
+	 */
 	startDivision?: [NodeId, NodeId];
 	/** Same as {@link startDivision}, for the ending point. */
 	endDivision?: [NodeId, NodeId];
@@ -75,13 +78,14 @@ export class Quadrant {
 				const j2 = this._junctions[j];
 				if(oneIsContainedInAnother(j1.$o, j2.$o)) return false;
 
-				// v0.6.17: if the delta point of any two junctions falls inside the circle,
-				// then this quadrant is clearly invalid.
+				// v0.6.17: if the delta point of any two junctions falls
+				// inside the circle, then this quadrant is clearly invalid.
 				const offset = getDeltaPointOffsetFromCorner(j1, j2);
 				const n1 = this._getOppositeId(j1);
 				const n2 = this._getOppositeId(j2);
 				const r = nodeSet.$distTriple(n1, n2, this.$flap.id).d3;
-				const deltaPtDist = new Vector(r - offset.x, r - offset.y).$length;
+				const deltaPt = new Vector(r - offset.x, r - offset.y);
+				const deltaPtDist = deltaPt.$length;
 				if(deltaPtDist < r) return false;
 			}
 		}
@@ -93,23 +97,30 @@ export class Quadrant {
 	}
 
 	/**
-	 * Resolve the starting/ending points of tracing for the contour of a node (given by its leaves).
+	 * Resolve the starting/ending points of tracing for the contour of a node
+	 * (given by its leaves).
 	 *
-	 * The junctions with flaps inside the node (i.e. wrapped by the river of the node)
-	 * do not show up on the contour of the node, as they are digested by the inner flaps.
-	 * So only the junctions with flaps outside the node determine the starting/ending points,
-	 * and where the gadget of such a junction is adjacent to the gadget of an inner junction,
-	 * the starting/ending point should be moved to the intersection ridge between the two gadgets instead
-	 * (the actual location is resolved by {@link RepoTrace} using the returned pair of flap ids).
+	 * The junctions with flaps inside the node (i.e. wrapped by the river of
+	 * the node) do not show up on the contour of the node, as they are
+	 * digested by the inner flaps. So only the junctions with flaps outside the
+	 * node determine the starting/ending points, and where the gadget of such a
+	 * junction is adjacent to the gadget of an inner junction, the
+	 * starting/ending point should be moved to the intersection ridge between
+	 * the two gadgets instead (the actual location is resolved by
+	 * {@link RepoTrace} using the returned pair of flap ids).
 	 *
-	 * Returns `null` if all junctions of this quadrant are with inner flaps, in which case
-	 * this quadrant does not participate in the tracing of the node at all.
+	 * Returns `null` if all junctions of this quadrant are with inner flaps, in
+	 * which case this quadrant does not participate in the tracing of the node
+	 * at all.
 	 */
-	public $resolveStartEnd(leaves: ReadonlySet<NodeId>): QuadrantStartEnd | null {
+	public $resolveStartEnd(
+		leaves: ReadonlySet<NodeId>
+	): QuadrantStartEnd | null {
 		const inside: ValidJunction[] = [];
 		const outside: ValidJunction[] = [];
 		for(const junction of this._junctions) {
-			(leaves.has(this._getOppositeId(junction)) ? inside : outside).push(junction);
+			const isInside = leaves.has(this._getOppositeId(junction));
+			(isInside ? inside : outside).push(junction);
 		}
 		if(!outside.length) return null;
 
@@ -120,7 +131,8 @@ export class Quadrant {
 		const [start, end] = this._startEndPoints(o);
 		if(!inside.length) return { start, end };
 
-		// The starting side corresponds to one of the axes (see _startEndPoints), and the ending side the other
+		// The starting side corresponds to one of the axes (see
+		// _startEndPoints), and the ending side the other
 		const reversed = this.q % 2 != SlashDirection.FW;
 		const startAxis: Axis = reversed ? "x" : "y";
 		const endAxis: Axis = reversed ? "y" : "x";
@@ -132,15 +144,19 @@ export class Quadrant {
 	}
 
 	/**
-	 * Find the inner junction adjacent to the outer junctions on the given side (if any),
-	 * and return the ids of the two flaps whose gadgets are divided by the intersection ridge in between.
+	 * Find the inner junction adjacent to the outer junctions on the given side
+	 * (if any), and return the ids of the two flaps whose gadgets are divided
+	 * by the intersection ridge in between.
 	 */
 	private _findNeighbor(
 		inside: ValidJunction[], outside: ValidJunction[], o: IPoint, axis: Axis
 	): [NodeId, NodeId] | undefined {
 		let neighbor: ValidJunction | undefined;
 		for(const j of inside) {
-			if(j.$o[axis] > o[axis] && (!neighbor || j.$o[axis] < neighbor.$o[axis])) neighbor = j;
+			const v = j.$o[axis];
+			if(v > o[axis] && (!neighbor || v < neighbor.$o[axis])) {
+				neighbor = j;
+			}
 		}
 		if(!neighbor) return undefined;
 		const last = outside.find(j => j.$o[axis] == o[axis])!;
@@ -161,11 +177,14 @@ export class Quadrant {
 	/**
 	 * In case there are rivers, calculate the corner of the overlap region.
 	 * @param ov The {@link JOverlap} to calculate.
-	 * @param junction The parent {@link JJunction} from which {@link ov} derives.
+	 * @param junction The parent {@link JJunction} from which {@link ov}
+	 * derives.
 	 * @param q Which corner (before transformation) to get
 	 * @param d Additional distance
 	 */
-	public $getOverlapCorner(ov: JOverlap, junction: JJunction, q: QuadrantDirection, d: number): Point {
+	public $getOverlapCorner(
+		ov: JOverlap, junction: JJunction, q: QuadrantDirection, d: number
+	): Point {
 		const r = this.$flap.$length + d;
 		let sx = ov.shift?.x ?? 0;
 		let sy = ov.shift?.y ?? 0;
@@ -197,9 +216,9 @@ export class Quadrant {
 		return { x: this.x(r), y: this.y(r) };
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Get the y-coordinate that is {@link d} units away from the tip.
@@ -220,7 +239,8 @@ export class Quadrant {
 	}
 }
 
-export const minQuadrantWeightComparator: Comparator<Quadrant> = (a, b) => a.w - b.w;
+export const minQuadrantWeightComparator: Comparator<Quadrant> =
+	(a, b) => a.w - b.w;
 
 /**
  * The weight for sorting points from the perspective of a given quadrant.
@@ -246,7 +266,9 @@ export function getFactors(q: QuadrantDirection): ISignPoint {
 	};
 }
 
-function getDeltaPointOffsetFromCorner(j1: ValidJunction, j2: ValidJunction): IPoint {
+function getDeltaPointOffsetFromCorner(
+	j1: ValidJunction, j2: ValidJunction
+): IPoint {
 	return {
 		x: Math.min(j1.$o.x, j2.$o.x),
 		y: Math.min(j1.$o.y, j2.$o.y),
@@ -263,7 +285,10 @@ function getDeltaPointOffsetFromCorner(j1: ValidJunction, j2: ValidJunction): IP
  *
  * A classic example of this is the following:
  * ```
- * parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)");
+ * parseTree(
+ * 	"(0,1,10),(0,2,10),(0,3,1)",
+ * 	"(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)"
+ * );
  * ```
  */
 function oneIsContainedInAnother(o1: IPoint, o2: IPoint): boolean {

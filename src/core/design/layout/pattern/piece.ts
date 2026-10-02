@@ -56,10 +56,13 @@ export class Piece extends Region implements JPiece {
 	/**
 	 * The {@link Cache}s are enumerable fields of the instance,
 	 * so we must not serialize (or clone) the instance directly,
-	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 * otherwise the caches will be included, and the result will depend on the
+	 * states of the caches.
 	 */
 	public toJSON(): JPiece {
-		const result: JPiece = { ox: this.ox, oy: this.oy, u: this.u, v: this.v };
+		const result: JPiece = {
+			ox: this.ox, oy: this.oy, u: this.u, v: this.v,
+		};
 		if(this.detours) result.detours = clone(this.detours);
 		if(this.shift) result.shift = { x: this.shift.x, y: this.shift.y };
 		return result;
@@ -127,9 +130,9 @@ export class Piece extends Region implements JPiece {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public readonly $anchors = new Cache<PerQuadrant<Point | null>>(() => {
 		const p = this._points.value;
@@ -168,9 +171,9 @@ export class Piece extends Region implements JPiece {
 		return this._points.value.map(p => p.$add(unshift));
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private readonly _points = new Cache(() => {
 		const { ox, oy, u, v } = this;
@@ -202,7 +205,9 @@ export class Piece extends Region implements JPiece {
 		]);
 	}
 
-	private _processDetour(ridges: Line[], contour: RationalPath, _detour: Path): void {
+	private _processDetour(
+		ridges: Line[], contour: RationalPath, _detour: Path
+	): void {
 		const detour = _detour.map(p => new Point(p).$add(this._shift.value));
 		const start = detour[0], end = detour[detour.length - 1];
 

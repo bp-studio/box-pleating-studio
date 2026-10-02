@@ -2,7 +2,8 @@ import type { NodeId } from "shared/json";
 
 export enum Direction { UR, UL, LL, LR, R, T, L, B, none }
 
-export type QuadrantDirection = Direction.UL | Direction.UR | Direction.LL | Direction.LR;
+export type QuadrantDirection =
+	Direction.UL | Direction.UR | Direction.LL | Direction.LR;
 
 export enum SlashDirection { FW, BW }
 
@@ -21,7 +22,10 @@ export const nextQuadrantOffset = 1;
  * Can be generated using {@link makePerQuadrant}.
  */
 export interface PerQuadrant<T> extends PerQuadrantBase<T> {
-	map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: PerQuadrant<T>): PerQuadrant<U>;
+	map<U>(
+		callbackfn: (value: T, index: number, array: T[]) => U,
+		thisArg?: PerQuadrant<T>
+	): PerQuadrant<U>;
 }
 
 export function perQuadrant<T>(args: PerQuadrantBase<T>): PerQuadrant<T> {
@@ -32,7 +36,9 @@ export function opposite(direction: QuadrantDirection): QuadrantDirection {
 	return (direction + 2) % quadrantNumber;
 }
 
-export function makePerQuadrant<T>(factory: (q: QuadrantDirection) => T): PerQuadrant<T> {
+export function makePerQuadrant<T>(
+	factory: (q: QuadrantDirection) => T
+): PerQuadrant<T> {
 	return quadrants.map(factory);
 }
 
@@ -48,6 +54,8 @@ export function getQuadrant(code: QuadrantCode): QuadrantDirection {
 	return code & QUADRANT_MASK;
 }
 
-export function makeQuadrantCode(id: NodeId, q: QuadrantDirection): QuadrantCode {
+export function makeQuadrantCode(
+	id: NodeId, q: QuadrantDirection
+): QuadrantCode {
 	return (id << 2 | q) as QuadrantCode;
 }

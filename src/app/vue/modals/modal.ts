@@ -6,7 +6,9 @@ interface ModalOptions extends Modal.Options {
 	onBeforeShow: Action<Awaitable<boolean>>;
 }
 
-export default function useModal(screen_name: string, options?: Partial<ModalOptions>) {
+export default function useModal(
+	screen_name: string, options?: Partial<ModalOptions>
+) {
 
 	let modal: Modal;
 

@@ -11,7 +11,9 @@ window.idbKeyval = idbKeyval;
 
 namespace HandleService {
 
-	export const enabled = computed(() => isFileApiEnabled && settings.useFileSystem);
+	export const enabled = computed(
+		() => isFileApiEnabled && settings.useFileSystem
+	);
 
 	export const recent: FileSystemFileHandle[] = reactive([]);
 
@@ -36,13 +38,17 @@ namespace HandleService {
 	}
 
 	/**
-	 * Find the id of existing handle in the given {@link FileSystemFileHandle} array.
-	 * It returns `undefined` if not found.
+	 * Find the id of existing handle in the given {@link FileSystemFileHandle}
+	 * array. It returns `undefined` if not found.
 	 */
-	export function locate(list: FileHandleList): Promise<(ProjId | undefined)[]> {
+	export function locate(
+		list: FileHandleList
+	): Promise<(ProjId | undefined)[]> {
 		const opened = [...handles.entries()];
 		const idTasks = list.map(async h => {
-			const tasks = opened.map(e => e[1].isSameEntry(h).then(yes => yes ? e[0] : undefined));
+			const tasks = opened.map(
+				e => e[1].isSameEntry(h).then(yes => yes ? e[0] : undefined)
+			);
 			const results = await Promise.all(tasks);
 			return results.find(i => i !== undefined);
 		});
@@ -53,7 +59,9 @@ namespace HandleService {
 		if(!enabled.value) return;
 		if(haveSession) {
 			const entries: [number, FileSystemFileHandle][] = await idbKeyval.get("handle") || [];
-			for(const [i, handle] of entries) handles.set(Workspace.ids.value[i], handle);
+			for(const [i, handle] of entries) {
+				handles.set(Workspace.ids.value[i], handle);
+			}
 		}
 		await getRecent();
 	}
@@ -79,8 +87,12 @@ namespace HandleService {
 		]);
 	}
 
-	export async function removeRecent(handle: FileSystemFileHandle): Promise<void> {
-		const tasks = recent.map(async e => await e.isSameEntry(handle) ? e : null);
+	export async function removeRecent(
+		handle: FileSystemFileHandle
+	): Promise<void> {
+		const tasks = recent.map(
+			async e => await e.isSameEntry(handle) ? e : null
+		);
 		// Be careful that the recent array might mutate during this await
 		const results = await Promise.all(tasks);
 		const entries = results.filter(e => e) as FileSystemFileHandle[];
@@ -90,7 +102,9 @@ namespace HandleService {
 		}
 	}
 
-	export async function addRecent(handle: FileSystemFileHandle): Promise<void> {
+	export async function addRecent(
+		handle: FileSystemFileHandle
+	): Promise<void> {
 		const MAX_RECENT = 10;
 		await removeRecent(handle);
 		recent.unshift(handle);

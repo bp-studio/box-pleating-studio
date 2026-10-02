@@ -30,9 +30,9 @@ namespace Display {
 			// This improves the displaying speed of the first open project.
 			premultipliedAlpha: false,
 
-			// Floating number devicePixelRatio could cause the grid to appear glitchy,
-			// so taking the floor of it is good enough. This approach results in good visuals
-			// in both desktops and mobiles.
+			// Floating number devicePixelRatio could cause the grid to appear
+			// glitchy, so taking the floor of it is good enough. This approach
+			// results in good visuals in both desktops and mobiles.
 			resolution: Math.floor(devicePixelRatio),
 			autoDensity: true,
 		});
@@ -79,14 +79,18 @@ namespace Display {
 	 * We use this mainly for {@link shield}ing.
 	 * We also pause the display when there's no opened project,
 	 * and resumes whenever a project is activated.
-	 * Notice that this means if we switch project before the async operation finishes,
-	 * the display will resume immediately, which is in fact the desired behavior.
+	 * Notice that this means if we switch project before the async operation
+	 * finishes, the display will resume immediately, which is in fact the
+	 * desired behavior.
 	 */
 	async function toggle(on: boolean): Promise<void> {
-		if(on) ticker.start(); // No need to check ticker.started; Pixi does that internally.
+		// No need to check ticker.started; Pixi does that internally.
+		if(on) ticker.start();
 		if(!on && ticker.started) {
 			await nextTick(); // First wait for the updating of Vue.
-			renderer.render(stage); // Then let Pixi to render one more time, to avoid glitches on the next activation
+			// Then let Pixi to render one more time, to avoid glitches on the
+			// next activation
+			renderer.render(stage);
 			ticker.stop();
 		}
 	}
@@ -107,16 +111,20 @@ namespace Display {
 		});
 	}
 
-	export function $setInteractive(interactive: boolean, cursor?: string): void {
-		// There is a small chance that this method is called before initializing,
-		// so we safe guard it here.
+	export function $setInteractive(
+		interactive: boolean, cursor?: string
+	): void {
+		// There is a small chance that this method is called before
+		// initializing, so we safe guard it here.
 		if(!stage) return;
 
 		stage.interactiveChildren = interactive;
 		if(cursor) stage.cursor = cursor;
 	}
 
-	export function $on(event: string, fn: (e: FederatedPointerEvent) => void): void {
+	export function $on(
+		event: string, fn: (e: FederatedPointerEvent) => void
+	): void {
 		stage.on(event, fn);
 	}
 }

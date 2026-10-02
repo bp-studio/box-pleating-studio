@@ -50,17 +50,23 @@ export class Device extends Draggable {
 
 		// We deliberately put the shade on a higher layer,
 		// so that its hovering effect can be prioritized.
-		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.edge]);
-		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.ridge]);
-		this._axisParallels = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.axisParallels]);
+		this._shade = this.$addRootObject(
+			new Graphics(), sheet.$layers[Layer.edge]
+		);
+		this._ridge = this.$addRootObject(
+			new SmoothGraphics(), sheet.$layers[Layer.ridge]
+		);
+		this._axisParallels = this.$addRootObject(
+			new SmoothGraphics(), sheet.$layers[Layer.axisParallels]
+		);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Control methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public override $constrainBy(v: IPoint): IPoint {
 		const f = this.$graphics.forward ? 1 : -1;
@@ -79,7 +85,8 @@ export class Device extends Draggable {
 	protected override async _move(x: number, y: number): Promise<void> {
 		const dx = x - this._location.x;
 
-		// Update range, so that subsequent dragging can be constraint correctly even before redraw.
+		// Update range, so that subsequent dragging can be constraint correctly
+		// even before redraw.
 		const r = this.$graphics.range;
 		this.$graphics.range = [r[0] - dx, r[1] - dx];
 
@@ -105,9 +112,9 @@ export class Device extends Draggable {
 		this._dragging = false;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $redraw(data: DeviceData): void {
 		const range = this.$graphics.range;
@@ -124,9 +131,13 @@ export class Device extends Draggable {
 
 	private _drawShade(): void {
 		this._shade.alpha = style.shade.alpha;
-		if(this.$selected || this.stretch.$selected) this._shade.alpha = style.shade.alpha;
-		else if(this.$hovered) this._shade.alpha = style.shade.hover;
-		else this._shade.alpha = 0;
+		if(this.$selected || this.stretch.$selected) {
+			this._shade.alpha = style.shade.alpha;
+		} else if(this.$hovered) {
+			this._shade.alpha = style.shade.hover;
+		} else {
+			this._shade.alpha = 0;
+		}
 	}
 
 	private _draw(): void {
@@ -134,10 +145,14 @@ export class Device extends Draggable {
 		fillContours(this._shade, this.$graphics.contours, style.hinge.color);
 
 		const sh = ProjectService.shrink.value;
-		this._axisParallels.clear().lineStyle(style.axisParallel.width * sh, style.axisParallel.color);
+		this._axisParallels.clear().lineStyle(
+			style.axisParallel.width * sh, style.axisParallel.color
+		);
 		drawLines(this._axisParallels, this.$graphics.axisParallel);
 
-		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
+		this._ridge.clear().lineStyle(
+			style.ridge.width * sh, style.ridge.color
+		);
 		drawLines(this._ridge, this.$graphics.ridges);
 	}
 }

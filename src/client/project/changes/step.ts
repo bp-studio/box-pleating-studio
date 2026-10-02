@@ -14,7 +14,10 @@ const AUTO_RESET = 1000;
 export enum OperationResult {
 	/** The operation completely failed. */
 	Failed,
-	/** The operation successfully carried some of the {@link Command}s, but not all of them. */
+	/**
+	 * The operation successfully carried some of the {@link Command}s, but not
+	 * all of them.
+	 */
 	Partial,
 	/** The operation completely succeeded. */
 	Success,
@@ -36,8 +39,8 @@ export class Step implements ISerializable<JStep> {
 	private readonly _commands: readonly Command[];
 
 	/**
-	 * {@link Memento}s that represented objects constructed in this {@link Step}
-	 * (possibly contains outdated records).
+	 * {@link Memento}s that represented objects constructed in this
+	 * {@link Step} (possibly contains outdated records).
 	 */
 	private readonly _construct: Memento[];
 
@@ -78,18 +81,20 @@ export class Step implements ISerializable<JStep> {
 			mode: this._mode,
 			before: this._before,
 			after: this._after,
-			construct: this._construct.length ? clone(this._construct) : undefined,
+			construct: this._construct.length ?
+				clone(this._construct) : undefined,
 			destruct: this._destruct.length ? clone(this._destruct) : undefined,
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Whether this {@link Step} doesn't actually do anything. */
 	public get $isVoid(): boolean {
-		return this._commands.every(c => c.$isVoid) && this._construct.length == 0 && this._destruct.length == 0;
+		return this._commands.every(c => c.$isVoid) &&
+			this._construct.length == 0 && this._destruct.length == 0;
 	}
 
 	public $tryAdd(commands: readonly Command[],
@@ -119,7 +124,8 @@ export class Step implements ISerializable<JStep> {
 		this._project.design.$addMementos(this._construct);
 
 		let result = OperationResult.Success;
-		const firstReject = await runCommandsAsync(this._commands, c => c.$redo());
+		const firstReject =
+			await runCommandsAsync(this._commands, c => c.$redo());
 		if(firstReject == 0) return OperationResult.Failed;
 		if(firstReject > 0) {
 			(this._commands as Command[]).splice(firstReject);
@@ -142,7 +148,8 @@ export class Step implements ISerializable<JStep> {
 		const firstReject = await runCommandsAsync(commands, c => c.$undo());
 		if(firstReject == 0) return OperationResult.Failed;
 		if(firstReject > 0) {
-			(this._commands as Command[]).splice(0, this._commands.length - firstReject);
+			const count = this._commands.length - firstReject;
+			(this._commands as Command[]).splice(0, count);
 			result = OperationResult.Partial;
 		}
 
@@ -152,19 +159,22 @@ export class Step implements ISerializable<JStep> {
 		return result;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Reset auto-sealing */
 	private _reset(): void {
 		if(this._timeout) clearTimeout(this._timeout);
-		if(!this._sealed) this._timeout = setTimeout(() => this._seal(), AUTO_RESET);
+		if(!this._sealed) {
+			this._timeout = setTimeout(() => this._seal(), AUTO_RESET);
+		}
 	}
 
 	/** Automatically seal self. */
 	private _seal(): void {
-		if(this._project.$isDragging) this._reset(); // Skip the sealing if we're still dragging.
+		// Skip the sealing if we're still dragging.
+		if(this._project.$isDragging) this._reset();
 		else this._sealed = true;
 	}
 

@@ -25,7 +25,9 @@ namespace Core {
 		localStorage.setItem("build", app_config.app_version);
 		if(!await StudioService.init()) return false;
 		const hasQueue = await File.openQueue();
-		const hasSession = await SessionService.init(Settings.loadSessionOnQueue || !hasQueue);
+		const hasSession = await SessionService.init(
+			Settings.loadSessionOnQueue || !hasQueue
+		);
 		if(getHadSettings()) await HandleService.load(hasSession);
 		await loadQuery();
 		welcomeScreenReady.value = true;
@@ -37,8 +39,9 @@ namespace Core {
 		const url = new URL(location.href);
 		const lz = url.searchParams.get("project");
 
-		// The value written to sessionStorage will not be lost due to tab reload,
-		// so we can use this to avoid the problem of reloading when one refreshes the page
+		// The value written to sessionStorage will not be lost due to tab
+		// reload, so we can use this to avoid the problem of reloading when one
+		// refreshes the page.
 		if(!lz || lz == sessionStorage.getItem("project")) return;
 		else sessionStorage.setItem("project", lz);
 

@@ -25,10 +25,11 @@ const maxKeyComparator: Comparator<AABBSide> = (a, b) => b.$key - a.$key;
  * It is composed of four {@link AABBSide}s, and most of its methods
  * encapsulate corresponding methods for these four components.
  *
- * Strictly speaking, there are two cases: when it is the bottom-level {@link AABB},
- * its boundaries are the variables themselves (the four sides of the flap rectangle);
- * or when it is not the bottom-level {@link AABB},
- * its boundaries are the union of all lower-level {@link AABB} (plus their margins).
+ * Strictly speaking, there are two cases: when it is the bottom-level
+ * {@link AABB}, its boundaries are the variables themselves (the four sides of
+ * the flap rectangle); or when it is not the bottom-level {@link AABB},
+ * its boundaries are the union of all lower-level {@link AABB} (plus their
+ * margins).
  *
  * As {@link AABBSide} uses a heap for dynamic updates,
  * it can quickly ensure that it updates to the correct boundary regardless
@@ -53,13 +54,16 @@ export class AABB {
 	}
 
 	public $intersects(that: AABB, gap: number): boolean {
-		return this._sides[Side.left].$base - gap < that._sides[Side.right].$base &&
-			this._sides[Side.right].$base + gap > that._sides[Side.left].$base &&
-			this._sides[Side.top].$base + gap > that._sides[Side.bottom].$base &&
-			this._sides[Side.bottom].$base - gap < that._sides[Side.top].$base;
+		const a = this._sides, b = that._sides;
+		return a[Side.left].$base - gap < b[Side.right].$base &&
+			a[Side.right].$base + gap > b[Side.left].$base &&
+			a[Side.top].$base + gap > b[Side.bottom].$base &&
+			a[Side.bottom].$base - gap < b[Side.top].$base;
 	}
 
-	public $update(top: number, right: number, bottom: number, left: number): void {
+	public $update(
+		top: number, right: number, bottom: number, left: number
+	): void {
 		this._sides[Side.top].$value = top;
 		this._sides[Side.right].$value = right;
 		this._sides[Side.bottom].$value = bottom;

@@ -68,7 +68,10 @@ export class Vector extends Couple {
 		return new Vector(this._x.neg, this._y.neg);
 	}
 
-	/** Returns the principal argument of the vector in radians, in the range of (-PI/2, PI/2). */
+	/**
+	 * Returns the principal argument of the vector in radians,
+	 * in the range of (-PI/2, PI/2).
+	 */
 	public get $angle(): number {
 		return Math.atan2(this.y, this.x);
 	}
@@ -98,7 +101,8 @@ export class Vector extends Couple {
 	/**
 	 * Double the principle argument and returns the new vector.
 	 *
-	 * Note that the length of the new vector may be different from the original length.
+	 * Note that the length of the new vector may be different from the original
+	 * length.
 	 */
 	public $doubleAngle(): Vector {
 		const { _x, _y } = this.$reduce();

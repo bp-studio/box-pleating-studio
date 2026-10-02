@@ -12,8 +12,8 @@ import type { Gadget } from "./gadget";
 
 //=================================================================
 /**
- * {@link AddOn} is a {@link Region} in a {@link Device} that does not belong to any {@link Gadget},
- * which is produced by standard joins.
+ * {@link AddOn} is a {@link Region} in a {@link Device} that does not belong
+ * to any {@link Gadget}, which is produced by standard joins.
  */
 //=================================================================
 export class AddOn extends Region implements JAddOn {
@@ -29,7 +29,8 @@ export class AddOn extends Region implements JAddOn {
 	/**
 	 * The {@link Cache}s are enumerable fields of the instance,
 	 * so we must not serialize (or clone) the instance directly,
-	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 * otherwise the caches will be included, and the result will depend on
+	 * the states of the caches.
 	 */
 	public toJSON(): JAddOn {
 		return {
@@ -44,5 +45,6 @@ export class AddOn extends Region implements JAddOn {
 		return { contour, ridges };
 	});
 
-	public readonly $direction = new Cache(() => new Vector(this.dir).$reduceToInt());
+	public readonly $direction =
+		new Cache(() => new Vector(this.dir).$reduceToInt());
 }

@@ -37,15 +37,18 @@ export function toLines(path: RationalPath): Line[] {
 }
 
 /**
- * Given a triangle, let the first vertex stays stationary,
- * and move the second vertex to the given target while keeping triangle similar.
+ * Given a triangle, let the first vertex stays stationary, and move the second
+ * vertex to the given target while keeping triangle similar.
  * @returns The third vertex after the moving.
  */
-export function triangleTransform(triangle: RationalPath, to: Point): Point | null {
+export function triangleTransform(
+	triangle: RationalPath, to: Point
+): Point | null {
 	const [p1, p2, p3] = triangle;
 	const [v1, v2, v3] = [to, p2, p3].map(p => p.$sub(p1));
 
-	// TODO: It is not yet clear why this might happen. More investigation is needed.
+	// TODO: It is not yet clear why this might happen.
+	// More investigation is needed.
 	if(v2.eq(Vector.ZERO) || v1.eq(Vector.ZERO)) return null;
 
 	const m = Matrix.$getTransformMatrix(v2, v1);

@@ -49,8 +49,10 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 
 	// Push them towards the shared corner as much as possible
 	const slack = Math.floor(g2.$slack.value[oriented ? 0 : 2]);
-	const offsets = oriented ? [0, slack] :
-		[j1.sx - g1.widthSpan.value, j2.sx - context.$getSpan(g2, 2) - g2.widthSpan.value - slack];
+	const offsets = oriented ? [0, slack] : [
+		j1.sx - g1.widthSpan.value,
+		j2.sx - context.$getSpan(g2, 2) - g2.widthSpan.value - slack,
+	];
 	if(reversed) offsets.reverse();
 	context.$devices.forEach((d, i) => d.$offset = offsets[i]);
 	return true;
@@ -70,13 +72,15 @@ function makeSpitJoinPattern(context: PositioningContext): boolean {
 	for(const device of nonJoin) {
 		const overlap = device.$partition.$overlaps[0];
 		const j = context.$getJunctions(device)[0];
-		const qOut = overlap.c[0].e! < 0 ? 0 : 2; // v0.6.17: orientation matters
+		// v0.6.17: orientation matters
+		const qOut = overlap.c[0].e! < 0 ? 0 : 2;
 		const corner = overlap.c[qOut];
 		const gadget = device.$gadgets[0];
 		const index = convertIndex(corner.e);
 		const q = corner.q!;
 		const targetCorner = device.$pattern.$config.$overlaps[index].c[q];
-		let offset = j.sx - context.$getSpan(gadget, qOut) - gadget.widthSpan.value;
+		let offset =
+			j.sx - context.$getSpan(gadget, qOut) - gadget.widthSpan.value;
 		if(targetCorner.type == CornerType.socket) {
 			offset += device.$pattern.$gadgets[index].$slack.value[q];
 		}
@@ -88,11 +92,14 @@ function makeSpitJoinPattern(context: PositioningContext): boolean {
 	return true;
 }
 
-function pushJoinDeviceTowardsJoint(context: PositioningContext, device: Device): void {
+function pushJoinDeviceTowardsJoint(
+	context: PositioningContext, device: Device
+): void {
 	const [j1, j2] = context.$getJunctions(device);
 	const oriented = j1.c[0].e == j2.c[0].e;
 	if(!oriented) {
 		const gadget = device.$gadgets[0];
-		device.$offset = j1.sx - context.$getSpan(gadget, 0) - gadget.widthSpan.value;
+		device.$offset =
+			j1.sx - context.$getSpan(gadget, 0) - gadget.widthSpan.value;
 	}
 }

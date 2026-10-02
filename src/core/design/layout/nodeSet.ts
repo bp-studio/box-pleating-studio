@@ -15,7 +15,8 @@ import type { Repository } from "./repository";
 
 //=================================================================
 /**
- * {@link NodeSet} keeps a record for the nodes and coverage info in a {@link Repository}.
+ * {@link NodeSet} keeps a record for the nodes and coverage info in a
+ * {@link Repository}.
  */
 //=================================================================
 export class NodeSet {
@@ -23,7 +24,8 @@ export class NodeSet {
 	public readonly $leaves: readonly NodeId[];
 
 	/**
-	 * All nodes on the paths from {@link $leaves} to their LCA, excluding the LCA itself.
+	 * All nodes on the paths from {@link $leaves} to their LCA, excluding the
+	 * LCA itself.
 	 * This is used in {@link traceContourTask} to build the {@link stretchMap}.
 	 */
 	public readonly $nodes: readonly NodeId[];
@@ -44,7 +46,9 @@ export class NodeSet {
 	 */
 	private readonly _lcaMap: IntDoubleMap<NodeId, ITreeNode> | undefined;
 
-	constructor(junctions: Junctions, quadrants: ReadonlyMap<number, Quadrant>) {
+	constructor(
+		junctions: Junctions, quadrants: ReadonlyMap<number, Quadrant>
+	) {
 		this.$leaves = getLeaves(junctions);
 
 		const heap = new BinaryHeap<ITreeNode>(maxDistComparator);
@@ -67,7 +71,8 @@ export class NodeSet {
 			const node = heap.$pop()!;
 			const coveredQuadrants = coverage.get(node)!;
 
-			// Stop processing if we've covered everything (i.e. reached the LCA of all relevant leaves)
+			// Stop processing if we've covered everything
+			// (i.e. reached the LCA of all relevant leaves)
 			if(coveredQuadrants.length == numQuadrants) {
 				coverage.delete(node);
 				continue;
@@ -76,10 +81,14 @@ export class NodeSet {
 			nodes.push(node.id);
 			const parent = node.$parent;
 			if(!parent) continue;
-			const parentCoverage = getOrSetEmptyArray(coverage, parent, () => heap.$insert(parent));
+			const parentCoverage = getOrSetEmptyArray(
+				coverage, parent, () => heap.$insert(parent)
+			);
 			if(this._lcaMap && parentCoverage.length) {
 				for(const A of parentCoverage) {
-					for(const B of coveredQuadrants) this._lcaMap.set(A.$flap.id, B.$flap.id, parent);
+					for(const B of coveredQuadrants) {
+						this._lcaMap.set(A.$flap.id, B.$flap.id, parent);
+					}
 				}
 			}
 			parentCoverage.push(...coveredQuadrants);
@@ -91,7 +100,8 @@ export class NodeSet {
 	}
 
 	/**
-	 * Given the ids of three flaps, return the distance from each of them to their branching node.
+	 * Given the ids of three flaps, return the distance from each of them to
+	 * their branching node.
 	 */
 	public $distTriple(i1: NodeId, i2: NodeId, i3: NodeId): {
 		d1: number; d2: number; d3: number;
@@ -124,9 +134,9 @@ export class NodeSet {
 		return false;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _dist(a: ITreeNode, b: ITreeNode): number {
 		return dist(a, b, this._lca(a, b));

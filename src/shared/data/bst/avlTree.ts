@@ -13,10 +13,11 @@ const NIL = { $height: -1 };
 //=================================================================
 /**
  * {@link AvlTree} is a self-balancing {@link IBinarySearchTree},
- * Its characteristic is to maintain complete balance
- * (the height difference of branches is at most 1), so the search performance is the greatest,
- * but at the cost of slower insertion and deletion than {@link RedBlackTree},
- * Therefore, it is suitable for situations where the search demand is much greater than the changes.
+ * Its characteristic is to maintain complete balance (the height difference of
+ * branches is at most 1), so the search performance is the greatest, but at the
+ * cost of slower insertion and deletion than {@link RedBlackTree}, Therefore,
+ * it is suitable for situations where the search demand is much greater than
+ * the changes.
  */
 //=================================================================
 
@@ -76,9 +77,9 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 		return result.$value;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected override _rotateRight(n: Node<K, V>): Node<K, V> {
 		const x = super._rotateRight(n);
@@ -94,9 +95,9 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 		return x;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Delete the node of the given key under node {@link n}.
@@ -134,7 +135,10 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 
 	private _insert(n: Node<K, V>, key: K, value: V): Node<K, V> {
 		if(n === this._nil) {
-			return this._tempNode = { $key: key, $value: value, $height: 0, $left: this._nil, $right: this._nil };
+			return this._tempNode = {
+				$key: key, $value: value, $height: 0,
+				$left: this._nil, $right: this._nil,
+			};
 		} else {
 			const compare = this._comparator(n.$key, key);
 			if(compare > 0) {
@@ -151,7 +155,8 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 
 	/**
 	 * Find and remove the minimum value under node {@link n}.
-	 * This method is similar to {@link _delete}, but does not require comparisons, so it is faster.
+	 * This method is similar to {@link _delete}, but does not require
+	 * comparisons, so it is faster.
 	 * @returns The node that replaces {@link n} in the tree.
 	 */
 	private _pop(n: Node<K, V>): Node<K, V> {
@@ -183,5 +188,6 @@ export class AvlTree<K, V = K> extends BinarySearchTree<K, V, Node<K, V>> {
 }
 
 function updateHeight<K, V>(n: Node<K, V>): void {
-	n.$height = 1 + (n.$left.$height > n.$right.$height ? n.$left.$height : n.$right.$height);
+	n.$height = 1 + (n.$left.$height > n.$right.$height ?
+		n.$left.$height : n.$right.$height);
 }

@@ -15,11 +15,12 @@ export type Polygon = Path[];
  * ```
  * Note that this is different from the ordering used in Pixi.js.
  */
-export type TransformationMatrix = [number, number, number, number, number, number];
+export type TransformationMatrix =
+	[number, number, number, number, number, number];
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Arc
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 export interface IArcPoint extends IPoint {
 	arc?: IPoint;
@@ -30,13 +31,16 @@ export type ArcPath = IArcPoint[];
 
 export type ArcPolygon = ArcPath[];
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Contour
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 export type PathEx = Path & {
 
-	/** In the use case of union, the id of a representative polygon from which this path forms. */
+	/**
+	 * In the use case of union, the id of a representative polygon from which
+	 * this path forms.
+	 */
 	from?: number;
 
 	/** In raw mode, store the ids of the leaves wrapped inside this path. */
@@ -46,7 +50,11 @@ export type PathEx = Path & {
 	isHole?: boolean;
 };
 
-/** Contour format. a set of contours consists of an outer path plus some inner holes. */
+/**
+ * Contour format.
+ *
+ * A set of contours consists of an outer path plus some inner holes.
+ */
 export interface Contour {
 
 	/** Outer path of the contour. */
@@ -56,9 +64,9 @@ export interface Contour {
 	inner?: PathEx[];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Utility functions
-/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 export function same(p1: IPoint, p2: IPoint): boolean {
 	return p1.x === p2.x && p1.y === p2.y;
@@ -83,7 +91,9 @@ export function xyComparator(p1: IPoint, p2: IPoint): number {
 	return p1.x - p2.x || p1.y - p2.y;
 }
 
-export function applyTransform(pt: IPoint, matrix: TransformationMatrix): IPoint {
+export function applyTransform(
+	pt: IPoint, matrix: TransformationMatrix
+): IPoint {
 	const [a, b, c, d, x, y] = matrix;
 	return {
 		x: pt.x * a + pt.y * b + x,

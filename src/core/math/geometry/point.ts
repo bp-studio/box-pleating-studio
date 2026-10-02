@@ -33,8 +33,11 @@ export class Point extends Couple implements IPoint {
 	public $sub(v: Vector): Point;
 	public $sub(p: Point): Vector;
 	public $sub(c: Vector | Point): Point | Vector {
-		if(c instanceof Vector) return new Point(this._x.sub(c._x), this._y.sub(c._y));
-		else return new Vector(this._x.sub(c._x), this._y.sub(c._y));
+		if(c instanceof Vector) {
+			return new Point(this._x.sub(c._x), this._y.sub(c._y));
+		} else {
+			return new Vector(this._x.sub(c._x), this._y.sub(c._y));
+		}
 	}
 
 	/** {@link Point} is allowed to be compared with {@link IPoint}s. */
@@ -54,16 +57,20 @@ export class Point extends Couple implements IPoint {
 		return new Point(this._x.fac(fx), this._y.fac(fy));
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 
 	public static $parseTest(p: string): Point {
 		const match = p.match(/^\((-?\d+)(?:\/(\d+))?, (-?\d+)(?:\/(\d+))?\)$/)!;
-		const x = new Fraction(Number(match[1]), Number(match[2] || 1) as Positive);
-		const y = new Fraction(Number(match[3]), Number(match[4] || 1) as Positive);
+		const x = new Fraction(
+			Number(match[1]), Number(match[2] || 1) as Positive
+		);
+		const y = new Fraction(
+			Number(match[3]), Number(match[4] || 1) as Positive
+		);
 		return new Point(x, y);
 	}
 

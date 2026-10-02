@@ -29,15 +29,17 @@ export interface IBinarySearchTree<K, V = K> {
 
 //=================================================================
 /**
- * {@link BinarySearchTree} is the underlying implementation of {@link IBinarySearchTree}
- * and provides some common functionalities of all BSTs.
+ * {@link BinarySearchTree} is the underlying implementation of
+ * {@link IBinarySearchTree} and provides some common functionalities of all
+ * BSTs.
  *
  * All empty nodes are represented by a physical node {@link _nil},
  * which saves some costs in decision-making.
  */
 //=================================================================
 
-export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IBinarySearchTree<K, V> {
+export abstract class BinarySearchTree<K, V, N extends Node<K, V>>
+	implements IBinarySearchTree<K, V> {
 
 	/** Instance of the NIL node */
 	protected readonly _nil: N;
@@ -55,7 +57,8 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 	 *
 	 * Correctness invariant: this must always point to either {@link _nil}
 	 * or a node that is currently in the tree. Specifically:
-	 * - {@link $delete} must reset this to {@link _nil} if it deletes the cached node.
+	 * - {@link $delete} must reset this to {@link _nil} if it deletes the
+	 *   cached node.
 	 * - {@link _replaceKeyValue} must redirect this if the cached node's
 	 *   key/value are moved to a different physical node.
 	 * Violating these would cause {@link $getPrev}/{@link $getNext} to
@@ -84,9 +87,9 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 		return this._root === this._nil;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected _getNode(key: K): N {
 		// If possible, return the cached node directly.
@@ -153,11 +156,15 @@ export abstract class BinarySearchTree<K, V, N extends Node<K, V>> implements IB
 		return n;
 	}
 
-	/** Replace key/value of a node by those of another node, and return the latter */
+	/**
+	 * Replace key/value of a node by those of another node,
+	 * and return the latter.
+	 */
 	protected _replaceKeyValue(n: N, by: N): N {
 		n.$value = by.$value;
 		(n as Writeable<Node<K, V>>).$key = by.$key;
-		if(this._lastQueriedNode === by) this._lastQueriedNode = n; // Be careful!
+		// Be careful!
+		if(this._lastQueriedNode === by) this._lastQueriedNode = n;
 		return by;
 	}
 }

@@ -20,12 +20,14 @@ type OppositeMap = Record<NodeId, NodeId[]>;
 
 //=================================================================
 /**
- * {@link Repository} consists of several {@link Configuration}s for a {@link Stretch}.
+ * {@link Repository} consists of several {@link Configuration}s for a
+ * {@link Stretch}.
  *
  * The motivation behind {@link Repository} is that when the structure of
  * a {@link Stretch} changes temporarily, or the {@link Stretch}
  * become temporarily inactive due to dragging,
- * a {@link Repository} helps memorizing the original combinations of {@link Pattern}s.
+ * a {@link Repository} helps memorizing the original combinations of
+ * {@link Pattern}s.
  */
 //=================================================================
 export class Repository implements ISerializable<JRepository | undefined> {
@@ -35,13 +37,19 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** Signature string created by {@link getStructureSignature}. */
 	public readonly $signature: string;
 
-	/** Coefficient of transformation; same as the {@link ValidJunction.$f $f} of the first junction. */
+	/**
+	 * Coefficient of transformation; same as the
+	 * {@link ValidJunction.$f $f} of the first junction.
+	 */
 	public readonly $f: ISignPoint;
 
 	/** Mapping quadrant codes to {@link Quadrant}s. */
 	public readonly $quadrants: ReadonlyMap<QuadrantCode, Quadrant>;
 
-	/** List {@link Quadrant}s by {@link QuadrantDirection} and sorted in tracing ordering. */
+	/**
+	 * List {@link Quadrant}s by {@link QuadrantDirection} and sorted in tracing
+	 * ordering.
+	 */
 	public readonly $directionalQuadrants: PerQuadrant<Quadrant[]>;
 
 	public readonly $junctions: JJunctions;
@@ -54,7 +62,10 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	 */
 	public readonly $oppositeMap: Readonly<OppositeMap>;
 
-	/** Whether the structure of this {@link Repository} makes sense. See {@link _checkValidity}(). */
+	/**
+	 * Whether the structure of this {@link Repository} makes sense. See
+	 * {@link _checkValidity}().
+	 */
 	public readonly $isValid: boolean;
 
 	/**
@@ -76,7 +87,10 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	/** The current index of {@link Configuration}. */
 	private _index: number = 0;
 
-	constructor(stretch: Stretch, junctions: Junctions, signature: string, prototype?: JStretch) {
+	constructor(
+		stretch: Stretch, junctions: Junctions, signature: string,
+		prototype?: JStretch
+	) {
 		this.$stretch = stretch;
 		this.$signature = signature;
 		this.$f = junctions[0].$f;
@@ -104,7 +118,9 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	public toJSON(): JRepository | undefined {
 		if(!this._configurations.$done) return undefined;
 		return {
-			configurations: this.$configurations.map(config => config.toJSON(true)),
+			configurations: this.$configurations.map(
+				config => config.toJSON(true)
+			),
 			index: this._index,
 		};
 	}
@@ -156,10 +172,13 @@ export class Repository implements ISerializable<JRepository | undefined> {
 	}
 
 	/**
-	 * In a 3-flap layout, calculate the maximal allowing distance from the intersection anchor to the shared corner.
+	 * In a 3-flap layout, calculate the maximal allowing distance from the
+	 * intersection anchor to the shared corner.
 	 * @param oriented Sharing lower-left corner
 	 */
-	public $getMaxIntersectionDistance(r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean): number {
+	public $getMaxIntersectionDistance(
+		r1: JQuadrilateral, r2: JQuadrilateral, oriented: boolean
+	): number {
 		const q = oriented ? 2 : 0;
 		const n1 = r1.c[q].e as NodeId;
 		const n2 = r2.c[q].e as NodeId;
@@ -175,9 +194,9 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		return j;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Perform some basic checks to see if it's remotely possible

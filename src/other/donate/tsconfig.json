@@ -20,6 +20,7 @@
 		"./**/*.vue",
 		"../../shared/frontend/locale.d.ts",
 		"../../shared/frontend/imports.d.ts",
+		"../../shared/frontend/navigator.d.ts",
 		"../../shared/frontend/shims.d.ts",
 		"../../shared/types/**/*.d.ts"
 	]

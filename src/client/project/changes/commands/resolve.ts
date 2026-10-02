@@ -12,8 +12,14 @@ import type { Command } from "./command";
 
 /** Restore a {@link JCommand} back to a {@link Command} instance. */
 export function $resolve(project: Project, c: JCommand): Command {
-	if(c.type == CommandType.field) return new FieldCommand(project, c as JFieldCommand);
-	if(c.type == CommandType.move) return new MoveCommand(project, c as JMoveCommand);
-	if(c.type == CommandType.edit) return new EditCommand(project, c as JEditCommand);
+	if(c.type == CommandType.field) {
+		return new FieldCommand(project, c as JFieldCommand);
+	}
+	if(c.type == CommandType.move) {
+		return new MoveCommand(project, c as JMoveCommand);
+	}
+	if(c.type == CommandType.edit) {
+		return new EditCommand(project, c as JEditCommand);
+	}
 	throw new Error();
 }

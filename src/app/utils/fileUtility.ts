@@ -26,7 +26,8 @@ namespace FileUtility {
 			const reader = new FileReader();
 			reader.onload = e => resolve(e.target!.result as ArrayBuffer);
 			reader.onerror = e => reject(e);
-			reader.readAsArrayBuffer(file); // readAsText may not be able to full read a binary file
+			// readAsText may not be able to full read a binary file
+			reader.readAsArrayBuffer(file);
 		});
 	}
 
@@ -56,7 +57,11 @@ namespace FileUtility {
 			// It goes here on user cancelling or on errors during saving
 			try {
 				// New API, added in Chrome 110
-				if(handle && "remove" in handle && typeof handle.remove == "function") {
+				if(
+					handle &&
+					"remove" in handle &&
+					typeof handle.remove == "function"
+				) {
 					handle.remove();
 				}
 			} catch { }

@@ -14,7 +14,8 @@ const DEFAULT_LOCALE = "en";
 
 //=================================================================
 /**
- * {@link LanguageService} determines locale on startup and manages related settings.
+ * {@link LanguageService} determines locale on startup and manages related
+ * settings.
  *
  * For historical reasons, language setting is store separately,
  * and is not part of the {@link Settings}.
@@ -38,9 +39,9 @@ namespace LanguageService {
 			messages: locale,
 		});
 
-		// When using such method to define a global constant,
-		// it is important NOT to declare a global var ahead of time,
-		// as it will make older Safari (say v11) thinks the two are different symbols.
+		// When using such method to define a global constant, it is important
+		// NOT to declare a global var ahead of time, as it will make older
+		// Safari (say v11) thinks the two are different symbols.
 		Object.defineProperty(window, "i18n", {
 			writable: false,
 			value: plugin.global,

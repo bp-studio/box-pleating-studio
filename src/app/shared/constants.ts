@@ -2,7 +2,8 @@
 /**
  * If native File Access API is supported.
  *
- * So far only desktop Chromium browsers have better support. Safari 15.2+ has support for private file system.
+ * So far only desktop Chromium browsers have better support. Safari 15.2+ has
+ * support for private file system.
  * @see https://caniuse.com/native-filesystem-api
  */
 export const isFileApiEnabled = typeof window.showSaveFilePicker != "undefined";
@@ -10,14 +11,16 @@ export const isFileApiEnabled = typeof window.showSaveFilePicker != "undefined";
 /**
  * Whether the current device is a touch-only device.
  *
- * Strictly speaking, this value is not a constant (when the debug console is enabled,
- * this value can be changed by switching emulation devices), but in practice it should be a constant.
+ * Strictly speaking, this value is not a constant (when the debug console is
+ * enabled, this value can be changed by switching emulation devices), but in
+ * practice it should be a constant.
  */
 export const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
 
 function testLowEnd(): boolean {
 	if(navigator.hardwareConcurrency && navigator.deviceMemory) {
-		return navigator.hardwareConcurrency <= 2 || navigator.deviceMemory <= 2;
+		return navigator.hardwareConcurrency <= 2 ||
+			navigator.deviceMemory <= 2;
 	}
 	return true;
 }
@@ -27,7 +30,8 @@ export const isLowEndDevice = testLowEnd();
 
 export const isIOS = (/iPad|iPhone|iPod/).test(navigator.userAgent);
 if(isIOS) {
-	// Prevent zooming on input on iOS. See https://stackoverflow.com/a/57527009/9953396
+	// Prevent zooming on input on iOS.
+	// See https://stackoverflow.com/a/57527009/9953396
 	const el = document.querySelector("meta[name=viewport]")!;
 	const content = el.getAttribute("content")!;
 	el.setAttribute("content", content.replace(/5(\.0)?/, "1.0"));
@@ -38,7 +42,8 @@ if(isIOS) {
  * Used for displaying Mac-style keyboard symbols.
  *
  * See https://stackoverflow.com/questions/10527983/ for the method used here.
- * Even MDN is good with this method: https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
+ * Even MDN is good with this method:
+ * https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
  */
 export const isMac = navigator.platform?.toLowerCase().startsWith("mac");
 if(isMac) document.body.classList.add("mac");
@@ -53,12 +58,15 @@ export const defaultTitle = document.title;
 // eslint-disable-next-line compat/compat
 export const copyEnabled = "clipboard" in navigator && "write" in navigator.clipboard;
 
-/** Whether the current instance is running online, as opposed to running locally. */
+/**
+ * Whether the current instance is running online, as opposed to running
+ * locally.
+ */
 export const isOnline = location.protocol === "https:";
 
 /**
- * {@link isOnline} does not automatically implies the availability of service worker,
- * as it is possible that secure connection is not really established.
+ * {@link isOnline} does not automatically implies the availability of service
+ * worker, as it is possible that secure connection is not really established.
  */
 export const hasServiceWorker = "serviceWorker" in navigator;
 

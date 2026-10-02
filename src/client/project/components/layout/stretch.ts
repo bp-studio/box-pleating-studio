@@ -46,9 +46,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		return [this.$tag, this.toJSON(true)];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get repo(): JRepository | undefined {
 		return this._data.value.repo;
@@ -64,7 +64,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	public set configIndex(v: number) {
 		// Since the entire repository is stored in the memo,
 		// it suffices to handling config/pattern navigation as field change.
-		this.$project.history.$fieldChange(this, "configIndex", this.configIndex, v);
+		this.$project.history.$fieldChange(
+			this, "configIndex", this.configIndex, v
+		);
 		this._navigate(() => this.$layout.$switchConfig(this.id, v));
 	}
 
@@ -74,7 +76,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		return repo.configurations[repo.index].index;
 	}
 	public set patternIndex(v: number) {
-		this.$project.history.$fieldChange(this, "patternIndex", this.patternIndex, v);
+		this.$project.history.$fieldChange(
+			this, "patternIndex", this.patternIndex, v
+		);
 		this._navigate(() => this.$layout.$switchPattern(this.id, v));
 	}
 
@@ -95,9 +99,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		this.patternIndex = (i + by + l) % l;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Control methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public override get $selected(): boolean {
 		return super.$selected;
@@ -107,9 +111,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		if(v) this.$complete();
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get $devices(): readonly Device[] {
 		return this._devices;
@@ -127,7 +131,9 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		this.$updateGraphics(model, deviceCount);
 	}
 
-	public $updateGraphics(model: UpdateModel, deviceCount: number = this.$devices.length): void {
+	public $updateGraphics(
+		model: UpdateModel, deviceCount: number = this.$devices.length
+	): void {
 		for(let i = 0; i < deviceCount; i++) {
 			const device = this._devices[i];
 			const deviceTag = this.$tag + "." + i;
@@ -148,7 +154,8 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 	}
 
 	/**
-	 * Complete the calculation of all stretch patterns when a {@link Stretch} is selected.
+	 * Complete the calculation of all stretch patterns when a {@link Stretch}
+	 * is selected.
 	 */
 	public async $complete(): Promise<void> {
 		// Skip if this is already done.
@@ -160,11 +167,13 @@ export class Stretch extends Control implements ISerializable<JStretch> {
 		if(data) this._data.value = data;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	private async _navigate(navigateFactory: () => Promise<void>): Promise<void> {
+	private async _navigate(
+		navigateFactory: () => Promise<void>
+	): Promise<void> {
 		SelectionController.clear();
 		SelectionController.$toggle(this, true);
 		await navigateFactory();

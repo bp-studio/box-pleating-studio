@@ -74,7 +74,12 @@ export abstract class JoinLogic {
 		if(isNaN(size)) return;
 
 		let offset: IPoint | undefined;
-		if(!$oriented) builder2.$additionalOffset = offset = { x: p1.sx - p2.sx, y: p1.sy - p2.sy };
+		if(!$oriented) {
+			builder2.$additionalOffset = offset = {
+				x: p1.sx - p2.sx,
+				y: p1.sy - p2.sy,
+			};
+		}
 
 		// Gather important parameters
 		const pt = s1 ? builder1.$anchor : builder2.$anchor;
@@ -94,9 +99,9 @@ export abstract class JoinLogic {
 
 	public abstract $join(): Generator<JoinResult>;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected readonly _deltaPt = new Cache(() => {
 		const { org } = this.data;
@@ -141,7 +146,9 @@ export abstract class JoinLogic {
 	 * Generated {@link JoinResult}.
 	 * @param shouldClone Whether the piece should be cloned.
 	 */
-	protected _result(shouldClone: boolean = false, extraSize: number = 0): JoinResult {
+	protected _result(
+		shouldClone: boolean = false, extraSize: number = 0
+	): JoinResult {
 		const { offset, size, addOns } = this.data;
 		const { j1, j2 } = this;
 		const oriented = this.joiner.$oriented;
@@ -158,20 +165,26 @@ export abstract class JoinLogic {
 		];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 	/* istanbul ignore next: debug */
 	public static debugContour(g1: JGadget, g2: JGadget): void {
-		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-		const pt = new Point(new Fraction(429, 7 as Positive), new Fraction(520, 7 as Positive));
+		const pt = new Point(
+			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+			new Fraction(429, 7 as Positive), new Fraction(520, 7 as Positive)
+		);
 		const c1 = new Gadget(g1).$contour.value;
 		const c2 = new Gadget(g2).$contour.value;
 		if(c1.some(p => p.eq(pt)) || c2.some(p => p.eq(pt))) {
-			// Paste the result of the following output to debug tools for inspection
-			console.log(JSON.stringify([[c1.map(p => p.$toIPoint())], [c2.map(p => p.$toIPoint())]]));
+			// Paste the result of the following output to debug tools for
+			// inspection
+			console.log(JSON.stringify([
+				[c1.map(p => p.$toIPoint())],
+				[c2.map(p => p.$toIPoint())],
+			]));
 			debugger;
 		}
 	}
