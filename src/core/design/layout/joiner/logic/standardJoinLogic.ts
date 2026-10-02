@@ -78,9 +78,13 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		// It is possible that the closest T results in an R that goes out of
 		// bounds. In that case we need to try the second closest T.
 		for(const T of gridPoints) {
-			// If the triangle is too small, it could go out of bounds
+			// If the triangle is too small, it could go out of bounds.
+			// The triangle does not degenerate (i.e. D differs from P and T),
+			// for otherwise D lies on e, which means that the two critical
+			// edges meet on the delta line (equivalently, on the bv line), and
+			// that is the case of simple joins, handled with a higher priority.
 			const R = triangleTransform([D, P, B], T);
-			if(!R || R.x * f < pt.x * f) continue;
+			if(R.x * f < pt.x * f) continue;
 
 			// Check if the transformed R-point goes out of bounds
 			if(!(i ? j1 : j2).$contains(R)) continue;
@@ -104,8 +108,12 @@ export class StandardJoinLogic extends BaseJoinLogic {
 
 		const P = D.$sub(B).$slope.gt(Fraction.ONE) ?
 			delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
+		// The triangle does not degenerate: T differs from D as D is not
+		// integral, and T differs from B, for otherwise B lies on e, which
+		// means that the two critical edges meet on the bv line, and that is
+		// the case of simple joins, handled with a higher priority.
 		const R = triangleTransform([T, D, P], B);
-		if(!R || !this._setupAnchor(R)) return;
+		if(!this._setupAnchor(R)) return;
 		this.data.addOns = [{
 			contour: [B, T, R].map(point => point.$toIPoint()),
 			dir: new Line(T, B).$reflect(p.$direction.value).$toIPoint(),
