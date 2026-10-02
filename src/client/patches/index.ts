@@ -3,6 +3,7 @@ import Rc0Migration from "./migrations/rc0Migration";
 import Rc1Migration from "./migrations/rc1Migration";
 import TrivialMigration from "./migrations/trivialMigration";
 import ProjectMigration from "./migrations/projectMigration";
+import StrategyMigration from "./migrations/strategyMigration";
 import HardLimitCheck from "./checks/hardLimitCheck";
 import { Migration } from "./migration";
 
@@ -36,6 +37,12 @@ Migration.$add(ProjectMigration, "0.6");
  * so now this version doesn't modify anything.
  */
 Migration.$add(TrivialMigration, "0.7");
+
+/**
+ * Version 0.8 moves the strategies from partitions to overlaps, so that each
+ * join can have its own strategy.
+ */
+Migration.$add(StrategyMigration, "0.8");
 
 /** Check for hard limits. */
 Migration.$check(HardLimitCheck);

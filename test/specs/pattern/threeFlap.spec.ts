@@ -4,6 +4,7 @@ import { describe, it, expect } from "@rstest/core";
 import { expectRepo, generateFromFlaps } from "./util";
 import { node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";
+import { JoinStrategy } from "shared/json";
 
 describe("Three flap patterns", () => {
 
@@ -141,6 +142,26 @@ describe("Three flap patterns", () => {
 	});
 
 	describe("Joins", () => {
+
+		it("Perfect join with the intersection off the angle bisector", () => {
+			// Since the ridge between the two gadgets vanishes in perfect
+			// joins, the intersection only needs to lie on the delta line.
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 10 },
+					{ id: b, x: 7, y: 9, radius: 1 },
+					{ id: c, x: 9, y: 8, radius: 1 },
+				]);
+				const config = expectRepo("1,2,3", 1)[0];
+				const partition = config.$partitions[0].toJSON();
+				const join = partition.overlaps.find(o => o.join)!.join;
+				expect(join).to.equal(JoinStrategy.perfect);
+				const ridges = config.$pattern!.$devices[0].$drawRidges;
+				const int = { x: 5, y: 5 };
+				expect(ridges).to.not.containLine([{ x: 0, y: 0 }, int]);
+				expect(ridges).to.containLine([int, { x: 8, y: 8 }]);
+			}
+		});
 
 		it("Base join", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {

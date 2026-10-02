@@ -5,6 +5,7 @@ import { convertIndex } from "shared/utils/pattern";
 import type { JJunction } from "shared/json";
 import type { Device } from "../device";
 import type { PositioningContext } from "./positioningContext";
+import type { fanPositioner } from "./fanPositioner";
 
 //=================================================================
 /**
@@ -19,7 +20,7 @@ export function twoJunctionPositioner(context: PositioningContext): boolean {
 	if(context.$devices.length == 2 && context.$overlaps.length == 2) {
 		return makeTwoDeviceRelayPattern(context);
 	}
-	return makeSpitJoinPattern(context);
+	return makeSplitJoinPattern(context);
 
 	//TODO: more general case
 }
@@ -58,7 +59,11 @@ function makeTwoDeviceRelayPattern(context: PositioningContext): boolean {
 	return true;
 }
 
-function makeSpitJoinPattern(context: PositioningContext): boolean {
+/**
+ * Push the join devices towards the joint, and the other devices the other
+ * way. Also used for the fans of three junctions (see {@link fanPositioner}).
+ */
+export function makeSplitJoinPattern(context: PositioningContext): boolean {
 	// Step 1: push all join devices towards their joint
 	const nonJoin = context.$devices.filter(device => {
 		if(device.$gadgets.length > 1) {
@@ -92,7 +97,11 @@ function makeSpitJoinPattern(context: PositioningContext): boolean {
 	return true;
 }
 
-function pushJoinDeviceTowardsJoint(
+/**
+ * Push a {@link Device} consisting of joined gadgets towards the joint.
+ * Also used for the fans of three junctions (see {@link fanPositioner}).
+ */
+export function pushJoinDeviceTowardsJoint(
 	context: PositioningContext, device: Device
 ): void {
 	const [j1, j2] = context.$getJunctions(device);

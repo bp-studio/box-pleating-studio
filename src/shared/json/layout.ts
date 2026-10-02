@@ -1,6 +1,6 @@
 import type { NodeId } from "./tree";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { CornerType } from "./enum";
+import type { CornerType, GadgetStrategy, JoinStrategy } from "./enum";
 import type { JConfiguration, JJunction } from "./pattern";
 
 export interface JQuadrilateral {
@@ -43,6 +43,16 @@ export interface JOverlap extends JQuadrilateral {
 	 * The regular shift of self relative to the `p[0]` corner (upper right) of
 	 * parent. If omitted, it would be (0, 0). */
 	shift?: IPoint;
+
+	/** How the gadget is generated. If omitted, it is an integral GOPS. */
+	gadget?: GadgetStrategy;
+
+	/**
+	 * How self joins onto the {@link JOverlap} at its joint corner.
+	 * This is present if and only if self is joined, that is, its joint corner
+	 * (either `c[0]` or `c[2]`) is of type {@link CornerType.coincide}.
+	 */
+	join?: JoinStrategy;
 }
 
 /** A negative number. */

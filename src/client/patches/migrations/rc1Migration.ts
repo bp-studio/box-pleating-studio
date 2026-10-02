@@ -2,7 +2,13 @@
 import { CornerType } from "shared/json";
 import { convertIndex } from "shared/utils/pattern";
 
-import type { JConfiguration, JCorner, JProject, JGadget, JOverlap, JPartition, JPattern, JStretch, Strategy, JLayout } from "shared/json";
+import type { JConfiguration, JCorner, JProject, JGadget, JOverlap, JPattern, JStretch, JLayout } from "shared/json";
+
+/** The format of partitions before version 0.8 (see strategyMigration). */
+interface LegacyPartition {
+	overlaps: JOverlap[];
+	strategy?: string;
+}
 
 /** Version rc1 adds {@link Partition} and {@link Device}. */
 export default function $process(proj: Pseudo<JProject>): boolean {
@@ -20,7 +26,7 @@ export default function $process(proj: Pseudo<JProject>): boolean {
 function pattern(cf: Pseudo<JConfiguration>, s: Pseudo<JStretch>): void {
 	s.configuration = {
 		partitions: partition(
-			cf.overlaps as JOverlap[], cf.strategy as Strategy
+			cf.overlaps as JOverlap[], cf.strategy as string | undefined
 		),
 	};
 	const pt = s.pattern as Pseudo<JPattern>;
@@ -51,7 +57,9 @@ function cornerFilter(c: JCorner): boolean {
 	return c.type == CornerType.coincide;
 }
 
-function partition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {
+function partition(
+	overlaps: JOverlap[], strategy?: string
+): LegacyPartition[] {
 	const partitions: JOverlap[][] = [];
 	const partitionMap = new Map<number, number>();
 
@@ -86,5 +94,5 @@ function partition(overlaps: JOverlap[], strategy?: Strategy): JPartition[] {
 			}
 		});
 	}
-	return partitions.map<JPartition>(p => ({ overlaps: p, strategy }));
+	return partitions.map<LegacyPartition>(p => ({ overlaps: p, strategy }));
 }

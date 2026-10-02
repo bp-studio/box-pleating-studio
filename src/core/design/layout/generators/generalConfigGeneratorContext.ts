@@ -1,11 +1,12 @@
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { singleConfigGenerator } from "./singleConfigGenerator";
-import { CornerType, Strategy } from "shared/json";
+import { CornerType, GadgetStrategy, JoinStrategy } from "shared/json";
 import { clone } from "shared/utils/clone";
 import { ConfigGeneratorContext } from "./configGeneratorContext";
 import { Direction, getNodeId, getQuadrant, makeQuadrantCode, nextQuadrantOffset, opposite, previousQuadrantOffset, quadrantNumber } from "shared/types/direction";
-import { searchRelay } from "./searchUtils/relay";
+import { relayOnto, searchRelay } from "./searchUtils/relay";
 import { cover, getExposedPart, toSplitItems } from "./searchUtils/splitJoin";
+import { FAN_SIZE } from "../joiner/fanJoin";
 
 import type { SplitItem } from "./searchUtils/splitJoin";
 import type { JointItem } from "./searchUtils/types";
@@ -14,14 +15,39 @@ import type { Configuration } from "../configuration";
 import type { JOverlap, JPartition, NodeId } from "shared/json";
 import type { Repository } from "../repository";
 import type { generalConfigGenerator } from "./generalConfigGenerator";
+import type { fanJoin } from "../joiner/fanJoin";
 
 const MAX_RANK_PER_JOINT = 9;
 
 const RELAY_RANK = 1;
+const SIMPLE_JOIN_RANK = 2;
 const BASE_JOIN_RANK = 4;
 const STANDARD_JOIN_RANK = 6;
 const HALF_INTEGRAL_RANK = 7;
 const UNIVERSAL_RANK = 8;
+
+/**
+ * Each of the two outer {@link JOverlap}s in a fan either joins onto the
+ * middle one with the given strategy, or is relayed onto it.
+ */
+type FanSide = JoinStrategy.perfect | JoinStrategy.simple | typeof RELAY;
+
+const RELAY = "relay";
+const { perfect: P, simple: S } = JoinStrategy;
+const R = RELAY;
+
+/**
+ * The combinations of the two sides of a fan, by rank. The rank of a fan is
+ * the sum of the ranks of its two sides, which are the same as in the case of
+ * two junctions (see {@link GeneralConfigGeneratorContext.$search}).
+ */
+const FAN_SIDES: Record<number, [FanSide, FanSide][]> = {
+	0: [[P, P]],
+	[RELAY_RANK]: [[P, R], [R, P]],
+	[SIMPLE_JOIN_RANK]: [[P, S], [S, P]],
+	[SIMPLE_JOIN_RANK + RELAY_RANK]: [[S, R], [R, S]],
+	[2 * SIMPLE_JOIN_RANK]: [[S, S]],
+};
 
 interface Joint {
 	nodeId: NodeId;
@@ -102,10 +128,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		// Previously, we can handle at most 1 joint...
 		if(this._joints.length > 1) return false;
 
-		// ...and only the case where the joint has exactly two junctions.
-		if(this._joints[0].items.length != 2) return false;
-
-		return true;
+		// ...and only the case where the joint has two or three junctions.
+		const count = this._joints[0].items.length;
+		return count == 2 || count == FAN_SIZE;
 	}
 
 	public *$rankCombination(
@@ -132,6 +157,11 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const joint = this._joints[0];
 		const rank = ranks[0];
 
+		if(joint.items.length == FAN_SIZE) {
+			yield* this._searchFan(joint, rank);
+			return;
+		}
+
 		if(rank >= RELAY_RANK) {
 			yield* this._searchRelay(joint.items, rank - RELAY_RANK);
 		}
@@ -153,12 +183,50 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	// Private methods
 	////////////////////////////////////////////////////////////////////////////
 
+	/**
+	 * Search for patterns where three junctions share the same quadrant of a
+	 * flap (a "fan"). For the moment, each of the outer two can either be
+	 * simple joined (including perfect joins) or relayed onto the middle one
+	 * (see {@link FAN_SIDES}), but not both relayed.
+	 */
+	private *_searchFan(
+		joint: Joint, rank: number
+	): Generator<Configuration> {
+		if(joint.items.some(item => item.split)) return;
+
+		for(const sides of FAN_SIDES[rank] ?? []) {
+			// Since the overlaps are not nested (see Quadrant.$checkValidity),
+			// sorting them by width puts the adjacent ones next to each other.
+			// We then put the middle one first.
+			const overlaps = this._itemsToOverlaps(joint.items);
+			overlaps.sort((a, b) => a.ox - b.ox);
+			[overlaps[0], overlaps[1]] = [overlaps[1], overlaps[0]];
+
+			const [middle, ...others] = overlaps;
+			const joined = [middle];
+			const partitions: JPartition[] = [{ overlaps: joined }];
+			for(const [i, o] of others.entries()) {
+				const side = sides[i];
+				if(side == RELAY) {
+					relayOnto(o, middle);
+					partitions.push({ overlaps: [o] });
+				} else {
+					const oriented = middle.c[0].e == o.c[0].e;
+					this._joinOverlaps(middle, o, oriented, side);
+					joined.push(o);
+				}
+			}
+			yield this.$make(partitions);
+		}
+	}
+
 	private *_searchRelay(
 		items: readonly JointItem[], rank: number
 	): Generator<Configuration> {
-		let strategy: Strategy | undefined;
-		if(rank == UNIVERSAL_RANK) strategy = Strategy.universal;
-		else if(rank == HALF_INTEGRAL_RANK) strategy = Strategy.halfIntegral;
+		const { universal, halfIntegral } = GadgetStrategy;
+		let strategy: GadgetStrategy | undefined;
+		if(rank == UNIVERSAL_RANK) strategy = universal;
+		else if(rank == HALF_INTEGRAL_RANK) strategy = halfIntegral;
 		else if(rank != 0) return;
 
 		const [o1, o2] = this._itemsToOverlaps(items);
@@ -178,21 +246,19 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		overlaps: JOverlap[], rank: number
 	): Generator<JPartition> {
 		const strategy = resolveJoinRank(rank);
-		if(!strategy && rank != 2) return;
+		if(!strategy) return;
 
-		for(let i = 1; i < overlaps.length; i++) {
-			const [o1, o2] = [overlaps[0], overlaps[i]];
-			const oriented = o1.c[0].e == o2.c[0].e;
-			this._joinOverlaps(o1, o2, oriented);
-		}
-		yield { overlaps, strategy };
+		const [o1, o2] = overlaps;
+		const oriented = o1.c[0].e == o2.c[0].e;
+		this._joinOverlaps(o1, o2, oriented, strategy);
+		yield { overlaps };
 	}
 
 	private *_searchRelayJoin(
 		overlaps: JOverlap[], rank: number
 	): Generator<JPartition> {
 		const strategy = resolveJoinRank(rank);
-		if(!strategy && rank != 2) return;
+		if(!strategy) return;
 
 		const [o1, o2] = overlaps;
 		const oriented = o1.c[0].e == o2.c[0].e;
@@ -201,18 +267,18 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		for(let n = 1; n < x; n++) {
 			const [o1p, o2p] = clone([o1, o2]);
-			const o = this._joinOverlaps(o1p, o2p, oriented, !o1x);
+			const o = this._joinOverlaps(o1p, o2p, oriented, strategy, !o1x);
 			o.ox -= n;
 			if(oriented) o.shift = { x: n, y: 0 };
-			yield { overlaps: [o1p, o2p], strategy };
+			yield { overlaps: [o1p, o2p] };
 		}
 
 		for(let n = 1; n < y; n++) {
 			const [o1p, o2p] = clone([o1, o2]);
-			const o = this._joinOverlaps(o1p, o2p, oriented, o1x);
+			const o = this._joinOverlaps(o1p, o2p, oriented, strategy, o1x);
 			o.oy -= n;
 			if(oriented) o.shift = { x: 0, y: n };
-			yield { overlaps: [o1p, o2p], strategy };
+			yield { overlaps: [o1p, o2p] };
 		}
 	}
 
@@ -259,12 +325,14 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	 *
 	 * @param oriented The shared corner of {@link o1} and {@link o2} is on the
 	 * lower left
+	 * @param join The {@link JoinStrategy}, recorded on the joining one.
 	 * @param reverse Join in the reversed way ({@link o1} onto {@link o2})
 	 *
 	 * @returns Whichever {@link JOverlap} that joins onto the other.
 	 */
 	private _joinOverlaps(
-		o1: JOverlap, o2: JOverlap, oriented: boolean, reverse = false
+		o1: JOverlap, o2: JOverlap, oriented: boolean,
+		join: JoinStrategy, reverse = false
 	): JOverlap {
 		if(reverse) [o1, o2] = [o2, o1];
 		const c = oriented ? Direction.UR : Direction.LL;
@@ -275,13 +343,15 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const other = this._junctions[o1.parent].c[opposite(c)].e!;
 		o2.c[q] = { type: CornerType.intersection, e: other };
 		o1.c[opposite(q)] = { type: CornerType.coincide, e: o2.id, q };
+		o2.join = join;
 		return o2;
 	}
 }
 
-function resolveJoinRank(rank: number): Strategy | undefined {
-	if(rank == 0) return Strategy.perfect;
-	if(rank == BASE_JOIN_RANK) return Strategy.baseJoin;
-	if(rank == STANDARD_JOIN_RANK) return Strategy.standardJoin;
+function resolveJoinRank(rank: number): JoinStrategy | undefined {
+	if(rank == 0) return JoinStrategy.perfect;
+	if(rank == SIMPLE_JOIN_RANK) return JoinStrategy.simple;
+	if(rank == BASE_JOIN_RANK) return JoinStrategy.baseJoin;
+	if(rank == STANDARD_JOIN_RANK) return JoinStrategy.standardJoin;
 	return undefined;
 }

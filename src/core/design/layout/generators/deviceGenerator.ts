@@ -1,10 +1,11 @@
 import { generate } from "core/math/gops";
 import { kamiyaHalfIntegral } from "core/math/kamiya";
-import { Strategy } from "shared/json";
+import { GadgetStrategy, JoinStrategy } from "shared/json";
 import { clone } from "shared/utils/clone";
 import { Piece } from "../pattern/piece";
 import { Gadget } from "../pattern/gadget";
 import { Direction } from "shared/types/direction";
+import { FAN_SIZE, fanJoin } from "../joiner/fanJoin";
 
 import type { Configuration } from "../configuration";
 import type { JDevice, JGadget, JOverlap, JPartition, JPiece } from "shared/json";
@@ -13,16 +14,16 @@ export function* deviceGenerator(
 	data: JPartition, config: Configuration
 ): Generator<JDevice> {
 	const junctions = config.$repo.$junctions;
-	const { overlaps, strategy } = data;
+	const { overlaps } = data;
 	if(overlaps.length == 1) {
 		const overlap = overlaps[0];
 		const { ox, oy } = overlap;
 		const sx = junctions[overlap.parent].sx;
-		if(strategy == Strategy.halfIntegral) {
+		if(overlap.gadget == GadgetStrategy.halfIntegral) {
 			for(const g of kamiyaHalfIntegral(overlap, sx)) {
 				yield { gadgets: [g] };
 			}
-		} if(strategy == Strategy.universal) {
+		} else if(overlap.gadget == GadgetStrategy.universal) {
 			for(const g of universalGPS(overlap, sx)) {
 				yield { gadgets: [g] };
 			}
@@ -34,9 +35,14 @@ export function* deviceGenerator(
 		}
 	} else if(overlaps.length == 2) {
 		const joiner = config.$repo.$getJoiner(overlaps);
-		if(strategy == Strategy.standardJoin) yield* joiner.$standardJoin();
-		else if(strategy == Strategy.baseJoin) yield* joiner.$baseJoin();
-		else yield* joiner.$simpleJoin(strategy);
+		// Depending on how the overlaps are joined (see _joinOverlaps in
+		// GeneralConfigGeneratorContext), either one could be the joined one.
+		const join = overlaps.find(o => o.join)!.join!;
+		if(join == JoinStrategy.standardJoin) yield* joiner.$standardJoin();
+		else if(join == JoinStrategy.baseJoin) yield* joiner.$baseJoin();
+		else yield* joiner.$simpleJoin(join);
+	} else if(overlaps.length == FAN_SIZE) {
+		yield* fanJoin(overlaps, config.$repo);
 	}
 	//TODO: general case
 }

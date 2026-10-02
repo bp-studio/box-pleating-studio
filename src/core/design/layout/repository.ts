@@ -188,7 +188,12 @@ export class Repository implements ISerializable<JRepository | undefined> {
 
 	/** Create (or reuse) a {@link Joiner} by the {@link JOverlap}s. */
 	public $getJoiner(overlaps: readonly JOverlap[]): Joiner {
-		const key = JSON.stringify(overlaps);
+		// The strategies are irrelevant to the Joiner, so we exclude them from
+		// the key, so that the same Joiner can be reused across ranks.
+		const key = JSON.stringify(
+			overlaps,
+			(k, v: unknown) => k == "gadget" || k == "join" ? undefined : v
+		);
 		let j = this._joinerCache.get(key);
 		if(!j) this._joinerCache.set(key, j = new Joiner(overlaps, this));
 		return j;

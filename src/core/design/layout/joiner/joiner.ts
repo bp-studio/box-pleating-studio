@@ -1,4 +1,4 @@
-import { Strategy } from "shared/json";
+import { JoinStrategy } from "shared/json";
 import { Direction } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
 import { generate } from "core/math/gops";
@@ -88,14 +88,36 @@ export class Joiner {
 	// Public methods
 	////////////////////////////////////////////////////////////////////////////
 
-	public *$simpleJoin(strategy?: Strategy): Generator<JDevice> {
+	/**
+	 * The candidate {@link JPiece}s of the first {@link JOverlap}.
+	 *
+	 * Note that this is not available if the two {@link JOverlap}s have the
+	 * same width or height (see the constructor), but in that case one of them
+	 * contains the other, which is excluded by Quadrant.$checkValidity.
+	 */
+	public get $firstPieces(): readonly JPiece[] {
+		return this.g1;
+	}
+
+	/**
+	 * Simple joins, including perfect joins, which are distinguished by whether
+	 * the axis-parallel creases of the two gadgets are parallel.
+	 *
+	 * @param first If given, only this {@link JPiece} will be used for the
+	 * first {@link JOverlap}.
+	 */
+	public *$simpleJoin(
+		strategy: JoinStrategy.simple | JoinStrategy.perfect, first?: JPiece
+	): Generator<JDevice> {
 		const { s1, s2 } = this;
+		const perfect = strategy == JoinStrategy.perfect;
 		yield* this.join(SimpleJoinLogic, (P1, P2) => {
 			const parallel = P1.$direction.value.$parallel(P2.$direction.value);
-			if(strategy == Strategy.perfect && !parallel) return false;
-			if((s1 || s2) && parallel) return false;
-			return true;
-		});
+			if(parallel != perfect) return false;
+
+			// Relay joins cannot be perfect
+			return !(s1 || s2) || !parallel;
+		}, first);
 	}
 
 	public *$baseJoin(): Generator<JDevice> {
@@ -124,12 +146,13 @@ export class Joiner {
 
 	private *join<T extends JoinLogic>(
 		Logic: new (joiner: Joiner, p1: Piece, p2: Piece) => T,
-		precondition?: (P1: Piece, P2: Piece) => boolean
+		precondition?: (P1: Piece, P2: Piece) => boolean,
+		first?: JPiece
 	): Generator<JDevice> {
 		const { g1, g2 } = this;
 		const result: JoinResult[] = [];
 		if(!g1) return;
-		for(const p1 of g1) {
+		for(const p1 of first ? [first] : g1) {
 			for(const p2 of g2) {
 				const P1 = new Piece(p1);
 				const P2 = new Piece(p2);

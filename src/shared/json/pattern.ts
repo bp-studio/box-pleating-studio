@@ -3,7 +3,6 @@ import type { Repository } from "core/design/layout/repository";
 import type { Gadget } from "core/design/layout/pattern/gadget";
 import type { AddOn } from "core/design/layout/pattern/addOn";
 import type { Pattern } from "core/design/layout/pattern/pattern";
-import type { Strategy } from "./enum";
 import type { JOverlap, JQuadrilateral } from "./layout";
 
 export interface JStretch {
@@ -60,9 +59,6 @@ export type JJunctions = readonly JJunction[];
 export interface JPartition {
 	/** All Overlaps in this Partition */
 	overlaps: readonly JOverlap[];
-
-	/** The generating {@link Strategy} used by this Partition */
-	strategy?: Strategy;
 }
 
 export interface JPattern {

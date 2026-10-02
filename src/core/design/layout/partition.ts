@@ -9,7 +9,7 @@ import { debugAssert } from "core/utils/debug";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, Strategy, NodeId } from "shared/json";
+import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, NodeId } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
@@ -45,14 +45,15 @@ export class Partition implements ISerializable<JPartition> {
 	 */
 	public readonly $devices: Store<JDevice>;
 
-	private readonly _strategy: Strategy | undefined;
-
 	constructor(config: Configuration, data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
 		debugAssert(() => data.overlaps[0].ox >= 0, "Negative overlap");
+		debugAssert(
+			() => data.overlaps.every(o => Boolean(o.join) == isJoined(o)),
+			"Inconsistent join strategy"
+		);
 		this.$devices = new Store(deviceGenerator(data, config));
-		this._strategy = data.strategy;
 
 		// Gather all corners
 		const map: CornerMap[] = [];
@@ -64,11 +65,14 @@ export class Partition implements ISerializable<JPartition> {
 		this.$cornerMap = map;
 	}
 
+	/**
+	 * The {@link JOverlap}s are rebuilt with a fixed ordering of fields, since
+	 * the JSON is also used as the signature of the {@link Configuration}, and
+	 * the ordering of the fields of the original objects depends on how they
+	 * were created (by searching, or by loading and migrating files).
+	 */
 	public toJSON(): JPartition {
-		return {
-			overlaps: this.$overlaps, // This is OK since the array is readonly
-			strategy: this._strategy,
-		};
+		return { overlaps: this.$overlaps.map(toCanonicalOverlap) };
 	}
 
 	public $getDisplacement(pattern: Pattern): Vector {
@@ -284,4 +288,18 @@ export class Partition implements ISerializable<JPartition> {
 	private _getParent(ov: JOverlap): Readonly<JJunction> {
 		return this.$configuration.$repo.$junctions[ov.parent];
 	}
+}
+
+/** Whether the joint corner of the {@link JOverlap} is coincide. */
+function isJoined(o: JOverlap): boolean {
+	return o.c[Direction.UR].type == CornerType.coincide ||
+		o.c[Direction.LL].type == CornerType.coincide;
+}
+
+function toCanonicalOverlap(o: JOverlap): JOverlap {
+	const result: JOverlap = { c: o.c, ox: o.ox, oy: o.oy, parent: o.parent };
+	if(o.shift) result.shift = o.shift;
+	if(o.gadget) result.gadget = o.gadget;
+	if(o.join) result.join = o.join;
+	return result;
 }

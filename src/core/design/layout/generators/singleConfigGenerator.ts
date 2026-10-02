@@ -1,6 +1,6 @@
 import { GeneratorUtil } from "core/utils/generator";
 import { createConfigFilter } from "./filters";
-import { Strategy } from "shared/json";
+import { GadgetStrategy } from "shared/json";
 
 import type { Configuration } from "../configuration";
 import type { ConfigGeneratorContext } from "./configGeneratorContext";
@@ -22,19 +22,18 @@ export function* singleConfigGenerator(
 	yield* GeneratorUtil.$first([
 		singleGadget(context, index),
 		doubleRelay(context, index),
-		singleGadget(context, index, Strategy.halfIntegral),
-		singleGadget(context, index, Strategy.universal),
+		singleGadget(context, index, GadgetStrategy.halfIntegral),
+		singleGadget(context, index, GadgetStrategy.universal),
 	], createConfigFilter(protoSignature));
 }
 
 function* singleGadget(
-	context: ConfigGeneratorContext, index: number, strategy?: Strategy
+	context: ConfigGeneratorContext, index: number, gadget?: GadgetStrategy
 ): Generator<Configuration> {
 	const j = context.$repo.$junctions[index];
-	const partitions: JPartition[] = [{
-		overlaps: [context.$toOverlap(j, index)],
-		strategy,
-	}];
+	const overlap = context.$toOverlap(j, index);
+	if(gadget) overlap.gadget = gadget;
+	const partitions: JPartition[] = [{ overlaps: [overlap] }];
 	yield context.$make(partitions, true);
 }
 
