@@ -4,6 +4,7 @@ import { deduplicate } from "core/math/geometry/path";
 import { GeneralUnion } from "core/math/sweepLine/polyBool/generalUnion/generalUnion";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
 import { fixPath } from "core/math/geometry/float";
+import { debugAssert } from "core/utils/debug";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Contour, PathEx } from "shared/types/geometry";
@@ -137,9 +138,9 @@ export function toGraphicalContours(contour: RationalContour): Contour[] {
 	let outers = contour.$outer.map(toPath).map(simplify);
 	let inners = contour.$inner.map(toPath).map(simplify).map(reverse);
 
-	// TODO: is this still possible?
-	/* istanbul ignore next: debug */
-	if(inners.some(p => p.length == 2)) debugger;
+	debugAssert(
+		() => !inners.some(p => p.length == 2), "Degenerated inner path"
+	);
 
 	rearrangeRole(outers, inners);
 	if(contour.$raw) {

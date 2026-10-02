@@ -1,6 +1,7 @@
 import { clone } from "shared/utils/clone";
 import { CornerType } from "shared/json";
 import { Configuration, cleanUp } from "../configuration";
+import { debugAssert } from "core/utils/debug";
 
 import type { Repository } from "../repository";
 import type { JJunction, JJunctions, JOverlap, JPartition, OverlapId } from "shared/json";
@@ -42,10 +43,10 @@ export class ConfigGeneratorContext {
 	): [JOverlap, JOverlap] {
 		const o1 = this.$toOverlap(j, index), o2 = this.$toOverlap(j, index);
 
-		/// #if DEBUG
-		/* istanbul ignore next: debug */
-		if(o1.id === undefined || o2.id === undefined) debugger;
-		/// #endif
+		debugAssert(
+			() => o1.id !== undefined && o2.id !== undefined,
+			"Overlap without id"
+		);
 
 		if(x > 0) {
 			o1.c[2] = { type: CornerType.internal, e: o2.id, q: 3 };

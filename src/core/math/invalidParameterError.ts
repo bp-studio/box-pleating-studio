@@ -1,3 +1,5 @@
+import { debugBreak } from "core/utils/debug";
+
 import type { Fraction } from "./fraction";
 
 //=================================================================
@@ -10,8 +12,6 @@ import type { Fraction } from "./fraction";
 export class InvalidParameterError extends Error {
 	constructor() {
 		super("Parameters are not valid");
-		/// #if DEBUG
-		if(!("expect" in globalThis)) debugger;
-		/// #endif
+		debugBreak();
 	}
 }

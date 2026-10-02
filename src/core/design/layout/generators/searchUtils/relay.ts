@@ -1,5 +1,6 @@
 import { CornerType } from "shared/json";
 import { clone } from "shared/utils/clone";
+import { debugAssert } from "core/utils/debug";
 
 import type { JOverlap, JPartition, Strategy } from "shared/json";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -13,10 +14,10 @@ export function* searchRelay(
 	const oriented = o1.c[2].e == o2.c[2].e; // They share lower-left corner
 	if(o1.ox > o2.ox) [o1, o2] = [o2, o1];
 
-	/// #if DEBUG
-	/* istanbul ignore next: debug */
-	if(o1.id === undefined || o2.id === undefined) debugger;
-	/// #endif
+	debugAssert(
+		() => o1.id !== undefined && o2.id !== undefined,
+		"Overlap without id"
+	);
 
 	// Perform two possible cuttings
 	if(!items[0].split) {

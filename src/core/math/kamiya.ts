@@ -3,6 +3,7 @@ import { generate, rank } from "./gops";
 import { Piece } from "core/design/layout/pattern/piece";
 import { Gadget } from "core/design/layout/pattern/gadget";
 import { Direction } from "shared/types/direction";
+import { debugAssert } from "core/utils/debug";
 
 import type { JGadget, JOverlap, JPiece } from "shared/json";
 
@@ -28,7 +29,7 @@ export function* kamiyaHalfIntegral(
 		const { ox, oy, u, v } = p1.$shrink(2);
 		const diff = Math.abs(ox - oy) / 2;
 
-		if(!Number.isInteger(diff)) debugger;
+		debugAssert(() => Number.isInteger(diff), "Non-integral difference");
 
 		const sm = Math.min(ox, oy);
 		const corner = sm + u + v - diff;

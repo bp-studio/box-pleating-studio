@@ -46,7 +46,7 @@ export default defineConfig({
 		},
 	},
 	source: {
-		include: [/@pixi/, /core-base/],
+		include: [/@pixi/, /core-base/, /vue-i18n/],
 		entry: {
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",

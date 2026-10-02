@@ -1,6 +1,7 @@
 import { same } from "shared/types/geometry";
 /// #if DEBUG
 import { pathToString, pointToString } from "core/math/geometry/path";
+import { debugFail } from "core/utils/debug";
 /// #endif
 
 import type { ISegment } from "../segment/segment";
@@ -194,7 +195,7 @@ export class Chainer<PathType extends Path = Path> {
 			}
 			console.log(pathToString(path));
 		}
-		debugger;
+		debugFail("Unclosed chains");
 	}
 
 	/* istanbul ignore next: debug */

@@ -8,6 +8,7 @@ import { deduplicate } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
 import { perQuadrant } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
+import { debugFail } from "core/utils/debug";
 
 import type { PerQuadrant } from "shared/types/direction";
 import type { Path } from "shared/types/geometry";
@@ -243,7 +244,7 @@ export class Piece extends Region implements JPiece {
 
 			// Something is wrong with the given detour if we get here.
 			/* istanbul ignore next: debug */
-			debugger;
+			debugFail("Invalid detour");
 		}
 	}
 }
