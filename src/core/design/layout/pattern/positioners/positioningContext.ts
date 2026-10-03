@@ -106,8 +106,13 @@ export class PositioningContext {
 
 			const g1 = this.$gadgets[index];
 			const g2 = this.$gadgets[targetIndex];
+			const device = this.$devices.find(d => d.$gadgets.includes(g2))!;
+			const obstacles = [
+				...device.$gadgets.map(g => g.$contour.value),
+				...device.$addOns.map(a => a.$shape.value.contour),
+			];
 			if(!mutual) {
-				g1.$setupConnectionSlack(g2, q, corner.q!);
+				g1.$setupConnectionSlack(g2, q, corner.q!, obstacles);
 			} else {
 				// If there're mutual connections, we don't need to setup
 				// the slack for real, but we keep a record for later usage.
@@ -115,6 +120,14 @@ export class PositioningContext {
 				const tx2 =
 					g2.widthSpan.value + g1.rx(2 - q, opposite(corner.q!));
 				if(tx2 > tx1) this._slackMap.set(corner, tx2 - tx1);
+
+				// The two gadgets of a mutual connection (cut from the same
+				// overlap) don't collide, but if the target is joined with
+				// other gadgets (as in split joins), it could collide with
+				// them.
+				if(device.$gadgets.length > 1) {
+					g1.$setupConnectionSlack(g2, q, corner.q!, obstacles);
+				}
 			}
 		}
 	}
@@ -172,7 +185,8 @@ export class PositioningContext {
 	private _getSlack(index: number, q: QuadrantDirection): number {
 		const corner = this.$overlaps[index].c[q];
 		const gadget = this.$gadgets[index];
-		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack.value[q]);
+		const slack = Math.floor(gadget.$slack.value[q]);
+		return Math.max(this._slackMap.get(corner) ?? 0, slack);
 	}
 
 	private _getNextIndex(index: number, q: TipDirection): number | null {

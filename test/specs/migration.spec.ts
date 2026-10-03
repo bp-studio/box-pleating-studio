@@ -131,14 +131,23 @@ describe("Migration", () => {
 
 });
 
-/** Search the patterns of the given flaps, and return the only stretch. */
+/**
+ * Search the patterns of the given flaps, and return the only stretch,
+ * keeping only the configurations that can be represented in the format
+ * before v0.8 (that is, without joining gadgets of non-default strategies).
+ */
 function searchStretch(flaps: number[][]): JStretch {
 	generateFromFlaps(
 		flaps.map(([x, y, radius], i) => ({ id: i + 1, x, y, radius }))
 	);
 	complete();
 	const [stretch] = State.$stretches.values();
-	return stretch.toJSON();
+	const result = stretch.toJSON();
+	const repo = result.repo!;
+	repo.configurations = repo.configurations.filter(c => c.partitions.every(
+		p => p.overlaps.length == 1 || p.overlaps.every(o => !o.gadget)
+	));
+	return result;
 }
 
 function makeProject(flaps: number[][], stretch: JStretch): JProject {

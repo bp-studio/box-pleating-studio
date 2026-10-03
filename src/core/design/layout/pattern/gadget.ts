@@ -142,20 +142,26 @@ export class Gadget implements JGadget {
 	 * @param g Connection target
 	 * @param q1 From which {@link QuadrantDirection} (0 or 2)
 	 * @param q2 To which {@link QuadrantDirection} (1 or 3)
+	 * @param obstacles The contours of all regions in the {@link Device} of
+	 * {@link g} (including {@link g} itself), which must be avoided. In the
+	 * fans, the target can be joined with another {@link Gadget} that is also
+	 * in the way.
 	 */
 	public $setupConnectionSlack(
-		g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection
+		g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection,
+		obstacles: readonly RationalPath[]
 	): void {
-		const c2 = g.$contour.value;
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
-		const slack = new Fraction(this._getSlack(q1));
+		// The slack of the target also applies (see Device.$getDraggingRange)
+		const slack = new Fraction(this._getSlack(q1) + g._getSlack(q2));
 		const v = g.$anchorMap.value[q2][0]
 			.$sub(Point.ZERO)
 			.$add(step.$scale(slack));
 
-		const c0_shift = q1 == 0 ?
-			v : v.$add(Point.ZERO.$sub(this.$anchorMap.value[2][0]));
+		// Align the anchor of this gadget, which is not necessarily at the
+		// origin of the gadget (for example in a reversed GPS).
+		const c0_shift = v.$add(Point.ZERO.$sub(this.$anchorMap.value[q1][0]));
 		// We keep this for debugging
 		const c0 = shift(this.$contour.value, c0_shift);
 		let c1 = c0;
@@ -163,8 +169,12 @@ export class Gadget implements JGadget {
 		// Perform collision tests.
 		// Be careful! We must ensure that the contours are simple here!
 		let s = 0;
-		const path2 = toPath(c2);
-		while(Overlap.$test(toPath(c1), path2)) {
+		const paths = obstacles.map(toPath);
+		const collides = (c: RationalPath): boolean => {
+			const path1 = toPath(c);
+			return paths.some(path2 => Overlap.$test(path1, path2));
+		};
+		while(collides(c1)) {
 			c1 = shift(c1, step);
 			s++;
 
@@ -174,11 +184,13 @@ export class Gadget implements JGadget {
 				// If we get here, typically it means one of the contours is
 				// not simple. Goto joinLogic.ts to debug the issue.
 				console.log(this.$contour.value.map(p => p.toString()));
-				console.log(c2.map(p => p.toString()));
 				const c = this.$contour.value;
 				const p1 = c.map(p => p.$toIPoint());
-				const p2 = c2.map(p => p.$toIPoint());
-				console.log(JSON.stringify([[p1, p2]]));
+				for(const c2 of obstacles) {
+					console.log(c2.map(p => p.toString()));
+					const p2 = c2.map(p => p.$toIPoint());
+					console.log(JSON.stringify([[p1, p2]]));
+				}
 				debugger;
 				throw new Error("Contour error");
 			}

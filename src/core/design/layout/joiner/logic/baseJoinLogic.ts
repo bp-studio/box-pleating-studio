@@ -60,15 +60,11 @@ export class BaseJoinLogic extends JoinLogic {
 	private tryJoin(
 		B: NPoint, D: NPoint, Din2: boolean, shouldClone: boolean
 	): JoinResult | undefined {
-		const { j1, j2, f } = this;
+		const { f } = this;
 		if(!B || !D) return;
 		if(B.$isIntegral && D.$isIntegral && !B.eq(D)) {
-			// There is no convex join if the two gadgets are "pointing
-			// inwards", as the straight-skeleton degenerates into a relay
-			// pattern.
-			const pointingInwards = D.x * f > B.x * f &&
-				this.joiner.$isClockwise != j1.$isSteeperThan(j2);
-			if(pointingInwards) return;
+			const convex = D.x * f > B.x * f;
+			if(convex && this._isPointingInwards()) return;
 
 			/* istanbul ignore next: debug */
 			if(!this._setupAnchor(D)) return;

@@ -3,8 +3,7 @@ import { Device } from "./device";
 import { Point } from "core/math/geometry/point";
 import { State } from "core/service/state";
 import { singleJunctionPositioner } from "./positioners/singleJunctionPositioner";
-import { twoJunctionPositioner } from "./positioners/twoJunctionPositioner";
-import { fanPositioner } from "./positioners/fanPositioner";
+import { jointPositioner } from "./positioners/jointPositioner";
 import { PositioningContext } from "./positioners/positioningContext";
 
 import type { Gadget } from "./gadget";
@@ -96,11 +95,8 @@ export class Pattern implements ISerializable<JPattern> {
 		if(singleMode || context.$junctions.length == 1) {
 			return singleJunctionPositioner(context);
 		}
-		if(context.$junctions.length == 2) {
-			return twoJunctionPositioner(context);
-		}
-		// So far, three junctions can only form a fan
-		return fanPositioner(context);
+		// So far, multiple junctions must share a single joint
+		return jointPositioner(context);
 	}
 
 	private _getDeviceOfConnection(c: JConnection): Device {

@@ -4,6 +4,9 @@ import { Cache } from "core/utils/cache";
 import { Gadget } from "../../pattern/gadget";
 import { Fraction } from "core/math/fraction";
 import { Vector } from "core/math/geometry/vector";
+import { debugAssert } from "core/utils/debug";
+import { Line } from "core/math/geometry/line";
+import { QV } from "../../pattern/quadrant";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Joinee } from "../joinee";
@@ -73,11 +76,19 @@ export abstract class JoinLogic {
 		if(s2) size += builder2.$setup(builder1, -1, s2, w2);
 		if(isNaN(size)) return;
 
+		// Align the joint corners of the two pieces, taking the shifts of the
+		// pieces into account (see JoinCandidate). In the oriented case, the
+		// joint corners are not shifted (see getJoinCandidates).
 		let offset: IPoint | undefined;
+		const t1 = p1.shift ?? { x: 0, y: 0 }, t2 = p2.shift ?? { x: 0, y: 0 };
+		debugAssert(
+			() => !$oriented || t1.x == t2.x && t1.y == t2.y,
+			"Shifted pieces in an oriented join"
+		);
 		if(!$oriented) {
 			builder2.$additionalOffset = offset = {
-				x: p1.sx - p2.sx,
-				y: p1.sy - p2.sy,
+				x: p1.sx - p2.sx + t1.x - t2.x,
+				y: p1.sy - p2.sy + t1.y - t2.y,
 			};
 		}
 
@@ -112,6 +123,27 @@ export abstract class JoinLogic {
 			org.y + ($intDist - (cw ? j1.p : j2.p).oy) * f
 		);
 	});
+
+	/**
+	 * Whether the critical edges of the two gadgets meet on the delta line,
+	 * which is the condition of simple joins (including perfect joins).
+	 */
+	protected _isSimple(): boolean {
+		const int = this.j1.e.$intersectLine(this.j2.e, false);
+		if(!int) return false;
+		return new Line(this._deltaPt.value, QV[0]).$lineContains(int);
+	}
+
+	/**
+	 * Whether the two gadgets are "pointing inwards", in which case there is
+	 * no convex join, as the straight-skeleton degenerates into a relay
+	 * pattern. Parallel gadgets never point inwards.
+	 */
+	protected _isPointingInwards(): boolean {
+		const { j1, j2 } = this;
+		if(j1.p.$direction.value.$parallel(j2.p.$direction.value)) return false;
+		return this.joiner.$isClockwise != j1.$isSteeperThan(j2);
+	}
 
 	/**
 	 * Setup the {@link Piece.detours} for the two {@link Piece}s.

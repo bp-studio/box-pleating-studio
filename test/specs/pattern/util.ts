@@ -2,6 +2,7 @@ import { expect } from "@rstest/core";
 
 import { createTree } from "@utils/tree";
 import { State } from "core/service/state";
+import { Overlap } from "core/math/sweepLine/clip/overlap";
 
 import type { Repository } from "core/design/layout/repository";
 import type { Pattern } from "core/design/layout/pattern/pattern";
@@ -65,4 +66,29 @@ export function expectRepo(
 	const pattern = config.$pattern!;
 	if(deviceCount >= 0) expect(pattern.$devices.length).to.equal(deviceCount);
 	return pattern.$devices;
+}
+
+/** Transpose the given point if {@link t} is true. */
+export function transpose(x: number, y: number, t: boolean): IPoint {
+	return t ? { x: y, y: x } : { x, y };
+}
+
+export const THREE_PERMUTATION = [
+	[1, 2, 3],
+	[1, 3, 2],
+	[2, 1, 3],
+	[2, 3, 1],
+	[3, 1, 2],
+	[3, 2, 1],
+];
+
+/** Expect that no two regions of the {@link Pattern} overlap. */
+export function expectNoOverlap(pattern: Pattern): void {
+	const contours = pattern.$devices
+		.flatMap(d => d.$contour.map(c => c.outer));
+	for(const [i, c1] of contours.entries()) {
+		for(const c2 of contours.slice(i + 1)) {
+			expect(Overlap.$test(c1, c2)).to.be.false;
+		}
+	}
 }

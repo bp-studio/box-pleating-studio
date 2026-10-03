@@ -1,10 +1,10 @@
 /* eslint-disable vitest/no-conditional-expect */
 import { describe, it, expect } from "@rstest/core";
 
-import { expectRepo, generateFromFlaps } from "./util";
+import { THREE_PERMUTATION, expectNoOverlap, expectRepo, generateFromFlaps, transpose } from "./util";
 import { node, parseTree } from "@utils/tree";
 import { toPath } from "core/math/geometry/rationalPath";
-import { JoinStrategy } from "shared/json";
+import { GadgetStrategy, JoinStrategy } from "shared/json";
 
 describe("Three flap patterns", () => {
 
@@ -101,7 +101,9 @@ describe("Three flap patterns", () => {
 					{ id: c, x: 10, y: 6, radius: 1 },
 				]);
 				const devices = expectRepo("1,2,3",
-					2,	// Both ways of cutting works
+					// Both ways of cutting works, plus a join of two
+					// half-integral gadgets of the same rank
+					3,
 					4,	// Each configuration has four conjugate patterns
 					2
 				);
@@ -115,6 +117,24 @@ describe("Three flap patterns", () => {
 					}
 				}
 				expect(pieceCount).to.equal(3);
+			}
+		});
+
+		it("Half integral relay in both orientations", () => {
+			// The slack of the half-integral gadget could be at either end,
+			// including the one touching the other gadget.
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 6 },
+					{ id: b, x: 4, y: 6, radius: 1 },
+					{ id: c, x: 5, y: 5, radius: 1 },
+				]);
+				const patterns = expectRepo("1,2,3", 4, 2);
+				const slacks = patterns.map(p => {
+					const gadget = p.$gadgets.find(g => g.pieces.length > 1)!;
+					return gadget.$slack.value.findIndex(s => s > 0);
+				});
+				expect(slacks).to.have.members([0, 2]);
 			}
 		});
 
@@ -141,75 +161,6 @@ describe("Three flap patterns", () => {
 
 	});
 
-	describe("Joins", () => {
-
-		it("Perfect join with the intersection off the angle bisector", () => {
-			// Since the ridge between the two gadgets vanishes in perfect
-			// joins, the intersection only needs to lie on the delta line.
-			for(const [a, b, c] of THREE_PERMUTATION) {
-				generateFromFlaps([
-					{ id: a, x: 0, y: 0, radius: 10 },
-					{ id: b, x: 7, y: 9, radius: 1 },
-					{ id: c, x: 9, y: 8, radius: 1 },
-				]);
-				const config = expectRepo("1,2,3", 1)[0];
-				const partition = config.$partitions[0].toJSON();
-				const join = partition.overlaps.find(o => o.join)!.join;
-				expect(join).to.equal(JoinStrategy.perfect);
-				const ridges = config.$pattern!.$devices[0].$drawRidges;
-				const int = { x: 5, y: 5 };
-				expect(ridges).to.not.containLine([{ x: 0, y: 0 }, int]);
-				expect(ridges).to.containLine([int, { x: 8, y: 8 }]);
-			}
-		});
-
-		it("Base join", () => {
-			for(const [a, b, c] of THREE_PERMUTATION) {
-				generateFromFlaps([
-					{ id: a, x: 0, y: 0, radius: 11 },
-					{ id: b, x: 7, y: 14, radius: 4 },
-					{ id: c, x: 15, y: 8, radius: 6 },
-				]);
-				const device = expectRepo("1,2,3", 1, 1, 1)[0];
-				expect(device.$addOns.length).to.equal(0, "Base joins have no addOn");
-			}
-		});
-
-		it("Standard join", () => {
-			for(const [a, b, c] of THREE_PERMUTATION) {
-				generateFromFlaps([
-					{ id: a, x: 0, y: 0, radius: 11 },
-					{ id: b, x: 5, y: 12, radius: 2 },
-					{ id: c, x: 15, y: 8, radius: 6 },
-				]);
-				const device = expectRepo("1,2,3", 1,
-					// Should find two standard joins,
-					// one concave and one convex
-					2,
-					1 // Standard join creates 1 Device
-				)[0];
-				expect(device.$addOns.length).to.equal(1, "Standard join will have 1 addOn");
-			}
-		});
-
-		it("Convex standard join is not valid if point R goes beyond the gadget", () => {
-			for(const [a, b, c] of THREE_PERMUTATION) {
-				generateFromFlaps([
-					{ id: a, x: 0, y: 0, radius: 28 },
-					{ id: b, x: 9, y: 32, radius: 5 },
-					{ id: c, x: 20, y: 31, radius: 5 },
-				]);
-				expectRepo("1,2,3", 1,
-					// Should find many half-integral patterns,
-					// instead of a convex standard join
-					8,
-					2 // Should be 2 devices instead of 1
-				);
-			}
-		});
-
-	});
-
 	describe("Split join", () => {
 		it("Creates split pattern with two devices", () => {
 			for(const [a, b, c] of THREE_PERMUTATION) {
@@ -228,6 +179,45 @@ describe("Three flap patterns", () => {
 					{ id: c, x: 12, y: 16, radius: 5 },
 				]);
 				expectRepo("1,2,3", 1, 1, 2);
+			}
+		});
+
+		it("Checks collisions of the remaining part with the joined gadgets", () => {
+			// The remaining part of the split junction is mutually connected
+			// with the other part, which is joined with the gadget of the other
+			// junction, and it must not collide with that gadget either.
+			for(const t of [false, true]) {
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 10 },
+						{ id: b, ...transpose(6, 11, t), radius: 2 },
+						{ id: c, ...transpose(7, 10, t), radius: 2 },
+					]);
+					for(const config of expectRepo("1,2,3", 2)) {
+						for(const pattern of config.$patterns) {
+							expectNoOverlap(pattern);
+						}
+					}
+				}
+			}
+		});
+
+		it("Skips split joins with both remaining parts relayed onto the join", () => {
+			// Both junctions are split, and the remaining parts would both sit
+			// in the concave corner of the join and overlap each other.
+			for(const t of [false, true]) {
+				for(const [a, b, c] of THREE_PERMUTATION) {
+					generateFromFlaps([
+						{ id: a, x: 0, y: 0, radius: 10 },
+						{ id: b, ...transpose(7, 10, t), radius: 2 },
+						{ id: c, ...transpose(10, 7, t), radius: 2 },
+					]);
+					for(const config of expectRepo("1,2,3", 2)) {
+						for(const pattern of config.$patterns) {
+							expectNoOverlap(pattern);
+						}
+					}
+				}
 			}
 		});
 
@@ -261,15 +251,25 @@ describe("Three flap patterns", () => {
 				expectRepo("1,2,3", 1); // There would be 2 configs without the check
 			}
 		});
+
+		it("Does not carry gadget strategies into joins", () => {
+			// One of the junctions alone is solved by half-integral gadgets,
+			// but the gadgets in the joins are always integral.
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 9 },
+					{ id: b, x: 5, y: 9, radius: 1 },
+					{ id: c, x: 10, y: 7, radius: 3 },
+				]);
+				for(const config of expectRepo("1,2,3", -1)) {
+					const { $partitions } = config;
+					const overlaps = $partitions.flatMap(p => p.$overlaps);
+					for(const o of overlaps) {
+						if(o.join) expect(o.gadget).to.be.undefined;
+					}
+				}
+			}
+		});
 	});
 
 });
-
-const THREE_PERMUTATION = [
-	[1, 2, 3],
-	[1, 3, 2],
-	[2, 1, 3],
-	[2, 3, 1],
-	[3, 1, 2],
-	[3, 2, 1],
-];

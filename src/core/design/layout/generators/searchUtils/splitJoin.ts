@@ -42,7 +42,9 @@ function toSplitItem(
 ): SplitItem {
 	const partitions = config.$rawPartitions;
 	const overlaps = partitions.map(p => p.overlaps[0]);
-	if(partitions.length == 1) return { overlap: overlaps[0], oppositeNodeId };
+	if(partitions.length == 1) {
+		return { overlap: forJoining(overlaps[0]), oppositeNodeId };
+	}
 	const isHorizontal = overlaps[0].ox == overlaps[1].ox;
 
 	const p = partitions.find(partition => {
@@ -50,22 +52,44 @@ function toSplitItem(
 		return overlap.c[0].e == nodeId || overlap.c[2].e == nodeId;
 	})!;
 	const remainingPartition = partitions.find(partition => partition != p);
-	const overlap = p.overlaps[0];
+	const overlap = forJoining(p.overlaps[0]);
 	return {
 		overlap, oppositeNodeId,
 		split: { remainingPartition, isHorizontal },
 	} as SplitItem;
 }
 
+/**
+ * The {@link JOverlap} to be joined. The gadgets in the joins are always
+ * integral, so the gadget strategy of the original {@link Configuration}
+ * (if any) must be dropped.
+ */
+function forJoining(overlap: JOverlap): JOverlap {
+	const result = { ...overlap };
+	delete result.gadget;
+	return result;
+}
+
+/**
+ * Whether the remaining part of the given {@link SplitItem} is connected to
+ * the intersection corner of the join with the other one, as it sits in the
+ * concave corner of their union. Otherwise it is on the outside.
+ */
+export function isRelayedOntoJoin(
+	item: SplitItem, against: SplitItem
+): boolean {
+	if(!item.split) return false;
+	const itemIsTaller = item.overlap.oy > against.overlap.oy;
+	return itemIsTaller != item.split.isHorizontal;
+}
+
 export function getExposedPart(
 	item: SplitItem, against: SplitItem, join: JPartition
 ): JPartition | undefined {
 	if(!item.split) return;
-	const itemIsTaller = item.overlap.oy > against.overlap.oy;
 	const isHorizontal = item.split.isHorizontal;
-	const splittingOnOutside = itemIsTaller == isHorizontal;
 	const result = clone(item.split.remainingPartition);
-	if(!splittingOnOutside) {
+	if(isRelayedOntoJoin(item, against)) {
 		if(isHorizontal) {
 			result.overlaps[0].ox -= against.overlap.ox;
 		} else {

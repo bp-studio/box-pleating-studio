@@ -157,18 +157,34 @@ export class Piece extends Region implements JPiece {
 		const ridges = toLines(contour);
 		if(this.detours) {
 			for(const detour of this.detours) {
-				this._processDetour(ridges, contour, detour);
+				const applied = this._processDetour(ridges, contour, detour);
+				/* istanbul ignore next: debug */
+				if(!applied) debugFail("Invalid detour");
 			}
 		}
 		return { contour, ridges };
 	});
 
 	/**
-	 * Return the original contour (not including shifting and detour)
+	 * Whether all the {@link detours} (which must be present) can be applied.
+	 * This is used for filtering out invalid combinations of detours, so it
+	 * does not report any failures.
+	 */
+	public get $isDetourValid(): boolean {
+		const contour = this._points.value.concat();
+		const ridges = toLines(contour);
+		return this.detours!.every(
+			detour => this._processDetour(ridges, contour, detour)
+		);
+	}
+
+	/**
+	 * Return the original contour (not including the offset and detour)
 	 * of this piece. Used only for constructing standard join.
 	 */
 	public get $originalContour(): readonly Point[] {
-		const unshift = this._shift.value.$neg; // v0.6.17: This is needed
+		// v0.6.17: This is needed
+		const unshift = new Vector(offsets.get(this)!).$neg;
 		return this._points.value.map(p => p.$add(unshift));
 	}
 
@@ -206,9 +222,10 @@ export class Piece extends Region implements JPiece {
 		]);
 	}
 
+	/** Apply the detour, and return whether it was successful. */
 	private _processDetour(
 		ridges: Line[], contour: RationalPath, _detour: Path
-	): void {
+	): boolean {
 		const detour = _detour.map(p => new Point(p).$add(this._shift.value));
 		const start = detour[0], end = detour[detour.length - 1];
 
@@ -239,13 +256,10 @@ export class Piece extends Region implements JPiece {
 				ridges.splice(i, tail, ...lines);
 				contour.splice(0, head);
 				ridges.splice(0, head);
-				return;
+				return true;
 			}
-
-			// Something is wrong with the given detour if we get here.
-			/* istanbul ignore next: debug */
-			debugFail("Invalid detour");
 		}
+		return false;
 	}
 }
 

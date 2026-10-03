@@ -1,7 +1,7 @@
 import { JoinStrategy } from "shared/json";
 import { Direction } from "shared/types/direction";
 import { Vector } from "core/math/geometry/vector";
-import { generate } from "core/math/gops";
+import { getJoinCandidates, restoreCandidates } from "./joinCandidate";
 import { Piece } from "../pattern/piece";
 import { SimpleJoinLogic } from "./logic/simpleJoinLogic";
 import { BaseJoinLogic } from "./logic/baseJoinLogic";
@@ -10,7 +10,8 @@ import { QV } from "../pattern/quadrant";
 
 import type { JoinLogic, JoinResult } from "./logic/joinLogic";
 import type { Repository } from "../repository";
-import type { JOverlap, JDevice, JJunction, JPiece } from "shared/json";
+import type { JoinCandidate } from "./joinCandidate";
+import type { JOverlap, JDevice, JJunction } from "shared/json";
 import type { QuadrantDirection } from "shared/types/direction";
 import type { Point } from "core/math/geometry/point";
 
@@ -23,8 +24,8 @@ import type { Point } from "core/math/geometry/point";
 
 export class Joiner {
 
-	private readonly g1!: readonly JPiece[];
-	private readonly g2!: readonly JPiece[];
+	private readonly g1!: readonly JoinCandidate[];
+	private readonly g2!: readonly JoinCandidate[];
 
 	/** Shifting of the first {@link JOverlap}. */
 	public readonly s1?: IPoint;
@@ -55,33 +56,36 @@ export class Joiner {
 	public readonly q!: QuadrantDirection;
 
 	constructor(overlaps: readonly JOverlap[], repo: Repository) {
-		const junctions: JJunction[] = [];
 		const [o1, o2] = overlaps;
 		// No need to continue in this case
 		if(o1.ox == o2.ox || o1.oy == o2.oy) return;
 
-		//TODO: allowing pass in a predefined list of pieces
-		// for better performance
-		[this.g1, this.g2] = overlaps.map(o => {
-			const j = repo.$junctions[o.parent];
-			junctions.push(j);
-			return Array.from(generate(o.ox, o.oy, j.sx));
-		});
-
-		const [j1, j2] = junctions;
+		const [j1, j2] = overlaps.map(o => repo.$junctions[o.parent]);
 		this.$oriented = j1.c[0].e == j2.c[0].e;
-		this.$isClockwise = o1.ox > o2.ox;
 		this.q = this.$oriented ? 0 : 2;
-		[this.q1, this.q2] = this._getQuadrantCombination();
-		this.$intersectionDist =
-			repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
-		this.w1 = j1.sx;
-		this.w2 = j2.sx;
 
 		// Calculate Overlap shifting
 		[this.s1, this.s2] = this.$oriented ?
 			[o1.shift, o2.shift] :
 			[getReverseShift(o1, j1), getReverseShift(o2, j2)];
+
+		// Compare the extents from the joint, as one of the overlaps could be
+		// shortened in relay joins.
+		const x1 = o1.ox + Math.abs(this.s1?.x ?? 0);
+		const x2 = o2.ox + Math.abs(this.s2?.x ?? 0);
+		this.$isClockwise = x1 > x2;
+
+		//TODO: allowing pass in a predefined list of pieces
+		// for better performance
+		[this.g1, this.g2] = [o1, o2].map((o, i) => Array.from(
+			getJoinCandidates(o, [j1, j2][i].sx, this.q)
+		));
+
+		[this.q1, this.q2] = this._getQuadrantCombination();
+		this.$intersectionDist =
+			repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
+		this.w1 = j1.sx;
+		this.w2 = j2.sx;
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -89,25 +93,41 @@ export class Joiner {
 	////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * The candidate {@link JPiece}s of the first {@link JOverlap}.
+	 * The {@link JoinCandidate}s of the first {@link JOverlap}.
 	 *
 	 * Note that this is not available if the two {@link JOverlap}s have the
 	 * same width or height (see the constructor), but in that case one of them
 	 * contains the other, which is excluded by Quadrant.$checkValidity.
 	 */
-	public get $firstPieces(): readonly JPiece[] {
+	public get $firstCandidates(): readonly JoinCandidate[] {
 		return this.g1;
+	}
+
+	/**
+	 * Joins of the given strategy.
+	 *
+	 * @param first If given, only this {@link JoinCandidate} will be used for
+	 * the first {@link JOverlap}.
+	 */
+	public *$join(
+		strategy: JoinStrategy, first?: JoinCandidate
+	): Generator<JDevice> {
+		if(strategy == JoinStrategy.standardJoin) {
+			yield* this.$standardJoin(first);
+		} else if(strategy == JoinStrategy.baseJoin) {
+			yield* this.$baseJoin(first);
+		} else {
+			yield* this.$simpleJoin(strategy, first);
+		}
 	}
 
 	/**
 	 * Simple joins, including perfect joins, which are distinguished by whether
 	 * the axis-parallel creases of the two gadgets are parallel.
-	 *
-	 * @param first If given, only this {@link JPiece} will be used for the
-	 * first {@link JOverlap}.
 	 */
 	public *$simpleJoin(
-		strategy: JoinStrategy.simple | JoinStrategy.perfect, first?: JPiece
+		strategy: JoinStrategy.simple | JoinStrategy.perfect,
+		first?: JoinCandidate
 	): Generator<JDevice> {
 		const { s1, s2 } = this;
 		const perfect = strategy == JoinStrategy.perfect;
@@ -120,16 +140,17 @@ export class Joiner {
 		}, first);
 	}
 
-	public *$baseJoin(): Generator<JDevice> {
-		yield* this.join(BaseJoinLogic);
+	public *$baseJoin(first?: JoinCandidate): Generator<JDevice> {
+		yield* this.join(BaseJoinLogic, undefined, first);
 	}
 
-	public *$standardJoin(): Generator<JDevice> {
+	public *$standardJoin(first?: JoinCandidate): Generator<JDevice> {
 		const { s1, s2 } = this, shift = Boolean(s1) || Boolean(s2);
 		let counter = 0;
 		yield* this.join(
 			StandardJoinLogic,
-			(P1, P2) => shift || counter++ == 0 // Return only the first one
+			(P1, P2) => shift || counter++ == 0, // Return only the first one
+			first
 		);
 	}
 
@@ -147,17 +168,21 @@ export class Joiner {
 	private *join<T extends JoinLogic>(
 		Logic: new (joiner: Joiner, p1: Piece, p2: Piece) => T,
 		precondition?: (P1: Piece, P2: Piece) => boolean,
-		first?: JPiece
+		first?: JoinCandidate
 	): Generator<JDevice> {
 		const { g1, g2 } = this;
 		const result: JoinResult[] = [];
 		if(!g1) return;
-		for(const p1 of first ? [first] : g1) {
-			for(const p2 of g2) {
-				const P1 = new Piece(p1);
-				const P2 = new Piece(p2);
+		for(const c1 of first ? [first] : g1) {
+			for(const c2 of g2) {
+				// The joining only concerns the main pieces
+				const P1 = new Piece(c1.piece);
+				const P2 = new Piece(c2.piece);
 				if(precondition && !precondition(P1, P2)) continue;
-				result.push(...new Logic(this, P1, P2).$join());
+				for(const [device, weight] of new Logic(this, P1, P2).$join()) {
+					const restored = restoreCandidates(device, [c1, c2]);
+					if(restored) result.push([restored, weight]);
+				}
 			}
 		}
 		result.sort((a, b) => a[1] - b[1]);

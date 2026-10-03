@@ -1,6 +1,6 @@
 import { generate } from "core/math/gops";
 import { kamiyaHalfIntegral } from "core/math/kamiya";
-import { GadgetStrategy, JoinStrategy } from "shared/json";
+import { GadgetStrategy } from "shared/json";
 import { clone } from "shared/utils/clone";
 import { Piece } from "../pattern/piece";
 import { Gadget } from "../pattern/gadget";
@@ -37,10 +37,7 @@ export function* deviceGenerator(
 		const joiner = config.$repo.$getJoiner(overlaps);
 		// Depending on how the overlaps are joined (see _joinOverlaps in
 		// GeneralConfigGeneratorContext), either one could be the joined one.
-		const join = overlaps.find(o => o.join)!.join!;
-		if(join == JoinStrategy.standardJoin) yield* joiner.$standardJoin();
-		else if(join == JoinStrategy.baseJoin) yield* joiner.$baseJoin();
-		else yield* joiner.$simpleJoin(join);
+		yield* joiner.$join(overlaps.find(o => o.join)!.join!);
 	} else if(overlaps.length == FAN_SIZE) {
 		yield* fanJoin(overlaps, config.$repo);
 	}
