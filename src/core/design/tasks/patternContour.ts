@@ -91,7 +91,7 @@ export function processNode(
 	const entries = node.$graphics.$traceContours.entries();
 	for(const [index, traceContour] of entries) {
 		const traceLeaves = new Set(traceContour.$leaves);
-		for(const outer of traceContour.$outer) {
+		for(const [piece, outer] of traceContour.$outer.entries()) {
 			const leaves = outer.leaves ?
 				outer.leaves.filter(l => trace.$leaves.has(l)) :
 				traceContour.$leaves;
@@ -121,7 +121,7 @@ export function processNode(
 			// by getQuadrantShape (see processOuter).
 			const map = createStartEndMap(quadrants, trace, traceLeaves);
 			const context: TraceContext = {
-				map, trace, node, index, leaves,
+				map, trace, node, index, piece, leaves,
 				rawMode: traceContour.$raw,
 			};
 			processOuter(outer, context);
@@ -150,6 +150,7 @@ interface TraceContext {
 	readonly trace: RepoTrace;
 	readonly node: ITreeNode;
 	readonly index: number;
+	readonly piece: number;
 	readonly leaves: NodeId[];
 	readonly rawMode: boolean;
 }
@@ -197,6 +198,7 @@ function processTrace(
 		contour.$ids = context.trace.$repo.$nodeSet.$nodes;
 		contour.$repo = context.trace.$repo.$signature;
 		contour.$for = context.index;
+		contour.$piece = context.piece;
 		contour.$leaves = context.leaves;
 		context.node.$graphics.$patternContours.push(contour);
 	}

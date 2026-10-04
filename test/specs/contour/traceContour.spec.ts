@@ -180,4 +180,52 @@ describe("Trace contour", () => {
 		expect(outer2).to.equalPath("(-43/2,-14),(-23,-16),(-27,-16),(-29,-40/3),(-29,-12),(-42,-12),(-42,-25),(-122/3,-25),(-40,-51/2),(-40,-28),(-124/3,-29),(-42,-29),(-42,-44),(-28,-44),(-28,-42),(-24,-42),(-24,-44),(1,-44),(1,-14)", true);
 	});
 
+	/** Added v0.8.0 */
+	it("Inserts pattern contours into the raw pieces they are traced from", () => {
+		// The raw contour of node 1 consists of two overlapping pieces, and
+		// both ends of the second pattern contour lie on the first piece
+		// after the first pattern contour is inserted. Previously, it was
+		// inserted into the first piece, which erased most of it.
+		parseTree(
+			"(0,1,3),(1,2,2),(1,5,2),(5,6,2),(0,9,4),(9,14,1),(14,15,1),(14,16,2)",
+			"(2,11,17,0,0),(6,0,8,0,0),(15,1,10,0,0),(16,13,19,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const contours = result.graphics["re0,1"].contours;
+		expect(contours.length).to.equal(1);
+		expect(contours[0].outer).to.equalPath("(6,22),(6,15),(-7,15),(-7,1),(7,1),(7,12),(16,12),(16,22)", true);
+	});
+
+	/** Added v0.8.0 */
+	it("Separates leaves with invalid junctions from the rest in raw mode", () => {
+		// Node 15 is in raw mode because of repo {4,23}, and flaps 17 and 18
+		// would be in the rest. Flap 17 overlaps flap 11 (invalid), so that
+		// it enlarged the piece beyond the hinge y=11 of the pattern of flaps
+		// 11 and 18. Previously, the extended pattern contour cut off the
+		// part (-2,11)-(0,12), which was not covered by anything else.
+		parseTree(
+			"(0,1,2),(1,3,2),(3,4,2),(0,9,1),(9,10,1),(10,11,2),(0,15,2),(15,16,2),(16,17,1),(16,18,2),(15,20,2),(20,22,1),(20,23,2)",
+			"(4,7,22,0,0),(11,4,15,0,0),(17,3,6,0,1),(18,13,8,0,0),(22,7,22,0,0),(23,17,11,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const contours = result.graphics["re0,15"].contours;
+		const outer = contours.find(c => c.outer.some(p => p.x == -2))!.outer;
+		expect(outer).to.equalPath("(37/3,17),(11,16),(11,14),(8,14),(8,13),(29/4,12),(-2,12),(-2,1),(8,1),(8,2),(19,2),(19,5),(23,5),(23,17)", true);
+	});
+
+	/** Added v0.8.0 */
+	it("Keeps the leaves of the same repo together when separated", () => {
+		// Flaps 4 and 8 both overlap flap 11 (invalid), so they are separated
+		// from the rest of node 1, but they are in the same repo {4,8,13},
+		// so they must be traced on the same piece.
+		parseTree(
+			"(0,1,4),(1,2,3),(2,4,1),(1,5,1),(1,6,1),(6,8,2),(0,9,4),(9,10,3),(10,11,2),(9,13,2)",
+			"(4,11,8,0,0),(5,2,10,0,0),(8,16,5,0,1),(11,15,0,0,0),(13,24,18,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const outer = result.graphics["re0,1"].contours[0].outer;
+		expect(outer).to.equalPath("(59/3,12),(19,25/2),(19,44/3),(18,16),(3,16),(3,15),(-3,15),(-3,5),(3,5),(3,0),(9,0),(9,-2),(23,-2),(23,12)", true);
+	});
+
 });
+

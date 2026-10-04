@@ -44,17 +44,30 @@ export function pointToString(p: IArcPoint): string {
 	return `(${p.x},${p.y})`;
 }
 
+/**
+ * Determine the orientation of a path by the turning direction at its
+ * lowest-leftmost vertex, which is always a convex vertex.
+ *
+ * Note that comparing only the neighbors of a leftmost vertex is not enough,
+ * as both of them could be at the same height when the leftmost edge is
+ * vertical.
+ */
 export function isClockwise(path: PathEx): boolean {
 	const l = path.length;
-	let minX = Number.POSITIVE_INFINITY, minXDelta: number = 0;
-	for(let i = 0, j = l - 1; i < l; j = i++) {
-		const p = path[i];
-		if(p.x < minX) {
-			minX = p.x;
-			const p1 = path[j], p2 = path[i + 1] || path[0];
-			const dx = p2.y - p1.y;
-			minXDelta = dx;
-		}
+	let index = 0;
+	for(let i = 1; i < l; i++) {
+		const p = path[i], q = path[index];
+		if(p.x < q.x || p.x == q.x && p.y < q.y) index = i;
 	}
-	return minXDelta > 0;
+	const p = path[index];
+	const p1 = path[(index + l - 1) % l], p2 = path[(index + 1) % l];
+	const cross = (p.x - p1.x) * (p2.y - p.y) - (p.y - p1.y) * (p2.x - p.x);
+	if(cross != 0) return cross < 0;
+
+	// Degenerated case, fallback to the signed area
+	let area = 0;
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		area += (path[j].x - path[i].x) * (path[j].y + path[i].y);
+	}
+	return area < 0;
 }

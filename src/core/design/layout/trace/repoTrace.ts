@@ -1,6 +1,7 @@
 import { pathToString } from "core/math/geometry/path";
 import { SlashDirection } from "shared/types/direction";
 import { Trace } from "./trace";
+import { State } from "core/service/state";
 import { QV, minQuadrantWeightComparator, pointWeight } from "../pattern/quadrant";
 
 import type { NodeId } from "shared/json/tree";
@@ -125,6 +126,15 @@ export class RepoTrace extends Trace {
 			if(ridge) result.end = hingeSideEnd(ridge, quadrant);
 		}
 		return result;
+	}
+
+	protected override _involvesInvalidJunctions(): boolean {
+		for(const junction of State.$junctions.values()) {
+			if(junction.$valid) continue;
+			const { $a: a, $b: b } = junction;
+			if(this.$leaves.has(a.id) || this.$leaves.has(b.id)) return true;
+		}
+		return false;
 	}
 
 	private _getIntersectionRidge(a: NodeId, b: NodeId): Ridge {

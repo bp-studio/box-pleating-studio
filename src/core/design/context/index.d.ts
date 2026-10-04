@@ -87,6 +87,14 @@ export interface PatternContour extends Array<Point> {
 	 */
 	$for?: number;
 
+	/**
+	 * The index in {@link ContourComponent.$outer} of the associated
+	 * {@link TraceContour}, from which this contour is traced.
+	 * In raw mode, the outer paths could overlap, and the ends of this contour
+	 * could lie on more than one of them, so we need to know the exact path.
+	 */
+	$piece?: number;
+
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly NodeId[];
 

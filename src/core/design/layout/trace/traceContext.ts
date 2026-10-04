@@ -16,10 +16,13 @@ interface RidgeIntersection extends IIntersection<Ridge> {
 	endPoint: boolean;
 }
 
-interface TraceNode {
+export interface TraceNode {
 	point: Point;
 	vector: Vector;
 	last?: Vector;
+
+	/** Whether the initial node is obtained by reflecting on a ridge. */
+	ridge?: boolean;
 }
 
 //=================================================================
@@ -99,6 +102,7 @@ export class TraceContext {
 			const result = {
 				point: intersection.point,
 				vector: intersection.line.$reflect(ray.vector),
+				ridge: !isSideDiagonal(intersection.line),
 			};
 
 			ridges.delete(intersection.line);
@@ -129,7 +133,11 @@ export class TraceContext {
 	private _testEndPoints(line: Line, start: boolean): boolean {
 		for(const hinge of this._hinges) {
 			const p = start ? line.p2 : line.p1;
-			if(hinge.$contains(p) && hinge.$vector.$parallel(line.$vector)) {
+			// Endpoints included, as the path could turn exactly at a vertex of
+			// the hinges (for example, when a gadget touches the corner of the
+			// flap), in which case the whole path is redundant.
+			const contains = hinge.$contains(p, true);
+			if(contains && hinge.$vector.$parallel(line.$vector)) {
 				return true;
 			}
 		}
@@ -205,7 +213,7 @@ function isCloser(r: RidgeIntersection, x: RidgeIntersection | null): boolean {
 		);
 }
 
-function isSideDiagonal(line: Line): line is SideDiagonal {
+export function isSideDiagonal(line: Line): line is SideDiagonal {
 	return "p0" in line;
 }
 

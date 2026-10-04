@@ -43,8 +43,11 @@ describe("Pattern contour", () => {
 	});
 
 	/** Added v0.7.9 */
-	it("Raw mode final check should first attempt last know cursor direction", () => {
-		// This example is derived from Scutigera by Matt LaBoone
+	it("Ends pattern contours on the hinges in raw mode", () => {
+		// This example is derived from Scutigera by Matt LaBoone.
+		// Previously, the end of the contour was extended to the hinges in
+		// raw mode, but that is no longer needed since the pieces are carved
+		// to match the tracing.
 		parseTree(
 			"(24,45,1),(24,38,7),(24,27,1),(45,1,1),(45,43,5),(27,26,1),(1,3,17)",
 			"(3,88,88,0,0),(38,66,74,0,0),(43,77,67,0,0),(26,63,62,0,0)"
@@ -54,4 +57,34 @@ describe("Pattern contour", () => {
 		expect(outer).to.equalPath("(107,107),(69,107),(69,81),(69.5,81),(73,229/3),(73,215/3),(71,69),(71,61),(83,61),(83,69),(107,69)", true);
 	});
 
+	/** Added v0.8.0 */
+	it("Ignores contours that never reflect on any ridge", () => {
+		// One of the hinge segments of node 11 is irrelevant to the pattern,
+		// and the contour traced on it merely goes along the hinge y=13.
+		// Previously, it was inserted and replaced most of the outer path.
+		parseTree(
+			"(0,5,2),(5,6,1),(6,8,1),(0,11,2),(11,13,3),(13,14,1),(13,15,1),(13,16,1)",
+			"(8,3,16,0,1),(14,4,6,0,1),(15,14,14,0,0),(16,12,22,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const outer = result.graphics["re0,11"].contours[0].outer;
+		expect(outer).to.equalPath("(18,20),(18,28),(6,28),(6,59/3),(7,55/3),(7,16),(8,16),(8,13),(-2,13),(-2,0),(10,0),(10,8),(20,8),(20,20)", true);
+	});
+
+	/** Added v0.8.0 */
+	it("Stops tracing when the gadget touches the corner of the flap", () => {
+		// The gadget of flaps 2 and 7 touches flap 7 exactly at its corner
+		// (26,41), so the traced path turns exactly at a vertex of the hinges
+		// and lies entirely along them. Previously, such path was not trimmed.
+		parseTree(
+			"(0,4,1),(0,14,4),(0,15,1),(4,9,1),(4,7,1),(15,1,14),(15,2,7),(15,11,6)",
+			"(2,20,34,0,0),(1,29,14,0,0),(9,44,26,0,0),(11,33,34,4,1),(7,27,42,0,0),(14,12,25,0,0)"
+		);
+		const node = State.m.$tree.$nodes[7 as NodeId]!;
+		const contours = node.$graphics.$patternContours;
+		expect(contours.length).to.equal(1);
+		expect(contours[0].$ids).to.not.include(2);
+	});
+
 });
+

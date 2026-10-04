@@ -115,4 +115,21 @@ describe("Rough contour", () => {
 		expect(contour.inner![0]).to.equalPath("(7,0),(7,-7),(-7,-7),(-7,7),(6,7),(6,0)", true);
 	});
 
+	/** Added v0.8.0 */
+	it("Treats the components touching at a vertex as one", () => {
+		// The expanded hinges of flaps 9 and 10 touch at (11,4) only, and
+		// the union is chained into a single path touching itself there.
+		// Previously, the path was assigned to the component of flap 9 only,
+		// leaving the component of flap 10 without an outer path, so that
+		// the river covered flap 10.
+		parseTree(
+			"(0,8,2),(8,9,1),(8,10,1),(0,1,1)",
+			"(1,40,40,0,0),(9,7,7,1,0),(10,14,0,0,1)"
+		);
+		const result = UpdateResult.$flush();
+		const contours = result.graphics["re0,8"].contours;
+		expect(contours.length).to.equal(1);
+		expect(contours[0].inner!.length).to.equal(2);
+	});
+
 });

@@ -8,6 +8,7 @@ import { climb } from "./utils/climb";
 import { expandPath, simplify } from "./utils/expand";
 import { getNewCarvings, rebuild } from "./utils/invasion";
 import { createRawPieces } from "./utils/rawPiece";
+import { createLeafSets, extractInvalidGroups } from "./utils/leafGroup";
 
 import type { RawPiece, getQuadrantShape } from "./utils/rawPiece";
 import type { NodeId } from "shared/json/tree";
@@ -130,6 +131,7 @@ function updater(node: ITreeNode): boolean {
 		// Whenever trace contour changes,
 		// established pairing relations are no longer valid.
 		contour.$for = undefined;
+		contour.$piece = undefined;
 	}
 	State.$contourWillChange.add(node);
 
@@ -279,17 +281,6 @@ function checkCriticalCorners(
 	return corners.size == 0;
 }
 
-interface LeafSet extends Array<NodeId> {
-	/** The {@link NodeSet} from which this {@link LeafSet} is created. */
-	nodeSet: NodeSet;
-
-	/**
-	 * This {@link LeafSet} contains a leaf that is shared with another
-	 * LeafSet.
-	 */
-	hasOverlapping?: boolean;
-}
-
 /**
  * Create the outer contour in raw mode.
  * @param missing The missing critical corners.
@@ -309,11 +300,7 @@ function createRawContour(
 		if(leafSet.hasOverlapping) { // We'll handle these later
 			for(const id of leafSet) sharedLeaves.add(id);
 		} else { // Group all relevant leaves into one raw contour
-			const pieces = leafSet.flatMap(
-				id => createRawContourForLeaf(node, tree.$nodes[id]!)
-			);
-			const outers = pieces.length > 1 ?
-				aaUnion.$get(...pieces.map(p => [p])) : pieces;
+			const [pieces, outers] = createRawContourForLeaves(node, leafSet);
 
 			// If the missing corners are not exposed even in the union of the
 			// LeafSet, they are eaten by the leaves of the LeafSet itself,
@@ -334,6 +321,12 @@ function createRawContour(
 		result.push(...packPaths(pieces, [id], pieces));
 	}
 
+	// See extractInvalidGroups
+	for(const group of extractInvalidGroups(leaves, remainingLeaves)) {
+		const [, outers] = createRawContourForLeaves(node, group);
+		result.push(...packPaths(outers, group));
+	}
+
 	// All the rest goes to the same group.
 	if(remainingLeaves.size > 0) {
 		// It is very common that majority of leaves remain,
@@ -351,44 +344,6 @@ function createRawContour(
 	}
 
 	return result;
-}
-
-/**
- * Ideally, we want to have as few raw contours as possible reduce the cost of
- * processing them, so we would like to group all leaves belonging to the same
- * {@link NodeSet}. However, in some cases a single leaf could belong to more
- * than one NodeSet. For such "shared leaf", we have to fully break up the
- * corresponding NodeSet into individual raw contours, otherwise generated
- * pattern contours could be blocked by the rough contours from other raw
- * contours.
- *
- * In this subroutine, we identify those leaves that are shared by more than
- * one NodeSet, and mark the corresponding {@link LeafSet.hasOverlapping}.
- */
-function createLeafSets(
-	nodeSets: NodeSet[], remainingLeaves: Set<NodeId>
-): LeafSet[] {
-	const leafSets = nodeSets.map(nodeSet => {
-		const leafSet = nodeSet.$leaves
-			.filter(id => remainingLeaves.has(id)) as LeafSet;
-		leafSet.nodeSet = nodeSet;
-		return leafSet;
-	});
-	const leafMap = new Map<NodeId, LeafSet>();
-	for(const leafSet of leafSets) {
-		for(const id of leafSet) {
-			remainingLeaves.delete(id);
-			if(leafMap.has(id)) {
-				// Found overlapping. Note that we keep checking the rest of the
-				// leaves, as they could also be shared with other LeafSets.
-				leafMap.get(id)!.hasOverlapping = true;
-				leafSet.hasOverlapping = true;
-			} else {
-				leafMap.set(id, leafSet);
-			}
-		}
-	}
-	return leafSets;
 }
 
 /**
@@ -461,4 +416,17 @@ function createRawContourForLeaf(
 	node: ITreeNode, leaf: ITreeNode
 ): RawPiece[] {
 	return createRawPieces(node, leaf, coveredJunctionMap.get(leaf.id) ?? []);
+}
+
+/** Returns the pieces of the leaves, and the union of them. */
+function createRawContourForLeaves(
+	node: ITreeNode, ids: readonly NodeId[]
+): [RawPiece[], PathEx[]] {
+	const tree = State.m.$tree;
+	const pieces = ids.flatMap(
+		id => createRawContourForLeaf(node, tree.$nodes[id]!)
+	);
+	const outers = pieces.length > 1 ?
+		aaUnion.$get(...pieces.map(p => [p])) : pieces;
+	return [pieces, outers];
 }

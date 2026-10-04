@@ -44,6 +44,7 @@ export class RoughUnion extends AAUnion {
 		 * so we should always check for self-intersections.
 		 */
 		super(true);
+		this._chainer.$onConnect = (a, b) => this._unionFind.$union(a, b);
 	}
 
 	public $union(...components: Polygon[]): UnionResult[] {

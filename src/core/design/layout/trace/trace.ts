@@ -1,14 +1,17 @@
 import { SlashDirection } from "shared/types/direction";
-import { TraceContext, getNextIntersection } from "./traceContext";
+import { TraceContext, getNextIntersection, isSideDiagonal } from "./traceContext";
+import { debugAssert } from "core/utils/debug";
 import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
+import type { TraceNode } from "./traceContext";
 import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
 import type { PatternContour } from "../../context";
+import type { getQuadrantShape } from "core/design/tasks/utils/rawPiece";
 
 /** The starting/ending points of tracing. */
 export interface StartEnd {
@@ -64,7 +67,7 @@ export class Trace {
 		if(!startDiagonal && virtualStart) {
 			startDiagonal = createVirtualDiagonal(start, directionalVector);
 		}
-		let cursor = ctx.$getInitialNode(ridges, startDiagonal);
+		const cursor = ctx.$getInitialNode(ridges, startDiagonal);
 		if(!cursor) return null;
 		path.push(cursor.point);
 
@@ -72,12 +75,41 @@ export class Trace {
 			this.$sideDiagonals.find(d => d.$contains(end, true));
 		if(endDiagonal) ridges.add(endDiagonal);
 
-		// Main loop
+		const reflected = Trace._mainLoop(
+			ridges, cursor, path, end, directionalVector
+		) || Boolean(cursor.ridge);
+
+		// A contour that never reflects on any ridge (side diagonals excluded)
+		// merely goes along the hinges, which happens when the hinge segment is
+		// irrelevant to the pattern (for example, another part of a piece
+		// formed by multiple leaves). There's nothing to trace in that case.
+		if(!reflected) return null;
+
+		const result = ctx.$trim(path);
+		if(!rawMode) return result;
+		else return this._rawModeFinalCheck(result, hinges);
+	}
+
+	////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Keep reflecting on the ridges, and returns whether any ridge (side
+	 * diagonals excluded) is reflected on.
+	 */
+	private static _mainLoop(
+		ridges: Set<Ridge>, initial: TraceNode, path: RationalPath,
+		end: Point, directionalVector: Vector
+	): boolean {
+		let cursor = initial;
+		let reflected = false;
 		while(true) {
 			const intersection = getNextIntersection(ridges, cursor);
 			if(!intersection) break;
 
 			ridges.delete(intersection.line);
+			if(!isSideDiagonal(intersection.line)) reflected = true;
 			cursor = {
 				last: intersection.line.$vector,
 				point: intersection.point,
@@ -92,76 +124,47 @@ export class Trace {
 				path.push(cursor.point);
 			}
 		}
-
-		const result = ctx.$trim(path);
-		if(!rawMode) return result;
-		else return Trace._rawModeFinalCheck(result, hinges, cursor.vector);
+		return reflected;
 	}
 
-	////////////////////////////////////////////////////////////////////////////
-	// Private methods
-	////////////////////////////////////////////////////////////////////////////
-
 	/**
-	 * In raw mode, we need to make some extra checks to make sure the
-	 * generated contour actually fits the given hinge segment.
+	 * In raw mode, the generated contour must end on the given hinge segment,
+	 * so that it can be inserted into the piece. This holds in valid layouts,
+	 * as the pieces are carved to match the tracing (see
+	 * {@link getQuadrantShape}). In layouts with invalid junctions, the repo
+	 * is formed by the valid junctions only, while the geometry of the pieces
+	 * could still be affected by the flaps of the invalid junctions, and the
+	 * contour could end elsewhere. In that case we give up the contour.
+	 *
+	 * Note that for the same reason, the contour could also end on the hinges
+	 * by chance and still be incorrect, which would leave a small region
+	 * uncovered. We accept that, since it only happens in layouts with invalid
+	 * junctions, and it is not worth the effort to correct the patterns in
+	 * those layouts.
 	 */
-	private static _rawModeFinalCheck(
-		result: PatternContour | null,
-		hinges: Path,
-		lastVec: Vector
+	private _rawModeFinalCheck(
+		result: PatternContour | null, hinges: Path
 	): PatternContour | null {
 		if(!result) return null;
-
-		// First we quickly check if the last point is on the hinges.
-		const hingeLines: Line[] = [];
 		const lastPoint = result[result.length - 1];
 		for(let i = hinges.length - 1; i > 0; i--) {
 			const line = Line.$fromIPoint(hinges[i], hinges[i - 1]);
-			hingeLines.push(line);
 			if(line.$contains(lastPoint, true)) return result;
 		}
+		debugAssert(
+			() => this._involvesInvalidJunctions(),
+			"Pattern contour does not end on the hinges"
+		);
+		return null;
+	}
 
-		const findIntersection = (pt: Point, v: Vector) => {
-			for(const hinge of hingeLines) {
-				const intersection = hinge.$intersection(pt, v, true);
-				if(intersection) return intersection;
-			}
-			return null;
-		};
-
-		// Otherwise, try to find the intersection of the last known cursor
-		// direction with the hinges.
-		if(lastVec.x == 0 || lastVec.y == 0) {
-			const intersection =
-				findIntersection(result[result.length - 1], lastVec);
-			if(intersection) {
-				result.push(intersection);
-				return result;
-			}
-		}
-
-		// If the above still doesn't work, try popping the tail segments and
-		// retry. It is not known if this is actually helpful, as I don't have a
-		// sample that really requires this for a valid rendering. However, the
-		// follow paths can be triggered by dragging Imai's JSP.
-		/* istanbul ignore next: significance unsure */
-		for(let i = result.length - 1; i > 0; i--) {
-			const last = result[i];
-			const prev = result[i - 1];
-			const vec = last.$sub(prev);
-
-			// If the segment is not orthogonal, we're out of luck.
-			if(vec.x != 0 && vec.y != 0) break;
-
-			result.pop();
-			const intersection = findIntersection(prev, vec);
-			if(intersection) {
-				result.push(intersection);
-				return result;
-			}
-		}
-		return null; // Out of luck
+	/**
+	 * Whether the flaps involved in the tracing have invalid junctions.
+	 * See {@link _rawModeFinalCheck}.
+	 */
+	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
+	protected _involvesInvalidJunctions(): boolean {
+		return false;
 	}
 
 	private _createFilteredRidges(
