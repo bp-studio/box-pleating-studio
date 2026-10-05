@@ -13,6 +13,7 @@ import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 import { FlapContainer } from "./flapContainer";
 import { applyTransform, norm } from "shared/types/geometry";
+import { Health } from "./health";
 
 import type { IEditor } from "../sheet";
 import type { TransformationMatrix } from "shared/types/geometry";
@@ -62,6 +63,7 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
+	public readonly health: Health;
 
 	private _deviceMovePromise: Promise<void> | undefined;
 	private _draggingDevice: Device | undefined;
@@ -82,6 +84,8 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		this.$sheet =
 			new Sheet(project, parentView, "layout", this, json, state);
 		this.$sheet.$addChild(this);
+		this.health = new Health(this);
+		this.$sheet.$addChild(this.health);
 
 		const filter = new AlphaFilter(style.junction.alpha);
 		this.$sheet.$layers[Layer.junction].filters = [filter];
@@ -141,6 +145,8 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 			this._addRiver(r, model.graphics[tag]);
 		}
 		this.riverCount = this.$rivers.size;
+
+		this.health.$check();
 	}
 
 	/**

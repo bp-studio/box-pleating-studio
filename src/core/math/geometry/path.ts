@@ -71,3 +71,26 @@ export function isClockwise(path: PathEx): boolean {
 	}
 	return area < 0;
 }
+
+/**
+ * Return only the right angle corners of a path at integral coordinates, as
+ * well as the adjacent points. The corners at non-integral coordinates (right
+ * angle or not) are always formed by the pattern ridges, so they are excluded.
+ */
+export function* pathRightCorners(
+	path: Path
+): Generator<[IPoint, IPoint, IPoint]> {
+	const l = path.length;
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const p1 = path[i];
+		if(!Number.isInteger(p1.x) || !Number.isInteger(p1.y)) continue;
+
+		const p0 = path[j];
+		const p2 = path[i + 1] || path[0];
+
+		// Check for right angle.
+		const dot =
+			(p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
+		if(dot == 0) yield [p1, p0, p2];
+	}
+}

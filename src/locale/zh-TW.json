@@ -90,7 +90,8 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "匯入 TreeMaker 檔案"
+			"TreeMaker": "匯入 TreeMaker 檔案",
+			"health": "檢查佈局"
 		},
 		"help": {
 			"title": "說明",
@@ -128,6 +129,7 @@
 			"ridge": "脊線摺痕",
 			"axisParallel": "軸平行摺痕",
 			"overlap": "重疊",
+			"uncovered": "未覆蓋區域",
 			"tip": "角片頂點",
 			"label": "文字標籤"
 		},
@@ -208,12 +210,28 @@
 		"repo": {
 			"type": "伸展結構",
 			"config": "組態",
-			"pattern": "摺痕模式",
-			"onlyOne": "只找到了一種摺痕模式"
+			"pattern": "摺痕圖案",
+			"onlyOne": "只找到了一種摺痕圖案"
 		}
 	},
 	"status": {
 		"invalid": "無效重疊"
+	},
+	"health": {
+		"invalid": "無效重疊",
+		"invalidDetail": "有些角片太過靠近（紅色區域）。請先將它們分散開來，之後才會進行其它的檢查。",
+		"unsolved": "找不到摺痕圖案",
+		"unsolvedDetail": "有些重疊雖然有效，但可行的伸展摺痕圖案尚未被實作。請試著調整角片的位置。",
+		"issues": "發現問題：{0}",
+		"uncovered": "未覆蓋區域",
+		"uncoveredDetail": "紙張的每個部分都應該被角片或河覆蓋。請試著加大角片的長寬、或增加填充空間的角片，以填滿黃色的區域。",
+		"dangling": "中斷的脊線",
+		"danglingDetail": "有些脊線在紙張內部中斷（紅點處），沒有與其它脊線相接。請試著調整角片的位置以連接所有脊線。",
+		"riverCorner": "不自然的河",
+		"riverCornerDetail": "有些河（如斜線紋路所示）覆蓋的區域大於必要的程度，程式無法自動決定出正確的脊線。請試著填補河的多餘覆蓋區域。",
+		"pass": "佈局完全有效",
+		"passDetail": "佈局中沒有發現任何問題。",
+		"learnMore": "了解更多"
 	},
 	"share": {
 		"title": "分享專案",
@@ -254,7 +272,7 @@
 		"latest": "您已經擁有最新版本的 BP Studio。",
 		"min3vertex": "樹狀結構至少需要有三個頂點",
 		"oldVersion": "專案「{0}」是使用較舊版本的 BP Studio 建立的，部份設計已被修改。專案會在下次存檔時更新為最新格式。",
-		"patternNotFound": "在當前的設計中，存在一些角片重疊是雖然有效、但目前的 BP Studio 卻無法找到可行的伸展摺痕模式的。本應用程式的作者將會持續實作更多演算法以涵蓋更多情況。",
+		"patternNotFound": "在當前的設計中，存在一些角片重疊是雖然有效、但目前的 BP Studio 卻無法找到可行的伸展摺痕圖案的。本應用程式的作者將會持續實作更多演算法以涵蓋更多情況。",
 		"unsaved": "專案「{0}」有尚未儲存的變更，確定要捨棄？",
 		"updateReady": "更新版本的 BP Studio 已準備就緒，並將在重新啟動時自動更新。您想要現在立刻重新啟動嗎？",
 		"restartFail": "無法重新啟動。請關閉 BP Studio 的所有實體。",

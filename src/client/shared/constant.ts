@@ -31,3 +31,5 @@ export const BLUE = 0x6699FF;
 export const GREEN = 0x008000;
 
 export const LIGHT_GREEN = 0x66dd66;
+
+export const LIGHT_YELLOW = 0xffe066;

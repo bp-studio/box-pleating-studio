@@ -113,6 +113,11 @@
 								:label="$t('preference.color.overlap')"
 							/>
 							<Color
+								v-model="Settings.colorScheme.uncovered"
+								:default="Studio.style.uncovered.color"
+								:label="$t('preference.color.uncovered')"
+							/>
+							<Color
 								v-model="Settings.colorScheme.dot"
 								:default="Studio.style.dot.fill"
 								:label="$t('preference.color.tip')"

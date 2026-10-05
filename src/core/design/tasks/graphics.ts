@@ -9,6 +9,7 @@ import { combineContour } from "./utils/combine";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { UpdateResult } from "core/service/updateResult";
 import { isCarvedQuadrant } from "./utils/invasion";
+import { pathRightCorners } from "core/math/geometry/path";
 
 import type { Point } from "core/math/geometry/point";
 import type { Repository } from "../layout/repository";
@@ -207,26 +208,4 @@ function tryAddRemainingRidge(
 		return true;
 	}
 	return false;
-}
-
-/**
- * Return only the right angle corners of a path, as well as the adjacent
- * points.
- */
-function* pathRightCorners(
-	path: Path
-): Generator<[IPoint, IPoint, IPoint]> {
-	const l = path.length;
-	for(let i = 0, j = l - 1; i < l; j = i++) {
-		const p1 = path[i];
-		if(!Number.isInteger(p1.x) || !Number.isInteger(p1.y)) continue;
-
-		const p0 = path[j];
-		const p2 = path[i + 1] || path[0];
-
-		// Check for right angle.
-		const dot =
-			(p1.x - p0.x) * (p2.x - p1.x) + (p1.y - p0.y) * (p2.y - p1.y);
-		if(dot == 0) yield [p1, p0, p2];
-	}
 }

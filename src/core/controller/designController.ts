@@ -6,8 +6,11 @@ import { setStretchPrototypes } from "core/design/tasks/stretch";
 import { getChildId } from "./treeController";
 import { structureTask } from "core/design/tasks/structure";
 import { AABBTask } from "core/design/tasks/aabb";
+import { checkHealth } from "core/design/health";
 
 import type { JDesign, JEdge, JFlap, JStretch } from "shared/json";
+import type { Path } from "shared/types/geometry";
+import type { HealthReport } from "core/design/health";
 
 export interface UpdateRequest {
 	flaps: JFlap[];
@@ -55,5 +58,13 @@ export namespace DesignController {
 		}
 		setStretchPrototypes(request.stretches);
 		Processor.$run(request.edges.length ? structureTask : AABBTask);
+	}
+
+	/**
+	 * Perform the design health check.
+	 * @param boundary The boundary of the sheet.
+	 */
+	export function health(boundary: Path): HealthReport {
+		return checkHealth(boundary);
 	}
 }

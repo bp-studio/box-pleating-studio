@@ -87,6 +87,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private readonly _updateCallbacks: Action[] = [];
 	private _updateCallbackTimeout: number | undefined;
 
+	/** The number of the callings to the Core in progress. */
+	private _pendingCalls: number = 0;
+
 	private readonly _returnCallbacks: Action[] = [];
 
 	/**
@@ -213,7 +216,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		const request = { controller, action, value: args } as CoreRequest;
 		const callbacks = this._returnCallbacks.concat();
 		this._returnCallbacks.length = 0;
+		this._pendingCalls++;
 		const response = await callCore(this._worker, request);
+		this._pendingCalls--;
 		for(const callback of callbacks) callback();
 		if("error" in response) {
 			await this._handleCoreError(request, response, stack);
@@ -224,6 +229,13 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			this.history.$flush();
 			this.design.$resetPrototype();
 		} else {
+			// No update is involved, so the pending update callbacks (if any)
+			// have to wait for the timeout again (it was cleared above),
+			// unless other callings will flush them.
+			if(this._updateCallbacks.length && !this._pendingCalls) {
+				this._updateCallbackTimeout =
+					setTimeout(() => this._flushUpdateCallback(), 0);
+			}
 			return response.value;
 		}
 	}

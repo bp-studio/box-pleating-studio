@@ -1,6 +1,7 @@
 
 /** All layers and their ordering. */
 export enum Layer {
+	uncovered,
 	sheet,
 	shade,
 	edge,
@@ -8,6 +9,7 @@ export enum Layer {
 	ridge,
 	axisParallels,
 	junction,
+	issue,
 	dot,
 	vertex,
 	label,
@@ -28,6 +30,7 @@ interface ILayerOptions {
 
 /** Settings for each layer. */
 export const LayerOptions: Record<Layer, ILayerOptions> = {
+	[Layer.uncovered]: { clipped: true },
 	[Layer.sheet]: {},
 	[Layer.shade]: { clipped: true, interactive: true },
 	[Layer.edge]: { clipped: true, interactive: true },
@@ -35,6 +38,7 @@ export const LayerOptions: Record<Layer, ILayerOptions> = {
 	[Layer.ridge]: { clipped: true },
 	[Layer.axisParallels]: { clipped: true },
 	[Layer.junction]: { clipped: true },
+	[Layer.issue]: {},
 	[Layer.dot]: {},
 	[Layer.vertex]: { interactive: true },
 	[Layer.label]: {},

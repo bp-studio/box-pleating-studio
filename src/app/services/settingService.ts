@@ -76,6 +76,7 @@ const defaultSettings = {
 		dot: DEFAULT_COLOR,
 		label: DEFAULT_COLOR,
 		axialParallel: DEFAULT_COLOR,
+		uncovered: DEFAULT_COLOR,
 	},
 	tools: {
 		Optimizer: {

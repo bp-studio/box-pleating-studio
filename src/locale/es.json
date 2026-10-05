@@ -90,7 +90,8 @@
 		},
 		"tools": {
 			"title": "Herramientas",
-			"TreeMaker": "Importar archivo TreeMaker"
+			"TreeMaker": "Importar archivo TreeMaker",
+			"health": "Comprobar diseño"
 		},
 		"help": {
 			"title": "Ayuda",
@@ -128,6 +129,7 @@
 			"ridge": "Pliegues de cresta",
 			"axisParallel": "Pliegues axiales-paralelos",
 			"overlap": "Superpuestas",
+			"uncovered": "Regiones no cubiertas",
 			"tip": "Puntas de solapa",
 			"label": "Etiqueta de texto"
 		},
@@ -214,6 +216,22 @@
 	},
 	"status": {
 		"invalid": "Superposiciones no válidas"
+	},
+	"health": {
+		"invalid": "Superposiciones no válidas",
+		"invalidDetail": "Algunas solapas están demasiado cerca entre sí (las regiones rojas). Sepárelas primero; las demás comprobaciones se realizarán después.",
+		"unsolved": "Patrones no encontrados",
+		"unsolvedDetail": "Algunas superposiciones son válidas, pero aún no se han implementado patrones de tramo para ellas. Intente ajustar las posiciones de las solapas.",
+		"issues": "Problemas encontrados: {0}",
+		"uncovered": "Regiones no cubiertas",
+		"uncoveredDetail": "Cada parte del papel debe estar cubierta por solapas o ríos. Intente aumentar el ancho o el alto de las solapas, o añadir solapas que llenen el espacio, para rellenar las regiones amarillas.",
+		"dangling": "Crestas interrumpidas",
+		"danglingDetail": "Algunos pliegues de cresta se interrumpen dentro del papel (en los puntos rojos) sin encontrarse con otras crestas. Intente ajustar las posiciones de las solapas para que todas las crestas queden conectadas.",
+		"riverCorner": "Ríos no naturales",
+		"riverCornerDetail": "Algunos ríos (mostrados con rayas) cubren más regiones de las necesarias, por lo que las crestas correctas no se pueden determinar automáticamente. Intente rellenar las regiones sobrantes cubiertas por los ríos.",
+		"pass": "El diseño es completamente válido",
+		"passDetail": "No se encontraron problemas en el diseño.",
+		"learnMore": "Más información"
 	},
 	"share": {
 		"title": "Compartir proyecto",

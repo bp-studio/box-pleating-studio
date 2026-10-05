@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { computed, readonly } from "vue";
 
-import { BLACK, BLUE, CHARCOAL, DANGER, DARK, GREEN, LIGHT, LIGHT_GREEN, RED, WHITE } from "client/shared/constant";
+import { BLACK, BLUE, CHARCOAL, DANGER, DARK, GREEN, LIGHT, LIGHT_GREEN, LIGHT_YELLOW, RED, WHITE } from "client/shared/constant";
 import settings from "app/services/settingService";
 import { isDark } from "app/misc/isDark";
 
@@ -52,6 +52,26 @@ namespace Style {
 	export const junction = {
 		alpha: computed(() => isDark.value ? 0.6 : 0.4),
 		color: computed(() => settings.colorScheme.junction ?? RED),
+	};
+
+	export const uncovered = {
+		alpha: computed(() => isDark.value ? 0.3 : 0.5),
+		color: computed(() => settings.colorScheme.uncovered ?? LIGHT_YELLOW),
+	};
+
+	/** The ends of the dangling ridges, using the color of the ridges. */
+	export const danglingRidge = {
+		/** The radius, in grid units. */
+		radius: 1 / 3,
+		/** The minimal radius, in pixels. */
+		minRadius: 10,
+		alpha: 0.5,
+	};
+
+	/** The marks of the unsolved quadrants. */
+	export const unsolvedMark = {
+		/** The font size relative to the radius of the quadrant. */
+		size: 2 / 3,
 	};
 
 	export const edge = {
