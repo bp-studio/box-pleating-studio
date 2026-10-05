@@ -10,6 +10,7 @@ import type { Pattern } from "../pattern";
 import type { JJunction, JJunctions, JOverlap, JCorner, OverlapId } from "shared/json";
 import type { Device } from "../device";
 import type { Gadget } from "../gadget";
+import type { RationalPath } from "core/math/geometry/rationalPath";
 
 type TipDirection = Direction.UR | Direction.LL;
 type SpanCache = Readonly<Record<TipDirection, Map<number, number>>>;
@@ -107,12 +108,16 @@ export class PositioningContext {
 			const g1 = this.$gadgets[index];
 			const g2 = this.$gadgets[targetIndex];
 			const device = this.$devices.find(d => d.$gadgets.includes(g2))!;
-			const obstacles = [
-				...device.$gadgets.map(g => g.$contour.value),
-				...device.$addOns.map(a => a.$shape.value.contour),
-			];
+			const obstacles = getRegions(device);
 			if(!mutual) {
-				g1.$setupConnectionSlack(g2, q, corner.q!, obstacles);
+				// In relayed joins, the other regions in the device of g1 move
+				// together with it.
+				const own = this.$devices.find(d => d.$gadgets.includes(g1))!;
+				const g1Contour = g1.$contour.value;
+				const companions = getRegions(own).filter(c => c != g1Contour);
+				g1.$setupConnectionSlack(
+					g2, q, corner.q!, obstacles, companions
+				);
 			} else {
 				// If there're mutual connections, we don't need to setup
 				// the slack for real, but we keep a record for later usage.
@@ -194,4 +199,12 @@ export class PositioningContext {
 		if(corner.type == CornerType.flap) return null;
 		return convertIndex(corner.e);
 	}
+}
+
+/** The contours of all regions (gadgets and add-ons) of a {@link Device}. */
+function getRegions(device: Device): RationalPath[] {
+	return [
+		...device.$gadgets.map(g => g.$contour.value),
+		...device.$addOns.map(a => a.$shape.value.contour),
+	];
 }

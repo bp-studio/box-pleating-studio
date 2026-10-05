@@ -69,6 +69,17 @@ export class Joiner {
 			[o1.shift, o2.shift] :
 			[getReverseShift(o1, j1), getReverseShift(o2, j2)];
 
+		// In relayed joins (see _makeRelayedJoin), both overlaps are cut by the
+		// same amount, so they still share a corner, and they are joined as
+		// usual there. The joining is invariant under the translation, except
+		// for the delta point, which is computed from the sizes of the cut
+		// overlaps correctly up to a translation along the diagonal (which
+		// doesn't matter for the delta line).
+		const { s1, s2 } = this;
+		if(s1 && s2 && s1.x == s2.x && s1.y == s2.y) {
+			[this.s1, this.s2] = [undefined, undefined];
+		}
+
 		// Compare the extents from the joint, as one of the overlaps could be
 		// shortened in relay joins.
 		const x1 = o1.ox + Math.abs(this.s1?.x ?? 0);

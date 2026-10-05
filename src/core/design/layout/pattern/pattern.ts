@@ -3,7 +3,7 @@ import { Device } from "./device";
 import { Point } from "core/math/geometry/point";
 import { State } from "core/service/state";
 import { singleJunctionPositioner } from "./positioners/singleJunctionPositioner";
-import { jointPositioner } from "./positioners/jointPositioner";
+import { hasOverlappingDevices, jointPositioner } from "./positioners/jointPositioner";
 import { PositioningContext } from "./positioners/positioningContext";
 
 import type { Gadget } from "./gadget";
@@ -55,6 +55,10 @@ export class Pattern implements ISerializable<JPattern> {
 				}
 			}
 		}
+
+		if(!seeded && this._isJoint && hasOverlappingDevices(this.$devices)) {
+			this.$valid = false;
+		}
 	}
 
 	public toJSON(): JPattern {
@@ -92,11 +96,15 @@ export class Pattern implements ISerializable<JPattern> {
 		const singleMode = this.$config.$singleMode;
 		if(!context.$checkJunctions(singleMode)) return false;
 
-		if(singleMode || context.$junctions.length == 1) {
-			return singleJunctionPositioner(context);
-		}
+		if(!this._isJoint) return singleJunctionPositioner(context);
 		// So far, multiple junctions must share a single joint
 		return jointPositioner(context);
+	}
+
+	/** Whether the pattern is positioned by {@link jointPositioner}. */
+	private get _isJoint(): boolean {
+		return !this.$config.$singleMode &&
+			this.$config.$repo.$junctions.length > 1;
 	}
 
 	private _getDeviceOfConnection(c: JConnection): Device {

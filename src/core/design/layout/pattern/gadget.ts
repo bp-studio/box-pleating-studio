@@ -146,10 +146,14 @@ export class Gadget implements JGadget {
 	 * {@link g} (including {@link g} itself), which must be avoided. In the
 	 * fans, the target can be joined with another {@link Gadget} that is also
 	 * in the way.
+	 * @param companions The contours of the other regions in the device of this
+	 * {@link Gadget}, in the same coordinates as {@link $contour}, which move
+	 * together with it (as in relayed joins).
 	 */
 	public $setupConnectionSlack(
 		g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection,
-		obstacles: readonly RationalPath[]
+		obstacles: readonly RationalPath[],
+		companions: readonly RationalPath[] = []
 	): void {
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
@@ -165,6 +169,7 @@ export class Gadget implements JGadget {
 		// We keep this for debugging
 		const c0 = shift(this.$contour.value, c0_shift);
 		let c1 = c0;
+		let others = companions.map(c => shift(c, c0_shift));
 
 		// Perform collision tests.
 		// Be careful! We must ensure that the contours are simple here!
@@ -174,8 +179,9 @@ export class Gadget implements JGadget {
 			const path1 = toPath(c);
 			return paths.some(path2 => Overlap.$test(path1, path2));
 		};
-		while(collides(c1)) {
+		while(collides(c1) || others.some(collides)) {
 			c1 = shift(c1, step);
+			others = others.map(c => shift(c, step));
 			s++;
 
 			/// #if DEBUG

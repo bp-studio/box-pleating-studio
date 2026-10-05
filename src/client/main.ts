@@ -5,6 +5,8 @@ import { SelectionController } from "./controllers/selectionController";
 import { display } from "./screen/display";
 import { Interaction } from "./services/interaction";
 import { ScrollController } from "./controllers/scrollController";
+import { Migration } from "./patches";
+import { parseEdges, parseFlaps } from "shared/utils/treeString";
 
 import type { IDragController } from "./controllers/dragController";
 import type { ISelectionController } from "./controllers/selectionController";
@@ -85,5 +87,46 @@ export function createTestCase(): void {
 export function simulateContextLoss(): void {
 	const context = display.canvas.getContext("webgl2");
 	context?.getExtension("WEBGL_lose_context")?.loseContext();
+}
+
+/**
+ * Open a project from the same format as `parseTree` in the tests (which is
+ * also the output of {@link createTestCase}), for inspecting the test cases.
+ *
+ * @param edges For example `"(0,1,9),(0,2,1)"`, as `(n1,n2,length)`.
+ * @param flaps For example `"(1,0,0,0,0),(2,5,9,0,0)"`, as
+ * `(id,x,y,width,height)`.
+ */
+export async function parseTree(edges: string, flaps: string): Promise<void> {
+	const jEdges = parseEdges(edges);
+	const jFlaps = parseFlaps(flaps);
+
+	// Move the flaps into the sheet
+	const minX = Math.min(...jFlaps.map(f => f.x));
+	const minY = Math.min(...jFlaps.map(f => f.y));
+	for(const f of jFlaps) {
+		f.x -= minX;
+		f.y -= minY;
+	}
+
+	const project = Migration.$getSample();
+	const { design } = project;
+	design.title = "parseTree";
+	design.mode = "layout";
+	design.layout.flaps = jFlaps;
+	design.layout.sheet.width = Math.max(...jFlaps.map(f => f.x + f.width));
+	design.layout.sheet.height = Math.max(...jFlaps.map(f => f.y + f.height));
+	design.tree.edges = jEdges;
+	const ids = new Set(jEdges.flatMap(e => [e.n1, e.n2]));
+	const columns = 8, spacing = 2;
+	design.tree.nodes = [...ids].map((id, i) => ({
+		id, name: "",
+		x: i % columns * spacing,
+		y: Math.floor(i / columns) * spacing,
+	}));
+
+	const { default: Workspace } = await import("app/services/workspaceService");
+	await Workspace.open(project as Pseudo<typeof project>);
+	Workspace.selectLast();
 }
 /// #endif

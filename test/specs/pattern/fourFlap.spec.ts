@@ -76,19 +76,19 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Joins three gadgets with half-integral gadgets", () => {
-			const fan = [[0, 0, 9], [6, 9, 1], [8, 8, 1], [9, 5, 1]];
+			// There are also other configurations of the same rank
+			const fan = [[0, 0, 13], [12, 8, 1], [11, 10, 1], [13, 7, 1]];
 			forEachFan(fan, pt => {
-				const ridges = expectFan("-+BH+P");
+				const ridges = expectFan("-+BH+P", 1, 4);
 
 				// The perfect join
-				expect(ridges).to.not.containLine([pt(0, 0), pt(3, 4)]);
-				expect(ridges).to.containLine([pt(3, 4), pt(7, 8)]);
+				expect(ridges).to.containLine([pt(0, 0), pt(3, 6)]);
+				expect(ridges).to.containLine([pt(8, 6), pt(11, 7)]);
 
 				// The base join with the half-integral gadget
-				expect(ridges).to.containLine([pt(0, 0), pt(5, 5)]);
-				expect(ridges).to.containLine([pt(5, 5), pt(4, 3)]);
-				expect(ridges).to.containLine([pt(4, 3), pt(17 / 2, 9 / 2)]);
-				expect(ridges).to.containLine([pt(17 / 2, 9 / 2), pt(8, 3)]);
+				expect(ridges).to.containLine([pt(0, 0), pt(9, 3)]);
+				expect(ridges).to.containLine([pt(9, 3), pt(23 / 2, 11 / 2)]);
+				expect(ridges).to.containLine([pt(23 / 2, 11 / 2), pt(10, 5)]);
 			});
 		});
 
@@ -150,15 +150,14 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Skips joins conflicting with each other in a fan", () => {
-			// There's also a configuration of the same rank, where the outer
-			// ones are joined onto the middle one with a base join (with a
-			// half-integral gadget) and a simple join respectively. Each join
-			// is valid on its own, but the gadgets overlap after merging.
-			const fan = [[0, 0, 15], [7, 15, 1], [10, 14, 1], [11, 12, 1]];
+			// In this layout, one of the fan joins of the same rank is valid
+			// on each side on its own, but the gadgets overlap after merging,
+			// so it is skipped (verified by instrumenting the merging).
+			const fan = [[0, 0, 16], [7, 16, 1], [14, 13, 1], [16, 10, 2]];
 			forEachFan(fan, () => {
 				const configs = expectRepo("1,2,3,4", 2);
 				expect(configs.map(describeFan)).to.have.members([
-					"-+PH+S", "-+S RH",
+					"-+P+T", "-+B+S",
 				]);
 			});
 		});

@@ -2,9 +2,11 @@ import { expect } from "@rstest/core";
 
 import { expectRepo, generateFromFlaps } from "./util";
 import { GadgetStrategy, JoinStrategy } from "shared/json";
+import { State } from "core/service/state";
 
 import type { ILine } from "shared/types/geometry";
-import type { JOverlap } from "shared/json";
+import type { JOverlap, NodeId } from "shared/json";
+import type { Device } from "core/design/layout/pattern/device";
 import type { Configuration } from "core/design/layout/configuration";
 import type { Pattern } from "core/design/layout/pattern/pattern";
 
@@ -64,6 +66,36 @@ export function findFan(
 	return config!;
 }
 
+/**
+ * Expect every {@link Device} of every {@link Pattern} of the
+ * {@link Configuration} to lie within the flap rectangles of its junctions.
+ */
+export function expectWithinFlapRectangles(config: Configuration): void {
+	const junctions = config.$repo.$junctions;
+	const tip = (id: number): IPoint =>
+		State.m.$tree.$nodes[id as NodeId]!.$AABB.$points[0];
+	for(const pattern of config.$patterns) {
+		for(const device of pattern.$devices) {
+			const rects = device.$partition.$overlaps.map(o => {
+				const j = junctions[o.parent];
+				const p1 = tip(j.c[0].e!), p2 = tip(j.c[2].e!);
+				return {
+					x1: Math.min(p1.x, p2.x), x2: Math.max(p1.x, p2.x),
+					y1: Math.min(p1.y, p2.y), y2: Math.max(p1.y, p2.y),
+				};
+			});
+			for(const { outer } of device.$contour) {
+				for(const p of outer) {
+					const inside = rects.some(r =>
+						r.x1 <= p.x && p.x <= r.x2 && r.y1 <= p.y && p.y <= r.y2
+					);
+					expect(inside, `(${p.x},${p.y})`).to.be.true;
+				}
+			}
+		}
+	}
+}
+
 /** All ridges of all the {@link Pattern}s of a {@link Configuration}. */
 export function getRidges(config: Configuration): ILine[] {
 	return config.$patterns.flatMap(
@@ -87,8 +119,9 @@ const GADGET_CODES = {
  * Describe the structure of a fan {@link Configuration}. The overlaps kept at
  * the joint are described by their joins (or "-" for the one being joined
  * onto) followed by their gadgets, and each of the relayed ones by "R",
- * followed by its gadget and "m" if it is the middle one. Everything is sorted
- * so that the result is independent of the transformation.
+ * followed by its gadget and "m" if it is the middle one. A relayed join is
+ * described by "J" followed by its two overlaps in parentheses. Everything is
+ * sorted so that the result is independent of the transformation.
  *
  * For example, "-H+SH Rm" means that the outer two are joined by a simple join
  * with half-integral gadgets, and the middle one is relayed onto the join.
@@ -109,9 +142,17 @@ export function describeFan(config: Configuration): string {
 		const [g1, g2] = joined.map(gadget).sort();
 		kept = ["-" + g1, join + g2];
 	}
-	const relays = relayed.map(([o]) =>
-		"R" + gadget(o) + (isMiddle(o) ? "m" : "")
-	);
+	const relays = relayed.map(overlaps => {
+		if(overlaps.length == 1) {
+			const [o] = overlaps;
+			return "R" + gadget(o) + (isMiddle(o) ? "m" : "");
+		}
+		// A relayed join
+		const pair = overlaps.map(
+			o => (o.join ? JOIN_CODES[o.join] : "-") + gadget(o)
+		);
+		return "J(" + pair.sort().join("+") + ")";
+	});
 	return [kept.sort().join("+"), ...relays.sort()].join(" ");
 }
 

@@ -8,7 +8,7 @@ import { relayOntoKept } from "./searchUtils/relay";
 import { cover, getExposedPart, isRelayedOntoJoin, toSplitItems } from "./searchUtils/splitJoin";
 import { FAN_SIZE } from "../joiner/fanJoin";
 import { MAX_CONNECTION_RANK, RELAY_RANK, resolveJoinRank } from "./searchUtils/rank";
-import { createPlans } from "./searchUtils/plan";
+import { createPlans, getRelays } from "./searchUtils/plan";
 
 import type { SplitItem } from "./searchUtils/splitJoin";
 import type { JointCorner } from "./searchUtils/relay";
@@ -176,6 +176,13 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		const kept = plan.kept.map(i => sorted[i]);
 		const fan = joint.items.length > 2;
+		const s = getJointCorner(joint);
+		if(plan.relayedJoin) {
+			const join = plan.joins[plan.joins.length - 1];
+			const pair = plan.relayedJoin.map(i => sorted[i]);
+			return this._makeRelayedJoin(s, kept[0], pair, join);
+		}
+
 		for(const [i, join] of plan.joins.entries()) {
 			let [o1, o2] = [kept[i], kept[i + 1]];
 			// The one being joined onto. They are chosen as in earlier versions
@@ -187,13 +194,14 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 			this._joinOverlaps(o1, o2, join);
 		}
 
-		const s = getJointCorner(joint);
 		const relayed = sorted.filter(o => !kept.includes(o));
-		for(const o of relayed) {
-			const i = sorted.indexOf(o);
-			const narrow = kept.filter(k => sorted.indexOf(k) < i).pop();
-			const wide = kept.find(k => sorted.indexOf(k) > i);
-			relayOntoKept(o, s, narrow, wide);
+		const relays = getRelays(sorted.length, plan);
+		for(const { index, narrow, wide } of relays) {
+			relayOntoKept(
+				sorted[index], s,
+				narrow === undefined ? undefined : sorted[narrow],
+				wide === undefined ? undefined : sorted[wide]
+			);
 		}
 
 		// The orderings of the partitions are also as in earlier versions
@@ -205,6 +213,40 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		const joined = [...middle, ...kept.filter(o => o != sorted[1])];
 		const partitions = [joined, ...relayed.map(o => [o])];
 		return this.$make(partitions.map(o => ({ overlaps: o })));
+	}
+
+	/**
+	 * Create the {@link Configuration} where the two overlaps not kept are cut
+	 * by the kept one, joined to each other, and the join is relayed onto the
+	 * side corner of the kept one. The middle one is the one being joined onto
+	 * (as in the fans), so it is the one connecting to the kept one.
+	 *
+	 * @param pair The two overlaps not kept, sorted by width.
+	 */
+	private _makeRelayedJoin(
+		s: JointCorner, kept: JOverlap, pair: JOverlap[], join: JoinStrategy
+	): Configuration {
+		const keptIsNarrow = kept.ox < pair[0].ox;
+		const [middle, outer] = keptIsNarrow ? pair : pair.toReversed();
+
+		// Join first, as the orientation is decided by the joint corners
+		this._joinOverlaps(middle, outer, join);
+		relayOntoKept(
+			middle, s,
+			keptIsNarrow ? kept : undefined,
+			keptIsNarrow ? undefined : kept
+		);
+
+		// The outer one is cut in the same way, and its connection to the kept
+		// one goes through the middle one in the join.
+		if(keptIsNarrow) outer.ox -= kept.ox;
+		else outer.oy -= kept.oy;
+		if(s == Direction.UR) outer.shift = middle.shift;
+
+		return this.$make([
+			{ overlaps: [kept] },
+			{ overlaps: [middle, outer] },
+		]);
 	}
 
 	/** Sort the given objects by the widths of the corresponding overlaps. */

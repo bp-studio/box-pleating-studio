@@ -1,12 +1,118 @@
 import { describe, it, expect } from "@rstest/core";
 
-import { expectFan, forEachFan } from "./fanUtil";
+import { expectFan, expectWithinFlapRectangles, findFan, forEachFan } from "./fanUtil";
 import { node } from "@utils/tree";
 import { same } from "shared/types/geometry";
 
 describe("Four flap patterns", () => {
 
 	describe("Fans with relays", () => {
+
+		it("Relays the middle onto the relayed side", () => {
+			// Only the narrowest overlap (1x8) is kept. The widest one (9x1)
+			// is relayed onto it, leaving 8x1, and the middle one (4x3) is
+			// relayed onto the side corner of that, leaving 3x2.
+			const fan = [[0, 0, 14], [6, 14, 1], [11, 12, 1], [14, 7, 1]];
+			forEachFan(fan, pt => {
+				const ridges = expectFan("- R Rm", 2);
+
+				// The kept gadget
+				expect(ridges).to.containLine([pt(0, 0), pt(12, 4)]);
+				expect(ridges).to.containLine([pt(0, 0), pt(1, 2)]);
+
+				// The outer one is relayed onto the side corner of the kept one
+				expect(ridges).to.containLine([pt(1, 2), pt(4, 4)]);
+				expect(ridges).to.containLine([pt(1, 2), pt(3, 12)]);
+
+				// The middle one is relayed onto the side corner of that
+				expect(ridges).to.containLine([pt(4, 4), pt(5, 5)]);
+			});
+		});
+
+		it("Pushes nested relays outwards from the ends of the chains", () => {
+			// The outer one (C, 7x2) is relayed onto the kept one, and the
+			// middle one (B, 1x5 after cutting) onto it. Previously, C was
+			// pushed outwards without leaving room for B. Also, the offset of B
+			// is relative to C, so the movement of C must be excluded.
+			// Otherwise, B goes beyond its flap.
+			const fan = [[0, 0, 17], [11, 16, 1], [16, 11, 1], [17, 6, 1]];
+			forEachFan(fan, () => {
+				const config = findFan("- R RHm", 8, 3);
+				expectWithinFlapRectangles(config);
+			});
+		});
+
+		it("Relays a perfect join", () => {
+			// The two wider overlaps are cut by the narrowest one (1x5), and
+			// joined perfectly at its side corner.
+			const fan = [[0, 0, 9], [5, 9, 1], [7, 8, 1], [9, 6, 1]];
+			forEachFan(fan, pt => {
+				const ridges = expectFan("- J(-+P)");
+
+				// The kept gadget
+				expect(ridges).to.containLine([pt(0, 0), pt(1, 2)]);
+
+				// The join starts at the side corner of the kept gadget
+				expect(ridges).to.containLine([pt(1, 2), pt(5, 4)]);
+				expect(ridges).to.containLine([pt(1, 2), pt(3, 8)]);
+				expect(ridges).to.not.containLine([pt(1, 2), pt(4, 6)]);
+			});
+		});
+
+		it("Relays a simple join", () => {
+			// The widest one is kept here, and the join cannot reach its side
+			// corner, as both joined gadgets are already at their flaps.
+			const fan = [[0, 0, 10], [5, 10, 1], [7, 9, 1], [10, 6, 1]];
+			forEachFan(fan, pt => {
+				const ridges = expectFan("- J(-+S)");
+
+				// The kept gadget
+				expect(ridges).to.containLine([pt(0, 0), pt(2, 1)]);
+
+				// The join
+				const i = pt(11 / 2, 9 / 2);
+				expect(ridges).to.containLine([pt(2, 1), pt(3, 2)]);
+				expect(ridges).to.containLine([pt(3, 2), i]);
+				expect(ridges).to.containLine([pt(3, 2), pt(5, 8)]);
+				expect(ridges).to.containLine([pt(3, 2), pt(9, 4)]);
+			});
+		});
+
+		it("Relays a base join with a half-integral gadget", () => {
+			const fan = [[0, 0, 12], [8, 11, 1], [11, 8, 1], [12, 5, 1]];
+			forEachFan(fan, pt => {
+				const ridges = expectFan("- J(-H+B)");
+
+				// The kept gadget
+				expect(ridges).to.containLine([pt(0, 0), pt(2, 3)]);
+
+				// The base join starts at the side corner of the kept gadget
+				expect(ridges).to.containLine([pt(2, 3), pt(7, 8)]);
+				expect(ridges).to.containLine([pt(7, 8), pt(6, 6)]);
+				expect(ridges).to.containLine([pt(6, 6), pt(21 / 2, 15 / 2)]);
+				expect(ridges).to.containLine([pt(2, 3), pt(4, 9)]);
+			});
+		});
+
+		it("Fits all gadgets of a relayed join in their flap rectangles", () => {
+			// Previously, only the first gadget of the relayed join was pushed
+			// to its flap, so that the other one went beyond its flap, and the
+			// join was one unit away from the kept gadget.
+			const fan = [[0, 0, 14], [6, 14, 1], [11, 11, 1], [14, 7, 1]];
+			forEachFan(fan, pt => {
+				const ridges = expectFan("- J(-+S)");
+
+				// The join starts at the side corner of the kept gadget
+				expect(ridges).to.containLine([pt(0, 0), pt(1, 2)]);
+				expect(ridges).to.containLine([pt(1, 2), pt(8, 5)]);
+				expect(ridges).to.containLine([pt(1, 2), pt(3, 12)]);
+				expect(ridges).to.not.containLine([pt(1, 2), pt(2, 3)]);
+
+				// One of the joined gadgets reaches its flap
+				expect(ridges).to.containLine([pt(3, 12), pt(6, 14)]);
+				expect(ridges).to.containLine([pt(10, 10), pt(11, 11)]);
+			});
+		});
 
 		it("Relays one side and joins the other side perfectly", () => {
 			// This layout also admits a perfect join and a simple join,
@@ -39,7 +145,7 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Relays both sides", () => {
-			const fan = [[0, 0, 9], [5, 9, 1], [7, 8, 1], [9, 6, 1]];
+			const fan = [[0, 0, 9], [5, 9, 1], [7, 8, 1], [8, 7, 1]];
 			forEachFan(fan, pt => {
 				const ridges = expectFan("- R R");
 
@@ -48,7 +154,7 @@ describe("Four flap patterns", () => {
 				expect(ridges).to.containLine([pt(0, 0), pt(1, 4)]);
 
 				// The relays connect to the two corners of the middle gadget
-				expect(ridges).to.containLine([pt(8, 4), pt(5, 3)]);
+				expect(ridges).to.containLine([pt(5, 3), pt(6, 6)]);
 				expect(ridges).to.containLine([pt(2, 5), pt(1, 4)]);
 			});
 		});
@@ -69,20 +175,21 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Relays one side with a half-integral gadget", () => {
-			// Joining all three with half-integral gadgets is of the same rank
-			const fan = [[0, 0, 10], [5, 10, 1], [7, 9, 1], [10, 6, 1]];
+			// Joining all three with half-integral gadgets, and relaying a join
+			// onto a half-integral gadget, are of the same rank
+			const fan = [[0, 0, 10], [6, 10, 1], [7, 9, 1], [9, 7, 1]];
 			forEachFan(fan, pt => {
 				// The two patterns are the two orientations of the gadget
-				const ridges = expectFan("-+P RH", 2, 2);
+				const ridges = expectFan("-+P RH", 2, 4);
 
 				// The perfect join
-				expect(ridges).to.not.containLine([pt(0, 0), pt(4, 7)]);
-				expect(ridges).to.containLine([pt(4, 7), pt(6, 9)]);
+				expect(ridges).to.not.containLine([pt(0, 0), pt(5, 5)]);
+				expect(ridges).to.containLine([pt(5, 5), pt(6, 8)]);
+				expect(ridges).to.containLine([pt(5, 5), pt(9, 7)]);
 
-				// The relayed gadget, with the small piece at the outer end
-				expect(ridges).to.containLine([pt(4, 2), pt(7, 3)]);
-				expect(ridges).to.containLine([pt(4, 2), pt(5, 4)]);
-				expect(ridges).to.containLine([pt(19 / 2, 11 / 2), pt(9, 4)]);
+				// The two orientations of the relayed gadget
+				expect(ridges).to.containLine([pt(2, 6), pt(3, 7)]);
+				expect(ridges).to.containLine([pt(2, 6), pt(7 / 2, 15 / 2)]);
 			});
 		});
 
@@ -125,24 +232,27 @@ describe("Four flap patterns", () => {
 			// collision test ignored the anchor of the relayed gadget not being
 			// at its origin (as in reversed GPS), so that an overlapping
 			// pattern of a lower rank was found in some of the transformations.
-			const fan = [[0, 0, 12], [8, 11, 1], [11, 8, 1], [12, 5, 1]];
+			// (The original layout of this test now finds a relayed join.)
+			const fan = [[0, 0, 15], [15, 8, 2], [10, 15, 2], [13, 11, 1]];
 			forEachFan(fan, pt => {
 				const ridges = expectFan("-+B RHm", 2);
 
 				// The base join
-				expect(ridges).to.containLine([pt(4, 3), pt(7, 4)]);
-				expect(ridges).to.containLine([pt(4, 3), pt(8, 11)]);
+				expect(ridges).to.containLine([pt(5, 5), pt(11, 7)]);
+				expect(ridges).to.containLine([pt(5, 5), pt(10, 15)]);
 
 				// The two orientations of the relayed gadget
-				expect(ridges).to.containLine([pt(4, 3), pt(5, 4)]);
-				expect(ridges).to.containLine([pt(4, 3), pt(11 / 2, 9 / 2)]);
+				expect(ridges).to.containLine([pt(5, 5), pt(7, 7)]);
+				expect(ridges).to.containLine([pt(5, 5), pt(15 / 2, 15 / 2)]);
 			});
 		});
 
 		it("Relays both sides onto a half-integral gadget", () => {
-			const fan = [[0, 0, 12], [6, 12, 1], [9, 11, 2], [11, 8, 1]];
+			// The relayed parts of the outer ones are of odd area, so that
+			// relaying the middle one onto the relayed side is not preferred.
+			const fan = [[0, 0, 12], [6, 12, 1], [9, 11, 2], [12, 8, 2]];
 			forEachFan(fan, pt => {
-				const ridges = expectFan("-H R R", 2);
+				const ridges = expectFan("-H R R");
 
 				// The middle gadget, with the slack at the joint
 				const s = pt(1 / 2, 1 / 2);
@@ -151,13 +261,13 @@ describe("Four flap patterns", () => {
 				expect(ridges).to.containLine([s, pt(5, 2)]);
 
 				// The relays
-				expect(ridges).to.containLine([pt(5, 2), pt(6, 3)]);
+				expect(ridges).to.containLine([pt(5, 2), pt(9, 3)]);
 				expect(ridges).to.containLine([pt(3, 8), pt(4, 11)]);
 			});
 		});
 
 		it("Relays both sides onto a universal gadget", () => {
-			const fan = [[0, 0, 10], [6, 10, 1], [9, 9, 2], [11, 5, 2]];
+			const fan = [[0, 0, 10], [7, 9, 1], [9, 9, 2], [11, 5, 2]];
 			forEachFan(fan, pt => {
 				const ridges = expectFan("-U R R");
 
@@ -172,9 +282,10 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Relays the middle onto a perfect join", () => {
+			// There's also a relayed join of the same rank
 			const fan = [[0, 0, 12], [7, 12, 1], [10, 10, 1], [11, 8, 1]];
 			forEachFan(fan, (pt, ids) => {
-				const ridges = expectFan("-+P Rm");
+				const ridges = expectFan("-+P Rm", 1, 2);
 
 				// The perfect join
 				expect(ridges).to.not.containLine([pt(0, 0), pt(3, 4)]);
@@ -211,9 +322,9 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Relays the middle onto a base join", () => {
-			const fan = [[0, 0, 12], [5, 12, 1], [10, 10, 1], [11, 8, 1]];
+			const fan = [[0, 0, 12], [5, 12, 1], [10, 12, 3], [11, 8, 1]];
 			forEachFan(fan, pt => {
-				const ridges = expectFan("-+B Rm");
+				const ridges = expectFan("-+B Rm", 2);
 
 				// The base join
 				expect(ridges).to.containLine([pt(0, 0), pt(4, 7)]);
@@ -221,27 +332,27 @@ describe("Four flap patterns", () => {
 				expect(ridges).to.containLine([pt(3, 4), pt(11, 8)]);
 
 				// The middle gadget connects to the concave corner of the join
-				expect(ridges).to.containLine([pt(3, 4), pt(6, 7)]);
+				expect(ridges).to.containLine([pt(3, 4), pt(4, 5)]);
 			});
 		});
 
 		it("Relays the middle onto a join of half-integral gadgets", () => {
-			// Both outer overlaps (5x1 and 1x5) are of odd area
-			// There's also a configuration of the same rank relaying one side
-			const fan = [[0, 0, 9], [5, 9, 1], [7, 8, 1], [9, 5, 1]];
+			// Both outer overlaps (1x13 and 7x1) are of odd area. There are
+			// also other configurations of the same rank.
+			const fan = [[0, 0, 19], [21, 9, 3], [19, 12, 3], [13, 19, 1]];
 			forEachFan(fan, pt => {
-				const ridges = expectFan("-H+SH Rm", 1, 2);
+				const ridges = expectFan("-H+SH Rm", 1, 6);
 
 				// The simple join
 				const i = pt(5 / 2, 5 / 2);
 				expect(ridges).to.containLine([pt(0, 0), i]);
-				expect(ridges).to.containLine([i, pt(17 / 2, 9 / 2)]);
-				expect(ridges).to.containLine([i, pt(9 / 2, 17 / 2)]);
+				expect(ridges).to.containLine([i, pt(41 / 2, 17 / 2)]);
+				expect(ridges).to.containLine([i, pt(11 / 2, 23 / 2)]);
 
 				// The middle gadget connects to the concave corner of the join
 				expect(ridges).to.containLine([i, pt(4, 4)]);
-				expect(ridges).to.containLine([pt(4, 4), pt(6, 5)]);
-				expect(ridges).to.containLine([pt(4, 4), pt(5, 7)]);
+				expect(ridges).to.containLine([pt(4, 4), pt(7, 9)]);
+				expect(ridges).to.containLine([pt(4, 4), pt(16, 7)]);
 			});
 		});
 
@@ -281,21 +392,21 @@ describe("Four flap patterns", () => {
 		});
 
 		it("Relays the middle with a half-integral gadget onto a join of half-integral gadgets", () => {
-			// All of the outer overlaps (5x1 and 1x5) and the remaining part of
-			// the middle one (1x1) are of odd area
-			const fan = [[0, 0, 9], [5, 9, 1], [8, 8, 1], [9, 5, 1]];
+			// All of the outer overlaps (7x3 and 3x7) and the remaining part of
+			// the middle one (3x1) are of odd area
+			const fan = [[0, 0, 16], [10, 14, 1], [14, 10, 1], [12, 14, 2]];
 			forEachFan(fan, pt => {
-				const ridges = expectFan("-H+SH RHm", 2, 5);
+				const ridges = expectFan("-H+SH RHm", 2, 8);
 
 				// The simple join
-				const i = pt(5 / 2, 5 / 2);
+				const i = pt(15 / 2, 15 / 2);
 				expect(ridges).to.containLine([pt(0, 0), i]);
-				expect(ridges).to.containLine([i, pt(17 / 2, 9 / 2)]);
-				expect(ridges).to.containLine([i, pt(9 / 2, 17 / 2)]);
+				expect(ridges).to.containLine([i, pt(27 / 2, 19 / 2)]);
+				expect(ridges).to.containLine([i, pt(19 / 2, 27 / 2)]);
 
 				// The two orientations of the half-integral gadget
-				expect(ridges).to.containLine([i, pt(11 / 2, 11 / 2)]);
-				expect(ridges).to.containLine([i, pt(5, 5)]);
+				expect(ridges).to.containLine([i, pt(8, 8)]);
+				expect(ridges).to.containLine([i, pt(17 / 2, 17 / 2)]);
 			});
 		});
 
