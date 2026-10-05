@@ -47,6 +47,23 @@ describe("Sweep-line algorithms", () => {
 			expect(valley.length).to.equal(2);
 		});
 
+		it("Subdivides lines containing other collinear lines", () => {
+			// The contained line comes first, so it is the earlier one in the
+			// status even though it starts later in the sweep.
+			const result = new Clip().$get([
+				makeCPLine(CreaseType.Border, 0, 0, 10, 0),
+				makeCPLine(CreaseType.Border, 10, 0, 10, 10),
+				makeCPLine(CreaseType.Border, 0, 10, 10, 10),
+				makeCPLine(CreaseType.Border, 0, 0, 0, 10),
+				makeCPLine(CreaseType.Mountain, 5, 5, 4, 4),
+				makeCPLine(CreaseType.Mountain, 6, 6, 1, 1),
+			]);
+			const mountain = result
+				.filter(l => l.type == CreaseType.Mountain)
+				.map(l => [l.p1.x, l.p2.x].sort((a, b) => a - b));
+			expect(mountain).to.have.deep.members([[1, 4], [4, 5], [5, 6]]);
+		});
+
 	});
 
 	describe("Overlap detection", () => {

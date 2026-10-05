@@ -188,7 +188,20 @@ function tryAddRemainingRidge(
 	if(f !== 1 && f !== -1) return false; // Fool proof
 	const sideCorners = freeCornerMap[f].get(p.x - f * p.y);
 	if(!sideCorners) return false;
-	const corner = sideCorners.find(c => line.$contains(c, true));
+
+	// Pick the nearest one, skipping the one at p1 itself (which could be a
+	// free corner of another stretch). The result must not depend on the order
+	// of the stretches.
+	let corner: Point | undefined;
+	let min = Number.POSITIVE_INFINITY;
+	for(const c of sideCorners) {
+		const distance = Math.abs(c.x - p1.x);
+		if(distance == 0 || distance >= min || !line.$contains(c, true)) {
+			continue;
+		}
+		corner = c;
+		min = distance;
+	}
 	if(corner) {
 		ridges.push([p1, corner.$toIPoint()]);
 		return true;

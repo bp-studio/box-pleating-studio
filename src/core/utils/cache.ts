@@ -1,9 +1,12 @@
 
 /**
- * Store compute functions externally so that
- * {@link Cache} instances can be `structuredClone`'d.
+ * The key of the compute function. Since `structuredClone` copies only the
+ * properties with string keys, {@link Cache} instances can be cloned with it.
+ *
+ * Previously, the compute functions were stored in a `WeakMap`, which turned
+ * out to be a bottleneck, as caches are created in large numbers.
  */
-const computeMap = new WeakMap<Cache<unknown>, () => unknown>();
+const COMPUTE = Symbol("compute");
 
 /**
  * {@link Cache} wraps a lazily computed value.
@@ -14,15 +17,15 @@ export class Cache<V> {
 
 	private _value: V | undefined;
 	private _has = false;
+	private readonly [COMPUTE]: () => V;
 
 	constructor(compute: () => V) {
-		computeMap.set(this, compute as () => unknown);
+		this[COMPUTE] = compute;
 	}
 
 	public get value(): V {
 		if(!this._has) {
-			const compute = computeMap.get(this) as () => V;
-			this._value = compute();
+			this._value = this[COMPUTE]();
 			this._has = true;
 		}
 		return this._value!;

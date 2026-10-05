@@ -1,5 +1,5 @@
 import { Intersector } from "../../classes/intersector";
-import { epsilonSame, isAlmostZero } from "core/math/geometry/float";
+import { epsilonSame, floatXyComparator, isAlmostZero } from "core/math/geometry/float";
 
 import type { LineSegment } from "../../classes/segment/lineSegment";
 import type { StartEvent } from "../../classes/event";
@@ -49,14 +49,20 @@ export class GeneralIntersector extends Intersector {
 			// Different lines.
 			if(!isAlmostZero(detBC, RELAXED_EPSILON)) return;
 
-			// We know that ev1 and ev2 are sorted
+			// Sort the two by their starting points. The order in the status
+			// is not enough, as collinear segments are ordered by their keys
+			// there, so ev1 could start later than ev2, in which case the
+			// starting point of ev1 would be missed below.
+			const swap = floatXyComparator(ev1.$point, ev2.$point) > 0;
+			if(swap) [ev1, ev2] = [ev2, ev1];
+			const [s1, s2] = swap ? [seg2, seg1] : [seg1, seg2];
 			const p2 = ev1.$other.$point;
 			const p3 = ev2.$point, p4 = ev2.$other.$point;
-			if(seg1.$containsPtOnLine(p3, false)) {
+			if(s1.$containsPtOnLine(p3, false)) {
 				ev1 = this._subdivide(ev1, p3);
 			}
-			if(seg1.$containsPtOnLine(p4, false)) this._subdivide(ev1, p4);
-			if(seg2.$containsPtOnLine(p2, false)) this._subdivide(ev2, p2);
+			if(s1.$containsPtOnLine(p4, false)) this._subdivide(ev1, p4);
+			if(s2.$containsPtOnLine(p2, false)) this._subdivide(ev2, p2);
 		} else {
 			// Crossing case
 			const pt: IPoint = {
