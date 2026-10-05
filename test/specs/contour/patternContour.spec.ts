@@ -46,8 +46,9 @@ describe("Pattern contour", () => {
 	it("Ends pattern contours on the hinges in raw mode", () => {
 		// This example is derived from Scutigera by Matt LaBoone.
 		// Previously, the end of the contour was extended to the hinges in
-		// raw mode, but that is no longer needed since the pieces are carved
-		// to match the tracing.
+		// raw mode in various ways, but most of them are no longer needed
+		// since the pieces are carved to match the tracing (see the next
+		// test for the one that is still needed).
 		parseTree(
 			"(24,45,1),(24,38,7),(24,27,1),(45,1,1),(45,43,5),(27,26,1),(1,3,17)",
 			"(3,88,88,0,0),(38,66,74,0,0),(43,77,67,0,0),(26,63,62,0,0)"
@@ -55,6 +56,20 @@ describe("Pattern contour", () => {
 		const result = UpdateResult.$flush();
 		const outer = result.graphics["re24,45"].contours[0].outer;
 		expect(outer).to.equalPath("(107,107),(69,107),(69,81),(69.5,81),(73,229/3),(73,215/3),(71,69),(71,61),(83,61),(83,69),(107,69)", true);
+	});
+
+	/** Added v0.8.0 */
+	it("Extends the last axis-parallel segment to the hinges in raw mode", () => {
+		// The last reflection of the contour of node 1 sends it horizontally
+		// towards the hinge x=27, and the tracing itself records only the
+		// points of reflection. Previously, the contour was given up.
+		parseTree(
+			"(0,1,7),(0,2,7),(0,3,13),(1,4,23),(1,5,1),(2,6,23),(2,7,1)",
+			"(3,26,0,0,0),(4,0,36,0,0),(5,21,23,0,0),(6,97,36,0,0),(7,75,23,0,0)"
+		);
+		const contours = State.m.$tree.$nodes[id1]!.$graphics.$patternContours;
+		const ends = contours.map(c => c.slice(-2).map(p => p.toString()).join(""));
+		expect(ends).to.include("(65/3, 13)(27, 13)");
 	});
 
 	/** Added v0.8.0 */

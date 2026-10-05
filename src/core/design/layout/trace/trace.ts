@@ -75,19 +75,19 @@ export class Trace {
 			this.$sideDiagonals.find(d => d.$contains(end, true));
 		if(endDiagonal) ridges.add(endDiagonal);
 
-		const reflected = Trace._mainLoop(
+		const loop = Trace._mainLoop(
 			ridges, cursor, path, end, directionalVector
-		) || Boolean(cursor.ridge);
+		);
 
 		// A contour that never reflects on any ridge (side diagonals excluded)
 		// merely goes along the hinges, which happens when the hinge segment is
 		// irrelevant to the pattern (for example, another part of a piece
 		// formed by multiple leaves). There's nothing to trace in that case.
-		if(!reflected) return null;
+		if(!loop.reflected && !cursor.ridge) return null;
 
 		const result = ctx.$trim(path);
 		if(!rawMode) return result;
-		else return this._rawModeFinalCheck(result, hinges);
+		else return this._rawModeFinalCheck(result, hinges, loop.vector);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -96,12 +96,13 @@ export class Trace {
 
 	/**
 	 * Keep reflecting on the ridges, and returns whether any ridge (side
-	 * diagonals excluded) is reflected on.
+	 * diagonals excluded) is reflected on, as well as the direction leaving
+	 * the last point.
 	 */
 	private static _mainLoop(
 		ridges: Set<Ridge>, initial: TraceNode, path: RationalPath,
 		end: Point, directionalVector: Vector
-	): boolean {
+	): { reflected: boolean, vector: Vector } {
 		let cursor = initial;
 		let reflected = false;
 		while(true) {
@@ -124,13 +125,21 @@ export class Trace {
 				path.push(cursor.point);
 			}
 		}
-		return reflected;
+		return { reflected, vector: cursor.vector };
 	}
 
 	/**
 	 * In raw mode, the generated contour must end on the given hinge segment,
-	 * so that it can be inserted into the piece. This holds in valid layouts,
-	 * as the pieces are carved to match the tracing (see
+	 * so that it can be inserted into the piece.
+	 *
+	 * Since the tracing records only the points of reflection, the contour
+	 * stops at the last reflection, and if the contour leaves it in an
+	 * axis-parallel direction (instead of along a diagonal ending on the
+	 * hinges), the last segment towards the hinges is missing. In that case we
+	 * extend the contour to the hinges.
+	 *
+	 * After that, the contour ends on the hinges in valid layouts, as the
+	 * pieces are carved to match the tracing (see
 	 * {@link getQuadrantShape}). In layouts with invalid junctions, the repo
 	 * is formed by the valid junctions only, while the geometry of the pieces
 	 * could still be affected by the flaps of the invalid junctions, and the
@@ -143,14 +152,24 @@ export class Trace {
 	 * those layouts.
 	 */
 	private _rawModeFinalCheck(
-		result: PatternContour | null, hinges: Path
+		result: PatternContour | null, hinges: Path, vector: Vector
 	): PatternContour | null {
 		if(!result) return null;
-		const lastPoint = result[result.length - 1];
+		const lines: Line[] = [];
 		for(let i = hinges.length - 1; i > 0; i--) {
-			const line = Line.$fromIPoint(hinges[i], hinges[i - 1]);
-			if(line.$contains(lastPoint, true)) return result;
+			lines.push(Line.$fromIPoint(hinges[i], hinges[i - 1]));
 		}
+		const lastPoint = result[result.length - 1];
+		if(lines.some(line => line.$contains(lastPoint, true))) return result;
+
+		if(vector.x == 0 || vector.y == 0) {
+			const extension = getNearestIntersection(lines, lastPoint, vector);
+			if(extension) {
+				result.push(extension);
+				return result;
+			}
+		}
+
 		debugAssert(
 			() => this._involvesInvalidJunctions(),
 			"Pattern contour does not end on the hinges"
@@ -191,6 +210,24 @@ export class Trace {
 		);
 		return new Set(filteredRidges);
 	}
+}
+
+/** The nearest intersection of a ray with the given lines, if any. */
+function getNearestIntersection(
+	lines: readonly Line[], p: Point, v: Vector
+): Point | null {
+	let result: Point | null = null;
+	let min = Number.POSITIVE_INFINITY;
+	for(const line of lines) {
+		const intersection = line.$intersection(p, v, true);
+		if(!intersection) continue;
+		const distance = intersection.$sub(p).$dot(v);
+		if(distance > 0 && distance < min) {
+			result = intersection;
+			min = distance;
+		}
+	}
+	return result;
 }
 
 /**
