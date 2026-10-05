@@ -31,6 +31,16 @@ export interface Carving {
 	 * Note that an invasion is carved even if the invading flap is also inside
 	 * the node, since the part of the overlapping region not covered by that
 	 * flap belongs to the outside (see {@link ValidJunction.$invasion}).
+	 *
+	 * A covered junction has no pattern of its own, and its overlapping region
+	 * is distributed by the pattern of the junction covering it, which could
+	 * give the region to the other side. So the piece must give up the region,
+	 * or it sticks out of the pattern contour of the covering junction, leaving
+	 * a staircase corner that no pattern fixes (as in the sample
+	 * `v08.riverRidge`, where the junction of flaps 9 and 19 is covered by that
+	 * of flaps 12 and 19, and flap 12 is inside the node). But that applies
+	 * only if the pattern involves the river of the node (see
+	 * {@link createCarving}).
 	 */
 	readonly always: IRect[];
 
@@ -142,6 +152,18 @@ function createCarving(
 		const invasion = j.$invasion;
 		const isInvaded = invasion?.flap === leaf && fitsAt(invasion, l);
 		if(!isCovered && !isDigested && !isInvaded) continue;
+
+		if(isCovered && !isDigested && !isInvaded) {
+			// The region is given up only to the patterns of the covering
+			// junctions, which redistribute the regions of the rivers along
+			// the paths between their flaps. So if none of them has a flap
+			// inside the node, the river of the node is not involved, and the
+			// region stays.
+			const involved = j.$getCovering().some(c =>
+				inside.has(c.$a.id) || inside.has(c.$b.id)
+			);
+			if(!involved) continue;
+		}
 
 		const q = getQuadrant(j.$a === leaf ? j.$q1 : j.$q2);
 		const corner = cornerRect(rect, q, j.$o.x, j.$o.y);

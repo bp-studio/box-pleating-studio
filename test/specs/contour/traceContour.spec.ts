@@ -45,6 +45,22 @@ describe("Trace contour", () => {
 	});
 
 	/** Added v0.8.0 */
+	it("Does not carve covered junctions for patterns not involving the node", () => {
+		// The junction of flaps 6 and 10 is covered by that of flaps 3 and 10,
+		// whose pattern does not involve the river of node 5 (neither flap 3
+		// nor flap 10 is inside it), so the overlapping region stays in the raw
+		// piece of flap 6. Previously, the region was carved out at the corner
+		// of the piece.
+		parseTree(
+			"(0,1,1),(1,2,1),(1,3,1),(2,4,1),(5,6,4),(11,12,1),(7,8,3),(7,9,3),(5,7,5),(2,5,2),(0,10,12),(11,0,6),(11,13,2)",
+			"(6,16,18,0,0),(8,30,30,0,0),(9,33,24,0,0),(4,43,32,0,0),(10,33,0,0,0),(13,58,31,0,0),(12,55,30,0,0),(3,24,12,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const outer = result.graphics["re2,5"].contours[0].outer;
+		expect(outer).to.equalPath("(42,31),(42,34),(40,34),(40,40),(20,40),(20,24),(10,24),(10,12),(22,12),(22,20),(23,20),(23,14),(43,14),(43,31)", true);
+	});
+
+	/** Added v0.8.0 */
 	it("Expands remaining leaves with invasions carved for the first time", () => {
 		// Node 15 is in raw mode, and leaves 6 and 14 of node 7 remain.
 		// Flap 11 invades flap 6, and the overlapping region fits the
