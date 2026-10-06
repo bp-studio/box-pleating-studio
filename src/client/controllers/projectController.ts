@@ -7,10 +7,23 @@ import { isContextLost } from "client/screen/contextManager";
 
 import type { JProject, JProjectLike, ProjId } from "shared/json";
 
+/// #if DEBUG
+const HMR_RELOAD_DELAY = 500;
+/// #endif
+
 function createWorker(): Promise<Worker> {
 	// This mechanism of waiting for the worker to get ready is needed only for
 	// Safari 11, and can be dropped in the future.
 	const worker = new Worker(new URL("core/main.ts", import.meta.url), { name: "core" });
+
+	/// #if DEBUG
+	// Reload the page when the hot update of the Core fails (see core/main.ts).
+	// The delay is for the main thread to finish its own update first.
+	worker.addEventListener("message", e => {
+		if(e.data === "hmr-reload") setTimeout(() => location.reload(), HMR_RELOAD_DELAY);
+	});
+	/// #endif
+
 	return new Promise<Worker>(resolve => {
 		worker.addEventListener("message", () => resolve(worker), { once: true });
 	});

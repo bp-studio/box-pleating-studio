@@ -1,3 +1,4 @@
+/// <reference types="@rspack/core/module" />
 
 // Polyfills
 import "shared/polyfill/toReversed";
@@ -53,5 +54,17 @@ onmessage = function(event: MessageEvent): void {
 // Signify that the worker is ready. This is needed in Safari 11,
 // otherwise the main thread might post message before the worker is ready.
 postMessage(null);
+
+/// #if DEBUG
+// The Core cannot be hot-updated, as its states are kept in module-level
+// singletons. When an update is aborted, the HMR runtime tries to reload the
+// page, which is not possible in a worker, so we ask the main thread to do so
+// (see createWorker in projectController.ts).
+if(import.meta.webpackHot) {
+	import.meta.webpackHot.addStatusHandler(status => {
+		if(status == "abort" || status == "fail") postMessage("hmr-reload");
+	});
+}
+/// #endif
 
 export { State as Data };
