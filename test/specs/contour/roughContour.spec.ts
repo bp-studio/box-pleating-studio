@@ -116,6 +116,22 @@ describe("Rough contour", () => {
 	});
 
 	/** Added v0.8.0 */
+	it("Does not carve the inner path for covered invasions", () => {
+		// Flap 16 invades flap 9, and the overlapping region fits only from
+		// node 3. But the junction 9-16 is covered by 12-16, whose pattern
+		// distributes the region, and flap 9 keeps its whole hinge. So the
+		// inner path of node 3 must not be carved; otherwise node 3 overlaps
+		// the upper half of flap 9.
+		parseTree(
+			"(13,0,3),(13,15,1),(13,16,1),(0,3,7),(15,14,1),(3,9,1),(3,12,1),(14,18,1)",
+			"(9,22,4,0,0),(12,20,4,0,0),(16,15,15,0,0),(18,20,20,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const contour = result.graphics["re0,3"].contours[0];
+		expect(contour.inner![0]).to.equalPath("(23,3),(19,3),(19,14/3),(921/47,231/47),(178/9,5),(23,5)", true);
+	});
+
+	/** Added v0.8.0 */
 	it("Treats the components touching at a vertex as one", () => {
 		// The expanded hinges of flaps 9 and 10 touch at (11,4) only, and
 		// the union is chained into a single path touching itself there.

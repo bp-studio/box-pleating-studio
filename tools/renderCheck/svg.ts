@@ -98,10 +98,17 @@ export function compose(panels: readonly Panel[]): string {
 	let x = 0;
 	const groups: string[] = [];
 	for(const panel of panels) {
-		// A nested SVG clips the content outside the panel.
+		// Nested SVGs clip the content outside the panel and the title bar.
+		// The first two elements are the background and the title.
+		const [background, title, ...content] = panel.body;
+		const { width: w, height: h } = panel;
+		const inner = `<svg y="${TITLE_HEIGHT}" width="${w}" ` +
+			`height="${h - TITLE_HEIGHT}" ` +
+			`viewBox="0 ${TITLE_HEIGHT} ${w} ${h - TITLE_HEIGHT}">\n` +
+			`${content.join("\n")}\n</svg>`;
 		groups.push(
-			`<svg x="${x}" y="0" width="${panel.width}" ` +
-			`height="${panel.height}">\n${panel.body.join("\n")}\n</svg>`
+			`<svg x="${x}" y="0" width="${w}" height="${h}">\n` +
+			`${background}\n${title}\n${inner}\n</svg>`
 		);
 		x += panel.width + GAP;
 	}

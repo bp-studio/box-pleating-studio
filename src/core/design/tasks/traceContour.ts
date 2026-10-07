@@ -225,13 +225,24 @@ type InnerSource = Pick<TraceContour, "$outer" | "$leaves" | "$raw">;
  * whose coverage includes the child, the pattern contour of the child will be
  * inserted into the inner path, so it is fine. Otherwise, we carve the child in
  * the same way (without checking the size) to make the inner path.
+ *
+ * The exception is when the junction of the invasion is covered. Its
+ * overlapping region is distributed by the pattern of the covering junction,
+ * and the child (being too small to be carved itself) keeps the region.
+ * Carving the inner path would make the node overlap the child.
  */
 function getInnerSource(node: ITreeNode, child: RoughContour): InnerSource {
 	const stretches = stretchMap.get(child.$id) ?? [];
-	const filter = (i: Invasion): boolean => !stretches.some(s => {
-		const leaves = s.$repo.$nodeSet.$leaves;
-		return leaves.includes(i.flap.id) && leaves.includes(i.invader.id);
-	});
+	const isCovered = (i: Invasion): boolean => {
+		// An invasion always comes from a valid junction.
+		const junction = State.$junctions.get(i.flap.id, i.invader.id);
+		return (junction as ValidJunction).$isCovered;
+	};
+	const filter = (i: Invasion): boolean => !isCovered(i) &&
+		!stretches.some(s => {
+			const leaves = s.$repo.$nodeSet.$leaves;
+			return leaves.includes(i.flap.id) && leaves.includes(i.invader.id);
+		});
 	const targets = getNewCarvings(child, node.$length, filter);
 	if(!targets.length) return child.$trace!;
 	const paths = rebuild(child, new Set(targets), 0, node.$length, filter);

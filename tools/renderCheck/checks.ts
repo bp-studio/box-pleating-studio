@@ -6,7 +6,7 @@ import type { ILine, Path, Polygon } from "shared/types/geometry";
 
 /** A problem found in the rendering of a layout. */
 export interface Issue {
-	kind: "crash" | "crossing" | "area";
+	kind: "crash" | "crossing" | "area" | "overlap";
 	message: string;
 	/** The locations of the problem, if any. */
 	points: IPoint[];
@@ -102,9 +102,12 @@ function isPerpendicular([a, b]: ILine, [c, d]: ILine): boolean {
 const AREA_TOLERANCE = 1e-6;
 
 /**
- * In valid layouts, the union of the final contours is exactly the union of
- * the rough contours, since the patterns only redistribute the regions where
- * the rough contours overlap (see section 5 of `docs/contour`).
+ * In valid layouts, the regions of the flaps and rivers exactly tile the union
+ * of the rough contours, since the patterns only redistribute the regions
+ * where the rough contours overlap (see section 5 of `docs/contour`). That is,
+ * the union of the final contours is exactly that of the rough contours, and
+ * the final contours don't overlap each other. The latter is checked by
+ * comparing the sum of the areas of the regions with the area of their union.
  */
 function checkArea(): Issue[] {
 	const rough: Polygon[] = [];
@@ -114,23 +117,84 @@ function checkArea(): Issue[] {
 		}
 	}
 	const final: Polygon[] = [];
+	let sum = 0;
 	for(const node of State.m.$tree.$nodes) {
 		if(!node?.$parent) continue;
 		for(const contour of node.$graphics.$contours) {
+			const inner = contour.inner ?? [];
 			final.push([
 				orient(contour.outer, true),
-				...(contour.inner ?? []).map(p => orient(p, false)),
+				...inner.map(p => orient(p, false)),
 			]);
+			sum += Math.abs(totalArea([contour.outer])) -
+				inner.reduce((a, p) => a + Math.abs(totalArea([p])), 0);
 		}
 	}
-	const roughArea = totalArea(new AAUnion().$get(...rough));
-	const finalArea = totalArea(new GeneralUnion().$get(...final));
-	if(Math.abs(roughArea - finalArea) <= AREA_TOLERANCE) return [];
-	return [{
-		kind: "area",
-		message: `final area ${finalArea} != rough area ${roughArea}`,
-		points: [],
-	}];
+	const roughUnion = new AAUnion().$get(...rough);
+	const finalUnion = new GeneralUnion().$get(...final);
+	const roughArea = totalArea(roughUnion);
+	const finalArea = totalArea(finalUnion);
+	const issues: Issue[] = [];
+	if(Math.abs(roughArea - finalArea) > AREA_TOLERANCE) {
+		issues.push({
+			kind: "area",
+			message: `final area ${finalArea} != rough area ${roughArea}`,
+			points: samplePoints(
+				p => inside(p, roughUnion) != inside(p, finalUnion)
+			),
+		});
+	}
+	if(sum - finalArea > AREA_TOLERANCE) {
+		issues.push({
+			kind: "overlap",
+			message: `regions overlap by area ${sum - finalArea}`,
+			points: [],
+		});
+	}
+	return issues;
+}
+
+const SAMPLE_STEP = 0.25;
+const MAX_SAMPLES = 20;
+
+/**
+ * Sample some points (at the centers of a fine grid over the layout) where the
+ * predicate holds, for showing the location of the issue.
+ */
+function samplePoints(predicate: (p: IPoint) => boolean): IPoint[] {
+	const points = State.m.$tree.$nodes.flatMap(node =>
+		node?.$graphics.$roughContours.flatMap(c => c.$outer.flat()) ?? []
+	);
+	const xs = points.map(p => p.x), ys = points.map(p => p.y);
+	const result: IPoint[] = [];
+	const half = SAMPLE_STEP / 2;
+	const [x1, x2] = [Math.min(...xs) + half, Math.max(...xs)];
+	const [y1, y2] = [Math.min(...ys) + half, Math.max(...ys)];
+	for(let x = x1; x < x2; x += SAMPLE_STEP) {
+		for(let y = y1; y < y2; y += SAMPLE_STEP) {
+			if(!predicate({ x, y })) continue;
+			result.push({ x, y });
+			if(result.length >= MAX_SAMPLES) return result;
+		}
+	}
+	return result;
+}
+
+/**
+ * Whether the point is inside the region bounded by the paths (by the
+ * even-odd rule, so the holes are accounted for).
+ */
+function inside(p: IPoint, paths: readonly Path[]): boolean {
+	let result = false;
+	for(const path of paths) {
+		for(let i = 0, j = path.length - 1; i < path.length; j = i++) {
+			const a = path[i], b = path[j];
+			if((a.y > p.y) == (b.y > p.y)) continue;
+			const x = a.x + (p.y - a.y) * (b.x - a.x) / (b.y - a.y);
+			if(x > p.x) result = !result;
+		}
+	}
+	return result;
 }
 
 function totalArea(paths: readonly Path[]): number {

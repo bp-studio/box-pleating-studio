@@ -102,8 +102,8 @@ export async function parseTree(edges: string, flaps: string): Promise<void> {
 	const jFlaps = parseFlaps(flaps);
 
 	// Move the flaps into the sheet
-	const minX = Math.min(...jFlaps.map(f => f.x));
-	const minY = Math.min(...jFlaps.map(f => f.y));
+	const minX = Math.min(0, ...jFlaps.map(f => f.x));
+	const minY = Math.min(0, ...jFlaps.map(f => f.y));
 	for(const f of jFlaps) {
 		f.x -= minX;
 		f.y -= minY;

@@ -92,6 +92,14 @@ See `checks.ts`.
 - **Area**: the union of the final contours differs from that of the rough
   contours. In valid layouts the patterns only redistribute the regions where
   the rough contours overlap, so the two must agree.
+- **Overlap**: the regions of the flaps and rivers overlap each other. This is
+  checked by comparing the sum of the areas of the regions with the area of
+  their union. Together with the area check, it means that the regions exactly
+  tile the union of the rough contours.
 
-These checks don't catch every problem. For example, two contours overlapping
-each other without crossing any ridge go unnoticed.
+The locations of the crossings, as well as some sampled points of the area
+mismatch, are marked in the pictures.
+
+These checks don't catch every problem. For example, a missing ridge at a turn
+of a hinge goes unnoticed. That is not checked yet, since the right angle
+corners of the rivers outside the patterns are known to lack ridges.
