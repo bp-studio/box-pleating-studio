@@ -96,4 +96,41 @@ describe("Rendering", () => {
 		expect(river.$ridges).to.not.containLine(ridge);
 	});
 
+	/** Added v0.8.0 */
+	it("Connects river ridges to free corners of repos in the same direction", () => {
+		// In both cases, the ridge shot from a right angle corner of the river
+		// happens to hit a free corner of a gadget of a repo in the other
+		// direction, which is unrelated. Previously, the ridge crossed the
+		// hinges of other flaps.
+		parseTree(
+			"(13,0,1),(0,4,3),(4,5,2),(4,6,3),(4,20,1)",
+			"(5,0,17,0,0),(6,4,20,0,0),(20,-1,22,0,0)"
+		);
+		const river4 = State.m.$tree.$nodes[4 as NodeId]!.$graphics;
+		const ridge4: ILine = [{ x: 0, y: 21 }, { x: 3, y: 18 }];
+		expect(river4.$ridges).to.not.containLine(ridge4);
+
+		parseTree(
+			"(13,0,3),(0,3,7),(3,12,1),(13,16,1),(0,19,3)",
+			"(12,22,4,0,0),(16,15,15,0,0),(19,10,10,0,0)"
+		);
+		const river3 = State.m.$tree.$nodes[3 as NodeId]!.$graphics;
+		const ridge3: ILine = [{ x: 21, y: 5 }, { x: 14, y: 12 }];
+		expect(river3.$ridges).to.not.containLine(ridge3);
+	});
+
+	/** Added v0.8.0 */
+	it("Does not connect river ridges across the hinges of the river", () => {
+		// The ridge shot from the corner (-1,20) of flap 20 hits a free corner
+		// of the gadget of flaps 5 and 10 (in the same direction), but only
+		// after running across flap 5.
+		parseTree(
+			"(0,4,5),(0,10,1),(4,5,2),(4,20,1)",
+			"(5,0,17,0,0),(10,6,11,0,0),(20,-2,21,0,0)"
+		);
+		const river = State.m.$tree.$nodes[4 as NodeId]!.$graphics;
+		const ridge: ILine = [{ x: -1, y: 20 }, { x: 4, y: 15 }];
+		expect(river.$ridges).to.not.containLine(ridge);
+	});
+
 });

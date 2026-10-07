@@ -13,6 +13,9 @@ debug.log
 # Coverage
 coverage/
 
+# Output of the render check
+/tools/renderCheck/out/
+
 # Playwright
 /test-results/
 /playwright-report/

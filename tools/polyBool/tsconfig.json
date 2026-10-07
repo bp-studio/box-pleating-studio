@@ -11,7 +11,7 @@
 		"target": "esnext",
 		"paths": {
 			"*": [
-				"../src/*"
+				"../../src/*"
 			]
 		},
 		"lib": [
@@ -22,6 +22,6 @@
 	},
 	"include": [
 		"./**/*.ts",
-		"../src/shared/types/**/*.d.ts"
+		"../../src/shared/types/**/*.d.ts"
 	]
 }

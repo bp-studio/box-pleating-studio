@@ -1,0 +1,22 @@
+{
+	"extends": "../../test/tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "../../",
+		"paths": {
+			"@utils/*": [
+				"../../test/utils/*"
+			],
+			"lib/*": [
+				"../../lib/*"
+			],
+			"*": [
+				"../../src/*"
+			]
+		}
+	},
+	"include": [
+		"./**/*.ts",
+		"../../test/utils/**/*.ts",
+		"../../src/shared/types/**/*.d.ts"
+	]
+}

@@ -10,7 +10,7 @@ export default defineConfig({
 		entry: {
 			index: "./tools/polyBool/index.ts",
 		},
-		tsconfigPath: "./tools/tsconfig.json",
+		tsconfigPath: "./tools/polyBool/tsconfig.json",
 	},
 	html: {
 		template: "./tools/polyBool/index.htm",

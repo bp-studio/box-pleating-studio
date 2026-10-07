@@ -25,6 +25,7 @@
 	"scripts": {
 		"browserstack": "cd ../browserstack-automate && pnpm dev",
 		"build": "rsbuild build",
+		"check:render": "rstest -c tools/renderCheck/rstest.config.ts",
 		"cov": "rstest --coverage",
 		"cov:html": "rstest --coverage --coverage.reporters lcov || echo. && pnpx open-cli coverage/lcov-report/index.html",
 		"cov:text": "rstest --coverage --coverage.reporters lcovonly --coverage.reporters text",
@@ -40,7 +41,7 @@
 		"scss:migrate": "pnpx sass-migrator module --migrate-deps src/app/style/main.scss",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"test": "rstest",
-		"tools": "rsbuild dev -c tools/rsbuild.config.ts -o"
+		"tools": "rsbuild dev -c tools/polyBool/rsbuild.config.ts -o"
 	},
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^7.3.1",

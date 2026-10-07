@@ -31,8 +31,13 @@ function draw(ctx: CanvasRenderingContext2D, ...polygons: Polygon[]): void {
 		for(const path of polygon) {
 			ctx.beginPath();
 			const last = path[path.length - 1];
-			ctx.moveTo(last.x * factor + OFFSET, full - last.y * factor + OFFSET);
-			for(const p of path) ctx.lineTo(p.x * factor + OFFSET, full - p.y * factor + OFFSET);
+			ctx.moveTo(
+				last.x * factor + OFFSET,
+				full - last.y * factor + OFFSET
+			);
+			for(const p of path) {
+				ctx.lineTo(p.x * factor + OFFSET, full - p.y * factor + OFFSET);
+			}
 			ctx.closePath();
 			ctx.stroke();
 		}
