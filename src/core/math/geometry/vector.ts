@@ -60,7 +60,20 @@ export class Vector extends Couple {
 
 	/** Calculates the dot product of vectors. */
 	public $dot(v: Vector): number {
-		return this._x.mul(v._x).a(this._y.mul(v._y)).$value;
+		return this.$exactDot(v).$value;
+	}
+
+	/** Calculates the dot product of vectors exactly. */
+	public $exactDot(v: Vector): Fraction {
+		return this._x.mul(v._x).a(this._y.mul(v._y));
+	}
+
+	/**
+	 * Calculates the cross product of vectors (i.e. the z-component),
+	 * which is positive if {@link v} is counter-clockwise from this vector.
+	 */
+	public $cross(v: Vector): Fraction {
+		return this._x.mul(v._y).s(this._y.mul(v._x));
 	}
 
 	/** Take the negative value and returns a new vector. */
@@ -107,6 +120,21 @@ export class Vector extends Couple {
 	public $doubleAngle(): Vector {
 		const { _x, _y } = this.$reduce();
 		return new Vector(_x.mul(_x).s(_y.mul(_y)), Fraction.TWO.mul(_x).m(_y));
+	}
+
+	/**
+	 * Compare the angle of this vector with the given one, where the angles
+	 * are taken in [0, 2pi) counter-clockwise from the positive x-axis.
+	 * Useful for sorting the vectors around a point.
+	 */
+	public $compareAngle(v: Vector): number {
+		return this._half - v._half || -Math.sign(this.$cross(v).$numerator);
+	}
+
+	/** 0 for the angles in [0, pi), and 1 for those in [pi, 2pi). */
+	private get _half(): number {
+		const x = this._x.$numerator, y = this._y.$numerator;
+		return y > 0 || y == 0 && x > 0 ? 0 : 1;
 	}
 
 	/** Check if the given vector is parallel to this one. */

@@ -313,7 +313,12 @@
 			"_": "Export CP file",
 			"format": "Format",
 			"reorient": "Reorient the sheet if applicable",
-			"useAuxiliary": "Use auxiliary lines (unofficial standard)"
+			"hinge": {
+				"_": "Hinge creases",
+				"auxiliary": "Auxiliary lines (unofficial standard)",
+				"valley": "Valley folds",
+				"none": "Omit"
+			}
 		}
 	},
 	"keyword": {

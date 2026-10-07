@@ -5,6 +5,7 @@ import { Vector } from "./vector";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { ILine } from "shared/types/geometry";
+import type { Rational } from "../fraction";
 
 /** Take the next integer of {@link x} in the direction of {@link f}. */
 function int(x: number, f: number): number {
@@ -182,13 +183,15 @@ export class Line {
 		return result;
 	}
 
-	public $xIntersection(x: number): Point {
+	/** The point at the given x on this (non-vertical) line. */
+	public $xIntersection(x: Rational): Point {
 		const v = this.p2.$sub(this.p1);
 		const f = new Fraction(x);
 		return new Point(f, this.p1._y.sub(v.$slope.m(this.p1._x.sub(f))));
 	}
 
-	public $yIntersection(y: number): Point {
+	/** The point at the given y on this (non-horizontal) line. */
+	public $yIntersection(y: Rational): Point {
 		const v = this.p2.$sub(this.p1);
 		const f = new Fraction(y);
 		return new Point(this.p1._x.sub(this.p1._y.sub(f).d(v.$slope)), f);

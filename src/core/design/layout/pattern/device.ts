@@ -14,6 +14,7 @@ import type { CornerMap, Partition } from "../partition";
 import type { JDevice, JConnection, JCorner, OverlapId } from "shared/json";
 import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Pattern } from "./pattern";
 
 export interface Ridge extends Line {
@@ -132,18 +133,20 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All ridges that should be drawn. */
 	public get $drawRidges(): readonly ILine[] {
-		const ridges =
+		return this.$ridgeLines.map(l => l.$toILine());
+	}
+
+	/** Same as {@link $drawRidges}, but in the original rational form. */
+	public get $ridgeLines(): readonly Line[] {
+		const ridges: Line[] =
 			this._ridges.filter(r => r.$type != CornerType.intersection);
 		for(const map of this.$partition.$externalCornerMaps.value) {
 			if(map.corner.type != CornerType.intersection) continue;
 			const from = this.$resolveCornerMap(map);
 			const to = this.$partition.$getExternalConnectionTarget(from, map);
-			if(to) {
-				const ridge = new Line(from, to) as Ridge;
-				ridges.push(ridge);
-			}
+			if(to) ridges.push(new Line(from, to));
 		}
-		return ridges.map(l => l.$toILine());
+		return ridges;
 	}
 
 	/** All ridges used for tracing */
@@ -154,20 +157,30 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All axis-parallel creases that should be drawn. */
 	public get $axisParallels(): readonly ILine[] {
+		return this.$axisParallelLines.map(l => l.$toILine());
+	}
+
+	/** Same as {@link $axisParallels}, but in the original rational form. */
+	public get $axisParallelLines(): readonly Line[] {
 		const result: Line[] = [];
 		for(const r of this._regions) {
 			for(const l of r.$axisParallels.value) {
 				result.push(this._transform(l));
 			}
 		}
-		return result.map(l => l.$toILine());
+		return result;
 	}
 
 	/** Contours for the devices. Used for drawing selection shade. */
 	public get $contour(): readonly Contour[] {
-		return this._regions.map(r => ({
-			outer: toPath(r.$shape.value.contour.map(p => this._transform(p))),
-		}));
+		return this.$regionPaths.map(path => ({ outer: toPath(path) }));
+	}
+
+	/** The outlines of the regions of the device. */
+	public get $regionPaths(): readonly RationalPath[] {
+		return this._regions.map(
+			r => r.$shape.value.contour.map(p => this._transform(p))
+		);
 	}
 
 	/** The lower and upper bounds of x-coordinate that can be dragged. */

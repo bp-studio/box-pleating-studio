@@ -313,7 +313,12 @@
 			"_": "匯出 CP 檔案",
 			"format": "格式",
 			"reorient": "若適用的話重新定向紙張",
-			"useAuxiliary": "使用輔助線（非官方標準）"
+			"hinge": {
+				"_": "樞紐摺痕",
+				"auxiliary": "輔助線（非官方標準）",
+				"valley": "谷摺線",
+				"none": "不輸出"
+			}
 		}
 	},
 	"keyword": {

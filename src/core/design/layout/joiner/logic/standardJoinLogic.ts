@@ -74,7 +74,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		const { j1, j2, f } = this;
 
 		const P = D.$sub(B).$slope.gt(Fraction.ONE) ?
-			e.$xIntersection(D.x) : e.$yIntersection(D.y);
+			e.$xIntersection(D._x) : e.$yIntersection(D._y);
 		const gridPoints = closestGridPoints(this._substituteEnd(e, B), D);
 
 		// The triangle does not degenerate. D differs from P, for otherwise
@@ -113,7 +113,7 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		if(!T) return;
 
 		const P = D.$sub(B).$slope.gt(Fraction.ONE) ?
-			delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
+			delta.$yIntersection(T._y) : delta.$xIntersection(T._x);
 		// T differs from D as D is not integral. If T coincides with B, then B
 		// lies on e, which means that the two critical edges meet on the bv
 		// line. For non-parallel gadgets, that is the same as meeting on the

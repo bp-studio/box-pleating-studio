@@ -1,11 +1,10 @@
 import { Processor } from "core/service/processor";
 import { State } from "core/service/state";
-import { Clip } from "core/math/sweepLine/clip/clip";
-import { CreaseType } from "shared/types/cp";
 import { patternTask } from "core/design/tasks/pattern";
+import { getGenericCP } from "core/design/cp/genericCP";
 
-import type { CPLine } from "shared/types/cp";
-import type { ILine, Path, Polygon } from "shared/types/geometry";
+import type { GenericCPLine } from "shared/types/cp";
+import type { Path } from "shared/types/geometry";
 import type { JStretch } from "shared/json";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Repository } from "core/design/layout/repository";
@@ -32,33 +31,11 @@ export namespace LayoutController {
 	}
 
 	/**
-	 * Generate the set of {@link CPLine}s clipped to the given boundary.
+	 * Generate the generic CP clipped to the given boundary
+	 * (see {@link getGenericCP}).
 	 */
-	export function getCP(
-		borders: Path, useAuxiliary: boolean = true
-	): CPLine[] {
-		const clip = new Clip();
-		const tree = State.m.$tree;
-		const lines: CPLine[] = [];
-		addPolygon(lines, [borders], CreaseType.Border);
-		for(const node of tree.$nodes) {
-			if(!node || !node.$parent) continue;
-			const hingeType = useAuxiliary ?
-				CreaseType.Auxiliary : CreaseType.Valley;
-			// It suffices to include only the outer contours in CP exporting.
-			const outers = node.$graphics.$contours.map(c => c.outer);
-			addPolygon(lines, outers, hingeType);
-			addLines(lines, node.$graphics.$ridges, CreaseType.Mountain);
-		}
-		for(const stretch of State.$stretches.values()) {
-			const pattern = stretch.$repo.$pattern;
-			if(!pattern) continue;
-			for(const device of pattern.$devices) {
-				addLines(lines, device.$drawRidges, CreaseType.Mountain);
-				addLines(lines, device.$axisParallels, CreaseType.Valley);
-			}
-		}
-		return clip.$get(lines);
+	export function getCP(borders: Path): GenericCPLine[] {
+		return getGenericCP(borders);
 	}
 
 	export /* istanbul ignore next: covered in practice */
@@ -101,26 +78,5 @@ export namespace LayoutController {
 		State.$movedDevices.add(device);
 		State.$repoToProcess.add(repo);
 		Processor.$run(patternTask);
-	}
-
-	function addPolygon(
-		set: CPLine[], polygon: Polygon, type: CreaseType
-	): void {
-		for(const path of polygon) {
-			const l = path.length;
-			for(let i = 0; i < l; i++) {
-				const p1 = path[i], p2 = path[i + 1] || path[0];
-				set.push({ type, p1, p2 });
-			}
-		}
-	}
-
-	function addLines(
-		set: CPLine[], lines: readonly ILine[], type: CreaseType
-	): void {
-		for(const line of lines) {
-			const [p1, p2] = line;
-			set.push({ type, p1, p2 });
-		}
 	}
 }

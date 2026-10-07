@@ -260,6 +260,11 @@ export class Fraction {
 		return this._p * v._q >= this._q * v._p;
 	}
 
+	/** Comparison, returning the sign of the difference. Useful for sorting. */
+	public $compare(v: Fraction): Sign {
+		return Math.sign(this._p * v._q - this._q * v._p) as Sign;
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 	// Other methods
 	////////////////////////////////////////////////////////////////////////////

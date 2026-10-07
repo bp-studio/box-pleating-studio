@@ -1,8 +1,15 @@
 import { State } from "core/service/state";
 import { isClockwise, pathRightCorners } from "core/math/geometry/path";
-import { getAllRidges, isInside, isOnSegment, TOLERANCE } from "./utils";
+import { Fraction } from "core/math/fraction";
+import { Point } from "core/math/geometry/point";
+import { Vector } from "core/math/geometry/vector";
+import { toLines, toRationalPath } from "core/math/geometry/rationalPath";
+import { pointInPolygon } from "core/math/geometry/pointInPolygon";
+import { getAllRidges, orient } from "./utils";
 
-import type { Contour, ILine, Path } from "shared/types/geometry";
+import type { Line } from "core/math/geometry/line";
+import type { RationalPath } from "core/math/geometry/rationalPath";
+import type { Contour, Path } from "shared/types/geometry";
 import type { NodeId } from "shared/json/tree";
 
 export interface MissingRiverRidges {
@@ -15,12 +22,6 @@ export interface MissingRiverRidges {
 	/** The contours of the river, for visualization. */
 	readonly contours: readonly Contour[];
 }
-
-/**
- * The distance of the test point from a corner along the inward diagonal, for
- * determining whether the corner points into the sheet.
- */
-const PROBE = 0.1;
 
 /**
  * Find the right angle corners of the rivers that don't have ridges going
@@ -38,13 +39,14 @@ const PROBE = 0.1;
  */
 export function findMissingRiverRidges(borders: Path): MissingRiverRidges[] {
 	const ridges = getAllRidges();
+	const border = toRationalPath(orient(borders, true));
 	const result: MissingRiverRidges[] = [];
 	for(const node of State.m.$tree.$nodes) {
 		if(!node || !node.$parent || node.$isLeaf) continue;
 		const corners: IPoint[] = [];
 		for(const contour of node.$graphics.$contours) {
 			const check = (path: Path, isOuter: boolean): void => {
-				corners.push(...findCorners(path, isOuter, borders, ridges));
+				corners.push(...findCorners(path, isOuter, border, ridges));
 			};
 			check(contour.outer, true);
 			for(const path of contour.inner ?? []) check(path, false);
@@ -61,18 +63,19 @@ export function findMissingRiverRidges(borders: Path): MissingRiverRidges[] {
  * @param isOuter Whether the path is the outer path of the river contour.
  */
 function findCorners(
-	path: Path, isOuter: boolean, borders: Path, ridges: readonly ILine[]
+	path: Path, isOuter: boolean, border: RationalPath, ridges: readonly Line[]
 ): IPoint[] {
 	// The river is on the left of the path if and only if the path is either
 	// an outer path in counter-clockwise orientation, or an inner path in
 	// clockwise orientation.
 	const left = isOuter != isClockwise(path);
 	const result: IPoint[] = [];
+	// The corners are integral (see pathRightCorners), so they are exact.
 	for(const [p, p0, p1] of pathRightCorners(path)) {
-		const v = getInwardDiagonal(p0, p, p1, left);
-		const probe = { x: p.x + v.x * PROBE, y: p.y + v.y * PROBE };
-		if(!isInside(probe, borders)) continue;
-		if(!hasInwardRidge(ridges, p, v)) result.push(p);
+		const corner = new Point(p);
+		const v = new Vector(getInwardDiagonal(p0, p, p1, left));
+		if(!pointsInto(border, corner, v)) continue;
+		if(!hasInwardRidge(ridges, corner, v)) result.push(p);
 	}
 	return result;
 }
@@ -98,6 +101,42 @@ export function getInwardDiagonal(
 }
 
 /**
+ * Whether the ray from the given point in the given direction goes into the
+ * interior of the sheet right away.
+ * @param border The border of the sheet, oriented counter-clockwise.
+ */
+export function pointsInto(border: RationalPath, p: Point, v: Vector): boolean {
+	const l = border.length;
+	for(let i = 0; i < l; i++) {
+		if(!border[i].eq(p)) continue;
+		// The interior angle at a vertex goes counter-clockwise from the
+		// outgoing edge to the incoming one.
+		const outgoing = border[(i + 1) % l].$sub(p);
+		const incoming = border[(i - 1 + l) % l].$sub(p);
+		return isStrictlyWithin(outgoing, v, incoming);
+	}
+	const edge = toLines(border).find(e => e.$contains(p));
+	if(edge) return edge.$vector.$cross(v).$numerator > 0;
+	return pointInPolygon(p, border);
+}
+
+/**
+ * Whether the vector v is strictly within the angle going counter-clockwise
+ * from u to w, which could be reflex.
+ */
+function isStrictlyWithin(u: Vector, v: Vector, w: Vector): boolean {
+	const uw = Math.sign(u.$cross(w).$numerator);
+	const uv = Math.sign(u.$cross(v).$numerator);
+	const vw = Math.sign(v.$cross(w).$numerator);
+	if(uw > 0) return uv > 0 && vw > 0;
+	// A reflex angle, whose complement goes counter-clockwise from w to u.
+	// The vector is within the angle if it is not within the closed
+	// complement, that is, unless w x v >= 0 and v x u >= 0.
+	if(uw < 0) return !(vw <= 0 && uv <= 0);
+	return uv > 0; // A straight angle
+}
+
+/**
  * Whether there is a ridge starting from (or passing through) the given
  * corner, going within 45 degrees of the inward diagonal (exclusive). For a
  * concave corner, that is the quadrant vertically opposite to the outside.
@@ -105,17 +144,17 @@ export function getInwardDiagonal(
  * @param v The inward diagonal, see {@link getInwardDiagonal}.
  */
 export function hasInwardRidge(
-	ridges: readonly ILine[], p: IPoint, v: IPoint
+	ridges: readonly Line[], p: Point, v: Vector
 ): boolean {
-	const isInward = (q: IPoint): boolean => {
-		const dx = q.x - p.x, dy = q.y - p.y;
-		const length = Math.hypot(dx, dy);
-		if(length < TOLERANCE) return false;
-		// The length of v is sqrt(2)
-		const cos = (dx * v.x + dy * v.y) / (length * Math.SQRT2);
-		return cos > Math.SQRT1_2 + TOLERANCE;
+	const vv = v.$exactDot(v);
+	const isInward = (q: Point): boolean => {
+		const d = q.$sub(p);
+		const dv = d.$exactDot(v);
+		if(dv.$numerator <= 0) return false;
+		// That is, cos > 1/sqrt(2), or 2 (d.v)^2 > |d|^2 |v|^2.
+		return Fraction.TWO.mul(dv).m(dv).gt(d.$exactDot(d).m(vv));
 	};
-	return ridges.some(([p1, p2]) =>
-		isOnSegment(p, p1, p2) && (isInward(p1) || isInward(p2))
+	return ridges.some(r =>
+		r.$contains(p, true) && (isInward(r.p1) || isInward(r.p2))
 	);
 }

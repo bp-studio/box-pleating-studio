@@ -313,7 +313,12 @@
 			"_": "Xuất tệp CP",
 			"format": "Định dạng",
 			"reorient": "Định hướng lại trang tính nếu có",
-			"useAuxiliary": "Sử dụng các dòng phụ trợ (tiêu chuẩn không chính thức)"
+			"hinge": {
+				"_": "Nếp gấp bản lề",
+				"auxiliary": "Đường phụ trợ (tiêu chuẩn không chính thức)",
+				"valley": "Nếp gấp thung lũng",
+				"none": "Bỏ qua"
+			}
 		}
 	},
 	"keyword": {

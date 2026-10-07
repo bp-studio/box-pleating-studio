@@ -87,6 +87,12 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private readonly _updateCallbacks: Action[] = [];
 	private _updateCallbackTimeout: number | undefined;
 
+	/**
+	 * The number of the updates from the Core, which can be used for detecting
+	 * changes of the design (for example, for caching).
+	 */
+	public $updateCount: number = 0;
+
 	/** The number of the callings to the Core in progress. */
 	private _pendingCalls: number = 0;
 
@@ -223,6 +229,7 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		if("error" in response) {
 			await this._handleCoreError(request, response, stack);
 		} else if("update" in response) {
+			this.$updateCount++;
 			this.design.$update(response.update);
 			this._flushUpdateCallback();
 			// Note that the flushing is also invoked on initialization

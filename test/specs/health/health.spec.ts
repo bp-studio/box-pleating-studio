@@ -8,10 +8,14 @@ import { Migration } from "client/patches";
 import { DesignController } from "core/controller/designController";
 import { findUncoveredRegions } from "core/design/health/uncovered";
 import { findDanglingRidgeEnds } from "core/design/health/danglingRidge";
-import { findMissingRiverRidges, hasInwardRidge } from "core/design/health/riverCorner";
+import { findMissingRiverRidges, hasInwardRidge, pointsInto } from "core/design/health/riverCorner";
+import { toRationalPath } from "core/math/geometry/rationalPath";
 import { complete } from "../pattern/util";
+import { Line } from "core/math/geometry/line";
+import { Point } from "core/math/geometry/point";
+import { Vector } from "core/math/geometry/vector";
 
-import type { ILine, Path } from "shared/types/geometry";
+import type { Path } from "shared/types/geometry";
 
 function rect(width: number, height: number): Path {
 	return parsePath(`(0,0),(${width},0),(${width},${height}),(0,${height})`);
@@ -176,12 +180,12 @@ describe("Health check", () => {
 		});
 
 		it("Accepts ridges within 45 degrees of the inward diagonal", () => {
-			const p = { x: 0, y: 0 };
-			const v = { x: 1, y: 1 };
+			const p = new Point(0, 0);
+			const v = new Vector(1, 1);
 			type Coords = [number, number, number, number];
 			const test = (...c: Coords): boolean => {
 				const [x1, y1, x2, y2] = c;
-				const ridge: ILine = [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+				const ridge = new Line(new Point(x1, y1), new Point(x2, y2));
 				return hasInwardRidge([ridge], p, v);
 			};
 			expect(test(0, 0, 2, 2)).to.be.true;
@@ -191,6 +195,31 @@ describe("Health check", () => {
 			expect(test(0, 0, -1, -1)).to.be.false;
 			expect(test(0, 0, -3, 1)).to.be.false;
 			expect(test(1, 0, 2, 2)).to.be.false; // Not through the corner
+		});
+
+		it("Determines whether a direction points into the sheet", () => {
+			// An L-shape in counter-clockwise orientation, with a reflex
+			// vertex at (5,5)
+			const border = toRationalPath(
+				parsePath("(0,0),(10,0),(10,5),(5,5),(5,10),(0,10)")
+			);
+			type Args = [number, number, number, number];
+			const test = (...[x, y, vx, vy]: Args): boolean =>
+				pointsInto(border, new Point(x, y), new Vector(vx, vy));
+			expect(test(2, 2, 1, 1)).to.be.true; // Interior
+			expect(test(20, 20, 1, 1)).to.be.false; // Exterior
+			expect(test(3, 0, 1, 1)).to.be.true; // On an edge
+			expect(test(3, 0, 1, -1)).to.be.false;
+			expect(test(3, 0, 1, 0)).to.be.false; // Along the edge
+			expect(test(0, 0, 1, 1)).to.be.true; // At a convex vertex
+			expect(test(0, 0, -1, 1)).to.be.false;
+			expect(test(0, 0, 1, 0)).to.be.false;
+			expect(test(5, 5, -1, -1)).to.be.true; // At the reflex vertex
+			expect(test(5, 5, 1, -1)).to.be.true;
+			expect(test(5, 5, -1, 1)).to.be.true;
+			expect(test(5, 5, 1, 1)).to.be.false;
+			expect(test(5, 5, 1, 0)).to.be.false;
+			expect(test(5, 5, 0, 1)).to.be.false;
 		});
 
 		it("Ignores the corners whose ridges would go outside the sheet", () => {

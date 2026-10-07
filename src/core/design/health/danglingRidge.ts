@@ -1,11 +1,10 @@
-import { Clip } from "core/math/sweepLine/clip/clip";
-import { CreaseType } from "shared/types/cp";
-import { getAllRidges, isOnBoundary, orient, toKey } from "./utils";
+import { subdivide } from "core/math/geometry/subdivide";
+import { getAllRidges } from "./utils";
+import { toRationalPath } from "core/math/geometry/rationalPath";
+import { pointInPolygon } from "core/math/geometry/pointInPolygon";
 
-import type { CPLine } from "shared/types/cp";
+import type { Point } from "core/math/geometry/point";
 import type { Path } from "shared/types/geometry";
-
-const clip = new Clip();
 
 /**
  * Find the ends of the ridges that terminate inside the sheet.
@@ -15,34 +14,26 @@ const clip = new Clip();
  * @param borders The border of the sheet.
  */
 export function findDanglingRidgeEnds(borders: Path): IPoint[] {
-	const border = orient(borders, true);
-	const lines: CPLine[] = [];
-	const l = border.length;
-	for(let i = 0; i < l; i++) {
-		const p1 = border[i], p2 = border[i + 1] || border[0];
-		lines.push({ type: CreaseType.Border, p1, p2 });
-	}
-	for(const [p1, p2] of getAllRidges()) {
-		lines.push({ type: CreaseType.Mountain, p1, p2 });
-	}
+	const border = toRationalPath(borders);
+	const segments = getAllRidges().map(line => ({ line }));
 
-	// Clipping subdivides the ridges at all the intersections (including
-	// T-junctions) and removes duplicates, so it suffices to count the degree
-	// of each end point.
-	const degrees = new Map<string, [IPoint, number]>();
-	for(const line of clip.$get(lines)) {
-		if(line.type != CreaseType.Mountain) continue;
-		for(const p of [line.p1, line.p2]) {
-			const key = toKey(p);
+	// Subdividing the ridges at all the intersections (including T-junctions)
+	// and merging the duplicates, it suffices to count the degree of each end
+	// point.
+	const degrees = new Map<string, [Point, number]>();
+	for(const edge of subdivide(segments)) {
+		for(const p of [edge.p1, edge.p2]) {
+			const key = p.toString();
 			const entry = degrees.get(key);
 			if(entry) entry[1]++;
 			else degrees.set(key, [p, 1]);
 		}
 	}
 
+	// The ends on or beyond the border are excluded.
 	const result: IPoint[] = [];
 	for(const [p, degree] of degrees.values()) {
-		if(degree == 1 && !isOnBoundary(p, border)) result.push(p);
+		if(degree == 1 && pointInPolygon(p, border)) result.push(p.$toIPoint());
 	}
 	return result;
 }

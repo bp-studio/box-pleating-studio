@@ -1,4 +1,4 @@
-import { Line } from "./line";
+import { toLines } from "./rationalPath";
 
 import type { Point } from "./point";
 import type { RationalPath } from "./rationalPath";
@@ -11,14 +11,18 @@ import type { RationalPath } from "./rationalPath";
  * [PNPOLY](https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html)
  * algorithm by W. Randolph Franklin.
  *
- * This function is currently not in used, but we keep it just for the record.
+ * The boundary is checked exactly beforehand, as the main loop handles the
+ * points on the boundary by the half-open convention only (that is, the points
+ * on the left and the bottom edges are regarded as outside, and those on the
+ * right and the top edges as inside).
  */
 export function pointInPolygon(
 	p: Point, path: RationalPath, boundary = false
 ): boolean {
+	if(isOnBoundary(p, path)) return boundary;
 	const l = path.length;
 	// Degenerated case
-	if(l == 2) return boundary && new Line(path[0], path[1]).$contains(p, true);
+	if(l == 2) return false;
 
 	// First convert everything into floating numbers.
 	// Errors won't be a problem here.
@@ -40,9 +44,12 @@ export function pointInPolygon(
 		if(!(my && ny && (mx || nx) && !(mx && nx))) {
 			const test = (yi * xj - xi * yj) / (xj - xi);
 			if(test < 0) continue;
-			if(test == 0) return boundary;
 		}
 		n = !n;
 	}
 	return n;
+}
+
+function isOnBoundary(p: Point, path: RationalPath): boolean {
+	return toLines(path).some(edge => edge.$contains(p, true));
 }

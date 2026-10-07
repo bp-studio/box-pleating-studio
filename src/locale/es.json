@@ -313,7 +313,12 @@
 			"_": "Exportar archivo CP",
 			"format": "Formato",
 			"reorient": "Reorientar la hoja si corresponde",
-			"useAuxiliary": "Use líneas auxiliares (estándar no oficial)"
+			"hinge": {
+				"_": "Pliegues de bisagra",
+				"auxiliary": "Líneas auxiliares (estándar no oficial)",
+				"valley": "Pliegues de valle",
+				"none": "Omitir"
+			}
 		}
 	},
 	"keyword": {
