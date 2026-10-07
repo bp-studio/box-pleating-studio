@@ -7,7 +7,7 @@ import { Vector } from "core/math/geometry/vector";
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
-import type { TraceNode } from "./traceContext";
+import type { TraceNode, VirtualDiagonal } from "./traceContext";
 import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
 import type { NodeId } from "shared/json/tree";
@@ -19,13 +19,13 @@ export interface StartEnd {
 	start: Point;
 	end: Point;
 	/**
-	 * Whether the starting point is not on an actual {@link SideDiagonal} but
-	 * on an intersection ridge (whose line then acts as a virtual side
+	 * If defined, the starting point is not on an actual {@link SideDiagonal}
+	 * but on this intersection ridge (whose line then acts as a virtual side
 	 * diagonal, with the starting point as its corner). This happens when the
 	 * side diagonal is digested by the flaps wrapped inside the node being
-	 * traced.
+	 * traced, or belongs to a flap outside the node.
 	 */
-	virtualStart: boolean;
+	startRidge?: Ridge;
 }
 
 //=================================================================
@@ -50,12 +50,14 @@ export class Trace {
 	}
 
 	/**
-	 * @param inside The leaves inside the contour being traced, whose flaps
-	 * shape the hinges in raw mode (see {@link _rawModeFinalCheck}).
+	 * @param inside The leaves inside the contour being traced. The
+	 * intersection ridges between them are ignored (see
+	 * {@link _createFilteredRidges}), and their flaps shape the hinges in raw
+	 * mode (see {@link _rawModeFinalCheck}).
 	 */
 	public $generate(
 		hinges: Path, start: Point, end: Point, rawMode: boolean,
-		virtualStart: boolean = false,
+		startRidge?: Ridge,
 		inside: ReadonlySet<NodeId> = new Set()
 	): PatternContour | null {
 		const ctx = new TraceContext(this, hinges);
@@ -64,14 +66,15 @@ export class Trace {
 		const directionalVector =
 			new Vector(1, this.$direction == SlashDirection.FW ? 1 : -1);
 		const ridges =
-			this._createFilteredRidges(start, end, directionalVector);
+			this._createFilteredRidges(start, end, directionalVector, inside);
 
 		// Initialize
 		const path: RationalPath = [];
 		let startDiagonal =
 			this.$sideDiagonals.find(d => d.$lineContains(start));
-		if(!startDiagonal && virtualStart) {
-			startDiagonal = createVirtualDiagonal(start, directionalVector);
+		if(!startDiagonal && startRidge) {
+			startDiagonal =
+				createVirtualDiagonal(start, directionalVector, startRidge);
 		}
 		const cursor = ctx.$getInitialNode(ridges, startDiagonal);
 		if(!cursor) return null;
@@ -92,8 +95,10 @@ export class Trace {
 		if(!loop.reflected && !cursor.ridge) return null;
 
 		const result = ctx.$trim(path);
+		if(!result) return null;
 		if(!rawMode) return result;
-		return this._rawModeFinalCheck(result, hinges, loop.vector, inside);
+		if(extendToHinges(result, hinges, loop.vector)) return result;
+		return this._rawModeFinalCheck(inside);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -135,23 +140,17 @@ export class Trace {
 	}
 
 	/**
-	 * In raw mode, the generated contour must end on the given hinge segment,
-	 * so that it can be inserted into the piece.
+	 * In raw mode, the generated contour must end on the given hinge segment
+	 * (after {@link extendToHinges}), so that it can be inserted into the
+	 * piece.
 	 *
-	 * Since the tracing records only the points of reflection, the contour
-	 * stops at the last reflection, and if the contour leaves it in an
-	 * axis-parallel direction (instead of along a diagonal ending on the
-	 * hinges), the last segment towards the hinges is missing. In that case we
-	 * extend the contour to the hinges.
-	 *
-	 * After that, the contour ends on the hinges in valid layouts, as the
-	 * pieces are carved to match the tracing (see
-	 * {@link getQuadrantShape}). In layouts with invalid junctions, the repo
-	 * is formed by the valid junctions only, while the geometry of the pieces
-	 * could still be affected by the flaps of the invalid junctions, and the
-	 * contour could end elsewhere. In that case we give up the contour. Note
-	 * that those flaps are not necessarily in the repo; it suffices that they
-	 * are inside the contour being traced.
+	 * That is the case in valid layouts, as the pieces are carved to match the
+	 * tracing (see {@link getQuadrantShape}). In layouts with invalid
+	 * junctions, the repo is formed by the valid junctions only, while the
+	 * geometry of the pieces could still be affected by the flaps of the
+	 * invalid junctions, and the contour could end elsewhere. In that case we
+	 * give up the contour. Note that those flaps are not necessarily in the
+	 * repo; it suffices that they are inside the contour being traced.
 	 *
 	 * Note that for the same reason, the contour could also end on the hinges
 	 * by chance and still be incorrect, which would leave a small region
@@ -159,26 +158,7 @@ export class Trace {
 	 * junctions, and it is not worth the effort to correct the patterns in
 	 * those layouts.
 	 */
-	private _rawModeFinalCheck(
-		result: PatternContour | null, hinges: Path, vector: Vector,
-		inside: ReadonlySet<NodeId>
-	): PatternContour | null {
-		if(!result) return null;
-		const lines: Line[] = [];
-		for(let i = hinges.length - 1; i > 0; i--) {
-			lines.push(Line.$fromIPoint(hinges[i], hinges[i - 1]));
-		}
-		const lastPoint = result[result.length - 1];
-		if(lines.some(line => line.$contains(lastPoint, true))) return result;
-
-		if(vector.x == 0 || vector.y == 0) {
-			const extension = getNearestIntersection(lines, lastPoint, vector);
-			if(extension) {
-				result.push(extension);
-				return result;
-			}
-		}
-
+	private _rawModeFinalCheck(inside: ReadonlySet<NodeId>): null {
 		debugAssert(
 			() => this._involvesInvalidJunctions(inside),
 			"Pattern contour does not end on the hinges"
@@ -196,8 +176,18 @@ export class Trace {
 		return false;
 	}
 
+	/**
+	 * The ridges between the starting and ending lines.
+	 *
+	 * An intersection ridge is usually treated as a ray (see
+	 * {@link getNextIntersection}), as the division of the gadgets continues
+	 * into the rivers outside. But if both flaps it divides are inside the
+	 * contour being traced, the division is internal to the contour (see
+	 * {@link Quadrant.$resolveStartEnd}), and only the ridge itself counts.
+	 */
 	private _createFilteredRidges(
-		start: Point, end: Point, directionalVector: Vector
+		start: Point, end: Point, directionalVector: Vector,
+		inside: ReadonlySet<NodeId>
 	): Set<Ridge> {
 		let startLine = new Line(start, directionalVector);
 		let endLine = new Line(end, directionalVector);
@@ -218,8 +208,34 @@ export class Trace {
 				endLine.$lineContains(r.p1) && endLine.$lineContains(r.p2)
 			)
 		);
-		return new Set(filteredRidges);
+		return new Set(filteredRidges.map(r => {
+			const internal = r.$division?.every(id => inside.has(id as NodeId));
+			return internal ? new Line(r.p1, r.p2) as Ridge : r;
+		}));
 	}
+}
+
+/**
+ * Since the tracing records only the points of reflection, the contour stops
+ * at the last reflection, and if the contour leaves it in an axis-parallel
+ * direction (instead of along a diagonal ending on the hinges), the last
+ * segment towards the hinges is missing. In that case we extend the contour
+ * to the hinges. Returns whether the contour ends on the hinges.
+ */
+function extendToHinges(
+	result: PatternContour, hinges: Path, vector: Vector
+): boolean {
+	const lines: Line[] = [];
+	for(let i = hinges.length - 1; i > 0; i--) {
+		lines.push(Line.$fromIPoint(hinges[i], hinges[i - 1]));
+	}
+	const lastPoint = result[result.length - 1];
+	if(lines.some(line => line.$contains(lastPoint, true))) return true;
+	if(vector.x != 0 && vector.y != 0) return false;
+	const extension = getNearestIntersection(lines, lastPoint, vector);
+	if(!extension) return false;
+	result.push(extension);
+	return true;
 }
 
 /** The nearest intersection of a ray with the given lines, if any. */
@@ -241,12 +257,18 @@ function getNearestIntersection(
 }
 
 /**
- * The side diagonal is digested (see StartEnd.virtualStart),
+ * The side diagonal is digested (see StartEnd.startRidge),
  * so we make a virtual one. Only its line and its corner matter
  * (it is not part of the ridges).
  */
-function createVirtualDiagonal(start: Point, v: Vector): SideDiagonal {
-	const virtual = new Line(start, v) as Partial<Writeable<SideDiagonal>>;
+function createVirtualDiagonal(
+	start: Point, v: Vector, ridge: Ridge
+): SideDiagonal {
+	const virtual = new Line(start, v) as Partial<Writeable<VirtualDiagonal>>;
 	virtual.p0 = start;
+	virtual.$virtual = true;
+	if(!ridge.p1.eq(ridge.p2)) {
+		virtual.$inner = ridge.p1.eq(start) ? ridge.p2 : ridge.p1;
+	}
 	return virtual as SideDiagonal;
 }

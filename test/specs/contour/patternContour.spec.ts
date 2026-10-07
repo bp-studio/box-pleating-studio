@@ -3,9 +3,16 @@ import { describe, it, expect } from "@rstest/core";
 import { id1, id6, parseTree } from "@utils/tree";
 import { State } from "core/service/state";
 import { TreeController } from "core/controller/treeController";
+import { LayoutController } from "core/controller/layoutController";
 import { UpdateResult } from "core/service/updateResult";
 
 import type { NodeId } from "shared/json/tree";
+import type { Path } from "shared/types/geometry";
+
+function outerOf(id: number): Path {
+	const node = State.m.$tree.$nodes[id as NodeId]!;
+	return node.$graphics.$contours[0].outer;
+}
 
 describe("Pattern contour", () => {
 
@@ -99,6 +106,90 @@ describe("Pattern contour", () => {
 		const contours = node.$graphics.$patternContours;
 		expect(contours.length).to.equal(1);
 		expect(contours[0].$ids).to.not.include(2);
+	});
+
+	describe("Virtual starting point on the hinges", () => {
+
+		/** Added v0.8.0 */
+		it("Goes along the hinge if the intersection ridge is outside", () => {
+			// River 3 covers only the quadrant of flap 4 in the repo, so the
+			// starting point is moved to the intersection ridge (36,52)-(37,53)
+			// dividing the gadgets of flaps 9 and 4, whose hinge-side end is
+			// exactly the first vertex of the hinges. The ridge lies outside
+			// the river, so the tracing goes along the hinge. Previously, it
+			// looked for a ridge only before the starting point, and failed.
+			parseTree(
+				"(0,1,3),(1,3,2),(3,4,2),(1,9,3),(0,10,4),(10,11,4),(11,13,3)",
+				"(4,33,57,0,1),(9,35,50,0,0),(13,50,65,0,0)"
+			);
+			const expected = "(29,62),(29,53),(37,53),(37,773/13),(2467/67,4022/67),(36,62)";
+			expect(outerOf(3)).to.equalPath(expected, true);
+
+			// Moving the gadget of flaps 4 and 13 degenerates the intersection
+			// ridge into the point (37,53). It has no other end, but there's
+			// nothing before the first vertex of the hinges anyway.
+			const pattern = State.$stretches.get("4,9,13")!.$repo.$pattern!;
+			const { x, y } = pattern.$devices[1].$location;
+			LayoutController.moveDevice("4,9,13", 1, { x: x + 1, y: y + 1 });
+			expect(outerOf(3)).to.equalPath(expected, true);
+		});
+
+		/** Added v0.8.0 */
+		it("Turns away from the hinge if the intersection ridge is inside", () => {
+			// The hinge-side end (58,57) of the intersection ridge dividing the
+			// gadgets of flaps 4 and 5 lies in the middle of the hinge of flap
+			// 4, and the ridge goes inside the flap. So the tracing turns
+			// away from the hinge, instead of going along it into the gadget.
+			parseTree(
+				"(0,1,2),(1,4,4),(1,5,1),(0,6,1),(6,8,4),(8,10,2)",
+				"(4,62,59,0,0),(5,56,58,0,0),(10,50,50,0,0)"
+			);
+			expect(outerOf(4)).to.equalPath("(66,63),(58,63),(58,57),(117/2,57),(59,169/3),(59,55),(66,55)", true);
+		});
+
+		/** Added v0.8.0 */
+		it("Traces flaps covering only the latter quadrant", () => {
+			// Similar to the cases above, for the flaps covering only the
+			// quadrant after the intersection ridge. Previously, the corners
+			// of flaps 7 and 10 were not cut, and overlapped with the rivers.
+			parseTree(
+				"(0,1,3),(1,2,6),(0,7,3),(0,8,3),(8,10,4),(10,12,2)",
+				"(2,50,63,0,0),(7,55,50,0,2),(12,67,50,0,0)"
+			);
+			expect(outerOf(7)).to.equalPath("(58,55),(271/5,55),(2521/47,2574/47),(52,54),(52,47),(58,47)", true);
+			parseTree(
+				"(0,1,2),(1,4,2),(4,7,4),(0,8,3),(8,9,4),(8,10,2)",
+				"(7,38,58,0,0),(9,50,70,0,0),(10,50,64,0,0)"
+			);
+			expect(outerOf(10)).to.equalPath("(52,66),(48,66),(48,63),(339/7,437/7),(49,62),(52,62)", true);
+		});
+	});
+
+	describe("Intersection ridges inside the contour", () => {
+
+		/** Added v0.8.0 */
+		it("Does not extend them as rays", () => {
+			// The intersection ridge (59,58)-(58,57) divides the gadgets of
+			// flaps 4 and 5, both inside river 1. Previously, it was extended
+			// as a ray when tracing river 1, which then turned at (56,55)
+			// and overlapped with river 6.
+			parseTree(
+				"(0,1,2),(1,4,4),(1,5,1),(0,6,1),(6,8,4),(8,10,2)",
+				"(4,62,59,0,0),(5,56,58,0,0),(10,50,50,0,0)"
+			);
+			expect(outerOf(1)).to.equalPath("(56,65),(56,61),(53,61),(53,113/2),(55,55),(57,55),(57,53),(68,53),(68,65)", true);
+		});
+
+		/** Added v0.8.0 */
+		it("Still reflects on the ridges themselves", () => {
+			// Here the intersection ridge (54,53)-(58,57) itself crosses
+			// river 1, which reflects on it at (56,55).
+			parseTree(
+				"(0,6,1),(0,1,2),(6,8,4),(1,4,4),(1,5,1),(8,10,2)",
+				"(4,62,59,0,0),(5,57,58,0,0),(10,50,50,0,0)"
+			);
+			expect(outerOf(1)).to.equalPath("(56,65),(56,61),(54,61),(54,169/3),(55,55),(56,55),(56,161/3),(113/2,53),(68,53),(68,65)", true);
+		});
 	});
 
 });

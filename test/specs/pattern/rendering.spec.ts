@@ -8,6 +8,7 @@ import { TreeController } from "core/controller/treeController";
 import { UpdateResult } from "core/service/updateResult";
 import { complete, generateFromFlaps } from "./util";
 import { DesignController } from "core/controller/designController";
+import { LayoutController } from "core/controller/layoutController";
 
 import type { ILine } from "shared/types/geometry";
 import type { NodeId } from "shared/json/tree";
@@ -75,6 +76,24 @@ describe("Rendering", () => {
 		move(16);
 		move(15);
 		expect(river.$ridges).to.containLine(ridge);
+	});
+
+	/** Added v0.8.0 */
+	it("Does not connect river ridges to free corners on the same side", () => {
+		// The ridge shot from the inner corner (57,57) of river 1 (that is,
+		// the corner of flap 5) hits the free corner (59,55), which is a
+		// vertex of the contour of flap 4, on the inner side of the river as
+		// well. It is not related to the corner.
+		parseTree(
+			"(0,6,1),(0,1,2),(6,8,4),(1,4,4),(1,5,1),(8,10,2)",
+			"(4,62,59,0,0),(5,56,58,0,0),(10,50,50,0,0)"
+		);
+		const pattern = State.$stretches.get("4,5,10")!.$repo.$pattern!;
+		const { x, y } = pattern.$devices[0].$location;
+		LayoutController.moveDevice("4,5,10", 0, { x: x - 2, y: y - 2 });
+		const river = State.m.$tree.$nodes[1 as NodeId]!.$graphics;
+		const ridge: ILine = [{ x: 57, y: 57 }, { x: 59, y: 55 }];
+		expect(river.$ridges).to.not.containLine(ridge);
 	});
 
 });

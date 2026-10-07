@@ -24,8 +24,6 @@ export interface QuadrantStartEnd {
 	 * dividing the gadgets of these flaps.
 	 */
 	startDivision?: [NodeId, NodeId];
-	/** Same as {@link startDivision}, for the ending point. */
-	endDivision?: [NodeId, NodeId];
 }
 
 //=================================================================
@@ -104,10 +102,12 @@ export class Quadrant {
 	 * the node) do not show up on the contour of the node, as they are
 	 * digested by the inner flaps. So only the junctions with flaps outside the
 	 * node determine the starting/ending points, and where the gadget of such a
-	 * junction is adjacent to the gadget of an inner junction, the
-	 * starting/ending point should be moved to the intersection ridge between
-	 * the two gadgets instead (the actual location is resolved by
-	 * {@link RepoTrace} using the returned pair of flap ids).
+	 * junction is adjacent to the gadget of an inner junction on the starting
+	 * side, the starting point should be moved to the intersection ridge
+	 * between the two gadgets instead (the actual location is resolved by
+	 * {@link RepoTrace} using the returned pair of flap ids). Doing the same on
+	 * the ending side makes no difference in a large number of valid layouts,
+	 * so it is not done.
 	 *
 	 * Returns `null` if all junctions of this quadrant are with inner flaps, in
 	 * which case this quadrant does not participate in the tracing of the node
@@ -132,14 +132,12 @@ export class Quadrant {
 		if(!inside.length) return { start, end };
 
 		// The starting side corresponds to one of the axes (see
-		// _startEndPoints), and the ending side the other
+		// _startEndPoints)
 		const reversed = this.q % 2 != SlashDirection.FW;
 		const startAxis: Axis = reversed ? "x" : "y";
-		const endAxis: Axis = reversed ? "y" : "x";
 		return {
 			start, end,
 			startDivision: this._findNeighbor(inside, outside, o, startAxis),
-			endDivision: this._findNeighbor(inside, outside, o, endAxis),
 		};
 	}
 

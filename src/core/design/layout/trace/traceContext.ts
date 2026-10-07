@@ -58,19 +58,7 @@ export class TraceContext {
 	public $getInitialNode(
 		ridges: Set<Ridge>, startDiagonal?: SideDiagonal
 	): TraceNode | null {
-		// If the start diagonal hits the hinges, the hinges before it lie
-		// outside the starting line, and they should not be considered (they
-		// could hit some ridges, especially when the hinges are carved in raw
-		// mode; see getQuadrantShape).
-		let startIndex = 0;
-		const diagonal = startDiagonal;
-		if(diagonal) {
-			const index = this._hinges.findIndex(
-				h => h.$intersectLine(diagonal, false)
-			);
-			if(index >= 0) startIndex = index;
-		}
-		for(const hinge of this._hinges.slice(startIndex)) {
+		for(const hinge of this._hinges) {
 			const v = hinge.$vector;
 			const ray = { point: hinge.p1, vector: v };
 
@@ -80,7 +68,8 @@ export class TraceContext {
 				if(p) {
 					const hv =
 						this._diagonalHitInitialVector(hinge, v, startDiagonal);
-					if(!p.eq(startDiagonal.p0)) {
+					const corner = p.eq(startDiagonal.p0);
+					if(!corner || startsAt(hinge, startDiagonal)) {
 						return { point: p, vector: hv };
 					} else {
 						// In this case we modify the ray and go to the case 2.
@@ -152,7 +141,7 @@ export class TraceContext {
 	private _diagonalHitInitialVector(
 		hinge: Line, v: Vector, diagonal: SideDiagonal
 	): Vector {
-		const cornerIsOnOutside = hinge.$pointIsOnRight(diagonal.p0, true);
+		const cornerIsOnOutside = isCornerOnOutside(hinge, diagonal);
 		const forward = this._trace.$direction == SlashDirection.FW;
 		const resultIsVertical = forward == cornerIsOnOutside;
 		const lineIsVertical = v.x == 0;
@@ -215,6 +204,60 @@ function isCloser(r: RidgeIntersection, x: RidgeIntersection | null): boolean {
 
 export function isSideDiagonal(line: Line): line is SideDiagonal {
 	return "p0" in line;
+}
+
+/**
+ * A virtual side diagonal, made from an intersection ridge (see
+ * {@link StartEnd.startRidge}).
+ */
+export interface VirtualDiagonal extends SideDiagonal {
+	readonly $virtual: true;
+
+	/**
+	 * The other end of the intersection ridge, that is, the one not on the
+	 * side of the hinges. Undefined if the ridge is degenerated.
+	 */
+	readonly $inner?: Point;
+}
+
+function isVirtual(diagonal: SideDiagonal): diagonal is VirtualDiagonal {
+	return "$virtual" in diagonal;
+}
+
+/**
+ * When the start diagonal hits the hinge exactly at its corner, whether the
+ * tracing simply starts there. Otherwise, the corner of an actual side
+ * diagonal is where the gadget touches the hinge, and we look for the ridge
+ * coming out of it.
+ *
+ * A virtual diagonal is not a ridge, so there's no such ridge, unless the
+ * intersection ridge is degenerated (in which case its point is where the
+ * gadgets meet). Even then, there's nothing before the corner to look for if
+ * it is the head of the hinge.
+ */
+function startsAt(hinge: Line, diagonal: SideDiagonal): boolean {
+	if(!isVirtual(diagonal)) return false;
+	return Boolean(diagonal.$inner) || diagonal.p0.eq(hinge.p1);
+}
+
+/**
+ * Whether the {@link RoughContour} doesn't wrap around the corner of the
+ * diagonal.
+ *
+ * The corner of a virtual diagonal could lie exactly on the hinges, in which
+ * case the side is decided by the other end of the intersection ridge instead.
+ * It is outside if it is on the outer side of the hinge, or beyond the ends of
+ * the hinge (where the contour turns away).
+ */
+function isCornerOnOutside(hinge: Line, diagonal: SideDiagonal): boolean {
+	const inner = isVirtual(diagonal) ? diagonal.$inner : undefined;
+	if(!inner || !hinge.$contains(diagonal.p0, true)) {
+		return hinge.$pointIsOnRight(diagonal.p0, true);
+	}
+	const v = hinge.$vector;
+	const t = inner.$sub(hinge.p1).$dot(v);
+	if(t <= 0 || t >= v.$dot(v)) return true;
+	return hinge.$pointIsOnRight(inner, true);
 }
 
 /**

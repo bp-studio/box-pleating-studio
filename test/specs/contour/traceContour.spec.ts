@@ -85,7 +85,7 @@ describe("Trace contour", () => {
 	});
 
 	/** Added v0.6.16 */
-	it("Breaks up raw group if any flap is used in more than one repos", () => {
+	it("Splits the flap used in more than one repos by quadrants", () => {
 		parseTree(
 			"(12,8,2),(12,15,2),(12,14,10),(12,13,10),(8,4,5),(15,20,16),(15,19,4),(15,18,4)",
 			"(13,10,24,2,0),(14,60,24,2,0),(18,55,8,0,0),(19,17,8,0,0),(20,36,0,0,0),(4,36,25,0,0)"
@@ -120,10 +120,12 @@ describe("Trace contour", () => {
 
 	/** Added v0.8.0 */
 	it("Resolves the starting/ending points by the leaves of each raw contour", () => {
-		// Flap 19 is used in three repos, so the leaves 6, 12 and 19 of
-		// node 0 have separate raw contours. The junctions 6-19 and 12-19
-		// are digested by node 0 as a whole, but not by the raw contours of
-		// 6 and 12, so the starting/ending points of tracing in those raw
+		// Flap 19 is used in three repos, so it is split by quadrants, and
+		// flaps 6 and 12 are traced on separate raw contours, each together
+		// with a quadrant part of flap 19. Originally, the leaves 6, 12 and
+		// 19 had separate raw contours. The junctions 6-19 and 12-19 are
+		// digested by node 0 as a whole, but not by the raw contours of 6
+		// and 12, so the starting/ending points of tracing in those raw
 		// contours must not be moved.
 		parseTree(
 			"(13,0,3),(13,15,1),(13,16,1),(0,4,5),(0,19,3),(0,3,7),(15,14,1),(15,17,1),(4,6,3),(3,12,1),(14,18,1),(14,1,1)",
@@ -153,24 +155,45 @@ describe("Trace contour", () => {
 	});
 
 	/** Added v0.8.0 */
-	it("Resolves the starting/ending points by the quadrants of each raw contour", () => {
-		// Flaps 1 and 2 have separate raw contours of node 15, and both of
-		// them have lower-left quadrants in the repo with flap 14. When
-		// tracing each raw contour, only the quadrant wrapped by it should
-		// be used for resolving the starting/ending points.
+	it("Resolves the starting/ending points by the quadrants of each component", () => {
+		// Node 8 has two components, wrapping flaps 14 and 15 respectively,
+		// and both flaps have quadrants in the repo with flap 7. When tracing
+		// each component, only the quadrants wrapped by it should be used for
+		// resolving the starting/ending points. Otherwise the contours are
+		// not modified at all.
+		// Note that this is not needed for raw contours anymore, as the
+		// pieces are split by repos.
 		parseTree(
-			"(0,15,2),(0,14,10),(15,1,5),(15,12,5),(15,8,2),(15,13,5),(15,2,5),(15,10,2)",
-			"(2,24,33,0,0),(1,33,24,0,0),(14,17,17,0,0),(13,10,33,0,0),(12,33,10,0,0),(10,17,31,0,5),(8,31,17,5,0)"
+			"(0,1,2),(1,4,6),(4,7,4),(0,8,2),(8,13,1),(13,14,1),(13,15,4)",
+			"(7,80,57,0,0),(14,74,42,0,0),(15,61,50,1,0)"
 		);
 		const result = UpdateResult.$flush();
-		const outer = result.graphics["re0,15"].contours[0].outer;
-		expect(outer).to.equalPath("(31,31),(31,40),(3,40),(3,26),(37/3,26),(41/3,27),(61/3,27),(65/3,26),(26,26),(26,65/3),(27,61/3),(27,41/3),(26,37/3),(26,3),(40,3),(40,31)", true);
+		const contours = result.graphics["re0,8"].contours;
+		expect(contours[0].outer).to.equalPath("(54,57),(54,43),(69,43),(69,261/5),(68,273/5),(68,57)", true);
+		expect(contours[1].outer).to.equalPath("(70,46),(70,38),(78,38),(78,45),(230/3,45),(76,91/2),(76,137/3),(376/5,46)", true);
+	});
+
+	/** Added v0.8.0 */
+	it("Moves the ending point to the intersection ridge with the next quadrant outside", () => {
+		// Flaps 3 and 10 are both in the repo with flap 18, in the same
+		// direction, and the node of flap 3 covers only the first of them.
+		// So the ending point of tracing flap 3 must be moved to the
+		// intersection ridge dividing the gadgets of flaps 3 and 10.
+		parseTree(
+			"(0,1,4),(1,3,1),(1,8,3),(8,10,1),(0,11,2),(11,16,4),(16,18,2)",
+			"(3,50,50,0,0),(10,55,50,0,0),(18,43,38,0,1)"
+		);
+		const flap = State.m.$tree.$nodes[3 as NodeId]!;
+		const outer = flap.$graphics.$contours[0].outer;
+		expect(outer).to.equalPath("(51,51),(49,51),(49,99/2),(149/3,49),(51,49)", true);
 	});
 
 	/** Added v0.8.0 */
 	it("Traces raw contours on the shapes of quadrants", () => {
-		// Flaps 1 and 2 have separate raw contours of node 15, and the
-		// junction 1-2 is digested by node 15. When tracing the upper-left
+		// Flaps 1 and 2 are split by quadrants, and the upper-left part of
+		// flap 1 and the lower-right part of flap 2 form a raw contour of
+		// node 15, which covers only a part of the overlapping region of the
+		// junction 1-2 digested by node 15. When tracing the upper-left
 		// quadrant of flap 1 (towards flap 14), the overlapping region of
 		// 1-2 must be carved out, and the result is extended back to the
 		// raw contour. Otherwise, the contour cuts across flap 14.
@@ -260,6 +283,26 @@ describe("Trace contour", () => {
 		const junction = State.$junctions.get(36 as NodeId, 53 as NodeId)!;
 		expect(junction.$valid).to.be.false;
 		expect(State.$stretches.get("4,44,73")!.$repo.$pattern).to.not.equal(null);
+	});
+
+	/** Added v0.8.0 */
+	it("Splits shared leaves by quadrants in raw mode", () => {
+		// Flap 56 is in repo {56,74} by its lower-right quadrant, and in repo
+		// {14,56,57} by its lower-left quadrant. The latter has no missing
+		// corners in node 52, but it must still be traced on a single piece
+		// with the lower-left part of flap 56 and flap 57. Previously, flap 56
+		// was taken out as a whole, and the virtual starting point led to a
+		// wrong initial direction. The result must be the same as if flap 74
+		// is not there.
+		parseTree(
+			"(47,52,9),(47,74,1),(52,57,3),(52,56,2),(14,47,8)",
+			"(14,28,44,0,0),(57,40,60,0,0),(56,45,56,0,0),(74,56,49,0,0)"
+		);
+		const result = UpdateResult.$flush();
+		const node = State.m.$tree.$nodes[52 as NodeId]!;
+		expect(node.$graphics.$traceContours[0].$raw).to.be.true;
+		const outer = result.graphics["re47,52"].contours[0].outer;
+		expect(outer).to.equalPath("(52,67),(52,72),(28,72),(28,52),(92/3,52),(36,48),(36,45),(55,45),(55,50),(56,50),(56,67)", true);
 	});
 
 });

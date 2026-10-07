@@ -61,7 +61,7 @@ export class RepoTrace extends Trace {
 				const startWeight = pointWeight(resolved.start, f);
 				if(startWeight < pointWeight(result.start, f)) {
 					result.start = resolved.start;
-					result.virtualStart = resolved.virtualStart;
+					result.startRidge = resolved.startRidge;
 				}
 				if(pointWeight(resolved.end, f) > pointWeight(result.end, f)) {
 					result.end = resolved.end;
@@ -83,7 +83,7 @@ export class RepoTrace extends Trace {
 				/* istanbul ignore else: legacy */
 				if(ridge) {
 					result.start = hingeSideEnd(ridge, all[first]);
-					result.virtualStart = true;
+					result.startRidge = ridge;
 				}
 			}
 			if(last < all.length - 1) {
@@ -110,20 +110,15 @@ export class RepoTrace extends Trace {
 		const resolved = quadrant.$resolveStartEnd(leaves);
 		if(!resolved) return null;
 		const result: StartEnd = {
-			start: resolved.start, end: resolved.end, virtualStart: false,
+			start: resolved.start, end: resolved.end,
 		};
 		if(resolved.startDivision) {
 			const ridge = this._getIntersectionRidge(...resolved.startDivision);
 			/* istanbul ignore else: legacy */
 			if(ridge) {
 				result.start = hingeSideEnd(ridge, quadrant);
-				result.virtualStart = true;
+				result.startRidge = ridge;
 			}
-		}
-		if(resolved.endDivision) {
-			const ridge = this._getIntersectionRidge(...resolved.endDivision);
-			/* istanbul ignore else: legacy */
-			if(ridge) result.end = hingeSideEnd(ridge, quadrant);
 		}
 		return result;
 	}
@@ -135,7 +130,8 @@ export class RepoTrace extends Trace {
 			this.$leaves.has(id) || inside.has(id);
 		for(const junction of State.$junctions.values()) {
 			if(junction.$valid) continue;
-			if(involves(junction.$a.id) || involves(junction.$b.id)) return true;
+			const { $a: a, $b: b } = junction;
+			if(involves(a.id) || involves(b.id)) return true;
 		}
 		return false;
 	}

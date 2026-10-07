@@ -1,7 +1,7 @@
 import { Task } from "./task";
 import { graphicsTask } from "./graphics";
 import { State } from "core/service/state";
-import { makePerQuadrant, quadrantNumber } from "shared/types/direction";
+import { makePerQuadrant, makeQuadrantCode, quadrantNumber } from "shared/types/direction";
 import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 import { RepoTrace } from "../layout/trace/repoTrace";
@@ -111,11 +111,13 @@ export function processNode(
 			}
 
 			// Create start/end map
+			const included = (outer as RawPiece).quadrants;
 			const quadrants = coveredQuadrants
 				// Make sure that the current path actually wraps
 				// around the quadrant (also for each raw piece)
 				.filter(q => !multiContour && !traceContour.$raw ||
-					leaves.includes(q.$flap.id));
+					leaves.includes(q.$flap.id) && (!included ||
+						included.has(makeQuadrantCode(q.$flap.id, q.q))));
 			// The junctions with the flaps inside the whole node are considered
 			// digested. In raw mode, that is made consistent with the geometry
 			// by getQuadrantShape (see processOuter).
@@ -192,7 +194,7 @@ function processTrace(
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
 	let contour = context.trace.$generate(
-		hingeSegment, map.start, map.end, context.rawMode, map.virtualStart,
+		hingeSegment, map.start, map.end, context.rawMode, map.startRidge,
 		context.inside
 	);
 	if(contour && base && shape) contour = extendToBase(base, shape, contour);

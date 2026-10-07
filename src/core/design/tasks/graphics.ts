@@ -3,7 +3,6 @@ import { State } from "core/service/state";
 import { toCorners } from "../context/aabb/aabb";
 import { same } from "shared/types/geometry";
 import { SlashDirection, quadrantNumber } from "shared/types/direction";
-import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { Line } from "core/math/geometry/line";
 import { combineContour } from "./utils/combine";
 import { getOrSetEmptyArray } from "shared/utils/map";
@@ -97,6 +96,9 @@ function flapRidge(node: ITreeNode): ILine[] {
 	return ridges;
 }
 
+/** A right angle corner, given by the point and its previous and next. */
+type Corner = [p1: IPoint, p0: IPoint, p2: IPoint];
+
 /** A map for quickly lookup the free corners. */
 type FreeCornerMap = Record<1 | -1, ReadonlyMap<number, Point[]>>;
 
@@ -117,26 +119,40 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 		const side = (contour.outer as PathEx).isHole ? -1 : 1;
 
 		// Create a record for all the vertices in inner contour.
-		const innerRightCorners = new Map<number, [IPoint, IPoint, IPoint]>();
-		const doubled = new Set<number>();
+		const innerRightCorners = new Map<string, Corner>();
+		const doubled = new Set<string>();
 		for(const path of contour.inner) {
-			for(const [p1, p0, p2] of pathRightCorners(path)) {
-				const key = getOrderedKey(p1.x, p1.y);
+			for(const corner of pathRightCorners(path)) {
+				const key = pointKey(corner[0]);
 				if(innerRightCorners.has(key)) doubled.add(key);
-				else innerRightCorners.set(key, [p1, p0, p2]);
+				else innerRightCorners.set(key, corner);
 			}
 		}
+
+		// A ridge shot from one side must not hit a free corner on the same
+		// side (the free corner could also be inside the river, or on the
+		// other side).
+		const inner = contour.inner;
+		const notOnInner = (c: Point): boolean =>
+			!inner.some(path => pathContains(path, c));
+		const notOnOuter = (c: Point): boolean =>
+			!pathContains(contour.outer, c);
 
 		// Check for each vertex on the outer contour.
 		for(const [p1, p0, p2] of pathRightCorners(contour.outer)) {
 			const p = getCorrespondingPoint(p1, p0, p2, width, side);
-			const innerKey = getOrderedKey(p.x, p.y);
+			const innerKey = pointKey(p);
 			// In some edge cases, it is possible that the corresponding inner
 			// point exists while the proposed ridge crease also hits a free
 			// corner at the same time. In that case, free corner should be used
 			// first.
-			const added = tryAddRemainingRidge(p1, p, freeCornerMap, ridges);
-			if(!added && innerRightCorners.has(innerKey)) {
+			const added =
+				tryAddRemainingRidge(p1, p, freeCornerMap, ridges, notOnOuter);
+			const corner = innerRightCorners.get(innerKey);
+			// The inner corner must also face the outer corner, that is, its
+			// corresponding point must be the outer corner. Otherwise the two
+			// corners are not related, and they happen to be at the distance.
+			if(!added && corner && faces(corner, p1, width, side)) {
 				ridges.push([p1, p]);
 				if(!doubled.has(innerKey)) innerRightCorners.delete(innerKey);
 			}
@@ -148,7 +164,7 @@ function riverRidge(node: ITreeNode, freeCorners: Point[]): ILine[] {
 			// the contours by their outer/inner relation, so there's no need to
 			// flip `side` parameter here.
 			const p = getCorrespondingPoint(p1, p0, p2, width, side);
-			tryAddRemainingRidge(p1, p, freeCornerMap, ridges);
+			tryAddRemainingRidge(p1, p, freeCornerMap, ridges, notOnInner);
 		}
 	}
 	return ridges;
@@ -181,8 +197,38 @@ function getCorrespondingPoint(
 	return { x: p1.x - side * fy * width, y: p1.y + side * fx * width };
 }
 
+/**
+ * The key of a point. Note that the coordinates could be negative or
+ * fractional, so a numeric key packing the coordinates doesn't work here.
+ */
+function pointKey(p: IPoint): string {
+	return p.x + "," + p.y;
+}
+
+/**
+ * Whether the given right angle corner faces the point, that is, its
+ * corresponding point is exactly the given point.
+ */
+function faces(
+	[p1, p0, p2]: Corner, p: IPoint, width: number, side: Sign
+): boolean {
+	const q = getCorrespondingPoint(p1, p0, p2, width, side);
+	return q.x == p.x && q.y == p.y;
+}
+
+/** Whether the point lies on the path (including the vertices). */
+function pathContains(path: Path, p: Point): boolean {
+	return path.some((v, i) =>
+		Line.$fromIPoint(v, path[(i + 1) % path.length]).$contains(p, true)
+	);
+}
+
+/**
+ * @param accepts Whether a free corner can be hit by the ridge.
+ */
 function tryAddRemainingRidge(
-	p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[]
+	p1: IPoint, p: IPoint, freeCornerMap: FreeCornerMap, ridges: ILine[],
+	accepts: (corner: Point) => boolean
 ): boolean {
 	const line = Line.$fromIPoint(p1, p);
 	const f = line.$slope;
@@ -197,7 +243,10 @@ function tryAddRemainingRidge(
 	let min = Number.POSITIVE_INFINITY;
 	for(const c of sideCorners) {
 		const distance = Math.abs(c.x - p1.x);
-		if(distance == 0 || distance >= min || !line.$contains(c, true)) {
+		if(
+			distance == 0 || distance >= min ||
+			!line.$contains(c, true) || !accepts(c)
+		) {
 			continue;
 		}
 		corner = c;

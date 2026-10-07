@@ -2,25 +2,27 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { patternContourTask } from "./patternContour";
 import { getOrSetEmptyArray } from "shared/utils/map";
-import { mapDirections } from "core/math/geometry/path";
 import { AAUnion } from "core/math/sweepLine/polyBool";
 import { climb } from "./utils/climb";
 import { expandPath, simplify } from "./utils/expand";
 import { getNewCarvings, rebuild } from "./utils/invasion";
 import { createRawPieces } from "./utils/rawPiece";
-import { createLeafSets, extractInvalidGroups } from "./utils/leafGroup";
+import { collectNodeSets, createLeafSets, extractInvalidGroups } from "./utils/leafGroup";
+import { createQuadrantGroups } from "./utils/quadrantGroup";
+import { checkCriticalCorners, cornerSignature } from "./utils/criticalCorner";
 
 import type { RawPiece, getQuadrantShape } from "./utils/rawPiece";
+import type { LeafSet } from "./utils/leafGroup";
+import type { CriticalCorner } from "./utils/criticalCorner";
 import type { NodeId } from "shared/json/tree";
 import type { Invasion, ValidJunction } from "../layout/junction/validJunction";
-import type { Quadrant } from "../layout/pattern/quadrant";
-import type { QuadrantDirection } from "shared/types/direction";
-import type { Path, PathEx } from "shared/types/geometry";
+import type { QuadrantCode } from "shared/types/direction";
+import type { PathEx } from "shared/types/geometry";
 import type { NodeSet } from "../layout/nodeSet";
 import type { Stretch } from "../layout/stretch";
 import type { ITreeNode, NodeGraphics, RoughContour, TraceContour, PatternContour } from "../context";
 
-const coveredJunctionMap = new Map<number, ValidJunction[]>();
+const coveredJunctionMap = new Map<NodeId, ValidJunction[]>();
 const stretchMap = new Map<number, Stretch[]>();
 
 /**
@@ -34,19 +36,6 @@ const signatureCache = new Map<number, string>();
 
 const aaUnion = new AAUnion();
 const expander = new AAUnion(true);
-
-/**
- * A {@link CriticalCorner} is a the {@link Quadrant.$corner} of a involved
- * {@link Quadrant}. It is necessary (though not always sufficient) for the
- * {@link TraceContour} to expose all relevant CriticalCorners for the tracing
- * algorithm to work.
- */
-interface CriticalCorner {
-	readonly $signature: string;
-	readonly $flap: NodeId;
-	readonly $nodeSet: NodeSet;
-	readonly $quadrant: Quadrant;
-}
 
 //=================================================================
 /**
@@ -169,16 +158,6 @@ function getCriticalCorners(
 	return result;
 }
 
-/**
- * Create a signature for a critical corner.
- *
- * Note that it does not suffice to check just the coordinates,
- * but also need to consider the turning direction of the corners.
- */
-function cornerSignature(p: IPoint, dir: QuadrantDirection): string {
-	return p.x + "," + p.y + "," + dir;
-}
-
 function toTraceContour(
 	node: ITreeNode, roughContour: RoughContour,
 	criticalCorners: CriticalCorner[]
@@ -264,24 +243,6 @@ function getInnerSource(node: ITreeNode, child: RoughContour): InnerSource {
 }
 
 /**
- * Check if all critical corners appears in the union path.
- *
- * This methods modifies {@link corners}, so it should only be invoked once.
- */
-function checkCriticalCorners(
-	result: readonly Path[],
-	corners: Set<string> | Map<string, CriticalCorner>
-): boolean {
-	for(const path of result) {
-		const dirs = mapDirections(path);
-		for(const [i, p] of path.entries()) {
-			corners.delete(cornerSignature(p, dirs[i]));
-		}
-	}
-	return corners.size == 0;
-}
-
-/**
  * Create the outer contour in raw mode.
  * @param missing The missing critical corners.
  */
@@ -289,37 +250,9 @@ function createRawContour(
 	node: ITreeNode, missing: readonly CriticalCorner[],
 	leaves: readonly NodeId[], children: readonly RoughContour[]
 ): PathEx[] {
-	const tree = State.m.$tree;
 	const remainingLeaves = new Set(leaves);
 	const result: PathEx[] = [];
-
-	const nodeSets = new Set(missing.map(c => c.$nodeSet));
-	const leafSets = createLeafSets([...nodeSets], remainingLeaves);
-	const sharedLeaves = new Set<NodeId>();
-	for(const leafSet of leafSets) {
-		if(leafSet.hasOverlapping) { // We'll handle these later
-			for(const id of leafSet) sharedLeaves.add(id);
-		} else { // Group all relevant leaves into one raw contour
-			const [pieces, outers] = createRawContourForLeaves(node, leafSet);
-
-			// If the missing corners are not exposed even in the union of the
-			// LeafSet, they are eaten by the leaves of the LeafSet itself,
-			// and we have to break it up as well.
-			const corners = new Set(missing
-				.filter(c => c.$nodeSet == leafSet.nodeSet)
-				.map(c => c.$signature));
-			if(checkCriticalCorners(outers, corners)) {
-				result.push(...packPaths(outers, leafSet, pieces));
-			} else {
-				for(const id of leafSet) sharedLeaves.add(id);
-			}
-		}
-	}
-	// Each shared leaf will have its own raw contour
-	for(const id of sharedLeaves) {
-		const pieces = createRawContourForLeaf(node, tree.$nodes[id]!);
-		result.push(...packPaths(pieces, [id], pieces));
-	}
+	result.push(...createLeafSetContours(node, missing, remainingLeaves));
 
 	// See extractInvalidGroups
 	for(const group of extractInvalidGroups(leaves, remainingLeaves)) {
@@ -343,6 +276,38 @@ function createRawContour(
 		result.push(...packPaths(outers, [...remainingLeaves]));
 	}
 
+	return result;
+}
+
+/**
+ * Create the raw contours for the {@link LeafSet}s of the {@link NodeSet}s
+ * involved (see {@link collectNodeSets}), and remove the leaves of them from
+ * {@link remainingLeaves}.
+ */
+function createLeafSetContours(
+	node: ITreeNode, missing: readonly CriticalCorner[],
+	remainingLeaves: Set<NodeId>
+): PathEx[] {
+	const result: PathEx[] = [];
+	const candidates = (stretchMap.get(node.id) ?? [])
+		.map(s => s.$repo.$nodeSet);
+	const nodeSets = collectNodeSets(
+		missing.map(c => c.$nodeSet), candidates, remainingLeaves
+	);
+	const leafSets = createLeafSets(nodeSets, remainingLeaves);
+	const groups = createQuadrantGroups(node, leafSets, coveredJunctionMap);
+	for(const { outers, leaves, pieces, quadrants } of groups) {
+		result.push(...packPaths(outers, leaves, pieces, quadrants));
+	}
+	// Each of the other LeafSets goes to one raw contour. Note that the flaps
+	// of the same repo never eat the corners of each other in valid layouts,
+	// so the missing corners are always exposed, unless carved out by the
+	// leaves themselves.
+	for(const leafSet of leafSets) {
+		if(leafSet.hasOverlapping) continue;
+		const [pieces, outers] = createRawContourForLeaves(node, leafSet);
+		result.push(...packPaths(outers, leafSet, pieces));
+	}
 	return result;
 }
 
@@ -388,13 +353,18 @@ function recursiveExpand(
 /**
  * @param pieces If given, and the outers form a single path,
  * the {@link RawPiece.carvings} of the pieces are kept on the path.
+ * @param quadrants See {@link RawPiece.quadrants}.
  */
 function packPaths(
-	outers: PathEx[], leaves: NodeId[], pieces?: RawPiece[]
+	outers: PathEx[], leaves: NodeId[], pieces?: RawPiece[],
+	quadrants?: ReadonlySet<QuadrantCode>
 ): PathEx[] {
 	// For the final checking in tracing algorithm.
 	const result: RawPiece[] = outers.map(simplify);
-	result.forEach(o => o.leaves = leaves);
+	for(const path of result) {
+		path.leaves = leaves;
+		if(quadrants) path.quadrants = quadrants;
+	}
 	if(pieces && result.length == 1) {
 		result[0].carvings = pieces.flatMap(p => p.carvings ?? []);
 	}

@@ -1,19 +1,23 @@
 import { State } from "core/service/state";
 import { getQuadrant, makePerQuadrant } from "shared/types/direction";
 import { carveCorners, cornerRect } from "./carve";
+import { getFactors } from "../../layout/pattern/quadrant";
 import { fitsAt } from "./invasion";
 import { simplify } from "./expand";
 import { tryInsert } from "./combine";
 import { Line } from "core/math/geometry/line";
 import { toRationalPath } from "core/math/geometry/rationalPath";
+import { AAUnion } from "core/math/sweepLine/polyBool";
 
 import type { IRect } from "./carve";
 import type { Path, PathEx } from "shared/types/geometry";
 import type { Point } from "core/math/geometry/point";
 import type { RationalPath } from "core/math/geometry/rationalPath";
-import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
+import type { PerQuadrant, QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { ValidJunction } from "../../layout/junction/validJunction";
 import type { ITreeNode, PatternContour } from "../../context";
+
+const aaUnion = new AAUnion();
 
 /**
  * The carving of a leaf in a raw piece (see {@link traceContourTask}).
@@ -22,7 +26,10 @@ import type { ITreeNode, PatternContour } from "../../context";
  * the overlapping regions of some of its junctions carved out of the corners.
  */
 export interface Carving {
-	/** The hinge rectangle of the leaf expanded to the node. */
+	/**
+	 * The hinge rectangle of the leaf expanded to the node (or a part of it,
+	 * see {@link createQuadrantPieces}).
+	 */
 	readonly rect: IRect;
 
 	/**
@@ -44,6 +51,9 @@ export interface Carving {
 	 */
 	readonly always: IRect[];
 
+	/** Same as {@link always}, by the quadrant of the leaf. */
+	readonly alwaysByQuadrant: PerQuadrant<IRect[]>;
+
 	/**
 	 * The corners of the other digested junctions (i.e. with the flaps also
 	 * inside the node), by the quadrant of the leaf. These are carved out only
@@ -58,6 +68,12 @@ export interface Carving {
  */
 export interface RawPiece extends PathEx {
 	carvings?: Carving[];
+
+	/**
+	 * If defined, only these quadrants of the leaves are included in the piece
+	 * (see {@link createQuadrantPieces}), and only they are traced on it.
+	 */
+	quadrants?: ReadonlySet<QuadrantCode>;
 }
 
 /**
@@ -75,24 +91,75 @@ export function createRawPieces(
 }
 
 /**
+ * Create the raw pieces of a part of a single leaf under the node, consisting
+ * of the given quadrants only (see {@link createRawContour}).
+ *
+ * The part of a quadrant is the hinge rectangle of the leaf expanded to the
+ * node, restricted to the quadrant together with the rectangle of the leaf
+ * itself, so that the parts of the four quadrants overlap exactly on the
+ * rectangle of the leaf. Only the corners of the quadrant are carved, as the
+ * pattern contours of the quadrant modify the part only.
+ */
+export function createQuadrantPieces(
+	node: ITreeNode, leaf: ITreeNode, covered: readonly ValidJunction[],
+	quadrants: readonly QuadrantDirection[]
+): RawPiece[] {
+	const carving = createCarving(node, leaf, new Set(covered));
+	const { rect } = carving;
+	const [t, r, b, l] = leaf.$AABB.$toValues();
+	const result: RawPiece[] = [];
+	for(const q of quadrants) {
+		const f = getFactors(q);
+		const part: IRect = {
+			x1: f.x > 0 ? l : rect.x1, x2: f.x > 0 ? rect.x2 : r,
+			y1: f.y > 0 ? b : rect.y1, y2: f.y > 0 ? rect.y2 : t,
+		};
+		const clip = (corners: readonly IRect[]): IRect[] => corners
+			.map(c => clipRect(c, part))
+			.filter(c => c.x1 < c.x2 && c.y1 < c.y2);
+		const always = clip(carving.alwaysByQuadrant[q]);
+		const partCarving: Carving = {
+			rect: part,
+			always,
+			alwaysByQuadrant: makePerQuadrant(p => p == q ? always : []),
+			digested: makePerQuadrant(
+				p => p == q ? clip(carving.digested[q]) : []
+			),
+		};
+		const paths: RawPiece[] = carveCorners(part, always);
+		for(const path of paths) path.carvings = [partCarving];
+		result.push(...paths);
+	}
+	return result;
+}
+
+function clipRect(a: IRect, b: IRect): IRect {
+	return {
+		x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1),
+		x2: Math.min(a.x2, b.x2), y2: Math.min(a.y2, b.y2),
+	};
+}
+
+/**
  * The shape of the raw piece for tracing the given quadrant, that is, with the
  * overlapping regions of the digested junctions in that quadrant carved out as
  * well. Returns `null` if there is no such junctions (so that the base shape
  * applies).
+ *
+ * A piece formed by multiple leaves (or parts of them, see
+ * {@link createQuadrantPieces}) has multiple carvings, and the shape is the
+ * union of the carved rectangles.
  */
 export function getQuadrantShape(
 	piece: RawPiece, q: QuadrantDirection
 ): PathEx[] | null {
 	const carvings = piece.carvings;
 	if(!carvings || carvings.every(c => !c.digested[q].length)) return null;
-	// Under the current understanding, a piece formed by multiple leaves never
-	// needs the shape of a quadrant: the digested junction would be with
-	// another leaf of the same group, which eats the corner of the quadrant,
-	// and so the group would have been broken up (see createRawContour). So
-	// there is only one carving here. We'll deal with it if we ever encounter
-	// a counterexample.
-	const c = carvings[0];
-	return carveCorners(c.rect, c.always.concat(c.digested[q])).map(simplify);
+	const shapes = carvings.map(
+		c => carveCorners(c.rect, c.always.concat(c.digested[q]))
+	);
+	const paths = shapes.length > 1 ? aaUnion.$get(...shapes) : shapes[0];
+	return paths.map(simplify);
 }
 
 /**
@@ -143,6 +210,7 @@ function createCarving(
 	const rect: IRect = { x1: lf - l, y1: b - l, x2: r + l, y2: t + l };
 	const inside = new Set(node.$leaves.map(n => n.id));
 	const always: IRect[] = [];
+	const alwaysByQuadrant = makePerQuadrant<IRect[]>(() => []);
 	const digested = makePerQuadrant<IRect[]>(() => []);
 	for(const junction of State.$junctions.values()) {
 		if(!junction.$valid || !junction.$involves(leaf.id)) continue;
@@ -167,8 +235,12 @@ function createCarving(
 
 		const q = getQuadrant(j.$a === leaf ? j.$q1 : j.$q2);
 		const corner = cornerRect(rect, q, j.$o.x, j.$o.y);
-		if(isDigested && !isCovered && !isInvaded) digested[q].push(corner);
-		else always.push(corner);
+		if(isDigested && !isCovered && !isInvaded) {
+			digested[q].push(corner);
+		} else {
+			always.push(corner);
+			alwaysByQuadrant[q].push(corner);
+		}
 	}
-	return { rect, always, digested };
+	return { rect, always, alwaysByQuadrant, digested };
 }
