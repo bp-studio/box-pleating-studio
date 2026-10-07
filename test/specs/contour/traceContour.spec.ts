@@ -243,5 +243,24 @@ describe("Trace contour", () => {
 		expect(outer).to.equalPath("(59/3,12),(19,25/2),(19,44/3),(18,16),(3,16),(3,15),(-3,15),(-3,5),(3,5),(3,0),(9,0),(9,-2),(23,-2),(23,12)", true);
 	});
 
+	/** Added v0.8.0 */
+	it("Tolerates invalid junctions inside the contour but not in the repo", () => {
+		// Flap 36 overlaps flap 53 (invalid), which affects the raw pieces of
+		// node 41. The pattern contour of repo {4,44,73} traced on them doesn't
+		// end on the hinges, which is expected even though neither flap is in
+		// the repo, as flap 36 is inside node 41. Previously, this triggered
+		// the debug assertion in Trace._rawModeFinalCheck.
+		const create = (): void => {
+			parseTree(
+				"(47,41,1),(47,50,6),(41,44,1),(41,46,1),(34,0,1),(34,36,4),(34,38,1),(69,71,1),(71,73,5),(47,53,11),(41,34,2),(4,0,8),(10,0,8),(28,0,7),(69,47,6)",
+				"(28,11,45,0,0),(4,38,22,0,0),(10,17,22,0,0),(36,42,9,0,0),(38,38,4,0,0),(53,59,4,0,0),(50,20,60,0,0),(73,60,33,0,0),(46,20,52,0,0),(44,50,23,0,0)"
+			);
+		};
+		expect(create).to.not.throw();
+		const junction = State.$junctions.get(36 as NodeId, 53 as NodeId)!;
+		expect(junction.$valid).to.be.false;
+		expect(State.$stretches.get("4,44,73")!.$repo.$pattern).to.not.equal(null);
+	});
+
 });
 

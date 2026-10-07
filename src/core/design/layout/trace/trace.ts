@@ -10,6 +10,7 @@ import type { Ridge } from "../pattern/device";
 import type { TraceNode } from "./traceContext";
 import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
+import type { NodeId } from "shared/json/tree";
 import type { PatternContour } from "../../context";
 import type { getQuadrantShape } from "core/design/tasks/utils/rawPiece";
 
@@ -48,9 +49,14 @@ export class Trace {
 		this.$sideDiagonals = sideDiagonals.filter(d => !d.$isDegenerated);
 	}
 
+	/**
+	 * @param inside The leaves inside the contour being traced, whose flaps
+	 * shape the hinges in raw mode (see {@link _rawModeFinalCheck}).
+	 */
 	public $generate(
 		hinges: Path, start: Point, end: Point, rawMode: boolean,
-		virtualStart: boolean = false
+		virtualStart: boolean = false,
+		inside: ReadonlySet<NodeId> = new Set()
 	): PatternContour | null {
 		const ctx = new TraceContext(this, hinges);
 		if(!ctx.$valid) return null;
@@ -87,7 +93,7 @@ export class Trace {
 
 		const result = ctx.$trim(path);
 		if(!rawMode) return result;
-		else return this._rawModeFinalCheck(result, hinges, loop.vector);
+		return this._rawModeFinalCheck(result, hinges, loop.vector, inside);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -143,7 +149,9 @@ export class Trace {
 	 * {@link getQuadrantShape}). In layouts with invalid junctions, the repo
 	 * is formed by the valid junctions only, while the geometry of the pieces
 	 * could still be affected by the flaps of the invalid junctions, and the
-	 * contour could end elsewhere. In that case we give up the contour.
+	 * contour could end elsewhere. In that case we give up the contour. Note
+	 * that those flaps are not necessarily in the repo; it suffices that they
+	 * are inside the contour being traced.
 	 *
 	 * Note that for the same reason, the contour could also end on the hinges
 	 * by chance and still be incorrect, which would leave a small region
@@ -152,7 +160,8 @@ export class Trace {
 	 * those layouts.
 	 */
 	private _rawModeFinalCheck(
-		result: PatternContour | null, hinges: Path, vector: Vector
+		result: PatternContour | null, hinges: Path, vector: Vector,
+		inside: ReadonlySet<NodeId>
 	): PatternContour | null {
 		if(!result) return null;
 		const lines: Line[] = [];
@@ -171,18 +180,19 @@ export class Trace {
 		}
 
 		debugAssert(
-			() => this._involvesInvalidJunctions(),
+			() => this._involvesInvalidJunctions(inside),
 			"Pattern contour does not end on the hinges"
 		);
 		return null;
 	}
 
 	/**
-	 * Whether the flaps involved in the tracing have invalid junctions.
+	 * Whether the flaps involved in the tracing (including those inside the
+	 * contour being traced) have invalid junctions.
 	 * See {@link _rawModeFinalCheck}.
 	 */
 	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
-	protected _involvesInvalidJunctions(): boolean {
+	protected _involvesInvalidJunctions(_inside: ReadonlySet<NodeId>): boolean {
 		return false;
 	}
 

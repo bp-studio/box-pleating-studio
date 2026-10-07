@@ -122,6 +122,7 @@ export function processNode(
 			const map = createStartEndMap(quadrants, trace, traceLeaves);
 			const context: TraceContext = {
 				map, trace, node, index, piece, leaves,
+				inside: traceLeaves,
 				rawMode: traceContour.$raw,
 			};
 			processOuter(outer, context);
@@ -152,6 +153,8 @@ interface TraceContext {
 	readonly index: number;
 	readonly piece: number;
 	readonly leaves: NodeId[];
+	/** All the leaves inside the trace contour. */
+	readonly inside: ReadonlySet<NodeId>;
 	readonly rawMode: boolean;
 }
 
@@ -189,7 +192,8 @@ function processTrace(
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
 	let contour = context.trace.$generate(
-		hingeSegment, map.start, map.end, context.rawMode, map.virtualStart
+		hingeSegment, map.start, map.end, context.rawMode, map.virtualStart,
+		context.inside
 	);
 	if(contour && base && shape) contour = extendToBase(base, shape, contour);
 	if(contour) {

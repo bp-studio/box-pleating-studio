@@ -128,11 +128,14 @@ export class RepoTrace extends Trace {
 		return result;
 	}
 
-	protected override _involvesInvalidJunctions(): boolean {
+	protected override _involvesInvalidJunctions(
+		inside: ReadonlySet<NodeId>
+	): boolean {
+		const involves = (id: NodeId): boolean =>
+			this.$leaves.has(id) || inside.has(id);
 		for(const junction of State.$junctions.values()) {
 			if(junction.$valid) continue;
-			const { $a: a, $b: b } = junction;
-			if(this.$leaves.has(a.id) || this.$leaves.has(b.id)) return true;
+			if(involves(junction.$a.id) || involves(junction.$b.id)) return true;
 		}
 		return false;
 	}
