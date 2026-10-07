@@ -91,7 +91,8 @@
 		"tools": {
 			"title": "Công cụ",
 			"TreeMaker": "Nhập tệp TreeMaker",
-			"health": "Kiểm tra bố trí"
+			"health": "Kiểm tra bố trí",
+			"healthOff": "Thoát kiểm tra bố trí"
 		},
 		"help": {
 			"title": "Cứu giúp",
@@ -220,7 +221,7 @@
 	"health": {
 		"invalid": "Chồng chéo không hợp lệ",
 		"invalidDetail": "Một số nhánh quá gần nhau (các vùng màu đỏ). Hãy tách chúng ra trước; các kiểm tra khác sẽ được thực hiện sau đó.",
-		"unsolved": "Không tìm thấy mẫu",
+		"unsolved": "Không tìm thấy mẫu căng ra",
 		"unsolvedDetail": "Một số chồng chéo là hợp lệ, nhưng các mẫu căng ra phù hợp cho chúng vẫn chưa được triển khai. Hãy thử điều chỉnh vị trí của các nhánh.",
 		"issues": "Số vấn đề tìm thấy: {0}",
 		"uncovered": "Vùng chưa được phủ",

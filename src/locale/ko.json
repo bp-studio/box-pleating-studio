@@ -91,7 +91,8 @@
 		"tools": {
 			"title": "도구",
 			"TreeMaker": "TreeMaker 파일 가져오기",
-			"health": "레이아웃 검사"
+			"health": "레이아웃 검사",
+			"healthOff": "레이아웃 검사 종료"
 		},
 		"help": {
 			"title": "도움",
@@ -220,7 +221,7 @@
 	"health": {
 		"invalid": "잘못된 겹침",
 		"invalidDetail": "일부 가지가 서로 너무 가깝습니다(빨간색 영역). 먼저 가지들을 떨어뜨려 주세요. 그 후에 다른 검사가 수행됩니다.",
-		"unsolved": "패턴을 찾을 수 없음",
+		"unsolved": "스트레치 패턴을 찾을 수 없음",
 		"unsolvedDetail": "일부 겹침은 유효하지만, 이에 맞는 스트레치 패턴이 아직 구현되지 않았습니다. 가지의 위치를 조정해 보세요.",
 		"issues": "발견된 문제: {0}",
 		"uncovered": "덮이지 않은 영역",

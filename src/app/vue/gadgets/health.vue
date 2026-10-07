@@ -17,7 +17,7 @@
 				<div v-if="item.title" class="fw-bold">{{ item.title }}</div>
 				<div>{{ item.detail }}</div>
 			</div>
-			<a class="text-white" href="https://bp-studio.github.io/manual.html#health-check" target="_blank">
+			<a class="text-white" :href="`https://bp-studio.github.io/${l}manual.html#health-check`" target="_blank">
 				{{ $t("health.learnMore") }}
 			</a>
 		</div>
@@ -41,6 +41,12 @@
 	}
 
 	const expanded = shallowRef(true);
+
+	const l = computed(() => {
+		const lang = i18n.locale.value;
+		if(lang == "en") return "";
+		return lang.replace(/-[a-z]+/, t => t.toLocaleUpperCase()) + "/";
+	});
 
 	const report = computed<HealthReport | null>(() => {
 		const design = Studio.project?.design;

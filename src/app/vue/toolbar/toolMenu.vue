@@ -4,7 +4,7 @@
 			<i class="fa-solid fa-calculator"/>{{ $t("plugin.optimizer._") }}
 		</DropdownItem>
 		<DropdownItem :disabled="!Studio.project" @click="toggleHealth">
-			<Hotkey icon="fas fa-stethoscope" ctrl hk="D">{{ $t("toolbar.tools.health") }}</Hotkey>
+			<Hotkey icon="fas fa-stethoscope" ctrl hk="D">{{ healthEnabled ? $t("toolbar.tools.healthOff") : $t("toolbar.tools.health") }}</Hotkey>
 		</DropdownItem>
 		<Divider/>
 		<Uploader accept=".tmd5" @upload="TreeMaker($event)">
@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 
-	import { onMounted } from "vue";
+	import { computed, onMounted } from "vue";
 
 	import { Dropdown } from "@/gadgets/menu";
 	import DropdownItem from "@/gadgets/menu/dropdownItem.vue";
@@ -40,6 +40,10 @@
 			if(Studio.project) toggleHealth();
 		}, "d");
 	});
+
+	const healthEnabled = computed(
+		() => Boolean(Studio.project?.design.layout.health.enabled)
+	);
 
 	function toggleHealth(): void {
 		const design = Studio.project!.design;

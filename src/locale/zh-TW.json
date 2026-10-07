@@ -91,7 +91,8 @@
 		"tools": {
 			"title": "工具",
 			"TreeMaker": "匯入 TreeMaker 檔案",
-			"health": "檢查佈局"
+			"health": "檢查佈局",
+			"healthOff": "關閉檢查"
 		},
 		"help": {
 			"title": "說明",
@@ -220,7 +221,7 @@
 	"health": {
 		"invalid": "無效重疊",
 		"invalidDetail": "有些角片太過靠近（紅色區域）。請先將它們分散開來，之後才會進行其它的檢查。",
-		"unsolved": "找不到摺痕圖案",
+		"unsolved": "找不到伸展圖案",
 		"unsolvedDetail": "有些重疊雖然有效，但可行的伸展摺痕圖案尚未被實作。請試著調整角片的位置。",
 		"issues": "發現問題：{0}",
 		"uncovered": "未覆蓋區域",

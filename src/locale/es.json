@@ -91,7 +91,8 @@
 		"tools": {
 			"title": "Herramientas",
 			"TreeMaker": "Importar archivo TreeMaker",
-			"health": "Comprobar diseño"
+			"health": "Comprobar diseño",
+			"healthOff": "Salir de la comprobación"
 		},
 		"help": {
 			"title": "Ayuda",
@@ -220,7 +221,7 @@
 	"health": {
 		"invalid": "Superposiciones no válidas",
 		"invalidDetail": "Algunas solapas están demasiado cerca entre sí (las regiones rojas). Sepárelas primero; las demás comprobaciones se realizarán después.",
-		"unsolved": "Patrones no encontrados",
+		"unsolved": "Patrones de tramo no encontrados",
 		"unsolvedDetail": "Algunas superposiciones son válidas, pero aún no se han implementado patrones de tramo para ellas. Intente ajustar las posiciones de las solapas.",
 		"issues": "Problemas encontrados: {0}",
 		"uncovered": "Regiones no cubiertas",

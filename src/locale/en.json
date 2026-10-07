@@ -91,7 +91,8 @@
 		"tools": {
 			"title": "Tools",
 			"TreeMaker": "Import TreeMaker file",
-			"health": "Check layout"
+			"health": "Check layout",
+			"healthOff": "Exit layout check"
 		},
 		"help": {
 			"title": "Help",
@@ -220,7 +221,7 @@
 	"health": {
 		"invalid": "Invalid overlaps",
 		"invalidDetail": "Some flaps are too close to each other (the red regions). Spread them out first; the other checks will be performed afterwards.",
-		"unsolved": "Patterns not found",
+		"unsolved": "Stretch patterns not found",
 		"unsolvedDetail": "Some overlaps are valid, but no stretch patterns have been implemented for them yet. Try adjusting the positions of the flaps.",
 		"issues": "Issues found: {0}",
 		"uncovered": "Uncovered regions",
