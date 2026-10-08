@@ -66,6 +66,13 @@ footer {
 	max-width: calc(100vw - 2rem);
 }
 
+#divToast {
+	position: absolute;
+	top: 4.75rem;
+	right: 1rem;
+	max-width: calc(100vw - 2rem);
+}
+
 .show-status {
 	#divWorkspace,
 	#divShade,
@@ -113,7 +120,8 @@ footer {
 		top: 6.15rem;
 	}
 
-	#divHealth {
+	#divHealth,
+	#divToast {
 		top: 7.15rem;
 	}
 }
@@ -130,6 +138,10 @@ footer {
 
 	#note {
 		right: 270px;
+	}
+
+	#divToast {
+		right: calc(250px + 1rem);
 	}
 }
 

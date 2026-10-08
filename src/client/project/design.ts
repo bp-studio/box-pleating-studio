@@ -15,6 +15,7 @@ import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
 import { BatchUpdateManager } from "./batchUpdateManager";
 import { CoreManager } from "./coreManager";
+import { clipboard, collectSubtrees, setClipboard } from "./components/tree/clipboard";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
@@ -186,6 +187,58 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 				await this.tree.$vertices.$delete(selections);
 			}
 		}
+	}
+
+	public get canCopy(): boolean {
+		return this.mode == "tree" &&
+			isTypedArray(SelectionController.selections, Vertex);
+	}
+
+	public get canPaste(): boolean {
+		const selections = SelectionController.selections;
+		return this.mode == "tree" && selections.length == 1 &&
+			selections[0] instanceof Vertex &&
+			this.tree.$vertices.$canPaste(clipboard.value);
+	}
+
+	/**
+	 * Copy the selected subtrees that are connected to the rest of the tree
+	 * by exactly one edge, and select the copied part only.
+	 * @returns Whether anything is copied.
+	 */
+	public copy(): boolean {
+		if(!this.canCopy) return false;
+		const vertices = SelectionController.selections as Vertex[];
+		const ids = new Set(vertices.map(v => v.id));
+		const result = collectSubtrees(this.tree, ids);
+		if(!result.subtrees.length) return false;
+		setClipboard(result.subtrees);
+		SelectionController.clear();
+		for(const id of result.ids) {
+			SelectionController.$toggle(this.tree.$vertices.$get(id)!, true);
+		}
+		return true;
+	}
+
+	/**
+	 * Delete the selected vertices as in {@link delete},
+	 * and copy the subtrees that are actually deleted.
+	 * @returns Whether anything is cut.
+	 */
+	public async cut(): Promise<boolean> {
+		if(!this.canCopy) return false;
+		const vertices = SelectionController.selections as Vertex[];
+		const subtrees = await this.tree.$vertices.$cut(vertices);
+		if(!subtrees.length) return false;
+		setClipboard(subtrees);
+		return true;
+	}
+
+	/** Paste the copied subtrees under the selected vertex. */
+	public async paste(): Promise<void> {
+		if(!this.canPaste) return;
+		const vertex = SelectionController.selections[0] as Vertex;
+		await this.tree.$vertices.$paste(vertex, clipboard.value);
 	}
 
 	////////////////////////////////////////////////////////////////////////////

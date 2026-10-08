@@ -2,6 +2,7 @@ import { computed, reactive, shallowRef } from "vue";
 
 import { defaultTitle } from "app/shared/constants";
 import Dialogs from "./dialogService";
+import Toast from "./toastService";
 
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
@@ -147,6 +148,23 @@ namespace StudioService {
 		const proj = project.value;
 		if(!proj) return;
 		execute(() => proj.design.delete());
+	}
+	export function copy(): void {
+		const design = project.value?.design;
+		if(!design?.canCopy) return;
+		if(!design.copy()) Toast.show(i18n.t("message.nothingCopied"));
+	}
+	export function cut(): void {
+		const design = project.value?.design;
+		if(!design?.canCopy) return;
+		execute(async () => {
+			if(!await design.cut()) Toast.show(i18n.t("message.nothingCopied"));
+		});
+	}
+	export function paste(): void {
+		const design = project.value?.design;
+		if(!design?.canPaste) return;
+		execute(() => design.paste());
 	}
 	export function svg(proj: Project, includeHidden: boolean): Promise<Blob> {
 		return Promise.resolve(bp.svg(proj, includeHidden));

@@ -21,6 +21,18 @@
 					{{ $t('toolbar.edit.redo') }}
 				</Hotkey>
 			</DropdownItem>
+			<template v-if="Studio.project?.design.mode != 'layout'">
+				<Divider/>
+				<DropdownItem :disabled="!Studio.project?.design.canCopy" @click="Studio.cut">
+					<Hotkey icon="fa-solid fa-scissors" ctrl hk="X">{{ $t('toolbar.edit.cut') }}</Hotkey>
+				</DropdownItem>
+				<DropdownItem :disabled="!Studio.project?.design.canCopy" @click="Studio.copy">
+					<Hotkey icon="fa-solid fa-copy" ctrl hk="C">{{ $t('toolbar.edit.copy') }}</Hotkey>
+				</DropdownItem>
+				<DropdownItem :disabled="!Studio.project?.design.canPaste" @click="Studio.paste">
+					<Hotkey icon="fa-solid fa-paste" ctrl hk="V">{{ $t('toolbar.edit.paste') }}</Hotkey>
+				</DropdownItem>
+			</template>
 			<Divider/>
 			<DropdownItem
 				:disabled="!Studio.project || !Studio.project.design.sheet.canSubdivide()"
@@ -70,6 +82,9 @@
 		HotkeyService.register(unselectAll, "escape", false);
 		HotkeyService.register(Studio.del, "delete", false);
 		HotkeyService.register(Studio.del, "backspace", false);
+		HotkeyService.register(Studio.cut, "x");
+		HotkeyService.register(Studio.copy, "c");
+		HotkeyService.register(Studio.paste, "v");
 
 		// on certain keyboards
 		HotkeyService.register(undo, "undo", false);
