@@ -24,6 +24,9 @@ export interface QuadrantStartEnd {
 	 * dividing the gadgets of these flaps.
 	 */
 	startDivision?: [NodeId, NodeId];
+
+	/** Same as {@link startDivision}, for the ending point. */
+	endDivision?: [NodeId, NodeId];
 }
 
 //=================================================================
@@ -111,9 +114,10 @@ export class Quadrant {
 	 * junction is adjacent to the gadget of an inner junction on the starting
 	 * side, the starting point should be moved to the intersection ridge
 	 * between the two gadgets instead (the actual location is resolved by
-	 * {@link RepoTrace} using the returned pair of flap ids). Doing the same on
-	 * the ending side makes no difference in a large number of valid layouts,
-	 * so it is not done.
+	 * {@link RepoTrace} using the returned pair of flap ids). The same goes for
+	 * the ending side, as otherwise the tracing could go past the intersection
+	 * ridge into the gadget of the inner junction before reaching the ending
+	 * line.
 	 *
 	 * Returns `null` if all junctions of this quadrant are with inner flaps, in
 	 * which case this quadrant does not participate in the tracing of the node
@@ -141,9 +145,11 @@ export class Quadrant {
 		// _startEndPoints)
 		const reversed = this.q % 2 != SlashDirection.FW;
 		const startAxis: Axis = reversed ? "x" : "y";
+		const endAxis: Axis = reversed ? "y" : "x";
 		return {
 			start, end,
 			startDivision: this._findNeighbor(inside, outside, o, startAxis),
+			endDivision: this._findNeighbor(inside, outside, o, endAxis),
 		};
 	}
 

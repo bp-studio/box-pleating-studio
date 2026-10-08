@@ -4,6 +4,8 @@ import { GadgetStrategy } from "shared/json/enum";
 import { debugAssert } from "core/utils/debug";
 import { same } from "shared/types/geometry";
 import { Piece } from "../pattern/piece";
+import { universalGPS } from "../generators/universalGPS";
+import { Direction } from "shared/types/direction";
 
 import type { Path } from "shared/types/geometry";
 import type { QuadrantDirection } from "shared/types/direction";
@@ -38,13 +40,20 @@ export interface JoinCandidate {
  *
  * @param sx The width of the flap rectangle.
  * @param q The index of the joint corner among the anchors of the gadget.
+ * @param edge The index of the ridge of the main piece facing the delta line
+ * (see Joinee.e).
  */
 export function* getJoinCandidates(
-	o: JOverlap, sx: number, q: QuadrantDirection
+	o: JOverlap, sx: number, q: QuadrantDirection, edge: QuadrantDirection
 ): Generator<JoinCandidate> {
 	if(o.gadget == GadgetStrategy.halfIntegral) {
 		for(const gadget of kamiyaHalfIntegral(o, sx)) {
 			const candidate = toCandidate(gadget, q);
+			if(candidate) yield candidate;
+		}
+	} else if(o.gadget == GadgetStrategy.universal) {
+		for(const gadget of universalGPS(o, sx)) {
+			const candidate = toUniversalCandidate(gadget, q, edge);
 			if(candidate) yield candidate;
 		}
 	} else {
@@ -72,6 +81,37 @@ function toCandidate(
 	const piece: JPiece = { ox, oy, u, v };
 	if(shift) piece.shift = shift;
 	const { anchors } = gadget;
+	return { piece, rest: { detours, pieces: others, anchors } };
+}
+
+/**
+ * Convert a universal GPS to a {@link JoinCandidate}. Its two pieces are the
+ * two halves of the stretch circumscribing rectangle cut along the diagonal,
+ * both containing the joint corner. Only the half containing the ridge facing
+ * the delta line takes part in the joining, as the main piece, and the other
+ * half is put back afterwards. Returns `null` if the joint corner is not on
+ * the grid (see Gadget.$reverseGPS).
+ */
+function toUniversalCandidate(
+	gadget: JGadget, q: QuadrantDirection, edge: QuadrantDirection
+): JoinCandidate | null {
+	// The upper-left half contains the ridges 0 and 1 (and the anchor 1),
+	// and the lower-right half contains the ridges 2 and 3 (and the anchor 3).
+	const anchor = edge < Direction.LL ? Direction.UL : Direction.LR;
+	const index = gadget.pieces.findIndex(
+		p => new Piece(p).$anchors.value[anchor] !== null
+	);
+	const main = gadget.pieces[index];
+	const others = gadget.pieces.filter((_, i) => i != index);
+	const { ox, oy, u, v, shift } = main;
+	const corner = q == 0 ? { x: 0, y: 0 } : { x: oy + u + v, y: ox + u + v };
+	const x = corner.x + (shift?.x ?? 0), y = corner.y + (shift?.y ?? 0);
+	if(!Number.isInteger(x) || !Number.isInteger(y)) return null;
+
+	const piece: JPiece = { ox, oy, u, v };
+	if(shift) piece.shift = shift;
+	const { anchors } = gadget;
+	const detours = main.detours!;
 	return { piece, rest: { detours, pieces: others, anchors } };
 }
 

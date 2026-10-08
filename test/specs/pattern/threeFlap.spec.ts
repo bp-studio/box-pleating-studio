@@ -147,7 +147,8 @@ describe("Three flap patterns", () => {
 					{ id: b, x: 10, y: 11, radius: 3 },
 					{ id: c, x: 11, y: 5, radius: 2 },
 				]);
-				const devices = expectRepo("1,2,3", 1, 4, 2);
+				// The second configuration joins a half of a universal GPS
+				const devices = expectRepo("1,2,3", 2, 4, 2);
 				let pieceCount = 0;
 				for(const device of devices) {
 					expect(device.$gadgets.length).to.equal(1);
@@ -161,6 +162,37 @@ describe("Three flap patterns", () => {
 			}
 		});
 
+	});
+
+	describe("Universal GPS join", () => {
+		it("Joins a half of a universal GPS", () => {
+			// The 1x7 overlap has odd area, but no half-integral gadget fits,
+			// and relaying fails as the gadgets do not fit the flap rectangle.
+			// So the universal GPS of 1x7 joins the 4x3 one with one of its
+			// halves, the one containing the ridge facing the delta line.
+			for(const [a, b, c] of THREE_PERMUTATION) {
+				generateFromFlaps([
+					{ id: a, x: 0, y: 0, radius: 10 },
+					{ id: b, x: 11, y: 5, radius: 2 },
+					{ id: c, x: 9, y: 10, radius: 3 },
+				]);
+				const configs = expectRepo("1,2,3", 2);
+				const joins = configs.map(config => {
+					const [partition] = config.$partitions;
+					expect(partition.$overlaps.length).to.equal(2);
+					const universal = partition.$overlaps
+						.find(o => o.gadget == GadgetStrategy.universal);
+					expect(universal).to.be.not.undefined;
+					return partition.$overlaps.find(o => o.join)!.join;
+				});
+				const { simple, standardJoin } = JoinStrategy;
+				expect(joins).to.eql([simple, standardJoin]);
+
+				const [device] = configs[0].$patterns[0].$devices;
+				const pieces = device.$gadgets.map(g => g.pieces.length);
+				expect(pieces.toSorted()).to.eql([1, 2]);
+			}
+		});
 	});
 
 	describe("Split join", () => {

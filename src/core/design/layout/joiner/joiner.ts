@@ -86,13 +86,13 @@ export class Joiner {
 		const x2 = o2.ox + Math.abs(this.s2?.x ?? 0);
 		this.$isClockwise = x1 > x2;
 
+		[this.q1, this.q2] = this._getQuadrantCombination();
+
 		//TODO: allowing pass in a predefined list of pieces
 		// for better performance
 		[this.g1, this.g2] = [o1, o2].map((o, i) => Array.from(
-			getJoinCandidates(o, [j1, j2][i].sx, this.q)
+			getJoinCandidates(o, [j1, j2][i].sx, this.q, [this.q1, this.q2][i])
 		));
-
-		[this.q1, this.q2] = this._getQuadrantCombination();
 		this.$intersectionDist =
 			repo.$getMaxIntersectionDistance(j1, j2, this.$oriented);
 		this.w1 = j1.sx;

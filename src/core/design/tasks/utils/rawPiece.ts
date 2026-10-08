@@ -16,6 +16,7 @@ import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { PerQuadrant, QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { ValidJunction } from "../../layout/junction/validJunction";
 import type { ITreeNode, PatternContour } from "../../context";
+import type { NodeId } from "shared/json/tree";
 
 const aaUnion = new AAUnion();
 
@@ -202,45 +203,109 @@ export function extendToBase(
 	return result as PatternContour;
 }
 
+/** The hinge rectangle of a leaf expanded to the given node. */
+export function getLeafRect(node: ITreeNode, leaf: ITreeNode): IRect {
+	const l = leaf.$dist - node.$dist + node.$length;
+	const [t, r, b, lf] = leaf.$AABB.$toValues();
+	return { x1: lf - l, y1: b - l, x2: r + l, y2: t + l };
+}
+
 function createCarving(
 	node: ITreeNode, leaf: ITreeNode, covered: ReadonlySet<ValidJunction>
 ): Carving {
 	const l = leaf.$dist - node.$dist + node.$length;
-	const [t, r, b, lf] = leaf.$AABB.$toValues();
-	const rect: IRect = { x1: lf - l, y1: b - l, x2: r + l, y2: t + l };
+	const rect = getLeafRect(node, leaf);
 	const inside = new Set(node.$leaves.map(n => n.id));
 	const always: IRect[] = [];
 	const alwaysByQuadrant = makePerQuadrant<IRect[]>(() => []);
 	const digested = makePerQuadrant<IRect[]>(() => []);
+	const outer = makePerQuadrant<IRect[]>(() => []);
+	const invadedFromInside = makePerQuadrant<IRect[]>(() => []);
 	for(const junction of State.$junctions.values()) {
 		if(!junction.$valid || !junction.$involves(leaf.id)) continue;
 		const j = junction as ValidJunction;
-		const isCovered = covered.has(j);
-		const isDigested = inside.has((j.$a === leaf ? j.$b : j.$a).id);
-		const invasion = j.$invasion;
-		const isInvaded = invasion?.flap === leaf && fitsAt(invasion, l);
-		if(!isCovered && !isDigested && !isInvaded) continue;
-
-		if(isCovered && !isDigested && !isInvaded) {
-			// The region is given up only to the patterns of the covering
-			// junctions, which redistribute the regions of the rivers along
-			// the paths between their flaps. So if none of them has a flap
-			// inside the node, the river of the node is not involved, and the
-			// region stays.
-			const involved = j.$getCovering().some(c =>
-				inside.has(c.$a.id) || inside.has(c.$b.id)
-			);
-			if(!involved) continue;
-		}
+		const kind = classify(j, leaf, l, covered, inside);
+		if(kind == CarvingKind.none) continue;
 
 		const q = getQuadrant(j.$a === leaf ? j.$q1 : j.$q2);
 		const corner = cornerRect(rect, q, j.$o.x, j.$o.y);
-		if(isDigested && !isCovered && !isInvaded) {
+		if(kind == CarvingKind.outer) {
+			outer[q].push(corner);
+		} else if(kind == CarvingKind.digested) {
 			digested[q].push(corner);
 		} else {
+			if(kind == CarvingKind.invadedFromInside) {
+				invadedFromInside[q].push(corner);
+			}
+			always.push(corner);
+			alwaysByQuadrant[q].push(corner);
+		}
+	}
+
+	// If a corner is invaded by a flap inside the node, the overlapping
+	// regions with the flaps outside at the same corner are carved as well,
+	// so that the corner forms a complete staircase. Otherwise the step left
+	// by the invasion alone misleads the tracing of their patterns. But an
+	// overlapping region containing the invasion is not carved, as the
+	// invasion is then a part of the region, and the step it leaves (after
+	// the invader fills its part) already matches the pattern of the region.
+	for(const [q, invasions] of invadedFromInside.entries()) {
+		if(!invasions.length) continue;
+		for(const corner of outer[q]) {
+			if(invasions.some(r => contains(corner, r))) continue;
 			always.push(corner);
 			alwaysByQuadrant[q].push(corner);
 		}
 	}
 	return { rect, always, alwaysByQuadrant, digested };
+}
+
+const enum CarvingKind {
+	/** Not carved. */
+	none,
+	/** A junction with a flap outside, carved only at invaded corners. */
+	outer,
+	/** See {@link Carving.digested}. */
+	digested,
+	/** See {@link Carving.always}. */
+	always,
+	/** Same as {@link always}, invaded by a flap inside the node. */
+	invadedFromInside,
+}
+
+/** How the overlapping region of a junction of the leaf is carved. */
+function classify(
+	j: ValidJunction, leaf: ITreeNode, l: number,
+	covered: ReadonlySet<ValidJunction>, inside: ReadonlySet<NodeId>
+): CarvingKind {
+	const isCovered = covered.has(j);
+	const isDigested = inside.has((j.$a === leaf ? j.$b : j.$a).id);
+	const invasion = j.$invasion;
+	const isInvaded = invasion?.flap === leaf && fitsAt(invasion, l);
+	if(isInvaded) {
+		return isDigested ? CarvingKind.invadedFromInside : CarvingKind.always;
+	}
+	if(!isCovered) {
+		return isDigested ? CarvingKind.digested : CarvingKind.outer;
+	}
+
+	// A covered junction has no gadget of its own, and if it is digested,
+	// its region lies between two leaves inside the node, which is not
+	// given to the outside by the covering pattern. So it is not carved at
+	// all.
+	if(isDigested) return CarvingKind.none;
+
+	// The region is given up only to the patterns of the covering
+	// junctions, which redistribute the regions of the rivers along
+	// the paths between their flaps. So if none of them has a flap
+	// inside the node, the river of the node is not involved, and the
+	// region stays.
+	const involved = j.$getCovering().some(c =>
+		inside.has(c.$a.id) || inside.has(c.$b.id)
+	);
+	return involved ? CarvingKind.always : CarvingKind.none;
+}
+
+function contains(a: IRect, b: IRect): boolean {
+	return a.x1 <= b.x1 && a.y1 <= b.y1 && b.x2 <= a.x2 && b.y2 <= a.y2;
 }

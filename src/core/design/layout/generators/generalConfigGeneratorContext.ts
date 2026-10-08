@@ -189,7 +189,10 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 				const list = joint.items.map(item => overlaps[item.index]);
 				partitions.push(...this._applyPlan(joint, plans[k], list));
 			}
-			if(isOddArea(overlaps[bridge])) continue;
+			// The relays at both ends could overlap each other, leaving
+			// nothing of the bridge.
+			const rest = overlaps[bridge];
+			if(rest.ox <= 0 || rest.oy <= 0 || isOddArea(rest)) continue;
 			yield this.$make(mergePartitions(overlaps, partitions));
 		}
 	}

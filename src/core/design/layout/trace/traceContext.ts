@@ -58,9 +58,13 @@ export class TraceContext {
 	public $getInitialNode(
 		ridges: Set<Ridge>, startDiagonal?: SideDiagonal
 	): TraceNode | null {
-		for(const hinge of this._hinges) {
+		const first = this._firstHingeIndex(startDiagonal);
+		let previous: Line | undefined = this._hinges[first - 1];
+		for(const hinge of this._hinges.slice(Math.max(first, 0))) {
 			const v = hinge.$vector;
 			const ray = { point: hinge.p1, vector: v };
+			const incoming = previous?.$vector ?? v;
+			previous = hinge;
 
 			// Case 1: side diagonals
 			if(startDiagonal) {
@@ -69,6 +73,11 @@ export class TraceContext {
 					const hv =
 						this._diagonalHitInitialVector(hinge, v, startDiagonal);
 					const corner = p.eq(startDiagonal.p0);
+					const ridge = corner && startsAt(hinge, startDiagonal) ?
+						findRidgeFrom(ridges, p, startDiagonal, p.eq(hinge.p1) ?
+							incoming : v) :
+						undefined;
+					if(ridge) return reflectAtCorner(ridges, p, ridge);
 					if(!corner || startsAt(hinge, startDiagonal)) {
 						return { point: p, vector: hv };
 					} else {
@@ -98,6 +107,21 @@ export class TraceContext {
 			return result;
 		}
 		return null;
+	}
+
+	/**
+	 * The index of the first hinge crossing the starting diagonal, or -1 if
+	 * there's none.
+	 *
+	 * The tracing starts at the starting diagonal, so the ridges hit by the
+	 * hinges before it (for example, the ones coming out of the tip of a flap
+	 * on the cut of a quadrant piece) have nothing to do with it.
+	 */
+	private _firstHingeIndex(startDiagonal?: SideDiagonal): number {
+		if(!startDiagonal) return -1;
+		return this._hinges.findIndex(
+			h => h.$intersectLine(startDiagonal, false)
+		);
 	}
 
 	/**
@@ -147,6 +171,49 @@ export class TraceContext {
 		const lineIsVertical = v.x == 0;
 		return resultIsVertical == lineIsVertical ? v : diagonal.$reflect(v);
 	}
+}
+
+/**
+ * Find the ridge coming out of the given point (other than the ones along the
+ * given diagonal, such as the intersection ridge of a virtual diagonal) to
+ * reflect on, when arriving along the hinge in the given direction. The hinge
+ * lies in the sector between the ridges, and it is reflected across the ridge
+ * closest to it.
+ */
+function findRidgeFrom(
+	ridges: Iterable<Ridge>, p: Point, diagonal: SideDiagonal, arriving: Vector
+): { line: Ridge, arriving: Vector } | undefined {
+	const back = arriving.$neg;
+	let result: Ridge | undefined, best = Number.NEGATIVE_INFINITY;
+	for(const ridge of ridges) {
+		if(ridge.$isDegenerated) continue;
+		if(!ridge.p1.eq(p) && !ridge.p2.eq(p)) continue;
+		if(ridge.$vector.$parallel(diagonal.$vector)) continue;
+		const out = (ridge.p1.eq(p) ? ridge.p2 : ridge.p1).$sub(p);
+		const cos = out.$dot(back) / Math.sqrt(out.$dot(out) * back.$dot(back));
+		if(cos > best) [result, best] = [ridge, cos];
+	}
+	return result && { line: result, arriving };
+}
+
+/**
+ * The tracing does not turn at the corner of the starting diagonal if a ridge
+ * comes out of it, but reflects on it, arriving along the hinge. It leaves the
+ * corner between the ridges, so none of them should be hit again there.
+ */
+function reflectAtCorner(
+	ridges: Set<Ridge>, p: Point,
+	ridge: { line: Ridge, arriving: Vector }
+): TraceNode {
+	for(const r of [...ridges]) {
+		if(r.p1.eq(p) || r.p2.eq(p)) ridges.delete(r);
+	}
+	return {
+		point: p,
+		vector: ridge.line.$reflect(ridge.arriving),
+		last: ridge.line.$vector,
+		ridge: true,
+	};
 }
 
 /**

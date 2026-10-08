@@ -81,7 +81,7 @@ describe("CP exporting", () => {
 	});
 
 	it("Ignores pattern-less repo", () => {
-		parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
+		parseTree("(2,0,10),(2,1,2),(2,3,2)", "(0,0,0,0,0),(1,11,5,0,0),(3,7,10,0,0)");
 		const result = LayoutController.getCP(parsePath("(0,0),(16,0),(16,16),(0,16)"));
 		// v0.8: flap 0 is invaded by flap 1 (see ValidJunction.$invasion),
 		// so its hinge is carved at the corner, and since the carved quadrant

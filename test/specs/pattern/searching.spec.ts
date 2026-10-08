@@ -109,7 +109,7 @@ describe("Searching", () => {
 	describe("Pattern-not-found notification", () => {
 
 		it("Signifies when no pattern is found", () => {
-			parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
+			parseTree("(2,0,10),(2,1,2),(2,3,2)", "(0,0,0,0,0),(1,11,5,0,0),(3,7,10,0,0)");
 			const stretch = State.$stretches.get("0,1,3")!;
 			expect(stretch.$repo.$isValid).to.be.true;
 			expect(stretch.$repo.$pattern).to.equal(null);
@@ -147,8 +147,8 @@ describe("Searching", () => {
 			// Same as the first case, plus flaps 4 and 5 forming an invalid
 			// junction far away.
 			parseTree(
-				"(2,0,10),(2,1,2),(2,3,3),(2,4,1),(2,5,1)",
-				"(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0),(4,40,40,0,0),(5,40,41,0,0)"
+				"(2,0,10),(2,1,2),(2,3,2),(2,4,1),(2,5,1)",
+				"(0,0,0,0,0),(1,11,5,0,0),(3,7,10,0,0),(4,40,40,0,0),(5,40,41,0,0)"
 			);
 			expect(State.$stretches.get("0,1,3")!.$repo.$pattern).to.equal(null);
 			expect(State.$junctions.get(id4, id5)!.$valid).to.be.false;

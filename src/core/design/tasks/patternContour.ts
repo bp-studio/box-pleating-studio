@@ -5,17 +5,18 @@ import { makePerQuadrant, makeQuadrantCode, quadrantNumber } from "shared/types/
 import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 import { RepoTrace } from "../layout/trace/repoTrace";
-import { extendToBase, getQuadrantShape } from "./utils/rawPiece";
+import { extendToBase, getLeafRect, getQuadrantShape } from "./utils/rawPiece";
 
 import type { TreeNode } from "../context/treeNode";
 import type { NodeId } from "shared/json/tree";
 import type { HingeSegment } from "../layout/trace/hingeSegment";
 import type { Quadrant } from "../layout/pattern/quadrant";
-import type { QuadrantDirection } from "shared/types/direction";
+import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../layout/repository";
 import type { ITreeNode, NodeGraphics } from "../context";
 import type { StartEnd } from "../layout/trace/trace";
 import type { RawPiece } from "./utils/rawPiece";
+import type { IRect } from "./utils/carve";
 import type { Path, PathEx } from "shared/types/geometry";
 
 //=================================================================
@@ -122,10 +123,15 @@ export function processNode(
 			// digested. In raw mode, that is made consistent with the geometry
 			// by getQuadrantShape (see processOuter).
 			const map = createStartEndMap(quadrants, trace, traceLeaves);
+			const rawMode = traceContour.$raw;
+			const rects = rawMode ?
+				makePerQuadrant(q => quadrants
+					.filter(quadrant => quadrant.q == q)
+					.map(quadrant => getLeafRect(node, quadrant.$flap))) :
+				undefined;
 			const context: TraceContext = {
-				map, trace, node, index, piece, leaves,
+				map, trace, node, index, piece, leaves, rects, rawMode,
 				inside: traceLeaves,
-				rawMode: traceContour.$raw,
 			};
 			processOuter(outer, context);
 		}
@@ -158,6 +164,12 @@ interface TraceContext {
 	/** All the leaves inside the trace contour. */
 	readonly inside: ReadonlySet<NodeId>;
 	readonly rawMode: boolean;
+
+	/**
+	 * In raw mode, the hinge rectangles (expanded to the node) of the leaves
+	 * of the traced quadrants, by the direction (see {@link processTrace}).
+	 */
+	readonly rects?: PerQuadrant<IRect[]>;
 }
 
 /**
@@ -193,6 +205,14 @@ function processTrace(
 ): void {
 	const map = context.map[hingeSegment.q];
 	if(!map) return;
+
+	// A raw piece could be formed by several leaves, and the starting/ending
+	// lines of a quadrant could happen to cross the hinges of the other
+	// leaves, which have nothing to do with the quadrant. The pattern contour
+	// of a quadrant only modifies the hinges along the rectangle of its leaf.
+	const rects = context.rects?.[hingeSegment.q];
+	if(rects && !rects.some(rect => isAlongRect(hingeSegment, rect))) return;
+
 	let contour = context.trace.$generate(
 		hingeSegment, map.start, map.end, context.rawMode, map.startRidge,
 		context.inside
@@ -208,6 +228,25 @@ function processTrace(
 		contour.$leaves = context.leaves;
 		context.node.$graphics.$patternContours.push(contour);
 	}
+}
+
+/** Whether any edge of the path lies along a side of the rectangle. */
+function isAlongRect(path: Path, rect: IRect): boolean {
+	const { x1, y1, x2, y2 } = rect;
+	for(let i = 0; i < path.length - 1; i++) {
+		const a = path[i], b = path[i + 1];
+		if(a.y == b.y && (a.y == y1 || a.y == y2)) {
+			const lo = Math.max(Math.min(a.x, b.x), x1);
+			const hi = Math.min(Math.max(a.x, b.x), x2);
+			if(lo < hi) return true;
+		}
+		if(a.x == b.x && (a.x == x1 || a.x == x2)) {
+			const lo = Math.max(Math.min(a.y, b.y), y1);
+			const hi = Math.min(Math.max(a.y, b.y), y2);
+			if(lo < hi) return true;
+		}
+	}
+	return false;
 }
 
 export function clearPatternContourForRepo(repo: Repository): void {

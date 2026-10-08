@@ -320,10 +320,8 @@ export class Device implements ISerializable<JDevice> {
 		const result = this.$getConnectionRidges(false);
 		for(const map of this.$partition.$externalCornerMaps.value) {
 			const from = this.$resolveCornerMap(map);
-			const dir = this._resolveCornerDirection(map.corner);
-			const to = this.$partition.$getExternalConnectionTarget(
-				from, map, dir
-			);
+			const to =
+				this.$partition.$getExternalConnectionTarget(from, map, true);
 			if(to) {
 				const ridge = new Line(from, to) as Ridge;
 				ridge.$type = map.corner.type; // Mark the ridge type
@@ -334,18 +332,6 @@ export class Device implements ISerializable<JDevice> {
 			}
 		}
 		return result;
-	}
-
-	private _resolveCornerDirection(
-		corner: JCorner
-	): QuadrantDirection | undefined {
-		if(corner.type != CornerType.intersection) return undefined;
-		const codes = this.$partition.$configuration.$repo.$quadrants.keys();
-		for(const code of codes) {
-			if(getNodeId(code) == corner.e) return getQuadrant(code);
-		}
-		/* istanbul ignore next: type-safety */
-		return undefined;
 	}
 
 	private _clearCache(): void {

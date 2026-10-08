@@ -49,6 +49,15 @@ describe("Bridged joints", () => {
 		expect(f2).to.equalPath("(6,9.5),(8,8),(10,8)");
 	});
 
+	it("Skips the plans where the relays at both ends overlap", () => {
+		// Flap 1 lies between flaps 2 and 3, so the junction 2-3 (4x2) is cut
+		// by 1-2 (3x2) at flap 2 and by 1-3 (3x2) at flap 3, leaving nothing.
+		expect(() => parseTree(
+			"(0,4,1),(4,1,1),(4,2,8),(0,3,7)",
+			"(1,0,0,0,0),(2,6,-7,0,0),(3,-6,7,0,0)"
+		)).to.not.throw();
+	});
+
 	it("Bridges a fan to another joint", () => {
 		// The fan at flap 3 uses the nested relay with flap 5 kept; the
 		// junction 3-8 is also nested with 5-8 (the same width) at flap 8.

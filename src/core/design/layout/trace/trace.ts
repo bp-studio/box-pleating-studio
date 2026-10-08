@@ -3,9 +3,9 @@ import { TraceContext, getNextIntersection, isSideDiagonal } from "./traceContex
 import { debugAssert } from "core/utils/debug";
 import { Line } from "core/math/geometry/line";
 import { Vector } from "core/math/geometry/vector";
+import { Point } from "core/math/geometry/point";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
-import type { Point } from "core/math/geometry/point";
 import type { Ridge } from "../pattern/device";
 import type { TraceNode, VirtualDiagonal } from "./traceContext";
 import type { SideDiagonal } from "../configuration";
@@ -101,7 +101,7 @@ export class Trace {
 		const result = ctx.$trim(path);
 		if(!result) return null;
 		if(!rawMode) return result;
-		if(extendToHinges(result, hinges, loop.vector)) return result;
+		if(endsOnHinges(result, hinges)) return result;
 		return this._rawModeFinalCheck(inside);
 	}
 
@@ -111,15 +111,15 @@ export class Trace {
 
 	/**
 	 * Keep reflecting on the ridges, and returns whether any ridge (side
-	 * diagonals excluded) is reflected on, as well as the direction leaving
-	 * the last point.
+	 * diagonals excluded) is reflected on.
 	 */
 	private static _mainLoop(
 		ridges: Set<Ridge>, initial: TraceNode, path: RationalPath,
 		end: Point, directionalVector: Vector, last: IPoint
-	): { reflected: boolean, vector: Vector } {
+	): { reflected: boolean } {
 		let cursor = initial;
 		let reflected = false;
+		const lastVertex = new Point(last);
 		while(true) {
 			const intersection = getNextIntersection(ridges, cursor);
 			if(!intersection) break;
@@ -137,24 +137,25 @@ export class Trace {
 				const line = new Line(lastPoint, cursor.point);
 				const test = line.$intersection(end, directionalVector);
 				if(test && !test.eq(cursor.point)) break; // early stop
+
+				// Going past the last vertex of the hinges leads outside of
+				// them, so we stop there.
+				if(line.$contains(lastVertex)) {
+					path.push(lastVertex);
+					break;
+				}
 				path.push(cursor.point);
 			}
 
-			// Reflecting at the last vertex of the hinges leads outside of
-			// them. This happens when the ending line is beyond the hinges
-			// (for a small flap with a large overlap), and a ridge happens to
-			// pass through that vertex (such as an intersection ridge towards
-			// the corner of the flap).
-			const { x, y } = cursor.point;
-			if(x == last.x && y == last.y) break;
+			// Similarly, reflecting at the last vertex leads outside.
+			if(cursor.point.eq(lastVertex)) break;
 		}
-		return { reflected, vector: cursor.vector };
+		return { reflected };
 	}
 
 	/**
-	 * In raw mode, the generated contour must end on the given hinge segment
-	 * (after {@link extendToHinges}), so that it can be inserted into the
-	 * piece.
+	 * In raw mode, the generated contour must end on the given hinge segment,
+	 * so that it can be inserted into the piece.
 	 *
 	 * That is the case in valid layouts, as the pieces are carved to match the
 	 * tracing (see {@link getQuadrantShape}). In layouts with invalid
@@ -228,44 +229,20 @@ export class Trace {
 }
 
 /**
- * Since the tracing records only the points of reflection, the contour stops
- * at the last reflection, and if the contour leaves it in an axis-parallel
- * direction (instead of along a diagonal ending on the hinges), the last
- * segment towards the hinges is missing. In that case we extend the contour
- * to the hinges. Returns whether the contour ends on the hinges.
+ * Whether the contour ends on the hinges.
+ *
+ * Note that if the contour leaves its last reflection in an axis-parallel
+ * direction, it does not end on the hinges, and we do not extend it to them
+ * either, as that happens only in layouts with invalid junctions (see
+ * {@link Trace._rawModeFinalCheck}), where the extension does no good.
  */
-function extendToHinges(
-	result: PatternContour, hinges: Path, vector: Vector
-): boolean {
-	const lines: Line[] = [];
-	for(let i = hinges.length - 1; i > 0; i--) {
-		lines.push(Line.$fromIPoint(hinges[i], hinges[i - 1]));
-	}
+function endsOnHinges(result: PatternContour, hinges: Path): boolean {
 	const lastPoint = result[result.length - 1];
-	if(lines.some(line => line.$contains(lastPoint, true))) return true;
-	if(vector.x != 0 && vector.y != 0) return false;
-	const extension = getNearestIntersection(lines, lastPoint, vector);
-	if(!extension) return false;
-	result.push(extension);
-	return true;
-}
-
-/** The nearest intersection of a ray with the given lines, if any. */
-function getNearestIntersection(
-	lines: readonly Line[], p: Point, v: Vector
-): Point | null {
-	let result: Point | null = null;
-	let min = Number.POSITIVE_INFINITY;
-	for(const line of lines) {
-		const intersection = line.$intersection(p, v, true);
-		if(!intersection) continue;
-		const distance = intersection.$sub(p).$dot(v);
-		if(distance > 0 && distance < min) {
-			result = intersection;
-			min = distance;
-		}
+	for(let i = hinges.length - 1; i > 0; i--) {
+		const line = Line.$fromIPoint(hinges[i], hinges[i - 1]);
+		if(line.$contains(lastPoint, true)) return true;
 	}
-	return result;
+	return false;
 }
 
 /**

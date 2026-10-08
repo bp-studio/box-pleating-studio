@@ -127,8 +127,9 @@ export function createPlans(
 		const pieces = getPieceSizes(sizes, structure);
 		// Nested overlaps (with a common side) could leave nothing
 		if(pieces.some(p => p.ox <= 0 || p.oy <= 0)) continue;
+		const fan = sizes.length > 2;
 		const gadgetChoices = pieces.map((size, i) =>
-			getGadgetChoices(isOddArea(size), isJoined(structure, i))
+			getGadgetChoices(isOddArea(size), isJoined(structure, i), fan)
 		);
 		for(const joins of product(getJoinChoices(structure))) {
 			// Earlier pieces become non-integral first
@@ -248,12 +249,17 @@ function isJoined(structure: Structure, i: number): boolean {
  * and half-integral gadgets only for odd ones.
  *
  * @param joined Whether the piece takes part in any join.
+ * @param fan Whether the overlaps form a fan.
  */
-function getGadgetChoices(odd: boolean, joined: boolean): Gadget[] {
-	// Joins support only integral and half-integral gadgets
-	// (see getJoinCandidates).
-	if(joined) return [odd ? H : undefined];
-	return odd ? [H, U] : [undefined, U];
+function getGadgetChoices(
+	odd: boolean, joined: boolean, fan: boolean
+): Gadget[] {
+	if(!joined) return odd ? [H, U] : [undefined, U];
+	if(!odd) return [undefined];
+	// A universal GPS joins with one of its halves (see getJoinCandidates),
+	// which is not supported in fans yet, as the middle one would have to
+	// join with both halves.
+	return fan ? [H] : [H, U];
 }
 
 export function isOddArea(o: Size): boolean {

@@ -1,4 +1,6 @@
 import { pathToString } from "core/math/geometry/path";
+import { Line } from "core/math/geometry/line";
+import { CornerType } from "shared/json";
 import { SlashDirection } from "shared/types/direction";
 import { Trace } from "./trace";
 import { State } from "core/service/state";
@@ -11,6 +13,7 @@ import type { Point } from "core/math/geometry/point";
 import type { Path } from "shared/types/geometry";
 import type { Quadrant } from "../pattern/quadrant";
 import type { StartEnd } from "./trace";
+import type { getNextIntersection } from "./traceContext";
 
 //=================================================================
 /**
@@ -25,8 +28,9 @@ export class RepoTrace extends Trace {
 	public readonly $leaves: ReadonlySet<number>;
 
 	constructor(repo: Repository) {
+		const ridges = repo.$pattern!.$devices.flatMap(d => d.$traceRidges);
 		super(
-			repo.$pattern!.$devices.flatMap(d => d.$traceRidges),
+			hasMultipleJoints(repo) ? ridges.map(toSegment) : ridges,
 			repo.$direction,
 			repo.$configuration!.$sideDiagonals
 		);
@@ -126,6 +130,11 @@ export class RepoTrace extends Trace {
 				result.startRidge = ridge;
 			}
 		}
+		if(resolved.endDivision) {
+			const ridge = this._getIntersectionRidge(...resolved.endDivision);
+			/* istanbul ignore else: legacy */
+			if(ridge) result.end = hingeSideEnd(ridge, quadrant);
+		}
 		return result;
 	}
 
@@ -165,6 +174,36 @@ export class RepoTrace extends Trace {
 		return `const trace = new Trace(${ridges}, ${dir}, ${sideDiagonals});\nconst result = trace.$generate(parsePath("${pathToString(hinges)}"), new Point${start.toString()}, new Point${end.toString()});`;
 	}
 	/// #endif
+}
+
+/**
+ * Whether the {@link Repository} has multiple joints (i.e. quadrants with
+ * multiple junctions), as in a bridge.
+ */
+function hasMultipleJoints(repo: Repository): boolean {
+	const counts = new Map<string, number>();
+	for(const { c } of repo.$junctions) {
+		for(const end of [c[0], c[2]]) {
+			const key = `${end.e},${end.q}`;
+			counts.set(key, (counts.get(key) ?? 0) + 1);
+		}
+	}
+	return [...counts.values()].filter(n => n > 1).length > 1;
+}
+
+/**
+ * An intersection ridge is usually treated as a ray (see
+ * {@link getNextIntersection}), as the division of the gadgets continues into
+ * the rivers outside, whose structure is unknown to a single joint. But with
+ * multiple joints facing each other, the structure on the other side is also
+ * controlled by the {@link Repository}, and the division ends at the target of
+ * the ridge. So it is made a segment, keeping {@link Ridge.$division}.
+ */
+function toSegment(ridge: Ridge): Ridge {
+	if(ridge.$type != CornerType.intersection) return ridge;
+	const result = new Line(ridge.p1, ridge.p2) as Ridge;
+	result.$division = ridge.$division;
+	return result;
 }
 
 /**

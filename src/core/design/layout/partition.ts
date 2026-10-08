@@ -14,6 +14,7 @@ import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
 import type { Ridge } from "./pattern/device";
+import type { ITreeNode } from "core/design/context";
 
 export interface CornerMap {
 	/** {@link JCorner} itself. */
@@ -102,26 +103,30 @@ export class Partition implements ISerializable<JPartition> {
 	 * automatically by the turning of rivers. And by the "target", we mean the
 	 * intersection of the ridge and the flap boundary.
 	 *
+	 * In tracing, an intersection ridge always has a target, as the tracing
+	 * has to reflect on it, and it is the one on the boundary of the flap it
+	 * connects to, i.e. the one closer to it. (Note that a flap could have
+	 * multiple quadrants in the repo, so its direction alone does not decide.)
+	 *
 	 * @param point The current location of the connection point itself.
 	 * @param c The corresponding {@link JCorner} info.
-	 * @param q If given, it will force returning the connection target on the
-	 * given direction.
+	 * @param tracing Whether the target is for tracing.
 	 */
 	public $getExternalConnectionTarget(
-		point: Point, map: CornerMap, q?: QuadrantDirection
+		point: Point, map: CornerMap, tracing: boolean = false
 	): Point | null {
 		let [p1, p2] = this.$getExternalConnectionTargets(map);
 		if(p1._x.gt(p2._x)) [p1, p2] = [p2, p1];
-		if(q === undefined) {
-			if(point._x.le(p1._x)) return p1;
-			if(point._x.ge(p2._x)) return p2;
-
-			// Otherwise, the connection point is not inside the two flap
-			// regions, and we shall return null.
-			return null;
-		} else {
-			return q == Direction.UR || q == Direction.LR ? p1 : p2;
+		if(tracing && map.corner.type == CornerType.intersection) {
+			const flap = State.m.$tree.$nodes[map.corner.e as NodeId]!;
+			return distToFlap(p1, flap) <= distToFlap(p2, flap) ? p1 : p2;
 		}
+		if(point._x.le(p1._x)) return p1;
+		if(point._x.ge(p2._x)) return p2;
+
+		// Otherwise, the connection point is not inside the two flap
+		// regions, and we shall return null.
+		return null;
 	}
 
 	/**
@@ -302,4 +307,10 @@ function toCanonicalOverlap(o: JOverlap): JOverlap {
 	if(o.gadget) result.gadget = o.gadget;
 	if(o.join) result.join = o.join;
 	return result;
+}
+
+/** The distance (in the sense of box pleating) from a point to a flap. */
+function distToFlap(p: Point, flap: ITreeNode): number {
+	const [t, r, b, l] = flap.$AABB.$toValues();
+	return Math.max(l - p.x, p.x - r, b - p.y, p.y - t, 0);
 }

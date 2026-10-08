@@ -25,14 +25,14 @@ describe("Rough contour", () => {
 
 	/** Added v0.8.0 */
 	it("Omits the default ridge of a carved quadrant without pattern", () => {
-		// Flap 1 invades the upper-right corner of flap 0, but the repo of
-		// flaps 0, 1, 3 has no pattern. The hinge is still carved, but the
+		// Flaps 1 and 3 invade the upper-right corner of flap 0, but the repo
+		// of flaps 0, 1, 3 has no pattern. The hinge is still carved, but the
 		// default ridge towards (10,10) would run across the carved region.
-		parseTree("(2,0,10),(2,1,2),(2,3,3)", "(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0)");
+		parseTree("(2,0,10),(2,1,2),(2,3,2)", "(0,0,0,0,0),(1,11,5,0,0),(3,7,10,0,0)");
 		const result = UpdateResult.$flush();
 		expect(result.patternNotFound).to.be.true;
 		const f0 = result.graphics.f0;
-		expect(f0.contours[0].outer).to.equalPath("(-10,-10),(10,-10),(10,3),(9,3),(9,10),(-10,10)", true);
+		expect(f0.contours[0].outer).to.equalPath("(-10,-10),(10,-10),(10,3),(9,3),(9,8),(5,8),(5,10),(-10,10)", true);
 		expect(f0.ridges.length).to.equal(3);
 		const hasRidge = f0.ridges.some(([, p]) => p.x == 10 && p.y == 10);
 		expect(hasRidge).to.be.false;
@@ -105,14 +105,14 @@ describe("Rough contour", () => {
 		// carved in the same way, so that it does not stick out of the
 		// outer path.
 		parseTree(
-			"(2,40,1),(40,41,1),(41,42,1),(42,43,1),(43,44,1),(44,45,1),(45,46,1),(46,47,1),(47,0,2),(2,1,2),(2,3,3),(2,20,1),(20,21,1),(21,22,1),(22,23,1),(23,24,1),(24,25,1),(25,26,1),(26,27,1),(27,5,9)",
-			"(0,0,0,0,0),(1,11,5,0,0),(3,9,10,0,0),(5,-60,-60,0,0)"
+			"(2,40,1),(40,41,1),(41,42,1),(42,43,1),(43,44,1),(44,45,1),(45,46,1),(46,47,1),(47,0,2),(2,1,2),(2,3,2),(2,20,1),(20,21,1),(21,22,1),(22,23,1),(23,24,1),(24,25,1),(25,26,1),(26,27,1),(27,5,9)",
+			"(0,0,0,0,0),(1,11,5,0,0),(3,7,10,0,0),(5,-60,-60,0,0)"
 		);
 		const result = UpdateResult.$flush();
 		expect(result.patternNotFound).to.be.true;
 		const contour = result.graphics["re41,42"].contours[0];
-		expect(contour.outer).to.equalPath("(7,1),(7,8),(-8,8),(-8,-8),(8,-8),(8,1)", true);
-		expect(contour.inner![0]).to.equalPath("(7,0),(7,-7),(-7,-7),(-7,7),(6,7),(6,0)", true);
+		expect(contour.outer).to.equalPath("(7,1),(7,6),(3,6),(3,8),(-8,8),(-8,-8),(8,-8),(8,1)", true);
+		expect(contour.inner![0]).to.equalPath("(7,0),(7,-7),(-7,-7),(-7,7),(2,7),(2,5),(6,5),(6,0)", true);
 	});
 
 	/** Added v0.8.0 */
