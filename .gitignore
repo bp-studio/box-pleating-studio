@@ -23,7 +23,6 @@ coverage/
 /playwright/.cache/
 
 # My own notes
-NOTE.md
 /docs/
 
 # This is private for now

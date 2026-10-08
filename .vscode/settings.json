@@ -138,6 +138,9 @@
 		"patches/": true,
 		"test-results/": true
 	},
+	"git.scanRepositories": [
+		"docs"
+	],
 	"i18n-ally.enabledFrameworks": [
 		"vue"
 	],
