@@ -8,7 +8,8 @@ import { relayOntoKept } from "./searchUtils/relay";
 import { cover, getExposedPart, isRelayedOntoJoin, toSplitItems } from "./searchUtils/splitJoin";
 import { FAN_SIZE } from "../joiner/fanJoin";
 import { MAX_CONNECTION_RANK, RELAY_RANK, resolveJoinRank } from "./searchUtils/rank";
-import { createPlans, getRelays } from "./searchUtils/plan";
+import { createJointPlans, getRelays, isOddArea, product, sortByWidth } from "./searchUtils/plan";
+import { filterBridgePlans, findBridge, mergePartitions } from "./searchUtils/bridge";
 
 import type { SplitItem } from "./searchUtils/splitJoin";
 import type { JointCorner } from "./searchUtils/relay";
@@ -101,12 +102,16 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	 * TODO: allowing more cases here.
 	 */
 	public $checkPreconditions(): boolean {
-		// Previously, we can handle at most 1 joint...
-		if(this._joints.length > 1) return false;
+		// We can handle at most 2 joints...
+		if(this._joints.length > 2) return false;
 
-		// ...and only the case where the joint has two or three junctions.
-		const count = this._joints[0].items.length;
-		return count == 2 || count == FAN_SIZE;
+		// ...where each joint has two or three junctions...
+		const sizes = this._joints.map(joint => joint.items.length);
+		if(sizes.some(n => n != 2 && n != FAN_SIZE)) return false;
+
+		// ...and two joints are connected by exactly one bridge.
+		return this._joints.length == 1 ||
+			findBridge(this._joints) !== undefined;
 	}
 
 	public *$rankCombination(
@@ -130,10 +135,15 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	 * This is the starting point of the pattern searching algorithm.
 	 */
 	public *$search(ranks: number[]): Generator<Configuration> {
+		if(this._joints.length > 1) {
+			yield* this._searchBridged(ranks);
+			return;
+		}
+
 		const joint = this._joints[0];
 		const rank = ranks[0];
 
-		joint.plans ||= this._createPlans(joint);
+		joint.plans ||= createJointPlans(sortItems(joint.items, joint));
 		for(const plan of joint.plans) {
 			if(plan.rank == rank) yield this._makePlan(joint, plan);
 		}
@@ -156,20 +166,49 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 	// Private methods
 	////////////////////////////////////////////////////////////////////////////
 
-	private _createPlans(joint: Joint): Plan[] {
-		const items = this._sortByWidth(joint.items);
-		const sizes = items.map(item => item.junction);
-		if(!items.some(item => item.split)) return createPlans(sizes);
-		if(items.length > 2) return [];
-
-		// Joins of split junctions are handled by split joins
-		return createPlans(sizes, plan => plan.kept.length == 1);
+	/**
+	 * Search the combinations of the {@link Plan}s of two joints, applied to
+	 * the same {@link JOverlap}s, so that the bridge is cut at both ends.
+	 *
+	 * For the moment, only the plans where the bridge is relayed at both ends
+	 * are supported, and the remaining part of the bridge must be integral.
+	 */
+	private *_searchBridged(ranks: number[]): Generator<Configuration> {
+		const bridge = findBridge(this._joints)!;
+		const choices = this._joints.map((joint, k) => {
+			joint.plans ||= createJointPlans(sortItems(joint.items, joint));
+			const i = sortItems(joint.items, joint)
+				.findIndex(item => item.index == bridge);
+			return filterBridgePlans(joint.plans, i, ranks[k]);
+		});
+		for(const plans of product(choices)) {
+			const overlaps =
+				this._junctions.map((j, i) => this.$toOverlap(j, i));
+			const partitions: JOverlap[][] = [];
+			for(const [k, joint] of this._joints.entries()) {
+				const list = joint.items.map(item => overlaps[item.index]);
+				partitions.push(...this._applyPlan(joint, plans[k], list));
+			}
+			if(isOddArea(overlaps[bridge])) continue;
+			yield this.$make(mergePartitions(overlaps, partitions));
+		}
 	}
 
 	/** Create the {@link Configuration} of a {@link Plan}. */
 	private _makePlan(joint: Joint, plan: Plan): Configuration {
 		const overlaps = this._itemsToOverlaps(joint.items);
-		const sorted = this._sortByWidth(overlaps);
+		const partitions = this._applyPlan(joint, plan, overlaps);
+		return this.$make(partitions.map(o => ({ overlaps: o })));
+	}
+
+	/**
+	 * Apply a {@link Plan} to the {@link JOverlap}s of a joint (in the same
+	 * ordering as {@link Joint.items}), and returns the partitions.
+	 */
+	private _applyPlan(
+		joint: Joint, plan: Plan, overlaps: JOverlap[]
+	): JOverlap[][] {
+		const sorted = sortItems(overlaps, joint);
 		for(const [i, gadget] of plan.gadgets.entries()) {
 			if(gadget) sorted[i].gadget = gadget;
 		}
@@ -206,26 +245,25 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		// The orderings of the partitions are also as in earlier versions
 		if(!fan) {
-			if(relayed.length == 0) return this.$make([{ overlaps }]);
-			return this.$make(sorted.map(o => ({ overlaps: [o] })));
+			if(relayed.length == 0) return [overlaps];
+			return sorted.map(o => [o]);
 		}
 		const middle = kept.filter(o => o == sorted[1]);
 		const joined = [...middle, ...kept.filter(o => o != sorted[1])];
-		const partitions = [joined, ...relayed.map(o => [o])];
-		return this.$make(partitions.map(o => ({ overlaps: o })));
+		return [joined, ...relayed.map(o => [o])];
 	}
 
 	/**
-	 * Create the {@link Configuration} where the two overlaps not kept are cut
-	 * by the kept one, joined to each other, and the join is relayed onto the
-	 * side corner of the kept one. The middle one is the one being joined onto
-	 * (as in the fans), so it is the one connecting to the kept one.
+	 * Create the partitions where the two overlaps not kept are cut by the
+	 * kept one, joined to each other, and the join is relayed onto the side
+	 * corner of the kept one. The middle one is the one being joined onto (as
+	 * in the fans), so it is the one connecting to the kept one.
 	 *
 	 * @param pair The two overlaps not kept, sorted by width.
 	 */
 	private _makeRelayedJoin(
 		s: JointCorner, kept: JOverlap, pair: JOverlap[], join: JoinStrategy
-	): Configuration {
+	): JOverlap[][] {
 		const keptIsNarrow = kept.ox < pair[0].ox;
 		const [middle, outer] = keptIsNarrow ? pair : pair.toReversed();
 
@@ -243,19 +281,7 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		else outer.oy -= kept.oy;
 		if(s == Direction.UR) outer.shift = middle.shift;
 
-		return this.$make([
-			{ overlaps: [kept] },
-			{ overlaps: [middle, outer] },
-		]);
-	}
-
-	/** Sort the given objects by the widths of the corresponding overlaps. */
-	private _sortByWidth<T>(list: readonly T[]): T[] {
-		const joint = this._joints[0];
-		const widths = joint.items.map(item => item.junction.ox);
-		const order = widths.map((_, i) => i);
-		order.sort((a, b) => widths[a] - widths[b]);
-		return order.map(i => list[i]);
+		return [[kept], [middle, outer]];
 	}
 
 	private *_searchJoinPartitions(
@@ -378,4 +404,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 function getJointCorner(joint: Joint): JointCorner {
 	const j = joint.items[0].junction;
 	return j.c[0].e == joint.nodeId ? Direction.UR : Direction.LL;
+}
+
+/** Sort the given objects by the sizes of the overlaps of a joint. */
+function sortItems<T>(list: readonly T[], joint: Joint): T[] {
+	return sortByWidth(list, joint.items.map(item => item.junction));
 }

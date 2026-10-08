@@ -2,6 +2,7 @@ import { GadgetStrategy, JoinStrategy } from "shared/json/enum";
 import { HALF_INTEGRAL_CONNECTION_RANK, JOIN_RANKS, RELAY_RANK, UNIVERSAL_CONNECTION_RANK } from "./rank";
 
 import type { JOverlap } from "shared/json/layout";
+import type { JointItem } from "./types";
 
 /**
  * A plan for the {@link JOverlap}s at a joint, which are sorted by width (and
@@ -124,6 +125,8 @@ export function createPlans(
 	const result: Plan[] = [];
 	for(const structure of STRUCTURES[sizes.length]) {
 		const pieces = getPieceSizes(sizes, structure);
+		// Nested overlaps (with a common side) could leave nothing
+		if(pieces.some(p => p.ox <= 0 || p.oy <= 0)) continue;
 		const gadgetChoices = pieces.map((size, i) =>
 			getGadgetChoices(isOddArea(size), isJoined(structure, i))
 		);
@@ -258,7 +261,7 @@ export function isOddArea(o: Size): boolean {
 }
 
 /** The Cartesian product, where the last list varies the fastest. */
-function* product<T>(lists: readonly (readonly T[])[]): Generator<T[]> {
+export function* product<T>(lists: readonly (readonly T[])[]): Generator<T[]> {
 	if(!lists.length) {
 		yield [];
 		return;
@@ -267,4 +270,29 @@ function* product<T>(lists: readonly (readonly T[])[]): Generator<T[]> {
 	for(const item of first) {
 		for(const tail of product(rest)) yield [item, ...tail];
 	}
+}
+
+/**
+ * Sort the given objects by the widths of the corresponding overlaps at a
+ * joint. Nested overlaps of the same width are sorted by decreasing heights,
+ * so that they still form a (degenerate) staircase.
+ */
+export function sortByWidth<T>(
+	list: readonly T[], sizes: readonly Size[]
+): T[] {
+	const order = sizes.map((_, i) => i);
+	order.sort((a, b) =>
+		sizes[a].ox - sizes[b].ox || sizes[b].oy - sizes[a].oy
+	);
+	return order.map(i => list[i]);
+}
+
+/** Create the plans for the items at a joint, sorted by width. */
+export function createJointPlans(items: readonly JointItem[]): Plan[] {
+	const sizes = items.map(item => item.junction);
+	if(!items.some(item => item.split)) return createPlans(sizes);
+	if(items.length > 2) return [];
+
+	// Joins of split junctions are handled by split joins
+	return createPlans(sizes, plan => plan.kept.length == 1);
 }

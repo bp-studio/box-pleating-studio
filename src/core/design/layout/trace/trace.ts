@@ -1,4 +1,4 @@
-import { SlashDirection } from "shared/types/direction";
+import { SlashDirection, getNodeId, getQuadrant } from "shared/types/direction";
 import { TraceContext, getNextIntersection, isSideDiagonal } from "./traceContext";
 import { debugAssert } from "core/utils/debug";
 import { Line } from "core/math/geometry/line";
@@ -13,6 +13,7 @@ import type { Path } from "shared/types/geometry";
 import type { NodeId } from "shared/json/tree";
 import type { PatternContour } from "../../context";
 import type { getQuadrantShape } from "core/design/tasks/utils/rawPiece";
+import type { HingeSegment } from "./hingeSegment";
 
 /** The starting/ending points of tracing. */
 export interface StartEnd {
@@ -70,8 +71,10 @@ export class Trace {
 
 		// Initialize
 		const path: RationalPath = [];
-		let startDiagonal =
-			this.$sideDiagonals.find(d => d.$lineContains(start));
+		let startDiagonal = findStartDiagonal(
+			this.$sideDiagonals.filter(d => d.$lineContains(start)),
+			hinges, inside
+		);
 		if(!startDiagonal && startRidge) {
 			startDiagonal =
 				createVirtualDiagonal(start, directionalVector, startRidge);
@@ -84,8 +87,9 @@ export class Trace {
 			this.$sideDiagonals.find(d => d.$contains(end, true));
 		if(endDiagonal) ridges.add(endDiagonal);
 
+		const last = hinges[hinges.length - 1];
 		const loop = Trace._mainLoop(
-			ridges, cursor, path, end, directionalVector
+			ridges, cursor, path, end, directionalVector, last
 		);
 
 		// A contour that never reflects on any ridge (side diagonals excluded)
@@ -112,7 +116,7 @@ export class Trace {
 	 */
 	private static _mainLoop(
 		ridges: Set<Ridge>, initial: TraceNode, path: RationalPath,
-		end: Point, directionalVector: Vector
+		end: Point, directionalVector: Vector, last: IPoint
 	): { reflected: boolean, vector: Vector } {
 		let cursor = initial;
 		let reflected = false;
@@ -135,6 +139,14 @@ export class Trace {
 				if(test && !test.eq(cursor.point)) break; // early stop
 				path.push(cursor.point);
 			}
+
+			// Reflecting at the last vertex of the hinges leads outside of
+			// them. This happens when the ending line is beyond the hinges
+			// (for a small flap with a large overlap), and a ridge happens to
+			// pass through that vertex (such as an intersection ridge towards
+			// the corner of the flap).
+			const { x, y } = cursor.point;
+			if(x == last.x && y == last.y) break;
 		}
 		return { reflected, vector: cursor.vector };
 	}
@@ -271,4 +283,23 @@ function createVirtualDiagonal(
 		virtual.$inner = ridge.p1.eq(start) ? ridge.p2 : ridge.p1;
 	}
 	return virtual as SideDiagonal;
+}
+
+/**
+ * Usually there's at most one {@link SideDiagonal} containing the starting
+ * point. But when the overlaps on two opposite quadrants of a small flap both
+ * span its whole side (for example, at the ends of a bridge), two side
+ * diagonals meet at the same corner of the flap from opposite sides. The one
+ * for the traced quadrant is the one whose junction is at that quadrant of a
+ * flap inside.
+ */
+function findStartDiagonal(
+	candidates: SideDiagonal[], hinges: Path, inside: ReadonlySet<NodeId>
+): SideDiagonal | undefined {
+	const q = (hinges as Partial<HingeSegment>).q;
+	if(candidates.length < 2 || q === undefined) return candidates[0];
+	const isTraced = (d: SideDiagonal): boolean => Boolean(d.$quadrants?.some(
+		code => getQuadrant(code) == q && inside.has(getNodeId(code))
+	));
+	return candidates.find(isTraced) ?? candidates[0];
 }

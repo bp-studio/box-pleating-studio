@@ -75,7 +75,13 @@ export class RepoTrace extends Trace {
 			filtered.sort(minQuadrantWeightComparator);
 			const first = all.indexOf(filtered[0]);
 			const last = all.indexOf(filtered[filtered.length - 1]);
-			if(first > 0) {
+			// If the quadrant has a junction with the flap of the adjacent
+			// quadrant (as in the nested overlaps at the ends of a bridge, see
+			// Quadrant.$checkValidity), the gadget of that junction lies within
+			// the range of the quadrant, so the range is not cut short.
+			const isAdjacent = (i: number, j: number): boolean =>
+				!all[i].$hasJunctionWith(all[j].$flap.id);
+			if(first > 0 && isAdjacent(first, first - 1)) {
 				const a = all[first - 1].$flap.id, b = all[first].$flap.id;
 				const ridge = this._getIntersectionRidge(a, b);
 				// It is possible that the intersection ridge is missing in
@@ -86,7 +92,7 @@ export class RepoTrace extends Trace {
 					result.startRidge = ridge;
 				}
 			}
-			if(last < all.length - 1) {
+			if(last < all.length - 1 && isAdjacent(last, last + 1)) {
 				const a = all[last].$flap.id, b = all[last + 1].$flap.id;
 				const ridge = this._getIntersectionRidge(a, b);
 				/* istanbul ignore else: legacy */

@@ -56,6 +56,14 @@ export class Pattern implements ISerializable<JPattern> {
 			}
 		}
 
+		// The bridges are placed in the middle of their dragging ranges, which
+		// also take the intersection anchors into account.
+		if(!seeded) {
+			for(const device of this.$devices) {
+				if(device.$isBridge) device.$center();
+			}
+		}
+
 		if(!seeded && this._isJoint && hasOverlappingDevices(this.$devices)) {
 			this.$valid = false;
 		}

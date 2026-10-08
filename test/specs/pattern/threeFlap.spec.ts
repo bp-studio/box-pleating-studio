@@ -53,7 +53,9 @@ describe("Three flap patterns", () => {
 	describe("Validity checks", () => {
 
 		it("Checks nested overlaps", () => {
-			parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)");
+			// The overlap 1-3 (3x3) is strictly inside 1-2 (4x4). With a common
+			// side, it would be supported (see bridge.spec).
+			parseTree("(0,1,10),(0,2,10),(0,3,1)", "(1,0,0,0,0),(2,16,16,0,0),(3,8,8,0,0)");
 			const repo = expectRepo("1,2,3");
 			expect(repo.$isValid).to.be.false;
 		});

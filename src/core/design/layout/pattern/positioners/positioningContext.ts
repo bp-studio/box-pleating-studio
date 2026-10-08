@@ -81,10 +81,14 @@ export class PositioningContext {
 	/**
 	 * Get the span of a {@link Gadget} towards a given {@link TipDirection},
 	 * but exclude the immediate slack for the sake of convenience.
+	 *
+	 * @param withSlack Include the immediate slack.
 	 */
-	public $getSpan(g: Gadget, q: TipDirection): number {
+	public $getSpan(g: Gadget, q: TipDirection, withSlack = false): number {
 		const index = this.$gadgets.indexOf(g);
-		return this._getSpan(index, q) - this._getSlack(index, q);
+		const span = this._getSpan(index, q);
+		if(withSlack) return span;
+		return span - this._getSlack(index, q);
 	}
 
 	////////////////////////////////////////////////////////////////////////////

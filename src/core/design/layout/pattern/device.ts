@@ -5,7 +5,7 @@ import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
-import { getNodeId, getQuadrant, opposite } from "shared/types/direction";
+import { Direction, getNodeId, getQuadrant, opposite } from "shared/types/direction";
 import { toPath } from "core/math/geometry/rationalPath";
 import { convertIndex } from "shared/utils/pattern";
 
@@ -207,6 +207,25 @@ export class Device implements ISerializable<JDevice> {
 			else if(f < 0 && result[0] < bound) result[0] = bound;
 		}
 		return result;
+	}
+
+	/** Whether the device is relayed at both ends (see jointPositioner). */
+	public get $isBridge(): boolean {
+		const c = this.$partition.$overlaps[0].c;
+		return c[Direction.UR].type == CornerType.internal &&
+			c[Direction.LL].type == CornerType.internal;
+	}
+
+	/** Move the device to the middle of its dragging range. */
+	public $center(): void {
+		const [lo, hi] = this.$getDraggingRange();
+		if(!Number.isFinite(lo) || !Number.isFinite(hi)) return;
+		const dx = Math.floor((lo + hi) / 2);
+		if(dx == 0) return;
+		const { x, y } = this.$pattern.$config.$repo.$f;
+		const location = this.$location;
+		this.$location = { x: location.x + dx, y: location.y + dx * x * y };
+		this.$updatePosition();
 	}
 
 	public $getConnectionRidges(internalOnly: boolean): Ridge[] {

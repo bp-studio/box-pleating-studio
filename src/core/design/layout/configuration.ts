@@ -5,13 +5,15 @@ import { CornerType } from "shared/json";
 import { Line } from "core/math/geometry/line";
 import { clone } from "shared/utils/clone";
 import { convertIndex } from "shared/utils/pattern";
+import { makeQuadrantCode } from "shared/types/direction";
 
 import type { Point } from "core/math/geometry/point";
 import type { CornerMap } from "./partition";
 import type { Repository } from "./repository";
 import type { ValidJunction } from "./junction/validJunction";
 import type { Pattern } from "./pattern/pattern";
-import type { JConfiguration, JJunction, JOverlap, JPartition, OverlapId } from "shared/json";
+import type { JConfiguration, JJunction, JOverlap, JPartition, NodeId, OverlapId } from "shared/json";
+import type { QuadrantCode } from "shared/types/direction";
 
 //=================================================================
 /**
@@ -161,8 +163,14 @@ export class Configuration implements ISerializable<JConfiguration> {
 			if(diagonal.$isDegenerated) {
 				diagonal = new Line(diagonal.p1, corner);
 			}
-			(diagonal as Partial<Writeable<SideDiagonal>>).p0 = corner;
-			result.push(diagonal as SideDiagonal);
+			const d = diagonal as Partial<Writeable<SideDiagonal>>;
+			d.p0 = corner;
+			const overlap = partition.$overlaps[map.overlapIndex];
+			const { c } = this.$repo.$junctions[overlap.parent];
+			d.$quadrants = [c[0], c[2]].map(
+				end => makeQuadrantCode(end.e as NodeId, end.q!)
+			);
+			result.push(d as SideDiagonal);
 		}
 		return result;
 	}
@@ -192,6 +200,9 @@ export class Configuration implements ISerializable<JConfiguration> {
 export interface SideDiagonal extends Line {
 	/** The corresponding side corner. */
 	readonly p0: Point;
+
+	/** The quadrants at the two ends of the junction of the side corner. */
+	readonly $quadrants?: readonly QuadrantCode[];
 }
 
 /**

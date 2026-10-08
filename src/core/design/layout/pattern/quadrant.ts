@@ -74,7 +74,13 @@ export class Quadrant {
 			const j1 = this._junctions[i];
 			for(let j = i + 1; j < this._junctions.length; j++) {
 				const j2 = this._junctions[j];
-				if(oneIsContainedInAnother(j1.$o, j2.$o)) return false;
+				if(oneIsContainedInAnother(j1.$o, j2.$o)) {
+					// With a common side, the difference is still a rectangle,
+					// so the larger one can be relayed onto the smaller one,
+					// and there's no concave corner for the delta point.
+					if(haveCommonSide(j1.$o, j2.$o)) continue;
+					return false;
+				}
 
 				// v0.6.17: if the delta point of any two junctions falls
 				// inside the circle, then this quadrant is clearly invalid.
@@ -159,6 +165,11 @@ export class Quadrant {
 		if(!neighbor) return undefined;
 		const last = outside.find(j => j.$o[axis] == o[axis])!;
 		return [this._getOppositeId(last), this._getOppositeId(neighbor)];
+	}
+
+	/** Whether this quadrant has a junction with the given flap. */
+	public $hasJunctionWith(id: NodeId): boolean {
+		return this._junctions.some(j => this._getOppositeId(j) == id);
 	}
 
 	private _startEndPoints(o: IPoint): [Point, Point] {
@@ -278,10 +289,19 @@ function getDeltaPointOffsetFromCorner(
  * (but not considered covered by our covering rules),
  * then this is currently not supported and we can skip searching.
  *
- * To resolve such a junction team, sophisticated cutting is required,
- * and we need more insights on such cases to implement the cutting algorithm.
- *
- * A classic example of this is the following:
+ * v0.8.0: Unless the two have a common side (see {@link haveCommonSide}).
+ * Otherwise, sophisticated cutting is required, and we need more insights on
+ * such cases to implement the cutting algorithm.
+ */
+function oneIsContainedInAnother(o1: IPoint, o2: IPoint): boolean {
+	return o1.x <= o2.x && o1.y <= o2.y || o2.x <= o1.x && o2.y <= o1.y;
+}
+
+/**
+ * Whether two nested overlaps have the same width or the same height. The
+ * difference is then a rectangle, which can be relayed onto the smaller one,
+ * so they form a degenerate staircase. A classic example is the following,
+ * where the junction between flaps 1 and 2 is nested at both ends:
  * ```
  * parseTree(
  * 	"(0,1,10),(0,2,10),(0,3,1)",
@@ -289,6 +309,6 @@ function getDeltaPointOffsetFromCorner(
  * );
  * ```
  */
-function oneIsContainedInAnother(o1: IPoint, o2: IPoint): boolean {
-	return o1.x <= o2.x && o1.y <= o2.y || o2.x <= o1.x && o2.y <= o1.y;
+function haveCommonSide(o1: IPoint, o2: IPoint): boolean {
+	return o1.x == o2.x || o1.y == o2.y;
 }

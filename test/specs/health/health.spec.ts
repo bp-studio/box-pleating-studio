@@ -235,7 +235,7 @@ describe("Health check", () => {
 			// See oneIsContainedInAnother in quadrant.ts
 			parseTree(
 				"(0,1,10),(0,2,10),(0,3,1)",
-				"(1,0,0,0,0),(2,16,16,0,0),(3,9,7,0,0)"
+				"(1,0,0,0,0),(2,16,16,0,0),(3,8,8,0,0)"
 			);
 			const report = DesignController.health(rect(16, 16));
 			expect(report.invalidJunctions).to.equal(0);
