@@ -1,6 +1,6 @@
 {
 	"name": "box-pleating-studio",
-	"version": "0.7.17",
+	"version": "0.8.0",
 	"app_version": "1904",
 	"private": true,
 	"description": "Super-complex origami design made easy!",
@@ -23,6 +23,7 @@
 	"author": "Mu-Tsun Tsai <don.m.t.tsai@gmail.com> (https://github.com/MuTsunTsai)",
 	"type": "module",
 	"scripts": {
+		"bench:optimizer": "rstest -c tools/optimizerBench/rstest.config.ts",
 		"browserstack": "cd ../browserstack-automate && pnpm dev",
 		"build": "rsbuild build",
 		"check:render": "rstest -c tools/renderCheck/rstest.config.ts",
@@ -71,7 +72,7 @@
 		"@mutsuntsai/eslint": "^1.5.2",
 		"@mutsuntsai/rsbuild-plugin-vue-ssg": "^2.0.1",
 		"@mutsuntsai/rsbuild-utils": "^1.0.1",
-		"@playwright/test": "^1.63.0",
+		"@playwright/test": "^1.64.0",
 		"@rsbuild/core": "^2.2.12",
 		"@rsbuild/plugin-assets-retry": "^2.0.2",
 		"@rsbuild/plugin-check-syntax": "^2.0.1",
@@ -93,7 +94,7 @@
 		"del": "^8.0.1",
 		"eslint": "^10.12.0",
 		"eslint-plugin-compat": "^7.0.2",
-		"eslint-plugin-jsdoc": "^65.1.0",
+		"eslint-plugin-jsdoc": "^65.2.0",
 		"eslint-plugin-typescript-compat": "^1.0.2",
 		"fancy-log": "^2.0.0",
 		"find-cache-directory": "^6.0.0",
