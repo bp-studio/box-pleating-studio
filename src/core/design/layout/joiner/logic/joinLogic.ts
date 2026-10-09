@@ -4,6 +4,9 @@ import { Cache } from "core/utils/cache";
 import { Gadget } from "../../pattern/gadget";
 import { Fraction } from "core/math/fraction";
 import { Vector } from "core/math/geometry/vector";
+import { debugAssert } from "core/utils/debug";
+import { Line } from "core/math/geometry/line";
+import { QV } from "../../pattern/quadrant";
 
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Joinee } from "../joinee";
@@ -73,8 +76,21 @@ export abstract class JoinLogic {
 		if(s2) size += builder2.$setup(builder1, -1, s2, w2);
 		if(isNaN(size)) return;
 
+		// Align the joint corners of the two pieces, taking the shifts of the
+		// pieces into account (see JoinCandidate). In the oriented case, the
+		// joint corners are not shifted (see getJoinCandidates).
 		let offset: IPoint | undefined;
-		if(!$oriented) builder2.$additionalOffset = offset = { x: p1.sx - p2.sx, y: p1.sy - p2.sy };
+		const t1 = p1.shift ?? { x: 0, y: 0 }, t2 = p2.shift ?? { x: 0, y: 0 };
+		debugAssert(
+			() => !$oriented || t1.x == t2.x && t1.y == t2.y,
+			"Shifted pieces in an oriented join"
+		);
+		if(!$oriented) {
+			builder2.$additionalOffset = offset = {
+				x: p1.sx - p2.sx + t1.x - t2.x,
+				y: p1.sy - p2.sy + t1.y - t2.y,
+			};
+		}
 
 		// Gather important parameters
 		const pt = s1 ? builder1.$anchor : builder2.$anchor;
@@ -94,9 +110,9 @@ export abstract class JoinLogic {
 
 	public abstract $join(): Generator<JoinResult>;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected readonly _deltaPt = new Cache(() => {
 		const { org } = this.data;
@@ -107,6 +123,27 @@ export abstract class JoinLogic {
 			org.y + ($intDist - (cw ? j1.p : j2.p).oy) * f
 		);
 	});
+
+	/**
+	 * Whether the critical edges of the two gadgets meet on the delta line,
+	 * which is the condition of simple joins (including perfect joins).
+	 */
+	protected _isSimple(): boolean {
+		const int = this.j1.e.$intersectLine(this.j2.e, false);
+		if(!int) return false;
+		return new Line(this._deltaPt.value, QV[0]).$lineContains(int);
+	}
+
+	/**
+	 * Whether the two gadgets are "pointing inwards", in which case there is
+	 * no convex join, as the straight-skeleton degenerates into a relay
+	 * pattern. Parallel gadgets never point inwards.
+	 */
+	protected _isPointingInwards(): boolean {
+		const { j1, j2 } = this;
+		if(j1.p.$direction.value.$parallel(j2.p.$direction.value)) return false;
+		return this.joiner.$isClockwise != j1.$isSteeperThan(j2);
+	}
 
 	/**
 	 * Setup the {@link Piece.detours} for the two {@link Piece}s.
@@ -141,7 +178,9 @@ export abstract class JoinLogic {
 	 * Generated {@link JoinResult}.
 	 * @param shouldClone Whether the piece should be cloned.
 	 */
-	protected _result(shouldClone: boolean = false, extraSize: number = 0): JoinResult {
+	protected _result(
+		shouldClone: boolean = false, extraSize: number = 0
+	): JoinResult {
 		const { offset, size, addOns } = this.data;
 		const { j1, j2 } = this;
 		const oriented = this.joiner.$oriented;
@@ -158,20 +197,26 @@ export abstract class JoinLogic {
 		];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 	/* istanbul ignore next: debug */
 	public static debugContour(g1: JGadget, g2: JGadget): void {
-		// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-		const pt = new Point(new Fraction(429, 7 as Positive), new Fraction(520, 7 as Positive));
+		const pt = new Point(
+			// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+			new Fraction(429, 7 as Positive), new Fraction(520, 7 as Positive)
+		);
 		const c1 = new Gadget(g1).$contour.value;
 		const c2 = new Gadget(g2).$contour.value;
 		if(c1.some(p => p.eq(pt)) || c2.some(p => p.eq(pt))) {
-			// Paste the result of the following output to debug tools for inspection
-			console.log(JSON.stringify([[c1.map(p => p.$toIPoint())], [c2.map(p => p.$toIPoint())]]));
+			// Paste the result of the following output to debug tools for
+			// inspection
+			console.log(JSON.stringify([
+				[c1.map(p => p.$toIPoint())],
+				[c2.map(p => p.$toIPoint())],
+			]));
 			debugger;
 		}
 	}

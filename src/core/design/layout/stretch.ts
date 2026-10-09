@@ -61,11 +61,12 @@ export class Stretch implements ISerializable<JStretch> {
 		const repo = this._repo;
 		if(signature === repo.$signature) {
 			/**
-			 * The {@link Repository.$signature} only encodes the structure and not the {@link NodeSet},
-			 * so in case nodes are changed due to splitting/merging,
-			 * we need to update the {@link NodeSet} here.
-			 * Note that to compare the old and new {@link NodeSet}s is no less work
-			 * than to just create and replace the {@link NodeSet} regardlessly.
+			 * The {@link Repository.$signature} only encodes the structure and
+			 * not the {@link NodeSet}, so in case nodes are changed due to
+			 * splitting/merging, we need to update the {@link NodeSet} here.
+			 * Note that to compare the old and new {@link NodeSet}s is no less
+			 * work than to just create and replace the {@link NodeSet}
+			 * regardlessly.
 			 */
 			const oldSet = repo.$nodeSet;
 			repo.$nodeSet = new NodeSet(junctions, repo.$quadrants);
@@ -101,10 +102,11 @@ export class Stretch implements ISerializable<JStretch> {
 	}
 
 	/**
-	 * Finish searching for patterns, called when the {@link Stretch} is first selected.
+	 * Finish searching for patterns, called when the {@link Stretch} is first
+	 * selected.
 	 *
-	 * Before that happens, a {@link Stretch} will always only yield the first pattern it finds,
-	 * to save the computation time.
+	 * Before that happens, a {@link Stretch} will always only yield the first
+	 * pattern it finds, to save the computation time.
 	 */
 	public $complete(): JStretch {
 		this._repo.$complete();

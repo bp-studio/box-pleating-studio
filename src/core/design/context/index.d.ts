@@ -11,8 +11,11 @@ import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
 import type { traceContourTask } from "core/design/tasks/traceContour";
+import type { fitsAt } from "core/design/tasks/utils/invasion";
 
-export type NodeCollection<T> = Readonly<Record<NodeId, T | undefined>> & Omit<ReadonlyArray<T | undefined>, number>;
+export type NodeCollection<T> =
+	Readonly<Record<NodeId, T | undefined>> &
+	Omit<ReadonlyArray<T | undefined>, number>;
 
 export interface ITree {
 	/** The array of all nodes. Some indices are skipped. */
@@ -70,7 +73,8 @@ export interface ITreeNode extends ITreeNodeBase, ISerializable<JEdge> {
 /** See {@link patternContourTask}. */
 export interface PatternContour extends Array<Point> {
 	/**
-	 * The {@link Repository.$signature} of the repo from which this path derives.
+	 * The {@link Repository.$signature} of the repo from which this path
+	 * derives.
 	 *
 	 * Used for removing the path should the corresponding repo change
 	 * (see {@link clearPatternContourForRepo}).
@@ -78,15 +82,25 @@ export interface PatternContour extends Array<Point> {
 	$repo: string;
 
 	/**
-	 * The index in {@link NodeGraphics.$roughContours} associated with this contour,
-	 * if available.
+	 * The index in {@link NodeGraphics.$roughContours} associated with this
+	 * contour, if available.
 	 */
 	$for?: number;
+
+	/**
+	 * The index in {@link ContourComponent.$outer} of the associated
+	 * {@link TraceContour}, from which this contour is traced.
+	 * In raw mode, the outer paths could overlap, and the ends of this contour
+	 * could lie on more than one of them, so we need to know the exact path.
+	 */
+	$piece?: number;
 
 	/** Same as {@link NodeSet.$nodes}. */
 	$ids: readonly NodeId[];
 
-	/** The ids of the wrapped leaves of the corresponding {@link RoughContour}. */
+	/**
+	 * The ids of the wrapped leaves of the corresponding {@link RoughContour}.
+	 */
 	$leaves: readonly NodeId[];
 }
 
@@ -117,16 +131,23 @@ export interface RoughContour extends ContourComponentBase<PathEx> {
 
 	/** Pointers to the child components. */
 	readonly $children: RoughContour[];
+
+	/**
+	 * The leaves inside this component with invasions not yet carved at this
+	 * level (see {@link fitsAt}).
+	 */
+	$pending?: NodeId[];
 }
 
 interface ContourComponentBase<T extends Path> {
 	/**
 	 * Outer path of the contour.
 	 * Note that it is not of the same meaning as {@link Contour.outer}.
-	 * In a {@link ContourComponent}, {@link $outer} is from the processing perspective
-	 * (that is, it is the side of the river boundary facing away from the wrapped flaps),
-	 * not from the rendering perspective (that is, it is graphically the outer path).
-	 * Therefore, the outer paths are not necessarily counter-clockwise in orientation.
+	 * In a {@link ContourComponent}, {@link $outer} is from the processing
+	 * perspective (that is, it is the side of the river boundary facing away
+	 * from the wrapped flaps), not from the rendering perspective (that is, it
+	 * is graphically the outer path). Therefore, the outer paths are not
+	 * necessarily counter-clockwise in orientation.
 	 *
 	 * In majority of cases there's only one outer path,
 	 * but it could also contains newly formed holes,
@@ -138,7 +159,8 @@ interface ContourComponentBase<T extends Path> {
 	$leaves: NodeId[];
 }
 
-export interface ContourComponent<T extends Path> extends ContourComponentBase<T> {
+export interface ContourComponent<T extends Path>
+	extends ContourComponentBase<T> {
 	/**
 	 * Inner holes of the contour contributed by the child contours, if any.
 	 * This does not include the newly formed holes.

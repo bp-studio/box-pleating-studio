@@ -40,7 +40,8 @@ export class BaseJoinLogic extends JoinLogic {
 	/**
 	 * Find the four critical intersections of the base join.
 	 *
-	 * It's worth mentioning that those four intersections doesn't always present.
+	 * It's worth mentioning that those four intersections doesn't always
+	 * present.
 	 * If the angles of the two {@link Gadget} are very "steep",
 	 * chances are that only one pair will show up.
 	 */
@@ -56,13 +57,14 @@ export class BaseJoinLogic extends JoinLogic {
 		return { D1, D2, B1, B2, delta };
 	}
 
-	private tryJoin(B: NPoint, D: NPoint, Din2: boolean, shouldClone: boolean): JoinResult | undefined {
-		const { j1, j2, f } = this;
+	private tryJoin(
+		B: NPoint, D: NPoint, Din2: boolean, shouldClone: boolean
+	): JoinResult | undefined {
+		const { f } = this;
 		if(!B || !D) return;
 		if(B.$isIntegral && D.$isIntegral && !B.eq(D)) {
-			// There is no convex join if the two gadgets are "pointing inwards",
-			// as the straight-skeleton degenerates into a relay pattern.
-			if(D.x * f > B.x * f && this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
+			const convex = D.x * f > B.x * f;
+			if(convex && this._isPointingInwards()) return;
 
 			/* istanbul ignore next: debug */
 			if(!this._setupAnchor(D)) return;

@@ -27,4 +27,10 @@ Problem::Problem(const emscripten::val &data) {
 		int height = flap["height"].as<int>();
 		last_hierarchy.flaps.emplace_back(id, width, height);
 	}
+
+	auto tree_data = data["tree"];
+	if(!tree_data.isUndefined() && !tree_data.isNull()) {
+		tree = make_unique<Tree>(tree_data);
+		last_hierarchy.tree = tree.get();
+	}
 }

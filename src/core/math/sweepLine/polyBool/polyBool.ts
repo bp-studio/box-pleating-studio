@@ -12,7 +12,8 @@ import type { StartEvent } from "../classes/event";
  */
 //=================================================================
 
-export abstract class PolyBool<ComponentType, PathType extends Path = Path> extends DivideAndCollect {
+export abstract class PolyBool<ComponentType, PathType extends Path = Path>
+	extends DivideAndCollect {
 
 	/** Logic for final assembling. */
 	protected abstract readonly _chainer: Chainer<PathType>;
@@ -27,15 +28,18 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 		return this._chainer.$chain(this._collectedSegments);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Load all initial events. */
 	protected abstract _initialize(components: ComponentType[]): void;
 
-	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
-		// If the previous segment just exited, then the current segment should be on the boundary.
+	protected override _setInsideFlag(
+		event: StartEvent, prev?: StartEvent
+	): void {
+		// If the previous segment just exited, then the current segment should
+		// be on the boundary.
 		if(prev && prev.$wrapCount != 0) {
 			event.$wrapCount += prev.$wrapCount;
 			event.$isInside = event.$wrapCount != 0;
@@ -46,9 +50,9 @@ export abstract class PolyBool<ComponentType, PathType extends Path = Path> exte
 		// if(event.$point.x == 73 && event.$point.y == 118) debugWrap(event);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 

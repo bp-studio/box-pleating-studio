@@ -15,6 +15,9 @@ import { Vertex } from "./components/tree/vertex";
 import { Edge } from "./components/tree/edge";
 import { BatchUpdateManager } from "./batchUpdateManager";
 import { CoreManager } from "./coreManager";
+import {
+	clipboard, collectSubtrees, getClipboardSource, setClipboard
+} from "./components/tree/clipboard";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
@@ -54,7 +57,8 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	/**
 	 * Prototypes of various objects before they are constructed.
 	 *
-	 * Currently only three object types are relevant: {@link Flap}, {@link Stretch} and {@link Vertex}.
+	 * Currently only three object types are relevant: {@link Flap},
+	 * {@link Stretch} and {@link Vertex}.
 	 *
 	 * It is cleared after each {@link $update}.
 	 */
@@ -74,7 +78,8 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const view = this.$addRootObject(new Container(), display.designs);
 		this.addEventListener(MOUNTED, e => view.visible = e.state);
 
-		this.layout = new Layout(project, view, json.layout.sheet, state?.layout);
+		this.layout =
+			new Layout(project, view, json.layout.sheet, state?.layout);
 		this.tree = new Tree(project, view, json.tree, state?.tree);
 		this.$addChild(this.layout.$sheet);
 		this.$addChild(this.tree.$sheet);
@@ -140,25 +145,33 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const { layout, tree } = this.$prototype;
 		for(const [tag, json] of mementos) {
 			const init = tag.substring(0, 1);
-			if(tag === "layout" || tag === "tree") this.$prototype[tag].sheet = json as JSheet;
+			if(tag === "layout" || tag === "tree") {
+				this.$prototype[tag].sheet = json as JSheet;
+			}
 			if(init === "f") layout.flaps.push(json as JFlap);
 			if(init === "v") tree.nodes.push(json as JVertex);
 			if(init === "s") layout.stretches.push(json as JStretch);
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public goToDual(): void {
 		const selections = SelectionController.selections;
 		if(this.mode == "layout") {
-			if(isTypedArray(selections, Flap)) this.layout.$goToDual(selections);
-			else if(selections[0] instanceof River) this.layout.$goToDual(selections[0]);
+			if(isTypedArray(selections, Flap)) {
+				this.layout.$goToDual(selections);
+			} else if(selections[0] instanceof River) {
+				this.layout.$goToDual(selections[0]);
+			}
 		} else {
-			if(isTypedArray(selections, Vertex)) this.tree.$goToDual(selections);
-			else if(selections[0] instanceof Edge) this.tree.$goToDual(selections[0]);
+			if(isTypedArray(selections, Vertex)) {
+				this.tree.$goToDual(selections);
+			} else if(selections[0] instanceof Edge) {
+				this.tree.$goToDual(selections[0]);
+			}
 		}
 	}
 
@@ -166,18 +179,78 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const selections = SelectionController.selections;
 		if(this.mode == "layout") {
 			if(isTypedArray(selections, Flap)) {
-				const promise = this.tree.$vertices.$delete(selections.map(f => f.$vertex));
+				const vertices = selections.map(f => f.$vertex);
+				const promise = this.tree.$vertices.$delete(vertices);
 				SelectionController.clear(); // order matters here
 				await promise;
 			}
 		} else {
-			if(isTypedArray(selections, Vertex)) await this.tree.$vertices.$delete(selections);
+			if(isTypedArray(selections, Vertex)) {
+				await this.tree.$vertices.$delete(selections);
+			}
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public get canCopy(): boolean {
+		return this.mode == "tree" &&
+			isTypedArray(SelectionController.selections, Vertex);
+	}
+
+	public get canPaste(): boolean {
+		const selections = SelectionController.selections;
+		return this.mode == "tree" && selections.length == 1 &&
+			selections[0] instanceof Vertex &&
+			this.tree.$vertices.$canPaste(clipboard.value);
+	}
+
+	/**
+	 * Copy the selected subtrees that are connected to the rest of the tree
+	 * by exactly one edge, and select the copied part only.
+	 * @returns Whether anything is copied.
+	 */
+	public copy(): boolean {
+		if(!this.canCopy) return false;
+		const vertices = SelectionController.selections as Vertex[];
+		const ids = new Set(vertices.map(v => v.id));
+		const result = collectSubtrees(this.tree, ids);
+		if(!result.subtrees.length) return false;
+		setClipboard(result.subtrees, this.$project.id);
+		gtag("event", "edit_copy");
+		SelectionController.clear();
+		for(const id of result.ids) {
+			SelectionController.$toggle(this.tree.$vertices.$get(id)!, true);
+		}
+		return true;
+	}
+
+	/**
+	 * Delete the selected vertices as in {@link delete},
+	 * and copy the subtrees that are actually deleted.
+	 * @returns Whether anything is cut.
+	 */
+	public async cut(): Promise<boolean> {
+		if(!this.canCopy) return false;
+		const vertices = SelectionController.selections as Vertex[];
+		const subtrees = await this.tree.$vertices.$cut(vertices);
+		if(!subtrees.length) return false;
+		setClipboard(subtrees, this.$project.id);
+		gtag("event", "edit_cut");
+		return true;
+	}
+
+	/** Paste the copied subtrees under the selected vertex. */
+	public async paste(): Promise<void> {
+		if(!this.canPaste) return;
+		gtag("event", "edit_paste", {
+			data1: getClipboardSource(this.$project.id),
+		});
+		const vertex = SelectionController.selections[0] as Vertex;
+		await this.tree.$vertices.$paste(vertex, clipboard.value);
+	}
+
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _onModeChanged(): void {
 		const mode = this.mode;
@@ -186,9 +259,9 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		if(mode === "layout") this.layout.$flaps.$sync.clear();
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 	/* istanbul ignore next: debug */

@@ -30,16 +30,19 @@ function handleContextLost(): void {
 	}
 
 	// Otherwise, we could be in the middle of opening a file
-	// (since file selectors on mobile devices will put the browser in background),
-	// and we need to wait until the files are loaded in that case.
+	// (since file selectors on mobile devices will put the browser in
+	// background), and we need to wait until the files are loaded in that
+	// case.
 	contextLost = true;
 
 	// First, show the loader to block the viewport.
 	DialogService.loader.show();
 
-	// Next, once the visibility changes back, we start the timer and prepare for restart.
+	// Next, once the visibility changes back, we start the timer and prepare
+	// for restart.
 	document.addEventListener("visibilitychange", () => {
-		// If, before the timeout, no files are opened, then we can safely restart.
+		// If, before the timeout, no files are opened, then we can safely
+		// restart.
 		restartTimeout = setTimeout(() => location.reload(), TIMEOUT);
 	}, { once: true });
 }

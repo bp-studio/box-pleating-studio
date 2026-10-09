@@ -48,12 +48,16 @@ export namespace Migration {
 				title: "",
 				mode: "tree",
 				layout: {
-					sheet: { type: GridType.rectangular, width: 16, height: 16 },
+					sheet: {
+						type: GridType.rectangular, width: 16, height: 16,
+					},
 					flaps: [],
 					stretches: [],
 				},
 				tree: {
-					sheet: { type: GridType.rectangular, width: 20, height: 20 },
+					sheet: {
+						type: GridType.rectangular, width: 20, height: 20,
+					},
 					nodes: [],
 					edges: [],
 				},
@@ -66,7 +70,8 @@ export namespace Migration {
 		let i = $getVersionIndex(proj);
 		while(i < migrations.length) {
 			console.info("Applying migration " + migrations[i][1]);
-			deprecate = migrations[i][0](proj) || deprecate; // Ordering matters
+			// Ordering matters
+			deprecate = migrations[i][0](proj) || deprecate;
 			i++;
 		}
 		proj.version = $getCurrentVersion();
@@ -78,7 +83,8 @@ export namespace Migration {
 
 		/* istanbul ignore next: legacy code */
 		if(deprecate) {
-			delete proj.history; // In deprecated files, history records are likely invalid.
+			// In deprecated files, history records are likely invalid.
+			delete proj.history;
 			options.onDeprecate?.(proj.design!.title);
 		}
 

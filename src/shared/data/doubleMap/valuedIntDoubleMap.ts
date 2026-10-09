@@ -6,7 +6,8 @@ import type { Node } from "./intDoubleMap";
 
 //=================================================================
 /**
- * {@link ValuedIntDoubleMap} is an {@link IntDoubleMap} plus the indexing on the values.
+ * {@link ValuedIntDoubleMap} is an {@link IntDoubleMap} plus the indexing on
+ * the values.
  */
 //=================================================================
 
@@ -47,9 +48,9 @@ export class ValuedIntDoubleMap<K extends number, V>
 		super.clear();
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected override _createNode(key1: K, key2: K, value: V): Node<K, V> {
 		const node = super._createNode(key1, key2, value);
@@ -70,12 +71,15 @@ export class ValuedIntDoubleMap<K extends number, V>
 		this._pasteNode(node);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _cutNode(node: Node<K, V>): void {
-		unlink(node, next => next ? this._valueMap.set(node.value, next) : this._valueMap.delete(node.value));
+		unlink(node, next => next ?
+			this._valueMap.set(node.value, next) :
+			this._valueMap.delete(node.value)
+		);
 	}
 
 	private _pasteNode(node: Node<K, V>): void {

@@ -3,7 +3,6 @@ import type { Repository } from "core/design/layout/repository";
 import type { Gadget } from "core/design/layout/pattern/gadget";
 import type { AddOn } from "core/design/layout/pattern/addOn";
 import type { Pattern } from "core/design/layout/pattern/pattern";
-import type { Strategy } from "./enum";
 import type { JOverlap, JQuadrilateral } from "./layout";
 
 export interface JStretch {
@@ -24,8 +23,9 @@ export interface JStretch {
  * Store all information about the {@link Repository} for session.
  *
  * It would not suffice to simply store the config/pattern counts and indices,
- * since the generated config/pattern could be different across different versions.
- * We therefore store the entire config/pattern hierarchy just to be sure.
+ * since the generated config/pattern could be different across different
+ * versions. We therefore store the entire config/pattern hierarchy just to be
+ * sure.
  */
 export interface JRepository {
 	configurations: Required<JConfiguration>[];
@@ -59,9 +59,6 @@ export type JJunctions = readonly JJunction[];
 export interface JPartition {
 	/** All Overlaps in this Partition */
 	overlaps: readonly JOverlap[];
-
-	/** The generating {@link Strategy} used by this Partition */
-	strategy?: Strategy;
 }
 
 export interface JPattern {
@@ -84,20 +81,23 @@ export interface JGadget {
 	/** All {@link Piece}s that form the current {@link Gadget} */
 	pieces: readonly JPiece[];
 
-	/** The relative offset of the {@link Gadget} to the `p[0]` of its first {@link Piece} */
+	/**
+	 * The relative offset of the {@link Gadget} to the `p[0]` of its first
+	 * {@link Piece}
+	 */
 	offset?: IPoint;
 
 	/**
-	 * Pay attention that the {@link anchors} are in opposite ordering from a {@link JOverlap},
-	 * that is, the one of index 0 is the lower left corner.
+	 * Pay attention that the {@link anchors} are in opposite ordering from a
+	 * {@link JOverlap}, that is, the one of index 0 is the lower left corner.
 	 */
 	anchors?: JAnchor[];
 }
 
 /**
- * An anchor point is a corner on a {@link Gadget} that connects to an outer ridge
- * (possibly degenerated). Usually it is one of the original corners
- * of the gadget, but for joined gadgets it could be a corner of an {@link AddOn}
+ * An anchor point is a corner on a {@link Gadget} that connects to an outer
+ * ridge (possibly degenerated). Usually it is one of the original corners of
+ * the gadget, but for joined gadgets it could be a corner of an {@link AddOn}
  * (as in the case of general joins), or a corner of another gadget
  * (as in the case of relay joins).
  */
@@ -105,11 +105,15 @@ export interface JAnchor {
 	/**
 	 * The slack that needs to be kept when connecting.
 	 *
-	 * We need to specify this only if the slack cannot be inferred from the constraints of partitions.
+	 * We need to specify this only if the slack cannot be inferred from the
+	 * constraints of partitions.
 	 */
 	slack?: number;
 
-	/** Customize Anchor position. If not assigned, it will be inferred from the Gadget. */
+	/**
+	 * Customize Anchor position. If not assigned, it will be inferred from the
+	 * Gadget.
+	 */
 	location?: IPoint;
 }
 
@@ -126,13 +130,18 @@ export interface JPiece {
 	/** The height of the margin rectangle (MR). */
 	v: number;
 
-	/** Detour in clockwise direction. The coordinates are before adding the shift. */
+	/**
+	 * Detour in clockwise direction. The coordinates are before adding the
+	 * shift.
+	 */
 	detours?: Path[];
 
 	/**
-	 * The relative shifting of this Piece to the reference point (before transformation) of the Partition.
+	 * The relative shifting of this Piece to the reference point (before
+	 * transformation) of the Partition.
 	 *
-	 * This includes the shifting of non-integral solutions, or the shifting in complex joins.
+	 * This includes the shifting of non-integral solutions, or the shifting in
+	 * complex joins.
 	 */
 	shift?: IPoint;
 }

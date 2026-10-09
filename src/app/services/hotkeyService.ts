@@ -14,15 +14,21 @@ namespace HotkeyService {
 	 * @param ctrl Default value is `true`.
 	 * @param shift Default value is `false`.
 	 */
-	export function register(action: Action, key: string, ctrl: boolean = true, shift: boolean = false): void {
+	export function register(
+		action: Action, key: string,
+		ctrl: boolean = true, shift: boolean = false
+	): void {
 		hotkeys.push([action, key.toLowerCase(), ctrl, shift]);
 	}
 
-	function wrapHandler(handler: Consumer<KeyboardEvent>): Consumer<KeyboardEvent> {
+	function wrapHandler(
+		handler: Consumer<KeyboardEvent>
+	): Consumer<KeyboardEvent> {
 		return e => {
 			// Capturing exceptions
 			const active = document.activeElement;
-			const isInput = active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement;
+			const isInput = active instanceof HTMLInputElement ||
+				active instanceof HTMLTextAreaElement;
 			const isSave = e.key.toLowerCase() == "s" && (e.metaKey || e.ctrlKey);
 			if(isInput && !isSave) return;
 
@@ -49,7 +55,10 @@ namespace HotkeyService {
 			if(document.querySelector(".modal-open")) return;
 
 			for(const [action, key, ctrl, shift] of hotkeys) {
-				if(e.key.toLowerCase() == key && (e.metaKey || e.ctrlKey) == ctrl && e.shiftKey == shift) {
+				if(
+					e.key.toLowerCase() == key &&
+					(e.metaKey || e.ctrlKey) == ctrl && e.shiftKey == shift
+				) {
 					e.preventDefault();
 					action();
 					return;

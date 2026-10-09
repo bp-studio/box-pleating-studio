@@ -1,9 +1,22 @@
-export enum Strategy {
+import type { JOverlap } from "./layout";
+
+/**
+ * How the gadget of a {@link JOverlap} is generated.
+ * If omitted, integral GOPS gadgets are generated.
+ */
+export enum GadgetStrategy {
 	halfIntegral = "HALFINTEGRAL",
 	universal = "UNIVERSAL",
+}
+
+/** How a {@link JOverlap} joins onto another {@link JOverlap}. */
+export enum JoinStrategy {
+	/** Simple joins where the axis-parallel creases are not parallel. */
+	simple = "SIMPLE",
+	/** Simple joins where the axis-parallel creases are parallel. */
+	perfect = "PERFECT",
 	baseJoin = "BASE_JOIN",
 	standardJoin = "STANDARD_JOIN",
-	perfect = "PERFECT",
 }
 
 export enum GridType {
@@ -36,8 +49,8 @@ export enum CornerType {
 	/** A conner that connects to a flap. */
 	flap,
 	/**
-	 * This corner coincides with another corner of another Overlap,
-	 * which makes the current overlap belong to the same Partition as the former.
+	 * This corner coincides with another corner of another Overlap, which makes
+	 * the current overlap belong to the same Partition as the former.
 	 */
 	coincide,
 }

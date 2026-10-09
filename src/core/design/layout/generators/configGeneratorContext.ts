@@ -1,14 +1,15 @@
 import { clone } from "shared/utils/clone";
 import { CornerType } from "shared/json";
 import { Configuration, cleanUp } from "../configuration";
+import { debugAssert } from "core/utils/debug";
 
 import type { Repository } from "../repository";
 import type { JJunction, JJunctions, JOverlap, JPartition, OverlapId } from "shared/json";
 
 //=================================================================
 /**
- * {@link ConfigGeneratorContext} tracks the creation of {@link JOverlap}s during
- * the course of generating {@link Configuration}s.
+ * {@link ConfigGeneratorContext} tracks the creation of {@link JOverlap}s
+ * during the course of generating {@link Configuration}s.
  */
 //=================================================================
 
@@ -25,24 +26,27 @@ export class ConfigGeneratorContext {
 		this._junctions = repo.$junctions;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Cut a {@link JJunction} into two, either vertically or horizontally.
 	 *
 	 * @param index The index of this {@link JJunction}.
 	 * @param id The next available index of the {@link JOverlap}.
-	 * The resulting indices of the cutting will go decreasingly from this number.
+	 * The resulting indices of the cutting will go decreasingly from this
+	 * number.
 	 */
-	public $cut(j: JJunction, index: number, x: number, y: number): [JOverlap, JOverlap] {
+	public $cut(
+		j: JJunction, index: number, x: number, y: number
+	): [JOverlap, JOverlap] {
 		const o1 = this.$toOverlap(j, index), o2 = this.$toOverlap(j, index);
 
-		/// #if DEBUG
-		/* istanbul ignore next: debug */
-		if(o1.id === undefined || o2.id === undefined) debugger;
-		/// #endif
+		debugAssert(
+			() => o1.id !== undefined && o2.id !== undefined,
+			"Overlap without id"
+		);
 
 		if(x > 0) {
 			o1.c[2] = { type: CornerType.internal, e: o2.id, q: 3 };
@@ -76,12 +80,15 @@ export class ConfigGeneratorContext {
 	}
 
 	/**
-	 * Replace temporary id to real id and construct a new {@link Configuration}.
+	 * Replace temporary id to real id and construct a new
+	 * {@link Configuration}.
 	 * @param single See {@link Configuration.$singleMode}.
 	 */
 	public $make(partitions: JPartition[], single?: boolean): Configuration {
 		if(single && this.$singleMode) {
-			return new Configuration(this.$repo, { partitions, raw: true }, true);
+			return new Configuration(
+				this.$repo, { partitions, raw: true }, true
+			);
 		} else {
 			cleanUp(partitions); // perform clean-up in place
 			return new Configuration(this.$repo, { partitions });

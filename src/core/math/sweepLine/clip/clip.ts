@@ -64,13 +64,17 @@ export class Clip extends DivideAndCollect {
 		}));
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
+	protected override _setInsideFlag(
+		event: StartEvent, prev?: StartEvent
+	): void {
 		if(prev) event.$wrapCount += prev.$wrapCount;
-		event.$isInside = event.$segment.$type == CreaseType.Border || // borders always count
+		event.$isInside =
+			// borders always count
+			event.$segment.$type == CreaseType.Border ||
 			!sameLine(event, prev) && // ignore identical lines
 			event.$wrapCount != 0;
 	}
@@ -78,5 +82,6 @@ export class Clip extends DivideAndCollect {
 
 function sameLine(ev1: StartEvent, ev2?: StartEvent): boolean {
 	if(!ev2) return false;
-	return epsilonSame(ev1.$point, ev2.$point) && epsilonSame(ev1.$other.$point, ev2.$other.$point);
+	return epsilonSame(ev1.$point, ev2.$point) &&
+		epsilonSame(ev1.$other.$point, ev2.$other.$point);
 }

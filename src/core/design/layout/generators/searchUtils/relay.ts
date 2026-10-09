@@ -1,61 +1,63 @@
 import { CornerType } from "shared/json";
-import { clone } from "shared/utils/clone";
+import { debugAssert } from "core/utils/debug";
+import { Direction, opposite, previousQuadrantOffset, quadrantNumber } from "shared/types/direction";
 
-import type { JOverlap, JPartition, Strategy } from "shared/json";
+import type { JOverlap, NodeId } from "shared/json";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JointItem } from "./types";
 
-export function* searchRelay(
-	items: readonly JointItem[],
-	o1: JOverlap, o2: JOverlap,
-	s1?: Strategy, s2?: Strategy
-): Generator<JPartition[]> {
-	const oriented = o1.c[2].e == o2.c[2].e; // They share lower-left corner
-	if(o1.ox > o2.ox) [o1, o2] = [o2, o1];
+/** The joint corner of the {@link JOverlap}s at a joint. */
+export type JointCorner = Direction.UR | Direction.LL;
 
-	/// #if DEBUG
-	/* istanbul ignore next: debug */
-	if(o1.id === undefined || o2.id === undefined) debugger;
-	/// #endif
+/**
+ * Relay a {@link JOverlap} onto the ones kept at the joint, by cutting off the
+ * parts of it that overlap its neighbors among the kept ones.
+ *
+ * Since the overlaps are not nested (see Quadrant.$checkValidity), the
+ * remaining part is always a rectangle. Its corner at the joint side is
+ * connected to the side corner of the only neighbor, or, if there are two
+ * neighbors (which must have been joined), to the intersection corner of the
+ * join, as the remaining part sits in the concave corner of their union. Its
+ * side corners connect to the intersections with the neighbors.
+ *
+ * @param o The {@link JOverlap} to relay.
+ * @param s The joint corner.
+ * @param narrow The nearest narrower kept one, if any.
+ * @param wide The nearest wider kept one, if any.
+ * @param farFlap The id of the flap at the far end (i.e. the corner opposite
+ * to the joint) of the given {@link JOverlap}. It is given by the junction,
+ * as the corner itself could have been modified by the plan at the other joint
+ * (when the neighbor is a bridge relayed at both ends).
+ */
+export function relayOntoKept(
+	o: JOverlap, s: JointCorner, narrow: JOverlap | undefined,
+	wide: JOverlap | undefined, farFlap: (o: JOverlap) => NodeId
+): void {
+	debugAssert(() => Boolean(narrow || wide), "Nothing to relay onto");
 
-	// Perform two possible cuttings
-	if(!items[0].split) {
-		yield makeXRelay(clone(o1), clone(o2), oriented, s1, s2);
-		if(s1 !== s2) yield makeXRelay(clone(o1), clone(o2), oriented, s2, s1);
+	// The side corners towards the narrower side and the wider side
+	const b: QuadrantDirection = (s + previousQuadrantOffset) % quadrantNumber;
+	const d = opposite(b);
+
+	// When the two neighbors are joined, the intersection corner belongs to
+	// whichever joins onto the other (see _joinOverlaps).
+	let target: JOverlap, q: QuadrantDirection;
+	if(wide && (!narrow || wide.c[b].type == CornerType.intersection)) {
+		[target, q] = [wide, b];
+	} else {
+		[target, q] = [narrow!, d];
 	}
-	if(!items[1].split) {
-		yield makeYRelay(clone(o1), clone(o2), oriented, s1, s2);
-		if(s1 !== s2) yield makeYRelay(clone(o1), clone(o2), oriented, s2, s1);
+
+	o.ox -= narrow?.ox ?? 0;
+	o.oy -= wide?.oy ?? 0;
+	o.c[s] = { type: CornerType.internal, e: target.id, q };
+	if(narrow) {
+		o.c[b] = { type: CornerType.intersection, e: farFlap(narrow) };
 	}
-}
-
-function getRelayParameters(oriented: boolean): QuadrantDirection[] {
-	// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-	return oriented ? [0, 1, 2, 3] : [2, 3, 0, 1];
-}
-
-function makeXRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy, s2?: Strategy): JPartition[] {
-	o2.ox -= o1.ox;
-	const [a, b, c, d] = getRelayParameters(oriented);
-	o2.c[c] = { type: CornerType.internal, e: o1.id, q: d };
-	o2.c[b] = { type: CornerType.intersection, e: o1.c[a].e };
-	o1.c[d] = { type: CornerType.socket, e: o2.id, q: c };
-	if(!oriented) o2.shift = { x: o1.ox, y: 0 };
-	return [
-		{ overlaps: [o1], strategy: s1 },
-		{ overlaps: [o2], strategy: s2 },
-	];
-}
-
-function makeYRelay(o1: JOverlap, o2: JOverlap, oriented: boolean, s1?: Strategy, s2?: Strategy): JPartition[] {
-	o1.oy -= o2.oy;
-	const [a, b, c, d] = getRelayParameters(oriented);
-	o1.c[c] = { type: CornerType.internal, e: o2.id, q: b };
-	o1.c[d] = { type: CornerType.intersection, e: o2.c[a].e };
-	o2.c[b] = { type: CornerType.socket, e: o1.id, q: c };
-	if(!oriented) o1.shift = { x: 0, y: o2.oy };
-	return [
-		{ overlaps: [o1], strategy: s1 },
-		{ overlaps: [o2], strategy: s2 },
-	];
+	if(wide) {
+		o.c[d] = { type: CornerType.intersection, e: farFlap(wide) };
+	}
+	target.c[q] = { type: CornerType.socket, e: o.id, q: s };
+	if(s == Direction.UR) {
+		o.shift = { x: narrow?.ox ?? 0, y: wide?.oy ?? 0 };
+	}
 }

@@ -9,16 +9,19 @@ import type { heightTask } from "../height";
 /**
  * A subroutine for updating the tree bottom-up.
  *
- * In principle, all tasks that uses this subroutine should depend
- * on {@link structureTask}, since it relies on the updated {@link TreeNode.$dist}
- * to perform the sorting of nodes; but one exception is {@link heightTask},
- * which uses the {@link TreeNode.$dist} before updating instead.
+ * In principle, all tasks that uses this subroutine should depend on
+ * {@link structureTask}, since it relies on the updated
+ * {@link TreeNode.$dist} to perform the sorting of nodes; but one exception is
+ * {@link heightTask}, which uses the {@link TreeNode.$dist} before updating
+ * instead.
  *
  * @param set The initial set of nodes for updating.
  * @param updater A function that returns boolean value
  * indicating whether to further process the parent node.
  */
-export function climb<T extends ITreeNode>(updater: Predicate<T>, ...sets: ReadonlySet<T>[]): void {
+export function climb<T extends ITreeNode>(
+	updater: Predicate<T>, ...sets: ReadonlySet<T>[]
+): void {
 	const total = sets.reduce((v, s) => v + s.size, 0);
 	if(total === 0) return;
 	if(total === 1) {

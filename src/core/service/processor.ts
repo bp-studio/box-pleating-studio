@@ -19,10 +19,16 @@ export namespace Processor {
 		// before the tasks start running, so we cannot actually do that.
 
 		queue(tasks);
-		while(!taskHeap.$isEmpty) {
-			const task = taskHeap.$pop()!;
-			task.$action();
-			queue(task.$dependant);
+		try {
+			while(!taskHeap.$isEmpty) {
+				const task = taskHeap.$pop()!;
+				task.$action();
+				queue(task.$dependant);
+			}
+		} finally {
+			// If a task throws, the remaining ones must not be carried over to
+			// the next run.
+			while(!taskHeap.$isEmpty) taskHeap.$pop();
 		}
 		State.$reset();
 	}

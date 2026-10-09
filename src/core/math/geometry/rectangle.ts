@@ -2,7 +2,8 @@ import { same } from "shared/types/geometry";
 
 //=================================================================
 /**
- * {@link Rectangle} represents an immutable rectangle of a specific location on the plane.
+ * {@link Rectangle} represents an immutable rectangle of a specific location on
+ * the plane.
  */
 //=================================================================
 

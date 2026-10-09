@@ -53,6 +53,26 @@ footer {
 	bottom: 20px;
 }
 
+/*
+ * No z-index here, so that the card stays below the dropdown menus (`nav` is
+ * an isolated stacking context at level 0, coming after this in the DOM).
+ */
+#divHealth {
+	position: absolute;
+	top: 4.75rem;
+	left: 1rem;
+
+	width: 20rem;
+	max-width: calc(100vw - 2rem);
+}
+
+#divToast {
+	position: absolute;
+	top: 4.75rem;
+	right: 1rem;
+	max-width: calc(100vw - 2rem);
+}
+
 .show-status {
 	#divWorkspace,
 	#divShade,
@@ -99,6 +119,11 @@ footer {
 	.shift-down {
 		top: 6.15rem;
 	}
+
+	#divHealth,
+	#divToast {
+		top: 7.15rem;
+	}
 }
 
 @media (100vh < width) and (700px <= width) {
@@ -113,6 +138,10 @@ footer {
 
 	#note {
 		right: 270px;
+	}
+
+	#divToast {
+		right: calc(250px + 1rem);
 	}
 }
 

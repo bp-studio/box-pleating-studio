@@ -10,7 +10,10 @@ export class CoreManager {
 
 	public readonly $project: Project;
 
-	/** A {@link Promise} that resolves immediately after returning from the Core. */
+	/**
+	 * A {@link Promise} that resolves immediately after returning from the
+	 * Core.
+	 */
 	private _lastReturn: Promise<void> = Promise.resolve();
 
 	/** A counter for the pending update calls. */
@@ -30,18 +33,23 @@ export class CoreManager {
 
 	/** Wait until the Core is free to call. */
 	public $prepare(): Promise<void> {
-		const ready = this.$project.history.$moving || this._pendingUpdateCount == 0 ?
-			Promise.resolve() : this._lastReturn;
+		const ready =
+			this.$project.history.$moving || this._pendingUpdateCount == 0 ?
+				Promise.resolve() : this._lastReturn;
 		this._pendingUpdateCount++;
 		return ready;
 	}
 
 	/** Execute a calling to the Core. */
-	public $run(stack: string, factory: Func<Route, Promise<void>>): Promise<void> {
-		this._lastReturn = new Promise(resolve => this.$project.$onReturn(() => {
-			this._pendingUpdateCount--;
-			resolve();
-		}));
+	public $run(
+		stack: string, factory: Func<Route, Promise<void>>
+	): Promise<void> {
+		this._lastReturn = new Promise(
+			resolve => this.$project.$onReturn(() => {
+				this._pendingUpdateCount--;
+				resolve();
+			})
+		);
 		return this._updating = factory(this.$project.$createCoreProxy(stack));
 	}
 }

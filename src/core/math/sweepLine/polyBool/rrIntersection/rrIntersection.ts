@@ -11,7 +11,8 @@ import type { IRoundedRect } from "./roundedRect";
 
 //=================================================================
 /**
- * {@link RRIntersection} calculates the intersection of two {@link IRoundedRect}s.
+ * {@link RRIntersection} calculates the intersection of two
+ * {@link IRoundedRect}s.
  */
 //=================================================================
 
@@ -25,9 +26,9 @@ export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 		super(new RREventProvider(), new RRIntersector());
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected _initialize(components: IRoundedRect[]): void {
 		for(let i = 0; i < components.length; i++) {
@@ -45,12 +46,16 @@ export class RRIntersection extends PolyBool<IRoundedRect, ArcPath> {
 
 			// Add line segments.
 			if(w) {
-				this._addSegment(new AALineSegment({ x, y: y - r }, { x: x + w, y: y - r }, i), 1);
-				this._addSegment(new AALineSegment({ x: x + w, y: y + h + r }, { x, y: y + h + r }, i), -1);
+				this._addSegment(new AALineSegment({ x, y: y - r },
+					{ x: x + w, y: y - r }, i), 1);
+				this._addSegment(new AALineSegment({ x: x + w, y: y + h + r },
+					{ x, y: y + h + r }, i), -1);
 			}
 			if(h) {
-				this._addSegment(new AALineSegment({ x: x + w + r, y }, { x: x + w + r, y: y + h }, i), 1);
-				this._addSegment(new AALineSegment({ x: x - r, y: y + h }, { x: x - r, y }, i), -1);
+				this._addSegment(new AALineSegment({ x: x + w + r, y },
+					{ x: x + w + r, y: y + h }, i), 1);
+				this._addSegment(new AALineSegment({ x: x - r, y: y + h },
+					{ x: x - r, y }, i), -1);
 			}
 		}
 	}

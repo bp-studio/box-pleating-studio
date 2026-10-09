@@ -20,10 +20,12 @@ export namespace GeneratorUtil {
 	 * passes (or that the filter marks with `undefined`, see below), no
 	 * further generators in the list will be executed.
 	 *
-	 * If the filter returns `undefined`, it will also signify stopping after the current generator,
-	 * only that the generated value will not be yielded.
+	 * If the filter returns `undefined`, it will also signify stopping after
+	 * the current generator, only that the generated value will not be yielded.
 	 */
-	export function* $first<T>(generators: Generator<T>[], filter: GeneratorFilter<T>): Generator<T> {
+	export function* $first<T>(
+		generators: Generator<T>[], filter: GeneratorFilter<T>
+	): Generator<T> {
 		for(const generator of generators) {
 			let found = false;
 			for(const value of generator) {

@@ -15,7 +15,9 @@ const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
  * ```js
  * (function() {
  * 	const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
- * 	const jsonBlob = new Blob([JSON.stringify({ data: "test file" })], { type: "application/json" });
+ * 	const jsonBlob = new Blob(
+ * 		[JSON.stringify({ data: "test file" })], { type: "application/json" }
+ * 	);
  * 	const formData = new FormData();
  * 	formData.append("payload_json", JSON.stringify({ content: `Test` }));
  * 	formData.append("file", jsonBlob, `test.json`);
@@ -23,7 +25,9 @@ const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
  * })()
  * ```
  */
-export async function uploadLog(log: JProject, error: CoreError): Promise<void> {
+export async function uploadLog(
+	log: JProject, error: CoreError
+): Promise<void> {
 	// Comment the next line to test fatal error reporting.
 	if(!isOnline) return;
 
@@ -42,7 +46,8 @@ export async function uploadLog(log: JProject, error: CoreError): Promise<void> 
 		formData.append("file", jsonBlob, `${app_config.app_version}-${err_short}.json`);
 
 		await fetch(WEBHOOK, {
-			method: "POST", // Note that this won't work with file:// protocol somehow
+			// Note that this won't work with `file://` protocol somehow
+			method: "POST",
 			body: formData,
 		});
 	} catch(e) {

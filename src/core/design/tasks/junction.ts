@@ -3,6 +3,7 @@ import { State } from "core/service/state";
 import { createJunction, Junction } from "../layout/junction/junction";
 import { invalidJunctionTask } from "./invalidJunction";
 import { stretchTask } from "./stretch";
+import { roughContourTask } from "./roughContour";
 import { dist } from "../context/treeUtils";
 import { UpdateResult } from "core/service/updateResult";
 
@@ -17,10 +18,13 @@ import type { ITreeNode } from "../context";
  * be provided automatically during the course of the algorithm.
  */
 //=================================================================
-export const junctionTask = new Task(junction, invalidJunctionTask, stretchTask);
+export const junctionTask = new Task(
+	junction, invalidJunctionTask, stretchTask, roughContourTask
+);
 
 function junction(): void {
-	// Delete junctions related to deleted nodes or nodes that are no longer leaves
+	// Delete junctions related to deleted nodes or nodes that are no longer
+	// leaves
 	UpdateResult.$pruneJunctions(State.$junctions);
 	for(const node of State.$childrenChanged) {
 		if(node.$children.$size > 0) State.$junctions.delete(node.id);
@@ -48,12 +52,19 @@ function getCollisionOfLCA(lca: ITreeNode): void {
 
 /**
  * Recursively compare two branches under a given LCA.
- * @param distChanged Indicating that the distance have changed along one of the branches,
- * in which case the comparison cannot be skipped and must carry on.
+ * @param distChanged Indicating that the distance have changed along one of
+ * the branches, in which case the comparison cannot be skipped and must carry
+ * on.
  */
-function compare(A: ITreeNode, B: ITreeNode, lca: ITreeNode, distChanged: boolean): void {
+function compare(
+	A: ITreeNode, B: ITreeNode, lca: ITreeNode, distChanged: boolean
+): void {
 	// If both subtrees haven't changed, there's no need to re-compare.
-	if(!distChanged && !State.$subtreeAABBChanged.has(A) && !State.$subtreeAABBChanged.has(B)) return;
+	if(
+		!distChanged &&
+		!State.$subtreeAABBChanged.has(A) &&
+		!State.$subtreeAABBChanged.has(B)
+	) return;
 
 	// Test for collision
 	if(!intersects(A, B, lca)) {
@@ -80,9 +91,13 @@ function compare(A: ITreeNode, B: ITreeNode, lca: ITreeNode, distChanged: boolea
 	} else {
 		// Choose the one with fewer children, to minimize comparisons.
 		if(m === 0 || n !== 0 && n < m) {
-			for(const c of a.$children) compare(c, b, lca, distChanged || ancestorChanged(c));
+			for(const c of a.$children) {
+				compare(c, b, lca, distChanged || ancestorChanged(c));
+			}
 		} else {
-			for(const c of b.$children) compare(a, c, lca, distChanged || ancestorChanged(c));
+			for(const c of b.$children) {
+				compare(a, c, lca, distChanged || ancestorChanged(c));
+			}
 		}
 	}
 }
@@ -95,7 +110,9 @@ function intersects(a: ITreeNode, b: ITreeNode, lca: ITreeNode): boolean {
 	return a.$AABB.$intersects(b.$AABB, dist(a, b, lca));
 }
 
-function getNontrivialDescendant(node: ITreeNode, ctx?: NontrivialDescendantContext): ITreeNode {
+function getNontrivialDescendant(
+	node: ITreeNode, ctx?: NontrivialDescendantContext
+): ITreeNode {
 	while(node.$children.$size === 1) {
 		node = node.$children.$get()!;
 		if(ctx) ctx.distChanged ||= ancestorChanged(node);

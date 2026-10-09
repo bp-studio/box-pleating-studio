@@ -60,7 +60,10 @@ export namespace ZoomController {
 		if(sheet.zoom == zoom) return;
 
 		// If the zooming center is not given, use the center of the canvas.
-		center ||= { x: display.canvas.clientWidth / 2, y: display.canvas.clientHeight / 2 };
+		center ||= {
+			x: display.canvas.clientWidth / 2,
+			y: display.canvas.clientHeight / 2,
+		};
 
 		// Find the coordinates of the zooming center
 		const oldScale = ProjectService.scale.value;
@@ -72,7 +75,8 @@ export namespace ZoomController {
 		sheet.$zoom = zoom; // This will cause the scale to change
 		const newScale = ProjectService.scale.value;
 
-		// We have to do this first, or there might not be scrollbars to scroll at all.
+		// We have to do this first, or there might not be scrollbars to scroll
+		// at all.
 		display.scrollView.$updateScrollbar();
 
 		// Calculate the scrolling position and complete the scrolling
@@ -85,8 +89,9 @@ export namespace ZoomController {
 	export function $wheel(event: WheelEvent): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
+		const steps = Math.round(sheet.zoom * event.deltaY / DELTA_SCALE);
 		$zoom(
-			sheet.zoom - Math.round(sheet.zoom * event.deltaY / DELTA_SCALE) * STEP,
+			sheet.zoom - steps * STEP,
 			sheet,
 			{ x: event.offsetX, y: event.offsetY }
 		);

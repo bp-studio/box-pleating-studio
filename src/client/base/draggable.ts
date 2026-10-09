@@ -13,15 +13,22 @@ export interface DragSelectable extends Draggable {
 //=================================================================
 export abstract class Draggable extends Control implements Draggable {
 
-	/** Current location of this {@link Draggable}. Overwritten in {@link Vertex}. */
+	/**
+	 * Current location of this {@link Draggable}. Overwritten in
+	 * {@link Vertex}.
+	 */
 	protected accessor _location: IPoint = { x: 0, y: 0 };
 
-	/** The offset vector between mouse location and the object location when the dragging started. */
+	/**
+	 * The offset vector between mouse location and the object location when the
+	 * dragging started.
+	 */
 	private _dragOffset!: IPoint;
 
 	/**
 	 * The read-only accessor to the current location.
-	 * To change the location, use one of the {@link $moveBy}, {@link $moveTo} or {@link $assign} methods.
+	 * To change the location, use one of the {@link $moveBy}, {@link $moveTo}
+	 * or {@link $assign} methods.
 	 */
 	public get $location(): IPoint {
 		return this._location;
@@ -66,14 +73,17 @@ export abstract class Draggable extends Control implements Draggable {
 		this._move(this._location.x + v.x, this._location.y + v.y);
 	}
 
-	/** Directly assign a new location. Used only in history navigation or internal manipulations. */
+	/**
+	 * Directly assign a new location. Used only in history navigation or
+	 * internal manipulations.
+	 */
 	public $assign(v: IPoint): Promise<void> {
 		return this._move(v.x, v.y);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Trigger movement.

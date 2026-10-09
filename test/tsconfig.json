@@ -18,7 +18,6 @@
 			"ESNext"
 		],
 		"types": [
-			"mocha",
 			"node"
 		],
 		"paths": {

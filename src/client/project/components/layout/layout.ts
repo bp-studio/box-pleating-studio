@@ -13,8 +13,9 @@ import { style } from "client/services/styleService";
 import { Stretch } from "./stretch";
 import { FlapContainer } from "./flapContainer";
 import { applyTransform, norm } from "shared/types/geometry";
+import { Health } from "./health";
 
-import type { IEditor } from "../sheet";
+import type { IEditor, TransformTarget } from "../sheet";
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { Flap } from "./flap";
 import type { BatchUpdateManager } from "client/project/batchUpdateManager";
@@ -48,15 +49,21 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 	public set invalidCount(v: number) { this._invalidCount.value = v; }
 
 	private readonly _patternNotFound = shallowRef(false);
-	public get patternNotFound(): boolean { return this._patternNotFound.value; }
-	public set patternNotFound(v: boolean) { this._patternNotFound.value = v; }
+	public get patternNotFound(): boolean {
+		return this._patternNotFound.value;
+	}
+	public set patternNotFound(v: boolean) {
+		this._patternNotFound.value = v;
+	}
 
 	public readonly $project: Project;
 	public readonly $sheet: Sheet;
 	public readonly $flaps: FlapContainer;
-	public readonly $rivers: IDoubleMap<NodeId, River> = new ValuedIntDoubleMap();
+	public readonly $rivers: IDoubleMap<NodeId, River> =
+		new ValuedIntDoubleMap();
 	public readonly $junctions: Map<string, Junction> = new Map();
 	public readonly $stretches: Map<string, Stretch> = new Map();
+	public readonly health: Health;
 
 	private _deviceMovePromise: Promise<void> | undefined;
 	private _draggingDevice: Device | undefined;
@@ -68,12 +75,17 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 	/** Cached value of junction color. */
 	private _junctionColor: number = 0;
 
-	constructor(project: Project, parentView: Container, json: JSheet, state?: JViewport) {
+	constructor(
+		project: Project, parentView: Container, json: JSheet, state?: JViewport
+	) {
 		super();
 		this.$project = project;
 		this.$flaps = new FlapContainer(this);
-		this.$sheet = new Sheet(project, parentView, "layout", this, json, state);
+		this.$sheet =
+			new Sheet(project, parentView, "layout", this, json, state);
 		this.$sheet.$addChild(this);
+		this.health = new Health(this);
+		this.$sheet.$addChild(this.health);
 
 		const filter = new AlphaFilter(style.junction.alpha);
 		this.$sheet.$layers[Layer.junction].filters = [filter];
@@ -85,13 +97,14 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		return {
 			sheet: this.$sheet.toJSON(),
 			flaps: [...this.$flaps].map(f => f.toJSON()),
-			stretches: [...this.$stretches.values()].map(s => s.toJSON(session)),
+			stretches: [...this.$stretches.values()]
+				.map(s => s.toJSON(session)),
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $update(model: UpdateModel): void {
 		const design = this.$project.design;
@@ -132,6 +145,8 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 			this._addRiver(r, model.graphics[tag]);
 		}
 		this.riverCount = this.$rivers.size;
+
+		this.health.$check();
 	}
 
 	/**
@@ -168,8 +183,9 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 	}
 
 	/**
-	 * Similar to {@link BatchUpdateManager}, dragging of {@link Device} can also fire rapidly,
-	 * and we use the same mechanism to control the callings to the Core.
+	 * Similar to {@link BatchUpdateManager}, dragging of {@link Device} can
+	 * also fire rapidly, and we use the same mechanism to control the callings
+	 * to the Core.
 	 */
 	public $moveDevice(device: Device, action: Action): Promise<void> {
 		this._draggingDeviceAction = action;
@@ -177,7 +193,8 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 			this._draggingDevice = device;
 			const stack = new Error().stack || "";
 			const prepare = this.$project.design.$coreManager.$prepare();
-			this._deviceMovePromise = prepare.then(() => this._flushDeviceMove(stack));
+			this._deviceMovePromise =
+				prepare.then(() => this._flushDeviceMove(stack));
 		}
 		return this._deviceMovePromise;
 	}
@@ -188,14 +205,23 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 	}
 
 	public $createFlapPrototype(id: NodeId, vertexLocation: IPoint): JFlap {
-		const { x, y } = getRelativePoint(vertexLocation, this.$project.design.tree.$sheet, this.$sheet);
+		const treeSheet = this.$project.design.tree.$sheet;
+		const { x, y } =
+			getRelativePoint(vertexLocation, treeSheet, this.$sheet);
 		return { id, x, y, width: 0, height: 0 };
 	}
 
-	public $transform(matrix: TransformationMatrix): void {
+	public $getSelectedTargets(): TransformTarget[] {
+		return [...this.$flaps].filter(f => f.$selected).map(f => f.toJSON());
+	}
+
+	public $transform(
+		matrix: TransformationMatrix, selectedOnly: boolean = false
+	): void {
 		const [a, b, c, d] = matrix;
 		const scale = Math.round((norm(a, c) + norm(b, d)) / 2);
 		for(const flap of this.$flaps) {
+			if(selectedOnly && !flap.$selected) continue;
 			const { x, y, width, height } = flap.toJSON();
 			const ll = applyTransform({ x, y }, matrix);
 			const ur = applyTransform({ x: x + width, y: y + height }, matrix);
@@ -212,9 +238,9 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _flushDeviceMove(stack: string): Promise<void> {
 		this._deviceMovePromise = undefined;
@@ -222,7 +248,9 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		this._draggingDeviceAction = undefined;
 		const device = this._draggingDevice!;
 		return this.$project.design.$coreManager.$run(stack, c =>
-			c.layout.moveDevice(device.stretch.id, device.$index, device.$location)
+			c.layout.moveDevice(
+				device.stretch.id, device.$index, device.$location
+			)
 		);
 	};
 

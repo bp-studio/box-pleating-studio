@@ -10,7 +10,8 @@ import type { TreeNode } from "../context/treeNode";
 
 //=================================================================
 /**
- * {@link structureTask} updates {@link TreeNode.$dist} and {@link TreeNode.$leaves} after the tree re-balances.
+ * {@link structureTask} updates {@link TreeNode.$dist} and
+ * {@link TreeNode.$leaves} after the tree re-balances.
  */
 //=================================================================
 export const structureTask = new Task(structure, AABBTask);

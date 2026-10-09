@@ -32,7 +32,7 @@ subgraph User input
 	F[\Flap positions<br>and sizes/]
 	P[\Stretch pattern<br>choices/]
 end
-subgraph "Tree#emsp;#emsp;#emsp;#emsp;"
+subgraph "Tree#emsp;#emsp;#emsp;#emsp;#emsp;#emsp;#emsp;#emsp;"
 	h{{node heights}}
 	b[tree balancing]
 	d[structure]
@@ -41,7 +41,7 @@ end
 rc[rough contours]
 j[junctions]
 i([invalid<br>junctions])
-subgraph "Pattern#emsp;#emsp;#emsp;#emsp;"
+subgraph "Pattern#emsp;#emsp;#emsp;#emsp;#emsp;#emsp;"
 	s[stretches]
 	p{{patterns}}
 	tc[trace contours]
@@ -52,8 +52,8 @@ g([graphics])
 T --> h --> b
 b & L --> d
 d & F --> a --> j
-j --> i
-j ---> s
-a ---> rc ----> tc --> pc --> g
+j ----> i ----> g
+j --> rc ----> tc --> pc --> g
+j --> s
 s & P --> p --> tc
 ```

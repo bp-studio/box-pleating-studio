@@ -26,12 +26,13 @@ export class Task<T = unknown> {
 	 * The reason for this counter-intuitive design is that,
 	 * the importing mechanism of JavaScript will then automatically
 	 * import the downstream modules. If we use the other approach,
-	 * then we will have to import the last downstream module somewhere ourselves,
-	 * which is even more inconvenient.
+	 * then we will have to import the last downstream module somewhere
+	 * ourselves, which is even more inconvenient.
 	 */
 	constructor(action: Action, ...deps: Task[]) {
 		this.$action = action;
-		this.$priority = deps.length ? Math.max(...deps.map(d => d.$priority)) + 1 : 0;
+		this.$priority = deps.length ?
+			Math.max(...deps.map(d => d.$priority)) + 1 : 0;
 		this.$dependant = deps;
 	}
 }

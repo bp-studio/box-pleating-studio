@@ -29,9 +29,10 @@ namespace ImportService {
 		return await new Promise<boolean>(resolve => {
 			if(launchQueue.setConsumer) {
 				launchQueue.setConsumer(launchParams => {
-				// Since somewhere around early 2024, Chrome always call this
-				// callback in desktop PWA even if no file handle is passed in.
-				// So we need to check if there's actually any files.
+					// Since somewhere around early 2024, Chrome always call
+					// this callback in desktop PWA even if no file handle is
+					// passed in. So we need to check if there's actually any
+					// files.
 					if(launchParams.files.length > 0) {
 						open(launchParams.files);
 						resolve(true);
@@ -49,17 +50,20 @@ namespace ImportService {
 	/**
 	 * Processing files opened with File Access API
 	 */
-	export async function open(list: FileHandleList, request: boolean = false): Promise<void> {
+	export async function open(
+		list: FileHandleList, request: boolean = false
+	): Promise<void> {
 		const ids = await Handles.locate(list);
 
-		// We perform actual opening only when there's a handle that is not yet opened.
-		// In that case we show the spinner animation.
+		// We perform actual opening only when there's a handle that is not yet
+		// opened. In that case we show the spinner animation.
 		if(ids.some(i => i === undefined)) await Dialogs.loader.show();
 
 		const tasks: Promise<void>[] = [];
 		for(let i = 0; i < list.length; i++) {
 			if(ids[i] === undefined) {
-				const task = openHandle(list[i], request).then(id => { ids[i] = id; });
+				const task = openHandle(list[i], request)
+					.then(id => { ids[i] = id; });
 				tasks.push(task);
 			}
 		}
@@ -97,7 +101,8 @@ namespace ImportService {
 			const index = ids.length - 1;
 			if(!takeover) {
 				Workspace.select(ids[index]);
-				await nextTick(); // Hide the spinner after the rendering is completed
+				// Hide the spinner after the rendering is completed
+				await nextTick();
 			} else {
 				await SessionService.save(index);
 			}
@@ -109,7 +114,9 @@ namespace ImportService {
 		Dialogs.loader.hide();
 	}
 
-	async function openHandle(handle: FileSystemFileHandle, request: boolean): Promise<ProjId | undefined> {
+	async function openHandle(
+		handle: FileSystemFileHandle, request: boolean
+	): Promise<ProjId | undefined> {
 		if(request && !await requestPermission(handle)) return undefined;
 		try {
 			const file = await handle.getFile();
@@ -121,7 +128,9 @@ namespace ImportService {
 		}
 	}
 
-	async function requestPermission(handle: FileSystemFileHandle): Promise<boolean> {
+	async function requestPermission(
+		handle: FileSystemFileHandle
+	): Promise<boolean> {
 		const mode: FileSystemPermissionMode = handle.name.endsWith(".bpz") ? "read" : "readwrite";
 		if(await handle.requestPermission({ mode }) == "granted") return true;
 		if(await Dialogs.confirm(i18n.t("message.filePermission"))) {
@@ -134,10 +143,13 @@ namespace ImportService {
 	 * Load the obtained file handle and returns the file id
 	 * (or the last id for workspace files).
 	 */
-	async function openFile(file: File, handle?: FileSystemFileHandle): Promise<ProjId | undefined> {
+	async function openFile(
+		file: File, handle?: FileSystemFileHandle
+	): Promise<ProjId | undefined> {
 		try {
 			const buffer = await FileUtility.readFile(file);
-			const test = String.fromCharCode(new Uint8Array(buffer.slice(0, 1))[0]);
+			const test =
+				String.fromCharCode(new Uint8Array(buffer.slice(0, 1))[0]);
 			if(test == "{") { // JSON
 				const dataString = FileUtility.bufferToText(buffer);
 				const id = await Workspace.open(JSON.parse(dataString));
@@ -153,7 +165,9 @@ namespace ImportService {
 			} else { throw new Error(); }
 		} catch {
 			debugger;
-			await Dialogs.alert(i18n.t("message.invalidFormat", [file.name]));
+			await Dialogs.alert(
+				i18n.t("message.invalidFormat", [file.name])
+			);
 			return undefined;
 		}
 	}
@@ -161,12 +175,18 @@ namespace ImportService {
 	/**
 	 * Open a workspace file and return the last opened project id, if any.
 	 */
-	async function openWorkspace(buffer: ArrayBuffer): Promise<ProjId | undefined> {
+	async function openWorkspace(
+		buffer: ArrayBuffer
+	): Promise<ProjId | undefined> {
 		const list = await Zip.decompress(buffer);
 		const files = Object.keys(list);
 		const ids = await Workspace.openMultiple(
 			files.map(f => JSON.parse(list[f])),
-			files.map(f => () => Dialogs.alert(i18n.t("message.invalidFormat", [f])))
+			files.map(f =>
+				() => Dialogs.alert(
+					i18n.t("message.invalidFormat", [f])
+				)
+			)
 		);
 		if(!ids.length) return undefined;
 		else return ids[ids.length - 1];

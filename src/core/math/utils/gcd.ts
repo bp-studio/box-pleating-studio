@@ -28,7 +28,9 @@ export function lcm(list: Positive[]): Positive {
  * Reduce a pair of integers.
  * Signs will be kept as they were.
  */
-export function reduceInt<A extends number, B extends number>(a: A, b: B): [A, B, Positive] {
+export function reduceInt<A extends number, B extends number>(
+	a: A, b: B
+): [A, B, Positive] {
 	const g = gcd(a, b);
 	return [a / g as A, b / g as B, g];
 }

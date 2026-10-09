@@ -4,7 +4,12 @@ This folder contains the design update tasks for Box Pleating Studio Core. These
 
 ## Task System Architecture
 
-Each task inherits from the `Task` base class with priority and dependency management. Tasks are automatically ordered and executed based on their dependencies.
+Each task is an instance of the [`Task`](task.ts) class, constructed with its action and **the tasks depending on it** (rather than the tasks it depends on; see the comments in `task.ts` for the reason).
+The priority of a task is one more than the maximal priority of its dependent tasks, and the [`Processor`](../../service/processor.ts) always executes the queued task with the highest priority first.
+After a task executes, all of its dependent tasks are queued unconditionally.
+
+Consequently, if a task reads the result of another task, the dependency must be declared explicitly.
+Do not rely on the execution order that merely happens to follow from the priorities.
 
 ## Data Flow Mapping
 
@@ -21,7 +26,7 @@ The following tasks correspond to the Mermaid flowchart in [core/README.md](../.
 - **[`invalidJunction.ts`](invalidJunction.ts)** - Handles invalid junctions
 
 ### Contour Processing
-- **[`roughContour.ts`](roughContour.ts)** - Generates rough contours
+- **[`roughContour.ts`](roughContour.ts)** - Generates rough contours, carving the invading junction rectangles out of the leaves (see `ValidJunction.$invasion`)
 - **[`traceContour.ts`](traceContour.ts)** - Traces final contours
 - **[`patternContour.ts`](patternContour.ts)** - Processes pattern contours
 
@@ -36,17 +41,35 @@ The following tasks correspond to the Mermaid flowchart in [core/README.md](../.
 
 The `utils/` folder contains helper functions:
 - **`climb.ts`** - Tree traversal utilities
-- **`combine.ts`** - Contour combination tools  
+- **`combine.ts`** - Contour combination tools
 - **`expand.ts`** - Path expansion and simplification tools
+- **`carve.ts`** - Carving rectangles out of the corners of a rectangle
+- **`invasion.ts`** - Bookkeeping of the invasions and the carved quadrants
 
 ## Execution Order
 
-Tasks execute following this dependency chain:
+The dependencies between the tasks are as follows:
 ```
-height → balance → structure → aabb → {junction, roughContour} 
-→ {invalidJunction, stretch, traceContour} 
-→ {pattern, patternContour} 
-→ graphics
+height
+  ↓
+balance
+  ↓
+structure
+  ↓
+aabb
+  ↓
+junction ───────┬───────────────┐
+  ↓             ↓               ↓
+stretch      roughContour    invalidJunction
+  ↓             │
+pattern         │
+  ↓             │
+traceContour ◄──┘
+  ↓
+patternContour
+  ↓
+graphics
 ```
 
-This design ensures each task executes only after its dependencies complete, maintaining data flow consistency.
+That is, `traceContour` depends on both `pattern` and `roughContour`,
+and `roughContour` depends on `junction` because of the carving.

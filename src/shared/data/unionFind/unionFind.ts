@@ -19,10 +19,12 @@ export class UnionFind<T> {
 
 	/**
 	 * @param size The projected element number limit.
-	 * Pay attention that an error will occur if the number of elements exceed this limit later on.
+	 * Pay attention that an error will occur if the number of elements exceed
+	 * this limit later on.
 	 */
 	constructor(size: number) {
-		// Initialize all arrays to the projected size, saving the overhead of pushing
+		// Initialize all arrays to the projected size,
+		// saving the overhead of pushing
 		this._element = new Array(size);
 		this._parent = createArray(size, -1);
 		this._size = createArray(size, 1);
@@ -55,18 +57,18 @@ export class UnionFind<T> {
 		else this._pointTo(j, i);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected _pointTo(i: number, j: number): void {
 		this._parent[i] = j;
 		this._size[j] += this._size[i];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _findRecursive(cursor: number): number {
 		const parent = this._parent[cursor];
@@ -74,9 +76,10 @@ export class UnionFind<T> {
 		const result = this._findRecursive(parent);
 
 		// Path compression. Note that such an approach would result in
-		// one redundant assignment (that is, the point that was originally located under result)
-		// in all cases. However, to avoid this redundant assignment,
-		// one more decision must be made anyway, and the cost of decision is in fact higher than assignment.
+		// one redundant assignment (that is, the point that was originally
+		// located under result) in all cases. However, to avoid this redundant
+		// assignment, one more decision must be made anyway, and the cost of
+		// decision is in fact higher than assignment.
 		// So the current approach is in fact faster.
 		this._parent[cursor] = result;
 

@@ -8,7 +8,8 @@ import type { ISegment } from "../../classes/segment/segment";
 
 //=================================================================
 /**
- * {@link GeneralEventProvider} is the {@link IEventProvider} for general line segments.
+ * {@link GeneralEventProvider} is the {@link IEventProvider} for general line
+ * segments.
  *
  * Since the subjects are general lines, epsilon-comparison is also needed here.
  */
@@ -21,11 +22,15 @@ export class GeneralEventProvider extends EventProvider {
 
 	constructor(exitFirst: boolean) {
 		super();
-		this.$eventComparator = exitFirst ? EventComparator.exit : EventComparator.enter;
-		this.$statusComparator = exitFirst ? StatusComparator.exit : StatusComparator.enter;
+		this.$eventComparator = exitFirst ?
+			EventComparator.exit : EventComparator.enter;
+		this.$statusComparator = exitFirst ?
+			StatusComparator.exit : StatusComparator.enter;
 	}
 
-	$createStart(startPoint: IPoint, segment: ISegment, delta: Sign): StartEvent {
+	$createStart(
+		startPoint: IPoint, segment: ISegment, delta: Sign
+	): StartEvent {
 		return new StartEvent(startPoint, segment, delta, this._nextId++);
 	}
 

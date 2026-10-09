@@ -3,8 +3,8 @@ import { UnionFind } from "./unionFind";
 
 //=================================================================
 /**
- * {@link ListUnionFind} has an additional {@link $list} functionality comparing to {@link UnionFind}.
- * It lists the result of all unions in the end.
+ * {@link ListUnionFind} has an additional {@link $list} functionality comparing
+ * to {@link UnionFind}. It lists the result of all unions in the end.
  */
 //=================================================================
 
@@ -15,7 +15,8 @@ export class ListUnionFind<T> extends UnionFind<T> {
 
 	/**
 	 * @param size The projected element number limit.
-	 * Pay attention that an error will occur if the number of elements exceed this limit later on.
+	 * Pay attention that an error will occur if the number of elements exceed
+	 * this limit later on.
 	 */
 	constructor(size: number) {
 		super(size);
@@ -35,9 +36,9 @@ export class ListUnionFind<T> extends UnionFind<T> {
 		return result;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected override _pointTo(i: number, j: number): void {
 		super._pointTo(i, j);
@@ -45,9 +46,9 @@ export class ListUnionFind<T> extends UnionFind<T> {
 		this._firstChild[j] = i;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _collectRecursive(i: number, result: T[]): T[] {
 		result.push(this._element[i]);

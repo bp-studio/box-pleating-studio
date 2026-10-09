@@ -7,11 +7,13 @@ import { applyTransform, dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { MAX_VERTICES } from "shared/types/constants";
+import { collectSubtrees, placeSubtree } from "./clipboard";
 
 import type { TransformationMatrix } from "shared/types/geometry";
-import type { IEditor } from "../sheet";
+import type { IEditor, TransformTarget } from "../sheet";
 import type { UpdateModel } from "core/service/updateModel";
-import type { JTree, JVertex, NodeId } from "shared/json";
+import type { JEdit, JFlap, JTree, JVertex, NodeId } from "shared/json";
+import type { Subtree } from "./clipboard";
 import type { Tree } from "./tree";
 import type { IntDoubleMap } from "shared/data/doubleMap/intDoubleMap";
 
@@ -118,7 +120,7 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 
 	public async $addLeaf(at: Vertex, length: number): Promise<void> {
 		const id = this.$nextAvailableId;
-		const p = this._findClosestEmptySpot(at);
+		const p = this._findClosestEmptySpot(at._location);
 		const design = this._tree.$project.design;
 		const prototype = design.$prototype;
 		prototype.tree.nodes.push({ id, name: "", x: p.x, y: p.y, isNew: true });
@@ -127,8 +129,82 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		await this._tree.$project.$core.tree.addLeaf(id, at.id, length, flap);
 	}
 
-	public async $delete(vertices: Vertex[]): Promise<void> {
+	public $delete(vertices: Vertex[]): Promise<void> {
+		return this._delete(...this._simulateDelete(vertices));
+	}
+
+	/**
+	 * Delete the given {@link Vertex Vertices} as in {@link $delete}, and
+	 * returns the {@link Subtree}s that are actually deleted.
+	 */
+	public async $cut(vertices: Vertex[]): Promise<Subtree[]> {
 		const [ids, parentIds] = this._simulateDelete(vertices);
+		if(!ids.length) return [];
+		// Each deleted component is attached to the rest by exactly one edge,
+		// as the rest is always connected during the deletion.
+		const { subtrees } = collectSubtrees(this._tree, new Set(ids));
+		await this._delete(ids, parentIds);
+		return subtrees;
+	}
+
+	/** Whether the given {@link Subtree}s can be pasted. */
+	public $canPaste(subtrees: readonly Subtree[]): boolean {
+		const count = subtrees.reduce((total, s) => total + s.length, 0);
+		return count > 0 && this._count.value + count <= MAX_VERTICES;
+	}
+
+	/**
+	 * Paste the given {@link Subtree}s under the given {@link Vertex}, keeping
+	 * the relative locations of the nodes (see {@link placeSubtree}).
+	 */
+	public async $paste(
+		at: Vertex, subtrees: readonly Subtree[]
+	): Promise<void> {
+		const design = this._tree.$project.design;
+		const prototype = design.$prototype;
+		const count = subtrees.reduce((total, s) => total + s.length, 0);
+		const ids = this._allocateIds(count);
+		const occupied = this._getOccupiedSpots();
+		const grid = this._tree.$sheet.grid;
+		const edits: JEdit[] = [];
+		const flaps: JFlap[] = [];
+		let k = 0;
+		for(const subtree of subtrees) {
+			const newIds: NodeId[] = [];
+			const spots =
+				placeSubtree(grid, at._location, subtree, occupied);
+			for(const p of spots) occupied.add(getOrderedKey(p.x, p.y));
+			for(const [i, node] of subtree.entries()) {
+				const id = ids[k++];
+				const parent = node.parent < 0 ? at.id : newIds[node.parent];
+				const p = spots[i];
+				newIds.push(id);
+				const { name, length, flap } = node;
+				const { x, y } = p;
+				prototype.tree.nodes.push({ id, name, x, y, isNew: true });
+				edits.push([true, { n1: id, n2: parent, length }]);
+				if(flap) {
+					const json = design.layout.$createFlapPrototype(id, p);
+					json.width = flap.width;
+					json.height = flap.height;
+					flaps.push(json);
+				}
+			}
+		}
+		prototype.layout.flaps.push(...flaps);
+
+		this._tree.$project.history.$cacheSelection();
+		this._tree.$updateCallback = () => {
+			SelectionController.clear();
+			for(const id of ids) {
+				SelectionController.$toggle(this._vertices[id]!, true);
+			}
+		};
+		const core = this._tree.$project.$core;
+		await core.tree.edit(edits, this._tree.$rootId, flaps, []);
+	}
+
+	private async _delete(ids: NodeId[], parentIds: NodeId[]): Promise<void> {
 		const design = this._tree.$project.design;
 		const prototypes = parentIds.map(n =>
 			design.layout.$createFlapPrototype(n, this._vertices[n]!._location)
@@ -136,7 +212,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		design.$prototype.layout.flaps.push(...prototypes);
 
 		this._tree.$project.history.$cacheSelection();
-		for(const id of ids) SelectionController.$toggle(this._vertices[id]!, false);
+		for(const id of ids) {
+			SelectionController.$toggle(this._vertices[id]!, false);
+		}
 		await this._tree.$project.$core.tree.removeLeaf(ids, prototypes);
 	}
 
@@ -150,24 +228,70 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		await this._tree.$project.$core.tree.join(vertex.id);
 	}
 
-	public $transform(matrix: TransformationMatrix): void {
-		for(const v of this) {
+	public $getSelectedTargets(): TransformTarget[] {
+		return [...this._getSelectedVertices()]
+			.map(v => ({ ...v._location, width: 0, height: 0 }));
+	}
+
+	public $transform(
+		matrix: TransformationMatrix, selectedOnly: boolean = false
+	): void {
+		const vertices = selectedOnly ? this._getSelectedVertices() : this;
+		for(const v of vertices) {
 			v.$assign(applyTransform(v._location, matrix));
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	/** Find the close empty spot around the given {@link Vertex}. */
-	private _findClosestEmptySpot(at: Vertex): IPoint {
-		const { x, y } = at._location;
-		const ref: IPoint = { x: x + X_DISPLACEMENT, y: y + Y_DISPLACEMENT };
+	/**
+	 * Allocate the given number of available ids for new
+	 * {@link Vertex Vertices}.
+	 */
+	private _allocateIds(count: number): NodeId[] {
+		const result: NodeId[] = [];
+		let next = this._vertices.length;
+		while(result.length < count) {
+			const id = this.$nextAvailableId;
+			if(id >= this._vertices.length) break;
+			result.push(id);
+		}
+		while(result.length < count) result.push(next++ as NodeId);
+		return result;
+	}
 
-		// Create an index for the position of all vertices
+	/**
+	 * The selected vertices, where a selected edge counts as selecting both of
+	 * its ends.
+	 */
+	private _getSelectedVertices(): Set<Vertex> {
+		const result = new Set<Vertex>();
+		for(const v of this) if(v.$selected) result.add(v);
+		for(const e of this._tree.$edges.values()) {
+			if(!e.$selected) continue;
+			result.add(e.$v1);
+			result.add(e.$v2);
+		}
+		return result;
+	}
+
+	/** Create an index for the position of all vertices. */
+	private _getOccupiedSpots(): Set<number> {
 		const occupied = new Set<number>();
-		for(const v of this) occupied.add(getOrderedKey(v._location.x, v._location.y));
+		for(const v of this) {
+			occupied.add(getOrderedKey(v._location.x, v._location.y));
+		}
+		return occupied;
+	}
+
+	/** Find the close empty spot around the given location. */
+	private _findClosestEmptySpot(
+		at: IPoint, occupied: Set<number> = this._getOccupiedSpots()
+	): IPoint {
+		const { x, y } = at;
+		const ref: IPoint = { x: x + X_DISPLACEMENT, y: y + Y_DISPLACEMENT };
 
 		// Search for empty spot
 		let spot: IPoint | undefined;
@@ -194,13 +318,14 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 
 		// In case of off-bound (unlikely, but just in case)
 		// we can do nothing other than returning the same point
-		return spot || at._location;
+		return spot || at;
 	}
 
 	/**
 	 * Simulate the process of a round of deleting,
 	 * and returns those {@link Vertex Vertices} that are actually deleted
-	 * (in the order of deletion), and those parent vertices that becomes new leaves.
+	 * (in the order of deletion), and those parent vertices that becomes new
+	 * leaves.
 	 *
 	 * If the user deliberately select all vertices and hit delete,
 	 * there's no way to tell which three vertices will survive ahead of time.
@@ -230,7 +355,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 			}
 			vertices = nextRound;
 		}
-		const parentIds = [...parents].filter(v => map.get(v)!.size === 1).map(v => v.id);
+		const parentIds = [...parents]
+			.filter(v => map.get(v)!.size === 1)
+			.map(v => v.id);
 		return [result, parentIds];
 	}
 
@@ -238,7 +365,9 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		const map = new Map<Vertex, Set<number>>();
 		for(const v of this) {
 			const neighbors = new Set<number>();
-			for(const n of this._tree.$edges.get(v.id)!.keys()) neighbors.add(n);
+			for(const n of this._tree.$edges.get(v.id)!.keys()) {
+				neighbors.add(n);
+			}
 			map.set(v, neighbors);
 		}
 		return map;

@@ -7,7 +7,8 @@ const MIN_SCALE = 10;
 
 //=================================================================
 /**
- * {@link ProjectService} manages reactivity related to "currently selected {@link Project}".
+ * {@link ProjectService} manages reactivity related to "currently selected
+ * {@link Project}".
  *
  * We made this a standalone service to eliminate cyclic importing of modules.
  */

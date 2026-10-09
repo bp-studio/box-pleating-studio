@@ -26,8 +26,9 @@ export interface LabelView extends Control {
  * It is the standard of drawing text labels.
  *
  * Labels are usually center-aligned and is placed below the reference points.
- * The exceptions are when the reference points are at the boundary of the sheet,
- * in which cases the labels could have different alignments and offsets.
+ * The exceptions are when the reference points are at the boundary of the
+ * sheet, in which cases the labels could have different alignments and
+ * offsets.
  * (See {@link Grid.$getLabelDirection} and {@link directionalOffsets}.)
  *
  * When the labels are too wide and overflow beyond the viewport,
@@ -66,9 +67,12 @@ export class Label extends Container {
 	 * @param text The string content of the text
 	 * @param x The reference coordinate.
 	 * @param y The reference coordinate.
-	 * @param direction Drawing direction (if omitted, it will be decided by the grid)
+	 * @param direction Drawing direction
+	 * (if omitted, it will be decided by the grid)
 	 */
-	public $draw(text: string, x: number, y: number, direction?: Direction): void {
+	public $draw(
+		text: string, x: number, y: number, direction?: Direction
+	): void {
 		// Setup text
 		text = text.trim();
 		this.visible = Boolean(text);
@@ -80,7 +84,8 @@ export class Label extends Container {
 		this._positioning(x, y, direction);
 		this._coloring();
 
-		// For some unknown reason, PIXI could calculate the wrong bound during the first rendering.
+		// For some unknown reason, PIXI could calculate the wrong bound during
+		// the first rendering.
 		// To fix the issue, we setup a timeout and redraw the label.
 		if(!this._initialized) {
 			registerInitialization(() => this._positioning(x, y, direction));
@@ -96,9 +101,9 @@ export class Label extends Container {
 		return { x: this.pivot.x / 2, y: this.pivot.y / 2 };
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Setup the position of the label. */
 	private _positioning(x: number, y: number, direction?: Direction): void {
@@ -111,9 +116,10 @@ export class Label extends Container {
 		this._label.scale.set(factor);
 		this._glow.scale.set(factor);
 
-		// Label is an outer container that aligns _glow and _label at the center.
-		// However upon positioning we need to align by the _label instead of the larger outer frame,
-		// so we need to fix the calculated sizes.
+		// Label is an outer container that aligns _glow and _label at the
+		// center. However upon positioning we need to align by the _label
+		// instead of the larger outer frame, so we need to fix the calculated
+		// sizes.
 		const outerBounds = this.getLocalBounds();
 		const innerBounds = this._label.getLocalBounds();
 		const innerWidth = innerBounds.width * factor;
@@ -128,16 +134,22 @@ export class Label extends Container {
 		}
 		const offset = directionalOffsets[direction];
 		const pivot: Writeable<IPoint> = {
-			x: -(Math.sign(offset.x) * (innerWidth / 2 - xFix) + offset.x * this.$distance),
-			y: Math.sign(offset.y) * (FONT_SIZE * SMOOTHNESS - yFix) + offset.y * this.$distance,
+			x: -(
+				Math.sign(offset.x) * (innerWidth / 2 - xFix) +
+				offset.x * this.$distance
+			),
+			y: Math.sign(offset.y) * (FONT_SIZE * SMOOTHNESS - yFix) +
+				offset.y * this.$distance,
 		};
 
 		// This part is the new logic since v0.7
 		// Fix the pivot and push the label inwards if there is overflow.
 		const sheetWidth = this._sheet.grid.$renderWidth;
 		const left = x * s + (innerBounds.left * factor - pivot.x) / SMOOTHNESS;
-		const right = (x - sheetWidth) * s + (innerBounds.right * factor - pivot.x) / SMOOTHNESS;
-		const horMargin = Math.max((display.viewport.width - sheetWidth * s) / 2, MARGIN);
+		const right = (x - sheetWidth) * s +
+			(innerBounds.right * factor - pivot.x) / SMOOTHNESS;
+		const horMargin =
+			Math.max((display.viewport.width - sheetWidth * s) / 2, MARGIN);
 		const leftOverflow = left + horMargin - LABEL_MARGIN;
 		const rightOverflow = right - horMargin + LABEL_MARGIN;
 		if(rightOverflow > 0) pivot.x += rightOverflow * SMOOTHNESS;

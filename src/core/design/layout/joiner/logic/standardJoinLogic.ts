@@ -18,7 +18,11 @@ type Index = 0 | 1;
 export class StandardJoinLogic extends BaseJoinLogic {
 
 	public override *$join(): Generator<JoinResult> {
-		if(!this.data) return;
+		// If the two gadgets can be simply joined, there's no need for
+		// standard joins. With two junctions, simple joins come with a higher
+		// priority so this won't happen, but in fans, the simple join on one
+		// side might not work for the fan as a whole.
+		if(!this.data || this._isSimple()) return;
 		const { D1, D2, B1, B2, delta } = this._baseJoinIntersections();
 		const { f } = this;
 
@@ -32,22 +36,22 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Convex standard join.
 	 */
-	private *_convexStandardJoin(B: Point, D: Point, i: Index): Generator<JoinResult> {
+	private *_convexStandardJoin(
+		B: Point, D: Point, i: Index
+	): Generator<JoinResult> {
 		if(B.$isIntegral) return; // Degenerated to base join
 		const { j1, j2 } = this;
 		const e = i ? j2.e : j1.e;
 		const p = i ? j2.p : j1.p;
 
-		// There is no convex join if the two gadgets are "pointing inwards",
-		// as the straight-skeleton degenerates into a relay pattern.
-		if(this.joiner.$isClockwise != j1.$isSteeperThan(j2)) return;
+		if(this._isPointingInwards()) return;
 
 		if(!this._setupAnchor(D)) return;
 
@@ -63,24 +67,27 @@ export class StandardJoinLogic extends BaseJoinLogic {
 		yield this._result(true, R.$dist(T));
 	}
 
-	private _tryConvexTransform(e: Line, B: Point, D: Point, i: Index): [Point, Point] | null {
+	private _tryConvexTransform(
+		e: Line, B: Point, D: Point, i: Index
+	): [Point, Point] | null {
 		const { pt } = this.data;
 		const { j1, j2, f } = this;
 
-		const P = D.$sub(B).$slope.gt(Fraction.ONE) ? e.$xIntersection(D.x) : e.$yIntersection(D.y);
+		const P = D.$sub(B).$slope.gt(Fraction.ONE) ?
+			e.$xIntersection(D._x) : e.$yIntersection(D._y);
 		const gridPoints = closestGridPoints(this._substituteEnd(e, B), D);
 
-		// It is possible that the closest T results in an R that goes out of bounds.
-		// In that case we need to try the second closest T.
-		for(const T of gridPoints) {
-			// Before version 0.6, if T happens to be the tip of the gadget,
-			// the tracing algorithm couldn't handle such cases, so we discarded those.
-			// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
-			if(T.eq(e.p1) || T.eq(e.p2)) continue;
+		// The triangle does not degenerate. D differs from P, for otherwise
+		// D lies on e, which means that the two critical edges meet on the
+		// delta line, and that is the case of simple joins (see $join). Thus
+		// D differs from any T on e as well.
 
-			// If the triangle is too small, it could go out of bounds
+		// It is possible that the closest T results in an R that goes out of
+		// bounds. In that case we need to try the second closest T.
+		for(const T of gridPoints) {
+			// If the triangle is too small, it could go out of bounds.
 			const R = triangleTransform([D, P, B], T);
-			if(!R || R.x * f < pt.x * f) continue;
+			if(R.x * f < pt.x * f) continue;
 
 			// Check if the transformed R-point goes out of bounds
 			if(!(i ? j1 : j2).$contains(R)) continue;
@@ -93,21 +100,29 @@ export class StandardJoinLogic extends BaseJoinLogic {
 	/**
 	 * Concave standard join.
 	 */
-	private *_concaveStandardJoin(B: Point, D: Point, i: Index, delta: Line): Generator<JoinResult> {
+	private *_concaveStandardJoin(
+		B: Point, D: Point, i: Index, delta: Line
+	): Generator<JoinResult> {
 		if(D.$isIntegral) return; // Degenerated to base join
 		const { j1, j2 } = this;
 		const e = i ? j2.e : j1.e;
 		const p = i ? j2.p : j1.p;
 		const T = closestGridPoints(this._substituteEnd(e, D), B)[0];
+		// The edge could contain no grid points at all, for example when the
+		// gadget is half-integral.
+		if(!T) return;
 
-		// Before version 0.6, if T happens to be the tip of the gadget,
-		// the tracing algorithm couldn't handle such cases, so we discarded those.
-		// TODO: Check if it is still the case in the new tracing algorithm since v0.6.
-		if(T.eq(e.p1) || T.eq(e.p2)) return;
-
-		const P = D.$sub(B).$slope.gt(Fraction.ONE) ? delta.$yIntersection(T.y) : delta.$xIntersection(T.x);
+		const P = D.$sub(B).$slope.gt(Fraction.ONE) ?
+			delta.$yIntersection(T._y) : delta.$xIntersection(T._x);
+		// T differs from D as D is not integral. If T coincides with B, then B
+		// lies on e, which means that the two critical edges meet on the bv
+		// line. For non-parallel gadgets, that is the same as meeting on the
+		// delta line (see $join), but not necessarily for parallel ones,
+		// although no such layouts have been found so far.
+		/* istanbul ignore next: foolproof */
+		if(T.eq(B)) return;
 		const R = triangleTransform([T, D, P], B);
-		if(!R || !this._setupAnchor(R)) return;
+		if(!this._setupAnchor(R)) return;
 		this.data.addOns = [{
 			contour: [B, T, R].map(point => point.$toIPoint()),
 			dir: new Line(T, B).$reflect(p.$direction.value).$toIPoint(),
@@ -133,7 +148,9 @@ export class StandardJoinLogic extends BaseJoinLogic {
  * so sorting them shouldn't be significant in terms of performance.
  */
 function closestGridPoints(e: Line, p: Point): Point[] {
-	const gridPoints = e.$gridPoints().map(q => [q, q.$dist(p)] as [Point, number]);
+	const gridPoints = e.$gridPoints().map(
+		q => [q, q.$dist(p)] as [Point, number]
+	);
 	gridPoints.sort((a, b) => a[1] - b[1]);
 	return gridPoints.map(t => t[0]);
 }

@@ -18,18 +18,23 @@ export class Matrix {
 	private readonly _det: Fraction;
 
 	/**
-	 * For performance, we do not clone the {@link Fraction}s again inside the constructor,
-	 * so make sure that the parameters are new instances already,
+	 * For performance, we do not clone the {@link Fraction}s again inside the
+	 * constructor, so make sure that the parameters are new instances already,
 	 * unless it is certain that the parameters will not mutate.
 	 */
-	constructor(a: Fraction, b: Fraction, c: Fraction, d: Fraction, det?: Fraction) {
+	constructor(
+		a: Fraction, b: Fraction, c: Fraction, d: Fraction,
+		det?: Fraction
+	) {
 		this.a = a; this.b = b;
 		this.c = c; this.d = d;
 		if(det) this._det = det;
 		else this._det = this.a.mul(this.d).s(this.b.mul(this.c));
 	}
 
-	public toString(): string { return [this.a, this.b, this.c, this.d].toString(); }
+	public toString(): string {
+		return [this.a, this.b, this.c, this.d].toString();
+	}
 
 	/// #if DEBUG
 	public toArray(): [number, number, number, number] {
@@ -59,6 +64,7 @@ export class Matrix {
 	public $multiply(p: Point): Point;
 	public $multiply(v: Vector): Vector;
 	public $multiply(that: Point | Vector): typeof that {
+		// eslint-disable-next-line new-cap
 		return new that.constructor(
 			this.a.mul(that._x).a(this.b.mul(that._y)),
 			this.c.mul(that._x).a(this.d.mul(that._y))

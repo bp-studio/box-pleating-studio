@@ -1,4 +1,5 @@
 import { JoinLogic } from "./joinLogic";
+import { QV } from "../../pattern/quadrant";
 
 import type { JoinResult } from "./joinLogic";
 
@@ -23,8 +24,17 @@ export class SimpleJoinLogic extends JoinLogic {
 		const int = j1.e.$intersectLine(j2.e); // p1-perspective
 		if(!int) return;
 
-		// Check the simple join condition
-		if(!int.$sub(pt).$parallel(bv)) return;
+		// Check the simple join condition. Normally the ridge from the joining
+		// point to the intersection must be the angle bisector of the
+		// axis-parallel creases. But if the axis-parallel creases are parallel
+		// (i.e. perfect joins), that ridge vanishes and the angle bisector is
+		// meaningless, and instead the intersection must lie on the delta line
+		// (by the diagonal principle).
+		const parallel = j1.p.$direction.value.$parallel(j2.p.$direction.value);
+		const onJoinLine = parallel ?
+			int.$sub(this._deltaPt.value).$parallel(QV[0]) :
+			int.$sub(pt).$parallel(bv);
+		if(!onJoinLine) return;
 
 		// Complete
 		if(!this._setupAnchor(int)) return;

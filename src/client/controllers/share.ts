@@ -3,10 +3,16 @@ import { display } from "client/screen/display";
 // Some environments does not support this class
 const TOUCH_SUPPORT = typeof TouchEvent != "undefined";
 
-/** Get the center of a mouse event or a touch event (relative to the canvas, in pixels). */
-export function $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
+export type MTEvent = MouseEvent | TouchEvent;
+
+/**
+ * Get the center of a mouse event or a touch event (relative to the canvas,
+ * in pixels).
+ */
+export function $getEventCenter(event: MTEvent): IPoint {
 	/**
-	 * We need to obtain the coordinates relative to the page first, for two reasons:
+	 * We need to obtain the coordinates relative to the page first, for two
+	 * reasons:
 	 * 1. There's no `offsetX` `offsetY` in touch events.
 	 * 2. Event origin may not be on the canvas in the case of dragging.
 	 */
@@ -19,7 +25,10 @@ export function $getEventCenter(event: MouseEvent | TouchEvent): IPoint {
 			// For touches more than one point,
 			// just take the midpoint of the first two points;
 			// we don't care too much about touches with three or more points.
-			pagePoint = { x: (t[1].pageX + t[0].pageX) / 2, y: (t[1].pageY + t[0].pageY) / 2 };
+			pagePoint = {
+				x: (t[1].pageX + t[0].pageX) / 2,
+				y: (t[1].pageY + t[0].pageY) / 2,
+			};
 		}
 	} else {
 		pagePoint = { x: event.pageX, y: event.pageY };

@@ -5,6 +5,7 @@ import { CornerType } from "shared/json/enum";
 import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { JJunction, NodeId } from "shared/json";
 import type { ITreeNode } from "core/design/context";
+import type { fitsAt } from "core/design/tasks/utils/invasion";
 
 interface ValidJunctionData {
 	lca: ITreeNode;
@@ -16,6 +17,21 @@ interface ValidJunctionData {
 }
 
 export type Junctions = readonly ValidJunction[];
+
+/** See {@link ValidJunction.$invasion}. */
+export interface Invasion {
+	/** The flap being invaded (the larger one). */
+	readonly flap: ITreeNode;
+	/** The flap invading (the smaller one). */
+	readonly invader: ITreeNode;
+	/** The quadrant of {@link flap} facing {@link invader}. */
+	readonly q: QuadrantDirection;
+	/**
+	 * The size of the overlapping region, which is carved out of the corner
+	 * of {@link flap} (see {@link fitsAt}).
+	 */
+	readonly o: IPoint;
+}
 
 //=================================================================
 /**
@@ -72,11 +88,12 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 
 	toJSON(): JJunction {
+		const q1 = getQuadrant(this.$q1), q2 = getQuadrant(this.$q2);
 		return {
 			c: [
-				{ type: CornerType.flap, e: this.$a.id, q: getQuadrant(this.$q1) },
+				{ type: CornerType.flap, e: this.$a.id, q: q1 },
 				{ type: CornerType.side },
-				{ type: CornerType.flap, e: this.$b.id, q: getQuadrant(this.$q2) },
+				{ type: CornerType.flap, e: this.$b.id, q: q2 },
 				{ type: CornerType.side },
 			],
 			f: this.$f,
@@ -86,9 +103,9 @@ export class ValidJunction implements ISerializable<JJunction> {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get $orientedIds(): [number, number] {
 		const [a, b] = [this.$a.id, this.$b.id];
@@ -98,21 +115,78 @@ export class ValidJunction implements ISerializable<JJunction> {
 	/**
 	 * Whether self is "practically" covered by another {@link ValidJunction}.
 	 *
-	 * The notion of practical covering is one step further of geometrical covering.
-	 * If A covers B, B covers C, and C is not covered by any other {@link ValidJunction}s other than B,
-	 * then since B will be invalidated by A, the covering of B over C also doesn't count,
-	 * so practically C is not really covered. And so on.
+	 * The notion of practical covering is one step further of geometrical
+	 * covering. If A covers B, B covers C, and C is not covered by any other
+	 * {@link ValidJunction}s other than B, then since B will be invalidated by
+	 * A, the covering of B over C also doesn't count, so practically C is not
+	 * really covered. And so on.
 	 */
 	public get $isCovered(): boolean {
 		if(this._isCovered === undefined) {
 			const that = this._geometricallyCoveredBy.find(j => !j.$isCovered);
-			// Uncomment the next line for coverage debugging
-			// if(that) console.log(`Junction ${this.$a.id},${this.$b.id} is covered by ${that.$a.id},${that.$b.id}`);
+			// Uncomment the next part for coverage debugging
+			// if(that) {
+			// 	console.log(
+			// 		`Junction ${this.$a.id},${this.$b.id}` +
+			// 		` is covered by ${that.$a.id},${that.$b.id}`
+			// 	);
+			// }
 			this._isCovered = Boolean(that);
 		}
 		return this._isCovered;
 	}
 	private _isCovered: boolean | undefined;
+
+	/**
+	 * Whether this junction is an "invasion" of a relatively small flap into
+	 * the territory of a large flap.
+	 *
+	 * The rough contours are made by expanding the flaps and taking unions,
+	 * regardless of the junctions. That works in most cases, but when a flap
+	 * A, even after expanding to the LCA, is still smaller than the
+	 * overlapping region in width or height, then the region of the other
+	 * flap B should be carved out by the overlapping region at its corner
+	 * (see {@link roughContourTask}).
+	 *
+	 * Whether the carving applies at a given level is decided by
+	 * {@link fitsAt}.
+	 *
+	 * This is purely geometric, and in particular it does not depend on
+	 * whether the junction is resolved by a stretch pattern (see the notes in
+	 * {@link roughContourTask} for the reason).
+	 */
+	public get $invasion(): Invasion | undefined {
+		if(this._invasion === undefined) {
+			this._invasion = this._computeInvasion();
+		}
+		return this._invasion || undefined;
+	}
+	private _invasion: Invasion | null | undefined;
+
+	private _computeInvasion(): Invasion | null {
+		const [a, b] = [this.$a, this.$b];
+		const rA = a.$dist - this.$lca.$dist;
+		const rB = b.$dist - this.$lca.$dist;
+		if(this._isSmall(a, rA)) return this._makeInvasion(b, -1);
+		if(this._isSmall(b, rB)) return this._makeInvasion(a, 1);
+		return null;
+	}
+
+	/**
+	 * Whether the flap is smaller than the overlapping region in width or
+	 * height after expanding by `r`.
+	 */
+	private _isSmall(flap: ITreeNode, r: number): boolean {
+		const [t, right, bottom, l] = flap.$AABB.$toValues();
+		return right - l + 2 * r < this.$o.x || t - bottom + 2 * r < this.$o.y;
+	}
+
+	/** @param sign 1 if the flap is {@link $a}, -1 otherwise. */
+	private _makeInvasion(flap: ITreeNode, sign: 1 | -1): Invasion {
+		const q = getQuadrant(sign === 1 ? this.$q1 : this.$q2);
+		const invader = sign === 1 ? this.$b : this.$a;
+		return { flap, invader, q, o: this.$o };
+	}
 
 	/** Get all {@link ValidJunction}s covering the current one. */
 	public $getCovering(): ValidJunction[] {
@@ -135,8 +209,10 @@ export class ValidJunction implements ISerializable<JJunction> {
 	}
 
 	/**
-	 * This method is mainly used in the case where the comparison rectangles are of the same size.
-	 * In that case, the junction corresponding to the closer flap should cover the other one.
+	 * This method is mainly used in the case where the comparison rectangles
+	 * are of the same size.
+	 * In that case, the junction corresponding to the closer flap should cover
+	 * the other one.
 	 *
 	 * v0.7: Note that if the comparison rectangles are not of the same size,
 	 * then the result can mutually be `true`.
@@ -145,11 +221,16 @@ export class ValidJunction implements ISerializable<JJunction> {
 		return this.$s.x < that.$s.x || this.$s.y < that.$s.y;
 	}
 
-	/** Based on the given canonical distance to get the comparison rectangle. */
+	/**
+	 * Based on the given canonical distance to get the comparison rectangle.
+	 */
 	public $getBaseRectangle(distanceToA: number): Rectangle {
 		const x = this.$tip.x + distanceToA * this.$f.x;
 		const y = this.$tip.y + distanceToA * this.$f.y;
-		return new Rectangle({ x, y }, { x: x - this.$o.x * this.$f.x, y: y - this.$o.y * this.$f.y });
+		return new Rectangle(
+			{ x, y },
+			{ x: x - this.$o.x * this.$f.x, y: y - this.$o.y * this.$f.y }
+		);
 	}
 
 	/** Create a {@link JJunction} matching the given transformation. */

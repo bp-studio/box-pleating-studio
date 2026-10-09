@@ -2,25 +2,25 @@
 	<div id="divDPad" :class="{ 'show': show && !showPanel, 'disabled': Studio.isDragging }">
 		<KeyButton
 			:show="show"
-			icon="bp-up"
+			icon="bp-arrow-up"
 			style="top: -0.5rem; left: 2rem;"
 			dir="up"
 		/>
 		<KeyButton
 			:show="show"
-			icon="bp-left"
+			icon="bp-arrow-left"
 			style="top: 2rem; left: -0.5rem;"
 			dir="left"
 		/>
 		<KeyButton
 			:show="show"
-			icon="bp-right"
+			icon="bp-arrow-right"
 			style="top: 2rem; left: 4.5rem;"
 			dir="right"
 		/>
 		<KeyButton
 			:show="show"
-			icon="bp-down"
+			icon="bp-arrow-down"
 			style="top: 4.5rem; left: 2rem;"
 			dir="down"
 		/>

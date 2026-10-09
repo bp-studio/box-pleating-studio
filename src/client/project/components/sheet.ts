@@ -16,6 +16,8 @@ import { createGrid } from "./grid";
 import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
+import { getDots } from "./grid/constrain";
+import { applyTransform } from "shared/types/geometry";
 
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { ComputedRef } from "vue";
@@ -28,10 +30,26 @@ import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
 
 const LAYERS = Enum.values(Layer);
 
+/**
+ * An object that can be rotated or flipped, given by its bounding rectangle
+ * (degenerated for a point).
+ */
+export interface TransformTarget extends IPoint, IDimension {}
+
 /** {@link IEditor} is the associated editing logic for a {@link Sheet}. */
 export interface IEditor {
-	$transform(matrix: TransformationMatrix): void;
+	/**
+	 * Transform all the objects, or only the selected ones (see
+	 * {@link $getSelectedTargets}).
+	 */
+	$transform(matrix: TransformationMatrix, selectedOnly?: boolean): void;
+
+	/** The selected objects that can be rotated or flipped. */
+	$getSelectedTargets(): TransformTarget[];
 }
+
+/** The linear parts of the matrices of rotations and flips. */
+type LinearPart = [number, number, number, number];
 
 //=================================================================
 /**
@@ -46,7 +64,8 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	 * The current scrolling position of this working area, in pixels.
 	 *
 	 * We made it {@link shallowRef} for better performance,
-	 * and use {@link Readonly} to ensure that we use different instances each time.
+	 * and use {@link Readonly} to ensure that we use different instances each
+	 * time.
 	 */
 	private readonly _scroll = shallowRef<IPoint>({ x: 0, y: 0 });
 	public get $scroll(): IPoint { return this._scroll.value; }
@@ -102,20 +121,26 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		for(const layer of LAYERS) {
 			const container = new Container();
 			this._layers[layer] = container;
-			if(!LayerOptions[layer].interactive) container.interactiveChildren = false;
+			if(!LayerOptions[layer].interactive) {
+				container.interactiveChildren = false;
+			}
 			if(LayerOptions[layer].clipped) container.mask = this._mask;
 		}
 		this.$view.addChild(this._mask, ...this._layers);
 
-		this._layers[Layer.sheet].addChild(this._borderGraphics, this._gridGraphics);
+		this._layers[Layer.sheet]
+			.addChild(this._borderGraphics, this._gridGraphics);
 
 		this._type.value = json?.type ?? GridType.rectangular;
-		this._grid.value = createGrid(this, this._type.value, json?.width, json?.height);
+		this._grid.value =
+			createGrid(this, this._type.value, json?.width, json?.height);
 
 		// Computed no longer requires effect scope since Vue 3.5
 		this.$imageDimension = computed(() => this._imageDimension);
 
-		this.$reactDraw(this._drawSheet, this._positioning, this._layerVisibility);
+		this.$reactDraw(
+			this._drawSheet, this._positioning, this._layerVisibility
+		);
 
 		this._onDestruct(() => {
 			// GC
@@ -145,9 +170,9 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		return result;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Proxy properties
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get type(): GridType {
 		return this._type.value;
@@ -163,11 +188,13 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			grid = createGrid(this, v, prototype.width, prototype.height);
 		} else {
 			history.$destruct(this._toMemento());
-			grid = createGrid(this, v, this._grid.value.$renderHeight, this._grid.value.$renderWidth);
+			const g = this._grid.value;
+			grid = createGrid(this, v, g.$renderHeight, g.$renderWidth);
 		}
 
-		// Due to the possible flap moving, the actual switching of grid will have
-		// to wait until the updates are complete, otherwise there will be glitches.
+		// Due to the possible flap moving, the actual switching of grid will
+		// have to wait until the updates are complete, otherwise there will be
+		// glitches.
 		this.$project.$onUpdate(() => {
 			this._grid.value = grid;
 			this._type.value = v;
@@ -194,16 +221,19 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		return this._layers;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Logics
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $getScale(): number {
 		const viewWidth = display.viewport.width;
 		const viewHeight = display.viewport.height;
 		const factor = this.$zoom / FULL_ZOOM;
-		const horizontalScale = (viewWidth - 2 * MARGIN) * factor / this._grid.value.$renderWidth;
-		const verticalScale = (viewHeight * factor - MARGIN * 2) / this._grid.value.$renderHeight;
+		const grid = this._grid.value;
+		const horizontalScale =
+			(viewWidth - 2 * MARGIN) * factor / grid.$renderWidth;
+		const verticalScale =
+			(viewHeight * factor - MARGIN * 2) / grid.$renderHeight;
 		return Math.min(horizontalScale, verticalScale);
 	}
 
@@ -216,53 +246,118 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		if(!this.canSubdivide()) return;
 		display.shield(async () => {
 			const oldCenter = this.grid.$getResizeCenter();
-			this.grid.$setDimension(this.grid.$renderWidth * 2, this.grid.$renderHeight * 2);
+			this.grid.$setDimension(
+				this.grid.$renderWidth * 2, this.grid.$renderHeight * 2
+			);
 			const newCenter = this.grid.$getResizeCenter();
-			this._editor.$transform([2, 0, 0, 2, newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y]);
+			this._editor.$transform([
+				2, 0, 0, 2,
+				newCenter.x - 2 * oldCenter.x, newCenter.y - 2 * oldCenter.y,
+			]);
 			await this.$project.design.$batchUpdateManager.$updateComplete;
 		});
 	}
 
-	public rotate(by: Sign): void {
+	/**
+	 * Rotate the whole sheet, or only the selected objects if any.
+	 * Returns `false` if the selected objects cannot fit into the sheet after
+	 * the rotation.
+	 */
+	public rotate(by: Sign): boolean {
 		gtag("event", "edit_rotate");
+		const targets = this._editor.$getSelectedTargets();
+		if(targets.length) {
+			return this._transformTargets(targets, [0, by, -by, 0]);
+		}
 		display.shield(async () => {
 			const oldCenter = this.grid.$getCenter();
 			const { width, height } = this.grid.toJSON();
 			this.grid.$setDimension(height, width);
 			const newCenter = this.grid.$getCenter();
-			this._editor.$transform([0, by, -by, 0, newCenter.x - by * oldCenter.y, newCenter.y + by * oldCenter.x]);
+			this._editor.$transform([
+				0, by, -by, 0,
+				newCenter.x - by * oldCenter.y, newCenter.y + by * oldCenter.x,
+			]);
 			await this.$project.design.$batchUpdateManager.$updateComplete;
 		});
+		return true;
 	}
 
-	public flip(horizontal: boolean): void {
+	/**
+	 * Flip the whole sheet, or only the selected objects if any.
+	 * Returns `false` if the selected objects cannot fit into the sheet after
+	 * the flip (which could happen only for sheets of some shapes).
+	 */
+	public flip(horizontal: boolean): boolean {
 		gtag("event", "edit_flip");
+		const targets = this._editor.$getSelectedTargets();
+		if(targets.length) {
+			return this._transformTargets(
+				targets, horizontal ? [-1, 0, 0, 1] : [1, 0, 0, -1]
+			);
+		}
 		display.shield(async () => {
 			const { x, y } = this.grid.$getCenter();
-			this._editor.$transform(horizontal ? [-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]);
+			this._editor.$transform(horizontal ?
+				[-1, 0, 0, 1, 2 * x, 0] : [1, 0, 0, -1, 0, 2 * y]
+			);
 			await this.$project.design.$batchUpdateManager.$updateComplete;
 		});
+		return true;
 	}
 
 	/** The dimension of the sheet after rasterization. */
 	declare public readonly $imageDimension: ComputedRef<IDimension>;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private get _imageDimension(): IDimension {
 		const s = ProjectService.scale.value;
 		const { x, y } = this._grid.value.$offset;
-		const hitMargin = 0.5; // Extra margin is needed, or the vertices on the boundary will be difficult to click
-		const [width, height] = [this._grid.value.$renderWidth, this._grid.value.$renderHeight];
+		// Extra margin is needed, or the vertices on the boundary will be
+		// difficult to click
+		const hitMargin = 0.5;
+		const [width, height] =
+			[this._grid.value.$renderWidth, this._grid.value.$renderHeight];
 		this.$view.hitArea = new Rectangle(
-			x - hitMargin, y - hitMargin, width + x + 2 * hitMargin, height + y + 2 * hitMargin
+			x - hitMargin, y - hitMargin,
+			width + x + 2 * hitMargin, height + y + 2 * hitMargin
 		);
 		return {
 			width: (width + x * 2) * s + MARGIN * 2,
 			height: (height + y * 2) * s + MARGIN * 2,
 		};
+	}
+
+	/**
+	 * Rotate or flip the given objects about the center of the bounding box of
+	 * their centers, rounded to the grid. If some of them go beyond the sheet,
+	 * they are all shifted back by the shortest distance. Returns `false` if
+	 * that's impossible, in which case nothing is changed.
+	 */
+	private _transformTargets(
+		targets: readonly TransformTarget[], [a, b, c, d]: LinearPart
+	): boolean {
+		const xs = targets.map(t => t.x + t.width / 2);
+		const ys = targets.map(t => t.y + t.height / 2);
+		const cx = Math.round((Math.min(...xs) + Math.max(...xs)) / 2);
+		const cy = Math.round((Math.min(...ys) + Math.max(...ys)) / 2);
+		const matrix: TransformationMatrix =
+			[a, b, c, d, cx - a * cx - b * cy, cy - c * cx - d * cy];
+		const corners = targets.flatMap(t =>
+			getDots(t, t.width, t.height).map(p => applyTransform(p, matrix))
+		);
+		const shift = this.grid.$getFitShift(corners);
+		if(!shift) return false;
+		matrix[4] += shift.x;
+		matrix[5] += shift.y;
+		display.shield(async () => {
+			this._editor.$transform(matrix, true);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
+		return true;
 	}
 
 	private _toMemento(): Memento {
@@ -271,7 +366,8 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 
 	/** Toggle layer visibility by user settings. */
 	private _layerVisibility(): void {
-		this._layers[Layer.axisParallels].visible = settings.display.axialParallel;
+		this._layers[Layer.axisParallels].visible =
+			settings.display.axialParallel;
 		this._layers[Layer.dot].visible = settings.display.dot;
 		this._layers[Layer.hinge].visible = settings.display.hinge;
 		this._layers[Layer.label].visible = settings.display.label;
@@ -282,8 +378,11 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	private _positioning(): void {
 		const image = this.$imageDimension.value;
 		const vp = display.viewport;
-		this.$view.x = Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
-		this.$view.y = Math.max((vp.height + image.height) / 2, image.height) - this.$scroll.y - MARGIN;
+		this.$view.x =
+			Math.max((vp.width - image.width) / 2, 0) - this.$scroll.x + MARGIN;
+		this.$view.y =
+			Math.max((vp.height + image.height) / 2, image.height) -
+			this.$scroll.y - MARGIN;
 	}
 
 	/** Draw the border and grid lines. */
@@ -312,7 +411,9 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 }
 
-export function getRelativePoint(point: IPoint, fromSheet: Sheet, toSheet: Sheet): IPoint {
+export function getRelativePoint(
+	point: IPoint, fromSheet: Sheet, toSheet: Sheet
+): IPoint {
 	const fromGrid = fromSheet.grid, toGrid = toSheet.grid;
 	const xFactor = toGrid.$renderWidth / fromGrid.$renderWidth;
 	const yFactor = toGrid.$renderHeight / fromGrid.$renderHeight;

@@ -1,6 +1,7 @@
 // For Safari < 12
 
-type flatMapCallback<T, U, This> = (this: This, value: T, index: number, array: unknown[]) => U | U[];
+type flatMapCallback<T, U, This> =
+	(this: This, value: T, index: number, array: unknown[]) => U | U[];
 
 //=================================================================
 /**

@@ -3,6 +3,7 @@ import Rc0Migration from "./migrations/rc0Migration";
 import Rc1Migration from "./migrations/rc1Migration";
 import TrivialMigration from "./migrations/trivialMigration";
 import ProjectMigration from "./migrations/projectMigration";
+import StrategyMigration from "./migrations/strategyMigration";
 import HardLimitCheck from "./checks/hardLimitCheck";
 import { Migration } from "./migration";
 
@@ -13,16 +14,17 @@ Migration.$add(Rc0Migration, "rc0");
 Migration.$add(Rc1Migration, "rc1");
 
 /**
- * Version 0 is identical as rc1. We change the version code just for the record.
- * This is the first publicly released format.
+ * Version 0 is identical as rc1. We change the version code just for the
+ * record. This is the first publicly released format.
  */
 Migration.$add(TrivialMigration, "0");
 
 /**
  * Version 0.4 is completely downward compatible to version 0,
  * so we don't need to modify anything. All difference will be ignored.
- * The differences include there's an additional `history` (not included in file saving),
- * deprecate `fullscreen`, change `scale` to `zoom` (not included in file saving)
+ * The differences include there's an additional `history` (not included in file
+ * saving), deprecate `fullscreen`, change `scale` to `zoom` (not included in
+ * file saving)
  */
 Migration.$add(TrivialMigration, "0.4");
 
@@ -35,6 +37,12 @@ Migration.$add(ProjectMigration, "0.6");
  * so now this version doesn't modify anything.
  */
 Migration.$add(TrivialMigration, "0.7");
+
+/**
+ * Version 0.8 moves the strategies from partitions to overlaps, so that each
+ * join can have its own strategy.
+ */
+Migration.$add(StrategyMigration, "0.8");
 
 /** Check for hard limits. */
 Migration.$check(HardLimitCheck);

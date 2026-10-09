@@ -40,7 +40,8 @@ export abstract class Destructible extends EventTarget {
 
 	/**
 	 * Provide the quick method to register destructing action.
-	 * Since destructing is a one-time thing, all these event listener has "once" on them.
+	 * Since destructing is a one-time thing, all these event listener has
+	 * "once" on them.
 	 */
 	protected _onDestruct(action: Consumer<DestructEvent>): void {
 		this.addEventListener(DESTRUCT, action, { once: true });

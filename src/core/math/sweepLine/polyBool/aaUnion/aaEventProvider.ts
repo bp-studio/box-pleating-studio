@@ -14,13 +14,16 @@ const SHIFT_DELTA = 14;
 
 //=================================================================
 /**
- * {@link AAEventProvider} generates and compares {@link SweepEvent}s for AA line segments.
+ * {@link AAEventProvider} generates and compares {@link SweepEvent}s for AA
+ * line segments.
  */
 //=================================================================
 
 export class AAEventProvider extends EventProvider {
 
-	public $createStart(startPoint: IPoint, segment: ISegment, delta: -1 | 1): StartEvent {
+	public $createStart(
+		startPoint: IPoint, segment: ISegment, delta: -1 | 1
+	): StartEvent {
 		const key = getKey(startPoint, 1, segment, delta, this._nextId++);
 		return new StartEvent(startPoint, segment, delta, key);
 	}
@@ -31,7 +34,8 @@ export class AAEventProvider extends EventProvider {
 	}
 
 	public readonly $eventComparator: Comparator<SweepEvent> = eventComparator;
-	public readonly $statusComparator: Comparator<StartEvent> = statusComparator;
+	public readonly $statusComparator: Comparator<StartEvent> =
+		statusComparator;
 }
 
 const eventComparator: Comparator<SweepEvent> = (a, b) =>
@@ -56,12 +60,15 @@ const statusComparator: Comparator<StartEvent> = (a, b) => a.$key - b.$key;
  * the range of point.y has to be within [-16384, 16384)
  * (See {@link COORDINATE_SHIFT}).
  */
-function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1, id: number): number {
+function getKey(
+	point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1, id: number
+): number {
 	let hor = (segment as AALineSegment).$isHorizontal ? 1 : 0;
 	if(isStart) hor ^= 1;
 	return (
 		// Sort by y-coordinate first.
-		// Notice that negative values won't affect the comparison of the remaining parts.
+		// Notice that negative values won't affect the comparison of the
+		// remaining parts.
 		point.y - COORDINATE_SHIFT << SHIFT_Y |
 
 		// for the events at the same location, end events goes first
@@ -72,12 +79,14 @@ function getKey(point: IPoint, isStart: 1 | 0, segment: ISegment, delta: -1 | 1,
 		// and it will be the other way for end events.
 		hor << SHIFT_HOR |
 
-		// For overlapping start events, entering segment goes before exiting segment,
-		// so that wrapCount will not be temporarily zero and causes misjudgment.
+		// For overlapping start events, entering segment goes before exiting
+		// segment, so that wrapCount will not be temporarily zero and causes
+		// misjudgment.
 		(delta === 1 ? 0 : 1) << SHIFT_DELTA |
 
-		// There's no need to sort in any particular ways for overlapping events of the same type;
-		// especially notice that the overall sorting is not effected by subdivision of segments.
+		// There's no need to sort in any particular ways for overlapping events
+		// of the same type; especially notice that the overall sorting is not
+		// effected by subdivision of segments.
 		id
 	);
 }

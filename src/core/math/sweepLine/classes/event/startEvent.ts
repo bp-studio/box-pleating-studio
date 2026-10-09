@@ -22,7 +22,10 @@ export class StartEvent extends EventBase {
 	 */
 	public $isInside: boolean = false;
 
-	/** How would {@link $wrapCount} change when we go through this segment from bottom to top. */
+	/**
+	 * How would {@link $wrapCount} change when we go through this segment from
+	 * bottom to top.
+	 */
 	public readonly $wrapDelta: Sign;
 
 	/**
@@ -42,7 +45,8 @@ export class StartEvent extends EventBase {
 	 * their ordering in the status queue, depending on the use case.
 	 * For example, when taking the union, the exiting edge should always be
 	 * placed after the entering edge, so that the {@link $wrapCount} doesn't
-	 * temporarily become zero as we examine them and cause them to be collected.
+	 * temporarily become zero as we examine them and cause them to be
+	 * collected.
 	 */
 	public $wrapCount: number;
 

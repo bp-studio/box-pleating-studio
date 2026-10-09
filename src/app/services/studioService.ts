@@ -2,6 +2,7 @@ import { computed, reactive, shallowRef } from "vue";
 
 import { defaultTitle } from "app/shared/constants";
 import Dialogs from "./dialogService";
+import Toast from "./toastService";
 
 import type { Stretch } from "client/project/components/layout/stretch";
 import type { Project } from "client/project/project";
@@ -9,10 +10,13 @@ import type { ComputedRef, UnwrapNestedRefs } from "vue";
 import type { DirectionKey } from "shared/types/types";
 import type { StudioOptions } from "client/options";
 import type { Device } from "client/project/components/layout/device";
+import type { Sheet } from "client/project/components/sheet";
 
 /** Before the Studio is initialized, use a default value as placeholder. */
 function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
-	return computed(() => StudioService.initialized.value ? target() : defaultValue);
+	return computed(
+		() => StudioService.initialized.value ? target() : defaultValue
+	);
 }
 
 /**
@@ -73,7 +77,8 @@ namespace StudioService {
 
 	export const mpSupported = proxy(() => bp.plugins.mpSupported.value, false);
 	export const style = proxy(() => bp.style, null!);
-	export const mouseCoordinates = proxy(() => bp.mouseCoordinates.value, null);
+	export const mouseCoordinates =
+		proxy(() => bp.mouseCoordinates.value, null);
 	export const selections = proxy(() => bp.selection.selections, []);
 	export const selection = computed(() => selections.value[0] ?? null);
 	export const stretch = computed(() => {
@@ -85,9 +90,11 @@ namespace StudioService {
 
 	export const plugins = proxy(() => bp.plugins, null!);
 
-	export const draggableSelected = proxy(() => bp.selection.draggables.value.length > 0, false);
+	export const draggableSelected =
+		proxy(() => bp.selection.draggables.value.length > 0, false);
 	export const isDragging = proxy(() => bp.drag.isDragging.value, false);
-	export const shouldTakeOverContextHandling = proxy(() => bp.shouldTakeOverContextHandling, () => false);
+	export const shouldTakeOverContextHandling =
+		proxy(() => bp.shouldTakeOverContextHandling, () => false);
 
 	export const history = proxy(() => bp.history, {
 		canUndo: false,
@@ -98,7 +105,9 @@ namespace StudioService {
 		notifyAll() { /* */ },
 	});
 
-	export async function execute(action: Action<Promise<void>>): Promise<void> {
+	export async function execute(
+		action: Action<Promise<void>>
+	): Promise<void> {
 		if(executing) return; // ignore rapid execution
 		try {
 			executing = true;
@@ -110,9 +119,9 @@ namespace StudioService {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Modal control
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	// Workspace should not be interactive if any modal is opened.
 	let modalCount = 0;
@@ -123,9 +132,9 @@ namespace StudioService {
 		if(--modalCount == 0) bp?.setInteractive(true);
 	});
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Delegate methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	export function beforePrint(): Promise<void> {
 		return bp.beforePrint(null);
@@ -140,6 +149,41 @@ namespace StudioService {
 		const proj = project.value;
 		if(!proj) return;
 		execute(() => proj.design.delete());
+	}
+	export function copy(): void {
+		const design = project.value?.design;
+		if(!design?.canCopy) return;
+		if(!design.copy()) Toast.show(i18n.t("message.nothingCopied"));
+	}
+	export function cut(): void {
+		const design = project.value?.design;
+		if(!design?.canCopy) return;
+		execute(async () => {
+			if(!await design.cut()) Toast.show(i18n.t("message.nothingCopied"));
+		});
+	}
+	export function paste(): void {
+		const design = project.value?.design;
+		if(!design?.canPaste) return;
+		execute(() => design.paste());
+	}
+	/**
+	 * Rotate the sheet, or only the selected objects if any (see
+	 * {@link Sheet.rotate}).
+	 */
+	export function rotate(by: Sign): void {
+		const sheet = project.value?.design.sheet;
+		if(sheet && !sheet.rotate(by)) Toast.show(i18n.t("message.cannotFit"));
+	}
+	/**
+	 * Flip the sheet, or only the selected objects if any (see
+	 * {@link Sheet.flip}).
+	 */
+	export function flip(horizontal: boolean): void {
+		const sheet = project.value?.design.sheet;
+		if(sheet && !sheet.flip(horizontal)) {
+			Toast.show(i18n.t("message.cannotFit"));
+		}
 	}
 	export function svg(proj: Project, includeHidden: boolean): Promise<Blob> {
 		return Promise.resolve(bp.svg(proj, includeHidden));
@@ -157,4 +201,5 @@ namespace StudioService {
 
 export const showPanel = shallowRef(false);
 
-export default <Readonly<UnwrapNestedRefs<typeof StudioService>>>reactive(StudioService);
+export default
+	<Readonly<UnwrapNestedRefs<typeof StudioService>>>reactive(StudioService);

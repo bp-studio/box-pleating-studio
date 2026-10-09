@@ -12,12 +12,17 @@ const MAX_SAFE = 67108863;
  */
 const ERROR = 1e-10;
 
-/** Using continuous fractions to obtain a rational approximation of any floating number. */
+/**
+ * Using continuous fractions to obtain a rational approximation of any
+ * floating number.
+ */
 export function toFraction(v: number, err: number): Fraction {
 	return toFractionRecursive(v, 1, 0, err);
 }
 
-export function toFractionRecursive(v: number, k2: number, k1: number, err: number): Fraction {
+export function toFractionRecursive(
+	v: number, k2: number, k1: number, err: number
+): Fraction {
 	const n = Math.floor(v), r = v - n, k0 = n * k1 + k2;
 	const f = new Fraction(n);
 	if(r / k0 / ((1 - r) * k0 + k1) < err) return f;
@@ -37,13 +42,13 @@ export type Rational = number | Fraction;
 /**
  * {@link Fraction} represents a rational number.
  *
- * Originally, this class used the {@link BigInt} type internally for infinite precision,
- * and had overloaded parameters for various operations for flexibility.
- * However, later it was found that BigInt's arithmetic speed is way too slow,
- * and overloading also incurred unnecessary overheads, so since v0.6.0,
- * this class was completely re-implemented to use the primitive number type,
- * and all overloading was removed,
- * so that all operations can only be performed with rational numbers.
+ * Originally, this class used the {@link BigInt} type internally for infinite
+ * precision, and had overloaded parameters for various operations for
+ * flexibility. However, later it was found that BigInt's arithmetic speed is
+ * way too slow, and overloading also incurred unnecessary overheads, so since
+ * v0.6.0, this class was completely re-implemented to use the primitive number
+ * type, and all overloading was removed, so that all operations can only be
+ * performed with rational numbers.
  */
 //=================================================================
 
@@ -83,16 +88,19 @@ export class Fraction {
 	public get $numerator(): number { return this._p; }
 	public get $denominator(): Positive { return this._q; }
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Core members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** The value of the fraction as number */
 	public get $value(): number {
 		return this._p / this._q;
 	}
 
-	/** Output the fraction in the format of `p/q` (in lowest terms), or just `p` if `q` equals 1. */
+	/**
+	 * Output the fraction in the format of `p/q` (in lowest terms),
+	 * or just `p` if `q` equals 1.
+	 */
 	public toString(): string {
 		// Uncomment the next line for easier debugging
 		// return this.$value.toString();
@@ -105,9 +113,9 @@ export class Fraction {
 		return new Fraction(this._p, this._q);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Single operation methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Simplification in place */
 	private _smp(): void {
@@ -127,16 +135,16 @@ export class Fraction {
 		return this;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Arithmetic methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Addition in place.
 	 *
 	 * Since v0.7.12, we optimize by reducing the denominators before addition
-	 * to prevent intermediate overflow during the common denominator calculation,
-	 * which may occur especially during matrix multiplications.
+	 * to prevent intermediate overflow during the common denominator
+	 * calculation, which may occur especially during matrix multiplications.
 	 */
 	public a(f: Fraction): this {
 		const [q1, q2, g] = reduceInt(this._q, f._q);
@@ -186,14 +194,15 @@ export class Fraction {
 	/** Normalization after each operation */
 	private _normalize(): this {
 		// Test if the numbers are greater than MAX_SAFE.
-		// If one of them are greater, then one more operation could lead to overflow.
+		// If one of them are greater,
+		// then one more operation could lead to overflow.
 		if(this._q > MAX_SAFE || Math.abs(this._p) > MAX_SAFE) this._smp();
 		return this;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Methods that creates new object
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Negation to new instance */
 	public get neg(): Fraction { return this.c().n(); }
@@ -222,9 +231,9 @@ export class Fraction {
 	 */
 	public div(v: Fraction): Fraction { return this.c().d(v); }
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Compare methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Equal to */
 	public eq(v: Fraction): boolean {
@@ -251,9 +260,14 @@ export class Fraction {
 		return this._p * v._q >= this._q * v._p;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/** Comparison, returning the sign of the difference. Useful for sorting. */
+	public $compare(v: Fraction): Sign {
+		return Math.sign(this._p * v._q - this._q * v._p) as Sign;
+	}
+
+	////////////////////////////////////////////////////////////////////////////
 	// Other methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $reduceWith(f: Fraction): [Fraction, Fraction] {
 		this._smp(); f._smp();

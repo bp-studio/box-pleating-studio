@@ -3,6 +3,7 @@ import { Line } from "./line";
 import { Point } from "./point";
 import { Matrix } from "./matrix";
 import { Vector } from "./vector";
+import { debugAssert } from "core/utils/debug";
 
 import type { NodeId } from "shared/json/tree";
 import type { PathEx } from "shared/types/geometry";
@@ -37,16 +38,24 @@ export function toLines(path: RationalPath): Line[] {
 }
 
 /**
- * Given a triangle, let the first vertex stays stationary,
- * and move the second vertex to the given target while keeping triangle similar.
+ * Given a triangle, let the first vertex stays stationary, and move the second
+ * vertex to the given target while keeping triangle similar.
+ *
+ * The first vertex must differ from both the second vertex and the target, as
+ * the transformation is undefined (or degenerated) otherwise. It is up to the
+ * caller to guarantee this.
  * @returns The third vertex after the moving.
  */
-export function triangleTransform(triangle: RationalPath, to: Point): Point | null {
+export function triangleTransform(
+	triangle: RationalPath, to: Point
+): Point {
 	const [p1, p2, p3] = triangle;
 	const [v1, v2, v3] = [to, p2, p3].map(p => p.$sub(p1));
 
-	// TODO: It is not yet clear why this might happen. More investigation is needed.
-	if(v2.eq(Vector.ZERO) || v1.eq(Vector.ZERO)) return null;
+	debugAssert(
+		() => !v2.eq(Vector.ZERO) && !v1.eq(Vector.ZERO),
+		"Degenerated triangle"
+	);
 
 	const m = Matrix.$getTransformMatrix(v2, v1);
 	return p1.$add(m.$multiply(v3));

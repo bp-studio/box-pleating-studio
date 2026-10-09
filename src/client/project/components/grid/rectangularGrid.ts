@@ -4,7 +4,9 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
 import { MAX_SHEET_SIZE, MIN_RECT_SIZE } from "shared/types/constants";
-import { rectangularConstrain } from "./constrain";
+import {
+	fitRange, leastOutsideShift, rectangularConstrain
+} from "./constrain";
 
 import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
@@ -41,9 +43,9 @@ export class RectangularGrid extends Grid {
 		};
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Proxy properties
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get diameter(): number {
 		return Math.max(this._height.value, this._width.value);
@@ -103,12 +105,13 @@ export class RectangularGrid extends Grid {
 		this.$project.history.$fieldChange(this, "width", oldValue, v, flush);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public override $canSubdivide(): boolean {
-		return this._width.value * 2 <= MAX_SHEET_SIZE && this._height.value * 2 <= MAX_SHEET_SIZE;
+		return this._width.value * 2 <= MAX_SHEET_SIZE &&
+			this._height.value * 2 <= MAX_SHEET_SIZE;
 	}
 
 	public override $getResizeCenter(): IPoint {
@@ -135,6 +138,23 @@ export class RectangularGrid extends Grid {
 
 	public $constrain(p: IPoint): IPoint {
 		return rectangularConstrain(this._width.value, this._height.value, p);
+	}
+
+	public $getFitShift(points: readonly IPoint[]): IPoint | null {
+		const x = fitRange(points.map(p => p.x), 0, this._width.value);
+		const y = fitRange(points.map(p => p.y), 0, this._height.value);
+		if(x === null || y === null) return null;
+		return { x, y };
+	}
+
+	protected override _getLeastOutsideShift(
+		points: readonly IPoint[]
+	): IPoint {
+		const [x, y] = leastOutsideShift(
+			points.map(p => p.x), points.map(p => p.y),
+			[0, this._width.value], [0, this._height.value], false
+		);
+		return { x, y };
 	}
 
 	public $contains(p: IPoint): boolean {
@@ -184,7 +204,9 @@ export class RectangularGrid extends Grid {
 		}
 	}
 
-	public $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix {
+	public $getTransformMatrix(
+		size: number, reorient: boolean
+	): TransformationMatrix {
 		const w = this._width.value, h = this._height.value;
 		const max = Math.max(w, h);
 		const s = size / max;
@@ -201,9 +223,9 @@ export class RectangularGrid extends Grid {
 		return this._width.value;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private get _xSpan(): [number, number] {
 		const anchors = this._anchors();

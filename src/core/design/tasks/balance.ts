@@ -42,7 +42,9 @@ function tryBalance(root: TreeNode): TreeNode | null {
 	if(!first) return null;
 	const second = root.$children.$getSecond();
 	const secondHeight = second ? second.$height + 1 : 0;
-	if(first.$height <= secondHeight && first.id !== balanceTask.data) return null;
+	if(first.$height <= secondHeight && first.id !== balanceTask.data) {
+		return null;
+	}
 
 	// Balancing
 	root.$height = secondHeight;

@@ -34,7 +34,8 @@ export interface JCommand {
 	/**
 	 * The tag of the effected object.
 	 *
-	 * Considering GC, {@link JCommand} doesn't keep the reference of the object.
+	 * Considering GC, {@link JCommand} doesn't keep the reference of the
+	 * object.
 	 */
 	readonly tag: string;
 }

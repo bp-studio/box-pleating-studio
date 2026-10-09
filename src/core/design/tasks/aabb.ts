@@ -1,7 +1,6 @@
 import { Task } from "./task";
 import { climb } from "./utils/climb";
 import { State } from "core/service/state";
-import { roughContourTask } from "./roughContour";
 import { junctionTask } from "./junction";
 
 import type { ITreeNode } from "../context";
@@ -11,10 +10,13 @@ import type { ITreeNode } from "../context";
  * {@link AABBTask} updates {@link TreeNode.$AABB}.
  */
 //=================================================================
-export const AABBTask = new Task(aabb, junctionTask, roughContourTask);
+export const AABBTask = new Task(aabb, junctionTask);
 
 function aabb(): void {
-	climb(updater, State.$lengthChanged, State.$nodeAABBChanged, State.$parentChanged);
+	climb(
+		updater,
+		State.$lengthChanged, State.$nodeAABBChanged, State.$parentChanged
+	);
 }
 
 function updater(node: ITreeNode): boolean {

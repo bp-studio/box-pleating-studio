@@ -10,9 +10,11 @@ node_modules/
 debug.log
 .VSCodeCounter/
 
-# Istanbul
-.nyc_output/
+# Coverage
 coverage/
+
+# Output of the render check
+/tools/renderCheck/out/
 
 # Playwright
 /test-results/
@@ -21,7 +23,6 @@ coverage/
 /playwright/.cache/
 
 # My own notes
-NOTE.md
 /docs/
 
 # This is private for now

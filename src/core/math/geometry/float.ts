@@ -22,7 +22,10 @@ export function isAlmostZero(x: number, eps = EPSILON): boolean {
 	return Math.abs(x) < eps;
 }
 
-/** Check if the two points are essentially equal under {@link EPSILON}-comparison. */
+/**
+ * Check if the two points are essentially equal under
+ * {@link EPSILON}-comparison.
+ */
 export function epsilonSame(p1: IPoint, p2: IPoint, eps = EPSILON): boolean {
 	return isAlmostZero(p1.x - p2.x, eps) && isAlmostZero(p1.y - p2.y, eps);
 }
@@ -32,7 +35,8 @@ export function fixZero(x: number): number {
 	return x;
 }
 
-export const floatXyComparator: Comparator<IPoint> = (a, b) => fixZero(a.x - b.x) || fixZero(a.y - b.y);
+export const floatXyComparator: Comparator<IPoint> =
+	(a, b) => fixZero(a.x - b.x) || fixZero(a.y - b.y);
 
 function fixFloat(x: number): number {
 	const rx = Math.round(x);

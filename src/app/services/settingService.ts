@@ -76,6 +76,7 @@ const defaultSettings = {
 		dot: DEFAULT_COLOR,
 		label: DEFAULT_COLOR,
 		axialParallel: DEFAULT_COLOR,
+		uncovered: DEFAULT_COLOR,
 	},
 	tools: {
 		Optimizer: {
@@ -88,7 +89,7 @@ const defaultSettings = {
 		CP: {
 			format: "cp",
 			reorient: false,
-			useAuxiliary: true,
+			hinge: "auxiliary",
 		} as CPOptions,
 		SVG: {
 			includeHiddenElement: false,
@@ -102,11 +103,23 @@ function loadSettings(settingString: string | null): void {
 	if(!settingString) return;
 	try {
 		const savedSettings = JSON.parse(settingString);
-		// Use deepCopy to read saved settings,
-		// so that old setting will not be overwritten as we add more settings in the future.
+		migrateSettings(savedSettings);
+		// Use deepCopy to read saved settings, so that old setting will not be
+		// overwritten as we add more settings in the future.
 		deepCopy(settings, savedSettings);
 	} catch {
 		// Simply ignore if anything went wrong
+	}
+}
+
+/** Migrate the settings saved by the older versions. */
+function migrateSettings(
+	saved: { tools?: { CP?: Record<string, unknown> } } | null
+): void {
+	// v0.8: The option of auxiliary lines is replaced by the hinge option.
+	const cp = saved?.tools?.CP;
+	if(cp && "useAuxiliary" in cp && !("hinge" in cp)) {
+		cp.hinge = cp.useAuxiliary ? "auxiliary" : "valley";
 	}
 }
 

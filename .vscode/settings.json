@@ -29,6 +29,7 @@
 		"fbclid",
 		"opendir",
 		"purgecss",
+		"reurl",
 		"tinyurl",
 		"weixin"
 	],
@@ -118,12 +119,12 @@
 		"*.js": "$(capture).prod.js, $(capture).min.js, $(capture).js.map",
 		"*.woff2": "$(capture).eot, $(capture).svg, $(capture).ttf, $(capture).woff",
 		".gitignore": ".gitattributes",
-		".mocharc.json": ".nycrc",
 		".stylelintrc.json": ".stylelintignore",
 		"README.md": "LICENSE.md, CONTRIBUTING.md",
 		"eslint.config.js": ".editorconfig",
 		"makefile": ".clang-*",
-		"package.json": "pnpm-*.yaml, .npmrc, .browserslistrc, knip.config.ts"
+		"package.json": "pnpm-*.yaml, .npmrc, .browserslistrc, knip.config.ts",
+		"rstest.config.ts": ".nycrc"
 	},
 	"files.associations": {
 		"*.bps": "json",
@@ -131,13 +132,15 @@
 	},
 	"files.exclude": {
 		"**/debug.log": true,
-		".nyc_output": true,
 		"build/obj/": true,
 		"coverage": true,
 		"node_modules/": true,
 		"patches/": true,
 		"test-results/": true
 	},
+	"git.scanRepositories": [
+		"docs"
+	],
 	"i18n-ally.enabledFrameworks": [
 		"vue"
 	],
@@ -158,9 +161,8 @@
 	],
 	"js/ts.suggestionActions.enabled": false, // See https://github.com/Microsoft/vscode/issues/47299
 	"js/ts.tsdk.path": "node_modules\\typescript\\lib",
-	"mochaExplorer.multiFileSuites": true,
-	"mochaExplorer.nodeArgv": [
-		"--enable-source-maps"
+	"rstest.testFileGlobPattern": [
+		"test/specs/**/*.spec.ts"
 	],
 	"scss.validate": false,
 	"stylelint.packageManager": "pnpm",

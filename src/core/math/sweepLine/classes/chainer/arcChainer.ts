@@ -7,7 +7,8 @@ import type { ArcSegment } from "../segment/arcSegment";
 
 //=================================================================
 /**
- * {@link ArcChainer} chains those polygons that might contain {@link ArcSegment}s.
+ * {@link ArcChainer} chains those polygons that might contain
+ * {@link ArcSegment}s.
  */
 //=================================================================
 
@@ -20,7 +21,9 @@ export class ArcChainer extends Chainer<ArcPath> {
 	}
 
 	/* istanbul ignore next: won't encounter for our use case */
-	protected override _connectChain(head: number, tail: number, segment: ISegment): void {
+	protected override _connectChain(
+		head: number, tail: number, segment: ISegment
+	): void {
 		_trySetArcSegment(this._points[this._chainHeads[tail]], segment);
 		super._connectChain(head, tail, segment);
 	}

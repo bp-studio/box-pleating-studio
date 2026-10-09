@@ -34,7 +34,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	private readonly _project: Project;
 	private readonly _steps: Step[] = shallowReactive([]);
 
-	// The following three is copied by instances, so we cannot make them readonly.
+	// The following three is copied by instances, so we cannot make them
+	// readonly.
 	private _queue: Command[] = [];
 	private _construct: Memento[] = [];
 	private _destruct: Memento[] = [];
@@ -100,7 +101,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	public get isModified(): boolean {
 		// Always display as modified during dragging to reduce UI flashes.
-		return this._project.$isDragging || this._savedIndex.value != this._index.value;
+		return this._project.$isDragging ||
+			this._savedIndex.value != this._index.value;
 	}
 
 	public $notifySave(): void {
@@ -109,7 +111,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	/** See {@link _flush}. */
 	public $flush(): void {
-		// Public flushing is allowed only if we're not in the middle of navigating.
+		// Public flushing is allowed only if we're not in the middle of
+		// navigating.
 		if(!this._moving) this._flush();
 	}
 
@@ -119,7 +122,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	/** Move an object. */
-	public $move(target: Draggable, newLocation: IPoint, oldLocation?: IPoint): void {
+	public $move(
+		target: Draggable, newLocation: IPoint, oldLocation?: IPoint
+	): void {
 		if(this.$isLocked) return;
 		const command = MoveCommand.$create(target, newLocation, oldLocation);
 		this._enqueue(command);
@@ -128,11 +133,14 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	/**
 	 * Change a field.
 	 * @param flush Whether to flush immediately. The default value is `true`.\
-	 * Set the value to `false` if the same field of multiple objects are changed simultaneously,
-	 * or if the operation might involve construction/destruction of objects.
+	 * Set the value to `false` if the same field of multiple objects are
+	 * changed simultaneously, or if the operation might involve
+	 * construction/destruction of objects.
 	 */
-	public $fieldChange(target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
-		flush: boolean = true): void {
+	public $fieldChange(
+		target: ITagObject, prop: string, oldValue: unknown, newValue: unknown,
+		flush: boolean = true
+	): void {
 		if(this.$isLocked) return;
 		this._enqueue(FieldCommand.$create(target, prop, oldValue, newValue));
 		if(flush) this._flush();
@@ -140,7 +148,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	public $edit(edits: JEdit[], oldRoot: NodeId, newRoot: NodeId): void {
 		if(this.$isLocked) return;
-		this._enqueue(EditCommand.$create(this._project, edits, oldRoot, newRoot));
+		this._enqueue(
+			EditCommand.$create(this._project, edits, oldRoot, newRoot)
+		);
 	}
 
 	public $construct(memento: Memento): void {
@@ -171,9 +181,10 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				this._moving = true;
 				const result = await this._steps[--this._index.value].$undo();
 				if(result != OperationResult.Success) {
-					// If something goes wrong, the step in question and everything
-					// before that should be discarded.
-					this._steps.splice(0, this._index.value + (result == OperationResult.Failed ? 1 : 0));
+					// If something goes wrong, the step in question and
+					// everything before that should be discarded.
+					const offset = result == OperationResult.Failed ? 1 : 0;
+					this._steps.splice(0, this._index.value + offset);
 					this._index.value = 0;
 				}
 				this._flush();
@@ -191,8 +202,8 @@ export default class HistoryManager implements ISerializable<JHistory> {
 				this._moving = true;
 				const result = await this._steps[this._index.value++].$redo();
 				if(result != OperationResult.Success) {
-					// If something goes wrong, the step in question and everything
-					// after that should be discarded.
+					// If something goes wrong, the step in question and
+					// everything after that should be discarded.
 					if(result == OperationResult.Failed) this._index.value--;
 					this._steps.splice(this._index.value);
 				}
@@ -201,12 +212,13 @@ export default class HistoryManager implements ISerializable<JHistory> {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Handles accumulating operations and gather them into a {@link Step} object.
+	 * Handles accumulating operations and gather them into a {@link Step}
+	 * object.
 	 */
 	private _flush(): void {
 		const selection = this._project.design.sheet.$getSelectedTags();
@@ -229,8 +241,9 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			this._queue = [];
 		}
 
-		// During history navigation, it is possible that these are still enqueued
-		// due to async operations. So we need to clean them in all cases.
+		// During history navigation, it is possible that these are still
+		// enqueued due to async operations. So we need to clean them in all
+		// cases.
 		this._construct = [];
 		this._destruct = [];
 
@@ -248,13 +261,17 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	private get _lastStep(): Step | undefined {
-		if(this._index.value == 0 || this._index.value < this._steps.length) return undefined;
+		if(this._index.value == 0 || this._index.value < this._steps.length) {
+			return undefined;
+		}
 		return this._steps[this._index.value - 1];
 	}
 
 	private _addStep(step: Step): void {
 		// Remove all Steps afterwards
-		if(this._steps.length > this._index.value) this._steps.length = this._index.value;
+		if(this._steps.length > this._index.value) {
+			this._steps.length = this._index.value;
+		}
 
 		// Add a new Step and move the index
 		this._steps[this._index.value++] = step;

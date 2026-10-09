@@ -5,6 +5,7 @@ import { heightTask } from "core/design/tasks/height";
 import { Processor } from "core/service/processor";
 import { State, fullReset } from "core/service/state";
 import { Migration } from "client/patches";
+import { parseEdges, parseFlaps } from "shared/utils/treeString";
 
 import type { TreeNode } from "core/design/context/treeNode";
 import type { JEdge, JFlap, JProject, NodeId } from "shared/json";
@@ -14,6 +15,7 @@ export const id1 = 1 as NodeId;
 export const id2 = 2 as NodeId;
 export const id3 = 3 as NodeId;
 export const id4 = 4 as NodeId;
+export const id5 = 5 as NodeId;
 export const id6 = 6 as NodeId;
 
 type Substitute<T, T1, T2> = {
@@ -28,17 +30,8 @@ type NFlap = Substitute<JFlap, NodeId, number>;
  * @param flaps Comma-separated list of `(id,x,y,width,height)`.
  */
 export function parseTree(edges: string, flaps?: string): Tree {
-	const nEdges: NEdge[] = [...edges.matchAll(/\((\d+),(\d+),(\d+)\)/g)]
-		.map(m => m.map(Number))
-		.map(m => ({ n1: m[1], n2: m[2], length: m[3] }));
-	if(flaps) {
-		const nFlaps: NFlap[] = [...flaps.matchAll(/\((\d+),(-?\d+),(-?\d+),(\d+),(\d+)\)/g)]
-			.map(m => m.map(Number))
-			.map(m => ({ id: m[1], x: m[2], y: m[3], width: m[4], height: m[5] }));
-		return createTree(nEdges, nFlaps);
-	} else {
-		return createTree(nEdges);
-	}
+	const nEdges = parseEdges(edges);
+	return flaps ? createTree(nEdges, parseFlaps(flaps)) : createTree(nEdges);
 }
 
 /**
@@ -63,7 +56,9 @@ export function exportProject(id: string | number = ""): JProject {
 	for(const n of nodes) {
 		project.design.tree.nodes.push({ id: n.id, x: 0, y: 0, name: "" });
 		if(n.$parent) {
-			project.design.tree.edges.push({ n1: n.$parent.id, n2: n.id, length: n.$length });
+			project.design.tree.edges.push({
+				n1: n.$parent.id, n2: n.id, length: n.$length,
+			});
 		}
 	}
 	writeFileSync(`export${id}.bps`, JSON.stringify(project));

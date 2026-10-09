@@ -14,7 +14,8 @@ import type { Tree } from "core/design/context/tree";
 
 //=================================================================
 /**
- * {@link State} manages the data that are passed around during the updating process.
+ * {@link State} manages the data that are passed around during the updating
+ * process.
  */
 //=================================================================
 
@@ -24,7 +25,10 @@ export namespace State {
 		/** Current {@link Tree}. */
 		$tree: Tree;
 
-		/** If the Client is performing dragging. Some of the tasks could take a shortcut in that case. */
+		/**
+		 * If the Client is performing dragging. Some of the tasks could take a
+		 * shortcut in that case.
+		 */
 		$isDragging: boolean;
 
 		/** Root have changed in the current round. */
@@ -36,8 +40,8 @@ export namespace State {
 
 	/**
 	 * We put all mutable states in this object,
-	 * as some of our toolchains (in particular Istanbul ESM loader) depends on Babel,
-	 * which does not support non-constant members in a namespace.
+	 * as some of our toolchains (in particular Istanbul ESM loader) depends on
+	 * Babel, which does not support non-constant members in a namespace.
 	 */
 	export const m: StateData = {
 		$tree: undefined!,
@@ -46,9 +50,9 @@ export namespace State {
 		$treeStructureChanged: false,
 	};
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Persistent states
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** All {@link Junction}s. */
 	export const $junctions = new IntDoubleMap<NodeId, Junction>();
@@ -56,11 +60,25 @@ export namespace State {
 	/** All {@link Stretch}es. */
 	export const $stretches = new Map<string, Stretch>();
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Semi-persistent states
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * The signature of the invasions of each leaf in the previous round, for
+	 * detecting changes (see {@link roughContourTask}).
+	 */
+	export const $invasionCache = new Map<NodeId, string>();
 
-	/** Used for finding those {@link InvalidJunction}s that needs to be deleted. */
+	/**
+	 * The signature of the stretches of each node in the previous round, for
+	 * detecting changes (see {@link traceContourTask}).
+	 */
+	export const $stretchSignatureCache = new Map<number, string>();
+
+	////////////////////////////////////////////////////////////////////////////
+	// Semi-persistent states
+	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Used for finding those {@link InvalidJunction}s that needs to be deleted.
+	 */
 	export const $invalidJunctionDiff = new DiffDoubleSet();
 
 	/** Used for finding those {@link Stretch}es that need to be deleted. */
@@ -69,35 +87,39 @@ export namespace State {
 	/** {@link Stretch} cache during dragging. */
 	export const $stretchCache = new Map<string, Stretch>();
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Temporary states
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Those nodes that have children changed (or initialized) in the current round,
-	 * except for those that are deleted later.
+	 * Those nodes that have children changed (or initialized) in the current
+	 * round, except for those that are deleted later.
 	 */
 	export const $childrenChanged = new Set<ITreeNode>();
 
 	/**
-	 * Those nodes that have parent changed (or initialized) in the current round,
-	 * except for the final root node.
+	 * Those nodes that have parent changed (or initialized) in the current
+	 * round, except for the final root node.
 	 */
 	export const $parentChanged = new Set<ITreeNode>();
 
 	/**
-	 * Those nodes that have the length of their parent edges changed in the current round,
-	 * except for those that are already in {@link $parentChanged}.
+	 * Those nodes that have the length of their parent edges changed in the
+	 * current round, except for those that are already in
+	 * {@link $parentChanged}.
 	 */
 	export const $lengthChanged = new Set<ITreeNode>();
 
 	/**
-	 * Those nodes that have any {@link AABB} changed in its subtree in the current round,
-	 * for determining if re-scanning for collision is necessary.
+	 * Those nodes that have any {@link AABB} changed in its subtree in the
+	 * current round, for determining if re-scanning for collision is necessary.
 	 */
 	export const $subtreeAABBChanged = new Set<ITreeNode>();
 
-	/** Those nodes that have their {@link ITreeNode.$AABB AABB} proactively changed in the current round. */
+	/**
+	 * Those nodes that have their {@link ITreeNode.$AABB AABB} proactively
+	 * changed in the current round.
+	 */
 	export const $nodeAABBChanged = new Set<ITreeNode>();
 
 	/**
@@ -110,13 +132,15 @@ export namespace State {
 	export const $newRepositories = new Set<Repository>();
 
 	/**
-	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} for all related nodes in the current round.
+	 * The {@link Repository Repositories} that needs to recalculate
+	 * {@link PatternContour} for all related nodes in the current round.
 	 */
 	export const $repoToProcess = new Set<Repository>();
 
 	/**
-	 * The {@link Repository Repositories} that needs to recalculate {@link PatternContour} for only some of the related nodes in the current round,
-	 * excluding those that are already in {@link $repoToProcess}.
+	 * The {@link Repository Repositories} that needs to recalculate
+	 * {@link PatternContour} for only some of the related nodes in the current
+	 * round, excluding those that are already in {@link $repoToProcess}.
 	 */
 	export const $repoToPartiallyProcess = new Map<Repository, ITreeNode[]>();
 
@@ -126,15 +150,22 @@ export namespace State {
 	 */
 	export const $repoWithNodeSetChanged = new Set<Repository>();
 
-	/** The prototypes of those {@link Stretch}es that are expected to form int the current round. */
+	/**
+	 * The prototypes of those {@link Stretch}es that are expected to form int
+	 * the current round.
+	 */
 	export const $stretchPrototypes = new Map<string, JStretch>();
 
 	/**
-	 * Those {@link ITreeNode}s that has its {@link ITreeNode.$roughContours} changed in the current round.
+	 * Those {@link ITreeNode}s that has its {@link ITreeNode.$roughContours}
+	 * changed in the current round.
 	 */
 	export const $roughContourChanged = new Set<ITreeNode>();
 
-	/** Those flaps or rivers that will change their contours in the current round. */
+	/**
+	 * Those flaps or rivers that will change their contours in the current
+	 * round.
+	 */
 	export const $contourWillChange = new Set<ITreeNode>();
 
 	/** The quadrants that have patterns. */
@@ -143,9 +174,9 @@ export namespace State {
 	/** The {@link Device}s moved (or initialized) in the current round. */
 	export const $movedDevices = new Set<Device>();
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Reset the temporary states after each round. */
 	export function $reset(): void {
@@ -180,4 +211,6 @@ export function fullReset(): void {
 	State.$invalidJunctionDiff.clear();
 	State.$stretchDiff.clear();
 	State.$stretchCache.clear();
+	State.$invasionCache.clear();
+	State.$stretchSignatureCache.clear();
 }

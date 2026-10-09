@@ -11,7 +11,9 @@ import type { Configuration } from "../configuration";
  * that works for multiple {@link JJunction}s in general.
  */
 //=================================================================
-export function* generalConfigGenerator(repo: Repository, protoSignature?: string): Generator<Configuration> {
+export function* generalConfigGenerator(
+	repo: Repository, protoSignature?: string
+): Generator<Configuration> {
 	// First find all possible configurations for each Junction
 	const context = new GeneralConfigGeneratorContext(repo);
 	if(!context.$checkPreconditions()) return;
@@ -23,7 +25,9 @@ export function* generalConfigGenerator(repo: Repository, protoSignature?: strin
 	yield* GeneratorUtil.$first(generators, createConfigFilter(protoSignature));
 }
 
-function* generateConfig(context: GeneralConfigGeneratorContext, targetRank: number): Generator<Configuration> {
+function* generateConfig(
+	context: GeneralConfigGeneratorContext, targetRank: number
+): Generator<Configuration> {
 	for(const combination of context.$rankCombination(targetRank)) {
 		yield* context.$search(combination);
 	}

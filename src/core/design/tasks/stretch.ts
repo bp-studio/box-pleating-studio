@@ -23,12 +23,13 @@ interface Team {
 
 //=================================================================
 /**
- * {@link stretchTask} arranges {@link Junction} into groups and maintain the set of {@link Stretch}es.
+ * {@link stretchTask} arranges {@link Junction} into groups and maintain the
+ * set of {@link Stretch}es.
  *
  * This is one exceptionally complicated part in the theory of general
  * stretch patterns, and even I can't say that I've figured it all out.
- * For several times throughout the years I thought that I've figured it all out,
- * but then came some bizarre edge cases that proved me wrong.
+ * For several times throughout the years I thought that I've figured it all
+ * out, but then came some bizarre edge cases that proved me wrong.
  * Anyway, the algorithm presented here is the accumulation of my understandings
  * so far, which should at least be able to handle vast majority of cases.
  */
@@ -75,11 +76,15 @@ function grouping(junctions: Junctions): Team[] {
 		// In some really rare cases, a single flap could have two opposite
 		// quadrants showing up in the same group, so the ids of the flaps
 		// may contain duplicates. We still have to make the check.
-		const $flaps = distinct(group.map(q => q >>> 2 as NodeId).sort(minComparator));
+		const $flaps = distinct(
+			group.map(q => q >>> 2 as NodeId).sort(minComparator)
+		);
 
 		foreachPair($flaps, (i, j) => {
 			const junction = quadrantMap.get(i, j);
-			if(junction && group.includes(junction.$q1)) $junctions.push(junction);
+			if(junction && group.includes(junction.$q1)) {
+				$junctions.push(junction);
+			}
 		});
 		result.push({ $junctions, $flaps });
 	}
@@ -113,12 +118,16 @@ function getUncoveredJunctions(junctions: Junctions): Junctions {
 	return junctions.filter(j => !j.$isCovered);
 }
 
-/** Update or create {@link Stretch} based on the flap structure of the {@link Team}. */
+/**
+ * Update or create {@link Stretch} based on the flap structure of the
+ * {@link Team}.
+ */
 function createOrUpdateStretch(team: Team): void {
 	const stretchId = team.$flaps.join(",");
 	State.$stretchDiff.$add(stretchId);
 	const oldStretch = tryGetStretch(stretchId);
-	const prototype = State.$stretchPrototypes.get(stretchId) || { id: stretchId };
+	const prototype =
+		State.$stretchPrototypes.get(stretchId) || { id: stretchId };
 	if(oldStretch) {
 		oldStretch.$update(team.$junctions, prototype);
 	} else {
@@ -160,7 +169,8 @@ function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction): void {
 
 	const j1Closer = j1.$isCloserThan(j2);
 	if(r1.eq(r2)) {
-		// In case of equal junctions, at least one side should be of the same flap
+		// In case of equal junctions, at least one side should be of the same
+		// flap
 		const [a1, b1] = j1.$orientedIds;
 		const [a2, b2] = j2.$orientedIds;
 		if(a1 !== a2 && b1 !== b2) return;
@@ -181,12 +191,18 @@ function checkGeometricalCovering(j1: ValidJunction, j2: ValidJunction): void {
  *
  * It is assumed here that `p1.$dist >= p2.$dist`.
  */
-function getPathIntersectionDistances(j1: ValidJunction, j2: ValidJunction): [number, number] | undefined {
+function getPathIntersectionDistances(
+	j1: ValidJunction, j2: ValidJunction
+): [number, number] | undefined {
 	const p1 = j1.$lca, p2 = j2.$lca;
 	if(p1 === p2) return [j1.$a.$dist - p1.$dist, j2.$a.$dist - p1.$dist];
 	if(p1.$dist === p2.$dist) return undefined;
-	if(isAncestor(p1, j2.$a)) return [j1.$a.$dist - p1.$dist, j2.$a.$dist - p1.$dist];
-	if(isAncestor(p1, j2.$b)) return [j1.$a.$dist - p1.$dist, dist(j2.$a, p1, p2)];
+	if(isAncestor(p1, j2.$a)) {
+		return [j1.$a.$dist - p1.$dist, j2.$a.$dist - p1.$dist];
+	}
+	if(isAncestor(p1, j2.$b)) {
+		return [j1.$a.$dist - p1.$dist, dist(j2.$a, p1, p2)];
+	}
 	return undefined;
 }
 

@@ -26,7 +26,9 @@ export class MoveCommand extends Command implements JMoveCommand {
 		draggingSession.clear();
 	}
 
-	public static $create(target: Draggable, newLocation: IPoint, oldLocation?: IPoint): MoveCommand {
+	public static $create(
+		target: Draggable, newLocation: IPoint, oldLocation?: IPoint
+	): MoveCommand {
 		return new MoveCommand(target.$project, {
 			tag: target.$tag,
 			old: oldLocation || clone(target.$location),
@@ -52,15 +54,17 @@ export class MoveCommand extends Command implements JMoveCommand {
 
 	public $canAddTo(command: Command): boolean {
 		// Precondition
-		if(!(command instanceof MoveCommand && command.tag == this.tag)) return false;
+		if(!(command instanceof MoveCommand && command.tag == this.tag)) {
+			return false;
+		}
 
 		// Handle dragging
 		if(this._project.$isDragging) return draggingSession.has(command);
 
 		return (// Candidate command must be immediately after self
 			command.new.x == this.old.x && command.new.y == this.old.y &&
-			// In case of keyboard moving, it must roughly towards the same direction.
-			// This solves the issue of returning to the origin.
+			// In case of keyboard moving, it must roughly towards the same
+			// direction. This solves the issue of returning to the origin.
 			this._dx * command._dx >= 0 && this._dy * command._dy >= 0);
 	}
 

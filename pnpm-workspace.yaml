@@ -2,6 +2,7 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@mutsuntsai/*"
 allowBuilds:
+  '@parcel/watcher': true
   "@swc/core": true
   core-js: true
   es5-ext: true

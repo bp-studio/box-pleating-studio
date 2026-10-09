@@ -17,7 +17,8 @@ export function getAction(request: CoreRequest): Action<unknown> {
 		throw new Error(`Unknown controller: ${request.controller}`);
 	}
 
-	const controller: Record<string, Action<unknown>> = Routes[request.controller];
+	const controller: Record<string, Action<unknown>> =
+		Routes[request.controller];
 	const action = controller[request.action];
 	if(typeof action != "function") {
 		throw new Error(`Unknown action: ${request.controller}.${request.action}`);

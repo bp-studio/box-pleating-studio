@@ -15,6 +15,8 @@ import { options } from "client/options";
 import { TapController } from "client/controllers/tapController";
 import { Project } from "client/project/project";
 
+import type { MTEvent } from "client/controllers/share";
+
 const TAP_DURATION = 50;
 const CANCEL_TAP_THRESHOLD = 3;
 
@@ -39,10 +41,10 @@ export namespace Interaction {
 
 	/**
 	 * In case of touching, we don't process the touchStart event immediately,
-	 * because it could be that the user is trying to perform a two-finger zooming,
-	 * and to process immediately will result in flashes. Instead,
-	 * we set a tiny delay by {@link TAP_DURATION} before actually process the event
-	 * (or if the touch is released before that).
+	 * because it could be that the user is trying to perform a two-finger
+	 * zooming, and to process immediately will result in flashes. Instead, we
+	 * set a tiny delay by {@link TAP_DURATION} before actually process the
+	 * event (or if the touch is released before that).
 	 */
 	let pendingTouchStart: TouchEvent | undefined;
 
@@ -75,7 +77,10 @@ export namespace Interaction {
 			const sheet = ProjectService.sheet.value;
 			if(!sheet) return;
 			const local = sheet.$view.toLocal(e.global);
-			mouseCoordinates.value = { x: Math.round(local.x), y: Math.round(local.y) };
+			mouseCoordinates.value = {
+				x: Math.round(local.x),
+				y: Math.round(local.y),
+			};
 		});
 
 		display.$on("mouseleave", e => {
@@ -130,13 +135,14 @@ export namespace Interaction {
 		pointerHeld = false;
 		if(event.touches.length >= 1) return; // End of zooming
 		const dragging = SelectionController.$endDrag();
-		if(event.touches.length == 0 && !dragging && !LongPressController.$triggered) {
+		const noTouch = event.touches.length == 0;
+		if(noTouch && !dragging && !LongPressController.$triggered) {
 			SelectionController.$processNext();
 		}
 		DragController.$dragEnd();
 	}
 
-	function pointerDown(event: MouseEvent | TouchEvent): void {
+	function pointerDown(event: MTEvent): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
 
@@ -160,9 +166,10 @@ export namespace Interaction {
 				pendingTouchStart = undefined;
 				DragController.$dragEnd();
 				if(touchCount > 2) {
-					// When there are three or more touches, it will require sophisticated
-					// method to identify each touches. To make our life easier, we simply
-					// cancel the scrolling and zooming in this case.
+					// When there are three or more touches, it will require
+					// sophisticated method to identify each touches. To make
+					// our life easier, we simply cancel the scrolling and
+					// zooming in this case.
 					ScrollController.$cancel();
 				} else if(!ScrollController.$isScrolling()) {
 					LongPressController.$cancel();
@@ -176,14 +183,16 @@ export namespace Interaction {
 			}
 		}
 
-		// As we get here, it must be a left click of the mouse or a single touch
+		// As we get here, it must be a left click of the mouse or a single
+		// touch
 		CursorController.$setDown(event);
 		if($isTouch(event)) {
 			TapController.$start();
 			LongPressController.$init();
 			pendingTouchStart = event;
 
-			// Only if we touch again on a selected Draggable will we process the event immediately
+			// Only if we touch again on a selected Draggable will we process
+			// the event immediately
 			if(SelectionController.$touchOnSelectedDraggable()) touchStart();
 			else setTimeout(touchStart, TAP_DURATION);
 		} else {
@@ -210,7 +219,7 @@ export namespace Interaction {
 		pendingTouchStart = undefined;
 	}
 
-	function drag(event: MouseEvent | TouchEvent): void {
+	function drag(event: MTEvent): void {
 		if($isTouch(event) && pendingTouchStart) {
 			const { dist } = CursorController.$displacement(event);
 			if(dist > CANCEL_TAP_THRESHOLD) {
@@ -224,7 +233,8 @@ export namespace Interaction {
 		// let the event listener on the body to take care of it.
 		if(ScrollController.$isScrolling()) return;
 
-		// In case of touch event, reselection will not trigger dragging immediately.
+		// In case of touch event, reselection will not trigger dragging
+		// immediately.
 		if(SelectionController.$tryReselect(event) && !$isTouch(event)) {
 			// This line is put here to avoid cyclic importing
 			DragController.$init(event);
@@ -250,7 +260,7 @@ export namespace Interaction {
 		}
 	}
 
-	function initScroll(event: MouseEvent | TouchEvent): void {
+	function initScroll(event: MTEvent): void {
 		ScrollController.$start(event);
 		CursorController.$update($getEventCenter(event));
 	}

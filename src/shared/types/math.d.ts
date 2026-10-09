@@ -1,6 +1,7 @@
 
 /**
- * {@link IPoint} is an abstraction of a two dimensional point, without any implementation.
+ * {@link IPoint} is an abstraction of a two dimensional point, without any
+ * implementation.
  *
  * For all of our use cases, it is more convenient to have them immutable,
  * so from now the coordinates are both readonly.
@@ -23,8 +24,10 @@ interface ISignPoint {
 type Sign = 0 | 1 | -1;
 
 /**
- * We use this type alias to remind ourselves that certain numbers must be positive.
+ * We use this type alias to remind ourselves that certain numbers must be
+ * positive.
  *
- * The `| 1` part of the definition is a trick that makes `*=` operator works between two {@link Positive} numbers.
+ * The `| 1` part of the definition is a trick that makes `*=` operator works
+ * between two {@link Positive} numbers.
  */
 type Positive = TypedNumber<"Positive"> | 1;

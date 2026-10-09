@@ -14,7 +14,8 @@ import type { Project } from "client/project/project";
  */
 //=================================================================
 
-export abstract class Grid extends Destructible implements ISerializable<JSheet>, ITagObject {
+export abstract class Grid extends Destructible
+	implements ISerializable<JSheet>, ITagObject {
 
 	public readonly $tag: string;
 	public readonly $project: Project;
@@ -67,6 +68,26 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	/** Find the point on the grid that is closest to the given point. */
 	public abstract $constrain(p: IPoint): IPoint;
 
+	/**
+	 * Find the shortest integral translation that brings all the given points
+	 * onto the grid, or `null` if there's none.
+	 */
+	public abstract $getFitShift(points: readonly IPoint[]): IPoint | null;
+
+	/**
+	 * Bring the given points onto the grid. They are shifted together by the
+	 * shortest distance if possible. Otherwise, they are shifted so that the
+	 * fewest of them are left outside, and then those are moved onto the grid
+	 * individually.
+	 */
+	public $fitPoints(points: readonly IPoint[]): IPoint[] {
+		const shift =
+			this.$getFitShift(points) ?? this._getLeastOutsideShift(points);
+		return points.map(
+			p => this.$constrain({ x: p.x + shift.x, y: p.y + shift.y })
+		);
+	}
+
 	/** Returns whether the grid can be subdivided. */
 	public abstract $canSubdivide(): boolean;
 
@@ -74,7 +95,8 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	public abstract $getCenter(): IPoint;
 
 	/**
-	 * Given an {@link IDimension}, check if the values are valid, and fix them if not.
+	 * Given an {@link IDimension}, check if the values are valid, and fix them
+	 * if not.
 	 * Used during optimization.
 	 */
 	public abstract $fixDimension(d: IDimension): void;
@@ -83,7 +105,9 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	 * Transformation matrix for a given point for CP exporting.
 	 * See {@link TransformationMatrix} for format.
 	 */
-	public abstract $getTransformMatrix(size: number, reorient: boolean): TransformationMatrix;
+	public abstract $getTransformMatrix(
+		size: number, reorient: boolean
+	): TransformationMatrix;
 
 	/**
 	 * Change the dimension by internal functions instead of by UI.
@@ -91,9 +115,15 @@ export abstract class Grid extends Destructible implements ISerializable<JSheet>
 	 */
 	public abstract $setDimension(width: number, height: number): void;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected method
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * The integral shift that leaves the fewest of the given points outside
+	 * the grid, and among those the shortest one.
+	 */
+	protected abstract _getLeastOutsideShift(points: readonly IPoint[]): IPoint;
 
 	protected _testFit(): boolean {
 		for(const c of this._sheet.$independents) {

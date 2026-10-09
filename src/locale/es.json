@@ -68,6 +68,9 @@
 			"redo": "Rehacer",
 			"selectAll": "Seleccionar todo",
 			"unselectAll": "Deselecciona todo",
+			"cut": "Cortar",
+			"copy": "Copiar",
+			"paste": "Pegar",
 			"subdivide": "Subdividir cuadrícula",
 			"rotate_right": "Girar a la derecha",
 			"rotate_left": "Girar a la izquierda",
@@ -90,7 +93,9 @@
 		},
 		"tools": {
 			"title": "Herramientas",
-			"TreeMaker": "Importar archivo TreeMaker"
+			"TreeMaker": "Importar archivo TreeMaker",
+			"health": "Comprobar diseño",
+			"healthOff": "Salir de la comprobación"
 		},
 		"help": {
 			"title": "Ayuda",
@@ -128,6 +133,7 @@
 			"ridge": "Pliegues de cresta",
 			"axisParallel": "Pliegues axiales-paralelos",
 			"overlap": "Superpuestas",
+			"uncovered": "Regiones no cubiertas",
 			"tip": "Puntas de solapa",
 			"label": "Etiqueta de texto"
 		},
@@ -215,11 +221,28 @@
 	"status": {
 		"invalid": "Superposiciones no válidas"
 	},
+	"health": {
+		"invalid": "Superposiciones no válidas",
+		"invalidDetail": "Algunas solapas están demasiado cerca entre sí (las regiones rojas). Sepárelas primero; las demás comprobaciones se realizarán después.",
+		"unsolved": "Patrones de tramo no encontrados",
+		"unsolvedDetail": "Algunas superposiciones son válidas, pero aún no se han implementado patrones de tramo para ellas. Intente ajustar las posiciones de las solapas.",
+		"issues": "Problemas encontrados: {0}",
+		"uncovered": "Regiones no cubiertas",
+		"uncoveredDetail": "Cada parte del papel debe estar cubierta por solapas o ríos. Intente aumentar el ancho o el alto de las solapas, o añadir solapas que llenen el espacio, para rellenar las regiones amarillas.",
+		"dangling": "Crestas interrumpidas",
+		"danglingDetail": "Algunos pliegues de cresta se interrumpen dentro del papel (en los puntos rojos) sin encontrarse con otras crestas. Intente ajustar las posiciones de las solapas para que todas las crestas queden conectadas.",
+		"riverCorner": "Ríos no naturales",
+		"riverCornerDetail": "Algunos ríos (mostrados con rayas) cubren más regiones de las necesarias, por lo que las crestas correctas no se pueden determinar automáticamente. Intente rellenar las regiones sobrantes cubiertas por los ríos.",
+		"pass": "El diseño es completamente válido",
+		"passDetail": "No se encontraron problemas en el diseño.",
+		"learnMore": "Más información"
+	},
 	"share": {
 		"title": "Compartir proyecto",
 		"copy": "Copiar",
 		"share": "Cuota",
-		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!"
+		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!",
+		"note": "Este enlace solo está pensado para compartir el proyecto a corto plazo, y no se garantiza que siga siendo válido a largo plazo."
 	},
 	"about": {
 		"title": "Acerca de Box Pleating Studio",
@@ -252,6 +275,8 @@
 		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; \nlos datos pueden estar corruptos.",
 		"latest": "Ya tienes la última versión de BP Studio.",
 		"min3vertex": "El árbol debe tener al menos 3 vértices.",
+		"nothingCopied": "No se copió nada. Solo se pueden copiar o cortar las partes de la selección unidas al resto del árbol por exactamente una arista.",
+		"cannotFit": "La selección no cabe en la hoja después de la transformación.",
 		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y se modificó parte del diseño. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
 		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
@@ -294,7 +319,12 @@
 			"_": "Exportar archivo CP",
 			"format": "Formato",
 			"reorient": "Reorientar la hoja si corresponde",
-			"useAuxiliary": "Use líneas auxiliares (estándar no oficial)"
+			"hinge": {
+				"_": "Pliegues de bisagra",
+				"auxiliary": "Líneas auxiliares (estándar no oficial)",
+				"valley": "Pliegues de valle",
+				"none": "Omitir"
+			}
 		}
 	},
 	"keyword": {

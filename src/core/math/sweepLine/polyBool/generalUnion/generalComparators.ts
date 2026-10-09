@@ -2,6 +2,7 @@ import { fixZero, floatXyComparator, isAlmostZero } from "core/math/geometry/flo
 
 import type { Comparator } from "shared/types/types";
 import type { StartEvent, SweepEvent } from "../../classes/event";
+import type { LineSegment } from "../../classes/segment/lineSegment";
 
 /**
  * Create an event comparator for the event queue (a heap).
@@ -10,19 +11,27 @@ import type { StartEvent, SweepEvent } from "../../classes/event";
  * wrap delta direction -> unique key as tiebreaker.
  *
  * The third line uses short-circuit: when both events are starts
- * (`a.$isStart` is truthy as 1), it further compares them by segment;
- * when either is an end event (`a.$isStart` is 0, falsy), it skips to the key tiebreaker.
+ * (`a.$isStart` is truthy as 1), it further compares them by segment; when
+ * either is an end event (`a.$isStart` is 0, falsy), it skips to the key
+ * tiebreaker.
  */
-function eventComparator(comparator: Comparator<StartEvent>): Comparator<SweepEvent> {
+function eventComparator(
+	comparator: Comparator<StartEvent>
+): Comparator<SweepEvent> {
 	return (a, b) =>
 		floatXyComparator(a.$point, b.$point) ||
 		// End events are prioritized for the events at the same location.
 		a.$isStart - b.$isStart ||
-		a.$isStart && (segmentComparator(a, b as StartEvent) || comparator(a, b as StartEvent)) ||
+		a.$isStart && (
+			segmentComparator(a, b as StartEvent) ||
+			comparator(a, b as StartEvent)
+		) ||
 		a.$key - b.$key;
 }
 
-function statusComparator(comparator: Comparator<StartEvent>): Comparator<StartEvent> {
+function statusComparator(
+	comparator: Comparator<StartEvent>
+): Comparator<StartEvent> {
 	return (a, b) =>
 		compareUpDown(a, b) ||
 		segmentComparator(a, b) ||
@@ -32,14 +41,17 @@ function statusComparator(comparator: Comparator<StartEvent>): Comparator<StartE
 
 /** Compare two {@link StartEvent}s with the same start point. */
 const segmentComparator: Comparator<StartEvent> = (a, b) =>
-	// The one with the smaller tangent slope goes first (be aware of floating error)
+	// The one with the smaller tangent slope goes first
+	// (be aware of floating error)
 	fixZero(getEventSlope(a) - getEventSlope(b)) ||
 	// Borders go before creases
 	a.$segment.$type - b.$segment.$type;
 
-const exitFirstComparator: Comparator<StartEvent> = (a, b) => a.$wrapDelta - b.$wrapDelta;
+const exitFirstComparator: Comparator<StartEvent> =
+	(a, b) => a.$wrapDelta - b.$wrapDelta;
 
-const enterFirstComparator: Comparator<StartEvent> = (a, b) => b.$wrapDelta - a.$wrapDelta;
+const enterFirstComparator: Comparator<StartEvent> =
+	(a, b) => b.$wrapDelta - a.$wrapDelta;
 
 /**
  * Compare the vertical positions of two segments at the current sweep line.
@@ -58,7 +70,21 @@ function compareUpDown(a: StartEvent, b: StartEvent): number {
 	return fixZero(getSlope(a.$point, b.$point) - getEventSlope(b));
 }
 
+/**
+ * The slope of the segment of the event. For a {@link LineSegment}, it is
+ * given by the equation of the line, which does not change in subdivision, so
+ * that the segments on the same line always have exactly the same slope, even
+ * if some of them are already subdivided and the others are not (otherwise the
+ * floating errors of the subdivision points could misorder them in the status,
+ * as in the overlapping edges of adjacent polygons).
+ */
 function getEventSlope(e: StartEvent): number {
+	const segment = e.$segment as Partial<LineSegment>;
+	if(segment.$coefficients) {
+		const [a, b] = segment.$coefficients;
+		if(isAlmostZero(b)) return Number.POSITIVE_INFINITY;
+		return -a / b;
+	}
 	return getSlope(e.$point, e.$other.$point);
 }
 

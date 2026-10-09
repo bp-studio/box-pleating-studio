@@ -6,7 +6,9 @@ interface PeriodicSyncManager {
 	/**
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/PeriodicSyncManager/unregister
 	 */
-	register(tag: string, options?: { minInterval: number }): Promise<undefined>;
+	register(
+		tag: string, options?: { minInterval: number }
+	): Promise<undefined>;
 
 	/**
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/PeriodicSyncManager/register

@@ -10,7 +10,7 @@ import { callWorker } from "app/utils/workerUtility";
 import { isIOS, isLowEndDevice } from "app/shared/constants";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
-import type { CoreError, JProject, ProjId } from "shared/json";
+import type { CoreError, JProject, JProjectLike, ProjId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
 /**
@@ -44,13 +44,18 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	public readonly history: HistoryManager;
 
 	/**
-	 * A type-safe {@link Proxy} object that provides access to all Core controllers and actions.
+	 * A type-safe {@link Proxy} object that provides access to all Core
+	 * controllers and actions.
 	 *
 	 * This proxy system offers several key benefits:
-	 * - **Full type safety**: All controller methods are properly typed with IntelliSense support
-	 * - **Automatic Promise wrapping**: Synchronous Core methods become async Client calls
-	 * - **Dynamic API generation**: Controllers and actions are created on-demand via proxy
-	 * - **Runtime validation**: Invalid controller/action calls throw descriptive errors
+	 * - **Full type safety**: All controller methods are properly typed with
+	 *   IntelliSense support
+	 * - **Automatic Promise wrapping**: Synchronous Core methods become async
+	 *   Client calls
+	 * - **Dynamic API generation**: Controllers and actions are created
+	 *   on-demand via proxy
+	 * - **Runtime validation**: Invalid controller/action calls throw
+	 *   descriptive errors
 	 *
 	 * @example
 	 * ```typescript
@@ -60,11 +65,14 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 * await project.$core.layout.updateConfiguration(config);
 	 * ```
 	 *
-	 * Most routes return a {@link Promise} that resolves after {@link Design.$update} completes,
-	 * ensuring the UI is updated before the Promise resolves. Some routes may return direct values.
+	 * Most routes return a {@link Promise} that resolves after
+	 * {@link Design.$update} completes, ensuring the UI is updated before the
+	 * Promise resolves. Some routes may return direct values.
 	 *
-	 * @see {@link Route} - The complete type definition for available controllers
-	 * @see {@link RouteMap} - The source mapping of controllers to their implementations
+	 * @see {@link Route} - The complete type definition for available
+	 * controllers
+	 * @see {@link RouteMap} - The source mapping of controllers to their
+	 * implementations
 	 */
 	public readonly $core: Route;
 
@@ -79,17 +87,27 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private readonly _updateCallbacks: Action[] = [];
 	private _updateCallbackTimeout: number | undefined;
 
+	/**
+	 * The number of the updates from the Core, which can be used for detecting
+	 * changes of the design (for example, for caching).
+	 */
+	public $updateCount: number = 0;
+
+	/** The number of the callings to the Core in progress. */
+	private _pendingCalls: number = 0;
+
 	private readonly _returnCallbacks: Action[] = [];
 
 	/**
 	 * Whether the user is performing dragging on the current {@link Project}.
-	 * This is made {@link shallowRef} as {@link HistoryManager.isModified} depends on it.
+	 * This is made {@link shallowRef} as {@link HistoryManager.isModified}
+	 * depends on it.
 	 */
 	private readonly _isDragging = shallowRef(false);
 	public get $isDragging(): boolean { return this._isDragging.value; }
 	public set $isDragging(v: boolean) { this._isDragging.value = v; }
 
-	constructor(json: RecursivePartial<JProject>, worker: Worker) {
+	constructor(json: JProjectLike, worker: Worker) {
 		// Projects are all inactive on construction.
 		// It will become active when selected later (see ProjectService)
 		super(false);
@@ -147,7 +165,8 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	 */
 	public $onUpdate(callback: Action): void {
 		this._updateCallbacks.push(callback);
-		this._updateCallbackTimeout ||= setTimeout(() => this._flushUpdateCallback(), 0);
+		this._updateCallbackTimeout ||=
+			setTimeout(() => this._flushUpdateCallback(), 0);
 	}
 
 	/**
@@ -160,30 +179,38 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	/**
 	 * Currently there's no way to directly get the full async stack trace,
 	 * so in case we need to invoke {@link _callCore} in an async stack,
-	 * we have to manually record the stack trace before we enter the async parts.
+	 * we have to manually record the stack trace before we enter the async
+	 * parts.
 	 */
 	public $createCoreProxy(stack?: string): Route {
 		return new Proxy({}, {
 			get: (controllers: Record<string, object>, controller: string) =>
-				controllers[controller] ||= this._createControllerProxy(controller, stack),
+				controllers[controller] ||=
+					this._createControllerProxy(controller, stack),
 		}) as Route;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	private _createControllerProxy(controller: string, stack?: string): Record<string, Action> {
+	private _createControllerProxy(
+		controller: string, stack?: string
+	): Record<string, Action> {
 		return new Proxy({}, {
 			get: (actions: Record<string, Action>, action: string) =>
-				actions[action] ||= (...args: unknown[]) => this._callCore(controller, action, args, stack),
+				actions[action] ||= (...args: unknown[]) =>
+					this._callCore(controller, action, args, stack),
 		});
 	}
 
 	/**
-	 * Send a request to the Core worker and obtain a direct result or an {@link UpdateModel}.
+	 * Send a request to the Core worker and obtain a direct result or an
+	 * {@link UpdateModel}.
 	 */
-	private async _callCore(controller: string, action: string, args: unknown[], stack?: string): Promise<unknown> {
+	private async _callCore(
+		controller: string, action: string, args: unknown[], stack?: string
+	): Promise<unknown> {
 		// There could be pending calling after fatal error.
 		// In that case we throw an error to stop further processing.
 		if(this._fatal) throw new Error();
@@ -195,26 +222,41 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		const request = { controller, action, value: args } as CoreRequest;
 		const callbacks = this._returnCallbacks.concat();
 		this._returnCallbacks.length = 0;
+		this._pendingCalls++;
 		const response = await callCore(this._worker, request);
+		this._pendingCalls--;
 		for(const callback of callbacks) callback();
 		if("error" in response) {
 			await this._handleCoreError(request, response, stack);
 		} else if("update" in response) {
+			this.$updateCount++;
 			this.design.$update(response.update);
 			this._flushUpdateCallback();
-			this.history.$flush(); // Note that the flushing is also invoked on initialization
+			// Note that the flushing is also invoked on initialization
+			this.history.$flush();
 			this.design.$resetPrototype();
 		} else {
+			// No update is involved, so the pending update callbacks (if any)
+			// have to wait for the timeout again (it was cleared above),
+			// unless other callings will flush them.
+			if(this._updateCallbacks.length && !this._pendingCalls) {
+				this._updateCallbackTimeout =
+					setTimeout(() => this._flushUpdateCallback(), 0);
+			}
 			return response.value;
 		}
 	}
 
-	private async _handleCoreError(request: object, response: ErrorResponse, stack: string): Promise<never> {
-		this.design.sheet.$view.interactiveChildren = false; // Stop hovering effect
+	private async _handleCoreError(
+		request: object, response: ErrorResponse, stack: string
+	): Promise<never> {
+		// Stop hovering effect
+		this.design.sheet.$view.interactiveChildren = false;
 		if(this._initialized && !this._fatal) {
 			this._fatal = true;
-			// Display a fatal message and close self, if the project has already been initialized.
-			// If not, the error thrown below will be caught by the App.
+			// Display a fatal message and close self, if the project has
+			// already been initialized. If not, the error thrown below will be
+			// caught by the App.
 			const coreError = response.error;
 			coreError.clientTrace = stack;
 			coreError.request = request;
@@ -231,12 +273,15 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	}
 }
 
-function callCore(worker: Worker, request: CoreRequest): Promise<CoreResponse> {
+function callCore(
+	worker: Worker, request: CoreRequest
+): Promise<CoreResponse> {
 	return new Promise(resolve => {
 		// Setup a timeout mechanism.
 		const timeout = setTimeout(() => {
 			/// #if DEBUG
-			// We don't kill the worker in debug mode to allow debugging the issue.
+			// We don't kill the worker in debug mode to allow debugging the
+			// issue.
 			console.error("Core computation timeout.");
 			/// #else
 			worker.terminate(); // Terminate immediately in this case

@@ -1,5 +1,6 @@
 
 #include "rect.h"
+#include "math/scale.h"
 
 Rect *Rect::instance = nullptr;
 
@@ -21,9 +22,8 @@ class RectBounds: public ScalarConstraint {
 	}
 };
 
-void Rect::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vector<bool> *fixed) const {
+void Rect::add_bounds(ConstraintList &cons, const vector<Flap> &flaps) const {
 	for(int i = 0; i < Shared::flap_count; i++) {
-		if(fixed && (*fixed)[i]) continue;
 		const auto &flap = flaps[i];
 		if(flap.width != 0) {
 			cons.emplace_back(make_unique<RectBounds>(i * 2, flap.width));
@@ -34,24 +34,20 @@ void Rect::add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vec
 	}
 }
 
-bool Rect::check_bounds(const vector<double> &xk, const int n, const vector<Flap> &flaps) const {
-	return xk[n * 2] >= 0 && xk[n * 2 + 1] >= 0;
+int Rect::ceil_size(const double size) const {
+	return int_scale(size);
 }
 
-vector<int> Rect::output(const vector<double> &solution) const {
-	vector<int> result;
+bool Rect::int_contains(const int x, const int y, const Flap &flap, const int size) const {
+	return x >= 0 && y >= 0 && x + flap.width <= size && y + flap.height <= size;
+}
+
+vector<int> Rect::int_output(const vector<int> &grid, const vector<Flap> &flaps) const {
+	vector<int> result(grid);
 	int max = 0;
-	for(int i = 0; i < Shared::last; i++) {
-		int r = round(solution[i]);
-		result.push_back(r);
-		if(r > max) max = r;
+	for(int i = 0; i < Shared::flap_count; i++) {
+		max = std::max({max, grid[i * 2] + flaps[i].width, grid[i * 2 + 1] + flaps[i].height});
 	}
 	result.push_back(max);
 	return result;
-}
-
-void Rect::enlarge_if_necessary(vector<double> &xk, const double x, const double y) const {
-	auto &s = xk[Shared::last];
-	if(x > s) s = x;
-	if(y > s) s = y;
 }

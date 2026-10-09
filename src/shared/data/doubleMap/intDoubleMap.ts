@@ -11,11 +11,11 @@ export const MAX = (1 << SHIFT) - 1;
 /**
  * {@link IntDoubleMap} is an {@link IDoubleMap} with integer indices.
  *
- * Here we use bit operations to improve performance,
- * with the price of maximal index being only {@link MAX} = `2 ** {@link SHIFT} - 1` = 65535.
- * In practice this is quite sufficient for our use cases.
- * In the implementation here, we will check the validity of the
- * parameters in the {@link set} method.
+ * Here we use bit operations to improve performance, with the price of
+ * maximal index being only {@link MAX} = `2 ** {@link SHIFT} - 1` = 65535.
+ * In practice this is quite sufficient for our use cases. In the
+ * implementation here, we will check the validity of the parameters in
+ * the {@link set} method.
  *
  * If we use instead the Cantor function to encode the index,
  * we could double the maximal index, but the performance won't
@@ -96,7 +96,9 @@ export class IntDoubleMap<K extends number, V> implements IDoubleMap<K, V> {
 		this._size = 0;
 	}
 
-	public forEach(callbackfn: DoubleMapCallback<K, V>, thisArg: this = this): void {
+	public forEach(
+		callbackfn: DoubleMapCallback<K, V>, thisArg: this = this
+	): void {
 		for(const [k1, k2, v] of this.entries()) {
 			callbackfn.apply(thisArg, [v, k1, k2, this]);
 		}
@@ -129,7 +131,9 @@ export class IntDoubleMap<K extends number, V> implements IDoubleMap<K, V> {
 			if(!node) return false;
 			const oriented = node.n1.key !== key1;
 			this._deleteKeyNode(key1, oriented ? node.n1 : node.n2);
-			if(key1 !== key2) this._deleteKeyNode(key2, oriented ? node.n2 : node.n1);
+			if(key1 !== key2) {
+				this._deleteKeyNode(key2, oriented ? node.n2 : node.n1);
+			}
 			this._deleteNode(key, node);
 			return true;
 		}
@@ -155,9 +159,9 @@ export class IntDoubleMap<K extends number, V> implements IDoubleMap<K, V> {
 		for(const [k1, k2] of this.keys()) yield this.get(k1, k2)!;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected _createNode(key1: K, key2: K, value: V): Node<K, V> {
 		const node = new Node(key1, key2, value);
@@ -183,9 +187,9 @@ export class IntDoubleMap<K extends number, V> implements IDoubleMap<K, V> {
 		node.value = value;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _insertKeyNode(key: K, n: KeyNode<K>): void {
 		const oldHead = this._keyMap.get(key);

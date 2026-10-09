@@ -1,6 +1,7 @@
 import { same } from "shared/types/geometry";
 /// #if DEBUG
 import { pathToString, pointToString } from "core/math/geometry/path";
+import { debugFail } from "core/utils/debug";
 /// #endif
 
 import type { ISegment } from "../segment/segment";
@@ -46,7 +47,8 @@ export class Chainer<PathType extends Path = Path> {
 
 			if(head && tail) {
 				if(head === tail) {
-					// A chain is connected on the two ends. Add it to the result.
+					// A chain is connected on the two ends.
+					// Add it to the result.
 					result.push(this._chainToPath(head, segment));
 					this._removeChain(head);
 				} else {
@@ -70,9 +72,9 @@ export class Chainer<PathType extends Path = Path> {
 		return result;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Reset the state of this {@link Chainer}.
@@ -83,7 +85,8 @@ export class Chainer<PathType extends Path = Path> {
 		this._chainTails = new Array(INITIAL_CHAIN_SIZE);
 		this._points = new Array(size);
 		this._next = new Array(size);
-		this._chains = 0; // We don't need to reset this in theory, but just to be sure.
+		// We don't need to reset this in theory, but just to be sure.
+		this._chains = 0;
 		this._length = 0;
 	}
 
@@ -99,7 +102,9 @@ export class Chainer<PathType extends Path = Path> {
 	}
 
 	/** Connect two chains with matching head and tail. */
-	protected _connectChain(head: number, tail: number, segment: ISegment): void {
+	protected _connectChain(
+		head: number, tail: number, segment: ISegment
+	): void {
 		this._next[this._chainTails[head]] = this._chainHeads[tail];
 		this._chainTails[head] = this._chainTails[tail];
 		this._removeChain(tail);
@@ -143,9 +148,9 @@ export class Chainer<PathType extends Path = Path> {
 		this._chainHeads[id] = i;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _findChain(indices: number[], p: IPoint): number {
 		/**
@@ -162,16 +167,16 @@ export class Chainer<PathType extends Path = Path> {
 		return 0;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 
 	/**
-	 * We shouldn't get here in theory. If we do,
-	 * the general rule of thumb is that the line segments are not thoroughly subdivided,
-	 * causing the {@link StartEvent.$wrapCount} to add up in the wrong way.
+	 * We shouldn't get here in theory. If we do, the general rule of thumb is
+	 * that the line segments are not thoroughly subdivided, causing the
+	 * {@link StartEvent.$wrapCount} to add up in the wrong way.
 	 * In that case, look for the following possible causes:
 	 *
 	 * 1. The input may contain self-intersections within the same polygon,
@@ -190,14 +195,16 @@ export class Chainer<PathType extends Path = Path> {
 			}
 			console.log(pathToString(path));
 		}
-		debugger;
+		debugFail("Unclosed chains");
 	}
 
 	/* istanbul ignore next: debug */
 	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	protected debugSegments(segments: ISegment[]): void {
 		for(const segment of segments) {
-			console.log(pointToString(segment.$start), pointToString(segment.$end));
+			console.log(
+				pointToString(segment.$start), pointToString(segment.$end)
+			);
 		}
 	}
 

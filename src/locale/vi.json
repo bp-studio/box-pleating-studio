@@ -68,6 +68,9 @@
 			"redo": "Làm lại",
 			"selectAll": "Chọn tất cả",
 			"unselectAll": "Bỏ chọn tất cả",
+			"cut": "Cắt",
+			"copy": "Sao chép",
+			"paste": "Dán",
 			"subdivide": "Lưới chia nhỏ",
 			"rotate_right": "Xoay phải",
 			"rotate_left": "Xoay trái",
@@ -90,7 +93,9 @@
 		},
 		"tools": {
 			"title": "Công cụ",
-			"TreeMaker": "Nhập tệp TreeMaker"
+			"TreeMaker": "Nhập tệp TreeMaker",
+			"health": "Kiểm tra bố trí",
+			"healthOff": "Thoát kiểm tra bố trí"
 		},
 		"help": {
 			"title": "Cứu giúp",
@@ -128,6 +133,7 @@
 			"ridge": "Nếp gấp ở sườn",
 			"axisParallel": "Nếp gấp trục song song",
 			"overlap": "Qua nối chồng",
+			"uncovered": "Vùng chưa được phủ",
 			"tip": "Mẹo nhánh",
 			"label": "Nhãn văn bản"
 		},
@@ -215,11 +221,28 @@
 	"status": {
 		"invalid": "chồng chéo không hợp lệ"
 	},
+	"health": {
+		"invalid": "Chồng chéo không hợp lệ",
+		"invalidDetail": "Một số nhánh quá gần nhau (các vùng màu đỏ). Hãy tách chúng ra trước; các kiểm tra khác sẽ được thực hiện sau đó.",
+		"unsolved": "Không tìm thấy mẫu căng ra",
+		"unsolvedDetail": "Một số chồng chéo là hợp lệ, nhưng các mẫu căng ra phù hợp cho chúng vẫn chưa được triển khai. Hãy thử điều chỉnh vị trí của các nhánh.",
+		"issues": "Số vấn đề tìm thấy: {0}",
+		"uncovered": "Vùng chưa được phủ",
+		"uncoveredDetail": "Mọi phần của tờ giấy đều phải được phủ bởi các nhánh hoặc sông. Hãy thử tăng chiều rộng hoặc chiều cao của các nhánh, hoặc thêm nhánh để lấp khoảng trống, sao cho các vùng màu vàng được lấp đầy.",
+		"dangling": "Đường sườn bị đứt",
+		"danglingDetail": "Một số nếp gấp ở sườn bị đứt bên trong tờ giấy (tại các chấm đỏ) mà không nối với các đường sườn khác. Hãy thử điều chỉnh vị trí của các nhánh để tất cả các đường sườn được nối với nhau.",
+		"riverCorner": "Sông không tự nhiên",
+		"riverCornerDetail": "Một số sông (được tô sọc chéo) phủ vùng lớn hơn mức cần thiết, nên không thể tự động xác định các đường sườn chính xác. Hãy thử lấp đầy các vùng thừa mà sông đang phủ.",
+		"pass": "Bố cục hoàn toàn hợp lệ",
+		"passDetail": "Không tìm thấy vấn đề nào trong bố cục.",
+		"learnMore": "Tìm hiểu thêm"
+	},
 	"share": {
 		"title": "Chia sẻ dự án",
 		"copy": "Sao chép",
 		"share": "Chia sẻ",
-		"message": "Xem dự án của tôi \"{0}\" được thiết kế với Box Pleating Studio!"
+		"message": "Xem dự án của tôi \"{0}\" được thiết kế với Box Pleating Studio!",
+		"note": "Liên kết này chỉ dùng để chia sẻ dự án trong thời gian ngắn và không đảm bảo sẽ còn hiệu lực lâu dài."
 	},
 	"about": {
 		"title": "Giới thiệu về Box Pleating Studio",
@@ -252,6 +275,8 @@
 		"invalidLink": "Đã xảy ra lỗi không mong muốn khi mở liên kết dự án; \ndữ liệu có thể bị hỏng.",
 		"latest": "Bạn đã có phiên bản BP Studio mới nhất.",
 		"min3vertex": "Cây cần có ít nhất 3 đỉnh.",
+		"nothingCopied": "Không có gì được sao chép. Chỉ những phần của vùng chọn nối với phần còn lại của cây bằng đúng một cạnh mới có thể được sao chép hoặc cắt.",
+		"cannotFit": "Sau khi biến đổi, vùng chọn không vừa trong tờ giấy.",
 		"oldVersion": "Dự án \"{0}\" đã được tạo bằng phiên bản cũ hơn của BP Studio và một phần thiết kế đã được sửa đổi. Nó sẽ được cập nhật lên định dạng mới nhất trong lần lưu tiếp theo.",
 		"patternNotFound": "Một số phần xếp chồng lên nhau của các nắp trong thiết kế này là hợp lệ, nhưng hiện tại BP Studio không thể tìm thấy các mẫu co giãn phù hợp cho chúng. Tác giả của ứng dụng này sẽ tiếp tục triển khai nhiều thuật toán hơn để bao gồm nhiều trường hợp hơn.",
 		"unsaved": "Dự án \"{0}\" chứa các thay đổi chưa được lưu. Hủy các thay đổi?",
@@ -294,7 +319,12 @@
 			"_": "Xuất tệp CP",
 			"format": "Định dạng",
 			"reorient": "Định hướng lại trang tính nếu có",
-			"useAuxiliary": "Sử dụng các dòng phụ trợ (tiêu chuẩn không chính thức)"
+			"hinge": {
+				"_": "Nếp gấp bản lề",
+				"auxiliary": "Đường phụ trợ (tiêu chuẩn không chính thức)",
+				"valley": "Nếp gấp thung lũng",
+				"none": "Bỏ qua"
+			}
 		}
 	},
 	"keyword": {

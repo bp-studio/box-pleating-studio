@@ -5,6 +5,7 @@ import { Vector } from "./vector";
 import { getOrSetEmptyArray } from "shared/utils/map";
 
 import type { ILine } from "shared/types/geometry";
+import type { Rational } from "../fraction";
 
 /** Take the next integer of {@link x} in the direction of {@link f}. */
 function int(x: number, f: number): number {
@@ -52,9 +53,9 @@ export class Line {
 		return result;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Instance
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public readonly p1: Point;
 	public readonly p2: Point;
@@ -95,7 +96,9 @@ export class Line {
 			this.p1.eq(l.p2) && this.p2.eq(l.p1);
 	}
 
-	/** Return a clone of the current {@link Line}, but in opposite direction. */
+	/**
+	 * Return a clone of the current {@link Line}, but in opposite direction.
+	 */
 	public $reverse(): Line {
 		return new Line(this.p2, this.p1);
 	}
@@ -125,15 +128,20 @@ export class Line {
 	 * with the given line segment (or straight line).
 	 */
 	public $intersectLine(l: Line, asSegment = true): Point | null {
-		const intersection = getIntersection(this, l.p1, l.$vector, asSegment, asSegment);
+		const intersection = getIntersection(
+			this, l.p1, l.$vector, asSegment, asSegment
+		);
 		return intersection && intersection.point;
 	}
 
 	/**
 	 * Return the intersection of this line (as segment, endpoints included)
-	 * with the given direction (as a straight line, unless {@link headless} or {@link tailless} is assigned).
+	 * with the given direction (as a straight line, unless {@link headless} or
+	 * {@link tailless} is assigned).
 	 */
-	public $intersection(p: Point, v: Vector, headless?: boolean, tailless?: boolean): Point | null {
+	public $intersection(
+		p: Point, v: Vector, headless?: boolean, tailless?: boolean
+	): Point | null {
 		const intersection = getIntersection(this, p, v, headless, tailless);
 		return intersection && intersection.point;
 	}
@@ -175,13 +183,15 @@ export class Line {
 		return result;
 	}
 
-	public $xIntersection(x: number): Point {
+	/** The point at the given x on this (non-vertical) line. */
+	public $xIntersection(x: Rational): Point {
 		const v = this.p2.$sub(this.p1);
 		const f = new Fraction(x);
 		return new Point(f, this.p1._y.sub(v.$slope.m(this.p1._x.sub(f))));
 	}
 
-	public $yIntersection(y: number): Point {
+	/** The point at the given y on this (non-horizontal) line. */
+	public $yIntersection(y: Rational): Point {
 		const v = this.p2.$sub(this.p1);
 		const f = new Fraction(y);
 		return new Point(this.p1._x.sub(this.p1._y.sub(f).d(v.$slope)), f);
@@ -211,9 +221,9 @@ export class Line {
 		return new Line(this.p1.$add(v), this.p2.$add(v));
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Removes part of the current line that overlaps any passed-in lines,
@@ -266,9 +276,9 @@ export class Line {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Debug methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/// #if DEBUG
 
@@ -276,7 +286,9 @@ export class Line {
 	public static $parseTest<T extends Line = Line>(jsons: TestLine<T>[]): T[] {
 		return jsons.map(j => {
 			const l = j as unknown as Record<string, string>;
-			const line = new Line(Point.$parseTest(l.p1), Point.$parseTest(l.p2));
+			const p1 = Point.$parseTest(l.p1);
+			const p2 = Point.$parseTest(l.p2);
+			const line = new Line(p1, p2);
 			const r = line as unknown as Record<string, unknown>;
 			if("type" in j) r.type = j.type;
 			if("p0" in j) r.p0 = Point.$parseTest(l.p0);
@@ -303,9 +315,12 @@ export interface IIntersection<T extends Line = Line> {
 /**
  * Given a point {@link p} and a directional vector {@link v},
  * determine whether it will intersect a given {@link line}.
- * @param headless If set to `true`, exclude the intersection that is on the opposite direction of {@link v}.
- * @param tailless If set to `true`, exclude the intersection that goes beyond the length of {@link v}.
- * @param targetAsRay If set to `true`, the {@link line} is treated as a ray instead.
+ * @param headless If set to `true`, exclude the intersection that is on the
+ * opposite direction of {@link v}.
+ * @param tailless If set to `true`, exclude the intersection that goes beyond
+ * the length of {@link v}.
+ * @param targetAsRay If set to `true`, the {@link line} is treated as a ray
+ * instead.
  */
 export function getIntersection<T extends Line>(
 	line: T, p: Point, v: Vector,

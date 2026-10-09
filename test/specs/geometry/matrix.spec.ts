@@ -1,13 +1,13 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { Fraction } from "core/math/fraction";
 import { Matrix } from "core/math/geometry/matrix";
 import { Vector } from "core/math/geometry/vector";
 import { applyTransform } from "shared/types/geometry";
 
-export default function() {
+describe("Matrix", () => {
 
-	it("Computes transformation matrix", function() {
+	it("Computes transformation matrix", () => {
 		const p1: IPoint = { x: -4, y: -2 };
 		const p2: IPoint = { x: -2, y: 0 };
 		const from = new Vector(p1);
@@ -20,10 +20,12 @@ export default function() {
 		expect(transformed).to.eql(p2);
 	});
 
-	it("Computes inverse", function() {
-		const m = new Matrix(new Fraction(1), new Fraction(2), new Fraction(3), new Fraction(4));
+	it("Computes inverse", () => {
+		const m = new Matrix(
+			new Fraction(1), new Fraction(2), new Fraction(3), new Fraction(4)
+		);
 		const inv = m.$inverse!;
 		expect(inv.toString()).to.equal("-2,1,3/2,-1/2");
 	});
 
-}
+});

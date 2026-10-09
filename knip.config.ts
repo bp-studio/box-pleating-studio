@@ -33,10 +33,8 @@ const config: KnipConfig = {
 	ignoreDependencies: [
 		"@(pixi|popperjs|rspack|types)/.+",
 		".+-loader",
-		"nyc",
 		"eslint-plugin-typescript-compat",
-		"@swc-node/core", // used in mocha test
-		"@swc/core", // peer of @swc-node/core
+		"@rstest/coverage-istanbul", // loaded by coverage.provider
 		"@fortawesome/fontawesome-free",
 	],
 	typescript: {

@@ -7,6 +7,8 @@ import { Initializer } from "../initializer";
 import { Chainer } from "../../classes/chainer/chainer";
 import { generalEndProcessor } from "../../classes/endProcessor";
 
+import type { EPSILON } from "core/math/geometry/float";
+import type { ISegment } from "../../classes/segment/segment";
 import type { Polygon } from "shared/types/geometry";
 import type { AAUnion } from "../aaUnion/aaUnion";
 
@@ -45,6 +47,17 @@ export class GeneralUnion extends UnionBase {
 		// General union will require epsilon comparison in the chainer
 		this._chainer.$checkFunction = epsilonSame;
 	}
+
+	/**
+	 * Skip the segments shorter than {@link EPSILON}, as the comparisons cannot
+	 * tell their endpoints apart. The chainer still closes the gaps, as it
+	 * compares the points with the same tolerance.
+	 */
+	protected override _addSegment(segment: ISegment, delta: Sign): void {
+		if(epsilonSame(segment.$start, segment.$end)) return;
+		super._addSegment(segment, delta);
+	}
 }
 
-export const generalInitializer = new Initializer(LineSegment, floatXyComparator);
+export const generalInitializer =
+	new Initializer(LineSegment, floatXyComparator);

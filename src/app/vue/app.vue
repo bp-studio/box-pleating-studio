@@ -3,6 +3,8 @@
 		<Welcome/>
 		<DPad v-if="phase >= 2"/>
 		<Dropzone v-if="phase >= 3"/>
+		<Health v-if="phase >= 3"/>
+		<Toast v-if="phase >= 3"/>
 
 		<Panel v-if="phase >= 1"/>
 		<template v-else>
@@ -55,6 +57,8 @@
 	const Panel = asyncComp(() => import("@/panel/panel.vue"));
 	const Status = asyncComp(() => import("@/status.vue"));
 	const DPad = asyncComp(() => import("@/gadgets/dpad.vue"));
+	const Health = asyncComp(() => import("@/gadgets/health.vue"));
+	const Toast = asyncComp(() => import("@/gadgets/toast.vue"));
 	const ModalFragment = asyncComp(() => import("@/modals/modalFragment.vue"));
 	const DialogFragment = asyncComp(() => import("@/dialogs/dialogFragment.vue"));
 

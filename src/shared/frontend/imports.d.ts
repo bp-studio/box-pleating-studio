@@ -27,6 +27,9 @@ declare global {
 	/** Global instance of the Client. Declared in HTML. */
 	declare const bp: typeof Client;
 
-	/** Global vue-i18n Composer instance. Either injected by SSG or created in LanguageService.ts. */
+	/**
+	 * Global vue-i18n Composer instance. Either injected by SSG or created in
+	 * LanguageService.ts.
+	 */
 	declare const i18n: Composer;
 }

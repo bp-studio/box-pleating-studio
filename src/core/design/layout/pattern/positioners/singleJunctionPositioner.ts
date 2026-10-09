@@ -15,7 +15,8 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 
 	if(devices.length == 1) {
 		// If there's only one GOPS, center it
-		devices[0].$offset = Math.floor((sx - devices[0].$gadgets[0].widthSpan.value) / 2);
+		const width = devices[0].$gadgets[0].widthSpan.value;
+		devices[0].$offset = Math.floor((sx - width) / 2);
 		return true;
 	}
 
@@ -32,7 +33,8 @@ export function singleJunctionPositioner(context: PositioningContext): boolean {
 		return true;
 	}
 
-	//TODO: Implement single junction patterns that are integral but require 4 or more devices
+	//TODO: Implement single junction patterns that are integral but require 4
+	// or more devices
 
 	/* istanbul ignore next: not yet implemented */
 	return false;

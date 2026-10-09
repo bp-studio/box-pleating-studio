@@ -10,7 +10,9 @@ export interface HingeSegment extends Path {
 /**
  * Break a hinge contour into segments by the given {@link SlashDirection}.
  */
-export function createHingeSegments(hinges: Path, dir: SlashDirection): HingeSegment[] {
+export function createHingeSegments(
+	hinges: Path, dir: SlashDirection
+): HingeSegment[] {
 	const l = hinges.length;
 	const directions = mapDirections(hinges);
 	const results: HingeSegment[] = [];

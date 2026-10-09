@@ -17,7 +17,9 @@ export class Bridge {
 		instance.init();
 	}
 
-	public async solve(request: OptimizerRequest, seed?: number): Promise<OptimizerResult> {
+	public async solve(
+		request: OptimizerRequest, seed?: number
+	): Promise<OptimizerResult> {
 		if(seed === undefined || !Number.isInteger(seed) || seed > UINT_MAX) {
 			seed = Math.floor(Math.random() * UINT_MAX);
 		}
@@ -25,6 +27,7 @@ export class Bridge {
 		const data = makeData(request);
 		const response = await this._instance.solve(data, seed);
 		const size = response.size();
+		/* istanbul ignore next: foolproof */
 		if(!size) throw new Error("No solution found.");
 		const grid = response.get(size - 1);
 		const result: OptimizerResult = {
@@ -47,6 +50,7 @@ function makeData(request: OptimizerRequest): object {
 		type: problem.type == "rect" ? 1 : 2,
 		hierarchies: problem.hierarchies,
 		flaps: problem.flaps,
+		tree: problem.tree,
 	};
 	const useView = request.layout == "view";
 	data.useView = useView;

@@ -40,13 +40,14 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			// This is needed, otherwise umd will be used, causing vue compiler to be bundled.
+			// This is needed, otherwise umd will be used,
+			// causing vue compiler to be bundled.
 			"vue-slicksort$": "./node_modules/vue-slicksort/dist/vue-slicksort.esm.js",
 			"./url.mjs$": "./lib/pixi/url.js", // see lib/README.md
 		},
 	},
 	source: {
-		include: [/@pixi/, /core-base/],
+		include: [/@pixi/, /core-base/, /vue-i18n/],
 		entry: {
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",
@@ -97,8 +98,9 @@ export default defineConfig({
 						chunks: "all",
 					},
 					shared: {
-						// This contains the modules used both by the main thread and the worker,
-						// so this must be in a separate file.
+						// This contains the modules used both by the main
+						// thread and the worker, so this must be in a
+						// separate file.
 						test: makeTest(/src[\\/]shared[\\/]/, /tslib/),
 						name: "shared",
 						chunks: "async",
@@ -236,10 +238,10 @@ export default defineConfig({
 		},
 		postcss: (_, { addPlugins }) => {
 			/**
-			 * For the moment, although LightingCSS claims to handle vendor prefixes,
-			 * the functionality seems less complete than postcssPresetEnv.
-			 * For example, `-webkit-text-decoration` is not handled by LightingCSS
-			 * (see https://caniuse.com/text-decoration).
+			 * For the moment, although LightingCSS claims to handle vendor
+			 * prefixes, the functionality seems less complete than
+			 * postcssPresetEnv. For example, `-webkit-text-decoration` is not
+			 * handled by LightingCSS (see https://caniuse.com/text-decoration).
 			 */
 			addPlugins(postcssPresetEnv() as PostCSSPlugin);
 		},
@@ -304,7 +306,10 @@ export default defineConfig({
 	},
 });
 
-/** Add simple handling for IE < 10, where conditional comments were supported. */
+/**
+ * Add simple handling for IE < 10,
+ * where conditional comments were supported.
+ */
 const wrapIE = (c: string) => `<!--[if IE]><body>IE is not supported.</body><![endif]--><!--[if !IE]><!-->${c}<!--<![endif]-->`;
 
 const i18n = createI18n<false, object>({

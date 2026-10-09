@@ -31,17 +31,21 @@ export function useViewport(el: HTMLElement): Viewport {
 	// Initialize
 	$update();
 
-	// When reloading the page, there may be a momentary size change on mobile devices.
-	// So we check the size one more time after constructing
+	// When reloading the page, there may be a momentary size change on mobile
+	// devices. So we check the size one more time after constructing
 	setTimeout($update, RETRY_DELAY);
 
 	// Setup the events to lock the Viewport on virtual keyboard.
 	// This is based on whether the device is a pure touch device;
-	// of course other devices may also have virtual keyboards, but let's not worry about those for now.
+	// of course other devices may also have virtual keyboards, but let's not
+	// worry about those for now.
 	if(isTouch) {
 		document.addEventListener("focusin", e => {
 			const t = e.target;
-			if(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) {
+			if(
+				t instanceof HTMLInputElement ||
+				t instanceof HTMLTextAreaElement
+			) {
 				lockViewport = true;
 			}
 		});

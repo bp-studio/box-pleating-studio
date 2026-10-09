@@ -7,7 +7,8 @@ import type { Junction } from "core/design/layout/junction/junction";
 
 //=================================================================
 /**
- * {@link UpdateResult} isolates {@link UpdateModel} and prevents unintended access.
+ * {@link UpdateResult} isolates {@link UpdateModel} and prevents unintended
+ * access.
  */
 //=================================================================
 export namespace UpdateResult {
@@ -34,7 +35,9 @@ export namespace UpdateResult {
 		_updateResult.remove.junctions.push(id);
 	}
 
-	export function $pruneJunctions(junctions: IntDoubleMap<NodeId, Junction>): void {
+	export function $pruneJunctions(
+		junctions: IntDoubleMap<NodeId, Junction>
+	): void {
 		for(const id of _updateResult.remove.nodes) {
 			junctions.delete(id);
 		}

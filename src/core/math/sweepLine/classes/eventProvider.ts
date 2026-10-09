@@ -16,7 +16,9 @@ export abstract class EventProvider {
 		this._nextId = 0;
 	}
 
-	abstract $createStart(startPoint: IPoint, segment: ISegment, delta: Sign): StartEvent;
+	abstract $createStart(
+		startPoint: IPoint, segment: ISegment, delta: Sign
+	): StartEvent;
 	abstract $createEnd(endPoint: IPoint, segment: ISegment): EndEvent;
 
 	abstract readonly $eventComparator: Comparator<SweepEvent>;

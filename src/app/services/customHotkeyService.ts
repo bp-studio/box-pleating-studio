@@ -14,7 +14,8 @@ export interface KeyStore {
 
 //=================================================================
 /**
- * {@link CustomHotkeyService} is responsible for managing hotkeys that can be customized
+ * {@link CustomHotkeyService} is responsible for managing hotkeys that can be
+ * customized.
  */
 //=================================================================
 namespace CustomHotkeyService {
@@ -103,7 +104,8 @@ namespace CustomHotkeyService {
 	function handleDimensionCommand(command: string): void {
 		if(!Studio.project) return;
 		const f = command.endsWith("i") ? 1 : -1;
-		const sel = Studio.selections.length ? Studio.selections : [Studio.project.design.sheet.grid];
+		const sel = Studio.selections.length ?
+			Studio.selections : [Studio.project.design.sheet.grid];
 		for(const target of sel) {
 			if(command.startsWith("w")) {
 				tryChange(target, f, "width", "size");

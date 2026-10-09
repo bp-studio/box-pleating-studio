@@ -5,14 +5,16 @@ import { Direction, makeQuadrantCode, opposite } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { State } from "core/service/state";
 import { deviceGenerator } from "./generators/deviceGenerator";
+import { debugAssert } from "core/utils/debug";
 
 import type { Point } from "core/math/geometry/point";
 import type { QuadrantDirection } from "shared/types/direction";
-import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, Strategy, NodeId } from "shared/json";
+import type { JConnection, JDevice, JJunction, JOverlap, JPartition, JCorner, JAnchor, NodeId } from "shared/json";
 import type { Pattern } from "./pattern/pattern";
 import type { Configuration } from "./configuration";
 import type { Vector } from "core/math/geometry/vector";
 import type { Ridge } from "./pattern/device";
+import type { ITreeNode } from "core/design/context";
 
 export interface CornerMap {
 	/** {@link JCorner} itself. */
@@ -44,14 +46,15 @@ export class Partition implements ISerializable<JPartition> {
 	 */
 	public readonly $devices: Store<JDevice>;
 
-	private readonly _strategy: Strategy | undefined;
-
 	constructor(config: Configuration, data: JPartition) {
 		this.$configuration = config;
 		this.$overlaps = data.overlaps;
-		if(data.overlaps[0].ox < 0) debugger;
+		debugAssert(() => data.overlaps[0].ox >= 0, "Negative overlap");
+		debugAssert(
+			() => data.overlaps.every(o => Boolean(o.join) == isJoined(o)),
+			"Inconsistent join strategy"
+		);
 		this.$devices = new Store(deviceGenerator(data, config));
-		this._strategy = data.strategy;
 
 		// Gather all corners
 		const map: CornerMap[] = [];
@@ -63,52 +66,67 @@ export class Partition implements ISerializable<JPartition> {
 		this.$cornerMap = map;
 	}
 
+	/**
+	 * The {@link JOverlap}s are rebuilt with a fixed ordering of fields, since
+	 * the JSON is also used as the signature of the {@link Configuration}, and
+	 * the ordering of the fields of the original objects depends on how they
+	 * were created (by searching, or by loading and migrating files).
+	 */
 	public toJSON(): JPartition {
-		return {
-			overlaps: this.$overlaps, // This is OK since the array is readonly
-			strategy: this._strategy,
-		};
+		return { overlaps: this.$overlaps.map(toCanonicalOverlap) };
 	}
 
 	public $getDisplacement(pattern: Pattern): Vector {
 		const connection = this.$displacementReference.value;
-		return pattern.$getConnectionTarget(connection).$sub(pattern.$config.$repo.$origin);
+		return pattern.$getConnectionTarget(connection).$sub(
+			pattern.$config.$repo.$origin
+		);
 	}
 
 	/** Choose an outward connection point in this Partition. */
 	public readonly $displacementReference = new Cache<JConnection>(() =>
 		// Choose whichever first one that is out-going
-		this.$overlaps.find(o => o.c[0].type != CornerType.coincide)!.c[0] as JConnection
+		this.$overlaps.find(
+			o => o.c[0].type != CornerType.coincide
+		)!.c[0] as JConnection
 	);
 
 	/**
 	 * Get the "target" of an external connection point.
 	 *
-	 * It is in general very difficult to determine the actual extend of an external connection ridge,
-	 * because that depends on the overall layout of all the flaps nearby,
-	 * not just the two flaps involved and tree structure. Therefore,
-	 * we draw the external connection ridge only up to the boundary of the flap,
-	 * and only when the connection point is within one of the two flap regions.
-	 * We then leave the rest of the ridge to be drawn automatically by the turning of rivers.
-	 * And by the "target", we mean the intersection of the ridge and the flap boundary.
+	 * It is in general very difficult to determine the actual extend of an
+	 * external connection ridge, because that depends on the overall layout of
+	 * all the flaps nearby, not just the two flaps involved and tree structure.
+	 * Therefore, we draw the external connection ridge only up to the boundary
+	 * of the flap, and only when the connection point is within one of the two
+	 * flap regions. We then leave the rest of the ridge to be drawn
+	 * automatically by the turning of rivers. And by the "target", we mean the
+	 * intersection of the ridge and the flap boundary.
+	 *
+	 * In tracing, an intersection ridge always has a target, as the tracing
+	 * has to reflect on it, and it is the one on the boundary of the flap it
+	 * connects to, i.e. the one closer to it. (Note that a flap could have
+	 * multiple quadrants in the repo, so its direction alone does not decide.)
 	 *
 	 * @param point The current location of the connection point itself.
 	 * @param c The corresponding {@link JCorner} info.
-	 * @param q If given, it will force returning the connection target on the given direction.
+	 * @param tracing Whether the target is for tracing.
 	 */
-	public $getExternalConnectionTarget(point: Point, map: CornerMap, q?: QuadrantDirection): Point | null {
+	public $getExternalConnectionTarget(
+		point: Point, map: CornerMap, tracing: boolean = false
+	): Point | null {
 		let [p1, p2] = this.$getExternalConnectionTargets(map);
 		if(p1._x.gt(p2._x)) [p1, p2] = [p2, p1];
-		if(q === undefined) {
-			if(point._x.le(p1._x)) return p1;
-			if(point._x.ge(p2._x)) return p2;
-
-			// Otherwise, the connection point is not inside the two flap regions,
-			// and we shall return null.
-			return null;
-		} else {
-			return q == Direction.UR || q == Direction.LR ? p1 : p2;
+		if(tracing && map.corner.type == CornerType.intersection) {
+			const flap = State.m.$tree.$nodes[map.corner.e as NodeId]!;
+			return distToFlap(p1, flap) <= distToFlap(p2, flap) ? p1 : p2;
 		}
+		if(point._x.le(p1._x)) return p1;
+		if(point._x.ge(p2._x)) return p2;
+
+		// Otherwise, the connection point is not inside the two flap
+		// regions, and we shall return null.
+		return null;
 	}
 
 	/**
@@ -119,7 +137,8 @@ export class Partition implements ISerializable<JPartition> {
 	 * through the external connection point and locate its intersection with
 	 * the boundary of the two flaps, but such method would not work for
 	 * patterns among multiple flaps. In that case, we need to consult
-	 * {@link _getExposedOverlap} method in order to calculate the location of the target.
+	 * {@link _getExposedOverlap} method in order to calculate the location of
+	 * the target.
 	 */
 	public $getExternalConnectionTargets(map: CornerMap): [Point, Point] {
 		const tree = State.m.$tree;
@@ -135,9 +154,10 @@ export class Partition implements ISerializable<JPartition> {
 		const quad2 = repo.$quadrants.get(makeQuadrantCode(n2, c2.q!))!;
 		let d1 = 0, d2 = 0;
 
-		// For intersections, the actual overlap to retrieve can be a lot more complicated
-		// because of the rivers around the flaps, so we need a series of additional
-		// calculations here to decide at what distance should we set the overlap.
+		// For intersections, the actual overlap to retrieve can be a lot more
+		// complicated because of the rivers around the flaps, so we need a
+		// series of additional calculations here to decide at what distance
+		// should we set the overlap.
 		const overlaps = this.$overlaps.concat();
 		if(map.corner.type == CornerType.intersection) {
 			const oriented = ov.c[0].e! < 0;
@@ -158,7 +178,9 @@ export class Partition implements ISerializable<JPartition> {
 
 		ov = this._getExposedOverlap(ov, overlaps);
 		const p1 = quad1.$getOverlapCorner(ov, parent, map.anchorIndex, d1);
-		const p2 = quad2.$getOverlapCorner(ov, parent, opposite(map.anchorIndex), d2);
+		const p2 = quad2.$getOverlapCorner(
+			ov, parent, opposite(map.anchorIndex), d2
+		);
 
 		return [p1, p2];
 	}
@@ -177,14 +199,19 @@ export class Partition implements ISerializable<JPartition> {
 
 		let [a, b] = [n1, n3];
 		if(a > b) [a, b] = [b, a];
-		const fromN1 = this.$configuration.$repo.$junctions.some(j => j.c[0].e == a && j.c[2].e == b);
+		const fromN1 = this.$configuration.$repo.$junctions.some(
+			j => j.c[0].e == a && j.c[2].e == b
+		);
 
 		[a, b] = [fromN1 ? n2 : n1, n3];
 		if(a > b) [a, b] = [b, a];
 		return [a, b];
 	}
 
-	/** All {@link JCorner}s that are dragging constraints of the current {@link Partition}. */
+	/**
+	 * All {@link JCorner}s that are dragging constraints of the current
+	 * {@link Partition}.
+	 */
 	public readonly $constraints = new Cache(() =>
 		this.$cornerMap.filter(m => {
 			const type = m.corner.type;
@@ -201,9 +228,9 @@ export class Partition implements ISerializable<JPartition> {
 		})
 	);
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _findOverlapForFlap(id: NodeId): JOverlap | undefined {
 		for(const ov of this.$overlaps) {
@@ -214,10 +241,12 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	/**
-	 * Find, in a {@link Partition} containing joins, what is left of a given {@link JOverlap}
-	 * after subtracting the other JOverlaps.
+	 * Find, in a {@link Partition} containing joins, what is left of a given
+	 * {@link JOverlap} after subtracting the other JOverlaps.
 	 */
-	private _getExposedOverlap(ov: JOverlap, overlaps: readonly JOverlap[]): JOverlap {
+	private _getExposedOverlap(
+		ov: JOverlap, overlaps: readonly JOverlap[]
+	): JOverlap {
 		// Trivial case
 		if(overlaps.length == 1) return ov;
 
@@ -243,10 +272,12 @@ export class Partition implements ISerializable<JPartition> {
 				}
 				if(p.c[2].e == parent.c[2].e) {
 					if(p.ox < parent.ox) {
-						result.ox = parent.ox - Math.max(p.ox, parent.ox - w) - shift.x;
+						result.ox =
+							parent.ox - Math.max(p.ox, parent.ox - w) - shift.x;
 					}
 					if(p.oy < parent.oy) {
-						result.oy = parent.oy - Math.max(p.oy, parent.oy - h) - shift.y;
+						result.oy =
+							parent.oy - Math.max(p.oy, parent.oy - h) - shift.y;
 					}
 				}
 			}
@@ -256,9 +287,30 @@ export class Partition implements ISerializable<JPartition> {
 	}
 
 	/**
-	 * Obtain the original {@link JJunction} corresponding to the give {@link JOverlap}.
+	 * Obtain the original {@link JJunction} corresponding to the give
+	 * {@link JOverlap}.
 	 */
 	private _getParent(ov: JOverlap): Readonly<JJunction> {
 		return this.$configuration.$repo.$junctions[ov.parent];
 	}
+}
+
+/** Whether the joint corner of the {@link JOverlap} is coincide. */
+function isJoined(o: JOverlap): boolean {
+	return o.c[Direction.UR].type == CornerType.coincide ||
+		o.c[Direction.LL].type == CornerType.coincide;
+}
+
+function toCanonicalOverlap(o: JOverlap): JOverlap {
+	const result: JOverlap = { c: o.c, ox: o.ox, oy: o.oy, parent: o.parent };
+	if(o.shift) result.shift = o.shift;
+	if(o.gadget) result.gadget = o.gadget;
+	if(o.join) result.join = o.join;
+	return result;
+}
+
+/** The distance (in the sense of box pleating) from a point to a flap. */
+function distToFlap(p: Point, flap: ITreeNode): number {
+	const [t, r, b, l] = flap.$AABB.$toValues();
+	return Math.max(l - p.x, p.x - r, b - p.y, p.y - t, 0);
 }

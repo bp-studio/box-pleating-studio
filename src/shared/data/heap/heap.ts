@@ -62,9 +62,9 @@ export abstract class Heap<T> implements IHeap<T> {
 
 	public abstract [Symbol.iterator](): IterableIterator<T>;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	protected _swap(a: number, b: number): void {
 		const temp = this._data[a];
@@ -73,7 +73,8 @@ export abstract class Heap<T> implements IHeap<T> {
 	}
 
 	protected _shouldSwap(a: number, b: number): boolean {
-		return b < this._data.length && this._comparator(this._data[a], this._data[b]) > 0;
+		return b < this._data.length &&
+			this._comparator(this._data[a], this._data[b]) > 0;
 	}
 
 	protected _trySwap(a: number, b: number): boolean {

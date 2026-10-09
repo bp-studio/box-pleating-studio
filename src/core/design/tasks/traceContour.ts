@@ -2,54 +2,39 @@ import { Task } from "./task";
 import { State } from "core/service/state";
 import { patternContourTask } from "./patternContour";
 import { getOrSetEmptyArray } from "shared/utils/map";
-import { mapDirections } from "core/math/geometry/path";
 import { AAUnion } from "core/math/sweepLine/polyBool";
 import { climb } from "./utils/climb";
 import { expandPath, simplify } from "./utils/expand";
-import { getQuadrant, quadrantNumber } from "shared/types/direction";
-import { getFactors } from "../layout/pattern/quadrant";
+import { getNewCarvings, rebuild } from "./utils/invasion";
+import { createRawPieces } from "./utils/rawPiece";
+import { collectNodeSets, createLeafSets, extractInvalidGroups } from "./utils/leafGroup";
+import { createQuadrantGroups } from "./utils/quadrantGroup";
+import { checkCriticalCorners, cornerSignature } from "./utils/criticalCorner";
 
+import type { RawPiece, getQuadrantShape } from "./utils/rawPiece";
+import type { LeafSet } from "./utils/leafGroup";
+import type { CriticalCorner } from "./utils/criticalCorner";
 import type { NodeId } from "shared/json/tree";
-import type { ValidJunction } from "../layout/junction/validJunction";
-import type { Quadrant } from "../layout/pattern/quadrant";
-import type { QuadrantDirection } from "shared/types/direction";
-import type { Path, PathEx } from "shared/types/geometry";
+import type { Invasion, ValidJunction } from "../layout/junction/validJunction";
+import type { QuadrantCode } from "shared/types/direction";
+import type { PathEx } from "shared/types/geometry";
 import type { NodeSet } from "../layout/nodeSet";
 import type { Stretch } from "../layout/stretch";
 import type { ITreeNode, NodeGraphics, RoughContour, TraceContour, PatternContour } from "../context";
 
-const coveredJunctionMap = new Map<number, ValidJunction[]>();
+const coveredJunctionMap = new Map<NodeId, ValidJunction[]>();
 const stretchMap = new Map<number, Stretch[]>();
-
-/**
- * Caches the stretch signature (sorted stretch IDs joined by ";") for each node.
- * Persists across {@link Processor.$run} calls to detect stretch changes:
- * when a node's current signature differs from its cached value,
- * the node enters `stretchChanged` and its trace contour is recomputed.
- */
-const signatureCache = new Map<number, string>();
 
 const aaUnion = new AAUnion();
 const expander = new AAUnion(true);
-
-/**
- * A {@link CriticalCorner} is a the {@link Quadrant.$corner} of a involved {@link Quadrant}.
- * It is necessary (though not always sufficient) for the {@link TraceContour}
- * to expose all relevant CriticalCorners for the tracing algorithm to work.
- */
-interface CriticalCorner {
-	readonly $signature: string;
-	readonly $flap: NodeId;
-	readonly $nodeSet: NodeSet;
-}
 
 //=================================================================
 /**
  * {@link traceContourTask} updates {@link NodeGraphics.$traceContours}.
  *
- * A {@link TraceContour} is the contour used for tracing {@link PatternContour}s.
- * It is the same as {@link RoughContour} in most cases,
- * but in some cases it will split the outer contours into "raw mode"
+ * A {@link TraceContour} is the contour used for tracing
+ * {@link PatternContour}s. It is the same as {@link RoughContour} in most
+ * cases, but in some cases it will split the outer contours into "raw mode"
  * to make the tracing algorithm work.
  */
 //=================================================================
@@ -58,7 +43,8 @@ export const traceContourTask = new Task(traceContour, patternContourTask);
 function traceContour(): void {
 	// Update covered junction map
 	coveredJunctionMap.clear();
-	const junctions = [...State.$junctions.values()].filter(j => j.$valid) as ValidJunction[];
+	const junctions = [...State.$junctions.values()]
+		.filter(j => j.$valid) as ValidJunction[];
 	for(const junction of junctions) {
 		const covering = junction.$getCovering();
 		if(covering.length == 0) continue;
@@ -89,19 +75,40 @@ function traceContour(): void {
 	for(let i = 0; i < tree.$nodes.length; i++) {
 		const node = tree.$nodes[i as NodeId];
 		if(!node) continue;
-		const cache = signatureCache.get(i);
+		const cache = State.$stretchSignatureCache.get(i);
 		const stretches = stretchMap.get(i) || [];
 		const signature = stretches.map(s => s.$id).sort().join(";");
 		if(cache !== signature) {
-			signatureCache.set(i, signature);
+			State.$stretchSignatureCache.set(i, signature);
 			stretchChanged.add(node);
 		}
 	}
 
+	// The inner paths of the parents depend on the patterns of the children
+	// (see getInnerSource).
+	const parents = [...stretchChanged].map(n => n.$parent).filter(p => p);
+
 	climb(updater,
 		State.$roughContourChanged,
-		stretchChanged
+		stretchChanged,
+		new Set(parents as ITreeNode[]),
+		getRepoChangedNodes()
 	);
+}
+
+/**
+ * The raw pieces (see {@link createRawPieces}) and the critical corners depend
+ * on the sizes of the junctions, which could change without changing the
+ * rough contours or the stretches of a node (for example, when a flap outside
+ * moves). In that case the repo is renewed, and the nodes in it are updated.
+ */
+function getRepoChangedNodes(): Set<ITreeNode> {
+	const tree = State.m.$tree;
+	const result = new Set<ITreeNode>();
+	for(const repo of State.$repoToProcess) {
+		for(const id of repo.$nodeSet.$nodes) result.add(tree.$nodes[id]!);
+	}
+	return result;
 }
 
 function updater(node: ITreeNode): boolean {
@@ -111,19 +118,23 @@ function updater(node: ITreeNode): boolean {
 
 	const traceContours: TraceContour[] = [];
 	for(const roughContour of node.$graphics.$roughContours) {
-		traceContours.push(toTraceContour(node, roughContour, criticalCorners));
+		const contour = toTraceContour(node, roughContour, criticalCorners);
+		traceContours.push(contour);
 	}
 	node.$graphics.$traceContours = traceContours;
 
 	for(const contour of node.$graphics.$patternContours) {
-		// Whenever trace contour changes, established pairing relations are no longer valid.
+		// Whenever trace contour changes,
+		// established pairing relations are no longer valid.
 		contour.$for = undefined;
+		contour.$piece = undefined;
 	}
 	State.$contourWillChange.add(node);
 
 	for(const stretch of stretches) {
 		if(!State.$repoToProcess.has(stretch.$repo)) {
-			getOrSetEmptyArray(State.$repoToPartiallyProcess, stretch.$repo).push(node);
+			const map = State.$repoToPartiallyProcess;
+			getOrSetEmptyArray(map, stretch.$repo).push(node);
 		}
 	}
 
@@ -131,7 +142,9 @@ function updater(node: ITreeNode): boolean {
 	return false;
 }
 
-function getCriticalCorners(node: ITreeNode, nodeSets: NodeSet[]): CriticalCorner[] {
+function getCriticalCorners(
+	node: ITreeNode, nodeSets: NodeSet[]
+): CriticalCorner[] {
 	const result: CriticalCorner[] = [];
 	for(const nodeSet of nodeSets) {
 		const quadrants = nodeSet.$quadrantCoverage.get(node) || [];
@@ -145,23 +158,17 @@ function getCriticalCorners(node: ITreeNode, nodeSets: NodeSet[]): CriticalCorne
 				$signature: signature,
 				$flap: flap.id,
 				$nodeSet: nodeSet,
+				$quadrant: quadrant,
 			});
 		}
 	}
 	return result;
 }
 
-/**
- * Create a signature for a critical corner.
- *
- * Note that it does not suffice to check just the coordinates,
- * but also need to consider the turning direction of the corners.
- */
-function cornerSignature(p: IPoint, dir: QuadrantDirection): string {
-	return p.x + "," + p.y + "," + dir;
-}
-
-function toTraceContour(node: ITreeNode, roughContour: RoughContour, criticalCorners: CriticalCorner[]): TraceContour {
+function toTraceContour(
+	node: ITreeNode, roughContour: RoughContour,
+	criticalCorners: CriticalCorner[]
+): TraceContour {
 	const leaves = roughContour.$leaves;
 	const result: TraceContour = {
 		$outer: roughContour.$outer,
@@ -171,12 +178,21 @@ function toTraceContour(node: ITreeNode, roughContour: RoughContour, criticalCor
 	};
 
 	if(leaves.length > 1) {
-		const cornerArray = criticalCorners.filter(c => leaves.includes(c.$flap));
+		// A quadrant whose junctions are all digested by the component is not
+		// traced at all (see Quadrant.$resolveStartEnd), so its corner is not
+		// required to be exposed. Note that the corner is still required even
+		// if it is carved out by an invasion from the inside (see
+		// ValidJunction.$invasion), as long as the quadrant is traced.
+		const leafSet = new Set(leaves);
+		const cornerArray = criticalCorners.filter(c =>
+			leafSet.has(c.$flap) && c.$quadrant.$resolveStartEnd(leafSet)
+		);
 		const corners = new Map<string, CriticalCorner>();
 		for(const c of cornerArray) corners.set(c.$signature, c);
 		if(!checkCriticalCorners(result.$outer, corners)) {
-			const nodeSets = [...corners.values()].map(c => c.$nodeSet);
-			result.$outer = createRawContour(node, nodeSets, leaves, roughContour.$children);
+			result.$outer = createRawContour(
+				node, [...corners.values()], leaves, roughContour.$children
+			);
 			result.$raw = true;
 		}
 	}
@@ -185,18 +201,18 @@ function toTraceContour(node: ITreeNode, roughContour: RoughContour, criticalCor
 	 * Since {@link traceContourTask} runs bottom-up,
 	 * we can be sure that {@link RoughContour.$trace} is defined.
 	 */
-	const children = roughContour.$children.map(r => r.$trace!);
+	const children = roughContour.$children.map(r => getInnerSource(node, r));
 	if(result.$raw) {
 		result.$inner = children.flatMap(c => {
-			const outer: PathEx[] = c.$outer.map(o => o.concat()); // Make a copy here
+			// Make a copy here
+			const outer: PathEx[] = c.$outer.map(o => o.concat());
 			outer.forEach(o => o.leaves = c.$leaves);
 			return outer;
 		});
 	} else {
-		const outers = children.flatMap(t => t.$raw ? t.$outer.map(o => [o]) : [t.$outer]);
-		// In theory, simply taking the union here could result in failure in pattern contour insertion,
-		// but in practice such failure can only occur when the layout is invalid (or so it seems),
-		// So we don't really need to worry about that.
+		const outers = children.flatMap(
+			t => t.$raw ? t.$outer.map(o => [o]) : [t.$outer]
+		);
 		result.$inner = aaUnion.$get(...outers);
 	}
 
@@ -204,62 +220,76 @@ function toTraceContour(node: ITreeNode, roughContour: RoughContour, criticalCor
 	return result;
 }
 
-/**
- * Check if all critical corners appears in the union path.
- *
- * This methods modifies {@link corners}, so it should only be invoked once.
- */
-function checkCriticalCorners(result: readonly Path[], corners: Set<string> | Map<string, CriticalCorner>): boolean {
-	for(const path of result) {
-		const dirs = mapDirections(path);
-		for(const [i, p] of path.entries()) {
-			corners.delete(cornerSignature(p, dirs[i]));
-		}
-	}
-	return corners.size == 0;
-}
+type InnerSource = Pick<TraceContour, "$outer" | "$leaves" | "$raw">;
 
-interface LeafSet extends Array<NodeId> {
-	/** This {@link LeafSet} contains a leaf that is shared with another LeafSet. */
-	hasOverlapping?: boolean;
+/**
+ * The child contour from which the inner paths are made.
+ *
+ * Usually it is just the {@link TraceContour} of the child. But if the child
+ * contains leaves with invasions carved at the level of the node for the first
+ * time (see {@link roughContourTask}), the child is not carved, and could stick
+ * out of the outer path of the node. If the invasion is resolved by a pattern
+ * whose coverage includes the child, the pattern contour of the child will be
+ * inserted into the inner path, so it is fine. Otherwise, we carve the child in
+ * the same way (without checking the size) to make the inner path.
+ *
+ * The exception is when the junction of the invasion is covered. Its
+ * overlapping region is distributed by the pattern of the covering junction,
+ * and the child (being too small to be carved itself) keeps the region.
+ * Carving the inner path would make the node overlap the child.
+ */
+function getInnerSource(node: ITreeNode, child: RoughContour): InnerSource {
+	const stretches = stretchMap.get(child.$id) ?? [];
+	const isCovered = (i: Invasion): boolean => {
+		// An invasion always comes from a valid junction.
+		const junction = State.$junctions.get(i.flap.id, i.invader.id);
+		return (junction as ValidJunction).$isCovered;
+	};
+	const filter = (i: Invasion): boolean => !isCovered(i) &&
+		!stretches.some(s => {
+			const leaves = s.$repo.$nodeSet.$leaves;
+			return leaves.includes(i.flap.id) && leaves.includes(i.invader.id);
+		});
+	const targets = getNewCarvings(child, node.$length, filter);
+	if(!targets.length) return child.$trace!;
+	const paths = rebuild(child, new Set(targets), 0, node.$length, filter);
+	return {
+		$outer: paths.length ? expander.$get(paths).map(simplify) : [],
+		$leaves: child.$leaves,
+		$raw: false,
+	};
 }
 
 /**
  * Create the outer contour in raw mode.
+ * @param missing The missing critical corners.
  */
 function createRawContour(
-	node: ITreeNode, nodeSets: NodeSet[],
+	node: ITreeNode, missing: readonly CriticalCorner[],
 	leaves: readonly NodeId[], children: readonly RoughContour[]
 ): PathEx[] {
-	const tree = State.m.$tree;
 	const remainingLeaves = new Set(leaves);
 	const result: PathEx[] = [];
+	result.push(...createLeafSetContours(node, missing, remainingLeaves));
 
-	const leafSets = createLeafSets(nodeSets, remainingLeaves);
-	const sharedLeaves = new Set<NodeId>();
-	for(const leafSet of leafSets) {
-		if(leafSet.hasOverlapping) { // We'll handle these later
-			for(const id of leafSet) sharedLeaves.add(id);
-		} else { // Group all relevant leaves into one raw contour
-			let outers = leafSet.map(id => createRawContourForLeaf(node, tree.$nodes[id]!));
-			if(outers.length > 1) outers = aaUnion.$get(...outers.map(p => [p]));
-			result.push(...packPaths(outers, leafSet));
-		}
-	}
-	for(const id of sharedLeaves) { // Each shared leaf will have its own raw contour
-		result.push(...packPaths([createRawContourForLeaf(node, tree.$nodes[id]!)], [id]));
+	// See extractInvalidGroups
+	for(const group of extractInvalidGroups(leaves, remainingLeaves)) {
+		const [, outers] = createRawContourForLeaves(node, group);
+		result.push(...packPaths(outers, group));
 	}
 
 	// All the rest goes to the same group.
 	if(remainingLeaves.size > 0) {
 		// It is very common that majority of leaves remain,
-		// and thus it won't be very efficient to use the same approach as the case above,
-		// as the performance of aaUnion drops when the number of polygons increases.
+		// and thus it won't be very efficient to use the same approach as the
+		// case above, as the performance of aaUnion drops when the number of
+		// polygons increases.
 		// However, since the remaining doesn't involve any critical corners,
 		// we can simply expand relevant child contours to get it,
 		// this could greatly improve the performance of taking the union.
 		// However, there is one catch here (see recursiveExpand).
-		const paths = recursiveExpand(node, children, remainingLeaves, node.$length);
+		const paths =
+			recursiveExpand(node, children, remainingLeaves, node.$length);
 		const outers = expander.$get(paths);
 		result.push(...packPaths(outers, [...remainingLeaves]));
 	}
@@ -268,32 +298,35 @@ function createRawContour(
 }
 
 /**
- * Ideally, we want to have as few raw contours as possible reduce the cost of processing them,
- * so we would like to group all leaves belonging to the same {@link NodeSet}.
- * However, in some cases a single leaf could belong to more than one NodeSet.
- * For such "shared leaf", we have to fully break up the corresponding NodeSet into individual raw contours,
- * otherwise generated pattern contours could be blocked by the rough contours from other raw contours.
- *
- * In this subroutine, we identify those leaves that are shared by more than one NodeSet,
- * and mark the corresponding {@link LeafSet.hasOverlapping}.
+ * Create the raw contours for the {@link LeafSet}s of the {@link NodeSet}s
+ * involved (see {@link collectNodeSets}), and remove the leaves of them from
+ * {@link remainingLeaves}.
  */
-function createLeafSets(nodeSets: NodeSet[], remainingLeaves: Set<NodeId>): LeafSet[] {
-	const leafSets = nodeSets.map(nodeSet => nodeSet.$leaves.filter(id => remainingLeaves.has(id))) as LeafSet[];
-	const leafMap = new Map<NodeId, LeafSet>();
-	for(const leafSet of leafSets) {
-		for(const id of leafSet) {
-			remainingLeaves.delete(id);
-			if(leafMap.has(id)) {
-				// Found overlapping
-				leafMap.get(id)!.hasOverlapping = true;
-				leafSet.hasOverlapping = true;
-				break;
-			} else {
-				leafMap.set(id, leafSet);
-			}
-		}
+function createLeafSetContours(
+	node: ITreeNode, missing: readonly CriticalCorner[],
+	remainingLeaves: Set<NodeId>
+): PathEx[] {
+	const result: PathEx[] = [];
+	const candidates = (stretchMap.get(node.id) ?? [])
+		.map(s => s.$repo.$nodeSet);
+	const nodeSets = collectNodeSets(
+		missing.map(c => c.$nodeSet), candidates, remainingLeaves
+	);
+	const leafSets = createLeafSets(nodeSets, remainingLeaves);
+	const groups = createQuadrantGroups(node, leafSets, coveredJunctionMap);
+	for(const { outers, leaves, pieces, quadrants } of groups) {
+		result.push(...packPaths(outers, leaves, pieces, quadrants));
 	}
-	return leafSets;
+	// Each of the other LeafSets goes to one raw contour. Note that the flaps
+	// of the same repo never eat the corners of each other in valid layouts,
+	// so the missing corners are always exposed, unless carved out by the
+	// leaves themselves.
+	for(const leafSet of leafSets) {
+		if(leafSet.hasOverlapping) continue;
+		const [pieces, outers] = createRawContourForLeaves(node, leafSet);
+		result.push(...packPaths(outers, leafSet, pieces));
+	}
+	return result;
 }
 
 /**
@@ -301,7 +334,11 @@ function createLeafSets(nodeSets: NodeSet[], remainingLeaves: Set<NodeId>): Leaf
  * we need to exclude those leaves that are already grouped,
  * so we cannot just expand the immediate child contours.
  * Instead, we need recursively find the contour that is OK to add.
- * The overall performance of doing so is still a lot better than the naive approach.
+ * The overall performance of doing so is still a lot better than the naive
+ * approach.
+ * Similarly, if the child contains leaves with invasions carved after the
+ * expansion for the first time (see {@link roughContourTask}), the child
+ * contour is not carved yet, so we need to perform recursion as well.
  */
 function recursiveExpand(
 	node: ITreeNode, children: readonly RoughContour[],
@@ -312,65 +349,72 @@ function recursiveExpand(
 		const leaves = child.$leaves.filter(id => remainingLeaves.has(id));
 		if(leaves.length == 1) {
 			// In this case we fallback to the naive approach
-			result.push(createRawContourForLeaf(node, State.m.$tree.$nodes[leaves[0]]!));
-		} else if(leaves.length == child.$leaves.length) {
+			const leaf = State.m.$tree.$nodes[leaves[0]]!;
+			result.push(...createRawContourForLeaf(node, leaf));
+		} else if(
+			leaves.length == child.$leaves.length &&
+			!getNewCarvings(child, length).length
+		) {
 			// We accept the contour only if all leaves are relevant
 			result.push(...child.$outer.map(o => expandPath(o, length)));
 		} else if(leaves.length > 0) {
 			// Otherwise, perform recursion
 			const unit = State.m.$tree.$nodes[child.$id]!.$length;
-			result.push(...recursiveExpand(node, child.$children, remainingLeaves, length + unit));
+			result.push(...recursiveExpand(
+				node, child.$children, remainingLeaves, length + unit
+			));
 		}
 	}
 	return result;
 }
 
-function packPaths(outers: PathEx[], leaves: NodeId[]): PathEx[] {
-	outers = outers.map(simplify); // For the final checking in tracing algorithm.
-	outers.forEach(o => o.leaves = leaves);
-	return outers;
+/**
+ * @param pieces If given, and the outers form a single path,
+ * the {@link RawPiece.carvings} of the pieces are kept on the path.
+ * @param quadrants See {@link RawPiece.quadrants}.
+ */
+function packPaths(
+	outers: PathEx[], leaves: NodeId[], pieces?: RawPiece[],
+	quadrants?: ReadonlySet<QuadrantCode>
+): PathEx[] {
+	// For the final checking in tracing algorithm.
+	const result: RawPiece[] = outers.map(simplify);
+	for(const path of result) {
+		path.leaves = leaves;
+		if(quadrants) path.quadrants = quadrants;
+	}
+	if(pieces && result.length == 1) {
+		result[0].carvings = pieces.flatMap(p => p.carvings ?? []);
+	}
+	return result;
 }
 
 /**
  * Create raw trace contour for a single leaf.
+ *
+ * The overlapping regions of the junctions with the flaps also inside the
+ * node are digested by those flaps (except for the invasions, see
+ * {@link createRawPieces}). Instead of taking unions with those flaps, we carve
+ * the overlapping regions out of the piece, but only when tracing the
+ * corresponding quadrant (see {@link getQuadrantShape}).
+ * That way the junctions can be consistently considered digested with
+ * respect to the whole node.
  */
-function createRawContourForLeaf(node: ITreeNode, leaf: ITreeNode): PathEx {
-	const outer = leaf.$graphics.$roughContours[0].$outer[0];
-	const l = leaf.$dist - node.$dist - leaf.$length + node.$length;
-	const result = expandPath(outer, l);
+function createRawContourForLeaf(
+	node: ITreeNode, leaf: ITreeNode
+): RawPiece[] {
+	return createRawPieces(node, leaf, coveredJunctionMap.get(leaf.id) ?? []);
+}
 
-	// The subtlety here is that if the leaf is involved in some covered junctions,
-	// we have to subtract the covered parts,
-	// otherwise there could be small glitches after we take the general union later.
-	const coveredJunctions = coveredJunctionMap.get(leaf.id);
-	if(!coveredJunctions) return result;
-
-	const final: Path = [];
-	const quadrants = [] as IPoint[];
-	for(const junction of coveredJunctions) {
-		const code = junction.$a === leaf ? junction.$q1 : junction.$q2;
-		quadrants[getQuadrant(code)] = junction.$o;
-	}
-	for(let q = 0; q < quadrantNumber; q++) {
-		const p = result[q];
-		const rect = quadrants[q];
-		if(!rect) {
-			final.push(p);
-		} else {
-			// There's no point to go beyond the total width of rivers.
-			// TODO: maybe there are exceptions? Watch out.
-			let { x, y } = rect;
-			if(x > l) x = l;
-			if(y > l) y = l;
-
-			// Create detour
-			const f = getFactors(q);
-			const pxy = { x: p.x - f.x * x, y: p.y - f.y * y };
-			const py = { x: p.x, y: pxy.y };
-			const px = { x: pxy.x, y: p.y };
-			if(q % 2) final.push(px, pxy, py);
-			else final.push(py, pxy, px);
-		}
-	}
-	return final;
+/** Returns the pieces of the leaves, and the union of them. */
+function createRawContourForLeaves(
+	node: ITreeNode, ids: readonly NodeId[]
+): [RawPiece[], PathEx[]] {
+	const tree = State.m.$tree;
+	const pieces = ids.flatMap(
+		id => createRawContourForLeaf(node, tree.$nodes[id]!)
+	);
+	const outers = pieces.length > 1 ?
+		aaUnion.$get(...pieces.map(p => [p])) : pieces;
+	return [pieces, outers];
 }

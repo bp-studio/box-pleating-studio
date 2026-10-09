@@ -13,10 +13,13 @@ interface ITagObject {
  * calls {@link history.$fieldChange} on set, implementing undo/redo support.
  *
  * This only works for purely synchronous properties.
- * For asynchronous properties, one must implement {@link history.$fieldChange} elsewhere.
+ * For asynchronous properties, one must implement
+ * {@link history.$fieldChange} elsewhere.
  */
 export class Field<V> {
-	/** Marks this as a reactive wrapper so {@link Destructible} preserves it. */
+	/**
+	 * Marks this as a reactive wrapper so {@link Destructible} preserves it.
+	 */
 	public readonly __v_isRef = true;
 
 	private readonly _ref: ShallowRef<V>;
@@ -37,6 +40,8 @@ export class Field<V> {
 		const oldValue = this._ref.value;
 		if(oldValue === v) return;
 		this._ref.value = v;
-		this._target.$project.history.$fieldChange(this._target, this._prop, oldValue, v);
+		this._target.$project.history.$fieldChange(
+			this._target, this._prop, oldValue, v
+		);
 	}
 }

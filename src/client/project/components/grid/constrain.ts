@@ -4,11 +4,15 @@
 
 type ConstrainFunc = Func<IPoint, IPoint>;
 
-export function constrainVertex(constrain: ConstrainFunc, location: IPoint, v: IPoint): IPoint {
+export function constrainVertex(
+	constrain: ConstrainFunc, location: IPoint, v: IPoint
+): IPoint {
 	return fixVector(constrain, location, v);
 }
 
-export function constrainFlap(constrain: ConstrainFunc, location: IPoint, w: number, h: number, v: IPoint): IPoint {
+export function constrainFlap(
+	constrain: ConstrainFunc, location: IPoint, w: number, h: number, v: IPoint
+): IPoint {
 	const zeroWidth = w === 0;
 	const zeroHeight = h === 0;
 	const { x, y } = location;
@@ -100,3 +104,144 @@ export function diagonalConstrain(w: number, _: number, p: IPoint): IPoint {
 	return { x, y };
 }
 
+/**
+ * The integral shift closest to zero that brings all the given values into the
+ * range [min, max], or `null` if there's none.
+ */
+export function fitRange(
+	values: readonly number[], min: number, max: number
+): number | null {
+	const lo = min - Math.min(...values);
+	const hi = max - Math.max(...values);
+	if(lo > hi) return null;
+	return Math.min(Math.max(0, Math.ceil(lo)), Math.floor(hi));
+}
+
+/**
+ * The shortest integral shift that brings all the given points into the
+ * diagonal grid of the given size (see {@link DiagonalGrid.$contains}).
+ *
+ * In the coordinates u = x + y and v = x - y, the grid is a rectangle, so the
+ * shift in each coordinate is found separately. But a shift (dx, dy) changes
+ * u and v by the same parity, so the shifts have to be adjusted if they differ
+ * in parity.
+ */
+export function diagonalFitShift(
+	s: number, points: readonly IPoint[]
+): IPoint | null {
+	const h = s % 2;
+	const f = (s - h) / 2;
+	const c = (s + h) / 2;
+	const us = points.map(p => p.x + p.y);
+	const vs = points.map(p => p.x - p.y);
+	const du = fitRange(us, f, c + s);
+	const dv = fitRange(vs, -c, c);
+	if(du === null || dv === null) return null;
+	let best: [number, number] | null = null;
+	let min = Number.POSITIVE_INFINITY;
+	for(const [u, v] of [
+		[du, dv], [du - 1, dv], [du + 1, dv], [du, dv - 1], [du, dv + 1],
+	]) {
+		if((u - v) % 2 != 0) continue;
+		if(fitRange(us.map(x => x + u), f, c + s) !== 0) continue;
+		if(fitRange(vs.map(x => x + v), -c, c) !== 0) continue;
+		const d = u * u + v * v;
+		if(d < min) [best, min] = [[u, v], d];
+	}
+	if(!best) return null;
+	const [u, v] = best;
+	return { x: (u + v) / 2, y: (u - v) / 2 };
+}
+
+type Range = readonly [min: number, max: number];
+
+/**
+ * The shift (du, dv) that brings the most of the given points into the given
+ * ranges of the coordinates, and among those the shortest one. If `parity` is
+ * set, du and dv must be of the same parity.
+ *
+ * The points inside form a box in the space of shifts, so the best shifts
+ * form a box whose sides are the shifts bringing some point exactly onto the
+ * boundary, and the shortest one is either zero or on those sides in each
+ * coordinate. With the parity, it could also be off by one.
+ */
+export function leastOutsideShift(
+	us: readonly number[], vs: readonly number[],
+	uRange: Range, vRange: Range, parity: boolean
+): [number, number] {
+	const candidates = (values: readonly number[], range: Range): number[] => {
+		const [lo, hi] = range;
+		const result = new Set([0]);
+		for(const x of values) {
+			for(const d of [lo - x, hi - x]) {
+				result.add(d);
+				if(parity) {
+					result.add(d - 1);
+					result.add(d + 1);
+				}
+			}
+		}
+		return [...result];
+	};
+	let best: [number, number] = [0, 0];
+	let bestInside = -1, bestDist = Number.POSITIVE_INFINITY;
+	const [vLo, vHi] = vRange;
+	for(const du of candidates(us, uRange)) {
+		const inside = vs
+			.filter((_, i) => isIn(us[i] + du, uRange))
+			.sort((a, b) => a - b);
+		if(inside.length < bestInside) continue;
+		for(const dv of candidates(vs, vRange)) {
+			if(parity && (du - dv) % 2 != 0) continue;
+			const count =
+				upperBound(inside, vHi - dv) - lowerBound(inside, vLo - dv);
+			const dist = du * du + dv * dv;
+			if(count > bestInside || count == bestInside && dist < bestDist) {
+				best = [du, dv];
+				bestInside = count;
+				bestDist = dist;
+			}
+		}
+	}
+	return best;
+}
+
+function isIn(value: number, [min, max]: Range): boolean {
+	return min <= value && value <= max;
+}
+
+/** The number of sorted values less than the given one. */
+function lowerBound(sorted: readonly number[], value: number): number {
+	let lo = 0, hi = sorted.length;
+	while(lo < hi) {
+		const mid = (lo + hi) >>> 1;
+		if(sorted[mid] < value) lo = mid + 1;
+		else hi = mid;
+	}
+	return lo;
+}
+
+/** The number of sorted values not greater than the given one. */
+function upperBound(sorted: readonly number[], value: number): number {
+	let lo = 0, hi = sorted.length;
+	while(lo < hi) {
+		const mid = (lo + hi) >>> 1;
+		if(sorted[mid] <= value) lo = mid + 1;
+		else hi = mid;
+	}
+	return lo;
+}
+
+/** See {@link leastOutsideShift}. */
+export function diagonalLeastOutsideShift(
+	s: number, points: readonly IPoint[]
+): IPoint {
+	const h = s % 2;
+	const f = (s - h) / 2;
+	const c = (s + h) / 2;
+	const [du, dv] = leastOutsideShift(
+		points.map(p => p.x + p.y), points.map(p => p.x - p.y),
+		[f, c + s], [-c, c], true
+	);
+	return { x: (du + dv) / 2, y: (du - dv) / 2 };
+}

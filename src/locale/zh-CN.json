@@ -68,6 +68,9 @@
 			"redo": "恢复",
 			"selectAll": "全选",
 			"unselectAll": "取消选取",
+			"cut": "剪切",
+			"copy": "复制",
+			"paste": "粘贴",
 			"subdivide": "细分格子",
 			"rotate_right": "向右旋转",
 			"rotate_left": "向左旋转",
@@ -90,7 +93,9 @@
 		},
 		"tools": {
 			"title": "工具",
-			"TreeMaker": "导入 TreeMaker 文件"
+			"TreeMaker": "导入 TreeMaker 文件",
+			"health": "检查布局",
+			"healthOff": "关闭检查"
 		},
 		"help": {
 			"title": "说明",
@@ -128,6 +133,7 @@
 			"ridge": "脊线折痕",
 			"axisParallel": "轴平行折痕",
 			"overlap": "重叠",
+			"uncovered": "未覆盖区域",
 			"tip": "角片顶点",
 			"label": "文字标签"
 		},
@@ -208,18 +214,35 @@
 		"repo": {
 			"type": "伸展结构",
 			"config": "组态",
-			"pattern": "折痕模式",
-			"onlyOne": "只找到了一种折痕模式"
+			"pattern": "折痕图案",
+			"onlyOne": "只找到了一种折痕图案"
 		}
 	},
 	"status": {
 		"invalid": "无效重叠"
 	},
+	"health": {
+		"invalid": "无效重叠",
+		"invalidDetail": "有些角片太过靠近（红色区域）。请先将它们分散开来，之后才会进行其它的检查。",
+		"unsolved": "找不到伸展图案",
+		"unsolvedDetail": "有些重叠虽然有效，但可行的伸展折痕图案尚未被实作。请试着调整角片的位置。",
+		"issues": "发现问题：{0}",
+		"uncovered": "未覆盖区域",
+		"uncoveredDetail": "纸张的每个部分都应该被角片或河覆盖。请试着加大角片的长宽、或增加填充空间的角片，以填满黄色的区域。",
+		"dangling": "中断的脊线",
+		"danglingDetail": "有些脊线在纸张内部中断（红点处），没有与其它脊线相接。请试着调整角片的位置以连接所有脊线。",
+		"riverCorner": "不自然的河",
+		"riverCornerDetail": "有些河（如斜线纹路所示）覆盖的区域大于必要的程度，程序无法自动决定出正确的脊线。请试着填补河的多余覆盖区域。",
+		"pass": "布局完全有效",
+		"passDetail": "布局中没有发现任何问题。",
+		"learnMore": "了解更多"
+	},
 	"share": {
 		"title": "分享项目",
 		"copy": "复制",
 		"share": "分享",
-		"message": "快来看我用 Box Pleating Studio 设计的项目「{0}」！"
+		"message": "快来看我用 Box Pleating Studio 设计的项目「{0}」！",
+		"note": "此网址仅供短期分享项目使用，并不保证长期有效。"
 	},
 	"about": {
 		"title": "关于 Box Pleating Studio",
@@ -252,8 +275,10 @@
 		"invalidLink": "打开项目链接时发生意外错误；数据可能已损坏。",
 		"latest": "您已经拥有最新版本的 BP Studio。",
 		"min3vertex": "树状结构至少需要有三个顶点",
+		"nothingCopied": "没有复制任何内容。只有选取范围中与树状结构的其余部分恰好以一条边相连的部分，才能复制或剪切。",
+		"cannotFit": "变换后，选取的对象无法放进纸张范围内。",
 		"oldVersion": "项目「{0}」是使用较旧版本的 BP Studio 创建的，部分设计已被修改。项目会在下次存档时更新为最新格式。",
-		"patternNotFound": "在当前的设计中，存在一些角片重叠是虽然有效、但目前的 BP Studio 却无法找到可行的伸展折痕模式的。本应用的作者将会持续实作更多演算法以涵盖更多情况。",
+		"patternNotFound": "在当前的设计中，存在一些角片重叠是虽然有效、但目前的 BP Studio 却无法找到可行的伸展折痕图案的。本应用的作者将会持续实作更多演算法以涵盖更多情况。",
 		"unsaved": "项目「{0}」有尚未保存的变更，确定要舍弃？",
 		"updateReady": "更新版本的 BP Studio 已准备就绪，并将在重新启动时自动更新。您想要现在立刻重新启动吗？",
 		"restartFail": "无法重新启动。请关闭 BP Studio 的所有实例。",
@@ -294,7 +319,12 @@
 			"_": "导出 CP 文件",
 			"format": "格式",
 			"reorient": "若适用的话重新定向纸张",
-			"useAuxiliary": "使用辅助线（非官方标准）"
+			"hinge": {
+				"_": "枢纽折痕",
+				"auxiliary": "辅助线（非官方标准）",
+				"valley": "谷折线",
+				"none": "不输出"
+			}
 		}
 	},
 	"keyword": {

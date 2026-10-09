@@ -43,13 +43,16 @@ namespace SessionService {
 				const session = JSON.parse(sessionString);
 				const jsons = session.jsons;
 				await Workspace.openMultiple(jsons);
-				if(session.open >= 0) Workspace.select(Workspace.ids.value[session.open]);
+				if(session.open >= 0) {
+					Workspace.select(Workspace.ids.value[session.open]);
+				}
 			}
 		}
 
 		request(sessionReload);
 
-		// The following is the best we can do to ensure session is saved before exiting.
+		// The following is the best we can do to ensure session is saved
+		// before exiting.
 		// See https://developer.chrome.com/blog/page-lifecycle-api/
 		window.setInterval(save, SAVE_INTERVAL);
 		window.addEventListener("pagehide", () => save());
@@ -90,7 +93,10 @@ namespace SessionService {
 
 		const session = {
 			jsons: bp.projects.getSession(Workspace.ids.value),
-			open: openedIndex ?? (Studio.project ? Workspace.projects.value.indexOf(Studio.project) : -1),
+			open: openedIndex ?? (
+				Studio.project ?
+					Workspace.projects.value.indexOf(Studio.project) : -1
+			),
 		};
 		const sessionString = JSON.stringify(session);
 		localStorage.setItem("session", sessionString);
@@ -118,7 +124,9 @@ if(!("locks" in navigator)) {
 	}
 
 	nav.locks = {
-		async request(_: string, options: LockOptions, callback: Action<Promise<void>>): Promise<void> {
+		async request(
+			_: string, options: LockOptions, callback: Action<Promise<void>>
+		): Promise<void> {
 			if(!hasServiceWorker) return;
 			const success = await callService<boolean>(options.steal ? "steal" : "request");
 			if(!success) await check();
@@ -132,9 +140,10 @@ if(!("locks" in navigator)) {
 		async query() {
 			if(!hasServiceWorker) return { held: [] };
 			const count = await new Promise<number>(resolve => {
-				// During the first launch, service worker will take more time to react,
-				// causing timeout. In that case we return falsy result.
-				// It's OK to do so since we won't need to load session on first launch anyway.
+				// During the first launch, service worker will take more time
+				// to react, causing timeout. In that case we return falsy
+				// result. It's OK to do so since we won't need to load
+				// session on first launch anyway.
 				setTimeout(() => resolve(1), SESSION_CHECK_TIMEOUT);
 				callService<number>("query").then(n => resolve(n));
 			});

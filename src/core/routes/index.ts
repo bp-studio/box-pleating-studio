@@ -2,7 +2,8 @@ import type { CoreError } from "shared/json/project";
 import type { UpdateModel } from "core/service/updateModel";
 import type { RouteMap } from "./routes";
 
-type ToPromise<T> = T extends (...args: infer U) => infer R ? (...args: U) => Promise<R> : never;
+type ToPromise<T> = T extends (...args: infer U) => infer R ?
+	(...args: U) => Promise<R> : never;
 
 type Controller<C> = {
 	readonly [A in keyof C]: ToPromise<C[A]>;

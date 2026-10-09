@@ -30,9 +30,3 @@ double RoundedConstraint::constraint(const double *x, double *grad) const {
 	}
 	return d * d - dx * dx - dy * dy;
 }
-
-double RoundedConstraint::exact(const vector<double> &x, const int i, const int j, const int dist, const vector<Flap> &flaps) {
-	auto dx = interval_distance(x[i * 2], flaps[i].width, x[j * 2], flaps[j].width);
-	auto dy = interval_distance(x[i * 2 + 1], flaps[i].height, x[j * 2 + 1], flaps[j].height);
-	return dist * dist - dx * dx - dy * dy;
-}

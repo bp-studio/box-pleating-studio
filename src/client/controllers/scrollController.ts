@@ -9,6 +9,8 @@ import { KeyboardController } from "./keyboardController";
 import { TapController } from "./tapController";
 import { norm } from "shared/types/geometry";
 
+import type { MTEvent } from "./share";
+
 const SCROLL_THRESHOLD = 2;
 
 enum ScrollingState {
@@ -28,7 +30,8 @@ export namespace ScrollController {
 
 	let _scrolling: ScrollingState = ScrollingState.notScrolling;
 
-	// These events must be add to the document instead of the canvas, so that we can capture it all.
+	// These events must be add to the document instead of the canvas, so that
+	// we can capture it all.
 	document.addEventListener("mousemove", pointerMove);
 	document.addEventListener("touchmove", pointerMove);
 	document.addEventListener("mouseup", pointerUp);
@@ -55,10 +58,12 @@ export namespace ScrollController {
 	}
 
 	export function $start(event: Event): void {
-		_scrolling = $isTouch(event) ? ScrollingState.pending : ScrollingState.scrolling;
+		_scrolling = $isTouch(event) ?
+			ScrollingState.pending : ScrollingState.scrolling;
 		display.canvas.style.cursor = "move";
 
-		// Temporarily disable interactivity, avoiding the cursor being changed by Pixi
+		// Temporarily disable interactivity, avoiding the cursor being changed
+		// by Pixi
 		display.$setInteractive(false);
 	}
 
@@ -83,20 +88,29 @@ export namespace ScrollController {
 		return false;
 	}
 
-	function pointerMove(event: MouseEvent | TouchEvent): void {
+	function pointerMove(event: MTEvent): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
 
-		// Handles the scrolling. The last conditions takes care of the possibility that
-		// touches remain very shortly as one release the fingers.
-		if(_scrolling && (event instanceof MouseEvent || event.touches.length >= 2)) {
+		// Handles the scrolling. The last conditions takes care of the
+		// possibility that touches remain very shortly as one release the
+		// fingers.
+		if(
+			_scrolling &&
+			(event instanceof MouseEvent || event.touches.length >= 2)
+		) {
 			const [pt, diff] = CursorController.$diff(event);
 			const dpi = window.devicePixelRatio || 1;
-			if(_scrolling == ScrollingState.scrolling || norm(diff.x, diff.y) / dpi >= SCROLL_THRESHOLD) {
+			if(
+				_scrolling == ScrollingState.scrolling ||
+				norm(diff.x, diff.y) / dpi >= SCROLL_THRESHOLD
+			) {
 				CursorController.$update(pt);
 				_scrolling = ScrollingState.scrolling;
 				TapController.$cancel();
-				sheet.$scroll = display.scrollView.$scrollTo(sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y);
+				sheet.$scroll = display.scrollView.$scrollTo(
+					sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y
+				);
 			}
 			if($isTouch(event)) ZoomController.$process(event);
 
@@ -105,7 +119,7 @@ export namespace ScrollController {
 		}
 	}
 
-	function pointerUp(event: MouseEvent | TouchEvent): void {
+	function pointerUp(event: MTEvent): void {
 		if(
 			$isTouch(event) && event.touches.length == 0 ||
 			event instanceof MouseEvent && event.button == MOUSE_MIDDLE_BUTTON

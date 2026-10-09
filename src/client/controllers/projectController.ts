@@ -5,12 +5,25 @@ import { deepAssign } from "shared/utils/clone";
 import ProjectService from "client/services/projectService";
 import { isContextLost } from "client/screen/contextManager";
 
-import type { JProject, ProjId } from "shared/json";
+import type { JProject, JProjectLike, ProjId } from "shared/json";
+
+/// #if DEBUG
+const HMR_RELOAD_DELAY = 500;
+/// #endif
 
 function createWorker(): Promise<Worker> {
-	// This mechanism of waiting for the worker to get ready is needed only for Safari 11,
-	// and can be dropped in the future.
+	// This mechanism of waiting for the worker to get ready is needed only for
+	// Safari 11, and can be dropped in the future.
 	const worker = new Worker(new URL("core/main.ts", import.meta.url), { name: "core" });
+
+	/// #if DEBUG
+	// Reload the page when the hot update of the Core fails (see core/main.ts).
+	// The delay is for the main thread to finish its own update first.
+	worker.addEventListener("message", e => {
+		if(e.data === "hmr-reload") setTimeout(() => location.reload(), HMR_RELOAD_DELAY);
+	});
+	/// #endif
+
 	return new Promise<Worker>(resolve => {
 		worker.addEventListener("message", () => resolve(worker), { once: true });
 	});
@@ -21,13 +34,13 @@ let __worker: Promise<Worker> | undefined = createWorker();
 
 /// #if DEBUG
 /**
- * For debugging memory leaks. When in debug mode,
- * it prints a message in the console after the {@link Project} has been garbage collected.
- * If the message fails to appear after closing the project and hitting the GC button,
- * we will then have to figure out what is keeping the reference of the project.
+ * For debugging memory leaks. When in debug mode, it prints a message in the
+ * console after the {@link Project} has been garbage collected. If the message
+ * fails to appear after closing the project and hitting the GC button, we will
+ * then have to figure out what is keeping the reference of the project.
  *
- * Since we might run the DEBUG mode in BrowserStack,
- * we also need to consider the case where {@link FinalizationRegistry} is not supported.
+ * Since we might run the DEBUG mode in BrowserStack, we also need to consider
+ * the case where {@link FinalizationRegistry} is not supported.
  */
 const registry = typeof FinalizationRegistry == "undefined" ? null :
 	// eslint-disable-next-line compat/compat
@@ -36,7 +49,8 @@ const registry = typeof FinalizationRegistry == "undefined" ? null :
 
 //=================================================================
 /**
- * {@link ProjectController} manages the creation of {@link Project} and the corresponding Core worker.
+ * {@link ProjectController} manages the creation of {@link Project} and the
+ * corresponding Core worker.
  */
 //=================================================================
 
@@ -60,7 +74,9 @@ export namespace ProjectController {
 	}
 
 	export function getSession(ids: readonly ProjId[]): JProject[] {
-		return ids.map(id => projectMap.get(id)?.toJSON(true) ?? fallbackMap[id]);
+		return ids.map(
+			id => projectMap.get(id)?.toJSON(true) ?? fallbackMap[id]
+		);
 	}
 
 	/** Returns the standing-by worker, or create a new worker. */
@@ -72,15 +88,17 @@ export namespace ProjectController {
 
 	/**
 	 * Creates a new {@link Project}.
-	 * The passed-in data will be deeply assigned on the template project instead of passing through migration.
+	 * The passed-in data will be deeply assigned on the template project
+	 * instead of passing through migration.
 	 */
-	export function create(json: RecursivePartial<JProject>): Promise<ProjId> {
-		json = deepAssign<RecursivePartial<JProject>>({
+	export function create(json: JProjectLike): Promise<ProjId> {
+		json = deepAssign<JProjectLike>({
 			design: {
 				layout: {
-					// In the old architecture, this part will be determined automatically,
-					// but the new architecture has a different order of passing data,
-					// so this part is needed from the beginning.
+					// In the old architecture, this part will be determined
+					// automatically, but the new architecture has a different
+					// order of passing data, so this part is needed from the
+					// beginning.
 					flaps: [
 						{ id: 1, x: 8, y: 10, width: 0, height: 0 },
 						{ id: 2, x: 8, y: 6, width: 0, height: 0 },
@@ -103,13 +121,14 @@ export namespace ProjectController {
 	}
 
 	/**
-	 * Opens an old project. Passed-in data will go through {@link Migration} and updated to the latest format.
+	 * Opens an old project. Passed-in data will go through {@link Migration}
+	 * and updated to the latest format.
 	 */
 	export function open(json: Pseudo<JProject>): Promise<ProjId> {
 		return makeProject(Migration.$process(json));
 	}
 
-	async function makeProject(json: RecursivePartial<JProject>): Promise<ProjId> {
+	async function makeProject(json: JProjectLike): Promise<ProjId> {
 		// Handling context loss, in which case we don't actually construct
 		// a Project instance, but just keep the JSON data for session saving.
 		if(isContextLost()) {
@@ -129,7 +148,8 @@ export namespace ProjectController {
 	}
 
 	/**
-	 * Close an opened project, releasing the corresponding worker and all its memory.
+	 * Close an opened project, releasing the corresponding worker and all its
+	 * memory.
 	 *
 	 * If all projects are closed, it creates a new standing-by worker.
 	 */

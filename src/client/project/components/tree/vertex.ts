@@ -26,7 +26,8 @@ import type { JVertex, Memento, NodeId } from "shared/json";
  * {@link Vertex} is the control for the tree vertices.
  */
 //=================================================================
-export class Vertex extends Independent implements DragSelectable, LabelView, ISerializable<JVertex> {
+export class Vertex extends Independent
+	implements DragSelectable, LabelView, ISerializable<JVertex> {
 
 	public readonly $tag: string;
 	public readonly type = "Vertex";
@@ -80,10 +81,13 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this._location = { x: json.x, y: json.y };
 		this._name = new Field(this, "name", json.name);
 
-		this._dot = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.vertex]);
+		this._dot = this.$addRootObject(
+			new ScaledSmoothGraphics(), sheet.$layers[Layer.vertex]
+		);
 		this.$setupHit(this._dot, new Circle(0, 0, style.vertex.size * 2));
 
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
+		this.$label =
+			this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
 
 		this.$reactDraw(this._draw, this._drawLabel);
 	}
@@ -103,9 +107,9 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		return [this.$tag, json];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _name!: Field<string>;
 	public get name(): string { return this._name.value; }
@@ -142,16 +146,18 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 		this._tree.$goToDual([this]);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Control methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get $anchor(): IPoint {
 		return this._location;
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		return constrainVertex(p => this._sheet.grid.$constrain(p), this._location, v);
+		return constrainVertex(
+			p => this._sheet.grid.$constrain(p), this._location, v
+		);
 	}
 
 	public override $selectableWith(c: Control): boolean {
@@ -174,27 +180,38 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 			if(!flap) {
 				this.$isNew = false;
 			} else {
-				const p = getRelativePoint(this._location, this._sheet, layout.$sheet);
+				const p = getRelativePoint(
+					this._location, this._sheet, layout.$sheet
+				);
 				return flap.$sync(p);
 			}
 		}
-		// If we get here, the Core will not be invoked, and we need to flush the history manually.
+		// If we get here, the Core will not be invoked, and we need to flush
+		// the history manually. But if other vertices moved together are
+		// syncing their flaps (as in rotating a new tree), the history will be
+		// flushed after the Core updates, so that all the moves are recorded
+		// in one step.
 		return pendingFlush ||= Promise.resolve().then(() => {
 			pendingFlush = undefined;
+			const design = this.$project.design;
+			if(design.$batchUpdateManager.$isPending) return;
 			this.$project.history.$flush();
 		});
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public $drawDot(graphics: SmoothGraphicsLike): void {
 		const s = ProjectService.scale.value;
-		const width = this.$selected || this.$hovered ? style.vertex.hover : style.vertex.width;
+		const width = this.$selected || this.$hovered ?
+			style.vertex.hover : style.vertex.width;
 		const size = style.vertex.size * ProjectService.getSmoothShrinkFactor();
+		const color = this.$selected ?
+			style.vertex.selected : style.vertex.color;
 		graphics.clear()
-			.lineStyle(width, this.$selected ? style.vertex.selected : style.vertex.color)
+			.lineStyle(width, color)
 			.beginFill(style.vertex.fill)
 			.drawCircle(this._location.x, this._location.y, size / s)
 			.endFill();
@@ -203,7 +220,9 @@ export class Vertex extends Independent implements DragSelectable, LabelView, IS
 	private _draw(): void {
 		this.$drawDot(this._dot);
 		const s = ProjectService.scale.value;
-		this._dot.hitArea = new Circle(this._location.x * s, this._location.y * s, style.vertex.size * 2);
+		this._dot.hitArea = new Circle(
+			this._location.x * s, this._location.y * s, style.vertex.size * 2
+		);
 	}
 
 	private _drawLabel(): void {

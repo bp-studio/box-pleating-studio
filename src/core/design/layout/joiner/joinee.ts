@@ -3,11 +3,11 @@ import { Direction } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
 import { Gadget } from "../pattern/gadget";
 import { isInside } from "core/math/geometry/winding";
+import { Point } from "core/math/geometry/point";
 
 import type { Path } from "shared/types/geometry";
 import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Line } from "core/math/geometry/line";
-import type { Point } from "core/math/geometry/point";
 import type { JAnchor, JGadget } from "shared/json";
 import type { QuadrantDirection } from "shared/types/direction";
 import type { Piece } from "../pattern/piece";
@@ -49,8 +49,11 @@ export class Joinee {
 	}
 
 	public $setupDetour(rawDetour: RationalPath, reverse: boolean): void {
-		const detour: Path = rawDetour.map(p => p.$add(this._v).$toIPoint());
-		detour.push(this._pt);
+		// The detours are in the coordinates before the shift of the piece
+		const shift = new Vector(this.p.shift ?? { x: 0, y: 0 });
+		const v = this._v.$add(shift.$neg);
+		const detour: Path = rawDetour.map(p => p.$add(v).$toIPoint());
+		detour.push(new Point(this._pt).$add(shift.$neg).$toIPoint());
 		if(reverse) detour.reverse();
 		this.p.$clearDetour();
 		this.p.$addDetour(detour);
@@ -65,11 +68,14 @@ export class Joinee {
 	 * TODO: But do such non-simple gadget make sense in practice?
 	 */
 	public $contains(p: Point): boolean {
-		// The shape of this.p could be dirty here, so we need to use $originalContour
+		// The shape of this.p could be dirty here,
+		// so we need to use $originalContour
 		return isInside(p.$add(this._v), this.p.$originalContour);
 	}
 
-	public $toGadget(shouldClone: boolean, oriented: boolean, offset?: IPoint): JGadget {
+	public $toGadget(
+		shouldClone: boolean, oriented: boolean, offset?: IPoint
+	): JGadget {
 		let off: IPoint | undefined = this._offset;
 		if(offset) {
 			off = { x: off.x + offset.x, y: off.y + offset.y };
@@ -95,7 +101,9 @@ export class Joinee {
 	}
 
 	public $isSteeperThan(that: Joinee): boolean {
-		return this.p.$direction.value.$slope.gt(that.p.$direction.value.$slope);
+		return this.p.$direction.value.$slope.gt(
+			that.p.$direction.value.$slope
+		);
 	}
 
 	public $setupAnchor(upperLeft: boolean, anchor: Point): void {

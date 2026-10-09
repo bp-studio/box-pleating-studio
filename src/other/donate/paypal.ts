@@ -34,7 +34,9 @@ function onApprove(details: PayPal.OrderResponseBody, store: Store): void {
 	store.step.value = 2;
 }
 
-export function initPayPalButton(init: (action: PayPal.OnInitActions) => void, store: Store): void {
+export function initPayPalButton(
+	init: (action: PayPal.OnInitActions) => void, store: Store
+): void {
 	if(typeof paypal === "undefined") {
 		setTimeout(() => initPayPalButton(init, store), 0);
 		return;
@@ -59,17 +61,26 @@ export function initPayPalButton(init: (action: PayPal.OnInitActions) => void, s
 		onClick() {
 			if(!store.amount.value) return;
 			purchase_units[0].description = "Supporting Box Pleating Studio";
-			purchase_units[0].amount.value = (store.amount.value + store.extra.value).toFixed(2);
+			purchase_units[0].amount.value =
+				(store.amount.value + store.extra.value).toFixed(2);
 		},
-		createOrder(data: Record<string, unknown>, actions: PayPal.CreateOrderActions) {
+		createOrder(
+			data: Record<string, unknown>, actions: PayPal.CreateOrderActions
+		) {
 			store.processing.value = true;
 			return actions.order.create({ intent: "AUTHORIZE", purchase_units });
 		},
-		onApprove(data: Record<string, unknown>, actions: PayPal.OnApproveActions): Promise<void> {
+		onApprove(
+			data: Record<string, unknown>, actions: PayPal.OnApproveActions
+		): Promise<void> {
 			if(!actions.order) return Promise.resolve();
-			return actions.order!.capture().then((details: PayPal.OrderResponseBody) => onApprove(details, store));
+			return actions.order!.capture().then(
+				(details: PayPal.OrderResponseBody) => onApprove(details, store)
+			);
 		},
-		onCancel(data: Record<string, unknown>, actions: PayPal.OnCancelledActions) {
+		onCancel(
+			data: Record<string, unknown>, actions: PayPal.OnCancelledActions
+		) {
 			store.processing.value = false;
 		},
 	}).render("#paypal-button-container");

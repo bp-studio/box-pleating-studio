@@ -1,4 +1,4 @@
-import { Assertion } from "chai";
+import { expect } from "@rstest/core";
 
 import { Line } from "core/math/geometry/line";
 import { pointToString } from "core/math/geometry/path";
@@ -17,20 +17,23 @@ declare global {
 	}
 }
 
-Assertion.addMethod("containLine", function(line: ILine) {
-	new Assertion(Array.isArray(this._obj)).to.be.true;
+expect.extend({
+	containLine(received, line: ILine) {
+		expect(Array.isArray(received)).to.be.true;
 
-	const match = this._obj.find((l: ILine) =>
-		same(line[0], l[0]) && same(line[1], l[1]) ||
-		same(line[0], l[1]) && same(line[1], l[0])
-	);
+		const match = received.find((l: ILine) =>
+			same(line[0], l[0]) && same(line[1], l[1]) ||
+			same(line[0], l[1]) && same(line[1], l[0])
+		);
 
-	this.assert(
-		match !== undefined,
-		"expect the array to contain #{exp}",
-		"expect the array to not contain #{exp}",
-		pointToString(line[0]) + "-" + pointToString(line[1])
-	);
+		const lineString = pointToString(line[0]) + "-" + pointToString(line[1]);
+		return {
+			pass: match !== undefined,
+			message: () => match ?
+				`expect the array to not contain ${lineString}` :
+				`expect the array to contain ${lineString}`,
+		};
+	},
 });
 
 export function parseLine(line: string) {
@@ -40,7 +43,11 @@ export function parseLine(line: string) {
 	return new Line(p1, p2);
 }
 
-export function makeCPLine(type: CreaseType, x1: number, y1: number, x2: number, y2: number): CPLine {
+export function makeCPLine(
+	type: CreaseType,
+	x1: number, y1: number,
+	x2: number, y2: number
+): CPLine {
 	return {
 		type,
 		p1: { x: x1, y: y1 },

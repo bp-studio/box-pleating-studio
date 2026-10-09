@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { describe, it, expect } from "@rstest/core";
 
 import { parsePath } from "@utils/path";
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
@@ -9,11 +9,11 @@ import { makeCPLine } from "@utils/line";
 
 import type { OverlapIntersector } from "core/math/sweepLine/clip/overlapIntersector";
 
-export default function() {
+describe("Sweep-line algorithms", () => {
 
-	describe("Stacking", function() {
+	describe("Stacking", () => {
 
-		it("Groups paths into outer and inner paths", function() {
+		it("Groups paths into outer and inner paths", () => {
 			const result = new Stacking().$get(
 				parsePath("(0,0),(5,0),(5,5),(0,5)"),
 				parsePath("(1,1),(1,4),(4,4),(4,1)"),
@@ -28,9 +28,9 @@ export default function() {
 
 	});
 
-	describe("Clipping", function() {
+	describe("Clipping", () => {
 
-		it("Clips lines in given boundary and subdivides all lines", function() {
+		it("Clips lines in given boundary and subdivides all lines", () => {
 			const result = new Clip().$get([
 				makeCPLine(CreaseType.Border, 1, 1, 5, 1),
 				makeCPLine(CreaseType.Border, 5, 1, 5, 5),
@@ -47,11 +47,28 @@ export default function() {
 			expect(valley.length).to.equal(2);
 		});
 
+		it("Subdivides lines containing other collinear lines", () => {
+			// The contained line comes first, so it is the earlier one in the
+			// status even though it starts later in the sweep.
+			const result = new Clip().$get([
+				makeCPLine(CreaseType.Border, 0, 0, 10, 0),
+				makeCPLine(CreaseType.Border, 10, 0, 10, 10),
+				makeCPLine(CreaseType.Border, 0, 10, 10, 10),
+				makeCPLine(CreaseType.Border, 0, 0, 0, 10),
+				makeCPLine(CreaseType.Mountain, 5, 5, 4, 4),
+				makeCPLine(CreaseType.Mountain, 6, 6, 1, 1),
+			]);
+			const mountain = result
+				.filter(l => l.type == CreaseType.Mountain)
+				.map(l => [l.p1.x, l.p2.x].sort((a, b) => a - b));
+			expect(mountain).to.have.deep.members([[1, 4], [4, 5], [5, 6]]);
+		});
+
 	});
 
-	describe("Overlap detection", function() {
+	describe("Overlap detection", () => {
 
-		it("Detects if two polygon overlaps", function() {
+		it("Detects if two polygon overlaps", () => {
 			const result = Overlap.$test(parsePath("(0,1),(2,1),(2,3),(0,3)"), parsePath("(1,0),(3,1),(3,2),(1,2)"));
 			expect(result).to.be.true;
 
@@ -60,7 +77,7 @@ export default function() {
 		});
 
 		/** v0.6.17, see {@link OverlapIntersector.$possibleIntersection}. */
-		it("Ignores self-intersections resulting from floating error", function() {
+		it("Ignores self-intersections resulting from floating error", () => {
 			const result = Overlap.$test(
 				parsePath("(1019/16,907/16),(1131/16,2139/16),(1611/16,2539/16),(1499/16,1307/16)"),
 				parsePath("(28,109),(61,131),(42,36),(1375/31,1130/31),(8,9)")
@@ -70,4 +87,4 @@ export default function() {
 
 	});
 
-}
+});

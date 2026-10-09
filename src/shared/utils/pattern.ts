@@ -1,5 +1,6 @@
 /**
- * Convert overlap id back and forth to the index within {@link Configuration.$overlaps}.
+ * Convert overlap id back and forth to the index within
+ * {@link Configuration.$overlaps}.
  *
  * @param code The id/index to convert.
  * It allows the possibility of type undefined for ease of use

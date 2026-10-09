@@ -14,10 +14,15 @@ export class Initializer {
 
 	private readonly _constructor: LineConstructor;
 
-	/** The comparator used in determine the direction of a line during {@link $init}. */
+	/**
+	 * The comparator used in determine the direction of a line during
+	 * {@link $init}.
+	 */
 	private readonly _comparator: Comparator<IPoint>;
 
-	constructor(lineConstructor: LineConstructor, comparator: Comparator<IPoint>) {
+	constructor(
+		lineConstructor: LineConstructor, comparator: Comparator<IPoint>
+	) {
 		this._constructor = lineConstructor;
 		this._comparator = comparator;
 	}

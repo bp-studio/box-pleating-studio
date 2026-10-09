@@ -5,7 +5,7 @@ import { Line } from "core/math/geometry/line";
 import { Point } from "core/math/geometry/point";
 import { CornerType } from "shared/json";
 import { Vector } from "core/math/geometry/vector";
-import { getNodeId, getQuadrant, opposite } from "shared/types/direction";
+import { Direction, getNodeId, getQuadrant, opposite } from "shared/types/direction";
 import { toPath } from "core/math/geometry/rationalPath";
 import { convertIndex } from "shared/utils/pattern";
 
@@ -14,12 +14,16 @@ import type { CornerMap, Partition } from "../partition";
 import type { JDevice, JConnection, JCorner, OverlapId } from "shared/json";
 import type { Contour, ILine } from "shared/types/geometry";
 import type { Region } from "./region";
+import type { RationalPath } from "core/math/geometry/rationalPath";
 import type { Pattern } from "./pattern";
 
 export interface Ridge extends Line {
 	$type?: CornerType;
 
-	/** The {@link TreeNode.id}s of the the two flaps separated by the intersection ridge. */
+	/**
+	 * The {@link TreeNode.id}s of the the two flaps separated by the
+	 * intersection ridge.
+	 */
 	$division?: [number, number];
 }
 
@@ -38,7 +42,8 @@ export class Device implements ISerializable<JDevice> {
 	private readonly _regions: readonly Region[];
 
 	/**
-	 * For each {@link Gadget} in {@link $gadgets}, list all its anchor point locations.
+	 * For each {@link Gadget} in {@link $gadgets}, list all its anchor point
+	 * locations.
 	 * This is available only after the {@link Device} has been initialized,
 	 * so we cannot use this during positioning.
 	 */
@@ -79,7 +84,8 @@ export class Device implements ISerializable<JDevice> {
 		return {
 			gadgets: this.$gadgets.map(g => g.toJSON()),
 			offset: this.$offset,
-			addOns: this.$addOns.length ? this.$addOns.map(a => a.toJSON()) : undefined,
+			addOns: this.$addOns.length ?
+				this.$addOns.map(a => a.toJSON()) : undefined,
 		};
 	}
 
@@ -98,14 +104,16 @@ export class Device implements ISerializable<JDevice> {
 		this.$location = { x: v * x, y: v * y };
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Public members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Update parameters after the {@link Device} have moved. */
 	public $updatePosition(): void {
 		// Update delta
-		const origin = this.$pattern.$config.$repo.$origin.$add(this._originalDisplacement);
+		const origin = this.$pattern.$config.$repo.$origin.$add(
+			this._originalDisplacement
+		);
 		this._delta = origin.$add(new Vector(this.$location)).$sub(Point.ZERO);
 
 		// Update anchors
@@ -125,17 +133,20 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All ridges that should be drawn. */
 	public get $drawRidges(): readonly ILine[] {
-		const ridges = this._ridges.filter(r => r.$type != CornerType.intersection);
+		return this.$ridgeLines.map(l => l.$toILine());
+	}
+
+	/** Same as {@link $drawRidges}, but in the original rational form. */
+	public get $ridgeLines(): readonly Line[] {
+		const ridges: Line[] =
+			this._ridges.filter(r => r.$type != CornerType.intersection);
 		for(const map of this.$partition.$externalCornerMaps.value) {
 			if(map.corner.type != CornerType.intersection) continue;
 			const from = this.$resolveCornerMap(map);
 			const to = this.$partition.$getExternalConnectionTarget(from, map);
-			if(to) {
-				const ridge = new Line(from, to) as Ridge;
-				ridges.push(ridge);
-			}
+			if(to) ridges.push(new Line(from, to));
 		}
-		return ridges.map(l => l.$toILine());
+		return ridges;
 	}
 
 	/** All ridges used for tracing */
@@ -146,35 +157,51 @@ export class Device implements ISerializable<JDevice> {
 
 	/** All axis-parallel creases that should be drawn. */
 	public get $axisParallels(): readonly ILine[] {
+		return this.$axisParallelLines.map(l => l.$toILine());
+	}
+
+	/** Same as {@link $axisParallels}, but in the original rational form. */
+	public get $axisParallelLines(): readonly Line[] {
 		const result: Line[] = [];
 		for(const r of this._regions) {
 			for(const l of r.$axisParallels.value) {
 				result.push(this._transform(l));
 			}
 		}
-		return result.map(l => l.$toILine());
+		return result;
 	}
 
 	/** Contours for the devices. Used for drawing selection shade. */
 	public get $contour(): readonly Contour[] {
-		return this._regions.map(r => ({
-			outer: toPath(r.$shape.value.contour.map(p => this._transform(p))),
-		}));
+		return this.$regionPaths.map(path => ({ outer: toPath(path) }));
+	}
+
+	/** The outlines of the regions of the device. */
+	public get $regionPaths(): readonly RationalPath[] {
+		return this._regions.map(
+			r => r.$shape.value.contour.map(p => this._transform(p))
+		);
 	}
 
 	/** The lower and upper bounds of x-coordinate that can be dragged. */
 	public $getDraggingRange(): readonly [number, number] {
 		const fx = this.$pattern.$config.$repo.$f.x;
-		const result = [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY] as [number, number];
+		const result = [
+			Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY,
+		] as [number, number];
 		for(const c of this.$partition.$constraints.value) {
 			const isOut = c.corner.type != CornerType.socket;
 			const q = isOut ? c.anchorIndex : opposite(c.corner.q!);
 			const f = fx * (q == 0 ? -1 : 1);
-			const target = this.$pattern.$getConnectionTarget(c.corner as JConnection);
-			const selfSlack = this.$gadgets[c.overlapIndex].$slack.value[c.anchorIndex];
+			const target =
+				this.$pattern.$getConnectionTarget(c.corner as JConnection);
+			const selfSlack =
+				this.$gadgets[c.overlapIndex].$slack.value[c.anchorIndex];
 			const targetSlack = c.corner.e !== undefined && c.corner.e < 0 ?
-				this.$pattern.$gadgets[convertIndex(c.corner.e)].$slack.value[c.corner.q!] : 0;
-			const slack = isOut && c.corner.type !== CornerType.internal ? selfSlack : targetSlack + selfSlack;
+				this.$pattern.$gadgets[convertIndex(c.corner.e)]
+					.$slack.value[c.corner.q!] : 0;
+			const slack = isOut && c.corner.type !== CornerType.internal ?
+				selfSlack : targetSlack + selfSlack;
 			const bound = target.x - this.$resolveCornerMap(c).x - slack * f;
 			if(f > 0 && result[1] > bound) result[1] = bound;
 			else if(f < 0 && result[0] < bound) result[0] = bound;
@@ -182,11 +209,31 @@ export class Device implements ISerializable<JDevice> {
 		return result;
 	}
 
+	/** Whether the device is relayed at both ends (see jointPositioner). */
+	public get $isBridge(): boolean {
+		const c = this.$partition.$overlaps[0].c;
+		return c[Direction.UR].type == CornerType.internal &&
+			c[Direction.LL].type == CornerType.internal;
+	}
+
+	/** Move the device to the middle of its dragging range. */
+	public $center(): void {
+		const [lo, hi] = this.$getDraggingRange();
+		if(!Number.isFinite(lo) || !Number.isFinite(hi)) return;
+		const dx = Math.floor((lo + hi) / 2);
+		if(dx == 0) return;
+		const { x, y } = this.$pattern.$config.$repo.$f;
+		const location = this.$location;
+		this.$location = { x: location.x + dx, y: location.y + dx * x * y };
+		this.$updatePosition();
+	}
+
 	public $getConnectionRidges(internalOnly: boolean): Ridge[] {
 		const result: Line[] = [];
 		for(const [i, ov] of this.$partition.$overlaps.entries()) {
 			for(const [q, c] of ov.c.entries()) {
-				if(c.type == CornerType.flap && !internalOnly || c.type == CornerType.internal) {
+				const includeFlap = c.type == CornerType.flap && !internalOnly;
+				if(includeFlap || c.type == CornerType.internal) {
 					result.push(new Line(
 						this.$anchors[i][q],
 						this.$pattern.$getConnectionTarget(c as JConnection)
@@ -201,9 +248,9 @@ export class Device implements ISerializable<JDevice> {
 		return this.$anchors[map.overlapIndex][map.anchorIndex];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _transform<T extends Point | Line>(obj: T): T {
 		const f = this.$pattern.$config.$repo.$f;
@@ -214,7 +261,8 @@ export class Device implements ISerializable<JDevice> {
 	private get _ridges(): readonly Ridge[] {
 		if(this._ridgeCache) return this._ridgeCache;
 		const neighborRidges = this._neighbors.value.flatMap(g => g._rawRidges);
-		return this._ridgeCache = Line.$subtract(this._rawRidges, neighborRidges);
+		return this._ridgeCache =
+			Line.$subtract(this._rawRidges, neighborRidges);
 	}
 
 	/**
@@ -225,13 +273,16 @@ export class Device implements ISerializable<JDevice> {
 		const result: Line[] = [];
 		for(const region of this._regions) {
 			const parallelRegions = this._regions.filter(
-				q => q != region && q.$direction.value.$parallel(region.$direction.value)
+				q => q != region &&
+					q.$direction.value.$parallel(region.$direction.value)
 			);
 
 			// Ridges that are perpendicular to the axis-parallel creases
 			// should not be eliminated (this happens in meandering)
 			const lines = parallelRegions.flatMap(
-				q => q.$shape.value.ridges.filter(l => !l.$perpendicular(q.$direction.value))
+				q => q.$shape.value.ridges.filter(
+					l => !l.$perpendicular(q.$direction.value)
+				)
 			);
 
 			result.push(...Line.$subtract(region.$shape.value.ridges, lines));
@@ -246,8 +297,10 @@ export class Device implements ISerializable<JDevice> {
 		const result = new Set<Device>();
 		for(const o of this.$partition.$overlaps) {
 			for(const corner of o.c) {
-				if(corner.type == CornerType.socket || corner.type == CornerType.internal) {
-					const [i] = this.$partition.$configuration.$overlapMap.get(corner.e as OverlapId)!;
+				const type = corner.type;
+				if(type == CornerType.socket || type == CornerType.internal) {
+					const map = this.$partition.$configuration.$overlapMap;
+					const [i] = map.get(corner.e as OverlapId)!;
 					result.add(this.$pattern.$devices[i]);
 				}
 			}
@@ -267,8 +320,8 @@ export class Device implements ISerializable<JDevice> {
 		const result = this.$getConnectionRidges(false);
 		for(const map of this.$partition.$externalCornerMaps.value) {
 			const from = this.$resolveCornerMap(map);
-			const dir = this._resolveCornerDirection(map.corner);
-			const to = this.$partition.$getExternalConnectionTarget(from, map, dir);
+			const to =
+				this.$partition.$getExternalConnectionTarget(from, map, true);
 			if(to) {
 				const ridge = new Line(from, to) as Ridge;
 				ridge.$type = map.corner.type; // Mark the ridge type
@@ -281,33 +334,25 @@ export class Device implements ISerializable<JDevice> {
 		return result;
 	}
 
-	private _resolveCornerDirection(corner: JCorner): QuadrantDirection | undefined {
-		if(corner.type != CornerType.intersection) return undefined;
-		const codes = this.$partition.$configuration.$repo.$quadrants.keys();
-		for(const code of codes) {
-			if(getNodeId(code) == corner.e) return getQuadrant(code);
-		}
-		/* istanbul ignore next: type-safety */
-		return undefined;
-	}
-
 	private _clearCache(): void {
 		this._ridgeCache = undefined;
 		this._rawRidgeCache = undefined;
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Static methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Generate a signature for a given list of {@link JDevice},
 	 * disregarding positional information.
 	 */
 	public static $getSignature(devices: readonly JDevice[]): string {
-		// The given devices could consist of Gadget instances (for example, those generated in searching),
-		// so we go through JSON to make a plain deep copy, which invokes their toJSON methods.
-		// Cloning the instances directly would include their caches (see Gadget.toJSON).
+		// The given devices could consist of Gadget instances (for example,
+		// those generated in searching), so we go through JSON to make a plain
+		// deep copy, which invokes their toJSON methods.
+		// Cloning the instances directly would include their caches
+		// (see Gadget.toJSON).
 		devices = JSON.parse(JSON.stringify(devices)) as JDevice[];
 		for(const device of devices) {
 			device.gadgets.forEach(g => Gadget.$simplify(g));

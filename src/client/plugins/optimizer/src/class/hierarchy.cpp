@@ -41,13 +41,12 @@ Hierarchy::Hierarchy(const emscripten::val &data, const Sheet *sheet): sheet(she
 	}
 }
 
-ConstraintList Hierarchy::generate_constraints(const vector<bool> *fixed) const {
+ConstraintList Hierarchy::generate_constraints() const {
 	ConstraintList cons;
-	sheet->add_bounds(cons, flaps, fixed);
+	sheet->add_bounds(cons, flaps);
 
 	for(const auto &entry: dist_map) {
 		auto [i, j, dist] = entry;
-		if(fixed && (*fixed)[i] && (*fixed)[j]) continue;
 		if(flaps[i].has_dimension() || flaps[j].has_dimension()) {
 			cons.emplace_back(make_unique<RoundedConstraint>(i, j, dist, &flaps));
 		} else {
@@ -55,18 +54,6 @@ ConstraintList Hierarchy::generate_constraints(const vector<bool> *fixed) const 
 		}
 	}
 	return cons;
-}
-
-bool Hierarchy::check(const vector<double> &x, const int n, const vector<bool> &fixed) const {
-	if(!sheet->check_bounds(x, n, flaps)) return false;
-
-	for(const auto &entry: dist_map) {
-		auto [i, j, dist] = entry;
-		if(i == n && fixed[j] || j == n && fixed[i]) {
-			if(RoundedConstraint::exact(x, i, j, dist, flaps) > 0) return false;
-		}
-	}
-	return true;
 }
 
 const Parent *Hierarchy::get_parent(const int id) const {

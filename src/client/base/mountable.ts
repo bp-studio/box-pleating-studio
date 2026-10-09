@@ -66,7 +66,10 @@ export abstract class Mountable extends Destructible {
 		return this._active;
 	}
 
-	/** Add child objects; the significance of child objects is that they will be destructed together. */
+	/**
+	 * Add child objects; the significance of child objects is that they will be
+	 * destructed together.
+	 */
 	public $addChild(child: Mountable): void {
 		child._parentIsNullOrMounted = this.$mounted;
 		child._updateMountedState();

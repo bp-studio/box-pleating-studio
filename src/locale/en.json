@@ -68,6 +68,9 @@
 			"redo": "Redo",
 			"selectAll": "Select all",
 			"unselectAll": "Unselect all",
+			"cut": "Cut",
+			"copy": "Copy",
+			"paste": "Paste",
 			"subdivide": "Subdivide grid",
 			"rotate_right": "Rotate right",
 			"rotate_left": "Rotate left",
@@ -90,7 +93,9 @@
 		},
 		"tools": {
 			"title": "Tools",
-			"TreeMaker": "Import TreeMaker file"
+			"TreeMaker": "Import TreeMaker file",
+			"health": "Check layout",
+			"healthOff": "Exit layout check"
 		},
 		"help": {
 			"title": "Help",
@@ -128,6 +133,7 @@
 			"ridge": "Ridge creases",
 			"axisParallel": "Axis-parallel creases",
 			"overlap": "Overlapping",
+			"uncovered": "Uncovered regions",
 			"tip": "Flap tips",
 			"label": "Text label"
 		},
@@ -215,11 +221,28 @@
 	"status": {
 		"invalid": "Invalid overlaps"
 	},
+	"health": {
+		"invalid": "Invalid overlaps",
+		"invalidDetail": "Some flaps are too close to each other (the red regions). Spread them out first; the other checks will be performed afterwards.",
+		"unsolved": "Stretch patterns not found",
+		"unsolvedDetail": "Some overlaps are valid, but no stretch patterns have been implemented for them yet. Try adjusting the positions of the flaps.",
+		"issues": "Issues found: {0}",
+		"uncovered": "Uncovered regions",
+		"uncoveredDetail": "Every part of the sheet should be covered by flaps or rivers. Try increasing the width or height of the flaps, or adding flaps to fill the space, so that the yellow regions are filled.",
+		"dangling": "Broken ridges",
+		"danglingDetail": "Some ridges break off inside the sheet (at the red dots) without meeting other ridges. Try adjusting the positions of the flaps so that all ridges are connected.",
+		"riverCorner": "Unnatural rivers",
+		"riverCornerDetail": "Some rivers (shown with stripes) cover more regions than necessary, so the correct ridges cannot be determined automatically. Try filling the excess regions covered by the rivers.",
+		"pass": "The layout is fully valid",
+		"passDetail": "No issues are found in the layout.",
+		"learnMore": "Learn more"
+	},
 	"share": {
 		"title": "Share project",
 		"copy": "Copy",
 		"share": "Share",
-		"message": "Check out my project \"{0}\" designed with Box Pleating Studio!"
+		"message": "Check out my project \"{0}\" designed with Box Pleating Studio!",
+		"note": "This link is intended for short-term sharing of the project only, and is not guaranteed to remain valid in the long term."
 	},
 	"about": {
 		"title": "About Box Pleating Studio",
@@ -252,6 +275,8 @@
 		"invalidLink": "Unexpected error occurred upon opening the project link; the data might be corrupted.",
 		"latest": "You already have the latest version of BP Studio.",
 		"min3vertex": "The tree needs to have at least 3 vertices.",
+		"nothingCopied": "Nothing was copied. Only the parts of the selection attached to the rest of the tree by exactly one edge can be copied or cut.",
+		"cannotFit": "The selection cannot fit in the sheet after the transformation.",
 		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and part of the design has been modified. It will be updated to the latest format on the next saving.",
 		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
 		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?",
@@ -294,7 +319,12 @@
 			"_": "Export CP file",
 			"format": "Format",
 			"reorient": "Reorient the sheet if applicable",
-			"useAuxiliary": "Use auxiliary lines (unofficial standard)"
+			"hinge": {
+				"_": "Hinge creases",
+				"auxiliary": "Auxiliary lines (unofficial standard)",
+				"valley": "Valley folds",
+				"none": "Omit"
+			}
 		}
 	},
 	"keyword": {

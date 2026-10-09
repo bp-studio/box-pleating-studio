@@ -13,10 +13,12 @@ class Rect: public Sheet {
 	Rect(const Rect &) = delete;
 	Rect &operator=(const Rect &) = delete;
 
-	void enlarge_if_necessary(vector<double> &xk, const double x, const double y) const override;
-	void add_bounds(ConstraintList &cons, const vector<Flap> &flaps, const vector<bool> *fixed) const override;
-	bool check_bounds(const vector<double> &xk, const int n, const vector<Flap> &flaps) const override;
-	vector<int> output(const vector<double> &solution) const override;
+	void add_bounds(ConstraintList &cons, const vector<Flap> &flaps) const override;
+
+	int size_step() const override { return 1; }
+	int ceil_size(const double size) const override;
+	bool int_contains(const int x, const int y, const Flap &flap, const int size) const override;
+	vector<int> int_output(const vector<int> &grid, const vector<Flap> &flaps) const override;
 
   private:
 	Rect(): Sheet(0) {} // No offset

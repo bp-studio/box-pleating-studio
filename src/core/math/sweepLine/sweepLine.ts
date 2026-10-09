@@ -37,14 +37,15 @@ export abstract class SweepLine {
 	protected readonly _provider: EventProvider;
 
 	/**
-	 * Event queue is an {@link IHeap} that stores all the future {@link SweepEvent}s
-	 * that have not yet occurred at the current stage of sweeping.
-	 * The events will be popped one by one from the queue and processed.
+	 * Event queue is an {@link IHeap} that stores all the future
+	 * {@link SweepEvent}s that have not yet occurred at the current stage of
+	 * sweeping. The events will be popped one by one from the queue and
+	 * processed.
 	 */
 	protected readonly _eventQueue: EventQueue;
 
 	/** The current intersection state of sweeping. */
-	protected readonly _status: IBinarySearchTree<StartEvent>;
+	protected _status: IBinarySearchTree<StartEvent>;
 
 	constructor(provider: EventProvider) {
 		this._provider = provider;
@@ -52,9 +53,9 @@ export abstract class SweepLine {
 		this._status = new RavlTree(provider.$statusComparator);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Abstract members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Process a {@link StartEvent}. */
 	protected abstract _processStart(event: StartEvent): void;
@@ -62,16 +63,30 @@ export abstract class SweepLine {
 	/** Process an {@link EndEvent}. */
 	protected abstract _processEnd(event: EndEvent): void;
 
-	/** The logic for determine the orientation of an initial {@link ISegment}. */
+	/**
+	 * The logic for determine the orientation of an initial {@link ISegment}.
+	 */
 	protected abstract readonly _orientation: IOrientation;
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Protected methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
-	/** Reset the state of self (for reusing instance). */
+	/**
+	 * Reset the state of self (for reusing instance).
+	 *
+	 * The event queue and the status are empty after a complete sweeping, but
+	 * not if the previous sweeping was interrupted by an error, in which case
+	 * they are cleared so that the leftovers do not affect this one. Note that
+	 * the event queue is shared with the {@link Intersector} (if any), so it
+	 * is emptied instead of replaced.
+	 */
 	protected _reset(): void {
 		this._provider.$reset();
+		while(!this._eventQueue.$isEmpty) this._eventQueue.$pop();
+		if(!this._status.$isEmpty) {
+			this._status = new RavlTree(this._provider.$statusComparator);
+		}
 	}
 
 	/** The main routine of the sweep line algorithm. */
@@ -86,15 +101,18 @@ export abstract class SweepLine {
 	/**
 	 * Add an {@link ISegment} during initialization.
 	 * @param segment The segment itself.
-	 * @param isEntering Whether this segment is entering its corresponding polygon.
+	 * @param isEntering Whether this segment is entering its corresponding
+	 * polygon.
 	 */
 	protected _addSegment(segment: ISegment, delta: Sign): void {
-		if(same(segment.$start, segment.$end)) return; // Skip degenerated segments
+		// Skip degenerated segments
+		if(same(segment.$start, segment.$end)) return;
 		const [startPoint, endPoint] = this._orientation(segment, delta) ?
 			[segment.$start, segment.$end] : [segment.$end, segment.$start];
 
 		// Create sweep events
-		const startEvent = this._provider.$createStart(startPoint, segment, delta);
+		const startEvent =
+			this._provider.$createStart(startPoint, segment, delta);
 		const endEvent = this._provider.$createEnd(endPoint, segment);
 		endEvent.$other = startEvent;
 		startEvent.$other = endEvent;

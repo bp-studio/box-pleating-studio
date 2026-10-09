@@ -10,6 +10,7 @@ import type { Pattern } from "../pattern";
 import type { JJunction, JJunctions, JOverlap, JCorner, OverlapId } from "shared/json";
 import type { Device } from "../device";
 import type { Gadget } from "../gadget";
+import type { RationalPath } from "core/math/geometry/rationalPath";
 
 type TipDirection = Direction.UR | Direction.LL;
 type SpanCache = Readonly<Record<TipDirection, Map<number, number>>>;
@@ -47,7 +48,12 @@ export class PositioningContext {
 		const r = this.$repo.$getMaxIntersectionDistance(j1, j2, oriented);
 		if(j2.ox > j1.ox) [j1, j2] = [j2, j1];
 		let p: IPoint = { x: r - j2.ox, y: r - j1.oy };
-		if(!oriented) p = { x: g.widthSpan.value - p.x, y: g.heightSpan.value - p.y };
+		if(!oriented) {
+			p = {
+				x: g.widthSpan.value - p.x,
+				y: g.heightSpan.value - p.y,
+			};
+		}
 		return new Point(p);
 	}
 
@@ -57,7 +63,9 @@ export class PositioningContext {
 
 	public $checkJunctions(singleMode: boolean): boolean {
 		// Trivial case
-		if(this.$junctions.length == 1 && this.$gadgets.length == 1) return true;
+		if(this.$junctions.length == 1 && this.$gadgets.length == 1) {
+			return true;
+		}
 
 		if(singleMode) {
 			const index = this.$overlaps[0].parent;
@@ -73,15 +81,19 @@ export class PositioningContext {
 	/**
 	 * Get the span of a {@link Gadget} towards a given {@link TipDirection},
 	 * but exclude the immediate slack for the sake of convenience.
+	 *
+	 * @param withSlack Include the immediate slack.
 	 */
-	public $getSpan(g: Gadget, q: TipDirection): number {
+	public $getSpan(g: Gadget, q: TipDirection, withSlack = false): number {
 		const index = this.$gadgets.indexOf(g);
-		return this._getSpan(index, q) - this._getSlack(index, q);
+		const span = this._getSpan(index, q);
+		if(withSlack) return span;
+		return span - this._getSlack(index, q);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private _setupSlackForOverlap(index: number): void {
 		const overlap = this.$overlaps[index];
@@ -93,25 +105,45 @@ export class PositioningContext {
 
 			const targetOverlap = this.$overlaps[targetIndex];
 			const oppositeCorner = targetOverlap.c[2 - q];
-			const mutual = oppositeCorner.type == CornerType.internal && oppositeCorner.e == id;
+			const mutual =
+				oppositeCorner.type == CornerType.internal &&
+				oppositeCorner.e == id;
 
 			const g1 = this.$gadgets[index];
 			const g2 = this.$gadgets[targetIndex];
+			const device = this.$devices.find(d => d.$gadgets.includes(g2))!;
+			const obstacles = getRegions(device);
 			if(!mutual) {
-				g1.$setupConnectionSlack(g2, q, corner.q!);
+				// In relayed joins, the other regions in the device of g1 move
+				// together with it.
+				const own = this.$devices.find(d => d.$gadgets.includes(g1))!;
+				const g1Contour = g1.$contour.value;
+				const companions = getRegions(own).filter(c => c != g1Contour);
+				g1.$setupConnectionSlack(
+					g2, q, corner.q!, obstacles, companions
+				);
 			} else {
 				// If there're mutual connections, we don't need to setup
 				// the slack for real, but we keep a record for later usage.
 				const tx1 = g1.widthSpan.value + g2.rx(q, corner.q!);
-				const tx2 = g2.widthSpan.value + g1.rx(2 - q, opposite(corner.q!));
+				const tx2 =
+					g2.widthSpan.value + g1.rx(2 - q, opposite(corner.q!));
 				if(tx2 > tx1) this._slackMap.set(corner, tx2 - tx1);
+
+				// The two gadgets of a mutual connection (cut from the same
+				// overlap) don't collide, but if the target is joined with
+				// other gadgets (as in split joins), it could collide with
+				// them.
+				if(device.$gadgets.length > 1) {
+					g1.$setupConnectionSlack(g2, q, corner.q!, obstacles);
+				}
 			}
 		}
 	}
 
 	/**
-	 * Given a {@link JJunction}, consider all possible {@link Gadget} chains within,
-	 * and make sure that all chains fit the space.
+	 * Given a {@link JJunction}, consider all possible {@link Gadget} chains
+	 * within, and make sure that all chains fit the space.
 	 */
 	private _checkJunction(index: number): boolean {
 		const junction = this.$junctions[index];
@@ -136,7 +168,9 @@ export class PositioningContext {
 		return junction.sx >= maxSpan;
 	}
 
-	private _getSpan(index: number, q: TipDirection, callback?: Consumer<number>): number {
+	private _getSpan(
+		index: number, q: TipDirection, callback?: Consumer<number>
+	): number {
 		if(this._spanCache[q].has(index)) {
 			return this._spanCache[q].get(index)!;
 		}
@@ -160,7 +194,8 @@ export class PositioningContext {
 	private _getSlack(index: number, q: QuadrantDirection): number {
 		const corner = this.$overlaps[index].c[q];
 		const gadget = this.$gadgets[index];
-		return this._slackMap.get(corner) ?? Math.floor(gadget.$slack.value[q]);
+		const slack = Math.floor(gadget.$slack.value[q]);
+		return Math.max(this._slackMap.get(corner) ?? 0, slack);
 	}
 
 	private _getNextIndex(index: number, q: TipDirection): number | null {
@@ -168,4 +203,12 @@ export class PositioningContext {
 		if(corner.type == CornerType.flap) return null;
 		return convertIndex(corner.e);
 	}
+}
+
+/** The contours of all regions (gadgets and add-ons) of a {@link Device}. */
+function getRegions(device: Device): RationalPath[] {
+	return [
+		...device.$gadgets.map(g => g.$contour.value),
+		...device.$addOns.map(a => a.$shape.value.contour),
+	];
 }

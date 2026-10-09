@@ -8,6 +8,7 @@ import { deduplicate } from "core/math/geometry/path";
 import { same } from "shared/types/geometry";
 import { perQuadrant } from "shared/types/direction";
 import { clone } from "shared/utils/clone";
+import { debugFail } from "core/utils/debug";
 
 import type { PerQuadrant } from "shared/types/direction";
 import type { Path } from "shared/types/geometry";
@@ -56,10 +57,13 @@ export class Piece extends Region implements JPiece {
 	/**
 	 * The {@link Cache}s are enumerable fields of the instance,
 	 * so we must not serialize (or clone) the instance directly,
-	 * otherwise the caches will be included, and the result will depend on the states of the caches.
+	 * otherwise the caches will be included, and the result will depend on the
+	 * states of the caches.
 	 */
 	public toJSON(): JPiece {
-		const result: JPiece = { ox: this.ox, oy: this.oy, u: this.u, v: this.v };
+		const result: JPiece = {
+			ox: this.ox, oy: this.oy, u: this.u, v: this.v,
+		};
 		if(this.detours) result.detours = clone(this.detours);
 		if(this.shift) result.shift = { x: this.shift.x, y: this.shift.y };
 		return result;
@@ -127,9 +131,9 @@ export class Piece extends Region implements JPiece {
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public readonly $anchors = new Cache<PerQuadrant<Point | null>>(() => {
 		const p = this._points.value;
@@ -153,24 +157,40 @@ export class Piece extends Region implements JPiece {
 		const ridges = toLines(contour);
 		if(this.detours) {
 			for(const detour of this.detours) {
-				this._processDetour(ridges, contour, detour);
+				const applied = this._processDetour(ridges, contour, detour);
+				/* istanbul ignore next: debug */
+				if(!applied) debugFail("Invalid detour");
 			}
 		}
 		return { contour, ridges };
 	});
 
 	/**
-	 * Return the original contour (not including shifting and detour)
+	 * Whether all the {@link detours} (which must be present) can be applied.
+	 * This is used for filtering out invalid combinations of detours, so it
+	 * does not report any failures.
+	 */
+	public get $isDetourValid(): boolean {
+		const contour = this._points.value.concat();
+		const ridges = toLines(contour);
+		return this.detours!.every(
+			detour => this._processDetour(ridges, contour, detour)
+		);
+	}
+
+	/**
+	 * Return the original contour (not including the offset and detour)
 	 * of this piece. Used only for constructing standard join.
 	 */
 	public get $originalContour(): readonly Point[] {
-		const unshift = this._shift.value.$neg; // v0.6.17: This is needed
+		// v0.6.17: This is needed
+		const unshift = new Vector(offsets.get(this)!).$neg;
 		return this._points.value.map(p => p.$add(unshift));
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private members
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	private readonly _points = new Cache(() => {
 		const { ox, oy, u, v } = this;
@@ -202,7 +222,10 @@ export class Piece extends Region implements JPiece {
 		]);
 	}
 
-	private _processDetour(ridges: Line[], contour: RationalPath, _detour: Path): void {
+	/** Apply the detour, and return whether it was successful. */
+	private _processDetour(
+		ridges: Line[], contour: RationalPath, _detour: Path
+	): boolean {
 		const detour = _detour.map(p => new Point(p).$add(this._shift.value));
 		const start = detour[0], end = detour[detour.length - 1];
 
@@ -233,13 +256,10 @@ export class Piece extends Region implements JPiece {
 				ridges.splice(i, tail, ...lines);
 				contour.splice(0, head);
 				ridges.splice(0, head);
-				return;
+				return true;
 			}
-
-			// Something is wrong with the given detour if we get here.
-			/* istanbul ignore next: debug */
-			debugger;
 		}
+		return false;
 	}
 }
 

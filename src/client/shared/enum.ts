@@ -1,4 +1,5 @@
-export type Enum<E> = Record<keyof E, number | string> & { [k: number]: string };
+export type Enum<E> =
+	Record<keyof E, number | string> & { [k: number]: string };
 
 type Value<T> = T[keyof T];
 

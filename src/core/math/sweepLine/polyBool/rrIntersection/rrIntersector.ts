@@ -30,11 +30,17 @@ export class RRIntersector extends Intersector {
 		if(seg1.$polygon === seg2.$polygon) return;
 
 		if(seg1.$type === seg2.$type) {
-			if(seg1.$type === SegmentType.AALine) this._processAALineSegments(ev1, ev2);
-			else this._processArcSegments(ev1, ev2);
+			if(seg1.$type === SegmentType.AALine) {
+				this._processAALineSegments(ev1, ev2);
+			} else {
+				this._processArcSegments(ev1, ev2);
+			}
 		} else {
-			if(seg1.$type === SegmentType.AALine) this._processArcVsAALine(ev2, ev1);
-			else this._processArcVsAALine(ev1, ev2);
+			if(seg1.$type === SegmentType.AALine) {
+				this._processArcVsAALine(ev2, ev1);
+			} else {
+				this._processArcVsAALine(ev1, ev2);
+			}
 		}
 	}
 
@@ -47,7 +53,8 @@ export class RRIntersector extends Intersector {
 			p = ref(ref(p, seg1), seg2);
 			const in1 = seg1.$inArcRange(p), in2 = seg2.$inArcRange(p);
 			// The condition for intersection is:
-			// it in the interior of self, and at least at the endpoint of the other.
+			// it in the interior of self, and at least at the endpoint of the
+			// other.
 			if(in1 < -EPSILON && in2 < EPSILON) {
 				ev1 = this._subdivide(ev1, p);
 				seg1 = ev1.$segment as ArcSegment;

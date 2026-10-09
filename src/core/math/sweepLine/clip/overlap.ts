@@ -53,7 +53,8 @@ export class Overlap extends DivideAndCollect {
 				const p1 = path[j];
 				const p2 = path[i];
 				const segment = new LineSegment(p1, p2, n);
-				// Here it is assumed that the inputs are oriented in clockwise direction.
+				// Here it is assumed that the inputs are oriented in clockwise
+				// direction.
 				const delta = xyComparator(p1, p2) < 0 ? -1 : 1;
 				this._addSegment(segment, delta);
 			}
@@ -73,7 +74,9 @@ export class Overlap extends DivideAndCollect {
 		return false;
 	}
 
-	protected override _setInsideFlag(event: StartEvent, prev?: StartEvent): void {
+	protected override _setInsideFlag(
+		event: StartEvent, prev?: StartEvent
+	): void {
 		if(prev && prev.$wrapCount != 0) {
 			event.$wrapCount += prev.$wrapCount;
 			event.$isInside = event.$wrapCount != 0;

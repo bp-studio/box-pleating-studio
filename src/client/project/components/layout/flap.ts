@@ -29,7 +29,8 @@ import type { Vertex } from "../tree/vertex";
  * {@link Flap} is the control for the flap.
  */
 //=================================================================
-export class Flap extends Independent implements DragSelectable, LabelView, ISerializable<JFlap> {
+export class Flap extends Independent
+	implements DragSelectable, LabelView, ISerializable<JFlap> {
 
 	public static $isFlap(c: Control): c is Flap {
 		return c.type === "Flap";
@@ -70,7 +71,10 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	public $anchor: IPoint = { x: 0, y: 0 };
 
-	constructor(layout: Layout, json: JFlap, vertex: Vertex, edge: Edge, graphics: GraphicsData) {
+	constructor(
+		layout: Layout, json: JFlap, vertex: Vertex, edge: Edge,
+		graphics: GraphicsData
+	) {
 		const sheet = layout.$sheet;
 		super(sheet);
 		this._layout = layout;
@@ -85,13 +89,23 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this.$edge = edge;
 		this._drawParams = this.toJSON();
 
-		this._dots = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.dot]);
+		const layers = sheet.$layers;
+		this._dots = this.$addRootObject(
+			new ScaledSmoothGraphics(), layers[Layer.dot]
+		);
 
-		this._shade = this.$addRootObject(new Graphics(), sheet.$layers[Layer.shade]);
-		this._ridge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.ridge]);
-		this._circle = this.$addRootObject(new ScaledSmoothGraphics(), sheet.$layers[Layer.hinge]);
-		this._hinge = this.$addRootObject(new SmoothGraphics(), sheet.$layers[Layer.hinge]);
-		this.$label = this.$addRootObject(new Label(sheet), sheet.$layers[Layer.label]);
+		this._shade = this.$addRootObject(new Graphics(), layers[Layer.shade]);
+		this._ridge = this.$addRootObject(
+			new SmoothGraphics(), layers[Layer.ridge]
+		);
+		this._circle = this.$addRootObject(
+			new ScaledSmoothGraphics(), layers[Layer.hinge]
+		);
+		this._hinge = this.$addRootObject(
+			new SmoothGraphics(), layers[Layer.hinge]
+		);
+		this.$label =
+			this.$addRootObject(new Label(sheet), layers[Layer.label]);
 		this.$setupHit(this._shade);
 
 		this.$reactDraw(this._draw, this._drawShade, this._drawLabel);
@@ -111,9 +125,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		return [this.$tag, this.toJSON()];
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Proxy properties
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** The name of the flap, which is the same as that of the vertex. */
 	public get name(): string {
@@ -157,9 +171,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Interface methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public get isDeletable(): boolean {
 		return !this.$destructed && this.$vertex.isDeletable;
@@ -175,16 +189,19 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._layout.$goToDual([this]);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Control methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	public override $selectableWith(c: Control): boolean {
 		return c instanceof Flap;
 	}
 
 	public override $constrainBy(v: IPoint): IPoint {
-		return constrainFlap(p => this._sheet.grid.$constrain(p), this._location, this._width.value, this.height, v);
+		return constrainFlap(
+			p => this._sheet.grid.$constrain(p),
+			this._location, this._width.value, this.height, v
+		);
 	}
 
 	public $testGrid(grid: Grid): boolean {
@@ -200,7 +217,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 	}
 
 	/** Manipulate by internal functions instead of by UI. */
-	public $manipulate(x: number, y: number, width: number, height: number): void {
+	public $manipulate(
+		x: number, y: number, width: number, height: number
+	): void {
 		const location = { x, y };
 		const w = this._width.value;
 		const h = this._height.value;
@@ -209,9 +228,14 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._width.value = width;
 		this._height.value = height;
 		this.$project.design.$batchUpdateManager.$addFlap(this, () => {
-			if(w != width) this.$project.history.$fieldChange(this, "width", w, width, false);
-			if(h != height) this.$project.history.$fieldChange(this, "height", h, height, false);
-			this.$project.history.$move(this, location, this._lastLocation);
+			const history = this.$project.history;
+			if(w != width) {
+				history.$fieldChange(this, "width", w, width, false);
+			}
+			if(h != height) {
+				history.$fieldChange(this, "height", h, height, false);
+			}
+			history.$move(this, location, this._lastLocation);
 		});
 	}
 
@@ -225,9 +249,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		});
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Drawing methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 * Update {@link _drawParams} and return it.
@@ -253,7 +277,8 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 
 	public $drawDot(graphics: SmoothGraphicsLike): void {
 		const s = ProjectService.scale.value;
-		const size = style.dot.size * ProjectService.shrink.value ** style.dot.exp;
+		const size =
+			style.dot.size * ProjectService.shrink.value ** style.dot.exp;
 		const { width: w, height: h } = this._drawParams;
 		const pts = getDots(this._drawParams, w, h);
 		graphics.clear().lineStyle(style.dot.width, style.dot.color);
@@ -277,7 +302,9 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		const { x, y, width: w, height: h } = this._drawParams;
 		const dir = w || h ? Direction.none : undefined;
 		this.$anchor = { x: x + w / 2, y: y + h / 2 };
-		this.$label.$draw(this.$vertex.name, this.$anchor.x, this.$anchor.y, dir);
+		this.$label.$draw(
+			this.$vertex.name, this.$anchor.x, this.$anchor.y, dir
+		);
 	}
 
 	private _draw(): void {
@@ -291,22 +318,26 @@ export class Flap extends Independent implements DragSelectable, LabelView, ISer
 		this._hinge.clear().lineStyle(style.hinge.width * sh, hingeColor);
 		drawContours(this._hinge, this.$graphics.contours);
 
-		this._ridge.clear().lineStyle(style.ridge.width * sh, style.ridge.color);
+		this._ridge.clear()
+			.lineStyle(style.ridge.width * sh, style.ridge.color);
 		drawLines(this._ridge, this.$graphics.ridges);
 
 		this._circle.clear().lineStyle(sh, hingeColor);
 		this.$drawCircle(this._circle);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 	// Private methods
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////
 
 	/** Test if the new size is acceptable. */
-	private _testResize(w: number, h: number, grid: Grid = this._sheet.grid): boolean {
+	private _testResize(
+		w: number, h: number, grid: Grid = this._sheet.grid
+	): boolean {
 		if(this.$project.history.$isLocked) return true;
+		// At most one tip may go beyond the range of the sheet.
 		return getDots(this._location, w, h)
 			.filter(p => !grid.$contains(p))
-			.length <= 1; // At most one tip may go beyond the range of the sheet.
+			.length <= 1;
 	}
 }
