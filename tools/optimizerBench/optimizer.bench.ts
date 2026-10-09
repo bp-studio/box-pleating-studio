@@ -1,21 +1,6 @@
 /**
  * Benchmark for the integer stages (fitting and tidying) of the Optimizer.
- *
- * Usage:
- *   make                                       # builds lib/optimizer/debug
- *   pnpm rstest run --include test/bench/optimizer.bench.ts --disableConsoleIntercept
- *
- * Note that the debug build is about 25x slower than the optimized ones.
- * For timing, build an optimized Node.js build with
- *   make MODE=opt "CXXFLAG_opt=-O3 -fno-exceptions -flto -D_OPENMP" "DEP_opt=lib/include/libnlopt.slsqp.2.11.0.a" "LDFLAG_opt=-lnlopt.slsqp.2.11.0 -sENVIRONMENT=node"
- * and change the import below to lib/optimizer/opt/optimizer.js.
- *
- * Environment variables:
- *   BPS_DIR   Directory containing the .bps files to use (default: ~/Documents/Origami/BP Studio Projects)
- *   BPS_ONLY  Substring filter for file names
- *   BH        Set to 1 to enable basin-hopping
- *   DIM       Set to 1 to keep flap dimensions (default: off, since saved designs are typically already fitted)
- *   TYPE      Set to "diag" to force diagonal sheets
+ * See README.md for the usage.
  */
 
 import { describe, it, beforeAll } from "@rstest/core";
@@ -30,7 +15,9 @@ import { TreeController } from "core/controller/treeController";
 import { GridType } from "shared/json";
 import factory from "lib/optimizer/debug/optimizer.js";
 
-import type { OptimizerRequest, OptimizerResult } from "client/plugins/optimizer/types";
+import type {
+	OptimizerRequest, OptimizerResult
+} from "client/plugins/optimizer/types";
 import type { JFlap, JProject, NodeId } from "shared/json";
 
 interface RunResult {
@@ -48,45 +35,64 @@ interface Case {
 	request: OptimizerRequest;
 }
 
-const dir = process.env.BPS_DIR ?? join(homedir(), "Documents/Origami/BP Studio Projects");
+const dir = process.env.BPS_DIR ??
+	join(homedir(), "Documents/Origami/BP Studio Projects");
 const only = process.env.BPS_ONLY;
 const useBH = process.env.BH == "1";
 const useDimension = process.env.DIM == "1";
 const SEED = 12345;
-const TIMEOUT = 24 * 60 * 60 * 1000; // Effectively no timeout
+
+/** Designs with fewer flaps are trivial for the optimizer. */
+const MIN_FLAPS = 3;
+
+/** The step of the jittering of the flaps at the same position. */
+const JITTER = 0.1;
 
 describe("Optimizer integer stages benchmark", () => {
 
 	const cases: Case[] = [];
 
 	beforeAll(() => {
-		const files = readdirSync(dir).filter(f => f.endsWith(".bps") && (!only || f.includes(only)));
+		const files = readdirSync(dir)
+			.filter(f => f.endsWith(".bps") && (!only || f.includes(only)));
 		for(const file of files) {
 			try {
-				const json = Migration.$process(JSON.parse(readFileSync(join(dir, file), "utf8")));
+				const json = Migration.$process(
+					JSON.parse(readFileSync(join(dir, file), "utf8"))
+				);
 				const request = createRequest(json);
-				if(request) cases.push({ name: file.replace(/\.bps$/, ""), request });
+				if(request) {
+					cases.push({ name: file.replace(/\.bps$/, ""), request });
+				}
 			} catch(e) {
-				console.log(`Skipping ${file}: ${e instanceof Error ? e.message : e}`);
+				const message = e instanceof Error ? e.message : e;
+				console.log(`Skipping ${file}: ${message}`);
 			}
 		}
 		console.log(`Loaded ${cases.length} designs from ${dir}`);
 	});
 
-	// eslint-disable-next-line vitest/expect-expect -- This is a benchmark
 	it("Runs the optimizer", async () => {
 		const rows: string[] = [];
-		rows.push("| design | flaps | cont. | size | fit ms | vertices before | vertices after | tidy ms |", "|---|---|---|---|---|---|---|---|");
+		rows.push(
+			"| design | flaps | cont. | size | fit ms | vertices before | vertices after | tidy ms |",
+			"|---|---|---|---|---|---|---|---|"
+		);
 		for(const c of cases) {
 			const flaps = c.request.problem.flaps.length;
 			process.stdout.write(`${c.name} (${flaps} flaps)...`);
-			const r = await run(c.request); // eslint-disable-line no-await-in-loop -- Sequential by design, for timing
-			process.stdout.write(` size ${r.width}, vertices ${r.verticesBefore} -> ${r.verticesAfter}\n`);
+			// Sequential by design, for timing
+			// eslint-disable-next-line no-await-in-loop
+			const r = await run(c.request);
+			const { width, verticesBefore, verticesAfter } = r;
+			process.stdout.write(
+				` size ${width}, vertices ${verticesBefore} -> ${verticesAfter}\n`
+			);
 			for(const line of r.log) console.log("  " + line);
-			rows.push(`| ${c.name} | ${flaps} | ${r.continuous.toFixed(2)} | ${r.width} | ${r.fitMs.toFixed(0)} | ${r.verticesBefore} | ${r.verticesAfter} | ${r.tidyMs.toFixed(0)} |`);
+			rows.push(`| ${c.name} | ${flaps} | ${r.continuous.toFixed(2)} | ${width} | ${r.fitMs.toFixed(0)} | ${verticesBefore} | ${verticesAfter} | ${r.tidyMs.toFixed(0)} |`);
 		}
 		console.log("\n" + rows.join("\n"));
-	}, TIMEOUT);
+	});
 });
 
 async function run(request: OptimizerRequest): Promise<RunResult> {
@@ -134,16 +140,22 @@ async function run(request: OptimizerRequest): Promise<RunResult> {
 function createRequest(json: JProject): OptimizerRequest | null {
 	const { flaps, sheet } = json.design.layout;
 	const { edges } = json.design.tree;
-	if(flaps.length < 3) return null;
-	sheet.type ??= GridType.rectangular; // Older files have no sheet type (the app defaults to rectangular)
+	if(flaps.length < MIN_FLAPS) return null;
+
+	// Older files have no sheet type (the app defaults to rectangular)
+	sheet.type ??= GridType.rectangular;
 	if(process.env.TYPE == "diag") sheet.type = GridType.diagonal;
-	if(!useDimension) flaps.forEach(f => f.width = f.height = 0); // Same as createOptimizerRequest in the client
+
+	// Same as createOptimizerRequest in the client
+	if(!useDimension) flaps.forEach(f => f.width = f.height = 0);
+
 	createTree(edges, flaps);
 	const hierarchies = TreeController.getHierarchy(false, useDimension);
 
 	const flapMap = new Map<NodeId, JFlap>();
 	for(const f of flaps) flapMap.set(f.id, f);
-	const orderedFlaps = hierarchies[hierarchies.length - 1].leaves.map(id => flapMap.get(id)!);
+	const orderedFlaps = hierarchies[hierarchies.length - 1].leaves
+		.map(id => flapMap.get(id)!);
 	if(orderedFlaps.some(f => !f)) return null;
 
 	// Same as makeInitialVector in the client, but with deterministic jittering
@@ -153,7 +165,7 @@ function createRequest(json: JProject): OptimizerRequest | null {
 		let { x, y } = f;
 		let key = x + "," + y;
 		while(set.has(key)) {
-			jitter += 0.1;
+			jitter += JITTER;
 			x = f.x + jitter;
 			y = f.y + jitter;
 			key = x + "," + y;
@@ -169,7 +181,9 @@ function createRequest(json: JProject): OptimizerRequest | null {
 		random: 0,
 		problem: {
 			type: sheet.type,
-			flaps: orderedFlaps.map(f => ({ id: f.id, width: f.width, height: f.height })),
+			flaps: orderedFlaps.map(f => ({
+				id: f.id, width: f.width, height: f.height,
+			})),
 			hierarchies,
 			tree: TreeController.getStructure(),
 		},

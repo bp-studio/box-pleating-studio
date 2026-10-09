@@ -16,6 +16,7 @@ export default defineConfig([
 				"src/other/service",
 				"test",
 				"e2e",
+				"tools/optimizerBench",
 				"tools/polyBool",
 				"tools/renderCheck",
 			],
