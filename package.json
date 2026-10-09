@@ -1,7 +1,7 @@
 {
 	"name": "box-pleating-studio",
-	"version": "0.8.0",
-	"app_version": "1906",
+	"version": "0.8.1",
+	"app_version": "1908",
 	"private": true,
 	"description": "Super-complex origami design made easy!",
 	"keywords": [

@@ -22,6 +22,13 @@ const NORMAL_TIMEOUT = 3000;
 const CORE_TIMEOUT = isIOS || isLowEndDevice ? SLOW_TIMEOUT : NORMAL_TIMEOUT;
 
 /**
+ * The routes (in the form `controller.action`) without the timeout. They could
+ * take long for large designs, and they are invoked on demand by the user,
+ * who is waiting for the result anyway.
+ */
+const UNTIMED_ROUTES: ReadonlySet<string> = new Set(["layout.getCP"]);
+
+/**
  * Id starts from 1 to ensure true values.
  */
 let nextId = 1;
@@ -223,7 +230,8 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		const callbacks = this._returnCallbacks.concat();
 		this._returnCallbacks.length = 0;
 		this._pendingCalls++;
-		const response = await callCore(this._worker, request);
+		const timed = !UNTIMED_ROUTES.has(controller + "." + action);
+		const response = await callCore(this._worker, request, timed);
 		this._pendingCalls--;
 		for(const callback of callbacks) callback();
 		if("error" in response) {
@@ -273,9 +281,11 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	}
 }
 
+/** @param timed Whether to fail the request after {@link CORE_TIMEOUT}. */
 function callCore(
-	worker: Worker, request: CoreRequest
+	worker: Worker, request: CoreRequest, timed: boolean
 ): Promise<CoreResponse> {
+	if(!timed) return callWorker<CoreResponse>(worker, request);
 	return new Promise(resolve => {
 		// Setup a timeout mechanism.
 		const timeout = setTimeout(() => {
