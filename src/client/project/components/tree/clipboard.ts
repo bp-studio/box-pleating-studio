@@ -2,7 +2,7 @@ import { shallowRef } from "vue";
 
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 
-import type { NodeId } from "shared/json";
+import type { NodeId, ProjId } from "shared/json";
 import type { Tree } from "./tree";
 import type { Grid } from "../grid/grid";
 
@@ -60,6 +60,12 @@ type ClipboardMessage = SetMessage | QueryMessage;
 let clipboardTime = 0;
 
 /**
+ * The project in which the content of the {@link clipboard} was set, or
+ * `undefined` if it was set in another instance of the app.
+ */
+let clipboardSource: ProjId | undefined;
+
+/**
  * The channel for syncing the {@link clipboard} across instances of the app.
  * It is not available in older browsers, in which case the clipboard simply
  * works within the current instance.
@@ -75,6 +81,7 @@ if(channel) {
 			if(clipboard.value.length) post();
 		} else if(msg.time > clipboardTime) {
 			clipboardTime = msg.time;
+			clipboardSource = undefined;
 			clipboard.value = msg.data;
 		}
 	};
@@ -82,10 +89,23 @@ if(channel) {
 	channel.postMessage({ type: "query" } satisfies ClipboardMessage);
 }
 
-export function setClipboard(subtrees: readonly Subtree[]): void {
+/** @param source The project in which the content is set. */
+export function setClipboard(
+	subtrees: readonly Subtree[], source: ProjId
+): void {
 	clipboardTime = Date.now();
+	clipboardSource = source;
 	clipboard.value = subtrees;
 	post();
+}
+
+/**
+ * Where the content of the {@link clipboard} comes from, relative to the given
+ * project (for analytics).
+ */
+export function getClipboardSource(target: ProjId): string {
+	if(clipboardSource === undefined) return "window";
+	return clipboardSource == target ? "project" : "other_project";
 }
 
 function post(): void {
