@@ -2,6 +2,7 @@ import { fixZero, floatXyComparator, isAlmostZero } from "core/math/geometry/flo
 
 import type { Comparator } from "shared/types/types";
 import type { StartEvent, SweepEvent } from "../../classes/event";
+import type { LineSegment } from "../../classes/segment/lineSegment";
 
 /**
  * Create an event comparator for the event queue (a heap).
@@ -69,7 +70,21 @@ function compareUpDown(a: StartEvent, b: StartEvent): number {
 	return fixZero(getSlope(a.$point, b.$point) - getEventSlope(b));
 }
 
+/**
+ * The slope of the segment of the event. For a {@link LineSegment}, it is
+ * given by the equation of the line, which does not change in subdivision, so
+ * that the segments on the same line always have exactly the same slope, even
+ * if some of them are already subdivided and the others are not (otherwise the
+ * floating errors of the subdivision points could misorder them in the status,
+ * as in the overlapping edges of adjacent polygons).
+ */
 function getEventSlope(e: StartEvent): number {
+	const segment = e.$segment as Partial<LineSegment>;
+	if(segment.$coefficients) {
+		const [a, b] = segment.$coefficients;
+		if(isAlmostZero(b)) return Number.POSITIVE_INFINITY;
+		return -a / b;
+	}
 	return getSlope(e.$point, e.$other.$point);
 }
 
