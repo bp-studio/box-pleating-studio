@@ -10,7 +10,7 @@ import { Migration } from "client/patches";
 
 import type { Configuration } from "core/design/layout/configuration";
 import type { Device } from "core/design/layout/pattern/device";
-import type { JEdge, JFlap } from "shared/json";
+import type { JEdge, JFlap, NodeId } from "shared/json";
 
 /** The sizes of the overlaps in each partition, as in `"2:2x1"`. */
 function describePartitions(config: Configuration): string[][] {
@@ -148,6 +148,25 @@ describe("Bridged joints", () => {
 			const [f3] = patternContours(3);
 			expect(f3).to.equalPath(path);
 		}
+	});
+
+	it("Takes the far flaps of the neighbors of a relay from the junctions", () => {
+		// The bridge 22-28 is relayed at both joints. At the joint of flap 28,
+		// 28-40 is relayed onto 28-35 and the bridge, whose far corner (at
+		// flap 22) has already been modified by the plan at the joint of flap
+		// 22. Previously, the intersection corner towards the bridge took the
+		// id of an overlap from that corner instead of flap 22.
+		parseTree(
+			"(13,15,1),(13,60,1),(15,17,1),(60,10,1),(17,19,1),(10,6,1)," +
+			"(19,48,1),(19,23,2),(6,28,11),(48,36,1),(36,37,1),(37,34,1)," +
+			"(34,21,2),(34,39,1),(21,22,2),(39,40,1),(39,35,1)",
+			"(35,38,14,12,0),(40,46,10,12,0),(22,49,6,8,0),(28,74,29,0,0)," +
+			"(23,66,14,0,1)"
+		);
+		expect(() => DesignController.update({
+			flaps: [{ id: 35 as NodeId, x: 43, y: 11, width: 12, height: 0 }],
+			edges: [], stretches: [], dragging: false,
+		})).to.not.throw();
 	});
 
 });

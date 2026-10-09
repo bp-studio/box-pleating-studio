@@ -25,15 +25,6 @@ import type { ITreeNode, NodeGraphics, RoughContour, TraceContour, PatternContou
 const coveredJunctionMap = new Map<NodeId, ValidJunction[]>();
 const stretchMap = new Map<number, Stretch[]>();
 
-/**
- * Caches the stretch signature (sorted stretch IDs joined by ";") for each
- * node.
- * Persists across {@link Processor.$run} calls to detect stretch changes:
- * when a node's current signature differs from its cached value,
- * the node enters `stretchChanged` and its trace contour is recomputed.
- */
-const signatureCache = new Map<number, string>();
-
 const aaUnion = new AAUnion();
 const expander = new AAUnion(true);
 
@@ -84,11 +75,11 @@ function traceContour(): void {
 	for(let i = 0; i < tree.$nodes.length; i++) {
 		const node = tree.$nodes[i as NodeId];
 		if(!node) continue;
-		const cache = signatureCache.get(i);
+		const cache = State.$stretchSignatureCache.get(i);
 		const stretches = stretchMap.get(i) || [];
 		const signature = stretches.map(s => s.$id).sort().join(";");
 		if(cache !== signature) {
-			signatureCache.set(i, signature);
+			State.$stretchSignatureCache.set(i, signature);
 			stretchChanged.add(node);
 		}
 	}
@@ -100,8 +91,24 @@ function traceContour(): void {
 	climb(updater,
 		State.$roughContourChanged,
 		stretchChanged,
-		new Set(parents as ITreeNode[])
+		new Set(parents as ITreeNode[]),
+		getRepoChangedNodes()
 	);
+}
+
+/**
+ * The raw pieces (see {@link createRawPieces}) and the critical corners depend
+ * on the sizes of the junctions, which could change without changing the
+ * rough contours or the stretches of a node (for example, when a flap outside
+ * moves). In that case the repo is renewed, and the nodes in it are updated.
+ */
+function getRepoChangedNodes(): Set<ITreeNode> {
+	const tree = State.m.$tree;
+	const result = new Set<ITreeNode>();
+	for(const repo of State.$repoToProcess) {
+		for(const id of repo.$nodeSet.$nodes) result.add(tree.$nodes[id]!);
+	}
+	return result;
 }
 
 function updater(node: ITreeNode): boolean {

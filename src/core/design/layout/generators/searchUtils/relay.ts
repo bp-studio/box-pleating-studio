@@ -2,7 +2,7 @@ import { CornerType } from "shared/json";
 import { debugAssert } from "core/utils/debug";
 import { Direction, opposite, previousQuadrantOffset, quadrantNumber } from "shared/types/direction";
 
-import type { JOverlap } from "shared/json";
+import type { JOverlap, NodeId } from "shared/json";
 import type { QuadrantDirection } from "shared/types/direction";
 
 /** The joint corner of the {@link JOverlap}s at a joint. */
@@ -23,9 +23,14 @@ export type JointCorner = Direction.UR | Direction.LL;
  * @param s The joint corner.
  * @param narrow The nearest narrower kept one, if any.
  * @param wide The nearest wider kept one, if any.
+ * @param farFlap The id of the flap at the far end (i.e. the corner opposite
+ * to the joint) of the given {@link JOverlap}. It is given by the junction,
+ * as the corner itself could have been modified by the plan at the other joint
+ * (when the neighbor is a bridge relayed at both ends).
  */
 export function relayOntoKept(
-	o: JOverlap, s: JointCorner, narrow?: JOverlap, wide?: JOverlap
+	o: JOverlap, s: JointCorner, narrow: JOverlap | undefined,
+	wide: JOverlap | undefined, farFlap: (o: JOverlap) => NodeId
 ): void {
 	debugAssert(() => Boolean(narrow || wide), "Nothing to relay onto");
 
@@ -46,12 +51,10 @@ export function relayOntoKept(
 	o.oy -= wide?.oy ?? 0;
 	o.c[s] = { type: CornerType.internal, e: target.id, q };
 	if(narrow) {
-		const e = narrow.c[opposite(s)].e;
-		o.c[b] = { type: CornerType.intersection, e };
+		o.c[b] = { type: CornerType.intersection, e: farFlap(narrow) };
 	}
 	if(wide) {
-		const e = wide.c[opposite(s)].e;
-		o.c[d] = { type: CornerType.intersection, e };
+		o.c[d] = { type: CornerType.intersection, e: farFlap(wide) };
 	}
 	target.c[q] = { type: CornerType.socket, e: o.id, q: s };
 	if(s == Direction.UR) {

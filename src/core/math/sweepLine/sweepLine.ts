@@ -45,7 +45,7 @@ export abstract class SweepLine {
 	protected readonly _eventQueue: EventQueue;
 
 	/** The current intersection state of sweeping. */
-	protected readonly _status: IBinarySearchTree<StartEvent>;
+	protected _status: IBinarySearchTree<StartEvent>;
 
 	constructor(provider: EventProvider) {
 		this._provider = provider;
@@ -72,9 +72,21 @@ export abstract class SweepLine {
 	// Protected methods
 	////////////////////////////////////////////////////////////////////////////
 
-	/** Reset the state of self (for reusing instance). */
+	/**
+	 * Reset the state of self (for reusing instance).
+	 *
+	 * The event queue and the status are empty after a complete sweeping, but
+	 * not if the previous sweeping was interrupted by an error, in which case
+	 * they are cleared so that the leftovers do not affect this one. Note that
+	 * the event queue is shared with the {@link Intersector} (if any), so it
+	 * is emptied instead of replaced.
+	 */
 	protected _reset(): void {
 		this._provider.$reset();
+		while(!this._eventQueue.$isEmpty) this._eventQueue.$pop();
+		if(!this._status.$isEmpty) {
+			this._status = new RavlTree(this._provider.$statusComparator);
+		}
 	}
 
 	/** The main routine of the sweep line algorithm. */

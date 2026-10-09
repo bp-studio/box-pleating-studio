@@ -54,7 +54,7 @@ export class Trace {
 	 * @param inside The leaves inside the contour being traced. The
 	 * intersection ridges between them are ignored (see
 	 * {@link _createFilteredRidges}), and their flaps shape the hinges in raw
-	 * mode (see {@link _rawModeFinalCheck}).
+	 * mode (see {@link _giveUp}).
 	 */
 	public $generate(
 		hinges: Path, start: Point, end: Point, rawMode: boolean,
@@ -100,9 +100,14 @@ export class Trace {
 
 		const result = ctx.$trim(path);
 		if(!result) return null;
+
+		// A contour returning to where it starts (by hitting a ridge head-on)
+		// cuts off nothing, and inserting it would collapse the path into a
+		// segment. It happens only in layouts with invalid junctions.
+		if(result[0].eq(result[result.length - 1])) return this._giveUp(inside);
 		if(!rawMode) return result;
 		if(endsOnHinges(result, hinges)) return result;
-		return this._rawModeFinalCheck(inside);
+		return this._giveUp(inside);
 	}
 
 	////////////////////////////////////////////////////////////////////////////
@@ -154,8 +159,11 @@ export class Trace {
 	}
 
 	/**
-	 * In raw mode, the generated contour must end on the given hinge segment,
-	 * so that it can be inserted into the piece.
+	 * Give up the generated contour, which happens only in layouts with
+	 * invalid junctions.
+	 *
+	 * In particular, in raw mode, the generated contour must end on the given
+	 * hinge segment, so that it can be inserted into the piece.
 	 *
 	 * That is the case in valid layouts, as the pieces are carved to match the
 	 * tracing (see {@link getQuadrantShape}). In layouts with invalid
@@ -171,10 +179,10 @@ export class Trace {
 	 * junctions, and it is not worth the effort to correct the patterns in
 	 * those layouts.
 	 */
-	private _rawModeFinalCheck(inside: ReadonlySet<NodeId>): null {
+	private _giveUp(inside: ReadonlySet<NodeId>): null {
 		debugAssert(
 			() => this._involvesInvalidJunctions(inside),
-			"Pattern contour does not end on the hinges"
+			"Pattern contour given up in a valid layout"
 		);
 		return null;
 	}
@@ -182,7 +190,7 @@ export class Trace {
 	/**
 	 * Whether the flaps involved in the tracing (including those inside the
 	 * contour being traced) have invalid junctions.
-	 * See {@link _rawModeFinalCheck}.
+	 * See {@link _giveUp}.
 	 */
 	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	protected _involvesInvalidJunctions(_inside: ReadonlySet<NodeId>): boolean {
@@ -234,7 +242,7 @@ export class Trace {
  * Note that if the contour leaves its last reflection in an axis-parallel
  * direction, it does not end on the hinges, and we do not extend it to them
  * either, as that happens only in layouts with invalid junctions (see
- * {@link Trace._rawModeFinalCheck}), where the extension does no good.
+ * {@link Trace._giveUp}), where the extension does no good.
  */
 function endsOnHinges(result: PatternContour, hinges: Path): boolean {
 	const lastPoint = result[result.length - 1];

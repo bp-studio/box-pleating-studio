@@ -60,6 +60,18 @@ export namespace State {
 	/** All {@link Stretch}es. */
 	export const $stretches = new Map<string, Stretch>();
 
+	/**
+	 * The signature of the invasions of each leaf in the previous round, for
+	 * detecting changes (see {@link roughContourTask}).
+	 */
+	export const $invasionCache = new Map<NodeId, string>();
+
+	/**
+	 * The signature of the stretches of each node in the previous round, for
+	 * detecting changes (see {@link traceContourTask}).
+	 */
+	export const $stretchSignatureCache = new Map<number, string>();
+
 	////////////////////////////////////////////////////////////////////////////
 	// Semi-persistent states
 	////////////////////////////////////////////////////////////////////////////
@@ -199,4 +211,6 @@ export function fullReset(): void {
 	State.$invalidJunctionDiff.clear();
 	State.$stretchDiff.clear();
 	State.$stretchCache.clear();
+	State.$invasionCache.clear();
+	State.$stretchSignatureCache.clear();
 }

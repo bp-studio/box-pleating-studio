@@ -96,7 +96,7 @@ export function createLeafSets(
  *
  * Otherwise, such a leaf could enlarge the piece of the rest beyond the hinges
  * of the patterns of other leaves in the same piece, and the pattern contours
- * extended in raw mode (see {@link Trace._rawModeFinalCheck}) would cut off
+ * extended in raw mode (see {@link Trace._giveUp}) would cut off
  * the enlarged part, which is not covered by anything else.
  *
  * The leaves of the same repos (with patterns) are grouped together, so that

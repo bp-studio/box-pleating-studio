@@ -2,6 +2,7 @@ import { describe, it, expect } from "@rstest/core";
 
 import { exportProject, parseTree } from "@utils/tree";
 import { LayoutController } from "core/controller/layoutController";
+import { DesignController } from "core/controller/designController";
 import { State } from "core/service/state";
 import { UpdateResult } from "core/service/updateResult";
 
@@ -303,6 +304,26 @@ describe("Trace contour", () => {
 		expect(node.$graphics.$traceContours[0].$raw).to.be.true;
 		const outer = result.graphics["re47,52"].contours[0].outer;
 		expect(outer).to.equalPath("(52,67),(52,72),(28,72),(28,52),(92/3,52),(36,48),(36,45),(55,45),(55,50),(56,50),(56,67)", true);
+	});
+
+	it("Updates the raw pieces when the junctions with flaps outside change", () => {
+		// The corner of flap 102 invaded by flap 100 (both under node 97) is
+		// carved together with the overlap of 31-102, whose size changes when
+		// flap 31 moves. Previously, the trace contour of node 97 was not
+		// updated, as neither its rough contour nor its stretches changed.
+		const edges =
+			"(5,76,1),(5,31,12),(76,90,3),(90,94,2),(94,97,2),(97,102,23),(97,100,1)";
+		parseTree(edges, "(100,81,88,0,9),(102,104,104,0,0),(31,77,65,0,0)");
+		DesignController.update({
+			flaps: [{ id: 31 as NodeId, x: 77, y: 62, width: 0, height: 0 }],
+			edges: [], stretches: [], dragging: false,
+		});
+		const getOuter = (): unknown => State.m.$tree.$nodes[97 as NodeId]!
+			.$graphics.$traceContours.map(c => c.$outer);
+		const updated = getOuter();
+
+		parseTree(edges, "(100,81,88,0,9),(102,104,104,0,0),(31,77,62,0,0)");
+		expect(updated).to.eql(getOuter());
 	});
 
 });

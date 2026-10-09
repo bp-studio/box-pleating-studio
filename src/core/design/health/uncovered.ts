@@ -23,7 +23,7 @@ const stacking = new Stacking();
  * This check is meaningful only for layouts without invalid junctions, which
  * should be checked first. In layouts with invalid junctions, the final
  * contours could differ from the union of the rough contours in some rare cases
- * (see tryInsert and Trace._rawModeFinalCheck), so the result might not match
+ * (see tryInsert and Trace._giveUp), so the result might not match
  * what is rendered.
  *
  * @param boundary The boundary of the sheet.

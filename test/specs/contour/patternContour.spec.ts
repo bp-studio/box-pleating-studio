@@ -185,10 +185,10 @@ describe("Pattern contour", () => {
 		// The intersection anchor between the gadgets of 1-2 and 1-3 lies at
 		// (4,-5), which is exactly the farther one of its possible targets, so
 		// in tracing, the ridge goes to the corner (5,-6) of flap 2 instead of
-		// being degenerated. The contour of node 4 (flaps 2, 3) arrives at the anchor
-		// and reflects on both the gadget ridge and the intersection ridge,
-		// coinciding with the contour of flap 1. Previously, it only reflected
-		// on the former and went into flap 2.
+		// being degenerated. The contour of node 4 (flaps 2, 3) arrives at the
+		// anchor and reflects on both the gadget ridge and the intersection
+		// ridge, coinciding with the contour of flap 1. Previously, it only
+		// reflected on the former and went into flap 2.
 		parseTree(
 			"(0,1,6),(0,4,1),(4,2,1),(4,3,7)",
 			"(1,0,0,0,0),(2,4,-7,0,0),(3,11,-11,0,0)"
@@ -233,6 +233,24 @@ describe("Pattern contour", () => {
 		const contours = State.m.$tree.$nodes[id4]!.$graphics.$patternContours;
 		expect(contours.length).to.equal(1);
 		expect(contours[0]).to.equalPath("(2,4),(2/3,5),(0,5)");
+	});
+
+	/** Added v0.8.0 */
+	it("Gives up the contours returning to where they start", () => {
+		// The junctions of flap 12 with flaps 38 and 42 are invalid. The
+		// contour of node 19 (flaps 38, 42, 50) hits a ridge head-on at
+		// (39,23) and returns to (36,27). Previously, inserting it collapsed
+		// the inner path of node 17 into a segment.
+		parseTree(
+			"(13,15,1),(13,60,1),(15,17,1),(60,10,1),(17,19,1),(10,6,1)," +
+			"(19,48,1),(6,5,1),(6,9,11),(6,12,11),(48,36,1),(48,49,1)," +
+			"(5,7,1),(36,37,1),(49,50,1),(37,41,1),(41,42,1),(41,38,1)",
+			"(50,42,30,0,0),(38,42,21,0,0),(42,40,20,0,0),(12,23,19,0,0)," +
+			"(9,23,41,0,0),(7,27,65,0,0)"
+		);
+		const contours = State.m.$tree.$nodes[19 as NodeId]!.$graphics
+			.$patternContours.map(c => c.map(p => p.toString()).join(""));
+		expect(contours).to.not.include("(36, 27)(39, 23)(36, 27)");
 	});
 
 	/** Added v0.8.0 */

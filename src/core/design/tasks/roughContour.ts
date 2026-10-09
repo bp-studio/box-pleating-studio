@@ -14,12 +14,6 @@ import type { junctionTask } from "./junction";
 
 const roughUnion = new RoughUnion();
 
-/**
- * The signature of the invasions of each leaf in the previous run,
- * for detecting changes.
- */
-const invasionCache = new Map<NodeId, string>();
-
 //=================================================================
 /**
  * {@link roughContourTask} updates {@link NodeGraphics.$roughContours}.
@@ -70,15 +64,15 @@ function updateInvasionMap(): Set<ITreeNode> {
 	updateInvasions(junctions);
 
 	const changed = new Set<ITreeNode>();
-	const ids = new Set(invasionCache.keys());
+	const ids = new Set(State.$invasionCache.keys());
 	for(const j of junctions) if(j.$invasion) ids.add(j.$invasion.flap.id);
 	for(const id of ids) {
 		const signature = getInvasions(id)
 			.map(i => [i.invader.id, i.q, i.o.x, i.o.y].join(","))
 			.sort().join(";");
-		if(invasionCache.get(id) === signature) continue;
-		if(signature) invasionCache.set(id, signature);
-		else invasionCache.delete(id);
+		if(State.$invasionCache.get(id) === signature) continue;
+		if(signature) State.$invasionCache.set(id, signature);
+		else State.$invasionCache.delete(id);
 		const node = State.m.$tree.$nodes[id];
 		if(node) changed.add(node);
 	}

@@ -238,12 +238,12 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		const relayed = sorted.filter(o => !kept.includes(o));
 		const relays = getRelays(sorted.length, plan);
+		const at = (i?: number): JOverlap | undefined =>
+			i === undefined ? undefined : sorted[i];
+		const farFlap = (o: JOverlap): NodeId =>
+			this._junctions[o.parent].c[opposite(s)].e as NodeId;
 		for(const { index, narrow, wide } of relays) {
-			relayOntoKept(
-				sorted[index], s,
-				narrow === undefined ? undefined : sorted[narrow],
-				wide === undefined ? undefined : sorted[wide]
-			);
+			relayOntoKept(sorted[index], s, at(narrow), at(wide), farFlap);
 		}
 
 		// The orderings of the partitions are also as in earlier versions
@@ -272,11 +272,9 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 
 		// Join first, as the orientation is decided by the joint corners
 		this._joinOverlaps(middle, outer, join);
-		relayOntoKept(
-			middle, s,
-			keptIsNarrow ? kept : undefined,
-			keptIsNarrow ? undefined : kept
-		);
+		const [narrow, wide] = keptIsNarrow ? [kept] : [undefined, kept];
+		relayOntoKept(middle, s, narrow, wide,
+			o => this._junctions[o.parent].c[opposite(s)].e as NodeId);
 
 		// The outer one is cut in the same way, and its connection to the kept
 		// one goes through the middle one in the join.
