@@ -17,7 +17,12 @@
 				<div v-if="item.title" class="fw-bold">{{ item.title }}</div>
 				<div>{{ item.detail }}</div>
 			</div>
-			<a class="text-white" :href="`https://bp-studio.github.io/${l}manual.html#health-check`" target="_blank">
+			<a
+				class="text-white"
+				:href="`https://bp-studio.github.io/${l}manual.html#health-check`"
+				target="_blank"
+				@click="learnMore"
+			>
 				{{ $t("health.learnMore") }}
 			</a>
 		</div>
@@ -91,6 +96,10 @@
 		}
 		return result;
 	});
+
+	function learnMore(): void {
+		gtag("event", "health_learn_more");
+	}
 
 	function add(list: Item[], key: string, n: number): void {
 		if(!n) return;

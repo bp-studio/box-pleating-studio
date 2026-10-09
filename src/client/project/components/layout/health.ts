@@ -27,6 +27,28 @@ const UNSOLVED_MARK = "?";
 
 const HALF = 0.5;
 
+const enum Analytics {
+	/** The next result is the first one after enabling. */
+	first,
+	/** The first result has issues, and they are not all resolved yet. */
+	resolve,
+	/** Nothing more to report. */
+	none,
+}
+
+/** The kinds of the issues in the report, in the same keys as in the UI. */
+function getIssues(report: HealthReport): string[] {
+	const g = report.geometry;
+	const counts: [string, number][] = [
+		["invalid", report.invalidJunctions],
+		["unsolved", report.unsolvedStretches],
+		["uncovered", g?.uncovered.length ?? 0],
+		["dangling", g?.danglingRidgeEnds.length ?? 0],
+		["riverCorner", g?.missingRiverRidges.length ?? 0],
+	];
+	return counts.filter(([, n]) => n).map(([key]) => key);
+}
+
 //=================================================================
 /**
  * {@link Health} manages the design health check of a {@link Layout}.
@@ -45,6 +67,7 @@ export class Health extends View {
 	public set enabled(v: boolean) {
 		this._enabled.value = v;
 		if(!v) this._report.value = null;
+		else this._analytics = Analytics.first;
 	}
 
 	private readonly _report = shallowRef<HealthReport | null>(null);
@@ -62,6 +85,9 @@ export class Health extends View {
 
 	/** Whether another check is needed after the current one. */
 	private _dirty: boolean = false;
+
+	/** What to report to Google Analytics for the next result. */
+	private _analytics: Analytics = Analytics.first;
 
 	constructor(layout: Layout) {
 		super();
@@ -102,7 +128,10 @@ export class Health extends View {
 			const border = this._layout.$sheet.grid.$getBorderPath();
 			const core = this._layout.$project.$core;
 			const report = await core.design.health(border);
-			if(this.enabled) this._report.value = report;
+			if(this.enabled) {
+				this._report.value = report;
+				this._sendAnalytics(report);
+			}
 		} finally {
 			this._checking = false;
 			if(this._dirty) this.$check();
@@ -112,6 +141,28 @@ export class Health extends View {
 	////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Report the first result after enabling, and the first time all the
+	 * issues are resolved after that, so that we know what issues the users
+	 * encounter, and how often the check helps them fix the layouts. The
+	 * results in between are not reported, as the check is performed on
+	 * every change of the layout.
+	 */
+	private _sendAnalytics(report: HealthReport): void {
+		const issues = getIssues(report);
+		if(this._analytics == Analytics.first) {
+			gtag("event", "health_result", {
+				data1: issues.length ? "issues" : "pass",
+				data2: issues.join(","),
+			});
+			this._analytics =
+				issues.length ? Analytics.resolve : Analytics.none;
+		} else if(this._analytics == Analytics.resolve && !issues.length) {
+			gtag("event", "health_resolved");
+			this._analytics = Analytics.none;
+		}
+	}
 
 	/**
 	 * Check upon enabling, and when the sheet changes (which doesn't

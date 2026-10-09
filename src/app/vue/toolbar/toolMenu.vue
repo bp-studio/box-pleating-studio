@@ -50,6 +50,7 @@
 		const health = design.layout.health;
 		health.enabled = !health.enabled;
 		if(health.enabled) design.mode = "layout";
+		gtag("event", "health_" + (health.enabled ? "on" : "off"));
 	}
 
 	async function TreeMaker(files: File[]): Promise<void> {
