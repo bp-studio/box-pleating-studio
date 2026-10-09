@@ -1,6 +1,8 @@
 import { describe, it, expect } from "@rstest/core";
 
-import { diagonalFitShift, fitRange } from "client/project/components/grid/constrain";
+import {
+	diagonalFitShift, diagonalLeastOutsideShift, fitRange, leastOutsideShift
+} from "client/project/components/grid/constrain";
 
 /** Same as DiagonalGrid.$contains, without the testing shift. */
 function diagonalContains(s: number, p: IPoint): boolean {
@@ -50,6 +52,29 @@ describe("Fitting into the grid", () => {
 	it("Fails if the points cannot fit into a diagonal grid", () => {
 		const points = [{ x: 0, y: 0 }, { x: 5, y: 0 }];
 		expect(diagonalFitShift(4, points)).to.be.null;
+	});
+
+	it("Shifts to leave the fewest points outside", () => {
+		const zeros = [0, 0, 0];
+		// At most one of them can be inside, and no shift is needed for that
+		expect(leastOutsideShift([0, 10, 20], zeros, [0, 8], [0, 8], false))
+			.to.eql([0, 0]);
+		// Shifting by -1 brings 5 and 9 inside
+		expect(leastOutsideShift([5, 9, 20], zeros, [0, 8], [0, 8], false))
+			.to.eql([-1, 0]);
+		// Both coordinates count
+		expect(leastOutsideShift([1, 2], [9, 1], [0, 8], [0, 8], false))
+			.to.eql([0, -1]);
+	});
+
+	it("Shifts to leave the fewest points outside a diagonal grid", () => {
+		// The grid of size 4 spans 4 in both u = x + y and v = x - y, so
+		// (0,0) and (6,0) cannot be both inside, but (0,0) and (3,0) can.
+		const points = [{ x: 0, y: 0 }, { x: 3, y: 0 }, { x: 6, y: 0 }];
+		const { x, y } = diagonalLeastOutsideShift(4, points);
+		expect(Number.isInteger(x) && Number.isInteger(y)).to.be.true;
+		const moved = points.map(p => ({ x: p.x + x, y: p.y + y }));
+		expect(moved.filter(p => diagonalContains(4, p)).length).to.equal(2);
 	});
 
 });

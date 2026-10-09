@@ -1,7 +1,10 @@
 import { shallowRef } from "vue";
 
+import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
+
 import type { NodeId } from "shared/json";
 import type { Tree } from "./tree";
+import type { Grid } from "../grid/grid";
 
 /** A node in a {@link Subtree}. */
 export interface SubtreeNode {
@@ -15,6 +18,12 @@ export interface SubtreeNode {
 	readonly length: number;
 
 	readonly name: string;
+
+	/**
+	 * The location of the node relative to the parent of the whole subtree
+	 * (i.e. the vertex above it, which is not included).
+	 */
+	readonly offset: IPoint;
 
 	/** The dimension of the flap, if the node is a leaf. */
 	readonly flap?: IDimension;
@@ -86,6 +95,43 @@ function post(): void {
 	);
 }
 
+/** The range of the final adjustment of the pasted subtrees. */
+const PASTE_ADJUST_RANGE = 2;
+
+/**
+ * The locations of the nodes of a pasted {@link Subtree}, restored relative to
+ * the vertex it is pasted under. They are first brought onto the sheet (see
+ * {@link Grid.$fitPoints}), and then shifted together within a small range to
+ * overlap the fewest occupied spots (given by {@link getOrderedKey}), staying
+ * on the sheet.
+ */
+export function placeSubtree(
+	grid: Grid, base: IPoint, subtree: Subtree, occupied: ReadonlySet<number>
+): IPoint[] {
+	const points = grid.$fitPoints(subtree.map(
+		({ offset }) => ({ x: base.x + offset.x, y: base.y + offset.y })
+	));
+	let result = points;
+	let minOverlap = Number.POSITIVE_INFINITY;
+	let minDist = Number.POSITIVE_INFINITY;
+	const r = PASTE_ADJUST_RANGE;
+	for(let dx = -r; dx <= r; dx++) {
+		for(let dy = -r; dy <= r; dy++) {
+			const moved = points.map(p => ({ x: p.x + dx, y: p.y + dy }));
+			if(!moved.every(p => grid.$contains(p))) continue;
+			const overlap = moved
+				.filter(p => occupied.has(getOrderedKey(p.x, p.y))).length;
+			const d = dx * dx + dy * dy;
+			if(overlap < minOverlap || overlap == minOverlap && d < minDist) {
+				result = moved;
+				minOverlap = overlap;
+				minDist = d;
+			}
+		}
+	}
+	return result;
+}
+
 export interface CollectResult {
 	readonly subtrees: Subtree[];
 
@@ -144,6 +190,7 @@ function getComponent(
 /** Create the {@link Subtree} hanging from the given parent. */
 function createSubtree(tree: Tree, root: NodeId, parent: NodeId): Subtree {
 	const flaps = tree.$project.design.layout.$flaps;
+	const base = tree.$vertices.$get(parent)!.$location;
 	const result: SubtreeNode[] = [];
 	const queue: [id: NodeId, from: NodeId, index: number][] = [
 		[root, parent, -1],
@@ -151,10 +198,12 @@ function createSubtree(tree: Tree, root: NodeId, parent: NodeId): Subtree {
 	for(const [id, from, index] of queue) {
 		const vertex = tree.$vertices.$get(id)!;
 		const flap = vertex.isLeaf ? flaps.get(id)?.toJSON() : undefined;
+		const { x, y } = vertex.$location;
 		result.push({
 			parent: index,
 			length: tree.$edges.get(id, from)!.length,
 			name: vertex.name,
+			offset: { x: x - base.x, y: y - base.y },
 			flap: flap && { width: flap.width, height: flap.height },
 		});
 		const current = result.length - 1;

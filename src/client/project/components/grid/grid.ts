@@ -74,6 +74,20 @@ export abstract class Grid extends Destructible
 	 */
 	public abstract $getFitShift(points: readonly IPoint[]): IPoint | null;
 
+	/**
+	 * Bring the given points onto the grid. They are shifted together by the
+	 * shortest distance if possible. Otherwise, they are shifted so that the
+	 * fewest of them are left outside, and then those are moved onto the grid
+	 * individually.
+	 */
+	public $fitPoints(points: readonly IPoint[]): IPoint[] {
+		const shift =
+			this.$getFitShift(points) ?? this._getLeastOutsideShift(points);
+		return points.map(
+			p => this.$constrain({ x: p.x + shift.x, y: p.y + shift.y })
+		);
+	}
+
 	/** Returns whether the grid can be subdivided. */
 	public abstract $canSubdivide(): boolean;
 
@@ -104,6 +118,12 @@ export abstract class Grid extends Destructible
 	////////////////////////////////////////////////////////////////////////////
 	// Protected method
 	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * The integral shift that leaves the fewest of the given points outside
+	 * the grid, and among those the shortest one.
+	 */
+	protected abstract _getLeastOutsideShift(points: readonly IPoint[]): IPoint;
 
 	protected _testFit(): boolean {
 		for(const c of this._sheet.$independents) {

@@ -7,7 +7,7 @@ import { applyTransform, dist } from "shared/types/geometry";
 import { getFirst } from "shared/utils/set";
 import { getOrderedKey } from "shared/data/doubleMap/intDoubleMap";
 import { MAX_VERTICES } from "shared/types/constants";
-import { collectSubtrees } from "./clipboard";
+import { collectSubtrees, placeSubtree } from "./clipboard";
 
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { IEditor, TransformTarget } from "../sheet";
@@ -154,8 +154,8 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 	}
 
 	/**
-	 * Paste the given {@link Subtree}s under the given {@link Vertex}.
-	 * Each node is placed at the closest empty spot around its parent.
+	 * Paste the given {@link Subtree}s under the given {@link Vertex}, keeping
+	 * the relative locations of the nodes (see {@link placeSubtree}).
 	 */
 	public async $paste(
 		at: Vertex, subtrees: readonly Subtree[]
@@ -165,21 +165,20 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		const count = subtrees.reduce((total, s) => total + s.length, 0);
 		const ids = this._allocateIds(count);
 		const occupied = this._getOccupiedSpots();
+		const grid = this._tree.$sheet.grid;
 		const edits: JEdit[] = [];
 		const flaps: JFlap[] = [];
 		let k = 0;
 		for(const subtree of subtrees) {
 			const newIds: NodeId[] = [];
-			const spots: IPoint[] = [];
-			for(const node of subtree) {
+			const spots =
+				placeSubtree(grid, at._location, subtree, occupied);
+			for(const p of spots) occupied.add(getOrderedKey(p.x, p.y));
+			for(const [i, node] of subtree.entries()) {
 				const id = ids[k++];
-				const isRoot = node.parent < 0;
-				const parent = isRoot ? at.id : newIds[node.parent];
-				const from = isRoot ? at._location : spots[node.parent];
-				const p = this._findClosestEmptySpot(from, occupied);
-				occupied.add(getOrderedKey(p.x, p.y));
+				const parent = node.parent < 0 ? at.id : newIds[node.parent];
+				const p = spots[i];
 				newIds.push(id);
-				spots.push(p);
 				const { name, length, flap } = node;
 				const { x, y } = p;
 				prototype.tree.nodes.push({ id, name, x, y, isNew: true });
