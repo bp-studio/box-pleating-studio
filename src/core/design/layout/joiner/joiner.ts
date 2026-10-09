@@ -106,12 +106,14 @@ export class Joiner {
 	/**
 	 * The {@link JoinCandidate}s of the first {@link JOverlap}.
 	 *
-	 * Note that this is not available if the two {@link JOverlap}s have the
-	 * same width or height (see the constructor), but in that case one of them
-	 * contains the other, which is excluded by Quadrant.$checkValidity.
+	 * Note that there's none if the two {@link JOverlap}s have the same width
+	 * or height (see the constructor). In that case one of them contains the
+	 * other with a common side, which is allowed by Quadrant.$checkValidity
+	 * for relaying, but they cannot be joined. This happens in fans, where the
+	 * one in the middle could be nested in both of the others.
 	 */
 	public get $firstCandidates(): readonly JoinCandidate[] {
-		return this.g1;
+		return this.g1 ?? [];
 	}
 
 	/**

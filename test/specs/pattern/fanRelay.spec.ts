@@ -1,7 +1,7 @@
 import { describe, it, expect } from "@rstest/core";
 
 import { expectFan, expectWithinFlapRectangles, findFan, forEachFan } from "./fanUtil";
-import { node } from "@utils/tree";
+import { node, parseTree } from "@utils/tree";
 import { same } from "shared/types/geometry";
 
 describe("Four flap patterns", () => {
@@ -410,6 +410,18 @@ describe("Four flap patterns", () => {
 			});
 		});
 
+	});
+
+	it("Does not join overlaps nested with a common side", () => {
+		// At the joint of flap 31, the overlap 31-46 (1x7) is nested in both
+		// 31-70 (1x13, the same width) and 2-31 (17x7, the same height).
+		// These can be relayed, but cannot be joined. Previously, the fan join
+		// crashed on the joiners of such pairs.
+		expect(() => parseTree(
+			"(5,76,1),(5,31,11),(5,46,5),(76,89,3),(89,72,2),(89,73,6)," +
+			"(72,67,2),(73,70,5),(67,2,23)",
+			"(46,62,74,0,0),(31,77,65,0,0),(70,52,78,0,0),(2,52,100,0,0)"
+		)).to.not.throw();
 	});
 
 });
