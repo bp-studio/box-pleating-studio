@@ -49,6 +49,7 @@ const deployMsg = `Before releasing, please check the following steps:
 4. Edit README.md if needed.
 5. Add GA tracking to new functionalities.
 6. Add relevant tests, and make sure that new codes are covered.
+7. Update user manual webpage if needed.
 Are you sure you want to deploy?"`;
 
 export const deployPub = () => seriesIf(
