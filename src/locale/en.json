@@ -276,6 +276,7 @@
 		"latest": "You already have the latest version of BP Studio.",
 		"min3vertex": "The tree needs to have at least 3 vertices.",
 		"nothingCopied": "Nothing was copied. Only the parts of the selection attached to the rest of the tree by exactly one edge can be copied or cut.",
+		"cannotFit": "The selection cannot fit in the sheet after the transformation.",
 		"oldVersion": "Project \"{0}\" was created with an older version of BP Studio, and part of the design has been modified. It will be updated to the latest format on the next saving.",
 		"patternNotFound": "Some of the overlappings of flaps in this design are valid, but for now BP Studio is unable to find working stretch patterns for them. The author of this app will continue to implement more algorithms to cover more cases.",
 		"unsaved": "Project \"{0}\" contains unsaved changes. Discard the changes?",

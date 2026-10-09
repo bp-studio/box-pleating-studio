@@ -16,6 +16,8 @@ import { createGrid } from "./grid";
 import { ZoomController } from "client/controllers/zoomController";
 import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
+import { getDots } from "./grid/constrain";
+import { applyTransform } from "shared/types/geometry";
 
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { ComputedRef } from "vue";
@@ -28,10 +30,26 @@ import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
 
 const LAYERS = Enum.values(Layer);
 
+/**
+ * An object that can be rotated or flipped, given by its bounding rectangle
+ * (degenerated for a point).
+ */
+export interface TransformTarget extends IPoint, IDimension {}
+
 /** {@link IEditor} is the associated editing logic for a {@link Sheet}. */
 export interface IEditor {
-	$transform(matrix: TransformationMatrix): void;
+	/**
+	 * Transform all the objects, or only the selected ones (see
+	 * {@link $getSelectedTargets}).
+	 */
+	$transform(matrix: TransformationMatrix, selectedOnly?: boolean): void;
+
+	/** The selected objects that can be rotated or flipped. */
+	$getSelectedTargets(): TransformTarget[];
 }
+
+/** The linear parts of the matrices of rotations and flips. */
+type LinearPart = [number, number, number, number];
 
 //=================================================================
 /**
@@ -240,8 +258,17 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		});
 	}
 
-	public rotate(by: Sign): void {
+	/**
+	 * Rotate the whole sheet, or only the selected objects if any.
+	 * Returns `false` if the selected objects cannot fit into the sheet after
+	 * the rotation.
+	 */
+	public rotate(by: Sign): boolean {
 		gtag("event", "edit_rotate");
+		const targets = this._editor.$getSelectedTargets();
+		if(targets.length) {
+			return this._transformTargets(targets, [0, by, -by, 0]);
+		}
 		display.shield(async () => {
 			const oldCenter = this.grid.$getCenter();
 			const { width, height } = this.grid.toJSON();
@@ -253,10 +280,22 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			]);
 			await this.$project.design.$batchUpdateManager.$updateComplete;
 		});
+		return true;
 	}
 
-	public flip(horizontal: boolean): void {
+	/**
+	 * Flip the whole sheet, or only the selected objects if any.
+	 * Returns `false` if the selected objects cannot fit into the sheet after
+	 * the flip (which could happen only for sheets of some shapes).
+	 */
+	public flip(horizontal: boolean): boolean {
 		gtag("event", "edit_flip");
+		const targets = this._editor.$getSelectedTargets();
+		if(targets.length) {
+			return this._transformTargets(
+				targets, horizontal ? [-1, 0, 0, 1] : [1, 0, 0, -1]
+			);
+		}
 		display.shield(async () => {
 			const { x, y } = this.grid.$getCenter();
 			this._editor.$transform(horizontal ?
@@ -264,6 +303,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			);
 			await this.$project.design.$batchUpdateManager.$updateComplete;
 		});
+		return true;
 	}
 
 	/** The dimension of the sheet after rasterization. */
@@ -289,6 +329,35 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 			width: (width + x * 2) * s + MARGIN * 2,
 			height: (height + y * 2) * s + MARGIN * 2,
 		};
+	}
+
+	/**
+	 * Rotate or flip the given objects about the center of the bounding box of
+	 * their centers, rounded to the grid. If some of them go beyond the sheet,
+	 * they are all shifted back by the shortest distance. Returns `false` if
+	 * that's impossible, in which case nothing is changed.
+	 */
+	private _transformTargets(
+		targets: readonly TransformTarget[], [a, b, c, d]: LinearPart
+	): boolean {
+		const xs = targets.map(t => t.x + t.width / 2);
+		const ys = targets.map(t => t.y + t.height / 2);
+		const cx = Math.round((Math.min(...xs) + Math.max(...xs)) / 2);
+		const cy = Math.round((Math.min(...ys) + Math.max(...ys)) / 2);
+		const matrix: TransformationMatrix =
+			[a, b, c, d, cx - a * cx - b * cy, cy - c * cx - d * cy];
+		const corners = targets.flatMap(t =>
+			getDots(t, t.width, t.height).map(p => applyTransform(p, matrix))
+		);
+		const shift = this.grid.$getFitShift(corners);
+		if(!shift) return false;
+		matrix[4] += shift.x;
+		matrix[5] += shift.y;
+		display.shield(async () => {
+			this._editor.$transform(matrix, true);
+			await this.$project.design.$batchUpdateManager.$updateComplete;
+		});
+		return true;
 	}
 
 	private _toMemento(): Memento {

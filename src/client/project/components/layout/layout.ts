@@ -15,7 +15,7 @@ import { FlapContainer } from "./flapContainer";
 import { applyTransform, norm } from "shared/types/geometry";
 import { Health } from "./health";
 
-import type { IEditor } from "../sheet";
+import type { IEditor, TransformTarget } from "../sheet";
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { Flap } from "./flap";
 import type { BatchUpdateManager } from "client/project/batchUpdateManager";
@@ -211,10 +211,17 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		return { id, x, y, width: 0, height: 0 };
 	}
 
-	public $transform(matrix: TransformationMatrix): void {
+	public $getSelectedTargets(): TransformTarget[] {
+		return [...this.$flaps].filter(f => f.$selected).map(f => f.toJSON());
+	}
+
+	public $transform(
+		matrix: TransformationMatrix, selectedOnly: boolean = false
+	): void {
 		const [a, b, c, d] = matrix;
 		const scale = Math.round((norm(a, c) + norm(b, d)) / 2);
 		for(const flap of this.$flaps) {
+			if(selectedOnly && !flap.$selected) continue;
 			const { x, y, width, height } = flap.toJSON();
 			const ll = applyTransform({ x, y }, matrix);
 			const ur = applyTransform({ x: x + width, y: y + height }, matrix);

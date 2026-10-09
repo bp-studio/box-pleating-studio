@@ -10,7 +10,7 @@ import { MAX_VERTICES } from "shared/types/constants";
 import { collectSubtrees } from "./clipboard";
 
 import type { TransformationMatrix } from "shared/types/geometry";
-import type { IEditor } from "../sheet";
+import type { IEditor, TransformTarget } from "../sheet";
 import type { UpdateModel } from "core/service/updateModel";
 import type { JEdit, JFlap, JTree, JVertex, NodeId } from "shared/json";
 import type { Subtree } from "./clipboard";
@@ -229,8 +229,16 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 		await this._tree.$project.$core.tree.join(vertex.id);
 	}
 
-	public $transform(matrix: TransformationMatrix): void {
-		for(const v of this) {
+	public $getSelectedTargets(): TransformTarget[] {
+		return [...this._getSelectedVertices()]
+			.map(v => ({ ...v._location, width: 0, height: 0 }));
+	}
+
+	public $transform(
+		matrix: TransformationMatrix, selectedOnly: boolean = false
+	): void {
+		const vertices = selectedOnly ? this._getSelectedVertices() : this;
+		for(const v of vertices) {
 			v.$assign(applyTransform(v._location, matrix));
 		}
 	}
@@ -252,6 +260,21 @@ export class VertexContainer implements Iterable<Vertex>, IEditor {
 			result.push(id);
 		}
 		while(result.length < count) result.push(next++ as NodeId);
+		return result;
+	}
+
+	/**
+	 * The selected vertices, where a selected edge counts as selecting both of
+	 * its ends.
+	 */
+	private _getSelectedVertices(): Set<Vertex> {
+		const result = new Set<Vertex>();
+		for(const v of this) if(v.$selected) result.add(v);
+		for(const e of this._tree.$edges.values()) {
+			if(!e.$selected) continue;
+			result.add(e.$v1);
+			result.add(e.$v2);
+		}
 		return result;
 	}
 

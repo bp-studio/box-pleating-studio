@@ -68,6 +68,12 @@ export abstract class Grid extends Destructible
 	/** Find the point on the grid that is closest to the given point. */
 	public abstract $constrain(p: IPoint): IPoint;
 
+	/**
+	 * Find the shortest integral translation that brings all the given points
+	 * onto the grid, or `null` if there's none.
+	 */
+	public abstract $getFitShift(points: readonly IPoint[]): IPoint | null;
+
 	/** Returns whether the grid can be subdivided. */
 	public abstract $canSubdivide(): boolean;
 

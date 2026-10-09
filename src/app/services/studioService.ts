@@ -10,6 +10,7 @@ import type { ComputedRef, UnwrapNestedRefs } from "vue";
 import type { DirectionKey } from "shared/types/types";
 import type { StudioOptions } from "client/options";
 import type { Device } from "client/project/components/layout/device";
+import type { Sheet } from "client/project/components/sheet";
 
 /** Before the Studio is initialized, use a default value as placeholder. */
 function proxy<T>(target: Action<T>, defaultValue: T): ComputedRef<T> {
@@ -165,6 +166,24 @@ namespace StudioService {
 		const design = project.value?.design;
 		if(!design?.canPaste) return;
 		execute(() => design.paste());
+	}
+	/**
+	 * Rotate the sheet, or only the selected objects if any (see
+	 * {@link Sheet.rotate}).
+	 */
+	export function rotate(by: Sign): void {
+		const sheet = project.value?.design.sheet;
+		if(sheet && !sheet.rotate(by)) Toast.show(i18n.t("message.cannotFit"));
+	}
+	/**
+	 * Flip the sheet, or only the selected objects if any (see
+	 * {@link Sheet.flip}).
+	 */
+	export function flip(horizontal: boolean): void {
+		const sheet = project.value?.design.sheet;
+		if(sheet && !sheet.flip(horizontal)) {
+			Toast.show(i18n.t("message.cannotFit"));
+		}
 	}
 	export function svg(proj: Project, includeHidden: boolean): Promise<Blob> {
 		return Promise.resolve(bp.svg(proj, includeHidden));

@@ -276,6 +276,7 @@
 		"latest": "Bạn đã có phiên bản BP Studio mới nhất.",
 		"min3vertex": "Cây cần có ít nhất 3 đỉnh.",
 		"nothingCopied": "Không có gì được sao chép. Chỉ những phần của vùng chọn nối với phần còn lại của cây bằng đúng một cạnh mới có thể được sao chép hoặc cắt.",
+		"cannotFit": "Sau khi biến đổi, vùng chọn không vừa trong tờ giấy.",
 		"oldVersion": "Dự án \"{0}\" đã được tạo bằng phiên bản cũ hơn của BP Studio và một phần thiết kế đã được sửa đổi. Nó sẽ được cập nhật lên định dạng mới nhất trong lần lưu tiếp theo.",
 		"patternNotFound": "Một số phần xếp chồng lên nhau của các nắp trong thiết kế này là hợp lệ, nhưng hiện tại BP Studio không thể tìm thấy các mẫu co giãn phù hợp cho chúng. Tác giả của ứng dụng này sẽ tiếp tục triển khai nhiều thuật toán hơn để bao gồm nhiều trường hợp hơn.",
 		"unsaved": "Dự án \"{0}\" chứa các thay đổi chưa được lưu. Hủy các thay đổi?",

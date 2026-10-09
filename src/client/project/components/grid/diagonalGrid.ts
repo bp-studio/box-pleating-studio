@@ -6,7 +6,7 @@ import { drawPath } from "client/utils/contourUtil";
 import { Grid } from "./grid";
 import { chebyshev } from "client/utils/chebyshev";
 import { MAX_SHEET_SIZE, MIN_DIAG_SIZE } from "shared/types/constants";
-import { diagonalConstrain } from "./constrain";
+import { diagonalConstrain, diagonalFitShift } from "./constrain";
 
 import type { GraphicsLike } from "client/utils/contourUtil";
 import type { Path, TransformationMatrix } from "shared/types/geometry";
@@ -111,6 +111,10 @@ export class DiagonalGrid extends Grid {
 
 	public $constrain(p: IPoint): IPoint {
 		return diagonalConstrain(this._size.value, this._size.value, p);
+	}
+
+	public $getFitShift(points: readonly IPoint[]): IPoint | null {
+		return diagonalFitShift(this._size.value, points);
 	}
 
 	public $contains(p: IPoint): boolean {

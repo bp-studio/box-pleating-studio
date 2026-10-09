@@ -40,16 +40,16 @@
 			>
 				<i class="fa-solid fa-table-cells"/>{{ $t('toolbar.edit.subdivide') }}
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.project" @click="Studio.project && Studio.project.design.sheet.rotate(1)">
+			<DropdownItem :disabled="!Studio.project" @click="Studio.rotate(1)">
 				<i class="fa-solid fa-rotate-right"/>{{ $t('toolbar.edit.rotate_right') }}
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.project" @click="Studio.project && Studio.project.design.sheet.rotate(-1)">
+			<DropdownItem :disabled="!Studio.project" @click="Studio.rotate(-1)">
 				<i class="fa-solid fa-rotate-left"/>{{ $t('toolbar.edit.rotate_left') }}
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.project" @click="Studio.project && Studio.project.design.sheet.flip(true)">
+			<DropdownItem :disabled="!Studio.project" @click="Studio.flip(true)">
 				<i class="fa-solid fa-arrows-left-right-to-line"/>{{ $t('toolbar.edit.horizontal_flip') }}
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.project" @click="Studio.project && Studio.project.design.sheet.flip(false)">
+			<DropdownItem :disabled="!Studio.project" @click="Studio.flip(false)">
 				<i class="fa-solid fa-arrows-left-right-to-line fa-rotate-90"/>{{ $t('toolbar.edit.vertical_flip') }}
 			</DropdownItem>
 			<Divider/>

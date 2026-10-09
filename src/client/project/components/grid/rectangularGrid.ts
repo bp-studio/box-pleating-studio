@@ -4,7 +4,7 @@ import { GridType } from "shared/json/enum";
 import { Direction } from "shared/types/direction";
 import { Grid } from "./grid";
 import { MAX_SHEET_SIZE, MIN_RECT_SIZE } from "shared/types/constants";
-import { rectangularConstrain } from "./constrain";
+import { fitRange, rectangularConstrain } from "./constrain";
 
 import type { Path, TransformationMatrix } from "shared/types/geometry";
 import type { GraphicsLike } from "client/utils/contourUtil";
@@ -136,6 +136,13 @@ export class RectangularGrid extends Grid {
 
 	public $constrain(p: IPoint): IPoint {
 		return rectangularConstrain(this._width.value, this._height.value, p);
+	}
+
+	public $getFitShift(points: readonly IPoint[]): IPoint | null {
+		const x = fitRange(points.map(p => p.x), 0, this._width.value);
+		const y = fitRange(points.map(p => p.y), 0, this._height.value);
+		if(x === null || y === null) return null;
+		return { x, y };
 	}
 
 	public $contains(p: IPoint): boolean {

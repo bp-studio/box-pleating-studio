@@ -104,3 +104,51 @@ export function diagonalConstrain(w: number, _: number, p: IPoint): IPoint {
 	return { x, y };
 }
 
+/**
+ * The integral shift closest to zero that brings all the given values into the
+ * range [min, max], or `null` if there's none.
+ */
+export function fitRange(
+	values: readonly number[], min: number, max: number
+): number | null {
+	const lo = min - Math.min(...values);
+	const hi = max - Math.max(...values);
+	if(lo > hi) return null;
+	return Math.min(Math.max(0, Math.ceil(lo)), Math.floor(hi));
+}
+
+/**
+ * The shortest integral shift that brings all the given points into the
+ * diagonal grid of the given size (see {@link DiagonalGrid.$contains}).
+ *
+ * In the coordinates u = x + y and v = x - y, the grid is a rectangle, so the
+ * shift in each coordinate is found separately. But a shift (dx, dy) changes
+ * u and v by the same parity, so the shifts have to be adjusted if they differ
+ * in parity.
+ */
+export function diagonalFitShift(
+	s: number, points: readonly IPoint[]
+): IPoint | null {
+	const h = s % 2;
+	const f = (s - h) / 2;
+	const c = (s + h) / 2;
+	const us = points.map(p => p.x + p.y);
+	const vs = points.map(p => p.x - p.y);
+	const du = fitRange(us, f, c + s);
+	const dv = fitRange(vs, -c, c);
+	if(du === null || dv === null) return null;
+	let best: [number, number] | null = null;
+	let min = Number.POSITIVE_INFINITY;
+	for(const [u, v] of [
+		[du, dv], [du - 1, dv], [du + 1, dv], [du, dv - 1], [du, dv + 1],
+	]) {
+		if((u - v) % 2 != 0) continue;
+		if(fitRange(us.map(x => x + u), f, c + s) !== 0) continue;
+		if(fitRange(vs.map(x => x + v), -c, c) !== 0) continue;
+		const d = u * u + v * v;
+		if(d < min) [best, min] = [[u, v], d];
+	}
+	if(!best) return null;
+	const [u, v] = best;
+	return { x: (u + v) / 2, y: (u - v) / 2 };
+}

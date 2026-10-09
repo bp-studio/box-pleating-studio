@@ -276,6 +276,7 @@
 		"latest": "Ya tienes la última versión de BP Studio.",
 		"min3vertex": "El árbol debe tener al menos 3 vértices.",
 		"nothingCopied": "No se copió nada. Solo se pueden copiar o cortar las partes de la selección unidas al resto del árbol por exactamente una arista.",
+		"cannotFit": "La selección no cabe en la hoja después de la transformación.",
 		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y se modificó parte del diseño. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
 		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",

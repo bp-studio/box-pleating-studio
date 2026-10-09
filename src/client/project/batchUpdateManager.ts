@@ -51,6 +51,11 @@ export class BatchUpdateManager {
 		return this._setupPromise();
 	}
 
+	/** Whether there are updates waiting to be sent to the Core. */
+	public get $isPending(): boolean {
+		return this._updatePromise !== undefined;
+	}
+
 	/**
 	 * Return a {@link Promise} that resolves when all updates are completed.
 	 */

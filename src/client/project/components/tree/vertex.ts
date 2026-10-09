@@ -187,9 +187,14 @@ export class Vertex extends Independent
 			}
 		}
 		// If we get here, the Core will not be invoked, and we need to flush
-		// the history manually.
+		// the history manually. But if other vertices moved together are
+		// syncing their flaps (as in rotating a new tree), the history will be
+		// flushed after the Core updates, so that all the moves are recorded
+		// in one step.
 		return pendingFlush ||= Promise.resolve().then(() => {
 			pendingFlush = undefined;
+			const design = this.$project.design;
+			if(design.$batchUpdateManager.$isPending) return;
 			this.$project.history.$flush();
 		});
 	}
