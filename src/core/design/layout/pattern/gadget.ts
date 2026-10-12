@@ -155,6 +155,20 @@ export class Gadget implements JGadget {
 		obstacles: readonly RationalPath[],
 		companions: readonly RationalPath[] = []
 	): void {
+		this.$addSlack(
+			q1, this.$getConnectionSlack(g, q1, q2, obstacles, companions)
+		);
+	}
+
+	/**
+	 * The additional slack needed towards a connection target, without
+	 * actually adding it. See {@link $setupConnectionSlack}.
+	 */
+	public $getConnectionSlack(
+		g: Gadget, q1: QuadrantDirection, q2: QuadrantDirection,
+		obstacles: readonly RationalPath[],
+		companions: readonly RationalPath[]
+	): number {
 		const f = q1 == 0 ? 1 : -1;
 		const step = new Vector(f, f);
 		// The slack of the target also applies (see Device.$getDraggingRange)
@@ -202,7 +216,7 @@ export class Gadget implements JGadget {
 			}
 			/// #endif
 		}
-		this.$addSlack(q1, s);
+		return s;
 	}
 
 	/** If the current {@link Gadget} contains the given ray. */

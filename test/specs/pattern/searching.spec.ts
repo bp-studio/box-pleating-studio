@@ -1,4 +1,4 @@
-import { describe, it, expect } from "@rstest/core";
+import { describe, it, expect, rs } from "@rstest/core";
 
 import { LayoutController } from "core/controller/layoutController";
 import { id2, id3, id4, id5, parseTree } from "@utils/tree";
@@ -8,6 +8,7 @@ import { complete, generateFromFlaps } from "./util";
 import { DesignController } from "core/controller/designController";
 import { getJSON } from "@utils/sample";
 import { Migration } from "client/patches";
+import { PositioningContext } from "core/design/layout/pattern/positioners/positioningContext";
 
 import type { JEdge, JFlap } from "shared/json";
 
@@ -165,6 +166,28 @@ describe("Searching", () => {
 			expect(UpdateResult.$flush().patternNotFound).to.be.false;
 		});
 
+	});
+
+	/** Added v0.8.2 */
+	it("Skips the combinations of devices exceeding the spans of junctions", () => {
+		// The bridge between flaps 23 and 148 is relayed onto the gadgets of
+		// flaps 23,65 and 75,148 at both ends, and the gadget of 88,148 is in
+		// turn relayed onto it, making 4 partitions with up to 12*6*10*14
+		// combinations of devices in each configuration, none of which fits.
+		// Checking each of them would take seconds.
+		const spy = rs.spyOn(PositioningContext.prototype, "$checkJunctions");
+		try {
+			parseTree(
+				"(23,40,21),(38,40,2),(38,41,2),(38,65,4),(40,88,4),(41,75,4),(41,148,54)",
+				"(23,29,17,0,2),(65,52,37,0,4),(75,66,17,4,0),(88,54,25,0,2),(148,104,65,12,0)"
+			);
+			const repo = State.$stretches.get("23,65,75,88,148")!.$repo;
+			expect(repo.$isValid).to.be.true;
+			expect(repo.$pattern).to.equal(null);
+			expect(spy.mock.calls.length).to.be.lessThan(100);
+		} finally {
+			spy.mockRestore();
+		}
 	});
 
 	it("Caches repo during dragging", () => {
