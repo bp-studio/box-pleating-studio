@@ -136,20 +136,32 @@ namespace {
 			cout << "Tidy: initial junction area " << total_area() << " " << initial << ", " << mobility_summary() << endl;
 			report(initial);
 
-			// The search is quite sensitive to the path taken, and neither proxy dominates the other,
-			// so we simply run both from the initial layout and keep the better result.
+			// The search is quite sensitive to the path taken, and no single path dominates the others,
+			// so we run several of them and keep the best result.
 			const GridLayout start = layout;
 			Score best_score = initial;
 			GridLayout best_layout = layout;
-			for(const bool use_covering: {true, false}) {
-				layout = start;
+			auto attempt = [&](const GridLayout &from, const bool use_covering, const bool use_partial) {
+				layout = from;
 				objective(nullptr);
-				const auto result = optimize(use_covering);
+				const auto result = optimize(use_covering, use_partial);
 				if(result < best_score) {
 					best_score = result;
 					best_layout = layout;
 				}
-			}
+			};
+
+			// First, both proxies from the initial layout, without partial moves.
+			for(const bool use_covering: {true, false}) attempt(start, use_covering, false);
+
+			// Then with partial moves (see `partial_move`), both from the initial layout and from the best result so far.
+			// Partial moves alter the path considerably, for better or worse,
+			// so they're not a replacement of the paths above.
+			// The plain proxy is skipped here, as it brings no further improvement in practice.
+			attempt(start, true, true);
+			const GridLayout middle = best_layout;
+			attempt(middle, true, true);
+
 			layout = std::move(best_layout);
 			report(best_score);
 		}
@@ -160,8 +172,9 @@ namespace {
 		 * then try swapping flaps to escape the local optimum, and repeat.
 		 * Returns the resulting objective.
 		 */
-		Score optimize(const bool use_covering) {
-			const char *name = use_covering ? "covering" : "plain";
+		Score optimize(const bool use_covering, const bool use_partial) {
+			const string name = string(use_covering ? "covering" : "plain") + (use_partial ? " partial" : "");
+			partial = use_partial;
 			Score current = objective(nullptr);
 			for(int round = 1; round <= MAX_ROUNDS; round++) {
 				for(int pass = 1; pass <= MAX_PASSES; pass++) {
@@ -301,6 +314,7 @@ namespace {
 		Contour contour;
 		vector<int> weight;	   // weight[i * n + j] = 0 if the junction between i and j is currently covered, 1 otherwise
 		vector<int> expansion; // expansion[i * n + j] = tree distance from flap i to the LCA of flaps i and j
+		bool partial = false;  // whether partial moves are allowed
 
 		// Neighborhood being solved
 		vector<Var> vars;
@@ -564,10 +578,62 @@ namespace {
 			const Score result = objective(&group);
 			if(result < current) return result;
 
-			// The proxy is only a proxy; revert if the actual objective doesn't improve
+			// The proxy is only a proxy; try a part of the moves, or revert if the actual objective doesn't improve
 			layout = backup;
+			if(partial && has_incumbent) {
+				const Score partial_result = partial_move(group, current);
+				if(partial_result < current) return partial_result;
+			}
 			objective(&group); // Restore the covering state and the contours
 			return current;
+		}
+
+		/**
+		 * The arrangement optimal in terms of the proxy may overshoot,
+		 * moving some flaps in ways that hurt the actual objective (typically because some flaps that
+		 * would follow are not in the group), while the rest of the moves alone would be an improvement.
+		 * So we try applying each proper subset of the moves (that keeps the layout valid) to the current layout,
+		 * and take the best one in terms of the actual objective, if it improves.
+		 *
+		 * It is assumed that `layout` is the current arrangement, and that `best_values` is the proxy optimum.
+		 * The layout is left changed only if the returned objective improves from the given value.
+		 *
+		 * Most subsets turn out to be invalid (moves of nearby flaps tend to depend on each other),
+		 * so this only accounts for a small portion of the running time despite the exponential number of subsets.
+		 */
+		Score partial_move(const vector<int> &group, const Score current) {
+			vector<int> moved;
+			for(int v = 0; v < vars.size(); v++) {
+				if(best_values[v] != vars[v].current) moved.push_back(v);
+			}
+			if(moved.size() < 2) return current;
+
+			const GridLayout backup = layout;
+			Score best_score = current;
+			GridLayout best_layout = layout;
+			const int full = (1 << moved.size()) - 1;
+			for(int mask = 1; mask < full; mask++) {
+				layout = backup;
+				for(int k = 0; k < moved.size(); k++) {
+					if(!(mask & (1 << k))) continue;
+					const auto &c = vars[moved[k]].values[best_values[moved[k]]];
+					layout.grid[vars[moved[k]].flap * 2] = c.x;
+					layout.grid[vars[moved[k]].flap * 2 + 1] = c.y;
+				}
+				bool valid = true;
+				for(int k = 0; k < moved.size() && valid; k++) {
+					const int i = vars[moved[k]].flap;
+					if(mask & (1 << k)) valid = feasible(i, layout.at(i));
+				}
+				if(!valid) continue;
+				const Score score = objective(&group);
+				if(score < best_score) {
+					best_score = score;
+					best_layout = layout;
+				}
+			}
+			layout = std::move(best_layout);
+			return objective(&group);
 		}
 
 		void apply(const vector<int> &values) {
