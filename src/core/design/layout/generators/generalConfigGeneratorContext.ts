@@ -331,6 +331,14 @@ export class GeneralConfigGeneratorContext extends ConfigGeneratorContext {
 		}
 	}
 
+	/**
+	 * Note that the remaining parts of the split overlaps are relayed back onto
+	 * the joined ones (mutual connections), and so far they are not combined
+	 * with other relays. If that is ever extended, see createSlackTerm in
+	 * spanBound.ts: the collision slack of such connections is ignored there
+	 * for the moment (which is still sound, only looser), and it can be
+	 * computed exactly for more precise pruning, with tests covering it.
+	 */
 	private *_searchSplitJoin(
 		joint: Joint, rank: number
 	): Generator<Configuration> {

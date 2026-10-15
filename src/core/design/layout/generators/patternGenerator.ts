@@ -1,9 +1,11 @@
 import { Pattern } from "../pattern/pattern";
 import { Device } from "../pattern/device";
+import { checkSpanBounds, createSpanBounds } from "./spanBound";
 
 import type { Configuration } from "../configuration";
 import type { JConfiguration, JDevice } from "shared/json";
 import type { Partition } from "../partition";
+import type { SpanBounds } from "./spanBound";
 
 //=================================================================
 /**
@@ -35,7 +37,9 @@ export function* patternGenerator(
 
 	// Search for patterns
 	const buffer: JDevice[] = new Array(config.$partitions.length);
-	const generator = recursiveDeviceGenerator(config.$partitions, 0, buffer);
+	const bounds = createSpanBounds(config);
+	const generator =
+		recursiveDeviceGenerator(config.$partitions, bounds, 0, buffer);
 	for(const devices of generator) {
 		// Compare and skip prototype pattern
 		if(protoSignature) {
@@ -50,14 +54,24 @@ export function* patternGenerator(
 	}
 }
 
+/**
+ * Generate the combinations of {@link JDevice}s in order. The combinations
+ * that cannot pass the {@link SpanBounds} are skipped as early as possible,
+ * as the number of combinations grows exponentially with the number of
+ * {@link Partition}s.
+ */
 function* recursiveDeviceGenerator(
-	partitions: readonly Partition[], depth: number, buffer: JDevice[]
+	partitions: readonly Partition[], bounds: SpanBounds,
+	depth: number, buffer: JDevice[]
 ): Generator<JDevice[]> {
 	const partition = partitions[depth];
 	for(const device of partition.$devices.$values()) {
 		buffer[depth] = device;
+		if(!checkSpanBounds(bounds, depth, buffer)) continue;
 		if(depth + 1 < partitions.length) {
-			yield* recursiveDeviceGenerator(partitions, depth + 1, buffer);
+			yield* recursiveDeviceGenerator(
+				partitions, bounds, depth + 1, buffer
+			);
 		} else {
 			yield buffer.concat();
 		}

@@ -206,7 +206,9 @@ export class PositioningContext {
 }
 
 /** The contours of all regions (gadgets and add-ons) of a {@link Device}. */
-function getRegions(device: Device): RationalPath[] {
+export function getRegions(
+	device: Pick<Device, "$gadgets" | "$addOns">
+): RationalPath[] {
 	return [
 		...device.$gadgets.map(g => g.$contour.value),
 		...device.$addOns.map(a => a.$shape.value.contour),

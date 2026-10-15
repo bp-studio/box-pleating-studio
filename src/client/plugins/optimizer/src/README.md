@@ -186,6 +186,27 @@ Instead, we use [Large Neighborhood Search](https://en.wikipedia.org/wiki/Large_
 Since the flaps in a group are re-arranged jointly, the ones that are stuck
 individually can move together with their neighbors, and over multiple passes they
 can travel far from where the fitting stage put them.
+
+One weakness of step 4 is that the proxy optimum may *overshoot*:
+it may move some flaps in a way that hurts the actual objective
+(typically because the flaps that would follow them are not in the group),
+while the rest of the moves alone would be a genuine improvement.
+Rejecting the whole arrangement throws away the good part as well.
+So there is an option of *partial moves*: when the proxy optimum is rejected,
+we try applying each proper subset of its moves (that keeps the layout valid),
+and accept the best one if the actual objective improves.
+Although the number of subsets is exponential in the group size,
+most of them are invalid (moves of nearby flaps tend to depend on each other),
+so this costs very little in practice.
+
 As the result depends quite a bit on the path taken by the search,
-the whole process is run twice, with and without the covering weights in the proxy,
-and the better result is kept.
+the whole process is run several times, and the best result is kept:
+
+1. With and without the covering weights in the proxy, from the layout of the fitting stage.
+2. With the covering weights and partial moves, from the layout of the fitting stage.
+3. With the covering weights and partial moves, from the best result so far.
+
+Partial moves change the path considerably, sometimes for the worse,
+so the runs without them are still needed;
+on the other hand, running without the covering weights in the latter two runs brings no further improvement in practice.
+Overall, this takes about 1.8 times as long as the first two runs alone.

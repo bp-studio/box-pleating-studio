@@ -26,13 +26,12 @@ describe("Optimizer", () => {
 			checkInterrupt: () => false,
 		});
 		const bridge = new Bridge(instance);
-		const request = makeRequest({ command: "start", useBH: false, layout: "view", random: 0, problem: { type: "rect", flaps: [{ id: 2, width: 0, height: 0 }, { id: 8, width: 0, height: 6 }, { id: 10, width: 5, height: 2 }, { id: 13, width: 0, height: 4 }, { id: 15, width: 0, height: 0 }, { id: 18, width: 0, height: 0 }, { id: 20, width: 0, height: 0 }, { id: 23, width: 0, height: 0 }, { id: 25, width: 0, height: 0 }, { id: 28, width: 3, height: 0 }, { id: 30, width: 0, height: 0 }], hierarchies: [{ leaves: [2, 8, 10, 13, 15, 18, 20, 23, 25, 28, 30], distMap: [[13, 15, 14], [8, 10, 14], [18, 20, 14], [28, 30, 14], [2, 8, 18], [2, 10, 22], [23, 25, 14], [13, 18, 30], [13, 20, 34], [15, 18, 34], [15, 20, 38], [2, 28, 22], [2, 30, 26], [8, 28, 30], [8, 30, 34], [10, 28, 34], [10, 30, 38], [2, 13, 34], [2, 15, 38], [2, 18, 30], [2, 20, 34], [8, 13, 42], [8, 15, 46], [8, 18, 38], [8, 20, 42], [10, 13, 46], [10, 15, 50], [10, 18, 42], [10, 20, 46], [28, 13, 38], [28, 15, 42], [28, 18, 34], [28, 20, 38], [30, 13, 42], [30, 15, 46], [30, 18, 38], [30, 20, 42], [2, 23, 26], [2, 25, 30], [8, 23, 34], [8, 25, 38], [10, 23, 38], [10, 25, 42], [28, 23, 30], [28, 25, 34], [30, 23, 34], [30, 25, 38], [13, 23, 34], [13, 25, 38], [15, 23, 38], [15, 25, 42], [18, 23, 30], [18, 25, 34], [20, 23, 34], [20, 25, 38]], parents: [] }] }, vec: [{ x: 0.5909090909090909, y: 0.6363636363636364 }, { x: 0.7121212121212122, y: 0.9090909090909091 }, { x: 0.9242424242424242, y: 0.9696969696969697 }, { x: 0.9696969696969697, y: 0.21212121212121213 }, { x: 1, y: 0 }, { x: 0.5151515151515151, y: 0.18181818181818182 }, { x: 0.3939393939393939, y: 0 }, { x: 0.19696969696969696, y: 0.5151515151515151 }, { x: 0, y: 0.42424242424242425 }, { x: 0.21212121212121213, y: 0.9696969696969697 }, { x: 0, y: 1 }] });
-		const result = await bridge.solve(request);
+		const result = await bridge.solve(dimensionRequest);
 		expect(result).to.deep.equal({
 			width: 66, height: 66,
 			flaps: [
 				{ id: 2, x: 39, y: 42 }, { id: 8, x: 47, y: 60 },
-				{ id: 10, x: 61, y: 64 }, { id: 13, x: 66, y: 14 },
+				{ id: 10, x: 61, y: 64 }, { id: 13, x: 64, y: 14 },
 				{ id: 15, x: 66, y: 0 }, { id: 18, x: 34, y: 12 },
 				{ id: 20, x: 26, y: 0 }, { id: 23, x: 13, y: 34 },
 				{ id: 25, x: 0, y: 28 }, { id: 28, x: 14, y: 64 },
@@ -64,6 +63,24 @@ describe("Optimizer", () => {
 		});
 	});
 
+	it("Tidies layouts at least as well as known solutions", async () => {
+		const logs: string[] = [];
+		const instance = await optimizer({
+			print: (s: string) => logs.push(s),
+			checkInterrupt: () => false,
+		});
+		const bridge = new Bridge(instance);
+		const result = await bridge.solve(tidyRequest, 1);
+		expect(result.width).to.equal(20);
+
+		// A known solution has 48 contour vertices and 32 uncovered junction
+		// area. The tidying used to get stuck at (52, 53), as the proxy
+		// optimum of the crucial neighborhood overshoots, and the improving
+		// part of it was never tried (resolved by partial moves).
+		const score = bestTidyScore(logs);
+		expect(compareScore(score, [48, 32])).to.be.at.most(0);
+	});
+
 	// This is the template for examine issues. Uncomment to use it.
 
 	// eslint-disable-next-line vitest/no-commented-out-tests
@@ -81,28 +98,124 @@ function makeRequest(data: unknown): OptimizerRequest {
 	return data as OptimizerRequest;
 }
 
-const simpleRequest = makeRequest({
-	command: "start",
-	problem: {
-		type: GridType.rectangular,
-		flaps: [
-			{ id: 1, width: 0, height: 0 },
-			{ id: 2, width: 0, height: 0 },
-			{ id: 4, width: 0, height: 0 },
-		],
-		hierarchies: [
-			{
-				leaves: [1, 2, 4],
-				distMap: [[1, 2, 16], [1, 4, 16], [2, 4, 12]],
-				parents: [],
-			},
-		],
-	},
-	layout: "view",
-	useBH: false,
-	random: 0,
-	vec: [{ x: 0.3, y: 0.3 }, { x: 0.4, y: 0.5 }, { x: 0.5, y: 0.4 }],
-});
+type Score = [vertices: number, area: number];
+
+/** Lexicographic comparison of tidying scores; negative if `a` is better. */
+function compareScore(a: Score, b: Score): number {
+	return a[0] - b[0] || a[1] - b[1];
+}
+
+/**
+ * The final score of the tidying stage, parsed from the logs.
+ *
+ * The tidying keeps the best of all the layouts it reaches, and the score of
+ * each of them is logged at some point, so the final score is simply the best
+ * among all the logged scores.
+ */
+function bestTidyScore(logs: string[]): Score {
+	const pattern =
+		/^Tidy: .*\(uncovered area (\d+), contour vertices (\d+)\)/;
+	let best: Score | undefined;
+	for(const line of logs) {
+		const match = line.match(pattern);
+		if(!match) continue;
+		const score: Score = [Number(match[2]), Number(match[1])];
+		if(!best || compareScore(score, best) < 0) best = score;
+	}
+	if(!best) throw new Error("No tidying score found in the logs.");
+	return best;
+}
+
+/** [id, parent, distance to the root] */
+type NodeData = [id: number, parent: number | null, dist: number];
+
+/** [id, x, y, width, height], where the dimensions default to 0 */
+type FlapData = [id: number, x: number, y: number, w?: number, h?: number];
+
+/**
+ * Create a view-mode {@link OptimizerRequest} on a rectangular sheet from a
+ * rooted tree and the flaps on a sheet of the given size, with the
+ * distances between the flaps derived from the tree.
+ */
+function createRequest(
+	nodes: NodeData[], flaps: FlapData[], size: number
+): OptimizerRequest {
+	const parent = new Map(nodes.map(([id, p]) => [id, p]));
+	const dist = new Map(nodes.map(([id, , d]) => [id, d]));
+	const ancestors = (id: number | null): number[] =>
+		id === null ? [] : [id, ...ancestors(parent.get(id)!)];
+	const treeDist = (a: number, b: number): number => {
+		const set = new Set(ancestors(a));
+		const lca = ancestors(b).find(n => set.has(n))!;
+		return dist.get(a)! + dist.get(b)! - 2 * dist.get(lca)!;
+	};
+
+	const leaves = flaps.map(([id]) => id);
+	const distMap: [number, number, number][] = [];
+	for(let i = 0; i < leaves.length; i++) {
+		for(let j = i + 1; j < leaves.length; j++) {
+			const [a, b] = [leaves[i], leaves[j]];
+			distMap.push([a, b, treeDist(a, b)]);
+		}
+	}
+
+	return makeRequest({
+		command: "start",
+		problem: {
+			type: GridType.rectangular,
+			flaps: flaps.map(([id, , , width = 0, height = 0]) =>
+				({ id, width, height })),
+			hierarchies: [{ leaves, distMap, parents: [] }],
+			tree: nodes.map(([id, p, d]) => ({ id, parent: p, dist: d })),
+		},
+		layout: "view",
+		useBH: false,
+		random: 0,
+		vec: flaps.map(([, x, y]) => ({ x: x / size, y: y / size })),
+	});
+}
+
+const simpleRequest = createRequest(
+	[[1, 5, 10], [2, 5, 6], [4, 5, 6], [5, null, 0]],
+	[[1, 3, 3], [2, 4, 5], [4, 5, 4]],
+	10
+);
+
+const dimensionRequest = createRequest(
+	[
+		[2, 32, 9], [8, 31, 17], [10, 31, 21], [13, 33, 25], [15, 33, 29],
+		[18, 35, 21], [20, 35, 25], [23, 37, 17], [25, 37, 21], [28, 39, 13],
+		[30, 39, 17], [31, 32, 12], [32, 38, 4], [33, 34, 20], [34, 36, 8],
+		[35, 34, 16], [36, 38, 4], [37, 36, 12], [38, null, 0], [39, 38, 8],
+	],
+	[
+		[2, 39, 42], [8, 47, 60, 0, 6], [10, 61, 64, 5, 2], [13, 64, 14, 0, 4],
+		[15, 66, 0], [18, 34, 12], [20, 26, 0], [23, 13, 34], [25, 0, 28],
+		[28, 14, 64, 3, 0], [30, 0, 66],
+	],
+	66
+);
+
+/**
+ * A completely invalid layout, for which the tidying stage used to miss a
+ * much neater solution. The tree is rooted at node 13, as the Core balances
+ * the tree that way.
+ */
+const tidyRequest = createRequest(
+	[
+		[0, 13, 3], [1, 14, 3], [2, 7, 13], [3, 0, 10], [4, 0, 8],
+		[5, 4, 10], [6, 4, 11], [7, 0, 11], [8, 7, 12], [9, 3, 11],
+		[10, 0, 4], [11, 3, 11], [12, 3, 11], [13, null, 0], [14, 15, 2],
+		[15, 13, 1], [16, 13, 1], [17, 15, 2], [18, 14, 3], [19, 0, 6],
+		[20, 4, 9],
+	],
+	[
+		[1, 12, 16], [2, 4, 3], [5, 2, 11], [6, 5, 14], [8, 6, 5],
+		[9, 13, 5], [11, 13, 3], [12, 13, 7], [16, 12, 11], [17, 12, 13],
+		[18, 12, 15], [19, 9, 8], [10, 5, 8], [20, 1, 12],
+	],
+	16
+);
 
 const simpleResult = {
 	width: 15,

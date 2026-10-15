@@ -29,6 +29,15 @@ const CORE_TIMEOUT = isIOS || isLowEndDevice ? SLOW_TIMEOUT : NORMAL_TIMEOUT;
 const UNTIMED_ROUTES: ReadonlySet<string> = new Set(["layout.getCP"]);
 
 /**
+ * Designs with more flaps than this are not timed. The timeout is meant to
+ * guard against infinite loops or pattern searching that takes too long, which
+ * are local issues not related to the scale of the design. Real designs rarely
+ * go beyond around a hundred flaps, and beyond this it is most likely a stress
+ * test, where the slowness is expected and not our concern.
+ */
+const MAX_TIMED_FLAPS = 256;
+
+/**
  * Id starts from 1 to ensure true values.
  */
 let nextId = 1;
@@ -230,7 +239,8 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		const callbacks = this._returnCallbacks.concat();
 		this._returnCallbacks.length = 0;
 		this._pendingCalls++;
-		const timed = !UNTIMED_ROUTES.has(controller + "." + action);
+		const timed = !UNTIMED_ROUTES.has(controller + "." + action) &&
+			this._flapCount <= MAX_TIMED_FLAPS;
 		const response = await callCore(this._worker, request, timed);
 		this._pendingCalls--;
 		for(const callback of callbacks) callback();
@@ -253,6 +263,15 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			}
 			return response.value;
 		}
+	}
+
+	/**
+	 * The number of flaps, including the prototypes not yet sent back from the
+	 * Core (in particular, all flaps on initialization).
+	 */
+	private get _flapCount(): number {
+		const layout = this.design.layout;
+		return layout.flapCount + this.design.$prototype.layout.flaps.length;
 	}
 
 	private async _handleCoreError(
