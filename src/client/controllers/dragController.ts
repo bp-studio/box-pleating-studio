@@ -115,11 +115,11 @@ export namespace DragController {
 		const project = ProjectService.project.value;
 		if(wasDragging && project) {
 			const draggable = SelectionController.draggables.value[0];
-			const shouldSignifyEnd = draggable && draggable.type === "Flap";
 			const draggingDevice = draggable && draggable.type === "Device";
-			project.design.$batchUpdateManager.$updateComplete.then(() => {
+			const manager = project.design.$batchUpdateManager;
+			manager.$updateComplete.then(() => {
 				project.$isDragging = false;
-				if(shouldSignifyEnd) project.$core.layout.dragEnd();
+				if(manager.$takeDraggedFlaps()) project.$core.layout.dragEnd();
 				if(draggingDevice) project.design.layout.$endDeviceDrag();
 			});
 		}
