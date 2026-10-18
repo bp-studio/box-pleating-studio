@@ -29,6 +29,15 @@ export class BatchUpdateManager {
 
 	private readonly _pendingEdges: JEdge[] = [];
 
+	/**
+	 * Whether any flap update has been sent to the Core in dragging mode since
+	 * the last {@link $takeDraggedFlaps}() call. If so, the Core has started
+	 * caching stretches and repositories, and needs to be notified when the
+	 * dragging ends. This happens not only when dragging flaps, but also when
+	 * dragging new vertices in tree mode, which sync their flaps.
+	 */
+	private _draggedFlaps: boolean = false;
+
 	private readonly _core: CoreManager;
 
 	constructor(core: CoreManager) {
@@ -64,6 +73,16 @@ export class BatchUpdateManager {
 			.then(() => this._core.$updating);
 	}
 
+	/**
+	 * Return whether any flap update has been sent in dragging mode,
+	 * and reset the record.
+	 */
+	public $takeDraggedFlaps(): boolean {
+		const result = this._draggedFlaps;
+		this._draggedFlaps = false;
+		return result;
+	}
+
 	////////////////////////////////////////////////////////////////////////////
 	// Private members
 	////////////////////////////////////////////////////////////////////////////
@@ -90,6 +109,7 @@ export class BatchUpdateManager {
 			request.flaps.push(f.$updateDrawParams());
 			for(const action of actions) action();
 		}
+		if(request.dragging && request.flaps.length) this._draggedFlaps = true;
 		this._pendingFlaps.clear();
 		this._pendingEdges.length = 0;
 		return this._core.$run(stack, c => c.design.update(request));
