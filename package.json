@@ -58,6 +58,7 @@
 		"bootstrap": "^5.3.8",
 		"fflate": "^0.8.3",
 		"idb-keyval": "^6.3.0",
+		"inapp-spy": "^5.0.10",
 		"probably-china": "^1.1.0",
 		"vue": "^3.5.44",
 		"vue-i18n": "^11.4.14",

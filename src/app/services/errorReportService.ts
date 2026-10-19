@@ -1,9 +1,62 @@
-import { isOnline } from "app/shared/constants";
+import { isInApp, isLowEndDevice, isOnline, isTouch } from "app/shared/constants";
 
-import type { CoreError, JProject } from "shared/json/project";
+import type { CoreError, DeviceInfo, JProject } from "shared/json/project";
 
 const LOG_FILENAME_LENGTH = 20;
 const JSON_INDENT = 4;
+const MB = 1048576;
+
+/**
+ * Collect information about the device for diagnosing performance issues.
+ * @param projects The number of opened projects.
+ */
+export function getDeviceInfo(projects: number): DeviceInfo {
+	// The following are undefined in unsupported browsers, which is fine.
+	/* eslint-disable compat/compat */
+	const memory = performance.memory;
+	const deviceMemory = navigator.deviceMemory;
+	const concurrency = navigator.hardwareConcurrency;
+	/* eslint-enable compat/compat */
+	return {
+		userAgent: navigator.userAgent,
+		deviceMemory,
+		concurrency,
+		lowEnd: isLowEndDevice,
+		touch: isTouch,
+		inApp: Boolean(isInApp),
+		screen: {
+			width: screen.width,
+			height: screen.height,
+			pixelRatio: devicePixelRatio,
+		},
+		viewport: { width: innerWidth, height: innerHeight },
+		gpu: getGpu(),
+		heap: memory && {
+			used: Math.round(memory.usedJSHeapSize / MB),
+			limit: Math.round(memory.jsHeapSizeLimit / MB),
+		},
+		uptime: Math.round(performance.now()),
+		projects,
+		visible: document.visibilityState == "visible",
+		focused: document.hasFocus(),
+	};
+}
+
+/** Use a temporary context to avoid interfering with the rendering. */
+function getGpu(): string | undefined {
+	try {
+		const gl = document.createElement("canvas").getContext("webgl");
+		if(!gl) return undefined;
+		const ext = gl.getExtension("WEBGL_debug_renderer_info");
+		const result = String(gl.getParameter(
+			ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER
+		));
+		gl.getExtension("WEBGL_lose_context")?.loseContext();
+		return result;
+	} catch {
+		return undefined;
+	}
+}
 
 /** @see [error.php](../../other/php/error.php) */
 const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
@@ -38,7 +91,7 @@ export async function uploadLog(
 
 		const trace = `Client trace:\n${block(error.clientTrace)}\nCore trace:\n${block(error.coreTrace)}`;
 		const payload = {
-			content: `A fatal error has occurred in BP Studio: **${error.message}**\n\n${getInfo()}\n\n${trace}\nFull log:`,
+			content: `A fatal error has occurred in BP Studio: **${error.message}**\n\n${getInfo(error.device)}\n\n${trace}\nFull log:`,
 		};
 		const jsonBlob = new Blob([JSON.stringify(log, null, JSON_INDENT)], { type: "application/json" });
 		const formData = new FormData();
@@ -56,10 +109,11 @@ export async function uploadLog(
 	gtag("event", "fatal_error", gaErrorData(error.message + "\n" + error.coreTrace));
 }
 
-function getInfo(): string {
-	let info = `User agent: ${navigator.userAgent}`;
-	if(navigator.deviceMemory) info += `\nDevice memory: ${navigator.deviceMemory}`;
-	if(navigator.hardwareConcurrency) info += `\nConcurrency: ${navigator.hardwareConcurrency}`;
+function getInfo(device: DeviceInfo): string {
+	let info = `User agent: ${device.userAgent}`;
+	if(device.deviceMemory) info += `\nDevice memory: ${device.deviceMemory}`;
+	if(device.concurrency) info += `\nConcurrency: ${device.concurrency}`;
+	if(device.gpu) info += `\nGPU: ${device.gpu}`;
 	return info;
 }
 

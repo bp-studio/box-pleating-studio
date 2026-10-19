@@ -4,7 +4,7 @@ import Dialogs from "./dialogService";
 import Studio from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
-import { uploadLog } from "./errorReportService";
+import { getDeviceInfo, uploadLog } from "./errorReportService";
 
 import type { OptimizerCallback, OptimizerOptions } from "client/plugins/optimizer";
 import type { CoreError, JProject, ProjId } from "shared/json";
@@ -206,7 +206,7 @@ namespace WorkspaceService {
 			const log = cloneObj(backup);
 			if(log) {
 				error.build = app_config.app_version;
-				error.userAgent = navigator.userAgent;
+				error.device = getDeviceInfo(ids.value.length);
 				log.error = error;
 				setTimeout(() => uploadLog(log, error), 0);
 			}

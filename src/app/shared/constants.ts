@@ -1,3 +1,4 @@
+import inAppSpy from "inapp-spy";
 
 /**
  * If native File Access API is supported.
@@ -74,7 +75,7 @@ export const hasServiceWorker = "serviceWorker" in navigator;
 const timing = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
 export const isReload = timing?.type == "reload" || performance.navigation?.type == 1;
 
-export const isInApp = navigator.userAgent.match(/\bFBAV\b/);
+export const isInApp = inAppSpy().isInApp;
 
 export const hasSharedArrayBuffer = typeof SharedArrayBuffer !== "undefined";
 
