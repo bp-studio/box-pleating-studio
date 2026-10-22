@@ -166,9 +166,18 @@ export class Repository implements ISerializable<JRepository | undefined> {
 		if(this.$origin.eq(origin)) return false;
 
 		this.$origin = new Point(origin);
+		this.$refreshDevices();
+		return true;
+	}
+
+	/**
+	 * Mark the {@link Device}s of all {@link Pattern}s for updating, as if the
+	 * origin has moved. Those of the current {@link Pattern} are updated in the
+	 * current round, and the rest are updated when switched to.
+	 */
+	public $refreshDevices(): void {
 		this.$configurations.forEach(c => c.$originDirty = true);
 		this.$configuration?.$tryUpdateOrigin();
-		return true;
 	}
 
 	/**

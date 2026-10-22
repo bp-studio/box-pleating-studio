@@ -1,7 +1,7 @@
 import { Repository } from "./repository";
 import { getStructureSignature } from "./junction/validJunction";
 import { State } from "core/service/state";
-import { clearPatternContourForRepo } from "../tasks/patternContour";
+import { clearPatternContourForLeftNodes, clearPatternContourForRepo } from "../tasks/patternContour";
 import { NodeSet } from "./nodeSet";
 
 import type { JStretch } from "shared/json";
@@ -70,12 +70,17 @@ export class Stretch implements ISerializable<JStretch> {
 			 */
 			const oldSet = repo.$nodeSet;
 			repo.$nodeSet = new NodeSet(junctions, repo.$quadrants);
+			clearPatternContourForLeftNodes(repo, oldSet);
 
 			const updated = repo.$tryUpdateOrigin(origin);
 			if(!this.$isActive || updated) {
 				State.$repoToProcess.add(repo);
 				this.$isActive = true;
 			} else if(oldSet.$compare(repo.$nodeSet)) {
+				// The ridges of the devices depend on the radii of the flaps
+				// (see Quadrant.$getOverlapCorner), which could change without
+				// changing the signature (for example, by joining nodes).
+				repo.$refreshDevices();
 				State.$repoWithNodeSetChanged.add(repo);
 			}
 			return;

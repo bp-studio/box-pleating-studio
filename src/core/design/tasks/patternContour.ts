@@ -13,6 +13,7 @@ import type { HingeSegment } from "../layout/trace/hingeSegment";
 import type { Quadrant } from "../layout/pattern/quadrant";
 import type { PerQuadrant, QuadrantDirection } from "shared/types/direction";
 import type { Repository } from "../layout/repository";
+import type { NodeSet } from "../layout/nodeSet";
 import type { ITreeNode, NodeGraphics } from "../context";
 import type { StartEnd } from "../layout/trace/trace";
 import type { RawPiece } from "./utils/rawPiece";
@@ -78,6 +79,8 @@ function patternContour(): void {
 	for(const repo of State.$repoWithNodeSetChanged) {
 		for(const node of nodesOfRepo(repo)) {
 			for(const contour of node.$graphics.$patternContours) {
+				// The node could be in other repos as well.
+				if(contour.$repo != repo.$signature) continue;
 				contour.$ids = repo.$nodeSet.$nodes;
 			}
 		}
@@ -252,6 +255,23 @@ function isAlongRect(path: Path, rect: IRect): boolean {
 export function clearPatternContourForRepo(repo: Repository): void {
 	for(const node of nodesOfRepo(repo)) {
 		clearPatternContourForNode(repo, node);
+	}
+}
+
+/**
+ * Clear the pattern contours of the repo on the nodes that are no longer in its
+ * {@link NodeSet}. The rest of the process only looks at the nodes in the
+ * current {@link NodeSet}, so otherwise those contours would be left behind,
+ * and show up again if the node later becomes part of a river.
+ */
+export function clearPatternContourForLeftNodes(
+	repo: Repository, oldSet: NodeSet
+): void {
+	const current = new Set(repo.$nodeSet.$nodes);
+	for(const id of oldSet.$nodes) {
+		if(current.has(id)) continue;
+		const node = State.m.$tree.$nodes[id];
+		if(node) clearPatternContourForNode(repo, node);
 	}
 }
 
