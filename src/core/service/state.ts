@@ -9,8 +9,12 @@ import type { JStretch, NodeId } from "shared/json";
 import type { Stretch } from "core/design/layout/stretch";
 import type { Junction } from "core/design/layout/junction/junction";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
-import type { ITreeNode, PatternContour } from "core/design/context";
+import type { ITreeNode, PatternContour, NodeGraphics } from "core/design/context";
 import type { Tree } from "core/design/context/tree";
+import type { roughContourTask } from "core/design/tasks/roughContour";
+import type { traceContourTask } from "core/design/tasks/traceContour";
+import type { AABB } from "core/design/context/aabb/aabb";
+import type { NodeSet } from "core/design/layout/nodeSet";
 
 //=================================================================
 /**
@@ -157,7 +161,7 @@ export namespace State {
 	export const $stretchPrototypes = new Map<string, JStretch>();
 
 	/**
-	 * Those {@link ITreeNode}s that has its {@link ITreeNode.$roughContours}
+	 * Those {@link ITreeNode}s that has its {@link NodeGraphics.$roughContours}
 	 * changed in the current round.
 	 */
 	export const $roughContourChanged = new Set<ITreeNode>();

@@ -1,5 +1,6 @@
 import { DesignController } from "core/controller/designController";
 import { TreeController } from "core/controller/treeController";
+import { LayoutController } from "core/controller/layoutController";
 import { State } from "core/service/state";
 
 import type { NodeId } from "shared/json/tree";
@@ -107,10 +108,18 @@ function removeLeaves(ids: number[]): void {
 		return n && n.$isLeaf && n.$parent;
 	});
 	if(!alive.length) return;
+	// Like the Client (see VertexContainer._simulateDelete), a prototype is
+	// needed for every neighbor whose degree drops to 1 in the unrooted tree.
+	// This includes the root left with a single child, which becomes a leaf
+	// after balancing.
+	const nodes = State.m.$tree.$nodes;
 	const protos: JFlapLike[] = [];
 	for(const id of alive) {
-		const p = State.m.$tree.$nodes[id as NodeId]!.$parent!;
-		if(p.$children.$size <= 1 && !alive.includes(p.id)) {
+		const p = nodes[id as NodeId]!.$parent!;
+		if(alive.includes(p.id) || protos.some(f => f.id === p.id)) continue;
+		const removed = alive.filter(a => nodes[a as NodeId]!.$parent === p);
+		const degree = p.$children.$size + (p.$parent ? 1 : 0) - removed.length;
+		if(degree === 1) {
 			protos.push({ id: p.id, x: 8, y: 8, width: 0, height: 0 });
 		}
 	}
@@ -228,6 +237,27 @@ export function execOp(op: string): void {
 		const id = Number(m[1]);
 		const n = State.m.$tree.$nodes[id as NodeId];
 		if(isJoinable(n)) TreeController.join(id as NodeId);
+	} else if((m = op.match(/^flap (\d+)->\((-?\d+),(-?\d+),(\d+),(\d+)\)$/))) {
+		const id = Number(m[1]);
+		const n = State.m.$tree.$nodes[id as NodeId];
+		if(n && n.$isLeaf && n.$parent) {
+			const [x, y, width, height] = m.slice(2).map(Number);
+			DesignController.update({
+				flaps: [{ id: id as NodeId, x, y, width, height }],
+				edges: [], stretches: [], dragging: true,
+			});
+		}
+	} else if((m = op.match(/^length (\d+)=(\d+)$/))) {
+		const id = Number(m[1]);
+		const n = State.m.$tree.$nodes[id as NodeId];
+		if(n && n.$parent) {
+			const edge = { n1: n.$parent.id, n2: n.id, length: Number(m[2]) };
+			DesignController.update({
+				flaps: [], edges: [edge], stretches: [], dragging: false,
+			});
+		}
+	} else if(op === "dragEnd") {
+		LayoutController.dragEnd();
 	}
 }
 
@@ -245,7 +275,7 @@ export function replayOps(ops: readonly string[], build: () => void): void {
 export function minimizeOps(
 	ops: string[], build: () => void, messageIncludes: string
 ): string[] {
-	const stillCrashes = (candidate: string[]): boolean => {
+	return minimizeOpsBy(ops, candidate => {
 		build();
 		try {
 			for(const op of candidate) execOp(op);
@@ -253,15 +283,23 @@ export function minimizeOps(
 			return (e as Error).message.includes(messageIncludes);
 		}
 		return false;
-	};
+	});
+}
 
+/**
+ * Delta-debugs an op list into a smaller one for which {@link stillFails}
+ * still holds. Greedy single-op removal followed by contiguous-chunk removal.
+ */
+export function minimizeOpsBy(
+	ops: string[], stillFails: (candidate: string[]) => boolean
+): string[] {
 	let current = ops.slice();
 	let changed = true;
 	while(changed) {
 		changed = false;
 		for(let i = current.length - 1; i >= 0; i--) {
 			const removeOne = current.slice(0, i).concat(current.slice(i + 1));
-			if(stillCrashes(removeOne)) {
+			if(stillFails(removeOne)) {
 				current = removeOne;
 				changed = true;
 			}
@@ -273,7 +311,7 @@ export function minimizeOps(
 		while(i + size <= current.length) {
 			const removeChunk =
 				current.slice(0, i).concat(current.slice(i + size));
-			if(stillCrashes(removeChunk)) current = removeChunk;
+			if(stillFails(removeChunk)) current = removeChunk;
 			else i++;
 		}
 	}

@@ -119,6 +119,24 @@ function generalCross(s1: LineSegment, s2: LineSegment): IPoint {
 /**
  * {@link GeneralIntersector} is the {@link Intersector} for general line
  * segments.
+ *
+ * Note on robustness: the floating errors are handled here by local epsilon
+ * comparisons (see {@link RELAXED_EPSILON}, {@link crossPoint} and
+ * {@link violatedEnd}), together with the tolerance in the comparators.
+ * As epsilon-equality is not transitive, such local decisions can contradict
+ * each other, and each of the measures above patches one such case.
+ *
+ * If floating issues keep coming up, a more systematic alternative is snap
+ * rounding (Greene and Hobby), which makes all the epsilon decisions in one
+ * place: the intersection points and the endpoints are rounded to a grid, and
+ * each segment passing through a "hot pixel" (a grid cell containing such a
+ * point) is rerouted through the center of the pixel, so that the result is
+ * topologically consistent and within half a pixel from the input. It can be
+ * done within a sweep in output-sensitive time (Goodrich, Guibas, Hershberger
+ * and Tanenbaum, 1997). A known drawback is that a rounded segment may come
+ * very close to a vertex it doesn't pass through; iterated snap rounding
+ * (Halperin and Packer, 2002) fixes that by rerouting repeatedly, at the cost
+ * of possibly larger deviation from the input.
  */
 //=================================================================
 

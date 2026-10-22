@@ -16,6 +16,8 @@ import type { ILine, Path, PathEx } from "shared/types/geometry";
 import type { DeviceData, GraphicsData } from "core/service/updateModel";
 import type { ITreeNode } from "../context";
 import type { QuadrantCode } from "shared/types/direction";
+import type { NodeId } from "shared/json/tree";
+import type { NodeSet } from "../layout/nodeSet";
 
 //=================================================================
 /**
@@ -32,23 +34,14 @@ function graphics(): void {
 		addRepo(repo);
 	}
 
-	const freeCorners: FreeCorner[] = [];
-	for(const stretch of State.$stretches.values()) {
-		const repo = stretch.$repo;
-		const config = repo.$configuration;
-		if(!config) continue;
-		const slope: Slope = repo.$direction == SlashDirection.FW ? 1 : -1;
-		for(const { corner } of config.$freeCorners) {
-			freeCorners.push({ corner, slope });
-		}
-	}
+	const freeCorners = getFreeCornersOfRivers();
 
 	// Flaps and rivers
 	for(const node of State.$contourWillChange) {
 		const g = node.$graphics;
 		combineContour(node);
 		g.$ridges = node.$isLeaf ?
-			flapRidge(node) : riverRidge(node, freeCorners);
+			flapRidge(node) : riverRidge(node, freeCorners.get(node.id) ?? []);
 
 		UpdateResult.$addGraphics(node.$tag, {
 			contours: g.$contours,
@@ -77,6 +70,33 @@ function addRepo(repo: Repository): void {
 			forward,
 		} as DeviceData);
 	}
+}
+
+/**
+ * Collect the free corners relevant to each river, that is, those of the
+ * stretches involving the river (see {@link NodeSet.$nodes}).
+ *
+ * Only these can be hit by the ridges of the river. A free corner of another
+ * stretch could lie inside the river only if the gadget overlaps the river (in
+ * invalid layouts), in which case it should not affect the ridges either.
+ * Restricting this way also makes the ridges of a river depend only on the
+ * stretches involving it, whose changes always come with the changes of its
+ * contours.
+ */
+function getFreeCornersOfRivers(): Map<NodeId, FreeCorner[]> {
+	const result = new Map<NodeId, FreeCorner[]>();
+	for(const stretch of State.$stretches.values()) {
+		const repo = stretch.$repo;
+		const config = repo.$configuration;
+		if(!config) continue;
+		const slope: Slope = repo.$direction == SlashDirection.FW ? 1 : -1;
+		const corners: FreeCorner[] =
+			config.$freeCorners.map(c => ({ corner: c.corner, slope }));
+		for(const id of repo.$nodeSet.$nodes) {
+			getOrSetEmptyArray(result, id).push(...corners);
+		}
+	}
+	return result;
 }
 
 function flapRidge(node: ITreeNode): ILine[] {

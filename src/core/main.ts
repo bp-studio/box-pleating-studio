@@ -23,6 +23,7 @@ onmessage = function(event: MessageEvent): void {
 	if(!event.ports[0]) return;
 
 	const request = event.data as CoreRequest;
+	const start = performance.now();
 	let response: CoreResponse;
 	try {
 		// Uncomment the next line to mock fatal error.
@@ -48,6 +49,8 @@ onmessage = function(event: MessageEvent): void {
 			{ message: "Unknown error", coreTrace: "" }) as CoreError;
 		response = { error };
 	}
+	// Reported to the Client for estimating the computing power of the device.
+	response.time = Math.round(performance.now() - start);
 	event.ports[0].postMessage(response);
 };
 

@@ -10,7 +10,7 @@ import { callWorker } from "app/utils/workerUtility";
 import { isIOS, isLowEndDevice } from "app/shared/constants";
 
 import type { Route, CoreResponse, ErrorResponse, CoreRequest } from "core/routes";
-import type { CoreError, JProject, JProjectLike, ProjId } from "shared/json";
+import type { CoreCallRecord, CoreError, JProject, JProjectLike, ProjId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 
 /**
@@ -36,6 +36,9 @@ const UNTIMED_ROUTES: ReadonlySet<string> = new Set(["layout.getCP"]);
  * test, where the slowness is expected and not our concern.
  */
 const MAX_TIMED_FLAPS = 256;
+
+/** The number of recent Core requests kept for error reports. */
+const MAX_CALL_RECORDS = 50;
 
 /**
  * Id starts from 1 to ensure true values.
@@ -113,6 +116,9 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	private _pendingCalls: number = 0;
 
 	private readonly _returnCallbacks: Action[] = [];
+
+	/** The most recent completed Core requests (for error reports). */
+	private readonly _callRecords: CoreCallRecord[] = [];
 
 	/**
 	 * Whether the user is performing dragging on the current {@link Project}.
@@ -241,8 +247,18 @@ export class Project extends Mountable implements ISerializable<JProject> {
 		this._pendingCalls++;
 		const timed = !UNTIMED_ROUTES.has(controller + "." + action) &&
 			this._flapCount <= MAX_TIMED_FLAPS;
+		const start = performance.now();
 		const response = await callCore(this._worker, request, timed);
 		this._pendingCalls--;
+		if(response.time !== undefined) {
+			this._callRecords.push({
+				route: controller + "." + action,
+				core: response.time,
+				wall: Math.round(performance.now() - start),
+			});
+			const records = this._callRecords;
+			if(records.length > MAX_CALL_RECORDS) records.shift();
+		}
 		for(const callback of callbacks) callback();
 		if("error" in response) {
 			await this._handleCoreError(request, response, stack);
@@ -287,6 +303,8 @@ export class Project extends Mountable implements ISerializable<JProject> {
 			const coreError = response.error;
 			coreError.clientTrace = stack;
 			coreError.request = request;
+			coreError.timeout = CORE_TIMEOUT;
+			coreError.recentCalls = this._callRecords;
 			Project.$onFatalError();
 			await options.onError?.(this.id, coreError, this.history.$backup);
 		}

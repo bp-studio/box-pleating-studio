@@ -9,6 +9,7 @@ import { UpdateResult } from "core/service/updateResult";
 import { complete, generateFromFlaps } from "./util";
 import { DesignController } from "core/controller/designController";
 import { LayoutController } from "core/controller/layoutController";
+import { checkConsistency } from "@utils/consistency";
 
 import type { ILine } from "shared/types/geometry";
 import type { NodeId } from "shared/json/tree";
@@ -31,6 +32,17 @@ describe("Rendering", () => {
 			[{ x: 4.5, y: 3.5 }, { x: 6, y: 5 }]
 		);
 		expect(ridges2).to.containLine([{ x: 4.5, y: 3.5 }, { x: 7, y: 6 }]);
+	});
+
+	it("Updates side ridges when a flap radius changes by joining", () => {
+		// Joining node 1 doesn't change the distance between flaps 2 and 3, so
+		// the signature of the repo stays the same, but the radius of flap 2
+		// grows from 3 to 6, and so does the side ridge extending to it.
+		// Found by the consistency checking in `test/utils/consistency.ts`.
+		const build = (): void => {
+			parseTree("(0,1,3),(1,2,3),(0,3,4)", "(2,0,0,0,0),(3,6,8,0,0)");
+		};
+		expect(checkConsistency(build, ["join 1"])).to.be.null;
 	});
 
 	it("Update origin when all flaps move simultaneously", () => {

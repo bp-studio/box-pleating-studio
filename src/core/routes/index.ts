@@ -32,4 +32,10 @@ export interface ErrorResponse {
 	error: CoreError;
 }
 
-export type CoreResponse = ValueResponse | UpdateResponse | ErrorResponse;
+interface ResponseBase {
+	/** Time (in milliseconds) spent by the Core on the request. */
+	time?: number;
+}
+
+export type CoreResponse = ResponseBase &
+	(ValueResponse | UpdateResponse | ErrorResponse);
