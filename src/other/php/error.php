@@ -17,7 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Discord Webhook URL (in environment variable)
-$webhook_url = $_SERVER['DISCORD_WEBHOOK'];
+$webhook_url = $_SERVER['DISCORD_WEBHOOK'] ?? '';
+if (!$webhook_url) {
+    http_response_code(500); // Internal Server Error
+    echo json_encode(['error' => 'The webhook is not configured.']);
+    exit;
+}
 
 // Verify request method is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -77,6 +82,4 @@ if ($response === false) {
     http_response_code($http_code);
     echo $response;
 }
-
-curl_close($ch);
 ?>

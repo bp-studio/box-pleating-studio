@@ -55,7 +55,6 @@ function shorten($url) {
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $error = curl_error($ch);
-    curl_close($ch);
     if ($response === false) return [null, "Request failed: $error"];
 
     $data = json_decode($response, true);
@@ -107,7 +106,6 @@ function notify_failure($url, $reason) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     curl_exec($ch);
-    curl_close($ch);
 }
 
 // Set CORS headers
@@ -136,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 // Verify that the URL is a share link of BP Studio
 $url = $_GET['url'] ?? '';
-$parts = parse_url($url);
+$parts = is_string($url) ? parse_url($url) : false; // `url[]=...` gives an array
 $valid = $parts !== false
     && is_allowed_origin(($parts['scheme'] ?? '') . '://' . ($parts['host'] ?? ''))
     && ($parts['path'] ?? '') === '/'
