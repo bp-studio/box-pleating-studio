@@ -97,8 +97,10 @@ export class RavlTree<K, V = K> extends ParentedTree<K, V, Node<K, V>> {
 			x = x.$parent;
 		}
 
+		// Now either the rank rule holds, or x is a 0-child whose sibling is an
+		// i-child with i > 1, and only the latter requires rotations.
 		const y = x.$parent;
-		if(y === this._nil) return;
+		if(y === this._nil || x.$rank !== y.$rank) return;
 
 		if(x === y.$left) {
 			const z = x.$right;

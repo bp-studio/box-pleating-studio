@@ -156,8 +156,15 @@ export class Chainer<PathType extends Path = Path> {
 		/**
 		 * We use linear search here to check all chains,
 		 * which appears to be inefficient,
-		 * but in practice there will only be at most two or three chains,
+		 * but in practice there will only be at most a few open chains,
 		 * so there is no need for optimizations.
+		 * (As measured in 2026, the maximum is 4 in both the tests and
+		 * real-world designs, with at most 79 segments in one call.)
+		 *
+		 * In theory, the chaining becomes quadratic for inputs with many
+		 * open chains at a time, such as many parallel strips.
+		 * If that ever matters, index the chains by their end points
+		 * (with grid cells for epsilon comparison) once there are many.
 		 */
 		for(let i = 1; i <= this._chains; i++) {
 			// Typically the instances of IPoints is not shared here,

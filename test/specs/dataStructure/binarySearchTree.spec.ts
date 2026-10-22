@@ -30,9 +30,63 @@ describe("Binary Search Tree", () => {
 			const tree = new RavlTree<number>(minComparator);
 			expect(() => tree.$delete(1)).to.not.throw();
 		});
+
+		it("Stays balanced when inserting at one end and deleting at the other", () => {
+			// This is the pattern of parallel segments in a sweep line.
+			const tree = new RavlTree<number>(minComparator);
+			const m = 4096, size = 1000;
+			for(let i = 0; i < m; i++) {
+				tree.$insert(-i, -i);
+				if(i >= size) tree.$delete(size - i);
+			}
+			expectRanks(tree);
+			// The height is at most log_phi(m) by the paper.
+			expect(height(tree)).to.be
+				.at.most(Math.log(m) / Math.log((1 + Math.sqrt(5)) / 2));
+		});
+
+		it("Keeps all rank differences positive", () => {
+			const tree = new RavlTree<number>(minComparator);
+			for(let i = 0; i < 1000; i++) {
+				tree.$insert(random(10000), i);
+				if(i % 3 == 0) tree.$delete(random(10000));
+			}
+			expectRanks(tree);
+		});
 	});
 
 });
+
+interface RankedNode {
+	$rank: number;
+	$left: RankedNode;
+	$right: RankedNode;
+}
+
+function getRoot(tree: RavlTree<number>): [RankedNode, RankedNode] {
+	const t = tree as unknown as { _root: RankedNode, _nil: RankedNode };
+	return [t._root, t._nil];
+}
+
+function height(tree: RavlTree<number>): number {
+	const [root, nil] = getRoot(tree);
+	const h = (n: RankedNode): number =>
+		n === nil ? 0 : 1 + Math.max(h(n.$left), h(n.$right));
+	return h(root);
+}
+
+/** The rank rule of RAVL trees: every rank difference is positive. */
+function expectRanks(tree: RavlTree<number>): void {
+	const [root, nil] = getRoot(tree);
+	const check = (n: RankedNode): void => {
+		if(n === nil) return;
+		expect(n.$rank).to.be.greaterThan(n.$left.$rank);
+		expect(n.$rank).to.be.greaterThan(n.$right.$rank);
+		check(n.$left);
+		check(n.$right);
+	};
+	check(root);
+}
 
 function testAdjacency(tree: IBinarySearchTree<number>): void {
 	// Generate some numbers to add
