@@ -5,7 +5,7 @@ import { CornerType } from "shared/json/enum";
 import type { QuadrantCode, QuadrantDirection } from "shared/types/direction";
 import type { JJunction, NodeId } from "shared/json";
 import type { ITreeNode } from "core/design/context";
-import type { fitsAt } from "core/design/tasks/utils/invasion";
+import type { fitsAt } from "core/design/layout/contour/invasion";
 
 interface ValidJunctionData {
 	lca: ITreeNode;

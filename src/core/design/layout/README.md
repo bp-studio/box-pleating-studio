@@ -48,3 +48,9 @@ The algorithm roughly goes as follows.
 5. Combine the `PatternContour` with the `RoughContour`.
    If raw contours are used in step 2,
    we need to take the general polygon union of the result.
+6. Regularize the rivers: the inner of a river becomes the morphological closing of its children,
+   so that the narrow gaps between the children are left as orphan regions
+   instead of being filled by the river (see `regularize`).
+
+The helpers for these steps are in the `contour` folder,
+and the tracing algorithm itself is in the `trace` folder.

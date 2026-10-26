@@ -104,10 +104,12 @@ const AREA_TOLERANCE = 1e-6;
 /**
  * In valid layouts, the regions of the flaps and rivers exactly tile the union
  * of the rough contours, since the patterns only redistribute the regions
- * where the rough contours overlap (see section 5 of `docs/contour`). That is,
- * the union of the final contours is exactly that of the rough contours, and
- * the final contours don't overlap each other. The latter is checked by
- * comparing the sum of the areas of the regions with the area of their union.
+ * where the rough contours overlap (see section 5 of `docs/contour`), except
+ * that the regularization (see regularize) takes the orphan regions out of the
+ * rivers. That is, the union of the final contours and the orphan regions is
+ * exactly that of the rough contours, and they don't overlap each other. The
+ * latter is checked by comparing the sum of their areas with the area of their
+ * union.
  */
 function checkArea(): Issue[] {
 	const rough: Polygon[] = [];
@@ -116,42 +118,66 @@ function checkArea(): Issue[] {
 			rough.push(contour.$outer.map(p => orient(p, !p.isHole)));
 		}
 	}
-	const final: Polygon[] = [];
+	const [regions, sum] = collectRegions();
+	const roughUnion = new AAUnion().$get(...rough);
+	const union = new GeneralUnion().$get(...regions);
+	const both = new GeneralUnion().$get(roughUnion, union);
+	const area = totalArea(union);
+	const excess = totalArea(both) - totalArea(roughUnion);
+	const uncovered = totalArea(both) - area;
+	const issues: Issue[] = [];
+	if(excess > AREA_TOLERANCE) {
+		issues.push({
+			kind: "area",
+			message: `regions exceed the rough contours by area ${excess}`,
+			points: samplePoints(
+				p => inside(p, union) && !inside(p, roughUnion)
+			),
+		});
+	}
+	if(uncovered > AREA_TOLERANCE) {
+		issues.push({
+			kind: "area",
+			message: `rough contours uncovered by area ${uncovered}`,
+			points: samplePoints(
+				p => inside(p, roughUnion) && !inside(p, union)
+			),
+		});
+	}
+	if(sum - area > AREA_TOLERANCE) {
+		issues.push({
+			kind: "overlap",
+			message: `regions overlap by area ${sum - area}`,
+			points: [],
+		});
+	}
+	return issues;
+}
+
+/**
+ * The regions of all flaps and rivers and the orphan regions, as polygons,
+ * along with the sum of their areas.
+ */
+function collectRegions(): [Polygon[], number] {
+	const regions: Polygon[] = [];
 	let sum = 0;
 	for(const node of State.m.$tree.$nodes) {
 		if(!node?.$parent) continue;
 		for(const contour of node.$graphics.$contours) {
 			const inner = contour.inner ?? [];
-			final.push([
+			regions.push([
 				orient(contour.outer, true),
 				...inner.map(p => orient(p, false)),
 			]);
 			sum += Math.abs(totalArea([contour.outer])) -
 				inner.reduce((a, p) => a + Math.abs(totalArea([p])), 0);
 		}
+		for(const orphan of node.$graphics.$orphans) {
+			regions.push([orient(orphan, true)]);
+			sum += Math.abs(totalArea([orphan]));
+		}
 	}
-	const roughUnion = new AAUnion().$get(...rough);
-	const finalUnion = new GeneralUnion().$get(...final);
-	const roughArea = totalArea(roughUnion);
-	const finalArea = totalArea(finalUnion);
-	const issues: Issue[] = [];
-	if(Math.abs(roughArea - finalArea) > AREA_TOLERANCE) {
-		issues.push({
-			kind: "area",
-			message: `final area ${finalArea} != rough area ${roughArea}`,
-			points: samplePoints(
-				p => inside(p, roughUnion) != inside(p, finalUnion)
-			),
-		});
-	}
-	if(sum - finalArea > AREA_TOLERANCE) {
-		issues.push({
-			kind: "overlap",
-			message: `regions overlap by area ${sum - finalArea}`,
-			points: [],
-		});
-	}
-	return issues;
+	return [regions, sum];
 }
 
 const SAMPLE_STEP = 0.25;

@@ -48,7 +48,7 @@ export function minimize(layout: Layout, kind: Issue["kind"]): Layout {
 }
 
 /** All the layouts one step smaller than the given one. */
-function* shrink(layout: Layout): Generator<Layout> {
+export function* shrink(layout: Layout): Generator<Layout> {
 	for(const flap of layout.flaps) {
 		const removed = removeLeaf(layout, flap.id);
 		if(removed) yield removed;

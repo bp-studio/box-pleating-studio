@@ -42,6 +42,18 @@ function createIncompleteLayout(): void {
 }
 
 /**
+ * River 1 holds flaps 2 and 3 placed diagonally. The river would need a
+ * stretch pattern of its own, which is not supported yet, so the right angle
+ * corners at (1,4), (4,1), (2,2) and (3,3) are left without ridges.
+ */
+function createSelfStretchLayout(): void {
+	parseTree(
+		"(0,1,2),(1,2,2),(1,3,2),(0,4,4)",
+		"(2,0,0,0,0),(3,5,5,0,0),(4,-6,10,0,0)"
+	);
+}
+
+/**
  * River 3 wraps a ring of 8 flaps, enclosing the region (5,5)-(15,15).
  * @param edges The other edges, including the parent edge of node 3.
  * @param flaps The other flaps.
@@ -58,6 +70,12 @@ function createRing(edges: string, flaps: string): void {
 		[flaps, ...ringFlaps].join(",")
 	);
 }
+
+/** The area of the hole enclosed by the ring (see {@link createRing}). */
+const HOLE_AREA = 100;
+
+/** The area of an orphan region between the flaps of the ring in the sheet. */
+const STRIP_AREA = 8;
 
 describe("Health check", () => {
 
@@ -123,19 +141,33 @@ describe("Health check", () => {
 		it("Finds the holes enclosed by the rivers", () => {
 			createRing("(0,3,4),(0,1,1)", "(1,40,40,0,0)");
 			const result = findUncoveredRegions(rect(20, 20));
-			expect(result.length).to.equal(1);
-			expect(result[0].outer).to.equalPath(
-				"(5,5),(15,5),(15,15),(5,15)", true
-			);
+			// The other 6 are the orphan regions between the flaps of the ring,
+			// clipped by the sheet.
+			expect(result.length).to.equal(7);
+			const hole = result.find(c => area(c.outer) == HOLE_AREA)!;
+			expect(hole.outer).to.equalPath("(5,5),(15,5),(15,15),(5,15)", true);
 		});
 
-		it("Fills the holes by the parent rivers", () => {
-			// River 5 is wide enough to fill the hole enclosed by river 3
+		it("Finds the orphan regions within the sheet", () => {
+			createRing("(0,3,4),(0,1,1)", "(1,40,40,0,0)");
+			const result = findUncoveredRegions(rect(20, 20));
+			const strip = result.find(c => area(c.outer) == STRIP_AREA)!;
+			expect(strip.outer).to.equalPath("(0,11),(1,11),(1,19),(0,19)", true);
+		});
+
+		it("Leaves the holes enclosed by the children as orphan regions", () => {
+			// River 5 would fill the hole enclosed by river 3 without the
+			// regularization. The hole is not wider than twice its length, so
+			// it becomes an orphan region of river 5 instead.
 			createRing(
 				"(0,2,1),(2,5,6),(5,3,4),(5,1,1),(0,9,12),(0,8,12)",
 				"(1,35,10,0,0),(9,60,60,0,0),(8,-40,60,0,0)"
 			);
-			expect(findUncoveredRegions(rect(20, 20))).to.be.empty;
+			const result = findUncoveredRegions(rect(20, 20));
+			const hole = result.find(c => area(c.outer) == HOLE_AREA)!;
+			const xs = hole.outer.map(p => p.x), ys = hole.outer.map(p => p.y);
+			expect([Math.min(...xs), Math.max(...xs)]).toEqual([5, 15]);
+			expect([Math.min(...ys), Math.max(...ys)]).toEqual([5, 15]);
 		});
 	});
 
@@ -170,13 +202,22 @@ describe("Health check", () => {
 	describe("Missing river ridges", () => {
 
 		it("Finds the right angle corners without inward ridges", () => {
-			createIncompleteLayout();
-			const result = findMissingRiverRidges(rect(16, 8));
+			createSelfStretchLayout();
+			const sheet = parsePath("(-4,-4),(9,-4),(9,9),(-4,9)");
+			const result = findMissingRiverRidges(sheet);
 			expect(result.length).to.equal(1);
-			expect(result[0].id).to.equal(3);
+			expect(result[0].id).to.equal(1);
 			expect(result[0].corners).to.have.deep.members([
-				{ x: 14, y: 2 }, { x: 14, y: 6 },
+				{ x: 1, y: 4 }, { x: 4, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 3 },
 			]);
+		});
+
+		it("Finds no missing ridges in the gaps excluded by regularization", () => {
+			// River 3 would dip into the gap between flaps 4 and 5 without the
+			// regularization, leaving the corners (14,2) and (14,6) without
+			// ridges.
+			createIncompleteLayout();
+			expect(findMissingRiverRidges(rect(16, 8))).to.be.empty;
 		});
 
 		it("Accepts ridges within 45 degrees of the inward diagonal", () => {
@@ -223,9 +264,12 @@ describe("Health check", () => {
 		});
 
 		it("Ignores the corners whose ridges would go outside the sheet", () => {
-			createIncompleteLayout();
-			const result = findMissingRiverRidges(rect(13, 8));
-			expect(result).to.be.empty;
+			createSelfStretchLayout();
+			// The corner (2,2) lies on the border, with its ridge going out.
+			const sheet = parsePath("(-4,-4),(2,-4),(2,9),(-4,9)");
+			const result = findMissingRiverRidges(sheet);
+			expect(result.length).to.equal(1);
+			expect(result[0].corners).to.have.deep.members([{ x: 1, y: 4 }]);
 		});
 	});
 

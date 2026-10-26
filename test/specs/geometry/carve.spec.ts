@@ -1,8 +1,8 @@
 import { describe, it, expect } from "@rstest/core";
 
-import { carveCorners } from "core/design/tasks/utils/carve";
+import { carveCorners } from "core/design/layout/contour/carve";
 
-import type { IRect } from "core/design/tasks/utils/carve";
+import type { IRect } from "core/design/layout/contour/carve";
 
 const base: IRect = { x1: 0, y1: 0, x2: 10, y2: 10 };
 

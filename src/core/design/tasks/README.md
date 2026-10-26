@@ -35,16 +35,14 @@ The following tasks correspond to the Mermaid flowchart in [core/README.md](../.
 - **[`pattern.ts`](pattern.ts)** - Finds all possible configurations and patterns
 
 ### Graphics Generation
-- **[`graphics.ts`](graphics.ts)** - Generates final graphics data
+- **[`graphics.ts`](graphics.ts)** - Combines the contours (including the regularization of the rivers) and generates final graphics data
 
 ## Utilities
 
-The `utils/` folder contains helper functions:
-- **`climb.ts`** - Tree traversal utilities
-- **`combine.ts`** - Contour combination tools
-- **`expand.ts`** - Path expansion and simplification tools
-- **`carve.ts`** - Carving rectangles out of the corners of a rectangle
-- **`invasion.ts`** - Bookkeeping of the invasions and the carved quadrants
+The `utils/` folder contains helpers directly related to the scheduling of the tasks:
+- **[`climb.ts`](utils/climb.ts)** - Updates the tree from the bottom up, starting from the given nodes and continuing to their parents as needed
+
+The algorithms of the contours used by the tasks above are in [`layout/contour`](../layout/contour/) (see also [layout/README.md](../layout/README.md)).
 
 ## Execution Order
 

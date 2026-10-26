@@ -5,6 +5,7 @@ import { GeneralUnion } from "core/math/sweepLine/polyBool/generalUnion/generalU
 import { Stacking } from "core/math/sweepLine/stacking/stacking";
 import { fixPath } from "core/math/geometry/float";
 import { debugAssert } from "core/utils/debug";
+import { regularize, removeSolidComponents } from "./regularization";
 
 import type { RationalPath, RationalPathEx } from "core/math/geometry/rationalPath";
 import type { Point } from "core/math/geometry/point";
@@ -40,8 +41,11 @@ export function combineContour(node: ITreeNode): void {
 	for(const contour of failed) {
 		rebuildInner(contour, childrenPatternContours);
 	}
+	g.$orphans = [];
+	regularize(node, result);
 
 	g.$contours = result.flatMap(toGraphicalContours);
+	removeSolidComponents(node);
 }
 
 function insertOuter(

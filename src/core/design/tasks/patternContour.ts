@@ -5,7 +5,7 @@ import { makePerQuadrant, makeQuadrantCode, quadrantNumber } from "shared/types/
 import { createHingeSegments } from "../layout/trace/hingeSegment";
 import { InvalidParameterError } from "core/math/invalidParameterError";
 import { RepoTrace } from "../layout/trace/repoTrace";
-import { extendToBase, getLeafRect, getQuadrantShape } from "./utils/rawPiece";
+import { extendToBase, getLeafRect, getQuadrantShape } from "../layout/contour/rawPiece";
 
 import type { TreeNode } from "../context/treeNode";
 import type { NodeId } from "shared/json/tree";
@@ -16,8 +16,8 @@ import type { Repository } from "../layout/repository";
 import type { NodeSet } from "../layout/nodeSet";
 import type { ITreeNode, NodeGraphics } from "../context";
 import type { StartEnd } from "../layout/trace/trace";
-import type { RawPiece } from "./utils/rawPiece";
-import type { IRect } from "./utils/carve";
+import type { RawPiece } from "../layout/contour/rawPiece";
+import type { IRect } from "../layout/contour/carve";
 import type { Path, PathEx } from "shared/types/geometry";
 
 //=================================================================
