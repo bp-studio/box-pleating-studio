@@ -89,13 +89,15 @@ See `checks.ts`.
   interior of both, and they are not perpendicular. This never happens in
   valid layouts, so it means that some contour is cut wrong, or some ridge is
   misplaced.
-- **Area**: the union of the final contours differs from that of the rough
-  contours. In valid layouts the patterns only redistribute the regions where
-  the rough contours overlap, so the two must agree.
-- **Overlap**: the regions of the flaps and rivers overlap each other. This is
-  checked by comparing the sum of the areas of the regions with the area of
-  their union. Together with the area check, it means that the regions exactly
-  tile the union of the rough contours.
+- **Area**: the union of the final contours and the orphan regions (the
+  regions taken out of the rivers by the regularization, see `regularize`)
+  differs from that of the rough contours. In valid layouts the patterns only
+  redistribute the regions where the rough contours overlap, so the two must
+  agree.
+- **Overlap**: the regions of the flaps and rivers, as well as the orphan
+  regions, overlap each other. This is checked by comparing the sum of their
+  areas with the area of their union. Together with the area check, it means
+  that they exactly tile the union of the rough contours.
 
 The locations of the crossings, as well as some sampled points of the area
 mismatch, are marked in the pictures.

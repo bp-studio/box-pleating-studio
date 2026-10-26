@@ -11,7 +11,8 @@ import type { Point } from "core/math/geometry/point";
 import type { roughContourTask } from "core/design/tasks/roughContour";
 import type { junctionTask } from "../tasks/junction";
 import type { traceContourTask } from "core/design/tasks/traceContour";
-import type { fitsAt } from "core/design/tasks/utils/invasion";
+import type { fitsAt } from "core/design/layout/contour/invasion";
+import type { regularize } from "core/design/layout/contour/regularization";
 
 export type NodeCollection<T> =
 	Readonly<Record<NodeId, T | undefined>> &
@@ -119,6 +120,12 @@ export interface NodeGraphics {
 
 	/** All ridge creases. */
 	$ridges: ILine[];
+
+	/**
+	 * The orphan regions of the river, as rectangles (see {@link regularize}).
+	 * They are left uncovered by any flap or river.
+	 */
+	$orphans: Path[];
 }
 
 /** See {@link roughContourTask}. */

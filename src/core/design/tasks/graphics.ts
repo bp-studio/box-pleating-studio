@@ -4,10 +4,10 @@ import { toCorners } from "../context/aabb/aabb";
 import { same } from "shared/types/geometry";
 import { SlashDirection, quadrantNumber } from "shared/types/direction";
 import { Line } from "core/math/geometry/line";
-import { combineContour } from "./utils/combine";
+import { combineContour } from "../layout/contour/combine";
 import { getOrSetEmptyArray } from "shared/utils/map";
 import { UpdateResult } from "core/service/updateResult";
-import { isCarvedQuadrant } from "./utils/invasion";
+import { isCarvedQuadrant } from "../layout/contour/invasion";
 import { pathRightCorners } from "core/math/geometry/path";
 
 import type { Point } from "core/math/geometry/point";
@@ -153,7 +153,6 @@ function riverRidge(
 		// skip the rest.
 		if(!contour.inner) continue;
 		const side = (contour.outer as PathEx).isHole ? -1 : 1;
-
 		const [innerRightCorners, doubled] = recordRightCorners(contour.inner);
 
 		// A ridge shot from one side must not hit a free corner on the same
@@ -161,6 +160,7 @@ function riverRidge(
 		// other side). Also, no ridge of the river may cross its hinges.
 		const inner = contour.inner;
 		const paths = [contour.outer, ...inner];
+		const multiplicity = countVertices(paths);
 		const fromOuter = (p1: IPoint, c: Point): boolean =>
 			!pathContains(contour.outer, c) && !crossesPaths(p1, c, paths);
 		const fromInner = (p1: IPoint, c: Point): boolean =>
@@ -179,16 +179,25 @@ function riverRidge(
 				tryAddRemainingRidge(p1, p, freeCornerMap, ridges, fromOuter);
 			const corner = innerRightCorners.get(innerKey);
 			// The inner corner must also face the outer corner, that is, its
-			// corresponding point must be the outer corner. Otherwise the two
-			// corners are not related, and they happen to be at the distance.
-			// Like any ridge of the river, it must not cross the hinges either.
-			if(
-				!added && corner && faces(corner, p1, width, side) &&
-				!crossesPaths(p1, p, paths)
-			) {
+			// corresponding point must be the outer corner; otherwise they just
+			// happen to be at the distance. This is not checked if the contour
+			// passes through the inner corner more than once (touching itself
+			// diagonally), as the recorded corner could be any of the passes.
+			const facing = (multiplicity.get(innerKey) ?? 0) > 1 ||
+				corner && faces(corner, p1, width, side);
+			if(!added && corner && facing && !crossesPaths(p1, p, paths)) {
 				ridges.push([p1, p]);
 				if(!doubled.has(innerKey)) innerRightCorners.delete(innerKey);
 			}
+		}
+
+		// The outer path touching itself diagonally
+		for(const [p1, p] of touchingCorners(contour.outer, width, side)) {
+			const key = pointKey(p);
+			if(!innerRightCorners.has(key)) continue;
+			if(crossesPaths(p1, p, paths)) continue;
+			ridges.push([p1, p]);
+			if(!doubled.has(key)) innerRightCorners.delete(key);
 		}
 
 		// Check remaining inner vertices.
@@ -201,6 +210,61 @@ function riverRidge(
 		}
 	}
 	return ridges;
+}
+
+/** The number of times the paths pass through each vertex. */
+function countVertices(paths: readonly Path[]): Map<string, number> {
+	const result = new Map<string, number>();
+	for(const path of paths) {
+		for(const p of path) {
+			const key = pointKey(p);
+			result.set(key, (result.get(key) ?? 0) + 1);
+		}
+	}
+	return result;
+}
+
+/**
+ * The right angle corners where the path touches itself diagonally, along with
+ * their corresponding points.
+ *
+ * At such a vertex, the river consists of two parts meeting at a single point,
+ * but each pass of the path through the vertex enters from one part and leaves
+ * into the other, so that the corners given by {@link pathRightCorners} face
+ * outside the river. Instead, the corners of the parts are formed by an
+ * incoming edge of one pass and an outgoing edge of another.
+ */
+function touchingCorners(
+	path: Path, width: number, side: Sign
+): [p1: IPoint, p: IPoint][] {
+	const passes = new Map<string, [p0: IPoint, p2: IPoint][]>();
+	const l = path.length;
+	for(let i = 0, j = l - 1; i < l; j = i++) {
+		const p1 = path[i];
+		if(!Number.isInteger(p1.x) || !Number.isInteger(p1.y)) continue;
+		getOrSetEmptyArray(passes, pointKey(p1))
+			.push([path[j], path[i + 1] || path[0]]);
+	}
+	const result: [IPoint, IPoint][] = [];
+	for(let i = 0; i < l; i++) {
+		const p1 = path[i];
+		const list = passes.get(pointKey(p1));
+		// Each vertex is handled at its first pass.
+		if(!list || list.length < 2 || list[0][1] != (path[i + 1] || path[0])) {
+			continue;
+		}
+		for(const [a, [p0]] of list.entries()) {
+			for(const [b, [, p2]] of list.entries()) {
+				if(a == b) continue;
+				const dot = (p1.x - p0.x) * (p2.x - p1.x) +
+					(p1.y - p0.y) * (p2.y - p1.y);
+				if(dot != 0) continue;
+				const p = getCorrespondingPoint(p1, p0, p2, width, side);
+				result.push([p1, p]);
+			}
+		}
+	}
+	return result;
 }
 
 /**

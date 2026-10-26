@@ -2,9 +2,9 @@ import { Task } from "./task";
 import { climb } from "./utils/climb";
 import { State } from "core/service/state";
 import { traceContourTask } from "./traceContour";
-import { simplify } from "./utils/expand";
+import { simplify } from "../layout/contour/expand";
 import { RoughUnion } from "core/math/sweepLine/polyBool/aaUnion/roughUnion";
-import { carveLeaf, expandOuter, fitsAt, getInvasions, getNewCarvings, radius, rebuild, updateInvasions } from "./utils/invasion";
+import { carveLeaf, expandOuter, fitsAt, getInvasions, getNewCarvings, radius, rebuild, updateInvasions } from "../layout/contour/invasion";
 
 import type { ValidJunction } from "../layout/junction/validJunction";
 import type { NodeId } from "shared/json/tree";

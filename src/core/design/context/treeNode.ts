@@ -56,6 +56,7 @@ export class TreeNode implements ITreeNode {
 		$traceContours: [],
 		$roughContours: [],
 		$ridges: [],
+		$orphans: [],
 	};
 
 	public $length: number = 0;

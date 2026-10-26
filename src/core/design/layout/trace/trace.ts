@@ -12,7 +12,7 @@ import type { SideDiagonal } from "../configuration";
 import type { Path } from "shared/types/geometry";
 import type { NodeId } from "shared/json/tree";
 import type { PatternContour } from "../../context";
-import type { getQuadrantShape } from "core/design/tasks/utils/rawPiece";
+import type { getQuadrantShape } from "core/design/layout/contour/rawPiece";
 import type { HingeSegment } from "./hingeSegment";
 
 /** The starting/ending points of tracing. */
