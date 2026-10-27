@@ -3,7 +3,9 @@ import { findUncoveredRegions } from "./uncovered";
 import { findDanglingRidgeEnds } from "./danglingRidge";
 import { findMissingRiverRidges } from "./riverCorner";
 import { isOnBoundary } from "./utils";
+import { getMinimalTree } from "./minimalTree";
 
+import type { TreeString } from "./minimalTree";
 import type { Contour, Path } from "shared/types/geometry";
 import type { MissingRiverRidges } from "./riverCorner";
 import type { Quadrant } from "../layout/pattern/quadrant";
@@ -28,6 +30,12 @@ export interface HealthReport {
 
 	/** The quadrants involved in the stretches without patterns. */
 	unsolvedQuadrants: UnsolvedQuadrant[];
+
+	/**
+	 * The layouts of the stretches without patterns, for analytics (see
+	 * {@link getMinimalTree}).
+	 */
+	unsolvedTrees: TreeString[];
 
 	/**
 	 * The geometric checks, which are performed only if there are no invalid
@@ -75,6 +83,7 @@ export function checkHealth(boundary: Path): HealthReport {
 	}
 	let unsolvedStretches = 0;
 	const quadrants = new Map<QuadrantCode, UnsolvedQuadrant>();
+	const unsolvedTrees: TreeString[] = [];
 	for(const stretch of State.$stretches.values()) {
 		const repo = stretch.$repo;
 		if(repo.$pattern) continue;
@@ -82,12 +91,14 @@ export function checkHealth(boundary: Path): HealthReport {
 		for(const [code, quadrant] of repo.$quadrants) {
 			quadrants.set(code, toUnsolvedQuadrant(quadrant));
 		}
+		unsolvedTrees.push(getMinimalTree(repo.$nodeSet.$leaves));
 	}
 
 	const report: HealthReport = {
 		invalidJunctions,
 		unsolvedStretches,
 		unsolvedQuadrants: [...quadrants.values()],
+		unsolvedTrees,
 	};
 	if(invalidJunctions) return report;
 

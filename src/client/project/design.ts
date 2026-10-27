@@ -18,6 +18,7 @@ import { CoreManager } from "./coreManager";
 import {
 	clipboard, collectSubtrees, getClipboardSource, setClipboard
 } from "./components/tree/clipboard";
+import { formatEdges, formatFlaps } from "shared/utils/treeString";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
@@ -266,8 +267,8 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 	/// #if DEBUG
 	/* istanbul ignore next: debug */
 	public createTestCase(): void {
-		const edges = this.tree.toJSON().edges.map(e => `(${e.n1},${e.n2},${e.length})`).join(",");
-		const flaps = this.layout.toJSON().flaps.map(f => `(${f.id},${f.x},${f.y},${f.width},${f.height})`).join(",");
+		const edges = formatEdges(this.tree.toJSON().edges);
+		const flaps = formatFlaps(this.layout.toJSON().flaps);
 		console.log(`parseTree(\n\t"${edges}",\n\t"${flaps}"\n);`);
 	}
 	/// #endif

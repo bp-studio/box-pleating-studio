@@ -36,6 +36,21 @@ const enum Analytics {
 	none,
 }
 
+/** See {@link Health._scheduleUnsolved}. */
+const UNSOLVED_DELAY = 2000;
+
+/** The maximal number of unsolved stretches reported in a session. */
+const MAX_UNSOLVED_REPORTS = 10;
+
+/** The maximal length of a parameter value in Google Analytics. */
+const GA_PARAM_LENGTH = 100;
+
+/** The number of parameters for an unsolved stretch (`data1` to `data3`). */
+const UNSOLVED_PARAMS = 3;
+
+/** The unsolved stretches reported in this session. */
+const reportedUnsolved = new Set<string>();
+
 /** The kinds of the issues in the report, in the same keys as in the UI. */
 function getIssues(report: HealthReport): string[] {
 	const g = report.geometry;
@@ -66,8 +81,12 @@ export class Health extends View {
 	public get enabled(): boolean { return this._enabled.value; }
 	public set enabled(v: boolean) {
 		this._enabled.value = v;
-		if(!v) this._report.value = null;
-		else this._analytics = Analytics.first;
+		if(v) {
+			this._analytics = Analytics.first;
+		} else {
+			this._report.value = null;
+			clearTimeout(this._unsolvedTimer);
+		}
 	}
 
 	private readonly _report = shallowRef<HealthReport | null>(null);
@@ -88,6 +107,9 @@ export class Health extends View {
 
 	/** What to report to Google Analytics for the next result. */
 	private _analytics: Analytics = Analytics.first;
+
+	/** See {@link _scheduleUnsolved}. */
+	private _unsolvedTimer: number | undefined;
 
 	constructor(layout: Layout) {
 		super();
@@ -147,7 +169,8 @@ export class Health extends View {
 	 * issues are resolved after that, so that we know what issues the users
 	 * encounter, and how often the check helps them fix the layouts. The
 	 * results in between are not reported, as the check is performed on
-	 * every change of the layout.
+	 * every change of the layout, except for the unsolved stretches (see
+	 * {@link _scheduleUnsolved}).
 	 */
 	private _sendAnalytics(report: HealthReport): void {
 		const issues = getIssues(report);
@@ -162,6 +185,22 @@ export class Health extends View {
 			gtag("event", "health_resolved");
 			this._analytics = Analytics.none;
 		}
+		this._scheduleUnsolved();
+	}
+
+	/**
+	 * Report the unsolved stretches once the layout stays unchanged for
+	 * {@link UNSOLVED_DELAY} after dragging, so that the transient ones
+	 * during the adjustments are skipped, as they don't reflect what the users
+	 * want to fold. Note that there might be no more check after dragging,
+	 * so we keep waiting instead of skipping the results during dragging.
+	 */
+	private _scheduleUnsolved(): void {
+		clearTimeout(this._unsolvedTimer);
+		this._unsolvedTimer = setTimeout(() => {
+			if(this._layout.$project.$isDragging) this._scheduleUnsolved();
+			else if(this.report) sendUnsolved(this.report);
+		}, UNSOLVED_DELAY);
 	}
 
 	/**
@@ -240,6 +279,33 @@ export class Health extends View {
 		for(const quadrant of quadrants) {
 			container.addChild(createMark(quadrant, s));
 		}
+	}
+}
+
+/**
+ * Report each new unsolved stretch (see {@link Health._scheduleUnsolved}), so
+ * that we know which patterns are most wanted. They are given as minimal
+ * trees, and the same structures in different designs result in the same
+ * strings.
+ *
+ * The data is `edges;flaps`, which can be passed directly to `parseTree` (in
+ * the tests or in the console). As each parameter is limited to
+ * {@link GA_PARAM_LENGTH} characters, the data is split into
+ * {@link UNSOLVED_PARAMS} parameters, enough for about 10 flaps.
+ */
+function sendUnsolved(report: HealthReport): void {
+	for(const { edges, flaps } of report.unsolvedTrees) {
+		if(reportedUnsolved.size >= MAX_UNSOLVED_REPORTS) return;
+		const data = edges + ";" + flaps;
+		if(reportedUnsolved.has(data)) continue;
+		reportedUnsolved.add(data);
+		const params: Record<string, string> = {};
+		for(let i = 0; i < UNSOLVED_PARAMS; i++) {
+			const start = i * GA_PARAM_LENGTH;
+			const chunk = data.slice(start, start + GA_PARAM_LENGTH);
+			if(chunk) params["data" + (i + 1)] = chunk;
+		}
+		gtag("event", "health_unsolved", params);
 	}
 }
 
