@@ -1,7 +1,7 @@
 <template>
 	<Dropdown label="Edit" icon="bp-pencil-ruler" :title="$t('toolbar.edit.title')">
 		<template #default>
-			<DropdownItem :disabled="!Studio.history.canUndo" @click="undo">
+			<DropdownItem :disabled="!Studio.history.canUndo" @click="menu('undo')">
 				<Hotkey
 					icon="bp-undo"
 					ctrl
@@ -11,7 +11,7 @@
 					{{ $t('toolbar.edit.undo') }}
 				</Hotkey>
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.history.canRedo" @click="redo">
+			<DropdownItem :disabled="!Studio.history.canRedo" @click="menu('redo')">
 				<Hotkey
 					icon="bp-redo"
 					ctrl
@@ -23,13 +23,13 @@
 			</DropdownItem>
 			<template v-if="Studio.project?.design.mode != 'layout'">
 				<Divider/>
-				<DropdownItem :disabled="!Studio.project?.design.canCopy" @click="Studio.cut">
+				<DropdownItem :disabled="!Studio.project?.design.canCopy" @click="menu('cut')">
 					<Hotkey icon="fa-solid fa-scissors" ctrl hk="X">{{ $t('toolbar.edit.cut') }}</Hotkey>
 				</DropdownItem>
-				<DropdownItem :disabled="!Studio.project?.design.canCopy" @click="Studio.copy">
+				<DropdownItem :disabled="!Studio.project?.design.canCopy" @click="menu('copy')">
 					<Hotkey icon="fa-solid fa-copy" ctrl hk="C">{{ $t('toolbar.edit.copy') }}</Hotkey>
 				</DropdownItem>
-				<DropdownItem :disabled="!Studio.project?.design.canPaste" @click="Studio.paste">
+				<DropdownItem :disabled="!Studio.project?.design.canPaste" @click="menu('paste')">
 					<Hotkey icon="fa-solid fa-paste" ctrl hk="V">{{ $t('toolbar.edit.paste') }}</Hotkey>
 				</DropdownItem>
 			</template>
@@ -53,10 +53,10 @@
 				<i class="fa-solid fa-arrows-left-right-to-line fa-rotate-90"/>{{ $t('toolbar.edit.vertical_flip') }}
 			</DropdownItem>
 			<Divider/>
-			<DropdownItem :disabled="!Studio.project" @click="selectAll">
+			<DropdownItem :disabled="!Studio.project" @click="menu('selectAll')">
 				<Hotkey icon="fa-solid fa-border-all" ctrl hk="A">{{ $t('toolbar.edit.selectAll') }}</Hotkey>
 			</DropdownItem>
-			<DropdownItem :disabled="!Studio.selections.length" @click="unselectAll">
+			<DropdownItem :disabled="!Studio.selections.length" @click="menu('unselectAll')">
 				<Hotkey icon="fas fa-border-none" :hk="isMac ? '⎋' : 'Esc'">{{ $t('toolbar.edit.unselectAll') }}</Hotkey>
 			</DropdownItem>
 		</template>
@@ -71,38 +71,48 @@
 	import HotkeyService from "app/services/hotkeyService";
 	import { isMac } from "app/shared/constants";
 	import Studio from "app/services/studioService";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "EditMenu" });
 
+	const commands = {
+		undo: () => Studio.history.undo(),
+		redo: () => Studio.history.redo(),
+		selectAll: () => Studio.selectAll(),
+		unselectAll: () => Studio.unselectAll(),
+		delete: () => Studio.del(),
+		cut: () => Studio.cut(),
+		copy: () => Studio.copy(),
+		paste: () => Studio.paste(),
+	};
+
+	type CommandName = keyof typeof commands;
+
+	/** Run a command, recording the input method. */
+	function run(name: CommandName, method: string): void {
+		Analytics.input(name, method);
+		commands[name]();
+	}
+
+	const menu = (name: CommandName): void => run(name, "menu");
+	const key = (name: CommandName) => (): void => run(name, "key");
+
 	onMounted(() => {
-		HotkeyService.register(undo, "z");
-		HotkeyService.register(redo, "y");
-		HotkeyService.register(redo, "z", true, true);
-		HotkeyService.register(selectAll, "a");
-		HotkeyService.register(unselectAll, "escape", false);
-		HotkeyService.register(Studio.del, "delete", false);
-		HotkeyService.register(Studio.del, "backspace", false);
-		HotkeyService.register(Studio.cut, "x");
-		HotkeyService.register(Studio.copy, "c");
-		HotkeyService.register(Studio.paste, "v");
+		HotkeyService.register(key("undo"), "z");
+		HotkeyService.register(key("redo"), "y");
+		HotkeyService.register(key("redo"), "z", true, true);
+		HotkeyService.register(key("selectAll"), "a");
+		HotkeyService.register(key("unselectAll"), "escape", false);
+		HotkeyService.register(key("delete"), "delete", false);
+		HotkeyService.register(key("delete"), "backspace", false);
+		HotkeyService.register(key("cut"), "x");
+		HotkeyService.register(key("copy"), "c");
+		HotkeyService.register(key("paste"), "v");
 
 		// on certain keyboards
-		HotkeyService.register(undo, "undo", false);
-		HotkeyService.register(redo, "redo", false);
-		HotkeyService.register(unselectAll, "clear", false);
+		HotkeyService.register(key("undo"), "undo", false);
+		HotkeyService.register(key("redo"), "redo", false);
+		HotkeyService.register(key("unselectAll"), "clear", false);
 	});
-
-	function undo(): void {
-		Studio.history.undo();
-	}
-	function redo(): void {
-		Studio.history.redo();
-	}
-	function selectAll(): void {
-		Studio.selectAll();
-	}
-	function unselectAll(): void {
-		Studio.unselectAll();
-	}
 
 </script>

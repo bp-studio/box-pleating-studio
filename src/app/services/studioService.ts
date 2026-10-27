@@ -194,8 +194,9 @@ namespace StudioService {
 	export function copyPNG(): Promise<void> {
 		return bp.copyPNG();
 	}
-	export function dragByKey(key: DirectionKey): void {
-		bp.drag.dragByKey(key);
+	/** @returns Whether the action is successful. */
+	export function dragByKey(key: DirectionKey): boolean {
+		return bp.drag.dragByKey(key);
 	}
 }
 

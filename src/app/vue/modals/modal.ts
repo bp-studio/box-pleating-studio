@@ -1,5 +1,7 @@
 import { onMounted, readonly, shallowRef } from "vue";
 
+import Analytics from "app/services/analyticsService";
+
 import type Modal from "bootstrap/js/dist/modal";
 
 interface ModalOptions extends Modal.Options {
@@ -30,7 +32,7 @@ export default function useModal(
 			if(bt) bt.focus();
 		}, { once: true });
 		modal.show();
-		gtag("event", "screen_view", { screen_name });
+		Analytics.event("screen_view", { screen_name });
 	}
 
 	function getFocusButton(): HTMLButtonElement {

@@ -2,13 +2,14 @@
 import File from "app/services/importService";
 import SessionService from "app/services/sessionService";
 import HandleService from "app/services/handleService";
-import Settings, { getHadSettings } from "app/services/settingService";
+import Settings, { DEFAULT_HOTKEY, getHadSettings } from "app/services/settingService";
 import StudioService from "app/services/studioService";
 import Dialogs from "app/services/dialogService";
 import LZ from "app/utils/lz";
 import Workspace from "./services/workspaceService";
 import { welcomeScreenReady } from "app/misc/phase";
 import HotkeyService from "./services/hotkeyService";
+import Analytics from "./services/analyticsService";
 
 namespace Core {
 
@@ -22,7 +23,9 @@ namespace Core {
 		Workspace.init();
 		HandleService.init();
 		HotkeyService.init();
+		Analytics.init(); // Must be before the next line
 		localStorage.setItem("build", app_config.app_version);
+		Analytics.hotkeys(Settings.hotkey, DEFAULT_HOTKEY);
 		if(!await StudioService.init()) return false;
 		const hasQueue = await File.openQueue();
 		const hasSession = await SessionService.init(
@@ -47,9 +50,9 @@ namespace Core {
 
 		try {
 			const json = JSON.parse(await LZ.decompress(lz));
-			await Workspace.open(json);
+			await Workspace.open(json, "share");
 			Workspace.selectLast();
-			gtag("event", "share_open");
+			Analytics.event("share_open");
 		} catch(e) {
 			await Dialogs.alert(i18n.t("message.invalidLink"));
 		}

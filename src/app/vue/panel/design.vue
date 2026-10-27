@@ -26,6 +26,7 @@
 		<Diagonal v-if="(design.sheet.grid.type == GridType.diagonal)" :target="design.sheet.grid"/>
 		<Number
 			v-model="design.sheet.zoom"
+			analytics="zoom"
 			:label="$t('panel.design.zoom')"
 			:step="step"
 			:min="100"

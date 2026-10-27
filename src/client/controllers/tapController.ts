@@ -1,4 +1,5 @@
 import ProjectService from "client/services/projectService";
+import Analytics from "app/services/analyticsService";
 
 const TWO = 100;
 const THREE = 150;
@@ -38,7 +39,9 @@ export namespace TapController {
 		const tapped = tapCount >= 2;
 		const project = ProjectService.project.value;
 		if(tapped && project) {
-			if(tapCount == 2) project.history.$undo();
+			const undo = tapCount == 2;
+			Analytics.input(undo ? "undo" : "redo", "gesture");
+			if(undo) project.history.$undo();
 			else project.history.$redo();
 		}
 		$cancel();

@@ -52,6 +52,7 @@
 	import { phase, asyncComp } from "app/misc/phase";
 	import Studio, { showPanel } from "app/services/studioService";
 	import { hk } from "app/services/customHotkeyService";
+	import Analytics from "app/services/analyticsService";
 	import StubMenu from "@/toolbar/stubMenu.vue";
 	import TabBar from "./components/tabBar.vue";
 
@@ -64,11 +65,15 @@
 	}
 
 	function toLayout(): void {
-		if(Studio.project) Studio.project.design.mode = "layout";
+		if(!Studio.project) return;
+		Analytics.input("mode", "toolbar");
+		Studio.project.design.mode = "layout";
 	}
 
 	function toTree(): void {
-		if(Studio.project) Studio.project.design.mode = "tree";
+		if(!Studio.project) return;
+		Analytics.input("mode", "toolbar");
+		Studio.project.design.mode = "tree";
 	}
 
 </script>

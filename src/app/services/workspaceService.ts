@@ -5,7 +5,9 @@ import Studio from "./studioService";
 import settings from "./settingService";
 import { clone as cloneObj } from "shared/utils/clone";
 import { getDeviceInfo, uploadLog } from "./errorReportService";
+import Analytics from "app/services/analyticsService";
 
+import type { ProjectSource } from "app/services/analyticsService";
 import type { OptimizerCallback, OptimizerOptions } from "client/plugins/optimizer";
 import type { CoreError, JProject, ProjId } from "shared/json";
 import type { Project } from "client/project/project";
@@ -58,24 +60,31 @@ namespace WorkspaceService {
 			const id = await bp.projects.create(json);
 			manipulateIds(arr => arr.push(id));
 			select(id);
+			Analytics.projectOpened("new");
 		} catch {
 			Dialogs.alert(i18n.t("message.fatal"));
 		}
 	}
 
-	export async function open(data: Pseudo<JProject>): Promise<ProjId> {
+	export async function open(
+		data: Pseudo<JProject>, source: ProjectSource
+	): Promise<ProjId> {
 		const id = await bp.projects.open(data);
 		manipulateIds(arr => arr.push(id));
 		tabHistory.unshift(id);
+		Analytics.projectOpened(source);
 		return id;
 	}
 
 	/**
 	 * Open multiple files in parallel,
 	 * but ensure that the tab is opened in the correct order.
+	 * @param source Omitted when restoring the session.
 	 */
 	export async function openMultiple(
-		jsons: Pseudo<JProject>[], failCallback?: Action[]
+		jsons: Pseudo<JProject>[],
+		failCallback?: Action[],
+		source?: ProjectSource
 	): Promise<ProjId[]> {
 		const tasks: Promise<ProjId | null>[] = [];
 		for(let i = 0; i < jsons.length; i++) {
@@ -97,6 +106,7 @@ namespace WorkspaceService {
 				tabHistory.unshift(id);
 			}
 		});
+		if(source && successIds.length) Analytics.projectOpened(source);
 		return successIds;
 	}
 
@@ -181,15 +191,19 @@ namespace WorkspaceService {
 	export async function clone(id: ProjId): Promise<void> {
 		const i = ids.value.indexOf(id);
 		await insertAfterAndSelect(projects.value[i].toJSON(true), id);
-		gtag("event", "project_clone");
+		Analytics.event("project_clone");
 	}
 
 	export async function optimize(
 		options: OptimizerOptions, callback: OptimizerCallback
 	): Promise<void> {
+		Analytics.event("optimizer_start");
 		const proj = Studio.project;
 		if(!proj) return;
+		const start = performance.now();
+		const flaps = proj.design.layout.flapCount;
 		const optimized = await bp.plugins.optimizer(proj, options, callback);
+		Analytics.optimized(options, flaps, performance.now() - start);
 		if(options.openNew) await insertAfterAndSelect(optimized, proj.id);
 	}
 
@@ -197,6 +211,7 @@ namespace WorkspaceService {
 		const arr = ids.value.concat();
 		action(arr);
 		ids.value = arr;
+		Analytics.projectCount(arr.length);
 	}
 
 	Studio.$onSetupOptions.push(options =>
@@ -215,10 +230,10 @@ namespace WorkspaceService {
 			if(backup) {
 				try {
 					// Auto recover
-					await open(backup as Pseudo<JProject>);
+					await open(backup as Pseudo<JProject>, "recover");
 					selectLast();
 				} catch {
-					gtag("event", "fatal_recovery_failed");
+					Analytics.event("fatal_recovery_failed");
 					await Dialogs.alert(i18n.t("message.recoverFailed"));
 				}
 			}

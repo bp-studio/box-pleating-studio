@@ -1,6 +1,7 @@
 <template>
 	<Number
 		v-model="grid().width"
+		analytics="value"
 		:label="$t('panel.design.width')"
 		:min="MIN_RECT_SIZE"
 		:max="MAX_SHEET_SIZE"
@@ -8,6 +9,7 @@
 	/>
 	<Number
 		v-model="grid().height"
+		analytics="value"
 		:label="$t('panel.design.height')"
 		:min="MIN_RECT_SIZE"
 		:max="MAX_SHEET_SIZE"

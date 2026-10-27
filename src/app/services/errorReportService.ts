@@ -1,4 +1,5 @@
 import { isInApp, isLowEndDevice, isOnline, isTouch } from "app/shared/constants";
+import Analytics from "./analyticsService";
 
 import type { CoreError, DeviceInfo, JProject } from "shared/json/project";
 
@@ -81,6 +82,10 @@ const WEBHOOK = "https://abstreamace.com/php-tool/bpstudio/error.php";
 export async function uploadLog(
 	log: JProject, error: CoreError
 ): Promise<void> {
+	// Sent first, so that it is not lost if the user closes the page during
+	// the uploading.
+	Analytics.errorEvent("fatal_error", error.message + "\n" + error.coreTrace);
+
 	// Comment the next line to test fatal error reporting.
 	if(!isOnline) return;
 
@@ -106,7 +111,6 @@ export async function uploadLog(
 	} catch(e) {
 		// ignore any error here.
 	}
-	gtag("event", "fatal_error", gaErrorData(error.message + "\n" + error.coreTrace));
 }
 
 function getInfo(device: DeviceInfo): string {

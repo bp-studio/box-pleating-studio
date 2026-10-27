@@ -18,6 +18,7 @@ import { style } from "client/services/styleService";
 import { $round } from "client/controllers/share";
 import { getDots } from "./grid/constrain";
 import { applyTransform } from "shared/types/geometry";
+import Analytics from "app/services/analyticsService";
 
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { ComputedRef } from "vue";
@@ -242,7 +243,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	}
 
 	public subdivide(): void {
-		gtag("event", "edit_subdivide");
+		Analytics.event("edit_subdivide");
 		if(!this.canSubdivide()) return;
 		display.shield(async () => {
 			const oldCenter = this.grid.$getResizeCenter();
@@ -264,7 +265,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	 * the rotation.
 	 */
 	public rotate(by: Sign): boolean {
-		gtag("event", "edit_rotate");
+		Analytics.event("edit_rotate");
 		const targets = this._editor.$getSelectedTargets();
 		if(targets.length) {
 			return this._transformTargets(targets, [0, by, -by, 0]);
@@ -289,7 +290,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	 * the flip (which could happen only for sheets of some shapes).
 	 */
 	public flip(horizontal: boolean): boolean {
-		gtag("event", "edit_flip");
+		Analytics.event("edit_flip");
 		const targets = this._editor.$getSelectedTargets();
 		if(targets.length) {
 			return this._transformTargets(

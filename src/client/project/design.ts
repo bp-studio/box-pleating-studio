@@ -19,6 +19,7 @@ import {
 	clipboard, collectSubtrees, getClipboardSource, setClipboard
 } from "./components/tree/clipboard";
 import { formatEdges, formatFlaps } from "shared/utils/treeString";
+import Analytics from "app/services/analyticsService";
 
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "./components/sheet";
@@ -47,7 +48,10 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 
 	private readonly _mode = shallowRef<DesignMode>("tree");
 	public get mode(): DesignMode { return this._mode.value; }
-	public set mode(v: DesignMode) { this._mode.value = v; }
+	public set mode(v: DesignMode) {
+		this._mode.value = v;
+		Analytics.modeChanged(this);
+	}
 
 	public readonly layout: Layout;
 	public readonly tree: Tree;
@@ -216,7 +220,7 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const result = collectSubtrees(this.tree, ids);
 		if(!result.subtrees.length) return false;
 		setClipboard(result.subtrees, this.$project.id);
-		gtag("event", "edit_copy");
+		Analytics.event("edit_copy");
 		SelectionController.clear();
 		for(const id of result.ids) {
 			SelectionController.$toggle(this.tree.$vertices.$get(id)!, true);
@@ -235,14 +239,14 @@ export class Design extends View implements ISerializable<JDesign>, ITagObject {
 		const subtrees = await this.tree.$vertices.$cut(vertices);
 		if(!subtrees.length) return false;
 		setClipboard(subtrees, this.$project.id);
-		gtag("event", "edit_cut");
+		Analytics.event("edit_cut");
 		return true;
 	}
 
 	/** Paste the copied subtrees under the selected vertex. */
 	public async paste(): Promise<void> {
 		if(!this.canPaste) return;
-		gtag("event", "edit_paste", {
+		Analytics.event("edit_paste", {
 			data1: getClipboardSource(this.$project.id),
 		});
 		const vertex = SelectionController.selections[0] as Vertex;

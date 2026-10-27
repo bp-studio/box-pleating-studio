@@ -4,6 +4,7 @@ import dialogs from "./dialogService";
 import Language from "./languageService";
 import { deepCopy } from "shared/utils/copy";
 import { clone } from "shared/utils/clone";
+import Analytics from "app/services/analyticsService";
 
 import type { CPOptions } from "client/plugins/cp";
 import type { OptimizerOptions } from "client/plugins/optimizer";
@@ -15,7 +16,7 @@ type Theme = "system" | "dark" | "light";
 
 const DEFAULT_COLOR = undefined as number | undefined;
 
-const DEFAULT_HOTKEY: KeyStore = {
+export const DEFAULT_HOTKEY: KeyStore = {
 	v: {
 		t: "1",
 		l: "2",
@@ -170,7 +171,7 @@ function save(): void {
 /** Reset to default settings */
 export async function reset(): Promise<void> {
 	if(!await dialogs.confirm(i18n.t("preference.confirmReset"))) return;
-	gtag("event", "settings_reset");
+	Analytics.event("settings_reset");
 	Object.assign(settings, clone(defaultSettings));
 	Language.reset();
 }

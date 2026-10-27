@@ -1,6 +1,7 @@
 <template>
 	<Number
 		v-model="grid().size"
+		analytics="value"
 		:label="$t('panel.design.size')"
 		:min="MIN_DIAG_SIZE"
 		:max="MAX_SHEET_SIZE"

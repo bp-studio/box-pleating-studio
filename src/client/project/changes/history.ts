@@ -5,6 +5,7 @@ import { Step, OperationResult, restore } from "./step";
 import { MoveCommand } from "./commands/moveCommand";
 import { EditCommand } from "./commands/editCommand";
 import { display } from "client/screen/display";
+import Analytics from "app/services/analyticsService";
 
 import type { JProject } from "shared/json";
 import type { JEdit, NodeId } from "shared/json/tree";
@@ -148,6 +149,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 
 	public $edit(edits: JEdit[], oldRoot: NodeId, newRoot: NodeId): void {
 		if(this.$isLocked) return;
+		Analytics.milestone("tree_edit");
 		this._enqueue(
 			EditCommand.$create(this._project, edits, oldRoot, newRoot)
 		);
@@ -177,6 +179,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			return;
 		}
 		if(this.$canUndo) {
+			Analytics.undo();
 			await display.shield(async () => {
 				this._moving = true;
 				const result = await this._steps[--this._index.value].$undo();
@@ -198,6 +201,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 			return;
 		}
 		if(this.$canRedo) {
+			Analytics.redo();
 			await display.shield(async () => {
 				this._moving = true;
 				const result = await this._steps[this._index.value++].$redo();
@@ -223,6 +227,7 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	private _flush(): void {
 		const selection = this._project.design.sheet.$getSelectedTags();
 		if(this._queue.length) {
+			if(!this._moving) Analytics.activity();
 			const s = this._lastStep;
 			if(!s || !s.$tryAdd(this._queue, this._construct, this._destruct)) {
 				const step = new Step(this._project, {

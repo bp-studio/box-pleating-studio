@@ -7,7 +7,7 @@
 <script setup lang="ts">
 
 	import Studio from "app/services/studioService";
-	import { useThrottledGA } from "app/utils/ga";
+	import Analytics from "app/services/analyticsService";
 
 	import type { DirectionKey } from "shared/types/types";
 
@@ -23,12 +23,12 @@
 
 	let to: number;
 
-	const ga = useThrottledGA("dpad", ONE_HOUR);
+	const ga = Analytics.throttled("dpad", ONE_HOUR);
 
 	function down(repeat: number, e?: Event): void {
 		const SENSITIVITY = 150;
 		if(props.show) {
-			Studio.dragByKey(props.dir);
+			if(Studio.dragByKey(props.dir)) Analytics.input("move", "dpad");
 			to = setTimeout(() => down(SENSITIVITY), repeat);
 		} else {
 			up();

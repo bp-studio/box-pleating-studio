@@ -1,13 +1,14 @@
 import { shallowRef } from "vue";
 
 import { SelectionController } from "./selectionController";
-import { $getEventCenter, $round } from "./share";
+import { $getEventCenter, $isTouch, $round } from "./share";
 import { CursorController } from "./cursorController";
 import ProjectService from "client/services/projectService";
 import { display } from "client/screen/display";
 import { isTypedArray } from "shared/utils/array";
 import { Device } from "client/project/components/layout/device";
 import { MoveCommand } from "client/project/changes/commands/moveCommand";
+import Analytics from "app/services/analyticsService";
 
 import type { MTEvent } from "./share";
 import type { Draggable } from "client/base/draggable";
@@ -81,6 +82,10 @@ export namespace DragController {
 		// Check if the mouse location changed.
 		let pt = getCoordinate(event);
 		if(!CursorController.$tryUpdate(pt)) return false;
+		if(!dragged) {
+			Analytics.input("move", $isTouch(event) ? "touch" : "mouse");
+			Analytics.dragStart();
+		}
 		dragged = true;
 
 		// Ask for those Draggables to check and fix the location
@@ -111,6 +116,7 @@ export namespace DragController {
 		const wasDragging = dragged;
 		isDragging.value = false;
 		dragged = false;
+		Analytics.dragEnd();
 
 		const project = ProjectService.project.value;
 		if(wasDragging && project) {

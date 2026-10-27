@@ -4,6 +4,7 @@ import { $getEventCenter } from "./share";
 import { display } from "client/screen/display";
 import { TapController } from "./tapController";
 import { norm } from "shared/types/geometry";
+import Analytics from "app/services/analyticsService";
 
 import type { Sheet } from "client/project/components/sheet";
 
@@ -40,6 +41,7 @@ export namespace ZoomController {
 		const dpi = window.devicePixelRatio ?? 1;
 		const distDelta = (touchDistance - _lastTouchDistance) / dpi;
 		if(!_zooming && Math.abs(distDelta) < ZOOM_THRESHOLD) return;
+		if(!_zooming) Analytics.input("zoom", "pinch");
 		_zooming = true;
 		TapController.$cancel();
 
@@ -89,6 +91,7 @@ export namespace ZoomController {
 	export function $wheel(event: WheelEvent): void {
 		const sheet = ProjectService.sheet.value;
 		if(!sheet) return;
+		Analytics.input("zoom", "wheel", true);
 		const steps = Math.round(sheet.zoom * event.deltaY / DELTA_SCALE);
 		$zoom(
 			sheet.zoom - steps * STEP,

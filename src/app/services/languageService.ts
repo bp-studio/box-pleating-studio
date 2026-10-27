@@ -4,6 +4,7 @@ import { probablyChina } from "probably-china";
 
 import locale from "app/shared/locale";
 import { useDebounce } from "app/utils/timerUtility";
+import Analytics from "app/services/analyticsService";
 
 import type { I18n } from "vue-i18n";
 import type { BpsLocale } from "app/shared/locale";
@@ -83,7 +84,7 @@ namespace LanguageService {
 			if(loc in locale) {
 				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
 				syncing = false;
-				debounce(() => gtag("event", "lang_" + loc.replace("-", "_")));
+				debounce(() => Analytics.event("lang_" + loc.replace("-", "_")));
 			} else {
 				loc = findFallbackLocale(loc);
 				nextTick(() => i18n.locale.value = loc);

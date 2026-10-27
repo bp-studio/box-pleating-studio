@@ -17,6 +17,7 @@
 
 	import ExportService from "app/services/exportService";
 	import Export from "../components/export.vue";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "PNG" });
 
@@ -31,7 +32,7 @@
 	}
 
 	function save(): void {
-		gtag("event", "project_png");
+		Analytics.event("project_png");
 	}
 
 	defineExpose({ show });

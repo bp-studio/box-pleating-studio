@@ -14,6 +14,7 @@ import { LongPressController } from "client/controllers/longPressController";
 import { options } from "client/options";
 import { TapController } from "client/controllers/tapController";
 import { Project } from "client/project/project";
+import Analytics from "app/services/analyticsService";
 
 import type { MTEvent } from "client/controllers/share";
 
@@ -99,6 +100,7 @@ export namespace Interaction {
 		if(document.activeElement != document.body) return;
 		if(ScrollController.$tryKeyStart(event)) return;
 		if(DragController.dragByKey(event.key)) {
+			Analytics.input("move", "arrow");
 			event.preventDefault(); // Prevent viewport scrolling
 		}
 	}
@@ -156,7 +158,10 @@ export namespace Interaction {
 			// space key scrolling and middle or right mouse button scrolling.
 			if(space || bt == MOUSE_MIDDLE_BUTTON || bt == MOUSE_RIGHT_BUTTON) {
 				event.preventDefault();
-				initScroll(event);
+				let method = "right";
+				if(space) method = "space";
+				else if(bt == MOUSE_MIDDLE_BUTTON) method = "middle";
+				initScroll(event, method);
 				return;
 			}
 		} else {
@@ -176,7 +181,7 @@ export namespace Interaction {
 					SelectionController.$endDrag();
 					SelectionController.clear();
 					ZoomController.$init(event);
-					initScroll(event);
+					initScroll(event, "touch");
 				}
 				// Stop further processing in any case
 				return;
@@ -260,8 +265,8 @@ export namespace Interaction {
 		}
 	}
 
-	function initScroll(event: MTEvent): void {
-		ScrollController.$start(event);
+	function initScroll(event: MTEvent, method: string): void {
+		ScrollController.$start(event, method);
 		CursorController.$update($getEventCenter(event));
 	}
 }

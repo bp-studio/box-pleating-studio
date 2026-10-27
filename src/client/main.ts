@@ -126,7 +126,7 @@ export async function parseTree(edges: string, flaps: string): Promise<void> {
 	}));
 
 	const { default: Workspace } = await import("app/services/workspaceService");
-	await Workspace.open(project as Pseudo<typeof project>);
+	await Workspace.open(project as Pseudo<typeof project>, "file");
 	Workspace.selectLast();
 }
 /// #endif

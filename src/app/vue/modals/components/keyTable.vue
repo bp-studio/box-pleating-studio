@@ -56,12 +56,12 @@
 	import Settings from "app/services/settingService";
 	import Dialogs from "app/services/dialogService";
 	import CustomHotkeyService from "app/services/customHotkeyService";
-	import { useThrottledGA } from "app/utils/ga";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "KeyTable" });
 
 	const ONE_HOUR = 3600000;
-	const ga = useThrottledGA("custom_key", ONE_HOUR);
+	const ga = Analytics.throttled("custom_key", ONE_HOUR);
 
 	type KeyMap = Record<string, Record<string, string>>;
 

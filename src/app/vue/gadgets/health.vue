@@ -33,6 +33,7 @@
 	import { computed, shallowRef } from "vue";
 
 	import Studio from "app/services/studioService";
+	import Analytics from "app/services/analyticsService";
 
 	import type { Health } from "client/project/components/layout/health";
 
@@ -98,7 +99,7 @@
 	});
 
 	function learnMore(): void {
-		gtag("event", "health_learn_more");
+		Analytics.event("health_learn_more");
 	}
 
 	function add(list: Item[], key: string, n: number): void {

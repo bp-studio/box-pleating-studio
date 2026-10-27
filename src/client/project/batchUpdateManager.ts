@@ -1,4 +1,5 @@
 import { getOrSetEmptyArray } from "shared/utils/map";
+import Analytics from "app/services/analyticsService";
 
 import type { UpdateRequest } from "core/controller/designController";
 import type { JEdge } from "shared/json/tree";
@@ -112,6 +113,8 @@ export class BatchUpdateManager {
 		if(request.dragging && request.flaps.length) this._draggedFlaps = true;
 		this._pendingFlaps.clear();
 		this._pendingEdges.length = 0;
-		return this._core.$run(stack, c => c.design.update(request));
+		const start = performance.now();
+		return this._core.$run(stack, c => c.design.update(request))
+			.then(() => Analytics.coreUpdate(performance.now() - start));
 	};
 }

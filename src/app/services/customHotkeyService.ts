@@ -3,6 +3,7 @@ import { zoomStep } from "app/utils/viewUtility";
 import Settings from "./settingService";
 import Studio from "./studioService";
 import HotkeyService from "./hotkeyService";
+import Analytics from "./analyticsService";
 
 import type { DirectionKey } from "shared/types/types";
 
@@ -72,16 +73,20 @@ namespace CustomHotkeyService {
 			l: "left",
 			r: "right",
 		};
-		Studio.dragByKey(map[command]);
+		if(Studio.dragByKey(map[command])) Analytics.input("move", "key");
 	}
 
 	/** Processing component navigation */
 	function handleNavigationCommand(command: string): void {
 		if(!Studio.project) return;
-		if(command == "d") return Studio.project.design.goToDual();
+		if(command == "d") {
+			Analytics.input("dual", "key");
+			return Studio.project.design.goToDual();
+		}
 
 		const stretch = Studio.stretch;
 		if(!stretch) return;
+		Analytics.input("pattern", "key");
 		const f = command.endsWith("n") ? 1 : -1;
 		if(command.startsWith("c")) stretch.switchConfig(f);
 		else stretch.switchPattern(f);
@@ -91,6 +96,7 @@ namespace CustomHotkeyService {
 	function handleViewCommand(command: string): void {
 		if(!Studio.project) return;
 		const design = Studio.project.design;
+		Analytics.input(command.startsWith("z") ? "zoom" : "mode", "key");
 		if(command.startsWith("z")) {
 			const sheet = design.sheet;
 			const step = zoomStep(sheet.zoom);
@@ -103,6 +109,7 @@ namespace CustomHotkeyService {
 	/** Processing size changes of components */
 	function handleDimensionCommand(command: string): void {
 		if(!Studio.project) return;
+		Analytics.input("value", "key");
 		const f = command.endsWith("i") ? 1 : -1;
 		const sel = Studio.selections.length ?
 			Studio.selections : [Studio.project.design.sheet.grid];

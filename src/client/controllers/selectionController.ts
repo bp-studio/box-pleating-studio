@@ -8,6 +8,7 @@ import { display } from "client/screen/display";
 import ProjectService from "client/services/projectService";
 import { CursorController } from "./cursorController";
 import { Independent } from "client/base/independent";
+import Analytics from "app/services/analyticsService";
 
 import type { MTEvent } from "./share";
 import type { Control } from "client/base/control";
@@ -146,6 +147,7 @@ export namespace SelectionController {
 			/// #endif
 			return Boolean(current || next);
 		} else {
+			if(next || current) Analytics.input("select", "ctrl");
 			if(next) {
 				return trySelect(next);
 			} else if(current) {
@@ -163,7 +165,11 @@ export namespace SelectionController {
 		const { current, next } = statusCache;
 		const project = ProjectService.project.value;
 		if(project && !project.$isDragging) {
-			if(current && next) clear();
+			if(current && next) {
+				// Clicking repeatedly to reach the overlapped one
+				Analytics.input("select", "cycle");
+				clear();
+			}
 			if(current && !next) clear(current);
 			if(next) trySelect(next);
 		}
@@ -215,6 +221,7 @@ export namespace SelectionController {
 			} else {
 				clear();
 			}
+			Analytics.input("select", "box");
 			view.visible = true;
 			display.$setInteractive(false);
 			dragSelectables = [...sheet.$controls].filter(

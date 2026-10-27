@@ -9,13 +9,13 @@
 				:size="configCount(stretch.repo)"
 				:index="stretch.configIndex"
 				:label="$t('panel.repo.config')"
-				@move="stretch.switchConfig($event)"
+				@move="Analytics.input('pattern', 'panel'); stretch.switchConfig($event)"
 			/>
 			<Store
 				:size="patternCount(stretch.repo)"
 				:index="stretch.patternIndex"
 				:label="$t('panel.repo.pattern')"
-				@move="stretch.switchPattern($event)"
+				@move="Analytics.input('pattern', 'panel'); stretch.switchPattern($event)"
 			/>
 		</div>
 	</template>
@@ -24,6 +24,7 @@
 <script setup lang="ts">
 
 	import Store from "@/gadgets/form/store.vue";
+	import Analytics from "app/services/analyticsService";
 
 	import type { JRepository } from "shared/json/pattern";
 	import type { Stretch } from "client/project/components/layout/stretch";

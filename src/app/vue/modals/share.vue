@@ -48,6 +48,7 @@
 	import { copyEnabled } from "app/shared/constants";
 	import useModal from "./modal";
 	import CheckButton from "@/gadgets/form/checkButton.vue";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "Share" });
 
@@ -91,7 +92,7 @@
 			document.execCommand("copy");
 		}
 		bt.value!.check();
-		gtag("event", "share", { method: "copy", content_type: "link" });
+		Analytics.event("share", { method: "copy", content_type: "link" });
 	}
 
 	function share(): void {
@@ -102,7 +103,7 @@
 		}).catch(() => {
 			// No need to handle cancelling
 		});
-		gtag("event", "share", { method: "app", content_type: "link" });
+		Analytics.event("share", { method: "app", content_type: "link" });
 	}
 
 	/**
