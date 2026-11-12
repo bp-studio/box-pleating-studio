@@ -249,7 +249,7 @@ export default defineConfig({
 			addRules({
 				test: /\.md$/,
 				use: [
-					"html-minifier-loader",
+					"./lib/html-minifier.js",
 					{
 						loader: "markdown-loader",
 						options: {

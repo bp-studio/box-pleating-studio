@@ -2,14 +2,10 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - "@mutsuntsai/*"
 allowBuilds:
-  '@parcel/watcher': true
-  "@swc/core": true
-  core-js: true
-  es5-ext: true
-  oxc-resolver: true
-  sharp: true
+  '@parcel/watcher': false
+  core-js: false
   ttf2woff2: true
-  unrs-resolver: true
+  unrs-resolver: false
 overrides:
   js-yaml: ^4.1.1
   magic-string: ^0.30.0

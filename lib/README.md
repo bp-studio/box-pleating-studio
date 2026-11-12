@@ -7,6 +7,8 @@ so what's in here are those libraries that need custom builds or fixes.
 Those including:
 
 - Bootstrap: Customized [Bootstrap](https://getbootstrap.com/) theme for BP Studio.
+- HTML minifier: A loader of [html-minifier](https://github.com/j9t/html-minifier) for the update logs,
+  replacing the unmaintained html-minifier-loader, which doesn't support html-minifier v5 (ESM-only and async).
 - LZMA: The released file by [LZMA.js](https://github.com/LZMA-JS/LZMA-JS) contains minification error which makes it unusable, the file here fixed the error.
 - Include: This contains the precompiled static library and/or header files of:
   - [NLopt](https://github.com/stevengj/nlopt)\
