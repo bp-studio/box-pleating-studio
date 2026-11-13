@@ -1,5 +1,5 @@
 <template>
-	<Row :label="label">
+	<Row v-slot="{ labelId }" :label="label">
 		<div class="input-group" style="flex-wrap: nowrap;">
 			<button
 				class="btn btn-sm btn-primary"
@@ -16,6 +16,7 @@
 				:disabled="disabled"
 				:class="{ 'error': value != modelValue }"
 				type="number"
+				:aria-labelledby="labelId"
 				:min="min"
 				:max="max"
 				style="cursor: ns-resize; min-width: 30px;"

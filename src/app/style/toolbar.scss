@@ -149,7 +149,7 @@ body > .tab .bt {
 
 @media (hover: hover) {
 	.tab:not(:hover, .active) {
-		color: #444;
+		color: #3c3c3c; // Contrast ratio 4.5+ to --bg-ui
 	}
 }
 

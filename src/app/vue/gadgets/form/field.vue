@@ -1,8 +1,9 @@
 <template>
-	<Row :label="label">
+	<Row v-slot="{ labelId }" :label="label">
 		<input
 			v-model="value"
 			class="form-control"
+			:aria-labelledby="labelId"
 			:placeholder="placeholder"
 			:class="{ error: value != modelValue }"
 			:type="type"

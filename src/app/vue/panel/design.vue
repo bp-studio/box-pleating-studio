@@ -16,8 +16,8 @@
 				<div v-if="design.mode == 'layout'" class="h6">{{ $t("panel.design.layout") }}</div>
 			</div>
 		</Row>
-		<Row v-if="design.mode == 'layout'" :label="$t('panel.design.grid._')">
-			<select v-model="design.sheet.type" class="form-select">
+		<Row v-if="design.mode == 'layout'" v-slot="{ labelId }" :label="$t('panel.design.grid._')">
+			<select v-model="design.sheet.type" class="form-select" :aria-labelledby="labelId">
 				<option :value="GridType.rectangular">{{ $t("panel.design.grid.rect") }}</option>
 				<option :value="GridType.diagonal">{{ $t("panel.design.grid.diag") }}</option>
 			</select>
