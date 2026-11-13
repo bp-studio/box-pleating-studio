@@ -1,12 +1,14 @@
 import type { SvgGraphics } from "client/svg/svgGraphics";
-import type { Graphics } from "@pixi/graphics";
+import type { FillInput, Graphics, SmoothGraphics } from "pixi.js";
 import type { Contour, ILine, Path } from "shared/types/geometry";
-import type { SmoothGraphics } from "@pixi/graphics-smooth";
 
 export type SmoothGraphicsLike = SmoothGraphics | SvgGraphics;
 export type GraphicsLike = Graphics | SmoothGraphicsLike;
 
-/** Draw the lines of a contour (no filling) */
+/**
+ * Draw the paths of contours (no filling or stroking).
+ * The caller should call {@link Graphics.stroke} afterwards.
+ */
 export function drawContours(
 	graphics: GraphicsLike, contours: readonly Contour[]
 ): void {
@@ -19,31 +21,29 @@ export function drawContours(
 }
 
 /**
- * Fill a contour.
+ * Fill contours.
  *
- * The filling API of Pixi consists of low-level methods such as
- * {@link Graphics.beginFill} and {@link Graphics.beginHole}. The premise of
- * these methods is that we have to pair up the outer and inner paths of the
+ * Holes are created by {@link Graphics.cut}, which applies to the last filling.
+ * The premise of it is that we have to pair up the outer and inner paths of the
  * polygons explicitly. (There's no need for orientation though, as Pixi will do
  * it itself) Once this premise is met, Pixi will use the library
  * [earcut](https://github.com/mapbox/earcut) to triangulate the polygon,
  * thereby reducing the general filling to triangle filling. Accordingly, the
  * library is super efficient, so probably there's no need to further optimize
  * it.
+ *
+ * Note that all inner paths of a contour must be cut at once,
+ * as consecutive cuttings will mess up with the previous fillings.
  */
 export function fillContours(
-	graphics: GraphicsLike, contours: readonly Contour[], color: number
+	graphics: GraphicsLike, contours: readonly Contour[], fill: FillInput
 ): void {
 	for(const contour of contours) {
-		graphics.beginFill(color);
 		drawPath(graphics, contour.outer);
-		graphics.endFill();
+		graphics.fill(fill);
 		if(contour.inner) {
-			graphics.beginHole();
-			for(const inner of contour.inner) {
-				drawPath(graphics, inner);
-			}
-			graphics.endHole();
+			for(const inner of contour.inner) drawPath(graphics, inner);
+			graphics.cut();
 		}
 	}
 }

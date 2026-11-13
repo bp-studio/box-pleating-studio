@@ -43,11 +43,10 @@ export default defineConfig({
 			// This is needed, otherwise umd will be used,
 			// causing vue compiler to be bundled.
 			"vue-slicksort$": "./node_modules/vue-slicksort/dist/vue-slicksort.esm.js",
-			"./url.mjs$": "./lib/pixi/url.js", // see lib/README.md
 		},
 	},
 	source: {
-		include: [/@pixi/, /core-base/, /vue-i18n/],
+		include: [/pixi\.js/, /core-base/, /vue-i18n/],
 		entry: {
 			index: "./src/app/main.ts",
 			donate: "./src/other/donate/main.ts",
@@ -106,23 +105,14 @@ export default defineConfig({
 						chunks: "async",
 						priority: -1,
 					},
-					pixiUtils: {
-						test: makeTest(
-							createDescendantRegExp("@pixi/ticker", "@pixi/math"),
-							/pixi[\\/]url.js/ // see lib/README.md
-						),
-						name: "pixi-utils",
-						chunks: "async",
-					},
-					pixiCore: {
-						test: /@pixi[\\/]core/,
-						name: "pixi-core",
-						chunks: "async",
-					},
 					pixi: {
-						test: /@pixi/,
+						// Pixi imports renderer-specific modules dynamically,
+						// so we only take the ones that the client imports
+						// statically, and leave the others in separate chunks
+						// to load only the needed ones.
+						test: createDescendantRegExp("pixi.js"),
 						name: "pixi",
-						chunks: "async",
+						chunks: chunk => chunk.name == "client",
 						priority: -1,
 					},
 					i18n: {

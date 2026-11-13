@@ -1,28 +1,31 @@
-import type { ColorSource } from "@pixi/core";
-import type { ILineStyleOptions, SmoothGraphics, LINE_SCALE_MODE } from "@pixi/graphics-smooth";
+import type { FillInput, SmoothGraphics, StrokeInput } from "pixi.js";
 
 //=================================================================
 /**
  * {@link SvgGraphics} creates SVG path syntax.
  * It is compatible to {@link SmoothGraphics} in method signatures.
+ *
+ * Like in Pixi v8, a path is first built and then filled or stroked.
+ * The actual styles are given by the CSS classes, so only the stroke width
+ * is taken from the styles.
  */
 //=================================================================
 
 export class SvgGraphics {
 
 	/** Class names used by the next object. */
-	public $class: string = "";
-
-	/** Whether we are creating a compound path. */
-	private _compoundMode: boolean = false;
-
-	/** Stroke width setting. */
-	private _width: number | undefined = undefined;
+	private _class: string = "";
 
 	/** Accumulated SVG string. */
 	private _svg: string = "";
 
-	/** Content of the current path. */
+	/** The path that has been filled or stroked, which can still be cut. */
+	private _committed: string = "";
+
+	/** Stroke width setting of the committed path. */
+	private _width: number | undefined = undefined;
+
+	/** The path currently being built. */
 	private _path: string = "";
 
 	public $get(): string {
@@ -30,13 +33,21 @@ export class SvgGraphics {
 		return this._svg;
 	}
 
+	/** Class names used by the next object. */
+	public get $class(): string {
+		return this._class;
+	}
+	public set $class(v: string) {
+		this.$addPath();
+		this._class = v;
+	}
+
+	/** Output all pending paths. */
 	public $addPath(): void {
+		this._outputCommitted();
 		if(this._path) {
-			const style = this._width === undefined ? "" : ` style="stroke-width:${this._width}"`;
-			this._svg += `<path class="${this.$class}"${style} d="${this._path}" />`;
+			this._svg += `<path class="${this._class}" d="${this._path}" />`;
 			this._path = "";
-			this._width = undefined;
-			this._compoundMode = false;
 		}
 	}
 
@@ -46,7 +57,6 @@ export class SvgGraphics {
 
 	public closePath(): this {
 		this._path += "Z";
-		if(!this._compoundMode) this.$addPath();
 		return this;
 	}
 
@@ -60,20 +70,6 @@ export class SvgGraphics {
 		return this;
 	}
 
-	public drawRoundedRect(
-		x: number, y: number, width: number, height: number, radius: number
-	): this {
-		this.$addPath();
-		this._svg += `<rect class="${this.$class}" x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" />`;
-		return this;
-	}
-
-	public drawCircle(x: number, y: number, radius: number): this {
-		this.$addPath();
-		this._svg += `<circle class="${this.$class}" cx="${x}" cy="${y}" r="${radius}" />`;
-		return this;
-	}
-
 	public arcTo(
 		x1: number, y1: number, x2: number, y2: number, radius: number
 	): this {
@@ -81,24 +77,43 @@ export class SvgGraphics {
 		return this;
 	}
 
-	/**
-	 * We use the same signature as {@link SmoothGraphics} here.
-	 */
-	public lineStyle(
-		width: number, color?: ColorSource, alpha?: number,
-		alignment?: number, scaleMode?: LINE_SCALE_MODE): this;
-	public lineStyle(options: ILineStyleOptions): this;
-	public lineStyle(
-		...args: [number, ...unknown[]] | [ILineStyleOptions]
-	): this {
-		if(typeof args[0] == "number") this._width = args[0];
-		else this._width = args[0].width;
+	public rect(x: number, y: number, width: number, height: number): this {
+		this.$addPath();
+		this._svg += `<rect class="${this._class}" x="${x}" y="${y}" width="${width}" height="${height}" />`;
 		return this;
 	}
 
-	public beginFill(color?: number, alpha?: number, smooth?: boolean): this {
+	public roundRect(
+		x: number, y: number, width: number, height: number, radius: number
+	): this {
 		this.$addPath();
-		this._compoundMode = true;
+		this._svg += `<rect class="${this._class}" x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" />`;
+		return this;
+	}
+
+	public circle(x: number, y: number, radius: number): this {
+		this.$addPath();
+		this._svg += `<circle class="${this._class}" cx="${x}" cy="${y}" r="${radius}" />`;
+		return this;
+	}
+
+	public fill(style?: FillInput): this {
+		this._commit();
+		return this;
+	}
+
+	public stroke(style?: StrokeInput): this {
+		this._commit();
+		if(this._committed && typeof style == "object" && style && "width" in style) {
+			this._width = style.width;
+		}
+		return this;
+	}
+
+	/** Cut the current path from the committed path, as in compound paths. */
+	public cut(): this {
+		this._committed += this._path;
+		this._path = "";
 		return this;
 	}
 
@@ -107,12 +122,28 @@ export class SvgGraphics {
 	////////////////////////////////////////////////////////////////////////////
 
 	public clear(): this { return this; }
-	public endFill(): this { return this; }
-	public beginHole(): this { return this; }
-	public endHole(): this { return this; }
-}
 
-// These methods are never used, so we don't actually implement them.
-export interface SvgGraphics {
-	drawRect(x: number, y: number, width: number, height: number): this;
+	////////////////////////////////////////////////////////////////////////////
+	// Private methods
+	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Commit the current path for filling or stroking.
+	 * If the current path is empty, the committed path is reused
+	 * (as in the case of filling and then stroking the same path).
+	 */
+	private _commit(): void {
+		if(!this._path) return;
+		this._outputCommitted();
+		this._committed = this._path;
+		this._path = "";
+	}
+
+	private _outputCommitted(): void {
+		if(!this._committed) return;
+		const style = this._width === undefined ? "" : ` style="stroke-width:${this._width}"`;
+		this._svg += `<path class="${this._class}"${style} d="${this._committed}" />`;
+		this._committed = "";
+		this._width = undefined;
+	}
 }

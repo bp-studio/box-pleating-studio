@@ -15,5 +15,4 @@ peerDependencyRules:
 publicHoistPattern:
   - "@rspack/core"
   - "@popperjs/core"
-  - "@pixi/*"
   - "@vue/*"

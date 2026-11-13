@@ -1,7 +1,5 @@
 import { nextTick, watch, watchEffect } from "vue";
-import { Container } from "@pixi/display";
-import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
-import { Ticker } from "@pixi/ticker";
+import { Container, GraphicsContext, Ticker } from "pixi.js";
 
 import ProjectService from "client/services/projectService";
 import { useBackground } from "./background";
@@ -10,8 +8,7 @@ import { ScrollView } from "./scrollView";
 import { useRenderer } from "./renderer";
 import { setup } from "./contextManager";
 
-import type { FederatedPointerEvent } from "@pixi/events";
-import type { Renderer } from "@pixi/core";
+import type { FederatedPointerEvent, Renderer } from "pixi.js";
 import type { ControlEventBoundary } from "./controlEventBoundary";
 
 namespace Display {
@@ -20,12 +17,11 @@ namespace Display {
 		const el = document.getElementById("divWorkspace")!;
 		scrollView = new ScrollView(el);
 		viewport = scrollView.$viewport;
-		canvas = document.createElement("canvas");
-		el.appendChild(canvas);
 
 		renderer = await useRenderer({
-			view: canvas,
-			antialias: true, // We still need this for drawing texts
+			// SmoothGraphics does anti-aliasing by itself, and MSAA is costly
+			// on weak GPUs and in software rendering.
+			antialias: false,
 			// Start the app regardless whether there's an opened project.
 			// This improves the displaying speed of the first open project.
 			premultipliedAlpha: false,
@@ -36,9 +32,11 @@ namespace Display {
 			resolution: Math.floor(devicePixelRatio),
 			autoDensity: true,
 		});
+		canvas = renderer.canvas as HTMLCanvasElement;
+		el.appendChild(canvas);
 
 		// Context loss handling
-		setup(canvas);
+		setup(renderer);
 
 		// Create top-level containers
 		stage = new Container();
@@ -129,7 +127,9 @@ namespace Display {
 	}
 }
 
-// Setup SmoothGraphics
-settings.LINE_SCALE_MODE = LINE_SCALE_MODE.NONE;
+// Make all line widths in screen pixels, regardless of the scaling.
+// For SmoothGraphics, this keeps the given width;
+// for regular Graphics, this gives 1px lines.
+GraphicsContext.defaultStrokeStyle.pixelLine = true;
 
 export const display: Readonly<typeof Display> = Display;

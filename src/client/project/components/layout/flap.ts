@@ -1,5 +1,4 @@
-import { SmoothGraphics } from "@pixi/graphics-smooth";
-import { Graphics } from "@pixi/graphics";
+import { Graphics, SmoothGraphics } from "pixi.js";
 import { shallowRef } from "vue";
 
 import { Layer } from "client/shared/layers";
@@ -272,7 +271,7 @@ export class Flap extends Independent
 	public $drawCircle(graphics: GraphicsLike): void {
 		const { x, y, width: w, height: h } = this._drawParams;
 		const r = this.$edge.length;
-		graphics.drawRoundedRect(x - r, y - r, w + r + r, h + r + r, r);
+		graphics.roundRect(x - r, y - r, w + r + r, h + r + r, r);
 	}
 
 	public $drawDot(graphics: SmoothGraphicsLike): void {
@@ -281,15 +280,15 @@ export class Flap extends Independent
 			style.dot.size * ProjectService.shrink.value ** style.dot.exp;
 		const { width: w, height: h } = this._drawParams;
 		const pts = getDots(this._drawParams, w, h);
-		graphics.clear().lineStyle(style.dot.width, style.dot.color);
+		graphics.clear();
 		for(let i = 0; i < quadrantNumber; i++) {
 			if(this._sheet.grid.$contains(pts[i])) {
-				graphics
-					.beginFill(style.dot.fill)
-					.drawCircle(pts[i].x, pts[i].y, size / s)
-					.endFill();
+				graphics.circle(pts[i].x, pts[i].y, size / s);
 			}
 		}
+		graphics
+			.fill(style.dot.fill)
+			.stroke({ width: style.dot.width, color: style.dot.color });
 	}
 
 	private _drawShade(): void {
@@ -315,15 +314,21 @@ export class Flap extends Independent
 
 		this.$drawDot(this._dots);
 
-		this._hinge.clear().lineStyle(style.hinge.width * sh, hingeColor);
+		this._hinge.clear();
 		drawContours(this._hinge, this.$graphics.contours);
+		this._hinge.stroke({
+			width: style.hinge.width * sh, color: hingeColor,
+		});
 
-		this._ridge.clear()
-			.lineStyle(style.ridge.width * sh, style.ridge.color);
+		this._ridge.clear();
 		drawLines(this._ridge, this.$graphics.ridges);
+		this._ridge.stroke({
+			width: style.ridge.width * sh, color: style.ridge.color,
+		});
 
-		this._circle.clear().lineStyle(sh, hingeColor);
+		this._circle.clear();
 		this.$drawCircle(this._circle);
+		this._circle.stroke({ width: sh, color: hingeColor });
 	}
 
 	////////////////////////////////////////////////////////////////////////////

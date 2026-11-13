@@ -75,9 +75,6 @@ try {
 	await runPhase(2);
 
 	// Initialize services and Client
-	await import("@pixi/utils");
-	await scheduler.yield();
-	await import("@pixi/display");
 	const Core = (await import("app/core")).default;
 	if(await Core.init()) {
 		LanguageService.setup();

@@ -1,6 +1,5 @@
 import { computed, shallowReactive, watch } from "vue";
-import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/math";
+import { Graphics, Rectangle } from "pixi.js";
 
 import { Draggable } from "client/base/draggable";
 import { $isTouch } from "./share";
@@ -258,14 +257,13 @@ export namespace SelectionController {
 		if(w < MIN_WIDTH) w = MIN_WIDTH;
 		if(h < MIN_WIDTH) h = MIN_WIDTH;
 		view.clear()
-			.lineStyle({ width: 1, color: COLOR })
-			.beginFill(COLOR, ALPHA)
-			.drawRect(
+			.rect(
 				Math.min(downPoint.x, point.x),
 				Math.min(downPoint.y, point.y),
 				w, h
 			)
-			.endFill();
+			.fill({ color: COLOR, alpha: ALPHA })
+			.stroke({ width: 1, color: COLOR });
 	}
 
 	export function $toggle(c: Control, selected: boolean): void {

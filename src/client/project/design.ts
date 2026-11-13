@@ -1,4 +1,4 @@
-import { Container } from "@pixi/display";
+import { Container } from "pixi.js";
 import { shallowRef } from "vue";
 
 import { Field } from "client/shared/decorators";

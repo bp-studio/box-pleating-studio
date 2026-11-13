@@ -1,20 +1,32 @@
 import DialogService from "app/services/dialogService";
 import Analytics from "app/services/analyticsService";
 
+import type { Renderer, WebGPURenderer } from "pixi.js";
+
 const TIMEOUT = 300;
 
 let contextLost = false;
 let restartTimeout: number | undefined;
 
 /**
- * WebGL context loss happens when there is something wrong with the GPU.
+ * WebGL context loss (or WebGPU device loss) happens when there is something
+ * wrong with the GPU.
  * This is beyond the control of our app, so there is no way to prevent it.
  * The best we can do is to handle the error and restart the page.
- * (I've tried restarting the Pixi.js renderer, but it doesn't work,
+ * (I've tried restarting the Pixi.js renderer in v7, but it doesn't work,
  * perhaps because of using smooth graphics.)
  */
-export function setup(canvas: HTMLCanvasElement): void {
-	canvas.addEventListener("webglcontextlost", handleContextLost, false);
+export function setup(renderer: Renderer): void {
+	if(renderer.name === "webgpu") {
+		// Pixi will try to restore the device by itself,
+		// but we still restart the page to be on the safe side.
+		const { device } = (renderer as WebGPURenderer).gpu;
+		device.lost.then(info => {
+			if(info.reason !== "destroyed") handleContextLost();
+		});
+	} else {
+		renderer.canvas.addEventListener("webglcontextlost", handleContextLost, false);
+	}
 }
 
 export function isContextLost(): boolean {

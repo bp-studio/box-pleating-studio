@@ -1,19 +1,17 @@
 import { shallowRef } from "vue";
-import { Graphics } from "@pixi/graphics";
-import { Matrix } from "@pixi/core";
-import { Container } from "@pixi/display";
-import { Text } from "@pixi/text";
+import { Container, Graphics, Matrix, Text } from "pixi.js";
 
 import { View } from "client/base/view";
 import ProjectService from "client/services/projectService";
 import { Layer } from "client/shared/layers";
 import { style } from "client/services/styleService";
-import { drawPath, fillContours } from "client/utils/contourUtil";
+import { fillContours } from "client/utils/contourUtil";
 import { getStripeTexture } from "client/utils/stripeTexture";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { BLACK, WHITE } from "client/shared/constant";
 import { HealthAnalytics } from "app/services/healthAnalytics";
 
+import type { FillInput } from "pixi.js";
 import type { Layout } from "./layout";
 import type { HealthReport, UnsolvedQuadrant } from "core/design/health";
 
@@ -150,23 +148,18 @@ export class Health extends View {
 
 		// The texture is in pixels, while the sheet is in grid units, so
 		// we scale the texture down to keep the stripes in constant width.
+		// The texture space has to be global so that the stripes of different
+		// rivers line up.
 		const s = ProjectService.scale.value;
-		const fill = {
+		const fill: FillInput = {
 			texture: getStripeTexture(),
 			color: style.hinge.color,
 			alpha: style.shade.alpha,
 			matrix: new Matrix(1 / s, 0, 0, 1 / s),
+			textureSpace: "global",
 		};
 		for(const { contours } of rivers) {
-			for(const contour of contours) {
-				graphics.beginTextureFill(fill);
-				drawPath(graphics, contour.outer);
-				graphics.endFill();
-				if(!contour.inner) continue;
-				graphics.beginHole();
-				for(const inner of contour.inner) drawPath(graphics, inner);
-				graphics.endHole();
-			}
+			fillContours(graphics, contours, fill);
 		}
 	}
 
@@ -179,11 +172,10 @@ export class Health extends View {
 		const { alpha, minRadius } = style.danglingRidge;
 		const scale = ProjectService.scale.value;
 		const radius = Math.max(style.danglingRidge.radius, minRadius / scale);
-		graphics.beginFill(style.ridge.color, alpha);
 		for(const p of geometry.danglingRidgeEnds) {
-			graphics.drawCircle(p.x, p.y, radius);
+			graphics.circle(p.x, p.y, radius);
 		}
-		graphics.endFill();
+		graphics.fill({ color: style.ridge.color, alpha });
 	}
 
 	/** Mark the unsolved quadrants with question marks. */
@@ -210,18 +202,21 @@ function createMark(quadrant: UnsolvedQuadrant, s: number): Container {
 	// The font size is in pixels, so that the text is rendered sharply.
 	const size = quadrant.radius * style.unsolvedMark.size;
 	const fontSize = Math.max(1, Math.round(size * s));
-	const glow = new Text(UNSOLVED_MARK, {
-		fill: BLACK,
-		fontSize,
-		stroke: BLACK,
-		strokeThickness: style.label.glow * 2,
-		lineJoin: "bevel",
+	const glow = new Text({
+		text: UNSOLVED_MARK,
+		style: {
+			fill: BLACK,
+			fontSize,
+			stroke: { color: BLACK, width: style.label.glow * 2, join: "bevel" },
+		},
 	});
-	const label = new Text(UNSOLVED_MARK, {
-		fill: WHITE,
-		fontSize,
-		stroke: WHITE,
-		strokeThickness: 1,
+	const label = new Text({
+		text: UNSOLVED_MARK,
+		style: {
+			fill: WHITE,
+			fontSize,
+			stroke: { color: WHITE, width: 1 },
+		},
 	});
 	glow.anchor.set(HALF);
 	label.anchor.set(HALF);

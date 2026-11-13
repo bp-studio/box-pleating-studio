@@ -1,4 +1,4 @@
-import { Circle } from "@pixi/math";
+import { Circle } from "pixi.js";
 import { shallowRef } from "vue";
 
 import { Layer } from "client/shared/layers";
@@ -14,7 +14,7 @@ import { constrainVertex } from "../grid/constrain";
 
 import type { Grid } from "../grid/grid";
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
-import type { SmoothGraphics } from "@pixi/graphics-smooth";
+import type { SmoothGraphics } from "pixi.js";
 import type { LabelView } from "client/utils/label";
 import type { Tree } from "./tree";
 import type { DragSelectable } from "client/base/draggable";
@@ -211,10 +211,9 @@ export class Vertex extends Independent
 		const color = this.$selected ?
 			style.vertex.selected : style.vertex.color;
 		graphics.clear()
-			.lineStyle(width, color)
-			.beginFill(style.vertex.fill)
-			.drawCircle(this._location.x, this._location.y, size / s)
-			.endFill();
+			.circle(this._location.x, this._location.y, size / s)
+			.fill(style.vertex.fill)
+			.stroke({ width, color });
 	}
 
 	private _draw(): void {

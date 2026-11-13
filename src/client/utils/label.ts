@@ -1,5 +1,4 @@
-import { Container } from "@pixi/display";
-import { Text } from "@pixi/text";
+import { Container, Text } from "pixi.js";
 
 import ProjectService from "client/services/projectService";
 import { MARGIN, LABEL_MARGIN } from "client/shared/constant";
@@ -165,15 +164,16 @@ export class Label extends Container {
 		this._label.style = {
 			fill,
 			fontSize: FONT_SIZE * SMOOTHNESS,
-			stroke: fill,
-			strokeThickness: 1,
+			stroke: { color: fill, width: 1 },
 		};
 		this._glow.style = {
 			fill: stroke,
 			fontSize: FONT_SIZE * SMOOTHNESS,
-			stroke,
-			strokeThickness: style.label.glow * SMOOTHNESS,
-			lineJoin: "bevel",
+			stroke: {
+				color: stroke,
+				width: style.label.glow * SMOOTHNESS,
+				join: "bevel",
+			},
 		};
 	}
 }

@@ -1,16 +1,12 @@
 import { computed, shallowRef } from "vue";
-import { Container } from "@pixi/display";
-import { Graphics } from "@pixi/graphics";
-import { Rectangle } from "@pixi/math";
-import { SmoothGraphics } from "@pixi/graphics-smooth";
+import { Container, Graphics, Rectangle, SmoothGraphics } from "pixi.js";
 
 import settings from "app/services/settingService";
 import { View } from "client/base/view";
 import { FULL_ZOOM, MARGIN } from "client/shared/constant";
 import ProjectService from "client/services/projectService";
 import { display } from "client/screen/display";
-import { Enum } from "client/shared/enum";
-import { Layer, LayerOptions } from "client/shared/layers";
+import { Layer, createLayers } from "client/shared/layers";
 import { GridType } from "shared/json";
 import { createGrid } from "./grid";
 import { ZoomController } from "client/controllers/zoomController";
@@ -28,8 +24,6 @@ import type { Independent } from "client/base/independent";
 import type { Project } from "../project";
 import type { Control } from "client/base/control";
 import type { DesignMode, JSheet, JViewport, Memento } from "shared/json";
-
-const LAYERS = Enum.values(Layer);
 
 /**
  * An object that can be rotated or flipped, given by its bounding rectangle
@@ -90,7 +84,7 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 	public readonly $independents: Set<Independent> = new Set();
 
 	/** The layers. */
-	private _layers: Container[] = [];
+	private readonly _layers: Container[];
 
 	/** The border of the sheet. */
 	private _borderGraphics: SmoothGraphics = new SmoothGraphics();
@@ -119,15 +113,8 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		}
 
 		this.$addRootObject(this.$view, parentView);
-		for(const layer of LAYERS) {
-			const container = new Container();
-			this._layers[layer] = container;
-			if(!LayerOptions[layer].interactive) {
-				container.interactiveChildren = false;
-			}
-			if(LayerOptions[layer].clipped) container.mask = this._mask;
-		}
-		this.$view.addChild(this._mask, ...this._layers);
+		this.$view.addChild(this._mask);
+		this._layers = createLayers(this.$view, this._mask);
 
 		this._layers[Layer.sheet]
 			.addChild(this._borderGraphics, this._gridGraphics);
@@ -393,21 +380,25 @@ export class Sheet extends View implements ISerializable<JSheet>, ITagObject {
 		this.$view.scale.set(s, -s);
 
 		// Draw border
-		this._borderGraphics.clear()
-			.lineStyle(style.border.width * sh, style.border.color);
+		this._borderGraphics.clear();
 		this._grid.value.$drawBorder(this._borderGraphics);
+		this._borderGraphics.stroke({
+			width: style.border.width * sh, color: style.border.color,
+		});
 
 		// Draw layer mask
-		this._mask.clear().beginFill(0);
+		this._mask.clear();
 		this._grid.value.$drawBorder(this._mask);
-		this._mask.endFill();
+		this._mask.fill(0);
 
 		// Draw grid lines
 		this._gridGraphics.visible = settings.display.grid;
 		if(this._gridGraphics.visible) {
-			this._gridGraphics.clear()
-				.lineStyle(style.grid.width * sh, style.grid.color);
+			this._gridGraphics.clear();
 			this._grid.value.$drawGrid(this._gridGraphics);
+			this._gridGraphics.stroke({
+				width: style.grid.width * sh, color: style.grid.color,
+			});
 		}
 	}
 }

@@ -24,6 +24,3 @@ Those including:
 	 (For VS Code, this requires the [WebAssembly DWARF Debugging](https://marketplace.visualstudio.com/items?itemName=ms-vscode.wasm-dwarf-debugging) extension.)
   2. Dist build is for the web worker and is thoroughly optimized (no debugging).
   3. Dist_MP build is also for the web worker, but enables multiple processing.
-- Pixi: [Pixi](https://pixijs.com/) v7 has a deprecated dependency of `url`, and since v7 isn't designed to be side-effect-free,
-  Rspack's tree-shaking doesn't work with it. We use a stub module as a substitute to reduce the bundle size.
-  This can be removed after updating to Pixi v8.

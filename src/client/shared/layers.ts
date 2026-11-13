@@ -1,3 +1,6 @@
+import { Container } from "pixi.js";
+
+import { Enum } from "client/shared/enum";
 
 /** All layers and their ordering. */
 export enum Layer {
@@ -43,3 +46,33 @@ export const LayerOptions: Record<Layer, ILayerOptions> = {
 	[Layer.vertex]: { interactive: true },
 	[Layer.label]: {},
 };
+
+/**
+ * Create the layers and add them to the view.
+ *
+ * Consecutive clipped layers are grouped to share one mask,
+ * as each mask is quite costly in Pixi v8,
+ * especially on devices with weak GPUs.
+ */
+export function createLayers(view: Container, mask: Container): Container[] {
+	const layers: Container[] = [];
+	let clippedGroup: Container | null = null;
+	for(const layer of Enum.values(Layer)) {
+		const container = new Container();
+		layers[layer] = container;
+		const options = LayerOptions[layer];
+		if(!options.interactive) container.interactiveChildren = false;
+		if(options.clipped) {
+			if(!clippedGroup) {
+				clippedGroup = new Container();
+				clippedGroup.mask = mask;
+				view.addChild(clippedGroup);
+			}
+			clippedGroup.addChild(container);
+		} else {
+			clippedGroup = null;
+			view.addChild(container);
+		}
+	}
+	return layers;
+}

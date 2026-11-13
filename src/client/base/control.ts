@@ -8,8 +8,7 @@ import type { SelectionController } from "client/controllers/selectionController
 import type { Project } from "client/project/project";
 import type { ITagObject } from "client/shared/interface";
 import type { Sheet } from "client/project/components/sheet";
-import type { Container } from "@pixi/display";
-import type { IHitArea } from "@pixi/events";
+import type { Container, IHitArea } from "pixi.js";
 
 type ControlType = "Flap" | "Vertex" | "River" | "Edge" | "Stretch" | "Device";
 

@@ -7,7 +7,7 @@ import { getFirst } from "shared/utils/set";
 
 import type { Vertex } from "./vertex";
 import type { Project } from "client/project/project";
-import type { Container } from "@pixi/display";
+import type { Container } from "pixi.js";
 import type { JEdge, JEdgeBase, JTree, JViewport, NodeId } from "shared/json";
 import type { UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";

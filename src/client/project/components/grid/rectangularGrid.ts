@@ -180,7 +180,7 @@ export class RectangularGrid extends Grid {
 	}
 
 	public $drawBorder(border: GraphicsLike): void {
-		border.drawRect(0, 0, this._width.value, this._height.value);
+		border.rect(0, 0, this._width.value, this._height.value);
 	}
 
 	public $getBorderPath(): Path {

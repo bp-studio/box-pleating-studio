@@ -1,10 +1,7 @@
-import { EventBoundary } from "@pixi/events";
+import { EventBoundary } from "pixi.js";
 
 import type { Control } from "client/base/control";
-import type { Point } from "@pixi/math";
-import type { Renderer } from "@pixi/core";
-import type { EventMode, EventSystem } from "@pixi/events";
-import type { Container, DisplayObject } from "@pixi/display";
+import type { Container, EventMode, EventSystem, Point, Renderer } from "pixi.js";
 import type { Sheet } from "client/project/components/sheet";
 
 export function useControlEventBoundary(
@@ -36,7 +33,7 @@ export class ControlEventBoundary extends EventBoundary {
 	public $hitTestAll(sheet: Sheet, location: IPoint): Control[] {
 		let result: Control[] = [];
 		this._hitTestAllRecursive(
-			sheet.$view, this.rootTarget.eventMode, location, result
+			sheet.$view, this.rootTarget.eventMode!, location, result
 		);
 		if(result.length) {
 			result.sort((a, b) => b.$priority - a.$priority);
@@ -48,7 +45,7 @@ export class ControlEventBoundary extends EventBoundary {
 	}
 
 	private _hitTestAllRecursive(
-		target: DisplayObject, eventMode: EventMode,
+		target: Container, eventMode: EventMode,
 		location: IPoint, result: Control[]
 	): void {
 
@@ -62,8 +59,9 @@ export class ControlEventBoundary extends EventBoundary {
 		if(target.interactiveChildren && target.children) {
 			for(const child of target.children) {
 				this._hitTestAllRecursive(
-					child as DisplayObject,
-					interactive ? eventMode : child.eventMode,
+					child,
+					// The getter falls back to the default mode at runtime.
+					interactive ? eventMode : child.eventMode!,
 					location, result
 				);
 			}
@@ -75,5 +73,5 @@ export class ControlEventBoundary extends EventBoundary {
 	}
 }
 
-/** Maps {@link DisplayObject}s back to corresponding {@link Control}s. */
-export const hitMap: WeakMap<DisplayObject, Control> = new WeakMap();
+/** Maps {@link Container}s back to corresponding {@link Control}s. */
+export const hitMap: WeakMap<Container, Control> = new WeakMap();
