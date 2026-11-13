@@ -1,7 +1,7 @@
 {
 	"name": "box-pleating-studio",
 	"version": "0.8.5",
-	"app_version": "1920",
+	"app_version": "1923",
 	"private": true,
 	"description": "Super-complex origami design made easy!",
 	"keywords": [
@@ -39,6 +39,7 @@
 		"lint:all": "eslint .",
 		"lint:inspect": "pnpx @eslint/config-inspector@latest",
 		"preview": "rsbuild preview --port 30784 -o",
+		"preview:tls": "rsbuild preview --port 30786 -o -- tls",
 		"scss:migrate": "pnpx sass-migrator module --migrate-deps src/app/style/main.scss",
 		"stylelint": "stylelint src/**/*.vue src/**/*.scss",
 		"test": "rstest",

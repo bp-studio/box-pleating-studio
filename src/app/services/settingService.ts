@@ -173,7 +173,7 @@ export async function reset(): Promise<void> {
 	if(!await dialogs.confirm(i18n.t("preference.confirmReset"))) return;
 	Analytics.event("settings_reset");
 	Object.assign(settings, clone(defaultSettings));
-	Language.reset();
+	await Language.reset();
 }
 
 export default settings;

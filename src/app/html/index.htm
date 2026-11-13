@@ -18,7 +18,6 @@
 	<link rel="preload" as="manifest" href="manifest.json">
 
 	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>
 	<script>
 		// This part is kept in debug because app_config is also used elsewhere
 		window.dataLayer = window.dataLayer || [];
@@ -32,6 +31,26 @@
 		gtag("js", new Date());
 		gtag("config", "G-GG1TEZGBCQ", app_config);
 
+		/**
+		 * gtag.js is loaded only after the startup (see app/init.ts), as it
+		 * takes a lot of bandwidth and main thread time, hurting FCP and TBT.
+		 * The commands above are queued in dataLayer and nothing is lost.
+		 * The URL is removed when deploying to QA and DEV (see gulp/tasks/ftp.js).
+		 */
+		var gaSrc = "https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ";
+		function loadGA() {
+			if(!gaSrc) return;
+			var script = document.createElement("script");
+			script.async = true;
+			script.src = gaSrc;
+			gaSrc = ""; // load only once
+			// eslint-disable-next-line compat/compat
+			document.head.appendChild(script);
+		}
+
+		// In case that the startup hangs without errors.
+		setTimeout(loadGA, 30000);
+
 		// Switch to dark theme immediately if necessary to avoid flashing
 		(function() {
 			var theme = "system", dark = false;
@@ -44,6 +63,24 @@
 				document.documentElement.classList.add("dark");
 			}
 		})();
+
+		// Show the Welcome Screen immediately instead of the spinner on the first
+		// startup (same condition as checkForEarlyWelcome()), which improves
+		// Speed Index. Only for English, to avoid flashing in other languages.
+		// The class is removed when the Welcome Screen is ready (see app/init.ts).
+		/* eslint-disable compat/compat */
+		(function() {
+			try {
+				var session = JSON.parse(localStorage.getItem("session"));
+				if(session && session.jsons.length) return;
+				if(/[?&]project=/.test(location.search)) return;
+				var lang = localStorage.getItem("locale") ||
+					navigator.languages && navigator.languages[0] || navigator.language || "";
+				if(lang.toLowerCase().indexOf("en") != 0) return;
+				document.documentElement.classList.add("early-welcome");
+			} catch(e) { }
+		})();
+		/* eslint-enable compat/compat */
 	</script>
 
 	<!-- SEO -->
@@ -377,6 +414,7 @@
 				) {
 					gtag("event", "unsupported", gaErrorData(runErr));
 				}
+				loadGA();
 				return false;
 			};
 

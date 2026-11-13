@@ -160,7 +160,8 @@ function taskFactory(id) {
 				.pipe(through2((content, file) => {
 					if(file.basename == "index.htm") {
 						return content
-							.replace('<script async src="https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ"></script>', "")
+							// Disable GA (see loadGA() in index.htm)
+							.replace("https://www.googletagmanager.com/gtag/js?id=G-GG1TEZGBCQ", "")
 							.replace("<title>Box Pleating Studio</title>", `<title>${ftpConfig[id].title}</title>`);
 					}
 					if(file.basename == "manifest.json") {

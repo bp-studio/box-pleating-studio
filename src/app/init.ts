@@ -1,5 +1,7 @@
 import { createSSRApp } from "vue";
 
+import { warmupPixi } from "client/screen/warmup";
+
 //=================================================================
 /**
  * This module contains the key to BP Studio's startup optimization.
@@ -12,12 +14,13 @@ import { createSSRApp } from "vue";
 //=================================================================
 
 const TIME_TERMINATE = 100;
+const TIME_GA = 3000;
 const TOTAL_PHASES = 10;
 
 await scheduler.yield();
 const { lcp, welcomeScreenReady, phase, checkForEarlyWelcome } = await import("app/misc/phase");
 const earlyWelcome = checkForEarlyWelcome();
-await import("app/shared/locale");
+(await import("app/shared/locale")).preloadLocales();
 await scheduler.yield();
 
 async function runPhase(to: number): Promise<void> {
@@ -64,8 +67,10 @@ try {
 	// LanguageService initialization
 	// This is done after LCP to prevent hydration mismatches.
 	await scheduler.yield();
-	LanguageService.init();
+	await LanguageService.init();
 	if(earlyWelcome) welcomeScreenReady.value = true;
+	// See the inline script in index.htm
+	document.documentElement.classList.remove("early-welcome");
 
 	// Phase 1 to 2
 	await import("@/panel/panel.vue");
@@ -73,6 +78,8 @@ try {
 	await runPhase(1);
 	await import("@/modals/modalFragment.vue");
 	await runPhase(2);
+
+	await warmupPixi();
 
 	// Initialize services and Client
 	const Core = (await import("app/core")).default;
@@ -92,6 +99,13 @@ try {
 			window.onerror = null;
 			window.onunhandledrejection = null;
 		}, TIME_TERMINATE);
+	}
+	// Load GA when the main thread is idle, so that it won't block the
+	// interactions right after the startup.
+	if(typeof requestIdleCallback == "function") {
+		requestIdleCallback(loadGA, { timeout: TIME_GA });
+	} else {
+		setTimeout(loadGA, TIME_GA);
 	}
 }
 

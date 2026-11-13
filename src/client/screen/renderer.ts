@@ -1,6 +1,9 @@
 import "pixi.js/events";
 import "pixi.js/filters";
-import { GlLimitsSystem, GpuLimitsSystem, autoDetectRenderer, extensions } from "pixi.js";
+import {
+	GlLimitsSystem, GpuLimitsSystem, autoDetectRenderer, extensions,
+	isWebGLSupported
+} from "pixi.js";
 
 import type { AutoDetectOptions, ExtensionType, Renderer } from "pixi.js";
 
@@ -83,7 +86,7 @@ export async function useRenderer(options: RendererOptions): Promise<Renderer> {
 	const renderer = await tryWebGPU(options);
 	if(renderer) return renderer;
 	try {
-		return await create(options, "webgl");
+		return await createWebGL(options);
 	} catch {
 		// Neither WebGPU nor WebGL is available.
 		return errMgr.setCustomError(
@@ -94,13 +97,43 @@ export async function useRenderer(options: RendererOptions): Promise<Renderer> {
 }
 
 function create(
-	options: RendererOptions, preference: "webgpu" | "webgl"
+	options: RendererOptions, preference: "webgpu" | "webgl",
+	extra?: Partial<AutoDetectOptions>
 ): Promise<Renderer> {
 	return autoDetectRenderer({
 		...options,
+		...extra,
 		preference: [preference],
 		skipExtensionImports: true,
 	});
+}
+
+/**
+ * Creating a WebGL context is costly, and Pixi does it twice (once for
+ * detecting the support) in the same task as the rest of the initialization.
+ * To improve TBT, we do these in separate tasks, and pass the context to Pixi.
+ */
+async function createWebGL(options: RendererOptions): Promise<Renderer> {
+	// The result is cached by Pixi, so it won't be done again.
+	if(!isWebGLSupported()) throw new Error("WebGL is not supported");
+	await scheduler.yield();
+
+	// Same as the attributes used by Pixi, see GlContextSystem.init().
+	const attributes: WebGLContextAttributes = {
+		alpha: false, // The background is opaque
+		premultipliedAlpha: options.premultipliedAlpha ?? true,
+		antialias: options.antialias,
+		stencil: true,
+		preserveDrawingBuffer: false,
+		powerPreference: "default",
+	};
+	const canvas = document.createElement("canvas");
+	const context = canvas.getContext("webgl2", attributes);
+	// Let Pixi handle it if WebGL 2 is not available.
+	if(!context) return create(options, "webgl");
+	await scheduler.yield();
+
+	return create(options, "webgl", { canvas, context });
 }
 
 /**

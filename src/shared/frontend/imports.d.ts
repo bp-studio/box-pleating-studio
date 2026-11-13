@@ -21,6 +21,9 @@ declare global {
 
 	declare function gaErrorData(err: string): object;
 
+	/** Loads gtag.js (only once), defined in HTML. */
+	declare function loadGA(): void;
+
 	/** App info, defined in HTML. */
 	declare const app_config: Record<string, string>;
 

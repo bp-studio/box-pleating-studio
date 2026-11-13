@@ -17,13 +17,16 @@ import { createI18n } from "vue-i18n";
 import locale from "./src/locale/en.json";
 import pkg from "./package.json";
 
-import type { PostCSSPlugin } from "@rsbuild/core";
+import type { PostCSSPlugin, RsbuildPlugin } from "@rsbuild/core";
 
 const isProduction = process.env.NODE_ENV === "production";
 
 // To enable these, execute for example `pnpm build -- doctor inspect`.
 const useRsdoctor = process.argv.includes("doctor");
 const inspectBuild = process.argv.includes("inspect");
+
+// Serve over HTTPS (and thus HTTP/2, as in production); see `pnpm preview:tls`.
+const useTLS = process.argv.includes("tls");
 
 // Build static assets once
 if(!fs.existsSync("build/temp")) {
@@ -80,6 +83,7 @@ export default defineConfig({
 			"Cross-Origin-Opener-Policy": "same-origin",
 			"Cross-Origin-Embedder-Policy": "require-corp",
 		},
+		https: useTLS ? getCertificate() : undefined,
 	},
 	performance: !isProduction ? undefined : {
 		chunkSplit: {
@@ -92,7 +96,15 @@ export default defineConfig({
 						chunks: "all",
 					},
 					index: {
-						test: makeTest(/src[\\/](app|log)\b/, /idb-keyval/, /probably-china/),
+						// Dependencies of the modules here must be included,
+						// or they are duplicated into each async chunk that
+						// app/init.ts imports, causing many sequential
+						// requests during startup.
+						test: makeTest(
+							/src[\\/](app|log)\b/, /idb-keyval/, /probably-china/,
+							/inapp-spy/, /vue-loader[\\/]dist[\\/]exportHelper/,
+							/client[\\/]screen[\\/]warmup[\\/]index/
+						),
 						name: "index",
 						chunks: "all",
 					},
@@ -110,13 +122,22 @@ export default defineConfig({
 						// so we only take the ones that the client imports
 						// statically, and leave the others in separate chunks
 						// to load only the needed ones.
-						test: createDescendantRegExp("pixi.js"),
+						test: makeTest(
+							createDescendantRegExp("pixi.js"),
+							// The warm-up stages
+							/client[\\/]screen[\\/]warmup[\\/](?!index|client)/
+						),
 						name: "pixi",
-						chunks: chunk => chunk.name == "client",
+						chunks: chunk => chunk.name == "client" ||
+							Boolean(chunk.name?.startsWith("warmup-")),
 						priority: -1,
 					},
 					i18n: {
-						test: makeTest(createDescendantRegExp("vue-i18n"), /locale\.ts$/, /\.json$/),
+						// Other locales are loaded on demand.
+						test: makeTest(
+							createDescendantRegExp("vue-i18n"), /locale\.ts$/,
+							/locale[\\/]en\.json$/
+						),
 						name: "vue-i18n",
 						chunks: "all",
 						priority: 1,
@@ -136,7 +157,8 @@ export default defineConfig({
 				/\.css$/,
 				/bps\.\w+\.woff2$/,
 				/(vue(-\w+)?)\.\w+\.js/,
-				/(client|shared)\.\w+\.js/,
+				// The client chunk is loaded with Pixi; see warmupPixi()
+				/shared\.\w+\.js/,
 			],
 		},
 		buildCache: true,
@@ -202,6 +224,7 @@ export default defineConfig({
 			ecmaVersion: 2019,
 			excludeOutput: /optimizer/,
 		}),
+		pluginPreloadLocale(),
 		pluginAssetsRetry({
 			addQuery: true,
 			max: 2,
@@ -220,8 +243,11 @@ export default defineConfig({
 				.options({
 					DEBUG: !isProduction,
 				});
+			// The oneOf rule of plugin-sass is named "sass" (no constant in
+			// CHAIN_ID). Using a non-existing name here silently creates an
+			// empty rule that never matches, and PurgeCSS doesn't run.
 			chain.module.rule(CHAIN_ID.RULE.SASS)
-				.oneOf(CHAIN_ID.ONE_OF.CSS_MAIN)
+				.oneOf("sass")
 				.use("bootstrap-loader")
 				.after(CHAIN_ID.USE.CSS)
 				.loader("./lib/bootstrap/loader.js");
@@ -295,6 +321,72 @@ export default defineConfig({
 		},
 	},
 });
+
+/**
+ * The locales other than English are loaded on demand (see app/shared/locale),
+ * but for the users of those locales, the locale chunk is needed right after
+ * LCP. To avoid waiting for it, this injects an inline script that preloads
+ * the chunks of the candidate locales (the same logic as `getLanguages()`)
+ * in parallel with the entry chunk.
+ */
+function pluginPreloadLocale(): RsbuildPlugin {
+	return {
+		name: "preload-locale",
+		setup(api) {
+			api.modifyHTMLTags((tags, context) => {
+				const { compilation, assetPrefix, filename } = context;
+				if(filename != "index.htm") return tags;
+				const urls: Record<string, string | null> = { en: null };
+				for(const chunk of compilation.chunks) {
+					const m = chunk.name?.match(/^locale-(.+)$/);
+					const file = [...chunk.files].find(f => f.endsWith(".js"));
+					if(m && file) urls[m[1]] = assetPrefix + file;
+				}
+				const script = `(function(u){
+					var s = localStorage.getItem("locale"), n = navigator.languages || [], c = s ? [s] : [];
+					for(var i = 0; i < n.length; i++) {
+						var a = n[i].replace(/_/g, "-").toLowerCase()
+							.replace(/^zh(-\\w+)?-hant.*$/, "zh-tw").replace(/^zh(-\\w+)?-hans.*$/, "zh-cn");
+						for(var l in u) if(a.indexOf(l) == 0) { c.push(l); break; }
+					}
+					for(i = 0; i < c.length; i++) {
+						if(!u[c[i]]) continue;
+						var e = document.createElement("link");
+						e.rel = "preload"; e.as = "script"; e.href = u[c[i]];
+						document.head.appendChild(e);
+						u[c[i]] = null;
+					}
+				})(${JSON.stringify(urls)});`;
+				tags.headTags.unshift({ tag: "script", children: script });
+				return tags;
+			});
+		},
+	};
+}
+
+/**
+ * Creates a locally-trusted certificate using mkcert (once).
+ * Browsers only support HTTP/2 over TLS, and the certificate must be trusted
+ * for the service worker to register.
+ */
+function getCertificate(): { key: Buffer, cert: Buffer } {
+	const dir = "build/cert";
+	const key = `${dir}/localhost-key.pem`;
+	const cert = `${dir}/localhost.pem`;
+	if(!fs.existsSync(key) || !fs.existsSync(cert)) {
+		fs.mkdirSync(dir, { recursive: true });
+		const result = spawnSync(
+			"mkcert",
+			["-key-file", key, "-cert-file", cert, "localhost", "127.0.0.1", "::1"],
+			{ stdio: "inherit", shell: true }
+		);
+		if(result.status !== 0) {
+			throw new Error("Failed to create the certificate with mkcert. " +
+				"Please make sure that it is installed and can write to " + dir);
+		}
+	}
+	return { key: fs.readFileSync(key), cert: fs.readFileSync(cert) };
+}
 
 /**
  * Add simple handling for IE < 10,

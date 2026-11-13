@@ -3,7 +3,7 @@
 		v-if="report"
 		id="divHealth"
 		class="card text-white shadow bg-opacity-75"
-		:class="'bg-' + level"
+		:class="BACKGROUND[level]"
 	>
 		<div class="d-flex align-items-center px-3 py-2">
 			<i class="me-2" :class="icon"/>
@@ -59,6 +59,14 @@
 		if(!design || design.mode != "layout") return null;
 		return design.layout.health.report;
 	});
+
+	// The class names must be written in full, or they're removed by PurgeCSS
+	// (see lib/bootstrap/loader.js).
+	const BACKGROUND = {
+		danger: "bg-danger",
+		warning: "bg-warning",
+		success: "bg-success",
+	};
 
 	const level = computed(() => {
 		const r = report.value!;
