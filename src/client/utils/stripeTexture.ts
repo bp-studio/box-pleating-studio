@@ -1,4 +1,4 @@
-import { Texture, WRAP_MODES } from "@pixi/core";
+import { CanvasSource, Texture } from "pixi.js";
 
 /**
  * The size of the texture in pixels, which is also the period of the stripes
@@ -17,7 +17,7 @@ let texture: Texture | undefined;
 /**
  * A repeating white texture of 45-degree stripes alternating with transparent
  * ones, for filling regions with stripes using
- * {@link Graphics.beginTextureFill} (with color tinting).
+ * {@link Graphics.fill} (with color tinting).
  *
  * It is created lazily, as it requires the DOM.
  */
@@ -35,7 +35,8 @@ export function getStripeTexture(): Texture {
 		}
 	}
 	context.putImageData(image, 0, 0);
-	texture = Texture.from(canvas);
-	texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
+	texture = new Texture({
+		source: new CanvasSource({ resource: canvas, addressMode: "repeat" }),
+	});
 	return texture;
 }

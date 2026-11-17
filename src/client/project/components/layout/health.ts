@@ -1,18 +1,17 @@
 import { shallowRef } from "vue";
-import { Graphics } from "@pixi/graphics";
-import { Matrix } from "@pixi/core";
-import { Container } from "@pixi/display";
-import { Text } from "@pixi/text";
+import { Container, Graphics, Matrix, Text } from "pixi.js";
 
 import { View } from "client/base/view";
 import ProjectService from "client/services/projectService";
 import { Layer } from "client/shared/layers";
 import { style } from "client/services/styleService";
-import { drawPath, fillContours } from "client/utils/contourUtil";
+import { fillContours } from "client/utils/contourUtil";
 import { getStripeTexture } from "client/utils/stripeTexture";
 import { ScaledSmoothGraphics } from "client/utils/scaledSmoothGraphics";
 import { BLACK, WHITE } from "client/shared/constant";
+import { HealthAnalytics } from "app/services/healthAnalytics";
 
+import type { FillInput } from "pixi.js";
 import type { Layout } from "./layout";
 import type { HealthReport, UnsolvedQuadrant } from "core/design/health";
 
@@ -26,28 +25,6 @@ import type { HealthReport, UnsolvedQuadrant } from "core/design/health";
 const UNSOLVED_MARK = "?";
 
 const HALF = 0.5;
-
-const enum Analytics {
-	/** The next result is the first one after enabling. */
-	first,
-	/** The first result has issues, and they are not all resolved yet. */
-	resolve,
-	/** Nothing more to report. */
-	none,
-}
-
-/** The kinds of the issues in the report, in the same keys as in the UI. */
-function getIssues(report: HealthReport): string[] {
-	const g = report.geometry;
-	const counts: [string, number][] = [
-		["invalid", report.invalidJunctions],
-		["unsolved", report.unsolvedStretches],
-		["uncovered", g?.uncovered.length ?? 0],
-		["dangling", g?.danglingRidgeEnds.length ?? 0],
-		["riverCorner", g?.missingRiverRidges.length ?? 0],
-	];
-	return counts.filter(([, n]) => n).map(([key]) => key);
-}
 
 //=================================================================
 /**
@@ -67,7 +44,7 @@ export class Health extends View {
 	public set enabled(v: boolean) {
 		this._enabled.value = v;
 		if(!v) this._report.value = null;
-		else this._analytics = Analytics.first;
+		this._analytics.$toggle(v);
 	}
 
 	private readonly _report = shallowRef<HealthReport | null>(null);
@@ -86,12 +63,13 @@ export class Health extends View {
 	/** Whether another check is needed after the current one. */
 	private _dirty: boolean = false;
 
-	/** What to report to Google Analytics for the next result. */
-	private _analytics: Analytics = Analytics.first;
+	private readonly _analytics: HealthAnalytics;
 
 	constructor(layout: Layout) {
 		super();
 		this._layout = layout;
+		this._analytics =
+			new HealthAnalytics(layout.$project, () => this.report);
 		const layers = layout.$sheet.$layers;
 		this._uncovered =
 			this.$addRootObject(new Graphics(), layers[Layer.uncovered]);
@@ -130,7 +108,7 @@ export class Health extends View {
 			const report = await core.design.health(border);
 			if(this.enabled) {
 				this._report.value = report;
-				this._sendAnalytics(report);
+				this._analytics.$result(report);
 			}
 		} finally {
 			this._checking = false;
@@ -141,28 +119,6 @@ export class Health extends View {
 	////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Report the first result after enabling, and the first time all the
-	 * issues are resolved after that, so that we know what issues the users
-	 * encounter, and how often the check helps them fix the layouts. The
-	 * results in between are not reported, as the check is performed on
-	 * every change of the layout.
-	 */
-	private _sendAnalytics(report: HealthReport): void {
-		const issues = getIssues(report);
-		if(this._analytics == Analytics.first) {
-			gtag("event", "health_result", {
-				data1: issues.length ? "issues" : "pass",
-				data2: issues.join(","),
-			});
-			this._analytics =
-				issues.length ? Analytics.resolve : Analytics.none;
-		} else if(this._analytics == Analytics.resolve && !issues.length) {
-			gtag("event", "health_resolved");
-			this._analytics = Analytics.none;
-		}
-	}
 
 	/**
 	 * Check upon enabling, and when the sheet changes (which doesn't
@@ -192,23 +148,18 @@ export class Health extends View {
 
 		// The texture is in pixels, while the sheet is in grid units, so
 		// we scale the texture down to keep the stripes in constant width.
+		// The texture space has to be global so that the stripes of different
+		// rivers line up.
 		const s = ProjectService.scale.value;
-		const fill = {
+		const fill: FillInput = {
 			texture: getStripeTexture(),
 			color: style.hinge.color,
 			alpha: style.shade.alpha,
 			matrix: new Matrix(1 / s, 0, 0, 1 / s),
+			textureSpace: "global",
 		};
 		for(const { contours } of rivers) {
-			for(const contour of contours) {
-				graphics.beginTextureFill(fill);
-				drawPath(graphics, contour.outer);
-				graphics.endFill();
-				if(!contour.inner) continue;
-				graphics.beginHole();
-				for(const inner of contour.inner) drawPath(graphics, inner);
-				graphics.endHole();
-			}
+			fillContours(graphics, contours, fill);
 		}
 	}
 
@@ -221,11 +172,10 @@ export class Health extends View {
 		const { alpha, minRadius } = style.danglingRidge;
 		const scale = ProjectService.scale.value;
 		const radius = Math.max(style.danglingRidge.radius, minRadius / scale);
-		graphics.beginFill(style.ridge.color, alpha);
 		for(const p of geometry.danglingRidgeEnds) {
-			graphics.drawCircle(p.x, p.y, radius);
+			graphics.circle(p.x, p.y, radius);
 		}
-		graphics.endFill();
+		graphics.fill({ color: style.ridge.color, alpha });
 	}
 
 	/** Mark the unsolved quadrants with question marks. */
@@ -252,18 +202,21 @@ function createMark(quadrant: UnsolvedQuadrant, s: number): Container {
 	// The font size is in pixels, so that the text is rendered sharply.
 	const size = quadrant.radius * style.unsolvedMark.size;
 	const fontSize = Math.max(1, Math.round(size * s));
-	const glow = new Text(UNSOLVED_MARK, {
-		fill: BLACK,
-		fontSize,
-		stroke: BLACK,
-		strokeThickness: style.label.glow * 2,
-		lineJoin: "bevel",
+	const glow = new Text({
+		text: UNSOLVED_MARK,
+		style: {
+			fill: BLACK,
+			fontSize,
+			stroke: { color: BLACK, width: style.label.glow * 2, join: "bevel" },
+		},
 	});
-	const label = new Text(UNSOLVED_MARK, {
-		fill: WHITE,
-		fontSize,
-		stroke: WHITE,
-		strokeThickness: 1,
+	const label = new Text({
+		text: UNSOLVED_MARK,
+		style: {
+			fill: WHITE,
+			fontSize,
+			stroke: { color: WHITE, width: 1 },
+		},
 	});
 	glow.anchor.set(HALF);
 	label.anchor.set(HALF);

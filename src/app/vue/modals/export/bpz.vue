@@ -18,6 +18,7 @@
 	import ExportService from "app/services/exportService";
 	import Studio from "app/services/studioService";
 	import Export from "../components/export.vue";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "BPZ" });
 
@@ -32,7 +33,7 @@
 	}
 
 	function save(): void {
-		gtag("event", "project_bpz");
+		Analytics.event("project_bpz");
 		Studio.history.notifyAll();
 	}
 

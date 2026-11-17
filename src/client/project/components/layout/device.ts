@@ -1,6 +1,5 @@
 
-import { Graphics } from "@pixi/graphics";
-import { SmoothGraphics } from "@pixi/graphics-smooth";
+import { Graphics, SmoothGraphics } from "pixi.js";
 
 import { Layer } from "client/shared/layers";
 import { drawLines, fillContours } from "client/utils/contourUtil";
@@ -145,14 +144,17 @@ export class Device extends Draggable {
 		fillContours(this._shade, this.$graphics.contours, style.hinge.color);
 
 		const sh = ProjectService.shrink.value;
-		this._axisParallels.clear().lineStyle(
-			style.axisParallel.width * sh, style.axisParallel.color
-		);
+		this._axisParallels.clear();
 		drawLines(this._axisParallels, this.$graphics.axisParallel);
+		this._axisParallels.stroke({
+			width: style.axisParallel.width * sh,
+			color: style.axisParallel.color,
+		});
 
-		this._ridge.clear().lineStyle(
-			style.ridge.width * sh, style.ridge.color
-		);
+		this._ridge.clear();
 		drawLines(this._ridge, this.$graphics.ridges);
+		this._ridge.stroke({
+			width: style.ridge.width * sh, color: style.ridge.color,
+		});
 	}
 }

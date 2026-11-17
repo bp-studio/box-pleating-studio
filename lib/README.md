@@ -7,6 +7,8 @@ so what's in here are those libraries that need custom builds or fixes.
 Those including:
 
 - Bootstrap: Customized [Bootstrap](https://getbootstrap.com/) theme for BP Studio.
+- HTML minifier: A loader of [html-minifier](https://github.com/j9t/html-minifier) for the update logs,
+  replacing the unmaintained html-minifier-loader, which doesn't support html-minifier v5 (ESM-only and async).
 - LZMA: The released file by [LZMA.js](https://github.com/LZMA-JS/LZMA-JS) contains minification error which makes it unusable, the file here fixed the error.
 - Include: This contains the precompiled static library and/or header files of:
   - [NLopt](https://github.com/stevengj/nlopt)\
@@ -22,6 +24,3 @@ Those including:
 	 (For VS Code, this requires the [WebAssembly DWARF Debugging](https://marketplace.visualstudio.com/items?itemName=ms-vscode.wasm-dwarf-debugging) extension.)
   2. Dist build is for the web worker and is thoroughly optimized (no debugging).
   3. Dist_MP build is also for the web worker, but enables multiple processing.
-- Pixi: [Pixi](https://pixijs.com/) v7 has a deprecated dependency of `url`, and since v7 isn't designed to be side-effect-free,
-  Rspack's tree-shaking doesn't work with it. We use a stub module as a substitute to reduce the bundle size.
-  This can be removed after updating to Pixi v8.

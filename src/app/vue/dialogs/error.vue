@@ -18,6 +18,7 @@
 
 	import Dialog from "./dialog.vue";
 	import FileUtility from "app/utils/fileUtility";
+	import Analytics from "app/services/analyticsService";
 
 	import type { JProject } from "shared/json";
 
@@ -46,7 +47,7 @@
 	}
 
 	function download(): void {
-		gtag("event", "fatal_error_log");
+		Analytics.event("fatal_error_log");
 	}
 
 	defineExpose({ show });

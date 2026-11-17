@@ -8,6 +8,7 @@ import { display } from "client/screen/display";
 import { KeyboardController } from "./keyboardController";
 import { TapController } from "./tapController";
 import { norm } from "shared/types/geometry";
+import Analytics from "app/services/analyticsService";
 
 import type { MTEvent } from "./share";
 
@@ -30,6 +31,9 @@ export namespace ScrollController {
 
 	let _scrolling: ScrollingState = ScrollingState.notScrolling;
 
+	/** The input method of the current scrolling, until it is recorded. */
+	let _method: string | undefined;
+
 	// These events must be add to the document instead of the canvas, so that
 	// we can capture it all.
 	document.addEventListener("mousemove", pointerMove);
@@ -42,7 +46,10 @@ export namespace ScrollController {
 		display.scrollView.$onScroll(p => {
 			if(_scrolling) return;
 			const sheet = ProjectService.sheet.value;
-			if(sheet) sheet.$scroll = p;
+			if(!sheet) return;
+			sheet.$scroll = p;
+			// By the wheel, the touchpad, or the scrollbar
+			Analytics.input("pan", "scroll", true);
 		});
 
 		// Restore the scroll position as we switch the view
@@ -57,7 +64,12 @@ export namespace ScrollController {
 		return Boolean(_scrolling);
 	}
 
-	export function $start(event: Event): void {
+	/**
+	 * @param method The input method, recorded once the scrolling actually
+	 * happens.
+	 */
+	export function $start(event: Event, method: string): void {
+		_method = method;
 		_scrolling = $isTouch(event) ?
 			ScrollingState.pending : ScrollingState.scrolling;
 		display.canvas.style.cursor = "move";
@@ -107,6 +119,8 @@ export namespace ScrollController {
 			) {
 				CursorController.$update(pt);
 				_scrolling = ScrollingState.scrolling;
+				if(_method) Analytics.input("pan", _method);
+				_method = undefined;
 				TapController.$cancel();
 				sheet.$scroll = display.scrollView.$scrollTo(
 					sheet.$scroll.x - diff.x, sheet.$scroll.y - diff.y

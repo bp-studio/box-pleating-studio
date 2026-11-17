@@ -1,5 +1,5 @@
 <template>
-	<button class="btn btn-primary" @click="StudioService.execute(click)">
+	<button class="btn btn-primary" @click="StudioService.execute(run)">
 		<slot/>
 	</button>
 </template>
@@ -18,13 +18,24 @@
 <script setup lang="ts">
 
 	import StudioService from "app/services/studioService";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({
 		name: "AsyncButton",
 	});
 
-	defineProps<{
+	const props = defineProps<{
 		click: Action<Promise<void>>;
+		/**
+		 * The task name for {@link Analytics.input} by the method `panel`;
+		 * not tracked if omitted.
+		 */
+		analytics?: string;
 	}>();
+
+	function run(): Promise<void> {
+		if(props.analytics) Analytics.input(props.analytics, "panel");
+		return props.click();
+	}
 
 </script>

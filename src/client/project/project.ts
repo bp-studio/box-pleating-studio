@@ -129,6 +129,13 @@ export class Project extends Mountable implements ISerializable<JProject> {
 	public get $isDragging(): boolean { return this._isDragging.value; }
 	public set $isDragging(v: boolean) { this._isDragging.value = v; }
 
+	/**
+	 * Resolves when the last dragging is finalized, that is, when
+	 * {@link $isDragging} is set back to `false` after all the updates
+	 * of the dragging are completed (see `DragController.$dragEnd()`).
+	 */
+	public $dragFinalized: Promise<void> = Promise.resolve();
+
 	constructor(json: JProjectLike, worker: Worker) {
 		// Projects are all inactive on construction.
 		// It will become active when selected later (see ProjectService)

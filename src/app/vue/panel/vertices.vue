@@ -1,11 +1,11 @@
 <template>
 	<div class="h5 panel-title">{{ $t("panel.vertices.type") }}</div>
 	<div v-if="selections.some(s => s.isLeaf)">
-		<AsyncButton v-if="!design.tree.isMinimal" :click="() => design.delete()">{{ $t("keyword.delete") }}</AsyncButton>
+		<AsyncButton v-if="!design.tree.isMinimal" analytics="delete" :click="() => design.delete()">{{ $t("keyword.delete") }}</AsyncButton>
 		<span v-else>{{ $t("message.min3vertex") }}</span>
 	</div>
 	<div class="mt-3">
-		<button class="btn btn-primary" :title="hk('n', 'd')" @click="design.goToDual()">{{ $t("panel.vertices.goto") }}</button>
+		<button class="btn btn-primary" :title="hk('n', 'd')" @click="Analytics.input('dual', 'panel'); design.goToDual()">{{ $t("panel.vertices.goto") }}</button>
 	</div>
 </template>
 
@@ -14,6 +14,7 @@
 	import AsyncButton from "@/gadgets/form/asyncButton.vue";
 	import { hk } from "app/services/customHotkeyService";
 	import Studio from "app/services/studioService";
+	import Analytics from "app/services/analyticsService";
 
 	import type { Vertex } from "client/project/components/tree/vertex";
 	import type { Design } from "client/project/design";

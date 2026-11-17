@@ -1,6 +1,5 @@
 import { computed, shallowRef } from "vue";
-import { Polygon } from "@pixi/math";
-import { SmoothGraphics } from "@pixi/graphics-smooth";
+import { Polygon, SmoothGraphics } from "pixi.js";
 
 import { Control } from "client/base/control";
 import { Layer } from "client/shared/layers";
@@ -151,12 +150,12 @@ export class Edge extends Control implements LabelView, ISerializable<JEdge> {
 		const width = this.$hovered || this.$selected ?
 			style.edge.hover : style.edge.width;
 		graphics.clear()
-			.lineStyle(
-				width * sh,
-				this.$selected ? style.edge.selected : style.edge.color
-			)
 			.moveTo(x1, y1)
-			.lineTo(x2, y2);
+			.lineTo(x2, y2)
+			.stroke({
+				width: width * sh,
+				color: this.$selected ? style.edge.selected : style.edge.color,
+			});
 	}
 
 	private _draw(): void {

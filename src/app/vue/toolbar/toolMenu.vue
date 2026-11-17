@@ -32,6 +32,7 @@
 	import { show } from "@/modals/modals";
 	import Divider from "@/gadgets/menu/divider.vue";
 	import SessionService from "app/services/sessionService";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "ToolMenu" });
 
@@ -50,7 +51,7 @@
 		const health = design.layout.health;
 		health.enabled = !health.enabled;
 		if(health.enabled) design.mode = "layout";
-		gtag("event", "health_" + (health.enabled ? "on" : "off"));
+		Analytics.event("health_" + (health.enabled ? "on" : "off"));
 	}
 
 	async function TreeMaker(files: File[]): Promise<void> {
@@ -61,7 +62,7 @@
 		let index: number | undefined;
 		try {
 			const project = Studio.plugins.treeMaker(name.replace(/\.tmd5$/i, ""), content);
-			await Workspace.open(project as Pseudo<typeof project>);
+			await Workspace.open(project as Pseudo<typeof project>, "treemaker");
 			Workspace.selectLast();
 			index = Workspace.ids.value.length - 1;
 		} catch(e) {

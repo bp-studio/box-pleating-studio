@@ -60,11 +60,13 @@ export const history = {
 	get canRedo() {
 		return getHistory()?.$canRedo ?? false;
 	},
+	// History navigation is ignored in the middle of dragging,
+	// just as most graphics editors do.
 	undo() {
-		getHistory()?.$undo();
+		if(!DragController.isDragging.value) getHistory()?.$undo();
 	},
 	redo() {
-		getHistory()?.$redo();
+		if(!DragController.isDragging.value) getHistory()?.$redo();
 	},
 	notify() {
 		getHistory()?.$notifySave();
@@ -126,7 +128,7 @@ export async function parseTree(edges: string, flaps: string): Promise<void> {
 	}));
 
 	const { default: Workspace } = await import("app/services/workspaceService");
-	await Workspace.open(project as Pseudo<typeof project>);
+	await Workspace.open(project as Pseudo<typeof project>, "file");
 	Workspace.selectLast();
 }
 /// #endif

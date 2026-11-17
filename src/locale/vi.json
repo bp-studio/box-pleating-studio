@@ -5,18 +5,15 @@
 	"since": 935,
 	"welcome": {
 		"title": "Chào mừng bạn đến với Box Pleating Studio!",
-		"intro": [
-			"Ứng dụng này được tạo ra để giúp các nhà thiết kế origami tạo ra các thiết kế phức tạp, điên rồ bằng cách sử dụng các box pleating và tiện ích GOPS.",
-			"Để bắt đầu, hãy nhấp vào nút menu phía trên bên trái để tạo một dự án mới trống hoặc đọc hướng dẫn sử dụng ngắn gọn của chúng tôi về {0}."
-		],
+		"intro": "Ứng dụng này được tạo ra để giúp các nhà thiết kế origami tạo ra các thiết kế phức tạp, điên rồ bằng cách sử dụng các box pleating và tiện ích GOPS. Để bắt đầu, hãy nhấp vào nút menu phía trên bên trái để tạo một dự án mới trống hoặc đọc hướng dẫn sử dụng ngắn gọn của chúng tôi trên {0}.",
 		"install": {
 			"hint": "Bạn cũng có thể cài đặt BP Studio như một ứng dụng độc lập cho thiết bị của mình và sử dụng ngoại tuyến!",
-			"ios": "Cách cài đặt trên iOS: Mở trang web này trong Safari, chạm vào biểu tượng \"Chia sẻ\" ở cuối màn hình, sau đó chạm vào \"Thêm vào màn hình chính\".",
+			"ios": "Cách cài đặt trên iOS: Mở trang web này trong Safari, chạm vào \"Chia sẻ\" (nếu không thấy, hãy chạm vào \"⋯\" trước), sau đó chạm vào \"Thêm vào Màn hình chính\".",
 			"bt": "Cài đặt ứng dụng Box Pleating Studio",
 			"prepare": "Đang chuẩn bị cài đặt, vui lòng đợi ...",
 			"ing": "Đang cài đặt ứng dụng, vui lòng đợi ...",
 			"ed": "BP Studio đã được cài đặt trên thiết bị của bạn.",
-			"open": "Mở ứng dụng Studio Pleating Box"
+			"open": "Mở ứng dụng Box Pleating Studio"
 		},
 		"copyright": "Bản quyền © 2020{0} bởi Thái Mục Thôn (Mu-Tsun Tsai)",
 		"recent": "Được sử dụng gần đây",
@@ -26,7 +23,7 @@
 	},
 	"toolbar": {
 		"file": {
-			"title": "Các tập tin",
+			"title": "Tệp",
 			"new": "Dự án mới",
 			"open": "Mở các dự án / không gian làm việc",
 			"print": "In chế độ xem hiện tại",
@@ -34,8 +31,8 @@
 			"notFound": "Không thể mở tệp \"{0}\"; \nkhông tìm thấy tệp.",
 			"recent": {
 				"title": "Mở tệp gần đây",
-				"empty": "Không có hồ sơ",
-				"clear": "Xóa hồ sơ"
+				"empty": "Không có tệp gần đây",
+				"clear": "Xóa lịch sử"
 			},
 			"BPF": "Định dạng BP Studio",
 			"BPS": {
@@ -57,13 +54,13 @@
 				"copy": "Sao chép chế độ xem hiện tại dưới dạng PNG"
 			},
 			"SVG": {
-				"name": "SVG hình ảnh",
+				"name": "Hình ảnh SVG",
 				"download": "Tải xuống chế độ xem hiện tại dưới dạng SVG",
 				"save": "Lưu chế độ xem hiện tại dưới dạng SVG"
 			}
 		},
 		"edit": {
-			"title": "Biên tập",
+			"title": "Chỉnh sửa",
 			"undo": "Hoàn tác",
 			"redo": "Làm lại",
 			"selectAll": "Chọn tất cả",
@@ -71,7 +68,7 @@
 			"cut": "Cắt",
 			"copy": "Sao chép",
 			"paste": "Dán",
-			"subdivide": "Lưới chia nhỏ",
+			"subdivide": "Chia nhỏ lưới",
 			"rotate_right": "Xoay phải",
 			"rotate_left": "Xoay trái",
 			"horizontal_flip": "Lật ngang",
@@ -84,33 +81,33 @@
 			"grid": "Hiện đường lưới",
 			"hinge": "Hiện nếp gấp bản lề",
 			"ridge": "Hiện nếp gấp ở sườn",
-			"axial": "Hiện nếp gấp trục song song trong tiện ích",
+			"axial": "Hiện nếp gấp song song với trục trong tiện ích",
 			"label": "Hiện nhãn",
-			"tip": "Hiện mẹo nhánh",
+			"tip": "Hiện đầu nhánh",
 			"dPad": "Hiện D-pad",
-			"status": "Thanh trạng thái chương trình",
+			"status": "Hiện thanh trạng thái",
 			"preference": "Tùy chọn"
 		},
 		"tools": {
 			"title": "Công cụ",
 			"TreeMaker": "Nhập tệp TreeMaker",
-			"health": "Kiểm tra bố trí",
-			"healthOff": "Thoát kiểm tra bố trí"
+			"health": "Kiểm tra bố cục",
+			"healthOff": "Thoát kiểm tra bố cục"
 		},
 		"help": {
-			"title": "Cứu giúp",
-			"about": "Trong khoảng",
+			"title": "Trợ giúp",
+			"about": "Giới thiệu",
 			"news": "Thông tin phiên bản",
 			"update": "Sẵn sàng cập nhật",
 			"checkUpdate": "Kiểm tra cập nhật",
 			"donation": "Quyên góp",
 			"discussions": "Thảo luận",
-			"issue": "Báo cáo phát hành",
+			"issue": "Báo cáo sự cố",
 			"homepage": "Trang chủ"
 		},
 		"view": {
 			"tree": "Cấu trúc cây",
-			"layout": "Bố trí"
+			"layout": "Bố cục"
 		},
 		"tab": {
 			"clone": "Nhân bản",
@@ -127,18 +124,18 @@
 		"color": {
 			"_": "Màu sắc",
 			"default": "Mặc định",
-			"border": "Đường biên giới",
+			"border": "Đường viền",
 			"grid": "Đường lưới",
 			"hinge": "Nếp gấp bản lề",
 			"ridge": "Nếp gấp ở sườn",
-			"axisParallel": "Nếp gấp trục song song",
-			"overlap": "Qua nối chồng",
+			"axisParallel": "Nếp gấp song song với trục",
+			"overlap": "Chồng chéo",
 			"uncovered": "Vùng chưa được phủ",
-			"tip": "Mẹo nhánh",
+			"tip": "Đầu nhánh",
 			"label": "Nhãn văn bản"
 		},
 		"hotkey": "Phím nóng",
-		"command": "Chỉ huy",
+		"command": "Lệnh",
 		"language": "Ngôn ngữ",
 		"theme": {
 			"_": "Chủ đề",
@@ -150,13 +147,13 @@
 		"confirmReset": "Bạn có chắc chắn muốn đặt lại tất cả cài đặt về mặc định không?",
 		"confirmKey": "Phím nóng {0} đã được gán cho lệnh \"{1}\"; bạn có muốn thay thế nó không?",
 		"autoSave": "Tự động lưu không gian làm việc",
-		"includeHidden": "Bao gồm các yếu tố ẩn trong xuất SVG",
+		"includeHidden": "Bao gồm các thành phần ẩn trong xuất SVG",
 		"loadSessionOnQueue": "Tải phiên trước khi mở trực tiếp tệp dự án",
 		"useFileSystem": "Sử dụng API hệ thống tệp"
 	},
 	"panel": {
 		"design": {
-			"type": "Box Pleating Studio Project",
+			"type": "Dự án Box Pleating Studio",
 			"title": "Tiêu đề",
 			"titlePH": "(Tên dự án)",
 			"descriptionPH": "(Mô tả dự án)",
@@ -196,8 +193,8 @@
 			"type": "Đỉnh",
 			"name": "Tên",
 			"addLeaf": "Thêm lá",
-			"ofLength": "chiều dài",
-			"delJoin": "Xóa và đến",
+			"ofLength": "có chiều dài",
+			"delJoin": "Xóa và nối",
 			"goto": "Đi tới nhánh"
 		},
 		"vertices": {
@@ -212,7 +209,7 @@
 			"goto": "Đi tới sông"
 		},
 		"repo": {
-			"type": "Căng ra",
+			"type": "Vùng căng",
 			"config": "Cấu hình",
 			"pattern": "Mẫu",
 			"onlyOne": "Chỉ có một mẫu được tìm thấy."
@@ -278,13 +275,35 @@
 		"nothingCopied": "Không có gì được sao chép. Chỉ những phần của vùng chọn nối với phần còn lại của cây bằng đúng một cạnh mới có thể được sao chép hoặc cắt.",
 		"cannotFit": "Sau khi biến đổi, vùng chọn không vừa trong tờ giấy.",
 		"oldVersion": "Dự án \"{0}\" đã được tạo bằng phiên bản cũ hơn của BP Studio và một phần thiết kế đã được sửa đổi. Nó sẽ được cập nhật lên định dạng mới nhất trong lần lưu tiếp theo.",
-		"patternNotFound": "Một số phần xếp chồng lên nhau của các nắp trong thiết kế này là hợp lệ, nhưng hiện tại BP Studio không thể tìm thấy các mẫu co giãn phù hợp cho chúng. Tác giả của ứng dụng này sẽ tiếp tục triển khai nhiều thuật toán hơn để bao gồm nhiều trường hợp hơn.",
+		"patternNotFound": "Một số phần xếp chồng lên nhau của các nhánh trong thiết kế này là hợp lệ, nhưng hiện tại BP Studio không thể tìm thấy các mẫu căng ra phù hợp cho chúng. Tác giả của ứng dụng này sẽ tiếp tục triển khai nhiều thuật toán hơn để bao gồm nhiều trường hợp hơn.",
 		"unsaved": "Dự án \"{0}\" chứa các thay đổi chưa được lưu. Hủy các thay đổi?",
 		"updateReady": "Phiên bản BP Studio mới hơn đã sẵn sàng và sẽ tự động cập nhật khi khởi động lại. Bạn có muốn khởi động lại ngay bây giờ?",
 		"restartFail": "Không thể khởi động lại. Vui lòng đóng tất cả các phiên bản của BP Studio.",
 		"webGL": {
 			"title": "Khởi tạo WebGL không thành công",
-			"body": "BP Studio yêu cầu chạy WebGL nhưng không thể khởi tạo ngữ cảnh WebGL. Vui lòng kiểm tra cài đặt trình duyệt của bạn."
+			"body": "BP Studio vẽ không gian làm việc bằng GPU (thông qua WebGPU hoặc WebGL), nhưng cả hai đều không khả dụng trong trình duyệt này. Điều này thường có nghĩa là tính năng tăng tốc GPU đã bị tắt hoặc bị chặn trong trình duyệt, ngay cả khi thiết bị của bạn có GPU. Vui lòng thử các cách sau:",
+			"tips": {
+				"accel": "Hãy đảm bảo rằng tính năng tăng tốc phần cứng đã được bật trong cài đặt trình duyệt (trong Chrome và Edge, đó là tùy chọn \"Sử dụng tính năng tăng tốc đồ hoạ nếu có\" trong mục \"Hệ thống\"), rồi khởi động lại trình duyệt.",
+				"gpuPage": "Trong Chrome hoặc Edge, hãy nhập {0} vào thanh địa chỉ để xem WebGL có khả dụng hay không, và lý do nếu nó bị tắt. Trong Firefox, mục \"Đồ họa\" của {1} cũng hiển thị thông tin tương tự.",
+				"linux": "Trên Linux, Chrome có thể tắt tính năng tăng tốc GPU nếu trình điều khiển đồ họa của bạn nằm trong danh sách chặn của nó. Khi đó, các trình duyệt khác như Firefox vẫn có thể hoạt động.",
+				"driver": "Hãy cập nhật trình điều khiển đồ họa của thiết bị hoặc thử một trình duyệt khác."
+			},
+			"diagnosis": "Thông tin chẩn đoán (vui lòng đính kèm khi báo cáo sự cố này):"
+		},
+		"startup": {
+			"title": "Đã xảy ra lỗi trong quá trình khởi động Box Pleating Studio.",
+			"causes": "Các nguyên nhân có thể bao gồm:",
+			"outdated": "Trình duyệt hoặc hệ điều hành đã lỗi thời",
+			"outdatedBody": "Yêu cầu tối thiểu của BP Studio là Chrome ≥ 66, Edge ≥ 79, Firefox ≥ 78, Opera ≥ 53, Safari ≥ 11.1 (hoặc 11.3 đối với iOS), hoặc Samsung Internet ≥ 9.2.<br>Các trình duyệt khác (đặc biệt là các trình duyệt dựa trên Chromium) cũng có thể hoạt động, nhưng không được hỗ trợ chính thức và không đảm bảo mọi chức năng đều hoạt động.<br>Nếu chưa làm, vui lòng nâng cấp trình duyệt của bạn (lưu ý rằng việc nâng cấp Safari đòi hỏi phải nâng cấp hệ thống) hoặc sử dụng phiên bản Chrome mới nhất, là trình duyệt được khuyên dùng.<br>Ngoài ra, các phiên bản Windows 7 cũ được biết là có thể gây ra sự cố với chứng chỉ SSL. Vui lòng thử cập nhật Windows nếu trang web bị đánh dấu là \"không an toàn\".",
+			"bug": "Lỗi tạm thời",
+			"bugBody": "Vui lòng thử xóa dữ liệu bộ nhớ đệm của trình duyệt và tải lại ứng dụng để cập nhật BP Studio lên phiên bản mới nhất, phiên bản này có thể đã sửa lỗi, đặc biệt là trên Safari, nơi một lỗi đã biết trong cơ chế bộ nhớ đệm có thể khiến bạn thấy lỗi này.",
+			"reported": "Trong mọi trường hợp, lỗi đã được báo cáo cho tác giả, và tác giả sẽ cố gắng hết sức để khắc phục khi có thể.<br>Nếu không có cách nào ở trên giải quyết được vấn đề, vui lòng quay lại sau vài ngày để xem lỗi đã được khắc phục chưa. Tác giả xin lỗi vì sự bất tiện này.",
+			"report": "Bạn cũng có thể gửi issue trên {0} hoặc qua {1} để báo cáo sự cố này; vui lòng đính kèm thông tin chẩn đoán dưới đây."
+		},
+		"resource": {
+			"title": "Không thể tải một số tài nguyên cần thiết.",
+			"body": "Do đó, Box Pleating Studio không thể khởi động.<br>Có thể là do sự cố kết nối Internet và/hoặc thiếu tài nguyên trong bộ nhớ đệm. Vui lòng kiểm tra mạng và thử lại.",
+			"failed": "Tài nguyên không tải được:"
 		},
 		"inApp": "Có vẻ như bạn đang sử dụng trình duyệt trong ứng dụng. Tải xuống có thể không hoạt động.",
 		"dropzone": "Thả tệp vào đây để mở"
@@ -292,7 +311,7 @@
 	"plugin": {
 		"TreeMaker": {
 			"not5": "Tệp \"{0}\" không có định dạng TreeMaker 5.",
-			"size8": "BP Studio yêu cầu kích thước trang tính ít nhất là 8.",
+			"size8": "BP Studio yêu cầu kích thước tờ giấy ít nhất là 8.",
 			"invalid": "Tệp \"{0}\" có vẻ như bị hỏng và không thể tải thành công."
 		},
 		"optimizer": {
@@ -304,13 +323,13 @@
 				"useDim": "Giữ nguyên chiều rộng và chiều cao của các nhánh"
 			},
 			"layout": {
-				"_": "Phương pháp bố trí",
+				"_": "Phương pháp bố cục",
 				"view": "Sử dụng bố cục hiện tại làm tài liệu tham khảo",
-				"random": "Hãy thử bố trí ngẫu nhiên",
+				"random": "Hãy thử bố cục ngẫu nhiên",
 				"toTry": "Số lượng bố cục để thử:",
 				"useBH": "Hãy thử các biến thể của bố cục hiện tại"
 			},
-			"skip": "Nhảy",
+			"skip": "Bỏ qua",
 			"run": "Chạy!",
 			"running": "Đang chạy...",
 			"mp": "Đa xử lý đã được kích hoạt"
@@ -318,7 +337,7 @@
 		"CP": {
 			"_": "Xuất tệp CP",
 			"format": "Định dạng",
-			"reorient": "Định hướng lại trang tính nếu có",
+			"reorient": "Định hướng lại tờ giấy nếu có thể",
 			"hinge": {
 				"_": "Nếp gấp bản lề",
 				"auxiliary": "Đường phụ trợ (tiêu chuẩn không chính thức)",
@@ -328,7 +347,7 @@
 		}
 	},
 	"keyword": {
-		"yes": "Đúng",
+		"yes": "Có",
 		"no": "Không",
 		"ok": "OK",
 		"here": "đây",
@@ -339,7 +358,7 @@
 		"delete": "Xóa bỏ",
 		"discord": "Máy chủ BP Studio Discord",
 		"version": "Phiên bản",
-		"filename": "tên tệp",
+		"filename": "Tên tệp",
 		"download": "Tải xuống",
 		"homepage": "trang chủ",
 		"untitled": "Không có tiêu đề",
@@ -347,6 +366,6 @@
 		"workspace": "không gian làm việc"
 	},
 	"help": {
-		"useFileSystem": "Kích hoạt điều này cho phép bạn lưu trực tiếp vào các tệp chỉnh sửa và lưu giữ bản ghi các tệp được mở gần đây. Bạn có thể vô hiệu hóa điều này nếu bạn gặp bất kỳ sự cố nào mở các tệp trên thiết bị di động."
+		"useFileSystem": "Bật tùy chọn này cho phép bạn lưu trực tiếp vào tệp đang chỉnh sửa và lưu giữ lịch sử các tệp được mở gần đây. Bạn có thể tắt tùy chọn này nếu gặp sự cố khi mở tệp trên thiết bị di động."
 	}
 }

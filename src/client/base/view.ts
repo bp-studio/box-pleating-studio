@@ -3,7 +3,7 @@ import { effectScope, watchEffect } from "vue";
 import { ACTIVE, Mountable, MOUNTED } from "./mountable";
 
 import type { EffectScope } from "vue";
-import type { Container } from "@pixi/display";
+import type { Container } from "pixi.js";
 
 //=================================================================
 /**

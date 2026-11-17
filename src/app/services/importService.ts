@@ -5,6 +5,7 @@ import Dialogs from "./dialogService";
 import Zip from "app/utils/zip";
 import Studio from "./studioService";
 import SessionService from "./sessionService";
+import Analytics from "app/services/analyticsService";
 
 import type { ProjId } from "shared/json";
 
@@ -73,7 +74,7 @@ namespace ImportService {
 		// Find the last opened tab
 		const id = ids.reverse().find(n => n !== undefined);
 		if(id !== undefined) {
-			gtag("event", "project_open");
+			Analytics.event("project_open");
 			Workspace.select(id);
 		}
 	}
@@ -96,7 +97,7 @@ namespace ImportService {
 		// so the last opened file must be the last tab.
 		const success = result.some(id => id !== undefined);
 		if(success) {
-			gtag("event", "project_open");
+			Analytics.event("project_open");
 			const ids = Workspace.ids.value;
 			const index = ids.length - 1;
 			if(!takeover) {
@@ -152,7 +153,7 @@ namespace ImportService {
 				String.fromCharCode(new Uint8Array(buffer.slice(0, 1))[0]);
 			if(test == "{") { // JSON
 				const dataString = FileUtility.bufferToText(buffer);
-				const id = await Workspace.open(JSON.parse(dataString));
+				const id = await Workspace.open(JSON.parse(dataString), "file");
 				if(handle) {
 					Handles.set(id, handle);
 					await Handles.addRecent(handle);
@@ -186,7 +187,8 @@ namespace ImportService {
 				() => Dialogs.alert(
 					i18n.t("message.invalidFormat", [f])
 				)
-			)
+			),
+			"file"
 		);
 		if(!ids.length) return undefined;
 		else return ids[ids.length - 1];

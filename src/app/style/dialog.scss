@@ -22,6 +22,11 @@
 			opacity: 1;
 		}
 	}
+
+	/* See the inline script in index.htm */
+	.early-welcome &.show {
+		visibility: hidden;
+	}
 }
 
 .spinner-container {

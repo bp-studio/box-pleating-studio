@@ -1,4 +1,4 @@
-import { SmoothGraphics } from "@pixi/graphics-smooth";
+import { SmoothGraphics } from "pixi.js";
 
 import ProjectService from "client/services/projectService";
 
@@ -6,25 +6,24 @@ import ProjectService from "client/services/projectService";
 /**
  * {@link ScaledSmoothGraphics} is intended to solve the issue addressed in
  * [graphics-smooth#23](https://github.com/pixijs/graphics-smooth/issues/23).
- * Once that issue is resolved, this class may be dropped and
- * be replaced by {@link SmoothGraphics} directly.
+ * The number of segments of a circle in {@link SmoothGraphics} is decided by
+ * the radius in local coordinates, so we draw them in a larger scale instead.
  */
 //=================================================================
 export class ScaledSmoothGraphics extends SmoothGraphics {
 
-	public override drawCircle(x: number, y: number, radius: number): this {
+	public override circle(x: number, y: number, radius: number): this {
 		const s = ProjectService.scale.value;
 		this.scale.set(1 / s);
-		return super.drawCircle(x * s, y * s, radius * s);
+		return super.circle(x * s, y * s, radius * s);
 	}
 
-	public override drawRoundedRect(
-		x: number, y: number, width: number, height: number, radius: number
+	public override roundRect(
+		x: number, y: number, width: number, height: number, radius?: number
 	): this {
 		const s = ProjectService.scale.value;
 		this.scale.set(1 / s);
-		return super.drawRoundedRect(
-			x * s, y * s, width * s, height * s, radius * s
-		);
+		const r = radius === undefined ? undefined : radius * s;
+		return super.roundRect(x * s, y * s, width * s, height * s, r);
 	}
 }

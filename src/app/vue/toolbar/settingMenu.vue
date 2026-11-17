@@ -82,6 +82,7 @@
 	import Studio from "app/services/studioService";
 	import Fullscreen from "./components/fullscreen.vue";
 	import { toHex } from "shared/utils/color";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "SettingMenu" });
 
@@ -99,7 +100,7 @@
 	}
 
 	function dPad(): void {
-		gtag("event", "dpad_" + (Settings.showDPad ? "on" : "off"));
+		Analytics.event("dpad_" + (Settings.showDPad ? "on" : "off"));
 	}
 
 </script>

@@ -5,30 +5,27 @@
 	"since": 900,
 	"welcome": {
 		"title": "¡Bienvenido a Box Pleating Studio!",
-		"intro": [
-			"Esta aplicación se ha desarrollado para ayudar a los diseñadores de origami a crear modelos complejos y sorprendentes utilizando pliegues en grilla cuadriculada (box pleating) y dispositivos GOPS.",
-			"Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en {0}."
-		],
+		"intro": "Esta aplicación se ha desarrollado para ayudar a los diseñadores de origami a crear modelos complejos y sorprendentes utilizando pliegues en grilla cuadriculada (box pleating) y gadgets GOPS. Para comenzar, haga clic en el botón del menú superior izquierdo para crear un nuevo proyecto o lea el manual de usuario en el {0}.",
 		"install": {
 			"hint": "¡También puede instalar BP Studio como una aplicación independiente en su dispositivo y usarla sin conexión!",
-			"ios": "Cómo instalar en iOS: Abra este sitio web en Safari, toque el icono \"Compartir\" en la parte inferior de la pantalla y luego toque \"Agregar a la pantalla de inicio\".",
+			"ios": "Cómo instalar en iOS: Abra este sitio web en Safari, toque \"Compartir\" (si no lo ve, toque primero \"⋯\") y luego toque \"Agregar a Inicio\".",
 			"bt": "Instalar la aplicación Box Pleating Studio",
-			"prepare": "Preparándose para la instalación, espere ...",
-			"ing": "Instalando la aplicación, espere ...",
+			"prepare": "Preparándose para la instalación, espere...",
+			"ing": "Instalando la aplicación, espere...",
 			"ed": "BP Studio ya está instalado en su dispositivo.",
-			"open": "Aplicación Open Box Pleating Studio"
+			"open": "Abrir la aplicación Box Pleating Studio"
 		},
 		"copyright": "Copyright © 2020{0} por Mu-Tsun Tsai",
-		"recent": "Recientemente usado",
-		"start": "Comienzo",
-		"website": "Sitio web de BP Studio",
+		"recent": "Usados recientemente",
+		"start": "Inicio",
+		"website": "sitio web de BP Studio",
 		"discord": "¡Únase a nuestro {0}!"
 	},
 	"toolbar": {
 		"file": {
 			"title": "Archivos",
 			"new": "Nuevo proyecto",
-			"open": "Proyectos abiertos / espacios de trabajo",
+			"open": "Abrir proyectos / espacios de trabajo",
 			"print": "Imprimir vista actual",
 			"share": "Compartir proyecto actual",
 			"notFound": "No se puede abrir el archivo \"{0}\"; archivo no encontrado.",
@@ -48,7 +45,7 @@
 			"BPZ": {
 				"name": "Espacio de trabajo de BP Studio",
 				"download": "Descargar espacio de trabajo",
-				"save": "Guardar espacio de trabajo como ..."
+				"save": "Guardar espacio de trabajo como..."
 			},
 			"PNG": {
 				"name": "Imagen PNG",
@@ -67,24 +64,24 @@
 			"undo": "Deshacer",
 			"redo": "Rehacer",
 			"selectAll": "Seleccionar todo",
-			"unselectAll": "Deselecciona todo",
+			"unselectAll": "Deseleccionar todo",
 			"cut": "Cortar",
 			"copy": "Copiar",
 			"paste": "Pegar",
 			"subdivide": "Subdividir cuadrícula",
 			"rotate_right": "Girar a la derecha",
 			"rotate_left": "Girar a la izquierda",
-			"horizontal_flip": "volteo horizontal",
-			"vertical_flip": "volteo vertical"
+			"horizontal_flip": "Voltear horizontalmente",
+			"vertical_flip": "Voltear verticalmente"
 		},
 		"setting": {
-			"title": "Ajustes",
+			"title": "Configuración",
 			"fullscreen": "Pantalla completa",
 			"fullscreenExit": "Salir de pantalla completa",
 			"grid": "Mostrar líneas de cuadrícula",
 			"hinge": "Mostrar pliegues de bisagra",
 			"ridge": "Mostrar pliegues de cresta",
-			"axial": "Mostrar pliegues axiales-paralelos en gadgets",
+			"axial": "Mostrar pliegues paralelos a los ejes en gadgets",
 			"label": "Mostrar etiquetas",
 			"tip": "Mostrar puntas de solapa",
 			"dPad": "Mostrar D-pad",
@@ -94,7 +91,7 @@
 		"tools": {
 			"title": "Herramientas",
 			"TreeMaker": "Importar archivo TreeMaker",
-			"health": "Comprobar diseño",
+			"health": "Comprobar distribución",
 			"healthOff": "Salir de la comprobación"
 		},
 		"help": {
@@ -110,7 +107,7 @@
 		},
 		"view": {
 			"tree": "Estructura de árbol",
-			"layout": "Diseño"
+			"layout": "Distribución"
 		},
 		"tab": {
 			"clone": "Clonar",
@@ -127,18 +124,18 @@
 		"color": {
 			"_": "Colores",
 			"default": "Por defecto",
-			"border": "Líneas fronterizas",
+			"border": "Líneas de borde",
 			"grid": "Líneas de cuadrícula",
 			"hinge": "Pliegues de bisagra",
 			"ridge": "Pliegues de cresta",
-			"axisParallel": "Pliegues axiales-paralelos",
+			"axisParallel": "Pliegues paralelos a los ejes",
 			"overlap": "Superpuestas",
 			"uncovered": "Regiones no cubiertas",
 			"tip": "Puntas de solapa",
 			"label": "Etiqueta de texto"
 		},
-		"hotkey": "Acceso rápido",
-		"command": "Mando",
+		"hotkey": "Teclas de acceso rápido",
+		"command": "Comando",
 		"language": "Idioma",
 		"theme": {
 			"_": "Tema",
@@ -148,11 +145,11 @@
 		},
 		"reset": "Restablecer todas las configuraciones",
 		"confirmReset": "¿Está seguro de que desea restablecer todas las configuraciones a las predeterminadas?",
-		"confirmKey": "La tecla de acceso rápido {0} ya está asignada al comando \"{1}\"; ¿te gustaría reemplazarlo?",
+		"confirmKey": "La tecla de acceso rápido {0} ya está asignada al comando \"{1}\"; ¿desea reemplazarlo?",
 		"autoSave": "Guardar el espacio de trabajo automáticamente",
 		"includeHidden": "Incluir elementos ocultos en las exportaciones SVG",
 		"loadSessionOnQueue": "Cargar la sesión anterior al abrir directamente un archivo de proyecto",
-		"useFileSystem": "Utilice la API del sistema de archivos"
+		"useFileSystem": "Usar la API del sistema de archivos"
 	},
 	"panel": {
 		"design": {
@@ -161,7 +158,7 @@
 			"titlePH": "(Título del Proyecto)",
 			"descriptionPH": "(Descripción del Proyecto)",
 			"tree": "Vista de estructura de árbol",
-			"layout": "Vista de maquetación",
+			"layout": "Vista de distribución",
 			"width": "Ancho",
 			"height": "Alto",
 			"size": "Tamaño",
@@ -177,7 +174,7 @@
 			"name": "Nombre",
 			"radius": "Radio",
 			"width": "Ancho",
-			"height": "Altura",
+			"height": "Alto",
 			"goto": "Ir al vértice"
 		},
 		"flaps": {
@@ -187,7 +184,7 @@
 		"river": {
 			"type": "Río",
 			"width": "Ancho",
-			"goto": "Ir al borde"
+			"goto": "Ir a la arista"
 		},
 		"rivers": {
 			"type": "Ríos"
@@ -197,7 +194,7 @@
 			"name": "Nombre",
 			"addLeaf": "Agregar hoja",
 			"ofLength": "de longitud",
-			"delJoin": "Eliminar y unirse",
+			"delJoin": "Eliminar y unir",
 			"goto": "Ir a la solapa"
 		},
 		"vertices": {
@@ -205,10 +202,10 @@
 			"goto": "Ir a solapas"
 		},
 		"edge": {
-			"type": "Borde",
+			"type": "Arista",
 			"length": "Largo",
-			"split": "Separar",
-			"merge": "Fusionar vértices finales",
+			"split": "Dividir",
+			"merge": "Fusionar vértices extremos",
 			"goto": "Ir al río"
 		},
 		"repo": {
@@ -233,92 +230,114 @@
 		"danglingDetail": "Algunos pliegues de cresta se interrumpen dentro del papel (en los puntos rojos) sin encontrarse con otras crestas. Intente ajustar las posiciones de las solapas para que todas las crestas queden conectadas.",
 		"riverCorner": "Ríos no naturales",
 		"riverCornerDetail": "Algunos ríos (mostrados con rayas) cubren más regiones de las necesarias, por lo que las crestas correctas no se pueden determinar automáticamente. Intente rellenar las regiones sobrantes cubiertas por los ríos.",
-		"pass": "El diseño es completamente válido",
-		"passDetail": "No se encontraron problemas en el diseño.",
+		"pass": "La distribución es completamente válida",
+		"passDetail": "No se encontraron problemas en la distribución.",
 		"learnMore": "Más información"
 	},
 	"share": {
 		"title": "Compartir proyecto",
 		"copy": "Copiar",
-		"share": "Cuota",
+		"share": "Compartir",
 		"message": "¡Mira mi proyecto \"{0}\" diseñado con Box Pleating Studio!",
 		"note": "Este enlace solo está pensado para compartir el proyecto a corto plazo, y no se garantiza que siga siendo válido a largo plazo."
 	},
 	"about": {
 		"title": "Acerca de Box Pleating Studio",
 		"license": "Publicado bajo licencia MIT.",
-		"manual": "Para obtener el manual del usuario, visite el {0} de la aplicación.",
+		"manual": "Para obtener el manual del usuario, visite la {0} de la aplicación.",
 		"feedback": "Para obtener comentarios, visite el {0} de la aplicación.",
 		"repo": "Repositorio de Github",
 		"donation": "BP Studio es de uso completamente gratuito. Si encuentra esta aplicación útil para su diseño y está interesado en apoyarla, puede donar cualquier cantidad con {0}.",
 		"visitBlog": "¡También visite el {0} del autor para obtener más información!",
-		"blog": "Blog",
+		"blog": "blog",
 		"sponsor": "BP Studio está orgullosamente patrocinado por:"
 	},
 	"donate": {
-		"title": "Box Pleating Studio de apoyo",
-		"intro": "¡Gracias por considerar su apoyo a Box Pleating Studio! Indique la cantidad que le gustaría donar. Puedes comprarme un café con $ 1 o una cena con $ 10, etc. 😄 (la comisión de PayPal se agregará durante el pago)",
-		"error": "Por favor, introduzca un número",
+		"title": "Apoyar a Box Pleating Studio",
+		"intro": "¡Gracias por considerar su apoyo a Box Pleating Studio! Indique la cantidad que le gustaría donar. Puede comprarme un café con $ 1 o una cena con $ 10, etc. 😄 (la comisión de PayPal se agregará durante el pago)",
+		"error": "Por favor, ingrese un número",
 		"then": "A continuación haga clic en el botón de abajo y siga las instrucciones para completar el pago.",
-		"wait": "Espere hasta que PayPal complete su transacción ...",
+		"wait": "Espere hasta que PayPal complete su transacción...",
 		"nextTime": "Quizás la próxima vez",
-		"thank": "¡Muchas gracias, {0}, por tu amable donación!"
+		"thank": "¡Muchas gracias, {0}, por su amable donación!"
 	},
 	"message": {
-		"connFail": "Falló la conexión a Internet; Por favor, inténtelo de nuevo más tarde.",
-		"downloadHint": "Haz clic en el botón derecho y usa \"Guardar enlace como\" para elegir la ubicación del archivo.",
+		"connFail": "Falló la conexión a Internet; por favor, inténtelo de nuevo más tarde.",
+		"downloadHint": "Haga clic con el botón derecho y use \"Guardar enlace como\" para elegir la ubicación del archivo.",
 		"filePermission": "Por motivos de seguridad, BP Studio necesita su permiso para acceder al archivo. Para cada archivo, solo necesitará otorgar permiso una vez por sesión. ¿Aún desea acceder al archivo?",
 		"fatal": "Se produjo un error interno y el proyecto no se puede seguir utilizando.",
-		"recover": "El espacio de trabajo se recuperará automáticamente, pero es probable que el error persista. \nDescargue el registro de errores y envíelo al autor para diagnosticar el problema.",
+		"recover": "El espacio de trabajo se recuperará automáticamente, pero es probable que el error persista. Descargue el registro de errores y envíelo al autor para diagnosticar el problema.",
 		"recoverFailed": "La recuperación falló.",
 		"invalidFormat": "El archivo \"{0}\" tiene un formato no válido.",
-		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; \nlos datos pueden estar corruptos.",
-		"latest": "Ya tienes la última versión de BP Studio.",
+		"invalidLink": "Se produjo un error inesperado al abrir el enlace del proyecto; los datos pueden estar corruptos.",
+		"latest": "Ya tiene la última versión de BP Studio.",
 		"min3vertex": "El árbol debe tener al menos 3 vértices.",
 		"nothingCopied": "No se copió nada. Solo se pueden copiar o cortar las partes de la selección unidas al resto del árbol por exactamente una arista.",
-		"cannotFit": "La selección no cabe en la hoja después de la transformación.",
+		"cannotFit": "La selección no cabe en el papel después de la transformación.",
 		"oldVersion": "El proyecto \"{0}\" se creó con una versión anterior de BP Studio y se modificó parte del diseño. Se actualizará al formato más reciente cuando vuelva a guardarlo.",
-		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de plegado que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
+		"patternNotFound": "Algunas de las superposiciones de solapas en este diseño son válidas, pero de momento BP Studio no puede encontrar patrones de tramo que funcionen para ellas. El autor de esta aplicación seguirá implementando más algoritmos que permitan cubrir más casos.",
 		"unsaved": "El proyecto \"{0}\" contiene cambios sin guardar. ¿Descartar los cambios?",
 		"updateReady": "Una nueva versión de BP Studio está lista y se actualizará automáticamente al reiniciar. ¿Le gustaría reiniciar ahora?",
 		"restartFail": "No se puede reiniciar. Cierre todas las instancias de BP Studio.",
 		"webGL": {
 			"title": "La inicialización de WebGL falló",
-			"body": "BP Studio requiere que se ejecute WebGL, pero no puede inicializar el contexto de WebGL. Por favor, compruebe la configuración de su navegador."
+			"body": "BP Studio dibuja el espacio de trabajo con la GPU (mediante WebGPU o WebGL), pero ninguno de los dos está disponible en este navegador. Normalmente esto significa que la aceleración por GPU está desactivada o bloqueada en el navegador, aunque su dispositivo tenga GPU. Pruebe lo siguiente:",
+			"tips": {
+				"accel": "Asegúrese de que la aceleración por hardware esté activada en la configuración del navegador (en Chrome y Edge, es la opción \"Usar la aceleración de gráficos cuando esté disponible\" en \"Sistema\") y reinicie el navegador.",
+				"gpuPage": "En Chrome o Edge, escriba {0} en la barra de direcciones para ver si WebGL está disponible y, si está desactivado, el motivo. En Firefox, la sección \"Gráficos\" de {1} muestra información similar.",
+				"linux": "En Linux, Chrome puede desactivar la aceleración por GPU si el controlador gráfico está en su lista de bloqueo. En ese caso, otros navegadores como Firefox podrían seguir funcionando.",
+				"driver": "Actualice el controlador gráfico de su dispositivo o pruebe con otro navegador."
+			},
+			"diagnosis": "Información de diagnóstico (inclúyala si reporta este problema):"
 		},
-		"inApp": "Parece que estás utilizando un navegador integrado en la aplicación. Es posible que la descarga no funcione.",
-		"dropzone": "Arrastra el archivo aquí para abrir"
+		"startup": {
+			"title": "Se produjo un error durante el inicio de Box Pleating Studio.",
+			"causes": "Las posibles causas incluyen:",
+			"outdated": "Navegador o sistema operativo obsoleto",
+			"outdatedBody": "Los requisitos mínimos de BP Studio son Chrome ≥ 66, Edge ≥ 79, Firefox ≥ 78, Opera ≥ 53, Safari ≥ 11.1 (u 11.3 en iOS) o Samsung Internet ≥ 9.2.<br>Otros navegadores (especialmente los basados en Chromium) también podrían funcionar, pero no tienen soporte oficial y no se garantiza que todas las funciones operen correctamente.<br>Si aún no lo ha hecho, actualice su navegador (tenga en cuenta que actualizar Safari requiere actualizar el sistema) o use la versión más reciente de Chrome, que es el navegador recomendado.<br>También se sabe que las versiones antiguas de Windows 7 pueden causar problemas con los certificados SSL. Intente actualizar Windows si el sitio web aparece como \"no seguro\".",
+			"bug": "Error temporal",
+			"bugBody": "Intente borrar los datos de caché del navegador y volver a cargar la aplicación para actualizar BP Studio a la versión más reciente, que podría haber corregido el error, especialmente en Safari, donde un error conocido en su mecanismo de caché podría hacer que vea este mensaje.",
+			"reported": "En todos los casos, el error se ha notificado al autor, que hará todo lo posible por solucionarlo cuando sea posible.<br>Si nada de lo anterior resuelve el problema, vuelva dentro de unos días y compruebe si se ha solucionado. El autor se disculpa por las molestias.",
+			"report": "También puede abrir un issue en {0} o escribir en {1} para reportar este problema; incluya la siguiente información de diagnóstico en su mensaje."
+		},
+		"resource": {
+			"title": "No se pudieron cargar algunos de los recursos necesarios.",
+			"body": "Por ello, Box Pleating Studio no puede iniciarse.<br>Probablemente se deba a un problema de conexión a Internet o a recursos que faltan en la caché. Compruebe su red e inténtelo de nuevo.",
+			"failed": "Recurso que no se pudo cargar:"
+		},
+		"inApp": "Parece que está utilizando un navegador integrado en la aplicación. Es posible que la descarga no funcione.",
+		"dropzone": "Suelte el archivo aquí para abrirlo"
 	},
 	"plugin": {
 		"TreeMaker": {
 			"not5": "El archivo \"{0}\" no tiene el formato TreeMaker 5.",
-			"size8": "BP Studio requiere un tamaño de hoja de al menos 8.",
+			"size8": "BP Studio requiere un tamaño de papel de al menos 8.",
 			"invalid": "El archivo \"{0}\" parece dañado y no se puede cargar correctamente."
 		},
 		"optimizer": {
-			"_": "Optimizar el diseño",
+			"_": "Optimizar la distribución",
 			"unsupported": "Su navegador no soporta esta característica. Actualice a la última versión.",
 			"options": {
 				"_": "Opciones",
 				"openNew": "Mostrar resultado en una nueva pestaña",
-				"useDim": "Mantenga los anchos y altos de las solapas"
+				"useDim": "Mantener los anchos y altos de las solapas"
 			},
 			"layout": {
-				"_": "Método de diseño",
-				"view": "Utilice el diseño actual como referencia",
-				"random": "Pruebe diseños aleatorios",
-				"toTry": "Número de diseños para probar:",
-				"useBH": "Pruebe variaciones de los diseños actuales."
+				"_": "Método de distribución",
+				"view": "Usar la distribución actual como referencia",
+				"random": "Probar distribuciones aleatorias",
+				"toTry": "Número de distribuciones para probar:",
+				"useBH": "Probar variaciones de las distribuciones actuales"
 			},
 			"skip": "Saltar",
-			"run": "¡Ejecuta!",
+			"run": "¡Ejecutar!",
 			"running": "Ejecutando...",
 			"mp": "Procesamiento múltiple activado"
 		},
 		"CP": {
 			"_": "Exportar archivo CP",
 			"format": "Formato",
-			"reorient": "Reorientar la hoja si corresponde",
+			"reorient": "Reorientar el papel si corresponde",
 			"hinge": {
 				"_": "Pliegues de bisagra",
 				"auxiliary": "Líneas auxiliares (estándar no oficial)",
@@ -336,7 +355,7 @@
 		"close": "Cerrar",
 		"cancel": "Cancelar",
 		"export": "Exportar",
-		"delete": "Borrar",
+		"delete": "Eliminar",
 		"discord": "Servidor Discord de BP Studio",
 		"version": "Versión",
 		"filename": "Nombre del archivo",
@@ -347,6 +366,6 @@
 		"workspace": "espacio de trabajo"
 	},
 	"help": {
-		"useFileSystem": "Habilitar esto le permite guardar directamente en los archivos de edición y mantener un registro de archivos abiertos recientemente. Puede deshabilitar esto si encuentra algún problema para abrir archivos en dispositivos móviles."
+		"useFileSystem": "Habilitar esto le permite guardar directamente en los archivos que está editando y mantener un registro de los archivos abiertos recientemente. Puede deshabilitar esto si encuentra algún problema para abrir archivos en dispositivos móviles."
 	}
 }

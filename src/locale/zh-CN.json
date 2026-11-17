@@ -5,17 +5,14 @@
 	"since": 900,
 	"welcome": {
 		"title": "欢迎使用 Box Pleating Studio！",
-		"intro": [
-			"本应用是用来帮助折纸设计者利用箱形褶（box pleating，日文作「蛇腹折り」）系统和 GOPS 来设计超复杂超狂的作品的。",
-			"首先，您可以从左上角的菜单建立新的空白项目，或是至 {0} 阅读简短的指南。"
-		],
+		"intro": "本应用是用来帮助折纸设计者利用箱形褶（box pleating，日文作“蛇腹折り”）系统和 GOPS 来设计超复杂超狂的作品的。首先，您可以从左上角的菜单新建空白项目，或是至 {0} 阅读简短的指南。",
 		"install": {
-			"hint": "您也可以将 BP Studio 以独立应用的形式安装至您的装置上，并离线使用！",
-			"ios": "iOS 安装方法：在 Safari 中打开本网址，按下屏幕中间下方的分享按钮，并且点选「加入至首页」。",
+			"hint": "您也可以将 BP Studio 以独立应用的形式安装到您的设备上，并离线使用！",
+			"ios": "iOS 安装方法：在 Safari 中打开本网址，轻点“共享”（如果没有看到，请先轻点“⋯”），然后轻点“添加到主屏幕”。",
 			"bt": "安装 Box Pleating Studio 应用",
 			"prepare": "正在准备安装，请稍候...",
-			"ing": "安装应用中，请稍待……",
-			"ed": "BP Studio 已经安装到您的装置上了。",
+			"ing": "正在安装应用，请稍候……",
+			"ed": "BP Studio 已经安装到您的设备上了。",
 			"open": "打开 Box Pleating Studio 应用"
 		},
 		"copyright": "Copyright © 2020{0} 蔡牧村",
@@ -31,7 +28,7 @@
 			"open": "打开项目 / 工作区",
 			"print": "打印目前的视图",
 			"share": "分享目前的项目",
-			"notFound": "无法打开文件「{0}」；文件未找到。",
+			"notFound": "无法打开文件“{0}”；文件未找到。",
 			"recent": {
 				"title": "打开最近的文件",
 				"empty": "没有记录",
@@ -67,7 +64,7 @@
 			"undo": "撤消",
 			"redo": "恢复",
 			"selectAll": "全选",
-			"unselectAll": "取消选取",
+			"unselectAll": "取消选择",
 			"cut": "剪切",
 			"copy": "复制",
 			"paste": "粘贴",
@@ -100,7 +97,7 @@
 		"help": {
 			"title": "说明",
 			"about": "关于",
-			"news": "版本资讯",
+			"news": "版本信息",
 			"update": "已准备更新",
 			"checkUpdate": "检查更新",
 			"donation": "捐款",
@@ -148,9 +145,9 @@
 		},
 		"reset": "将所有设置重置为默认值",
 		"confirmReset": "您确定要将所有设置重置为默认值吗？",
-		"confirmKey": "热键 {0} 已分配给命令「{1}」；你想更换它吗？",
+		"confirmKey": "热键 {0} 已分配给命令“{1}”；您想替换它吗？",
 		"autoSave": "自动保存工作区",
-		"includeHidden": "在 SVG 输出中包含隐藏元件",
+		"includeHidden": "在 SVG 输出中包含隐藏元素",
 		"loadSessionOnQueue": "直接打开项目文件时加载先前的会话",
 		"useFileSystem": "使用文件系统 API"
 	},
@@ -195,7 +192,7 @@
 		"vertex": {
 			"type": "顶点",
 			"name": "名称",
-			"addLeaf": "新增叶边",
+			"addLeaf": "添加叶边",
 			"ofLength": "长度为",
 			"delJoin": "删除并合并端点",
 			"goto": "前往角片"
@@ -213,7 +210,7 @@
 		},
 		"repo": {
 			"type": "伸展结构",
-			"config": "组态",
+			"config": "配置",
 			"pattern": "折痕图案",
 			"onlyOne": "只找到了一种折痕图案"
 		}
@@ -224,8 +221,8 @@
 	"health": {
 		"invalid": "无效重叠",
 		"invalidDetail": "有些角片太过靠近（红色区域）。请先将它们分散开来，之后才会进行其它的检查。",
-		"unsolved": "找不到伸展图案",
-		"unsolvedDetail": "有些重叠虽然有效，但可行的伸展折痕图案尚未被实作。请试着调整角片的位置。",
+		"unsolved": "找不到伸展折痕图案",
+		"unsolvedDetail": "有些重叠虽然有效，但可行的伸展折痕图案尚未实现。请试着调整角片的位置。",
 		"issues": "发现问题：{0}",
 		"uncovered": "未覆盖区域",
 		"uncoveredDetail": "纸张的每个部分都应该被角片或河覆盖。请试着加大角片的长宽、或增加填充空间的角片，以填满黄色的区域。",
@@ -241,59 +238,81 @@
 		"title": "分享项目",
 		"copy": "复制",
 		"share": "分享",
-		"message": "快来看我用 Box Pleating Studio 设计的项目「{0}」！",
+		"message": "快来看我用 Box Pleating Studio 设计的项目“{0}”！",
 		"note": "此网址仅供短期分享项目使用，并不保证长期有效。"
 	},
 	"about": {
 		"title": "关于 Box Pleating Studio",
 		"license": "依 MIT 授权条款发行",
 		"manual": "欲参阅指南，请前往本 App 的 {0}。",
-		"feedback": "欲提供意见回馈，请前往本 App 的 {0}。",
-		"repo": "Github 存储库",
-		"donation": "BP Studio 的使用是完全免费的。若您觉得本 App 对您的折纸设计有帮助并有兴趣提供支持，欢迎您透过 {0} 任意捐款。",
+		"feedback": "欲提供意见反馈，请前往本 App 的 {0}。",
+		"repo": "GitHub 仓库",
+		"donation": "BP Studio 的使用是完全免费的。若您觉得本 App 对您的折纸设计有帮助并有兴趣提供支持，欢迎您通过 {0} 任意捐款。",
 		"visitBlog": "您还可以访问作者的{0}以了解更多信息！",
 		"blog": "博客",
 		"sponsor": "BP Studio 荣幸地获得以下赞助："
 	},
 	"donate": {
 		"title": "赞助 Box Pleating Studio",
-		"intro": "感谢您考虑赞助 Box Pleating Studio！请输入任何您想捐款的数字。您可以捐美金 $1 请我喝杯咖啡，或 $10 请我吃顿饭之类的。 😄 (PayPal 手续费会在结帐时加上去)",
+		"intro": "感谢您考虑赞助 Box Pleating Studio！请输入任何您想捐款的金额。您可以捐 1 美元请我喝杯咖啡，或 10 美元请我吃顿饭之类的。😄（PayPal 手续费会在结账时加上去）",
 		"error": "请输入一个数字",
-		"then": "然后按下底下的按钮并依指示完成捐款。",
+		"then": "然后点击下方的按钮并按照提示完成捐款。",
 		"wait": "请等待 PayPal 完成您的交易……",
 		"nextTime": "下次再说",
 		"thank": "{0}，感谢您的热情捐款！"
 	},
 	"message": {
-		"connFail": "网络连线失败；请稍后再试。",
-		"downloadHint": "按右键并点选「另存连结」可指定存档位置",
-		"filePermission": "出于安全性原因，BP Studio 需要您的授权才能访问该文件。对于每个文件，您在执行阶段中只需要授权一次。您仍要访问该文件吗？",
+		"connFail": "网络连接失败；请稍后再试。",
+		"downloadHint": "右键点击并选择“链接另存为…”可指定保存位置。",
+		"filePermission": "出于安全原因，BP Studio 需要您的授权才能访问该文件。每个文件在每次会话中只需授权一次。您仍要访问该文件吗？",
 		"fatal": "发生内部错误，项目无法进一步操作。",
 		"recover": "工作区将自动恢复，但错误可能会持续存在。请下载错误日志并发送给作者以诊断问题。",
 		"recoverFailed": "恢复失败。",
-		"invalidFormat": "文件「{0}」的格式无效。",
+		"invalidFormat": "文件“{0}”的格式无效。",
 		"invalidLink": "打开项目链接时发生意外错误；数据可能已损坏。",
 		"latest": "您已经拥有最新版本的 BP Studio。",
 		"min3vertex": "树状结构至少需要有三个顶点",
-		"nothingCopied": "没有复制任何内容。只有选取范围中与树状结构的其余部分恰好以一条边相连的部分，才能复制或剪切。",
-		"cannotFit": "变换后，选取的对象无法放进纸张范围内。",
-		"oldVersion": "项目「{0}」是使用较旧版本的 BP Studio 创建的，部分设计已被修改。项目会在下次存档时更新为最新格式。",
-		"patternNotFound": "在当前的设计中，存在一些角片重叠是虽然有效、但目前的 BP Studio 却无法找到可行的伸展折痕图案的。本应用的作者将会持续实作更多演算法以涵盖更多情况。",
-		"unsaved": "项目「{0}」有尚未保存的变更，确定要舍弃？",
+		"nothingCopied": "没有复制任何内容。只有选中范围中与树状结构的其余部分恰好以一条边相连的部分，才能复制或剪切。",
+		"cannotFit": "变换后，选中的对象无法放进纸张范围内。",
+		"oldVersion": "项目“{0}”是使用较旧版本的 BP Studio 创建的，部分设计已被修改。项目会在下次存档时更新为最新格式。",
+		"patternNotFound": "本设计中有些角片重叠虽然有效，但 BP Studio 目前还找不到可行的伸展折痕图案。本应用的作者将会持续实现更多算法，以涵盖更多情况。",
+		"unsaved": "项目“{0}”有尚未保存的更改，确定要放弃更改吗？",
 		"updateReady": "更新版本的 BP Studio 已准备就绪，并将在重新启动时自动更新。您想要现在立刻重新启动吗？",
 		"restartFail": "无法重新启动。请关闭 BP Studio 的所有实例。",
 		"webGL": {
 			"title": "WebGL 初始化失败",
-			"body": "BP Studio 运行需要 WebGL，但无法初始化 WebGL 环境。请检查您的浏览器设置。"
+			"body": "BP Studio 会使用 GPU（通过 WebGPU 或 WebGL）来绘制工作区，但这个浏览器目前两者都无法使用。这通常表示浏览器的 GPU 加速被禁用或屏蔽了，即使您的设备本身有 GPU 也一样。请尝试以下方法：",
+			"tips": {
+				"accel": "确认浏览器设置中已启用硬件加速（Chrome 与 Edge 中是“系统”下的“使用图形加速功能（如果可用）”选项），然后重新启动浏览器。",
+				"gpuPage": "在 Chrome 或 Edge 中，可以在地址栏输入 {0}，查看 WebGL 是否可用，以及被禁用的原因。在 Firefox 中，{1} 的“图像”部分也会显示类似的信息。",
+				"linux": "在 Linux 上，如果您的显卡驱动程序被 Chrome 列入黑名单，它可能会禁用 GPU 加速。此时其它浏览器（例如 Firefox）可能仍然可以正常使用。",
+				"driver": "更新设备的显卡驱动程序，或改用其它浏览器。"
+			},
+			"diagnosis": "诊断信息（反馈此问题时请一并提供）："
+		},
+		"startup": {
+			"title": "Box Pleating Studio 启动时发生错误。",
+			"causes": "可能的原因包括：",
+			"outdated": "浏览器或操作系统过旧",
+			"outdatedBody": "BP Studio 的最低要求为 Chrome ≥ 66、Edge ≥ 79、Firefox ≥ 78、Opera ≥ 53、Safari ≥ 11.1（iOS 则为 11.3）或 Samsung Internet ≥ 9.2。<br>其它浏览器（尤其是基于 Chromium 的浏览器）也可能可以使用，但并未正式支持，无法保证所有功能都能正常运行。<br>如果您还没有这么做，请更新您的浏览器（请注意，更新 Safari 需要更新系统），或使用最新版的 Chrome，这是推荐使用的浏览器。<br>另外，已知较早版本的 Windows 7 可能会导致 SSL 证书的问题。如果网站被标示为“不安全”，请尝试更新 Windows。",
+			"bug": "暂时性的 bug",
+			"bugBody": "请尝试清除浏览器的缓存数据并重新加载，以将 BP Studio 更新到最新版本，新版本可能已经修复了这个 bug。在 Safari 上尤其如此，因为其缓存机制的一个已知 bug 可能会导致您看到这个错误。",
+			"reported": "无论是哪一种情况，这个错误都已经报告给作者，作者会尽力在可行时修复。<br>如果以上方法都无法解决问题，请过几天再回来看看错误是否已经解决。造成不便，作者深感抱歉。",
+			"report": "您也可以在 {0} 上提交 issue，或通过 {1} 反馈这个问题；反馈时请附上以下的诊断信息。"
+		},
+		"resource": {
+			"title": "部分必要的资源无法顺利加载。",
+			"body": "因此 Box Pleating Studio 无法启动。<br>这可能是因为网络连接问题，或是缓存的资源丢失。请检查您的网络后再试一次。",
+			"failed": "加载失败的资源："
 		},
 		"inApp": "您似乎正在使用应用内浏览器。下载功能可能无法使用。",
 		"dropzone": "拖放文件以打开"
 	},
 	"plugin": {
 		"TreeMaker": {
-			"not5": "文件「{0}」不是 TreeMaker 5 的格式。",
+			"not5": "文件“{0}”不是 TreeMaker 5 的格式。",
 			"size8": "BP Studio 要求纸张大小至少为 8。",
-			"invalid": "文件「{0}」似乎已损坏，无法成功读取。"
+			"invalid": "文件“{0}”似乎已损坏，无法成功读取。"
 		},
 		"optimizer": {
 			"_": "优化布局",
@@ -318,7 +337,7 @@
 		"CP": {
 			"_": "导出 CP 文件",
 			"format": "格式",
-			"reorient": "若适用的话重新定向纸张",
+			"reorient": "必要时调整纸张方向",
 			"hinge": {
 				"_": "枢纽折痕",
 				"auxiliary": "辅助线（非官方标准）",

@@ -5,7 +5,7 @@ import { MockFileSystemFileHandle } from "../utils/mockFileSystemFileHandle";
 /** 360 x 640 Resolution, Chrome */
 test.describe("Galaxy S5", () => {
 
-	test("Shows 4 recent files", async ({ page }) => {
+	test("Shows 5 recent files", async ({ page }) => {
 		await page.goto("/");
 
 		// Setup mock file list
@@ -20,7 +20,8 @@ test.describe("Galaxy S5", () => {
 		const quickItems = page.locator(".recent .quick-item:visible");
 		await expect(quickItems).toHaveCount(10);
 
-		// Assert that only 4 recent files are not clipped by overflow
+		// Assert that only 5 recent files are not clipped by overflow
+		// (the number depends on the height of the intro text above)
 		const itemsInViewport = await quickItems.evaluateAll(items =>
 			items.filter(item => {
 				const rect = item.getBoundingClientRect();
@@ -28,7 +29,7 @@ test.describe("Galaxy S5", () => {
 				return rect.right <= parentRect.right && rect.left >= parentRect.left;
 			})
 		);
-		expect(itemsInViewport).toHaveLength(4);
+		expect(itemsInViewport).toHaveLength(5);
 	});
 
 });

@@ -2,15 +2,15 @@ import { watch, nextTick, reactive } from "vue";
 import { createI18n } from "vue-i18n";
 import { probablyChina } from "probably-china";
 
-import locale from "app/shared/locale";
+import locale, {
+	DEFAULT_LOCALE, LOCALE_KEY, formatLocale, getLanguages, loadLocale, locales
+} from "app/shared/locale";
 import { useDebounce } from "app/utils/timerUtility";
+import Analytics from "app/services/analyticsService";
 
 import type { I18n } from "vue-i18n";
 import type { BpsLocale } from "app/shared/locale";
 import type Settings from "./settingService";
-
-const LOCALE_KEY = "locale";
-const DEFAULT_LOCALE = "en";
 
 //=================================================================
 /**
@@ -28,15 +28,12 @@ namespace LanguageService {
 
 	/** Create i18n instance. */
 	export function createPlugin(): I18n {
-		// Replace the flag to avoid unnecessary trouble.
-		if(probablyChina) locale["zh-tw"].emoji = () => "🇭🇰";
-
 		const plugin = createI18n<[BpsLocale], string, false>({
 			legacy: false,
 			locale: DEFAULT_LOCALE,
 			fallbackLocale: DEFAULT_LOCALE,
 			silentFallbackWarn: true,
-			messages: locale,
+			messages: { [DEFAULT_LOCALE]: locale[DEFAULT_LOCALE] },
 		});
 
 		// When using such method to define a global constant, it is important
@@ -50,17 +47,29 @@ namespace LanguageService {
 		return plugin;
 	}
 
-	export function init(): void {
+	/** Loads a locale and adds it to the i18n instance (only once). */
+	async function register(loc: string): Promise<BpsLocale> {
+		const messages = await loadLocale(loc);
+		if(!i18n.availableLocales.includes(loc) && locales.includes(loc)) {
+			// Replace the flag to avoid unnecessary trouble.
+			if(loc == "zh-tw" && probablyChina) messages.emoji = () => "🇭🇰";
+			i18n.setLocaleMessage(loc, messages);
+		}
+		return messages;
+	}
+
+	export async function init(): Promise<void> {
 		_options.length = 0;
 		const build = Number(localStorage.getItem("build") || 0);
 		const localeSetting = localStorage.getItem(LOCALE_KEY);
 		const langs = getLanguages(localeSetting);
-		const newLocale = langs.some(l => Number(locale[l].since) > build);
+		const messages = await Promise.all(langs.map(register));
+		const newLocale = messages.some(m => Number(m.since) > build);
 
 		if(langs.length > 1 && (!localeSetting || newLocale)) {
 			_options.push(...langs);
 		}
-		const loc = format(localeSetting || langs[0] || DEFAULT_LOCALE);
+		const loc = formatLocale(localeSetting || langs[0] || DEFAULT_LOCALE);
 		i18n.locale.value = loc;
 		localStorage.setItem(LOCALE_KEY, loc);
 	}
@@ -79,11 +88,15 @@ namespace LanguageService {
 			}
 		});
 
+		// The other locales are needed in the preferences.
+		for(const l of locales) register(l);
+
 		watch(i18n.locale, loc => {
-			if(loc in locale) {
+			if(locales.includes(loc)) {
+				register(loc);
 				if(!syncing) localStorage.setItem(LOCALE_KEY, loc);
 				syncing = false;
-				debounce(() => gtag("event", "lang_" + loc.replace("-", "_")));
+				debounce(() => Analytics.event("lang_" + loc.replace("-", "_")));
 			} else {
 				loc = findFallbackLocale(loc);
 				nextTick(() => i18n.locale.value = loc);
@@ -92,46 +105,22 @@ namespace LanguageService {
 		}, { immediate: true });
 	}
 
-	/** Obtain the list of candidate languages. */
-	function getLanguages(loc: string | null): string[] {
-		const locales = Object.keys(locale);
-		if(!navigator.languages) return locales;
-		let languages = navigator.languages
-			.map(a => locales.find(l => format(a).startsWith(l)))
-			.filter((l): l is string => Boolean(l));
-		if(loc) languages.unshift(loc);
-		languages = Array.from(new Set(languages));
-		return languages;
-	}
-
 	function findFallbackLocale(loc: string): string {
 		const tokens = loc.split("-");
 		while(tokens.length) {
 			tokens.pop();
 			const l = tokens.join("-");
-			if(l in locale) return l;
+			if(locales.includes(l)) return l;
 		}
 		return DEFAULT_LOCALE;
-	}
-
-	/**
-	 * Normalize the language codes returned by browsers.
-	 * @see https://datatracker.ietf.org/doc/html/rfc5646
-	 */
-	function format(l: string): string {
-		return l.replace(/_/g, "-")
-			.toLowerCase()
-			// Firefox Android returns "zh-Hant-TW" instead of "zh-TW"
-			.replace(/^zh(-\w+)?-hant.*$/, "zh-tw")
-			.replace(/^zh(-\w+)?-hans.*$/, "zh-cn");
 	}
 
 	// eslint-disable-next-line no-unassigned-vars
 	export let onReset: Action | undefined;
 
-	export function reset(): void {
+	export async function reset(): Promise<void> {
 		localStorage.removeItem(LOCALE_KEY);
-		init();
+		await init();
 		if(onReset) onReset();
 	}
 }

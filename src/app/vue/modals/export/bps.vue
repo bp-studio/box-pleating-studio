@@ -18,6 +18,7 @@
 	import ExportService from "app/services/exportService";
 	import Studio from "app/services/studioService";
 	import Export from "../components/export.vue";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "BPS" });
 
@@ -32,7 +33,8 @@
 	}
 
 	function save(): void {
-		gtag("event", "project_bps", { data1: Studio.project?.design.title });
+		Analytics.event("project_bps", { data1: Studio.project?.design.title });
+		Analytics.saved(Studio.project);
 		Studio.history.notify();
 	}
 

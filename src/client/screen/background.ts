@@ -3,7 +3,7 @@ import { watch } from "vue";
 import { DARK, WHITE } from "client/shared/constant";
 import { isDark } from "app/misc/isDark";
 
-import type { Renderer } from "@pixi/core";
+import type { Renderer } from "pixi.js";
 
 function setBackgroundColor(renderer: Renderer, dark: boolean): void {
 	renderer.background.color = dark ? DARK : WHITE;

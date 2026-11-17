@@ -21,6 +21,7 @@
 	import Settings from "app/services/settingService";
 	import Toggle from "@/gadgets/form/toggle.vue";
 	import Export from "../components/export.vue";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "SVG" });
 
@@ -35,7 +36,7 @@
 	}
 
 	function save(): void {
-		gtag("event", "project_svg");
+		Analytics.event("project_svg");
 	}
 
 	defineExpose({ show });

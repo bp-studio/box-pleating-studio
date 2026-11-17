@@ -37,7 +37,7 @@
 	import { computed, useId } from "vue";
 
 	import { toHex } from "shared/utils/color";
-	import { useThrottledGA } from "app/utils/ga";
+	import Analytics from "app/services/analyticsService";
 
 	defineOptions({ name: "Color" });
 
@@ -52,7 +52,7 @@
 
 	const id: string = "color" + useId();
 
-	const ga = useThrottledGA("custom_color", TEN_MINUTES);
+	const ga = Analytics.throttled("custom_color", TEN_MINUTES);
 
 	const hex = computed(() => toHex(modelValue.value ?? props.default));
 

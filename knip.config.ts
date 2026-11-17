@@ -31,7 +31,7 @@ const config: KnipConfig = {
 	],
 	ignoreBinaries: ["echo."],
 	ignoreDependencies: [
-		"@(pixi|popperjs|rspack|types)/.+",
+		"@(popperjs|rspack|types)/.+",
 		".+-loader",
 		"eslint-plugin-typescript-compat",
 		"@rstest/coverage-istanbul", // loaded by coverage.provider

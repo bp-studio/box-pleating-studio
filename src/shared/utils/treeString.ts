@@ -25,3 +25,15 @@ export function parseFlaps(s: string): JFlap[] {
 		x, y, width, height,
 	}));
 }
+
+/** Inverse of {@link parseEdges}. */
+export function formatEdges(edges: readonly JEdge[]): string {
+	return edges.map(e => `(${e.n1},${e.n2},${e.length})`).join(",");
+}
+
+/** Inverse of {@link parseFlaps}. */
+export function formatFlaps(flaps: readonly JFlap[]): string {
+	return flaps
+		.map(f => `(${f.id},${f.x},${f.y},${f.width},${f.height})`)
+		.join(",");
+}

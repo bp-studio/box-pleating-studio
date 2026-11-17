@@ -1,5 +1,14 @@
 <template>
-	<i18n-t keypath="welcome.intro[1]" tag="p" scope="global">
+	<!--
+		The intro is a single paragraph, so that it remains the largest text
+		block (i.e. the LCP element) even when the install hint shows up later.
+	-->
+	<i18n-t
+		keypath="welcome.intro"
+		tag="p"
+		class="mt-4"
+		scope="global"
+	>
 		<a target="_blank" rel="noopener" href="https://bp-studio.github.io/">{{ $t("welcome.website") }}</a>
 	</i18n-t>
 	<p>

@@ -150,6 +150,7 @@
 	import OptProgress, { contextKey } from "./components/optProgress.vue";
 	import Toggle from "@/gadgets/form/toggle.vue";
 	import studioService from "app/services/studioService";
+	import Analytics from "app/services/analyticsService";
 
 	import type { OptimizerCommand, OptimizerEvent } from "client/plugins/optimizer/types";
 
@@ -279,18 +280,17 @@
 		},
 		skip(): void {
 			state.skipping = true;
-			gtag("event", "optimizer_skip", { data1: Stage[state.stage] });
+			Analytics.event("optimizer_skip", { data1: Stage[state.stage] });
 			handler("skip");
 		},
 		stop(): void {
 			state.stopping = true;
-			gtag("event", "optimizer_stop", { data1: Stage[state.stage] });
+			Analytics.event("optimizer_stop", { data1: Stage[state.stage] });
 			handler("stop");
 		},
 	});
 
 	async function run(): Promise<void> {
-		gtag("event", "optimizer_start");
 		state.running = true;
 		state.minor = 0;
 		state.stage = Stage.initializing;
@@ -310,7 +310,7 @@
 					support.value = false;
 				} else {
 					state.error = error;
-					gtag("event", "optimizer_error", { data1: state.error, data2: Stage[state.stage] });
+					Analytics.event("optimizer_error", { data1: state.error, data2: Stage[state.stage] });
 					state.stage = Stage.error;
 				}
 			}

@@ -1,5 +1,7 @@
 import { createSSRApp } from "vue";
 
+import { warmupPixi } from "client/screen/warmup";
+
 //=================================================================
 /**
  * This module contains the key to BP Studio's startup optimization.
@@ -12,12 +14,13 @@ import { createSSRApp } from "vue";
 //=================================================================
 
 const TIME_TERMINATE = 100;
+const TIME_GA = 3000;
 const TOTAL_PHASES = 10;
 
 await scheduler.yield();
 const { lcp, welcomeScreenReady, phase, checkForEarlyWelcome } = await import("app/misc/phase");
 const earlyWelcome = checkForEarlyWelcome();
-await import("app/shared/locale");
+(await import("app/shared/locale")).preloadLocales();
 await scheduler.yield();
 
 async function runPhase(to: number): Promise<void> {
@@ -64,8 +67,11 @@ try {
 	// LanguageService initialization
 	// This is done after LCP to prevent hydration mismatches.
 	await scheduler.yield();
-	LanguageService.init();
+	await LanguageService.init();
+	(await import("app/misc/startupError")).registerStartupError();
 	if(earlyWelcome) welcomeScreenReady.value = true;
+	// See the inline script in index.htm
+	document.documentElement.classList.remove("early-welcome");
 
 	// Phase 1 to 2
 	await import("@/panel/panel.vue");
@@ -74,10 +80,9 @@ try {
 	await import("@/modals/modalFragment.vue");
 	await runPhase(2);
 
+	await warmupPixi();
+
 	// Initialize services and Client
-	await import("@pixi/utils");
-	await scheduler.yield();
-	await import("@pixi/display");
 	const Core = (await import("app/core")).default;
 	if(await Core.init()) {
 		LanguageService.setup();
@@ -88,7 +93,12 @@ try {
 	}
 
 } catch(e: unknown) {
-	if(e instanceof Error) errMgr.setRunErr(e.message);
+	// An error shown or recorded earlier takes precedence; in particular,
+	// errMgr.setCustomError() throws an empty error after showing its message.
+	if(errMgr.ok()) {
+		console.error(e);
+		errMgr.setRunErr(describeError(e));
+	}
 } finally {
 	if(errMgr.callback()) { // Second checkpoint
 		setTimeout(() => {
@@ -96,6 +106,22 @@ try {
 			window.onunhandledrejection = null;
 		}, TIME_TERMINATE);
 	}
+	// Load GA when the main thread is idle, so that it won't block the
+	// interactions right after the startup.
+	if(typeof requestIdleCallback == "function") {
+		requestIdleCallback(loadGA, { timeout: TIME_GA });
+	} else {
+		setTimeout(loadGA, TIME_GA);
+	}
+}
+
+/**
+ * The message of an error caught during the startup. It must not be empty,
+ * or errMgr will regard the startup as successful.
+ */
+function describeError(e: unknown): string {
+	if(e instanceof Error) return e.message || e.stack || e.name;
+	return String(e) || "Unknown error";
 }
 
 /**

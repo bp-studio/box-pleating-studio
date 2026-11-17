@@ -1,5 +1,6 @@
 import HotkeyService from "app/services/hotkeyService";
 import Studio from "app/services/studioService";
+import Analytics from "app/services/analyticsService";
 
 export function zoomStep(currentZoom: number): number {
 	const FULL_ZOOM = 100, ZOOM_STEP = 25;
@@ -8,6 +9,7 @@ export function zoomStep(currentZoom: number): number {
 
 function zoom(unit: number): void {
 	if(!Studio.project) return;
+	Analytics.input("zoom", "key");
 	const sheet = Studio.project.design.sheet;
 	sheet.zoom += unit * zoomStep(sheet.zoom);
 }

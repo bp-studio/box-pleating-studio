@@ -5,13 +5,10 @@
 	"since": 0,
 	"welcome": {
 		"title": "Welcome to Box Pleating Studio!",
-		"intro": [
-			"This app is made to help origami designers to make complex, crazy designs using box pleating and GOPS gadgets.",
-			"To begin, click on the upper-left menu button to create an empty new project, or read our brief user manual on {0}."
-		],
+		"intro": "This app is made to help origami designers to make complex, crazy designs using box pleating and GOPS gadgets. To begin, click on the upper-left menu button to create an empty new project, or read our brief user manual on {0}.",
 		"install": {
 			"hint": "You can also install BP Studio as a standalone app to your device, and use it offline!",
-			"ios": "How to install on iOS: Open this website in Safari, tap the \"Share\" icon at the bottom of\tyour screen, and then tap \"Add to home screen\".",
+			"ios": "How to install on iOS: Open this website in Safari, tap \"Share\" (if you don't see it, tap \"⋯\" first), and then tap \"Add to Home Screen\".",
 			"bt": "Install Box Pleating Studio App",
 			"prepare": "Preparing for installation, please wait...",
 			"ing": "Installing app, please wait...",
@@ -284,7 +281,29 @@
 		"restartFail": "Unable to restart. Please close all instances of BP Studio.",
 		"webGL": {
 			"title": "WebGL initialization failed",
-			"body": "BP Studio requires WebGL to run, but is unable to initialize WebGL context. Please check your browser's settings."
+			"body": "BP Studio draws the workspace using the GPU (through WebGPU or WebGL), but neither of them is available in this browser. This usually means that GPU acceleration is disabled or blocked in the browser, even if your device has a GPU. Please try the following:",
+			"tips": {
+				"accel": "Make sure that hardware acceleration is enabled in the browser settings (in Chrome and Edge, it is the option \"Use graphics acceleration when available\" under \"System\"), and then restart the browser.",
+				"gpuPage": "In Chrome or Edge, enter {0} in the address bar to see whether WebGL is available, and the reason if it is disabled. In Firefox, the \"Graphics\" section of {1} shows similar information.",
+				"linux": "On Linux, Chrome may disable GPU acceleration if your graphics driver is on its blocklist. In that case, other browsers such as Firefox may still work.",
+				"driver": "Update the graphics driver of your device, or try another browser."
+			},
+			"diagnosis": "Diagnosis information (please include it if you report this issue):"
+		},
+		"startup": {
+			"title": "An error occurred during the startup of Box Pleating Studio.",
+			"causes": "Possible causes include:",
+			"outdated": "Outdated browser or operating system",
+			"outdatedBody": "Minimal requirement for BP Studio is Chrome ≥ 66, Edge ≥ 79, Firefox ≥ 78, Opera ≥ 53, Safari ≥ 11.1 (or 11.3 for iOS), or Samsung Internet ≥ 9.2.<br>Other browsers (especially those that are Chromium-based) might also work, but are not officially supported and there's no guarantee that all functionality will operate.<br>If you haven't done so, please upgrade your browser (note that upgrading Safari requires upgrading the system) or use the latest version of Chrome, which is the recommended browser.<br>It is also known that earlier versions of Windows 7 may cause issues with SSL certificates. Please try updating Windows if the website is marked \"insecure\".",
+			"bug": "Temporary bug",
+			"bugBody": "Please try clearing browser cache data and reloading the app to update BP Studio to the latest version, which might have fixed the bug, especially on Safari, in which a known bug in its caching mechanism could lead to you seeing this error.",
+			"reported": "In all cases, the error has been reported to the author, and he will try his best to fix the issue when applicable.<br>If none of the above solved the problem, please come back later in a few days and see if the error has been solved. The author apologizes for the inconvenience.",
+			"report": "You could also submit an issue on {0} or through {1} to report this issue; please include the following diagnosis information in your submission."
+		},
+		"resource": {
+			"title": "Some of the required resources cannot be loaded successfully.",
+			"body": "As a result, Box Pleating Studio cannot be started.<br>This is probably due to internet connection problem and/or missing cached resources. Please check your network and try again.",
+			"failed": "Resource failed to load:"
 		},
 		"inApp": "It seems that you are using an in-app browser. Downloading might not work.",
 		"dropzone": "Drop file to open"

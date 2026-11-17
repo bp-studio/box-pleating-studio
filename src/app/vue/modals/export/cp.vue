@@ -42,6 +42,7 @@
 	import Toggle from "@/gadgets/form/toggle.vue";
 	import ExportService from "app/services/exportService";
 	import Export from "../components/export.vue";
+	import Analytics from "app/services/analyticsService";
 
 	import type { CPFormat } from "client/plugins/cp";
 
@@ -80,7 +81,8 @@
 	}
 
 	function save(): void {
-		gtag("event", "export_cp");
+		Analytics.event("export_cp");
+		Analytics.saved(Studio.project);
 	}
 
 	defineExpose({ show });

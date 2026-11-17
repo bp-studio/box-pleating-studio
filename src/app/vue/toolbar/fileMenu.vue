@@ -134,6 +134,7 @@
 	import { Uploader, Opener, SaveAs } from "@/gadgets/file";
 	import RecentMenu from "./recentMenu.vue";
 	import { show } from "@/modals/modals";
+	import Analytics from "app/services/analyticsService";
 
 	import type { ProjId } from "shared/json";
 
@@ -172,29 +173,31 @@
 		Studio.history.notify();
 		Handles.set(Studio.project!.id, handle);
 		Handles.addRecent(handle);
-		gtag("event", "project_bps", { data1: Studio.project!.design.title });
+		Analytics.event("project_bps", { data1: Studio.project!.design.title });
+		Analytics.saved(Studio.project);
 	}
 	function notifyAll(handle?: FileSystemFileHandle): void {
 		Studio.history.notifyAll();
 		if(handle) Handles.addRecent(handle);
-		gtag("event", "project_bpz");
+		Analytics.event("project_bpz");
 	}
 	function svgSaved(): void {
-		gtag("event", "project_svg");
+		Analytics.event("project_svg");
 	}
 	function pngSaved(): void {
-		gtag("event", "project_png");
+		Analytics.event("project_png");
 	}
 
 	function copyPNG(): void {
 		Studio.copyPNG();
-		gtag("event", "share", { method: "copy", content_type: "image" });
+		Analytics.event("share", { method: "copy", content_type: "image" });
 	}
 
 	async function save(id?: ProjId): Promise<boolean> {
 		if(id === undefined) id = Studio.project!.id;
 		const proj = Workspace.getProject(id)!;
-		gtag("event", "project_bps", { data1: proj.design.title });
+		Analytics.event("project_bps", { data1: proj.design.title });
+		Analytics.saved(proj);
 		try {
 			const handle = Handles.get(id);
 			const writable = await handle.createWritable();
@@ -237,7 +240,7 @@
 		if(!Studio.project) return;
 		await Studio.beforePrint();
 		window.print();
-		gtag("event", "print");
+		Analytics.event("print");
 	}
 
 </script>

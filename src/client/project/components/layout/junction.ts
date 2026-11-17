@@ -1,10 +1,9 @@
-import { SmoothGraphics } from "@pixi/graphics-smooth";
+import { SmoothGraphics } from "pixi.js";
 
 import { dist } from "shared/types/geometry";
 import { style } from "client/services/styleService";
 
 import type { SmoothGraphicsLike } from "client/utils/contourUtil";
-import type { LINE_JOIN } from "@pixi/graphics";
 import type { ArcPath, ArcPolygon } from "shared/types/geometry";
 import type { InvalidJunction } from "core/design/layout/junction/invalidJunction";
 
@@ -31,19 +30,6 @@ export class Junction extends SmoothGraphics {
 		for(const path of this.$polygon) {
 			if(!path.length) return;
 
-			// Decide the stroke width based on the narrowness of the shape.
-			const narrowness = getNarrowness(path);
-			if(narrowness < THRESHOLD) {
-				target.lineStyle({
-					width: Math.min(2 / narrowness, maxWidth),
-					join: "bevel" as LINE_JOIN,
-					color,
-				});
-			} else {
-				target.lineStyle(0);
-			}
-
-			target.beginFill(color);
 			target.moveTo(path[0].x, path[0].y);
 			for(let i = 1; i < path.length; i++) {
 				const p = path[i];
@@ -53,7 +39,18 @@ export class Junction extends SmoothGraphics {
 			const p = path[0];
 			if(p.arc) target.arcTo(p.arc.x, p.arc.y, p.x, p.y, p.r!);
 			target.closePath();
-			target.endFill();
+			target.fill(color);
+
+			// Narrow shapes are stroked to make them visible,
+			// and the stroke width is based on the narrowness.
+			const narrowness = getNarrowness(path);
+			if(narrowness < THRESHOLD) {
+				target.stroke({
+					width: Math.min(2 / narrowness, maxWidth),
+					join: "bevel",
+					color,
+				});
+			}
 		}
 	}
 }

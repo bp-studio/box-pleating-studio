@@ -76,6 +76,8 @@ export default defineConfig([
 				"Object.fromEntries",
 				"ObjectConstructor.fromEntries",
 				"PromiseConstructor.withResolvers",
+				"PromiseConstructor.allSettled",
+				"String.matchAll",
 				"scheduler",
 			],
 		},

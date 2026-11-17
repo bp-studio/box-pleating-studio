@@ -1,6 +1,7 @@
 import { computed, shallowRef } from "vue";
 
-import Settings from "../services/settingService";
+import Settings from "app/services/settingService";
+import Analytics from "app/services/analyticsService";
 
 const mm = matchMedia("(prefers-color-scheme: dark)");
 const isPreferred = shallowRef(mm.matches);
@@ -22,6 +23,6 @@ export const isDark = computed(() => {
 	const theme = Settings.theme;
 	const result = theme == "dark" || theme == "system" && isPreferred.value;
 	document.documentElement.classList.toggle("dark", result);
-	gtag("event", "theme_" + (result ? "dark" : "light"));
+	Analytics.event("theme_" + (result ? "dark" : "light"));
 	return result;
 });

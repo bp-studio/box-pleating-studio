@@ -147,7 +147,7 @@ html.dark {
 
 	@media (hover: hover) {
 		.tab:not(:hover, .active) {
-			color: #777;
+			color: #a0a0a0; // Contrast ratio 4.5+ to --bg-ui
 		}
 	}
 

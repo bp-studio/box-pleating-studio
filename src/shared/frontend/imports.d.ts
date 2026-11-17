@@ -17,9 +17,18 @@ declare global {
 		setCustomError(title: string, body: string): never;
 		setRunErr(error: string): void;
 		setResErr(error: string): void;
+
+		/**
+		 * Replaces the shown startup error message with the localized version,
+		 * if available (see app/misc/startupError.ts).
+		 */
+		localize(): void;
 	};
 
 	declare function gaErrorData(err: string): object;
+
+	/** Loads gtag.js (only once), defined in HTML. */
+	declare function loadGA(): void;
 
 	/** App info, defined in HTML. */
 	declare const app_config: Record<string, string>;

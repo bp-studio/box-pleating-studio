@@ -1,5 +1,4 @@
-import { Graphics } from "@pixi/graphics";
-import { SmoothGraphics } from "@pixi/graphics-smooth";
+import { Graphics, SmoothGraphics } from "pixi.js";
 
 import { Layer } from "client/shared/layers";
 import { Control } from "client/base/control";
@@ -101,15 +100,19 @@ export class River extends Control {
 		fillContours(this._shade, this.$graphics.contours, color);
 
 		const sh = ProjectService.shrink.value;
-		this._hinge.clear().lineStyle(width * sh, color);
+		const hinge = { width: width * sh, color };
 
 		// Uncomment the next line for debugging
-		// if(this.$selected) this._hinge.lineStyle(width * 2 * sh, 0x66dd66);
+		// if(this.$selected) hinge.color = 0x66dd66, hinge.width *= 2;
 
+		this._hinge.clear();
 		drawContours(this._hinge, this.$graphics.contours);
+		this._hinge.stroke(hinge);
 
-		this._ridge.clear()
-			.lineStyle(style.ridge.width * sh, style.ridge.color);
+		this._ridge.clear();
 		drawLines(this._ridge, this.$graphics.ridges);
+		this._ridge.stroke({
+			width: style.ridge.width * sh, color: style.ridge.color,
+		});
 	}
 }

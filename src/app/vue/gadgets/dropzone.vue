@@ -10,6 +10,7 @@
 	import { onMounted } from "vue";
 
 	import importService from "app/services/importService";
+	import Analytics from "app/services/analyticsService";
 
 	onMounted(() => {
 		const dropzone = document.querySelector(".dropzone") as HTMLDivElement;
@@ -35,7 +36,7 @@
 				}
 			}
 			if(files.length) {
-				gtag("event", "dropzone");
+				Analytics.event("dropzone");
 				importService.openFiles(files);
 			}
 		});

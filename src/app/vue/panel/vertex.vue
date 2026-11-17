@@ -4,7 +4,12 @@
 		<Field v-model="subject.name" :label="$t('panel.vertex.name')"/>
 	</div>
 	<div class="mt-3 d-flex" style="flex-wrap: wrap;">
-		<AsyncButton class="flex-shrink-0" :disabled="subject.cannotAdd" :click="() => subject.addLeaf(newLength)">
+		<AsyncButton
+			class="flex-shrink-0"
+			:disabled="subject.cannotAdd"
+			analytics="addLeaf"
+			:click="() => subject.addLeaf(newLength)"
+		>
 			{{
 				$t("panel.vertex.addLeaf") }}
 		</AsyncButton>
@@ -16,18 +21,23 @@
 			<div class="d-flex flex-grow-1">
 				<label class="col-form-label me-2 flex-shrink-0">{{ $t("panel.vertex.ofLength") }}</label>
 				<div class="flex-grow-1" style="width: 90px;">
-					<Number v-model="newLength" :min="1" :max="subject.maxNewLeafLength"/>
+					<Number
+						v-model="newLength"
+						analytics="value"
+						:min="1"
+						:max="subject.maxNewLeafLength"
+					/>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div v-if="subject.isDeletable" class="mt-3">
-		<AsyncButton :click="() => subject.delete()">
+		<AsyncButton analytics="delete" :click="() => subject.delete()">
 			{{ subject.isLeaf ? $t('keyword.delete') : $t('panel.vertex.delJoin') }}
 		</AsyncButton>
 	</div>
 	<div v-if="subject.isLeaf" class="mt-3">
-		<button class="btn btn-primary" :title="hk('n', 'd')" @click="subject.goToDual()">{{ $t("panel.vertex.goto") }}</button>
+		<button class="btn btn-primary" :title="hk('n', 'd')" @click="Analytics.input('dual', 'panel'); subject.goToDual()">{{ $t("panel.vertex.goto") }}</button>
 	</div>
 </template>
 
@@ -39,6 +49,7 @@
 	import Field from "@/gadgets/form/field.vue";
 	import Number from "@/gadgets/form/number.vue";
 	import AsyncButton from "@/gadgets/form/asyncButton.vue";
+	import Analytics from "app/services/analyticsService";
 
 	import type { Vertex } from "client/project/components/tree/vertex";
 

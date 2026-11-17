@@ -1,5 +1,5 @@
 
-import { AlphaFilter } from "@pixi/filter-alpha";
+import { AlphaFilter } from "pixi.js";
 import { shallowRef } from "vue";
 
 import { ValuedIntDoubleMap } from "shared/data/doubleMap/valuedIntDoubleMap";
@@ -14,13 +14,14 @@ import { Stretch } from "./stretch";
 import { FlapContainer } from "./flapContainer";
 import { applyTransform, norm } from "shared/types/geometry";
 import { Health } from "./health";
+import Analytics from "app/services/analyticsService";
 
 import type { IEditor, TransformTarget } from "../sheet";
 import type { TransformationMatrix } from "shared/types/geometry";
 import type { Flap } from "./flap";
 import type { BatchUpdateManager } from "client/project/batchUpdateManager";
 import type { Device } from "./device";
-import type { Container } from "@pixi/display";
+import type { Container } from "pixi.js";
 import type { Project } from "client/project/project";
 import type { GraphicsData, UpdateModel } from "core/service/updateModel";
 import type { IDoubleMap } from "shared/data/doubleMap/iDoubleMap";
@@ -87,7 +88,7 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		this.health = new Health(this);
 		this.$sheet.$addChild(this.health);
 
-		const filter = new AlphaFilter(style.junction.alpha);
+		const filter = new AlphaFilter({ alpha: style.junction.alpha });
 		this.$sheet.$layers[Layer.junction].filters = [filter];
 
 		this.$reactDraw(this._redrawJunctions);
@@ -147,6 +148,7 @@ export class Layout extends View implements ISerializable<JLayout>, IEditor {
 		this.riverCount = this.$rivers.size;
 
 		this.health.$check();
+		Analytics.layoutUpdated(this);
 	}
 
 	/**
