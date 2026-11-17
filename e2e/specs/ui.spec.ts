@@ -31,7 +31,7 @@ test.describe("I18n", () => {
 		await page.getByRole("menuitem", { name: "Settings" }).click();
 		await page.getByRole("menuitem", { name: "首选项", exact: true }).click();
 		await page.getByLabel("Language").selectOption("ko");
-		await page.getByRole("button", { name: "좋아요" }).click();
+		await page.getByRole("button", { name: "확인" }).click();
 		const locator = page.locator("#divWelcome");
 		await expect(locator).toContainText("시작");
 	});
