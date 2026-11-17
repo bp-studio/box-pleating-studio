@@ -386,6 +386,30 @@
 			var errShown = false;
 
 			/**
+			 * The id of the shown error message element,
+			 * and the diagnosis information appended to it.
+			 * @type {string|null}
+			 */
+			var shownId = null, shownDetail = "";
+
+			/**
+			 * Replaces the shown error message (written in English in this file)
+			 * with the localized version, if the global `startupError` object is
+			 * available, which is registered by the app once the locale is settled
+			 * (see app/misc/startupError.ts). The app also calls this upon
+			 * registering, in case that the error is shown earlier.
+			 */
+			self.localize = function() {
+				if(!shownId || typeof startupError == "undefined") return;
+				try {
+					var el = document.getElementById(shownId);
+					el.innerHTML = startupError[shownId]() + shownDetail;
+				} catch(e) {
+					// Keep the English version.
+				}
+			};
+
+			/**
 			 * Final processing.
 			 *
 			 * @return Whether the app has launched successfully.
@@ -397,15 +421,14 @@
 
 				display("divWorkspace");
 				display("app");
-				display(
-					resErr ? "resource" : "requirement",
-					true,
-					resErr ?
-						resErr :
-						"<br>Build number: " + app_config.app_version +
-						"<br>" + navigator.userAgent +
-						"<br>" + runErr
-				);
+				shownId = resErr ? "resource" : "requirement";
+				shownDetail = resErr ?
+					resErr :
+					"<br>Build number: " + app_config.app_version +
+					"<br>" + navigator.userAgent +
+					"<br>" + runErr;
+				display(shownId, true, shownDetail);
+				self.localize();
 
 				if(runErr &&
 					// Filter clawers; no need to report related errors.
@@ -451,13 +474,16 @@
 			self.setRunErr = setRunErr;
 			self.setResErr = setResErr;
 			self.setCustomError = function(title, message) {
-				display("divWorkspace");
-				display("divSpinner");
-				// The app (which is SSG-rendered) must be hidden too,
-				// or it covers the message completely.
-				display("app");
-				display("resource", true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
-				errShown = true;
+				// Keep the error that has been shown earlier, if any.
+				if(!errShown) {
+					display("divWorkspace");
+					display("divSpinner");
+					// The app (which is SSG-rendered) must be hidden too,
+					// or it covers the message completely.
+					display("app");
+					display("resource", true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
+					errShown = true;
+				}
 				// eslint-disable-next-line compat/compat
 				throw new Error(); // stops all further processing
 			};
@@ -593,7 +619,7 @@
 				and he will try his best to fix the issue when applicable.<br>
 				If none of the above solved the problem,
 				please come back later in a few days and see if the error has been solved.
-				The author apologize for the inconvenience.<br>
+				The author apologizes for the inconvenience.<br>
 				You could also submit an issue on
 				<a href="https://github.com/bp-studio/box-pleating-studio/issues" target="_blank" rel="noopener">GitHub</a>
 				or through <a href="https://discord.gg/zS4FPxHwHX" target="_blank" rel="noopener">Discord</a>
@@ -605,7 +631,7 @@
 			<div class="mt-2">
 				As a result, Box Pleating Studio cannot be started.<br>
 				This is probably due to internet connection problem and/or missing cached resources.
-				Please check you network and try again.<br><br>
+				Please check your network and try again.<br><br>
 				Resource failed to load:
 			</div>
 		</div>

@@ -281,7 +281,29 @@
 		"restartFail": "無法重新啟動。請關閉 BP Studio 的所有實體。",
 		"webGL": {
 			"title": "WebGL 初始化失敗",
-			"body": "BP Studio 運行需要 WebGL，但無法初始化 WebGL 環境。請檢查您的瀏覽器設置。"
+			"body": "BP Studio 會使用 GPU（透過 WebGPU 或 WebGL）來繪製工作區，但這個瀏覽器目前兩者都無法使用。這通常表示瀏覽器的 GPU 加速被停用或封鎖了，即使您的裝置本身有 GPU 也一樣。請嘗試以下方法：",
+			"tips": {
+				"accel": "確認瀏覽器設定中已啟用硬體加速（Chrome 與 Edge 中是「系統」底下的「可用時使用圖形加速」選項），然後重新啟動瀏覽器。",
+				"gpuPage": "在 Chrome 或 Edge 中，可以在網址列輸入 {0}，查看 WebGL 是否可用，以及停用的原因。在 Firefox 中，{1} 的「圖形」區段也會顯示類似的資訊。",
+				"linux": "在 Linux 上，如果您的顯示卡驅動程式被 Chrome 列入黑名單，它可能會停用 GPU 加速。此時其它瀏覽器（例如 Firefox）可能仍然可以正常使用。",
+				"driver": "更新裝置的顯示卡驅動程式，或改用其它瀏覽器。"
+			},
+			"diagnosis": "診斷資訊（回報此問題時請一併提供）："
+		},
+		"startup": {
+			"title": "Box Pleating Studio 啟動時發生錯誤。",
+			"causes": "可能的原因包括：",
+			"outdated": "瀏覽器或作業系統過舊",
+			"outdatedBody": "BP Studio 的最低需求為 Chrome ≥ 66、Edge ≥ 79、Firefox ≥ 78、Opera ≥ 53、Safari ≥ 11.1（iOS 則為 11.3）或 Samsung Internet ≥ 9.2。<br>其它瀏覽器（尤其是以 Chromium 為基礎的瀏覽器）也可能可以使用，但並未正式支援，無法保證所有功能都能正常運作。<br>如果您還沒有這麼做，請更新您的瀏覽器（請注意，更新 Safari 需要更新系統），或使用最新版的 Chrome，這是建議使用的瀏覽器。<br>另外，已知較早版本的 Windows 7 可能會導致 SSL 憑證的問題。如果網站被標示為「不安全」，請嘗試更新 Windows。",
+			"bug": "暫時性的 bug",
+			"bugBody": "請嘗試清除瀏覽器的快取資料並重新載入，以將 BP Studio 更新到最新版本，新版本可能已經修正了這個 bug。在 Safari 上尤其如此，因為其快取機制的一個已知 bug 可能會導致您看到這個錯誤。",
+			"reported": "無論是哪一種情況，這個錯誤都已經回報給作者，作者會盡力在可行時修正。<br>如果以上方法都無法解決問題，請過幾天再回來看看錯誤是否已經解決。造成不便，作者深感抱歉。",
+			"report": "您也可以在 {0} 上提交 issue，或透過 {1} 回報這個問題；回報時請附上以下的診斷資訊。"
+		},
+		"resource": {
+			"title": "部分必要的資源無法順利載入。",
+			"body": "因此 Box Pleating Studio 無法啟動。<br>這可能是因為網路連線問題，或是快取的資源遺失。請檢查您的網路後再試一次。",
+			"failed": "載入失敗的資源："
 		},
 		"inApp": "您似乎正在使用應用程式內瀏覽器。下載功能可能無法使用。",
 		"dropzone": "拖放檔案以開啟"

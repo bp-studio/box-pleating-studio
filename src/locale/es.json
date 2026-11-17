@@ -281,7 +281,29 @@
 		"restartFail": "No se puede reiniciar. Cierre todas las instancias de BP Studio.",
 		"webGL": {
 			"title": "La inicialización de WebGL falló",
-			"body": "BP Studio requiere que se ejecute WebGL, pero no puede inicializar el contexto de WebGL. Por favor, compruebe la configuración de su navegador."
+			"body": "BP Studio dibuja el espacio de trabajo con la GPU (mediante WebGPU o WebGL), pero ninguno de los dos está disponible en este navegador. Normalmente esto significa que la aceleración por GPU está desactivada o bloqueada en el navegador, aunque su dispositivo tenga GPU. Pruebe lo siguiente:",
+			"tips": {
+				"accel": "Asegúrese de que la aceleración por hardware esté activada en la configuración del navegador (en Chrome y Edge, es la opción \"Usar aceleración de gráficos cuando esté disponible\" en \"Sistema\") y reinicie el navegador.",
+				"gpuPage": "En Chrome o Edge, escriba {0} en la barra de direcciones para ver si WebGL está disponible y, si está desactivado, el motivo. En Firefox, la sección \"Gráficos\" de {1} muestra información similar.",
+				"linux": "En Linux, Chrome puede desactivar la aceleración por GPU si el controlador gráfico está en su lista de bloqueo. En ese caso, otros navegadores como Firefox podrían seguir funcionando.",
+				"driver": "Actualice el controlador gráfico de su dispositivo o pruebe con otro navegador."
+			},
+			"diagnosis": "Información de diagnóstico (inclúyala si informa de este problema):"
+		},
+		"startup": {
+			"title": "Se produjo un error durante el inicio de Box Pleating Studio.",
+			"causes": "Las posibles causas incluyen:",
+			"outdated": "Navegador o sistema operativo obsoleto",
+			"outdatedBody": "Los requisitos mínimos de BP Studio son Chrome ≥ 66, Edge ≥ 79, Firefox ≥ 78, Opera ≥ 53, Safari ≥ 11.1 (u 11.3 en iOS) o Samsung Internet ≥ 9.2.<br>Otros navegadores (especialmente los basados en Chromium) también podrían funcionar, pero no tienen soporte oficial y no se garantiza que todas las funciones operen correctamente.<br>Si aún no lo ha hecho, actualice su navegador (tenga en cuenta que actualizar Safari requiere actualizar el sistema) o use la versión más reciente de Chrome, que es el navegador recomendado.<br>También se sabe que las versiones antiguas de Windows 7 pueden causar problemas con los certificados SSL. Intente actualizar Windows si el sitio web aparece como \"no seguro\".",
+			"bug": "Error temporal",
+			"bugBody": "Intente borrar los datos de caché del navegador y volver a cargar la aplicación para actualizar BP Studio a la versión más reciente, que podría haber corregido el error, especialmente en Safari, donde un error conocido en su mecanismo de caché podría hacer que vea este mensaje.",
+			"reported": "En todos los casos, el error se ha notificado al autor, que hará todo lo posible por solucionarlo cuando sea posible.<br>Si nada de lo anterior resuelve el problema, vuelva dentro de unos días y compruebe si se ha solucionado. El autor se disculpa por las molestias.",
+			"report": "También puede abrir un issue en {0} o escribir en {1} para informar de este problema; incluya la siguiente información de diagnóstico en su mensaje."
+		},
+		"resource": {
+			"title": "No se pudieron cargar algunos de los recursos necesarios.",
+			"body": "Por ello, Box Pleating Studio no puede iniciarse.<br>Probablemente se deba a un problema de conexión a Internet o a recursos que faltan en la caché. Compruebe su red e inténtelo de nuevo.",
+			"failed": "Recurso que no se pudo cargar:"
 		},
 		"inApp": "Parece que estás utilizando un navegador integrado en la aplicación. Es posible que la descarga no funcione.",
 		"dropzone": "Arrastra el archivo aquí para abrir"

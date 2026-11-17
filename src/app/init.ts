@@ -68,6 +68,7 @@ try {
 	// This is done after LCP to prevent hydration mismatches.
 	await scheduler.yield();
 	await LanguageService.init();
+	(await import("app/misc/startupError")).registerStartupError();
 	if(earlyWelcome) welcomeScreenReady.value = true;
 	// See the inline script in index.htm
 	document.documentElement.classList.remove("early-welcome");

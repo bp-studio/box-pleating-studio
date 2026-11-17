@@ -281,7 +281,29 @@
 		"restartFail": "Không thể khởi động lại. Vui lòng đóng tất cả các phiên bản của BP Studio.",
 		"webGL": {
 			"title": "Khởi tạo WebGL không thành công",
-			"body": "BP Studio yêu cầu chạy WebGL nhưng không thể khởi tạo ngữ cảnh WebGL. Vui lòng kiểm tra cài đặt trình duyệt của bạn."
+			"body": "BP Studio vẽ không gian làm việc bằng GPU (thông qua WebGPU hoặc WebGL), nhưng cả hai đều không khả dụng trong trình duyệt này. Điều này thường có nghĩa là tính năng tăng tốc GPU đã bị tắt hoặc bị chặn trong trình duyệt, ngay cả khi thiết bị của bạn có GPU. Vui lòng thử các cách sau:",
+			"tips": {
+				"accel": "Hãy đảm bảo rằng tính năng tăng tốc phần cứng đã được bật trong cài đặt trình duyệt (trong Chrome và Edge, đó là tùy chọn \"Sử dụng tính năng tăng tốc đồ họa khi có\" trong mục \"Hệ thống\"), rồi khởi động lại trình duyệt.",
+				"gpuPage": "Trong Chrome hoặc Edge, hãy nhập {0} vào thanh địa chỉ để xem WebGL có khả dụng hay không, và lý do nếu nó bị tắt. Trong Firefox, mục \"Đồ họa\" của {1} cũng hiển thị thông tin tương tự.",
+				"linux": "Trên Linux, Chrome có thể tắt tính năng tăng tốc GPU nếu trình điều khiển đồ họa của bạn nằm trong danh sách chặn của nó. Khi đó, các trình duyệt khác như Firefox vẫn có thể hoạt động.",
+				"driver": "Hãy cập nhật trình điều khiển đồ họa của thiết bị hoặc thử một trình duyệt khác."
+			},
+			"diagnosis": "Thông tin chẩn đoán (vui lòng đính kèm khi báo cáo sự cố này):"
+		},
+		"startup": {
+			"title": "Đã xảy ra lỗi trong quá trình khởi động Box Pleating Studio.",
+			"causes": "Các nguyên nhân có thể bao gồm:",
+			"outdated": "Trình duyệt hoặc hệ điều hành đã lỗi thời",
+			"outdatedBody": "Yêu cầu tối thiểu của BP Studio là Chrome ≥ 66, Edge ≥ 79, Firefox ≥ 78, Opera ≥ 53, Safari ≥ 11.1 (hoặc 11.3 đối với iOS), hoặc Samsung Internet ≥ 9.2.<br>Các trình duyệt khác (đặc biệt là các trình duyệt dựa trên Chromium) cũng có thể hoạt động, nhưng không được hỗ trợ chính thức và không đảm bảo mọi chức năng đều hoạt động.<br>Nếu chưa làm, vui lòng nâng cấp trình duyệt của bạn (lưu ý rằng việc nâng cấp Safari đòi hỏi phải nâng cấp hệ thống) hoặc sử dụng phiên bản Chrome mới nhất, là trình duyệt được khuyên dùng.<br>Ngoài ra, các phiên bản Windows 7 cũ được biết là có thể gây ra sự cố với chứng chỉ SSL. Vui lòng thử cập nhật Windows nếu trang web bị đánh dấu là \"không an toàn\".",
+			"bug": "Lỗi tạm thời",
+			"bugBody": "Vui lòng thử xóa dữ liệu bộ nhớ đệm của trình duyệt và tải lại ứng dụng để cập nhật BP Studio lên phiên bản mới nhất, phiên bản này có thể đã sửa lỗi, đặc biệt là trên Safari, nơi một lỗi đã biết trong cơ chế bộ nhớ đệm có thể khiến bạn thấy lỗi này.",
+			"reported": "Trong mọi trường hợp, lỗi đã được báo cáo cho tác giả, và tác giả sẽ cố gắng hết sức để khắc phục khi có thể.<br>Nếu không có cách nào ở trên giải quyết được vấn đề, vui lòng quay lại sau vài ngày để xem lỗi đã được khắc phục chưa. Tác giả xin lỗi vì sự bất tiện này.",
+			"report": "Bạn cũng có thể gửi issue trên {0} hoặc qua {1} để báo cáo sự cố này; vui lòng đính kèm thông tin chẩn đoán dưới đây."
+		},
+		"resource": {
+			"title": "Không thể tải một số tài nguyên cần thiết.",
+			"body": "Do đó, Box Pleating Studio không thể khởi động.<br>Có thể là do sự cố kết nối Internet và/hoặc thiếu tài nguyên trong bộ nhớ đệm. Vui lòng kiểm tra mạng và thử lại.",
+			"failed": "Tài nguyên không tải được:"
 		},
 		"inApp": "Có vẻ như bạn đang sử dụng trình duyệt trong ứng dụng. Tải xuống có thể không hoạt động.",
 		"dropzone": "Thả tệp vào đây để mở"

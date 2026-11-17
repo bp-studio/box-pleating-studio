@@ -87,13 +87,51 @@ export async function useRenderer(options: RendererOptions): Promise<Renderer> {
 	if(renderer) return renderer;
 	try {
 		return await createWebGL(options);
-	} catch {
+	} catch(e) {
 		// Neither WebGPU nor WebGL is available.
+		failures.push("WebGL: " + reason(e));
 		return errMgr.setCustomError(
 			i18n.t("message.webGL.title"),
-			i18n.t("message.webGL.body")
+			errorBody()
 		);
 	}
+}
+
+/** The reasons of the failed attempts, for diagnosis. */
+const failures: string[] = [];
+
+function reason(e: unknown): string {
+	const message = e instanceof Error ? e.message : String(e);
+	return message || "unknown error";
+}
+
+function escapeHTML(text: string): string {
+	return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/**
+ * The message shown when neither WebGPU nor WebGL is available. In particular,
+ * this happens when GPU acceleration is disabled or blocked in the browser.
+ */
+function errorBody(): string {
+	const tips = [
+		i18n.t("message.webGL.tips.accel"),
+		i18n.t("message.webGL.tips.gpuPage", [
+			"<code>chrome://gpu</code>",
+			"<code>about:support</code>",
+		]),
+		i18n.t("message.webGL.tips.linux"),
+		i18n.t("message.webGL.tips.driver"),
+	];
+	const diagnosis = [
+		"Build number: " + app_config.app_version,
+		navigator.userAgent,
+		...failures,
+	];
+	return i18n.t("message.webGL.body") +
+		`<ul class="mt-2">${tips.map(t => `<li>${t}</li>`).join("")}</ul>` +
+		`${i18n.t("message.webGL.diagnosis")}<br>` +
+		diagnosis.map(escapeHTML).join("<br>");
 }
 
 function create(
@@ -141,13 +179,25 @@ async function createWebGL(options: RendererOptions): Promise<Renderer> {
  * initialize, nor does it time out, so we handle these ourselves.
  */
 async function tryWebGPU(options: RendererOptions): Promise<Renderer | null> {
-	if(!("gpu" in navigator)) return null;
-	const attempt = create(options, "webgpu").catch(() => null);
+	if(!("gpu" in navigator)) {
+		failures.push("WebGPU: not supported");
+		return null;
+	}
+	let settled = false;
+	const attempt = create(options, "webgpu")
+		.catch((e: unknown) => {
+			failures.push("WebGPU: " + reason(e));
+			return null;
+		})
+		.finally(() => {
+			settled = true;
+		});
 	const timeout = new Promise<null>(resolve => {
 		setTimeout(() => resolve(null), WEBGPU_TIMEOUT);
 	});
 	const renderer = await Promise.race([attempt, timeout]);
 	if(!renderer) {
+		if(!settled) failures.push("WebGPU: timed out");
 		// Clean up if the attempt eventually succeeds after timeout.
 		attempt.then(r => r?.destroy());
 	}
