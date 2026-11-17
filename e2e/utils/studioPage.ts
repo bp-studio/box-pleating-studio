@@ -74,6 +74,11 @@ export class StudioPage {
 		return await this.page.evaluate(bp => bp.history.canUndo, bpHandle);
 	}
 
+	public async getCanRedo(): Promise<boolean> {
+		const bpHandle = await this.getHandle();
+		return await this.page.evaluate(bp => bp.history.canRedo, bpHandle);
+	}
+
 	public async nextTick(): Promise<void> {
 		const bpHandle = await this.getHandle();
 		await this.page.evaluate(bp => bp.nextTick(), bpHandle);

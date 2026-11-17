@@ -123,7 +123,7 @@ export namespace DragController {
 			const draggable = SelectionController.draggables.value[0];
 			const draggingDevice = draggable && draggable.type === "Device";
 			const manager = project.design.$batchUpdateManager;
-			manager.$updateComplete.then(() => {
+			project.$dragFinalized = manager.$updateComplete.then(() => {
 				project.$isDragging = false;
 				if(manager.$takeDraggedFlaps()) project.$core.layout.dragEnd();
 				if(draggingDevice) project.design.layout.$endDeviceDrag();

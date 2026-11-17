@@ -174,14 +174,17 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	public async $undo(): Promise<void> {
+		await this._settle();
 		if(this._moving) {
 			this._moveQueue.push(() => this.$undo());
 			return;
 		}
 		if(this.$canUndo) {
 			Analytics.undo();
+			// Set synchronously after the checking, so that other navigations
+			// will be queued.
+			this._moving = true;
 			await display.shield(async () => {
-				this._moving = true;
 				const result = await this._steps[--this._index.value].$undo();
 				if(result != OperationResult.Success) {
 					// If something goes wrong, the step in question and
@@ -196,14 +199,15 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	}
 
 	public async $redo(): Promise<void> {
+		await this._settle();
 		if(this._moving) {
 			this._moveQueue.push(() => this.$redo());
 			return;
 		}
 		if(this.$canRedo) {
 			Analytics.redo();
+			this._moving = true; // See $undo()
 			await display.shield(async () => {
-				this._moving = true;
 				const result = await this._steps[this._index.value++].$redo();
 				if(result != OperationResult.Success) {
 					// If something goes wrong, the step in question and
@@ -219,6 +223,22 @@ export default class HistoryManager implements ISerializable<JHistory> {
 	////////////////////////////////////////////////////////////////////////////
 	// Private methods
 	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Waits until the pending updates are completed (including the
+	 * finalization of dragging) before navigating.
+	 *
+	 * The commands of an update are enqueued when it is sent to the Core, but
+	 * they become a {@link Step} only when the Core returns. If we navigate in
+	 * between, the commands will be flushed as a new {@link Step} after the
+	 * navigation, which is not applied (and it also discards the redo
+	 * {@link Step}s). The construction and destruction from the Core will also
+	 * be ignored, as they're returned during the navigation.
+	 */
+	private async _settle(): Promise<void> {
+		await this._project.$dragFinalized;
+		await this._project.design.$batchUpdateManager.$updateComplete;
+	}
 
 	/**
 	 * Handles accumulating operations and gather them into a {@link Step}

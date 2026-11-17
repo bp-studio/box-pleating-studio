@@ -60,11 +60,13 @@ export const history = {
 	get canRedo() {
 		return getHistory()?.$canRedo ?? false;
 	},
+	// History navigation is ignored in the middle of dragging,
+	// just as most graphics editors do.
 	undo() {
-		getHistory()?.$undo();
+		if(!DragController.isDragging.value) getHistory()?.$undo();
 	},
 	redo() {
-		getHistory()?.$redo();
+		if(!DragController.isDragging.value) getHistory()?.$redo();
 	},
 	notify() {
 		getHistory()?.$notifySave();
