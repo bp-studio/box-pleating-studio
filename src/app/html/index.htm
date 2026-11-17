@@ -453,6 +453,9 @@
 			self.setCustomError = function(title, message) {
 				display("divWorkspace");
 				display("divSpinner");
+				// The app (which is SSG-rendered) must be hidden too,
+				// or it covers the message completely.
+				display("app");
 				display("resource", true).innerHTML = "<h3>" + title + '</h3><div class="mt-2">' + message + "</div>";
 				errShown = true;
 				// eslint-disable-next-line compat/compat
