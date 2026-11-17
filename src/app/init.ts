@@ -93,7 +93,12 @@ try {
 	}
 
 } catch(e: unknown) {
-	if(e instanceof Error) errMgr.setRunErr(e.message);
+	// An error shown or recorded earlier takes precedence; in particular,
+	// errMgr.setCustomError() throws an empty error after showing its message.
+	if(errMgr.ok()) {
+		console.error(e);
+		errMgr.setRunErr(describeError(e));
+	}
 } finally {
 	if(errMgr.callback()) { // Second checkpoint
 		setTimeout(() => {
@@ -108,6 +113,15 @@ try {
 	} else {
 		setTimeout(loadGA, TIME_GA);
 	}
+}
+
+/**
+ * The message of an error caught during the startup. It must not be empty,
+ * or errMgr will regard the startup as successful.
+ */
+function describeError(e: unknown): string {
+	if(e instanceof Error) return e.message || e.stack || e.name;
+	return String(e) || "Unknown error";
 }
 
 /**

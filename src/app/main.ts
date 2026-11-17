@@ -3,6 +3,7 @@ import "shared/polyfill/globalThis"; // For Safari < 12.1, used in Pixi, Vue
 import "shared/polyfill/eventTarget"; // For Safari < 14, used in Client
 import "shared/polyfill/flatMap"; // For Safari < 12, used in VueDraggable
 import "shared/polyfill/toReversed"; // Used in Client
+import "shared/polyfill/matchAll"; // For Safari < 13, used in Pixi
 import "shared/polyfill/withResolvers";
 import "shared/polyfill/scheduler";
 

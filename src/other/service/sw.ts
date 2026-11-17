@@ -13,6 +13,8 @@
  *    Although workbox-sw has its CDN, but that increases a lot of network
  *    requests, and it also downloads a lot more bytes.
  */
+import "../../shared/polyfill/allSettled"; // For Safari < 13, used in Workbox
+
 import { BroadcastUpdatePlugin } from "workbox-broadcast-update";
 import { PrecacheController, PrecacheRoute } from "workbox-precaching";
 import { setDefaultHandler, registerRoute } from "workbox-routing";

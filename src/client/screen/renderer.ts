@@ -90,6 +90,9 @@ export async function useRenderer(options: RendererOptions): Promise<Renderer> {
 	} catch(e) {
 		// Neither WebGPU nor WebGL is available.
 		failures.push("WebGL: " + reason(e));
+		if(!/bot|crawl|spider/i.test(navigator.userAgent)) {
+			gtag("event", "webgl_unavailable", gaErrorData(failures.join("; ")));
+		}
 		return errMgr.setCustomError(
 			i18n.t("message.webGL.title"),
 			errorBody()

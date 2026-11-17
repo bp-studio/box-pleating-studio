@@ -52,6 +52,31 @@ test.describe("GPU disabled", () => {
 			return Boolean(element?.closest("#resource"));
 		}, [box.x + box.width / 2, box.y + box.height / 2]);
 		expect(onTop).toBe(true);
+
+		// The error is reported to GA (gtag.js queues the events in dataLayer)
+		const reported = await page.evaluate(() =>
+			(window as unknown as { dataLayer: IArguments[] }).dataLayer
+				.some(args => args[0] == "event" && args[1] == "webgl_unavailable")
+		);
+		expect(reported).toBe(true);
+	});
+});
+
+test.describe("Startup error", () => {
+	test("Shows error message for errors without message", async ({ page }) => {
+		await page.addInitScript(() => {
+			// fixTouchAction() in app/init.ts calls this on #app
+			const getComputedStyle = window.getComputedStyle;
+			window.getComputedStyle = function(el, ...args) {
+				// eslint-disable-next-line no-throw-literal
+				if(el.id == "app") throw "";
+				return getComputedStyle(el, ...args);
+			};
+		});
+		await page.goto("/");
+		const locator = page.locator("#requirement");
+		await expect(locator.locator("h3")).toBeVisible();
+		await expect(locator).toContainText("Unknown error");
 	});
 });
 
